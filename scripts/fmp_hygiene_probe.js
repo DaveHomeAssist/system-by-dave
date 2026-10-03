@@ -56,6 +56,12 @@ const ALIASES = ['/fmp-walk', '/fmp-walk/', '/fmp/walk/', '/fmp-index/'];
 // /backfocus/ is an indexable public field guide; only FMP operational pages must stay noindex.
 const NOINDEX_PAGES = ['/fmp-index/'];
 const BROWSER_PAGES = [...MODEL_ROUTES, '/fmp/', '/fmpwalk/', '/fmp/rig/', '/fmp/guide/', '/fmp/camera/pit-center/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/'];
+// Pages that still scroll the document (WEB-2), recorded in docs/fmp-open-issues-plan-2.md E1. Remove a route
+// in the release that makes it fit; W8 warns on any other page that scrolls and on a listed page that now fits.
+const WEB2_DEBT = [
+  '/fmp/models/atem-hd8-iso.html', '/fmp/models/p240.html', '/fmp/models/ccu4.html', // 375×812 only
+  '/fmp/ptz/SuperJoy-G1-Interactive-Guide.html', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/' // both sizes
+];
 const LEGACY_ORIGINS = [/davehomeassist\.github\.io/i, /\.chatgpt\.site/i];
 // Hosts that answer automated requests with a bot challenge (403/429) but loaded in a real browser.
 // A challenged link is unverified by this run, so L3 reports grey rather than pass or warn; a 404,
@@ -176,12 +182,40 @@ async function checkRelease() {
   const pins = releasePins(provenance);
   record('P5', 'release', pins.status, 'Active releases share one export; frozen releases stay at their pin', pins.detail);
   try {
-    const compare = JSON.parse(execFileSync('gh', ['api', `repos/${CANONICAL_REPO}/compare/${commit}...main`, '--jq', '{ahead_by,behind_by,status}'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }));
+    const gh = args => execFileSync('gh', ['api', ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    const compare = JSON.parse(gh([`repos/${CANONICAL_REPO}/compare/${commit}...main`, '--jq', '{ahead_by,behind_by,status}']));
     const ahead = compare.ahead_by || 0;
-    record('P4', 'release', ahead ? 'warn' : 'pass', 'Released source commit is current with canonical main', ahead ? `${CANONICAL_REPO} main is ${ahead} commit(s) ahead of released ${commit.slice(0, 12)}` : `released ${commit.slice(0, 12)} is main`);
+    // A release cut from a PR head leaves main one merge commit ahead with the same files.
+    const trees = ahead ? { released: gh([`repos/${CANONICAL_REPO}/commits/${commit}`, '--jq', '.commit.tree.sha']), main: gh([`repos/${CANONICAL_REPO}/commits/main`, '--jq', '.commit.tree.sha']) } : {};
+    const verdict = releaseCurrency(commit, ahead, trees.released, trees.main);
+    record('P4', 'release', verdict.status, 'Released source commit is current with canonical main', verdict.detail);
   } catch {
     record('P4', 'release', 'grey', 'Released source commit is current with canonical main', `gh could not compare ${CANONICAL_REPO}; check access`);
   }
+}
+
+/** P4: main ahead of the released commit warns, unless main's files are identical (a merge commit only). */
+function releaseCurrency(commit, ahead, releasedTree, mainTree) {
+  const short = String(commit).slice(0, 12);
+  if (!ahead) return { status: 'pass', detail: `released ${short} is main` };
+  if (releasedTree && releasedTree === mainTree) return { status: 'pass', detail: `main is ${ahead} commit(s) ahead of released ${short} with identical files (tree ${String(mainTree).slice(0, 12)})` };
+  return { status: 'warn', detail: `${CANONICAL_REPO} main is ${ahead} commit(s) ahead of released ${short}` };
+}
+
+/** W8: document scroll (WEB-2) on any page outside WEB2_DEBT warns, and so does a listed page that now fits. */
+function pageScroll(pages, debt = WEB2_DEBT) {
+  const over = metrics => Boolean(metrics) && metrics.scrollHeight > metrics.clientHeight + 2;
+  const scrolling = pages.filter(page => over(page.desktop) || over(page.phone))
+    .map(page => ({ route: page.route, sizes: [over(page.desktop) && '1440×900', over(page.phone) && '375×812'].filter(Boolean) }));
+  const fresh = scrolling.filter(page => !debt.includes(page.route));
+  const known = scrolling.filter(page => debt.includes(page.route));
+  const fixed = debt.filter(route => pages.some(page => page.route === route) && !scrolling.some(page => page.route === route));
+  const list = items => items.map(page => `${page.route} (${page.sizes.join(', ')})`).join('; ');
+  const parts = [];
+  if (fresh.length) parts.push(`new page scroll: ${list(fresh)}`);
+  if (fixed.length) parts.push(`now fits, remove from WEB2_DEBT: ${fixed.join(', ')}`);
+  if (known.length) parts.push(`recorded debt: ${list(known)}`);
+  return { status: fresh.length || fixed.length ? 'warn' : 'pass', detail: parts.join(' · ') || `${pages.length} pages fit` };
 }
 
 /** P5: active releases ship from one export; a frozen release must not move off its pin. */
@@ -394,6 +428,7 @@ const PAGE_STATE = `(() => {
     h1: document.querySelectorAll('h1').length,
     skip: Boolean(skip), skipTarget: Boolean(target),
     overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 2,
+    scrollHeight: document.documentElement.scrollHeight, clientHeight: document.documentElement.clientHeight,
     smallControls: small.length,
     smallExamples: small.slice(0, 4).map(el => ((el.getAttribute('aria-label') || el.textContent || el.type || '').trim().replace(/\\s+/g, ' ').slice(0, 40)) + ' ' + Math.round(el.getBoundingClientRect().width) + 'x' + Math.round(el.getBoundingClientRect().height)),
     unnamed: controls.filter(el => !(el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') || el.textContent.trim() || el.title || (el.id && document.querySelector('label[for="' + CSS.escape(el.id) + '"]')) || el.closest('label'))).length,
@@ -430,9 +465,16 @@ async function auditPage(route, scheme) {
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
   await wait(600);
   const phone = await evaluate(cdp, PAGE_STATE);
+  // WEB-2 names 375×812 as its phone size; measure it once, in the light run.
+  let web2Phone = null;
+  if (scheme === 'light') {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });
+    await wait(600);
+    web2Phone = await evaluate(cdp, '({ scrollHeight: document.documentElement.scrollHeight, clientHeight: document.documentElement.clientHeight })');
+  }
   cdp.close();
   await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/close/${created.id}`).catch(() => {});
-  return { route, scheme, loadMs, desktop, phone, consoleIssues: unique(consoleIssues), failedRequests: unique(failedRequests) };
+  return { route, scheme, loadMs, desktop, phone, web2Phone, consoleIssues: unique(consoleIssues), failedRequests: unique(failedRequests) };
 }
 
 async function checkBrowser() {
@@ -496,6 +538,8 @@ async function checkBrowser() {
   record('W6', 'browser', theme.length ? 'warn' : 'pass', 'Theme control present and first visit defaults to light (WEB-1)', theme.join('; ') || 'all pages');
   const rig = light.find(page => page.route === '/fmp/rig/');
   if (rig) record('W7', 'browser', rig.desktop?.canvases ? 'pass' : 'fail', 'Rig explorer renders a 3D canvas', `${rig.desktop?.canvases ?? 0} canvas · load ${rig.loadMs}ms`);
+  const scroll = pageScroll(light.map(page => ({ route: page.route, desktop: page.desktop, phone: page.web2Phone })));
+  record('W8', 'browser', scroll.status, 'No page scroll at 1440×900 or 375×812 beyond the recorded WEB-2 debt', scroll.detail);
   return pages;
 }
 
@@ -542,4 +586,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { releasePins, classifyExternal, externalStatus, ACTIVE_RELEASES, FROZEN_RELEASES };
+module.exports = { releasePins, releaseCurrency, pageScroll, classifyExternal, externalStatus, ACTIVE_RELEASES, FROZEN_RELEASES, WEB2_DEBT };

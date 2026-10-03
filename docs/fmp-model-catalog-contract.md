@@ -147,8 +147,10 @@ the SuperJoy are generated from these catalogs (`npm run build:gear-from-fmp`;
 see `docs/gear-reference-contract.md`). `loadEquipmentCatalogs` in
 `scripts/fmp_model_contract.js` is the one loader for both this gate and that
 generator. `npm run verify:fmp` fails when a re-export changes a catalog without
-regenerating those sheets. Keep `component_id` stable: Gear Reference links each
-part to the interactive model at `#part=<component_id>`.
+regenerating those sheets. Keep `component_id` stable: the release gate and the
+explorers' own `#part=<component_id>` links depend on it. Since #202 the public
+Gear Reference sheets carry no FMP links; they use the catalogs for equipment
+identity and text only.
 
 ## Changing the vocabulary
 
