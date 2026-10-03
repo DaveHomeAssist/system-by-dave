@@ -72,6 +72,24 @@ describe("Displays and Projection", () => {
     expect(next.displays[0].routeId).toBe("");
     expect(JSON.parse(next.imports[0].raw).meta.showName).toBe("Different show");
   });
+  it("preserves configured project identity on first imports, including empty sheets", async () => {
+    for (const records of [[], [{ display: "Main screen" }]]) {
+      const raw = JSON.stringify({ schema: "system-by-dave.display-plan.v1", meta: { showName: "Source show", venue: "Source venue", videoLead: "Source lead" }, items: records });
+      const preview = await previewImport(raw, "sheet");
+      for (const configured of [{ ...emptyDocument(), title: "Configured show" }, { ...emptyDocument(), meta: { venue: "Chosen venue", videoLead: "Chosen lead" } }]) {
+        const next = applyImport(configured, preview);
+        expect(next.title).toBe(configured.title);
+        expect(next.meta).toEqual(configured.meta);
+        expect(next.imports[0].raw).toBe(raw);
+      }
+    }
+  });
+  it("does not rename a blank plan when importing an empty sheet", async () => {
+    const doc = emptyDocument();
+    const preview = await previewImport('{"schema":"system-by-dave.projection-plan.v1","items":[],"meta":{"showName":"Empty source"}}', "empty");
+    const next = applyImport(doc, preview);
+    expect(next.title).toBe(doc.title); expect(next.meta).toEqual({});
+  });
   it("exports all fields as quoted CSV and neutralizes spreadsheet formulas", () => {
     const csv = displaysCsv([{ ...newDisplay("projection"), screen: '=HYPERLINK("bad")', notes: 'a,b\nc' }]);
     expect(csv).toContain('"\'=HYPERLINK(""bad"")"');
