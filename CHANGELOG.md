@@ -7,6 +7,13 @@
 - Give LED Wall Calculator bounded subject pages, persistent dimensions/raster/power/count/mass, and an explicit View option on short screens. Preserve profiles, calculations, warning semantics and cabinet inspection.
 - Prepare direct planner and LED visits through the existing shared worker; require current cache assets before readiness. Add touch-enabled orientation/theme, focus, onboarding and offline regression gates. Physical-device acceptance and the remaining suite migration stay open.
 
+## 2026-10-03 — Cheesesteak interaction feedback
+
+- Publish canonical source `7deb5a9` with tactile press and hover states, immediate random selection, honest saved-preference confirmations, accessible success/error messages, and share links that retain the `/cheesesteaks/` base path.
+- Keep all motion below 200ms: 80ms press, 120ms hover/release, 160ms state/confirmation, and 180ms error/boundary settlement. Map dragging has gentle boundary resistance, integer zoom snapping, and no inertial coast. Remove decorative loops and respect reduced motion.
+- Keep the shop feed and informational articles within bounded scrolling panels with visible navigation. Verify light/dark themes at desktop, 680px, phone, and ultrawide widths, plus saved-shop/share round trips and reduced-motion errors. Preserve noindex routes and the existing snapshot data.
+- The canonical source includes the interaction-to-feedback mapping and timing/easing specs in `docs/INTERACTIONS.md`; the artifact remains managed by `sync:cheesesteaks`.
+
 ## 2026-10-03 — Cheesesteak About copy
 
 - Publish the About page through the canonical sync from `DaveHomeAssist/philly-cheesesteak-heatmap` source `e7c6814`: real OpenStreetMap shops, saved Reddit discussion, dataset-derived shop count and date, and explicit missing ratings/search volume. Record the source revision in `cheesesteaks/SOURCE.txt` and omit nested 404 routes.
