@@ -103,12 +103,14 @@ try{
   }
   if(tool==='led')await page.locator('[data-led-jump=ledLayoutSection]').tap();
   const active=page.locator(tool==='stage'?'#measuredDistance':'#ledCabinetsWide');
-  await active.focus();await page.setViewportSize({width:390,height:400});await page.waitForTimeout(150);
+  await active.focus();await page.setViewportSize({width:390,height:400});
+  await page.waitForFunction(()=>document.documentElement.style.getPropertyValue('--av-available-height')===`${visualViewport.height}px`);
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   const reducedHeight=await page.evaluate(()=>{
    const inside=(e,b)=>{const r=e.getBoundingClientRect();return r.left>=b.left-1&&r.right<=b.right+1&&r.top>=b.top-1&&r.bottom<=b.bottom+1;};
    const active=document.activeElement,win=active.closest('.av-paged').querySelector('.av-page-window').getBoundingClientRect();
    const results=[...document.querySelectorAll('#ledResultStrip strong,#hDist')];
-   return {ok:inside(active,win)&&(!active.labels?.[0]||inside(active.labels[0],win))&&results.every(e=>inside(e,e.closest('#ledResultStrip')?.getBoundingClientRect()||{left:0,top:0,right:innerWidth,bottom:innerHeight})),id:active.id,input:active.getBoundingClientRect().toJSON(),label:active.labels?.[0]?.getBoundingClientRect().toJSON(),win:win.toJSON()};
+   return {ok:inside(active,win)&&(!active.labels?.[0]||inside(active.labels[0],win))&&results.every(e=>inside(e,e.closest('#ledResultStrip')?.getBoundingClientRect()||{left:0,top:0,right:innerWidth,bottom:innerHeight})),results:results.map(e=>({id:e.id,text:e.textContent,rect:e.getBoundingClientRect().toJSON(),strip:e.closest('#ledResultStrip')?.getBoundingClientRect().toJSON()})),id:active.id,input:active.getBoundingClientRect().toJSON(),label:active.labels?.[0]?.getBoundingClientRect().toJSON(),win:win.toJSON()};
   });
   assert.ok(reducedHeight.ok,`${tool} reduced-height input, label and results remain visible: ${JSON.stringify(reducedHeight)}`);
   await page.setViewportSize({width:390,height:844});
