@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-03 — AV Video Displays & Projection
+
+- Added an optional Displays workspace with display and projection details, explicit stable route links, trace-to-canvas navigation, missing-link checks and separate operator statuses.
+- Added lossless, previewed Display Plan / Projection Plan imports, original-source export, destination CSV, old-backup defaults, undo and hidden-module retention. Legacy pages and specialist planners remain independently available.
+- Added unit and release browser coverage for import preservation, linked-route deletion, save/reload, disabled modules, export/restore, desktop/phone themes and offline destination editing. Physical operator acceptance remains separate.
+
 ## 2026-10-03 — AV bounded workspace foundation
 
 - Add shared safe-area, touch, input and available-viewport tokens with reproducible inline consumers. Preserve the specialist themes and standalone planner architecture.
