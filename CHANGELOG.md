@@ -5,6 +5,7 @@
 - Preserve a plan's entered title and metadata when its first legacy routes or destinations are imported. Only a pristine default plan with incoming records adopts source metadata; empty imports never rename the plan. Original source metadata remains in Export original.
 - Add unit and browser regression coverage for a configured, saved plan with no existing records.
 
+
 ## 2026-10-03 — AV Video Displays & Projection
 
 - Added an optional Displays workspace with display and projection details, explicit stable route links, trace-to-canvas navigation, missing-link checks and separate operator statuses.
@@ -17,6 +18,11 @@
 - Keep Throwline Stage 3D results visible above the canvas and page its existing control nodes. Fit Quick Start to phone landscape and preserve scene intents, field evidence, explicit saves, renderer and export behavior.
 - Give LED Wall Calculator bounded subject pages, persistent dimensions/raster/power/count/mass, and an explicit View option on short screens. Preserve profiles, calculations, warning semantics and cabinet inspection.
 - Prepare direct planner and LED visits through the existing shared worker; require current cache assets before readiness. Add touch-enabled orientation/theme, focus, onboarding and offline regression gates. Physical-device acceptance and the remaining suite migration stay open.
+
+## 2026-10-03 — Preserve Throwline range readouts
+
+- Move the existing wide/tele throw distances into bounded Facts alongside detailed ratio fit, preserving access after compacting the persistent set-mark banner. Add a visibility regression and roll the shared offline cache.
+
 
 ## 2026-10-03 — Cheesesteak interaction feedback
 
