@@ -1,6 +1,6 @@
 # AV Suite Doorway Contract
 
-**Implemented 2026-10-02:** neutral first visits now open Toolbox automatically; explicit routes, show context and a deliberately saved entry preference still take precedence. Toolbox features [AV Video](../av-video/), which combines Signal Flow and Video Patch. Their individual registry records and legacy URLs remain compatible, while their Toolbox cards resolve to the combined application. The [Video workflow contract](av-video.md) describes the shipped slice. This implementation supersedes older chooser-first behavior described in the historical sections below.
+**Implemented 2026-10-02:** neutral first visits now open Toolbox automatically; explicit routes, show context and a deliberately saved entry preference still take precedence. Toolbox features [AV Video](../av-video/), which combines Signal Flow and Video Patch. Their individual registry records and legacy URLs remain compatible, while their Toolbox cards resolve to the combined application. The [Video workflow contract](av-video.md) describes the shipped slice. Fresh visits no longer show the chooser. Returning visits can still follow a saved Show Console preference; closing that gap is part of Stage 1 of the maintained plan.
 
 `av-suite.html` is the stable AV by Dave route. It exposes two distinct,
 addressable workspaces without duplicating the route or the canonical tool
@@ -16,7 +16,7 @@ registry. The AV domain root `/` is a landing page with direct links to both.
 - A URL containing any supported `sbd*` show parameter always opens Show
   Console, even when `entry=toolbox` is also present.
 - A neutral URL uses the saved entry preference when one exists. A true first
-  visit presents two native-button choices and stores the selected preference.
+  visit opens Toolbox without a chooser. The chooser remains available as an explicit navigation action.
 - Doorway navigation uses `history.pushState`; Back and Forward restore the
   entry represented by the URL.
 
@@ -110,7 +110,7 @@ transform transitions. Repeated transitions kill in-flight tweens before
 starting a new sequence. `prefers-reduced-motion: reduce` bypasses animation and
 renders the final state immediately.
 
-The first-visit chooser uses native buttons, moves focus into the dialog, traps
+The explicitly opened chooser uses native buttons, moves focus into the dialog, traps
 Tab while open, restores the background inert state, and supports native Enter
 activation. The doorway and Toolbox are release-probed at 390, 680, and 1280
 pixels for page overflow and unreachable clipped controls.
@@ -120,8 +120,7 @@ pixels for page overflow and unreachable clipped controls.
 The entries and persistence behavior above describe the current implementation.
 The [maintained consolidation plan](av-suite-consolidation-spec.md), revised by
 Dave on 2026-10-01, sets **Toolbox as the default entrance** to focused applications
-with a shared experience and optional modules. It supersedes the first-visit
-chooser and saved-entry fallback for neutral visits when implemented; explicit
+with a shared experience and optional modules. The fresh-visit chooser has been removed from the default path. The saved-entry fallback for neutral returning visits still needs to be removed; explicit
 Show Console and supported legacy show-context routes retain compatibility.
 
 Video must be directly launchable without Workbook. Workbook is to be removed
@@ -129,5 +128,4 @@ from public promotion, launch surfaces and the public editor artifact. Dave
 clarified on 2026-10-02 that no Workbook recovery notice, dedicated export flow,
 transition period or migration project is required; former entry URLs can return
 to Toolbox. Its concept/source remains for a possible future redesign. These are
-settled target decisions. This document still describes the live chooser and Workbook grouping above so a plan revision
-is not mistaken for a shipped interface change.
+settled target decisions. This document distinguishes the shipped fresh-visit default from the remaining returning-preference and Workbook-withdrawal work.
