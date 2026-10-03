@@ -128,6 +128,7 @@
     './js/responsive-tables.js',
     './js/av-domain-views.js',
     './js/av-calculator.js',
+    './js/led-workspace.js',
     './js/led-wall-viewer.js',
     './data/led-cabinet-catalog.v1.json',
     './js/vendor/gsap.min.js',
@@ -244,7 +245,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261002-led-wall-edge-cases',
+    version:'v20261003-av-workspace',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

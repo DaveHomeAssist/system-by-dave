@@ -1624,17 +1624,7 @@
     const jumpButtons = document.querySelectorAll('[data-led-jump]');
     jumpButtons.forEach(button => {
       button.addEventListener('click', () => {
-        const target = document.getElementById(button.dataset.ledJump);
-        if (target.classList.contains('led-module')) setLedPanelExpanded(target, true);
-        const suite = els.ledWallPreview.closest('.led-suite');
-        const sectionNav = suite.querySelector('.led-section-nav');
-        const header = suite.querySelector('.led-suite-head');
-        const clearance = getComputedStyle(sectionNav).display === 'none' ? header.offsetHeight : sectionNav.offsetHeight;
-        const top = target.getBoundingClientRect().top - suite.getBoundingClientRect().top + suite.scrollTop - clearance - 8;
-        suite.scrollTo({ top, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-        target.focus({ preventScroll: true });
-        jumpButtons.forEach(item => item.removeAttribute('aria-current'));
-        button.setAttribute('aria-current', 'location');
+        els.ledWallPreview.closest('.led-suite').dispatchEvent(new CustomEvent('led-section-request', {detail:{id:button.dataset.ledJump}}));
       });
     });
     window.addEventListener('pagehide', () => { if (previewMotion) previewMotion.kill(); }, { once: true });

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-03 — AV bounded workspace foundation
+
+- Add shared safe-area, touch, input and available-viewport tokens with reproducible inline consumers. Preserve the specialist themes and standalone planner architecture.
+- Keep Throwline Stage 3D results visible above the canvas and page its existing control nodes. Fit Quick Start to phone landscape and preserve scene intents, field evidence, explicit saves, renderer and export behavior.
+- Give LED Wall Calculator bounded subject pages, persistent dimensions/raster/power/count/mass, and an explicit View option on short screens. Preserve profiles, calculations, warning semantics and cabinet inspection.
+- Prepare direct planner and LED visits through the existing shared worker; require current cache assets before readiness. Add touch-enabled orientation/theme, focus, onboarding and offline regression gates. Physical-device acceptance and the remaining suite migration stay open.
+
 ## 2026-10-03 — Cheesesteak interaction feedback
 
 - Publish canonical source `7deb5a9` with tactile press and hover states, immediate random selection, honest saved-preference confirmations, accessible success/error messages, and share links that retain the `/cheesesteaks/` base path.
