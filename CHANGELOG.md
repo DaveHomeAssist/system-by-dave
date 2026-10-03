@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-03 — Cheesesteak About copy
+
+- Publish the About page through the canonical sync from `DaveHomeAssist/philly-cheesesteak-heatmap` source `e7c6814`: real OpenStreetMap shops, saved Reddit discussion, dataset-derived shop count and date, and explicit missing ratings/search volume. Record the source revision in `cheesesteaks/SOURCE.txt` and omit nested 404 routes.
+- Replace the fictional-demo disclaimer and unavailable correction-form instructions in the static edition with accurate snapshot copy and Dave's existing public contact route. Preserve distinct demo/live copy, privacy details, and photo credits in source; server builds choose their wording at request time.
+- Keep the About document inside a bounded scrolling panel with visible navigation and theme controls. Verify desktop, 680px, phone, and ultrawide layouts with the existing reduced-motion skyline. The route remains noindex and outside the sitemap.
+- Include informational content directly in exported HTML so About stays readable with JavaScript disabled.
+- Resolve existing release-check failures: preserve dialog focus during report submission and wrap keyboard focus at dialog edges, improve the comparison label contrast in both themes, and correct test-only Next request setup and select locators.
+
 ## 2026-10-02 — Signal flow canvas clarity
 
 - Route cables around device cards in the interactive diagram and SVG export; retain visible direction arrows, compact transport labels and automatic selected-route emphasis.
