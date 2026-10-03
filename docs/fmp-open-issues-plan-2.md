@@ -67,7 +67,7 @@ aviewfrommyseat bot challenge accepted in A7) and 1 warning (P4, which is D1).
 ## Order and verification
 
 1. Let Phase B finish first (fmp-suite #54 and its release); it moves the walk and the release pin.
-2. One fmp-suite PR for D3 and D4, and one system-by-dave PR for D1, D2, D4, D5 and D9. Then re-export and run `npm run verify:fmp`, `npm run test:domain-cutover` and, after deploy, `npm run hygiene:fmp`. The probe should be Green apart from L3 grey and the W8 debt list.
+2. One fmp-suite PR for D3 and D4, and one system-by-dave PR for D1, D2, D4, D5 and D9. Then re-export and run `npm run verify:fmp`, `npm run test:domain-cutover` and, after deploy, `npm run hygiene:fmp`. Expect Grey, not Green: the probe's light is Grey while any check is grey, and L3 stays grey behind the bot challenge. Every other check should pass, and W8 should list only the E1 debt pages.
 3. D6–D8 housekeeping, then C6 and C1 as Dave's time allows; the agent rechecks the preflight after C6.
 4. Each E item gets its own pull request with a browser check. E1 work starts with the page being changed.
 5. Phase C items stay here until Dave records a date.
