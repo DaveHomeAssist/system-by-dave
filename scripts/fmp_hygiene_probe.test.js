@@ -7,7 +7,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { releasePins, classifyExternal, externalStatus, ACTIVE_RELEASES, FROZEN_RELEASES } = require('./fmp_hygiene_probe');
+const { releasePins, releaseCurrency, pageScroll, classifyExternal, externalStatus, ACTIVE_RELEASES, FROZEN_RELEASES, WEB2_DEBT } = require('./fmp_hygiene_probe');
 
 const root = path.resolve(__dirname, '..');
 const provenanceOf = dir => JSON.parse(fs.readFileSync(path.join(root, dir, 'source_provenance.json'), 'utf8'));
@@ -55,4 +55,33 @@ test('L3 reports a bot challenge from a browser-checked host as unverified, neve
   assert.equal(classifyExternal('https://example.com/', 403), 'broken', 'only browser-checked hosts get the exception');
   assert.equal(classifyExternal('https://example.com/', 0), 'broken');
   assert.equal(classifyExternal('https://example.com/', 200), 'ok');
+});
+
+test('P4 passes when main is only a merge commit with the released files, and warns on real drift', () => {
+  const sha = '20d23c6c88c2'.padEnd(40, '0');
+  assert.equal(releaseCurrency(sha, 0).status, 'pass');
+  const merged = releaseCurrency(sha, 1, 'tree-a', 'tree-a');
+  assert.equal(merged.status, 'pass');
+  assert.match(merged.detail, /1 commit\(s\) ahead of released 20d23c6c88c2 with identical files/);
+  const drift = releaseCurrency(sha, 2, 'tree-a', 'tree-b');
+  assert.equal(drift.status, 'warn');
+  assert.match(drift.detail, /main is 2 commit\(s\) ahead of released 20d23c6c88c2$/);
+  assert.equal(releaseCurrency(sha, 1, undefined, undefined).status, 'warn', 'missing trees never pass');
+});
+
+test('W8 warns on new page scroll and on a recorded page that now fits, not on recorded debt', () => {
+  const fits = { scrollHeight: 900, clientHeight: 900 };
+  const tall = { scrollHeight: 1700, clientHeight: 900 };
+  const debt = ['/fmp/gear/', '/fmp/ptz/'];
+  const known = pageScroll([{ route: '/fmp/', desktop: fits, phone: fits }, { route: '/fmp/gear/', desktop: tall, phone: tall }, { route: '/fmp/ptz/', desktop: fits, phone: tall }], debt);
+  assert.equal(known.status, 'pass');
+  assert.match(known.detail, /recorded debt: \/fmp\/gear\/ \(1440×900, 375×812\); \/fmp\/ptz\/ \(375×812\)/);
+  const fresh = pageScroll([{ route: '/fmpwalk/', desktop: fits, phone: tall }, { route: '/fmp/gear/', desktop: tall, phone: tall }, { route: '/fmp/ptz/', desktop: tall, phone: tall }], debt);
+  assert.equal(fresh.status, 'warn');
+  assert.match(fresh.detail, /new page scroll: \/fmpwalk\/ \(375×812\)/);
+  const fixed = pageScroll([{ route: '/fmp/gear/', desktop: fits, phone: fits }, { route: '/fmp/ptz/', desktop: tall, phone: tall }], debt);
+  assert.equal(fixed.status, 'warn');
+  assert.match(fixed.detail, /now fits, remove from WEB2_DEBT: \/fmp\/gear\//);
+  assert.equal(pageScroll([{ route: '/fmp/', desktop: fits, phone: null }], []).status, 'pass', 'a missing phone measurement is not scroll');
+  assert.ok(Array.isArray(WEB2_DEBT));
 });
