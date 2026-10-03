@@ -4,10 +4,20 @@
 
 Signal Flow is an interactive device-and-connection canvas backed by the same routes as Video Patch. Create or edit a route in either view: source, destination, processor, format, connector, input, converter, status, backup and notes stay together. Checks show missing fields and reported issues without changing the operator's status or claiming that a physical signal has been tested. No show setup or Workbook is required.
 
+## Canvas clarity
+
+Cables use orthogonal obstacle routing in both the canvas and exported SVG. They route around devices, including after dragging; enclosed ports show an Arrange warning instead of a false connection through overlapping equipment. Arrowheads stop before the target port so the device cannot cover them. HDMI is dashed and SDI is solid; compact connector labels and accessible full signal descriptions replace repeated long cable labels. The selected route shows its source format once above the canvas; different explicit formats can label individual cables when there is room.
+
+Source format and connector describe the first cable only. Patch details provide explicit converter and processor output port, connector and format, plus destination input. Missing output details stay unknown: the device name does not prove conversion behavior. Older backups load with blank output fields, preserving existing route values and original imports. The sample names switcher outputs AUX 1 and AUX 2, and connects recorder/encoder routes to the shared switcher.
+
+A reported issue belongs to a route, not every device on it. Its path stays red when selected, and one clickable banner states the affected device count and that the failed step is unconfirmed. It opens Checks. Operator statuses such as tested are preserved and labelled as operator reports, never live telemetry. Record tester, time and scope in Operator notes; no test provenance is invented.
+
+The desktop header includes plan identity and the canvas toolbar includes route controls. New-port handles appear on hover, keyboard focus, selection and touch devices; keyboard connection remains available in device details.
+
 ## Working with a plan
 
 - Add devices or try the sample. Drag equipment to arrange it and connect an output port to an input. A keyboard alternative is available in the selected device panel. Both actions create real editable routes in Patch. New equipment avoids overlap with an existing saved layout.
-- Select a cable or a route to trace its path. Shared devices appear once, with incoming feeds and branching outputs. Zoom, pan, Fit View and the optional overview let you navigate larger systems. Double-click a device to rename it across all connected routes; use **Edit route** for a single route.
+- The selected route highlights immediately; **All routes** clears the highlight. Select a cable or a route to trace its path. Shared devices appear once, with incoming feeds and branching outputs. Zoom, pan, Fit View and the optional overview let you navigate larger systems. Double-click a device to rename it across all connected routes; use **Edit route** for a single route.
 - **Export diagram** downloads a standalone SVG for handoff. Save and JSON export retain both routing data and equipment positions. On a phone, **Back to diagram** returns from the editor to the canvas.
 - Switch between **Signal flow** and **Patch** to see the same data in different views. **Checks** opens routes needing attention.
 - Use **Project** to name the plan, enter optional venue/lead details, and turn patch, checks or backup modules off. Disabled controls and search fields disappear; their data stays in a full export. Patch checks run only when the patch module is enabled. These preferences belong to the saved plan.

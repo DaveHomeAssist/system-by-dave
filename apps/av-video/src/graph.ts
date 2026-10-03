@@ -1,7 +1,8 @@
+import { orthogonalPath } from "./routing";
 import { DeviceKind, newRoute, Route, uid, VideoDocument } from "./model";
 
 export type Device = { id: string; label: string; kind: DeviceKind; position: { x: number; y: number }; routes: string[]; inputs: number; outputs: number; issue: boolean };
-export type Wire = { id: string; source: string; target: string; routes: string[]; label: string; sourcePort: string; targetPort: string; issue: boolean };
+export type Wire = { id: string; source: string; target: string; routes: string[]; label: string; connector: string; format: string; sourcePort: string; targetPort: string; issue: boolean };
 export const deviceId = (label: string) => `device:${encodeURIComponent(label)}`;
 export const deviceHeight = (d: Device) => 76 + Math.max(d.inputs, d.outputs, 1) * 26;
 const fields = ["source", "converter", "processor", "destination"] as const;
@@ -15,7 +16,7 @@ export function buildGraph(doc: VideoDocument): { devices: Device[]; wires: Wire
     const n = nodes.get(id)!;
     const set = roles.get(id) || new Set<DeviceKind>(); set.add(kind); roles.set(id, set);
     if (route && !n.routes.includes(route.id)) n.routes.push(route.id);
-    if (route?.status === "issue") n.issue = true;
+    // A reported route issue does not identify a failed device.
     return id;
   }
   doc.graphDevices.forEach(d => node(d.label, d.kind));
@@ -27,11 +28,17 @@ export function buildGraph(doc: VideoDocument): { devices: Device[]; wires: Wire
     for (let i = 0; i < hops.length - 1; i++) {
       const source = hops[i], target = hops[i + 1];
       if (source === target) continue;
-      const sourcePort = doc.modules.patch && i === 0 ? route.output : "";
-      const targetPort = doc.modules.patch && (route.processor ? target === deviceId(route.processor) : i === hops.length - 2) ? route.input : "";
+      const atConverter = doc.modules.patch && route.converter && source === deviceId(route.converter);
+      const atProcessor = route.processor && source === deviceId(route.processor);
+      const sourcePort = !doc.modules.patch ? "" : atConverter ? route.converterOutput : atProcessor ? route.processorOutput : route.output;
+      const targetPort = !doc.modules.patch ? "" : route.processor && target === deviceId(route.processor) ? route.input : i === hops.length - 2 ? (route.processor ? route.destinationInput : route.input) : "";
+      // Never infer a converter or processor output from the upstream cable.
+      const connector = atConverter ? route.converterConnector : atProcessor ? route.processorConnector : route.connector;
+      const format = atConverter ? route.converterFormat : atProcessor ? route.processorFormat : route.format;
       const id = `wire:${encodeURIComponent(JSON.stringify([source, target, sourcePort, targetPort]))}`;
-      const label = [route.connector, route.format].filter(Boolean).join(" · ");
-      if (!wires.has(id)) wires.set(id, { id, source, target, routes: [], label, sourcePort, targetPort, issue: false });
+      const label = [connector || "Connector unknown", format || "Format unknown"].join(" · ");
+      if (!wires.has(id)) wires.set(id, { id, source, target, routes: [], label, connector, format, sourcePort, targetPort, issue: false });
+      else if (wires.get(id)!.label !== label) { wires.get(id)!.label = "Conflicting route signal details"; wires.get(id)!.connector = ""; wires.get(id)!.format = ""; }
       const wire = wires.get(id)!; wire.routes.push(route.id); wire.issue ||= route.status === "issue";
     }
   }
@@ -101,9 +108,9 @@ export function diagramSvg(doc: VideoDocument): string {
   const lines = wires.map(w => {
     const a = devices.find(d => d.id === w.source)!, b = devices.find(d => d.id === w.target)!;
     const x1 = a.position.x + 240, y1 = a.position.y + 63 + wires.filter(edge => edge.source === a.id).indexOf(w) * 26;
-    const x2 = b.position.x, y2 = b.position.y + 63 + wires.filter(edge => edge.target === b.id).indexOf(w) * 26;
-    const bend = Math.max(65, Math.abs(x2 - x1) / 2);
-    return `<path d="M${x1} ${y1} C${x1 + bend} ${y1} ${x2 - bend} ${y2} ${x2} ${y2}" fill="none" stroke="${w.issue ? "#9a392d" : "#526574"}" stroke-width="2" marker-end="url(#arrow)"/><text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 9}" text-anchor="middle" font-size="10">${escape(w.label)}</text>`;
+    const x2 = b.position.x - 8, y2 = b.position.y + 63 + wires.filter(edge => edge.target === b.id).indexOf(w) * 26;
+    const routed = orthogonalPath({ x: x1, y: y1 }, { x: x2, y: y2 }, devices.map(d => ({ x: d.position.x, y: d.position.y, width: 240, height: deviceHeight(d) })));
+    return `<g><title>${escape(w.label)}</title><path d="${routed.path}" fill="none" stroke="${w.issue ? "#9a392d" : "#526574"}" stroke-width="2" ${routed.blocked ? "" : 'marker-end="url(#arrow)"'}/>${routed.blocked ? `<text x="${x1 + 24}" y="${y1 - 9}" font-size="10">Arrange overlapping devices</text>` : ""}${routed.label && routed.label.width > w.connector.length * 7 + 16 ? `<text x="${routed.label.x}" y="${routed.label.y - 9}" text-anchor="middle" font-size="10">${escape(w.connector || "?")}</text>` : ""}</g>`;
   }).join("");
   const boxes = devices.map(n => {
     const ports = (side: "input" | "output") => wires.filter(w => side === "input" ? w.target === n.id : w.source === n.id).map((w, i) => {

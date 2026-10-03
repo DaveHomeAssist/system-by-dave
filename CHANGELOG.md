@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-02 — Signal flow canvas clarity
+
+- Route cables around device cards in the interactive diagram and SVG export; retain visible direction arrows, compact transport labels and automatic selected-route emphasis.
+- Add explicit converter/processor output signal details with backward-compatible blank defaults; never copy HDMI or format claims past an unspecified conversion. Keep the sample recorder connected to the shared switcher.
+- Replace repeated device fault badges with one route issue banner linked to Checks; distinguish operator-reported status from physical verification. Compact desktop chrome and reveal unused ports when relevant.
+
+
 ## 2026-10-02 — Anchored video menus
 
 - Render format and connector menus inside AV Video so embedded browsers cannot place their native popup on another monitor. Keep options within the page viewport with keyboard selection, cancellation and typeahead.
