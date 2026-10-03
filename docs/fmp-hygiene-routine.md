@@ -106,7 +106,7 @@ check. Add `--strict` to exit non-zero on any failure.
 | W5 | Phone controls at least 44px | Gloved and one-handed use |
 | W6 | Theme control present, and the first visit defaults to light | `WEB-1` in the workspace rules |
 | W7 | The rig explorer renders a 3D canvas | Three.js runtime is intact |
-| W8 | No page scroll at 1440×900 or 375×812 outside the recorded `WEB2_DEBT` list; a listed page that now fits also warns | `WEB-2` in the workspace rules; keeps the debt list honest |
+| W8 | No page scroll at 1440×900 or 375×812 on any published route outside the recorded `WEB2_DEBT` list; a listed page that now fits also warns | `WEB-2` in the workspace rules; keeps the debt list honest |
 
 ### Manual website checks (weekly)
 

@@ -477,6 +477,27 @@ async function auditPage(route, scheme) {
   return { route, scheme, loadMs, desktop, phone, web2Phone, consoleIssues: unique(consoleIssues), failedRequests: unique(failedRequests) };
 }
 
+/** W8 only: document scroll at 1440×900 and 375×812 for a published route the full audit does not load. */
+async function scrollAudit(route) {
+  const created = await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/new?about:blank`, { method: 'PUT' }).then(res => res.json());
+  const cdp = new CDP(created.webSocketDebuggerUrl);
+  await cdp.open();
+  await Promise.all(['Page.enable', 'Runtime.enable'].map(method => cdp.send(method)));
+  await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }, { name: 'prefers-reduced-motion', value: 'reduce' }] });
+  await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+  await cdp.send('Page.navigate', { url: baseFor(route) + route });
+  for (let i = 0; i < 60 && (await evaluate(cdp, 'document.readyState')) !== 'complete'; i += 1) await wait(250);
+  await wait(1500);
+  const metrics = '({ scrollHeight: document.documentElement.scrollHeight, clientHeight: document.documentElement.clientHeight })';
+  const desktop = await evaluate(cdp, metrics);
+  await cdp.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 2, mobile: true });
+  await wait(600);
+  const phone = await evaluate(cdp, metrics);
+  cdp.close();
+  await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/close/${created.id}`).catch(() => {});
+  return { route, desktop, phone };
+}
+
 async function checkBrowser() {
   if (flag('skip-browser') || !fs.existsSync(CHROME)) {
     record('W0', 'browser', 'grey', 'Rendered browser checks', flag('skip-browser') ? 'skipped by --skip-browser' : `Chrome not found at ${CHROME}`);
@@ -489,6 +510,7 @@ async function checkBrowser() {
     '--disable-extensions', '--disable-background-networking', `--remote-debugging-port=${DEBUG_PORT}`, `--user-data-dir=${profile}`, 'about:blank'
   ], { stdio: 'ignore' });
   const pages = [];
+  const scrollOnly = [];
   try {
     for (let i = 0; i < 80; i += 1) {
       if (await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/version`).then(res => res.ok, () => false)) break;
@@ -498,6 +520,8 @@ async function checkBrowser() {
       pages.push(await auditPage(route, 'light'));
       pages.push(await auditPage(route, 'dark'));
     }
+    // W8 covers every published route, including the ones the full audit above does not load.
+    for (const route of ROUTES.filter(route => !BROWSER_PAGES.includes(route))) scrollOnly.push(await scrollAudit(route));
   } finally {
     chrome.kill('SIGTERM');
     await wait(500);
@@ -538,7 +562,7 @@ async function checkBrowser() {
   record('W6', 'browser', theme.length ? 'warn' : 'pass', 'Theme control present and first visit defaults to light (WEB-1)', theme.join('; ') || 'all pages');
   const rig = light.find(page => page.route === '/fmp/rig/');
   if (rig) record('W7', 'browser', rig.desktop?.canvases ? 'pass' : 'fail', 'Rig explorer renders a 3D canvas', `${rig.desktop?.canvases ?? 0} canvas · load ${rig.loadMs}ms`);
-  const scroll = pageScroll(light.map(page => ({ route: page.route, desktop: page.desktop, phone: page.web2Phone })));
+  const scroll = pageScroll([...light.map(page => ({ route: page.route, desktop: page.desktop, phone: page.web2Phone })), ...scrollOnly]);
   record('W8', 'browser', scroll.status, 'No page scroll at 1440×900 or 375×812 beyond the recorded WEB-2 debt', scroll.detail);
   return pages;
 }
