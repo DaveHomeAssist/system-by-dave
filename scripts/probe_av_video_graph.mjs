@@ -69,7 +69,37 @@ try {
   assert.equal(await node('Production switcher').count(), 1);
   assert.equal(await page.locator('.react-flow__node').count(), 8);
   assert.equal(await page.locator('.react-flow__edge').count(), 7);
+  assert.equal(await page.locator('.wire-traced').count(), 2, 'initial selected route highlights automatically');
+  assert.equal(await page.locator('.device-issue').count(), 0, 'a route issue is not four device faults');
+  // Sample every drawn segment in screen coordinates: cables must clear unrelated cards.
+  assert.deepEqual(await page.locator('.react-flow__edge').evaluateAll(edges => edges.flatMap(edge => {
+    const path = edge.querySelector('.react-flow__edge-path');
+    const id = JSON.parse(decodeURIComponent(edge.dataset.id.slice(5)));
+    const others = [...document.querySelectorAll('.react-flow__node')].filter(n => !id.slice(0, 2).includes(n.dataset.id));
+    for (let length = 0; length <= path.getTotalLength(); length += 2) {
+      const point = path.getPointAtLength(length).matrixTransform(path.getScreenCTM());
+      for (const n of others) { const r = n.getBoundingClientRect(); if (point.x > r.left && point.x < r.right && point.y > r.top && point.y < r.bottom) return [n.dataset.id]; }
+    }
+    return [];
+  })), [], 'no cable passes through an unrelated device');
+  await page.getByLabel('Select route to trace').selectOption('');
+  assert.equal(await page.locator('.wire-traced').count(), 0, 'All routes clears the highlight');
   await page.getByLabel('Select route to trace').selectOption({ label: 'SLIDES → Screen' });
+  assert.match(await page.locator('.flow-issue').innerText(), /4 devices on path.*failed step unconfirmed/);
+  await page.locator('.flow-issue').click();
+  assert.equal(await page.locator('.check-list > button').count(), 1);
+  await page.locator('.check-list > button').click();
+  assert.equal(await page.getByLabel('Converter output connector', { exact: true }).inputValue(), '3G SDI');
+  await page.getByLabel('Converter output connector', { exact: true }).fill('12G SDI');
+  await save(); await page.reload(); await button('Edit route').click();
+  // Reload selects the first route; select Slides explicitly to verify persisted hop fields.
+  await button('Back to diagram').click();
+  await page.getByLabel('Select route to trace').selectOption({ label: 'SLIDES → Screen' });
+  await button('Edit route').click();
+  assert.equal(await page.getByLabel('Converter output connector', { exact: true }).inputValue(), '12G SDI');
+  await page.getByLabel('Converter output connector', { exact: true }).fill('3G SDI');
+  await button('Back to diagram').click();
+
   assert.equal(await page.locator('.wire-traced').count(), 3);
   assert.equal(await page.locator('.wire-dimmed').count(), 4);
   await button('Trace path').click();

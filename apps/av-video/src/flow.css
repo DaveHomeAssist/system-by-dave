@@ -90,3 +90,39 @@
   .flow-empty p { font-size: 11px; }
   .device-selection { top: 30px; left: 8px; width: calc(100% - 16px); max-height: calc(100% - 96px); }
 }
+
+/* Route selection is blue; red is reserved for a reported problem. */
+.diagram-device.kind-processor { --device-color: var(--av-info); }
+.diagram-wire.wire-traced .react-flow__edge-path { stroke: var(--av-info); }
+.diagram-wire.wire-issue .react-flow__edge-path { stroke: var(--av-danger); stroke-dasharray: none; }
+.diagram-wire.transport-hdmi .react-flow__edge-path { stroke-dasharray: 7 4; }
+.diagram-wire.wire-dimmed { opacity: .35; }
+.cable-label { pointer-events: none; }
+.cable-label rect { fill: var(--av-bg); }
+.cable-label text { fill: var(--av-text-2); font: 10px ui-monospace, monospace; }
+.cable-blocked { fill: var(--av-danger); font-size: 10px; }
+.flow-issue { flex-shrink: 0; text-align: left; padding: 8px 16px; border: 0; border-radius: 0; color: var(--av-danger); background: var(--av-danger-soft)!important; font-size: 12px; }
+.signal-note { font-size: 11px; font-weight: normal; margin-top: 12px; }
+.device-new-ports { opacity: 0; }
+.diagram-device:hover .device-new-ports, .react-flow__node:focus-within .device-new-ports, .react-flow__node.selected .device-new-ports { opacity: 1; }
+.react-flow:has(.connectingfrom) .device-new-ports { opacity: 1; }
+@media (hover: none) { .device-new-ports { opacity: 1; } }
+@media (min-width: 1101px) {
+  .video-app { position: relative; }
+  .plan-bar { position: absolute; right: 24px; top: 80px; z-index: 2; padding: 0; background: transparent; border: 0; }
+  .plan-summary { display: none; }
+  .view-tabs { padding-right: 210px; }
+  .flow-workspace { position: relative; }
+  .flow-toolbar { min-height: 65px; padding-left: 530px; }
+  .flow-heading { display: none; }
+  .flow-actions { margin-left: auto; }
+  .flow-route-bar { position: absolute; top: 0; left: 0; height: 65px; border: 0; background: transparent; padding: 8px 12px; max-width: 525px; flex-wrap: wrap; }
+  .flow-route-bar select { width: 205px; }
+  .flow-route-format { display: none; }
+}
+.header-plan { max-width: 420px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media(max-width:680px) { .header-plan { max-width: 130px; } .flow-issue { font-size: 10px; padding: 6px 8px; } }
+.diagram-device.is-dimmed { opacity: .62; }
+.flow-context { padding: 5px 16px; min-height: 25px; border-bottom: 1px solid var(--av-line); }
+.flow-context .flow-route-format { display: block; margin: 0; font-size: 11px; }
+@media(max-width:680px) { .flow-context { padding: 5px 8px; } .flow-context .flow-route-format { font-size: 10px; } }

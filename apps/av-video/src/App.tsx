@@ -6,7 +6,7 @@ import { applyImport, emptyDocument, LEGACY, loadDocument, Module, newRoute, Pre
 
 type View = "flow" | "patch" | "checks" | "project";
 const statuses = ["planned", "pending", "patched", "routed", "tested", "ready", "verified", "issue", "spare", "backup"];
-const labels: Partial<Record<keyof Route, string>> = { route: "Route name", source: "Source", destination: "Destination", system: "System", type: "Source type", format: "Format", connector: "Connector", processor: "Processor", input: "Switcher / device input", output: "Source output", converter: "Converter", backup: "Backup route", status: "Status", notes: "Operator notes" };
+const labels: Partial<Record<keyof Route, string>> = { converterOutput: "Converter output port", converterConnector: "Converter output connector", converterFormat: "Converter output format", processorOutput: "Processor output port", processorConnector: "Processor output connector", processorFormat: "Processor output format", destinationInput: "Destination input", route: "Route name", source: "Source", destination: "Destination", system: "System", type: "Source type", format: "Format", connector: "Connector", processor: "Processor", input: "Switcher / device input", output: "Source output", converter: "Converter", backup: "Backup route", status: "Status", notes: "Operator notes" };
 function download(name: string, raw: string) {
   const url = URL.createObjectURL(new Blob([raw], { type: "application/json" }));
   const link = document.createElement("a"); link.href = url; link.download = name; link.click();
@@ -44,7 +44,7 @@ export function App() {
   function undoEdit() { if (history.past.length) { setHistory(undo); notify("Undone. Save to keep this version."); } }
   function redoEdit() { if (history.future.length) { setHistory(redo); notify("Redone. Save to keep this version."); } }
   useEffect(() => {
-    if (!doc.routes.some(r => r.id === selected)) setSelected(doc.routes[0]?.id || "");
+    if (selected && !doc.routes.some(r => r.id === selected)) setSelected(doc.routes[0]?.id || "");
     if ((view === "patch" || view === "checks") && !doc.modules[view]) setView("project");
   }, [doc, selected, view]);
   useEffect(() => {
@@ -61,7 +61,7 @@ export function App() {
   const route = doc.routes.find(r => r.id === selected);
   const visible = doc.routes.filter(r => {
     const fields = [r.route, r.source, r.destination, r.format, r.connector, r.processor, r.system, r.type, r.status, r.notes,
-      ...(doc.modules.patch ? [r.input, r.converter] : []), ...(doc.modules.backups ? [r.backup] : [])];
+      ...(doc.modules.patch ? [r.input, r.output, r.converter, r.converterOutput, r.converterConnector, r.converterFormat, r.processorOutput, r.processorConnector, r.processorFormat, r.destinationInput] : []), ...(doc.modules.backups ? [r.backup] : [])];
     return (status === "all" || r.status === status) && fields.join(" ").toLowerCase().includes(search.toLowerCase());
   });
   const issues = doc.routes.filter(r => routeGaps(r, doc.modules).length);
@@ -124,14 +124,14 @@ export function App() {
     {([ ["flow", "Signal flow"], ...(doc.modules.patch ? [["patch", "Patch"]] : []), ...(doc.modules.checks ? [["checks", "Checks"]] : []), ["project", "Project"] ] as [View, string][]).map(([id, label]) => <button key={id} type="button" aria-current={view === id ? "page" : undefined} onClick={() => switchView(id)}>{label}{id === "checks" && <span>{issues.length}</span>}</button>)}
   </nav>;
   return <div className="video-app">
-    <header className="app-header"><div className="app-identity"><span className="app-mark" aria-hidden="true">Vi</span><div><h1>AV Video</h1><p>Signal flow + video patch</p></div></div>
+    <header className="app-header"><div className="app-identity"><span className="app-mark" aria-hidden="true">Vi</span><div><h1>AV Video</h1><p className="header-plan" title={doc.title}>{doc.title} · {dirty ? "Unsaved" : baseline.current ? "Saved in this browser" : "New plan"}</p></div></div>
       <div className="header-actions"><label className="theme-label"><span>Theme</span><select aria-label="Theme" value={theme} onChange={e => changeTheme(e.target.value)}><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label><button type="button" className="primary" onClick={save}>Save{dirty ? " •" : ""}</button><button type="button" onClick={exportDoc}>Export</button></div>
     </header>
     <div className="plan-bar"><div className="plan-summary"><strong title={doc.title}>{doc.title}</strong><span>{doc.routes.length} routes · {dirty ? "Unsaved changes" : baseline.current ? "Saved in this browser" : "New plan"}</span></div><div className="history-actions" aria-label="Edit history"><button type="button" onClick={undoEdit} disabled={!history.past.length} title="Undo (⌘/Ctrl Z)">↶ Undo</button><button type="button" onClick={redoEdit} disabled={!history.future.length} title="Redo (⌘/Ctrl Shift Z)">↷ Redo</button></div></div>
     {nav}
     <main id="workspace" tabIndex={-1} className={`workspace view-${view} ${inspectorOpen ? "inspector-open" : ""} ${mobileDetail ? "detail-open" : ""}`}>
       {(view === "flow" || view === "patch") && <>
-        {view === "flow" ? <FlowCanvas doc={doc} selected={selected} onChange={update} onSelect={setSelected} onEdit={() => { setInspectorOpen(true); setMobileDetail(true); }} onAddRoute={add} onSample={() => replace(sampleDocument())} onImport={() => switchView("project")} notify={notify} /> :         <section className="route-browser" aria-label="Patch routes">
+        {view === "flow" ? <FlowCanvas doc={doc} selected={selected} onChange={update} onSelect={setSelected} onChecks={() => switchView("checks")} onEdit={() => { setInspectorOpen(true); setMobileDetail(true); }} onAddRoute={add} onSample={() => replace(sampleDocument())} onImport={() => switchView("project")} notify={notify} /> :         <section className="route-browser" aria-label="Patch routes">
           <div className="panel-heading"><div><h2>Video patch</h2><p>One route list. Every view stays in sync.</p></div><button type="button" className="primary" onClick={add}>Add route</button></div>
           <div className="filters"><input aria-label="Search routes" type="search" placeholder="Search routes…" value={search} onChange={e => setSearch(e.target.value)} /><select aria-label="Filter status" value={status} onChange={e => setStatus(e.target.value)}><option value="all">All statuses</option>{Array.from(new Set([...statuses, ...doc.routes.map(r => r.status)])).map(s => <option key={s} value={s}>{s || "Unspecified"}</option>)}</select></div>
           <div className="route-list">
@@ -145,10 +145,10 @@ export function App() {
         {(view === "patch" || inspectorOpen) && <section className="inspector" aria-label="Route editor"><div className="panel-heading"><div><h2>Route details</h2><p>{route ? "Edits appear in both views" : "Select a route to edit"}</p></div><button type="button" className="mobile-back" onClick={() => { setMobileDetail(false); setInspectorOpen(false); }}>{view === "flow" ? "Back to diagram" : "Back to routes"}</button></div>
           {route ? <div className="editor-scroll"><div className="field-grid">{field("route")}{field("type")}{field("source")}{field("destination")}<SignalFields key={route.id} format={route.format} connector={route.connector} onChange={changeRoute} notify={notify} />{field("processor")}{field("system")}
             <label>Status<select value={route.status} onChange={e => changeRoute("status", e.target.value)}>{Array.from(new Set([...statuses, route.status])).map(s => <option key={s} value={s}>{s || "Unspecified"}</option>)}</select></label>
-            {doc.modules.patch && <fieldset className="wide"><legend>Patch details</legend><div className="field-grid">{field("input")}{field("output")}{field("converter")}</div></fieldset>}
+            {doc.modules.patch && <fieldset className="wide"><legend>Patch details</legend><div className="field-grid">{field("input")}{field("output")}{field("converter")}{route.converter && <>{field("converterOutput")}{field("converterConnector")}{field("converterFormat")}</>}{route.processor && <>{field("processorOutput")}{field("processorConnector")}{field("processorFormat")}{field("destinationInput")}</>}</div><p className="signal-note">Source format and connector describe the first cable. Specify each device output; blanks stay unknown.</p></fieldset>}
             {doc.modules.backups && field("backup")}{field("notes", true)}
           </div>
-          {doc.modules.checks && <div className="route-checks"><h3>Route checks</h3>{routeGaps(route, doc.modules).length ? <ul>{routeGaps(route, doc.modules).map(g => <li key={g}>{g}</li>)}</ul> : <p>Required fields filled. Confirm the physical route before marking it ready.</p>}</div>}
+          <p className="signal-note">Status is operator reported, not a live signal test. Record who tested this route, when and what they verified in Operator notes.</p>{doc.modules.checks && <div className="route-checks"><h3>Route checks</h3>{routeGaps(route, doc.modules).length ? <ul>{routeGaps(route, doc.modules).map(g => <li key={g}>{g}</li>)}</ul> : <p>Required fields filled. Confirm the physical route before marking it ready.</p>}</div>}
           {route.origin && <p className="provenance">Imported from {doc.imports.find(i => i.id === route.origin)?.name || "an original sheet"}. Original data is included in exports.</p>}
           <div className="row-actions"><button type="button" onClick={() => { const copy = { ...route, id: uid(), route: `${route.route || route.source} copy` }; update({ ...doc, routes: [...doc.routes, copy] }); setSelected(copy.id); }}>Duplicate route</button><button type="button" className="danger" onClick={() => { if (!confirm("Remove this route from the current plan?")) return; const rows = doc.routes.filter(r => r.id !== route.id); update({ ...doc, routes: rows }); setSelected(rows[0]?.id || ""); setMobileDetail(false); }}>Remove route</button></div>
           </div> : <div className="empty"><p>Choose a route from the list, or create one.</p></div>}
