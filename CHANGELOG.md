@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-03 — Preserve configured Video projects during import
+
+- Preserve a plan's entered title and metadata when its first legacy routes or destinations are imported. Only a pristine default plan with incoming records adopts source metadata; empty imports never rename the plan. Original source metadata remains in Export original.
+- Add unit and browser regression coverage for a configured, saved plan with no existing records.
+
 ## 2026-10-03 — AV Video Displays & Projection
 
 - Added an optional Displays workspace with display and projection details, explicit stable route links, trace-to-canvas navigation, missing-link checks and separate operator statuses.
