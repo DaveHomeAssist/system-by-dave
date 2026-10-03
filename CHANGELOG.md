@@ -2,9 +2,10 @@
 
 ## 2026-10-03 — Cheesesteak About copy
 
-- Publish the About page from `DaveHomeAssist/philly-cheesesteak-heatmap` source `9a06e5b`: real OpenStreetMap shops, saved Reddit discussion, dataset-derived shop count and date, and explicit missing ratings/search volume.
+- Publish the About page from `DaveHomeAssist/philly-cheesesteak-heatmap` source `0f18281`: real OpenStreetMap shops, saved Reddit discussion, dataset-derived shop count and date, and explicit missing ratings/search volume.
 - Replace the fictional-demo disclaimer and unavailable correction-form instructions in the static edition with accurate snapshot copy and a public project issue link. Preserve distinct demo/live copy, privacy details, and photo credits in source.
 - Keep the About document inside a bounded scrolling panel with visible navigation and theme controls. Verify desktop, 680px, phone, and ultrawide layouts with the existing reduced-motion skyline. The route remains noindex and outside the sitemap.
+- Include informational content directly in exported HTML so About stays readable with JavaScript disabled.
 
 ## 2026-10-02 — Signal flow canvas clarity
 
