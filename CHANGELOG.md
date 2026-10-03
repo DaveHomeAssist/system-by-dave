@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-03 — Reconcile the maintained AV consolidation plan
+
+- Carry forward Toolbox, focused applications, optional modules and Workbook withdrawal without reopening settled choices. Preserve the shipped Video document/module ownership contract; gate future shared identity and application decisions only where they apply.
+- Replace stale chooser and pre-Video planning claims with an explicit repository/live audit. Fresh neutral Toolbox is shipped; saved Show Console preferences still override returning neutral visits, and Workbook remains publicly exposed.
+- Separate planning completion from future implementation gates, retain Workbook withdrawal as priority work, and identify Cameras/Playback and Stream/Record as the remaining Video slices. No runtime behavior changes in this revision.
+
 ## 2026-10-03 — Preserve configured Video projects during import
 
 - Preserve a plan's entered title and metadata when its first legacy routes or destinations are imported. Only a pristine default plan with incoming records adopts source metadata; empty imports never rename the plan. Original source metadata remains in Export original.

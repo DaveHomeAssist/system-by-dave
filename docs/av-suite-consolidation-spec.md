@@ -4,7 +4,7 @@
 
 **Decision revision:** 2026-10-02, requested by Dave. The October 2 clarification removes assumed Workbook adoption, recovery and migration requirements from public withdrawal. This is the maintained product and migration plan. It supersedes the September 23 seven-workspace proposal and the September 29 recommendation to build Video inside Workbook. The [dated specification](av-suite-consolidation-spec-2026-09-23.md) remains historical evidence.
 
-**Delivery boundary:** This revision changes the plan. Toolbox as the default, optional modules, focused consolidated applications, and removal of Workbook from the public website are target behavior, not a claim of implementation. Current source at `238f2ed` still publishes Workbook and retains the doorway chooser. Use the [doorway contract](av-suite-doorway.md) for shipped behavior and the [development assets index](av-suite-development-assets-index.md) for evidence and source ownership.
+**Delivery boundary, audited 2026-10-03:** This is the maintained consolidation plan, with shipped slices identified separately. Repository baseline `1c738b1` contains a fresh-visit Toolbox default and independent AV Video with document-owned optional modules. Live readback at source revision `da9026e` confirmed those surfaces. A returning browser with `preferredEntry: "show"` still opens Show Console on a neutral URL, and Workbook remains promoted and publicly served. Therefore Stage 1 is incomplete. Do not describe the whole application map, universal module management, Workbook withdrawal or eight-tool Video acceptance as delivered. Use the [doorway contract](av-suite-doorway.md) and [development assets index](av-suite-development-assets-index.md) for evidence and source ownership.
 
 ## Settled product decisions
 
@@ -86,13 +86,13 @@ The capability is settled. The shipped AV Video modules (Patch, Displays, Checks
 4. **Dependencies:** Declare core functionality and module dependencies. Explain a required dependency before enabling it. Do not silently re-enable modules, suppress unresolved cross-module faults, or show an all-ready result for unevaluated work. Readiness identifies its evaluated scope.
 5. **Deep links and recovery:** A link to a disabled module shows its name and an explicit enable/open action. It does not silently change preferences or discard the route. Cancel returns to the app or Toolbox. Unknown/removed module IDs have a useful fallback.
 6. **Active operations:** A visibility toggle must never stop, hide, or orphan a running cue, timer, recording/control session or unsaved edit. Keep that active surface reachable and defer the toggle until the operation is safely resolved by the user.
-7. **Persistence:** Recommended first release: device-local personal preferences separate from project data, with versioned normalization and safe defaults when storage fails. Account sync, team policy and per-project presets are not prerequisites. Changing those ownership semantics requires the product decision below.
+7. **Persistence:** Preserve the shipped AV Video contract: module visibility belongs to its versioned document and travels in a full backup. Toolbox application visibility is a separate personal preference, not a write to a Video document or Show Console readiness. For future applications, choose document-owned versus device-local module preferences before the affected persistence/import UI is implemented. Account sync and team policy are not prerequisites. Do not retroactively move Video preferences to a different store as a routine cleanup.
 
 Example: a projection operator opens Video from Toolbox, keeps Switching & Routes and Displays & Projection, and turns Cameras, Playback and Stream & Record off. The interface stays focused; saved stream records remain in backups and return unchanged when that module is enabled.
 
 ## Workbook public withdrawal and retained concept
 
-Withdrawal is requested and settled; it is not complete in this planning revision. The current Toolbox still labels Workbook as its “Spine,” and both the registry and public Tools directory expose it. Remove that product positioning and launch dependency as an early bounded release, without waiting for Unified Video or a Workbook replacement.
+Withdrawal is requested and settled; it is not complete at the October 3 audit. Source still labels Workbook as the Toolbox “Spine,” the registry exposes it, and live browser readback found Workbook links and the public editor shell. Public removal must be verified across the full surface list below. Remove that product positioning and launch dependency as an early bounded release, without waiting for Unified Video or a Workbook replacement.
 
 The withdrawal implementation must cover the AV home and Toolbox, Show Console recommendations, shared navigation/search, the System by Dave Tools directory and other public promotion, registry visibility, sitemap/indexing, direct Workbook URLs, domain staging and service-worker/offline assets. Removing a card alone is not removal from the public website. Audit both `avbydave.com` and the former `systembydave.com` routes, including `/av-workbook.html`, `/av-workbook/` and `/av-workbook/index.html`.
 
@@ -138,12 +138,39 @@ These are open product choices, not a request to reapprove settled direction. Re
 
 | Choice | Recommended path | Consequence and decision gate |
 | --- | --- | --- |
-| **Document identity across applications** | Each app owns documents; share only explicit supported context/imports at first | A shared project container changes identity, conflict handling and migration scope. Resolve before the Video persistence contract; Workbook is not the assumed answer. |
-| **First module presets and preference scope** | A compact Video core around Switching & Routes; optional task modules chosen by the user; preferences local to that user/device | AV Video now enables its shipped modules initially and saves visibility in the document; retain that contract. Resolve presets for future applications before their UI/import behavior ships. The ability to turn modules off is settled. |
+| **Shared identity or synchronization across applications** | Keep the shipped app-owned Video document and explicit supported context/imports | A shared project container or automatic cross-app synchronization changes identity, conflict handling and migration scope. Surface that choice before implementing shared identity, not before continuing independently saved Video modules. Workbook is not the assumed answer. |
+| **Future application presets and preference scope** | Keep Video visibility in its document; choose the appropriate ownership separately for future applications | AV Video now enables its shipped modules initially and saves visibility in the document; retain that contract. Resolve presets for future applications before their UI/import behavior ships. The ability to turn modules off is settled. |
 | **Remaining application boundaries** | Keep existing live apps separate; evaluate Infrastructure as a family before combining it | Resolve Power/Network/Lighting and live-app mergers before implementing those mergers. It does not block independent Video or Toolbox work. |
 | **Show Console readiness authority** | Keep manual console status and display app-derived issues separately | Automated aggregation needs one writer, scoped status semantics and conflict/rollback rules. Resolve only before adding that aggregation. |
 
 Routine choices such as component boundaries, route spelling within compatibility requirements, validation-library reuse, dependency extraction, test fixtures, cache invalidation, build wiring and reversible preference migrations are engineering work. Select and document them without asking Dave, provided they preserve the settled product and data boundaries. Do not turn the old Workbook architecture, repository layout, or absence of a framework into a constraint on application quality.
+
+## Current implementation gaps and next work
+
+The sequence above is the target program, not a checklist of completed releases. The October 3 audit gives the following actionable state:
+
+| Work | Current evidence | Next bounded release and exit evidence |
+| --- | --- | --- |
+| Toolbox default for every neutral visit | Fresh live browser opens Toolbox. A browser with saved `preferredEntry: "show"` opens Show Console. | Complete the neutral-entry rule while preserving explicit Show Console/show-context URLs, Back/Forward and unrelated personal/show data. Test fresh and returning profiles separately. No product reapproval is needed. |
+| Workbook public withdrawal | Workbook registry record, Toolbox “Spine” source, live links and public editor shell remain. | Remove promotion and editor/source artifacts from both publication paths; keep repository source/history and leave browser storage untouched. Verify direct aliases, search, sitemap, staging, service-worker caches and live former URLs. No recovery/migration project is required. |
+| Independent Video | Signal Flow/Patch and Displays/Projection are released; four legacy import types, optional document-owned modules and original-source preservation are implemented. | Cameras & Playback, then Stream & Record. Preserve the field/status matrix and operating semantics; test each module's imports, save/export, offline, disabled-state and physical-acceptance boundaries. |
+| Other focused applications and universal visibility management | The application map and module behavior above are requirements; the existing tool directory is not proof of those applications or a global Manage modules surface. | Implement coherent application slices, resolving only the remaining family/identity/readiness choices before dependent work. Keep specialists independently launchable. |
+
+The foundation gaps remain priority work even though independent Video slices have progressed. A module release does not silently close Workbook withdrawal or the returning-browser doorway gap.
+
+## Planning completion audit
+
+This audit checks the requested plan revision. The implementation gates in the next section remain binding for each future release; they are not claimed complete by publishing this plan.
+
+| Requested planning requirement | Maintained plan coverage |
+| --- | --- |
+| Toolbox as the default entry | Settled decision 1, Toolbox contract, Stage 1 and explicit fresh/returning acceptance above |
+| Focused applications using Adobe Suite as the reference | Settled decision 2, application map, shared-experience and ownership boundaries |
+| Optional modules reduce clutter without data loss | Settled decision 3 and all seven optional-module rules, including disabled links, scoped checks and active operations |
+| No Workbook requirement or assumed Video host | Settled decision 4, app-owned data contract and independent Video phase plan |
+| Public Workbook removal while retaining redesign knowledge | Settled decision 5 and the full withdrawal surface/retention contract; runtime removal remains open |
+| Carry decisions forward and distinguish consequential choices | Settled decision 6 and the gated choice table; already-shipped Video persistence/module ownership is not reopened |
+| Verify repository and deployment state | October 3 repository/live audit above, source map and linked evidence in the development assets index; later releases require their own readback |
 
 ## Acceptance and release evidence
 
