@@ -59,7 +59,7 @@
     "dev:av-video": "vite --config apps/av-video/vite.config.ts",
     "test:av-video": "vitest run --config apps/av-video/vitest.config.ts",
     "typecheck:av-video": "tsc -p apps/av-video/tsconfig.json --noEmit",
-    "test:av-video-browser": "node scripts/probe_av_video.mjs --no-sandbox && node scripts/probe_av_video_graph.mjs --no-sandbox"
+    "test:av-video-browser": "node scripts/probe_av_video.mjs --no-sandbox && node scripts/probe_av_video_graph.mjs --no-sandbox && node scripts/probe_av_video_displays.mjs --no-sandbox"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

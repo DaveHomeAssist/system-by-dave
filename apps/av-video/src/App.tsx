@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { DisplaysPanel } from "./DisplaysPanel";
+import { displayGaps, displayIssues, displayName } from "./displays";
 import { FlowCanvas } from "./FlowCanvas";
 import { SignalFields } from "./SignalFields";
 import { createHistory, record, redo, undo } from "./history";
 import { applyImport, emptyDocument, LEGACY, loadDocument, Module, newRoute, Preview, previewImport, Route, routeGaps, sampleDocument, saveDocument, STORE, uid, VideoDocument } from "./model";
 
-type View = "flow" | "patch" | "checks" | "project";
+type View = "flow" | "patch" | "checks" | "displays" | "project";
 const statuses = ["planned", "pending", "patched", "routed", "tested", "ready", "verified", "issue", "spare", "backup"];
 const labels: Partial<Record<keyof Route, string>> = { converterOutput: "Converter output port", converterConnector: "Converter output connector", converterFormat: "Converter output format", processorOutput: "Processor output port", processorConnector: "Processor output connector", processorFormat: "Processor output format", destinationInput: "Destination input", route: "Route name", source: "Source", destination: "Destination", system: "System", type: "Source type", format: "Format", connector: "Connector", processor: "Processor", input: "Switcher / device input", output: "Source output", converter: "Converter", backup: "Backup route", status: "Status", notes: "Operator notes" };
 function download(name: string, raw: string) {
@@ -21,13 +23,14 @@ export function App() {
   const [savedSnapshot, setSavedSnapshot] = useState(() => JSON.stringify(initial.doc));
   const baseline = useRef(initial.baseline);
   const dirty = JSON.stringify(doc) !== savedSnapshot;
-  const [message, setMessage] = useState(initial.error || (initial.doc.routes.length ? "Plan loaded from this browser." : "Ready. Create a route or import an existing sheet."));
+  const [message, setMessage] = useState(initial.error || ((initial.doc.routes.length || initial.doc.displays.length) ? "Plan loaded from this browser." : "Ready. Create a route or import an existing sheet."));
   const [problem, setProblem] = useState(Boolean(initial.error));
   const [view, setView] = useState<View>(() => {
     const requested = new URLSearchParams(location.search).get("view");
-    return requested === "patch" || requested === "checks" ? (initial.doc.modules[requested] ? requested : "project") : "flow";
+    return requested === "patch" || requested === "checks" || requested === "displays" ? (initial.doc.modules[requested] ? requested : "project") : "flow";
   });
   const [selected, setSelected] = useState(initial.doc.routes[0]?.id || "");
+  const [selectedDisplay, setSelectedDisplay] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -45,7 +48,7 @@ export function App() {
   function redoEdit() { if (history.future.length) { setHistory(redo); notify("Redone. Save to keep this version."); } }
   useEffect(() => {
     if (selected && !doc.routes.some(r => r.id === selected)) setSelected(doc.routes[0]?.id || "");
-    if ((view === "patch" || view === "checks") && !doc.modules[view]) setView("project");
+    if ((view === "patch" || view === "checks" || view === "displays") && !doc.modules[view]) setView("project");
   }, [doc, selected, view]);
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
@@ -64,6 +67,7 @@ export function App() {
       ...(doc.modules.patch ? [r.input, r.output, r.converter, r.converterOutput, r.converterConnector, r.converterFormat, r.processorOutput, r.processorConnector, r.processorFormat, r.destinationInput] : []), ...(doc.modules.backups ? [r.backup] : [])];
     return (status === "all" || r.status === status) && fields.join(" ").toLowerCase().includes(search.toLowerCase());
   });
+  const destinationIssues = displayIssues(doc);
   const issues = doc.routes.filter(r => routeGaps(r, doc.modules).length);
   useEffect(() => {
     const unload = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = ""; } };
@@ -87,7 +91,7 @@ export function App() {
   function toggleModule(module: Module) {
     update({ ...doc, modules: { ...doc.modules, [module]: !doc.modules[module] } });
     if (view === module) setView("project");
-    notify(`${module === "patch" ? "Patch view" : module === "checks" ? "Checks" : "Backup details"} ${doc.modules[module] ? "hidden" : "enabled"}. Saved fields are retained.`);
+    notify(`${module === "patch" ? "Patch view" : module === "checks" ? "Checks" : module === "displays" ? "Displays & Projection" : "Backup details"} ${doc.modules[module] ? "hidden" : "enabled"}. Saved fields are retained.`);
   }
   async function inspect(raw: string, name: string, browserKey?: string) {
     importTrigger.current = document.activeElement as HTMLElement;
@@ -104,13 +108,13 @@ export function App() {
     try {
       if (preview.browserKey && localStorage.getItem(preview.browserKey) !== preview.raw) throw new Error("The source changed after preview. Cancel and import again.");
       const next = applyImport(doc, preview); update(next); setSelected(next.routes[0]?.id || "");
-      setPreview(null); setView("flow"); setSearch(""); setStatus("all"); setMobileDetail(false);
-      notify(`${preview.routes.length} routes ${preview.restore ? "restored" : "imported"}. Save to keep this plan in this browser.`);
+      setPreview(null); setView(preview.displays.length && next.modules.displays ? "displays" : "flow"); setSelectedDisplay(preview.displays[0]?.id || ""); setSearch(""); setStatus("all"); setMobileDetail(false);
+      notify(`${preview.routes.length} routes and ${preview.displays.length} destinations ${preview.restore ? "restored" : "imported"}. Save to keep this plan in this browser.`);
     } catch (error) { setPreview(null); notify(errorText(error), true); }
   }
   function exportDoc() { download("av-video.json", JSON.stringify(doc, null, 2)); notify("Full plan exported, including hidden module data and original imports."); }
   function replace(next: VideoDocument) {
-    if ((doc.routes.length || doc.graphDevices.length || dirty || Object.keys(doc.meta).length) && !window.confirm("Replace the current plan? Export first if you need to keep it.")) return;
+    if ((doc.routes.length || doc.displays.length || doc.graphDevices.length || dirty || Object.keys(doc.meta).length) && !window.confirm("Replace the current plan? Export first if you need to keep it.")) return;
     update(next); setSelected(next.routes[0]?.id || ""); setView("flow"); setSearch(""); setStatus("all"); setMobileDetail(false); setInspectorOpen(false); notify(next.routes.length ? "Plan ready. Select a cable to trace its path, or drag devices to arrange." : "New plan. Add devices or routes to begin.");
   }
   function changeTheme(value: string) {
@@ -121,13 +125,13 @@ export function App() {
     {multiline ? <textarea value={route[name]} onBlur={finishEdit} onChange={e => changeRoute(name, e.target.value, true)} rows={4} /> : <input value={route[name]} onBlur={finishEdit} onChange={e => changeRoute(name, e.target.value, true)} />}
   </label>;
   const nav = <nav className="view-tabs" aria-label="Video workspace">
-    {([ ["flow", "Signal flow"], ...(doc.modules.patch ? [["patch", "Patch"]] : []), ...(doc.modules.checks ? [["checks", "Checks"]] : []), ["project", "Project"] ] as [View, string][]).map(([id, label]) => <button key={id} type="button" aria-current={view === id ? "page" : undefined} onClick={() => switchView(id)}>{label}{id === "checks" && <span>{issues.length}</span>}</button>)}
+    {([ ["flow", "Signal flow"], ...(doc.modules.patch ? [["patch", "Patch"]] : []), ...(doc.modules.displays ? [["displays", "Displays"]] : []), ...(doc.modules.checks ? [["checks", "Checks"]] : []), ["project", "Project"] ] as [View, string][]).map(([id, label]) => <button key={id} type="button" aria-current={view === id ? "page" : undefined} onClick={() => switchView(id)}>{label}{id === "checks" && <span>{issues.length + destinationIssues.length}</span>}</button>)}
   </nav>;
   return <div className="video-app">
     <header className="app-header"><div className="app-identity"><span className="app-mark" aria-hidden="true">Vi</span><div><h1>AV Video</h1><p className="header-plan" title={doc.title}>{doc.title} · {dirty ? "Unsaved" : baseline.current ? "Saved in this browser" : "New plan"}</p></div></div>
       <div className="header-actions"><label className="theme-label"><span>Theme</span><select aria-label="Theme" value={theme} onChange={e => changeTheme(e.target.value)}><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label><button type="button" className="primary" onClick={save}>Save{dirty ? " •" : ""}</button><button type="button" onClick={exportDoc}>Export</button></div>
     </header>
-    <div className="plan-bar"><div className="plan-summary"><strong title={doc.title}>{doc.title}</strong><span>{doc.routes.length} routes · {dirty ? "Unsaved changes" : baseline.current ? "Saved in this browser" : "New plan"}</span></div><div className="history-actions" aria-label="Edit history"><button type="button" onClick={undoEdit} disabled={!history.past.length} title="Undo (⌘/Ctrl Z)">↶ Undo</button><button type="button" onClick={redoEdit} disabled={!history.future.length} title="Redo (⌘/Ctrl Shift Z)">↷ Redo</button></div></div>
+    <div className="plan-bar"><div className="plan-summary"><strong title={doc.title}>{doc.title}</strong><span>{doc.routes.length} routes · {doc.displays.length} destinations · {dirty ? "Unsaved changes" : baseline.current ? "Saved in this browser" : "New plan"}</span></div><div className="history-actions" aria-label="Edit history"><button type="button" onClick={undoEdit} disabled={!history.past.length} title="Undo (⌘/Ctrl Z)">↶ Undo</button><button type="button" onClick={redoEdit} disabled={!history.future.length} title="Redo (⌘/Ctrl Shift Z)">↷ Redo</button></div></div>
     {nav}
     <main id="workspace" tabIndex={-1} className={`workspace view-${view} ${inspectorOpen ? "inspector-open" : ""} ${mobileDetail ? "detail-open" : ""}`}>
       {(view === "flow" || view === "patch") && <>
@@ -154,15 +158,16 @@ export function App() {
           </div> : <div className="empty"><p>Choose a route from the list, or create one.</p></div>}
         </section>}
       </>}
-      {view === "checks" && <section className="single-panel"><div className="panel-heading"><div><h2>Route checks</h2><p>Checks cover {doc.modules.patch ? "signal and patch fields" : "signal fields only; patch module is off"}. These are planning checks, not a live signal test.</p></div><strong>{issues.length} need attention</strong></div><div className="check-list">{issues.length ? issues.map(r => <button type="button" key={r.id} onClick={() => { setView("flow"); setInspectorOpen(true); choose(r.id); }}><strong>{r.route || r.source || "Untitled route"}</strong><span>{routeGaps(r, doc.modules).join(" · ")}</span><span>Edit route →</span></button>) : <div className="empty"><h3>{doc.routes.length ? "No field gaps in enabled modules" : "No routes to check yet"}</h3><p>Operator statuses are preserved separately from these checks.</p></div>}</div></section>}
+      {view === "displays" && <DisplaysPanel doc={doc} selected={selectedDisplay} onSelect={setSelectedDisplay} onChange={update} onFinish={finishEdit} onRoute={id => { setSelected(id); switchView("flow"); }} onImport={() => switchView("project")} notify={notify} />}
+      {view === "checks" && <section className="single-panel"><div className="panel-heading"><div><h2>Planning checks</h2><p>{doc.modules.displays ? "Displays and projection included. " : "Displays module is off. "}Checks cover {doc.modules.patch ? "signal and patch fields" : "signal fields only; patch module is off"}. These are planning checks, not a live signal test.</p></div><strong>{issues.length + destinationIssues.length} need attention</strong></div><div className="check-list">{destinationIssues.map(item => <button type="button" key={item.id} onClick={() => { setSelectedDisplay(item.id); switchView("displays"); }}><strong>{displayName(item)}</strong><span>{displayGaps(item, doc.routes).join(" · ")}</span><span>Edit destination →</span></button>)}{issues.length ? issues.map(r => <button type="button" key={r.id} onClick={() => { setView("flow"); setInspectorOpen(true); choose(r.id); }}><strong>{r.route || r.source || "Untitled route"}</strong><span>{routeGaps(r, doc.modules).join(" · ")}</span><span>Edit route →</span></button>) : destinationIssues.length ? null : <div className="empty"><h3>{doc.routes.length || doc.displays.length ? "No field gaps in enabled modules" : "No records to check yet"}</h3><p>Operator statuses are preserved separately from these checks.</p></div>}</div></section>}
       {view === "project" && <section className="single-panel project-panel"><div className="panel-heading"><div><h2>Project & modules</h2><p>Use Video on its own. Add show details only when useful.</p></div></div><div className="project-scroll">
         <section><h3>Video plan</h3><div className="field-grid"><label>Plan name<input value={doc.title} onBlur={finishEdit} onChange={e => update({ ...doc, title: e.target.value }, "title")} /></label><label>Venue<input value={doc.meta.venue || ""} onBlur={finishEdit} onChange={e => update({ ...doc, meta: { ...doc.meta, venue: e.target.value } }, "venue")} /></label><label>Video lead<input value={doc.meta.videoLead || ""} onBlur={finishEdit} onChange={e => update({ ...doc, meta: { ...doc.meta, videoLead: e.target.value } }, "videoLead")} /></label></div><div className="row-actions"><button type="button" onClick={() => replace(emptyDocument())}>New plan</button><button type="button" onClick={() => replace(sampleDocument())}>Load sample</button></div></section>
-        <section><h3>Optional modules</h3><p>Turn off what you do not need. Its fields stay in the plan and full export.</p>{([ ["patch", "Patch view", "Input assignments and converters"], ["checks", "Route checks", "Field gaps and reported issues"], ["backups", "Backup details", "Alternate routes and equipment"] ] as [Module, string, string][]).map(([id, name, description]) => <label className="module-toggle" key={id}><input type="checkbox" checked={doc.modules[id]} onChange={() => toggleModule(id)} /><span><strong>{name}</strong><small>{description}</small></span></label>)}</section>
-        <section><h3>Bring existing work together</h3><p>Import Signal Flow or Video Patch sheets into this route list. Each source stays intact. Review imports before applying them.</p><div className="import-actions"><button type="button" disabled={reading} onClick={() => fileInput.current?.click()}>Import JSON file</button>{(Object.keys(LEGACY) as (keyof typeof LEGACY)[]).map(name => <button type="button" key={name} disabled={reading} onClick={() => importSaved(name)}>Import saved {name}</button>)}</div><p className="muted">Saved sheets are available only in the browser and site where they were created. JSON files work across sites.</p>{doc.imports.length > 0 && <details><summary>{doc.imports.length} original imports retained</summary>{doc.imports.map(i => <div className="original-import" key={i.id}><span>{i.name}</span><button type="button" onClick={() => download("original-sheet.json", i.raw)}>Export original</button></div>)}</details>}</section>
+        <section><h3>Optional modules</h3><p>Turn off what you do not need. Its fields stay in the plan and full export.</p>{([ ["patch", "Patch view", "Input assignments and converters"], ["displays", "Displays & Projection", "Destinations, screens and projector setups"], ["checks", "Route checks", "Field gaps and reported issues"], ["backups", "Backup details", "Alternate routes and equipment"] ] as [Module, string, string][]).map(([id, name, description]) => <label className="module-toggle" key={id}><input type="checkbox" checked={doc.modules[id]} onChange={() => toggleModule(id)} /><span><strong>{name}</strong><small>{description}</small></span></label>)}</section>
+        <section><h3>Bring existing work together</h3><p>Import Signal Flow, Video Patch, Display Plan or Projection Plan sheets. Each source stays intact. Review imports before applying them.</p><div className="import-actions"><button type="button" disabled={reading} onClick={() => fileInput.current?.click()}>Import JSON file</button>{(Object.keys(LEGACY) as (keyof typeof LEGACY)[]).map(name => <button type="button" key={name} disabled={reading} onClick={() => importSaved(name)}>Import saved {name}</button>)}</div><p className="muted">Saved sheets are available only in the browser and site where they were created. JSON files work across sites.</p>{doc.imports.length > 0 && <details><summary>{doc.imports.length} original imports retained</summary>{doc.imports.map(i => <div className="original-import" key={i.id}><span>{i.name}</span><button type="button" onClick={() => download("original-sheet.json", i.raw)}>Export original</button></div>)}</details>}</section>
       </div></section>}
     </main>
     <footer role="status" className={`message ${problem ? "error" : ""}`}>{message}</footer>
     <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={async e => { const file = e.target.files?.[0]; e.target.value = ""; if (!file) return; try { await inspect(await file.text(), file.name); } catch (error) { notify(errorText(error), true); } }} />
-    <dialog ref={dialog} aria-labelledby="import-title" onCancel={() => setPreview(null)}><h2 id="import-title">Review import</h2>{preview && <><p>{preview.name}</p><p><strong>{preview.routes.length} routes</strong> · {Object.keys(preview.meta).length} metadata fields</p><p>{preview.restore ? "This backup replaces the current plan, including module choices. Export your current plan first if you need to keep it." : "Routes will be added to this plan. Notes, statuses, and a complete original source copy are retained. Similar routes are kept separate; no automatic merging."}</p><div className="import-preview">{preview.routes.map(r => <div key={r.id}><strong>{r.source || "Unnamed source"} → {r.destination || "Unnamed destination"}</strong><span>{r.route} · {r.status || "Unspecified"}</span></div>)}</div><div className="row-actions"><button type="button" onClick={() => setPreview(null)}>Cancel</button>{preview.restore && <button type="button" onClick={exportDoc}>Export current plan</button>}<button type="button" className="primary" onClick={confirmImport}>{preview.restore ? "Replace with backup" : "Add routes to plan"}</button></div></>}</dialog>
+    <dialog ref={dialog} aria-labelledby="import-title" onCancel={() => setPreview(null)}><h2 id="import-title">Review import</h2>{preview && <><p>{preview.name}</p><p><strong>{preview.routes.length} routes · {preview.displays.length} destinations</strong> · {Object.keys(preview.meta).length} metadata fields</p><p>{preview.restore ? "This backup replaces the current plan, including module choices. Export your current plan first if you need to keep it." : "Records will be added to this plan. Notes, statuses, and a complete original source copy are retained. Similar records are kept separate; route links require your selection. Extra fields and metadata remain in Export original."}</p><div className="import-preview">{preview.displays.map(item => <div key={item.id}><strong>{displayName(item)}</strong><span>{item.kind} · {item.status || "Unspecified"} · {item.route || "No original route reference"}</span></div>)}{preview.routes.map(r => <div key={r.id}><strong>{r.source || "Unnamed source"} → {r.destination || "Unnamed destination"}</strong><span>{r.route} · {r.status || "Unspecified"}</span></div>)}</div><div className="row-actions"><button type="button" onClick={() => setPreview(null)}>Cancel</button>{preview.restore && <button type="button" onClick={exportDoc}>Export current plan</button>}<button type="button" className="primary" onClick={confirmImport}>{preview.restore ? "Replace with backup" : preview.displays.length ? "Add destinations to plan" : "Add routes to plan"}</button></div></>}</dialog>
   </div>;
 }

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-03 — AV Video Displays & Projection
+
+- Added an optional Displays workspace with display and projection details, explicit stable route links, trace-to-canvas navigation, missing-link checks and separate operator statuses.
+- Added lossless, previewed Display Plan / Projection Plan imports, original-source export, destination CSV, old-backup defaults, undo and hidden-module retention. Legacy pages and specialist planners remain independently available.
+- Added unit and release browser coverage for import preservation, linked-route deletion, save/reload, disabled modules, export/restore, desktop/phone themes and offline destination editing. Physical operator acceptance remains separate.
+
+
 ## 2026-10-03 — Cheesesteak About copy
 
 - Publish the About page through the canonical sync from `DaveHomeAssist/philly-cheesesteak-heatmap` source `e7c6814`: real OpenStreetMap shops, saved Reddit discussion, dataset-derived shop count and date, and explicit missing ratings/search volume. Record the source revision in `cheesesteaks/SOURCE.txt` and omit nested 404 routes.
