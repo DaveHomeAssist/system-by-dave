@@ -88,7 +88,7 @@ check. Add `--strict` to exit non-zero on any failure.
 | P1 | Live `source_provenance.json` matches `main` | Pages deploy completed and nothing stale is served |
 | P2 | Every live managed file matches its provenance SHA-256 | No partial deploy or cache poisoning |
 | P3 | `?v=` cache-bust tokens match the files they load | A stale token lets a phone keep an old module after a release |
-| P4 | The released `fmp/` commit is current with canonical `fmp-suite` `main` | Shows unreleased fixes waiting on export |
+| P4 | The released `fmp/` commit is current with canonical `fmp-suite` `main`; a merge commit with identical files counts as current | Shows unreleased fixes waiting on export |
 | P5 | Active releases share one export, and frozen releases stay at their pin | `fmp/` and `fmpwalk/` move together with every export and must pin the same source commit. The walk was dropped from the export in fmp-suite `0946989` and restored on 2026-09-25, so nothing is frozen now (`ACTIVE_RELEASES` and `FROZEN_RELEASES` in the probe; `npm run test:fmp-hygiene`) |
 | I1–I3 | Noindex on every FMP page, robots disallow, sitemap exclusion | Discovery policy (not access control) |
 | L1 | Same-origin links, assets, and script-built routes resolve | Catches broken links, including ones built at runtime from `./camera/` |
@@ -106,6 +106,7 @@ check. Add `--strict` to exit non-zero on any failure.
 | W5 | Phone controls at least 44px | Gloved and one-handed use |
 | W6 | Theme control present, and the first visit defaults to light | `WEB-1` in the workspace rules |
 | W7 | The rig explorer renders a 3D canvas | Three.js runtime is intact |
+| W8 | No page scroll at 1440×900 or 375×812 on any published route outside the recorded `WEB2_DEBT` list; a listed page that now fits also warns | `WEB-2` in the workspace rules; keeps the debt list honest |
 
 ### Manual website checks (weekly)
 

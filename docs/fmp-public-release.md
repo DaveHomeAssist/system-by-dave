@@ -137,30 +137,40 @@ before redirecting there. Links crossing the two origins are absolute and the
 exporter enforces it. The hub's Operators view links the walk at its own origin.
 
 The Google client and the `fmp-walk-notion` backend (`FMP_ALLOWED_ORIGINS`) allow
-`https://housevideo.app`; keep `https://systembydave.com` in both while old drafts
-may still be moved. **Both must also allow `https://walk.housevideo.app` before the
-walk's cutover, or walk Gmail send and Notion save fail there** — see gates 1 and 2.
-Run gates 3 and 4 on housevideo.app, and gate 4 on walk.housevideo.app.
+`https://housevideo.app` (camera sign-in) and `https://walk.housevideo.app` (the
+walk's Notion sign-in and save) — see gates 1 and 2. The walk opens Gmail as a
+compose window (fmp-suite #51), so no origin is needed for email. Retire
+`https://systembydave.com` from both: its `/fmp/` and `/fmpwalk/` pages are move
+notices with `default-src 'none'` that cannot make requests, and the saved-data move
+uses browser storage only (fmp-suite #55 removes it from the backend default; the
+live variable is Dave's, plan 2 C6). Run gate 3 on housevideo.app and gate 4 on
+walk.housevideo.app.
 
 ## Commissioning gates
 
 1. Confirm the existing FMP Google client lists these exact JavaScript origins:
-   `https://housevideo.app` (camera Google sign-in), `https://walk.housevideo.app`
-   (walk Gmail send and Notion save) and, while old drafts may still be moved,
-   `https://systembydave.com`. No path, new client, or browser client secret is
-   needed. Only the client's owner can read that list in Google Cloud Console; a
-   rendered sign-in button does not show that an origin is allowed. The backend
-   half is already in place: on 2026-10-01 `/health` returned a matching
-   `Access-Control-Allow-Origin` for all three origins and 403 for an unlisted one.
+   `https://housevideo.app` (camera Google sign-in) and `https://walk.housevideo.app`
+   (the walk's Notion sign-in), and that `https://systembydave.com` and
+   `https://davehomeassist.github.io` are gone. No path, new client, or browser
+   client secret is needed. Only the client's owner can read that list in Google
+   Cloud Console; a rendered sign-in button does not show that an origin is
+   allowed. The backend half: on 2026-10-03 a preflight still returned a matching
+   `Access-Control-Allow-Origin` for both retired origins, so the live
+   `FMP_ALLOWED_ORIGINS` needs editing too (plan 2 C6).
 2. Share the existing Events, Crew Calls, Faults, Walk Reports, and Cameras
    reference page with the dedicated FMP Walk internal Notion connection. The
    deployment token remains in Google Secret Manager. Codex connector access is
    separate.
 3. Sign in with an explicitly authorized operations account. Verify context reads,
    a synthetic SETUP TEST check-in, fault photo, checkout, and exact Notion
-   readback from a camera route.
-4. In a separate walk acceptance, verify a reviewed synthetic report download,
-   Gmail Sent receipt, Notion record, files, linked faults, and exact readback.
+   readback from a camera route. Keep the browser console open through sign-in,
+   account selection, save and sign-out, and record any Google Identity warnings
+   or errors.
+4. In a separate walk acceptance, verify a reviewed synthetic report download;
+   that Open Gmail draft opens a compose window with the expected recipients,
+   subject and body; that the operator sends it and the message appears in Gmail
+   Sent (the app itself sends nothing); and the Notion record, files, linked
+   faults and exact readback. Keep the console open as in gate 3.
 5. Retain SETUP TEST and partial-verification language until the applicable gates
    pass. A deployed URL, health response, or mocked browser test is not evidence
    of a successful live save or email delivery.
