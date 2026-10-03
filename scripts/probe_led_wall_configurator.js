@@ -52,13 +52,15 @@ async function main() {
   const port = 9900 + Math.floor(Math.random() * 300);
   const profile = fs.mkdtempSync(`${os.tmpdir()}/sbd-led-configurator-probe-`);
   const chrome = spawn(chromeBin, [
-    '--headless=new', '--enable-unsafe-swiftshader', ...(noWebgl ? ['--disable-webgl'] : []), '--disable-background-networking',
+    '--headless=new', '--enable-unsafe-swiftshader', ...(process.platform === 'linux' ? ['--no-sandbox', '--disable-dev-shm-usage'] : []), ...(noWebgl ? ['--disable-webgl'] : []), '--disable-background-networking',
     '--disable-component-update', '--no-default-browser-check', '--no-first-run',
     `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'
-  ], { stdio: ['ignore', 'ignore', 'ignore'] });
+  ], { stdio: ['ignore', 'ignore', 'pipe'] });
+  let startupLog = '';
+  chrome.stderr.on('data', chunk => { startupLog = (startupLog + chunk).slice(-4000); });
 
   try {
-    await waitForJson(port);
+    try { await waitForJson(port); } catch (error) { throw new Error(`${error.message} Chrome exit=${chrome.exitCode}; ${startupLog}`); }
     const page = await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: 'PUT' }).then((response) => response.json());
     const socket = new WebSocket(page.webSocketDebuggerUrl);
     await new Promise((resolve, reject) => {

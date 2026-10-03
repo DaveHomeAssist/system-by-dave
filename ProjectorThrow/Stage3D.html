@@ -453,6 +453,13 @@ html[data-av-workspace=stage] .onboarding-actions button{flex:1;min-height:44px;
 html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=wide] .workflow-route{grid-template-columns:repeat(3,minmax(0,1fr))}
 html[data-av-workspace=stage][data-workspace-short=true] .onboarding-intro{display:none}
 html[data-av-workspace=stage] .quick-start-toggle{color:var(--dim)}
+html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .app{grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:52px var(--stage-hud-bottom,100px) minmax(0,1fr) var(--av-touch);grid-template-areas:"header header header header header header header" "stage stage stage stage stage stage stage" "controls controls controls controls controls controls controls" "dock dock dock dock links links links"}
+html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .mobile-dock{padding:0;gap:0}
+html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .workspace-links{gap:0}
+html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .workspace-links a{flex:1;min-width:0;padding:2px;text-align:center}
+html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] #stageOfflineCompact{display:none}
+html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .stage-canvas{visibility:hidden}
+
 html[data-av-workspace=stage] #offlineBadge{display:block}
 html[data-av-workspace=stage] .workspace-links .av-offline-status{font-size:10px}
 html[data-av-workspace=stage] .hud .provenance-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px;margin-top:4px}
@@ -485,7 +492,7 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 .av-page-content :is(.field,label,.row,.scene-actions,.led-detail-stat,.field-note,.model-note,.calculation-gate,.lab){break-inside:avoid}
 .av-page-content :is(.grp,.control-block,.field-grid,.led-module-fields,.led-detail-body,.scenario-history){display:block;overflow:visible;margin:0;padding:0;border:0}
 .av-page-content :is(.grp,.control-block,.field-grid,.led-module-fields,.led-detail-body)>*{margin-bottom:var(--av-gap)}
-.av-page-content :is(.field-grid>label,.field){display:block}
+.av-page-content :is(.field-grid>label,.field){display:inline-block;vertical-align:top;width:100%}
 .av-page-content :is(input:not([type=range]),select,textarea){max-width:100%;width:100%}
 .av-page-content input[type=range]{width:100%}
 .av-page-content h3{margin:0 0 var(--av-gap);break-after:avoid}
@@ -1304,7 +1311,7 @@ themeToggle.addEventListener('click',()=>applyTheme(currentTheme()==='dark'?'lig
 applyTheme(currentTheme());
 // Reveal the same verification fields and their bounded page at every width.
 function revealFieldVerification(){
-  document.body.dataset.mobilePanel='adjust';
+  if(document.body.dataset.mobilePanel!=='adjust')setMobilePanel('adjust');
   adjustPanel.open=true;
   selectWorkflowPanel('deliver');
   requestAnimationFrame(()=>requestAnimationFrame(()=>{

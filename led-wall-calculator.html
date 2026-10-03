@@ -120,6 +120,11 @@ html[data-av-workspace=led][data-workspace-shape=wide] .led-suite[data-active-se
 html[data-av-workspace=led][data-workspace-short=true] .led-suite[data-active-section=ledPreviewView] .led-stage{display:grid;grid-column:2;grid-row:1}
 html[data-av-workspace=led] .brand-text .planning-label{display:block;font-size:10px}
 html[data-av-workspace=led] #ledPowerResult small{display:block}
+html[data-av-workspace=led][data-workspace-short=true][data-workspace-shape=stack] .led-result-strip{grid-template-columns:minmax(0,1fr)}
+html[data-av-workspace=led][data-workspace-short=true][data-workspace-shape=stack] .led-result{padding:2px;min-height:0}
+html[data-av-workspace=led][data-workspace-short=true][data-workspace-shape=stack] .led-result strong{font-size:12px;line-height:1.1}
+html[data-av-workspace=led][data-workspace-short=true][data-workspace-shape=stack] .led-result span{line-height:1.1}
+
 </style>
 
 <script>document.documentElement.classList.add('led-workspace-ready')</script>
@@ -141,7 +146,7 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 .av-page-content :is(.field,label,.row,.scene-actions,.led-detail-stat,.field-note,.model-note,.calculation-gate,.lab){break-inside:avoid}
 .av-page-content :is(.grp,.control-block,.field-grid,.led-module-fields,.led-detail-body,.scenario-history){display:block;overflow:visible;margin:0;padding:0;border:0}
 .av-page-content :is(.grp,.control-block,.field-grid,.led-module-fields,.led-detail-body)>*{margin-bottom:var(--av-gap)}
-.av-page-content :is(.field-grid>label,.field){display:block}
+.av-page-content :is(.field-grid>label,.field){display:inline-block;vertical-align:top;width:100%}
 .av-page-content :is(input:not([type=range]),select,textarea){max-width:100%;width:100%}
 .av-page-content input[type=range]{width:100%}
 .av-page-content h3{margin:0 0 var(--av-gap);break-after:avoid}

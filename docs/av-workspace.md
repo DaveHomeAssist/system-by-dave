@@ -4,7 +4,7 @@ The first consumers are [Throwline Stage 3D](../ProjectorThrow/Stage3D.html) and
 
 [Workspace tokens](../design/av-workspace.tokens.json) define minimum touch size, input text size, spacing, safe insets and minimum pane width. [Shared styles](../css/av-workspace.css) and the [view controller](../js/av-workspace.js) use those tokens. Specialist palette and typography remain owned by each existing product. The pane threshold is derived from two minimum panes, rather than a separate collection of mobile breakpoints.
 
-The page is locked to the available dynamic viewport. Safe area padding belongs to the outer shell. Visual viewport resize updates available height when browser chrome or the keyboard changes it; pinch zoom retains magnification instead of reflowing the workspace. Physical Safari keyboard, browser chrome and notch behavior still require device acceptance.
+The page is locked to the available dynamic viewport. Safe area padding belongs to the outer shell. Visual viewport resize updates available height when browser chrome or the keyboard changes it; pinch zoom retains magnification instead of reflowing the workspace. A reduced-height portrait layout retains the active field and result banner while suppressing the spatial preview. Physical Safari keyboard, browser chrome and notch behavior still require device acceptance.
 
 Settings use bounded column pages with Previous, Next and a page count. Each real field and its label stay together; keyboard focus reveals the containing page immediately. Resizing recomputes the pages and retains focused controls. Paging changes view state only and never clones inputs or calculation state. Overflow is clipped at the page window, not made scrollable. Large data records may still use their own contained panels.
 
@@ -22,7 +22,7 @@ The existing [AV Suite worker](../av-suite-worker.js) is the sole cache owner. [
 
 ## Verification and remaining acceptance
 
-- `npm run test:av-workspace` runs touch-enabled Chromium device contexts at six requested phone/tablet sizes in both orientations and themes, plus three intermediate/desktop sizes (72 cases). It checks root containment, input and label reachability, target sizes, result placement, rotation state, onboarding and theme persistence; then independently prepares and reloads all three entries offline and edits them.
+- `npm run test:av-workspace` runs touch-enabled Chromium device contexts at six requested phone/tablet sizes in both orientations and themes, plus three intermediate/desktop sizes (72 cases). It checks root containment, input and label reachability, target sizes, result placement, rotation state, onboarding and theme persistence, plus a reduced-height input/result check; then independently prepares and reloads all three entries offline and edits them.
 - `npm run probe:led-configurator -- --base=http://127.0.0.1:8000/` and the same command with `--no-webgl` cover calculation, profile, persistence, preview, fallback and cross-page handoff behavior.
 - `npm run test:throwline-browser` and `npm run verify:throwline` cover the scene contract, planner, manipulation, exports, field evidence and fallback behavior.
 - `AV_WORKSPACE_EVIDENCE=/absolute/output/path npm run test:av-workspace` saves screenshots and matrix JSON. `AV_WORKSPACE_BASE=https://avbydave.com/` points the same probe at the published release.
