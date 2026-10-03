@@ -118,8 +118,11 @@ export async function previewImport(raw: string, name: string, browserKey?: stri
 export function applyImport(doc: VideoDocument, preview: Preview): VideoDocument {
   if (preview.restore) return preview.restore;
   if (doc.imports.some(entry => entry.id === preview.fingerprint)) throw new Error("This exact source is already imported. Existing edits are unchanged.");
-  return { ...doc, title: (doc.routes.length || doc.displays.length) ? doc.title : preview.meta.showName || doc.title,
-    meta: (doc.routes.length || doc.displays.length) ? doc.meta : { ...doc.meta, ...preview.meta },
+  const adoptMetadata = doc.title === "Untitled video plan" && !Object.keys(doc.meta).length
+    && !doc.routes.length && !doc.displays.length && !doc.graphDevices.length && !doc.imports.length
+    && Boolean(preview.routes.length || preview.displays.length);
+  return { ...doc, title: adoptMetadata ? preview.meta.showName || doc.title : doc.title,
+    meta: adoptMetadata ? { ...preview.meta } : doc.meta,
     routes: [...doc.routes, ...preview.routes], displays: [...doc.displays, ...preview.displays], imports: [...doc.imports, { id: preview.fingerprint, name: preview.name, raw: preview.raw }] };
 }
 export function sampleDocument(): VideoDocument {

@@ -65,7 +65,15 @@ async function exportPlan() {
 }
 try {
   await page.goto(url);
-  await goProject(); await button('Load sample').click(); await save();
+  await goProject();
+  await page.getByLabel('Plan name', { exact: true }).fill('Configured empty show');
+  await page.getByLabel('Venue', { exact: true }).fill('Chosen venue');
+  await page.getByLabel('Video lead', { exact: true }).fill('Chosen lead'); await save();
+  await page.locator('input[type=file]').setInputFiles({ name: 'display.json', mimeType: 'application/json', buffer: Buffer.from(raw) });
+  await button('Add destinations to plan').click(); await save();
+  assert.equal((await readSaved()).title, 'Configured empty show');
+  assert.deepEqual((await readSaved()).meta, { venue: 'Chosen venue', videoLead: 'Chosen lead' });
+  await goProject(); page.once('dialog', dialog => dialog.accept()); await button('Load sample').click(); await save();
   await page.evaluate(({ raw, projection }) => { localStorage.setItem('display-plan.v1', raw); localStorage.setItem('sbd.projectionPlan.v1', JSON.stringify(projection)); }, { raw, projection });
   await goProject(); await button('Import saved Display Plan').click(); await page.getByRole('dialog').waitFor();
   await button('Cancel').click(); assert.equal((await readSaved()).displays.length, 0);
