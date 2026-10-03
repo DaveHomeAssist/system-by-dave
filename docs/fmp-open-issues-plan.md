@@ -8,7 +8,7 @@ Owners: **fmp-suite** means fix the canonical source and re-export; **sbd** mean
 this repository; **Dave** means a console, credential or hardware step that an
 agent cannot do.
 
-## Status, October 1
+## Status, October 3
 
 | # | Status |
 | --- | --- |
@@ -22,11 +22,13 @@ agent cannot do.
 | A8 | Done: system-by-dave #185 resolved camera-sim audit rows D10 and W2; fmp-suite #41 records an outcome for every walk UX audit recommendation (`docs/walk-ux-audit-outcomes.md`) and for the operator reference review |
 | B2 | Fixed in source: fmp-suite #40 (merged), shipped by the system-by-dave #179 release export. Hash routes for the walk (`#/walk/<stop>`, `#/faults`, `#/report`) with Back, reload and deep links; the first Back closes an open fault sheet |
 | B3 | Done: system-by-dave #187, a weekly WebKit smoke for the Camera Simulator. Its first CI run rendered with WebGL on iPhone 13 and iPad Pro 11 emulation (8/8) |
-| B4 | In review: fmp-suite #43, a sticky Pass/Flag/Skip bar above the nav |
-| B6 | Partly in review: fmp-suite #43 ties every reading label to its field. Segmented controls for yes/no and level readings remain |
-| B7 | In review: fmp-suite #44, Display mode after the zones, a sticky Start walk (it sat at y=1435 on a 390x844 phone) and a distinct Required style |
-| B8 | In review: fmp-suite #43, `--dim` at 4.5:1 on all card surfaces in both modes (Night measured 2.84:1), 44px targets, heading levels, status emoji hidden from screen readers |
-| B9 | In review: fmp-suite #45, preview first, Send as the one primary action, a global disabled style, Retry Notion only after a failure. Moving Clear and start over to Setup follows #44 |
+| B1 | Superseded: fmp-suite #53 made the walk a paged no-scroll workspace with a 44 px Position picker, a non-interactive rail and the route list hidden. The Route button and phone route sheet (fmp-suite #49) were closed unmerged. Since #54 the picker's last entry says End of route until every position has a result |
+| B4 | Shipped: fmp-suite #43 made Pass/Flag/Skip sticky; since fmp-suite #53 they sit on the walk's Result page, so no scrolling is needed to reach them |
+| B5 | Fixed in source: fmp-suite #54 (merged `acdbb8a`), shipped by the October 3 walk release export. Rebuilt on #53 after #47 and #50 went stale. Next position is outlined so Pass and Flag lead, Save fault advances, the end card counts positions not walked with a jump to the first, and its fault count is labelled Faults. The header and Position picker say walk complete only when every position has a result |
+| B6 | Shipped: fmp-suite #43 ties every reading label to its field, and fmp-suite #48 replaced typed yes/no and level readings with tap controls |
+| B7 | Shipped: fmp-suite #44, Display mode after the zones, Start walk in reach (it sat at y=1435 on a 390x844 phone) and a distinct Required style |
+| B8 | Shipped: fmp-suite #43, `--dim` at 4.5:1 on all card surfaces in both modes (Night measured 2.84:1), 44px targets, heading levels, status emoji hidden from screen readers |
+| B9 | Shipped: fmp-suite #45, preview first, Send as the one primary action, a global disabled style, Retry Notion only after a failure. Clear and start over stays on Report (agent call, October 1, not a decision from Dave): it is the last step after send and backup, and it has a confirm and an undo |
 
 ## Phase A: small fixes, no hardware
 

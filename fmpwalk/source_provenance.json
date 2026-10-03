@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "20d23c6c88c28d67c4a6381f688dbfe50728c727",
+  "sourceCommit": "acdbb8a1b678976b3b432bae4f8f4bd4101245c3",
   "mode": "local-first",
   "files": {
     "assets/walk-photos/2026-08-28-bacardi-concession-menu-displays-closeup.jpg": "8d503de7ddd3f8fd678edbf66c3b85882990b807d4cafd3feebcbe8d4059149b",
@@ -25,16 +25,16 @@
     "assets/walk-photos/2026-09-16-concession-menu-board-beer-seltzer-wine.jpg": "90575bfafbcd44034284b7efeebaedef1b7bbe3ae6532b37477fc38340a8afc4",
     "assets/walk-photos/2026-09-16-concession-menu-board-drinks.jpg": "f10d2074f7eb8bf1971a98d73ab94f394bf540fbdee7484ca1bb758018f34a70",
     "email.js": "6743ac2f30366875656baa60e3e8d107ff605d3b8d54a94d7138219a62d260c5",
-    "index.html": "0ba153f233a4d46285ed3da50b687192a2597f4c9b6b768121b1dfac2657c82d",
+    "index.html": "9ae9d83442b184963dd31d37a7e3d64769e0a9ef25e78589cd24799d2bfbc4c4",
     "mail.js": "fe07a45a7b6d11537a05f44f5349b4b1e4407f4891fb3a8037377a5ccba0022a",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "notion.js": "760791e5db5cab8b6cd99921a75297d815600ebb6e1f08a530ac07e3bb72b1be",
     "photos.js": "56a96b43f5b35693ec72e0876fb30b8a989edb9197b469dcc9099d544da5164e",
     "walk-core.js": "2feb000f544df4428b8a96d60de78bcc9fb21dab11d7c28d3f1205495a400ec4",
     "walk-pages.css": "ad2f56bff67570bd179cb08525edd320c6bf4b8be3bebf1401aaacabc01b5896",
-    "walk-pages.js": "99919936e2945da5f5903aac109a818d25ffaef22c8b599a564d24a310339f11",
+    "walk-pages.js": "d93b538de665f9a3fae4b58c11110d86150ab4242def1f59372cd6f235b053c6",
     "walk-reference.json": "646f0c57001da5a52065690254646292af78dabeb4fe0e4c33f8683a8623df2a",
     "walk-reliability.js": "69c42cc2f7ccc989584dcd8ba1a1264dd063aa3358a0590f7aac1785616391d0"
   },
-  "artifactSha256": "7dec68b4cf2578db964286673218c91aa9c5c43c7cc650f5b7d57ef6e427c5bf"
+  "artifactSha256": "b697be3f997e5ed919c7ee0f047814eb92e33c4c49b5ea43386f1d46027c0ec9"
 }
