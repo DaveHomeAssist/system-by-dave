@@ -6,7 +6,7 @@ The feature text and declared keys come from the registry. Export, print, and ke
 
 | Tool and feature | Route | Origin | Declared storage and known exceptions | Export | Print | Keyboard | Offline route |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| **AV Video** — Signal Flow and Video Patch combined: one route list, signal chains, input assignments, checks, and optional modules. | `/av-video/` | https://avbydave.com | sbd.avVideo.v1 | Source signal | Not found | Not found | Named |
+| **AV Video** — Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules. | `/av-video/` | https://avbydave.com | sbd.avVideo.v1 | Source signal | Not found | Not found | Named |
 | **AV Workbook** — Shared show workbook for rooms, crew, gear, signal sources, patching, validation, and handoff state. | `/av-workbook/` | https://avbydave.com | system-by-dave.av-workbook.active.v1, system-by-dave.av-workbook.fallback.v1; IndexedDB system-by-dave-av-workbook / workbooks | Source signal | Not found | Not found | Named |
 | **Teleprompter** — Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view. | `/teleprompter.html` | https://avbydave.com | teleprompter.v1, teleprompter.script.v1, teleprompter.preferences.v1, teleprompter.savedScripts.v1, teleprompter.savedFormats.v1, teleprompter.pacePresets.v1, teleprompter.bookmarks.v1, teleprompter.customColors.v1 | Source signal | Not found | Source signal | Named |
 | **Show Timer** — Countdown, count up, clock mode, stage view, warning states, and keyboard control. | `/show-timer.html` | https://avbydave.com | showTimer.preferences.v1 | Source signal | Not found | Source signal | Named |

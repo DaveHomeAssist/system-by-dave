@@ -1,6 +1,6 @@
 # AV Suite consolidation: Toolbox and focused applications
 
-**Implementation update 2026-10-02:** [AV Video](../av-video/) combines Signal Flow and Video Patch as one standalone application launched from Toolbox, with optional modules and its own versioned document. See [the implemented workflow](av-video.md). Cross-application document linking remains deferred; it is not a prerequisite for this independently saved route-and-patch slice. The remaining six Video workflows and other focused applications remain planned.
+**Implementation update 2026-10-03:** [AV Video](../av-video/) combines Signal Flow and Video Patch as one standalone application launched from Toolbox, with optional modules and its own versioned document. See [the implemented workflow](av-video.md). Cross-application document linking remains deferred; it is not a prerequisite for this independently saved route-and-patch slice. The October 3 Displays & Projection slice adds destination records, explicit route links and lossless imports from Display Plan and Projection Plan. Cameras, Playback, Stream Plan and Record Log remain planned. Full capability and operator acceptance, and legacy entry retirement, remain open.
 
 **Decision revision:** 2026-10-02, requested by Dave. The October 2 clarification removes assumed Workbook adoption, recovery and migration requirements from public withdrawal. This is the maintained product and migration plan. It supersedes the September 23 seven-workspace proposal and the September 29 recommendation to build Video inside Workbook. The [dated specification](av-suite-consolidation-spec-2026-09-23.md) remains historical evidence.
 
@@ -78,7 +78,7 @@ LED Wall Calculator remains a directly launchable specialist, also reachable fro
 
 ## Optional modules
 
-The capability is settled. Initial module presets and whether a project's module setup travels with its document remain choices to resolve before that implementation.
+The capability is settled. The shipped AV Video modules (Patch, Displays, Checks and Backups) travel with its saved document and are enabled initially. Future application presets and broader user/device preferences remain choices for the affected implementation.
 
 1. **Control:** Provide a plainly labeled Manage modules control in Toolbox and each affected app. Show what each module does and allow enable, disable, and restore defaults. Toolbox may also hide unneeded applications from the user's personal launch view; Manage applications keeps them recoverable.
 2. **Reduced clutter:** A disabled module disappears from normal tabs, cards, contextual panels, commands and default search results. An explicit Show disabled option in management/search makes it findable again. Do not leave empty tabs or repeated upgrade-style prompts.
@@ -139,7 +139,7 @@ These are open product choices, not a request to reapprove settled direction. Re
 | Choice | Recommended path | Consequence and decision gate |
 | --- | --- | --- |
 | **Document identity across applications** | Each app owns documents; share only explicit supported context/imports at first | A shared project container changes identity, conflict handling and migration scope. Resolve before the Video persistence contract; Workbook is not the assumed answer. |
-| **First module presets and preference scope** | A compact Video core around Switching & Routes; optional task modules chosen by the user; preferences local to that user/device | Confirm which task views appear initially and whether presets travel with projects before the module UI/import behavior ships. The ability to turn modules off is settled. |
+| **First module presets and preference scope** | A compact Video core around Switching & Routes; optional task modules chosen by the user; preferences local to that user/device | AV Video now enables its shipped modules initially and saves visibility in the document; retain that contract. Resolve presets for future applications before their UI/import behavior ships. The ability to turn modules off is settled. |
 | **Remaining application boundaries** | Keep existing live apps separate; evaluate Infrastructure as a family before combining it | Resolve Power/Network/Lighting and live-app mergers before implementing those mergers. It does not block independent Video or Toolbox work. |
 | **Show Console readiness authority** | Keep manual console status and display app-derived issues separately | Automated aggregation needs one writer, scoped status semantics and conflict/rollback rules. Resolve only before adding that aggregation. |
 

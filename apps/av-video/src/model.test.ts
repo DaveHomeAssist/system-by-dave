@@ -45,7 +45,7 @@ describe("AV Video shared plan", () => {
     expect(() => parseDocument(JSON.stringify({ ...emptyDocument(), schema: "future" }))).toThrow();
   });
   it("module changes retain all hidden data in a restorable backup", async () => {
-    const doc = sampleDocument(); doc.modules = { patch: false, checks: false, backups: false };
+    const doc = sampleDocument(); doc.modules = { ...doc.modules, patch: false, checks: false, backups: false };
     const preview = await previewImport(JSON.stringify(doc), "backup.json");
     expect(applyImport(emptyDocument(), preview)).toEqual(doc);
     expect(doc.routes[0].input).toBe("Switcher input 1");
