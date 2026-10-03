@@ -27,15 +27,15 @@ aviewfrommyseat bot challenge accepted in A7) and 1 warning (P4, which is D1).
 
 | # | Status |
 | --- | --- |
-| D1 | Done in this repository's Phase D PR: P4 passes when main's files match the release. The live run reported "1 commit(s) ahead of released 20d23c6c88c2 with identical files" |
-| D2 | Done in the same PR: gates 1, 3 and 4 in `docs/fmp-public-release.md` |
-| D3, D10 | fmp-suite #55; live after the next fmp/ and fmpwalk/ re-export |
-| D4 | Code in fmp-suite #55; gate 1 and the origin note in this PR; the live variable is C6 |
-| D5 | Done in the same PR |
+| D1 | Done in system-by-dave #231: P4 passes when main's files match the release. A live run reported "1 commit(s) ahead of released 20d23c6c88c2 with identical files" |
+| D2 | Done in system-by-dave #231: gates 1, 3 and 4 in `docs/fmp-public-release.md` |
+| D3, D10 | Merged in fmp-suite #55 (`92db88a`) and re-exported to fmp/ and fmpwalk/ by the Phase D release PR |
+| D4 | Code in fmp-suite #55; gate 1 and the origin note in system-by-dave #231; the live variable is C6 |
+| D5 | Done in system-by-dave #231 |
 | D6 | 46 branches deleted on October 3: the four superseded ones (each tip still reachable from its PR) and 42 merged ones. Kept: the Faults branch, the only ref to `04a4e04`, and the four walk Phase B branches, which belong to that session. The auto-delete setting waits for Dave |
 | D7 | Done: housevideo#2 closed with a pointer to the source repositories |
-| D8 | After the walk Phase B release and the #55 re-export |
-| D9 | Done in this repository's Phase D PR: probe check W8, with the seven pages in E1 as recorded debt |
+| D8 | Console gates updated October 3 (g10, g11 and g21 closed; g06, g08 and g09 reworded; g23–g25 added). The full refresh follows this release |
+| D9 | Done in system-by-dave #231: probe check W8 covers every published route, with the seven pages in E1 as recorded debt |
 
 ## Phase D: small fixes, no hardware
 
