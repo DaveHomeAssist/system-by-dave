@@ -3,7 +3,9 @@
 /* Offline cache worker for the AV Suite. The asset manifest and cache version
    come from js/sbd-registry.js — the single source of truth for tools. Bump
    SBD_REGISTRY.version and update this worker when a cached asset changes so
-   installed clients discover a new cache generation. */
+   installed clients discover a new cache generation. Scripts and styles use
+   network-first loading so an online return does not pair new HTML with stale
+   cached application code. */
 importScripts('./js/sbd-registry.js');
 
 var CACHE_PREFIX='sbd-av-suite-';
@@ -128,12 +130,15 @@ self.addEventListener('fetch',function(event){
     return;
   }
   event.respondWith(caches.open(CACHE_NAME).then(function(cache){
-    if(request.mode==='navigate'){
-      return fetch(request).then(function(response){
+    if(request.mode==='navigate'||request.destination==='script'||request.destination==='style'){
+      var networkRequest=request.mode==='navigate'?fetch(request):fetch(request,{cache:'no-cache'});
+      return networkRequest.then(function(response){
+        if(request.mode!=='navigate'&&!response.ok) throw new Error('Asset request failed');
         return putClean(cache,request,response);
       }).catch(function(){
         return cachedResponse(cache,request).then(function(found){
           if(found) return found;
+          if(request.mode!=='navigate') throw new Error('Offline asset is unavailable');
           var fallback=new URL(request.url).pathname===new URL('./',self.registration.scope).pathname?'./av-suite-landing2.html':'./av-suite.html';
           return cache.match(new URL(fallback,self.registration.scope).href).then(function(page){return page||offlinePage();});
         });

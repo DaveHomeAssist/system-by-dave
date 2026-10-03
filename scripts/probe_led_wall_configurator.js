@@ -308,6 +308,46 @@ async function main() {
       throw new Error(`Blank optional cabinet raster did not persist explicitly: ${JSON.stringify(blankRasterState)}.`);
     }
     console.log('PASS blank optional raster persistence');
+    const subpixelCabinet = await evaluate(`(() => {
+      const set = (id, value) => {
+        const field = document.getElementById(id);
+        field.value = value;
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+      set('ledCabinetWidthMm', '1');
+      set('ledCabinetHeightMm', '1');
+      set('ledPitchMm', '50');
+      return {
+        raster: document.getElementById('ledCabinetRaster').textContent,
+        warnings: document.getElementById('ledWarnings').textContent,
+        summary: document.getElementById('ledWallPreview').getAttribute('aria-label')
+      };
+    })()`);
+    if (!subpixelCabinet.raster.includes('1 × 1 px')
+      || !subpixelCabinet.warnings.includes('smaller than one pixel')
+      || /(?:NaN|Infinity)/.test(JSON.stringify(subpixelCabinet))) {
+      throw new Error(`Subpixel cabinet dimensions produced an invalid wall: ${JSON.stringify(subpixelCabinet)}.`);
+    }
+    console.log('PASS subpixel cabinet dimensions stay finite and explain the mismatch');
+    await scenario('restore cabinet geometry after subpixel case', [
+      ['ledCabinetWidthMm', '500'], ['ledCabinetHeightMm', '1000'], ['ledPitchMm', '2.5']
+    ], { cabinetRaster: '200 × 400 px · pitch derived' });
+    const invertedPower = await evaluate(`(() => {
+      const max = document.getElementById('ledMaxWattsEach');
+      const typical = document.getElementById('ledTypicalWattsEach');
+      max.value = '65';
+      max.dispatchEvent(new Event('change', { bubbles: true }));
+      typical.value = '180';
+      typical.dispatchEvent(new Event('change', { bubbles: true }));
+      return document.getElementById('ledWarnings').textContent;
+    })()`);
+    if (!invertedPower.includes('Typical watts per cabinet exceed maximum watts')) {
+      throw new Error(`Inverted power rating did not warn the operator: ${invertedPower}.`);
+    }
+    console.log('PASS inconsistent typical and maximum power rating is flagged');
+    await scenario('restore cabinet power after inverted case', [
+      ['ledMaxWattsEach', '180'], ['ledTypicalWattsEach', '65']
+    ], { power: '1.08 kW max' });
     const numericDraft = await evaluate(`(() => {
       const pitch = document.getElementById('ledPitchMm');
       pitch.value = '0';
@@ -792,6 +832,28 @@ async function main() {
       throw new Error(`Quick reset erased LED state: ${JSON.stringify(reset)}.`);
     }
     console.log('PASS reload and reset preserve independent calculator values');
+
+    await evaluate(`navigator.serviceWorker.register('./av-suite-worker.js', { scope: './' }).then(() => navigator.serviceWorker.ready.then(() => true))`);
+    await cdp('Page.reload');
+    await delay(400);
+    const workerReady = await evaluate(`Boolean(navigator.serviceWorker.controller)`);
+    if (!workerReady) throw new Error('Returning-browser cache test did not obtain service-worker control.');
+    const onlineAsset = await evaluate(`(async () => {
+      const cacheName = (await caches.keys()).find(name => name.startsWith('sbd-av-suite-'));
+      const cache = await caches.open(cacheName);
+      const url = new URL('./js/vendor/gsap.min.js', location.href).href;
+      await cache.put(url, new Response('window.__staleLedAsset = true;', { headers: { 'Content-Type': 'text/javascript' } }));
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url + '?edgeOnline=1';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.append(script);
+      });
+      return { stale: Boolean(window.__staleLedAsset), refreshed: (await (await cache.match(url))?.text())?.startsWith('/*!'), cacheName };
+    })()`);
+    if (onlineAsset.stale || !onlineAsset.refreshed) throw new Error(`Online return loaded stale cached script: ${JSON.stringify(onlineAsset)}.`);
+    console.log('PASS online return refreshes a stale cached script');
 
     if (exceptions.length) throw new Error(`Runtime exceptions: ${exceptions.join('; ')}`);
     socket.close();
