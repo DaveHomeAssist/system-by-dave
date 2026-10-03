@@ -12,7 +12,7 @@ const server=createServer(async(req,res)=>{try{let file=join(ROOT,new URL(req.ur
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base=process.env.AV_WORKSPACE_BASE||`http://127.0.0.1:${server.address().port}/`;
 const browser=await chromium.launch({channel:process.env.CHROME_CHANNEL||'chrome',headless:true,args:['--enable-unsafe-swiftshader']});
-const sizes=[[360,800],[390,844],[430,932],[768,1024],[820,1180],[1024,1366],[680,900],[1440,900],[2560,720]];
+const sizes=[[360,800],[390,844],[430,932],[768,1024],[820,1180],[1024,1366],[680,900],[1440,900],[2560,720],[320,800]];
 const evidence=[];const failures=[];const output=process.env.AV_WORKSPACE_EVIDENCE;
 if(output)await mkdir(output,{recursive:true});
 function geometry(){
@@ -85,6 +85,9 @@ try{
    await page.waitForFunction(()=>document.activeElement.id==='measuredDistance');
    assert.equal(await page.locator('#workflowTabDeliver').getAttribute('aria-selected'),'true','Field Verify reveals Deliver');
    assert.equal(await page.evaluate(()=>document.activeElement.id),'measuredDistance','Field Verify focuses the first measurement');
+   assert.equal(await page.locator('[data-mobile-panel-button=adjust]').getAttribute('aria-expanded'),'true','Field Verify synchronizes its trigger');
+   await page.keyboard.press('Escape');
+   assert.equal(await page.evaluate(()=>document.activeElement.dataset.mobilePanelButton),'adjust','Field Verify dismissal restores Adjust focus');
    for(const name of ['view','facts','export']){
     await page.locator(`[data-mobile-panel-button="${name}"]`).tap();await page.waitForTimeout(100);
     const sheet=await page.evaluate(()=>{const hud=document.querySelector('.hud').getBoundingClientRect();const visible=[...document.querySelectorAll('.scene-toolbar,.facts,.mobile-exports')].filter(e=>e.checkVisibility());return{count:visible.length,clear:visible.every(e=>{const r=e.getBoundingClientRect();return r.top>=hud.bottom-1&&r.bottom<=innerHeight&&r.left>=0&&r.right<=innerWidth;})};});

@@ -453,11 +453,12 @@ html[data-av-workspace=stage] .onboarding-actions button{flex:1;min-height:44px;
 html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=wide] .workflow-route{grid-template-columns:repeat(3,minmax(0,1fr))}
 html[data-av-workspace=stage][data-workspace-short=true] .onboarding-intro{display:none}
 html[data-av-workspace=stage] .quick-start-toggle{color:var(--dim)}
+html[data-av-workspace=stage][data-workspace-short=true] .app{grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:52px minmax(0,1fr) var(--av-touch);grid-template-areas:"header header header header header header header" "controls controls controls stage stage stage stage" "dock dock dock dock links links links"}
 html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .app{grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:52px var(--stage-hud-bottom,100px) minmax(0,1fr) var(--av-touch);grid-template-areas:"header header header header header header header" "stage stage stage stage stage stage stage" "controls controls controls controls controls controls controls" "dock dock dock dock links links links"}
-html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .mobile-dock{padding:0;gap:0}
-html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .workspace-links{gap:0}
-html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .workspace-links a{flex:1;min-width:0;padding:2px;text-align:center}
-html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] #stageOfflineCompact{display:none}
+html[data-av-workspace=stage][data-workspace-short=true] .mobile-dock{padding:0;gap:0}
+html[data-av-workspace=stage][data-workspace-short=true] .workspace-links{gap:0}
+html[data-av-workspace=stage][data-workspace-short=true] .workspace-links a{flex:1;min-width:0;padding:2px;text-align:center}
+html[data-av-workspace=stage][data-workspace-short=true] #stageOfflineCompact{display:none}
 html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=stack] .stage-canvas{visibility:hidden}
 
 html[data-av-workspace=stage] #offlineBadge{display:block}
@@ -501,7 +502,7 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 .av-page-nav output{min-width:0;font-size:12px;text-align:center;color:var(--av-text,var(--chalk))}
 .av-offline-status{font-size:11px;line-height:1.3;color:var(--av-text,var(--chalk))}
 
-.av-page-content .grp>div:has(>input),.av-page-content .grp>div:has(>select){break-inside:avoid}
+.av-page-content .grp>div:has(>input),.av-page-content .grp>div:has(>select){display:inline-block;vertical-align:top;width:100%;break-inside:avoid}
 
 .av-page-content :is(.scene-actions,.row,.unit-strip){display:contents!important;break-inside:auto}
 .av-page-content :is(.scene-actions,.row,.unit-strip)>button{display:block;width:100%;margin-bottom:var(--av-gap);break-inside:avoid}

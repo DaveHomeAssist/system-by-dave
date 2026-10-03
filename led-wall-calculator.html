@@ -64,7 +64,7 @@ html[data-av-workspace=led] main{display:flex;flex:1;flex-direction:column;min-h
 html[data-av-workspace=led] .led-page-status{flex-direction:row;flex-wrap:nowrap;align-items:center;flex:none;min-height:18px;margin:0;padding:0;font-size:11px;display:flex;gap:8px}
 html[data-av-workspace=led] #actionStatus{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html[data-av-workspace=led] .led-suite:not([data-active-section]){visibility:hidden}
-html[data-av-workspace=led] .led-suite{flex:1;display:grid;min-height:0;min-width:0;overflow:hidden;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto 44px;gap:8px;padding:8px}
+html[data-av-workspace=led] .led-suite{flex:1;display:grid;min-height:0;min-width:0;overflow:hidden;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto auto;gap:8px;padding:8px}
 html[data-av-workspace=led] .led-suite-head{display:none}
 html[data-av-workspace=led] .led-stage{grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;min-height:0;min-width:0;gap:4px;margin:0;padding:8px}
 html[data-av-workspace=led] .led-stage-view{height:100%;min-height:0;padding:0 16px}
@@ -87,7 +87,7 @@ html[data-av-workspace=led] .led-result{padding:4px;min-width:0;min-height:0;bor
 html[data-av-workspace=led] .led-result span{font-size:10px;margin:0}
 html[data-av-workspace=led] .led-result strong{font-size:14px;line-height:1.25;overflow-wrap:anywhere}
 html[data-av-workspace=led] .led-result small{font-size:10px;margin:0;line-height:1.2}
-html[data-av-workspace=led] .led-section-nav{grid-row:3;grid-column:1/-1;position:static;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:0;overflow:hidden;background:var(--av-surface)}
+html[data-av-workspace=led] .led-section-nav{grid-row:3;grid-column:1/-1;position:static;display:grid;grid-template-columns:repeat(auto-fit,minmax(var(--av-touch),1fr));grid-auto-rows:var(--av-touch);gap:2px;padding:0;overflow:hidden;background:var(--av-surface)}
 html[data-av-workspace=led] .led-section-nav button{min-width:44px;min-height:44px;font-size:11px;padding:4px}
 html[data-av-workspace=led] .led-section-nav [aria-current]{background:var(--av-accent-soft);color:var(--av-accent-strong);border-color:var(--av-accent)}
 html[data-av-workspace=led] .led-detail-grid{display:block;min-height:0;padding:0;overflow:visible}
@@ -96,7 +96,7 @@ html[data-av-workspace=led] .led-disclaimer{margin:0;padding:8px;font-size:12px}
 html[data-av-workspace=led] .sbd-nav{display:grid;grid-template-columns:repeat(5,minmax(44px,1fr));gap:4px;padding:4px;left:var(--av-safe-left);right:var(--av-safe-right);bottom:var(--av-safe-bottom);max-height:none}
 html[data-av-workspace=led] .sbd-nav a{min-height:44px;min-width:44px;font-size:10px;padding:4px;justify-content:center}
 html[data-av-workspace=led] .sbd-nav a .sbd-nav-label{font-size:10px}
-html[data-av-workspace=led][data-workspace-shape=stack] .led-suite{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(100px,.65fr) minmax(0,1fr) auto 44px}
+html[data-av-workspace=led][data-workspace-shape=stack] .led-suite{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(100px,.65fr) minmax(0,1fr) auto auto}
 html[data-av-workspace=led][data-workspace-shape=stack] .led-stage{grid-column:1;grid-row:1;grid-template-columns:minmax(0,1fr) 90px;grid-template-rows:minmax(0,1fr);padding:4px}
 html[data-av-workspace=led][data-workspace-shape=stack] .led-stage-data{align-content:center}
 html[data-av-workspace=led][data-workspace-shape=stack] .led-view-toggle{flex-direction:column;gap:4px}
@@ -104,7 +104,7 @@ html[data-av-workspace=led][data-workspace-shape=stack] .led-editor{grid-column:
 html[data-av-workspace=led][data-workspace-shape=stack] .led-result-strip{grid-row:3;grid-template-columns:repeat(3,minmax(0,1fr))}
 html[data-av-workspace=led][data-workspace-shape=stack] .led-section-nav{grid-row:4}
 html[data-av-workspace=led][data-workspace-short=true] .led-page-status{display:none}
-html[data-av-workspace=led][data-workspace-short=true] .led-suite{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);grid-template-rows:minmax(0,1fr) 44px}
+html[data-av-workspace=led][data-workspace-short=true] .led-suite{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);grid-template-rows:minmax(0,1fr) auto}
 html[data-av-workspace=led][data-workspace-short=true] .led-stage{display:none}
 html[data-av-workspace=led][data-workspace-short=true] .led-result-strip{grid-column:1;grid-row:1;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start}
 html[data-av-workspace=led][data-workspace-short=true] .led-editor{grid-column:2;grid-row:1}
@@ -155,7 +155,7 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 .av-page-nav output{min-width:0;font-size:12px;text-align:center;color:var(--av-text,var(--chalk))}
 .av-offline-status{font-size:11px;line-height:1.3;color:var(--av-text,var(--chalk))}
 
-.av-page-content .grp>div:has(>input),.av-page-content .grp>div:has(>select){break-inside:avoid}
+.av-page-content .grp>div:has(>input),.av-page-content .grp>div:has(>select){display:inline-block;vertical-align:top;width:100%;break-inside:avoid}
 
 .av-page-content :is(.scene-actions,.row,.unit-strip){display:contents!important;break-inside:auto}
 .av-page-content :is(.scene-actions,.row,.unit-strip)>button{display:block;width:100%;margin-bottom:var(--av-gap);break-inside:avoid}

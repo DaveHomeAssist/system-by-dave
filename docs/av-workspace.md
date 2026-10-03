@@ -22,7 +22,7 @@ The existing [AV Suite worker](../av-suite-worker.js) is the sole cache owner. [
 
 ## Verification and remaining acceptance
 
-- `npm run test:av-workspace` runs touch-enabled Chromium device contexts at six requested phone/tablet sizes in both orientations and themes, plus three intermediate/desktop sizes (72 cases). It checks root containment, input and label reachability, target sizes, result placement, rotation state, onboarding and theme persistence, plus a reduced-height input/result check; then independently prepares and reloads all three entries offline and edits them.
+- `npm run test:av-workspace` runs touch-enabled Chromium device contexts at six requested phone/tablet sizes in both orientations and themes, plus three intermediate/desktop sizes (80 cases, including 320px narrow-width coverage). It checks root containment, input and label reachability, target sizes, result placement, rotation state, onboarding and theme persistence, plus a reduced-height input/result check; then independently prepares and reloads all three entries offline and edits them.
 - `npm run probe:led-configurator -- --base=http://127.0.0.1:8000/` and the same command with `--no-webgl` cover calculation, profile, persistence, preview, fallback and cross-page handoff behavior.
 - `npm run test:throwline-browser` and `npm run verify:throwline` cover the scene contract, planner, manipulation, exports, field evidence and fallback behavior.
 - `AV_WORKSPACE_EVIDENCE=/absolute/output/path npm run test:av-workspace` saves screenshots and matrix JSON. `AV_WORKSPACE_BASE=https://avbydave.com/` points the same probe at the published release.
