@@ -914,8 +914,8 @@
     const enteredRasterProvided = Boolean(providedCabinetPixelsWide && providedCabinetPixelsHigh);
     const pitchDerivedEnteredWide = enteredCabinetWidthMm / pitchMm;
     const pitchDerivedEnteredHigh = enteredCabinetHeightMm / pitchMm;
-    const enteredCabinetPixelsWide = enteredRasterProvided ? providedCabinetPixelsWide : Math.round(pitchDerivedEnteredWide);
-    const enteredCabinetPixelsHigh = enteredRasterProvided ? providedCabinetPixelsHigh : Math.round(pitchDerivedEnteredHigh);
+    const enteredCabinetPixelsWide = enteredRasterProvided ? providedCabinetPixelsWide : Math.max(1, Math.round(pitchDerivedEnteredWide));
+    const enteredCabinetPixelsHigh = enteredRasterProvided ? providedCabinetPixelsHigh : Math.max(1, Math.round(pitchDerivedEnteredHigh));
     const impliedPitchWideMm = enteredCabinetWidthMm / enteredCabinetPixelsWide;
     const impliedPitchHighMm = enteredCabinetHeightMm / enteredCabinetPixelsHigh;
     const rotated = String(state.ledCabinetRotation) === '90';
@@ -981,6 +981,13 @@
     const power = calculateLedPower({ cabinetsTotal, areaM2 });
     const viewing = calculateLedViewing(pitchMm);
     const warnings = [];
+
+    if (pitchDerivedEnteredWide < 1 || pitchDerivedEnteredHigh < 1) {
+      warnings.push({ severity: 'bad', label: 'PITCH', text: 'Cabinet dimensions are smaller than one pixel at the entered pitch. Verify cabinet size and pixel pitch against the product specification before using this plan.' });
+    }
+    if (power.typicalWattsEach > power.maxWattsEach) {
+      warnings.push({ severity: 'bad', label: 'POWER', text: 'Typical watts per cabinet exceed maximum watts per cabinet. Verify both ratings before using the power or circuit plan.' });
+    }
 
     if (pitchFraction > 0.05) {
       const rasterAuthority = enteredRasterProvided
