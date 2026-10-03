@@ -208,3 +208,5 @@ The first baseline is
 [`reports/fmp-hygiene-baseline-2026-09-17.md`](../reports/fmp-hygiene-baseline-2026-09-17.md).
 Open findings from the October 1, 2026 survey and probe, with a verdict and
 owner for each, are in [`fmp-open-issues-plan.md`](fmp-open-issues-plan.md).
+The October 3 follow-up survey is in
+[`fmp-open-issues-plan-2.md`](fmp-open-issues-plan-2.md).
