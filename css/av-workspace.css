@@ -33,3 +33,6 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 [data-av-workspace] button:is(:active,.is-pressing){transform:none}
 
 .av-page-content summary{display:block;break-inside:avoid}
+
+/* Native WebKit selectors do not consistently honor min-height alone. */
+[data-av-workspace] select{height:var(--av-touch)}

@@ -2982,11 +2982,14 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 
 .av-page-content summary{display:block;break-inside:avoid}
 
+/* Native WebKit selectors do not consistently honor min-height alone. */
+[data-av-workspace] select{height:var(--av-touch)}
+
 </style>
 <!-- AV workspace styles:end -->
 <!-- AV workspace runtime:start -->
 <script>
-window.AVWorkspaceVersion="v20261003-av-workspace-range";
+window.AVWorkspaceVersion="v20261003-av-workspace-webkit";
 /* View state only: existing form nodes and product calculation state remain authoritative. */
 (function(global){
   'use strict';

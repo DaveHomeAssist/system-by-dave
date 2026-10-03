@@ -32,4 +32,6 @@ jobs:
       - run: npm ci
       - run: npm run verify:av && npm run verify:throwline
       - run: npm run test:av-workspace
+      - run: npx playwright install --with-deps webkit
+      - run: AV_WORKSPACE_BROWSER=webkit npm run test:av-workspace
       - run: npm run test:throwline-browser

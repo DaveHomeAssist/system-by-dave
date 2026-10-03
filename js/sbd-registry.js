@@ -245,7 +245,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261003-av-workspace-range',
+    version:'v20261003-av-workspace-webkit',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
