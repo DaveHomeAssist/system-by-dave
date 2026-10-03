@@ -149,7 +149,7 @@ function update(){
   const panel=document.querySelector('.panel.on');if(!panel)return;preparePanel(panel);prepareNotes(panel);
   const key=S.tab+(S.tab==='walk'?':'+S.idx:''),remembered=memories.get(key)||[0,0],roots=workspace.roots();
   taskSelect.replaceChildren(...roots.map((r,i)=>new Option(r.dataset.title,String(i))));taskLabel.firstChild.textContent=({setup:'Setup',walk:'Walk',tk:'Faults',rep:'Report',ref:'Reference'})[S.tab];
-  positionLabel.hidden=S.tab!=='walk';if(S.tab==='walk'){position.replaceChildren(...stations().map((s,i)=>new Option(`${i+1} · ${s.name}`,String(i))));position.append(new Option('Walk complete',String(stations().length)));position.value=String(S.idx);}
+  positionLabel.hidden=S.tab!=='walk';if(S.tab==='walk'){position.replaceChildren(...stations().map((s,i)=>new Option(`${i+1} · ${s.name}`,String(i))));const route=stations();position.append(new Option(route.length&&route.every(s=>S.res[s.id]?.status)?'Walk complete':'End of route',String(route.length)));position.value=String(S.idx);}
   workspace.show(...remembered);refreshNotes(panel);prepareSheet();prepareDialogs();
   if(editing&&active.isConnected){
    const host=active.closest('dialog[open],#sheet.on'),pager=host?pagers.get(host):workspace;
