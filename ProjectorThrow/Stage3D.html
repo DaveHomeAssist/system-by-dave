@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="en">
+<html data-av-workspace="stage" lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Throwline Stage 3D is an offline-capable spatial workspace for projector placement, throw geometry, field verification, room planning, and model export.">
 <meta name="theme-color" id="themeColor" content="#f4f1ea">
 <meta name="color-scheme" content="light dark">
@@ -386,8 +386,245 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
   .theme-toggle,.unit-toggle{min-width:40px;padding-inline:6px}
   .field-verify-toggle,.quick-start-toggle{padding-inline:6px}
 }
+/* Workspace adapter: same scene, bounded controls, and an unobscured set mark. */
+html[data-av-workspace=stage] .app{height:calc(var(--av-available-height,100dvh) - var(--av-safe-top) - var(--av-safe-bottom));grid-template-columns:minmax(var(--av-pane-min),.85fr) minmax(0,1.15fr);grid-template-rows:52px minmax(0,1fr) 44px 44px;grid-template-areas:"header header" "controls stage" "dock dock" "links links"}
+html[data-av-workspace=stage] header{padding:4px 8px;gap:8px;flex-wrap:nowrap;min-height:0}
+html[data-av-workspace=stage] .brand{font-size:12px;letter-spacing:.08em}
+html[data-av-workspace=stage] :is(.tag,.companion,.header-more){display:none}
+html[data-av-workspace=stage] .header-actions{gap:4px;flex-wrap:nowrap}
+html[data-av-workspace=stage] .header-actions button{min-width:44px;min-height:44px;padding:4px 8px;font-size:10px}
+html[data-av-workspace=stage] .theme-toggle span{display:none}
+html[data-av-workspace=stage] .quick-label-wide{display:none}
+html[data-av-workspace=stage] .quick-label-short{display:inline}
+html[data-av-workspace=stage] aside{display:block!important;position:relative;grid-area:controls;inset:auto;width:auto;max-height:none;height:100%!important;min-height:0;overflow:hidden;border-radius:0;box-shadow:none;margin:0}
+html[data-av-workspace=stage] .adjust-panel>summary{display:none}
+html[data-av-workspace=stage] .adjust-content{inset:0;grid-template-rows:44px minmax(0,1fr)}
+html[data-av-workspace=stage] .workflow-flight-strip{display:none;align-items:center;justify-content:space-between;padding:4px 8px;gap:4px;min-width:0}
+html[data-av-workspace=stage] .flight-kicker{display:none}
+html[data-av-workspace=stage] .flight-unit{font-size:10px;margin:0}
+html[data-av-workspace=stage] .flight-provenance{font-size:9px}
+html[data-av-workspace=stage] .flight-numbers{font-size:11px;flex-wrap:nowrap}
+html[data-av-workspace=stage] .workflow-tabs{min-height:44px}
+html[data-av-workspace=stage] .workflow-tab{min-height:44px;font-size:12px;color:var(--dim);padding:4px}
+html[data-av-workspace=stage] .workflow-tab span{display:none}
+html[data-av-workspace=stage] .workflow-panel{padding:8px;min-height:0;overflow:hidden;scrollbar-gutter:auto}
+html[data-av-workspace=stage] .workflow-panel-title{display:none;font-size:12px;margin-bottom:8px;letter-spacing:.03em}
+html[data-av-workspace=stage] .workflow-panel-title span{display:none}
+html[data-av-workspace=stage] .workflow-footer{display:none}
+html[data-av-workspace=stage] .grp{margin:0}
+html[data-av-workspace=stage] .lab{font-size:12px;line-height:1.3}
+html[data-av-workspace=stage] .grp h3{font-size:12px}
+html[data-av-workspace=stage] .advanced-block>summary{min-height:44px;font-size:12px}
+html[data-av-workspace=stage] .scene-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+html[data-av-workspace=stage] .scene-actions button{min-height:44px;font-size:11px;white-space:normal}
+html[data-av-workspace=stage] main{overflow:hidden;display:block;position:relative;grid-area:stage}
+html[data-av-workspace=stage] .hud{position:absolute;left:8px;right:8px;top:8px;width:auto;max-width:none;max-height:none;padding:6px 8px;pointer-events:none}
+html[data-av-workspace=stage] .hud .big{font-size:26px;margin:0}
+html[data-av-workspace=stage] .hud .sub{display:none}
+html[data-av-workspace=stage] .hud .k{font-size:10px}
+html[data-av-workspace=stage] .hud .note{font-size:11px;margin-top:2px}
+html[data-av-workspace=stage] .hud .band{display:none}
+html[data-av-workspace=stage] .stage-canvas{inset:var(--stage-hud-bottom,116px) 0 0}
+html[data-av-workspace=stage] :is(.scene-toolbar,.facts,.mobile-exports){display:none;position:absolute;inset:var(--stage-hud-bottom,116px) 8px 8px;width:auto;max-height:none;min-height:0;overflow:hidden;margin:0;padding:8px;background:var(--case);box-shadow:none;border:1px solid var(--line);z-index:20}
+html[data-av-workspace=stage] body[data-mobile-panel=view] .scene-toolbar,html[data-av-workspace=stage] body[data-mobile-panel=facts] .facts,html[data-av-workspace=stage] body[data-mobile-panel=export] .mobile-exports{display:grid}
+html[data-av-workspace=stage] body[data-sheet-open=true] main::after{display:none}
+html[data-av-workspace=stage] .facts-trigger{display:none}
+html[data-av-workspace=stage] .mobile-dock{grid-area:dock;position:static;display:grid;grid-template-columns:repeat(4,minmax(44px,1fr));gap:4px;padding:0 8px;min-height:44px;border-top:1px solid var(--line)}
+html[data-av-workspace=stage] .mobile-dock button{min-height:44px;font-size:11px;padding:4px}
+html[data-av-workspace=stage] .workspace-links{grid-area:links;display:flex;align-items:center;justify-content:space-around;gap:4px;min-height:44px;border-top:1px solid var(--line);background:var(--case)}
+html[data-av-workspace=stage] .workspace-links a{display:flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;font-size:11px;padding:4px}
+html[data-av-workspace=stage][data-workspace-shape=stack] .app{grid-template-columns:minmax(0,1fr);grid-template-rows:52px minmax(var(--av-preview-min),1.2fr) minmax(0,1fr) 44px 44px;grid-template-areas:"header" "stage" "controls" "dock" "links"}
+html[data-av-workspace=stage][data-workspace-shape=stack] .header-actions button{padding-inline:4px}
+html[data-av-workspace=stage][data-workspace-shape=stack] .field-verify-toggle{font-size:9px}
+html[data-av-workspace=stage][data-workspace-shape=stack] .stage-canvas{inset:var(--stage-hud-bottom,110px) 0 0}
+html[data-av-workspace=stage] .onboarding-dialog:not(.job-sheet-dialog){width:min(740px,calc(100vw - var(--av-safe-left) - var(--av-safe-right) - 16px));max-width:none;height:calc(var(--av-available-height,100dvh) - var(--av-safe-top) - var(--av-safe-bottom) - 16px);max-height:620px;overflow:hidden;padding:0}
+html[data-av-workspace=stage] .onboarding-shell{height:100%;display:flex;flex-direction:column;gap:8px;padding:16px;overflow:hidden}
+html[data-av-workspace=stage] .onboarding-title{font-size:26px;margin:0;max-width:none;padding-right:40px}
+html[data-av-workspace=stage] .onboarding-kicker{margin:0;font-size:10px}
+html[data-av-workspace=stage] .onboarding-intro{font-size:13px;margin:0}
+html[data-av-workspace=stage] .optic-sketch{display:none}
+html[data-av-workspace=stage] .workflow-route{display:grid;flex:1;min-height:0;grid-template-columns:1fr;gap:8px}
+html[data-av-workspace=stage] .workflow-step{min-height:44px;padding:8px}
+html[data-av-workspace=stage] .workflow-step-copy span{font-size:12px}
+html[data-av-workspace=stage] .onboarding-footer{flex:none;display:block;margin:0;padding:0}
+html[data-av-workspace=stage] .onboarding-note{display:none}
+html[data-av-workspace=stage] .onboarding-actions{display:flex;width:100%;gap:8px}
+html[data-av-workspace=stage] .onboarding-actions button{flex:1;min-height:44px;font-size:11px}
+html[data-av-workspace=stage][data-workspace-short=true][data-workspace-shape=wide] .workflow-route{grid-template-columns:repeat(3,minmax(0,1fr))}
+html[data-av-workspace=stage][data-workspace-short=true] .onboarding-intro{display:none}
+html[data-av-workspace=stage] .quick-start-toggle{color:var(--dim)}
+html[data-av-workspace=stage] #offlineBadge{display:block}
+html[data-av-workspace=stage] .workspace-links .av-offline-status{font-size:10px}
+html[data-av-workspace=stage] .hud .provenance-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px;margin-top:4px}
+html[data-av-workspace=stage] .hud .state-label{margin:0;padding:2px 4px;font-size:11px;line-height:1.2;letter-spacing:0;text-transform:none}
+html[data-av-workspace=stage] .hud .provenance-badge{font-size:10px;letter-spacing:0;padding:2px 4px}
+html[data-av-workspace=stage] .facts{pointer-events:auto}
+html[data-av-workspace=stage] .facts :is(.av-page-content,.av-page-window){display:block;padding:0;border:0}
+html[data-av-workspace=stage] .facts .av-page-content>div{break-inside:avoid;padding:4px;gap:8px}
+html[data-av-workspace=stage] .facts dt{font-size:11px;min-width:90px;letter-spacing:0}
+html[data-av-workspace=stage] .facts dd{font-size:12px;overflow-wrap:anywhere}
+
+
 </style>
 <link rel="stylesheet" href="../css/sbd-public-nav.css">
+<!-- AV workspace styles:start -->
+<style>
+/* Generated from design/av-workspace.tokens.json and css/av-workspace.css. */
+:root{--av-touch:44px;--av-input:16px;--av-gap:8px;--av-page-gap:16px;--av-pane-min:320px;--av-preview-min:160px;--av-safe-top:env(safe-area-inset-top, 0px);--av-safe-right:env(safe-area-inset-right, 0px);--av-safe-bottom:env(safe-area-inset-bottom, 0px);--av-safe-left:env(safe-area-inset-left, 0px);}
+/* Shared containment and interaction contract. Product palettes remain local. */
+html[data-av-workspace],html[data-av-workspace] body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}
+html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-right) var(--av-safe-bottom) var(--av-safe-left);box-sizing:border-box}
+[data-av-workspace] :is(button,a,summary,input,select,textarea){touch-action:manipulation}
+[data-av-workspace] :is(button,summary,input,select,textarea){min-height:var(--av-touch);min-width:var(--av-touch);box-sizing:border-box}
+[data-av-workspace] :is(input,select,textarea){font-size:var(--av-input)!important}
+[data-av-workspace] :is(a,button,summary):focus-visible{outline:2px solid var(--av-focus,var(--hazard));outline-offset:-2px}
+[data-av-workspace] [hidden]{display:none!important}
+.av-paged{display:grid;grid-template-rows:minmax(0,1fr) var(--av-touch);gap:var(--av-gap);min-height:0;min-width:0;overflow:hidden!important}
+.av-page-window{position:relative;min-width:0;min-height:0;overflow:clip}
+.av-page-content{height:100%;width:100%;column-width:var(--av-page-width);column-gap:var(--av-page-gap);column-fill:auto;transform:translateX(var(--av-page-offset,0px));transition:none!important}
+.av-page-content :is(.field,label,.row,.scene-actions,.led-detail-stat,.field-note,.model-note,.calculation-gate,.lab){break-inside:avoid}
+.av-page-content :is(.grp,.control-block,.field-grid,.led-module-fields,.led-detail-body,.scenario-history){display:block;overflow:visible;margin:0;padding:0;border:0}
+.av-page-content :is(.grp,.control-block,.field-grid,.led-module-fields,.led-detail-body)>*{margin-bottom:var(--av-gap)}
+.av-page-content :is(.field-grid>label,.field){display:block}
+.av-page-content :is(input:not([type=range]),select,textarea){max-width:100%;width:100%}
+.av-page-content input[type=range]{width:100%}
+.av-page-content h3{margin:0 0 var(--av-gap);break-after:avoid}
+.av-page-nav{display:flex;align-items:center;justify-content:space-between;gap:var(--av-gap);min-width:0}
+.av-page-nav button{flex:none;min-height:var(--av-touch);min-width:var(--av-touch);font:inherit;color:inherit;background:var(--av-surface,var(--case));border:1px solid var(--av-line,var(--line));border-radius:4px;padding:4px 12px}
+.av-page-nav output{min-width:0;font-size:12px;text-align:center;color:var(--av-text,var(--chalk))}
+.av-offline-status{font-size:11px;line-height:1.3;color:var(--av-text,var(--chalk))}
+
+.av-page-content .grp>div:has(>input),.av-page-content .grp>div:has(>select){break-inside:avoid}
+
+.av-page-content :is(.scene-actions,.row,.unit-strip){display:contents!important;break-inside:auto}
+.av-page-content :is(.scene-actions,.row,.unit-strip)>button{display:block;width:100%;margin-bottom:var(--av-gap);break-inside:avoid}
+
+[data-av-workspace] input[type=range]{margin:0}
+.av-page-content a{display:inline-flex;align-items:center;min-height:var(--av-touch);min-width:var(--av-touch)}
+
+/* Keep the hit surface stationary while retaining border/color press feedback. */
+[data-av-workspace] button:is(:active,.is-pressing){transform:none}
+
+.av-page-content summary{display:block;break-inside:avoid}
+
+</style>
+<!-- AV workspace styles:end -->
+<!-- AV workspace runtime:start -->
+<script>
+window.AVWorkspaceVersion="v20261003-av-workspace";
+/* View state only: existing form nodes and product calculation state remain authoritative. */
+(function(global){
+  'use strict';
+  const root=document.documentElement;
+  const pagers=new Set();
+  let frame=0;
+  function refresh(){
+    cancelAnimationFrame(frame);
+    frame=requestAnimationFrame(()=>pagers.forEach(pager=>pager.refresh()));
+  }
+  function viewport(){
+    const visual=global.visualViewport;
+    // Pinch zoom must continue to magnify the page, not reflow it under the finger.
+    const height=visual&&visual.scale===1?visual.height:global.innerHeight;
+    root.style.setProperty('--av-available-height',`${height}px`);
+    const pane=parseFloat(getComputedStyle(root).getPropertyValue('--av-pane-min'))||320;
+    root.dataset.workspaceShape=global.innerWidth>=pane*2?'wide':'stack';
+    root.dataset.workspaceShort=String(height<pane*2);
+    refresh();
+  }
+  function paginate(panel,{label='Controls'}={}){
+    if(panel.avPager)return panel.avPager;
+    const win=document.createElement('div');win.className='av-page-window';
+    const content=document.createElement('div');content.className='av-page-content';
+    while(panel.firstChild)content.append(panel.firstChild);
+    win.append(content);
+    const nav=document.createElement('nav');nav.className='av-page-nav';nav.setAttribute('aria-label',`${label} pages`);
+    const back=document.createElement('button');back.type='button';back.textContent='Previous';back.setAttribute('aria-label',`Previous ${label.toLowerCase()} page`);
+    const next=document.createElement('button');next.type='button';next.textContent='Next';next.setAttribute('aria-label',`Next ${label.toLowerCase()} page`);
+    const count=document.createElement('output');count.setAttribute('aria-live','polite');
+    nav.append(back,count,next);panel.append(win,nav);panel.classList.add('av-paged');
+    let page=0,total=1,width=0,gap=16;
+    function show(value){
+      page=Math.max(0,Math.min(total-1,value));
+      content.style.setProperty('--av-page-offset',`${-page*(width+gap)}px`);
+      count.textContent=`${label} · ${page+1} / ${total}`;
+      back.disabled=page===0;next.disabled=page===total-1;
+      panel.dataset.page=String(page+1);panel.dataset.pages=String(total);
+    }
+    const api={
+      refresh(){
+        if(!panel.checkVisibility()||win.clientWidth===0||win.clientHeight===0)return;
+        width=win.getBoundingClientRect().width;gap=parseFloat(getComputedStyle(root).getPropertyValue('--av-page-gap'))||16;
+        content.style.setProperty('--av-page-width',`${width}px`);
+        total=Math.max(1,Math.ceil((content.scrollWidth+gap)/(width+gap)));
+        const active=document.activeElement;
+        if(content.contains(active))api.reveal(active);else show(page);
+      },
+      reveal(element){
+        const x=element.getBoundingClientRect().left-content.getBoundingClientRect().left;
+        show(Math.floor((x+1)/(width+gap)));
+      }
+    };
+    back.addEventListener('click',()=>show(page-1));next.addEventListener('click',()=>show(page+1));
+    content.addEventListener('focusin',event=>api.reveal(event.target));
+    content.addEventListener('toggle',refresh,true);
+    new ResizeObserver(refresh).observe(win);
+    new MutationObserver(refresh).observe(content,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['hidden','open']});
+    panel.avPager=api;pagers.add(api);refresh();return api;
+  }
+  global.AVWorkspace={paginate,refresh};
+  if(root.hasAttribute('data-av-workspace')){
+    viewport();global.addEventListener('resize',viewport);global.visualViewport?.addEventListener('resize',viewport);
+  }
+})(window);
+
+/* One cache owner per AV origin. Readiness means control AND this entry's assets exist. */
+(function(global){
+  'use strict';
+  const root=document.documentElement;
+  const isThrowline=location.pathname.includes('/ProjectorThrow/');
+  const base=new URL(isThrowline?'../':'./',location.href);
+  let badge;
+  function report(state,text){root.dataset.workspaceOffline=state;if(badge)badge.textContent=text;}
+  async function prepare(){
+    if(!isSecureContext||!('serviceWorker' in navigator)||!('caches' in global)){report('unavailable','Offline cache unavailable');return false;}
+    report('preparing','Preparing offline use');
+    try{
+      const registration=await navigator.serviceWorker.register(new URL('av-suite-worker.js',base));
+      await navigator.serviceWorker.ready;
+      const ready=async()=>{
+        const controller=navigator.serviceWorker.controller;if(!controller)return false;
+        const info=await new Promise(resolve=>{
+          const channel=new MessageChannel();const timer=setTimeout(()=>{channel.port1.close();resolve(null);},2000);
+          channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();resolve(event.data);};
+          controller.postMessage({type:'SBD_OFFLINE_VERSION'},[channel.port2]);
+        });
+        if(!info||info.version!==global.AVWorkspaceVersion)return false;
+        const assets=[new URL(location.pathname+(location.pathname.endsWith('/')?'index.html':''),location.origin).href,...[...document.querySelectorAll('script[src],link[rel=stylesheet]')].map(el=>el.src||el.href)];
+        if(isThrowline)assets.push(new URL('ProjectorThrow/throwline-scene-state.js',base).href);
+        else assets.push(...['data/led-cabinet-catalog.v1.json','ProjectorThrow/vendor/three/three.module.min.js','ProjectorThrow/vendor/three/three.core.min.js','ProjectorThrow/vendor/three/addons/controls/OrbitControls.js'].map(path=>new URL(path,base).href));
+        const cache=await caches.open(info.cache);
+        const matches=await Promise.all(assets.filter(url=>new URL(url).origin===location.origin).map(url=>cache.match(url,{ignoreSearch:true})));
+        if(matches.some(item=>!item))return false;
+        report('ready','Offline ready');return true;
+      };
+      if(await ready())return true;
+      registration.active?.postMessage({type:'SBD_CLAIM_CLIENTS'});
+      return await new Promise(resolve=>{
+        const timer=setTimeout(()=>finish(false),45000);
+        const poll=setInterval(async()=>{try{if(await ready())finish(true);}catch{finish(false);}},1000);
+        function finish(ok){clearTimeout(timer);clearInterval(poll);if(!ok)report('partial','Offline not ready — stay online');resolve(ok);}
+      });
+    }catch(error){report('error','Offline unavailable — keep connection');return false;}
+  }
+  global.AVOffline={prepare};
+  function start(){badge=document.getElementById('workspaceOffline');if(badge)prepare();}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})(window);
+
+</script>
+<!-- AV workspace runtime:end -->
+
 </head>
 <body>
 <a class="sbd-skip-link" href="#stage-workspace">Skip to Throwline Stage 3D workspace</a>
@@ -622,7 +859,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
     </section>
     <button class="facts-trigger" id="factsTrigger" type="button" aria-controls="stageFactsSheet" aria-expanded="false">Facts</button>
     <div class="stage-canvas">
-      <three-d-stage name="throwline-stage" fallback="index.html?workspace=planner" role="region" aria-label="Interactive Throwline Stage 3D"></three-d-stage>
+      <three-d-stage external-controls name="throwline-stage" fallback="index.html?workspace=planner" role="region" aria-label="Interactive Throwline Stage 3D"></three-d-stage>
       <section class="stage-fallback" id="stageFallback" aria-labelledby="stageFallbackTitle" hidden>
         <svg id="stageFallbackDrawing" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="stageFallbackSvgTitle stageFallbackSvgDescription">
           <title id="stageFallbackSvgTitle">Throwline live 2D plan view</title>
@@ -744,7 +981,7 @@ const offlineBadge = document.getElementById('offlineBadge');
 const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
-const OFFLINE_CACHE_VERSION = 'v20261002-led-wall-edge-cases';
+const OFFLINE_CACHE_VERSION = 'v20261003-av-workspace';
 const WORKFLOW_STAGES = ['setup','place','room','deliver'];
 const workflowTabs = [...document.querySelectorAll('[data-workflow-tab]')];
 const workflowPanels = [...document.querySelectorAll('[data-workflow-panel]')];
@@ -771,6 +1008,8 @@ function activateStageFallback(){
 function setOfflineStatus(state,badge,title,detail){
   document.documentElement.dataset.offline=state;
   offlineBadge.textContent=badge;
+  const compact=document.getElementById('stageOfflineCompact');
+  if(compact)compact.textContent=state==='ready'?'Offline ready':state==='installing'||state==='updating'?'Caching…':'Online needed';
   offlineStatusTitle.textContent=title;
   offlineStatusDetail.textContent=detail;
 }
@@ -788,6 +1027,9 @@ async function markOfflineReady(){
   const version=await controllingWorkerVersion();
   document.documentElement.dataset.offlineVersion=version;
   if(version!==OFFLINE_CACHE_VERSION)return false;
+  const cache=await caches.open('sbd-av-suite-'+version);
+  const assets=['Stage3D.html','three-d-stage.js','throwline-scene-state.js','vendor/three/three.module.min.js','vendor/three/three.core.min.js','vendor/three/addons/controls/OrbitControls.js','vendor/three/addons/exporters/OBJExporter.js','vendor/three/addons/exporters/GLTFExporter.js'];
+  if((await Promise.all(assets.map(path=>cache.match(new URL(path,location.href).href)))).some(item=>!item))return false;
   setOfflineStatus('ready','Offline ready · direct spatial control','Offline ready.','This workspace and its pinned 3D engine are saved on this device.');
   return true;
 }
@@ -804,6 +1046,8 @@ async function prepareOfflineUse(){
     setOfflineStatus('updating','Updating offline files · stay online','Updating offline files.','Keep this page online while the current workspace replaces an older cache.');
     navigator.serviceWorker.addEventListener('controllerchange',()=>markOfflineReady(),{once:true});
     registration.update().catch(()=>{});
+    const retry=setInterval(async()=>{try{if(await markOfflineReady())clearInterval(retry);}catch{clearInterval(retry);}},1000);
+    setTimeout(()=>clearInterval(retry),45000);
   }catch(error){
     console.warn('Throwline offline cache unavailable',error);
     setOfflineStatus('error','Local engine · offline cache failed','Offline cache could not be prepared.','The workspace is available now, but a network connection will be required to reopen it.');
@@ -1058,16 +1302,13 @@ function applyTheme(theme,{persist=false,announceChange=false}={}){
 }
 themeToggle.addEventListener('click',()=>applyTheme(currentTheme()==='dark'?'light':'dark',{persist:true,announceChange:true}));
 applyTheme(currentTheme());
-// Field Verify always leads to the verification fields: on phone widths (820px and below) that means
-// opening the Adjust sheet, disclosing Verify & Deliver, scrolling the panel into view, and focusing
-// the measured-distance field; wider layouts open the rail to the same disclosure.
+// Reveal the same verification fields and their bounded page at every width.
 function revealFieldVerification(){
-  if (window.innerWidth <= 820 && document.body.dataset.mobilePanel !== 'adjust') setMobilePanel('adjust');
-  adjustPanel.open = true;
+  document.body.dataset.mobilePanel='adjust';
+  adjustPanel.open=true;
   selectWorkflowPanel('deliver');
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    document.getElementById('fieldVerificationPanel').scrollIntoView({block:'nearest',behavior:'auto'});
-    if (window.innerWidth <= 820) document.getElementById('measuredDistance').focus({preventScroll:true});
+    document.getElementById('measuredDistance').focus({preventScroll:true});
   }));
 }
 function setFieldVerify(enabled,{announceChange=false}={}){
@@ -2199,6 +2440,18 @@ window.addEventListener('pagehide',event=>{fieldVerificationMotion?.revert();if(
   activateStageFallback();
   stageStatus.textContent = 'The 3D view couldn’t start on this device. The live 2D plan view is active; calculations, placement controls, scene JSON, and the job sheet still work. 3D view controls and model downloads are off.';
 }
+</script>
+<script>
+(function(){
+  const fit=document.createElement('div');const label=document.createElement('dt');label.textContent='Ratio fit';const detail=document.createElement('dd');detail.append(document.getElementById('hNote'));fit.append(label,detail);document.querySelector('.facts').append(fit);
+  const hud=document.querySelector('.hud');new ResizeObserver(()=>{document.documentElement.style.setProperty('--stage-hud-bottom',`${hud.offsetTop+hud.offsetHeight+8}px`);AVWorkspace.refresh();}).observe(hud);
+  const links=document.createElement('nav');links.className='workspace-links';links.setAttribute('aria-label','Product navigation');
+  document.querySelectorAll('.header-actions > a').forEach(a=>links.append(a));document.querySelector('.app').append(links);
+  const compact=document.createElement('span');compact.id='stageOfflineCompact';compact.className='av-offline-status';compact.textContent='Caching…';links.append(compact);
+  const setup=document.getElementById('workflowPanelSetup');setup.append(document.getElementById('offlineBadge'),setup.querySelector('.online-note'));
+  document.querySelectorAll('.workflow-panel,.scene-toolbar,.facts,.mobile-exports').forEach(panel=>AVWorkspace.paginate(panel,{label:panel.getAttribute('aria-label')||'Controls'}));
+  new MutationObserver(()=>AVWorkspace.refresh()).observe(document.body,{attributes:true,attributeFilter:['data-mobile-panel']});
+})();
 </script>
 </body>
 </html>

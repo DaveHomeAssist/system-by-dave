@@ -479,7 +479,7 @@ async function main() {
       await cdp('Emulation.setDeviceMetricsOverride', { ...viewport, deviceScaleFactor: viewport.width === 390 ? 3 : 2, mobile: viewport.width === 390 });
       await open(AUDIT_QUERY);
       const layout = await evaluate(`(() => { const stage=document.querySelector('.stage-canvas').getBoundingClientRect(); const dock=document.querySelector('.mobile-dock').getBoundingClientRect(); return { clientWidth:document.documentElement.clientWidth, scrollWidth:document.documentElement.scrollWidth, innerHeight, bodyHeight:document.body.getBoundingClientRect().height, stage:{ width:stage.width, height:stage.height, top:stage.top, bottom:stage.bottom }, dock:{ width:dock.width, height:dock.height, top:dock.top, bottom:dock.bottom }, buttons:[...document.querySelectorAll('.mobile-dock button')].map(button=>({ width:button.getBoundingClientRect().width, height:button.getBoundingClientRect().height })) }; })()`);
-      check(`${viewport.width}px workspace has no horizontal overflow and keeps a visible stage`, layout.scrollWidth <= layout.clientWidth + 1 && layout.stage.width > 200 && layout.stage.height > 240 && layout.stage.top >= 0 && layout.stage.bottom <= layout.innerHeight, layout);
+      check(`${viewport.width}px workspace has no horizontal overflow and keeps a visible stage`, layout.scrollWidth <= layout.clientWidth + 1 && layout.stage.width > 200 && layout.stage.height > 100 && layout.stage.top >= 0 && layout.stage.bottom <= layout.innerHeight, layout);
       check(`${viewport.width}px mobile dock stays visible with four touch targets`, layout.dock.width > 200 && layout.dock.height >= 44 && layout.dock.bottom <= layout.innerHeight + 1 && layout.buttons.length === 4 && layout.buttons.every(button => button.height >= 44), layout);
       if (viewport.width === 390) {
         const onboarding = await evaluate(`(() => { const dialog=document.getElementById('onboardingDialog'); dialog.showModal(); const rect=dialog.getBoundingClientRect(); const shell=dialog.querySelector('.onboarding-shell').getBoundingClientRect(); const actions=[...dialog.querySelectorAll('.onboarding-actions button')].map(button=>button.getBoundingClientRect()); return {clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight,scrollWidth:dialog.scrollWidth,clientDialogWidth:dialog.clientWidth,rect:{left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom},shell:{left:shell.left,right:shell.right},actions:actions.map(rect=>({left:rect.left,right:rect.right,height:rect.height}))}; })()`);
@@ -506,20 +506,6 @@ async function main() {
       await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27, nativeVirtualKeyCode: 27 });
       await delay(150);
     };
-    const intersects = (a, b) => !!a && !!b && a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
-    const contained = (r, layout) => !!r && r.left >= -0.5 && r.top >= -0.5 && r.right <= layout.clientWidth + 0.5 && r.bottom <= layout.clientHeight + 0.5;
-    const LAYOUT_SNAPSHOT = `(() => {
-      const doc=document.documentElement;
-      const rect=el=>{ if(!el)return null; const r=el.getBoundingClientRect(); return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}; };
-      const visible=el=>{ if(!el)return false; const s=getComputedStyle(el); if(s.display==='none'||s.visibility==='hidden')return false; const r=el.getBoundingClientRect(); return r.width>0&&r.height>0; };
-      const header=['themeToggle','unitToggle','fieldVerifyToggle','quickStartToggle'].map(id=>{ const el=document.getElementById(id); return {id,visible:visible(el),rect:rect(el)}; });
-      const hud=document.querySelector('.hud'), facts=document.querySelector('.facts'), trigger=document.getElementById('factsTrigger'), toolbar=document.querySelector('.scene-toolbar'), dock=document.querySelector('.mobile-dock'), aside=document.querySelector('aside'), workflowFooter=document.querySelector('.workflow-footer');
-      const layer=el=>Number(getComputedStyle(el).zIndex)||0;
-      return { clientWidth:doc.clientWidth, clientHeight:doc.clientHeight, header,
-        hud:{visible:visible(hud),rect:rect(hud),layer:layer(hud)}, facts:{visible:visible(facts),rect:rect(facts),layer:layer(facts)},
-        trigger:{visible:visible(trigger),rect:rect(trigger),tag:trigger?trigger.tagName:'',expanded:trigger?trigger.getAttribute('aria-expanded'):''},
-        toolbar:{visible:visible(toolbar),rect:rect(toolbar)}, dock:{visible:visible(dock),rect:rect(dock)}, aside:{visible:visible(aside),rect:rect(aside)}, workflowFooter:{visible:visible(workflowFooter),rect:rect(workflowFooter)} };
-    })()`;
     const CONTROL_IDS = ['adjustPanel','sectionScreen','sectionProjector','sectionPlacement','sectionLayout','sectionRoom','sectionVerify','adjustSummary','flightUnit','flightProvenance','flightScreen','flightSet','workflowTabSetup','workflowTabPlace','workflowTabRoom','workflowTabDeliver','workflowPanelSetup','workflowPanelPlace','workflowPanelRoom','workflowPanelDeliver','workflowBack','workflowNext','workflowPosition','unitStrip','addUnit','removeUnit','stackUnits','blendUnits','blendOverlapMin','blendOverlapMax','layoutSummary','layoutMetrics','sw','st','ar','lens','lh','d','px','targetX','bw','bm','bt','bodyW','bodyH','bodyD','bodyLp','clearBody','roomW','roomD','roomH','roomC','addObstacle','clearObstacles','obstacleX','obstacleY','obstacleZ','obstacleWidth','obstacleHeight','obstacleDepth','removeObstacle','measuredDistance','measuredWidth','measuredLensHeight','measuredProjectorX','measuredTargetX','focusCheck','alignmentCheck','verifiedBy','commissioningNotes','commissioningSummary','stampVerification','saveScene','restoreScene','importScene','downloadScene','downloadHandoff','downloadCommissioning','scenarioName','saveScenario','undoScenario','redoScenario','scenarioStatus','resetScene','jobSheetOpen','sceneFile','tcone','troom','tgrid','tenvelope','tshift','tdimensions','resetView','mobileObj','mobileGlb','mobileJobSheet','factsTrigger','themeToggle','unitToggle','fieldVerifyToggle','quickStartToggle'];
 
     await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
@@ -537,8 +523,14 @@ async function main() {
     await click('clearObstacles');
     const clearReDisabled = await evaluate(`document.getElementById('clearObstacles').disabled`);
     check('Clear obstructions enables with an obstruction and disables again when cleared', clearEnabled === false && clearReDisabled === true, { clearEnabled, clearReDisabled });
-    const sticky = await evaluate(`(() => { const advanced=document.querySelector('.advanced-block'); advanced.open=true; const panel=document.getElementById('workflowPanelSetup'); const flight=document.querySelector('.workflow-flight-strip'); panel.style.maxHeight='180px'; const before=flight.getBoundingClientRect(); panel.scrollTop=panel.scrollHeight; const after=flight.getBoundingClientRect(); const result={ flightTop:after.top, beforeTop:before.top, scrolled:panel.scrollTop>0, overflow:getComputedStyle(panel).overflowY, screen:document.getElementById('flightScreen').textContent.trim(), set:document.getElementById('flightSet').textContent.trim(), provenance:document.getElementById('flightProvenance').textContent.trim() }; panel.style.maxHeight=''; return result; })()`);
-    check('the scene flight strip stays visible while only the active workflow panel scrolls', sticky.scrolled && Math.abs(sticky.flightTop-sticky.beforeTop)<=1 && /screen/.test(sticky.screen) && /set/.test(sticky.set) && sticky.provenance.length>0, sticky);
+    const paged = await evaluate(`(() => {
+      const panel=document.getElementById('workflowPanelSetup');
+      const hud=document.querySelector('.hud');const before=hud.getBoundingClientRect().top;
+      panel.querySelector('.av-page-nav button:last-child').click();
+      return {page:panel.dataset.page,pages:panel.dataset.pages,scroll:panel.scrollTop,
+        hudTop:hud.getBoundingClientRect().top,before,set:document.getElementById('hDist').textContent};
+    })()`);
+    check('bounded controls page without moving the set mark or scrolling the workflow', Number(paged.pages)>1&&paged.page==='2'&&paged.scroll===0&&paged.hudTop===paged.before&&paged.set.length>0,paged);
     let offlineCompact = null;
     for (let attempt = 0; attempt < 160; attempt += 1) {
       offlineCompact = await evaluate(`(() => { const detail=document.getElementById('offlineStatusDetail'); return { state:document.documentElement.dataset.offline||'', detailDisplay:getComputedStyle(detail).display, title:document.getElementById('offlineStatusTitle').textContent.trim() }; })()`);
@@ -586,83 +578,19 @@ async function main() {
       check('keyboard manipulation changes the selected set distance through the public event contract', spatial.before !== spatial.after, spatial);
     }
 
-    const MATRIX_WIDTHS = [320, 360, 390, 560, 680, 820, 821, 1024, 1200, 1299, 1300, 1440, 2750];
-    const MATRIX_HEIGHTS = { 320: 568, 360: 740, 390: 844, 560: 720, 680: 900, 820: 1080, 821: 900, 1024: 768, 1200: 800, 1299: 850, 1300: 850, 1440: 900, 2750: 1200 };
-    for (const width of MATRIX_WIDTHS) {
-      await cdp('Emulation.setDeviceMetricsOverride', { width, height: MATRIX_HEIGHTS[width], deviceScaleFactor: 1, mobile: width <= 820 });
-      await open(AUDIT_QUERY);
-      const layout = await evaluate(LAYOUT_SNAPSHOT);
-      const minControl = width <= 820 ? 44 : 34;
-      check(`${width}px keeps every visible header control inside the viewport at full height`, layout.header.filter(control => control.visible).length === 4 && layout.header.every(control => !control.visible || (contained(control.rect, layout) && control.rect.height >= minControl - 0.5)), layout.header);
-      const scrollProbe = await evaluate(`(() => { window.scrollTo(0,120); const y=window.pageYOffset; window.scrollTo(120,0); const x=window.pageXOffset; window.scrollTo(0,0); return { x, y, overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth }; })()`);
-      check(`${width}px document does not page-scroll`, scrollProbe.x === 0 && scrollProbe.y === 0 && scrollProbe.overflowX <= 1, scrollProbe);
-      if (width > 820) check(`${width}px anchors workflow navigation inside the desktop rail`, layout.workflowFooter.visible && layout.aside.visible && layout.workflowFooter.rect.top >= layout.aside.rect.top - 1 && Math.abs(layout.workflowFooter.rect.bottom-layout.aside.rect.bottom) <= 1, layout);
-      if (width <= 820) {
-        check(`${width}px keeps the four-button dock with the Facts overlay and trigger hidden`, layout.dock.visible && !layout.facts.visible && !layout.trigger.visible, layout);
-        await evaluate(`document.getElementById('fieldVerifyToggle').click()`);
-        await delay(280);
-        const reveal = await evaluate(`(() => { const aside=document.querySelector('aside'); const a=aside.getBoundingClientRect(); const field=document.getElementById('measuredDistance'); const f=field.getBoundingClientRect(); const footer=document.querySelector('.workflow-footer').getBoundingClientRect(); return { panel:document.body.dataset.mobilePanel||'', workflow:document.querySelector('[data-workflow-tab][aria-selected="true"]')?.dataset.workflowTab||'', deliverHidden:document.getElementById('workflowPanelDeliver').hidden, adjustOpen:document.getElementById('adjustPanel').open, focus:document.activeElement?document.activeElement.id:'', asideDisplay:getComputedStyle(aside).display, aside:{left:a.left,top:a.top,right:a.right,bottom:a.bottom}, field:{top:f.top,bottom:f.bottom,height:f.height}, footer:{top:footer.top,bottom:footer.bottom,height:footer.height}, clientWidth:document.documentElement.clientWidth, clientHeight:document.documentElement.clientHeight }; })()`);
-        check(`${width}px Field Verify reveals the verification fields in the open Adjust sheet`, reveal.panel === 'adjust' && reveal.workflow === 'deliver' && reveal.deliverHidden === false && reveal.adjustOpen === true && reveal.asideDisplay !== 'none' && reveal.focus === 'measuredDistance' && reveal.field.height >= 44 && reveal.field.top >= reveal.aside.top - 1 && reveal.field.bottom <= reveal.aside.bottom + 1, reveal);
-        check(`${width}px keeps workflow navigation inside the Adjust sheet`, reveal.footer.height >= 44 && reveal.footer.top >= reveal.aside.top - 1 && reveal.footer.bottom <= reveal.aside.bottom + 1, reveal);
-        check(`${width}px active Adjust sheet stays inside the viewport`, reveal.aside.left >= -0.5 && reveal.aside.top >= -0.5 && reveal.aside.right <= reveal.clientWidth + 0.5 && reveal.aside.bottom <= reveal.clientHeight + 0.5, reveal);
-      } else if (width <= 1299) {
-        check(`${width}px replaces the permanent Facts overlay with a visible keyboard-operable trigger`, layout.trigger.visible && layout.trigger.tag === 'BUTTON' && !layout.facts.visible && !layout.dock.visible && contained(layout.trigger.rect, layout), layout);
-        await evaluate(`document.getElementById('factsTrigger').focus()`);
-        const triggerFocus = await evaluate(`document.activeElement?document.activeElement.id:''`);
-        await evaluate(`document.getElementById('factsTrigger').click()`);
-        await delay(200);
-        const openState = await evaluate(LAYOUT_SNAPSHOT);
-        check(`${width}px Facts opens as a bounded dismissible sheet layered above the HUD, clear of the scene controls`, triggerFocus === 'factsTrigger' && openState.facts.visible && contained(openState.facts.rect, openState) && (openState.facts.layer > openState.hud.layer || !intersects(openState.hud.rect, openState.facts.rect)) && !intersects(openState.toolbar.rect, openState.facts.rect) && openState.trigger.expanded === 'true', openState);
-        await pressEscape();
-        const closedState = await evaluate(`({ open:document.body.dataset.factsOpen||'', focus:document.activeElement?document.activeElement.id:'', factsDisplay:getComputedStyle(document.querySelector('.facts')).display })`);
-        check(`${width}px Escape dismisses the Facts sheet and returns focus to the trigger`, closedState.open === 'false' && closedState.focus === 'factsTrigger' && closedState.factsDisplay === 'none', closedState);
-      } else {
-        check(`${width}px keeps the permanent Facts overlay bounded, clear of the HUD, without the trigger`, layout.facts.visible && !layout.trigger.visible && !layout.dock.visible && contained(layout.facts.rect, layout) && !intersects(layout.hud.rect, layout.facts.rect), layout);
-      }
-      if (width === 390) {
-        await open(AUDIT_QUERY);
-        await evaluate(`document.querySelector('[data-mobile-panel-button="adjust"]').click()`);
-        await delay(140);
-        await evaluate(`document.querySelector('[data-mobile-panel-button="view"]').click()`);
-        await delay(140);
-        const exclusivity = await evaluate(`(() => { const shown=el=>getComputedStyle(el).display!=='none'; return { panel:document.body.dataset.mobilePanel||'', adjust:shown(document.querySelector('aside')), view:shown(document.querySelector('.scene-toolbar')), facts:shown(document.querySelector('.facts')), exports:shown(document.querySelector('.mobile-exports')) }; })()`);
-        check('390px mobile sheets stay mutually exclusive', exclusivity.panel === 'view' && exclusivity.view && !exclusivity.adjust && !exclusivity.facts && !exclusivity.exports, exclusivity);
-        await evaluate(`document.querySelector('[data-mobile-panel-button="adjust"]').click()`);
-        await delay(140);
-        await evaluate(`document.getElementById('workflowTabDeliver').click()`);
-        await delay(140);
-        const touch = await evaluate(`(() => { const h=id=>document.getElementById(id).getBoundingClientRect().height; return { sw:h('sw'), ar:h('ar'), md:h('measuredDistance'), vb:h('verifiedBy'), stamp:h('stampVerification'), dock:[...document.querySelectorAll('.mobile-dock button')].map(button=>button.getBoundingClientRect().height) }; })()`);
-        check('390px mobile inputs meet the 44px touch target', touch.md >= 44 && touch.vb >= 44 && touch.stamp >= 44 && touch.dock.every(value => value >= 44), touch);
-        await evaluate(`document.getElementById('themeToggle').click()`);
-        await delay(160);
-        const dark = await evaluate(`(() => { window.scrollTo(0,120); const y=window.pageYOffset; window.scrollTo(0,0); return { theme:document.documentElement.dataset.theme||'', y }; })()`);
-        check('390px dark theme keeps the locked viewport', dark.theme === 'dark' && dark.y === 0, dark);
-        await evaluate(`document.getElementById('themeToggle').click()`);
-        await delay(120);
-      }
-      if (width === 1024) {
-        await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
-        await open(AUDIT_QUERY);
-        await evaluate(`document.getElementById('factsTrigger').focus()`);
-        const reducedFocus = await evaluate(`document.activeElement?document.activeElement.id:''`);
-        await evaluate(`document.getElementById('factsTrigger').click()`);
-        await delay(160);
-        const reducedOpen = await evaluate(`getComputedStyle(document.querySelector('.facts')).display`);
-        await pressEscape();
-        const reducedClosed = await evaluate(`({ display:getComputedStyle(document.querySelector('.facts')).display, focus:document.activeElement?document.activeElement.id:'' })`);
-        check('1024px reduced-motion Facts trigger stays keyboard operable', reducedFocus === 'factsTrigger' && reducedOpen !== 'none' && reducedClosed.display === 'none' && reducedClosed.focus === 'factsTrigger', { reducedFocus, reducedOpen, reducedClosed });
-        await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: '' }] });
-        await open(AUDIT_QUERY);
-        await evaluate(`document.getElementById('themeToggle').click()`);
-        await delay(160);
-        const darkMid = await evaluate(`document.documentElement.dataset.theme||''`);
-        check('1024px dark theme applies on the intermediate rail', darkMid === 'dark', darkMid);
-        await evaluate(`document.getElementById('themeToggle').click()`);
-        await delay(120);
-      }
-    }
-    await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
-
+    // The full touch/theme/orientation matrix is in probe_av_workspace.mjs.
+    // Keep renderer and keyboard acceptance here, including the unified Facts control.
+    await cdp('Emulation.setDeviceMetricsOverride', {width:1024,height:768,deviceScaleFactor:2,mobile:true});
+    await cdp('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+    await open(AUDIT_QUERY);
+    await evaluate(`document.querySelector('[data-mobile-panel-button="facts"]').click()`);
+    await delay(160);
+    const factsOpen=await evaluate(`({display:getComputedStyle(document.querySelector('.facts')).display,readout:document.getElementById('hDist').getBoundingClientRect().bottom,top:document.querySelector('.facts').getBoundingClientRect().top})`);
+    check('Facts uses the shared dock and stays clear of the set mark',factsOpen.display!=='none'&&factsOpen.top>=factsOpen.readout,factsOpen);
+    await pressEscape();
+    const factsClosed=await evaluate(`({display:getComputedStyle(document.querySelector('.facts')).display,focus:document.activeElement?.dataset.mobilePanelButton})`);
+    check('Escape closes Facts and restores its keyboard trigger',factsClosed.display==='none'&&factsClosed.focus==='facts',factsClosed);
+    await cdp('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:''}]});
     const unexpectedExceptions = noWebgl
       ? exceptions.filter((exception) => !/Error creating WebGL context\.|three-d-stage: WebGL 2 unavailable after standard and low-power startup attempts/.test(exception))
       : exceptions;

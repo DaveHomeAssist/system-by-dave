@@ -108,9 +108,10 @@
       gap: 8px;
       font-family: var(--mono, ui-monospace, monospace);
     }
+    :host([external-controls]) .toolbar { display: none; }
     .toolbar button {
       appearance: none;
-      min-height: 36px;
+      min-height: var(--av-touch, 44px);
       border: 1px solid var(--line, rgba(20, 20, 19, 0.2));
       border-radius: var(--r, 4px);
       background: var(--overlay, var(--case, #fff));
@@ -140,7 +141,9 @@
       font: 600 10px/1.5 var(--mono, ui-monospace, monospace);
       letter-spacing: .06em;
       text-transform: uppercase;
-      color: var(--dimmer, #666e79);
+      color: var(--dim, #4c535d);
+      background: var(--overlay, #fbfaf7);
+      padding: 4px;
       user-select: none;
       pointer-events: none;
     }

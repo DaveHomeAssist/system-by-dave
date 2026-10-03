@@ -116,6 +116,9 @@ jobs:
           CHROME_CHANNEL: chrome
         run: npm run test:switcher-guide-browser
 
+      - name: Verify AV bounded workspaces
+        run: npm run test:av-workspace
+
       - name: Verify Throwline release contract
         run: npm run verify:throwline
 
