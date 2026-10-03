@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-03 — Preserve Throwline range readouts
+
+- Move the existing wide/tele throw distances into bounded Facts alongside detailed ratio fit, preserving access after compacting the persistent set-mark banner. Add a visibility regression and roll the shared offline cache.
+
 ## 2026-10-03 — AV bounded workspace foundation
 
 - Add shared safe-area, touch, input and available-viewport tokens with reproducible inline consumers. Preserve the specialist themes and standalone planner architecture.

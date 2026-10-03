@@ -92,6 +92,7 @@ try{
     await page.locator(`[data-mobile-panel-button="${name}"]`).tap();await page.waitForTimeout(100);
     const sheet=await page.evaluate(()=>{const hud=document.querySelector('.hud').getBoundingClientRect();const visible=[...document.querySelectorAll('.scene-toolbar,.facts,.mobile-exports')].filter(e=>e.checkVisibility());return{count:visible.length,clear:visible.every(e=>{const r=e.getBoundingClientRect();return r.top>=hud.bottom-1&&r.bottom<=innerHeight&&r.left>=0&&r.right<=innerWidth;})};});
     assert.ok(sheet.count===1&&sheet.clear,'one bounded sheet stays clear of HUD');
+    if(name==='facts'){const range=await page.evaluate(()=>{const e=document.getElementById('hWide'),f=document.querySelector('.facts');f.avPager.reveal(e);const r=e.getBoundingClientRect(),w=f.querySelector('.av-page-window').getBoundingClientRect();return e.checkVisibility()&&r.left>=w.left-1&&r.right<=w.right+1&&r.top>=w.top-1&&r.bottom<=w.bottom+1&&document.getElementById('hTele').checkVisibility();});assert.ok(range,'wide and tele throw distances remain readable in Facts');}
     await page.keyboard.press('Escape');
     assert.equal(await page.evaluate(()=>document.body.dataset.mobilePanel),'','Escape dismisses sheet');
    }

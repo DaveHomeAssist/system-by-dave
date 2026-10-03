@@ -471,6 +471,7 @@ html[data-av-workspace=stage] .facts :is(.av-page-content,.av-page-window){displ
 html[data-av-workspace=stage] .facts .av-page-content>div{break-inside:avoid;padding:4px;gap:8px}
 html[data-av-workspace=stage] .facts dt{font-size:11px;min-width:90px;letter-spacing:0}
 html[data-av-workspace=stage] .facts dd{font-size:12px;overflow-wrap:anywhere}
+html[data-av-workspace=stage] .facts .sub{display:block;padding:0;border:0}
 
 
 </style>
@@ -519,7 +520,7 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 <!-- AV workspace styles:end -->
 <!-- AV workspace runtime:start -->
 <script>
-window.AVWorkspaceVersion="v20261003-av-workspace";
+window.AVWorkspaceVersion="v20261003-av-workspace-range";
 /* View state only: existing form nodes and product calculation state remain authoritative. */
 (function(global){
   'use strict';
@@ -989,7 +990,7 @@ const offlineBadge = document.getElementById('offlineBadge');
 const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
-const OFFLINE_CACHE_VERSION = 'v20261003-av-workspace';
+const OFFLINE_CACHE_VERSION = 'v20261003-av-workspace-range';
 const WORKFLOW_STAGES = ['setup','place','room','deliver'];
 const workflowTabs = [...document.querySelectorAll('[data-workflow-tab]')];
 const workflowPanels = [...document.querySelectorAll('[data-workflow-panel]')];
@@ -2451,6 +2452,7 @@ window.addEventListener('pagehide',event=>{fieldVerificationMotion?.revert();if(
 </script>
 <script>
 (function(){
+  const range=document.createElement('div');const rangeLabel=document.createElement('dt');rangeLabel.textContent='Throw range';const rangeValue=document.createElement('dd');rangeValue.append(document.querySelector('.hud .sub'));range.append(rangeLabel,rangeValue);document.querySelector('.facts').prepend(range);
   const fit=document.createElement('div');const label=document.createElement('dt');label.textContent='Ratio fit';const detail=document.createElement('dd');detail.append(document.getElementById('hNote'));fit.append(label,detail);document.querySelector('.facts').append(fit);
   const hud=document.querySelector('.hud');new ResizeObserver(()=>{document.documentElement.style.setProperty('--stage-hud-bottom',`${hud.offsetTop+hud.offsetHeight+8}px`);AVWorkspace.refresh();}).observe(hud);
   const links=document.createElement('nav');links.className='workspace-links';links.setAttribute('aria-label','Product navigation');
