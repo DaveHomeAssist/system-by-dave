@@ -5,13 +5,15 @@ import {createServer} from 'node:http';
 import {readFile,stat,mkdir,writeFile} from 'node:fs/promises';
 import {join,extname,resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {chromium,devices} from 'playwright';
+import {chromium,webkit,devices} from 'playwright';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const MIME={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.woff2':'font/woff2'};
 const server=createServer(async(req,res)=>{try{let file=join(ROOT,new URL(req.url,'http://local').pathname);if((await stat(file)).isDirectory())file=join(file,'index.html');res.writeHead(200,{'content-type':MIME[extname(file)]||'application/octet-stream'});res.end(await readFile(file));}catch{res.writeHead(404).end();}});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base=process.env.AV_WORKSPACE_BASE||`http://127.0.0.1:${server.address().port}/`;
-const browser=await chromium.launch({channel:process.env.CHROME_CHANNEL||'chrome',headless:true,args:['--enable-unsafe-swiftshader']});
+const engine=process.env.AV_WORKSPACE_BROWSER||'chromium';
+assert.ok(['chromium','webkit'].includes(engine),'supported browser engine');
+const browser=engine==='webkit'?await webkit.launch({headless:true}):await chromium.launch({channel:process.env.CHROME_CHANNEL||'chrome',headless:true,args:['--enable-unsafe-swiftshader']});
 const sizes=[[360,800],[390,844],[430,932],[768,1024],[820,1180],[1024,1366],[680,900],[1440,900],[2560,720],[320,800]];
 const evidence=[];const failures=[];const output=process.env.AV_WORKSPACE_EVIDENCE;
 if(output)await mkdir(output,{recursive:true});
@@ -37,25 +39,27 @@ function geometry(){
   const win=e.closest('.av-page-window');if(win&&!inside(r,rect(win)))return false;
   return r.w<43.5||r.h<43.5;
  }).map(e=>({id:e.id,text:e.textContent.slice(0,35),rect:rect(e)}));
- return {width:innerWidth,height:innerHeight,touch:navigator.maxTouchPoints,coarse:matchMedia('(pointer:coarse)').matches,meta:document.querySelector('meta[name=viewport]').content,root:{width:root.scrollWidth,height:root.scrollHeight,overflow:getComputedStyle(root).overflow},bodyOverflow:getComputedStyle(document.body).overflow,bad,small,results,fields:[...document.querySelectorAll('input,select,textarea')].filter(e=>e.checkVisibility()).map(e=>({id:e.id,font:parseFloat(getComputedStyle(e).fontSize)}))};
+ return {width:innerWidth,height:innerHeight,touch:navigator.maxTouchPoints,touchEvent:window.workspaceTouchObserved===true,coarse:matchMedia('(pointer:coarse)').matches,meta:document.querySelector('meta[name=viewport]').content,root:{width:root.scrollWidth,height:root.scrollHeight,overflow:getComputedStyle(root).overflow},bodyOverflow:getComputedStyle(document.body).overflow,bad,small,results,fields:[...document.querySelectorAll('input,select,textarea')].filter(e=>e.checkVisibility()).map(e=>({id:e.id,font:parseFloat(getComputedStyle(e).fontSize)}))};
 }
 try{
  for(const [tool,route] of [['stage','ProjectorThrow/Stage3D.html'],['led','led-wall-calculator.html']]){
   const context=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844},serviceWorkers:'block',reducedMotion:'reduce'});
+  await context.addInitScript(()=>document.addEventListener('touchstart',()=>{window.workspaceTouchObserved=true;},{once:true}));
   const page=await context.newPage();page.setDefaultTimeout(8000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(new URL(route,base).href,{waitUntil:'networkidle'});
   if(tool==='stage'){await page.locator('#onboardingExplore').tap();await page.waitForFunction(()=>document.activeElement.id==='stage-workspace');await page.locator('#sw').focus();for(let i=0;i<5;i++)await page.keyboard.press('ArrowRight');assert.equal(await page.locator('#sw').inputValue(),'22.5');}
-  else{await page.locator('#ledCabinetsWide').fill('10');await page.locator('#ledCabinetsHigh').fill('6');await page.keyboard.press('Tab');assert.match(await page.locator('#ledNativeRaster').innerText(),/1,720 × 1,032/);}
+  else{await page.locator('#ledCabinetsWide').tap();await page.locator('#ledCabinetsWide').fill('10');await page.locator('#ledCabinetsHigh').fill('6');await page.keyboard.press('Tab');assert.match(await page.locator('#ledNativeRaster').innerText(),/1,720 × 1,032/);}
   for(const theme of ['light','dark']){
    if(theme==='dark')await page.locator('#themeToggle').tap();
    for(const [w,h] of sizes){for(const [orientation,width,height] of [['portrait',w,h],['landscape',h,w]]){
     await page.setViewportSize({width,height});
-    await (await context.newCDPSession(page)).send('Emulation.setDeviceMetricsOverride',{width,height,mobile:true,deviceScaleFactor:3,screenWidth:width,screenHeight:height,screenOrientation:{type:orientation==='portrait'?'portraitPrimary':'landscapePrimary',angle:orientation==='portrait'?0:90}});
-    await page.waitForTimeout(100);
+    if(engine==='chromium')await (await context.newCDPSession(page)).send('Emulation.setDeviceMetricsOverride',{width,height,mobile:true,deviceScaleFactor:3,screenWidth:width,screenHeight:height,screenOrientation:{type:orientation==='portrait'?'portraitPrimary':'landscapePrimary',angle:orientation==='portrait'?0:90}});
+    await page.waitForFunction(()=>{const root=document.documentElement,pane=parseFloat(getComputedStyle(root).getPropertyValue('--av-pane-min'));return root.dataset.workspaceShort===String(visualViewport.height<pane*2)&&root.style.getPropertyValue('--av-available-height')===`${visualViewport.height}px`;});
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     const state=await page.evaluate(geometry);state.tool=tool;state.theme=theme;state.orientation=orientation;
     const fail=[];
     if(state.root.width>width||state.root.height>height||state.root.overflow!=='hidden'||state.bodyOverflow!=='hidden')fail.push('viewport lock');
-    if(!state.touch||!state.coarse||!state.meta.includes('viewport-fit=cover'))fail.push('touch/meta');
+    if(!state.touchEvent||!state.coarse||!state.meta.includes('viewport-fit=cover'))fail.push('touch/meta');
     if(state.bad.length)fail.push('paged input or label clipped');
     if(state.small.length)fail.push('small target');
     if(state.fields.some(f=>f.font<16))fail.push('input type size');
@@ -72,7 +76,7 @@ try{
   }
   // All subject tabs expose their existing fields through the same paging contract.
   await page.setViewportSize({width:844,height:390});
-  await (await context.newCDPSession(page)).send('Emulation.clearDeviceMetricsOverride');
+  if(engine==='chromium')await (await context.newCDPSession(page)).send('Emulation.clearDeviceMetricsOverride');
   await page.setViewportSize({width:844,height:390});
   await page.waitForTimeout(200);
   const tabs=tool==='stage'?'[data-workflow-tab]':'[data-led-jump]';
@@ -115,9 +119,10 @@ try{
  }
  if(output)await writeFile(join(output,'matrix.json'),JSON.stringify(evidence,null,2));
  if(failures.length){console.error(failures.join('\n'));throw new Error(`${failures.length} workspace cases failed`);}
- console.log(`PASS ${evidence.length} touch viewport/theme cases, labels, inputs, results and rotation state`);
+ console.log(`PASS ${engine}: ${evidence.length} touch viewport/theme cases, labels, inputs, results and rotation state`);
  // Independent first visits must prepare the SAME shared worker, then actually reload without a network.
- for(const route of ['led-wall-calculator.html','ProjectorThrow/?workspace=planner','ProjectorThrow/Stage3D.html']){
+ if(engine==='webkit')console.log('SKIP WebKit offline reload: desktop automation returns an internal navigation error with network disabled; Chromium runs perform the independent offline acceptance.');
+ for(const route of engine==='webkit'?[]:['led-wall-calculator.html','ProjectorThrow/?workspace=planner','ProjectorThrow/Stage3D.html']){
   const context=await browser.newContext({...devices['iPhone 13']});const page=await context.newPage();
   await page.goto(new URL(route,base).href,{waitUntil:'networkidle'});
   const stage=route.endsWith('Stage3D.html');

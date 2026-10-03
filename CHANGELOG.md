@@ -24,6 +24,11 @@
 - Move the existing wide/tele throw distances into bounded Facts alongside detailed ratio fit, preserving access after compacting the persistent set-mark banner. Add a visibility regression and roll the shared offline cache.
 
 
+## 2026-10-03 — WebKit workspace verification
+
+- Keep the Throwline result banner intrinsically sized after rotation so focused measurement fields retain room in a reduced viewport. Apply the shared explicit touch height to native selectors.
+- Add the WebKit touch matrix to the existing browser gate; retain Chromium offline checks and the separate physical Safari acceptance boundary.
+
 ## 2026-10-03 — Cheesesteak interaction feedback
 
 - Publish canonical source `7deb5a9` with tactile press and hover states, immediate random selection, honest saved-preference confirmations, accessible success/error messages, and share links that retain the `/cheesesteaks/` base path.
