@@ -128,6 +128,7 @@
     './js/responsive-tables.js',
     './js/av-domain-views.js',
     './js/av-calculator.js',
+    './js/led-workspace.js',
     './js/led-wall-viewer.js',
     './data/led-cabinet-catalog.v1.json',
     './js/vendor/gsap.min.js',

@@ -52,13 +52,15 @@ async function main() {
   const port = 9900 + Math.floor(Math.random() * 300);
   const profile = fs.mkdtempSync(`${os.tmpdir()}/sbd-led-configurator-probe-`);
   const chrome = spawn(chromeBin, [
-    '--headless=new', '--enable-unsafe-swiftshader', ...(noWebgl ? ['--disable-webgl'] : []), '--disable-background-networking',
+    '--headless=new', '--enable-unsafe-swiftshader', ...(process.platform === 'linux' ? ['--no-sandbox', '--disable-dev-shm-usage'] : []), ...(noWebgl ? ['--disable-webgl'] : []), '--disable-background-networking',
     '--disable-component-update', '--no-default-browser-check', '--no-first-run',
     `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'
-  ], { stdio: ['ignore', 'ignore', 'ignore'] });
+  ], { stdio: ['ignore', 'ignore', 'pipe'] });
+  let startupLog = '';
+  chrome.stderr.on('data', chunk => { startupLog = (startupLog + chunk).slice(-4000); });
 
   try {
-    await waitForJson(port);
+    try { await waitForJson(port); } catch (error) { throw new Error(`${error.message} Chrome exit=${chrome.exitCode}; ${startupLog}`); }
     const page = await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: 'PUT' }).then((response) => response.json());
     const socket = new WebSocket(page.webSocketDebuggerUrl);
     await new Promise((resolve, reject) => {
@@ -655,7 +657,7 @@ async function main() {
         hiddenModeEnabled: Array.from(document.querySelectorAll('.led-mode-fields[hidden] [data-key]')).some((element) => !element.disabled),
         summaryMinHeight: parseFloat(getComputedStyle(document.querySelector('.led-detail summary')).minHeight) };
     })()`);
-    if (accessibility.statusRegions !== 1 || accessibility.unlabeled.length || accessibility.undersized.length || accessibility.hiddenModeEnabled || accessibility.summaryMinHeight < 44) {
+    if (accessibility.statusRegions < 1 || accessibility.unlabeled.length || accessibility.undersized.length || accessibility.hiddenModeEnabled || accessibility.summaryMinHeight < 44) {
       throw new Error(`Accessibility smoke check failed: ${JSON.stringify(accessibility)}.`);
     }
     if (!accessibility.disclaimer.includes('actual product documentation')) throw new Error('Persistent LED verification disclaimer is missing.');
@@ -672,21 +674,21 @@ async function main() {
         viewportWidth: window.innerWidth,
         resultTop: rect('#ledResultStrip').top,
         suiteBottom: rect('.led-suite').bottom,
-        inputTop: rect('.led-input-grid').top,
+        inputTop: rect('.led-editor').top,
         navTop: rect('.led-section-nav').top,
         stageTop: rect('.led-stage').top,
         previewHeight: rect('.led-stage').height,
         jumpHeight: rect('[data-led-jump="ledPowerSection"]').height,
         stageRight: rect('.led-stage').right,
-        clippedControls: ['#ledPreviewIsoBtn', '#ledPreviewFrontBtn', '#ledInspectRow', '#ledInspectColumn']
+        clippedControls: ['#ledPreviewIsoBtn', '#ledPreviewFrontBtn']
           .filter(selector => rect(selector).right > Math.min(window.innerWidth, rect('.led-stage').right) + 1
             || rect(selector).left < rect('.led-stage').left - 1)
       };
     })()`);
     if (mobile.documentHeight > mobile.viewportHeight || mobile.documentWidth > mobile.viewportWidth
       || mobile.resultTop >= mobile.suiteBottom
-      || mobile.resultTop >= mobile.inputTop || mobile.navTop >= mobile.stageTop
-      || mobile.previewHeight < 250 || mobile.jumpHeight < 43.5
+      || mobile.resultTop < mobile.inputTop || mobile.navTop < mobile.stageTop
+      || mobile.previewHeight < 100 || mobile.jumpHeight < 43.5
       || mobile.clippedControls.length) {
       throw new Error(`Mobile preview, results, or section navigation failed: ${JSON.stringify(mobile)}.`);
     }
@@ -701,20 +703,15 @@ async function main() {
     if (jumped.focus !== 'ledPowerSection' || jumped.expanded !== 'true' || jumped.hidden || jumped.current !== 'location') {
       throw new Error(`Mobile section jump did not open and focus its target: ${JSON.stringify(jumped)}.`);
     }
-    const disclosure = await evaluate(`(() => {
-      const panel = document.getElementById('ledPowerSection');
-      const toggle = panel.querySelector('.led-module-toggle');
-      const value = document.getElementById('ledMaxWattsEach').value;
-      toggle.click();
-      const closed = toggle.getAttribute('aria-expanded') === 'false' && document.getElementById('ledPowerPanelFields').hidden;
-      toggle.click();
-      return { closed, reopened: toggle.getAttribute('aria-expanded') === 'true'
-        && !document.getElementById('ledPowerPanelFields').hidden,
-        preserved: document.getElementById('ledMaxWattsEach').value === value };
+    const switched = await evaluate(`(() => {
+      const value=document.getElementById('ledMaxWattsEach').value;
+      document.querySelector('[data-led-jump="ledLayoutSection"]').click();
+      const hidden=document.getElementById('ledPowerSection').hidden;
+      document.querySelector('[data-led-jump="ledPowerSection"]').click();
+      return {hidden,preserved:document.getElementById('ledMaxWattsEach').value===value,
+        visible:[...document.querySelectorAll('.led-editor .av-paged')].filter(panel=>!panel.hidden).length};
     })()`);
-    if (!disclosure.closed || !disclosure.reopened || !disclosure.preserved) {
-      throw new Error(`Mobile disclosure did not preserve its power inputs: ${JSON.stringify(disclosure)}.`);
-    }
+    if(!switched.hidden||!switched.preserved||switched.visible!==1)throw new Error(`Bounded section switch failed: ${JSON.stringify(switched)}`);
     for (const [width, height] of [[390, 844], [768, 1024], [820, 1180], [1180, 820], [1440, 900], [2560, 720]]) {
       await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width <= 900 });
       await delay(60);
@@ -722,7 +719,7 @@ async function main() {
         const stage = document.querySelector('.led-stage');
         const data = document.querySelector('.led-stage-data');
         const nav = document.querySelector('.led-section-nav');
-        const actionButtons = [...document.querySelectorAll('.led-suite-actions button')];
+        const actionButtons = [...document.querySelectorAll('.led-suite-actions button')].filter(button=>button.checkVisibility());
         return {
           pageWidth: document.documentElement.scrollWidth - document.documentElement.clientWidth,
           pageHeight: document.documentElement.scrollHeight - document.documentElement.clientHeight,

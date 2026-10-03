@@ -2,6 +2,8 @@
 
 Throwline is the offline-capable projector planning surface at `/ProjectorThrow/`. Normal launches open `Stage3D.html` as the primary spatial workspace for placement, room, obstruction, multi-projector, and field-verification decisions. A successful first load installs and claims the shared AV service worker before the page labels itself `Offline ready`; until then, the visible status says that offline use is being prepared. The detailed calculation and show-handoff planner remains available at `index.html?workspace=planner`; existing hash-based planner share links bypass the default launch switch and continue opening the planner directly. With JavaScript unavailable, `index.html` remains the self-contained fallback.
 
+The [shared bounded workspace foundation](../docs/av-workspace.md) provides safe insets, minimum touch and input sizes, and focus-aware control pages. Stage 3D uses the same scene state in stacked phone and side-by-side tablet layouts. The standalone planner receives the shared interaction and offline preparation primitives; it retains its existing layout.
+
 ## Stage 3D architecture
 
 - `throwline-scene-state.js` is the shared scene contract and pure geometry boundary. It normalizes imported data, applies named user intents, calculates projector and multi-projector geometry, detects beam obstructions, owns commissioning evidence, and provides named scenario history with undo and redo.

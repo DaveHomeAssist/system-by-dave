@@ -436,7 +436,7 @@ if (catalog) {
 if (!avRegistry || !Array.isArray(avRegistry.tools)) fail('SBD_REGISTRY.tools did not load.');
 
 requireMatch(main, /<!DOCTYPE html>/i, 'ProjectorThrow/index.html is missing its HTML document type.');
-requireMatch(main, /<html\s+lang=["']en["']>/i, 'Throwline must remain a standalone HTML document without shared-theme opt-in attributes.');
+requireMatch(main, /<html\b[^>]*\blang=["']en["'][^>]*>/i, 'Throwline must remain a standalone HTML document without shared-theme opt-in attributes.');
 requireMatch(main, /const DEFAULT_WORKSPACE = ["']Stage3D\.html["']/, 'Throwline must make Stage 3D the default workspace.');
 requireMatch(main, /query\.get\(["']workspace["']\) === ["']planner["']/, 'Throwline must retain an explicit planner launch route.');
 requireMatch(main, /window\.location\.hash\.length > 1/, 'Throwline must preserve existing hash-based planner share links.');
@@ -627,7 +627,7 @@ requireMatch(stage, /height:100dvh;[^}]*grid-template-areas:"header" "stage" "do
 requireMatch(stage, /class=["']mobile-dock["'][^>]*>[\s\S]*data-mobile-panel-button=["']adjust["'][\s\S]*data-mobile-panel-button=["']view["'][\s\S]*data-mobile-panel-button=["']facts["'][\s\S]*data-mobile-panel-button=["']export["']/, 'Stage 3D phone workspace must expose Adjust, View, Facts, and Export sheets.');
 requireMatch(stage, /body\[data-mobile-panel=adjust\][\s\S]*body\[data-mobile-panel=view\][\s\S]*body\[data-mobile-panel=facts\][\s\S]*body\[data-mobile-panel=export\]/, 'Stage 3D phone sheets must use one exclusive mobile-panel state.');
 requireMatch(stage, /dataset\.fieldVerify\s*=/, 'Stage 3D must expose Field Verify state on the document.');
-requireMatch(stage, /function\s+revealFieldVerification\s*\([\s\S]*?window\.innerWidth\s*<=\s*820[\s\S]*?setMobilePanel\(['"]adjust['"]\)[\s\S]*?selectWorkflowPanel\(['"]deliver['"]\)[\s\S]*?fieldVerificationPanel[\s\S]*?scrollIntoView[\s\S]*?measuredDistance[\s\S]*?\.focus\(/, 'Stage 3D Field Verify must open the Adjust sheet, select Deliver, scroll the panel into view, and focus the measured distance on phone widths.');
+requireMatch(stage, /function\s+revealFieldVerification\s*\([\s\S]*?selectWorkflowPanel\(['"]deliver['"]\)[\s\S]*?measuredDistance[\s\S]*?\.focus\(\{preventScroll:true\}\)/, 'Stage 3D Field Verify must select Deliver and reveal the measured distance through focus without scrolling.');
 requireMatch(stage, /if\s*\(enabled\s*&&\s*announceChange\)\s*revealFieldVerification\(\)/, 'Stage 3D Field Verify must reveal the verification fields when the operator enables it.');
 requireMatch(main, /id=["']plannerFieldVerify["']/, 'Throwline main app must expose a Field Verify mode control.');
 requireMatch(main, /dataset\.fieldVerify\s*=/, 'Throwline main app must expose Field Verify state on the document.');
@@ -729,24 +729,14 @@ requireMatch(stage, /@media \(min-width:821px\) and \(max-width:1299px\)\{[\s\S]
 requireMatch(stage, /function\s+setFactsSheet\s*\([\s\S]*?aria-expanded[\s\S]*?Escape[\s\S]*?setFactsSheet\(false,\{focusTrigger:true\}\)/, 'Stage 3D Facts sheet must be dismissible from the keyboard.');
 requireMatch(stage, /@media \(max-width:360px\)\{[\s\S]*?\.theme-toggle,\.unit-toggle\{min-width:40px/, 'Stage 3D must keep the 360px header controls inside the viewport without shrinking their touch height.');
 requireMatch(stage, /\.field-grid input,input\[type=text\]\{min-height:44px\}/, 'Stage 3D phone number and text inputs must be at least 44px tall.');
-requireMatch(browserProbe, /320, 360, 390, 560, 680, 820, 821, 1024, 1200, 1299, 1300, 1440, 2750/, 'The browser probe must sweep the full responsive width matrix.');
-[
-  ['Field Verify reveals the verification fields in the open Adjust sheet', 'the mobile Field Verify reveal'],
-  ['keeps every visible header control inside the viewport at full height', 'header containment'],
-  ['document does not page-scroll', 'the viewport lock'],
-  ['anchors workflow navigation inside the desktop rail', 'desktop workflow navigation containment'],
-  ['clear of the HUD', 'HUD and Facts overlay separation'],
-  ['active Adjust sheet stays inside the viewport', 'mobile sheet bounds'],
-  ['keeps workflow navigation inside the Adjust sheet', 'mobile workflow navigation containment'],
-  ['mobile inputs meet the 44px touch target', '44px mobile controls'],
-  ['mobile sheets stay mutually exclusive', 'sheet exclusivity'],
-  ['every baseline control, camera, and export route is present', 'the control inventory'],
-  ['prefers-reduced-motion', 'reduced-motion coverage'],
-  ['Escape dismisses the Facts sheet', 'keyboard dismissal of the Facts sheet'],
-  ['dark theme keeps the locked viewport', 'dark-theme responsive coverage'],
-].forEach(([token, name]) => {
-  if (!browserProbe.includes(token)) fail(`The browser probe must hard-fail ${name}.`);
-});
+const workspaceProbe = read('scripts/probe_av_workspace.mjs');
+requireMatch(workspaceProbe, /360,800[\s\S]*390,844[\s\S]*430,932[\s\S]*768,1024[\s\S]*820,1180[\s\S]*1024,1366[\s\S]*680,900/, 'Workspace probe must cover all requested phone/tablet sizes and the intermediate width.');
+for (const token of ['portrait','landscape',"['light','dark']",'viewport lock','paged input or label clipped','small target','rotation state','onboarding clipped','Field Verify reveals Deliver','one bounded sheet stays clear of HUD','Escape dismisses sheet','theme persists']) {
+  if (!workspaceProbe.includes(token)) fail(`Workspace probe must hard-fail ${token}.`);
+}
+for (const token of ['every baseline control, camera, and export route is present','prefers-reduced-motion','390px Field Verify error is visible']) {
+  if (!browserProbe.includes(token)) fail(`Throwline browser probe must preserve ${token}.`);
+}
 requireMatch(sidecar, /:host\(\[field-verify\]\)\s+\.toolbar/, 'Stage exports must yield to planning data in Field Verify mode.');
 requireMatch(sidecar, /@media\s*\(max-width:\s*820px\)[\s\S]*?\.toolbar\s*\{[^}]*display:\s*none/s, 'Stage 3D must hide its internal export toolbar on phone.');
 requireMatch(sidecar, /\n\s+runExport\s*\(format\)/, 'Stage 3D must expose its existing export flow to phone controls.');

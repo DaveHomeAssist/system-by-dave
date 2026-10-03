@@ -1,0 +1,35 @@
+/* Shared containment and interaction contract. Product palettes remain local. */
+html[data-av-workspace],html[data-av-workspace] body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}
+html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-right) var(--av-safe-bottom) var(--av-safe-left);box-sizing:border-box}
+[data-av-workspace] :is(button,a,summary,input,select,textarea){touch-action:manipulation}
+[data-av-workspace] :is(button,summary,input,select,textarea){min-height:var(--av-touch);min-width:var(--av-touch);box-sizing:border-box}
+[data-av-workspace] :is(input,select,textarea){font-size:var(--av-input)!important}
+[data-av-workspace] :is(a,button,summary):focus-visible{outline:2px solid var(--av-focus,var(--hazard));outline-offset:-2px}
+[data-av-workspace] [hidden]{display:none!important}
+.av-paged{display:grid;grid-template-rows:minmax(0,1fr) var(--av-touch);gap:var(--av-gap);min-height:0;min-width:0;overflow:hidden!important}
+.av-page-window{position:relative;min-width:0;min-height:0;overflow:clip}
+.av-page-content{height:100%;width:100%;column-width:var(--av-page-width);column-gap:var(--av-page-gap);column-fill:auto;transform:translateX(var(--av-page-offset,0px));transition:none!important}
+.av-page-content :is(.field,label,.row,.scene-actions,.led-detail-stat,.field-note,.model-note,.calculation-gate,.lab){break-inside:avoid}
+.av-page-content :is(.grp,.control-block,.field-grid,.led-module-fields,.led-detail-body,.scenario-history){display:block;overflow:visible;margin:0;padding:0;border:0}
+.av-page-content :is(.grp,.control-block,.field-grid,.led-module-fields,.led-detail-body)>*{margin-bottom:var(--av-gap)}
+.av-page-content :is(.field-grid>label,.field){display:inline-block;vertical-align:top;width:100%}
+.av-page-content :is(input:not([type=range]),select,textarea){max-width:100%;width:100%}
+.av-page-content input[type=range]{width:100%}
+.av-page-content h3{margin:0 0 var(--av-gap);break-after:avoid}
+.av-page-nav{display:flex;align-items:center;justify-content:space-between;gap:var(--av-gap);min-width:0}
+.av-page-nav button{flex:none;min-height:var(--av-touch);min-width:var(--av-touch);font:inherit;color:inherit;background:var(--av-surface,var(--case));border:1px solid var(--av-line,var(--line));border-radius:4px;padding:4px 12px}
+.av-page-nav output{min-width:0;font-size:12px;text-align:center;color:var(--av-text,var(--chalk))}
+.av-offline-status{font-size:11px;line-height:1.3;color:var(--av-text,var(--chalk))}
+
+.av-page-content .grp>div:has(>input),.av-page-content .grp>div:has(>select){display:inline-block;vertical-align:top;width:100%;break-inside:avoid}
+
+.av-page-content :is(.scene-actions,.row,.unit-strip){display:contents!important;break-inside:auto}
+.av-page-content :is(.scene-actions,.row,.unit-strip)>button{display:block;width:100%;margin-bottom:var(--av-gap);break-inside:avoid}
+
+[data-av-workspace] input[type=range]{margin:0}
+.av-page-content a{display:inline-flex;align-items:center;min-height:var(--av-touch);min-width:var(--av-touch)}
+
+/* Keep the hit surface stationary while retaining border/color press feedback. */
+[data-av-workspace] button:is(:active,.is-pressing){transform:none}
+
+.av-page-content summary{display:block;break-inside:avoid}
