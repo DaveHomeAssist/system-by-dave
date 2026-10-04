@@ -37,7 +37,7 @@
     "verify:gear-reference": "node scripts/build_gear_from_fmp.js --check && node --test scripts/gear_equipment_adapter.test.js && node scripts/verify_gear_reference.js",
     "build:gear-from-fmp": "node scripts/build_gear_from_fmp.js",
     "verify:davai": "python3 build_site.py --check",
-    "verify:indexing": "node scripts/verify_indexing_policy.js",
+    "verify:indexing": "node --test scripts/indexing_policy.test.js && node scripts/verify_indexing_policy.js",
     "sync:cheesesteaks": "node scripts/sync_cheesesteaks.mjs",
     "sync:noteforge": "node scripts/sync_noteforge_release.js",
     "verify:noteforge": "node scripts/verify_noteforge_release.js",
