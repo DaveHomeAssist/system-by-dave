@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-04 — Toolbox for every neutral visit
+
+- Open Toolbox on neutral returning visits, preserving explicit Show links and saved show data. Retain but ignore the legacy doorway preference.
+- Gate AV themes, Calculator interactions, navigation parity and the Toolbox persistence contract on pull requests.
+- Fix unreadable light-mode route inspector cards in Power, Network, Signal Flow and RF; desktop checks now cover them.
+
 ## 2026-10-04 — Clear start and resume labels in the preshow walk
 
 - Export canonical FMP source `9d5167aab3e880584c6811051c8ce6263a880032`: fresh/setup-only walks show Start walk; recorded observations and route progress show Resume walk. Reload retains observations and reset restores Start walk.

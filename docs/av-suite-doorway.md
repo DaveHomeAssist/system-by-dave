@@ -1,6 +1,6 @@
 # AV Suite Doorway Contract
 
-**Implemented 2026-10-02:** neutral first visits now open Toolbox automatically; explicit routes, show context and a deliberately saved entry preference still take precedence. Toolbox features [AV Video](../av-video/), which combines Signal Flow and Video Patch. Their individual registry records and legacy URLs remain compatible, while their Toolbox cards resolve to the combined application. The [Video workflow contract](av-video.md) describes the shipped slice. Fresh visits no longer show the chooser. Returning visits can still follow a saved Show Console preference; closing that gap is part of Stage 1 of the maintained plan.
+**Implemented 2026-10-04:** all neutral visits open Toolbox, including returning visits with a saved Show preference. Explicit routes and supported show context retain their existing behavior. The old preference is retained without being used or rewritten. Toolbox features [AV Video](../av-video/), which combines Signal Flow and Video Patch; their individual registry records and legacy URLs remain compatible. The [Video workflow contract](av-video.md) describes the shipped slice.
 
 `av-suite.html` is the stable AV by Dave route. It exposes two distinct,
 addressable workspaces without duplicating the route or the canonical tool
@@ -15,8 +15,7 @@ registry. The AV domain root `/` is a landing page with direct links to both.
   roadmap panel. It does not save client or venue work.
 - A URL containing any supported `sbd*` show parameter always opens Show
   Console, even when `entry=toolbox` is also present.
-- A neutral URL uses the saved entry preference when one exists. A true first
-  visit opens Toolbox without a chooser. The chooser remains available as an explicit navigation action.
+- A neutral URL opens Toolbox without a chooser, regardless of an older saved entry preference. The chooser remains available as an explicit navigation action.
 - Doorway navigation uses `history.pushState`; Back and Forward restore the
   entry represented by the URL.
 
@@ -52,7 +51,7 @@ does not imply persistent workflow functionality.
 
 `av-suite-ui.v1` owns doorway and Toolbox preferences:
 
-- `preferredEntry`
+- `preferredEntry` (retained legacy value; ignored for neutral routing)
 - `toolboxPinned`
 - `toolboxRecent`
 - `toolboxSearch`
@@ -120,7 +119,7 @@ pixels for page overflow and unreachable clipped controls.
 The entries and persistence behavior above describe the current implementation.
 The [maintained consolidation plan](av-suite-consolidation-spec.md), revised by
 Dave on 2026-10-01, sets **Toolbox as the default entrance** to focused applications
-with a shared experience and optional modules. The fresh-visit chooser has been removed from the default path. The saved-entry fallback for neutral returning visits still needs to be removed; explicit
+with a shared experience and optional modules. The fresh-visit chooser has been removed from the default path. Neutral returning visits also open Toolbox; explicit
 Show Console and supported legacy show-context routes retain compatibility.
 
 Video must be directly launchable without Workbook. Workbook is to be removed
@@ -128,4 +127,4 @@ from public promotion, launch surfaces and the public editor artifact. Dave
 clarified on 2026-10-02 that no Workbook recovery notice, dedicated export flow,
 transition period or migration project is required; former entry URLs can return
 to Toolbox. Its concept/source remains for a possible future redesign. These are
-settled target decisions. This document distinguishes the shipped fresh-visit default from the remaining returning-preference and Workbook-withdrawal work.
+settled target decisions. This document distinguishes the shipped fresh-visit default from the remaining Workbook-withdrawal work.

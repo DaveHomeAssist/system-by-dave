@@ -212,6 +212,26 @@ async function main() {
       mobile: false
     });
 
+    // Legacy Show preference must never redirect a neutral visit or mutate its saved show.
+    await navigate('av-suite.html?entry=toolbox');
+    const returningSentinel = await evaluateValue(`(() => {
+      localStorage.clear();
+      localStorage.setItem('av-suite-ui.v1', JSON.stringify({preferredEntry: 'show'}));
+      const saved = '{"sentinel":"returning-show-must-survive","bytes":[7,8,9]}';
+      localStorage.setItem('av-suite-dashboard.v1', saved);
+      return saved;
+    })()`);
+    await navigate('av-suite.html');
+    const returning = await evaluateValue(`({
+      mode: document.getElementById('avApp').getAttribute('data-entry'),
+      chooserHidden: document.getElementById('entryChooser').hidden,
+      dashboard: localStorage.getItem('av-suite-dashboard.v1'),
+      preference: JSON.parse(localStorage.getItem('av-suite-ui.v1')).preferredEntry
+    })`);
+    if (returning.mode !== 'toolbox' || !returning.chooserHidden) failures.push('Neutral returning visit did not open Toolbox.');
+    if (returning.dashboard !== returningSentinel) failures.push('Neutral returning visit mutated saved show data.');
+    if (returning.preference !== 'show') failures.push('Neutral returning visit rewrote the retained legacy preference.');
+
     /* Toolbox contract: cold entry, consolidated applications, plain links, isolated
        UI state, persistence, and a byte-for-byte untouched show dashboard. */
     await navigate('av-suite.html?entry=toolbox');
@@ -363,7 +383,7 @@ async function main() {
       mode: document.getElementById('avApp').getAttribute('data-entry'),
       chooserHidden: document.getElementById('entryChooser').hidden
     }))()`);
-    if (savedShowDoor.mode !== 'show' || !savedShowDoor.chooserHidden) failures.push(`Saved Show Console doorway preference was not restored on a neutral visit: ${JSON.stringify(savedShowDoor)}.`);
+    if (savedShowDoor.mode !== 'toolbox' || !savedShowDoor.chooserHidden) failures.push(`Neutral visit after explicit Show selection did not open Toolbox: ${JSON.stringify(savedShowDoor)}.`);
     await evaluateValue(`(() => {
       document.getElementById('doorwayBtn').click();
       document.querySelector('[data-entry-choice="toolbox"]').click();
@@ -374,7 +394,7 @@ async function main() {
       mode: document.getElementById('avApp').getAttribute('data-entry'),
       chooserHidden: document.getElementById('entryChooser').hidden
     }))()`);
-    if (savedToolboxDoor.mode !== 'toolbox' || !savedToolboxDoor.chooserHidden) failures.push(`Saved AV Toolbox doorway preference was not restored on a neutral visit: ${JSON.stringify(savedToolboxDoor)}.`);
+    if (savedToolboxDoor.mode !== 'toolbox' || !savedToolboxDoor.chooserHidden) failures.push(`Neutral visit after explicit Toolbox selection did not open Toolbox: ${JSON.stringify(savedToolboxDoor)}.`);
 
     /* Reduced motion must snap to final state without an active tween. */
     await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });

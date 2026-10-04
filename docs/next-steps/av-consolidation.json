@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "1adc8846653c72e0ad115c4941c809bac1c79cf1",
+  "head": "f6df6ebca4450a0ad405cfb422316bc2fa36c105",
   "status": "amber",
-  "statusReason": "Viewport delivery complete; returning-neutral Toolbox and public Workbook withdrawal remain open. Physical acceptance and broader consolidation are separate.",
+  "statusReason": "Neutral returning-entry fix is implemented and locally verified; release CI and public readback pending. Workbook withdrawal remains next.",
   "lastActivity": "2026-10-04",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
@@ -28,7 +28,7 @@
       "type": "logic",
       "sev": "P1",
       "title": "One Show Console visit permanently defeats the Toolbox default",
-      "detail": "Live readback 2026-10-04: fresh neutral entry is Toolbox; a controlled saved preferredEntry=show fixture still opens Show Console. js/av-suite/app.js still honors and writes preferredEntry.",
+      "detail": "Implemented in the current candidate: neutral visits ignore but preserve legacy preferredEntry, explicit Show/context links remain supported, and browser regression requires Toolbox with unchanged saved dashboard. Local check passed; public delivery pending.",
       "files": [
         "js/av-suite/app.js",
         "js/av-suite/app.js"
@@ -41,7 +41,7 @@
       "type": "infra",
       "sev": "P1",
       "title": "Release probe enforces the old saved-Show precedence",
-      "detail": "Source review at 1adc884; original audit wording follows, exact counts/line references are historical. probe_av_suite_responsive.js fails unless a saved Show preference opens Show Console on a neutral URL; Pages CI runs it. Invert it with the AVC-01 fix.",
+      "detail": "Implemented in the current candidate: neutral visits ignore but preserve legacy preferredEntry, explicit Show/context links remain supported, and browser regression requires Toolbox with unchanged saved dashboard. Local check passed; public delivery pending.",
       "files": [
         "scripts/probe_av_suite_responsive.js",
         ".github/workflows/deploy-pages.yml"
@@ -262,7 +262,7 @@
   "short": "AV Suite",
   "evidence": {
     "checkedOn": "2026-10-04",
-    "sourceRevision": "1adc8846653c72e0ad115c4941c809bac1c79cf1",
+    "sourceRevision": "f6df6ebca4450a0ad405cfb422316bc2fa36c105",
     "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
     "sources": [
       "docs/av-suite-consolidation-spec.md",
@@ -281,6 +281,13 @@
     "limits": [
       "Physical/operator acceptance remains open.",
       "Stored full viewport matrices and final catalog-navigation results were inspected as delivery evidence, not rerun in this reconciliation."
+    ],
+    "candidateBranch": "codex/av-neutral-and-pr-checks-20261004",
+    "candidateChecks": [
+      "Toolbox responsive and returning legacy-preference isolation passed at 390/680/1280px",
+      "Navigation parity passed across 46 tools at 375/1440px",
+      "Themes passed across 47 surfaces in light/dark at 390/1280px",
+      "Calculator functional browser checks passed"
     ]
   },
   "historicalFindings": [

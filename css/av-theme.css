@@ -750,3 +750,13 @@ html[data-av-theme="light"][data-av-tool="teleprompter"] .format-bar .fb-label {
     color: #111 !important;
   }
 }
+
+/* Route inspector cards must use the active palette, including desktop-only panels. */
+html[data-av-theme] :where(.circuit-node, .device-node, .flow-node, .unit-node) {
+  background: var(--av-surface-2);
+  border-color: var(--av-line);
+  color: var(--av-text);
+}
+html[data-av-theme] .conflict-warn {
+  color: var(--av-danger);
+}
