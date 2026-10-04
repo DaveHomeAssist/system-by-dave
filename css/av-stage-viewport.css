@@ -89,4 +89,5 @@
  #plotItemList{display:block!important;height:auto!important;overflow:visible!important;}
  #plotItemList button{display:block!important;color:#000;background:transparent;border:0;}
 }
-@media screen {[data-av-viewport] .av-items .field{grid-column:auto;}}
+@media screen {[data-av-viewport] .av-stage-unit{grid-column:auto!important;grid-row:auto!important;}
+ [data-av-viewport] .selected-card strong{white-space:normal;overflow:visible;overflow-wrap:anywhere;}}
