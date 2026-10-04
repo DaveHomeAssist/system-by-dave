@@ -58,6 +58,7 @@ export function App() {
   const { theme, toggle: toggleTheme } = useTheme();
   const layout = useLayoutClass();
   const phone = layout === "phone";
+  const compactLandscape = useMediaQuery("(orientation: landscape) and (min-width: 720px) and (max-width: 959px)");
   const docked = layout === "ultrawide";
   const short = useMediaQuery(SHORT_SCREEN);
 
@@ -256,6 +257,7 @@ export function App() {
         onOpen={openPanel}
         onHelp={() => setHelpOpen(true)}
         onToggleTheme={toggleTheme}
+        compactVenue={compactLandscape ? { shown: venueShown, toggle: () => setVenueShown(value => !value) } : undefined}
       />
       {state.storageNotice && (
         <div className="banner banner-warn" role="alert">

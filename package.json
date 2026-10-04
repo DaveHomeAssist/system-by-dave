@@ -17,7 +17,7 @@
     "build:camera-sim": "vite build --config apps/fmp-camera-sim/vite.config.ts && node scripts/build_camera_sim_offline.mjs",
     "dev:camera-sim": "vite --config apps/fmp-camera-sim/vite.config.ts",
     "test:camera-sim": "vitest run --config apps/fmp-camera-sim/vitest.config.ts",
-    "test:camera-sim-browser": "node scripts/probe_camera_sim.mjs",
+    "test:camera-sim-browser": "node scripts/probe_camera_sim.mjs && node scripts/probe_camera_sim_landscape.mjs",
     "test:camera-sim-webkit": "node scripts/probe_camera_sim_webkit.mjs",
     "typecheck:camera-sim": "tsc -p apps/fmp-camera-sim/tsconfig.json --noEmit",
     "verify:camera-sim-release": "node --test scripts/camera_sim_release.test.mjs && node scripts/verify_camera_sim_release.mjs",

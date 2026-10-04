@@ -2088,6 +2088,45 @@ button:disabled {
   }
 }
 
+/* Landscape phones retain the picture beside a scrollable control column. The
+   joystick and zoom stay at the top; presets/settings remain reachable below. */
+@media (orientation: landscape) and (min-width: 720px) and (max-width: 959px) {
+  .sim-app[data-layout="tablet"] .sim-workspace,
+  .sim-app[data-layout="tablet"][data-venue="shown"]:not([data-expanded="true"]) .sim-workspace {
+    grid-template-columns: minmax(0, 1fr) 282px;
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas: "monitor controls" "venue controls";
+    gap: 6px;
+    padding: 6px;
+  }
+  .sim-app[data-layout="tablet"][data-venue="shown"]:not([data-expanded="true"]) .sim-workspace {
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .sim-app[data-layout="tablet"][data-venue="collapsed"] .venue-panel { display: none; }
+  .sim-app[data-layout="tablet"] .sim-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .sim-app[data-layout="tablet"] .flag { padding-inline: 8px; font-size: 12px; }
+  .sim-app[data-layout="tablet"] .sim-actions { gap: 4px; }
+  .sim-app[data-layout="tablet"] .sim-actions .tool-button { padding-inline: 8px; font-size: 12px; }
+  .sim-app[data-layout="tablet"] .controls-panel { padding: 8px; }
+  .sim-app[data-layout="tablet"] .controls-grid {
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .sim-app[data-layout="tablet"] .speed-controls,
+  .sim-app[data-layout="tablet"] .preset-pad { grid-column: 1 / -1; }
+  .sim-app[data-layout="tablet"] .control-hint { display: none; }
+  .sim-app[data-layout="tablet"] .readout-speed,
+  .sim-app[data-layout="tablet"] .readout-hfov { display: none; }
+  .sim-app[data-layout="tablet"] .readout { padding: 5px 8px; gap: 4px 10px; font-size: 12px; }
+  .sim-app[data-layout="tablet"] .sim-bar { padding: 6px 10px; gap: 6px; }
+  .sim-app[data-layout="tablet"] .sim-title h1 { font-size: 16px; }
+  .sim-app[data-layout="tablet"] .panel-head { padding: 4px 8px; }
+  .sim-app[data-layout="tablet"] .panel-head h2 { font-size: 12px; }
+  .sim-app[data-layout="tablet"] .panel-tools { gap: 4px; }
+  .sim-app[data-layout="tablet"] .panel-tools .tool-button { padding-inline: 6px; font-size: 12px; }
+  .sim-app[data-layout="tablet"] .monitor-stage { padding: 6px; }
+}
+
 /* Ultrawide: the side panel docks as a third column. */
 .sim-app[data-layout="ultrawide"] .sim-workspace {
   grid-template-columns: minmax(0, 1fr) minmax(360px, 30%) 440px;
