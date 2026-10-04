@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-av-theme="system" data-av-tool="strike-plan">
+<html data-sbd-nav="embedded" data-sbd-public-nav="off" data-worksheet-task="Strike" lang="en" data-av-theme="system" data-av-tool="strike-plan">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -127,13 +127,16 @@
 <link rel="stylesheet" href="css/av-domain-views.css">
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 <link rel="stylesheet" href="css/av-theme.css">
+<link rel="stylesheet" href="css/av-viewport.css">
+<link rel="stylesheet" href="css/av-worksheet-viewport.css">
+<link rel="stylesheet" href="css/av-logistics-viewport.css">
 </head>
 <body>
 <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Strike Plan</h1>
 <a class="skip-link" href="#strike">Skip to strike plan</a>
 <noscript><div class="noscript">Strike Plan needs JavaScript for editing, import, export, filtering, and browser saved state.</div></noscript>
 <div class="app">
-  <header class="topbar">
+  <header class="topbar"><div data-sbd-nav-slot></div>
     <a class="brand" href="av-suite.html" aria-label="Back to the AV Suite">
       <span class="brand-mark">S</span>
       <span class="brand-text"><strong>Strike Plan</strong><span>System by Dave AV tools</span></span>
@@ -350,6 +353,8 @@
   function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
   function escapeAttr(value){return escapeHtml(value);}
   function cssEscape(value){if(window.CSS&&CSS.escape) return CSS.escape(value);return String(value).replace(/"/g,'\\"');}
+  // Read-only exception projection; the existing application owns validation and selection.
+  window.AVLogisticsExceptions=function(){return state.items.filter(hasGap).map(function(item){return Object.assign({},item);});};
   loadState();
   render();
   bindEvents();
@@ -361,5 +366,8 @@
 <script src="js/responsive-tables.js" defer></script>
 <script src="js/av-domain-views.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
+<script src="js/av-viewport.js"></script>
+<script src="js/av-logistics-viewport.js"></script>
+<script src="js/av-worksheet-viewport.js"></script>
 </body>
 </html>

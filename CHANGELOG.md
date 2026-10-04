@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-03 — Logistics viewport tasks
+
+- Adopt focused Prep, Pack, Load In, Strike and Cable records with metadata, detail, status, output and operator views, using the validated worksheet shell.
+- Add complete exception views using each application's existing issue/gap validation. Opening an exception clears filters and selects the original record; all stores, fields, identities, quantities and exports remain independent.
+
 ## 2026-10-03 — Cue Sheet viewport tasks
 
 - Separate setup, editing and operation with focused playback, media connection, layer and output tasks; keep current/next cues and essential controls together.

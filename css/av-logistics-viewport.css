@@ -1,0 +1,8 @@
+@media screen {
+ [data-av-viewport] .av-exception-list{min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;display:grid;align-content:start;gap:12px;}
+ [data-av-viewport] .av-exception-list article{padding:8px;background:var(--av-surface-2);border:1px solid var(--av-line);}
+ [data-av-viewport] .av-exception-list dl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:4px 8px;}
+ [data-av-viewport] .av-exception-list :is(dt,dd,button){margin:0;white-space:normal;overflow-wrap:anywhere;}
+ [data-av-viewport] .av-exception-list dt{text-transform:capitalize;color:var(--av-muted);}
+}
+@media print{.av-exception-list{display:block!important;height:auto!important;max-height:none!important;overflow:visible!important;}}
