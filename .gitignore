@@ -23,3 +23,9 @@ _hat-in-ring-src/
 *.token
 *secret*.json
 credentials.json
+
+# Private workspace material must never return to this public repository.
+house/
+flooring-contract-review.html
+cross-project-*
+.agent-claim
