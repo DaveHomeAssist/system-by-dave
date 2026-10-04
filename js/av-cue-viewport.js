@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
  const currentLabel=document.createElement('strong');currentLabel.textContent='Current';const currentText=document.createElement('div');currentText.id='viewportCurrent';currentText.dataset.web2Scroll='';currentText.tabIndex=0;currentText.setAttribute('role','region');currentText.setAttribute('aria-label','Current program cue details');current.append(currentLabel,currentText);
  const nextCard=next.querySelector('.next-card');nextCard.classList.add('av-cue-next');nextCard.dataset.web2Scroll='';nextCard.tabIndex=0;nextCard.setAttribute('role','region');nextCard.setAttribute('aria-label','Next cue details');
  const liveControls=document.createElement('div');liveControls.className='av-cue-live-controls';liveControls.append(document.getElementById('goLiveBtn'),document.getElementById('takeNextBtn'));
- live.append(current,nextCard);operate.items.append(live,liveControls);
+ const nextGroup=document.createElement("section");nextGroup.className="av-cue-current";const nextLabel=document.createElement("strong");nextLabel.textContent="Next";nextGroup.append(nextLabel,nextCard);
+ live.append(current,nextGroup);operate.items.append(live,liveControls);
  const pending=[setup,edit,operate,
   panel('editToolsView','Edit tools',[toolbar]),panel('addView','Quick add',[quick]),
   panel('previewView','Preview',[preview],true),panel('programView','Program',[program],true),
