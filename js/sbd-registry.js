@@ -24,7 +24,6 @@
      tool writes (used by saved-data scan + show-package export/import). */
   var TOOLS=[
     {id:'av-video',name:'AV Video',href:'av-video/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules.',storageKeys:[{key:'sbd.avVideo.v1',label:'AV Video plan'}],toolboxFeatured:true},
-    {id:'av-workbook',name:'AV Workbook',href:'av-workbook/',dept:'Workbook',phases:['advance','prep','loadin','show','strike','closeout'],tag:'Show File',desc:'Shared show workbook for rooms, crew, gear, signal sources, patching, validation, and handoff state.',storageKeys:[{key:'system-by-dave.av-workbook.active.v1',label:'AV Workbook active workbook'},{key:'system-by-dave.av-workbook.fallback.v1',label:'AV Workbook fallback'}]},
     {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.pacePresets.v1',label:'Teleprompter saved paces'},{key:'teleprompter.bookmarks.v1',label:'Teleprompter bookmarks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
     {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
     {id:'cue-sheet',name:'Cue Sheet',href:'cue-sheet.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Browser based rundown control with preview, lightweight layered playback, monitor output, capture inputs, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'Cue Sheet state'}]},
@@ -73,18 +72,18 @@
 
   /* Per-phase recommendations shown by the console and the context dock. */
   var RECOMMENDED={
-    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','throwline','stageplotter','pixelforge','input-list'],
-    prep:['av-workbook','gear-prep','gear-reference','truck-pack','cue-sheet','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
-    loadin:['av-workbook','load-in-plan','gear-reference','room-check','show-board','power-plan','line-check','display-plan','projection-plan','throwline','speaker-plan','show-task-board'],
-    show:['av-workbook','teleprompter','show-timer','cue-sheet','show-board','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
-    strike:['av-workbook','strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
-    closeout:['av-workbook','show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
+    advance:['show-advance','site-survey','breakout-room-matrix','crew-call','throwline','stageplotter','pixelforge','input-list'],
+    prep:['gear-prep','gear-reference','truck-pack','cue-sheet','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
+    loadin:['load-in-plan','gear-reference','room-check','show-board','power-plan','line-check','display-plan','projection-plan','throwline','speaker-plan','show-task-board'],
+    show:['teleprompter','show-timer','cue-sheet','show-board','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
+    strike:['strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
+    closeout:['show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
   };
 
   /* Universal-nav grouping (matches the homepage + All Tools directory).
      Coarser than tool.dept on purpose — ten browseable groups. */
   var NAV_DEPARTMENTS=[
-    {label:'Workbook',toolIds:['av-workbook','show-advance','show-task-board','show-handoff','show-report']},
+    {label:'Show planning',toolIds:['show-advance','show-task-board','show-handoff','show-report']},
     {label:'Run of show',toolIds:['teleprompter','show-timer','cue-sheet','playback-check','comms-check']},
     {label:'Graphics',toolIds:['pixelforge','playback-check','display-plan','projection-plan']},
     {label:'Audio',toolIds:['audio-patch','line-check','input-list','speaker-plan','rf-coordination']},
@@ -100,7 +99,7 @@
   ];
 
   /* Compatibility routes normalize to their canonical local applications. */
-  var ALIASES={'av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
+  var ALIASES={};
   var ALIAS_FILES=['./plotforge.html'];
 
   /* Persisted suite state used `cueforge` before the browser tool was correctly
@@ -177,10 +176,6 @@
     './av-video/index.html',
     './av-video/assets/av-video.js',
     './av-video/assets/av-video.css',
-    './av-workbook.html',
-    './av-workbook/index.html',
-    './av-workbook/assets/av-workbook.js',
-    './av-workbook/assets/av-workbook.css',
     './pixelforge/',
     './pixelforge/index.html',
     './pixelforge/editor.html',
@@ -211,9 +206,7 @@
 
   /* Console family taxonomy (av-suite.html rail navigation only — a coarser,
      14-group alternative to NAV_DEPARTMENTS above, purpose-built for the
-     AV Suite console's left rail + "All tools" grid). av-workbook is
-     deliberately NOT a member of any family — it renders as the console's
-     always-visible "Show file / Spine" rail entry instead. `subs` (only on
+     AV Suite console's left rail + "All tools" grid). `subs` (only on
      teleprompter, throwline, av-calculator) are informational mode/citation
      chips shown when a tool row is expanded — not separate routes. */
   var CONSOLE_FAMILIES=[
@@ -259,7 +252,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261003-stage-viewport',
+    version:'v20261004-workbook-withdrawn',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

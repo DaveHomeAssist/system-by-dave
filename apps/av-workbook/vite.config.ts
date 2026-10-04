@@ -7,7 +7,7 @@ export default defineConfig({
   base: "/av-workbook/",
   plugins: [react()],
   build: {
-    outDir: resolve(__dirname, "../../av-workbook"),
+    outDir: resolve(__dirname, "dist"),
     emptyOutDir: true,
     sourcemap: false,
     rollupOptions: {

@@ -33,7 +33,6 @@ STATIC_PAGES = [
     ("tailscale-manual.html", "monthly", "0.7"),
     ("av-suite.html", "weekly", "0.9"),
     ("av-tool-suite/index-v2/", "monthly", "0.7"),
-    ("av-workbook/", "weekly", "0.8"),
     ("backfocus/", "monthly", "0.7"),
     ("switcher/", "monthly", "0.7"),
     ("switcher/guide/", "monthly", "0.6"),

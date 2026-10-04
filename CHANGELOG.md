@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-04 — Withdraw the public AV Workbook
+
+- Remove Workbook from Toolbox, Show Console, shared navigation, the public directory, sitemap and offline assets.
+- Return all former Workbook entry URLs on both origins directly to Toolbox without reading or modifying browser data.
+- Retain source and its 60 tests; build only into ignored app-local output and reject source/editor bundles in publication artifacts.
+- Verify the withdrawal across 56 domain cutover browser cases, including stored-record preservation.
+
 ## 2026-10-04 — Toolbox for every neutral visit
 
 - Open Toolbox on neutral returning visits, preserving explicit Show links and saved show data. Retain but ignore the legacy doorway preference.

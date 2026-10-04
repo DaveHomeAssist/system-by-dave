@@ -25,7 +25,6 @@ const chromeBin = chromeArg ? chromeArg.slice('--chrome='.length) : (
 const allTargets = [
   ['hub-toolbox', 'av-suite.html?entry=toolbox'],
   ['hub-show', 'av-suite.html?entry=show'],
-  ['av-workbook', 'av-workbook/'],
   ['ontrack', 'ontrack.html'],
   ['show-timer', 'show-timer.html'],
   ['playback-check', 'playback-check.html'],
@@ -257,7 +256,7 @@ async function main() {
         }),
         phaseHidden: document.getElementById('phaseStrip').hidden,
         setupHidden: document.getElementById('setupBtn').hidden || getComputedStyle(document.getElementById('setupBtn')).display === 'none',
-        showFileHidden: getComputedStyle(document.getElementById('showFileRailBlock')).display === 'none'
+        showFileHidden: !document.getElementById('showFileRailBlock')
       };
     })()`);
     if (toolboxInitial.mode !== 'toolbox') failures.push('entry=toolbox did not resolve to Toolbox.');

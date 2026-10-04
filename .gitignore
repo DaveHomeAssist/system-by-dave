@@ -29,3 +29,6 @@ house/
 flooring-contract-review.html
 cross-project-*
 .agent-claim
+
+# Workbook is retained as source, outside every public artifact.
+apps/av-workbook/dist/

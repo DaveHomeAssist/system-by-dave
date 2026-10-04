@@ -178,9 +178,10 @@ jobs:
       - name: Stage site (everything except VCS + CI tooling)
         run: |
           mkdir -p _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='package.json' --exclude='package-lock.json' --exclude='/flooring-contract-review.html' --exclude='/house' --exclude='/cross-project-*' --exclude='.agent-claim' ./ _site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='package.json' --exclude='package-lock.json' --exclude='/flooring-contract-review.html' --exclude='/house' --exclude='/cross-project-*' --exclude='.agent-claim' --exclude='/apps/av-workbook' --exclude='/av-workbook/assets' ./ _site/
           # Check the actual publish artifact as well as the tracked source.
           node scripts/verify_private_exposure.js _site
+          node scripts/verify_workbook_withdrawal.cjs _site
           echo "Staged $(find _site -type f | wc -l) files."
 
       - name: Stage domain sites

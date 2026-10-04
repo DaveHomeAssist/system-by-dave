@@ -10,7 +10,7 @@ documenting the Notion skills, agents, widgets, and templates I build and use.
 - JavaScript where needed
 - App-grade surfaces may use framework code, package tooling, or generated
   assets when that is the right product architecture
-- The canonical AV registry currently contains **46 browser tools**; public
+- The canonical AV registry currently contains **45 browser tools**; public
   count copy is release-gated against `js/sbd-registry.js`
 - Hosted on GitHub Pages with a custom domain (`CNAME`)
 

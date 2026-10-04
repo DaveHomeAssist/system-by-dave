@@ -495,7 +495,7 @@ function renderHeader(){
   $('phaseStrip').innerHTML=PHASES.map(function(p){return '<button type="button" data-phase="'+p.id+'" aria-pressed="'+String(state.phase===p.id)+'" data-on="'+(state.phase===p.id?'1':'0')+'">'+escapeHtml(p.label)+'</button>';}).join('');
   applyShellTheme();
   $('helpBtn').setAttribute('aria-pressed',String(uiState.help));
-  ['hbFile','hbFams','hbProfile','hbRecs'].forEach(function(id){$(id).hidden=!uiState.help;});
+  ['hbFams','hbProfile','hbRecs'].forEach(function(id){$(id).hidden=!uiState.help;});
 }
 
 /* ============================================================
@@ -536,9 +536,6 @@ function renderMobileFamStrip(){
   wrap.innerHTML=FAMILIES.map(function(fam){var on=(viewState.context==='show'&&viewState.view==='family'&&viewState.fam===fam.id)||(viewState.context==='shop'&&toolboxState.family===fam.id);return '<button type="button" class="mob-fam-btn" data-fam-select="'+fam.id+'" aria-pressed="'+String(on)+'">'+escapeHtml(fam.label)+'</button>';}).join('');
 }
 function renderRail(){
-  var wb=toolById('av-workbook');
-  var link=$('railWorkbookLink');
-  if(wb){link.setAttribute('href',toolHref(wb));link.setAttribute('data-tool','av-workbook');}
   renderPinList();
   renderFamilyList();
   renderMobileFamStrip();
@@ -619,9 +616,7 @@ function renderAllView(){
   $('allViewVersion').textContent='Registry '+(REG.version||'');
   function cardHtml(tool){var ready=toolReadiness(tool.id);var pinned=state.favorites.indexOf(tool.id)>=0;var dot=ready==='ready'||ready==='issue'?'<span class="stdot st-'+ready+'"></span>':(ready==='skipped'?'<span class="stdot st-skipped"></span>':'');return '<div class="allcard">'+dot+'<a href="'+escapeAttr(toolHref(tool))+'" data-tool="'+tool.id+'">'+escapeHtml(tool.name)+'</a><span class="ac-tag">'+escapeHtml(tool.tag)+'</span><button type="button" class="pinbtn" data-pin="'+tool.id+'" aria-pressed="'+String(pinned)+'" title="'+(pinned?'Unpin ':'Pin ')+escapeAttr(tool.name)+'"><svg class="ic" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M12 2 9 9l-6 1 4.5 4L6 21l6-3.5L18 21l-1.5-7L21 10l-6-1z"/></svg></button></div>';}
   var groupsHtml='';
-  var wb=toolById('av-workbook');
   function groupHead(icon,label,count,dept){var d=escapeHtml(label);return '<div class="allgroup-head">'+(icon?iconSvg(icon,15):'')+'<h3>'+d+'</h3><span class="n">'+count+'</span><span class="d">'+escapeHtml(dept)+'</span></div>';}
-  if(wb&&visibleIds[wb.id]) groupsHtml+='<div class="allgroup">'+groupHead(null,'Workbook','1 tool','Spine')+'<div data-r="allgrid">'+cardHtml(wb)+'</div></div>';
   FAMILIES.forEach(function(fam){
     var tools=familyTools(fam).filter(function(t){return visibleIds[t.id];});
     if(!tools.length) return;
@@ -731,7 +726,6 @@ function renderAsideNoShow(){
 var HELP_LEGEND=[
   {n:1,title:'Families',body:'Fourteen families organize the '+TOOLS.length+'-tool registry. Tools with modes nest underneath — expand the chevron.'},
   {n:2,title:'Show profile',body:'Set once. Every tool link carries this context in the URL and prefills on open.'},
-  {n:3,title:'Workbook',body:'The show file every other tool reads and writes. It sits above the families, not inside one.'},
   {n:4,title:'Recommendations',body:'Driven by the current phase. Each card cites the rule or saved-data key that produced it, so the suggestion is auditable.'},
   {n:5,title:'Review queue',body:'Blockers, pending phase tools and saved-data risks collect here. Copy it as a handoff.'}
 ];

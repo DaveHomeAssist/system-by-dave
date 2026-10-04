@@ -429,71 +429,29 @@ try {
     await page.locator('#backupFile').setInputFiles(backup);
     await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
     assert.deepEqual(await readValues(page), expected);
-    assert.equal(avStorageKeys.length, 61);
+    assert.equal(avStorageKeys.length, 59);
     assert.ok(avStorageKeys.includes('sbd.avVideo.v1'), 'AV Video must participate in cross-domain backup and restore');
   });
 
-  await test('AV Workbook link offers show context without saving it', async page => {
+  await test('Withdrawn Workbook aliases open Toolbox without touching saved records', async (page, context) => {
     const site = sites.find(entry => entry.id === 'avbydave');
-    await seedWorkbook(page, site.origin);
-    await page.goto(site.origin + '/av-workbook/?sbdShow=Other%20Show&sbdVenue=Other%20Room&sbdDate=2026-10-09');
-    await page.getByRole('heading', { name: 'Apply show details from this link?' }).waitFor();
-    await page.setViewportSize({ width: 390, height: 844 });
-    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Context offer must fit a mobile viewport');
-    assert.deepEqual(await readWorkbook(page), { active: workbookFixture.workbookId, workbook: workbookFixture });
-    await page.getByRole('button', { name: 'Dismiss' }).click();
-    assert.deepEqual(await readWorkbook(page), { active: workbookFixture.workbookId, workbook: workbookFixture });
-    await page.reload();
-    await page.getByRole('button', { name: 'Apply to current workbook' }).click();
-    await page.getByRole('heading', { name: 'Other Show' }).waitFor();
-    const saved = await readWorkbook(page);
-    assert.equal(saved.workbook.show.showName, 'Other Show');
-    assert.equal(saved.workbook.show.venue, 'Other Room');
-    assert.equal(saved.workbook.show.targetDate, '2026-10-09');
-  });
-
-  await test('AV Workbook JSON import previews and preserves the original', async page => {
-    const site = sites.find(entry => entry.id === 'avbydave');
-    await seedWorkbook(page, site.origin);
-    await page.goto(site.origin + '/av-workbook/');
-    await page.locator('input[type=file]').setInputFiles({ name: 'fixture.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({
-      ...workbookFixture, show: { ...workbookFixture.show, showName: 'Imported Copy' }
-    })) });
-    await page.getByRole('heading', { name: /Import fixture.json as a separate workbook copy/ }).waitFor();
-    assert.deepEqual(await readWorkbook(page), { active: workbookFixture.workbookId, workbook: workbookFixture });
-    const downloaded = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'Download backup and apply' }).click();
-    assert.match((await downloaded).suggestedFilename(), /backup\.json$/);
-    await page.getByRole('heading', { name: 'Imported Copy' }).waitFor();
-    const original = await readWorkbook(page);
-    assert.deepEqual(original.workbook, workbookFixture);
-    const active = await page.evaluate(() => localStorage.getItem('system-by-dave.av-workbook.active.v1'));
-    assert.match(active, /^wb-import-/);
-  });
-
-  await test('AV Workbook rejects an import preview after another tab edits the record', async page => {
-    const site = sites.find(entry => entry.id === 'avbydave');
-    await seedWorkbook(page, site.origin);
-    await page.goto(site.origin + '/av-workbook/');
-    await page.locator('input[type=file]').setInputFiles({ name: 'fixture.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(workbookFixture)) });
-    await page.getByRole('heading', { name: /Import fixture.json as a separate workbook copy/ }).waitFor();
-    await page.evaluate(() => new Promise((resolve, reject) => {
-      const request = indexedDB.open('system-by-dave-av-workbook');
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        const db = request.result;
-        const tx = db.transaction('workbooks', 'readwrite');
-        const record = tx.objectStore('workbooks').get('wb-cutover-audio');
-        record.onsuccess = () => tx.objectStore('workbooks').put({ ...record.result, savedAt: '2026-09-23T09:00:00.000Z', show: { ...record.result.show, venue: 'Newer edit' } });
-        tx.oncomplete = () => { db.close(); resolve(); };
-        tx.onerror = () => reject(tx.error);
-      };
-    }));
-    await page.getByRole('button', { name: 'Download backup and apply' }).click();
-    await page.getByText('Workbook changed since this preview. Review the import again before saving.').waitFor();
-    const saved = await readWorkbook(page);
-    assert.equal(saved.active, workbookFixture.workbookId);
-    assert.equal(saved.workbook.show.venue, 'Newer edit');
+    for (const origin of [source, site.origin]) {
+      await seedWorkbook(page, origin);
+      for (const route of ['/av-workbook/', '/av-workbook/index.html', '/av-workbook.html']) {
+        await page.goto(origin + route + '?sbdShow=Do%20not%20attach');
+        await page.waitForURL(site.origin + '/av-suite.html?entry=toolbox');
+        assert.equal(await page.locator('#avApp').getAttribute('data-entry'), 'toolbox');
+        assert.equal(await page.locator('a[href*=av-workbook]').count(), 0);
+        const savedPage = await context.newPage();
+        await savedPage.goto(origin + '/index.html');
+        assert.deepEqual(await readWorkbook(savedPage), { active: workbookFixture.workbookId, workbook: workbookFixture });
+        await savedPage.close();
+      }
+      for (const asset of ['/av-workbook/assets/av-workbook.js', '/av-workbook/assets/av-workbook.css', '/apps/av-workbook/src/App.tsx']) {
+        if (origin === source) continue; // Production source artifact exclusion is verified separately.
+        assert.equal((await page.request.get(origin + asset)).status(), 404, asset);
+      }
+    }
   });
 
   await test('Show Board real records and snapshots survive move and backup', async (page, context) => {
