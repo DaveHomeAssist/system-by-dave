@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-04 — Cheesesteak hidden-canvas safety
+
+- Sync source `694e0177203ffa2f28729f55c56cf13292199cce`. Disable Leaflet’s window resize listener so the nonzero container observer exclusively owns map resizing.
+- Verify desktop-to-phone and reverse transitions after hidden render frames, rejecting canvas errors; the exported build passed 12 hidden resize cycles across four widths.
+
 ## 2026-10-04 — Verification gates revived from PR #48
 
 - `build_site.py --check` (`npm run verify:davai`, run in the Pages deploy) fails when the tracked `systembydave/` bundle drifts from its generator. The generator now reproduces the August public-shell breadcrumb, shared nav assets and canonical Davai title and lede instead of regressing them on rebuild, resolves paths from the repository root and honours `SBD_BUILD_DATE`.
