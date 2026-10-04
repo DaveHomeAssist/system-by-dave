@@ -172,6 +172,25 @@ async function main() {
       return result.result.value;
     }
 
+    async function reveal(selector) {
+      await evaluate(`(async () => {
+        const item=document.querySelector(${JSON.stringify(selector)}), panel=item?.closest('.av-view');
+        if(!panel)return;
+        const url=new URL(location.href);url.searchParams.set('taskView',panel.id);history.replaceState(null,'',url);dispatchEvent(new PopStateEvent('popstate'));
+        const settle=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));await settle();
+        const buttons=panel.querySelectorAll(':scope > .av-pages button');
+        while(buttons[0]&&!buttons[0].disabled){buttons[0].click();await settle();}
+        for(let i=0;i<50&&!item.checkVisibility();i++){if(!buttons[1]||buttons[1].disabled)throw new Error('Unreachable control '+${JSON.stringify(selector)});buttons[1].click();await settle();}
+        item.scrollIntoView({block:'nearest',inline:'nearest'});
+      })()`);
+    }
+
+    async function measureTaskControls() {
+      const selectors=await evaluate(`Array.from(document.querySelectorAll('[data-quick-add],.transport button,.transport input,.source-rack button,.source-rack input:not(.sr-only),.source-rack select,#timelineExpandBtn,#layerList button,#layerList input')).filter(n=>!n.disabled).map((n,i)=>{n.dataset.probeControl=String(i);return '[data-probe-control="'+i+'"]';})`);
+      for(const selector of selectors){await reveal(selector);await evaluate(`(()=>{const n=document.querySelector(${JSON.stringify(selector)}),r=n.getBoundingClientRect();n.dataset.probeWidth=r.width;n.dataset.probeHeight=r.height;})()`);}
+      await reveal('#showTitle');
+    }
+
     async function snapshot() {
       return evaluate(`(() => {
         const rows = Array.from(document.querySelectorAll('#cueBody tr[data-id]'));
@@ -234,9 +253,9 @@ async function main() {
           callerCards,
           quickAdd: Array.from(document.querySelectorAll('[data-quick-add]')).map((button) => ({
             kind: button.dataset.quickAdd,
-            width: Math.round(button.getBoundingClientRect().width),
-            height: Math.round(button.getBoundingClientRect().height),
-            label: button.innerText.trim()
+            width: Math.round(Number(button.dataset.probeWidth) || button.getBoundingClientRect().width),
+            height: Math.round(Number(button.dataset.probeHeight) || button.getBoundingClientRect().height),
+            label: Array.from(button.querySelectorAll('strong,.quick-add-copy>span')).map(n=>n.textContent.trim()).join('\\n')
           })),
           gsap: window.gsap?.version || '',
           layerCount: document.querySelectorAll('#layerList .layer-row').length,
@@ -258,8 +277,8 @@ async function main() {
             const labels = Array.from(item.labels || []).map((label) => label.textContent.trim()).join(' ');
             return {
               name: item.getAttribute('aria-label') || labels || item.textContent.trim() || item.value,
-              width: Math.round(rect.width),
-              height: Math.round(rect.height)
+              width: Math.round(Number(item.dataset.probeWidth) || rect.width),
+              height: Math.round(Number(item.dataset.probeHeight) || rect.height)
             };
           }),
           contrast: {
@@ -276,11 +295,13 @@ async function main() {
     }
 
     async function click(selector) {
+      await reveal(selector);
       await evaluate(`document.querySelector(${JSON.stringify(selector)})?.click()`);
       await delay(180);
     }
 
     async function setValue(selector, value, eventName = 'input') {
+      await reveal(selector);
       await evaluate(`(() => {
         const el = document.querySelector(${JSON.stringify(selector)});
         if (!el) return false;
@@ -331,6 +352,8 @@ async function main() {
       };
     })()`);
 
+    await evaluate(`document.documentElement.dataset.avTheme === 'light' && document.getElementById('viewportTheme')?.click()`);
+    await measureTaskControls();
     let state = await snapshot();
     const verifiedContrast = state.contrast;
     assert(state.title.includes('Cue Sheet'), 'Cue Sheet page title did not load.');
@@ -466,6 +489,7 @@ async function main() {
 
     await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] });
     await delay(200);
+    await evaluate(`document.documentElement.dataset.avTheme !== 'light' && document.getElementById('viewportTheme')?.click()`);
     const lightState = await snapshot();
     assert(lightState.contrast.mutedText >= 4.5 && lightState.contrast.dimText >= 4.5 && lightState.contrast.primaryLabel >= 4.5, `Cue Sheet light-theme text contrast is below AA: ${JSON.stringify(lightState.contrast)}.`);
     assert(lightState.contrast.controlBoundary >= 3, `Cue Sheet light-theme control boundary contrast is below 3:1: ${JSON.stringify(lightState.contrast)}.`);

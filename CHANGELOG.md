@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-03 — Cue Sheet viewport tasks
+
+- Separate setup, editing and operation with focused playback, media connection, layer and output tasks; keep current/next cues and essential controls together.
+- Keep the existing cue engine and mounted media nodes authoritative across view changes. Preserve timeline focus shortcuts, original documents, independent playback layers, imports and output window.
+- Add controlled media continuity and viewport checks; expand complete printed values and restore explicit theme choice.
+
 ## 2026-10-03 — Show Operations viewport views
 
 - Organize twelve Show Operations routes into bounded task views while retaining every application model, storage key, field, import/export shape and handler. Retain derived operator cards and the independent Show Handoff workflow.

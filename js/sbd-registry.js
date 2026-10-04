@@ -130,6 +130,8 @@
     './js/av-calculator.js',
     './js/av-calculator-viewport.js',
     './js/av-viewport.js',
+    './js/av-cue-viewport.js',
+    './css/av-cue-viewport.css',
     './js/av-worksheet-viewport.js',
     './css/av-worksheet-viewport.css',
     './js/av-board-viewport.js',
@@ -253,7 +255,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261003-show-viewport',
+    version:'v20261003-cue-viewport',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

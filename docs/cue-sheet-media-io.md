@@ -34,3 +34,11 @@ Browser and operating-system window policy remains authoritative. Popups must be
 ## Verification boundary
 
 The automated probe validates media attachment with local PNG and WAV fixtures, Preview and Program rendering, audible preview state, layer persistence, timeline focus, responsive containment, accessible names/targets, and contrast. Physical capture-card signal, real NDI software or gateway output, popup policy, display placement, and the final audio path must be checked with the show computer and venue hardware.
+
+## Viewport operation
+
+Setup, Edit and Operate are focused tasks. Edit tools, quick add, Preview, Program, Playback, Connections, Layers, On deck and Status keep their original controls and handlers. Operate keeps current program cue details, the next cue and the Go Live / Take Next Cue controls available together. Ultrawide operation adds Preview and Program alongside those controls. The compact task selector is at the bottom on phones.
+
+Switching tasks changes visibility without replacing media nodes or writing the cue document. The existing F/Expand Timeline preference still selects the Edit workspace; Escape restores Operate. Theme choice is explicit and persists independently of cue documents. Print expands task pages and complete field values. No local file, stream or document migration is introduced.
+
+Run `node scripts/probe_cue_viewport.cjs` against a checkout on port 4179, and repeat with `VIEWPORT_BROWSER=webkit`; `VIEWPORT_BASE` selects another origin. The probe uses synthetic silence and `scripts/fixtures/viewport-blue.mp4` (12 seconds of blue video and silent audio, generated with FFmpeg) to verify media continuity, output-window content, export/import, save/reload, shortcuts and print. Hardware capture, real NDI, external display placement and venue audio remain physical acceptance checks. The reusable checker uses `scripts/viewport_cue_adapter.cjs`.
