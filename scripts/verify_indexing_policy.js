@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { originFor, siteSitemap, cutoverSites } = require('./domain_sites_lib');
+const { hasNoIndex, canonical, indexingPolicy, otherDomainOrigins } = require('./indexing_policy');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
@@ -34,18 +35,9 @@ function routeFor(file) {
   return `/${file}`;
 }
 
-function canonical(source) {
-  const match = source.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
-  return match ? match[1] : '';
-}
-
 function refreshTarget(source) {
   const match = source.match(/<meta\s+http-equiv=["']refresh["']\s+content=["'][^"']*url=([^"']+)["']/i);
   return match ? match[1] : '';
-}
-
-function hasNoIndex(source) {
-  return /<meta\s+name=["']robots["']\s+content=["'][^"']*noindex/i.test(source);
 }
 
 const sitemap = read('sitemap.xml');
@@ -70,6 +62,16 @@ const robots = read('robots.txt');
 // managed /cheesesteaks/ static export (map, rankings, neighborhoods, methodology, about) from 2026-10-01.
 // AV Video adds its source page and AV-origin generated application on 2026-10-02.
 if (unlisted.length !== 154) fail(`Expected 154 tracked routes outside the sitemap; found ${unlisted.length}.`);
+
+// The count above only detects new unlisted routes; this enforces the documented policy itself
+// (scripts/indexing_policy.js) for every one of them.
+const otherOrigins = otherDomainOrigins();
+const policies = {};
+unlisted.forEach((file) => {
+  const policy = indexingPolicy(routeFor(file), read(file), robots, otherOrigins);
+  if (!policy) fail(`${file} is outside the sitemap but has no noindex meta tag, robots.txt Disallow, or canonical URL on another published domain (${[...otherOrigins].join(', ')}).`);
+  else policies[policy] = (policies[policy] || 0) + 1;
+});
 
 [
   '/apps/av-workbook/',
@@ -155,4 +157,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Indexing policy verification passed (sitemap=${sitemapRoutes.size}, trackedHtml=${files.length}, unlisted=${unlisted.length}, hatHandoffs=${hatFiles.length}).`);
+console.log(`Indexing policy verification passed (sitemap=${sitemapRoutes.size}, trackedHtml=${files.length}, unlisted=${unlisted.length} ${JSON.stringify(policies)}, hatHandoffs=${hatFiles.length}).`);
