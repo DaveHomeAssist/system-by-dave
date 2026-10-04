@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-sbd-nav="off" data-av-theme="system" data-av-tool="show-board">
+<html lang="en" data-sbd-nav="embedded" data-sbd-public-nav="off" data-av-theme="system" data-av-tool="show-board">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -407,18 +407,22 @@ body.edit #addroom{display:inline-block}
 }
 </style>
 <link rel="stylesheet" href="css/av-theme.css">
+<link rel="stylesheet" href="css/av-viewport.css">
+<link rel="stylesheet" href="css/av-board-viewport.css">
 </head>
 <body>
 <a class="sbd-skip-link" href="#setup">Skip to Show Board workspace</a>
+<noscript><p>This tool requires JavaScript for editing, saving, and exporting show records. Enable JavaScript to use the workspace.</p></noscript>
+<header class="av-board-header"><h1>Show Board</h1><div data-sbd-nav-slot></div><button id="viewportTheme" type="button">Dark</button></header>
 
 <!-- ============ SETUP ============ -->
-<section id="setup" tabindex="-1">
+<section role="main" id="setup" tabindex="-1">
   <h2>New show</h2>
   <p class="lede">Set the rooms and the shape of the day once. Everything after that is
     scanning signs and ticking boxes.</p>
 
   <div class="card">
-    <h3>The show</h3>
+    <h2>The show</h2>
     <div class="field"><label>Show name</label>
       <input type="text" id="s_name" placeholder="e.g. AOM 2026"></div>
     <div class="field"><label>Venue</label>
@@ -429,7 +433,7 @@ body.edit #addroom{display:inline-block}
   </div>
 
   <div class="card">
-    <h3>Rooms</h3>
+    <h2>Rooms</h2>
     <div class="field">
       <label>One room per line</label>
       <textarea id="s_rooms" rows="9" placeholder="Parlor A | Floor 2&#10;Parlor B | Floor 2&#10;Seminar A | Floor 1&#10;Horizons | Rooftop"></textarea>
@@ -441,7 +445,7 @@ body.edit #addroom{display:inline-block}
   </div>
 
   <div class="card">
-    <h3>Time</h3>
+    <h2>Time</h2>
     <div class="field half"><label>Grid</label><select id="s_tick"></select></div>
     <div class="field half"><label>Snap edits to</label><select id="s_snap"></select></div>
     <div class="field half"><label>Turn is tight under</label>
@@ -492,8 +496,8 @@ body.edit #addroom{display:inline-block}
 
 <section class="now">
   <div><div class="clock" id="clock">--:--<span id="ampm"></span></div></div>
-  <div class="now-col"><h3>Live now</h3><div class="lines" id="live">&mdash;</div></div>
-  <div class="now-col"><h3>Next action</h3><div class="lines" id="next">&mdash;</div></div>
+  <div class="now-col"><h2>Live now</h2><div class="lines" id="live">&mdash;</div></div>
+  <div class="now-col"><h2>Next action</h2><div class="lines" id="next">&mdash;</div></div>
 </section>
 
 <section class="attention" aria-labelledby="attention-title">
@@ -1272,9 +1276,11 @@ $("zoomout").addEventListener("click",()=>zoom(-1));
 /* ---------- theme ---------- */
 const themePreference=window.matchMedia("(prefers-color-scheme: dark)");
 function applyTheme(){
-  document.body.classList.toggle("dark",themePreference.matches);
+  const choice = document.documentElement.dataset.avTheme;
+  document.body.classList.toggle("dark", choice === "dark" || (choice === "system" && themePreference.matches));
 }
 themePreference.addEventListener("change",applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement,{attributes:true,attributeFilter:["data-av-theme"]});
 applyTheme();
 
 /* ---------- edit mode ---------- */
@@ -1661,5 +1667,7 @@ $("keepminebtn").addEventListener("click",()=>{
 <script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
+<script src="js/av-viewport.js"></script>
+<script src="js/av-board-viewport.js"></script>
 </body>
 </html>

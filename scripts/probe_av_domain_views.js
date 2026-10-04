@@ -394,6 +394,19 @@ async function main() {
       });
       await cdp('Page.navigate', { url: new URL(target.page, baseUrl).href });
       await delay(2200);
+      // Migrated tools expose this same derived deck through their Operator task.
+      await evaluate(`(async () => {
+        const panel = document.querySelector(${JSON.stringify(target.panel)});
+        const view = panel?.closest('.av-view');
+        if (!view) return;
+        document.getElementById(view.id + 'Tab').click();
+        for (let i = 0; i < 30 && !panel.querySelector('.av-domain-deck').checkVisibility(); i++) {
+          const next = Array.from(view.querySelectorAll('.av-pages button')).find(button => button.textContent === 'Next');
+          if (!next || next.disabled) break;
+          next.click();
+          await new Promise(resolve => requestAnimationFrame(resolve));
+        }
+      })()`);
       const mobile = await evaluate(`(() => {
         const panel = document.querySelector(${JSON.stringify(target.panel)});
         const vw = window.innerWidth;

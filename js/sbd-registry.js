@@ -130,6 +130,10 @@
     './js/av-calculator.js',
     './js/av-calculator-viewport.js',
     './js/av-viewport.js',
+    './js/av-worksheet-viewport.js',
+    './css/av-worksheet-viewport.css',
+    './js/av-board-viewport.js',
+    './css/av-board-viewport.css',
     './css/av-viewport.css',
     './css/av-calculator-viewport.css',
     './js/led-workspace.js',
@@ -249,7 +253,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261003-viewport-contrast',
+    version:'v20261003-show-viewport',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

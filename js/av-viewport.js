@@ -17,7 +17,7 @@
       card.dataset.pages = String(pages.length); card.dataset.page = String(page + 1);
     }
     function refresh() {
-      if (card.hidden || !card.checkVisibility()) return;
+      if (matchMedia('print').matches || card.hidden || !card.checkVisibility()) return;
       units = typeof supplied === 'function' ? supplied() : supplied;
       units.forEach(unit => unit.classList.remove(hiddenClass));
       const available = items.clientHeight;
@@ -38,13 +38,15 @@
       if (focused >= 0) page = focused;
       show();
     }
-    previous.addEventListener('click', () => { page--; show(); });
-    next.addEventListener('click', () => { page++; show(); });
-    new ResizeObserver(refresh).observe(items);
-    new MutationObserver(refresh).observe(items, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'data-open', 'data-sbd-suite-compact'] });
-    return { refresh, reveal(element) { refresh(); const index = pages.findIndex(group => group.some(unit => unit.contains(element))); if (index >= 0) { page = index; show(); } } };
+    previous.addEventListener('click', () => { previous.focus({ preventScroll:true }); page--; show(); });
+    next.addEventListener('click', () => { next.focus({ preventScroll:true }); page++; show(); });
+    let scheduled = 0;
+    function schedule() { if (!scheduled) scheduled = requestAnimationFrame(() => { scheduled = 0; refresh(); }); }
+    const resize = new ResizeObserver(schedule); resize.observe(items);
+    const mutations = new MutationObserver(schedule); mutations.observe(items, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'data-open', 'data-sbd-suite-compact'] });
+    return { refresh, destroy() { resize.disconnect(); mutations.disconnect(); cancelAnimationFrame(scheduled); }, reveal(element) { refresh(); const index = pages.findIndex(group => group.some(unit => unit.contains(element))); if (index >= 0) { page = index; show(); } } };
   }
-  function tabs(nav, panels, { label, selectId = 'taskView', className = 'av-tabs', parameter = 'taskView', hash = false, onChange = () => {}, additionalVisible = () => false }) {
+  function tabs(nav, panels, { label, selectId = 'taskView', className = 'av-tabs', parameter = 'taskView', hash = false, onChange = () => {}, beforeChange = () => {}, onTarget = () => {}, additionalVisible = () => false }) {
     const list = document.createElement('div'); list.className = className;
     list.setAttribute('role', 'tablist'); list.setAttribute('aria-label', label);
     const select = document.createElement('select'); select.id = selectId; select.setAttribute('aria-label', `${label} view`);
@@ -58,6 +60,7 @@
     });
     nav.replaceChildren(list, select);
     function activate(index, push = false) {
+      beforeChange();
       active = Math.max(0, Math.min(panels.length - 1, index));
       panels.forEach(({ node }, i) => {
         node.hidden = i !== active && !additionalVisible(i, active);
@@ -78,6 +81,7 @@
       const target = document.getElementById(id);
       const index = panels.findIndex(({ node }) => node === target || node.contains(target));
       activate(index < 0 ? 0 : index);
+      if (target) onTarget(target, index);
     }
     select.addEventListener('change', () => activate(Number(select.value), true));
     list.addEventListener('keydown', event => {
@@ -89,5 +93,13 @@
     window.addEventListener('popstate', fromLocation); window.addEventListener('hashchange', fromLocation);
     return { activate, fromLocation, refresh: () => activate(active) };
   }
+  // Print complete field values, including long notes and table cells.
+  window.addEventListener('beforeprint', () => {
+    document.querySelectorAll('.av-print-text').forEach(node => node.remove());
+    document.querySelectorAll('textarea,select,input:not([type=file]):not([type=hidden]):not([type=checkbox]):not([type=radio])').forEach(node => {
+      const output = document.createElement('pre'); output.className = 'av-print-text'; output.textContent = node.tagName === 'SELECT' ? node.selectedOptions[0]?.textContent || node.value : node.value; node.after(output);
+    });
+  });
+  window.addEventListener('afterprint', () => document.querySelectorAll('.av-print-text').forEach(node => node.remove()));
   window.AVViewport = { paginate, tabs };
 })();
