@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data: blob:; connect-src 'self' https://accounts.google.com https://gmail.googleapis.com https://openidconnect.googleapis.com https://fmp-walk-notion-6u2y7s4nzq-ue.a.run.app; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data: blob:; connect-src 'self' https://accounts.google.com https://openidconnect.googleapis.com https://fmp-walk-notion-6u2y7s4nzq-ue.a.run.app; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -844,7 +844,13 @@ var SEV = [
   {v:"cos", l:"🔵 Cosmetic, monitor it"}
 ];
 
-var ROUTES = ["Video (self)","IT · DMP service","GoVision · bowl LED","Rigging","House audio","Head of Video","ConcertVision 🔴","Videri 🔴","Live Nation facility 🔴","Undecided"];
+var ROUTES = ["Video (self)","IT · DMP service","GoVision · bowl LED","Rigging","House audio","Head of Video","ConcertVision (contact unknown)","Videri (contact unknown)","Live Nation facility (contact unknown)","Undecided"];
+/* A select option cannot hide an emoji from a screen reader, so these three routes say it in words.
+   Saved tickets keep the stored value until the ticket is saved again. The editor and ticket list show
+   the new name, but the report keeps the stored text: report retries hash the walk and its Markdown, so
+   changing it unprompted would create a duplicate report. */
+var ROUTE_RENAMED = {"ConcertVision 🔴":"ConcertVision (contact unknown)","Videri 🔴":"Videri (contact unknown)","Live Nation facility 🔴":"Live Nation facility (contact unknown)"};
+function routeName(v){ return Object.prototype.hasOwnProperty.call(ROUTE_RENAMED, v) ? ROUTE_RENAMED[v] : v; }
 
 /* ══════════════════════ state and persistence ══════════════════════ */
 var S = {
@@ -1345,9 +1351,10 @@ function openSheet(station, existing){
   h += '<div class="mini" style="margin-top:8px">Select the observed symptoms.</div></fieldset>';
 
   h += '<div class="fld"><label for="sRoute">Route to</label><select id="sRoute">';
-  var routeOptions = f.route && ROUTES.indexOf(f.route) === -1 ? [f.route].concat(ROUTES) : ROUTES;
+  var curRoute = routeName(f.route);
+  var routeOptions = curRoute && ROUTES.indexOf(curRoute) === -1 ? [curRoute].concat(ROUTES) : ROUTES;
   for(var k=0;k<routeOptions.length;k++){
-    h += '<option' + (f.route === routeOptions[k] ? " selected" : "") + ">" + esc(routeOptions[k]) + "</option>";
+    h += '<option' + (curRoute === routeOptions[k] ? " selected" : "") + ">" + esc(routeOptions[k]) + "</option>";
   }
   h += "</select><div class=\"mini\" style=\"margin-top:6px\">Video reports faults. IT services the players.</div></div>";
 
@@ -1483,7 +1490,7 @@ function renderTickets(){
       '<div class="tk-sym">' + esc(f.sym.join(" · ")) + "</div>" +
       (f.notes ? '<div class="tk-sym" style="color:var(--dim)">' + esc(f.notes) + "</div>" : "") +
       '<div class="tk-ft">' +
-      '<span class="route">' + esc(f.route) + "</span>" +
+      '<span class="route">' + esc(routeName(f.route)) + "</span>" +
       (f.photos && f.photos.length ? '<span>📷 ' + f.photos.length + ' attached</span>' : f.photo ? "<span>📷 recorded, no file</span>" : "") +
       (rc >= 2 ? '<span class="repeat">' + rc + "× repeat</span>" : "") +
       '<button class="tk-del" data-e="' + f.id + '">Edit</button>' +
