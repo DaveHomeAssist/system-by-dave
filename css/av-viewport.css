@@ -14,3 +14,4 @@
 
 @media screen { .av-print-text { display:none!important; } }
 @media print { :is(input,select,textarea):has(+ .av-print-text) { display:none!important; } .av-print-text { display:block!important; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; } }
+@media screen { [data-av-viewport] [tabindex]:focus-visible { outline:2px solid var(--av-focus); outline-offset:-2px; } }
