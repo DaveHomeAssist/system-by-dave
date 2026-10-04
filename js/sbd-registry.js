@@ -128,6 +128,8 @@
     './js/responsive-tables.js',
     './js/av-domain-views.js',
     './js/av-calculator.js',
+    './js/av-calculator-viewport.js',
+    './css/av-calculator-viewport.css',
     './js/led-workspace.js',
     './js/led-wall-viewer.js',
     './data/led-cabinet-catalog.v1.json',
@@ -245,7 +247,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261003-av-workspace-webkit',
+    version:'v20261003-calculator-viewport',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

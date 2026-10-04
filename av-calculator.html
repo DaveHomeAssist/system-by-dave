@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-av-theme="system" data-av-tool="av-calculator">
+<html lang="en" data-av-theme="system" data-av-tool="av-calculator" data-sbd-nav="off" data-sbd-public-nav="off">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,24 +29,26 @@
 <link rel="stylesheet" href="css/av-calculator.css">
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 <link rel="stylesheet" href="css/av-theme.css">
+<script src="js/av-theme-mode.js"></script>
+<link rel="stylesheet" href="css/av-calculator-viewport.css">
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to calculators</a>
+<a data-web2-ignore="Offscreen skip link becomes visible on keyboard focus" class="skip-link" href="#main-content">Skip to calculators</a>
 <noscript>
   <div class="noscript">JavaScript is off, so calculations are unavailable.</div>
 </noscript>
 <div class="app">
   <header class="topbar">
     <a class="brand" href="av-suite.html" aria-label="AV Suite home">
-      <span class="brand-mark">S</span>
+
       <span class="brand-text">
-        <strong>AV Calculator</strong>
-        <span>AV by Dave planning tools</span>
+        <h1>AV Calculator</h1>
+
       </span>
     </a>
     <div class="top-actions" aria-label="Related tools">
-      <a class="top-link" href="led-wall-calculator.html">LED Wall</a>
-      <a class="top-link" href="av-suite.html">AV Suite</a>
+      <a class="top-link" href="/">Home</a>
+      <a class="top-link" href="av-suite.html?entry=toolbox">Toolbox</a>
       <button type="button" class="theme-toggle" id="themeToggle">Dark mode</button>
     </div>
   </header>
@@ -63,10 +65,6 @@
           <li>Instant updates</li>
         </ul>
       </div>
-      <div class="hero-actions">
-        <button type="button" class="primary" id="copySummaryBtn">Copy Summary</button>
-        <button type="button" id="resetBtn">Reset</button>
-      </div>
     </section>
 
     <nav class="calc-jump" aria-label="Jump to calculator">
@@ -80,7 +78,7 @@
     </nav>
 
     <section class="grid" aria-label="Calculator groups">
-      <article class="calc-card" id="audioCard">
+      <section class="calc-card" id="audioCard">
         <div class="card-head">
           <h2><span class="card-index" aria-hidden="true">01</span>Audio Delay</h2>
           <span>Distance to delay</span>
@@ -119,9 +117,9 @@
           <div class="result"><span>48k Samples</span><strong id="delaySamples">0</strong></div>
         </div>
         <div class="hint" id="delayHint">Enter speaker distance to calculate delay time.</div>
-      </article>
+      </section>
 
-      <article class="calc-card" id="projectionCard">
+      <section class="calc-card" id="projectionCard">
         <div class="card-head">
           <h2><span class="card-index" aria-hidden="true">02</span>Projection</h2>
           <span>Screen and throw</span>
@@ -155,9 +153,9 @@
           <div class="result"><span>Ideal Throw</span><strong id="idealThrow">0 ft</strong></div>
         </div>
         <div class="hint" id="projectionHint">Use actual distance to compare against the lens throw ratio.</div>
-      </article>
+      </section>
 
-      <article class="calc-card" id="storageCard">
+      <section class="calc-card" id="storageCard">
         <div class="card-head">
           <h2><span class="card-index" aria-hidden="true">03</span>Record Storage</h2>
           <span>Bitrate to drive size</span>
@@ -186,9 +184,9 @@
           <div class="result"><span>Per Hour</span><strong id="perHourStorage">0 GB</strong></div>
         </div>
         <div class="hint" id="storageHint">Use camera bitrate, feed count, and runtime to size recording media.</div>
-      </article>
+      </section>
 
-      <article class="calc-card" id="powerCard">
+      <section class="calc-card" id="powerCard">
         <div class="card-head">
           <h2><span class="card-index" aria-hidden="true">04</span>Power Load</h2>
           <span id="powerMethodBadge">Nameplate current</span>
@@ -241,9 +239,9 @@
           <div class="result" id="circuitResult"><span>Of 80% Planning Reference</span><strong id="circuitPercent">—</strong></div>
         </div>
         <div class="hint warning" id="powerWarning"><strong id="powerWarningLabel">Planning reference:</strong> <span id="powerWarningText">Enter the equipment nameplate current. Include startup or inrush demand and verify the distribution before assigning circuits.</span></div>
-      </article>
+      </section>
 
-      <article class="calc-card" id="voltageDropCard">
+      <section class="calc-card" id="voltageDropCard">
         <div class="card-head">
           <h2><span class="card-index" aria-hidden="true">05</span>Voltage Drop</h2>
           <span>Cable run loss</span>
@@ -284,9 +282,9 @@
           <div class="result"><span>End Volts</span><strong id="dropEndV">0 V</strong></div>
         </div>
         <div class="hint" id="dropHint">Keep drop under 3 percent for sensitive gear; under 5 percent overall.</div>
-      </article>
+      </section>
 
-      <article class="calc-card" id="splCard">
+      <section class="calc-card" id="splCard">
         <div class="card-head">
           <h2><span class="card-index" aria-hidden="true">06</span>SPL Distance</h2>
           <span>Inverse square loss</span>
@@ -311,7 +309,7 @@
           <div class="result"><span>Doublings</span><strong id="splDoublings">0</strong></div>
         </div>
         <div class="hint" id="splHint">Free-field estimate. Real rooms add reflections and gain.</div>
-      </article>
+      </section>
     </section>
 
     <section class="summary-panel" aria-label="Calculation summary">
@@ -322,6 +320,9 @@
       <div class="summary-body">
         <pre class="summary-output" id="summaryOutput"></pre>
         <div class="summary-actions">
+          <button type="button" id="copySummaryBtn">Copy Summary</button>
+          <button type="button" id="resetBtn">Reset</button>
+          <a href="led-wall-calculator.html">LED Wall planner</a>
           <button type="button" class="primary" id="copySummaryBtn2">Copy</button>
           <button type="button" id="downloadSummaryBtn">Download TXT</button>
         </div>
@@ -335,6 +336,7 @@
 <script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/av-calculator.js"></script>
+<script src="js/av-calculator-viewport.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
 </body>

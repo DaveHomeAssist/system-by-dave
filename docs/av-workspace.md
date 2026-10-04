@@ -29,3 +29,12 @@ The existing [AV Suite worker](../av-suite-worker.js) is the sole cache owner. [
 - `AV_WORKSPACE_EVIDENCE=/absolute/output/path npm run test:av-workspace` saves screenshots and matrix JSON. `AV_WORKSPACE_BASE=https://avbydave.com/` points the same probe at the published release.
 
 Emulation does not establish physical iOS keyboard avoidance, address-bar transitions, notch/home-indicator clearance, daylight readability, or real operator acceptance. Those remain explicit device checks. This foundation is not a claim that every control across the suite has passed WCAG AA.
+
+
+## AV Calculator viewport pilot
+
+[AV Calculator](../av-calculator.html) preserves the existing calculation engine, `avCalculator.v1` values and incoming card hashes. Its [view adapter](../js/av-calculator-viewport.js) organizes the six calculations and operator summary into keyboard tabs, with a labeled bottom task selector on phones. Bounded field pages retain real input nodes; they do not turn forms into scrolling panels. Only the complete generated summary is a long scroll panel. Wide displays additionally show the summary beside the current calculation. Show-context controls retain their original event handlers in an optional Show context view. Neither task switching nor layout writes readiness or document data.
+
+The pilot uses explicit navigation opt-outs while providing Home, Toolbox, current task, a deterministic show-context return, and the first-focus skip link. Save guards still run. The shared navigation migration follows this opt-in pilot; other consumers keep their current behavior.
+
+Verification: `node scripts/probe_calculator_viewport.cjs` against a local server at port 4173; `VIEWPORT_BROWSER=webkit` selects WebKit and excludes offline reload, which remains a Chromium check. `VIEWPORT_BASE` names another origin. The reusable viewport skill checker uses [the calculator adapter](../scripts/viewport_calculator_adapter.cjs) to exercise every field page, real theme control, readiness and the permitted summary scroll region. The October 3 local matrix passed 188/188 pages per engine in both themes at 1440×900, 375×812, 844×390, 320×256 and 3840×1080. A separate 680px layout pass, PF-required error state, summary export, print expansion, reload, navigation and offline checks passed. These are automated source checks; deployment and physical acceptance are separate gates recorded in the requested candidate report.

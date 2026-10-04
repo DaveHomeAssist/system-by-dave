@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-03 — AV Calculator viewport pilot
+
+- Replace the stacked calculator surface with focused calculation and summary views, bounded field pages, compact primary links, bottom task selection on phones, and useful summary context on ultrawide screens.
+- Preserve calculation values, validation, storage keys, incoming card hashes, show-context controls, save guards, reset, copy and TXT output; expose complete print content. Cache the new layout assets with the existing AV worker.
+- Add calculator view adapters and functional checks. Local Chromium and WebKit viewport/axe matrices each passed 188 view pages; offline edit/reload passed in Chromium. Physical device and operator acceptance remain open.
+
 ## 2026-10-03 — Reconcile the maintained AV consolidation plan
 
 - Carry forward Toolbox, focused applications, optional modules and Workbook withdrawal without reopening settled choices. Preserve the shipped Video document/module ownership contract; gate future shared identity and application decisions only where they apply.
