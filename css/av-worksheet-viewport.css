@@ -62,3 +62,10 @@
  .av-view:last-child .av-items { break-after:auto; }
  .table-wrap table { min-width:0; width:100%; }
 }
+
+@media screen {
+ [data-av-tool=show-handoff][data-av-viewport] .metric{padding:8px;}
+ [data-av-tool=show-handoff][data-av-viewport] .metric strong{font-size:24px;}
+ [data-av-tool=show-handoff][data-av-viewport] #actionNote{white-space:normal;overflow:auto;overflow-wrap:anywhere;text-overflow:clip;max-height:2.6em;overscroll-behavior:contain;}
+}
+@media print{#actionNote{max-height:none!important;overflow:visible!important;white-space:normal!important;}}
