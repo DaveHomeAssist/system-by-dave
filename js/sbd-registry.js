@@ -129,6 +129,8 @@
     './js/av-domain-views.js',
     './js/av-calculator.js',
     './js/av-calculator-viewport.js',
+    './js/av-viewport.js',
+    './css/av-viewport.css',
     './css/av-calculator-viewport.css',
     './js/led-workspace.js',
     './js/led-wall-viewer.js',
@@ -247,7 +249,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261003-calculator-viewport',
+    version:'v20261003-viewport-shell',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

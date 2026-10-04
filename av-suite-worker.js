@@ -8,7 +8,7 @@
    cached application code. */
 importScripts('./js/sbd-registry.js');
 
-// Calculator viewport release: focused views and preserved incoming power handoffs.
+// Viewport shell release: opt-in embedded navigation and shared view mechanics.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();

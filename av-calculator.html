@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-av-theme="system" data-av-tool="av-calculator" data-sbd-nav="off" data-sbd-public-nav="off">
+<html lang="en" data-av-theme="system" data-av-tool="av-calculator" data-sbd-nav="embedded" data-sbd-public-nav="off">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,6 +30,7 @@
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 <link rel="stylesheet" href="css/av-theme.css">
 <script src="js/av-theme-mode.js"></script>
+<link rel="stylesheet" href="css/av-viewport.css">
 <link rel="stylesheet" href="css/av-calculator-viewport.css">
 </head>
 <body>
@@ -47,8 +48,7 @@
       </span>
     </a>
     <div class="top-actions" aria-label="Related tools">
-      <a class="top-link" href="/">Home</a>
-      <a class="top-link" href="av-suite.html?entry=toolbox">Toolbox</a>
+      <div data-sbd-nav-slot></div>
       <button type="button" class="theme-toggle" id="themeToggle">Dark mode</button>
     </div>
   </header>
@@ -336,6 +336,7 @@
 <script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/av-calculator.js"></script>
+<script src="js/av-viewport.js"></script>
 <script src="js/av-calculator-viewport.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
