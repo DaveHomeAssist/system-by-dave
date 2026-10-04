@@ -47,4 +47,5 @@
  .av-board-header,.av-task-nav,.av-pages,#overlay,#sheet,button{display:none!important;}
  .av-board-view[hidden],.av-page-away{display:block!important;}
  body:not(.setup) #setup{display:none!important;}
+ #sessionList button{display:block!important;border:0;background:transparent;color:#000;text-align:left;}
 }
