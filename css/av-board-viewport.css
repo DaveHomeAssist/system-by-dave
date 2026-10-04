@@ -21,6 +21,7 @@
  [data-av-viewport] #sessionList{display:grid;align-content:start;gap:8px;}
  [data-av-viewport] #sessionList button{text-align:left;white-space:normal;overflow-wrap:anywhere;}
  [data-av-viewport] .err { color:var(--av-danger); }
+ [data-av-viewport] .av-items :is(h1,h2,h3,p,.lede,.footnote,.sub,.clock,.note,.hint){margin:0!important;}
  [data-av-viewport] .av-flow{display:contents!important;overflow:visible!important;}
  [data-av-viewport] :is(.field,.chk){min-width:0;margin:0;float:none;width:auto;}
  [data-av-viewport] .field label{font-size:14px;margin:0;}
