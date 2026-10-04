@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-04 — Retire the Pier 68 run of show
+
+- Remove `/afterbreak/` now that the September 11–12 event is over. The page was noindex and disallowed, but its internal crew, purchasing and promotion notes were still readable by anyone with the link.
+- Drop its robots rule, indexing-policy assertion and README entry.
+
 ## 2026-10-04 — Cheesesteak map resize correction
 
 - Sync source `b9fd299b7a200cd905157f1ec20fcad84a188d19` after verifying that returning from Order & picks restores the map canvas after a desktop-to-phone resize.
