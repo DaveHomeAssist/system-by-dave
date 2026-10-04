@@ -176,7 +176,7 @@ function assertPageContracts(registry) {
   if (!index.includes('href="av-suite.html?entry=toolbox"') || !index.includes('Browse AV tools')) {
     fail('Homepage is missing the addressable AV Toolbox doorway.');
   }
-  if (!tools.includes("url: 'av-suite.html?entry=toolbox'") || !tools.includes('AV Toolbox')) {
+  if (!/<a class="tool-card"[^>]*\shref="av-suite\.html\?entry=toolbox"[^>]*>[\s\S]*?<h2>AV Toolbox<\/h2>/.test(tools)) {
     fail('Tools directory is missing the addressable AV Toolbox entry.');
   }
 
