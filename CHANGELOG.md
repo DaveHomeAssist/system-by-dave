@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-03 — Opt-in AV viewport shell
+
+- Extract the validated calculator field pager and semantic task navigation into shared view helpers without changing application documents or stores.
+- Add an explicit embedded navigation slot for adopting applications; preserve existing consumers and specialist opt-outs, including save guards. AV Calculator is the first embedded consumer.
+- Repeat both-theme/five-size viewport checks after extraction and add a registry-wide navigation parity probe.
+
 ## 2026-10-03 — AV Calculator viewport pilot
 
 - Replace the stacked calculator surface with focused calculation and summary views, bounded field pages, compact primary links, bottom task selection on phones, and useful summary context on ultrawide screens.

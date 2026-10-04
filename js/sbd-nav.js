@@ -238,6 +238,19 @@
     if(SKIP[route]) return;
     if(document.querySelector('nav.sbd-nav')) return;
 
+    // Explicit migration: only opted-in products supply a layout-owned slot.
+    // Legacy consumers and specialist opt-outs keep their existing behavior.
+    var slot = document.querySelector('[data-sbd-nav-slot]');
+    if(document.documentElement.getAttribute('data-sbd-nav') === 'embedded' && slot){
+      var embedded = el('nav', 'sbd-nav sbd-nav-embedded');
+      embedded.setAttribute('aria-label', 'Tool navigation');
+      embedded.setAttribute('data-sbd-nav', 'true');
+      embedded.appendChild(link('', '/', 'Home', 'Return to this site home'));
+      embedded.appendChild(link('', 'av-suite.html?entry=toolbox', 'Toolbox', 'Browse AV Toolbox'));
+      slot.appendChild(embedded);
+      return;
+    }
+
     var style = el('style');
     style.textContent = [
       '.sbd-nav{position:fixed;right:14px;bottom:14px;z-index:9998;display:flex;align-items:center;gap:5px;padding:6px;border:1px solid rgba(150,162,178,.32);border-radius:12px;background:rgba(13,16,21,.93);box-shadow:0 10px 30px rgba(0,0,0,.42);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}',

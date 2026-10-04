@@ -1,0 +1,13 @@
+/* Shared opt-in controls. Product adapters own the bounded panel arrangement. */
+.sbd-nav-embedded { position:static; display:flex; gap:4px; padding:0; margin:0; border:0; box-shadow:none; }
+.sbd-nav-embedded a { display:inline-flex; align-items:center; min-height:44px; padding:6px 10px; color:var(--av-text); text-decoration:none; font-size:12px; }
+.av-tabs { display:flex; gap:4px; }
+.av-tabs button { flex:1; min-width:0; }
+.av-tabs [aria-selected=true] { border:2px solid var(--av-accent); background:var(--av-accent-soft); }
+.av-task-nav > select { display:none; }
+.av-pages { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; }
+.av-pages output { font-size:14px; text-align:center; }
+@media screen { .av-page-away { display:none!important; } }
+@media(max-width:1000px) { .av-tabs { display:none; } .av-task-nav > select { display:block; width:100%; } }
+@media print { .av-pages,.av-task-nav,.sbd-nav-embedded { display:none!important; } .av-page-away { display:block; } }
+@media(prefers-reduced-motion:reduce) { .av-tabs *, .av-pages *, .sbd-nav-embedded * { transition:none!important; animation:none!important; } }
