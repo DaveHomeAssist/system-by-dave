@@ -1,0 +1,338 @@
+{
+  "id": "av-video",
+  "name": "AV Video, Calculators & Throwline",
+  "repos": [
+    "DaveHomeAssist/system-by-dave"
+  ],
+  "head": "1adc8846653c72e0ad115c4941c809bac1c79cf1",
+  "status": "amber",
+  "statusReason": "All six viewport refactors are deployed; PR probe coverage and historical shell/Video follow-ups remain open. Physical/operator acceptance is separate.",
+  "lastActivity": "2026-10-04",
+  "shipped": [
+    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
+    "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+    "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit.",
+    "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan."
+  ],
+  "nextStep": {
+    "title": "Wire the viewport and theme probes into relevant pull request checks",
+    "why": "Source review still finds the theme probe only in deployment and the Calculator/navigation probes absent from PR workflows. Delivered local/live evidence does not close CI coverage.",
+    "doneWhen": "Relevant PR changes trigger real theme, Calculator and navigation parity probes; current-head CI and deployment pass without weakening assertions.",
+    "effort": "S",
+    "owner": "Codex",
+    "blockedBy": ""
+  },
+  "findings": [
+    {
+      "id": "AVV-02",
+      "type": "infra",
+      "sev": "P1",
+      "title": "Theme, calculator and nav-parity probes never run on PRs",
+      "detail": "Rechecked 2026-10-04 at 1adc884: workflows reference probe_av_themes only during deploy-pages. Calculator and navigation parity probes are not wired to PR workflows. Their local/live passes do not prove future PR coverage.",
+      "files": [
+        "scripts/probe_calculator_viewport.cjs",
+        ".github/workflows/av-workspace.yml",
+        ".github/workflows/deploy-pages.yml"
+      ],
+      "evidence": "code-read",
+      "phase": 0
+    },
+    {
+      "id": "AVV-05",
+      "type": "nav",
+      "sev": "P2",
+      "title": "Skip link resets calculator to first task (hash routing)",
+      "detail": "Source still activates task zero when fromLocation cannot map the hash. The earlier skip-link observation is not re-tested here; preserve this follow-up rather than infer it fixed by broad passing matrices.",
+      "files": [
+        "js/av-viewport.js",
+        "av-calculator.html"
+      ],
+      "evidence": "code-read",
+      "phase": 0
+    },
+    {
+      "id": "AVV-06",
+      "type": "responsive",
+      "sev": "P2",
+      "title": "Unguarded Element.checkVisibility in shared paging runtime",
+      "detail": "Current shared AVViewport still calls Element.checkVisibility without feature detection. Older-iPad compatibility remains a source-level risk, not a reproduced physical-device failure.",
+      "files": [
+        "js/av-workspace.js",
+        "js/av-viewport.js",
+        "led-wall-calculator.html"
+      ],
+      "evidence": "code-read",
+      "phase": 0
+    },
+    {
+      "id": "AVV-10",
+      "type": "feature",
+      "sev": "P2",
+      "title": "Video slices left: Cameras/Playback, Stream & Record, 4 imports",
+      "detail": "Modules are patch/checks/backups/displays only; LEGACY imports cover 4 of 8 keys (no stream-plan, record-log, camera-shot-list, playback-check).",
+      "files": [
+        "apps/av-video/src/model.ts",
+        "apps/av-video/src/model.ts",
+        "docs/av-suite-consolidation-stage2-video.md"
+      ],
+      "evidence": "code-read",
+      "phase": 1
+    },
+    {
+      "id": "AVV-13",
+      "type": "nav",
+      "sev": "P3",
+      "title": "Embedded nav from #238 uses a relative Toolbox link",
+      "detail": "Current embedded navigation still uses relative av-suite.html?entry=toolbox. Root-level migrated routes passed comparison; future subdirectory adoption requires explicit resolution and compatibility checks.",
+      "files": [
+        "js/sbd-nav.js",
+        "css/av-viewport.css"
+      ],
+      "evidence": "code-read",
+      "phase": 0
+    },
+    {
+      "id": "AVV-14",
+      "type": "decision",
+      "sev": "P1",
+      "title": "Physical-device and operator acceptance not yet recorded",
+      "detail": "Physical phones/tablets, virtual keyboards, touch ergonomics, operator rehearsal, capture/NDI and external output/audio routing remain open. Automated Chromium/WebKit and touch emulation are separate evidence.",
+      "files": [
+        "docs/av-workspace.md",
+        "docs/av-video.md",
+        "CHANGELOG.md"
+      ],
+      "evidence": "doc",
+      "phase": 3
+    }
+  ],
+  "phases": [
+    {
+      "name": "PR checks and shell follow-ups — Open",
+      "goal": "Close the confirmed coverage gap; revalidate recorded shell risks before fixes.",
+      "items": [
+        "AVV-02: wire theme, Calculator and navigation parity probes on relevant PRs.",
+        "AVV-05 / AVV-06 / AVV-13: preserve hash, compatibility and subdirectory follow-ups."
+      ],
+      "gate": "Relevant PR gate execution and focused regression proof; no weakened assertions."
+    },
+    {
+      "name": "Remaining AV Video capabilities — Planned",
+      "goal": "Cameras/Playback, then Stream/Record under the existing field/import contract.",
+      "items": [
+        "Preserve independent Video documents, reversible modules, import previews and original legacy records.",
+        "Revalidate historical Video navigation, form-size, offline-entry and stream-key findings before dependent work."
+      ],
+      "gate": "Per-slice compatibility, offline/recovery and operator acceptance; legacy retirement is separate."
+    },
+    {
+      "name": "Six viewport candidates — Delivered",
+      "goal": "Keep completed work out of the pending migration queue.",
+      "items": [
+        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
+        "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+        "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit."
+      ],
+      "gate": "PRs #237–#243 merged; both destination/source deployment evidence verified. Unselected catalog tools are not claimed refactored."
+    },
+    {
+      "name": "Physical and operator acceptance — Open",
+      "goal": "Complete the real device and venue checks automation cannot establish.",
+      "items": [
+        "Phones/tablets, virtual keyboards, address bar and safe areas.",
+        "Touch/pointer ergonomics and live operator rehearsal.",
+        "Capture/NDI hardware and external display/audio routing."
+      ],
+      "gate": "Dated device/OS and operator pass/fail evidence, with failures retained."
+    }
+  ],
+  "decisionsForDave": [
+    "Retire the 8 legacy Video pages once AV Video imports all 8 keys, or keep them live indefinitely?",
+    "Minimum iOS/iPadOS for field use: 17.4+ (checkVisibility) or add fallbacks for older iPads?",
+    "Throwline: keep explicit-save only (edited width resets on reload) or add a draft autosave?",
+    "Stream & Record: block raw stream keys outright on import/export, or keep warning-only?"
+  ],
+  "files": [
+    {
+      "path": "docs/next-steps/av-video.json",
+      "why": "Public-safe evidence projection; underlying product specifications and implementation remain authoritative."
+    },
+    {
+      "path": "docs/av-workspace.md",
+      "why": "Bounded workspace contract, calculator pilot, probes and open device acceptance"
+    },
+    {
+      "path": "docs/av-video.md",
+      "why": "AV Video behavior, storage key, save/stale-tab and verification contract"
+    },
+    {
+      "path": "docs/av-suite-consolidation-stage2-video.md",
+      "why": "Video increments 2.0-2.5 with exit gates and V0 defect list"
+    },
+    {
+      "path": "apps/av-video/src/App.tsx",
+      "why": "View state, save/stale-tab handling, imports, Displays wiring"
+    },
+    {
+      "path": "apps/av-video/src/model.ts",
+      "why": "Document schema, LEGACY import keys, compare-and-swap saveDocument"
+    },
+    {
+      "path": "js/av-workspace.js",
+      "why": "Shared paging runtime synced inline into Throwline and LED pages"
+    },
+    {
+      "path": "js/av-calculator-viewport.js",
+      "why": "Calculator task views and hash routing (pilot for AVViewport)"
+    },
+    {
+      "path": "js/sbd-nav.js",
+      "why": "Current shared navigation and save guards; embedded migration and subdirectory follow-up."
+    },
+    {
+      "path": "js/sbd-registry.js",
+      "why": "Tool inventory, storage keys, cache version and offline assets"
+    },
+    {
+      "path": "ProjectorThrow/Stage3D.html",
+      "why": "Stage 3D workspace, cache pin, small-text CSS"
+    }
+  ],
+  "verify": [
+    "git diff --check",
+    "npm run verify:av",
+    "VIEWPORT_BASE=https://avbydave.com/ node scripts/probe_calculator_viewport.cjs",
+    "VIEWPORT_BASE=https://avbydave.com/ VIEWPORT_BROWSER=webkit node scripts/probe_calculator_viewport.cjs"
+  ],
+  "context": [
+    "All six viewport candidates are deployed; the earlier not-live statements are superseded.",
+    "AV Video owns sbd.avVideo.v1; layout reuse does not merge stores or make Workbook a dependency.",
+    "Legacy Video routes remain until their replacement/compatibility gates are satisfied.",
+    "Workbook redesign and legacy Video rebuild were excluded from the viewport work.",
+    "WebKit Calculator geometry/function checks passed; its offline reload lane is excluded. Chromium offline proof is not physical Safari acceptance.",
+    "Historical audit details remain in private updater backups; stable finding IDs preserve traceability."
+  ],
+  "links": [
+    {
+      "label": "Maintained consolidation plan",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/1adc8846653c72e0ad115c4941c809bac1c79cf1/docs/av-suite-consolidation-spec.md"
+    },
+    {
+      "label": "Viewport workflow contract",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/1adc8846653c72e0ad115c4941c809bac1c79cf1/docs/av-workspace.md"
+    },
+    {
+      "label": "Final viewport release #243",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/243"
+    },
+    {
+      "label": "Published source",
+      "url": "https://avbydave.com/source.json"
+    },
+    {
+      "label": "Source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577"
+    },
+    {
+      "label": "AV deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749"
+    },
+    {
+      "label": "Toolbox",
+      "url": "https://avbydave.com/av-suite.html?entry=toolbox"
+    }
+  ],
+  "kickoffPrompt": "Work in DaveHomeAssist/system-by-dave from freshly verified remote main under its claim protocol. Read AGENTS.md, CLAUDE.md, docs/av-workspace.md and current workflows. Scope the AVV-02 coverage gap: wire the existing theme, Calculator viewport and registry navigation parity probes into appropriate pull request checks with controlled servers/fixtures. Do not redesign applications or silently close historical findings. Run the exact affected checks, review the diff, commit, push, merge only the verified current head, then verify deployment and live behavior. Refresh the existing av-video projection and retain physical/operator acceptance as a separate lane.",
+  "confidence": "high for cited release and scoped checks; historical findings require revalidation",
+  "unknowns": [
+    "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
+    "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
+    "Catalog-wide overflow counts from the earlier pilot are superseded; no new whole-catalog overflow count is asserted."
+  ],
+  "short": "AV Video",
+  "evidence": {
+    "checkedOn": "2026-10-04",
+    "sourceRevision": "1adc8846653c72e0ad115c4941c809bac1c79cf1",
+    "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
+    "sources": [
+      "docs/av-suite-consolidation-spec.md",
+      "docs/av-suite-consolidation-stage2-video.md",
+      "docs/av-workspace.md",
+      "CHANGELOG.md"
+    ],
+    "release": "https://github.com/DaveHomeAssist/system-by-dave/commit/1adc8846653c72e0ad115c4941c809bac1c79cf1",
+    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577",
+    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749",
+    "publishedSource": "https://avbydave.com/source.json",
+    "runtime": [
+      "Live Calculator functional checks: Chromium including offline; WebKit excluding offline reload.",
+      "Fresh Toolbox opens Toolbox; saved preferredEntry=show still opens Show Console; Workbook link visible in both."
+    ],
+    "limits": [
+      "Physical/operator acceptance remains open.",
+      "Stored full viewport matrices and final catalog-navigation results were inspected as delivery evidence, not rerun in this reconciliation."
+    ]
+  },
+  "historicalFindings": [
+    {
+      "id": "AVV-01",
+      "title": "Fixed: deploy red since #237 (run 383 green after #239)",
+      "status": "Superseded",
+      "note": "All six increments deployed with successful required gates and live readback; prior deployment/readback gap closed."
+    },
+    {
+      "id": "AVV-03",
+      "title": "39 of 46 registry tools still scroll the page",
+      "status": "Superseded",
+      "note": "Earlier 39-of-46 / 78-case overflow count predates the remaining 19 route refactors; do not reuse as a current count. Unselected tools and legacy Video remain outside this scope."
+    },
+    {
+      "id": "AVV-04",
+      "title": "AV Video view is not in the URL; Back/Forward lose the task",
+      "status": "Needs revalidation",
+      "note": "Historical finding retained by ID; not reverified in this scoped board reconciliation."
+    },
+    {
+      "id": "AVV-07",
+      "title": "AV Video form text below 16px (iOS focus zoom)",
+      "status": "Needs revalidation",
+      "note": "Historical finding retained by ID; not reverified in this scoped board reconciliation."
+    },
+    {
+      "id": "AVV-08",
+      "title": "Stage 3D still ships 8-8.5px labels and alerts",
+      "status": "Needs revalidation",
+      "note": "Historical finding retained by ID; not reverified in this scoped board reconciliation."
+    },
+    {
+      "id": "AVV-09",
+      "title": "LED working state key undeclared (V0-10 still open)",
+      "status": "Needs revalidation",
+      "note": "Historical finding retained by ID; not reverified in this scoped board reconciliation."
+    },
+    {
+      "id": "AVV-11",
+      "title": "Direct /av-video/ and calculator visits never prepare offline",
+      "status": "Needs revalidation",
+      "note": "Historical finding retained by ID; not reverified in this scoped board reconciliation."
+    },
+    {
+      "id": "AVV-12",
+      "title": "Raw stream keys can travel in Stream Plan exports",
+      "status": "Needs revalidation",
+      "note": "Historical finding retained by ID; not reverified in this scoped board reconciliation."
+    }
+  ],
+  "decisionsResolved": [
+    {
+      "id": "AVV-SCROLL",
+      "question": "Scroll policy: must all 30 worksheet tools become no-page-scroll, or only apps and calculators?",
+      "resolution": "WEB-2 and the ordered six-candidate request settle viewport containment; no further scroll-policy approval is required."
+    },
+    {
+      "id": "AVV-SEQUENCE",
+      "question": "Next Video slice first: Cameras/Playback or Stream & Record?",
+      "resolution": "The maintained implementation plan specifies Cameras/Playback followed by Stream/Record. Follow that sequence; no new decision inferred."
+    }
+  ]
+}

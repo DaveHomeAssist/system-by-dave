@@ -234,3 +234,10 @@ Pages workflow before a production claim.
 - [ ] The change is committed and pushed; required CI passes; the pull request
       is merged when green (golden rule 6) and the deploy completes; the exact
       live surface is read back.
+
+## Next steps projection
+
+Follow workspace NEXT-1 through NEXT-6. Maintain the existing AV board IDs via
+[the public-safe projections](docs/next-steps/README.md), using the workspace
+governed updater. Product specifications remain authoritative; keep private
+board snapshots and evidence out of this repository.
