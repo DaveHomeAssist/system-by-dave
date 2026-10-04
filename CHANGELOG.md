@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-03 — Calculator header theme correction
+
+- Use the shared foreground token for the compact calculator title so it stays readable on the light header. The deployment theme gate caught the inherited hero color before publication.
+
 ## 2026-10-03 — Opt-in AV viewport shell
 
 - Extract the validated calculator field pager and semantic task navigation into shared view helpers without changing application documents or stores.
