@@ -32,7 +32,7 @@ aviewfrommyseat bot challenge accepted in A7) and 1 warning (P4, which is D1).
 | D3, D10 | Merged in fmp-suite #55 (`92db88a`) and re-exported to fmp/ and fmpwalk/ by the Phase D release PR |
 | D4 | Code in fmp-suite #55; gate 1 and the origin note in system-by-dave #231; the live variable is C6 |
 | D5 | Done in system-by-dave #231 |
-| D6 | 46 branches deleted on October 3: the four superseded ones (each tip still reachable from its PR) and 42 merged ones. Kept: the Faults branch, the only ref to `04a4e04`, and the four walk Phase B branches, which belong to that session. The auto-delete setting waits for Dave |
+| D6 | 46 branches deleted on October 3: the four superseded ones (each tip still reachable from its PR) and 42 merged ones. Kept: the Faults branch, the only ref to `04a4e04`, and the four walk Phase B branches, which belong to that session. "Automatically delete head branches" turned on for fmp-suite October 3 (Dave approved) |
 | D7 | Done: housevideo#2 closed with a pointer to the source repositories |
 | D8 | Console gates updated October 3 (g10, g11 and g21 closed; g06, g08 and g09 reworded; g23–g25 added). The full refresh follows this release |
 | D9 | Done in system-by-dave #231: probe check W8 covers every published route, with the seven pages in E1 as recorded debt |
