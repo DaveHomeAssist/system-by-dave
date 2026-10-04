@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-04 — Cheesesteak map resize correction
+
+- Sync source `b9fd299b7a200cd905157f1ec20fcad84a188d19` after verifying that returning from Order & picks restores the map canvas after a desktop-to-phone resize.
+- Observe container size changes, invalidate Leaflet without panning or animation, and disconnect on cleanup.
+
 ## 2026-10-04 — Cheesesteak anticipatory browsing
 
 - Sync the managed snapshot from source `2b41ea80f6ad0dce0f4d7af080e4b88e48f14126`: exact-count recovery, contextual saved/neighborhood suggestions and explicit remembered defaults and orders.
