@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-04 — Clear start and resume labels in the preshow walk
+
+- Export canonical FMP source `9d5167aab3e880584c6811051c8ce6263a880032`: fresh/setup-only walks show Start walk; recorded observations and route progress show Resume walk. Reload retains observations and reset restores Start walk.
+- Refresh both managed release provenance records from the same verified source.
+
 ## 2026-10-04 — Remove private workspace material from public source
 
 - Remove private property documents and cross-project workspace dashboards from the current public tree; preserve recovery material privately. Earlier Git revisions are unchanged.

@@ -596,7 +596,7 @@ dialog{max-width:min(90vw,720px);max-height:85dvh;overflow:auto;background:var(-
     <div class="mini" style="margin-top:10px">Auto follows the device setting.</div>
   </div>
 
-  <div class="stepnav"><button class="next" id="btnStart">Resume Walk</button></div>
+  <div class="stepnav"><button class="next" id="btnStart">Start walk</button></div>
 </section>
 
 <!-- ══════════════ WALK ══════════════ -->
@@ -979,7 +979,7 @@ function availableStations(){ return FMPWalkCore.availableStations(S.meta); }
 function zoneGroups(){ return FMPWalkCore.zoneGroups(S.meta); }
 function stations(){ return FMPWalkCore.stations(S.meta); }
 // Setup and zone changes can reshape the route mid-walk. Stay on the same stop while it is still on the
-// route, otherwise go to the first stop not yet walked (walk UX audit #3). Only Start walk returns to stop 1.
+// route, otherwise go to the first stop not yet walked (walk UX audit #3). New Walk resets observations and returns to stop 1.
 // A finished walk (S.idx past the last stop) stays finished unless the change adds a stop not yet walked.
 function keepStop(change){
   var before = stations(), finished = S.idx >= before.length, id = !finished && before[S.idx] && before[S.idx].id;
@@ -1015,6 +1015,13 @@ function renderHeader(){
   for(var i=0;i<st.length;i++){ if(S.res[st[i].id] && S.res[st[i].id].status) done++; }
   $("hShow").textContent = S.meta.show || "No show set";
   $("hMeta").textContent = (S.meta.date || "no date") + " · " + (S.meta.cfg === "winter" ? "winter rig" : "summer rig");
+  var hasObservations = S.idx > 0 || S.faults.length > 0 || Object.keys(S.res).some(function(id){
+    var reading = S.res[id] || {};
+    return ["status", "bright", "match", "level", "count", "note"].some(function(key){
+      return reading[key] !== undefined && reading[key] !== null && String(reading[key]).trim() !== "";
+    }) || Object.values(reading.visual || {}).some(Boolean);
+  });
+  $("btnStart").textContent = hasObservations ? "Resume walk" : "Start walk";
   $("hDone").textContent = done;
   $("hTot").textContent = "of " + st.length;
 
