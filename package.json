@@ -62,7 +62,8 @@
     "typecheck:av-video": "tsc -p apps/av-video/tsconfig.json --noEmit",
     "test:av-video-browser": "node scripts/probe_av_video.mjs --no-sandbox && node scripts/probe_av_video_graph.mjs --no-sandbox && node scripts/probe_av_video_displays.mjs --no-sandbox",
     "sync:av-workspace": "node scripts/sync_av_workspace.js",
-    "test:av-workspace": "node scripts/probe_av_workspace.mjs"
+    "test:av-workspace": "node scripts/probe_av_workspace.mjs",
+    "verify:private-exposure": "node --test scripts/verify_private_exposure.test.js && node scripts/verify_private_exposure.js"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-04 — Remove private workspace material from public source
+
+- Remove private property documents and cross-project workspace dashboards from the current public tree; preserve recovery material privately. Earlier Git revisions are unchanged.
+- Replace absolute local user paths in public reference material with a neutral workspace label.
+- Check tracked source on every pull request and check the staged Pages artifact for private workspace files and absolute local user paths before publication.
+
 ## 2026-10-04 — Cheesesteak hidden-canvas safety
 
 - Sync source `694e0177203ffa2f28729f55c56cf13292199cce`. Disable Leaflet’s window resize listener so the nonzero container observer exclusively owns map resizing.
