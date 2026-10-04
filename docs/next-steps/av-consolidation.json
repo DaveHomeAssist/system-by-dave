@@ -1,0 +1,358 @@
+{
+  "id": "av-consolidation",
+  "name": "AV Suite — Toolbox & consolidation",
+  "repos": [
+    "DaveHomeAssist/system-by-dave"
+  ],
+  "head": "1adc8846653c72e0ad115c4941c809bac1c79cf1",
+  "status": "amber",
+  "statusReason": "Viewport delivery complete; returning-neutral Toolbox and public Workbook withdrawal remain open. Physical acceptance and broader consolidation are separate.",
+  "lastActivity": "2026-10-04",
+  "shipped": [
+    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
+    "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+    "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit.",
+    "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan."
+  ],
+  "nextStep": {
+    "title": "Close returning-neutral Toolbox, then public Workbook withdrawal",
+    "why": "These settled product decisions still have implementation gaps, independently of the completed viewport refactors.",
+    "doneWhen": "Saved Show preference plus a neutral URL opens Toolbox; explicit Show links work; Workbook promotion/editor artifacts are withdrawn and former routes return to Toolbox without changing browser data.",
+    "effort": "M",
+    "owner": "Codex",
+    "blockedBy": ""
+  },
+  "findings": [
+    {
+      "id": "AVC-01",
+      "type": "logic",
+      "sev": "P1",
+      "title": "One Show Console visit permanently defeats the Toolbox default",
+      "detail": "Live readback 2026-10-04: fresh neutral entry is Toolbox; a controlled saved preferredEntry=show fixture still opens Show Console. js/av-suite/app.js still honors and writes preferredEntry.",
+      "files": [
+        "js/av-suite/app.js",
+        "js/av-suite/app.js"
+      ],
+      "evidence": "observed",
+      "phase": 0
+    },
+    {
+      "id": "AVC-02",
+      "type": "infra",
+      "sev": "P1",
+      "title": "Release probe enforces the old saved-Show precedence",
+      "detail": "Source review at 1adc884; original audit wording follows, exact counts/line references are historical. probe_av_suite_responsive.js fails unless a saved Show preference opens Show Console on a neutral URL; Pages CI runs it. Invert it with the AVC-01 fix.",
+      "files": [
+        "scripts/probe_av_suite_responsive.js",
+        ".github/workflows/deploy-pages.yml"
+      ],
+      "evidence": "code-read",
+      "phase": 0
+    },
+    {
+      "id": "AVC-03",
+      "type": "feature",
+      "sev": "P1",
+      "title": "AV Workbook still promoted and served publicly",
+      "detail": "Live readback 2026-10-04 finds a visible Workbook link in both fresh Toolbox and saved Show Console. The maintained withdrawal requirement remains open; viewport work did not withdraw Workbook.",
+      "files": [
+        "js/sbd-registry.js",
+        "av-suite.html",
+        "tools.html"
+      ],
+      "evidence": "observed",
+      "phase": 1
+    },
+    {
+      "id": "AVC-04",
+      "type": "infra",
+      "sev": "P1",
+      "title": "Workbook ships via Pages rsync, offline cache, sitemap, staging",
+      "detail": "Source review at 1adc884; original audit wording follows, exact counts/line references are historical. rsync stages the whole repo (apps/av-workbook source + av-workbook/ bundle); offlineAssets cache it (L168-171); gen_sitemap.py:36 and avbydave pages list it.",
+      "files": [
+        ".github/workflows/deploy-pages.yml",
+        "js/sbd-registry.js",
+        "scripts/gen_sitemap.py"
+      ],
+      "evidence": "code-read",
+      "phase": 1
+    },
+    {
+      "id": "AVC-11",
+      "type": "feature",
+      "sev": "P2",
+      "title": "Video slices left: Cameras & Playback, then Stream & Record",
+      "detail": "Source review at 1adc884; original audit wording follows, exact counts/line references are historical. camera-shot-list, playback-check, stream-plan and record-log lack AV Video homes and imports; 2.2-2.5 acceptance open. Internals belong to the AV Video audit.",
+      "files": [
+        "docs/av-suite-consolidation-stage2-video.md",
+        "docs/av-video.md"
+      ],
+      "evidence": "doc",
+      "phase": 3
+    },
+    {
+      "id": "AVC-12",
+      "type": "feature",
+      "sev": "P2",
+      "title": "No Manage apps/modules in Toolbox; other focused apps unstarted",
+      "detail": "The maintained plan still lists universal application/module visibility and coherent cross-tool application slices as future gates. Shipped worksheet task views do not prove shared Logistics/Show Operations document consolidation.",
+      "files": [
+        "js/av-suite/app.js",
+        "docs/av-suite-consolidation-spec.md"
+      ],
+      "evidence": "code-read",
+      "phase": 3
+    },
+    {
+      "id": "AVC-13",
+      "type": "docs",
+      "sev": "P3",
+      "title": "CLAUDE.md and doorway doc encode saved-entry precedence",
+      "detail": "Source review at 1adc884; original audit wording follows, exact counts/line references are historical. CLAUDE.md 'an explicitly saved entry preference is honored' and av-suite-doorway.md:18 describe current code, not the settled neutral-to-Toolbox rule.",
+      "files": [
+        "CLAUDE.md",
+        "docs/av-suite-doorway.md"
+      ],
+      "evidence": "code-read",
+      "phase": 0
+    }
+  ],
+  "phases": [
+    {
+      "name": "Stage 1a — Returning-neutral Toolbox",
+      "goal": "Implement the settled default while preserving explicit entries and saved data.",
+      "items": [
+        "AVC-01 / AVC-02 / AVC-13 remain open.",
+        "Fresh neutral entry already opens Toolbox; returning saved Show preference is the remaining gap."
+      ],
+      "gate": "Returning neutral entry opens Toolbox and explicit Show/context/history journeys pass."
+    },
+    {
+      "name": "Stage 1b — Public Workbook withdrawal",
+      "goal": "Remove public promotion and editor publication under the maintained plan.",
+      "items": [
+        "AVC-03 / AVC-04 remain open.",
+        "Preserve source/history and browser data; no separate recovery or migration project."
+      ],
+      "gate": "Staged and live former entry URLs return to Toolbox; no promoted/public editor remains."
+    },
+    {
+      "name": "Viewport delivery — Complete",
+      "goal": "Record delivered layout work independently from application consolidation.",
+      "items": [
+        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
+        "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+        "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit."
+      ],
+      "gate": "Release proof is recorded; physical/operator acceptance remains separate."
+    },
+    {
+      "name": "Remaining application consolidation — Planned",
+      "goal": "Follow the maintained spec; do not reopen settled app ownership.",
+      "items": [
+        "Cameras/Playback, then Stream/Record belong to AV Video.",
+        "Shared identities, future preference scope, family mergers and automated readiness require their own choice gates.",
+        "Revalidate historical safety/mobile findings before a separately scoped fix."
+      ],
+      "gate": "Per-slice data compatibility, release proof and operator acceptance."
+    }
+  ],
+  "decisionsForDave": [
+    "D4 [unlocks]: safe areas - add viewport-fit=cover only where a page pads its edges (recommended), or suite-wide?",
+    "D6: Throwline tokens - keep specialist tokens (CLAUDE.md) or generate them from one authored token source?",
+    "D7: fixes in other repos (fmp-suite, DeckForge, BPM Delay, Lansdowne, PlotForge) - do upstream now or defer?",
+    "D8: record the audit outcome in the repo like docs/fmp-camera-simulator-audit-2026-09.md? (recommended)"
+  ],
+  "files": [
+    {
+      "path": "docs/next-steps/av-consolidation.json",
+      "why": "Public-safe evidence projection; underlying product specifications and implementation remain authoritative."
+    },
+    {
+      "path": "docs/av-suite-consolidation-spec.md",
+      "why": "Maintained plan: settled decisions, Stage 1 gaps, full Workbook withdrawal surface"
+    },
+    {
+      "path": "docs/av-suite-doorway.md",
+      "why": "Doorway and av-suite-ui.v1 persistence contract; update with the neutral rule"
+    },
+    {
+      "path": "js/av-suite/app.js",
+      "why": "resolvedEntryFromLocation L206, navigateEntry L214, Workbook Spine group L624"
+    },
+    {
+      "path": "scripts/probe_av_suite_responsive.js",
+      "why": "L361-377 saved-doorway assertions to invert"
+    },
+    {
+      "path": "js/sbd-registry.js",
+      "why": "av-workbook record L27, phase recs L76-81, offline assets L168-171, version"
+    },
+    {
+      "path": "av-suite.html",
+      "why": "Static Workbook rail link L112 and noscript link L60"
+    },
+    {
+      "path": ".github/workflows/deploy-pages.yml",
+      "why": "rsync staging L179 publishes the whole repo; probes run at L106"
+    },
+    {
+      "path": "scripts/domain-sites.json",
+      "why": "avbydave pages list includes av-workbook.html; registry pages staged"
+    },
+    {
+      "path": "docs/av-suite-consolidation-stage2-video.md",
+      "why": "2.0c open safety items, 2.1-2.5 gates, Video field matrix"
+    },
+    {
+      "path": "docs/av-suite-development-assets-index.md",
+      "why": "Authority map and observed live state for the program"
+    }
+  ],
+  "verify": [
+    "git diff --check",
+    "npm run verify:av",
+    "VIEWPORT_BASE=https://avbydave.com/ node scripts/probe_calculator_viewport.cjs",
+    "VIEWPORT_BASE=https://avbydave.com/ VIEWPORT_BROWSER=webkit node scripts/probe_calculator_viewport.cjs"
+  ],
+  "context": [
+    "Toolbox default, independent applications, reversible optional modules and app-owned Video documents are settled.",
+    "Public Workbook withdrawal is settled; retained source/concept does not make Workbook a required host.",
+    "The 20 viewport routes preserve independent stores and specialist semantics; layout delivery does not prove application/document consolidation.",
+    "Earlier audit details and unchanged private evidence remain in the updater backup. Superseded counts and revalidation notes are preserved by finding ID.",
+    "Unanswered historical questions remain Open; recommendations are not approvals."
+  ],
+  "links": [
+    {
+      "label": "Maintained consolidation plan",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/1adc8846653c72e0ad115c4941c809bac1c79cf1/docs/av-suite-consolidation-spec.md"
+    },
+    {
+      "label": "Viewport workflow contract",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/1adc8846653c72e0ad115c4941c809bac1c79cf1/docs/av-workspace.md"
+    },
+    {
+      "label": "Final viewport release #243",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/243"
+    },
+    {
+      "label": "Published source",
+      "url": "https://avbydave.com/source.json"
+    },
+    {
+      "label": "Source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577"
+    },
+    {
+      "label": "AV deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749"
+    },
+    {
+      "label": "Toolbox",
+      "url": "https://avbydave.com/av-suite.html?entry=toolbox"
+    }
+  ],
+  "kickoffPrompt": "Work in DaveHomeAssist/system-by-dave from freshly verified remote main using the repository claim protocol. Read AGENTS.md, CLAUDE.md, docs/av-suite-consolidation-spec.md and docs/av-suite-doorway.md. Implement the settled returning-neutral Toolbox rule while preserving explicit Show/context entry, pins, recents, saved show data and browser history. Update the paired responsive assertion and documentation. Validate, review, commit, push, merge under repository policy and verify deployment and live fresh/returning journeys. Follow with public Workbook withdrawal under the maintained scope; do not redesign Workbook or migrate its documents. Refresh the existing av-consolidation projection after verified evidence changes.",
+  "confidence": "high for cited release and scoped checks; historical findings require revalidation",
+  "unknowns": [
+    "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
+    "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
+    "Catalog-wide overflow counts from the earlier pilot are superseded; no new whole-catalog overflow count is asserted."
+  ],
+  "short": "AV Suite",
+  "evidence": {
+    "checkedOn": "2026-10-04",
+    "sourceRevision": "1adc8846653c72e0ad115c4941c809bac1c79cf1",
+    "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
+    "sources": [
+      "docs/av-suite-consolidation-spec.md",
+      "docs/av-suite-consolidation-stage2-video.md",
+      "docs/av-workspace.md",
+      "CHANGELOG.md"
+    ],
+    "release": "https://github.com/DaveHomeAssist/system-by-dave/commit/1adc8846653c72e0ad115c4941c809bac1c79cf1",
+    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577",
+    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749",
+    "publishedSource": "https://avbydave.com/source.json",
+    "runtime": [
+      "Live Calculator functional checks: Chromium including offline; WebKit excluding offline reload.",
+      "Fresh Toolbox opens Toolbox; saved preferredEntry=show still opens Show Console; Workbook link visible in both."
+    ],
+    "limits": [
+      "Physical/operator acceptance remains open.",
+      "Stored full viewport matrices and final catalog-navigation results were inspected as delivery evidence, not rerun in this reconciliation."
+    ]
+  },
+  "historicalFindings": [
+    {
+      "id": "AVC-05",
+      "title": "Plain-key shortcuts hijack Cmd/Ctrl combos on 28 pages (V0-5)",
+      "status": "Needs revalidation",
+      "note": "Earlier audit evidence retained in the private board backup. Not reverified by viewport release or this reconciliation."
+    },
+    {
+      "id": "AVC-06",
+      "title": "Direct-entry offline works on only 6 AV pages",
+      "status": "Needs revalidation",
+      "note": "Earlier audit evidence retained in the private board backup. Not reverified by viewport release or this reconciliation."
+    },
+    {
+      "id": "AVC-07",
+      "title": "8 mobile-audit decisions unanswered; D1-D4 gate a 14-item PR",
+      "status": "Needs revalidation",
+      "note": "Earlier audit evidence retained in the private board backup. Not reverified by viewport release or this reconciliation."
+    },
+    {
+      "id": "AVC-08",
+      "title": "2.0c legacy safety open: unreadable data and sample seeding",
+      "status": "Needs revalidation",
+      "note": "Earlier audit evidence retained in the private board backup. Not reverified by viewport release or this reconciliation."
+    },
+    {
+      "id": "AVC-09",
+      "title": "Shared shell lacks 16px touch inputs and 44px targets",
+      "status": "Needs revalidation",
+      "note": "Earlier audit evidence retained in the private board backup. Not reverified by viewport release or this reconciliation."
+    },
+    {
+      "id": "AVC-10",
+      "title": "Audit unrecorded in repo; parts already overtaken",
+      "status": "Needs revalidation",
+      "note": "Earlier audit evidence retained in the private board backup. Not reverified by viewport release or this reconciliation."
+    },
+    {
+      "id": "AVC-14",
+      "title": "+8 lower-priority audit items tracked in the earlier private audit",
+      "status": "Needs revalidation",
+      "note": "Earlier audit evidence retained in the private board backup. Not reverified by viewport release or this reconciliation."
+    },
+    {
+      "id": "AVC-07-DECISIONS",
+      "title": "Earlier eight-question approval gate",
+      "status": "Superseded in part",
+      "note": "No-scroll, theme support, ordered six-candidate adoption and Workbook exclusion were explicitly settled; unanswered questions remain below."
+    }
+  ],
+  "decisionsResolved": [
+    {
+      "id": "AVC-D1",
+      "question": "D1 [unlocks fix PR]: no-scroll rule everywhere incl. ~35 worksheets, or only calculators, workspaces and the Suite?",
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
+    },
+    {
+      "id": "AVC-D2",
+      "question": "D2 [unlocks]: AV Workbook - withdrawal settled 10-02, dark lock gone; confirm it is simply excluded from mobile fixes?",
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
+    },
+    {
+      "id": "AVC-D3",
+      "question": "D3 [unlocks]: Throwline+LED already got the shell (#226); confirm, and pick next adopter: AV Video, Show Console or worksheets?",
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
+    },
+    {
+      "id": "AVC-D5",
+      "question": "D5: theme toggle for ~38 tools in shared nav, no new storage key - placement OK, and must every worksheet support both palettes?",
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
+    }
+  ]
+}

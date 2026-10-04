@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-04 — AV next steps reconciliation
+
+- Add public-safe projections for the existing AV Suite and AV Video board entries, linked to maintained specifications and dated release evidence.
+- Supersede pilot-era deployment and overflow claims after the six viewport releases; retain historical findings, unanswered choices and physical/operator acceptance separately.
+
 ## 2026-10-03 — StagePlotter viewport workspace
 
 - Keep the plot central with separate Tools, Selected, Setup, Items, Outputs and Status tasks, plus selected properties beside the canvas on ultrawide displays.
