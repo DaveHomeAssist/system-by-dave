@@ -1,0 +1,54 @@
+name: AV viewport and theme contracts
+
+on:
+  pull_request:
+    paths:
+      - '*.html'
+      - 'js/**'
+      - 'css/**'
+      - 'apps/av-*/**'
+      - 'av-video/**'
+      - 'av-workbook/**'
+      - 'ProjectorThrow/**'
+      - 'design/**'
+      - 'scripts/probe_av_*.js'
+      - 'scripts/probe_calculator_viewport.cjs'
+      - 'scripts/probe_viewport_navigation.cjs'
+      - 'package*.json'
+      - '.github/workflows/av-viewport-contracts.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  viewport-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium chrome
+      - name: Verify current application contracts in Chromium
+        env:
+          VIEWPORT_BASE: http://127.0.0.1:4173/
+        run: |
+          export CHROME_BIN="$(command -v google-chrome)"
+          python3 -m http.server 4173 --bind 127.0.0.1 >"$RUNNER_TEMP/av-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in $(seq 1 20); do
+            if curl --silent --fail "$VIEWPORT_BASE" >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --fail "$VIEWPORT_BASE" >/dev/null
+          node scripts/probe_av_themes.js --base="$VIEWPORT_BASE" --width=390
+          node scripts/probe_av_themes.js --base="$VIEWPORT_BASE" --width=1280
+          node scripts/probe_calculator_viewport.cjs
+          node scripts/probe_viewport_navigation.cjs
+          node scripts/probe_av_suite_responsive.js --base="$VIEWPORT_BASE" --target=hub-toolbox

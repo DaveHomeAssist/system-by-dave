@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-04 — Toolbox for every neutral visit
+
+- Open Toolbox on neutral returning visits, preserving explicit Show links and saved show data. Retain but ignore the legacy doorway preference.
+- Gate AV themes, Calculator interactions, navigation parity and the Toolbox persistence contract on pull requests.
+- Fix unreadable light-mode route inspector cards in Power, Network, Signal Flow and RF; desktop checks now cover them.
+
 ## 2026-10-04 — Remove private workspace material from public source
 
 - Remove private property documents and cross-project workspace dashboards from the current public tree; preserve recovery material privately. Earlier Git revisions are unchanged.

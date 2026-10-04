@@ -84,7 +84,7 @@ metadata, and title families are release-gated by the public content contract.
 
 `av-suite.html` is one doorway with two addressable workspaces: Show Console at
 `?entry=show` and the show-independent AV Toolbox at `?entry=toolbox`. A neutral
-first visit opens Toolbox; an explicitly saved entry preference is honored; any explicit `sbd*` show parameter
+visit opens Toolbox, including returning visits with a legacy entry preference; any explicit `sbd*` show parameter
 forces Show Console. The registry drives both workspaces' tool inventory,
 storage metadata, navigation, offline assets, and generated sitemap entries.
 Toolbox-only pins, recents, search, and filter preferences live in
