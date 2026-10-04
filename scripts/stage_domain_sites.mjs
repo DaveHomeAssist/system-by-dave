@@ -465,6 +465,10 @@ function transferPage(site, origin) {
 }
 
 function stubPage(site, origin, file, host) {
+  // Retired Workbook routes go straight to Toolbox, without a storage/migration interstitial.
+  if (site.id === 'avbydave' && ['av-workbook.html', 'av-workbook/index.html'].includes(file)) {
+    return read(file).replaceAll('/av-suite.html?entry=toolbox', `${origin}/av-suite.html?entry=toolbox`);
+  }
   const route = routeFor(file);
   const target = `${origin}/${route}`;
   const publisher = host ? { name: host.name, home: host.home } : { name: 'System by Dave', home: 'https://systembydave.com/' };

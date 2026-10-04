@@ -39,7 +39,6 @@ const STANDALONE_RETURNS = [
   'camera-sim/index.html',
   'camera-sim/fmp-camera-simulator-offline.html',
   'resume/av/index.html',
-  'av-workbook/index.html',
   'pixelforge/index.html',
   'world-cup/index.html',
   'fifa-pitch-crew/index.html',
@@ -57,7 +56,6 @@ const REQUIRED_SKIP_LINKS = new Map([
   ['camera-sim/index.html', 'sim-workspace'],
   ['camera-sim/fmp-camera-simulator-offline.html', 'sim-workspace'],
   ['depotops/index.html', 'depotops-workspace'],
-  ['av-workbook/index.html', 'root'],
   ['pixelforge/index.html', 'root'],
   ['ProjectorThrow/index.html', 'throwline-workspace'],
   ['ProjectorThrow/Stage3D.html', 'stage-workspace'],
@@ -375,13 +373,12 @@ function verifyAvWorkbookRegistry() {
   }
   if (!registry.tools.length) fail('AV tool registry is empty.');
   const workbook = registry.toolById && registry.toolById('av-workbook');
-  if (!workbook) fail('AV Workbook is not a registry tool.');
-  else if (workbook.href !== 'av-workbook/') fail(`AV Workbook href is ${workbook.href}, expected av-workbook/.`);
+  if (workbook) fail('Withdrawn Workbook must not be a public registry tool.');
   Object.keys(registry.recommended || {}).forEach((phase) => {
-    if ((registry.recommended[phase] || [])[0] !== 'av-workbook') fail(`${phase} recommendations do not start with AV Workbook.`);
+    if ((registry.recommended[phase] || []).includes('av-workbook')) fail(`${phase} still recommends withdrawn Workbook.`);
   });
   const navHasWorkbook = (registry.navDepartments || []).some((group) => (group.toolIds || []).includes('av-workbook'));
-  if (!navHasWorkbook) fail('AV Workbook is not present in universal nav departments.');
+  if (navHasWorkbook) fail('Withdrawn Workbook remains in universal navigation.');
   const cueSheet = registry.toolById && registry.toolById('cue-sheet');
   if (!cueSheet || cueSheet.name !== 'Cue Sheet' || cueSheet.href !== 'cue-sheet.html') fail('Cue Sheet is not registered at canonical cue-sheet.html.');
   const legacyCueForgeId = registry.toolById && registry.toolById('cueforge');

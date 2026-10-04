@@ -75,8 +75,9 @@ to make stale documentation true.
 - **Public shell and naming:** `docs/public-shell-contract.md` and
   `docs/public-content-contract.md` own navigation behavior, canonical names,
   title families, and checked public counts.
-- **AV Workbook:** edit `apps/av-workbook/`; regenerate `av-workbook/` with the
-  package build.
+- **AV Workbook:** retained source lives in `apps/av-workbook/`; the package
+  build writes its ignored `dist/` for verification only. Public `av-workbook/`
+  is a Toolbox redirect; never publish retained source or editor bundles.
 - **NoteForge:** synchronize the verified external build with
   `npm run sync:noteforge`; do not hand-edit managed artifact files.
   `.github/workflows/noteforge-sync.yml` does this on NoteForge's release

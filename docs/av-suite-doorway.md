@@ -37,7 +37,7 @@ empty legacy name on read; all other saved show data remains intact.
 ## AV Toolbox
 
 AV Toolbox is derived entirely from `window.SBD_REGISTRY.tools`. It renders the
-complete current inventory, groups tools by workbook and console families, and
+complete current inventory, groups tools by application and console families, and
 uses registry `toolboxFeatured` flags for the featured set. Toolbox links are
 plain destinations: they do not include `sbdShow`, `sbdVenue`, `sbdDate`,
 `sbdOperator`, or `sbdPhase`.
@@ -128,3 +128,11 @@ clarified on 2026-10-02 that no Workbook recovery notice, dedicated export flow,
 transition period or migration project is required; former entry URLs can return
 to Toolbox. Its concept/source remains for a possible future redesign. These are
 settled target decisions. This document distinguishes the shipped fresh-visit default from the remaining Workbook-withdrawal work.
+
+## Retired Workbook entries
+
+`/av-workbook.html`, `/av-workbook/` and `/av-workbook/index.html` return directly
+to Toolbox on both public origins. These noindex aliases do not read, transfer,
+change or delete browser data. Workbook is absent from discovery, navigation,
+offline assets and published editor/source artifacts. Retained source builds
+privately under `apps/av-workbook/dist/` for regression checks.

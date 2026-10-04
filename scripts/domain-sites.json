@@ -102,7 +102,8 @@
         "av-suite-landing2.html",
         "av-suite.html",
         "av-workbook.html",
-        "av-tool-suite/"
+        "av-tool-suite/",
+        "av-workbook/"
       ],
       "assets": [],
       "robotsDisallow": [
@@ -117,7 +118,9 @@
           "av-suite-ui.v1",
           "av-suite-dock-compact.v1",
           "av-theme-mode.v1",
-          "sbd.handoff.v1"
+          "sbd.handoff.v1",
+          "system-by-dave.av-workbook.active.v1",
+          "system-by-dave.av-workbook.fallback.v1"
         ],
         "prefixes": [
           "sbd.handoff.",

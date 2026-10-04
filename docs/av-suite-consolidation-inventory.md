@@ -1,13 +1,12 @@
 # AV Suite consolidation source inventory
 
-Generated from `js/sbd-registry.js` version `v20261003-stage-viewport`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
+Generated from `js/sbd-registry.js` version `v20261004-workbook-withdrawn`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
 
 The feature text and declared keys come from the registry. Export, print, and keyboard columns identify only source-code signals in the route file. “Not found” does not prove absence; “Source signal” does not prove working behavior. Offline means the route is named by the registry manifest, not that every dependency is cached. Each behavior still needs browser and field-parity verification before a legacy route can be retired.
 
 | Tool and feature | Route | Origin | Declared storage and known exceptions | Export | Print | Keyboard | Offline route |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | **AV Video** — Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules. | `/av-video/` | https://avbydave.com | sbd.avVideo.v1 | Source signal | Not found | Not found | Named |
-| **AV Workbook** — Shared show workbook for rooms, crew, gear, signal sources, patching, validation, and handoff state. | `/av-workbook/` | https://avbydave.com | system-by-dave.av-workbook.active.v1, system-by-dave.av-workbook.fallback.v1; IndexedDB system-by-dave-av-workbook / workbooks | Source signal | Not found | Not found | Named |
 | **Teleprompter** — Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view. | `/teleprompter.html` | https://avbydave.com | teleprompter.v1, teleprompter.script.v1, teleprompter.preferences.v1, teleprompter.savedScripts.v1, teleprompter.savedFormats.v1, teleprompter.pacePresets.v1, teleprompter.bookmarks.v1, teleprompter.customColors.v1 | Source signal | Not found | Source signal | Named |
 | **Show Timer** — Countdown, count up, clock mode, stage view, warning states, and keyboard control. | `/show-timer.html` | https://avbydave.com | showTimer.preferences.v1 | Source signal | Not found | Source signal | Named |
 | **Cue Sheet** — Browser based rundown control with preview, lightweight layered playback, monitor output, capture inputs, print, JSON, and CSV. | `/cue-sheet.html` | https://avbydave.com | cueSheet.v1 | Source signal | Source signal | Source signal | Named |
@@ -53,7 +52,7 @@ The feature text and declared keys come from the registry. Export, print, and ke
 | **LED Wall Calculator** — Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning. | `/led-wall-calculator.html` | https://avbydave.com | avCalculator.ledProfiles.v1; working state in avCalculator.v1 (declared under av-calculator) | Source signal | Not found | Not found | Named |
 | **OnTrack** — DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes. | `/ontrack.html` | https://avbydave.com | ontrack_v1 | Source signal | Not found | Source signal | Named |
 
-**Count:** 46 registry tools; 61 declared local-storage keys.
+**Count:** 45 registry tools; 59 declared local-storage keys.
 
 ## Unresolved mapping and proof
 
