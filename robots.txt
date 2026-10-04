@@ -21,7 +21,6 @@ Disallow: /fmp-walk/
 Disallow: /fmpwalk/
 Disallow: /camera-sim/
 Disallow: /wedding-ops.html
-Disallow: /afterbreak/
 Sitemap: https://systembydave.com/sitemap.xml
 Sitemap: https://systembydave.com/systembydave/sitemap.xml
 Host: systembydave.com

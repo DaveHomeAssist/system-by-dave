@@ -69,7 +69,7 @@ const robots = read('robots.txt');
 // /fmp/walk/ redirect to the walk's own origin from 2026-10-01, and the five noindex pages of the
 // managed /cheesesteaks/ static export (map, rankings, neighborhoods, methodology, about) from 2026-10-01.
 // AV Video adds its source page and AV-origin generated application on 2026-10-02.
-if (unlisted.length !== 155) fail(`Expected 155 tracked routes outside the sitemap; found ${unlisted.length}.`);
+if (unlisted.length !== 154) fail(`Expected 154 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
@@ -146,7 +146,6 @@ if (!fmpIndexAlias.includes('location.replace("/fmp/" + location.search + locati
 if (canonical(fmpIndexAlias) !== `${originFor('fmp/')}/fmp/`) fail('fmp-index/index.html canonical does not match its redirect target.');
 if (sitemapRoutes.has('/fmp-index/')) fail('fmp-index/index.html appears in the sitemap.');
 
-if (!hasNoIndex(read('afterbreak/index.html'))) fail('afterbreak/index.html is missing noindex.');
 if (!hasNoIndex(read('cross-project-actions.html'))) fail('cross-project-actions.html is missing noindex.');
 if (!hasNoIndex(read('html/sbd-brand.html'))) fail('html/sbd-brand.html is missing noindex.');
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-04 — Retire the Pier 68 run of show
+
+- Remove `/afterbreak/` now that the September 11–12 event is over. The page was noindex and disallowed, but its internal crew, purchasing and promotion notes were still readable by anyone with the link.
+- Drop its robots rule, indexing-policy assertion and README entry.
+
 ## 2026-10-04 — Homepage share descriptions
 
 - Make the Open Graph, Twitter Card and WebSite structured-data descriptions match the homepage meta description, so every surface names Prompt Lab and the free, local and optional paid paths.
