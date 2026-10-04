@@ -249,7 +249,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261003-viewport-shell',
+    version:'v20261003-viewport-contrast',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

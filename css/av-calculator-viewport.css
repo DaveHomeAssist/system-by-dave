@@ -5,7 +5,7 @@
  [data-calculator-viewport] .app { height:100vh; height:100dvh; min-height:0; display:grid; grid-template-rows:auto minmax(0,1fr); padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
  [data-calculator-viewport] :is(main,.calc-card,.summary-panel,.calc-items,.summary-body) { min-height:0; min-width:0; }
  [data-calculator-viewport] .topbar { position:static; padding:4px 12px; gap:8px; }
- [data-calculator-viewport] .brand-text h1 { font-size:16px; margin:0; }
+ [data-calculator-viewport] .brand-text h1 { font-size:16px; margin:0; color:var(--av-text); }
  [data-calculator-viewport] .top-actions { gap:4px; flex-wrap:nowrap; }
  [data-calculator-viewport] :is(button,a:not(.skip-link),input,select) { transition:none; transform:none; }
  [data-calculator-viewport] .calc-card, [data-calculator-viewport] .summary-panel { animation:none; opacity:1; transform:none; }
