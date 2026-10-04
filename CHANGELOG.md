@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-04 — Cheesesteak anticipatory browsing
+
+- Sync the managed snapshot from source `2b41ea80f6ad0dce0f4d7af080e4b88e48f14126`: exact-count recovery, contextual saved/neighborhood suggestions and explicit remembered defaults and orders.
+- Separate Explore, Order & picks and Preferences; preserve independent saved shops/theme/team state and disclose the 30-day preference expiry in About.
+- Keep query text and coordinates out of storage, handle denied storage honestly, and retain brief reduced-motion-aware feedback.
+
 ## 2026-10-04 — AV next steps reconciliation
 
 - Add public-safe projections for the existing AV Suite and AV Video board entries, linked to maintained specifications and dated release evidence.
