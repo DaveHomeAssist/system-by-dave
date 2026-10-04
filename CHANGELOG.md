@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-03 — Show Operations viewport views
+
+- Organize twelve Show Operations routes into bounded task views while retaining every application model, storage key, field, import/export shape and handler. Retain derived operator cards and the independent Show Handoff workflow.
+- Keep Show Board’s timeline, sessions, current/next actions, issues, snapshots and conflict recovery accessible through specialist views; paginate setup and dialogs and restore explicit theme choice.
+- Preserve full printed field values, long record scrolling and original show-context controls. Extend the opt-in pager to avoid resize feedback and preserve keyboard focus in WebKit.
+
 ## 2026-10-03 — Opt-in AV viewport shell
 
 - Extract the validated calculator field pager and semantic task navigation into shared view helpers without changing application documents or stores.

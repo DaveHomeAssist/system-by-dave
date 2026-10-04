@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-av-theme="system" data-av-tool="breakout-room-matrix">
+<html data-sbd-nav="embedded" data-sbd-public-nav="off" lang="en" data-av-theme="system" data-av-tool="breakout-room-matrix">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -112,6 +112,8 @@
 <link rel="stylesheet" href="css/av-domain-views.css">
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 <link rel="stylesheet" href="css/av-theme.css">
+<link rel="stylesheet" href="css/av-viewport.css">
+<link rel="stylesheet" href="css/av-worksheet-viewport.css">
 </head>
 <body>
 <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Breakout Room Matrix</h1>
@@ -123,6 +125,7 @@
       <span class="brand-mark">BR</span>
       <span class="brand-text"><strong>Breakout Room Matrix</strong><span>System by Dave AV tools</span></span>
     </a>
+    <div data-sbd-nav-slot></div>
     <div class="top-actions">
       <button id="printBtn" type="button">Print</button>
       <button id="copySummaryBtn" type="button">Copy Summary</button>
@@ -368,5 +371,7 @@
 <script src="js/responsive-tables.js" defer></script>
 <script src="js/av-domain-views.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
+<script src="js/av-viewport.js"></script>
+<script src="js/av-worksheet-viewport.js"></script>
 </body>
 </html>

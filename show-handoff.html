@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-av-theme="system" data-av-tool="show-handoff">
+<html data-sbd-nav="embedded" data-sbd-public-nav="off" lang="en" data-av-theme="system" data-av-tool="show-handoff">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -637,8 +637,11 @@
 <link rel="stylesheet" href="css/responsive-tables.css">
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 <link rel="stylesheet" href="css/av-theme.css">
+<link rel="stylesheet" href="css/av-viewport.css">
+<link rel="stylesheet" href="css/av-worksheet-viewport.css">
 </head>
 <body>
+<noscript><p>This tool requires JavaScript for editing, saving, and exporting show records. Enable JavaScript to use the workspace.</p></noscript>
 <a class="skip-link" href="#handoffForm">Skip to handoff form</a>
 <div class="app">
   <header class="topbar">
@@ -649,6 +652,7 @@
         <span>AV operator tool</span>
       </span>
     </a>
+    <div data-sbd-nav-slot></div>
     <div class="top-actions">
       <button id="sampleBtn" type="button">Load Sample</button>
       <button id="clearBtn" class="danger" type="button">Clear</button>
@@ -1443,5 +1447,7 @@
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
+<script src="js/av-viewport.js"></script>
+<script src="js/av-worksheet-viewport.js"></script>
 </body>
 </html>

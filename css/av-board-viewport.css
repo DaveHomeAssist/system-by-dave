@@ -1,0 +1,50 @@
+@media screen {
+ [data-av-viewport] .sbd-suite-note-editor[data-open=true] { display:contents; }
+ [data-av-viewport] .sbd-suite-dock :is(a,button,input,span) { min-width:0;max-width:none;white-space:normal;min-height:44px;color:var(--av-text);background:var(--av-surface); }
+ [data-av-viewport] .sbd-suite-note-editor:not([data-open=true]) { display:none!important; }
+ html[data-av-viewport],html[data-av-viewport] body{height:100%;min-height:0;overflow:hidden;}
+ [data-av-viewport] body{height:100dvh;max-width:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);display:grid;grid-template-rows:auto minmax(0,1fr);}
+ .av-board-header{display:flex;gap:8px;align-items:center;padding:4px 8px;background:var(--av-surface);color:var(--av-text);}
+ .av-board-header h1{flex:1;}
+ [data-av-viewport] :is(button,input,select){min-height:44px;font-size:16px;}
+ [data-av-viewport] :is(button,a,input,select,textarea):focus-visible{outline:2px solid var(--av-focus);outline-offset:-2px;}
+ [data-av-viewport] :is(#app,#setup){min-height:0;min-width:0;max-width:none;margin:0;padding:4px;}
+ [data-av-viewport] #app{display:grid;grid-template-rows:auto minmax(0,1fr);gap:4px;}
+ [data-av-viewport] body.setup #app{display:none;}
+ [data-av-viewport] #setup{display:none;}
+ [data-av-viewport] body.setup #setup{display:grid;}
+ [data-av-viewport] .av-board-view{min-height:0;min-width:0;display:grid;grid-template-rows:minmax(0,1fr) 44px;gap:4px;padding:4px;}
+ [data-av-viewport] .av-items{min-height:0;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;grid-auto-rows:max-content;gap:8px;}
+ [data-av-viewport] :is(.blk.gone,.turn.past,.gearrow.on span){opacity:1;}
+ [data-av-viewport] .turn.past{border-inline-start:3px solid var(--av-muted);}
+ [data-av-viewport] .attention-card .detail{white-space:normal;overflow:visible;text-overflow:clip;}
+ [data-av-viewport] #sessionList{display:grid;align-content:start;gap:8px;}
+ [data-av-viewport] #sessionList button{text-align:left;white-space:normal;overflow-wrap:anywhere;}
+ [data-av-viewport] .err { color:var(--av-danger); }
+ [data-av-viewport] .av-flow{display:contents!important;overflow:visible!important;}
+ [data-av-viewport] :is(.field,.chk){min-width:0;margin:0;float:none;width:auto;}
+ [data-av-viewport] .field label{font-size:14px;margin:0;}
+ [data-av-viewport] textarea{resize:none;height:64px;min-height:44px;font-size:16px;}
+ [data-av-viewport] :is(h1,h2,h3){font-size:18px;margin:0;}
+ [data-av-viewport] .av-long{min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;scroll-padding:44px 0 0;max-height:none;}
+ [data-av-viewport] :is(#timelineView,#issuesView,#turnsView,#sessionsView) .av-items{grid-template-columns:minmax(0,1fr);}
+ [data-av-viewport] :is([hidden],.av-page-away){display:none!important;}
+ [data-av-viewport] #sheet.open{display:grid;inset:0;margin:auto;width:min(900px,100%);max-width:none;max-height:100dvh;height:100dvh;border-radius:0;overflow:visible;transform:none;}
+ @media(max-width:680px){
+  [data-av-viewport] .av-items{grid-template-columns:minmax(0,1fr);}
+  [data-av-viewport] #app{grid-template-rows:minmax(0,1fr) auto;}
+  [data-av-viewport] .av-task-nav{grid-row:2;}
+  [data-av-viewport] #app>.av-board-view{grid-row:1;grid-column:1;}
+ }
+ @media(min-width:2200px){
+  [data-av-viewport] #app:has(#timelineViewTab[aria-selected=true]){grid-template-columns:minmax(0,3fr) minmax(0,1fr);}
+  [data-av-viewport] .av-task-nav{grid-column:1/-1;}
+ }
+ @media(prefers-reduced-motion:reduce){[data-av-viewport] *{transition:none!important;animation:none!important;}}
+}
+@media print{
+ html,body,#app,#setup,.av-board-view,.av-items,.av-flow,.av-long{height:auto!important;max-height:none!important;overflow:visible!important;display:block!important;}
+ .av-board-header,.av-task-nav,.av-pages,#overlay,#sheet,button{display:none!important;}
+ .av-board-view[hidden],.av-page-away{display:block!important;}
+ body:not(.setup) #setup{display:none!important;}
+}
