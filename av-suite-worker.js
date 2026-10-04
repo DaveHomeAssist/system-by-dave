@@ -8,7 +8,7 @@
    cached application code. */
 importScripts('./js/sbd-registry.js');
 
-// Logistics viewport release: focused records and independent exception views.
+// StagePlotter viewport release: bounded drawing view and persistent geometry.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();
