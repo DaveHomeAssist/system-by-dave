@@ -36,6 +36,7 @@ aviewfrommyseat bot challenge accepted in A7) and 1 warning (P4, which is D1).
 | D7 | Done: housevideo#2 closed with a pointer to the source repositories |
 | D8 | Console gates updated October 3 (g10, g11 and g21 closed; g06, g08 and g09 reworded; g23–g25 added). The full refresh follows this release |
 | D9 | Done in system-by-dave #231: probe check W8 covers every published route, with the seven pages in E1 as recorded debt |
+| D11 | Open: added October 3; ships with the next walk release |
 
 ## Phase D: small fixes, no hardware
 
@@ -51,6 +52,7 @@ aviewfrommyseat bot challenge accepted in A7) and 1 warning (P4, which is D1).
 | D8 | The FMP Development Console is stale and carries obsolete gates | Snapshot October 1, 2:48 AM ET. g11 (leftover branches) is D6. g21 (an embed mode for four explorers) is obsolete because #202 removed FMP links and frames from Gear Reference. For g10 (keep the Show Console links?): they return 200 and pass only venue and phase, and since fmp-suite #14 the Operator field gets no position codes | **After the Phase B release:** refresh projects, PRs and the provenance chain. Close g21 with that reason and g10 as "keep the links", citing this evidence. Add gates for C6 and E1 | agent | S |
 | D9 | No check reports page scroll, so WEB-2 drift is invisible | Probe W3 checks horizontal overflow only; the debt in E1 passed every probe lane | **Add probe check W8:** page scroll at 1440×900 or 375×812 warns. Pages listed in E1 report as recorded debt rather than a warning until they are fixed | sbd | S |
 | D10 | Three walk choices still lead with a status emoji | fmp-suite `docs/walk-ux-audit-outcomes.md` ("Partly done"): #43 hid the emoji in body copy, and the severity chips already wrap theirs in `aria-hidden` (`tests/browser.mjs` checks it). The Route to options "ConcertVision 🔴", "Videri 🔴" and "Live Nation facility 🔴" end with one, and there it means "contact unknown" (the contacts table says so in words). An `<option>` cannot hide part of its text from a screen reader | **Replace the emoji with words.** Write "(contact unknown)" in the three route options; saved tickets show the new name and take it on their next save | fmp-suite | S |
+| D11 | The walk's Setup button always says "Resume Walk" | fmp-suite `index.html:598` hard-codes the label (since #51, `d89d6fe`, with no recorded decision), so a first visit offers to resume a walk that does not exist, and the capital W breaks the suite's sentence case. The handler at `:1892` only saves and opens the walk, while the comment at `:981` still says "Only Start walk returns to stop 1" | **Label it from state:** "Start walk" until any position has a result, "Resume walk" after. Correct the comment to match the handler. Bundle with the next walk release rather than shipping alone | fmp-suite | S |
 
 ## Phase E: larger agent work
 
