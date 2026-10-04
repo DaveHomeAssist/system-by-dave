@@ -1,4 +1,4 @@
-const { chromium } = require('playwright');
+const { chromium, webkit } = require('playwright');
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
@@ -6,7 +6,7 @@ const registry = require('../js/sbd-registry.js').SBD_REGISTRY;
 const base = process.env.VIEWPORT_BASE || 'http://localhost:4173/';
 const baseline = execFileSync('git', ['show', 'd40e8a5:js/sbd-nav.js'], { encoding: 'utf8' });
 (async () => {
-  const browser = await chromium.launch({ channel: 'chrome' });
+  const browser = await (process.env.VIEWPORT_BROWSER === 'webkit' ? webkit.launch() : chromium.launch({ channel: 'chrome' }));
   const results = [];
   for (const tool of registry.tools) for (const width of [375, 1440]) {
     const captures = [];
@@ -17,8 +17,10 @@ const baseline = execFileSync('git', ['show', 'd40e8a5:js/sbd-nav.js'], { encodi
       if (old) await page.route('**/js/sbd-nav.js', route => route.fulfill({ contentType: 'application/javascript', body: baseline }));
       await page.goto(`${base}${tool.href}?sbdShow=Navigation%20fixture&sbdPhase=prep`, { waitUntil: 'load' });
       await page.waitForTimeout(400);
-      if (tool.id === 'av-calculator') await page.waitForSelector('[data-calculator-viewport=ready]');
+      const embedded = await page.locator('html').getAttribute('data-sbd-nav') === 'embedded';
+      if (embedded) await page.waitForFunction(() => document.documentElement.dataset.avViewport === 'ready' || document.documentElement.dataset.calculatorViewport === 'ready');
       captures.push(await page.evaluate(errors => ({
+        embedded: document.documentElement.dataset.sbdNav === 'embedded',
         links: [...document.querySelectorAll('.sbd-nav a')].map(a => ({ label: a.textContent, href: a.getAttribute('href') })),
         guards: !!Storage.prototype.setItem.sbdSaveGuard,
         errors,
@@ -27,13 +29,15 @@ const baseline = execFileSync('git', ['show', 'd40e8a5:js/sbd-nav.js'], { encodi
       await context.close();
     }
     fs.writeFileSync('/tmp/viewport-nav-last.json', JSON.stringify({ tool: tool.id, width, captures }, null, 2));
-    if (tool.id !== 'av-calculator') {
+    assert.deepEqual(captures[1].errors, captures[0].errors, `${tool.id} ${width}: new runtime errors`);
+    if (!captures[1].embedded) {
       assert.deepEqual(captures[1].links, captures[0].links, `${tool.id} ${width}: navigation changed`);
-      assert.deepEqual(captures[1].errors, captures[0].errors, `${tool.id} ${width}: new runtime errors`);
       assert.equal(captures[1].guards, captures[0].guards, `${tool.id}: save guards changed`);
     } else {
       assert.deepEqual(captures[1].links.map(link => link.label), ['Home', 'Toolbox']);
       assert.equal(captures[1].guards, true);
+      const root = captures[1].root;
+      assert(root.scrollWidth <= root.width && root.scrollHeight <= root.height, `${tool.id} ${width}: viewport overflow`);
     }
     results.push({ tool: tool.id, width, baseline: captures[0], current: captures[1] });
     console.log('PASS navigation contract', tool.id, width);
