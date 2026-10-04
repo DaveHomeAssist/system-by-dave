@@ -315,6 +315,15 @@ function verifyNavigationContract() {
     if (!tools.includes(name)) fail(`Tools is missing ${name}.`);
   });
   if (!read('sitemap.xml').includes('https://systembydave.com/noteforge/')) fail('Sitemap is missing NoteForge.');
+
+  // The Tools directory column shares the header's width and left edge (desktop and <=680px).
+  const navCss = read('css/sbd-public-nav.css');
+  const squash = (value) => value.replace(/\s+/g, '');
+  const headerWidths = Array.from(navCss.matchAll(/\.sbd-site-header__inner\s*\{[^}]*?\bwidth:\s*([^;]+);/g), (match) => squash(match[1]));
+  const toolsWidths = Array.from(tools.matchAll(/--shell-width:\s*([^;]+);/g), (match) => squash(match[1]));
+  if (headerWidths.length !== 2 || JSON.stringify(toolsWidths) !== JSON.stringify(headerWidths)) {
+    fail(`Tools --shell-width (${toolsWidths.join(' | ')}) does not match .sbd-site-header__inner (${headerWidths.join(' | ')}).`);
+  }
 }
 
 // 404.html is served at whatever path was missing, so every same-origin reference

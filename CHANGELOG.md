@@ -2,10 +2,11 @@
 
 ## 2026-10-04 — Illustrated Tools directory (draft for review)
 
-- Revive the unmerged `codex/tools-card-preview-20260923` work: the Tools directory becomes a five-column illustrated card grid (four, three and two columns as the viewport narrows) with category badges, 44px filter chips, visible keyboard focus and the same destinations and filters.
+- Revive the unmerged `codex/tools-card-preview-20260923` work: the Tools directory becomes a five-column illustrated card grid (four, three and two columns as the viewport narrows) with category badges, 44px filter chips, visible keyboard focus and the same destinations and filters. The hero, filters, grid and notes share the public header's width and left edge at every breakpoint.
+- Badges for AV registry tools show the registry's navigation department (Music, Run of show, Logistics, Workbook, Video, Graphics); other projects keep their directory categories. `verify:av` checks the registry badges and `verify:public-navigation` checks the shared width.
 - Order cards by daily AV operation, AV references and apps, Notion, labs, then apps, games and trackers; titles show only the product name, the count reads visible out of 34 projects, and the AV Toolbox link sits below the grid with the registry count of 46.
 - Add AV Video beside AV Workbook. It has no artwork yet, so it uses a monogram text card in the same grid; any future tool without artwork gets the same treatment.
-- Serve the two illustration atlases as WebP (2.88 MB of PNG down to 262 KB) and render every card in the HTML so the directory works without JavaScript; filtering only hides cards.
+- Serve the two illustration atlases as WebP (2.88 MB of PNG down to 262 KB) with sprite geometry that keeps every icon's native aspect ratio, and render every card in the HTML so the directory works without JavaScript; filtering only hides cards.
 - Fade in the first 12 visible cards with the vendored GSAP build, skipped entirely under reduced motion and when GSAP is unavailable.
 
 ## 2026-10-04 — Retire the Pier 68 run of show
