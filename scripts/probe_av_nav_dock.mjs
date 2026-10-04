@@ -39,6 +39,25 @@ try {
   const base = `http://127.0.0.1:${server.address().port}/cable-plan.html`;
   const show = `${base}?sbdShow=Winter%20Keynote&sbdVenue=Hall%20B`;
 
+  async function revealViewport(page, selector) {
+    if (!await page.locator('[data-av-viewport=ready]').count()) return;
+    const target = page.locator(selector);
+    const id = await target.evaluate(node => node.closest('.av-view')?.id);
+    if (!id) return;
+    const tab = page.locator('#' + id + 'Tab');
+    if (await tab.isVisible()) await tab.click();
+    else {
+      const index = await tab.evaluate(node => [...node.parentElement.children].indexOf(node));
+      await page.locator('#taskView').selectOption(String(index));
+    }
+    const pager = page.locator('#' + id + ' > .av-pages');
+    const previous = pager.getByRole('button', { name: 'Previous', exact: true });
+    while (await previous.isEnabled()) await previous.click();
+    for (let n = 0; n < 30 && !await target.isVisible(); n++) {
+      await pager.getByRole('button', { name: 'Next', exact: true }).click();
+    }
+  }
+
   async function checkLayout(page, label) {
     await page.waitForTimeout(100);
     const result = await page.evaluate(() => {
@@ -58,13 +77,17 @@ try {
         (link) => link.getBoundingClientRect().height));
       const fixedWorkspace = document.documentElement.classList.contains('led-workspace-ready');
       const appBottom = fixedWorkspace ? document.querySelector('.app').getBoundingClientRect().bottom : null;
-      return { overlap, navTop: a.top, navBottom: a.bottom, blockedLink: blockedLink?.textContent,
+      const embedded = nav.classList.contains('sbd-nav-embedded');
+      const root = document.documentElement;
+      const main = document.querySelector('main')?.getBoundingClientRect();
+      return { embedded, overflowX: root.scrollWidth-root.clientWidth, overflowY: root.scrollHeight-root.clientHeight, mainTop: main?.top, overlap, navTop: a.top, navBottom: a.bottom, blockedLink: blockedLink?.textContent,
         shortestLink, fixedWorkspace, appBottom,
         clearance: parseFloat(getComputedStyle(document.body).paddingBottom) };
     });
     if (result.missing || result.overlap > 0.5 || result.navTop < -1
         || result.navBottom > page.viewportSize().height + 1 || result.blockedLink || result.shortestLink < 44
-        || (result.fixedWorkspace ? result.appBottom > result.navTop - 8
+        || (result.embedded ? result.overflowX > 1 || result.overflowY > 1 || result.mainTop < result.navBottom
+          : result.fixedWorkspace ? result.appBottom > result.navTop - 8
           : result.clearance < page.viewportSize().height - result.navTop - 1)) {
       throw new Error(`${label}: ${JSON.stringify(result)}`);
     }
@@ -158,7 +181,8 @@ try {
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message));
     await page.goto(show, { waitUntil: 'networkidle' });
-    await checkLayout(page, `${width}x${height} expanded dock`);
+    await revealViewport(page, '[data-sbd-suite-note-button]');
+    await checkLayout(page, `${width}x${height} show context`);
     if (width === 390 && height === 844) {
       await page.locator('.sbd-nav a').first().focus();
       await page.keyboard.press('Tab');
@@ -177,10 +201,19 @@ try {
     if (width === 390 || width === 768) {
       await page.locator('[data-sbd-suite-note-button]').click();
       await checkLayout(page, `${width}x${height} note editor`);
+      await revealViewport(page, '[data-sbd-suite-compact-toggle]');
       await page.locator('[data-sbd-suite-compact-toggle]').click();
       await checkLayout(page, `${width}x${height} compact dock`);
     }
-    const showLink = await page.locator('.sbd-nav a[href*="sbdShow="]').count();
+    const embedded = await page.locator('.sbd-nav-embedded').count();
+    const links = embedded ? '[data-sbd-suite-return]' : '.sbd-nav a[href*="sbdShow="]';
+    const showLink = await page.locator(links).count();
+    if (embedded) {
+      const destination = new URL(await page.locator(links).getAttribute('href'), page.url());
+      if (destination.origin !== new URL(page.url()).origin || !destination.pathname.endsWith('/av-suite.html')
+          || destination.searchParams.get('sbdShow') !== 'Winter Keynote'
+          || destination.searchParams.get('sbdVenue') !== 'Hall B') throw new Error('Show return lost its context');
+    }
     if (!showLink || errors.length) throw new Error(`${width}x${height}: context link=${showLink}, page errors=${errors.join('; ')}`);
     await page.close();
   }
@@ -264,8 +297,10 @@ try {
   await page.goto(base, { waitUntil: 'networkidle' });
   const noShow = await page.evaluate(() => ({ nav: !!document.querySelector('.sbd-nav'),
     dock: !!document.querySelector('[data-sbd-suite-dock]'),
+    embedded: document.querySelector('.sbd-nav')?.classList.contains('sbd-nav-embedded'),
+    header: !!document.querySelector('.av-header .sbd-nav'),
     bottom: document.querySelector('.sbd-nav')?.getBoundingClientRect().bottom }));
-  if (!noShow.nav || noShow.dock || Math.abs(noShow.bottom - 834) > 1) {
+  if (!noShow.nav || noShow.dock || (noShow.embedded ? !noShow.header || noShow.bottom > 60 : Math.abs(noShow.bottom - 834) > 1)) {
     throw new Error(`no-show navigation changed: ${JSON.stringify(noShow)}`);
   }
   console.log('ok - tool navigation without show context');
@@ -278,10 +313,14 @@ try {
   await page.emulateMedia({ media: 'screen' });
   await page.waitForTimeout(100);
   const restored = await page.evaluate(() => ({
+    embedded: !!document.querySelector('.sbd-nav-embedded'),
+    navHeight: document.querySelector('.sbd-nav').getBoundingClientRect().height,
+    overflowX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    overflowY: document.documentElement.scrollHeight - document.documentElement.clientHeight,
     clearance: parseFloat(getComputedStyle(document.body).paddingBottom),
     required: innerHeight - document.querySelector('.sbd-nav').getBoundingClientRect().top,
   }));
-  if (restored.clearance < restored.required) {
+  if (restored.embedded ? restored.navHeight < 44 || restored.overflowX > 1 || restored.overflowY > 1 : restored.clearance < restored.required) {
     throw new Error(`screen clearance not restored after print: ${JSON.stringify(restored)}`);
   }
   console.log('ok - hidden print navigation and restored screen clearance');

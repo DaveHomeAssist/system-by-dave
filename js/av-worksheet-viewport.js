@@ -45,12 +45,13 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
     panel('outputsView', 'Outputs', [outputs, hero.querySelector('.hero-tools'), main.querySelector('.preview-panel')])
   ] : [
     panel('metadataView', 'Setup', [hero.querySelector('.show-panel')]),
-    panel('recordsView', 'Records', [records], true),
+    panel('recordsView', root.dataset.worksheetTask || 'Records', [records], true),
     panel('controlsView', 'Find / Add', [controls]),
     panel('selectedView', 'Selected', [selected]),
     panel('statusView', 'Status', [hero.querySelector('.status-panel')]),
     panel('outputsView', 'Outputs', [outputs, ...others])
   ];
+  window.AVWorksheetExtraViews?.({ main, panel, pending });
   const domain = main.querySelector('.av-domain-view');
   if (domain) pending.push(panel('operatorView', 'Operator', [domain], true));
   if (context) {
@@ -60,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
   // Freeform notes and generated documents can contain arbitrarily long text.
   main.querySelectorAll('textarea').forEach(node => { node.dataset.web2Scroll = ''; if (!node.hasAttribute('aria-label')) node.setAttribute('aria-label', node.labels?.[0]?.textContent.trim() || 'Notes'); });
   if (handoff) { const note=document.getElementById('actionNote'); note.dataset.web2Scroll=''; note.tabIndex=0; note.setAttribute('role','region'); note.setAttribute('aria-label','Next action summary'); }
-  const longPanels = [...main.querySelectorAll('.table-wrap, .av-domain-deck')];
+  const longPanels = [...main.querySelectorAll('.table-wrap, .av-domain-deck, .av-exception-list')];
   longPanels.forEach((node, i) => {
     node.dataset.web2Scroll = ''; node.tabIndex = 0; node.setAttribute('role', 'region');
     node.setAttribute('aria-label', `${title} records`);
@@ -71,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
   });
   function units(node) {
     if (node.matches('[type=file],.av-print-text')) return [];
-    if (node.matches('.table-wrap, .av-domain-deck, .field, .metric, .stat, .item-node, .selected-item, .empty-state, h2, h3, p, label, button, a, input, select, textarea, span, .av-shortcut')) return [node];
+    if (node.matches('.table-wrap, .av-domain-deck, .av-exception-list, .field, .metric, .stat, .item-node, .selected-item, .empty-state, h2, h3, p, label, button, a, input, select, textarea, span, .av-shortcut')) return [node];
     if (node.querySelector(':scope > label') && node.querySelector(':scope > input, :scope > select, :scope > textarea')) { node.classList.add('av-field'); return [node]; }
     if (node.matches('dl')) {
       for (const dt of [...node.querySelectorAll(':scope > dt')]) {
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
     pagers[index] = AVViewport.paginate(node, items, {
       label: panels[index].name,
       units: () => [...items.children].flatMap(units),
-      beforeMeasure: available => { items.querySelectorAll('.table-wrap, .av-domain-deck').forEach(table => {
+      beforeMeasure: available => { items.querySelectorAll('.table-wrap, .av-domain-deck, .av-exception-list').forEach(table => {
         const empty = table.matches('.table-wrap') && !table.querySelector('tbody tr');
         if (table.hidden !== empty) table.hidden = empty;
         table.style.height = `${available}px`;
