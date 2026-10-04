@@ -21,6 +21,8 @@ function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === '.git' || entry.name === 'node_modules' || entry.name === '_hat-in-ring-src') continue;
     const absolute = path.join(dir, entry.name);
+    // Retained Workbook verification output is ignored and excluded from every publish artifact.
+    if (path.relative(ROOT, absolute) === path.join("apps", "av-workbook", "dist")) continue;
     if (entry.isDirectory()) walk(absolute, out);
     else if (entry.isFile() && entry.name.endsWith('.html')) {
       out.push(path.relative(ROOT, absolute).split(path.sep).join('/'));
