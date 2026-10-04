@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
   }
   // Freeform notes and generated documents can contain arbitrarily long text.
   main.querySelectorAll('textarea').forEach(node => { node.dataset.web2Scroll = ''; if (!node.hasAttribute('aria-label')) node.setAttribute('aria-label', node.labels?.[0]?.textContent.trim() || 'Notes'); });
+  if (handoff) { const note=document.getElementById('actionNote'); note.dataset.web2Scroll=''; note.tabIndex=0; note.setAttribute('role','region'); note.setAttribute('aria-label','Next action summary'); }
   const longPanels = [...main.querySelectorAll('.table-wrap, .av-domain-deck, .av-exception-list')];
   longPanels.forEach((node, i) => {
     node.dataset.web2Scroll = ''; node.tabIndex = 0; node.setAttribute('role', 'region');
