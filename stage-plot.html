@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-av-theme="system" data-av-tool="stageplotter">
+<html data-sbd-nav="embedded" data-sbd-public-nav="off" lang="en" data-av-theme="system" data-av-tool="stageplotter">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -863,11 +863,14 @@
 </style>
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 <link rel="stylesheet" href="css/av-theme.css">
+<link rel="stylesheet" href="css/av-viewport.css">
+<link rel="stylesheet" href="css/av-stage-viewport.css">
 </head>
 <body>
 <a class="skip-link" href="#plotSurface">Skip to plot surface</a>
+<noscript><p>Enable JavaScript to edit, save, import, or export StagePlotter layouts.</p></noscript>
 <div class="app">
-  <header class="topbar">
+  <header class="topbar"><div data-sbd-nav-slot></div>
     <a class="brand" href="av-suite.html" aria-label="Back to System by Dave AV tools">
       <span class="brand-mark">S</span>
       <span class="brand-text">
@@ -1822,6 +1825,7 @@
     surface.addEventListener("pointerup", endDrag);
     surface.addEventListener("pointercancel", endDrag);
     document.addEventListener("keydown", function(e){
+      if(e.defaultPrevented) return;
       var tag = document.activeElement ? document.activeElement.tagName : "";
       var typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
       if((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s"){
@@ -1868,5 +1872,7 @@
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
+<script src="js/av-viewport.js"></script>
+<script src="js/av-stage-viewport.js"></script>
 </body>
 </html>

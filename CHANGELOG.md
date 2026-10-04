@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-03 — StagePlotter viewport workspace
+
+- Keep the plot central with separate Tools, Selected, Setup, Items, Outputs and Status tasks, plus selected properties beside the canvas on ultrawide displays.
+- Fit the original 16:9 drawing into the available area; add view-only zoom/pan controls without changing percent geometry or document schemas. Preserve original pointer movement, keyboard nudging, selection, imports and exports.
+- Keep complete item descriptions and coordinates reachable in the Items list and selected controls; expand the drawing and complete values for print.
+
 ## 2026-10-03 — Logistics viewport tasks
 
 - Adopt focused Prep, Pack, Load In, Strike and Cable records with metadata, detail, status, output and operator views, using the validated worksheet shell.
