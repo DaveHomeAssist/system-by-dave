@@ -6,3 +6,8 @@
  [data-av-viewport] .av-exception-list dt{text-transform:capitalize;color:var(--av-muted);}
 }
 @media print{.av-exception-list{display:block!important;height:auto!important;max-height:none!important;overflow:visible!important;}}
+@media screen {
+ [data-av-viewport] .check-issue{color:var(--av-danger);}
+ [data-av-viewport] .check-warn{color:var(--av-warning);}
+ [data-av-viewport] .check-ok{color:var(--av-success);}
+}
