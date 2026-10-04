@@ -5,6 +5,9 @@
 - Organize twelve Show Operations routes into bounded task views while retaining every application model, storage key, field, import/export shape and handler. Retain derived operator cards and the independent Show Handoff workflow.
 - Keep Show Board’s timeline, sessions, current/next actions, issues, snapshots and conflict recovery accessible through specialist views; paginate setup and dialogs and restore explicit theme choice.
 - Preserve full printed field values, long record scrolling and original show-context controls. Extend the opt-in pager to avoid resize feedback and preserve keyboard focus in WebKit.
+## 2026-10-03 — Calculator header theme correction
+
+- Use the shared foreground token for the compact calculator title so it stays readable on the light header. The deployment theme gate caught the inherited hero color before publication.
 
 ## 2026-10-03 — Opt-in AV viewport shell
 
