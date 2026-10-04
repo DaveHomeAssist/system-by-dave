@@ -85,6 +85,9 @@ to make stale documentation true.
   `main`.
 - **Throwline catalog:** use `npm run sync:throwline-catalog` and
   `npm run verify:throwline`.
+- **Davai bundle:** `build_site.py` generates `systembydave/`; edit the
+  generator, run `python3 build_site.py`, and gate with `npm run verify:davai`.
+  Do not hand-edit the generated pages.
 - **Domain sites:** `scripts/domain-sites.json` owns which pages are also
   published on housevideo.app and avbydave.com, and each site's cutover state.
   Those pages link systembydave.com-only destinations absolutely
@@ -101,8 +104,10 @@ to make stale documentation true.
   a page-appropriate Content Security Policy.
 - Indexable static routes belong in `STATIC_PAGES` in
   `scripts/gen_sitemap.py`; indexable AV tools belong in the registry. Routes
-  intentionally excluded from search need an explicit `noindex` policy and
-  must remain out of the sitemap.
+  intentionally excluded from search need an explicit `noindex` policy (or a
+  `robots.txt` Disallow) and must remain out of the sitemap. A page served here
+  but owned by another published domain carries that domain's canonical URL
+  instead; `npm run verify:indexing` checks every route outside the sitemap.
 - `html/sbd-brand.html` is an internal noindex design document, but still needs
   an explicit indexing policy.
 - Public navigation must satisfy `docs/public-shell-contract.md`, including a
@@ -200,6 +205,7 @@ Pages workflow before a production claim.
 - **AV Workbook:** `npm run typecheck:av-workbook`,
   `npm run test:av-workbook`, and `npm run build:av-workbook`.
 - **Throwline:** `npm run verify:throwline`.
+- **Davai bundle (`build_site.py`, `systembydave/`):** `npm run verify:davai`.
 - **FMP Camera Simulator:** `npm run typecheck:camera-sim`, `npm run test:camera-sim`,
   `npm run build:camera-sim`, `npm run test:camera-sim-browser`, and
   `npm run verify:camera-sim-release -- --base origin/main`. Any change to `camera-sim/`

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-04 — Verification gates revived from PR #48
+
+- `build_site.py --check` (`npm run verify:davai`, run in the Pages deploy) fails when the tracked `systembydave/` bundle drifts from its generator. The generator now reproduces the August public-shell breadcrumb, shared nav assets and canonical Davai title and lede instead of regressing them on rebuild, resolves paths from the repository root and honours `SBD_BUILD_DATE`.
+- `npm run verify:indexing` checks every tracked route outside the sitemap for an explicit policy: `noindex`, a `robots.txt` Disallow, or a canonical URL on another published domain from `scripts/domain-sites.json` (`/av-video/` canonicalizes to its AV by Dave origin; a Disallow would hide that canonical from crawlers). `scripts/indexing_policy.test.js` covers the rule.
+- `npm run verify:throwline` requires each calculation-ready profile's maker cross-check to match the ratio `resolveProfileRatio()` calculates with, and its basis aspect variant to match the profile ratio.
+- Corrected the Throwline scene-contract comment that said combined lens-shift limits are not modeled; `assessCombinedShift()` applies the maker's combined rule.
+
 ## 2026-10-04 — Retire the Pier 68 run of show
 
 - Remove `/afterbreak/` now that the September 11–12 event is over. The page was noindex and disallowed, but its internal crew, purchasing and promotion notes were still readable by anyone with the link.
