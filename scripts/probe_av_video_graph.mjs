@@ -102,6 +102,8 @@ try {
 
   assert.equal(await page.locator('.wire-traced').count(), 3);
   assert.equal(await page.locator('.wire-dimmed').count(), 4);
+  // Checks opened the Troubleshooting view. Arrange on a maximized Signal Flow, as an operator would.
+  await button('Maximize Signal Flow').click(); await button('Fit View').click();
   await button('Trace path').click();
   const camera = node('Camera 1').locator('.device-title');
   const box = await camera.boundingBox();

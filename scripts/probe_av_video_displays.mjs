@@ -83,9 +83,9 @@ try {
   assert.equal(await page.getByRole('combobox', { name: 'Linked route', exact: true }).getAttribute('data-value'), '');
   const firstRoute = (await readSaved()).routes[0];
   await page.getByRole('combobox', { name: 'Linked route', exact: true }).click();
-  await page.getByRole('option', { name: 'CAM 1 → IMAG', exact: true }).click();
+  await page.getByRole('listbox', { name: 'Linked route', exact: true }).getByRole('option', { name: 'CAM 1 → IMAG', exact: true }).click();
   await button('Trace linked route').click();
-  assert.equal(await button('Signal flow').getAttribute('aria-current'), 'page');
+  assert.equal(await page.locator('.console-panel.is-focused[data-panel=flow]').count(), 1, 'tracing a linked route brings Signal Flow forward');
   await button('Displays').click();
   await page.getByLabel('Destination notes', { exact: true }).fill('Operator edit\nkeeps spacing  ');
   await save(); await page.reload(); await button('Displays').click();
@@ -109,7 +109,8 @@ try {
   await page.getByLabel('Displays & Projection', { exact: false }).uncheck(); await save();
   assert.equal(await button('Displays').count(), 0);
   const hidden = await exportPlan(); assert.deepEqual(hidden.displays, combined.displays);
-  await page.goto(`${url}?view=displays`); assert.equal(await button('Project').getAttribute('aria-current'), 'page');
+  await page.goto(`${url}?view=displays`); await page.locator('.console-panel[data-panel=project]').waitFor();
+  assert.equal(await page.getByRole('tab', { name: 'Project', exact: true }).getAttribute('aria-selected'), 'true', 'a disabled-module link opens Project without enabling it');
   assert.match(await page.getByRole('status').textContent(), /disabled.*Enable it in Project/);
   await page.getByLabel('Displays & Projection', { exact: false }).check(); await save();
   await button('Displays').click();
@@ -161,7 +162,7 @@ try {
   await page.setViewportSize({ width: 1440, height: 900 });
   await button('Add display').click(); await page.getByLabel('Display name', { exact: true }).fill('Confidence monitor');
   await page.getByRole('combobox', { name: 'Destination status', exact: true }).click();
-  await page.getByRole('option', { name: 'cabled', exact: true }).click();
+  await page.getByRole('listbox', { name: 'Destination status', exact: true }).getByRole('option', { name: 'cabled', exact: true }).click();
   await save(); assert.equal((await readSaved()).displays.at(-1).status, 'cabled');
   await button('Duplicate destination').click(); await save(); assert.equal((await readSaved()).displays.length, 4);
   page.once('dialog', dialog => dialog.accept()); await button('Remove destination').click(); await save();

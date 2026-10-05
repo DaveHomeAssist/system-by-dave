@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Display, displayFields, displaySchema, newDisplay, projectionFields } from "./displays";
+import { workspaceSchema } from "../../shared/av-console/layout";
 
 export const STORE = "sbd.avVideo.v1";
 export const SCHEMA = "system-by-dave.av-video.v1";
@@ -22,6 +23,8 @@ const documentSchema = z.object({
   imports: z.array(z.object({ id: text, name: text, raw: text }).strict()),
   graphDevices: z.array(z.object({ id: text, label: text, kind: deviceKind }).strict()).default([]),
   graphPositions: z.record(z.object({ x: z.number().finite(), y: z.number().finite() }).strict()).default({}),
+  /* Stored console views (panel arrangements only). Absent in older plans, which open with the default views. */
+  workspace: workspaceSchema.optional(),
 }).strict().superRefine((doc, ctx) => {
   if (new Set(doc.displays.map(r => r.id)).size !== doc.displays.length) ctx.addIssue({ code: "custom", message: "Duplicate display IDs" });
   if (new Set(doc.routes.map(r => r.id)).size !== doc.routes.length) ctx.addIssue({ code: "custom", message: "Duplicate route IDs" });

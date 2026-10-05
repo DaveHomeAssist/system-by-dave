@@ -1,6 +1,4 @@
-.workspace.view-flow { grid-template-columns: minmax(0, 1fr); padding: 12px; }
-.workspace.view-flow.inspector-open { grid-template-columns: minmax(0, 1fr) 340px; }
-.flow-workspace { display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; border: 1px solid var(--av-line); border-radius: 8px; background: var(--av-surface); }
+.flow-workspace { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; background: transparent; }
 .flow-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--av-line); }
 .flow-heading { display: flex; align-items: baseline; gap: 18px; }
 .flow-heading h2 { font-size: 18px; white-space: nowrap; }
@@ -49,7 +47,7 @@
 .diagram-wire.wire-issue .react-flow__edge-path { stroke: var(--av-danger); stroke-dasharray: 5 4; }
 .diagram-wire.wire-traced .react-flow__edge-path { stroke: var(--av-accent); }
 .diagram-wire.wire-dimmed { opacity: .17; }
-.flow-empty { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 430px; width: calc(100% - 50px); padding: 24px; text-align: center; background: var(--av-surface); border: 1px solid var(--av-line); border-radius: 10px; box-shadow: var(--av-shadow); }
+.flow-empty { position: absolute; inset: 0; margin: auto; height: max-content; max-height: 100%; overflow: auto; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 430px; width: calc(100% - 50px); padding: 24px; text-align: center; background: var(--av-surface); border: 1px solid var(--av-line); border-radius: 10px; box-shadow: var(--av-shadow); }
 .flow-empty h3 { font-size: 24px; letter-spacing: -.5px; }
 .flow-empty p { font-size: 13px; }
 .flow-empty-symbol { font-size: 29px; color: var(--av-accent); letter-spacing: 10px; }
@@ -63,14 +61,9 @@
 .device-selection select { margin-top: 6px; font-size: 12px; }
 .device-selection .device-close { position: absolute; right: 2px; top: 2px; border: 0; background: transparent!important; width: 44px; font-size: 22px; }
 .flow-workspace dialog label { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; gap: 7px; margin-top: 16px; }
-.view-flow .inspector .mobile-back { display: block; font-size: 11px; }
-@media(min-width:2000px) { .workspace.view-flow.inspector-open { grid-template-columns: minmax(0,1fr) 440px; } .flow-canvas .react-flow__minimap { width: 240px; height: 150px; } }
-@media(max-width:1100px) { .flow-heading { display: block; } .flow-heading span { display: block; margin-top: 5px; } .flow-route-format { display: none; } }
+@media(min-width:2000px) { .flow-canvas .react-flow__minimap { width: 240px; height: 150px; } }
+@container panel (max-width:979px) { .flow-heading { display: block; } .flow-heading span { display: block; margin-top: 5px; } .flow-route-format { display: none; } }
 @media(max-width:680px) {
-  .workspace.view-flow { display: block; padding: 6px; }
-  .flow-workspace { height: 100%; }
-  .view-flow.detail-open .flow-workspace { display: none; }
-  .view-flow.detail-open .inspector { display: flex; }
   .flow-toolbar { padding: 10px; display: block; }
   .flow-heading { display: flex; justify-content: space-between; margin-bottom: 8px; }
   .flow-heading h2 { font-size: 16px; }
@@ -107,11 +100,7 @@
 .diagram-device:hover .device-new-ports, .react-flow__node:focus-within .device-new-ports, .react-flow__node.selected .device-new-ports { opacity: 1; }
 .react-flow:has(.connectingfrom) .device-new-ports { opacity: 1; }
 @media (hover: none) { .device-new-ports { opacity: 1; } }
-@media (min-width: 1101px) {
-  .video-app { position: relative; }
-  .plan-bar { position: absolute; right: 24px; top: 80px; z-index: 2; padding: 0; background: transparent; border: 0; }
-  .plan-summary { display: none; }
-  .view-tabs { padding-right: 210px; }
+@container panel (min-width: 980px) {
   .flow-workspace { position: relative; }
   .flow-toolbar { min-height: 65px; padding-left: 530px; }
   .flow-heading { display: none; }
@@ -126,3 +115,7 @@
 .flow-context { padding: 5px 16px; min-height: 25px; border-bottom: 1px solid var(--av-line); }
 .flow-context .flow-route-format { display: block; margin: 0; font-size: 11px; }
 @media(max-width:680px) { .flow-context { padding: 5px 8px; } .flow-context .flow-route-format { font-size: 10px; } }
+
+.flow-canvas { overflow: hidden; }
+@container panel (max-width: 640px) { .flow-empty-symbol { display: none; } .flow-empty h3 { font-size: 19px; } }
+.flow-canvas .react-flow__controls { flex-direction: row; }

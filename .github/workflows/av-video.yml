@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'apps/av-video/**'
+      - 'apps/shared/**'
+      - 'scripts/probe_av_console.mjs'
       - 'av-video/**'
       - 'package*.json'
       - 'scripts/probe_av_video*.mjs'

@@ -74,4 +74,13 @@ describe("AV Video shared plan", () => {
     expect(loadDocument(store).error).toContain("blocked"); expect(store.getItem(STORE)).toBe("broken");
     expect(() => saveDocument({ getItem: () => null, setItem: () => { throw new Error("quota"); } }, sampleDocument(), null)).toThrow("quota");
   });
+  it("opens older plans without views and round-trips stored console views", () => {
+    const older = emptyDocument(); expect(older.workspace).toBeUndefined();
+    expect(parseDocument(JSON.stringify(older))).toEqual(older);
+    const withViews = { ...older, workspace: { version: 1 as const, views: [{ id: "wide", name: "Wide", panels: [{ id: "p1", type: "flow", x: 0, y: 0, w: 12, h: 8 }] }] } };
+    const store = new Map<string, string>(); const storage = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => { store.set(k, v); } };
+    saveDocument(storage, withViews, null);
+    expect(loadDocument(storage).doc.workspace).toEqual(withViews.workspace);
+    expect(() => parseDocument(JSON.stringify({ ...older, workspace: { version: 9, views: [] } }))).toThrow();
+  });
 });
