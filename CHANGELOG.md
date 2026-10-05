@@ -13,6 +13,7 @@
   - `probe_av_console` covers draft restore and discard, the draft index, plan isolation and layout restore after reload.
   - The main AV Video probe opens Signal Flow before editing in a second tab, which now lands on the restored view.
   - The phone check waits for the one-panel layout.
+  - `test_domain_cutover` acknowledges the two new declared keys (61) and checks they travel with the plan in backup and restore.
 
 ## 2026-10-05 — Stage Slate is the first-use theme
 
