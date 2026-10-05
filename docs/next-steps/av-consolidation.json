@@ -4,19 +4,21 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
+  "head": "75132ba7a111b5a33b1b5df52f65ceb44df63dbc",
   "status": "amber",
-  "statusReason": "Stage 1 delivered: returning neutral visits open Toolbox, Workbook promotion/editor/source publication is withdrawn, and former URLs reach Toolbox. PR gates and live readback pass. Remaining focused-application stages and operator acceptance remain open.",
-  "lastActivity": "2026-10-04",
+  "statusReason": "Toolbox foundation, public Workbook withdrawal, AV Video console workspace, Stage Slate, drafts and recovery hardening are delivered. Remaining Video panels, Rail implementation, RAIL-2/RAIL-3 choices, and physical/operator acceptance remain open.",
+  "lastActivity": "2026-10-05",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
     "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit.",
-    "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan."
+    "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan.",
+    "Console workspace and Show panels (#262), Stage Slate first-use theme (#263), and separate draft/layout persistence (#264) are published.",
+    "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe."
   ],
   "nextStep": {
     "title": "Continue independent Video modules under the maintained increments",
-    "why": "Neutral entry and public Workbook withdrawal are delivered; Cameras/Playback and Stream/Record remain the next independently saved application slices.",
+    "why": "The console foundation and bounded recovery repair are delivered. Continue Cameras/Playback before Stream/Record; do not reopen Workbook or silently retire legacy sheets.",
     "doneWhen": "Each remaining Video slice preserves legacy fields/statuses and originals, supports reversible optional modules, and passes source, browser and release checks.",
     "effort": "L",
     "owner": "Codex",
@@ -155,6 +157,16 @@
         "Revalidate historical safety/mobile findings before a separately scoped fix."
       ],
       "gate": "Per-slice data compatibility, release proof and operator acceptance."
+    },
+    {
+      "name": "Console workspace and recovery \u2014 Delivered",
+      "goal": "Protect operator edits while making panel arrangements reusable.",
+      "items": [
+        "Shared console presentation with independent Video document ownership; explicit Save and unchanged recovery keys.",
+        "Draft write/removal/index and layout failures are surfaced; stale draft actions preserve stored and in-memory work.",
+        "Damaged cached geometry is sanitized for display without overwriting the original cache; hidden modules retain definitions."
+      ],
+      "gate": "PR #266 release verified separately from physical/operator acceptance."
     }
   ],
   "decisionsForDave": [
@@ -220,9 +232,18 @@
     "Public Workbook withdrawal is settled; retained source/concept does not make Workbook a required host.",
     "The 20 viewport routes preserve independent stores and specialist semantics; layout delivery does not prove application/document consolidation.",
     "Earlier audit details and unchanged private evidence remain in the updater backup. Superseded counts and revalidation notes are preserved by finding ID.",
-    "Unanswered historical questions remain Open; recommendations are not approvals."
+    "Unanswered historical questions remain Open; recommendations are not approvals.",
+    "The prior design-only console assessment is superseded by #262-#264. Recovery hardening #266 is delivered; the recorded RAIL-1B default decision and open RAIL-2/RAIL-3 choices are preserved as planning, not implementation evidence."
   ],
   "links": [
+    {
+      "label": "Console recovery release #266",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/266"
+    },
+    {
+      "label": "Console workspace contract",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/75132ba7a111b5a33b1b5df52f65ceb44df63dbc/docs/av-console.md"
+    },
     {
       "label": "Maintained consolidation plan",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/1adc8846653c72e0ad115c4941c809bac1c79cf1/docs/av-suite-consolidation-spec.md"
@@ -241,11 +262,11 @@
     },
     {
       "label": "Source deployment",
-      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577"
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37385110411"
     },
     {
       "label": "AV deployment",
-      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749"
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37387293386"
     },
     {
       "label": "Toolbox",
@@ -253,7 +274,7 @@
     }
   ],
   "kickoffPrompt": "Continue the maintained AV consolidation stages 0\u20136 and Video increments 2.0a\u20132.5 from fresh remote main. Stage 1 is delivered; do not repeat it. Preserve focused app ownership, explicit imports and reversible modules. Begin the remaining independent Video capabilities, retain original legacy data, verify current-head CI, deployment and live behavior, and keep physical acceptance separate.",
-  "confidence": "high for cited release and scoped checks; historical findings require revalidation",
+  "confidence": "High for the cited console release and scoped automated checks; physical acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
@@ -261,41 +282,35 @@
   ],
   "short": "AV Suite",
   "evidence": {
-    "checkedOn": "2026-10-04",
-    "sourceRevision": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
-    "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
+    "checkedOn": "2026-10-05",
+    "sourceRevision": "75132ba7a111b5a33b1b5df52f65ceb44df63dbc",
+    "scope": "Console recovery release and focused browser acceptance; no new catalog-wide or physical-device acceptance claim.",
     "sources": [
-      "docs/av-suite-consolidation-spec.md",
-      "docs/av-suite-consolidation-stage2-video.md",
-      "docs/av-workspace.md",
+      "docs/av-console.md",
+      "apps/shared/av-console/drafts.ts",
+      "apps/shared/av-console/Workspace.tsx",
+      "scripts/probe_av_console_recovery.mjs",
       "CHANGELOG.md"
     ],
-    "release": "https://github.com/DaveHomeAssist/system-by-dave/commit/1adc8846653c72e0ad115c4941c809bac1c79cf1",
-    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577",
-    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749",
+    "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/266",
+    "recoveryMerge": "73a7bbeb3e61b28470c668538b6fa530ccc4d53c",
+    "liveProbeSourceRevision": "73a7bbeb3e61b28470c668538b6fa530ccc4d53c",
+    "liveProbeRunner": "Duncan",
+    "exactHeadCI": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37384569429",
+    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37385110411",
+    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37387293386",
     "publishedSource": "https://avbydave.com/source.json",
     "runtime": [
-      "Live Calculator functional checks: Chromium including offline; WebKit excluding offline reload.",
-      "Fresh Toolbox opens Toolbox; saved preferredEntry=show still opens Show Console; Workbook link visible in both."
+      "Walter: typecheck, 69 unit tests, build, full Video/graph/Displays/console probes, 14 recovery scenarios, 128 legacy checks, verify:av and verify:domain-sites passed.",
+      "Duncan: live isolated recovery probe passed: storage failures, tab conflicts, stale discard, Save/reload/export, keyboard controls, themes, 375/719/720/1099/1100/1440 widths and hidden-module retention.",
+      "Live source.json named 73a7bbeb3e61b28470c668538b6fa530ccc4d53c before and after the Duncan probe. Published AV Video JavaScript/CSS matched that revision byte-for-byte."
     ],
     "limits": [
-      "Physical/operator acceptance remains open.",
-      "Stored full viewport matrices and final catalog-navigation results were inspected as delivery evidence, not rerun in this reconciliation."
-    ],
-    "candidateBranch": "codex/av-neutral-and-pr-checks-20261004",
-    "candidateChecks": [
-      "Toolbox responsive and returning legacy-preference isolation passed at 390/680/1280px",
-      "Navigation parity passed across 46 tools at 375/1440px",
-      "Themes passed across 47 surfaces in light/dark at 390/1280px",
-      "Calculator functional browser checks passed"
-    ],
-    "delivery": {
-      "neutralEntryPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/256",
-      "withdrawalPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/257",
-      "metadataFixPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/258",
-      "deployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37252267300",
-      "liveReadback": "AV source.json names 1e51c7c. All six former Workbook entry URLs on both origins reach Toolbox. Editor bundle and retained source are 404. PR viewport contracts pass."
-    }
+      "Physical phones/tablets and operator rehearsal are not established by automation.",
+      "RAIL-1B remains an accepted planning decision; no Rail runtime or browser-rendered v3 parity is claimed.",
+      "Already-open older application builds must reload to participate in the new draft lock protocol. Browsers without Web Locks retain explicit Save/Export and report unavailable automatic draft recovery.",
+      "Remaining historical shell findings require their own revalidation; the prior homepage overflow observation is not remeasured here."
+    ]
   },
   "historicalFindings": [
     {
@@ -367,6 +382,49 @@
       "id": "AVC-D5",
       "question": "D5: theme toggle for ~38 tools in shared nav, no new storage key - placement OK, and must every worksheet support both palettes?",
       "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
+    }
+  ],
+  "historicalEvidence": [
+    {
+      "supersededOn": "2026-10-05",
+      "reason": "Supersedes the active October 4 snapshot. Its returning-Show and visible-Workbook runtime statements predate the delivery already recorded under #256-#258; preserve as historical only. Console releases #262-#264 and recovery #266 are now recorded.",
+      "evidence": {
+        "checkedOn": "2026-10-04",
+        "sourceRevision": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
+        "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
+        "sources": [
+          "docs/av-suite-consolidation-spec.md",
+          "docs/av-suite-consolidation-stage2-video.md",
+          "docs/av-workspace.md",
+          "CHANGELOG.md"
+        ],
+        "release": "https://github.com/DaveHomeAssist/system-by-dave/commit/1adc8846653c72e0ad115c4941c809bac1c79cf1",
+        "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577",
+        "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749",
+        "publishedSource": "https://avbydave.com/source.json",
+        "runtime": [
+          "Live Calculator functional checks: Chromium including offline; WebKit excluding offline reload.",
+          "Fresh Toolbox opens Toolbox; saved preferredEntry=show still opens Show Console; Workbook link visible in both."
+        ],
+        "limits": [
+          "Physical/operator acceptance remains open.",
+          "Stored full viewport matrices and final catalog-navigation results were inspected as delivery evidence, not rerun in this reconciliation."
+        ],
+        "candidateBranch": "codex/av-neutral-and-pr-checks-20261004",
+        "candidateChecks": [
+          "Toolbox responsive and returning legacy-preference isolation passed at 390/680/1280px",
+          "Navigation parity passed across 46 tools at 375/1440px",
+          "Themes passed across 47 surfaces in light/dark at 390/1280px",
+          "Calculator functional browser checks passed"
+        ],
+        "delivery": {
+          "neutralEntryPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/256",
+          "withdrawalPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/257",
+          "metadataFixPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/258",
+          "deployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37252267300",
+          "liveReadback": "AV source.json names 1e51c7c. All six former Workbook entry URLs on both origins reach Toolbox. Editor bundle and retained source are 404. PR viewport contracts pass."
+        }
+      }
     }
   ]
 }
