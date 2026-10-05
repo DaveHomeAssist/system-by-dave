@@ -57,6 +57,10 @@ try {
       await page.getByRole('button',{name:'Show venue view',exact:true}).click();
       assert(await page.getByRole('button',{name:'Hide venue view',exact:true}).isVisible());
       await page.getByRole('button',{name:'Hide venue view',exact:true}).click();
+      const thirds=page.getByRole('button',{name:'Thirds',exact:true});
+      const pressed=await thirds.getAttribute('aria-pressed');
+      await thirds.click();
+      assert.notEqual(await thirds.getAttribute('aria-pressed'),pressed);
       await page.locator('.controls-panel').evaluate(el=>el.scrollTop=0);
       await page.screenshot({path:`/tmp/camera-${viewport.width}-${theme}.png`});
       assert.equal(problems.length,0,problems.join('\n'));

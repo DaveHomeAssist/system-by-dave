@@ -23,25 +23,11 @@ export const GUIDE_BUTTONS: Array<{ key: keyof GuidePreferences; label: string }
   { key: "thirds", label: "Thirds" },
 ];
 
-export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, onToggleExpanded, onGuides }: Props) {
-  // Live figures refresh this panel alone, not the whole interface.
-  const { snapshot, lens } = useTelemetry(store);
-  const { pose, recall, atLimit, speeds } = snapshot;
-  const guides = state.project.session.preferences.guides;
-  const delayMs = state.project.session.preferences.monitorDelayMs;
-  const approximate = state.unsettled.length > 0;
-  const limitText = [
-    atLimit.pan && `Pan ${atLimit.pan === "max" ? "right" : "left"} limit`,
-    atLimit.tilt && `Tilt ${atLimit.tilt === "max" ? "up" : "down"} limit`,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
-  return (
-    <section className="panel monitor-panel" aria-labelledby="monitor-title">
-      <div className="panel-head">
-        <h2 id="monitor-title">Camera monitor</h2>
-        <div className="panel-tools" role="group" aria-label="Monitor guides">
+export function MonitorTools({ guides, expanded, onGuides, onToggleExpanded }: {
+  guides: GuidePreferences; expanded: boolean;
+  onGuides(patch: Partial<GuidePreferences>): void; onToggleExpanded(): void;
+}) {
+  return (<div className="panel-tools" role="group" aria-label="Monitor guides">
           {GUIDE_BUTTONS.map(({ key, label }) => (
             <button key={key} {...keepFocus} type="button" className="tool-button" aria-pressed={guides[key]} onClick={() => onGuides({ [key]: !guides[key] })}>
               <span className="tool-label">{label}</span>
@@ -60,7 +46,28 @@ export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, on
             <span className="tool-label label-long">{expanded ? "Restore layout" : "Expand monitor"}</span>
             <span className="tool-label label-short">{expanded ? "Restore" : "Expand"}</span>
           </button>
-        </div>
+        </div>);
+}
+
+export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, onToggleExpanded, onGuides }: Props) {
+  // Live figures refresh this panel alone, not the whole interface.
+  const { snapshot, lens } = useTelemetry(store);
+  const { pose, recall, atLimit, speeds } = snapshot;
+  const guides = state.project.session.preferences.guides;
+  const delayMs = state.project.session.preferences.monitorDelayMs;
+  const approximate = state.unsettled.length > 0;
+  const limitText = [
+    atLimit.pan && `Pan ${atLimit.pan === "max" ? "right" : "left"} limit`,
+    atLimit.tilt && `Tilt ${atLimit.tilt === "max" ? "up" : "down"} limit`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  return (
+    <section className="panel monitor-panel" aria-labelledby="monitor-title">
+      <div className="panel-head">
+        <h2 id="monitor-title">Camera monitor</h2>
+        <MonitorTools guides={guides} expanded={expanded} onGuides={onGuides} onToggleExpanded={onToggleExpanded} />
       </div>
       <div className="monitor-stage">
         <div className="monitor-frame" data-render={state.renderStatus} data-onair={state.onAir.live ? "true" : undefined} onPointerDown={focusWorkspace}>

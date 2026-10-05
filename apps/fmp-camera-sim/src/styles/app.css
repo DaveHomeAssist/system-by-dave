@@ -2107,6 +2107,9 @@ button:disabled {
   .sim-app[data-layout="tablet"] .flag { padding-inline: 8px; font-size: 12px; }
   .sim-app[data-layout="tablet"] .sim-actions { gap: 4px; }
   .sim-app[data-layout="tablet"] .sim-actions .tool-button { padding-inline: 8px; font-size: 12px; }
+  .sim-app[data-layout="tablet"] .monitor-panel .panel-head { display: none; }
+  .sim-app[data-layout="tablet"] .compact-picture-controls { padding-block: 8px; }
+  .sim-app[data-layout="tablet"] .compact-picture-controls h3 { margin: 0 0 6px; font-size: 13px; }
   .sim-app[data-layout="tablet"] .controls-panel { padding: 8px; }
   .sim-app[data-layout="tablet"] .controls-grid {
     grid-template-columns: 150px minmax(0, 1fr);
