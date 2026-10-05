@@ -21,6 +21,8 @@ function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === '.git' || entry.name === 'node_modules' || entry.name === '_hat-in-ring-src') continue;
     const absolute = path.join(dir, entry.name);
+    // Retained Workbook verification output is ignored and excluded from every publish artifact.
+    if (path.relative(ROOT, absolute) === path.join("apps", "av-workbook", "dist")) continue;
     if (entry.isDirectory()) walk(absolute, out);
     else if (entry.isFile() && entry.name.endsWith('.html')) {
       out.push(path.relative(ROOT, absolute).split(path.sep).join('/'));
@@ -61,7 +63,8 @@ const robots = read('robots.txt');
 // /fmp/walk/ redirect to the walk's own origin from 2026-10-01, and the five noindex pages of the
 // managed /cheesesteaks/ static export (map, rankings, neighborhoods, methodology, about) from 2026-10-01.
 // AV Video adds its source page and AV-origin generated application on 2026-10-02.
-if (unlisted.length !== 145) fail(`Expected 145 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// On 2026-10-04 /av-video/ joins the avbydave.com sitemap (registry directory hrefs are listed), leaving 144.
+if (unlisted.length !== 144) fail(`Expected 144 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 // The count above only detects new unlisted routes; this enforces the documented policy itself
 // (scripts/indexing_policy.js) for every one of them.
