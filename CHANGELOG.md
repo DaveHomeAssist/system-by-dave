@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-04 — AV Video in the AV by Dave sitemap
+
+- `scripts/gen_sitemap.py` now lists registry tools whose route is a directory (`av-video/`, `pixelforge/`, `ProjectorThrow/`) instead of only `.html` routes, skipping paths a static entry already lists. `/av-video/` was live and canonical on avbydave.com but missing from its sitemap; the other two were already listed, and every other sitemap is unchanged.
+- The indexing gate's unlisted-route count drops from 145 to 144 accordingly.
+
 ## 2026-10-04 — Illustrated Tools directory (draft for review)
 
 - Revive the unmerged `codex/tools-card-preview-20260923` work: the Tools directory becomes a five-column illustrated card grid (four, three and two columns as the viewport narrows) with category badges, 44px filter chips, visible keyboard focus and the same destinations and filters. The hero, filters, grid and notes share the public header's width and left edge at every breakpoint.
