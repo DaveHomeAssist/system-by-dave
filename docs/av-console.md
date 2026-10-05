@@ -63,8 +63,8 @@ Recorded on 2026-10-05 from Dave's review of the console manifest:
 5. **Unification.** Related tools join family consoles with one document and one selection. Every absorbed tool's data imports losslessly.
 
 The console order follows the manifest:
-1. AV Video (this release).
-2. Live panels for AV Video: switcher bus, multiview, cameras, stream and record.
+1. AV Video, with its Switcher bus and Multiview live panels (this release).
+2. AV Video's Cameras, Playback, Stream and Record panels, absorbing their legacy sheets with lossless imports.
 3. The rail, the Stage Slate default and the draft store.
 4. Show Control and Audio.
 5. The remaining family consoles and specialists. Throwline keeps its flight strip, verdict and provenance ladder as chrome the layout cannot hide.

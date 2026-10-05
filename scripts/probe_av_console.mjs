@@ -58,7 +58,7 @@ try {
   await page.goto(url);
   await button('Try a sample plan').click(); await save();
   // Default views come from the console; the plan stores none until asked.
-  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Project']);
+  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Show', 'Project']);
   assert.deepEqual(await panels(), ['flow', 'patch', 'inspector']);
   assert.equal((await readSaved()).workspace, undefined, 'default views are not written into the plan');
   // Panel buttons bring a panel forward, switching to the view that holds it.
@@ -94,20 +94,38 @@ try {
   await page.getByRole('menuitem', { name: 'Store as new view' }).click();
   await save();
   const stored = (await readSaved()).workspace;
-  assert.equal(stored.version, 1); assert.equal(stored.views.length, 5);
+  assert.equal(stored.version, 1); assert.equal(stored.views.length, 6);
   assert.deepEqual(stored.views[0].panels.map(p => p.type).sort(), ['checks', 'flow', 'inspector']);
   assert.equal((await readSaved()).routes.length, before, 'view edits never change records');
   await page.reload();
-  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Project', 'Routing 5']);
+  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Show', 'Project', 'Routing 6']);
   assert.deepEqual((await panels()).sort(), ['checks', 'flow', 'inspector']);
   // Rename and delete a view; deleting never deletes records.
-  await tab('Routing 5').click();
+  await tab('Routing 6').click();
   await page.getByRole('button', { name: 'View options' }).click(); await page.getByRole('menuitem', { name: 'Rename…' }).click();
   await page.getByLabel('View name').fill('Load-in'); await page.getByRole('menuitem', { name: 'Rename' }).click();
   assert.equal(await tab('Load-in').count(), 1);
   await page.getByRole('button', { name: 'View options' }).click(); await page.getByRole('menuitem', { name: 'Delete view' }).click();
   assert.equal(await tab('Load-in').count(), 0); await save();
   assert.equal((await readSaved()).routes.length, before);
+  // Live panels: Cut swaps program and preview; nothing is inferred and the plan never changes.
+  await tab('Show').click();
+  assert.deepEqual((await panels()).sort(), ['bus', 'flow', 'multiview']);
+  const savedPlan = JSON.stringify(await readSaved());
+  const pgmTile = page.locator('.mv-tile.mv-program .mv-showing');
+  assert.equal(await pgmTile.textContent(), 'Camera 1');
+  assert.match(await page.locator('.mv-tile', { hasText: 'IMAG screens' }).textContent(), /AUX 1 · not assigned/);
+  await page.getByRole('button', { name: 'Cut', exact: true }).click();
+  assert.equal(await pgmTile.textContent(), 'Slides laptop');
+  assert.match(await page.locator('.mv-tile', { hasText: 'Stream encoder' }).textContent(), /Slides laptop/);
+  await page.getByLabel('AUX 1 source').selectOption({ label: 'Camera 1' });
+  assert.match(await page.locator('.mv-tile', { hasText: 'IMAG screens' }).textContent(), /Camera 1/);
+  assert.doesNotMatch(await page.getByRole('button', { name: /^Save/ }).textContent(), /•/, 'live bus state is not a plan edit');
+  assert.equal(JSON.stringify(await readSaved()), savedPlan);
+  await page.getByRole('button', { name: 'Close panel' }).count(); // layout operations leave live state alone
+  await page.getByRole('button', { name: 'Multiview options' }).click(); await page.getByRole('menuitem', { name: 'Maximize' }).click();
+  assert.equal(await pgmTile.textContent(), 'Slides laptop');
+  await page.getByRole('button', { name: 'Restore Multiview' }).click();
   // Disabling a module hides its panels, keeps them in the view, and says so.
   await button('Project').click(); await page.getByRole('checkbox', { name: /Route checks/ }).uncheck();
   await tab('Routing').click();

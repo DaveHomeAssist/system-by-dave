@@ -24,6 +24,11 @@
   - scope their option lookups to the intended list;
   - check panel focus instead of the old tab state;
   - arrange devices on a maximized Signal Flow.
+- **Show view** with **Switcher bus** and **Multiview**, derived from routes (`apps/av-video/src/bus.ts`, unit-tested).
+  - PGM and PVW keys and Cut.
+  - AUX pickers that start Not assigned.
+  - Destination tiles showing what each carries.
+  - Bus state is live, never a plan edit, and unaffected by layout operations.
 - **Decisions recorded** for the unified console suite (`docs/av-console.md`): Stage Slate dark default, separate draft store, read-only show chip, every app in scope, family consoles.
 
 ## 2026-10-04 — AV Video in the AV by Dave sitemap
