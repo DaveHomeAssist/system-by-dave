@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "2d759db198ecfad49f8fd7bddadc107559695202",
+  "head": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
   "status": "amber",
-  "statusReason": "Neutral Toolbox routing and viewport contracts merged in #256. Workbook withdrawal is implemented and verified locally; publication and live readback pending.",
+  "statusReason": "Stage 1 delivered: returning neutral visits open Toolbox, Workbook promotion/editor/source publication is withdrawn, and former URLs reach Toolbox. PR gates and live readback pass. Remaining focused-application stages and operator acceptance remain open.",
   "lastActivity": "2026-10-04",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -15,10 +15,10 @@
     "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan."
   ],
   "nextStep": {
-    "title": "Publish and verify Workbook withdrawal; continue independent Video modules",
-    "why": "Stage 1 source implementation is complete; live proof closes its gate before remaining app slices.",
-    "doneWhen": "Saved Show preference plus a neutral URL opens Toolbox; explicit Show links work; Workbook promotion/editor artifacts are withdrawn and former routes return to Toolbox without changing browser data.",
-    "effort": "M",
+    "title": "Continue independent Video modules under the maintained increments",
+    "why": "Neutral entry and public Workbook withdrawal are delivered; Cameras/Playback and Stream/Record remain the next independently saved application slices.",
+    "doneWhen": "Each remaining Video slice preserves legacy fields/statuses and originals, supports reversible optional modules, and passes source, browser and release checks.",
+    "effort": "L",
     "owner": "Codex",
     "blockedBy": ""
   },
@@ -28,7 +28,7 @@
       "type": "logic",
       "sev": "P1",
       "title": "One Show Console visit permanently defeats the Toolbox default",
-      "detail": "Implemented and merged in PR #256. Returning neutral visits open Toolbox; explicit Show/context/history journeys and saved dashboard preservation pass.",
+      "detail": "Delivered in #256 and verified through the subsequent published release. Neutral entry uses Toolbox regardless of legacy preference; explicit Show/context/history and saved-data preservation pass.",
       "files": [
         "js/av-suite/app.js",
         "js/av-suite/app.js"
@@ -41,7 +41,7 @@
       "type": "infra",
       "sev": "P1",
       "title": "Release probe enforces the old saved-Show precedence",
-      "detail": "Implemented and merged in PR #256. Returning neutral visits open Toolbox; explicit Show/context/history journeys and saved dashboard preservation pass.",
+      "detail": "Delivered in #256 and verified through the subsequent published release. Neutral entry uses Toolbox regardless of legacy preference; explicit Show/context/history and saved-data preservation pass.",
       "files": [
         "scripts/probe_av_suite_responsive.js",
         ".github/workflows/deploy-pages.yml"
@@ -54,7 +54,7 @@
       "type": "feature",
       "sev": "P1",
       "title": "AV Workbook still promoted and served publicly",
-      "detail": "Implemented in the withdrawal candidate: no registry/discovery/offline Workbook, no published source/editor bundle, and all former URLs redirect directly to Toolbox. 56 domain browser cases and 60 retained source tests pass; deployment readback remains.",
+      "detail": "Delivered in #257/#258. Workbook is absent from registry/discovery/offline/published editor and source. All three aliases on both public origins reach Toolbox; former bundle and retained source return 404. Existing browser records remain untouched.",
       "files": [
         "js/sbd-registry.js",
         "av-suite.html",
@@ -68,7 +68,7 @@
       "type": "infra",
       "sev": "P1",
       "title": "Workbook ships via Pages rsync, offline cache, sitemap, staging",
-      "detail": "Implemented in the withdrawal candidate: no registry/discovery/offline Workbook, no published source/editor bundle, and all former URLs redirect directly to Toolbox. 56 domain browser cases and 60 retained source tests pass; deployment readback remains.",
+      "detail": "Delivered in #257/#258. Workbook is absent from registry/discovery/offline/published editor and source. All three aliases on both public origins reach Toolbox; former bundle and retained source return 404. Existing browser records remain untouched.",
       "files": [
         ".github/workflows/deploy-pages.yml",
         "js/sbd-registry.js",
@@ -108,7 +108,7 @@
       "type": "docs",
       "sev": "P3",
       "title": "CLAUDE.md and doorway doc encode saved-entry precedence",
-      "detail": "Implemented and merged in PR #256. Returning neutral visits open Toolbox; explicit Show/context/history journeys and saved dashboard preservation pass.",
+      "detail": "Delivered in #256 and verified through the subsequent published release. Neutral entry uses Toolbox regardless of legacy preference; explicit Show/context/history and saved-data preservation pass.",
       "files": [
         "CLAUDE.md",
         "docs/av-suite-doorway.md"
@@ -119,20 +119,20 @@
   ],
   "phases": [
     {
-      "name": "Stage 1a \u2014 Returning-neutral Toolbox",
+      "name": "Stage 1a \u2014 Returning-neutral Toolbox \u2014 Delivered",
       "goal": "Implement the settled default while preserving explicit entries and saved data.",
       "items": [
-        "Implemented and merged in PR #256; source CI green.",
-        "Fresh and returning neutral entry opens Toolbox with explicit Show/context/history support."
+        "Merged in #256; relevant PR contracts and public deployment pass.",
+        "Fresh/returning neutral visits open Toolbox; explicit Show/context/history and saved data remain supported."
       ],
       "gate": "Returning neutral entry opens Toolbox and explicit Show/context/history journeys pass."
     },
     {
-      "name": "Stage 1b \u2014 Public Workbook withdrawal",
+      "name": "Stage 1b \u2014 Public Workbook withdrawal \u2014 Delivered",
       "goal": "Remove public promotion and editor publication under the maintained plan.",
       "items": [
-        "Implementation and local artifact/browser checks pass; live release pending.",
-        "Source/history and browser data retained; no dedicated migration or recovery project."
+        "Merged in #257 and metadata follow-up #258; public readback verified.",
+        "All six former URLs return to Toolbox; editor/source absent; source/history and browser records preserved."
       ],
       "gate": "Staged and live former entry URLs return to Toolbox; no promoted/public editor remains."
     },
@@ -252,7 +252,7 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Work in DaveHomeAssist/system-by-dave from freshly verified remote main using the repository claim protocol. Read AGENTS.md, CLAUDE.md, docs/av-suite-consolidation-spec.md and docs/av-suite-doorway.md. Implement the settled returning-neutral Toolbox rule while preserving explicit Show/context entry, pins, recents, saved show data and browser history. Update the paired responsive assertion and documentation. Validate, review, commit, push, merge under repository policy and verify deployment and live fresh/returning journeys. Follow with public Workbook withdrawal under the maintained scope; do not redesign Workbook or migrate its documents. Refresh the existing av-consolidation projection after verified evidence changes.",
+  "kickoffPrompt": "Continue the maintained AV consolidation stages 0\u20136 and Video increments 2.0a\u20132.5 from fresh remote main. Stage 1 is delivered; do not repeat it. Preserve focused app ownership, explicit imports and reversible modules. Begin the remaining independent Video capabilities, retain original legacy data, verify current-head CI, deployment and live behavior, and keep physical acceptance separate.",
   "confidence": "high for cited release and scoped checks; historical findings require revalidation",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
@@ -262,7 +262,7 @@
   "short": "AV Suite",
   "evidence": {
     "checkedOn": "2026-10-04",
-    "sourceRevision": "f6df6ebca4450a0ad405cfb422316bc2fa36c105",
+    "sourceRevision": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
     "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
     "sources": [
       "docs/av-suite-consolidation-spec.md",
@@ -288,7 +288,14 @@
       "Navigation parity passed across 46 tools at 375/1440px",
       "Themes passed across 47 surfaces in light/dark at 390/1280px",
       "Calculator functional browser checks passed"
-    ]
+    ],
+    "delivery": {
+      "neutralEntryPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/256",
+      "withdrawalPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/257",
+      "metadataFixPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/258",
+      "deployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37252267300",
+      "liveReadback": "AV source.json names 1e51c7c. All six former Workbook entry URLs on both origins reach Toolbox. Editor bundle and retained source are 404. PR viewport contracts pass."
+    }
   },
   "historicalFindings": [
     {
