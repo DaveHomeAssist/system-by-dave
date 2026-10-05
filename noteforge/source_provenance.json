@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "https://github.com/DaveHomeAssist/noteforge",
-  "sourceCommit": "7114047aca10ad9b25839774a22d06370a6456bd",
+  "sourceCommit": "b7584ec687eceffcda6247c460b0c30b30745dea",
   "artifactHashes": {
     "assets/archive-view-Bf9uu0QX.js": "e21a1472f5ddef8d07d3bc5cafba33970a70921e556067256f4f005349bfd4db",
     "assets/archive-view-Cm1NOkv7.css": "cf91023aa2f1bf083e61e10a3c5ecb4d04703eaf48cc305f86af98fcabcb6460",
@@ -81,7 +81,7 @@
     "assets/yaml-vendor-wEas4CYs.js": "dbf3690c003374e2d3d9c43984ce92a0da39b4fff151cbbca3295bb67d3a95fe",
     "icon.svg": "fa4555f0de21b5708945345fcefff66468a1c7966d86c63d917e5e89e737cade",
     "icons.svg": "9d75a6b9bb64f5078b4712eaf297f0c287b08627d46224bd6d6ffee773dee4cd",
-    "index.html": "1c613551d3a7c3aa3c2224d5387228483df4c76b646530b2c68a29a00f233c61",
+    "index.html": "e33dba08d5e14d9fb5cd638aa4c18bbeb9cf00daac4804bf60a12f4aea5f564c",
     "manifest.webmanifest": "3c25e054a7cdff50193412b6ecea156767f51653327ddb6e6340e4ed53bd71f8",
     "og-image.svg": "3635be9e26e4dec9981b9faf8e6bcaeb947e9e90c16aa55f25c4a9aa6f357d7a",
     "robots.txt": "e35fa87c613fa3cb4510b337c0a3e6cd96f075af392a84d39dac73692945f9d4",
