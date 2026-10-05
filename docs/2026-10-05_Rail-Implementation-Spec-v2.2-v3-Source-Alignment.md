@@ -304,7 +304,7 @@ The source contract says malformed draft/layout entries are ignored by the conso
 
 ### 7.1 Responsive shell and console modes
 
-**Open RAIL-2:** literal v3 keeps a 56px icon rail at every viewport and reduces each rail button from 44px to 36px when viewport height is below 700px. The v2.1 engineering recommendation replaces the rail with an Apps dialog below 720px and adds a labeled desktop treatment. The table below is the recommended integration profile, not a description of literal v3, and is not implementation-authorized until RAIL-2 is resolved.
+**Open RAIL-2:** literal v3 keeps a 56px icon rail at every viewport and visually reduces each rail button from 44px to 36px when viewport height is below 700px. That short-height source behavior is evidence, not authorization to violate the production accessibility contract: implementation must preserve at least a 44 × 44 CSS-pixel interactive area and use intentional rail scrolling when height is constrained. The v2.1 engineering recommendation replaces the rail with an Apps dialog below 720px and adds a labeled desktop treatment. The table below is the recommended integration profile, not a description of literal v3, and is not implementation-authorized until RAIL-2 is resolved.
 
 | Viewport width in CSS pixels | Rail presentation | Existing console presentation |
 | --- | --- | --- |
@@ -329,7 +329,7 @@ The first-use theme is **Stage Slate (dark)**. **Warm Paper (light)** and **Syst
 
 Preserve the v3-derived focus hierarchy: the focused panel has a stronger border and AV Video's **Signal Flow** is the lit, brightest panel surface. The rail must not replace the console with a generic dashboard or obscure its active-workspace focus. [S3]
 
-Use the recovered source icons and shared theme tokens while developing. Literal v3 uses a 56px icon rail, 44px buttons, a 4px gap and 8px/6px rail padding; below 700px viewport height the buttons become 36px. Any labeled rail or phone Apps dialog is an explicit adaptation under RAIL-2, not a v3 measurement. Do not expand this PR into retheming unrelated applications; verify that AV Video and the rail respect the shared choice.
+Use the recovered source icons and shared theme tokens while developing. Literal v3 uses a 56px icon rail, 44px buttons, a 4px gap and 8px/6px rail padding; below 700px viewport height its visual button boxes become 36px. Do not reproduce that undersized interaction target: keep the production target at least 44 × 44 CSS pixels and scroll the rail instead. Any labeled rail or phone Apps dialog is an explicit adaptation under RAIL-2, not a v3 measurement. Do not expand this PR into retheming unrelated applications; verify that AV Video and the rail respect the shared choice.
 
 ### 7.3 Preserve the v3 console interaction contract
 
@@ -463,12 +463,12 @@ This specification defines the bounded rail slice and its technical dependencies
 | Theme | v3 source defaults to Stage Slate and toggles to Warm Paper; current repository contract also supports System and stored choice | Section 7.2 retains current production compatibility | Rendered rail styling in all three production modes |
 | Show context | v3 source always seeds a show and displays a read-only app chip; repository contract permits standalone use without context | Section 5 follows the current product contract and treats context-only display as an explicit safety adaptation | Contextual and standalone browser tests |
 | Workspace | 12 × 8, no overlap, panel minimums, panel scrolling | Section 7.3 preservation contract | Actual fit with rail at all fixtures |
-| Responsive modes | Console: phone below 720, tablet below 1100, desktop otherwise. Rail: persistent 56px icon column; buttons 36px below 700px height, otherwise 44px. | RAIL-2 must choose literal v3 or the recommended phone Apps/labeled desktop adaptation | Resolved decision and viewport comparison |
+| Responsive modes | Console: phone below 720, tablet below 1100, desktop otherwise. Source rail: persistent 56px icon column; visual buttons 36px below 700px height, otherwise 44px. | RAIL-2 must choose the persistent source rail or the recommended phone Apps/labeled desktop adaptation; either profile retains a 44 × 44 production target | Resolved decision and viewport comparison |
 | Save and recovery | Explicit Save; offered draft recovery; silently restored local layout | Separate document, draft, and layout boundaries in section 6 | Lifecycle tests, including failure cases |
 | Panel/view/module separation | Close hides view; module disable retains stored panels; view recall does not enable modules | Rail never takes ownership of these actions | Integration regressions and state-isolation evidence |
 | Specialist identity | Distinct panel libraries and character; protected Throwline chrome | Preserve as broader design direction without expanding this PR | Future specialist-specific reference and integration tests |
 | Default rail contents | Toolbox; nine consoles in the RAIL-1B order; All apps; Customize. Specialists and externals live under All apps. | Exact source order is resolved; current-unbuilt consoles are Planned/status-only | Implementation and deployed-state assertions |
-| Rail-specific visuals | 56px source rail, source icon SVGs, 4px gap, 8px/6px padding, 44px or short-height 36px buttons | Reuse source evidence; label any RAIL-2 adaptation | Rendered side-by-side review |
+| Rail-specific visuals | 56px source rail, source icon SVGs, 4px gap, 8px/6px padding, 44px or short-height 36px visual button boxes | Reuse source evidence; label any RAIL-2 adaptation; never reduce the production interactive target below 44 × 44 | Rendered side-by-side review |
 | Registry and routing safeguards | Not specified by the recovered prototype-derived document | Retain typed IDs, separate externals, safe context policy, and direct-key draft reads from the engineering review | Current-head regression tests, not visual inference |
 
 ## Source basis
