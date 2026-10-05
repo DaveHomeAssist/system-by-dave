@@ -1,4 +1,5 @@
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { LayoutState } from "./drafts";
 import { clone, COLS, deleteView, firstFree, fits, nudge, Panel, PanelDef, Rect, renameView, ROWS, sameLayout, sanitizeView, split, storeAsNew, suggest, trim, updateView, View } from "./layout";
 
 /* Console workspace: grandMA-style panel host shared by AV by Dave consoles.
@@ -15,12 +16,18 @@ type Drag = { id: string; kind: "move" | "resize"; px: number; py: number; orig:
 const uid = () => (globalThis.crypto?.randomUUID?.() || String(Date.now() + Math.random())).slice(0, 8);
 function modeFor(width: number): Mode { return width < 720 ? "phone" : width < 1100 ? "tablet" : "desktop"; }
 
-export function useConsoleWorkspace(views: View[], library: PanelDef[]) {
-  const [viewId, setViewId] = useState(views[0]?.id || "");
-  const [live, setLive] = useState<Record<string, Panel[]>>({});
+/* persist: device-local layout state (current view, unstored arrangements,
+   lock). It is restored on load and written on change; it never touches the
+   console's document. */
+export function useConsoleWorkspace(views: View[], library: PanelDef[], persist?: { initial: LayoutState | null; save: (state: LayoutState) => void }) {
+  const [viewId, setViewId] = useState(() => persist?.initial?.viewId || views[0]?.id || "");
+  const [live, setLive] = useState<Record<string, Panel[]>>(() => persist?.initial?.live || {});
   const [focus, setFocus] = useState<string | null>(null);
   const [max, setMax] = useState<Record<string, string | null>>({});
-  const [locked, setLocked] = useState(false);
+  const [locked, setLocked] = useState(() => persist?.initial?.locked || false);
+  const save = persist?.save;
+  const opened = useRef(false);
+  useEffect(() => { if (!opened.current) { opened.current = true; return; } save?.({ viewId, live, locked }); }, [viewId, live, locked, save]);
   const [phoneType, setPhoneType] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>(() => modeFor(typeof window === "undefined" ? 1440 : window.innerWidth));
   useEffect(() => { const resize = () => setMode(modeFor(window.innerWidth)); window.addEventListener("resize", resize); return () => window.removeEventListener("resize", resize); }, []);

@@ -143,15 +143,40 @@ try {
   await button('Locked').click();
   // Phone: one panel at a time with a bottom switcher; the desktop arrangement is kept.
   await page.setViewportSize({ width: 375, height: 812 });
-  assert.equal(await page.locator('.console-panel').count(), 1);
+  await page.waitForFunction(() => document.querySelectorAll('.console-panel').length === 1);
   await page.locator('.console-quick').getByRole('button', { name: /^Checks/ }).click();
   assert.deepEqual(await panels(), ['checks']);
   assert.ok(await page.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), 'phone page overflow');
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.waitForFunction(() => document.querySelectorAll('.console-panel').length === 3);
   assert.deepEqual((await panels()).sort(), ['checks', 'flow', 'inspector']);
+  // Draft store: unsaved record edits survive a reload as an offer, never applied silently.
+  await tab('Routing').click();
+  await page.getByLabel('Source', { exact: true }).fill('Draft camera');
+  await page.waitForFunction(() => localStorage.getItem('sbd.avVideo.draft.v1') !== null);
+  assert.ok(JSON.parse(await page.evaluate(() => localStorage.getItem('sbd.consoleDrafts.v1')))['av-video'], 'rail draft index names AV Video');
+  const savedBefore = JSON.stringify(await readSaved());
+  page.once('dialog', d => d.accept()); await page.reload();
+  await page.getByRole('alert').filter({ hasText: 'Unsaved edits' }).waitFor();
+  assert.notEqual(await page.getByLabel('Source', { exact: true }).inputValue(), 'Draft camera', 'a draft is offered, not applied');
+  assert.equal(JSON.stringify(await readSaved()), savedBefore, 'the saved plan is untouched by drafts');
+  await button('Restore draft').click();
+  assert.equal(await page.getByLabel('Source', { exact: true }).inputValue(), 'Draft camera');
+  assert.match(await page.getByRole('button', { name: /^Save/ }).textContent(), /•/);
+  page.once('dialog', d => d.accept()); await page.reload();
+  await button('Discard draft').click();
+  assert.equal(await page.evaluate(() => localStorage.getItem('sbd.avVideo.draft.v1')), null);
+  assert.equal(JSON.parse(await page.evaluate(() => localStorage.getItem('sbd.consoleDrafts.v1')))['av-video'], undefined);
+  // Unstored layout and the current view are kept on this device across reloads.
+  await tab('Troubleshooting').click();
+  await page.getByRole('button', { name: 'Checks options' }).click(); await page.getByRole('menuitem', { name: 'Close panel' }).click();
+  await page.reload();
+  // The tab carries an "arrangement changed" marker until the view is stored.
+  assert.equal(await page.getByRole('tab', { name: /^Troubleshooting/ }).getAttribute('aria-selected'), 'true');
+  assert.deepEqual((await panels()).sort(), ['flow', 'inspector']);
+  assert.equal(JSON.stringify(await readSaved()), savedBefore, 'layout state never writes the plan');
   assert.deepEqual(errors, []);
-  console.log(`AV console workspace verification passed: default views, panel buttons, chooser by keyboard, menus and Escape focus, move/size, store/update/rename/delete views with Save, reload, module-hidden panels, maximize/restore, lock, phone switcher (${BASE}).`);
+  console.log(`AV console workspace verification passed: default views, panel buttons, chooser by keyboard, menus and Escape focus, move/size, store/update/rename/delete views with Save, reload, module-hidden panels, maximize/restore, lock, phone switcher, draft restore/discard and layout persistence (${BASE}).`);
 } finally {
   await context.close(); await browser.close(); await new Promise(resolve => server.close(resolve));
 }
