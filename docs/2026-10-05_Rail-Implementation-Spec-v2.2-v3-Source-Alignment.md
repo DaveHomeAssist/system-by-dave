@@ -11,6 +11,7 @@
 **Reference baseline:** `66b3d66285e6c34c8b1b7db9a087caeec0e7f670`. Recheck the implementation branch before changing code.
 
 **Prototype evidence:** The supplied `AV-Suite-v3.zip` archive was inspected directly at SHA-256 `71b72c70ab3e004fd324f98cec7ed05a2cf16d054a4c05fce74fe298c5dd5e02`; its `AV Suite Prototype v3.dc.html` and `proto-data-v3.js` establish the source rail structure described below. [S6]
+
 **Qualification:** This revision is aligned to the recovered v3 source and the current repository contract. The prototype was not executed in a browser, so exact rendered pixels, focus behavior and interactive parity still require implementation-time comparison. This is a specification, not evidence of implementation, testing, deployment or visual parity.
 
 **Decision record — RAIL-1B, October 5, 2026:** Dave selected the complete nine-console v3 rail order. Every console slot appears by default. A console that is not implemented in the current product is visibly and accessibly marked **Planned**, remains status-only and must not acquire a fabricated route, document, storage key or readiness claim.
