@@ -212,7 +212,7 @@ If RAIL-3 selects local customization, use this versioned payload. The example c
 | Save failure | Keep the session's selected arrangement and visibly report that it was not saved |
 | Restore defaults | Explicitly replace preferences with the current registry defaults |
 
-Only explicit pin, unpin, reorder, or reset actions persist rail preferences. For ordinary edits, preserve planned and unresolved IDs in their existing order after the visible actionable pins; deduplicate the resulting stored list. Replacing an unreadable or unsupported payload requires an explicit reset, not an incidental customization write. Do not migrate or synchronize Toolbox favorites into the new key automatically.
+Only explicit pin, unpin, reorder, or reset actions persist rail preferences. For ordinary edits, keep known planned console IDs in their actual stored positions while applying the requested change to the visible ordered list. Preserve only suppressed unresolved IDs in their existing relative order after the visible entries, then deduplicate the resulting stored list. Replacing an unreadable or unsupported payload requires an explicit reset, not an incidental customization write. Do not migrate or synchronize Toolbox favorites into the new key automatically.
 
 The rail must not write to saved-show keys, application documents, draft keys, draft indexes, or console layout keys. Opening a dialog, reading state, or rendering indicators must not save anything.
 
