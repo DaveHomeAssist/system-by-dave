@@ -20,26 +20,31 @@ function modeFor(width: number): Mode { return width < 720 ? "phone" : width < 1
    lock). It is restored on load and written on change; it never touches the
    console's document. */
 export function useConsoleWorkspace(views: View[], library: PanelDef[], persist?: { initial: LayoutState | null; save: (state: LayoutState) => void }) {
-  const [viewId, setViewId] = useState(() => persist?.initial?.viewId || views[0]?.id || "");
+  const [viewId, setViewId] = useState(() => views.find(v => v.id === persist?.initial?.viewId)?.id || views[0]?.id || "");
   const [live, setLive] = useState<Record<string, Panel[]>>(() => persist?.initial?.live || {});
   const [focus, setFocus] = useState<string | null>(null);
   const [max, setMax] = useState<Record<string, string | null>>({});
   const [locked, setLocked] = useState(() => persist?.initial?.locked || false);
   const save = persist?.save;
-  const opened = useRef(false);
-  useEffect(() => { if (!opened.current) { opened.current = true; return; } save?.({ viewId, live, locked }); }, [viewId, live, locked, save]);
+  const previousLayout = useRef(JSON.stringify({ viewId, live, locked }));
+  useEffect(() => {
+    const next = JSON.stringify({ viewId, live, locked });
+    if (previousLayout.current === next) return;
+    previousLayout.current = next;
+    save?.({ viewId, live, locked });
+  }, [viewId, live, locked, save]);
   const [phoneType, setPhoneType] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>(() => modeFor(typeof window === "undefined" ? 1440 : window.innerWidth));
   useEffect(() => { const resize = () => setMode(modeFor(window.innerWidth)); window.addEventListener("resize", resize); return () => window.removeEventListener("resize", resize); }, []);
   const view = views.find(v => v.id === viewId) || views[0];
   useEffect(() => { if (view && view.id !== viewId) setViewId(view.id); }, [view, viewId]);
   const available = useMemo(() => new Set(library.map(d => d.type)), [library]);
-  const arrangement = view ? (live[view.id] || sanitizeView(view).panels) : [];
+  const arrangement = view ? sanitizeView({ ...view, panels: live[view.id] || view.panels }).panels : [];
   const panels = arrangement.filter(p => available.has(p.type));
   const hidden = arrangement.length - panels.length;
   const setPanels = useCallback((fn: (current: Panel[]) => Panel[]) => {
     if (!view) return;
-    setLive(state => ({ ...state, [view.id]: fn(state[view.id] || sanitizeView(view).panels) }));
+    setLive(state => ({ ...state, [view.id]: fn(sanitizeView({ ...view, panels: state[view.id] || view.panels }).panels) }));
   }, [view]);
   /* Bring a panel type forward: focus it here, otherwise open the first view
      that holds it, otherwise place it in free space. Returns false when the

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-05 — Console recovery hardening
+
+- Report draft, layout, removal and advisory-index failures without losing current edits or falsely confirming discard. Export remains available.
+- Coordinate draft mutations with an origin-wide Web Lock and exact snapshot guards; reject conflicting writes and stale recovery actions without replacing another tab’s draft. Clean tabs do not clear recovery owned elsewhere.
+- Sanitize cached geometry for display while preserving original storage and hidden module definitions; avoid layout writes on an unchanged opening.
+- Add fault-injection and competing-tab browser regressions to the AV Video gate. Bump the AV cache version and regenerate its consumers for the corrected bundle.
+
 ## 2026-10-05 — Console drafts and layout persistence
 
 - **Draft store.** New `apps/shared/av-console/drafts.ts`, used first by AV Video.

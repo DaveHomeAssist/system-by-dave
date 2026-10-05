@@ -8,7 +8,7 @@ import { SignalFields } from "./SignalFields";
 import { createHistory, record, redo, undo } from "./history";
 import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/Workspace";
 import type { PanelDef, View as ConsoleView } from "../../shared/av-console/layout";
-import { clearDraft, readDraft, readLayout, writeDraft, writeLayout } from "../../shared/av-console/drafts";
+import { createDraftSession, draftSnapshot, DRAFT_INDEX, readLayout, writeLayout, type DraftResult } from "../../shared/av-console/drafts";
 import { applyImport, emptyDocument, LEGACY, loadDocument, parseDocument, Module, newRoute, Preview, previewImport, Route, routeGaps, sampleDocument, saveDocument, STORE, uid, VideoDocument } from "./model";
 
 /* Draft store (docs/av-console.md): unsaved record edits and unstored layout. */
@@ -51,8 +51,15 @@ export function App() {
   const [savedSnapshot, setSavedSnapshot] = useState(() => JSON.stringify(initial.doc));
   const baseline = useRef(initial.baseline);
   const dirty = JSON.stringify(doc) !== savedSnapshot;
+  const currentDoc = useRef(doc);
+  currentDoc.current = doc;
   const [message, setMessage] = useState(initial.error || (new URLSearchParams(location.search).get("view") === "displays" && !initial.doc.modules.displays ? "Displays & Projection is disabled. Enable it in Project to open this view; its data is retained." : (initial.doc.routes.length || initial.doc.displays.length) ? "Plan loaded from this browser." : "Ready. Create a route or import an existing sheet."));
   const [problem, setProblem] = useState(Boolean(initial.error));
+  const [recoveryProblems, setRecoveryProblems] = useState<Record<string, string>>({});
+  const reportDraft = (result: DraftResult) => {
+    if (!result.ok && !result.error) return;
+    setRecoveryProblems(p => ({ ...p, draft: result.error || "", index: result.indexChecked ? result.indexError || "" : p.index || "" }));
+  };
   const [selected, setSelected] = useState(initial.doc.routes[0]?.id || "");
   const [selectedDisplay, setSelectedDisplay] = useState("");
   const [search, setSearch] = useState("");
@@ -66,20 +73,45 @@ export function App() {
   const library = LIBRARY.filter(d => !d.module || doc.modules[d.module as Module]);
   const layoutPersist = useMemo(() => {
     let saved = null; try { saved = readLayout(localStorage, LAYOUT_KEY); } catch { /* storage unavailable */ }
-    return { initial: saved, save: (state: Parameters<typeof writeLayout>[2]) => { try { writeLayout(localStorage, LAYOUT_KEY, state); } catch { /* layout is a convenience */ } } };
+    return { initial: saved, save: (state: Parameters<typeof writeLayout>[2]) => { let ok = false;
+      try { ok = writeLayout(localStorage, LAYOUT_KEY, state); } catch { /* report below */ }
+      setRecoveryProblems(p => ({ ...p, layout: ok ? "" : "Layout could not be saved. This arrangement is available for this visit only." })); } };
   }, []);
   const ws = useConsoleWorkspace(doc.workspace?.views || DEFAULT_VIEWS, library, layoutPersist);
-  /* A draft that differs from the saved plan is offered, never applied silently. */
-  const [draftOffer, setDraftOffer] = useState(() => {
-    try { const d = readDraft(localStorage, DRAFT_KEY, CONSOLE_ID, value => parseDocument(JSON.stringify(value))); return d && JSON.stringify(d.doc) !== JSON.stringify(initial.doc) ? d : null; } catch { return null; }
+  /* Capture the exact offered bytes once; another tab never grants ownership. */
+  const [recovery] = useState(() => {
+    try {
+      const snapshot = draftSnapshot(localStorage, DRAFT_KEY, CONSOLE_ID, value => parseDocument(JSON.stringify(value)));
+      const lock = navigator.locks ? (action: () => DraftResult) => navigator.locks.request(DRAFT_INDEX, action) : undefined;
+      return { snapshot, session: createDraftSession(localStorage, DRAFT_KEY, CONSOLE_ID, snapshot, lock) };
+    } catch { return { snapshot: { raw: null, draft: null, error: "Draft recovery unavailable. Export edits before leaving." }, session: null }; }
   });
+  const [draftOffer, setDraftOffer] = useState(() => recovery.snapshot.draft && JSON.stringify(recovery.snapshot.draft.doc) !== JSON.stringify(initial.doc) ? recovery.snapshot.draft : null);
   useEffect(() => {
-    if (draftOffer) return; // keep the earlier draft until the operator restores or discards it
-    const timer = setTimeout(() => { try { if (dirty) writeDraft(localStorage, DRAFT_KEY, CONSOLE_ID, doc, baseline.current, doc.title); else clearDraft(localStorage, DRAFT_KEY, CONSOLE_ID); } catch { /* drafts are best effort; Export still works */ } }, 400);
+    if (recovery.snapshot.error) { reportDraft({ ok: false, error: recovery.snapshot.error }); return; }
+    if (draftOffer) {
+      if (dirty) reportDraft({ ok: false, error: "An earlier draft awaits review. Current edits are not backed up as a draft. Export them before restoring or leaving." });
+      return;
+    }
+    if (!recovery.session) return;
+    const timer = setTimeout(() => { void recovery.session!.sync(doc, baseline.current, dirty, doc.title).then(reportDraft); }, 400);
     return () => clearTimeout(timer);
-  }, [doc, dirty, draftOffer]);
-  function restoreDraft() { if (!draftOffer) return; update(draftOffer.doc); setDraftOffer(null); notify("Draft restored. Save to keep it in this browser."); }
-  function discardDraft() { try { clearDraft(localStorage, DRAFT_KEY, CONSOLE_ID); } catch { /* nothing to clear */ } setDraftOffer(null); notify("Draft discarded. The saved plan is unchanged."); }
+  }, [doc, dirty, draftOffer, recovery]);
+  async function restoreDraft() {
+    if (!draftOffer || !recovery.session) return;
+    if (dirty) { notify("Export current edits before restoring a draft. Reload to review recovery without replacing these edits.", true); return; }
+    const restoringDoc = doc;
+    const result = await recovery.session.restore(); reportDraft(result);
+    if (!result.ok) return;
+    if (currentDoc.current !== restoringDoc) { notify("Edits changed while recovery was waiting. Export current edits before restoring a draft.", true); return; }
+    update(draftOffer.doc); setDraftOffer(null); notify("Draft restored. Save to keep it in this browser.");
+  }
+  async function discardDraft() {
+    if (!recovery.session) return;
+    const result = await recovery.session.discard(); reportDraft(result);
+    if (!result.ok) return;
+    setDraftOffer(null); notify("Draft discarded. The saved plan is unchanged.");
+  }
   const show = (type: PanelType) => ws.show(type);
   /* Live switcher state: what is on program, preview and each AUX. Held for
      this visit only; layout and view changes never touch it. */
@@ -129,7 +161,7 @@ export function App() {
   }, [preview]);
   function save() {
     if (initial.error) { notify(initial.error, true); return; }
-    try { baseline.current = saveDocument(localStorage, doc, baseline.current); setSavedSnapshot(JSON.stringify(doc)); finishEdit(); notify("Saved in this browser."); }
+    try { baseline.current = saveDocument(localStorage, doc, baseline.current); setSavedSnapshot(JSON.stringify(doc)); finishEdit(); notify("Saved in this browser."); if (!draftOffer) void recovery.session?.sync(doc, baseline.current, false, doc.title).then(reportDraft); }
     catch (error) { notify(errorText(error), true); }
   }
   function changeRoute(field: keyof Route, value: string, typing = false) { update({ ...doc, routes: doc.routes.map(r => r.id === selected ? { ...r, [field]: value } : r) }, typing ? `route:${selected}:${field}` : undefined); }
@@ -223,7 +255,7 @@ export function App() {
     <main id="workspace" tabIndex={-1} className="workspace-host">
       <ConsoleWorkspace ws={ws} label="AV Video" quick={quick} render={renderPanel} onViewsChange={storeViews} notify={text => notify(text)} />
     </main>
-    <footer role="status" className={`message ${problem ? "error" : ""}`}>{message}</footer>
+    <footer role="status" className={`message ${problem || Object.values(recoveryProblems).some(Boolean) ? "error" : ""}`}>{[...Object.values(recoveryProblems).filter(Boolean), message].join(" ")}</footer>
     <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={async e => { const file = e.target.files?.[0]; e.target.value = ""; if (!file) return; try { await inspect(await file.text(), file.name); } catch (error) { notify(errorText(error), true); } }} />
     <dialog ref={dialog} aria-labelledby="import-title" onCancel={() => setPreview(null)}><h2 id="import-title">Review import</h2>{preview && <><p>{preview.name}</p><p><strong>{preview.routes.length} routes · {preview.displays.length} destinations</strong> · {Object.keys(preview.meta).length} metadata fields</p><p>{preview.restore ? "This backup replaces the current plan, including module choices. Export your current plan first if you need to keep it." : "Records will be added to this plan. Notes, statuses, and a complete original source copy are retained. Similar records are kept separate; route links require your selection. Extra fields and metadata remain in Export original."}</p><div className="import-preview">{preview.displays.map(item => <div key={item.id}><strong>{displayName(item)}</strong><span>{item.kind} · {item.status || "Unspecified"} · {item.route || "No original route reference"}</span></div>)}{preview.routes.map(r => <div key={r.id}><strong>{r.source || "Unnamed source"} → {r.destination || "Unnamed destination"}</strong><span>{r.route} · {r.status || "Unspecified"}</span></div>)}</div><div className="row-actions"><button type="button" onClick={() => setPreview(null)}>Cancel</button>{preview.restore && <button type="button" onClick={exportDoc}>Export current plan</button>}<button type="button" className="primary" onClick={confirmImport}>{preview.restore ? "Replace with backup" : preview.displays.length ? "Add destinations to plan" : "Add routes to plan"}</button></div></>}</dialog>
   </div>;
