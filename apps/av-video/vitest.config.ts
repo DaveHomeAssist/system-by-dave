@@ -5,6 +5,6 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "node",
-    include: ["apps/av-video/src/**/*.test.ts", "apps/av-video/src/**/*.test.tsx"]
+    include: ["apps/av-video/src/**/*.test.ts", "apps/av-video/src/**/*.test.tsx", "apps/shared/av-console/**/*.test.ts"]
   }
 });

@@ -56,6 +56,7 @@ handoffs.
 - `js/sbd-registry.js`: canonical AV inventory and offline manifest
 - `js/sbd-nav.js`, `js/av-suite-context.js`, `js/sbd-handoff.js`: shared AV
   navigation, show context, and cross-tool handoff behavior
+- `apps/shared/av-console/`: shared panel-console workspace used by AV consoles (`docs/av-console.md`)
 - `apps/av-workbook/`: React/TypeScript source for AV Workbook
 - `av-workbook/`: noindex redirect to Toolbox; no editor artifact
 - `apps/fmp-camera-sim/`: React/TypeScript/Three.js source for the FMP Camera

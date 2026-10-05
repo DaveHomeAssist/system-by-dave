@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-10-05 — AV Video panel console
+
+- **Shared console workspace.** A new engine in `apps/shared/av-console/`, contract in `docs/av-console.md`:
+  - a snapping 12 × 8 grid;
+  - tap-empty-space or Add panel chooser with search, categories and a space preview;
+  - draw-to-add while unlocked;
+  - panel menus: change, move and size, split, maximize, close;
+  - layout lock and full screen;
+  - stored views: store, update, rename, duplicate, delete, revert;
+  - a keyboard path for every operation;
+  - tablet two-up and phone one-panel layouts with a bottom switcher.
+- **AV Video uses it.** Its five tabs become panels, plus a new Inspector panel, in Routing, Projection, Troubleshooting and Project views.
+  - The tab labels survive as panel buttons.
+  - Edit route, route cards, check items and linked-route tracing bring the right panel forward.
+  - Signal Flow is the lit panel. A neighbouring Patch panel defers onboarding and Add route to it.
+- **Plan document.** `system-by-dave.av-video.v1` gains an optional `workspace` block for stored views. Older plans open unchanged with the default views, and an unknown workspace version blocks saving instead of rewriting the plan.
+- **Layout fixes inside panels.**
+  - Signal Flow's toolbar follows its panel width (container queries), not the viewport.
+  - The empty-state card stays inside the canvas.
+  - The zoom controls lie flat so they fit shorter panels.
+- **Probes.** New `scripts/probe_av_console.mjs` in `test:av-video-browser`. The graph and Displays probes now:
+  - scope their option lookups to the intended list;
+  - check panel focus instead of the old tab state;
+  - arrange devices on a maximized Signal Flow.
+- **Show view** with **Switcher bus** and **Multiview**, derived from routes (`apps/av-video/src/bus.ts`, unit-tested).
+  - PGM and PVW keys and Cut.
+  - AUX pickers that start Not assigned.
+  - Destination tiles showing what each carries.
+  - Bus state is live, never a plan edit, and unaffected by layout operations.
+- **Decisions recorded** for the unified console suite (`docs/av-console.md`): Stage Slate dark default, separate draft store, read-only show chip, every app in scope, family consoles.
+
 ## 2026-10-04 — AV Video in the AV by Dave sitemap
 
 - `scripts/gen_sitemap.py` now lists registry tools whose route is a directory (`av-video/`, `pixelforge/`, `ProjectorThrow/`) instead of only `.html` routes, skipping paths a static entry already lists. `/av-video/` was live and canonical on avbydave.com but missing from its sitemap; the other two were already listed, and every other sitemap is unchanged.
