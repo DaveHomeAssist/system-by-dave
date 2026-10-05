@@ -139,7 +139,7 @@ Do not feed external IDs through `toolById()` or `normalizeToolId()`. Preserve t
 | Input or contract | Required result |
 | --- | --- |
 | Old saved tool ID `cueforge` | Cue Sheet, ID `cue-sheet` |
-| New rail entry `external:cueforge` | CueForge's `cueforge.html` handoff |
+| New rail entry `external:cueforge` | CueForge's `https://systembydave.com/cueforge.html` handoff |
 | Old saved tool ID `plotforge` | StagePlotter, ID `stageplotter` |
 | New rail entry `external:plotforge` | PlotForge's `plotforge.html` handoff |
 | Console storage metadata | Its draft and layout keys also appear in the owning tool's `storageKeys` |
@@ -154,7 +154,7 @@ These catalog labels are retained from the supplied plan. They describe intended
 
 | Product | Destination | Badge | Behavior |
 | --- | --- | --- | --- |
-| CueForge | `cueforge.html` | Desktop app | Open the explanatory handoff, never Cue Sheet |
+| CueForge | `https://systembydave.com/cueforge.html` | Desktop app | Open the explanatory handoff on its owning domain, never Cue Sheet |
 | PlotForge | `plotforge.html` | Own app | Open its handoff, never StagePlotter |
 | House Video / FMP | `https://housevideo.app/` | Link out | External navigation; no implied shared state |
 | Arena Ops | None | API pending | Informational status card; not pinnable or clickable |
@@ -244,6 +244,8 @@ The chip remains console-owned UI, outside the rail's preference state. Preserve
 Preserve destination-defined query parameters and hashes when composing internal links. Never populate missing URL context from saved show data. Resolve registry-relative paths against the explicit suite/deployment base, not the current `/av-video/` directory. Validate destination protocols and construct links through one shared rail URL builder.
 
 Classify external handoffs by entry type even when their first URL is local. `plotforge.html` must not receive show parameters from the rail and then forward them to its external destination. Apply the same routing policy to external command-menu actions. Do not broaden this PR into an unrelated rewrite of all public handoff behavior.
+
+CueForge is not published in the `avbydave.com` destination set. Its rail entry must remain the absolute `https://systembydave.com/cueforge.html` URL; assert that AV Video does not resolve it as the nonexistent `https://avbydave.com/cueforge.html` path.
 
 ### Family browsing contract
 
