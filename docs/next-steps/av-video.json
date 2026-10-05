@@ -268,11 +268,11 @@
     },
     {
       "label": "Source deployment",
-      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577"
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37282446471"
     },
     {
       "label": "AV deployment",
-      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749"
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37286283303"
     },
     {
       "label": "Toolbox",
@@ -288,40 +288,52 @@
   ],
   "short": "AV Video",
   "evidence": {
-    "checkedOn": "2026-10-04",
-    "sourceRevision": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
-    "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
+    "checkedOn": "2026-10-05",
+    "sourceRevision": "66b3d66285e6c34c8b1b7db9a087caeec0e7f670",
+    "scope": "Fresh source and deployment reconciliation for the shipped AV Video console, Stage Slate default, draft recovery and device-local layout persistence, plus the RAIL-1B planning decision. This is not browser-rendered Rail or physical acceptance evidence.",
     "sources": [
-      "docs/av-suite-consolidation-spec.md",
+      "docs/2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md",
+      "docs/av-console.md",
       "docs/av-suite-consolidation-stage2-video.md",
       "docs/av-workspace.md",
       "CHANGELOG.md"
     ],
-    "release": "https://github.com/DaveHomeAssist/system-by-dave/commit/1adc8846653c72e0ad115c4941c809bac1c79cf1",
-    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577",
-    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749",
+    "release": "https://github.com/DaveHomeAssist/system-by-dave/commit/66b3d66285e6c34c8b1b7db9a087caeec0e7f670",
+    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37282446471",
+    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37286283303",
     "publishedSource": "https://avbydave.com/source.json",
     "runtime": [
-      "Live Calculator functional checks: Chromium including offline; WebKit excluding offline reload.",
-      "Fresh Toolbox opens Toolbox; saved preferredEntry=show still opens Show Console; Workbook link visible in both."
+      "Published source.json read back sourceCommit 66b3d66285e6c34c8b1b7db9a087caeec0e7f670 on 2026-10-05.",
+      "CueForge owning-domain handoff returned 200; the excluded avbydave.com/cueforge.html path returned 404; avbydave.com/plotforge.html returned 200."
     ],
     "limits": [
       "Physical/operator acceptance remains open.",
-      "Stored full viewport matrices and final catalog-navigation results were inspected as delivery evidence, not rerun in this reconciliation."
-    ],
-    "candidateBranch": "codex/av-neutral-and-pr-checks-20261004",
-    "candidateChecks": [
-      "Toolbox responsive and returning legacy-preference isolation passed at 390/680/1280px",
-      "Navigation parity passed across 46 tools at 375/1440px",
-      "Themes passed across 47 surfaces in light/dark at 390/1280px",
-      "Calculator functional browser checks passed"
+      "RAIL-1B is a planning decision only: no Rail implementation, browser-rendered v3 comparison or deployed nine-slot state is claimed.",
+      "The earlier viewport runtime matrix was not rerun in this reconciliation; its evidence is retained separately below."
     ],
     "delivery": {
-      "neutralEntryPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/256",
-      "withdrawalPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/257",
-      "metadataFixPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/258",
-      "deployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37252267300",
-      "liveReadback": "AV source.json names 1e51c7c. All six former Workbook entry URLs on both origins reach Toolbox. Editor bundle and retained source are 404. PR viewport contracts pass."
+      "consolePR": "https://github.com/DaveHomeAssist/system-by-dave/pull/264",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37282446471",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37286283303",
+      "liveReadback": "AV source.json names 66b3d66285e6c34c8b1b7db9a087caeec0e7f670; both deployment runs completed successfully."
+    },
+    "priorViewportEvidence": {
+      "checkedOn": "2026-10-04",
+      "sourceRevision": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
+      "candidateBranch": "codex/av-neutral-and-pr-checks-20261004",
+      "candidateChecks": [
+        "Toolbox responsive and returning legacy-preference isolation passed at 390/680/1280px",
+        "Navigation parity passed across 46 tools at 375/1440px",
+        "Themes passed across 47 surfaces in light/dark at 390/1280px",
+        "Calculator functional browser checks passed"
+      ],
+      "delivery": {
+        "neutralEntryPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/256",
+        "withdrawalPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/257",
+        "metadataFixPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/258",
+        "deployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37252267300",
+        "liveReadback": "AV source.json named 1e51c7c at that check. All six former Workbook entry URLs on both origins reached Toolbox. Editor bundle and retained source were 404. PR viewport contracts passed."
+      }
     }
   },
   "historicalFindings": [
