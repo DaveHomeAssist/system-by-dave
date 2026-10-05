@@ -4,21 +4,21 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "f6df6ebca4450a0ad405cfb422316bc2fa36c105",
+  "head": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
   "status": "amber",
-  "statusReason": "Theme, Calculator and navigation PR workflow implemented; local probes pass. New desktop coverage exposed and fixed inspector-card contrast in four tools. Current-head CI and deployment still pending.",
+  "statusReason": "Theme, Calculator, navigation and persistence probes now gate relevant PRs. Desktop inspector contrast was fixed and checks pass on the published release. Remaining Video capabilities and physical acceptance remain open.",
   "lastActivity": "2026-10-04",
   "shipped": [
-    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
-    "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
+    "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
     "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit.",
     "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan."
   ],
   "nextStep": {
-    "title": "Wire the viewport and theme probes into relevant pull request checks",
-    "why": "Source review still finds the theme probe only in deployment and the Calculator/navigation probes absent from PR workflows. Delivered local/live evidence does not close CI coverage.",
-    "doneWhen": "Relevant PR changes trigger real theme, Calculator and navigation parity probes; current-head CI and deployment pass without weakening assertions.",
-    "effort": "S",
+    "title": "Deliver Cameras and Playback, then Stream and Record",
+    "why": "The selected pre-merge viewport coverage gap is closed; continue the maintained Video capability sequence.",
+    "doneWhen": "Video increments preserve legacy fields/statuses and imports with independent saved documents, reversible modules and verified publication.",
+    "effort": "L",
     "owner": "Codex",
     "blockedBy": ""
   },
@@ -28,7 +28,7 @@
       "type": "infra",
       "sev": "P1",
       "title": "Theme, calculator and nav-parity probes never run on PRs",
-      "detail": "Rechecked 2026-10-04 at 1adc884: workflows reference probe_av_themes only during deploy-pages. Calculator and navigation parity probes are not wired to PR workflows. Their local/live passes do not prove future PR coverage.",
+      "detail": "Delivered in #256: path-scoped PR workflow runs real theme probes at 390/1280, Calculator interactions, navigation parity and Toolbox persistence. Exact-head CI and subsequent public deployment pass.",
       "files": [
         "scripts/probe_calculator_viewport.cjs",
         ".github/workflows/av-workspace.yml",
@@ -108,16 +108,16 @@
   ],
   "phases": [
     {
-      "name": "PR checks and shell follow-ups — Open",
+      "name": "PR checks and shell follow-ups \u2014 Open",
       "goal": "Close the confirmed coverage gap; revalidate recorded shell risks before fixes.",
       "items": [
-        "AVV-02: wire theme, Calculator and navigation parity probes on relevant PRs.",
+        "AVV-02 delivered: theme, Calculator and navigation parity probes gate relevant PRs.",
         "AVV-05 / AVV-06 / AVV-13: preserve hash, compatibility and subdirectory follow-ups."
       ],
       "gate": "Relevant PR gate execution and focused regression proof; no weakened assertions."
     },
     {
-      "name": "Remaining AV Video capabilities — Planned",
+      "name": "Remaining AV Video capabilities \u2014 Planned",
       "goal": "Cameras/Playback, then Stream/Record under the existing field/import contract.",
       "items": [
         "Preserve independent Video documents, reversible modules, import previews and original legacy records.",
@@ -126,17 +126,17 @@
       "gate": "Per-slice compatibility, offline/recovery and operator acceptance; legacy retirement is separate."
     },
     {
-      "name": "Six viewport candidates — Delivered",
+      "name": "Six viewport candidates \u2014 Delivered",
       "goal": "Keep completed work out of the pending migration queue.",
       "items": [
-        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
-        "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
+        "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
         "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit."
       ],
-      "gate": "PRs #237–#243 merged; both destination/source deployment evidence verified. Unselected catalog tools are not claimed refactored."
+      "gate": "PRs #237\u2013#243 merged; both destination/source deployment evidence verified. Unselected catalog tools are not claimed refactored."
     },
     {
-      "name": "Physical and operator acceptance — Open",
+      "name": "Physical and operator acceptance \u2014 Open",
       "goal": "Complete the real device and venue checks automation cannot establish.",
       "items": [
         "Phones/tablets, virtual keyboards, address bar and safe areas.",
@@ -242,7 +242,7 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Work in DaveHomeAssist/system-by-dave from freshly verified remote main under its claim protocol. Read AGENTS.md, CLAUDE.md, docs/av-workspace.md and current workflows. Scope the AVV-02 coverage gap: wire the existing theme, Calculator viewport and registry navigation parity probes into appropriate pull request checks with controlled servers/fixtures. Do not redesign applications or silently close historical findings. Run the exact affected checks, review the diff, commit, push, merge only the verified current head, then verify deployment and live behavior. Refresh the existing av-video projection and retain physical/operator acceptance as a separate lane.",
+  "kickoffPrompt": "Continue the maintained AV Video increments from fresh remote main. AVV-02 pre-merge theme, Calculator and navigation coverage is delivered. Preserve independently saved Video documents and explicit legacy imports while delivering Cameras/Playback then Stream/Record; test optional-module off states, export/reload, unchanged original data, CI and public release. Physical acceptance remains separate.",
   "confidence": "high for cited release and scoped checks; historical findings require revalidation",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
@@ -252,7 +252,7 @@
   "short": "AV Video",
   "evidence": {
     "checkedOn": "2026-10-04",
-    "sourceRevision": "f6df6ebca4450a0ad405cfb422316bc2fa36c105",
+    "sourceRevision": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
     "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
     "sources": [
       "docs/av-suite-consolidation-spec.md",
@@ -278,7 +278,14 @@
       "Navigation parity passed across 46 tools at 375/1440px",
       "Themes passed across 47 surfaces in light/dark at 390/1280px",
       "Calculator functional browser checks passed"
-    ]
+    ],
+    "delivery": {
+      "neutralEntryPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/256",
+      "withdrawalPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/257",
+      "metadataFixPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/258",
+      "deployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37252267300",
+      "liveReadback": "AV source.json names 1e51c7c. All six former Workbook entry URLs on both origins reach Toolbox. Editor bundle and retained source are 404. PR viewport contracts pass."
+    }
   },
   "historicalFindings": [
     {

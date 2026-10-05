@@ -4,7 +4,7 @@
 
 **Decision revision:** 2026-10-02, requested by Dave. The October 2 clarification removes assumed Workbook adoption, recovery and migration requirements from public withdrawal. This is the maintained product and migration plan. It supersedes the September 23 seven-workspace proposal and the September 29 recommendation to build Video inside Workbook. The [dated specification](av-suite-consolidation-spec-2026-09-23.md) remains historical evidence.
 
-**Delivery boundary, updated 2026-10-04:** The neutral Toolbox rule and pre-merge viewport/theme gates merged in PR #256. The Workbook withdrawal candidate removes public discovery, editor/source publication and offline dependencies; all former URLs use noindex redirects to Toolbox without accessing saved data. The 56-case domain browser suite passes, including storage preservation on both origins, and all 60 retained Workbook source tests pass. Candidate publication and live readback remain required before Stage 1 is called delivered. Stages 2–6 and Video increments 2.0a–2.5 remain the maintained authority; neither the application map nor operator acceptance is implied by this foundation work. See the [doorway contract](av-suite-doorway.md).
+**Delivery boundary, verified 2026-10-04:** Stage 1 is delivered. PR #256 supplies neutral Toolbox routing and pre-merge viewport/theme contracts; #257 withdraws Workbook and #258 completes publication metadata. Public source `1e51c7c` includes these changes: all three former Workbook entry URLs on both origins reach Toolbox, and editor bundles plus retained source are unavailable. Local cutover checks preserve saved records. Stages 2–6 and Video increments 2.0a–2.5 remain the maintained authority; no full application-map or physical/operator acceptance is implied. See the [doorway contract](av-suite-doorway.md).
 
 ## Settled product decisions
 
@@ -92,7 +92,7 @@ Example: a projection operator opens Video from Toolbox, keeps Switching & Route
 
 ## Workbook public withdrawal and retained concept
 
-Withdrawal is implemented in the October 4 candidate: public promotion, registry entries, offline dependencies and editor assets are removed. Retained builds no longer overwrite the public redirects. Staged and browser checks cover the full surface list below; deployed readback is still required to close this release gate.
+Withdrawal is delivered in the October 4 release: public promotion, registry entries, offline dependencies and editor assets are removed. Retained builds no longer overwrite the public redirects. Staged, browser and deployed readback checks cover the full surface list below.
 
 The withdrawal implementation must cover the AV home and Toolbox, Show Console recommendations, shared navigation/search, the System by Dave Tools directory and other public promotion, registry visibility, sitemap/indexing, direct Workbook URLs, domain staging and service-worker/offline assets. Removing a card alone is not removal from the public website. Audit both `avbydave.com` and the former `systembydave.com` routes, including `/av-workbook.html`, `/av-workbook/` and `/av-workbook/index.html`.
 
@@ -152,7 +152,7 @@ The sequence above is the target program, not a checklist of completed releases.
 | Work | Current evidence | Next bounded release and exit evidence |
 | --- | --- | --- |
 | Toolbox default for every neutral visit | PR #256 merged; fresh and saved-Show profiles open Toolbox while explicit entries and browser data remain intact. | Read back the published release; keep the new PR viewport contracts green. |
-| Workbook public withdrawal | Candidate removes promotion, editor/source artifacts, sitemap and offline dependencies; direct aliases and unchanged storage pass across both origins. | Publish and verify live former URLs and asset absence. No recovery/migration project is required. |
+| Workbook public withdrawal | Delivered: promotion, editor/source artifacts, sitemap and offline dependencies removed; direct aliases and unchanged storage verified across both origins. | Live former URLs and artifact absence verified. Keep the withdrawal contract gated; no recovery/migration project is required. |
 | Independent Video | Signal Flow/Patch and Displays/Projection are released; four legacy import types, optional document-owned modules and original-source preservation are implemented. | Cameras & Playback, then Stream & Record. Preserve the field/status matrix and operating semantics; test each module's imports, save/export, offline, disabled-state and physical-acceptance boundaries. |
 | Other focused applications and universal visibility management | The application map and module behavior above are requirements; the existing tool directory is not proof of those applications or a global Manage modules surface. | Implement coherent application slices, resolving only the remaining family/identity/readiness choices before dependent work. Keep specialists independently launchable. |
 
@@ -168,7 +168,7 @@ This audit checks the requested plan revision. The implementation gates in the n
 | Focused applications using Adobe Suite as the reference | Settled decision 2, application map, shared-experience and ownership boundaries |
 | Optional modules reduce clutter without data loss | Settled decision 3 and all seven optional-module rules, including disabled links, scoped checks and active operations |
 | No Workbook requirement or assumed Video host | Settled decision 4, app-owned data contract and independent Video phase plan |
-| Public Workbook removal while retaining redesign knowledge | Settled decision 5 and the full withdrawal surface/retention contract; runtime removal implemented; publication readback pending |
+| Public Workbook removal while retaining redesign knowledge | Settled decision 5 and the full withdrawal surface/retention contract; public runtime removal delivered; source/history retained |
 | Carry decisions forward and distinguish consequential choices | Settled decision 6 and the gated choice table; already-shipped Video persistence/module ownership is not reopened |
 | Verify repository and deployment state | October 3 repository/live audit above, source map and linked evidence in the development assets index; later releases require their own readback |
 
