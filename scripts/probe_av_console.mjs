@@ -161,10 +161,12 @@ try {
   assert.notEqual(await page.getByLabel('Source', { exact: true }).inputValue(), 'Draft camera', 'a draft is offered, not applied');
   assert.equal(JSON.stringify(await readSaved()), savedBefore, 'the saved plan is untouched by drafts');
   await button('Restore draft').click();
+  await page.waitForFunction(() => !document.querySelector('.draft-offer'));
   assert.equal(await page.getByLabel('Source', { exact: true }).inputValue(), 'Draft camera');
   assert.match(await page.getByRole('button', { name: /^Save/ }).textContent(), /•/);
   page.once('dialog', d => d.accept()); await page.reload();
   await button('Discard draft').click();
+  await page.waitForFunction(() => !document.querySelector('.draft-offer'));
   assert.equal(await page.evaluate(() => localStorage.getItem('sbd.avVideo.draft.v1')), null);
   assert.equal(JSON.parse(await page.evaluate(() => localStorage.getItem('sbd.consoleDrafts.v1')))['av-video'], undefined);
   // Unstored layout and the current view are kept on this device across reloads.

@@ -59,7 +59,19 @@ Drafts and layout (`apps/shared/av-console/drafts.ts`):
 - **Unstored layout.** The current view, unstored arrangements and the lock are device-local interface state (AV Video: `sbd.avVideo.layout.v1`). They are restored silently, written only after a change, and never write the plan.
 - **Draft index.** `sbd.consoleDrafts.v1` lists which consoles hold drafts, for the suite rail's draft dots.
 
-Unreadable or malformed draft and layout entries are ignored. Storage failures are reported, never thrown, and Export still covers unsaved work.
+Unreadable or malformed recovery entries are preserved. Invalid cached layout geometry is filtered for display without rewriting the saved plan or original cache. Unknown or disabled panel types retain their definitions. Opening an unchanged workspace does not write its layout.
+
+### Recovery hardening acceptance (2026-10-05)
+
+The baseline at `66b3d66285e6c34c8b1b7db9a087caeec0e7f670` suppressed write/removal failures, allowed tabs to overwrite or clear one another's recovery draft, and rendered unsanitized cached geometry. The regression probe reproduces these failures before the correction.
+
+- Draft mutations compare the exact initially read or last-owned draft bytes under an origin-wide Web Lock. A clean visit never owns or clears another tab's draft. A stale write, restore or discard stops automatic mutations and directs the operator to Export, then reload and review. No document merge or automatic conflict winner is chosen.
+- Browsers without Web Locks keep explicit Save and Export; automatic draft mutations fail closed with a visible warning. Already-open older application versions do not participate in the new lock protocol; reload all AV Video tabs after upgrading.
+- Failed draft writes, removals, layout writes and advisory-index updates are reported distinctly in the existing status footer. Failed removal retains the draft offer and index. Failed index updates do not claim the underlying draft failed. Editing and Export remain usable.
+- Restore cannot replace current unsaved edits. Until an earlier offer is resolved, new edits remain in memory with an explicit recovery warning.
+- Saved document and export schemas and all three existing recovery/layout keys remain unchanged. Recovery is device-local, not a substitute for exported backups.
+
+`probe_av_console_recovery.mjs` covers injected storage failures, malformed geometry, competing tabs, stale discard, clean-tab cleanup, explicit Save, reload, export, keyboard recovery, both palettes and the 720/1100px responsive boundaries. Physical touch and operator acceptance remain separate.
 
 ## Decisions
 

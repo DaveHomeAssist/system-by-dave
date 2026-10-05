@@ -69,7 +69,7 @@ const rect = (p: Rect): Rect => ({ x: p.x, y: p.y, w: p.w, h: p.h });
    another panel, and unknown types are retained but not rendered. */
 export function sanitizeView(view: View): View {
   const kept: Panel[] = [];
-  for (const p of view.panels) if (fits(p, kept)) kept.push(p);
+  for (const p of view.panels) if (!kept.some(q => q.id === p.id) && fits(p, kept)) kept.push(p);
   return { ...view, panels: kept };
 }
 export const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
