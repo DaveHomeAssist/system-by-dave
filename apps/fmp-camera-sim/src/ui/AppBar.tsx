@@ -12,10 +12,11 @@ interface Props {
   onOpen(tab: PanelTab, opener: HTMLElement): void;
   onHelp(): void;
   onToggleTheme(): void;
+  compactVenue?: { shown: boolean; toggle(): void };
 }
 
 /** Title, the persistent evidence flags, panel shortcuts and the theme toggle. */
-export function AppBar({ state, theme, drawerOpen, drawerTab, showPanelButtons, onOpen, onHelp, onToggleTheme }: Props) {
+export function AppBar({ state, theme, drawerOpen, drawerTab, showPanelButtons, onOpen, onHelp, onToggleTheme, compactVenue }: Props) {
   const approximate = state.unsettled.length > 0;
   const exercise = state.exercise;
   return (
@@ -57,6 +58,7 @@ export function AppBar({ state, theme, drawerOpen, drawerTab, showPanelButtons, 
         )}
       </div>
       <nav className="sim-actions" aria-label="Simulator panels">
+        {compactVenue && <button type="button" className="tool-button" aria-pressed={compactVenue.shown} onClick={compactVenue.toggle}>{compactVenue.shown ? "Hide venue view" : "Show venue view"}</button>}
         {showPanelButtons && (
           <>
             <button

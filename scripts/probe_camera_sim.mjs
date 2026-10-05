@@ -15,6 +15,7 @@ import { chromium } from 'playwright';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const results = [];
+const rendererWarnings = [];
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -85,6 +86,7 @@ async function open(options = {}) {
   page.on('pageerror', (error) => problems.push(`pageerror: ${error.message}`));
   page.on('console', (message) => {
     if (message.type() === 'error') problems.push(`console: ${message.text()}`);
+    if (message.type() === 'warning' && /THREE\./.test(message.text())) rendererWarnings.push(message.text());
   });
   await page.goto(options.url || PAGE);
   await page.waitForFunction(() => window.__fmpCameraSim && window.__fmpCameraSim.state().renderStatus !== 'starting', null, { timeout: 30000 });
@@ -1399,6 +1401,7 @@ for (const [label, viewport] of [
   });
 }
 
+record(rendererWarnings.length === 0, 'No THREE renderer warnings across browser scenarios', [...new Set(rendererWarnings)].join(' | '));
 await browser.close();
 server.close();
 const failed = results.filter((result) => !result.ok);

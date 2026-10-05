@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTelemetry } from "../app/hooks";
 import { training, useTraining } from "../app/training";
 import { suggestPresetName } from "../sim/presetName";
@@ -12,10 +13,11 @@ interface Props {
   store: SimulatorStore;
   input: InputController;
   state: StoreState;
+  pictureControls?: ReactNode;
 }
 
 /** Compact SuperJoy-style surface: joystick, zoom, speeds, presets, Home and Stop. */
-export function ControlsPanel({ store, input, state }: Props) {
+export function ControlsPanel({ store, input, state, pictureControls }: Props) {
   const telemetry = useTelemetry(store);
   const { session } = state.project;
   const announcement = state.announcement;
@@ -51,6 +53,7 @@ export function ControlsPanel({ store, input, state }: Props) {
           suggestName={suggestions === "off" ? undefined : (preset) => suggestPresetName(state.geometry, state.project.camera, preset)}
         />
       </div>
+      {pictureControls && <div className="compact-picture-controls"><h3>Picture guides</h3>{pictureControls}</div>}
       <p className={`status-line ${announcement ? `tone-${announcement.tone}` : ""}`} role="status" aria-live="polite" data-testid="status-line">
         {announcement?.text ?? "Ready. Drag the joystick, use the arrow keys, or press ? for shortcuts."}
       </p>

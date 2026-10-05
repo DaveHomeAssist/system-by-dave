@@ -13,6 +13,12 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.13.1 — 2026-10-04 — Landscape phones and renderer warning checks
+
+- Keep the picture beside a scrollable controls column on 720–959 px landscape screens. Joystick and zoom remain visible; presets and settings stay reachable without page overflow.
+- Gate landscape phone geometry and touch movement, and fail browser checks on THREE renderer warnings.
+- Add a copy-paste, read-only device baseline sampler; actual hardware measurements remain an operator task.
+
 ## 1.13.0 — 2026-09-29 — On air: tally and monitor delay
 
 - Take the camera on air with the monitor's Take button or P. The tally lamp on the modelled P240 lights, the monitor gets a red border and an ON AIR chip, and every move while live is counted: separate moves, moves with a zoom and the fastest pan/tilt speed. The first move on air warns in the status line; taking the camera off air reports the take ("Clean take" when it held still). Resetting the session, importing a project or loading another tab's saved copy takes it off air and forgets the take. Counting follows the simulation's own samples, so it is the same at any frame rate.

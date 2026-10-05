@@ -329,6 +329,48 @@ browser, device pixel ratio, refresh rate, the quality level reached, draws per 
 moving, draw calls and JavaScript heap. Repeat with `&render=always` to measure what drawing on
 demand saves. Record the table in the audit-outcomes page.
 
+**One-paste sampler.** Paste this once in the device inspector on `?diagnostics=1`.
+It only reads diagnostics and keeps observations in memory. It sends nothing and changes no session.
+Call `cameraBaseline.sample("idle 60s")`, then `sample("operating 60s")`,
+`sample("venue shown")`, `sample("venue collapsed")`, and after returning from 30 seconds
+in the background, `sample("background 30s")`. Copy `cameraBaseline.json()` into the
+existing audit outcomes record with the physical device, OS, browser and observed heat.
+Refresh or close the page to discard the in-memory sampler. These are real-device observations;
+headless regression timings cannot substitute for them.
+
+```js
+window.cameraBaseline = (() => {
+  const sim = window.__fmpCameraSim;
+  if (!sim) throw new Error("Open the simulator with ?diagnostics=1 first");
+  const started = performance.now();
+  const rows = [];
+  const meta = {
+    release: sim.release(), userAgent: navigator.userAgent,
+    viewport: [innerWidth, innerHeight], pixelRatio: devicePixelRatio,
+    renderMode: new URL(location.href).searchParams.get("render") || "on-demand"
+  };
+  const sample = label => {
+    const row = {
+      label, seconds: +((performance.now() - started) / 1000).toFixed(1),
+      visibility: document.visibilityState, render: sim.render(),
+      heapBytes: performance.memory?.usedJSHeapSize ?? null
+    };
+    rows.push(structuredClone(row));
+    console.log(row);
+    return row;
+  };
+  sample("start");
+  return { sample, json: () => JSON.stringify({ meta, rows }, null, 2) };
+})();
+```
+
+**Landscape-phone release 1.13.1.** At 844 × 390 and 932 × 430 the compact header
+keeps its accuracy flags and all actions. The venue-view toggle moves into that header;
+the picture and joystick share the workspace, while the control column scrolls to presets.
+Chromium gates require a 300 px picture, unchanged page bounds, real touch pan and reachable Stop
+in both themes and with wider text. WebKit repeats landscape geometry and keyboard movement.
+Renderer `THREE.*` warnings now fail both browser checks. Physical Safari remains separate.
+
 ### Release QA and rollback
 
 Before telling operators a release is live, beyond the automated gates:

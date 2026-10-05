@@ -16,7 +16,7 @@ import { ControlsPanel } from "./ControlsPanel";
 import { HelpDialog } from "./HelpDialog";
 import { OnboardingTip, shouldShowOnboarding } from "./OnboardingTip";
 import { keepFocus } from "./keepFocus";
-import { GUIDE_BUTTONS, MonitorPanel } from "./MonitorPanel";
+import { GUIDE_BUTTONS, MonitorPanel, MonitorTools } from "./MonitorPanel";
 import { type PanelTab, SidePanel } from "./SidePanel";
 import { VenuePanel } from "./VenuePanel";
 
@@ -58,6 +58,7 @@ export function App() {
   const { theme, toggle: toggleTheme } = useTheme();
   const layout = useLayoutClass();
   const phone = layout === "phone";
+  const compactLandscape = useMediaQuery("(orientation: landscape) and (min-width: 720px) and (max-width: 959px)");
   const docked = layout === "ultrawide";
   const short = useMediaQuery(SHORT_SCREEN);
 
@@ -256,6 +257,7 @@ export function App() {
         onOpen={openPanel}
         onHelp={() => setHelpOpen(true)}
         onToggleTheme={toggleTheme}
+        compactVenue={compactLandscape ? { shown: venueShown, toggle: () => setVenueShown(value => !value) } : undefined}
       />
       {state.storageNotice && (
         <div className="banner banner-warn" role="alert">
@@ -314,7 +316,7 @@ export function App() {
           onCutaway={() => setCutaway(value => !value)}
           onView={(view: OverviewPreset) => rendererRef.current?.setOverviewView(view, state.geometry)}
         />
-        <ControlsPanel store={store} input={input} state={state} />
+        <ControlsPanel store={store} input={input} state={state} pictureControls={compactLandscape ? <MonitorTools guides={state.project.session.preferences.guides} expanded={expanded} onGuides={patch => store.setGuides(patch)} onToggleExpanded={toggleExpanded} /> : undefined} />
         {phone && mobileTab === "settings" && (
           <div className="phone-utilities" role="group" aria-label="Help, appearance and monitor guides">
             <button type="button" className="tool-button" onClick={() => setHelpOpen(true)} aria-label="Help and keyboard shortcuts">
