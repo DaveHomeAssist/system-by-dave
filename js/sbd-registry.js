@@ -23,7 +23,7 @@
   /* dept = console grouping (fine-grained). storageKeys = localStorage keys the
      tool writes (used by saved-data scan + show-package export/import). */
   var TOOLS=[
-    {id:'av-video',name:'AV Video',href:'av-video/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules.',storageKeys:[{key:'sbd.avVideo.v1',label:'AV Video plan'}],toolboxFeatured:true},
+    {id:'av-video',name:'AV Video',href:'av-video/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules.',storageKeys:[{key:'sbd.avVideo.v1',label:'AV Video plan'},{key:'sbd.avVideo.draft.v1',label:'AV Video unsaved draft'},{key:'sbd.avVideo.layout.v1',label:'AV Video panel layout'}],toolboxFeatured:true},
     {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.pacePresets.v1',label:'Teleprompter saved paces'},{key:'teleprompter.bookmarks.v1',label:'Teleprompter bookmarks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
     {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
     {id:'cue-sheet',name:'Cue Sheet',href:'cue-sheet.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Browser based rundown control with preview, lightweight layered playback, monitor output, capture inputs, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'Cue Sheet state'}]},
@@ -252,7 +252,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261005-stage-slate-default',
+    version:'v20261005-console-drafts',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

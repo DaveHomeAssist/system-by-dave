@@ -50,7 +50,16 @@ The engine owns presentation only. It never reads or writes records. Panel conte
 - An unknown version fails validation, so the plan is protected instead of rewritten.
 - Overlapping or out-of-range panels in a damaged view are dropped at display time; the stored data is left alone.
 
-Live arrangement changes that have not been stored are interface state for this visit. The suite draft store (next step) will keep them across app switches.
+Drafts and layout (`apps/shared/av-console/drafts.ts`):
+
+- **Unsaved record edits.** A console keeps these under its own draft key (AV Video: `sbd.avVideo.draft.v1`), never in its saved document.
+  - On the next visit a draft that differs from the saved plan is **offered**, with Restore draft and Discard draft. It is never applied silently, and the offer says when the saved plan has changed since.
+  - A restored draft is an ordinary unsaved edit, so Save stays explicit.
+  - Saving, or returning to the saved state, clears the draft.
+- **Unstored layout.** The current view, unstored arrangements and the lock are device-local interface state (AV Video: `sbd.avVideo.layout.v1`). They are restored silently, written only after a change, and never write the plan.
+- **Draft index.** `sbd.consoleDrafts.v1` lists which consoles hold drafts, for the suite rail's draft dots.
+
+Unreadable or malformed draft and layout entries are ignored. Storage failures are reported, never thrown, and Export still covers unsaved work.
 
 ## Decisions
 

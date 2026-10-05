@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-05 — Console drafts and layout persistence
+
+- **Draft store.** New `apps/shared/av-console/drafts.ts`, used first by AV Video.
+  - Unsaved record edits are kept under `sbd.avVideo.draft.v1`, never in the saved plan.
+  - On the next visit, a draft that differs from the saved plan is offered with **Restore draft** and **Discard draft**, and says when the saved plan changed since. Nothing is applied silently.
+  - Saving, or returning to the saved state, clears the draft.
+  - `sbd.consoleDrafts.v1` indexes which consoles hold drafts, ready for the suite rail.
+- **Layout persistence.** The current view, unstored panel arrangements and the lock are kept on the device (`sbd.avVideo.layout.v1`). They are written only after a change and never touch the plan.
+- **Registry.** AV Video declares the two new keys. The registry version moves to `v20261005-console-drafts` so offline caches pick up the new bundle, and its dependents are regenerated.
+- **Probes.**
+  - `probe_av_console` covers draft restore and discard, the draft index, plan isolation and layout restore after reload.
+  - The main AV Video probe opens Signal Flow before editing in a second tab, which now lands on the restored view.
+  - The phone check waits for the one-panel layout.
+
 ## 2026-10-05 — Stage Slate is the first-use theme
 
 - **Dark by default.** A first visit to any AV by Dave page now opens in Stage Slate. Warm Paper (light) and System remain available, and a stored `av-theme-mode.v1` choice is never overridden.

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DisplaysPanel } from "./DisplaysPanel";
 import { BusPanel, MultiviewPanel } from "./LivePanels";
 import { BusState, initialBus, sourceAt, switchers } from "./bus";
@@ -8,8 +8,13 @@ import { SignalFields } from "./SignalFields";
 import { createHistory, record, redo, undo } from "./history";
 import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/Workspace";
 import type { PanelDef, View as ConsoleView } from "../../shared/av-console/layout";
-import { applyImport, emptyDocument, LEGACY, loadDocument, Module, newRoute, Preview, previewImport, Route, routeGaps, sampleDocument, saveDocument, STORE, uid, VideoDocument } from "./model";
+import { clearDraft, readDraft, readLayout, writeDraft, writeLayout } from "../../shared/av-console/drafts";
+import { applyImport, emptyDocument, LEGACY, loadDocument, parseDocument, Module, newRoute, Preview, previewImport, Route, routeGaps, sampleDocument, saveDocument, STORE, uid, VideoDocument } from "./model";
 
+/* Draft store (docs/av-console.md): unsaved record edits and unstored layout. */
+const CONSOLE_ID = "av-video";
+const DRAFT_KEY = "sbd.avVideo.draft.v1";
+const LAYOUT_KEY = "sbd.avVideo.layout.v1";
 type PanelType = "flow" | "patch" | "inspector" | "displays" | "checks" | "project" | "bus" | "multiview";
 /* Panel library and the starting arrangements (docs/av-console.md). Views are
    stored in the plan only after Store or Update; these defaults cost nothing. */
@@ -59,7 +64,22 @@ export function App() {
   const dialog = useRef<HTMLDialogElement>(null);
   const importTrigger = useRef<HTMLElement | null>(null);
   const library = LIBRARY.filter(d => !d.module || doc.modules[d.module as Module]);
-  const ws = useConsoleWorkspace(doc.workspace?.views || DEFAULT_VIEWS, library);
+  const layoutPersist = useMemo(() => {
+    let saved = null; try { saved = readLayout(localStorage, LAYOUT_KEY); } catch { /* storage unavailable */ }
+    return { initial: saved, save: (state: Parameters<typeof writeLayout>[2]) => { try { writeLayout(localStorage, LAYOUT_KEY, state); } catch { /* layout is a convenience */ } } };
+  }, []);
+  const ws = useConsoleWorkspace(doc.workspace?.views || DEFAULT_VIEWS, library, layoutPersist);
+  /* A draft that differs from the saved plan is offered, never applied silently. */
+  const [draftOffer, setDraftOffer] = useState(() => {
+    try { const d = readDraft(localStorage, DRAFT_KEY, CONSOLE_ID, value => parseDocument(JSON.stringify(value))); return d && JSON.stringify(d.doc) !== JSON.stringify(initial.doc) ? d : null; } catch { return null; }
+  });
+  useEffect(() => {
+    if (draftOffer) return; // keep the earlier draft until the operator restores or discards it
+    const timer = setTimeout(() => { try { if (dirty) writeDraft(localStorage, DRAFT_KEY, CONSOLE_ID, doc, baseline.current, doc.title); else clearDraft(localStorage, DRAFT_KEY, CONSOLE_ID); } catch { /* drafts are best effort; Export still works */ } }, 400);
+    return () => clearTimeout(timer);
+  }, [doc, dirty, draftOffer]);
+  function restoreDraft() { if (!draftOffer) return; update(draftOffer.doc); setDraftOffer(null); notify("Draft restored. Save to keep it in this browser."); }
+  function discardDraft() { try { clearDraft(localStorage, DRAFT_KEY, CONSOLE_ID); } catch { /* nothing to clear */ } setDraftOffer(null); notify("Draft discarded. The saved plan is unchanged."); }
   const show = (type: PanelType) => ws.show(type);
   /* Live switcher state: what is on program, preview and each AUX. Held for
      this visit only; layout and view changes never touch it. */
@@ -199,6 +219,7 @@ export function App() {
       <div className="header-actions"><label className="theme-label"><span>Theme</span><select aria-label="Theme" value={theme} onChange={e => changeTheme(e.target.value)}><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label><button type="button" className="primary" onClick={save}>Save{dirty ? " •" : ""}</button><button type="button" onClick={exportDoc}>Export</button></div>
     </header>
     <div className="plan-bar"><div className="plan-summary"><strong title={doc.title}>{doc.title}</strong><span>{doc.routes.length} routes · {doc.displays.length} destinations · {dirty ? "Unsaved changes" : baseline.current ? "Saved in this browser" : "New plan"}</span></div><div className="history-actions" aria-label="Edit history"><button type="button" onClick={undoEdit} disabled={!history.past.length} title="Undo (⌘/Ctrl Z)">↶ Undo</button><button type="button" onClick={redoEdit} disabled={!history.future.length} title="Redo (⌘/Ctrl Shift Z)">↷ Redo</button></div></div>
+    {draftOffer && <div className="draft-offer" role="alert"><p><strong>Unsaved edits</strong> from {new Date(draftOffer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device{draftOffer.baseline !== baseline.current ? ". The saved plan has changed since they were made" : ""}. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={restoreDraft}>Restore draft</button><button type="button" onClick={discardDraft}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
       <ConsoleWorkspace ws={ws} label="AV Video" quick={quick} render={renderPanel} onViewsChange={storeViews} notify={text => notify(text)} />
     </main>

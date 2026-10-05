@@ -131,7 +131,7 @@ try {
   await page.getByRole('status').filter({ hasText: 'Choose an AV Video' }).waitFor();
   assert.deepEqual(await readSaved(), exported);
   // Stale-tab writer cannot overwrite a later save.
-  const second = await context.newPage(); await second.goto(url); await second.getByRole('button', { name: 'Edit route', exact: true }).click(); await second.getByLabel('Source', { exact: true }).fill('Later tab source');
+  const second = await context.newPage(); await second.goto(url); await second.getByRole('button', { name: 'Signal flow', exact: true }).click(); await second.getByRole('button', { name: 'Edit route', exact: true }).click(); await second.getByLabel('Source', { exact: true }).fill('Later tab source');
   await second.getByRole('button', { name: /^Save/ }).click();
   await button('Signal flow').click(); await button('Edit route').click(); await page.getByLabel('Source', { exact: true }).fill('Stale tab source'); await save();
   assert.match(await page.getByRole('status').textContent(), /another tab/);
