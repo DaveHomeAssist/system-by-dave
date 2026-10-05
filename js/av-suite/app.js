@@ -203,15 +203,15 @@ function cycleBrand(){
    ============================================================ */
 function hasShowContext(params){return SHOW_CONTEXT_PARAMS.some(function(name){return params.has(name);});}
 function explicitEntryFromLocation(){var params=new URLSearchParams(window.location.search);if(hasShowContext(params)) return 'show';var entry=params.get('entry');return entry==='show'||entry==='toolbox'||entry==='frontoffice'?entry:'';}
-function resolvedEntryFromLocation(){var explicit=explicitEntryFromLocation();if(explicit) return explicit;if(window.history.state&&window.history.state.avEntry==='chooser') return '';return uiState.preferredEntry||'toolbox';}
+function resolvedEntryFromLocation(){var explicit=explicitEntryFromLocation();if(explicit) return explicit;if(window.history.state&&window.history.state.avEntry==='chooser') return '';return 'toolbox';}
 function entryUrl(mode){var url=new URL(window.location.href);url.searchParams.set('entry',mode);if(mode!=='show') SHOW_CONTEXT_PARAMS.forEach(function(name){url.searchParams.delete(name);});return url.pathname+url.search+url.hash;}
-function updateEntryDefaultNote(){var note=$('entryDefaultNote');if(!note) return;note.textContent=uiState.preferredEntry?(uiState.preferredEntry==='toolbox'?'Default doorway: AV Toolbox.':'Default doorway: Show Console.'):'Default doorway: AV Toolbox.';}
+function updateEntryDefaultNote(){var note=$('entryDefaultNote');if(!note) return;note.textContent='Default doorway: AV Toolbox.';}
 function openEntryChooser(){entryState.lastFocus=document.activeElement;entryState.chooserOpen=true;updateEntryDefaultNote();$('entryCloseBtn').hidden=!entryState.mode;$('entryChooser').hidden=false;setModalBackgroundInert(true);window.setTimeout(function(){var first=$('entryChooser').querySelector('[data-entry-choice]');if(first) first.focus();},0);}
 function closeEntryChooser(restoreFocus){if(!entryState.chooserOpen||!entryState.mode) return;entryState.chooserOpen=false;$('entryChooser').hidden=true;setModalBackgroundInert(false);if(restoreFocus!==false&&entryState.lastFocus&&entryState.lastFocus.focus) entryState.lastFocus.focus();entryState.lastFocus=null;}
 function animateWorkspace(){var regions=Array.prototype.filter.call($('avApp').querySelectorAll('[data-workspace-region]'),function(el){return !el.hidden&&getComputedStyle(el).display!=='none';});var reduced=Boolean(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);if(window.gsap&&typeof window.gsap.killTweensOf==='function'){window.gsap.killTweensOf(regions);if(reduced){window.gsap.set(regions,{clearProps:'transform,opacity'});return;}window.gsap.fromTo(regions,{opacity:0,y:12},{opacity:1,y:0,duration:.28,stagger:.04,ease:'power2.out',clearProps:'transform,opacity',overwrite:true});return;}regions.forEach(function(el){el.style.removeProperty('opacity');el.style.removeProperty('transform');});}
 function applyEntryMode(mode,options){if(mode!=='show'&&mode!=='toolbox'&&mode!=='frontoffice') return;options=options||{};entryState.mode=mode==='show'?'show':'toolbox';viewState.context=mode==='frontoffice'?'office':(mode==='toolbox'?'shop':'show');$('avApp').setAttribute('data-entry',entryState.mode);if(mode==='show'&&!viewState.fam) viewState.fam=defaultFamilyForPhase();if(mode!=='show'&&!$('onboardOverlay').hidden){$('onboardOverlay').hidden=true;setModalBackgroundInert(false);obState.step=0;}renderAll();animateWorkspace();if(options.focusMain){window.setTimeout(function(){$('main-content').focus();},0);}if(mode==='show'&&options.allowOnboarding&&!uiState.onboardingSeen) window.setTimeout(openOnboarding,0);}
-function chooseEntry(mode){uiState.preferredEntry=mode;writeUi({preferredEntry:mode});entryState.chooserOpen=false;$('entryChooser').hidden=true;setModalBackgroundInert(false);window.history.pushState({avEntry:mode},'',entryUrl(mode));applyEntryMode(mode,{focusMain:true,allowOnboarding:true});entryState.lastFocus=null;}
-function navigateEntry(mode){if(mode!=='show'&&mode!=='toolbox') return;uiState.preferredEntry=mode;writeUi({preferredEntry:mode});window.history.pushState({avEntry:mode},'',entryUrl(mode));applyEntryMode(mode,{focusMain:true,allowOnboarding:mode==='show'});}
+function chooseEntry(mode){entryState.chooserOpen=false;$('entryChooser').hidden=true;setModalBackgroundInert(false);window.history.pushState({avEntry:mode},'',entryUrl(mode));applyEntryMode(mode,{focusMain:true,allowOnboarding:true});entryState.lastFocus=null;}
+function navigateEntry(mode){if(mode!=='show'&&mode!=='toolbox') return;window.history.pushState({avEntry:mode},'',entryUrl(mode));applyEntryMode(mode,{focusMain:true,allowOnboarding:mode==='show'});}
 function handleEntryPopstate(){var mode=resolvedEntryFromLocation();if(!mode){openEntryChooser();return;}if(entryState.chooserOpen){entryState.chooserOpen=false;$('entryChooser').hidden=true;setModalBackgroundInert(false);}if(mode==='show') applyUrlContext();applyEntryMode(mode,{focusMain:true,allowOnboarding:false});}
 
 /* ============================================================
@@ -495,7 +495,7 @@ function renderHeader(){
   $('phaseStrip').innerHTML=PHASES.map(function(p){return '<button type="button" data-phase="'+p.id+'" aria-pressed="'+String(state.phase===p.id)+'" data-on="'+(state.phase===p.id?'1':'0')+'">'+escapeHtml(p.label)+'</button>';}).join('');
   applyShellTheme();
   $('helpBtn').setAttribute('aria-pressed',String(uiState.help));
-  ['hbFile','hbFams','hbProfile','hbRecs'].forEach(function(id){$(id).hidden=!uiState.help;});
+  ['hbFams','hbProfile','hbRecs'].forEach(function(id){$(id).hidden=!uiState.help;});
 }
 
 /* ============================================================
@@ -536,9 +536,6 @@ function renderMobileFamStrip(){
   wrap.innerHTML=FAMILIES.map(function(fam){var on=(viewState.context==='show'&&viewState.view==='family'&&viewState.fam===fam.id)||(viewState.context==='shop'&&toolboxState.family===fam.id);return '<button type="button" class="mob-fam-btn" data-fam-select="'+fam.id+'" aria-pressed="'+String(on)+'">'+escapeHtml(fam.label)+'</button>';}).join('');
 }
 function renderRail(){
-  var wb=toolById('av-workbook');
-  var link=$('railWorkbookLink');
-  if(wb){link.setAttribute('href',toolHref(wb));link.setAttribute('data-tool','av-workbook');}
   renderPinList();
   renderFamilyList();
   renderMobileFamStrip();
@@ -619,9 +616,7 @@ function renderAllView(){
   $('allViewVersion').textContent='Registry '+(REG.version||'');
   function cardHtml(tool){var ready=toolReadiness(tool.id);var pinned=state.favorites.indexOf(tool.id)>=0;var dot=ready==='ready'||ready==='issue'?'<span class="stdot st-'+ready+'"></span>':(ready==='skipped'?'<span class="stdot st-skipped"></span>':'');return '<div class="allcard">'+dot+'<a href="'+escapeAttr(toolHref(tool))+'" data-tool="'+tool.id+'">'+escapeHtml(tool.name)+'</a><span class="ac-tag">'+escapeHtml(tool.tag)+'</span><button type="button" class="pinbtn" data-pin="'+tool.id+'" aria-pressed="'+String(pinned)+'" title="'+(pinned?'Unpin ':'Pin ')+escapeAttr(tool.name)+'"><svg class="ic" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M12 2 9 9l-6 1 4.5 4L6 21l6-3.5L18 21l-1.5-7L21 10l-6-1z"/></svg></button></div>';}
   var groupsHtml='';
-  var wb=toolById('av-workbook');
   function groupHead(icon,label,count,dept){var d=escapeHtml(label);return '<div class="allgroup-head">'+(icon?iconSvg(icon,15):'')+'<h3>'+d+'</h3><span class="n">'+count+'</span><span class="d">'+escapeHtml(dept)+'</span></div>';}
-  if(wb&&visibleIds[wb.id]) groupsHtml+='<div class="allgroup">'+groupHead(null,'Workbook','1 tool','Spine')+'<div data-r="allgrid">'+cardHtml(wb)+'</div></div>';
   FAMILIES.forEach(function(fam){
     var tools=familyTools(fam).filter(function(t){return visibleIds[t.id];});
     if(!tools.length) return;
@@ -731,7 +726,6 @@ function renderAsideNoShow(){
 var HELP_LEGEND=[
   {n:1,title:'Families',body:'Fourteen families organize the '+TOOLS.length+'-tool registry. Tools with modes nest underneath — expand the chevron.'},
   {n:2,title:'Show profile',body:'Set once. Every tool link carries this context in the URL and prefills on open.'},
-  {n:3,title:'Workbook',body:'The show file every other tool reads and writes. It sits above the families, not inside one.'},
   {n:4,title:'Recommendations',body:'Driven by the current phase. Each card cites the rule or saved-data key that produced it, so the suggestion is auditable.'},
   {n:5,title:'Review queue',body:'Blockers, pending phase tools and saved-data risks collect here. Copy it as a handoff.'}
 ];

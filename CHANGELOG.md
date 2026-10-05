@@ -3,11 +3,35 @@
 ## 2026-10-04 — Illustrated Tools directory (draft for review)
 
 - Revive the unmerged `codex/tools-card-preview-20260923` work: the Tools directory becomes a five-column illustrated card grid (four, three and two columns as the viewport narrows) with category badges, 44px filter chips, visible keyboard focus and the same destinations and filters. The hero, filters, grid and notes share the public header's width and left edge at every breakpoint.
-- Badges for AV registry tools show the registry's navigation department (Music, Run of show, Logistics, Workbook, Video, Graphics); other projects keep their directory categories. `verify:av` checks the registry badges and `verify:public-navigation` checks the shared width.
-- Order cards by daily AV operation, AV references and apps, Notion, labs, then apps, games and trackers; titles show only the product name, the count reads visible out of 34 projects, and the AV Toolbox link sits below the grid with the registry count of 46.
-- Add AV Video beside AV Workbook. It has no artwork yet, so it uses a monogram text card in the same grid; any future tool without artwork gets the same treatment.
+- Badges for AV registry tools show the registry's navigation department (Music, Run of show, Logistics, Video, Graphics); other projects keep their directory categories. `verify:av` checks the registry badges and `verify:public-navigation` checks the shared width.
+- Order cards by daily AV operation, AV references and apps, Notion, labs, then apps, games and trackers; titles show only the product name, the count reads visible out of 33 projects, and the AV Toolbox link sits below the grid with the registry count of 45. Workbook stays withdrawn: it has no card.
+- Add AV Video beside Gear Reference. It has no artwork yet, so it uses a monogram text card in the same grid; any future tool without artwork gets the same treatment.
 - Serve the two illustration atlases as WebP (2.88 MB of PNG down to 262 KB) with sprite geometry that keeps every icon's native aspect ratio, and render every card in the HTML so the directory works without JavaScript; filtering only hides cards.
 - Fade in the first 12 visible cards with the vendored GSAP build, skipped entirely under reduced motion and when GSAP is unavailable.
+
+## 2026-10-04 — Withdraw the public AV Workbook
+
+- Remove Workbook from Toolbox, Show Console, shared navigation, the public directory, sitemap and offline assets.
+- Return all former Workbook entry URLs on both origins directly to Toolbox without reading or modifying browser data.
+- Retain source and its 60 tests; build only into ignored app-local output and reject source/editor bundles in publication artifacts.
+- Verify the withdrawal across 56 domain cutover browser cases, including stored-record preservation.
+
+## 2026-10-04 — Toolbox for every neutral visit
+
+- Open Toolbox on neutral returning visits, preserving explicit Show links and saved show data. Retain but ignore the legacy doorway preference.
+- Gate AV themes, Calculator interactions, navigation parity and the Toolbox persistence contract on pull requests.
+- Fix unreadable light-mode route inspector cards in Power, Network, Signal Flow and RF; desktop checks now cover them.
+
+## 2026-10-04 — Clear start and resume labels in the preshow walk
+
+- Export canonical FMP source `9d5167aab3e880584c6811051c8ce6263a880032`: fresh/setup-only walks show Start walk; recorded observations and route progress show Resume walk. Reload retains observations and reset restores Start walk.
+- Refresh both managed release provenance records from the same verified source.
+
+## 2026-10-04 — Remove private workspace material from public source
+
+- Remove private property documents and cross-project workspace dashboards from the current public tree; preserve recovery material privately. Earlier Git revisions are unchanged.
+- Replace absolute local user paths in public reference material with a neutral workspace label.
+- Check tracked source on every pull request and check the staged Pages artifact for private workspace files and absolute local user paths before publication.
 
 ## 2026-10-04 — Cheesesteak hidden-canvas safety
 

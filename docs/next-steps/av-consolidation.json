@@ -1,22 +1,22 @@
 {
   "id": "av-consolidation",
-  "name": "AV Suite — Toolbox & consolidation",
+  "name": "AV Suite \u2014 Toolbox & consolidation",
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "1adc8846653c72e0ad115c4941c809bac1c79cf1",
+  "head": "2d759db198ecfad49f8fd7bddadc107559695202",
   "status": "amber",
-  "statusReason": "Viewport delivery complete; returning-neutral Toolbox and public Workbook withdrawal remain open. Physical acceptance and broader consolidation are separate.",
+  "statusReason": "Neutral Toolbox routing and viewport contracts merged in #256. Workbook withdrawal is implemented and verified locally; publication and live readback pending.",
   "lastActivity": "2026-10-04",
   "shipped": [
-    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
-    "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
+    "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
     "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit.",
     "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan."
   ],
   "nextStep": {
-    "title": "Close returning-neutral Toolbox, then public Workbook withdrawal",
-    "why": "These settled product decisions still have implementation gaps, independently of the completed viewport refactors.",
+    "title": "Publish and verify Workbook withdrawal; continue independent Video modules",
+    "why": "Stage 1 source implementation is complete; live proof closes its gate before remaining app slices.",
     "doneWhen": "Saved Show preference plus a neutral URL opens Toolbox; explicit Show links work; Workbook promotion/editor artifacts are withdrawn and former routes return to Toolbox without changing browser data.",
     "effort": "M",
     "owner": "Codex",
@@ -28,7 +28,7 @@
       "type": "logic",
       "sev": "P1",
       "title": "One Show Console visit permanently defeats the Toolbox default",
-      "detail": "Live readback 2026-10-04: fresh neutral entry is Toolbox; a controlled saved preferredEntry=show fixture still opens Show Console. js/av-suite/app.js still honors and writes preferredEntry.",
+      "detail": "Implemented and merged in PR #256. Returning neutral visits open Toolbox; explicit Show/context/history journeys and saved dashboard preservation pass.",
       "files": [
         "js/av-suite/app.js",
         "js/av-suite/app.js"
@@ -41,7 +41,7 @@
       "type": "infra",
       "sev": "P1",
       "title": "Release probe enforces the old saved-Show precedence",
-      "detail": "Source review at 1adc884; original audit wording follows, exact counts/line references are historical. probe_av_suite_responsive.js fails unless a saved Show preference opens Show Console on a neutral URL; Pages CI runs it. Invert it with the AVC-01 fix.",
+      "detail": "Implemented and merged in PR #256. Returning neutral visits open Toolbox; explicit Show/context/history journeys and saved dashboard preservation pass.",
       "files": [
         "scripts/probe_av_suite_responsive.js",
         ".github/workflows/deploy-pages.yml"
@@ -54,7 +54,7 @@
       "type": "feature",
       "sev": "P1",
       "title": "AV Workbook still promoted and served publicly",
-      "detail": "Live readback 2026-10-04 finds a visible Workbook link in both fresh Toolbox and saved Show Console. The maintained withdrawal requirement remains open; viewport work did not withdraw Workbook.",
+      "detail": "Implemented in the withdrawal candidate: no registry/discovery/offline Workbook, no published source/editor bundle, and all former URLs redirect directly to Toolbox. 56 domain browser cases and 60 retained source tests pass; deployment readback remains.",
       "files": [
         "js/sbd-registry.js",
         "av-suite.html",
@@ -68,7 +68,7 @@
       "type": "infra",
       "sev": "P1",
       "title": "Workbook ships via Pages rsync, offline cache, sitemap, staging",
-      "detail": "Source review at 1adc884; original audit wording follows, exact counts/line references are historical. rsync stages the whole repo (apps/av-workbook source + av-workbook/ bundle); offlineAssets cache it (L168-171); gen_sitemap.py:36 and avbydave pages list it.",
+      "detail": "Implemented in the withdrawal candidate: no registry/discovery/offline Workbook, no published source/editor bundle, and all former URLs redirect directly to Toolbox. 56 domain browser cases and 60 retained source tests pass; deployment readback remains.",
       "files": [
         ".github/workflows/deploy-pages.yml",
         "js/sbd-registry.js",
@@ -108,7 +108,7 @@
       "type": "docs",
       "sev": "P3",
       "title": "CLAUDE.md and doorway doc encode saved-entry precedence",
-      "detail": "Source review at 1adc884; original audit wording follows, exact counts/line references are historical. CLAUDE.md 'an explicitly saved entry preference is honored' and av-suite-doorway.md:18 describe current code, not the settled neutral-to-Toolbox rule.",
+      "detail": "Implemented and merged in PR #256. Returning neutral visits open Toolbox; explicit Show/context/history journeys and saved dashboard preservation pass.",
       "files": [
         "CLAUDE.md",
         "docs/av-suite-doorway.md"
@@ -119,35 +119,35 @@
   ],
   "phases": [
     {
-      "name": "Stage 1a — Returning-neutral Toolbox",
+      "name": "Stage 1a \u2014 Returning-neutral Toolbox",
       "goal": "Implement the settled default while preserving explicit entries and saved data.",
       "items": [
-        "AVC-01 / AVC-02 / AVC-13 remain open.",
-        "Fresh neutral entry already opens Toolbox; returning saved Show preference is the remaining gap."
+        "Implemented and merged in PR #256; source CI green.",
+        "Fresh and returning neutral entry opens Toolbox with explicit Show/context/history support."
       ],
       "gate": "Returning neutral entry opens Toolbox and explicit Show/context/history journeys pass."
     },
     {
-      "name": "Stage 1b — Public Workbook withdrawal",
+      "name": "Stage 1b \u2014 Public Workbook withdrawal",
       "goal": "Remove public promotion and editor publication under the maintained plan.",
       "items": [
-        "AVC-03 / AVC-04 remain open.",
-        "Preserve source/history and browser data; no separate recovery or migration project."
+        "Implementation and local artifact/browser checks pass; live release pending.",
+        "Source/history and browser data retained; no dedicated migration or recovery project."
       ],
       "gate": "Staged and live former entry URLs return to Toolbox; no promoted/public editor remains."
     },
     {
-      "name": "Viewport delivery — Complete",
+      "name": "Viewport delivery \u2014 Complete",
       "goal": "Record delivered layout work independently from application consolidation.",
       "items": [
-        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
-        "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
+        "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
         "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit."
       ],
       "gate": "Release proof is recorded; physical/operator acceptance remains separate."
     },
     {
-      "name": "Remaining application consolidation — Planned",
+      "name": "Remaining application consolidation \u2014 Planned",
       "goal": "Follow the maintained spec; do not reopen settled app ownership.",
       "items": [
         "Cameras/Playback, then Stream/Record belong to AV Video.",
@@ -262,7 +262,7 @@
   "short": "AV Suite",
   "evidence": {
     "checkedOn": "2026-10-04",
-    "sourceRevision": "1adc8846653c72e0ad115c4941c809bac1c79cf1",
+    "sourceRevision": "f6df6ebca4450a0ad405cfb422316bc2fa36c105",
     "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
     "sources": [
       "docs/av-suite-consolidation-spec.md",
@@ -281,6 +281,13 @@
     "limits": [
       "Physical/operator acceptance remains open.",
       "Stored full viewport matrices and final catalog-navigation results were inspected as delivery evidence, not rerun in this reconciliation."
+    ],
+    "candidateBranch": "codex/av-neutral-and-pr-checks-20261004",
+    "candidateChecks": [
+      "Toolbox responsive and returning legacy-preference isolation passed at 390/680/1280px",
+      "Navigation parity passed across 46 tools at 375/1440px",
+      "Themes passed across 47 surfaces in light/dark at 390/1280px",
+      "Calculator functional browser checks passed"
     ]
   },
   "historicalFindings": [
@@ -337,22 +344,22 @@
     {
       "id": "AVC-D1",
       "question": "D1 [unlocks fix PR]: no-scroll rule everywhere incl. ~35 worksheets, or only calculators, workspaces and the Suite?",
-      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
     },
     {
       "id": "AVC-D2",
       "question": "D2 [unlocks]: AV Workbook - withdrawal settled 10-02, dark lock gone; confirm it is simply excluded from mobile fixes?",
-      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
     },
     {
       "id": "AVC-D3",
       "question": "D3 [unlocks]: Throwline+LED already got the shell (#226); confirm, and pick next adopter: AV Video, Show Console or worksheets?",
-      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
     },
     {
       "id": "AVC-D5",
       "question": "D5: theme toggle for ~38 tools in shared nav, no new storage key - placement OK, and must every worksheet support both palettes?",
-      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
     }
   ]
 }

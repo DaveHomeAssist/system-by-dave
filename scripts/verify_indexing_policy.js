@@ -21,6 +21,8 @@ function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === '.git' || entry.name === 'node_modules' || entry.name === '_hat-in-ring-src') continue;
     const absolute = path.join(dir, entry.name);
+    // Retained Workbook verification output is ignored and excluded from every publish artifact.
+    if (path.relative(ROOT, absolute) === path.join("apps", "av-workbook", "dist")) continue;
     if (entry.isDirectory()) walk(absolute, out);
     else if (entry.isFile() && entry.name.endsWith('.html')) {
       out.push(path.relative(ROOT, absolute).split(path.sep).join('/'));
@@ -61,7 +63,7 @@ const robots = read('robots.txt');
 // /fmp/walk/ redirect to the walk's own origin from 2026-10-01, and the five noindex pages of the
 // managed /cheesesteaks/ static export (map, rankings, neighborhoods, methodology, about) from 2026-10-01.
 // AV Video adds its source page and AV-origin generated application on 2026-10-02.
-if (unlisted.length !== 154) fail(`Expected 154 tracked routes outside the sitemap; found ${unlisted.length}.`);
+if (unlisted.length !== 145) fail(`Expected 145 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 // The count above only detects new unlisted routes; this enforces the documented policy itself
 // (scripts/indexing_policy.js) for every one of them.
@@ -78,7 +80,6 @@ unlisted.forEach((file) => {
   '/apps/av-video/',
   '/apps/fmp-camera-sim/',
   '/camera-sim/',
-  '/cross-project-actions.html',
   '/fmp-index/',
   '/fmp/',
   '/fmp-walk/',
@@ -121,7 +122,7 @@ hatFiles.forEach((file) => {
 });
 
 [
-  ['av-workbook.html', `${originFor('av-workbook/')}/av-workbook/`],
+  ['av-workbook.html', 'https://avbydave.com/av-suite.html'],
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],
@@ -148,7 +149,6 @@ if (!fmpIndexAlias.includes('location.replace("/fmp/" + location.search + locati
 if (canonical(fmpIndexAlias) !== `${originFor('fmp/')}/fmp/`) fail('fmp-index/index.html canonical does not match its redirect target.');
 if (sitemapRoutes.has('/fmp-index/')) fail('fmp-index/index.html appears in the sitemap.');
 
-if (!hasNoIndex(read('cross-project-actions.html'))) fail('cross-project-actions.html is missing noindex.');
 if (!hasNoIndex(read('html/sbd-brand.html'))) fail('html/sbd-brand.html is missing noindex.');
 
 if (failures.length) {

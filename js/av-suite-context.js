@@ -88,7 +88,7 @@
       {name:'Crew Time Log',href:'crew-time-log.html'}
     ]
   };
-  var ROUTE_ALIASES={'av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
+  var ROUTE_ALIASES={};
 
   /* Prefer js/sbd-registry.js (single source of truth) when a page loads it
      before this script; the literals above remain as a fallback so the dock

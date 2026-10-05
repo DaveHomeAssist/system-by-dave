@@ -57,7 +57,7 @@ handoffs.
 - `js/sbd-nav.js`, `js/av-suite-context.js`, `js/sbd-handoff.js`: shared AV
   navigation, show context, and cross-tool handoff behavior
 - `apps/av-workbook/`: React/TypeScript source for AV Workbook
-- `av-workbook/`: generated AV Workbook Pages artifact
+- `av-workbook/`: noindex redirect to Toolbox; no editor artifact
 - `apps/fmp-camera-sim/`: React/TypeScript/Three.js source for the FMP Camera
   Simulator; `camera-sim/` is its generated artifact (published on housevideo.app)
 - `ProjectorThrow/`: Throwline planner and Stage 3D companion
@@ -84,7 +84,7 @@ metadata, and title families are release-gated by the public content contract.
 
 `av-suite.html` is one doorway with two addressable workspaces: Show Console at
 `?entry=show` and the show-independent AV Toolbox at `?entry=toolbox`. A neutral
-first visit opens Toolbox; an explicitly saved entry preference is honored; any explicit `sbd*` show parameter
+visit opens Toolbox, including returning visits with a legacy entry preference; any explicit `sbd*` show parameter
 forces Show Console. The registry drives both workspaces' tool inventory,
 storage metadata, navigation, offline assets, and generated sitemap entries.
 Toolbox-only pins, recents, search, and filter preferences live in
@@ -115,7 +115,9 @@ practice and the Camera Simulator under `fmpTraining.v1`
 
 ### Built and managed products
 
-AV Workbook is edited in `apps/av-workbook/` and built into `av-workbook/`.
+AV Workbook source is retained in `apps/av-workbook/` and builds into its ignored
+`dist/` for verification. Neither source nor editor bundles are published.
+`av-workbook.html` and `av-workbook/` return directly to Toolbox without touching saved data.
 The FMP Camera Simulator is edited in `apps/fmp-camera-sim/` and built into
 `camera-sim/` (plus its standalone offline HTML) with `npm run build:camera-sim`;
 it sits beside `/shader/` rather than in the managed `fmp/` export. Its release log,

@@ -8,7 +8,7 @@ file path in the repo. It assumes no prior conversation context — everything n
 ## Who you are and where you are
 
 You are Codex (GPT-5.6 Ultra) working inside the repository at
-`/Users/daverobertson/Code/system-by-dave` — **System by Dave**, a personal workflow/tooling site
+`[local workspace]/Code/system-by-dave` — **System by Dave**, a personal workflow/tooling site
 (`systembydave.com`, GitHub Pages). Read `AGENTS.md` and `CLAUDE.md` in the repo root before
 touching anything — they define coding conventions, the page inventory, and the shared
 architecture (`css/style.css` for shared styles, `js/sbd-registry.js` as the single source of
