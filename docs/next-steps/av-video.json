@@ -4,15 +4,16 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
+  "head": "66b3d66285e6c34c8b1b7db9a087caeec0e7f670",
   "status": "amber",
-  "statusReason": "Theme, Calculator, navigation and persistence probes now gate relevant PRs. Desktop inspector contrast was fixed and checks pass on the published release. Remaining Video capabilities and physical acceptance remain open.",
-  "lastActivity": "2026-10-04",
+  "statusReason": "AV Video's console, Stage Slate default, drafts and device-local layout persistence are published. RAIL-1B now fixes the future application rail at nine source-ordered console slots with production-unbuilt entries marked Planned; Rail implementation, two interaction choices, remaining Video capabilities and physical acceptance remain open.",
+  "lastActivity": "2026-10-05",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
     "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit.",
-    "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan."
+    "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan.",
+    "The shared console workspace, Stage Slate first-use theme, offered draft recovery and device-local layout persistence shipped through #264 at 66b3d66; source deployment 37282446471 and AV deployment 37286283303 succeeded."
   ],
   "nextStep": {
     "title": "Deliver Cameras and Playback, then Stream and Record",
@@ -103,6 +104,20 @@
         "CHANGELOG.md"
       ],
       "evidence": "doc",
+      "phase": 4
+    },
+    {
+      "id": "AVV-15",
+      "type": "decision",
+      "sev": "P1",
+      "title": "RAIL-1B fixes nine console slots; responsive and customization profiles remain open",
+      "detail": "Dave selected RAIL-1B on 2026-10-05: Toolbox; AV Video, Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator; then All apps and Customize. At 66b3d66 only AV Video is a production console, so the other eight slots must be visibly Planned and status-only. RAIL-2 and RAIL-3 still decide literal-v3 versus adapted phone navigation and customization behavior; no Rail implementation is claimed.",
+      "files": [
+        "docs/2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md",
+        "docs/av-console.md",
+        "js/sbd-registry.js"
+      ],
+      "evidence": "doc",
       "phase": 3
     }
   ],
@@ -136,6 +151,16 @@
       "gate": "PRs #237\u2013#243 merged; both destination/source deployment evidence verified. Unselected catalog tools are not claimed refactored."
     },
     {
+      "name": "Application rail \u2014 Design decision recorded",
+      "goal": "Carry the complete v3 console order without presenting planned consoles as available products.",
+      "items": [
+        "RAIL-1B selected October 5: nine source-ordered console slots appear by default between fixed Toolbox and All apps / Customize controls.",
+        "At the current production baseline only AV Video is available; Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator are Planned/status-only console identities.",
+        "RAIL-2 and RAIL-3 remain open for responsive rail presentation and local customization; implementation, tests, merge and deployment have not started."
+      ],
+      "gate": "Resolve RAIL-2 and RAIL-3, then implement from the source-aligned brief without fabricated routes, documents, storage or readiness."
+    },
+    {
       "name": "Physical and operator acceptance \u2014 Open",
       "goal": "Complete the real device and venue checks automation cannot establish.",
       "items": [
@@ -147,6 +172,8 @@
     }
   ],
   "decisionsForDave": [
+    "RAIL-2 [needed before Rail implementation]: A) use an Apps dialog below 720px and a labeled rail at 1440px+ (recommended for usable phone width), or B) keep literal v3's persistent 56px icon rail at every width?",
+    "RAIL-3 [needed before Rail implementation]: A) implement local pin/unpin/reorder/reset in sbd.rail.v1 (recommended for reversible operator preferences), or B) keep literal v3's fixed order with Customize as future status only?",
     "Retire the 8 legacy Video pages once AV Video imports all 8 keys, or keep them live indefinitely?",
     "Minimum iOS/iPadOS for field use: 17.4+ (checkVisibility) or add fallbacks for older iPads?",
     "Throwline: keep explicit-save only (edited width resets on reload) or add a draft autosave?",
@@ -156,6 +183,10 @@
     {
       "path": "docs/next-steps/av-video.json",
       "why": "Public-safe evidence projection; underlying product specifications and implementation remain authoritative."
+    },
+    {
+      "path": "docs/2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md",
+      "why": "Source-aligned Rail brief, RAIL-1B decision record and explicit RAIL-2/RAIL-3 choice gates"
     },
     {
       "path": "docs/av-workspace.md",
@@ -205,6 +236,8 @@
     "VIEWPORT_BASE=https://avbydave.com/ VIEWPORT_BROWSER=webkit node scripts/probe_calculator_viewport.cjs"
   ],
   "context": [
+    "RAIL-1B was selected October 5, 2026: the default rail reproduces all nine v3 console slots in source order; production-unbuilt consoles remain clearly Planned and status-only.",
+    "The original v3 source archive was inspected at SHA-256 71b72c70ab3e004fd324f98cec7ed05a2cf16d054a4c05fce74fe298c5dd5e02; browser-rendered parity remains unverified.",
     "All six viewport candidates are deployed; the earlier not-live statements are superseded.",
     "AV Video owns sbd.avVideo.v1; layout reuse does not merge stores or make Workbook a dependency.",
     "Legacy Video routes remain until their replacement/compatibility gates are satisfied.",
@@ -213,6 +246,10 @@
     "Historical audit details remain in private updater backups; stable finding IDs preserve traceability."
   ],
   "links": [
+    {
+      "label": "Rail implementation specification v2.2",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md"
+    },
     {
       "label": "Maintained consolidation plan",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/1adc8846653c72e0ad115c4941c809bac1c79cf1/docs/av-suite-consolidation-spec.md"
@@ -231,11 +268,11 @@
     },
     {
       "label": "Source deployment",
-      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577"
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37282446471"
     },
     {
       "label": "AV deployment",
-      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749"
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37286283303"
     },
     {
       "label": "Toolbox",
@@ -251,40 +288,52 @@
   ],
   "short": "AV Video",
   "evidence": {
-    "checkedOn": "2026-10-04",
-    "sourceRevision": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
-    "scope": "Scoped reconciliation of the delivered viewport work and next-step routing. Broader historical audit findings are not a fresh catalog audit.",
+    "checkedOn": "2026-10-05",
+    "sourceRevision": "66b3d66285e6c34c8b1b7db9a087caeec0e7f670",
+    "scope": "Fresh source and deployment reconciliation for the shipped AV Video console, Stage Slate default, draft recovery and device-local layout persistence, plus the RAIL-1B planning decision. This is not browser-rendered Rail or physical acceptance evidence.",
     "sources": [
-      "docs/av-suite-consolidation-spec.md",
+      "docs/2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md",
+      "docs/av-console.md",
       "docs/av-suite-consolidation-stage2-video.md",
       "docs/av-workspace.md",
       "CHANGELOG.md"
     ],
-    "release": "https://github.com/DaveHomeAssist/system-by-dave/commit/1adc8846653c72e0ad115c4941c809bac1c79cf1",
-    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37175190577",
-    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37176560749",
+    "release": "https://github.com/DaveHomeAssist/system-by-dave/commit/66b3d66285e6c34c8b1b7db9a087caeec0e7f670",
+    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37282446471",
+    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37286283303",
     "publishedSource": "https://avbydave.com/source.json",
     "runtime": [
-      "Live Calculator functional checks: Chromium including offline; WebKit excluding offline reload.",
-      "Fresh Toolbox opens Toolbox; saved preferredEntry=show still opens Show Console; Workbook link visible in both."
+      "Published source.json read back sourceCommit 66b3d66285e6c34c8b1b7db9a087caeec0e7f670 on 2026-10-05.",
+      "CueForge owning-domain handoff returned 200; the excluded avbydave.com/cueforge.html path returned 404; avbydave.com/plotforge.html returned 200."
     ],
     "limits": [
       "Physical/operator acceptance remains open.",
-      "Stored full viewport matrices and final catalog-navigation results were inspected as delivery evidence, not rerun in this reconciliation."
-    ],
-    "candidateBranch": "codex/av-neutral-and-pr-checks-20261004",
-    "candidateChecks": [
-      "Toolbox responsive and returning legacy-preference isolation passed at 390/680/1280px",
-      "Navigation parity passed across 46 tools at 375/1440px",
-      "Themes passed across 47 surfaces in light/dark at 390/1280px",
-      "Calculator functional browser checks passed"
+      "RAIL-1B is a planning decision only: no Rail implementation, browser-rendered v3 comparison or deployed nine-slot state is claimed.",
+      "The earlier viewport runtime matrix was not rerun in this reconciliation; its evidence is retained separately below."
     ],
     "delivery": {
-      "neutralEntryPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/256",
-      "withdrawalPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/257",
-      "metadataFixPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/258",
-      "deployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37252267300",
-      "liveReadback": "AV source.json names 1e51c7c. All six former Workbook entry URLs on both origins reach Toolbox. Editor bundle and retained source are 404. PR viewport contracts pass."
+      "consolePR": "https://github.com/DaveHomeAssist/system-by-dave/pull/264",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37282446471",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37286283303",
+      "liveReadback": "AV source.json names 66b3d66285e6c34c8b1b7db9a087caeec0e7f670; both deployment runs completed successfully."
+    },
+    "priorViewportEvidence": {
+      "checkedOn": "2026-10-04",
+      "sourceRevision": "1e51c7c5ae9553fed7df34c29abaf34e2bd0bc28",
+      "candidateBranch": "codex/av-neutral-and-pr-checks-20261004",
+      "candidateChecks": [
+        "Toolbox responsive and returning legacy-preference isolation passed at 390/680/1280px",
+        "Navigation parity passed across 46 tools at 375/1440px",
+        "Themes passed across 47 surfaces in light/dark at 390/1280px",
+        "Calculator functional browser checks passed"
+      ],
+      "delivery": {
+        "neutralEntryPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/256",
+        "withdrawalPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/257",
+        "metadataFixPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/258",
+        "deployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37252267300",
+        "liveReadback": "AV source.json named 1e51c7c at that check. All six former Workbook entry URLs on both origins reached Toolbox. Editor bundle and retained source were 404. PR viewport contracts passed."
+      }
     }
   },
   "historicalFindings": [
