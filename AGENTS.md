@@ -3,6 +3,10 @@
 Read `CLAUDE.md` first for project orientation. This file defines how agents
 change, verify, document, and release this repository.
 
+## Workspace contract
+
+Read `~/Code/ops-hub/90-governance/WORKSPACE_OPERATING_RULES.md` before project rules, including COMMS (one entry on the shared Agent Communications Page per session).
+
 ## Instruction precedence
 
 This file does not override platform instructions or an applicable parent

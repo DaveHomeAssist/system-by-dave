@@ -11,7 +11,7 @@
 <meta name="description" content="Every tool, app, tracker and widget built by Dave Robertson — AV show utilities, Notion tools, apps & games, live trackers, and dev labs. Filter by category.">
 <link rel="canonical" href="https://systembydave.com/tools.html">
 <meta name="robots" content="index,follow">
-<meta name="theme-color" content="#0A0D14">
+<meta name="theme-color" content="#0d1217">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="Tools — System by Dave">
@@ -21,49 +21,66 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/fonts.css">
+<script>(function(d){d.classList.add('tools-js');try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('tools-motion');}catch(e){}})(document.documentElement);</script>
 <style>
-  :root{--bg:#0A0D14;--ink:#F3F4F7;--rust:oklch(0.65 0.19 33);
+  :root{--bg:#0d1217;--ink:#f3f5f8;--rust:oklch(0.65 0.19 33);
+    --card:#192027;--card-border:#303943;--muted:#a3aeba;
+    /* Same width and left edge as .sbd-site-header__inner (css/sbd-public-nav.css); verify:public-navigation compares them. */
+    --shell-width:min(1200px, calc(100% - 40px));
     --ff-display:'Space Grotesk','DM Sans',-apple-system,sans-serif;--ff-body:'DM Sans',-apple-system,sans-serif;--ff-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;}
   *{margin:0;padding:0;box-sizing:border-box;}
-  html{background:#0A0D14;}
+  html{background:var(--bg);}
   body{font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
   ::selection{background:oklch(0.65 0.19 33 / 0.32);color:#fff;}
   a{color:inherit;}
-  .container{max-width:1200px;margin:0 auto;padding:0 40px;}
+  .container{width:var(--shell-width);margin:0 auto;}
   .nav-link{color:rgba(243,244,247,0.6);transition:color .2s ease;text-decoration:none;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;}
   .nav-link:hover{color:#F3F4F7;}
   .nav-link.active{color:oklch(0.72 0.19 33);}
   .gh-btn{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;transition:background .2s ease,color .2s ease;}
   .gh-btn:hover{background:oklch(0.65 0.19 33);color:#fff;}
-  .tools-hero{padding:88px 0 28px;}
+  .tools-hero{padding:46px 0 15px;}
   .tools-hero .eyebrow{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:oklch(0.72 0.19 33);}
-  .tools-hero h1{font-family:var(--ff-display);font-weight:600;font-size:clamp(40px,5.4vw,68px);line-height:1.0;letter-spacing:-0.03em;margin:14px 0 16px;}
+  .tools-hero h1{font-family:var(--ff-display);font-weight:600;font-size:clamp(36px,4.8vw,60px);line-height:1.02;letter-spacing:-0.03em;margin:10px 0 12px;}
   .tools-hero p{max-width:62ch;color:rgba(243,244,247,0.62);font-size:17px;font-weight:300;line-height:1.7;}
-  .tools-controls{position:sticky;top:70px;z-index:40;background:rgba(10,13,20,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.09);padding:14px 0;margin:28px 0;}
+  .tools-controls{position:sticky;top:70px;z-index:40;background:rgba(13,18,23,0.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-block:1px solid rgba(255,255,255,0.09);padding:12px 0;margin:18px 0;}
+  html:not(.tools-js) .tools-controls{display:none;}
   .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
-  .chip-filter{font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:8px 14px;min-height:36px;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,0.14);background:transparent;color:rgba(243,244,247,0.6);cursor:pointer;transition:all .18s;}
+  .chip-filter{font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:9px 16px;min-height:44px;border-radius:999px;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,0.16);background:#171e25;color:#c5cbd3;cursor:pointer;transition:background .18s,border-color .18s,color .18s;}
   .chip-filter:hover{border-color:rgba(255,255,255,0.3);color:#F3F4F7;}
-  .chip-filter[aria-pressed="true"]{background:oklch(0.65 0.19 33);border-color:oklch(0.65 0.19 33);color:#fff;}
-  .chips .count{margin-left:auto;font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.45);white-space:nowrap;}
-  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;padding-bottom:80px;}
-  .tool-card{display:flex;flex-direction:column;gap:10px;padding:24px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;transition:transform .25s,border-color .25s;position:relative;overflow:hidden;}
-  .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:oklch(0.65 0.19 33);transform:scaleX(0);transform-origin:left;transition:transform .25s;}
-  .tool-card:hover{transform:translateY(-4px);border-color:oklch(0.65 0.19 33);}
-  .tool-card:hover::before{transform:scaleX(1);}
-  .tool-card:focus-visible{outline:2px solid oklch(0.65 0.19 33);outline-offset:3px;}
-  .tool-card .tc-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
-  .tool-card h3{font-family:var(--ff-display);font-weight:600;font-size:21px;line-height:1.1;}
-  .tool-card .tc-ext{font-family:var(--ff-mono);font-size:11px;color:oklch(0.72 0.19 33);white-space:nowrap;}
-  .tool-card p{font-size:14px;font-weight:300;line-height:1.55;color:rgba(243,244,247,0.6);flex:1;}
-  .tool-card .tc-host{font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.4);word-break:break-all;}
-  .tool-card .tc-chips{display:flex;flex-wrap:wrap;gap:6px;}
-  .tc-chip{font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;padding:3px 8px;background:rgba(255,255,255,0.06);color:rgba(243,244,247,0.6);}
-  .tools-empty{grid-column:1/-1;text-align:center;color:rgba(243,244,247,0.45);padding:60px 0;font-family:var(--ff-mono);font-size:13px;}
-  .tools-note{color:rgba(243,244,247,0.5);font-size:13px;margin:0 0 24px;font-family:var(--ff-mono);}
+  .chip-filter[aria-pressed="true"]{background:#473163;border-color:#9e73d8;color:#fff;}
+  .chip-filter:focus-visible{outline:2px solid #a77de3;outline-offset:3px;}
+  .chips .count{margin-left:auto;min-height:1.6em;font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.6);white-space:nowrap;}
+  .tools-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding-bottom:24px;}
+  .tool-card{--accent:#a47ce7;--badge:#30243f;display:flex;flex-direction:column;align-items:center;justify-content:space-between;min-width:0;min-height:214px;padding:9px 10px 12px;border:1px solid var(--card-border);border-radius:12px;background:linear-gradient(145deg,#202630 0%,var(--card) 58%,#172027 100%);box-shadow:0 5px 13px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.04);text-align:center;text-decoration:none;color:inherit;position:relative;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;}
+  .tool-card[hidden]{display:none;}
+  .tools-motion .tool-card:nth-child(-n+12){opacity:0;}
+  .tool-card[data-tone="blue"]{--accent:#87baff;--badge:#203750;}
+  .tool-card[data-tone="teal"]{--accent:#6fe0dc;--badge:#173e42;}
+  .tool-card[data-tone="green"]{--accent:#89dc86;--badge:#233d2c;}
+  .tool-card[data-tone="orange"]{--accent:#ffaa69;--badge:#4a3022;}
+  .tool-card[data-tone="red"]{--accent:#f18a83;--badge:#482b2d;}
+  .tool-card:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 15px 30px rgba(0,0,0,.34),0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent);}
+  .tool-card:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+  .tc-art{display:block;width:min(100%,178px);aspect-ratio:7/5;flex:none;background-image:url('img/tools-card-atlas.webp');background-size:500% 700%;background-position:var(--art-x) var(--art-y);background-repeat:no-repeat;mix-blend-mode:lighten;}
+  .tc-art--unique{background-image:url('img/tools-card-unique-atlas.webp');background-size:auto 300%;}
+  .tc-art--text{display:grid;place-items:center;background:none;mix-blend-mode:normal;container-type:inline-size;}
+  .tc-mark{display:grid;place-items:center;width:68%;height:72%;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-radius:18px;background:radial-gradient(120% 95% at 50% 22%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 72%),#131a21;box-shadow:inset 0 1px rgba(255,255,255,.06),0 8px 18px rgba(0,0,0,.3);color:var(--accent);font:700 clamp(26px,24cqi,44px)/1 var(--ff-display);letter-spacing:-.04em;text-shadow:0 0 22px color-mix(in srgb,var(--accent) 35%,transparent);}
+  .tool-card h2{display:grid;place-items:center;min-height:2.5em;font-family:var(--ff-display);font-weight:700;font-size:clamp(14px,1.3vw,18px);line-height:1.2;letter-spacing:-.025em;text-wrap:balance;}
+  .tc-badge{display:inline-flex;align-items:center;justify-content:center;gap:8px;max-width:100%;min-height:26px;padding:3px 12px;border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);border-radius:999px;background:var(--badge);color:color-mix(in srgb,var(--accent) 75%,white);font:700 11px/1.15 var(--ff-mono);letter-spacing:.035em;text-transform:uppercase;white-space:nowrap;}
+  .tc-badge::before{content:'';width:10px;height:10px;flex:none;border-radius:50%;background:var(--accent);box-shadow:0 0 11px color-mix(in srgb,var(--accent) 45%,transparent);}
+  .tool-card .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  .tools-empty{grid-column:1/-1;text-align:center;color:rgba(243,244,247,0.6);padding:60px 0;font-family:var(--ff-mono);font-size:13px;}
+  .tools-note{color:var(--muted);font-size:13px;margin:0 0 18px;font-family:var(--ff-mono);}
+  .tools-note--after{margin:0 0 44px;text-align:right;font-size:12px;}
   .tools-note a{color:oklch(0.72 0.19 33);text-underline-offset:3px;}
   footer{border-top:1px solid rgba(255,255,255,0.07);margin-top:40px;}
   .foot{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:48px 0 36px;}
-  @media (max-width:680px){.container{padding:0 20px;}.tools-controls{top:0;}.tools-grid{grid-template-columns:1fr;}.chips .count{width:100%;margin:4px 0 0;}}
+  @media (max-width:1180px){.tools-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
+  @media (max-width:900px){.tools-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  @media (max-width:680px){:root{--shell-width:calc(100% - 24px);}.tools-hero{padding-top:30px;}.tools-controls{top:0;}.tools-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}.tool-card{min-height:208px;padding-inline:7px;}.tool-card h2{font-size:14px;}.tc-art{width:min(100%,150px);}.tc-badge{font-size:9px;padding-inline:8px;gap:5px;}.tc-badge::before{width:7px;height:7px;}.chips .count{width:100%;margin:4px 0 0;}}
+  @media (max-width:360px){.tools-grid{grid-template-columns:1fr;}.tool-card{min-height:220px;}.tool-card h2{font-size:17px;}}
+  @media (prefers-reduced-motion:reduce){.tool-card,.chip-filter{transition:none;}.tool-card:hover{transform:none;}}
 </style>
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
@@ -98,13 +115,234 @@
 
     <div class="tools-controls">
       <div class="container">
-        <div class="chips" id="filterChips" role="group" aria-label="Filter tools by category"></div>
+        <div class="chips" id="filterChips" role="group" aria-label="Filter tools by category">
+          <button type="button" class="chip-filter" data-chip="All" aria-pressed="true">All</button>
+          <button type="button" class="chip-filter" data-chip="AV" aria-pressed="false">AV</button>
+          <button type="button" class="chip-filter" data-chip="Notion" aria-pressed="false">Notion</button>
+          <button type="button" class="chip-filter" data-chip="Apps" aria-pressed="false">Apps</button>
+          <button type="button" class="chip-filter" data-chip="Games" aria-pressed="false">Games</button>
+          <button type="button" class="chip-filter" data-chip="Trackers" aria-pressed="false">Trackers</button>
+          <button type="button" class="chip-filter" data-chip="Sports" aria-pressed="false">Sports</button>
+          <button type="button" class="chip-filter" data-chip="Labs" aria-pressed="false">Labs</button>
+          <span class="count" id="toolCount" aria-live="polite"></span>
+        </div>
       </div>
     </div>
 
     <div class="container">
-      <p class="tools-note">The AV Suite bundles 45 operator tools. <a href="av-suite.html?entry=toolbox">Open the AV Toolbox</a> to browse the complete live registry without attaching a show.</p>
-      <div class="tools-grid" id="toolsGrid"></div>
+      <!-- Curated overlay: the public-facing set, in display order (daily AV operation,
+           AV references and apps, Notion, labs, then apps, games and trackers).
+           Adding a tool = add one card here (kept in sync with project-registry-public.js).
+           data-chips drives the filters. A card for an AV registry tool carries
+           data-registry-id and shows that tool's navigation department from
+           js/sbd-registry.js as its badge (verify:av checks it); other cards keep their
+           directory category. Artwork comes from the two WebP atlases via --art-x/--art-y:
+           the 5x7 atlas has 7:5 cells, and the 2x3 atlas has 3:2 cells that are scaled to
+           the box height and cropped horizontally, so no icon is stretched. A tool without
+           artwork uses the tc-art--text monogram card.
+           Cards deep-link to the live page; cross-domain links open in a new tab. -->
+      <div class="tools-grid" id="toolsGrid">
+        <a class="tool-card" data-chips="AV" data-tone="violet" data-track-cta="tools:show-console" href="av-suite.html?entry=show">
+          <span class="tc-art" style="--art-x:0%;--art-y:2.2%" aria-hidden="true"></span>
+          <h2>Show Console</h2>
+          <span class="tc-badge">AV Suite</span>
+          <span class="sr-only">Show-attached operations console with profile context, phase recommendations, readiness, notes, imports, exports, and handoffs.</span>
+        </a>
+        <a class="tool-card" data-chips="AV" data-tone="violet" data-track-cta="tools:av-toolbox" href="av-suite.html?entry=toolbox">
+          <span class="tc-art" style="--art-x:25%;--art-y:2.2%" aria-hidden="true"></span>
+          <h2>AV Toolbox</h2>
+          <span class="tc-badge">AV Suite</span>
+          <span class="sr-only">Show-independent doorway to all 45 registered AV tools with live search, families, use-anytime picks, pins, and recents.</span>
+        </a>
+        <a class="tool-card" data-registry-id="ontrack" data-chips="AV Apps" data-tone="teal" data-track-cta="tools:ontrack" href="ontrack.html">
+          <span class="tc-art" style="--art-x:25%;--art-y:17.7%" aria-hidden="true"></span>
+          <h2>OnTrack</h2>
+          <span class="tc-badge">Music</span>
+          <span class="sr-only">DJ set intelligence — import a rekordbox library, plan sets, log played history, and debrief gigs with per-track notes.</span>
+        </a>
+        <a class="tool-card" data-chips="AV" data-tone="teal" data-track-cta="tools:back-focus" href="backfocus/">
+          <span class="tc-art" style="--art-x:50%;--art-y:17.7%" aria-hidden="true"></span>
+          <h2>Back Focus</h2>
+          <span class="tc-badge">AV apps</span>
+          <span class="sr-only">Preshow camera field guide — diagnose flange back focus, step through the electronic or mechanical Fujinon procedure, verify it, and hand the camera back.</span>
+        </a>
+        <a class="tool-card" data-registry-id="teleprompter" data-chips="AV" data-tone="blue" data-track-cta="tools:teleprompter" href="teleprompter.html">
+          <span class="tc-art" style="--art-x:100%;--art-y:2.2%" aria-hidden="true"></span>
+          <h2>Teleprompter</h2>
+          <span class="tc-badge">Run of show</span>
+          <span class="sr-only">On-device teleprompter with instrument-grade controls, mirror/fullscreen, rundown timing and show packages.</span>
+        </a>
+        <a class="tool-card" data-registry-id="gear-reference" data-chips="AV" data-tone="blue" data-track-cta="tools:gear-reference" href="gear-reference.html">
+          <span class="tc-art" style="--art-x:50%;--art-y:2.2%" aria-hidden="true"></span>
+          <h2>Gear Reference</h2>
+          <span class="tc-badge">Logistics</span>
+          <span class="sr-only">Offline per-device field sheets with schematics, procedures, consumables, intake checks, and source confidence.</span>
+        </a>
+        <a class="tool-card tool-card--text" data-registry-id="av-video" data-chips="AV Apps" data-tone="teal" data-track-cta="tools:av-video" href="av-video/">
+          <span class="tc-art tc-art--text" aria-hidden="true"><span class="tc-mark">AV</span></span>
+          <h2>AV Video</h2>
+          <span class="tc-badge">Video</span>
+          <span class="sr-only">Signal Flow, Video Patch, Displays and Projection in one plan: connected routes, destination plans, checks, and optional modules.</span>
+        </a>
+        <a class="tool-card" data-chips="AV" data-tone="violet" data-track-cta="tools:deckforge" href="https://davehomeassist.github.io/deckforge/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:0%;--art-y:17.7%" aria-hidden="true"></span>
+          <h2>DeckForge</h2>
+          <span class="tc-badge">AV references</span>
+          <span class="sr-only">Design Elgato Stream Deck &amp; Logitech MX Creative Console layouts for your OBS / vMix show workflow. Opens davehomeassist.github.io/deckforge in a new tab.</span>
+        </a>
+        <a class="tool-card" data-registry-id="pixelforge" data-chips="AV Apps" data-tone="blue" data-track-cta="tools:pixelforge" href="pixelforge/">
+          <span class="tc-art" style="--art-x:75%;--art-y:17.7%" aria-hidden="true"></span>
+          <h2>PixelForge</h2>
+          <span class="tc-badge">Graphics</span>
+          <span class="sr-only">Browser raster, vector, text, and image editing for show graphics, signage fixes, simple overlays, and PNG export.</span>
+        </a>
+        <a class="tool-card" data-chips="Notion" data-tone="violet" data-track-cta="tools:notion-skills" href="skills.html">
+          <span class="tc-art" style="--art-x:100%;--art-y:17.7%" aria-hidden="true"></span>
+          <h2>Notion Skills</h2>
+          <span class="tc-badge">Notion</span>
+          <span class="sr-only">AI skills that run natively inside Notion AI — no external apps or plugins to break.</span>
+        </a>
+        <a class="tool-card" data-chips="Notion" data-tone="teal" data-track-cta="tools:notion-agents" href="agents.html">
+          <span class="tc-art" style="--art-x:0%;--art-y:33.9%" aria-hidden="true"></span>
+          <h2>Notion Agents</h2>
+          <span class="tc-badge">Notion</span>
+          <span class="sr-only">Agents that triage your inbox, assemble briefings and keep your prompts organized — inside Notion.</span>
+        </a>
+        <a class="tool-card" data-chips="Notion" data-tone="violet" data-track-cta="tools:notion-widgets" href="widgets.html">
+          <span class="tc-art" style="--art-x:25%;--art-y:33.9%" aria-hidden="true"></span>
+          <h2>Notion Widgets</h2>
+          <span class="tc-badge">Notion</span>
+          <span class="sr-only">Self-contained widgets that embed in Notion pages via iframe. Free and open source.</span>
+        </a>
+        <a class="tool-card" data-chips="Notion" data-tone="violet" data-track-cta="tools:prompts" href="prompts/">
+          <span class="tc-art" style="--art-x:50%;--art-y:33.9%" aria-hidden="true"></span>
+          <h2>Prompts</h2>
+          <span class="tc-badge">Notion</span>
+          <span class="sr-only">A library of reusable prompts for building systems inside Notion.</span>
+        </a>
+        <a class="tool-card" data-chips="Notion Labs" data-tone="violet" data-track-cta="tools:notionwidgets-gallery" href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:75%;--art-y:33.9%" aria-hidden="true"></span>
+          <h2>NotionWidgets (gallery)</h2>
+          <span class="tc-badge">Notion</span>
+          <span class="sr-only">The open-source catalog of embeddable Notion widgets — project status, quest log, and more. Opens davehomeassist.github.io/NotionWidgets in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:graph-explorer" href="https://davehomeassist.github.io/graph-explorer/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:0%;--art-y:79.1%" aria-hidden="true"></span>
+          <h2>Graph Explorer</h2>
+          <span class="tc-badge">Labs</span>
+          <span class="sr-only">Dataset-agnostic node-graph topology visualizer — one D3 / Dagre engine, many pluggable map packs. Opens davehomeassist.github.io/graph-explorer in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:sdlc-tool-stack-map" href="https://davehomeassist.github.io/sdlc-tool-stack-map/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:25%;--art-y:79.1%" aria-hidden="true"></span>
+          <h2>SDLC Tool Stack Map</h2>
+          <span class="tc-badge">Labs</span>
+          <span class="sr-only">An interactive visual map of an SDLC tool stack, grouped by lifecycle stage. Opens davehomeassist.github.io/sdlc-tool-stack-map in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:prompt-lab" href="https://promptlab.tools/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:50%;--art-y:79.1%" aria-hidden="true"></span>
+          <h2>Prompt Lab</h2>
+          <span class="tc-badge">Labs</span>
+          <span class="sr-only">A prompt-engineering workstation with a sign-in web app, extension setup, and documented desktop source build; the free editor has optional Pro tools. Opens promptlab.tools in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:project-registry" href="project-registry.html">
+          <span class="tc-art" style="--art-x:75%;--art-y:79.1%" aria-hidden="true"></span>
+          <h2>Project Registry</h2>
+          <span class="tc-badge">Labs</span>
+          <span class="sr-only">Public-safe repository inventory with stack, purpose, status, and recent activity.</span>
+        </a>
+        <a class="tool-card" data-chips="Notion Labs" data-tone="violet" data-track-cta="tools:davai-system-by-dave-memory-architecture" href="systembydave/">
+          <span class="tc-art tc-art--unique" style="--art-x:6.25%;--art-y:100%" aria-hidden="true"></span>
+          <h2>Davai — System by Dave Memory Architecture</h2>
+          <span class="tc-badge">Labs</span>
+          <span class="sr-only">The layered memory, routing, lifecycle, and synchronization architecture behind Dave’s working system.</span>
+        </a>
+        <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:tailscale-manual" href="tailscale-manual.html">
+          <span class="tc-art tc-art--unique" style="--art-x:93.75%;--art-y:100%" aria-hidden="true"></span>
+          <h2>Tailscale Manual</h2>
+          <span class="tc-badge">Labs</span>
+          <span class="sr-only">A responsive, printable field manual for secure Tailscale access, identity, routing, and recovery.</span>
+        </a>
+        <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:dave-robertson-profile" href="profile/">
+          <span class="tc-art" style="--art-x:25%;--art-y:95.8%" aria-hidden="true"></span>
+          <h2>Dave Robertson Profile</h2>
+          <span class="tc-badge">Labs</span>
+          <span class="sr-only">Live event, broadcast, systems, and business operating context for clients and collaborators.</span>
+        </a>
+        <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:remote-desktop" href="remote-desktop.html">
+          <span class="tc-art" style="--art-x:50%;--art-y:95.8%" aria-hidden="true"></span>
+          <h2>Remote Desktop</h2>
+          <span class="tc-badge">Labs</span>
+          <span class="sr-only">Serverless WebRTC screen share, file transfer, and remote view — locator-not-password session codes, verbal peer authentication, and capability-scoped consent.</span>
+        </a>
+        <a class="tool-card" data-chips="Apps Games" data-tone="green" data-track-cta="tools:garden-os" href="https://davehomeassist.github.io/garden-os/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:100%;--art-y:33.9%" aria-hidden="true"></span>
+          <h2>Garden OS</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">Plan a raised-bed garden with an explainable, deterministic crop-scoring engine. Spec-first showcase. Opens davehomeassist.github.io/garden-os in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Apps Games Sports" data-tone="violet" data-track-cta="tools:mlb-ballparks-quest" href="https://davehomeassist.github.io/mlb-ballparks-quest/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:0%;--art-y:48.8%" aria-hidden="true"></span>
+          <h2>MLB Ballparks Quest</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">Track ballpark visits, plan stadium road trips, and scorekeep live games. Phillies-themed PWA. Opens davehomeassist.github.io/mlb-ballparks-quest in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Apps Sports" data-tone="teal" data-track-cta="tools:ballpark-scorecard" href="scorecard/">
+          <span class="tc-art tc-art--unique" style="--art-x:94.93%;--art-y:0%" aria-hidden="true"></span>
+          <h2>Ballpark Scorecard</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">A focused, installable baseball scorecard for tracking an entire game from the stands.</span>
+        </a>
+        <a class="tool-card" data-chips="Games Sports" data-tone="green" data-track-cta="tools:fifa-pitch-crew" href="/fifa-pitch-crew/">
+          <span class="tc-art" style="--art-x:50%;--art-y:48.8%" aria-hidden="true"></span>
+          <h2>FIFA Pitch Crew</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">Arcade halftime-cover game — deploy the stage cloth across six lanes, dodge the sprinklers, run the show, then strike it before kickoff.</span>
+        </a>
+        <a class="tool-card" data-chips="Apps" data-tone="orange" data-track-cta="tools:noteforge" href="noteforge/">
+          <span class="tc-art tc-art--unique" style="--art-x:6.25%;--art-y:0%" aria-hidden="true"></span>
+          <h2>NoteForge</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">A local-first writing workspace for structured notes, reusable documents, and focused drafting.</span>
+        </a>
+        <a class="tool-card" data-chips="Apps Trackers" data-tone="green" data-track-cta="tools:trailkeeper" href="https://davehomeassist.github.io/trailkeeper/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:100%;--art-y:48.8%" aria-hidden="true"></span>
+          <h2>Trailkeeper</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">Plan, shortlist and log hiking trails with live weather and nearby-trail discovery. Opens davehomeassist.github.io/trailkeeper in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Apps Trackers" data-tone="green" data-track-cta="tools:festival-atlas" href="https://davehomeassist.github.io/festival-atlas/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art tc-art--unique" style="--art-x:6.12%;--art-y:50%" aria-hidden="true"></span>
+          <h2>Festival Atlas</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">Browse, route and journal music festivals — 43 USA festivals seeded with 2026 dates. (Prototype.) Opens davehomeassist.github.io/festival-atlas in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Trackers" data-tone="teal" data-track-cta="tools:hat-in-ring-radar" href="https://hatinring.com/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:25%;--art-y:63.3%" aria-hidden="true"></span>
+          <h2>Hat-in-Ring Radar</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">A 2028 presidential signal tracker — who is stepping into the ring, scored by how serious the move is. Opens hatinring.com in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Trackers Sports" data-tone="green" data-track-cta="tools:world-cup-predictor" href="/world-cup/">
+          <span class="tc-art" style="--art-x:50%;--art-y:63.3%" aria-hidden="true"></span>
+          <h2>World Cup Predictor</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">Predict and track the World Cup as results come in.</span>
+        </a>
+        <a class="tool-card" data-chips="Trackers Sports" data-tone="red" data-track-cta="tools:phillies-wire" href="https://davehomeassist.github.io/phillies-wire/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art tc-art--unique" style="--art-x:93.75%;--art-y:50%" aria-hidden="true"></span>
+          <h2>Phillies Wire</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">A daily auto-generated Philadelphia Phillies newsletter, dashboard and live-innings view. Opens davehomeassist.github.io/phillies-wire in a new tab.</span>
+        </a>
+        <a class="tool-card" data-chips="Trackers" data-tone="green" data-track-cta="tools:frontier-signals" href="https://davehomeassist.github.io/frontier-signals-pipeline/" target="_blank" rel="noopener noreferrer">
+          <span class="tc-art" style="--art-x:100%;--art-y:63.3%" aria-hidden="true"></span>
+          <h2>Frontier Signals</h2>
+          <span class="tc-badge">Apps/Games/Trackers</span>
+          <span class="sr-only">A dark editorial &quot;magazine&quot; tracking frontier-compute signals, refreshed from a scraper pipeline. Opens davehomeassist.github.io/frontier-signals-pipeline in a new tab.</span>
+        </a>
+        <p class="tools-empty" id="toolsEmpty" hidden>No tools in this category yet.</p>
+      </div>
+      <p class="tools-note tools-note--after">The AV Suite bundles 45 operator tools. <a href="av-suite.html?entry=toolbox">Browse the complete AV Toolbox</a>.</p>
     </div>
   </main>
 
@@ -126,107 +364,59 @@
 
   <!-- the full project inventory is available for enrichment / future-proofing -->
   <script src="project-registry-public.js"></script>
+  <script src="js/vendor/gsap.min.js"></script>
   <script>
-  /* Curated overlay: the public-facing set, each with a verified live URL + filter chips.
-     Adding a tool = add one entry here (kept in sync with project-registry-public.js).
-     Cards deep-link to the live page; cross-domain links open in a new tab. */
-  var TOOLS = [
-    // ── AV ──
-    { name: 'Show Console',         url: 'av-suite.html?entry=show',                        chips: ['AV'],                    blurb: 'Show-attached operations console with profile context, phase recommendations, readiness, notes, imports, exports, and handoffs.' },
-    { name: 'AV Toolbox',           url: 'av-suite.html?entry=toolbox',                     chips: ['AV'],                    blurb: 'Show-independent doorway to all 45 registered AV tools with live search, families, use-anytime picks, pins, and recents.' },
-    { name: 'Gear Reference',      url: 'gear-reference.html',                             chips: ['AV'],                    blurb: 'Offline per-device field sheets with schematics, procedures, consumables, intake checks, and source confidence.' },
-    { name: 'Teleprompter',        url: 'teleprompter.html',                               chips: ['AV'],                    blurb: 'On-device teleprompter with instrument-grade controls, mirror/fullscreen, rundown timing and show packages.' },
-    { name: 'DeckForge',           url: 'https://davehomeassist.github.io/deckforge/',     chips: ['AV'],                    blurb: 'Design Elgato Stream Deck & Logitech MX Creative Console layouts for your OBS / vMix show workflow.' },
-    { name: 'OnTrack',             url: 'ontrack.html',                                    chips: ['AV','Apps'],             blurb: 'DJ set intelligence — import a rekordbox library, plan sets, log played history, and debrief gigs with per-track notes.' },
-    { name: 'Back Focus',          url: 'backfocus/',                                      chips: ['AV'],                    blurb: 'Preshow camera field guide — diagnose flange back focus, step through the electronic or mechanical Fujinon procedure, verify it, and hand the camera back.' },
-    // ── Notion ──
-    { name: 'Notion Skills',       url: 'skills.html',                                     chips: ['Notion'],                blurb: 'AI skills that run natively inside Notion AI — no external apps or plugins to break.' },
-    { name: 'Notion Agents',       url: 'agents.html',                                     chips: ['Notion'],                blurb: 'Agents that triage your inbox, assemble briefings and keep your prompts organized — inside Notion.' },
-    { name: 'Notion Widgets',      url: 'widgets.html',                                    chips: ['Notion'],                blurb: 'Self-contained widgets that embed in Notion pages via iframe. Free and open source.' },
-    { name: 'Prompts',             url: 'prompts/',                                        chips: ['Notion'],                blurb: 'A library of reusable prompts for building systems inside Notion.' },
-    { name: 'NotionWidgets (gallery)', url: 'https://davehomeassist.github.io/NotionWidgets/', chips: ['Notion','Labs'],     blurb: 'The open-source catalog of embeddable Notion widgets — project status, quest log, and more.' },
-    // ── Apps & Games ──
-    { name: 'Garden OS',           url: 'https://davehomeassist.github.io/garden-os/',     chips: ['Apps','Games'],          blurb: 'Plan a raised-bed garden with an explainable, deterministic crop-scoring engine. Spec-first showcase.' },
-    { name: 'MLB Ballparks Quest', url: 'https://davehomeassist.github.io/mlb-ballparks-quest/', chips: ['Apps','Games','Sports'], blurb: 'Track ballpark visits, plan stadium road trips, and scorekeep live games. Phillies-themed PWA.' },
-    { name: 'Ballpark Scorecard',  url: 'scorecard/',                                      chips: ['Apps','Sports'],         blurb: 'A focused, installable baseball scorecard for tracking an entire game from the stands.' },
-    { name: 'FIFA Pitch Crew',     url: '/fifa-pitch-crew/',                               chips: ['Games','Sports'],        blurb: 'Arcade halftime-cover game — deploy the stage cloth across six lanes, dodge the sprinklers, run the show, then strike it before kickoff.' },
-    { name: 'PixelForge',          url: 'pixelforge/',                                     chips: ['AV','Apps'],             blurb: 'Browser raster, vector, text, and image editing for show graphics, signage fixes, simple overlays, and PNG export.' },
-    { name: 'NoteForge',           url: 'noteforge/',                                      chips: ['Apps'],                  blurb: 'A local-first writing workspace for structured notes, reusable documents, and focused drafting.' },
-    { name: 'Trailkeeper',         url: 'https://davehomeassist.github.io/trailkeeper/',   chips: ['Apps','Trackers'],       blurb: 'Plan, shortlist and log hiking trails with live weather and nearby-trail discovery.' },
-    { name: 'Festival Atlas',      url: 'https://davehomeassist.github.io/festival-atlas/',chips: ['Apps','Trackers'],       blurb: 'Browse, route and journal music festivals — 43 USA festivals seeded with 2026 dates. (Prototype.)' },
-    // ── Trackers ──
-    { name: 'Hat-in-Ring Radar',   url: 'https://hatinring.com/',                          chips: ['Trackers'],              blurb: 'A 2028 presidential signal tracker — who is stepping into the ring, scored by how serious the move is.' },
-    { name: 'World Cup Predictor', url: '/world-cup/',                                     chips: ['Trackers','Sports'],     blurb: 'Predict and track the World Cup as results come in.' },
-    { name: 'Phillies Wire',       url: 'https://davehomeassist.github.io/phillies-wire/', chips: ['Trackers','Sports'],     blurb: 'A daily auto-generated Philadelphia Phillies newsletter, dashboard and live-innings view.' },
-    { name: 'Frontier Signals',    url: 'https://davehomeassist.github.io/frontier-signals-pipeline/', chips: ['Trackers'],  blurb: 'A dark editorial "magazine" tracking frontier-compute signals, refreshed from a scraper pipeline.' },
-    // ── Labs ──
-    { name: 'Graph Explorer',      url: 'https://davehomeassist.github.io/graph-explorer/',chips: ['Labs'],                  blurb: 'Dataset-agnostic node-graph topology visualizer — one D3 / Dagre engine, many pluggable map packs.' },
-    { name: 'SDLC Tool Stack Map', url: 'https://davehomeassist.github.io/sdlc-tool-stack-map/', chips: ['Labs'],            blurb: 'An interactive visual map of an SDLC tool stack, grouped by lifecycle stage.' },
-    { name: 'Prompt Lab',          url: 'https://promptlab.tools/',                        chips: ['Labs'],                  blurb: 'A prompt-engineering workstation with a sign-in web app, extension setup, and documented desktop source build; the free editor has optional Pro tools.' },
-    { name: 'Project Registry',    url: 'project-registry.html',                           chips: ['Labs'],                  blurb: 'Public-safe repository inventory with stack, purpose, status, and recent activity.' },
-    { name: 'Davai — System by Dave Memory Architecture', url: 'systembydave/',            chips: ['Notion','Labs'],         blurb: 'The layered memory, routing, lifecycle, and synchronization architecture behind Dave’s working system.' },
-    { name: 'Tailscale Manual',    url: 'tailscale-manual.html',                           chips: ['Labs'],                  blurb: 'A responsive, printable field manual for secure Tailscale access, identity, routing, and recovery.' },
-    { name: 'Dave Robertson Profile', url: 'profile/',                                     chips: ['Labs'],                  blurb: 'Live event, broadcast, systems, and business operating context for clients and collaborators.' },
-    { name: 'Remote Desktop',      url: 'remote-desktop.html',                             chips: ['Labs'],                  blurb: 'Serverless WebRTC screen share, file transfer, and remote view — locator-not-password session codes, verbal peer authentication, and capability-scoped consent.' }
-  ];
+  (function(){
+    var root = document.documentElement;
+    try {
+      var CHIP_ORDER = ['AV','Notion','Apps','Games','Trackers','Sports','Labs'];
+      var grid = document.getElementById('toolsGrid');
+      var chipsBar = document.getElementById('filterChips');
+      var empty = document.getElementById('toolsEmpty');
+      var count = document.getElementById('toolCount');
+      var cards = Array.prototype.slice.call(grid.querySelectorAll('.tool-card'));
+      var buttons = Array.prototype.slice.call(chipsBar.querySelectorAll('.chip-filter'));
+      var reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+      var active = 'All';
+      var cardTween = null;
 
-  var CHIP_ORDER = ['AV','Notion','Apps','Games','Trackers','Sports','Labs'];
-  var grid = document.getElementById('toolsGrid');
-  var chipsBar = document.getElementById('filterChips');
-  var active = 'All';
+      function inFilter(card){
+        return active === 'All' || card.getAttribute('data-chips').split(' ').indexOf(active) >= 0;
+      }
 
-  function isExternal(url){ return /^https?:\/\//i.test(url); }
-  function hostLabel(url){
-    if (isExternal(url)) { try { return new URL(url).host + new URL(url).pathname.replace(/\/$/,''); } catch(e){ return url; } }
-    return 'systembydave.com/' + url.replace(/^\//,'');
-  }
-  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+      // Fade in only the first 12 visible cards; links stay usable throughout.
+      function animate(shown){
+        if (cardTween){ cardTween.kill(); cardTween = null; window.gsap.set(cards, {clearProps:'opacity'}); }
+        if (!window.gsap || (reduceMotion && reduceMotion.matches)) return;
+        cardTween = window.gsap.fromTo(shown.slice(0, 12), {opacity:0}, {opacity:1,duration:0.38,stagger:{amount:0.3,grid:'auto'},ease:'power2.out',clearProps:'opacity',onComplete:function(){ cardTween = null; }});
+      }
 
-  function render(){
-    var shown = TOOLS.filter(function(t){ return active === 'All' || t.chips.indexOf(active) >= 0; });
-    grid.innerHTML = shown.length ? shown.map(function(t){
-      var ext = isExternal(t.url);
-      var attrs = ext ? ' target="_blank" rel="noopener noreferrer"' : '';
-      return '<a class="tool-card" data-track-cta="tools:' + esc(t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) + '" href="' + esc(t.url) + '"' + attrs + '>'
-        + '<div class="tc-head"><h3>' + esc(t.name) + '</h3>' + (ext ? '<span class="tc-ext">↗</span>' : '') + '</div>'
-        + '<p>' + esc(t.blurb) + '</p>'
-        + '<div class="tc-host">' + esc(hostLabel(t.url)) + '</div>'
-        + '<div class="tc-chips">' + t.chips.map(function(c){ return '<span class="tc-chip">' + esc(c) + '</span>'; }).join('') + '</div>'
-        + '</a>';
-    }).join('') : '<div class="tools-empty">No tools in this category yet.</div>';
-  }
+      function setActive(chip){
+        active = chip;
+        if (history.replaceState) history.replaceState(null, '', chip === 'All' ? location.pathname : '#' + chip.toLowerCase());
+        buttons.forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-chip') === active)); });
+        var shown = cards.filter(function(card){ var on = inFilter(card); card.hidden = !on; return on; });
+        empty.hidden = shown.length > 0;
+        count.textContent = shown.length + ' / ' + cards.length + ' projects';
+        animate(shown);
+      }
 
-  function renderChips(){
-    var cats = ['All'].concat(CHIP_ORDER);
-    chipsBar.innerHTML = cats.map(function(c){
-      return '<button type="button" class="chip-filter" data-chip="' + c + '" aria-pressed="' + (c === active) + '">' + c + '</button>';
-    }).join('') + '<span class="count" id="toolCount"></span>';
-    chipsBar.querySelectorAll('.chip-filter').forEach(function(b){
-      b.addEventListener('click', function(){ setActive(b.getAttribute('data-chip')); });
-    });
-  }
+      function chipFromHash(){
+        var h = (location.hash || '').replace('#','').toLowerCase();
+        var match = CHIP_ORDER.filter(function(c){ return c.toLowerCase() === h; })[0];
+        return match || 'All';
+      }
 
-  function setActive(chip){
-    active = chip;
-    if (history.replaceState) history.replaceState(null, '', chip === 'All' ? location.pathname : '#' + chip.toLowerCase());
-    chipsBar.querySelectorAll('.chip-filter').forEach(function(b){
-      b.setAttribute('aria-pressed', String(b.getAttribute('data-chip') === active));
-    });
-    render();
-    var count = document.getElementById('toolCount');
-    var n = TOOLS.filter(function(t){ return active === 'All' || t.chips.indexOf(active) >= 0; }).length;
-    if (count) count.textContent = n + (n === 1 ? ' tool' : ' tools');
-  }
-
-  function chipFromHash(){
-    var h = (location.hash || '').replace('#','').toLowerCase();
-    var match = CHIP_ORDER.filter(function(c){ return c.toLowerCase() === h; })[0];
-    return match || 'All';
-  }
-
-  renderChips();
-  setActive(chipFromHash());
-  window.addEventListener('hashchange', function(){ setActive(chipFromHash()); });
+      buttons.forEach(function(b){
+        b.addEventListener('click', function(){ setActive(b.getAttribute('data-chip')); });
+      });
+      setActive(chipFromHash());
+      window.addEventListener('hashchange', function(){ setActive(chipFromHash()); });
+    } finally {
+      // The pre-paint hide only covers the gap until GSAP takes over; never leave cards hidden.
+      root.classList.remove('tools-motion');
+    }
+  })();
   </script>
   <script src="js/sbd-cta-metrics.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
