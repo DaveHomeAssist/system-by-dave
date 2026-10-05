@@ -176,9 +176,27 @@ function assertPageContracts(registry) {
   if (!index.includes('href="av-suite.html?entry=toolbox"') || !index.includes('Browse AV tools')) {
     fail('Homepage is missing the addressable AV Toolbox doorway.');
   }
-  if (!tools.includes("url: 'av-suite.html?entry=toolbox'") || !tools.includes('AV Toolbox')) {
+  if (!/<a class="tool-card"[^>]*\shref="av-suite\.html\?entry=toolbox"[^>]*>[\s\S]*?<h2>AV Toolbox<\/h2>/.test(tools)) {
     fail('Tools directory is missing the addressable AV Toolbox entry.');
   }
+  // Tools directory cards for registry tools carry the registry id and its navigation department.
+  const toolCards = Array.from(tools.matchAll(/<a class="tool-card[^"]*"([^>]*)>[\s\S]*?<span class="tc-badge">([^<]*)<\/span>/g), (match) => ({
+    attrs: match[1],
+    href: (match[1].match(/\shref="([^"]*)"/) || [])[1],
+    registryId: (match[1].match(/\sdata-registry-id="([^"]*)"/) || [])[1],
+    badge: match[2]
+  }));
+  toolCards.forEach((card) => {
+    const tool = registry.tools.find((candidate) => candidate.href === card.href);
+    if (!tool) {
+      if (card.registryId) fail(`Tools card ${card.href} names registry id ${card.registryId} but is not a registry route.`);
+      return;
+    }
+    const department = (registry.navDepartments || []).find((group) => (group.toolIds || []).includes(tool.id));
+    const expected = department ? department.label : tool.dept;
+    if (card.registryId !== tool.id) fail(`Tools card ${card.href} must carry data-registry-id="${tool.id}".`);
+    if (card.badge !== expected) fail(`Tools card ${tool.id} badge "${card.badge}" must be the registry department "${expected}".`);
+  });
 
   const calculator = read('av-calculator.html');
   const calculatorLogic = read('js/av-calculator.js');
