@@ -12,7 +12,7 @@ const routes = (process.env.VIEWPORT_ROUTES || 'show-advance').split(',');
   const page = await context.newPage(); const errors=[];page.on('pageerror',error=>errors.push(error.message));
   page.on('dialog',dialog=>dialog.accept());
   await page.goto(base+tool.href);await page.waitForSelector('[data-av-viewport=ready]');
-  assert.equal(await page.locator('html').getAttribute('data-av-theme'),'light');
+  assert.equal(await page.locator('html').getAttribute('data-av-theme'),'dark');
   async function activate(view) {await page.evaluate(view=>{const url=new URL(location.href);url.searchParams.set('taskView',view);history.pushState(null,'',url);dispatchEvent(new PopStateEvent('popstate'));},view);}
   async function reveal(selector) {
    const view=await page.locator(selector).evaluate(node=>node.closest('.av-view')?.id);if(view)await activate(view);
@@ -47,7 +47,7 @@ const routes = (process.env.VIEWPORT_ROUTES || 'show-advance').split(',');
   assert.equal(await page.locator('#hint').isVisible(),true,'failed import is reachable');
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),key),saved,'invalid import preserves saved work');
   await page.locator('#viewportTheme').click();await page.reload();await page.waitForSelector('[data-av-viewport=ready]');
-  assert.equal(await page.locator('html').getAttribute('data-av-theme'),'dark');assert.equal(await page.evaluate(key=>localStorage.getItem(key),key),saved);
+  assert.equal(await page.locator('html').getAttribute('data-av-theme'),'light','the operator choice survives reload');assert.equal(await page.evaluate(key=>localStorage.getItem(key),key),saved);
   await activate(handoff?'actionsView':'recordsView');const panel=page.locator('.table-wrap').first();await panel.evaluate(node=>{node.scrollTop=node.scrollHeight;node.scrollLeft=node.scrollWidth;});
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   const scroll=await panel.evaluate(node=>({top:node.scrollTop,left:node.scrollLeft}));await activate('metadataView');await activate(handoff?'actionsView':'recordsView');

@@ -91,10 +91,10 @@ function recommendedTools(){return (RECOMMENDED[state.phase]||[]).map(toolById).
 function readUi(){try{return JSON.parse(localStorage.getItem(UI_KEY)||'{}')||{};}catch(e){return {};}}
 function writeUi(patch){try{var cur=readUi();Object.keys(patch).forEach(function(k){cur[k]=patch[k];});localStorage.setItem(UI_KEY,JSON.stringify(cur));}catch(e){}}
 function systemPrefersDark(){return Boolean(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);}
-function readThemeMode(){var mode='light';try{var stored=localStorage.getItem(THEME_KEY);if(stored==='dark'||stored==='light'||stored==='system') mode=stored;}catch(e){}return mode;}
+function readThemeMode(){var mode='dark';try{var stored=localStorage.getItem(THEME_KEY);if(stored==='dark'||stored==='light'||stored==='system') mode=stored;}catch(e){}return mode;}
 
 var ui=readUi();
-var initialTheme=(window.__avResolveInitialTheme?window.__avResolveInitialTheme():{brand:'sbd',mode:'light',theme:'paper'});
+var initialTheme=(window.__avResolveInitialTheme?window.__avResolveInitialTheme():{brand:'sbd',mode:'dark',theme:'slate'});
 var uiState={
   density:ui.density==='compact'?'compact':'comfortable',
   brand:initialTheme.brand,

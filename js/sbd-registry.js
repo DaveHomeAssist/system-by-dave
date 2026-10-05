@@ -252,7 +252,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261004-workbook-withdrawn',
+    version:'v20261005-stage-slate-default',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

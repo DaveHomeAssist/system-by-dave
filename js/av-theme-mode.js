@@ -6,7 +6,8 @@
 
   var locked = root.getAttribute('data-av-theme-lock');
   var hasLock = locked === 'dark' || locked === 'light';
-  var mode = hasLock ? locked : 'light';
+  /* Stage Slate (dark) is the first-use default (docs/av-console.md, 2026-10-05). */
+  var mode = hasLock ? locked : 'dark';
   if(!hasLock){
     try{
       var stored = localStorage.getItem('av-theme-mode.v1');

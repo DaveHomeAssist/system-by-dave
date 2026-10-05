@@ -12,7 +12,7 @@
   try { saved = localStorage.getItem('av-theme-mode.v1'); } catch (_) {}
   let mode = requested === 'light' || requested === 'dark'
     ? requested
-    : saved === 'dark' ? 'dark' : 'light';
+    : saved === 'light' ? 'light' : 'dark';
 
   function paint() {
     root.setAttribute('data-av-theme', mode);
