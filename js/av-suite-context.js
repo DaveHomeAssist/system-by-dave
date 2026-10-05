@@ -7,7 +7,7 @@
     if(!root.hasAttribute('data-av-theme')) return;
     var tool = root.getAttribute('data-av-tool');
     if(tool === 'throwline' || tool === 'pixelforge') return;
-    var mode = 'light';
+    var mode = 'dark'; /* Stage Slate first-use default (docs/av-console.md) */
     try{
       var stored = localStorage.getItem('av-theme-mode.v1');
       if(stored === 'dark' || stored === 'light' || stored === 'system') mode = stored;

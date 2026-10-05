@@ -70,7 +70,7 @@ try {
   await page.goto(url);
   await page.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
   assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null, 'opening the app must not write a plan');
-  assert.equal(await page.locator('html').getAttribute('data-av-theme'), 'light');
+  assert.equal(await page.locator('html').getAttribute('data-av-theme'), 'dark');
   await page.keyboard.press('Tab');
   assert.equal(await page.locator(':focus').textContent(), 'Skip to video workspace');
   await button('Try a sample plan').click();

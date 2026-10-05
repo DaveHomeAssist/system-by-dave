@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-05 — Stage Slate is the first-use theme
+
+- **Dark by default.** A first visit to any AV by Dave page now opens in Stage Slate. Warm Paper (light) and System remain available, and a stored `av-theme-mode.v1` choice is never overridden.
+  - The default is set in `js/av-theme-mode.js`, `js/av-suite-context.js`, the Toolbox bootstrap and app, the AV home script, and AV Calculator's reset.
+  - The install manifest uses the Stage Slate background and theme colors.
+- **Cache version.** The registry version moves to `v20261005-stage-slate-default` so the offline cache refreshes the changed scripts. The generated workspace blocks, Stage 3D's pinned cache version and the consolidation inventory are regenerated.
+- **Probes.** The first-load assertions in the AV Video, calculator, worksheet and cue probes expect dark. The toggle-then-reload checks in the calculator, worksheet, cue, Show Board and StagePlotter probes now expect the light choice to survive reload.
+
 ## 2026-10-05 — AV Video panel console
 
 - **Shared console workspace.** A new engine in `apps/shared/av-console/`, contract in `docs/av-console.md`:

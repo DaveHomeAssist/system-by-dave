@@ -56,7 +56,7 @@ Live arrangement changes that have not been stored are interface state for this 
 
 Recorded on 2026-10-05 from Dave's review of the console manifest:
 
-1. **Theme.** Stage Slate dark becomes the first-use default. Warm Paper remains the light option. This is a separate release; AV Video still follows the current suite default today.
+1. **Theme.** Stage Slate (dark) is the first-use default across AV by Dave. Warm Paper (light) and System stay available, and an operator's stored choice always wins. The default is set in `js/av-theme-mode.js`, `js/av-suite-context.js`, the Toolbox bootstrap, the AV home and AV Calculator.
 2. **Drafts.** Each console gets its own draft key, separate from its saved document, plus a rail draft index. Save stays explicit.
 3. **Show chip.** Show and phase appear read-only, only when a console is opened with show context. Consoles never swap each other's data.
 4. **Scope.** Every application adopts the system, including products outside the registry, each with its own panel library and character. No generic sheet template.
