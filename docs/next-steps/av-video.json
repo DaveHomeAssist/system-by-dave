@@ -104,7 +104,7 @@
         "CHANGELOG.md"
       ],
       "evidence": "doc",
-      "phase": 3
+      "phase": 4
     },
     {
       "id": "AVV-15",
@@ -118,7 +118,7 @@
         "js/sbd-registry.js"
       ],
       "evidence": "doc",
-      "phase": 4
+      "phase": 3
     }
   ],
   "phases": [
