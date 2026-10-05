@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-04 — AV Video in the AV by Dave sitemap
+
+- `scripts/gen_sitemap.py` now lists registry tools whose route is a directory (`av-video/`, `pixelforge/`, `ProjectorThrow/`) instead of only `.html` routes, skipping paths a static entry already lists. `/av-video/` was live and canonical on avbydave.com but missing from its sitemap; the other two were already listed, and every other sitemap is unchanged.
+- The indexing gate's unlisted-route count drops from 145 to 144 accordingly.
+
 ## 2026-10-04 — Withdraw the public AV Workbook
 
 - Remove Workbook from Toolbox, Show Console, shared navigation, the public directory, sitemap and offline assets.

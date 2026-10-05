@@ -102,7 +102,7 @@ def site_for(path, sites, hrefs):
 
 def registry_tool_pages():
     src = io.open(os.path.join(ROOT, "js", "sbd-registry.js"), encoding="utf-8").read()
-    hrefs = re.findall(r"href:'([a-z0-9-]+\.html)'", src)
+    hrefs = re.findall(r"href:'([a-z0-9-]+\.html|[A-Za-z0-9-]+/)'", src)
     alias_files = re.findall(r"'\./([a-z0-9-]+\.html)'", src.split("ALIAS_FILES=")[1].split("]")[0])
     seen, pages = set(), []
     for href in hrefs + alias_files:
@@ -166,8 +166,9 @@ def main():
             continue
         if not path or is_indexable(path):
             entries.append((path, lastmod_for(path, dirty), freq, prio))
+    listed = {path for path, _, _, _ in entries}
     for href in registry_tool_pages():
-        if not belongs(href):
+        if href in listed or not belongs(href):
             continue
         if not os.path.exists(os.path.join(ROOT, href)):
             print("skip (missing file):", href, file=sys.stderr)
