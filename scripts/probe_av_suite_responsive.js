@@ -416,7 +416,8 @@ async function main() {
         event.preventDefault();
         window.__externalCommandCapture = {
           reference: link.getAttribute('data-external-command'),
-          href: link.href
+          href: link.href,
+          rel: link.rel
         };
       }, true);
       const input = document.getElementById('commandInput');
@@ -431,7 +432,7 @@ async function main() {
         dashboardAfter: localStorage.getItem('av-suite-dashboard.v1')
       };
     })()`);
-    if (externalExecution.capture?.reference !== 'external:cueforge' || externalExecution.capture?.href !== 'https://systembydave.com/cueforge.html') failures.push(`CueForge command did not execute its exact external route: ${JSON.stringify(externalExecution)}.`);
+    if (externalExecution.capture?.reference !== 'external:cueforge' || externalExecution.capture?.href !== 'https://systembydave.com/cueforge.html' || externalExecution.capture?.rel !== 'noopener noreferrer') failures.push(`CueForge command did not execute its exact protected external route: ${JSON.stringify(externalExecution)}.`);
     if (externalExecution.recent?.[0] !== 'external:cueforge') failures.push(`Executed external command was not recorded with its typed ID: ${JSON.stringify(externalExecution.recent)}.`);
     if (externalExecution.dashboardAfter !== externalExecution.dashboard) failures.push('Toolbox external command mutated the saved show dashboard.');
 

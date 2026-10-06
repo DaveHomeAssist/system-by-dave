@@ -285,6 +285,9 @@ function assertPageContracts(registry) {
   if (!/function navigableExternalById\(id\)[\s\S]*external\.kind==='handoff'[\s\S]*external\.destination/.test(avSuiteApp)) {
     fail('AV Suite command validation does not exclude status-only external products.');
   }
+  if (!/function openExternal\(id\)[\s\S]*link\.rel='noopener noreferrer'/.test(avSuiteApp)) {
+    fail('AV Suite external command navigation is missing rel protection.');
+  }
   ['toolboxPinned', 'toolboxRecent', 'toolboxSearch', 'toolboxFilter', 'toolboxFamily', 'preferredEntry'].forEach((field) => {
     if (!avSuiteApp.includes(field)) fail(`AV Suite UI preferences are missing ${field}.`);
   });
