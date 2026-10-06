@@ -377,7 +377,18 @@
       if(!store||typeof store[action]!=='function') return;
       var result=action==='move'?store.move(reference,index):store[action](reference);
       var state=result&&result.state?result.state:store.read();
-      customize.status.textContent=result.ok?(result.changed?'Rail preferences updated.':'No preference change was needed.'):(result.message||'Rail preferences could not be updated.');
+      var statusMessage='No preference change was needed.';
+      if(!result.ok){
+        statusMessage=result.message||'Rail preferences could not be updated.';
+      }else if(result.changed&&action==='move'){
+        var visibleRefs=array(state&&state.visibleRefs);
+        var position=visibleRefs.indexOf(reference);
+        var movedEntry=railRuntime().resolveRef(reference,registry);
+        statusMessage=(movedEntry?movedEntry.label:reference)+' moved to position '+(position+1)+' of '+visibleRefs.length+'.';
+      }else if(result.changed){
+        statusMessage='Rail preferences updated.';
+      }
+      customize.status.textContent=statusMessage;
       renderCustomize(state);
       if(typeof options.onPreferencesChange==='function') options.onPreferencesChange(result);
       var focusAction=nextAction||(result.ok&&action==='unpin'?'pin':result.ok&&action==='pin'?'unpin':action);

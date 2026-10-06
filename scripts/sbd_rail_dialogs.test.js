@@ -308,6 +308,10 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.equal(preferenceStorage.setCalls.length, 2);
   assert.equal(JSON.parse(preferenceStorage.data['sbd.rail.v1']).pinned.at(-1), 'console:audio');
   assert.equal(document.activeElement.getAttribute('data-action'), 'unpin');
+  click(action(controller.customizeDialog, 'console:audio', 'move-up'));
+  assert.equal(preferenceStorage.setCalls.length, 3);
+  assert.equal(controller.customizeDialog.children[1].textContent, 'Audio moved to position 8 of 9.');
+  assert.equal(document.activeElement.getAttribute('data-action'), 'move-up');
   click(action(controller.customizeDialog, 'defaults', 'reset'));
   assert.deepEqual(JSON.parse(preferenceStorage.data['sbd.rail.v1']).pinned, Array.from(registry.rail.defaultPinned));
   assert.equal(draftStorage.setCalls.length, 0);
