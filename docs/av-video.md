@@ -95,3 +95,9 @@ Signal Flow and Video Patch legacy URLs and storage contracts remain usable. The
 Preset references: [Blackmagic video standards](https://www.blackmagicdesign.com/products/atemtelevisionstudio/techspecs) and [Extron EDID timing tables](https://media.extron.com/public/download/files/userman/dtp_t_hwp_uwp_D_series_68-2547-01_H.pdf). These inform useful planning choices, not a claim that every device supports every format.
 
 The sequence probe checks camera/playback import parity, ordering and status actions, route links, CSV/full backups, recovery, module retention, keyboard and responsive themes, and offline edits. Run it through `npm run test:av-video-browser`.
+
+### Cameras/Playback release evidence, October 5
+
+[PR #268](https://github.com/DaveHomeAssist/system-by-dave/pull/268) and the compatible dependency repair [#271](https://github.com/DaveHomeAssist/system-by-dave/pull/271) published at `338ea85d3162a55e30a0c40f07955e2390ad46c2`. [Source publication](https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37403101951) and [AV destination publication](https://github.com/DaveHomeAssist/avbydave/actions/runs/37404940165) succeeded. The earlier audit failure in run `37400441588` remains historical evidence; the high-severity gate was preserved.
+
+Walter's isolated live sequence probe passed imports and field parity, actions/order, undo/redo, CSV/full backup, draft recovery, hidden modules, keyboard controls, both themes, responsive boundaries and offline Save/reload. The published source and JS/CSS matched before and after the probe. This closes automated delivery acceptance for Cameras/Playback; physical/operator acceptance and the remaining Video modules stay open.

@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "75132ba7a111b5a33b1b5df52f65ceb44df63dbc",
+  "head": "338ea85d3162a55e30a0c40f07955e2390ad46c2",
   "status": "amber",
-  "statusReason": "Console recovery is delivered. Cameras/Playback is implemented on the current branch with release verification pending. Stream/Record, Rail decisions/runtime and physical/operator acceptance remain open.",
+  "statusReason": "Cameras/Playback and console recovery are delivered with automated live proof. The dependency-security blocker is resolved. Stream/Record, Rail integration and physical/operator acceptance remain open.",
   "lastActivity": "2026-10-05",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -14,15 +14,16 @@
     "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit.",
     "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan.",
     "The shared console workspace, Stage Slate first-use theme, offered draft recovery and device-local layout persistence shipped through #264 at 66b3d66; source deployment 37282446471 and AV deployment 37286283303 succeeded.",
-    "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe."
+    "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe.",
+    "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter."
   ],
   "nextStep": {
-    "title": "Verify and publish Cameras and Playback, then prepare Stream and Record",
-    "why": "The Cameras/Playback implementation adds ordered records, operator actions and two lossless imports. Complete exact-head CI and publication before calling it delivered; Stream/Record remains next.",
+    "title": "Prepare Stream and Record after resolving stream-key handling",
+    "why": "Cameras/Playback is published and live-verified. Define credential handling across Stream/Record imports, original payloads and exports before its dependent implementation.",
     "doneWhen": "Video increments preserve legacy fields/statuses and imports with independent saved documents, reversible modules and verified publication.",
     "effort": "L",
     "owner": "Codex",
-    "blockedBy": ""
+    "blockedBy": "Stream-key handling decision before dependent Stream/Record implementation"
   },
   "findings": [
     {
@@ -70,8 +71,8 @@
       "id": "AVV-10",
       "type": "feature",
       "sev": "P2",
-      "title": "Cameras/Playback implemented; publication and Stream/Record remain",
-      "detail": "The earlier four-import/source-only finding is superseded by Cameras/Playback source implementation: six legacy imports, ordered shot/cue panels, explicit route links, optional modules and retained originals. Exact-head CI, publishing and isolated live proof remain required before delivery; Stream Plan and Record Log are still unbuilt in AV Video.",
+      "title": "Cameras/Playback delivered; Stream/Record remains",
+      "detail": "The earlier source-only finding is superseded by #268/#271, successful source/destination publication and isolated live acceptance at 338ea85. Six legacy import families preserve original data. Stream Plan and Record Log remain unbuilt in AV Video; physical/operator acceptance and legacy retirement remain separate.",
       "files": [
         "apps/av-video/src/model.ts",
         "apps/av-video/src/model.ts",
@@ -111,8 +112,8 @@
       "id": "AVV-15",
       "type": "decision",
       "sev": "P1",
-      "title": "RAIL-1B fixes nine console slots; responsive and customization profiles remain open",
-      "detail": "Dave selected RAIL-1B on 2026-10-05: Toolbox; AV Video, Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator; then All apps and Customize. At 66b3d66 only AV Video is a production console, so the other eight slots must be visibly Planned and status-only. RAIL-2 and RAIL-3 still decide literal-v3 versus adapted phone navigation and customization behavior; no Rail implementation is claimed.",
+      "title": "Nine Rail slots and responsive/customization choices approved; integration remains",
+      "detail": "Dave selected RAIL-1B on 2026-10-05: Toolbox; AV Video, Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator; then All apps and Customize. At 66b3d66 only AV Video is a production console, so the other eight slots must be visibly Planned and status-only. Dave approved RAIL-2A (phone Apps below 720px, compact rail at 720\u20131439px, labeled rail at 1440px+) and RAIL-3A (device-local pin, unpin, reorder and reset) on October 5. The Rail owner handles isolated implementation and later integration; no deployed Rail runtime or visual parity is claimed.",
       "files": [
         "docs/2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md",
         "docs/av-console.md",
@@ -134,7 +135,7 @@
     },
     {
       "name": "Remaining AV Video capabilities \u2014 Planned",
-      "goal": "Cameras/Playback, then Stream/Record under the existing field/import contract.",
+      "goal": "Stream/Record under the existing field/import contract; Cameras/Playback is delivered.",
       "items": [
         "Preserve independent Video documents, reversible modules, import previews and original legacy records.",
         "Revalidate historical Video navigation, form-size, offline-entry and stream-key findings before dependent work."
@@ -152,14 +153,14 @@
       "gate": "PRs #237\u2013#243 merged; both destination/source deployment evidence verified. Unselected catalog tools are not claimed refactored."
     },
     {
-      "name": "Application rail \u2014 Design decision recorded",
+      "name": "Application rail \u2014 Approved choices; integration pending",
       "goal": "Carry the complete v3 console order without presenting planned consoles as available products.",
       "items": [
         "RAIL-1B selected October 5: nine source-ordered console slots appear by default between fixed Toolbox and All apps / Customize controls.",
         "At the current production baseline only AV Video is available; Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator are Planned/status-only console identities.",
-        "RAIL-2 and RAIL-3 remain open for responsive rail presentation and local customization; implementation, tests, merge and deployment have not started."
+        "RAIL-2A responsive presentation and RAIL-3A device-local customization are approved. The Rail owner handles isolated implementation and integration; no public runtime acceptance is claimed."
       ],
-      "gate": "Resolve RAIL-2 and RAIL-3, then implement from the source-aligned brief without fabricated routes, documents, storage or readiness."
+      "gate": "Integrate the approved profile through the Rail owner, preserving exact nine slots, eight truthful Planned states, data and accessibility contracts."
     },
     {
       "name": "Physical and operator acceptance \u2014 Open",
@@ -182,19 +183,17 @@
       "gate": "PR #266 release verified separately from physical/operator acceptance."
     },
     {
-      "name": "Cameras and Playback \u2014 In verification",
+      "name": "Cameras and Playback \u2014 Delivered",
       "goal": "Deliver ordered camera shots and playback cues in the independent Video console.",
       "items": [
         "Preserve every legacy field, status, duration string and original import; keep legacy pages unchanged.",
         "Add reversible modules, stored-view reachability, operator status actions and CSV/full backups.",
-        "Walter: typecheck, 77 unit tests, build and all Video browser probes passed, including Cameras/Playback, layout and 14 recovery scenarios. Exact-head CI and publishing remain pending."
+        "Walter: 77 unit tests, full Video browser probes including 14 recovery scenarios, 128 legacy checks, 80 workspace cases and three offline reloads passed. Both publications succeeded. Isolated live sequence journeys passed at 338ea85 with exact-source/asset parity before and after."
       ],
-      "gate": "Green final-head CI, both publishing workflows, exact-source live journeys and scoped board parity; physical acceptance remains separate."
+      "gate": "Source, required CI, publication and isolated live acceptance passed; physical/operator acceptance remains separate."
     }
   ],
   "decisionsForDave": [
-    "RAIL-2 [needed before Rail implementation]: A) use an Apps dialog below 720px and a labeled rail at 1440px+ (recommended for usable phone width), or B) keep literal v3's persistent 56px icon rail at every width?",
-    "RAIL-3 [needed before Rail implementation]: A) implement local pin/unpin/reorder/reset in sbd.rail.v1 (recommended for reversible operator preferences), or B) keep literal v3's fixed order with Customize as future status only?",
     "Retire the 8 legacy Video pages once AV Video imports all 8 keys, or keep them live indefinitely?",
     "Minimum iOS/iPadOS for field use: 17.4+ (checkVisibility) or add fallbacks for older iPads?",
     "Throwline: keep explicit-save only (edited width resets on reload) or add a draft autosave?",
@@ -309,7 +308,7 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Continue the maintained AV Video increments from fresh remote main. AVV-02 pre-merge theme, Calculator and navigation coverage is delivered. Preserve independently saved Video documents and explicit legacy imports while delivering Cameras/Playback then Stream/Record; test optional-module off states, export/reload, unchanged original data, CI and public release. Physical acceptance remains separate.",
+  "kickoffPrompt": "Continue the maintained AV Video increments from fresh remote main. AVV-02 pre-merge theme, Calculator and navigation coverage is delivered. Preserve independently saved Video documents and explicit legacy imports while preparing Stream/Record after its credential-handling decision; test optional-module off states, export/reload, unchanged original data, CI and public release. Physical acceptance remains separate.",
   "confidence": "High for the cited console release and scoped automated checks; physical acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
@@ -319,41 +318,37 @@
   "short": "AV Video",
   "evidence": {
     "checkedOn": "2026-10-05",
-    "sourceRevision": "75132ba7a111b5a33b1b5df52f65ceb44df63dbc",
-    "scope": "Console recovery release and focused browser acceptance; no new catalog-wide or physical-device acceptance claim.",
+    "sourceRevision": "338ea85d3162a55e30a0c40f07955e2390ad46c2",
+    "scope": "Cameras/Playback automated delivery acceptance; no Rail runtime, Stream/Record or physical acceptance claim.",
     "sources": [
-      "docs/av-console.md",
-      "apps/shared/av-console/drafts.ts",
-      "apps/shared/av-console/Workspace.tsx",
-      "scripts/probe_av_console_recovery.mjs",
-      "CHANGELOG.md"
+      "docs/av-video.md",
+      "apps/av-video/src/sequences.ts",
+      "apps/av-video/src/SequencePanel.tsx",
+      "scripts/probe_av_video_sequences.mjs"
     ],
-    "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/266",
-    "recoveryMerge": "73a7bbeb3e61b28470c668538b6fa530ccc4d53c",
-    "liveProbeSourceRevision": "73a7bbeb3e61b28470c668538b6fa530ccc4d53c",
-    "liveProbeRunner": "Duncan",
-    "exactHeadCI": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37384569429",
-    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37385110411",
-    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37387293386",
+    "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/268",
+    "featureMerge": "6ef9a2540335668ca2d516afa2e72685a42476ff",
+    "securityRepair": "https://github.com/DaveHomeAssist/system-by-dave/pull/271",
+    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37403101951",
+    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37404940165",
+    "destinationCommit": "cde819cd195b97dfa897d1f378f2d0858f5c8e3d",
+    "failedSourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37400441588",
     "publishedSource": "https://avbydave.com/source.json",
+    "liveProbeSourceRevision": "338ea85d3162a55e30a0c40f07955e2390ad46c2",
+    "liveProbeRunner": "Walter",
     "runtime": [
-      "Walter: typecheck, 69 unit tests, build, full Video/graph/Displays/console probes, 14 recovery scenarios, 128 legacy checks, verify:av and verify:domain-sites passed.",
-      "Duncan: live isolated recovery probe passed: storage failures, tab conflicts, stale discard, Save/reload/export, keyboard controls, themes, 375/719/720/1099/1100/1440 widths and hidden-module retention.",
-      "Live source.json named 73a7bbeb3e61b28470c668538b6fa530ccc4d53c before and after the Duncan probe. Published AV Video JavaScript/CSS matched that revision byte-for-byte."
+      "PR #268: nine checks passed at 9102054; PR #271: eight checks passed at e9f0589.",
+      "Walter: 77 unit tests, typecheck/build, full Video probes, 128 legacy checks, 80 workspace cases and three offline reloads passed before release.",
+      "Security repair: clean install, high-severity audit with zero vulnerabilities, three app builds and unchanged generated artifacts.",
+      "Live isolated Cameras/Playback imports, field parity, ordering/actions, undo/redo, CSV/full backup, recovery, module retention, keyboard, light/dark themes, 375/680/719/720/1099/1100/1440/3440 widths and offline Save/reload passed.",
+      "Published source and JS/CSS byte parity matched before and after the live probe. Desktop and phone captures inspected."
     ],
     "limits": [
-      "Physical phones/tablets and operator rehearsal are not established by automation.",
-      "RAIL-1B remains an accepted planning decision; no Rail runtime or browser-rendered v3 parity is claimed.",
-      "Already-open older application builds must reload to participate in the new draft lock protocol. Browsers without Web Locks retain explicit Save/Export and report unavailable automatic draft recovery.",
-      "Remaining historical shell findings require their own revalidation; the prior homepage overflow observation is not remeasured here."
-    ],
-    "camerasPlayback": {
-      "baseRevision": "63de8305f4b5018c7457ca6bccd95db0af297c04",
-      "branch": "codex/av-video-cameras-playback-20261005",
-      "state": "implemented; remote Video tests passed; exact-head CI and publication pending",
-      "runner": "Walter",
-      "scope": "Camera Shot List and Playback Check; no Rail, Stream/Record, hardware control, sync or legacy retirement."
-    }
+      "Physical phones/tablets, virtual keyboards and operator rehearsal are not established by browser automation.",
+      "Rail choices are approved; this release does not establish Rail runtime or visual parity.",
+      "Stream/Record credential policy, legacy retirement and cross-app synchronization remain separate decisions/work.",
+      "Historical shell findings retain their own revalidation requirements."
+    ]
   },
   "historicalFindings": [
     {
@@ -415,6 +410,16 @@
       "id": "AVV-SEQUENCE",
       "question": "Next Video slice first: Cameras/Playback or Stream & Record?",
       "resolution": "The maintained implementation plan specifies Cameras/Playback followed by Stream/Record. Follow that sequence; no new decision inferred."
+    },
+    {
+      "id": "RAIL-2",
+      "question": "RAIL-2 [needed before Rail implementation]: A) use an Apps dialog below 720px and a labeled rail at 1440px+ (recommended for usable phone width), or B) keep literal v3's persistent 56px icon rail at every width?",
+      "resolution": "Dave approved October 5 in the confirmed-choices intake: Phone Apps dialog below 720px, compact rail at 720\u20131439px, labeled rail at 1440px+. The Rail owner handles specification/runtime integration separately."
+    },
+    {
+      "id": "RAIL-3",
+      "question": "RAIL-3 [needed before Rail implementation]: A) implement local pin/unpin/reorder/reset in sbd.rail.v1 (recommended for reversible operator preferences), or B) keep literal v3's fixed order with Customize as future status only?",
+      "resolution": "Dave approved October 5 in the confirmed-choices intake: Device-local pin, unpin, reorder and reset. The Rail owner handles specification/runtime integration separately."
     }
   ],
   "historicalEvidence": [
@@ -467,6 +472,58 @@
             "metadataFixPR": "https://github.com/DaveHomeAssist/system-by-dave/pull/258",
             "deployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37252267300",
             "liveReadback": "AV source.json named 1e51c7c at that check. All six former Workbook entry URLs on both origins reached Toolbox. Editor bundle and retained source were 404. PR viewport contracts passed."
+          }
+        }
+      }
+    },
+    {
+      "recordedOn": "2026-10-05",
+      "scope": "Recovery release and Cameras/Playback publication blocker, superseded by verified 338ea85 release and live acceptance",
+      "evidence": {
+        "checkedOn": "2026-10-05",
+        "sourceRevision": "75132ba7a111b5a33b1b5df52f65ceb44df63dbc",
+        "scope": "Console recovery release and focused browser acceptance; no new catalog-wide or physical-device acceptance claim.",
+        "sources": [
+          "docs/av-console.md",
+          "apps/shared/av-console/drafts.ts",
+          "apps/shared/av-console/Workspace.tsx",
+          "scripts/probe_av_console_recovery.mjs",
+          "CHANGELOG.md"
+        ],
+        "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/266",
+        "recoveryMerge": "73a7bbeb3e61b28470c668538b6fa530ccc4d53c",
+        "liveProbeSourceRevision": "73a7bbeb3e61b28470c668538b6fa530ccc4d53c",
+        "liveProbeRunner": "Duncan",
+        "exactHeadCI": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37384569429",
+        "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37385110411",
+        "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37387293386",
+        "publishedSource": "https://avbydave.com/source.json",
+        "runtime": [
+          "Walter: typecheck, 69 unit tests, build, full Video/graph/Displays/console probes, 14 recovery scenarios, 128 legacy checks, verify:av and verify:domain-sites passed.",
+          "Duncan: live isolated recovery probe passed: storage failures, tab conflicts, stale discard, Save/reload/export, keyboard controls, themes, 375/719/720/1099/1100/1440 widths and hidden-module retention.",
+          "Live source.json named 73a7bbeb3e61b28470c668538b6fa530ccc4d53c before and after the Duncan probe. Published AV Video JavaScript/CSS matched that revision byte-for-byte."
+        ],
+        "limits": [
+          "Physical phones/tablets and operator rehearsal are not established by automation.",
+          "RAIL-1B remains an accepted planning decision; no Rail runtime or browser-rendered v3 parity is claimed.",
+          "Already-open older application builds must reload to participate in the new draft lock protocol. Browsers without Web Locks retain explicit Save/Export and report unavailable automatic draft recovery.",
+          "Remaining historical shell findings require their own revalidation; the prior homepage overflow observation is not remeasured here."
+        ],
+        "camerasPlayback": {
+          "baseRevision": "63de8305f4b5018c7457ca6bccd95db0af297c04",
+          "branch": "codex/av-video-cameras-playback-20261005",
+          "state": "merged; publication blocked by dependency audit; compatible repair in verification",
+          "runner": "Walter",
+          "scope": "Camera Shot List and Playback Check; no Rail, Stream/Record, hardware control, sync or legacy retirement.",
+          "merge": "6ef9a2540335668ca2d516afa2e72685a42476ff",
+          "failedSourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37400441588",
+          "dependencyRepair": {
+            "package": "source-map-js",
+            "from": "1.2.1",
+            "to": "1.2.2",
+            "advisory": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+            "scope": "Only the transitive lock entry; no manifest change or audit bypass.",
+            "verification": "Walter: clean npm ci, npm audit --audit-level=high (zero vulnerabilities), Video/Workbook/Simulator builds and generated-file parity all pass. Repaired PR/release gates remain pending."
           }
         }
       }
