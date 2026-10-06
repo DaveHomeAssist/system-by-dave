@@ -50,3 +50,10 @@
 .draft-offer p{flex:1;min-width:240px;font-size:12px;color:var(--av-text)}
 .draft-offer .row-actions{margin:0}
 @media(max-width:680px){.draft-offer{padding:4px 8px;gap:6px;flex-wrap:nowrap}.draft-offer p{font-size:11px;min-width:0}.draft-more{display:none}.draft-offer .row-actions{flex-wrap:nowrap;gap:4px}.draft-offer button{padding:6px 8px;font-size:11px}}
+
+/* Sequence panels adapt to their actual console slot, not only the viewport. */
+.sequence-layout{display:grid;grid-template-columns:minmax(240px,40%) minmax(0,1fr);gap:12px;min-height:0;min-width:0;height:100%;flex:1}.sequence-layout>.route-browser,.sequence-layout>.inspector{min-height:0;min-width:0}.sequence-actions{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border-bottom:1px solid var(--av-line);max-height:140px;overflow:auto}.sequence-actions button{font-size:12px}.sequence-next{padding:8px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}.sequence-back{display:none}.sequence-route{margin-top:16px}.sequence-route>button{margin-top:10px}.sequence-layout .route-card-title strong{overflow-wrap:anywhere}.sequence-layout .route-card-footer{white-space:normal}
+@container panel (max-width:760px){.sequence-layout{display:flex;flex-direction:column}.sequence-layout>.sequence-inspector{display:none}.sequence-detail-open>.route-browser{display:none}.sequence-detail-open>.sequence-inspector{display:flex;flex:1}.sequence-back{display:block}.sequence-layout .field-grid{grid-template-columns:1fr}}
+@media(max-width:680px){.sequence-layout{display:flex;flex-direction:column}.sequence-layout>.sequence-inspector{display:none}.sequence-detail-open>.route-browser{display:none}.sequence-detail-open>.sequence-inspector{display:flex;flex:1}.sequence-back{display:block}}
+
+.video-app .mode-phone .console-quick button{flex:0 0 auto;min-width:64px;padding-inline:10px}
