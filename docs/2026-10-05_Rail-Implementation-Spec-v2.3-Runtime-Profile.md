@@ -194,10 +194,18 @@ The registry slice must assert:
 
 Later runtime verification must cover the responsive fixtures, keyboard order, visible focus, 44px targets, 200% zoom, reduced motion, preference reload/reset/failure behavior, Planned status semantics, route context isolation, and unchanged AV Video document state.
 
+### Standalone runtime source boundary
+
+Sequence step 2 is implemented as an unmounted source layer in `js/sbd-rail.js` and `css/sbd-rail.css`. The runtime exports exact typed-reference resolution, `sbd.rail.v1` reads, and explicit `pin`, `unpin`, `move`, and `reset` operations. It does not inspect storage or the DOM when loaded and does not mount itself.
+
+The preference parser renders defaults without writing when the key is absent. It preserves known Planned entries in order, suppresses unresolved or non-pinnable entries, and retains only unresolved references after visible entries on the next explicit successful edit. Known non-pinnable records are dropped by that explicit edit. Duplicate references are removed by exact string identity without invoking tool aliases. Unreadable or unsupported payloads remain untouched until explicit reset.
+
+The standalone renderer uses native links and buttons, a non-interactive Planned treatment, visible and screen-reader-readable status text, a focusable bounded scroll region, 44px targets, a phone Apps trigger below 720px, compact presentation from 720 through 1439px, and labeled presentation from 1440px upward. Dialogs, focus trapping, production mounting, cache changes, and live acceptance remain later steps.
+
 ## 9. Implementation sequence
 
 1. **Complete in this source slice:** add identities, default pins, external records, exact lookup, and focused verifier coverage. Defer the cache-version bump until the rail runtime and offline assets are introduced together.
-2. Implement the standalone rail renderer and preference parser without mounting it.
+2. **Implemented in the stacked standalone-runtime review slice:** rail renderer and preference parser, without production mounting.
 3. Add All apps and Customize dialogs, typed route resolution, and AV Video draft invalidation.
 4. Implement Toolbox family and external command support explicitly.
 5. Mount the selected RAIL-2A profile around AV Video and rebuild production assets.
