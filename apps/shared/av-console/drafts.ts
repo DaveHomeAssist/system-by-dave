@@ -2,8 +2,11 @@ import { z } from "zod";
 import type { Panel } from "./layout";
 
 export const DRAFT_INDEX = "sbd.consoleDrafts.v1";
+export const DRAFT_CHANGE_EVENT = "sbd:console-draft-change";
 type Store = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 export type Draft<T> = { v: 1; console: string; at: string; baseline: string | null; doc: T };
+export type DraftChangeDetail = { consoleId: string };
+export type DraftChangeNotifier = (detail: DraftChangeDetail) => void;
 const draftShape = z.object({ v: z.literal(1), console: z.string(), at: z.string(), baseline: z.string().nullable(), doc: z.unknown() }).strict();
 const panelShape = z.object({ id: z.string(), type: z.string(), x: z.number().int(), y: z.number().int(), w: z.number().int(), h: z.number().int() }).strict();
 const layoutShape = z.object({ v: z.literal(1), viewId: z.string(), locked: z.boolean(), live: z.record(z.array(panelShape)) }).strict();
@@ -11,6 +14,11 @@ export type LayoutState = { viewId: string; locked: boolean; live: Record<string
 export type DraftResult = { ok: boolean; error?: string; indexError?: string; indexChecked?: boolean };
 export type DraftSnapshot<T> = { raw: string | null; draft: Draft<T> | null; error?: string };
 export type DraftLock = (action: () => DraftResult) => Promise<DraftResult>;
+
+export const dispatchDraftChange: DraftChangeNotifier = detail => {
+  if (typeof window === "undefined" || typeof CustomEvent !== "function") return;
+  window.dispatchEvent(new CustomEvent<DraftChangeDetail>(DRAFT_CHANGE_EVENT, { detail }));
+};
 
 function readJson(storage: Store, key: string): unknown { try { const raw = storage.getItem(key); return raw === null ? null : JSON.parse(raw); } catch { return null; } }
 function writeJson(storage: Store, key: string, value: unknown): boolean { try { const raw = JSON.stringify(value); storage.setItem(key, raw); return storage.getItem(key) === raw; } catch { return false; } }
@@ -59,7 +67,7 @@ export function draftIndex(storage: Store): Record<string, { at: string; label: 
 /* Compare and mutate under one origin-wide Web Lock. The saved-plan guard is
    separate. Never acquire ownership by observing another tab's storage event.
    A changed snapshot stops this session until explicit reload/recovery. */
-export function createDraftSession<T>(storage: Store, key: string, console: string, snapshot: DraftSnapshot<T>, lock?: DraftLock) {
+export function createDraftSession<T>(storage: Store, key: string, console: string, snapshot: DraftSnapshot<T>, lock?: DraftLock, notifyDraftChange: DraftChangeNotifier = dispatchDraftChange) {
   let expected = snapshot.raw;
   let owned = false;
   let blocked = snapshot.error;
@@ -77,6 +85,7 @@ export function createDraftSession<T>(storage: Store, key: string, console: stri
         if (storage.getItem(key) !== expected) { blocked = conflict; return { ok: false, error: blocked }; }
         if (action === "restore") { owned = true; return { ok: true }; }
         const result = action === "write" ? writeDraft(storage, key, console, doc!, baseline ?? null, label || "") : clearDraft(storage, key, console);
+        try { notifyDraftChange({ consoleId: console }); } catch { /* advisory invalidation must not change draft persistence */ }
         if (result.ok) { expected = storage.getItem(key); owned = action === "write"; }
         return result;
       });
