@@ -20,6 +20,13 @@
 - Update only the transitive `source-map-js` lock entry from 1.2.1 to 1.2.2, within PostCSS’s existing compatible range, to address GHSA-68fv-2mgg-jv7q. Keep the high-severity audit gate unchanged.
 - Preserve the failed Cameras/Playback publication run 37400441588 as evidence; source merge alone does not establish publication or live acceptance.
 
+## 2026-10-05 — Standalone AV application rail runtime
+
+- Add an unmounted, registry-driven application rail that resolves typed console, family, tool and external references without alias fallthrough.
+- Render the nine-console RAIL-1B order with AV Video available and eight keyboard-discoverable, non-navigating Planned entries.
+- Add explicit `sbd.rail.v1` pin, unpin, reorder and reset operations. Reads and rendering never write; unsupported payloads require reset; unknown IDs survive explicit edits; failed saves retain the attempted session arrangement and report that it was not persisted.
+- Add phone, compact and labeled responsive foundations plus focused Node coverage in the required AV verification gate. Dialogs, production mounting, browser acceptance and deployment remain later work.
+
 ## 2026-10-05 — Cameras and Playback in AV Video
 
 - Add ordered shot and playback-cue panels, field editors, filters, duplication, reordering, operator status actions and explicit signal-route links.
