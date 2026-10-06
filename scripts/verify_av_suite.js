@@ -303,7 +303,7 @@ function assertPageContracts(registry) {
   ['./av-suite.html?entry=show', './av-suite.html?entry=toolbox'].forEach((url) => {
     if (!shortcutUrls.includes(url)) fail(`PWA manifest is missing shortcut ${url}.`);
   });
-  if (!index.includes('href="av-suite.html?entry=toolbox"') || !index.includes('Browse AV tools')) {
+  if (!index.includes('href="av-suite.html?entry=toolbox"') || !/Browse (the )?AV tools/.test(index)) {
     fail('Homepage is missing the addressable AV Toolbox doorway.');
   }
   if (!/<a class="tool-card"[^>]*\shref="av-suite\.html\?entry=toolbox"[^>]*>[\s\S]*?<h2>AV Toolbox<\/h2>/.test(tools)) {

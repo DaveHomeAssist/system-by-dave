@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-10-06 — Homepage privacy copy clarification
+
+- Remove the homepage analytics claim and clarify the browser-stored click counts in the privacy policy; align the sitemap dates.
+
+## 2026-10-05 — Homepage copy refresh and facelift
+
+- **Copy.** New headline "Tools that do the unglamorous work." and a subhead that names all three product lines. Every route, product, featured and proof card now ends in a labelled link to a real page; product-card chips (Show Console, Toolbox, All tools; Overview, Web app, Pricing; Agents, Widgets, Skills) are real links instead of decorative labels. The stat strip reads 45 AV tools, 4 Notion agents, 4 free widgets, 7 Prompt Lab enhancement modes, replacing "01 Prompt-engineering workbench". Notion agents are no longer described as "in production" (the agents page calls them concepts set up by contact), and the unverifiable Prompt Lab version tag and "Featured this month" heading are gone. Sort Inbox links to its detail section on the agents page.
+- **Design.** `index.html` moves from per-element inline styles to one page style block after the shared shell CSS: tokenised colors, one type scale (DM Sans + JetBrains Mono, both self-hosted; the never-loaded Space Grotesk is dropped from the stack), rounded cards with a stretched-link pattern, consistent 48px buttons and 44px chips, visible card focus rings, a cropped Prompt Lab screenshot with real alt text, a 3-up proof grid, and a `prefers-reduced-motion` bypass. Mobile stacks the hero actions and cards without the previous `!important` overrides.
+- No other page, shared stylesheet, route or metadata contract changed; the homepage title, description, Open Graph, Twitter and JSON-LD copy follow the new headline.
+
+## 2026-10-05 — Cameras/Playback release acceptance
+
+- Record successful source and AV destination publication at `338ea85`, followed by isolated live Cameras/Playback acceptance on Walter, including imports, recovery, responsive themes and offline Save/reload.
+- Retain the earlier dependency-audit failure and its compatible repair as history. Keep physical/operator acceptance, Stream/Record and Rail integration separate; carry forward the approved Rail responsive/customization choices.
+
+## 2026-10-05 — AV release dependency security
+
+- Update only the transitive `source-map-js` lock entry from 1.2.1 to 1.2.2, within PostCSS’s existing compatible range, to address GHSA-68fv-2mgg-jv7q. Keep the high-severity audit gate unchanged.
+- Preserve the failed Cameras/Playback publication run 37400441588 as evidence; source merge alone does not establish publication or live acceptance.
+
 ## 2026-10-05 — Standalone AV application rail runtime
 
 - Add an unmounted, registry-driven application rail that resolves typed console, family, tool and external references without alias fallthrough.
