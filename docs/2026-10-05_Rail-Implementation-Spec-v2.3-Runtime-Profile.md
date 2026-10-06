@@ -196,7 +196,7 @@ Later runtime verification must cover the responsive fixtures, keyboard order, v
 
 ## 9. Implementation sequence
 
-1. **Complete in this source slice:** add identities, default pins, external records, exact lookup, version bump, and focused verifier coverage.
+1. **Complete in this source slice:** add identities, default pins, external records, exact lookup, and focused verifier coverage. Defer the cache-version bump until the rail runtime and offline assets are introduced together.
 2. Implement the standalone rail renderer and preference parser without mounting it.
 3. Add All apps and Customize dialogs, typed route resolution, and AV Video draft invalidation.
 4. Implement Toolbox family and external command support explicitly.
