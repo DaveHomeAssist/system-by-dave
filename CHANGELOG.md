@@ -27,6 +27,7 @@
 - Add explicit `sbd.rail.v1` pin, unpin, reorder and reset operations. Reads and rendering never write; unsupported payloads require reset; unknown IDs survive explicit edits; failed saves retain the attempted session arrangement and report that it was not persisted.
 - Add phone, compact and labeled responsive foundations plus focused Node coverage in the required AV verification gate. Production mounting, browser acceptance and deployment remain later work.
 - Add unmounted All apps and Customize dialogs, destination-specific typed routing, direct draft-key status reads, same-tab/cross-tab invalidation, focus return and keyboard preference controls. AV Video emits advisory `sbd:console-draft-change` events after attempted draft mutations without changing its existing persistence result.
+- Honor typed Toolbox `family=` links as non-persisted effective filters, with Show/Front Office precedence and Back/Forward recomputation. Add exact `external:` quick-switcher commands for navigable handoffs while preserving legacy CueForge/PlotForge tool aliases and excluding status-only products.
 
 ## 2026-10-05 — Cameras and Playback in AV Video
 

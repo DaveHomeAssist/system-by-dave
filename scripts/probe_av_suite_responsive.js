@@ -304,6 +304,138 @@ async function main() {
     if (toolboxReload.dashboard !== toolboxInteraction.sentinelBefore) failures.push('Toolbox reload changed the show dashboard sentinel.');
     if (toolboxReload.search !== 'projection' || toolboxReload.family !== 'video' || toolboxReload.pinned !== 'true') failures.push('Toolbox UI preferences did not survive reload.');
 
+    /* A typed family URL is an effective, non-persisted browsing override.
+       Unknown families fall back to the saved Toolbox state, and popstate
+       recomputes the effective family without touching saved show/UI bytes. */
+    const familySentinel = await evaluateValue(`(() => ({
+      dashboard: localStorage.getItem('av-suite-dashboard.v1'),
+      ui: localStorage.getItem('av-suite-ui.v1')
+    }))()`);
+    await navigate('av-suite.html?entry=toolbox&family=audio');
+    const knownFamily = await evaluateValue(`(() => ({
+      mode: document.getElementById('avApp').getAttribute('data-entry'),
+      search: document.getElementById('toolboxSearchInput').value,
+      family: document.getElementById('toolboxFamilySelect').value,
+      allPressed: document.querySelector('[data-toolbox-filter="all"]').getAttribute('aria-pressed'),
+      tools: Array.from(document.querySelectorAll('.toolbox-card a[data-tool]')).map((link) => link.getAttribute('data-tool')).sort(),
+      expected: window.SBD_REGISTRY.consoleFamilies.find((family) => family.id === 'audio').toolIds.slice().sort(),
+      dashboard: localStorage.getItem('av-suite-dashboard.v1'),
+      ui: localStorage.getItem('av-suite-ui.v1')
+    }))()`);
+    if (knownFamily.mode !== 'toolbox' || knownFamily.search !== '' || knownFamily.family !== 'audio' || knownFamily.allPressed !== 'true') failures.push(`Known family URL did not establish the effective Toolbox state: ${JSON.stringify(knownFamily)}.`);
+    if (JSON.stringify(knownFamily.tools) !== JSON.stringify(knownFamily.expected)) failures.push(`Known family URL displayed the wrong tools: ${JSON.stringify(knownFamily)}.`);
+    if (knownFamily.dashboard !== familySentinel.dashboard || knownFamily.ui !== familySentinel.ui) failures.push('Known family URL mutated saved show or Toolbox preferences.');
+
+    await navigate('av-suite.html?entry=toolbox&family=missing');
+    const unknownFamily = await evaluateValue(`(() => ({
+      search: document.getElementById('toolboxSearchInput').value,
+      family: document.getElementById('toolboxFamilySelect').value,
+      pinned: document.querySelector('[data-toolbox-filter="pinned"]').getAttribute('aria-pressed'),
+      dashboard: localStorage.getItem('av-suite-dashboard.v1'),
+      ui: localStorage.getItem('av-suite-ui.v1')
+    }))()`);
+    if (unknownFamily.search !== 'projection' || unknownFamily.family !== 'video' || unknownFamily.pinned !== 'true') failures.push(`Unknown family URL did not use the normal saved Toolbox fallback: ${JSON.stringify(unknownFamily)}.`);
+    if (unknownFamily.dashboard !== familySentinel.dashboard || unknownFamily.ui !== familySentinel.ui) failures.push('Unknown family URL mutated saved show or Toolbox preferences.');
+
+    await navigate('av-suite.html?entry=toolbox&family=audio');
+    const familyHistory = await evaluateValue(`(async () => {
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      history.pushState({ avEntry: 'toolbox' }, '', 'av-suite.html?entry=toolbox&family=video');
+      dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
+      await wait(100);
+      const pushed = document.getElementById('toolboxFamilySelect').value;
+      history.back();
+      await wait(180);
+      const back = document.getElementById('toolboxFamilySelect').value;
+      history.forward();
+      await wait(180);
+      const forward = document.getElementById('toolboxFamilySelect').value;
+      return {
+        pushed, back, forward,
+        dashboard: localStorage.getItem('av-suite-dashboard.v1'),
+        ui: localStorage.getItem('av-suite-ui.v1')
+      };
+    })()`, true);
+    if (familyHistory.pushed !== 'video' || familyHistory.back !== 'audio' || familyHistory.forward !== 'video') failures.push(`Family URL history did not recompute effective browsing state: ${JSON.stringify(familyHistory)}.`);
+    if (familyHistory.dashboard !== familySentinel.dashboard || familyHistory.ui !== familySentinel.ui) failures.push('Family Back/Forward mutated saved show or Toolbox preferences.');
+
+    await navigate('av-suite.html?entry=frontoffice&family=audio');
+    const frontOfficeFamily = await evaluateValue(`({
+      context: document.querySelector('#shopOfficeView h2')?.textContent || '',
+      toolboxControls: Boolean(document.getElementById('toolboxFamilySelect')),
+      dashboard: localStorage.getItem('av-suite-dashboard.v1'),
+      ui: localStorage.getItem('av-suite-ui.v1')
+    })`);
+    if (!frontOfficeFamily.context.startsWith('Front Office') || frontOfficeFamily.toolboxControls) failures.push(`Front Office incorrectly applied the Toolbox family override: ${JSON.stringify(frontOfficeFamily)}.`);
+    if (frontOfficeFamily.dashboard !== familySentinel.dashboard || frontOfficeFamily.ui !== familySentinel.ui) failures.push('Front Office family URL mutated saved show or Toolbox preferences.');
+
+    /* Exact external commands coexist with legacy tool aliases. Status-only
+       products never become executable commands or valid command recents. */
+    await navigate('av-suite.html?entry=toolbox&probe=command-recents#source-fragment');
+    const externalCommands = await evaluateValue(`(() => {
+      const ui = JSON.parse(localStorage.getItem('av-suite-ui.v1') || '{}');
+      ui.toolboxCommandRecent = ['external:cueforge', 'external:arenaops', 'tool:cueforge', 'tool:plotforge'];
+      localStorage.setItem('av-suite-ui.v1', JSON.stringify(ui));
+      return true;
+    })()`);
+    if (!externalCommands) failures.push('Could not seed external command recent coverage.');
+    await navigate('av-suite.html?entry=toolbox#source-fragment');
+    const externalPool = await evaluateValue(`(() => {
+      document.getElementById('searchBtn').click();
+      const input = document.getElementById('commandInput');
+      function query(value) {
+        input.value = value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        return Array.from(document.querySelectorAll('[data-command-id]')).map((row) => ({
+          id: row.getAttribute('data-command-id'),
+          href: row.getAttribute('data-command-href') || ''
+        }));
+      }
+      return {
+        recent: query(''),
+        cueforge: query('CueForge'),
+        plotforge: query('PlotForge'),
+        cueSheet: query('Cue Sheet'),
+        stageplotter: query('StagePlotter'),
+        arenaops: query('Arena Ops')
+      };
+    })()`);
+    if (!externalPool.cueforge.some((item) => item.id === 'external:cueforge' && item.href === 'https://systembydave.com/cueforge.html')) failures.push(`CueForge external command is missing or routed through the wrong destination: ${JSON.stringify(externalPool.cueforge)}.`);
+    const plotForgeCommand = externalPool.plotforge.find((item) => item.id === 'external:plotforge');
+    if (!plotForgeCommand || new URL(plotForgeCommand.href).pathname !== '/plotforge.html' || new URL(plotForgeCommand.href).search || new URL(plotForgeCommand.href).hash) failures.push(`PlotForge external command inherited source context/hash: ${JSON.stringify(externalPool.plotforge)}.`);
+    if (!externalPool.cueSheet.some((item) => item.id === 'tool:cue-sheet') || !externalPool.stageplotter.some((item) => item.id === 'tool:stageplotter')) failures.push('Legacy CueForge/PlotForge tool aliases no longer resolve to Cue Sheet/StagePlotter commands.');
+    if (externalPool.arenaops.some((item) => item.id === 'external:arenaops') || externalPool.recent.some((item) => item.id === 'external:arenaops')) failures.push('Status-only Arena Ops became an executable or recent command.');
+    if (!externalPool.recent.some((item) => item.id === 'external:cueforge') || !externalPool.recent.some((item) => item.id === 'tool:cue-sheet') || !externalPool.recent.some((item) => item.id === 'tool:stageplotter')) failures.push(`Valid typed/legacy command recents were not retained: ${JSON.stringify(externalPool.recent)}.`);
+
+    const externalExecution = await evaluateValue(`(() => {
+      const dashboard = localStorage.getItem('av-suite-dashboard.v1');
+      window.__externalCommandCapture = null;
+      document.addEventListener('click', (event) => {
+        const link = event.target.closest && event.target.closest('a[data-external-command]');
+        if (!link) return;
+        event.preventDefault();
+        window.__externalCommandCapture = {
+          reference: link.getAttribute('data-external-command'),
+          href: link.href,
+          rel: link.rel
+        };
+      }, true);
+      const input = document.getElementById('commandInput');
+      input.value = 'CueForge';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      document.querySelector('[data-command-id="external:cueforge"]').click();
+      const ui = JSON.parse(localStorage.getItem('av-suite-ui.v1') || '{}');
+      return {
+        capture: window.__externalCommandCapture,
+        recent: ui.toolboxCommandRecent,
+        dashboard,
+        dashboardAfter: localStorage.getItem('av-suite-dashboard.v1')
+      };
+    })()`);
+    if (externalExecution.capture?.reference !== 'external:cueforge' || externalExecution.capture?.href !== 'https://systembydave.com/cueforge.html' || externalExecution.capture?.rel !== 'noopener noreferrer') failures.push(`CueForge command did not execute its exact protected external route: ${JSON.stringify(externalExecution)}.`);
+    if (externalExecution.recent?.[0] !== 'external:cueforge') failures.push(`Executed external command was not recorded with its typed ID: ${JSON.stringify(externalExecution.recent)}.`);
+    if (externalExecution.dashboardAfter !== externalExecution.dashboard) failures.push('Toolbox external command mutated the saved show dashboard.');
+
     /* Addressing priority and Show Console context propagation. */
     await navigate('av-suite.html?entry=show&sbdShow=Probe%20Show&sbdVenue=Probe%20Hall&sbdDate=2026-08-31&sbdOperator=Probe&sbdPhase=show');
     const showContract = await evaluateValue(`(() => {
@@ -319,7 +451,7 @@ async function main() {
     if (showContract.mode !== 'show') failures.push('entry=show did not resolve to Show Console.');
     if (!showContract.contextual) failures.push('Show Console links no longer carry the explicit show context.');
 
-    await navigate('av-suite.html?entry=toolbox&sbdShow=Forced%20Show');
+    await navigate('av-suite.html?entry=toolbox&family=audio&sbdShow=Forced%20Show');
     const forcedShow = await evaluateValue(`document.getElementById('avApp').getAttribute('data-entry')`);
     if (forcedShow !== 'show') failures.push('Explicit sbd* context did not force Show Console over entry=toolbox.');
 

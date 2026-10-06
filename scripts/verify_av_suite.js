@@ -273,6 +273,21 @@ function assertPageContracts(registry) {
   if (!/function toolHref\(tool\)[\s\S]*entryState\.mode==='toolbox'[\s\S]*url\.searchParams\.delete\(name\)/.test(avSuiteApp)) {
     fail('Toolbox toolHref does not strip every show-context parameter.');
   }
+  ['function toolboxFamilyOverrideFromLocation()', 'function effectiveToolboxState()', 'syncToolboxFamilyOverride();'].forEach((contract) => {
+    if (!avSuiteApp.includes(contract)) fail(`AV Toolbox family URL handling is missing ${contract}.`);
+  });
+  if (!/toolboxFamilyOverrideFromLocation\(\)[\s\S]*hasShowContext\(params\)[\s\S]*familyExists\(family\)/.test(avSuiteApp)) {
+    fail('AV Toolbox family URL handling does not preserve Show precedence and exact family validation.');
+  }
+  ['var EXTERNALS=REG.externals||[];', "value.indexOf('external:')===0", 'appendExternalCommands(items', 'data-command-id'].forEach((contract) => {
+    if (!avSuiteApp.includes(contract)) fail(`AV Suite external commands are missing ${contract}.`);
+  });
+  if (!/function navigableExternalById\(id\)[\s\S]*external\.kind==='handoff'[\s\S]*external\.destination/.test(avSuiteApp)) {
+    fail('AV Suite command validation does not exclude status-only external products.');
+  }
+  if (!/function openExternal\(id\)[\s\S]*link\.rel='noopener noreferrer'/.test(avSuiteApp)) {
+    fail('AV Suite external command navigation is missing rel protection.');
+  }
   ['toolboxPinned', 'toolboxRecent', 'toolboxSearch', 'toolboxFilter', 'toolboxFamily', 'preferredEntry'].forEach((field) => {
     if (!avSuiteApp.includes(field)) fail(`AV Suite UI preferences are missing ${field}.`);
   });
