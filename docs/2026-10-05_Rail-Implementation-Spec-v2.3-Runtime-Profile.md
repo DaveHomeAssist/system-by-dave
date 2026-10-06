@@ -200,13 +200,21 @@ Sequence step 2 is implemented as an unmounted source layer in `js/sbd-rail.js` 
 
 The preference parser renders defaults without writing when the key is absent. It preserves known Planned entries in order, suppresses unresolved or non-pinnable entries, and retains only unresolved references after visible entries on the next explicit successful edit. Known non-pinnable records are dropped by that explicit edit. Duplicate references are removed by exact string identity without invoking tool aliases. Unreadable or unsupported payloads remain untouched until explicit reset.
 
-The standalone renderer uses native links and buttons, a non-interactive Planned treatment, visible and screen-reader-readable status text, a focusable bounded scroll region, 44px targets, a phone Apps trigger below 720px, compact presentation from 720 through 1439px, and labeled presentation from 1440px upward. Dialogs, focus trapping, production mounting, cache changes, and live acceptance remain later steps.
+The standalone renderer uses native links and buttons, a non-interactive Planned treatment, visible and screen-reader-readable status text, a focusable bounded scroll region, 44px targets, a phone Apps trigger below 720px, compact presentation from 720 through 1439px, and labeled presentation from 1440px upward. Production mounting, cache changes, and live acceptance remain later steps.
+
+### Standalone dialogs, routing, and draft invalidation boundary
+
+Sequence step 3 is implemented as an unmounted source layer in `js/sbd-rail-dialogs.js` and `css/sbd-rail-dialogs.css`. It provides bounded native dialogs for All apps and Customize, focus trapping and trigger-focus return, keyboard pin/unpin/reorder/reset controls, and explicit session-only failure feedback. Opening, closing, catalog rendering, route resolution, and draft reads do not write `sbd.rail.v1` or application storage.
+
+The shared typed route builder resolves registry-relative paths against an explicit suite base. It forwards only `sbdShow`, `sbdVenue`, `sbdDate`, `sbdOperator`, and `sbdPhase` from the supplied source URL to eligible same-origin console/tool routes. Toolbox, family and external routes receive no source context or source hash; status-only and Planned entries remain non-navigable.
+
+Draft indicators validate each console's declared direct key and supported envelope without reading the advisory index or parsing the application document. The observer re-reads on `sbd:console-draft-change`, native storage events, storage clear, and page restoration. AV Video's existing draft session emits the same-page invalidation after each attempted write or clear; the event never claims persistence success and does not change its locking, conflict, save, restore, discard, or failure behavior.
 
 ## 9. Implementation sequence
 
 1. **Complete in this source slice:** add identities, default pins, external records, exact lookup, and focused verifier coverage. Defer the cache-version bump until the rail runtime and offline assets are introduced together.
 2. **Implemented in the stacked standalone-runtime review slice:** rail renderer and preference parser, without production mounting.
-3. Add All apps and Customize dialogs, typed route resolution, and AV Video draft invalidation.
+3. **Implemented in the stacked standalone-dialog review slice:** All apps and Customize dialogs, typed route resolution, and AV Video draft invalidation, without production mounting.
 4. Implement Toolbox family and external command support explicitly.
 5. Mount the selected RAIL-2A profile around AV Video and rebuild production assets.
 6. Add rail assets to the offline set, add browser probes, and run the full AV verification matrix.
