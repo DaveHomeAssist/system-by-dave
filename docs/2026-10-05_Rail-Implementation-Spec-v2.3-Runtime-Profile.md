@@ -210,12 +210,18 @@ The shared typed route builder resolves registry-relative paths against an expli
 
 Draft indicators validate each console's declared direct key and supported envelope without reading the advisory index or parsing the application document. The observer re-reads on `sbd:console-draft-change`, native storage events, storage clear, and page restoration. AV Video's existing draft session emits the same-page invalidation after each attempted write or clear; the event never claims persistence success and does not change its locking, conflict, save, restore, discard, or failure behavior.
 
+### Toolbox family and external command boundary
+
+Sequence step 4 is implemented in the existing Toolbox application. A recognized `family=` value in resolved Toolbox mode creates an effective view with empty search and the All filter without writing either `av-suite-ui.v1` or the saved-show payload. Unknown families use the persisted Toolbox fallback; recognized show context and Front Office retain precedence. Popstate recomputes the effective family from the current URL, while an explicit Toolbox control action adopts the visible family and resumes the existing page-local persistence behavior.
+
+The quick switcher now validates, renders, executes, and records exact `external:` command IDs for registry handoffs with safe HTTP(S) destinations. External routes are built without source show parameters or hashes. Status-only externals do not enter the command pool or valid recent-command state. Existing `tool:cueforge` and `tool:plotforge` compatibility remains unchanged and continues to resolve to Cue Sheet and StagePlotter.
+
 ## 9. Implementation sequence
 
 1. **Complete in this source slice:** add identities, default pins, external records, exact lookup, and focused verifier coverage. Defer the cache-version bump until the rail runtime and offline assets are introduced together.
 2. **Implemented in the stacked standalone-runtime review slice:** rail renderer and preference parser, without production mounting.
 3. **Implemented in the stacked standalone-dialog review slice:** All apps and Customize dialogs, typed route resolution, and AV Video draft invalidation, without production mounting.
-4. Implement Toolbox family and external command support explicitly.
+4. **Implemented in the stacked Toolbox integration review slice:** non-mutating `family=` effective state and exact external quick-switcher commands.
 5. Mount the selected RAIL-2A profile around AV Video and rebuild production assets.
 6. Add rail assets to the offline set, add browser probes, and run the full AV verification matrix.
 7. Merge, deploy, verify the live revision, and obtain rendered and operator acceptance.
