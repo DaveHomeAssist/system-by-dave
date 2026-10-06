@@ -6,7 +6,7 @@
   ],
   "head": "75132ba7a111b5a33b1b5df52f65ceb44df63dbc",
   "status": "amber",
-  "statusReason": "Console recovery is delivered. Cameras/Playback is implemented on the current branch with release verification pending. Stream/Record, Rail decisions/runtime and physical/operator acceptance remain open.",
+  "statusReason": "Cameras/Playback merged in #268; publication stopped at the source-map-js dependency audit. The compatible 1.2.2 lockfile repair passes clean install and audit; repaired release and live verification remain pending. Rail and Stream/Record remain separate work.",
   "lastActivity": "2026-10-05",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -17,12 +17,12 @@
     "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe."
   ],
   "nextStep": {
-    "title": "Verify and publish Cameras and Playback, then prepare Stream and Record",
-    "why": "The Cameras/Playback implementation adds ordered records, operator actions and two lossless imports. Complete exact-head CI and publication before calling it delivered; Stream/Record remains next.",
+    "title": "Publish the security repair and verify Cameras and Playback",
+    "why": "The first publication stopped before staging on GHSA-68fv-2mgg-jv7q. Keep the high-severity gate; deliver the compatible dependency repair, then verify exact-source live sequence journeys.",
     "doneWhen": "Each remaining Video slice preserves legacy fields/statuses and originals, supports reversible optional modules, and passes source, browser and release checks.",
     "effort": "L",
     "owner": "Codex",
-    "blockedBy": ""
+    "blockedBy": "Security repair PR, required CI and publication before live proof"
   },
   "findings": [
     {
@@ -324,9 +324,19 @@
     "camerasPlayback": {
       "baseRevision": "63de8305f4b5018c7457ca6bccd95db0af297c04",
       "branch": "codex/av-video-cameras-playback-20261005",
-      "state": "implemented; remote Video tests passed; exact-head CI and publication pending",
+      "state": "merged; publication blocked by dependency audit; compatible repair in verification",
       "runner": "Walter",
-      "scope": "Camera Shot List and Playback Check; no Rail, Stream/Record, hardware control, sync or legacy retirement."
+      "scope": "Camera Shot List and Playback Check; no Rail, Stream/Record, hardware control, sync or legacy retirement.",
+      "merge": "6ef9a2540335668ca2d516afa2e72685a42476ff",
+      "failedSourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37400441588",
+      "dependencyRepair": {
+        "package": "source-map-js",
+        "from": "1.2.1",
+        "to": "1.2.2",
+        "advisory": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+        "scope": "Only the transitive lock entry; no manifest change or audit bypass.",
+        "verification": "Walter: clean npm ci, npm audit --audit-level=high (zero vulnerabilities), Video/Workbook/Simulator builds and generated-file parity all pass. Repaired PR/release gates remain pending."
+      }
     }
   },
   "historicalFindings": [

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-05 — AV release dependency security
+
+- Update only the transitive `source-map-js` lock entry from 1.2.1 to 1.2.2, within PostCSS’s existing compatible range, to address GHSA-68fv-2mgg-jv7q. Keep the high-severity audit gate unchanged.
+- Preserve the failed Cameras/Playback publication run 37400441588 as evidence; source merge alone does not establish publication or live acceptance.
+
 ## 2026-10-05 — Cameras and Playback in AV Video
 
 - Add ordered shot and playback-cue panels, field editors, filters, duplication, reordering, operator status actions and explicit signal-route links.
