@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-06 — Homepage privacy copy clarification
+
+- Clarify that homepage link click counts remain in browser storage and are not sent to an analytics service; align the privacy policy and sitemap dates.
+
 ## 2026-10-05 — Homepage copy refresh and facelift
 
 - **Copy.** New headline "Tools that do the unglamorous work." and a subhead that names all three product lines. Every route, product, featured and proof card now ends in a labelled link to a real page; product-card chips (Show Console, Toolbox, All tools; Overview, Web app, Pricing; Agents, Widgets, Skills) are real links instead of decorative labels. The stat strip reads 45 AV tools, 4 Notion agents, 4 free widgets, 7 Prompt Lab enhancement modes, replacing "01 Prompt-engineering workbench". Notion agents are no longer described as "in production" (the agents page calls them concepts set up by contact), and the unverifiable Prompt Lab version tag and "Featured this month" heading are gone. Sort Inbox links to its detail section on the agents page.
