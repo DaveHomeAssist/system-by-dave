@@ -2,7 +2,7 @@
 
 ## 2026-10-06 — Homepage privacy copy clarification
 
-- Clarify that homepage link click counts remain in browser storage and are not sent to an analytics service; align the privacy policy and sitemap dates.
+- Remove the homepage analytics claim and clarify the browser-stored click counts in the privacy policy; align the sitemap dates.
 
 ## 2026-10-05 — Homepage copy refresh and facelift
 
