@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
-<title>System by Dave — Software tools that do the unglamorous work</title>
+<title>System by Dave — Tools that do the unglamorous work</title>
 <meta name="robots" content="index,follow">
-<meta name="twitter:title" content="System by Dave — Software tools that do the unglamorous work">
-<meta name="twitter:description" content="Notion agents and widgets, Prompt Lab, and a full kit of browser-based AV show tools. Three product lines with clear free, local, and optional paid paths.">
+<meta name="twitter:title" content="System by Dave — Tools that do the unglamorous work">
+<meta name="twitter:description" content="Offline-capable browser tools for live-show crews, the Prompt Lab prompt workbench, and agents and widgets for Notion. Built by Dave Robertson.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
-<meta name="description" content="Notion agents and widgets, Prompt Lab, and a full kit of browser-based AV show tools. Three product lines with clear free, local, and optional paid paths.">
+<meta name="description" content="Offline-capable browser tools for live-show crews, the Prompt Lab prompt workbench, and agents and widgets for Notion. Built by Dave Robertson.">
 <link rel="canonical" href="https://systembydave.com/">
 <meta name="theme-color" content="#0A0D14">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
-<meta property="og:title" content="System by Dave — Software tools that do the unglamorous work">
-<meta property="og:description" content="Notion agents and widgets, Prompt Lab, and a full kit of browser-based AV show tools. Three product lines with clear free, local, and optional paid paths.">
+<meta property="og:title" content="System by Dave — Tools that do the unglamorous work">
+<meta property="og:description" content="Offline-capable browser tools for live-show crews, the Prompt Lab prompt workbench, and agents and widgets for Notion. Built by Dave Robertson.">
 <meta property="og:url" content="https://systembydave.com/">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -27,84 +27,183 @@
     window.location.replace(`${window.location.origin}${p}${window.location.search}${window.location.hash}`);
   }
 </script>
-<style>
-  :root{
-    --bg:#0A0D14; --ink:#F3F4F7;
-    --blue:oklch(0.66 0.17 256); --red:oklch(0.65 0.19 33); --green:oklch(0.68 0.13 158);
-    --ff-display:'Space Grotesk','DM Sans',-apple-system,sans-serif;
-    --ff-body:'DM Sans',-apple-system,sans-serif;
-    --ff-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{background:#0A0D14;}
-  ::selection{background:oklch(0.66 0.17 256 / 0.3);color:#fff;}
-  a{color:inherit;}
-  .nav-link{color:rgba(243,244,247,0.6);transition:color .2s ease;}
-  .nav-link:hover{color:#F3F4F7;}
-  .gh-btn{transition:background .2s ease,color .2s ease;}
-  .gh-btn:hover{background:oklch(0.66 0.17 256)!important;color:#fff!important;}
-  .line-card{transition:transform .35s ease, background .35s ease, border-color .35s ease;}
-  .line-card:hover{transform:translateY(-5px);background:rgba(255,255,255,0.05);}
-  .line-card.l-red:hover{border-color:var(--red);}
-  .line-card.l-green:hover{border-color:var(--green);}
-  .line-card.l-blue:hover{border-color:var(--blue);}
-  .feat:hover{border-color:rgba(255,255,255,0.22);}
-  .cta-1{transition:background .2s ease,color .2s ease;}
-  .cta-1:hover{background:oklch(0.66 0.17 256)!important;color:#fff!important;}
-  .cta-2{transition:border-color .2s ease;}
-  .cta-2:hover{border-color:#F3F4F7!important;}
-  .audience-card,.proof-card{transition:transform .25s ease,border-color .25s ease,background .25s ease;}
-  .audience-card:hover,.proof-card:hover{transform:translateY(-3px);border-color:rgba(243,244,247,0.28);background:rgba(255,255,255,0.045);}
-  .audience-grid,.proof-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-  .product-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
-  .mini-cta{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:8px 11px;border:1px solid rgba(255,255,255,0.13);font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:rgba(243,244,247,0.72);transition:border-color .2s ease,color .2s ease,background .2s ease;}
-  .mini-cta:hover{border-color:rgba(243,244,247,0.42);color:#F3F4F7;background:rgba(255,255,255,0.045);}
-  .hero h1 br.mobile-break{display:none;}
-  a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:3px;}
-  @media (max-width:880px){
-    .specs{grid-template-columns:repeat(2,1fr)!important;}
-    .audience-grid,.proof-grid{grid-template-columns:1fr 1fr!important;}
-    .lines,.feat-grid,.feat-side,.ethos-pts{grid-template-columns:1fr!important;}
-    .ethos-wrap{grid-template-columns:1fr!important;}
-    nav.bar{flex-wrap:wrap;height:auto!important;padding-top:14px!important;padding-bottom:14px!important;gap:14px!important;}
-    .nav-links{gap:18px!important;}
-    .hero{padding:64px 0 56px!important;}
-  }
-  @media (max-width:680px){
-    *{min-width:0;}
-    body{overflow-x:hidden;}
-    nav.bar,.hero,section,footer>div{max-width:100%!important;width:100%!important;padding-left:20px!important;padding-right:20px!important;}
-    nav.bar{display:grid!important;grid-template-columns:1fr!important;justify-items:start!important;justify-content:start!important;}
-    .nav-links{width:100%;display:grid!important;grid-template-columns:1fr!important;gap:10px!important;}
-    .nav-links a{text-align:center;width:100%;}
-    .hero{padding-top:54px!important;text-align:left!important;}
-    .hero>div:first-child{display:flex!important;flex-wrap:nowrap!important;align-items:flex-start!important;max-width:100%;width:100%;white-space:normal!important;line-height:1.4;overflow-wrap:anywhere;word-break:break-word;border-radius:18px!important;}
-    .hero-badge-copy{flex:1;min-width:0;white-space:normal;overflow-wrap:break-word;}
-    .hero h1{max-width:100%;font-size:34px!important;line-height:1.06!important;letter-spacing:0!important;text-wrap:auto;white-space:normal!important;overflow-wrap:anywhere;word-break:break-word;}
-    .hero h1 span{display:block;max-width:100%;white-space:normal!important;overflow-wrap:anywhere;word-break:break-word;}
-    .hero h1 br{display:block;}
-    .hero h1 br.mobile-break{display:block;}
-    .hero p{font-size:16px!important;max-width:100%!important;width:100%!important;white-space:normal!important;overflow-wrap:anywhere;word-break:break-word;}
-    .hero-actions{display:grid!important;grid-template-columns:1fr!important;align-items:stretch!important;}
-    .hero-actions a{justify-content:center;min-width:0;}
-    .audience-grid,.proof-grid,.specs{grid-template-columns:1fr!important;}
-    .section-row{flex-direction:column;align-items:flex-start!important;gap:8px!important;}
-    .section-row span:last-child{margin-left:0!important;}
-  }
-</style>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","name":"System by Dave","url":"https://systembydave.com/","description":"Notion agents and widgets, Prompt Lab, and a full kit of browser-based AV show tools. Three product lines with clear free, local, and optional paid paths.","publisher":{"@type":"Person","name":"Dave Robertson"},"sameAs":["https://github.com/DaveHomeAssist/system-by-dave","https://promptlab.tools"]}
+{"@context":"https://schema.org","@type":"WebSite","name":"System by Dave","url":"https://systembydave.com/","description":"Offline-capable browser tools for live-show crews, the Prompt Lab prompt workbench, and agents and widgets for Notion. Built by Dave Robertson.","publisher":{"@type":"Person","name":"Dave Robertson"},"sameAs":["https://github.com/DaveHomeAssist/system-by-dave","https://promptlab.tools"]}
 </script>
 <link rel="stylesheet" href="css/sbd-public-nav.css">
+<style>
+  :root{
+    --bg:#0A0D14; --surface:#0F131D; --surface-2:#141926;
+    --ink:#F3F4F7; --ink-2:rgba(243,244,247,0.74); --ink-3:rgba(243,244,247,0.6);
+    --line:rgba(255,255,255,0.09); --line-2:rgba(255,255,255,0.18);
+    --blue:oklch(0.7 0.16 256); --red:oklch(0.7 0.17 36); --green:oklch(0.74 0.13 158);
+    --ff-display:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --ff-body:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --ff-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --radius:14px; --radius-sm:10px;
+    --wrap:1160px; --gutter:clamp(20px,4vw,40px);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{background:var(--bg);}
+  body{font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  ::selection{background:oklch(0.66 0.17 256 / 0.32);color:#fff;}
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:4px;}
+
+  .page{position:relative;min-height:100vh;overflow-x:clip;}
+  .page-bg{position:absolute;inset:0 0 auto;height:900px;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 0%, oklch(0.66 0.17 256 / 0.16), transparent 70%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 88px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 88px);
+    -webkit-mask-image:linear-gradient(to bottom,#000 30%,transparent);mask-image:linear-gradient(to bottom,#000 30%,transparent);}
+  .page-inner{position:relative;z-index:1;}
+  .wrap{max-width:var(--wrap);margin:0 auto;padding-left:var(--gutter);padding-right:var(--gutter);}
+
+  /* Type */
+  .eyebrow{font-family:var(--ff-mono);font-weight:400;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);}
+  .h2{font-family:var(--ff-display);font-weight:500;font-size:clamp(26px,3.2vw,36px);line-height:1.15;letter-spacing:-0.02em;}
+  .lede{font-size:16px;color:var(--ink-2);max-width:60ch;}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:12px 22px;border-radius:var(--radius-sm);font-family:var(--ff-body);font-size:15px;font-weight:500;line-height:1.2;text-decoration:none;border:1px solid transparent;transition:background-color .2s ease,border-color .2s ease,color .2s ease;}
+  .btn--primary{background:var(--ink);color:var(--bg);}
+  .btn--primary:hover{background:#fff;}
+  .btn--ghost{border-color:var(--line-2);color:var(--ink);background:rgba(255,255,255,0.02);}
+  .btn--ghost:hover{border-color:rgba(243,244,247,0.5);background:rgba(255,255,255,0.06);}
+  .btn .arrow{transition:transform .2s ease;}
+  .btn:hover .arrow{transform:translateX(3px);}
+
+  /* Hero */
+  .hero{padding-top:clamp(56px,9vw,112px);padding-bottom:clamp(40px,6vw,64px);text-align:center;}
+  .badge{display:inline-flex;align-items:center;gap:10px;padding:7px 14px;margin-bottom:28px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,0.02);font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;color:var(--ink-2);}
+  .badge-dot{width:7px;height:7px;flex:none;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);}
+  .hero h1{font-family:var(--ff-display);font-weight:500;font-size:clamp(40px,7vw,84px);line-height:1.02;letter-spacing:-0.035em;margin:0 auto 24px;text-wrap:balance;}
+  .hero h1 .muted{display:block;color:rgba(243,244,247,0.5);}
+  .hero-sub{font-size:clamp(16px,1.6vw,19px);line-height:1.65;color:var(--ink-2);max-width:62ch;margin:0 auto 36px;text-wrap:pretty;}
+  .hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;}
+
+  .stats{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);margin-top:clamp(48px,7vw,80px);border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden;text-align:left;}
+  .stat{padding:22px 24px;border-left:1px solid var(--line);}
+  .stat:first-child{border-left:0;}
+  .stat-num{font-family:var(--ff-display);font-weight:500;font-size:40px;line-height:1;letter-spacing:-0.02em;margin-bottom:10px;}
+  .stat-label{font-size:14px;line-height:1.45;color:var(--ink-2);}
+  .c-blue{color:var(--blue);} .c-green{color:var(--green);} .c-red{color:var(--red);}
+
+  /* Sections */
+  .section{padding-top:clamp(48px,7vw,88px);}
+  .section-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 32px;margin-bottom:28px;}
+  .section-head .eyebrow{display:block;margin-bottom:10px;}
+  .section-head .lede{margin-top:10px;}
+
+  /* Cards (stretched-link pattern: the CTA link covers the card) */
+  .card{position:relative;display:flex;flex-direction:column;padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,var(--surface-2),var(--surface));transition:border-color .25s ease,transform .25s ease,box-shadow .25s ease;}
+  .card:hover{border-color:var(--line-2);transform:translateY(-3px);box-shadow:0 18px 40px -24px rgba(0,0,0,0.8);}
+  .card:has(.card-link:focus-visible){outline:2px solid var(--blue);outline-offset:3px;}
+  .card-link{text-decoration:none;}
+  .card-link::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:1;}
+  .card-link:focus-visible{outline:none;}
+  .card .tag{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px;}
+  .card h3{font-family:var(--ff-display);font-weight:500;font-size:22px;line-height:1.2;letter-spacing:-0.01em;margin-bottom:8px;}
+  .card p{font-size:15px;line-height:1.6;color:var(--ink-2);}
+  .card .cta{margin-top:auto;padding-top:20px;display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;}
+  .card .cta .arrow{transition:transform .2s ease;}
+  .card:hover .cta .arrow{transform:translateX(3px);}
+  .card .cta{color:var(--ink);}
+  .card .cta .card-link{color:inherit;}
+  .accent-blue .tag,.accent-blue .cta{color:var(--blue);}
+  .accent-green .tag,.accent-green .cta{color:var(--green);}
+  .accent-red .tag,.accent-red .cta{color:var(--red);}
+  .accent-neutral .tag{color:var(--ink-2);}
+  .vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  .accent-blue .card-link,.accent-green .card-link,.accent-red .card-link{color:inherit;}
+
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+
+  /* Product lines */
+  .line{min-height:100%;padding:26px 24px;overflow:hidden;}
+  .line::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:currentColor;opacity:0.9;}
+  .line.accent-red{color:var(--red);} .line.accent-green{color:var(--green);} .line.accent-blue{color:var(--blue);}
+  .line > *{color:var(--ink);}
+  .line .tag{color:inherit;}
+  .line .line-mark{position:absolute;top:22px;right:24px;font-family:var(--ff-mono);font-size:44px;font-weight:400;line-height:1;opacity:0.18;color:inherit;}
+  .line h3{font-size:26px;margin-bottom:10px;}
+  .line h3 a{text-decoration:none;}
+  .line .meta{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-3);margin:auto 0 0;padding-top:20px;}
+  .chips{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:6px;padding-top:14px;list-style:none;}
+  .chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:10px 12px;border:1px solid var(--line-2);border-radius:999px;background:rgba(10,13,20,0.6);font-size:13.5px;font-weight:500;line-height:1.1;text-decoration:none;color:var(--ink);transition:border-color .2s ease,background-color .2s ease;}
+  .chip:hover{border-color:rgba(243,244,247,0.55);background:rgba(255,255,255,0.07);}
+  .chip:focus-visible{border-radius:999px;}
+
+  /* Featured */
+  .feat-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;}
+  .feat-side{display:grid;gap:16px;}
+  .card.feat-main{padding:0;overflow:hidden;}
+  .feat-shot{position:relative;aspect-ratio:16/8;overflow:hidden;border-bottom:1px solid var(--line);background:#0B0E16;}
+  .feat-shot img{position:absolute;right:-1%;top:-14%;width:auto;height:225%;max-width:none;opacity:0.95;}
+  .feat-shot::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--surface-2) 0%,rgba(20,25,38,0.6) 30%,transparent 60%);pointer-events:none;}
+  .feat-body{display:flex;flex-direction:column;flex:1;padding:24px 26px 26px;}
+  .feat-main h3{font-size:26px;}
+  .feat-links{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:auto;padding-top:20px;}
+  .feat-links a{display:inline-flex;align-items:center;min-height:44px;font-size:15px;font-weight:500;color:var(--green);text-underline-offset:3px;}
+
+  /* Approach */
+  .approach{display:grid;grid-template-columns:1fr 1.5fr;gap:clamp(28px,5vw,64px);padding:clamp(28px,5vw,52px);border:1px solid var(--line);border-radius:calc(var(--radius) + 4px);background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.005));}
+  .approach-quote{font-family:var(--ff-display);font-weight:400;font-size:clamp(22px,2.4vw,30px);line-height:1.3;letter-spacing:-0.015em;margin-top:16px;}
+  .approach-quote em{font-style:normal;color:var(--blue);}
+  .points{display:grid;grid-template-columns:1fr 1fr;gap:28px 36px;}
+  .point{padding-left:16px;border-left:2px solid var(--line-2);}
+  .point h3{font-size:16px;font-weight:500;margin-bottom:6px;}
+  .point p{font-size:15px;line-height:1.6;color:var(--ink-2);}
+
+  /* Footer */
+  .site-footer{margin-top:clamp(56px,8vw,96px);border-top:1px solid var(--line);}
+  .footer-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 32px;padding-top:36px;padding-bottom:36px;}
+  .footer-brand{display:flex;align-items:center;gap:12px;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-2);}
+  .footer-mark{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line-2);border-radius:8px;font-family:var(--ff-display);font-weight:500;font-size:13px;letter-spacing:0;color:var(--ink);}
+  .footer-links{display:flex;flex-wrap:wrap;gap:4px 8px;list-style:none;}
+  .footer-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;font-size:14px;color:var(--ink-2);text-decoration:none;transition:color .2s ease;}
+  .footer-links a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px;}
+  .footer-copy{font-family:var(--ff-mono);font-size:12px;color:var(--ink-3);}
+
+  @media (max-width:960px){
+    .grid-4{grid-template-columns:repeat(2,1fr);}
+    .grid-3,.feat-grid{grid-template-columns:1fr;}
+    .approach{grid-template-columns:1fr;}
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .stat:nth-child(3){border-left:0;}
+    .stat:nth-child(n+3){border-top:1px solid var(--line);}
+  }
+  @media (max-width:680px){
+    .hero{text-align:left;}
+    .hero h1{margin-left:0;}
+    .hero-sub{margin-left:0;}
+    .badge{border-radius:12px;align-items:flex-start;line-height:1.4;}
+    .badge-dot{margin-top:5px;}
+    .hero-actions{display:grid;grid-template-columns:1fr;}
+    .grid-4,.points{grid-template-columns:1fr;}
+    .stat{padding:18px;}
+    .stat-num{font-size:32px;}
+    .card{padding:20px;}
+    .line{padding:24px 20px;}
+    .feat-shot{aspect-ratio:16/10;}
+    .footer-inner{flex-direction:column;align-items:flex-start;}
+    .footer-links{margin-left:-8px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition:none!important;animation:none!important;}
+    .card:hover{transform:none;}
+    .btn:hover .arrow,.card:hover .cta .arrow{transform:none;}
+  }
+</style>
 </head>
-<body style="font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;">
+<body>
 <a class="sbd-skip-link" href="#main-content">Skip to content</a>
-<div style="position:relative;min-height:100vh;overflow-x:hidden;">
-
-  <div style="position:absolute;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
-  <div style="position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:560px;pointer-events:none;z-index:0;background:radial-gradient(ellipse at center, oklch(0.66 0.17 256 / 0.18), transparent 70%);filter:blur(20px);"></div>
-
-  <div style="position:relative;z-index:1;">
+<div class="page">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="page-inner">
 
     <!-- NAV -->
     <header class="sbd-site-header">
@@ -123,227 +222,227 @@
   </nav>
 </header>
 
+    <main>
     <!-- HERO -->
-    <section id="main-content" class="hero" tabindex="-1" style="max-width:1200px;margin:0 auto;padding:104px 40px 80px;text-align:center;">
-      <div style="display:inline-flex;align-items:center;gap:10px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.55);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:100px;margin-bottom:36px;">
-        <span style="width:7px;height:7px;flex:none;border-radius:50%;background:oklch(0.68 0.13 158);box-shadow:0 0 10px oklch(0.68 0.13 158);"></span><span class="hero-badge-copy">Built by one person · tested in production</span>
-      </div>
-      <h1 style="font-family:var(--ff-display);font-weight:600;font-size:clamp(46px,7vw,92px);line-height:0.98;letter-spacing:-0.03em;margin-bottom:30px;">Software tools that<br><span style="color:rgba(243,244,247,0.45);">do the unglamorous<br class="mobile-break"> work.</span></h1>
-      <p style="font-size:18px;font-weight:300;line-height:1.7;color:rgba(243,244,247,0.62);max-width:580px;margin:0 auto 44px;">Notion agents and widgets, Prompt Lab, and a full kit of browser-based AV show tools. Three product lines with clear free, local, and optional paid paths.</p>
-      <div class="hero-actions" style="display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;">
-        <a href="#audiences" class="cta-1" data-track-cta="home:audience-paths" style="display:inline-flex;align-items:center;gap:10px;padding:16px 30px;background:#F3F4F7;color:#0A0D14;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Choose your path <span>→</span></a>
-        <a href="av-suite.html?entry=show" class="cta-2" data-track-cta="home:work-a-show" style="display:inline-flex;align-items:center;gap:8px;padding:16px 28px;color:#F3F4F7;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.18);">Work a show</a>
-        <a href="av-suite.html?entry=toolbox" class="cta-2" data-track-cta="home:browse-av-tools" style="display:inline-flex;align-items:center;gap:8px;padding:16px 28px;color:#F3F4F7;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.18);">Browse AV tools</a>
-        <a href="profile/#contact" class="cta-2" data-track-cta="home:contact-dave" style="display:inline-flex;align-items:center;gap:8px;padding:16px 28px;color:#F3F4F7;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.18);">Contact Dave</a>
+    <section id="main-content" class="hero wrap" tabindex="-1" aria-labelledby="hero-title">
+      <p class="badge"><span class="badge-dot" aria-hidden="true"></span><span>Built and maintained by Dave Robertson</span></p>
+      <h1 id="hero-title">Tools that do <span class="muted">the unglamorous work.</span></h1>
+      <p class="hero-sub">Offline-capable browser tools for live-show crews, a prompt-engineering workbench, and agents and widgets for Notion. Built by a live-event and broadcast technologist.</p>
+      <div class="hero-actions">
+        <a href="av-suite.html?entry=toolbox" class="btn btn--primary" data-track-cta="home:browse-av-tools">Browse the AV tools <span class="arrow" aria-hidden="true">→</span></a>
+        <a href="#lines" class="btn btn--ghost" data-track-cta="home:audience-paths">See all three products</a>
+        <a href="profile/#contact" class="btn btn--ghost" data-track-cta="home:contact-dave">Hire Dave</a>
       </div>
 
       <!-- spec strip -->
-      <div class="specs" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:84px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.06);text-align:left;">
-        <div style="background:#0A0D14;padding:26px 24px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:38px;line-height:1;margin-bottom:8px;color:oklch(0.66 0.17 256);">01</div><div style="font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Prompt-engineering workbench</div></div>
-        <div style="background:#0A0D14;padding:26px 24px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:38px;line-height:1;margin-bottom:8px;color:oklch(0.68 0.13 158);">45</div><div style="font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Browser AV tools, offline-capable</div></div>
-        <div style="background:#0A0D14;padding:26px 24px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:38px;line-height:1;margin-bottom:8px;color:oklch(0.65 0.19 33);">04</div><div style="font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Notion agents, in production</div></div>
-        <div style="background:#0A0D14;padding:26px 24px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:38px;line-height:1;margin-bottom:8px;color:#F3F4F7;">$0</div><div style="font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Widgets, free &amp; open source</div></div>
-      </div>
+      <ul class="stats" role="list" aria-label="At a glance">
+        <li class="stat"><div class="stat-num c-green">45</div><p class="stat-label">Browser AV tools that keep working offline</p></li>
+        <li class="stat"><div class="stat-num c-red">4</div><p class="stat-label">Notion AI agents, set up with Dave</p></li>
+        <li class="stat"><div class="stat-num">4</div><p class="stat-label">Notion widgets, free and open source</p></li>
+        <li class="stat"><div class="stat-num c-blue">7</div><p class="stat-label">Enhancement modes in Prompt Lab</p></li>
+      </ul>
     </section>
 
-    <!-- AUDIENCE PATHS -->
-    <section id="audiences" style="max-width:1200px;margin:0 auto;padding:34px 40px 48px;">
-      <div class="section-row" style="display:flex;align-items:baseline;gap:18px;margin-bottom:24px;">
-        <span style="font-family:var(--ff-mono);font-size:12px;color:rgba(243,244,247,0.4);">Start</span>
-        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(25px,3vw,36px);letter-spacing:-0.02em;">Choose the route that matches the job</h2>
-        <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">Choose by product</span>
+    <!-- START HERE -->
+    <section id="audiences" class="section wrap" aria-labelledby="audiences-title">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Start here</span>
+          <h2 id="audiences-title" class="h2">What do you need to get done?</h2>
+        </div>
       </div>
-      <div class="audience-grid">
-        <a href="av-suite.html" class="audience-card" data-track-cta="audience:run-show" style="display:flex;flex-direction:column;min-height:210px;padding:24px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;">
-          <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.11em;text-transform:uppercase;color:oklch(0.68 0.13 158);margin-bottom:22px;">Live operator</span>
-          <h3 style="font-family:var(--ff-display);font-size:23px;line-height:1.12;margin-bottom:12px;">Run a show</h3>
-          <p style="font-size:13.5px;color:rgba(243,244,247,0.58);line-height:1.6;margin-bottom:22px;">Launch the AV console, set show context, track readiness, and open the next tool.</p>
-          <span style="margin-top:auto;font-family:var(--ff-mono);font-size:11px;color:oklch(0.68 0.13 158);text-transform:uppercase;letter-spacing:0.06em;">Open suite →</span>
-        </a>
-        <a href="prompt-lab.html" class="audience-card" data-track-cta="audience:prompt-lab" style="display:flex;flex-direction:column;min-height:210px;padding:24px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;">
-          <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.11em;text-transform:uppercase;color:oklch(0.66 0.17 256);margin-bottom:22px;">AI workflow</span>
-          <h3 style="font-family:var(--ff-display);font-size:23px;line-height:1.12;margin-bottom:12px;">Use Prompt Lab</h3>
-          <p style="font-size:13.5px;color:rgba(243,244,247,0.58);line-height:1.6;margin-bottom:22px;">Install the extension or open the web app to write, score, compare, and reuse prompts.</p>
-          <span style="margin-top:auto;font-family:var(--ff-mono);font-size:11px;color:oklch(0.66 0.17 256);text-transform:uppercase;letter-spacing:0.06em;">View product →</span>
-        </a>
-        <a href="notion.html" class="audience-card" data-track-cta="audience:notion" style="display:flex;flex-direction:column;min-height:210px;padding:24px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;">
-          <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.11em;text-transform:uppercase;color:oklch(0.65 0.19 33);margin-bottom:22px;">Workspace ops</span>
-          <h3 style="font-family:var(--ff-display);font-size:23px;line-height:1.12;margin-bottom:12px;">Build in Notion</h3>
-          <p style="font-size:13.5px;color:rgba(243,244,247,0.58);line-height:1.6;margin-bottom:22px;">Browse agents, widgets, skills, and prompt systems that stay native to Notion.</p>
-          <span style="margin-top:auto;font-family:var(--ff-mono);font-size:11px;color:oklch(0.65 0.19 33);text-transform:uppercase;letter-spacing:0.06em;">Open Notion tools →</span>
-        </a>
-        <a href="profile/#contact" class="audience-card" data-track-cta="audience:hire-dave" style="display:flex;flex-direction:column;min-height:210px;padding:24px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;">
-          <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.11em;text-transform:uppercase;color:rgba(243,244,247,0.68);margin-bottom:22px;">Client or partner</span>
-          <h3 style="font-family:var(--ff-display);font-size:23px;line-height:1.12;margin-bottom:12px;">Hire Dave</h3>
-          <p style="font-size:13.5px;color:rgba(243,244,247,0.58);line-height:1.6;margin-bottom:22px;">Review the profile, active domains, and technical operating style before reaching out.</p>
-          <span style="margin-top:auto;font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.82);text-transform:uppercase;letter-spacing:0.06em;">Open profile →</span>
-        </a>
+      <div class="grid-4">
+        <article class="card accent-green">
+          <p class="tag">Live-show operators</p>
+          <h3>Run a show</h3>
+          <p>Set the show context in the AV console, track readiness, and open the right tool for each phase, from advance to strike.</p>
+          <p class="cta"><a class="card-link" href="av-suite.html?entry=show" data-track-cta="audience:run-show">Open the Show Console <span class="arrow" aria-hidden="true">→</span></a></p>
+        </article>
+        <article class="card accent-blue">
+          <p class="tag">Anyone writing prompts</p>
+          <h3>Write better prompts</h3>
+          <p>Write, enhance, score, and compare prompts in a browser sidebar or the web app, and keep the good ones in a library.</p>
+          <p class="cta"><a class="card-link" href="prompt-lab.html" data-track-cta="audience:prompt-lab">See Prompt Lab <span class="arrow" aria-hidden="true">→</span></a></p>
+        </article>
+        <article class="card accent-red">
+          <p class="tag">Notion workspaces</p>
+          <h3>Build in Notion</h3>
+          <p>Agents, embeddable widgets, skills, and prompt systems that live inside Notion instead of another app.</p>
+          <p class="cta"><a class="card-link" href="notion.html" data-track-cta="audience:notion">Browse the Notion tools <span class="arrow" aria-hidden="true">→</span></a></p>
+        </article>
+        <article class="card accent-neutral">
+          <p class="tag">Clients and partners</p>
+          <h3>Hire Dave</h3>
+          <p>Live-event, broadcast, and systems work. Read the background and the domains Dave works in, then get in touch.</p>
+          <p class="cta"><a class="card-link" href="profile/#contact" data-track-cta="audience:hire-dave">Contact Dave <span class="arrow" aria-hidden="true">→</span></a></p>
+        </article>
       </div>
     </section>
 
     <!-- PRODUCT LINES -->
-    <section id="lines" style="max-width:1200px;margin:0 auto;padding:48px 40px 40px;">
-      <div style="display:flex;align-items:baseline;gap:18px;margin-bottom:40px;">
-        <span style="font-family:var(--ff-mono);font-size:12px;color:rgba(243,244,247,0.4);">01</span>
-        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(26px,3vw,38px);letter-spacing:-0.02em;">Three product lines</h2>
-        <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">Pick a workspace →</span>
+    <section id="lines" class="section wrap" aria-labelledby="lines-title">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Products</span>
+          <h2 id="lines-title" class="h2">Three product lines</h2>
+          <p class="lede">Each one stands on its own. Pick the one that fits the work.</p>
+        </div>
       </div>
-      <div class="lines" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
-        <a href="notion.html" class="line-card l-red" style="position:relative;display:flex;flex-direction:column;min-height:340px;padding:30px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:oklch(0.65 0.19 33);opacity:0.85;"></div>
-          <div style="display:flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.65 0.19 33);margin-bottom:auto;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Workspace</div>
-          <div style="font-family:var(--ff-mono);font-size:64px;font-weight:500;line-height:1;color:oklch(0.65 0.19 33);opacity:0.16;margin:32px 0 18px;">N</div>
-          <h3 style="font-family:var(--ff-display);font-weight:600;font-size:27px;letter-spacing:-0.01em;margin-bottom:12px;">Notion</h3>
-          <p style="font-size:14px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.6);margin-bottom:22px;">AI agents and embeddable widgets that run natively inside Notion — triage, briefings, formatting, and live dashboards.</p>
-          <div class="product-actions" aria-label="Notion actions">
-            <span class="mini-cta">Agents</span>
-            <span class="mini-cta">Widgets</span>
-            <span class="mini-cta">Skills</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);">
-            <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">4 agents · free widgets</span>
-            <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.65 0.19 33);">Enter →</span>
-          </div>
-        </a>
-        <a href="av-suite.html" class="line-card l-green" style="position:relative;display:flex;flex-direction:column;min-height:340px;padding:30px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:oklch(0.68 0.13 158);opacity:0.85;"></div>
-          <div style="display:flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.68 0.13 158);margin-bottom:auto;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.68 0.13 158);"></span>Live shows</div>
-          <div style="font-family:var(--ff-mono);font-size:64px;font-weight:500;line-height:1;color:oklch(0.68 0.13 158);opacity:0.16;margin:32px 0 18px;">AV</div>
-          <h3 style="font-family:var(--ff-display);font-weight:600;font-size:27px;letter-spacing:-0.01em;margin-bottom:12px;">AV by Dave</h3>
-          <p style="font-size:14px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.6);margin-bottom:22px;">A full kit of browser-based tools for live-show operators — planning, patching, timing, cueing, and run-of-show.</p>
-          <div class="product-actions" aria-label="AV by Dave actions">
-            <span class="mini-cta">Launch</span>
-            <span class="mini-cta">Offline</span>
-            <span class="mini-cta">Docs</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);">
-            <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">45 tools · offline</span>
-            <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.68 0.13 158);">Enter →</span>
-          </div>
-        </a>
-        <a href="prompt-lab.html" class="line-card l-blue" style="position:relative;display:flex;flex-direction:column;min-height:340px;padding:30px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:oklch(0.66 0.17 256);opacity:0.85;"></div>
-          <div style="display:flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.66 0.17 256);margin-bottom:auto;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.66 0.17 256);"></span>Web · extension · source build</div>
-          <div style="font-family:var(--ff-mono);font-size:64px;font-weight:500;line-height:1;color:oklch(0.66 0.17 256);opacity:0.16;margin:32px 0 18px;">PL</div>
-          <h3 style="font-family:var(--ff-display);font-weight:600;font-size:27px;letter-spacing:-0.01em;margin-bottom:12px;">Prompt Lab</h3>
-          <p style="font-size:14px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.6);margin-bottom:22px;">A prompt-engineering workbench in your browser sidebar — write, enhance, score, compare, and organize prompts.</p>
-          <div class="product-actions" aria-label="Prompt Lab actions">
-            <span class="mini-cta">Product</span>
-            <span class="mini-cta">Web app</span>
-            <span class="mini-cta">Pricing</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);">
-            <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Free editor · optional Pro</span>
-            <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.66 0.17 256);">Enter →</span>
-          </div>
-        </a>
+      <div class="grid-3">
+        <article class="card line accent-green">
+          <span class="line-mark" aria-hidden="true">AV</span>
+          <p class="tag">Live shows</p>
+          <h3><a class="card-link" href="av-suite.html" data-track-cta="lines:av-suite">AV by Dave</a></h3>
+          <p>Browser tools for live-show operators: planning, patching, timing, cueing, and run-of-show. Save your work in the browser and keep going without a connection.</p>
+          <p class="meta">45 tools · offline</p>
+          <ul class="chips" role="list" aria-label="AV by Dave links">
+            <li><a class="chip" href="av-suite.html?entry=show">Show Console</a></li>
+            <li><a class="chip" href="av-suite.html?entry=toolbox">Toolbox</a></li>
+            <li><a class="chip" href="tools.html">All tools</a></li>
+          </ul>
+        </article>
+        <article class="card line accent-blue">
+          <span class="line-mark" aria-hidden="true">PL</span>
+          <p class="tag">Web · extension · source build</p>
+          <h3><a class="card-link" href="prompt-lab.html" data-track-cta="lines:prompt-lab">Prompt Lab</a></h3>
+          <p>A prompt-engineering workbench in your browser sidebar. Write, enhance, score, compare, and organize prompts. The hosted web app requires sign-in.</p>
+          <p class="meta">Free editor · optional Pro</p>
+          <ul class="chips" role="list" aria-label="Prompt Lab links">
+            <li><a class="chip" href="prompt-lab.html">Overview</a></li>
+            <li><a class="chip" href="https://promptlab.tools/app" target="_blank" rel="noopener noreferrer">Web app <span aria-hidden="true">↗</span><span class="vh"> (opens in a new tab)</span></a></li>
+            <li><a class="chip" href="https://promptlab.tools/#pricing" target="_blank" rel="noopener noreferrer">Pricing <span aria-hidden="true">↗</span><span class="vh"> (opens in a new tab)</span></a></li>
+          </ul>
+        </article>
+        <article class="card line accent-red">
+          <span class="line-mark" aria-hidden="true">N</span>
+          <p class="tag">Workspace</p>
+          <h3><a class="card-link" href="notion.html" data-track-cta="lines:notion">Notion</a></h3>
+          <p>AI agents that run on Notion AI for triage, briefings, and formatting, plus widgets you embed in any page for live dashboards.</p>
+          <p class="meta">4 agents · 4 free widgets</p>
+          <ul class="chips" role="list" aria-label="Notion links">
+            <li><a class="chip" href="agents.html">Agents</a></li>
+            <li><a class="chip" href="widgets.html">Widgets</a></li>
+            <li><a class="chip" href="skills.html">Skills</a></li>
+          </ul>
+        </article>
       </div>
     </section>
 
     <!-- FEATURED -->
-    <section style="max-width:1200px;margin:0 auto;padding:56px 40px;">
-      <div style="display:flex;align-items:baseline;gap:18px;margin-bottom:40px;">
-        <span style="font-family:var(--ff-mono);font-size:12px;color:rgba(243,244,247,0.4);">02</span>
-        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(26px,3vw,38px);letter-spacing:-0.02em;">Featured this month</h2>
+    <section class="section wrap" aria-labelledby="featured-title">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Featured</span>
+          <h2 id="featured-title" class="h2">Worth a closer look</h2>
+        </div>
       </div>
-      <div class="feat-grid" style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;">
-        <a href="prompt-lab.html" class="feat" style="position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:360px;padding:32px;border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;background:#0E1220;transition:border-color .3s ease;">
-          <img src="img/promptlab-extension-preview.webp" alt="Prompt Lab" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top right;opacity:0.5;-webkit-mask-image:linear-gradient(to top, transparent 8%, #000 75%);mask-image:linear-gradient(to top, transparent 8%, #000 75%);">
-          <div style="position:relative;">
-            <div style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.7 0.16 256);margin-bottom:14px;">Prompt Lab · v1.7</div>
-            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:30px;letter-spacing:-0.01em;margin-bottom:12px;max-width:420px;">A prompt-engineering workbench in your browser sidebar</h3>
-            <p style="font-size:14px;font-weight:300;color:rgba(243,244,247,0.6);max-width:420px;">7 enhancement modes, live quality scoring, a local browser library, and Pro A/B Compare. The hosted app requires sign-in.</p>
+      <div class="feat-grid">
+        <article class="card feat-main accent-blue">
+          <div class="feat-shot">
+            <img src="img/promptlab-extension-preview.webp" alt="The Prompt Lab sidebar open next to a web page, with quick prompts, an input box, and Enhance and Save to Library buttons." loading="lazy" width="1280" height="736">
           </div>
-        </a>
-        <div class="feat-side" style="display:grid;grid-template-rows:1fr 1fr;gap:20px;">
-          <a href="av-suite.html" class="feat" style="display:flex;flex-direction:column;justify-content:space-between;padding:26px;border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;background:rgba(255,255,255,0.02);transition:border-color .3s ease;">
-            <div style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.13 158);">AV by Dave · new tools</div>
-            <div>
-              <h3 style="font-family:var(--ff-display);font-weight:600;font-size:23px;margin-bottom:6px;">Cue Sheet + Show Advance</h3>
-              <p style="font-size:13.5px;font-weight:300;color:rgba(243,244,247,0.58);">Run-of-show control and pre-show advance, now in the suite.</p>
+          <div class="feat-body">
+            <p class="tag">Prompt Lab</p>
+            <h3>A prompt workbench that lives in your sidebar</h3>
+            <p>Seven enhancement modes, live quality scoring, and a prompt library stored in your browser. A/B Compare is part of the optional Pro plan.</p>
+            <p class="cta"><a class="card-link" href="prompt-lab.html" data-track-cta="featured:prompt-lab">See what's inside <span class="arrow" aria-hidden="true">→</span></a></p>
+          </div>
+        </article>
+        <div class="feat-side">
+          <article class="card accent-green">
+            <p class="tag">AV by Dave</p>
+            <h3>Cue Sheet and Show Advance</h3>
+            <p>Cue Sheet runs the rundown with preview, playback, and print or CSV export. Show Advance collects contacts, access, schedule, power, network, and open questions before you arrive.</p>
+            <div class="feat-links">
+              <a href="cue-sheet.html" data-track-cta="featured:cue-sheet">Open Cue Sheet <span aria-hidden="true">→</span></a>
+              <a href="show-advance.html" data-track-cta="featured:show-advance">Open Show Advance <span aria-hidden="true">→</span></a>
             </div>
-          </a>
-          <a href="notion.html" class="feat" style="display:flex;flex-direction:column;justify-content:space-between;padding:26px;border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;background:rgba(255,255,255,0.02);transition:border-color .3s ease;">
-            <div style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.7 0.19 33);">Notion · agents</div>
-            <div>
-              <h3 style="font-family:var(--ff-display);font-weight:600;font-size:23px;margin-bottom:6px;">Sort Inbox</h3>
-              <p style="font-size:13.5px;font-weight:300;color:rgba(243,244,247,0.58);">Weekly triage that classifies and routes every inbox item.</p>
-            </div>
-          </a>
+          </article>
+          <article class="card accent-red">
+            <p class="tag">Notion agent</p>
+            <h3>Sort Inbox</h3>
+            <p>Scheduled inbox triage for Notion. It classifies new entries, applies your routing rules, and leaves a short review queue.</p>
+            <p class="cta"><a class="card-link" href="agents.html#sort-inbox-details" data-track-cta="featured:sort-inbox">Read about Sort Inbox <span class="arrow" aria-hidden="true">→</span></a></p>
+          </article>
         </div>
       </div>
     </section>
 
     <!-- PROOF SURFACES -->
-    <section style="max-width:1200px;margin:0 auto;padding:28px 40px 56px;">
-      <div class="section-row" style="display:flex;align-items:baseline;gap:18px;margin-bottom:28px;">
-        <span style="font-family:var(--ff-mono);font-size:12px;color:rgba(243,244,247,0.4);">Proof</span>
-        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(25px,3vw,36px);letter-spacing:-0.02em;">Status, source, and operating context</h2>
-        <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">Inspectable</span>
+    <section class="section wrap" aria-labelledby="proof-title">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Check the work</span>
+          <h2 id="proof-title" class="h2">Source, background, and how the site runs</h2>
+        </div>
       </div>
-      <div class="proof-grid">
-        <a href="project-registry.html" class="proof-card" data-track-cta="proof:registry" style="display:flex;flex-direction:column;min-height:190px;padding:24px;border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.025);text-decoration:none;color:inherit;">
-          <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.66 0.17 256);margin-bottom:18px;">Project Registry</span>
-          <h3 style="font-family:var(--ff-display);font-size:22px;line-height:1.16;margin-bottom:10px;">Public repo snapshot</h3>
-          <p style="font-size:13.5px;color:rgba(243,244,247,0.58);line-height:1.58;">A public-safe inventory of active repositories, stacks, status, and recent activity.</p>
-        </a>
-        <a href="profile/" class="proof-card" data-track-cta="proof:profile" style="display:flex;flex-direction:column;min-height:190px;padding:24px;border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.025);text-decoration:none;color:inherit;">
-          <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.65 0.19 33);margin-bottom:18px;">Profile</span>
-          <h3 style="font-family:var(--ff-display);font-size:22px;line-height:1.16;margin-bottom:10px;">Operator background</h3>
-          <p style="font-size:13.5px;color:rgba(243,244,247,0.58);line-height:1.58;">Live event, broadcast, systems, and business context for clients and collaborators.</p>
-        </a>
-        <a href="privacy-policy.html" class="proof-card" data-track-cta="proof:privacy" style="display:flex;flex-direction:column;min-height:190px;padding:24px;border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.025);text-decoration:none;color:inherit;">
-          <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.68);margin-bottom:18px;">Privacy</span>
-          <h3 style="font-family:var(--ff-display);font-size:22px;line-height:1.16;margin-bottom:10px;">Static by design</h3>
-          <p style="font-size:13.5px;color:rgba(243,244,247,0.58);line-height:1.58;">The site has no account system, no database, and no network analytics layer.</p>
-        </a>
+      <div class="grid-3">
+        <article class="card accent-blue">
+          <p class="tag">Project Registry</p>
+          <h3>Public repo snapshot</h3>
+          <p>A public-safe list of active repositories with their stack, status, and recent activity.</p>
+          <p class="cta"><a class="card-link" href="project-registry.html" data-track-cta="proof:registry">Open the registry <span class="arrow" aria-hidden="true">→</span></a></p>
+        </article>
+        <article class="card accent-red">
+          <p class="tag">Profile</p>
+          <h3>Operator background</h3>
+          <p>Live events, broadcast, and systems work: the experience these tools come from.</p>
+          <p class="cta"><a class="card-link" href="profile/" data-track-cta="proof:profile">Read Dave's profile <span class="arrow" aria-hidden="true">→</span></a></p>
+        </article>
+        <article class="card accent-neutral">
+          <p class="tag">Privacy</p>
+          <h3>Static by design</h3>
+          <p>No accounts, no database, and no analytics on this site. Most pages are plain HTML served from GitHub Pages.</p>
+          <p class="cta"><a class="card-link" href="privacy-policy.html" data-track-cta="proof:privacy">Read the privacy policy <span class="arrow" aria-hidden="true">→</span></a></p>
+        </article>
       </div>
     </section>
 
-    <!-- ETHOS -->
-    <section style="max-width:1200px;margin:0 auto;padding:56px 40px 80px;">
-      <div class="ethos-wrap" style="border:1px solid rgba(255,255,255,0.09);padding:56px 48px;background:linear-gradient(180deg, rgba(255,255,255,0.025), transparent);display:grid;grid-template-columns:1fr 1.5fr;gap:56px;align-items:start;">
+    <!-- APPROACH -->
+    <section class="section wrap" aria-labelledby="approach-title">
+      <div class="approach">
         <div>
-          <div style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(243,244,247,0.45);margin-bottom:20px;">The approach</div>
-          <p style="font-family:var(--ff-display);font-weight:500;font-size:clamp(24px,2.6vw,32px);line-height:1.28;letter-spacing:-0.01em;">Every tool is built from real workflows, tested in production, and made to <span style="color:oklch(0.66 0.17 256);">disappear</span> into how you already work.</p>
+          <h2 id="approach-title" class="eyebrow">The approach</h2>
+          <p class="approach-quote">Each tool starts from a real job and is built to <em>get out of the way</em> once you know it.</p>
         </div>
-        <div class="ethos-pts" style="display:grid;grid-template-columns:1fr 1fr;gap:32px 40px;">
-          <div style="padding-left:18px;border-left:1px solid rgba(255,255,255,0.14);">
-            <h4 style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:10px;color:#F3F4F7;">Built native</h4>
-            <p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.55);">No external apps to break. Skills run on Notion AI; AV tools run offline in your browser.</p>
+        <div class="points">
+          <div class="point">
+            <h3>Runs where you work</h3>
+            <p>AV tools run in the browser and keep working offline. Notion agents run on Notion AI, and widgets embed in a Notion page.</p>
           </div>
-          <div style="padding-left:18px;border-left:1px solid rgba(255,255,255,0.14);">
-            <h4 style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:10px;color:#F3F4F7;">Documented</h4>
-            <p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.55);">Every product ships with a setup guide and architecture notes — know what you use and why.</p>
+          <div class="point">
+            <h3>Your data stays local</h3>
+            <p>AV tools save to your browser and export to files you keep. Nothing here needs an account on this site.</p>
           </div>
-          <div style="padding-left:18px;border-left:1px solid rgba(255,255,255,0.14);">
-            <h4 style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:10px;color:#F3F4F7;">Modular</h4>
-            <p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.55);">Use standalone or connect together. Shared naming means everything clicks into place.</p>
+          <div class="point">
+            <h3>Works alone or together</h3>
+            <p>Use one tool, or pass show details from one AV tool to the next. Every handoff asks before it imports anything.</p>
           </div>
-          <div style="padding-left:18px;border-left:1px solid rgba(255,255,255,0.14);">
-            <h4 style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:10px;color:#F3F4F7;">Clear product terms</h4>
-            <p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.55);">AV tools and widgets are free. Prompt Lab has a free editor and an optional Pro subscription.</p>
+          <div class="point">
+            <h3>Plain pricing</h3>
+            <p>AV tools and widgets are free. Prompt Lab has a free editor and an optional Pro plan at $9/month.</p>
           </div>
         </div>
       </div>
     </section>
+    </main>
 
     <!-- FOOTER -->
-    <footer style="border-top:1px solid rgba(255,255,255,0.07);">
-      <div style="max-width:1200px;margin:0 auto;padding:48px 40px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;">S</span>
-          <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.6);">System by Dave</span>
-        </div>
-        <div style="display:flex;gap:26px;flex-wrap:wrap;">
-          <a href="notion.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Notion</a>
-          <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV Suite</a>
-          <a href="prompt-lab.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt Lab</a>
-          <a href="tools.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Tools</a>
-          <a href="profile/" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Profile</a>
-          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">GitHub ↗</a>
-        </div>
-        <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <div class="footer-brand"><span class="footer-mark" aria-hidden="true">SD</span>System by Dave</div>
+        <nav aria-label="Footer">
+          <ul class="footer-links" role="list">
+            <li><a href="av-suite.html">AV Suite</a></li>
+            <li><a href="prompt-lab.html">Prompt Lab</a></li>
+            <li><a href="notion.html">Notion</a></li>
+            <li><a href="tools.html">Tools</a></li>
+            <li><a href="profile/">Profile</a></li>
+            <li><a href="privacy-policy.html">Privacy</a></li>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span><span class="vh"> (opens in a new tab)</span></a></li>
+          </ul>
+        </nav>
+        <span class="footer-copy">© 2026</span>
       </div>
     </footer>
 
