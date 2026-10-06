@@ -226,6 +226,45 @@
     {id:'music',label:'Music',depts:'Music · outside AV scope',icon:['M9 18V5l12-2v13','M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z','M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'],toolIds:['ontrack']}
   ];
 
+  /* Application identities recovered from AV Suite Prototype v3. Planned
+     consoles are intentionally status-only: do not add routes, tool IDs,
+     document contracts, or storage metadata until that console ships. */
+  var CONSOLES=[
+    {id:'av-video',prototypeId:'video',label:'AV Video',availability:'available',toolId:'av-video',draftKey:'sbd.avVideo.draft.v1',layoutKey:'sbd.avVideo.layout.v1',icon:['m16 9 5-3v12l-5-3z','M3 6h13v12H3z']},
+    {id:'audio',prototypeId:'audio',label:'Audio',availability:'planned',icon:['M4 10v4','M8 6v12','M12 3v18','M16 7v10','M20 10v4']},
+    {id:'show-control',prototypeId:'showcontrol',label:'Show Control',availability:'planned',icon:['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z','M10 8.5v7l5.5-3.5z']},
+    {id:'show-ops',prototypeId:'showops',label:'Show Ops',availability:'planned',icon:['M3 5h18v16H3z','M3 10h18','M8 3v4','M16 3v4','M7 14h5','M10 17h7']},
+    {id:'front-office',prototypeId:'office',label:'Front Office',availability:'planned',icon:['M5 4h14v17H5z','M9 4V2h6v2','m9 13 2 2 4-4']},
+    {id:'shop',prototypeId:'shop',label:'The Shop',availability:'planned',icon:['M4 4h16v13H4z','M4 9h16','M10 12h4','M8 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z','M16 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z']},
+    {id:'infrastructure',prototypeId:'infra',label:'Infrastructure',availability:'planned',icon:['M13 2 4 14h7l-1 8 9-12h-7z']},
+    {id:'lighting',prototypeId:'lighting',label:'Lighting',availability:'planned',icon:['M9 18h6','M10 21h4','M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z']},
+    {id:'av-calculator',prototypeId:'calc',label:'AV Calculator',availability:'planned',icon:['M5 3h14v18H5z','M8 7h8v3H8z','M8 14h2','M11 14h2','M14 14h2','M8 17.5h2','M11 17.5h2','M14 17.5h2']}
+  ];
+
+  var RAIL={
+    defaultPinned:[
+      'console:av-video',
+      'console:audio',
+      'console:show-control',
+      'console:show-ops',
+      'console:front-office',
+      'console:shop',
+      'console:infrastructure',
+      'console:lighting',
+      'console:av-calculator'
+    ]
+  };
+
+  /* External product identities never enter the tool inventory. A handoff has
+     a verified destination; a status record is intentionally non-navigable. */
+  var EXTERNALS=[
+    {id:'cueforge',label:'CueForge',kind:'handoff',destination:'https://systembydave.com/cueforge.html',badge:'Desktop app'},
+    {id:'plotforge',label:'PlotForge',kind:'handoff',destination:'plotforge.html',badge:'Own app'},
+    {id:'housevideo',label:'House Video / FMP',kind:'handoff',destination:'https://housevideo.app/',badge:'Link out'},
+    {id:'arenaops',label:'Arena Ops',kind:'status',badge:'API pending'},
+    {id:'deckforge',label:'DeckForge + Stream Deck',kind:'status',badge:'Control surface'}
+  ];
+
   function offlineAssets(){
     var seen={};
     return BASE_ASSETS
@@ -250,19 +289,29 @@
     return null;
   }
 
+  function externalById(id){
+    id=String(id||'');
+    for(var i=0;i<EXTERNALS.length;i++){if(EXTERNALS[i].id===id) return EXTERNALS[i];}
+    return null;
+  }
+
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261005-console-recovery',
+    version:'v20261005-video-sequences',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
     navDepartments:NAV_DEPARTMENTS,
     consoleFamilies:CONSOLE_FAMILIES,
+    consoles:CONSOLES,
+    rail:RAIL,
+    externals:EXTERNALS,
     aliases:ALIASES,
     idAliases:ID_ALIASES,
     baseAssets:BASE_ASSETS,
     offlineAssets:offlineAssets,
     toolById:toolById,
-    normalizeToolId:normalizeToolId
+    normalizeToolId:normalizeToolId,
+    externalById:externalById
   };
 })(typeof self!=='undefined'?self:this);

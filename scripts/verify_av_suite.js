@@ -87,6 +87,121 @@ function assertSourceChecks(registry) {
   }
 }
 
+function assertRailRegistryContracts(registry) {
+  const expectedConsoles = [
+    ['av-video', 'video', 'AV Video', 'available'],
+    ['audio', 'audio', 'Audio', 'planned'],
+    ['show-control', 'showcontrol', 'Show Control', 'planned'],
+    ['show-ops', 'showops', 'Show Ops', 'planned'],
+    ['front-office', 'office', 'Front Office', 'planned'],
+    ['shop', 'shop', 'The Shop', 'planned'],
+    ['infrastructure', 'infra', 'Infrastructure', 'planned'],
+    ['lighting', 'lighting', 'Lighting', 'planned'],
+    ['av-calculator', 'calc', 'AV Calculator', 'planned']
+  ];
+  const actualConsoles = (registry.consoles || []).map((console) => [
+    console.id,
+    console.prototypeId,
+    console.label,
+    console.availability
+  ]);
+  if (JSON.stringify(actualConsoles) !== JSON.stringify(expectedConsoles)) {
+    fail(`Rail console identities or source order are wrong: ${JSON.stringify(actualConsoles)}.`);
+  }
+
+  const consoleIds = (registry.consoles || []).map((console) => console.id);
+  const prototypeIds = (registry.consoles || []).map((console) => console.prototypeId);
+  if (new Set(consoleIds).size !== consoleIds.length) fail('Rail console IDs are not unique.');
+  if (new Set(prototypeIds).size !== prototypeIds.length) fail('Rail prototype IDs are not unique.');
+  const expectedIcons = {
+    'av-video': ['m16 9 5-3v12l-5-3z', 'M3 6h13v12H3z'],
+    audio: ['M4 10v4', 'M8 6v12', 'M12 3v18', 'M16 7v10', 'M20 10v4'],
+    'show-control': ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z', 'M10 8.5v7l5.5-3.5z'],
+    'show-ops': ['M3 5h18v16H3z', 'M3 10h18', 'M8 3v4', 'M16 3v4', 'M7 14h5', 'M10 17h7'],
+    'front-office': ['M5 4h14v17H5z', 'M9 4V2h6v2', 'm9 13 2 2 4-4'],
+    shop: ['M4 4h16v13H4z', 'M4 9h16', 'M10 12h4', 'M8 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z', 'M16 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z'],
+    infrastructure: ['M13 2 4 14h7l-1 8 9-12h-7z'],
+    lighting: ['M9 18h6', 'M10 21h4', 'M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z'],
+    'av-calculator': ['M5 3h14v18H5z', 'M8 7h8v3H8z', 'M8 14h2', 'M11 14h2', 'M14 14h2', 'M8 17.5h2', 'M11 17.5h2', 'M14 17.5h2']
+  };
+  (registry.consoles || []).forEach((console) => {
+    if (JSON.stringify(console.icon) !== JSON.stringify(expectedIcons[console.id])) {
+      fail(`Rail console ${console.id} does not preserve its v3 source icon.`);
+    }
+  });
+
+  const expectedPinned = expectedConsoles.map(([id]) => `console:${id}`);
+  if (JSON.stringify(registry.rail?.defaultPinned || []) !== JSON.stringify(expectedPinned)) {
+    fail(`Rail default pins do not match the RAIL-1B order: ${(registry.rail?.defaultPinned || []).join(', ')}.`);
+  }
+
+  const avVideo = (registry.consoles || []).find((console) => console.id === 'av-video');
+  if (!avVideo || avVideo.toolId !== 'av-video' || avVideo.draftKey !== 'sbd.avVideo.draft.v1' || avVideo.layoutKey !== 'sbd.avVideo.layout.v1') {
+    fail('AV Video rail identity is missing its canonical tool and storage metadata.');
+  } else {
+    const avVideoToolKeys = (registry.toolById('av-video')?.storageKeys || []).map((entry) => entry.key);
+    [avVideo.draftKey, avVideo.layoutKey].forEach((key) => {
+      if (!avVideoToolKeys.includes(key)) fail(`AV Video rail storage key is absent from the owning tool: ${key}.`);
+    });
+  }
+
+  const plannedForbiddenFields = ['toolId', 'href', 'route', 'draftKey', 'layoutKey', 'storageKey', 'storageKeys', 'document', 'doc', 'schema'];
+  (registry.consoles || []).filter((console) => console.availability === 'planned').forEach((console) => {
+    plannedForbiddenFields.forEach((field) => {
+      if (Object.prototype.hasOwnProperty.call(console, field)) fail(`Planned console ${console.id} fabricates ${field} metadata.`);
+    });
+  });
+  const available = (registry.consoles || []).filter((console) => console.availability === 'available').map((console) => console.id);
+  if (JSON.stringify(available) !== JSON.stringify(['av-video'])) {
+    fail(`Only AV Video may be available in the RAIL-1B registry slice: ${available.join(', ')}.`);
+  }
+
+  const expectedExternals = [
+    ['cueforge', 'CueForge', 'handoff', 'https://systembydave.com/cueforge.html', 'Desktop app'],
+    ['plotforge', 'PlotForge', 'handoff', 'plotforge.html', 'Own app'],
+    ['housevideo', 'House Video / FMP', 'handoff', 'https://housevideo.app/', 'Link out'],
+    ['arenaops', 'Arena Ops', 'status', undefined, 'API pending'],
+    ['deckforge', 'DeckForge + Stream Deck', 'status', undefined, 'Control surface']
+  ];
+  const actualExternals = (registry.externals || []).map((external) => [
+    external.id,
+    external.label,
+    external.kind,
+    external.destination,
+    external.badge
+  ]);
+  if (JSON.stringify(actualExternals) !== JSON.stringify(expectedExternals)) {
+    fail(`Rail external records are wrong: ${JSON.stringify(actualExternals)}.`);
+  }
+  (registry.externals || []).forEach((external) => {
+    if (external.kind === 'handoff' && !external.destination) fail(`External handoff ${external.id} has no destination.`);
+    if (external.kind === 'status' && Object.prototype.hasOwnProperty.call(external, 'destination')) {
+      fail(`Status-only external ${external.id} must not have a destination.`);
+    }
+  });
+
+  if (typeof registry.externalById !== 'function') {
+    fail('SBD_REGISTRY.externalById did not load.');
+  } else {
+    expectedExternals.forEach(([id, label]) => {
+      if (registry.externalById(id)?.label !== label) fail(`externalById does not resolve exact external id ${id}.`);
+    });
+    ['cue-sheet', 'stageplotter', 'missing'].forEach((id) => {
+      if (registry.externalById(id) !== null) fail(`externalById must not alias or fabricate ${id}.`);
+    });
+  }
+  if (registry.toolById('cueforge')?.id !== 'cue-sheet') fail('Legacy cueforge tool ID no longer normalizes to Cue Sheet.');
+  if (registry.toolById('plotforge')?.id !== 'stageplotter') fail('Legacy plotforge tool ID no longer normalizes to StagePlotter.');
+
+  const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
+  if (registry.tools.length !== 45 || registry.baseAssets.length !== 94 || registry.offlineAssets().length !== 139 || storageKeyCount !== 61) {
+    fail(`Rail metadata changed an existing inventory count (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
+  }
+  (registry.externals || []).forEach((external) => {
+    if (registry.tools.some((tool) => tool.id === external.id)) fail(`External ${external.id} leaked into the normal tool inventory.`);
+  });
+}
+
 function assertPageContracts(registry) {
   const publicPages = ['index.html', 'tools.html', 'av-suite.html', 'av-workbook.html', 'av-workbook/index.html'];
   const toolPages = registry.tools.map((tool) => tool.href);
@@ -351,6 +466,7 @@ async function assertRemoteChecks(registry) {
 (async function main() {
   const registry = loadRegistry();
   assertSourceChecks(registry);
+  assertRailRegistryContracts(registry);
   assertPageContracts(registry);
   await assertRemoteChecks(registry);
 

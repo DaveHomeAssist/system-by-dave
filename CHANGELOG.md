@@ -6,6 +6,23 @@
 - **Design.** `index.html` moves from per-element inline styles to one page style block after the shared shell CSS: tokenised colors, one type scale (DM Sans + JetBrains Mono, both self-hosted; the never-loaded Space Grotesk is dropped from the stack), rounded cards with a stretched-link pattern, consistent 48px buttons and 44px chips, visible card focus rings, a cropped Prompt Lab screenshot with real alt text, a 3-up proof grid, and a `prefers-reduced-motion` bypass. Mobile stacks the hero actions and cards without the previous `!important` overrides.
 - No other page, shared stylesheet, route or metadata contract changed; the homepage title, description, Open Graph, Twitter and JSON-LD copy follow the new headline.
 
+## 2026-10-05 — Cameras/Playback release acceptance
+
+- Record successful source and AV destination publication at `338ea85`, followed by isolated live Cameras/Playback acceptance on Walter, including imports, recovery, responsive themes and offline Save/reload.
+- Retain the earlier dependency-audit failure and its compatible repair as history. Keep physical/operator acceptance, Stream/Record and Rail integration separate; carry forward the approved Rail responsive/customization choices.
+
+## 2026-10-05 — AV release dependency security
+
+- Update only the transitive `source-map-js` lock entry from 1.2.1 to 1.2.2, within PostCSS’s existing compatible range, to address GHSA-68fv-2mgg-jv7q. Keep the high-severity audit gate unchanged.
+- Preserve the failed Cameras/Playback publication run 37400441588 as evidence; source merge alone does not establish publication or live acceptance.
+
+## 2026-10-05 — Cameras and Playback in AV Video
+
+- Add ordered shot and playback-cue panels, field editors, filters, duplication, reordering, operator status actions and explicit signal-route links.
+- Import Camera Shot List and Playback Check through previews that retain original text, statuses, durations, metadata and complete source payloads. Reject mixed collections and preserve existing edits on duplicate/stale imports.
+- Keep optional modules, old backups, hidden records, undo/redo, explicit Save, draft recovery and complete JSON exports compatible; export each record family as CSV.
+- Extend automated field-parity and browser acceptance. These planning records do not control cameras or play media; legacy sheets and physical/operator acceptance remain separate.
+
 ## 2026-10-05 — Console recovery hardening
 
 - Report draft, layout, removal and advisory-index failures without losing current edits or falsely confirming discard. Export remains available.

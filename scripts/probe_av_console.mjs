@@ -58,7 +58,7 @@ try {
   await page.goto(url);
   await button('Try a sample plan').click(); await save();
   // Default views come from the console; the plan stores none until asked.
-  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Show', 'Project']);
+  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Show', 'Cameras', 'Playback', 'Project']);
   assert.deepEqual(await panels(), ['flow', 'patch', 'inspector']);
   assert.equal((await readSaved()).workspace, undefined, 'default views are not written into the plan');
   // Panel buttons bring a panel forward, switching to the view that holds it.
@@ -94,14 +94,14 @@ try {
   await page.getByRole('menuitem', { name: 'Store as new view' }).click();
   await save();
   const stored = (await readSaved()).workspace;
-  assert.equal(stored.version, 1); assert.equal(stored.views.length, 6);
+  assert.equal(stored.version, 1); assert.equal(stored.views.length, 8);
   assert.deepEqual(stored.views[0].panels.map(p => p.type).sort(), ['checks', 'flow', 'inspector']);
   assert.equal((await readSaved()).routes.length, before, 'view edits never change records');
   await page.reload();
-  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Show', 'Project', 'Routing 6']);
+  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Show', 'Cameras', 'Playback', 'Project', 'Routing 8']);
   assert.deepEqual((await panels()).sort(), ['checks', 'flow', 'inspector']);
   // Rename and delete a view; deleting never deletes records.
-  await tab('Routing 6').click();
+  await tab('Routing 8').click();
   await page.getByRole('button', { name: 'View options' }).click(); await page.getByRole('menuitem', { name: 'Rename…' }).click();
   await page.getByLabel('View name').fill('Load-in'); await page.getByRole('menuitem', { name: 'Rename' }).click();
   assert.equal(await tab('Load-in').count(), 1);

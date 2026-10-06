@@ -26,6 +26,37 @@ Display Plan and Projection Plan JSON exports and browser sheets have preview/ca
 
 Throwline and LED Wall Calculator remain separate planners accessible from the destination list. These are navigation links with no implicit data transfer; save before leaving. Legacy Display Plan and Projection Plan pages remain available, including their print and summary workflows. This release does not retire them or claim full eight-tool/operator acceptance.
 
+## Cameras and Playback
+
+**Cameras** keeps ordered shots with number, cue, camera, type, subject, framing,
+movement, preset, status and notes. **Take next** marks the first untaken shot
+in the full list as taken, even if a filter hides it. **Playback** keeps cue,
+file, type, duration, aspect, audio, destination, status, backup and notes.
+**Mark next ready played** marks the first ready cue in the full list as played;
+it never advances a pending cue. Neither action sends hardware commands or
+plays a media file. Undo reverses a mark like any other plan edit.
+
+Both panels support search/status filters, add, duplicate, move up/down and
+confirmed removal. New records are inserted after the selected record.
+Imported unknown statuses and duration strings remain verbatim. Link a route
+explicitly to trace its signal path; names never merge identities automatically.
+Planning checks report missing camera/subject or file/destination, reported
+problems and deleted route links, without asserting physical readiness.
+
+Project can disable either module. Hidden records and panel definitions remain
+in Save and JSON Export; their checks are omitted. Re-enable to recover them.
+`?view=cameras` and `?view=playback` open the corresponding panel, or Project
+with guidance when the module is disabled. Older saved workspaces gain reachable
+views in memory; opening them does not save or rewrite the original layout.
+
+Import Camera Shot List (`camera-shot-list.v1`) and Playback Check
+(`playback-check.v1`) from JSON files or this site's saved sheets. Preview and
+confirm before appending. All source metadata (including camera `date` versus
+playback `showDate`), IDs and extra fields remain in **Export original**.
+Each panel's CSV includes all records, family fields and explicit route links;
+full JSON Export is the restorable backup. Original legacy pages remain
+independent and usable, including their printing and summary workflows.
+
 ## Working with a plan
 
 - Add devices or try the sample. Drag equipment to arrange it and connect an output port to an input. A keyboard alternative is available in the selected device panel. Both actions create real editable routes in Patch. New equipment avoids overlap with an existing saved layout.
@@ -38,14 +69,14 @@ Throwline and LED Wall Calculator remain separate planners accessible from the d
   - Multiview shows program, preview and each destination with the source it carries. Tap a tile to trace its route.
   - Bus selections are live state for this visit. They never edit or dirty the plan, survive every layout change, and do not control hardware.
 - Tap empty space or **Add panel** to place another panel, arrange panels from their menus or, when unlocked, by dragging, then **Store** or **Update** the view. Stored views travel in the plan and its JSON backup; they are kept by **Save** like any other edit. Older plans open with the default views. On a phone, one panel shows at a time with a bottom switcher.
-- Use **Project** to name the plan, enter optional venue/lead details, and turn patch, displays, checks or backup modules off. Disabled controls and search fields disappear; their data stays in a full export. Patch checks run only when the patch module is enabled. These preferences belong to the saved plan.
+- Use **Project** to name the plan, enter optional venue/lead details, and turn patch, displays, cameras, playback, checks or backup modules off. Disabled controls and search fields disappear; their data stays in a full export. Patch checks run only when the patch module is enabled. These preferences belong to the saved plan.
 - Format and connector dropdowns render inside the webpage and stay within its viewport, avoiding native menu placement on the wrong display in embedded browsers. Arrow keys, Home/End and typing find an option; Enter selects, Escape cancels, and Tab closes without changing the value.
 - **Undo / Redo** restores up to 80 edits during this visit, including device moves, connections, route deletion, imports and module switches. Typing in one field is grouped until focus leaves it. Use Cmd/Ctrl Z and Cmd/Ctrl Shift Z (or Ctrl Y) outside text fields; text fields keep native typing undo. Save does not clear history; reloading does.
 - Choose a **Format / EDID timing** and **Connector** from the preset menus. Format choices distinguish 59.94 from 60 and include HD, UHD and common computer rasters. These are planned timings, not EDID binaries or hardware programming. Imported connector/format text stays intact even when it is outside the menus.
 - **Custom / LED wall** accepts pixel width, height and frame rate. **Use saved LED wall** reads the native raster from the existing LED Wall Calculator on this origin, including cabinet rotation and whole-cabinet rounding for layout, target-size and target-raster modes. It applies only the selected route format, can be undone, and never writes calculator data. The processor still needs to accept that native raster.
 - Unsaved edits are also kept as a draft on this device. If you leave without saving, the next visit offers **Restore draft** or **Discard draft**; nothing is applied until you choose. The current view and unstored panel arrangements come back automatically.
 - **Save** keeps the current plan in this browser and on this site. It does not sync to another device. **Export** downloads a complete JSON backup, including data in hidden modules and original imports.
-- **Import JSON file** accepts an AV Video backup or a Signal Flow / Video Patch / Display Plan / Projection Plan export. **Import saved…** reads the earlier sheet's storage on the current site. Preview route counts and contents before applying. Legacy imports append records; a full Video backup replaces the current plan after explicit confirmation, with an export-current action available.
+- **Import JSON file** accepts an AV Video backup or a Signal Flow / Video Patch / Display Plan / Projection Plan / Camera Shot List / Playback Check export. **Import saved…** reads the earlier sheet's storage on the current site. Preview route counts and contents before applying. Legacy imports append records; a full Video backup replaces the current plan after explicit confirmation, with an export-current action available.
 
 Imports preserve configured plan titles and metadata, even before the first route or destination exists. Only a pristine default plan receiving records adopts source metadata; empty imports never rename it. Importing does not alter the earlier sheets. Every original payload, metadata field, row ID and extra field remains in a verbatim source copy, downloadable independently. Editable route fields preserve blanks, text and original statuses. Identical imports are refused, including after edits. Similar routes from different sources remain separate rather than guessing identity. Rows are not truncated to legacy limits. Browser-source changes after preview cancel the operation.
 
@@ -55,10 +86,18 @@ Source: `apps/av-video/` (React/TypeScript, existing Vite/Zod dependencies). [Re
 
 Explicit save compares the loaded raw value against current storage before writing. Unknown/malformed stored documents block saving; storage or quota errors keep the draft available for export. Opening the app never writes a plan. A stale tab must export its draft and reload. Module changes, imports, resets and edits remain unsaved until Save; leaving an unsaved draft triggers the browser's leave warning.
 
-Signal Flow and Video Patch legacy URLs and storage contracts remain usable. Their Toolbox cards are consolidated into AV Video, and the shared Video navigation prioritizes the new application. Other Video tools remain separately accessible: camera sheets, playback, streaming and recording consolidation remains planned. Displays and projection are implemented with legacy compatibility; human acceptance remains open.
+Signal Flow and Video Patch legacy URLs and storage contracts remain usable. Their Toolbox cards are consolidated into AV Video, and the shared Video navigation prioritizes the new application. Other Video tools remain separately accessible: streaming and recording consolidation remains planned. Cameras and Playback now have native records and previewed imports. Displays and projection are implemented with legacy compatibility; human acceptance remains open.
 
 ## Verification
 
 `npm run typecheck:av-video`, `npm run test:av-video`, `npm run build:av-video`, and `npm run test:av-video-browser` run in release CI. The browser probes check device dragging and reload, shared-device rename, port dragging, keyboard connection, route tracing, patch parity, standalone SVG export, zoom and overview, plus shared edits, save/reload, import cancel/confirmation, original-source preservation, full backup round trips, duplicate/stale imports, stale tabs, unreadable storage, module visibility, Toolbox launch, offline editing/reload and viewport containment at 375, 680, 1440 and 3440 pixels in light/dark modes. Set `CHROME_CHANNEL=chrome` to use installed Chrome; set `AV_VIDEO_BASE` to read back a deployment in an isolated test browser context. The destination probe additionally checks display/projection imports, route linking/tracing/removal, CSV, hidden-module recovery, old-backup compatibility, keyboard navigation and offline destination edits. Technical checks do not substitute for venue/operator acceptance.
 
 Preset references: [Blackmagic video standards](https://www.blackmagicdesign.com/products/atemtelevisionstudio/techspecs) and [Extron EDID timing tables](https://media.extron.com/public/download/files/userman/dtp_t_hwp_uwp_D_series_68-2547-01_H.pdf). These inform useful planning choices, not a claim that every device supports every format.
+
+The sequence probe checks camera/playback import parity, ordering and status actions, route links, CSV/full backups, recovery, module retention, keyboard and responsive themes, and offline edits. Run it through `npm run test:av-video-browser`.
+
+### Cameras/Playback release evidence, October 5
+
+[PR #268](https://github.com/DaveHomeAssist/system-by-dave/pull/268) and the compatible dependency repair [#271](https://github.com/DaveHomeAssist/system-by-dave/pull/271) published at `338ea85d3162a55e30a0c40f07955e2390ad46c2`. [Source publication](https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37403101951) and [AV destination publication](https://github.com/DaveHomeAssist/avbydave/actions/runs/37404940165) succeeded. The earlier audit failure in run `37400441588` remains historical evidence; the high-severity gate was preserved.
+
+Walter's isolated live sequence probe passed imports and field parity, actions/order, undo/redo, CSV/full backup, draft recovery, hidden modules, keyboard controls, both themes, responsive boundaries and offline Save/reload. The published source and JS/CSS matched before and after the probe. This closes automated delivery acceptance for Cameras/Playback; physical/operator acceptance and the remaining Video modules stay open.
