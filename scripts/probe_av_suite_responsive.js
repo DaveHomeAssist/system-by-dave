@@ -392,6 +392,7 @@ async function main() {
         }));
       }
       return {
+        savedRecent: JSON.parse(localStorage.getItem('av-suite-ui.v1') || '{}').toolboxCommandRecent || [],
         recent: query(''),
         cueforge: query('CueForge'),
         plotforge: query('PlotForge'),
@@ -405,7 +406,7 @@ async function main() {
     if (!plotForgeCommand || new URL(plotForgeCommand.href).pathname !== '/plotforge.html' || new URL(plotForgeCommand.href).search || new URL(plotForgeCommand.href).hash) failures.push(`PlotForge external command inherited source context/hash: ${JSON.stringify(externalPool.plotforge)}.`);
     if (!externalPool.cueSheet.some((item) => item.id === 'tool:cue-sheet') || !externalPool.stageplotter.some((item) => item.id === 'tool:stageplotter')) failures.push('Legacy CueForge/PlotForge tool aliases no longer resolve to Cue Sheet/StagePlotter commands.');
     if (externalPool.arenaops.some((item) => item.id === 'external:arenaops') || externalPool.recent.some((item) => item.id === 'external:arenaops')) failures.push('Status-only Arena Ops became an executable or recent command.');
-    if (!externalPool.recent.some((item) => item.id === 'external:cueforge') || !externalPool.recent.some((item) => item.id === 'tool:cue-sheet') || !externalPool.recent.some((item) => item.id === 'tool:stageplotter')) failures.push(`Valid typed/legacy command recents were not retained: ${JSON.stringify(externalPool.recent)}.`);
+    if (!externalPool.savedRecent.includes('external:cueforge') || !externalPool.savedRecent.includes('tool:cue-sheet') || !externalPool.savedRecent.includes('tool:stageplotter')) failures.push(`Valid typed/legacy command recents were not retained: ${JSON.stringify(externalPool.savedRecent)}.`);
 
     const externalExecution = await evaluateValue(`(() => {
       const dashboard = localStorage.getItem('av-suite-dashboard.v1');
