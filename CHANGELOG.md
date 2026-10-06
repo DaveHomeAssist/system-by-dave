@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-05 — Cameras and Playback in AV Video
+
+- Add ordered shot and playback-cue panels, field editors, filters, duplication, reordering, operator status actions and explicit signal-route links.
+- Import Camera Shot List and Playback Check through previews that retain original text, statuses, durations, metadata and complete source payloads. Reject mixed collections and preserve existing edits on duplicate/stale imports.
+- Keep optional modules, old backups, hidden records, undo/redo, explicit Save, draft recovery and complete JSON exports compatible; export each record family as CSV.
+- Extend automated field-parity and browser acceptance. These planning records do not control cameras or play media; legacy sheets and physical/operator acceptance remain separate.
+
 ## 2026-10-05 — Console recovery hardening
 
 - Report draft, layout, removal and advisory-index failures without losing current edits or falsely confirming discard. Export remains available.

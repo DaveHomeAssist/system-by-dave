@@ -252,7 +252,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261005-console-recovery',
+    version:'v20261005-video-sequences',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

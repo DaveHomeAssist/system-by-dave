@@ -29,7 +29,7 @@ The engine owns presentation only. It never reads or writes records. Panel conte
   - Dragging uses the title bar; resizing uses the corner handle. Both work only while unlocked on a desktop layout.
   - Close removes the view of the data. It never deletes records or turns off a module.
 - **Layout lock.** Lock stops dragging and resizing. Menu commands still work, and the lock state is always visible.
-- **Panel buttons.** These bring a panel forward. They focus it in the current view, open the stored view that holds it, or place it in free space. AV Video keeps its earlier labels (Signal flow, Patch, Displays, Checks, Project) so existing links and habits still land on the same work.
+- **Panel buttons.** These bring a panel forward. They focus it in the current view, open the stored view that holds it, or place it in free space. AV Video keeps its earlier labels (Signal flow, Patch, Displays, Checks, Project) and adds Cameras and Playback so existing links and habits still land on the same work.
 - **Views.**
   - **Store as new view** and **Update** copy the live arrangement into the plan. They are document edits: undoable, shown as unsaved, and kept only by **Save**.
   - **Rename**, **Duplicate** and **Delete** never touch records. **Revert** returns to the stored arrangement.
@@ -85,7 +85,7 @@ Recorded on 2026-10-05 from Dave's review of the console manifest:
 
 The console order follows the manifest:
 1. AV Video, with its Switcher bus and Multiview live panels (this release).
-2. AV Video's Cameras, Playback, Stream and Record panels, absorbing their legacy sheets with lossless imports.
+2. Cameras and Playback are implemented in the October 5 slice with ordered records and lossless imports; Stream and Record remain next. Delivery evidence lives in the existing Video next-steps record.
 3. The rail, the Stage Slate default and the draft store.
 4. Show Control and Audio.
 5. The remaining family consoles and specialists. Throwline keeps its flight strip, verdict and provenance ladder as chrome the layout cannot hide.

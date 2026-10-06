@@ -6,7 +6,7 @@
   ],
   "head": "75132ba7a111b5a33b1b5df52f65ceb44df63dbc",
   "status": "amber",
-  "statusReason": "Toolbox foundation, public Workbook withdrawal, AV Video console workspace, Stage Slate, drafts and recovery hardening are delivered. Remaining Video panels, Rail implementation, RAIL-2/RAIL-3 choices, and physical/operator acceptance remain open.",
+  "statusReason": "Console recovery is delivered. Cameras/Playback is implemented on the current branch with release verification pending. Stream/Record, Rail decisions/runtime and physical/operator acceptance remain open.",
   "lastActivity": "2026-10-05",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -17,8 +17,8 @@
     "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe."
   ],
   "nextStep": {
-    "title": "Continue independent Video modules under the maintained increments",
-    "why": "The console foundation and bounded recovery repair are delivered. Continue Cameras/Playback before Stream/Record; do not reopen Workbook or silently retire legacy sheets.",
+    "title": "Verify and publish Cameras and Playback, then prepare Stream and Record",
+    "why": "The Cameras/Playback implementation adds ordered records, operator actions and two lossless imports. Complete exact-head CI and publication before calling it delivered; Stream/Record remains next.",
     "doneWhen": "Each remaining Video slice preserves legacy fields/statuses and originals, supports reversible optional modules, and passes source, browser and release checks.",
     "effort": "L",
     "owner": "Codex",
@@ -83,8 +83,8 @@
       "id": "AVC-11",
       "type": "feature",
       "sev": "P2",
-      "title": "Video slices left: Cameras & Playback, then Stream & Record",
-      "detail": "Source review at 1adc884; original audit wording follows, exact counts/line references are historical. camera-shot-list, playback-check, stream-plan and record-log lack AV Video homes and imports; 2.2-2.5 acceptance open. Internals belong to the AV Video audit.",
+      "title": "Cameras/Playback implemented; publication and Stream/Record remain",
+      "detail": "The earlier four-import/source-only finding is superseded by Cameras/Playback source implementation: six legacy imports, ordered shot/cue panels, explicit route links, optional modules and retained originals. Exact-head CI, publishing and isolated live proof remain required before delivery; Stream Plan and Record Log are still unbuilt in AV Video.",
       "files": [
         "docs/av-suite-consolidation-stage2-video.md",
         "docs/av-video.md"
@@ -167,6 +167,16 @@
         "Damaged cached geometry is sanitized for display without overwriting the original cache; hidden modules retain definitions."
       ],
       "gate": "PR #266 release verified separately from physical/operator acceptance."
+    },
+    {
+      "name": "Cameras and Playback \u2014 In verification",
+      "goal": "Deliver ordered camera shots and playback cues in the independent Video console.",
+      "items": [
+        "Preserve every legacy field, status, duration string and original import; keep legacy pages unchanged.",
+        "Add reversible modules, stored-view reachability, operator status actions and CSV/full backups.",
+        "Walter: typecheck, 77 unit tests, build and all Video browser probes passed, including Cameras/Playback, layout and 14 recovery scenarios. Exact-head CI and publishing remain pending."
+      ],
+      "gate": "Green final-head CI, both publishing workflows, exact-source live journeys and scoped board parity; physical acceptance remains separate."
     }
   ],
   "decisionsForDave": [
@@ -310,7 +320,14 @@
       "RAIL-1B remains an accepted planning decision; no Rail runtime or browser-rendered v3 parity is claimed.",
       "Already-open older application builds must reload to participate in the new draft lock protocol. Browsers without Web Locks retain explicit Save/Export and report unavailable automatic draft recovery.",
       "Remaining historical shell findings require their own revalidation; the prior homepage overflow observation is not remeasured here."
-    ]
+    ],
+    "camerasPlayback": {
+      "baseRevision": "63de8305f4b5018c7457ca6bccd95db0af297c04",
+      "branch": "codex/av-video-cameras-playback-20261005",
+      "state": "implemented; remote Video tests passed; exact-head CI and publication pending",
+      "runner": "Walter",
+      "scope": "Camera Shot List and Playback Check; no Rail, Stream/Record, hardware control, sync or legacy retirement."
+    }
   },
   "historicalFindings": [
     {

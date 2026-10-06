@@ -97,7 +97,7 @@ operator's Warm Paper, Stage Slate, or System choice.
 The [maintained consolidation plan](docs/av-suite-consolidation-spec.md) sets the
 next product direction: Toolbox as default, focused applications with optional
 modules, independently launchable Unified Video, and public Workbook withdrawal
-while retaining its concept for possible redesign. AV Video now combines Signal Flow and Video Patch at `/av-video/`, with app-owned data and optional patch, displays/projection, checks and backup modules. Displays & Projection records link explicitly to routes and import the legacy Display Plan / Projection Plan sheets without changing their originals. The remaining application consolidation is target work. See `docs/av-video.md`. Workbook is not a
+while retaining its concept for possible redesign. AV Video now combines Signal Flow and Video Patch at `/av-video/`, with app-owned data and optional patch, displays/projection, cameras, playback, checks and backup modules. Cameras and Playback add ordered shot/cue records and previewed legacy imports with original-source retention. Displays & Projection records link explicitly to routes and import the legacy Display Plan / Projection Plan sheets without changing their originals. The remaining application consolidation is target work. See `docs/av-video.md`. Workbook is not a
 required host or database for new applications. Dave clarified on 2026-10-02
 that its withdrawal needs no recovery notice, dedicated export flow, transition
 period or migration project; do not factor assumed Workbook adoption into scope.

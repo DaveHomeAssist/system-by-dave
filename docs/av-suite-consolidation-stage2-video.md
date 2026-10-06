@@ -2,7 +2,41 @@
 
 **Decision revision:** 2026-10-01. Unified Video is a focused application launched directly from Toolbox, independent of AV Workbook. The [maintained specification](av-suite-consolidation-spec.md) carries Dave's settled Toolbox, application, module and Workbook-withdrawal decisions. The former D2 recommendation and Workbook v2 execution brief are superseded; do not ask for their approval or implement them as the next phase.
 
-**Evidence boundary:** The September 29 source audit below used `c21ce22`; its line citations and defects are historical evidence with subsequent fixes noted. Increments 2.0a and 2.0b and bounded 2.0c slices were recorded at the historical source baseline `238f2ed`. Remaining suite safety work is open. The first independent route-and-patch slice of 2.1–2.4 is now implemented in `apps/av-video/` and built to `/av-video/`; see [the implemented contract](av-video.md). The October 3 Displays & Projection slice adds app-owned destination records, explicit route links, scoped checks and previewed imports from Display Plan and Projection Plan. Destination field, persistence, responsive and offline browser gates run alongside the existing route probes. Cameras/Playback and Stream/Record remain the next implementation slices. Full eight-tool Stage 2 acceptance and human acceptance remain open.
+**Evidence boundary:** The September 29 source audit below used `c21ce22`; its line citations and defects are historical evidence with subsequent fixes noted. Increments 2.0a and 2.0b and bounded 2.0c slices were recorded at the historical source baseline `238f2ed`. Remaining suite safety work is open. The first independent route-and-patch slice of 2.1–2.4 is now implemented in `apps/av-video/` and built to `/av-video/`; see [the implemented contract](av-video.md). The October 3 Displays & Projection slice adds app-owned destination records, explicit route links, scoped checks and previewed imports from Display Plan and Projection Plan. Destination field, persistence, responsive and offline browser gates run alongside the existing route probes. The October 5 Cameras/Playback slice implements ordered records, optional panels and two additional imports; its publication evidence belongs to the existing next-steps records. Stream/Record remains the next implementation slice. Full eight-tool Stage 2 acceptance and human acceptance remain open.
+
+## Cameras and Playback implementation brief — 2026-10-05
+
+**Problem and outcome:** shot lists and playback checks remain separate from the
+Video console. Add independent Cameras and Playback panels to the existing plan,
+so an operator can prepare, order, select and mark records while retaining route
+context, explicit Save, recoverable drafts and a complete handoff backup.
+
+**Smallest useful slice:** separate typed shot/cue collections, list and detail
+editors, search/status filters, add/duplicate/reorder/remove, camera Take next
+(first untaken shot) and playback Mark next ready played (first ready cue).
+These actions record operator activity; they never drive a camera or play media.
+Each record can explicitly link to an existing route without merging identities.
+CSV includes every family field; full JSON includes hidden data and originals.
+
+**Import and persistence:** preview file or same-origin saved imports from
+`camera-shot-list.v1` and `playback-check.v1`; preserve all field-matrix text,
+statuses, duration strings, metadata and source payloads. Reject ambiguous,
+malformed, duplicate and stale imports atomically. Old Video documents acquire
+empty collections and enabled module defaults in memory, without a write on
+open. Hide/re-enable retains records, stored panels and exports. Reuse existing
+history, save conflict checks and draft recovery; no new storage keys.
+
+**Acceptance:** cover every field/status, empty and over-legacy-cap imports,
+original-source byte preservation, confirmed imports, editing/order/actions,
+undo/redo, CSV/full backup round trips, old plans, disabled deep links, draft
+restore/conflicts, offline reload, keyboard/theme/phone/tablet/ultrawide layout
+and published-source parity. Physical/operator acceptance remains separate.
+
+**Exclusions and risks:** no Rail, Stream/Record, synchronization, hardware
+control, Workbook restoration or legacy retirement. Preserve raw metadata in
+original imports rather than guessing shared people/identity. Imported unknown
+statuses stay editable. Older application versions may reject extended plans;
+never down-convert or overwrite them. Keep legacy sheets independently usable.
 
 ## Where the program stands
 
@@ -24,7 +58,7 @@ The product direction below carries the October 1 request forward. Routine engin
 | D4 | Legacy pages remain independent writers of their existing keys. New imports are previewed copies; repeat import never silently overwrites newer app edits. | Data-preservation contract. |
 | D5 | Preserve the delivered Workbook load/save safeguards and apply equivalent fail-closed behavior to any new app store. | Completed safety work remains valuable; a Workbook schema extension is no longer a Video prerequisite. |
 | D6 | LED Wall Calculator stays a focused specialist launched directly and from Displays & Projection. | Engineering navigation default; preserve its own state and documented Power Load handoff. |
-| D7 | Toolbox is the default entrance and Video is directly visible. Video opens without show setup, with optional validated show context and optional modules. | Settled product boundary. The current doorway's explicit show-context compatibility remains documented; the target neutral Toolbox default must also cover returning profiles. Current saved Show Console preferences still override neutral entry; that Stage 1 gap remains open. |
+| D7 | Toolbox is the default entrance and Video is directly visible. Video opens without show setup, with optional validated show context and optional modules. | Settled product boundary. PR #256 delivered the neutral Toolbox default for fresh and returning profiles; the earlier saved-Show override finding is superseded. Explicit show-context compatibility remains documented and tested. |
 | D8 | Video derives scoped issues locally and does not write `av-suite-dashboard.v1` readiness. | Preserve one writer until the consequential readiness-authority choice is resolved. |
 
 ## Stage 0 Video-slice source audit
@@ -93,7 +127,7 @@ Each increment is a separate pull request that merges only when every check is g
 | **2.0c Suite-wide legacy safety** | In progress 2026-10-01: navigation and three browser probes delivered in a bounded first slice; the remaining safety work is open; Workbook theme follows the Suite and the fourth browser probe joins CI in a second slice; lossless Video load lands in a third slice. Independent of 2.1. Extends the 2.0b fixes to the rest of the suite and closes what 2.0b left open: the modifier guard on 23 tool pages (V0-5), unreadable-data preservation on the remaining pages and a way out when a second unreadable value arrives (V0-3), seeding on Input List and StagePlotter (V0-2), lossless load on the Video pages (V0-4), Display Plan and Projection Plan navigation (V0-9), the four probes outside CI (V0-11), and the Workbook's dark-only theme (workspace rule WEB-1; resolved in the second 2.0c slice). The remaining work is split into reviewable pull requests. | Cmd/Ctrl+P is not intercepted on any tool page. No tool page saves over a value it could not parse, and a second unreadable value has a way out. Input List and StagePlotter start empty. Reloading a Video page keeps every stored character and row. Display Plan and Projection Plan step through Video. The four probes run in the Pages workflow. The Workbook follows the suite theme, light by default. |
 | **2.1 Independent Video foundation** | The app-owned route/destination document, validation and fail-closed persistence are implemented. Extend that independent foundation for the remaining typed entities; shared cross-app identity is deferred. Select source structure and reusable code autonomously. | Every matrix field has a typed or verbatim provenance home. Save/reload, schema compatibility, backup and stale-tab behavior pass. Launch, edit and export work without Workbook installed or opened; its data stays byte-identical. |
 | **2.2 Legacy Video import** | Signal Flow, Video Patch, Display Plan and Projection Plan imports are implemented; the other four remain. Complete reviewable imports for all eight keys with counts, unmapped fields, suggested endpoint matches, backup, confirmation, stale-preview rejection and repeat-import conflict handling. | Unit fixtures and a real browser preview/cancel/apply/repeat/restore journey preserve every legacy key and newer destination edit. |
-| **2.3 Focused views and optional modules** | Switching & Routes, Displays & Projection and scoped checks are implemented; shipped module visibility belongs to the Video document. Build Cameras, Playback and Stream & Record with reversible visibility and preserved data. Use the shared experience and independent app boundary. | Representative video chains retain status, backup and export details. Disable/reload/deep-link/export/re-enable preserves data and reduces clutter; active operations remain reachable. Specialist launches pass only supported fields. |
+| **2.3 Focused views and optional modules** | Switching & Routes, Displays & Projection and scoped checks are implemented; shipped module visibility belongs to the Video document. Cameras and Playback now add ordered records and reversible visibility; Stream & Record remains planned. Use the shared experience and independent app boundary. | Representative video chains retain status, backup and export details. Disable/reload/deep-link/export/re-enable preserves data and reduces clutter; active operations remain reachable. Specialist launches pass only supported fields. |
 | **2.4 Toolbox launch and compatibility** | Independent Video launch and return navigation are implemented. Complete returning-neutral Toolbox behavior and remaining compatibility gates. Coordinate with the specification's earlier Toolbox-default release; do not recreate a chooser or Workbook launch dependency. | Video is visible without search at phone, 680px, desktop and 32:9. Neutral entry opens Toolbox, explicit Show Console/legacy show-context links still work, Back/Forward restore app/task, and rollback retains saved work. |
 | **2.5 Stage 2 acceptance** | Verify remote, CI, destination deployment and rendered journeys; record a separate operator trial and update the plan. | All eight legacy capabilities and compatible routes remain available. App independence, module behavior, data/field parity and recovery gates pass. Human acceptance is recorded separately from technical proof. |
 

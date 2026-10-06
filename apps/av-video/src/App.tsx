@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { SequencePanel } from "./SequencePanel";
+import { newShot, newPlayback, shotFields, playbackFields, shotName, playbackName, shotGaps, playbackGaps } from "./sequences";
 import { DisplaysPanel } from "./DisplaysPanel";
 import { BusPanel, MultiviewPanel } from "./LivePanels";
 import { BusState, initialBus, sourceAt, switchers } from "./bus";
@@ -15,7 +17,7 @@ import { applyImport, emptyDocument, LEGACY, loadDocument, parseDocument, Module
 const CONSOLE_ID = "av-video";
 const DRAFT_KEY = "sbd.avVideo.draft.v1";
 const LAYOUT_KEY = "sbd.avVideo.layout.v1";
-type PanelType = "flow" | "patch" | "inspector" | "displays" | "checks" | "project" | "bus" | "multiview";
+type PanelType = "cameras" | "playback" | "flow" | "patch" | "inspector" | "displays" | "checks" | "project" | "bus" | "multiview";
 /* Panel library and the starting arrangements (docs/av-console.md). Views are
    stored in the plan only after Store or Update; these defaults cost nothing. */
 const LIBRARY: PanelDef[] = [
@@ -25,6 +27,8 @@ const LIBRARY: PanelDef[] = [
   { type: "bus", name: "Switcher bus", group: "Common", description: "Program, preview and AUX keys with Cut. Live state: never a plan edit.", minW: 4, minH: 2 },
   { type: "multiview", name: "Multiview", group: "Common", description: "Program, preview and every destination as a tile, showing what it carries.", minW: 3, minH: 3 },
   { type: "displays", name: "Displays & Projection", group: "Planning", description: "Destination records, projection details and linked routes.", minW: 4, minH: 3, module: "displays" },
+  { type: "cameras", name: "Cameras", group: "Planning", description: "Ordered shots, camera details and operator take records.", minW: 4, minH: 4, module: "cameras" },
+  { type: "playback", name: "Playback", group: "Planning", description: "Ordered cues, file checks and operator playback records.", minW: 4, minH: 4, module: "playback" },
   { type: "checks", name: "Checks", group: "Utilities", description: "Planning checks with what they evaluated and links to affected records.", minW: 3, minH: 3, module: "checks" },
   { type: "project", name: "Project", group: "Utilities", description: "Plan details, optional modules and imports from earlier sheets.", minW: 6, minH: 4 },
 ];
@@ -33,6 +37,8 @@ const DEFAULT_VIEWS: ConsoleView[] = [
   { id: "projection", name: "Projection", panels: [{ id: "projection-displays", type: "displays", x: 0, y: 0, w: 7, h: 8 }, { id: "projection-flow", type: "flow", x: 7, y: 0, w: 5, h: 8 }] },
   { id: "trouble", name: "Troubleshooting", panels: [{ id: "trouble-checks", type: "checks", x: 0, y: 0, w: 3, h: 8 }, { id: "trouble-flow", type: "flow", x: 3, y: 0, w: 6, h: 8 }, { id: "trouble-inspector", type: "inspector", x: 9, y: 0, w: 3, h: 8 }] },
   { id: "show", name: "Show", panels: [{ id: "show-flow", type: "flow", x: 0, y: 0, w: 7, h: 5 }, { id: "show-multiview", type: "multiview", x: 7, y: 0, w: 5, h: 8 }, { id: "show-bus", type: "bus", x: 0, y: 5, w: 7, h: 3 }] },
+  { id: "cameras", name: "Cameras", panels: [{ id: "cameras-list", type: "cameras", x: 0, y: 0, w: 12, h: 8 }] },
+  { id: "playback", name: "Playback", panels: [{ id: "playback-list", type: "playback", x: 0, y: 0, w: 12, h: 8 }] },
   { id: "project", name: "Project", panels: [{ id: "project-project", type: "project", x: 0, y: 0, w: 12, h: 8 }] },
 ];
 const statuses = ["planned", "pending", "patched", "routed", "tested", "ready", "verified", "issue", "spare", "backup"];
@@ -62,6 +68,8 @@ export function App() {
   };
   const [selected, setSelected] = useState(initial.doc.routes[0]?.id || "");
   const [selectedDisplay, setSelectedDisplay] = useState("");
+  const [selectedShot, setSelectedShot] = useState("");
+  const [selectedCue, setSelectedCue] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -77,7 +85,18 @@ export function App() {
       try { ok = writeLayout(localStorage, LAYOUT_KEY, state); } catch { /* report below */ }
       setRecoveryProblems(p => ({ ...p, layout: ok ? "" : "Layout could not be saved. This arrangement is available for this visit only." })); } };
   }, []);
-  const ws = useConsoleWorkspace(doc.workspace?.views || DEFAULT_VIEWS, library, layoutPersist);
+  const views = useMemo(() => {
+    if (!doc.workspace) return DEFAULT_VIEWS;
+    const result = [...doc.workspace.views];
+    // Older stored workspaces gain reachable views in memory; opening never saves them.
+    for (const type of ["cameras", "playback", "project"]) if (!result.some(view => view.panels.some(panel => panel.type === type))) {
+      const base = DEFAULT_VIEWS.find(view => view.id === type)!;
+      let id = type; while (result.some(view => view.id === id)) id += "-new";
+      result.push({ ...base, id });
+    }
+    return result;
+  }, [doc.workspace]);
+  const ws = useConsoleWorkspace(views, library, layoutPersist);
   /* Capture the exact offered bytes once; another tab never grants ownership. */
   const [recovery] = useState(() => {
     try {
@@ -128,7 +147,10 @@ export function App() {
   }, [doc, selected]);
   useEffect(() => {
     const requested = new URLSearchParams(location.search).get("view");
-    if (requested === "patch" || requested === "checks" || requested === "displays") show(initial.doc.modules[requested] ? requested : "project");
+    if (requested === "patch" || requested === "checks" || requested === "displays" || requested === "cameras" || requested === "playback") {
+      show(initial.doc.modules[requested] ? requested : "project");
+      if (!initial.doc.modules[requested]) notify(`${requested} is disabled. Enable it in Project; its records are retained.`);
+    }
   }, []);
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
@@ -148,6 +170,8 @@ export function App() {
     return (status === "all" || r.status === status) && fields.join(" ").toLowerCase().includes(search.toLowerCase());
   });
   const destinationIssues = displayIssues(doc);
+  const shotIssues = doc.modules.cameras ? doc.shots.filter(row => shotGaps(row, doc.routes).length) : [];
+  const cueIssues = doc.modules.playback ? doc.cues.filter(row => playbackGaps(row, doc.routes).length) : [];
   const issues = doc.routes.filter(r => routeGaps(r, doc.modules).length);
   useEffect(() => {
     const unload = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = ""; } };
@@ -170,7 +194,7 @@ export function App() {
   function storeViews(views: ConsoleView[], text: string) { update({ ...doc, workspace: { version: 1, views } }); notify(text); }
   function toggleModule(module: Module) {
     update({ ...doc, modules: { ...doc.modules, [module]: !doc.modules[module] } });
-    notify(`${module === "patch" ? "Patch view" : module === "checks" ? "Checks" : module === "displays" ? "Displays & Projection" : "Backup details"} ${doc.modules[module] ? "hidden" : "enabled"}. Saved fields are retained.`);
+    notify(`${module === "patch" ? "Patch view" : module === "checks" ? "Checks" : module === "displays" ? "Displays & Projection" : module === "cameras" ? "Cameras" : module === "playback" ? "Playback" : "Backup details"} ${doc.modules[module] ? "hidden" : "enabled"}. Saved fields are retained.`);
   }
   async function inspect(raw: string, name: string, browserKey?: string) {
     importTrigger.current = document.activeElement as HTMLElement;
@@ -187,13 +211,13 @@ export function App() {
     try {
       if (preview.browserKey && localStorage.getItem(preview.browserKey) !== preview.raw) throw new Error("The source changed after preview. Cancel and import again.");
       const next = applyImport(doc, preview); update(next); setSelected(next.routes[0]?.id || "");
-      setPreview(null); show(preview.displays.length && next.modules.displays ? "displays" : "flow"); setSelectedDisplay(preview.displays[0]?.id || ""); setSearch(""); setStatus("all");
-      notify(`${preview.routes.length} routes and ${preview.displays.length} destinations ${preview.restore ? "restored" : "imported"}. Save to keep this plan in this browser.`);
+      setPreview(null); show(preview.shots.length && next.modules.cameras ? "cameras" : preview.cues.length && next.modules.playback ? "playback" : preview.displays.length && next.modules.displays ? "displays" : "flow"); setSelectedShot(preview.shots[0]?.id || ""); setSelectedCue(preview.cues[0]?.id || ""); setSelectedDisplay(preview.displays[0]?.id || ""); setSearch(""); setStatus("all");
+      notify(`${preview.routes.length} routes and ${preview.displays.length} destinations, ${preview.shots.length} shots and ${preview.cues.length} cues ${preview.restore ? "restored" : "imported"}. Save to keep this plan in this browser.`);
     } catch (error) { setPreview(null); notify(errorText(error), true); }
   }
   function exportDoc() { download("av-video.json", JSON.stringify(doc, null, 2)); notify("Full plan exported, including hidden module data and original imports."); }
   function replace(next: VideoDocument) {
-    if ((doc.routes.length || doc.displays.length || doc.graphDevices.length || dirty || Object.keys(doc.meta).length) && !window.confirm("Replace the current plan? Export first if you need to keep it.")) return;
+    if ((doc.shots.length || doc.cues.length || doc.routes.length || doc.displays.length || doc.graphDevices.length || dirty || Object.keys(doc.meta).length) && !window.confirm("Replace the current plan? Export first if you need to keep it.")) return;
     update(next); setSelected(next.routes[0]?.id || ""); show("flow"); setSearch(""); setStatus("all"); notify(next.routes.length ? "Plan ready. Select a cable to trace its path, or drag devices to arrange." : "New plan. Add devices or routes to begin.");
   }
   function changeTheme(value: string) {
@@ -203,7 +227,7 @@ export function App() {
   const field = (name: keyof Route, multiline = false) => route && <label key={name} className={multiline ? "wide" : ""}>{labels[name]}
     {multiline ? <textarea value={route[name]} onBlur={finishEdit} onChange={e => changeRoute(name, e.target.value, true)} rows={4} /> : <input value={route[name]} onBlur={finishEdit} onChange={e => changeRoute(name, e.target.value, true)} />}
   </label>;
-  const checkCount = issues.length + destinationIssues.length;
+  const checkCount = issues.length + destinationIssues.length + shotIssues.length + cueIssues.length;
   /* Onboarding lives in the lit Signal Flow panel; a neighbouring Patch panel stays compact. */
   const flowBeside = ws.mode !== "phone" && ws.panels.some(p => p.type === "flow");
   const routeLabel = (r?: Route) => r ? r.route || r.source || "Untitled route" : "";
@@ -233,11 +257,13 @@ export function App() {
           </div> : <div className="empty"><p>Choose a route from the list, or create one.</p></div>}
         </section>, context: route ? `Following · ${routeLabel(route)}` : "Following selection" };
       case "displays": return { body: <DisplaysPanel doc={doc} selected={selectedDisplay} onSelect={setSelectedDisplay} onChange={update} onFinish={finishEdit} onRoute={id => { setSelected(id); show("flow"); }} onImport={() => show("project")} notify={notify} />, context: `${doc.displays.length} destinations` };
-      case "checks": return { body: <section className="single-panel"><div className="panel-heading"><div><h2>Planning checks</h2><p>{doc.modules.displays ? "Displays and projection included. " : "Displays module is off. "}Checks cover {doc.modules.patch ? "signal and patch fields" : "signal fields only; patch module is off"}. These are planning checks, not a live signal test.</p></div><strong>{issues.length + destinationIssues.length} need attention</strong></div><div className="check-list">{destinationIssues.map(item => <button type="button" key={item.id} onClick={() => { setSelectedDisplay(item.id); show("displays"); }}><strong>{displayName(item)}</strong><span>{displayGaps(item, doc.routes).join(" · ")}</span><span>Edit destination →</span></button>)}{issues.length ? issues.map(r => <button type="button" key={r.id} onClick={() => { setSelected(r.id); show("inspector"); }}><strong>{r.route || r.source || "Untitled route"}</strong><span>{routeGaps(r, doc.modules).join(" · ")}</span><span>Edit route →</span></button>) : destinationIssues.length ? null : <div className="empty"><h3>{doc.routes.length || doc.displays.length ? "No field gaps in enabled modules" : "No records to check yet"}</h3><p>Operator statuses are preserved separately from these checks.</p></div>}</div></section>, context: `${checkCount} need attention` };
+      case "cameras": return { body: <SequencePanel family="cameras" rows={doc.shots} fields={shotFields} statuses={["ready", "hold", "problem", "taken"]} create={newShot} name={shotName} summary={row => [row.camera, row.cue, row.framing, row.movement].filter(Boolean).join(" · ")} gaps={shotGaps} doc={doc} selected={selectedShot} onSelect={setSelectedShot} onChange={(shots, group) => update({ ...doc, shots }, group)} onFinish={finishEdit} onRoute={id => { setSelected(id); show("flow"); }} onImport={() => show("project")} notify={notify} />, context: `${doc.shots.length} shots` };
+      case "playback": return { body: <SequencePanel family="playback" rows={doc.cues} fields={playbackFields} statuses={["ready", "pending", "issue", "played"]} create={newPlayback} name={playbackName} summary={row => [row.duration, row.destination, row.audio].filter(Boolean).join(" · ")} gaps={playbackGaps} doc={doc} selected={selectedCue} onSelect={setSelectedCue} onChange={(cues, group) => update({ ...doc, cues }, group)} onFinish={finishEdit} onRoute={id => { setSelected(id); show("flow"); }} onImport={() => show("project")} notify={notify} />, context: `${doc.cues.length} cues` };
+      case "checks": return { body: <section className="single-panel"><div className="panel-heading"><div><h2>Planning checks</h2><p>{doc.modules.displays ? "Displays and projection included. " : "Displays module is off. "}Checks cover {doc.modules.patch ? "signal and patch fields" : "signal fields only; patch module is off"}. Camera and playback checks apply only when their modules are enabled. These are planning checks, not a live signal test.</p></div><strong>{checkCount} need attention</strong></div><div className="check-list">{shotIssues.map(row => <button type="button" key={row.id} onClick={() => { setSelectedShot(row.id); show("cameras"); }}><strong>{shotName(row)}</strong><span>{shotGaps(row, doc.routes).join(" · ")}</span><span>Edit shot →</span></button>)}{cueIssues.map(row => <button type="button" key={row.id} onClick={() => { setSelectedCue(row.id); show("playback"); }}><strong>{playbackName(row)}</strong><span>{playbackGaps(row, doc.routes).join(" · ")}</span><span>Edit cue →</span></button>)}{destinationIssues.map(item => <button type="button" key={item.id} onClick={() => { setSelectedDisplay(item.id); show("displays"); }}><strong>{displayName(item)}</strong><span>{displayGaps(item, doc.routes).join(" · ")}</span><span>Edit destination →</span></button>)}{issues.length ? issues.map(r => <button type="button" key={r.id} onClick={() => { setSelected(r.id); show("inspector"); }}><strong>{r.route || r.source || "Untitled route"}</strong><span>{routeGaps(r, doc.modules).join(" · ")}</span><span>Edit route →</span></button>) : destinationIssues.length + shotIssues.length + cueIssues.length ? null : <div className="empty"><h3>{doc.routes.length || doc.displays.length || doc.shots.length || doc.cues.length ? "No field gaps in enabled modules" : "No records to check yet"}</h3><p>Operator statuses are preserved separately from these checks.</p></div>}</div></section>, context: `${checkCount} need attention` };
       case "project": return { body: <section className="single-panel project-panel"><div className="panel-heading"><div><h2>Project & modules</h2><p>Use Video on its own. Add show details only when useful.</p></div></div><div className="project-scroll">
         <section><h3>Video plan</h3><div className="field-grid"><label>Plan name<input value={doc.title} onBlur={finishEdit} onChange={e => update({ ...doc, title: e.target.value }, "title")} /></label><label>Venue<input value={doc.meta.venue || ""} onBlur={finishEdit} onChange={e => update({ ...doc, meta: { ...doc.meta, venue: e.target.value } }, "venue")} /></label><label>Video lead<input value={doc.meta.videoLead || ""} onBlur={finishEdit} onChange={e => update({ ...doc, meta: { ...doc.meta, videoLead: e.target.value } }, "videoLead")} /></label></div><div className="row-actions"><button type="button" onClick={() => replace(emptyDocument())}>New plan</button><button type="button" onClick={() => replace(sampleDocument())}>Load sample</button></div></section>
-        <section><h3>Optional modules</h3><p>Turn off what you do not need. Its fields stay in the plan and full export.</p>{([ ["patch", "Patch view", "Input assignments and converters"], ["displays", "Displays & Projection", "Destinations, screens and projector setups"], ["checks", "Route checks", "Field gaps and reported issues"], ["backups", "Backup details", "Alternate routes and equipment"] ] as [Module, string, string][]).map(([id, name, description]) => <label className="module-toggle" key={id}><input type="checkbox" checked={doc.modules[id]} onChange={() => toggleModule(id)} /><span><strong>{name}</strong><small>{description}</small></span></label>)}</section>
-        <section><h3>Bring existing work together</h3><p>Import Signal Flow, Video Patch, Display Plan or Projection Plan sheets. Each source stays intact. Review imports before applying them.</p><div className="import-actions"><button type="button" disabled={reading} onClick={() => fileInput.current?.click()}>Import JSON file</button>{(Object.keys(LEGACY) as (keyof typeof LEGACY)[]).map(name => <button type="button" key={name} disabled={reading} onClick={() => importSaved(name)}>Import saved {name}</button>)}</div><p className="muted">Saved sheets are available only in the browser and site where they were created. JSON files work across sites.</p>{doc.imports.length > 0 && <details><summary>{doc.imports.length} original imports retained</summary>{doc.imports.map(i => <div className="original-import" key={i.id}><span>{i.name}</span><button type="button" onClick={() => download("original-sheet.json", i.raw)}>Export original</button></div>)}</details>}</section>
+        <section><h3>Optional modules</h3><p>Turn off what you do not need. Its fields stay in the plan and full export.</p>{([ ["patch", "Patch view", "Input assignments and converters"], ["displays", "Displays & Projection", "Destinations, screens and projector setups"], ["cameras", "Cameras", "Shot preparation and operator take records"], ["playback", "Playback", "Cue preparation and operator playback records"], ["checks", "Route checks", "Field gaps and reported issues"], ["backups", "Backup details", "Alternate routes and equipment"] ] as [Module, string, string][]).map(([id, name, description]) => <label className="module-toggle" key={id}><input type="checkbox" checked={doc.modules[id]} onChange={() => toggleModule(id)} /><span><strong>{name}</strong><small>{description}</small></span></label>)}</section>
+        <section><h3>Bring existing work together</h3><p>Import Signal Flow, Video Patch, Display Plan, Projection Plan, Camera Shot List or Playback Check sheets. Each source stays intact. Review imports before applying them.</p><div className="import-actions"><button type="button" disabled={reading} onClick={() => fileInput.current?.click()}>Import JSON file</button>{(Object.keys(LEGACY) as (keyof typeof LEGACY)[]).map(name => <button type="button" key={name} disabled={reading} onClick={() => importSaved(name)}>Import saved {name}</button>)}</div><p className="muted">Saved sheets are available only in the browser and site where they were created. JSON files work across sites.</p>{doc.imports.length > 0 && <details><summary>{doc.imports.length} original imports retained</summary>{doc.imports.map(i => <div className="original-import" key={i.id}><span>{i.name}</span><button type="button" onClick={() => download("original-sheet.json", i.raw)}>Export original</button></div>)}</details>}</section>
       </div></section>, context: doc.title };
       case "bus": { const sw = switcherList.find(x => x.name === busPick) || switcherList[0]; const st = sw && (bus[sw.name] || initialBus(sw));
         return { body: <BusPanel list={switcherList} current={busPick} state={bus} onPick={setBusPick} onChange={(name, next, text) => { setBus(b => ({ ...b, [name]: next })); notify(text); }} />, context: sw && st ? `PGM · ${sourceAt(sw, st.pgm) || "nothing"}` : "No switcher" }; }
@@ -245,18 +271,18 @@ export function App() {
       default: return { body: <p className="muted">This panel is not available in this version.</p> };
     }
   }
-  const quick = [{ type: "flow", label: "Signal flow" }, ...(doc.modules.patch ? [{ type: "patch", label: "Patch" }] : []), ...(doc.modules.displays ? [{ type: "displays", label: "Displays" }] : []), ...(doc.modules.checks ? [{ type: "checks", label: "Checks", badge: checkCount }] : []), { type: "project", label: "Project" }];
+  const quick = [{ type: "flow", label: "Signal flow" }, ...(doc.modules.patch ? [{ type: "patch", label: "Patch" }] : []), ...(doc.modules.displays ? [{ type: "displays", label: "Displays" }] : []), ...(doc.modules.cameras ? [{ type: "cameras", label: "Cameras" }] : []), ...(doc.modules.playback ? [{ type: "playback", label: "Playback" }] : []), ...(doc.modules.checks ? [{ type: "checks", label: "Checks", badge: checkCount }] : []), { type: "project", label: "Project" }];
   return <div className="video-app">
     <header className="app-header"><div className="app-identity"><span className="app-mark" aria-hidden="true">Vi</span><div><h1>AV Video</h1><p className="header-plan" title={doc.title}>{doc.title} · {dirty ? "Unsaved" : baseline.current ? "Saved in this browser" : "New plan"}</p></div></div>
       <div className="header-actions"><label className="theme-label"><span>Theme</span><select aria-label="Theme" value={theme} onChange={e => changeTheme(e.target.value)}><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label><button type="button" className="primary" onClick={save}>Save{dirty ? " •" : ""}</button><button type="button" onClick={exportDoc}>Export</button></div>
     </header>
-    <div className="plan-bar"><div className="plan-summary"><strong title={doc.title}>{doc.title}</strong><span>{doc.routes.length} routes · {doc.displays.length} destinations · {dirty ? "Unsaved changes" : baseline.current ? "Saved in this browser" : "New plan"}</span></div><div className="history-actions" aria-label="Edit history"><button type="button" onClick={undoEdit} disabled={!history.past.length} title="Undo (⌘/Ctrl Z)">↶ Undo</button><button type="button" onClick={redoEdit} disabled={!history.future.length} title="Redo (⌘/Ctrl Shift Z)">↷ Redo</button></div></div>
+    <div className="plan-bar"><div className="plan-summary"><strong title={doc.title}>{doc.title}</strong><span>{doc.routes.length} routes · {doc.displays.length} destinations · {doc.shots.length} shots · {doc.cues.length} cues · {dirty ? "Unsaved changes" : baseline.current ? "Saved in this browser" : "New plan"}</span></div><div className="history-actions" aria-label="Edit history"><button type="button" onClick={undoEdit} disabled={!history.past.length} title="Undo (⌘/Ctrl Z)">↶ Undo</button><button type="button" onClick={redoEdit} disabled={!history.future.length} title="Redo (⌘/Ctrl Shift Z)">↷ Redo</button></div></div>
     {draftOffer && <div className="draft-offer" role="alert"><p><strong>Unsaved edits</strong> from {new Date(draftOffer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device{draftOffer.baseline !== baseline.current ? ". The saved plan has changed since they were made" : ""}. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={restoreDraft}>Restore draft</button><button type="button" onClick={discardDraft}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
       <ConsoleWorkspace ws={ws} label="AV Video" quick={quick} render={renderPanel} onViewsChange={storeViews} notify={text => notify(text)} />
     </main>
     <footer role="status" className={`message ${problem || Object.values(recoveryProblems).some(Boolean) ? "error" : ""}`}>{[...Object.values(recoveryProblems).filter(Boolean), message].join(" ")}</footer>
     <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={async e => { const file = e.target.files?.[0]; e.target.value = ""; if (!file) return; try { await inspect(await file.text(), file.name); } catch (error) { notify(errorText(error), true); } }} />
-    <dialog ref={dialog} aria-labelledby="import-title" onCancel={() => setPreview(null)}><h2 id="import-title">Review import</h2>{preview && <><p>{preview.name}</p><p><strong>{preview.routes.length} routes · {preview.displays.length} destinations</strong> · {Object.keys(preview.meta).length} metadata fields</p><p>{preview.restore ? "This backup replaces the current plan, including module choices. Export your current plan first if you need to keep it." : "Records will be added to this plan. Notes, statuses, and a complete original source copy are retained. Similar records are kept separate; route links require your selection. Extra fields and metadata remain in Export original."}</p><div className="import-preview">{preview.displays.map(item => <div key={item.id}><strong>{displayName(item)}</strong><span>{item.kind} · {item.status || "Unspecified"} · {item.route || "No original route reference"}</span></div>)}{preview.routes.map(r => <div key={r.id}><strong>{r.source || "Unnamed source"} → {r.destination || "Unnamed destination"}</strong><span>{r.route} · {r.status || "Unspecified"}</span></div>)}</div><div className="row-actions"><button type="button" onClick={() => setPreview(null)}>Cancel</button>{preview.restore && <button type="button" onClick={exportDoc}>Export current plan</button>}<button type="button" className="primary" onClick={confirmImport}>{preview.restore ? "Replace with backup" : preview.displays.length ? "Add destinations to plan" : "Add routes to plan"}</button></div></>}</dialog>
+    <dialog ref={dialog} aria-labelledby="import-title" onCancel={() => setPreview(null)}><h2 id="import-title">Review import</h2>{preview && <><p>{preview.name}</p><p><strong>{preview.routes.length} routes · {preview.displays.length} destinations · {preview.shots.length} shots · {preview.cues.length} cues</strong> · {Object.keys(preview.meta).length} metadata fields</p><p>{preview.restore ? "This backup replaces the current plan, including module choices. Export your current plan first if you need to keep it." : "Records will be added to this plan. Notes, statuses, and a complete original source copy are retained. Similar records are kept separate; route links require your selection. Extra fields and metadata remain in Export original."}</p><div className="import-preview">{preview.shots.map(row => <div key={row.id}><strong>{shotName(row)}</strong><span>{row.camera} · {row.status || "Unspecified"}</span></div>)}{preview.cues.map(row => <div key={row.id}><strong>{playbackName(row)}</strong><span>{row.duration} · {row.status || "Unspecified"}</span></div>)}{preview.displays.map(item => <div key={item.id}><strong>{displayName(item)}</strong><span>{item.kind} · {item.status || "Unspecified"} · {item.route || "No original route reference"}</span></div>)}{preview.routes.map(r => <div key={r.id}><strong>{r.source || "Unnamed source"} → {r.destination || "Unnamed destination"}</strong><span>{r.route} · {r.status || "Unspecified"}</span></div>)}</div><div className="row-actions"><button type="button" onClick={() => setPreview(null)}>Cancel</button>{preview.restore && <button type="button" onClick={exportDoc}>Export current plan</button>}<button type="button" className="primary" onClick={confirmImport}>{preview.restore ? "Replace with backup" : preview.shots.length ? "Add shots to plan" : preview.cues.length ? "Add cues to plan" : preview.displays.length ? "Add destinations to plan" : "Add routes to plan"}</button></div></>}</dialog>
   </div>;
 }
