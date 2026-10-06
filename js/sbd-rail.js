@@ -157,11 +157,13 @@
     options=options||{};
     var registry=registryOrDefault(options.registry);
     var storage=options.storage;
+    var sessionState=null;
     if(typeof storage==='undefined'){
       try{storage=root.localStorage||null;}catch(error){storage=null;}
     }
 
     function read(){
+      if(sessionState) return sessionState;
       if(!storage||typeof storage.getItem!=='function') return fallbackState('unavailable',registry,null,'Rail preferences are unavailable in this browser.',false);
       try{return parsePreferences(storage.getItem(STORAGE_KEY),registry);}
       catch(error){return fallbackState('unavailable',registry,null,'Rail preferences are unavailable in this browser.',false);}
@@ -170,12 +172,19 @@
     function writePinned(pinned,previous){
       var payload={version:PREFERENCE_VERSION,pinned:dedupe(pinned)};
       var raw=JSON.stringify(payload);
+      var attempted=stateFromPinned('unsaved',payload.pinned,registry,{
+        raw:raw,
+        message:'Rail preferences could not be saved. This arrangement is available for this session only.',
+        persisted:false
+      });
       try{
         if(!storage||typeof storage.setItem!=='function') throw new Error('Storage unavailable');
         storage.setItem(STORAGE_KEY,raw);
-        return {ok:true,changed:true,state:parsePreferences(raw,registry)};
+        sessionState=parsePreferences(raw,registry);
+        return {ok:true,changed:true,state:sessionState};
       }catch(error){
-        return {ok:false,changed:false,code:'storage-error',message:'Rail preferences could not be saved.',state:previous};
+        sessionState=attempted;
+        return {ok:false,changed:true,code:'storage-error',message:attempted.message,state:sessionState,previousState:previous};
       }
     }
 
@@ -274,6 +283,9 @@
     element.appendChild(labelSpan(documentRef,entry.label));
 
     if(planned){
+      element.setAttribute('tabindex','0');
+      element.setAttribute('role','note');
+      element.setAttribute('aria-label',entry.label+'. Planned.');
       element.setAttribute('data-status','planned');
       var shortStatus=documentRef.createElement('span');
       shortStatus.className='sbd-rail__status-short';

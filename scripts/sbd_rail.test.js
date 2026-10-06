@@ -234,10 +234,22 @@ test('storage failures are explicit and preserve unrelated data', () => {
   assert.deepEqual(blockedRead.setCalls, []);
 
   const blockedWrite = new MemoryStorage({ unrelated: 'keep' }, { throwOnSet: true });
-  const failed = rail.createPreferenceStore({ storage: blockedWrite, registry }).pin('external:cueforge');
+  const recoveringStore = rail.createPreferenceStore({ storage: blockedWrite, registry });
+  const failed = recoveringStore.pin('external:cueforge');
   assert.equal(failed.code, 'storage-error');
+  assert.equal(failed.changed, true);
+  assert.equal(failed.state.status, 'unsaved');
+  assert.equal(failed.state.persisted, false);
+  assert.equal(failed.state.visibleRefs.at(-1), 'external:cueforge');
+  assert.deepEqual(Array.from(recoveringStore.read().visibleRefs), Array.from(failed.state.visibleRefs));
   assert.equal(blockedWrite.data.unrelated, 'keep');
   assert.equal(Object.prototype.hasOwnProperty.call(blockedWrite.data, 'sbd.rail.v1'), false);
+
+  blockedWrite.options.throwOnSet = false;
+  const recovered = recoveringStore.unpin('external:cueforge');
+  assert.equal(recovered.ok, true);
+  assert.equal(recovered.state.status, 'saved');
+  assert.deepEqual(JSON.parse(blockedWrite.data['sbd.rail.v1']).pinned, Array.from(registry.rail.defaultPinned));
 });
 
 test('standalone renderer exposes nine ordered slots with eight non-actionable Planned states', () => {
@@ -273,7 +285,9 @@ test('standalone renderer exposes nine ordered slots with eight non-actionable P
   planned.forEach((entry) => {
     assert.equal(entry.tagName, 'DIV');
     assert.equal(entry.hasAttribute('href'), false);
-    assert.equal(entry.hasAttribute('tabindex'), false);
+    assert.equal(entry.getAttribute('tabindex'), '0');
+    assert.equal(entry.getAttribute('role'), 'note');
+    assert.match(entry.getAttribute('aria-label'), /\. Planned\.$/);
     assert.equal(entry.hasAttribute('aria-current'), false);
     assert.equal(elementsByClass(entry, 'sbd-rail__status')[0].textContent, 'Planned');
   });
@@ -341,5 +355,6 @@ test('responsive stylesheet encodes the settled breakpoints and accessibility fo
   assert.match(css, /overscroll-behavior: contain;/);
   assert.match(css, /safe-area-inset-top/);
   assert.match(css, /safe-area-inset-bottom/);
+  assert.match(css, /\.sbd-rail__entry\.is-planned:focus-visible[\s\S]*overflow-wrap: anywhere;/);
   assert.match(css, /@media print/);
 });

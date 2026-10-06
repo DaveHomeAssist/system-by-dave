@@ -198,6 +198,36 @@
   }
 }
 
+@media (min-width: 720px) and (max-width: 1439px) {
+  .sbd-rail__entry.is-planned:focus-visible {
+    flex-direction: column;
+    padding-inline: 2px;
+    text-align: center;
+  }
+
+  .sbd-rail__entry.is-planned:focus-visible .sbd-rail__label,
+  .sbd-rail__entry.is-planned:focus-visible .sbd-rail__status {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .sbd-rail__entry.is-planned:focus-visible .sbd-rail__status {
+    font: 700 8px/1.2 'JetBrains Mono', ui-monospace, monospace;
+    text-transform: uppercase;
+  }
+
+  .sbd-rail__entry.is-planned:focus-visible .sbd-rail__status-short {
+    display: none;
+  }
+}
+
 @media (min-width: 1440px) {
   .sbd-rail {
     width: 224px;
