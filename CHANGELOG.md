@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-05 — Cameras/Playback release acceptance
+
+- Record successful source and AV destination publication at `338ea85`, followed by isolated live Cameras/Playback acceptance on Walter, including imports, recovery, responsive themes and offline Save/reload.
+- Retain the earlier dependency-audit failure and its compatible repair as history. Keep physical/operator acceptance, Stream/Record and Rail integration separate; carry forward the approved Rail responsive/customization choices.
+
 ## 2026-10-05 — AV release dependency security
 
 - Update only the transitive `source-map-js` lock entry from 1.2.1 to 1.2.2, within PostCSS’s existing compatible range, to address GHSA-68fv-2mgg-jv7q. Keep the high-severity audit gate unchanged.
