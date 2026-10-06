@@ -353,14 +353,14 @@
     });
     nav.appendChild(list);
 
-    if(state.resetRequired){
+    if(state.message){
       var notice=documentRef.createElement('div');
       notice.className='sbd-rail__notice';
       notice.setAttribute('role','status');
       var message=documentRef.createElement('p');
       message.textContent=state.message;
       notice.appendChild(message);
-      if(typeof options.onResetPreferences==='function'){
+      if(state.resetRequired&&typeof options.onResetPreferences==='function'){
         var reset=documentRef.createElement('button');
         reset.type='button';
         reset.className='sbd-rail__reset';

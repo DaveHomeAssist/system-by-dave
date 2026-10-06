@@ -344,6 +344,40 @@ test('rendering a corrupt preference fallback does not reset it implicitly', () 
   assert.deepEqual(storage.setCalls, []);
 });
 
+test('unavailable and unsaved states stay visibly reported without offering reset', () => {
+  const { rail, registry } = loadRuntime();
+  const document = new FakeDocument();
+  let resetCount = 0;
+  const onResetPreferences = () => { resetCount += 1; };
+
+  const blockedRead = new MemoryStorage({}, { throwOnGet: true });
+  const unavailable = rail.render(new FakeElement('div', document), {
+    registry,
+    preferenceStore: rail.createPreferenceStore({ storage: blockedRead, registry }),
+    onResetPreferences
+  });
+  const unavailableNotices = elementsByClass(unavailable.shell, 'sbd-rail__notice');
+  assert.equal(unavailableNotices.length, 1);
+  assert.equal(unavailableNotices[0].getAttribute('role'), 'status');
+  assert.equal(unavailableNotices[0].children[0].textContent, 'Rail preferences are unavailable in this browser.');
+  assert.equal(elementsByClass(unavailable.shell, 'sbd-rail__reset').length, 0);
+
+  const blockedWrite = new MemoryStorage({}, { throwOnSet: true });
+  const failed = rail.createPreferenceStore({ storage: blockedWrite, registry }).pin('external:cueforge');
+  const unsaved = rail.render(new FakeElement('div', document), { registry, state: failed.state, onResetPreferences });
+  const unsavedNotices = elementsByClass(unsaved.shell, 'sbd-rail__notice');
+  assert.equal(unsavedNotices.length, 1);
+  assert.match(unsavedNotices[0].children[0].textContent, /could not be saved/);
+  assert.equal(elementsByClass(unsaved.shell, 'sbd-rail__reset').length, 0);
+
+  const saved = rail.render(new FakeElement('div', document), {
+    registry,
+    preferenceStore: rail.createPreferenceStore({ storage: new MemoryStorage(), registry })
+  });
+  assert.equal(elementsByClass(saved.shell, 'sbd-rail__notice').length, 0);
+  assert.equal(resetCount, 0);
+});
+
 test('responsive stylesheet encodes the settled breakpoints and accessibility foundations', () => {
   const css = fs.readFileSync(path.join(ROOT, 'css/sbd-rail.css'), 'utf8');
 
