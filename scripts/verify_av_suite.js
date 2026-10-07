@@ -204,12 +204,12 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261007-video-module-management') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261007-eight-app-integration') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
-  if (registry.tools.length !== 45 || registry.baseAssets.length !== 99 || registry.offlineAssets().length !== 144 || storageKeyCount !== 61) {
-    fail(`Rail integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
+  if (registry.tools.length !== 52 || registry.baseAssets.length !== 126 || registry.offlineAssets().length !== 178 || storageKeyCount !== 69) {
+    fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {
     if (registry.tools.some((tool) => tool.id === external.id)) fail(`External ${external.id} leaked into the normal tool inventory.`);

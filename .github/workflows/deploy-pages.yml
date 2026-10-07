@@ -142,6 +142,12 @@ jobs:
           npm run build:av-video
           npm run test:av-video-browser
 
+      - name: Verify AV Audio
+        run: |
+          npm run typecheck:av-audio
+          npm run test:av-audio
+          npm run build:av-audio
+
       - name: Verify NoteForge release contract
         run: npm run verify:noteforge
 
@@ -172,8 +178,8 @@ jobs:
         run: |
           npm audit --audit-level=high
           python3 scripts/gen_sitemap.py
-          git diff --exit-code -- av-workbook av-video camera-sim sitemap.xml
-          test -z "$(git status --porcelain -- av-workbook av-video camera-sim sitemap.xml)"
+          git diff --exit-code -- av-workbook av-video av-audio camera-sim sitemap.xml
+          test -z "$(git status --porcelain -- av-workbook av-video av-audio camera-sim sitemap.xml)"
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |
