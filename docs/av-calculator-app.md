@@ -22,10 +22,13 @@ untouched. The original browser key and calculation formulas stay intact.
 The existing route remains the entry point. Its Summary view opens a bounded
 Field sets dialog with Save, Recall, Export, Import and Delete. The new
 `avCalculator.fieldSets.v1` key contains a versioned array of named input
-sets. It never writes show context, LED profiles, Rail preferences or another
+sets (up to 100). It never writes show context, LED profiles, Rail preferences or another
 application's document. Import is limited to the exported schema and its own
 known input keys. Restoring a set updates the existing working key through the
-calculator's current validation and recalculation path.
+calculator's current validation and recalculation path. Imported numeric values
+must match the source input's range and step before the set can be added. The
+preview lists every labeled input and value before Apply; a rejected file or a
+full library leaves existing sets and working values unchanged.
 
 ## Exclusions and acceptance
 

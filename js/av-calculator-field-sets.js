@@ -31,6 +31,12 @@
         if (typeof value !== 'number' || !Number.isFinite(value)) return false;
         if (field.min !== '' && value < Number(field.min)) return false;
         if (field.max !== '' && value > Number(field.max)) return false;
+        const step = Number(field.step);
+        if (field.step !== 'any' && Number.isFinite(step) && step > 0) {
+          const base = field.min === '' ? 0 : Number(field.min);
+          const offset = (value - base) / step;
+          if (Math.abs(offset - Math.round(offset)) > Math.max(1, Math.abs(offset)) * Number.EPSILON * 8) return false;
+        }
         return true;
       }
       return typeof value === 'string' && value.length <= 500;
@@ -61,6 +67,7 @@
 
   function persist(next) {
     if (!writable) { note('Saved field sets are unreadable. No changes were written.', true); return false; }
+    if (next.length > 100) { note('Field sets are full (100). Export or delete a set before adding another.', true); return false; }
     try {
       if (localStorage.getItem(KEY) !== observedRaw) {
         writable = false;
@@ -88,6 +95,22 @@
   }
 
   function selected() { return sets.find(set => set.id === select.value); }
+
+  function showPreview(item) {
+    const list = el('fieldSetPreviewValues');
+    list.replaceChildren();
+    api.keys.forEach(key => {
+      const field = document.querySelector(`[data-key="${key}"]`);
+      const label = document.querySelector(`label[for="${field.id}"]`);
+      const name = document.createElement('dt');
+      name.textContent = label?.textContent?.trim() || key;
+      const value = document.createElement('dd');
+      value.textContent = field.tagName === 'SELECT'
+        ? [...field.options].find(option => option.value === String(item.values[key]))?.textContent || String(item.values[key])
+        : String(item.values[key]);
+      list.append(name, value);
+    });
+  }
 
   function download(set) {
     const file = new Blob([JSON.stringify({ schema: SCHEMA, name: set.name, values: set.values }, null, 2)], { type: 'application/json' });
@@ -142,6 +165,7 @@
         !parsed.name.trim() || parsed.name.length > 80 || !validValues(parsed.values)) throw new Error('invalid file');
       pending = { name: parsed.name.trim(), values: parsed.values };
       el('fieldSetPreviewText').textContent = `Ready to add “${pending.name}” with ${api.keys.length} inputs. Current values will stay as they are.`;
+      showPreview(pending);
       el('fieldSetPreview').hidden = false;
       note('Review the set, then choose Add imported set.');
     } catch (_) {
