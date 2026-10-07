@@ -1,9 +1,47 @@
 import { chromium } from '../node_modules/playwright/index.mjs';
 import { strict as assert } from 'node:assert';
+import { readFile } from 'node:fs/promises';
 const url = process.env.SHOW_CONTROL_URL || 'http://127.0.0.1:8765/show-control/';
 const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH, args: ['--no-sandbox'] });
 try {
   for (const viewport of [{ width: 1440, height: 900 }, { width: 375, height: 812 }]) {
+    const failedContext = await browser.newContext({ viewport });
+    const failedPage = await failedContext.newPage();
+    await failedPage.route('**/show-control/app.mjs', route => route.abort());
+    await failedPage.goto(url);
+    assert.equal(await failedPage.getByRole('button', { name: 'Save run' }).isDisabled(), true);
+    assert.equal(await failedPage.locator('#go').isDisabled(), true);
+    assert.match(await failedPage.locator('#message').innerText(), /controls stay disabled/);
+    await failedContext.close();
+
+    const recoveryContext = await browser.newContext({ viewport, acceptDownloads: true });
+    const recoveryPage = await recoveryContext.newPage();
+    await recoveryPage.goto(url);
+    const unreadable = '{"version":99,"original":"keep these exact characters"';
+    await recoveryPage.evaluate(raw => localStorage.setItem('sbd.showControl.v1', raw), unreadable);
+    await recoveryPage.reload();
+    assert.equal(await recoveryPage.getByRole('button', { name: 'Save run' }).isDisabled(), true);
+    assert.equal(await recoveryPage.getByRole('button', { name: 'Replace damaged saved run' }).isDisabled(), true);
+    assert.equal(await recoveryPage.evaluate(() => localStorage.getItem('sbd.showControl.v1')), unreadable);
+    const [rawDownload] = await Promise.all([recoveryPage.waitForEvent('download'), recoveryPage.getByRole('button', { name: 'Download unreadable saved data' }).click()]);
+    assert.equal(await readFile(await rawDownload.path(), 'utf8'), unreadable);
+    recoveryPage.on('dialog', dialog => dialog.accept());
+    await recoveryPage.evaluate(() => localStorage.setItem('sbd.showControl.v1', 'changed-in-another-tab'));
+    await recoveryPage.getByRole('button', { name: 'Replace damaged saved run' }).click();
+    assert.match(await recoveryPage.locator('#message').innerText(), /another tab changed/i);
+    assert.equal(await recoveryPage.evaluate(() => localStorage.getItem('sbd.showControl.v1')), 'changed-in-another-tab');
+    await recoveryPage.evaluate(raw => localStorage.setItem('sbd.showControl.v1', raw), unreadable);
+    await recoveryPage.getByRole('button', { name: 'Replace damaged saved run' }).click();
+    assert.equal(await recoveryPage.evaluate(() => localStorage.getItem('sbd.showControl.v1')), null);
+    assert.equal(await recoveryPage.getByRole('button', { name: 'Save run' }).isEnabled(), true);
+    await recoveryPage.locator('#cue-number').fill('R1');
+    await recoveryPage.locator('#cue-action').fill('Recovered run');
+    await recoveryPage.getByRole('button', { name: 'Add to run' }).click();
+    await recoveryPage.getByRole('button', { name: 'Save run' }).click();
+    await recoveryPage.reload();
+    assert.match(await recoveryPage.locator('#summary').innerText(), /1 cues/);
+    await recoveryContext.close();
+
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.goto(url);
@@ -30,7 +68,10 @@ try {
     assert.match(await page.locator('#summary').innerText(), /1 cues/);
     await page.getByRole('button', { name: 'Preview local Cue Sheet' }).click();
     assert.match(await page.locator('#preview').innerText(), /Source show · 1 cues/);
+    await page.locator('#cue-file').setInputFiles({ name: 'other.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ title: 'Other show', rows: [{ id: 'other', number: 'B1', action: 'Other' }] })) });
+    await page.locator('#cue-file-preview').getByRole('button', { name: 'Copy imported cues' }).waitFor();
     await page.getByRole('button', { name: 'Copy cues into this run' }).click();
+    assert.match(await page.locator('#summary').innerText(), /Source show/);
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('cueSheet.v1')).rows[0].custom.preserved), true);
     const cueForgeSource = { version: 7, name: 'CueForge show', modifiedAt: '2026-10-07T12:00:00Z', settings: { sharedSecret: 'private-fixture' }, cueLists: [{ id: 'main', name: 'Main', cues: [{ id: 'cf-1', number: '1.5', name: 'Opening', type: 'video', notes: 'Standby', properties: { filePath: '/private/fixture.mp4' } }] }] };
     await page.locator('#cueforge-file').setInputFiles({ name: 'show.cueforge', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(cueForgeSource)) });
