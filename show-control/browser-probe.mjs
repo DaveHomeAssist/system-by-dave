@@ -1,8 +1,45 @@
 import { chromium } from '../node_modules/playwright/index.mjs';
 import { strict as assert } from 'node:assert';
 import { readFile } from 'node:fs/promises';
-const url = process.env.SHOW_CONTROL_URL || 'http://127.0.0.1:8765/show-control/';
-const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH, args: ['--no-sandbox'] });
+import { createServer } from 'node:http';
+import path from 'node:path';
+let server;
+let url = process.env.SHOW_CONTROL_URL || 'http://127.0.0.1:8765/show-control/';
+if (process.env.SHOW_CONTROL_ROOT) {
+  const root = process.env.SHOW_CONTROL_ROOT;
+  server = createServer(async (request, response) => {
+    const files = { '/show-control/': 'show-control/index.html', '/show-control/style.css': 'show-control/style.css', '/show-control/app.mjs': 'show-control/app.mjs', '/show-control/model.mjs': 'show-control/model.mjs', '/css/av-theme.css': 'css/av-theme.css', '/js/av-theme-mode.js': 'js/av-theme-mode.js' };
+    const file = files[request.url?.split('?')[0]];
+    if (!file) { response.writeHead(404); response.end(); return; }
+    try { response.setHeader('Content-Type', file.endsWith('.css') ? 'text/css' : file.endsWith('.html') ? 'text/html' : 'text/javascript'); response.end(await readFile(path.join(root, file))); }
+    catch { response.writeHead(404); response.end(); }
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  url = `http://127.0.0.1:${server.address().port}/show-control/`;
+}
+const screenshotDir = process.env.SCREENSHOT_DIR || '/out';
+const browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : { channel: 'msedge' }), args: ['--no-sandbox'] });
+function luminance(hex) { const channels = hex.slice(1).match(/../g).map(value => parseInt(value, 16) / 255).map(value => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4); return channels[0] * .2126 + channels[1] * .7152 + channels[2] * .0722; }
+function contrast(a, b) { const x = luminance(a), y = luminance(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+function cssHex(value) { const channels = value.match(/^rgb\((\d+), (\d+), (\d+)\)$/); assert.ok(channels, `Expected opaque RGB color: ${value}`); return `#${channels.slice(1).map(channel => Number(channel).toString(16).padStart(2, '0')).join('')}`; }
+async function checkTheme(page, expected) {
+  const actual = await page.evaluate(() => {
+    const css = getComputedStyle(document.documentElement);
+    const value = key => css.getPropertyValue(key).trim().toLowerCase();
+    return { tool: document.documentElement.dataset.avTool, mode: document.documentElement.dataset.avTheme, bg: value('--av-bg'), surface: value('--av-surface'), text: value('--av-text'), muted: value('--av-muted'), accent: value('--av-accent'), primary: value('--av-primary-ink'), focus: value('--av-focus'), saved: localStorage.getItem('av-theme-mode.v1') };
+  });
+  assert.equal(actual.tool, 'show-control'); assert.equal(actual.mode, expected); assert.equal(actual.saved, expected);
+  assert.equal(actual.bg, expected === 'light' ? '#eee8df' : '#0c1016');
+  assert.ok(contrast(actual.text, actual.bg) >= 4.5);
+  assert.ok(contrast(actual.muted, actual.surface) >= 4.5);
+  assert.ok(contrast(actual.accent, actual.surface) >= 4.5);
+  assert.ok(contrast(actual.primary, actual.accent) >= 4.5);
+  assert.ok(contrast(actual.focus, actual.surface) >= 3);
+}
+async function checkVisibleControls(page) {
+  const controls = await page.evaluate(() => Object.fromEntries(['#theme', '#save', '#go', '[data-tab="run"]', '[data-tab="setup"]'].map(selector => { const style = getComputedStyle(document.querySelector(selector)); return [selector, { color: style.color, background: style.backgroundColor }]; })));
+  for (const [selector, style] of Object.entries(controls)) assert.ok(contrast(cssHex(style.color), cssHex(style.background)) >= 4.5, `${selector} has insufficient visible contrast: ${JSON.stringify(style)}`);
+}
 try {
   for (const viewport of [{ width: 1440, height: 900 }, { width: 375, height: 812 }]) {
     const failedContext = await browser.newContext({ viewport });
@@ -45,6 +82,23 @@ try {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.goto(url);
+    await page.evaluate(() => localStorage.setItem('av-theme-mode.v1', 'light'));
+    await page.reload();
+    await checkTheme(page, 'light');
+    await page.getByRole('button', { name: 'Switch to Stage Slate dark theme' }).click();
+    await checkTheme(page, 'dark');
+    await checkVisibleControls(page);
+    await page.reload();
+    await checkTheme(page, 'dark');
+    await page.screenshot({ path: path.join(screenshotDir, `show-control-dark-${viewport.width}.png`) });
+    await page.getByRole('button', { name: 'Switch to Warm Paper light theme' }).click();
+    await checkTheme(page, 'light');
+    await checkVisibleControls(page);
+    await page.getByRole('tab', { name: 'Run' }).focus();
+    await page.keyboard.press('ArrowRight');
+    assert.equal(await page.getByRole('tab', { name: 'Setup' }).getAttribute('aria-selected'), 'true');
+    await page.keyboard.press('ArrowLeft');
+    assert.equal(await page.getByRole('tab', { name: 'Run' }).getAttribute('aria-selected'), 'true');
     await page.evaluate(() => localStorage.setItem('cueSheet.v1', JSON.stringify({ title:'Source show', rows:[{id:'original', number:'A1', action:'Opening', custom:{ preserved:true }}] })));
     await page.getByRole('tab', { name: 'Setup' }).click();
     await page.locator('#cue-number').fill('001');
@@ -86,8 +140,13 @@ try {
     const size = await page.evaluate(() => ({ width: document.documentElement.scrollWidth <= document.documentElement.clientWidth, height: document.documentElement.scrollHeight <= document.documentElement.clientHeight }));
     assert.deepEqual(size, { width: true, height: true });
     await page.getByRole('tab', { name: 'Run' }).click();
-    await page.screenshot({ path: `/out/show-control-${viewport.width}.png` });
+    await page.getByRole('button', { name: 'Switch to Stage Slate dark theme' }).click();
+    await checkTheme(page, 'dark');
+    await page.screenshot({ path: path.join(screenshotDir, `show-control-dark-filled-${viewport.width}.png`) });
+    await page.getByRole('button', { name: 'Switch to Warm Paper light theme' }).click();
+    await checkTheme(page, 'light');
+    await page.screenshot({ path: path.join(screenshotDir, `show-control-light-${viewport.width}.png`) });
     await context.close();
   }
-  console.log('Show Control browser probe passed: save/reload, hold/go, failed import, viewport scroll.');
-} finally { await browser.close(); }
+  console.log('Show Control browser probe passed: theme tokens/contrast, save/reload, hold/go, failed import, viewport scroll.');
+} finally { await browser.close(); if (server) await new Promise(resolve => server.close(resolve)); }

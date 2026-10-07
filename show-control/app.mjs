@@ -40,10 +40,27 @@ $('import-file').onchange = async e => { const file = e.target.files[0]; e.targe
 $('export-raw').onclick = () => { if (unreadableRaw === null) return; downloadText('show-control-unreadable-saved-data.txt', unreadableRaw, 'text/plain'); rawExported = true; $('recover').disabled = false; message('Original saved text downloaded. Keep that file before replacing the damaged run.'); };
 $('recover').onclick = () => { if (!blocked || !rawExported || unreadableRaw === null) return; if (!confirm('Replace the unreadable saved run? Keep the downloaded original for recovery.')) return; try { if (localStorage.getItem(STORE) !== baseline) throw Error('Another tab changed this run. Reload before recovery.'); localStorage.removeItem(STORE); if (localStorage.getItem(STORE) !== null) throw Error('Storage removal could not be verified.'); baseline = null; unreadableRaw = null; blocked = false; rawExported = false; run = emptyRun(); dirty = false; $('recovery').hidden = true; for (const el of document.querySelectorAll('main button, main input, main textarea')) el.disabled = false; render(); message('Damaged run replaced after export. Import a backup or start a new run.'); } catch (error) { message(error.message, true); } };
 $('new').onclick = () => { if (dirty && !confirm('Replace unsaved Show Control changes? Export first if needed.')) return; replace(emptyRun()); };
-const themeKey = 'sbd.showControl.theme.v1';
-let theme = 'light'; try { theme = localStorage.getItem(themeKey) === 'dark' ? 'dark' : 'light'; } catch {}
-function applyTheme() { document.documentElement.dataset.theme = theme; $('theme').textContent = theme === 'light' ? 'Dark mode' : 'Light mode'; }
-$('theme').onclick = () => { theme = theme === 'light' ? 'dark' : 'light'; applyTheme(); try { localStorage.setItem(themeKey, theme); } catch { message('Theme choice could not be saved.', true); } }; applyTheme();
+const themeKey = 'av-theme-mode.v1';
+let theme = document.documentElement.getAttribute('data-av-theme') || 'dark';
+try {
+  const shared = localStorage.getItem(themeKey);
+  const legacy = localStorage.getItem('sbd.showControl.theme.v1');
+  if (!['light', 'dark', 'system'].includes(shared) && ['light', 'dark'].includes(legacy)) {
+    theme = legacy;
+    localStorage.setItem(themeKey, theme);
+  }
+} catch { /* The current visit still has a usable theme. */ }
+function applyTheme() {
+  document.documentElement.setAttribute('data-av-theme', theme);
+  const dark = theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+  $('theme').textContent = dark ? 'Warm Paper' : 'Stage Slate';
+  $('theme').setAttribute('aria-label', `Switch to ${dark ? 'Warm Paper light' : 'Stage Slate dark'} theme`);
+  const lightColor = document.querySelector('meta[data-av-theme-color="light"]');
+  const darkColor = document.querySelector('meta[data-av-theme-color="dark"]');
+  lightColor.media = theme === 'system' ? '(prefers-color-scheme: light)' : theme === 'light' ? 'all' : 'not all';
+  darkColor.media = theme === 'system' ? '(prefers-color-scheme: dark)' : theme === 'dark' ? 'all' : 'not all';
+}
+$('theme').onclick = () => { theme = theme === 'dark' ? 'light' : theme === 'light' ? 'dark' : matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark'; applyTheme(); try { localStorage.setItem(themeKey, theme); } catch { message('Theme choice could not be saved.', true); } }; applyTheme();
 function tick() { $('clock').textContent = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }); } tick(); setInterval(tick, 1000);
 const phonePanels = ['on-deck','cues','notes']; let phonePanel = 0;
 function applyPhone() { $('run').dataset.panel = phonePanels[phonePanel]; document.querySelectorAll('[data-phone]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.phone === phonePanels[phonePanel]))); }
