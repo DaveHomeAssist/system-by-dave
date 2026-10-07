@@ -1,4 +1,27 @@
-/* Standalone AV application rail. The production shell mounts this later. */
+/* AV application rail and bounded host shell. */
+.av-video-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 100%;
+  height: calc(100dvh - 44px);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sbd-rail-host {
+  display: contents;
+}
+
+.av-video-shell__workspace {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .sbd-rail-shell {
   display: contents;
   color: var(--av-text, #211d1a);
@@ -63,7 +86,12 @@
 }
 
 .sbd-rail-launcher {
+  width: 100%;
+  justify-content: flex-start;
   padding-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
+  border-width: 0 0 1px;
+  border-color: var(--av-line, #d6cabc);
+  border-radius: 0;
 }
 
 .sbd-rail__action:hover,
@@ -188,13 +216,26 @@
 }
 
 @media (min-width: 720px) {
+  .av-video-shell {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .av-video-shell__workspace {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
   .sbd-rail-launcher {
     display: none;
   }
 
   .sbd-rail {
     display: flex;
+    grid-column: 1;
+    grid-row: 1;
     flex-direction: column;
+    max-height: 100%;
   }
 }
 

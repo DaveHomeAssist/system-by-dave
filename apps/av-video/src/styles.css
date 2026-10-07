@@ -57,3 +57,6 @@
 @media(max-width:680px){.sequence-layout{display:flex;flex-direction:column}.sequence-layout>.sequence-inspector{display:none}.sequence-detail-open>.route-browser{display:none}.sequence-detail-open>.sequence-inspector{display:flex;flex:1}.sequence-back{display:block}}
 
 .video-app .mode-phone .console-quick button{flex:0 0 auto;min-width:64px;padding-inline:10px}
+
+/* The application is hosted inside the production Rail shell. */
+#root{height:100%;min-width:0;min-height:0}

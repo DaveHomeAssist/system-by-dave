@@ -1,4 +1,4 @@
-/* System by Dave — standalone AV rail dialogs, routing, and draft awareness.
+/* System by Dave — AV rail dialogs, routing, and draft awareness.
    This module does not mount itself or write application data. */
 (function(root){
   'use strict';
@@ -268,7 +268,15 @@
       if(typeof event.preventDefault==='function') event.preventDefault();
       focusElement(focusable[next]);
     });
-    return {dialog:dialog,body:body,status:status,show:show,hide:hide,closeButton:close};
+    return {
+      dialog:dialog,
+      body:body,
+      status:status,
+      show:show,
+      hide:hide,
+      closeButton:close,
+      setTrigger:function(source){trigger=source||null;}
+    };
   }
 
   function createDraftSlot(documentRef,entry,draftTargets){
@@ -480,6 +488,8 @@
       openCustomize:function(trigger){customize.status.textContent='';renderCustomize();customize.show(trigger);},
       closeAllApps:allApps.hide,
       closeCustomize:customize.hide,
+      setAllAppsTrigger:allApps.setTrigger,
+      setCustomizeTrigger:customize.setTrigger,
       refresh:function(){renderCustomize();return draftObserver.refresh();},
       destroy:function(){
         draftObserver.destroy();

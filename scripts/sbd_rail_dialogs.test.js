@@ -316,8 +316,10 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.deepEqual(JSON.parse(preferenceStorage.data['sbd.rail.v1']).pinned, Array.from(registry.rail.defaultPinned));
   assert.equal(draftStorage.setCalls.length, 0);
 
+  const replacementTrigger = new FakeElement('button', document);
+  controller.setCustomizeTrigger(replacementTrigger);
   controller.closeCustomize();
-  assert.equal(document.activeElement, customizeTrigger);
+  assert.equal(document.activeElement, replacementTrigger);
   controller.destroy();
   assert.equal(container.children.length, 0);
 });

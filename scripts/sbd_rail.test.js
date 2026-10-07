@@ -267,7 +267,9 @@ test('standalone renderer exposes nine ordered slots with eight non-actionable P
     currentRef: 'console:av-video',
     onAllApps: () => { allAppsCount += 1; },
     onCustomize: () => { customizeCount += 1; },
-    appsDialogId: 'railAppsDialog'
+    appsDialogId: 'railAppsDialog',
+    toolboxHref: 'https://avbydave.com/av-suite.html?entry=toolbox',
+    resolveHref: (entry) => `https://avbydave.com/${entry.href}`
   });
 
   assert.equal(rendered.entries.length, 9);
@@ -292,8 +294,11 @@ test('standalone renderer exposes nine ordered slots with eight non-actionable P
     assert.equal(elementsByClass(entry, 'sbd-rail__status')[0].textContent, 'Planned');
   });
   assert.equal(rendered.entries[0].tagName, 'A');
-  assert.equal(rendered.entries[0].getAttribute('href'), 'av-video/');
+  assert.equal(rendered.entries[0].getAttribute('href'), 'https://avbydave.com/av-video/');
   assert.equal(rendered.entries[0].getAttribute('aria-current'), 'page');
+  assert.equal(elementsByClass(rendered.shell, 'sbd-rail__toolbox')[0].getAttribute('href'), 'https://avbydave.com/av-suite.html?entry=toolbox');
+  assert.equal(rendered.allAppsButton, elementsByClass(rendered.shell, 'sbd-rail__all')[0]);
+  assert.equal(rendered.customizeButton, elementsByClass(rendered.shell, 'sbd-rail__customize')[0]);
 
   rendered.launcher.dispatch('click');
   elementsByClass(rendered.shell, 'sbd-rail__all')[0].dispatch('click');
@@ -387,6 +392,8 @@ test('responsive stylesheet encodes the settled breakpoints and accessibility fo
   assert.match(css, /:focus-visible/);
   assert.match(css, /overflow-y: auto;/);
   assert.match(css, /overscroll-behavior: contain;/);
+  assert.match(css, /\.av-video-shell[\s\S]*height: calc\(100dvh - 44px\);/);
+  assert.match(css, /grid-template-columns: auto minmax\(0, 1fr\);/);
   assert.match(css, /safe-area-inset-top/);
   assert.match(css, /safe-area-inset-bottom/);
   assert.match(css, /\.sbd-rail__entry\.is-planned:focus-visible[\s\S]*overflow-wrap: anywhere;/);

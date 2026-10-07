@@ -158,6 +158,11 @@
     './ProjectorThrow/vendor/qrcode-generator/qrcode.js',
     './css/sbd-public-nav.css',
     './css/av-theme.css',
+    './css/sbd-rail.css',
+    './css/sbd-rail-dialogs.css',
+    './js/sbd-rail.js',
+    './js/sbd-rail-dialogs.js',
+    './js/sbd-rail-mount.js',
     './css/responsive-tables.css',
     './css/av-domain-views.css',
     './css/fonts.css',
@@ -297,7 +302,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261005-video-sequences',
+    version:'v20261007-av-video-rail',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

@@ -1,6 +1,5 @@
-/* System by Dave — standalone AV application rail runtime.
-   This module does not mount itself. Consumers supply a registry, storage,
-   container, and callbacks when the production integration is ready. */
+/* System by Dave — AV application rail runtime.
+   Consumers supply a registry, storage, container, and callbacks. */
 (function(root){
   'use strict';
 
@@ -272,7 +271,7 @@
     return button;
   }
 
-  function railEntry(documentRef,entry,currentRef,onNavigate){
+  function railEntry(documentRef,entry,currentRef,onNavigate,resolveHref){
     var planned=entry.namespace==='console'&&entry.availability==='planned';
     var element=documentRef.createElement(planned?'div':'a');
     element.className='sbd-rail__entry'+(planned?' is-planned':'');
@@ -299,7 +298,8 @@
       return element;
     }
 
-    element.setAttribute('href',entry.href);
+    var href=typeof resolveHref==='function'?resolveHref(entry):entry.href;
+    element.setAttribute('href',href||entry.href);
     if(entry.namespace==='external') element.setAttribute('rel','noopener noreferrer');
     if(entry.ref===currentRef) element.setAttribute('aria-current','page');
     if(typeof onNavigate==='function') element.addEventListener('click',function(event){onNavigate(entry,event);});
@@ -346,7 +346,7 @@
       var entry=resolveRef(reference,registry);
       if(!entry||!entry.pinnable) return;
       var item=documentRef.createElement('li');
-      var element=railEntry(documentRef,entry,options.currentRef,options.onNavigate);
+      var element=railEntry(documentRef,entry,options.currentRef,options.onNavigate,options.resolveHref);
       item.appendChild(element);
       list.appendChild(item);
       renderedEntries.push(element);
@@ -373,8 +373,10 @@
 
     var footer=documentRef.createElement('div');
     footer.className='sbd-rail__footer';
-    footer.appendChild(actionButton(documentRef,'All apps',STATIC_ICONS.all,options.onAllApps,'sbd-rail__all'));
-    footer.appendChild(actionButton(documentRef,'Customize',STATIC_ICONS.customize,options.onCustomize,'sbd-rail__customize'));
+    var allAppsButton=actionButton(documentRef,'All apps',STATIC_ICONS.all,options.onAllApps,'sbd-rail__all');
+    var customizeButton=actionButton(documentRef,'Customize',STATIC_ICONS.customize,options.onCustomize,'sbd-rail__customize');
+    footer.appendChild(allAppsButton);
+    footer.appendChild(customizeButton);
     nav.appendChild(footer);
     shell.appendChild(nav);
     container.replaceChildren(shell);
@@ -385,6 +387,8 @@
       launcher:launcher,
       rail:nav,
       entries:renderedEntries,
+      allAppsButton:allAppsButton,
+      customizeButton:customizeButton,
       destroy:function(){container.replaceChildren();}
     };
   }

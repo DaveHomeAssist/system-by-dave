@@ -193,9 +193,23 @@ function assertRailRegistryContracts(registry) {
   if (registry.toolById('cueforge')?.id !== 'cue-sheet') fail('Legacy cueforge tool ID no longer normalizes to Cue Sheet.');
   if (registry.toolById('plotforge')?.id !== 'stageplotter') fail('Legacy plotforge tool ID no longer normalizes to StagePlotter.');
 
+  const railAssets = [
+    './css/sbd-rail.css',
+    './css/sbd-rail-dialogs.css',
+    './js/sbd-rail.js',
+    './js/sbd-rail-dialogs.js',
+    './js/sbd-rail-mount.js'
+  ];
+  railAssets.forEach((asset) => {
+    if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
+    if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
+  });
+  if (registry.version !== 'v20261007-av-video-rail') fail(`Rail cache generation is not current: ${registry.version}.`);
+  if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
+
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
-  if (registry.tools.length !== 45 || registry.baseAssets.length !== 94 || registry.offlineAssets().length !== 139 || storageKeyCount !== 61) {
-    fail(`Rail metadata changed an existing inventory count (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
+  if (registry.tools.length !== 45 || registry.baseAssets.length !== 99 || registry.offlineAssets().length !== 144 || storageKeyCount !== 61) {
+    fail(`Rail integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {
     if (registry.tools.some((tool) => tool.id === external.id)) fail(`External ${external.id} leaked into the normal tool inventory.`);
@@ -218,6 +232,21 @@ function assertPageContracts(registry) {
 
   const index = read('index.html');
   const tools = read('tools.html');
+  const avVideo = read('av-video/index.html');
+  [
+    '../css/sbd-rail.css',
+    '../css/sbd-rail-dialogs.css',
+    '../js/sbd-rail.js',
+    '../js/sbd-rail-dialogs.js',
+    '../js/sbd-rail-mount.js'
+  ].forEach((asset) => {
+    if (!avVideo.includes(asset)) fail(`AV Video production build does not load ${asset}.`);
+  });
+  if (!/data-sbd-rail-host[^>]*data-current-ref="console:av-video"/.test(avVideo)
+      || !/class="av-video-shell__workspace"/.test(avVideo)
+      || !/data-sbd-rail-dialogs/.test(avVideo)) {
+    fail('AV Video production build does not mount the Rail outside the React root.');
+  }
   if (/(^|[^0-9])40\+/.test(index + tools) || /~40/.test(index + tools)) {
     fail('Public AV Suite copy still contains stale 40+ or ~40 count.');
   }
