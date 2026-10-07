@@ -14,3 +14,6 @@ A named show can create, edit, close and reopen room, crew and task records; sav
 
 ## Publication handoff
 The scoped branch is deliberately `noindex` and canonicalized to the source origin until the Rail owner serializes registry, domain staging, sitemap and offline publication. That integration must switch the canonical and Open Graph URL to the verified published origin and remove `noindex`. The global indexing gate counts out-of-sitemap routes and cannot pass on this app-only branch; it needs the shared registration in the Rail integration.
+
+## Theme contract
+The application consumes `css/av-theme.css` and `js/av-theme-mode.js` with `data-av-tool="show-ops"`. Its visible toggle writes the shared `av-theme-mode.v1` preference, while all palette and contrast tokens come from the canonical AV light and dark themes. Show documents and their save key remain independent of theme preferences.
