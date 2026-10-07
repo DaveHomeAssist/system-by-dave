@@ -1,0 +1,50 @@
+import {chromium} from 'playwright';
+import {createServer} from 'node:http';
+import {readFile} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import assert from 'node:assert/strict';
+const root=resolve(import.meta.dirname,'..');
+const mime={'.html':'text/html','.css':'text/css','.mjs':'text/javascript','.png':'image/png'};
+const server=createServer(async(req,res)=>{try{const path=join(root,decodeURIComponent(req.url.split('?')[0]));if(!path.startsWith(root))throw Error('path');const file=path.endsWith('/')?join(path,'index.html'):path;const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[file.slice(file.lastIndexOf('.'))]||'text/plain'});res.end(data)}catch{res.writeHead(404);res.end()}});
+await new Promise(resolve=>server.listen(0,'0.0.0.0',resolve));
+const base=`http://127.0.0.1:${server.address().port}/the-shop/`;
+const browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(process.env.SHOP_CHROME ? {executablePath:process.env.SHOP_CHROME} : {})});
+try{
+  for(const viewport of [{width:1440,height:900},{width:375,height:812}]){
+    const context=await browser.newContext({viewport});const page=await context.newPage();
+    const legacy=JSON.stringify({schema:'system-by-dave.gear-prep.v1',meta:{showName:'Test show'},items:[{id:'legacy-a',item:'Camera kit',caseId:'CAM-1',owner:'Video',status:'issue',notes:'Keep batteries'}]});
+    await page.addInitScript(bytes=>localStorage.setItem('gear-prep.v1',bytes),legacy);
+    await page.goto(base);
+    await page.getByRole('button',{name:'Import source'}).click();
+    await page.getByRole('button',{name:'Preview saved source'}).click();
+    assert.match(await page.locator('#importPreview').innerText(),/1 rows ready/);
+    await page.getByRole('button',{name:'Add previewed rows'}).click();
+    await page.getByRole('button',{name:/Camera kit/}).click();
+    await page.locator('[name=owner]').fill('Lead video');
+    await page.getByRole('button',{name:'Apply changes'}).click();
+    await page.getByRole('button',{name:'Save plan'}).click();
+    await page.reload();
+    assert.match(await page.getByRole('button',{name:/Camera kit/}).innerText(),/Lead video/);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('gear-prep.v1')),legacy);
+    await page.getByRole('button',{name:'Import source'}).click();
+    await page.locator('#importFile').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{bad')});
+    assert.equal(await page.getByRole('button',{name:'Add previewed rows'}).isDisabled(),true);
+    await page.getByRole('button',{name:'Close import'}).click();
+    assert.equal(await page.getByRole('button',{name:/Camera kit/}).count(),1);
+    await page.getByRole('button',{name:'Import source'}).click();
+    await page.locator('#sourceKind').selectOption('shop-backup');
+    const backup=await page.evaluate(()=>localStorage.getItem('sbd.shop.v1'));
+    await page.locator('#importFile').setInputFiles({name:'shop.json',mimeType:'application/json',buffer:Buffer.from(backup)});
+    assert.match(await page.locator('#importPreview').innerText(),/Shop rows ready to restore/);
+    await page.getByRole('button',{name:'Close import'}).click();
+    assert.equal(await page.evaluate(()=>localStorage.getItem('sbd.shop.v1')),backup);
+    await page.getByRole('button',{name:'Dark mode'}).click();
+    assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('dark')),true);
+    await page.getByRole('button',{name:'Light mode'}).click();
+    const overflow=await page.evaluate(()=>({vertical:document.documentElement.scrollHeight>document.documentElement.clientHeight,horizontal:document.documentElement.scrollWidth>document.documentElement.clientWidth}));
+    assert.deepEqual(overflow,{vertical:false,horizontal:false});
+    await page.screenshot({path:`/work/the-shop-${viewport.width}.png`,fullPage:true});
+    await context.close();
+  }
+  console.log('The Shop browser probe passed: import, edit, save/reload, source parity, failed import, viewport bounds.');
+}finally{await browser.close();server.close()}
