@@ -152,6 +152,7 @@ try {
   await customizeDialog().locator('[data-rail-ref="console:audio"][data-action="unpin"]').click();
   assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').count(), 0);
   await page.getByRole('button', { name: 'Close Customize rail', exact: true }).click();
+  await page.waitForFunction(() => document.activeElement?.classList.contains('sbd-rail__customize'));
   assert.equal(await page.locator('.sbd-rail__customize').evaluate(element => element === document.activeElement), true);
   await page.reload();
   await page.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
