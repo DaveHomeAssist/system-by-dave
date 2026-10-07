@@ -92,6 +92,12 @@ The capability is settled. The shipped AV Video modules (Patch, Displays, Checks
 
 Example: a projection operator opens Video from Toolbox, keeps Switching & Routes and Displays & Projection, and turns Cameras, Playback and Stream & Record off. The interface stays focused; saved stream records remain in backups and return unchanged when that module is enabled.
 
+### Toolbox to Video module-management slice
+
+An operator browsing Toolbox should be able to find the shipped AV Video module controls without first learning that they live under Project. The smallest useful slice adds a clearly labeled **Manage modules** link to the AV Video application card and opens its existing Project & modules panel. That panel remains the document-owned place to enable or disable Video modules; simply following the link must not write a plan, Toolbox preference, Show Console record, or Rail preference.
+
+This slice does not add universal application visibility, new module presets, cross-document preferences, or controls for the eight Planned Rail consoles. It depends only on the existing AV Video route and Project panel, not the Stream/Record credential decision. Verify the direct link and loaded/saved-module cases in a browser at desktop and phone widths, including a customized layout that hides Project in a full grid; the link must reveal the panel without replacing that layout or saving a plan. Check root containment, a 44px target, and unchanged Toolbox/Show/Rail storage on navigation. Full Stage 6 management, including restore-defaults behavior and future application ownership, remains a separate acceptance item.
+
 ## Workbook public withdrawal and retained concept
 
 Withdrawal is delivered in the October 4 release: public promotion, registry entries, offline dependencies and editor assets are removed. Retained builds no longer overwrite the public redirects. Staged, browser and deployed readback checks cover the full surface list below.

@@ -9,7 +9,7 @@ import { FlowCanvas } from "./FlowCanvas";
 import { SignalFields } from "./SignalFields";
 import { createHistory, record, redo, undo } from "./history";
 import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/Workspace";
-import type { PanelDef, View as ConsoleView } from "../../shared/av-console/layout";
+import { sanitizeView, type Panel, type PanelDef, type View as ConsoleView } from "../../shared/av-console/layout";
 import { createDraftSession, draftSnapshot, DRAFT_INDEX, readLayout, writeLayout, type DraftResult } from "../../shared/av-console/drafts";
 import { applyImport, emptyDocument, LEGACY, loadDocument, parseDocument, Module, newRoute, Preview, previewImport, Route, routeGaps, sampleDocument, saveDocument, STORE, uid, VideoDocument } from "./model";
 
@@ -79,12 +79,6 @@ export function App() {
   const dialog = useRef<HTMLDialogElement>(null);
   const importTrigger = useRef<HTMLElement | null>(null);
   const library = LIBRARY.filter(d => !d.module || doc.modules[d.module as Module]);
-  const layoutPersist = useMemo(() => {
-    let saved = null; try { saved = readLayout(localStorage, LAYOUT_KEY); } catch { /* storage unavailable */ }
-    return { initial: saved, save: (state: Parameters<typeof writeLayout>[2]) => { let ok = false;
-      try { ok = writeLayout(localStorage, LAYOUT_KEY, state); } catch { /* report below */ }
-      setRecoveryProblems(p => ({ ...p, layout: ok ? "" : "Layout could not be saved. This arrangement is available for this visit only." })); } };
-  }, []);
   const views = useMemo(() => {
     if (!doc.workspace) return DEFAULT_VIEWS;
     const result = [...doc.workspace.views];
@@ -96,6 +90,29 @@ export function App() {
     }
     return result;
   }, [doc.workspace]);
+  const [layoutPersist] = useState(() => {
+    let saved = null; try { saved = readLayout(localStorage, LAYOUT_KEY); } catch { /* storage unavailable */ }
+    let hiddenProjectView: string | null = null;
+    let hiddenArrangement: Panel[] | null = null;
+    if (new URLSearchParams(location.search).get("view") === "project" && saved) {
+      const persisted = saved;
+      const visibleProject = views.some(view => sanitizeView({ ...view, panels: persisted.live[view.id] || view.panels }).panels.some(panel => panel.type === "project"));
+      if (!visibleProject) {
+        const projectView = views.find(view => sanitizeView(view).panels.some(panel => panel.type === "project"));
+        if (projectView && Object.prototype.hasOwnProperty.call(saved.live, projectView.id)) {
+          hiddenProjectView = projectView.id;
+          hiddenArrangement = saved.live[projectView.id];
+          saved = { ...saved, live: { ...saved.live } };
+          delete saved.live[projectView.id];
+        }
+      }
+    }
+    return { initial: saved, save: (state: Parameters<typeof writeLayout>[2]) => { let ok = false;
+      const next = hiddenProjectView && hiddenArrangement && !Object.prototype.hasOwnProperty.call(state.live, hiddenProjectView)
+        ? { ...state, live: { ...state.live, [hiddenProjectView]: hiddenArrangement } } : state;
+      try { ok = writeLayout(localStorage, LAYOUT_KEY, next); } catch { /* report below */ }
+      setRecoveryProblems(p => ({ ...p, layout: ok ? "" : "Layout could not be saved. This arrangement is available for this visit only." })); } };
+  });
   const ws = useConsoleWorkspace(views, library, layoutPersist);
   /* Capture the exact offered bytes once; another tab never grants ownership. */
   const [recovery] = useState(() => {
@@ -147,6 +164,7 @@ export function App() {
   }, [doc, selected]);
   useEffect(() => {
     const requested = new URLSearchParams(location.search).get("view");
+    if (requested === "project") { show("project"); return; }
     if (requested === "patch" || requested === "checks" || requested === "displays" || requested === "cameras" || requested === "playback") {
       show(initial.doc.modules[requested] ? requested : "project");
       if (!initial.doc.modules[requested]) notify(`${requested} is disabled. Enable it in Project; its records are retained.`);

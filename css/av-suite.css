@@ -439,6 +439,7 @@ img,svg{display:block}
 #avApp .toolbox-card-head a{font-family:var(--f-head);font-size:15px;font-weight:var(--w-semi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #avApp .toolbox-card-head .ac-tag{font-family:var(--f-label);font-size:9px;color:var(--c-neutral-500);flex:none}
 #avApp .toolbox-card p{margin:5px 0 0;font-size:11.5px;line-height:1.45;color:var(--c-neutral-600)}
+#avApp .toolbox-module-link{display:inline-flex;align-items:center;min-height:44px;margin-top:4px;text-decoration:underline;text-underline-offset:3px}
 #avApp .toolbox-card-actions{display:flex;align-items:flex-start;gap:5px}
 #avApp .toolbox-card-actions button{width:44px;height:44px;padding:0}
 #avApp .toolbox-card-actions .toolbox-open{background:var(--c-accent);border-color:var(--c-accent);color:var(--st-ink)}
@@ -681,4 +682,3 @@ img,svg{display:block}
 @media (prefers-reduced-motion:reduce){
   #avApp *{transition-duration:.001ms!important;animation-duration:.001ms!important}
 }
-
