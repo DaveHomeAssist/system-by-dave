@@ -1,0 +1,5 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {blank,validPlan,legacyPreview,mergeLegacy,counts} from './model.mjs';
+test('legacy originals retained without replacing existing rows',()=>{const source={schema:'system-by-dave.power-plan.v1',circuits:[{id:'a',circuit:'C1',capacity:'20',draw:'12',status:'issue',notes:'keep'}]};const base=blank();base.records.push({id:'old',type:'cable',name:'old',status:'tested'});const next=mergeLegacy(base,legacyPreview(source));assert.equal(next.records.length,2);assert.deepEqual(next.legacySources[0],source);assert.equal(next.records[1].sourceRecord.notes,'keep');assert.equal(base.records.length,1);assert.equal(counts(next.records).issues,1);assert.equal(counts([{type:'power',capacity:'10',draw:'12',status:'planned'}]).issues,1);validPlan(next);});
+test('invalid source and unsupported saved plan fail before mutation',()=>{assert.throws(()=>legacyPreview({schema:'unknown',items:[]}));assert.throws(()=>legacyPreview({schema:'system-by-dave.network-plan.v1',devices:[null]}));assert.throws(()=>validPlan({schema:'future'}));});
