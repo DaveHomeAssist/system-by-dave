@@ -11,3 +11,6 @@ Name the show, add rooms, crew and tasks, update each status, review the handoff
 
 ## Acceptance
 A named show can create, edit, close and reopen room, crew and task records; save and reload; export and restore a document; preview a backup before replacement; and recover from invalid import or storage failure. Keyboard controls and layouts work at desktop and phone sizes without page scroll. The application remains useful when no legacy records exist. Integration must mark the Show Ops rail entry available and add its route to publication, offline and navigation contracts only after the scoped PR is merged.
+
+## Publication handoff
+The scoped branch is deliberately `noindex` and canonicalized to the source origin until the Rail owner serializes registry, domain staging, sitemap and offline publication. That integration must switch the canonical and Open Graph URL to the verified published origin and remove `noindex`. The global indexing gate counts out-of-sitemap routes and cannot pass on this app-only branch; it needs the shared registration in the Rail integration.
