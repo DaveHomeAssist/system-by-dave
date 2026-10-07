@@ -4,10 +4,10 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "338ea85d3162a55e30a0c40f07955e2390ad46c2",
+  "head": "55bec1afdd3b9e8e14f5a7ac3ed0a0caef858915",
   "status": "amber",
-  "statusReason": "Cameras/Playback and console recovery are delivered with automated live proof. The standalone Rail runtime, dialogs and Toolbox family/external commands are merged (#272, #274, #276) with source and CI proof; the Rail is not yet mounted in production navigation. Stream/Record, Rail mounting and physical/operator acceptance remain open.",
-  "lastActivity": "2026-10-06",
+  "statusReason": "The shared Rail runtime and AV Video production mount are delivered through #272, #274, #276 and #279. The exact nine RAIL-1B slots, eight Planned states, RAIL-2A layouts, local customization, both publications and live automated acceptance are verified. Stream/Record, broader app consolidation and physical/operator acceptance remain open.",
+  "lastActivity": "2026-10-07",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -15,7 +15,8 @@
     "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan.",
     "Console workspace and Show panels (#262), Stage Slate first-use theme (#263), and separate draft/layout persistence (#264) are published.",
     "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe.",
-    "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter."
+    "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter.",
+    "Application Rail (#272, #274, #276, #279): shared runtime/dialogs and typed Toolbox commands are mounted around AV Video with nine RAIL-1B slots, eight Planned entries, RAIL-2A breakpoints, device-local customization and offline support. Source/destination publication, Walter live acceptance and seven-asset parity passed at 55bec1a."
   ],
   "nextStep": {
     "title": "Prepare Stream and Record after resolving stream-key handling",
@@ -160,6 +161,16 @@
       "gate": "Per-slice data compatibility, release proof and operator acceptance."
     },
     {
+      "name": "Application Rail \u2014 Delivered",
+      "goal": "Expose the full v3 console order without presenting unbuilt consoles as available products.",
+      "items": [
+        "Toolbox and the exact nine RAIL-1B console slots are followed by All apps and Customize; only AV Video is available and the other eight consoles are Planned/status-only.",
+        "RAIL-2A uses a phone Apps launcher below 720px, compact rail at 720\u20131439px and labeled rail at 1440px+. Device-local pin, unpin, reorder, reset and corrupt-preference recovery are live.",
+        "PR #279, source deployment 37572814064 and AV destination deployment 37574460288 passed. Walter live acceptance covered 11 viewport fixtures; seven published Rail/AV assets matched 55bec1a byte-for-byte."
+      ],
+      "gate": "Source, exact-head CI, both publications, live Rail journeys and asset parity passed. Returning-client offline update behavior, physical devices and operator acceptance remain separate."
+    },
+    {
       "name": "Console workspace and recovery \u2014 Delivered",
       "goal": "Protect operator edits while making panel arrangements reusable.",
       "items": [
@@ -190,6 +201,10 @@
     {
       "path": "docs/next-steps/av-consolidation.json",
       "why": "Public-safe evidence projection; underlying product specifications and implementation remain authoritative."
+    },
+    {
+      "path": "docs/2026-10-05_Rail-Implementation-Spec-v2.3-Runtime-Profile.md",
+      "why": "Implemented Rail runtime profile, breakpoints, storage, routing, recovery and verification contract"
     },
     {
       "path": "docs/av-suite-consolidation-spec.md",
@@ -235,6 +250,7 @@
   "verify": [
     "git diff --check",
     "npm run verify:av",
+    "AV_VIDEO_BASE=https://avbydave.com node scripts/probe_av_video_rail.mjs --no-sandbox",
     "VIEWPORT_BASE=https://avbydave.com/ node scripts/probe_calculator_viewport.cjs",
     "VIEWPORT_BASE=https://avbydave.com/ VIEWPORT_BROWSER=webkit node scripts/probe_calculator_viewport.cjs"
   ],
@@ -244,9 +260,17 @@
     "The 20 viewport routes preserve independent stores and specialist semantics; layout delivery does not prove application/document consolidation.",
     "Earlier audit details and unchanged private evidence remain in the updater backup. Superseded counts and revalidation notes are preserved by finding ID.",
     "Unanswered historical questions remain Open; recommendations are not approvals.",
-    "The prior design-only console assessment is superseded by #262-#264. Recovery hardening #266 is delivered; the recorded RAIL-1B default decision and open RAIL-2/RAIL-3 choices are preserved as planning, not implementation evidence."
+    "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A and device-local customization are delivered; physical/operator acceptance remains open."
   ],
   "links": [
+    {
+      "label": "Application Rail release #279",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/279"
+    },
+    {
+      "label": "Rail runtime profile v2.3",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/2026-10-05_Rail-Implementation-Spec-v2.3-Runtime-Profile.md"
+    },
     {
       "label": "Console recovery release #266",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/266"
@@ -273,19 +297,19 @@
     },
     {
       "label": "Source deployment",
-      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37385110411"
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37572814064"
     },
     {
       "label": "AV deployment",
-      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37387293386"
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37574460288"
     },
     {
       "label": "Toolbox",
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Continue the maintained AV consolidation stages 0\u20136 and Video increments 2.0a\u20132.5 from fresh remote main. Stage 1 is delivered; do not repeat it. Preserve focused app ownership, explicit imports and reversible modules. Cameras/Playback is delivered; prepare Stream/Record after its credential-handling decision, retain original legacy data, verify current-head CI, deployment and live behavior, and keep physical acceptance separate.",
-  "confidence": "High for the cited console release and scoped automated checks; physical acceptance and historical follow-ups remain open.",
+  "kickoffPrompt": "Continue the maintained AV consolidation stages from fresh remote main. Stage 1 and the AV Video application Rail are delivered; do not repeat them. Preserve focused app ownership, typed Rail identities, device-local preferences, explicit imports and reversible modules. Prepare Stream/Record after its credential-handling decision; verify exact-head CI, publication and live behavior, and keep returning-client offline updates and physical acceptance separate.",
+  "confidence": "High for the cited Rail and console releases, exact asset parity and scoped automated live checks; returning-client offline transition, physical acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
@@ -321,21 +345,36 @@
     ],
     "limits": [
       "Physical phones/tablets, virtual keyboards and operator rehearsal are not established by browser automation.",
-      "Rail choices are approved; this release does not establish Rail runtime or visual parity.",
+      "Rail runtime is live-verified in automated Chromium; returning-client offline update behavior and physical/operator acceptance are not established.",
       "Stream/Record credential policy, legacy retirement and cross-app synchronization remain separate decisions/work.",
       "Historical shell findings retain their own revalidation requirements."
     ],
-    "railSource": {
-      "checkedOn": "2026-10-06",
+    "railRelease": {
+      "checkedOn": "2026-10-07",
       "merges": {
         "#272": "c2c3ca76671c920a43883c72301fbc4f015baae7",
         "#274": "12aeb2ef6d16392c9a49fc46b7507c27fed81d8e",
-        "#276": "fdfccabaad18108b18916ae158462d0cac750414"
+        "#276": "fdfccabaad18108b18916ae158462d0cac750414",
+        "#279": "55bec1afdd3b9e8e14f5a7ac3ed0a0caef858915"
       },
-      "scope": "Rail runtime, dialogs and Toolbox family/external commands in source with required CI; unmounted. No production navigation change, rendering parity, device or operator claim.",
+      "scope": "Shared Rail runtime, dialogs and typed Toolbox commands mounted around AV Video with RAIL-1B, RAIL-2A, device-local customization, recovery and offline assets; no Stream/Record or physical/operator acceptance claim.",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37572814064",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37574460288",
+      "destinationCommit": "708e324e86005f98b866bfc7456b6a7b634084b6",
+      "liveProbeRunner": "Walter",
+      "runtime": [
+        "Nine exact-head PR jobs passed at 4b3e3fc; final Codex review reported no major issues after two focus/access fixes.",
+        "Walter verify:av passed 23 Rail/worker tests; the live Rail probe passed 11 viewport fixtures, routing, state preservation, customization, corrupt-preference recovery, focus, zoom and reduced-motion checks.",
+        "Published source.json named 55bec1a; AV Video HTML, both Rail stylesheets, three Rail scripts and the registry matched the merge byte-for-byte."
+      ],
+      "limits": [
+        "Fresh-profile live automation does not prove the service-worker transition for an already-open returning client.",
+        "Physical phones/tablets, virtual keyboards, touch ergonomics and operator rehearsal remain open."
+      ],
       "fixesDuringIntegration": [
         "verify:av accepts the facelift homepage copy (#277)",
-        "Rail renders every state message and offers Reset only when reset is required (Codex review on #272)"
+        "Rail renders every state message and offers Reset only when reset is required (Codex review on #272)",
+        "Phone All apps exposes Customize and rerendered preferences retain the visible launcher as the focus return target (Codex reviews on #279)"
       ]
     }
   },
