@@ -47,8 +47,10 @@ It clearly reports that no show is attached and keeps Show Console controls out
 of the Toolbox workspace. Front Office remains a labeled roadmap concept and
 does not imply persistent workflow functionality.
 The AV Video card also links directly to its document-owned Project & modules
-panel with a **Manage modules** action. Opening that panel changes no saved
-state; the operator must explicitly change a module and Save in AV Video.
+panel with a **Manage modules** action. Opening it does not change module
+visibility or save the Video plan; ordinary panel navigation may remember the
+current view in the device-local layout preference. The operator must explicitly
+change a module and Save in AV Video.
 
 ## Persistence boundary
 

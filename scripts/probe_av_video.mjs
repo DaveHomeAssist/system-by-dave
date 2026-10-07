@@ -170,10 +170,13 @@ try {
   assert.equal(await hub.evaluate(() => localStorage.getItem('av-suite-dashboard.v1')), null);
   const navigationStorage = await hub.evaluate(() => ({ ui: localStorage.getItem('av-suite-ui.v1'), rail: localStorage.getItem('sbd.rail.v1') }));
   const manageModules = hub.getByRole('link', { name: 'Manage modules', exact: true });
-  for (const [width, height] of [[1440, 900], [375, 812]]) {
+  for (const [width, height] of [[1440, 900], [375, 812], [844, 390], [320, 256], [3840, 1080]]) {
     await hub.setViewportSize({ width, height });
     assert.ok(await hub.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), `Toolbox overflow at ${width}x${height}`);
-    assert.ok((await manageModules.boundingBox()).height >= 44, `Manage modules target is short at ${width}x${height}`);
+    const targetBox = await manageModules.boundingBox();
+    const targetStyle = await manageModules.evaluate(element => ({ minHeight: getComputedStyle(element).minHeight, display: getComputedStyle(element).display }));
+    assert.equal(targetStyle.minHeight, '44px', `Manage modules minimum target changed at ${width}x${height}`);
+    assert.ok(targetBox.height >= 43.5, `Manage modules target is short at ${width}x${height}: ${JSON.stringify({ targetBox, targetStyle })}`);
   }
   await manageModules.click();
   await hub.getByRole('heading', { name: 'Project & modules' }).waitFor();
@@ -187,6 +190,7 @@ try {
   await hub.locator('#toolboxGroups a[data-tool=av-video]').click(); await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
   await toolbox.setOffline(true); await hub.reload();
   await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
+  await hub.getByRole('button', { name: 'Signal flow', exact: true }).click();
   await hub.getByRole('button', { name: 'Add route', exact: true }).click();
   await hub.getByLabel('Source', { exact: true }).fill('Offline camera');
   await hub.getByRole('button', { name: /^Save/ }).click();
