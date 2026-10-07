@@ -46,6 +46,7 @@ test('production mount wires typed routes, dialogs, explicit reset, and focus-sa
       const railNode = { focusCalls: 0, focus() { this.focusCalls += 1; } };
       const result = {
         rail: railNode,
+        launcher: { id: `launcher-${renderOptions.length}` },
         allAppsButton: { id: `all-${renderOptions.length}` },
         customizeButton: { id: `customize-${renderOptions.length}` },
         destroy() {}
@@ -59,9 +60,10 @@ test('production mount wires typed routes, dialogs, explicit reset, and focus-sa
     allTrigger: null,
     customizeTrigger: null,
     replacementTrigger: null,
+    getCustomizeTrigger() { return this.customizeTrigger; },
     openAllApps(trigger) { this.allTrigger = trigger; },
     openCustomize(trigger) { this.customizeTrigger = trigger; },
-    setCustomizeTrigger(trigger) { this.replacementTrigger = trigger; },
+    setCustomizeTrigger(trigger) { this.customizeTrigger = trigger; this.replacementTrigger = trigger; },
     destroy() {}
   };
   const dialogs = {
@@ -102,9 +104,19 @@ test('production mount wires typed routes, dialogs, explicit reset, and focus-sa
   assert.equal(renderOptions.length, 2);
   assert.equal(controller.replacementTrigger, mounted.rendered().customizeButton);
 
-  renderOptions[1].onResetPreferences();
-  assert.equal(store.resetCalls, 1);
+  controller.customizeTrigger = mounted.rendered().launcher;
+  dialogOptions.onPreferencesChange({ state: { status: 'saved' } });
   assert.equal(renderOptions.length, 3);
+  assert.equal(controller.replacementTrigger, mounted.rendered().launcher);
+
+  controller.customizeTrigger = mounted.rendered().allAppsButton;
+  dialogOptions.onPreferencesChange({ state: { status: 'saved' } });
+  assert.equal(renderOptions.length, 4);
+  assert.equal(controller.replacementTrigger, mounted.rendered().allAppsButton);
+
+  renderOptions[3].onResetPreferences();
+  assert.equal(store.resetCalls, 1);
+  assert.equal(renderOptions.length, 5);
   assert.equal(railNodes.at(-1).focusCalls, 1);
 });
 

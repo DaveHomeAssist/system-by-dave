@@ -276,6 +276,7 @@
       hide:hide,
       closeButton:close,
       setTrigger:function(source){trigger=source||null;},
+      getTrigger:function(){return trigger;},
       takeTrigger:function(){var source=trigger;trigger=null;return source;}
     };
   }
@@ -500,6 +501,7 @@
       closeCustomize:customize.hide,
       setAllAppsTrigger:allApps.setTrigger,
       setCustomizeTrigger:customize.setTrigger,
+      getCustomizeTrigger:customize.getTrigger,
       refresh:function(){renderCustomize();return draftObserver.refresh();},
       destroy:function(){
         draftObserver.destroy();

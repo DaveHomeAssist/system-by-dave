@@ -117,6 +117,14 @@ try {
   await expectOpen(customizeDialog());
   assert.equal(await allAppsDialog().isVisible(), false);
   assert.equal(await page.evaluate(key => localStorage.getItem(key), railKey), null, 'opening phone customization must not write preferences');
+  await customizeDialog().locator('[data-rail-ref="console:audio"][data-action="unpin"]').click();
+  assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').count(), 0);
+  await page.getByRole('button', { name: 'Close Customize rail', exact: true }).click();
+  await page.waitForFunction(() => document.activeElement?.classList.contains('sbd-rail-launcher'));
+  assert.equal(await page.locator('.sbd-rail-launcher').evaluate(element => element === document.activeElement), true);
+  await openAllApps();
+  await allAppsDialog().getByRole('button', { name: 'Customize rail', exact: true }).click();
+  await customizeDialog().locator('[data-rail-ref="console:audio"][data-action="pin"]').click();
   await page.getByRole('button', { name: 'Close Customize rail', exact: true }).click();
   await page.waitForFunction(() => document.activeElement?.classList.contains('sbd-rail-launcher'));
   await openAllApps();

@@ -80,8 +80,13 @@
         sourceUrl:sourceUrl,
         idPrefix:'sbdRail',
         onPreferencesChange:function(result){
+          var previous=rendered;
+          var previousTrigger=controller&&typeof controller.getCustomizeTrigger==='function'?controller.getCustomizeTrigger():null;
           renderRail(result&&result.state);
-          controller.setCustomizeTrigger(rendered.customizeButton);
+          var nextTrigger=rendered.customizeButton;
+          if(previous&&previousTrigger===previous.launcher) nextTrigger=rendered.launcher;
+          else if(previous&&previousTrigger===previous.allAppsButton) nextTrigger=rendered.allAppsButton;
+          controller.setCustomizeTrigger(nextTrigger);
         }
       });
       renderRail();
