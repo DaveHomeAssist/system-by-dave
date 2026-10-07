@@ -1,0 +1,8 @@
+import { describe, it, expect, vi } from "vitest";
+import { apply, blank, LEGACY, load, preview, save, STORE } from "./model";
+const raw = JSON.stringify({ schema:"input-list.v1", rows:[{id:"one",ch:7,source:"Vocal",patch:"SB-A/7",stand:"Downstage",owner:"A2",notes:"Keep"}] });
+describe("Audio plan",()=>{
+  it("maps input identity while keeping complete source bytes",async()=>{ const result=await preview(raw,"inputs.json",LEGACY[0]); const doc=apply(blank(),result); expect(doc.channels[0]).toMatchObject({channel:"7",source:"Vocal",input:"SB-A/7",location:"Downstage",tech:"A2"}); expect(doc.imports[0].raw).toBe(raw); expect(doc.channels[0].legacy).toMatchObject({notes:"Keep"}); expect(()=>apply(doc,result)).toThrow(/already/); });
+  it("rejects failed imports without mutating the plan",async()=>{ const doc=blank(); await expect(preview('{bad','bad.json',LEGACY[0])).rejects.toThrow(); expect(doc.channels).toHaveLength(0); await expect(preview(JSON.stringify({items:[]}),"wrong.json",LEGACY[0])).rejects.toThrow(/Expected/); });
+  it("saves with readback and protects concurrent changes",()=>{ const data=new Map<string,string>(); const storage={getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value);}}; const original='legacy byte string'; data.set("input-list.v1",original); const doc=blank(); doc.title="Test"; const saved=save(storage,doc,null); expect(load(storage).doc.title).toBe("Test"); expect(data.get("input-list.v1")).toBe(original); expect(()=>save(storage,doc,null)).toThrow(/another tab/); expect(saved).toBe(data.get(STORE)); });
+});
