@@ -16,4 +16,4 @@ The application owns `sbd.frontOffice.document.v1` only. A versioned document st
 
 ## Dependencies, risks, and acceptance
 
-The app is a standalone static route so the Rail owner can integrate `front-office/index.html` without shared-file conflicts. Its link targets are canonical registry routes. Acceptance requires durable save/reload, invalid-import recovery without loss of originals, keyboard use and responsive 390px and desktop presentation. Browser, deployment, and human acceptance are separate evidence lanes.
+The app is a standalone static route so the Rail owner can integrate `front-office/index.html` without shared-file conflicts. Its link targets are canonical registry routes. Acceptance requires durable save/reload, invalid-import recovery without loss of originals, inert failed boot and recoverable record-limit validation, keyboard use and responsive 390px and desktop presentation. Browser, deployment, and human acceptance are separate evidence lanes.
