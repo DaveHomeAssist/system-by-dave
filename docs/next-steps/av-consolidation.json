@@ -19,12 +19,12 @@
     "Application Rail (#272, #274, #276, #279): shared runtime/dialogs and typed Toolbox commands are mounted around AV Video with nine RAIL-1B slots, eight Planned entries, RAIL-2A breakpoints, device-local customization and offline support. Source/destination publication, Walter live acceptance, seven-asset parity and the returning-client cache transition from published adf1f1e to reviewed 55bec1a passed."
   ],
   "nextStep": {
-    "title": "Prepare Stream and Record after resolving stream-key handling",
-    "why": "Cameras/Playback is published and live-verified. Define credential handling across Stream/Record imports, original payloads and exports before its dependent implementation.",
-    "doneWhen": "Each remaining Video slice preserves legacy fields/statuses and originals, supports reversible optional modules, and passes source, browser and release checks.",
-    "effort": "L",
-    "owner": "Codex",
-    "blockedBy": "Stream-key handling decision before dependent Stream/Record implementation"
+    "title": "Decide the Stream and Record credential boundary",
+    "why": "AVV-STREAM-KEY-1 documents current warning-only leakage through legacy storage/exports and AV Video original-payload retention. Approve block-raw or accept the warning-only disclosure risk before dependent implementation.",
+    "doneWhen": "Dave selects Option 1 (block raw keys at every AV Video boundary, recommended) or Option 2 (warning-only) and the answer is recorded before Stream/Record runtime work.",
+    "effort": "S",
+    "owner": "Dave",
+    "blockedBy": "Dave decision AVV-STREAM-KEY-1; independent typed schema and synthetic fixture design may proceed without runtime changes"
   },
   "findings": [
     {
@@ -196,7 +196,8 @@
     "D4 [unlocks]: safe areas - add viewport-fit=cover only where a page pads its edges (recommended), or suite-wide?",
     "D6: Throwline tokens - keep specialist tokens (CLAUDE.md) or generate them from one authored token source?",
     "D7: fixes in other repos (fmp-suite, DeckForge, BPM Delay, Lansdowne, PlotForge) - do upstream now or defer?",
-    "D8: record the audit outcome in the repo like docs/fmp-camera-simulator-audit-2026-09.md? (recommended)"
+    "D8: record the audit outcome in the repo like docs/fmp-camera-simulator-audit-2026-09.md? (recommended)",
+    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?"
   ],
   "files": [
     {
@@ -265,6 +266,10 @@
     "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open."
   ],
   "links": [
+    {
+      "label": "Stream and Record credential decision",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/av-video-stream-record-credential-decision.md"
+    },
     {
       "label": "Application Rail release #279",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/279"
@@ -394,6 +399,23 @@
         "verify:av accepts the facelift homepage copy (#277)",
         "Rail renders every state message and offers Reset only when reset is required (Codex review on #272)",
         "Phone All apps exposes Customize and rerendered preferences retain the visible launcher as the focus return target (Codex reviews on #279)"
+      ]
+    },
+    "credentialDecision": {
+      "checkedOn": "2026-10-07",
+      "sourceRevision": "b0effc822acad9786c528f99c8731c022028093c",
+      "status": "Open; documentation and recommendation only",
+      "decisionId": "AVV-STREAM-KEY-1",
+      "brief": "docs/av-video-stream-record-credential-decision.md",
+      "verifiedFacts": [
+        "Legacy Stream Plan stores keyLabel and includes it in JSON and CSV exports; its detector warns but does not block or transform the value.",
+        "AV Video stores accepted legacy source text verbatim in imports[].raw and includes that text in saved documents and full backups.",
+        "Record Log has no credential field."
+      ],
+      "recommendation": "Block raw stream keys at every AV Video boundary and reject unsafe candidates before preview adoption or persistence.",
+      "limits": [
+        "No runtime implementation or provider/device operation is included.",
+        "Only synthetic examples may be used in dependent tests."
       ]
     }
   },

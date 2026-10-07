@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-07 — Stream and Record credential boundary prepared for decision
+
+- Added the source-grounded AVV-STREAM-KEY-1 decision contract for Stream/Record. It compares blocking raw stream keys at every AV Video boundary with retaining the legacy warning-only behavior, recommends the blocking policy, and defines exact import, original-payload, storage, export and recovery consequences.
+- This is documentation only. The choice remains open, the legacy Stream Plan remains warning-only, and no AV Video runtime, provider, encoder or production credential was read or changed.
+
 ## 2026-10-07 — AV Video application Rail
 
 - Mount the registry-driven application Rail outside the AV Video React root. It reproduces all nine v3 console slots in source order: AV Video is Available and the other eight are visibly Planned, status-only, and non-navigating.
