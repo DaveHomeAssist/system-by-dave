@@ -6,13 +6,18 @@ Static, standalone AV by Dave workspace at `/front-office/`. It owns `sbd.frontO
 
 Add client and venue records, attach jobs, update each stage and next action, record decisions, save, export, and preview imports before replacing the open document. Forms stay unavailable until the application boots; validation failures retain entered values and the current document. The Show Advance, Change Order, Client Sign Off, and Show Handoff links open their existing independent tools; they do not pass data. Detailed tool import needs a separately verified schema adapter.
 
+## Layout and theme
+
+Front Office has a viewport-locked shell with Clients, Venues and Jobs tabs. Long records scroll within the selected labelled panel; the page stays fixed. A fresh visit starts in Warm Paper, while the visible toggle saves Light, Dark or System under the existing `av-theme-mode.v1` preference. `theme-init.js` applies that choice before the styles load. The document key and specialist tool storage are unchanged.
+
 ## Checks
 
 - `node --test front-office/model.test.mjs`
 - `node --check front-office/app.mjs`
+- `node front-office/layout-probe.cjs` with Playwright and `CHROMIUM_PATH`; checks five viewport sizes, both themes, contrast, keyboard tabs, and internal long-list scroll
 - `node front-office/probe.cjs` with Playwright available and `CHROMIUM_PATH` set to an installed Chromium binary if the Playwright package and browser versions differ.
 
-The probe uses disposable browser storage and captures `/work/front-office-desktop.png` and `/work/front-office-phone.png` when run in the Dominic container. Browser and device-local storage acceptance do not establish live publication or physical operator acceptance.
+The probes use disposable browser storage and save candidate screenshots beside the probe scripts on the runner. Browser and device-local storage acceptance do not establish live publication or physical operator acceptance.
 
 ## Integration handoff
 

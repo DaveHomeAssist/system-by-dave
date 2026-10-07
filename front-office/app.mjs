@@ -2,6 +2,44 @@ import { KEY, STAGES, emptyDocument, parseDocument, validateDocument, addClient,
 const $ = id => document.getElementById(id);
 let doc = emptyDocument(), saved = '', blocked = false, original = null, pending = null, interactive = false;
 const source = { advance: '../show-advance.html', change: '../change-order.html', signoff: '../client-signoff.html', handoff: '../show-handoff.html' };
+const tabs = ['clients', 'venues', 'jobs'];
+let activeTab = 'clients';
+function activateTab(name, focus = false) {
+  if (!tabs.includes(name)) return;
+  activeTab = name;
+  for (const id of tabs) {
+    const selected = id === name;
+    const tab = $(`tab-${id}`);
+    tab.setAttribute('aria-selected', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    $(`panel-${id}`).hidden = !selected;
+  }
+  if (focus) $(`tab-${name}`).focus();
+}
+function applyTheme(mode, persist = false) {
+  const choice = ['light', 'dark', 'system'].includes(mode) ? mode : 'light';
+  document.documentElement.setAttribute('data-av-theme', choice);
+  $('theme-toggle').textContent = `${choice[0].toUpperCase()}${choice.slice(1)} theme`;
+  $('theme-toggle').setAttribute('aria-label', `Theme: ${choice}. Change theme`);
+  for (const id of ['light', 'dark']) {
+    const meta = document.querySelector(`meta[data-av-theme-color="${id}"]`);
+    meta.media = choice === 'system' ? `(prefers-color-scheme: ${id})` : choice === id ? 'all' : 'not all';
+  }
+  if (persist) try { localStorage.setItem('av-theme-mode.v1', choice); } catch (error) { status('Theme changed for this visit. This browser could not save the preference.', true); }
+}
+try { applyTheme(localStorage.getItem('av-theme-mode.v1') || 'light'); } catch (error) { applyTheme('light'); }
+$('theme-toggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-av-theme');
+  applyTheme(current === 'light' ? 'dark' : current === 'dark' ? 'system' : 'light', true);
+});
+for (const id of tabs) $('tab-' + id).addEventListener('click', () => activateTab(id));
+document.querySelector('.tab-list').addEventListener('keydown', event => {
+  const index = tabs.indexOf(activeTab);
+  const next = event.key === 'ArrowRight' ? (index + 1) % tabs.length : event.key === 'ArrowLeft' ? (index + tabs.length - 1) % tabs.length : event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : -1;
+  if (next < 0) return;
+  event.preventDefault();
+  activateTab(tabs[next], true);
+});
 function status(message, error = false) { $('status').textContent = message; $('status').classList.toggle('error', error); }
 function download(name, content, type = 'application/json') { const url = URL.createObjectURL(new Blob([content], { type })); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
 function dirty() { return JSON.stringify(doc) !== saved; }
@@ -27,8 +65,8 @@ function activateForms() { document.querySelectorAll('#workspace form').forEach(
 function edit(build) { try { const next = validateDocument(build(doc)); doc = next; render(); mark(); return true; } catch (error) { status(`Could not update: ${error.message} Current records are unchanged.`, true); return false; } }
 try { const raw = localStorage.getItem(KEY); if (raw !== null) { original = raw; doc = parseDocument(raw); saved = JSON.stringify(doc); } else saved = JSON.stringify(doc); } catch (error) { blocked = true; $('save').disabled = true; $('export').disabled = true; $('recovery').hidden = false; $('workspace').hidden = true; status(`Saved data could not be opened: ${error.message}`, true); }
 if (!blocked) { render(); mark(); }
-$('client-form').addEventListener('submit', event => { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; if (edit(current => addClient(current, form.elements.name.value, form.elements.contact.value, form.elements.notes.value))) form.reset(); form.elements.name.focus(); });
-$('venue-form').addEventListener('submit', event => { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; if (edit(current => addVenue(current, form.elements.name.value, form.elements.location.value, form.elements.notes.value))) form.reset(); form.elements.name.focus(); });
+$('client-form').addEventListener('submit', event => { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; if (edit(current => addClient(current, form.elements.name.value, form.elements.contact.value, form.elements.notes.value))) { form.reset(); if (doc.clients.length === 1 && !doc.venues.length) activateTab('venues', true); else form.elements.name.focus(); } });
+$('venue-form').addEventListener('submit', event => { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; if (edit(current => addVenue(current, form.elements.name.value, form.elements.location.value, form.elements.notes.value))) { form.reset(); if (doc.venues.length === 1 && doc.clients.length) activateTab('jobs', true); else form.elements.name.focus(); } });
 $('job-form').addEventListener('submit', event => { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; if (edit(current => addJob(current, form.elements.name.value, form.elements.clientId.value, form.elements.venueId.value, form.elements.nextAction.value))) form.reset(); form.elements.name.focus(); });
 $('jobs').addEventListener('submit', event => { const form = event.target.closest('.update-form'); if (!form) return; event.preventDefault(); const job = doc.jobs.find(row => row.id === form.dataset.id); if (!job) return; const note = form.elements.note.value.trim(); if (note.length > 500) return status('Update is too long.', true); edit(current => updateJob(current, job.id, form.elements.stage.value, form.elements.nextAction.value, note, new Date().toISOString())); });
 $('filter').addEventListener('change', render);
@@ -45,4 +83,4 @@ window.addEventListener('beforeunload', event => { if (dirty() && !blocked) { ev
 // Controls become active only after every handler is installed.
 interactive = true;
 $('boot-status').hidden = true;
-if (!blocked) activateForms();
+if (!blocked) { activateForms(); activateTab(doc.jobs.length ? 'jobs' : doc.clients.length ? 'venues' : 'clients'); }
