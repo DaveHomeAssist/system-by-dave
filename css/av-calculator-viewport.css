@@ -98,6 +98,10 @@
 .field-sets-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
 .field-sets-dialog :focus-visible { outline:2px solid var(--av-focus); outline-offset:2px; }
 .field-sets-dialog #fieldSetStatus[data-error=true] { color:var(--av-danger,var(--av-text)); font-weight:700; }
+.field-set-values { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:4px 12px; max-height:30dvh; overflow:auto; padding:8px; margin:8px 0; border:1px solid var(--av-line); border-radius:8px; }
+.field-set-values dt, .field-set-values dd { margin:0; overflow-wrap:anywhere; }
+.field-set-values dt { color:var(--av-muted); }
+.field-set-values dd { font-weight:700; text-align:right; }
 @media(max-width:680px) { .field-sets-dialog { padding:12px; } }
 
 @media screen { [data-calculator-viewport] .brand { animation:none; opacity:1; transform:none; } }
