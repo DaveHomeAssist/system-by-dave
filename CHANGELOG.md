@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-07 — Video module controls linked from Toolbox
+
+- Add a Manage modules action to the AV Video Toolbox card that opens the existing Project & modules panel. Opening the route does not change module, Toolbox, Show Console, or Rail storage.
+- Advance the AV offline cache generation so returning clients receive the updated Toolbox control and stylesheet.
+- Keep module visibility document-owned; this does not implement universal application management, Stream/Record, or any Planned Rail console.
+
 ## 2026-10-07 — Stream and Record credential boundary prepared for decision
 
 - Added the source-grounded AVV-STREAM-KEY-1 decision contract for Stream/Record. It compares blocking raw stream keys at every AV Video boundary with retaining the legacy warning-only behavior, recommends the blocking policy, and defines exact import, original-payload, storage, export and recovery consequences.

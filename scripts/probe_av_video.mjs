@@ -93,7 +93,8 @@ try {
   assert.equal(await page.getByLabel('Backup route', { exact: true }).count(), 0);
   assert.equal(await page.locator('.react-flow__node').filter({hasText:'HDMI to SDI'}).count(), 0);
   const hidden = await exportPlan(); assert.equal(hidden.routes[0].input, 'Input 9'); assert.equal(hidden.routes[0].backup, 'Camera 2 wide');
-  await save(); await page.reload(); await goProject();
+  await save(); await page.goto(`${url}?view=project`);
+  await page.getByRole('heading', { name: 'Project & modules' }).waitFor();
   assert.equal(await page.getByRole('checkbox', { name: /Patch view/ }).isChecked(), false);
   await page.getByRole('checkbox', { name: /Patch view/ }).check(); await page.getByRole('checkbox', { name: /Backup details/ }).check();
   await save();
@@ -167,6 +168,21 @@ try {
   assert.equal(await hub.locator('#toolboxGroups a[data-tool=signal-flow]').count(), 0);
   assert.equal(await hub.locator('#toolboxGroups a[data-tool=video-patch]').count(), 0);
   assert.equal(await hub.evaluate(() => localStorage.getItem('av-suite-dashboard.v1')), null);
+  const navigationStorage = await hub.evaluate(() => ({ ui: localStorage.getItem('av-suite-ui.v1'), rail: localStorage.getItem('sbd.rail.v1') }));
+  const manageModules = hub.getByRole('link', { name: 'Manage modules', exact: true });
+  for (const [width, height] of [[1440, 900], [375, 812]]) {
+    await hub.setViewportSize({ width, height });
+    assert.ok(await hub.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), `Toolbox overflow at ${width}x${height}`);
+    assert.ok((await manageModules.boundingBox()).height >= 44, `Manage modules target is short at ${width}x${height}`);
+  }
+  await manageModules.click();
+  await hub.getByRole('heading', { name: 'Project & modules' }).waitFor();
+  assert.equal(new URL(hub.url()).searchParams.get('view'), 'project');
+  assert.equal(await hub.getByRole('checkbox', { name: /Patch view/ }).count(), 1);
+  assert.equal(await hub.evaluate(key => localStorage.getItem(key), key), null, 'opening module management must not write a plan');
+  assert.equal(await hub.evaluate(() => localStorage.getItem('av-suite-dashboard.v1')), null, 'module navigation must not write Show Console');
+  assert.deepEqual(await hub.evaluate(() => ({ ui: localStorage.getItem('av-suite-ui.v1'), rail: localStorage.getItem('sbd.rail.v1') })), navigationStorage, 'module navigation must not change Toolbox or Rail preferences');
+  await hub.goto(`${BASE}/av-suite.html`); await hub.locator('#shopOfficeView').waitFor();
   await hub.evaluate(() => navigator.serviceWorker.ready);
   await hub.locator('#toolboxGroups a[data-tool=av-video]').click(); await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
   await toolbox.setOffline(true); await hub.reload();

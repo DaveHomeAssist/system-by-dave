@@ -147,6 +147,7 @@ export function App() {
   }, [doc, selected]);
   useEffect(() => {
     const requested = new URLSearchParams(location.search).get("view");
+    if (requested === "project") { show("project"); return; }
     if (requested === "patch" || requested === "checks" || requested === "displays" || requested === "cameras" || requested === "playback") {
       show(initial.doc.modules[requested] ? requested : "project");
       if (!initial.doc.modules[requested]) notify(`${requested} is disabled. Enable it in Project; its records are retained.`);

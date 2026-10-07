@@ -204,7 +204,7 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261007-av-video-rail') fail(`Rail cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261007-video-module-management') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
