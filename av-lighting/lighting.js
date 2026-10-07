@@ -91,8 +91,23 @@
   $('confirmImport').addEventListener('click',()=>{if(!preview)return;if(!confirm(`Replace this plan's ${plan.items.length} fixtures with the ${preview.items.length} previewed fixtures?`))return;plan=preview;preview=null;selected='';$('confirmImport').hidden=true;$('importPreview').textContent='Preview imported. Save the plan to keep it after reload.';syncMeta();changed();});
   const setTab=id=>{document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==id);document.querySelectorAll('.tabs button').forEach(el=>el.setAttribute('aria-current',el.dataset.tab===id?'page':'false'));};
   document.querySelectorAll('.tabs button').forEach(button=>button.addEventListener('click',()=>setTab(button.dataset.tab)));
-  $('themeBtn').addEventListener('click',()=>{const dark=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=dark?'dark':'light';$('themeBtn').textContent=dark?'Light mode':'Dark mode';try{localStorage.setItem('sbd.avLighting.theme',dark?'dark':'light');}catch{}});
-  try{if(localStorage.getItem('sbd.avLighting.theme')==='dark')$('themeBtn').click();}catch{}
+  function themeIsDark() {
+    const mode = document.documentElement.getAttribute('data-av-theme');
+    return mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+  function syncThemeButton() {
+    const dark = themeIsDark();
+    $('themeBtn').textContent = dark ? 'Warm Paper' : 'Stage Slate';
+    $('themeBtn').setAttribute('aria-label', dark ? 'Switch to Warm Paper light theme' : 'Switch to Stage Slate dark theme');
+  }
+  $('themeBtn').addEventListener('click',()=>{
+    const mode = themeIsDark() ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-av-theme', mode);
+    for (const meta of document.querySelectorAll('meta[name="theme-color"][data-av-theme-color]')) meta.media = meta.dataset.avThemeColor === mode ? 'all' : 'not all';
+    try { localStorage.setItem('av-theme-mode.v1', mode); } catch { message('Theme changed for this visit; preference could not be saved.'); }
+    syncThemeButton();
+  });
+  syncThemeButton();
   function syncMeta(){for(const field of ['showName','venue','lead'])$(field).value=plan.meta[field];}
   syncMeta();render();
   if (unreadableRaw !== null || storageReadFailed) { $('recoveryNotice').hidden=false; if (storageReadFailed) { $('recoveryNotice').querySelector('p').textContent='Browser storage could not be read. Saving is blocked. Export a backup and reload after storage access is restored.'; $('recoverBtn').hidden=true; message('Saved plan could not be read. Save is blocked.'); } else message('Saved plan is unreadable. Preserve the original before saving.'); }
