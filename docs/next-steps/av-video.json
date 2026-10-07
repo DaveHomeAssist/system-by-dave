@@ -16,7 +16,7 @@
     "The shared console workspace, Stage Slate first-use theme, offered draft recovery and device-local layout persistence shipped through #264 at 66b3d66; source deployment 37282446471 and AV deployment 37286283303 succeeded.",
     "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe.",
     "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter.",
-    "Application Rail (#279): AV Video now mounts the exact nine RAIL-1B console slots with eight non-actionable Planned entries, RAIL-2A phone/compact/labeled layouts, typed routes, device-local customization and offline assets. Source and AV publications succeeded; Walter live acceptance and seven-asset parity passed at 55bec1a."
+    "Application Rail (#279): AV Video now mounts the exact nine RAIL-1B console slots with eight non-actionable Planned entries, RAIL-2A phone/compact/labeled layouts, typed routes, device-local customization and offline assets. Source and AV publications succeeded; Walter live acceptance, seven-asset parity and the returning-client cache transition from published adf1f1e to reviewed 55bec1a passed."
   ],
   "nextStep": {
     "title": "Prepare Stream and Record after resolving stream-key handling",
@@ -146,9 +146,10 @@
         "RAIL-1B selected October 5: nine source-ordered console slots appear by default between fixed Toolbox and All apps / Customize controls.",
         "At the current production baseline only AV Video is available; Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator are Planned/status-only console identities.",
         "RAIL-2A responsive presentation and device-local customization are mounted around AV Video. Typed routes, data isolation, explicit recovery, focus return and five local offline assets are covered.",
-        "PR #279, source deployment 37572814064 and AV destination deployment 37574460288 passed. Walter live acceptance covered 11 viewport fixtures; seven published Rail/AV assets matched 55bec1a byte-for-byte."
+        "PR #279, source deployment 37572814064 and AV destination deployment 37574460288 passed. Walter live acceptance covered 11 viewport fixtures; seven published Rail/AV assets matched 55bec1a byte-for-byte.",
+        "Walter's isolated returning-client fixture kept one browser context from published adf1f1e through reviewed 55bec1a: AV Video data, UI-written Rail customization and typed context survived the worker update, the old cache was removed, all seven Rail/AV assets were cached and the updated app reopened offline."
       ],
-      "gate": "Source, exact-head CI, both publications, live Rail journeys and asset parity passed. Returning-client offline update behavior, physical devices and operator acceptance remain separate."
+      "gate": "Source, exact-head CI, both publications, live Rail journeys, asset parity and the isolated returning-client offline update passed. Physical devices and operator acceptance remain separate."
     },
     {
       "name": "Physical and operator acceptance \u2014 Open",
@@ -240,6 +241,7 @@
   "verify": [
     "git diff --check",
     "npm run verify:av",
+    "npm run test:av-offline-transition",
     "AV_VIDEO_BASE=https://avbydave.com node scripts/probe_av_video_rail.mjs --no-sandbox",
     "VIEWPORT_BASE=https://avbydave.com/ node scripts/probe_calculator_viewport.cjs",
     "VIEWPORT_BASE=https://avbydave.com/ VIEWPORT_BROWSER=webkit node scripts/probe_calculator_viewport.cjs"
@@ -253,7 +255,7 @@
     "Workbook redesign and legacy Video rebuild were excluded from the viewport work.",
     "WebKit Calculator geometry/function checks passed; its offline reload lane is excluded. Chromium offline proof is not physical Safari acceptance.",
     "Historical audit details remain in private updater backups; stable finding IDs preserve traceability.",
-    "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A and device-local customization are delivered; physical/operator acceptance remains open."
+    "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open."
   ],
   "links": [
     {
@@ -301,8 +303,8 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Continue the maintained AV Video increments from fresh remote main. The application Rail is delivered; do not repeat its mount. Preserve independent Video documents, typed Rail identities, device-local preferences and explicit legacy imports while preparing Stream/Record after its credential-handling decision. Verify exact-head CI, publication and live behavior; keep returning-client offline updates and physical acceptance separate.",
-  "confidence": "High for the cited Rail and console releases, exact asset parity and scoped automated live checks; returning-client offline transition, physical acceptance and historical follow-ups remain open.",
+  "kickoffPrompt": "Continue the maintained AV Video increments from fresh remote main. The application Rail and its isolated returning-client offline transition are delivered; do not repeat them. Preserve independent Video documents, typed Rail identities, device-local preferences and explicit legacy imports while preparing Stream/Record after its credential-handling decision. Verify exact-head CI, publication and live behavior; keep physical acceptance separate.",
+  "confidence": "High for the cited Rail and console releases, exact asset parity, scoped automated live checks and isolated returning-client offline transition; physical acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
@@ -338,7 +340,7 @@
     ],
     "limits": [
       "Physical phones/tablets, virtual keyboards and operator rehearsal are not established by browser automation.",
-      "Rail runtime is live-verified in automated Chromium; returning-client offline update behavior and physical/operator acceptance are not established.",
+      "Rail runtime and its returning-client update are verified in isolated automated Chromium; physical/operator acceptance is not established.",
       "Stream/Record credential policy, legacy retirement and cross-app synchronization remain separate decisions/work.",
       "Historical shell findings retain their own revalidation requirements."
     ],
@@ -350,15 +352,32 @@
       "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37572814064",
       "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37574460288",
       "destinationCommit": "708e324e86005f98b866bfc7456b6a7b634084b6",
+      "offlineTransition": {
+        "runner": "Walter",
+        "origin": "Ephemeral loopback origin; one persistent isolated Chromium context",
+        "oldRevision": "adf1f1eda565b51b13d42b08968ca081e0f547a7",
+        "oldDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37433638295",
+        "oldCache": "sbd-av-suite-v20261005-video-sequences",
+        "newRevision": "55bec1afdd3b9e8e14f5a7ac3ed0a0caef858915",
+        "newCache": "sbd-av-suite-v20261007-av-video-rail",
+        "preserved": [
+          "sbd.avVideo.v1 saved through the real AV Video UI",
+          "sbd.rail.v1 written through the real Customize dialog while the old worker controlled the network-first Rail page",
+          "sbdShow, sbdVenue, sbdDate, sbdOperator and sbdPhase typed context; unrelated private query data stayed excluded"
+        ],
+        "result": "PASS: controller changed, old cache was removed, seven Rail/AV assets were present in the new cache and the updated contextual app reopened offline.",
+        "limit": "Isolated Chromium lifecycle evidence only; no production cache, Dave browser profile, physical device or operator workflow was mutated or accepted."
+      },
       "publishedSource": "https://avbydave.com/source.json",
       "liveProbeRunner": "Walter",
       "runtime": [
         "Nine exact-head PR jobs passed at 4b3e3fc; final Codex review reported no major issues after two focus/access fixes.",
         "Walter verify:av passed 23 Rail/worker tests; the live Rail probe passed 11 viewport fixtures, routing, state preservation, customization, corrupt-preference recovery, focus, zoom and reduced-motion checks.",
-        "Published source.json named 55bec1a; AV Video HTML, both Rail stylesheets, three Rail scripts and the registry matched the merge byte-for-byte."
+        "Published source.json named 55bec1a; AV Video HTML, both Rail stylesheets, three Rail scripts and the registry matched the merge byte-for-byte.",
+        "Walter returning-client transition passed from published adf1f1e/old cache to reviewed 55bec1a/new cache in one persistent isolated browser context, followed by an offline reopen."
       ],
       "limits": [
-        "Fresh-profile live automation does not prove the service-worker transition for an already-open returning client.",
+        "The returning-client fixture reproduces the browser lifecycle on an isolated loopback origin; it is not Dave's production profile or a physical device.",
         "Physical phones/tablets, virtual keyboards, touch ergonomics and operator rehearsal remain open."
       ]
     }
@@ -368,7 +387,7 @@
       "id": "AVV-15",
       "title": "Nine Rail slots and responsive/local customization delivered",
       "status": "Delivered",
-      "note": "Delivered in #279 at 55bec1a. AV Video mounts the exact nine RAIL-1B slots with eight Planned/status-only consoles, RAIL-2A layouts and device-local customization. Both publications, Walter live acceptance across 11 viewports and seven-asset parity passed. Physical/operator acceptance remains separate."
+      "note": "Delivered in #279 at 55bec1a. AV Video mounts the exact nine RAIL-1B slots with eight Planned/status-only consoles, RAIL-2A layouts and device-local customization. Both publications, Walter live acceptance across 11 viewports, seven-asset parity and the isolated returning-client cache transition from published adf1f1e passed. Physical/operator acceptance remains separate."
     },
     {
       "id": "AVV-01",
