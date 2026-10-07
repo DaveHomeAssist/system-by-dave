@@ -4,7 +4,7 @@ Static, standalone AV by Dave workspace at `/front-office/`. It owns `sbd.frontO
 
 ## Workflow
 
-Add client and venue records, attach jobs, update each stage and next action, record decisions, save, export, and preview imports before replacing the open document. The Show Advance, Change Order, Client Sign Off, and Show Handoff links open their existing independent tools; they do not pass data. Detailed tool import needs a separately verified schema adapter.
+Add client and venue records, attach jobs, update each stage and next action, record decisions, save, export, and preview imports before replacing the open document. Forms stay unavailable until the application boots; validation failures retain entered values and the current document. The Show Advance, Change Order, Client Sign Off, and Show Handoff links open their existing independent tools; they do not pass data. Detailed tool import needs a separately verified schema adapter.
 
 ## Checks
 
