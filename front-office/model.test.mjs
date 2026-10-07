@@ -1,0 +1,5 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { emptyDocument, parseDocument, validateDocument, addClient, addVenue, addJob, updateJob } from './model.mjs';
+test('client and venue lead to a durable job with update history', () => { let doc = addClient(emptyDocument(), 'Acme', 'Alex', ''); doc = addVenue(doc, 'Hall', 'NY', ''); doc = addJob(doc, 'Annual show', doc.clients[0].id, doc.venues[0].id, 'Confirm date'); doc = updateJob(doc, doc.jobs[0].id, 'Advance', 'Walk room', 'Date confirmed', '2026-10-07T12:00:00Z'); assert.deepEqual(parseDocument(JSON.stringify(doc)), doc); assert.equal(doc.jobs[0].updates[0].body, 'Date confirmed'); });
+test('invalid import cannot replace data or break references', () => { const doc = emptyDocument(); assert.throws(() => parseDocument('{bad')); assert.throws(() => validateDocument({ ...doc, version: 2 })); assert.throws(() => validateDocument({ ...doc, jobs: [{ id: 'one', name: 'Show', clientId: 'missing', venueId: 'missing', stage: 'Inquiry', nextAction: '', updates: [] }] })); assert.deepEqual(doc, emptyDocument()); });
