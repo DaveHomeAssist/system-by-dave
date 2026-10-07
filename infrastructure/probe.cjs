@@ -2,9 +2,10 @@ const { chromium } = require('playwright');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
-const root = __dirname;
+const root = path.join(__dirname, '..');
 const server = http.createServer((req,res)=>{
-  const name = path.basename(new URL(req.url,'http://localhost').pathname) || 'index.html';
+  const pathname = new URL(req.url,'http://localhost').pathname;
+  const name = pathname.endsWith('/') ? `${pathname}index.html` : pathname;
   fs.readFile(path.join(root,name),(error,body)=>{
     res.writeHead(error?404:200,{'Content-Type':name.endsWith('.mjs')?'text/javascript':name.endsWith('.css')?'text/css':'text/html'});
     res.end(error?'Missing':body);
@@ -17,7 +18,7 @@ const server = http.createServer((req,res)=>{
     for(const viewport of [{width:1440,height:900},{width:375,height:812}]){
       const context=await browser.newContext({viewport});
       const a=await context.newPage();const b=await context.newPage();
-      await Promise.all([a.goto('http://127.0.0.1:4178/'),b.goto('http://127.0.0.1:4178/')]);
+      await Promise.all([a.goto('http://127.0.0.1:4178/infrastructure/'),b.goto('http://127.0.0.1:4178/infrastructure/')]);
       await a.getByRole('button',{name:'Add circuit'}).click();
       await a.locator('.record input').first().fill('Primary C1');
       await a.getByRole('button',{name:'Save changes'}).click();
@@ -41,6 +42,12 @@ const server = http.createServer((req,res)=>{
       await a.locator('#confirmImport').click();
       await a.getByRole('button',{name:'Network'}).click();
       if(await a.locator('.record input').first().inputValue()!=='Core switch')throw Error('legacy import failed');
+      const beforeTheme=await a.locator('html').getAttribute('data-av-theme');
+      await a.locator('#theme').click();
+      const afterTheme=await a.locator('html').getAttribute('data-av-theme');
+      if(afterTheme===beforeTheme)throw Error('theme control did not switch');
+      await a.reload();
+      if(await a.locator('html').getAttribute('data-av-theme')!==afterTheme)throw Error('theme choice did not persist');
       const overflow=await a.evaluate(()=>({h:document.documentElement.scrollHeight-document.documentElement.clientHeight,w:document.documentElement.scrollWidth-document.documentElement.clientWidth}));
       if(overflow.h>0||overflow.w>0)throw Error(`overflow ${viewport.width}: ${JSON.stringify(overflow)}`);
       await a.screenshot({path:`/work/infrastructure-review-${viewport.width}.png`});
