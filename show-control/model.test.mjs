@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { STORE, emptyRun, fromCueSheet, logEvent, save, validate } from './model.mjs';
+import { STORE, emptyRun, fromCueSheet, cueForgeLists, fromCueForge, logEvent, save, validate } from './model.mjs';
 
 test('Cue Sheet copy retains every original row and advances only the private run', () => {
   const original = { title: 'General Session', rows: [{ id: 'a', number: '001', action: 'Doors', custom: { layer: 2 } }, { id: 'b', number: '002', action: 'Walk on' }] };
@@ -26,4 +26,18 @@ test('invalid imports and stale saves preserve stored bytes', () => {
   assert.equal(map.get(STORE), saved);
   assert.throws(() => save(emptyRun(), storage, null), /Another tab/);
   assert.equal(map.get(STORE), saved);
+});
+
+test('CueForge schema 7 list becomes a private calling snapshot without patch or secrets', () => {
+  const source = { version: 7, name: 'Show', modifiedAt: '2026-10-07T12:00:00Z', settings: { oscRemoteControl: { sharedSecret: 'fixture-secret' } }, patch: { audioOutputs: ['fixture-patch'] }, cueLists: [{ id: 'main', name: 'Main', cues: [{ id: 'a', number: '1.5', name: 'Walk on', type: 'audio', notes: 'Standby A1', properties: { filePath: '/fixture/private.wav' }, triggers: [{ type: 'osc' }] }] }] };
+  const raw = JSON.stringify(source);
+  const run = fromCueForge(cueForgeLists(raw), 'main');
+  const backup = JSON.stringify(validate(run));
+  assert.equal(run.cues[0].number, '1.5');
+  assert.equal(run.source.product, 'CueForge');
+  assert.equal(backup.includes('fixture-secret'), false);
+  assert.equal(backup.includes('fixture-patch'), false);
+  assert.equal(backup.includes('private.wav'), false);
+  assert.equal(raw, JSON.stringify(source));
+  assert.throws(() => cueForgeLists(JSON.stringify({ ...source, version: 8 })), /version 7/);
 });

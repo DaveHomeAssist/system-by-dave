@@ -5,3 +5,5 @@
 #add-cue{display:grid;grid-template-columns:1fr 2fr 1fr auto;align-items:end;gap:8px;margin-top:12px}#add-cue label{grid-row:1;font-size:.8rem;color:var(--muted)}#add-cue input{grid-row:2;min-width:0;width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}#add-cue label:nth-of-type(1),#cue-number{grid-column:1}#add-cue label:nth-of-type(2),#cue-action{grid-column:2}#add-cue label:nth-of-type(3),#cue-owner{grid-column:3}#add-cue button{grid-column:4;grid-row:2}@media(max-width:900px){#add-cue{display:flex;flex-direction:column;align-items:stretch}#add-cue label{margin-top:5px}}
 
 @media(max-width:720px){#message{order:4;min-height:0}}
+
+#cueforge-preview select{display:block;width:100%;max-width:500px;min-height:44px;margin-top:6px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
