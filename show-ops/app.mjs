@@ -1,9 +1,11 @@
 import { SCHEMA, KEY, empty, validate, addRecord, updateRecord, handoff, statuses } from './model.mjs';
 const $ = id => document.getElementById(id);
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let doc = empty(); let saved = JSON.stringify(doc); let tab = 'setup'; let pending = null;
-try { const raw = localStorage.getItem(KEY); if (raw) { doc = validate(JSON.parse(raw)); saved = JSON.stringify(doc); } } catch (error) { notice(`Saved Show Ops data could not be read: ${error.message}. It has not been changed.`, true); }
-const dark = localStorage.getItem('sbd.showOps.theme.v1') === 'dark'; document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+let doc = empty(); let saved = JSON.stringify(doc); let tab = 'setup'; let pending = null; let storageReadable = true;
+try { const raw = localStorage.getItem(KEY); if (raw) { doc = validate(JSON.parse(raw)); saved = JSON.stringify(doc); } } catch (error) { storageReadable = false; notice(`Saved Show Ops data could not be read: ${error.message}. It has not been changed. Save is disabled until you can reload and review it.`, true); }
+let dark = false;
+try { dark = localStorage.getItem('sbd.showOps.theme.v1') === 'dark'; } catch { /* A blocked theme preference must not stop the workspace. */ }
+document.documentElement.dataset.theme = dark ? 'dark' : 'light';
 function notice(message, error = false) { $('notice').textContent = message; $('notice').dataset.error = error ? 'true' : 'false'; }
 function changed() { $('dirty').textContent = JSON.stringify(doc) === saved ? 'Saved' : 'Unsaved edits'; render(); }
 function render() {
@@ -37,18 +39,18 @@ document.addEventListener('input', event => {
 });
 document.addEventListener('change', async event => {
   if (event.target.dataset.field === 'status') { const row = event.target.closest('[data-id]'); doc = updateRecord(doc, tab, row.dataset.id, 'status', event.target.value); changed(); }
-  if (event.target.id === 'import') { pending = null; try { const file = event.target.files[0]; if (!file || file.size > 5000000) throw new Error('Choose a JSON backup smaller than 5 MB.'); pending = validate(JSON.parse(await file.text())); showPreview(); notice('Backup validated. Review its summary, then confirm to replace the current show.'); } catch (error) { $('preview').textContent = ''; notice(error.message, true); } }
+  if (event.target.id === 'import') { pending = null; try { const file = event.target.files[0]; if (!file || file.size > 5000000) throw new Error('Choose a JSON backup smaller than 5 MB.'); pending = validate(JSON.parse(await file.text())); showPreview(); notice('Backup validated. Review its summary, then confirm to replace the current show.'); } catch (error) { $('preview').textContent = ''; event.target.value = ''; notice(error.message, true); } }
 });
 document.addEventListener('submit', event => { if (event.target.id !== 'add-form') return; event.preventDefault(); const data = new FormData(event.target); doc = addRecord(doc, tab, String(data.get('name')||''), String(data.get('detail')||'')); changed(); });
 document.addEventListener('click', event => {
   const target = event.target.closest('button'); if (!target) return;
   if (target.dataset.tab) { tab = target.dataset.tab; render(); return; }
-  if (target.id === 'save') { try { const serialized = JSON.stringify(validate(doc)); localStorage.setItem(KEY, serialized); saved = serialized; $('dirty').textContent = 'Saved'; notice('Show saved on this device. Export a JSON backup for recovery.'); } catch (error) { notice(`Save failed: ${error.message}. Your edits remain in this tab; export a backup.`, true); } return; }
+  if (target.id === 'save') { try { if (!storageReadable) throw new Error('Saved data could not be read; reload when storage is available before saving.'); const serialized = JSON.stringify(validate(doc)); localStorage.setItem(KEY, serialized); saved = serialized; $('dirty').textContent = 'Saved'; notice('Show saved on this device. Export a JSON backup for recovery.'); } catch (error) { notice(`Save failed: ${error.message}. Your edits remain in this tab; export a backup.`, true); } return; }
   if (target.id === 'theme') { const next = document.documentElement.dataset.theme === 'dark' ? 'light':'dark'; document.documentElement.dataset.theme = next; try { localStorage.setItem('sbd.showOps.theme.v1',next); } catch {} target.textContent = next === 'dark' ? 'Light mode':'Dark mode'; return; }
   if (target.dataset.remove) { doc = { ...doc, [tab]: doc[tab].filter(row=>row.id!==target.dataset.remove) }; changed(); return; }
   if (target.id === 'export') { const blob = new Blob([JSON.stringify(doc,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url;a.download='show-ops-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); notice('Backup downloaded.'); return; }
   if (target.id === 'confirm-import' && pending) { doc=pending;pending=null;changed();notice('Backup loaded as unsaved edits. Save to keep it on this device.');return; }
-  if (target.id === 'cancel-import') {pending=null;$('preview').textContent='';notice('Import cancelled.');}
+  if (target.id === 'cancel-import') {pending=null;$('preview').textContent='';$('import').value='';notice('Import cancelled.');}
 });
 window.addEventListener('beforeunload', event => { if (JSON.stringify(doc) !== saved) { event.preventDefault(); event.returnValue=''; } });
 $('theme').textContent = dark ? 'Light mode' : 'Dark mode'; render();
