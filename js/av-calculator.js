@@ -495,6 +495,32 @@
     return saved;
   }
 
+  if (!isLedPage) {
+    window.AvCalculatorFieldSets = Object.freeze({
+      keys: Object.freeze([...activeKeys]),
+      capture: () => Object.fromEntries([...activeKeys].map(key => [key, state[key]])),
+      restore(values) {
+        if (!values || typeof values !== 'object' || Array.isArray(values) ||
+          [...activeKeys].some(key => !Object.prototype.hasOwnProperty.call(values, key))) return false;
+        const previous = { ...state };
+        activeKeys.forEach(key => { state[key] = values[key]; });
+        setFieldValues();
+        syncPowerMethodUI();
+        const corrections = normalizeFields();
+        if (corrections.length) {
+          state = previous;
+          setFieldValues();
+          syncPowerMethodUI();
+          return false;
+        }
+        const saved = saveState();
+        calculate();
+        announceAction(saved ? 'Field set recalled and saved.' : 'Field set recalled, but browser storage is unavailable.', saved ? 'success' : 'error');
+        return true;
+      }
+    });
+  }
+
   function numberValue(key) {
     const value = Number(state[key]);
     return Number.isFinite(value) ? value : Number(DEFAULTS[key]);
