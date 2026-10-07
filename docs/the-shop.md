@@ -9,3 +9,5 @@ The smallest useful flow is: name a plan, add work, copy a source plan or import
 This slice excludes automatic two-way synchronization, gear inventory mutation, hardware control, and duplicate identity resolution across legacy plans. Copies from distinct tools remain distinct rows until the operator consolidates them. Gear Reference stays a separate read-only source. CueForge and PlotForge are maintained specialist products with separate ownership and no Shop data contract.
 
 Acceptance: fresh add/edit/save/reload, import preview and cancel, malformed import recovery, original legacy key byte parity, export, desktop and phone keyboard operation, light/dark toggle, and no page scroll at 1440×900 and 375×812. The Rail owner must separately add `console:shop` route `/the-shop/`, context rules, offline assets and public navigation. Merge/deployment and live behavior require serialized integration.
+
+The route remains `noindex` until the shared indexable-route registry and verifier count are updated during Rail integration.
