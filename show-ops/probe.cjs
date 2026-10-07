@@ -1,0 +1,60 @@
+const { chromium } = require('playwright');
+const http = require('node:http');
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert/strict');
+const root = path.resolve(__dirname, '..');
+const server = http.createServer((req,res)=>{
+  const pathname = decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+  const file = path.join(root,pathname === '/show-ops/' ? 'show-ops/index.html' : pathname);
+  if (!file.startsWith(root) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {res.writeHead(404);res.end();return;}
+  res.setHeader('Content-Type',file.endsWith('.mjs')?'text/javascript':file.endsWith('.css')?'text/css':'text/html'); fs.createReadStream(file).pipe(res);
+});
+(async()=>{
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  const browser=await chromium.launch({headless:true,executablePath:'/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell',args:['--no-sandbox']});
+  const origin=`http://127.0.0.1:${server.address().port}`;
+  const page=await browser.newPage({viewport:{width:1440,height:900}});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto(origin+'/show-ops/');
+  await page.locator('#name').fill('Acceptance show');
+  await page.locator('#date').fill('2026-10-07');
+  await page.getByRole('button',{name:'Rooms',exact:true}).click();
+  await page.locator('[name=name]').fill('Main room');
+  await page.locator('[name=detail]').fill('Projector check');
+  await page.getByRole('button',{name:'Add room'}).click();
+  await page.locator('[data-field=status]').selectOption('Ready');
+  await page.getByRole('button',{name:'Save show'}).click();
+  await page.reload();
+  assert.equal(await page.locator('#show-title').textContent(),'Acceptance show');
+  await page.getByRole('button',{name:'Rooms',exact:true}).click();
+  assert.equal(await page.locator('[data-field=name]').inputValue(),'Main room');
+  await page.getByRole('button',{name:'Backup',exact:true}).click();
+  await page.locator('#import').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{bad')});
+  assert.match(await page.locator('#notice').textContent(),/JSON|property|Unexpected/);
+  assert.equal(await page.locator('#show-title').textContent(),'Acceptance show');
+  const backup={schema:'system-by-dave.show-ops.v1',show:'Restored show',date:'2026-10-08',notes:'',rooms:[],crew:[],tasks:[]};
+  await page.locator('#import').setInputFiles({name:'good.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});
+  assert.equal(await page.locator('#confirm-import').count(),1);
+  await page.locator('#cancel-import').click();
+  await page.locator('#import').setInputFiles({name:'good.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});
+  await page.locator('#confirm-import').click();
+  assert.equal(await page.locator('#show-title').textContent(),'Restored show');
+  await page.reload();
+  assert.equal(await page.locator('#show-title').textContent(),'Acceptance show');
+  assert.equal(await page.locator('#show-title').textContent(),'Acceptance show');
+  const failed=await browser.newPage({viewport:{width:900,height:700}});
+  await failed.addInitScript(()=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key==='sbd.showOps.document.v1') throw new Error('Quota test');return original.call(this,key,value)}});
+  await failed.goto(origin+'/show-ops/');await failed.locator('#name').fill('Unsaved after failure');await failed.locator('#save').click();
+  assert.match(await failed.locator('#notice').textContent(),/Save failed/);
+  assert.equal(await failed.locator('#name').inputValue(),'Unsaved after failure');await failed.close();
+  await page.screenshot({path:'/check/output/show-ops-desktop.png',fullPage:true});
+  for(const size of [{width:1440,height:900},{width:375,height:812},{width:2560,height:720}]){
+    await page.setViewportSize(size);const bounds=await page.evaluate(()=>({h:document.documentElement.scrollHeight,ch:document.documentElement.clientHeight,w:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}));if(bounds.w>bounds.cw) console.log(await page.evaluate(()=>[...document.querySelectorAll("*")].filter(e=>e.getBoundingClientRect().right>innerWidth).slice(0,8).map(e=>[e.tagName,e.className,e.getBoundingClientRect().right])));assert.ok(bounds.h<=bounds.ch && bounds.w<=bounds.cw,JSON.stringify({size,bounds}));
+  }
+  await page.setViewportSize({width:375,height:812});
+  await page.screenshot({path:'/check/output/show-ops-phone.png',fullPage:true});
+  assert.deepEqual(errors,[]);
+  console.log('Show Ops browser acceptance passed: save/reload, valid and invalid import, desktop/phone/ultrawide no page scroll, screenshots.');
+  await browser.close(); server.close();
+})().catch(error=>{console.error(error);server.close();process.exitCode=1});
