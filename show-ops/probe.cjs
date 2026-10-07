@@ -12,7 +12,8 @@ const server = http.createServer((req,res)=>{
 });
 (async()=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-  const browser=await chromium.launch({headless:true,executablePath:'/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell',args:['--no-sandbox']});
+  const browser=await chromium.launch({headless:true,executablePath:process.env.SHOW_OPS_BROWSER || '/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell',args:['--no-sandbox']});
+  const output=process.env.SHOW_OPS_OUTPUT || '/check/output'; fs.mkdirSync(output,{recursive:true});
   const origin=`http://127.0.0.1:${server.address().port}`;
   const page=await browser.newPage({viewport:{width:1440,height:900}});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -61,7 +62,7 @@ const server = http.createServer((req,res)=>{
   assert.equal(await blocked.evaluate(()=>window.__rawRead('sbd.showOps.document.v1').includes('Protected show')),true);
   await blocked.close();
   const themeBlocked=await browser.newPage({viewport:{width:900,height:700}});
-  await themeBlocked.addInitScript(()=>{const read=Storage.prototype.getItem;Storage.prototype.getItem=function(key){if(key==='sbd.showOps.theme.v1') throw new Error('Theme blocked');return read.call(this,key)}});
+  await themeBlocked.addInitScript(()=>{const read=Storage.prototype.getItem;Storage.prototype.getItem=function(key){if(key==='av-theme-mode.v1') throw new Error('Theme blocked');return read.call(this,key)}});
   await themeBlocked.goto(origin+'/show-ops/');
   assert.equal(await themeBlocked.locator('#name').count(),1);
   await themeBlocked.locator('#name').fill('Still usable');
@@ -73,12 +74,46 @@ const server = http.createServer((req,res)=>{
   await failed.goto(origin+'/show-ops/');await failed.locator('#name').fill('Unsaved after failure');await failed.locator('#save').click();
   assert.match(await failed.locator('#notice').textContent(),/Save failed/);
   assert.equal(await failed.locator('#name').inputValue(),'Unsaved after failure');await failed.close();
-  await page.screenshot({path:'/check/output/show-ops-desktop.png',fullPage:true});
+  await page.screenshot({path:path.join(output,'show-ops-desktop.png'),fullPage:true});
   for(const size of [{width:1440,height:900},{width:375,height:812},{width:2560,height:720}]){
     await page.setViewportSize(size);const bounds=await page.evaluate(()=>({h:document.documentElement.scrollHeight,ch:document.documentElement.clientHeight,w:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}));if(bounds.w>bounds.cw) console.log(await page.evaluate(()=>[...document.querySelectorAll("*")].filter(e=>e.getBoundingClientRect().right>innerWidth).slice(0,8).map(e=>[e.tagName,e.className,e.getBoundingClientRect().right])));assert.ok(bounds.h<=bounds.ch && bounds.w<=bounds.cw,JSON.stringify({size,bounds}));
   }
   await page.setViewportSize({width:375,height:812});
-  await page.screenshot({path:'/check/output/show-ops-phone.png',fullPage:true});
+  await page.screenshot({path:path.join(output,'show-ops-phone.png'),fullPage:true});
+  const themePage=await browser.newPage();
+  const themeErrors=[]; themePage.on('pageerror',error=>themeErrors.push(error.message));
+  await themePage.goto(origin+'/show-ops/');
+  for (const mode of ['light','dark']) {
+    await themePage.evaluate(value=>localStorage.setItem('av-theme-mode.v1',value),mode);
+    for (const size of [{width:390,height:844},{width:1440,height:900}]) {
+      await themePage.setViewportSize(size); await themePage.reload();
+      const appearance=await themePage.evaluate(()=>{
+        const root=document.documentElement, style=getComputedStyle(root);
+        const token=name=>style.getPropertyValue(name).trim().toLowerCase();
+        const color=element=>getComputedStyle(element).color;
+        return {tool:root.dataset.avTool,mode:root.dataset.avTheme,bg:token('--av-bg'),surface:token('--av-surface'),text:token('--av-text'),accent:token('--av-accent'),primaryInk:token('--av-primary-ink'),eyebrow:color(document.querySelector('main .eyebrow')),badge:color(document.querySelector('.badge')),button:color(document.querySelector('.primary')),overflow:root.scrollWidth-root.clientWidth};
+      });
+      assert.equal(appearance.tool,'show-ops'); assert.equal(appearance.mode,mode);
+      assert.equal(appearance.bg,mode==='light'?'#eee8df':'#0c1016'); assert.ok(appearance.overflow<=1);
+      const channels=value=>value.startsWith('#')?value.slice(1).match(/../g).map(v=>parseInt(v,16)):value.match(/[\d.]+/g).slice(0,3).map(Number);
+      const luminance=value=>channels(value).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((sum,v,index)=>sum+v*[.2126,.7152,.0722][index],0);
+      const contrast=(a,b)=>{const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+      assert.ok(contrast(appearance.text,appearance.bg)>=4.5,JSON.stringify(appearance));
+      assert.ok(contrast(appearance.eyebrow,appearance.bg)>=4.5,JSON.stringify(appearance));
+      assert.ok(contrast(appearance.badge,appearance.bg)>=4.5,JSON.stringify(appearance));
+      assert.ok(contrast(appearance.button,appearance.accent)>=4.5,JSON.stringify(appearance));
+      await themePage.locator('#name').fill(`${mode} ${size.width} operator`);
+      await themePage.locator('#save').click(); await themePage.reload();
+      assert.equal(await themePage.locator('#name').inputValue(),`${mode} ${size.width} operator`);
+      await themePage.screenshot({path:path.join(output,`show-ops-${mode}-${size.width}.png`),fullPage:true});
+    }
+  }
+  await themePage.locator('#theme').click();
+  assert.equal(await themePage.evaluate(()=>document.documentElement.dataset.avTheme),'light');
+  await themePage.reload();
+  assert.equal(await themePage.evaluate(()=>document.documentElement.dataset.avTheme),'light');
+  assert.deepEqual(themeErrors,[]);
+  await themePage.close();
   assert.deepEqual(errors,[]);
   console.log('Show Ops browser acceptance passed: save/reload, valid and invalid import, desktop/phone/ultrawide no page scroll, screenshots.');
   await browser.close(); server.close();

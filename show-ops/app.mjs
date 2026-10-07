@@ -3,9 +3,8 @@ const $ = id => document.getElementById(id);
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let doc = empty(); let saved = JSON.stringify(doc); let tab = 'setup'; let pending = null; let storageReadable = true;
 try { const raw = localStorage.getItem(KEY); if (raw) { doc = validate(JSON.parse(raw)); saved = JSON.stringify(doc); } } catch (error) { storageReadable = false; notice(`Saved Show Ops data could not be read: ${error.message}. It has not been changed. Save is disabled until you can reload and review it.`, true); }
-let dark = false;
-try { dark = localStorage.getItem('sbd.showOps.theme.v1') === 'dark'; } catch { /* A blocked theme preference must not stop the workspace. */ }
-document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+const themeRoot = document.documentElement;
+function themeButtonLabel() { return themeRoot.getAttribute('data-av-theme') === 'dark' ? 'Light mode' : 'Dark mode'; }
 function notice(message, error = false) { $('notice').textContent = message; $('notice').dataset.error = error ? 'true' : 'false'; }
 function changed() { $('dirty').textContent = JSON.stringify(doc) === saved ? 'Saved' : 'Unsaved edits'; render(); }
 function render() {
@@ -46,11 +45,11 @@ document.addEventListener('click', event => {
   const target = event.target.closest('button'); if (!target) return;
   if (target.dataset.tab) { tab = target.dataset.tab; render(); return; }
   if (target.id === 'save') { try { if (!storageReadable) throw new Error('Saved data could not be read; reload when storage is available before saving.'); const serialized = JSON.stringify(validate(doc)); localStorage.setItem(KEY, serialized); saved = serialized; $('dirty').textContent = 'Saved'; notice('Show saved on this device. Export a JSON backup for recovery.'); } catch (error) { notice(`Save failed: ${error.message}. Your edits remain in this tab; export a backup.`, true); } return; }
-  if (target.id === 'theme') { const next = document.documentElement.dataset.theme === 'dark' ? 'light':'dark'; document.documentElement.dataset.theme = next; try { localStorage.setItem('sbd.showOps.theme.v1',next); } catch {} target.textContent = next === 'dark' ? 'Light mode':'Dark mode'; return; }
+  if (target.id === 'theme') { const next = themeRoot.getAttribute('data-av-theme') === 'dark' ? 'light' : 'dark'; themeRoot.setAttribute('data-av-theme', next); try { localStorage.setItem('av-theme-mode.v1', next); } catch { notice('Theme changed for this visit. Browser preferences could not be saved.', true); } target.textContent = themeButtonLabel(); return; }
   if (target.dataset.remove) { doc = { ...doc, [tab]: doc[tab].filter(row=>row.id!==target.dataset.remove) }; changed(); return; }
   if (target.id === 'export') { const blob = new Blob([JSON.stringify(doc,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url;a.download='show-ops-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); notice('Backup downloaded.'); return; }
   if (target.id === 'confirm-import' && pending) { doc=pending;pending=null;changed();notice('Backup loaded as unsaved edits. Save to keep it on this device.');return; }
   if (target.id === 'cancel-import') {pending=null;$('preview').textContent='';$('import').value='';notice('Import cancelled.');}
 });
 window.addEventListener('beforeunload', event => { if (JSON.stringify(doc) !== saved) { event.preventDefault(); event.returnValue=''; } });
-$('theme').textContent = dark ? 'Light mode' : 'Dark mode'; render();
+$('theme').textContent = themeButtonLabel(); render();
