@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Show scoped room, crew, task and handoff workspace for AV operators.">
+<meta name="theme-color" content="#eee8df">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<link rel="canonical" href="https://avbydave.com/show-ops/">
+<meta property="og:type" content="website"><meta property="og:title" content="Show Ops"><meta property="og:description" content="Show scoped room, crew, task and handoff workspace."><meta property="og:url" content="https://avbydave.com/show-ops/"><meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Show Ops"><meta name="twitter:description" content="Show scoped room, crew, task and handoff workspace."><meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<title>Show Ops — AV by Dave</title><link rel="stylesheet" href="./style.css"><script type="module" src="./app.mjs"></script>
+</head>
+<body><a class="skip" href="#main">Skip to Show Ops</a>
+<header><div class="brand"><a href="/av-suite.html?entry=toolbox">← Toolbox</a><span>/</span><strong>Show Ops</strong></div><div class="actions"><button id="theme" type="button">Dark mode</button><button id="save" type="button" class="primary">Save show</button></div></header>
+<div class="shell"><aside aria-label="Show summary"><p class="eyebrow">LIVE WORKSPACE</p><h1 id="show-title">Untitled show</h1><p id="show-date">Set a show date in Setup</p><div id="counts" class="counts"></div><p class="aside-note">Your edits stay on this device until you save. Export a backup for another device.</p><a href="/show-board.html">Open Show Board timeline ↗</a><a href="/room-check.html">Open Room Check ↗</a><a href="/crew-call.html">Open Crew Call ↗</a><a href="/show-task-board.html">Open Show Task Board ↗</a></aside>
+<main id="main"><div class="topline"><div><p class="eyebrow">OPERATIONS / <span id="section-label">SETUP</span></p><h2 id="section-title">Set the show</h2></div><span id="dirty" class="badge">Saved</span></div><nav class="tabs" aria-label="Show Ops sections"><button data-tab="setup" aria-current="page">Setup</button><button data-tab="rooms">Rooms</button><button data-tab="crew">Crew</button><button data-tab="tasks">Tasks</button><button data-tab="handoff">Handoff</button><button data-tab="backup">Backup</button></nav><div id="view" class="view"></div></main></div>
+<div id="notice" role="status" aria-live="polite"></div><noscript><p class="noscript">Show Ops needs JavaScript to edit and save. The original tools remain available in <a href="/av-suite.html?entry=toolbox">Toolbox</a>.</p></noscript>
+</body></html>
