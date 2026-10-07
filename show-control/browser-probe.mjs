@@ -1,0 +1,52 @@
+import { chromium } from '../node_modules/playwright/index.mjs';
+import { strict as assert } from 'node:assert';
+const url = process.env.SHOW_CONTROL_URL || 'http://127.0.0.1:8765/show-control/';
+const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH, args: ['--no-sandbox'] });
+try {
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 375, height: 812 }]) {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.goto(url);
+    await page.evaluate(() => localStorage.setItem('cueSheet.v1', JSON.stringify({ title:'Source show', rows:[{id:'original', number:'A1', action:'Opening', custom:{ preserved:true }}] })));
+    await page.getByRole('tab', { name: 'Setup' }).click();
+    await page.locator('#cue-number').fill('001');
+    await page.locator('#cue-action').fill('Doors');
+    await page.getByRole('button', { name: 'Add to run' }).click();
+    await page.getByRole('button', { name: 'Save run' }).click();
+    await page.reload();
+    await page.getByRole('tab', { name: 'Run' }).click();
+    assert.match(await page.locator('#summary').innerText(), /1 cues/);
+    if (viewport.width < 720) await page.getByRole('button', { name: 'On deck' }).click();
+    await page.getByRole('button', { name: 'Log Hold', exact: true }).click();
+    assert.equal(await page.getByRole('button', { name: 'Log Go →' }).isDisabled(), true);
+    await page.getByRole('button', { name: 'Log Resume' }).click();
+    await page.getByRole('button', { name: 'Log Go →' }).click();
+    await page.getByRole('button', { name: 'Save run' }).click();
+    await page.reload();
+    assert.match(await page.locator('#count').innerText(), /1 \/ 1 called/);
+    await page.getByRole('tab', { name: 'Setup' }).click();
+    await page.locator('#import-file').setInputFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{"schema":"bad"}') });
+    await page.locator('#message').getByText(/current run was kept/i).waitFor();
+    assert.match(await page.locator('#summary').innerText(), /1 cues/);
+    await page.getByRole('button', { name: 'Preview local Cue Sheet' }).click();
+    assert.match(await page.locator('#preview').innerText(), /Source show · 1 cues/);
+    await page.getByRole('button', { name: 'Copy cues into this run' }).click();
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('cueSheet.v1')).rows[0].custom.preserved), true);
+    const cueForgeSource = { version: 7, name: 'CueForge show', modifiedAt: '2026-10-07T12:00:00Z', settings: { sharedSecret: 'private-fixture' }, cueLists: [{ id: 'main', name: 'Main', cues: [{ id: 'cf-1', number: '1.5', name: 'Opening', type: 'video', notes: 'Standby', properties: { filePath: '/private/fixture.mp4' } }] }] };
+    await page.locator('#cueforge-file').setInputFiles({ name: 'show.cueforge', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(cueForgeSource)) });
+    await page.getByRole('button', { name: 'Copy selected cue list' }).click();
+    assert.match(await page.locator('#summary').innerText(), /CueForge reference only/);
+    await page.getByRole('button', { name: 'Save run' }).click();
+    const saved = await page.evaluate(() => localStorage.getItem('sbd.showControl.v1'));
+    assert.equal(saved.includes('private-fixture'), false);
+    assert.equal(saved.includes('/private/fixture.mp4'), false);
+    await page.reload();
+    assert.match(await page.locator('#summary').innerText(), /CueForge reference only/);
+    const size = await page.evaluate(() => ({ width: document.documentElement.scrollWidth <= document.documentElement.clientWidth, height: document.documentElement.scrollHeight <= document.documentElement.clientHeight }));
+    assert.deepEqual(size, { width: true, height: true });
+    await page.getByRole('tab', { name: 'Run' }).click();
+    await page.screenshot({ path: `/out/show-control-${viewport.width}.png` });
+    await context.close();
+  }
+  console.log('Show Control browser probe passed: save/reload, hold/go, failed import, viewport scroll.');
+} finally { await browser.close(); }
