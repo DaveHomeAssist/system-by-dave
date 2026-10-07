@@ -1,5 +1,7 @@
 (() => {
   'use strict';
+  const template = document.getElementById('appTemplate');
+  template.replaceWith(template.content);
   const KEY = 'sbd.avLighting.v1';
   const SCHEMA = 'system-by-dave.av-lighting.v1';
   const LEGACY = 'system-by-dave.lighting-patch.v1';
@@ -23,17 +25,23 @@
     const source = raw.meta && typeof raw.meta === 'object' ? raw.meta : {};
     return {schema:SCHEMA,meta:{showName:String(source.showName || 'Untitled lighting plan').slice(0,120),venue:String(source.venue || '').slice(0,120),lead:String(source.lead || '').slice(0,80)},items};
   };
-  let plan = blank(), selected = '', dirty = false, preview = null;
-  try { const saved = localStorage.getItem(KEY); if (saved) plan = validate(JSON.parse(saved)); }
-  catch (error) { message('Saved plan could not be read. It has been left untouched. Import a backup or export before saving.'); }
+  let plan = blank(), selected = '', dirty = false, preview = null, unreadableRaw = null, storageReadFailed = false;
+  try { const saved = localStorage.getItem(KEY); if (saved !== null) { try { plan = validate(JSON.parse(saved)); } catch { unreadableRaw = saved; } } }
+  catch { storageReadFailed = true; }
   function message(value) { $('message').textContent = value; }
   function changed() { dirty = true; $('saveState').textContent = 'Unsaved changes'; render(); }
   function save() {
+    if (storageReadFailed || unreadableRaw !== null) { message('Save blocked: saved data could not be read or preserved.'); return; }
     try { localStorage.setItem(KEY, JSON.stringify(plan)); dirty=false; $('saveState').textContent='Saved on this device'; message('Plan saved on this device. Export JSON for a portable backup.'); }
     catch { message('Save failed. Export JSON to keep a portable copy.'); }
   }
   function conflicts() { const counts = new Map(); for (const item of plan.items) { const key = addressKey(item); if (key) counts.set(key,(counts.get(key)||0)+1); } return counts; }
-  function addressKey(item) { return item.status === 'spare' || !item.universe.trim() || !item.address.trim() ? '' : `${item.universe.trim()}:${item.address.trim()}`; }
+  function addressKey(item) {
+    if (item.status === 'spare') return '';
+    const normalize = value => { const text=value.trim(); return /^\d+$/.test(text) ? String(BigInt(text)) : text; };
+    const universe=normalize(item.universe), address=normalize(item.address);
+    return universe && address ? `${universe}:${address}` : '';
+  }
   function hasConflict(item,map) { const key=addressKey(item); return !!key && map.get(key)>1; }
   function render() {
     const map=conflicts(), query=$('search').value.trim().toLowerCase();
@@ -64,6 +72,18 @@
   $('fixtureForm').addEventListener('change',event=>{const field=event.target.name,item=plan.items.find(i=>i.id===selected);if(item&&FIELDS.includes(field)){item[field]=event.target.value;changed();}});
   $('removeBtn').addEventListener('click',()=>{const item=plan.items.find(i=>i.id===selected);if(!item||!confirm(`Remove ${item.unit || item.fixture || 'this fixture'} from this plan?`))return;plan.items=plan.items.filter(i=>i.id!==selected);selected='';changed();});
   $('saveBtn').addEventListener('click',save); $('search').addEventListener('input',render);
+  $('recoverBtn').addEventListener('click',()=>{
+    if (unreadableRaw === null) return;
+    if (!confirm('Preserve the unreadable original under a separate recovery key, then enable saving this plan?')) return;
+    try {
+      const key = `${KEY}.recovery.${Date.now()}.${crypto.randomUUID()}`;
+      localStorage.setItem(key, unreadableRaw);
+      if (localStorage.getItem(key) !== unreadableRaw) throw new Error('Recovery copy did not verify.');
+      unreadableRaw = null; $('recoveryNotice').hidden = true;
+      message(`Original preserved under ${key}. You may now save this plan.`);
+    } catch { message('Could not preserve the original. Save remains blocked.'); }
+  });
+  window.addEventListener('beforeunload',event=>{ if (!dirty) return; event.preventDefault(); event.returnValue=''; });
   for(const field of ['showName','venue','lead']) $(field).addEventListener('input',()=>{plan.meta[field]=$(field).value;changed();});
   $('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(plan,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='av-lighting-plan.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);message('JSON backup exported.');});
   $('legacyBtn').addEventListener('click',()=>{preview=null;$('confirmImport').hidden=true;try{const original=localStorage.getItem('lighting-patch.v1');if(!original)throw new Error('No saved Lighting Patch was found on this origin.');preview=validate(JSON.parse(original));$('importPreview').textContent=`Saved Lighting Patch: ${preview.items.length} fixtures from ${preview.meta.showName}. Current plan: ${plan.items.length} fixtures. Export a backup before replacement if needed.`;$('confirmImport').hidden=false;}catch(error){$('importPreview').textContent=`Could not review saved Lighting Patch: ${error.message} Current plan is unchanged.`;}});
@@ -75,4 +95,6 @@
   try{if(localStorage.getItem('sbd.avLighting.theme')==='dark')$('themeBtn').click();}catch{}
   function syncMeta(){for(const field of ['showName','venue','lead'])$(field).value=plan.meta[field];}
   syncMeta();render();
+  if (unreadableRaw !== null || storageReadFailed) { $('recoveryNotice').hidden=false; if (storageReadFailed) { $('recoveryNotice').querySelector('p').textContent='Browser storage could not be read. Saving is blocked. Export a backup and reload after storage access is restored.'; $('recoverBtn').hidden=true; message('Saved plan could not be read. Save is blocked.'); } else message('Saved plan is unreadable. Preserve the original before saving.'); }
+  $('bootFailure').hidden=true; $('app').removeAttribute('inert');
 })();
