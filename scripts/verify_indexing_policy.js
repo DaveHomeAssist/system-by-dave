@@ -3,6 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { SBD_REGISTRY } = require('../js/sbd-registry.js');
 const { originFor, siteSitemap, cutoverSites } = require('./domain_sites_lib');
 const { hasNoIndex, canonical, indexingPolicy, otherDomainOrigins } = require('./indexing_policy');
 
@@ -55,7 +56,7 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-// 148 includes the AV by Dave landing source and noindex alternative, Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
+// 145 includes the AV by Dave landing source and noindex alternative, Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
 // /fmp/gear/, /fmp/build/ and /fmp/ptz/ pages that replaced Notion links on 2026-09-18,
 // plus the four additional equipment explorers published on 2026-09-20, and the noindex
 // FMP Camera Simulator (its page, standalone offline copy and app source) from 2026-09-23,
@@ -66,6 +67,12 @@ const robots = read('robots.txt');
 // public application routes belong in the AV-origin sitemap through the registry,
 // so they must not increase the count of tracked routes outside all sitemaps.
 if (unlisted.length !== 145) fail(`Expected 145 tracked routes outside the sitemap; found ${unlisted.length}.`);
+SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
+  const route = `/${tool.href}`;
+  if (!sitemapRoutes.has(route)) {
+    fail(`Registered application ${route} is absent from the public sitemap; inspect its noindex and domain metadata.`);
+  }
+});
 
 // The count above only detects new unlisted routes; this enforces the documented policy itself
 // (scripts/indexing_policy.js) for every one of them.
