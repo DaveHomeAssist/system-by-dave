@@ -1,14 +1,16 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
+function contrast(a,b){const c=value=>{const hex=value.trim().match(/^#([0-9a-f]{6})$/i);assert.ok(hex,value);return [0,2,4].map(i=>parseInt(hex[1].slice(i,i+2),16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4)};const l=value=>{const [r,g,b]=c(value);return .2126*r+.7152*g+.0722*b};const x=l(a),y=l(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
 const path = require('node:path');
+const {pathToFileURL} = require('node:url');
 (async()=>{
- const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+ const browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(process.env.PLAYWRIGHT_CHROME_CHANNEL?{channel:process.env.PLAYWRIGHT_CHROME_CHANNEL}:{})});
  try {
   for(const viewport of [{width:1440,height:900},{width:375,height:812}]){
    const context=await browser.newContext({viewport});
    const page=await context.newPage();
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
-   await page.goto('file://'+path.resolve(__dirname,'index.html'));
+   await page.goto(pathToFileURL(path.resolve(__dirname,'index.html')).href);
    await page.getByRole('button',{name:'Add fixture'}).click();
    await page.locator('[name=unit]').fill('LX-01');
    await page.locator('[name=fixture]').fill('Wash');
@@ -43,12 +45,12 @@ const path = require('node:path');
    const dimensions=await page.evaluate(()=>({h:document.documentElement.scrollHeight,ch:document.documentElement.clientHeight,w:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}));
    assert.ok(dimensions.h<=dimensions.ch && dimensions.w<=dimensions.cw,JSON.stringify(dimensions));
    assert.deepEqual(errors,[]);
-   await page.screenshot({path:`/work/av-lighting-${viewport.width}.png`,fullPage:true});
+   await page.screenshot({path:path.join(process.env.PROBE_OUTPUT_DIR || "/work",`av-lighting-${viewport.width}.png`),fullPage:true});
    await context.close();
   }
   const safety=await browser.newContext({viewport:{width:1440,height:900}});
   await safety.addInitScript(() => localStorage.setItem('sbd.avLighting.v1','{bad'));
-  const broken=await safety.newPage(); await broken.goto('file://'+path.resolve(__dirname,'index.html'));
+  const broken=await safety.newPage(); await broken.goto(pathToFileURL(path.resolve(__dirname,'index.html')).href);
   assert.equal(await broken.locator('#recoveryNotice').isVisible(),true);
   await broken.getByRole('button',{name:'Save plan'}).click();
   assert.equal(await broken.evaluate(() => localStorage.getItem('sbd.avLighting.v1')),'{bad');
@@ -65,7 +67,7 @@ const path = require('node:path');
   await safety.close();
   const failedCopy=await browser.newContext();
   await failedCopy.addInitScript(() => {localStorage.setItem('sbd.avLighting.v1','{bad');const original=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key.startsWith('sbd.avLighting.v1.recovery.'))throw new Error('quota');return original.call(this,key,value);};});
-  const failedPage=await failedCopy.newPage();await failedPage.goto('file://'+path.resolve(__dirname,'index.html'));
+  const failedPage=await failedCopy.newPage();await failedPage.goto(pathToFileURL(path.resolve(__dirname,'index.html')).href);
   failedPage.once('dialog',dialog=>dialog.accept());
   await failedPage.getByRole('button',{name:'Preserve original and enable save'}).click();
   assert.match(await failedPage.locator('#message').textContent(),/Save remains blocked/);
@@ -74,17 +76,51 @@ const path = require('node:path');
   await failedCopy.close();
   const denied=await browser.newContext();
   await denied.addInitScript(() => {const original=Storage.prototype.getItem;Storage.prototype.getItem=function(key){if(key==='sbd.avLighting.v1')throw new Error('denied');return original.call(this,key);};});
-  const deniedPage=await denied.newPage();await deniedPage.goto('file://'+path.resolve(__dirname,'index.html'));
+  const deniedPage=await denied.newPage();await deniedPage.goto(pathToFileURL(path.resolve(__dirname,'index.html')).href);
   assert.equal(await deniedPage.locator('#recoveryNotice').isVisible(),true);
   assert.equal(await deniedPage.locator('#recoverBtn').isVisible(),false);
   await deniedPage.getByRole('button',{name:'Save plan'}).click();
   assert.match(await deniedPage.locator('#message').textContent(),/Save blocked/);
   await denied.close();
   const noScript=await browser.newContext({javaScriptEnabled:false});
-  const inert=await noScript.newPage();await inert.goto('file://'+path.resolve(__dirname,'index.html'));
+  const inert=await noScript.newPage();await inert.goto(pathToFileURL(path.resolve(__dirname,'index.html')).href);
   assert.equal(await inert.locator('#bootFailure').isVisible(),true);
   assert.equal(await inert.locator('#app').isVisible(),false);
   await noScript.close();
-  console.log('Lighting browser probe passed: save/reload, numeric conflict, imports, unreadable recovery, dirty guard, keyboard skip, script failure, viewport bounds, screenshots');
+  for (const mode of ['light','dark']) for (const width of [390,1280]) {
+    const themeContext=await browser.newContext({viewport:{width,height:width===390?844:900}});
+    await themeContext.addInitScript(value => localStorage.setItem('av-theme-mode.v1',value),mode);
+    const themed=await themeContext.newPage();await themed.goto(pathToFileURL(path.resolve(__dirname,'index.html')).href);
+    const identity=await themed.evaluate(() => ({tool:document.documentElement.dataset.avTool,mode:document.documentElement.dataset.avTheme,bg:getComputedStyle(document.documentElement).getPropertyValue('--av-bg').trim(),scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));
+    assert.equal(identity.tool,'av-lighting');assert.equal(identity.mode,mode);
+    assert.equal(identity.bg,mode==='light'?'#eee8df':'#0c1016');
+    assert.ok(identity.scrollWidth<=identity.clientWidth,JSON.stringify(identity));
+    const tokens=await themed.evaluate(() => {const style=getComputedStyle(document.documentElement);return Object.fromEntries(['--av-text','--av-bg','--av-muted','--av-surface','--av-accent','--av-primary-ink','--av-focus'].map(key=>[key,style.getPropertyValue(key).trim()]));});
+    assert.ok(contrast(tokens['--av-text'],tokens['--av-bg'])>=4.5);
+    assert.ok(contrast(tokens['--av-muted'],tokens['--av-surface'])>=4.5);
+    assert.ok(contrast(tokens['--av-accent'],tokens['--av-surface'])>=4.5);
+    assert.ok(contrast(tokens['--av-primary-ink'],tokens['--av-accent'])>=4.5);
+    assert.ok(contrast(tokens['--av-focus'],tokens['--av-surface'])>=3);
+    await themed.getByRole('button',{name:'Add fixture'}).click();
+    await themed.locator('[name=unit]').fill('LX-THEME');
+    await themed.getByRole('button',{name:'Save plan'}).click();
+    await themed.reload();await themed.getByRole('button',{name:/LX-THEME/}).click();
+    assert.equal(await themed.locator('[name=unit]').inputValue(),'LX-THEME');
+    await themed.screenshot({path:path.join(process.env.PROBE_OUTPUT_DIR || "/work",`av-lighting-${mode}-${width}.png`),fullPage:true});
+    if (mode==='light' && width===390) {
+      await themed.getByRole('button',{name:'Switch to Stage Slate dark theme'}).click();
+      assert.equal(await themed.evaluate(() => localStorage.getItem('av-theme-mode.v1')),'dark');
+      assert.equal(await themed.evaluate(() => document.documentElement.dataset.avTheme),'dark');
+    }
+    await themeContext.close();
+  }
+  const systemContext=await browser.newContext({colorScheme:'dark',viewport:{width:390,height:844}});
+  await systemContext.addInitScript(() => localStorage.setItem('av-theme-mode.v1','system'));
+  const systemPage=await systemContext.newPage();await systemPage.goto(pathToFileURL(path.resolve(__dirname,'index.html')).href);
+  assert.equal(await systemPage.evaluate(() => document.documentElement.dataset.avTheme),'system');
+  await systemPage.getByRole('button',{name:'Switch to Warm Paper light theme'}).click();
+  assert.equal(await systemPage.evaluate(() => document.documentElement.dataset.avTheme),'light');
+  await systemContext.close();
+  console.log('Lighting browser probe passed: save/reload, numeric conflict, imports, unreadable recovery, dirty guard, keyboard skip, script failure, AV theme modes at 390/1280 including system dark, viewport bounds, screenshots');
  } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1});
