@@ -11,3 +11,7 @@ This slice excludes automatic two-way synchronization, gear inventory mutation, 
 Acceptance: fresh add/edit/save/reload, import preview and cancel, malformed import recovery, original legacy key byte parity, export, desktop and phone keyboard operation, light/dark toggle, and no page scroll at 1440×900 and 375×812. The Rail owner must separately add `console:shop` route `/the-shop/`, context rules, offline assets and public navigation. Merge/deployment and live behavior require serialized integration.
 
 The route remains `noindex` until the shared indexable-route registry and verifier count are updated during Rail integration.
+
+## Palette and operator preference
+
+The Shop opts into the shared AV theme as `data-av-tool="the-shop"`, reads Warm Paper and Stage Slate tokens from `css/av-theme.css`, and applies the shared `av-theme-mode.v1` choice through `js/av-theme-mode.js`. Its visible toggle writes that shared choice. An older Shop-only light/dark choice is honored only when no shared preference exists; no legacy plan data is rewritten.

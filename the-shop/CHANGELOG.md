@@ -9,3 +9,5 @@
 The route is awaiting shared Rail registration and deployment through the serialized integration owner.
 
 - Review repair: valid backup recovery preserves unreadable saved bytes before replacement; Truck Pack strapped maps to ready; blank item titles leave live rows intact; Skip to worklist moves focus to its target.
+
+- Adopted shared AV theme identity, palette tokens and persisted operator preference; corrected theme contrast in the app mark and kept the app's light/dark toggle.

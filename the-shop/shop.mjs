@@ -20,8 +20,26 @@ $('closeDetail').addEventListener('click',()=>{$('detail').classList.remove('ope
 $('deleteBtn').addEventListener('click',()=>{if(!selected||!confirm('Remove this item from The Shop? The original source record stays saved.'))return;plan.items=plan.items.filter(x=>x.id!==selected);selected=null;changed();$('detail').classList.remove('open');$('addBtn').focus();});
 $('saveBtn').addEventListener('click',()=>{if(blocked&&!recoveryAuthorized)return message('Existing saved plan is unreadable. Preview a valid Shop backup to recover it.',true);try{const current=storage.getItem(KEY);if(current!==savedBytes){message('Saved plan changed in another tab. Export this work, then reload.',true);return}const bytes=JSON.stringify({...validatePlan(plan),savedAt:new Date().toISOString()});if(recoveryAuthorized&&savedBytes!==null){recoveryKey ||= 'sbd.shop.recovery.'+crypto.randomUUID();storage.setItem(recoveryKey,savedBytes);if(storage.getItem(recoveryKey)!==savedBytes)throw new Error('Could not preserve the unreadable original');}storage.setItem(KEY,bytes);const recovered=recoveryAuthorized;savedBytes=bytes;blocked=false;recoveryAuthorized=false;dirty=false;message(recovered?'Recovered plan saved; unreadable original preserved in browser storage':'Saved to this browser');}catch(error){message(`Save failed: ${error.message}. Export this plan.`,true)}});
 $('exportBtn').addEventListener('click',()=>{const exportingOriginal=blocked&&!recoveryAuthorized&&savedBytes;const data=exportingOriginal?savedBytes:JSON.stringify({...plan,exportedAt:new Date().toISOString()},null,2),url=URL.createObjectURL(new Blob([data],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=exportingOriginal?'the-shop-unreadable-original.json':'the-shop-plan.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);message('JSON backup downloaded');});
-$('themeBtn').addEventListener('click',()=>{const dark=!document.body.classList.contains('dark');document.body.classList.toggle('dark',dark);$('themeBtn').textContent=dark?'Light mode':'Dark mode';try{storage.setItem('sbd.shop.theme.v1',dark?'dark':'light')}catch{message('Theme choice is session only.',true)}});
-try{if(storage.getItem('sbd.shop.theme.v1')==='dark'){$('themeBtn').click()}}catch{}
+function setTheme(mode){
+  document.documentElement.setAttribute('data-av-theme',mode);
+  const dark=mode==='dark'||(mode==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);
+  $('themeBtn').textContent=dark?'Light mode':'Dark mode';
+  document.querySelector('[data-av-theme-color=light]').media=mode==='light'?'all':mode==='dark'?'not all':'(prefers-color-scheme: light)';
+  document.querySelector('[data-av-theme-color=dark]').media=mode==='dark'?'all':mode==='light'?'not all':'(prefers-color-scheme: dark)';
+}
+$('themeBtn').addEventListener('click',()=>{
+  const current=document.documentElement.getAttribute('data-av-theme');
+  const dark=current==='dark'||(current==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);
+  const next=dark?'light':'dark';
+  setTheme(next);
+  try{storage.setItem('av-theme-mode.v1',next)}catch{message('Theme choice is session only.',true)}
+});
+try{
+  const shared=storage.getItem('av-theme-mode.v1');
+  const legacy=storage.getItem('sbd.shop.theme.v1');
+  if(!shared&&(legacy==='dark'||legacy==='light'))setTheme(legacy);
+}catch{}
+setTheme(document.documentElement.getAttribute('data-av-theme')||'dark');
 $('importBtn').addEventListener('click',()=>{$('importPreview').textContent='Select a source to preview.';$('confirmImport').disabled=true;pending=null;pendingPlan=null;$('importDialog').showModal();});
 function preview(kind,text){try{const payload=JSON.parse(text);if(kind==='shop-backup'){pendingPlan=validatePlan(payload);pending=pendingPlan.items;$('importPreview').textContent=`${pending.length} Shop rows ready to restore. Confirming will replace the current in-memory plan; Save is still required.`;$('confirmImport').disabled=false;return}pendingPlan=null;pending=stageLegacy(kind,payload);$('importPreview').innerHTML=`<strong>${pending.length} rows ready to copy</strong><br>${pending.slice(0,8).map(x=>esc(x.title)).join('<br>')}${pending.length>8?'<br>…':''}`;$('confirmImport').disabled=!pending.length;}catch(error){pending=null;pendingPlan=null;$('confirmImport').disabled=true;$('importPreview').textContent=error.message;}}
 $('readSource').addEventListener('click',()=>{const kind=$('sourceKind').value;try{if(kind==='shop-backup')throw new Error('Choose a Shop JSON backup file.');const bytes=storage.getItem(SOURCES[kind].key);if(!bytes)throw new Error(`No saved ${SOURCES[kind].label} plan found in this browser.`);preview(kind,bytes)}catch(error){pending=null;$('confirmImport').disabled=true;$('importPreview').textContent=error.message}});
