@@ -11,3 +11,7 @@ Acceptance: add/edit/status records in all three areas; issue queue reflects iss
 ## Recovery and concurrent tabs
 
 Save compares the exact loaded browser document with current storage while holding an origin-wide Web Lock. If another tab changed the document, Save stops and directs the operator to Export, reload and review. Browsers without Web Locks retain editing and Export but disable Save. Unsupported or malformed saved documents are left in browser storage and never silently replaced. Import validates the full candidate and size limits before swapping the visible plan. Legacy issue-status notes appear in the issue queue while the untouched source record remains embedded for recovery.
+
+## Theme
+
+The application opts into the shared AV theme contract through `css/av-theme.css` and `js/av-theme-mode.js`. Its visible light/dark control writes the existing `av-theme-mode.v1` preference, while the application stylesheet owns layout only. The operator's stored AV theme is restored on reload. No Infrastructure document fields or legacy keys change with theme selection.
