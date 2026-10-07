@@ -1,4 +1,4 @@
-/* Standalone AV rail dialogs. Production mounting is intentionally deferred. */
+/* AV rail dialogs. */
 .sbd-rail-dialog {
   width: min(960px, calc(100vw - 32px));
   max-width: none;
@@ -202,6 +202,10 @@
 
 .sbd-rail-dialog__reset {
   margin-top: 16px;
+}
+
+.sbd-rail-dialog__open-customize {
+  margin-top: 24px;
 }
 
 @media (min-width: 900px) {

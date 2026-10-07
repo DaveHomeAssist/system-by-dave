@@ -1,4 +1,4 @@
-/* System by Dave — standalone AV rail dialogs, routing, and draft awareness.
+/* System by Dave — AV rail dialogs, routing, and draft awareness.
    This module does not mount itself or write application data. */
 (function(root){
   'use strict';
@@ -268,7 +268,17 @@
       if(typeof event.preventDefault==='function') event.preventDefault();
       focusElement(focusable[next]);
     });
-    return {dialog:dialog,body:body,status:status,show:show,hide:hide,closeButton:close};
+    return {
+      dialog:dialog,
+      body:body,
+      status:status,
+      show:show,
+      hide:hide,
+      closeButton:close,
+      setTrigger:function(source){trigger=source||null;},
+      getTrigger:function(){return trigger;},
+      takeTrigger:function(){var source=trigger;trigger=null;return source;}
+    };
   }
 
   function createDraftSlot(documentRef,entry,draftTargets){
@@ -352,6 +362,15 @@
         section.appendChild(grid);
         fragment.push(section);
       });
+      var customizeFromAll=actionButton('Customize rail','customize','rail',!store,function(){
+        var returnTrigger=allApps.takeTrigger();
+        allApps.hide();
+        customize.status.textContent='';
+        renderCustomize();
+        customize.show(returnTrigger);
+      });
+      customizeFromAll.className+=' sbd-rail-dialog__open-customize';
+      fragment.push(customizeFromAll);
       allApps.body.replaceChildren.apply(allApps.body,fragment);
     }
 
@@ -480,6 +499,9 @@
       openCustomize:function(trigger){customize.status.textContent='';renderCustomize();customize.show(trigger);},
       closeAllApps:allApps.hide,
       closeCustomize:customize.hide,
+      setAllAppsTrigger:allApps.setTrigger,
+      setCustomizeTrigger:customize.setTrigger,
+      getCustomizeTrigger:customize.getTrigger,
       refresh:function(){renderCustomize();return draftObserver.refresh();},
       destroy:function(){
         draftObserver.destroy();

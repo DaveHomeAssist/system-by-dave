@@ -294,6 +294,15 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.equal(action(controller.customizeDialog, 'external:arenaops', 'pin'), undefined);
   assert.equal(preferenceStorage.setCalls.length, 0);
 
+  click(action(controller.allAppsDialog, 'rail', 'customize'));
+  assert.equal(controller.allAppsDialog.hidden, true);
+  assert.equal(controller.customizeDialog.hidden, false);
+  assert.equal(document.activeElement.getAttribute('aria-label'), 'Close Customize rail');
+  controller.closeCustomize();
+  assert.equal(document.activeElement, allTrigger);
+  assert.equal(preferenceStorage.setCalls.length, 0);
+
+  controller.openAllApps(allTrigger);
   controller.allAppsDialog.dispatch('keydown', { key: 'Escape' });
   assert.equal(controller.allAppsDialog.hidden, true);
   assert.equal(document.activeElement, allTrigger);
@@ -316,8 +325,10 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.deepEqual(JSON.parse(preferenceStorage.data['sbd.rail.v1']).pinned, Array.from(registry.rail.defaultPinned));
   assert.equal(draftStorage.setCalls.length, 0);
 
+  const replacementTrigger = new FakeElement('button', document);
+  controller.setCustomizeTrigger(replacementTrigger);
   controller.closeCustomize();
-  assert.equal(document.activeElement, customizeTrigger);
+  assert.equal(document.activeElement, replacementTrigger);
   controller.destroy();
   assert.equal(container.children.length, 0);
 });

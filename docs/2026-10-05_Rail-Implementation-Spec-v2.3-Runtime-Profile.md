@@ -14,6 +14,8 @@ This version records the three settled product decisions and the first bounded s
 - **RAIL-2A:** use a phone Apps dialog below 720 CSS pixels, a compact rail from 720 through 1439, and a labeled rail from 1440 upward.
 - **RAIL-3A:** support device-local pin, unpin, reorder, and reset preferences in `sbd.rail.v1`.
 
+**Implementation update — October 7, 2026:** sequence steps 5–6 are implemented in source. AV Video now mounts the selected Rail profile outside its React root, the production bundle is rebuilt, and the five local Rail assets ship in cache generation `v20261007-av-video-rail` with focused source and browser verification. Merge, publication, live revision proof and operator acceptance remain separate sequence-step-7 evidence.
+
 The rail owns application navigation preferences only. It does not own show data, console documents, modules, draft recovery, or panel layouts.
 
 ## 1. Source authority and scope
@@ -222,8 +224,8 @@ The quick switcher now validates, renders, executes, and records exact `external
 2. **Implemented in the stacked standalone-runtime review slice:** rail renderer and preference parser, without production mounting.
 3. **Implemented in the stacked standalone-dialog review slice:** All apps and Customize dialogs, typed route resolution, and AV Video draft invalidation, without production mounting.
 4. **Implemented in the stacked Toolbox integration review slice:** non-mutating `family=` effective state and exact external quick-switcher commands.
-5. Mount the selected RAIL-2A profile around AV Video and rebuild production assets.
-6. Add rail assets to the offline set, add browser probes, and run the full AV verification matrix.
+5. **Implemented in the AV Video Rail integration slice:** mount the selected RAIL-2A profile around AV Video and rebuild production assets.
+6. **Implemented in the AV Video Rail integration slice:** add local Rail assets to the offline set, bump the cache generation, add browser probes, and run the full AV verification matrix.
 7. Merge, deploy, verify the live revision, and obtain rendered and operator acceptance.
 
 No step creates an unbuilt console. Planned entries remain status-only until a separate console implementation brief, source, route, persistence contract, and verification exist.

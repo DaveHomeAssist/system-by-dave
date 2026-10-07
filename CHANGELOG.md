@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-07 — AV Video application Rail
+
+- Mount the registry-driven application Rail outside the AV Video React root. It reproduces all nine v3 console slots in source order: AV Video is Available and the other eight are visibly Planned, status-only, and non-navigating.
+- Apply the settled RAIL-2A profile: phone Apps dialog below 720px, compact rail from 720–1439px, and labeled rail from 1440px upward without changing AV Video's viewport-driven phone, tablet, and desktop panel modes.
+- Wire All apps, Customize, typed destination routing, direct draft status, explicit local pin/unpin/reorder/reset, and focus return. Rail reflow and dialogs leave the active Video document and workspace state in place.
+- Add the five local Rail assets to the offline manifest, bump the cache generation to `v20261007-av-video-rail`, regenerate cache consumers and the AV inventory, rebuild AV Video, and add focused source/browser coverage for the required responsive fixtures.
+
 ## 2026-10-06 — Homepage privacy copy clarification
 
 - Remove the homepage analytics claim and clarify the browser-stored click counts in the privacy policy; align the sitemap dates.
