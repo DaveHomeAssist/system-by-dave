@@ -19,12 +19,12 @@
     "Application Rail (#279): AV Video now mounts the exact nine RAIL-1B console slots with eight non-actionable Planned entries, RAIL-2A phone/compact/labeled layouts, typed routes, device-local customization and offline assets. Source and AV publications succeeded; Walter live acceptance, seven-asset parity and the returning-client cache transition from published adf1f1e to reviewed 55bec1a passed."
   ],
   "nextStep": {
-    "title": "Prepare Stream and Record after resolving stream-key handling",
-    "why": "Cameras/Playback is published and live-verified. Define credential handling across Stream/Record imports, original payloads and exports before its dependent implementation.",
-    "doneWhen": "Video increments preserve legacy fields/statuses and imports with independent saved documents, reversible modules and verified publication.",
-    "effort": "L",
-    "owner": "Codex",
-    "blockedBy": "Stream-key handling decision before dependent Stream/Record implementation"
+    "title": "Decide the Stream and Record credential boundary",
+    "why": "AVV-STREAM-KEY-1 documents current warning-only leakage through legacy storage/exports and AV Video original-payload retention. Approve block-raw or accept the warning-only disclosure risk before dependent implementation.",
+    "doneWhen": "Dave selects Option 1 (block raw keys at every AV Video boundary, recommended) or Option 2 (warning-only) and the answer is recorded before Stream/Record runtime work.",
+    "effort": "S",
+    "owner": "Dave",
+    "blockedBy": "Dave decision AVV-STREAM-KEY-1; independent typed schema and synthetic fixture design may proceed without runtime changes"
   },
   "findings": [
     {
@@ -186,7 +186,7 @@
     "Retire the 8 legacy Video pages once AV Video imports all 8 keys, or keep them live indefinitely?",
     "Minimum iOS/iPadOS for field use: 17.4+ (checkVisibility) or add fallbacks for older iPads?",
     "Throwline: keep explicit-save only (edited width resets on reload) or add a draft autosave?",
-    "Stream & Record: block raw stream keys outright on import/export, or keep warning-only?"
+    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?"
   ],
   "files": [
     {
@@ -258,6 +258,10 @@
     "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open."
   ],
   "links": [
+    {
+      "label": "Stream and Record credential decision",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/av-video-stream-record-credential-decision.md"
+    },
     {
       "label": "Application Rail release #279",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/279"
@@ -380,6 +384,23 @@
         "The returning-client fixture reproduces the browser lifecycle on an isolated loopback origin; it is not Dave's production profile or a physical device.",
         "Physical phones/tablets, virtual keyboards, touch ergonomics and operator rehearsal remain open."
       ]
+    },
+    "credentialDecision": {
+      "checkedOn": "2026-10-07",
+      "sourceRevision": "b0effc822acad9786c528f99c8731c022028093c",
+      "status": "Open; documentation and recommendation only",
+      "decisionId": "AVV-STREAM-KEY-1",
+      "brief": "docs/av-video-stream-record-credential-decision.md",
+      "verifiedFacts": [
+        "Legacy Stream Plan stores keyLabel and includes it in JSON and CSV exports; its detector warns but does not block or transform the value.",
+        "AV Video stores accepted legacy source text verbatim in imports[].raw and includes that text in saved documents and full backups.",
+        "Record Log has no credential field."
+      ],
+      "recommendation": "Block raw stream keys at every AV Video boundary and reject unsafe candidates before preview adoption or persistence.",
+      "limits": [
+        "No runtime implementation or provider/device operation is included.",
+        "Only synthetic examples may be used in dependent tests."
+      ]
     }
   },
   "historicalFindings": [
@@ -434,8 +455,8 @@
     {
       "id": "AVV-12",
       "title": "Raw stream keys can travel in Stream Plan exports",
-      "status": "Needs revalidation",
-      "note": "Historical finding retained by ID; not reverified in this scoped board reconciliation."
+      "status": "Confirmed current",
+      "note": "Revalidated at b0effc8 on 2026-10-07. stream-plan.html stores keyLabel and exports it in JSON and CSV; looksLikeRawKey adds a row/summary warning but does not block or transform the value. AVV-STREAM-KEY-1 recommends rejecting unsafe candidates before AV Video retains imports[].raw."
     }
   ],
   "decisionsResolved": [
