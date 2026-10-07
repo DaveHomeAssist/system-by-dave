@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "55bec1afdd3b9e8e14f5a7ac3ed0a0caef858915",
+  "head": "a6241a9a57805992100b6c26df23fcfdcb3db82b",
   "status": "amber",
-  "statusReason": "The shared Rail runtime and AV Video production mount are delivered through #272, #274, #276 and #279. The exact nine RAIL-1B slots, eight Planned states, RAIL-2A layouts, local customization, both publications and live automated acceptance are verified. Stream/Record, broader app consolidation and physical/operator acceptance remain open.",
+  "statusReason": "The shared Rail runtime and AV Video production mount are delivered through #272, #274, #276 and #279. Toolbox-to-AV Video Manage modules #283 is published at a6241a9 and its live navigation and isolated browser behavior pass. Stream/Record, universal app management and physical/operator acceptance remain open.",
   "lastActivity": "2026-10-07",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -16,7 +16,8 @@
     "Console workspace and Show panels (#262), Stage Slate first-use theme (#263), and separate draft/layout persistence (#264) are published.",
     "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe.",
     "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter.",
-    "Application Rail (#272, #274, #276, #279): shared runtime/dialogs and typed Toolbox commands are mounted around AV Video with nine RAIL-1B slots, eight Planned entries, RAIL-2A breakpoints, device-local customization and offline support. Source/destination publication, Walter live acceptance, seven-asset parity and the returning-client cache transition from published adf1f1e to reviewed 55bec1a passed."
+    "Application Rail (#272, #274, #276, #279): shared runtime/dialogs and typed Toolbox commands are mounted around AV Video with nine RAIL-1B slots, eight Planned entries, RAIL-2A breakpoints, device-local customization and offline support. Source/destination publication, Walter live acceptance, seven-asset parity and the returning-client cache transition from published adf1f1e to reviewed 55bec1a passed.",
+    "AV Video Manage modules (#283): the Toolbox card opens the guarded Project view; source and AV publication, Walter live navigation/browser checks and four-asset parity passed at a6241a9."
   ],
   "nextStep": {
     "title": "Decide the Stream and Record credential boundary",
@@ -98,8 +99,8 @@
       "id": "AVC-12",
       "type": "feature",
       "sev": "P2",
-      "title": "No Manage apps/modules in Toolbox; other focused apps unstarted",
-      "detail": "The maintained plan still lists universal application/module visibility and coherent cross-tool application slices as future gates. Shipped worksheet task views do not prove shared Logistics/Show Operations document consolidation.",
+      "title": "AV Video Manage modules linked from Toolbox; universal app management remains planned",
+      "detail": "PR #283 published a Manage modules link on the AV Video Toolbox card and a guarded Project deep link without changing saved layouts. Walter verified the live Toolbox click, Project view, eight Planned Rail entries and AV Video browser flow. Universal application/module management and coherent cross-tool app slices are still future gates; worksheet task views do not prove shared Logistics/Show Operations document consolidation.",
       "files": [
         "js/av-suite/app.js",
         "docs/av-suite-consolidation-spec.md"
@@ -399,6 +400,22 @@
         "verify:av accepts the facelift homepage copy (#277)",
         "Rail renders every state message and offers Reset only when reset is required (Codex review on #272)",
         "Phone All apps exposes Customize and rerendered preferences retain the visible launcher as the focus return target (Codex reviews on #279)"
+      ]
+    },
+    "moduleManagementRelease": {
+      "checkedOn": "2026-10-07",
+      "status": "Published; isolated live browser acceptance passed",
+      "scope": "AV Video card Manage modules deep link and saved-layout reachability; not universal app management or Stream/Record",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/283",
+      "head": "192bbf2cb40405038af994820474d8689b25607e",
+      "featureMerge": "a6241a9a57805992100b6c26df23fcfdcb3db82b",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37643453450",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37647082283",
+      "destinationCommit": "0eae673774fc1b1c1dd0f71404702f3f3e6cc4cb",
+      "liveReadback": "avbydave.com/source.json names a6241a9; Walter Chrome fresh-profile Toolbox Manage modules click opened /av-video/?view=project with six module controls and eight Planned Rail entries. Full live AV Video probe passed at 1440, 680, 375 and 3440 widths; four deployed assets matched the merge byte-for-byte.",
+      "offlineTransition": "Walter isolated Chromium PASS from published 642a47e/old Rail cache to a6241a9/new module-management cache; saved AV Video data and Rail preferences survived, old cache removed, updated app reopened offline.",
+      "limits": [
+        "Physical devices, Dave's browser profile and operator acceptance remain untested."
       ]
     },
     "credentialDecision": {
