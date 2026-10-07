@@ -204,6 +204,10 @@
   margin-top: 16px;
 }
 
+.sbd-rail-dialog__open-customize {
+  margin-top: 24px;
+}
+
 @media (min-width: 900px) {
   .sbd-rail-dialog__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));

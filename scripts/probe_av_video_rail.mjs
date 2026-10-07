@@ -113,6 +113,13 @@ try {
   assert.equal(await allAppsDialog().locator('[data-entry-type="Planned console"]').count(), 8);
   assert.equal(await allAppsDialog().locator('[data-entry-type="Planned console"][href]').count(), 0);
   assert.equal(await page.getByRole('navigation', { name: 'Panels' }).isVisible(), true, 'phone panel switcher remains distinct from Apps');
+  await allAppsDialog().getByRole('button', { name: 'Customize rail', exact: true }).click();
+  await expectOpen(customizeDialog());
+  assert.equal(await allAppsDialog().isVisible(), false);
+  assert.equal(await page.evaluate(key => localStorage.getItem(key), railKey), null, 'opening phone customization must not write preferences');
+  await page.getByRole('button', { name: 'Close Customize rail', exact: true }).click();
+  await page.waitForFunction(() => document.activeElement?.classList.contains('sbd-rail-launcher'));
+  await openAllApps();
   await page.keyboard.press('Escape');
   assert.equal(await allAppsDialog().isVisible(), false);
   assert.equal(await page.locator('.sbd-rail-launcher').evaluate(element => element === document.activeElement), true);
