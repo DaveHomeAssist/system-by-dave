@@ -108,21 +108,6 @@
       ],
       "evidence": "doc",
       "phase": 4
-    },
-    {
-      "id": "AVV-15",
-      "type": "decision",
-      "sev": "P1",
-      "title": "Nine Rail slots and responsive/local customization delivered",
-      "detail": "Delivered in #279 at 55bec1a. AV Video mounts Toolbox; the exact nine RAIL-1B console slots; then All apps and Customize. AV Video is available and the other eight consoles are visibly Planned and status-only. RAIL-2A uses phone Apps below 720px, a compact rail at 720\u20131439px and a labeled rail at 1440px+. Device-local pin, unpin, reorder, reset and corrupt-preference recovery are live. Walter passed 11 live viewport fixtures, focus/routing/state/customization checks and seven-asset parity. Physical devices and operator acceptance remain separate.",
-      "files": [
-        "docs/2026-10-05_Rail-Implementation-Spec-v2.3-Runtime-Profile.md",
-        "docs/av-console.md",
-        "js/sbd-registry.js",
-        "js/sbd-rail-mount.js"
-      ],
-      "evidence": "observed",
-      "phase": 3
     }
   ],
   "phases": [
@@ -379,6 +364,12 @@
     }
   },
   "historicalFindings": [
+    {
+      "id": "AVV-15",
+      "title": "Nine Rail slots and responsive/local customization delivered",
+      "status": "Delivered",
+      "note": "Delivered in #279 at 55bec1a. AV Video mounts the exact nine RAIL-1B slots with eight Planned/status-only consoles, RAIL-2A layouts and device-local customization. Both publications, Walter live acceptance across 11 viewports and seven-asset parity passed. Physical/operator acceptance remains separate."
+    },
     {
       "id": "AVV-01",
       "title": "Fixed: deploy red since #237 (run 383 green after #239)",
