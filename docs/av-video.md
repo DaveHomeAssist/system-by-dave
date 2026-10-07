@@ -106,6 +106,12 @@ Preset references: [Blackmagic video standards](https://www.blackmagicdesign.com
 
 The sequence probe checks camera/playback import parity, ordering and status actions, route links, CSV/full backups, recovery, module retention, keyboard and responsive themes, and offline edits. Run it through `npm run test:av-video-browser`.
 
+### Application Rail returning-client transition evidence, October 7
+
+`npm run test:av-offline-transition` replays the successfully published pre-Rail revision `adf1f1eda565b51b13d42b08968ca081e0f547a7` (deployment `37433638295`) and the exact reviewed Rail runtime `55bec1afdd3b9e8e14f5a7ac3ed0a0caef858915` on one isolated origin. One persistent Chromium context installs and is controlled by cache `sbd-av-suite-v20261005-video-sequences`, creates and saves a real sample AV Video plan, then loads the network-first Rail UI while that older worker still controls the page and unpins Audio through the real Customize dialog. The registration then updates to `sbd-av-suite-v20261007-av-video-rail`, removes the old cache, precaches all seven checked Rail/AV assets and reopens the same contextual AV Video URL offline. The saved `sbd.avVideo.v1` document and `sbd.rail.v1` preference remain byte-identical; the Rail retains the five typed show fields and drops the unrelated `private` parameter.
+
+Walter passed this protocol on exact detached old/new Git trees. The fixture exercises a genuine worker install, control, update, `controllerchange`, cache replacement and offline navigation in one browser context; it does not modify production, Dave's browser profile or real saved data. It is automated Chromium evidence, not physical-device or operator acceptance.
+
 ### Cameras/Playback release evidence, October 5
 
 [PR #268](https://github.com/DaveHomeAssist/system-by-dave/pull/268) and the compatible dependency repair [#271](https://github.com/DaveHomeAssist/system-by-dave/pull/271) published at `338ea85d3162a55e30a0c40f07955e2390ad46c2`. [Source publication](https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37403101951) and [AV destination publication](https://github.com/DaveHomeAssist/avbydave/actions/runs/37404940165) succeeded. The earlier audit failure in run `37400441588` remains historical evidence; the high-severity gate was preserved.
