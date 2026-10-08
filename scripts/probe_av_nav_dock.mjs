@@ -59,7 +59,16 @@ try {
   }
 
   async function checkLayout(page, label) {
-    await page.waitForTimeout(100);
+    // Dock insertion and ResizeObserver positioning can settle on later frames.
+    // Wait for separation, then apply the full geometry and hit-target checks.
+    await page.waitForFunction(() => {
+      const nav = document.querySelector('.sbd-nav');
+      const dock = document.querySelector('[data-sbd-suite-dock]');
+      if (!nav || !dock) return false;
+      const a = nav.getBoundingClientRect();
+      const b = dock.getBoundingClientRect();
+      return a.right <= b.left || a.left >= b.right || a.bottom <= b.top - 8 || a.top >= b.bottom + 8;
+    }, null, { timeout: 2000 }).catch(() => {});
     const result = await page.evaluate(() => {
       const nav = document.querySelector('.sbd-nav');
       const dock = document.querySelector('[data-sbd-suite-dock]');
