@@ -337,7 +337,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261007-eight-app-integration',
+    version:'v20261008-front-office-show-advance',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

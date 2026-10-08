@@ -53,6 +53,21 @@
       <button id="confirm-import" type="button" class="primary">Replace current document</button>
       <button id="cancel-import" type="button">Cancel</button>
     </section>
+    <section id="advance-preview" role="dialog" aria-modal="true" aria-labelledby="advance-title" aria-describedby="advance-summary" data-web2-scroll tabindex="-1" hidden>
+      <h2 id="advance-title">Review Show Advance copy</h2>
+      <p id="advance-summary"></p>
+      <p id="advance-limits">Advance requests and their original fields stay in this device-local Front Office backup; they are not converted into job updates. The source tool and its saved data are not changed.</p>
+      <ul id="advance-statuses" aria-label="Source request statuses"></ul>
+      <form id="advance-form">
+        <label>Client record<select id="advance-client-choice" name="clientChoice"></select></label>
+        <label id="advance-client-name-label">New client name<input id="advance-client-name" name="clientName" maxlength="500" required></label>
+        <label>Venue record<select id="advance-venue-choice" name="venueChoice"></select></label>
+        <label id="advance-venue-name-label">New venue name<input id="advance-venue-name" name="venueName" maxlength="500" required></label>
+        <label>New job name<input id="advance-job-name" name="jobName" maxlength="500" required></label>
+        <p id="advance-warning" class="advance-warning"></p>
+        <div class="advance-actions"><button id="confirm-advance" type="submit" class="primary">Copy into Front Office</button><button id="cancel-advance" type="button">Cancel</button></div>
+      </form>
+    </section>
     <noscript>JavaScript is required to edit Front Office records. Existing saved data is unchanged.</noscript>
     <div id="workspace">
       <div class="stats" id="stats" aria-label="Record counts"></div>
@@ -82,6 +97,11 @@
         </section>
         <section class="panel job-panel" id="panel-jobs" role="tabpanel" aria-labelledby="tab-jobs" data-web2-scroll tabindex="0" hidden>
           <div class="section-head"><h2>Jobs</h2><label>Show stage<select id="filter"><option value="all">All stages</option><option>Inquiry</option><option>Advance</option><option>Confirmed</option><option>Show</option><option>Closeout</option><option>Complete</option></select></label></div>
+          <section class="advance-entry" aria-labelledby="advance-entry-title">
+            <h3 id="advance-entry-title">Bring in Show Advance</h3>
+            <p>Review a saved advance or its JSON export, then explicitly copy it as a new job. No source data changes.</p>
+            <div class="advance-actions"><button id="advance-saved" type="button" disabled>Preview saved Show Advance</button><button id="advance-file-button" type="button" disabled>Choose Show Advance JSON</button><input id="advance-file" type="file" accept="application/json,.json" aria-label="Choose Show Advance JSON" tabindex="-1"></div>
+          </section>
           <form id="job-form" class="job-form" hidden>
             <label>Job name<input name="name" required maxlength="500"></label>
             <label>Client<select name="clientId" required></select></label>

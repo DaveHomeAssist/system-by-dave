@@ -1,6 +1,7 @@
-import { KEY, STAGES, emptyDocument, parseDocument, validateDocument, addClient, addVenue, addJob, updateJob } from './model.mjs';
+import { KEY, ADVANCE_KEY, STAGES, emptyDocument, parseDocument, parseShowAdvance, alreadyImportedAdvance, appendShowAdvance, validateDocument, addClient, addVenue, addJob, updateJob } from './model.mjs';
 const $ = id => document.getElementById(id);
 let doc = emptyDocument(), saved = '', blocked = false, original = null, pending = null, interactive = false;
+let advancePending = null, advanceReturnFocus = null;
 const source = { advance: '../show-advance.html', change: '../change-order.html', signoff: '../client-signoff.html', handoff: '../show-handoff.html' };
 const tabs = ['clients', 'venues', 'jobs'];
 let activeTab = 'clients';
@@ -46,6 +47,53 @@ function dirty() { return JSON.stringify(doc) !== saved; }
 function mark() { status(dirty() ? 'Unsaved changes · Save your document or export a backup.' : original === null ? 'New document · Add records, then save on this device.' : 'Saved on this device. Export a backup for transfer.'); }
 function node(tag, content, className) { const element = document.createElement(tag); if (content != null) element.textContent = content; if (className) element.className = className; return element; }
 function option(select, value, label) { const element = document.createElement('option'); element.value = value; element.textContent = label; select.append(element); }
+function closeAdvancePreview() {
+  advancePending = null;
+  $('advance-preview').hidden = true;
+  for (const element of [document.querySelector('.site-header'), document.querySelector('.hero'), $('workspace'), document.querySelector('footer')]) element.inert = false;
+  if (advanceReturnFocus?.isConnected) advanceReturnFocus.focus();
+  advanceReturnFocus = null;
+}
+function updateAdvanceBinding() {
+  for (const kind of ['client', 'venue']) {
+    const creating = !$(`advance-${kind}-choice`).value;
+    $(`advance-${kind}-name-label`).hidden = !creating;
+    $(`advance-${kind}-name`).required = creating;
+  }
+}
+function previewAdvance(raw, sourceKind, trigger) {
+  if (blocked) throw new Error('Recover the saved Front Office document before copying a source.');
+  const candidate = parseShowAdvance(raw);
+  if (alreadyImportedAdvance(doc, candidate)) throw new Error('This exact Show Advance is already copied into a job.');
+  const savedAdvanceRaw = sourceKind === 'saved' ? raw : null;
+  advancePending = { candidate, savedAdvanceRaw, docSnapshot: JSON.stringify(doc), storedSnapshot: original };
+  advanceReturnFocus = trigger;
+  pending = null;
+  $('import-preview').hidden = true;
+  const meta = candidate.meta;
+  $('advance-summary').textContent = `${meta.showName || 'Unnamed show'} · ${meta.showDate || 'No date'} · ${candidate.items.length} requests. Choose the Front Office identities below. Copying creates one unsaved Advance-stage job.`;
+  const statuses = $('advance-statuses');
+  statuses.replaceChildren(...Object.entries(candidate.statusCounts).map(([name, count]) => node('li', `${name.slice(0, 80)}: ${count}`)));
+  for (const [kind, rows] of [['client', doc.clients], ['venue', doc.venues]]) {
+    const select = $(`advance-${kind}-choice`);
+    select.replaceChildren();
+    option(select, '', `Create new ${kind}`);
+    rows.forEach(row => option(select, row.id, `Use existing: ${row.name}`));
+    $(`advance-${kind}-name`).value = String(meta[kind] || '').slice(0, 500);
+  }
+  $('advance-job-name').value = String(meta.showName || '').slice(0, 500);
+  updateAdvanceBinding();
+  const similar = doc.jobs.filter(job => job.name.trim().toLowerCase() === meta.showName.trim().toLowerCase()).length;
+  const warnings = [];
+  if (similar) warnings.push(`${similar} existing job${similar === 1 ? '' : 's'} share this show name; this copy will be a separate job.`);
+  if (candidate.unsupportedStatuses.length) warnings.push(`Unrecognized source statuses are retained but not mapped: ${candidate.unsupportedStatuses.map(value => value.slice(0, 50)).join(', ')}.`);
+  if (!meta.client || !meta.venue) warnings.push('Supply any missing client or venue name, or choose an existing record.');
+  $('advance-warning').textContent = warnings.join(' ');
+  $('advance-preview').hidden = false;
+  for (const element of [document.querySelector('.site-header'), document.querySelector('.hero'), $('workspace'), document.querySelector('footer')]) element.inert = true;
+  $('advance-client-choice').focus();
+  status('Show Advance preview ready. No Front Office or source data has changed.');
+}
 function render() {
   $('stats').replaceChildren();
   for (const [value, label] of [[doc.clients.length, 'Clients'], [doc.venues.length, 'Venues'], [doc.jobs.filter(job => job.stage !== 'Complete').length, 'Open jobs'], [doc.jobs.filter(job => job.stage === 'Complete').length, 'Complete']]) { const card = node('div', null, 'stat'); card.append(node('strong', value), node('span', label)); $('stats').append(card); }
@@ -58,6 +106,7 @@ function render() {
     const form = node('form', null, 'update-form'); form.hidden = !interactive; form.dataset.id = job.id; const stageLabel = node('label', 'Stage'); const stage = node('select'); stage.name = 'stage'; STAGES.forEach(value => option(stage, value, value)); stage.value = job.stage; stageLabel.append(stage); const nextLabel = node('label', 'Next action'); const next = node('input'); next.name = 'nextAction'; next.maxLength = 2000; next.value = job.nextAction; nextLabel.append(next); const noteLabel = node('label', 'Add update'); const note = node('textarea'); note.name = 'note'; note.maxLength = 500; note.placeholder = 'Decision, change, approval, or handoff note'; noteLabel.append(note); const button = node('button', 'Update job'); form.append(stageLabel, nextLabel, noteLabel, button); card.append(form);
     if (job.nextAction) card.append(node('p', `Next: ${job.nextAction}`, 'next-action'));
     if (job.updates.length) { const log = node('details'); const summary = node('summary', `${job.updates.length} update${job.updates.length === 1 ? '' : 's'}`); log.append(summary); const list = node('ol'); job.updates.forEach(update => { const item = node('li'); item.append(node('time', update.date), node('p', update.body)); list.append(item); }); log.append(list); card.append(log); }
+    if (job.sourceAdvance) { const advance = parseShowAdvance(job.sourceAdvance.raw); card.append(node('p', `Show Advance copy · ${advance.items.length} original requests retained in backup.`, 'source-note')); const sourceButton = node('button', 'Export original Show Advance'); sourceButton.type = 'button'; sourceButton.dataset.exportAdvance = job.id; card.append(sourceButton); }
     const links = node('div', null, 'tool-links'); for (const [key, label] of [['advance', 'Show Advance'], ['change', 'Change Order'], ['signoff', 'Client Sign Off'], ['handoff', 'Show Handoff']]) { const a = node('a', label); a.href = source[key]; links.append(a); } card.append(links); jobs.append(card); });
   if (!visible.length) jobs.append(node('p', selected === 'all' ? 'No jobs yet. Start with a client and venue.' : `No ${selected.toLowerCase()} jobs.`, 'empty'));
 }
@@ -69,6 +118,43 @@ $('client-form').addEventListener('submit', event => { event.preventDefault(); c
 $('venue-form').addEventListener('submit', event => { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; if (edit(current => addVenue(current, form.elements.name.value, form.elements.location.value, form.elements.notes.value))) { form.reset(); if (doc.venues.length === 1 && doc.clients.length) activateTab('jobs', true); else form.elements.name.focus(); } });
 $('job-form').addEventListener('submit', event => { event.preventDefault(); const form = event.currentTarget; if (!form.reportValidity()) return; if (edit(current => addJob(current, form.elements.name.value, form.elements.clientId.value, form.elements.venueId.value, form.elements.nextAction.value))) form.reset(); form.elements.name.focus(); });
 $('jobs').addEventListener('submit', event => { const form = event.target.closest('.update-form'); if (!form) return; event.preventDefault(); const job = doc.jobs.find(row => row.id === form.dataset.id); if (!job) return; const note = form.elements.note.value.trim(); if (note.length > 500) return status('Update is too long.', true); edit(current => updateJob(current, job.id, form.elements.stage.value, form.elements.nextAction.value, note, new Date().toISOString())); });
+$('jobs').addEventListener('click', event => { const button = event.target.closest('[data-export-advance]'); if (!button) return; const job = doc.jobs.find(row => row.id === button.dataset.exportAdvance); if (job?.sourceAdvance) download('show-advance-original.json', job.sourceAdvance.raw); });
+$('advance-saved').addEventListener('click', event => { try { const raw = localStorage.getItem(ADVANCE_KEY); if (raw === null) throw new Error('No saved Show Advance was found on this origin. Choose a JSON export instead.'); previewAdvance(raw, 'saved', event.currentTarget); } catch (error) { status(`Show Advance preview rejected: ${error.message} Current work is unchanged.`, true); } });
+$('advance-file-button').addEventListener('click', () => $('advance-file').click());
+$('advance-file').addEventListener('change', async event => { const file = event.target.files[0]; event.target.value = ''; if (!file) return; try { if (file.size > 1_000_000) throw new Error('Show Advance export is larger than 1 MB.'); previewAdvance(await file.text(), 'file', $('advance-file-button')); } catch (error) { status(`Show Advance preview rejected: ${error.message} Current work is unchanged.`, true); } });
+for (const kind of ['client', 'venue']) $(`advance-${kind}-choice`).addEventListener('change', updateAdvanceBinding);
+$('cancel-advance').addEventListener('click', () => { closeAdvancePreview(); mark(); });
+$('advance-preview').addEventListener('keydown', event => {
+  if (event.key === 'Escape') { event.preventDefault(); closeAdvancePreview(); mark(); return; }
+  if (event.key !== 'Tab') return;
+  const focusable = [...$('advance-preview').querySelectorAll('select, input:not([type="file"]), button')].filter(element => !element.hidden && !element.disabled && !element.closest('[hidden]'));
+  if (!focusable.length) return;
+  if (event.shiftKey && document.activeElement === focusable[0]) { event.preventDefault(); focusable.at(-1).focus(); }
+  else if (!event.shiftKey && document.activeElement === focusable.at(-1)) { event.preventDefault(); focusable[0].focus(); }
+});
+$('advance-form').addEventListener('submit', event => {
+  event.preventDefault();
+  if (!advancePending || !event.currentTarget.reportValidity()) return;
+  let storedNow;
+  let sourceNow;
+  try { storedNow = localStorage.getItem(KEY); if (advancePending.savedAdvanceRaw !== null) sourceNow = localStorage.getItem(ADVANCE_KEY); }
+  catch (error) { closeAdvancePreview(); status(`Storage could not be checked: ${error.message}. Nothing was copied.`, true); return; }
+  if (JSON.stringify(doc) !== advancePending.docSnapshot || storedNow !== advancePending.storedSnapshot || storedNow !== original || (advancePending.savedAdvanceRaw !== null && sourceNow !== advancePending.savedAdvanceRaw)) { closeAdvancePreview(); status('Preview is stale: Front Office or saved Show Advance changed. Review the source again; nothing was copied.', true); return; }
+  try {
+    const next = appendShowAdvance(doc, advancePending.candidate, {
+      clientId: $('advance-client-choice').value,
+      clientName: $('advance-client-name').value,
+      venueId: $('advance-venue-choice').value,
+      venueName: $('advance-venue-name').value,
+      jobName: $('advance-job-name').value
+    });
+    doc = next;
+    closeAdvancePreview();
+    render();
+    activateTab('jobs');
+    status('Show Advance copied into this unsaved Front Office document. Save or export a backup.');
+  } catch (error) { status(`Show Advance copy rejected: ${error.message} Current work is unchanged.`, true); }
+});
 $('filter').addEventListener('change', render);
 $('save').addEventListener('click', () => { if (blocked) return status('Recover the saved original first.', true); try { const current = localStorage.getItem(KEY); if (current !== original) return status('Saved data changed in another tab. Export your current work, then reload before saving.', true); const raw = JSON.stringify(validateDocument(doc)); localStorage.setItem(KEY, raw); original = raw; saved = raw; mark(); } catch (error) { status(`Save failed: ${error.message}. Export a backup.`, true); } });
 $('export').addEventListener('click', () => download('front-office-backup.json', JSON.stringify(doc, null, 2)));
@@ -83,4 +169,4 @@ window.addEventListener('beforeunload', event => { if (dirty() && !blocked) { ev
 // Controls become active only after every handler is installed.
 interactive = true;
 $('boot-status').hidden = true;
-if (!blocked) { activateForms(); activateTab(doc.jobs.length ? 'jobs' : doc.clients.length ? 'venues' : 'clients'); }
+if (!blocked) { activateForms(); $('advance-saved').disabled = false; $('advance-file-button').disabled = false; activateTab(doc.jobs.length ? 'jobs' : doc.clients.length ? 'venues' : 'clients'); }
