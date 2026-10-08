@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-08 — Front Office Show Advance one-way copy
+
+- Preview a saved or exported Show Advance v1 in Front Office, explicitly bind client and venue identities, and copy one unsaved Advance-stage job without changing the source tool.
+- Keep the exact validated source JSON in the Front Office backup and offer a per-job original export. Reject malformed, repeated, oversized and stale copies; a changed source remains a separate job, not a sync.
+- Cover source-byte durability, cancellation, backup/reopen and browser behavior across phone, short-height, desktop and ultrawide viewports.
+
 ## 2026-10-08 — Show Control CueForge selected-list integrity
 
 - Reject empty or duplicate CueForge list and per-list cue IDs, malformed safe fields and overlong identities before offering an import preview. Hold only the allowlisted schema-7 cue snapshot in the browser adapter; no native settings, patch, trigger, media path or control state enters it.
