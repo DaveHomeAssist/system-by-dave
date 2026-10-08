@@ -86,8 +86,9 @@ export function previewRoomCheck(doc, raw) {
   }));
   const available = source.items.filter(item => !copied.has(`${source.identity}\u0000${item.id}`));
   if (!available.length) throw new Error('Every check in this Room Check source was already copied. Nothing was changed.');
-  if (current.roomCheckSources.length >= 20 || current.roomCheckSources.reduce((size, entry) => size + byteLength(entry.raw), 0) + byteLength(raw) > MAX_SOURCE_BYTES) throw new Error('Show Ops source history is full. Export a backup before adding more sources.');
-  return { ...source, available, alreadyCopied: source.items.length - available.length };
+  const existingSource = current.roomCheckSources.find(entry => entry.raw === raw);
+  if (!existingSource && (current.roomCheckSources.length >= 20 || current.roomCheckSources.reduce((size, entry) => size + byteLength(entry.raw), 0) + byteLength(raw) > MAX_SOURCE_BYTES)) throw new Error('Show Ops source history is full. Export a backup before adding more sources.');
+  return { ...source, available, alreadyCopied: source.items.length - available.length, existingSourceId: existingSource?.id || null };
 }
 
 export function copyRoomCheck(doc, source, selectedIds, origin, importedAt, nextId = () => crypto.randomUUID()) {
@@ -96,12 +97,13 @@ export function copyRoomCheck(doc, source, selectedIds, origin, importedAt, next
   if (!['saved', 'file'].includes(origin) || !Array.isArray(selectedIds) || !selectedIds.length || new Set(selectedIds).size !== selectedIds.length) throw new Error('Select one or more distinct Room Check checks. Nothing was changed.');
   const available = new Map(preview.available.map(item => [item.id, item]));
   if (selectedIds.some(id => !available.has(id)) || current.rooms.length + selectedIds.length > 2000) throw new Error('Selected Room Check checks are unavailable or exceed Show Ops capacity. Nothing was changed.');
-  const sourceId = nextId();
+  const sourceId = preview.existingSourceId || nextId();
   const rows = selectedIds.map(itemId => {
     const item = available.get(itemId);
     return { id: nextId(), name: `${item.area} · ${item.check}`, detail: '', status: 'Needs check', source: { sourceId, itemId, snapshot: sourceSnapshot(item) } };
   });
-  return validate({ ...current, show: current.show || preview.meta.showName, date: current.date || preview.meta.showDate, rooms: [...current.rooms, ...rows], roomCheckSources: [...current.roomCheckSources, { id: sourceId, origin, importedAt, identity: preview.identity, raw: source.raw }] });
+  const roomCheckSources = preview.existingSourceId ? current.roomCheckSources : [...current.roomCheckSources, { id: sourceId, origin, importedAt, identity: preview.identity, raw: source.raw }];
+  return validate({ ...current, show: current.show || preview.meta.showName, date: current.date || preview.meta.showDate, rooms: [...current.rooms, ...rows], roomCheckSources });
 }
 export function addRecord(doc, kind, name, detail = '') {
   if (!kinds.includes(kind) || !name.trim()) return doc;

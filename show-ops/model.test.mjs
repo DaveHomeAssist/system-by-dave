@@ -53,8 +53,20 @@ test('Room Check show and date must match, and selected checks remain distinct',
   assert.equal(previewRoomCheck(first, raw).available.length, 1);
   const second = copyRoomCheck(first, previewRoomCheck(first, raw), ['check-2'], 'file', '2026-10-08T12:00:00Z', nextId);
   assert.equal(second.rooms.length, 2);
+  assert.equal(second.roomCheckSources.length, 1);
+  assert.equal(second.rooms[0].source.sourceId, second.rooms[1].source.sourceId);
   assert.throws(() => previewRoomCheck(second, raw), /already copied/);
   assert.throws(() => copyRoomCheck(first, previewRoomCheck(first, raw), ['check-1'], 'file', '2026-10-08T12:00:00Z', ids()), /unavailable/);
+});
+test('repeated partial copies of unchanged source reuse one history entry', () => {
+  const items = Array.from({ length: 25 }, (_, index) => ({ id: `part-${index}`, area: 'room', check: `Check ${index}`, owner: '', due: '', priority: 'normal', status: 'pending', blocker: '', notes: '' }));
+  const raw = roomCheck(items);
+  const nextId = ids();
+  let doc = empty();
+  for (const item of items) doc = copyRoomCheck(doc, previewRoomCheck(doc, raw), [item.id], 'file', '2026-10-08T12:00:00Z', nextId);
+  assert.equal(doc.roomCheckSources.length, 1);
+  assert.equal(doc.rooms.length, items.length);
+  assert.deepEqual(new Set(doc.rooms.map(row => row.source.sourceId)), new Set([doc.roomCheckSources[0].id]));
 });
 test('Room Check rejects malformed, oversized, duplicate and unsupported source data', () => {
   assert.throws(() => parseRoomCheck('{bad'), /could not be parsed/);

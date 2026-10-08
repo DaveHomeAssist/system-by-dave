@@ -130,6 +130,7 @@ const server = http.createServer((req,res)=>{
   await page.reload();
   copied=JSON.parse(await page.evaluate(()=>localStorage.getItem('sbd.showOps.document.v1')));
   assert.equal(copied.rooms.length,3);
+  assert.equal(copied.roomCheckSources.length,1);
   assert.equal(copied.rooms[2].source.snapshot.blocker,'Aux missing');
   await page.getByRole('button',{name:'Backup',exact:true}).click();
   await page.locator('#room-saved').click();
