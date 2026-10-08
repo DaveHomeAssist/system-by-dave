@@ -6,4 +6,16 @@
 
 @media(max-width:720px){#message{order:4;min-height:0}}
 
-#cueforge-preview select{display:block;width:100%;max-width:500px;min-height:44px;margin-top:6px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+#cueforge-preview select{display:block;width:100%;max-width:500px;min-height:44px;margin-top:6px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--av-text)}
+#cueforge-preview select:focus-visible,#cueforge-preview .cueforge-cues:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+#cueforge-preview .cueforge-selection{font-weight:700}
+#cueforge-preview .cueforge-cues{max-height:12rem;overflow:auto;overscroll-behavior:contain;margin:8px 0;padding:8px 8px 8px 34px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+#cueforge-preview .cueforge-cues li{padding:6px 0;overflow-wrap:anywhere}
+#cueforge-preview .cueforge-cues li+li{border-top:1px solid var(--line)}
+#cueforge-preview .cueforge-impact{border-left:3px solid var(--accent);padding-left:10px}
+#cueforge-preview select option{color:var(--av-text);background:var(--card)}
+html[data-av-theme=dark] #cueforge-preview select{color-scheme:dark}
+html[data-av-theme=light] #cueforge-preview select{color-scheme:light}
+@media(prefers-color-scheme:dark){html[data-av-theme=system] #cueforge-preview select{color-scheme:dark}}
+@media(prefers-color-scheme:light){html[data-av-theme=system] #cueforge-preview select{color-scheme:light}}
+@media(max-width:720px) and (max-height:400px){.shell header{height:44px;min-height:44px;flex-direction:row;align-items:center;gap:4px;padding:0 8px}.shell header>div:first-child{gap:8px}.shell header .header-actions{justify-content:flex-end}.shell #clock{display:none}main{padding:5px 8px;gap:4px}.top{align-items:center}.top .eyebrow{display:none}.top h1{font-size:1.1rem}.top #summary{font-size:.7rem}.actions{gap:3px;flex-wrap:nowrap}.actions button{padding:4px 5px;font-size:.72rem}.tabs{margin-top:0;gap:4px}.tabs button{padding:4px}#message{font-size:.7rem;line-height:1.1}}

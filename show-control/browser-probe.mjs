@@ -79,7 +79,7 @@ try {
     assert.match(await recoveryPage.locator('#summary').innerText(), /1 cues/);
     await recoveryContext.close();
 
-    const context = await browser.newContext({ viewport });
+    const context = await browser.newContext({ viewport, acceptDownloads: true });
     const page = await context.newPage();
     await page.goto(url);
     await page.evaluate(() => localStorage.setItem('av-theme-mode.v1', 'light'));
@@ -127,16 +127,60 @@ try {
     await page.getByRole('button', { name: 'Copy cues into this run' }).click();
     assert.match(await page.locator('#summary').innerText(), /Source show/);
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('cueSheet.v1')).rows[0].custom.preserved), true);
-    const cueForgeSource = { version: 7, name: 'CueForge show', modifiedAt: '2026-10-07T12:00:00Z', settings: { sharedSecret: 'private-fixture' }, cueLists: [{ id: 'main', name: 'Main', cues: [{ id: 'cf-1', number: '1.5', name: 'Opening', type: 'video', notes: 'Standby', properties: { filePath: '/private/fixture.mp4' } }] }] };
-    await page.locator('#cueforge-file').setInputFiles({ name: 'show.cueforge', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(cueForgeSource)) });
+    const priorRun = await page.locator('#summary').innerText();
+    const priorStored = await page.evaluate(() => localStorage.getItem('sbd.showControl.v1'));
+    const cueForgeSource = { version: 7, name: 'CueForge show', modifiedAt: '2026-10-07T12:00:00Z', settings: { sharedSecret: 'private-fixture' }, patch: { videoOutputs: ['private-patch'] }, cueLists: [
+      { id: 'first', name: 'First', cues: [{ id: 'cf-a', number: 'A1', name: 'Wrong list cue', type: 'audio', notes: '' }] },
+      { id: 'main', name: 'Main', cues: [{ id: 'cf-1', number: '1.5', name: 'Opening', type: 'video', notes: 'Standby', properties: { filePath: '/private/fixture.mp4' }, triggers: [{ type: 'osc' }] }] },
+    ] };
+    const chooseCueForge = source => page.locator('#cueforge-file').setInputFiles({ name: 'show.cueforge', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(source)) });
+    await chooseCueForge({ ...cueForgeSource, cueLists: [cueForgeSource.cueLists[0], { ...cueForgeSource.cueLists[1], id: 'first' }] });
+    await page.locator('#message').getByText(/duplicate cue list ID/).waitFor();
+    assert.equal(await page.locator('#cueforge-preview').isHidden(), true);
+    await chooseCueForge({ ...cueForgeSource, cueLists: [{ ...cueForgeSource.cueLists[0], id: ' ' }, cueForgeSource.cueLists[1]] });
+    await page.locator('#message').getByText(/empty ID/).waitFor();
+    await chooseCueForge({ ...cueForgeSource, cueLists: [{ ...cueForgeSource.cueLists[0], cues: [cueForgeSource.cueLists[0].cues[0], { ...cueForgeSource.cueLists[0].cues[0] }] }, cueForgeSource.cueLists[1]] });
+    await page.locator('#message').getByText(/duplicate cue ID/).waitFor();
+    assert.equal(await page.locator('#summary').innerText(), priorRun);
+    assert.equal(await page.evaluate(() => localStorage.getItem('sbd.showControl.v1')), priorStored);
+    await chooseCueForge(cueForgeSource);
+    await page.locator('#message').getByText(/selected-list preview ready/).waitFor();
+    await page.locator('#cueforge-list').selectOption('main');
+    assert.match(await page.locator('#cueforge-preview .cueforge-selection').innerText(), /Selected: Main · 1 cues/);
+    assert.match(await page.locator('#cueforge-preview .cueforge-cues').innerText(), /Number: 1\.5 · Name: Opening · Type: video · ID: cf-1 · Notes: Standby/);
+    assert.doesNotMatch(await page.locator('#cueforge-preview .cueforge-cues').innerText(), /Wrong list cue/);
+    assert.match(await page.locator('#cueforge-impact').innerText(), /Current run: Source show · 1 cues · cue position 0\/1 · 0 log events · unsaved changes/);
+    page.once('dialog', async dialog => { assert.match(dialog.message(), /Replace the current Show Control run/); await dialog.dismiss(); });
+    await page.getByRole('button', { name: 'Copy selected cue list' }).click();
+    assert.equal(await page.locator('#summary').innerText(), priorRun);
+    assert.equal(await page.evaluate(() => localStorage.getItem('sbd.showControl.v1')), priorStored);
+    assert.match(await page.locator('#message').innerText(), /copy canceled/);
+    page.once('dialog', dialog => dialog.accept());
     await page.getByRole('button', { name: 'Copy selected cue list' }).click();
     assert.match(await page.locator('#summary').innerText(), /CueForge reference only/);
+    assert.equal(await page.evaluate(() => localStorage.getItem('sbd.showControl.v1')), priorStored);
     await page.getByRole('button', { name: 'Save run' }).click();
     const saved = await page.evaluate(() => localStorage.getItem('sbd.showControl.v1'));
     assert.equal(saved.includes('private-fixture'), false);
+    assert.equal(saved.includes('private-patch'), false);
     assert.equal(saved.includes('/private/fixture.mp4'), false);
+    assert.equal(saved.includes('triggers'), false);
+    const savedRun = JSON.parse(saved);
+    assert.deepEqual(savedRun.cues[0].sourceRow, { id: 'cf-1', number: '1.5', name: 'Opening', type: 'video', notes: 'Standby' });
+    assert.deepEqual(savedRun.source, { product: 'CueForge', listId: 'main', listName: 'Main', fileModifiedAt: '2026-10-07T12:00:00Z' });
+    const [backupDownload] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export backup' }).click()]);
+    const backupText = await readFile(await backupDownload.path(), 'utf8');
+    assert.deepEqual(JSON.parse(backupText), savedRun);
+    await page.locator('#cue-number').fill('T1');
+    await page.locator('#cue-action').fill('Temporary change');
+    await page.getByRole('button', { name: 'Add to run' }).click();
+    await page.locator('#import-file').setInputFiles({ name: 'show-control-backup.json', mimeType: 'application/json', buffer: Buffer.from(backupText) });
+    await page.getByRole('button', { name: 'Restore this backup' }).click();
+    assert.match(await page.locator('#summary').innerText(), /1 cues/);
+    await page.getByRole('button', { name: 'Save run' }).click();
     await page.reload();
     assert.match(await page.locator('#summary').innerText(), /CueForge reference only/);
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('sbd.showControl.v1'))), savedRun);
     const size = await page.evaluate(() => ({ width: document.documentElement.scrollWidth <= document.documentElement.clientWidth, height: document.documentElement.scrollHeight <= document.documentElement.clientHeight }));
     assert.deepEqual(size, { width: true, height: true });
     await page.getByRole('tab', { name: 'Run' }).click();
@@ -148,5 +192,28 @@ try {
     await page.screenshot({ path: path.join(screenshotDir, `show-control-light-${viewport.width}.png`) });
     await context.close();
   }
-  console.log('Show Control browser probe passed: theme tokens/contrast, save/reload, hold/go, failed import, viewport scroll.');
+  for (const viewport of [{ width: 320, height: 256 }, { width: 844, height: 390 }, { width: 3840, height: 1080 }]) {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.goto(url);
+    await page.getByRole('tab', { name: 'Setup' }).click();
+    const source = { version: 7, name: 'Large list', modifiedAt: '2026-10-07T12:00:00Z', cueLists: [{ id: 'main', name: 'Main', cues: Array.from({ length: 30 }, (_, i) => ({ id: `cue-${i + 1}`, number: String(i + 1), name: `Cue ${i + 1}`, type: 'audio', notes: '' })) }] };
+    await page.locator('#cueforge-file').setInputFiles({ name: 'long.cueforge', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(source)) });
+    const list = page.locator('#cueforge-preview .cueforge-cues');
+    await list.focus();
+    assert.equal(await page.evaluate(() => document.activeElement?.classList.contains('cueforge-cues')), true, `Cue list focus at ${viewport.width}×${viewport.height}`);
+    await page.keyboard.press('ArrowDown');
+    await page.waitForFunction(() => document.querySelector('#cueforge-preview .cueforge-cues').scrollTop > 0, null, { timeout: 1500 });
+    const layout = await page.evaluate(() => {
+      const root = document.documentElement, list = document.querySelector('#cueforge-preview .cueforge-cues'), select = document.querySelector('#cueforge-list'), style = getComputedStyle(select);
+      return { width: root.scrollWidth <= root.clientWidth, height: root.scrollHeight <= root.clientHeight, listScrolls: list.scrollHeight > list.clientHeight, listAtEnd: list.scrollTop > 0, setupHeight: document.querySelector('#setup').getBoundingClientRect().height, minTargetHeight: Math.min(...['#save', '#export', '#theme', '[data-tab="run"]', '[data-tab="setup"]'].map(selector => document.querySelector(selector).getBoundingClientRect().height)), selectColor: style.color, selectBackground: style.backgroundColor };
+    });
+    assert.deepEqual({ width: layout.width, height: layout.height, listScrolls: layout.listScrolls, listAtEnd: layout.listAtEnd }, { width: true, height: true, listScrolls: true, listAtEnd: true }, `CueForge preview layout at ${viewport.width}×${viewport.height}`);
+    assert.ok(layout.setupHeight >= 60, `Setup panel collapsed at ${viewport.width}×${viewport.height}: ${layout.setupHeight}px`);
+    assert.ok(layout.minTargetHeight >= 44, `Persistent control below 44px at ${viewport.width}×${viewport.height}: ${JSON.stringify(layout)}`);
+    assert.ok(contrast(cssHex(layout.selectColor), cssHex(layout.selectBackground)) >= 4.5, `CueForge list select contrast at ${viewport.width}×${viewport.height}: ${JSON.stringify(layout)}`);
+    await page.screenshot({ path: path.join(screenshotDir, `show-control-cueforge-preview-${viewport.width}.png`) });
+    await context.close();
+  }
+  console.log('Show Control browser probe passed: CueForge ambiguity rejection, selected-list preview/confirmation, safe backup roundtrip, theme/contrast, save/reload and five viewport scroll checks.');
 } finally { await browser.close(); if (server) await new Promise(resolve => server.close(resolve)); }
