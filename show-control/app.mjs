@@ -19,8 +19,12 @@ function render() {
   const events = $('events'); events.replaceChildren();
   if (!run.events.length) events.textContent = 'No calls recorded yet.';
   run.events.forEach(event => { const div = document.createElement('div'); div.className = 'event'; div.textContent = `${new Date(event.at).toLocaleString()} · ${event.action}${event.cue ? ` · ${event.cue}` : ''}`; events.append(div); });
+  const cueForgeImpact = $('cueforge-impact');
+  if (cueForgeImpact) cueForgeImpact.textContent = currentRunImpact();
 }
 function replace(next) { if (blocked) { message('Recover the unreadable saved run before replacing it.', true); return; } run = validate(next); dirty = true; for (const id of ['preview', 'cue-file-preview', 'cueforge-preview', 'import-preview']) $(id).hidden = true; render(); message('Run loaded in this tab. Save to keep it after reload.'); }
+function currentRunImpact() { return `Current run: ${run.title} · ${run.cues.length} cues · cue position ${run.current}/${run.cues.length} · ${run.events.length} log events${run.held ? ' · on Hold' : ''}${dirty ? ' · unsaved changes' : ''}. Copying replaces this run in this tab; the saved browser copy stays until you Save.`; }
+function hasRunToReplace() { return Boolean(dirty || run.cues.length > 0 || run.events.length > 0 || run.current > 0 || run.held || run.notes.trim() !== '' || run.source || run.title !== 'Untitled show'); }
 function downloadText(name, value, type) { const blob = new Blob([value], { type }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
 function download() { downloadText('show-control-backup.json', JSON.stringify(run, null, 2), 'application/json'); message('Backup exported.'); }
 function setTab(id) { document.querySelectorAll('[role=tab]').forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.tab === id))); document.querySelectorAll('.view').forEach(view => { view.hidden = view.id !== id; view.classList.toggle('active', view.id === id); }); }
@@ -29,13 +33,50 @@ document.querySelector('.tabs').addEventListener('keydown', e => { if (!['ArrowL
 buttons.go.onclick = () => { run = logEvent(run, 'Go'); dirty = true; render(); message('Go recorded. Save the run.'); };
 buttons.hold.onclick = () => { run = logEvent(run, 'Hold'); dirty = true; render(); message('Hold recorded.'); };
 buttons.resume.onclick = () => { run = logEvent(run, 'Resume'); dirty = true; render(); message('Resume recorded.'); };
-$('notes').addEventListener('input', e => { run.notes = e.target.value; dirty = true; $('summary').textContent = `${run.title} · ${run.cues.length} cues · Unsaved changes`; });
+$('notes').addEventListener('input', e => { run.notes = e.target.value; dirty = true; $('summary').textContent = `${run.title} · ${run.cues.length} cues · Unsaved changes`; if ($('cueforge-impact')) $('cueforge-impact').textContent = currentRunImpact(); });
 $('save').onclick = () => { if (blocked) { message('Recover the unreadable saved run before saving here.', true); return; } try { baseline = save(run, localStorage, baseline); dirty = false; render(); message('Run saved and verified in this browser.'); } catch (error) { message(error.message, true); } };
 $('export').onclick = download;
 $('preview-cues').onclick = () => { try { const raw = localStorage.getItem(CUE_KEY); if (!raw) throw Error('No local Cue Sheet was found in this browser.'); const next = fromCueSheet(raw); const box = $('preview'); box.replaceChildren(); const p = document.createElement('p'); p.textContent = `${next.title} · ${next.cues.length} cues. This will replace the current Show Control run only after you confirm.`; const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Copy cues into this run'; b.onclick = () => replace(next); box.append(p,b); box.hidden = false; message('Cue Sheet preview ready.'); } catch (error) { message(error.message, true); } };
 $('cue-file').onchange = async e => { const file = e.target.files[0]; e.target.value = ''; if (!file) return; try { if (file.size > 8_000_000) throw Error('Cue Sheet export is too large.'); const next = fromCueSheet(await file.text()); const box = $('cue-file-preview'); box.replaceChildren(); const p = document.createElement('p'); p.textContent = `${next.title} · ${next.cues.length} cues. Confirm to copy into this run.`; const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Copy imported cues'; b.onclick = () => replace(next); box.append(p,b); box.hidden = false; message('Cue Sheet export preview ready.'); } catch (error) { $('cue-file-preview').hidden = true; message(error.message, true); } };
 $('add-cue').onsubmit = e => { e.preventDefault(); const number = $('cue-number').value.trim(), action = $('cue-action').value.trim(), owner = $('cue-owner').value.trim(); if (!number || !action) return; const row = { number, action, owner, time: '', status: 'Ready', notes: '' }; run.cues.push({ id: `cue-${Date.now()}-${run.cues.length}`, ...row, sourceRow: structuredClone(row) }); dirty = true; e.target.reset(); render(); message('Cue added. Save the run.'); };
-$('cueforge-file').onchange = async e => { const file = e.target.files[0]; e.target.value = ''; if (!file) return; try { if (file.size > 8_000_000) throw Error('CueForge file is too large for a calling snapshot. The current run was kept.'); const source = cueForgeLists(await file.text()); const box = $('cueforge-preview'); box.replaceChildren(); const label = document.createElement('label'); label.htmlFor = 'cueforge-list'; label.textContent = 'Cue list'; const select = document.createElement('select'); select.id = 'cueforge-list'; source.cueLists.forEach(list => { const option = document.createElement('option'); option.value = list.id; option.textContent = `${list.name} · ${list.cues.length} cues`; select.append(option); }); const note = document.createElement('p'); note.textContent = 'Only cue identity and notes enter Show Control. Patch, triggers, media paths and settings stay in the original file.'; const button = document.createElement('button'); button.type = 'button'; button.textContent = 'Copy selected cue list'; button.onclick = () => { try { replace(fromCueForge(source, select.value)); } catch (error) { message(error.message, true); } }; box.append(label, select, note, button); box.hidden = false; message('CueForge cue lists ready for review.'); } catch (error) { $('cueforge-preview').hidden = true; message(error.message, true); } };
+$('cueforge-file').onchange = async e => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  try {
+    if (file.size > 8_000_000) throw Error('CueForge file is too large for a calling snapshot. The current run was kept.');
+    const source = cueForgeLists(await file.text());
+    const box = $('cueforge-preview'); box.replaceChildren();
+    const label = document.createElement('label'); label.htmlFor = 'cueforge-list'; label.textContent = 'Cue list';
+    const select = document.createElement('select'); select.id = 'cueforge-list';
+    source.cueLists.forEach(list => { const option = document.createElement('option'); option.value = list.id; option.textContent = `${list.name} · ${list.cues.length} cues`; select.append(option); });
+    const selected = document.createElement('p'); selected.className = 'cueforge-selection';
+    const cues = document.createElement('ol'); cues.className = 'cueforge-cues'; cues.tabIndex = 0; cues.dataset.web2Scroll = ''; cues.setAttribute('aria-label', 'Cues in selected CueForge list');
+    const impact = document.createElement('p'); impact.id = 'cueforge-impact'; impact.className = 'cueforge-impact';
+    const note = document.createElement('p'); note.textContent = 'Only the cue fields shown here enter Show Control. Patch, triggers, media paths and settings stay in the original file.';
+    const button = document.createElement('button'); button.type = 'button'; button.textContent = 'Copy selected cue list';
+    let selectedRun;
+    const renderSelected = () => {
+      selectedRun = fromCueForge(source, select.value);
+      selected.textContent = `Selected: ${selectedRun.source.listName} · ${selectedRun.cues.length} cues. Review the exact calling snapshot below.`;
+      cues.replaceChildren();
+      selectedRun.cues.forEach(cue => {
+        const row = cue.sourceRow, item = document.createElement('li');
+        item.textContent = `Number: ${row.number || '(blank)'} · Name: ${row.name || '(blank)'} · Type: ${row.type || '(blank)'} · ID: ${row.id}${row.notes ? ` · Notes: ${row.notes}` : ''}`;
+        cues.append(item);
+      });
+      if (!selectedRun.cues.length) cues.textContent = 'This list has no cues.';
+      impact.textContent = currentRunImpact();
+    };
+    select.addEventListener('change', renderSelected);
+    button.onclick = () => {
+      impact.textContent = currentRunImpact();
+      if (hasRunToReplace() && !confirm(`Replace the current Show Control run with ${selectedRun.source.listName} (${selectedRun.cues.length} cues)?\n\n${impact.textContent}\n\nExport the current run first if you need a recovery copy.`)) { message('CueForge copy canceled. The current run was kept.'); return; }
+      replace(selectedRun);
+    };
+    box.append(label, select, selected, cues, impact, note, button);
+    renderSelected(); box.hidden = false; message('CueForge selected-list preview ready.');
+  } catch (error) { $('cueforge-preview').hidden = true; message(error.message, true); }
+};
 $('import-file').onchange = async e => { const file = e.target.files[0]; e.target.value = ''; if (!file) return; try { if (file.size > 8_000_000) throw Error('Backup is too large. The current run was kept.'); const next = validate(JSON.parse(await file.text())); const box = $('import-preview'); box.replaceChildren(); const p = document.createElement('p'); p.textContent = `${next.title} · ${next.cues.length} cues · ${next.events.length} log events. Confirm to replace the current Show Control run.`; const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Restore this backup'; b.onclick = () => replace(next); box.append(p,b); box.hidden = false; message('Backup preview ready.'); } catch (error) { $('import-preview').hidden = true; message(error.message, true); } };
 $('export-raw').onclick = () => { if (unreadableRaw === null) return; downloadText('show-control-unreadable-saved-data.txt', unreadableRaw, 'text/plain'); rawExported = true; $('recover').disabled = false; message('Original saved text downloaded. Keep that file before replacing the damaged run.'); };
 $('recover').onclick = () => { if (!blocked || !rawExported || unreadableRaw === null) return; if (!confirm('Replace the unreadable saved run? Keep the downloaded original for recovery.')) return; try { if (localStorage.getItem(STORE) !== baseline) throw Error('Another tab changed this run. Reload before recovery.'); localStorage.removeItem(STORE); if (localStorage.getItem(STORE) !== null) throw Error('Storage removal could not be verified.'); baseline = null; unreadableRaw = null; blocked = false; rawExported = false; run = emptyRun(); dirty = false; $('recovery').hidden = true; for (const el of document.querySelectorAll('main button, main input, main textarea')) el.disabled = false; render(); message('Damaged run replaced after export. Import a backup or start a new run.'); } catch (error) { message(error.message, true); } };

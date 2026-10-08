@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-08 — Show Control CueForge selected-list integrity
+
+- Reject empty or duplicate CueForge list and per-list cue IDs, malformed safe fields and overlong identities before offering an import preview. Hold only the allowlisted schema-7 cue snapshot in the browser adapter; no native settings, patch, trigger, media path or control state enters it.
+- Preview the exact selected cue identities and current-run impact, then require confirmation before replacing an active or dirty calling run. Canceled or rejected copies leave the run and saved browser bytes unchanged.
+- Cover safe source-row and list/timestamp provenance through save, export and restore, plus phone, short-landscape, desktop and ultrawide preview containment. CueForge remains the separate executable product; Show Control records human calls only.
+
 ## 2026-10-08 — PlotForge fixture handoff into AV Lighting
 
 - Review a PlotForge interop manifest v1 in AV Lighting and explicitly confirm a one-way fixture copy. Map patch and focus fields, report status downgrades, and retain the complete source manifest in saved Lighting backups for provenance.

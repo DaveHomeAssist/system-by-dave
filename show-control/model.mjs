@@ -3,22 +3,50 @@ export const SCHEMA = 'system-by-dave.show-control.v1';
 export const CUE_KEY = 'cueSheet.v1';
 const text = (value, max = 1200) => typeof value === 'string' ? value.slice(0, max) : '';
 export function emptyRun() { return { schema: SCHEMA, version: 1, title: 'Untitled show', cues: [], current: 0, held: false, notes: '', events: [] }; }
-export function cueForgeLists(raw) {
-  const source = JSON.parse(raw);
-  if (!source || source.version !== 7 || !Array.isArray(source.cueLists) || !source.cueLists.length) throw Error('Use a CueForge version 7 show file. The current run was kept.');
-  if (source.cueLists.length > 100 || source.cueLists.some(list => !list || typeof list.id !== 'string' || typeof list.name !== 'string' || !Array.isArray(list.cues) || list.cues.length > 2000)) throw Error('CueForge cue lists are invalid or too large. The current run was kept.');
-  return source;
+function cueForgeField(value, max, label) {
+  if (typeof value !== 'string' || value.length > max) throw Error(`${label} is invalid or too long. The current run was kept.`);
+  return value;
 }
+function safeCueForgeSource(source) {
+  if (!source || source.version !== 7 || !Array.isArray(source.cueLists) || !source.cueLists.length) throw Error('Use a CueForge version 7 show file. The current run was kept.');
+  if (source.cueLists.length > 100) throw Error('CueForge has too many cue lists. The current run was kept.');
+  const listIds = new Set();
+  const cueLists = source.cueLists.map((list, listIndex) => {
+    if (!list || !Array.isArray(list.cues) || list.cues.length > 2000) throw Error(`CueForge cue list ${listIndex + 1} is invalid or too large. The current run was kept.`);
+    const id = cueForgeField(list.id, 100, `CueForge cue list ${listIndex + 1} ID`);
+    if (!id.trim()) throw Error(`CueForge cue list ${listIndex + 1} has an empty ID. The current run was kept.`);
+    if (listIds.has(id)) throw Error(`CueForge has a duplicate cue list ID (${listIndex + 1}). The current run was kept.`);
+    listIds.add(id);
+    const cueIds = new Set();
+    const cues = list.cues.map((cue, cueIndex) => {
+      if (!cue || typeof cue !== 'object') throw Error(`CueForge cue ${cueIndex + 1} in list ${listIndex + 1} is invalid. The current run was kept.`);
+      const cueId = cueForgeField(cue.id, 100, `CueForge cue ${cueIndex + 1} ID`);
+      if (!cueId.trim()) throw Error(`CueForge cue ${cueIndex + 1} in list ${listIndex + 1} has an empty ID. The current run was kept.`);
+      if (cueIds.has(cueId)) throw Error(`CueForge list ${listIndex + 1} has a duplicate cue ID (${cueIndex + 1}). The current run was kept.`);
+      cueIds.add(cueId);
+      return {
+        id: cueId,
+        number: cueForgeField(cue.number, 80, `CueForge cue ${cueIndex + 1} number`),
+        name: cueForgeField(cue.name, 1200, `CueForge cue ${cueIndex + 1} name`),
+        type: cueForgeField(cue.type, 80, `CueForge cue ${cueIndex + 1} type`),
+        notes: cueForgeField(cue.notes, 1200, `CueForge cue ${cueIndex + 1} notes`),
+      };
+    });
+    return { id, name: cueForgeField(list.name, 80, `CueForge cue list ${listIndex + 1} name`), cues };
+  });
+  return { version: 7, name: cueForgeField(source.name, 140, 'CueForge show name'), modifiedAt: cueForgeField(source.modifiedAt, 40, 'CueForge modified timestamp'), cueLists };
+}
+export function cueForgeLists(raw) { return safeCueForgeSource(JSON.parse(raw)); }
 export function fromCueForge(source, listId) {
-  const list = source.cueLists.find(item => item.id === listId);
+  const safeSource = safeCueForgeSource(source);
+  const list = safeSource.cueLists.find(item => item.id === listId);
   if (!list) throw Error('Choose a CueForge cue list. The current run was kept.');
   const run = emptyRun();
-  run.title = `${text(source.name, 140) || 'CueForge show'} · ${text(list.name, 80)}`;
-  run.source = { product: 'CueForge', listId: text(list.id, 100), listName: text(list.name, 80), fileModifiedAt: text(source.modifiedAt, 40) };
+  run.title = `${safeSource.name || 'CueForge show'} · ${list.name}`;
+  run.source = { product: 'CueForge', listId: list.id, listName: list.name, fileModifiedAt: safeSource.modifiedAt };
   run.cues = list.cues.map((cue, index) => {
-    if (!cue || typeof cue.id !== 'string' || typeof cue.number !== 'string' || typeof cue.name !== 'string' || typeof cue.type !== 'string') throw Error(`CueForge cue ${index + 1} is invalid. The current run was kept.`);
     // Keep a minimal calling snapshot; never persist patch, properties, trigger or credential fields.
-    const sourceRow = { id: text(cue.id, 100), number: text(cue.number, 80), name: text(cue.name), type: text(cue.type, 80), notes: text(cue.notes) };
+    const sourceRow = { id: cue.id, number: cue.number, name: cue.name, type: cue.type, notes: cue.notes };
     return { id: `cue-${index + 1}`, number: sourceRow.number, time: '', action: sourceRow.name, owner: '', status: sourceRow.type, notes: sourceRow.notes, sourceRow };
   });
   return run;
