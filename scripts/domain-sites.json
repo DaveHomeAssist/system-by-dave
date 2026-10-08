@@ -112,7 +112,7 @@
       ],
       "storage": {
         "registryKeys": true,
-        "revision": 3,
+        "revision": 4,
         "keys": [
           "av-suite-dashboard.v1",
           "av-suite-ui.v1",
@@ -123,7 +123,9 @@
           "system-by-dave.av-workbook.fallback.v1"
         ],
         "prefixes": [
+          "sbd.avLighting.v1.recovery.",
           "sbd.handoff.",
+          "sbd.shop.recovery.",
           "sbd.showboard."
         ],
         "indexedDB": [

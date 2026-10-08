@@ -102,8 +102,9 @@ routes.forEach((route) => {
     }
   } else {
     const expectedHref = route.file.includes('/') ? '../css/av-theme.css' : 'css/av-theme.css';
-    if (!html.includes(`href="${expectedHref}"`)) fail(`${route.file} does not load ${expectedHref}.`);
-    if (html.indexOf(`href="${expectedHref}"`) < html.lastIndexOf('</style>')) {
+    const hrefIndex = html.indexOf(`href="${expectedHref}"`);
+    if (hrefIndex === -1) fail(`${route.file} does not load ${expectedHref}.`);
+    else if (hrefIndex < html.lastIndexOf('</style>')) {
       fail(`${route.file} loads the shared theme before its page-local styles.`);
     }
   }

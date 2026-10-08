@@ -377,7 +377,7 @@ try {
       const original = await context.newPage();
       await original.goto(source + '/index.html');
       assert.deepEqual(await readWorkbook(original), { active: workbookFixture.workbookId, workbook: workbookFixture });
-      assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 3);
+      assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 4);
     });
   }
 
@@ -414,9 +414,15 @@ try {
     // Kept copies of unreadable saves travel and restore with their keys.
     expected['signal-flow.v1.unreadable'] = '{"routes":[{"route":"SF 001"';
     expected['av-suite-dashboard.v1.unreadable'] = '{"showName":"Unreadable show"';
+    expected['sbd.avLighting.v1.recovery.1728300000000.fixture'] = '{"lighting":"Unreadable original"';
+    expected['sbd.shop.recovery.fixture'] = '{"shop":"Unreadable original"';
     await page.goto(source + '/index.html');
-    await page.evaluate(values => Object.entries(values).forEach(([key, value]) => localStorage.setItem(key, value)), expected);
+    await page.evaluate(values => {
+      Object.entries(values).forEach(([key, value]) => localStorage.setItem(key, value));
+      localStorage.setItem('sbd.domainMove.avbydave.v1', JSON.stringify({ state: 'moved', revision: 3, at: '2026-10-07T00:00:00.000Z' }));
+    }, expected);
     await page.goto(source + site.route + '?cutover=registry-keys');
+    await page.getByRole('button', { name: 'Move my data and continue' }).waitFor();
     const downloaded = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download a backup' }).click();
     const backup = await (await downloaded).path();
@@ -424,12 +430,27 @@ try {
     await page.waitForURL(site.origin + site.route + '?cutover=registry-keys');
     const readValues = current => current.evaluate(keys => Object.fromEntries(keys.map(key => [key, localStorage.getItem(key)])), Object.keys(expected));
     assert.deepEqual(await readValues(page), expected);
+    const original = await context.newPage();
+    await original.goto(source + '/index.html');
+    assert.deepEqual(await readValues(original), expected);
+    assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 4);
+    await original.close();
     await page.evaluate(keys => keys.forEach(key => localStorage.removeItem(key)), Object.keys(expected));
     await page.goto(site.origin + '/transfer.html');
     await page.locator('#backupFile').setInputFiles(backup);
     await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
     assert.deepEqual(await readValues(page), expected);
-    assert.equal(avStorageKeys.length, 61);
+    assert.equal(avStorageKeys.length, 69);
+    assert.ok([
+      'sbd.avAudio.v1',
+      'sbd.showControl.v1',
+      'sbd.showOps.document.v1',
+      'sbd.frontOffice.document.v1',
+      'sbd.shop.v1',
+      'sbd.infrastructure.v1',
+      'sbd.avLighting.v1',
+      'avCalculator.fieldSets.v1'
+    ].every(key => avStorageKeys.includes(key)), 'New app plans and Calculator field sets must survive transfer and backup restore');
     assert.ok(avStorageKeys.includes('sbd.avVideo.v1'), 'AV Video must participate in cross-domain backup and restore');
     assert.ok(['sbd.avVideo.draft.v1', 'sbd.avVideo.layout.v1'].every(key => avStorageKeys.includes(key)), 'AV Video drafts and layout travel with its plan');
   });

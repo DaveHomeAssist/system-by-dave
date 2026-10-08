@@ -1,12 +1,19 @@
 # AV Suite consolidation source inventory
 
-Generated from `js/sbd-registry.js` version `v20261007-video-module-management`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
+Generated from `js/sbd-registry.js` version `v20261007-eight-app-integration`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
 
 The feature text and declared keys come from the registry. Export, print, and keyboard columns identify only source-code signals in the route file. “Not found” does not prove absence; “Source signal” does not prove working behavior. Offline means the route is named by the registry manifest, not that every dependency is cached. Each behavior still needs browser and field-parity verification before a legacy route can be retired.
 
 | Tool and feature | Route | Origin | Declared storage and known exceptions | Export | Print | Keyboard | Offline route |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | **AV Video** — Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules. | `/av-video/` | https://avbydave.com | sbd.avVideo.v1, sbd.avVideo.draft.v1, sbd.avVideo.layout.v1 | Source signal | Not found | Not found | Named |
+| **Audio** — Inputs, patch, line checks and speaker zones in one saved Audio plan. | `/av-audio/` | https://avbydave.com | sbd.avAudio.v1 | Source signal | Not found | Not found | Named |
+| **Show Control** — Call logging and reviewed cue-list snapshots; CueForge remains the executable show-control product. | `/show-control/` | https://avbydave.com | sbd.showControl.v1 | Source signal | Not found | Not found | Named |
+| **Show Ops** — Room readiness, crew calls, tasks and show handoff in one saved workspace. | `/show-ops/` | https://avbydave.com | sbd.showOps.document.v1 | Source signal | Not found | Not found | Named |
+| **Front Office** — Clients, venues and jobs from inquiry through signoff, with an independent local document. | `/front-office/` | https://avbydave.com | sbd.frontOffice.document.v1 | Source signal | Not found | Not found | Named |
+| **The Shop** — Gear prep, pack, load in and strike worklist with source-preserving imports. | `/the-shop/` | https://avbydave.com | sbd.shop.v1 | Source signal | Not found | Not found | Named |
+| **Infrastructure** — Power, network and cable records with a shared issue queue. | `/infrastructure/` | https://avbydave.com | sbd.infrastructure.v1 | Source signal | Not found | Not found | Named |
+| **Lighting** — Fixture patch and focus workspace; PlotForge remains the full lighting-plot product. | `/av-lighting/` | https://avbydave.com | sbd.avLighting.v1 | Source signal | Not found | Not found | Named |
 | **Teleprompter** — Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view. | `/teleprompter.html` | https://avbydave.com | teleprompter.v1, teleprompter.script.v1, teleprompter.preferences.v1, teleprompter.savedScripts.v1, teleprompter.savedFormats.v1, teleprompter.pacePresets.v1, teleprompter.bookmarks.v1, teleprompter.customColors.v1 | Source signal | Not found | Source signal | Named |
 | **Show Timer** — Countdown, count up, clock mode, stage view, warning states, and keyboard control. | `/show-timer.html` | https://avbydave.com | showTimer.preferences.v1 | Source signal | Not found | Source signal | Named |
 | **Cue Sheet** — Browser based rundown control with preview, lightweight layered playback, monitor output, capture inputs, print, JSON, and CSV. | `/cue-sheet.html` | https://avbydave.com | cueSheet.v1 | Source signal | Source signal | Source signal | Named |
@@ -48,11 +55,11 @@ The feature text and declared keys come from the registry. Export, print, and ke
 | **Truck Pack Plan** — Cases, truck zones, load order, unload order, weights, owners, pack status, and issues. | `/truck-pack.html` | https://avbydave.com | truck-pack.v1 | Source signal | Source signal | Source signal | Named |
 | **Load In Plan** — Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps. | `/load-in-plan.html` | https://avbydave.com | load-in-plan.v1 | Source signal | Source signal | Source signal | Named |
 | **Strike Plan** — Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues. | `/strike-plan.html` | https://avbydave.com | strike-plan.v1 | Source signal | Source signal | Source signal | Named |
-| **AV Calculator** — Audio delay, projection throw, record storage, power load, voltage drop, and SPL distance with a copyable field summary. | `/av-calculator.html` | https://avbydave.com | avCalculator.v1 | Source signal | Not found | Not found | Named |
+| **AV Calculator** — Audio delay, projection throw, record storage, power load, voltage drop, SPL distance and named field sets. | `/av-calculator.html` | https://avbydave.com | avCalculator.v1, avCalculator.fieldSets.v1 | Source signal | Not found | Not found | Named |
 | **LED Wall Calculator** — Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning. | `/led-wall-calculator.html` | https://avbydave.com | avCalculator.ledProfiles.v1; working state in avCalculator.v1 (declared under av-calculator) | Source signal | Not found | Not found | Named |
 | **OnTrack** — DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes. | `/ontrack.html` | https://avbydave.com | ontrack_v1 | Source signal | Not found | Source signal | Named |
 
-**Count:** 45 registry tools; 61 declared local-storage keys.
+**Count:** 52 registry tools; 69 declared local-storage keys.
 
 ## Unresolved mapping and proof
 

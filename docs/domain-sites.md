@@ -167,10 +167,13 @@ AV by Dave's explicit database list includes `PixelForge` and AV Workbook's
 local-storage keys come from the registry. The transfer is a one-time,
 operator-confirmed copy, not a shared cross-origin show record; an existing
 destination record remains authoritative until the operator reviews it.
-The AV transfer decision is at revision 3. Revision 2 offered browsers that completed or skipped
-the earlier policy the newly inventoried Workbook store on a return visit; revision 3 does the same
-for each key's kept `<key>.unreadable` copy, which `storagePolicy()` adds for every listed key. No source record is deleted; repeated imports keep existing destination
-records.
+The AV transfer decision is at revision 4. Revision 2 offered browsers that
+completed or skipped the earlier policy the newly inventoried Workbook store
+on a return visit; revision 3 does the same for each key's kept
+`<key>.unreadable` copy, which `storagePolicy()` adds for every listed key.
+Revision 4 reoffers the transfer for Lighting and Shop recovery copies kept
+under their dynamic prefixes. No source record is deleted; repeated imports
+keep existing destination records.
 
 - **Move my data and continue**: opens `transfer.html` on the new domain as a
   popup, which announces itself to its opener; the stub sends the data by

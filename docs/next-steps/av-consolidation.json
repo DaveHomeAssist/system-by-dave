@@ -6,7 +6,7 @@
   ],
   "head": "a6241a9a57805992100b6c26df23fcfdcb3db82b",
   "status": "amber",
-  "statusReason": "The shared Rail runtime and AV Video production mount are delivered through #272, #274, #276 and #279. Toolbox-to-AV Video Manage modules #283 is published at a6241a9 and its live navigation and isolated browser behavior pass. Stream/Record, universal app management and physical/operator acceptance remain open.",
+  "statusReason": "The shared Rail runtime and AV Video Manage modules remain the last verified live application state at a6241a9. Eight application candidates are combined in draft PR #293, linked below, with all eight Rail slots still Planned. Route, theme, indexing, domain-staging, viewport and review gates remain open; this draft is not merged, deployed or live-accepted. Stream/Record, universal app management and physical/operator acceptance remain separate open work.",
   "lastActivity": "2026-10-07",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -20,12 +20,12 @@
     "AV Video Manage modules (#283): the Toolbox card opens the guarded Project view; source and AV publication, Walter live navigation/browser checks and four-asset parity passed at a6241a9."
   ],
   "nextStep": {
-    "title": "Decide the Stream and Record credential boundary",
-    "why": "AVV-STREAM-KEY-1 documents current warning-only leakage through legacy storage/exports and AV Video original-payload retention. Approve block-raw or accept the warning-only disclosure risk before dependent implementation.",
-    "doneWhen": "Dave selects Option 1 (block raw keys at every AV Video boundary, recommended) or Option 2 (warning-only) and the answer is recorded before Stream/Record runtime work.",
-    "effort": "S",
-    "owner": "Dave",
-    "blockedBy": "Dave decision AVV-STREAM-KEY-1; independent typed schema and synthetic fixture design may proceed without runtime changes"
+    "title": "Close the eight candidate application release gates",
+    "why": "Draft PR #293 combines owner PRs #285-#292, but app-local navigation, canonical/indexing metadata, shared theme opt-ins, Front Office page-level scrolling and review findings currently block exact-head CI and viewport acceptance. Keep the Rail slots Planned while fixes are reviewed.",
+    "doneWhen": "All eight owner heads are integrated, required CI and review gates pass at the exact integration head, source and AV destination publish successfully, and live browser journeys are verified before any Rail slot becomes available.",
+    "effort": "M",
+    "owner": "Application owners and Rail integration",
+    "blockedBy": "App-owner fixes and review resolution in #285-#292; no new Dave product decision is needed for these release-contract corrections"
   },
   "findings": [
     {
@@ -267,6 +267,10 @@
     "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open."
   ],
   "links": [
+    {
+      "label": "Eight application draft integration #293",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/293"
+    },
     {
       "label": "Stream and Record credential decision",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/av-video-stream-record-credential-decision.md"
