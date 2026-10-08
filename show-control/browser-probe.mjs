@@ -135,15 +135,16 @@ try {
     ] };
     const chooseCueForge = source => page.locator('#cueforge-file').setInputFiles({ name: 'show.cueforge', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(source)) });
     await chooseCueForge({ ...cueForgeSource, cueLists: [cueForgeSource.cueLists[0], { ...cueForgeSource.cueLists[1], id: 'first' }] });
-    assert.match(await page.locator('#message').innerText(), /duplicate cue list ID/);
+    await page.locator('#message').getByText(/duplicate cue list ID/).waitFor();
     assert.equal(await page.locator('#cueforge-preview').isHidden(), true);
     await chooseCueForge({ ...cueForgeSource, cueLists: [{ ...cueForgeSource.cueLists[0], id: ' ' }, cueForgeSource.cueLists[1]] });
-    assert.match(await page.locator('#message').innerText(), /empty ID/);
+    await page.locator('#message').getByText(/empty ID/).waitFor();
     await chooseCueForge({ ...cueForgeSource, cueLists: [{ ...cueForgeSource.cueLists[0], cues: [cueForgeSource.cueLists[0].cues[0], { ...cueForgeSource.cueLists[0].cues[0] }] }, cueForgeSource.cueLists[1]] });
-    assert.match(await page.locator('#message').innerText(), /duplicate cue ID/);
+    await page.locator('#message').getByText(/duplicate cue ID/).waitFor();
     assert.equal(await page.locator('#summary').innerText(), priorRun);
     assert.equal(await page.evaluate(() => localStorage.getItem('sbd.showControl.v1')), priorStored);
     await chooseCueForge(cueForgeSource);
+    await page.locator('#message').getByText(/selected-list preview ready/).waitFor();
     await page.locator('#cueforge-list').selectOption('main');
     assert.match(await page.locator('#cueforge-preview .cueforge-selection').innerText(), /Selected: Main · 1 cues/);
     assert.match(await page.locator('#cueforge-preview .cueforge-cues').innerText(), /Number: 1\.5 · Name: Opening · Type: video · ID: cf-1 · Notes: Standby/);
@@ -155,8 +156,6 @@ try {
     assert.equal(await page.evaluate(() => localStorage.getItem('sbd.showControl.v1')), priorStored);
     assert.match(await page.locator('#message').innerText(), /copy canceled/);
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('#cueforge-file').setInputFiles({ name: 'show.cueforge', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(cueForgeSource)) });
-    await page.locator('#cueforge-list').selectOption('main');
     await page.getByRole('button', { name: 'Copy selected cue list' }).click();
     assert.match(await page.locator('#summary').innerText(), /CueForge reference only/);
     assert.equal(await page.evaluate(() => localStorage.getItem('sbd.showControl.v1')), priorStored);
