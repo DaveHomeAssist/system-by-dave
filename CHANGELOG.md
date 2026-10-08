@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-08 — PlotForge fixture handoff into AV Lighting
+
+- Review a PlotForge interop manifest v1 in AV Lighting and explicitly confirm a one-way fixture copy. Map patch and focus fields, report status downgrades, and retain the complete source manifest in saved Lighting backups for provenance.
+- Reject duplicate IDs, unsupported versions and oversized or malformed files without changing the current plan. Preserve Lighting backup and legacy import behavior, and keep PlotForge storage, output and synchronization outside this handoff.
+- Contain the Handoff work area at short desktop heights and keep the bottom tabs usable on very short phones.
+
 ## 2026-10-07 — Video module controls linked from Toolbox
 
 - Add a Manage modules action to the AV Video Toolbox card that opens the existing Project & modules panel. Opening the route does not change module, Toolbox, Show Console, or Rail storage.

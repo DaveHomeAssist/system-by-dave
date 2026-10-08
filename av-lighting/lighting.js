@@ -5,6 +5,10 @@
   const KEY = 'sbd.avLighting.v1';
   const SCHEMA = 'system-by-dave.av-lighting.v1';
   const LEGACY = 'system-by-dave.lighting-patch.v1';
+  const PLOTFORGE_KIND = 'plotforge-interop-manifest';
+  // A Lighting backup repeats mapped fixture fields alongside its source manifest.
+  const MAX_IMPORT_BYTES = 12_000_000;
+  const MAX_MANIFEST_CHARS = 1_500_000;
   const FIELDS = ['unit','fixture','position','mode','universe','address','channel','dimmer','color','focus','status','notes'];
   const STATUSES = ['planned','hung','addressed','patched','focused','issue','spare'];
   const $ = id => document.getElementById(id);
@@ -13,8 +17,22 @@
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('A fixture record is invalid.');
     const item = {id: typeof raw.id === 'string' && raw.id ? raw.id : crypto.randomUUID()};
     for (const field of FIELDS) item[field] = typeof raw[field] === 'string' ? raw[field].slice(0, field === 'notes' ? 2000 : 500) : '';
+    if (typeof raw.sourceId === 'string' && raw.sourceId) item.sourceId = raw.sourceId.slice(0, 100);
     if (!STATUSES.includes(item.status)) item.status = 'planned';
     return item;
+  };
+  const plotForgeManifest = raw => {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw) || raw.kind !== PLOTFORGE_KIND || raw.schemaVersion !== 1) throw new Error('Use a PlotForge interop manifest version 1.');
+    if (!raw.show || typeof raw.show.name !== 'string' || !Array.isArray(raw.positions) || !Array.isArray(raw.commentPins) || !Array.isArray(raw.fixtures) || !raw.fixtures.length || raw.fixtures.length > 1000) throw new Error('PlotForge manifest must contain 1–1,000 fixtures and its show, positions and comment pins.');
+    if (typeof raw.generatedAt !== 'string' || JSON.stringify(raw).length > MAX_MANIFEST_CHARS) throw new Error('PlotForge manifest is missing provenance or exceeds the import size limit.');
+    const ids = new Set();
+    for (const row of raw.fixtures) {
+      if (!row || typeof row !== 'object' || Array.isArray(row) || typeof row.id !== 'string' || !row.id || row.id.length > 100 || ids.has(row.id)) throw new Error('PlotForge fixture IDs must be unique nonempty strings.');
+      ids.add(row.id);
+      if (row.dmx != null && (typeof row.dmx !== 'object' || Array.isArray(row.dmx))) throw new Error(`PlotForge fixture ${row.id} has an invalid DMX assignment.`);
+      for (const value of [row.dmx?.universe, row.dmx?.address]) if (value != null && (!Number.isInteger(value) || value < 1)) throw new Error(`PlotForge fixture ${row.id} has an invalid DMX assignment.`);
+    }
+    return raw;
   };
   const validate = raw => {
     if (!raw || typeof raw !== 'object' || !Array.isArray(raw.items) || raw.items.length > 1000) throw new Error('Expected a plan with up to 1,000 fixtures.');
@@ -23,7 +41,22 @@
     const items = raw.items.map(fixture);
     for (const item of items) { if (ids.has(item.id)) item.id = crypto.randomUUID(); ids.add(item.id); }
     const source = raw.meta && typeof raw.meta === 'object' ? raw.meta : {};
-    return {schema:SCHEMA,meta:{showName:String(source.showName || 'Untitled lighting plan').slice(0,120),venue:String(source.venue || '').slice(0,120),lead:String(source.lead || '').slice(0,80)},items};
+    const result = {schema:SCHEMA,meta:{showName:String(source.showName || 'Untitled lighting plan').slice(0,120),venue:String(source.venue || '').slice(0,120),lead:String(source.lead || '').slice(0,80)},items};
+    if (raw.plotforgeSource !== undefined) result.plotforgeSource = plotForgeManifest(raw.plotforgeSource);
+    return result;
+  };
+  const fromPlotForge = source => {
+    const manifest = plotForgeManifest(source);
+    let needsWork = 0, unknownStatuses = 0;
+    const items = manifest.fixtures.map(row => {
+      let status = row.status;
+      if (status === 'needs_work') { status = 'issue'; needsWork++; }
+      else if (!STATUSES.includes(status)) { status = 'planned'; unknownStatuses++; }
+      const focus = Number.isFinite(row.focus?.xMm) && Number.isFinite(row.focus?.yMm) ? `x ${row.focus.xMm} mm, y ${row.focus.yMm} mm` : '';
+      return {id:row.id,sourceId:row.id,unit:row.unitNumber == null ? '' : String(row.unitNumber),fixture:row.profileName || '',position:row.positionName || '',mode:row.mode || '',universe:row.dmx?.universe == null ? '' : String(row.dmx.universe),address:row.dmx?.address == null ? '' : String(row.dmx.address),channel:row.channel == null ? '' : String(row.channel),dimmer:row.dimmer || '',color:row.color || '',focus,status,notes:row.notes?.crew || ''};
+    });
+    const plan = validate({schema:SCHEMA,meta:{showName:manifest.show.name,venue:manifest.show.metadata?.venue || '',lead:''},items,plotforgeSource:manifest});
+    return {plan,needsWork,unknownStatuses};
   };
   let plan = blank(), selected = '', dirty = false, preview = null, unreadableRaw = null, storageReadFailed = false;
   try { const saved = localStorage.getItem(KEY); if (saved !== null) { try { plan = validate(JSON.parse(saved)); } catch { unreadableRaw = saved; } } }
@@ -85,9 +118,10 @@
   });
   window.addEventListener('beforeunload',event=>{ if (!dirty) return; event.preventDefault(); event.returnValue=''; });
   for(const field of ['showName','venue','lead']) $(field).addEventListener('input',()=>{plan.meta[field]=$(field).value;changed();});
+  $('plotforgeBtn').addEventListener('click',()=>window.open('../plotforge.html','_blank','noopener,noreferrer'));
   $('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(plan,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='av-lighting-plan.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);message('JSON backup exported.');});
   $('legacyBtn').addEventListener('click',()=>{preview=null;$('confirmImport').hidden=true;try{const original=localStorage.getItem('lighting-patch.v1');if(!original)throw new Error('No saved Lighting Patch was found on this origin.');preview=validate(JSON.parse(original));$('importPreview').textContent=`Saved Lighting Patch: ${preview.items.length} fixtures from ${preview.meta.showName}. Current plan: ${plan.items.length} fixtures. Export a backup before replacement if needed.`;$('confirmImport').hidden=false;}catch(error){$('importPreview').textContent=`Could not review saved Lighting Patch: ${error.message} Current plan is unchanged.`;}});
-  $('importInput').addEventListener('change',async event=>{preview=null;$('confirmImport').hidden=true;const file=event.target.files[0];if(!file)return;try{preview=validate(JSON.parse(await file.text()));$('importPreview').textContent=`Ready to import ${preview.items.length} fixtures from ${preview.meta.showName}. Current plan: ${plan.items.length} fixtures. Export a backup first if needed.`;$('confirmImport').hidden=false;}catch(error){$('importPreview').textContent=`Import rejected: ${error.message} Current plan is unchanged.`;}event.target.value='';});
+  $('importInput').addEventListener('change',async event=>{preview=null;$('confirmImport').hidden=true;const file=event.target.files[0];if(!file)return;try{if(file.size>MAX_IMPORT_BYTES)throw new Error('File exceeds the 12 MB import limit.');const raw=JSON.parse(await file.text());if(raw?.kind===PLOTFORGE_KIND){const result=fromPlotForge(raw);preview=result.plan;$('importPreview').textContent=`PlotForge: ${preview.items.length} fixtures from ${preview.meta.showName}. ${result.needsWork} needs-work statuses map to issue; ${result.unknownStatuses} unknown statuses map to planned. Full source stays in the backup; no sync or footprint, geometry or output control. Current plan: ${plan.items.length}. Export it before replacement.`;}else{preview=validate(raw);$('importPreview').textContent=`Ready to import ${preview.items.length} fixtures from ${preview.meta.showName}. Current plan: ${plan.items.length} fixtures. Export a backup first if needed.`;}$('confirmImport').hidden=false;}catch(error){$('importPreview').textContent=`Import rejected: ${error.message} Current plan is unchanged.`;}event.target.value='';});
   $('confirmImport').addEventListener('click',()=>{if(!preview)return;if(!confirm(`Replace this plan's ${plan.items.length} fixtures with the ${preview.items.length} previewed fixtures?`))return;plan=preview;preview=null;selected='';$('confirmImport').hidden=true;$('importPreview').textContent='Preview imported. Save the plan to keep it after reload.';syncMeta();changed();});
   const setTab=id=>{document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==id);document.querySelectorAll('.tabs button').forEach(el=>el.setAttribute('aria-current',el.dataset.tab===id?'page':'false'));};
   document.querySelectorAll('.tabs button').forEach(button=>button.addEventListener('click',()=>setTab(button.dataset.tab)));

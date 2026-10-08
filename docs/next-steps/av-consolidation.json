@@ -6,7 +6,7 @@
   ],
   "head": "59d41e3c3a52f9c58cd1bf047a7c208a8d26c711",
   "status": "amber",
-  "statusReason": "Eight standalone AV application candidates from #285-#292 are merged through #293 and published at 59d41e3 after release repairs #294-#295. Source and AV destination deployment, isolated live desktop/phone Toolbox journeys, theme checks, Rail behavior and asset parity passed. All eight new Rail console slots remain Planned; physical/operator acceptance, Stream/Record and universal app management remain separate open work.",
+  "statusReason": "Eight standalone AV application candidates from #285-#292 are merged through #293 and published at 59d41e3 after release repairs #294-#295. Source and AV destination deployment, isolated live desktop/phone Toolbox journeys, theme checks, Rail behavior and asset parity passed. All eight new Rail console slots remain Planned. Canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
   "lastActivity": "2026-10-08",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -21,12 +21,12 @@
     "Eight standalone AV application candidates (#285-#293) are published at 59d41e3 after release repairs #294-#295. Walter passed 16 isolated live Toolbox journeys, light/dark checks at phone and desktop widths, Rail and Calculator/Show Control flows; all eight new Rail console slots remain Planned."
   ],
   "nextStep": {
-    "title": "Field-accept the eight standalone applications before Rail promotion",
-    "why": "Automated source, CI, publication and isolated live browser proof is complete, but no physical device or operator show workflow has accepted these applications. The Rail entries must remain Planned until a separate promotion decision.",
-    "doneWhen": "Representative saved-plan, export/reopen, touch and show-handoff journeys are accepted on the intended physical devices by an operator, and Dave explicitly decides which Rail slots, if any, become Available.",
-    "effort": "M",
-    "owner": "Dave and application operators",
-    "blockedBy": "Physical/operator acceptance and an explicit Rail promotion decision; no known source or CI blocker"
+    "title": "Complete canonical specialist handoffs before field acceptance",
+    "why": "The eight published candidates pass their isolated browser jobs, but that does not prove canonical specialist data compatibility or connected application workflows. The Rail entries remain Planned.",
+    "doneWhen": "Each affected app accepts its canonical source through a bounded, provenance-preserving workflow with source, CI, published and live evidence; then operators accept representative saved-plan, export/reopen, touch and show-handoff journeys on intended physical devices before any explicit Rail promotion.",
+    "effort": "L",
+    "owner": "Application owners, then Dave and application operators",
+    "blockedBy": "Remaining per-slice source and live compatibility work; physical/operator acceptance and a later explicit Rail promotion decision"
   },
   "findings": [
     {
@@ -157,6 +157,7 @@
       "goal": "Follow the maintained spec; do not reopen settled app ownership.",
       "items": [
         "Eight standalone application candidates are published and isolated-live tested at 59d41e3; their Rail slots remain Planned pending physical/operator acceptance and explicit promotion.",
+        "AV Lighting accepts a previewed one-way PlotForge interop manifest v1 fixture copy and preserves the full source in its backup; this does not establish full PlotForge parity, synchronization, live output, physical acceptance or Rail promotion.",
         "Cameras/Playback is delivered; Stream/Record remains the next AV Video module slice.",
         "Shared identities, future preference scope, family mergers and automated readiness require their own choice gates.",
         "Revalidate historical safety/mobile findings before a separately scoped fix."
