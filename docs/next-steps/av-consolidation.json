@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "d1cb53881de6e80c205e1cfb0bd00e64349770b3",
+  "head": "675ad91606ef31fc2a4953caf3025b154bd8c3c2",
   "status": "amber",
-  "statusReason": "Eight standalone AV application candidates were published at 59d41e3 after #293-#295. AV Lighting's one-way PlotForge fixture handoff (#297), Show Control's safe CueForge selected-list integrity repair (#299), and Front Office's local Show Advance v1 import (#301) were source-merged, published and isolated-live verified at eca82f8, 8b7751f and d1cb538 respectively. All eight new Rail console slots remain Planned. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
+  "statusReason": "Eight standalone AV application candidates were published at 59d41e3 after #293-#295. AV Lighting's PlotForge handoff (#297), Show Control's CueForge integrity repair (#299), Front Office's Show Advance import (#301), and Show Ops' Room Check v1 one-way copy (#303) were source-merged, published and isolated-live verified through 675ad916. All eight new Rail console slots remain Planned. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
   "lastActivity": "2026-10-08",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -21,7 +21,8 @@
     "Eight standalone AV application candidates (#285-#293) are published at 59d41e3 after release repairs #294-#295. Walter passed 16 isolated live Toolbox journeys, light/dark checks at phone and desktop widths, Rail and Calculator/Show Control flows; all eight new Rail console slots remain Planned.",
     "AV Lighting's previewed PlotForge interop manifest v1 fixture copy (#297) is published at eca82f8. Walter passed isolated live import/save/reload and launch-link checks at 375x812 and 1440x900; three affected assets matched source byte-for-byte.",
     "Show Control's one-way CueForge version 7 selected-list integrity repair (#299) is published at 8b7751f. Duplicate or empty list/cue IDs are rejected; the selected safe cue snapshot and replacement impact are previewed before guarded copy. Walter passed isolated live confirmation/cancel, save/export/restore, secret-field exclusion, theme/contrast and five viewport checks; four Show Control assets matched source byte-for-byte.",
-    "Front Office's local Show Advance v1 import (#301) is published at d1cb538. Walter passed isolated live saved/file preview, cancellation, stale-source protection, explicit client/venue binding, unsaved copy, backup/restart, rejection and five viewport checks; five Front Office runtime assets matched source byte-for-byte."
+    "Front Office's local Show Advance v1 import (#301) is published at d1cb538. Walter passed isolated live saved/file preview, cancellation, stale-source protection, explicit client/venue binding, unsaved copy, backup/restart, rejection and five viewport checks; five Front Office runtime assets matched source byte-for-byte.",
+    "Show Ops' selected Room Check v1 one-way copy (#303) is published at 675ad916. Walter passed model, saved/file browser and isolated live synthetic copy checks; all copied statuses begin Needs check, exact source JSON survives Save/backup/reopen, and five published assets matched source byte-for-byte."
   ],
   "nextStep": {
     "title": "Complete canonical specialist handoffs before field acceptance",
@@ -162,6 +163,7 @@
         "Eight standalone application candidates are published and isolated-live tested at 59d41e3; their Rail slots remain Planned pending physical/operator acceptance and explicit promotion.",
         "AV Lighting's previewed one-way PlotForge interop manifest v1 fixture copy and full-source backup are published at eca82f8; this does not establish full PlotForge parity, synchronization, live output, physical acceptance or Rail promotion.",
         "Show Control's guarded one-way CueForge version 7 selected-list snapshot is published at 8b7751f; the native file, secrets, patch, media paths and output control remain outside the browser copy. This is not full CueForge parity, synchronization, physical acceptance or Rail promotion.",
+        "Show Ops' selected Room Check v1 copy is published at 675ad916, with original source retained and target rows requiring a fresh readiness check. This is not synchronization, physical acceptance, Show Board parity or Rail promotion.",
         "Cameras/Playback is delivered; Stream/Record remains the next AV Video module slice.",
         "Shared identities, future preference scope, family mergers and automated readiness require their own choice gates.",
         "Revalidate historical safety/mobile findings before a separately scoped fix."
@@ -260,6 +262,7 @@
   "verify": [
     "git diff --check",
     "npm run verify:av",
+    "node --test show-ops/model.test.mjs",
     "npm run test:av-offline-transition",
     "AV_VIDEO_BASE=https://avbydave.com node scripts/probe_av_video_rail.mjs --no-sandbox",
     "VIEWPORT_BASE=https://avbydave.com/ node scripts/probe_calculator_viewport.cjs",
@@ -271,9 +274,22 @@
     "The 20 viewport routes preserve independent stores and specialist semantics; layout delivery does not prove application/document consolidation.",
     "Earlier audit details and unchanged private evidence remain in the updater backup. Superseded counts and revalidation notes are preserved by finding ID.",
     "Unanswered historical questions remain Open; recommendations are not approvals.",
-    "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open."
+    "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open.",
+    "Room Check v1 checks can be copied selectively into Show Ops as unsaved Needs check rows with exact source provenance; this does not synchronize the tools or promote the Planned Rail slot."
   ],
   "links": [
+    {
+      "label": "Show Ops Room Check v1 copy #303",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/303"
+    },
+    {
+      "label": "Show Ops Room Check source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37857071044"
+    },
+    {
+      "label": "Show Ops Room Check AV destination deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37859264058"
+    },
     {
       "label": "Show Control CueForge integrity #299",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/299"
@@ -360,7 +376,7 @@
     }
   ],
   "kickoffPrompt": "Continue the maintained AV consolidation stages from fresh remote main. Stage 1, the AV Video application Rail and its isolated returning-client offline transition are delivered; do not repeat them. Preserve focused app ownership, typed Rail identities, device-local preferences, explicit imports and reversible modules. Prepare Stream/Record after its credential-handling decision; verify exact-head CI, publication and live behavior, and keep physical acceptance separate.",
-  "confidence": "High for the cited Rail and console releases, PlotForge-to-Lighting and CueForge-to-Show-Control import slices, exact affected-asset parity, scoped automated live checks and isolated returning-client offline transition; broader canonical app parity, physical acceptance and historical follow-ups remain open.",
+  "confidence": "High for the cited Rail and console releases, PlotForge-to-Lighting, CueForge-to-Show-Control and Room-Check-to-Show-Ops slices, exact affected-asset parity, scoped automated live checks and isolated returning-client offline transition; broader canonical app parity, physical acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
@@ -542,6 +558,29 @@
         "An initial Walter checkout with core.autocrlf=true reported three stale generated files under verify:av; an independent LF checkout passed the complete gate. This was checkout normalization, not a source defect.",
         "No physical device, operator rehearsal, CueForge native execution, output hardware or cross-tool synchronization was accepted.",
         "The other canonical specialist handoffs and all eight Planned Rail slots remain separate open work."
+      ]
+    },
+    "showOpsRoomCheckRelease": {
+      "checkedOn": "2026-10-08",
+      "sourceRevision": "675ad91606ef31fc2a4953caf3025b154bd8c3c2",
+      "status": "Published; isolated live browser copy passed; physical/operator acceptance open",
+      "scope": "One-way selected Room Check v1 saved/file copy into unsaved Show Ops room rows with strict show/date binding, source-byte provenance and all target statuses reset to Needs check; no source mutation, synchronization, Show Board parity or Rail promotion",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/303",
+      "head": "4e78aa3261b78b5fdcf5bd7af6ff1278a2f7915b",
+      "merge": "675ad91606ef31fc2a4953caf3025b154bd8c3c2",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37857071044",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37859264058",
+      "destinationCommit": "645f10f39124811dba6706bc62e4614b81c1084f",
+      "publishedSource": "https://avbydave.com/source.json",
+      "liveProbeRunner": "Walter",
+      "runtime": [
+        "All six exact-head PR checks passed. Walter's LF checkout passed eight model tests, saved/file browser acceptance, verify:av, verify:throwline and verify:domain-sites. A review finding about duplicate source history was fixed and covered by 25 repeated partial copies.",
+        "Source Pages and AV destination deployments succeeded. Live source.json named 675ad916; Show Ops HTML, app, model and CSS plus the registry matched that merge byte-for-byte.",
+        "Walter's isolated Edge live probe passed synthetic saved Room Check preview, selected unsaved copy, explicit Save/reload, source-key preservation and original status/provenance checks at 375x812 and 1440x900."
+      ],
+      "limits": [
+        "The private Next Steps Board file was absent at its registered Downloads path; this public-safe project record does not establish private board synchronization.",
+        "No physical device, operator rehearsal, Room Check producer-side routed handoff, cross-tool synchronization, Show Board parity or Rail promotion was accepted. The other specialist handoffs remain separate open work."
       ]
     },
     "frontOfficeShowAdvanceRelease": {
