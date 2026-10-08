@@ -2,7 +2,7 @@
 // Render the AV tool navigation beside the show dock at representative widths.
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
-import { dirname, extname, join, resolve } from 'node:path';
+import { dirname, extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
@@ -19,7 +19,7 @@ const MIME = {
 };
 const server = createServer(async (request, response) => {
   let file = resolve(ROOT, '.' + decodeURIComponent(new URL(request.url, 'http://probe').pathname));
-  if (!file.startsWith(ROOT + '/')) return response.writeHead(403).end();
+  if (!file.startsWith(ROOT + sep)) return response.writeHead(403).end();
   try {
     if ((await stat(file)).isDirectory()) file = join(file, 'index.html');
     const body = await readFile(file);
