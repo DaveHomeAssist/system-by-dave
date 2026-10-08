@@ -2,7 +2,7 @@
 // Render the AV tool navigation beside the show dock at representative widths.
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
-import { dirname, extname, join, resolve } from 'node:path';
+import { dirname, extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
@@ -19,7 +19,7 @@ const MIME = {
 };
 const server = createServer(async (request, response) => {
   let file = resolve(ROOT, '.' + decodeURIComponent(new URL(request.url, 'http://probe').pathname));
-  if (!file.startsWith(ROOT + '/')) return response.writeHead(403).end();
+  if (!file.startsWith(ROOT + sep)) return response.writeHead(403).end();
   try {
     if ((await stat(file)).isDirectory()) file = join(file, 'index.html');
     const body = await readFile(file);
@@ -59,7 +59,16 @@ try {
   }
 
   async function checkLayout(page, label) {
-    await page.waitForTimeout(100);
+    // Dock insertion and ResizeObserver positioning can settle on later frames.
+    // Wait for separation, then apply the full geometry and hit-target checks.
+    await page.waitForFunction(() => {
+      const nav = document.querySelector('.sbd-nav');
+      const dock = document.querySelector('[data-sbd-suite-dock]');
+      if (!nav || !dock) return false;
+      const a = nav.getBoundingClientRect();
+      const b = dock.getBoundingClientRect();
+      return a.right <= b.left || a.left >= b.right || a.bottom <= b.top - 8 || a.top >= b.bottom + 8;
+    }, null, { timeout: 2000 }).catch(() => {});
     const result = await page.evaluate(() => {
       const nav = document.querySelector('.sbd-nav');
       const dock = document.querySelector('[data-sbd-suite-dock]');
