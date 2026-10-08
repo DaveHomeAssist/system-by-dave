@@ -4,10 +4,10 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "a6241a9a57805992100b6c26df23fcfdcb3db82b",
+  "head": "59d41e3c3a52f9c58cd1bf047a7c208a8d26c711",
   "status": "amber",
-  "statusReason": "The shared Rail runtime and AV Video Manage modules remain the last verified live application state at a6241a9. Eight application candidates are combined in draft PR #293, linked below, with all eight Rail slots still Planned. Route, theme, indexing, domain-staging, viewport and review gates remain open; this draft is not merged, deployed or live-accepted. Stream/Record, universal app management and physical/operator acceptance remain separate open work.",
-  "lastActivity": "2026-10-07",
+  "statusReason": "Eight standalone AV application candidates from #285-#292 are merged through #293 and published at 59d41e3 after release repairs #294-#295. Source and AV destination deployment, isolated live desktop/phone Toolbox journeys, theme checks, Rail behavior and asset parity passed. All eight new Rail console slots remain Planned; physical/operator acceptance, Stream/Record and universal app management remain separate open work.",
+  "lastActivity": "2026-10-08",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -17,15 +17,16 @@
     "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe.",
     "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter.",
     "Application Rail (#272, #274, #276, #279): shared runtime/dialogs and typed Toolbox commands are mounted around AV Video with nine RAIL-1B slots, eight Planned entries, RAIL-2A breakpoints, device-local customization and offline support. Source/destination publication, Walter live acceptance, seven-asset parity and the returning-client cache transition from published adf1f1e to reviewed 55bec1a passed.",
-    "AV Video Manage modules (#283): the Toolbox card opens the guarded Project view; source and AV publication, Walter live navigation/browser checks and four-asset parity passed at a6241a9."
+    "AV Video Manage modules (#283): the Toolbox card opens the guarded Project view; source and AV publication, Walter live navigation/browser checks and four-asset parity passed at a6241a9.",
+    "Eight standalone AV application candidates (#285-#293) are published at 59d41e3 after release repairs #294-#295. Walter passed 16 isolated live Toolbox journeys, light/dark checks at phone and desktop widths, Rail and Calculator/Show Control flows; all eight new Rail console slots remain Planned."
   ],
   "nextStep": {
-    "title": "Close the eight candidate application release gates",
-    "why": "Draft PR #293 combines owner PRs #285-#292, but app-local navigation, canonical/indexing metadata, shared theme opt-ins, Front Office page-level scrolling and review findings currently block exact-head CI and viewport acceptance. Keep the Rail slots Planned while fixes are reviewed.",
-    "doneWhen": "All eight owner heads are integrated, required CI and review gates pass at the exact integration head, source and AV destination publish successfully, and live browser journeys are verified before any Rail slot becomes available.",
+    "title": "Field-accept the eight standalone applications before Rail promotion",
+    "why": "Automated source, CI, publication and isolated live browser proof is complete, but no physical device or operator show workflow has accepted these applications. The Rail entries must remain Planned until a separate promotion decision.",
+    "doneWhen": "Representative saved-plan, export/reopen, touch and show-handoff journeys are accepted on the intended physical devices by an operator, and Dave explicitly decides which Rail slots, if any, become Available.",
     "effort": "M",
-    "owner": "Application owners and Rail integration",
-    "blockedBy": "App-owner fixes and review resolution in #285-#292; no new Dave product decision is needed for these release-contract corrections"
+    "owner": "Dave and application operators",
+    "blockedBy": "Physical/operator acceptance and an explicit Rail promotion decision; no known source or CI blocker"
   },
   "findings": [
     {
@@ -152,9 +153,10 @@
       "gate": "Release proof is recorded; physical/operator acceptance remains separate."
     },
     {
-      "name": "Remaining application consolidation \u2014 Planned",
+      "name": "Remaining application consolidation \u2014 In progress",
       "goal": "Follow the maintained spec; do not reopen settled app ownership.",
       "items": [
+        "Eight standalone application candidates are published and isolated-live tested at 59d41e3; their Rail slots remain Planned pending physical/operator acceptance and explicit promotion.",
         "Cameras/Playback is delivered; Stream/Record remains the next AV Video module slice.",
         "Shared identities, future preference scope, family mergers and automated readiness require their own choice gates.",
         "Revalidate historical safety/mobile findings before a separately scoped fix."
@@ -268,8 +270,16 @@
   ],
   "links": [
     {
-      "label": "Eight application draft integration #293",
+      "label": "Eight application published integration #293",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/293"
+    },
+    {
+      "label": "Eight application source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37731066055"
+    },
+    {
+      "label": "Eight application AV destination deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37733064303"
     },
     {
       "label": "Stream and Record credential decision",
@@ -420,6 +430,35 @@
       "offlineTransition": "Walter isolated Chromium PASS from published 642a47e/old Rail cache to a6241a9/new module-management cache; saved AV Video data and Rail preferences survived, old cache removed, updated app reopened offline.",
       "limits": [
         "Physical devices, Dave's browser profile and operator acceptance remain untested."
+      ]
+    },
+    "applicationIntegrationRelease": {
+      "checkedOn": "2026-10-08",
+      "sourceRevision": "59d41e3c3a52f9c58cd1bf047a7c208a8d26c711",
+      "status": "Published; isolated live browser acceptance passed; eight Rail slots remain Planned",
+      "scope": "Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and Calculator as standalone AV applications; no universal app management or physical/operator acceptance claim.",
+      "ownerPulls": "#285-#292",
+      "integrationPull": "https://github.com/DaveHomeAssist/system-by-dave/pull/293",
+      "integrationMerge": "6c8e973d10b68a0bd74ecb92c8c7b9a6c673f82a",
+      "releaseRepairs": [
+        "https://github.com/DaveHomeAssist/system-by-dave/pull/294",
+        "https://github.com/DaveHomeAssist/system-by-dave/pull/295"
+      ],
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37731066055",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37733064303",
+      "destinationCommit": "6c274513c1c068652c951d9981f825b359dbab30",
+      "publishedSource": "https://avbydave.com/source.json",
+      "liveProbeRunner": "Walter",
+      "runtime": [
+        "All nine exact-head integration CI jobs passed at 8224663; Walter's focused recovery-copy transfer and prior-decision Workbook scenarios passed. The main release workflow passed domain cutover, AV/browser contracts, generated-file verification and all publish steps.",
+        "Live source.json named 59d41e3 and 222 staged AV files. Ten AV entry/registry/assets and four source-site files matched origin/main byte-for-byte.",
+        "Walter's isolated Chrome contexts passed 16 Toolbox click-through journeys at 1440x900 and 375x812 with no page errors or horizontal overflow; desktop and phone screenshots were retained privately.",
+        "All eight applications passed light/dark theme, contrast and overflow probes at 390px and 1440px. The live Rail probe passed nine slots, Planned status, 11 viewport fixtures, customization and preservation. Calculator field-set and Show Control save/recovery journeys passed."
+      ],
+      "limits": [
+        "Isolated browser contexts and screenshots are not physical phone/tablet, keyboard, operator rehearsal or field acceptance.",
+        "The eight standalone apps do not make their Rail console slots Available or establish cross-tool document synchronization.",
+        "Stream/Record, universal app management, canonical specialist integrations and unanswered decisions remain separate."
       ]
     },
     "credentialDecision": {
