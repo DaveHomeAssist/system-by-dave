@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-08 — Room Check v1 one-way copy into Show Ops
+
+- Review saved or exported Room Check v1 checks inside Show Ops, select individual checks, and copy them as unsaved rooms bound to the same show and date. Every copied row starts at Needs check; no Room Check readiness is promoted.
+- Preserve exact source JSON and per-check provenance through Show Ops save, export, and restore without writing Room Check storage. Reject malformed, oversized, duplicate, mismatched, or stale copy attempts.
+- Cover cancellation, storage failure, concurrent-tab protection, source-byte recovery, and responsive browser previews; advance the AV offline cache generation.
+
 ## 2026-10-08 — Front Office Show Advance one-way copy
 
 - Preview a saved or exported Show Advance v1 in Front Office, explicitly bind client and venue identities, and copy one unsaved Advance-stage job without changing the source tool.
