@@ -59,7 +59,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261008-front-office-show-advance');
+      assert.equal(name, 'sbd-av-suite-v20261008-show-ops-room-check');
       return cache;
     } },
     fetch: async () => new Response('ok'),
