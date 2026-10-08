@@ -205,10 +205,12 @@ try {
     await page.keyboard.press('ArrowDown');
     await page.waitForFunction(() => document.querySelector('#cueforge-preview .cueforge-cues').scrollTop > 0, null, { timeout: 1500 });
     const layout = await page.evaluate(() => {
-      const root = document.documentElement, list = document.querySelector('#cueforge-preview .cueforge-cues');
-      return { width: root.scrollWidth <= root.clientWidth, height: root.scrollHeight <= root.clientHeight, listScrolls: list.scrollHeight > list.clientHeight, listAtEnd: list.scrollTop > 0 };
+      const root = document.documentElement, list = document.querySelector('#cueforge-preview .cueforge-cues'), select = document.querySelector('#cueforge-list'), style = getComputedStyle(select);
+      return { width: root.scrollWidth <= root.clientWidth, height: root.scrollHeight <= root.clientHeight, listScrolls: list.scrollHeight > list.clientHeight, listAtEnd: list.scrollTop > 0, setupHeight: document.querySelector('#setup').getBoundingClientRect().height, selectColor: style.color, selectBackground: style.backgroundColor };
     });
-    assert.deepEqual(layout, { width: true, height: true, listScrolls: true, listAtEnd: true }, `CueForge preview layout at ${viewport.width}×${viewport.height}`);
+    assert.deepEqual({ width: layout.width, height: layout.height, listScrolls: layout.listScrolls, listAtEnd: layout.listAtEnd }, { width: true, height: true, listScrolls: true, listAtEnd: true }, `CueForge preview layout at ${viewport.width}×${viewport.height}`);
+    assert.ok(layout.setupHeight >= 60, `Setup panel collapsed at ${viewport.width}×${viewport.height}: ${layout.setupHeight}px`);
+    assert.ok(contrast(cssHex(layout.selectColor), cssHex(layout.selectBackground)) >= 4.5, `CueForge list select contrast at ${viewport.width}×${viewport.height}: ${JSON.stringify(layout)}`);
     await page.screenshot({ path: path.join(screenshotDir, `show-control-cueforge-preview-${viewport.width}.png`) });
     await context.close();
   }
