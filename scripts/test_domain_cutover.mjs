@@ -429,7 +429,17 @@ try {
     await page.locator('#backupFile').setInputFiles(backup);
     await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
     assert.deepEqual(await readValues(page), expected);
-    assert.equal(avStorageKeys.length, 61);
+    assert.equal(avStorageKeys.length, 69);
+    assert.ok([
+      'sbd.avAudio.v1',
+      'sbd.showControl.v1',
+      'sbd.showOps.document.v1',
+      'sbd.frontOffice.document.v1',
+      'sbd.shop.v1',
+      'sbd.infrastructure.v1',
+      'sbd.avLighting.v1',
+      'avCalculator.fieldSets.v1'
+    ].every(key => avStorageKeys.includes(key)), 'New app plans and Calculator field sets must survive transfer and backup restore');
     assert.ok(avStorageKeys.includes('sbd.avVideo.v1'), 'AV Video must participate in cross-domain backup and restore');
     assert.ok(['sbd.avVideo.draft.v1', 'sbd.avVideo.layout.v1'].every(key => avStorageKeys.includes(key)), 'AV Video drafts and layout travel with its plan');
   });
