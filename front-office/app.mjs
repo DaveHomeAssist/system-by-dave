@@ -72,6 +72,7 @@ function previewAdvance(raw, sourceKind, trigger) {
   $('import-preview').hidden = true;
   const meta = candidate.meta;
   $('advance-summary').textContent = `${meta.showName || 'Unnamed show'} · ${meta.showDate || 'No date'} · ${candidate.items.length} requests. Choose the Front Office identities below. Copying creates one unsaved Advance-stage job.`;
+  $('advance-identities').textContent = `Source client: ${meta.client || 'Not provided'} · Source venue: ${meta.venue || 'Not provided'}. These names remain visible while you choose existing or new records.`;
   const statuses = $('advance-statuses');
   statuses.replaceChildren(...Object.entries(candidate.statusCounts).map(([name, count]) => node('li', `${name.slice(0, 80)}: ${count}`)));
   for (const [kind, rows] of [['client', doc.clients], ['venue', doc.venues]]) {

@@ -18,9 +18,10 @@ The application owns `sbd.frontOffice.document.v1` only. A versioned document st
 
 The app is a standalone static route so the Rail owner can integrate `front-office/index.html` without shared-file conflicts. Its link targets are canonical registry routes. Acceptance requires durable save/reload, invalid-import recovery without loss of originals, inert failed boot and recoverable record-limit validation, keyboard use and responsive 390px and desktop presentation. Browser, deployment, and human acceptance are separate evidence lanes.
 
-## Show Advance one-way handoff
+## Show Advance local one-way import
 
 Front Office may review either the current same-origin `show-advance.v1` saved document or a user-selected `system-by-dave.show-advance.v1` JSON export. This is an explicit copy into one new Front Office job, not synchronization or a change to Show Advance. The existing Front Office backup-replacement import remains separate.
+This local-source import is not a suite navigation handoff: Show Advance stages no `sbd.handoff.v1` envelope or active-suite context. A future routed handoff requires its own producer-side scope and confirmation contract.
 
 Preview the source show, client, venue, date, request count and status distribution. Advance requests are retained in the original source snapshot, not reclassified as Front Office updates or readiness. The operator must choose an existing client/venue or explicitly create each one, and may edit the new job name. No client/venue match or job status is inferred from names, requests or launch context. The new job starts at `Advance` with no inferred next action. Its backup carries the exact validated source JSON and import time; the UI identifies that private source data travels with the Front Office backup. An exact repeat source is rejected, while a changed source with a similar show name is disclosed as a separate copy, never merged into an existing job.
 

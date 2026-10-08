@@ -4,6 +4,9 @@ export const ADVANCE_SCHEMA = 'system-by-dave.show-advance.v1';
 export const STAGES = ['Inquiry', 'Advance', 'Confirmed', 'Show', 'Closeout', 'Complete'];
 export const emptyDocument = () => ({ version: 1, clients: [], venues: [], jobs: [] });
 const advanceStatuses = ['needed', 'requested', 'received', 'confirmed', 'issue', 'deferred'];
+const advanceSections = ['contacts', 'venue', 'schedule', 'power', 'network', 'audio', 'video', 'labor', 'deliverables', 'risk', 'other'];
+const advancePriorities = ['high', 'medium', 'low'];
+const advanceFields = ['id', 'section', 'ask', 'owner', 'due', 'priority', 'status', 'details', 'notes'];
 const maxAdvanceBytes = 1_000_000;
 const maxBackupBytes = 2_000_000;
 const text = value => typeof value === 'string' && value.trim().length > 0 && value.length <= 500;
@@ -23,7 +26,7 @@ export function parseShowAdvance(raw) {
   if (!['showName', 'client', 'venue', 'showDate'].every(key => typeof value.meta[key] === 'string') || Object.values(value.meta).some(field => typeof field !== 'string')) throw new Error('Invalid Show Advance metadata.');
   const ids = new Set();
   for (const row of value.items) {
-    if (!row || typeof row !== 'object' || Array.isArray(row) || typeof row.id !== 'string' || !row.id.trim() || row.id !== row.id.trim() || row.id.length > 500 || ids.has(row.id) || Object.values(row).some(field => typeof field !== 'string')) throw new Error('Invalid or duplicate Show Advance request ID or field.');
+    if (!row || typeof row !== 'object' || Array.isArray(row) || !advanceFields.every(key => typeof row[key] === 'string') || !row.id.trim() || row.id !== row.id.trim() || row.id.length > 500 || ids.has(row.id) || !advanceSections.includes(row.section) || !advancePriorities.includes(row.priority) || !row.status.trim() || Object.values(row).some(field => typeof field !== 'string')) throw new Error('Invalid or duplicate Show Advance request ID or field.');
     ids.add(row.id);
   }
   const statusCounts = Object.create(null);

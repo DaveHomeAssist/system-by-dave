@@ -22,9 +22,12 @@ test('Show Advance import rejects ambiguous, malformed and overlarge source with
   const original = emptyDocument();
   assert.throws(() => parseShowAdvance('{broken'), /could not be read/);
   assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), schema: 'future' })), /Unsupported/);
-  assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: [{ id: 'same' }, { id: 'same' }] })), /duplicate/);
-  assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: [{ id: '  ' }] })), /Invalid/);
-  assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: [{ id: 'ask-1', notes: { nested: true } }] })), /Invalid/);
+  assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: [{ ...advance().items[0], id: 'same' }, { ...advance().items[0], id: 'same' }] })), /duplicate/);
+  assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: [{ ...advance().items[0], id: '  ' }] })), /Invalid/);
+  assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: [{ id: 'ask-1' }] })), /Invalid/);
+  assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: [{ ...advance().items[0], section: 'unknown' }] })), /Invalid/);
+  assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: [{ ...advance().items[0], priority: 'critical' }] })), /Invalid/);
+  assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: [{ ...advance().items[0], notes: { nested: true } }] })), /Invalid/);
   assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), items: Array.from({ length: 301 }, (_, index) => ({ id: `ask-${index}` })) })), /Unsupported/);
   assert.throws(() => parseShowAdvance(JSON.stringify({ ...advance(), extra: 'x'.repeat(1_000_000) })), /larger than 1 MB/);
   assert.deepEqual(original, emptyDocument());

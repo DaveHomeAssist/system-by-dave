@@ -64,6 +64,7 @@ li p { margin: .15rem 0; white-space: pre-wrap; }
 .advance-entry { margin: .6rem 0 .9rem; padding: .75rem; border: 1px solid var(--line); border-radius: 9px; background: var(--raised); }
 .advance-entry h3, .advance-entry p { margin: 0 0 .45rem; }
 .advance-entry p, #advance-preview p { color: var(--muted); font-size: .86rem; }
+#advance-identities { overflow-wrap: anywhere; }
 .advance-actions { display: flex; flex-wrap: wrap; gap: .45rem; }
 .advance-warning { color: var(--av-warning) !important; }
 .job-form { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; padding-bottom: .8rem; border-bottom: 1px solid var(--line); }

@@ -64,6 +64,7 @@ const waitForStatus = (page, phrase) => page.waitForFunction(expected => documen
     await page.locator('#advance-client-choice').selectOption('client-1');
     await page.locator('#advance-venue-choice').selectOption('venue-1');
     assert.equal(await page.locator('#advance-client-name-label').isHidden(), true);
+    assert.match(await page.locator('#advance-identities').innerText(), /Source client: Synthetic client.*Source venue: Synthetic venue/);
     await page.locator('#advance-job-name').fill('Synthetic show');
     await page.locator('#confirm-advance').click();
     assert.equal(await page.locator('.job').count(), 2);
@@ -97,6 +98,9 @@ const waitForStatus = (page, phrase) => page.waitForFunction(expected => documen
     await page.locator('#advance-file').setInputFiles(fileInput('ambiguous.json', JSON.stringify({ ...source, items: [source.items[0], source.items[0]] })));
     await waitForStatus(page, 'duplicate Show Advance');
     assert.match(await page.locator('#status').innerText(), /duplicate Show Advance/);
+    await page.locator('#advance-file').setInputFiles(fileInput('incomplete.json', JSON.stringify({ ...source, items: [{ id: 'request-1' }] })));
+    await waitForStatus(page, 'Invalid or duplicate Show Advance request');
+    assert.equal(await page.locator('#advance-preview').isHidden(), true);
     assert.equal(await page.evaluate(key => localStorage.getItem(key), frontKey), JSON.stringify(saved));
 
     const changedRaw = JSON.stringify({ ...source, items: [{ ...source.items[0], status: 'confirmed' }], exportedAt: '2026-10-08T16:00:00Z' });
