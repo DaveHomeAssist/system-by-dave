@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "8b7751fba47988f0cff4e02ad878d22d2ba25ef9",
+  "head": "d1cb53881de6e80c205e1cfb0bd00e64349770b3",
   "status": "amber",
-  "statusReason": "Eight standalone AV application candidates were published at 59d41e3 after #293-#295. AV Lighting's one-way PlotForge fixture handoff (#297) and Show Control's safe CueForge selected-list integrity repair (#299) were source-merged, published and isolated-live verified at eca82f8 and 8b7751f respectively. All eight new Rail console slots remain Planned. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
+  "statusReason": "Eight standalone AV application candidates were published at 59d41e3 after #293-#295. AV Lighting's one-way PlotForge fixture handoff (#297), Show Control's safe CueForge selected-list integrity repair (#299), and Front Office's local Show Advance v1 import (#301) were source-merged, published and isolated-live verified at eca82f8, 8b7751f and d1cb538 respectively. All eight new Rail console slots remain Planned. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
   "lastActivity": "2026-10-08",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -20,7 +20,8 @@
     "AV Video Manage modules (#283): the Toolbox card opens the guarded Project view; source and AV publication, Walter live navigation/browser checks and four-asset parity passed at a6241a9.",
     "Eight standalone AV application candidates (#285-#293) are published at 59d41e3 after release repairs #294-#295. Walter passed 16 isolated live Toolbox journeys, light/dark checks at phone and desktop widths, Rail and Calculator/Show Control flows; all eight new Rail console slots remain Planned.",
     "AV Lighting's previewed PlotForge interop manifest v1 fixture copy (#297) is published at eca82f8. Walter passed isolated live import/save/reload and launch-link checks at 375x812 and 1440x900; three affected assets matched source byte-for-byte.",
-    "Show Control's one-way CueForge version 7 selected-list integrity repair (#299) is published at 8b7751f. Duplicate or empty list/cue IDs are rejected; the selected safe cue snapshot and replacement impact are previewed before guarded copy. Walter passed isolated live confirmation/cancel, save/export/restore, secret-field exclusion, theme/contrast and five viewport checks; four Show Control assets matched source byte-for-byte."
+    "Show Control's one-way CueForge version 7 selected-list integrity repair (#299) is published at 8b7751f. Duplicate or empty list/cue IDs are rejected; the selected safe cue snapshot and replacement impact are previewed before guarded copy. Walter passed isolated live confirmation/cancel, save/export/restore, secret-field exclusion, theme/contrast and five viewport checks; four Show Control assets matched source byte-for-byte.",
+    "Front Office's local Show Advance v1 import (#301) is published at d1cb538. Walter passed isolated live saved/file preview, cancellation, stale-source protection, explicit client/venue binding, unsaved copy, backup/restart, rejection and five viewport checks; five Front Office runtime assets matched source byte-for-byte."
   ],
   "nextStep": {
     "title": "Complete canonical specialist handoffs before field acceptance",
@@ -541,6 +542,30 @@
         "An initial Walter checkout with core.autocrlf=true reported three stale generated files under verify:av; an independent LF checkout passed the complete gate. This was checkout normalization, not a source defect.",
         "No physical device, operator rehearsal, CueForge native execution, output hardware or cross-tool synchronization was accepted.",
         "The other canonical specialist handoffs and all eight Planned Rail slots remain separate open work."
+      ]
+    },
+    "frontOfficeShowAdvanceRelease": {
+      "checkedOn": "2026-10-08",
+      "sourceRevision": "d1cb53881de6e80c205e1cfb0bd00e64349770b3",
+      "status": "Published; isolated live browser import passed; physical/operator acceptance open",
+      "scope": "One-way local/file Show Advance v1 copy into a new unsaved Front Office Advance-stage job with exact source provenance, preview and explicit client/venue binding; no producer-side routed handoff, source mutation, synchronization or Rail promotion",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/301",
+      "head": "d36c95191fc961787ffde44bae0be2d2bb811064",
+      "merge": "d1cb53881de6e80c205e1cfb0bd00e64349770b3",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37846309989",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37850031246",
+      "destinationCommit": "0c4e1707a7b3d51797ade0444552f4ef45db5fd7",
+      "publishedSource": "https://avbydave.com/source.json",
+      "liveProbeRunner": "Walter",
+      "runtime": [
+        "All six exact-head PR checks passed. The source Pages workflow succeeded on retry and published the exact merge revision to the AV destination; destination Pages workflow succeeded and live source.json named d1cb538.",
+        "Walter's isolated Chromium/Edge live probe passed synthetic saved/file preview, cancellation, stale source/document, explicit binding, unsaved copy, backup/restart, rejection and five viewport checks.",
+        "Published Front Office HTML, app, model, CSS and theme initialization matched the merge byte-for-byte."
+      ],
+      "limits": [
+        "The initial source deployment run failed at the Pages artifact metadata service and its same-run retry encountered a duplicate artifact; a clean workflow dispatch then passed on attempt 2 after an intermittent unrelated LED bounded-workspace assertion on attempt 1.",
+        "The existing private Next Steps Board file was unavailable at its canonical Downloads path, so board projection was not synchronized.",
+        "No physical device, operator rehearsal, Show Advance producer-side routed handoff, cross-tool synchronization or source mutation was accepted. The other specialist handoffs and all eight Planned Rail slots remain separate open work."
       ]
     },
     "credentialDecision": {
