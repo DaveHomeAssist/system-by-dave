@@ -202,12 +202,14 @@ try {
     await page.locator('#cueforge-file').setInputFiles({ name: 'long.cueforge', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(source)) });
     const list = page.locator('#cueforge-preview .cueforge-cues');
     await list.focus();
-    await page.keyboard.press('End');
+    assert.equal(await page.evaluate(() => document.activeElement?.classList.contains('cueforge-cues')), true, `Cue list focus at ${viewport.width}×${viewport.height}`);
+    await page.keyboard.press('ArrowDown');
+    await page.waitForFunction(() => document.querySelector('#cueforge-preview .cueforge-cues').scrollTop > 0, null, { timeout: 1500 });
     const layout = await page.evaluate(() => {
       const root = document.documentElement, list = document.querySelector('#cueforge-preview .cueforge-cues');
       return { width: root.scrollWidth <= root.clientWidth, height: root.scrollHeight <= root.clientHeight, listScrolls: list.scrollHeight > list.clientHeight, listAtEnd: list.scrollTop > 0 };
     });
-    assert.deepEqual(layout, { width: true, height: true, listScrolls: true, listAtEnd: true });
+    assert.deepEqual(layout, { width: true, height: true, listScrolls: true, listAtEnd: true }, `CueForge preview layout at ${viewport.width}×${viewport.height}`);
     await page.screenshot({ path: path.join(screenshotDir, `show-control-cueforge-preview-${viewport.width}.png`) });
     await context.close();
   }
