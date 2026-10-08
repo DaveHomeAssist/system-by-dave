@@ -87,7 +87,7 @@ export function previewRoomCheck(doc, raw) {
   const available = source.items.filter(item => !copied.has(`${source.identity}\u0000${item.id}`));
   if (!available.length) throw new Error('Every check in this Room Check source was already copied. Nothing was changed.');
   const existingSource = current.roomCheckSources.find(entry => entry.raw === raw);
-  if (!existingSource && (current.roomCheckSources.length >= 20 || current.roomCheckSources.reduce((size, entry) => size + byteLength(entry.raw), 0) + byteLength(raw) > MAX_SOURCE_BYTES)) throw new Error('Show Ops source history is full. Export a backup before adding more sources.');
+  if (!existingSource && (current.roomCheckSources.length >= 20 || current.roomCheckSources.reduce((size, entry) => size + byteLength(entry.raw), 0) + byteLength(raw) > MAX_SOURCE_BYTES)) throw new Error('This show cannot accept another distinct Room Check source. Nothing was changed.');
   return { ...source, available, alreadyCopied: source.items.length - available.length, existingSourceId: existingSource?.id || null };
 }
 
