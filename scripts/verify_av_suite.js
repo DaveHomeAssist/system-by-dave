@@ -208,7 +208,8 @@ function assertRailRegistryContracts(registry) {
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
-  if (registry.tools.length !== 52 || registry.baseAssets.length !== 126 || registry.offlineAssets().length !== 178 || storageKeyCount !== 69) {
+  if (!registry.offlineAssets().includes('./front-office/theme-init.js')) fail('Front Office theme initialization is missing from offline assets.');
+  if (registry.tools.length !== 52 || registry.baseAssets.length !== 127 || registry.offlineAssets().length !== 179 || storageKeyCount !== 69) {
     fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {

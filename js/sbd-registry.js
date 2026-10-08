@@ -200,6 +200,7 @@
     './show-ops/model.mjs',
     './show-ops/style.css',
     './front-office/index.html',
+    './front-office/theme-init.js',
     './front-office/app.mjs',
     './front-office/model.mjs',
     './front-office/style.css',
