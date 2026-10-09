@@ -88,7 +88,11 @@ try {
     assert.equal(exported.crewCallSources[0].raw, raw);
     await assertFit(page);
     await page.locator('#theme').click();
-    assert.equal(await page.locator('html').getAttribute('data-av-theme'), 'dark');
+    const firstTheme = await page.locator('html').getAttribute('data-av-theme');
+    await assertFit(page);
+    await page.locator('#theme').click();
+    const secondTheme = await page.locator('html').getAttribute('data-av-theme');
+    assert.deepEqual([firstTheme, secondTheme].sort(), ['dark', 'light']);
     await assertFit(page);
     await context.close();
     console.log(`PASS saved/cancel/select/save/reload/export/theme/viewport ${viewport.width}x${viewport.height}`);
