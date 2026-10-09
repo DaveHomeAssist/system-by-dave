@@ -1,5 +1,11 @@
 # The Shop changelog
 
+## 2026-10-08
+
+- Show Gear Prep requested quantity and operator-entered packed quantity in previews, worklist rows and the inspector. Blank counts remain unknown; partial packs do not imply readiness.
+- Keep Shop v1 backup compatibility and original-source retention. Reject malformed, repeated, or stale Gear Prep source previews without changing saved plans.
+- Prevent a low-contrast flash during theme changes and unlock bounded panels for printing.
+
 ## 2026-10-07
 
 - Created a standalone logistics worklist spanning prep, pack, load in and strike.
