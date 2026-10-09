@@ -440,7 +440,7 @@ try {
     await page.locator('#backupFile').setInputFiles(backup);
     await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
     assert.deepEqual(await readValues(page), expected);
-    assert.equal(avStorageKeys.length, 69);
+    assert.equal(avStorageKeys.length, 71);
     assert.ok([
       'sbd.avAudio.v1',
       'sbd.showControl.v1',
@@ -453,6 +453,7 @@ try {
     ].every(key => avStorageKeys.includes(key)), 'New app plans and Calculator field sets must survive transfer and backup restore');
     assert.ok(avStorageKeys.includes('sbd.avVideo.v1'), 'AV Video must participate in cross-domain backup and restore');
     assert.ok(['sbd.avVideo.draft.v1', 'sbd.avVideo.layout.v1'].every(key => avStorageKeys.includes(key)), 'AV Video drafts and layout travel with its plan');
+    assert.ok(['sbd.showOps.draft.v1', 'sbd.showOps.layout.v1'].every(key => avStorageKeys.includes(key)), 'Show Ops drafts and layout travel with its document');
   });
 
   await test('Withdrawn Workbook aliases open Toolbox without touching saved records', async (page, context) => {
