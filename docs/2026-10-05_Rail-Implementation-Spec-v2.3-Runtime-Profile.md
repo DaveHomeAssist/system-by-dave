@@ -16,6 +16,8 @@ This version records the three settled product decisions and the first bounded s
 
 **Implementation update — October 7, 2026:** sequence steps 5–6 are implemented in source. AV Video now mounts the selected Rail profile outside its React root, the production bundle is rebuilt, and the five local Rail assets ship in cache generation `v20261007-av-video-rail` with focused source and browser verification. Merge, publication, live revision proof and operator acceptance remain separate sequence-step-7 evidence.
 
+**Application-launcher update — October 9, 2026:** the eight primary applications that were later published are promoted from status-only identities to canonical Rail destinations under the [application-launcher brief](av-rail-application-launcher.md). Rail availability now means a published primary route exists. Physical-device, operator and deeper workflow acceptance remain separate evidence and do not block basic navigation.
+
 The rail owns application navigation preferences only. It does not own show data, console documents, modules, draft recovery, or panel layouts.
 
 ## 1. Source authority and scope
