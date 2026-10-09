@@ -41,8 +41,15 @@ try{
     await page.locator('[name=packedQty]').fill('4');
     await page.getByRole('button',{name:'Apply changes'}).click();
     assert.match(await page.locator('#footerMessage').innerText(),/cannot exceed requested/);
+    assert.match(await page.locator('#countHelp').innerText(),/cannot exceed requested/);
+    assert.equal(await page.locator('#countHelp').getAttribute('role'),'alert');
+    assert.equal(await page.locator('[name=packedQty]').getAttribute('aria-invalid'),'true');
+    const errorInView=await page.locator('#countHelp').evaluate(el=>{const error=el.getBoundingClientRect(),form=el.closest('form').getBoundingClientRect();return error.top>=form.top&&error.bottom<=form.bottom&&error.top>=0&&error.bottom<=innerHeight});
+    assert.equal(errorInView,true);
     assert.match(await page.getByRole('button',{name:/Camera kit/}).innerText(),/Packed not counted/);
     await page.locator('[name=packedQty]').fill('1');
+    assert.match(await page.locator('#countHelp').innerText(),/Blank means unknown/);
+    assert.equal(await page.locator('[name=packedQty]').getAttribute('aria-invalid'),'false');
     await page.locator('[name=owner]').fill('Lead video');
     await page.getByRole('button',{name:'Apply changes'}).click();
     await page.getByRole('button',{name:'Save plan'}).click();
