@@ -35,7 +35,7 @@ test('unknown and zero quantities are distinct and old Shop backups remain valid
 });
 
 test('malformed quantities, overpacking and duplicate Gear Prep ids reject without source mutation',()=>{
-  for(const qty of ['three','1.5','100000',-1]){
+  for(const qty of ['three','1.5','100000',-1,[3]]){
     const source={schema:SOURCES['gear-prep'].schema,items:[{id:'good',item:'Good',qty:'3'},{id:'bad',item:'Bad',qty}]};
     const bytes=JSON.stringify(source);
     assert.throws(()=>stageLegacy('gear-prep',source),/quantity/);

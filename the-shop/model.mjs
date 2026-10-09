@@ -11,6 +11,7 @@ export const STATUSES = ['queued','working','ready','hold'];
 const field = (value, length=240) => String(value ?? '').slice(0,length);
 export function quantity(value, label='Quantity') {
   if (value === null || value === undefined || value === '') return null;
+  if (typeof value !== 'string' && typeof value !== 'number') throw new Error(`${label} must be a whole number from 0 to 99999.`);
   const text = typeof value === 'string' ? value.trim() : String(value);
   if (text === '') return null;
   if (!/^\d{1,5}$/.test(text) || !Number.isSafeInteger(Number(text))) throw new Error(`${label} must be a whole number from 0 to 99999.`);
@@ -43,6 +44,7 @@ export function stageLegacy(kind, payload) {
     const title = field(original.item || original.contents || original.caseId).trim();
     if (!title) throw new Error(`Source row ${index+1} has no item or case name.`);
     if (kind === 'gear-prep') {
+      if (typeof original.id !== 'string') throw new Error(`Gear Prep row ${index+1} has a missing or repeated source id.`);
       const id = field(original.id,120);
       if (!id || sourceIds.has(id)) throw new Error(`Gear Prep row ${index+1} has a missing or repeated source id.`);
       sourceIds.add(id);
