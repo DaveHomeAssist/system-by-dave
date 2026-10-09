@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-09 — Show Ops touch console
+
+- Reuse AV Video's shared workspace for functional Rooms, Crew, Tasks, Setup, Handoff and Backup panels, with side-by-side operation, layout controls and saved views.
+- Preserve the existing Show Ops v1 document, source-copy models and exact provenance; compose optional workspace validation without changing legacy source records or status meanings.
+- Add console-local draft recovery, device-local arrangements, the shared Rail and explicit storage-failure reporting. Panel operations never delete records or silently save the show.
+- Add typed source/build and focused model/browser gates. Record the corrected whole-toolset target and remaining capability gaps separately from route availability and physical acceptance.
+
 ## 2026-10-09 — Rail console snapshots
 
 - Make all nine published primary AV applications selectable from the Rail while preserving the exact v3 order, existing routes, local customization and validated show context.

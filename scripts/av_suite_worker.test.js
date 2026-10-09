@@ -59,7 +59,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261009-suite-console-snapshots');
+      assert.equal(name, 'sbd-av-suite-v20261009-show-ops-console');
       return cache;
     } },
     fetch: async () => new Response('ok'),
@@ -81,7 +81,9 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     './css/sbd-rail-dialogs.css',
     './js/sbd-rail.js',
     './js/sbd-rail-dialogs.js',
-    './js/sbd-rail-mount.js'
+    './js/sbd-rail-mount.js',
+    './show-ops/assets/show-ops.js',
+    './show-ops/assets/index.css'
   ];
   railAssets.forEach(asset => assert.ok(optional.includes(asset), `${asset} was not precached`));
   assert.equal(critical.some(asset => railAssets.includes(asset)), false);

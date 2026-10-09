@@ -148,6 +148,15 @@ jobs:
           npm run test:av-audio
           npm run build:av-audio
 
+      - name: Verify Show Ops console
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:show-ops
+          npm run test:show-ops
+          npm run build:show-ops
+          npm run test:show-ops-browser
+
       - name: Verify NoteForge release contract
         run: npm run verify:noteforge
 
@@ -178,8 +187,8 @@ jobs:
         run: |
           npm audit --audit-level=high
           python3 scripts/gen_sitemap.py
-          git diff --exit-code -- av-workbook av-video av-audio camera-sim sitemap.xml
-          test -z "$(git status --porcelain -- av-workbook av-video av-audio camera-sim sitemap.xml)"
+          git diff --exit-code -- av-workbook av-video av-audio show-ops camera-sim sitemap.xml
+          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops camera-sim sitemap.xml)"
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |

@@ -1,6 +1,6 @@
 # AV Suite consolidation source inventory
 
-Generated from `js/sbd-registry.js` version `v20261009-suite-console-snapshots`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
+Generated from `js/sbd-registry.js` version `v20261009-show-ops-console`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
 
 The feature text and declared keys come from the registry. Export, print, and keyboard columns identify only source-code signals in the route file. “Not found” does not prove absence; “Source signal” does not prove working behavior. Offline means the route is named by the registry manifest, not that every dependency is cached. Each behavior still needs browser and field-parity verification before a legacy route can be retired.
 
@@ -9,7 +9,7 @@ The feature text and declared keys come from the registry. Export, print, and ke
 | **AV Video** — Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules. | `/av-video/` | https://avbydave.com | sbd.avVideo.v1, sbd.avVideo.draft.v1, sbd.avVideo.layout.v1 | Source signal | Not found | Not found | Named |
 | **Audio** — Inputs, patch, line checks and speaker zones in one saved Audio plan. | `/av-audio/` | https://avbydave.com | sbd.avAudio.v1 | Source signal | Not found | Not found | Named |
 | **Show Control** — Call logging and reviewed cue-list snapshots; CueForge remains the executable show-control product. | `/show-control/` | https://avbydave.com | sbd.showControl.v1 | Source signal | Not found | Not found | Named |
-| **Show Ops** — Room readiness, crew calls, tasks and show handoff in one saved workspace. | `/show-ops/` | https://avbydave.com | sbd.showOps.document.v1 | Source signal | Not found | Not found | Named |
+| **Show Ops** — Room readiness, crew calls, tasks and show handoff in one saved workspace. | `/show-ops/` | https://avbydave.com | sbd.showOps.document.v1, sbd.showOps.draft.v1, sbd.showOps.layout.v1 | Source signal | Not found | Not found | Named |
 | **Front Office** — Clients, venues and jobs from inquiry through signoff, with an independent local document. | `/front-office/` | https://avbydave.com | sbd.frontOffice.document.v1 | Source signal | Not found | Not found | Named |
 | **The Shop** — Gear prep, pack, load in and strike worklist with source-preserving imports. | `/the-shop/` | https://avbydave.com | sbd.shop.v1 | Source signal | Not found | Not found | Named |
 | **Infrastructure** — Power, network and cable records with a shared issue queue. | `/infrastructure/` | https://avbydave.com | sbd.infrastructure.v1 | Source signal | Not found | Not found | Named |
@@ -59,7 +59,7 @@ The feature text and declared keys come from the registry. Export, print, and ke
 | **LED Wall Calculator** — Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning. | `/led-wall-calculator.html` | https://avbydave.com | avCalculator.ledProfiles.v1; working state in avCalculator.v1 (declared under av-calculator) | Source signal | Not found | Not found | Named |
 | **OnTrack** — DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes. | `/ontrack.html` | https://avbydave.com | ontrack_v1 | Source signal | Not found | Source signal | Named |
 
-**Count:** 52 registry tools; 69 declared local-storage keys.
+**Count:** 52 registry tools; 71 declared local-storage keys.
 
 ## Unresolved mapping and proof
 

@@ -26,7 +26,7 @@
     {id:'av-video',name:'AV Video',href:'av-video/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules.',storageKeys:[{key:'sbd.avVideo.v1',label:'AV Video plan'},{key:'sbd.avVideo.draft.v1',label:'AV Video unsaved draft'},{key:'sbd.avVideo.layout.v1',label:'AV Video panel layout'}],toolboxFeatured:true},
     {id:'av-audio',name:'Audio',href:'av-audio/',dept:'Audio',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Inputs, patch, line checks and speaker zones in one saved Audio plan.',storageKeys:[{key:'sbd.avAudio.v1',label:'Audio plan'}]},
     {id:'show-control',name:'Show Control',href:'show-control/',dept:'Show Flow',phases:['prep','show'],tag:'Application',desc:'Call logging and reviewed cue-list snapshots; CueForge remains the executable show-control product.',storageKeys:[{key:'sbd.showControl.v1',label:'Show Control run'}]},
-    {id:'show-ops',name:'Show Ops',href:'show-ops/',dept:'Rooms',phases:['advance','prep','loadin','show','closeout'],tag:'Application',desc:'Room readiness, crew calls, tasks and show handoff in one saved workspace.',storageKeys:[{key:'sbd.showOps.document.v1',label:'Show Ops document'}]},
+    {id:'show-ops',name:'Show Ops',href:'show-ops/',dept:'Rooms',phases:['advance','prep','loadin','show','closeout'],tag:'Application',desc:'Room readiness, crew calls, tasks and show handoff in one saved workspace.',storageKeys:[{key:'sbd.showOps.document.v1',label:'Show Ops document'},{key:'sbd.showOps.draft.v1',label:'Show Ops unsaved draft'},{key:'sbd.showOps.layout.v1',label:'Show Ops device layout'}]},
     {id:'front-office',name:'Front Office',href:'front-office/',dept:'Client',phases:['advance','prep','show','closeout'],tag:'Application',desc:'Clients, venues and jobs from inquiry through signoff, with an independent local document.',storageKeys:[{key:'sbd.frontOffice.document.v1',label:'Front Office document'}]},
     {id:'the-shop',name:'The Shop',href:'the-shop/',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Application',desc:'Gear prep, pack, load in and strike worklist with source-preserving imports.',storageKeys:[{key:'sbd.shop.v1',label:'The Shop plan'}]},
     {id:'infrastructure',name:'Infrastructure',href:'infrastructure/',dept:'Power',phases:['advance','prep','loadin'],tag:'Application',desc:'Power, network and cable records with a shared issue queue.',storageKeys:[{key:'sbd.infrastructure.v1',label:'Infrastructure plan'}]},
@@ -199,6 +199,8 @@
     './show-ops/app.mjs',
     './show-ops/model.mjs',
     './show-ops/style.css',
+    './show-ops/assets/show-ops.js',
+    './show-ops/assets/index.css',
     './front-office/index.html',
     './front-office/theme-init.js',
     './front-office/app.mjs',
@@ -273,7 +275,7 @@
     {id:'av-video',prototypeId:'video',label:'AV Video',availability:'available',toolId:'av-video',panelGroup:'Common',draftKey:'sbd.avVideo.draft.v1',layoutKey:'sbd.avVideo.layout.v1',icon:['m16 9 5-3v12l-5-3z','M3 6h13v12H3z']},
     {id:'audio',prototypeId:'audio',label:'Audio',availability:'available',toolId:'av-audio',panelGroup:'Common',icon:['M4 10v4','M8 6v12','M12 3v18','M16 7v10','M20 10v4']},
     {id:'show-control',prototypeId:'showcontrol',label:'Show Control',availability:'available',toolId:'show-control',panelGroup:'Common',icon:['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z','M10 8.5v7l5.5-3.5z']},
-    {id:'show-ops',prototypeId:'showops',label:'Show Ops',availability:'available',toolId:'show-ops',panelGroup:'Common',icon:['M3 5h18v16H3z','M3 10h18','M8 3v4','M16 3v4','M7 14h5','M10 17h7']},
+    {id:'show-ops',prototypeId:'showops',label:'Show Ops',availability:'available',toolId:'show-ops',panelGroup:'Common',draftKey:'sbd.showOps.draft.v1',layoutKey:'sbd.showOps.layout.v1',icon:['M3 5h18v16H3z','M3 10h18','M8 3v4','M16 3v4','M7 14h5','M10 17h7']},
     {id:'front-office',prototypeId:'office',label:'Front Office',availability:'available',toolId:'front-office',panelGroup:'Planning',icon:['M5 4h14v17H5z','M9 4V2h6v2','m9 13 2 2 4-4']},
     {id:'shop',prototypeId:'shop',label:'The Shop',availability:'available',toolId:'the-shop',panelGroup:'Planning',icon:['M4 4h16v13H4z','M4 9h16','M10 12h4','M8 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z','M16 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z']},
     {id:'infrastructure',prototypeId:'infra',label:'Infrastructure',availability:'available',toolId:'infrastructure',panelGroup:'Planning',icon:['M13 2 4 14h7l-1 8 9-12h-7z']},
@@ -337,7 +339,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261009-suite-console-snapshots',
+    version:'v20261009-show-ops-console',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

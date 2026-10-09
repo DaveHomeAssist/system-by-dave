@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec",
+  "head": "9c992ff2ab393efb3918d6878b4813452a07d916",
   "status": "amber",
-  "statusReason": "Eight standalone AV application candidates and their bounded handoff slices are published. All nine primary applications are now navigable from the Rail through #312 at c77b0cd, with source/destination publication, production provenance, live Audio launch and ten AV Video page-asset matches verified. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
+  "statusReason": "Dave clarified the target on October 9: expand AV Video's functional touch panel workspace across the toolset, not just launch independent pages. PR314 subsequently merged full application snapshots inside AV Video at 9c992ff. This candidate preserves that host and adds six native Show Ops panels within its application, with independent saved views and recovery. Embedded and standalone data/browser checks pass; exact-head CI, merge/publication/live acceptance remain separate gates. Full specialist parity and physical/operator acceptance remain open.",
   "lastActivity": "2026-10-09",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -29,12 +29,12 @@
     "All nine published primary AV applications are navigable from the Rail (#312) at c77b0cd. Source deployment 37893934453 and AV destination deployment 37895712977 passed; production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified. Physical/operator and connected-workflow acceptance remain separate."
   ],
   "nextStep": {
-    "title": "Complete canonical specialist handoffs and field acceptance",
-    "why": "The published primary applications now open from the Rail, but route availability does not prove canonical specialist data compatibility, connected application workflows or field readiness.",
-    "doneWhen": "Each affected app accepts its canonical source through a bounded, provenance-preserving workflow with source, CI, published and live evidence; then operators accept representative saved-plan, export/reopen, touch and show-handoff journeys on intended physical devices.",
+    "title": "Deliver shared touch consoles across the toolset",
+    "why": "Launch links and source-copy workflows alone do not deliver the AV Video interaction model. Operators need real tools inside configurable panels and saved views.",
+    "doneWhen": "Show Ops' six existing functions pass console, save/recovery, exact-source preservation, CI, publication and live gates; then Audio continuity and remaining fixed families adopt the shared engine, followed by missing specialist capabilities and physical/operator acceptance.",
     "effort": "L",
     "owner": "Application owners, then Dave and application operators",
-    "blockedBy": "Remaining per-slice source and live compatibility work; physical/operator acceptance"
+    "blockedBy": "No unresolved product decision blocks the bounded Show Ops conversion. Broader legacy retirement and streaming credentials remain separate later decisions; physical/operator acceptance remains outstanding."
   },
   "findings": [
     {
@@ -817,6 +817,11 @@
     }
   ],
   "decisionsResolved": [
+    {
+      "id": "AVC-D-CONSOLE-TARGET",
+      "question": "What interaction model should the AV Suite toolset converge on?",
+      "resolution": "On October 9 Dave chose AV Video's working touch friendly, tile/panel workspace expanded across the toolset, and directly instructed implementation to resume. First bounded conversion is Show Ops using the existing engine and data model. Do not reinterpret this as approval for a global show database, credential policy or legacy route deletion. Coverage and acceptance are in docs/av-console-rollout.md."
+    },
     {
       "id": "AVC-D1",
       "question": "D1 [unlocks fix PR]: no-scroll rule everywhere incl. ~35 worksheets, or only calculators, workspaces and the Suite?",

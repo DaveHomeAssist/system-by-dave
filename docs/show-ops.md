@@ -12,8 +12,45 @@ Name the show, add rooms, crew and tasks, update each status, review the handoff
 ## Acceptance
 A named show can create, edit, close and reopen room, crew and task records; save and reload; export and restore a document; preview a backup before replacement; and recover from invalid import or storage failure. Keyboard controls and layouts work at desktop and phone sizes without page scroll. The application remains useful when no legacy records exist. Integration must mark the Show Ops rail entry available and add its route to publication, offline and navigation contracts only after the scoped PR is merged.
 
+## Console workspace
+
+The October 9 console expansion moves the existing functions into AV Video's
+shared panel engine. Rooms, Crew and Tasks work side by side; Setup, Handoff and
+Backup are available through the same chooser and quick buttons. Close, move,
+resize, maximize and layout lock affect presentation only. Store/Update view
+stages an optional version-1 `workspace` in the existing show document; explicit
+Save retains it. Old backups without views still load. Unknown workspace versions
+fail closed without replacing saved bytes.
+
+Source now lives in `apps/show-ops/`. It composes the existing pure domain model
+in `show-ops/model.mjs` with the shared layout validator; it does not duplicate
+room, task or crew import semantics. `npm run build:show-ops` regenerates the
+published entry and assets. The previous fixed-section controller remains
+unreferenced source history, not another active renderer.
+
+Recovery uses `sbd.showOps.draft.v1` and `sbd.showOps.layout.v1`. Drafts require
+review before restoration, use the shared cross-tab lock protocol, and never
+silently save the show. Unstored arrangements are device-local; named views
+travel in exports. Source-copy operations retain those views and all source
+history. Restore clears the current layout overrides so imported views are usable.
+
+Setup's field picker switches among Name, Date, Notes and original Tools without
+an ordinary form scroller. Record collections scroll inside their own panels.
+At short heights the workspace presents one panel at a time; **Show** opens Save,
+theme, status and recovery controls without consuming the working panel's space.
+
+Run `npm run typecheck:show-ops`, `npm run test:show-ops`,
+`npm run build:show-ops` and `npm run test:show-ops-browser`. The new console probe
+owns rendered regression coverage; `show-ops/probe.cjs` documents the historical
+fixed-section acceptance and is not the console's current browser command.
+See [the scoped rollout and coverage assessment](av-console-rollout.md).
+
 ## Publication handoff
-The standalone application is published on AV by Dave, but its Rail console slot remains Planned. A compatible data import does not promote that slot or retire an original worksheet.
+The separate Rail launcher release (#312) made the existing application route
+available. This means launchable, not whole-console or physical acceptance.
+The shared-console slice must pass its own build, browser, CI, publication and
+live gates. Original tools remain available; timekeeping, breakout scheduling,
+Show Board timeline and full specialist parity are outside this conversion.
 
 ## Theme contract
 The application consumes `css/av-theme.css` and `js/av-theme-mode.js` with `data-av-tool="show-ops"`. Its visible toggle writes the shared `av-theme-mode.v1` preference, while all palette and contrast tokens come from the canonical AV light and dark themes. Show documents and their save key remain independent of theme preferences.
