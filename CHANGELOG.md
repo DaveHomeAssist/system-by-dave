@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-09 — Crew Call active-crew copy into Show Ops
+
+- Preview saved or exported Crew Call v1 records, select active crew and make a one-way unsaved Show Ops copy. Wrapped source members are excluded; copied rows begin Called for operator review without asserting attendance.
+- Retain original fields, including contact details and status, and exact source JSON in bounded Show Ops backups. Reject malformed, duplicate, mismatched, repeated and stale copies without changing either saved document; older Show Ops v1 backups remain readable.
+- Cover model and browser save/export/restore, phone and desktop flows; advance the AV offline cache generation. Crew Call stays independent and the Show Ops Rail slot remains Planned.
+
 ## 2026-10-08 — The Shop Gear Prep quantity and partial-pack count
 
 - Copy Gear Prep's requested quantity into a visible Shop field while preserving the original record and source bytes. Keep packed quantity unknown until an operator enters it, then show partial counts without changing readiness automatically.
