@@ -218,6 +218,14 @@ try {
   assert.equal(await read(safety, key), '{broken');
   await quick(safety, 'Backup');
   assert.equal(await safety.getByRole('button', { name: 'Download original saved bytes' }).count(), 1);
+  await safety.evaluate(({ key, draftKey, doc }) => {
+    localStorage.setItem(key, JSON.stringify(doc));
+    localStorage.setItem(draftKey, JSON.stringify({ v: 1, console: 'show-ops', at: new Date().toISOString(), baseline: null, doc }));
+  }, { key, draftKey, doc: exported });
+  await safety.reload();
+  await safety.waitForFunction(draftKey => localStorage.getItem(draftKey) === null, draftKey);
+  assert.equal(await safety.getByRole('button', { name: 'Restore draft', exact: true }).count(), 0);
+  assert.deepEqual(JSON.parse(await read(safety, key)), exported);
   await safety.evaluate(() => localStorage.clear()); await safety.reload();
   await safety.evaluate(() => { Storage.prototype.setItem = () => { throw new DOMException('Synthetic full storage', 'QuotaExceededError'); }; });
   await setup(safety, 'notes'); await safety.locator('#notes').fill('Keep this unsaved text');
@@ -244,6 +252,29 @@ try {
   assert.equal(await page.locator('#notes').inputValue(), JSON.parse(beforeOffline).notes);
   assert.equal(await read(page, key), beforeOffline);
   await context.setOffline(false);
+  const embeddedContext = await browser.newContext({ viewport: { width: 1440, height: 900 }, hasTouch: true });
+  const host = await embeddedContext.newPage();
+  await host.goto(`${base}/av-video/?sbdShow=Context%20only&private=do-not-forward`);
+  await host.locator('.sbd-rail__entry[data-rail-ref="console:show-ops"]').tap();
+  const frame = host.frameLocator('iframe[title="Show Ops application"]');
+  await frame.locator('#main').waitFor();
+  assert.equal(new URL(host.url()).pathname, '/av-video/');
+  assert.equal(await frame.locator('.ops-nav').isVisible(), false);
+  assert.equal(await frame.locator('.sbd-rail').isVisible(), false);
+  await setup(frame, 'identity'); await frame.locator('#name').fill('Embedded acceptance');
+  await frame.locator('#save').tap();
+  assert.equal(JSON.parse(await read(host, key)).show, 'Embedded acceptance');
+  assert.equal(await read(host, 'sbd.avVideo.v1'), null, 'saving Show Ops must not save the host plan');
+  await host.setViewportSize({ width: 375, height: 812 });
+  await quick(frame, 'Rooms');
+  await reachable(frame.locator('[name="name"]'));
+  await frame.locator('[name="name"]').fill('Touch room');
+  await frame.getByRole('button', { name: 'Add room', exact: true }).tap();
+  if (!await frame.locator('#save').isVisible()) await frame.getByRole('button', { name: 'Show controls', exact: true }).tap();
+  await frame.locator('#save').tap();
+  assert.equal(JSON.parse(await read(host, key)).rooms[0].name, 'Touch room');
+  assert.equal(await host.locator('iframe[title="Show Ops application"]').getAttribute('src').then(src => src.includes('private=')), false);
+  await embeddedContext.close();
   assert.deepEqual(errors, []);
   console.log('PASS Show Ops console: six functional panels, view/save/reload, source guards and exact provenance, export/restore, drafts, stale tabs, storage failures, offline reopen, two themes and eight viewport sizes.');
 } catch (error) {

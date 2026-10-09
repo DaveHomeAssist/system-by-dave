@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "57aa5d281e4f086417a3cfec305bb59df14dd371",
+  "head": "9c992ff2ab393efb3918d6878b4813452a07d916",
   "status": "amber",
-  "statusReason": "Dave clarified the target on October 9: expand AV Video's functional touch panel workspace across the toolset, not just launch independent pages. All nine Rail applications remain available from #312; that is launchability, not console parity. Audio already shares the panel engine. The first additional conversion, Show Ops, is implemented on the candidate branch with data and browser checks; merge/publication/live acceptance remain separate gates. The other fixed family consoles, full specialist parity and physical/operator acceptance remain open.",
+  "statusReason": "Dave clarified the target on October 9: expand AV Video's functional touch panel workspace across the toolset, not just launch independent pages. PR314 subsequently merged full application snapshots inside AV Video at 9c992ff. This candidate preserves that host and adds six native Show Ops panels within its application, with independent saved views and recovery. Embedded and standalone data/browser checks pass; exact-head CI, merge/publication/live acceptance remain separate gates. Full specialist parity and physical/operator acceptance remain open.",
   "lastActivity": "2026-10-09",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",

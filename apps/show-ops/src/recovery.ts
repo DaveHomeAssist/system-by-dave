@@ -28,6 +28,15 @@ export function useRecovery(doc: ShowDocument, dirty: boolean, baseline: string 
   });
   const [offer, setOffer] = useState(() => recovery.snapshot.draft && JSON.stringify(recovery.snapshot.draft.doc) !== JSON.stringify(initial) ? recovery.snapshot.draft : null);
   useEffect(() => {
+    if (!recovery.session || !recovery.snapshot.draft || JSON.stringify(recovery.snapshot.draft.doc) !== JSON.stringify(initial)) return;
+    // A prior tab may have saved and exited before its draft cleanup completed.
+    // Claim only the exact matching snapshot under the shared lock, then clear.
+    void recovery.session.restore().then(async result => {
+      if (!result.ok || current.current !== initial) { report(result); return; }
+      report(await recovery.session!.sync(initial, baseline, false, initial.show || "Show Ops"));
+    });
+  }, [recovery, initial]);
+  useEffect(() => {
     if (recovery.snapshot.error) { report({ ok: false, error: recovery.snapshot.error }); return; }
     if (offer) {
       if (dirty) report({ ok: false, error: "An earlier draft awaits review. Export current edits before restoring or leaving." });
@@ -51,5 +60,9 @@ export function useRecovery(doc: ShowDocument, dirty: boolean, baseline: string 
     report(result);
     if (result.ok) { setOffer(null); notify("Draft discarded. The saved show is unchanged."); }
   }
-  return { layout, offer, restore, discard, errors: Object.values(errors).filter(Boolean) };
+  async function saved(next: ShowDocument, raw: string) {
+    if (!recovery.session || offer) return;
+    report(await recovery.session.sync(next, raw, false, next.show || "Show Ops"));
+  }
+  return { layout, offer, restore, discard, saved, errors: Object.values(errors).filter(Boolean) };
 }

@@ -88,11 +88,13 @@ export function App() {
     return () => window.removeEventListener("beforeunload", leave);
   }, [dirty]);
 
-  function store() {
+  async function store() {
     try {
       if (blocked) throw new Error("Saved data could not be read. Download the original bytes and export new work before recovery.");
       const raw = saveDocument(localStorage, doc, baseline.current);
-      baseline.current = raw; setSaved(raw); setMessage("Show saved and verified on this device. Export a backup for recovery.");
+      baseline.current = raw;
+      await recovery.saved(doc, raw);
+      setSaved(raw); setMessage("Show saved and verified on this device. Export a backup for recovery.");
     } catch (error) { setMessage(`Save failed: ${errorText(error)}`); }
   }
   function themeToggle() {

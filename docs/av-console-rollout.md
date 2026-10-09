@@ -9,6 +9,11 @@ Tools must be usable inside their console, with arrangements, maximize, layout
 lock and saved views. A link to a standalone page does not establish this parity.
 
 Source baseline: `57aa5d281e4f086417a3cfec305bb59df14dd371`.
+Integration baseline: `9c992ff2ab393efb3918d6878b4813452a07d916` (PR #314),
+which adds full application snapshots inside AV Video. Preserve that host;
+Show Ops now exposes its six functional panels inside its application snapshot
+as well as at its standalone route. Embedded mode omits duplicate navigation,
+while Show Ops Save continues to affect only its own document.
 The [console contract](av-console.md) and [registry inventory](av-suite-consolidation-inventory.md)
 remain authoritative. The original v3 archive is unavailable for fresh visual
 comparison; [the recorded source analysis](2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md)

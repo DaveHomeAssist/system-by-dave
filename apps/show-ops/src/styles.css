@@ -19,6 +19,9 @@ h2 { font-size: 18px; } h3 { font-size: 15px; }
 .ops-nav a { display: inline-flex; align-items: center; min-height: 44px; }
 .ops-shell { height: calc(100dvh - 44px); display: grid; grid-template-columns: auto minmax(0, 1fr); min-width: 0; min-height: 0; overflow: hidden; }
 #root { grid-column: 2; grid-row: 1; min-width: 0; min-height: 0; overflow: hidden; }
+.ops-embedded .ops-nav, .ops-embedded .sbd-rail-host { display: none; }
+.ops-embedded .ops-shell { height: 100dvh; grid-template-columns: minmax(0,1fr); }
+.ops-embedded #root { grid-column: 1; }
 .ops-app { height: 100%; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 .ops-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 18px; border-bottom: 1px solid var(--av-line); }
 .ops-header > div:first-child { min-width: 0; }

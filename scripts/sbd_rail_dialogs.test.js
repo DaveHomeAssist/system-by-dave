@@ -289,6 +289,9 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   const audioConsole = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'console:audio')[0];
   assert.equal(new URL(audioConsole.getAttribute('href')).pathname, '/av-audio/');
   assert.equal(new URL(audioConsole.getAttribute('href')).searchParams.get('sbdShow'), 'Gala');
+  controller.setCurrentRef('console:audio');
+  assert.equal(avVideo.hasAttribute('aria-current'), false);
+  assert.equal(audioConsole.getAttribute('aria-current'), 'page');
   ['av-audio', 'show-control', 'show-ops', 'front-office', 'the-shop', 'infrastructure', 'av-lighting', 'av-calculator'].forEach((toolId) => {
     assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', `tool:${toolId}`).length, 0);
   });
