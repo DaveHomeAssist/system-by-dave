@@ -118,6 +118,7 @@
     './av-suite-landing2.html',
     './css/av-landing-alt.css',
     './js/av-landing-alt.js',
+    './js/av-landing-theme.js',
     './av-suite.html',
     './av-suite-worker.js',
     './css/av-suite.css',
@@ -234,7 +235,6 @@
     './pixelforge/assets/ai-CBLG0OHf.js',
     './pixelforge/assets/sdk-B-fUwnrA.js',
     './svg/system_by_dave_logo_rust.svg',
-    './img/card-cover-banner-wide.png',
     './manifest.json',
     './fonts/dm-sans.woff2',
     './fonts/dm-serif-display.woff2',
@@ -339,7 +339,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261009-show-ops-console',
+    version:'v20261009-avbydave-quick-fixes',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

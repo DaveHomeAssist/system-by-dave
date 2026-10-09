@@ -118,7 +118,8 @@ function verifyCounts() {
   const contracts = new Map([
     ['index.html', [`>${count}</div>`, `${count} tools · offline`]],
     ['tools.html', [`bundles ${count} operator tools`, `all ${count} registered AV tools`]],
-    ['README.md', [`contains **${count} browser tools**`]]
+    ['README.md', [`contains **${count} browser tools**`]],
+    ['av-suite-landing2.html', [`<strong data-av-tool-count>${count}</strong>`, `See all <span data-av-tool-count>${count}</span> tools`, `content="${count} free browser tools`]]
   ]);
   contracts.forEach((snippets, file) => {
     const source = read(file);

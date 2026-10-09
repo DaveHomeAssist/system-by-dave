@@ -32,7 +32,7 @@ STATIC_PAGES = [
     ("depotops/", "weekly", "0.7"),
     ("tailscale-manual.html", "monthly", "0.7"),
     ("av-suite.html", "weekly", "0.9"),
-    ("av-tool-suite/index-v2/", "monthly", "0.7"),
+    # av-tool-suite/index-v2/ is a noindex archive of the old AV index (2026-10-09).
     ("backfocus/", "monthly", "0.7"),
     ("switcher/", "monthly", "0.7"),
     ("switcher/guide/", "monthly", "0.6"),

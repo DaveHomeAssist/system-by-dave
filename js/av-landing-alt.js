@@ -19,7 +19,7 @@
     toggle.textContent = mode === 'dark' ? 'Light mode' : 'Dark mode';
     toggle.setAttribute('aria-label', 'Use ' + (mode === 'dark' ? 'light' : 'dark') + ' mode');
     toggle.setAttribute('aria-pressed', String(mode === 'dark'));
-    themeColor.setAttribute('content', mode === 'dark' ? '#06101a' : '#edf3f8');
+    themeColor.setAttribute('content', mode === 'dark' ? '#0a0d14' : '#f4f6f8');
   }
 
   function save() {
@@ -44,7 +44,7 @@
       paint();
     }
   });
-  year.textContent = String(new Date().getFullYear());
+  if (year) year.textContent = String(new Date().getFullYear());
 
   if (!window.isSecureContext || !('serviceWorker' in navigator) || !('caches' in window)) {
     offlineStatus.textContent = 'Offline access unavailable in this browser.';

@@ -105,7 +105,9 @@
         "av-tool-suite/",
         "av-workbook/"
       ],
-      "assets": [],
+      "assets": [
+        "img/av-by-dave-og.png"
+      ],
       "robotsDisallow": [
         "/404.html",
         "/transfer.html"

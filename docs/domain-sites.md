@@ -80,6 +80,14 @@ Each staged site gets its own `index.html` (home page or redirect), `404.html`,
 `robots.txt`, `CNAME`, `source.json` (source commit and artifact digest) and
 `transfer.html`.
 
+AV by Dave's generated `404.html` uses the landing's dark style and offers the AV
+Toolbox and the home page; the FMP sites keep the plain page. The stager never
+publishes development files that sit beside tools: browser probes (`probe.*`,
+`*-probe.*`), unit tests (`*.test.*`), `README.md`, `CHANGELOG.md` and anything
+under `node_modules/`. Vendored third-party code keeps its notices. AV by Dave
+pages share `img/av-by-dave-og.png` as their link preview; the site's `assets`
+entry stages it.
+
 ## Before and after cutover
 
 Until a site's `cutover` is `true`, its new domain is a mirror: the pages keep

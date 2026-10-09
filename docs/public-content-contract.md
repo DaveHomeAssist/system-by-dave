@@ -30,7 +30,7 @@ The title character is part of the family: marketing uses an em dash, operator t
 
 ## Canonical AV count
 
-`js/sbd-registry.js` is the source of truth. The homepage, Tools directory, AV console, and README carry a checked static fallback. A registry change must update those values in the same release.
+`js/sbd-registry.js` is the source of truth. The homepage, Tools directory, AV console, AV by Dave landing (`av-suite-landing2.html`), and README carry a checked static fallback. A registry change must update those values in the same release.
 
 ## Release gate
 
