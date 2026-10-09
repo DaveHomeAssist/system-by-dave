@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { empty, validate, addRecord, updateRecord, handoff, SCHEMA, ROOM_CHECK_SCHEMA, MAX_ROOM_CHECK_BYTES, parseRoomCheck, previewRoomCheck, copyRoomCheck, TASK_BOARD_SCHEMA, MAX_TASK_BOARD_BYTES, parseTaskBoard, previewTaskBoard, copyTaskBoard } from './model.mjs';
+import { empty, validate, addRecord, updateRecord, handoff, SCHEMA, ROOM_CHECK_SCHEMA, MAX_ROOM_CHECK_BYTES, parseRoomCheck, previewRoomCheck, copyRoomCheck, TASK_BOARD_SCHEMA, MAX_TASK_BOARD_BYTES, parseTaskBoard, previewTaskBoard, copyTaskBoard, CREW_CALL_SCHEMA, MAX_CREW_CALL_BYTES, parseCrewCall, previewCrewCall, copyCrewCall } from './model.mjs';
 const roomCheck = (items = [
   { id: 'check-1', area: 'room', check: 'Sightlines', owner: 'Lead tech', due: '07:30', priority: 'high', status: 'ready', blocker: '', notes: 'Back row checked', custom: 'Keep exact original' },
   { id: 'check-2', area: 'video', check: 'DSM route', owner: 'V1', due: '08:00', priority: 'normal', status: 'issue', blocker: 'Aux missing', notes: 'Ask switcher' }
@@ -12,6 +12,11 @@ const taskBoard = (items = [
   { id: 'task-3', area: 'stage', task: 'Tape lectern', owner: 'Stage', priority: 'low', due: '08:00', status: 'done', source: 'Room walk', blocker: '', notes: '' },
   { id: 'task-4', area: 'comms', task: 'Swap beltpack', owner: 'Comms', priority: 'normal', due: '10:00', status: 'deferred', source: 'Operator', blocker: '', notes: '' }
 ]) => JSON.stringify({ schema: TASK_BOARD_SCHEMA, exportedAt: '2026-10-08T10:00:00Z', meta: { showName: 'Test show', client: 'Client', venue: 'Hall', room: 'Main', showDate: '2026-10-08', boardLead: 'Lead', showCaller: 'Caller', shift: 'Day', handoffTime: '17:00' }, items });
+const crewCall = (items = [
+  { id: 'crew-1', section: 'audio', name: 'A1', role: 'Audio Lead', call: '07:30', location: 'FOH', meal: '12:30', release: '18:00', phone: '555-0101', status: 'on-site', notes: 'Mixes show' },
+  { id: 'crew-2', section: 'stage', name: 'Stagehand', role: 'Labor', call: '08:00', location: 'Dock', meal: '13:00', release: '17:00', phone: '555-0102', status: 'problem', notes: 'Awaiting access' },
+  { id: 'crew-3', section: 'video', name: 'V1', role: 'Video Lead', call: '07:00', location: 'Video world', meal: '12:00', release: '18:30', phone: '555-0103', status: 'wrapped', notes: 'Released' }
+], saved = false) => JSON.stringify({ schema: CREW_CALL_SCHEMA, [saved ? 'savedAt' : 'exportedAt']: '2026-10-08T10:00:00Z', meta: { showName: 'Test show', client: 'Client', venue: 'Hall', showDate: '2026-10-08', advanceLead: 'PM', loadIn: '07:00', handoffTo: 'Caller' }, items, ...(saved ? { selectedId: 'crew-1', filters: { search: '', section: 'all', status: 'all' } } : {}) });
 test('records survive JSON backup and reload with their statuses', () => {
   let doc = { ...empty(), show: 'Test show', date: '2026-10-07' };
   doc = addRecord(doc, 'rooms', 'Main room', 'Check projector');
@@ -147,4 +152,74 @@ test('Show Task Board provenance rejects missing source and changed active statu
   assert.throws(() => validate(missing), /Show Task Board provenance/);
   const changed = structuredClone(doc); const source = JSON.parse(raw); source.items[0].status = 'done'; changed.taskBoardSources[0].raw = JSON.stringify(source);
   assert.throws(() => validate(changed), /Show Task Board provenance/);
+});
+test('Crew Call saved and exported copies keep exact source and never infer attendance', () => {
+  const raw = crewCall(undefined, true);
+  const preview = previewCrewCall(empty(), raw);
+  assert.deepEqual(preview.available.map(item => item.id), ['crew-1', 'crew-2']);
+  assert.equal(preview.excluded, 1);
+  const doc = copyCrewCall(empty(), preview, ['crew-1', 'crew-2'], 'saved', '2026-10-09T04:00:00Z', ids());
+  assert.equal(doc.show, 'Test show'); assert.equal(doc.date, '2026-10-08');
+  assert.deepEqual(doc.crew.map(row => row.status), ['Called', 'Called']);
+  assert.deepEqual(doc.crew.map(row => row.crewSource.snapshot.status), ['on-site', 'problem']);
+  assert.equal(doc.crew[0].crewSource.snapshot.phone, '555-0101');
+  assert.equal(doc.crew[1].crewSource.snapshot.notes, 'Awaiting access');
+  assert.equal(doc.crewCallSources[0].raw, raw);
+  assert.deepEqual(validate(JSON.parse(JSON.stringify(doc))), doc);
+  assert.deepEqual(validate({ schema: SCHEMA, show: 'Old', date: '', notes: '', rooms: [], crew: [], tasks: [] }).crewCallSources, []);
+  assert.deepEqual(parseCrewCall(crewCall()).active.map(item => item.id), ['crew-1', 'crew-2']);
+});
+test('Crew Call rejects show/date conflicts, repeated or wrapped rows and stale source revisions', () => {
+  const raw = crewCall(); const before = empty(); const baseline = JSON.stringify(before);
+  assert.throws(() => previewCrewCall({ ...before, show: 'Another show' }, raw), /show differs/);
+  assert.throws(() => previewCrewCall({ ...before, date: '2026-10-09' }, raw), /date differs/);
+  assert.throws(() => copyCrewCall(before, previewCrewCall(before, raw), ['crew-1', 'crew-1'], 'file', '2026-10-09T04:00:00Z', ids()), /distinct/);
+  assert.throws(() => copyCrewCall(before, previewCrewCall(before, raw), ['crew-3'], 'file', '2026-10-09T04:00:00Z', ids()), /unavailable/);
+  const nextId = ids();
+  const first = copyCrewCall(before, previewCrewCall(before, raw), ['crew-1'], 'file', '2026-10-09T04:00:00Z', nextId);
+  assert.deepEqual(previewCrewCall(first, raw).available.map(item => item.id), ['crew-2']);
+  const changed = JSON.parse(raw); changed.items[0].notes = 'Changed at source';
+  assert.deepEqual(previewCrewCall(first, JSON.stringify(changed)).available.map(item => item.id), ['crew-2']);
+  assert.throws(() => copyCrewCall(first, previewCrewCall(first, JSON.stringify(changed)), ['crew-1'], 'file', '2026-10-09T04:30:00Z', nextId), /unavailable/);
+  const second = copyCrewCall(first, previewCrewCall(first, raw), ['crew-2'], 'file', '2026-10-09T05:00:00Z', nextId);
+  assert.equal(second.crewCallSources.length, 1);
+  assert.throws(() => previewCrewCall(second, raw), /No new active/);
+  assert.equal(JSON.stringify(before), baseline);
+});
+test('Crew Call parser rejects malformed, future, oversized and ambiguous input', () => {
+  assert.throws(() => parseCrewCall('{bad'), /could not be parsed/);
+  assert.throws(() => parseCrewCall('é'.repeat(MAX_CREW_CALL_BYTES / 2 + 1)), /exceeds 500 KB/);
+  const duplicate = JSON.parse(crewCall()); duplicate.items[1].id = duplicate.items[0].id;
+  assert.throws(() => parseCrewCall(JSON.stringify(duplicate)), /duplicate crew member/);
+  const unknown = JSON.parse(crewCall()); unknown.items[0].status = 'verified';
+  assert.throws(() => parseCrewCall(JSON.stringify(unknown)), /unsupported/);
+  unknown.items[0].status = 'on-site'; unknown.items[0].token = 'unsafe';
+  assert.throws(() => parseCrewCall(JSON.stringify(unknown)), /unsupported/);
+  delete unknown.items[0].token; unknown.schema = 'system-by-dave.crew-call.v2';
+  assert.throws(() => parseCrewCall(JSON.stringify(unknown)), /Crew Call v1/);
+  unknown.schema = CREW_CALL_SCHEMA; unknown.meta.showDate = '2026-02-30';
+  assert.throws(() => parseCrewCall(JSON.stringify(unknown)), /valid show date/);
+  unknown.meta.showDate = '2026-10-08'; unknown.meta.showName = 'Untitled Crew Call';
+  assert.throws(() => parseCrewCall(JSON.stringify(unknown)), /named show/);
+});
+test('Crew Call accepts producer notes above 5,000 characters within the source byte limit', () => {
+  const source = JSON.parse(crewCall());
+  source.items[0].notes = 'Long producer note. '.repeat(300);
+  const raw = JSON.stringify(source);
+  assert.ok(source.items[0].notes.length > 5000);
+  assert.ok(new TextEncoder().encode(raw).length < MAX_CREW_CALL_BYTES);
+  const copied = copyCrewCall(empty(), previewCrewCall(empty(), raw), ['crew-1'], 'file', '2026-10-09T04:00:00Z', ids());
+  assert.equal(copied.crew[0].crewSource.snapshot.notes, source.items[0].notes);
+  assert.equal(validate(JSON.parse(JSON.stringify(copied))).crewCallSources[0].raw, raw);
+});
+test('Crew Call provenance and source history reject tampering without mutating the candidate', () => {
+  const raw = crewCall();
+  const doc = copyCrewCall(empty(), previewCrewCall(empty(), raw), ['crew-1'], 'file', '2026-10-09T04:00:00Z', ids());
+  const missing = structuredClone(doc); missing.crewCallSources = [];
+  assert.throws(() => validate(missing), /Crew Call provenance/);
+  const changed = structuredClone(doc); const source = JSON.parse(raw); source.items[0].status = 'wrapped'; changed.crewCallSources[0].raw = JSON.stringify(source);
+  assert.throws(() => validate(changed), /Crew Call provenance/);
+  const many = structuredClone(doc); many.crewCallSources = Array.from({ length: 21 }, () => doc.crewCallSources[0]);
+  assert.throws(() => validate(many), /Crew Call source history/);
+  assert.deepEqual(validate(JSON.parse(JSON.stringify(doc))), doc);
 });

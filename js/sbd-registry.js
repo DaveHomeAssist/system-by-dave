@@ -337,7 +337,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261008-shop-quantity-counts',
+    version:'v20261009-show-ops-crew-call',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
