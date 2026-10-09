@@ -6,6 +6,7 @@
 - Preserve the existing Show Ops v1 document, source-copy models and exact provenance; compose optional workspace validation without changing legacy source records or status meanings.
 - Add console-local draft recovery, device-local arrangements, the shared Rail and explicit storage-failure reporting. Panel operations never delete records or silently save the show.
 - Add typed source/build and focused model/browser gates. Record the corrected whole-toolset target and remaining capability gaps separately from route availability and physical acceptance.
+- Rebuild Audio after the shared snapshot-tab change and verify its committed bundle in pull requests, closing the inherited publication mismatch before deployment.
 
 ## 2026-10-09 — Rail console snapshots
 
