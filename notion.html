@@ -46,7 +46,7 @@
   .hero-action:hover{border-color:oklch(0.72 0.19 33);background:rgba(255,255,255,0.045);}
   a:focus-visible,button:focus-visible{outline:2px solid var(--rust);outline-offset:3px;}
   @media (max-width:880px){
-    .agrid,.wgrid,.ops-grid,.ops-proof,.steps{grid-template-columns:1fr!important;}
+    .agrid,.wgrid,.steps{grid-template-columns:1fr!important;}
     .hero-grid,.statgrid{grid-template-columns:1fr!important;}
     nav.bar{flex-wrap:wrap;height:auto!important;padding:14px 20px!important;gap:14px!important;}
     .nav-links{gap:18px!important;}
@@ -98,7 +98,7 @@
           </div>
         </div>
         <div class="statgrid" style="display:grid;grid-template-columns:1fr 1fr;gap:1px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.06);">
-          <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;color:oklch(0.72 0.19 33);">04</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Agent concepts</div></div>
+          <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;color:oklch(0.72 0.19 33);">04</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Agents, set up with Dave</div></div>
           <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;">04</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Free widgets</div></div>
           <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;">$0</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Open source</div></div>
           <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;">1:1</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Setup contact</div></div>
@@ -198,44 +198,9 @@
       </div>
     </section>
 
-    <section style="max-width:1200px;margin:0 auto;padding:22px 40px 54px;">
-      <div style="display:flex;align-items:baseline;gap:18px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.09);">
-        <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);">03</span>
-        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(24px,2.8vw,34px);letter-spacing:-0.02em;">Notion Track</h2>
-        <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">Source checked Jul 3</span>
-      </div>
-      <div class="ops-grid" style="display:grid;grid-template-columns:1fr 1.25fr;gap:18px;align-items:stretch;">
-        <div style="border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.025);padding:28px;">
-          <div style="display:inline-flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:18px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.72 0.19 33);"></span>Operator state</div>
-          <h3 style="font-family:var(--ff-display);font-weight:600;font-size:26px;line-height:1.16;margin-bottom:12px;">Product pages are public. DBX is the source.</h3>
-          <p style="font-size:14px;font-weight:300;line-height:1.65;color:rgba(243,244,247,0.58);">The agents and widgets above are the public catalog. The internal Notion Track keeps database identity, routing rules, and workspace health separate so a public page never stands in for live workspace status.</p>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;">
-            <a href="project-registry.html" class="hero-action primary" data-track-cta="notion:open-registry">View registry</a>
-          </div>
-        </div>
-        <div class="ops-proof" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.06);">
-          <div style="background:#0A0D14;padding:24px 22px;">
-            <div style="font-family:var(--ff-display);font-weight:600;font-size:32px;color:oklch(0.72 0.19 33);">0</div>
-            <div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Source decisions</div>
-            <p style="font-size:12.5px;font-weight:300;line-height:1.5;color:rgba(243,244,247,0.48);margin-top:16px;">DBX source decision queue is clear after live query.</p>
-          </div>
-          <div style="background:#0A0D14;padding:24px 22px;">
-            <div style="font-family:var(--ff-display);font-weight:600;font-size:32px;">0</div>
-            <div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Routing gaps</div>
-            <p style="font-size:12.5px;font-weight:300;line-height:1.5;color:rgba(243,244,247,0.48);margin-top:16px;">Audited Routing Rule gaps are verified clear after three routing expansion batches.</p>
-          </div>
-          <div style="background:#0A0D14;padding:24px 22px;">
-            <div style="font-family:var(--ff-display);font-weight:600;font-size:32px;">75</div>
-            <div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Rows touched</div>
-            <p style="font-size:12.5px;font-weight:300;line-height:1.5;color:rgba(243,244,247,0.48);margin-top:16px;">Core routing rows, placeholders, and all audited routing gaps were reconciled.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section style="max-width:1200px;margin:0 auto;padding:48px 40px 80px;">
       <div class="steps" style="border:1px solid rgba(255,255,255,0.09);padding:44px;background:linear-gradient(180deg, oklch(0.65 0.19 33 / 0.05), transparent);display:grid;grid-template-columns:repeat(3,1fr);gap:36px;">
-        <div><div style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);margin-bottom:14px;">01</div><h4 style="font-family:var(--ff-display);font-weight:600;font-size:18px;margin-bottom:8px;">Duplicate into Notion</h4><p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);">Each agent and widget comes as a template you duplicate into your own workspace in one click.</p></div>
+        <div><div style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);margin-bottom:14px;">01</div><h4 style="font-family:var(--ff-display);font-weight:600;font-size:18px;margin-bottom:8px;">Pick a widget or agent</h4><p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);">Widgets are free to embed in any page. Agents are set up with Dave in your own workspace.</p></div>
         <div><div style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);margin-bottom:14px;">02</div><h4 style="font-family:var(--ff-display);font-weight:600;font-size:18px;margin-bottom:8px;">Configure once</h4><p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);">Set your databases and preferences. Widgets configure through URL parameters — no API key.</p></div>
         <div><div style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);margin-bottom:14px;">03</div><h4 style="font-family:var(--ff-display);font-weight:600;font-size:18px;margin-bottom:8px;">Let it run</h4><p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);">Agents work natively on Notion AI; widgets embed live. Updates ship as platforms add features.</p></div>
       </div>
@@ -248,6 +213,10 @@
           <a href="index.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Home</a>
           <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV Suite</a>
           <a href="prompt-lab.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt Lab</a>
+          <a href="notion.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Notion</a>
+          <a href="tools.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Tools</a>
+          <a href="profile/" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">About Dave</a>
+          <a href="privacy-policy.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Privacy</a>
           <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">GitHub ↗</a>
         </div>
         <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>

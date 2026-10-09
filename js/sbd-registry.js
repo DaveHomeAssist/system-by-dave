@@ -339,7 +339,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261009-avbydave-console-facelift',
+    version:'v20261009-sbd-walkthrough-fixes',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
