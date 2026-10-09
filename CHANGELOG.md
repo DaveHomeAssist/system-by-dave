@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-09 — System by Dave walkthrough fixes
+
+- Homepage: keep the three products as the focus. Remove the "Hire Dave" hero button and the fourth "Hire Dave" route card; the profile stays reachable as a quieter "About Dave" card link and footer link.
+- Profile: land on the URL fragment (for example `profile/#contact`) once layout settles. Smooth scrolling, late images and the ScrollTrigger refresh had left first-time visitors at the hero. Rename the "Named AI Agents" stat and table to "Personal AI helpers" so they are not confused with the Notion agent products, and describe the personal Notion setup without internal database names.
+- Notion: remove the internal "Notion Track" operations section, describe the agents as "set up with Dave" on the Notion and Agents pages, and stop promising one-click agent templates.
+- Contact: public pages (Agents, both resumes) use avbydave@gmail.com.
+- Prompt Lab: add an "Extension setup" link to promptlab.tools/setup.html, rename the "Install with the operating context visible" heading to "Before you install", and label the features section "Features" instead of a second "01".
+- Shared header on phones: one 57px row with the SD home mark and every primary destination still visible (no hamburger), instead of three rows (133px).
+- Footers on Prompt Lab, Notion, Tools, Privacy, Agents, Widgets and Skills share one link set (Home, AV Suite, Prompt Lab, Notion, Tools, About Dave, Privacy, GitHub); the profile footer links System by Dave and Privacy.
+- 404 and 500 pages no longer scroll sideways on phones (the background glow is capped to the viewport).
+- AV tools: page titles use `Tool | AV by Dave` and the tool brand text reads AV by Dave. Show Timer's brand returns to the AV by Dave home and its second link opens the AV Toolbox. PixelForge's breadcrumb returns to the AV Toolbox. Tools directory copy no longer says "doorway".
+- Advance the AV offline cache generation.
+
 ## 2026-10-09 — AV by Dave console facelift
 
 - Bring the AV Toolbox and Show Console (SBD Paper and Stage Slate) in line with avbydave.com: DM Sans headings, a green rounded "AV" brand mark, 10px control and 14px card corners, ink-style 48px primary buttons, and the AV by Dave green for navigation chrome. New `--av-brand*`, `--av-font-ui` and radius tokens in `css/av-theme.css` carry the brand; the in-tool `--av-accent` is unchanged. Industry and Borland DOS skins keep their own look.

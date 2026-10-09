@@ -39,6 +39,32 @@
     });
   });
 
+  /* ---------------- Deep links (#contact etc.) ---------------- */
+  // html{scroll-behavior:smooth} plus late-loading images and the
+  // ScrollTrigger refresh on load can interrupt the browser's own jump to the
+  // URL fragment, leaving first-time visitors at the hero (or part-way down).
+  // Once layout has settled, land on the fragment target instantly.
+  function landOnHash() {
+    var id = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : "";
+    var target = id ? document.getElementById(id) : null;
+    if (!target) { return; }
+    var root = document.documentElement;
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    target.scrollIntoView({ block: "start", behavior: "auto" });
+    root.style.scrollBehavior = prev;
+  }
+  if (window.location.hash) {
+    if (document.readyState === "complete") {
+      window.requestAnimationFrame(landOnHash);
+    } else {
+      // Two frames after "load" so this runs after ScrollTrigger.refresh().
+      window.addEventListener("load", function () {
+        window.requestAnimationFrame(function () { window.requestAnimationFrame(landOnHash); });
+      });
+    }
+  }
+
   /* ---------------- Motion (GSAP) ---------------- */
   var gsap = window.gsap;
   if (!gsap) { return; } // No GSAP -> CSS leaves everything visible. Done.

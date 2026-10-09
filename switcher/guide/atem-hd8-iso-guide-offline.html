@@ -295,24 +295,43 @@
   .sbd-site-header[data-sbd-header="compact"] .sbd-site-menu { display: block; }
 }
 
+/* Phones: one compact row. The SD mark stays as the home link (its word is
+   kept for screen readers) and every primary destination stays visible in a
+   single row of equal columns, so the sticky header takes one row instead of
+   three. No hamburger: primary destinations remain directly available. */
 @media (max-width: 680px) {
   .sbd-site-header__inner {
     width: calc(100% - 24px);
-    padding: 8px 0 10px;
+    min-height: 56px;
+    padding: 4px 0;
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
   }
 
   .sbd-site-brand {
     justify-self: start;
   }
 
+  .sbd-site-brand__word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .sbd-site-links {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 4px;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 2px;
   }
 
   .sbd-site-links a,

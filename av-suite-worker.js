@@ -8,7 +8,7 @@
    cached application code. */
 importScripts('./js/sbd-registry.js');
 
-// AV by Dave console facelift: refresh the shared chrome CSS, tool brand marks and Gear Reference fixes.
+// System by Dave walkthrough fixes: AV by Dave tool titles and brand text, Show Timer home link.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();

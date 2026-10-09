@@ -21,7 +21,7 @@ Public System by Dave copy uses canonical names, title families, and registry-ba
 ## Title families
 
 - Marketing and directory pages normally use `Page — System by Dave`.
-- AV operator tools normally use `Tool | System by Dave`.
+- AV operator tools normally use `Tool | AV by Dave`, matching avbydave.com where they are published. Gear Reference keeps its contract title `Gear Reference`.
 - Product flagships may lead with the product name and a descriptive phrase when the same text is carried through title, Open Graph, and Twitter metadata.
 - Personal Profile and Resume pages may lead with the person's name or audience because the audience is more useful than the portfolio brand.
 - Davai subpages use `Page | Davai`; the Davai overview uses the full canonical display name.
