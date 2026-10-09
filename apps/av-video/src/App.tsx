@@ -17,7 +17,31 @@ import { applyImport, emptyDocument, LEGACY, loadDocument, parseDocument, Module
 const CONSOLE_ID = "av-video";
 const DRAFT_KEY = "sbd.avVideo.draft.v1";
 const LAYOUT_KEY = "sbd.avVideo.layout.v1";
-type PanelType = "cameras" | "playback" | "flow" | "patch" | "inspector" | "displays" | "checks" | "project" | "bus" | "multiview";
+const RAIL_SELECT_EVENT = "sbd:rail-console-select";
+const RAIL_ACTIVE_EVENT = "sbd:console-snapshot-active";
+const CONTEXT_KEYS = ["sbdShow", "sbdVenue", "sbdDate", "sbdOperator", "sbdPhase"];
+const SUITE_APPS = [
+  { consoleId: "audio", type: "suite-audio", name: "Audio", href: "/av-audio/", group: "Common" },
+  { consoleId: "show-control", type: "suite-show-control", name: "Show Control", href: "/show-control/", group: "Common" },
+  { consoleId: "show-ops", type: "suite-show-ops", name: "Show Ops", href: "/show-ops/", group: "Common" },
+  { consoleId: "front-office", type: "suite-front-office", name: "Front Office", href: "/front-office/", group: "Planning" },
+  { consoleId: "shop", type: "suite-shop", name: "The Shop", href: "/the-shop/", group: "Planning" },
+  { consoleId: "infrastructure", type: "suite-infrastructure", name: "Infrastructure", href: "/infrastructure/", group: "Planning" },
+  { consoleId: "lighting", type: "suite-lighting", name: "Lighting", href: "/av-lighting/", group: "Utilities" },
+  { consoleId: "av-calculator", type: "suite-av-calculator", name: "AV Calculator", href: "/av-calculator.html", group: "Utilities" },
+] as const;
+type SuiteApp = typeof SUITE_APPS[number];
+type SuitePanelType = SuiteApp["type"];
+type PanelType = "cameras" | "playback" | "flow" | "patch" | "inspector" | "displays" | "checks" | "project" | "bus" | "multiview" | SuitePanelType;
+const suiteAppForType = (type: string) => SUITE_APPS.find(app => app.type === type);
+const suiteAppForView = (view?: ConsoleView) => view?.panels.map(panel => suiteAppForType(panel.type)).find(Boolean);
+function suiteAppHref(app: SuiteApp) {
+  const target = new URL(app.href, location.origin);
+  const source = new URLSearchParams(location.search);
+  for (const key of CONTEXT_KEYS) if (source.has(key)) target.searchParams.set(key, source.get(key)!);
+  target.searchParams.set("sbdEmbed", "console");
+  return `${target.pathname}${target.search}`;
+}
 /* Panel library and the starting arrangements (docs/av-console.md). Views are
    stored in the plan only after Store or Update; these defaults cost nothing. */
 const LIBRARY: PanelDef[] = [
@@ -31,6 +55,7 @@ const LIBRARY: PanelDef[] = [
   { type: "playback", name: "Playback", group: "Planning", description: "Ordered cues, file checks and operator playback records.", minW: 4, minH: 4, module: "playback" },
   { type: "checks", name: "Checks", group: "Utilities", description: "Planning checks with what they evaluated and links to affected records.", minW: 3, minH: 3, module: "checks" },
   { type: "project", name: "Project", group: "Utilities", description: "Plan details, optional modules and imports from earlier sheets.", minW: 6, minH: 4 },
+  ...SUITE_APPS.map(app => ({ type: app.type, name: `${app.name} application`, group: app.group, description: `The complete ${app.name} application, using its own saved data and tools.`, minW: 4, minH: 4 } as PanelDef)),
 ];
 const DEFAULT_VIEWS: ConsoleView[] = [
   { id: "routing", name: "Routing", panels: [{ id: "routing-flow", type: "flow", x: 0, y: 0, w: 8, h: 5 }, { id: "routing-patch", type: "patch", x: 0, y: 5, w: 8, h: 3 }, { id: "routing-inspector", type: "inspector", x: 8, y: 0, w: 4, h: 8 }] },
@@ -40,6 +65,7 @@ const DEFAULT_VIEWS: ConsoleView[] = [
   { id: "cameras", name: "Cameras", panels: [{ id: "cameras-list", type: "cameras", x: 0, y: 0, w: 12, h: 8 }] },
   { id: "playback", name: "Playback", panels: [{ id: "playback-list", type: "playback", x: 0, y: 0, w: 12, h: 8 }] },
   { id: "project", name: "Project", panels: [{ id: "project-project", type: "project", x: 0, y: 0, w: 12, h: 8 }] },
+  ...SUITE_APPS.map(app => ({ id: `suite-${app.consoleId}`, name: app.name, panels: [{ id: `suite-${app.consoleId}-app`, type: app.type, x: 0, y: 0, w: 12, h: 8 }] })),
 ];
 const statuses = ["planned", "pending", "patched", "routed", "tested", "ready", "verified", "issue", "spare", "backup"];
 const labels: Partial<Record<keyof Route, string>> = { converterOutput: "Converter output port", converterConnector: "Converter output connector", converterFormat: "Converter output format", processorOutput: "Processor output port", processorConnector: "Processor output connector", processorFormat: "Processor output format", destinationInput: "Destination input", route: "Route name", source: "Source", destination: "Destination", system: "System", type: "Source type", format: "Format", connector: "Connector", processor: "Processor", input: "Switcher / device input", output: "Source output", converter: "Converter", backup: "Backup route", status: "Status", notes: "Operator notes" };
@@ -83,9 +109,9 @@ export function App() {
     if (!doc.workspace) return DEFAULT_VIEWS;
     const result = [...doc.workspace.views];
     // Older stored workspaces gain reachable views in memory; opening never saves them.
-    for (const type of ["cameras", "playback", "project"]) if (!result.some(view => view.panels.some(panel => panel.type === type))) {
-      const base = DEFAULT_VIEWS.find(view => view.id === type)!;
-      let id = type; while (result.some(view => view.id === id)) id += "-new";
+    for (const type of ["cameras", "playback", "project", ...SUITE_APPS.map(app => app.type)]) if (!result.some(view => view.panels.some(panel => panel.type === type))) {
+      const base = DEFAULT_VIEWS.find(view => view.panels.some(panel => panel.type === type))!;
+      let id = base.id; while (result.some(view => view.id === id)) id += "-new";
       result.push({ ...base, id });
     }
     return result;
@@ -114,6 +140,30 @@ export function App() {
       setRecoveryProblems(p => ({ ...p, layout: ok ? "" : "Layout could not be saved. This arrangement is available for this visit only." })); } };
   });
   const ws = useConsoleWorkspace(views, library, layoutPersist);
+  const activeSuiteApp = suiteAppForView(ws.view);
+  const lastVideoView = useRef("routing");
+  const viewTabs = useMemo(() => activeSuiteApp ? (ws.view ? [ws.view] : []) : views.filter(view => !suiteAppForView(view)), [activeSuiteApp, views, ws.view]);
+  useEffect(() => {
+    if (!activeSuiteApp) lastVideoView.current = ws.viewId;
+    window.dispatchEvent(new CustomEvent(RAIL_ACTIVE_EVENT, { detail: { ref: activeSuiteApp ? `console:${activeSuiteApp.consoleId}` : "console:av-video" } }));
+  }, [activeSuiteApp, ws.viewId]);
+  useEffect(() => {
+    const selectSnapshot = (event: Event) => {
+      const selectedRef = (event as CustomEvent<{ ref?: string }>).detail?.ref;
+      if (selectedRef === "console:av-video") {
+        const target = views.find(view => view.id === lastVideoView.current && !suiteAppForView(view)) || views.find(view => !suiteAppForView(view));
+        if (!target) return;
+        event.preventDefault(); ws.setViewId(target.id); notify(`AV Video snapshot recalled. ${target.name} is ready.`); return;
+      }
+      const app = SUITE_APPS.find(item => selectedRef === `console:${item.consoleId}`);
+      if (!app) return;
+      const target = views.find(view => view.id === `suite-${app.consoleId}`) || views.find(view => view.panels.some(panel => panel.type === app.type));
+      if (!target) return;
+      event.preventDefault(); ws.setViewId(target.id); notify(`${app.name} snapshot recalled inside the console. Its application data remains independent.`);
+    };
+    window.addEventListener(RAIL_SELECT_EVENT, selectSnapshot);
+    return () => window.removeEventListener(RAIL_SELECT_EVENT, selectSnapshot);
+  }, [views, ws]);
   /* Capture the exact offered bytes once; another tab never grants ownership. */
   const [recovery] = useState(() => {
     try {
@@ -250,6 +300,12 @@ export function App() {
   const flowBeside = ws.mode !== "phone" && ws.panels.some(p => p.type === "flow");
   const routeLabel = (r?: Route) => r ? r.route || r.source || "Untitled route" : "";
   function renderPanel(type: string) {
+    const suiteApp = suiteAppForType(type);
+    if (suiteApp) return {
+      body: <iframe className="suite-app-frame" src={suiteAppHref(suiteApp)} title={`${suiteApp.name} application`} />,
+      context: "Live application · independent saved data",
+      actions: <a className="suite-app-open" href={suiteApp.href} target="_blank" rel="noreferrer">Open standalone</a>,
+    };
     switch (type as PanelType) {
       case "flow": return { body: <FlowCanvas doc={doc} selected={selected} onChange={update} onSelect={setSelected} onChecks={() => show("checks")} onEdit={() => show("inspector")} onAddRoute={add} onSample={() => replace(sampleDocument())} onImport={() => show("project")} notify={notify} />, context: `${doc.routes.length} routes${route ? ` · tracing ${routeLabel(route)}` : ""}` };
       case "patch": return { body: <section className="route-browser" aria-label="Patch routes">
@@ -289,7 +345,8 @@ export function App() {
       default: return { body: <p className="muted">This panel is not available in this version.</p> };
     }
   }
-  const quick = [{ type: "flow", label: "Signal flow" }, ...(doc.modules.patch ? [{ type: "patch", label: "Patch" }] : []), ...(doc.modules.displays ? [{ type: "displays", label: "Displays" }] : []), ...(doc.modules.cameras ? [{ type: "cameras", label: "Cameras" }] : []), ...(doc.modules.playback ? [{ type: "playback", label: "Playback" }] : []), ...(doc.modules.checks ? [{ type: "checks", label: "Checks", badge: checkCount }] : []), { type: "project", label: "Project" }];
+  const videoQuick = [{ type: "flow", label: "Signal flow" }, ...(doc.modules.patch ? [{ type: "patch", label: "Patch" }] : []), ...(doc.modules.displays ? [{ type: "displays", label: "Displays" }] : []), ...(doc.modules.cameras ? [{ type: "cameras", label: "Cameras" }] : []), ...(doc.modules.playback ? [{ type: "playback", label: "Playback" }] : []), ...(doc.modules.checks ? [{ type: "checks", label: "Checks", badge: checkCount }] : []), { type: "project", label: "Project" }];
+  const quick = activeSuiteApp ? SUITE_APPS.map(app => ({ type: app.type, label: app.name })) : videoQuick;
   return <div className="video-app">
     <header className="app-header"><div className="app-identity"><span className="app-mark" aria-hidden="true">Vi</span><div><h1>AV Video</h1><p className="header-plan" title={doc.title}>{doc.title} · {dirty ? "Unsaved" : baseline.current ? "Saved in this browser" : "New plan"}</p></div></div>
       <div className="header-actions"><label className="theme-label"><span>Theme</span><select aria-label="Theme" value={theme} onChange={e => changeTheme(e.target.value)}><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label><button type="button" className="primary" onClick={save}>Save{dirty ? " •" : ""}</button><button type="button" onClick={exportDoc}>Export</button></div>
@@ -297,7 +354,7 @@ export function App() {
     <div className="plan-bar"><div className="plan-summary"><strong title={doc.title}>{doc.title}</strong><span>{doc.routes.length} routes · {doc.displays.length} destinations · {doc.shots.length} shots · {doc.cues.length} cues · {dirty ? "Unsaved changes" : baseline.current ? "Saved in this browser" : "New plan"}</span></div><div className="history-actions" aria-label="Edit history"><button type="button" onClick={undoEdit} disabled={!history.past.length} title="Undo (⌘/Ctrl Z)">↶ Undo</button><button type="button" onClick={redoEdit} disabled={!history.future.length} title="Redo (⌘/Ctrl Shift Z)">↷ Redo</button></div></div>
     {draftOffer && <div className="draft-offer" role="alert"><p><strong>Unsaved edits</strong> from {new Date(draftOffer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device{draftOffer.baseline !== baseline.current ? ". The saved plan has changed since they were made" : ""}. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={restoreDraft}>Restore draft</button><button type="button" onClick={discardDraft}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
-      <ConsoleWorkspace ws={ws} label="AV Video" quick={quick} render={renderPanel} onViewsChange={storeViews} notify={text => notify(text)} />
+      <ConsoleWorkspace ws={ws} label="AV Suite" quick={quick} render={renderPanel} onViewsChange={storeViews} notify={text => notify(text)} viewTabs={viewTabs} />
     </main>
     <footer role="status" className={`message ${problem || Object.values(recoveryProblems).some(Boolean) ? "error" : ""}`}>{[...Object.values(recoveryProblems).filter(Boolean), message].join(" ")}</footer>
     <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={async e => { const file = e.target.files?.[0]; e.target.value = ""; if (!file) return; try { await inspect(await file.text(), file.name); } catch (error) { notify(errorText(error), true); } }} />

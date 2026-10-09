@@ -2,6 +2,9 @@
 (function(root){
   'use strict';
 
+  var CONSOLE_SELECT_EVENT='sbd:rail-console-select';
+  var CONSOLE_ACTIVE_EVENT='sbd:console-snapshot-active';
+
   function eventTrigger(event){
     return event&&(event.currentTarget||event.target)||null;
   }
@@ -34,6 +37,7 @@
       catch(error){baseUrl='/';}
     }
     var storage=Object.prototype.hasOwnProperty.call(options,'storage')?options.storage:safeStorage();
+    var eventTarget=options.eventTarget||root;
     var store=rail.createPreferenceStore({registry:registry,storage:storage});
     var rendered=null;
     var controller=null;
@@ -47,6 +51,42 @@
       return result.ok?result.href:entry.href;
     }
 
+    function selectionEvent(entry){
+      var detail={ref:entry.ref,consoleId:entry.id,href:resolvedHref(entry)};
+      if(typeof root.CustomEvent==='function') return new root.CustomEvent(CONSOLE_SELECT_EVENT,{detail:detail,cancelable:true});
+      if(documentRef&&typeof documentRef.createEvent==='function'){
+        var event=documentRef.createEvent('CustomEvent');
+        event.initCustomEvent(CONSOLE_SELECT_EVENT,false,true,detail);
+        return event;
+      }
+      return null;
+    }
+
+    function setCurrent(reference,state){
+      if(reference===currentRef) return;
+      currentRef=reference;
+      host.setAttribute('data-current-ref',reference);
+      if(rendered) renderRail(state||rendered.state);
+    }
+
+    function navigate(entry,event){
+      if(!entry||entry.namespace!=='console'||!eventTarget||typeof eventTarget.dispatchEvent!=='function') return;
+      if(event&&(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(typeof event.button==='number'&&event.button!==0))) return;
+      var signal=selectionEvent(entry);
+      if(!signal) return;
+      var continueNavigation=eventTarget.dispatchEvent(signal);
+      if(continueNavigation&&!signal.defaultPrevented) return;
+      if(event&&typeof event.preventDefault==='function') event.preventDefault();
+      setCurrent(entry.ref);
+      if(controller&&typeof controller.closeAllApps==='function') controller.closeAllApps();
+    }
+
+    function activeSnapshot(event){
+      var reference=event&&event.detail&&event.detail.ref;
+      var entry=typeof reference==='string'?rail.resolveRef(reference,registry):null;
+      if(entry&&entry.namespace==='console') setCurrent(reference);
+    }
+
     function renderRail(state){
       rendered=rail.render(host,{
         registry:registry,
@@ -55,6 +95,7 @@
         currentRef:currentRef,
         toolboxHref:(function(){var result=route('toolbox');return result.ok?result.href:'/av-suite.html?entry=toolbox';}()),
         resolveHref:resolvedHref,
+        onNavigate:navigate,
         appsDialogId:'sbdRailAllApps',
         onAllApps:function(event){controller.openAllApps(eventTrigger(event));},
         onCustomize:function(event){controller.openCustomize(eventTrigger(event));},
@@ -74,11 +115,12 @@
         registry:registry,
         preferenceStore:store,
         draftStorage:storage,
-        eventTarget:options.eventTarget||root,
+        eventTarget:eventTarget,
         currentRef:currentRef,
         baseUrl:baseUrl,
         sourceUrl:sourceUrl,
         idPrefix:'sbdRail',
+        onNavigate:navigate,
         onPreferencesChange:function(result){
           var previous=rendered;
           var previousTrigger=controller&&typeof controller.getCustomizeTrigger==='function'?controller.getCustomizeTrigger():null;
@@ -89,6 +131,7 @@
           controller.setCustomizeTrigger(nextTrigger);
         }
       });
+      if(eventTarget&&typeof eventTarget.addEventListener==='function') eventTarget.addEventListener(CONSOLE_ACTIVE_EVENT,activeSnapshot);
       renderRail();
       return {
         ok:true,
@@ -96,12 +139,14 @@
         controller:controller,
         rendered:function(){return rendered;},
         destroy:function(){
+          if(eventTarget&&typeof eventTarget.removeEventListener==='function') eventTarget.removeEventListener(CONSOLE_ACTIVE_EVENT,activeSnapshot);
           if(controller) controller.destroy();
           if(rendered) rendered.destroy();
           host.removeAttribute('data-rail-state');
         }
       };
     }catch(error){
+      if(eventTarget&&typeof eventTarget.removeEventListener==='function') eventTarget.removeEventListener(CONSOLE_ACTIVE_EVENT,activeSnapshot);
       if(controller&&typeof controller.destroy==='function') controller.destroy();
       host.setAttribute('data-rail-state','unavailable');
       if(root.console&&typeof root.console.error==='function') root.console.error('Application Rail unavailable.',error);

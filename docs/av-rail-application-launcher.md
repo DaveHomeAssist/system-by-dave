@@ -1,7 +1,9 @@
 # AV Rail application launcher
 
 **Date:** October 9, 2026
-**Status:** Implementation brief
+**Status:** Delivered interim milestone
+
+**Final Rail experience:** This launcher slice is superseded as the definition of done by the [AV Suite console snapshot Rail](av-suite-console-snapshot-rail.md). Its published routes and navigation contract remain the standalone fallback.
 
 ## Problem
 

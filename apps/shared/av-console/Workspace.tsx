@@ -72,10 +72,11 @@ type Props = {
   render: (type: string, panel: Panel) => PanelRender;
   onViewsChange: (views: View[], message: string) => void;
   notify: (text: string) => void;
+  viewTabs?: View[];
   extraViews?: ReactNode;
 };
 
-export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, extraViews }: Props) {
+export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, viewTabs, extraViews }: Props) {
   const grid = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLElement | null>(null);
@@ -87,6 +88,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   const [drag, setDrag] = useState<Drag | null>(null);
   const [draw, setDraw] = useState<{ anchor: { x: number; y: number }; px: number; py: number; rect?: Rect } | null>(null);
   const { view, panels, mode, locked } = ws;
+  const visibleViewTabs = viewTabs || ws.views;
   const maxId = view ? ws.max[view.id] || null : null;
   const def = (type: string) => ws.library.find(d => d.type === type);
   const stored = view ? sanitizeView(view).panels : [];
@@ -244,7 +246,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   return <div ref={shell} className={`console-shell mode-${mode} ${locked ? "is-locked" : ""}`}>
     <div className="console-strip">
       <div role="tablist" aria-label={`${label} views`} className="console-views">
-        {ws.views.map(v => <button key={v.id} type="button" role="tab" aria-selected={v.id === ws.viewId} onClick={() => { ws.setViewId(v.id); close(); }}>{v.name}{v.id === ws.viewId && changed && <span className="console-dot" title="Arrangement changed. Store or update the view to keep it." aria-label="arrangement changed" />}</button>)}
+        {visibleViewTabs.map(v => <button key={v.id} type="button" role="tab" aria-selected={v.id === ws.viewId} onClick={() => { ws.setViewId(v.id); close(); }}>{v.name}{v.id === ws.viewId && changed && <span className="console-dot" title="Arrangement changed. Store or update the view to keep it." aria-label="arrangement changed" />}</button>)}
         {extraViews}
       </div>
       <button type="button" className="console-icon" aria-label="View options" aria-haspopup="menu" onClick={e => { trigger.current = e.currentTarget; const p = at(e.currentTarget); setChooser(null); setMenu({ kind: "view", id: ws.viewId, ...clampPos(p.left, p.top, 260, 340) }); }}>▾</button>

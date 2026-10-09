@@ -337,7 +337,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261009-rail-application-launcher',
+    version:'v20261009-suite-console-snapshots',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
