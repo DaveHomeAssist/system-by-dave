@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-08 — The Shop Gear Prep quantity and partial-pack count
+
+- Copy Gear Prep's requested quantity into a visible Shop field while preserving the original record and source bytes. Keep packed quantity unknown until an operator enters it, then show partial counts without changing readiness automatically.
+- Reject malformed, repeated, and stale Gear Prep copies; retain compatibility with Shop v1 backups that lack count fields. Cover save/reload, export/restore, phone and desktop import behavior, and advance the AV offline cache generation.
+
 ## 2026-10-08 — Show Task Board active-task copy into Show Ops
 
 - Preview saved or exported Show Task Board v1 data and select active tasks for a one-way, unsaved Show Ops copy. Done, canceled and deferred source tasks are excluded; every selected copy begins Open for operator review.
