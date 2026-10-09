@@ -752,7 +752,8 @@
       'sbd-suite-link sbd-suite-step',
       contextHref(tool.href),
       direction + ' ' + tool.name,
-      direction + ' phase tool: ' + tool.name
+      // The accessible name starts with the visible text (WCAG 2.5.3).
+      direction + ' ' + tool.name + ' (' + (direction === 'Prev' ? 'previous' : 'next') + ' phase tool)'
     );
     link.title = direction + ' phase tool: ' + tool.name;
     dock.appendChild(link);

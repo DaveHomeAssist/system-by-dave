@@ -33,10 +33,14 @@ noscript{display:block}
 .sbd-site-header{flex:none;position:static;background:var(--av-surface,rgba(10,13,20,.88));color:var(--av-text,#f3f4f7);border-bottom:1px solid var(--av-line,rgba(255,255,255,.09));-webkit-backdrop-filter:none;backdrop-filter:none}
 .sbd-site-header__inner{width:100%;min-height:40px;padding:0 16px}
 .sbd-site-brand{min-height:36px}
-.sbd-site-brand__mark{width:24px;height:24px;border-color:var(--av-line-strong,rgba(255,255,255,.34));color:var(--av-accent,#e08a4f)}
+.sbd-site-brand__mark{width:28px;height:28px;border-radius:var(--av-radius-control,10px);border-color:var(--av-line-strong,rgba(255,255,255,.34));color:var(--av-brand,#58c38b)}
 .sbd-site-links a{color:var(--av-muted,inherit)}
-.sbd-site-links a:hover,.sbd-site-links a[aria-current="page"]{background:var(--av-accent-soft,rgba(224,138,79,.16));color:var(--av-accent-strong,#e08a4f)}
-.sbd-site-brand:focus-visible,.sbd-site-links a:focus-visible{outline-color:var(--av-accent,#e08a4f)}
+.sbd-site-links a{border-radius:var(--av-radius-control,10px);font-family:var(--av-font-ui,inherit);font-weight:600;font-size:12px;letter-spacing:.01em;text-transform:none}
+.sbd-site-links a:hover,.sbd-site-links a[aria-current="page"]{background:var(--av-brand-soft,rgba(88,195,139,.14));color:var(--av-brand-strong,#7bd6a6)}
+.sbd-site-brand__word{font-family:var(--av-font-ui,inherit);font-weight:600;font-size:14px;letter-spacing:0}
+.sbd-site-menu>summary{border-color:var(--av-line-strong,rgba(255,255,255,.18))}
+.sbd-site-menu__panel{background:var(--av-surface,#0f131d);border-color:var(--av-line,rgba(255,255,255,.14))}
+.sbd-site-brand:focus-visible,.sbd-site-links a:focus-visible{outline-color:var(--av-brand,#58c38b)}
 img,svg{display:block}
 ::selection{background:var(--c-accent-line,rgba(158,67,43,.3))}
 
@@ -53,16 +57,20 @@ img,svg{display:block}
    tokens already resolve per html[data-av-theme], so one mapping block
    covers both palettes correctly. */
 #avApp[data-theme="paper"],#avApp[data-theme="slate"]{
-  --font-body:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
-  --f-head:'DM Serif Display',Georgia,'Times New Roman',serif;
-  --w-semi:400;--w-bold:400; /* DM Serif Display ships weight 400 only — never synthesize bold */
+  --font-body:var(--av-font-ui,'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif);
+  /* One type family with avbydave.com and systembydave.com: DM Sans for
+     headings too (the variable font file covers 400–700). */
+  --f-head:var(--av-font-ui,'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif);
+  --w-semi:500;--w-bold:600;
   --c-bg:var(--av-bg);--c-surface:var(--av-surface);--c-surface-2:var(--av-surface-2);--c-surface-3:var(--av-surface-3);--c-raised:var(--av-raised);
   --c-neutral-100:var(--av-surface-2);--c-neutral-200:var(--av-surface-3);--c-neutral-300:var(--av-line);--c-neutral-400:var(--av-line-strong);
   --c-neutral-500:var(--av-dim);--c-neutral-600:var(--av-muted);--c-neutral-700:var(--av-text-2);--c-neutral-800:var(--av-text);--c-neutral-900:var(--av-text);
   --c-text:var(--av-text);
-  --c-accent:var(--av-accent);--c-accent-100:var(--av-accent-soft);--c-accent-200:var(--av-accent-soft);--c-accent-300:var(--av-accent-strong);
-  --c-accent-400:var(--av-accent-strong);--c-accent-600:var(--av-accent-strong);--c-accent-700:var(--av-accent-strong);--c-accent-800:var(--av-accent-strong);--c-accent-900:var(--av-accent-strong);
-  --c-accent-line:var(--av-accent-line);
+  /* The console chrome uses the AV by Dave brand green (css/av-theme.css). */
+  --c-accent:var(--av-brand);--c-accent-100:var(--av-brand-soft);--c-accent-200:var(--av-brand-soft);--c-accent-300:var(--av-brand-strong);
+  --c-accent-400:var(--av-brand-strong);--c-accent-600:var(--av-brand-strong);--c-accent-700:var(--av-brand-strong);--c-accent-800:var(--av-brand-strong);--c-accent-900:var(--av-brand-strong);
+  --c-accent-line:var(--av-brand-line);
+  --c-brand-ink:var(--av-brand-ink);
   --st-ready:var(--av-success);--st-ready-tint:var(--av-success-soft);--st-ready-line:var(--av-success-line);
   --st-issue:var(--av-danger);--st-issue-tint:var(--av-danger-soft);--st-issue-line:var(--av-danger-line);
   --st-skip:var(--av-dim);--st-skip-tint:var(--av-surface-2);--st-skip-line:var(--av-line-strong);
@@ -627,6 +635,36 @@ img,svg{display:block}
 #avApp.compact .rail-block{padding:0 12px 10px}
 
 /* ============================================================
+   AV BY DAVE FACELIFT (2026-10-09) — SBD Paper / Stage Slate only.
+   Matches avbydave.com and the systembydave.com homepage: DM Sans, the
+   green brand mark, 10px control corners, 14px card corners and 48px
+   primary buttons. Industry and Borland DOS keep their own skins.
+   ============================================================ */
+#avApp:is([data-theme="paper"],[data-theme="slate"]){--r-ctl:var(--av-radius-control,10px);--r-card:var(--av-radius-card,14px)}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .corner{display:none}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) :is(button,input,select,textarea,.kbd,.stpill,.hb,.pinbtn,.mob-fam-btn){border-radius:var(--r-ctl)}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) :is(.seg,.hd-ctx,.hd-phase-strip){border-radius:var(--r-ctl);overflow:hidden}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) :is(.seg,.hd-ctx,.hd-phase-strip) button{border-radius:0}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) :is(.card,.ctx-hero,.toolbox-card,.rec-card,.toolrow-card,.tr-sub-card,.allcard,.entry-door,.aside-card,.pin-row,.drawer-summary){border-radius:var(--r-card)}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .card{overflow:hidden}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) button{font-size:13px;letter-spacing:0}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) button.primary{min-height:48px;padding:12px 22px;background:var(--c-text);border-color:var(--c-text);color:var(--c-bg);font-weight:600}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) button.primary:hover{filter:none;background:var(--c-neutral-700);border-color:var(--c-neutral-700)}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) :is(.hd-ctx,.hd-phase-strip,.seg) button[aria-pressed="true"],
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .mob-fam-btn[aria-pressed="true"],
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .toolbox-card-actions .toolbox-open{background:var(--c-accent);border-color:var(--c-accent);color:var(--c-brand-ink)}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) :is(.hd-ctx,.hd-phase-strip,.seg) button,
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .hd-icon-btn.labeled,
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .mob-fam-btn{font-family:var(--font-body);font-size:13px;font-weight:500;letter-spacing:0;text-transform:none}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .hd-mark{width:34px;height:34px;border:0;border-radius:var(--r-ctl);background:var(--c-accent);color:var(--c-brand-ink);font-family:var(--f-label);font-size:12px;font-weight:700;letter-spacing:.02em}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .hd-word{font-family:var(--font-body);font-size:16px;font-weight:600;letter-spacing:-.01em;text-transform:none}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) [data-r="head"]{border-bottom:1px solid var(--c-neutral-300)}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .ctx-hero h2{font-size:24px;font-weight:600;letter-spacing:-.02em}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) :is(.toolbox-card-head a,.rec-card-top strong,.allcard a,.tr-sub-card-top strong){font-weight:600;letter-spacing:-.01em}
+#avApp:is([data-theme="paper"],[data-theme="slate"]) .ob-dialog{border-radius:var(--r-card);overflow:hidden}
+#avApp .mob-fam-btn{height:44px}
+
+/* ============================================================
    RESPONSIVE — anchors match the design source's data-r map. Kept
    last in the sheet on purpose: several rules here share exact
    selector specificity with earlier component rules (e.g.
@@ -681,4 +719,26 @@ img,svg{display:block}
 }
 @media (prefers-reduced-motion:reduce){
   #avApp *{transition-duration:.001ms!important;animation-duration:.001ms!important}
+}
+
+/* Phone header (AV by Dave facelift): no clipped workspace tabs, every
+   header control keeps a visible label, and the Toolbox content starts on
+   the first screen. Kept after the responsive block so it wins ties. */
+@media (max-width:680px){
+  #avApp [data-r="head"]{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px 12px}
+  #avApp .hd-left{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px 10px;max-width:none;overflow:visible}
+  #avApp .hd-ctx{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
+  #avApp .hd-ctx button{justify-content:center;padding:0 4px;white-space:nowrap;min-width:0}
+  #avApp .hd-ctx button svg{display:none}
+  #avApp .hd-right{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0;width:100%}
+  #avApp .hd-right .hd-icon-btn,#avApp .hd-right .hd-icon-btn.labeled,#avApp #brandCycleBtn.labeled{width:auto;min-width:0;padding:0 4px;gap:5px}
+  #avApp .hd-right .lbl{display:inline;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #avApp .hd-right .kbd,#avApp .hd-cache{display:none}
+  #avApp [data-r="phases"]{order:0;min-width:0;width:100%;max-width:100%;justify-self:stretch;justify-content:flex-start;overflow-x:auto}
+}
+/* Mid-width desktops: the labelled header buttons stay on the brand row. */
+@media (min-width:681px) and (max-width:1439px){
+  #avApp .hd-right{gap:6px}
+  #avApp .hd-right .kbd,#avApp .hd-cache{display:none}
+  #avApp .hd-right .hd-icon-btn.labeled{padding:0 10px}
 }

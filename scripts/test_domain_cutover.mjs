@@ -264,7 +264,7 @@ try {
         await context.setOffline(true);
         await page.reload();
         assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
-        assert.ok((await page.locator('body').innerText()).includes('AV SUITE'));
+        assert.match(await page.locator('body').innerText(), /AV Suite/i, 'AV Suite page rendered');
       }
     });
 
@@ -693,7 +693,7 @@ try {
       await context.setOffline(true);
       await page.reload();
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'keep during activation');
-      assert.ok((await page.locator('body').innerText()).includes('AV SUITE'));
+      assert.match(await page.locator('body').innerText(), /AV Suite/i, 'AV Suite page rendered');
     } finally {
       responseHooks.delete(directory);
       releaseCache?.(); releaseNavigation?.();

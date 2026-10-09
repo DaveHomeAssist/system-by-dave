@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-09 — AV by Dave console facelift
+
+- Bring the AV Toolbox and Show Console (SBD Paper and Stage Slate) in line with avbydave.com: DM Sans headings, a green rounded "AV" brand mark, 10px control and 14px card corners, ink-style 48px primary buttons, and the AV by Dave green for navigation chrome. New `--av-brand*`, `--av-font-ui` and radius tokens in `css/av-theme.css` carry the brand; the in-tool `--av-accent` is unchanged. Industry and Borland DOS skins keep their own look.
+- Phone header: the System by Dave cross-site links (Tools, Notion, Prompt Lab, Dave) fold into a "More" menu while AV by Dave home and AV Suite stay visible. Header buttons show text labels (SBD, Light/Dark, Help, Start screen, Settings, Search), the Show Console / Toolbox / Front Office tabs share the full width instead of clipping, and the Toolbox content starts on the first screen.
+- Shared tool chrome: on AV pages the floating System by Dave nav and tool brand marks use the brand green, DM Sans and rounded corners (other System by Dave pages keep their look; the offline switcher guide is rebuilt because it inlines `css/sbd-public-nav.css`). 34 tool headers show the "AV" mark (decorative) instead of "S", and each "back to the AV Suite" link name now starts with its visible text.
+- Gear Reference: the scrolling section panel is keyboard-focusable, and Prev/Next section buttons keep their visible words in the accessible name. The AV Suite dock's Prev/Next phase links do the same.
+- Advance the AV offline cache generation.
+
 ## 2026-10-09 — AV by Dave landing quick fixes
 
 - Rewrite the avbydave.com landing in plain language: free browser tools for live-show crews that keep working offline, with show data kept on the device. Add the registry-checked "52 browser AV tools that keep working offline" stat and WebSite structured data. Remove the previous-landing, Doorway and engineering Docs links.
