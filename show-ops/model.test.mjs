@@ -202,6 +202,16 @@ test('Crew Call parser rejects malformed, future, oversized and ambiguous input'
   unknown.meta.showDate = '2026-10-08'; unknown.meta.showName = 'Untitled Crew Call';
   assert.throws(() => parseCrewCall(JSON.stringify(unknown)), /named show/);
 });
+test('Crew Call accepts producer notes above 5,000 characters within the source byte limit', () => {
+  const source = JSON.parse(crewCall());
+  source.items[0].notes = 'Long producer note. '.repeat(300);
+  const raw = JSON.stringify(source);
+  assert.ok(source.items[0].notes.length > 5000);
+  assert.ok(new TextEncoder().encode(raw).length < MAX_CREW_CALL_BYTES);
+  const copied = copyCrewCall(empty(), previewCrewCall(empty(), raw), ['crew-1'], 'file', '2026-10-09T04:00:00Z', ids());
+  assert.equal(copied.crew[0].crewSource.snapshot.notes, source.items[0].notes);
+  assert.equal(validate(JSON.parse(JSON.stringify(copied))).crewCallSources[0].raw, raw);
+});
 test('Crew Call provenance and source history reject tampering without mutating the candidate', () => {
   const raw = crewCall();
   const doc = copyCrewCall(empty(), previewCrewCall(empty(), raw), ['crew-1'], 'file', '2026-10-09T04:00:00Z', ids());

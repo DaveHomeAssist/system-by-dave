@@ -81,7 +81,7 @@ export function parseCrewCall(raw) {
   if (!onlyKeys(meta, crewMetaFields) || crewMetaFields.some(key => !text(meta[key], 500)) || !meta.showName.trim() || meta.showName.trim() === 'Untitled Crew Call' || !validDate(meta.showDate)) throw new Error('Crew Call needs a named show and valid show date. Nothing was changed.');
   const ids = new Set();
   for (const item of value.items) {
-    if (!isRecord(item) || !onlyKeys(item, ['id', ...crewFields]) || !text(item.id, 200) || !item.id.trim() || ids.has(item.id) || !crewDepartments.includes(item.section) || !text(item.name, 500) || !item.name.trim() || ['role', 'call', 'location', 'meal', 'release', 'phone'].some(key => !text(item[key], 500)) || !crewStatuses.includes(item.status) || !text(item.notes, 5000)) throw new Error('Crew Call has an invalid, unsupported or duplicate crew member. Nothing was changed.');
+    if (!isRecord(item) || !onlyKeys(item, ['id', ...crewFields]) || !text(item.id, 200) || !item.id.trim() || ids.has(item.id) || !crewDepartments.includes(item.section) || !text(item.name, 500) || !item.name.trim() || ['role', 'call', 'location', 'meal', 'release', 'phone'].some(key => !text(item[key], 500)) || !crewStatuses.includes(item.status) || typeof item.notes !== 'string') throw new Error('Crew Call has an invalid, unsupported or duplicate crew member. Nothing was changed.');
     ids.add(item.id);
   }
   return { raw, meta: { showName: meta.showName, showDate: meta.showDate, venue: meta.venue }, items: value.items, active: value.items.filter(activeCrew), identity: crewIdentity(meta) };
