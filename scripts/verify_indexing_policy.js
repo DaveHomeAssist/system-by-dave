@@ -56,7 +56,7 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-// 146 includes the AV by Dave landing source and noindex alternative, Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
+// 147 includes the AV by Dave landing source and noindex alternative, Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
 // /fmp/gear/, /fmp/build/ and /fmp/ptz/ pages that replaced Notion links on 2026-09-18,
 // plus the four additional equipment explorers published on 2026-09-20, and the noindex
 // FMP Camera Simulator (its page, standalone offline copy and app source) from 2026-09-23,
@@ -67,7 +67,8 @@ const robots = read('robots.txt');
 // public application routes belong in the AV-origin sitemap through the registry,
 // so they must not increase the count of tracked routes outside all sitemaps.
 // Show Ops adds its nonpublic application source under apps/show-ops/.
-if (unlisted.length !== 146) fail(`Expected 146 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// The old AV Tool Suite index v2 became a noindex archive on 2026-10-09 (147).
+if (unlisted.length !== 147) fail(`Expected 147 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   if (!sitemapRoutes.has(route)) {

@@ -1,31 +1,37 @@
 <!DOCTYPE html>
-<html lang="en" data-av-theme="light" data-av-tool="landing-alt">
+<html lang="en" data-av-theme="dark" data-av-tool="landing-alt">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'" />
-<title>AV by Dave — Run the show from one console</title>
-<meta name="description" content="A show-first view of AV by Dave: enter the Show Console with a named show, or open the AV Toolbox for a standalone task." />
+<title>AV by Dave — Free offline tools for live-show crews</title>
+<meta name="description" content="52 free browser tools for live-show crews: audio, video, lighting, power and show calling. They keep working offline and your show data stays on your device." />
 <meta name="robots" content="noindex,follow" />
 <link rel="canonical" href="https://avbydave.com/" />
-<meta name="theme-color" content="#edf3f8" id="altThemeColor" />
+<meta name="theme-color" content="#0a0d14" id="altThemeColor" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="AV by Dave" />
-<meta property="og:title" content="AV by Dave — Run the show from one console" />
-<meta property="og:description" content="A show-first view of the Show Console and AV Toolbox for live event operators." />
+<meta property="og:title" content="AV by Dave — Free offline tools for live-show crews" />
+<meta property="og:description" content="Free browser tools for audio, video, lighting, power and show calling. They keep working offline and your show data stays on your device." />
 <meta property="og:url" content="https://avbydave.com/" />
-<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png" />
-<meta property="og:image:width" content="1024" />
-<meta property="og:image:height" content="412" />
-<meta property="og:image:alt" content="System by Dave preview banner" />
+<meta property="og:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="AV by Dave: free AV tools for live-show crews" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="AV by Dave — Run the show from one console" />
-<meta name="twitter:description" content="A show-first view of the Show Console and AV Toolbox for live event operators." />
-<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png" />
+<meta name="twitter:title" content="AV by Dave — Free offline tools for live-show crews" />
+<meta name="twitter:description" content="Free browser tools for audio, video, lighting, power and show calling. They keep working offline and your show data stays on your device." />
+<meta name="twitter:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+<meta name="twitter:image:alt" content="AV by Dave: free AV tools for live-show crews" />
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png" />
+<script src="js/av-landing-theme.js"></script>
+<link rel="stylesheet" href="css/fonts.css" />
 <link rel="stylesheet" href="css/av-landing-alt.css" />
 <script src="js/av-landing-alt.js" defer></script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"AV by Dave","url":"https://avbydave.com/","description":"Free browser tools for live-show crews that keep working offline. Show data stays on your device.","inLanguage":"en","publisher":{"@type":"Person","name":"Dave Robertson","url":"https://systembydave.com/"},"isPartOf":{"@type":"WebSite","name":"System by Dave","url":"https://systembydave.com/"}}
+</script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to main content</a>
@@ -34,21 +40,20 @@
   <header class="site-header">
     <div class="inner">
       <a class="brand" href="https://avbydave.com/" aria-label="AV by Dave home">
-        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-mark" aria-hidden="true">AV</span>
         <span class="brand-text">
           <strong>AV by Dave</strong>
-          <span>Show-first view</span>
+          <span>Tools for live-show crews</span>
         </span>
       </a>
       <nav class="nav" aria-label="Primary">
-        <a href="https://avbydave.com/">Home</a>
-        <a href="https://avbydave.com/av-suite.html?entry=show">Show Console</a>
         <a href="https://avbydave.com/av-suite.html?entry=toolbox">AV Toolbox</a>
-        <a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/av-suite-doorway.md" rel="noopener noreferrer">Docs <span aria-hidden="true">↗</span><span class="sr-only">(opens GitHub)</span></a>
+        <a href="https://avbydave.com/av-suite.html?entry=show">Show Console</a>
+        <a href="https://avbydave.com/front-office/">Front Office <span class="beta">Beta</span></a>
+        <a href="https://systembydave.com/" rel="noopener noreferrer">System by Dave <span aria-hidden="true">↗</span></a>
       </nav>
       <div class="header-actions">
-        <button class="btn btn-ghost theme-toggle" id="themeToggle" type="button" aria-label="Use dark mode" aria-pressed="false" hidden>Dark mode</button>
-        <a class="btn btn-primary" href="https://avbydave.com/av-suite.html?entry=show">Open Show Console</a>
+        <button class="btn btn-ghost theme-toggle" id="themeToggle" type="button" aria-label="Use light mode" aria-pressed="true" hidden>Light mode</button>
       </div>
     </div>
   </header>
@@ -57,17 +62,21 @@
     <div class="wrap">
       <section class="hero" aria-labelledby="hero-title">
         <div>
-          <p class="eyebrow">Show-first landing · Live event ops</p>
-          <h1 id="hero-title">Run the show from one console</h1>
+          <p class="eyebrow">Free · Works offline · No account</p>
+          <h1 id="hero-title">Free AV tools for live-show crews</h1>
           <p class="hero-lead">
-            Start in the Show Console with a named show, phase, readiness and next actions in view.
-            Open supported tools with that context, or use the AV Toolbox for one task with no show attached.
+            Browser tools for audio, video, lighting, power and show calling. They keep working
+            offline after your first visit, and your show data stays on your device.
           </p>
           <div class="hero-ctas">
-            <a class="btn btn-primary btn-lg" href="https://avbydave.com/av-suite.html?entry=show">Open Show Console</a>
-            <a class="btn btn-ghost btn-lg" href="https://avbydave.com/av-suite.html?entry=toolbox">Browse the AV Toolbox</a>
+            <a class="btn btn-primary btn-lg" href="https://avbydave.com/av-suite.html?entry=toolbox">Browse the AV tools <span aria-hidden="true">→</span></a>
+            <a class="btn btn-ghost btn-lg" href="https://avbydave.com/av-suite.html?entry=show">Open the Show Console</a>
           </div>
-          <p class="hero-tertiary">Front Office <span class="soon">coming soon</span> <span aria-hidden="true">·</span> <a href="https://avbydave.com/av-suite-landing.html">See the previous landing</a></p>
+          <ul class="hero-stats" role="list">
+            <li><strong data-av-tool-count>52</strong> browser AV tools that keep working offline</li>
+            <li>No account or install needed</li>
+          </ul>
+          <p class="hero-tertiary"><a href="https://avbydave.com/front-office/">Try Front Office</a> <span class="beta">Beta</span> <span>clients, venues and jobs in one place</span></p>
         </div>
 
         <aside class="product-card" aria-label="Example show multiview (illustration, not live status)">
@@ -129,23 +138,23 @@
       </section>
 
 
-      <section class="quick-tools" aria-label="Top tools">
+      <section class="quick-tools" aria-labelledby="quick-tools-title">
         <div class="quick-tools-head">
-          <h2>Use anytime</h2>
-          <a href="https://avbydave.com/av-suite.html?entry=toolbox">Explore the full AV Toolbox →</a>
+          <h2 id="quick-tools-title">Start with one tool</h2>
+          <a href="https://avbydave.com/av-suite.html?entry=toolbox">See all <span data-av-tool-count>52</span> tools →</a>
         </div>
         <div class="quick-tools-grid">
-          <a class="quick-tool" href="https://avbydave.com/plotforge.html">
-            <svg class="icon" viewBox="0 0 56 56" fill="none" aria-hidden="true"><path d="M6 13h44M12 13v28M44 13v28M18 41h20M20 21l-4 9h8l-4-9ZM36 21l-4 9h8l-4-9ZM20 13v8M36 13v8"/></svg>
-            <span class="tag">Lighting</span>
-            <span class="name">PlotForge</span>
-            <span class="blurb">Full lighting-plot app · opens PlotForge</span>
-          </a>
           <a class="quick-tool" href="https://avbydave.com/ProjectorThrow/">
             <svg class="icon" viewBox="0 0 56 56" fill="none" aria-hidden="true"><path d="M7 34h18l6-9H13l-6 9ZM11 38h13M35 16l15 7v22l-15-7V16ZM31 25l19-2M25 30l25-7M25 34l25 11"/></svg>
             <span class="tag">Projection</span>
             <span class="name">Throwline</span>
-            <span class="blurb">Throw, fit, brightness, room plan</span>
+            <span class="blurb">Projector throw, fit, brightness and room plan</span>
+          </a>
+          <a class="quick-tool" href="https://avbydave.com/av-calculator.html">
+            <svg class="icon" viewBox="0 0 56 56" fill="none" aria-hidden="true"><rect x="13" y="7" width="30" height="42" rx="3"/><path d="M19 14h18v9H19zM20 30h3M28 30h3M36 30h1M20 36h3M28 36h3M36 36h1M20 42h11M36 42h1"/></svg>
+            <span class="tag">Math</span>
+            <span class="name">AV Calculator</span>
+            <span class="blurb">Delay, throw, storage, power, voltage drop, SPL</span>
           </a>
           <a class="quick-tool" href="https://avbydave.com/gear-reference.html">
             <svg class="icon" viewBox="0 0 56 56" fill="none" aria-hidden="true"><rect x="8" y="10" width="40" height="36" rx="3"/><path d="M13 18h30M13 27h30M13 36h30M17 15h4M17 23h4M17 32h4M32 15h10M32 23h10M32 32h10"/></svg>
@@ -153,11 +162,12 @@
             <span class="name">Gear Reference</span>
             <span class="blurb">Device sheets, specs, procedures</span>
           </a>
-          <a class="quick-tool" href="https://avbydave.com/av-calculator.html">
-            <svg class="icon" viewBox="0 0 56 56" fill="none" aria-hidden="true"><rect x="13" y="7" width="30" height="42" rx="3"/><path d="M19 14h18v9H19zM20 30h3M28 30h3M36 30h1M20 36h3M28 36h3M36 36h1M20 42h11M36 42h1"/></svg>
-            <span class="tag">Math</span>
-            <span class="name">AV Calculator</span>
-            <span class="blurb">Delay, throw, storage, power</span>
+          <a class="quick-tool" href="https://avbydave.com/plotforge.html">
+            <svg class="icon" viewBox="0 0 56 56" fill="none" aria-hidden="true"><path d="M6 13h44M12 13v28M44 13v28M18 41h20M20 21l-4 9h8l-4-9ZM36 21l-4 9h8l-4-9ZM20 13v8M36 13v8"/></svg>
+            <span class="tag">Lighting</span>
+            <span class="name">PlotForge</span>
+            <span class="blurb">Full lighting-plot app</span>
+            <span class="beta-note"><span class="beta">Beta</span> opens plotforge-beta.vercel.app</span>
           </a>
         </div>
       </section>
@@ -171,10 +181,10 @@
             <span class="viz-chip hold"><i></i>HOLD 1</span>
             <span class="viz-chip clear"><i></i>CLEAR</span>
           </div>
-          <h3>Triage first</h3>
+          <h3>Problems first</h3>
           <p>
-            Blockers surface before the catalog. See what stops the show, clear it,
-            then open the tool that matters.
+            The Show Console puts what could stop the show at the top. Clear it,
+            then open the tool you need.
           </p>
         </article>
 
@@ -207,8 +217,8 @@
           </div>
           <h3>One show, carried everywhere</h3>
           <p>
-            Keep the show name, venue, date, phase and operator close at hand.
-            Supported tool links can carry that context; confirmed handoffs move data where available.
+            Name the show once. The show name, venue, date and phase follow you into
+            the tools that support it, and data only moves between tools when you confirm it.
           </p>
         </article>
       </section>
@@ -217,7 +227,7 @@
     <div class="trust">
       <div class="inner">
         <span class="accent" aria-hidden="true"></span>
-        <span>Show data stays on your device · Free in the browser</span>
+        <span>Free in the browser · Show data stays on your device</span>
         <span id="offlineStatus" role="status">Offline access prepares after your first visit.</span>
         <span class="accent" aria-hidden="true"></span>
       </div>
@@ -226,8 +236,14 @@
 
   <footer>
     <div class="wrap inner">
-      <span>© <span id="y"></span> System by Dave · AV by Dave</span>
-      <span id="docs"><a href="https://avbydave.com/av-suite-landing.html">Previous landing</a> · <a href="https://avbydave.com/av-suite.html?entry=show">Open Show Console</a> · <a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/av-suite-doorway.md" rel="noopener noreferrer">Docs ↗</a> · <a href="https://systembydave.com/" rel="noopener noreferrer">System by Dave ↗</a></span>
+      <span>© <span id="y">2026</span> System by Dave · AV by Dave</span>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="https://avbydave.com/av-suite.html?entry=toolbox">AV Toolbox</a>
+        <a href="https://avbydave.com/av-suite.html?entry=show">Show Console</a>
+        <a href="https://avbydave.com/front-office/">Front Office</a>
+        <a href="https://systembydave.com/privacy-policy.html" rel="noopener noreferrer">Privacy</a>
+        <a href="https://systembydave.com/" rel="noopener noreferrer">System by Dave <span aria-hidden="true">↗</span></a>
+      </nav>
     </div>
   </footer>
 

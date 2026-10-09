@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-09 — AV by Dave landing quick fixes
+
+- Rewrite the avbydave.com landing in plain language: free browser tools for live-show crews that keep working offline, with show data kept on the device. Add the registry-checked "52 browser AV tools that keep working offline" stat and WebSite structured data. Remove the previous-landing, Doorway and engineering Docs links.
+- Link Front Office with a Beta label. Move Throwline into the first "Start with one tool" slot and label PlotForge "Beta · opens plotforge-beta.vercel.app".
+- Restyle the landing to match the systembydave.com homepage: DM Sans, 48px buttons, 10px control and 14px card corners, and AV by Dave's single green accent. Ship it dark in HTML and apply a saved light choice from an early head script (`js/av-landing-theme.js`), so there is no light flash. The footer year renders without JavaScript and the phone header keeps every destination visible in two rows.
+- Give AV by Dave pages one AV-specific link preview, `img/av-by-dave-og.png` (1200×630, 59 KB), in place of the generic System by Dave banner, and drop that 594 KB banner from the AV offline cache.
+- Make the old AV Tool Suite index v2 a noindex archive outside the sitemap. Stop staging browser probes, unit tests, README/CHANGELOG notes and `node_modules/` files onto other domains. Give avbydave.com a styled 404 page that links the AV Toolbox and home.
+- Toolbox: explain the gap between listed and registered tools ("Showing 50 of 52 tools · 2 more open inside AV Video") and fix the duplicate banner landmark by making the AV bar a labelled region that holds the page heading.
+- Advance the AV offline cache generation.
+
 ## 2026-10-09 — Show Ops touch console
 
 - Reuse AV Video's shared workspace for functional Rooms, Crew, Tasks, Setup, Handoff and Backup panels, with side-by-side operation, layout controls and saved views.
