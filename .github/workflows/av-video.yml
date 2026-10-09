@@ -4,9 +4,12 @@ on:
   pull_request:
     paths:
       - 'apps/av-video/**'
+      - 'apps/show-ops/**'
       - 'apps/shared/**'
       - 'scripts/probe_av_console*.mjs'
       - 'av-video/**'
+      - 'show-ops/**'
+      - 'scripts/probe_show_ops_console.mjs'
       - 'package*.json'
       - 'scripts/probe_av_video*.mjs'
       - 'scripts/probe_av_suite_responsive.js'
@@ -40,6 +43,14 @@ jobs:
           test -z "$(git status --porcelain -- av-video)"
       - run: npx playwright install --with-deps chromium
       - run: npm run test:av-video-browser
+      - name: Show Ops console typecheck, tests, build and browser
+        run: |
+          npm run typecheck:show-ops
+          npm run test:show-ops
+          npm run build:show-ops
+          git diff --exit-code -- show-ops
+          test -z "$(git status --porcelain -- show-ops)"
+          npm run test:show-ops-browser
       - name: AV source checks
         run: npm run verify:av
       - name: Toolbox entry and consolidation contract

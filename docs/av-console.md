@@ -2,7 +2,9 @@
 
 The console workspace is the grandMA-style panel host that AV by Dave consoles share. You tap empty space, choose a panel, work in that space, and store the arrangement as a named view. Window sizing, layout lock and stored views follow Hog-style conventions. The design source is the Claude Design prototype *AV Suite Prototype v3*, built from the [unified console manifest](#decisions).
 
-AV Video is the first console. The engine lives in [`apps/shared/av-console/`](../apps/shared/av-console/):
+AV Video is the reference console. Audio already uses this engine; Show Ops
+adopts it in the October 9 functional-panel conversion. The engine lives in
+[`apps/shared/av-console/`](../apps/shared/av-console/):
 
 - `layout.ts` holds the pure grid model: fit, suggest, trim, nudge and split, plus the view operations and the persisted `workspace` shape. Its tests are in `layout.test.ts`.
 - `Workspace.tsx` holds `useConsoleWorkspace` (live arrangement state) and `ConsoleWorkspace` (view strip, panel buttons, grid, chooser, menus, pointer and keyboard paths).
@@ -17,6 +19,10 @@ A console supplies four things:
 - **A renderer** for each panel type.
 
 The engine owns presentation only. It never reads or writes records. Panel content, selection, records, validation and saving stay with the console. Specialist consoles (Throwline, CueForge-style live surfaces) may scope their own tokens and chrome inside `.console-shell`.
+
+The [October 9 rollout assessment](av-console-rollout.md) maps the current toolset
+to actual panel capabilities. A primary application's Rail link proves navigation,
+not shared-workspace adoption or legacy tool parity.
 
 ## Interaction contract
 
