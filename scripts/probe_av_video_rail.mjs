@@ -112,7 +112,11 @@ try {
   assert.equal(await allAppsDialog().locator('[data-entry-type="Console"], [data-entry-type="Planned console"]').count(), 9);
   assert.equal(await allAppsDialog().locator('[data-entry-type="Planned console"]').count(), 0);
   assert.equal(await allAppsDialog().locator('[data-entry-type="Console"][href]').count(), 9);
-  assert.equal(await allAppsDialog().locator('[data-rail-ref="console:audio"]').getAttribute('href'), 'http://127.0.0.1:4173/av-audio/');
+  const audioRailHref = new URL(await allAppsDialog().locator('[data-rail-ref="console:audio"]').getAttribute('href'));
+  assert.equal(audioRailHref.pathname, '/av-audio/');
+  assert.equal(audioRailHref.searchParams.get('sbdShow'), 'Gala');
+  assert.equal(audioRailHref.searchParams.get('sbdPhase'), 'show');
+  assert.equal(audioRailHref.searchParams.has('private'), false);
   assert.equal(await page.getByRole('navigation', { name: 'Panels' }).isVisible(), true, 'phone panel switcher remains distinct from Apps');
   await allAppsDialog().getByRole('button', { name: 'Customize rail', exact: true }).click();
   await expectOpen(customizeDialog());
