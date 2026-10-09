@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "675ad91606ef31fc2a4953caf3025b154bd8c3c2",
+  "head": "37f4eecbf61cbce780f856afb3c122e0c7b5576f",
   "status": "amber",
-  "statusReason": "Eight standalone AV application candidates were published at 59d41e3 after #293-#295. AV Lighting's PlotForge handoff (#297), Show Control's CueForge integrity repair (#299), Front Office's Show Advance import (#301), and Show Ops' Room Check v1 one-way copy (#303) were source-merged, published and isolated-live verified through 675ad916. All eight new Rail console slots remain Planned. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
+  "statusReason": "Eight standalone AV application candidates were published at 59d41e3 after #293-#295. AV Lighting's PlotForge handoff (#297), Show Control's CueForge integrity repair (#299), Front Office's Show Advance import (#301), and Show Ops' Room Check and active Show Task Board one-way copies (#303, #305) were source-merged, published and isolated-live verified through 37f4eec; the unrelated Workbook date-fixture release repair is #306. All eight new Rail console slots remain Planned. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
   "lastActivity": "2026-10-08",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -22,7 +22,8 @@
     "AV Lighting's previewed PlotForge interop manifest v1 fixture copy (#297) is published at eca82f8. Walter passed isolated live import/save/reload and launch-link checks at 375x812 and 1440x900; three affected assets matched source byte-for-byte.",
     "Show Control's one-way CueForge version 7 selected-list integrity repair (#299) is published at 8b7751f. Duplicate or empty list/cue IDs are rejected; the selected safe cue snapshot and replacement impact are previewed before guarded copy. Walter passed isolated live confirmation/cancel, save/export/restore, secret-field exclusion, theme/contrast and five viewport checks; four Show Control assets matched source byte-for-byte.",
     "Front Office's local Show Advance v1 import (#301) is published at d1cb538. Walter passed isolated live saved/file preview, cancellation, stale-source protection, explicit client/venue binding, unsaved copy, backup/restart, rejection and five viewport checks; five Front Office runtime assets matched source byte-for-byte.",
-    "Show Ops' selected Room Check v1 one-way copy (#303) is published at 675ad916. Walter passed model, saved/file browser and isolated live synthetic copy checks; all copied statuses begin Needs check, exact source JSON survives Save/backup/reopen, and five published assets matched source byte-for-byte."
+    "Show Ops' selected Room Check v1 one-way copy (#303) is published at 675ad916. Walter passed model, saved/file browser and isolated live synthetic copy checks; all copied statuses begin Needs check, exact source JSON survives Save/backup/reopen, and five published assets matched source byte-for-byte.",
+    "Show Ops' selected active Show Task Board v1 one-way copy (#305) is published at 37f4eec after date-fixture release repair #306. Walter passed model, saved/file and isolated live synthetic copy checks at phone and desktop widths; copied rows begin unsaved Open, retain exact source/provenance, and five published assets matched source byte-for-byte."
   ],
   "nextStep": {
     "title": "Complete canonical specialist handoffs before field acceptance",
@@ -581,6 +582,32 @@
       "limits": [
         "The private Next Steps Board file was absent at its registered Downloads path; this public-safe project record does not establish private board synchronization.",
         "No physical device, operator rehearsal, Room Check producer-side routed handoff, cross-tool synchronization, Show Board parity or Rail promotion was accepted. The other specialist handoffs remain separate open work."
+      ]
+    },
+    "showOpsTaskBoardRelease": {
+      "checkedOn": "2026-10-08",
+      "sourceRevision": "37f4eecbf61cbce780f856afb3c122e0c7b5576f",
+      "status": "Published; isolated live browser copy passed; physical/operator acceptance open",
+      "scope": "One-way selected active Show Task Board v1 saved/file copy into unsaved Open Show Ops task rows, preserving exact original status, blocker, priority and source JSON; done, canceled and deferred excluded; no source mutation, sync, Show Board parity or Rail promotion",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/305",
+      "head": "66ac93cec3dcc7acc1ccf54201def29060057729",
+      "merge": "74a63aefc357b86d7d5dd51302961cce1d49d200",
+      "releaseRepair": "https://github.com/DaveHomeAssist/system-by-dave/pull/306",
+      "releaseRepairMerge": "37f4eecbf61cbce780f856afb3c122e0c7b5576f",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37870533550",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37872702654",
+      "destinationCommit": "34544ff41ef0f837d8f848272826c88427703095",
+      "publishedSource": "https://avbydave.com/source.json",
+      "liveProbeRunner": "Walter",
+      "runtime": [
+        "All six exact-head PR checks passed. Walter's LF checkout passed 12 model tests, saved/file Edge browser acceptance, verify:av, verify:throwline and verify:domain-sites. An exact-commit returning-client offline transition from 4028470 to 66ac93c passed without changing saved AV Video or Rail data.",
+        "The first source Pages run failed only on a date-dependent AV Workbook test fixture; #306 changed that fixture's baseline date without changing runtime logic or weakening its assertion. Its three exact-head checks and the replacement source workflow, including AV Workbook, passed. AV destination Pages passed; live source.json named 37f4eec and Show Ops HTML, app, model and CSS plus the registry matched that commit byte-for-byte.",
+        "Synthetic browser coverage includes active-only selection, visible source blocker/status, cancel, changed source/target rejection, invalid-field and markup escaping, unsaved copy, failed Save, explicit Save/reload and exact-source backup/restore at phone, short-landscape, desktop and ultrawide widths. Walter's isolated live Edge probe passed saved/file preview, selected unsaved Open copy, explicit Save/reload and original source/status/provenance retention at 375px and 1440px."
+      ],
+      "limits": [
+        "The initial source Pages run 37868310415 failed the date-dependent AV Workbook fixture before publication; it is superseded by successful source run 37870533550 and AV destination run 37872702654.",
+        "The private Next Steps Board file was absent at its registered Downloads path; this public-safe project record does not establish private board synchronization.",
+        "No physical device, operator rehearsal, producer-side route, cross-tool synchronization, Show Board timeline parity or Rail promotion was accepted. Other canonical specialist handoffs remain separate open work."
       ]
     },
     "frontOfficeShowAdvanceRelease": {
