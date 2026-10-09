@@ -198,6 +198,7 @@ try {
     assert.equal(new URL(page.url()).pathname, '/av-video/', `${label} must stay inside the console shell`);
   }
   await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').click();
+  await page.locator('iframe[title="Audio application"]').waitFor();
   assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Audio']);
   await page.frameLocator('iframe[title="Audio application"]').locator('body').waitFor();
   const audioBefore = await page.locator('.console-panel[data-panel="suite-audio"]').getAttribute('style');
