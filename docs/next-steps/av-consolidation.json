@@ -4,10 +4,10 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "dce2905a980254be2052771b498cb16b8f6ff89b",
+  "head": "be0f4f2bb3013ea43985be641e2c2e56d3743c26",
   "status": "amber",
-  "statusReason": "Eight standalone AV application candidates were published at 59d41e3 after #293-#295. AV Lighting's PlotForge handoff (#297), Show Control's CueForge integrity repair (#299), Front Office's Show Advance import (#301), Show Ops' Room Check and active Show Task Board one-way copies (#303, #305), and The Shop's Gear Prep quantity handoff (#308) were source-merged, published and isolated-live verified through dce2905; the unrelated Workbook date-fixture release repair is #306. All eight new Rail console slots remain Planned. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
-  "lastActivity": "2026-10-08",
+  "statusReason": "Eight standalone AV application candidates were published at 59d41e3 after #293-#295. AV Lighting's PlotForge handoff (#297), Show Control's CueForge integrity repair (#299), Front Office's Show Advance import (#301), Show Ops' Room Check, active Show Task Board and Crew Call one-way copies (#303, #305, #310), and The Shop's Gear Prep quantity handoff (#308) were source-merged, published and isolated-live verified through be0f4f2; the unrelated Workbook date-fixture release repair is #306. All eight new Rail console slots remain Planned. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
+  "lastActivity": "2026-10-09",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -24,7 +24,8 @@
     "Front Office's local Show Advance v1 import (#301) is published at d1cb538. Walter passed isolated live saved/file preview, cancellation, stale-source protection, explicit client/venue binding, unsaved copy, backup/restart, rejection and five viewport checks; five Front Office runtime assets matched source byte-for-byte.",
     "Show Ops' selected Room Check v1 one-way copy (#303) is published at 675ad916. Walter passed model, saved/file browser and isolated live synthetic copy checks; all copied statuses begin Needs check, exact source JSON survives Save/backup/reopen, and five published assets matched source byte-for-byte.",
     "Show Ops' selected active Show Task Board v1 one-way copy (#305) is published at 37f4eec after date-fixture release repair #306. Walter passed model, saved/file and isolated live synthetic copy checks at phone and desktop widths; copied rows begin unsaved Open, retain exact source/provenance, and five published assets matched source byte-for-byte.",
-    "The Shop's Gear Prep v1 requested-quantity and operator-entered partial-pack counts (#308) are published at dce2905. Walter passed isolated live preview, visible overpack rejection, explicit Save/reload and producer-byte preservation at 375px and 1440px; nine affected published assets matched source byte-for-byte. The Shop remains a Planned Rail slot."
+    "The Shop's Gear Prep v1 requested-quantity and operator-entered partial-pack counts (#308) are published at dce2905. Walter passed isolated live preview, visible overpack rejection, explicit Save/reload and producer-byte preservation at 375px and 1440px; nine affected published assets matched source byte-for-byte. The Shop remains a Planned Rail slot.",
+    "Show Ops' selected Crew Call v1 one-way copy (#310) is published at be0f4f2. Walter passed isolated live saved/file preview, cancellation, unsaved copy, explicit Save/reload, export/restore, stale-target and malformed-file guards, theme checks and six viewport sizes; nine published assets matched source byte-for-byte. Copied crew start Called without inferring attendance, while original source bytes, statuses and notes are retained. Show Ops remains a Planned Rail slot."
   ],
   "nextStep": {
     "title": "Complete canonical specialist handoffs before field acceptance",
@@ -165,7 +166,7 @@
         "Eight standalone application candidates are published and isolated-live tested at 59d41e3; their Rail slots remain Planned pending physical/operator acceptance and explicit promotion.",
         "AV Lighting's previewed one-way PlotForge interop manifest v1 fixture copy and full-source backup are published at eca82f8; this does not establish full PlotForge parity, synchronization, live output, physical acceptance or Rail promotion.",
         "Show Control's guarded one-way CueForge version 7 selected-list snapshot is published at 8b7751f; the native file, secrets, patch, media paths and output control remain outside the browser copy. This is not full CueForge parity, synchronization, physical acceptance or Rail promotion.",
-        "Show Ops' selected Room Check v1 copy is published at 675ad916, with original source retained and target rows requiring a fresh readiness check. This is not synchronization, physical acceptance, Show Board parity or Rail promotion.",
+        "Show Ops' selected Room Check v1 copy is published at 675ad916, with original source retained and target rows requiring a fresh readiness check. Active Show Task Board and Crew Call v1 selected one-way copies are also published through be0f4f2; copied crew begin Called without inferring attendance. These are not synchronization, physical acceptance, Show Board parity or Rail promotion.",
         "The Shop's one-way Gear Prep v1 quantity copy is published at dce2905. Requested counts enter Shop, packed counts remain operator-entered, partial packs survive Save/reload, and the original source remains unchanged; no synchronization or Rail promotion is implied.",
         "Cameras/Playback is delivered; Stream/Record remains the next AV Video module slice.",
         "Shared identities, future preference scope, family mergers and automated readiness require their own choice gates.",
@@ -268,6 +269,7 @@
     "node --test the-shop/model.test.mjs",
     "node the-shop/probe.mjs",
     "node --test show-ops/model.test.mjs",
+    "SHOW_OPS_BASE_URL=https://avbydave.com node scripts/probe_show_ops_crew.mjs --no-sandbox",
     "npm run test:av-offline-transition",
     "AV_VIDEO_BASE=https://avbydave.com node scripts/probe_av_video_rail.mjs --no-sandbox",
     "VIEWPORT_BASE=https://avbydave.com/ node scripts/probe_calculator_viewport.cjs",
@@ -280,9 +282,22 @@
     "Earlier audit details and unchanged private evidence remain in the updater backup. Superseded counts and revalidation notes are preserved by finding ID.",
     "Unanswered historical questions remain Open; recommendations are not approvals.",
     "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open.",
-    "Room Check v1 checks can be copied selectively into Show Ops as unsaved Needs check rows with exact source provenance; this does not synchronize the tools or promote the Planned Rail slot."
+    "Room Check v1 checks can be copied selectively into Show Ops as unsaved Needs check rows with exact source provenance; this does not synchronize the tools or promote the Planned Rail slot.",
+    "Crew Call v1 active members can be copied selectively into Show Ops as unsaved Called rows with exact source provenance and no automatic attendance inference; the producer and Planned Rail slot remain unchanged."
   ],
   "links": [
+    {
+      "label": "Show Ops Crew Call one-way copy #310",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/310"
+    },
+    {
+      "label": "Show Ops Crew Call source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37885057850"
+    },
+    {
+      "label": "Show Ops Crew Call AV destination deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37886815389"
+    },
     {
       "label": "The Shop Gear Prep quantity handoff #308",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/308"
@@ -393,7 +408,7 @@
     }
   ],
   "kickoffPrompt": "Continue the maintained AV consolidation stages from fresh remote main. Stage 1, the AV Video application Rail and its isolated returning-client offline transition are delivered; do not repeat them. Preserve focused app ownership, typed Rail identities, device-local preferences, explicit imports and reversible modules. Prepare Stream/Record after its credential-handling decision; verify exact-head CI, publication and live behavior, and keep physical acceptance separate.",
-  "confidence": "High for the cited Rail and console releases, PlotForge-to-Lighting, CueForge-to-Show-Control, Room-Check-to-Show-Ops and Gear-Prep-to-Shop quantity slices, exact affected-asset parity, scoped automated live checks and isolated returning-client offline transition; broader canonical app parity, physical acceptance and historical follow-ups remain open.",
+  "confidence": "High for the cited Rail and console releases, PlotForge-to-Lighting, CueForge-to-Show-Control, Room-Check, Show-Task-Board and Crew-Call-to-Show-Ops, and Gear-Prep-to-Shop quantity slices, exact affected-asset parity, scoped automated live checks and isolated returning-client offline transition; broader canonical app parity, physical acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
@@ -647,6 +662,29 @@
       "limits": [
         "The private Next Steps Board file was absent at its registered Downloads path; this public-safe project record does not establish private board synchronization.",
         "No physical device, operator rehearsal, producer-side routed handoff, cross-tool synchronization, automatic pack state or Rail promotion was accepted. Other canonical specialist handoffs remain separate open work."
+      ]
+    },
+    "showOpsCrewCallRelease": {
+      "checkedOn": "2026-10-09",
+      "sourceRevision": "be0f4f2bb3013ea43985be641e2c2e56d3743c26",
+      "status": "Published; isolated live browser copy passed; physical/operator acceptance open",
+      "scope": "Reviewed one-way selected Crew Call v1 saved/file copy into Show Ops with exact source provenance, explicit Save and no automatic attendance inference; no producer mutation, synchronization or Rail promotion",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/310",
+      "head": "1d23358d8241e550dd973cf1680e503823b10791",
+      "merge": "be0f4f2bb3013ea43985be641e2c2e56d3743c26",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37885057850",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37886815389",
+      "destinationCommit": "3cf9f82827ac1078913f58639cb26beeef7b08e3",
+      "publishedSource": "https://avbydave.com/source.json",
+      "liveProbeRunner": "Walter",
+      "runtime": [
+        "All six exact-head PR checks passed after a review finding about Crew Call's unbounded notes was repaired; the review thread was resolved. Walter's LF checkout passed verify:av, verify:throwline and verify:domain-sites before the narrow review fix, then 17 model tests and saved/file browser acceptance at the exact merge. The new long-note regression also passed on the Mac; CI does not run this specific model test file.",
+        "Source Pages and AV destination workflows succeeded. Live source.json named be0f4f2; Show Ops HTML, CSS, app and model plus registry, worker and three generated pages matched the merge byte-for-byte.",
+        "Walter's isolated live Chromium probe passed synthetic saved/file preview, cancel, selected unsaved Called copy, explicit Save/reload, exact-source backup/restore, stale-target and malformed-file rejection, light/dark themes, zero page errors and root containment at 375x812, 680x800, 844x390, 320x256, 1440x900 and 3840x1080."
+      ],
+      "limits": [
+        "The private Next Steps Board file was absent at its registered Downloads path; this public-safe project record does not establish private board synchronization.",
+        "No physical device, operator rehearsal, producer-side routed handoff, cross-tool synchronization, attendance equivalence or Rail promotion was accepted. Other canonical specialist handoffs remain separate open work."
       ]
     },
     "frontOfficeShowAdvanceRelease": {
