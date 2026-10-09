@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec",
+  "head": "9c370be5dc7125eacdfb4591aa85d670a87ba48d",
   "status": "amber",
-  "statusReason": "All nine published primary AV applications are now navigable from the AV Video Rail and appear once as Console links in All apps. PR #312, source publication, AV destination publication, production provenance, live Audio launch and ten AV Video page-asset matches pass at c77b0cd. Stream/Record and physical/operator acceptance remain open.",
+  "statusReason": "All nine primary Rail identities now recall inside AV Video's shared console. PR #314 and the 9c370be publication preserve selectable, resizable and reconfigurable snapshot panels, stored arrangements, standalone routes and independent app data; production provenance, isolated live browser acceptance and ten-asset parity pass. Stream/Record and physical/operator acceptance remain open.",
   "lastActivity": "2026-10-09",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -18,7 +18,8 @@
     "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter.",
     "Application Rail (#279): AV Video now mounts the exact nine RAIL-1B console slots with eight non-actionable Planned entries, RAIL-2A phone/compact/labeled layouts, typed routes, device-local customization and offline assets. Source and AV publications succeeded; Walter live acceptance, seven-asset parity and the returning-client cache transition from published adf1f1e to reviewed 55bec1a passed.",
     "AV Video Manage modules (#283): the Toolbox card opens the guarded Project view; source and AV publication, Walter live navigation/browser checks and four-asset parity passed at a6241a9.",
-    "All nine published primary AV applications are navigable from the Rail (#312) at c77b0cd. Source deployment 37893934453 and AV destination deployment 37895712977 passed; production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified. Physical/operator and connected-workflow acceptance remain separate."
+    "All nine published primary AV applications are navigable from the Rail (#312) at c77b0cd. Source deployment 37893934453 and AV destination deployment 37895712977 passed; production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified. Physical/operator and connected-workflow acceptance remain separate.",
+    "In-console application snapshots (#314, publication repairs #317/#316) are published at 9c370be. All eight non-Video Rail applications open within AV Video as selectable, resizable and reconfigurable panels; stored arrangements, Change/Close state, focus, standalone routes and independent app data passed isolated live production checks on Walter."
   ],
   "nextStep": {
     "title": "Decide the Stream and Record credential boundary",
@@ -142,17 +143,20 @@
       "gate": "PRs #237\u2013#243 merged; both destination/source deployment evidence verified. Unselected catalog tools are not claimed refactored."
     },
     {
-      "name": "Application rail \u2014 Delivered",
-      "goal": "Carry the complete v3 console order as the launcher for published primary applications.",
+      "name": "Application rail and console snapshots \u2014 Delivered",
+      "goal": "Recall all nine published primary applications inside AV Video's shared console while retaining standalone routes and independent application data.",
       "items": [
         "RAIL-1B selected October 5: nine source-ordered console slots appear by default between fixed Toolbox and All apps / Customize controls.",
         "PR #312 maps all nine published primary applications to canonical routes; every Rail entry and Console card is navigable, zero entries remain Planned, and mapped apps are not duplicated under Specialist tools.",
         "RAIL-2A responsive presentation and device-local customization are mounted around AV Video. Typed routes, data isolation, explicit recovery, focus return and five local offline assets are covered.",
         "PR #279, source deployment 37572814064 and AV destination deployment 37574460288 passed. Walter live acceptance covered 11 viewport fixtures; seven published Rail/AV assets matched 55bec1a byte-for-byte.",
         "Walter's isolated returning-client fixture kept one browser context from published adf1f1e through reviewed 55bec1a: AV Video data, UI-written Rail customization and typed context survived the worker update, the old cache was removed, all seven Rail/AV assets were cached and the updated app reopened offline.",
-        "Source deployment 37893934453 and AV destination deployment 37895712977 passed at c77b0cd. Production source.json, live Audio launch and ten AV Video page-asset matches were verified; physical/operator acceptance remains open."
+        "Source deployment 37893934453 and AV destination deployment 37895712977 passed at c77b0cd. Production source.json, live Audio launch and ten AV Video page-asset matches were verified; physical/operator acceptance remains open.",
+        "PR #314 turns all eight non-Video Rail entries into same-origin application snapshot panels without leaving /av-video/; AV Video remains the native ninth identity.",
+        "Snapshot panels use the shared 12\u00d78 engine for selection, add/change/close, move/size/split, maximize, layout lock and stored arrangements; Save remains explicit and application data stays app-owned.",
+        "Source workflow 37906183659 and AV destination workflow 37910550653 passed at 9c370be; Walter's isolated production run exercised all eight embedded routes, resize/store/reload and active Rail behavior, and ten release assets matched source."
       ],
-      "gate": "Source, exact-head CI, both publications, live Rail journeys, asset parity and the isolated returning-client offline update passed. Physical devices and operator acceptance remain separate."
+      "gate": "Exact-head CI, repaired generated-output parity, both publications, production provenance, live console journeys and asset parity passed. Physical devices and operator acceptance remain separate."
     },
     {
       "name": "Physical and operator acceptance \u2014 Open",
@@ -263,6 +267,30 @@
   ],
   "links": [
     {
+      "label": "In-console application snapshots #314",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/314"
+    },
+    {
+      "label": "Audio bundle parity guard #316",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/316"
+    },
+    {
+      "label": "Audio bundle publication repair #317",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/317"
+    },
+    {
+      "label": "Console snapshot source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37906183659"
+    },
+    {
+      "label": "Console snapshot AV destination deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37910550653"
+    },
+    {
+      "label": "Live AV Video console",
+      "url": "https://avbydave.com/av-video/"
+    },
+    {
       "label": "Rail application launcher #312",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/312"
     },
@@ -323,8 +351,8 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Continue the maintained AV Video increments from fresh remote main. The application Rail and its isolated returning-client offline transition are delivered; do not repeat them. Preserve independent Video documents, typed Rail identities, device-local preferences and explicit legacy imports while preparing Stream/Record after its credential-handling decision. Verify exact-head CI, publication and live behavior; keep physical acceptance separate.",
-  "confidence": "High for the cited Rail and console releases, exact source/live asset parity, production provenance, live application navigation and isolated returning-client offline transition; physical/operator acceptance and historical follow-ups remain open.",
+  "kickoffPrompt": "Continue AV Video from accepted application source 9c370be. The nine-identity in-console snapshot Rail is delivered; do not rebuild it. Preserve standalone routes, app-owned data, typed context and stored arrangements. Prepare Stream/Record only after AVV-STREAM-KEY-1, and keep physical/operator acceptance separate.",
+  "confidence": "High for the cited in-console snapshot release, exact source/live asset parity, production provenance and isolated live browser journeys; physical/operator acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
@@ -454,6 +482,64 @@
       "limits": [
         "Browser navigation and exact asset parity do not establish physical-device, operator or connected cross-application workflow acceptance.",
         "Stream Plan, Record Log and the AVV-STREAM-KEY-1 credential decision remain separate AV Video work."
+      ]
+    },
+    "consoleSnapshotRelease": {
+      "checkedOn": "2026-10-09",
+      "sourceRevision": "9c370be5dc7125eacdfb4591aa85d670a87ba48d",
+      "status": "Published; isolated live browser acceptance passed; physical/operator acceptance open",
+      "scope": "All nine primary AV Rail identities recall inside AV Video's shared console; the eight non-Video applications run as selectable, resizable and reconfigurable same-origin snapshot panels with stored arrangements, while standalone routes and app-owned data remain independent.",
+      "sources": [
+        "apps/av-video/src/App.tsx",
+        "apps/shared/av-console/Workspace.tsx",
+        "js/sbd-rail-mount.js",
+        "js/sbd-rail-dialogs.js",
+        "js/sbd-registry.js",
+        "scripts/probe_av_console.mjs"
+      ],
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/314",
+      "head": "1ce4660402a82e71f831ea8e88461b93894281e8",
+      "featureMerge": "9c992ff2ab393efb3918d6878b4813452a07d916",
+      "publicationRepairs": {
+        "#317": "6b64fb443e5e53606f13528f2e732b8c5bc430b6",
+        "#316": "9c370be5dc7125eacdfb4591aa85d670a87ba48d"
+      },
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37906183659",
+      "sourceDeploymentAttempt": 2,
+      "transientWorkspaceGateAttempt": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37906183659/attempts/1",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37910550653",
+      "destinationCommit": "9619276ae6a0725d78e2447baa7b41c37230bcea",
+      "failedSourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37903086664",
+      "publishedSource": "https://avbydave.com/source.json",
+      "artifactSha256": "c6355361546f58beaef930e4d4fcb225bbdc18f55e149702fb1d11d95b6bcbda",
+      "liveProbeSourceRevision": "9c370be5dc7125eacdfb4591aa85d670a87ba48d",
+      "liveProbeRunner": "Walter",
+      "cacheVersion": "v20261009-show-ops-console",
+      "assetSha256": {
+        "av-video/assets/av-video.js": "5526372651036cb4a553a5c2488e47b93ca065814c7aa7f3df84ff539bd7a2d5",
+        "av-video/assets/av-video.css": "2061bd71adfe740d6afd217e7736105c76d58b61e8a21dde8600c7b35dbb4be0",
+        "av-audio/assets/av-audio.js": "99a9148d49ee648da948c4c83f4ff665a97b7e86dc82293404642e668f99db5a",
+        "js/sbd-rail-mount.js": "4c3d0d000a037c6af7d12a2433b9009caf6f343e1a85b378d5c563d086f72f6e",
+        "js/sbd-rail-dialogs.js": "8c3578d0c47a5ceaf1ebf4ecfc2a515fe685ee5d073b18a1817ac0642bb47cf0",
+        "js/sbd-registry.js": "ff13a85bfde59259a320442e268a47bb03bf24412c4d690562052fddb0af201c",
+        "av-suite-worker.js": "4e215cc043f07add2bf8b251ff870de1a8cf5c0d55f617869d25cac751f7c10f",
+        "show-ops/assets/show-ops.js": "45c82c7b692e80338845bc18c959e9e79892ba92e3c377d8350faa1810e755d5",
+        "show-ops/assets/index.css": "55d8797fda333349e03176952988d2a169c224faa41634022e42d35bb3b03992",
+        "ProjectorThrow/Stage3D.html": "f796a32c74612a21b110d1af507df8ce48495bda024018d08b0c73a347e818ff"
+      },
+      "runtime": [
+        "PR #314 passed six exact-head checks at 1ce4660 after all review threads were resolved; it merged normally as 9c992ff.",
+        "The first source deployment stopped before staging because Audio's generated bundle had not been rebuilt after the shared workspace change. PR #317 supplied the byte-identical rebuild and PR #316 added Audio typecheck, test, build and drift coverage to the AV Video workflow; the combined accepted source is 9c370be.",
+        "Source run attempt 1 later stopped before staging on one LED 360x800 dark geometry assertion. The unchanged source passed all 80 touch viewport/theme cases and three offline reloads on Duncan; same-head attempt 2 then passed the release gate and publication.",
+        "Source workflow 37906183659 and AV destination workflow 37910550653 passed; production source.json named 9c370be5dc7125eacdfb4591aa85d670a87ba48d.",
+        "Walter's isolated production Chromium runs passed all nine Rail identities, all eight in-console application frame routes, Rail/All Apps selection, keyboard focus, Change/Close active-state tracking, resize, stored-view Save/reload, responsive layouts, recovery and zero page errors.",
+        "Production AV Video JavaScript/CSS, Audio JavaScript, Show Ops JavaScript/CSS, Stage3D HTML, both Rail scripts, registry and worker matched the accepted source byte-for-byte."
+      ],
+      "limits": [
+        "Physical phones/tablets, virtual keyboards, touch ergonomics and operator rehearsal remain open.",
+        "Embedding preserves each application's existing behavior; it does not establish missing specialist parity, cross-application synchronization or external hardware/output acceptance.",
+        "Stream Plan, Record Log and AVV-STREAM-KEY-1 remain separate AV Video work.",
+        "On Walter, the standalone npm test:av-audio command exits when Vitest finds no Audio test files; Linux exact-head and source workflows pass the Audio tests, typecheck, build parity and complete AV release gates."
       ]
     }
   },
