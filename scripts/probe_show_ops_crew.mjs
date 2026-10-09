@@ -21,19 +21,24 @@ const sourceKey = 'crew-call.v1';
 const targetKey = 'sbd.showOps.document.v1';
 const captureDir = process.env.SHOW_OPS_CAPTURE_DIR;
 
-const server = createServer(async (request, response) => {
-  try {
-    let relative = decodeURIComponent(new URL(request.url, 'http://probe').pathname).replace(/^\/+/, '');
-    if (!relative || relative.endsWith('/')) relative += 'index.html';
-    if (relative.split('/').includes('..')) throw new Error('Invalid path');
-    const path = resolve(root, relative);
-    if (!path.startsWith(`${root}${sep}`) || !(await stat(path)).isFile()) throw new Error('Invalid file');
-    response.writeHead(200, { 'content-type': `${mime[extname(path)] || 'application/octet-stream'}; charset=utf-8`, 'cache-control': 'no-store' });
-    response.end(await readFile(path));
-  } catch { response.writeHead(404, { 'content-type': 'text/plain' }); response.end('not found'); }
-});
-await new Promise(resolveReady => server.listen(0, '127.0.0.1', resolveReady));
-const base = `http://127.0.0.1:${server.address().port}`;
+const liveBase = process.env.SHOW_OPS_BASE_URL?.replace(/\/$/, '');
+let server;
+let base = liveBase;
+if (!liveBase) {
+  server = createServer(async (request, response) => {
+    try {
+      let relative = decodeURIComponent(new URL(request.url, 'http://probe').pathname).replace(/^\/+/, '');
+      if (!relative || relative.endsWith('/')) relative += 'index.html';
+      if (relative.split('/').includes('..')) throw new Error('Invalid path');
+      const path = resolve(root, relative);
+      if (!path.startsWith(`${root}${sep}`) || !(await stat(path)).isFile()) throw new Error('Invalid file');
+      response.writeHead(200, { 'content-type': `${mime[extname(path)] || 'application/octet-stream'}; charset=utf-8`, 'cache-control': 'no-store' });
+      response.end(await readFile(path));
+    } catch { response.writeHead(404, { 'content-type': 'text/plain' }); response.end('not found'); }
+  });
+  await new Promise(resolveReady => server.listen(0, '127.0.0.1', resolveReady));
+  base = `http://127.0.0.1:${server.address().port}`;
+}
 const channel = process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANNEL } : process.env.CHROME_BIN ? { executablePath: process.env.CHROME_BIN } : {};
 let browser;
 const errors = [];
@@ -153,5 +158,5 @@ try {
   assert.deepEqual(errors, []);
 } finally {
   await browser?.close();
-  await new Promise(resolveClose => server.close(resolveClose));
+  if (server) await new Promise(resolveClose => server.close(resolveClose));
 }
