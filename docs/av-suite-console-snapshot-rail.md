@@ -1,6 +1,6 @@
 # AV Suite console snapshot Rail
 
-**Date:** October 9, 2026  
+**Date:** October 9, 2026
 **Status:** Implementation contract
 
 ## Definition of done
