@@ -4,10 +4,10 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "a6241a9a57805992100b6c26df23fcfdcb3db82b",
+  "head": "c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec",
   "status": "amber",
-  "statusReason": "The AV Video application Rail is mounted and live-verified with nine RAIL-1B slots and eight Planned states. Toolbox-to-AV Video Manage modules #283 is published at a6241a9; its live navigation and isolated browser behavior pass. Stream/Record and physical/operator acceptance remain open.",
-  "lastActivity": "2026-10-07",
+  "statusReason": "All nine published primary AV applications are now navigable from the AV Video Rail and appear once as Console links in All apps. PR #312, source publication, AV destination publication, production provenance, live Audio launch and ten AV Video page-asset matches pass at c77b0cd. Stream/Record and physical/operator acceptance remain open.",
+  "lastActivity": "2026-10-09",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -17,7 +17,8 @@
     "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe.",
     "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter.",
     "Application Rail (#279): AV Video now mounts the exact nine RAIL-1B console slots with eight non-actionable Planned entries, RAIL-2A phone/compact/labeled layouts, typed routes, device-local customization and offline assets. Source and AV publications succeeded; Walter live acceptance, seven-asset parity and the returning-client cache transition from published adf1f1e to reviewed 55bec1a passed.",
-    "AV Video Manage modules (#283): the Toolbox card opens the guarded Project view; source and AV publication, Walter live navigation/browser checks and four-asset parity passed at a6241a9."
+    "AV Video Manage modules (#283): the Toolbox card opens the guarded Project view; source and AV publication, Walter live navigation/browser checks and four-asset parity passed at a6241a9.",
+    "All nine published primary AV applications are navigable from the Rail (#312) at c77b0cd. Source deployment 37893934453 and AV destination deployment 37895712977 passed; production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified. Physical/operator and connected-workflow acceptance remain separate."
   ],
   "nextStep": {
     "title": "Decide the Stream and Record credential boundary",
@@ -142,13 +143,14 @@
     },
     {
       "name": "Application rail \u2014 Delivered",
-      "goal": "Carry the complete v3 console order without presenting planned consoles as available products.",
+      "goal": "Carry the complete v3 console order as the launcher for published primary applications.",
       "items": [
         "RAIL-1B selected October 5: nine source-ordered console slots appear by default between fixed Toolbox and All apps / Customize controls.",
-        "At the current production baseline only AV Video is available; Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator are Planned/status-only console identities.",
+        "PR #312 maps all nine published primary applications to canonical routes; every Rail entry and Console card is navigable, zero entries remain Planned, and mapped apps are not duplicated under Specialist tools.",
         "RAIL-2A responsive presentation and device-local customization are mounted around AV Video. Typed routes, data isolation, explicit recovery, focus return and five local offline assets are covered.",
         "PR #279, source deployment 37572814064 and AV destination deployment 37574460288 passed. Walter live acceptance covered 11 viewport fixtures; seven published Rail/AV assets matched 55bec1a byte-for-byte.",
-        "Walter's isolated returning-client fixture kept one browser context from published adf1f1e through reviewed 55bec1a: AV Video data, UI-written Rail customization and typed context survived the worker update, the old cache was removed, all seven Rail/AV assets were cached and the updated app reopened offline."
+        "Walter's isolated returning-client fixture kept one browser context from published adf1f1e through reviewed 55bec1a: AV Video data, UI-written Rail customization and typed context survived the worker update, the old cache was removed, all seven Rail/AV assets were cached and the updated app reopened offline.",
+        "Source deployment 37893934453 and AV destination deployment 37895712977 passed at c77b0cd. Production source.json, live Audio launch and ten AV Video page-asset matches were verified; physical/operator acceptance remains open."
       ],
       "gate": "Source, exact-head CI, both publications, live Rail journeys, asset parity and the isolated returning-client offline update passed. Physical devices and operator acceptance remain separate."
     },
@@ -248,7 +250,7 @@
     "VIEWPORT_BASE=https://avbydave.com/ VIEWPORT_BROWSER=webkit node scripts/probe_calculator_viewport.cjs"
   ],
   "context": [
-    "RAIL-1B was selected October 5, 2026: the default rail reproduces all nine v3 console slots in source order; production-unbuilt consoles remain clearly Planned and status-only.",
+    "RAIL-1B was selected October 5, 2026. Its original status-only baseline is superseded by #312: all nine published primary applications are canonical Rail destinations; physical/operator acceptance remains separate.",
     "The original v3 source archive was inspected at SHA-256 71b72c70ab3e004fd324f98cec7ed05a2cf16d054a4c05fce74fe298c5dd5e02; browser-rendered parity remains unverified.",
     "All six viewport candidates are deployed; the earlier not-live statements are superseded.",
     "AV Video owns sbd.avVideo.v1; layout reuse does not merge stores or make Workbook a dependency.",
@@ -256,9 +258,22 @@
     "Workbook redesign and legacy Video rebuild were excluded from the viewport work.",
     "WebKit Calculator geometry/function checks passed; its offline reload lane is excluded. Chromium offline proof is not physical Safari acceptance.",
     "Historical audit details remain in private updater backups; stable finding IDs preserve traceability.",
-    "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open."
+    "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open.",
+    "PR #312 delivered the application-launcher model: Rail availability means the published primary route opens, not that physical/operator or deeper connected-workflow acceptance is complete."
   ],
   "links": [
+    {
+      "label": "Rail application launcher #312",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/312"
+    },
+    {
+      "label": "Rail application launcher source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37893934453"
+    },
+    {
+      "label": "Rail application launcher AV deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37895712977"
+    },
     {
       "label": "Stream and Record credential decision",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/av-video-stream-record-credential-decision.md"
@@ -309,7 +324,7 @@
     }
   ],
   "kickoffPrompt": "Continue the maintained AV Video increments from fresh remote main. The application Rail and its isolated returning-client offline transition are delivered; do not repeat them. Preserve independent Video documents, typed Rail identities, device-local preferences and explicit legacy imports while preparing Stream/Record after its credential-handling decision. Verify exact-head CI, publication and live behavior; keep physical acceptance separate.",
-  "confidence": "High for the cited Rail and console releases, exact asset parity, scoped automated live checks and isolated returning-client offline transition; physical acceptance and historical follow-ups remain open.",
+  "confidence": "High for the cited Rail and console releases, exact source/live asset parity, production provenance, live application navigation and isolated returning-client offline transition; physical/operator acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
@@ -417,6 +432,28 @@
       "limits": [
         "No runtime implementation or provider/device operation is included.",
         "Only synthetic examples may be used in dependent tests."
+      ]
+    },
+    "applicationLauncherRelease": {
+      "checkedOn": "2026-10-09",
+      "scope": "All nine published primary AV applications navigable from the Rail and listed once in All apps; no document, schema, storage, physical-device, operator or connected-workflow acceptance change.",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/312",
+      "sourceRevision": "c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37893934453",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37895712977",
+      "destinationCommit": "9412f690e3dbcacc0903a5a1f506bb4b58a92a5e",
+      "publishedSource": "https://avbydave.com/source.json",
+      "artifactSha256": "b9d9267789f6c51f8db09c9d0cad848e6541ee6135b592503e8780bf60f9d41d",
+      "runtime": [
+        "All six required exact-head PR checks passed at a14e487 after the Stage 3D offline cache pin was aligned; the resolved review thread identified the same repair.",
+        "Source workflow 37893934453 and AV destination workflow 37895712977 passed; production source.json named c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec.",
+        "Live AV Video showed nine canonical Rail links and zero Planned entries. All apps showed nine Console links without repeating the mapped primary applications under Specialist tools.",
+        "The live Audio Console card opened https://avbydave.com/av-audio/ and rendered the Audio workspace.",
+        "AV Video JavaScript, CSS, registry, Rail scripts and shared theme assets matched the c77b0cd source byte-for-byte."
+      ],
+      "limits": [
+        "Browser navigation and exact asset parity do not establish physical-device, operator or connected cross-application workflow acceptance.",
+        "Stream Plan, Record Log and the AVV-STREAM-KEY-1 credential decision remain separate AV Video work."
       ]
     }
   },

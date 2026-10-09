@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "be0f4f2bb3013ea43985be641e2c2e56d3743c26",
+  "head": "c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec",
   "status": "amber",
-  "statusReason": "Eight standalone AV application candidates were published at 59d41e3 after #293-#295. AV Lighting's PlotForge handoff (#297), Show Control's CueForge integrity repair (#299), Front Office's Show Advance import (#301), Show Ops' Room Check, active Show Task Board and Crew Call one-way copies (#303, #305, #310), and The Shop's Gear Prep quantity handoff (#308) were source-merged, published and isolated-live verified through be0f4f2; the unrelated Workbook date-fixture release repair is #306. All eight new Rail console slots remain Planned. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
+  "statusReason": "Eight standalone AV application candidates and their bounded handoff slices are published. All nine primary applications are now navigable from the Rail through #312 at c77b0cd, with source/destination publication, production provenance, live Audio launch and ten AV Video page-asset matches verified. Other canonical specialist handoffs and representative app parity remain incomplete; physical/operator acceptance, Stream/Record and universal app management are separate open work.",
   "lastActivity": "2026-10-09",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -25,15 +25,16 @@
     "Show Ops' selected Room Check v1 one-way copy (#303) is published at 675ad916. Walter passed model, saved/file browser and isolated live synthetic copy checks; all copied statuses begin Needs check, exact source JSON survives Save/backup/reopen, and five published assets matched source byte-for-byte.",
     "Show Ops' selected active Show Task Board v1 one-way copy (#305) is published at 37f4eec after date-fixture release repair #306. Walter passed model, saved/file and isolated live synthetic copy checks at phone and desktop widths; copied rows begin unsaved Open, retain exact source/provenance, and five published assets matched source byte-for-byte.",
     "The Shop's Gear Prep v1 requested-quantity and operator-entered partial-pack counts (#308) are published at dce2905. Walter passed isolated live preview, visible overpack rejection, explicit Save/reload and producer-byte preservation at 375px and 1440px; nine affected published assets matched source byte-for-byte. The Shop remains a Planned Rail slot.",
-    "Show Ops' selected Crew Call v1 one-way copy (#310) is published at be0f4f2. Walter passed isolated live saved/file preview, cancellation, unsaved copy, explicit Save/reload, export/restore, stale-target and malformed-file guards, theme checks and six viewport sizes; nine published assets matched source byte-for-byte. Copied crew start Called without inferring attendance, while original source bytes, statuses and notes are retained. Show Ops remains a Planned Rail slot."
+    "Show Ops' selected Crew Call v1 one-way copy (#310) is published at be0f4f2. Walter passed isolated live saved/file preview, cancellation, unsaved copy, explicit Save/reload, export/restore, stale-target and malformed-file guards, theme checks and six viewport sizes; nine published assets matched source byte-for-byte. Copied crew start Called without inferring attendance, while original source bytes, statuses and notes are retained. Show Ops remains a Planned Rail slot.",
+    "All nine published primary AV applications are navigable from the Rail (#312) at c77b0cd. Source deployment 37893934453 and AV destination deployment 37895712977 passed; production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified. Physical/operator and connected-workflow acceptance remain separate."
   ],
   "nextStep": {
-    "title": "Complete canonical specialist handoffs before field acceptance",
-    "why": "The eight published candidates pass their isolated browser jobs, but that does not prove canonical specialist data compatibility or connected application workflows. The Rail entries remain Planned.",
-    "doneWhen": "Each affected app accepts its canonical source through a bounded, provenance-preserving workflow with source, CI, published and live evidence; then operators accept representative saved-plan, export/reopen, touch and show-handoff journeys on intended physical devices before any explicit Rail promotion.",
+    "title": "Complete canonical specialist handoffs and field acceptance",
+    "why": "The published primary applications now open from the Rail, but route availability does not prove canonical specialist data compatibility, connected application workflows or field readiness.",
+    "doneWhen": "Each affected app accepts its canonical source through a bounded, provenance-preserving workflow with source, CI, published and live evidence; then operators accept representative saved-plan, export/reopen, touch and show-handoff journeys on intended physical devices.",
     "effort": "L",
     "owner": "Application owners, then Dave and application operators",
-    "blockedBy": "Remaining per-slice source and live compatibility work; physical/operator acceptance and a later explicit Rail promotion decision"
+    "blockedBy": "Remaining per-slice source and live compatibility work; physical/operator acceptance"
   },
   "findings": [
     {
@@ -108,7 +109,7 @@
       "type": "feature",
       "sev": "P2",
       "title": "AV Video Manage modules linked from Toolbox; universal app management remains planned",
-      "detail": "PR #283 published a Manage modules link on the AV Video Toolbox card and a guarded Project deep link without changing saved layouts. Walter verified the live Toolbox click, Project view, eight Planned Rail entries and AV Video browser flow. Universal application/module management and coherent cross-tool app slices are still future gates; worksheet task views do not prove shared Logistics/Show Operations document consolidation.",
+      "detail": "PR #283 published a Manage modules link on the AV Video Toolbox card and a guarded Project deep link without changing saved layouts. PR #312 later made all nine published primary applications navigable from the Rail. Universal application/module management and coherent cross-tool app slices are still future gates; worksheet task views do not prove shared Logistics/Show Operations document consolidation.",
       "files": [
         "js/av-suite/app.js",
         "docs/av-suite-consolidation-spec.md"
@@ -163,11 +164,11 @@
       "name": "Remaining application consolidation \u2014 In progress",
       "goal": "Follow the maintained spec; do not reopen settled app ownership.",
       "items": [
-        "Eight standalone application candidates are published and isolated-live tested at 59d41e3; their Rail slots remain Planned pending physical/operator acceptance and explicit promotion.",
-        "AV Lighting's previewed one-way PlotForge interop manifest v1 fixture copy and full-source backup are published at eca82f8; this does not establish full PlotForge parity, synchronization, live output, physical acceptance or Rail promotion.",
-        "Show Control's guarded one-way CueForge version 7 selected-list snapshot is published at 8b7751f; the native file, secrets, patch, media paths and output control remain outside the browser copy. This is not full CueForge parity, synchronization, physical acceptance or Rail promotion.",
-        "Show Ops' selected Room Check v1 copy is published at 675ad916, with original source retained and target rows requiring a fresh readiness check. Active Show Task Board and Crew Call v1 selected one-way copies are also published through be0f4f2; copied crew begin Called without inferring attendance. These are not synchronization, physical acceptance, Show Board parity or Rail promotion.",
-        "The Shop's one-way Gear Prep v1 quantity copy is published at dce2905. Requested counts enter Shop, packed counts remain operator-entered, partial packs survive Save/reload, and the original source remains unchanged; no synchronization or Rail promotion is implied.",
+        "Eight standalone primary applications are published, isolated-live tested and navigable from the Rail through #312. Canonical specialist compatibility, connected workflows and physical/operator acceptance remain separate.",
+        "AV Lighting's previewed one-way PlotForge interop manifest v1 fixture copy and full-source backup are published at eca82f8; this does not establish full PlotForge parity, synchronization, live output, physical acceptance.",
+        "Show Control's guarded one-way CueForge version 7 selected-list snapshot is published at 8b7751f; the native file, secrets, patch, media paths and output control remain outside the browser copy. This is not full CueForge parity, synchronization, physical acceptance.",
+        "Show Ops' selected Room Check v1 copy is published at 675ad916, with original source retained and target rows requiring a fresh readiness check. Active Show Task Board and Crew Call v1 selected one-way copies are also published through be0f4f2; copied crew begin Called without inferring attendance. These are not synchronization, physical acceptance, Show Board parity.",
+        "The Shop's one-way Gear Prep v1 quantity copy is published at dce2905. Requested counts enter Shop, packed counts remain operator-entered, partial packs survive Save/reload, and the original source remains unchanged; no synchronization is implied.",
         "Cameras/Playback is delivered; Stream/Record remains the next AV Video module slice.",
         "Shared identities, future preference scope, family mergers and automated readiness require their own choice gates.",
         "Revalidate historical safety/mobile findings before a separately scoped fix."
@@ -176,12 +177,13 @@
     },
     {
       "name": "Application Rail \u2014 Delivered",
-      "goal": "Expose the full v3 console order without presenting unbuilt consoles as available products.",
+      "goal": "Expose the full v3 console order as a launcher for published primary applications.",
       "items": [
-        "Toolbox and the exact nine RAIL-1B console slots are followed by All apps and Customize; only AV Video is available and the other eight consoles are Planned/status-only.",
+        "Toolbox and the exact nine RAIL-1B console slots are followed by All apps and Customize; all nine published primary applications open their canonical routes and mapped apps appear once in All apps.",
         "RAIL-2A uses a phone Apps launcher below 720px, compact rail at 720\u20131439px and labeled rail at 1440px+. Device-local pin, unpin, reorder, reset and corrupt-preference recovery are live.",
         "PR #279, source deployment 37572814064 and AV destination deployment 37574460288 passed. Walter live acceptance covered 11 viewport fixtures; seven published Rail/AV assets matched 55bec1a byte-for-byte.",
-        "Walter's isolated returning-client fixture kept one browser context from published adf1f1e through reviewed 55bec1a: AV Video data, UI-written Rail customization and typed context survived the worker update, the old cache was removed, all seven Rail/AV assets were cached and the updated app reopened offline."
+        "Walter's isolated returning-client fixture kept one browser context from published adf1f1e through reviewed 55bec1a: AV Video data, UI-written Rail customization and typed context survived the worker update, the old cache was removed, all seven Rail/AV assets were cached and the updated app reopened offline.",
+        "PR #312, source deployment 37893934453 and AV destination deployment 37895712977 passed at c77b0cd. Production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified; physical/operator acceptance remains open."
       ],
       "gate": "Source, exact-head CI, both publications, live Rail journeys, asset parity and the isolated returning-client offline update passed. Physical devices and operator acceptance remain separate."
     },
@@ -282,10 +284,23 @@
     "Earlier audit details and unchanged private evidence remain in the updater backup. Superseded counts and revalidation notes are preserved by finding ID.",
     "Unanswered historical questions remain Open; recommendations are not approvals.",
     "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open.",
-    "Room Check v1 checks can be copied selectively into Show Ops as unsaved Needs check rows with exact source provenance; this does not synchronize the tools or promote the Planned Rail slot.",
-    "Crew Call v1 active members can be copied selectively into Show Ops as unsaved Called rows with exact source provenance and no automatic attendance inference; the producer and Planned Rail slot remain unchanged."
+    "Room Check v1 checks can be copied selectively into Show Ops as unsaved Needs check rows with exact source provenance; this does not synchronize the tools, and route availability does not certify the handoff.",
+    "Crew Call v1 active members can be copied selectively into Show Ops as unsaved Called rows with exact source provenance and no automatic attendance inference; the producer remains unchanged, and route availability does not certify the handoff.",
+    "PR #312 supersedes the status-only Rail baseline: all nine published primary applications are canonical Rail destinations, while physical/operator and connected-workflow acceptance remain separate."
   ],
   "links": [
+    {
+      "label": "Rail application launcher #312",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/312"
+    },
+    {
+      "label": "Rail application launcher source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37893934453"
+    },
+    {
+      "label": "Rail application launcher AV deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37895712977"
+    },
     {
       "label": "Show Ops Crew Call one-way copy #310",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/310"
@@ -408,7 +423,7 @@
     }
   ],
   "kickoffPrompt": "Continue the maintained AV consolidation stages from fresh remote main. Stage 1, the AV Video application Rail and its isolated returning-client offline transition are delivered; do not repeat them. Preserve focused app ownership, typed Rail identities, device-local preferences, explicit imports and reversible modules. Prepare Stream/Record after its credential-handling decision; verify exact-head CI, publication and live behavior, and keep physical acceptance separate.",
-  "confidence": "High for the cited Rail and console releases, PlotForge-to-Lighting, CueForge-to-Show-Control, Room-Check, Show-Task-Board and Crew-Call-to-Show-Ops, and Gear-Prep-to-Shop quantity slices, exact affected-asset parity, scoped automated live checks and isolated returning-client offline transition; broader canonical app parity, physical acceptance and historical follow-ups remain open.",
+  "confidence": "High for the cited Rail application-launcher release, bounded handoff slices, exact source/live asset parity, production provenance and live navigation; broader canonical app parity, physical acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
@@ -726,6 +741,28 @@
       "limits": [
         "No runtime implementation or provider/device operation is included.",
         "Only synthetic examples may be used in dependent tests."
+      ]
+    },
+    "applicationLauncherRelease": {
+      "checkedOn": "2026-10-09",
+      "scope": "All nine published primary AV applications navigable from the Rail and listed once in All apps; no document, schema, storage, physical-device, operator or connected-workflow acceptance change.",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/312",
+      "sourceRevision": "c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37893934453",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37895712977",
+      "destinationCommit": "9412f690e3dbcacc0903a5a1f506bb4b58a92a5e",
+      "publishedSource": "https://avbydave.com/source.json",
+      "artifactSha256": "b9d9267789f6c51f8db09c9d0cad848e6541ee6135b592503e8780bf60f9d41d",
+      "runtime": [
+        "All six required exact-head PR checks passed at a14e487 after the Stage 3D offline cache pin was aligned; the resolved review thread identified the same repair.",
+        "Source workflow 37893934453 and AV destination workflow 37895712977 passed; production source.json named c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec.",
+        "Live AV Video showed nine canonical Rail links and zero Planned entries. All apps showed nine Console links without repeating the mapped primary applications under Specialist tools.",
+        "The live Audio Console card opened https://avbydave.com/av-audio/ and rendered the Audio workspace.",
+        "AV Video JavaScript, CSS, registry, Rail scripts and shared theme assets matched the c77b0cd source byte-for-byte."
+      ],
+      "limits": [
+        "Browser navigation and exact asset parity do not establish physical-device, operator or connected cross-application workflow acceptance.",
+        "Stream Plan, Record Log and the AVV-STREAM-KEY-1 credential decision remain separate AV Video work."
       ]
     }
   },
