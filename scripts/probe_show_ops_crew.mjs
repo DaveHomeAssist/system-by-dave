@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
-import { extname, resolve, sep } from 'node:path';
+import { mkdir, readFile, stat } from 'node:fs/promises';
+import { extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
@@ -19,6 +19,7 @@ const source = {
 const raw = JSON.stringify(source);
 const sourceKey = 'crew-call.v1';
 const targetKey = 'sbd.showOps.document.v1';
+const captureDir = process.env.SHOW_OPS_CAPTURE_DIR;
 
 const server = createServer(async (request, response) => {
   try {
@@ -54,7 +55,7 @@ const assertFit = async page => {
 
 try {
   browser = await chromium.launch({ headless: true, ...channel, args: process.argv.includes('--no-sandbox') ? ['--no-sandbox'] : [] });
-  for (const viewport of [{ width: 375, height: 812 }, { width: 1440, height: 900 }]) {
+  for (const viewport of [{ width: 375, height: 812 }, { width: 680, height: 800 }, { width: 844, height: 390 }, { width: 320, height: 256 }, { width: 1440, height: 900 }, { width: 3840, height: 1080 }]) {
     const { context, page } = await open(viewport);
     await backup(page);
     await page.locator('#crew-saved').click();
@@ -62,6 +63,10 @@ try {
     assert.equal(await page.locator('input[name="crew-call-row"]').count(), 2);
     assert.match(await page.locator('#crew-preview').innerText(), /555-0101/);
     await assertFit(page);
+    if (captureDir && [375, 1440, 3840].includes(viewport.width)) {
+      await mkdir(captureDir, { recursive: true });
+      await page.screenshot({ path: join(captureDir, `crew-preview-${viewport.width}x${viewport.height}.png`) });
+    }
     await page.locator('#cancel-crew').click();
     assert.equal(await storage(page), null);
     await page.locator('#crew-saved').click();
