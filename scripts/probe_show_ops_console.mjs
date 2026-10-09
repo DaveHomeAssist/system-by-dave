@@ -229,8 +229,23 @@ try {
   const failedSaveExport = safety.waitForEvent('download'); await safety.locator('#export').click();
   assert.equal(JSON.parse(await readFile(await (await failedSaveExport).path(), 'utf8')).notes, 'Keep this unsaved text');
   await safetyContext.close();
+  const beforeOffline = await read(page, key);
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.register('/av-suite-worker.js', { scope: '/', updateViaCache: 'none' });
+    await navigator.serviceWorker.ready;
+  });
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+  assert.equal(await page.evaluate(async () => {
+    const cache = await caches.open(`sbd-av-suite-${window.SBD_REGISTRY.version}`);
+    return (await Promise.all(['/show-ops/', '/show-ops/assets/show-ops.js', '/show-ops/assets/index.css'].map(path => cache.match(path)))).every(Boolean);
+  }), true, 'Show Ops entry and built assets must be cached');
+  await context.setOffline(true); await page.reload();
+  await setup(page, 'notes');
+  assert.equal(await page.locator('#notes').inputValue(), JSON.parse(beforeOffline).notes);
+  assert.equal(await read(page, key), beforeOffline);
+  await context.setOffline(false);
   assert.deepEqual(errors, []);
-  console.log('PASS Show Ops console: six functional panels, view/save/reload, source guards and exact provenance, export/restore, drafts, stale tabs, two themes and eight viewport sizes.');
+  console.log('PASS Show Ops console: six functional panels, view/save/reload, source guards and exact provenance, export/restore, drafts, stale tabs, storage failures, offline reopen, two themes and eight viewport sizes.');
 } catch (error) {
   await page.screenshot({ path: join(output, 'show-ops-failure.png') });
   throw error;
