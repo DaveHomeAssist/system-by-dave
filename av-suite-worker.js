@@ -8,7 +8,7 @@
    cached application code. */
 importScripts('./js/sbd-registry.js');
 
-// Show Ops Crew Call copy: refresh cached application assets.
+// Rail application launcher: refresh registry-backed navigation assets.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();

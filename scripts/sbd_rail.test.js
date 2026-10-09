@@ -179,13 +179,13 @@ test('explicit edits keep unresolved refs after visible refs and never alias IDs
   assert.equal(storage.data.unrelated, 'keep');
 });
 
-test('typed resolution stays exact across console, family, tool, and external namespaces', () => {
+test('typed resolution stays exact across available console, family, tool, and external namespaces', () => {
   const { rail, registry } = loadRuntime();
 
-  const plannedCalculator = rail.resolveRef('console:av-calculator', registry);
-  assert.equal(plannedCalculator.availability, 'planned');
-  assert.equal(plannedCalculator.navigable, false);
-  assert.equal(plannedCalculator.href, null);
+  const calculator = rail.resolveRef('console:av-calculator', registry);
+  assert.equal(calculator.availability, 'available');
+  assert.equal(calculator.navigable, true);
+  assert.equal(calculator.href, 'av-calculator.html');
 
   const audioFamily = rail.resolveRef('family:audio', registry);
   assert.equal(audioFamily.href, 'av-suite.html?entry=toolbox&family=audio');
@@ -252,7 +252,7 @@ test('storage failures are explicit and preserve unrelated data', () => {
   assert.deepEqual(JSON.parse(blockedWrite.data['sbd.rail.v1']).pinned, Array.from(registry.rail.defaultPinned));
 });
 
-test('standalone renderer exposes nine ordered slots with eight non-actionable Planned states', () => {
+test('standalone renderer exposes nine ordered application links', () => {
   const { rail, registry } = loadRuntime();
   const storage = new MemoryStorage();
   const store = rail.createPreferenceStore({ storage, registry });
@@ -283,19 +283,22 @@ test('standalone renderer exposes nine ordered slots with eight non-actionable P
   assert.equal(elementsByClass(rendered.shell, 'sbd-rail__toolbox')[0].hasAttribute('aria-current'), false);
 
   const planned = rendered.entries.filter((entry) => entry.getAttribute('data-status') === 'planned');
-  assert.equal(planned.length, 8);
-  planned.forEach((entry) => {
-    assert.equal(entry.tagName, 'DIV');
-    assert.equal(entry.hasAttribute('href'), false);
-    assert.equal(entry.getAttribute('tabindex'), '0');
-    assert.equal(entry.getAttribute('role'), 'note');
-    assert.match(entry.getAttribute('aria-label'), /\. Planned\.$/);
-    assert.equal(entry.hasAttribute('aria-current'), false);
-    assert.equal(elementsByClass(entry, 'sbd-rail__status')[0].textContent, 'Planned');
+  assert.equal(planned.length, 0);
+  rendered.entries.forEach((entry) => {
+    assert.equal(entry.tagName, 'A');
+    assert.equal(entry.hasAttribute('href'), true);
   });
   assert.equal(rendered.entries[0].tagName, 'A');
   assert.equal(rendered.entries[0].getAttribute('href'), 'https://avbydave.com/av-video/');
   assert.equal(rendered.entries[0].getAttribute('aria-current'), 'page');
+  assert.equal(rendered.entries[1].getAttribute('href'), 'https://avbydave.com/av-audio/');
+  assert.equal(rendered.entries[2].getAttribute('href'), 'https://avbydave.com/show-control/');
+  assert.equal(rendered.entries[3].getAttribute('href'), 'https://avbydave.com/show-ops/');
+  assert.equal(rendered.entries[4].getAttribute('href'), 'https://avbydave.com/front-office/');
+  assert.equal(rendered.entries[5].getAttribute('href'), 'https://avbydave.com/the-shop/');
+  assert.equal(rendered.entries[6].getAttribute('href'), 'https://avbydave.com/infrastructure/');
+  assert.equal(rendered.entries[7].getAttribute('href'), 'https://avbydave.com/av-lighting/');
+  assert.equal(rendered.entries[8].getAttribute('href'), 'https://avbydave.com/av-calculator.html');
   assert.equal(elementsByClass(rendered.shell, 'sbd-rail__toolbox')[0].getAttribute('href'), 'https://avbydave.com/av-suite.html?entry=toolbox');
   assert.equal(rendered.allAppsButton, elementsByClass(rendered.shell, 'sbd-rail__all')[0]);
   assert.equal(rendered.customizeButton, elementsByClass(rendered.shell, 'sbd-rail__customize')[0]);

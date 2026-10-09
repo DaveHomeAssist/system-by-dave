@@ -90,14 +90,14 @@ function assertSourceChecks(registry) {
 function assertRailRegistryContracts(registry) {
   const expectedConsoles = [
     ['av-video', 'video', 'AV Video', 'available'],
-    ['audio', 'audio', 'Audio', 'planned'],
-    ['show-control', 'showcontrol', 'Show Control', 'planned'],
-    ['show-ops', 'showops', 'Show Ops', 'planned'],
-    ['front-office', 'office', 'Front Office', 'planned'],
-    ['shop', 'shop', 'The Shop', 'planned'],
-    ['infrastructure', 'infra', 'Infrastructure', 'planned'],
-    ['lighting', 'lighting', 'Lighting', 'planned'],
-    ['av-calculator', 'calc', 'AV Calculator', 'planned']
+    ['audio', 'audio', 'Audio', 'available'],
+    ['show-control', 'showcontrol', 'Show Control', 'available'],
+    ['show-ops', 'showops', 'Show Ops', 'available'],
+    ['front-office', 'office', 'Front Office', 'available'],
+    ['shop', 'shop', 'The Shop', 'available'],
+    ['infrastructure', 'infra', 'Infrastructure', 'available'],
+    ['lighting', 'lighting', 'Lighting', 'available'],
+    ['av-calculator', 'calc', 'AV Calculator', 'available']
   ];
   const actualConsoles = (registry.consoles || []).map((console) => [
     console.id,
@@ -151,9 +151,16 @@ function assertRailRegistryContracts(registry) {
       if (Object.prototype.hasOwnProperty.call(console, field)) fail(`Planned console ${console.id} fabricates ${field} metadata.`);
     });
   });
-  const available = (registry.consoles || []).filter((console) => console.availability === 'available').map((console) => console.id);
-  if (JSON.stringify(available) !== JSON.stringify(['av-video'])) {
-    fail(`Only AV Video may be available in the RAIL-1B registry slice: ${available.join(', ')}.`);
+  const expectedToolIds = ['av-video', 'av-audio', 'show-control', 'show-ops', 'front-office', 'the-shop', 'infrastructure', 'av-lighting', 'av-calculator'];
+  const available = (registry.consoles || []).filter((console) => console.availability === 'available');
+  if (JSON.stringify(available.map((console) => console.toolId)) !== JSON.stringify(expectedToolIds)) {
+    fail(`Rail application tool mappings are wrong: ${available.map((console) => console.toolId || '(missing)').join(', ')}.`);
+  }
+  available.forEach((console) => {
+    if (!registry.toolById(console.toolId)?.href) fail(`Available Rail application ${console.id} has no canonical tool route.`);
+  });
+  if (available.length !== expectedConsoles.length) {
+    fail(`Every published primary Rail application must be available: ${available.map((console) => console.id).join(', ')}.`);
   }
 
   const expectedExternals = [
@@ -204,7 +211,7 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261009-show-ops-crew-call') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261009-rail-application-launcher') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;

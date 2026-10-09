@@ -188,7 +188,9 @@ test('typed route resolution carries context only to eligible internal destinati
   registry.tools.push({ id: 'unsafe-fixture', name: 'Unsafe fixture', href: 'javascript:alert(1)' });
   assert.equal(dialogs.resolveRoute('tool:unsafe-fixture', options).code, 'unsafe-protocol');
 
-  assert.equal(dialogs.resolveRoute('console:audio', options).code, 'not-navigable');
+  const audioConsole = new URL(dialogs.resolveRoute('console:audio', options).href);
+  assert.equal(audioConsole.pathname, '/av-audio/');
+  assert.equal(audioConsole.searchParams.get('sbdShow'), 'Gala');
   assert.equal(dialogs.resolveRoute('external:arenaops', options).code, 'not-navigable');
   assert.equal(dialogs.resolveRoute('tool:cueforge', options).code, 'unknown-reference');
 });
@@ -273,17 +275,22 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   const consoleCards = descendants(controller.allAppsDialog).filter((element) => (element.getAttribute('data-rail-ref') || '').startsWith('console:'));
   assert.equal(consoleCards.length, 9);
   const plannedCards = consoleCards.filter((element) => element.getAttribute('data-entry-type') === 'Planned console');
-  assert.equal(plannedCards.length, 8);
-  plannedCards.forEach((card) => {
-    assert.equal(card.tagName, 'DIV');
-    assert.equal(card.hasAttribute('href'), false);
-    assert.equal(card.getAttribute('tabindex'), '0');
+  assert.equal(plannedCards.length, 0);
+  consoleCards.forEach((card) => {
+    assert.equal(card.tagName, 'A');
+    assert.equal(card.hasAttribute('href'), true);
   });
   const avVideo = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'console:av-video')[0];
   assert.equal(avVideo.tagName, 'A');
   assert.equal(new URL(avVideo.getAttribute('href')).searchParams.get('sbdShow'), 'Gala');
   assert.equal(avVideo.getAttribute('aria-current'), 'page');
   assert.equal(elementsByClass(avVideo, 'sbd-rail-dialog__draft')[0].textContent, 'Unsaved draft');
+  const audioConsole = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'console:audio')[0];
+  assert.equal(new URL(audioConsole.getAttribute('href')).pathname, '/av-audio/');
+  assert.equal(new URL(audioConsole.getAttribute('href')).searchParams.get('sbdShow'), 'Gala');
+  ['av-audio', 'show-control', 'show-ops', 'front-office', 'the-shop', 'infrastructure', 'av-lighting', 'av-calculator'].forEach((toolId) => {
+    assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', `tool:${toolId}`).length, 0);
+  });
   const audioFamily = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'family:audio')[0];
   assert.equal(new URL(audioFamily.getAttribute('href')).searchParams.has('sbdShow'), false);
   const cueForge = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:cueforge')[0];

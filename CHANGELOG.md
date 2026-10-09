@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-09 — Rail application launcher
+
+- Make all nine published primary AV applications navigable from the Rail while preserving the exact v3 order, existing routes, local customization and validated show context.
+- Remove the mapped primary applications from the duplicate Specialist tools list in All apps through the existing registry-derived catalog.
+- Keep physical-device, operator and deeper workflow acceptance separate from route availability; no document, schema, storage key or application behavior changes.
+- Advance the AV offline cache generation and cover direct Rail links in source and browser checks.
+
 ## 2026-10-09 — Crew Call active-crew copy into Show Ops
 
 - Preview saved or exported Crew Call v1 records, select active crew and make a one-way unsaved Show Ops copy. Wrapped source members are excluded; copied rows begin Called for operator review without asserting attendance.
