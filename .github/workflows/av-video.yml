@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - 'apps/av-video/**'
+      - 'apps/av-audio/**'
       - 'apps/show-ops/**'
       - 'apps/shared/**'
       - 'scripts/probe_av_console*.mjs'
       - 'av-video/**'
+      - 'av-audio/**'
       - 'show-ops/**'
       - 'scripts/probe_show_ops_console.mjs'
       - 'package*.json'
@@ -41,6 +43,13 @@ jobs:
         run: |
           git diff --exit-code -- av-video
           test -z "$(git status --porcelain -- av-video)"
+      - name: Audio shared-console consumer matches its source
+        run: |
+          npm run typecheck:av-audio
+          npm run test:av-audio
+          npm run build:av-audio
+          git diff --exit-code -- av-audio
+          test -z "$(git status --porcelain -- av-audio)"
       - run: npx playwright install --with-deps chromium
       - run: npm run test:av-video-browser
       - name: Show Ops console typecheck, tests, build and browser
