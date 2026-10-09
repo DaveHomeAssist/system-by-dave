@@ -142,6 +142,8 @@ export function App() {
   const ws = useConsoleWorkspace(views, library, layoutPersist);
   const activeSuiteApp = suiteAppForView(ws.view);
   const lastVideoView = useRef("routing");
+  const workspaceRef = useRef(ws); workspaceRef.current = ws;
+  const viewsRef = useRef(views); viewsRef.current = views;
   const viewTabs = useMemo(() => activeSuiteApp ? (ws.view ? [ws.view] : []) : views.filter(view => !suiteAppForView(view)), [activeSuiteApp, views, ws.view]);
   useEffect(() => {
     if (!activeSuiteApp) lastVideoView.current = ws.viewId;
@@ -149,21 +151,23 @@ export function App() {
   }, [activeSuiteApp, ws.viewId]);
   useEffect(() => {
     const selectSnapshot = (event: Event) => {
+      const currentViews = viewsRef.current;
+      const currentWorkspace = workspaceRef.current;
       const selectedRef = (event as CustomEvent<{ ref?: string }>).detail?.ref;
       if (selectedRef === "console:av-video") {
-        const target = views.find(view => view.id === lastVideoView.current && !suiteAppForView(view)) || views.find(view => !suiteAppForView(view));
+        const target = currentViews.find(view => view.id === lastVideoView.current && !suiteAppForView(view)) || currentViews.find(view => !suiteAppForView(view));
         if (!target) return;
-        event.preventDefault(); ws.setViewId(target.id); notify(`AV Video snapshot recalled. ${target.name} is ready.`); return;
+        event.preventDefault(); currentWorkspace.setViewId(target.id); setProblem(false); setMessage(`AV Video snapshot recalled. ${target.name} is ready.`); return;
       }
       const app = SUITE_APPS.find(item => selectedRef === `console:${item.consoleId}`);
       if (!app) return;
-      const target = views.find(view => view.id === `suite-${app.consoleId}`) || views.find(view => view.panels.some(panel => panel.type === app.type));
+      const target = currentViews.find(view => view.id === `suite-${app.consoleId}`) || currentViews.find(view => view.panels.some(panel => panel.type === app.type));
       if (!target) return;
-      event.preventDefault(); ws.setViewId(target.id); notify(`${app.name} snapshot recalled inside the console. Its application data remains independent.`);
+      event.preventDefault(); currentWorkspace.setViewId(target.id); setProblem(false); setMessage(`${app.name} snapshot recalled inside the console. Its application data remains independent.`);
     };
     window.addEventListener(RAIL_SELECT_EVENT, selectSnapshot);
     return () => window.removeEventListener(RAIL_SELECT_EVENT, selectSnapshot);
-  }, [views, ws]);
+  }, []);
   /* Capture the exact offered bytes once; another tab never grants ownership. */
   const [recovery] = useState(() => {
     try {
