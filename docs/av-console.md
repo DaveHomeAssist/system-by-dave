@@ -1,5 +1,11 @@
 # AV console workspace
 
+## Suite definition of done
+
+As clarified on October 9, 2026, the complete application Rail is part of the console rather than only a route launcher. AV Video and the other eight primary applications are selectable Rail snapshots inside the shared workspace. Their panels use the same move, resize, split, maximize, replace, lock and stored-view controls. Full details and compatibility boundaries are in [AV Suite console snapshot Rail](av-suite-console-snapshot-rail.md).
+
+Standalone application routes remain available. Each application continues to own its records, storage, schemas, import history, Save and Export behavior; the suite snapshot stores arrangement only.
+
 The console workspace is the grandMA-style panel host that AV by Dave consoles share. You tap empty space, choose a panel, work in that space, and store the arrangement as a named view. Window sizing, layout lock and stored views follow Hog-style conventions. The design source is the Claude Design prototype *AV Suite Prototype v3*, built from the [unified console manifest](#decisions).
 
 AV Video is the first console. The engine lives in [`apps/shared/av-console/`](../apps/shared/av-console/):
@@ -82,6 +88,7 @@ Recorded on 2026-10-05 from Dave's review of the console manifest:
 3. **Show chip.** Show and phase appear read-only, only when a console is opened with show context. Consoles never swap each other's data.
 4. **Scope.** Every application adopts the system, including products outside the registry, each with its own panel library and character. No generic sheet template.
 5. **Unification.** Related tools join family consoles with one document and one selection. Every absorbed tool's data imports losslessly.
+6. **Rail snapshots.** The nine primary Rail identities recall in-console snapshots. The Rail retains standalone destinations as fallback links, while the mounted suite shell handles ordinary selection without page navigation.
 
 The console order follows the manifest:
 1. AV Video, with its Switcher bus and Multiview live panels (this release).

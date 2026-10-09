@@ -94,14 +94,14 @@ try {
   await page.getByRole('menuitem', { name: 'Store as new view' }).click();
   await save();
   const stored = (await readSaved()).workspace;
-  assert.equal(stored.version, 1); assert.equal(stored.views.length, 8);
+  assert.equal(stored.version, 1); assert.equal(stored.views.length, 16);
   assert.deepEqual(stored.views[0].panels.map(p => p.type).sort(), ['checks', 'flow', 'inspector']);
   assert.equal((await readSaved()).routes.length, before, 'view edits never change records');
   await page.reload();
-  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Show', 'Cameras', 'Playback', 'Project', 'Routing 8']);
+  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Routing', 'Projection', 'Troubleshooting', 'Show', 'Cameras', 'Playback', 'Project', 'Routing 16']);
   assert.deepEqual((await panels()).sort(), ['checks', 'flow', 'inspector']);
   // Rename and delete a view; deleting never deletes records.
-  await tab('Routing 8').click();
+  await tab('Routing 16').click();
   await page.getByRole('button', { name: 'View options' }).click(); await page.getByRole('menuitem', { name: 'Rename…' }).click();
   await page.getByLabel('View name').fill('Load-in'); await page.getByRole('menuitem', { name: 'Rename' }).click();
   assert.equal(await tab('Load-in').count(), 1);
@@ -177,8 +177,75 @@ try {
   assert.equal(await page.getByRole('tab', { name: /^Troubleshooting/ }).getAttribute('aria-selected'), 'true');
   assert.deepEqual((await panels()).sort(), ['flow', 'inspector']);
   assert.equal(JSON.stringify(await readSaved()), savedBefore, 'layout state never writes the plan');
+
+  // Every Rail application recalls an in-console snapshot instead of leaving AV Video.
+  const suiteSnapshots = [
+    ['audio', 'Audio', '/av-audio/'],
+    ['show-control', 'Show Control', '/show-control/'],
+    ['show-ops', 'Show Ops', '/show-ops/'],
+    ['front-office', 'Front Office', '/front-office/'],
+    ['shop', 'The Shop', '/the-shop/'],
+    ['infrastructure', 'Infrastructure', '/infrastructure/'],
+    ['lighting', 'Lighting', '/av-lighting/'],
+    ['av-calculator', 'AV Calculator', '/av-calculator.html'],
+  ];
+  for (const [id, label, pathname] of suiteSnapshots) {
+    await page.locator(`.sbd-rail__entry[data-rail-ref="console:${id}"]`).click();
+    const frame = page.locator(`iframe[title="${label} application"]`);
+    await frame.waitFor();
+    assert.equal(new URL(await frame.getAttribute('src'), BASE).pathname, pathname);
+    assert.equal(await page.locator(`.sbd-rail__entry[data-rail-ref="console:${id}"]`).getAttribute('aria-current'), 'page');
+    assert.equal(new URL(page.url()).pathname, '/av-video/', `${label} must stay inside the console shell`);
+  }
+  await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').click();
+  await page.locator('iframe[title="Audio application"]').waitFor();
+  assert.deepEqual(await page.getByRole('tab').allTextContents(), ['Audio']);
+  await page.frameLocator('iframe[title="Audio application"]').locator('body').waitFor();
+  const audioBefore = await page.locator('.console-panel[data-panel="suite-audio"]').getAttribute('style');
+  await page.getByRole('button', { name: 'Audio application options' }).click();
+  await page.getByRole('menuitem', { name: 'Move and size…' }).click();
+  await page.getByRole('menuitem', { name: 'Narrower' }).click();
+  await page.getByRole('menuitem', { name: 'Done' }).click();
+  await page.keyboard.press('Escape');
+  assert.notEqual(await page.locator('.console-panel[data-panel="suite-audio"]').getAttribute('style'), audioBefore, 'suite snapshot panels resize on the shared grid');
+  await page.getByRole('button', { name: 'View options' }).click();
+  await page.getByRole('menuitem', { name: 'Update “Audio”' }).click();
+  await save();
+  await page.reload();
+  await page.locator('iframe[title="Audio application"]').waitFor();
+  assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').getAttribute('aria-current'), 'page');
+  await page.locator('.sbd-rail__entry[data-rail-ref="console:av-video"]').click();
+  assert.equal(await tab('Routing').getAttribute('aria-selected'), 'true');
+  assert.equal(await page.locator('.suite-app-frame').count(), 0);
+
+  // Selection rerenders keep keyboard focus, and the phone/dialog marker follows the live snapshot.
+  const audioRail = page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]');
+  await audioRail.focus(); await page.keyboard.press('Enter');
+  await page.locator('iframe[title="Audio application"]').waitFor();
+  assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').evaluate(element => element === document.activeElement), true);
+  const allAppsTrigger = page.locator('.sbd-rail__all');
+  await allAppsTrigger.click();
+  const allApps = page.locator('#sbdRailAllApps');
+  await allApps.locator('[data-rail-ref="console:show-control"]').click();
+  await page.locator('iframe[title="Show Control application"]').waitFor();
+  assert.equal(await page.locator('.sbd-rail__all').evaluate(element => element === document.activeElement), true, 'All apps returns focus to the replacement trigger');
+  await page.locator('.sbd-rail__all').click();
+  assert.equal(await allApps.locator('[data-rail-ref="console:show-control"]').getAttribute('aria-current'), 'page');
+  assert.equal(await allApps.locator('[data-rail-ref="console:audio"]').getAttribute('aria-current'), null);
+  await allApps.getByRole('button', { name: 'Close All apps', exact: true }).click();
+
+  // The active Rail identity follows the effective arrangement after Change and Close.
+  await page.getByRole('button', { name: 'Show Control application options' }).click();
+  await page.getByRole('menuitem', { name: 'Change panel…' }).click();
+  const appChooser = page.getByRole('dialog', { name: 'Add panel' });
+  await appChooser.getByRole('button', { name: 'Common', exact: true }).click();
+  await appChooser.locator('.console-choices button').filter({ hasText: 'Audio application' }).click();
+  assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').getAttribute('aria-current'), 'page');
+  await page.getByRole('button', { name: 'Audio application options' }).click();
+  await page.getByRole('menuitem', { name: 'Close panel' }).click();
+  assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:av-video"]').getAttribute('aria-current'), 'page');
   assert.deepEqual(errors, []);
-  console.log(`AV console workspace verification passed: default views, panel buttons, chooser by keyboard, menus and Escape focus, move/size, store/update/rename/delete views with Save, reload, module-hidden panels, maximize/restore, lock, phone switcher, draft restore/discard and layout persistence (${BASE}).`);
+  console.log(`AV console workspace verification passed: default views, panel buttons, chooser by keyboard, menus and Escape focus, move/size, store/update/rename/delete views with Save, reload, module-hidden panels, maximize/restore, lock, phone switcher, draft restore/discard, layout persistence, and all eight in-console Rail snapshots (${BASE}).`);
 } finally {
   await context.close(); await browser.close(); await new Promise(resolve => server.close(resolve));
 }

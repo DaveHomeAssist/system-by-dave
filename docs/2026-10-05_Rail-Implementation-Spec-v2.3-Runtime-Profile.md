@@ -18,7 +18,9 @@ This version records the three settled product decisions and the first bounded s
 
 **Application-launcher update — October 9, 2026:** the eight primary applications that were later published are promoted from status-only identities to canonical Rail destinations under the [application-launcher brief](av-rail-application-launcher.md). Rail availability now means a published primary route exists. Physical-device, operator and deeper workflow acceptance remain separate evidence and do not block basic navigation.
 
-The rail owns application navigation preferences only. It does not own show data, console documents, modules, draft recovery, or panel layouts.
+**Console-snapshot update — October 9, 2026:** ordinary selection in the mounted AV Video suite shell recalls the matching in-console application snapshot under the [console snapshot Rail contract](av-suite-console-snapshot-rail.md). The published destinations remain fallback links and continue to handle modifier-clicks and pages without a suite selection handler.
+
+The rail owns application order and navigation preferences only. It signals snapshot selection but does not own show data, console documents, modules, draft recovery, or panel layouts. The receiving console workspace owns the recalled arrangement.
 
 ## 1. Source authority and scope
 
