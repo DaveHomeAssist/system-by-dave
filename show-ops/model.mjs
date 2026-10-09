@@ -3,6 +3,9 @@ export const KEY = 'sbd.showOps.document.v1';
 export const ROOM_CHECK_SCHEMA = 'system-by-dave.room-check.v1';
 export const ROOM_CHECK_KEY = 'room-check.v1';
 export const MAX_ROOM_CHECK_BYTES = 500000;
+export const TASK_BOARD_SCHEMA = 'system-by-dave.show-task-board.v1';
+export const TASK_BOARD_KEY = 'show-task-board.v1';
+export const MAX_TASK_BOARD_BYTES = 500000;
 const MAX_SOURCE_BYTES = 2000000;
 const kinds = ['rooms', 'crew', 'tasks'];
 const statuses = { rooms: ['Needs check', 'Ready', 'Blocked'], crew: ['Called', 'On site', 'Released'], tasks: ['Open', 'In progress', 'Done'] };
@@ -10,12 +13,20 @@ const roomStatuses = ['pending', 'checked', 'ready', 'watch', 'issue', 'deferred
 const roomAreas = ['room', 'audio', 'video', 'lighting', 'stage', 'network', 'talent', 'safety', 'house', 'other'];
 const priorities = ['high', 'normal', 'low'];
 const roomFields = ['area', 'check', 'owner', 'due', 'priority', 'status', 'blocker', 'notes'];
+const taskFields = ['area', 'task', 'owner', 'priority', 'due', 'status', 'source', 'blocker', 'notes'];
+const taskStatuses = ['queued', 'assigned', 'in-progress', 'blocked', 'waiting', 'done', 'deferred', 'canceled'];
+const taskAreas = ['audio', 'video', 'lighting', 'stage', 'network', 'comms', 'records', 'client', 'crew', 'room', 'power', 'general'];
+const taskMetaFields = ['showName', 'client', 'venue', 'room', 'showDate', 'boardLead', 'showCaller', 'shift', 'handoffTime'];
 const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const text = (value, max) => typeof value === 'string' && value.length <= max;
 const byteLength = value => new TextEncoder().encode(value).length;
 const sourceIdentity = meta => [meta.showName, meta.showDate, meta.venue, meta.room].map(value => value.trim().toLowerCase()).join('\u0000');
 const sourceSnapshot = item => Object.fromEntries(roomFields.map(field => [field, item[field]]));
-export const empty = () => ({ schema: SCHEMA, show: '', date: '', notes: '', rooms: [], crew: [], tasks: [], roomCheckSources: [] });
+const taskSnapshot = item => Object.fromEntries(taskFields.map(field => [field, item[field]]));
+const validDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
+const onlyKeys = (value, allowed) => Object.keys(value).every(key => allowed.includes(key));
+const activeTask = item => !['done', 'canceled', 'deferred'].includes(item.status);
+export const empty = () => ({ schema: SCHEMA, show: '', date: '', notes: '', rooms: [], crew: [], tasks: [], roomCheckSources: [], taskBoardSources: [] });
 
 export function parseRoomCheck(raw) {
   if (typeof raw !== 'string' || !raw || byteLength(raw) > MAX_ROOM_CHECK_BYTES) throw new Error('Room Check JSON is empty or exceeds 500 KB. Nothing was changed.');
@@ -25,13 +36,29 @@ export function parseRoomCheck(raw) {
   const meta = value.meta;
   for (const key of ['showName', 'showDate', 'venue', 'room']) if (!text(meta[key], 500)) throw new Error(`Invalid Room Check ${key}. Nothing was changed.`);
   if (!meta.showName.trim() || meta.showName.trim() === 'Untitled Room Check') throw new Error('Name the show in Room Check before copying it. Nothing was changed.');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(meta.showDate) || Number.isNaN(Date.parse(`${meta.showDate}T00:00:00Z`)) || new Date(`${meta.showDate}T00:00:00Z`).toISOString().slice(0, 10) !== meta.showDate) throw new Error('Room Check needs a valid show date. Nothing was changed.');
+  if (!validDate(meta.showDate)) throw new Error('Room Check needs a valid show date. Nothing was changed.');
   const ids = new Set();
   for (const item of value.items) {
     if (!isRecord(item) || !text(item.id, 200) || !item.id.trim() || ids.has(item.id) || !roomAreas.includes(item.area) || !text(item.check, 450) || !item.check.trim() || !text(item.owner, 500) || !text(item.due, 500) || !priorities.includes(item.priority) || !roomStatuses.includes(item.status) || !text(item.blocker, 2000) || !text(item.notes, 5000)) throw new Error('Room Check has an invalid, unsupported or duplicate check. Nothing was changed.');
     ids.add(item.id);
   }
   return { raw, meta: { showName: meta.showName, showDate: meta.showDate, venue: meta.venue, room: meta.room }, items: value.items, identity: sourceIdentity(meta) };
+}
+export function parseTaskBoard(raw) {
+  if (typeof raw !== 'string' || !raw || byteLength(raw) > MAX_TASK_BOARD_BYTES) throw new Error('Show Task Board JSON is empty or exceeds 500 KB. Nothing was changed.');
+  let value;
+  try { value = JSON.parse(raw); } catch { throw new Error('Show Task Board JSON could not be parsed. Nothing was changed.'); }
+  const topKeys = ['schema', 'savedAt', 'exportedAt', 'meta', 'items', 'selectedId', 'filters'];
+  if (!isRecord(value) || value.schema !== TASK_BOARD_SCHEMA || !onlyKeys(value, topKeys) || !isRecord(value.meta) || !Array.isArray(value.items) || !value.items.length || value.items.length > 300) throw new Error('Choose a Show Task Board v1 document with 1–300 tasks. Nothing was changed.');
+  if (value.selectedId !== undefined && !text(value.selectedId, 200) || value.filters !== undefined && (!isRecord(value.filters) || !onlyKeys(value.filters, ['search', 'area', 'priority', 'status']) || Object.values(value.filters).some(field => !text(field, 500))) || value.savedAt !== undefined && !text(value.savedAt, 100) || value.exportedAt !== undefined && !text(value.exportedAt, 100)) throw new Error('Show Task Board has unsupported saved fields. Nothing was changed.');
+  const meta = value.meta;
+  if (!onlyKeys(meta, taskMetaFields) || taskMetaFields.some(key => !text(meta[key], 500)) || !meta.showName.trim() || meta.showName.trim() === 'Untitled Task Board' || !validDate(meta.showDate)) throw new Error('Show Task Board needs a named show and valid show date. Nothing was changed.');
+  const ids = new Set();
+  for (const item of value.items) {
+    if (!isRecord(item) || !onlyKeys(item, ['id', ...taskFields]) || !text(item.id, 200) || !item.id.trim() || ids.has(item.id) || !taskAreas.includes(item.area) || !text(item.task, 500) || !item.task.trim() || !text(item.owner, 500) || ![...priorities, 'critical'].includes(item.priority) || !text(item.due, 100) || !taskStatuses.includes(item.status) || !text(item.source, 500) || !text(item.blocker, 2000) || !text(item.notes, 5000)) throw new Error('Show Task Board has an invalid, unsupported or duplicate task. Nothing was changed.');
+    ids.add(item.id);
+  }
+  return { raw, meta: { showName: meta.showName, showDate: meta.showDate, venue: meta.venue, room: meta.room }, items: value.items, active: value.items.filter(activeTask), identity: sourceIdentity(meta) };
 }
 export function validate(value) {
   if (!isRecord(value) || value.schema !== SCHEMA) throw new Error('This is not a Show Ops v1 backup. Nothing was changed.');
@@ -52,7 +79,19 @@ export function validate(value) {
     bySource.set(source.id, parsed);
     return { id: source.id, origin: source.origin, importedAt: source.importedAt, identity: parsed.identity, raw: source.raw };
   });
+  const taskSources = value.taskBoardSources === undefined ? [] : value.taskBoardSources;
+  if (!Array.isArray(taskSources) || taskSources.length > 20) throw new Error('Invalid Show Task Board source history. Nothing was changed.');
+  const byTaskSource = new Map();
+  result.taskBoardSources = taskSources.map(source => {
+    if (!isRecord(source) || !text(source.id, 200) || !source.id || byTaskSource.has(source.id) || !['saved', 'file'].includes(source.origin) || !text(source.importedAt, 100) || !source.importedAt) throw new Error('Invalid Show Task Board source history. Nothing was changed.');
+    const parsed = parseTaskBoard(source.raw);
+    sourceBytes += byteLength(source.raw);
+    if (sourceBytes > MAX_SOURCE_BYTES || source.identity !== parsed.identity) throw new Error('Invalid Show Task Board source history. Nothing was changed.');
+    byTaskSource.set(source.id, parsed);
+    return { id: source.id, origin: source.origin, importedAt: source.importedAt, identity: parsed.identity, raw: source.raw };
+  });
   const copied = new Set();
+  const copiedTasks = new Set();
   for (const kind of kinds) {
     if (!Array.isArray(value[kind]) || value[kind].length > 2000) throw new Error(`Invalid ${kind} records. Nothing was changed.`);
     const ids = new Set();
@@ -68,6 +107,15 @@ export function validate(value) {
         if (!original || copied.has(copyKey)) throw new Error('Invalid or duplicate Room Check provenance. Nothing was changed.');
         copied.add(copyKey);
         normalized.source = { sourceId: row.source.sourceId, itemId: original.id, snapshot: sourceSnapshot(original) };
+      }
+      if (row.taskSource !== undefined) {
+        if (kind !== 'tasks' || !isRecord(row.taskSource) || !text(row.taskSource.sourceId, 200) || !text(row.taskSource.itemId, 200) || !byTaskSource.has(row.taskSource.sourceId)) throw new Error('Invalid Show Task Board provenance. Nothing was changed.');
+        const parsed = byTaskSource.get(row.taskSource.sourceId);
+        const original = parsed.active.find(item => item.id === row.taskSource.itemId);
+        const copyKey = `${parsed.identity}\u0000${row.taskSource.itemId}`;
+        if (!original || copiedTasks.has(copyKey)) throw new Error('Invalid or duplicate Show Task Board provenance. Nothing was changed.');
+        copiedTasks.add(copyKey);
+        normalized.taskSource = { sourceId: row.taskSource.sourceId, itemId: original.id, snapshot: taskSnapshot(original) };
       }
       return normalized;
     });
@@ -87,7 +135,7 @@ export function previewRoomCheck(doc, raw) {
   const available = source.items.filter(item => !copied.has(`${source.identity}\u0000${item.id}`));
   if (!available.length) throw new Error('Every check in this Room Check source was already copied. Nothing was changed.');
   const existingSource = current.roomCheckSources.find(entry => entry.raw === raw);
-  if (!existingSource && (current.roomCheckSources.length >= 20 || current.roomCheckSources.reduce((size, entry) => size + byteLength(entry.raw), 0) + byteLength(raw) > MAX_SOURCE_BYTES)) throw new Error('This show cannot accept another distinct Room Check source. Nothing was changed.');
+  if (!existingSource && (current.roomCheckSources.length >= 20 || [...current.roomCheckSources, ...current.taskBoardSources].reduce((size, entry) => size + byteLength(entry.raw), 0) + byteLength(raw) > MAX_SOURCE_BYTES)) throw new Error('This show cannot accept another distinct Room Check source. Nothing was changed.');
   return { ...source, available, alreadyCopied: source.items.length - available.length, existingSourceId: existingSource?.id || null };
 }
 
@@ -104,6 +152,36 @@ export function copyRoomCheck(doc, source, selectedIds, origin, importedAt, next
   });
   const roomCheckSources = preview.existingSourceId ? current.roomCheckSources : [...current.roomCheckSources, { id: sourceId, origin, importedAt, identity: preview.identity, raw: source.raw }];
   return validate({ ...current, show: current.show || preview.meta.showName, date: current.date || preview.meta.showDate, rooms: [...current.rooms, ...rows], roomCheckSources });
+}
+export function previewTaskBoard(doc, raw) {
+  const current = validate(doc);
+  const source = parseTaskBoard(raw);
+  if (current.show.trim() && current.show.trim() !== source.meta.showName.trim()) throw new Error('Show Task Board show differs from this Show Ops show. Nothing was changed.');
+  if (current.date && current.date !== source.meta.showDate) throw new Error('Show Task Board date differs from this Show Ops date. Nothing was changed.');
+  const copied = new Set(current.tasks.filter(row => row.taskSource).map(row => {
+    const entry = current.taskBoardSources.find(item => item.id === row.taskSource.sourceId);
+    return `${entry.identity}\u0000${row.taskSource.itemId}`;
+  }));
+  const available = source.active.filter(item => !copied.has(`${source.identity}\u0000${item.id}`));
+  if (!available.length) throw new Error('No new active Show Task Board tasks are available. Nothing was changed.');
+  const existingSource = current.taskBoardSources.find(entry => entry.raw === raw);
+  if (!existingSource && (current.taskBoardSources.length >= 20 || [...current.roomCheckSources, ...current.taskBoardSources].reduce((size, entry) => size + byteLength(entry.raw), 0) + byteLength(raw) > MAX_SOURCE_BYTES)) throw new Error('This show cannot accept another distinct Show Task Board source. Nothing was changed.');
+  return { ...source, available, alreadyCopied: source.active.length - available.length, excluded: source.items.length - source.active.length, existingSourceId: existingSource?.id || null };
+}
+export function copyTaskBoard(doc, source, selectedIds, origin, importedAt, nextId = () => crypto.randomUUID()) {
+  const current = validate(doc);
+  const preview = previewTaskBoard(current, source.raw);
+  if (!['saved', 'file'].includes(origin) || !Array.isArray(selectedIds) || !selectedIds.length || new Set(selectedIds).size !== selectedIds.length) throw new Error('Select one or more distinct active tasks. Nothing was changed.');
+  const available = new Map(preview.available.map(item => [item.id, item]));
+  if (selectedIds.some(id => !available.has(id)) || current.tasks.length + selectedIds.length > 2000) throw new Error('Selected Show Task Board tasks are unavailable or exceed Show Ops capacity. Nothing was changed.');
+  const sourceId = preview.existingSourceId || nextId();
+  const rows = selectedIds.map(itemId => {
+    const item = available.get(itemId);
+    const detail = [item.owner && `Owner: ${item.owner}`, item.due && `Due: ${item.due}`, item.blocker && `Blocker: ${item.blocker}`].filter(Boolean).join(' · ').slice(0, 2000);
+    return { id: nextId(), name: item.task, detail, status: 'Open', taskSource: { sourceId, itemId, snapshot: taskSnapshot(item) } };
+  });
+  const taskBoardSources = preview.existingSourceId ? current.taskBoardSources : [...current.taskBoardSources, { id: sourceId, origin, importedAt, identity: preview.identity, raw: source.raw }];
+  return validate({ ...current, show: current.show || preview.meta.showName, date: current.date || preview.meta.showDate, tasks: [...current.tasks, ...rows], taskBoardSources });
 }
 export function addRecord(doc, kind, name, detail = '') {
   if (!kinds.includes(kind) || !name.trim()) return doc;

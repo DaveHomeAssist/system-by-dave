@@ -337,7 +337,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261008-show-ops-room-check',
+    version:'v20261008-show-ops-task-board',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

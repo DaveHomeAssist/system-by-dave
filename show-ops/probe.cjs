@@ -136,6 +136,100 @@ const server = http.createServer((req,res)=>{
   await page.locator('#room-saved').click();
   assert.match(await page.locator('#notice').textContent(),/already copied/);
   assert.equal(await page.evaluate(()=>localStorage.getItem('room-check.v1')),roomRaw);
+  const taskRaw=JSON.stringify({schema:'system-by-dave.show-task-board.v1',savedAt:'2026-10-07T07:00:00Z',meta:{showName:'Acceptance show',client:'Client',venue:'Hall',room:'Main',showDate:'2026-10-07',boardLead:'Lead',showCaller:'Caller',shift:'Day',handoffTime:'17:00'},items:[
+    {id:'task-one',area:'video',task:'Replace DSM cable',owner:'V1',priority:'critical',due:'09:00',status:'blocked',source:'Line check',blocker:'Spare cable needed',notes:'Case A3'},
+    {id:'task-two',area:'audio',task:'Confirm lectern mic',owner:'A1',priority:'normal',due:'09:15',status:'in-progress',source:'Sound check',blocker:'',notes:''},
+    {id:'task-three',area:'stage',task:'Tape lectern',owner:'Stage',priority:'low',due:'08:00',status:'done',source:'Room walk',blocker:'',notes:''},
+    {id:'task-four',area:'comms',task:'Swap beltpack',owner:'Comms',priority:'normal',due:'10:00',status:'deferred',source:'Operator',blocker:'',notes:''}
+  ]});
+  await page.evaluate(raw=>localStorage.setItem('show-task-board.v1',raw),taskRaw);
+  const beforeTask=await page.evaluate(()=>localStorage.getItem('sbd.showOps.document.v1'));
+  await page.locator('#task-saved').click();
+  assert.equal(await page.locator('input[name="task-board-row"]').count(),2);
+  assert.match(await page.locator('#task-preview').textContent(),/2 done, canceled or deferred excluded/);
+  assert.match(await page.locator('#task-preview').textContent(),/Spare cable needed/);
+  for(const size of [{width:320,height:256},{width:375,height:812},{width:844,height:390},{width:1440,height:900},{width:3840,height:1080}]){
+    await page.setViewportSize(size);
+    const bounds=await page.evaluate(()=>({h:document.documentElement.scrollHeight,ch:document.documentElement.clientHeight,w:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}));
+    assert.ok(bounds.h<=bounds.ch && bounds.w<=bounds.cw,JSON.stringify({size,bounds}));
+    await page.locator('input[name="task-board-row"][value="task-two"]').focus();
+    assert.equal(await page.locator('input[name="task-board-row"][value="task-two"]').isVisible(),true);
+    if([375,1440].includes(size.width)) await page.screenshot({path:path.join(output,`show-ops-task-preview-${size.width}.png`)});
+  }
+  await page.locator('#theme').click();
+  assert.equal(await page.evaluate(()=>document.documentElement.dataset.avTheme),'light');
+  for(const size of [{width:375,height:812},{width:1440,height:900}]){
+    await page.setViewportSize(size);
+    await page.locator('#task-preview').scrollIntoViewIfNeeded();
+    const bounds=await page.evaluate(()=>({h:document.documentElement.scrollHeight,ch:document.documentElement.clientHeight,w:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}));
+    assert.ok(bounds.h<=bounds.ch && bounds.w<=bounds.cw,JSON.stringify({size,bounds}));
+    await page.screenshot({path:path.join(output,`show-ops-task-preview-light-${size.width}.png`)});
+  }
+  await page.setViewportSize({width:1440,height:900});
+  await page.locator('#cancel-task').click();
+  assert.equal(await page.evaluate(()=>localStorage.getItem('sbd.showOps.document.v1')),beforeTask);
+  await page.locator('#task-saved').click();
+  await page.evaluate(raw=>localStorage.setItem('show-task-board.v1',raw.replace('Case A3','Case B4')),taskRaw);
+  await page.locator('#confirm-task').click();
+  assert.match(await page.locator('#notice').textContent(),/changed after preview/);
+  await page.evaluate(raw=>localStorage.setItem('show-task-board.v1',raw),taskRaw);
+  await page.locator('#task-saved').click();
+  await page.evaluate(raw=>localStorage.setItem('sbd.showOps.document.v1',raw.replace('Acceptance show','Other tab')),beforeTask);
+  await page.locator('#confirm-task').click();
+  assert.match(await page.locator('#notice').textContent(),/changed after preview/);
+  await page.evaluate(raw=>localStorage.setItem('sbd.showOps.document.v1',raw),beforeTask);
+  const invalidTask=JSON.parse(taskRaw); invalidTask.items[0].password='unsafe';
+  await page.locator('#task-file').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(invalidTask))});
+  await page.waitForFunction(()=>document.querySelector('#notice').textContent.includes('invalid, unsupported'));
+  assert.match(await page.locator('#notice').textContent(),/invalid, unsupported/);
+  const escapedTask=JSON.parse(taskRaw); escapedTask.items[0].task='<svg onload="window.__taskInjected=true">';
+  await page.locator('#task-file').setInputFiles({name:'escaped.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(escapedTask))});
+  await page.locator('#confirm-task').waitFor();
+  assert.equal(await page.evaluate(()=>window.__taskInjected),undefined);
+  assert.match(await page.locator('#task-preview').textContent(),/<svg onload=/);
+  await page.locator('#cancel-task').click();
+  await page.locator('#task-file').setInputFiles({name:'show-task-board.json',mimeType:'application/json',buffer:Buffer.from(taskRaw)});
+  await page.locator('input[name="task-board-row"][value="task-two"]').uncheck();
+  await page.locator('#confirm-task').click();
+  assert.equal(await page.locator('#dirty').textContent(),'Unsaved edits');
+  assert.equal(await page.locator('[data-field=status]').last().inputValue(),'Open');
+  assert.match(await page.locator('.source-fields summary').last().textContent(),/Original Show Task Board: blocked/);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('sbd.showOps.document.v1')),beforeTask);
+  await page.reload();
+  await page.getByRole('button',{name:'Tasks',exact:true}).click();
+  assert.equal(await page.locator('.record').count(),0);
+  await page.getByRole('button',{name:'Backup',exact:true}).click();
+  await page.locator('#task-saved').click();
+  await page.locator('input[name="task-board-row"][value="task-two"]').uncheck();
+  await page.locator('#confirm-task').click();
+  await page.locator('#save').click();
+  await page.reload();
+  let copiedTask=JSON.parse(await page.evaluate(()=>localStorage.getItem('sbd.showOps.document.v1')));
+  assert.equal(copiedTask.taskBoardSources[0].raw,taskRaw);
+  assert.equal(copiedTask.tasks[0].status,'Open');
+  assert.equal(copiedTask.tasks[0].taskSource.snapshot.status,'blocked');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('show-task-board.v1')),taskRaw);
+  await page.getByRole('button',{name:'Backup',exact:true}).click();
+  const taskDownloadPromise=page.waitForEvent('download'); await page.locator('#export').click();
+  const taskDownload=await taskDownloadPromise;
+  const taskBackup=fs.readFileSync(await taskDownload.path(),'utf8');
+  assert.equal(JSON.parse(taskBackup).taskBoardSources[0].raw,taskRaw);
+  const taskRestored=await browser.newPage({viewport:{width:375,height:812}});
+  await taskRestored.goto(origin+'/show-ops/');
+  await taskRestored.getByRole('button',{name:'Backup',exact:true}).click();
+  await taskRestored.locator('#import').setInputFiles({name:'show-ops-backup.json',mimeType:'application/json',buffer:Buffer.from(taskBackup)});
+  await taskRestored.locator('#confirm-import').click(); await taskRestored.locator('#save').click(); await taskRestored.reload();
+  assert.equal(JSON.parse(await taskRestored.evaluate(()=>localStorage.getItem('sbd.showOps.document.v1'))).taskBoardSources[0].raw,taskRaw);
+  await taskRestored.close();
+  await page.locator('#task-file').setInputFiles({name:'show-task-board.json',mimeType:'application/json',buffer:Buffer.from(taskRaw)});
+  assert.match(await page.locator('#task-preview').textContent(),/1 previously copied/);
+  await page.locator('#confirm-task').click(); await page.locator('#save').click(); await page.reload();
+  copiedTask=JSON.parse(await page.evaluate(()=>localStorage.getItem('sbd.showOps.document.v1')));
+  assert.equal(copiedTask.tasks.length,2);
+  assert.equal(copiedTask.taskBoardSources.length,1);
+  await page.getByRole('button',{name:'Backup',exact:true}).click();
+  await page.locator('#task-saved').click();
+  assert.match(await page.locator('#notice').textContent(),/No new active/);
   const blocked=await browser.newPage({viewport:{width:900,height:700}});
   await blocked.goto(origin+'/show-ops/');
   await blocked.evaluate(()=>localStorage.setItem('sbd.showOps.document.v1',JSON.stringify({schema:'system-by-dave.show-ops.v1',show:'Protected show',date:'2026-10-07',notes:'',rooms:[],crew:[],tasks:[]})));
@@ -170,6 +264,14 @@ const server = http.createServer((req,res)=>{
   assert.equal(await failed.locator('.record').count(),2);
   assert.equal(await failed.evaluate(()=>localStorage.getItem('sbd.showOps.document.v1')),null);
   assert.equal(await failed.evaluate(()=>localStorage.getItem('room-check.v1')),roomRaw);
+  await failed.evaluate(raw=>localStorage.setItem('show-task-board.v1',raw),taskRaw);
+  await failed.getByRole('button',{name:'Backup',exact:true}).click();
+  await failed.locator('#task-saved').click();
+  await failed.locator('#confirm-task').click();
+  await failed.locator('#save').click();
+  assert.match(await failed.locator('#notice').textContent(),/Save failed/);
+  assert.equal(await failed.evaluate(()=>localStorage.getItem('sbd.showOps.document.v1')),null);
+  assert.equal(await failed.evaluate(()=>localStorage.getItem('show-task-board.v1')),taskRaw);
   await failed.close();
   const concurrent=await browser.newPage({viewport:{width:900,height:700}});
   await concurrent.goto(origin+'/show-ops/');

@@ -1,11 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { empty, validate, addRecord, updateRecord, handoff, SCHEMA, ROOM_CHECK_SCHEMA, MAX_ROOM_CHECK_BYTES, parseRoomCheck, previewRoomCheck, copyRoomCheck } from './model.mjs';
+import { empty, validate, addRecord, updateRecord, handoff, SCHEMA, ROOM_CHECK_SCHEMA, MAX_ROOM_CHECK_BYTES, parseRoomCheck, previewRoomCheck, copyRoomCheck, TASK_BOARD_SCHEMA, MAX_TASK_BOARD_BYTES, parseTaskBoard, previewTaskBoard, copyTaskBoard } from './model.mjs';
 const roomCheck = (items = [
   { id: 'check-1', area: 'room', check: 'Sightlines', owner: 'Lead tech', due: '07:30', priority: 'high', status: 'ready', blocker: '', notes: 'Back row checked', custom: 'Keep exact original' },
   { id: 'check-2', area: 'video', check: 'DSM route', owner: 'V1', due: '08:00', priority: 'normal', status: 'issue', blocker: 'Aux missing', notes: 'Ask switcher' }
 ]) => JSON.stringify({ schema: ROOM_CHECK_SCHEMA, exportedAt: '2026-10-08T10:00:00Z', meta: { showName: 'Test show', showDate: '2026-10-08', venue: 'Hall', room: 'Main' }, items });
 const ids = () => { let count = 0; return () => `copy-${++count}`; };
+const taskBoard = (items = [
+  { id: 'task-1', area: 'video', task: 'Replace DSM cable', owner: 'V1', priority: 'critical', due: '09:00', status: 'blocked', source: 'Line check', blocker: 'Spare cable needed', notes: 'Case A3' },
+  { id: 'task-2', area: 'audio', task: 'Confirm lectern mic', owner: 'A1', priority: 'normal', due: '09:15', status: 'in-progress', source: 'Sound check', blocker: '', notes: '' },
+  { id: 'task-3', area: 'stage', task: 'Tape lectern', owner: 'Stage', priority: 'low', due: '08:00', status: 'done', source: 'Room walk', blocker: '', notes: '' },
+  { id: 'task-4', area: 'comms', task: 'Swap beltpack', owner: 'Comms', priority: 'normal', due: '10:00', status: 'deferred', source: 'Operator', blocker: '', notes: '' }
+]) => JSON.stringify({ schema: TASK_BOARD_SCHEMA, exportedAt: '2026-10-08T10:00:00Z', meta: { showName: 'Test show', client: 'Client', venue: 'Hall', room: 'Main', showDate: '2026-10-08', boardLead: 'Lead', showCaller: 'Caller', shift: 'Day', handoffTime: '17:00' }, items });
 test('records survive JSON backup and reload with their statuses', () => {
   let doc = { ...empty(), show: 'Test show', date: '2026-10-07' };
   doc = addRecord(doc, 'rooms', 'Main room', 'Check projector');
@@ -88,4 +94,57 @@ test('invalid source provenance and duplicate selection cannot alter a saved can
   const broken = structuredClone(copied); broken.roomCheckSources[0].raw = roomCheck([]);
   assert.throws(() => validate(broken), /Room Check v1/);
   assert.equal(JSON.stringify(before), bytes);
+});
+test('active Show Task Board copy is unsaved Open work with exact provenance and older backup compatibility', () => {
+  const raw = taskBoard();
+  const preview = previewTaskBoard(empty(), raw);
+  assert.deepEqual(preview.available.map(item => item.id), ['task-1', 'task-2']);
+  assert.equal(preview.excluded, 2);
+  const doc = copyTaskBoard(empty(), preview, ['task-1'], 'file', '2026-10-08T11:00:00Z', ids());
+  assert.equal(doc.show, 'Test show'); assert.equal(doc.date, '2026-10-08');
+  assert.equal(doc.tasks[0].status, 'Open');
+  assert.equal(doc.tasks[0].taskSource.snapshot.status, 'blocked');
+  assert.equal(doc.tasks[0].taskSource.snapshot.blocker, 'Spare cable needed');
+  assert.match(doc.tasks[0].detail, /Owner: V1.*Due: 09:00.*Blocker: Spare cable needed/);
+  assert.equal(doc.taskBoardSources[0].raw, raw);
+  assert.deepEqual(validate(JSON.parse(JSON.stringify(doc))), doc);
+  assert.deepEqual(validate({ schema: SCHEMA, show: 'Old', date: '', notes: '', rooms: [], crew: [], tasks: [] }).taskBoardSources, []);
+});
+test('Show Task Board rejects conflicts, repeated and inactive task selections without changing the input', () => {
+  const raw = taskBoard(); const before = empty(); const baseline = JSON.stringify(before);
+  assert.throws(() => previewTaskBoard({ ...before, show: 'Other' }, raw), /show differs/);
+  assert.throws(() => previewTaskBoard({ ...before, date: '2026-10-09' }, raw), /date differs/);
+  assert.throws(() => copyTaskBoard(before, previewTaskBoard(before, raw), ['task-1', 'task-1'], 'saved', '2026-10-08T11:00:00Z', ids()), /distinct/);
+  assert.throws(() => copyTaskBoard(before, previewTaskBoard(before, raw), ['task-3'], 'saved', '2026-10-08T11:00:00Z', ids()), /unavailable/);
+  const nextId = ids();
+  const first = copyTaskBoard(before, previewTaskBoard(before, raw), ['task-1'], 'saved', '2026-10-08T11:00:00Z', nextId);
+  assert.deepEqual(previewTaskBoard(first, raw).available.map(item => item.id), ['task-2']);
+  const second = copyTaskBoard(first, previewTaskBoard(first, raw), ['task-2'], 'file', '2026-10-08T12:00:00Z', nextId);
+  assert.equal(second.taskBoardSources.length, 1);
+  assert.throws(() => previewTaskBoard(second, raw), /No new active/);
+  const changed = JSON.parse(raw); changed.items[0].notes = 'Updated elsewhere';
+  assert.deepEqual(previewTaskBoard(first, JSON.stringify(changed)).available.map(item => item.id), ['task-2']);
+  assert.equal(JSON.stringify(before), baseline);
+});
+test('Show Task Board source validation rejects malformed, unsupported, oversized and ambiguous data', () => {
+  assert.throws(() => parseTaskBoard('{bad'), /could not be parsed/);
+  assert.throws(() => parseTaskBoard('é'.repeat(MAX_TASK_BOARD_BYTES / 2 + 1)), /exceeds 500 KB/);
+  const duplicate = JSON.parse(taskBoard()); duplicate.items[1].id = duplicate.items[0].id;
+  assert.throws(() => parseTaskBoard(JSON.stringify(duplicate)), /duplicate task/);
+  const unknown = JSON.parse(taskBoard()); unknown.items[0].status = 'verified';
+  assert.throws(() => parseTaskBoard(JSON.stringify(unknown)), /unsupported/);
+  unknown.items[0].status = 'blocked'; unknown.items[0].password = 'unsafe';
+  assert.throws(() => parseTaskBoard(JSON.stringify(unknown)), /unsupported/);
+  delete unknown.items[0].password; unknown.schema = 'system-by-dave.show-task-board.v2';
+  assert.throws(() => parseTaskBoard(JSON.stringify(unknown)), /Show Task Board v1/);
+  unknown.schema = TASK_BOARD_SCHEMA; unknown.meta.showDate = '2026-02-30';
+  assert.throws(() => parseTaskBoard(JSON.stringify(unknown)), /valid show date/);
+});
+test('Show Task Board provenance rejects missing source and changed active status', () => {
+  const raw = taskBoard();
+  const doc = copyTaskBoard(empty(), previewTaskBoard(empty(), raw), ['task-1'], 'file', '2026-10-08T11:00:00Z', ids());
+  const missing = structuredClone(doc); missing.taskBoardSources = [];
+  assert.throws(() => validate(missing), /Show Task Board provenance/);
+  const changed = structuredClone(doc); const source = JSON.parse(raw); source.items[0].status = 'done'; changed.taskBoardSources[0].raw = JSON.stringify(source);
+  assert.throws(() => validate(changed), /Show Task Board provenance/);
 });

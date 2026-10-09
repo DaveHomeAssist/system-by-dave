@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-08 — Show Task Board active-task copy into Show Ops
+
+- Preview saved or exported Show Task Board v1 data and select active tasks for a one-way, unsaved Show Ops copy. Done, canceled and deferred source tasks are excluded; every selected copy begins Open for operator review.
+- Retain the original status, blocker, priority, owner, due time and exact source JSON through Show Ops save, export and restore. Reject malformed, unsafe-field, oversized, duplicate, mismatched or stale source copies without changing either saved document.
+- Cover saved/file cancellation, source/target conflicts, backup recovery and affected phone, desktop and ultrawide previews; advance the AV offline cache generation. This does not promote the Planned Rail slot.
+
 ## 2026-10-08 — Room Check v1 one-way copy into Show Ops
 
 - Review saved or exported Room Check v1 checks inside Show Ops, select individual checks, and copy them as unsaved rooms bound to the same show and date. Every copied row starts at Needs check; no Room Check readiness is promoted.
