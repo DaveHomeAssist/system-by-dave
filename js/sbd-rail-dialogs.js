@@ -314,6 +314,7 @@
     if(!documentRef||typeof documentRef.createElement!=='function') throw new Error('SBD_RAIL_DIALOGS.create requires a document.');
     var registry=registryOrDefault(options.registry);
     var store=options.preferenceStore||null;
+    var currentRef=options.currentRef||'';
     var sections=catalog(registry);
     var prefix=options.idPrefix||'sbdRail';
     var draftTargets={};
@@ -333,7 +334,7 @@
       if(route.ok){
         card.setAttribute('href',route.href);
         if(entry.namespace==='external') card.setAttribute('rel','noopener noreferrer');
-        if(entry.ref===options.currentRef) card.setAttribute('aria-current','page');
+        if(entry.ref===currentRef) card.setAttribute('aria-current','page');
         if(typeof options.onNavigate==='function') card.addEventListener('click',function(event){options.onNavigate(entry,event);});
       }else{
         card.setAttribute('tabindex','0');
@@ -372,6 +373,19 @@
       customizeFromAll.className+=' sbd-rail-dialog__open-customize';
       fragment.push(customizeFromAll);
       allApps.body.replaceChildren.apply(allApps.body,fragment);
+    }
+
+    function setCurrentRef(reference){
+      currentRef=String(reference||'');
+      function visit(element){
+        if(element&&typeof element.getAttribute==='function'&&element.getAttribute('data-rail-ref')){
+          if(element.getAttribute('data-rail-ref')===currentRef) element.setAttribute('aria-current','page');
+          else element.removeAttribute('aria-current');
+        }
+        var children=element&&element.children||[];
+        for(var i=0;i<children.length;i++) visit(children[i]);
+      }
+      visit(allApps.body);
     }
 
     function pinnableEntries(){
@@ -500,8 +514,10 @@
       closeAllApps:allApps.hide,
       closeCustomize:customize.hide,
       setAllAppsTrigger:allApps.setTrigger,
+      getAllAppsTrigger:allApps.getTrigger,
       setCustomizeTrigger:customize.setTrigger,
       getCustomizeTrigger:customize.getTrigger,
+      setCurrentRef:setCurrentRef,
       refresh:function(){renderCustomize();return draftObserver.refresh();},
       destroy:function(){
         draftObserver.destroy();

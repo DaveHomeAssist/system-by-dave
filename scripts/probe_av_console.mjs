@@ -217,6 +217,33 @@ try {
   await page.locator('.sbd-rail__entry[data-rail-ref="console:av-video"]').click();
   assert.equal(await tab('Routing').getAttribute('aria-selected'), 'true');
   assert.equal(await page.locator('.suite-app-frame').count(), 0);
+
+  // Selection rerenders keep keyboard focus, and the phone/dialog marker follows the live snapshot.
+  const audioRail = page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]');
+  await audioRail.focus(); await page.keyboard.press('Enter');
+  await page.locator('iframe[title="Audio application"]').waitFor();
+  assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').evaluate(element => element === document.activeElement), true);
+  const allAppsTrigger = page.locator('.sbd-rail__all');
+  await allAppsTrigger.click();
+  const allApps = page.locator('#sbdRailAllApps');
+  await allApps.locator('[data-rail-ref="console:show-control"]').click();
+  await page.locator('iframe[title="Show Control application"]').waitFor();
+  assert.equal(await page.locator('.sbd-rail__all').evaluate(element => element === document.activeElement), true, 'All apps returns focus to the replacement trigger');
+  await page.locator('.sbd-rail__all').click();
+  assert.equal(await allApps.locator('[data-rail-ref="console:show-control"]').getAttribute('aria-current'), 'page');
+  assert.equal(await allApps.locator('[data-rail-ref="console:audio"]').getAttribute('aria-current'), null);
+  await allApps.getByRole('button', { name: 'Close All apps', exact: true }).click();
+
+  // The active Rail identity follows the effective arrangement after Change and Close.
+  await page.getByRole('button', { name: 'Show Control application options' }).click();
+  await page.getByRole('menuitem', { name: 'Change panel…' }).click();
+  const appChooser = page.getByRole('dialog', { name: 'Add panel' });
+  await appChooser.getByRole('button', { name: 'Common', exact: true }).click();
+  await appChooser.locator('.console-choices button').filter({ hasText: 'Audio application' }).click();
+  assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').getAttribute('aria-current'), 'page');
+  await page.getByRole('button', { name: 'Audio application options' }).click();
+  await page.getByRole('menuitem', { name: 'Close panel' }).click();
+  assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:av-video"]').getAttribute('aria-current'), 'page');
   assert.deepEqual(errors, []);
   console.log(`AV console workspace verification passed: default views, panel buttons, chooser by keyboard, menus and Escape focus, move/size, store/update/rename/delete views with Save, reload, module-hidden panels, maximize/restore, lock, phone switcher, draft restore/discard, layout persistence, and all eight in-console Rail snapshots (${BASE}).`);
 } finally {

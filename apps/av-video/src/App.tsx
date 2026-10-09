@@ -20,21 +20,28 @@ const LAYOUT_KEY = "sbd.avVideo.layout.v1";
 const RAIL_SELECT_EVENT = "sbd:rail-console-select";
 const RAIL_ACTIVE_EVENT = "sbd:console-snapshot-active";
 const CONTEXT_KEYS = ["sbdShow", "sbdVenue", "sbdDate", "sbdOperator", "sbdPhase"];
-const SUITE_APPS = [
-  { consoleId: "audio", type: "suite-audio", name: "Audio", href: "/av-audio/", group: "Common" },
-  { consoleId: "show-control", type: "suite-show-control", name: "Show Control", href: "/show-control/", group: "Common" },
-  { consoleId: "show-ops", type: "suite-show-ops", name: "Show Ops", href: "/show-ops/", group: "Common" },
-  { consoleId: "front-office", type: "suite-front-office", name: "Front Office", href: "/front-office/", group: "Planning" },
-  { consoleId: "shop", type: "suite-shop", name: "The Shop", href: "/the-shop/", group: "Planning" },
-  { consoleId: "infrastructure", type: "suite-infrastructure", name: "Infrastructure", href: "/infrastructure/", group: "Planning" },
-  { consoleId: "lighting", type: "suite-lighting", name: "Lighting", href: "/av-lighting/", group: "Utilities" },
-  { consoleId: "av-calculator", type: "suite-av-calculator", name: "AV Calculator", href: "/av-calculator.html", group: "Utilities" },
-] as const;
-type SuiteApp = typeof SUITE_APPS[number];
-type SuitePanelType = SuiteApp["type"];
+type SuiteApp = { consoleId: string; type: `suite-${string}`; name: string; href: string; group: PanelDef["group"] };
+type SuiteRegistry = {
+  tools?: { id: string; href: string }[];
+  consoles?: { id: string; label: string; availability: string; toolId: string; panelGroup?: PanelDef["group"] }[];
+};
+declare global { interface Window { SBD_REGISTRY?: SuiteRegistry } }
+function suiteAppsFromRegistry(): SuiteApp[] {
+  const registry = window.SBD_REGISTRY;
+  const tools = new Map((registry?.tools || []).map(tool => [tool.id, tool]));
+  return (registry?.consoles || []).flatMap(console => {
+    const tool = tools.get(console.toolId);
+    if (console.id === CONSOLE_ID || console.availability !== "available" || !tool || !console.panelGroup) return [];
+    const href = new URL(tool.href, `${location.origin}/`);
+    return [{ consoleId: console.id, type: `suite-${console.id}`, name: console.label, href: `${href.pathname}${href.search}`, group: console.panelGroup }];
+  });
+}
+const SUITE_APPS = suiteAppsFromRegistry();
+type SuitePanelType = `suite-${string}`;
 type PanelType = "cameras" | "playback" | "flow" | "patch" | "inspector" | "displays" | "checks" | "project" | "bus" | "multiview" | SuitePanelType;
 const suiteAppForType = (type: string) => SUITE_APPS.find(app => app.type === type);
 const suiteAppForView = (view?: ConsoleView) => view?.panels.map(panel => suiteAppForType(panel.type)).find(Boolean);
+const suiteAppForPanels = (panels: Panel[]) => panels.map(panel => suiteAppForType(panel.type)).find(Boolean);
 function suiteAppHref(app: SuiteApp) {
   const target = new URL(app.href, location.origin);
   const source = new URLSearchParams(location.search);
@@ -140,7 +147,7 @@ export function App() {
       setRecoveryProblems(p => ({ ...p, layout: ok ? "" : "Layout could not be saved. This arrangement is available for this visit only." })); } };
   });
   const ws = useConsoleWorkspace(views, library, layoutPersist);
-  const activeSuiteApp = suiteAppForView(ws.view);
+  const activeSuiteApp = suiteAppForPanels(ws.panels);
   const lastVideoView = useRef("routing");
   const workspaceRef = useRef(ws); workspaceRef.current = ws;
   const viewsRef = useRef(views); viewsRef.current = views;

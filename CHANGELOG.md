@@ -1,11 +1,12 @@
 # Changelog
 
-## 2026-10-09 — Rail application launcher
+## 2026-10-09 — Rail console snapshots
 
-- Make all nine published primary AV applications navigable from the Rail while preserving the exact v3 order, existing routes, local customization and validated show context.
+- Make all nine published primary AV applications selectable from the Rail while preserving the exact v3 order, existing routes, local customization and validated show context.
+- Recall the eight non-Video applications inside AV Video's shared console as selectable, movable, resizable and storable panels. Keep each application's existing storage, schema, Save, Export, import and recovery behavior independent, with a standalone route available from every panel.
 - Remove the mapped primary applications from the duplicate Specialist tools list in All apps through the existing registry-derived catalog.
-- Keep physical-device, operator and deeper workflow acceptance separate from route availability; no document, schema, storage key or application behavior changes.
-- Advance the AV offline cache generation and cover direct Rail links in source and browser checks.
+- Keep physical-device, operator and deeper workflow acceptance separate from route and snapshot availability; existing application documents, schemas and storage keys remain compatible.
+- Advance the AV offline cache generation and cover registry-derived snapshots, responsive layout, focus, persistence and direct Rail links in source and browser checks.
 
 ## 2026-10-09 — Crew Call active-crew copy into Show Ops
 

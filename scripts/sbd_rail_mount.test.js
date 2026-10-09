@@ -70,9 +70,16 @@ test('production mount wires typed routes, dialogs, explicit reset, and focus-sa
       assert.equal(container, host);
       renderOptions.push(options);
       const railNode = { focusCalls: 0, focus() { this.focusCalls += 1; } };
+      const entries = ['console:av-video', 'console:audio'].map((reference) => ({
+        reference,
+        focusCalls: 0,
+        getAttribute(name) { return name === 'data-rail-ref' ? this.reference : null; },
+        focus() { this.focusCalls += 1; }
+      }));
       const result = {
         state: options.state || { status: 'default' },
         rail: railNode,
+        entries,
         launcher: { id: `launcher-${renderOptions.length}` },
         allAppsButton: { id: `all-${renderOptions.length}` },
         customizeButton: { id: `customize-${renderOptions.length}` },
@@ -87,11 +94,16 @@ test('production mount wires typed routes, dialogs, explicit reset, and focus-sa
     allTrigger: null,
     customizeTrigger: null,
     replacementTrigger: null,
+    replacementAllAppsTrigger: null,
+    currentRefs: [],
     closeAllAppsCalls: 0,
+    getAllAppsTrigger() { return this.allTrigger; },
     getCustomizeTrigger() { return this.customizeTrigger; },
     openAllApps(trigger) { this.allTrigger = trigger; },
     openCustomize(trigger) { this.customizeTrigger = trigger; },
+    setAllAppsTrigger(trigger) { this.allTrigger = trigger; this.replacementAllAppsTrigger = trigger; },
     setCustomizeTrigger(trigger) { this.customizeTrigger = trigger; this.replacementTrigger = trigger; },
+    setCurrentRef(reference) { this.currentRefs.push(reference); },
     closeAllApps() { this.closeAllAppsCalls += 1; },
     destroy() {}
   };
@@ -135,6 +147,7 @@ test('production mount wires typed routes, dialogs, explicit reset, and focus-sa
   dialogOptions.onPreferencesChange({ state: { status: 'saved' } });
   assert.equal(renderOptions.length, 2);
   assert.equal(controller.replacementTrigger, mounted.rendered().customizeButton);
+  assert.equal(controller.replacementAllAppsTrigger, mounted.rendered().allAppsButton);
 
   controller.customizeTrigger = mounted.rendered().launcher;
   dialogOptions.onPreferencesChange({ state: { status: 'saved' } });
@@ -162,6 +175,13 @@ test('production mount wires typed routes, dialogs, explicit reset, and focus-sa
   eventTarget.dispatchEvent(new FakeCustomEvent('sbd:console-snapshot-active', { detail: { ref: 'console:av-video' } }));
   assert.equal(host.getAttribute('data-current-ref'), 'console:av-video');
   assert.equal(renderOptions.at(-1).currentRef, 'console:av-video');
+
+  const audioEntry = mounted.rendered().entries.find(entry => entry.reference === 'console:audio');
+  const keyboardNavigation = { currentTarget: audioEntry, prevented: false, button: 0, preventDefault() { this.prevented = true; } };
+  renderOptions.at(-1).onNavigate({ ref: 'console:audio', id: 'audio', namespace: 'console', href: 'av-audio/' }, keyboardNavigation);
+  const replacementAudioEntry = mounted.rendered().entries.find(entry => entry.reference === 'console:audio');
+  assert.equal(replacementAudioEntry.focusCalls, 1, 'Rail selection focuses the replacement entry after rerender');
+  assert.deepEqual(controller.currentRefs, ['console:audio', 'console:av-video', 'console:audio']);
 
   const renderCount = renderOptions.length;
   mounted.destroy();

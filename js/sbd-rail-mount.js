@@ -66,12 +66,21 @@
       if(reference===currentRef) return;
       currentRef=reference;
       host.setAttribute('data-current-ref',reference);
+      if(controller&&typeof controller.setCurrentRef==='function') controller.setCurrentRef(reference);
       if(rendered) renderRail(state||rendered.state);
+    }
+
+    function renderedEntry(reference){
+      var entries=rendered&&rendered.entries||[];
+      for(var i=0;i<entries.length;i++) if(entries[i].getAttribute&&entries[i].getAttribute('data-rail-ref')===reference) return entries[i];
+      return null;
     }
 
     function navigate(entry,event){
       if(!entry||entry.namespace!=='console'||!eventTarget||typeof eventTarget.dispatchEvent!=='function') return;
       if(event&&(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(typeof event.button==='number'&&event.button!==0))) return;
+      var trigger=eventTrigger(event);
+      var fromRail=!!(rendered&&rendered.entries&&rendered.entries.indexOf(trigger)!==-1);
       var signal=selectionEvent(entry);
       if(!signal) return;
       var continueNavigation=eventTarget.dispatchEvent(signal);
@@ -79,6 +88,7 @@
       if(event&&typeof event.preventDefault==='function') event.preventDefault();
       setCurrent(entry.ref);
       if(controller&&typeof controller.closeAllApps==='function') controller.closeAllApps();
+      if(fromRail){var replacement=renderedEntry(entry.ref);if(replacement&&typeof replacement.focus==='function') replacement.focus();}
     }
 
     function activeSnapshot(event){
@@ -88,6 +98,9 @@
     }
 
     function renderRail(state){
+      var previous=rendered;
+      var allAppsTrigger=controller&&typeof controller.getAllAppsTrigger==='function'?controller.getAllAppsTrigger():null;
+      var customizeTrigger=controller&&typeof controller.getCustomizeTrigger==='function'?controller.getCustomizeTrigger():null;
       rendered=rail.render(host,{
         registry:registry,
         preferenceStore:store,
@@ -105,6 +118,19 @@
           if(rendered&&rendered.rail&&typeof rendered.rail.focus==='function') rendered.rail.focus();
         }
       });
+      if(controller&&previous){
+        if(typeof controller.setAllAppsTrigger==='function'){
+          if(allAppsTrigger===previous.launcher) allAppsTrigger=rendered.launcher;
+          else allAppsTrigger=rendered.allAppsButton;
+          controller.setAllAppsTrigger(allAppsTrigger);
+        }
+        if(typeof controller.setCustomizeTrigger==='function'){
+          if(customizeTrigger===previous.launcher) customizeTrigger=rendered.launcher;
+          else if(customizeTrigger===previous.allAppsButton) customizeTrigger=rendered.allAppsButton;
+          else customizeTrigger=rendered.customizeButton;
+          controller.setCustomizeTrigger(customizeTrigger);
+        }
+      }
       host.setAttribute('data-rail-state','ready');
       return rendered;
     }
@@ -122,13 +148,7 @@
         idPrefix:'sbdRail',
         onNavigate:navigate,
         onPreferencesChange:function(result){
-          var previous=rendered;
-          var previousTrigger=controller&&typeof controller.getCustomizeTrigger==='function'?controller.getCustomizeTrigger():null;
           renderRail(result&&result.state);
-          var nextTrigger=rendered.customizeButton;
-          if(previous&&previousTrigger===previous.launcher) nextTrigger=rendered.launcher;
-          else if(previous&&previousTrigger===previous.allAppsButton) nextTrigger=rendered.allAppsButton;
-          controller.setCustomizeTrigger(nextTrigger);
         }
       });
       if(eventTarget&&typeof eventTarget.addEventListener==='function') eventTarget.addEventListener(CONSOLE_ACTIVE_EVENT,activeSnapshot);
