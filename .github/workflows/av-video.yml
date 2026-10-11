@@ -6,6 +6,9 @@ on:
       - 'apps/av-video/**'
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
+      - 'apps/show-control/**'
+      - 'show-control/**'
+      - 'scripts/probe_show_control_console.mjs'
       - 'apps/shared/**'
       - 'scripts/probe_av_console*.mjs'
       - 'av-video/**'
@@ -60,6 +63,14 @@ jobs:
           git diff --exit-code -- show-ops
           test -z "$(git status --porcelain -- show-ops)"
           npm run test:show-ops-browser
+      - name: Show Control panels and saved-run compatibility
+        run: |
+          npm run typecheck:show-control
+          npm run test:show-control
+          npm run build:show-control
+          git diff --exit-code -- show-control
+          test -z "$(git status --porcelain -- show-control)"
+          npm run test:show-control-browser
       - name: AV source checks
         run: npm run verify:av
       - name: Toolbox entry and consolidation contract

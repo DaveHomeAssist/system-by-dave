@@ -1,0 +1,142 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { font: 14px Inter, system-ui, sans-serif; color: var(--av-text); background: var(--av-bg); }
+button, input, textarea, select { font: inherit; touch-action: manipulation; }
+button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--av-line-strong); border-radius: 6px; background: var(--av-surface); color: var(--av-text); cursor: pointer; }
+button:hover { border-color: var(--av-accent); }
+button:disabled { opacity: .55; cursor: not-allowed; }
+button.primary { background: var(--av-accent); color: var(--av-primary-ink); border-color: var(--av-accent); font-weight: 700; }
+:focus-visible { outline: 3px solid var(--av-focus); outline-offset: 2px; }
+a { color: var(--av-accent); }
+input, textarea, select { width: 100%; min-width: 0; min-height: 44px; padding: 8px; color: var(--av-text); background: var(--av-control); border: 1px solid var(--av-line-strong); border-radius: 5px; }
+label { display: flex; flex-direction: column; gap: 4px; min-width: 0; font-size: 12px; font-weight: 600; }
+h1, h2, h3, p { margin: 0; }
+p { line-height: 1.45; }
+h2 { font-size: 18px; }
+h3 { font-size: 16px; }
+.skip { position: fixed; left: 12px; top: -100px; z-index: 1000; padding: 12px; background: var(--av-surface); }
+.skip:focus { top: 4px; }
+.call-nav { height: 44px; display: flex; align-items: center; gap: 18px; padding: 0 16px; border-bottom: 1px solid var(--av-line); font-size: 12px; }
+.call-nav a { display: inline-flex; align-items: center; min-height: 44px; }
+.call-shell { height: calc(100dvh - 44px); min-height: 0; min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); overflow: hidden; }
+#root { grid-column: 2; grid-row: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.call-embedded .call-nav, .call-embedded .sbd-rail-host { display: none; }
+.call-embedded .call-shell { height: 100dvh; grid-template-columns: minmax(0, 1fr); }
+.call-embedded #root { grid-column: 1; }
+.call-app { display: flex; flex-direction: column; height: 100%; min-width: 0; min-height: 0; }
+.call-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--av-line); }
+.call-header > div:first-child { min-width: 0; }
+.call-header small { font-size: 10px; letter-spacing: .1em; color: var(--av-muted); }
+.call-header h1 { font-size: 22px; }
+.call-header p { color: var(--av-muted); font-size: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 65vw; }
+.call-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.call-summary { display: flex; align-items: center; gap: 16px; min-width: 0; padding: 6px 16px; font-size: 12px; color: var(--av-muted); border-bottom: 1px solid var(--av-line); }
+.call-summary time { font-variant-numeric: tabular-nums; color: var(--av-text); flex-shrink: 0; }
+.call-summary span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.call-status { flex-shrink: 0; padding: 6px 14px; max-height: 64px; overflow: auto; font-size: 12px; color: var(--av-muted); border-top: 1px solid var(--av-line); }
+.call-status span { display: block; color: var(--av-warning); }
+.call-recovery { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 12px; font-size: 12px; background: var(--av-warning-soft); }
+.call-recovery p { flex: 1; min-width: 150px; }
+.call-deck { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; }
+.call-cue-detail { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 16px; overflow-wrap: anywhere; }
+.call-cue-detail h2 { font-size: clamp(20px, 2vw, 34px); line-height: 1.2; margin: 8px 0 14px; }
+.call-cue-detail p { white-space: pre-wrap; }
+.call-eyebrow { color: var(--av-accent); font-size: 11px; letter-spacing: .1em; }
+.call-buttons { display: flex; flex-shrink: 0; gap: 4px; padding: 8px; border-top: 1px solid var(--av-line); }
+.call-buttons button { flex: 1; min-width: 0; padding-inline: 4px; font-size: 12px; }
+.call-list, .call-menu, .call-preview { flex: 1; min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 10px; }
+.call-cue { display: flex; flex-direction: column; align-items: stretch; width: 100%; text-align: left; gap: 5px; margin-bottom: 8px; overflow-wrap: anywhere; }
+.call-cue[aria-current] { border-color: var(--av-accent); background: var(--av-accent-soft); }
+.call-cue span, .call-cue small { color: var(--av-muted); font-size: 12px; }
+.call-event { padding: 12px 4px; border-bottom: 1px solid var(--av-line); overflow-wrap: anywhere; }
+.call-event time { display: block; color: var(--av-muted); font-size: 12px; margin-top: 5px; }
+.call-notes { flex: 1; min-height: 0; padding: 8px; }
+.call-notes textarea { flex: 1; min-height: 44px; resize: none; line-height: 1.5; }
+.call-menu > button { display: block; width: 100%; margin-bottom: 8px; text-align: left; }
+.call-menu p { font-size: 12px; color: var(--av-muted); }
+.call-single { padding: 4px 8px; min-height: 0; }
+.call-single button { width: 100%; }
+.call-dialog { width: min(680px, calc(100vw - 16px)); height: min(680px, calc(100dvh - 16px)); max-height: calc(100dvh - 16px); padding: 10px; border: 1px solid var(--av-line-strong); border-radius: 8px; background: var(--av-surface); color: var(--av-text); overflow: hidden; }
+.call-dialog[open] { display: flex; flex-direction: column; gap: 8px; }
+.call-dialog::backdrop, .call-controls::backdrop { background: rgb(0 0 0 / .65); }
+.call-dialog > header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-shrink: 0; }
+.call-dialog > header h2 { font-size: 17px; }
+.call-dialog-actions { display: flex; flex-shrink: 0; gap: 8px; }
+.call-dialog-actions button { flex: 1; min-width: 0; }
+.call-entry { display: flex; flex: 1; min-height: 0; flex-direction: column; gap: 12px; }
+.call-entry .call-dialog-actions { margin-top: auto; }
+.call-list-select { flex-shrink: 0; }
+.call-preview { padding: 8px; border: 1px solid var(--av-accent-line); background: var(--av-accent-soft); border-radius: 5px; }
+.call-preview p { margin: 8px 0; font-size: 12px; }
+.call-preview ol { padding-left: 24px; }
+.call-preview li { margin-bottom: 10px; overflow-wrap: anywhere; }
+.call-preview li span { display: block; font-size: 12px; color: var(--av-muted); white-space: pre-wrap; }
+.call-file { display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+.call-file p { font-size: 12px; }
+.call-file input { max-width: 100%; }
+.call-dialog-status { flex-shrink: 0; max-height: 48px; overflow: auto; font-size: 12px; color: var(--av-muted); }
+.call-controls { width: min(600px, calc(100vw - 16px)); max-height: calc(100dvh - 16px); padding: 8px; color: var(--av-text); background: var(--av-surface); border: 1px solid var(--av-line-strong); border-radius: 8px; }
+.call-controls .call-header { flex-wrap: wrap; }
+.call-controls > button { width: 100%; }
+@media (max-width: 1099px) { .call-header { padding: 8px 10px; } .call-header p { max-width: 45vw; } }
+@media (max-width: 719px) {
+  .call-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  #root { grid-column: 1; }
+  .call-shell .sbd-rail-launcher { position: absolute; top: 0; right: 6px; z-index: 5; margin: 0; width: auto; }
+  .call-nav { padding-right: 105px; gap: 12px; }
+  .call-nav > span { display: none; }
+  .call-header { gap: 6px; padding: 6px 8px; }
+  .call-header h1 { font-size: 17px; }
+  .call-header small { display: none; }
+  .call-header p { max-width: 42vw; font-size: 10px; }
+  .call-actions { gap: 4px; }
+  .call-actions button { padding: 4px 7px; font-size: 12px; }
+  .call-summary { padding: 5px 10px; gap: 8px; font-size: 11px; }
+  .call-status { padding: 4px 10px; max-height: 52px; font-size: 11px; }
+  .call-app .console-quick { justify-content: flex-start; }
+  .call-app .console-quick button { flex: 0 0 auto; min-width: 52px; }
+  .call-app .console-strip { flex-wrap: nowrap; overflow: hidden; gap: 2px; }
+  .call-app .console-views { flex: 1; }
+  .call-app .console-tools { gap: 2px; }
+  .call-app .console-tools button { font-size: 11px; padding: 4px; }
+}
+@media (max-height: 500px) {
+  .call-summary, .call-header small, .call-header p { display: none; }
+  .call-header { padding: 2px 6px; }
+  .call-status { max-height: 24px; padding-block: 3px; }
+  .call-app .console-strip { flex-wrap: nowrap; padding: 0 4px; gap: 2px; }
+  .call-app .console-views { flex: 1; }
+  .call-app .console-tools { gap: 2px; }
+  .call-app .console-tools button { padding-inline: 4px; font-size: 11px; }
+  .call-app .console-quick { flex: none; margin: 0; padding: 0 4px; border-left: 0; border-top: 1px solid var(--av-line); justify-content: flex-start; }
+  .call-app .console-quick button { flex: 0 0 auto; font-size: 12px; padding: 4px 6px; }
+  .call-app .console-grid { padding: 0 4px; }
+  .call-app .console-bar { min-height: 44px; padding-block: 0; gap: 4px; }
+  .call-compact .console-views > button[aria-label="Show controls"] { order: -1; }
+  .call-cue-detail { padding: 2px 8px; }
+  .call-cue-detail h2 { font-size: 14px; margin: 0; }
+  .call-eyebrow { display: none; }
+  .call-buttons { padding: 2px; }
+  /* The selected cue's full details remain available in On Deck. Keep the
+     short-height rundown target itself wholly reachable above the switcher. */
+  .call-cue { min-height: 44px; padding: 6px; gap: 0; justify-content: center; }
+  .call-cue strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .call-cue span, .call-cue small { display: none; }
+  .call-notes { padding: 2px 6px; font-size: 10px; gap: 1px; }
+  .call-dialog { padding: 6px; }
+  .call-dialog[open] { gap: 4px; }
+  .call-dialog-status { max-height: 18px; font-size: 11px; }
+  .call-entry { gap: 4px; }
+  .call-entry label { flex-direction: row; align-items: center; }
+  .call-entry label input, .call-entry label select { flex: 1; width: 60%; }
+  .call-file { gap: 6px; }
+  .call-file p { font-size: 11px; }
+  .call-list-select { flex-direction: row; align-items: center; }
+  .call-list-select select { flex: 1; width: 60%; }
+}
+@media (min-width: 2200px) { .call-cue-detail { padding: 24px; } .call-list { padding: 18px; } .call-cue-detail h2 { max-width: 32ch; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+@media print {
+  html, body, .call-shell, #root, .call-app, .console-shell, .console-grid, .console-panel, .console-body, .call-list, .call-cue-detail, .call-deck { height: auto !important; max-height: none !important; overflow: visible !important; display: block !important; }
+  .call-nav, .sbd-rail-host, .console-strip, .console-quick, .console-bar-actions, .call-actions, .call-buttons, .call-menu, .call-status { display: none !important; }
+}

@@ -440,7 +440,9 @@ try {
     await page.locator('#backupFile').setInputFiles(backup);
     await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
     assert.deepEqual(await readValues(page), expected);
-    assert.equal(avStorageKeys.length, 71);
+    assert.equal(avStorageKeys.length, 73);
+    assert.ok(avStorageKeys.includes('sbd.showControl.draft.v1'));
+    assert.ok(avStorageKeys.includes('sbd.showControl.layout.v1'));
     assert.ok([
       'sbd.avAudio.v1',
       'sbd.showControl.v1',

@@ -11,6 +11,7 @@ Disallow: /apps/av-workbook/
 Disallow: /apps/av-audio/
 Disallow: /apps/av-video/
 Disallow: /apps/show-ops/
+Disallow: /apps/show-control/
 Disallow: /apps/fmp-camera-sim/
 Disallow: /cross-project-actions.html
 Disallow: /html/sbd-brand.html

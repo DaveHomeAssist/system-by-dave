@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-11 — Show Control working console panels
+
+- Reuse the existing console engine for On Deck, Cues, Notes, Call Log, Setup/Import and Backup, including configurable layouts, saved views, keyboard paths and touch sized controls.
+- Retain Show Control v1 saves, cue position, Hold, call events, source rows and safe CueForge provenance. Add optional stored views and separate guarded draft/device layout keys without silently saving or synchronizing another app.
+- Preserve preview/cancel, selected-list identity, stale-source and stale-tab guards, original-byte recovery and explicit Save/export. Calls remain human log entries; playback, timers and hardware outputs remain outside this slice.
+- Add typed source, model compatibility tests, generated asset checks and an isolated browser gate for standalone, embedded, responsive and offline behavior. Physical-device/operator and power-loss acceptance remain separate.
+
 ## 2026-10-09 — Show Ops touch console
 
 - Reuse AV Video's shared workspace for functional Rooms, Crew, Tasks, Setup, Handoff and Backup panels, with side-by-side operation, layout controls and saved views.
