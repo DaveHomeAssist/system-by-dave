@@ -19,3 +19,45 @@ html[data-av-theme=light] #cueforge-preview select{color-scheme:light}
 @media(prefers-color-scheme:dark){html[data-av-theme=system] #cueforge-preview select{color-scheme:dark}}
 @media(prefers-color-scheme:light){html[data-av-theme=system] #cueforge-preview select{color-scheme:light}}
 @media(max-width:720px) and (max-height:400px){.shell header{height:44px;min-height:44px;flex-direction:row;align-items:center;gap:4px;padding:0 8px}.shell header>div:first-child{gap:8px}.shell header .header-actions{justify-content:flex-end}.shell #clock{display:none}main{padding:5px 8px;gap:4px}.top{align-items:center}.top .eyebrow{display:none}.top h1{font-size:1.1rem}.top #summary{font-size:.7rem}.actions{gap:3px;flex-wrap:nowrap}.actions button{padding:4px 5px;font-size:.72rem}.tabs{margin-top:0;gap:4px}.tabs button{padding:4px}#message{font-size:.7rem;line-height:1.1}}
+
+/* The Run view budgets space for its panel selector before sizing the cue grid. */
+#run:not([hidden]) { display: flex; flex-direction: column; }
+#run .grid { height: auto; flex: 1; min-height: 0; }
+.phone-panels { flex: none; }
+.primary { justify-content: flex-start; overflow: auto; overscroll-behavior: contain; }
+.cue-copy { flex: 1; min-height: 32px; margin-bottom: 8px; overflow: auto; overflow-wrap: anywhere; overscroll-behavior: contain; }
+.cue-copy:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+.primary .call-actions { flex: none; }
+.primary .status { flex: none; margin: 8px 0 0; }
+
+/* Short application panels use the same three Run subjects as phones. */
+@media (max-height: 520px) {
+  .phone-panels { display: flex; gap: 6px; margin-bottom: 8px; }
+  .phone-panels button { flex: 1; padding: 7px; font-size: .8rem; }
+  .phone-panels button[aria-pressed=true] { background: var(--accent); color: var(--accent-ink); }
+  #run .grid { display: flex; flex-direction: column; }
+  #run .grid .card { display: none; }
+  #run[data-panel=on-deck] .primary,
+  #run[data-panel=cues] .cue-list,
+  #run[data-panel=notes] .notes { display: flex; flex: 1; }
+}
+
+/* The console already provides navigation and the shared theme control. */
+html[data-sbd-embed=console] .shell > header { display: none; }
+html[data-sbd-embed=console] main { padding: 8px; gap: 6px; }
+html[data-sbd-embed=console] .top { align-items: center; }
+html[data-sbd-embed=console] .top > div:first-child { min-width: 0; }
+html[data-sbd-embed=console] .actions { flex-shrink: 0; flex-wrap: nowrap; gap: 4px; }
+html[data-sbd-embed=console] .actions button { min-width: 44px; }
+html[data-sbd-embed=console] .top .eyebrow { display: none; }
+html[data-sbd-embed=console] .top h1 { font-size: 1.1rem; }
+html[data-sbd-embed=console] .top #summary { font-size: .82rem; overflow-wrap: anywhere; }
+html[data-sbd-embed=console] #message { min-height: 0; max-height: 2.4em; overflow: auto; font-size: .78rem; line-height: 1.2; }
+
+@media (max-height: 400px) {
+  .primary.card { padding: 8px; }
+  .primary .current { font-size: 1.5rem; }
+  .primary .call-actions { flex-wrap: nowrap; gap: 4px; }
+  .primary .call-actions button { flex: 1; min-width: 0; padding: 4px 6px; font-size: .78rem; }
+  .primary .status { margin-top: 4px; font-size: .78rem; }
+}

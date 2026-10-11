@@ -25,6 +25,7 @@ The October 9 application launcher release remains valid route and fallback deli
 
 - AV Video stays native to the shared console workspace and retains its existing Video views and panels.
 - Each other primary application is available as a real panel type. Its default snapshot contains one full-size application panel on the 12×8 grid.
+- A single tablet panel fills the available workspace; narrower presentation never rewrites its stored desktop geometry. Multiple tablet panels retain their two-column arrangement.
 - A Rail click dispatches a cancelable console-selection event. AV Video handles the event when its suite shell is active, recalls the matching snapshot and cancels navigation. Without a handler, the existing standalone link continues to work.
 - The phone Apps dialog uses the same selection path as the desktop and tablet Rail.
 - The active Rail item follows the recalled snapshot. Returning to AV Video restores the last native Video view when possible.
@@ -32,6 +33,7 @@ The October 9 application launcher release remains valid route and fallback deli
 - Every hosted application keeps its existing route, schema, storage keys, Save/Export behavior and recovery rules. The outer snapshot stores panel type and geometry only; it never copies or merges application records.
 - Recognized `sbdShow`, `sbdVenue`, `sbdDate`, `sbdOperator` and `sbdPhase` context is passed into hosted applications. Other query data is not forwarded.
 - Every application panel provides an explicit **Open standalone** escape hatch.
+- Show Control's embedded view uses the host's navigation and theme control while keeping its own Save and Export actions. Its Run selector occupies separate space from the cue grid; long cue details scroll inside the cue area, and short panels expose On deck, Cues and Notes independently.
 
 ## Persistence and compatibility
 
@@ -51,6 +53,7 @@ Standalone URLs remain published and directly usable. Modifier-clicking a Rail l
 6. Existing Video panels, layouts, recovery, documents, routes and browser probes remain compatible.
 7. Rail customization, standalone navigation, show-context allowlisting, offline update behavior and all application storage remain compatible.
 8. Exact-head source checks, source publication, AV destination publication, production provenance and affected asset parity pass independently. Physical touch and operator acceptance remain separate.
+9. `scripts/probe_show_control_embed.mjs` exercises empty and long cues in resized desktop, tablet, 680px, phone, desktop and ultrawide console panels. Calling controls retain 44px touch targets without covering navigation; Hold, Resume, Go, Save and Export remain usable and independent from AV Video records.
 
 ## Follow-on refinement
 
