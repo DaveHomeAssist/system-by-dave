@@ -29,10 +29,10 @@ feature parity or authorization to remove any route.
 | --- | --- | --- |
 | AV Video | AV Video, Signal Flow, Video Patch, Display Plan, Projection Plan, Camera Shot List, Playback Check, Record Log, Stream Plan; Throwline and LED Wall Calculator retain specialist controls | Ten real panel types use the shared engine. Preserve route/selection model, graph and sequence renderers. Stream/Record remain absent; streaming credential policy is unresolved. Specialist capabilities are not absorbed merely by linking them. |
 | Audio | Audio, Input List, Audio Patch, Line Check, Speaker Plan, RF Coordination, Comms Check | Already uses the same shared engine with five panels and one channel model. Earlier claims that it was only a standalone fixed page were incorrect. Needs full legacy field/action parity, RF/Comms panel semantics, Rail/recovery integration and operator proof. |
-| Show Control | Show Control, Cue Sheet, Show Timer, Teleprompter | Native On Deck, Cues, Notes, Call Log, Setup/Import and Backup source in the October 11 candidate, reusing the call log and safe CueForge snapshot model. Release verification remains separate. Real cue/media playback, timer outputs and teleprompter controls need their own panel integrations; a call log does not replace CueForge execution. |
+| Show Control | Show Control, Cue Sheet, Show Timer, Teleprompter | Native On Deck, Cues, Notes, Call Log, Setup/Import and Backup published through PR #323 at `7ca404b`; standalone and embedded live browser checks passed. Real cue/media playback, timer outputs and teleprompter controls need their own panel integrations; a call log does not replace CueForge execution. |
 | Show Ops | Show Ops, Room Check, Crew Call, Crew Time Log, Breakout Room Matrix, Show Board, Show Task Board, Show Handoff, Show Report | Six native panels delivered in PR #315: Rooms, Crew, Tasks, Setup, Handoff and Backup retain reviewed source copies. Timekeeping, breakout/timeline behavior and report workflows remain additional capabilities, not covered by a source snapshot. |
 | Front Office | Front Office, Show Advance, Site Survey, Change Order, Client Sign Off | Reuse client/venue/job model and reviewed advance import. Convert current editor into panels, then implement missing survey, approval, scope and signoff behavior. |
-| The Shop | The Shop, Gear Prep, Gear Reference, Truck Pack Plan, Load In Plan, Strike Plan | Reuse phase worklist and quantity guards. Panelize worklist and details, then establish complete truck/order/reference and phase parity. |
+| The Shop | The Shop, Gear Prep, Gear Reference, Truck Pack Plan, Load In Plan, Strike Plan | Four native working panels in the October 11 candidate: Worklist, Item inspector, Plan/Import and Backup. Preserve phase worklist, quantity guards and reviewed source copies. Release gates remain separate; complete truck/order/reference and phase parity is additional work. |
 | Infrastructure | Infrastructure, Power Plan, Network Plan, Cable Plan | Reuse independent records and issue model; replace fixed navigation with discipline panels and issue context. Preserve advisory versus safety boundaries. |
 | Lighting | Lighting, Lighting Patch | Reuse fixture model, patch/focus controls and safe PlotForge manifest intake. Convert editor to functional panels; PlotForge remains the separate full plot product. |
 | AV Calculator | AV Calculator | Six calculations and field sets exist in the standalone calculator; shared console panel adoption remains unimplemented. |
@@ -51,8 +51,9 @@ Each application still owns its records, selection, validation and explicit Save
   that newer release rather than reverting to the earlier eight Planned labels.
 - At the original source baseline only AV Video and Audio imported the shared
   workspace. Show Ops followed in PR #315; the October 11 Show Control candidate
-  adds six native calling panels. Front Office, The Shop, Infrastructure and
-  Lighting still use fixed views; the calculator remains a specialist layout.
+  adds six native calling panels, published in PR #323. The next Shop candidate
+  adds four native panels. Front Office, Infrastructure and Lighting still use
+  fixed views; the calculator remains a specialist layout.
 - Exact raw import retention protects source evidence but does not prove that all
   original fields and operator actions are usable in the receiving console.
 - Source, automated browser, CI, deployment and physical touch acceptance are

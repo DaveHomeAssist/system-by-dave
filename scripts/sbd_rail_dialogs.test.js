@@ -204,6 +204,10 @@ test('draft reads validate the direct console key without writing or trusting th
 
   assert.equal(dialogs.readDraftState('console:av-video', { registry, storage }).status, 'present');
   assert.equal(dialogs.readDraftState('console:audio', { registry, storage }).status, 'not-applicable');
+  storage.data['sbd.shop.draft.v1'] = draftEnvelope('shop');
+  assert.equal(dialogs.readDraftState('console:shop', { registry, storage }).status, 'present');
+  storage.data['sbd.shop.draft.v1'] = draftEnvelope('the-shop');
+  assert.equal(dialogs.readDraftState('console:shop', { registry, storage }).status, 'unavailable');
   assert.deepEqual(storage.setCalls, []);
 
   storage.data['sbd.avVideo.draft.v1'] = draftEnvelope('audio');
@@ -238,13 +242,14 @@ test('draft observer refreshes same-tab, cross-tab, clear, and page-restore inva
     ['console:av-video', 'present'],
     ['console:av-video', 'none'],
     ['console:av-video', 'unavailable'],
-    ['console:show-ops', 'none']
+    ['console:show-ops', 'none'],
+    ['console:shop', 'none']
   ]);
   assert.deepEqual(storage.setCalls, []);
 
   observer.destroy();
   target.dispatch('pageshow');
-  assert.equal(changes.length, 4);
+  assert.equal(changes.length, 5);
 });
 
 test('All apps and Customize dialogs preserve truthful status, focus, and explicit writes', () => {

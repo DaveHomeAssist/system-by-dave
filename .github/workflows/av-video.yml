@@ -7,6 +7,9 @@ on:
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
       - 'apps/show-control/**'
+      - 'apps/the-shop/**'
+      - 'the-shop/**'
+      - 'scripts/probe_the_shop_console.mjs'
       - 'show-control/**'
       - 'scripts/probe_show_control_console.mjs'
       - 'apps/shared/**'
@@ -75,6 +78,14 @@ jobs:
           git diff --exit-code -- show-control
           test -z "$(git status --porcelain -- show-control)"
           npm run test:show-control-browser
+      - name: Shop panels and saved-plan compatibility
+        run: |
+          npm run typecheck:the-shop
+          npm run test:the-shop
+          npm run build:the-shop
+          git diff --exit-code -- the-shop
+          test -z "$(git status --porcelain -- the-shop)"
+          npm run test:the-shop-browser
       - name: AV source checks
         run: npm run verify:av
       - name: Toolbox entry and consolidation contract

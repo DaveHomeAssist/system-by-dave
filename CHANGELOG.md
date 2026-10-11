@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-11 — The Shop working console panels
+
+- Convert the existing worklist, item inspector, plan/import and backup controls into four native panels on the shared AV console engine, standalone and inside AV Video.
+- Keep Shop v1 plans, quantities, all four reviewed legacy imports, source originals and explicit Apply/Save. Compose optional stored views and separate guarded draft/device layout keys; panel operations never change readiness or another tool's records.
+- Preserve damaged-save bytes before replacement, stale-source/tab guards, unknown versus zero quantities, pending form edits across panel switches, shared themes and offline assets.
+- Add typed source/build, compatibility tests and isolated browser gates; physical touch, virtual keyboards, interruption/power loss and operator acceptance remain separate.
+
 ## 2026-10-11 — Show Control working console panels
 
 - Reuse the existing console engine for On Deck, Cues, Notes, Call Log, Setup/Import and Backup, including configurable layouts, saved views, keyboard paths and touch sized controls.

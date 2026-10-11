@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "efc0356d82afc127ffe97876b9da541791fb5ccd",
+  "head": "7ca404bc2730b85ab3e8b730d504a2c099057ebf",
   "status": "amber",
-  "statusReason": "Show Control's six native panels are reconciled with merged layout repair #322 at efc0356 in PR #323. The browser-channel publication failure is repaired; typecheck, 11 model tests, build, AV checks, seven native browser groups and the six-size embedded regression pass. Ownership is released, not a blocker. Current-head review/CI, publication and live acceptance remain separate release gates; physical/operator and broader toolset parity stay open.",
+  "statusReason": "Show Control's six native panels are merged in #323, published at 7ca404b and verified live. The next accepted slice converts The Shop into Worklist, Item inspector, Plan/Import and Backup on the same engine. Candidate source preserves Shop v1 data and reviewed imports; exact-head CI, publication and live gates remain pending. Physical/operator and broader toolset parity remain separate.",
   "lastActivity": "2026-10-11",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -31,11 +31,11 @@
     "Show Ops shared touch console (#315) is published through the combined 9c370be release. Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup use the shared panel engine with explicit Save, stored views, draft/layout recovery and exact source preservation."
   ],
   "nextStep": {
-    "title": "Finish the reconciled Show Control release",
-    "why": "PR #322 is merged and its owner released integration. PR #323 preserves its shared tablet sizing and embedded theme/chrome behavior, with the regression adapted to the six native panels and deployment Chrome channel.",
-    "doneWhen": "PR #323 passes exact-head review/CI, both publications and isolated live readback. Physical/operator acceptance stays separately open.",
+    "title": "Deliver The Shop native working panels",
+    "why": "Show Control release gates passed. The Shop is the next bounded conversion of an existing model to the accepted AV Video touch workspace, without new logistics capabilities.",
+    "doneWhen": "Four functional Shop panels pass compatibility, browser, exact-head CI, publication and live gates. Physical/operator acceptance stays separately open.",
     "effort": "M",
-    "owner": "Show Control release lane",
+    "owner": "Shop native console lane",
     "blockedBy": "No product choice or ownership block. Complete current candidate release gates; do not reinstate the historical reassessment or usage pause."
   },
   "findings": [
@@ -479,8 +479,8 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Continue Show Control native panels from candidate 81e5391 in draft PR #323, based on ab0e3f5. First resolve integration ownership/order with the concurrent repair #322, then preserve its embedded theme/chrome and short-tablet coverage when reconciling. Complete exact-head review/CI, source and AV publication and isolated live readback. Preserve v1 saves, explicit Save, guarded recovery, safe source provenance, standalone routes and independent data. Do not rebuild the delivered nine-identity snapshot layer or Show Ops, restore the superseded reassessment pause, or claim physical/operator acceptance from automation.",
-  "confidence": "High for the recorded historical releases and current bounded Show Control source/browser checks. The native candidate is not merged or published; integration with #322, exact-head review/CI, live acceptance and physical/operator evidence remain separate.",
+  "kickoffPrompt": "Continue The Shop four native working-panel candidate from source base 7ca404b using docs/the-shop.md. Preserve v1 plans, reviewed copies from all four legacy sources, quantities, source originals, explicit Apply/Save, guarded recovery, standalone and actual AV Video embedding. Complete exact-head CI, source and AV publication and live verification. Show Control #323 and the nine-identity snapshot host are already delivered; do not rebuild them, restore the historical pause or expand into new logistics capabilities. Keep physical/operator acceptance separate.",
+  "confidence": "High for Show Control's verified release and The Shop's bounded model/native browser evidence. Shop release gates remain pending; no whole-toolset or physical/operator completion claim.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
@@ -489,6 +489,25 @@
   ],
   "short": "AV Suite",
   "evidence": {
+    "shopNativePanelsCandidate": {
+      "checkedOn": "2026-10-11",
+      "sourceBase": "7ca404bc2730b85ab3e8b730d504a2c099057ebf",
+      "branch": "codex/shop-panels-20261011",
+      "status": "Implemented and verified on the qualified runner; exact-head CI, publication and live verification pending",
+      "scope": "Worklist, Item inspector, Plan/Import and Backup; unchanged pure logistics model, optional stored views, owned draft/layout recovery and independent explicit Save.",
+      "checks": ["Typecheck, eight existing model tests, ten native model tests and production build", "Preserved legacy quantity/import/recovery browser assertions", "Eight native browser groups: working panels, views, four imports, drafts/stale tabs, refused storage, two themes/nine viewports, offline and AV Video embedding", "AV registry/theme/worker/Rail/inventory checks"],
+      "limits": ["Physical touch, virtual keyboard, power interruption/process restart and operator rehearsal not tested", "Complete logistics/specialist parity and cross-tool synchronization not included"]
+    },
+    "showControlNativePanelsRelease": {
+      "checkedOn": "2026-10-11",
+      "sourceRevision": "7ca404bc2730b85ab3e8b730d504a2c099057ebf",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/323",
+      "sourcePublication": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38182139289",
+      "destinationPublication": "https://github.com/DaveHomeAssist/avbydave/actions/runs/38183669223",
+      "status": "Merged, published and verified live; supersedes the candidate record below",
+      "checks": "Nine exact-head CI checks; seven live native groups; six live embedded layouts; fourteen deployed files matched source.",
+      "limits": "Physical/operator acceptance remains open. Original LED CI clipping failure is retained; one unchanged-source retry passed without explaining its cause."
+    },
     "showControlNativePanelsCandidate": {
       "checkedOn": "2026-10-11",
       "originalSourceRevision": "81e5391faae0a68225227c967d72d935020fe6f1",

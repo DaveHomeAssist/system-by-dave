@@ -1,0 +1,16 @@
+export type Phase = 'prep' | 'pack' | 'load in' | 'strike';
+export type Status = 'queued' | 'working' | 'ready' | 'hold';
+export type SourceKind = 'gear-prep' | 'truck-pack' | 'load-in-plan' | 'strike-plan';
+export type ShopItem = { id: string; title: string; caseId: string; department: string; owner: string; location: string; destination: string; notes: string; blocker: string; phase: Phase; status: Status; requestedQty: number | null; packedQty: number | null; source: { kind: SourceKind; id: string; show: string } | null; original: unknown };
+export type ShopPlan = { schema: string; name: string; items: ShopItem[] };
+export const KEY: string;
+export const SCHEMA: string;
+export const SOURCES: Record<SourceKind, { key: string; label: string; schema: string }>;
+export const PHASES: Phase[];
+export const STATUSES: Status[];
+export function emptyPlan(): ShopPlan;
+export function validatePlan(value: unknown): ShopPlan;
+export function quantity(value: unknown, label?: string): number | null;
+export function countPair(requested: unknown, packed: unknown): { requestedQty: number | null; packedQty: number | null };
+export function stageLegacy(kind: SourceKind, payload: unknown): ShopItem[];
+export function assertFreshSourceRows(existing: ShopItem[], staged: ShopItem[]): void;
