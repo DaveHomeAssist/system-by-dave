@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-11 — Show Control embedded layout
+
+- Budget the Run panel selector separately from the cue grid, contain long cue details, and keep calling controls reachable in resized console panels.
+- Remove repeated navigation only when Show Control is hosted in the console, and follow the host's shared theme selection.
+- Let a single tablet panel fill the console workspace while preserving stored desktop geometry and multiple-panel arrangements.
+- Add browser regression coverage for empty and long cues, six viewport sizes, calling actions, independent Save/Export and layout preservation; advance the AV offline cache generation.
+
 ## 2026-10-09 — Show Ops touch console
 
 - Reuse AV Video's shared workspace for functional Rooms, Crew, Tasks, Setup, Handoff and Backup panels, with side-by-side operation, layout controls and saved views.

@@ -11,6 +11,8 @@ on:
       - 'av-video/**'
       - 'av-audio/**'
       - 'show-ops/**'
+      - 'show-control/**'
+      - 'scripts/probe_show_control_embed.mjs'
       - 'scripts/probe_show_ops_console.mjs'
       - 'package*.json'
       - 'scripts/probe_av_video*.mjs'

@@ -339,7 +339,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261009-show-ops-console',
+    version:'v20261011-show-control-embed',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
