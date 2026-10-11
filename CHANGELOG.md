@@ -6,6 +6,7 @@
 - Retain Show Control v1 saves, cue position, Hold, call events, source rows and safe CueForge provenance. Add optional stored views and separate guarded draft/device layout keys without silently saving or synchronizing another app.
 - Preserve preview/cancel, selected-list identity, stale-source and stale-tab guards, original-byte recovery and explicit Save/export. Calls remain human log entries; playback, timers and hardware outputs remain outside this slice.
 - Add typed source, model compatibility tests, generated asset checks and an isolated browser gate for standalone, embedded, responsive and offline behavior. Physical-device/operator and power-loss acceptance remain separate.
+- Align Stage 3D's offline-readiness cache pin with the new shared cache generation; preserve its specialist behavior and calculation boundaries.
 
 ## 2026-10-09 — Show Ops touch console
 

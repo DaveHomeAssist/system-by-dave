@@ -497,6 +497,12 @@
       "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/323",
       "integrationDependency": "https://github.com/DaveHomeAssist/system-by-dave/pull/322",
       "integrationDependencyHead": "c71362e576403beeeadbed19c394f5a0d76a2d6d",
+      "initialCiFailures": {
+        "head": "3975fedea498b4bf90810b3807e99fa4f737dcac",
+        "runs": ["https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857022", "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857100"],
+        "cause": "Stage 3D's separate OFFLINE_CACHE_VERSION constant still named the prior generation. The new registry and generated workspace pins were correct; the verifier correctly rejected their mismatch.",
+        "repair": "Update only the separate Stage 3D readiness pin to the candidate registry generation. No projector behavior, calculation rule or verifier assertion is weakened. Replacement exact-head CI remains required."
+      },
       "scope": "On Deck, Cues, Notes, Call Log, Setup/Import and Backup on the unchanged shared engine, retaining v1 data, exact safe source provenance, explicit Save and guarded recovery.",
       "verification": [
         "Windows runner: Show Control typecheck, four pure-model tests, seven adapter tests and Vite build pass.",
