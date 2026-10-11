@@ -67,7 +67,8 @@ const robots = read('robots.txt');
 // public application routes belong in the AV-origin sitemap through the registry,
 // so they must not increase the count of tracked routes outside all sitemaps.
 // Show Ops and Show Control add their nonpublic application source pages.
-if (unlisted.length !== 147) fail(`Expected 147 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// The Shop native source entry adds one non-published application template.
+if (unlisted.length !== 148) fail(`Expected 148 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   if (!sitemapRoutes.has(route)) {
