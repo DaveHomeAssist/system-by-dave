@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "81e5391faae0a68225227c967d72d935020fe6f1",
+  "head": "efc0356d82afc127ffe97876b9da541791fb5ccd",
   "status": "amber",
-  "statusReason": "The published nine-application snapshot layer and Show Ops native panels remain delivered. Show Control's six native working panels are now implemented and pushed at 81e5391 in draft PR #323; focused typecheck, 11 tests, build, browser/recovery/offline and embedded checks pass. Integration must preserve the independently owned overlapping repair #322 before merge. Candidate CI/review, publication and live acceptance are separate gates; physical/operator and deeper specialist acceptance remain open.",
+  "statusReason": "Show Control's six native panels are reconciled with merged layout repair #322 at efc0356 in PR #323. The browser-channel publication failure is repaired; typecheck, 11 model tests, build, AV checks, seven native browser groups and the six-size embedded regression pass. Ownership is released, not a blocker. Current-head review/CI, publication and live acceptance remain separate release gates; physical/operator and broader toolset parity stay open.",
   "lastActivity": "2026-10-11",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -31,12 +31,12 @@
     "Show Ops shared touch console (#315) is published through the combined 9c370be release. Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup use the shared panel engine with explicit Save, stored views, draft/layout recovery and exact source preservation."
   ],
   "nextStep": {
-    "title": "Reconcile Show Control native panels with the concurrent layout repair",
-    "why": "Draft PR #323 and repair #322 overlap the Show Control entry, offline/build integration and embedded behavior. The native conversion must preserve the repair's host theme, chrome, tablet sizing and regression coverage.",
-    "doneWhen": "The #322 owner completes its release or explicitly hands off integration; #323 is reconciled and passes exact-head review/CI, both publications and isolated live readback. Physical/operator acceptance stays separately open.",
+    "title": "Finish the reconciled Show Control release",
+    "why": "PR #322 is merged and its owner released integration. PR #323 preserves its shared tablet sizing and embedded theme/chrome behavior, with the regression adapted to the six native panels and deployment Chrome channel.",
+    "doneWhen": "PR #323 passes exact-head review/CI, both publications and isolated live readback. Physical/operator acceptance stays separately open.",
     "effort": "M",
-    "owner": "Show Control release owners",
-    "blockedBy": "Concurrent ownership and integration order with open PR #322, not the historical reassessment or a usage limit. No new product choice blocks the six-panel source slice."
+    "owner": "Show Control release lane",
+    "blockedBy": "No product choice or ownership block. Complete current candidate release gates; do not reinstate the historical reassessment or usage pause."
   },
   "findings": [
     {
@@ -491,12 +491,21 @@
   "evidence": {
     "showControlNativePanelsCandidate": {
       "checkedOn": "2026-10-11",
-      "sourceRevision": "81e5391faae0a68225227c967d72d935020fe6f1",
-      "baseRevision": "ab0e3f5324c216a19e94014f2a809f0562b508ca",
-      "status": "Implemented and pushed; draft PR awaiting concurrent-owner integration",
+      "originalSourceRevision": "81e5391faae0a68225227c967d72d935020fe6f1",
+      "sourceRevision": "efc0356d82afc127ffe97876b9da541791fb5ccd",
+      "baseRevision": "55581710363acf667e87f7323d6eaf469016ed4c",
+      "status": "Reconciled native candidate verified on the runner; current-head release gates remain required",
       "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/323",
       "integrationDependency": "https://github.com/DaveHomeAssist/system-by-dave/pull/322",
       "integrationDependencyHead": "c71362e576403beeeadbed19c394f5a0d76a2d6d",
+      "integrationDependencyMerge": "55581710363acf667e87f7323d6eaf469016ed4c",
+      "integrationRelease": "Prior repair owner explicitly released a clean tree, claim, browser and runner reservations after the failed publication.",
+      "retainedPublicationFailure": {
+        "run": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38178605158",
+        "cause": "The new embedded probe ignored CHROME_CHANNEL=chrome and requested an uninstalled Playwright browser.",
+        "repair": "Honor the established Chrome channel/path convention and run the PR Video browser gate with the deployment channel. Preserve the original six-size regression using native-panel controls, without installing a workaround browser or weakening assertions.",
+        "liveObservation": "The prior cloud owner observed Site Unavailable; no availability conclusion is inferred for this candidate before fresh publication/live checks."
+      },
       "initialCiFailures": {
         "head": "3975fedea498b4bf90810b3807e99fa4f737dcac",
         "runs": ["https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857022", "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857100"],
@@ -505,6 +514,8 @@
       },
       "scope": "On Deck, Cues, Notes, Call Log, Setup/Import and Backup on the unchanged shared engine, retaining v1 data, exact safe source provenance, explicit Save and guarded recovery.",
       "verification": [
+        "Reconciled efc0356: Windows runner typecheck, 11 tests and build pass; shared workspace and AV Video/Audio/Show Ops bundles are byte-identical to merged #322.",
+        "Chrome 155.0.8059.39 with CHROME_CHANNEL=chrome: six embedded viewport cases pass at 2026-10-11T22:43:03.294Z, including full-width tablet resize, 44px controls, long cue/source-row fidelity, Hold/Resume/Go, independent Save/export and host theme changes. The complete seven-group native console probe and AV source gate also pass after reconciliation.",
         "Windows runner: Show Control typecheck, four pure-model tests, seven adapter tests and Vite build pass.",
         "Isolated Chromium 155.0.8059.39: seven browser groups pass at 2026-10-11T21:26:45.742Z, including legacy runs, calls, saved views, safe imports/backups, draft and damaged-byte recovery, storage failure and stale-tab safeguards.",
         "All six panels and import dialogs are reachable in light/dark across 1440x900, 1100x900, 720x900, 680x812, 375x812, 844x390, 320x256 and 3840x1080; cached offline reopen and the real AV Video embedded route with independent Save pass.",
@@ -513,11 +524,11 @@
       ],
       "artifactSha256": {
         "show-control/index.html": "f41b1d356c8b98a369db4c81576eeafad1caccc19c5e4a688a0d807ee843c265",
-        "show-control/assets/show-control.js": "805b8833be7d03414e5173cb3e399aabd84c2a7d4342f4bd1f9171a3f8e24e0e",
-        "show-control/assets/index.css": "59f8b2f15a55711eda142b0f73c41368c1d5acd30be8ac9fd9a30033ebcea88b"
+        "show-control/assets/show-control.js": "534767f8f7d82c7eda7cabae825de15dd9104e4e709280b2eeaa78780fb9eb49",
+        "show-control/assets/index.css": "f1672570ca528c9d178bfbb474ee76487b86c9f84f8a53a632a6be0cc905e907"
       },
       "limits": [
-        "No candidate merge, publication or live-production proof is claimed. Preserve #322 instead of overwriting its independently owned repair.",
+        "Runner proof is not merge, publication or live-production proof. Those gates remain separate in PR #323; the former #322 ownership hold is superseded by its explicit release.",
         "The previous reassessment pause was superseded by the October 11 human restart. Usage was explicitly clarified not to be a blocker.",
         "Physical touch, virtual keyboards, operator rehearsal, full browser-process restart and power-loss durability remain untested.",
         "No playback, hardware outputs, timer/teleprompter integration, credentials, cross-app sync, Rail promotions or shared-engine/Show Ops changes."
