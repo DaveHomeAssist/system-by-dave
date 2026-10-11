@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-11 — Show Control working console panels
+
+- Reuse the existing console engine for On Deck, Cues, Notes, Call Log, Setup/Import and Backup, including configurable layouts, saved views, keyboard paths and touch sized controls.
+- Retain Show Control v1 saves, cue position, Hold, call events, source rows and safe CueForge provenance. Add optional stored views and separate guarded draft/device layout keys without silently saving or synchronizing another app.
+- Preserve preview/cancel, selected-list identity, stale-source and stale-tab guards, original-byte recovery and explicit Save/export. Calls remain human log entries; playback, timers and hardware outputs remain outside this slice.
+- Add typed source, model compatibility tests, generated asset checks and an isolated browser gate for standalone, embedded, responsive and offline behavior. Physical-device/operator and power-loss acceptance remain separate.
+- Align Stage 3D's offline-readiness cache pin with the new shared cache generation; preserve its specialist behavior and calculation boundaries.
+- Reconcile the embedded layout repair, retaining host theme changes and single-panel tablet sizing. Adapt the embedded regression to the native panel controls, and honor the deployment runner's installed Chrome channel without installing a fallback browser or weakening assertions.
+
 ## 2026-10-11 — Show Control embedded layout
 
 - Budget the Run panel selector separately from the cue grid, contain long cue details, and keep calling controls reachable in resized console panels.

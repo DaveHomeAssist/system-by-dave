@@ -25,7 +25,7 @@
   var TOOLS=[
     {id:'av-video',name:'AV Video',href:'av-video/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules.',storageKeys:[{key:'sbd.avVideo.v1',label:'AV Video plan'},{key:'sbd.avVideo.draft.v1',label:'AV Video unsaved draft'},{key:'sbd.avVideo.layout.v1',label:'AV Video panel layout'}],toolboxFeatured:true},
     {id:'av-audio',name:'Audio',href:'av-audio/',dept:'Audio',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Inputs, patch, line checks and speaker zones in one saved Audio plan.',storageKeys:[{key:'sbd.avAudio.v1',label:'Audio plan'}]},
-    {id:'show-control',name:'Show Control',href:'show-control/',dept:'Show Flow',phases:['prep','show'],tag:'Application',desc:'Call logging and reviewed cue-list snapshots; CueForge remains the executable show-control product.',storageKeys:[{key:'sbd.showControl.v1',label:'Show Control run'}]},
+    {id:'show-control',name:'Show Control',href:'show-control/',dept:'Show Flow',phases:['prep','show'],tag:'Application',desc:'Configurable calling, rundown, notes and log panels; CueForge remains the executable show-control product.',storageKeys:[{key:'sbd.showControl.v1',label:'Show Control run'},{key:'sbd.showControl.draft.v1',label:'Show Control recovery draft'},{key:'sbd.showControl.layout.v1',label:'Show Control device layout'}]},
     {id:'show-ops',name:'Show Ops',href:'show-ops/',dept:'Rooms',phases:['advance','prep','loadin','show','closeout'],tag:'Application',desc:'Room readiness, crew calls, tasks and show handoff in one saved workspace.',storageKeys:[{key:'sbd.showOps.document.v1',label:'Show Ops document'},{key:'sbd.showOps.draft.v1',label:'Show Ops unsaved draft'},{key:'sbd.showOps.layout.v1',label:'Show Ops device layout'}]},
     {id:'front-office',name:'Front Office',href:'front-office/',dept:'Client',phases:['advance','prep','show','closeout'],tag:'Application',desc:'Clients, venues and jobs from inquiry through signoff, with an independent local document.',storageKeys:[{key:'sbd.frontOffice.document.v1',label:'Front Office document'}]},
     {id:'the-shop',name:'The Shop',href:'the-shop/',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Application',desc:'Gear prep, pack, load in and strike worklist with source-preserving imports.',storageKeys:[{key:'sbd.shop.v1',label:'The Shop plan'}]},
@@ -195,6 +195,8 @@
     './show-control/app.mjs',
     './show-control/model.mjs',
     './show-control/style.css',
+    './show-control/assets/show-control.js',
+    './show-control/assets/index.css',
     './show-ops/index.html',
     './show-ops/app.mjs',
     './show-ops/model.mjs',
@@ -339,7 +341,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261011-show-control-embed',
+    version:'v20261011-show-control-native',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

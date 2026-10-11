@@ -1,0 +1,13 @@
+export type Cue = { id: string; number: string; time: string; action: string; owner: string; status: string; notes: string; sourceRow: Record<string, unknown> };
+export type Run = { schema: string; version: number; title: string; cues: Cue[]; current: number; held: boolean; notes: string; events: { at: string; action: string; cue: string }[]; source?: { product: 'CueForge'; listId: string; listName: string; fileModifiedAt: string } };
+export type CallingSource = { version: number; name: string; modifiedAt: string; cueLists: { id: string; name: string; cues: { id: string; number: string; name: string; type: string; notes: string }[] }[] };
+export const STORE: string;
+export const SCHEMA: string;
+export const CUE_KEY: string;
+export function emptyRun(): Run;
+export function validate(value: unknown): Run;
+export function cueForgeLists(raw: string): CallingSource;
+export function fromCueForge(source: CallingSource, listId: string): Run;
+export function fromCueSheet(raw: string): Run;
+export function logEvent(run: Run, action: string, at?: string): Run;
+export function save(run: Run, storage: Pick<Storage, 'getItem' | 'setItem'>, baseline: string | null): string;

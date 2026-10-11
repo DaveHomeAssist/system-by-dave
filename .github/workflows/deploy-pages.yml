@@ -157,6 +157,15 @@ jobs:
           npm run build:show-ops
           npm run test:show-ops-browser
 
+      - name: Verify Show Control panels
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:show-control
+          npm run test:show-control
+          npm run build:show-control
+          npm run test:show-control-browser
+
       - name: Verify NoteForge release contract
         run: npm run verify:noteforge
 
@@ -187,8 +196,8 @@ jobs:
         run: |
           npm audit --audit-level=high
           python3 scripts/gen_sitemap.py
-          git diff --exit-code -- av-workbook av-video av-audio show-ops camera-sim sitemap.xml
-          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops camera-sim sitemap.xml)"
+          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control camera-sim sitemap.xml
+          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control camera-sim sitemap.xml)"
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |

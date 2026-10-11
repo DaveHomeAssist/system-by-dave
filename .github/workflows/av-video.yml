@@ -6,12 +6,14 @@ on:
       - 'apps/av-video/**'
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
+      - 'apps/show-control/**'
+      - 'show-control/**'
+      - 'scripts/probe_show_control_console.mjs'
       - 'apps/shared/**'
       - 'scripts/probe_av_console*.mjs'
       - 'av-video/**'
       - 'av-audio/**'
       - 'show-ops/**'
-      - 'show-control/**'
       - 'scripts/probe_show_control_embed.mjs'
       - 'scripts/probe_show_ops_console.mjs'
       - 'package*.json'
@@ -53,7 +55,10 @@ jobs:
           git diff --exit-code -- av-audio
           test -z "$(git status --porcelain -- av-audio)"
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:av-video-browser
+      - name: Video and embedded layout probes with deployment Chrome
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:av-video-browser
       - name: Show Ops console typecheck, tests, build and browser
         run: |
           npm run typecheck:show-ops
@@ -62,6 +67,14 @@ jobs:
           git diff --exit-code -- show-ops
           test -z "$(git status --porcelain -- show-ops)"
           npm run test:show-ops-browser
+      - name: Show Control panels and saved-run compatibility
+        run: |
+          npm run typecheck:show-control
+          npm run test:show-control
+          npm run build:show-control
+          git diff --exit-code -- show-control
+          test -z "$(git status --porcelain -- show-control)"
+          npm run test:show-control-browser
       - name: AV source checks
         run: npm run verify:av
       - name: Toolbox entry and consolidation contract
