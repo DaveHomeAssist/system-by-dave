@@ -50,6 +50,26 @@ they do not block this independently testable source slice. Rollback is a review
 source revert and normal publication, preserving saved data and exported backups;
 never clear user storage or silently downgrade an unknown workspace.
 
+### Embedded layout reconciliation — October 11
+
+The native conversion retains the shared single-panel tablet sizing from
+[PR #322](https://github.com/DaveHomeAssist/system-by-dave/pull/322), merged as
+`55581710363acf667e87f7323d6eaf469016ed4c`. It hides only duplicated host
+navigation, follows host theme changes, bounds long cue content and preserves
+44-pixel panel-switch targets after resizing. The iframe regression now exercises
+the six native panel controls instead of the retired fixed Run/Setup/Log DOM.
+It still checks the six original viewport cases, independent Save/export, exact
+source rows, Hold/Resume/Go, host themes, tablet width and stored desktop geometry.
+
+The first publication of #322 failed in
+[run 38178605158](https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38178605158)
+because that new probe ignored `CHROME_CHANNEL=chrome`. It now uses the established
+channel-selection convention, with the explicit `CHROME_PATH` fallback retained;
+no browser installation workaround is required. The pull-request Video browser
+gate uses the deployment Chrome channel so the same failure is caught before
+merge. Cloud-only Site Unavailable observations from the prior owner remain
+historical evidence, not proof of this candidate's live availability.
+
 ## Operator problem and smallest useful slice
 
 A caller needs a focused next-cue desk during a show, with a visible clock, hold state, cue notes and a recoverable run record. Show Control copies a reviewed Cue Sheet rundown into its own document, then records cue progress and a time-stamped event log. It also accepts its own JSON backup. The source Cue Sheet, Show Timer and Teleprompter remain independent and unchanged. Canonical CueForge (`DaveHomeAssist/cueforge` at inspected `faf8792`) is the maintained executable cue and Show Mode product; its schema-7 show files, output arm, Panic and native routing must not be recreated in this browser desk. Show Control links to the existing CueForge handoff and claims only human call tracking. PlotForge is a separate lighting-plot product and has no cue-control data contract here.

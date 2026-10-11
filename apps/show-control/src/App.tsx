@@ -28,6 +28,7 @@ export function App() {
   const [rawExported, setRawExported] = useState(false);
   const [message, setMessage] = useState(initial.error || 'Ready. Human call tracking only; Save stays explicit.');
   const [theme, setTheme] = useState(document.documentElement.dataset.avTheme || 'dark');
+  const darkTheme = theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
   const [compact, setCompact] = useState(window.innerHeight < 500);
   const [clock, setClock] = useState(new Date().toLocaleTimeString());
   const [action, setAction] = useState<Action>('setup');
@@ -54,6 +55,20 @@ export function App() {
     window.addEventListener('resize', resize);
     return () => { clearInterval(timer); window.removeEventListener('resize', resize); };
   }, []);
+  useEffect(() => {
+    const receiveTheme = (event: StorageEvent) => {
+      if (event.key === 'av-theme-mode.v1' && ['light', 'dark', 'system'].includes(event.newValue || '')) setTheme(event.newValue!);
+    };
+    window.addEventListener('storage', receiveTheme);
+    return () => window.removeEventListener('storage', receiveTheme);
+  }, []);
+  useEffect(() => {
+    document.documentElement.dataset.avTheme = theme;
+    const lightColor = document.querySelector<HTMLMetaElement>('meta[data-av-theme-color="light"]');
+    const darkColor = document.querySelector<HTMLMetaElement>('meta[data-av-theme-color="dark"]');
+    if (lightColor) lightColor.media = theme === 'system' ? '(prefers-color-scheme: light)' : theme === 'light' ? 'all' : 'not all';
+    if (darkColor) darkColor.media = theme === 'system' ? '(prefers-color-scheme: dark)' : theme === 'dark' ? 'all' : 'not all';
+  }, [theme]);
   useEffect(() => {
     const leave = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = ''; } };
     window.addEventListener('beforeunload', leave); return () => window.removeEventListener('beforeunload', leave);
@@ -127,7 +142,7 @@ export function App() {
     } catch (error) { setMessage(errorText(error)); }
   }
   function toggleTheme() {
-    const next = theme === 'dark' ? 'light' : 'dark'; setTheme(next); document.documentElement.dataset.avTheme = next;
+    const next = darkTheme ? 'light' : 'dark'; setTheme(next);
     try { localStorage.setItem('av-theme-mode.v1', next); } catch { setMessage('Theme changed for this visit only; preferences could not be saved.'); }
   }
   const actions = (kind: 'setup' | 'backup') => <div className="call-menu" data-web2-scroll tabIndex={0} role="region" aria-label={`${kind} actions`}>
@@ -140,7 +155,7 @@ export function App() {
     if (type === 'log') return { context: 'Local human calls · no triggers', body: <div className="call-list" data-web2-scroll tabIndex={0} role="region" aria-label="Call history">{!run.events.length ? <p>No calls recorded yet.</p> : run.events.map((event, i) => <article className="call-event" key={`${event.at}-${i}`}><strong>{event.action}{event.cue && ` · ${event.cue}`}</strong><time>{new Date(event.at).toLocaleString()}</time></article>)}</div> };
     return { body: compact ? <div className="call-single"><button onClick={() => openDialog(type === 'setup' ? 'setup' : 'backup')}>{type === 'setup' ? 'Setup and imports' : 'Backup controls'}</button></div> : actions(type === 'setup' ? 'setup' : 'backup') };
   }
-  const header = <header className="call-header"><div><small>AV BY DAVE / HUMAN CALL TRACKING</small><h1>Show Control</h1><p id="summary">{impact(run, dirty)}</p></div><div className="call-actions"><button id="theme" onClick={toggleTheme}>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</button><button id="save" className="primary" disabled={blocked} onClick={() => void store()}>Save run</button></div></header>;
+  const header = <header className="call-header"><div><small>AV BY DAVE / HUMAN CALL TRACKING</small><h1>Show Control</h1><p id="summary">{impact(run, dirty)}</p></div><div className="call-actions"><button id="theme" onClick={toggleTheme}>{darkTheme ? 'Light mode' : 'Dark mode'}</button><button id="save" className="primary" disabled={blocked} onClick={() => void store()}>Save run</button></div></header>;
   const notice = <footer id="notice" role="status" aria-live="polite" className="call-status">{message}{recovery.errors.map(error => <span key={error}>{error}</span>)}</footer>;
   const recoveryControls = recovery.offer && <section className="call-recovery" aria-label="Draft recovery"><p>Unsaved draft available.{recovery.offer.baseline !== baseline.current && ' The saved run changed since this draft.'}</p><button disabled={blocked} onClick={() => void recovery.restore()}>Restore draft</button><button onClick={() => void recovery.discard()}>Discard draft</button></section>;
   const preview = pending && <><div className="call-preview" data-web2-scroll tabIndex={0} role="region" aria-label="Import preview"><h3>{pending.run.title}</h3><p>{pending.run.cues.length} cues · {pending.run.events.length} calls</p><p>Current run: {impact(run, dirty)}. Copying replaces this tab's run; saved data stays until Save.</p>{pending.source && <p>Only safe cue identities and notes are copied. No patch, triggers, paths, settings or credentials.</p>}<ol>{pending.run.cues.map(item => <li key={item.id}><strong>{item.number} · {item.action}</strong><span>{item.notes}</span>{pending.kind === 'cueforge' && <span>Type: {String(item.sourceRow.type)} · ID: {String(item.sourceRow.id)}</span>}</li>)}</ol></div><div className="call-dialog-actions"><button className="primary" onClick={confirmPreview}>{pending.kind === 'restore' ? 'Restore this backup' : 'Copy selected cues'}</button><button onClick={() => { setPending(null); reading.current++; setMessage('Preview canceled. No saved data changed.'); }}>Cancel preview</button></div></>;

@@ -24,6 +24,7 @@ h3 { font-size: 16px; }
 .call-embedded .call-shell { height: 100dvh; grid-template-columns: minmax(0, 1fr); }
 .call-embedded #root { grid-column: 1; }
 .call-app { display: flex; flex-direction: column; height: 100%; min-width: 0; min-height: 0; }
+.call-app .console-quick button { min-width: 44px; flex-shrink: 0; }
 .call-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--av-line); }
 .call-header > div:first-child { min-width: 0; }
 .call-header small { font-size: 10px; letter-spacing: .1em; color: var(--av-muted); }

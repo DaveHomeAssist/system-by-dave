@@ -7,6 +7,14 @@
 - Preserve preview/cancel, selected-list identity, stale-source and stale-tab guards, original-byte recovery and explicit Save/export. Calls remain human log entries; playback, timers and hardware outputs remain outside this slice.
 - Add typed source, model compatibility tests, generated asset checks and an isolated browser gate for standalone, embedded, responsive and offline behavior. Physical-device/operator and power-loss acceptance remain separate.
 - Align Stage 3D's offline-readiness cache pin with the new shared cache generation; preserve its specialist behavior and calculation boundaries.
+- Reconcile the embedded layout repair, retaining host theme changes and single-panel tablet sizing. Adapt the embedded regression to the native panel controls, and honor the deployment runner's installed Chrome channel without installing a fallback browser or weakening assertions.
+
+## 2026-10-11 — Show Control embedded layout
+
+- Budget the Run panel selector separately from the cue grid, contain long cue details, and keep calling controls reachable in resized console panels.
+- Remove repeated navigation only when Show Control is hosted in the console, and follow the host's shared theme selection.
+- Let a single tablet panel fill the console workspace while preserving stored desktop geometry and multiple-panel arrangements.
+- Add browser regression coverage for empty and long cues, six viewport sizes, calling actions, independent Save/Export and layout preservation; advance the AV offline cache generation.
 
 ## 2026-10-09 — Show Ops touch console
 

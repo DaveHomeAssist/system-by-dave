@@ -228,12 +228,14 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   const phoneShown = mode === "phone" ? (panels.find(p => p.type === ws.phoneType) || panels.find(p => p.id === ws.focus) || panels.find(p => def(p.type)?.lit) || panels[0]) : undefined;
   const ordered = [...panels].sort((a, b) => a.y - b.y || a.x - b.x);
   const visible = maxId ? panels.filter(p => p.id === maxId) : mode === "phone" ? (phoneShown ? [phoneShown] : []) : panels;
+  // A lone tablet panel uses the available workspace without changing its stored desktop geometry.
+  const singleTabletPanel = mode === "tablet" && panels.length === 1;
   const area = (p: Panel) => {
-    if (maxId || mode === "phone") return { gridColumn: "1 / -1", gridRow: "1 / -1" };
+    if (maxId || mode === "phone" || singleTabletPanel) return { gridColumn: "1 / -1", gridRow: "1 / -1" };
     if (mode === "tablet") { const i = ordered.findIndex(x => x.id === p.id); return { gridColumn: String(i % 2 + 1), gridRow: String(Math.floor(i / 2) + 1) }; }
     return { gridColumn: `${p.x + 1} / ${p.x + p.w + 1}`, gridRow: `${p.y + 1} / ${p.y + p.h + 1}` };
   };
-  const gridStyle = maxId || mode === "phone" ? { gridTemplateColumns: "minmax(0,1fr)", gridTemplateRows: "minmax(0,1fr)" }
+  const gridStyle = maxId || mode === "phone" || singleTabletPanel ? { gridTemplateColumns: "minmax(0,1fr)", gridTemplateRows: "minmax(0,1fr)" }
     : mode === "tablet" ? { gridTemplateColumns: "repeat(2,minmax(0,1fr))", gridTemplateRows: `repeat(${Math.max(1, Math.ceil(panels.length / 2))},minmax(0,1fr))` }
     : { gridTemplateColumns: `repeat(${COLS},minmax(0,1fr))`, gridTemplateRows: `repeat(${ROWS},minmax(0,1fr))` };
   const shownTypes = new Set((mode === "phone" ? visible : panels).map(p => p.type));

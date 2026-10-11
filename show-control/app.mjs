@@ -1,4 +1,5 @@
 import { STORE, CUE_KEY, emptyRun, validate, fromCueSheet, cueForgeLists, fromCueForge, logEvent, save } from './model.mjs';
+if (window.parent !== window && new URLSearchParams(location.search).get('sbdEmbed') === 'console') document.documentElement.dataset.sbdEmbed = 'console';
 const $ = id => document.getElementById(id);
 let baseline = null, run = emptyRun(), dirty = false, blocked = false, unreadableRaw = null, rawExported = false, bootProblem = '';
 try { baseline = localStorage.getItem(STORE); if (baseline !== null) run = validate(JSON.parse(baseline)); }
@@ -102,6 +103,9 @@ function applyTheme() {
   darkColor.media = theme === 'system' ? '(prefers-color-scheme: dark)' : theme === 'dark' ? 'all' : 'not all';
 }
 $('theme').onclick = () => { theme = theme === 'dark' ? 'light' : theme === 'light' ? 'dark' : matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark'; applyTheme(); try { localStorage.setItem(themeKey, theme); } catch { message('Theme choice could not be saved.', true); } }; applyTheme();
+window.addEventListener('storage', event => {
+  if (event.key === themeKey && ['light', 'dark', 'system'].includes(event.newValue)) { theme = event.newValue; applyTheme(); }
+});
 function tick() { $('clock').textContent = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }); } tick(); setInterval(tick, 1000);
 const phonePanels = ['on-deck','cues','notes']; let phonePanel = 0;
 function applyPhone() { $('run').dataset.panel = phonePanels[phonePanel]; document.querySelectorAll('[data-phone]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.phone === phonePanels[phonePanel]))); }

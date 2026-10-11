@@ -14,6 +14,7 @@ on:
       - 'av-video/**'
       - 'av-audio/**'
       - 'show-ops/**'
+      - 'scripts/probe_show_control_embed.mjs'
       - 'scripts/probe_show_ops_console.mjs'
       - 'package*.json'
       - 'scripts/probe_av_video*.mjs'
@@ -54,7 +55,10 @@ jobs:
           git diff --exit-code -- av-audio
           test -z "$(git status --porcelain -- av-audio)"
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:av-video-browser
+      - name: Video and embedded layout probes with deployment Chrome
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:av-video-browser
       - name: Show Ops console typecheck, tests, build and browser
         run: |
           npm run typecheck:show-ops
