@@ -4,10 +4,10 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "9c370be5dc7125eacdfb4591aa85d670a87ba48d",
+  "head": "81e5391faae0a68225227c967d72d935020fe6f1",
   "status": "amber",
-  "statusReason": "Dave's October 9 snapshot definition of done is published: all nine primary Rail identities recall inside AV Video as selectable, resizable and reconfigurable console views while standalone routes and app-owned data remain. PR #315 also delivers Show Ops' six functional panels on the shared engine. Automated source, destination, production and isolated live browser gates pass at 9c370be; deeper specialist parity and physical/operator acceptance remain open.",
-  "lastActivity": "2026-10-09",
+  "statusReason": "The published nine-application snapshot layer and Show Ops native panels remain delivered. Show Control's six native working panels are now implemented and pushed at 81e5391 in draft PR #323; focused typecheck, 11 tests, build, browser/recovery/offline and embedded checks pass. Integration must preserve the independently owned overlapping repair #322 before merge. Candidate CI/review, publication and live acceptance are separate gates; physical/operator and deeper specialist acceptance remain open.",
+  "lastActivity": "2026-10-11",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -31,12 +31,12 @@
     "Show Ops shared touch console (#315) is published through the combined 9c370be release. Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup use the shared panel engine with explicit Save, stored views, draft/layout recovery and exact source preservation."
   ],
   "nextStep": {
-    "title": "Complete physical and operator console acceptance",
-    "why": "The user-defined nine-application snapshot target and the bounded Show Ops native-panel slice are published. Automation cannot establish real touch ergonomics, virtual keyboards, venue operation or external AV paths.",
-    "doneWhen": "Dated phone/tablet and operator evidence covers Rail selection, panel resize/reconfigure/store/reopen, each embedded application's Save/Export boundaries and representative external display/audio paths, with failures retained.",
+    "title": "Reconcile Show Control native panels with the concurrent layout repair",
+    "why": "Draft PR #323 and repair #322 overlap the Show Control entry, offline/build integration and embedded behavior. The native conversion must preserve the repair's host theme, chrome, tablet sizing and regression coverage.",
+    "doneWhen": "The #322 owner completes its release or explicitly hands off integration; #323 is reconciled and passes exact-head review/CI, both publications and isolated live readback. Physical/operator acceptance stays separately open.",
     "effort": "M",
-    "owner": "Dave and AV operators",
-    "blockedBy": "Access to representative physical devices and venue hardware; Stream/Record credentials and deeper specialist parity remain separate work."
+    "owner": "Show Control release owners",
+    "blockedBy": "Concurrent ownership and integration order with open PR #322, not the historical reassessment or a usage limit. No new product choice blocks the six-panel source slice."
   },
   "findings": [
     {
@@ -284,6 +284,10 @@
   ],
   "verify": [
     "git diff --check",
+    "npm run typecheck:show-control",
+    "npm run test:show-control",
+    "npm run build:show-control",
+    "npm run test:show-control-browser",
     "npm run verify:av",
     "node --test the-shop/model.test.mjs",
     "node the-shop/probe.mjs",
@@ -306,6 +310,14 @@
     "PR #312 supersedes the status-only Rail baseline: all nine published primary applications are canonical Rail destinations, while physical/operator and connected-workflow acceptance remain separate."
   ],
   "links": [
+    {
+      "label": "Show Control native panels candidate #323",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/323"
+    },
+    {
+      "label": "Concurrent Show Control layout repair #322",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/322"
+    },
     {
       "label": "In-console application snapshots #314",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/314"
@@ -467,8 +479,8 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Continue AV consolidation from accepted application source 9c370be. The nine-identity in-console snapshot Rail and Show Ops shared-console slice are delivered; do not rebuild them. Treat deeper native-panel and specialist parity as bounded capability work, preserve app-owned data and standalone routes, and complete physical/operator acceptance separately.",
-  "confidence": "High for the cited whole-suite snapshot layer, Show Ops shared-console slice, exact source/live asset parity, production provenance and isolated live browser journeys; deeper specialist and physical/operator acceptance remain open.",
+  "kickoffPrompt": "Continue Show Control native panels from candidate 81e5391 in draft PR #323, based on ab0e3f5. First resolve integration ownership/order with the concurrent repair #322, then preserve its embedded theme/chrome and short-tablet coverage when reconciling. Complete exact-head review/CI, source and AV publication and isolated live readback. Preserve v1 saves, explicit Save, guarded recovery, safe source provenance, standalone routes and independent data. Do not rebuild the delivered nine-identity snapshot layer or Show Ops, restore the superseded reassessment pause, or claim physical/operator acceptance from automation.",
+  "confidence": "High for the recorded historical releases and current bounded Show Control source/browser checks. The native candidate is not merged or published; integration with #322, exact-head review/CI, live acceptance and physical/operator evidence remain separate.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
@@ -477,6 +489,34 @@
   ],
   "short": "AV Suite",
   "evidence": {
+    "showControlNativePanelsCandidate": {
+      "checkedOn": "2026-10-11",
+      "sourceRevision": "81e5391faae0a68225227c967d72d935020fe6f1",
+      "baseRevision": "ab0e3f5324c216a19e94014f2a809f0562b508ca",
+      "status": "Implemented and pushed; draft PR awaiting concurrent-owner integration",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/323",
+      "integrationDependency": "https://github.com/DaveHomeAssist/system-by-dave/pull/322",
+      "integrationDependencyHead": "c71362e576403beeeadbed19c394f5a0d76a2d6d",
+      "scope": "On Deck, Cues, Notes, Call Log, Setup/Import and Backup on the unchanged shared engine, retaining v1 data, exact safe source provenance, explicit Save and guarded recovery.",
+      "verification": [
+        "Windows runner: Show Control typecheck, four pure-model tests, seven adapter tests and Vite build pass.",
+        "Isolated Chromium 155.0.8059.39: seven browser groups pass at 2026-10-11T21:26:45.742Z, including legacy runs, calls, saved views, safe imports/backups, draft and damaged-byte recovery, storage failure and stale-tab safeguards.",
+        "All six panels and import dialogs are reachable in light/dark across 1440x900, 1100x900, 720x900, 680x812, 375x812, 844x390, 320x256 and 3840x1080; cached offline reopen and the real AV Video embedded route with independent Save pass.",
+        "AV, indexing and domain-site staging pass on Windows. Bounded source-only public navigation/consistency and generated workspace/sitemap parity pass on macOS.",
+        "Domain cutover behavior assertions pass on Windows, but the command exits nonzero during temporary-folder cleanup with ENOTEMPTY. Linux exact-head CI is required; this is not recorded as a clean command pass."
+      ],
+      "artifactSha256": {
+        "show-control/index.html": "f41b1d356c8b98a369db4c81576eeafad1caccc19c5e4a688a0d807ee843c265",
+        "show-control/assets/show-control.js": "805b8833be7d03414e5173cb3e399aabd84c2a7d4342f4bd1f9171a3f8e24e0e",
+        "show-control/assets/index.css": "59f8b2f15a55711eda142b0f73c41368c1d5acd30be8ac9fd9a30033ebcea88b"
+      },
+      "limits": [
+        "No candidate merge, publication or live-production proof is claimed. Preserve #322 instead of overwriting its independently owned repair.",
+        "The previous reassessment pause was superseded by the October 11 human restart. Usage was explicitly clarified not to be a blocker.",
+        "Physical touch, virtual keyboards, operator rehearsal, full browser-process restart and power-loss durability remain untested.",
+        "No playback, hardware outputs, timer/teleprompter integration, credentials, cross-app sync, Rail promotions or shared-engine/Show Ops changes."
+      ]
+    },
     "checkedOn": "2026-10-05",
     "sourceRevision": "338ea85d3162a55e30a0c40f07955e2390ad46c2",
     "scope": "Cameras/Playback automated delivery acceptance; no Rail runtime, Stream/Record or physical acceptance claim.",
