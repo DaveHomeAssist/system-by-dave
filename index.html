@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -198,8 +198,11 @@
     .btn:hover .arrow,.card:hover .cta .arrow{transform:none;}
   }
 </style>
+<script src="js/public-theme.js"></script>
+<link rel="stylesheet" href="css/public-viewport.css">
+<script src="js/public-viewport.js" defer></script>
 </head>
-<body>
+<body data-public-site="system">
 <a class="sbd-skip-link" href="#main-content">Skip to content</a>
 <div class="page">
   <div class="page-bg" aria-hidden="true"></div>
@@ -224,7 +227,7 @@
 
     <main>
     <!-- HERO -->
-    <section id="main-content" class="hero wrap" tabindex="-1" aria-labelledby="hero-title">
+    <section data-public-panel="Start" id="main-content" class="hero wrap" tabindex="-1" aria-labelledby="hero-title">
       <p class="badge"><span class="badge-dot" aria-hidden="true"></span><span>Built and maintained by Dave Robertson</span></p>
       <h1 id="hero-title">Tools that do <span class="muted">the unglamorous work.</span></h1>
       <p class="hero-sub">Offline-capable browser tools for live-show crews, a prompt-engineering workbench, and agents and widgets for Notion. Built by a live-event and broadcast technologist.</p>
@@ -243,7 +246,7 @@
     </section>
 
     <!-- START HERE -->
-    <section id="audiences" class="section wrap" aria-labelledby="audiences-title">
+    <section data-public-panel="Find a tool" id="audiences" class="section wrap" aria-labelledby="audiences-title">
       <div class="section-head">
         <div>
           <span class="eyebrow">Start here</span>
@@ -273,7 +276,7 @@
     </section>
 
     <!-- PRODUCT LINES -->
-    <section id="lines" class="section wrap" aria-labelledby="lines-title">
+    <section data-public-panel="Products" id="lines" class="section wrap" aria-labelledby="lines-title">
       <div class="section-head">
         <div>
           <span class="eyebrow">Products</span>
@@ -322,7 +325,7 @@
     </section>
 
     <!-- FEATURED -->
-    <section class="section wrap" aria-labelledby="featured-title">
+    <section data-public-panel="Featured" id="featured" class="section wrap" aria-labelledby="featured-title">
       <div class="section-head">
         <div>
           <span class="eyebrow">Featured</span>
@@ -362,7 +365,7 @@
     </section>
 
     <!-- PROOF SURFACES -->
-    <section class="section wrap" aria-labelledby="proof-title">
+    <section data-public-panel="About" id="about" class="section wrap" aria-labelledby="proof-title">
       <div class="section-head">
         <div>
           <span class="eyebrow">Check the work</span>
@@ -389,8 +392,6 @@
           <p class="cta"><a class="card-link" href="privacy-policy.html" data-track-cta="proof:privacy">Read the privacy policy <span class="arrow" aria-hidden="true">→</span></a></p>
         </article>
       </div>
-    </section>
-
     <!-- APPROACH -->
     <section class="section wrap" aria-labelledby="approach-title">
       <div class="approach">
@@ -417,11 +418,7 @@
           </div>
         </div>
       </div>
-    </section>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="site-footer">
+    </section>    <footer class="site-footer">
       <div class="wrap footer-inner">
         <div class="footer-brand"><span class="footer-mark" aria-hidden="true">SD</span>System by Dave</div>
         <nav aria-label="Footer">
@@ -438,6 +435,11 @@
         <span class="footer-copy">© 2026</span>
       </div>
     </footer>
+    </section>
+
+    </main>
+
+    <!-- FOOTER -->
 
   </div>
 </div>

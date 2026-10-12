@@ -117,6 +117,8 @@
   var BASE_ASSETS=[
     './av-suite-landing2.html',
     './css/av-landing-alt.css',
+    './css/public-viewport.css',
+    './js/public-viewport.js',
     './js/av-landing-alt.js',
     './js/av-landing-theme.js',
     './av-suite.html',
@@ -345,7 +347,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261012-website-review',
+    version:'v20261012-public-viewport',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

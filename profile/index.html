@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,13 +37,14 @@
 
 <link rel="stylesheet" href="../css/fonts.css" />
 <link rel="stylesheet" href="styles.css" />
-<script src="vendor/gsap.min.js" defer></script>
-<script src="vendor/ScrollTrigger.min.js" defer></script>
 <script src="reveal.js" defer></script>
 <!-- Source: built from REF | Dave Bio (internal). Assets in /assets are compressed and metadata-stripped. -->
 <link rel="stylesheet" href="../css/sbd-public-nav.css">
+<script src="../js/public-theme.js"></script>
+<link rel="stylesheet" href="../css/public-viewport.css">
+<script src="../js/public-viewport.js" defer></script>
 </head>
-<body>
+<body data-public-site="profile">
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="sbd-site-header">
   <nav class="sbd-site-header__inner" aria-label="Primary">
@@ -61,21 +62,8 @@
   </nav>
 </header>
 
-<nav aria-label="Profile sections">
-  <div class="wrap">
-    <div class="brand">DAVE<b>·</b>ROBERTSON</div>
-    <div class="navlinks">
-      <a href="#work">Work</a>
-      <a href="#diy">DIY</a>
-      <a href="#systems">Systems</a>
-      <a href="#toolkit">Toolkit</a>
-      <a href="#gear">Gear</a>
-      <a href="#values">Approach</a>
-      <a href="#contact">Contact</a>
-    </div>
-  </div>
-</nav>
-
+<main id="main" tabindex="-1">
+<section data-public-panel="About" id="about">
 <header class="hero">
   <div class="wrap hero-grid">
     <div class="hero-copy">
@@ -94,8 +82,6 @@
     </div>
   </div>
 </header>
-
-<main id="main" tabindex="-1">
 
 <section id="stats" aria-labelledby="stats-h">
   <div class="wrap reveal">
@@ -127,7 +113,8 @@
   </div>
 </section>
 
-<section id="work">
+</section>
+<section data-public-panel="Work" id="work">
   <div class="wrap reveal">
     <div class="sec-head"><span class="sec-idx">01</span><h2 class="sec-title">Professional Work</h2></div>
     <p class="body measure">Dave works across video engineering, camera systems, switching, media servers, LED walls, and live event technology. As a member of <b>IATSE Local 8</b>, he has contributed to corporate events, concerts, sports venues, conventions, and large-scale productions, including FIFA World Cup 26 Philadelphia field operations. He runs his own company, <b>Digital Footprints LLC</b>, while pursuing higher-responsibility roles in broadcast, studio operations, and live production — as interested in understanding <em>why</em> something works as in getting it working.</p>
@@ -142,8 +129,40 @@
       <div class="card"><div class="ico" aria-hidden="true">🎛️</div><div class="t">Show Control</div><div class="d">Cueing and integration of live systems.</div></div>
     </div>
   </div>
+<section id="gear">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-idx">05</span><h2 class="sec-title">Gear &amp; Brands</h2></div>
+    <p class="body section-intro">A sample of the manufacturers and platforms Dave works across in the field — cameras and lenses, switchers, LED processing, media servers, signal conversion, and camera support.</p>
+    <div class="logos">
+      <img src="assets/logos/sony.svg" alt="Sony" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/canon.svg" alt="Canon" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/panasonic.svg" alt="Panasonic" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/red_digital_cinema.png" alt="RED Digital Cinema" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/arri.svg" alt="ARRI" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/z_cam.png" alt="Z Cam" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/grass_valley.png" alt="Grass Valley" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/ross_video.png" alt="Ross Video" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/newtek.svg" alt="NewTek" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/analog_way.png" alt="Analog Way" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/barco.png" alt="Barco" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/christie.png" alt="Christie" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/disguise.png" alt="disguise" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/green_hippo.png" alt="Green Hippo" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/resolume.png" alt="Resolume" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/brompton.png" alt="Brompton" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/aja.png" alt="AJA" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/decimator.png" alt="Decimator" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/atomos.png" alt="Atomos" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/extron.png" alt="Extron" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/vinten.png" alt="Vinten" width="120" height="34" loading="lazy" decoding="async" />
+      <img src="assets/logos/sachtler.svg" alt="Sachtler" width="120" height="34" loading="lazy" decoding="async" />
+    </div>
+  </div>
 </section>
 
+</section>
+
+<section data-public-panel="Systems" id="interests">
 <section id="diy">
   <div class="wrap reveal">
     <div class="sec-head"><span class="sec-idx">02</span><h2 class="sec-title">DIY &amp; Technical Interests</h2></div>
@@ -240,38 +259,8 @@
   </div>
 </section>
 
-<section id="gear">
-  <div class="wrap reveal">
-    <div class="sec-head"><span class="sec-idx">05</span><h2 class="sec-title">Gear &amp; Brands</h2></div>
-    <p class="body section-intro">A sample of the manufacturers and platforms Dave works across in the field — cameras and lenses, switchers, LED processing, media servers, signal conversion, and camera support.</p>
-    <div class="logos">
-      <img src="assets/logos/sony.svg" alt="Sony" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/canon.svg" alt="Canon" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/panasonic.svg" alt="Panasonic" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/red_digital_cinema.png" alt="RED Digital Cinema" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/arri.svg" alt="ARRI" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/z_cam.png" alt="Z Cam" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/grass_valley.png" alt="Grass Valley" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/ross_video.png" alt="Ross Video" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/newtek.svg" alt="NewTek" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/analog_way.png" alt="Analog Way" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/barco.png" alt="Barco" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/christie.png" alt="Christie" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/disguise.png" alt="disguise" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/green_hippo.png" alt="Green Hippo" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/resolume.png" alt="Resolume" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/brompton.png" alt="Brompton" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/aja.png" alt="AJA" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/decimator.png" alt="Decimator" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/atomos.png" alt="Atomos" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/extron.png" alt="Extron" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/vinten.png" alt="Vinten" width="120" height="34" loading="lazy" decoding="async" />
-      <img src="assets/logos/sachtler.svg" alt="Sachtler" width="120" height="34" loading="lazy" decoding="async" />
-    </div>
-  </div>
 </section>
-
-<section id="values">
+<section data-public-panel="Approach" id="values">
   <div class="wrap reveal">
     <div class="sec-head"><span class="sec-idx">06</span><h2 class="sec-title">Approach &amp; Values</h2></div>
     <p class="body measure">A recurring theme across Dave's work is <b>self-sufficiency</b>: whether troubleshooting an LED wall, designing a Home Assistant dashboard, or building an inventory system, he prefers to understand things deeply enough to maintain and improve them himself. He is skeptical of unnecessary complexity and favors solutions that are robust, understandable, and usable in the real world.</p>
@@ -285,7 +274,7 @@
   </div>
 </section>
 
-<section id="contact">
+<section data-public-panel="Contact" id="contact">
   <div class="wrap reveal">
     <div class="sec-head"><span class="sec-idx">07</span><h2 class="sec-title">Contact</h2></div>
     <p class="body section-intro">Open a channel for freelance bookings, union calls, or a build conversation.</p>
@@ -323,10 +312,6 @@
       </div>
     </div>
   </div>
-</section>
-
-</main>
-
 <footer>
   <div class="wrap reveal">
     <div class="foot-grid">
@@ -344,6 +329,9 @@
     <div class="sig footer-note">© <span id="yr">2026</span> David Robertson · Digital Footprints LLC</div>
   </div>
 </footer>
+</section>
+
+</main>
 
 <script src="../js/sbd-public-nav.js" defer></script>
 </body>

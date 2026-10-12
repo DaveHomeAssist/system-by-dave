@@ -7,7 +7,9 @@
 - Load DM Sans in the shared AV palette and apply the external-link relationship policy to console navigation. Keep the previously approved Stage Slate default and orange in-tool actions.
 - Replace the stale Front Office roadmap panel with an honest Beta handoff to the existing application. Compact phone Toolbox summary/filter controls so the first tool is visible.
 - Correct the one-page AV resume PDF email without changing its other content or layout; ignore malformed profile fragments safely.
-- Advance the offline generation. Marketing/profile viewport layout and final owner release approval remain open.
+- Advance the offline generation. Final owner release approval remains open.
+- Following Dave’s WEBREVIEW-D1 selection, organize the System homepage, AV landing and profile into viewport-sized subject tabs and content pages. Preserve authored copy, deep links, keyboard navigation, browser history and full print/no-script documents.
+- Add shared light/dark controls to the System homepage and profile; light is the fresh default, while AV retains its approved Stage Slate preference. Add a browser regression gate for both themes and six viewport sizes.
 
 ## 2026-10-09 — System by Dave walkthrough fixes
 

@@ -32,8 +32,10 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"AV by Dave","url":"https://avbydave.com/","description":"Free browser tools for live-show crews that keep working offline. Show data stays on your device.","inLanguage":"en","publisher":{"@type":"Person","name":"Dave Robertson","url":"https://systembydave.com/"},"isPartOf":{"@type":"WebSite","name":"System by Dave","url":"https://systembydave.com/"}}
 </script>
+<link rel="stylesheet" href="css/public-viewport.css">
+<script src="js/public-viewport.js" defer></script>
 </head>
-<body>
+<body data-public-site="av">
   <a class="skip" href="#main">Skip to main content</a>
   <div class="page-bg" aria-hidden="true"></div>
 
@@ -60,7 +62,7 @@
 
   <main id="main" tabindex="-1">
     <div class="wrap">
-      <section class="hero" aria-labelledby="hero-title">
+      <section data-public-panel="Overview" id="overview" class="hero" aria-labelledby="hero-title">
         <div>
           <p class="eyebrow">Free · Works offline · No account</p>
           <h1 id="hero-title">Free AV tools for live-show crews</h1>
@@ -137,8 +139,7 @@
         </aside>
       </section>
 
-
-      <section class="quick-tools" aria-labelledby="quick-tools-title">
+      <section data-public-panel="Tools" id="tools" class="quick-tools" aria-labelledby="quick-tools-title">
         <div class="quick-tools-head">
           <h2 id="quick-tools-title">Start with one tool</h2>
           <a href="https://avbydave.com/av-suite.html?entry=toolbox">See all <span data-av-tool-count>52</span> tools →</a>
@@ -172,7 +173,7 @@
         </div>
       </section>
 
-      <section class="features" aria-labelledby="principles-title">
+      <section data-public-panel="How it works" id="principles" class="features" aria-labelledby="principles-title">
         <h2 id="principles-title" class="sr-only">How AV by Dave works</h2>
         <article class="feature">
           <div class="feature-viz" aria-hidden="true">
@@ -221,9 +222,6 @@
             the tools that support it, and data only moves between tools when you confirm it.
           </p>
         </article>
-      </section>
-    </div>
-
     <div class="trust">
       <div class="inner">
         <span class="accent" aria-hidden="true"></span>
@@ -232,8 +230,6 @@
         <span class="accent" aria-hidden="true"></span>
       </div>
     </div>
-  </main>
-
   <footer>
     <div class="wrap inner">
       <span>© <span id="y">2026</span> System by Dave · AV by Dave</span>
@@ -246,6 +242,10 @@
       </nav>
     </div>
   </footer>
+      </section>
+    </div>
+
+  </main>
 
 </body>
 </html>
