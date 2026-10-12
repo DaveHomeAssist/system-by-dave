@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-12 — Infrastructure touch panel acceptance
+
+- Keep focused fields inside the existing bounded record panel with scroll padding, including the short-height layout. The unchanged full-containment and 44 px checks pass for all six panels in both themes at nine sizes.
+- Retain measured clipping diagnostics in the browser probe and correct Stage 3D's offline-readiness pin to the existing Infrastructure cache generation.
+- Duncan passes typecheck, sixteen model tests, build, 23 Rail/worker tests, 47 Throwline tests and all eight native browser groups, including independent embedded Save, recovery, stored views and offline reopen. CI, publication and live proof are tracked separately in PR #325; physical-device/operator acceptance is not inferred.
+
 ## 2026-10-11 — Infrastructure native console candidate
 
 - Add six working panel types for Power, Network, Cable, Issues, Plan/Import and Backup using the existing model and shared console engine.
@@ -7,7 +13,7 @@
 - Add typed source, generated entry/assets, eleven compatibility tests and a native browser probe retaining the earlier stale-save/import/theme/containment scenarios.
 - Typecheck, five original plus eleven native model tests and production build passed. Correct the omitted Infrastructure draft notification and stale cache-version expectation after reproducing both failures; the full AV source gate and 23 Rail/worker checks now pass.
 - Tighten native probe targeting to distinguish record dropdowns from their named regions, and wait for the current Save to clear unsaved state instead of accepting a prior success message. Preserve the original failures and exact saved-value assertions.
-- Five functional browser groups pass, including legacy imports, save/reload and recovery. Release remains held on the light 1024×768 tablet field-containment check for Power's Issue / blocker control; responsive, embedding, offline, publication and physical/operator acceptance are incomplete.
+- At checkpoint `b098126`, five functional browser groups passed, but the light 1024×768 tablet field-containment check failed for Power's Issue / blocker control. This historical failure is retained; the October 12 entry records its bounded repair and subsequent acceptance.
 
 ## 2026-10-11 — The Shop working console panels
 

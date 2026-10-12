@@ -58,14 +58,16 @@ async function reachable(control, label = String(control)) {
   await control.scrollIntoViewIfNeeded();
   const r = await control.evaluate(element => {
     const box = element.getBoundingClientRect(); let top = 0, bottom = innerHeight, left = 0, right = innerWidth;
+    const clips = [];
     for (let node = element.parentElement; node; node = node.parentElement) {
       const style = getComputedStyle(node), bounds = node.getBoundingClientRect();
       if (/(hidden|auto|scroll|clip)/.test(style.overflowY)) { top = Math.max(top, bounds.top); bottom = Math.min(bottom, bounds.bottom); }
       if (/(hidden|auto|scroll|clip)/.test(style.overflowX)) { left = Math.max(left, bounds.left); right = Math.min(right, bounds.right); }
+      if (/(hidden|auto|scroll|clip)/.test(style.overflowX+' '+style.overflowY)) clips.push({tag:node.tagName,className:node.className,rect:bounds.toJSON(),clientHeight:node.clientHeight,scrollHeight:node.scrollHeight,scrollTop:node.scrollTop,overflowX:style.overflowX,overflowY:style.overflowY});
       if (node instanceof HTMLDialogElement && node.matches(':modal')) break;
     }
     const hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
-    return { width: box.width, height: box.height, inside: box.top >= top - 1 && box.bottom <= bottom + 1 && box.left >= left - 1 && box.right <= right + 1, hit: hit === element || element.contains(hit) };
+    return { width: box.width, height: box.height, inside: box.top >= top - 1 && box.bottom <= bottom + 1 && box.left >= left - 1 && box.right <= right + 1, hit: hit === element || element.contains(hit), viewport:{width:innerWidth,height:innerHeight},box:box.toJSON(),visible:{top,bottom,left,right},clips };
   });
   assert.ok(r.width >= 44 && r.height >= 44 && r.inside && r.hit, `${label}: ${JSON.stringify(r)}`);
 }

@@ -4,10 +4,10 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "fe48d2672e22c9280a3c8f50b706380d558d58e0",
+  "head": "b0981261dd01be7a327fb8e8091ff115c5c8a91d",
   "status": "amber",
-  "statusReason": "Show Control #323 and The Shop #324 are merged, published and verified live. Infrastructure PR325 remains a candidate: the original observer/cache expectations are corrected, all 23 AV Rail/worker checks and five native functional browser groups pass. The light 1024x768 tablet containment assertion fails for Power's Issue / blocker control. Remaining responsive, embedding, offline and release gates are incomplete; physical/operator and broader toolset parity remain separate.",
-  "lastActivity": "2026-10-11",
+  "statusReason": "The clarified target is functional touch panels across the toolset, not catalogue links. Show Control #323 and The Shop #324 are delivered. Infrastructure PR325 now passes Duncan typecheck, sixteen model tests, build, 23 Rail/worker tests, 47 Throwline tests and all eight browser groups, including nine-size/two-theme reachability, recovery, offline and AV Video embedding. The measured tablet clipping and stale Stage 3D cache pin are repaired; exact-head CI, publication and live checks remain release gates. Whole-toolset and physical/operator acceptance remain open.",
+  "lastActivity": "2026-10-12",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -31,12 +31,12 @@
     "Show Ops shared touch console (#315) is published through the combined 9c370be release. Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup use the shared panel engine with explicit Save, stored views, draft/layout recovery and exact source preservation."
   ],
   "nextStep": {
-    "title": "Resolve Infrastructure tablet field containment and finish acceptance",
-    "why": "Both original expectation failures are resolved and functional data/recovery groups pass; the tablet field reachability gate now fails at 1024x768 in light mode.",
-    "doneWhen": "The exact field-containment failure is explained and corrected without weakening touch/reachability assertions, then remaining responsive, embedded and offline gates pass before exact-head CI, publication and live verification.",
+    "title": "Publish the verified Infrastructure panels, then convert remaining fixed consoles",
+    "why": "The existing record scroller needed a focus/reveal inset: the Power Issue field extended 1.203125 px beyond its tablet clip. Matching scroll padding resolves it without weakening assertions or changing fields, data or the shared engine.",
+    "doneWhen": "PR325 passes exact-head CI/review, source and AV destination publication, and isolated live checks. Then Front Office, Lighting and Calculator receive working panels while existing capabilities and saved data remain intact.",
     "effort": "M",
     "owner": "Infrastructure native console lane",
-    "blockedBy": "Native browser attempt three fails Power Issue / blocker containment at light 1024x768 (198.5x88 control, inside=false, hit=true). Screenshot and first two harness failures are retained. Precise clipping cause is not yet established; no product decision is missing."
+    "blockedBy": "No product decision blocks Infrastructure release. Required CI/publication/live gates must pass; physical devices and operators remain separate acceptance. Historical failed checkpoints are retained."
   },
   "findings": [
     {
@@ -479,8 +479,8 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Continue the Infrastructure native-console candidate from main base 72c0872 and docs/infrastructure-app.md. Preserve the recorded Rail observer failure; add Infrastructure to the expected refresh list and update the post-destroy count without weakening behavior checks, then qualify a remote runner for focused panel, compatibility, recovery, responsive, offline and actual AV Video embedding checks. Preserve v1 plans, legacy originals, explicit Save and safety/context boundaries. Complete normal exact-head review, CI, publication and live gates only after passing. The Shop #324 is delivered; do not rebuild it or reinstate historical pause/usage blockers.",
-  "confidence": "High for the prior Show Control/Shop releases and Infrastructure typecheck/model/build evidence. Infrastructure browser and release acceptance are unverified because the Rail observer gate failed. No whole-toolset or physical completion claim.",
+  "kickoffPrompt": "Finish PR325 from its verified current head through exact-head CI, review, merge, source and AV publication and isolated live acceptance. Preserve the measured tablet regression, unchanged reachability assertions, v1 plans, imports, original data and independent Save. Continue the accepted AV Video interaction model into the remaining fixed consoles using the existing engine and models. Do not rebuild delivered consoles, delete legacy routes or equate snapshots and launch links with full capability parity.",
+  "confidence": "High for the existing Show Control/Shop releases and current Infrastructure source and eight-group remote browser acceptance. Exact-head publication/live and physical/operator acceptance remain separately unverified.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
@@ -490,21 +490,23 @@
   "short": "AV Suite",
   "evidence": {
     "infrastructureNativePanelsCandidate": {
-      "checkedOn": "2026-10-11",
+      "checkedOn": "2026-10-12",
       "sourceBase": "72c08720208818484c707073a24d92d4aa792df2",
       "branch": "codex/infrastructure-panels-20261011",
-      "status": "Source/model/build verified; stopped at failed Rail observer gate before browser acceptance",
+      "status": "Source, model, build and eight native browser groups pass on Duncan; exact-head release gates pending",
       "checks": [
         "Typecheck passed",
         "Five original and eleven native model tests passed",
         "Production build passed",
-        "Worker/Rail assertions: eight pass, one fails; expected refresh list omits Infrastructure"
+        "Full AV source verification and 23 Rail/worker tests pass",
+        "47 Throwline tests and release verification pass with the corrected Stage 3D cache pin",
+        "Eight native browser groups pass: functional records, stored views, imports, recovery, safe failures, nine-size/two-theme controls, offline and actual AV Video embedding"
       ],
       "limits": [
-        "Native browser probe not started",
-        "No CI, merge, publication, live or physical acceptance claimed"
+        "Earlier observer/cache and tablet-containment failures retained as historical evidence",
+        "No new exact-head CI, merge, publication, live or physical acceptance claimed by local browser evidence"
       ],
-      "next": "Add the Infrastructure none-state refresh and expected final count six to the observer test, then continue focused acceptance without weakening assertions."
+      "next": "Complete PR325 exact-head release gates; preserve broader toolset gaps and physical acceptance."
     },
     "shopNativePanelsRelease": {
       "checkedOn": "2026-10-11",
