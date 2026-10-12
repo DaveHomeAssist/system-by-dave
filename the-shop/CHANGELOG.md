@@ -1,5 +1,12 @@
 # The Shop changelog
 
+## 2026-10-11
+
+- Adopt four working console panels: Worklist, Item inspector, Plan/Import and Backup. Reuse the shared layout engine for arrangements, maximize, lock and stored views.
+- Preserve Shop v1 plans, reviewed imports, original rows, quantity/status separation and guarded malformed-save replacement. Pending item edits survive panel switches and require Apply before Save/export/recovery.
+- Add optional workspace metadata, independent draft/layout recovery, shared theme/context and embedded AV Video operation without duplicate navigation.
+- Retain legacy model tests and browser assertions; add native panel, saved-data, responsive, offline and embedding gates.
+
 ## 2026-10-08
 
 - Show Gear Prep requested quantity and operator-entered packed quantity in previews, worklist rows and the inspector. Blank counts remain unknown; partial packs do not imply readiness.

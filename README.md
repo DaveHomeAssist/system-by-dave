@@ -18,6 +18,8 @@ documenting the Notion skills, agents, widgets, and templates I build and use.
 
 [AV Video](https://avbydave.com/av-video/) combines an interactive Signal Flow canvas, Video Patch, Displays & Projection, Cameras and Playback in one independent application. Source lives in `apps/av-video/`; `npm run build:av-video` regenerates the committed `av-video/` artifact. Use `npm run typecheck:av-video`, `npm run test:av-video` and `npm run test:av-video-browser` to verify it. See [the workflow and data contract](docs/av-video.md).
 
+[The Shop](https://avbydave.com/the-shop/) uses the same console engine for Worklist, Item inspector, Plan/Import and Backup panels, standalone or embedded in AV Video. Source is in `apps/the-shop/`; `npm run build:the-shop` regenerates the committed entry and assets without removing the existing logistics model. Verify with `npm run typecheck:the-shop`, `npm run test:the-shop` and `npm run test:the-shop-browser`. See [its scope, saved-data and verification contract](docs/the-shop.md).
+
 ## Local development
 
 No toolchain required. Any static file server works:
