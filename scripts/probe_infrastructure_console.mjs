@@ -49,7 +49,8 @@ async function seed(page, value = fixture) { await page.evaluate(({ key, value }
 async function save(page) {
   if (!await page.locator('#saveBtn').isVisible()) await button(page, 'Infrastructure controls').click();
   await page.locator('#saveBtn').click();
-  await page.waitForFunction(() => /Saved to this browser|Recovered plan saved/.test(document.getElementById('footerMessage').textContent));
+  // A previous successful Save message can remain while the next Web Lock waits.
+  await page.waitForFunction(() => !document.querySelector('.infra-header p').textContent.endsWith(' · unsaved') && /Saved to this browser|Recovered plan saved/.test(document.getElementById('footerMessage').textContent));
   if (await button(page, 'Back to panels').isVisible()) await button(page, 'Back to panels').click();
 }
 async function exportPlan(page) { await quick(page, 'Backup'); const downloaded = page.waitForEvent('download'); await button(panel(page, 'backup'), 'Export JSON').click(); return JSON.parse(await readFile(await (await downloaded).path(), 'utf8')); }
@@ -89,7 +90,7 @@ try {
   await cable.getByLabel('Destination',{exact:true}).fill('Stage left');
   assert.deepEqual(JSON.parse(await read(page)),fixture);
   await quick(page,'Issues'); await button(panel(page,'issues'),/Circuit 1/).click();
-  assert.equal(await panel(page,'power').getByLabel('Power record').inputValue(),'0');
+  assert.equal(await panel(page,'power').getByRole('combobox',{name:/^Power record/}).inputValue(),'0');
   await power.getByLabel('Draw (A)',{exact:true}).fill('');
   await power.getByLabel('Issue / blocker',{exact:true}).fill('   ');
   assert.equal(await power.getByLabel('Record issue').count(),0);
@@ -190,7 +191,7 @@ try {
         await reachable(button(page.locator('.console-quick'),name),size.width+' '+name+' switcher'); await quick(page,name); await noOverflow(page,theme+'/'+size.width+'/'+name);
         const area=panel(page,type); assert.equal(await area.count(),1);
         if(['power','network','cable'].includes(type)){
-          await reachable(area.getByLabel(name+' record')); const select=area.getByLabel(name+' record'); const last=await select.locator('option').last().getAttribute('value'); await select.selectOption(last);
+          const select=area.getByRole('combobox',{name:new RegExp('^'+name+' record')}); await reachable(select); const last=await select.locator('option').last().getAttribute('value'); await select.selectOption(last);
           await reachable(area.locator('[name=name]')); await reachable(area.locator('[name=issue]')); await reachable(area.locator('[name=status]'));
           await reachable(area.locator(type==='power'?'[name=draw]':type==='network'?'[name=vlan]':'[name=destination]'));
           await reachable(button(area,'Remove record'));
@@ -210,7 +211,7 @@ try {
   await page.evaluate(async()=>{await navigator.serviceWorker.register('/av-suite-worker.js',{scope:'/',updateViaCache:'none'});await navigator.serviceWorker.ready;});
   await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
   assert.equal(await page.evaluate(async()=>{const cache=await caches.open('sbd-av-suite-'+window.SBD_REGISTRY.version);return(await Promise.all(['/infrastructure/','/infrastructure/assets/infrastructure.js','/infrastructure/assets/index.css'].map(path=>cache.match(path)))).every(Boolean);}),true);
-  await primary.context.setOffline(true);await page.reload();await quick(page,'Power');assert.equal(await read(page),beforeOffline);assert.equal(await panel(page,'power').getByLabel('Power record').locator('option').count(),20);await primary.context.setOffline(false);
+  await primary.context.setOffline(true);await page.reload();await quick(page,'Power');assert.equal(await read(page),beforeOffline);assert.equal(await panel(page,'power').getByRole('combobox',{name:/^Power record/}).locator('option').count(),20);await primary.context.setOffline(false);
   pass('published entry/native assets cached and saved plan reopened offline');
 
   const embedded=await browser.newContext({viewport:{width:1440,height:900},hasTouch:true});contexts.push(embedded);

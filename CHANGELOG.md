@@ -5,7 +5,9 @@
 - Add six working panel types for Power, Network, Cable, Issues, Plan/Import and Backup using the existing model and shared console engine.
 - Preserve v1 plans, original legacy objects, arbitrary existing statuses, explicit Save, Web Lock/stale-tab guards and independent embedded operation; add optional stored views and console-local draft/layout recovery.
 - Add typed source, generated entry/assets, eleven compatibility tests and a native browser probe retaining the earlier stale-save/import/theme/containment scenarios.
-- Typecheck, five original plus eleven native model tests and production build passed. Release is held on the Rail observer regression's expected console list, which still omits Infrastructure. Browser, CI, publication and physical/operator acceptance are not claimed.
+- Typecheck, five original plus eleven native model tests and production build passed. Correct the omitted Infrastructure draft notification and stale cache-version expectation after reproducing both failures; the full AV source gate and 23 Rail/worker checks now pass.
+- Tighten native probe targeting to distinguish record dropdowns from their named regions, and wait for the current Save to clear unsaved state instead of accepting a prior success message. Preserve the original failures and exact saved-value assertions.
+- Five functional browser groups pass, including legacy imports, save/reload and recovery. Release remains held on the light 1024×768 tablet field-containment check for Power's Issue / blocker control; responsive, embedding, offline, publication and physical/operator acceptance are incomplete.
 
 ## 2026-10-11 — The Shop working console panels
 

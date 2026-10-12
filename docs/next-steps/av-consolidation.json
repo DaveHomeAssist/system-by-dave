@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "72c08720208818484c707073a24d92d4aa792df2",
+  "head": "fe48d2672e22c9280a3c8f50b706380d558d58e0",
   "status": "amber",
-  "statusReason": "Show Control #323 and The Shop #324 are merged, published and verified live. Infrastructure's six native panels are a new source candidate: typecheck, sixteen model tests and build pass, but the Rail observer regression still expects only five refresh events and omits Infrastructure. Browser acceptance and release remain blocked; physical/operator and broader toolset parity remain separate.",
+  "statusReason": "Show Control #323 and The Shop #324 are merged, published and verified live. Infrastructure PR325 remains a candidate: the original observer/cache expectations are corrected, all 23 AV Rail/worker checks and five native functional browser groups pass. The light 1024x768 tablet containment assertion fails for Power's Issue / blocker control. Remaining responsive, embedding, offline and release gates are incomplete; physical/operator and broader toolset parity remain separate.",
   "lastActivity": "2026-10-11",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -31,12 +31,12 @@
     "Show Ops shared touch console (#315) is published through the combined 9c370be release. Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup use the shared panel engine with explicit Save, stored views, draft/layout recovery and exact source preservation."
   ],
   "nextStep": {
-    "title": "Repair Infrastructure observer expectation and qualify native panels",
-    "why": "Six native panels now have source/model/build proof; the new draft registration adds one observer event not included in the old assertion.",
-    "doneWhen": "The preserved observer regression and focused native/compatibility/browser gates pass, followed by exact-head review, CI, publication and live verification.",
+    "title": "Resolve Infrastructure tablet field containment and finish acceptance",
+    "why": "Both original expectation failures are resolved and functional data/recovery groups pass; the tablet field reachability gate now fails at 1024x768 in light mode.",
+    "doneWhen": "The exact field-containment failure is explained and corrected without weakening touch/reachability assertions, then remaining responsive, embedded and offline gates pass before exact-head CI, publication and live verification.",
     "effort": "M",
     "owner": "Infrastructure native console lane",
-    "blockedBy": "Rail observer test expects five events rather than six after Infrastructure draft registration. Browser probe did not start. No product approval or ownership decision is missing."
+    "blockedBy": "Native browser attempt three fails Power Issue / blocker containment at light 1024x768 (198.5x88 control, inside=false, hit=true). Screenshot and first two harness failures are retained. Precise clipping cause is not yet established; no product decision is missing."
   },
   "findings": [
     {
