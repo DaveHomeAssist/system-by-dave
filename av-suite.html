@@ -33,19 +33,28 @@
 </head>
 <body>
 <a class="sbd-skip-link" href="#main-content">Skip to AV Suite workspace</a>
-<header class="sbd-site-header">
+<header class="sbd-site-header" data-sbd-header="compact">
   <nav class="sbd-site-header__inner" aria-label="Primary">
     <a class="sbd-site-brand" href="https://systembydave.com/">
       <span class="sbd-site-brand__mark" aria-hidden="true">SD</span>
       <span class="sbd-site-brand__word">System by Dave</span>
     </a>
     <div class="sbd-site-links">
-      <a href="https://systembydave.com/tools.html">Tools</a>
+      <a class="sbd-site-links__more" href="https://systembydave.com/tools.html">Tools</a>
       <a href="/">AV by Dave home</a>
       <a href="/av-suite.html" aria-current="page">AV Suite</a>
-      <a href="https://systembydave.com/notion.html">Notion</a>
-      <a href="https://systembydave.com/prompt-lab.html">Prompt Lab</a>
-      <a href="https://systembydave.com/profile/">Dave</a>
+      <a class="sbd-site-links__more" href="https://systembydave.com/notion.html">Notion</a>
+      <a class="sbd-site-links__more" href="https://systembydave.com/prompt-lab.html">Prompt Lab</a>
+      <a class="sbd-site-links__more" href="https://systembydave.com/profile/">Dave</a>
+      <details class="sbd-site-menu">
+        <summary>More <span class="visually-hidden">System by Dave links</span></summary>
+        <div class="sbd-site-menu__panel">
+          <a href="https://systembydave.com/tools.html">Tools</a>
+          <a href="https://systembydave.com/notion.html">Notion</a>
+          <a href="https://systembydave.com/prompt-lab.html">Prompt Lab</a>
+          <a href="https://systembydave.com/profile/">Dave</a>
+        </div>
+      </details>
     </div>
   </nav>
 </header>
@@ -79,19 +88,19 @@
     <div class="hd-ctx-note" id="ctxNote" hidden></div>
   </div>
   <div class="hd-right">
-    <button type="button" id="brandCycleBtn" class="hd-icon-btn labeled" title="Switch design theme"><span class="lbl">SBD</span></button>
-    <button type="button" id="modeToggleBtn" class="hd-icon-btn" title="Toggle light / dark" aria-label="Toggle light or dark"></button>
-    <button type="button" id="helpBtn" class="hd-icon-btn" title="Toggle help mode" aria-label="Toggle help mode" aria-pressed="false">
-      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.1.9-1.1 1.7v.4"/><path d="M12 17h.01"/></svg>
+    <button type="button" id="brandCycleBtn" class="hd-icon-btn labeled" title="Switch design theme"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.6-1.3-.6-2.1 0-.9.7-1.6 1.6-1.6H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg><span class="lbl">SBD</span></button>
+    <button type="button" id="modeToggleBtn" class="hd-icon-btn labeled" title="Toggle light / dark"></button>
+    <button type="button" id="helpBtn" class="hd-icon-btn labeled" title="Toggle help mode" aria-pressed="false">
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.1.9-1.1 1.7v.4"/><path d="M12 17h.01"/></svg><span class="lbl">Help</span>
     </button>
-    <button type="button" id="doorwayBtn" class="hd-icon-btn labeled" title="Choose AV Suite doorway">
-      <svg class="ic" viewBox="0 0 24 24"><path d="M4 21V3h13v18"/><path d="M8 12h.01"/><path d="M17 21h3"/></svg><span class="lbl">Doorway</span>
+    <button type="button" id="doorwayBtn" class="hd-icon-btn labeled" title="Choose where AV by Dave opens">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M4 21V3h13v18"/><path d="M8 12h.01"/><path d="M17 21h3"/></svg><span class="lbl">Start screen</span>
     </button>
     <button type="button" id="setupBtn" class="hd-icon-btn labeled" title="Reopen guided setup" data-show-only>
       <svg class="ic" viewBox="0 0 24 24"><path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M12 11v6M9 14h6"/></svg><span class="lbl">Setup</span>
     </button>
-    <button type="button" id="settingsBtn" class="hd-icon-btn" aria-haspopup="dialog" aria-controls="settingsDrawer" aria-expanded="false" title="Operator settings" aria-label="Operator settings">
-      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.8 7.8 0 0 0-1.7-1L15 3h-4l-.3 2.4a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.8 7.8 0 0 0 1.7 1L11 21h4l.3-2.4a7.8 7.8 0 0 0 1.7-1l2.4 1 2-3.4z"/></svg>
+    <button type="button" id="settingsBtn" class="hd-icon-btn labeled" aria-haspopup="dialog" aria-controls="settingsDrawer" aria-expanded="false" title="Operator settings">
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.8 7.8 0 0 0-1.7-1L15 3h-4l-.3 2.4a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.8 7.8 0 0 0 1.7 1L11 21h4l.3-2.4a7.8 7.8 0 0 0 1.7-1l2.4 1 2-3.4z"/></svg><span class="lbl">Settings</span>
     </button>
     <button type="button" id="searchBtn" class="hd-icon-btn labeled" title="Quick Switcher">
       <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="lbl">Search</span><span class="kbd">⌘K</span>

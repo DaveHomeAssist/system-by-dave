@@ -121,6 +121,7 @@
   :focus-visible{outline:2px solid var(--accent-strong);outline-offset:3px}
   ::selection{background:var(--accent);color:var(--bg)}
   [hidden]{display:none!important}
+  .panel:focus-visible{outline:2px solid var(--av-brand,#58c38b);outline-offset:-4px}
   .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   .skip-link{position:fixed;z-index:2147483647;left:12px;top:10px;padding:10px 14px;border-radius:6px;background:var(--text);color:var(--bg);font-weight:800;text-decoration:none;transform:translateY(-160%)}
   .skip-link:focus{transform:translateY(0)}
@@ -374,7 +375,8 @@
     .section-heading{font-size:22px}
     .stagebar{grid-template-columns:auto auto minmax(44px,1fr) auto;padding:8px;gap:7px}
     .keys{display:none}
-    .button.nav-label span{display:none}
+    /* Phones show only the arrow; the words stay in the accessible name. */
+    .button.nav-label span:not([aria-hidden]){position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{scroll-behavior:auto!important}
@@ -448,11 +450,11 @@
       </div>
       <div class="stage" id="reference-stage" aria-busy="true"></div>
       <footer class="stagebar">
-        <button class="button nav-label" id="previousSection" type="button" aria-label="Previous section" disabled>← <span>Prev</span></button>
+        <button class="button nav-label" id="previousSection" type="button" disabled><span aria-hidden="true">← </span><span>Prev</span><span class="sr-only"> section</span></button>
         <span class="count" id="sectionCount">00 / 00</span>
         <div class="progress" id="sectionProgress" role="progressbar" aria-label="Reference progress" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><span></span></div>
         <span class="keys">← → move · Home / End jump</span>
-        <button class="button nav-label" id="nextSection" type="button" aria-label="Next section" disabled><span>Next</span> →</button>
+        <button class="button nav-label" id="nextSection" type="button" disabled><span>Next</span><span class="sr-only"> section</span><span aria-hidden="true"> →</span></button>
       </footer>
     </section>
   </main>
@@ -927,6 +929,8 @@
       var active=panelIndex===index;
       panel.classList.toggle('active',active);
       panel.setAttribute('aria-hidden',active?'false':'true');
+      // The active panel scrolls, so keyboard users must be able to reach it.
+      panel.tabIndex=active?0:-1;
       if(active) panel.removeAttribute('inert'); else panel.setAttribute('inert','');
     });
     tabs.forEach(function(tab,tabIndex){
