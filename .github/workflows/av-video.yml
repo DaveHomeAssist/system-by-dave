@@ -9,6 +9,9 @@ on:
       - 'apps/show-control/**'
       - 'apps/infrastructure/**'
       - 'apps/front-office/**'
+      - 'apps/av-lighting/**'
+      - 'av-lighting/**'
+      - 'scripts/probe_av_lighting_console.mjs'
       - 'front-office/**'
       - 'scripts/probe_front_office_console.mjs'
       - 'infrastructure/**'
@@ -92,6 +95,14 @@ jobs:
           git diff --exit-code -- front-office
           test -z "$(git status --porcelain -- front-office)"
           npm run test:front-office-browser
+      - name: Lighting panels and saved-plan compatibility
+        run: |
+          npm run typecheck:av-lighting
+          npm run test:av-lighting
+          npm run build:av-lighting
+          git diff --exit-code -- av-lighting
+          test -z "$(git status --porcelain -- av-lighting)"
+          npm run test:av-lighting-browser
       - name: Infrastructure and Shop panels and saved-plan compatibility
         run: |
           npm run typecheck:infrastructure

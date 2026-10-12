@@ -18,7 +18,7 @@ The smallest useful handoff maps only fixture identity, position, profile/mode, 
 
 Before replacement, validate the manifest marker/version, fixture count, unique IDs and source size; report malformed, unsupported and oversized files without changing the working or saved plan. Preview the candidate count, original source and status mapping, require explicit confirmation, and retain the prior plan until the operator saves. Export remains available if local storage cannot save. An AV Lighting backup containing the source snapshot must survive reload and export/import unchanged. Legacy Lighting Patch import remains supported and its original key stays untouched. Browser acceptance covers these cases at desktop and phone widths with keyboard and page-containment checks. Physical and operator acceptance remains open.
 
-## Next bounded conversion: native working panels
+## Native working panels
 
 **Operator outcome:** Use the same configurable workspace as AV Video to keep a
 fixture list and its full inspector visible together, bring up focus work or plan
@@ -71,4 +71,34 @@ failures. Verify named views, keyboard focus, 44px controls, both themes at the
 established nine sizes, offline reopening and actual AV Video embedding. Require
 generated-output parity, exact-head CI, both publications and isolated live
 acceptance. Physical devices, virtual keyboards, power loss and operator
-acceptance remain separate; this brief does not claim implementation.
+acceptance remain separate.
+
+### Implementation and verification
+
+`apps/av-lighting/` now owns the React application and builds the existing
+`av-lighting/` route. The extracted `av-lighting/model.mjs` keeps the prior
+normalization, ID repair, PlotForge mapping and duplicate-start semantics;
+two Node tests compare it directly with the retained original editor functions.
+Ten native model tests cover optional views, limits, source retention and guarded
+save/recovery. No new dependency or shared workspace engine change is required.
+
+Run `npm run typecheck:av-lighting`, `npm run test:av-lighting`,
+`npm run build:av-lighting` and `npm run test:av-lighting-browser`.
+The historical `node av-lighting/probe.cjs` entry forwards to the native HTTP
+probe. Synthetic isolated contexts are used locally and against an explicit
+`LIGHTING_BASE`; `LIGHTING_OUTPUT` selects the evidence directory and
+`LIGHTING_CHROME` selects an installed browser. Existing `CHROME_CHANNEL` is
+also supported. Both PR and publication workflows rebuild, exercise the panels
+and verify the committed generated output.
+
+The document key/schema and legacy key stay unchanged. New device-local keys
+are `sbd.avLighting.draft.v1` and `sbd.avLighting.layout.v1`. The legacy key is
+read only. Save preserves verified original bytes before replacing an unreadable
+document; when startup reads return no bytes, the app refuses an original-backup
+download rather than claiming an empty file is the original. Imported source
+objects may contain private notes, so exported backups should be handled safely.
+
+Source/model/build checks are candidate evidence, not publication or operator
+acceptance. Follow the existing AV consolidation projection for exact revision,
+browser, CI, publication and live proof; the entire specialist toolset is not
+declared complete by this five-panel conversion.

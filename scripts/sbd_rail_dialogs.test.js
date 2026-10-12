@@ -249,13 +249,14 @@ test('draft observer refreshes same-tab, cross-tab, clear, and page-restore inva
     ['console:show-ops', 'none'],
     ['console:front-office', 'none'],
     ['console:shop', 'none'],
-    ['console:infrastructure', 'none']
+    ['console:infrastructure', 'none'],
+    ['console:lighting', 'none']
   ]);
   assert.deepEqual(storage.setCalls, []);
 
   observer.destroy();
   target.dispatch('pageshow');
-  assert.equal(changes.length, 7);
+  assert.equal(changes.length, 8);
 });
 
 test('All apps and Customize dialogs preserve truthful status, focus, and explicit writes', () => {

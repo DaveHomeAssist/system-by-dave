@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-12 — Lighting native working panels
+
+- Add Fixtures, Fixture details, Focus, Plan/Import and Backup using the shared AV console workspace, standalone and embedded. Retain all twelve fixture fields, show metadata, status/focus/search, confirmed removal and duplicate-start warnings; no footprint or DMX-control claim.
+- Extract the existing normalization and PlotForge mapping into a pure model, checked against the retained original functions. Preserve the document/legacy keys, ID repair, source-only PlotForge fields, existing limits and optional version-1 views; add separate guarded draft/layout recovery.
+- Keep Save explicit with byte-baseline, Web Lock and write/readback guards. Refuse unsafe stale imports/saves; verify unreadable-original recovery before replacement; never label an empty download as an unreadable original when reads were denied.
+- Add twelve model tests, nine-group browser coverage, generated-output PR/publication gates, native offline assets and transfer inventory. Typecheck, model tests, build, 23 Rail/worker checks and all nine browser groups pass on Duncan, including every control at nine sizes/two themes, offline reopening and actual AV Video embedding. Exact CI/publication/live proof remain separate.
+- Preserve first failures: DOM iteration/test-environment typing fixed without a dependency, Windows generator-input line endings reconciled to canonical bytes, asynchronous draft-discard assertion waits for actual completion without weakening saved-record equality.
+
 ## 2026-10-12 — Front Office read-denial backup and publication gate
 
 - Refuse Export when startup storage reads failed and no original bytes were obtained. Explain that no original backup was created; do not label an empty working document as the original. Readable originals and export after write failure retain their existing paths.
