@@ -4,6 +4,14 @@
    Product-specific layout and operator semantics stay local; color authority
    lives here and follows the operating-system preference by default. */
 
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("../fonts/dm-sans.woff2") format("woff2");
+}
+
 :root {
   color-scheme: light;
 

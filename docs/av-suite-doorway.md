@@ -12,7 +12,7 @@ registry. The AV domain root `/` is a landing page with direct links to both.
 - `av-suite.html?entry=toolbox` opens **AV Toolbox** for show-independent tool
   discovery and launch.
 - `av-suite.html?entry=frontoffice` opens the addressable **Front Office**
-  roadmap panel. It does not save client or venue work.
+  Beta handoff panel linking to `/front-office/`. The panel does not edit client or venue work; the separate application owns those records.
 - A URL containing any supported `sbd*` show parameter always opens Show
   Console, even when `entry=toolbox` is also present.
 - A neutral URL opens Toolbox without a chooser, regardless of an older saved entry preference. The chooser remains available as an explicit navigation action.
@@ -44,8 +44,7 @@ plain destinations: they do not include `sbdShow`, `sbdVenue`, `sbdDate`,
 
 Toolbox exposes search plus All, Use anytime, Pinned, Recent, and family views.
 It clearly reports that no show is attached and keeps Show Console controls out
-of the Toolbox workspace. Front Office remains a labeled roadmap concept and
-does not imply persistent workflow functionality.
+of the Toolbox workspace. Front Office remains a separate application with its own local Save and Export controls. The console handoff does not edit those records.
 The AV Video card also links directly to its document-owned Project & modules
 panel with a **Manage modules** action. Opening it does not change module
 visibility or save the Video plan; ordinary panel navigation may remember the

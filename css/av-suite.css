@@ -742,3 +742,19 @@ img,svg{display:block}
   #avApp .hd-right .kbd,#avApp .hd-cache{display:none}
   #avApp .hd-right .hd-icon-btn.labeled{padding:0 10px}
 }
+
+/* Keep the first Toolbox results reachable without scrolling past duplicate
+   workspace actions and summary badges on phones. Header tabs retain them. */
+@media (max-width:680px){
+  #avApp .toolbox-hero{padding:14px;margin-bottom:12px}
+  #avApp .toolbox-hero .toolbox-status,
+  #avApp .toolbox-hero .ctx-keys,
+  #avApp .toolbox-hero .toolbox-hero-actions{display:none}
+  #avApp .toolbox-toolbar{grid-template-columns:minmax(0,1fr) minmax(100px,.7fr)}
+  #avApp .toolbox-toolbar input,#avApp .toolbox-toolbar select{min-width:0;width:100%}
+  #avApp .toolbox-filter-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+  #avApp .toolbox-filter-row button{padding:6px;font-size:12px}
+  #avApp .toolbox-filter-row .fam-view-count{grid-column:1/-1}
+  #avApp .toolbox-hero h2{font-size:20px;margin-bottom:6px}
+  #avApp .toolbox-hero p{font-size:13px;line-height:1.4;margin:0}
+}
