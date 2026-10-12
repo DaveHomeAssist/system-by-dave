@@ -46,6 +46,8 @@
   });
   if (year) year.textContent = String(new Date().getFullYear());
 
+  if (!offlineStatus) return;
+
   if (!window.isSecureContext || !('serviceWorker' in navigator) || !('caches' in window)) {
     offlineStatus.textContent = 'Offline access unavailable in this browser.';
     return;
