@@ -6,7 +6,7 @@
   ],
   "head": "0d08fc5270a1e13c24cacb8f158dc2091e90fddc",
   "status": "amber",
-  "statusReason": "The target remains functional touch panels across the toolset, not catalogue links. Infrastructure #325 is merged, published and verified live at 0d08fc5 after nine exact-head checks, both publications, eight live browser groups and eight-asset parity. Show Control #323 and The Shop #324 are also delivered. Front Office, Lighting and Calculator still need native working layouts; deeper legacy/specialist parity and physical/operator acceptance remain open.",
+  "statusReason": "The target remains functional touch panels across the toolset, not catalogue links. Infrastructure #325, Show Control #323 and The Shop #324 are delivered. Front Office has six native working panels with typecheck, seventeen model tests, build and nine Duncan browser groups passing; exact-head CI, publication and live gates remain open. Lighting and Calculator still need native working layouts; deeper specialist parity and physical/operator acceptance remain separate.",
   "lastActivity": "2026-10-12",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -32,8 +32,8 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Convert Front Office into native working panels",
-    "why": "Its existing client, venue and job editor still uses fixed views. Operators need the same configurable working workspace as AV Video, while retaining current records and reviewed Show Advance imports.",
+    "title": "Verify and release Front Office native working panels",
+    "why": "The six-panel candidate reuses AV Video's shared workspace and the existing Front Office model. Finish its bounded browser, CI and publication gates while retaining current records and reviewed Show Advance imports.",
     "doneWhen": "Jobs, Clients, Venues, Job updates, Advance import and Backup work as shared-engine panels, standalone and embedded, preserving explicit Save, old backups and exact imported sources. Scoped model/browser/recovery/viewport/offline checks, exact-head CI, both publications and isolated live acceptance pass. Physical/operator acceptance stays separate.",
     "effort": "M",
     "owner": "Front Office native console lane",

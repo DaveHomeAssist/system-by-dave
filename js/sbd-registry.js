@@ -27,7 +27,7 @@
     {id:'av-audio',name:'Audio',href:'av-audio/',dept:'Audio',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Inputs, patch, line checks and speaker zones in one saved Audio plan.',storageKeys:[{key:'sbd.avAudio.v1',label:'Audio plan'}]},
     {id:'show-control',name:'Show Control',href:'show-control/',dept:'Show Flow',phases:['prep','show'],tag:'Application',desc:'Configurable calling, rundown, notes and log panels; CueForge remains the executable show-control product.',storageKeys:[{key:'sbd.showControl.v1',label:'Show Control run'},{key:'sbd.showControl.draft.v1',label:'Show Control recovery draft'},{key:'sbd.showControl.layout.v1',label:'Show Control device layout'}]},
     {id:'show-ops',name:'Show Ops',href:'show-ops/',dept:'Rooms',phases:['advance','prep','loadin','show','closeout'],tag:'Application',desc:'Room readiness, crew calls, tasks and show handoff in one saved workspace.',storageKeys:[{key:'sbd.showOps.document.v1',label:'Show Ops document'},{key:'sbd.showOps.draft.v1',label:'Show Ops unsaved draft'},{key:'sbd.showOps.layout.v1',label:'Show Ops device layout'}]},
-    {id:'front-office',name:'Front Office',href:'front-office/',dept:'Client',phases:['advance','prep','show','closeout'],tag:'Application',desc:'Clients, venues and jobs from inquiry through signoff, with an independent local document.',storageKeys:[{key:'sbd.frontOffice.document.v1',label:'Front Office document'}]},
+    {id:'front-office',name:'Front Office',href:'front-office/',dept:'Client',phases:['advance','prep','show','closeout'],tag:'Application',desc:'Working client, venue, job and advance panels with explicit Save and an independent local document.',storageKeys:[{key:'sbd.frontOffice.document.v1',label:'Front Office document'},{key:'sbd.frontOffice.draft.v1',label:'Front Office recovery draft'},{key:'sbd.frontOffice.layout.v1',label:'Front Office device layout'}]},
     {id:'the-shop',name:'The Shop',href:'the-shop/',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Application',desc:'Configurable worklist, item inspector, plan/import and backup panels with source-preserving copies.',storageKeys:[{key:'sbd.shop.v1',label:'The Shop plan'},{key:'sbd.shop.draft.v1',label:'The Shop recovery draft'},{key:'sbd.shop.layout.v1',label:'The Shop device layout'}]},
     {id:'infrastructure',name:'Infrastructure',href:'infrastructure/',dept:'Power',phases:['advance','prep','loadin'],tag:'Application',desc:'Working power, network, cable and issue panels with compatible imports and explicit Save.',storageKeys:[{key:'sbd.infrastructure.v1',label:'Infrastructure plan'},{key:'sbd.infrastructure.draft.v1',label:'Infrastructure recovery draft'},{key:'sbd.infrastructure.layout.v1',label:'Infrastructure device layout'}]},
     {id:'av-lighting',name:'Lighting',href:'av-lighting/',dept:'Lighting',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Fixture patch and focus workspace; PlotForge remains the full lighting-plot product.',storageKeys:[{key:'sbd.avLighting.v1',label:'Lighting plan'}]},
@@ -208,6 +208,8 @@
     './front-office/app.mjs',
     './front-office/model.mjs',
     './front-office/style.css',
+    './front-office/assets/front-office.js',
+    './front-office/assets/index.css',
     './the-shop/index.html',
     './the-shop/shop.mjs',
     './the-shop/model.mjs',
@@ -282,7 +284,7 @@
     {id:'audio',prototypeId:'audio',label:'Audio',availability:'available',toolId:'av-audio',panelGroup:'Common',icon:['M4 10v4','M8 6v12','M12 3v18','M16 7v10','M20 10v4']},
     {id:'show-control',prototypeId:'showcontrol',label:'Show Control',availability:'available',toolId:'show-control',panelGroup:'Common',icon:['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z','M10 8.5v7l5.5-3.5z']},
     {id:'show-ops',prototypeId:'showops',label:'Show Ops',availability:'available',toolId:'show-ops',panelGroup:'Common',draftKey:'sbd.showOps.draft.v1',layoutKey:'sbd.showOps.layout.v1',icon:['M3 5h18v16H3z','M3 10h18','M8 3v4','M16 3v4','M7 14h5','M10 17h7']},
-    {id:'front-office',prototypeId:'office',label:'Front Office',availability:'available',toolId:'front-office',panelGroup:'Planning',icon:['M5 4h14v17H5z','M9 4V2h6v2','m9 13 2 2 4-4']},
+    {id:'front-office',prototypeId:'office',label:'Front Office',availability:'available',toolId:'front-office',panelGroup:'Planning',draftKey:'sbd.frontOffice.draft.v1',layoutKey:'sbd.frontOffice.layout.v1',icon:['M5 4h14v17H5z','M9 4V2h6v2','m9 13 2 2 4-4']},
     {id:'shop',prototypeId:'shop',label:'The Shop',availability:'available',toolId:'the-shop',panelGroup:'Planning',draftKey:'sbd.shop.draft.v1',layoutKey:'sbd.shop.layout.v1',icon:['M4 4h16v13H4z','M4 9h16','M10 12h4','M8 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z','M16 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z']},
     {id:'infrastructure',prototypeId:'infra',label:'Infrastructure',availability:'available',toolId:'infrastructure',panelGroup:'Planning',draftKey:'sbd.infrastructure.draft.v1',layoutKey:'sbd.infrastructure.layout.v1',icon:['M13 2 4 14h7l-1 8 9-12h-7z']},
     {id:'lighting',prototypeId:'lighting',label:'Lighting',availability:'available',toolId:'av-lighting',panelGroup:'Utilities',icon:['M9 18h6','M10 21h4','M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z']},
@@ -345,7 +347,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261011-infrastructure-native',
+    version:'v20261012-front-office-native',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

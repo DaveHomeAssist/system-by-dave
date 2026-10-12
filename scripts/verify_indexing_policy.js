@@ -69,7 +69,8 @@ const robots = read('robots.txt');
 // Show Ops and Show Control add their nonpublic application source pages.
 // The Shop native source entry adds one non-published application template.
 // Infrastructure adds its non-published native source template.
-if (unlisted.length !== 149) fail(`Expected 149 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// Front Office adds one non-published native source template; its public route is unchanged.
+if (unlisted.length !== 150) fail(`Expected 150 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   if (!sitemapRoutes.has(route)) {
