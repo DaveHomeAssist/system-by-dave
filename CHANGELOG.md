@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-12 — Front Office native panel candidate
+
+- Add working Jobs, Clients, Venues, Job updates, Advance import and Backup panels with the existing shared workspace engine; preserve the current client/venue/job model and specialist boundaries.
+- Retain v1 documents, explicit identity binding, exact Show Advance originals and guarded Save; add optional stored views and separate draft/layout recovery. Unfinished forms survive panel and job selection changes and must be applied or cleared before Save, export or replacement.
+- Preserve unreadable original bytes before recovery, stale source/tab protection, existing import limits and independent embedded operation. No new runtime dependency or shared-engine rewrite.
+- Add native source/build, nine compatibility tests alongside the eight original model tests, isolated browser acceptance, generated-output CI checks and offline/transfer inventory updates. Publication and live acceptance remain separate gates; physical devices, virtual keyboards and real interruption/power-loss acceptance are not inferred.
+- Duncan passes all nine native browser groups in both themes at nine sizes, with offline reopening and actual AV Video embedding. Short-height validation and refused Save feedback stay visible. Full transfer assertions pass on Windows but cleanup exits nonzero; normal Linux CI remains the complete command gate.
+
 ## 2026-10-12 — Infrastructure touch panel acceptance
 
 - Keep focused fields inside the existing bounded record panel with scroll padding, including the short-height layout. The unchanged full-containment and 44 px checks pass for all six panels in both themes at nine sizes.
