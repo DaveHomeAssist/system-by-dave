@@ -30,6 +30,7 @@ on:
       - 'js/sbd-registry.js'
       - 'js/av-suite/**'
       - '.github/workflows/av-video.yml'
+      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:

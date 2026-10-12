@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-12 — Front Office read-denial backup and publication gate
+
+- Refuse Export when startup storage reads failed and no original bytes were obtained. Explain that no original backup was created; do not label an empty working document as the original. Readable originals and export after write failure retain their existing paths.
+- Add an explicit no-download browser regression for denied reads. Carry Front Office's existing type/model/build/browser checks and generated-output parity into the production publication workflow, with deployment-workflow changes covered by the PR gate.
+- Roll the shared offline cache generation for the corrected native bundle; retain all existing storage keys and registry counts.
+- Record PR #327's exact-head green merge at `f1eb365`; publication and live acceptance remain separate. Scope the next Lighting native-panel conversion without claiming it is implemented.
+
 ## 2026-10-12 — Front Office native panel candidate
 
 - Add working Jobs, Clients, Venues, Job updates, Advance import and Backup panels with the existing shared workspace engine; preserve the current client/venue/job model and specialist boundaries.
