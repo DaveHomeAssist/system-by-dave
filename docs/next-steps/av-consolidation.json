@@ -1,6 +1,6 @@
 {
   "id": "av-consolidation",
-  "name": "AV Suite \u2014 Toolbox & consolidation",
+  "name": "AV Suite — Toolbox & consolidation",
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
@@ -9,8 +9,8 @@
   "statusReason": "The clarified target is functional touch panels across the toolset, not catalogue links. Show Control #323 and The Shop #324 are delivered. Infrastructure PR325 now passes Duncan typecheck, sixteen model tests, build, 23 Rail/worker tests, 47 Throwline tests and all eight browser groups, including nine-size/two-theme reachability, recovery, offline and AV Video embedding. The measured tablet clipping and stale Stage 3D cache pin are repaired; exact-head CI, publication and live checks remain release gates. Whole-toolset and physical/operator acceptance remain open.",
   "lastActivity": "2026-10-12",
   "shipped": [
-    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
-    "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
+    "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
     "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit.",
     "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan.",
     "Console workspace and Show panels (#262), Stage Slate first-use theme (#263), and separate draft/layout persistence (#264) are published.",
@@ -135,7 +135,7 @@
   ],
   "phases": [
     {
-      "name": "Stage 1a \u2014 Returning-neutral Toolbox \u2014 Delivered",
+      "name": "Stage 1a — Returning-neutral Toolbox — Delivered",
       "goal": "Implement the settled default while preserving explicit entries and saved data.",
       "items": [
         "Merged in #256; relevant PR contracts and public deployment pass.",
@@ -144,7 +144,7 @@
       "gate": "Returning neutral entry opens Toolbox and explicit Show/context/history journeys pass."
     },
     {
-      "name": "Stage 1b \u2014 Public Workbook withdrawal \u2014 Delivered",
+      "name": "Stage 1b — Public Workbook withdrawal — Delivered",
       "goal": "Remove public promotion and editor publication under the maintained plan.",
       "items": [
         "Merged in #257 and metadata follow-up #258; public readback verified.",
@@ -153,17 +153,17 @@
       "gate": "Staged and live former entry URLs return to Toolbox; no promoted/public editor remains."
     },
     {
-      "name": "Viewport delivery \u2014 Complete",
+      "name": "Viewport delivery — Complete",
       "goal": "Record delivered layout work independently from application consolidation.",
       "items": [
-        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
-        "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
+        "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
         "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit."
       ],
       "gate": "Release proof is recorded; physical/operator acceptance remains separate."
     },
     {
-      "name": "Remaining application consolidation \u2014 In progress",
+      "name": "Remaining application consolidation — In progress",
       "goal": "Follow the maintained spec; do not reopen settled app ownership.",
       "items": [
         "Eight standalone primary applications are published, isolated-live tested and navigable from the Rail through #312. Canonical specialist compatibility, connected workflows and physical/operator acceptance remain separate.",
@@ -180,11 +180,11 @@
       "gate": "Per-slice data compatibility, release proof and operator acceptance."
     },
     {
-      "name": "Application Rail and console snapshots \u2014 Delivered",
+      "name": "Application Rail and console snapshots — Delivered",
       "goal": "Recall all nine primary AV identities within AV Video's shared console while preserving standalone applications and independent data.",
       "items": [
         "Toolbox and the exact nine RAIL-1B console slots are followed by All apps and Customize; all nine published primary applications open their canonical routes and mapped apps appear once in All apps.",
-        "RAIL-2A uses a phone Apps launcher below 720px, compact rail at 720\u20131439px and labeled rail at 1440px+. Device-local pin, unpin, reorder, reset and corrupt-preference recovery are live.",
+        "RAIL-2A uses a phone Apps launcher below 720px, compact rail at 720–1439px and labeled rail at 1440px+. Device-local pin, unpin, reorder, reset and corrupt-preference recovery are live.",
         "PR #279, source deployment 37572814064 and AV destination deployment 37574460288 passed. Walter live acceptance covered 11 viewport fixtures; seven published Rail/AV assets matched 55bec1a byte-for-byte.",
         "Walter's isolated returning-client fixture kept one browser context from published adf1f1e through reviewed 55bec1a: AV Video data, UI-written Rail customization and typed context survived the worker update, the old cache was removed, all seven Rail/AV assets were cached and the updated app reopened offline.",
         "PR #312, source deployment 37893934453 and AV destination deployment 37895712977 passed at c77b0cd. Production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified; physical/operator acceptance remains open.",
@@ -194,7 +194,7 @@
       "gate": "Exact-head CI, repaired generated-output parity, both publications, production provenance, live console journeys and asset parity passed. Physical devices and operator acceptance remain separate."
     },
     {
-      "name": "Show Ops shared console \u2014 Delivered",
+      "name": "Show Ops shared console — Delivered",
       "goal": "Use the existing Show Ops records and guarded imports through the same configurable panel engine as AV Video.",
       "items": [
         "Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup remain available through the chooser and quick controls.",
@@ -204,7 +204,7 @@
       "gate": "Source, generated bundle parity, exact-head CI, both publications and isolated live browser behavior passed. Missing specialist capabilities and physical/operator acceptance remain separate."
     },
     {
-      "name": "Console workspace and recovery \u2014 Delivered",
+      "name": "Console workspace and recovery — Delivered",
       "goal": "Protect operator edits while making panel arrangements reusable.",
       "items": [
         "Shared console presentation with independent Video document ownership; explicit Save and unchanged recovery keys.",
@@ -215,7 +215,7 @@
       "gate": "PR #266 release verified separately from physical/operator acceptance."
     },
     {
-      "name": "Cameras and Playback \u2014 Delivered",
+      "name": "Cameras and Playback — Delivered",
       "goal": "Deliver ordered camera shots and playback cues in the independent Video console.",
       "items": [
         "Preserve every legacy field, status, duration string and original import; keep legacy pages unchanged.",
@@ -230,7 +230,9 @@
     "D6: Throwline tokens - keep specialist tokens (CLAUDE.md) or generate them from one authored token source?",
     "D7: fixes in other repos (fmp-suite, DeckForge, BPM Delay, Lansdowne, PlotForge) - do upstream now or defer?",
     "D8: record the audit outcome in the repo like docs/fmp-camera-simulator-audit-2026-09.md? (recommended)",
-    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?"
+    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?",
+    "WEBREVIEW-D1: Convert marketing/profile pages to viewport layouts (recommended), or explicitly allow their current scrolling presentation?",
+    "WEBREVIEW-D2: Approve the corrected PR 319/320/321 release only after layout/theme disposition and exact-head gates; retain orange tool actions with green navigation (recommended)."
   ],
   "files": [
     {
@@ -526,8 +528,16 @@
       "branch": "codex/shop-panels-20261011",
       "status": "Implemented and verified on the qualified runner; exact-head CI, publication and live verification pending",
       "scope": "Worklist, Item inspector, Plan/Import and Backup; unchanged pure logistics model, optional stored views, owned draft/layout recovery and independent explicit Save.",
-      "checks": ["Typecheck, eight existing model tests, ten native model tests and production build", "Preserved legacy quantity/import/recovery browser assertions", "Eight native browser groups: working panels, views, four imports, drafts/stale tabs, refused storage, two themes/nine viewports, offline and AV Video embedding", "AV registry/theme/worker/Rail/inventory checks"],
-      "limits": ["Physical touch, virtual keyboard, power interruption/process restart and operator rehearsal not tested", "Complete logistics/specialist parity and cross-tool synchronization not included"]
+      "checks": [
+        "Typecheck, eight existing model tests, ten native model tests and production build",
+        "Preserved legacy quantity/import/recovery browser assertions",
+        "Eight native browser groups: working panels, views, four imports, drafts/stale tabs, refused storage, two themes/nine viewports, offline and AV Video embedding",
+        "AV registry/theme/worker/Rail/inventory checks"
+      ],
+      "limits": [
+        "Physical touch, virtual keyboard, power interruption/process restart and operator rehearsal not tested",
+        "Complete logistics/specialist parity and cross-tool synchronization not included"
+      ]
     },
     "showControlNativePanelsRelease": {
       "checkedOn": "2026-10-11",
@@ -558,7 +568,10 @@
       },
       "initialCiFailures": {
         "head": "3975fedea498b4bf90810b3807e99fa4f737dcac",
-        "runs": ["https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857022", "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857100"],
+        "runs": [
+          "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857022",
+          "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857100"
+        ],
         "cause": "Stage 3D's separate OFFLINE_CACHE_VERSION constant still named the prior generation. The new registry and generated workspace pins were correct; the verifier correctly rejected their mismatch.",
         "repair": "Update only the separate Stage 3D readiness pin to the candidate registry generation. No projector behavior, calculation rule or verifier assertion is weakened. Replacement exact-head CI remains required."
       },
@@ -997,6 +1010,34 @@
         "Crew Time Log, breakout/timeline behavior, client-facing Show Report parity and other specialist functions remain separate.",
         "No physical device, venue operator or connected hardware acceptance is claimed."
       ]
+    },
+    "websiteReleaseReview": {
+      "checkedOn": "2026-10-12",
+      "sourceRevision": "a43bb26",
+      "baseMain": "0d08fc5",
+      "pullRequests": [
+        319,
+        320,
+        321
+      ],
+      "status": "Targeted corrections committed; owner layout decision and final release approval pending. No production merge or deployment.",
+      "corrections": [
+        "Preserve current Show Control, The Shop and Infrastructure consoles during stack integration",
+        "Correct domain preview branding, AV 404 metadata and themes, shared font loading and external navigation attributes",
+        "Replace stale Front Office concept with Beta application handoff",
+        "Compact phone Toolbox controls; correct one-page PDF email and malformed contact fragments"
+      ],
+      "checks": [
+        "40 staged browser views at 320, 375, 680 and 1440 pixels; 102 collected internal links resolved",
+        "Focused theme persistence, font load, normal-motion contact jumps and first visible tool checks on Dominic",
+        "Navigation dock suite passes; source and exact-head CI checks refreshed after main integration"
+      ],
+      "open": [
+        "WEBREVIEW-D1: marketing/profile pages retain page scrolling; choose viewport conversion (recommended) or explicitly approve a scoped exception",
+        "System marketing/profile pages lack a complete visible light/dark toggle; resolve with the layout treatment or explicitly scope an exception",
+        "WEBREVIEW-D2: Dave final approval of the complete stacked release; orange tool actions and green navigation recommended",
+        "Post-approval dependency-order merge, final integrated CI and publication/live verification remain required"
+      ]
     }
   },
   "historicalFindings": [
@@ -1058,22 +1099,22 @@
     {
       "id": "AVC-D1",
       "question": "D1 [unlocks fix PR]: no-scroll rule everywhere incl. ~35 worksheets, or only calculators, workspaces and the Suite?",
-      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
     },
     {
       "id": "AVC-D2",
       "question": "D2 [unlocks]: AV Workbook - withdrawal settled 10-02, dark lock gone; confirm it is simply excluded from mobile fixes?",
-      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
     },
     {
       "id": "AVC-D3",
       "question": "D3 [unlocks]: Throwline+LED already got the shell (#226); confirm, and pick next adopter: AV Video, Show Console or worksheets?",
-      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
     },
     {
       "id": "AVC-D5",
       "question": "D5: theme toggle for ~38 tools in shared nav, no new storage key - placement OK, and must every worksheet support both palettes?",
-      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
     }
   ],
   "historicalEvidence": [
