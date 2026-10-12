@@ -170,6 +170,10 @@ jobs:
         env:
           CHROME_CHANNEL: chrome
         run: |
+          npm run typecheck:infrastructure
+          npm run test:infrastructure
+          npm run build:infrastructure
+          npm run test:infrastructure-browser
           npm run typecheck:the-shop
           npm run test:the-shop
           npm run build:the-shop
@@ -205,8 +209,8 @@ jobs:
         run: |
           npm audit --audit-level=high
           python3 scripts/gen_sitemap.py
-          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control the-shop camera-sim sitemap.xml
-          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control the-shop camera-sim sitemap.xml)"
+          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control the-shop infrastructure camera-sim sitemap.xml
+          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control the-shop infrastructure camera-sim sitemap.xml)"
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |

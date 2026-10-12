@@ -9,6 +9,21 @@
 - Make the old AV Tool Suite index v2 a noindex archive outside the sitemap. Stop staging browser probes, unit tests, README/CHANGELOG notes and `node_modules/` files onto other domains. Give avbydave.com a styled 404 page that links the AV Toolbox and home.
 - Toolbox: explain the gap between listed and registered tools ("Showing 50 of 52 tools · 2 more open inside AV Video") and fix the duplicate banner landmark by making the AV bar a labelled region that holds the page heading.
 - Advance the AV offline cache generation.
+## 2026-10-12 — Infrastructure touch panel acceptance
+
+- Keep focused fields inside the existing bounded record panel with scroll padding, including the short-height layout. The unchanged full-containment and 44 px checks pass for all six panels in both themes at nine sizes.
+- Retain measured clipping diagnostics in the browser probe and correct Stage 3D's offline-readiness pin to the existing Infrastructure cache generation.
+- Duncan passes typecheck, sixteen model tests, build, 23 Rail/worker tests, 47 Throwline tests and all eight native browser groups, including independent embedded Save, recovery, stored views and offline reopen. CI, publication and live proof are tracked separately in PR #325; physical-device/operator acceptance is not inferred.
+
+## 2026-10-11 — Infrastructure native console candidate
+
+- Add six working panel types for Power, Network, Cable, Issues, Plan/Import and Backup using the existing model and shared console engine.
+- Preserve v1 plans, original legacy objects, arbitrary existing statuses, explicit Save, Web Lock/stale-tab guards and independent embedded operation; add optional stored views and console-local draft/layout recovery.
+- Add typed source, generated entry/assets, eleven compatibility tests and a native browser probe retaining the earlier stale-save/import/theme/containment scenarios.
+- Typecheck, five original plus eleven native model tests and production build passed. Correct the omitted Infrastructure draft notification and stale cache-version expectation after reproducing both failures; the full AV source gate and 23 Rail/worker checks now pass.
+- Tighten native probe targeting to distinguish record dropdowns from their named regions, and wait for the current Save to clear unsaved state instead of accepting a prior success message. Preserve the original failures and exact saved-value assertions.
+- At checkpoint `b098126`, five functional browser groups passed, but the light 1024×768 tablet field-containment check failed for Power's Issue / blocker control. This historical failure is retained; the October 12 entry records its bounded repair and subsequent acceptance.
+
 ## 2026-10-11 — The Shop working console panels
 
 - Convert the existing worklist, item inspector, plan/import and backup controls into four native panels on the shared AV console engine, standalone and inside AV Video.

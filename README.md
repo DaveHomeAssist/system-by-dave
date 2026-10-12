@@ -22,6 +22,8 @@ documenting the Notion skills, agents, widgets, and templates I build and use.
 
 ## Local development
 
+[Infrastructure](https://avbydave.com/infrastructure/) has a native-console candidate in `apps/infrastructure/`: Power, Network, Cable, Issues, Plan/Import and Backup share its existing model. Use `npm run typecheck:infrastructure`, `npm run test:infrastructure`, `npm run build:infrastructure` and `npm run test:infrastructure-browser`. The build preserves the standalone model and writes the committed entry/assets. See [the brief and compatibility contract](docs/infrastructure-app.md); source presence does not establish release or browser acceptance.
+
 No toolchain required. Any static file server works:
 
 ```bash

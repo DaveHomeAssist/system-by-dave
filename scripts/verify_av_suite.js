@@ -217,7 +217,7 @@ function assertRailRegistryContracts(registry) {
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
   if (!registry.offlineAssets().includes('./front-office/theme-init.js')) fail('Front Office theme initialization is missing from offline assets.');
   // Shop native JavaScript/CSS and its own draft/layout keys; no new tool entry.
-  if (registry.tools.length !== 52 || registry.baseAssets.length !== 133 || registry.offlineAssets().length !== 185 || storageKeyCount !== 75) {
+  if (registry.tools.length !== 52 || registry.baseAssets.length !== 135 || registry.offlineAssets().length !== 187 || storageKeyCount !== 77) {
     fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {
