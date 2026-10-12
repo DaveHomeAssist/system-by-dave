@@ -85,7 +85,9 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     './show-ops/assets/show-ops.js',
     './show-ops/assets/index.css',
     './the-shop/assets/the-shop.js',
-    './the-shop/assets/index.css'
+    './the-shop/assets/index.css',
+    './infrastructure/assets/infrastructure.js',
+    './infrastructure/assets/index.css'
   ];
   railAssets.forEach(asset => assert.ok(optional.includes(asset), `${asset} was not precached`));
   assert.equal(critical.some(asset => railAssets.includes(asset)), false);

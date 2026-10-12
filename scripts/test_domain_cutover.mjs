@@ -440,7 +440,8 @@ try {
     await page.locator('#backupFile').setInputFiles(backup);
     await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
     assert.deepEqual(await readValues(page), expected);
-    assert.equal(avStorageKeys.length, 75);
+    assert.equal(avStorageKeys.length, 77);
+    assert.ok(['sbd.infrastructure.draft.v1', 'sbd.infrastructure.layout.v1'].every(key => avStorageKeys.includes(key)), 'Infrastructure drafts and layout travel with its plan');
     assert.ok(['sbd.shop.draft.v1', 'sbd.shop.layout.v1'].every(key => avStorageKeys.includes(key)), 'Shop drafts and layout travel with its plan');
     assert.ok(avStorageKeys.includes('sbd.showControl.draft.v1'));
     assert.ok(avStorageKeys.includes('sbd.showControl.layout.v1'));

@@ -7,6 +7,8 @@ on:
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
       - 'apps/show-control/**'
+      - 'apps/infrastructure/**'
+      - 'infrastructure/**'
       - 'apps/the-shop/**'
       - 'the-shop/**'
       - 'scripts/probe_the_shop_console.mjs'
@@ -80,6 +82,12 @@ jobs:
           npm run test:show-control-browser
       - name: Shop panels and saved-plan compatibility
         run: |
+          npm run typecheck:infrastructure
+          npm run test:infrastructure
+          npm run build:infrastructure
+          git diff --exit-code -- infrastructure
+          test -z "$(git status --porcelain -- infrastructure)"
+          npm run test:infrastructure-browser
           npm run typecheck:the-shop
           npm run test:the-shop
           npm run build:the-shop

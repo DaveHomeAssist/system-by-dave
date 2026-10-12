@@ -12,7 +12,7 @@ The feature text and declared keys come from the registry. Export, print, and ke
 | **Show Ops** — Room readiness, crew calls, tasks and show handoff in one saved workspace. | `/show-ops/` | https://avbydave.com | sbd.showOps.document.v1, sbd.showOps.draft.v1, sbd.showOps.layout.v1 | Source signal | Not found | Not found | Named |
 | **Front Office** — Clients, venues and jobs from inquiry through signoff, with an independent local document. | `/front-office/` | https://avbydave.com | sbd.frontOffice.document.v1 | Source signal | Not found | Not found | Named |
 | **The Shop** — Configurable worklist, item inspector, plan/import and backup panels with source-preserving copies. | `/the-shop/` | https://avbydave.com | sbd.shop.v1, sbd.shop.draft.v1, sbd.shop.layout.v1 | Source signal | Not found | Not found | Named |
-| **Infrastructure** — Power, network and cable records with a shared issue queue. | `/infrastructure/` | https://avbydave.com | sbd.infrastructure.v1 | Source signal | Not found | Not found | Named |
+| **Infrastructure** — Working power, network, cable and issue panels with compatible imports and explicit Save. | `/infrastructure/` | https://avbydave.com | sbd.infrastructure.v1, sbd.infrastructure.draft.v1, sbd.infrastructure.layout.v1 | Source signal | Not found | Not found | Named |
 | **Lighting** — Fixture patch and focus workspace; PlotForge remains the full lighting-plot product. | `/av-lighting/` | https://avbydave.com | sbd.avLighting.v1 | Source signal | Not found | Not found | Named |
 | **Teleprompter** — Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view. | `/teleprompter.html` | https://avbydave.com | teleprompter.v1, teleprompter.script.v1, teleprompter.preferences.v1, teleprompter.savedScripts.v1, teleprompter.savedFormats.v1, teleprompter.pacePresets.v1, teleprompter.bookmarks.v1, teleprompter.customColors.v1 | Source signal | Not found | Source signal | Named |
 | **Show Timer** — Countdown, count up, clock mode, stage view, warning states, and keyboard control. | `/show-timer.html` | https://avbydave.com | showTimer.preferences.v1 | Source signal | Not found | Source signal | Named |
@@ -59,7 +59,7 @@ The feature text and declared keys come from the registry. Export, print, and ke
 | **LED Wall Calculator** — Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning. | `/led-wall-calculator.html` | https://avbydave.com | avCalculator.ledProfiles.v1; working state in avCalculator.v1 (declared under av-calculator) | Source signal | Not found | Not found | Named |
 | **OnTrack** — DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes. | `/ontrack.html` | https://avbydave.com | ontrack_v1 | Source signal | Not found | Source signal | Named |
 
-**Count:** 52 registry tools; 75 declared local-storage keys.
+**Count:** 52 registry tools; 77 declared local-storage keys.
 
 ## Unresolved mapping and proof
 
