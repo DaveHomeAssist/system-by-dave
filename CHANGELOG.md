@@ -9,6 +9,29 @@
 - Make the old AV Tool Suite index v2 a noindex archive outside the sitemap. Stop staging browser probes, unit tests, README/CHANGELOG notes and `node_modules/` files onto other domains. Give avbydave.com a styled 404 page that links the AV Toolbox and home.
 - Toolbox: explain the gap between listed and registered tools ("Showing 50 of 52 tools · 2 more open inside AV Video") and fix the duplicate banner landmark by making the AV bar a labelled region that holds the page heading.
 - Advance the AV offline cache generation.
+## 2026-10-11 — The Shop working console panels
+
+- Convert the existing worklist, item inspector, plan/import and backup controls into four native panels on the shared AV console engine, standalone and inside AV Video.
+- Keep Shop v1 plans, quantities, all four reviewed legacy imports, source originals and explicit Apply/Save. Compose optional stored views and separate guarded draft/device layout keys; panel operations never change readiness or another tool's records.
+- Preserve damaged-save bytes before replacement, stale-source/tab guards, unknown versus zero quantities, pending form edits across panel switches, shared themes and offline assets.
+- Add typed source/build, compatibility tests and isolated browser gates; physical touch, virtual keyboards, interruption/power loss and operator acceptance remain separate.
+- Trim surrounding whitespace only when item edits are applied, keeping empty blockers consistent between rows and summary while preserving original imports and untouched old saves. Add save/reload regression coverage, and align the domain-transfer inventory and deferred error-visibility probe with the native panels.
+
+## 2026-10-11 — Show Control working console panels
+
+- Reuse the existing console engine for On Deck, Cues, Notes, Call Log, Setup/Import and Backup, including configurable layouts, saved views, keyboard paths and touch sized controls.
+- Retain Show Control v1 saves, cue position, Hold, call events, source rows and safe CueForge provenance. Add optional stored views and separate guarded draft/device layout keys without silently saving or synchronizing another app.
+- Preserve preview/cancel, selected-list identity, stale-source and stale-tab guards, original-byte recovery and explicit Save/export. Calls remain human log entries; playback, timers and hardware outputs remain outside this slice.
+- Add typed source, model compatibility tests, generated asset checks and an isolated browser gate for standalone, embedded, responsive and offline behavior. Physical-device/operator and power-loss acceptance remain separate.
+- Align Stage 3D's offline-readiness cache pin with the new shared cache generation; preserve its specialist behavior and calculation boundaries.
+- Reconcile the embedded layout repair, retaining host theme changes and single-panel tablet sizing. Adapt the embedded regression to the native panel controls, and honor the deployment runner's installed Chrome channel without installing a fallback browser or weakening assertions.
+
+## 2026-10-11 — Show Control embedded layout
+
+- Budget the Run panel selector separately from the cue grid, contain long cue details, and keep calling controls reachable in resized console panels.
+- Remove repeated navigation only when Show Control is hosted in the console, and follow the host's shared theme selection.
+- Let a single tablet panel fill the console workspace while preserving stored desktop geometry and multiple-panel arrangements.
+- Add browser regression coverage for empty and long cues, six viewport sizes, calling actions, independent Save/Export and layout preservation; advance the AV offline cache generation.
 
 ## 2026-10-09 — Show Ops touch console
 

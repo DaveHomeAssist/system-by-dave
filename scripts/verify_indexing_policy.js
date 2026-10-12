@@ -66,9 +66,9 @@ const robots = read('robots.txt');
 // AV Audio adds one nonpublic source page under apps/av-audio/. The seven new
 // public application routes belong in the AV-origin sitemap through the registry,
 // so they must not increase the count of tracked routes outside all sitemaps.
-// Show Ops adds its nonpublic application source under apps/show-ops/.
-// The old AV Tool Suite index v2 became a noindex archive on 2026-10-09 (147).
-if (unlisted.length !== 147) fail(`Expected 147 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// Show Ops and Show Control add their nonpublic application source pages.
+// The Shop native source entry adds one non-published application template.
+if (unlisted.length !== 149) fail(`Expected 149 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   if (!sitemapRoutes.has(route)) {
@@ -91,6 +91,7 @@ unlisted.forEach((file) => {
   '/apps/av-audio/',
   '/apps/av-video/',
   '/apps/show-ops/',
+  '/apps/show-control/',
   '/apps/fmp-camera-sim/',
   '/camera-sim/',
   '/fmp-index/',

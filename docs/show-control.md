@@ -1,5 +1,75 @@
 # Show Control application brief
 
+## Native console panels — October 9 implementation slice
+
+**Authority and baseline:** Dave's accepted whole-toolset touch workspace direction;
+the [console rollout](av-console-rollout.md) and [shared contract](av-console.md).
+Original baseline `4740b934660e672634e1d009329555a365920076`; resumed October 11
+against `ab0e3f5324c216a19e94014f2a809f0562b508ca`, preserving the intervening
+unrelated publication. The published application
+snapshot and standalone route remain available; neither proves native panel parity.
+
+**Problem and flow:** A caller must see the next cue, rundown, operator notes and
+call history together. Open Show Control, select a cue, record Go/Hold/Resume,
+bring up Setup/Import or Backup, arrange panels and store a named view. Explicit
+Save retains the run and stored arrangements. Closing a panel never changes a cue,
+hold state or event. Calls remain human log entries, not output commands.
+
+**Owned smallest slice:** On Deck, Cues, Notes, Call Log, Setup/Import and Backup
+rendered with the existing shared engine. Typed application source belongs in
+`apps/show-control/`; the existing pure calling/import model remains authoritative.
+Own the generated entry/assets, adapter and recovery code, focused tests/probe,
+necessary build/offline/indexing integration and this application's records. No
+new dependency or shared-engine redesign. Show Ops and other application source
+stay untouched.
+
+**Data and compatibility:** Preserve `sbd.showControl.v1` and
+`system-by-dave.show-control.v1`, prior backups, cue position/Hold/events and exact
+safe source rows/provenance. Optional version-1 workspace data is validated at the
+console boundary and retained on Save/export/restore; unknown versions fail closed.
+Per-console draft and device-layout keys use the existing guarded recovery engine.
+Unstored layout never saves the run. Preserve unreadable-byte export before explicit
+replacement, stale-tab guards, import preview/cancel and read-only allowlisted show
+context. Do not silently merge source data or turn a calling snapshot into execution.
+
+**Acceptance:** Model and adapter fixtures cover old/new backups and rejected
+versions. Browser fixtures cover all six panels, Go/Hold/Resume, closed-panel state
+preservation, named views, Save/export/reload, offline reopen, exact selected-list
+imports, canceled replacement, stale tabs/previews, unavailable or refused storage,
+draft restore/discard and the existing damaged-save recovery flow. Check standalone
+and real AV Video embedding with independent Save, keyboard/focus, both themes,
+phone/tablet/desktop/short-height/ultrawide containment and reachable controls.
+Require generated parity, current-head CI/review, both publications and isolated
+live readback before technical delivery. Use synthetic disposable data only.
+
+**Exclusions and release limits:** No playback, native hardware triggers, timers,
+teleprompter controls, credentials, cross-application synchronization, Rail status
+promotion or rework of Show Ops. Physical touch/virtual keyboards/operator rehearsal
+and full process-restart/power-loss durability remain separate unverified gates;
+they do not block this independently testable source slice. Rollback is a reviewed
+source revert and normal publication, preserving saved data and exported backups;
+never clear user storage or silently downgrade an unknown workspace.
+
+### Embedded layout reconciliation — October 11
+
+The native conversion retains the shared single-panel tablet sizing from
+[PR #322](https://github.com/DaveHomeAssist/system-by-dave/pull/322), merged as
+`55581710363acf667e87f7323d6eaf469016ed4c`. It hides only duplicated host
+navigation, follows host theme changes, bounds long cue content and preserves
+44-pixel panel-switch targets after resizing. The iframe regression now exercises
+the six native panel controls instead of the retired fixed Run/Setup/Log DOM.
+It still checks the six original viewport cases, independent Save/export, exact
+source rows, Hold/Resume/Go, host themes, tablet width and stored desktop geometry.
+
+The first publication of #322 failed in
+[run 38178605158](https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38178605158)
+because that new probe ignored `CHROME_CHANNEL=chrome`. It now uses the established
+channel-selection convention, with the explicit `CHROME_PATH` fallback retained;
+no browser installation workaround is required. The pull-request Video browser
+gate uses the deployment Chrome channel so the same failure is caught before
+merge. Cloud-only Site Unavailable observations from the prior owner remain
+historical evidence, not proof of this candidate's live availability.
+
 ## Operator problem and smallest useful slice
 
 A caller needs a focused next-cue desk during a show, with a visible clock, hold state, cue notes and a recoverable run record. Show Control copies a reviewed Cue Sheet rundown into its own document, then records cue progress and a time-stamped event log. It also accepts its own JSON backup. The source Cue Sheet, Show Timer and Teleprompter remain independent and unchanged. Canonical CueForge (`DaveHomeAssist/cueforge` at inspected `faf8792`) is the maintained executable cue and Show Mode product; its schema-7 show files, output arm, Panic and native routing must not be recreated in this browser desk. Show Control links to the existing CueForge handoff and claims only human call tracking. PlotForge is a separate lighting-plot product and has no cue-control data contract here.
@@ -18,4 +88,20 @@ Acceptance: valid schema-7 files with distinct IDs copy the selected list exactl
 
 ## Dependencies, exclusions and acceptance
 
-The app is standalone static HTML, CSS and JavaScript, with no new runtime dependency. It opts into the existing `css/av-theme.css` tokens and `av-theme-mode.v1` preference, retaining a prior Show Control-only light/dark choice when no shared preference exists. Shared Rail metadata, navigation, sitemap, domain staging and offline assets are integration work owned by the Rail/release lane. Acceptance for this slice: load/save/reload, progress and hold flow, rejected import preserving saved bytes, Cue Sheet original preservation, keyboard access, light/dark toggle, page-scroll checks at 1440×900 and 375×812, and candidate browser screenshots. Hardware triggering, remote outputs, live timer synchronization and teleprompter editing are excluded.
+The console uses the repository's existing React/TypeScript and Vite tooling,
+with no new dependency. Source lives in `apps/show-control/`; `npm run
+build:show-control` generates the static entry and assets in `show-control/`
+without removing the existing pure model or legacy assets. It opts into the
+existing `css/av-theme.css` tokens and `av-theme-mode.v1` preference, retaining a
+prior Show Control-only light/dark choice when no shared preference exists.
+Shared Rail metadata, navigation, sitemap, domain staging and offline assets
+remain integration work owned by this release lane. Hardware triggering,
+remote outputs, live timer synchronization and teleprompter editing are excluded.
+
+Verification commands: `npm run typecheck:show-control`, `npm run
+test:show-control`, `npm run build:show-control`, and `npm run
+test:show-control-browser`. The browser gate uses synthetic isolated contexts,
+not an operator's profile. `SHOW_CONTROL_BASE` selects an already published
+origin, `SHOW_CONTROL_OUTPUT` selects a private evidence directory and
+`CHROME_CHANNEL` selects an installed browser channel. These checks do not
+establish physical device, virtual keyboard, power-loss or operator acceptance.

@@ -211,12 +211,13 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261009-avbydave-quick-fixes') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261011-shop-native') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
   if (!registry.offlineAssets().includes('./front-office/theme-init.js')) fail('Front Office theme initialization is missing from offline assets.');
-  if (registry.tools.length !== 52 || registry.baseAssets.length !== 129 || registry.offlineAssets().length !== 181 || storageKeyCount !== 71) {
+  // Shop native JavaScript/CSS and its own draft/layout keys; no new tool entry.
+  if (registry.tools.length !== 52 || registry.baseAssets.length !== 133 || registry.offlineAssets().length !== 185 || storageKeyCount !== 75) {
     fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {
