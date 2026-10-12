@@ -29,7 +29,7 @@
     {id:'show-ops',name:'Show Ops',href:'show-ops/',dept:'Rooms',phases:['advance','prep','loadin','show','closeout'],tag:'Application',desc:'Room readiness, crew calls, tasks and show handoff in one saved workspace.',storageKeys:[{key:'sbd.showOps.document.v1',label:'Show Ops document'},{key:'sbd.showOps.draft.v1',label:'Show Ops unsaved draft'},{key:'sbd.showOps.layout.v1',label:'Show Ops device layout'}]},
     {id:'front-office',name:'Front Office',href:'front-office/',dept:'Client',phases:['advance','prep','show','closeout'],tag:'Application',desc:'Clients, venues and jobs from inquiry through signoff, with an independent local document.',storageKeys:[{key:'sbd.frontOffice.document.v1',label:'Front Office document'}]},
     {id:'the-shop',name:'The Shop',href:'the-shop/',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Application',desc:'Configurable worklist, item inspector, plan/import and backup panels with source-preserving copies.',storageKeys:[{key:'sbd.shop.v1',label:'The Shop plan'},{key:'sbd.shop.draft.v1',label:'The Shop recovery draft'},{key:'sbd.shop.layout.v1',label:'The Shop device layout'}]},
-    {id:'infrastructure',name:'Infrastructure',href:'infrastructure/',dept:'Power',phases:['advance','prep','loadin'],tag:'Application',desc:'Power, network and cable records with a shared issue queue.',storageKeys:[{key:'sbd.infrastructure.v1',label:'Infrastructure plan'}]},
+    {id:'infrastructure',name:'Infrastructure',href:'infrastructure/',dept:'Power',phases:['advance','prep','loadin'],tag:'Application',desc:'Working power, network, cable and issue panels with compatible imports and explicit Save.',storageKeys:[{key:'sbd.infrastructure.v1',label:'Infrastructure plan'},{key:'sbd.infrastructure.draft.v1',label:'Infrastructure recovery draft'},{key:'sbd.infrastructure.layout.v1',label:'Infrastructure device layout'}]},
     {id:'av-lighting',name:'Lighting',href:'av-lighting/',dept:'Lighting',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Fixture patch and focus workspace; PlotForge remains the full lighting-plot product.',storageKeys:[{key:'sbd.avLighting.v1',label:'Lighting plan'}]},
     {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.pacePresets.v1',label:'Teleprompter saved paces'},{key:'teleprompter.bookmarks.v1',label:'Teleprompter bookmarks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
     {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
@@ -219,6 +219,8 @@
     './infrastructure/app.mjs',
     './infrastructure/model.mjs',
     './infrastructure/style.css',
+    './infrastructure/assets/infrastructure.js',
+    './infrastructure/assets/index.css',
     './av-lighting/index.html',
     './av-lighting/lighting.js',
     './av-lighting/lighting.css',
@@ -282,7 +284,7 @@
     {id:'show-ops',prototypeId:'showops',label:'Show Ops',availability:'available',toolId:'show-ops',panelGroup:'Common',draftKey:'sbd.showOps.draft.v1',layoutKey:'sbd.showOps.layout.v1',icon:['M3 5h18v16H3z','M3 10h18','M8 3v4','M16 3v4','M7 14h5','M10 17h7']},
     {id:'front-office',prototypeId:'office',label:'Front Office',availability:'available',toolId:'front-office',panelGroup:'Planning',icon:['M5 4h14v17H5z','M9 4V2h6v2','m9 13 2 2 4-4']},
     {id:'shop',prototypeId:'shop',label:'The Shop',availability:'available',toolId:'the-shop',panelGroup:'Planning',draftKey:'sbd.shop.draft.v1',layoutKey:'sbd.shop.layout.v1',icon:['M4 4h16v13H4z','M4 9h16','M10 12h4','M8 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z','M16 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z']},
-    {id:'infrastructure',prototypeId:'infra',label:'Infrastructure',availability:'available',toolId:'infrastructure',panelGroup:'Planning',icon:['M13 2 4 14h7l-1 8 9-12h-7z']},
+    {id:'infrastructure',prototypeId:'infra',label:'Infrastructure',availability:'available',toolId:'infrastructure',panelGroup:'Planning',draftKey:'sbd.infrastructure.draft.v1',layoutKey:'sbd.infrastructure.layout.v1',icon:['M13 2 4 14h7l-1 8 9-12h-7z']},
     {id:'lighting',prototypeId:'lighting',label:'Lighting',availability:'available',toolId:'av-lighting',panelGroup:'Utilities',icon:['M9 18h6','M10 21h4','M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z']},
     {id:'av-calculator',prototypeId:'calc',label:'AV Calculator',availability:'available',toolId:'av-calculator',panelGroup:'Utilities',icon:['M5 3h14v18H5z','M8 7h8v3H8z','M8 14h2','M11 14h2','M14 14h2','M8 17.5h2','M11 17.5h2','M14 17.5h2']}
   ];
