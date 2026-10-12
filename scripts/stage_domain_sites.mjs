@@ -412,17 +412,38 @@ function notFoundPage(site) {
   const title = escapeHtml(site.name);
   if (site.registry) {
     return `<!doctype html>
-<html lang="en">
+<html lang="en" data-av-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Page not found | ${title}</title>
 <meta name="description" content="That address is not part of ${title}.">
+<link rel="canonical" href="https://${escapeHtml(site.domain)}/404.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Page not found | ${title}">
+<meta property="og:description" content="That address is not part of ${title}. Open the AV Toolbox to find your tool.">
+<meta property="og:url" content="https://${escapeHtml(site.domain)}/404.html">
+<meta property="og:image" content="https://${escapeHtml(site.domain)}/img/av-by-dave-og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Page not found | ${title}">
+<meta name="twitter:description" content="That address is not part of ${title}. Open the AV Toolbox to find your tool.">
+<meta name="twitter:image" content="https://${escapeHtml(site.domain)}/img/av-by-dave-og.png">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0a0d14">
+<meta name="theme-color" content="#0a0d14" id="altThemeColor">
+<script src="/js/av-landing-theme.js"></script>
+<script src="/js/av-landing-alt.js" defer></script>
 <link rel="icon" href="/svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
-<style>${AV_NOT_FOUND_STYLE}</style>
+<style>${AV_NOT_FOUND_STYLE}
+html[data-av-theme="light"]{color-scheme:light}
+html[data-av-theme="light"] body{background:#f4f6f8;color:#141a21}
+html[data-av-theme="light"] main{background:#fff;border-color:#d7dde3}
+html[data-av-theme="light"] p{color:#46515c}
+html[data-av-theme="light"] .code{color:#17714a}
+html[data-av-theme="light"] .btn{background:#fff;color:#141a21;border-color:#b9c2cb}
+html[data-av-theme="light"] .btn.primary{background:#141a21;color:#fff}
+button.btn{font:inherit;cursor:pointer;margin-top:16px}
+</style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to page content</a>
@@ -434,6 +455,7 @@ function notFoundPage(site) {
 <a class="btn primary" href="/av-suite.html?entry=toolbox">Open the AV Toolbox</a>
 <a class="btn" href="${site.home}">${title} home</a>
 </div>
+<button class="btn" id="themeToggle" type="button" aria-label="Use light mode" aria-pressed="true" hidden>Light mode</button>
 </main>
 </body>
 </html>
