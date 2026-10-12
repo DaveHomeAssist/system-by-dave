@@ -45,7 +45,8 @@
   // URL fragment, leaving first-time visitors at the hero (or part-way down).
   // Once layout has settled, land on the fragment target instantly.
   function landOnHash() {
-    var id = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : "";
+    var id = window.location.hash.slice(1);
+    try { id = decodeURIComponent(id); } catch (_) { return; }
     var target = id ? document.getElementById(id) : null;
     if (!target) { return; }
     var root = document.documentElement;
