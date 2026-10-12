@@ -343,7 +343,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261011-shop-native',
+    version:'v20261012-toolbox-review',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
