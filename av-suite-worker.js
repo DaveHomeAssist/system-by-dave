@@ -8,7 +8,7 @@
    cached application code. */
 importScripts('./js/sbd-registry.js');
 
-// System by Dave walkthrough fixes: AV by Dave tool titles and brand text, Show Timer home link.
+// Website release review: v20261012-website-review.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();

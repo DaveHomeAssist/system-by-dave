@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-12 — Stacked website release review
+
+- Reconcile landing, Toolbox and walkthrough changes with current main, preserving the native Show Control and The Shop applications and their source templates.
+- Restore System by Dave preview artwork on its homepage and error page; complete generated AV 404 metadata and add a working saved theme toggle.
+- Load DM Sans in the shared AV palette and apply the external-link relationship policy to console navigation. Keep the previously approved Stage Slate default and orange in-tool actions.
+- Replace the stale Front Office roadmap panel with an honest Beta handoff to the existing application. Compact phone Toolbox summary/filter controls so the first tool is visible.
+- Correct the one-page AV resume PDF email without changing its other content or layout; ignore malformed profile fragments safely.
+- Advance the offline generation. Marketing/profile viewport layout and final owner release approval remain open.
+
 ## 2026-10-09 — System by Dave walkthrough fixes
 
 - Homepage: keep the three products as the focus. Remove the "Hire Dave" hero button and the fourth "Hire Dave" route card; the profile stays reachable as a quieter "About Dave" card link and footer link.
