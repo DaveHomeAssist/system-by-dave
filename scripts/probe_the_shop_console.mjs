@@ -90,6 +90,27 @@ try {
   await page.locator('#phaseFilter').selectOption('all'); await page.locator('#search').fill('');
   pass('working panel edits, pending form preservation, explicit Apply/Save, unknown versus zero, filters and independent blocker/status');
 
+  const whitespace = (await fresh()).page; await seed(whitespace); await whitespace.locator('.row').first().click();
+  await whitespace.getByLabel('Item name', { exact: true }).fill('  Camera kit 1  ');
+  for (const name of ['caseId', 'department', 'owner', 'location', 'destination', 'blocker', 'notes']) await whitespace.locator(`[name="${name}"]`).fill('   ');
+  await button(whitespace, 'Apply changes').click(); await quick(whitespace, 'Worklist');
+  assert.equal(await whitespace.locator('.shop-blocker').count(), 0, 'Whitespace-only blockers must not render a warning');
+  assert.match(await whitespace.locator('.shop-summary').textContent(), /0 held \/ blocked/);
+  await save(whitespace); const normalized = JSON.parse(await read(whitespace)).items[0];
+  assert.equal(normalized.title, 'Camera kit 1');
+  for (const key of ['caseId', 'department', 'owner', 'location', 'destination', 'blocker', 'notes']) assert.equal(normalized[key], '', `${key} saves empty, not whitespace`);
+  assert.equal(normalized.status, 'ready'); assert.equal(normalized.requestedQty, 3); assert.equal(normalized.packedQty, null);
+  assert.deepEqual(normalized.original, fixture.items[0].original);
+  await whitespace.reload(); await quick(whitespace, 'Worklist');
+  assert.equal(await whitespace.locator('.shop-blocker').count(), 0); assert.match(await whitespace.locator('.shop-summary').textContent(), /0 held \/ blocked/);
+  await whitespace.locator('.row').first().click(); await whitespace.locator('[name="status"]').selectOption('hold'); await button(whitespace, 'Apply changes').click();
+  await quick(whitespace, 'Worklist'); assert.equal(await whitespace.locator('.shop-blocker').count(), 0); assert.match(await whitespace.locator('.shop-summary').textContent(), /1 held \/ blocked/);
+  const oldWhitespace = structuredClone(fixture); oldWhitespace.items[0].blocker = '   ';
+  await seed(whitespace, oldWhitespace); await quick(whitespace, 'Worklist');
+  assert.equal(await whitespace.locator('.shop-blocker').count(), 0); assert.match(await whitespace.locator('.shop-summary').textContent(), /0 held \/ blocked/);
+  assert.equal(JSON.parse(await read(whitespace)).items[0].blocker, '   ', 'Opening an old plan must not rewrite its saved values');
+  pass('spaces-only edited fields save empty, blocker warnings agree with summary, old saved bytes and source originals stay unchanged');
+
   await button(page, 'Worklist options').click(); await page.getByRole('menuitem', { name: 'Close panel', exact: true }).click(); assert.equal(await panel(page, 'worklist').count(), 0);
   assert.deepEqual(JSON.parse(await read(page)), saved); await quick(page, 'Worklist');
   await button(page, 'Maximize Worklist').click(); assert.equal(await page.locator('.console-panel').count(), 1); await button(page, 'Restore Worklist').click();

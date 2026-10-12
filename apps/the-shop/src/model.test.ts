@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { KEY, SOURCES, emptyPlan, stageLegacy, type SourceKind } from '../../../the-shop/model.mjs';
-import { DEFAULT_VIEWS, DRAFT_KEY, filterItems, loadPlan, parsePlan, quantityLabel, retainWorkspace, savePlan } from './model';
+import { DEFAULT_VIEWS, DRAFT_KEY, filterItems, loadPlan, normalizeItemEdit, parsePlan, quantityLabel, retainWorkspace, savePlan } from './model';
 import { createDraftSession, draftSnapshot } from '../../shared/av-console/drafts';
 
 function storage() {
@@ -10,6 +10,24 @@ function storage() {
 const fixture = () => ({ ...emptyPlan(), items: stageLegacy('gear-prep', { schema: SOURCES['gear-prep'].schema, items: [{ id: 'gear1', item: 'Camera kit', qty: '3', owner: 'Video', status: 'loaded', custom: { keep: true } }] }), workspace: { version: 1 as const, views: structuredClone(DEFAULT_VIEWS) } });
 
 describe('Shop native workspace and persistence', () => {
+  it('trims applied text while preserving inner spacing, source originals, counts and workspace', () => {
+    const plan = fixture(); const item = { ...plan.items[0], title: '  Camera kit  ', caseId: ' CAM  1 ', department: ' Video ', owner: ' Lead  operator ', location: '  Dock A ', destination: ' Stage ', blocker: ' Check batteries ', notes: '  First line\n  Indented second line  ', packedQty: 0 };
+    const before = structuredClone(item); const next = normalizeItemEdit(item);
+    expect(next).toMatchObject({ title: 'Camera kit', caseId: 'CAM  1', department: 'Video', owner: 'Lead  operator', location: 'Dock A', destination: 'Stage', blocker: 'Check batteries', notes: 'First line\n  Indented second line', requestedQty: 3, packedQty: 0, status: 'ready' });
+    expect(next.original).toEqual(item.original); expect(next.source).toEqual(item.source); expect(item).toEqual(before);
+    const store = storage(); savePlan(store, { ...plan, items: [next] }, null);
+    expect(loadPlan(store).plan).toEqual({ ...plan, items: [next] });
+  });
+  it('saves whitespace-only edited fields as empty without rewriting an old plan on read', () => {
+    const plan = fixture(); Object.assign(plan.items[0], { caseId: ' ', department: '\t', owner: '  ', location: '\n ', destination: ' ', notes: '\n\t ', blocker: '   ' });
+    const store = storage(); const oldBytes = JSON.stringify(plan); store.setItem(KEY, oldBytes);
+    expect(loadPlan(store).plan.items[0].blocker).toBe('   '); expect(store.getItem(KEY)).toBe(oldBytes);
+    const next = normalizeItemEdit(plan.items[0]);
+    for (const field of ['caseId', 'department', 'owner', 'location', 'destination', 'notes', 'blocker'] as const) expect(next[field]).toBe('');
+    savePlan(store, { ...plan, items: [next] }, oldBytes);
+    expect(loadPlan(store).plan.items[0]).toEqual(next); expect(next.original).toEqual(plan.items[0].original);
+    expect(next).toMatchObject({ status: 'ready', requestedQty: 3, packedQty: null });
+  });
   it('opens old v1 backups without fabricating quantities or workspace', () => {
     const old = { ...emptyPlan(), items: [{ id: 'old', title: 'Rack', phase: 'pack', status: 'ready' }] };
     const next = parsePlan(old); expect(next.workspace).toBeUndefined(); expect(next.items[0]).toMatchObject({ requestedQty: null, packedQty: null });

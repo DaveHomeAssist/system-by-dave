@@ -6,7 +6,7 @@
   ],
   "head": "7ca404bc2730b85ab3e8b730d504a2c099057ebf",
   "status": "amber",
-  "statusReason": "Show Control's six native panels are merged in #323, published at 7ca404b and verified live. The next accepted slice converts The Shop into Worklist, Item inspector, Plan/Import and Backup on the same engine. Candidate source preserves Shop v1 data and reviewed imports; exact-head CI, publication and live gates remain pending. Physical/operator and broader toolset parity remain separate.",
+  "statusReason": "Show Control's six native panels are merged in #323, published at 7ca404b and verified live. The Shop's four native working panels are in PR #324. Its spaces-only blocker review finding is being corrected at the explicit edit boundary with save/reload coverage; the exact domain inventory and deferred error-visibility checks are also aligned. Review closure, exact-head CI, publication and live gates remain pending. Physical/operator and broader toolset parity remain separate.",
   "lastActivity": "2026-10-11",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -36,7 +36,7 @@
     "doneWhen": "Four functional Shop panels pass compatibility, browser, exact-head CI, publication and live gates. Physical/operator acceptance stays separately open.",
     "effort": "M",
     "owner": "Shop native console lane",
-    "blockedBy": "No product choice or ownership block. Complete current candidate release gates; do not reinstate the historical reassessment or usage pause."
+    "blockedBy": "No product choice or ownership block. Verify the bounded PR #324 review correction, resolve its thread with evidence and complete current-head release gates. Preserve original review/probe/indexing failures; do not reinstate the historical reassessment or usage pause."
   },
   "findings": [
     {

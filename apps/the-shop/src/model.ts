@@ -29,6 +29,10 @@ export function parsePlan(value: unknown): Plan {
 export function retainWorkspace(current: Plan, next: ShopPlan): Plan {
   return current.workspace ? { ...next, workspace: current.workspace } : next;
 }
+// Normalize only an explicitly applied edit, never saved imports or retained originals.
+export function normalizeItemEdit(item: ShopItem): ShopItem {
+  return { ...item, title: item.title.trim(), caseId: item.caseId.trim(), department: item.department.trim(), owner: item.owner.trim(), location: item.location.trim(), destination: item.destination.trim(), notes: item.notes.trim(), blocker: item.blocker.trim() };
+}
 export function loadPlan(storage: Pick<Storage, 'getItem'>) {
   let raw: string | null = null;
   try { raw = storage.getItem(KEY); return { raw, plan: raw === null ? emptyPlan() : parsePlan(JSON.parse(raw)), error: '' }; }

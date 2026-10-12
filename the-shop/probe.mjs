@@ -57,6 +57,7 @@ try{
     assert.match(await page.locator('#countHelp').innerText(),/cannot exceed requested/);
     assert.equal(await page.locator('#countHelp').getAttribute('role'),'alert');
     assert.equal(await page.locator('[name=packedQty]').getAttribute('aria-invalid'),'true');
+    await page.waitForFunction(()=>{const el=document.getElementById('countHelp'),error=el.getBoundingClientRect(),form=el.closest('form').getBoundingClientRect();return error.top>=form.top&&error.bottom<=form.bottom&&error.top>=0&&error.bottom<=innerHeight});
     const errorInView=await page.locator('#countHelp').evaluate(el=>{const error=el.getBoundingClientRect(),form=el.closest('form').getBoundingClientRect();return error.top>=form.top&&error.bottom<=form.bottom&&error.top>=0&&error.bottom<=innerHeight});
     assert.equal(errorInView,true);
     await quick(page,'Worklist');
