@@ -175,6 +175,15 @@ jobs:
           npm run build:front-office
           npm run test:front-office-browser
 
+      - name: Verify Lighting panels
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:av-lighting
+          npm run test:av-lighting
+          npm run build:av-lighting
+          npm run test:av-lighting-browser
+
       - name: Verify Infrastructure and Shop panels
         env:
           CHROME_CHANNEL: chrome
@@ -218,8 +227,8 @@ jobs:
         run: |
           npm audit --audit-level=high
           python3 scripts/gen_sitemap.py
-          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control front-office the-shop infrastructure camera-sim sitemap.xml
-          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control front-office the-shop infrastructure camera-sim sitemap.xml)"
+          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control front-office av-lighting the-shop infrastructure camera-sim sitemap.xml
+          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control front-office av-lighting the-shop infrastructure camera-sim sitemap.xml)"
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |
