@@ -347,7 +347,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261012-front-office-native',
+    version:'v20261012-front-office-export-guard',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

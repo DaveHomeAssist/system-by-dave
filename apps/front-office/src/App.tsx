@@ -116,6 +116,11 @@ export function App() {
   }
   function exportPlan(original = false) {
     if (!original && !noPending()) return;
+    if (blocked && !recoveryAuthorized && baseline.current === null) {
+      setMessage('Export unavailable: saved records could not be read. No original backup was created. Restore browser storage access and reload.');
+      if (compact && !controls.current?.open) controls.current?.showModal();
+      return;
+    }
     const preserve = original || (blocked && !recoveryAuthorized);
     download(preserve ? 'front-office-unreadable-original.json' : 'front-office.json', preserve && baseline.current !== null ? baseline.current : JSON.stringify(plan, null, 2));
     setMessage('JSON downloaded. Backups may contain private contact and original Show Advance data.');

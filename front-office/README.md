@@ -20,6 +20,8 @@ Existing v1 backups stay valid without migration. Optional `workspace: {version:
 
 Form input survives panel switches, close/reopen and job selection while the tab stays open. Add or Update applies it to working records; Save/export/replacement refuses unfinished forms so input is not silently omitted. Drafts protect applied records, not unapplied form text; leaving with either warns. Backup-file import retains the existing 2 MB cap, while valid existing browser documents are not retroactively capped. Show Advance sources retain their existing 1 MB cap.
 
+If storage cannot be read at startup, no original bytes are available to export. Export explicitly refuses that case instead of labelling an empty document as an original backup. A write failure after a successful read still leaves working records exportable.
+
 ## Checks
 
 - `npm run typecheck:front-office`
