@@ -208,6 +208,10 @@ test('draft reads validate the direct console key without writing or trusting th
   assert.equal(dialogs.readDraftState('console:shop', { registry, storage }).status, 'present');
   storage.data['sbd.shop.draft.v1'] = draftEnvelope('the-shop');
   assert.equal(dialogs.readDraftState('console:shop', { registry, storage }).status, 'unavailable');
+  storage.data['sbd.infrastructure.draft.v1'] = draftEnvelope('infrastructure');
+  assert.equal(dialogs.readDraftState('console:infrastructure', { registry, storage }).status, 'present');
+  storage.data['sbd.infrastructure.draft.v1'] = draftEnvelope('shop');
+  assert.equal(dialogs.readDraftState('console:infrastructure', { registry, storage }).status, 'unavailable');
   assert.deepEqual(storage.setCalls, []);
 
   storage.data['sbd.avVideo.draft.v1'] = draftEnvelope('audio');

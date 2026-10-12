@@ -33,7 +33,7 @@ feature parity or authorization to remove any route.
 | Show Ops | Show Ops, Room Check, Crew Call, Crew Time Log, Breakout Room Matrix, Show Board, Show Task Board, Show Handoff, Show Report | Six native panels delivered in PR #315: Rooms, Crew, Tasks, Setup, Handoff and Backup retain reviewed source copies. Timekeeping, breakout/timeline behavior and report workflows remain additional capabilities, not covered by a source snapshot. |
 | Front Office | Front Office, Show Advance, Site Survey, Change Order, Client Sign Off | Reuse client/venue/job model and reviewed advance import. Convert current editor into panels, then implement missing survey, approval, scope and signoff behavior. |
 | The Shop | The Shop, Gear Prep, Gear Reference, Truck Pack Plan, Load In Plan, Strike Plan | Four native working panels in the October 11 candidate: Worklist, Item inspector, Plan/Import and Backup. Preserve phase worklist, quantity guards and reviewed source copies. Release gates remain separate; complete truck/order/reference and phase parity is additional work. |
-| Infrastructure | Infrastructure, Power Plan, Network Plan, Cable Plan | Reuse independent records and issue model; replace fixed navigation with discipline panels and issue context. Preserve advisory versus safety boundaries. |
+| Infrastructure | Infrastructure, Power Plan, Network Plan, Cable Plan | October 11 native candidate exposes Power, Network, Cable, Issues, Plan/Import and Backup using the existing model. Typecheck, sixteen model tests and build pass; Rail observer expected-list regression blocks further acceptance. No browser/publication or safety-approval claim. |
 | Lighting | Lighting, Lighting Patch | Reuse fixture model, patch/focus controls and safe PlotForge manifest intake. Convert editor to functional panels; PlotForge remains the separate full plot product. |
 | AV Calculator | AV Calculator | Six calculations and field sets exist in the standalone calculator; shared console panel adoption remains unimplemented. |
 | Specialists outside the nine families | StagePlotter, PixelForge, OnTrack | Preserve their distinct graphics/layout/music workflows. Panel adoption needs its own capability assessment; do not force these into generic records. |
@@ -52,8 +52,9 @@ Each application still owns its records, selection, validation and explicit Save
 - At the original source baseline only AV Video and Audio imported the shared
   workspace. Show Ops followed in PR #315; the October 11 Show Control candidate
   adds six native calling panels, published in PR #323. The next Shop candidate
-  adds four native panels. Front Office, Infrastructure and Lighting still use
-  fixed views; the calculator remains a specialist layout.
+  adds four native panels. Infrastructure now has a six-panel candidate awaiting
+  acceptance; Front Office and Lighting still use fixed views, and the calculator
+  remains a specialist layout.
 - Exact raw import retention protects source evidence but does not prove that all
   original fields and operator actions are usable in the receiving console.
 - Source, automated browser, CI, deployment and physical touch acceptance are

@@ -68,7 +68,8 @@ const robots = read('robots.txt');
 // so they must not increase the count of tracked routes outside all sitemaps.
 // Show Ops and Show Control add their nonpublic application source pages.
 // The Shop native source entry adds one non-published application template.
-if (unlisted.length !== 148) fail(`Expected 148 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// Infrastructure adds its non-published native source template.
+if (unlisted.length !== 149) fail(`Expected 149 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   if (!sitemapRoutes.has(route)) {

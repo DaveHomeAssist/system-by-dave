@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-11 — Infrastructure native console candidate
+
+- Add six working panel types for Power, Network, Cable, Issues, Plan/Import and Backup using the existing model and shared console engine.
+- Preserve v1 plans, original legacy objects, arbitrary existing statuses, explicit Save, Web Lock/stale-tab guards and independent embedded operation; add optional stored views and console-local draft/layout recovery.
+- Add typed source, generated entry/assets, eleven compatibility tests and a native browser probe retaining the earlier stale-save/import/theme/containment scenarios.
+- Typecheck, five original plus eleven native model tests and production build passed. Release is held on the Rail observer regression's expected console list, which still omits Infrastructure. Browser, CI, publication and physical/operator acceptance are not claimed.
+
 ## 2026-10-11 — The Shop working console panels
 
 - Convert the existing worklist, item inspector, plan/import and backup controls into four native panels on the shared AV console engine, standalone and inside AV Video.
