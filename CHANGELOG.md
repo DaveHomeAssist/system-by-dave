@@ -5,6 +5,7 @@
 - Keep focused fields inside the existing bounded record panel with scroll padding, including the short-height layout. The unchanged full-containment and 44 px checks pass for all six panels in both themes at nine sizes.
 - Retain measured clipping diagnostics in the browser probe and correct Stage 3D's offline-readiness pin to the existing Infrastructure cache generation.
 - Duncan passes typecheck, sixteen model tests, build, 23 Rail/worker tests, 47 Throwline tests and all eight native browser groups, including independent embedded Save, recovery, stored views and offline reopen. CI, publication and live proof are tracked separately in PR #325; physical-device/operator acceptance is not inferred.
+- PR #325 is merged and published at `0d08fc5`; nine exact-head checks, both publications, eight live browser groups and eight-asset parity passed. Preserve the first live-manifest failure as a verification-list correction, not an application repair. Refresh the rollout/projection and scope Front Office's next native panel conversion without claiming it is implemented.
 
 ## 2026-10-11 — Infrastructure native console candidate
 

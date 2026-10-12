@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "b0981261dd01be7a327fb8e8091ff115c5c8a91d",
+  "head": "0d08fc5270a1e13c24cacb8f158dc2091e90fddc",
   "status": "amber",
-  "statusReason": "The clarified target is functional touch panels across the toolset, not catalogue links. Show Control #323 and The Shop #324 are delivered. Infrastructure PR325 now passes Duncan typecheck, sixteen model tests, build, 23 Rail/worker tests, 47 Throwline tests and all eight browser groups, including nine-size/two-theme reachability, recovery, offline and AV Video embedding. The measured tablet clipping and stale Stage 3D cache pin are repaired; exact-head CI, publication and live checks remain release gates. Whole-toolset and physical/operator acceptance remain open.",
+  "statusReason": "The target remains functional touch panels across the toolset, not catalogue links. Infrastructure #325 is merged, published and verified live at 0d08fc5 after nine exact-head checks, both publications, eight live browser groups and eight-asset parity. Show Control #323 and The Shop #324 are also delivered. Front Office, Lighting and Calculator still need native working layouts; deeper legacy/specialist parity and physical/operator acceptance remain open.",
   "lastActivity": "2026-10-12",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -28,15 +28,16 @@
     "Show Ops' selected Crew Call v1 one-way copy (#310) is published at be0f4f2. Walter passed isolated live saved/file preview, cancellation, unsaved copy, explicit Save/reload, export/restore, stale-target and malformed-file guards, theme checks and six viewport sizes; nine published assets matched source byte-for-byte. Copied crew start Called without inferring attendance, while original source bytes, statuses and notes are retained. Show Ops remains a Planned Rail slot.",
     "All nine published primary AV applications are navigable from the Rail (#312) at c77b0cd. Source deployment 37893934453 and AV destination deployment 37895712977 passed; production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified. Physical/operator and connected-workflow acceptance remain separate.",
     "In-console application snapshots (#314, publication repairs #317/#316) are published at 9c370be. All eight non-Video Rail applications open within AV Video as selectable, resizable and reconfigurable panels; stored arrangements, Change/Close state, focus, standalone routes and independent app data passed isolated live production checks on Walter.",
-    "Show Ops shared touch console (#315) is published through the combined 9c370be release. Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup use the shared panel engine with explicit Save, stored views, draft/layout recovery and exact source preservation."
+    "Show Ops shared touch console (#315) is published through the combined 9c370be release. Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup use the shared panel engine with explicit Save, stored views, draft/layout recovery and exact source preservation.",
+    "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Publish the verified Infrastructure panels, then convert remaining fixed consoles",
-    "why": "The existing record scroller needed a focus/reveal inset: the Power Issue field extended 1.203125 px beyond its tablet clip. Matching scroll padding resolves it without weakening assertions or changing fields, data or the shared engine.",
-    "doneWhen": "PR325 passes exact-head CI/review, source and AV destination publication, and isolated live checks. Then Front Office, Lighting and Calculator receive working panels while existing capabilities and saved data remain intact.",
+    "title": "Convert Front Office into native working panels",
+    "why": "Its existing client, venue and job editor still uses fixed views. Operators need the same configurable working workspace as AV Video, while retaining current records and reviewed Show Advance imports.",
+    "doneWhen": "Jobs, Clients, Venues, Job updates, Advance import and Backup work as shared-engine panels, standalone and embedded, preserving explicit Save, old backups and exact imported sources. Scoped model/browser/recovery/viewport/offline checks, exact-head CI, both publications and isolated live acceptance pass. Physical/operator acceptance stays separate.",
     "effort": "M",
-    "owner": "Infrastructure native console lane",
-    "blockedBy": "No product decision blocks Infrastructure release. Required CI/publication/live gates must pass; physical devices and operators remain separate acceptance. Historical failed checkpoints are retained."
+    "owner": "Front Office native console lane",
+    "blockedBy": "No unresolved product decision blocks this bounded conversion. Follow the existing Front Office brief; Lighting, Calculator, deeper specialist parity and physical/operator acceptance remain later work."
   },
   "findings": [
     {
@@ -479,8 +480,8 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Finish PR325 from its verified current head through exact-head CI, review, merge, source and AV publication and isolated live acceptance. Preserve the measured tablet regression, unchanged reachability assertions, v1 plans, imports, original data and independent Save. Continue the accepted AV Video interaction model into the remaining fixed consoles using the existing engine and models. Do not rebuild delivered consoles, delete legacy routes or equate snapshots and launch links with full capability parity.",
-  "confidence": "High for the existing Show Control/Shop releases and current Infrastructure source and eight-group remote browser acceptance. Exact-head publication/live and physical/operator acceptance remain separately unverified.",
+  "kickoffPrompt": "Implement the native touch-panel slice in docs/front-office-brief.md using the existing Front Office model and shared AV console engine. Preserve clients, venues, jobs, exact Show Advance source copies, explicit identity binding, explicit Save and independent data ownership. Verify standalone and AV Video embedded workflows, recovery, both themes, required viewport sizes and offline reopening, then complete normal exact-head release and isolated live acceptance. Do not rebuild delivered consoles, delete legacy routes or equate snapshots and launch links with full capability parity. Work serially with a qualified remote runner unless Dave separately approves delegation.",
+  "confidence": "High for the bounded Infrastructure source, nine exact-head checks, both publications, eight-group live browser acceptance and eight-asset parity. Whole-toolset, physical/operator and actual process/power interruption acceptance remain unverified.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
@@ -489,6 +490,20 @@
   ],
   "short": "AV Suite",
   "evidence": {
+    "infrastructureNativePanelsRelease": {
+      "checkedOn": "2026-10-12",
+      "sourceRevision": "0d08fc5270a1e13c24cacb8f158dc2091e90fddc",
+      "finalHead": "e263b985f53cf0abf1cecb2631746a0334160015",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/325",
+      "sourcePublication": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38279336293",
+      "destinationPublication": "https://github.com/DaveHomeAssist/avbydave/actions/runs/38282101734",
+      "destinationRevision": "19e1af3faf6abf76bbb135a731a595b74f5ad0d7",
+      "artifactSha256": "56d10fb0ea360c924802d8ffb7968070deba58117e998ef3b19566a30a5dd9b3",
+      "status": "Merged, published and verified live; supersedes the candidate record below",
+      "checks": "Sixteen model tests, 23 Rail/worker tests, 47 Throwline tests, typecheck/build, nine exact-head CI checks, eight isolated live browser groups and eight-asset parity passed. Six panels have reachable 44px controls in both themes at nine viewport sizes; independent embedded Save, retained originals, named views, recovery and offline reopening passed.",
+      "retainedFailures": "Earlier observer/cache/harness/tablet failures remain historical. The first production parity attempt incorrectly listed two legacy workspace paths not loaded by these native entries. The manifest was corrected to their actual Rail dependencies; no runtime or browser assertion changed.",
+      "limits": "Physical touch, virtual keyboard, operator rehearsal and actual process/power interruption remain untested. This is not complete legacy or specialist parity."
+    },
     "infrastructureNativePanelsCandidate": {
       "checkedOn": "2026-10-12",
       "sourceBase": "72c08720208818484c707073a24d92d4aa792df2",
