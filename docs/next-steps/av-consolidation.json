@@ -232,8 +232,7 @@
     "D7: fixes in other repos (fmp-suite, DeckForge, BPM Delay, Lansdowne, PlotForge) - do upstream now or defer?",
     "D8: record the audit outcome in the repo like docs/fmp-camera-simulator-audit-2026-09.md? (recommended)",
     "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?",
-    "WEBREVIEW-D1: Convert marketing/profile pages to viewport layouts (recommended), or explicitly allow their current scrolling presentation?",
-    "WEBREVIEW-D2: Approve the corrected PR 319/320/321 release only after layout/theme disposition and exact-head gates; retain orange tool actions with green navigation (recommended)."
+    "WEBREVIEW-D2: Approve the corrected PR 319/320/321 release only after exact-head gates and Dave’s final review; retain orange tool actions with green navigation (recommended)."
   ],
   "files": [
     {
@@ -1028,30 +1027,34 @@
     },
     "websiteReleaseReview": {
       "checkedOn": "2026-10-12",
-      "sourceRevision": "a43bb26",
-      "baseMain": "0d08fc5",
+      "sourceRevision": "d05829b03fc9eb770f8e5c0d229c63ab1a3d08cf",
+      "baseMain": "9bfd383",
       "pullRequests": [
         319,
         320,
         321
       ],
-      "status": "Targeted corrections committed; owner layout decision and final release approval pending. No production merge or deployment.",
+      "status": "WEBREVIEW-D1 selected by Dave, implemented and browser-verified. Final release approval remains required; no production merge or deployment.",
       "corrections": [
         "Preserve current Show Control, The Shop and Infrastructure consoles during stack integration",
         "Correct domain preview branding, AV 404 metadata and themes, shared font loading and external navigation attributes",
         "Replace stale Front Office concept with Beta application handoff",
-        "Compact phone Toolbox controls; correct one-page PDF email and malformed contact fragments"
+        "Compact phone Toolbox controls; correct one-page PDF email and malformed contact fragments",
+        "Convert both landing pages and profile to subject tabs and paginated viewport content; add complete saved System theme controls and preserve AV Stage Slate default"
       ],
       "checks": [
         "40 staged browser views at 320, 375, 680 and 1440 pixels; 102 collected internal links resolved",
         "Focused theme persistence, font load, normal-motion contact jumps and first visible tool checks on Dominic",
-        "Navigation dock suite passes; source and exact-head CI checks refreshed after main integration"
+        "Navigation dock suite passes; source and exact-head CI checks refreshed after main integration",
+        "Dominic: 1172 content-page views across six sizes and both themes; keyboard, theme reload, contact/history routing, find-event, print expansion and no-script checks passed"
       ],
       "open": [
-        "WEBREVIEW-D1: marketing/profile pages retain page scrolling; choose viewport conversion (recommended) or explicitly approve a scoped exception",
-        "System marketing/profile pages lack a complete visible light/dark toggle; resolve with the layout treatment or explicitly scope an exception",
         "WEBREVIEW-D2: Dave final approval of the complete stacked release; orange tool actions and green navigation recommended",
-        "Post-approval dependency-order merge, final integrated CI and publication/live verification remain required"
+        "Post-approval dependency-order merge, final integrated CI and publication/live verification remain required",
+        "Exact-head CI, remaining PR bases and main must be checked again immediately before the approved merge"
+      ],
+      "acceptedDecisions": [
+        "WEBREVIEW-D1: Dave selected viewport layouts and complete theme controls on October 12, 2026; final release approval was not included."
       ]
     }
   },
