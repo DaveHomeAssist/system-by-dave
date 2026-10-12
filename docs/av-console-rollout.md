@@ -31,9 +31,9 @@ feature parity or authorization to remove any route.
 | Audio | Audio, Input List, Audio Patch, Line Check, Speaker Plan, RF Coordination, Comms Check | Already uses the same shared engine with five panels and one channel model. Earlier claims that it was only a standalone fixed page were incorrect. Needs full legacy field/action parity, RF/Comms panel semantics, Rail/recovery integration and operator proof. |
 | Show Control | Show Control, Cue Sheet, Show Timer, Teleprompter | Native On Deck, Cues, Notes, Call Log, Setup/Import and Backup published through PR #323 at `7ca404b`; standalone and embedded live browser checks passed. Real cue/media playback, timer outputs and teleprompter controls need their own panel integrations; a call log does not replace CueForge execution. |
 | Show Ops | Show Ops, Room Check, Crew Call, Crew Time Log, Breakout Room Matrix, Show Board, Show Task Board, Show Handoff, Show Report | Six native panels delivered in PR #315: Rooms, Crew, Tasks, Setup, Handoff and Backup retain reviewed source copies. Timekeeping, breakout/timeline behavior and report workflows remain additional capabilities, not covered by a source snapshot. |
-| Front Office | Front Office, Show Advance, Site Survey, Change Order, Client Sign Off | Reuse client/venue/job model and reviewed advance import. Convert current editor into panels, then implement missing survey, approval, scope and signoff behavior. |
+| Front Office | Front Office, Show Advance, Site Survey, Change Order, Client Sign Off | Next bounded conversion: Jobs, Clients, Venues, Job updates, Advance import and Backup panels, scoped in the [existing brief](front-office-brief.md). Reuse the model and reviewed import; survey, approval, scope and signoff behavior remain additional work. |
 | The Shop | The Shop, Gear Prep, Gear Reference, Truck Pack Plan, Load In Plan, Strike Plan | Four native working panels delivered through PR #324: Worklist, Item inspector, Plan/Import and Backup. Preserve phase worklist, quantity guards and reviewed source copies. Complete truck/order/reference and phase parity remains additional work. |
-| Infrastructure | Infrastructure, Power Plan, Network Plan, Cable Plan | Six native panels: Power, Network, Cable, Issues, Plan/Import and Backup. October 12 Duncan acceptance passes typecheck, sixteen model tests, build, source checks and eight browser groups across both themes/nine sizes, including saved views, recovery, offline and actual AV Video embedding. PR #325 tracks exact-head CI/publication/live gates; physical/operator and safety approval are not claimed. |
+| Infrastructure | Infrastructure, Power Plan, Network Plan, Cable Plan | Six native panels published through PR #325 at `0d08fc5`: Power, Network, Cable, Issues, Plan/Import and Backup. Nine exact-head checks, both publications, eight isolated live browser groups and eight-asset parity pass, including both themes/nine sizes, saved views, recovery, offline and actual AV Video embedding. Physical/operator and safety approval are not claimed. |
 | Lighting | Lighting, Lighting Patch | Reuse fixture model, patch/focus controls and safe PlotForge manifest intake. Convert editor to functional panels; PlotForge remains the separate full plot product. |
 | AV Calculator | AV Calculator | Six calculations and field sets exist in the standalone calculator; shared console panel adoption remains unimplemented. |
 | Specialists outside the nine families | StagePlotter, PixelForge, OnTrack | Preserve their distinct graphics/layout/music workflows. Panel adoption needs its own capability assessment; do not force these into generic records. |
@@ -52,8 +52,8 @@ Each application still owns its records, selection, validation and explicit Save
 - At the original source baseline only AV Video and Audio imported the shared
   workspace. Show Ops followed in PR #315; the October 11 Show Control candidate
   adds six native calling panels, published in PR #323. Shop adds four native
-  panels through PR #324. Infrastructure has six panels with automated local
-  acceptance, awaiting release; Front Office and Lighting still use fixed views, and the calculator
+  panels through PR #324. Infrastructure has six panels published and verified
+  live through PR #325; Front Office and Lighting still use fixed views, and the calculator
   remains a specialist layout.
 - Exact raw import retention protects source evidence but does not prove that all
   original fields and operator actions are usable in the receiving console.
