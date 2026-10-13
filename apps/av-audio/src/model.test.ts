@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { apply, blank, LEGACY, load, newRow, PATCH_STATUSES, preview, save, STORE } from "./model";
+import { apply, blank, INPUT_STATUSES, LEGACY, load, newRow, PATCH_STATUSES, preview, save, STORE } from "./model";
 const raw = JSON.stringify({ schema:"input-list.v1", rows:[{id:"one",ch:7,source:"Vocal",patch:"SB-A/7",stand:"Downstage",owner:"A2",notes:"Keep"}] });
 describe("Audio plan",()=>{
   it("maps input identity while keeping complete source bytes",async()=>{ const result=await preview(raw,"inputs.json",LEGACY[0]); const doc=apply(blank(),result); expect(doc.channels[0]).toMatchObject({channel:"7",source:"Vocal",input:"SB-A/7",location:"Downstage",tech:"A2"}); expect(doc.imports[0].raw).toBe(raw); expect(doc.channels[0].legacy).toMatchObject({notes:"Keep"}); expect(()=>apply(doc,result)).toThrow(/already/); });
@@ -51,6 +51,45 @@ describe("Input List connection parity",()=>{
     expect(loaded.error).toBe(""); expect(loaded.raw).toBe(raw);
     expect(loaded.doc).toEqual(doc); expect(loaded.doc.channels[0].conn).toBeUndefined();
     expect(apply(blank(),await preview(raw,"old-backup.json"))).toEqual(doc);
+  });
+});
+
+describe("Input List status parity",()=>{
+  const input = (status?:string) => JSON.stringify({rows:[{id:"i1",ch:7,source:"Vocal",...(status===undefined?{}:{status})}]});
+  it.each([...INPUT_STATUSES,"","Custom input state",undefined])("preserves imported input status %s",async status=>{
+    const raw=input(status), doc=apply(blank(),await preview(raw,"input.json",LEGACY[0]));
+    expect(doc.channels[0].inputStatus).toBe(status??"");
+    expect(doc.channels[0].legacy).toEqual(JSON.parse(raw).rows[0]);
+    expect(doc.imports[0].raw).toBe(raw); expect(newRow().inputStatus).toBe("");
+  });
+  it("roundtrips an Input edit independently and keeps it on changed-source import",async()=>{
+    const raw=input("open"), imported=await preview(raw,"input.json",LEGACY[0]);
+    const doc=apply(blank(),imported);
+    Object.assign(doc.channels[0],{inputStatus:"checked",patchStatus:"ready",lineCheckStatus:"issue",status:"issue",conn:"TRS"});
+    const data=new Map<string,string>([["input-list.v1",raw]]);
+    const storage={getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value);}};
+    save(storage,doc,null);
+    const restored=apply(blank(),await preview(JSON.stringify(load(storage).doc),"backup.json"));
+    expect(restored).toEqual(doc); expect(data.get("input-list.v1")).toBe(raw);
+    expect(()=>apply(restored,imported)).toThrow(/already/);
+    const changed=apply(restored,await preview(input("problem"),"changed.json",LEGACY[0]));
+    expect(changed.channels).toHaveLength(1);
+    expect(changed.channels[0]).toMatchObject({inputStatus:"checked",patchStatus:"ready",lineCheckStatus:"issue",status:"issue",conn:"TRS"});
+    expect(changed.channels[0].legacy.sources).toEqual([JSON.parse(raw).rows[0],JSON.parse(input("problem")).rows[0]]);
+  });
+  it("fills blank input status without changing other workflow stages",async()=>{
+    const doc=apply(blank(),await preview(input(""),"blank.json",LEGACY[0]));
+    Object.assign(doc.channels[0],{patchStatus:"gained",lineCheckStatus:"issue",status:"issue",conn:"XLR"});
+    const merged=apply(doc,await preview(input("patched"),"patched.json",LEGACY[0]));
+    expect(merged.channels[0]).toMatchObject({inputStatus:"patched",patchStatus:"gained",lineCheckStatus:"issue",status:"issue",conn:"XLR"});
+  });
+  it("opens and restores absent input status without inference or migration",async()=>{
+    const doc=blank(), channel=newRow(); delete channel.inputStatus;
+    Object.assign(channel,{status:"issue",legacy:{status:"open"}}); doc.channels=[channel];
+    const raw=JSON.stringify(doc), loaded=load({getItem:()=>raw});
+    expect(loaded.error).toBe(""); expect(loaded.raw).toBe(raw);
+    expect(loaded.doc).toEqual(doc); expect(loaded.doc.channels[0].inputStatus).toBeUndefined();
+    expect(apply(blank(),await preview(raw,"old.json"))).toEqual(doc);
   });
 });
 
