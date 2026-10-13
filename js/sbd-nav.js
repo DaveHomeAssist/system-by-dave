@@ -232,6 +232,10 @@
     schedule();
   }
 
+  try{
+    if(window.parent!==window&&new URLSearchParams(window.location.search).get('sbdEmbed')==='panel') document.documentElement.setAttribute('data-sbd-embed','panel');
+  }catch(e){}
+
   function render(){
     var route = currentRoute();
     if(document.documentElement.getAttribute('data-sbd-nav') === 'off') return;

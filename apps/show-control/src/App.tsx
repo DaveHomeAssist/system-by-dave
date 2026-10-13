@@ -12,6 +12,8 @@ export function App() {
     show: (type: string) => workspace.current?.show(type) ?? false,
     notify: (_text: string, error?: boolean) => { if (error && window.innerHeight < 500 && !controls.current?.open) controls.current?.showModal(); },
     resetLayout: () => { workspace.current?.setLive({}); workspace.current?.setMax({}); },
+    panels: () => (workspace.current?.panels || []).map(panel => panel.type),
+    mode: () => workspace.current?.mode || 'desktop',
   }));
   const pack = useShowControlPack(host);
   const ws = useConsoleWorkspace(pack.views, pack.library, pack.layout);
@@ -49,7 +51,7 @@ export function App() {
     {compact ? <dialog ref={controls} className="call-controls" aria-label="Show controls">{header}{recoveryControls}{notice}<button onClick={() => controls.current?.close()}>Back to panels</button></dialog> : header}
     <div className="call-summary"><time>{clock}</time><span>{hold}</span></div>
     {!compact && recoveryControls}
-    <ConsoleWorkspace ws={compact ? { ...ws, mode: 'phone' } : ws} label="Show Control" extraViews={compact && <button aria-label="Show controls" onClick={() => controls.current?.showModal()}>Show{pack.dirty ? ' *' : ''}{pack.recovery.offer || pack.recovery.errors.length ? ' !' : ''}</button>} quick={pack.quick} render={pack.render} onViewsChange={pack.storeViews} notify={text => host.notify(text)} />
+    <ConsoleWorkspace ws={compact ? { ...ws, mode: 'phone' } : ws} label="Show Control" extraViews={compact && <button aria-label="Show controls" onClick={() => controls.current?.showModal()}>Show{pack.dirty ? ' *' : ''}{pack.recovery.offer || pack.recovery.errors.length ? ' !' : ''}</button>} quick={pack.quick} render={pack.render} onViewsChange={pack.storeViews} notify={text => pack.notify(text)} />
     {!compact && notice}
     {pack.dialogs}
   </main>;

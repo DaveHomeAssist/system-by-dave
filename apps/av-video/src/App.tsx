@@ -15,6 +15,8 @@ export function App() {
     show: (type: string) => workspace.current?.show(type) ?? false,
     notify: (_text: string, _error?: boolean) => undefined,
     resetLayout: () => { workspace.current?.setLive({}); workspace.current?.setMax({}); },
+    panels: () => (workspace.current?.panels || []).map(panel => panel.type),
+    mode: () => workspace.current?.mode || 'desktop',
   }));
   const pack = useVideoPack(host);
   const ws = useConsoleWorkspace(pack.views, pack.library, pack.layout);
@@ -46,7 +48,7 @@ export function App() {
     <div className="plan-bar"><div className="plan-summary"><strong title={pack.title}>{pack.title}</strong><span>{pack.summary}</span></div>{pack.actions}</div>
     {offer && <div className="draft-offer" role="alert"><p><strong>Unsaved edits</strong> from {new Date(offer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={() => void pack.recovery.restore()}>Restore draft</button><button type="button" onClick={() => void pack.recovery.discard()}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
-      <ConsoleWorkspace ws={ws} label="AV Video" quick={pack.quick} render={pack.render} onViewsChange={pack.storeViews} notify={text => host.notify(text)} />
+      <ConsoleWorkspace ws={ws} label="AV Video" quick={pack.quick} render={pack.render} onViewsChange={pack.storeViews} notify={text => pack.notify(text)} />
     </main>
     <footer role="status" className={`message ${pack.problem ? "error" : ""}`}>{[...pack.recovery.errors, pack.status].join(" ")}</footer>
     {pack.dialogs}

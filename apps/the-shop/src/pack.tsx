@@ -148,7 +148,7 @@ export function useShopPack(host: PackHost): Pack {
   const ready = plan.items.filter(row => row.status === 'ready').length;
   return {
     id: 'shop', label: 'The Shop', title: plan.name, summary: `${plan.items.length} items · ${working} working · ${held} held / blocked · ${ready} marked ready`,
-    dirty, blocked: !editable, pending: formDirty, save: store, exportDoc: () => exportPlan(), status: message, problem,
+    dirty, blocked: !editable, pending: formDirty, save: store, exportDoc: () => exportPlan(), status: message, problem, notify,
     recovery: { offer: recovery.offer, restore: recovery.restore, discard: recovery.discard, errors: recovery.errors },
     render, dialogs, quick: LIBRARY.map(p => ({ type: p.type, label: p.name })), library: LIBRARY, views,
     storeViews: (next: View[], text: string) => { if (editable) setPlan(p => ({ ...p, workspace: { version: 1, views: next } })); notify(editable ? text : 'Recover the saved plan before storing views.', !editable); },

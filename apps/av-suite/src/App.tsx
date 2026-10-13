@@ -33,6 +33,8 @@ export function App() {
     show: (type: string) => workspace.current?.show(`${def.id}:${type}`) ?? false,
     notify: (text: string, error = false) => setStatus({ app: def.label, text, error }),
     resetLayout: () => { workspace.current?.setMax({}); },
+    panels: () => (workspace.current?.panels || []).filter(panel => appOf(panel.type) === def.id).map(panel => shortOf(panel.type)),
+    mode: () => workspace.current?.mode || "desktop",
   }])));
   // PACKS is a module constant, so this hook order never changes between renders.
   const packs: Pack[] = PACKS.map(def => def.use(hosts[def.id]));

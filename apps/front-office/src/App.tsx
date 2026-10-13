@@ -12,6 +12,8 @@ export function App() {
     show: (type: string) => workspace.current?.show(type) ?? false,
     notify: (_text: string, error?: boolean) => { if (error && window.innerHeight < 500 && !controls.current?.open) controls.current?.showModal(); },
     resetLayout: () => { workspace.current?.setLive({}); workspace.current?.setMax({}); },
+    panels: () => (workspace.current?.panels || []).map(panel => panel.type),
+    mode: () => workspace.current?.mode || 'desktop',
   }));
   const pack = useFrontOfficePack(host);
   const ws = useConsoleWorkspace(pack.views, pack.library, pack.layout);
@@ -42,7 +44,7 @@ export function App() {
   return <main id="main" className={`office-app${compact ? ' office-compact' : ''}`} tabIndex={-1}>
     {compact ? <dialog ref={controls} className="office-controls" aria-label="Front Office controls">{header}{recoveryControls}{notice}<button onClick={() => controls.current?.close()}>Back to panels</button></dialog> : header}
     <div className="office-summary">{pack.summary.split(' · ').map(part => <span key={part}>{part}</span>)}</div>{!compact && recoveryControls}
-    <ConsoleWorkspace ws={compact ? { ...ws, mode: 'phone' } : ws} label="Front Office" extraViews={compact && <button aria-label="Front Office controls" onClick={() => controls.current?.showModal()}>Office{pack.dirty || pack.pending ? ' *' : ''}{pack.recovery.offer || pack.recovery.errors.length ? ' !' : ''}</button>} quick={pack.quick} render={pack.render} onViewsChange={pack.storeViews} notify={text => host.notify(text)} />
+    <ConsoleWorkspace ws={compact ? { ...ws, mode: 'phone' } : ws} label="Front Office" extraViews={compact && <button aria-label="Front Office controls" onClick={() => controls.current?.showModal()}>Office{pack.dirty || pack.pending ? ' *' : ''}{pack.recovery.offer || pack.recovery.errors.length ? ' !' : ''}</button>} quick={pack.quick} render={pack.render} onViewsChange={pack.storeViews} notify={text => pack.notify(text)} />
     {!compact && notice}
     {pack.dialogs}
   </main>;

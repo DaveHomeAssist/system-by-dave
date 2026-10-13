@@ -5,8 +5,8 @@
     "DaveHomeAssist/system-by-dave"
   ],
   "head": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
-  "status": "red",
-  "statusReason": "Dave reviewed the live Rail on 2026-10-13 and rejected the delivered layering: /av-video/ iframes eight standalone consoles, producing nested view strips, duplicate Add panel/lock/maximize controls and two Save semantics, while Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge and StagePlotter are links out and the 34 legacy sheet pages remain published. Direction reset in docs/av-suite-shell.md: one /av/ console, one engine instance, every application as an in-process panel pack, specialists as chrome-less panels, legacy sheets retired. Per-family console and parity slices are paused.",
+  "status": "amber",
+  "statusReason": "Slice B of the AV Suite shell is in source on 2026-10-13: /av/ hosts one shared-engine workspace with shell-owned views, the Rail, and all eight family applications as in-process panel packs; AV Calculator, Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge and StagePlotter embed as chrome-less panels; each application has one Document panel. Local Chrome passes the shell probe, the seven family probes, the Calculator probe, the AV Video set and the deploy-only AV suites; the Audio keyboard-choice step is a macOS select quirk left to CI. Publication, live acceptance and slice C (retiring the 34 sheet pages, Toolbox and /av-video/ redirects) remain.",
   "audioLineCheckChoiceParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
@@ -82,11 +82,11 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Build the AV Suite shell at /av/ (slice B), then retire the 34 sheet pages (slice C)",
-    "why": "The accepted product is one console. The current host nests consoles and keeps the sheets Dave wants gone.",
-    "doneWhen": "Acceptance 1\u20135 of docs/av-suite-shell.md pass on avbydave.com/av/; then acceptance 6 after slice C.",
-    "effort": "Large: eight pack conversions, shell, specialist embed mode, probes; then 34 stubs and registry retirement.",
-    "owner": "Claude (serial); no Codex family-console dispatch until the shell lands",
+    "title": "Merge the shell (slice B), read back avbydave.com/av/, then retire the 34 sheet pages (slice C)",
+    "why": "The accepted product is one console; the sheets and the standalone family routes are the remaining fragmentation.",
+    "doneWhen": "avbydave.com/av/ serves the shell with all nine identities and specialist panels; then every retired route is a redirect stub and is absent from Toolbox, sitemap, offline assets and counts.",
+    "effort": "Slice C: 34 stubs, registry retired/replacedBy, Toolbox and /av-video/ redirects, probe removal, sitemap and count updates.",
+    "owner": "Claude (serial)",
     "blockedBy": []
   },
   "findings": [
@@ -279,8 +279,8 @@
       "name": "AV Suite shell \u2014 In progress",
       "goal": "One /av/ console with every application as a panel pack and the legacy sheets retired (docs/av-suite-shell.md).",
       "items": [
-        "Slice A: brief, supersede notes, hold on per-family conversions (2026-10-13)",
-        "Slice B: apps/av-suite shell, eight pack conversions, specialist embed mode, Document panel, shell probe",
+        "Slice A: brief, supersede notes, hold on per-family conversions (PR #338, 2026-10-13)",
+        "Slice B: apps/av-suite shell, eight pack conversions, specialist embed mode, Document panels, shell probe (in source 2026-10-13; publication pending)",
         "Slice C: 34 redirect stubs, registry retired/replacedBy, Toolbox and /av-video/ redirects, probe removal, sitemap and counts"
       ],
       "gate": "typecheck, unit, build parity, shell browser probe at six sizes in both palettes, verify:av, verify:public-navigation, verify:public-consistency, verify:domain-sites; slice C adds test:domain-cutover"
@@ -540,7 +540,7 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Read docs/av-suite-shell.md. Build apps/av-suite (one ConsoleWorkspace, shell-owned views, Rail mount) and convert each family App into a pack hook per the Pack contract; embed specialists with ?sbdEmbed=panel; add the shell probe; keep every saved document and schema unchanged. Then retire the 34 sheet pages per slice C.",
+  "kickoffPrompt": "Read docs/av-suite-shell.md. Confirm avbydave.com/av/ serves the merged shell, then implement slice C: replace the 34 legacy sheet pages with noindex redirect stubs into the owning application's view, mark their registry entries retired/replacedBy, redirect av-suite.html and /av-video/ into /av/ preserving sbd* context, remove their probes, regenerate sitemap, inventory and counts, and run test:domain-cutover before merging.",
   "confidence": "High for the bounded Infrastructure source, nine exact-head checks, both publications, eight-group live browser acceptance and eight-asset parity. Whole-toolset, physical/operator and actual process/power interruption acceptance remain unverified.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",

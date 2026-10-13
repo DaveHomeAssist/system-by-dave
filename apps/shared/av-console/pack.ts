@@ -17,6 +17,9 @@ export type PackHost = {
   notify: (text: string, error?: boolean) => void;
   /* Clear device-local arrangement state after a document replacement. */
   resetLayout: () => void;
+  /* Short types of this pack's panels currently on screen, and the mode. */
+  panels: () => string[];
+  mode: () => "phone" | "tablet" | "desktop";
 };
 
 export type PackRecovery = {
@@ -41,6 +44,9 @@ export type Pack = {
   exportDoc: () => void;
   status: string;
   problem: boolean;
+  /* Show a message in this pack's status line (the standalone host routes
+     workspace messages here). */
+  notify: (text: string, error?: boolean) => void;
   recovery: PackRecovery;
   render: (type: string, panel: Panel) => PanelRender;
   /* Dialogs that must stay mounted while the pack is live. */

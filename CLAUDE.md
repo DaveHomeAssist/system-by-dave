@@ -57,6 +57,11 @@ handoffs.
 - `js/sbd-nav.js`, `js/av-suite-context.js`, `js/sbd-handoff.js`: shared AV
   navigation, show context, and cross-tool handoff behavior
 - `apps/shared/av-console/`: shared panel-console workspace used by AV consoles (`docs/av-console.md`)
+- `apps/av-suite/`: React/TypeScript source for the AV Suite shell; `av/` is its
+  generated artifact (one console; `docs/av-suite-shell.md`)
+- `apps/<family>/src/pack.tsx`: each application's panel pack (contract in
+  `apps/shared/av-console/pack.ts`), mounted by the shell and by the
+  application's own standalone route
 - `apps/av-workbook/`: React/TypeScript source for AV Workbook
 - `av-workbook/`: noindex redirect to Toolbox; no editor artifact
 - `apps/fmp-camera-sim/`: React/TypeScript/Three.js source for the FMP Camera

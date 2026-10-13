@@ -20,6 +20,8 @@ adopts it in the October 9 functional-panel conversion. The engine lives in
 
 ## What is shared and what is not
 
+Since 2026-10-13 an application supplies these as a **panel pack** (`apps/<app>/src/pack.tsx`, contract in `apps/shared/av-console/pack.ts`): a hook that owns the document, recovery and actions and returns the renderer. The AV Suite shell at `/av/` mounts every pack in one workspace and namespaces its panel types; the application's standalone route mounts the same pack inside its own workspace.
+
 A console supplies four things:
 - **Its panel library:** type, name, category, description, minimum size, optional module, and whether it is the lit panel.
 - **Its default views.**

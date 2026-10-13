@@ -159,7 +159,7 @@ export function useShowOpsPack(host: PackHost): Pack {
   }
   return {
     id: "show-ops", label: "Show Ops", title: doc.show || "Untitled show", summary: `${doc.date || "No date"} · ${open.rooms.length} rooms to check · ${open.crew.length} crew not released · ${open.tasks.length} tasks open`,
-    dirty, blocked, save: store, exportDoc: () => { download("show-ops-backup.json", JSON.stringify(doc, null, 2)); notify("Backup exported."); }, status: message, problem,
+    dirty, blocked, save: store, exportDoc: () => { download("show-ops-backup.json", JSON.stringify(doc, null, 2)); notify("Backup exported."); }, status: message, problem, notify,
     recovery: { offer: recovery.offer, restore: recovery.restore, discard: recovery.discard, errors: recovery.errors },
     render, quick: LIBRARY.map(panel => ({ type: panel.type, label: panel.name })), library: LIBRARY, views,
     storeViews: (next: View[], text: string) => { setDoc(d => ({ ...d, workspace: { version: 1, views: next } })); notify(text); },

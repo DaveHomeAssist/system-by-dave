@@ -12,6 +12,8 @@ export function App() {
     show: (type: string) => workspace.current?.show(type) ?? false,
     notify: (_text: string, error?: boolean) => { if (error && window.innerHeight < 500 && !controls.current?.open) controls.current?.showModal(); },
     resetLayout: () => { workspace.current?.setLive({}); workspace.current?.setMax({}); },
+    panels: () => (workspace.current?.panels || []).map(panel => panel.type),
+    mode: () => workspace.current?.mode || 'desktop',
   }));
   const pack = useShopPack(host);
   const ws = useConsoleWorkspace(pack.views, pack.library, pack.layout);
@@ -43,7 +45,7 @@ export function App() {
     {compact ? <dialog ref={controls} className="shop-controls" aria-label="Shop controls">{header}{recoveryControls}{notice}<button onClick={() => controls.current?.close()}>Back to panels</button></dialog> : header}
     <div className="shop-summary">{pack.summary.split(' · ').slice(1).map(part => <span key={part}>{part}</span>)}</div>
     {!compact && recoveryControls}
-    <ConsoleWorkspace ws={compact ? { ...ws, mode: 'phone' } : ws} label="The Shop" extraViews={compact && <button aria-label="Shop controls" onClick={() => controls.current?.showModal()}>Shop{pack.dirty || pack.pending ? ' *' : ''}{pack.recovery.offer || pack.recovery.errors.length ? ' !' : ''}</button>} quick={pack.quick} render={pack.render} onViewsChange={pack.storeViews} notify={text => host.notify(text)} />
+    <ConsoleWorkspace ws={compact ? { ...ws, mode: 'phone' } : ws} label="The Shop" extraViews={compact && <button aria-label="Shop controls" onClick={() => controls.current?.showModal()}>Shop{pack.dirty || pack.pending ? ' *' : ''}{pack.recovery.offer || pack.recovery.errors.length ? ' !' : ''}</button>} quick={pack.quick} render={pack.render} onViewsChange={pack.storeViews} notify={text => pack.notify(text)} />
     {!compact && notice}
     {pack.dialogs}
   </main>;

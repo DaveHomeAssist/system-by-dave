@@ -59,8 +59,8 @@ export function useFrontOfficePack(host: PackHost): Pack {
   useEffect(() => {
     const receive = (event: StorageEvent) => {
       if (event.key === KEY || event.key === null) {
-        try { if (localStorage.getItem(KEY) !== baseline.current) notify('Saved document changed in another tab. Export edits, then reload. Save will be refused.', true); }
-        catch { notify('Browser storage became unavailable. Keep this tab open and export your work.', true); }
+        try { if (localStorage.getItem(KEY) !== baseline.current) notify('Saved document changed in another tab. Export edits, then reload. Save will be refused.'); }
+        catch { notify('Browser storage became unavailable. Keep this tab open and export your work.'); }
       }
     };
     window.addEventListener('storage', receive);
@@ -71,7 +71,7 @@ export function useFrontOfficePack(host: PackHost): Pack {
     const form = event.currentTarget, kind = form.dataset.kind!;
     try { setPlan(parsePlan(make())); clear(); setFormErrors(v => ({ ...v, [kind]: '' })); notify('Record applied to working document. Save is still required.'); }
     catch (error) {
-      const text = errorText(error); notify(text, true); setFormErrors(v => ({ ...v, [kind]: text }));
+      const text = errorText(error); notify(text); setFormErrors(v => ({ ...v, [kind]: text }));
       // Report at the form without discarding input or forcing the operator out of the panel.
       requestAnimationFrame(() => form.querySelector<HTMLElement>('[data-form-feedback]')?.focus());
     }
@@ -102,7 +102,7 @@ export function useFrontOfficePack(host: PackHost): Pack {
   function closeImport() { reading.current++; setPreview(null); modal.current?.close(); trigger.current?.focus(); }
   function openImport(next: 'advance' | 'backup') {
     if (!noPending()) return;
-    if (next === 'advance' && !editable) { notify('Recover the saved document before importing an advance.', true); return; }
+    if (next === 'advance' && !editable) { notify('Recover the saved document before importing an advance.'); return; }
     trigger.current = document.activeElement as HTMLElement; setPurpose(next); setPreview(null); setPreviewMessage('Choose a source to preview.'); reading.current++; modal.current?.showModal();
   }
   function stagePreview(raw: string, before: Plan, fromSaved = false) {
@@ -202,7 +202,7 @@ export function useFrontOfficePack(host: PackHost): Pack {
     </div><button id="confirmImport" className="primary" disabled={!preview} onClick={confirmImport}>Apply preview</button></dialog>;
   return {
     id: 'front-office', label: 'Front Office', title: `${plan.jobs.length} jobs`, summary: `${plan.jobs.length} jobs · ${plan.clients.length} clients · ${plan.venues.length} venues`,
-    dirty, blocked: !editable, pending: pendingForms, save: store, exportDoc: () => exportPlan(), status: message, problem,
+    dirty, blocked: !editable, pending: pendingForms, save: store, exportDoc: () => exportPlan(), status: message, problem, notify,
     recovery: { offer: recovery.offer, restore: recovery.restore, discard: recovery.discard, errors: recovery.errors },
     render, dialogs, quick: LIBRARY.map(p => ({ type: p.type, label: p.name })), library: LIBRARY, views,
     storeViews: (next: View[], text: string) => { if (editable) setPlan(p => ({ ...p, workspace: { version: 1, views: next } })); notify(editable ? text : 'Recover the saved document before storing views.', !editable); },
