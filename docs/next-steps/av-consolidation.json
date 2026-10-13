@@ -4,9 +4,18 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "12931bdc8627f6d936d6061ab834dfaf53fa98cb",
+  "head": "5db793e84bf8db34848438d5497ec29af572be52",
   "status": "amber",
-  "statusReason": "All nine primary families have shared-engine working panels in source, not merely catalogue links. Front Office #328 and Lighting #329 have separate verified publication/live receipts. Calculator #330 adds six calculators, summary and optional show context while preserving original values, field sets and LED behavior. Its release ledger records the Stage Slate correction and exact final publication/live evidence; merge alone is not live acceptance. Whole-toolset specialist parity and physical/operator acceptance remain open.",
+  "statusReason": "All nine primary families have shared-engine working panels. Calculator #330/#331 is published and independently live-verified at 5db793e. Audio Connection parity is the next bounded candidate: it passes runner model/browser checks, with exact-head CI, merge, publication and live gates recorded separately in its pull-request release ledger. Whole-toolset specialist parity and physical/operator acceptance remain open.",
+  "audioConnectionParity": {
+    "recordedOn": "2026-10-13",
+    "baseRevision": "5db793e84bf8db34848438d5497ec29af572be52",
+    "branch": "codex/audio-connector-parity-20261013",
+    "scope": "Input List conn becomes an editable Audio Connection field; preserve originals, old backups, repeat-import behavior and nonblank operator edits. No other field mapping, RF/comms, Stream policy or shared save redesign.",
+    "candidateEvidence": "Duncan: typecheck, twelve model tests, build, nine Rail/worker checks and all six focused browser groups pass. Short screens use existing Full screen; constrained embedded tablets use Maximize Inputs.",
+    "deliveryEvidence": "Use this branch's pull-request release ledger for exact final head, CI, merge, both publications and isolated live asset/browser receipts. Candidate checks alone do not prove deployment.",
+    "limits": ["Physical touch devices, real virtual keyboards, process interruption and power loss are not tested.", "The registered private Next Steps Board is unavailable; no replacement or synchronization is claimed.", "AVV-STREAM-KEY-1 remains unanswered and blocks only its dependent work."]
+  },
   "lastActivity": "2026-10-13",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
@@ -32,12 +41,12 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Validate the operator workspace and prioritize remaining specialist parity",
-    "why": "The shared panel foundation now spans the nine primary families. A real operator walkthrough and the explicit capability map should guide the remaining specialist integrations.",
-    "doneWhen": "Use the final verified production receipt in PR330, exercise a representative workspace on an actual touch device, record operator feedback, and scope the next missing capability without claiming all52tools are fully integrated.",
+    "title": "Close Audio Connection parity and prioritize the next verified specialist gap",
+    "why": "The nine-family panel foundation is live. Audio's original conn value was source-only; the bounded candidate exposes it without changing source snapshots or saved formats.",
+    "doneWhen": "Use the Audio candidate's final pull-request release ledger for exact-head CI, both publications and live proof. Then use the capability map and real operator feedback to scope the next missing capability without claiming all 52 tools are fully integrated.",
     "effort": "M",
     "owner": "AV console acceptance",
-    "blockedBy": "Physical device/operator evidence is not supplied by automated browser tests. Read the final PR330 release receipt before live acceptance; AVV-STREAM-KEY-1 blocks only its own later streaming work."
+    "blockedBy": "Physical device/operator evidence is not supplied by automated browser tests. The missing private Board prevents board synchronization, not independent delivery. AVV-STREAM-KEY-1 blocks only its own later streaming work."
   },
   "findings": [
     {

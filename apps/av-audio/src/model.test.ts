@@ -1,10 +1,57 @@
 import { describe, it, expect, vi } from "vitest";
-import { apply, blank, LEGACY, load, preview, save, STORE } from "./model";
+import { apply, blank, LEGACY, load, newRow, preview, save, STORE } from "./model";
 const raw = JSON.stringify({ schema:"input-list.v1", rows:[{id:"one",ch:7,source:"Vocal",patch:"SB-A/7",stand:"Downstage",owner:"A2",notes:"Keep"}] });
 describe("Audio plan",()=>{
   it("maps input identity while keeping complete source bytes",async()=>{ const result=await preview(raw,"inputs.json",LEGACY[0]); const doc=apply(blank(),result); expect(doc.channels[0]).toMatchObject({channel:"7",source:"Vocal",input:"SB-A/7",location:"Downstage",tech:"A2"}); expect(doc.imports[0].raw).toBe(raw); expect(doc.channels[0].legacy).toMatchObject({notes:"Keep"}); expect(()=>apply(doc,result)).toThrow(/already/); });
   it("rejects failed imports without mutating the plan",async()=>{ const doc=blank(); await expect(preview('{bad','bad.json',LEGACY[0])).rejects.toThrow(); expect(doc.channels).toHaveLength(0); await expect(preview(JSON.stringify({items:[]}),"wrong.json",LEGACY[0])).rejects.toThrow(/Expected/); });
   it("saves with readback and protects concurrent changes",()=>{ const data=new Map<string,string>(); const storage={getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value);}}; const original='legacy byte string'; data.set("input-list.v1",original); const doc=blank(); doc.title="Test"; const saved=save(storage,doc,null); expect(load(storage).doc.title).toBe("Test"); expect(data.get("input-list.v1")).toBe(original); expect(()=>save(storage,doc,null)).toThrow(/another tab/); expect(saved).toBe(data.get(STORE)); });
+});
+
+describe("Input List connection parity",()=>{
+  const source = (conn?: string) => JSON.stringify({ rows:[{id:"input-1",ch:7,source:"Vocal",...(conn === undefined ? {} : {conn})}] });
+  it.each(["XLR", "", undefined])("imports the explicit connection %s without inference",async conn=>{
+    const raw=source(conn);
+    const doc=apply(blank(),await preview(raw,"input.json",LEGACY[0]));
+    expect(doc.channels[0].conn).toBe(conn ?? "");
+    expect(doc.channels[0].legacy).toEqual(JSON.parse(raw).rows[0]);
+    expect(doc.imports[0].raw).toBe(raw);
+    expect(newRow().conn).toBe("");
+  });
+  it("roundtrips an edited connection without rewriting original source bytes",async()=>{
+    const raw=source("XLR");
+    const imported=await preview(raw,"input.json",LEGACY[0]);
+    const doc=apply(blank(),imported);
+    doc.channels[0].conn="TRS / operator patch";
+    const data=new Map<string,string>([["input-list.v1",raw]]);
+    const storage={getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value);}};
+    save(storage,doc,null);
+    const reopened=load(storage).doc;
+    const restored=apply(blank(),await preview(JSON.stringify(reopened),"backup.json"));
+    expect(restored).toEqual(doc);
+    expect(restored.channels[0]).toMatchObject({conn:"TRS / operator patch",legacy:{conn:"XLR"}});
+    expect(restored.imports[0].raw).toBe(raw);
+    expect(data.get("input-list.v1")).toBe(raw);
+    expect(()=>apply(restored,imported)).toThrow(/already/);
+  });
+  it("fills a blank connection on changed-source import but keeps a working edit",async()=>{
+    const empty=apply(blank(),await preview(source(""),"empty.json",LEGACY[0]));
+    const filled=apply(empty,await preview(source("XLR"),"xlr.json",LEGACY[0]));
+    expect(filled.channels).toHaveLength(1);
+    expect(filled.channels[0].conn).toBe("XLR");
+    filled.channels[0].conn="Working connection";
+    const merged=apply(filled,await preview(source("TRS"),"trs.json",LEGACY[0]));
+    expect(merged.channels).toHaveLength(1);
+    expect(merged.channels[0].conn).toBe("Working connection");
+    expect(merged.channels[0].legacy.sources).toEqual([{id:"input-1",ch:7,source:"Vocal",conn:""},{id:"input-1",ch:7,source:"Vocal",conn:"XLR"},{id:"input-1",ch:7,source:"Vocal",conn:"TRS"}]);
+  });
+  it("opens and restores a pre-connection backup without migration or writes",async()=>{
+    const doc=blank(); const row=newRow(); delete row.conn; row.legacy={conn:"Original-only value"}; doc.channels=[row];
+    const raw=JSON.stringify(doc);
+    const loaded=load({getItem:()=>raw});
+    expect(loaded.error).toBe(""); expect(loaded.raw).toBe(raw);
+    expect(loaded.doc).toEqual(doc); expect(loaded.doc.channels[0].conn).toBeUndefined();
+    expect(apply(blank(),await preview(raw,"old-backup.json"))).toEqual(doc);
+  });
 });
 
 describe("reviewed import boundaries",()=>{
