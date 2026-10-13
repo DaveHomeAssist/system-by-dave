@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-12 — Calculator working panel candidate
+
+- Reuse the shared console engine for six calculation panels and Operator Summary, plus optional Show context. Preserve the original DOM controls, formula/normalization engine, field sets and shared LED working values instead of duplicating calculation logic.
+- Add default task views, close/reopen, move/resize/maximize, keyboard menus and independent versioned stored views/device layouts. Values retain their existing autosave semantics; Save views is separate and refuses unreadable or changed view records.
+- Keep the route, named-set review/import/export and summary commands. Adopt light-first theme behavior on Calculator only, panel-local pagination, bottom phone navigation, short-height controls and standalone/embedded presentation.
+- Add type/model/build/browser and committed-output gates to existing CI/publication workflows, preserving original field-set and viewport assertions with native-panel navigation. Existing PR gate budget increases from ten to fifteen minutes for the additional serial consumer; no new workflow or dependency.
+- Front Office correction PR #328 passed final source/destination publication and all nine isolated live groups at `c6ed44c`, with fourteen exact runtime hashes before/after. Lighting PR #329 passed all nine checks, both publications and all nine isolated live groups at `c5cbd90`, with fourteen exact runtime hashes before/after on October 13. Calculator passed its final ten-group runner suite; CI/publication/live gates remain separate.
+
 ## 2026-10-12 — Lighting native working panels
 
 - Add Fixtures, Fixture details, Focus, Plan/Import and Backup using the shared AV console workspace, standalone and embedded. Retain all twelve fixture fields, show metadata, status/focus/search, confirmed removal and duplicate-start warnings; no footprint or DMX-control claim.

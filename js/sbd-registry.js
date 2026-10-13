@@ -72,7 +72,7 @@
     {id:'truck-pack',name:'Truck Pack Plan',href:'truck-pack.html',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Truck',desc:'Cases, truck zones, load order, unload order, weights, owners, pack status, and issues.',storageKeys:[{key:'truck-pack.v1',label:'Truck Pack Plan'}]},
     {id:'load-in-plan',name:'Load In Plan',href:'load-in-plan.html',dept:'Logistics',phases:['loadin'],tag:'Load In',desc:'Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps.',storageKeys:[{key:'load-in-plan.v1',label:'Load In Plan'}]},
     {id:'strike-plan',name:'Strike Plan',href:'strike-plan.html',dept:'Logistics',phases:['strike'],tag:'Strike',desc:'Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues.',storageKeys:[{key:'strike-plan.v1',label:'Strike Plan'}]},
-    {id:'av-calculator',name:'AV Calculator',href:'av-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'Math',desc:'Audio delay, projection throw, record storage, power load, voltage drop, SPL distance and named field sets.',storageKeys:[{key:'avCalculator.v1',label:'AV Calculator'},{key:'avCalculator.fieldSets.v1',label:'AV Calculator field sets'}],toolboxFeatured:true},
+    {id:'av-calculator',name:'AV Calculator',href:'av-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'Math',desc:'Working calculation and summary panels with named field sets and configurable views.',storageKeys:[{key:'avCalculator.v1',label:'AV Calculator'},{key:'avCalculator.fieldSets.v1',label:'AV Calculator field sets'},{key:'avCalculator.views.v1',label:'AV Calculator stored views'},{key:'avCalculator.layout.v1',label:'AV Calculator device layout'}],toolboxFeatured:true},
     {id:'led-wall-calculator',name:'LED Wall Calculator',href:'led-wall-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'LED',desc:'Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning.',storageKeys:[{key:'avCalculator.ledProfiles.v1',label:'LED wall cabinet profiles'}]},
     {id:'ontrack',name:'OnTrack',href:'ontrack.html',dept:'Music',phases:['prep','show','closeout'],tag:'DJ',desc:'DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes.',storageKeys:[{key:'ontrack_v1',label:'OnTrack library, sets, and notes'}]}
   ];
@@ -228,6 +228,8 @@
     './av-lighting/assets/av-lighting.js',
     './av-lighting/assets/index.css',
     './js/av-calculator-field-sets.js',
+    './av-calculator/assets/av-calculator.js',
+    './av-calculator/assets/main.css',
     './pixelforge/',
     './pixelforge/index.html',
     './pixelforge/editor.html',
@@ -349,7 +351,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261012-lighting-native',
+    version:'v20261012-calculator-native',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

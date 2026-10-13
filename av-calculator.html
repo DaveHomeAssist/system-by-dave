@@ -31,14 +31,15 @@
 <link rel="stylesheet" href="css/av-theme.css">
 <script src="js/av-theme-mode.js"></script>
 <link rel="stylesheet" href="css/av-viewport.css">
-<link rel="stylesheet" href="css/av-calculator-viewport.css">
+<link rel="stylesheet" href="av-calculator/assets/main.css">
 </head>
 <body>
 <a data-web2-ignore="Offscreen skip link becomes visible on keyboard focus" class="skip-link" href="#main-content">Skip to calculators</a>
 <noscript>
   <div class="noscript">JavaScript is off, so calculations are unavailable.</div>
 </noscript>
-<div class="app">
+<div id="calculatorRoot"></div>
+<div class="app" id="calculatorSource" hidden>
   <header class="topbar">
     <a class="brand" href="av-suite.html" aria-label="AV Suite home">
 
@@ -53,7 +54,7 @@
     </div>
   </header>
 
-  <main id="main-content">
+  <main id="calculatorSourceBody">
     <section class="hero" aria-label="AV calculator overview">
       <div class="hero-copy">
         <p class="eyebrow">Field math</p>
@@ -365,7 +366,7 @@
 <script src="js/av-calculator.js"></script>
 <script src="js/av-calculator-field-sets.js"></script>
 <script src="js/av-viewport.js"></script>
-<script src="js/av-calculator-viewport.js"></script>
+<script type="module" src="av-calculator/assets/av-calculator.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
 </body>

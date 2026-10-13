@@ -261,7 +261,7 @@
 
   const themeToggle = document.getElementById('themeToggle');
   const savedTheme = storage.get('av-theme-mode.v1');
-  if (!['light', 'dark', 'system'].includes(savedTheme)) document.documentElement.dataset.avTheme = 'dark';
+  if (!['light', 'dark', 'system'].includes(savedTheme)) document.documentElement.dataset.avTheme = isLedPage ? 'dark' : 'light';
   function syncThemeToggle() {
     const chosen = document.documentElement.dataset.avTheme;
     const dark = chosen === 'dark' || (chosen === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);

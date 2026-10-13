@@ -26,7 +26,9 @@ documenting the Notion skills, agents, widgets, and templates I build and use.
 
 [Lighting](https://avbydave.com/av-lighting/) has a native-panel candidate in `apps/av-lighting/`: Fixtures, Fixture details, Focus, Plan/Import and Backup preserve existing patch/focus fields and reviewed PlotForge imports. Use `npm run typecheck:av-lighting`, `npm run test:av-lighting`, `npm run build:av-lighting` and `npm run test:av-lighting-browser`. See [the brief and compatibility contract](docs/av-lighting.md); candidate checks and publication/live proof are separate.
 
-No toolchain required. Any static file server works:
+[AV Calculator](https://avbydave.com/av-calculator.html) uses the shared console workspace around its original six calculation engines. Source is in `apps/av-calculator/`; `npm run build:av-calculator` writes only its native JS/CSS, leaving the canonical HTML and shared LED engine maintained separately. Verify with `npm run typecheck:av-calculator`, `npm run test:av-calculator` and `npm run test:av-calculator-browser`. See [the panel and field-set contract](docs/av-calculator-app.md). Inputs autosave; workspace views save separately.
+
+No toolchain is needed to serve the committed artifacts. Any static file server works:
 
 ```bash
 # Python

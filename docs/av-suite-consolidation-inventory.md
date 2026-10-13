@@ -1,6 +1,6 @@
 # AV Suite consolidation source inventory
 
-Generated from `js/sbd-registry.js` version `v20261012-lighting-native`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
+Generated from `js/sbd-registry.js` version `v20261012-calculator-native`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
 
 The feature text and declared keys come from the registry. Export, print, and keyboard columns identify only source-code signals in the route file. “Not found” does not prove absence; “Source signal” does not prove working behavior. Offline means the route is named by the registry manifest, not that every dependency is cached. Each behavior still needs browser and field-parity verification before a legacy route can be retired.
 
@@ -55,11 +55,11 @@ The feature text and declared keys come from the registry. Export, print, and ke
 | **Truck Pack Plan** — Cases, truck zones, load order, unload order, weights, owners, pack status, and issues. | `/truck-pack.html` | https://avbydave.com | truck-pack.v1 | Source signal | Source signal | Source signal | Named |
 | **Load In Plan** — Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps. | `/load-in-plan.html` | https://avbydave.com | load-in-plan.v1 | Source signal | Source signal | Source signal | Named |
 | **Strike Plan** — Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues. | `/strike-plan.html` | https://avbydave.com | strike-plan.v1 | Source signal | Source signal | Source signal | Named |
-| **AV Calculator** — Audio delay, projection throw, record storage, power load, voltage drop, SPL distance and named field sets. | `/av-calculator.html` | https://avbydave.com | avCalculator.v1, avCalculator.fieldSets.v1 | Source signal | Not found | Not found | Named |
+| **AV Calculator** — Working calculation and summary panels with named field sets and configurable views. | `/av-calculator.html` | https://avbydave.com | avCalculator.v1, avCalculator.fieldSets.v1, avCalculator.views.v1, avCalculator.layout.v1 | Source signal | Not found | Not found | Named |
 | **LED Wall Calculator** — Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning. | `/led-wall-calculator.html` | https://avbydave.com | avCalculator.ledProfiles.v1; working state in avCalculator.v1 (declared under av-calculator) | Source signal | Not found | Not found | Named |
 | **OnTrack** — DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes. | `/ontrack.html` | https://avbydave.com | ontrack_v1 | Source signal | Not found | Source signal | Named |
 
-**Count:** 52 registry tools; 81 declared local-storage keys.
+**Count:** 52 registry tools; 83 declared local-storage keys.
 
 ## Unresolved mapping and proof
 
