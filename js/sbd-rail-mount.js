@@ -77,7 +77,7 @@
     }
 
     function navigate(entry,event){
-      if(!entry||(entry.namespace!=='console'&&entry.namespace!=='tool')||!eventTarget||typeof eventTarget.dispatchEvent!=='function') return;
+      if(!entry||(entry.namespace!=='console'&&entry.namespace!=='tool'&&entry.namespace!=='toolbox')||!eventTarget||typeof eventTarget.dispatchEvent!=='function') return;
       if(event&&(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(typeof event.button==='number'&&event.button!==0))) return;
       var trigger=eventTrigger(event);
       var fromRail=!!(rendered&&rendered.entries&&rendered.entries.indexOf(trigger)!==-1);
@@ -93,6 +93,7 @@
 
     function activeSnapshot(event){
       var reference=event&&event.detail&&event.detail.ref;
+      if(reference==='toolbox'){setCurrent('toolbox');return;}
       var entry=typeof reference==='string'?rail.resolveRef(reference,registry):null;
       if(entry&&(entry.namespace==='console'||entry.namespace==='tool')) setCurrent(reference);
     }

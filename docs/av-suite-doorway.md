@@ -1,5 +1,7 @@
 # AV Suite Doorway Contract
 
+**Retired 2026-10-13.** `av-suite.html` is now a noindex redirect stub into the AV by Dave console at `/av/` (it keeps `sbd*` show context and maps `?entry=show` to Show Control). Toolbox pins, recents, families, the Show Console dashboard and `js/av-suite/` are gone; see [the AV Suite shell brief](av-suite-shell.md). This document is kept as the record of the doorway that existed from 2026-10-04 to 2026-10-13.
+
 **Implemented 2026-10-04:** all neutral visits open Toolbox, including returning visits with a saved Show preference. Explicit routes and supported show context retain their existing behavior. The old preference is retained without being used or rewritten. Toolbox features [AV Video](../av-video/), which combines Signal Flow and Video Patch; their individual registry records and legacy URLs remain compatible. The [Video workflow contract](av-video.md) describes the shipped slice.
 
 `av-suite.html` is the stable AV by Dave route. It exposes two distinct,

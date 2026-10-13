@@ -179,7 +179,7 @@ test('explicit edits keep unresolved refs after visible refs and never alias IDs
   assert.equal(storage.data.unrelated, 'keep');
 });
 
-test('typed resolution stays exact across available console, family, tool, and external namespaces', () => {
+test('typed resolution stays exact across available console, tool, and external namespaces', () => {
   const { rail, registry } = loadRuntime();
 
   const calculator = rail.resolveRef('console:av-calculator', registry);
@@ -187,9 +187,7 @@ test('typed resolution stays exact across available console, family, tool, and e
   assert.equal(calculator.navigable, true);
   assert.equal(calculator.href, 'av-calculator.html');
 
-  const audioFamily = rail.resolveRef('family:audio', registry);
-  assert.equal(audioFamily.href, 'av-suite.html?entry=toolbox&family=audio');
-  assert.ok(audioFamily.icon.length > 0);
+  assert.equal(rail.resolveRef('family:audio', registry), null, 'Toolbox families no longer exist');
 
   const throwline = rail.resolveRef('tool:throwline', registry);
   assert.equal(throwline.href, 'ProjectorThrow/');
@@ -268,7 +266,7 @@ test('standalone renderer exposes nine ordered application links', () => {
     onAllApps: () => { allAppsCount += 1; },
     onCustomize: () => { customizeCount += 1; },
     appsDialogId: 'railAppsDialog',
-    toolboxHref: 'https://avbydave.com/av-suite.html?entry=toolbox',
+    toolboxHref: 'https://avbydave.com/av/',
     resolveHref: (entry) => `https://avbydave.com/${entry.href}`
   });
 
@@ -299,7 +297,7 @@ test('standalone renderer exposes nine ordered application links', () => {
   assert.equal(rendered.entries[6].getAttribute('href'), 'https://avbydave.com/infrastructure/');
   assert.equal(rendered.entries[7].getAttribute('href'), 'https://avbydave.com/av-lighting/');
   assert.equal(rendered.entries[8].getAttribute('href'), 'https://avbydave.com/av-calculator.html');
-  assert.equal(elementsByClass(rendered.shell, 'sbd-rail__toolbox')[0].getAttribute('href'), 'https://avbydave.com/av-suite.html?entry=toolbox');
+  assert.equal(elementsByClass(rendered.shell, 'sbd-rail__toolbox')[0].getAttribute('href'), 'https://avbydave.com/av/');
   assert.equal(rendered.allAppsButton, elementsByClass(rendered.shell, 'sbd-rail__all')[0]);
   assert.equal(rendered.customizeButton, elementsByClass(rendered.shell, 'sbd-rail__customize')[0]);
 
@@ -314,7 +312,7 @@ test('standalone renderer exposes nine ordered application links', () => {
   assert.equal(container.children.length, 0);
 });
 
-test('standalone renderer marks Toolbox as current only when explicitly selected', () => {
+test('standalone renderer marks Workspace as current only when explicitly selected', () => {
   const { rail, registry } = loadRuntime();
   const document = new FakeDocument();
   const container = new FakeElement('div', document);

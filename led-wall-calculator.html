@@ -175,7 +175,7 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 <!-- AV workspace styles:end -->
 <!-- AV workspace runtime:start -->
 <script>
-window.AVWorkspaceVersion="v20261013-av-suite-shell";
+window.AVWorkspaceVersion="v20261013-av-suite-retire-sheets";
 /* View state only: existing form nodes and product calculation state remain authoritative. */
 (function(global){
   'use strict';
@@ -247,7 +247,10 @@ window.AVWorkspaceVersion="v20261013-av-suite-shell";
   'use strict';
   const root=document.documentElement;
   const isThrowline=location.pathname.includes('/ProjectorThrow/');
-  const base=new URL(isThrowline?'../':'./',location.href);
+  const isLed=location.pathname.includes('led-wall-calculator');
+  // The site root is wherever js/sbd-registry.js was loaded from; /av/ and / both resolve there.
+  const registryScript=document.querySelector('script[src*="sbd-registry.js"]');
+  const base=registryScript?new URL('../',registryScript.src):new URL(isThrowline?'../':'./',location.href);
   let badge;
   function report(state,text){root.dataset.workspaceOffline=state;if(badge)badge.textContent=text;}
   async function prepare(){
@@ -263,10 +266,10 @@ window.AVWorkspaceVersion="v20261013-av-suite-shell";
           channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();resolve(event.data);};
           controller.postMessage({type:'SBD_OFFLINE_VERSION'},[channel.port2]);
         });
-        if(!info||info.version!==global.AVWorkspaceVersion)return false;
+        if(!info||info.version!==(global.AVWorkspaceVersion||(global.SBD_REGISTRY&&global.SBD_REGISTRY.version)))return false;
         const assets=[new URL(location.pathname+(location.pathname.endsWith('/')?'index.html':''),location.origin).href,...[...document.querySelectorAll('script[src],link[rel=stylesheet]')].map(el=>el.src||el.href)];
         if(isThrowline)assets.push(new URL('ProjectorThrow/throwline-scene-state.js',base).href);
-        else assets.push(...['data/led-cabinet-catalog.v1.json','ProjectorThrow/vendor/three/three.module.min.js','ProjectorThrow/vendor/three/three.core.min.js','ProjectorThrow/vendor/three/addons/controls/OrbitControls.js'].map(path=>new URL(path,base).href));
+        else if(isLed)assets.push(...['data/led-cabinet-catalog.v1.json','ProjectorThrow/vendor/three/three.module.min.js','ProjectorThrow/vendor/three/three.core.min.js','ProjectorThrow/vendor/three/addons/controls/OrbitControls.js'].map(path=>new URL(path,base).href));
         const cache=await caches.open(info.cache);
         const matches=await Promise.all(assets.filter(url=>new URL(url).origin===location.origin).map(url=>cache.match(url,{ignoreSearch:true})));
         if(matches.some(item=>!item))return false;
@@ -296,13 +299,13 @@ window.AVWorkspaceVersion="v20261013-av-suite-shell";
 <noscript><div class="noscript">JavaScript is off, so calculations are unavailable.</div></noscript>
 <div class="app">
   <header class="topbar">
-    <a class="brand" href="av-suite.html" aria-label="AV Suite home">
+    <a class="brand" href="av/" aria-label="AV Suite home">
       <span class="brand-mark">S</span>
       <span class="brand-text"><strong>LED Wall Calculator</strong><span class="planning-label">Planning estimates</span></span>
     </a>
     <div class="top-actions" aria-label="Related tools">
       <a class="top-link" href="av-calculator.html">Quick Calculators</a>
-      <a class="top-link" href="av-suite.html">AV Suite</a>
+      <a class="top-link" href="av/">AV Suite</a>
       <button type="button" class="theme-toggle" id="themeToggle">Dark mode</button>
     </div>
   </header>

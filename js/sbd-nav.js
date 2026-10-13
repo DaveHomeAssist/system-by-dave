@@ -15,6 +15,7 @@
   var DEPARTMENTS = REG.navDepartments.map(function(group){
     return {label: group.label, tools: group.toolIds.map(function(id){
       var tool = REG.toolById(id);
+      if(tool && tool.retired) return null;
       return tool ? {name: tool.name, href: tool.href} : null;
     }).filter(Boolean)};
   });
@@ -251,7 +252,7 @@
       embedded.setAttribute('aria-label', 'Tool navigation');
       embedded.setAttribute('data-sbd-nav', 'true');
       embedded.appendChild(link('', '/', 'Home', 'Return to this site home'));
-      embedded.appendChild(link('', 'av-suite.html?entry=toolbox', 'Toolbox', 'Browse AV Toolbox'));
+      embedded.appendChild(link('', 'av/', 'AV by Dave', 'Open the AV by Dave console'));
       slot.appendChild(embedded);
       return;
     }
@@ -278,8 +279,7 @@
     nav.setAttribute('aria-label', 'Tool navigation');
 
     nav.appendChild(link('', '/', 'Home', 'Return to this site home'));
-    nav.appendChild(link('', withContext('av-suite.html'), 'AV Suite', 'Open the AV Suite hub'));
-    nav.appendChild(link('', 'av-suite.html?entry=toolbox', 'AV Toolbox', 'Browse AV Toolbox'));
+    nav.appendChild(link('', withContext('av/'), 'AV by Dave', 'Open the AV by Dave console'));
 
     var here = locate(route);
     if(here && here.dept.tools.length > 1){

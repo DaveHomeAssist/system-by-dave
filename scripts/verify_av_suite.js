@@ -80,11 +80,6 @@ function assertSourceChecks(registry) {
     fail('PixelForge AI credentials must not be registered for saved-data scans or show-package export.');
   }
 
-  const toolboxFeatured = registry.tools.filter((tool) => tool.toolboxFeatured === true).map((tool) => tool.id).sort();
-  const expectedFeatured = ['av-calculator', 'av-video', 'gear-reference', 'pixelforge', 'throwline'];
-  if (JSON.stringify(toolboxFeatured) !== JSON.stringify(expectedFeatured)) {
-    fail(`Toolbox Use anytime registry set is wrong: ${toolboxFeatured.join(', ')}.`);
-  }
 }
 
 function assertRailRegistryContracts(registry) {
@@ -211,13 +206,22 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261013-av-suite-shell') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261013-av-suite-retire-sheets') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
   if (!registry.offlineAssets().includes('./front-office/theme-init.js')) fail('Front Office theme initialization is missing from offline assets.');
-  // The AV Suite shell at av/ adds its page and bundle; no new tool entry.
-  if (registry.tools.length !== 52 || registry.baseAssets.length !== 144 || registry.offlineAssets().length !== 196 || storageKeyCount !== 83) {
+  // 34 sheet routes are retired redirect stubs (docs/av-suite-shell.md): they keep their
+  // storage keys for data transfer but leave the offline suite; Toolbox assets are gone.
+  const retiredTools = registry.tools.filter((tool) => tool.retired);
+  if (retiredTools.length !== 34 || registry.tools.length - retiredTools.length !== 18) fail(`Retired sheet count changed: ${retiredTools.length} retired of ${registry.tools.length}.`);
+  retiredTools.forEach((tool) => {
+    if (!['video', 'audio', 'show-control', 'show-ops', 'front-office', 'shop', 'infrastructure', 'lighting'].includes(tool.retired)) fail(`Retired tool ${tool.id} names an unknown pack ${tool.retired}.`);
+    if (registry.offlineAssets().includes(`./${tool.href}`)) fail(`Retired route ${tool.href} must not be an offline asset.`);
+    const stub = read(tool.href);
+    if (!/<meta name="robots" content="noindex,follow">/.test(stub) || !stub.includes(`location.replace('/av/?app=${tool.retired}')`) || !/rel="canonical" href="https:\/\/avbydave\.com\/"/.test(stub)) fail(`Retired route ${tool.href} is not a noindex redirect stub into /av/?app=${tool.retired}.`);
+  });
+  if (registry.tools.length !== 52 || registry.baseAssets.length !== 135 || registry.offlineAssets().length !== 153 || storageKeyCount !== 83) {
     fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {
@@ -260,92 +264,43 @@ function assertPageContracts(registry) {
     fail('Public AV Suite copy still contains stale 40+ or ~40 count.');
   }
 
+  // AV by Dave is one console (docs/av-suite-shell.md): the shell source at av/ is
+  // staged as the avbydave.com home, and the retired Toolbox, landing and index pages
+  // are noindex redirect stubs into it.
+  const shell = read('av/index.html');
+  if (!/<meta name="robots" content="noindex,follow"/.test(shell) || !shell.includes('<link rel="canonical" href="https://avbydave.com/"')) {
+    fail('AV Suite shell source must be noindex with the avbydave.com root as canonical (it is staged as that home page).');
+  }
+  if (!/data-sbd-rail-host[^>]*data-current-ref="toolbox"/.test(shell) || !/data-sbd-rail-dialogs/.test(shell) || !/js\/av-offline\.js/.test(shell) || !/id="workspaceOffline"/.test(shell)) {
+    fail('AV Suite shell does not mount the Rail on the Workspace entry with offline registration.');
+  }
   const avSuite = read('av-suite.html');
-  const avSuiteCss = read('css/av-suite.css');
-  const avSuiteApp = read('js/av-suite/app.js');
-  const avSuiteModal = read('js/av-suite/modal-controller.js');
-  const avSuiteRuntime = [avSuite, avSuiteCss, avSuiteApp, avSuiteModal].join('\n');
-  if (!/data-av-theme="system" data-av-tool="av-suite"/.test(avSuite) || !/href="css\/av-theme\.css"/.test(avSuite) || !/prefers-color-scheme: dark/.test(avSuite)) {
-    fail('AV Suite does not declare the shared system-adaptive theme contract.');
+  if (!/<meta name="robots" content="noindex,follow">/.test(avSuite) || !/location\.replace\('\/av\/'/.test(avSuite) || !/sbdShow/.test(avSuite) || !/entry'\)==='show'/.test(avSuite)) {
+    fail('av-suite.html must be a noindex stub that redirects into /av/ keeping sbd* context and mapping ?entry=show to Show Control.');
   }
-  if (!/href="css\/av-suite\.css"/.test(avSuite) || !/type="module" src="js\/av-suite\/app\.js"/.test(avSuite)) {
-    fail('AV Suite does not load its extracted stylesheet and application module.');
+  const toolIndex = read('av-tool-suite/index-v2/index.html');
+  if (!/<meta name="robots" content="noindex,follow">/.test(toolIndex) || !toolIndex.includes("location.replace('/av/')")) {
+    fail('The historical AV Tool Suite index must redirect into /av/.');
   }
-  if (/script-src[^;]*'unsafe-inline'/.test(avSuite) || /<script>([\s\S]*?)<\/script>/.test(avSuite)) {
-    fail('AV Suite still requires inline JavaScript after the architecture extraction.');
-  }
-  if (!/import \{ setModalBackgroundInert \} from '\.\/modal-controller\.js';/.test(avSuiteApp)) {
-    fail('AV Suite application module does not import the shared modal controller.');
-  }
-  if (/oklch\(0\.68 0\.13 158|#30B27B|--bg:#0A0D14/.test(avSuiteRuntime)) {
-    fail('AV Suite still contains the retired green-led dark palette.');
-  }
-  if (!/SENSITIVE_PACKAGE_KEYS=\{'PixelForge\.ai\.v1':true\}/.test(avSuiteApp)) {
-    fail('AV Suite is missing the defense-in-depth show-package secret denylist.');
-  }
-  if (!/!SENSITIVE_PACKAGE_KEYS\[key\]/.test(avSuiteApp)) {
-    fail('AV Suite imports do not reject sensitive package keys.');
-  }
-  if (!/id="settingsDrawer"[^>]*\binert\b/i.test(avSuite)) {
-    fail('Settings drawer is not inert in its closed HTML state.');
-  }
-  if (!/removeAttribute\('inert'\)/.test(avSuiteRuntime) || !/setAttribute\('inert',''\)/.test(avSuiteRuntime)) {
-    fail('Settings drawer inert state is not toggled by the drawer controller.');
-  }
-  if (!/id="clearFiltersBtn"/.test(avSuiteRuntime) || !/function clearToolFilters\(/.test(avSuiteApp)) {
-    fail('AV Suite filtered empty state does not provide a recovery action.');
-  }
-  if (!avSuiteApp.includes("<h3>'+d+'</h3>")) {
-    fail('AV Suite tool groups do not preserve the page heading hierarchy.');
-  }
-  // The canonical origin follows the AV by Dave cutover (scripts/domain-sites.json).
-  if (!avSuite.includes(`href="${originFor('av-suite.html')}/av-suite.html"`) || /rel="canonical"[^>]+\?entry=/.test(avSuite)) {
-    fail('AV Suite canonical must remain the query-free /av-suite.html URL.');
-  }
-  if (!/id="entryChooser"[\s\S]*data-entry-choice="show"[\s\S]*data-entry-choice="toolbox"/.test(avSuite) || !/id="doorwayBtn"/.test(avSuite)) {
-    fail('AV Suite is missing the keyboard-addressable two-door chooser or its reopen control.');
-  }
-  if (!/SHOW_CONTEXT_PARAMS=\['sbdShow','sbdVenue','sbdDate','sbdOperator','sbdPhase'\]/.test(avSuiteApp) || !/if\(hasShowContext\(params\)\) return 'show'/.test(avSuiteApp)) {
-    fail('Explicit sbd* context does not source-authoritatively force Show Console.');
-  }
-  if (!/function toolHref\(tool\)[\s\S]*entryState\.mode==='toolbox'[\s\S]*url\.searchParams\.delete\(name\)/.test(avSuiteApp)) {
-    fail('Toolbox toolHref does not strip every show-context parameter.');
-  }
-  ['function toolboxFamilyOverrideFromLocation()', 'function effectiveToolboxState()', 'syncToolboxFamilyOverride();'].forEach((contract) => {
-    if (!avSuiteApp.includes(contract)) fail(`AV Toolbox family URL handling is missing ${contract}.`);
+  ['av-suite-landing.html', 'av-suite-landing2.html', 'css/av-suite.css', 'js/av-suite/app.js', 'js/av-domain-views.js', 'js/av-landing-alt.js'].forEach((file) => {
+    if (fs.existsSync(path.join(ROOT, file))) fail(`Retired Toolbox asset still exists: ${file}.`);
   });
-  if (!/toolboxFamilyOverrideFromLocation\(\)[\s\S]*hasShowContext\(params\)[\s\S]*familyExists\(family\)/.test(avSuiteApp)) {
-    fail('AV Toolbox family URL handling does not preserve Show precedence and exact family validation.');
-  }
-  ['var EXTERNALS=REG.externals||[];', "value.indexOf('external:')===0", 'appendExternalCommands(items', 'data-command-id'].forEach((contract) => {
-    if (!avSuiteApp.includes(contract)) fail(`AV Suite external commands are missing ${contract}.`);
-  });
-  if (!/function navigableExternalById\(id\)[\s\S]*external\.kind==='handoff'[\s\S]*external\.destination/.test(avSuiteApp)) {
-    fail('AV Suite command validation does not exclude status-only external products.');
-  }
-  if (!/function openExternal\(id\)[\s\S]*link\.rel='noopener noreferrer'/.test(avSuiteApp)) {
-    fail('AV Suite external command navigation is missing rel protection.');
-  }
-  ['toolboxPinned', 'toolboxRecent', 'toolboxSearch', 'toolboxFilter', 'toolboxFamily', 'preferredEntry'].forEach((field) => {
-    if (!avSuiteApp.includes(field)) fail(`AV Suite UI preferences are missing ${field}.`);
-  });
-  if (!/TOOLBOX_FEATURED=TOOLS\.filter\(function\(tool\)\{return tool\.toolboxFeatured===true;\}\)/.test(avSuiteApp)) {
-    fail('AV Toolbox Use anytime inventory is not derived from registry.toolboxFeatured.');
-  }
-  if (!/src="js\/vendor\/gsap\.min\.js"/.test(avSuite) || !/gsap\.killTweensOf\(regions\)/.test(avSuiteApp) || !/prefers-reduced-motion:reduce/.test(avSuiteCss)) {
-    fail('AV Suite doorway motion is missing local GSAP, tween cleanup, or reduced-motion bypass.');
-  }
+  const domainSites = JSON.parse(read('scripts/domain-sites.json'));
+  const avSite = domainSites.sites.find((site) => site.id === 'avbydave');
+  if (!avSite || avSite.landingPage !== 'av/index.html' || !avSite.pages.includes('av/')) fail('avbydave.com must stage the AV Suite shell as its home page.');
 
   const manifest = JSON.parse(read('manifest.json'));
   const shortcutUrls = (manifest.shortcuts || []).map((shortcut) => shortcut.url);
-  ['./av-suite.html?entry=show', './av-suite.html?entry=toolbox'].forEach((url) => {
+  if (manifest.start_url !== './av/') fail('PWA manifest start_url must open the console.');
+  ['./av/?app=show-control', './av/'].forEach((url) => {
     if (!shortcutUrls.includes(url)) fail(`PWA manifest is missing shortcut ${url}.`);
   });
-  if (!index.includes('href="av-suite.html?entry=toolbox"') || !/Browse (the )?AV tools/.test(index)) {
-    fail('Homepage is missing the addressable AV Toolbox doorway.');
+  if (!index.includes('href="av/"') || !/Open AV by Dave/.test(index)) {
+    fail('Homepage is missing the AV by Dave console doorway.');
   }
-  if (!/<a class="tool-card"[^>]*\shref="av-suite\.html\?entry=toolbox"[^>]*>[\s\S]*?<h2>AV Toolbox<\/h2>/.test(tools)) {
-    fail('Tools directory is missing the addressable AV Toolbox entry.');
+  if (/av-suite\.html\?entry=/.test(index + tools)) fail('Public copy still links the retired Toolbox or Show Console doorways.');
+  if (!/<a class="tool-card"[^>]*\shref="av\/"[^>]*>[\s\S]*?<h2>AV by Dave<\/h2>/.test(tools)) {
+    fail('Tools directory is missing the AV by Dave console entry.');
   }
   // Tools directory cards for registry tools carry the registry id and its navigation department.
   const toolCards = Array.from(tools.matchAll(/<a class="tool-card[^"]*"([^>]*)>[\s\S]*?<span class="tc-badge">([^<]*)<\/span>/g), (match) => ({
@@ -396,19 +351,7 @@ function assertPageContracts(registry) {
     }
   });
 
-  // Video legacy pages (docs/av-suite-consolidation-stage2-video.md, increment 2.0b): single-key
-  // shortcuts must leave Cmd/Ctrl/Alt combinations (print, reload, bookmark) to the browser.
-  ['signal-flow.html', 'video-patch.html', 'display-plan.html', 'projection-plan.html', 'stream-plan.html',
-    'record-log.html', 'camera-shot-list.html', 'playback-check.html'].forEach((rel) => {
-    const source = read(rel);
-    const handlers = source.match(/document\.addEventListener\(\s*(['"])keydown\1\s*,\s*function\s*\(\s*\w+\s*\)\s*\{[\s\S]{0,160}/g) || [];
-    if (!handlers.length) fail(`${rel} has no document keydown handler to check.`);
-    handlers.forEach((handler) => {
-      const name = handler.match(/function\s*\(\s*(\w+)\s*\)/)[1];
-      const guard = new RegExp(`\\{\\s*if\\s*\\(\\s*${name}\\.metaKey\\s*\\|\\|\\s*${name}\\.ctrlKey\\s*\\|\\|\\s*${name}\\.altKey\\s*\\)\\s*return;`);
-      if (!guard.test(handler)) fail(`${rel} single-key shortcuts do not return early for Cmd, Ctrl or Alt.`);
-    });
-  });
+  // The eight Video legacy sheet pages retired into AV Video on 2026-10-13; their shortcut contract left with them.
   const workbookStore = read('apps/av-workbook/src/store.ts');
   if (/createSampleWorkbook/.test(workbookStore)) {
     fail('AV Workbook store still seeds the sample workbook on first launch.');
@@ -497,7 +440,7 @@ function assertPageContracts(registry) {
 async function assertRemoteChecks(registry) {
   if (!baseUrl) return;
   const targets = Array.from(new Set(
-    ['av-suite.html', 'tools.html', 'index.html']
+    ['av/', 'tools.html', 'index.html']
       .concat(registry.tools.map((tool) => tool.href))
       .concat(registry.offlineAssets ? registry.offlineAssets().map((asset) => asset.replace(/^\.\//, '')) : [])
   ));

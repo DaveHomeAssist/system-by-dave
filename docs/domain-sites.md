@@ -17,7 +17,7 @@ and the browser storage its tools own. AV by Dave pages come from
 avbydave.com without editing the config. Paths are unchanged on the new domains:
 `systembydave.com/fmp/house/` is `housevideo.app/fmp/house/`. The bare domain
 redirects to the site's home (`/fmp/` or `/fmpwalk/`). AV by Dave serves the
-source-controlled `av-suite-landing2.html` at `/`; the direct source path is
+source-controlled `av/index.html` at `/`; the direct source path is
 noindex and canonical to `/`. It keeps direct Show Console and Toolbox routes
 and is cached with the AV shell for offline return visits. The previous
 `av-suite-landing.html` was retired (UX-005): it is now a noindex redirect to

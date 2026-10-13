@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-13 — AV by Dave is one console (slice C)
+
+- Make the AV Suite shell the AV by Dave home: `av/index.html` is staged as `/` on avbydave.com (`scripts/domain-sites.json` `landingPage`), canonical to the domain root and noindex at its source path and `/av/` alias. The console opens on an empty **Workspace** view; the Rail's top entry is now Workspace and recalls that view in place, the PWA manifest starts at `./av/`, and the shell registers the suite service worker through `js/av-offline.js` (which now resolves the site root from the registry script wherever the page lives).
+- Retire the 34 legacy sheet pages, `av-suite.html` (Toolbox and Show Console), both landing pages and the historical AV Tool Suite index as noindex redirect stubs into the console: sheets go to their owning application (`/av/?app=<pack>`), `av-suite.html` keeps `sbd*` show context and maps `?entry=show` to Show Control. Registry entries carry `retired:'<pack>'`, keep their storage keys for domain transfer and one-time import, and leave `offlineAssets()`, the sitemap and the public counts (18 live tools). `verify:av` checks every stub.
+- Remove the Toolbox code (`js/av-suite/`, `css/av-suite.css`), the landing and domain-view scripts, the Toolbox family taxonomy and `family:` Rail references, and the probes that only tested those surfaces (nav dock, suite import, context fill, legacy video pages, save safety, responsive hub, domain views, logistics exceptions, viewport navigation, worksheet viewport). Nav scripts, the Rail's All apps dialog and the theme, gear-reference, indexing, navigation, consistency and cutover verifiers skip retired routes; the AV Video probes register offline through the console.
+- Repoint every non-managed Toolbox and Show Console link (site header, home, tools directory, README, Throwline, Stage 3D, Calculator, LED Wall, StagePlotter, CueForge boundary, shader and switcher references, application breadcrumbs) at the console; managed FMP pages keep their `av-suite.html?entry=show&sbd…` links, which the stub forwards. Advance the cache generation to `v20261013-av-suite-retire-sheets`.
+
 ## 2026-10-13 — AV Suite shell (slice B)
 
 - Add the AV Suite shell at `/av/` (`apps/av-suite/`, built into `av/`): one shared-engine workspace with shell-owned views (`sbd.avSuite.workspace.v1`, device-local arrangement in `sbd.avSuite.layout.v1`), the production Rail, a chooser grouped by application, and a status line that names the application reporting.

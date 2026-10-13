@@ -6,7 +6,7 @@
   ],
   "head": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
   "status": "amber",
-  "statusReason": "Slice B of the AV Suite shell is in source on 2026-10-13: /av/ hosts one shared-engine workspace with shell-owned views, the Rail, and all eight family applications as in-process panel packs; AV Calculator, Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge and StagePlotter embed as chrome-less panels; each application has one Document panel. Local Chrome passes the shell probe, the seven family probes, the Calculator probe, the AV Video set and the deploy-only AV suites; the Audio keyboard-choice step is a macOS select quirk left to CI. Publication, live acceptance and slice C (retiring the 34 sheet pages, Toolbox and /av-video/ redirects) remain.",
+  "statusReason": "Slices A\u2013C of the AV Suite shell are in source on 2026-10-13: /av/ is one console and the avbydave.com home, opening on an empty Workspace view; eight family applications run as in-process panel packs; specialists embed as chrome-less panels; av-suite.html, the landing pages, the historical index and the 34 legacy sheet pages are noindex redirect stubs; Toolbox code and Toolbox-only probes are removed. Publication and live acceptance follow the slice C pull request. Standalone family routes still exist and mount the same packs; physical/operator acceptance remains open.",
   "audioLineCheckChoiceParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
@@ -82,10 +82,10 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Merge the shell (slice B), read back avbydave.com/av/, then retire the 34 sheet pages (slice C)",
-    "why": "The accepted product is one console; the sheets and the standalone family routes are the remaining fragmentation.",
-    "doneWhen": "avbydave.com/av/ serves the shell with all nine identities and specialist panels; then every retired route is a redirect stub and is absent from Toolbox, sitemap, offline assets and counts.",
-    "effort": "Slice C: 34 stubs, registry retired/replacedBy, Toolbox and /av-video/ redirects, probe removal, sitemap and count updates.",
+    "title": "Publish slice C, read back avbydave.com/ as the console, then decide whether standalone family routes redirect into /av/",
+    "why": "The product is one console; the eight standalone routes are the last duplicate surfaces, kept only because their probes still drive them.",
+    "doneWhen": "avbydave.com/ serves the shell on an empty Workspace; every retired route redirects; then either the family routes redirect into /av/?app=<pack> with their probes retargeted, or they are recorded as deliberate deep links.",
+    "effort": "Moderate: eight stubs plus retargeting ~10 probes to the shell.",
     "owner": "Claude (serial)",
     "blockedBy": []
   },
@@ -281,7 +281,7 @@
       "items": [
         "Slice A: brief, supersede notes, hold on per-family conversions (PR #338, 2026-10-13)",
         "Slice B: apps/av-suite shell, eight pack conversions, specialist embed mode, Document panels, shell probe (in source 2026-10-13; publication pending)",
-        "Slice C: 34 redirect stubs, registry retired/replacedBy, Toolbox and /av-video/ redirects, probe removal, sitemap and counts"
+        "Slice C: console is the avbydave.com home with an empty Workspace view; 34 sheet pages, av-suite.html, landing pages and the historical index are redirect stubs; Toolbox code and probes removed (in source 2026-10-13; publication pending)"
       ],
       "gate": "typecheck, unit, build parity, shell browser probe at six sizes in both palettes, verify:av, verify:public-navigation, verify:public-consistency, verify:domain-sites; slice C adds test:domain-cutover"
     }
@@ -540,7 +540,7 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Read docs/av-suite-shell.md. Confirm avbydave.com/av/ serves the merged shell, then implement slice C: replace the 34 legacy sheet pages with noindex redirect stubs into the owning application's view, mark their registry entries retired/replacedBy, redirect av-suite.html and /av-video/ into /av/ preserving sbd* context, remove their probes, regenerate sitemap, inventory and counts, and run test:domain-cutover before merging.",
+  "kickoffPrompt": "Confirm avbydave.com/ serves the AV by Dave console (empty Workspace, nine Rail identities, Throwline as a panel) and every retired sheet route redirects. Then retarget the family probes at /av/?app=<pack> and replace the eight standalone family routes with redirect stubs, keeping their packs in apps/<app>/src/pack.tsx.",
   "confidence": "High for the bounded Infrastructure source, nine exact-head checks, both publications, eight-group live browser acceptance and eight-asset parity. Whole-toolset, physical/operator and actual process/power interruption acceptance remain unverified.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",

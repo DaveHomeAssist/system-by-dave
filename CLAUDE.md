@@ -88,16 +88,19 @@ metadata, and title families are release-gated by the public content contract.
 
 ### AV by Dave
 
-`av-suite.html` is one doorway with two addressable workspaces: Show Console at
-`?entry=show` and the show-independent AV Toolbox at `?entry=toolbox`. A neutral
-visit opens Toolbox, including returning visits with a legacy entry preference; any explicit `sbd*` show parameter
-forces Show Console. The registry drives both workspaces' tool inventory,
-storage metadata, navigation, offline assets, and generated sitemap entries.
-Toolbox-only pins, recents, search, and filter preferences live in
-`av-suite-ui.v1` and must never mutate the show dashboard in
-`av-suite-dashboard.v1`. See `docs/av-suite-doorway.md` for the complete routing
-and persistence contract. `js/av-theme-mode.js` and `js/av-theme.js` apply the
-operator's Warm Paper, Stage Slate, or System choice.
+AV by Dave is one console. The shell at `/av/` (`apps/av-suite/`, built into
+`av/`) opens on an empty Workspace view; the Rail recalls each application's
+views in place, the chooser lists every application's panels, and the
+specialist tools open as chrome-less panels (`?sbdEmbed=panel`). On
+avbydave.com the shell is also the home page (`scripts/domain-sites.json`
+`landingPage`). `av-suite.html` (the former Toolbox and Show Console doorway),
+the two landing pages and the 34 legacy sheet pages are noindex redirect stubs
+into the console; their registry entries carry `retired:'<pack>'`, keep their
+storage keys for data transfer and one-time import, and leave the offline
+suite, sitemap and public counts (`verify:av` checks the stubs). Shell views
+live in `sbd.avSuite.workspace.v1`; each application keeps its own document and
+explicit Save. See `docs/av-suite-shell.md`. `js/av-theme-mode.js` and
+`js/av-theme.js` apply the operator's Warm Paper, Stage Slate, or System choice.
 
 The [AV Suite shell brief](docs/av-suite-shell.md) (2026-10-13) is the current
 direction: one `/av/` console, every application as a panel pack, specialists
@@ -176,7 +179,7 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - Links between the camera training tools and the FMP explorers: `docs/camera-training-links.md`
 - AV inventory and storage keys: `js/sbd-registry.js`
 - Sitemap membership: `scripts/gen_sitemap.py`
-- AV Suite doorway and storage: `docs/av-suite-doorway.md`
+- AV Suite doorway (retired 2026-10-13; history): `docs/av-suite-doorway.md`
 - AV Suite shell (one console): `docs/av-suite-shell.md`
 - Verification commands: `package.json` and `AGENTS.md`
 - Other domains (housevideo.app, avbydave.com), saved-data transfer and

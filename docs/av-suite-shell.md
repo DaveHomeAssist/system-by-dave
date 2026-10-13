@@ -1,7 +1,7 @@
 # AV Suite shell: one console
 
 **Date:** October 13, 2026
-**Status:** Slice A delivered (direction, hold). Slice B delivered in source on 2026-10-13: the shell at `/av/`, eight panel packs, specialist embed mode, Document panels, shell probe; publication and live acceptance follow its pull request. Slice C (sheet retirement) is next. Supersedes the
+**Status:** Slice A delivered (direction, hold). Slice B delivered in source on 2026-10-13: the shell at `/av/`, eight panel packs, specialist embed mode, Document panels, shell probe; publication and live acceptance follow its pull request. Slice C delivered in source on 2026-10-13: the console is the avbydave.com home and opens on an empty Workspace view; `av-suite.html`, both landing pages, the historical tool index and the 34 sheet pages are redirect stubs; the Toolbox code, Toolbox families and their probes are removed. Standalone family routes still exist and mount the same packs. Supersedes the
 [console snapshot Rail](av-suite-console-snapshot-rail.md) as the definition of
 done and pauses further per-family console conversions under the
 [October 9 rollout](av-console-rollout.md).

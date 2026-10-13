@@ -165,13 +165,10 @@ test('typed route resolution carries context only to eligible internal destinati
   assert.equal(consoleRoute.searchParams.has('private'), false);
   assert.equal(consoleRoute.hash, '');
 
-  const familyRoute = new URL(dialogs.resolveRoute('family:audio', options).href);
-  assert.equal(familyRoute.searchParams.get('entry'), 'toolbox');
-  assert.equal(familyRoute.searchParams.get('family'), 'audio');
-  assert.equal(familyRoute.searchParams.has('sbdShow'), false);
+  assert.equal(dialogs.resolveRoute('family:audio', options).ok, false, 'Toolbox families no longer resolve');
 
   const toolboxRoute = new URL(dialogs.resolveRoute('toolbox', options).href);
-  assert.equal(toolboxRoute.searchParams.get('entry'), 'toolbox');
+  assert.equal(toolboxRoute.pathname, '/av/');
   assert.equal(toolboxRoute.searchParams.has('sbdShow'), false);
 
   const cueForge = new URL(dialogs.resolveRoute('external:cueforge', options).href);
@@ -307,8 +304,7 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   ['av-audio', 'show-control', 'show-ops', 'front-office', 'the-shop', 'infrastructure', 'av-lighting', 'av-calculator'].forEach((toolId) => {
     assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', `tool:${toolId}`).length, 0);
   });
-  const audioFamily = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'family:audio')[0];
-  assert.equal(new URL(audioFamily.getAttribute('href')).searchParams.has('sbdShow'), false);
+  assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'family:audio').length, 0, 'All apps lists no Toolbox families');
   const cueForge = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:cueforge')[0];
   assert.equal(cueForge.getAttribute('href'), 'https://systembydave.com/cueforge.html');
   const arenaOps = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:arenaops')[0];
