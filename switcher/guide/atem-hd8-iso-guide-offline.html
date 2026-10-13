@@ -21,7 +21,17 @@
 <meta name="twitter:image" content="https://housevideo.app/fmp/fmp-social-card.png">
 <meta name="theme-color" content="#f1eee7">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4eee2'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%239a4525' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%239a4525'/%3E%3C/svg%3E" type="image/svg+xml">
-<style>.sbd-public-nav {
+<style>/* Hosted as a panel inside the AV Suite shell (docs/av-suite-shell.md): the
+   shell owns navigation, so page escape navigation and static breadcrumbs hide. */
+html[data-sbd-embed="panel"] .sbd-public-nav,
+html[data-sbd-embed="panel"] .sbd-skip-link,
+html[data-sbd-embed="panel"] nav.sbd-nav,
+html[data-sbd-embed="panel"] .sbd-site-return,
+html[data-sbd-embed="panel"] .sbd-site-header {
+  display: none !important;
+}
+
+.sbd-public-nav {
   position: fixed;
   left: max(12px, env(safe-area-inset-left));
   bottom: max(12px, env(safe-area-inset-bottom));
