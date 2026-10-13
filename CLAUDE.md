@@ -94,8 +94,12 @@ Toolbox-only pins, recents, search, and filter preferences live in
 and persistence contract. `js/av-theme-mode.js` and `js/av-theme.js` apply the
 operator's Warm Paper, Stage Slate, or System choice.
 
-The [maintained consolidation plan](docs/av-suite-consolidation-spec.md) sets the
-next product direction: Toolbox as default, focused applications with optional
+The [AV Suite shell brief](docs/av-suite-shell.md) (2026-10-13) is the current
+direction: one `/av/` console, every application as a panel pack, specialists
+as chrome-less panels, the legacy sheet pages retired. Do not start further
+per-family console conversions outside that brief. The earlier
+[consolidation plan](docs/av-suite-consolidation-spec.md) set the
+previous direction: Toolbox as default, focused applications with optional
 modules, independently launchable Unified Video, and public Workbook withdrawal
 while retaining its concept for possible redesign. AV Video now combines Signal Flow and Video Patch at `/av-video/`, with app-owned data and optional patch, displays/projection, cameras, playback, checks and backup modules. Cameras and Playback add ordered shot/cue records and previewed legacy imports with original-source retention. Displays & Projection records link explicitly to routes and import the legacy Display Plan / Projection Plan sheets without changing their originals. The remaining application consolidation is target work. See `docs/av-video.md`. Workbook is not a
 required host or database for new applications. Dave clarified on 2026-10-02
@@ -168,6 +172,7 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - AV inventory and storage keys: `js/sbd-registry.js`
 - Sitemap membership: `scripts/gen_sitemap.py`
 - AV Suite doorway and storage: `docs/av-suite-doorway.md`
+- AV Suite shell (one console): `docs/av-suite-shell.md`
 - Verification commands: `package.json` and `AGENTS.md`
 - Other domains (housevideo.app, avbydave.com), saved-data transfer and
   cutover: `docs/domain-sites.md`

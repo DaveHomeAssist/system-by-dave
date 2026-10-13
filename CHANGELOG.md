@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-13 — AV Suite shell direction
+
+- Record Dave's 2026-10-13 direction in `docs/av-suite-shell.md`: one `/av/` console with a single shared-engine instance, every application mounted as an in-process panel pack, Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter and AV Calculator as chrome-less panels, and the 34 legacy sheet pages retired. Three list-style record panels remain; the repeated Plan/Import and Backup panels do not.
+- Mark the October 9 console snapshot Rail, the Rail launcher and the console expansion assessment as superseded or paused. The `/av-video/` host that iframes eight standalone consoles is an interim release, not the product.
+- Reset the AV consolidation next-steps record: status red, next step is slice B (shell and pack conversions) then slice C (sheet retirement). No further per-family console or parity slices are dispatched outside the shell brief.
+
 ## 2026-10-13 — Audio Line Check choice parity
 
 - Add the original seven Line Check status choices alongside the existing editable text field. Both controls use the same value; custom entry remains available, and saved blank/custom/absent/null values retain the existing display behavior.

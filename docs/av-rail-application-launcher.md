@@ -3,7 +3,9 @@
 **Date:** October 9, 2026
 **Status:** Delivered interim milestone
 
-**Final Rail experience:** This launcher slice is superseded as the definition of done by the [AV Suite console snapshot Rail](av-suite-console-snapshot-rail.md). Its published routes and navigation contract remain the standalone fallback.
+**Superseded 2026-10-13:** the final Rail experience is the [AV Suite shell](av-suite-shell.md); the standalone routes remain only until slice C redirects them.
+
+**Final Rail experience (October 9, superseded):** This launcher slice is superseded as the definition of done by the [AV Suite console snapshot Rail](av-suite-console-snapshot-rail.md). Its published routes and navigation contract remain the standalone fallback.
 
 ## Problem
 
