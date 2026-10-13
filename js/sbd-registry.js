@@ -351,7 +351,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261012-calculator-native',
+    version:'v20261013-calculator-theme',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
