@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-13 — Audio embedded resize verification repair
+
+- Retain PR #333 publication failure `38375997754`: the embedded Audio probe timed out on Maximize Inputs after resizing, despite passing premerge and runner checks.
+- Observe stale workspace mode after iframe dimensions change and reproduce skipped maximization on the reverse transition. Wait for matching host/iframe modes and stable geometry before selecting mode-specific controls; activate each intended panel first.
+- Require phone controls or Maximize/Restore explicitly, retain all data and reachability assertions, and cover fourteen bidirectional transitions. Normal and sixfold CPU-throttled Duncan runs each pass all nine groups.
+- Change only verification and release records: no runtime, generated asset, cache or saved-data change. CI, source/destination publication and live acceptance remain separate gates in the repair pull request.
+
 ## 2026-10-13 — Audio Patch status parity
 
 - Add an independently editable Patch status select with the original seven states, blank and preserved custom values. Do not change input/line-check/generic status, Connection, original snapshots or storage schemas.
