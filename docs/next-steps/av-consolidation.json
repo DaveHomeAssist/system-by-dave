@@ -13,7 +13,8 @@
     "branch": "codex/audio-input-status-parity-20261013",
     "scope": "Editable original Input List open/patched/checked/problem values in Inputs; preserve blank/custom/absent states, Patch/Line Check/Connection, original snapshots and app-owned Save/import semantics.",
     "candidateEvidence": "Duncan Windows Chrome155: typecheck,35 model tests, Audio build, full AV verification/23 Rail-worker tests and all12 focused browser groups pass. Both themes/seven sizes,44px hit-testing, backup/reopen/repeat imports, prepared offline and14 bidirectional embedded transitions pass. Exact hashes and release ledger bind these results to the candidate.",
-    "next": "Complete scoped review, exact-head CI, merge, source and AV publication, then isolated live behavior and asset readback.",
+    "next": "Complete PR335 correction1 shared-cache verification, exact-head review/CI, merge, both publications and isolated live proof. Final receipt belongs to https://github.com/DaveHomeAssist/system-by-dave/pull/335.",
+    "correction1": "Candidate304c190 workspace38388863489 and domain38388863409 failed the valid Stage3D current-cache check. Its missed OFFLINE_CACHE_VERSION now matches registry v20261013-audio-input-status. Duncan passes Throwline47, AV23 and Shader Practice54 after process-local Python qualification;35prior runtime/test inputs unchanged. Failed CI and initial runner alias attempt retained. Final-head CI/publication/live remain PR335 ledger gates; no weaker assertion or new workflow.",
     "limits": "No storage/schema or workflow change, full52-tool parity, Stream/Record policy resolution, physical touch, real virtual keyboard, process interruption, power loss or human acceptance is implied."
   },
   "audioPatchStatusParity": {
