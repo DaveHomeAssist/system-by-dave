@@ -6,15 +6,15 @@
   ],
   "head": "d42453456f7261814bec7314c9f6c5a611e4f99a",
   "status": "amber",
-  "statusReason": "All nine primary families have shared-engine working panels. Audio Connection #332 is published and live-verified at d424534. The next Audio Patch status candidate is implemented but blocked at its runner test command by transferred macOS metadata, despite 25 actual model tests passing. Build/browser/CI/release gates remain open; no Patch status publication is claimed. Whole-toolset parity and physical/operator acceptance remain open.",
+  "statusReason": "All nine primary families have shared-engine working panels. Audio Connection #332 is published and live-verified at d424534. Audio Patch status passes the clean 25-test command and build after transfer repair, but verify:av stops on a stale cache-version expectation. Browser/CI/release gates remain open; no Patch status publication is claimed. Whole-toolset parity and physical/operator acceptance remain open.",
   "audioPatchStatusParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "d42453456f7261814bec7314c9f6c5a611e4f99a",
     "branch": "codex/audio-patch-status-parity-20261013",
     "scope": "Independently editable original Patch statuses, blank and custom values; preserve Connection, original snapshots, line-check results and existing import/save semantics.",
-    "candidateEvidence": "Duncan typecheck and all 25 actual model tests pass. Overall test:av-audio fails on archive-generated ._model.test.ts metadata; execution stopped before build or browser.",
-    "next": "Preserve the failed evidence; make a metadata-free transfer, remove only verified task-created sidecars, and rerun the failed gate before build/browser and normal exact-head release closure.",
-    "deliveryEvidence": "Unreleased. Generated artifacts/cache synchronization, browser acceptance, required CI, merge, publication and live proof remain pending."
+    "candidateEvidence": "Duncan typecheck retained. Transfer repair verified 33 source hashes and moved 33 exact archive-matched metadata sidecars to recoverable evidence. Clean test:av-audio passes all25tests; build succeeds. verify:av fails on its prior-generation cache assertion; the worker test also retains that old expected value.",
+    "next": "Align only the existing suite verifier and worker-test cache pins with the candidate registry, rerun the failed AV gate, then continue focused browser checks and normal exact-head release closure. Preserve both prior attempts.",
+    "deliveryEvidence": "Unreleased. Built/generated outputs remain on the isolated runner; import their exact bytes only after the required gate is repaired. Browser acceptance, required CI, merge, publication and live proof remain pending."
   },
   "audioConnectionParity": {
     "recordedOn": "2026-10-13",
@@ -50,12 +50,12 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Unblock Audio Patch status verification and finish its bounded release",
-    "why": "Patch status is imported but lacked its own editable control. The scoped candidate restores that operation; verification stopped on a metadata-contaminated runner transfer.",
-    "doneWhen": "The clean transfer passes the failed test gate, generated outputs match source, and standalone/embedded status independence passes browser checks followed by exact-head CI, merge, both publications and live proof.",
+    "title": "Align Audio Patch cache test pins and finish its bounded release",
+    "why": "The transfer blocker is repaired. The scoped working-control candidate passes model/build checks, but existing AV tests still pin the previous cache generation.",
+    "doneWhen": "The affected AV gate passes, generated outputs match source, and standalone/embedded status independence passes browser checks followed by exact-head CI, merge, both publications and live proof.",
     "effort": "M",
     "owner": "AV console acceptance",
-    "blockedBy": "Runner transfer metadata blocks the current candidate test gate. Physical/operator acceptance remains separate. The missing private Board prevents synchronization, not independent delivery. AVV-STREAM-KEY-1 blocks only its dependent work."
+    "blockedBy": "Existing cache-version assertions need scoped alignment; execution stopped at the instructed source-assertion boundary. Physical/operator acceptance remains separate. The missing private Board prevents synchronization, not independent delivery. AVV-STREAM-KEY-1 blocks only its dependent work."
   },
   "findings": [
     {

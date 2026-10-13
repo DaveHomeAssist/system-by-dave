@@ -4,7 +4,8 @@
 
 - Add an independently editable Patch status select with the original seven states, blank and preserved custom values. Do not change input/line-check/generic status, Connection, original snapshots or storage schemas.
 - Add status import/roundtrip/merge/old-backup model cases and extend the existing Audio browser probe for independent edits, embedded operation, responsive reachability and offline reopening.
-- Duncan typecheck and 25 actual model tests pass, but transferred macOS metadata creates an extra binary test suite and fails the overall test command. Execution stopped at that required gate; build, generated-cache sync, browser, CI/review, merge, publication and live verification are not complete.
+- Retain the first failed model command caused by transferred macOS metadata. After a verified metadata-free retransmission and recovery-preserving cleanup, the clean command passes 25 tests and the Audio build succeeds.
+- The next AV gate stops on its old cache-version assertion; the suite verifier and worker test still expect the previous release. Browser, CI/review, merge, publication and live verification remain incomplete. This candidate is not released.
 
 ## 2026-10-13 — Audio connection parity
 
