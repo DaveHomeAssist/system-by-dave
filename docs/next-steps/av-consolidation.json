@@ -6,7 +6,7 @@
   ],
   "head": "c5cbd9074c243d62bd3d5aa6edac767dc6e9faff",
   "status": "amber",
-  "statusReason": "Functional touch panels remain the target. Front Office #328 is published and all nine isolated live groups plus fourteen-asset parity pass at c6ed44c. Lighting #329 passed all nine checks, both publications and all nine isolated live groups with fourteen-asset parity at c5cbd90. Calculator has a shared-engine candidate preserving six original calculation engines, field sets and LED fields; final ten-group runner verification passed and release gates remain pending. Deeper specialist parity and physical/operator acceptance remain separate.",
+  "statusReason": "Functional touch panels remain the target. Front Office #328 is published and all nine isolated live groups plus fourteen-asset parity pass at c6ed44c. Lighting #329 passed all nine checks, both publications and all nine isolated live groups with fourteen-asset parity at c5cbd90. Calculator has a shared-engine candidate preserving six original calculation engines, field sets and LED fields; final eleven-group runner verification passed and release gates remain pending. Deeper specialist parity and physical/operator acceptance remain separate.",
   "lastActivity": "2026-10-13",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",

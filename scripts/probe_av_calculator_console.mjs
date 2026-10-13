@@ -70,6 +70,24 @@ try {
   const stale = (await fresh()).page; await stale.evaluate(key=>localStorage.setItem(key,'other tab'),viewsKey); await button(stale,'Save views').click(); await stale.waitForFunction(()=>document.getElementById('workspaceStatus').textContent.includes('another tab')); assert.match(await stale.locator('#workspaceStatus').textContent(),/another tab/); assert.equal(await read(stale,viewsKey),'other tab');
   pass('new workspace data refuses unreadable or stale-tab replacement');
 
+  const staticContext = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 256 } }); contexts.push(staticContext);
+  const staticPage = await staticContext.newPage(); await staticPage.goto(base + '/av-calculator.html');
+  const fallback = staticPage.locator('.calculator-noscript'); await fallback.waitFor();
+  for (const name of Object.values(names).slice(0, 6)) assert.ok((await fallback.textContent()).includes(name), name + ' fallback description');
+  assert.match(await fallback.textContent(), /Enable JavaScript and reload/); assert.match(await fallback.textContent(), /does not verify electrical safety/);
+  await reachable(fallback.getByRole('link', { name: 'AV Suite', exact: true }), 'static AV Suite navigation'); await reachable(fallback.getByRole('link', { name: 'Toolbox', exact: true }), 'static Toolbox navigation');
+  await fallback.getByText('Field verification required:', { exact: true }).scrollIntoViewIfNeeded(); await noOverflow(staticPage);
+  assert.equal(await staticPage.locator('#calculatorSource').isVisible(), false, 'no misleading nonworking calculator controls');
+  for (const denied of [false, true]) {
+    const compact = await fresh({ width: 844, height: 390 }, denied
+      ? () => { Storage.prototype.setItem = () => { throw new DOMException('Synthetic storage denied', 'SecurityError'); }; }
+      : () => { localStorage.setItem('avCalculator.v1', '{invalid'); });
+    await compact.page.locator('.calculator-controls[open]').waitFor(); assert.equal(await compact.page.locator('#actionStatus').isVisible(), true);
+    assert.match(await compact.page.locator('#actionStatus').textContent(), denied ? /storage is unavailable/ : /data was invalid/);
+    await button(compact.page, 'Back to panels').click(); await fill(compact.page, '#delayDistance', '100'); assert.match(await compact.page.locator('#delayMs').textContent(), /88\.8/);
+  }
+  pass('no-JavaScript navigation and safety fallback, and visible compact startup storage errors');
+
   for (const theme of ['light','dark']) {
     await page.setViewportSize({width:1440,height:900}); if(await page.locator('html').getAttribute('data-av-theme')!==theme) await page.locator('#themeToggle').click();
     assert.equal(await page.locator('.calculator-header h1').evaluate(el=>getComputedStyle(el).color),await page.locator('.calculator-app').evaluate(el=>getComputedStyle(el).color),'header uses readable foreground token');

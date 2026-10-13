@@ -52,8 +52,10 @@ export function App() {
   useEffect(() => { const resize = () => { setCompact(innerHeight < 500); controls.current?.close(); }; addEventListener('resize', resize); return () => removeEventListener('resize', resize); }, []);
   useEffect(() => {
     const status = nodes.get('actionStatus')!;
-    const errors = new MutationObserver(() => { if (status.classList.contains('error') && innerHeight < 500 && !controls.current?.open) controls.current?.showModal(); });
+    const revealError = () => { if (status.classList.contains('error') && innerHeight < 500 && !controls.current?.open) controls.current?.showModal(); };
+    const errors = new MutationObserver(revealError);
     errors.observe(status, { childList: true, attributes: true, attributeFilter: ['class'] });
+    revealError(); // The original engine reports startup failures before React mounts.
     const theme = (event: StorageEvent) => { if (event.key === 'av-theme-mode.v1' && ['light', 'dark', 'system'].includes(event.newValue || '')) { document.documentElement.dataset.avTheme = event.newValue!; const dark = event.newValue === 'dark' || (event.newValue === 'system' && matchMedia('(prefers-color-scheme: dark)').matches); const node = nodes.get('themeToggle')!; node.textContent = dark ? 'Light mode' : 'Dark mode'; node.setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} mode`); } };
     addEventListener('storage', theme); return () => { errors.disconnect(); removeEventListener('storage', theme); };
   }, []);
