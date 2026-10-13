@@ -264,7 +264,7 @@ try {
         await context.setOffline(true);
         await page.reload();
         assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
-        assert.ok((await page.locator('body').innerText()).includes('AV SUITE'));
+        assert.ok((await page.locator('body').innerText()).includes('AV by Dave'));
       }
     });
 
@@ -698,7 +698,7 @@ try {
       await context.setOffline(true);
       await page.reload();
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'keep during activation');
-      assert.ok((await page.locator('body').innerText()).includes('AV SUITE'));
+      assert.ok((await page.locator('body').innerText()).includes('AV by Dave'));
     } finally {
       responseHooks.delete(directory);
       releaseCache?.(); releaseNavigation?.();
