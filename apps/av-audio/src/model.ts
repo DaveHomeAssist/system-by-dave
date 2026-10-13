@@ -4,6 +4,7 @@ export const STORE = "sbd.avAudio.v1";
 export const SCHEMA = "system-by-dave.av-audio.v1";
 export const INPUT_STATUSES = ["open","patched","checked","problem"] as const;
 export const PATCH_STATUSES = ["planned","patched","gained","linecheck","ready","issue","spare"] as const;
+export const LINE_CHECK_STATUSES = ["pending","patched","checked","passed","issue","muted","spare"] as const;
 export const LEGACY = [
   { name: "Input List", key: "input-list.v1", collection: "rows" },
   { name: "Audio Patch", key: "audio-patch.v1", collection: "items" },

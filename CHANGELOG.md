@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-13 — Audio Line Check choice parity
+
+- Add the original seven Line Check status choices alongside the existing editable text field. Both controls use the same value; custom entry remains available, and saved blank/custom/absent/null values retain the existing display behavior.
+- Preserve explicit Save, the existing Line Check/generic-status alias, current changed-source import semantics, original snapshots and independent Input/Patch/Connection fields. This closes a minor choice-control gap, not a broken workflow.
+- Duncan passes typecheck, 51 Audio model tests, build, full AV verification/23 Rail-worker cases, Throwline/47 and Shader Practice/54. All sixteen focused browser groups and fourteen embedded transitions pass, including presets, custom entry, old backups, edit comparisons and offline use. Candidate, CI and published acceptance remain separate gates; physical/operator and interruption/power-loss proof is not implied.
+- Advance the shared cache generation and its intentional assertions/consumers together, including Stage 3D's named offline pin. Retain PR #335's successful release and earlier cache-pin failures as historical evidence.
+
 ## 2026-10-13 — Audio Input status parity
 
 - Correct the missed Stage 3D offline-cache pin after PR #335's first workspace/domain CI runs rejected its mismatch with the new registry generation. Retain both failures; do not weaken the shared verification assertion or alter Audio runtime behavior in this correction.
