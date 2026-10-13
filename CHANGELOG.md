@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-13 — Audio connection parity
+
+- Expose Input List's existing `conn` as Connection in Audio's working Inputs panel. Preserve arbitrary/blank values, original row objects and exact source JSON through import, edit, Save/reload and backup restore; unchanged-source repeats remain rejected and changed-source merges preserve nonblank operator edits.
+- Keep old Audio backups compatible without migration or automatic writes. No storage key/schema, status semantics, RF/comms or shared document change.
+- Add six model cases and a focused six-group browser probe to the existing AV Video CI/publication command. Repair Windows test discovery using the established app-root/relative-glob pattern.
+- Keep expanded records in one bounded list scroller, use 44 px inputs and make the existing full-screen toolbar fit short displays. Short-screen and embedded tablet acceptance explicitly uses Full screen/Maximize; it is not a claim of simultaneous three-panel field visibility.
+- Duncan passes typecheck, twelve model tests, build, nine Rail/worker regressions, both themes at seven sizes, prepared offline editing and independent AV Video embedded use. Exact-head CI, merge, publication and live checks remain separate release-ledger gates.
+
 ## 2026-10-13 — Calculator theme alignment
 
 - Restore the established Stage Slate first-use default, correcting the native conversion's light-default drift. Stored Light, Dark or System choices still win; the calculation engine is otherwise unchanged.
