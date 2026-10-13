@@ -52,6 +52,10 @@ async function patchStatus(scope) {
   if(await toggle.getAttribute('aria-expanded')!=='true')await toggle.click();
   return panel.getByRole('combobox',{name:/^patch status/i});
 }
+async function inputStatus(scope) {
+  await connection(scope);
+  return scope.locator('.console-panel[data-panel="inputs"]').getByRole('combobox',{name:/^input status/i});
+}
 async function imported(scope, raw, saved = false, source = 'Input List') {
   await quick(scope,'Project');
   await scope.locator('.console-panel[data-panel="project"]').getByRole('combobox',{name:/^legacy tool/i}).selectOption({label:source});
@@ -214,6 +218,57 @@ try {
   assert.equal(JSON.parse(await read(page)).channels[0].lineCheckStatus,'issue');
   pass('saved Patch status and independent line-check result survive page close and reopen');
 
+  control=await inputStatus(page); assert.equal(await control.inputValue(),'open');
+  assert.deepEqual(await control.locator('option').evaluateAll(options=>options.map(option=>option.value)),['','open','patched','checked','problem']);
+  const inputBefore=await exported(page,page);
+  for(const value of ['open','patched','checked','problem','']) {
+    await control.selectOption(value);
+    const expected=structuredClone(inputBefore); expected.channels[0].inputStatus=value;
+    assert.deepEqual(await exported(page,page),expected,'Input edit changes only inputStatus');
+    assert.equal(await page.locator('.console-panel[data-panel="inputs"] .audio-row-title em').first().textContent(),'issue');
+  }
+  await control.selectOption('checked'); await save(page); await page.reload();
+  assert.equal(await (await inputStatus(page)).inputValue(),'checked');
+  const inputSaved=await read(page);
+  await imported(page,original,true);
+  assert.match(await page.getByRole('status').textContent(),/already been imported/);
+  assert.equal(await read(page),inputSaved);
+  const changedInput=JSON.parse(original); changedInput.rows[0].status='problem';
+  await imported(page,JSON.stringify(changedInput));
+  assert.equal(await (await inputStatus(page)).inputValue(),'checked');
+  await save(page); const inputBackup=await exported(page,page);
+  assert.equal(inputBackup.channels.length,1);
+  assert.equal(inputBackup.channels[0].patchStatus,'ready');
+  assert.equal(inputBackup.channels[0].lineCheckStatus,'issue');
+  assert.equal(inputBackup.channels[0].status,'issue');
+  assert.equal(inputBackup.channels[0].conn,'TRS / operator patch');
+  assert.ok(inputBackup.imports.some(source=>source.raw===original));
+  assert.equal(await read(page,producer),original);
+  assert.equal(await read(page,'audio-patch.v1'),patchSource);
+  assert.equal(await read(page,'line-check.v1'),checkSource);
+  await imported(restore,JSON.stringify(inputBackup));
+  assert.deepEqual(await exported(restore,restore),inputBackup); await save(restore); await restore.reload();
+  assert.equal(await (await inputStatus(restore)).inputValue(),'checked');
+  const oldInput=structuredClone(inputBackup); delete oldInput.channels[0].inputStatus;
+  await imported(restore,JSON.stringify(oldInput));
+  assert.equal(await (await inputStatus(restore)).inputValue(),'');
+  assert.deepEqual(await exported(restore,restore),oldInput,'absent Input status must not infer or migrate it');
+  const customInput=structuredClone(inputBackup); customInput.channels[0].inputStatus='Custom input state';
+  await imported(restore,JSON.stringify(customInput));
+  assert.equal(await (await inputStatus(restore)).inputValue(),'Custom input state');
+  assert.deepEqual(await exported(restore,restore),customInput);
+  await save(restore); await restore.reload();
+  assert.equal(await (await inputStatus(restore)).inputValue(),'Custom input state');
+  await (await inputStatus(restore)).selectOption(''); await save(restore); await restore.reload();
+  assert.equal(await (await inputStatus(restore)).inputValue(),'');
+  assert.equal(JSON.parse(await read(restore)).channels[0].lineCheckStatus,'issue');
+  pass('Input status original choices, blank/custom/absent values, edit-only-field comparison, issue precedence and source-preserving Save/restore/repeated imports');
+  await page.close(); page=await primary.context.newPage(); await page.goto(base+'/av-audio/');
+  assert.equal(await (await inputStatus(page)).inputValue(),'checked');
+  assert.equal(JSON.parse(await read(page)).channels[0].patchStatus,'ready');
+  assert.equal(JSON.parse(await read(page)).channels[0].lineCheckStatus,'issue');
+  pass('saved Input status survives page close/reopen independently from Patch and Line Check');
+
   for(const theme of ['light','dark']) {
     await page.evaluate(theme=>localStorage.setItem('av-theme-mode.v1',theme),theme); await page.reload();
     for(const size of [{width:1440,height:900},{width:375,height:812},{width:680,height:812},{width:1024,height:768},{width:844,height:390},{width:320,height:256},{width:3840,height:1080}]) {
@@ -225,6 +280,10 @@ try {
       await noOverflow(page); await reachable(control,theme+'/'+size.width+'x'+size.height);
       await control.focus(); assert.equal(await control.evaluate(el=>el===document.activeElement),true);
       assert.equal(await control.inputValue(),'TRS / operator patch');
+      const input=await inputStatus(page); await reachable(input,'Input/'+theme+'/'+size.width+'x'+size.height);
+      await input.focus(); assert.equal(await input.evaluate(el=>el===document.activeElement),true);
+      assert.equal(await input.inputValue(),'checked');
+      if([1440,375,3840].includes(size.width))await page.screenshot({path:join(output,`audio-input-${theme}-${size.width}.png`)});
       const patch=await patchStatus(page); await reachable(patch,'Patch/'+theme+'/'+size.width+'x'+size.height);
       await patch.focus(); assert.equal(await patch.evaluate(el=>el===document.activeElement),true);
       assert.equal(await patch.inputValue(),'ready');
@@ -232,7 +291,7 @@ try {
       if(size.height<500)await page.evaluate(()=>document.exitFullscreen());
     }
   }
-  pass('Connection and Patch status keyboard focus and full 44px reachability in both themes at seven sizes; existing full-screen panel path at short heights');
+  pass('Connection, Input and Patch status keyboard focus and full 44px reachability in both themes at seven sizes; existing full-screen panel path at short heights');
   await page.setViewportSize({width:1440,height:900});
   await page.evaluate(async()=>{await navigator.serviceWorker.register('/av-suite-worker.js',{scope:'/',updateViaCache:'none'});await navigator.serviceWorker.ready;});
   await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
@@ -247,6 +306,14 @@ try {
   assert.equal(JSON.parse(await read(page)).channels[0].lineCheckStatus,'issue');
   await primary.context.setOffline(false);
   pass('prepared offline Patch status edit survives Save/reload without changing line-check issue');
+  await primary.context.setOffline(true);
+  await (await inputStatus(page)).selectOption('problem'); await save(page); await page.reload();
+  assert.equal(await (await inputStatus(page)).inputValue(),'problem');
+  const offline=JSON.parse(await read(page));
+  assert.equal(offline.channels[0].patchStatus,'gained'); assert.equal(offline.channels[0].lineCheckStatus,'issue');
+  assert.equal(offline.channels[0].conn,'Offline connection');
+  await primary.context.setOffline(false);
+  pass('prepared offline Input status edit survives Save/reload with Patch, Line Check and Connection unchanged');
 
   const hostContext=await browser.newContext({viewport:{width:1440,height:900},hasTouch:true,acceptDownloads:true}); contexts.push(hostContext);
   host=await hostContext.newPage(); host.on('pageerror',error=>errors.push(error.message));
@@ -263,7 +330,9 @@ try {
   assert.equal(await (await connection(frame)).inputValue(),'Embedded edit');
   await imported(frame,patchSource,false,'Audio Patch'); await imported(frame,checkSource,false,'Line Check');
   await (await patchStatus(frame)).selectOption('gained'); await save(frame);
+  await (await inputStatus(frame)).selectOption('checked'); await save(frame);
   const embedded=await exported(frame,host);
+  assert.equal(embedded.channels[0].inputStatus,'checked');
   assert.equal(embedded.channels[0].patchStatus,'gained'); assert.equal(embedded.channels[0].lineCheckStatus,'issue');
   assert.equal(embedded.channels[0].conn,'Embedded edit'); assert.equal(await read(host,'sbd.avVideo.v1'),null);
   await host.reload(); await frame.locator('.console-shell').waitFor();
@@ -275,6 +344,9 @@ try {
     else {await button(frame,'Maximize Inputs').click();await button(frame,'Restore Inputs').waitFor();}
     await reachable(input,'embedded/'+size.width);
     assert.equal(await input.inputValue(),'Embedded edit');
+    const inputState=await inputStatus(frame);
+    await reachable(inputState,'embedded Input/'+size.width);
+    assert.equal(await inputState.inputValue(),'checked');
     if(mode!=='phone')await button(frame,'Restore Inputs').click();
     const patch=await patchStatus(frame);
     if(mode==='phone')assert.equal(await button(frame,'Maximize Patch').count(),0);
@@ -283,12 +355,13 @@ try {
     assert.equal(await patch.inputValue(),'gained');
     if(mode!=='phone')await button(frame,'Restore Patch').click();
     const saved=JSON.parse(await read(host));
+    assert.equal(saved.channels[0].inputStatus,'checked');
     assert.equal(saved.channels[0].patchStatus,'gained');assert.equal(saved.channels[0].lineCheckStatus,'issue');
     assert.equal(saved.channels[0].conn,'Embedded edit');assert.equal(await read(host,'sbd.avVideo.v1'),null);
     await noOverflow(frame); await noOverflow(host);
   }
   await host.screenshot({path:join(output,'audio-embedded-phone.png')});
-  pass('actual AV Video embedded Connection/Patch import/edit/Save/export/reload, independent line-check results and document, touch-size field access using panel maximize where needed');
+  pass('actual AV Video embedded Connection/Input/Patch import/edit/Save/export/reload, independent line-check results and document, touch-size field access using panel maximize where needed');
   assert.deepEqual(errors,[]);
   await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,resizeTransitions,physicalDevice:'not tested',virtualKeyboard:'not tested',processRestartAndPowerLoss:'not tested'},null,2));
 } catch(error) {

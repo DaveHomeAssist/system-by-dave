@@ -4,23 +4,33 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "d42453456f7261814bec7314c9f6c5a611e4f99a",
+  "head": "702e287c0140e1b7e29b5c0675d91d3360e9a61c",
   "status": "amber",
-  "statusReason": "All nine primary families have shared-engine working panels. Audio Connection #332 is live at d424534. Audio Patch #333 merged at7e6d4a3 but publication38375997754 failed in the embedded resize probe. The scoped synchronization repair passes nine browser groups and fourteen bidirectional transitions at normal and sixfold-throttled speed. Exact CI/publication/live results belong to its repair pull-request ledger; whole-toolset and physical/operator acceptance remain open.",
+  "statusReason": "All nine primary families have shared-engine working panels. Audio Patch is live at 702e287 after PR334 closed PR333's publication blocker; retain the failed attempt and repair proof. The next bounded Input Status control passes Duncan model/build/AV and twelve browser groups; its own CI/publication/live gates remain pending. Whole-toolset and physical/operator acceptance remain open.",
+  "audioInputStatusParity": {
+    "recordedOn": "2026-10-13",
+    "baseRevision": "702e287c0140e1b7e29b5c0675d91d3360e9a61c",
+    "branch": "codex/audio-input-status-parity-20261013",
+    "scope": "Editable original Input List open/patched/checked/problem values in Inputs; preserve blank/custom/absent states, Patch/Line Check/Connection, original snapshots and app-owned Save/import semantics.",
+    "candidateEvidence": "Duncan Windows Chrome155: typecheck,35 model tests, Audio build, full AV verification/23 Rail-worker tests and all12 focused browser groups pass. Both themes/seven sizes,44px hit-testing, backup/reopen/repeat imports, prepared offline and14 bidirectional embedded transitions pass. Exact hashes and release ledger bind these results to the candidate.",
+    "next": "Complete scoped review, exact-head CI, merge, source and AV publication, then isolated live behavior and asset readback.",
+    "limits": "No storage/schema or workflow change, full52-tool parity, Stream/Record policy resolution, physical touch, real virtual keyboard, process interruption, power loss or human acceptance is implied."
+  },
   "audioPatchStatusParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "d42453456f7261814bec7314c9f6c5a611e4f99a",
     "branch": "codex/audio-patch-status-parity-20261013",
     "scope": "Independently editable original Patch statuses, blank and custom values; preserve Connection, original snapshots, line-check results and existing import/save semantics.",
     "candidateEvidence": "Duncan typecheck retained; clean model command25/25pass; build, full verify:av and23Rail/worker tests pass. All nine focused browser groups pass, including actual embedding, independent statuses, Connection/original preservation, old/custom/blank fields, both themes/seven sizes and prepared offline editing.36exact input hashes match. Transfer, stale-cache-expectation and initial select-locator failures are preserved with bounded corrections.",
-    "next": "Complete the embedded resize repair's exact-head CI, merge, source/destination publication and isolated live verification before selecting another parity gap.",
+    "next": "Bounded Patch release complete through PR334. Preserve its failed publication/diagnosis/repair history and continue the separately scoped Input Status gap.",
     "deliveryEvidence": "PR333 merged7e6d4a3ca7b54bbcba3b2956fe7f3d991c9f5703; source publication38375997754 failed before domain publication. Preserve https://github.com/DaveHomeAssist/system-by-dave/pull/333#issuecomment-6142797171. Runtime assets remain unchanged by the repair; its final pull-request ledger owns publication and live evidence.",
     "publicationRepair": {
       "baseRevision": "7e6d4a3ca7b54bbcba3b2956fe7f3d991c9f5703",
       "branch": "codex/audio-embedded-resize-20261013",
       "scope": "Probe synchronization and explicit mode-specific control assertions; no runtime, cache, schema or generated asset changes.",
       "diagnosis": "Actual iframe width changes before React workspace mode. Reverse resize reproduces skipped maximization and failed reachability; the original30second timeout is retained separately.",
-      "evidence": "Duncan Chrome155 passes all9groups and14bidirectional resize transitions at10:03:31Z normal and10:03:50Z sixfold CPU throttle.36runtime/test inputs verified; runner claim released andNodeCount0. Exact-head CI, publication and live remain separate gates."
+      "evidence": "Duncan Chrome155 passes all9groups and14bidirectional resize transitions at10:03:31Z normal and10:03:50Z sixfold CPU throttle.36runtime/test inputs verified; runner claim released andNodeCount0. Exact-head CI, publication and live remain separate gates.",
+      "completedRelease": "PR334 merged702e287c0140e1b7e29b5c0675d91d3360e9a61c; final-head CI38381284145/38381284149 and source38382482306/AV38385917587 publications passed. Live9groups/14transitions/13asset hashes passed2026-10-13T10:50:13.901Z; runner released. Exact receipt: https://github.com/DaveHomeAssist/system-by-dave/pull/334#issuecomment-6143918379. Earlier failed publication38375997754 remains historical evidence."
     }
   },
   "audioConnectionParity": {
@@ -57,8 +67,8 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Close Audio Patch status release and select the next verified parity gap",
-    "why": "The working-control candidate now passes model/build/AV/browser gates while preserving independent status and original data. Deployment and full specialist parity remain separate claims.",
+    "title": "Close Audio Input Status release with independent workflow stages",
+    "why": "Original Input List status now has a working control in the Inputs panel. Its candidate passes model/build/AV/browser gates while preserving Patch, Line Check, Connection and original data. Publication and full specialist parity remain separate claims.",
     "doneWhen": "The final pull-request ledger records exact-head CI, merge, both publications and live proof. Then scope one next source-confirmed missing operator capability without assuming all52tools must be absorbed.",
     "effort": "M",
     "owner": "AV console acceptance",
@@ -505,7 +515,7 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Use the final exact production receipt in PR330 as the release baseline, then review the shared touch workspace on a representative actual device and scope one remaining operator capability from docs/av-console-rollout.md. Preserve original records, specialist routes and independent Save behavior. Do not equate nine available console families with full52tool parity, infer physical acceptance from browser tests, or resolve AVV-STREAM-KEY-1 without Dave. Work serially and keep substantial execution on a qualified remote runner.",
+  "kickoffPrompt": "Use the final Audio Input Status pull-request ledger and fresh production source as the release baseline. Finish any still-open exact-head CI, publication or live gate before selecting the next source-confirmed original-tool parity gap. Preserve Input, Patch and Line Check independence, Connection, original records, specialist routes and explicit Save. Keep PR333's failure and PR334's successful repair as history. Do not infer full52-tool parity or physical acceptance, resolve AVV-STREAM-KEY-1, or delegate without Dave's approval. Keep substantial execution on a qualified remote runner.",
   "confidence": "High for the bounded Infrastructure source, nine exact-head checks, both publications, eight-group live browser acceptance and eight-asset parity. Whole-toolset, physical/operator and actual process/power interruption acceptance remain unverified.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",

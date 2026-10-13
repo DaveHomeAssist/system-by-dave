@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-13 — Audio Input status parity
+
+- Expose the original Input List Open, Patched, Checked and Problem states as an independently editable Input status select. Preserve blank/custom/absent values without inference or migration; Patch, Line Check, Connection and original source data remain separate.
+- Reuse the existing select, explicit Save and import/merge/backup contracts. No storage key/schema, dependency, shared-engine or workflow change.
+- Duncan passes typecheck, 35 model tests, Audio build, full AV verification with 23 Rail/worker tests, and all twelve focused browser groups. Checks cover edit-only-field comparison, Save/reopen/restore, repeat imports, both themes/seven sizes, 44 px reachability, prepared offline edits and fourteen embedded resize transitions. Physical devices, virtual keyboards, process interruption and power loss are not proven.
+- PR #334 previously closed the Patch release blocker at `702e287`: both publications and isolated live nine-group acceptance passed. Preserve PR #333's failed publication and repair evidence. This Input slice still needs its own exact-head CI, publication and live receipt.
+
 ## 2026-10-13 — Audio embedded resize verification repair
 
 - Retain PR #333 publication failure `38375997754`: the embedded Audio probe timed out on Maximize Inputs after resizing, despite passing premerge and runner checks.
