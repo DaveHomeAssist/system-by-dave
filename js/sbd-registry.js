@@ -185,6 +185,9 @@
     './data/gear/ptzoptics-superjoy-g1.json',
     './data/gear/figures/x39-chassis.svg',
     './data/gear/figures/x39-io.svg',
+    './av/index.html',
+    './av/assets/av-suite.js',
+    './av/assets/av-suite.css',
     './av-video/index.html',
     './av-video/assets/av-video.js',
     './av-video/assets/av-video.css',
@@ -351,7 +354,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261013-audio-line-check-controls',
+    version:'v20261013-av-suite-shell',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

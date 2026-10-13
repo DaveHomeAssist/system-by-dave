@@ -52,7 +52,7 @@
     }
 
     function selectionEvent(entry){
-      var detail={ref:entry.ref,consoleId:entry.id,href:resolvedHref(entry)};
+      var detail={ref:entry.ref,namespace:entry.namespace,consoleId:entry.namespace==='console'?entry.id:null,toolId:entry.namespace==='tool'?entry.id:null,href:resolvedHref(entry)};
       if(typeof root.CustomEvent==='function') return new root.CustomEvent(CONSOLE_SELECT_EVENT,{detail:detail,cancelable:true});
       if(documentRef&&typeof documentRef.createEvent==='function'){
         var event=documentRef.createEvent('CustomEvent');
@@ -77,7 +77,7 @@
     }
 
     function navigate(entry,event){
-      if(!entry||entry.namespace!=='console'||!eventTarget||typeof eventTarget.dispatchEvent!=='function') return;
+      if(!entry||(entry.namespace!=='console'&&entry.namespace!=='tool')||!eventTarget||typeof eventTarget.dispatchEvent!=='function') return;
       if(event&&(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||(typeof event.button==='number'&&event.button!==0))) return;
       var trigger=eventTrigger(event);
       var fromRail=!!(rendered&&rendered.entries&&rendered.entries.indexOf(trigger)!==-1);
@@ -94,7 +94,7 @@
     function activeSnapshot(event){
       var reference=event&&event.detail&&event.detail.ref;
       var entry=typeof reference==='string'?rail.resolveRef(reference,registry):null;
-      if(entry&&entry.namespace==='console') setCurrent(reference);
+      if(entry&&(entry.namespace==='console'||entry.namespace==='tool')) setCurrent(reference);
     }
 
     function renderRail(state){

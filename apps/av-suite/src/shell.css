@@ -1,0 +1,23 @@
+/* AV Suite shell (docs/av-suite-shell.md). Panel packs bring their own
+   stylesheets; this file owns only the shell frame around the one workspace. */
+.suite-app{display:flex;flex-direction:column;height:100%;min-height:0;min-width:0;background:var(--av-bg);color:var(--av-text)}
+.suite-header{display:flex;align-items:center;gap:16px;padding:8px 16px;border-bottom:1px solid var(--av-line);background:var(--av-surface);min-width:0}
+.suite-identity{display:flex;align-items:center;gap:12px;min-width:0}
+.suite-identity h1{font-size:18px;letter-spacing:-.4px;white-space:nowrap}
+.suite-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:7px;background:var(--av-accent);color:var(--av-primary-ink);font:800 12px/1 ui-monospace,monospace;letter-spacing:.06em;flex-shrink:0}
+.suite-plan{font-size:11px;color:var(--av-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.suite-context{font-size:11px;color:var(--av-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.suite-actions{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.suite-actions .theme-label{display:flex;align-items:center;gap:6px;font-size:12px}
+.suite-actions .theme-label select{width:auto}
+.suite-bar{display:flex;align-items:center;gap:16px;padding:4px 16px;border-bottom:1px solid var(--av-line);background:var(--av-surface-2);font-size:12px;color:var(--av-muted);min-width:0}
+.suite-summary{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suite-dirty{flex-shrink:0;color:var(--av-warning);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%}
+.suite-app .workspace-host{flex:1;min-height:0;display:flex;flex-direction:column}
+.suite-app .message{flex-shrink:0}
+[data-pack-dialogs]{display:contents}
+/* Pack panels fill their console body the way their own pages did. */
+.suite-app .console-body>.lighting-menu,.suite-app .console-body>.infra-menu,.suite-app .console-body>.infra-records,.suite-app .console-body>.shop-menu,.suite-app .console-body>.office-scroll,.suite-app .console-body>.ops-scroll,.suite-app .console-body>.ops-record-panel,.suite-app .console-body>.call-list,.suite-app .console-body>.call-menu,.suite-app .console-body>.audio-panel{flex:1;min-height:0;overflow:auto}
+.suite-app .console-body section>h3{margin:12px 0 6px}
+@media(max-width:1099px){.suite-header{gap:10px;padding:8px 12px}.suite-context{display:none}.suite-plan{max-width:30vw}}
+@media(max-width:719px){.suite-header{padding:6px 10px;gap:8px}.suite-mark{display:none}.suite-identity h1{font-size:16px}.suite-plan{display:none}.suite-actions .theme-label>span{display:none}.suite-actions button{padding:8px 10px}.suite-bar{padding:4px 10px;font-size:11px}.suite-dirty{display:none}}

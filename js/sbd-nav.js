@@ -235,6 +235,7 @@
   function render(){
     var route = currentRoute();
     if(document.documentElement.getAttribute('data-sbd-nav') === 'off') return;
+    if(document.documentElement.getAttribute('data-sbd-embed') === 'panel') return;
     if(SKIP[route]) return;
     if(document.querySelector('nav.sbd-nav')) return;
 
