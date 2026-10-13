@@ -695,7 +695,8 @@ try {
       await returning;
       assert.equal(await page.evaluate(() => window.acceptanceInitiallyControlled), false, 'The regression must actually start without a controller');
       await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
-      await page.locator('#offlineSummary .offline-pill').filter({ hasText: 'Worker' }).getByText('Ready', { exact: true }).waitFor({ state: 'attached' });
+      // The console reports readiness through js/av-offline.js once the worker controls it and its assets are cached.
+      await page.waitForFunction(() => document.documentElement.dataset.workspaceOffline === 'ready', null, { timeout: 60000, polling: 250 });
       await context.setOffline(true);
       await page.reload();
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'keep during activation');
