@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-13 — Audio Patch status candidate, not released
+
+- Add an independently editable Patch status select with the original seven states, blank and preserved custom values. Do not change input/line-check/generic status, Connection, original snapshots or storage schemas.
+- Add status import/roundtrip/merge/old-backup model cases and extend the existing Audio browser probe for independent edits, embedded operation, responsive reachability and offline reopening.
+- Duncan typecheck and 25 actual model tests pass, but transferred macOS metadata creates an extra binary test suite and fails the overall test command. Execution stopped at that required gate; build, generated-cache sync, browser, CI/review, merge, publication and live verification are not complete.
+
 ## 2026-10-13 — Audio connection parity
 
 - Expose Input List's existing `conn` as Connection in Audio's working Inputs panel. Preserve arbitrary/blank values, original row objects and exact source JSON through import, edit, Save/reload and backup restore; unchanged-source repeats remain rejected and changed-source merges preserve nonblank operator edits.

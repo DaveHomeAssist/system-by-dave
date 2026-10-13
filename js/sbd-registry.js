@@ -351,7 +351,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261013-audio-connector',
+    version:'v20261013-audio-patch-status',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
