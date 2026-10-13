@@ -6,6 +6,7 @@
 - Observe stale workspace mode after iframe dimensions change and reproduce skipped maximization on the reverse transition. Wait for matching host/iframe modes and stable geometry before selecting mode-specific controls; activate each intended panel first.
 - Require phone controls or Maximize/Restore explicitly, retain all data and reachability assertions, and cover fourteen bidirectional transitions. Normal and sixfold CPU-throttled Duncan runs each pass all nine groups.
 - Change only verification and release records: no runtime, generated asset, cache or saved-data change. CI, source/destination publication and live acceptance remain separate gates in the repair pull request.
+- Include the existing Audio probe in the AV Video pull-request path filter so probe-only repairs run the same verification before merge; no new workflow, commands, timeout or permission changes.
 
 ## 2026-10-13 — Audio Patch status parity
 

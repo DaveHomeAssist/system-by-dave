@@ -34,6 +34,7 @@ on:
       - 'scripts/probe_show_ops_console.mjs'
       - 'package*.json'
       - 'scripts/probe_av_video*.mjs'
+      - 'scripts/probe_av_audio_connector.mjs'
       - 'scripts/probe_av_suite_responsive.js'
       - 'js/sbd-registry.js'
       - 'js/av-suite/**'
