@@ -50,11 +50,11 @@ async function patchStatus(scope) {
   const panel=scope.locator('.console-panel[data-panel="patch"]');
   const toggle=panel.locator('.audio-row-title').first();
   if(await toggle.getAttribute('aria-expanded')!=='true')await toggle.click();
-  return panel.getByLabel('patch Status',{exact:true});
+  return panel.getByRole('combobox',{name:/^patch status/i});
 }
 async function imported(scope, raw, saved = false, source = 'Input List') {
   await quick(scope,'Project');
-  await scope.getByLabel('Legacy tool',{exact:true}).selectOption({label:source});
+  await scope.locator('.console-panel[data-panel="project"]').getByRole('combobox',{name:/^legacy tool/i}).selectOption({label:source});
   if (saved) await button(scope,'Preview saved browser sheet').click();
   else await scope.locator('input[type=file]').setInputFiles(file(raw));
   await button(scope,'Confirm import').click();

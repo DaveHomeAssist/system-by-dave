@@ -1,11 +1,12 @@
 # Changelog
 
-## 2026-10-13 — Audio Patch status candidate, not released
+## 2026-10-13 — Audio Patch status parity
 
 - Add an independently editable Patch status select with the original seven states, blank and preserved custom values. Do not change input/line-check/generic status, Connection, original snapshots or storage schemas.
 - Add status import/roundtrip/merge/old-backup model cases and extend the existing Audio browser probe for independent edits, embedded operation, responsive reachability and offline reopening.
 - Retain the first failed model command caused by transferred macOS metadata. After a verified metadata-free retransmission and recovery-preserving cleanup, the clean command passes 25 tests and the Audio build succeeds.
-- The next AV gate stops on its old cache-version assertion; the suite verifier and worker test still expect the previous release. Browser, CI/review, merge, publication and live verification remain incomplete. This candidate is not released.
+- Align only the two stale cache-generation expectations; full AV verification and all 23 Rail/worker tests pass. Preserve the intermediate failure.
+- Nine focused browser groups pass on Duncan, including independent Patch status, existing Connection behavior, original/legacy preservation, both themes/seven viewports, offline and AV Video embedded use. Correct native-select probe targeting without weakening data assertions. Exact-head CI/review, merge, publication/live and physical acceptance remain distinct release-ledger gates.
 
 ## 2026-10-13 — Audio connection parity
 
