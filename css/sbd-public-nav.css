@@ -1,3 +1,13 @@
+/* Hosted as a panel inside the AV Suite shell (docs/av-suite-shell.md): the
+   shell owns navigation, so page escape navigation and static breadcrumbs hide. */
+html[data-sbd-embed="panel"] .sbd-public-nav,
+html[data-sbd-embed="panel"] .sbd-skip-link,
+html[data-sbd-embed="panel"] nav.sbd-nav,
+html[data-sbd-embed="panel"] .sbd-site-return,
+html[data-sbd-embed="panel"] .sbd-site-header {
+  display: none !important;
+}
+
 .sbd-public-nav {
   position: fixed;
   left: max(12px, env(safe-area-inset-left));

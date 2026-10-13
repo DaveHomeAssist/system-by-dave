@@ -70,7 +70,9 @@ const robots = read('robots.txt');
 // The Shop native source entry adds one non-published application template.
 // Infrastructure adds its non-published native source template.
 // Front Office adds one non-published native source template; its public route is unchanged.
-if (unlisted.length !== 151) fail(`Expected 151 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// The AV Suite shell adds its non-published source template under apps/av-suite/; its public
+// route av/ belongs in the AV-origin sitemap.
+if (unlisted.length !== 152) fail(`Expected 152 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   if (!sitemapRoutes.has(route)) {

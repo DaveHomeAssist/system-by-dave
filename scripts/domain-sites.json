@@ -98,6 +98,7 @@
       "landingPage": "av-suite-landing2.html",
       "registry": true,
       "pages": [
+        "av/",
         "av-suite-landing.html",
         "av-suite-landing2.html",
         "av-suite.html",

@@ -32,6 +32,7 @@ STATIC_PAGES = [
     ("depotops/", "weekly", "0.7"),
     ("tailscale-manual.html", "monthly", "0.7"),
     ("av-suite.html", "weekly", "0.9"),
+    ("av/", "weekly", "0.9"),
     ("av-tool-suite/index-v2/", "monthly", "0.7"),
     ("backfocus/", "monthly", "0.7"),
     ("switcher/", "monthly", "0.7"),

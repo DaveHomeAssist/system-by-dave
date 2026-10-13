@@ -9,8 +9,7 @@ export const LIBRARY: PanelDef[] = [
   { type: 'network', name: 'Network', group: 'Common', description: 'Edit device, address and VLAN records.', minW: 3, minH: 3 },
   { type: 'cable', name: 'Cable', group: 'Common', description: 'Edit runs, endpoints and testing status.', minW: 3, minH: 3 },
   { type: 'issues', name: 'Issues', group: 'Common', description: 'Review issues and open their source records.', minW: 3, minH: 3 },
-  { type: 'plan', name: 'Plan/Import', group: 'Utilities', description: 'Name the plan and review legacy JSON sources.', minW: 3, minH: 3 },
-  { type: 'backup', name: 'Backup', group: 'Utilities', description: 'Explicit Save, export, restore and recovery.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Document', group: 'Utilities', description: 'Plan name, Save, export, restore and Power, Network or Cable Plan imports.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'systems', name: 'Systems', panels: [
@@ -20,9 +19,8 @@ export const DEFAULT_VIEWS: View[] = [
   ] },
   { id: 'review', name: 'Review', panels: [
     { id: 'issues', type: 'issues', x: 0, y: 0, w: 6, h: 8 },
-    { id: 'plan', type: 'plan', x: 6, y: 0, w: 6, h: 8 },
+    { id: 'document', type: 'document', x: 6, y: 0, w: 6, h: 8 },
   ] },
-  { id: 'backup', name: 'Backup', panels: [{ id: 'backup', type: 'backup', x: 0, y: 0, w: 12, h: 8 }] },
 ];
 export function parsePlan(value: unknown): Plan {
   const plan = validPlan(value);

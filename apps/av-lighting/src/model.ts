@@ -8,8 +8,7 @@ export const LIBRARY: PanelDef[] = [
   { type: 'fixtures', name: 'Fixtures', group: 'Common', description: 'Search, select and add fixture records.', minW: 3, minH: 3, lit: true },
   { type: 'details', name: 'Fixture details', group: 'Common', description: 'Edit all patch, focus and status fields.', minW: 3, minH: 3 },
   { type: 'focus', name: 'Focus', group: 'Common', description: 'Review focus notes and set fixture status.', minW: 3, minH: 3 },
-  { type: 'plan', name: 'Plan/Import', group: 'Utilities', description: 'Show metadata, Lighting Patch and PlotForge imports.', minW: 3, minH: 3 },
-  { type: 'backup', name: 'Backup', group: 'Utilities', description: 'Explicit Save, export, restore and recovery.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Document', group: 'Utilities', description: 'Show details, Save, export, restore and Lighting Patch or PlotForge imports.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'patch', name: 'Patch', panels: [
@@ -17,10 +16,7 @@ export const DEFAULT_VIEWS: View[] = [
     { id: 'details', type: 'details', x: 5, y: 0, w: 7, h: 8 },
   ] },
   { id: 'focus', name: 'Focus', panels: [{ id: 'focus', type: 'focus', x: 0, y: 0, w: 12, h: 8 }] },
-  { id: 'plan', name: 'Plan', panels: [
-    { id: 'plan', type: 'plan', x: 0, y: 0, w: 6, h: 8 },
-    { id: 'backup', type: 'backup', x: 6, y: 0, w: 6, h: 8 },
-  ] },
+  { id: 'plan', name: 'Plan', panels: [{ id: 'document', type: 'document', x: 0, y: 0, w: 12, h: 8 }] },
 ];
 export function parsePlan(value: unknown): Plan {
   const plan = validate(value);

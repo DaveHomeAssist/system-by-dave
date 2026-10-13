@@ -7,18 +7,14 @@ export const LAYOUT_KEY = 'sbd.shop.layout.v1';
 export const LIBRARY: PanelDef[] = [
   { type: 'worklist', name: 'Worklist', group: 'Common', description: 'Filter and select prep, pack, load in and strike work.', minW: 3, minH: 3, lit: true },
   { type: 'inspector', name: 'Item inspector', group: 'Common', description: 'Edit the selected item, quantities, ownership and blockers.', minW: 3, minH: 3 },
-  { type: 'plan', name: 'Plan/Import', group: 'Utilities', description: 'Name this plan and review copies from four legacy tools.', minW: 3, minH: 3 },
-  { type: 'backup', name: 'Backup', group: 'Utilities', description: 'Explicit Save, export, restore and damaged-save recovery.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Document', group: 'Utilities', description: 'Plan name, Save, export, restore and copies from Gear Prep, Truck Pack, Load In or Strike plans.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'work', name: 'Work', panels: [
     { id: 'worklist', type: 'worklist', x: 0, y: 0, w: 5, h: 8 },
     { id: 'inspector', type: 'inspector', x: 5, y: 0, w: 7, h: 8 },
   ] },
-  { id: 'manage', name: 'Manage', panels: [
-    { id: 'plan', type: 'plan', x: 0, y: 0, w: 6, h: 8 },
-    { id: 'backup', type: 'backup', x: 6, y: 0, w: 6, h: 8 },
-  ] },
+  { id: 'manage', name: 'Manage', panels: [{ id: 'document', type: 'document', x: 0, y: 0, w: 12, h: 8 }] },
 ];
 // Keep the pure logistics model unchanged; validate optional presentation data here.
 export function parsePlan(value: unknown): Plan {

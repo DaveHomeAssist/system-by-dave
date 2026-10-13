@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-13 — AV Suite shell (slice B)
+
+- Add the AV Suite shell at `/av/` (`apps/av-suite/`, built into `av/`): one shared-engine workspace with shell-owned views (`sbd.avSuite.workspace.v1`, device-local arrangement in `sbd.avSuite.layout.v1`), the production Rail, a chooser grouped by application, and a status line that names the application reporting.
+- Convert AV Video, Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure and Lighting from standalone consoles into panel packs (`apps/<app>/src/pack.tsx`, contract in `apps/shared/av-console/pack.ts`). Each pack keeps its own document, storage key, schema, recovery and explicit Save; the shell mounts all eight in process and namespaces their panel types. The standalone routes mount the same packs with their page chrome.
+- Replace each application's separate Plan/Import and Backup panels with one Document panel (AV Video keeps Project). Show Control keeps Setup for cues.
+- Host AV Calculator, Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge and StagePlotter as chrome-less panels: `?sbdEmbed=panel` marks the page, `js/sbd-nav.js` and `js/sbd-public-nav.js` skip their navigation, `css/sbd-public-nav.css` hides static breadcrumbs, and the Calculator serves its plain page. Rail `tool:` entries dispatch the same cancelable selection as consoles so All apps opens them in the shell.
+- Remove the embedded full-application iframes from `/av-video/` and the `probe_show_control_embed.mjs` probe; the family probes drop their AV Video embedding sections and follow the Document panel. Add `scripts/probe_av_suite_shell.mjs` (nine identities recall in place, Calculator and Throwline embed, a mixed Lighting + Video view stores and restores, Save writes one key, no overflow at eight sizes in both palettes) to the AV Video and Pages workflows.
+- Register `av/` and its bundle as offline assets, advance the cache generation to `v20261013-av-suite-shell` (worker test and Stage 3D pin), publish `av/` on avbydave.com and regenerate the consolidation inventory.
+
+## 2026-10-13 — AV Suite shell direction
+
+- Record Dave's 2026-10-13 direction in `docs/av-suite-shell.md`: one `/av/` console with a single shared-engine instance, every application mounted as an in-process panel pack, Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter and AV Calculator as chrome-less panels, and the 34 legacy sheet pages retired. Three list-style record panels remain; the repeated Plan/Import and Backup panels do not.
+- Mark the October 9 console snapshot Rail, the Rail launcher and the console expansion assessment as superseded or paused. The `/av-video/` host that iframes eight standalone consoles is an interim release, not the product.
+- Reset the AV consolidation next-steps record: status red, next step is slice B (shell and pack conversions) then slice C (sheet retirement). No further per-family console or parity slices are dispatched outside the shell brief.
+
 ## 2026-10-13 — Audio Line Check choice parity
 
 - Add the original seven Line Check status choices alongside the existing editable text field. Both controls use the same value; custom entry remains available, and saved blank/custom/absent/null values retain the existing display behavior.

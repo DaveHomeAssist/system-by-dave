@@ -142,6 +142,15 @@ jobs:
           npm run build:av-video
           npm run test:av-video-browser
 
+      - name: Verify AV Suite shell
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:av-suite
+          npm run build:av-suite
+          git diff --exit-code -- av
+          npm run test:av-suite-browser
+
       - name: Verify AV Audio
         run: |
           npm run typecheck:av-audio
