@@ -28,8 +28,8 @@ const button = (scope, name) => scope.getByRole('button', {name,exact:true});
 const quick = (scope, name) => button(scope.locator('.console-quick'),name).click();
 const read = (page, name = key) => page.evaluate(name => localStorage.getItem(name), name);
 const file = raw => ({name:'synthetic.json',mimeType:'application/json',buffer:Buffer.from(raw)});
-const contexts = [], errors = [], passed = [];
-let browser, page;
+const contexts = [], errors = [], passed = [], resizeTransitions = [];
+let browser, page, host;
 async function fresh() {
   const context = await browser.newContext({viewport:{width:1440,height:900},hasTouch:true,acceptDownloads:true});
   contexts.push(context);
@@ -70,6 +70,32 @@ async function exported(scope, downloadPage) {
 }
 async function noOverflow(scope) {
   assert.ok(await scope.locator('html').evaluate(el => el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth), 'root must fit viewport');
+}
+async function resizeEmbedded(size) {
+  await host.setViewportSize(size);
+  // setViewportSize does not wait for either React workspace's resize render.
+  // Require matching modes and stable geometry before selecting mode-specific controls.
+  const state=await host.evaluate(size=>new Promise((resolve,reject)=>{
+    const started=performance.now(); let previous='',stable=0;
+    function check() {
+      const child=document.querySelector('iframe[title="Audio application"]')?.contentWindow;
+      const state=[window,child].map(w=>{
+        const shell=w?.document.querySelector('.console-shell');
+        const mode=['phone','tablet','desktop'].find(mode=>shell?.classList.contains('mode-'+mode));
+        const width=w?.innerWidth,height=w?.innerHeight;
+        return {width,height,mode,expected:width<720?'phone':width<1100?'tablet':'desktop'};
+      });
+      const signature=JSON.stringify(state);
+      const ready=innerWidth===size.width&&innerHeight===size.height&&state.every(s=>s.width>0&&s.height>0&&s.mode===s.expected);
+      stable=ready&&signature===previous?stable+1:0; previous=signature;
+      if(stable>=2)return resolve({viewport:size,host:state[0],frame:state[1]});
+      if(performance.now()-started>=5000)return reject(new Error('Embedded resize did not settle: '+signature));
+      requestAnimationFrame(check);
+    }
+    requestAnimationFrame(check);
+  }),size);
+  resizeTransitions.push(state);
+  return state.frame.mode;
 }
 async function reachable(control, label) {
   await control.scrollIntoViewIfNeeded();
@@ -223,7 +249,7 @@ try {
   pass('prepared offline Patch status edit survives Save/reload without changing line-check issue');
 
   const hostContext=await browser.newContext({viewport:{width:1440,height:900},hasTouch:true,acceptDownloads:true}); contexts.push(hostContext);
-  const host=await hostContext.newPage(); host.on('pageerror',error=>errors.push(error.message));
+  host=await hostContext.newPage(); host.on('pageerror',error=>errors.push(error.message));
   await host.goto(base+'/av-video/');
   await host.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').click();
   const frame=host.frameLocator('iframe[title="Audio application"]'); await frame.locator('.console-shell').waitFor();
@@ -242,26 +268,32 @@ try {
   assert.equal(embedded.channels[0].conn,'Embedded edit'); assert.equal(await read(host,'sbd.avVideo.v1'),null);
   await host.reload(); await frame.locator('.console-shell').waitFor();
   assert.equal(await (await patchStatus(frame)).inputValue(),'gained');
-  for(const size of [{width:1024,height:768},{width:680,height:812},{width:375,height:812}]) {
-    await host.setViewportSize(size);
-    const maximize=button(frame,'Maximize Inputs');
-    if(await maximize.isVisible())await maximize.click();
-    await reachable(await connection(frame),'embedded/'+size.width);
-    const restoreInputs=button(frame,'Restore Inputs');
-    if(await restoreInputs.isVisible())await restoreInputs.click();
-    const patch=await patchStatus(frame), maximizePatch=button(frame,'Maximize Patch');
-    if(await maximizePatch.isVisible())await maximizePatch.click();
+  const embeddedSizes=[{width:1024,height:768},{width:680,height:812},{width:375,height:812},{width:680,height:812},{width:1024,height:768},{width:1440,height:900},{width:375,height:812}];
+  for(const size of [...embeddedSizes,...embeddedSizes]) {
+    const mode=await resizeEmbedded(size), input=await connection(frame);
+    if(mode==='phone')assert.equal(await button(frame,'Maximize Inputs').count(),0);
+    else {await button(frame,'Maximize Inputs').click();await button(frame,'Restore Inputs').waitFor();}
+    await reachable(input,'embedded/'+size.width);
+    assert.equal(await input.inputValue(),'Embedded edit');
+    if(mode!=='phone')await button(frame,'Restore Inputs').click();
+    const patch=await patchStatus(frame);
+    if(mode==='phone')assert.equal(await button(frame,'Maximize Patch').count(),0);
+    else {await button(frame,'Maximize Patch').click();await button(frame,'Restore Patch').waitFor();}
     await reachable(patch,'embedded Patch/'+size.width);
-    const restorePatch=button(frame,'Restore Patch');
-    if(await restorePatch.isVisible())await restorePatch.click();
+    assert.equal(await patch.inputValue(),'gained');
+    if(mode!=='phone')await button(frame,'Restore Patch').click();
+    const saved=JSON.parse(await read(host));
+    assert.equal(saved.channels[0].patchStatus,'gained');assert.equal(saved.channels[0].lineCheckStatus,'issue');
+    assert.equal(saved.channels[0].conn,'Embedded edit');assert.equal(await read(host,'sbd.avVideo.v1'),null);
     await noOverflow(frame); await noOverflow(host);
   }
   await host.screenshot({path:join(output,'audio-embedded-phone.png')});
   pass('actual AV Video embedded Connection/Patch import/edit/Save/export/reload, independent line-check results and document, touch-size field access using panel maximize where needed');
   assert.deepEqual(errors,[]);
-  await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,physicalDevice:'not tested',virtualKeyboard:'not tested',processRestartAndPowerLoss:'not tested'},null,2));
+  await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,resizeTransitions,physicalDevice:'not tested',virtualKeyboard:'not tested',processRestartAndPowerLoss:'not tested'},null,2));
 } catch(error) {
-  await writeFile(join(output,'failure.json'),JSON.stringify({at:new Date().toISOString(),passed,error:String(error),stack:error.stack},null,2));
+  await writeFile(join(output,'failure.json'),JSON.stringify({at:new Date().toISOString(),passed,resizeTransitions,error:String(error),stack:error.stack},null,2));
+  if(host&&!host.isClosed())await host.screenshot({path:join(output,'embedded-failure.png')}).catch(()=>{});
   if(page&&!page.isClosed())await page.screenshot({path:join(output,'failure.png')}).catch(()=>{});
   throw error;
 } finally {
