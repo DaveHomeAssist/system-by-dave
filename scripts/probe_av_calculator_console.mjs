@@ -38,7 +38,7 @@ async function reachable(control, name) {
 try {
   await mkdir(output, { recursive: true }); browser = await chromium.launch({ headless: true, ...launch, args: ['--no-sandbox'] });
   const primary = await fresh(); page = primary.page;
-  assert.equal(await page.locator('html').getAttribute('data-av-theme'), 'light');
+  assert.equal(await page.locator('html').getAttribute('data-av-theme'), 'dark');
   assert.equal(await page.locator('[data-key]').count(), 26); assert.equal(await read(page, viewsKey), null);
   await fill(page, '#delayDistance', '100'); assert.match(await page.locator('#delayMs').textContent(), /88\.8/);
   await fill(page, '#screenWidth', '20'); assert.match(await page.locator('#idealThrow').textContent(), /30/);
@@ -110,9 +110,11 @@ try {
   pass('prepared offline workspace reload and calculation');
 
   const context=await browser.newContext({viewport:{width:1024,height:768},hasTouch:true});contexts.push(context);const host=await context.newPage();host.on('pageerror',e=>errors.push(e.message));await host.goto(base+'/av-video/?sbdShow=Host%20context&private=do-not-forward');await host.locator('.sbd-rail__entry[data-rail-ref="console:av-calculator"]').tap();const frame=host.frameLocator('iframe[title="AV Calculator application"]');await frame.locator('.console-shell').waitFor();
+  assert.equal(await frame.locator('html').getAttribute('data-av-theme'), await host.locator('html').getAttribute('data-av-theme'), 'embedded first-use theme matches host');
+  for (const theme of ['light', 'dark', 'system', 'dark']) { await host.getByRole('combobox', { name: 'Theme', exact: true }).selectOption(theme); await frame.locator('html[data-av-theme="' + theme + '"]').waitFor({ state: 'attached' }); }
   for(const size of [{width:1024,height:768},{width:680,height:812},{width:375,height:812}]){await host.setViewportSize(size);await fill(frame,'#delayDistance',String(size.width));assert.equal(JSON.parse(await read(host,key)).delayDistance,size.width);assert.equal(await read(host,'sbd.avVideo.v1'),null);await noOverflow(frame);await noOverflow(host);}
   assert.equal((await host.locator('iframe[title="AV Calculator application"]').getAttribute('src')).includes('private='),false);await host.screenshot({path:join(output,'calculator-embedded-phone.png')});
-  pass('actual AV Video embedding, independent calculator writes and allowlisted host context at touch sizes');
+  pass('actual AV Video embedding, matching first-use and shared themes, independent calculator writes and allowlisted host context at touch sizes');
   assert.deepEqual(errors,[]);
   // Keep the original named-set acceptance, including 100-set limits, in the gate.
   // The child needs this HTTP server, so do not block its event loop here.

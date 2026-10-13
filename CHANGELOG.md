@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-13 — Calculator theme alignment
+
+- Restore the established Stage Slate first-use default, correcting the native conversion's light-default drift. Stored Light, Dark or System choices still win; the calculation engine is otherwise unchanged.
+- Verify that Calculator starts with the same theme as its AV Video host and follows live Light/Dark/System selections. Preserve no-JavaScript, compact startup-error, calculation, field-set, layout, print, offline and independent-data acceptance.
+- Roll the offline cache generation for the correction. PR #330 is merged at `12931bd`; its source publication is running, and final corrected publication/live acceptance remain required.
+
 ## 2026-10-12 — Calculator working panel candidate
 
 - Reuse the shared console engine for six calculation panels and Operator Summary, plus optional Show context. Preserve the original DOM controls, formula/normalization engine, field sets and shared LED working values instead of duplicating calculation logic.
