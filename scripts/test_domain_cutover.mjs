@@ -624,7 +624,8 @@ try {
     await page.goto(site.origin + '/av/');
     await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
     const manifest = await page.evaluate(async () => {
-      const expected = SBD_REGISTRY.offlineAssets().map(asset => new URL(asset, location.href).pathname);
+      // The console lives under /av/; offline assets are relative to the worker scope at the origin root.
+      const expected = SBD_REGISTRY.offlineAssets().map(asset => new URL(asset, location.origin + '/').pathname);
       const names = (await caches.keys()).filter(name => name.startsWith('sbd-av-suite-'));
       const entries = (await Promise.all(names.map(async name => (await (await caches.open(name)).keys()).map(request => new URL(request.url).pathname)))).flat();
       return { expected, entries };

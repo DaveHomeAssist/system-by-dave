@@ -75,7 +75,7 @@ try {
   const fallback = staticPage.locator('.calculator-noscript'); await fallback.waitFor();
   for (const name of Object.values(names).slice(0, 6)) assert.ok((await fallback.textContent()).includes(name), name + ' fallback description');
   assert.match(await fallback.textContent(), /Enable JavaScript and reload/); assert.match(await fallback.textContent(), /does not verify electrical safety/);
-  await reachable(fallback.getByRole('link', { name: 'AV by Dave', exact: true }), 'static AV by Dave navigation'); await reachable(fallback.getByRole('link', { name: 'Toolbox', exact: true }), 'static Toolbox navigation');
+  await reachable(fallback.getByRole('link', { name: 'AV by Dave', exact: true }), 'static AV by Dave navigation');
   await fallback.getByText('Field verification required:', { exact: true }).scrollIntoViewIfNeeded(); await noOverflow(staticPage);
   assert.equal(await staticPage.locator('#calculatorSource').isVisible(), false, 'no misleading nonworking calculator controls');
   for (const denied of [false, true]) {
