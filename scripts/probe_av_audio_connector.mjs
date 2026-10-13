@@ -31,7 +31,7 @@ const button = (scope, name) => scope.getByRole('button', {name,exact:true});
 const quick = (scope, name) => button(scope.locator('.console-quick'),name).click();
 const read = (page, name = key) => page.evaluate(name => localStorage.getItem(name), name);
 const file = raw => ({name:'synthetic.json',mimeType:'application/json',buffer:Buffer.from(raw)});
-const contexts = [], errors = [], passed = [], resizeTransitions = [];
+const contexts = [], errors = [], passed = [], resizeTransitions = [], shortHeightActivations = [];
 let browser, page, host, linePage, speakerPage;
 async function fresh() {
   const context = await browser.newContext({viewport:{width:1440,height:900},hasTouch:true,acceptDownloads:true});
@@ -397,11 +397,19 @@ try {
   for(const theme of ['light','dark']) {
     await page.evaluate(theme=>localStorage.setItem('av-theme-mode.v1',theme),theme); await page.reload();
     for(const size of [{width:1440,height:900},{width:375,height:812},{width:680,height:812},{width:1024,height:768},{width:844,height:390},{width:320,height:256},{width:3840,height:1080}]) {
-      await page.setViewportSize(size); control=await connection(page);
+      await page.setViewportSize(size);
       if(size.height<500) {
+        // Speakers selects a different row. Focus the panel before expanding its
+        // now-collapsed row: the ordinary short-height grid has no body space.
+        await quick(page,'Inputs');
+        assert.equal(await page.locator('[data-panel="inputs"] .audio-row-title').first().getAttribute('aria-expanded'),'false','exercise collapsed Inputs after Speakers');
         await button(page,'Full screen focused panel').click();
         await page.locator('.console-shell:fullscreen').waitFor();
+        const activation=await page.locator('[data-panel="inputs"]').evaluate(panel=>({viewport:{width:innerWidth,height:innerHeight},activeView:document.querySelector('.console-views [aria-selected="true"]')?.textContent,body:panel.querySelector('.console-body').getBoundingClientRect().toJSON(),fullscreen:Boolean(document.fullscreenElement)}));
+        assert.ok(activation.fullscreen&&activation.body.height>=44,'Full screen makes the collapsed Inputs row reachable');
+        shortHeightActivations.push({theme,...activation});
       }
+      control=await connection(page);
       await noOverflow(page); await reachable(control,theme+'/'+size.width+'x'+size.height);
       await control.focus(); assert.equal(await control.evaluate(el=>el===document.activeElement),true);
       assert.equal(await control.inputValue(),'TRS / operator patch');
@@ -547,9 +555,10 @@ try {
   pass('actual AV Video embedded Connection/Input/Patch and Line Check picker/custom import/edit/Save/export/reload, independent document and touch-size access using panel maximize where needed');
   pass('actual AV Video embedded Speaker choice/custom import/edit/Save/export/reload remains independent across fourteen resize transitions');
   assert.deepEqual(errors,[]);
-  await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,resizeTransitions,physicalDevice:'not tested',virtualKeyboard:'not tested',processRestartAndPowerLoss:'not tested'},null,2));
+  assert.equal(shortHeightActivations.length,4,'both short heights tested in both themes');
+  await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,resizeTransitions,shortHeightActivations,physicalDevice:'not tested',virtualKeyboard:'not tested',processRestartAndPowerLoss:'not tested'},null,2));
 } catch(error) {
-  await writeFile(join(output,'failure.json'),JSON.stringify({at:new Date().toISOString(),passed,resizeTransitions,error:String(error),stack:error.stack},null,2));
+  await writeFile(join(output,'failure.json'),JSON.stringify({at:new Date().toISOString(),passed,resizeTransitions,shortHeightActivations,error:String(error),stack:error.stack},null,2));
   if(host&&!host.isClosed())await host.screenshot({path:join(output,'embedded-failure.png')}).catch(()=>{});
   if(linePage&&!linePage.isClosed())await linePage.screenshot({path:join(output,'line-check-failure.png')}).catch(()=>{});
   if(speakerPage&&!speakerPage.isClosed())await speakerPage.screenshot({path:join(output,'speaker-failure.png')}).catch(()=>{});
