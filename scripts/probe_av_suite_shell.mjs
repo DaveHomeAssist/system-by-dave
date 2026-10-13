@@ -96,6 +96,8 @@ try {
   assert.equal(await page.locator('.suite-app-open').getAttribute('target'), '_blank');
   await page.frameLocator('.console-panel iframe').locator('html[data-sbd-embed="panel"]').waitFor();
   assert.equal(await page.frameLocator('.console-panel iframe').locator('.sbd-public-nav, nav.sbd-nav, .console-strip').count(), 0, 'embedded tool hides its page navigation and mounts no console of its own');
+  await page.frameLocator('.console-panel iframe').locator('#audioCard').waitFor({ state: 'visible', timeout: 15000 });
+  assert.ok(await page.frameLocator('.console-panel iframe').locator('#calculatorSource').isVisible(), 'embedded calculator shows its plain cards instead of a blank page');
 
   // 1b. The Rail's Workspace entry recalls the empty view in place.
   await page.locator('.sbd-rail__toolbox').click();

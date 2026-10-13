@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-13 — AV Calculator panel shows its cards
+
+- Show the AV Calculator's plain calculator cards when it is embedded as a console panel (`?sbdEmbed=panel`): the page kept its source section hidden while skipping the workspace mount, so the Throwline-style panel in the AV Suite shell rendered blank. `scripts/probe_av_suite_shell.mjs` now asserts the embedded calculator renders its first card.
+
 ## 2026-10-13 — AV by Dave is one console (slice C)
 
 - Make the AV Suite shell the AV by Dave home: `av/index.html` is staged as `/` on avbydave.com (`scripts/domain-sites.json` `landingPage`), canonical to the domain root and noindex at its source path and `/av/` alias. The console opens on an empty **Workspace** view; the Rail's top entry is now Workspace and recalls that view in place, the PWA manifest starts at `./av/`, and the shell registers the suite service worker through `js/av-offline.js` (which now resolves the site root from the registry script wherever the page lives).

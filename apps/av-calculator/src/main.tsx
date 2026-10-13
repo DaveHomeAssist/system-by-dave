@@ -8,7 +8,12 @@ import './styles.css';
 function start() {
   // Inside the AV Suite shell the plain calculator page is the panel; its own
   // console workspace stays out so the host's controls are the only ones.
-  if (window.parent !== window && new URLSearchParams(location.search).get('sbdEmbed') === 'panel') { document.documentElement.dataset.calculatorViewport = 'plain'; return; }
+  if (window.parent !== window && new URLSearchParams(location.search).get('sbdEmbed') === 'panel') {
+    // The plain page is the panel: reveal the original calculator cards instead of mounting the workspace.
+    const source = document.getElementById('calculatorSource'); if (source) source.hidden = false;
+    document.documentElement.dataset.calculatorViewport = 'plain';
+    return;
+  }
   // Shared context hydration schedules a task at DOMContentLoaded first.
   setTimeout(() => {
     prepare();
