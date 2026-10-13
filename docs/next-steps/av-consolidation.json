@@ -4,10 +4,10 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "c6ed44cf3d94011231bd85b09466abb5dedfc1a0",
+  "head": "c5cbd9074c243d62bd3d5aa6edac767dc6e9faff",
   "status": "amber",
-  "statusReason": "The target remains functional touch panels across the toolset, not catalogue links. Infrastructure #325, Show Control #323 and The Shop #324 are delivered. Front Office correction #328 is merged at c6ed44c after all seven applicable checks passed; final publication/live proof is pending. Lighting's five-panel candidate passes twelve model tests, typecheck, build, 23 Rail/worker checks and nine browser groups on Duncan; exact-head CI/publication/live proof remain pending. Calculator, deeper specialist parity and physical/operator acceptance remain separate.",
-  "lastActivity": "2026-10-12",
+  "statusReason": "Functional touch panels remain the target. Front Office #328 is published and all nine isolated live groups plus fourteen-asset parity pass at c6ed44c. Lighting #329 passed all nine checks, both publications and all nine isolated live groups with fourteen-asset parity at c5cbd90. Calculator has a shared-engine candidate preserving six original calculation engines, field sets and LED fields; final eleven-group runner verification passed and release gates remain pending. Deeper specialist parity and physical/operator acceptance remain separate.",
+  "lastActivity": "2026-10-13",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -32,12 +32,12 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Verify and release Lighting native working panels",
-    "why": "The five-panel candidate applies AV Video's workspace to fixture patch and focus work without changing the existing Lighting/PlotForge data boundaries. Finish Front Office's in-flight release proof and Lighting's own browser and delivery gates.",
-    "doneWhen": "Fixtures, Fixture details, Focus, Plan/Import and Backup work as shared-engine panels, standalone and embedded, preserving all fields, reviewed imports, complete source objects, explicit Save and old backups. Scoped model/browser/recovery/viewport/offline checks, exact-head CI, both publications and isolated live acceptance pass. Physical/operator acceptance stays separate.",
+    "title": "Verify and release Calculator working panels",
+    "why": "The final family shell needs working calculation panels and configurable arrangements while retaining existing formulas and field-set behavior. Lighting publication and isolated live proof now pass.",
+    "doneWhen": "Six calculators and Operator Summary work as shared-engine panels, standalone and embedded; original values/field sets/LED data, stored layouts, all controls, themes, required viewports, print and offline behavior pass. Exact-head CI, both publications and isolated live acceptance pass separately.",
     "effort": "M",
-    "owner": "Lighting native console lane",
-    "blockedBy": "No unresolved product decision blocks this bounded conversion. Follow docs/av-lighting.md; Calculator, deeper specialist parity and physical/operator acceptance remain later work."
+    "owner": "Calculator native console lane",
+    "blockedBy": "No unresolved product decision blocks this conversion. Follow docs/av-calculator-app.md; specialist parity, physical/operator acceptance and AVV-STREAM-KEY-1 remain separate."
   },
   "findings": [
     {
@@ -480,7 +480,7 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Finish the native Lighting panel slice in docs/av-lighting.md using the existing fixture model and shared AV console engine. Preserve every recognized field, legacy normalization, complete PlotForge source objects, reviewed imports, explicit Save and independent data ownership. Verify standalone and AV Video embedded workflows, recovery, both themes, required viewport sizes and offline reopening, then complete normal exact-head release and isolated live acceptance. Close Front Office's in-flight publication/live gates without re-running already-passed source checks. Do not rebuild delivered consoles, delete specialist routes or equate launch links with full capability parity. Work serially with a qualified remote runner unless Dave separately approves delegation.",
+  "kickoffPrompt": "Finish the Calculator working panels defined in docs/av-calculator-app.md using the existing shared console engine and original calculation controls. Preserve formulas, autosaved values, named field sets, LED fields and routes; keep workspace storage independent. Verify functional/browser/viewport/theme/print/offline/host flows, then complete exact-head CI, merge, publication and isolated live acceptance. Preserve completed Lighting and Front Office live evidence. Do not delete specialist routes or equate launchability with full parity. Work serially on a qualified remote runner.",
   "confidence": "High for the bounded Infrastructure source, nine exact-head checks, both publications, eight-group live browser acceptance and eight-asset parity. Whole-toolset, physical/operator and actual process/power interruption acceptance remain unverified.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
@@ -490,11 +490,13 @@
   ],
   "short": "AV Suite",
   "evidence": {
-    "lightingNativePanelsCandidate": {
-      "checkedOn": "2026-10-12",
+    "lightingNativePanelsRelease": {
+      "checkedOn": "2026-10-13",
       "baseRevision": "c6ed44cf3d94011231bd85b09466abb5dedfc1a0",
+      "sourceRevision": "c5cbd9074c243d62bd3d5aa6edac767dc6e9faff",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/329",
       "scope": "Five working panels with all existing fixture fields and reviewed Lighting Patch/PlotForge import; no specialist geometry, footprint inference or DMX control",
-      "status": "Typecheck, twelve model tests, build and all nine browser groups pass on Duncan at 2026-10-12T19:16:22.553Z; release gates pending",
+      "status": "Twelve model tests, all nine exact-head CI checks and source38298133364/AV destination38301460263 publications pass at c5cbd9074c243d62bd3d5aa6edac767dc6e9faff. All nine isolated live groups pass on Duncan at2026-10-13T05:13:26.410Z, with fourteen runtime hashes and provenance before/after; destination cc1dfc74f95c7ed9975dd16323fb99e2442610ce.",
       "checks": ["Two direct comparisons with original pure normalization/mapping and ten native compatibility/save tests", "All fields, status/focus/search/removal, duplicate starts/spares, imports, full source retention and backup roundtrip", "Stored views, keyboard focus, draft/original recovery and denied/refused/stale-tab safety", "Every control at44px in both themes across nine sizes; offline reopening and actual AV Video embedding", "23 Rail/worker tests, source/theme/inventory checks; bounded Mac public/navigation/indexing checks"],
       "retainedFailures": "Initial DOM iteration and Node test typing failed and were corrected without dependencies. Windows CRLF generator inputs were reconciled to canonical LF. Draft-discard test awaited Web Lock completion while retaining exact saved-record equality.",
       "limits": "Physical devices, virtual keyboards, browser/OS process restart, power loss and operator acceptance remain untested. Nine available Rail slots do not establish full specialist parity."
@@ -505,7 +507,7 @@
       "finalHead": "50ed167df10388c56c1fb77e76fa25b702fdfa72",
       "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/328",
       "sourcePublication": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38295314330",
-      "status": "Read-denial export and publication-gate correction merged after all seven exact-head checks passed; final publication and live acceptance pending",
+      "status": "Corrected c6ed44c source38295314330 and AV destination38298328233 at3bf1e6568246ad1237183331b0ed4daba8273f3f succeeded. All nine isolated live groups pass at2026-10-12T19:35:33.043Z; fourteen runtime hashes and provenance match before/after.",
       "checks": "Typecheck, seventeen unchanged original/native model tests, build and nine Duncan browser groups passed, including denied-read no-download assertion. All seven applicable PR328 checks passed. Source/viewport/recovery/offline/embedding evidence does not imply publication.",
       "retainedFailures": "Windows transfer cleanup failure after all56 assertions passed remains recorded; complete Linux gate passed. Metadata transfer, short-height containment/feedback, selector and deferred-focus harness failures were diagnosed and corrected without weakening acceptance.",
       "limits": "Physical touch, virtual keyboards, actual process/power interruption and operator acceptance remain untested; no full specialist parity claim."

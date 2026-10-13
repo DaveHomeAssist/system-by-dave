@@ -1,10 +1,13 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import adapter from './calculator_console_adapter.cjs';
+const { reveal, fieldSets } = adapter;
 
 const base = process.env.CALCULATOR_BASE || 'http://127.0.0.1:4173/';
 const output = process.env.CALCULATOR_SCREENSHOT || '/tmp/av-calculator-field-sets.png';
-const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
+const launch = process.env.CHROME_CHANNEL ? {channel:process.env.CHROME_CHANNEL} : process.env.CALCULATOR_CHROME ? {executablePath:process.env.CALCULATOR_CHROME} : {};
+const browser = await chromium.launch({ headless: true, ...launch, args: ['--no-sandbox'] });
 try {
   for (const viewport of [{ width: 1440, height: 900 }, { width: 375, height: 812 }]) {
     const context = await browser.newContext({ viewport });
@@ -13,10 +16,8 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(new URL('av-calculator.html', base).href);
     await page.waitForSelector('html[data-calculator-viewport="ready"]');
-    await page.locator('#delayDistance').fill('90');
-    if (viewport.width > 1000) await page.locator('#summaryCardTab').click();
-    else await page.locator('#calculatorView').selectOption('6');
-    await page.locator('#fieldSetsOpen').click();
+    await (await reveal(page, '#delayDistance')).fill('90');
+    await fieldSets(page);
     await page.locator('#fieldSetName').fill('Ballroom A');
     await page.locator('#fieldSetSave').click();
     assert.match(await page.locator('#fieldSetStatus').innerText(), /saved in this browser/);
@@ -26,9 +27,7 @@ try {
     await page.reload();
     await page.waitForSelector('html[data-calculator-viewport="ready"]');
     assert.equal(await page.locator('#delayDistance').inputValue(), '90');
-    if (viewport.width > 1000) await page.locator('#summaryCardTab').click();
-    else await page.locator('#calculatorView').selectOption('6');
-    await page.locator('#fieldSetsOpen').click();
+    await fieldSets(page);
     await page.locator('#fieldSetSelect').selectOption({ label: 'Ballroom A' });
     await page.locator('#fieldSetExport').click();
     const exported = await page.evaluate(() => JSON.parse(localStorage.getItem('avCalculator.fieldSets.v1')).sets[0]);
@@ -51,12 +50,8 @@ try {
     assert.equal(await page.locator('#fieldSetSelect option').count(), 3);
     await page.screenshot({ path: viewport.width === 375 ? output : output.replace(/\.png$/, '-desktop.png') });
     await page.locator('#fieldSetsClose').click();
-    if (viewport.width > 1000) await page.locator('#audioCardTab').click();
-    else await page.locator('#calculatorView').selectOption('0');
-    await page.locator('#delayDistance').fill('120');
-    if (viewport.width > 1000) await page.locator('#summaryCardTab').click();
-    else await page.locator('#calculatorView').selectOption('6');
-    await page.locator('#fieldSetsOpen').click();
+    await (await reveal(page, '#delayDistance')).fill('120');
+    await fieldSets(page);
     await page.locator('#fieldSetSelect').selectOption({ label: 'Ballroom A' });
     await page.locator('#fieldSetRecall').click();
     assert.equal(await page.locator('#delayDistance').inputValue(), '90');
@@ -68,9 +63,7 @@ try {
       localStorage.setItem(key, JSON.stringify({ version: 1, sets: Array.from({ length: 100 }, (_, index) => ({ ...first, id: `fixture-${index}`, name: `Fixture ${index}` })) }));
     });
     await page.reload();
-    if (viewport.width > 1000) await page.locator('#summaryCardTab').click();
-    else await page.locator('#calculatorView').selectOption('6');
-    await page.locator('#fieldSetsOpen').click();
+    await fieldSets(page);
     await page.locator('#fieldSetName').fill('Set 101');
     await page.locator('#fieldSetSave').click();
     assert.match(await page.locator('#fieldSetStatus').innerText(), /full \(100\)/);
