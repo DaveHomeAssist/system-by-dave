@@ -100,6 +100,7 @@
     Object.keys(REG.recommended).forEach(function(phase){
       next[phase] = REG.recommended[phase].map(function(id){
         var tool = REG.toolById(id);
+        if(tool && tool.retired) tool = null;
         return tool ? {name: tool.name, href: tool.href} : null;
       }).filter(Boolean);
     });
@@ -344,7 +345,7 @@
   }
 
   function suiteHref(){
-    return contextHref('av-suite.html');
+    return contextHref('av/');
   }
 
   function currentRoute(){

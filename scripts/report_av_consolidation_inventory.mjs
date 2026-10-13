@@ -38,6 +38,10 @@ const lines = [
 ];
 
 for (const tool of registry.tools) {
+  if (tool.retired) {
+    lines.push(`| **${escape(tool.name)}** — retired 2026-10-13; redirect stub into the ${escape(tool.retired)} panels | \`/${escape(tool.href)}\` → \`/av/?app=${escape(tool.retired)}\` | ${escape(domainSites.originFor(tool.href))} | ${escape(tool.storageKeys.map(item => item.key).join(', ') || 'None declared')} (import once from the console) | — | — | — | not cached |`);
+    continue;
+  }
   const file = routeFile(tool.href);
   if (!fs.existsSync(file)) throw new Error(`Missing registry route: ${tool.href}`);
   const source = fs.readFileSync(file, 'utf8');
@@ -48,7 +52,7 @@ for (const tool of registry.tools) {
   lines.push(`| **${escape(tool.name)}** — ${escape(tool.desc)} | \`/${escape(normalizedRoute)}\` | ${escape(domainSites.originFor(normalizedRoute))} | ${escape(storage)} | ${signal(source, /download|export|\.csv|\.json|\.png|\.pdf/i)} | ${signal(source, /window\.print|printBtn|@media print/i)} | ${signal(source, /keydown|keyup|accesskey/i)} | ${offline.has(normalizedRoute) ? 'Named' : 'Not named'} |`);
 }
 
-lines.push('', `**Count:** ${registry.tools.length} registry tools; ${registry.tools.reduce((sum, tool) => sum + tool.storageKeys.length, 0)} declared local-storage keys.`, '',
+lines.push('', `**Count:** ${registry.tools.length} registry tools (${registry.tools.filter(tool => !tool.retired).length} live, ${registry.tools.filter(tool => tool.retired).length} retired redirect stubs); ${registry.tools.reduce((sum, tool) => sum + tool.storageKeys.length, 0)} declared local-storage keys.`, '',
   '## Unresolved mapping and proof', '',
   '- Inspect each source signal in its full script and perform keyboard, print, export, and offline browser checks. The table is a source inventory, not completion of those gates.',
   '- Audit undeclared storage keys and databases across every route. Show Board, Workbook, and LED Wall Calculator are confirmed exceptions listed above; the Video-slice source audit is recorded in `docs/av-suite-consolidation-stage2-video.md`, and other exceptions remain to be determined.',

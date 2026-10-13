@@ -46,7 +46,7 @@ async function serve(directory) {
 let source = 'https://systembydave.com';
 const sites = [
   { id: 'housevideo', origin: 'https://housevideo.app', route: '/fmp/', key: 'fmp.cutover.acceptance', database: 'fmpPhotosV1' },
-  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av-suite.html', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' },
+  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av/', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' },
   // The preshow walk is its own origin. It claims the same fmp prefix and photo
   // database as the hub, so its acceptance key is distinct to keep the two apart.
   { id: 'housevideo-walk', origin: 'https://walk.housevideo.app', route: '/fmpwalk/', key: 'fmp.walk-cutover.acceptance', database: 'fmpPhotosV1' }
@@ -460,14 +460,15 @@ try {
     assert.ok(['sbd.showOps.draft.v1', 'sbd.showOps.layout.v1'].every(key => avStorageKeys.includes(key)), 'Show Ops drafts and layout travel with its document');
   });
 
-  await test('Withdrawn Workbook aliases open Toolbox without touching saved records', async (page, context) => {
+  await test('Withdrawn Workbook aliases open the AV by Dave console without touching saved records', async (page, context) => {
     const site = sites.find(entry => entry.id === 'avbydave');
     for (const origin of [source, site.origin]) {
       await seedWorkbook(page, origin);
       for (const route of ['/av-workbook/', '/av-workbook/index.html', '/av-workbook.html']) {
         await page.goto(origin + route + '?sbdShow=Do%20not%20attach');
-        await page.waitForURL(site.origin + '/av-suite.html?entry=toolbox');
-        assert.equal(await page.locator('#avApp').getAttribute('data-entry'), 'toolbox');
+        await page.waitForURL(site.origin + '/av/');
+        await page.locator('.suite-header h1').waitFor();
+        assert.equal(await page.locator('.suite-header h1').textContent(), 'AV by Dave');
         assert.equal(await page.locator('a[href*=av-workbook]').count(), 0);
         const savedPage = await context.newPage();
         await savedPage.goto(origin + '/index.html');
@@ -620,7 +621,7 @@ try {
     page.setDefaultNavigationTimeout(20000);
     page.setDefaultTimeout(20000);
     const site = sites[1];
-    await page.goto(site.origin + '/av-suite.html');
+    await page.goto(site.origin + '/av/');
     await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
     const manifest = await page.evaluate(async () => {
       const expected = SBD_REGISTRY.offlineAssets().map(asset => new URL(asset, location.href).pathname);

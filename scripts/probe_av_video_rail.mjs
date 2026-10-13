@@ -103,8 +103,7 @@ try {
   assert.equal(videoHref.searchParams.has('private'), false);
   assert.equal(videoHref.hash, '');
   const toolboxHref = new URL(await page.locator('.sbd-rail__toolbox').getAttribute('href'));
-  assert.equal(toolboxHref.pathname, '/av-suite.html');
-  assert.equal(toolboxHref.searchParams.get('entry'), 'toolbox');
+  assert.equal(toolboxHref.pathname, '/av/', 'the Rail Workspace entry opens the console');
   assert.equal(toolboxHref.searchParams.has('sbdShow'), false);
 
   await page.setViewportSize({ width: 375, height: 667 });

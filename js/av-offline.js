@@ -3,7 +3,10 @@
   'use strict';
   const root=document.documentElement;
   const isThrowline=location.pathname.includes('/ProjectorThrow/');
-  const base=new URL(isThrowline?'../':'./',location.href);
+  const isLed=location.pathname.includes('led-wall-calculator');
+  // The site root is wherever js/sbd-registry.js was loaded from; /av/ and / both resolve there.
+  const registryScript=document.querySelector('script[src*="sbd-registry.js"]');
+  const base=registryScript?new URL('../',registryScript.src):new URL(isThrowline?'../':'./',location.href);
   let badge;
   function report(state,text){root.dataset.workspaceOffline=state;if(badge)badge.textContent=text;}
   async function prepare(){
@@ -19,10 +22,10 @@
           channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();resolve(event.data);};
           controller.postMessage({type:'SBD_OFFLINE_VERSION'},[channel.port2]);
         });
-        if(!info||info.version!==global.AVWorkspaceVersion)return false;
+        if(!info||info.version!==(global.AVWorkspaceVersion||(global.SBD_REGISTRY&&global.SBD_REGISTRY.version)))return false;
         const assets=[new URL(location.pathname+(location.pathname.endsWith('/')?'index.html':''),location.origin).href,...[...document.querySelectorAll('script[src],link[rel=stylesheet]')].map(el=>el.src||el.href)];
         if(isThrowline)assets.push(new URL('ProjectorThrow/throwline-scene-state.js',base).href);
-        else assets.push(...['data/led-cabinet-catalog.v1.json','ProjectorThrow/vendor/three/three.module.min.js','ProjectorThrow/vendor/three/three.core.min.js','ProjectorThrow/vendor/three/addons/controls/OrbitControls.js'].map(path=>new URL(path,base).href));
+        else if(isLed)assets.push(...['data/led-cabinet-catalog.v1.json','ProjectorThrow/vendor/three/three.module.min.js','ProjectorThrow/vendor/three/three.core.min.js','ProjectorThrow/vendor/three/addons/controls/OrbitControls.js'].map(path=>new URL(path,base).href));
         const cache=await caches.open(info.cache);
         const matches=await Promise.all(assets.filter(url=>new URL(url).origin===location.origin).map(url=>cache.match(url,{ignoreSearch:true})));
         if(matches.some(item=>!item))return false;

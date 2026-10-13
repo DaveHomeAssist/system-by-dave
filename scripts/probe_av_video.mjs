@@ -161,45 +161,11 @@ try {
   assert.match(await bad.getByRole('status').textContent(), /blocked/);
   assert.equal(await bad.evaluate(key => localStorage.getItem(key), key), 'broken saved source');
   await broken.close();
+  // The console shell registers the suite worker; AV Video then edits and reloads offline.
   const toolbox = await browser.newContext(); const hub = await toolbox.newPage();
-  await hub.goto(`${BASE}/av-suite.html`); await hub.locator('#shopOfficeView').waitFor();
-  assert.equal(await hub.locator('#avApp').getAttribute('data-entry'), 'toolbox');
-  assert.ok(await hub.locator('#toolboxGroups a[data-tool=av-video]').isVisible());
-  assert.equal(await hub.locator('#toolboxGroups a[data-tool=signal-flow]').count(), 0);
-  assert.equal(await hub.locator('#toolboxGroups a[data-tool=video-patch]').count(), 0);
-  assert.equal(await hub.evaluate(() => localStorage.getItem('av-suite-dashboard.v1')), null);
-  const navigationStorage = await hub.evaluate(() => ({ ui: localStorage.getItem('av-suite-ui.v1'), rail: localStorage.getItem('sbd.rail.v1') }));
-  const manageModules = hub.getByRole('link', { name: 'Manage modules', exact: true });
-  for (const [width, height] of [[1440, 900], [375, 812], [844, 390], [320, 256], [3840, 1080]]) {
-    await hub.setViewportSize({ width, height });
-    assert.ok(await hub.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), `Toolbox overflow at ${width}x${height}`);
-    const targetBox = await manageModules.boundingBox();
-    const targetStyle = await manageModules.evaluate(element => ({ minHeight: getComputedStyle(element).minHeight, display: getComputedStyle(element).display }));
-    assert.equal(targetStyle.minHeight, '44px', `Manage modules minimum target changed at ${width}x${height}`);
-    assert.ok(targetBox.height >= 43.5, `Manage modules target is short at ${width}x${height}: ${JSON.stringify({ targetBox, targetStyle })}`);
-  }
-  await manageModules.click();
-  await hub.getByRole('heading', { name: 'Project & modules' }).waitFor();
-  assert.equal(new URL(hub.url()).searchParams.get('view'), 'project');
-  assert.equal(await hub.getByRole('checkbox', { name: /Patch view/ }).count(), 1);
-  assert.equal(await hub.evaluate(key => localStorage.getItem(key), key), null, 'opening module management must not write a plan');
-  assert.equal(await hub.evaluate(() => localStorage.getItem('av-suite-dashboard.v1')), null, 'module navigation must not write Show Console');
-  assert.deepEqual(await hub.evaluate(() => ({ ui: localStorage.getItem('av-suite-ui.v1'), rail: localStorage.getItem('sbd.rail.v1') })), navigationStorage, 'module navigation must not change Toolbox or Rail preferences');
-  const hiddenProjectLayout = { v: 1, viewId: 'routing', locked: false, live: { project: [] } };
-  await hub.evaluate(layout => localStorage.setItem('sbd.avVideo.layout.v1', JSON.stringify(layout)), hiddenProjectLayout);
-  await hub.setViewportSize({ width: 375, height: 812 });
-  await hub.goto(`${BASE}/av-suite.html`); await hub.locator('#shopOfficeView').waitFor();
-  await hub.getByRole('link', { name: 'Manage modules', exact: true }).click();
-  await hub.getByRole('heading', { name: 'Project & modules' }).waitFor();
-  assert.ok(await hub.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), 'custom layout recovery overflows the phone viewport');
-  assert.equal(await hub.getByRole('checkbox', { name: /Patch view/ }).count(), 1, 'custom layout must not hide module controls');
-  const recoveredLayout = await hub.evaluate(() => JSON.parse(localStorage.getItem('sbd.avVideo.layout.v1')));
-  assert.equal(recoveredLayout.viewId, 'project', 'deep link must select the Project view');
-  assert.deepEqual(recoveredLayout.live.project, hiddenProjectLayout.live.project, 'deep link must preserve the customized Project arrangement');
-  assert.equal(await hub.evaluate(key => localStorage.getItem(key), key), null, 'layout recovery must not write a plan');
-  await hub.goto(`${BASE}/av-suite.html`); await hub.locator('#shopOfficeView').waitFor();
-  await hub.evaluate(() => navigator.serviceWorker.ready);
-  await hub.locator('#toolboxGroups a[data-tool=av-video]').click(); await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
+  await hub.goto(`${BASE}/av/`); await hub.evaluate(() => navigator.serviceWorker.ready);
+  await hub.goto(url); await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
+  await hub.waitForFunction(() => navigator.serviceWorker.controller);
   await toolbox.setOffline(true); await hub.reload();
   await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
   await hub.getByRole('button', { name: 'Signal flow', exact: true }).click();
@@ -210,7 +176,7 @@ try {
   await toolbox.setOffline(false);
   await toolbox.close();
   assert.deepEqual(errors, []);
-  console.log(`AV Video browser verification passed: shared route edits, persistence, imports, export, module scope, stale writes, corrupt storage, Toolbox, offline edit/reload, themes and 4 viewport sizes (${BASE}). Screenshots: ${shots}`);
+  console.log(`AV Video browser verification passed: shared route edits, persistence, imports, export, module scope, stale writes, corrupt storage, console-registered offline edit/reload, themes and 4 viewport sizes (${BASE}). Screenshots: ${shots}`);
 } finally {
   await context.close(); await browser.close(); await new Promise(resolve => server.close(resolve));
 }

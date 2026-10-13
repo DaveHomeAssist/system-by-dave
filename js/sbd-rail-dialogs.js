@@ -38,7 +38,7 @@
   }
 
   function toolboxEntry(){
-    return {ref:'toolbox',namespace:'toolbox',id:'toolbox',label:'Toolbox',availability:'available',pinnable:false,navigable:true,href:'av-suite.html?entry=toolbox'};
+    return {ref:'toolbox',namespace:'toolbox',id:'toolbox',label:'Workspace',availability:'available',pinnable:false,navigable:true,href:'av/'};
   }
 
   function resolveRoute(reference,options){
@@ -172,15 +172,13 @@
     array(registry.consoles).forEach(function(item){if(item.toolId) consoleTools[item.toolId]=true;});
     return [
       {id:'consoles',label:'Consoles',entries:array(registry.consoles).map(function(item){return railRuntime().resolveRef('console:'+item.id,registry);}).filter(Boolean)},
-      {id:'families',label:'Toolbox families',entries:array(registry.consoleFamilies).map(function(item){return railRuntime().resolveRef('family:'+item.id,registry);}).filter(Boolean)},
-      {id:'tools',label:'Specialist tools',entries:array(registry.tools).filter(function(item){return !consoleTools[item.id];}).map(function(item){return railRuntime().resolveRef('tool:'+item.id,registry);}).filter(Boolean)},
+      {id:'tools',label:'Specialist tools',entries:array(registry.tools).filter(function(item){return !consoleTools[item.id]&&!item.retired;}).map(function(item){return railRuntime().resolveRef('tool:'+item.id,registry);}).filter(Boolean)},
       {id:'externals',label:'External products',entries:array(registry.externals).map(function(item){return railRuntime().resolveRef('external:'+item.id,registry);}).filter(Boolean)}
     ];
   }
 
   function entryType(entry){
     if(entry.namespace==='console') return entry.availability==='planned'?'Planned console':'Console';
-    if(entry.namespace==='family') return 'Family';
     if(entry.namespace==='tool') return 'Tool';
     return entry.navigable?'External handoff':'Status only';
   }

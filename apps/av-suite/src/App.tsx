@@ -4,7 +4,7 @@ import { readLayout, writeLayout, type LayoutState } from "../../shared/av-conso
 import type { Panel, View } from "../../shared/av-console/layout";
 import { CONTEXT_KEYS, showContext, type Pack, type PackHost } from "../../shared/av-console/pack";
 import { PACKS, SPECIALISTS, specialistHref } from "./packs";
-import { appOf, defaultViews, LAYOUT_KEY, loadViews, packLibrary, saveViews, shortOf, specialistLibrary, TOOL_PREFIX } from "./views";
+import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, packLibrary, saveViews, shortOf, specialistLibrary, SUITE_PREFIX, TOOL_PREFIX, viewApp } from "./views";
 
 /* AV Suite shell (docs/av-suite-shell.md): one console. Every application is a
    panel pack mounted here; specialist tools are chrome-less panels. The Rail
@@ -14,6 +14,7 @@ const RAIL_ACTIVE_EVENT = "sbd:console-snapshot-active";
 type Status = { app: string; text: string; error: boolean };
 
 function railRef(app: string, toolId?: string) {
+  if (app === SUITE_PREFIX) return "toolbox";
   if (app === TOOL_PREFIX) { const tool = SPECIALISTS.find(entry => entry.id === toolId); return tool?.consoleId ? `console:${tool.consoleId}` : `tool:${toolId}`; }
   const pack = PACKS.find(entry => entry.id === app);
   return pack ? `console:${pack.consoleId}` : "";
@@ -47,7 +48,7 @@ export function App() {
   });
   const ws = useConsoleWorkspace(views, library, layoutPersist);
   workspace.current = ws;
-  const activeApp = appOf(ws.viewId);
+  const activeApp = viewApp(ws.view);
   const activeTool = activeApp === TOOL_PREFIX ? shortOf(ws.viewId) : "";
   const activePack = packs.find(pack => pack.id === activeApp);
   const lastView = useRef<Record<string, string>>({});
@@ -64,6 +65,11 @@ export function App() {
   }, []);
   function openApp(id: string): boolean {
     const current = viewsRef.current;
+    if (id === "toolbox" || id === "workspace") {
+      const blank = current.find(view => view.id === BLANK_VIEW.id);
+      if (!blank) return false;
+      ws.setViewId(blank.id); setStatus({ app: "", text: "Empty workspace. Add any panel, or pick an application on the Rail.", error: false }); return true;
+    }
     const pack = PACKS.find(entry => entry.id === id || entry.consoleId === id);
     if (pack) {
       const target = current.find(view => view.id === lastView.current[pack.id]) || current.find(view => appOf(view.id) === pack.id);
@@ -115,15 +121,21 @@ export function App() {
     const pack = packs.find(entry => entry.id === app);
     return pack ? pack.render(short, panel) : { body: <p className="muted">This panel is not available.</p> };
   }
-  const viewTabs = views.filter(view => appOf(view.id) === activeApp && (activeApp !== TOOL_PREFIX || view.id === ws.viewId));
+  const viewTabs = views.filter(view => viewApp(view) === activeApp && (activeApp !== TOOL_PREFIX || view.id === ws.viewId));
   const quick = activePack ? activePack.quick.map(item => ({ ...item, type: `${activePack.id}:${item.type}` })) : [];
-  const activeTitle = activePack ? activePack.label : SPECIALISTS.find(entry => entry.id === activeTool)?.label || "AV Suite";
+  const activeTitle = activePack ? activePack.label : SPECIALISTS.find(entry => entry.id === activeTool)?.label || "AV by Dave";
+  const [offline, setOffline] = useState(document.documentElement.dataset.workspaceOffline || "");
+  useEffect(() => {
+    const observer = new MutationObserver(() => setOffline(document.documentElement.dataset.workspaceOffline || ""));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-workspace-offline"] });
+    return () => observer.disconnect();
+  }, []);
   const context = showContext();
   const offer = activePack?.recovery.offer;
   const dirtyApps = packs.filter(pack => pack.dirty).map(pack => pack.label);
   return <div className="suite-app" data-active-app={activeApp}>
     <header className="suite-header">
-      <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : "One console for the whole suite"}</p></div></div>
+      <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : "Empty workspace · add any panel"}</p></div></div>
       {context && <span className="suite-context" aria-label="Read-only show context">{context}</span>}
       <div className="suite-actions">
         {activePack?.actions}
@@ -132,10 +144,10 @@ export function App() {
         <button type="button" disabled={!activePack} onClick={() => activePack?.exportDoc()}>Export</button>
       </div>
     </header>
-    <div className="suite-bar"><span className="suite-summary">{activePack ? activePack.summary : activeTool ? "Panels keep working while this tool runs; its Save lives inside the panel." : ""}</span>{dirtyApps.length > 0 && <span className="suite-dirty" title={dirtyApps.join(", ")}>Unsaved: {dirtyApps.join(", ")}</span>}</div>
+    <div className="suite-bar"><span className="suite-summary">{activePack ? activePack.summary : activeTool ? "Panels keep working while this tool runs; its Save lives inside the panel." : "Tap empty space or + Add panel to call up any panel from any application. Store the arrangement as a view."}{offline === "ready" && <span className="suite-offline">Offline ready</span>}</span>{dirtyApps.length > 0 && <span className="suite-dirty" title={dirtyApps.join(", ")}>Unsaved: {dirtyApps.join(", ")}</span>}</div>
     {offer && activePack && <div className="draft-offer" role="alert"><p><strong>{activePack.label} unsaved edits</strong> from {new Date(offer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={() => void activePack.recovery.restore()}>Restore draft</button><button type="button" onClick={() => void activePack.recovery.discard()}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
-      <ConsoleWorkspace ws={ws} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || "Tools"} />
+      <ConsoleWorkspace ws={ws} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : "AV Video")} />
     </main>
     <footer role="status" className={`message ${status.error || activePack?.problem ? "error" : ""}`}>{[...(activePack?.recovery.errors || []), status.app ? `${status.app}: ${status.text}` : status.text].join(" ")}</footer>
     {packs.map(pack => <div key={pack.id} data-pack-dialogs={pack.id}>{pack.dialogs}</div>)}

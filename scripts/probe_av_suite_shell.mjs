@@ -61,10 +61,15 @@ async function assertNoOverflow(width, height, label) {
 try {
   await page.goto(url);
   await heading().waitFor();
-  assert.equal(await heading().textContent(), 'AV Video');
+  // The console opens on an empty Workspace: no application, no panels, one Add panel.
+  assert.equal(await heading().textContent(), 'AV by Dave');
   assert.equal(await page.locator('[data-sbd-rail-host]').getAttribute('data-rail-state'), 'ready');
   assert.equal(await page.locator('.console-strip').count(), 1, 'exactly one console strip');
-  assert.equal(await page.locator('iframe').count(), 0, 'no application iframes on the Video view');
+  assert.equal(await page.locator('.console-empty').count(), 1, 'the Workspace view starts empty');
+  assert.equal(await page.locator('.console-panel').count(), 0);
+  assert.equal(await page.locator('.sbd-rail__toolbox').getAttribute('aria-current'), 'page', 'Workspace is current on the Rail');
+  assert.equal(new URL(await page.locator('.sbd-rail__toolbox').getAttribute('href'), BASE).pathname, '/av/');
+  assert.equal(await page.locator('iframe').count(), 0, 'no application iframes on the empty view');
   assert.equal(await storage('sbd.avSuite.workspace.v1'), null, 'opening the shell writes no views');
 
   // 1. Every Rail identity recalls in place: same URL, its own views, one set of controls.
@@ -91,6 +96,14 @@ try {
   assert.equal(await page.locator('.suite-app-open').getAttribute('target'), '_blank');
   await page.frameLocator('.console-panel iframe').locator('html[data-sbd-embed="panel"]').waitFor();
   assert.equal(await page.frameLocator('.console-panel iframe').locator('.sbd-public-nav, nav.sbd-nav, .console-strip').count(), 0, 'embedded tool hides its page navigation and mounts no console of its own');
+
+  // 1b. The Rail's Workspace entry recalls the empty view in place.
+  await page.locator('.sbd-rail__toolbox').click();
+  await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'AV by Dave');
+  assert.equal(new URL(page.url()).pathname, '/av/', 'Workspace stays on /av/');
+  assert.equal(await page.locator('.console-empty').count(), 1);
+  assert.equal(await page.locator('.sbd-rail__toolbox').getAttribute('aria-current'), 'page');
+  assert.equal(await page.locator('.sbd-rail__entry[aria-current="page"]').count(), 0);
 
   // 2. Specialist tools from All apps open in the shell too.
   await page.locator('.sbd-rail__all').click();
