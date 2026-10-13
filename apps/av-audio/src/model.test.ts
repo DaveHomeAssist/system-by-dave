@@ -1,6 +1,46 @@
 import { describe, it, expect, vi } from "vitest";
-import { apply, blank, INPUT_STATUSES, LEGACY, LINE_CHECK_STATUSES, load, newRow, PATCH_STATUSES, preview, save, STORE } from "./model";
+import { apply, blank, INPUT_STATUSES, LEGACY, LINE_CHECK_STATUSES, load, newRow, PATCH_STATUSES, preview, save, SPEAKER_STATUSES, STORE } from "./model";
 const raw = JSON.stringify({ schema:"input-list.v1", rows:[{id:"one",ch:7,source:"Vocal",patch:"SB-A/7",stand:"Downstage",owner:"A2",notes:"Keep"}] });
+
+describe("Speaker status choice parity",()=>{
+  const choices={planned:"Planned",patched:"Patched",tuned:"Tuned",coverage:"Coverage Checked",ready:"Ready",issue:"Issue",spare:"Spare"};
+  const source=(status?:string|null)=>JSON.stringify({items:[{id:"speaker-1",zone:"House L",speaker:"Synthetic array",type:"main",processor:"DSP A",output:"1",amp:"Amp A",cable:"NL8",trim:"-2 dB",delay:"4 ms",coverage:"checked",...(status===undefined?{}:{status}),backup:"Spare array",notes:"Keep speaker note"}]});
+  it("matches the original seven values and labels without defaulting new rows",()=>{
+    expect(SPEAKER_STATUSES).toEqual(choices);expect(newRow(true).status).toBe("");
+  });
+  it.each([...Object.keys(choices),"","Custom speaker state",undefined,null])("imports status %s without inference and retains every original field",async status=>{
+    const raw=source(status),doc=apply(blank(),await preview(raw,"speaker.json",LEGACY[3]));
+    expect(doc.speakers[0].status).toBe(status??"");
+    expect(doc.speakers[0].legacy).toEqual(JSON.parse(raw).items[0]);expect(doc.imports[0].raw).toBe(raw);
+    expect(doc.speakers[0]).toMatchObject({coverage:"checked",type:"main",trim:"-2 dB",delay:"4 ms",backup:"Spare array",notes:"Keep speaker note"});
+  });
+  it("saves and restores only the working status, leaving channels and producer bytes independent",async()=>{
+    const raw=source("patched"),imported=await preview(raw,"speaker.json",LEGACY[3]);
+    const doc=apply(blank(),imported);doc.channels=[{...newRow(),status:"issue",inputStatus:"open",patchStatus:"gained",lineCheckStatus:"issue",conn:"XLR"}];
+    const before=structuredClone(doc);doc.speakers[0].status="coverage";
+    const data=new Map<string,string>([["sbd.speakerPlan.v1",raw]]);
+    const storage={getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value);}};
+    save(storage,doc,null);const restored=apply(blank(),await preview(JSON.stringify(load(storage).doc),"backup.json"));
+    const expected=structuredClone(before);expected.speakers[0].status="coverage";expect(restored).toEqual(expected);
+    expect(data.get("sbd.speakerPlan.v1")).toBe(raw);expect(()=>apply(restored,imported)).toThrow(/already/);
+    const changed=apply(restored,await preview(source("ready"),"changed.json",LEGACY[3]));
+    expect(changed.speakers).toEqual(restored.speakers);expect(changed.channels).toEqual(restored.channels);
+    expect(changed.imports[1].raw).toBe(source("ready"));
+  });
+  it.each([undefined,null,"","Custom saved speaker"])("opens and restores old status %s without migration or writes",async status=>{
+    const doc=blank(),speaker=newRow(true);if(status===undefined)delete speaker.status;else speaker.status=status;
+    speaker.coverage="checked";speaker.legacy={status:"ready"};doc.speakers=[speaker];
+    const raw=JSON.stringify(doc),loaded=load({getItem:()=>raw});
+    expect(loaded.error).toBe("");expect(loaded.raw).toBe(raw);expect(loaded.doc).toEqual(doc);
+    expect(apply(blank(),await preview(raw,"old.json"))).toEqual(doc);
+  });
+  it("keeps an existing blank speaker status on same-ID changed source and appends only unseen IDs",async()=>{
+    const doc=apply(blank(),await preview(source(""),"blank.json",LEGACY[3]));
+    const changed=JSON.parse(source("ready"));changed.items.push({...changed.items[0],id:"speaker-2",status:"spare"});
+    const result=apply(doc,await preview(JSON.stringify(changed),"changed.json",LEGACY[3]));
+    expect(result.speakers).toHaveLength(2);expect(result.speakers[0]).toEqual(doc.speakers[0]);expect(result.speakers[1].status).toBe("spare");
+  });
+});
 describe("Audio plan",()=>{
   it("maps input identity while keeping complete source bytes",async()=>{ const result=await preview(raw,"inputs.json",LEGACY[0]); const doc=apply(blank(),result); expect(doc.channels[0]).toMatchObject({channel:"7",source:"Vocal",input:"SB-A/7",location:"Downstage",tech:"A2"}); expect(doc.imports[0].raw).toBe(raw); expect(doc.channels[0].legacy).toMatchObject({notes:"Keep"}); expect(()=>apply(doc,result)).toThrow(/already/); });
   it("rejects failed imports without mutating the plan",async()=>{ const doc=blank(); await expect(preview('{bad','bad.json',LEGACY[0])).rejects.toThrow(); expect(doc.channels).toHaveLength(0); await expect(preview(JSON.stringify({items:[]}),"wrong.json",LEGACY[0])).rejects.toThrow(/Expected/); });

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-13 — Audio Speaker status choice parity
+
+- Add the original seven Speaker status choices and labels alongside existing custom entry. Preserve blank/custom/absent/null records and explicit Save; only the selected speaker's status changes.
+- Keep status `coverage` (Coverage Checked) independent from the separate coverage field, all other speaker fields, channel statuses and original source bytes. Same-ID changed-source imports still preserve working rows; no schema, key or import-policy change.
+- Duncan passes typecheck, 69 model tests, build, AV/23 Rail-worker cases, Throwline/47 and Shader Practice/54. Thirteen browser groups pass, then Inputs expansion is blocked by overlapping panel headers at 844×390 before the probe enters Full screen. Preserve the failed run; no retry or release progression. Remaining browser, CI and published acceptance are open; physical/operator and interruption/power-loss proof is not implied.
+- Advance shared cache generation and all intentional consumers together. PR #336's Line Check release at `94b1ce7` is the completed baseline, not evidence for this changed control.
+
 ## 2026-10-13 — Audio Line Check choice parity
 
 - Add the original seven Line Check status choices alongside the existing editable text field. Both controls use the same value; custom entry remains available, and saved blank/custom/absent/null values retain the existing display behavior.

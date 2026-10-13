@@ -351,7 +351,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261013-audio-line-check-controls',
+    version:'v20261013-audio-speaker-status',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

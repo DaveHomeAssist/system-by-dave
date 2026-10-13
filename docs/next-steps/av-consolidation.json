@@ -4,16 +4,27 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
+  "head": "94b1ce79499de92416a5c30357298d619fb74ecb",
   "status": "amber",
-  "statusReason": "All nine primary families have shared-engine working panels. Audio Input Status is live at 47e773d through PR335; retain its initial cache-pin failure and correction proof. The bounded Line Check choice control passes Duncan model/build/shared-cache verification and sixteen browser groups; exact-head CI/publication/live gates remain separate. This is a minor control-parity gap, not a broken workflow. Whole-toolset and physical/operator acceptance remain open.",
+  "statusReason": "All nine primary families have shared-engine working panels. Audio Line Check choices are live at 94b1ce7 through PR336. Speaker status choices are a preserved candidate, not released:69model tests and13browser groups pass, then the short-height Inputs expansion gate fails before Full screen. Release progression stopped. This is minor control parity, not a broken Speaker workflow. Whole-toolset and physical/operator acceptance remain open.",
+  "audioSpeakerStatusParity": {
+    "recordedOn": "2026-10-13",
+    "baseRevision": "94b1ce79499de92416a5c30357298d619fb74ecb",
+    "branch": "codex/audio-speaker-status-control-parity-20261013",
+    "scope": "Original planned/Planned, patched/Patched, tuned/Tuned, coverage/Coverage Checked, ready/Ready, issue/Issue and spare/Spare chooser alongside editable custom entry. Preserve blank/absent/null records, explicit Save and current Speaker import/restore behavior; other speaker fields and channels stay independent.",
+    "candidateEvidence": "Duncan passes typecheck,69 Audio model tests,build,AV23,Throwline47 and Shader Practice54. Thirteen browser groups pass including Speaker choices/custom/blank, status-only changes, save/reopen/restore, repeated imports and absent/null records. At2026-10-13T13:56:26.239Z the Light844x390 Inputs expansion times out on intercepting panel headers before Full screen. No retry or weakened assertion. Runner released13:56:26.6339872Z,claim absent,Node0.",
+    "next": "Diagnose and correct the bounded short-height probe ordering only after continuation authority; then rerun required browser acceptance before exact-head review/CI, merge, publications and live proof. No release claim from this candidate.",
+    "blocker": "Required browser gate failed. Likely cause: Speakers changes selected row, so the next Inputs visit needs expansion in a clipped short-height panel before the probe invokes Full screen. Screenshot and call trace retained; hypothesis not validated by a repair run. Private Board synchronization also unavailable:ENOENT; no replacement created.",
+    "limits": "No schema/storage/import-policy change, speaker type/coverage chooser, other application, new workflow, full52-tool parity, Stream/Record decision, physical touch, real virtual keyboard, browser-process interruption, power loss or operator acceptance."
+  },
   "audioLineCheckChoiceParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
     "branch": "codex/audio-line-check-control-parity-20261013",
     "scope": "Original pending/patched/checked/passed/issue/muted/spare picker alongside existing custom entry. Preserve blank/absent/null fallback, Line Check/generic alias, explicit Save/restore and current import semantics; Input/Patch/Connection and originals stay independent.",
     "candidateEvidence": "Duncan Windows Chrome155: typecheck,51 Audio model tests, build, full AV verification/23 Rail-worker cases, Throwline47 and Shader Practice54 pass. All16 focused browser groups and14 embedded transitions pass, including keyboard/44px reachability, both themes/seven sizes, old/custom/blank values, exact edit comparisons, Save/page reopen/backup/repeat imports and prepared offline use.",
-    "next": "Complete exact-head review/CI, merge, both publications and isolated live proof. The final pull-request release receipt owns post-candidate evidence; earlier releases do not prove this changed control.",
+    "next": "Bounded Line Check choice release completed through PR336. Preserve its exact release evidence as the baseline for the separately scoped Speaker status chooser.",
+    "completedRelease": "PR336 merge94b1ce79499de92416a5c30357298d619fb74ecb equals tested candidate61892dac0370e535a8bfeba2a93938588a3d794d. Six exact-head checks, source38400352053 and AV38404414033 publications passed. Live16groups/14transitions/13before-and-after asset hashes passed2026-10-13T13:24:29.311Z. Receipt: https://github.com/DaveHomeAssist/system-by-dave/pull/336#issuecomment-6146604898.",
     "limits": "No storage/schema or import-policy change, new workflow, full52-tool parity, Stream/Record decision, physical touch, real virtual keyboard, browser-process interruption, power loss or operator acceptance is implied."
   },
   "audioInputStatusParity": {
@@ -78,12 +89,12 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Close Audio Line Check choices with custom entry preserved",
-    "why": "The original seven-choice picker now sits beside Audio's existing Line Check text field. Its candidate passes model/build/shared-cache/browser gates while preserving the generic alias, Input/Patch independence and original data. This is a minor control-parity improvement; publication and full specialist parity remain separate claims.",
-    "doneWhen": "The final pull-request ledger records exact-head CI, merge, both publications and live proof. Then scope one next source-confirmed missing operator capability without assuming all52tools must be absorbed.",
+    "title": "Unblock short-height acceptance for Audio Speaker status choices",
+    "why": "The original seven Speaker choices now sit beside the existing editable field. Preserve blank/custom/absent/null records, same-ID import protection, independent coverage and channels. This is a minor control-parity improvement; publication and full specialist parity remain separate claims.",
+    "doneWhen": "The short-height failure is explained and corrected without forced clicks or weaker reachability/data assertions; the full focused browser gate passes, followed by exact-head CI, merge, both publications and live proof in the release ledger.",
     "effort": "M",
     "owner": "AV console acceptance",
-    "blockedBy": "No remaining candidate source/test blocker. Physical/operator acceptance remains separate. The missing private Board prevents synchronization, not independent delivery. AVV-STREAM-KEY-1 blocks only its dependent work."
+    "blockedBy": "Required browser failure at844x390; release progression stopped. Physical/operator acceptance remains separate. Missing private Board prevents synchronization, not independent delivery. AVV-STREAM-KEY-1 blocks only its dependent work."
   },
   "findings": [
     {
