@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { apply, blank, LEGACY, load, newRow, preview, save, STORE } from "./model";
+import { apply, blank, LEGACY, load, newRow, PATCH_STATUSES, preview, save, STORE } from "./model";
 const raw = JSON.stringify({ schema:"input-list.v1", rows:[{id:"one",ch:7,source:"Vocal",patch:"SB-A/7",stand:"Downstage",owner:"A2",notes:"Keep"}] });
 describe("Audio plan",()=>{
   it("maps input identity while keeping complete source bytes",async()=>{ const result=await preview(raw,"inputs.json",LEGACY[0]); const doc=apply(blank(),result); expect(doc.channels[0]).toMatchObject({channel:"7",source:"Vocal",input:"SB-A/7",location:"Downstage",tech:"A2"}); expect(doc.imports[0].raw).toBe(raw); expect(doc.channels[0].legacy).toMatchObject({notes:"Keep"}); expect(()=>apply(doc,result)).toThrow(/already/); });
@@ -51,6 +51,49 @@ describe("Input List connection parity",()=>{
     expect(loaded.error).toBe(""); expect(loaded.raw).toBe(raw);
     expect(loaded.doc).toEqual(doc); expect(loaded.doc.channels[0].conn).toBeUndefined();
     expect(apply(blank(),await preview(raw,"old-backup.json"))).toEqual(doc);
+  });
+});
+
+describe("Audio Patch status parity",()=>{
+  const patch = (status?:string) => JSON.stringify({items:[{id:"p1",channel:"7",source:"Vocal",...(status===undefined?{}:{status})}]});
+  it.each([...PATCH_STATUSES,"","Custom operator state",undefined])("preserves imported patch status %s",async status=>{
+    const raw=patch(status);
+    const doc=apply(blank(),await preview(raw,"patch.json",LEGACY[1]));
+    expect(doc.channels[0].patchStatus).toBe(status??"");
+    expect(doc.channels[0].legacy).toEqual(JSON.parse(raw).items[0]);
+    expect(doc.imports[0].raw).toBe(raw);
+  });
+  it("roundtrips a working patch edit independently from line check and source bytes",async()=>{
+    const raw=patch("patched"), imported=await preview(raw,"patch.json",LEGACY[1]);
+    const doc=apply(blank(),imported);
+    Object.assign(doc.channels[0],{inputStatus:"open",lineCheckStatus:"issue",status:"issue",conn:"TRS",patchStatus:"ready"});
+    const data=new Map<string,string>([["audio-patch.v1",raw]]);
+    const storage={getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value);}};
+    save(storage,doc,null);
+    const restored=apply(blank(),await preview(JSON.stringify(load(storage).doc),"backup.json"));
+    expect(restored).toEqual(doc);
+    expect(restored.channels[0]).toMatchObject({inputStatus:"open",lineCheckStatus:"issue",status:"issue",conn:"TRS",patchStatus:"ready",legacy:{status:"patched"}});
+    expect(data.get("audio-patch.v1")).toBe(raw);
+    expect(()=>apply(restored,imported)).toThrow(/already/);
+    const changed=apply(restored,await preview(patch("spare"),"changed.json",LEGACY[1]));
+    expect(changed.channels).toHaveLength(1);
+    expect(changed.channels[0].patchStatus).toBe("ready");
+    expect(changed.channels[0].lineCheckStatus).toBe("issue");
+    expect(changed.channels[0].legacy.sources).toEqual([JSON.parse(raw).items[0],JSON.parse(patch("spare")).items[0]]);
+  });
+  it("fills a blank patch status without changing a line-check result",async()=>{
+    const doc=apply(blank(),await preview(patch(""),"blank.json",LEGACY[1]));
+    Object.assign(doc.channels[0],{lineCheckStatus:"issue",status:"issue"});
+    const merged=apply(doc,await preview(patch("patched"),"patched.json",LEGACY[1]));
+    expect(merged.channels[0]).toMatchObject({patchStatus:"patched",lineCheckStatus:"issue",status:"issue"});
+  });
+  it("opens missing patch status without deriving it from generic status or original",async()=>{
+    const doc=blank(), channel=newRow(); delete channel.patchStatus;
+    Object.assign(channel,{status:"issue",legacy:{status:"patched"}}); doc.channels=[channel];
+    const raw=JSON.stringify(doc), loaded=load({getItem:()=>raw});
+    expect(loaded.error).toBe(""); expect(loaded.raw).toBe(raw);
+    expect(loaded.doc).toEqual(doc); expect(loaded.doc.channels[0].patchStatus).toBeUndefined();
+    expect(apply(blank(),await preview(raw,"old.json"))).toEqual(doc);
   });
 });
 

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { workspaceSchema } from "../../shared/av-console/layout";
 export const STORE = "sbd.avAudio.v1";
 export const SCHEMA = "system-by-dave.av-audio.v1";
+export const PATCH_STATUSES = ["planned","patched","gained","linecheck","ready","issue","spare"] as const;
 export const LEGACY = [
   { name: "Input List", key: "input-list.v1", collection: "rows" },
   { name: "Audio Patch", key: "audio-patch.v1", collection: "items" },
