@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { apply, blank, INPUT_STATUSES, LEGACY, load, newRow, PATCH_STATUSES, preview, save, STORE } from "./model";
+import { apply, blank, INPUT_STATUSES, LEGACY, LINE_CHECK_STATUSES, load, newRow, PATCH_STATUSES, preview, save, STORE } from "./model";
 const raw = JSON.stringify({ schema:"input-list.v1", rows:[{id:"one",ch:7,source:"Vocal",patch:"SB-A/7",stand:"Downstage",owner:"A2",notes:"Keep"}] });
 describe("Audio plan",()=>{
   it("maps input identity while keeping complete source bytes",async()=>{ const result=await preview(raw,"inputs.json",LEGACY[0]); const doc=apply(blank(),result); expect(doc.channels[0]).toMatchObject({channel:"7",source:"Vocal",input:"SB-A/7",location:"Downstage",tech:"A2"}); expect(doc.imports[0].raw).toBe(raw); expect(doc.channels[0].legacy).toMatchObject({notes:"Keep"}); expect(()=>apply(doc,result)).toThrow(/already/); });
@@ -132,6 +132,46 @@ describe("Audio Patch status parity",()=>{
     const raw=JSON.stringify(doc), loaded=load({getItem:()=>raw});
     expect(loaded.error).toBe(""); expect(loaded.raw).toBe(raw);
     expect(loaded.doc).toEqual(doc); expect(loaded.doc.channels[0].patchStatus).toBeUndefined();
+    expect(apply(blank(),await preview(raw,"old.json"))).toEqual(doc);
+  });
+});
+
+describe("Line Check choice parity",()=>{
+  const check=(status?:string)=>JSON.stringify({items:[{id:"check-7",channel:"7",source:"Vocal",...(status===undefined?{}:{status}),problem:"Original issue"}]});
+  it("retains the original seven Line Check choices",()=>{
+    expect([...LINE_CHECK_STATUSES]).toEqual(["pending","patched","checked","passed","issue","muted","spare"]);
+  });
+  it.each([...LINE_CHECK_STATUSES,"","Custom line result",undefined])("retains imported Line Check value %s and original bytes",async status=>{
+    const raw=check(status),doc=apply(blank(),await preview(raw,"check.json",LEGACY[2]));
+    expect(doc.channels[0]).toMatchObject({lineCheckStatus:status??"",status:status??"",problem:"Original issue",legacy:JSON.parse(raw).items[0]});
+    expect(doc.imports[0].raw).toBe(raw);
+  });
+  it("roundtrips a custom Line Check result and existing generic alias without changing other stages",async()=>{
+    const raw=check("issue"),doc=apply(blank(),await preview(raw,"check.json",LEGACY[2]));
+    Object.assign(doc.channels[0],{inputStatus:"checked",patchStatus:"gained",conn:"TRS",lineCheckStatus:"Custom operator result",status:"Custom operator result"});
+    const data=new Map<string,string>([["line-check.v1",raw]]);
+    const storage={getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value);}};
+    save(storage,doc,null);
+    const restored=apply(blank(),await preview(JSON.stringify(load(storage).doc),"backup.json"));
+    expect(restored).toEqual(doc); expect(data.get("line-check.v1")).toBe(raw);
+    expect(restored.channels[0].legacy).toEqual(JSON.parse(raw).items[0]);
+  });
+  it("keeps the existing latest nonblank Line Check import rule and exact repeat rejection",async()=>{
+    const original=await preview(check("issue"),"original.json",LEGACY[2]);
+    const doc=apply(blank(),original);
+    Object.assign(doc.channels[0],{inputStatus:"checked",patchStatus:"gained",conn:"TRS",lineCheckStatus:"Custom working result",status:"Custom working result"});
+    expect(()=>apply(doc,original)).toThrow(/already/);
+    const changed=apply(doc,await preview(check("passed"),"changed.json",LEGACY[2]));
+    expect(changed.channels[0]).toMatchObject({inputStatus:"checked",patchStatus:"gained",conn:"TRS",lineCheckStatus:"passed",status:"passed",problem:"Original issue"});
+    expect(changed.channels[0].legacy.sources).toEqual([JSON.parse(check("issue")).items[0],JSON.parse(check("passed")).items[0]]);
+    expect(changed.imports.map(x=>x.raw)).toEqual([check("issue"),check("passed")]);
+  });
+  it.each([undefined,null,""])("opens and restores old Line Check value %s without normalization",async value=>{
+    const doc=blank(),channel=newRow();
+    if(value===undefined)delete channel.lineCheckStatus;else channel.lineCheckStatus=value;
+    Object.assign(channel,{status:"Custom generic fallback",inputStatus:"open",patchStatus:"ready"});doc.channels=[channel];
+    const raw=JSON.stringify(doc),loaded=load({getItem:()=>raw});
+    expect(loaded.error).toBe("");expect(loaded.raw).toBe(raw);expect(loaded.doc).toEqual(doc);
     expect(apply(blank(),await preview(raw,"old.json"))).toEqual(doc);
   });
 });

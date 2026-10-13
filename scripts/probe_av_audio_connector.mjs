@@ -29,7 +29,7 @@ const quick = (scope, name) => button(scope.locator('.console-quick'),name).clic
 const read = (page, name = key) => page.evaluate(name => localStorage.getItem(name), name);
 const file = raw => ({name:'synthetic.json',mimeType:'application/json',buffer:Buffer.from(raw)});
 const contexts = [], errors = [], passed = [], resizeTransitions = [];
-let browser, page, host;
+let browser, page, host, linePage;
 async function fresh() {
   const context = await browser.newContext({viewport:{width:1440,height:900},hasTouch:true,acceptDownloads:true});
   contexts.push(context);
@@ -55,6 +55,13 @@ async function patchStatus(scope) {
 async function inputStatus(scope) {
   await connection(scope);
   return scope.locator('.console-panel[data-panel="inputs"]').getByRole('combobox',{name:/^input status/i});
+}
+async function lineCheck(scope) {
+  await quick(scope,'Line check');
+  const panel=scope.locator('.console-panel[data-panel="check"]');
+  const toggle=panel.locator('.audio-row-title').first();
+  if(await toggle.getAttribute('aria-expanded')!=='true')await toggle.click();
+  return {choice:panel.getByRole('combobox',{name:'Line Check choices',exact:true}),custom:panel.getByRole('textbox',{name:'Line Check Status',exact:true})};
 }
 async function imported(scope, raw, saved = false, source = 'Input List') {
   await quick(scope,'Project');
@@ -269,6 +276,58 @@ try {
   assert.equal(JSON.parse(await read(page)).channels[0].lineCheckStatus,'issue');
   pass('saved Input status survives page close/reopen independently from Patch and Line Check');
 
+  const lineFixture=await fresh(); linePage=lineFixture.page;
+  await linePage.evaluate(({original,patchSource,checkSource})=>{
+    localStorage.setItem('input-list.v1',original);localStorage.setItem('audio-patch.v1',patchSource);localStorage.setItem('line-check.v1',checkSource);
+  },{original,patchSource,checkSource});
+  await imported(linePage,original,true);await imported(linePage,patchSource,true,'Audio Patch');await imported(linePage,checkSource,true,'Line Check');
+  const lineBaseline=await exported(linePage,linePage);await save(linePage);
+  const storedLineBaseline=await read(linePage);
+  let line=await lineCheck(linePage);
+  const lineChoices=['pending','patched','checked','passed','issue','muted','spare'];
+  assert.deepEqual(await line.choice.locator('option').evaluateAll(options=>options.map(option=>option.value)),['',...lineChoices]);
+  await line.choice.selectOption('pending');await line.choice.focus();await line.choice.press('ArrowDown');
+  assert.equal(await line.custom.inputValue(),'patched','keyboard choice updates existing text control');
+  for(const value of [...lineChoices,'Custom operator result','']) {
+    if(value==='Custom operator result')await line.custom.fill(value);else await line.choice.selectOption(value);
+    assert.equal(await line.choice.inputValue(),value);assert.equal(await line.custom.inputValue(),value);
+    const expected=structuredClone(lineBaseline);Object.assign(expected.channels[0],{lineCheckStatus:value,status:value});
+    assert.deepEqual(await exported(linePage,linePage),expected,'only existing Line Check/generic alias pair changes');
+    assert.equal(await read(linePage),storedLineBaseline,'edits do not save automatically');
+  }
+  await save(linePage);await linePage.reload();line=await lineCheck(linePage);
+  assert.equal(await line.choice.inputValue(),'');assert.equal(await line.custom.inputValue(),'');
+  await line.custom.fill('Custom saved check');await save(linePage);
+  const lineBackup=await exported(linePage,linePage);
+  const lineRestore=(await fresh()).page;await imported(lineRestore,JSON.stringify(lineBackup));
+  assert.deepEqual(await exported(lineRestore,lineRestore),lineBackup);await save(lineRestore);await lineRestore.reload();
+  assert.equal(await (await lineCheck(lineRestore)).choice.inputValue(),'Custom saved check');
+  for(const [name,raw]of [['input-list.v1',original],['audio-patch.v1',patchSource],['line-check.v1',checkSource]])assert.equal(await read(linePage,name),raw);
+  pass('Line Check seven-choice and keyboard picker plus editable custom/blank values, existing generic alias, explicit Save/restore and original-source independence');
+
+  await linePage.close();linePage=await lineFixture.context.newPage();await linePage.goto(base+'/av-audio/');
+  line=await lineCheck(linePage);assert.equal(await line.custom.inputValue(),'Custom saved check');
+  const lineSaved=await read(linePage);await imported(linePage,checkSource,true,'Line Check');
+  assert.match(await linePage.getByRole('status').textContent(),/already been imported/);assert.equal(await read(linePage),lineSaved);
+  const changedCheck=JSON.parse(checkSource);changedCheck.items[0].status='passed';
+  await imported(linePage,JSON.stringify(changedCheck),false,'Line Check');
+  line=await lineCheck(linePage);assert.equal(await line.choice.inputValue(),'passed');assert.equal(await line.custom.inputValue(),'passed');
+  const changedLine=await exported(linePage,linePage);
+  assert.equal(changedLine.channels[0].status,'passed');assert.equal(changedLine.channels[0].inputStatus,'open');assert.equal(changedLine.channels[0].patchStatus,'patched');
+  assert.equal(changedLine.channels[0].conn,'XLR');assert.equal(changedLine.channels[0].problem,'Synthetic no signal');
+  assert.equal(await read(linePage,'line-check.v1'),checkSource);assert.equal(changedLine.imports[2].raw,checkSource);
+  pass('Line Check custom result survives page reopen; repeat rejection and latest nonblank changed-source rule remain unchanged');
+
+  for(const value of [undefined,null,'']) {
+    const old=structuredClone(lineBackup);if(value===undefined)delete old.channels[0].lineCheckStatus;else old.channels[0].lineCheckStatus=value;
+    old.channels[0].status='Old generic fallback';const raw=JSON.stringify(old);
+    await lineRestore.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key,raw});await lineRestore.reload();
+    line=await lineCheck(lineRestore);const expected=value??'Old generic fallback';
+    assert.equal(await line.choice.inputValue(),expected);assert.equal(await line.custom.inputValue(),expected);
+    assert.deepEqual(await exported(lineRestore,lineRestore),old);assert.equal(await read(lineRestore),raw,'opening absent/null/blank never normalizes or saves');
+  }
+  pass('old absent/null Line Check fallback and explicit blank display correctly without writes, coercion or migration');
+
   for(const theme of ['light','dark']) {
     await page.evaluate(theme=>localStorage.setItem('av-theme-mode.v1',theme),theme); await page.reload();
     for(const size of [{width:1440,height:900},{width:375,height:812},{width:680,height:812},{width:1024,height:768},{width:844,height:390},{width:320,height:256},{width:3840,height:1080}]) {
@@ -288,10 +347,17 @@ try {
       await patch.focus(); assert.equal(await patch.evaluate(el=>el===document.activeElement),true);
       assert.equal(await patch.inputValue(),'ready');
       if([1440,375,3840].includes(size.width))await page.screenshot({path:join(output,`audio-${theme}-${size.width}.png`)});
+      const check=await lineCheck(page);
+      for(const [name,field]of Object.entries(check)) {
+        await reachable(field,'Line Check '+name+'/'+theme+'/'+size.width+'x'+size.height);
+        await field.focus();assert.equal(await field.evaluate(el=>el===document.activeElement),true);
+        assert.equal(await field.inputValue(),'issue');
+      }
+      if([1440,375,3840].includes(size.width))await page.screenshot({path:join(output,`audio-line-check-${theme}-${size.width}.png`)});
       if(size.height<500)await page.evaluate(()=>document.exitFullscreen());
     }
   }
-  pass('Connection, Input and Patch status keyboard focus and full 44px reachability in both themes at seven sizes; existing full-screen panel path at short heights');
+  pass('Connection, Input/Patch and both Line Check controls have keyboard focus and full 44px reachability in both themes at seven sizes; existing full-screen panel path at short heights');
   await page.setViewportSize({width:1440,height:900});
   await page.evaluate(async()=>{await navigator.serviceWorker.register('/av-suite-worker.js',{scope:'/',updateViaCache:'none'});await navigator.serviceWorker.ready;});
   await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
@@ -314,6 +380,15 @@ try {
   assert.equal(offline.channels[0].conn,'Offline connection');
   await primary.context.setOffline(false);
   pass('prepared offline Input status edit survives Save/reload with Patch, Line Check and Connection unchanged');
+  await primary.context.setOffline(true);line=await lineCheck(page);
+  await line.choice.selectOption('muted');await save(page);await page.reload();
+  line=await lineCheck(page);assert.equal(await line.custom.inputValue(),'muted');
+  await line.custom.fill('Custom offline check');await save(page);await page.reload();
+  line=await lineCheck(page);assert.equal(await line.choice.inputValue(),'Custom offline check');
+  const offlineCheck=JSON.parse(await read(page));const expectedOffline=structuredClone(offline);
+  Object.assign(expectedOffline.channels[0],{lineCheckStatus:'Custom offline check',status:'Custom offline check'});
+  assert.deepEqual(offlineCheck,expectedOffline);await primary.context.setOffline(false);
+  pass('prepared offline Line Check picker/custom edits survive Save/reload with only the existing alias pair changed');
 
   const hostContext=await browser.newContext({viewport:{width:1440,height:900},hasTouch:true,acceptDownloads:true}); contexts.push(hostContext);
   host=await hostContext.newPage(); host.on('pageerror',error=>errors.push(error.message));
@@ -331,6 +406,11 @@ try {
   await imported(frame,patchSource,false,'Audio Patch'); await imported(frame,checkSource,false,'Line Check');
   await (await patchStatus(frame)).selectOption('gained'); await save(frame);
   await (await inputStatus(frame)).selectOption('checked'); await save(frame);
+  line=await lineCheck(frame);await line.choice.selectOption('muted');await save(frame);
+  assert.equal(JSON.parse(await read(host)).channels[0].status,'muted');
+  await line.custom.fill('Custom embedded check');await save(frame);await host.reload();await frame.locator('.console-shell').waitFor();
+  line=await lineCheck(frame);assert.equal(await line.choice.inputValue(),'Custom embedded check');
+  await line.choice.selectOption('issue');await save(frame);
   const embedded=await exported(frame,host);
   assert.equal(embedded.channels[0].inputStatus,'checked');
   assert.equal(embedded.channels[0].patchStatus,'gained'); assert.equal(embedded.channels[0].lineCheckStatus,'issue');
@@ -354,6 +434,11 @@ try {
     await reachable(patch,'embedded Patch/'+size.width);
     assert.equal(await patch.inputValue(),'gained');
     if(mode!=='phone')await button(frame,'Restore Patch').click();
+    const check=await lineCheck(frame);
+    if(mode==='phone')assert.equal(await button(frame,'Maximize Line check').count(),0);
+    else {await button(frame,'Maximize Line check').click();await button(frame,'Restore Line check').waitFor();}
+    for(const [name,field]of Object.entries(check)) {await reachable(field,'embedded Line Check '+name+'/'+size.width);assert.equal(await field.inputValue(),'issue');}
+    if(mode!=='phone')await button(frame,'Restore Line check').click();
     const saved=JSON.parse(await read(host));
     assert.equal(saved.channels[0].inputStatus,'checked');
     assert.equal(saved.channels[0].patchStatus,'gained');assert.equal(saved.channels[0].lineCheckStatus,'issue');
@@ -361,12 +446,13 @@ try {
     await noOverflow(frame); await noOverflow(host);
   }
   await host.screenshot({path:join(output,'audio-embedded-phone.png')});
-  pass('actual AV Video embedded Connection/Input/Patch import/edit/Save/export/reload, independent line-check results and document, touch-size field access using panel maximize where needed');
+  pass('actual AV Video embedded Connection/Input/Patch and Line Check picker/custom import/edit/Save/export/reload, independent document and touch-size access using panel maximize where needed');
   assert.deepEqual(errors,[]);
   await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,resizeTransitions,physicalDevice:'not tested',virtualKeyboard:'not tested',processRestartAndPowerLoss:'not tested'},null,2));
 } catch(error) {
   await writeFile(join(output,'failure.json'),JSON.stringify({at:new Date().toISOString(),passed,resizeTransitions,error:String(error),stack:error.stack},null,2));
   if(host&&!host.isClosed())await host.screenshot({path:join(output,'embedded-failure.png')}).catch(()=>{});
+  if(linePage&&!linePage.isClosed())await linePage.screenshot({path:join(output,'line-check-failure.png')}).catch(()=>{});
   if(page&&!page.isClosed())await page.screenshot({path:join(output,'failure.png')}).catch(()=>{});
   throw error;
 } finally {
