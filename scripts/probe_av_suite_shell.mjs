@@ -306,6 +306,14 @@ try {
   assert.equal(await storage('sbd.avSuite.workspace.v1'), specialistViews);
   assert.equal(await storage('sbd.avSuite.layout.v1'), specialistLayout);
   assert.equal(await storage('avCalculator.v1'), JSON.stringify({ ...JSON.parse(calculatorValues), delayDistance: 124 }));
+  await page.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
+  await chooser.getByRole('button', { name: 'Audio', exact: true }).click();
+  await chooser.locator('.console-choices button').filter({ hasText: 'Inputs' }).click();
+  assert.equal(await page.locator('.console-panel[data-app="Audio"]').count(), 1, 'hidden legacy app geometry does not block adding a native panel');
+  assert.equal(await storage('sbd.avSuite.workspace.v1'), specialistViews, 'editing the live arrangement leaves the saved legacy view intact');
+  await page.reload();
+  await page.locator('.console-panel[data-app="Audio"]').waitFor();
+  assert.equal(await page.locator('iframe').count(), 0);
 
   // Exercise every menu entry as a replacement in one workspace, not just sample departments.
   const menuContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });

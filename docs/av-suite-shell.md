@@ -52,6 +52,9 @@ iframes. This supersedes the specialist-embed direction recorded above.
 Standalone specialist routes remain reachable through normal Rail links.
 Existing saved specialist slots remain in stored layouts, with an explanation
 and separate-page link instead of an embedded app; no automatic data rewrite.
+An explicit add/rearrange action removes unavailable slots from the live
+arrangement so their old geometry cannot block new native panels. Saved views
+remain unchanged until the operator explicitly stores or updates a view.
 
 ### October 14 completion: individual panels
 

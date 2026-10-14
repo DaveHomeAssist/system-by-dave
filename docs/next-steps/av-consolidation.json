@@ -13,7 +13,8 @@
     "branch": "codex/complete-panel-composition-20261014",
     "scope": "Nine native department packs in one chooser; Calculator individual controls and complete Video menu. No whole-app tiles: specialist tools remain standalone links and old slots stay stored unchanged. No redesign, document consolidation, schema change or hardware control.",
     "evidence": "Duncan passes both typechecks, Calculator model tests and builds, native four-department add/split/replace/store/reload, isolated saves, disabled Video module menu, field sets/export/print cleanup, legacy view-byte preservation, visible storage failures and eight sizes in both palettes. Native and standalone prepared offline reload/editing, the full standalone Calculator browser suite, AV26, Throwline47, Shader54 and domain staging pass. Navigation and consistency pass the lightweight POSIX file-only checks on the Mac; the unchanged Windows skip-path comparison fails. Exact-head CI and publication remain independent gates.",
-    "next": "Verify every native menu entry and legacy specialist layout preservation, then exact-head CI, merge, deployment and isolated live readback. The PR release receipt records provider and live proof; physical operator acceptance remains separate.",
+    "menuAcceptance": "All 50 individual choices across nine departments pass actual replacement in one workspace. No iframes or whole-app choices. Last menu item reachable at six sizes. Legacy Calculator Rail recall and specialist layout byte preservation pass; adding a native panel to an old specialist view works and reloads without changing the saved view.",
+    "next": "Complete exact-head CI, merge, deployment and isolated live readback. PR342 release receipts record provider and live proof; physical operator acceptance remains separate.",
     "limits": "No physical touch, real virtual keyboard, browser-process crash, power loss or human acceptance is implied."
   },
   "audioLineCheckChoiceParity": {

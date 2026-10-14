@@ -118,6 +118,9 @@ export function App() {
   const context = showContext();
   const offer = activePack?.recovery.offer;
   const dirtyApps = packs.filter(pack => pack.dirty).map(pack => pack.label);
+  // Hidden legacy app slots must not collide with a newly chosen native panel.
+  // Only an explicit arrangement action changes the live layout; saved views stay intact.
+  const panelWorkspace = { ...ws, hidden: 0, setPanels: (change: (panels: Panel[]) => Panel[]) => ws.setPanels(current => change(current.filter(panel => library.some(def => def.type === panel.type)))) };
   return <div className="suite-app" data-active-app={activeApp}>
     <header className="suite-header">
       <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : "Empty workspace · add any panel"}</p></div></div>
@@ -133,7 +136,7 @@ export function App() {
     {offer && activePack && <div className="draft-offer" role="alert"><p><strong>{activePack.label} unsaved edits</strong> from {new Date(offer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={() => void activePack.recovery.restore()}>Restore draft</button><button type="button" onClick={() => void activePack.recovery.discard()}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
       {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Whole apps no longer run inside tiles. Add individual panels here; standalone tools keep their own saved data.{SPECIALISTS.filter(tool => (ws.live[ws.viewId] || ws.view?.panels || []).some(panel => panel.type === `${TOOL_PREFIX}:${tool.id}`)).map(tool => <a key={tool.id} href={specialistHref(tool)} target="_blank" rel="noopener noreferrer"> Open {tool.label} separately</a>)}</div>}
-      <ConsoleWorkspace ws={{ ...ws, hidden: 0 }} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || "AV Video"} />
+      <ConsoleWorkspace ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || "AV Video"} />
     </main>
     <footer role="status" className={`message ${status.error || activePack?.problem ? "error" : ""}`}>{[...(activePack?.recovery.errors || []), status.app ? `${status.app}: ${status.text}` : status.text].join(" ")}</footer>
     {packs.map(pack => <div key={pack.id} data-pack-dialogs={pack.id}>{pack.dialogs}</div>)}
