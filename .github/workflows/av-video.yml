@@ -3,11 +3,25 @@ name: Verify AV Video
 on:
   pull_request:
     paths:
+      - 'apps/av-suite/**'
+      - 'av/**'
+      - 'scripts/probe_av_suite_shell.mjs'
       - 'apps/av-video/**'
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
       - 'apps/show-control/**'
       - 'apps/infrastructure/**'
+      - 'apps/front-office/**'
+      - 'apps/av-lighting/**'
+      - 'apps/av-calculator/**'
+      - 'av-calculator/**'
+      - 'av-calculator.html'
+      - 'js/av-calculator*.js'
+      - 'scripts/*calculator*'
+      - 'av-lighting/**'
+      - 'scripts/probe_av_lighting_console.mjs'
+      - 'front-office/**'
+      - 'scripts/probe_front_office_console.mjs'
       - 'infrastructure/**'
       - 'apps/the-shop/**'
       - 'the-shop/**'
@@ -19,14 +33,13 @@ on:
       - 'av-video/**'
       - 'av-audio/**'
       - 'show-ops/**'
-      - 'scripts/probe_show_control_embed.mjs'
       - 'scripts/probe_show_ops_console.mjs'
       - 'package*.json'
       - 'scripts/probe_av_video*.mjs'
-      - 'scripts/probe_av_suite_responsive.js'
+      - 'scripts/probe_av_audio_connector.mjs'
       - 'js/sbd-registry.js'
-      - 'js/av-suite/**'
       - '.github/workflows/av-video.yml'
+      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -35,7 +48,7 @@ permissions:
 jobs:
   video:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -52,6 +65,16 @@ jobs:
         run: |
           git diff --exit-code -- av-video
           test -z "$(git status --porcelain -- av-video)"
+      - name: AV Suite shell typecheck, build parity and browser
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:av-suite
+          npm run build:av-suite
+          git diff --exit-code -- av
+          test -z "$(git status --porcelain -- av)"
+          npx playwright install --with-deps chromium
+          npm run test:av-suite-browser
       - name: Audio shared-console consumer matches its source
         run: |
           npm run typecheck:av-audio
@@ -80,7 +103,32 @@ jobs:
           git diff --exit-code -- show-control
           test -z "$(git status --porcelain -- show-control)"
           npm run test:show-control-browser
-      - name: Shop panels and saved-plan compatibility
+      - name: Front Office panels and saved-document compatibility
+        run: |
+          npm run typecheck:front-office
+          npm run test:front-office
+          npm run build:front-office
+          git diff --exit-code -- front-office
+          test -z "$(git status --porcelain -- front-office)"
+          npm run test:front-office-browser
+      - name: Lighting panels and saved-plan compatibility
+        run: |
+          npm run typecheck:av-lighting
+          npm run test:av-lighting
+          npm run build:av-lighting
+          git diff --exit-code -- av-lighting
+          test -z "$(git status --porcelain -- av-lighting)"
+          npm run test:av-lighting-browser
+      - name: Calculator panels and unchanged field calculations
+        # The serial gate now verifies Calculator plus eight other consumers.
+        run: |
+          npm run typecheck:av-calculator
+          npm run test:av-calculator
+          npm run build:av-calculator
+          git diff --exit-code -- av-calculator
+          test -z "$(git status --porcelain -- av-calculator)"
+          npm run test:av-calculator-browser
+      - name: Infrastructure and Shop panels and saved-plan compatibility
         run: |
           npm run typecheck:infrastructure
           npm run test:infrastructure
@@ -96,15 +144,3 @@ jobs:
           npm run test:the-shop-browser
       - name: AV source checks
         run: npm run verify:av
-      - name: Toolbox entry and consolidation contract
-        run: |
-          export CHROME_BIN="$(command -v google-chrome)"
-          test -n "$CHROME_BIN"
-          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/av-toolbox-server.log 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid"' EXIT
-          for attempt in 1 2 3 4 5 6 7 8 9 10; do
-            if curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null; then break; fi
-            sleep 1
-          done
-          node scripts/probe_av_suite_responsive.js --target=hub-toolbox

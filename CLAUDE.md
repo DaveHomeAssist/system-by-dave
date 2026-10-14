@@ -57,6 +57,11 @@ handoffs.
 - `js/sbd-nav.js`, `js/av-suite-context.js`, `js/sbd-handoff.js`: shared AV
   navigation, show context, and cross-tool handoff behavior
 - `apps/shared/av-console/`: shared panel-console workspace used by AV consoles (`docs/av-console.md`)
+- `apps/av-suite/`: React/TypeScript source for the AV Suite shell; `av/` is its
+  generated artifact (one console; `docs/av-suite-shell.md`)
+- `apps/<family>/src/pack.tsx`: each application's panel pack (contract in
+  `apps/shared/av-console/pack.ts`), mounted by the shell and by the
+  application's own standalone route
 - `apps/av-workbook/`: React/TypeScript source for AV Workbook
 - `av-workbook/`: noindex redirect to Toolbox; no editor artifact
 - `apps/fmp-camera-sim/`: React/TypeScript/Three.js source for the FMP Camera
@@ -83,19 +88,26 @@ metadata, and title families are release-gated by the public content contract.
 
 ### AV by Dave
 
-`av-suite.html` is one doorway with two addressable workspaces: Show Console at
-`?entry=show` and the show-independent AV Toolbox at `?entry=toolbox`. A neutral
-visit opens Toolbox, including returning visits with a legacy entry preference; any explicit `sbd*` show parameter
-forces Show Console. The registry drives both workspaces' tool inventory,
-storage metadata, navigation, offline assets, and generated sitemap entries.
-Toolbox-only pins, recents, search, and filter preferences live in
-`av-suite-ui.v1` and must never mutate the show dashboard in
-`av-suite-dashboard.v1`. See `docs/av-suite-doorway.md` for the complete routing
-and persistence contract. `js/av-theme-mode.js` and `js/av-theme.js` apply the
-operator's Warm Paper, Stage Slate, or System choice.
+AV by Dave is one console. The shell at `/av/` (`apps/av-suite/`, built into
+`av/`) opens on an empty Workspace view; the Rail recalls each application's
+views in place, the chooser lists every application's panels, and the
+specialist tools open as chrome-less panels (`?sbdEmbed=panel`). On
+avbydave.com the shell is also the home page (`scripts/domain-sites.json`
+`landingPage`). `av-suite.html` (the former Toolbox and Show Console doorway),
+the two landing pages and the 34 legacy sheet pages are noindex redirect stubs
+into the console; their registry entries carry `retired:'<pack>'`, keep their
+storage keys for data transfer and one-time import, and leave the offline
+suite, sitemap and public counts (`verify:av` checks the stubs). Shell views
+live in `sbd.avSuite.workspace.v1`; each application keeps its own document and
+explicit Save. See `docs/av-suite-shell.md`. `js/av-theme-mode.js` and
+`js/av-theme.js` apply the operator's Warm Paper, Stage Slate, or System choice.
 
-The [maintained consolidation plan](docs/av-suite-consolidation-spec.md) sets the
-next product direction: Toolbox as default, focused applications with optional
+The [AV Suite shell brief](docs/av-suite-shell.md) (2026-10-13) is the current
+direction: one `/av/` console, every application as a panel pack, specialists
+as chrome-less panels, the legacy sheet pages retired. Do not start further
+per-family console conversions outside that brief. The earlier
+[consolidation plan](docs/av-suite-consolidation-spec.md) set the
+previous direction: Toolbox as default, focused applications with optional
 modules, independently launchable Unified Video, and public Workbook withdrawal
 while retaining its concept for possible redesign. AV Video now combines Signal Flow and Video Patch at `/av-video/`, with app-owned data and optional patch, displays/projection, cameras, playback, checks and backup modules. Cameras and Playback add ordered shot/cue records and previewed legacy imports with original-source retention. Displays & Projection records link explicitly to routes and import the legacy Display Plan / Projection Plan sheets without changing their originals. The remaining application consolidation is target work. See `docs/av-video.md`. Workbook is not a
 required host or database for new applications. Dave clarified on 2026-10-02
@@ -167,7 +179,8 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - Links between the camera training tools and the FMP explorers: `docs/camera-training-links.md`
 - AV inventory and storage keys: `js/sbd-registry.js`
 - Sitemap membership: `scripts/gen_sitemap.py`
-- AV Suite doorway and storage: `docs/av-suite-doorway.md`
+- AV Suite doorway (retired 2026-10-13; history): `docs/av-suite-doorway.md`
+- AV Suite shell (one console): `docs/av-suite-shell.md`
 - Verification commands: `package.json` and `AGENTS.md`
 - Other domains (housevideo.app, avbydave.com), saved-data transfer and
   cutover: `docs/domain-sites.md`

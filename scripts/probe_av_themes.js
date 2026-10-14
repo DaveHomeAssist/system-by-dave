@@ -42,8 +42,8 @@ function loadRegistry() {
 
 const registry = loadRegistry();
 const allTargets = [
-  { id: 'av-suite', href: 'av-suite.html' },
-  ...registry.tools.map((tool) => ({ id: tool.id, href: tool.href }))
+  { id: 'av-suite', href: 'av/' },
+  ...registry.tools.filter((tool) => !tool.retired).map((tool) => ({ id: tool.id, href: tool.href }))
 ];
 const requestedTargets = targetArg ? new Set(targetArg.slice('--target='.length).split(',').filter(Boolean)) : null;
 const targets = requestedTargets ? allTargets.filter((target) => requestedTargets.has(target.id)) : allTargets;

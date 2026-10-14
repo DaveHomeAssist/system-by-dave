@@ -1,6 +1,11 @@
 (function(){
   'use strict';
 
+  /* Hosted as a panel inside the AV Suite shell: the host owns navigation. */
+  try{
+    if(window.parent!==window&&new URLSearchParams(window.location.search).get('sbdEmbed')==='panel') document.documentElement.setAttribute('data-sbd-embed','panel');
+  }catch(e){}
+  if(document.documentElement.getAttribute('data-sbd-embed')==='panel') return;
   if(document.documentElement.getAttribute('data-sbd-public-nav') === 'off') return;
 
   function pathName(){

@@ -2,7 +2,9 @@
 
 Dave selected WEBREVIEW-D1 on October 12, 2026: convert the System homepage,
 AV landing and profile to viewport layouts with complete theme controls.
-This authorizes implementation, not final approval or publication of PRs 319–321.
+The October 13 single-console decision supersedes the AV landing portion: the
+release preserves `/av/` and retired-page redirects. The public reader now applies
+to the System homepage and profile. This authorizes implementation, not final approval or publication of PRs 319–321.
 
 Preserve existing copy, branding, product destinations, profile contact fragments,
 AV Stage Slate first-use and the shared saved AV preference. System pages start

@@ -36,7 +36,7 @@ const browser = await chromium.launch({ headless: true });
 const base = `http://127.0.0.1:${server.address().port}`;
 let views = 0;
 try {
-  for (const route of ['/', '/av-suite-landing2.html', '/profile/']) {
+  for (const route of ['/', '/profile/']) {
     const page = await browser.newPage({ viewport: { width: 375, height: 812 }, colorScheme: 'dark', reducedMotion: 'reduce' });
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));

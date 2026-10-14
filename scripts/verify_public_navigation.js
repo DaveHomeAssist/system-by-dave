@@ -23,7 +23,6 @@ const CORE_HEADERS = new Map([
   ['prompt-lab.html', 'Prompt Lab'],
   ['privacy-policy.html', null],
   ['remote-desktop.html', 'Tools'],
-  ['av-suite.html', 'AV Suite'],
   ['project-registry.html', 'Tools'],
   ['tailscale-manual.html', 'Tools'],
   ['resume/index.html', 'Dave'],
@@ -64,16 +63,14 @@ const REQUIRED_SKIP_LINKS = new Map([
   ['scorecard/index.html', 'scorecard-workspace'],
   ['noteforge/index.html', 'app'],
   ['prompts/index.html', 'prompt-library'],
-  ['teleprompter.html', 'teleprompter-workspace'],
-  ['show-board.html', 'setup']
+  ['teleprompter.html', 'teleprompter-workspace']
 ]);
 const CUSTOM_SHELLS = new Map([
   ['depotops/index.html', ['href="/"', 'href="/tools.html"', 'aria-current="page">DepotOps']],
   // AV by Dave pages are also published on avbydave.com, so their System by Dave
   // home link is absolute (scripts/domain-sites.json).
-  ['av-tool-suite/index-v2/index.html', ['href="https://systembydave.com/"', 'href="/av-suite.html"', 'System by Dave / AV Tool Suite']],
-  ['ProjectorThrow/index.html', ['href="https://systembydave.com/"', 'href="../av-suite.html"', 'id="throwline-workspace"']],
-  ['ProjectorThrow/Stage3D.html', ['href="https://systembydave.com/"', 'href="index.html?workspace=planner"', 'href="../av-suite.html"', 'id="stage-workspace"']]
+  ['ProjectorThrow/index.html', ['href="https://systembydave.com/"', 'href="../av/"', 'id="throwline-workspace"']],
+  ['ProjectorThrow/Stage3D.html', ['href="https://systembydave.com/"', 'href="index.html?workspace=planner"', 'href="../av/"', 'id="stage-workspace"']]
 ]);
 const SITE_ORIGIN = 'https://systembydave.com';
 // FMP video operations shell. fmp/ and fmpwalk/ are managed exports from
@@ -269,7 +266,7 @@ function verifyNavigationContract() {
     if (!/class="sbd-site-header"/.test(source)) fail(`${file} is missing the shared global header.`);
     // Pages also published on another domain (scripts/domain-sites.json) name
     // their systembydave.com destinations absolutely.
-    ['/tools.html', '/av-suite.html', '/notion.html', '/prompt-lab.html', '/profile/'].forEach((href) => {
+    ['/tools.html', '/av/', '/notion.html', '/prompt-lab.html', '/profile/'].forEach((href) => {
       if (!source.includes(`href="${href}"`) && !source.includes(`href="${SITE_ORIGIN}${href}"`)) fail(`${file} is missing global destination ${href}.`);
     });
     if (active === 'Home') {

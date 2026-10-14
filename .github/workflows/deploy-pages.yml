@@ -71,27 +71,7 @@ jobs:
           npm run verify:domain-sites
           npm run test:camera-training-links
 
-      - name: Verify AV suite import safety
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-suite-import-browser
-
-      - name: Verify AV Video legacy pages
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-video-legacy-browser
-
-      - name: Verify AV save safety
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-save-safety-browser
-
-      - name: Verify AV navigation clearance
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-nav-browser
-
-      - name: Verify AV domain views and responsive tools
+      - name: Verify AV themes and LED configurator
         run: |
           export CHROME_BIN="$(command -v google-chrome)"
           test -n "$CHROME_BIN"
@@ -99,19 +79,12 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           for attempt in 1 2 3 4 5 6 7 8 9 10; do
-            if curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null; then break; fi
+            if curl --silent --fail http://127.0.0.1:8000/av/ >/dev/null; then break; fi
             sleep 1
           done
-          curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null
-          node scripts/probe_av_domain_views.js
+          curl --silent --fail http://127.0.0.1:8000/av/ >/dev/null
           node scripts/probe_av_themes.js
-          node scripts/probe_av_suite_responsive.js
           node scripts/probe_led_wall_configurator.js
-
-      - name: Verify AV show context fill
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-context-fill-browser
 
       - name: Verify ATEM switcher guide
         env:
@@ -142,6 +115,15 @@ jobs:
           npm run build:av-video
           npm run test:av-video-browser
 
+      - name: Verify AV Suite shell
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:av-suite
+          npm run build:av-suite
+          git diff --exit-code -- av
+          npm run test:av-suite-browser
+
       - name: Verify AV Audio
         run: |
           npm run typecheck:av-audio
@@ -166,7 +148,34 @@ jobs:
           npm run build:show-control
           npm run test:show-control-browser
 
-      - name: Verify Shop panels
+      - name: Verify Front Office panels
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:front-office
+          npm run test:front-office
+          npm run build:front-office
+          npm run test:front-office-browser
+
+      - name: Verify Lighting panels
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:av-lighting
+          npm run test:av-lighting
+          npm run build:av-lighting
+          npm run test:av-lighting-browser
+
+      - name: Verify Calculator panels
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:av-calculator
+          npm run test:av-calculator
+          npm run build:av-calculator
+          npm run test:av-calculator-browser
+
+      - name: Verify Infrastructure and Shop panels
         env:
           CHROME_CHANNEL: chrome
         run: |
@@ -209,8 +218,8 @@ jobs:
         run: |
           npm audit --audit-level=high
           python3 scripts/gen_sitemap.py
-          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control the-shop infrastructure camera-sim sitemap.xml
-          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control the-shop infrastructure camera-sim sitemap.xml)"
+          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim sitemap.xml
+          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim sitemap.xml)"
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |

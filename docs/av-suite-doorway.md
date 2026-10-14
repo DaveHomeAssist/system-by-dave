@@ -1,5 +1,7 @@
 # AV Suite Doorway Contract
 
+**Retired 2026-10-13.** `av-suite.html` is now a noindex redirect stub into the AV by Dave console at `/av/` (it keeps `sbd*` show context and maps `?entry=show` to Show Control). Toolbox pins, recents, families, the Show Console dashboard and `js/av-suite/` are gone; see [the AV Suite shell brief](av-suite-shell.md). This document is kept as the record of the doorway that existed from 2026-10-04 to 2026-10-13.
+
 **Implemented 2026-10-04:** all neutral visits open Toolbox, including returning visits with a saved Show preference. Explicit routes and supported show context retain their existing behavior. The old preference is retained without being used or rewritten. Toolbox features [AV Video](../av-video/), which combines Signal Flow and Video Patch; their individual registry records and legacy URLs remain compatible. The [Video workflow contract](av-video.md) describes the shipped slice.
 
 `av-suite.html` is the stable AV by Dave route. It exposes two distinct,
@@ -12,7 +14,7 @@ registry. The AV domain root `/` is a landing page with direct links to both.
 - `av-suite.html?entry=toolbox` opens **AV Toolbox** for show-independent tool
   discovery and launch.
 - `av-suite.html?entry=frontoffice` opens the addressable **Front Office**
-  Beta handoff panel linking to `/front-office/`. The panel does not edit client or venue work; the separate application owns those records.
+  roadmap panel. It does not save client or venue work.
 - A URL containing any supported `sbd*` show parameter always opens Show
   Console, even when `entry=toolbox` is also present.
 - A neutral URL opens Toolbox without a chooser, regardless of an older saved entry preference. The chooser remains available as an explicit navigation action.
@@ -44,7 +46,8 @@ plain destinations: they do not include `sbdShow`, `sbdVenue`, `sbdDate`,
 
 Toolbox exposes search plus All, Use anytime, Pinned, Recent, and family views.
 It clearly reports that no show is attached and keeps Show Console controls out
-of the Toolbox workspace. Front Office remains a separate application with its own local Save and Export controls. The console handoff does not edit those records.
+of the Toolbox workspace. Front Office remains a labeled roadmap concept and
+does not imply persistent workflow functionality.
 The AV Video card also links directly to its document-owned Project & modules
 panel with a **Manage modules** action. Opening it does not change module
 visibility or save the Video plan; ordinary panel navigation may remember the

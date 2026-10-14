@@ -9,8 +9,8 @@ export const LIBRARY: PanelDef[] = [
   { type: 'cues', name: 'Cues', group: 'Common', description: 'Rundown and shared cue selection.', minW: 3, minH: 3 },
   { type: 'notes', name: 'Notes', group: 'Common', description: 'Operator notes saved with this run.', minW: 3, minH: 3 },
   { type: 'log', name: 'Call Log', group: 'Common', description: 'Time-stamped human calls, never hardware commands.', minW: 3, minH: 3 },
-  { type: 'setup', name: 'Setup/Import', group: 'Utilities', description: 'Add cues or review a Cue Sheet or CueForge calling snapshot.', minW: 3, minH: 3 },
-  { type: 'backup', name: 'Backup', group: 'Utilities', description: 'Export, restore and damaged-save recovery.', minW: 3, minH: 3 },
+  { type: 'setup', name: 'Setup', group: 'Utilities', description: 'Add cues or review a Cue Sheet or CueForge calling snapshot.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Document', group: 'Utilities', description: 'Run title, Save, export, restore and damaged-save recovery.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'calling', name: 'Calling', panels: [
@@ -21,7 +21,7 @@ export const DEFAULT_VIEWS: View[] = [
   { id: 'prepare', name: 'Prepare', panels: [
     { id: 'setup', type: 'setup', x: 0, y: 0, w: 4, h: 8 },
     { id: 'notes', type: 'notes', x: 4, y: 0, w: 4, h: 8 },
-    { id: 'backup', type: 'backup', x: 8, y: 0, w: 4, h: 8 },
+    { id: 'document', type: 'document', x: 8, y: 0, w: 4, h: 8 },
   ] },
 ];
 // Compose presentation validation without changing the pure calling/import model.

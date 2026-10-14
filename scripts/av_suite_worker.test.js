@@ -59,7 +59,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261012-public-viewport');
+      assert.equal(name, 'sbd-av-suite-v20261014-public-release');
       return cache;
     } },
     fetch: async () => new Response('ok'),
@@ -87,9 +87,16 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     './the-shop/assets/the-shop.js',
     './the-shop/assets/index.css',
     './infrastructure/assets/infrastructure.js',
-    './infrastructure/assets/index.css'
+    './infrastructure/assets/index.css',
+    './front-office/assets/front-office.js',
+    './front-office/assets/index.css',
+    './av-lighting/assets/av-lighting.js',
+    './av-lighting/assets/index.css'
   ];
   railAssets.forEach(asset => assert.ok(optional.includes(asset), `${asset} was not precached`));
   assert.equal(critical.some(asset => railAssets.includes(asset)), false);
+  // The console shell itself must install; a missing optional asset never blocks it.
+  ['./av/index.html', './av/assets/av-suite.js', './av/assets/av-suite.css', './js/av-offline.js'].forEach(asset => assert.ok(critical.includes(asset), `${asset} is not a critical shell asset`));
+  assert.equal(critical.some(asset => /av-suite\.html|av-suite-landing|js\/av-suite\//.test(asset)), false, 'retired Toolbox assets are no longer critical');
   assert.equal(registry.offlineAssets().some(asset => /^https?:/.test(asset)), false);
 });
