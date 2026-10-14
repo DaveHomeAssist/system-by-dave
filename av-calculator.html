@@ -31,16 +31,30 @@
 <link rel="stylesheet" href="css/av-theme.css">
 <script src="js/av-theme-mode.js"></script>
 <link rel="stylesheet" href="css/av-viewport.css">
-<link rel="stylesheet" href="css/av-calculator-viewport.css">
+<link rel="stylesheet" href="av-calculator/assets/main.css">
 </head>
 <body>
 <a data-web2-ignore="Offscreen skip link becomes visible on keyboard focus" class="skip-link" href="#main-content">Skip to calculators</a>
 <noscript>
-  <div class="noscript">JavaScript is off, so calculations are unavailable.</div>
+  <main id="main-content" class="calculator-noscript" tabindex="-1">
+    <h1>AV Calculator</h1>
+    <p>JavaScript is off, so calculations, saved values and field sets are unavailable. Enable JavaScript and reload to use the working panels.</p>
+    <nav aria-label="Calculator fallback navigation"><a href="av/">AV by Dave</a> <a </nav>
+    <ul>
+      <li><strong>Audio Delay:</strong> distance, temperature, frames and samples.</li>
+      <li><strong>Projection:</strong> screen dimensions and lens throw.</li>
+      <li><strong>Record Storage:</strong> bitrate, recording time and headroom.</li>
+      <li><strong>Power Load:</strong> nameplate current or manufacturer power factor.</li>
+      <li><strong>Voltage Drop:</strong> cable length and copper conductor estimates.</li>
+      <li><strong>SPL Distance:</strong> free-field distance loss estimates.</li>
+    </ul>
+    <p><strong>Field verification required:</strong> confirm every result against equipment specifications and venue conditions before show use. Calculator output does not verify electrical safety or suitability.</p>
+  </main>
 </noscript>
-<div class="app">
+<div id="calculatorRoot"></div>
+<div class="app" id="calculatorSource" hidden>
   <header class="topbar">
-    <a class="brand" href="av-suite.html" aria-label="AV Suite home">
+    <a class="brand" href="av/" aria-label="AV Suite home">
 
       <span class="brand-text">
         <h1>AV Calculator</h1>
@@ -53,7 +67,7 @@
     </div>
   </header>
 
-  <main id="main-content">
+  <main id="calculatorSourceBody">
     <section class="hero" aria-label="AV calculator overview">
       <div class="hero-copy">
         <p class="eyebrow">Field math</p>
@@ -365,7 +379,7 @@
 <script src="js/av-calculator.js"></script>
 <script src="js/av-calculator-field-sets.js"></script>
 <script src="js/av-viewport.js"></script>
-<script src="js/av-calculator-viewport.js"></script>
+<script type="module" src="av-calculator/assets/av-calculator.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
 </body>

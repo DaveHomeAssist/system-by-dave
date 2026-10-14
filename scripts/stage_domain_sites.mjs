@@ -403,8 +403,7 @@ function homePage(site, origin) {
 `;
 }
 
-// AV by Dave's not-found page matches its dark landing (DM Sans, 48px controls,
-// 10px corners, one green accent) and offers Home and the AV Toolbox. Every URL
+// AV by Dave's not-found page shares AV branding and links to the current console. Every URL
 // is root-absolute because GitHub Pages serves it at whatever path was requested.
 const AV_NOT_FOUND_STYLE = '@font-face{font-family:"DM Sans";font-weight:100 1000;font-display:swap;src:url(/fonts/dm-sans.woff2) format("woff2")}:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#0a0d14;color:#f3f4f7;font:16px/1.6 "DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{width:min(100%,34rem);padding:32px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:#0f131d}main:focus{outline:none}.code{margin:0 0 10px;color:#58c38b;font:400 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}h1{margin:0 0 10px;font-size:clamp(28px,6vw,36px);font-weight:600;letter-spacing:-.02em;line-height:1.15}p{margin:0 0 24px;color:rgba(243,244,247,.74)}.actions{display:flex;flex-wrap:wrap;gap:10px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 22px;border:1px solid rgba(255,255,255,.18);border-radius:10px;color:#f3f4f7;font-weight:500;text-decoration:none}.btn.primary{background:#f3f4f7;border-color:#f3f4f7;color:#0a0d14}.btn:hover{border-color:#58c38b}a:focus-visible{outline:2px solid #58c38b;outline-offset:3px}.skip{position:absolute;left:-999px;top:12px;padding:12px 16px;border-radius:10px;background:#f3f4f7;color:#0a0d14}.skip:focus{left:12px}';
 
@@ -422,17 +421,17 @@ function notFoundPage(site) {
 <link rel="canonical" href="https://${escapeHtml(site.domain)}/404.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Page not found | ${title}">
-<meta property="og:description" content="That address is not part of ${title}. Open the AV Toolbox to find your tool.">
+<meta property="og:description" content="That address is not part of ${title}. Open the AV console to find your tool.">
 <meta property="og:url" content="https://${escapeHtml(site.domain)}/404.html">
 <meta property="og:image" content="https://${escapeHtml(site.domain)}/img/av-by-dave-og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Page not found | ${title}">
-<meta name="twitter:description" content="That address is not part of ${title}. Open the AV Toolbox to find your tool.">
+<meta name="twitter:description" content="That address is not part of ${title}. Open the AV console to find your tool.">
 <meta name="twitter:image" content="https://${escapeHtml(site.domain)}/img/av-by-dave-og.png">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0a0d14" id="altThemeColor">
 <script src="/js/av-landing-theme.js"></script>
-<script src="/js/av-landing-alt.js" defer></script>
+
 <link rel="icon" href="/svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <style>${AV_NOT_FOUND_STYLE}
 html[data-av-theme="light"]{color-scheme:light}
@@ -450,9 +449,9 @@ button.btn{font:inherit;cursor:pointer;margin-top:16px}
 <main id="main" tabindex="-1">
 <p class="code">404 · ${escapeHtml(site.domain)}</p>
 <h1>Page not found</h1>
-<p>That address is not part of ${title}. The tool may have moved; every tool is listed in the AV Toolbox.</p>
+<p>That address is not part of ${title}. The tool may have moved; open the AV console to choose a panel.</p>
 <div class="actions">
-<a class="btn primary" href="/av-suite.html?entry=toolbox">Open the AV Toolbox</a>
+<a class="btn primary" href="/av/">Open the AV console</a>
 <a class="btn" href="${site.home}">${title} home</a>
 </div>
 <button class="btn" id="themeToggle" type="button" aria-label="Use light mode" aria-pressed="true" hidden>Light mode</button>
@@ -528,7 +527,7 @@ function transferPage(site, origin) {
 function stubPage(site, origin, file, host) {
   // Retired Workbook routes go straight to Toolbox, without a storage/migration interstitial.
   if (site.id === 'avbydave' && ['av-workbook.html', 'av-workbook/index.html'].includes(file)) {
-    return read(file).replaceAll('/av-suite.html?entry=toolbox', `${origin}/av-suite.html?entry=toolbox`);
+    return read(file).replaceAll("location.replace('/av/')", `location.replace('${origin}/av/')`).replaceAll('href="/av/"', `href="${origin}/av/"`);
   }
   const route = routeFor(file);
   const target = `${origin}/${route}`;

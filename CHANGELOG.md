@@ -1,19 +1,115 @@
 # Changelog
 
-## 2026-10-09 — AV by Dave landing quick fixes
+## 2026-10-14 — Website release reconciliation
 
-- Rewrite the avbydave.com landing in plain language: free browser tools for live-show crews that keep working offline, with show data kept on the device. Add the registry-checked "52 browser AV tools that keep working offline" stat and WebSite structured data. Remove the previous-landing, Doorway and engineering Docs links.
-- Link Front Office with a Beta label. Move Throwline into the first "Start with one tool" slot and label PlotForge "Beta · opens plotforge-beta.vercel.app".
-- Restyle the landing to match the systembydave.com homepage: DM Sans, 48px buttons, 10px control and 14px card corners, and AV by Dave's single green accent. Ship it dark in HTML and apply a saved light choice from an early head script (`js/av-landing-theme.js`), so there is no light flash. The footer year renders without JavaScript and the phone header keeps every destination visible in two rows.
-- Give AV by Dave pages one AV-specific link preview, `img/av-by-dave-og.png` (1200×630, 59 KB), in place of the generic System by Dave banner, and drop that 594 KB banner from the AV offline cache.
-- Make the old AV Tool Suite index v2 a noindex archive outside the sitemap. Stop staging browser probes, unit tests, README/CHANGELOG notes and `node_modules/` files onto other domains. Give avbydave.com a styled 404 page that links the AV Toolbox and home.
-- Toolbox: explain the gap between listed and registered tools ("Showing 50 of 52 tools · 2 more open inside AV Video") and fix the duplicate banner landmark by making the AV bar a labelled region that holds the page heading.
-- Advance the AV offline cache generation.
+- Reconcile the landing PR with the released single AV console. Preserve retired route redirects and current application builds; retain AV social artwork, development-file exclusions and the branded not-found page. Final Dave approval remains required before merging the website stack.
+
+## 2026-10-13 — AV by Dave is one console (slice C)
+
+- Make the AV Suite shell the AV by Dave home: `av/index.html` is staged as `/` on avbydave.com (`scripts/domain-sites.json` `landingPage`), canonical to the domain root and noindex at its source path and `/av/` alias. The console opens on an empty **Workspace** view; the Rail's top entry is now Workspace and recalls that view in place, the PWA manifest starts at `./av/`, and the shell registers the suite service worker through `js/av-offline.js` (which now resolves the site root from the registry script wherever the page lives).
+- Retire the 34 legacy sheet pages, `av-suite.html` (Toolbox and Show Console), both landing pages and the historical AV Tool Suite index as noindex redirect stubs into the console: sheets go to their owning application (`/av/?app=<pack>`), `av-suite.html` keeps `sbd*` show context and maps `?entry=show` to Show Control. Registry entries carry `retired:'<pack>'`, keep their storage keys for domain transfer and one-time import, and leave `offlineAssets()`, the sitemap and the public counts (18 live tools). `verify:av` checks every stub.
+- Remove the Toolbox code (`js/av-suite/`, `css/av-suite.css`), the landing and domain-view scripts, the Toolbox family taxonomy and `family:` Rail references, and the probes that only tested those surfaces (nav dock, suite import, context fill, legacy video pages, save safety, responsive hub, domain views, logistics exceptions, viewport navigation, worksheet viewport). Nav scripts, the Rail's All apps dialog and the theme, gear-reference, indexing, navigation, consistency and cutover verifiers skip retired routes; the AV Video probes register offline through the console.
+- Repoint every non-managed Toolbox and Show Console link (site header, home, tools directory, README, Throwline, Stage 3D, Calculator, LED Wall, StagePlotter, CueForge boundary, shader and switcher references, application breadcrumbs) at the console; managed FMP pages keep their `av-suite.html?entry=show&sbd…` links, which the stub forwards. Advance the cache generation to `v20261013-av-suite-retire-sheets`.
+
+## 2026-10-13 — AV Suite shell (slice B)
+
+- Add the AV Suite shell at `/av/` (`apps/av-suite/`, built into `av/`): one shared-engine workspace with shell-owned views (`sbd.avSuite.workspace.v1`, device-local arrangement in `sbd.avSuite.layout.v1`), the production Rail, a chooser grouped by application, and a status line that names the application reporting.
+- Convert AV Video, Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure and Lighting from standalone consoles into panel packs (`apps/<app>/src/pack.tsx`, contract in `apps/shared/av-console/pack.ts`). Each pack keeps its own document, storage key, schema, recovery and explicit Save; the shell mounts all eight in process and namespaces their panel types. The standalone routes mount the same packs with their page chrome.
+- Replace each application's separate Plan/Import and Backup panels with one Document panel (AV Video keeps Project). Show Control keeps Setup for cues.
+- Host AV Calculator, Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge and StagePlotter as chrome-less panels: `?sbdEmbed=panel` marks the page, `js/sbd-nav.js` and `js/sbd-public-nav.js` skip their navigation, `css/sbd-public-nav.css` hides static breadcrumbs, and the Calculator serves its plain page. Rail `tool:` entries dispatch the same cancelable selection as consoles so All apps opens them in the shell.
+- Remove the embedded full-application iframes from `/av-video/` and the `probe_show_control_embed.mjs` probe; the family probes drop their AV Video embedding sections and follow the Document panel. Add `scripts/probe_av_suite_shell.mjs` (nine identities recall in place, Calculator and Throwline embed, a mixed Lighting + Video view stores and restores, Save writes one key, no overflow at eight sizes in both palettes) to the AV Video and Pages workflows.
+- Register `av/` and its bundle as offline assets, advance the cache generation to `v20261013-av-suite-shell` (worker test and Stage 3D pin), publish `av/` on avbydave.com and regenerate the consolidation inventory.
+
+## 2026-10-13 — AV Suite shell direction
+
+- Record Dave's 2026-10-13 direction in `docs/av-suite-shell.md`: one `/av/` console with a single shared-engine instance, every application mounted as an in-process panel pack, Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter and AV Calculator as chrome-less panels, and the 34 legacy sheet pages retired. Three list-style record panels remain; the repeated Plan/Import and Backup panels do not.
+- Mark the October 9 console snapshot Rail, the Rail launcher and the console expansion assessment as superseded or paused. The `/av-video/` host that iframes eight standalone consoles is an interim release, not the product.
+- Reset the AV consolidation next-steps record: status red, next step is slice B (shell and pack conversions) then slice C (sheet retirement). No further per-family console or parity slices are dispatched outside the shell brief.
+
+## 2026-10-13 — Audio Line Check choice parity
+
+- Add the original seven Line Check status choices alongside the existing editable text field. Both controls use the same value; custom entry remains available, and saved blank/custom/absent/null values retain the existing display behavior.
+- Preserve explicit Save, the existing Line Check/generic-status alias, current changed-source import semantics, original snapshots and independent Input/Patch/Connection fields. This closes a minor choice-control gap, not a broken workflow.
+- Duncan passes typecheck, 51 Audio model tests, build, full AV verification/23 Rail-worker cases, Throwline/47 and Shader Practice/54. All sixteen focused browser groups and fourteen embedded transitions pass, including presets, custom entry, old backups, edit comparisons and offline use. Candidate, CI and published acceptance remain separate gates; physical/operator and interruption/power-loss proof is not implied.
+- Advance the shared cache generation and its intentional assertions/consumers together, including Stage 3D's named offline pin. Retain PR #335's successful release and earlier cache-pin failures as historical evidence.
+
+## 2026-10-13 — Audio Input status parity
+
+- Correct the missed Stage 3D offline-cache pin after PR #335's first workspace/domain CI runs rejected its mismatch with the new registry generation. Retain both failures; do not weaken the shared verification assertion or alter Audio runtime behavior in this correction.
+- Duncan's corrected shared guards pass: Throwline 47 tests, AV 23 checks and Shader Practice 54 tests. Retain the initial Windows Python-alias setup failure and successful process-local qualification; 35 prior runtime/test inputs remain unchanged.
+- Expose the original Input List Open, Patched, Checked and Problem states as an independently editable Input status select. Preserve blank/custom/absent values without inference or migration; Patch, Line Check, Connection and original source data remain separate.
+- Reuse the existing select, explicit Save and import/merge/backup contracts. No storage key/schema, dependency, shared-engine or workflow change.
+- Duncan passes typecheck, 35 model tests, Audio build, full AV verification with 23 Rail/worker tests, and all twelve focused browser groups. Checks cover edit-only-field comparison, Save/reopen/restore, repeat imports, both themes/seven sizes, 44 px reachability, prepared offline edits and fourteen embedded resize transitions. Physical devices, virtual keyboards, process interruption and power loss are not proven.
+- PR #334 previously closed the Patch release blocker at `702e287`: both publications and isolated live nine-group acceptance passed. Preserve PR #333's failed publication and repair evidence. This Input slice still needs its own exact-head CI, publication and live receipt.
+
+## 2026-10-13 — Audio embedded resize verification repair
+
+- Retain PR #333 publication failure `38375997754`: the embedded Audio probe timed out on Maximize Inputs after resizing, despite passing premerge and runner checks.
+- Observe stale workspace mode after iframe dimensions change and reproduce skipped maximization on the reverse transition. Wait for matching host/iframe modes and stable geometry before selecting mode-specific controls; activate each intended panel first.
+- Require phone controls or Maximize/Restore explicitly, retain all data and reachability assertions, and cover fourteen bidirectional transitions. Normal and sixfold CPU-throttled Duncan runs each pass all nine groups.
+- Change only verification and release records: no runtime, generated asset, cache or saved-data change. CI, source/destination publication and live acceptance remain separate gates in the repair pull request.
+- Include the existing Audio probe in the AV Video pull-request path filter so probe-only repairs run the same verification before merge; no new workflow, commands, timeout or permission changes.
+
+## 2026-10-13 — Audio Patch status parity
+
+- Add an independently editable Patch status select with the original seven states, blank and preserved custom values. Do not change input/line-check/generic status, Connection, original snapshots or storage schemas.
+- Add status import/roundtrip/merge/old-backup model cases and extend the existing Audio browser probe for independent edits, embedded operation, responsive reachability and offline reopening.
+- Retain the first failed model command caused by transferred macOS metadata. After a verified metadata-free retransmission and recovery-preserving cleanup, the clean command passes 25 tests and the Audio build succeeds.
+- Align only the two stale cache-generation expectations; full AV verification and all 23 Rail/worker tests pass. Preserve the intermediate failure.
+- Nine focused browser groups pass on Duncan, including independent Patch status, existing Connection behavior, original/legacy preservation, both themes/seven viewports, offline and AV Video embedded use. Correct native-select probe targeting without weakening data assertions. Exact-head CI/review, merge, publication/live and physical acceptance remain distinct release-ledger gates.
+
+## 2026-10-13 — Audio connection parity
+
+- Expose Input List's existing `conn` as Connection in Audio's working Inputs panel. Preserve arbitrary/blank values, original row objects and exact source JSON through import, edit, Save/reload and backup restore; unchanged-source repeats remain rejected and changed-source merges preserve nonblank operator edits.
+- Keep old Audio backups compatible without migration or automatic writes. No storage key/schema, status semantics, RF/comms or shared document change.
+- Add six model cases and a focused six-group browser probe to the existing AV Video CI/publication command. Repair Windows test discovery using the established app-root/relative-glob pattern.
+- Keep expanded records in one bounded list scroller, use 44 px inputs and make the existing full-screen toolbar fit short displays. Short-screen and embedded tablet acceptance explicitly uses Full screen/Maximize; it is not a claim of simultaneous three-panel field visibility.
+- Duncan passes typecheck, twelve model tests, build, nine Rail/worker regressions, both themes at seven sizes, prepared offline editing and independent AV Video embedded use. Exact-head CI, merge, publication and live checks remain separate release-ledger gates.
+
+## 2026-10-13 — Calculator theme alignment
+
+- Restore the established Stage Slate first-use default, correcting the native conversion's light-default drift. Stored Light, Dark or System choices still win; the calculation engine is otherwise unchanged.
+- Verify that Calculator starts with the same theme as its AV Video host and follows live Light/Dark/System selections. Preserve no-JavaScript, compact startup-error, calculation, field-set, layout, print, offline and independent-data acceptance.
+- Roll the offline cache generation for the correction. PR #330 is merged at `12931bd`; its source publication is running, and final corrected publication/live acceptance remain required.
+
+## 2026-10-12 — Calculator working panel candidate
+
+- Reuse the shared console engine for six calculation panels and Operator Summary, plus optional Show context. Preserve the original DOM controls, formula/normalization engine, field sets and shared LED working values instead of duplicating calculation logic.
+- Add default task views, close/reopen, move/resize/maximize, keyboard menus and independent versioned stored views/device layouts. Values retain their existing autosave semantics; Save views is separate and refuses unreadable or changed view records.
+- Keep the route, named-set review/import/export and summary commands. Adopt light-first theme behavior on Calculator only, panel-local pagination, bottom phone navigation, short-height controls and standalone/embedded presentation.
+- Preserve navigation, six calculator descriptions and the field safety warning without JavaScript. Surface existing startup storage errors immediately in compact Controls; add regressions for both review findings. All eleven runner browser groups pass after correction.
+- Add type/model/build/browser and committed-output gates to existing CI/publication workflows, preserving original field-set and viewport assertions with native-panel navigation. Existing PR gate budget increases from ten to fifteen minutes for the additional serial consumer; no new workflow or dependency.
+- Front Office correction PR #328 passed final source/destination publication and all nine isolated live groups at `c6ed44c`, with fourteen exact runtime hashes before/after. Lighting PR #329 passed all nine checks, both publications and all nine isolated live groups at `c5cbd90`, with fourteen exact runtime hashes before/after on October 13. Calculator passed its final eleven-group runner suite; CI/publication/live gates remain separate.
+
+## 2026-10-12 — Lighting native working panels
+
+- Add Fixtures, Fixture details, Focus, Plan/Import and Backup using the shared AV console workspace, standalone and embedded. Retain all twelve fixture fields, show metadata, status/focus/search, confirmed removal and duplicate-start warnings; no footprint or DMX-control claim.
+- Extract the existing normalization and PlotForge mapping into a pure model, checked against the retained original functions. Preserve the document/legacy keys, ID repair, source-only PlotForge fields, existing limits and optional version-1 views; add separate guarded draft/layout recovery.
+- Keep Save explicit with byte-baseline, Web Lock and write/readback guards. Refuse unsafe stale imports/saves; verify unreadable-original recovery before replacement; never label an empty download as an unreadable original when reads were denied.
+- Add twelve model tests, nine-group browser coverage, generated-output PR/publication gates, native offline assets and transfer inventory. Typecheck, model tests, build, 23 Rail/worker checks and all nine browser groups pass on Duncan, including every control at nine sizes/two themes, offline reopening and actual AV Video embedding. Exact CI/publication/live proof remain separate.
+- Preserve first failures: DOM iteration/test-environment typing fixed without a dependency, Windows generator-input line endings reconciled to canonical bytes, asynchronous draft-discard assertion waits for actual completion without weakening saved-record equality.
+
+## 2026-10-12 — Front Office read-denial backup and publication gate
+
+- Refuse Export when startup storage reads failed and no original bytes were obtained. Explain that no original backup was created; do not label an empty working document as the original. Readable originals and export after write failure retain their existing paths.
+- Add an explicit no-download browser regression for denied reads. Carry Front Office's existing type/model/build/browser checks and generated-output parity into the production publication workflow, with deployment-workflow changes covered by the PR gate.
+- Roll the shared offline cache generation for the corrected native bundle; retain all existing storage keys and registry counts.
+- Record PR #327's exact-head green merge at `f1eb365`; publication and live acceptance remain separate. Scope the next Lighting native-panel conversion without claiming it is implemented.
+
+## 2026-10-12 — Front Office native panel candidate
+
+- Add working Jobs, Clients, Venues, Job updates, Advance import and Backup panels with the existing shared workspace engine; preserve the current client/venue/job model and specialist boundaries.
+- Retain v1 documents, explicit identity binding, exact Show Advance originals and guarded Save; add optional stored views and separate draft/layout recovery. Unfinished forms survive panel and job selection changes and must be applied or cleared before Save, export or replacement.
+- Preserve unreadable original bytes before recovery, stale source/tab protection, existing import limits and independent embedded operation. No new runtime dependency or shared-engine rewrite.
+- Add native source/build, nine compatibility tests alongside the eight original model tests, isolated browser acceptance, generated-output CI checks and offline/transfer inventory updates. Publication and live acceptance remain separate gates; physical devices, virtual keyboards and real interruption/power-loss acceptance are not inferred.
+- Duncan passes all nine native browser groups in both themes at nine sizes, with offline reopening and actual AV Video embedding. Short-height validation and refused Save feedback stay visible. Full transfer assertions pass on Windows but cleanup exits nonzero; normal Linux CI remains the complete command gate.
+
 ## 2026-10-12 — Infrastructure touch panel acceptance
 
 - Keep focused fields inside the existing bounded record panel with scroll padding, including the short-height layout. The unchanged full-containment and 44 px checks pass for all six panels in both themes at nine sizes.
 - Retain measured clipping diagnostics in the browser probe and correct Stage 3D's offline-readiness pin to the existing Infrastructure cache generation.
 - Duncan passes typecheck, sixteen model tests, build, 23 Rail/worker tests, 47 Throwline tests and all eight native browser groups, including independent embedded Save, recovery, stored views and offline reopen. CI, publication and live proof are tracked separately in PR #325; physical-device/operator acceptance is not inferred.
+- PR #325 is merged and published at `0d08fc5`; nine exact-head checks, both publications, eight live browser groups and eight-asset parity passed. Preserve the first live-manifest failure as a verification-list correction, not an application repair. Refresh the rollout/projection and scope Front Office's next native panel conversion without claiming it is implemented.
 
 ## 2026-10-11 — Infrastructure native console candidate
 

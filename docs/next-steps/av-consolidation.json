@@ -4,10 +4,60 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "b0981261dd01be7a327fb8e8091ff115c5c8a91d",
+  "head": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
   "status": "amber",
-  "statusReason": "The clarified target is functional touch panels across the toolset, not catalogue links. Show Control #323 and The Shop #324 are delivered. Infrastructure PR325 now passes Duncan typecheck, sixteen model tests, build, 23 Rail/worker tests, 47 Throwline tests and all eight browser groups, including nine-size/two-theme reachability, recovery, offline and AV Video embedding. The measured tablet clipping and stale Stage 3D cache pin are repaired; exact-head CI, publication and live checks remain release gates. Whole-toolset and physical/operator acceptance remain open.",
-  "lastActivity": "2026-10-12",
+  "statusReason": "Slices A\u2013C of the AV Suite shell are in source on 2026-10-13: /av/ is one console and the avbydave.com home, opening on an empty Workspace view; eight family applications run as in-process panel packs; specialists embed as chrome-less panels; av-suite.html, the landing pages, the historical index and the 34 legacy sheet pages are noindex redirect stubs; Toolbox code and Toolbox-only probes are removed. Publication and live acceptance follow the slice C pull request. Standalone family routes still exist and mount the same packs; physical/operator acceptance remains open.",
+  "audioLineCheckChoiceParity": {
+    "recordedOn": "2026-10-13",
+    "baseRevision": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
+    "branch": "codex/audio-line-check-control-parity-20261013",
+    "scope": "Original pending/patched/checked/passed/issue/muted/spare picker alongside existing custom entry. Preserve blank/absent/null fallback, Line Check/generic alias, explicit Save/restore and current import semantics; Input/Patch/Connection and originals stay independent.",
+    "candidateEvidence": "Duncan Windows Chrome155: typecheck,51 Audio model tests, build, full AV verification/23 Rail-worker cases, Throwline47 and Shader Practice54 pass. All16 focused browser groups and14 embedded transitions pass, including keyboard/44px reachability, both themes/seven sizes, old/custom/blank values, exact edit comparisons, Save/page reopen/backup/repeat imports and prepared offline use.",
+    "next": "Complete exact-head review/CI, merge, both publications and isolated live proof. The final pull-request release receipt owns post-candidate evidence; earlier releases do not prove this changed control.",
+    "limits": "No storage/schema or import-policy change, new workflow, full52-tool parity, Stream/Record decision, physical touch, real virtual keyboard, browser-process interruption, power loss or operator acceptance is implied."
+  },
+  "audioInputStatusParity": {
+    "recordedOn": "2026-10-13",
+    "baseRevision": "702e287c0140e1b7e29b5c0675d91d3360e9a61c",
+    "branch": "codex/audio-input-status-parity-20261013",
+    "scope": "Editable original Input List open/patched/checked/problem values in Inputs; preserve blank/custom/absent states, Patch/Line Check/Connection, original snapshots and app-owned Save/import semantics.",
+    "candidateEvidence": "Duncan Windows Chrome155: typecheck,35 model tests, Audio build, full AV verification/23 Rail-worker tests and all12 focused browser groups pass. Both themes/seven sizes,44px hit-testing, backup/reopen/repeat imports, prepared offline and14 bidirectional embedded transitions pass. Exact hashes and release ledger bind these results to the candidate.",
+    "next": "Bounded Input Status release completed through PR335. Preserve the failed candidate and correction history while closing the separately scoped Line Check choice control.",
+    "completedRelease": "PR335 merge47e773d5ff17fb2b5040f9888bc06db62cf80835 equals tested candidate d640e4ffebdb40d64ef2f578ab6f7aab70cceb53. Six exact-head checks and source38391964907/AV38395431301 publications passed. Live12groups/14transitions/13before-and-after asset hashes passed2026-10-13T12:12:13.538Z. Receipt: https://github.com/DaveHomeAssist/system-by-dave/pull/335#issuecomment-6145277011.",
+    "correction1": "Candidate304c190 workspace38388863489 and domain38388863409 failed the valid Stage3D current-cache check. Its missed OFFLINE_CACHE_VERSION now matches registry v20261013-audio-input-status. Duncan passes Throwline47, AV23 and Shader Practice54 after process-local Python qualification;35prior runtime/test inputs unchanged. Failed CI and initial runner alias attempt retained. Final-head CI/publication/live remain PR335 ledger gates; no weaker assertion or new workflow.",
+    "limits": "No storage/schema or workflow change, full52-tool parity, Stream/Record policy resolution, physical touch, real virtual keyboard, process interruption, power loss or human acceptance is implied."
+  },
+  "audioPatchStatusParity": {
+    "recordedOn": "2026-10-13",
+    "baseRevision": "d42453456f7261814bec7314c9f6c5a611e4f99a",
+    "branch": "codex/audio-patch-status-parity-20261013",
+    "scope": "Independently editable original Patch statuses, blank and custom values; preserve Connection, original snapshots, line-check results and existing import/save semantics.",
+    "candidateEvidence": "Duncan typecheck retained; clean model command25/25pass; build, full verify:av and23Rail/worker tests pass. All nine focused browser groups pass, including actual embedding, independent statuses, Connection/original preservation, old/custom/blank fields, both themes/seven sizes and prepared offline editing.36exact input hashes match. Transfer, stale-cache-expectation and initial select-locator failures are preserved with bounded corrections.",
+    "next": "Bounded Patch release complete through PR334. Preserve its failed publication/diagnosis/repair history and continue the separately scoped Input Status gap.",
+    "deliveryEvidence": "PR333 merged7e6d4a3ca7b54bbcba3b2956fe7f3d991c9f5703; source publication38375997754 failed before domain publication. Preserve https://github.com/DaveHomeAssist/system-by-dave/pull/333#issuecomment-6142797171. Runtime assets remain unchanged by the repair; its final pull-request ledger owns publication and live evidence.",
+    "publicationRepair": {
+      "baseRevision": "7e6d4a3ca7b54bbcba3b2956fe7f3d991c9f5703",
+      "branch": "codex/audio-embedded-resize-20261013",
+      "scope": "Probe synchronization and explicit mode-specific control assertions; no runtime, cache, schema or generated asset changes.",
+      "diagnosis": "Actual iframe width changes before React workspace mode. Reverse resize reproduces skipped maximization and failed reachability; the original30second timeout is retained separately.",
+      "evidence": "Duncan Chrome155 passes all9groups and14bidirectional resize transitions at10:03:31Z normal and10:03:50Z sixfold CPU throttle.36runtime/test inputs verified; runner claim released andNodeCount0. Exact-head CI, publication and live remain separate gates.",
+      "completedRelease": "PR334 merged702e287c0140e1b7e29b5c0675d91d3360e9a61c; final-head CI38381284145/38381284149 and source38382482306/AV38385917587 publications passed. Live9groups/14transitions/13asset hashes passed2026-10-13T10:50:13.901Z; runner released. Exact receipt: https://github.com/DaveHomeAssist/system-by-dave/pull/334#issuecomment-6143918379. Earlier failed publication38375997754 remains historical evidence."
+    }
+  },
+  "audioConnectionParity": {
+    "recordedOn": "2026-10-13",
+    "baseRevision": "5db793e84bf8db34848438d5497ec29af572be52",
+    "branch": "codex/audio-connector-parity-20261013",
+    "scope": "Input List conn becomes an editable Audio Connection field; preserve originals, old backups, repeat-import behavior and nonblank operator edits. No other field mapping, RF/comms, Stream policy or shared save redesign.",
+    "candidateEvidence": "Duncan: typecheck, twelve model tests, build, nine Rail/worker checks and all six focused browser groups pass. Short screens use existing Full screen; constrained embedded tablets use Maximize Inputs.",
+    "deliveryEvidence": "PR332 merged at d42453456f7261814bec7314c9f6c5a611e4f99a; source publication38364398389 and AV publication38367764572 succeeded. Six isolated live groups and thirteen exact runtime hashes passed on October13. Final ledger: https://github.com/DaveHomeAssist/system-by-dave/pull/332#issuecomment-6141306517.",
+    "limits": [
+      "Physical touch devices, real virtual keyboards, process interruption and power loss are not tested.",
+      "The registered private Next Steps Board is unavailable; no replacement or synchronization is claimed.",
+      "AVV-STREAM-KEY-1 remains unanswered and blocks only its dependent work."
+    ]
+  },
+  "lastActivity": "2026-10-13",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -28,15 +78,16 @@
     "Show Ops' selected Crew Call v1 one-way copy (#310) is published at be0f4f2. Walter passed isolated live saved/file preview, cancellation, unsaved copy, explicit Save/reload, export/restore, stale-target and malformed-file guards, theme checks and six viewport sizes; nine published assets matched source byte-for-byte. Copied crew start Called without inferring attendance, while original source bytes, statuses and notes are retained. Show Ops remains a Planned Rail slot.",
     "All nine published primary AV applications are navigable from the Rail (#312) at c77b0cd. Source deployment 37893934453 and AV destination deployment 37895712977 passed; production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified. Physical/operator and connected-workflow acceptance remain separate.",
     "In-console application snapshots (#314, publication repairs #317/#316) are published at 9c370be. All eight non-Video Rail applications open within AV Video as selectable, resizable and reconfigurable panels; stored arrangements, Change/Close state, focus, standalone routes and independent app data passed isolated live production checks on Walter.",
-    "Show Ops shared touch console (#315) is published through the combined 9c370be release. Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup use the shared panel engine with explicit Save, stored views, draft/layout recovery and exact source preservation."
+    "Show Ops shared touch console (#315) is published through the combined 9c370be release. Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup use the shared panel engine with explicit Save, stored views, draft/layout recovery and exact source preservation.",
+    "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Publish the verified Infrastructure panels, then convert remaining fixed consoles",
-    "why": "The existing record scroller needed a focus/reveal inset: the Power Issue field extended 1.203125 px beyond its tablet clip. Matching scroll padding resolves it without weakening assertions or changing fields, data or the shared engine.",
-    "doneWhen": "PR325 passes exact-head CI/review, source and AV destination publication, and isolated live checks. Then Front Office, Lighting and Calculator receive working panels while existing capabilities and saved data remain intact.",
-    "effort": "M",
-    "owner": "Infrastructure native console lane",
-    "blockedBy": "No product decision blocks Infrastructure release. Required CI/publication/live gates must pass; physical devices and operators remain separate acceptance. Historical failed checkpoints are retained."
+    "title": "Publish slice C, read back avbydave.com/ as the console, then decide whether standalone family routes redirect into /av/",
+    "why": "The product is one console; the eight standalone routes are the last duplicate surfaces, kept only because their probes still drive them.",
+    "doneWhen": "avbydave.com/ serves the shell on an empty Workspace; every retired route redirects; then either the family routes redirect into /av/?app=<pack> with their probes retargeted, or they are recorded as deliberate deep links.",
+    "effort": "Moderate: eight stubs plus retargeting ~10 probes to the shell.",
+    "owner": "Claude (serial)",
+    "blockedBy": []
   },
   "findings": [
     {
@@ -163,7 +214,7 @@
       "gate": "Release proof is recorded; physical/operator acceptance remains separate."
     },
     {
-      "name": "Remaining application consolidation \u2014 In progress",
+      "name": "Remaining application consolidation \u2014 Paused 2026-10-13 (superseded by the shell)",
       "goal": "Follow the maintained spec; do not reopen settled app ownership.",
       "items": [
         "Eight standalone primary applications are published, isolated-live tested and navigable from the Rail through #312. Canonical specialist compatibility, connected workflows and physical/operator acceptance remain separate.",
@@ -223,6 +274,16 @@
         "Walter: 77 unit tests, full Video browser probes including 14 recovery scenarios, 128 legacy checks, 80 workspace cases and three offline reloads passed. Both publications succeeded. Isolated live sequence journeys passed at 338ea85 with exact-source/asset parity before and after."
       ],
       "gate": "Source, required CI, publication and isolated live acceptance passed; physical/operator acceptance remains separate."
+    },
+    {
+      "name": "AV Suite shell \u2014 In progress",
+      "goal": "One /av/ console with every application as a panel pack and the legacy sheets retired (docs/av-suite-shell.md).",
+      "items": [
+        "Slice A: brief, supersede notes, hold on per-family conversions (PR #338, 2026-10-13)",
+        "Slice B: apps/av-suite shell, eight pack conversions, specialist embed mode, Document panels, shell probe (in source 2026-10-13; publication pending)",
+        "Slice C: console is the avbydave.com home with an empty Workspace view; 34 sheet pages, av-suite.html, landing pages and the historical index are redirect stubs; Toolbox code and probes removed (in source 2026-10-13; publication pending)"
+      ],
+      "gate": "typecheck, unit, build parity, shell browser probe at six sizes in both palettes, verify:av, verify:public-navigation, verify:public-consistency, verify:domain-sites; slice C adds test:domain-cutover"
     }
   ],
   "decisionsForDave": [
@@ -479,8 +540,8 @@
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Finish PR325 from its verified current head through exact-head CI, review, merge, source and AV publication and isolated live acceptance. Preserve the measured tablet regression, unchanged reachability assertions, v1 plans, imports, original data and independent Save. Continue the accepted AV Video interaction model into the remaining fixed consoles using the existing engine and models. Do not rebuild delivered consoles, delete legacy routes or equate snapshots and launch links with full capability parity.",
-  "confidence": "High for the existing Show Control/Shop releases and current Infrastructure source and eight-group remote browser acceptance. Exact-head publication/live and physical/operator acceptance remain separately unverified.",
+  "kickoffPrompt": "Confirm avbydave.com/ serves the AV by Dave console (empty Workspace, nine Rail identities, Throwline as a panel) and every retired sheet route redirects. Then retarget the family probes at /av/?app=<pack> and replace the eight standalone family routes with redirect stubs, keeping their packs in apps/<app>/src/pack.tsx.",
+  "confidence": "High for the bounded Infrastructure source, nine exact-head checks, both publications, eight-group live browser acceptance and eight-asset parity. Whole-toolset, physical/operator and actual process/power interruption acceptance remain unverified.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
@@ -489,6 +550,58 @@
   ],
   "short": "AV Suite",
   "evidence": {
+    "calculatorNativePanelsReleaseLedger": {
+      "checkedOn": "2026-10-13",
+      "sourceRevision": "12931bdc8627f6d936d6061ab834dfaf53fa98cb",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/330",
+      "scope": "Six original calculation panels, Operator Summary and optional Show context; shared console arrangements, independent version1 view/layout keys, original field sets and LED values retained",
+      "sourceChecks": "PR330 final head912ddd0 passed all9CI checks and merged. Duncan checks7 and theme-aligned checks8 each pass all11browsergroups; type/model/build and generated-output checks pass for the unchanged native bundle.",
+      "releaseEvidence": "PR330 is the release ledger. Its final receipt identifies the theme follow-up PR, exact source/destination publications, production revision, asset hashes and isolated live groups. Follow that receipt for current deployment proof; source and merge evidence alone do not establish live acceptance.",
+      "corrections": "Review caught missing no-JavaScript navigation/safety and hidden compact startup errors; both corrected with regressions. Visual review then caught unintended light-first drift; restored the recorded Stage Slate default and verified host-to-frame Light/Dark/System changes. Original formula engine matches the pre-conversion source byte-for-byte.",
+      "limits": "No new storage redesign, full specialist parity, real power/process interruption, physical-device or operator acceptance claim."
+    },
+    "lightingNativePanelsRelease": {
+      "checkedOn": "2026-10-13",
+      "baseRevision": "c6ed44cf3d94011231bd85b09466abb5dedfc1a0",
+      "sourceRevision": "c5cbd9074c243d62bd3d5aa6edac767dc6e9faff",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/329",
+      "scope": "Five working panels with all existing fixture fields and reviewed Lighting Patch/PlotForge import; no specialist geometry, footprint inference or DMX control",
+      "status": "Twelve model tests, all nine exact-head CI checks and source38298133364/AV destination38301460263 publications pass at c5cbd9074c243d62bd3d5aa6edac767dc6e9faff. All nine isolated live groups pass on Duncan at2026-10-13T05:13:26.410Z, with fourteen runtime hashes and provenance before/after; destination cc1dfc74f95c7ed9975dd16323fb99e2442610ce.",
+      "checks": [
+        "Two direct comparisons with original pure normalization/mapping and ten native compatibility/save tests",
+        "All fields, status/focus/search/removal, duplicate starts/spares, imports, full source retention and backup roundtrip",
+        "Stored views, keyboard focus, draft/original recovery and denied/refused/stale-tab safety",
+        "Every control at44px in both themes across nine sizes; offline reopening and actual AV Video embedding",
+        "23 Rail/worker tests, source/theme/inventory checks; bounded Mac public/navigation/indexing checks"
+      ],
+      "retainedFailures": "Initial DOM iteration and Node test typing failed and were corrected without dependencies. Windows CRLF generator inputs were reconciled to canonical LF. Draft-discard test awaited Web Lock completion while retaining exact saved-record equality.",
+      "limits": "Physical devices, virtual keyboards, browser/OS process restart, power loss and operator acceptance remain untested. Nine available Rail slots do not establish full specialist parity."
+    },
+    "frontOfficeNativePanelsRelease": {
+      "checkedOn": "2026-10-12",
+      "sourceRevision": "c6ed44cf3d94011231bd85b09466abb5dedfc1a0",
+      "finalHead": "50ed167df10388c56c1fb77e76fa25b702fdfa72",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/328",
+      "sourcePublication": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38295314330",
+      "status": "Corrected c6ed44c source38295314330 and AV destination38298328233 at3bf1e6568246ad1237183331b0ed4daba8273f3f succeeded. All nine isolated live groups pass at2026-10-12T19:35:33.043Z; fourteen runtime hashes and provenance match before/after.",
+      "checks": "Typecheck, seventeen unchanged original/native model tests, build and nine Duncan browser groups passed, including denied-read no-download assertion. All seven applicable PR328 checks passed. Source/viewport/recovery/offline/embedding evidence does not imply publication.",
+      "retainedFailures": "Windows transfer cleanup failure after all56 assertions passed remains recorded; complete Linux gate passed. Metadata transfer, short-height containment/feedback, selector and deferred-focus harness failures were diagnosed and corrected without weakening acceptance.",
+      "limits": "Physical touch, virtual keyboards, actual process/power interruption and operator acceptance remain untested; no full specialist parity claim."
+    },
+    "infrastructureNativePanelsRelease": {
+      "checkedOn": "2026-10-12",
+      "sourceRevision": "0d08fc5270a1e13c24cacb8f158dc2091e90fddc",
+      "finalHead": "e263b985f53cf0abf1cecb2631746a0334160015",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/325",
+      "sourcePublication": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38279336293",
+      "destinationPublication": "https://github.com/DaveHomeAssist/avbydave/actions/runs/38282101734",
+      "destinationRevision": "19e1af3faf6abf76bbb135a731a595b74f5ad0d7",
+      "artifactSha256": "56d10fb0ea360c924802d8ffb7968070deba58117e998ef3b19566a30a5dd9b3",
+      "status": "Merged, published and verified live; supersedes the candidate record below",
+      "checks": "Sixteen model tests, 23 Rail/worker tests, 47 Throwline tests, typecheck/build, nine exact-head CI checks, eight isolated live browser groups and eight-asset parity passed. Six panels have reachable 44px controls in both themes at nine viewport sizes; independent embedded Save, retained originals, named views, recovery and offline reopening passed.",
+      "retainedFailures": "Earlier observer/cache/harness/tablet failures remain historical. The first production parity attempt incorrectly listed two legacy workspace paths not loaded by these native entries. The manifest was corrected to their actual Rail dependencies; no runtime or browser assertion changed.",
+      "limits": "Physical touch, virtual keyboard, operator rehearsal and actual process/power interruption remain untested. This is not complete legacy or specialist parity."
+    },
     "infrastructureNativePanelsCandidate": {
       "checkedOn": "2026-10-12",
       "sourceBase": "72c08720208818484c707073a24d92d4aa792df2",
@@ -526,8 +639,16 @@
       "branch": "codex/shop-panels-20261011",
       "status": "Implemented and verified on the qualified runner; exact-head CI, publication and live verification pending",
       "scope": "Worklist, Item inspector, Plan/Import and Backup; unchanged pure logistics model, optional stored views, owned draft/layout recovery and independent explicit Save.",
-      "checks": ["Typecheck, eight existing model tests, ten native model tests and production build", "Preserved legacy quantity/import/recovery browser assertions", "Eight native browser groups: working panels, views, four imports, drafts/stale tabs, refused storage, two themes/nine viewports, offline and AV Video embedding", "AV registry/theme/worker/Rail/inventory checks"],
-      "limits": ["Physical touch, virtual keyboard, power interruption/process restart and operator rehearsal not tested", "Complete logistics/specialist parity and cross-tool synchronization not included"]
+      "checks": [
+        "Typecheck, eight existing model tests, ten native model tests and production build",
+        "Preserved legacy quantity/import/recovery browser assertions",
+        "Eight native browser groups: working panels, views, four imports, drafts/stale tabs, refused storage, two themes/nine viewports, offline and AV Video embedding",
+        "AV registry/theme/worker/Rail/inventory checks"
+      ],
+      "limits": [
+        "Physical touch, virtual keyboard, power interruption/process restart and operator rehearsal not tested",
+        "Complete logistics/specialist parity and cross-tool synchronization not included"
+      ]
     },
     "showControlNativePanelsRelease": {
       "checkedOn": "2026-10-11",
@@ -558,7 +679,10 @@
       },
       "initialCiFailures": {
         "head": "3975fedea498b4bf90810b3807e99fa4f737dcac",
-        "runs": ["https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857022", "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857100"],
+        "runs": [
+          "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857022",
+          "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38176857100"
+        ],
         "cause": "Stage 3D's separate OFFLINE_CACHE_VERSION constant still named the prior generation. The new registry and generated workspace pins were correct; the verifier correctly rejected their mismatch.",
         "repair": "Update only the separate Stage 3D readiness pin to the candidate registry generation. No projector behavior, calculation rule or verifier assertion is weakened. Replacement exact-head CI remains required."
       },

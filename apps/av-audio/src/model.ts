@@ -2,13 +2,16 @@ import { z } from "zod";
 import { workspaceSchema } from "../../shared/av-console/layout";
 export const STORE = "sbd.avAudio.v1";
 export const SCHEMA = "system-by-dave.av-audio.v1";
+export const INPUT_STATUSES = ["open","patched","checked","problem"] as const;
+export const PATCH_STATUSES = ["planned","patched","gained","linecheck","ready","issue","spare"] as const;
+export const LINE_CHECK_STATUSES = ["pending","patched","checked","passed","issue","muted","spare"] as const;
 export const LEGACY = [
   { name: "Input List", key: "input-list.v1", collection: "rows" },
   { name: "Audio Patch", key: "audio-patch.v1", collection: "items" },
   { name: "Line Check", key: "line-check.v1", collection: "items" },
   { name: "Speaker Plan", key: "sbd.speakerPlan.v1", collection: "items" },
 ] as const;
-const fields = ["channel","source","type","location","console","stagebox","input","phantom","gain","destination","monitor","status","inputStatus","patchStatus","lineCheckStatus","tech","talkback","problem","notes"] as const;
+const fields = ["channel","source","type","conn","location","console","stagebox","input","phantom","gain","destination","monitor","status","inputStatus","patchStatus","lineCheckStatus","tech","talkback","problem","notes"] as const;
 const speakerFields = ["zone","speaker","type","processor","output","amp","cable","trim","delay","coverage","status","backup","notes"] as const;
 const row = z.object({ id: z.string(), origin: z.string(), legacy: z.record(z.unknown()) }).and(z.record(z.unknown()));
 const docSchema = z.object({ schema: z.literal(SCHEMA), title: z.string(), channels: z.array(row), speakers: z.array(row), imports: z.array(z.object({ id: z.string(), name: z.string(), raw: z.string(), count: z.number() })), workspace: workspaceSchema.optional() });

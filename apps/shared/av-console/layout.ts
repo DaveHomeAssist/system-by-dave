@@ -9,7 +9,9 @@ export const ROWS = 8;
 export type Rect = { x: number; y: number; w: number; h: number };
 export type Panel = Rect & { id: string; type: string };
 export type View = { id: string; name: string; panels: Panel[] };
-export type PanelDef = { type: string; name: string; group: "Common" | "Planning" | "Utilities"; description: string; minW: number; minH: number; module?: string; lit?: boolean };
+/* `app` groups a panel under its application in a multi-application chooser;
+   `key` is the stable short name used for data-panel when `type` is namespaced. */
+export type PanelDef = { type: string; name: string; group: "Common" | "Planning" | "Utilities"; description: string; minW: number; minH: number; module?: string; lit?: boolean; app?: string; key?: string };
 
 const int = z.number().int();
 const panelSchema = z.object({ id: z.string().min(1), type: z.string().min(1), x: int.min(0), y: int.min(0), w: int.min(1), h: int.min(1) }).strict();

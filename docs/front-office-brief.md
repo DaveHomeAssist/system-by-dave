@@ -28,3 +28,48 @@ Preview the source show, client, venue, date, request count and status distribut
 Reject unsupported schemas, malformed or excessive records, duplicate/empty source IDs and overlarge source or resulting backup. A saved Show Advance changed after preview, a Front Office document changed in another tab, or a changed in-memory Front Office document invalidates the preview. Cancel and rejection leave both working and saved Front Office data unchanged. Confirmation appends only to the in-memory document; explicit Save remains required and preserves the existing cross-tab write guard. The legacy key is read-only, and backup export/restore must retain the source snapshot byte-for-byte. No specialist route retirement, account/shared identity, remote service, output control or Rail promotion is included.
 
 Acceptance covers local saved and exported source, existing/new identity binding, missing source metadata, exact repeat and changed-source behavior, stale preview, invalid input, cancellation, failed Save, restart/reopen and backup roundtrip with the original source key unchanged. Exercise keyboard focus, both themes and root containment at phone, short-height, desktop and ultrawide viewports. Physical/operator acceptance remains separate.
+
+## Next bounded conversion: native touch panels
+
+The accepted suite direction is AV Video's configurable working workspace, not
+another launcher or catalogue. Front Office is the next fixed family editor to
+convert. This section scopes that implementation; it is not a completion claim.
+
+**Outcome and flow:** Open Front Office inside AV Video or at its existing route;
+keep Jobs, Clients and Venues visible together; select a job and work with its
+dated updates; bring up Advance import or Backup as needed. Arrange, maximize,
+lock and store views using the existing shared console engine. Save remains
+explicit and affects Front Office only.
+
+**Smallest useful slice:** Six panel types: Jobs, Clients, Venues, Job updates,
+Advance import and Backup. Reuse every current record field, stage, next action,
+identity binding and reviewed import guard. Selection belongs to Front Office;
+closing or replacing a panel must not delete a record. Embedded mode omits
+duplicate navigation, without a second workspace engine or new dependency.
+
+**Data and recovery:** Keep `sbd.frontOffice.document.v1` and the existing v1
+backup schema. Optional versioned workspace data stores presentation; existing
+backups remain valid. Reject unknown workspace versions without replacing the
+current document. Use console-local draft/layout recovery and the shared
+conflict guards. Preserve exact Show Advance source JSON, explicit identity
+choices, stale-preview protection, unreadable originals and export on Save
+failure. Host context is read-only and must not bind or overwrite identities.
+
+**Exclusions:** No account or synchronization, merged cross-console document,
+survey/approval/signature/quote engine, source-tool retirement, automatic save,
+or assertion of full specialist parity. Existing specialist routes remain.
+
+**Dependencies and risks:** Reuse the shared console engine and existing pure
+Front Office model/import parser. The main risks are selection drift, hidden
+identity fields, stale imports and accidental overwrite during layout recovery.
+Implement source in the established app structure and generate the existing
+public route; do not hand-edit generated bundles.
+
+**Acceptance:** All current workflows operate in their panels, standalone and
+embedded. Model and browser tests cover old/new backups, exact retained source,
+explicit Save/reload/export, named views, draft recovery, concurrent tabs,
+malformed/refused storage and canceled/stale imports. Check every control in both
+themes across the established phone, tablet, desktop, short-height and ultrawide
+matrix, including keyboard focus and 44px touch targets. Verify offline reopening,
+generated asset parity, required CI, both publications and isolated live behavior.
+Physical devices and operator acceptance remain separate, unproven gates.

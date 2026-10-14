@@ -1,7 +1,9 @@
 # AV Suite console snapshot Rail
 
 **Date:** October 9, 2026
-**Status:** Implementation contract
+**Status:** Superseded interim release (see below)
+
+**Superseded 2026-10-13:** Dave rejected the embedded-application layering as a console inside a console. The [AV Suite shell brief](av-suite-shell.md) is now the definition of done: one `/av/` console, one engine instance, every application as an in-process panel pack, specialists as chrome-less panels, and the legacy sheet pages retired. This document is kept as the record of the interim release.
 
 ## Definition of done
 

@@ -9,8 +9,7 @@ export const LIBRARY: PanelDef[] = [
   { type: "crew", name: "Crew", group: "Common", description: "Crew calls, details and attendance recorded by the operator.", minW: 3, minH: 3 },
   { type: "tasks", name: "Tasks", group: "Common", description: "Open work, owners and next actions.", minW: 3, minH: 3 },
   { type: "handoff", name: "Handoff", group: "Planning", description: "Live summary of outstanding rooms, crew and tasks.", minW: 3, minH: 3 },
-  { type: "setup", name: "Setup", group: "Utilities", description: "Show identity, date and operating notes.", minW: 3, minH: 3 },
-  { type: "backup", name: "Backup", group: "Utilities", description: "Export, restore and reviewed copies from original tools.", minW: 4, minH: 4 },
+  { type: "document", name: "Document", group: "Utilities", description: "Show identity, notes, Save, export, restore and reviewed copies from Room Check, Task Board or Crew Call.", minW: 4, minH: 4 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: "operations", name: "Operations", panels: [
@@ -19,10 +18,9 @@ export const DEFAULT_VIEWS: View[] = [
     { id: "tasks", type: "tasks", x: 8, y: 0, w: 4, h: 8 },
   ] },
   { id: "briefing", name: "Briefing", panels: [
-    { id: "setup", type: "setup", x: 0, y: 0, w: 6, h: 8 },
+    { id: "document", type: "document", x: 0, y: 0, w: 6, h: 8 },
     { id: "handoff", type: "handoff", x: 6, y: 0, w: 6, h: 8 },
   ] },
-  { id: "backup", name: "Backup", panels: [{ id: "backup", type: "backup", x: 0, y: 0, w: 12, h: 8 }] },
 ];
 
 // Keep the existing domain validator and copy functions authoritative. Layout

@@ -151,7 +151,7 @@ try {
     }
   }
   // Prime the suite service worker, then prove that the same destination data edits and reloads offline.
-  await page.goto(`${BASE}/av-suite.html`); await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.goto(`${BASE}/av/`); await page.evaluate(() => navigator.serviceWorker.ready);
   await page.goto(url); await button('Displays').click();
   await context.setOffline(true); await page.reload(); await button('Displays').click();
   await page.getByRole('button', { name: /Main screen.*lined/ }).click();
