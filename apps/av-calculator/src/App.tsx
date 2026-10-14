@@ -1,3 +1,4 @@
+import type { DepartmentPresentation } from "../../shared/av-console/Department";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ConsoleWorkspace, useConsoleWorkspace } from '../../shared/av-console/Workspace';
 import type { LayoutState } from '../../shared/av-console/drafts';
@@ -15,7 +16,7 @@ function Control({ id }: { id: string }) {
   }, [id]);
   return <div className="calculator-leaf" data-control={id} ref={target} />;
 }
-export function App() {
+export function App({ present }: DepartmentPresentation = {}) {
   const storage = useMemo(() => ({ getItem: (key: string) => localStorage.getItem(key), setItem: (key: string, value: string) => localStorage.setItem(key, value) }), []);
   const [initial] = useState(() => load(storage, VIEWS_KEY, parseViews, nodes.has('showContextCard') ? [...DEFAULT_VIEWS, { id: 'context', name: 'Context', panels: [{ id: 'context-panel', type: 'showContextCard', x: 0, y: 0, w: 12, h: 8 }] }] : DEFAULT_VIEWS));
   const [initialLayout] = useState(() => load<LayoutState | null>(storage, LAYOUT_KEY, parseLayout, null));
@@ -70,9 +71,10 @@ export function App() {
   }, [dirty]);
   const header = <header className="calculator-header"><Control id="navigation" /><h1>Calculator</h1><Control id="themeToggle" /><button onClick={() => document.querySelector<HTMLDialogElement>('#fieldSetsDialog')!.showModal()}>Field sets</button><button onClick={() => void storeViews()}>Save views{dirty ? ' *' : ''}</button></header>;
   const notice = <footer className="calculator-status"><Control id="saveStatus" /><Control id="actionStatus" /><p role="status" id="workspaceStatus">{message}</p></footer>;
-  return <main id="main-content" className="calculator-app" tabIndex={-1}>
+  const screen = <main id="main-content" className="calculator-app" tabIndex={-1}>
     {compact ? <dialog className="calculator-controls" ref={controls} aria-label="Calculator controls">{header}{notice}<button onClick={() => controls.current?.close()}>Back to panels</button></dialog> : header}
     <ConsoleWorkspace ws={compact ? { ...ws, mode: 'phone' } : ws} label="Calculator" quick={library.map(p => ({ type: p.type, label: p.name }))} render={type => ({ body: <Control id={type} /> })} onViewsChange={changeViews} notify={notify} extraViews={compact && <button aria-label="Calculator controls" onClick={() => controls.current?.showModal()}>Controls{dirty ? ' *' : ''}</button>} />
     {!compact && notice}
   </main>;
+  return present ? present(screen) : screen;
 }

@@ -1,3 +1,4 @@
+import type { DepartmentPresentation } from "../../shared/av-console/Department";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { ConsoleWorkspace, useConsoleWorkspace } from '../../shared/av-console/Workspace';
 import { KEY, ADVANCE_KEY, STAGES, emptyDocument, addClient, addVenue, addJob, updateJob, parseShowAdvance, alreadyImportedAdvance, appendShowAdvance, type Advance, type Binding, type Job } from '../../../front-office/model.mjs';
@@ -17,7 +18,7 @@ function download(name: string, raw: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function App() {
+export function App({ present }: DepartmentPresentation = {}) {
   const [initial] = useState(() => { try { return loadPlan(localStorage); } catch { return loadPlan({ getItem: () => { throw Error('Unavailable'); } }); } });
   const [plan, setPlan] = useState<Plan>(initial.plan);
   const [saved, setSaved] = useState(JSON.stringify(initial.plan));
@@ -226,7 +227,7 @@ export function App() {
   const header = <header className="office-header"><div><small>AV BY DAVE / CLIENTS & JOBS</small><h1>Front Office</h1><p>{dirty ? 'Unsaved records or views' : 'Records match saved baseline'}{pendingForms ? ' · unfinished forms' : ''}</p></div><div className="office-header-actions"><button onClick={toggleTheme}>{darkTheme ? 'Light mode' : 'Dark mode'}</button><button id="saveBtn" className="primary" onClick={() => void store()}>Save document</button></div></header>;
   const notice = <footer id="footerMessage" className="office-status" role="status" aria-live="polite">{message}{pendingForms && <span>Unfinished form input: apply or clear before Save. It is not draft-protected.</span>}{recovery.errors.map(error => <span key={error}>{error}</span>)}</footer>;
   const recoveryControls = recovery.offer && <section className="office-recovery" aria-label="Draft recovery"><p>Unsaved draft available.{recovery.offer.baseline !== baseline.current && ' Saved document changed since this draft.'}</p><button disabled={!editable} onClick={() => void recovery.restore()}>Restore draft</button><button onClick={() => void recovery.discard()}>Discard draft</button></section>;
-  return <main id="main" className={`office-app${compact ? ' office-compact' : ''}`} tabIndex={-1}>
+  const screen = <main id="main" className={`office-app${compact ? ' office-compact' : ''}`} tabIndex={-1}>
     {compact ? <dialog ref={controls} className="office-controls" aria-label="Front Office controls">{header}{recoveryControls}{notice}<button onClick={() => controls.current?.close()}>Back to panels</button></dialog> : header}
     <div className="office-summary"><span>{plan.jobs.length} jobs</span><span>{plan.clients.length} clients</span><span>{plan.venues.length} venues</span></div>{!compact && recoveryControls}
     <ConsoleWorkspace ws={compact ? { ...ws, mode: 'phone' } : ws} label="Front Office" extraViews={compact && <button aria-label="Front Office controls" onClick={() => controls.current?.showModal()}>Office{dirty || pendingForms ? ' *' : ''}{recovery.offer || recovery.errors.length ? ' !' : ''}</button>} quick={LIBRARY.map(p => ({ type: p.type, label: p.name }))} render={render} onViewsChange={(next, text) => { if (editable) setPlan(p => ({ ...p, workspace: { version: 1, views: next } })); setMessage(editable ? text : 'Recover the saved document before storing views.'); }} notify={setMessage} />
@@ -241,4 +242,5 @@ export function App() {
       </>}
     </div><button id="confirmImport" className="primary" disabled={!preview} onClick={confirmImport}>Apply preview</button></dialog>
   </main>;
+  return present ? present(screen) : screen;
 }

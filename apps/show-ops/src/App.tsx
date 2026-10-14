@@ -1,3 +1,4 @@
+import type { DepartmentPresentation } from "../../shared/av-console/Department";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/Workspace";
 import { KEY, ROOM_CHECK_KEY, TASK_BOARD_KEY, CREW_CALL_KEY, addRecord, updateRecord, handoff, statuses, previewRoomCheck, copyRoomCheck, previewTaskBoard, copyTaskBoard, previewCrewCall, copyCrewCall, type Kind, type RecordRow, type CopyPreview } from "../../../show-ops/model.mjs";
@@ -51,7 +52,7 @@ function Records({ kind, rows, add, edit, remove }: { kind: Kind; rows: RecordRo
   </div>;
 }
 
-export function App() {
+export function App({ present }: DepartmentPresentation = {}) {
   const [initial] = useState(() => {
     try { return loadDocument(localStorage); }
     catch { return loadDocument({ getItem: () => { throw new Error("Storage unavailable"); } }); }
@@ -186,11 +187,12 @@ export function App() {
   const header = <header className="ops-header"><div><small>AV BY DAVE / SHOW OPS</small><h1 id="show-title">{doc.show || "Untitled show"}</h1><span id="show-date">{doc.date || "Set a date in Setup"}</span></div><div className="ops-actions"><span id="dirty">{dirty ? "Unsaved edits" : baseline.current === null ? "Not saved" : "Saved"}</span><button id="theme" onClick={themeToggle}>{theme === "dark" ? "Light mode" : "Dark mode"}</button><button className="primary" id="save" disabled={blocked} onClick={store}>Save show</button></div></header>;
   const notice = <footer id="notice" className="ops-status" role="status" aria-live="polite">{message}{recovery.errors.map(error => <span key={error}>{error}</span>)}</footer>;
   const recoveryControls = recovery.offer && <section className="ops-recovery" aria-label="Draft recovery"><p>Unsaved draft available.{recovery.offer.baseline !== baseline.current && " The saved show has changed since this draft."}</p><button onClick={() => void recovery.restore()}>Restore draft</button><button onClick={() => void recovery.discard()}>Discard draft</button></section>;
-  return <main id="main" className={`ops-app${compact ? " ops-compact" : ""}`} tabIndex={-1}>
+  const screen = <main id="main" className={`ops-app${compact ? " ops-compact" : ""}`} tabIndex={-1}>
     {compact ? <dialog ref={controls} className="ops-controls" aria-label="Show controls">{header}{recoveryControls}{notice}<button onClick={() => controls.current?.close()}>Back to panels</button></dialog> : header}
     <div className="ops-summary" id="counts"><span><b>{open.rooms.length}</b> rooms to check</span><span><b>{open.crew.length}</b> crew not released</span><span><b>{open.tasks.length}</b> tasks open</span></div>
     {!compact && recoveryControls}
     <ConsoleWorkspace ws={compact ? { ...ws, mode: "phone" } : ws} label="Show Ops" extraViews={compact && <button aria-label="Show controls" onClick={() => controls.current?.showModal()}>Show{dirty ? " *" : ""}{recovery.errors.length || recovery.offer ? " !" : ""}</button>} quick={LIBRARY.map(panel => ({ type: panel.type, label: panel.name }))} render={render} onViewsChange={(next, text) => { setDoc(d => ({ ...d, workspace: { version: 1, views: next } })); setMessage(text); }} notify={setMessage} />
     {!compact && notice}
   </main>;
+  return present ? present(screen) : screen;
 }

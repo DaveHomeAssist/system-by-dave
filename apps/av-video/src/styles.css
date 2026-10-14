@@ -63,3 +63,12 @@
 
 /* The application is hosted inside the production Rail shell. */
 #root{height:100%;min-width:0;min-height:0}
+.department-slot,.department-panel,.department-body{height:100%;min-height:0;min-width:0}
+.department-panel{display:flex;flex-direction:column}
+.department-actions{display:flex;gap:8px;padding:4px 8px;flex-shrink:0;border-bottom:1px solid var(--av-line)}
+.department-actions button{min-height:44px}
+.department-body{flex:1;overflow:hidden}
+.department-body>*,.department-body .calculator-leaf{height:100%;min-height:0}
+.department-controls{width:min(760px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:12px}
+.department-controls>main{height:auto!important;min-height:0!important;overflow:visible!important;display:flex!important;flex-direction:column!important}
+.department-controls>button{margin-bottom:12px;min-height:44px}

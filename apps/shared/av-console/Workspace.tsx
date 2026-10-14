@@ -1,4 +1,5 @@
-import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { DepartmentNavigation } from "./DepartmentContext";
 import type { LayoutState } from "./drafts";
 import { clone, COLS, deleteView, firstFree, fits, nudge, Panel, PanelDef, Rect, renameView, ROWS, sameLayout, sanitizeView, split, storeAsNew, suggest, trim, updateView, View } from "./layout";
 
@@ -20,6 +21,7 @@ function modeFor(width: number): Mode { return width < 720 ? "phone" : width < 1
    lock). It is restored on load and written on change; it never touches the
    console's document. */
 export function useConsoleWorkspace(views: View[], library: PanelDef[], persist?: { initial: LayoutState | null; save: (state: LayoutState) => void }) {
+  const department = useContext(DepartmentNavigation);
   const [viewId, setViewId] = useState(() => views.find(v => v.id === persist?.initial?.viewId)?.id || views[0]?.id || "");
   const [live, setLive] = useState<Record<string, Panel[]>>(() => persist?.initial?.live || {});
   const [focus, setFocus] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export function useConsoleWorkspace(views: View[], library: PanelDef[], persist?
     if (r) { const id = `p-${uid()}`; setPanels(ps => [...ps, { id, type, ...r }]); setFocus(id); return true; }
     return false;
   }, [available, view, arrangement, views, live, library, max, setPanels]);
-  return { views, view, viewId: view?.id || "", setViewId: (id: string) => { setViewId(id); setPhoneType(null); }, live, setLive, panels, hidden, setPanels, focus, setFocus, max, setMax, locked, setLocked, mode, phoneType, setPhoneType, show, library };
+  return { views, view, viewId: view?.id || "", setViewId: (id: string) => { setViewId(id); setPhoneType(null); }, live, setLive, panels, hidden, setPanels, focus, setFocus, max, setMax, locked, setLocked, mode, phoneType, setPhoneType, show: department?.show || show, library };
 }
 export type ConsoleWorkspace = ReturnType<typeof useConsoleWorkspace>;
 

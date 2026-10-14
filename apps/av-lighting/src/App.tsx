@@ -1,3 +1,4 @@
+import type { DepartmentPresentation } from "../../shared/av-console/Department";
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ConsoleWorkspace, useConsoleWorkspace } from '../../shared/av-console/Workspace';
 import { KEY, FIELDS, STATUSES, MAX_IMPORT_BYTES, PLOTFORGE_KIND, blank, fixture, fromPlotForge, conflicts, hasConflict, type Field } from '../../../av-lighting/model.mjs';
@@ -14,7 +15,7 @@ function download(name: string, raw: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function App() {
+export function App({ present }: DepartmentPresentation = {}) {
   const [initial] = useState(() => { try { return loadPlan(localStorage); } catch { return loadPlan({ getItem: () => { throw Error('Unavailable'); } }); } });
   const [plan, setPlan] = useState<Plan>(initial.plan);
   const [saved, setSaved] = useState(JSON.stringify(initial.plan));
@@ -165,7 +166,7 @@ export function App() {
   const header = <header className="lighting-header"><div><small>AV BY DAVE / LIGHTING</small><h1>Lighting</h1><p>{plan.meta.showName}{dirty ? ' · unsaved' : ''}</p></div><div className="lighting-header-actions"><button onClick={toggleTheme}>{darkTheme ? 'Light mode' : 'Dark mode'}</button><button id="saveBtn" className="primary" onClick={() => void store()}>Save plan</button></div></header>;
   const notice = <footer id="footerMessage" className="lighting-status" role="status" aria-live="polite">{message}{recovery.errors.map(error => <span key={error}>{error}</span>)}</footer>;
   const recoveryControls = recovery.offer && <section className="lighting-recovery" aria-label="Draft recovery"><p>Unsaved draft available.{recovery.offer.baseline !== baseline.current && ' Saved plan changed since this draft.'}</p><button disabled={!editable} onClick={() => void recovery.restore()}>Restore draft</button><button onClick={() => void recovery.discard()}>Discard draft</button></section>;
-  return <main id="main" className={`lighting-app${compact ? ' lighting-compact' : ''}`} tabIndex={-1}>
+  const screen = <main id="main" className={`lighting-app${compact ? ' lighting-compact' : ''}`} tabIndex={-1}>
     {compact ? <dialog ref={controls} className="lighting-controls" aria-label="Lighting controls">{header}{recoveryControls}{notice}<button onClick={() => controls.current?.close()}>Back to panels</button></dialog> : header}
     <div className="lighting-summary"><span>{plan.items.length} fixtures</span><span>{plan.items.filter(row => ['patched', 'focused'].includes(row.status)).length} ready</span><span>{plan.items.filter(row => row.status === 'issue').length} issues</span><span>{plan.items.filter(row => hasConflict(row, conflictMap)).length} duplicate starts</span></div>
     {!compact && recoveryControls}
@@ -173,4 +174,5 @@ export function App() {
     {!compact && notice}
     <dialog ref={modal} className="lighting-dialog" aria-label="Import plan" onCancel={event => { event.preventDefault(); closeImport(); }}><header><h2>{purpose === 'backup' ? 'Restore backup' : 'Review lighting plan'}</h2><button aria-label="Close import" onClick={closeImport}>Close</button></header><div className="lighting-import-body" data-web2-scroll>{purpose === 'source' && <button onClick={readLegacy}>Read saved Lighting Patch</button>}<label>Import JSON<input id="importFile" type="file" accept=".json,application/json" onChange={e => { const file = e.target.files?.[0]; e.target.value = ''; if (file) void readFile(file); }} /></label><div id="importPreview" role="status"><p>{previewMessage}</p>{pending && <ul>{pending.plan.items.map(row => <li key={row.id}><strong>{row.unit || 'No unit'} · {row.fixture || 'Unnamed fixture'}</strong><span>{row.status}</span></li>)}</ul>}</div></div><button id="confirmImport" className="primary" disabled={!pending} onClick={confirmImport}>Apply preview</button></dialog>
   </main>;
+  return present ? present(screen) : screen;
 }

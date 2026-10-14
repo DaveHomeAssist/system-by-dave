@@ -1,3 +1,4 @@
+import type { DepartmentPresentation } from "../../shared/av-console/Department";
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ConsoleWorkspace, useConsoleWorkspace } from '../../shared/av-console/Workspace';
 import { KEY, SOURCES, PHASES, STATUSES, emptyPlan, stageLegacy, assertFreshSourceRows, countPair, type ShopItem, type SourceKind } from '../../../the-shop/model.mjs';
@@ -16,7 +17,7 @@ function download(name: string, raw: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function App() {
+export function App({ present }: DepartmentPresentation = {}) {
   const [initial] = useState(() => { try { return loadPlan(localStorage); } catch { return loadPlan({ getItem: () => { throw Error('Unavailable'); } }); } });
   const [plan, setPlan] = useState<Plan>(initial.plan);
   const [saved, setSaved] = useState(JSON.stringify(initial.plan));
@@ -167,7 +168,7 @@ export function App() {
   const header = <header className="shop-header"><div><small>AV BY DAVE / PREP TO STRIKE</small><h1>The Shop</h1><p>{plan.name} · {plan.items.length} items{dirty ? ' · unsaved' : ''}{formDirty ? ' · item edits pending' : ''}</p></div><div className="shop-actions"><button onClick={toggleTheme}>{darkTheme ? 'Light mode' : 'Dark mode'}</button><button id="saveBtn" className="primary" onClick={() => void store()}>Save plan</button></div></header>;
   const notice = <footer id="footerMessage" className="shop-status" role="status" aria-live="polite">{message}{recovery.errors.map(error => <span key={error}>{error}</span>)}</footer>;
   const recoveryControls = recovery.offer && <section className="shop-recovery" aria-label="Draft recovery"><p>Unsaved draft available.{recovery.offer.baseline !== baseline.current && ' The saved plan changed since this draft.'}</p><button disabled={!editable || formDirty} onClick={() => void recovery.restore()}>Restore draft</button><button onClick={() => void recovery.discard()}>Discard draft</button></section>;
-  return <main id="main" className={`shop-app${compact ? ' shop-compact' : ''}`} tabIndex={-1}>
+  const screen = <main id="main" className={`shop-app${compact ? ' shop-compact' : ''}`} tabIndex={-1}>
     {compact ? <dialog ref={controls} className="shop-controls" aria-label="Shop controls">{header}{recoveryControls}{notice}<button onClick={() => controls.current?.close()}>Back to panels</button></dialog> : header}
     <div className="shop-summary"><span>{plan.items.filter(row => row.status === 'working').length} working</span><span>{plan.items.filter(row => row.status === 'hold' || row.blocker.trim()).length} held / blocked</span><span>{plan.items.filter(row => row.status === 'ready').length} marked ready</span></div>
     {!compact && recoveryControls}
@@ -175,4 +176,5 @@ export function App() {
     {!compact && notice}
     <dialog ref={modal} className="shop-dialog" aria-label="Import source" onCancel={e => { e.preventDefault(); closeImport(); }}><header><h2>Review source</h2><button aria-label="Close import" onClick={closeImport}>Close</button></header><div className="shop-import-body" data-web2-scroll><label>Source<select id="sourceKind" value={kind} onChange={e => { setKind(e.target.value as Kind); setPending(null); reading.current++; setPreviewMessage('Select a source to preview.'); }}>{Object.entries(SOURCES).map(([key, spec]) => <option value={key} key={key}>{spec.label}</option>)}<option value="shop-backup">Shop backup</option></select></label><button disabled={kind === 'shop-backup'} onClick={readSaved}>Preview saved source</button><label>Import JSON<input id="importFile" type="file" accept=".json,application/json" onChange={e => { const file = e.target.files?.[0]; e.target.value = ''; if (file) void readFile(file); }} /></label><div id="importPreview" role="status"><p>{previewMessage}</p>{pending && <ul>{(pending.kind === 'shop-backup' ? pending.plan.items : pending.added).map(row => <li key={row.id}><strong>{row.title}</strong><span>{quantityLabel(row)}</span></li>)}</ul>}</div></div><button className="primary" disabled={!pending || (pending.kind !== 'shop-backup' && !pending.added.length)} onClick={confirmImport}>Add previewed rows</button></dialog>
   </main>;
+  return present ? present(screen) : screen;
 }

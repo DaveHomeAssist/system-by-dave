@@ -1,15 +1,16 @@
+import type { DepartmentPresentation } from "../../shared/av-console/Department";
 import { useRef, useState } from "react";
 import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/Workspace";
 import type { PanelDef, View } from "../../shared/av-console/layout";
 import { apply, blank, fieldsFor, INPUT_STATUSES, LEGACY, LINE_CHECK_STATUSES, load, newRow, PATCH_STATUSES, preview, save, SCHEMA, STORE, type AudioDoc } from "./model";
-const library: PanelDef[] = [
+export const library: PanelDef[] = [
   { type:"inputs", name:"Inputs", group:"Common", description:"Source and channel identity", minW:3,minH:3,lit:true },
   { type:"patch", name:"Patch", group:"Common", description:"Stagebox, console input and destination", minW:3,minH:3 },
   { type:"check", name:"Line check", group:"Common", description:"Operator, status and problems", minW:3,minH:3 },
   { type:"speakers", name:"Speakers", group:"Planning", description:"PA zones and processor outputs", minW:4,minH:3 },
   { type:"project", name:"Project", group:"Utilities", description:"Title, import and source history", minW:4,minH:3 }
 ];
-const defaults: View[] = [
+export const defaults: View[] = [
   { id:"channels", name:"Channels", panels:[{id:"input",type:"inputs",x:0,y:0,w:4,h:8},{id:"patch",type:"patch",x:4,y:0,w:4,h:8},{id:"check",type:"check",x:8,y:0,w:4,h:8}] },
   { id:"pa", name:"PA", panels:[{id:"speakers",type:"speakers",x:0,y:0,w:8,h:8},{id:"project",type:"project",x:8,y:0,w:4,h:8}] }
 ];
@@ -26,7 +27,7 @@ function LineCheckControls({value,onChange}:{value:string,onChange:(value:string
 }
 function exportRaw(raw:string) { const url=URL.createObjectURL(new Blob([raw],{type:"application/octet-stream"})); const a=document.createElement("a"); a.href=url; a.download="av-audio-unreadable-backup.txt"; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
 function exportFile(doc: AudioDoc) { const url = URL.createObjectURL(new Blob([JSON.stringify(doc,null,2)],{type:"application/json"})); const a=document.createElement("a"); a.href=url; a.download="av-audio.json"; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
-export function App() {
+export function App({ present }: DepartmentPresentation = {}) {
   const [initial] = useState(() => { try { return load(localStorage); } catch { return { raw:null, doc:blank(), error:"Browser storage is unavailable. Export new work before leaving." }; } });
   const [doc,setDoc] = useState(initial.doc);
   const [saved,setSaved] = useState(JSON.stringify(initial.doc));
@@ -50,5 +51,6 @@ export function App() {
     const speaker=type==="speakers", rows=speaker?doc.speakers:doc.channels;
     return { body:<div className="audio-panel"><div className="audio-panel-actions"><button onClick={()=>add(speaker)}>Add {speaker?"zone":"channel"}</button><span>{rows.length} records</span></div><div className="audio-rows">{rows.length===0&&<p className="empty">No {speaker?"zones":"channels"} yet.</p>}{rows.map((row,i)=><div className="audio-row" key={String(row.id)}><button className="audio-row-title" aria-expanded={selected===row.id} onClick={()=>setSelected(selected===row.id?"":String(row.id))}><strong>{String(row[speaker?"zone":"channel"]||`#${i+1}`)}</strong><span>{String(row[speaker?"speaker":"source"]||"Name needed")}</span><em>{String((!speaker && (row.lineCheckStatus || row.patchStatus || row.inputStatus)) || row.status || "planned")}</em></button>{selected===row.id&&<div className="audio-fields">{groups[type].map(key=>key==="lineCheckStatus"?<LineCheckControls key={key} value={String(row[key]??row.status??"")} onChange={value=>edit(String(row.id),speaker,key,value)}/>:<label key={key}>{key==="conn"?"Connection":key.replace(/([A-Z])/g," $1")}{key==="patchStatus"||key==="inputStatus"?<RowStatus choices={key==="inputStatus"?INPUT_STATUSES:PATCH_STATUSES} value={String(row[key]??"")} onChange={value=>edit(String(row.id),speaker,key,value)}/>:<input value={String(row[key]??(key==="lineCheckStatus"?row.status:"")??"")} onChange={e=>edit(String(row.id),speaker,key,e.target.value)}/>}</label>)}<button className="delete-row" onClick={()=>{ if(window.confirm("Delete this row from the unsaved plan? Export or Save to keep a backup.")) { setDoc(d=>({...d,[speaker?"speakers":"channels"]:d[speaker?"speakers":"channels"].filter(x=>x.id!==row.id)})); setSelected(""); } }}>Delete row</button>{!speaker&&type==="check"&&<small>{!row.source||!row.input?"Review source and patch before marking ready.":"Source and input recorded. Verify at the actual console."}</small>}</div>}</div>)}</div></div> };
   }
-  return <main className="audio-app"><header className="audio-header"><div><small>AV BY DAVE / APPLICATION</small><h1>Audio</h1><p>Inputs → patch → line check</p></div><div className="audio-actions"><span aria-live="polite">{dirty?"Unsaved edits":"Saved state"}</span><button onClick={()=>exportFile(doc)}>Export JSON</button>{blocked&&initial.raw!==null&&<button onClick={()=>exportRaw(initial.raw!)}>Download original saved bytes</button>}<button className="primary" onClick={store} disabled={!dirty||blocked}>Save</button></div></header><div className="audio-status" role="status">{message}</div><ConsoleWorkspace ws={ws} label="Audio" quick={library.map(x=>({type:x.type,label:x.name}))} render={render} onViewsChange={(next,text)=>{setViews(next);setDoc(d=>({...d,workspace:{version:1,views:next}}));setMessage(text);}} notify={setMessage}/></main>;
+  const screen = <main className="audio-app"><header className="audio-header"><div><small>AV BY DAVE / APPLICATION</small><h1>Audio</h1><p>Inputs → patch → line check</p></div><div className="audio-actions"><span aria-live="polite">{dirty?"Unsaved edits":"Saved state"}</span><button onClick={()=>exportFile(doc)}>Export JSON</button>{blocked&&initial.raw!==null&&<button onClick={()=>exportRaw(initial.raw!)}>Download original saved bytes</button>}<button className="primary" onClick={store} disabled={!dirty||blocked}>Save</button></div></header><div className="audio-status" role="status">{message}</div><ConsoleWorkspace ws={ws} label="Audio" quick={library.map(x=>({type:x.type,label:x.name}))} render={render} onViewsChange={(next,text)=>{setViews(next);setDoc(d=>({...d,workspace:{version:1,views:next}}));setMessage(text);}} notify={setMessage}/></main>;
+  return present ? present(screen) : screen;
 }

@@ -1,3 +1,4 @@
+import type { DepartmentPresentation } from "../../shared/av-console/Department";
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ConsoleWorkspace, useConsoleWorkspace } from '../../shared/av-console/Workspace';
 import { CUE_KEY, STORE, emptyRun, fromCueSheet, cueForgeLists, fromCueForge, logEvent, type CallingSource } from '../../../show-control/model.mjs';
@@ -17,7 +18,7 @@ function impact(run: CallingRun, dirty: boolean) {
 }
 const titles: Record<Action, string> = { setup: 'Setup and imports', backup: 'Backup controls', add: 'Add a cue', 'cue-sheet': 'Cue Sheet copy', cueforge: 'CueForge calling snapshot', restore: 'Restore backup' };
 
-export function App() {
+export function App({ present }: DepartmentPresentation = {}) {
   const [initial] = useState(() => { try { return loadRun(localStorage); } catch { return loadRun({ getItem: () => { throw Error('Unavailable'); } }); } });
   const [run, setRun] = useState<CallingRun>(initial.run);
   const [saved, setSaved] = useState(JSON.stringify(initial.run));
@@ -159,7 +160,7 @@ export function App() {
   const notice = <footer id="notice" role="status" aria-live="polite" className="call-status">{message}{recovery.errors.map(error => <span key={error}>{error}</span>)}</footer>;
   const recoveryControls = recovery.offer && <section className="call-recovery" aria-label="Draft recovery"><p>Unsaved draft available.{recovery.offer.baseline !== baseline.current && ' The saved run changed since this draft.'}</p><button disabled={blocked} onClick={() => void recovery.restore()}>Restore draft</button><button onClick={() => void recovery.discard()}>Discard draft</button></section>;
   const preview = pending && <><div className="call-preview" data-web2-scroll tabIndex={0} role="region" aria-label="Import preview"><h3>{pending.run.title}</h3><p>{pending.run.cues.length} cues · {pending.run.events.length} calls</p><p>Current run: {impact(run, dirty)}. Copying replaces this tab's run; saved data stays until Save.</p>{pending.source && <p>Only safe cue identities and notes are copied. No patch, triggers, paths, settings or credentials.</p>}<ol>{pending.run.cues.map(item => <li key={item.id}><strong>{item.number} · {item.action}</strong><span>{item.notes}</span>{pending.kind === 'cueforge' && <span>Type: {String(item.sourceRow.type)} · ID: {String(item.sourceRow.id)}</span>}</li>)}</ol></div><div className="call-dialog-actions"><button className="primary" onClick={confirmPreview}>{pending.kind === 'restore' ? 'Restore this backup' : 'Copy selected cues'}</button><button onClick={() => { setPending(null); reading.current++; setMessage('Preview canceled. No saved data changed.'); }}>Cancel preview</button></div></>;
-  return <main id="main" tabIndex={-1} className={`call-app${compact ? ' call-compact' : ''}`}>
+  const screen = <main id="main" tabIndex={-1} className={`call-app${compact ? ' call-compact' : ''}`}>
     {compact ? <dialog ref={controls} className="call-controls" aria-label="Show controls">{header}{recoveryControls}{notice}<button onClick={() => controls.current?.close()}>Back to panels</button></dialog> : header}
     <div className="call-summary"><time>{clock}</time><span>{run.held ? 'HOLD — resume before Go' : 'Human call log only'}</span>{context && <span aria-label="Read-only show context">{context}</span>}</div>
     {!compact && recoveryControls}
@@ -172,4 +173,5 @@ export function App() {
       <p className="call-dialog-status" role="status">{message}</p>
     </dialog>
   </main>;
+  return present ? present(screen) : screen;
 }

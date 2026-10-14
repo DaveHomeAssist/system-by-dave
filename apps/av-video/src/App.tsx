@@ -9,6 +9,8 @@ import { FlowCanvas } from "./FlowCanvas";
 import { SignalFields } from "./SignalFields";
 import { createHistory, record, redo, undo } from "./history";
 import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/Workspace";
+import { createDepartmentBridge, DepartmentSlot } from "../../shared/av-console/Department";
+import { DEPARTMENTS, DepartmentRuntime, expandDepartmentPanels, expandDepartmentViews } from "./departments";
 import { sanitizeView, type Panel, type PanelDef, type View as ConsoleView } from "../../shared/av-console/layout";
 import { createDraftSession, draftSnapshot, DRAFT_INDEX, readLayout, writeLayout, type DraftResult } from "../../shared/av-console/drafts";
 import { applyImport, emptyDocument, LEGACY, loadDocument, parseDocument, Module, newRoute, Preview, previewImport, Route, routeGaps, sampleDocument, saveDocument, STORE, uid, VideoDocument } from "./model";
@@ -39,7 +41,7 @@ function suiteAppsFromRegistry(): SuiteApp[] {
 const SUITE_APPS = suiteAppsFromRegistry();
 type SuitePanelType = `suite-${string}`;
 type PanelType = "cameras" | "playback" | "flow" | "patch" | "inspector" | "displays" | "checks" | "project" | "bus" | "multiview" | SuitePanelType;
-const suiteAppForType = (type: string) => SUITE_APPS.find(app => app.type === type);
+const suiteAppForType = (type: string) => SUITE_APPS.find(app => app.type === type || type.startsWith(app.consoleId + ":"));
 const suiteAppForView = (view?: ConsoleView) => view?.panels.map(panel => suiteAppForType(panel.type)).find(Boolean);
 const suiteAppForPanels = (panels: Panel[]) => panels.map(panel => suiteAppForType(panel.type)).find(Boolean);
 function suiteAppHref(app: SuiteApp) {
@@ -62,7 +64,7 @@ const LIBRARY: PanelDef[] = [
   { type: "playback", name: "Playback", group: "Planning", description: "Ordered cues, file checks and operator playback records.", minW: 4, minH: 4, module: "playback" },
   { type: "checks", name: "Checks", group: "Utilities", description: "Planning checks with what they evaluated and links to affected records.", minW: 3, minH: 3, module: "checks" },
   { type: "project", name: "Project", group: "Utilities", description: "Plan details, optional modules and imports from earlier sheets.", minW: 6, minH: 4 },
-  ...SUITE_APPS.map(app => ({ type: app.type, name: `${app.name} application`, group: app.group, description: `The complete ${app.name} application, using its own saved data and tools.`, minW: 4, minH: 4 } as PanelDef)),
+  ...SUITE_APPS.flatMap(app => (DEPARTMENTS.find(d => d.id === app.consoleId)?.panels || []).map(panel => ({ ...panel, type: `${app.consoleId}:${panel.type}`, name: `${app.name} · ${panel.name}`, module: undefined }))),
 ];
 const DEFAULT_VIEWS: ConsoleView[] = [
   { id: "routing", name: "Routing", panels: [{ id: "routing-flow", type: "flow", x: 0, y: 0, w: 8, h: 5 }, { id: "routing-patch", type: "patch", x: 0, y: 5, w: 8, h: 3 }, { id: "routing-inspector", type: "inspector", x: 8, y: 0, w: 4, h: 8 }] },
@@ -72,7 +74,7 @@ const DEFAULT_VIEWS: ConsoleView[] = [
   { id: "cameras", name: "Cameras", panels: [{ id: "cameras-list", type: "cameras", x: 0, y: 0, w: 12, h: 8 }] },
   { id: "playback", name: "Playback", panels: [{ id: "playback-list", type: "playback", x: 0, y: 0, w: 12, h: 8 }] },
   { id: "project", name: "Project", panels: [{ id: "project-project", type: "project", x: 0, y: 0, w: 12, h: 8 }] },
-  ...SUITE_APPS.map(app => ({ id: `suite-${app.consoleId}`, name: app.name, panels: [{ id: `suite-${app.consoleId}-app`, type: app.type, x: 0, y: 0, w: 12, h: 8 }] })),
+  ...SUITE_APPS.map(app => ({ id: `suite-${app.consoleId}`, name: app.name, panels: (DEPARTMENTS.find(d => d.id === app.consoleId)?.views[0].panels || []).map(panel => ({ ...panel, id: `${app.consoleId}/${panel.id}`, type: `${app.consoleId}:${panel.type}` })) })),
 ];
 const statuses = ["planned", "pending", "patched", "routed", "tested", "ready", "verified", "issue", "spare", "backup"];
 const labels: Partial<Record<keyof Route, string>> = { converterOutput: "Converter output port", converterConnector: "Converter output connector", converterFormat: "Converter output format", processorOutput: "Processor output port", processorConnector: "Processor output connector", processorFormat: "Processor output format", destinationInput: "Destination input", route: "Route name", source: "Source", destination: "Destination", system: "System", type: "Source type", format: "Format", connector: "Connector", processor: "Processor", input: "Switcher / device input", output: "Source output", converter: "Converter", backup: "Backup route", status: "Status", notes: "Operator notes" };
@@ -111,12 +113,13 @@ export function App() {
   const fileInput = useRef<HTMLInputElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const importTrigger = useRef<HTMLElement | null>(null);
-  const library = LIBRARY.filter(d => !d.module || doc.modules[d.module as Module]);
+  const library = LIBRARY;
+  const [departments] = useState(() => Object.fromEntries(SUITE_APPS.map(app => [app.consoleId, createDepartmentBridge(app.consoleId, app.name)])));
   const views = useMemo(() => {
     if (!doc.workspace) return DEFAULT_VIEWS;
-    const result = [...doc.workspace.views];
+    const result = expandDepartmentViews(doc.workspace.views);
     // Older stored workspaces gain reachable views in memory; opening never saves them.
-    for (const type of ["cameras", "playback", "project", ...SUITE_APPS.map(app => app.type)]) if (!result.some(view => view.panels.some(panel => panel.type === type))) {
+    for (const type of ["cameras", "playback", "project", ...DEPARTMENTS.map(d => `${d.id}:${d.panels[0].type}`)]) if (!result.some(view => view.panels.some(panel => panel.type === type))) {
       const base = DEFAULT_VIEWS.find(view => view.panels.some(panel => panel.type === type))!;
       let id = base.id; while (result.some(view => view.id === id)) id += "-new";
       result.push({ ...base, id });
@@ -125,6 +128,7 @@ export function App() {
   }, [doc.workspace]);
   const [layoutPersist] = useState(() => {
     let saved = null; try { saved = readLayout(localStorage, LAYOUT_KEY); } catch { /* storage unavailable */ }
+    if (saved) saved = { ...saved, live: Object.fromEntries(Object.entries(saved.live).map(([id, panels]) => [id, expandDepartmentPanels(panels)])) };
     let hiddenProjectView: string | null = null;
     let hiddenArrangement: Panel[] | null = null;
     if (new URLSearchParams(location.search).get("view") === "project" && saved) {
@@ -151,7 +155,7 @@ export function App() {
   const lastVideoView = useRef("routing");
   const workspaceRef = useRef(ws); workspaceRef.current = ws;
   const viewsRef = useRef(views); viewsRef.current = views;
-  const viewTabs = useMemo(() => activeSuiteApp ? (ws.view ? [ws.view] : []) : views.filter(view => !suiteAppForView(view)), [activeSuiteApp, views, ws.view]);
+  const viewTabs = views;
   useEffect(() => {
     if (!activeSuiteApp) lastVideoView.current = ws.viewId;
     window.dispatchEvent(new CustomEvent(RAIL_ACTIVE_EVENT, { detail: { ref: activeSuiteApp ? `console:${activeSuiteApp.consoleId}` : "console:av-video" } }));
@@ -310,11 +314,11 @@ export function App() {
   /* Onboarding lives in the lit Signal Flow panel; a neighbouring Patch panel stays compact. */
   const flowBeside = ws.mode !== "phone" && ws.panels.some(p => p.type === "flow");
   const routeLabel = (r?: Route) => r ? r.route || r.source || "Untitled route" : "";
-  function renderPanel(type: string) {
+  function renderPanel(type: string, panel: Panel) {
     const suiteApp = suiteAppForType(type);
     if (suiteApp) return {
-      body: <iframe className="suite-app-frame" src={suiteAppHref(suiteApp)} title={`${suiteApp.name} application`} />,
-      context: "Live application · independent saved data",
+      body: <DepartmentSlot bridge={departments[suiteApp.consoleId]} panel={panel} />,
+      context: suiteApp.name,
       actions: <a className="suite-app-open" href={suiteApp.href} target="_blank" rel="noreferrer">Open standalone</a>,
     };
     switch (type as PanelType) {
@@ -357,8 +361,9 @@ export function App() {
     }
   }
   const videoQuick = [{ type: "flow", label: "Signal flow" }, ...(doc.modules.patch ? [{ type: "patch", label: "Patch" }] : []), ...(doc.modules.displays ? [{ type: "displays", label: "Displays" }] : []), ...(doc.modules.cameras ? [{ type: "cameras", label: "Cameras" }] : []), ...(doc.modules.playback ? [{ type: "playback", label: "Playback" }] : []), ...(doc.modules.checks ? [{ type: "checks", label: "Checks", badge: checkCount }] : []), { type: "project", label: "Project" }];
-  const quick = activeSuiteApp ? SUITE_APPS.map(app => ({ type: app.type, label: app.name })) : videoQuick;
+  const quick = activeSuiteApp ? library.filter(p => p.type.startsWith(activeSuiteApp.consoleId + ":")).map(p => ({ type: p.type, label: p.name })) : videoQuick;
   return <div className="video-app">
+    {Object.values(departments).map(bridge => <DepartmentRuntime key={bridge.id} bridge={bridge} show={ws.show} />)}
     <header className="app-header"><div className="app-identity"><span className="app-mark" aria-hidden="true">Vi</span><div><h1>AV Video</h1><p className="header-plan" title={doc.title}>{doc.title} · {dirty ? "Unsaved" : baseline.current ? "Saved in this browser" : "New plan"}</p></div></div>
       <div className="header-actions"><label className="theme-label"><span>Theme</span><select aria-label="Theme" value={theme} onChange={e => changeTheme(e.target.value)}><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label><button type="button" className="primary" onClick={save}>Save{dirty ? " •" : ""}</button><button type="button" onClick={exportDoc}>Export</button></div>
     </header>
