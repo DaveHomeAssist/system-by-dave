@@ -12,8 +12,8 @@ import { calculatorPack } from "../../av-calculator/src/pack";
 /* All nine Rail identities expose individual, in-process panels. */
 export const PACKS: PackDef[] = [videoPack, audioPack, showControlPack, showOpsPack, frontOfficePack, shopPack, infrastructurePack, lightingPack, calculatorPack];
 
-/* Specialist tools hosted as chrome-less panels (`?sbdEmbed=panel`). Each
-   keeps its own page, document and storage; the shell never reads them. */
+/* Standalone tools are links, never panel choices. Keep this catalog for
+   recovery links in old layouts; their documents and storage stay untouched. */
 export type Specialist = { id: string; label: string; description: string; consoleId?: string; fallbackHref: string; minW: number; minH: number };
 export const SPECIALISTS: Specialist[] = [
   { id: "throwline", label: "Throwline", description: "Projector throw, fit, brightness and multi-projector layouts with Stage 3D.", fallbackHref: "ProjectorThrow/", minW: 5, minH: 4 },

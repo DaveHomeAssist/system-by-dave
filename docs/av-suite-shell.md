@@ -46,6 +46,13 @@ the result. The engine itself is sound and is reused unchanged in spirit.
 
 ## Definition of done
 
+**October 14 clarification:** only individual native department panels belong
+in the shared chooser. No whole-application tiles, including specialist
+iframes. This supersedes the specialist-embed direction recorded above.
+Standalone specialist routes remain reachable through normal Rail links.
+Existing saved specialist slots remain in stored layouts, with an explanation
+and separate-page link instead of an embedded app; no automatic data rewrite.
+
 ### October 14 completion: individual panels
 
 Dave's acceptance is any individual panel from any department selectable from
@@ -65,21 +72,19 @@ shared state, view save/reload, legacy layouts, export and palette/viewport
 containment before release. No new dependencies, hardware control or redesign.
 
 - `https://avbydave.com/av/` opens one console. The Rail on the left lists the
-  nine application identities plus the specialist tools. Selecting a Rail item
-  recalls that application's views in the same workspace; it never navigates
-  away and never renders a second console.
+  nine application identities plus standalone tool links. Selecting a department
+  recalls its views in the same workspace and never renders a second console.
 - The panel chooser offers every application's panels in one library, grouped
   by application, so a stored view can mix Video routes, Lighting fixtures and
-  a Teleprompter panel side by side.
+  Calculator controls side by side. Only native panels appear in this chooser.
 - One view strip, one Add panel, one lock, one maximize, one status line.
   Views are owned by the shell (`sbd.avSuite.workspace.v1`), device-local
   arrangement in `sbd.avSuite.layout.v1`, both exportable as a layout file.
 - Each application keeps its own document, storage key, schema, validation and
   explicit Save. The shell header saves the active application; a dirty marker
   per Rail item shows which applications hold unsaved edits.
-- Specialist tools render as chrome-less panels (`?sbdEmbed=panel` hides their
-  public shell navigation). They keep their own documents and full-screen
-  modes; the shell never copies or merges their data.
+- Specialist tools open on their own routes, never inside workspace tiles.
+  Their documents and full-screen modes remain unchanged.
 - One **Document** panel per active application replaces the per-family
   Plan/Import and Backup panels: title and metadata, Save, Export, Restore,
   and one-time import of legacy sheet data.
@@ -116,15 +121,14 @@ Panel types are namespaced `<app>:<type>` by the shell; packs keep their own
 short names. Theme, compact-height handling and `beforeunload` are shell
 concerns and leave the packs.
 
-**Specialist panels.** `shell` renders `<iframe src="<route>?sbdEmbed=panel">`
-with an **Open full** action. `js/av-theme-mode.js` sets
-`html[data-sbd-embed]` from the query; `css/av-theme.css` hides the public
-shell navigation under it. AV Calculator is a native pack: its existing engine
+**Specialist links.** Standalone tools are absent from the panel chooser and
+new default views. Previously saved slots remain stored but are not rendered;
+the shell offers separate-page recovery links. AV Calculator is a native pack: its existing engine
 is compiled into the suite and its DOM-adopting bridge supplies individual
 controls. It is not an embedded specialist application.
 
 **Rail.** `js/sbd-rail-mount.js` is reused. The shell handles
-`sbd:rail-console-select` for every identity and dispatches
+`sbd:rail-console-select` for every native department and dispatches
 `sbd:console-snapshot-active` as the active view changes. Specialist entries
 are added to the Rail catalog as pinnable items.
 
@@ -156,8 +160,9 @@ standalone routes still live; they redirect in C.
    reload and layout export/import.
 3. Each application's Save writes only its own storage key; Export produces
    the same schema as before; existing saved documents open unchanged.
-4. Every specialist tool opens as a panel without its public navigation and
-   has a working **Open full** action.
+4. Every chooser entry renders an individual native panel with no iframe.
+   Specialist links open standalone routes. Old specialist layout bytes remain
+   unchanged on opening, with a clear recovery link and no app tile.
 5. Phone (under 720px) shows one panel with the shell's panel switcher; tablet
    shows two across; desktop the 12×8 grid. No page scrolling at 375, 680,
    1024×690, 1100, 1440 and 3440 widths in both palettes.

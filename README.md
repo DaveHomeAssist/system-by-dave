@@ -54,7 +54,7 @@ use the tooling selected for that surface.
 | `fmp-index/index.html` | Retired FMP working index: noindex redirect to the `/fmp/` hub, keeping query and hash |
 | `fmp/` | Managed FMP video operations hub, camera commissioning, bowl training, and rig reference; authenticated camera API remains SETUP TEST only; [release and sync contract](docs/fmp-public-release.md) |
 | `fmpwalk/` | Managed local-first preshow venue walk; configured for walk.housevideo.app with destination verification before cutover; explicit download, Gmail, and Notion actions; no silent writes |
-| `av/` | AV by Dave: one console, every application and tool as panels (`docs/av-suite-shell.md`) |
+| `av/` | AV by Dave: one console, nine departments of individual native panels; standalone tool links (`docs/av-suite-shell.md`) |
 | `av-suite.html` | Redirect stub into the console (keeps `sbd*` show context) |
 | `docs/av-suite-development-assets-index.md` | AV Suite source, spec, migration, release, and historical-asset authority map |
 | `av-calculator.html` | Six quick AV calculations and a copyable field summary on avbydave.com |

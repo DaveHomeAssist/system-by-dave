@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
 /* AV Suite shell (docs/av-suite-shell.md): one console at /av/. Every Rail
-   identity recalls its views in place, specialist tools open as chrome-less
-   panels, views mix applications, each application saves only its own key,
+   identity recalls its views in place, standalone tools are not panel choices,
+   views mix applications, each application saves only its own key,
    and the page never scrolls at any size in either palette. */
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -120,16 +120,17 @@ try {
   assert.equal(await page.locator('.sbd-rail__toolbox').getAttribute('aria-current'), 'page');
   assert.equal(await page.locator('.sbd-rail__entry[aria-current="page"]').count(), 0);
 
-  // 2. Specialist tools from All apps open in the shell too.
+  // 2. Specialist tools remain links, never whole applications in tiles.
   await page.locator('.sbd-rail__all').click();
   const allApps = page.locator('#sbdRailAllApps');
   await allApps.waitFor({ state: 'visible' });
-  await allApps.locator('[data-rail-ref="tool:throwline"]').click();
-  await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'Throwline');
-  assert.equal(new URL(page.url()).pathname, '/av/');
-  const throwlineSrc = new URL(await page.locator('.console-panel iframe').getAttribute('src'), BASE);
-  assert.equal(throwlineSrc.pathname, '/ProjectorThrow/');
-  assert.equal(throwlineSrc.searchParams.get('sbdEmbed'), 'panel');
+  const specialistLink = allApps.locator('[data-rail-ref="tool:throwline"]');
+  assert.equal(new URL(await specialistLink.getAttribute('href'), BASE).pathname, '/ProjectorThrow/');
+  await specialistLink.click();
+  await page.waitForURL('**/ProjectorThrow/**');
+  assert.equal(new URL(page.url()).searchParams.has('sbdEmbed'), false);
+  await page.goto(url);
+  await heading().waitFor();
 
   // 3. A mixed view: Lighting fixtures next to Video routing, stored by the shell and restored after reload.
   await rail('console:av-video').click();
@@ -138,6 +139,8 @@ try {
   await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   const chooser = page.getByRole('dialog', { name: 'Add panel' });
   assert.deepEqual((await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents()).slice(0, 3), ['AV Video', 'Audio', 'Show Control'], 'chooser groups panels by application');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 9, 'only the nine native departments are offered');
+  assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 0, 'no whole-app choices');
   await chooser.getByRole('button', { name: 'Lighting', exact: true }).click();
   await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).click();
   assert.equal(await page.locator('.console-panel[data-app="Lighting"][data-panel="fixtures"]').count(), 1);
@@ -276,6 +279,11 @@ try {
   assert.equal(await page.locator('.suite-header .av-print-text').count(), 0, 'Calculator print preparation leaves the shell controls alone');
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
   assert.equal(await page.locator('.av-print-text').count(), 0, 'temporary print values are cleaned up');
+  await page.evaluate(layout => localStorage.setItem('sbd.avSuite.layout.v1', JSON.stringify({ ...JSON.parse(layout), viewId: 'suite:workspace' })), legacyLayout);
+  await page.goto(`${BASE}/av/`);
+  await rail('console:av-calculator').click();
+  assert.equal(await page.getByRole('tab', { name: 'My saved calculator', exact: true }).getAttribute('aria-selected'), 'true', 'Rail recalls the legacy Calculator view instead of a new default');
+  assert.equal(await storage('sbd.avSuite.workspace.v1'), legacyViews, 'Rail recall does not rewrite saved views');
   await page.waitForFunction(() => document.documentElement.dataset.workspaceOffline === 'ready');
   await context.setOffline(true);
   try {
@@ -284,6 +292,63 @@ try {
     await page.waitForFunction(() => JSON.parse(localStorage.getItem('avCalculator.v1'))?.delayDistance === 124);
     assert.equal(await page.locator('.console-panel iframe').count(), 0, 'native Calculator works after prepared offline reload');
   } finally { await context.setOffline(false); }
+  // Previous specialist slots and their data are retained, never embedded or silently rewritten.
+  const specialistView = { id: 'tool:throwline', name: 'Saved projector workspace', panels: [{ id: 'old-projector', type: 'tool:throwline', x: 0, y: 0, w: 12, h: 8 }] };
+  const specialistViews = JSON.stringify({ version: 1, views: [specialistView] });
+  const specialistLayout = JSON.stringify({ v: 1, viewId: specialistView.id, locked: false, live: { [specialistView.id]: specialistView.panels } });
+  await page.evaluate(({ views, layout }) => {
+    localStorage.setItem('sbd.avSuite.workspace.v1', views);
+    localStorage.setItem('sbd.avSuite.layout.v1', layout);
+  }, { views: specialistViews, layout: specialistLayout });
+  await page.goto(`${BASE}/av/`);
+  await page.getByRole('link', { name: 'Open Throwline separately' }).waitFor();
+  assert.equal(await page.locator('iframe').count(), 0);
+  assert.equal(await storage('sbd.avSuite.workspace.v1'), specialistViews);
+  assert.equal(await storage('sbd.avSuite.layout.v1'), specialistLayout);
+  assert.equal(await storage('avCalculator.v1'), JSON.stringify({ ...JSON.parse(calculatorValues), delayDistance: 124 }));
+
+  // Exercise every menu entry as a replacement in one workspace, not just sample departments.
+  const menuContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  let panelCount = 0;
+  try {
+    const menuPage = await menuContext.newPage();
+    menuPage.on('pageerror', error => errors.push(error.message));
+    await menuPage.goto(`${BASE}/av/`);
+    const menu = menuPage.getByRole('dialog', { name: 'Add panel' });
+    const openMenu = async () => {
+      if (await menuPage.locator('.console-panel').count()) {
+        await menuPage.locator('.console-panel .console-bar-actions button[aria-haspopup="menu"]').click();
+        await menuPage.getByRole('menuitem', { name: 'Change panel…' }).click();
+      } else await menuPage.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
+    };
+    await openMenu();
+    const groups = await menu.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents();
+    assert.equal(groups.length, 9);
+    for (const group of groups) {
+      await menu.getByRole('button', { name: group, exact: true }).click();
+      const count = await menu.locator('.console-choices button').count();
+      for (let index = 0; index < count; index++) {
+        if (index) { await openMenu(); await menu.getByRole('button', { name: group, exact: true }).click(); }
+        await menu.locator('.console-choices button').nth(index).click();
+        assert.equal(await menuPage.locator('.console-panel').count(), 1, `${group}: replacement stays in the same slot`);
+        assert.equal(await menuPage.locator('.console-panel').getAttribute('data-app'), group);
+        assert.equal(await menuPage.locator('iframe').count(), 0, `${group}: every choice renders natively`);
+        assert.equal(await menuPage.locator('.console-panel .console-body').isVisible(), true);
+        panelCount++;
+      }
+      console.log(`Native chooser: ${group}, ${count} panels passed.`);
+      await openMenu();
+    }
+    await menuPage.keyboard.press('Escape');
+    for (const [width, height] of [[375, 812], [667, 375], [680, 700], [1024, 690], [1440, 900], [3440, 1440]]) {
+      await menuPage.setViewportSize({ width, height });
+      await openMenu();
+      await menu.getByRole('button', { name: 'AV Video', exact: true }).click();
+      await menu.locator('.console-choices button').last().click();
+      assert.equal(await menuPage.locator('.console-panel').getAttribute('data-app'), 'AV Video', `last menu item reachable at ${width}x${height}`);
+      assert.equal(await menuPage.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
+    }
+  } finally { await menuContext.close(); }
   const blockedContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   try {
     await blockedContext.addInitScript(() => { Storage.prototype.setItem = function () { throw new DOMException('Storage blocked', 'QuotaExceededError'); }; });
@@ -296,7 +361,7 @@ try {
     assert.equal(await blockedPage.evaluate(() => localStorage.getItem('avCalculator.v1')), null, 'failed autosave is not reported as persisted');
   } finally { await blockedContext.close(); }
   assert.deepEqual(errors, []);
-  console.log('AV Suite shell verification passed: nine native department packs, Calculator values shared across mixed panels and reloads, full Video menu with modules disabled, legacy layouts preserved, isolated saves, specialist embed boundary, and both palettes at eight sizes.');
+  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across nine native departments, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, no whole-app tiles, and both palettes at eight sizes.`);
 } catch (error) {
   if (process.env.AV_SUITE_EVIDENCE) {
     await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });
