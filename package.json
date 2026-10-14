@@ -43,6 +43,7 @@
     "verify:noteforge": "node scripts/verify_noteforge_release.js",
     "test:noteforge-shell-browser": "node scripts/probe_noteforge_shell.mjs",
     "verify:portfolio-schemas": "node scripts/verify_portfolio_schemas.js",
+    "test:public-viewport": "node scripts/probe_public_viewport.mjs",
     "verify:public-navigation": "node scripts/verify_public_navigation.js",
     "verify:public-consistency": "node scripts/verify_public_consistency.js",
     "test:shader-practice": "node --test shader/shading-practice-state.test.js shader/fmp-training.test.js scripts/shader_practice_worker.test.js",

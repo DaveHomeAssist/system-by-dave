@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-14 — Website release reconciliation
+
+- Retain the approved System/profile subject tabs, pagination and saved light/dark controls; preserve contact/PDF corrections and accessible mobile navigation. AV lands directly in the current console.
+- Reconcile the landing PR with the released single AV console. Preserve retired route redirects and current application builds; retain AV social artwork, development-file exclusions and the branded not-found page. Final Dave approval remains required before merging the website stack.
 ## 2026-10-14 — Individual Calculator panels in the shared console
 
 - Remove all whole-app specialist tiles from the shared chooser and new views. Standalone tools keep their normal Rail links. Existing saved specialist slots remain stored unchanged, with separate-page recovery links instead of iframes. Exercise every native menu choice as a replacement in the same workspace.

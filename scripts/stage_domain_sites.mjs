@@ -29,6 +29,11 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_FILE = 'scripts/domain-sites.json';
 const SKIP_DIRS = new Set(['node_modules', '.git', '.github', '_site', '_sites']);
 const SKIP_FILES = new Set(['.DS_Store', '.agent-claim']);
+// Development-only files that sit beside published tools (browser probes, unit
+// tests, release notes, package code they import) are never part of a site.
+const DEV_FILE = /(?:^|\/)(?:node_modules\/|[^/]*\.test\.[cm]?[jt]s$|(?:[^/]*[-_.])?probe\.[cm]?[jt]s$|(?:CHANGELOG|README)\.md$)/i;
+// Vendored third-party code keeps its notices.
+const isDevFile = (rel) => DEV_FILE.test(rel) && !/(?:^|\/)vendor\//.test(rel);
 const TRANSFER_ASSETS = ['js/domain-storage.js', 'js/domain-transfer.js', 'css/domain-move.css'];
 const RETIRED_WORKER = 'av-suite-worker.js';
 
@@ -81,7 +86,7 @@ function listTree(rel) {
       if (SKIP_DIRS.has(entry.name) || SKIP_FILES.has(entry.name)) continue;
       const child = `${prefix}${entry.name}`;
       if (entry.isDirectory()) walk(path.join(dir, entry.name), `${child}/`);
-      else if (entry.isFile()) out.push(child);
+      else if (entry.isFile() && !isDevFile(child)) out.push(child);
     }
   };
   walk(abs(rel), rel);
@@ -340,7 +345,7 @@ function closeSite(site, entries, generated, movedIndex, simulate) {
         continue;
       }
       const rel = target.path;
-      if (files.has(rel) || generated.has(rel)) continue;
+      if (files.has(rel) || generated.has(rel) || isDevFile(rel)) continue;
       if (!fs.existsSync(abs(rel))) {
         warnings.push(`${file}: "${raw}" -> ${rel} does not exist in the repository.`);
         continue;
@@ -398,8 +403,64 @@ function homePage(site, origin) {
 `;
 }
 
+// AV by Dave's not-found page shares AV branding and links to the current console. Every URL
+// is root-absolute because GitHub Pages serves it at whatever path was requested.
+const AV_NOT_FOUND_STYLE = '@font-face{font-family:"DM Sans";font-weight:100 1000;font-display:swap;src:url(/fonts/dm-sans.woff2) format("woff2")}:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#0a0d14;color:#f3f4f7;font:16px/1.6 "DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{width:min(100%,34rem);padding:32px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:#0f131d}main:focus{outline:none}.code{margin:0 0 10px;color:#58c38b;font:400 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}h1{margin:0 0 10px;font-size:clamp(28px,6vw,36px);font-weight:600;letter-spacing:-.02em;line-height:1.15}p{margin:0 0 24px;color:rgba(243,244,247,.74)}.actions{display:flex;flex-wrap:wrap;gap:10px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 22px;border:1px solid rgba(255,255,255,.18);border-radius:10px;color:#f3f4f7;font-weight:500;text-decoration:none}.btn.primary{background:#f3f4f7;border-color:#f3f4f7;color:#0a0d14}.btn:hover{border-color:#58c38b}a:focus-visible{outline:2px solid #58c38b;outline-offset:3px}.skip{position:absolute;left:-999px;top:12px;padding:12px 16px;border-radius:10px;background:#f3f4f7;color:#0a0d14}.skip:focus{left:12px}';
+
 function notFoundPage(site) {
   const title = escapeHtml(site.name);
+  if (site.registry) {
+    return `<!doctype html>
+<html lang="en" data-av-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Page not found | ${title}</title>
+<meta name="description" content="That address is not part of ${title}.">
+<link rel="canonical" href="https://${escapeHtml(site.domain)}/404.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Page not found | ${title}">
+<meta property="og:description" content="That address is not part of ${title}. Open the AV console to find your tool.">
+<meta property="og:url" content="https://${escapeHtml(site.domain)}/404.html">
+<meta property="og:image" content="https://${escapeHtml(site.domain)}/img/av-by-dave-og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Page not found | ${title}">
+<meta name="twitter:description" content="That address is not part of ${title}. Open the AV console to find your tool.">
+<meta name="twitter:image" content="https://${escapeHtml(site.domain)}/img/av-by-dave-og.png">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a0d14" id="altThemeColor">
+<script src="/js/av-landing-theme.js"></script>
+
+<link rel="icon" href="/svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>${AV_NOT_FOUND_STYLE}
+html[data-av-theme="light"]{color-scheme:light}
+html[data-av-theme="light"] body{background:#f4f6f8;color:#141a21}
+html[data-av-theme="light"] main{background:#fff;border-color:#d7dde3}
+html[data-av-theme="light"] p{color:#46515c}
+html[data-av-theme="light"] .code{color:#17714a}
+html[data-av-theme="light"] .btn{background:#fff;color:#141a21;border-color:#b9c2cb}
+html[data-av-theme="light"] .btn.primary{background:#141a21;color:#fff}
+button.btn{font:inherit;cursor:pointer;margin-top:16px}
+@media(max-height:500px){body{padding:8px}main{padding:12px}.code{font-size:11px;margin-bottom:4px}h1{font-size:24px;margin-bottom:6px}p{font-size:13px;line-height:1.35;margin-bottom:8px}.actions{gap:6px}.actions .btn{flex:1;min-width:0;padding:6px;font-size:12px;line-height:1.3;min-height:44px}button.btn{min-height:44px;padding:6px 12px;margin-top:8px}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to page content</a>
+<main id="main" tabindex="-1">
+<p class="code">404 · ${escapeHtml(site.domain)}</p>
+<h1>Page not found</h1>
+<p>That address is not part of ${title}. The tool may have moved; open the AV console to choose a panel.</p>
+<div class="actions">
+<a class="btn primary" href="/av/">Open the AV console</a>
+<a class="btn" href="${site.home}">${title} home</a>
+</div>
+<button class="btn" id="themeToggle" type="button" aria-label="Use light mode" aria-pressed="true" hidden>Light mode</button>
+</main>
+</body>
+</html>
+`;
+  }
   return `<!doctype html>
 <html lang="en">
 <head>

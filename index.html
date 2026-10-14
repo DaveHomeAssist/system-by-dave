@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,7 +80,7 @@
   .badge{display:inline-flex;align-items:center;gap:10px;padding:7px 14px;margin-bottom:28px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,0.02);font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;color:var(--ink-2);}
   .badge-dot{width:7px;height:7px;flex:none;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);}
   .hero h1{font-family:var(--ff-display);font-weight:500;font-size:clamp(40px,7vw,84px);line-height:1.02;letter-spacing:-0.035em;margin:0 auto 24px;text-wrap:balance;}
-  .hero h1 .muted{display:block;color:rgba(243,244,247,0.5);}
+  .hero h1 .muted{display:block;color:var(--ink-2);}
   .hero-sub{font-size:clamp(16px,1.6vw,19px);line-height:1.65;color:var(--ink-2);max-width:62ch;margin:0 auto 36px;text-wrap:pretty;}
   .hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;}
 
@@ -198,8 +198,11 @@
     .btn:hover .arrow,.card:hover .cta .arrow{transform:none;}
   }
 </style>
+<script src="js/public-theme.js"></script>
+<link rel="stylesheet" href="css/public-viewport.css">
+<script src="js/public-viewport.js" defer></script>
 </head>
-<body>
+<body data-public-site="system">
 <a class="sbd-skip-link" href="#main-content">Skip to content</a>
 <div class="page">
   <div class="page-bg" aria-hidden="true"></div>
@@ -224,14 +227,13 @@
 
     <main>
     <!-- HERO -->
-    <section id="main-content" class="hero wrap" tabindex="-1" aria-labelledby="hero-title">
+    <section data-public-panel="Start" id="main-content" class="hero wrap" tabindex="-1" aria-labelledby="hero-title">
       <p class="badge"><span class="badge-dot" aria-hidden="true"></span><span>Built and maintained by Dave Robertson</span></p>
       <h1 id="hero-title">Tools that do <span class="muted">the unglamorous work.</span></h1>
       <p class="hero-sub">Offline-capable browser tools for live-show crews, a prompt-engineering workbench, and agents and widgets for Notion. Built by a live-event and broadcast technologist.</p>
       <div class="hero-actions">
         <a href="av/" class="btn btn--primary" data-track-cta="home:browse-av-tools">Open AV by Dave <span class="arrow" aria-hidden="true">→</span></a>
         <a href="#lines" class="btn btn--ghost" data-track-cta="home:audience-paths">See all three products</a>
-        <a href="profile/#contact" class="btn btn--ghost" data-track-cta="home:contact-dave">Hire Dave</a>
       </div>
 
       <!-- spec strip -->
@@ -244,14 +246,14 @@
     </section>
 
     <!-- START HERE -->
-    <section id="audiences" class="section wrap" aria-labelledby="audiences-title">
+    <section data-public-panel="Find a tool" id="audiences" class="section wrap" aria-labelledby="audiences-title">
       <div class="section-head">
         <div>
           <span class="eyebrow">Start here</span>
           <h2 id="audiences-title" class="h2">What do you need to get done?</h2>
         </div>
       </div>
-      <div class="grid-4">
+      <div class="grid-3">
         <article class="card accent-green">
           <p class="tag">Live-show operators</p>
           <h3>Run a show</h3>
@@ -270,17 +272,11 @@
           <p>Agents, embeddable widgets, skills, and prompt systems that live inside Notion instead of another app.</p>
           <p class="cta"><a class="card-link" href="notion.html" data-track-cta="audience:notion">Browse the Notion tools <span class="arrow" aria-hidden="true">→</span></a></p>
         </article>
-        <article class="card accent-neutral">
-          <p class="tag">Clients and partners</p>
-          <h3>Hire Dave</h3>
-          <p>Live-event, broadcast, and systems work. Read the background and the domains Dave works in, then get in touch.</p>
-          <p class="cta"><a class="card-link" href="profile/#contact" data-track-cta="audience:hire-dave">Contact Dave <span class="arrow" aria-hidden="true">→</span></a></p>
-        </article>
       </div>
     </section>
 
     <!-- PRODUCT LINES -->
-    <section id="lines" class="section wrap" aria-labelledby="lines-title">
+    <section data-public-panel="Products" id="lines" class="section wrap" aria-labelledby="lines-title">
       <div class="section-head">
         <div>
           <span class="eyebrow">Products</span>
@@ -329,7 +325,7 @@
     </section>
 
     <!-- FEATURED -->
-    <section class="section wrap" aria-labelledby="featured-title">
+    <section data-public-panel="Featured" id="featured" class="section wrap" aria-labelledby="featured-title">
       <div class="section-head">
         <div>
           <span class="eyebrow">Featured</span>
@@ -369,7 +365,7 @@
     </section>
 
     <!-- PROOF SURFACES -->
-    <section class="section wrap" aria-labelledby="proof-title">
+    <section data-public-panel="About" id="about" class="section wrap" aria-labelledby="proof-title">
       <div class="section-head">
         <div>
           <span class="eyebrow">Check the work</span>
@@ -384,10 +380,10 @@
           <p class="cta"><a class="card-link" href="project-registry.html" data-track-cta="proof:registry">Open the registry <span class="arrow" aria-hidden="true">→</span></a></p>
         </article>
         <article class="card accent-red">
-          <p class="tag">Profile</p>
+          <p class="tag">About Dave</p>
           <h3>Operator background</h3>
           <p>Live events, broadcast, and systems work: the experience these tools come from.</p>
-          <p class="cta"><a class="card-link" href="profile/" data-track-cta="proof:profile">Read Dave's profile <span class="arrow" aria-hidden="true">→</span></a></p>
+          <p class="cta"><a class="card-link" href="profile/" data-track-cta="proof:profile">About Dave <span class="arrow" aria-hidden="true">→</span></a></p>
         </article>
         <article class="card accent-neutral">
           <p class="tag">Privacy</p>
@@ -396,8 +392,6 @@
           <p class="cta"><a class="card-link" href="privacy-policy.html" data-track-cta="proof:privacy">Read the privacy policy <span class="arrow" aria-hidden="true">→</span></a></p>
         </article>
       </div>
-    </section>
-
     <!-- APPROACH -->
     <section class="section wrap" aria-labelledby="approach-title">
       <div class="approach">
@@ -424,11 +418,7 @@
           </div>
         </div>
       </div>
-    </section>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="site-footer">
+    </section>    <footer class="site-footer">
       <div class="wrap footer-inner">
         <div class="footer-brand"><span class="footer-mark" aria-hidden="true">SD</span>System by Dave</div>
         <nav aria-label="Footer">
@@ -437,7 +427,7 @@
             <li><a href="prompt-lab.html">Prompt Lab</a></li>
             <li><a href="notion.html">Notion</a></li>
             <li><a href="tools.html">Tools</a></li>
-            <li><a href="profile/">Profile</a></li>
+            <li><a href="profile/">About Dave</a></li>
             <li><a href="privacy-policy.html">Privacy</a></li>
             <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span><span class="vh"> (opens in a new tab)</span></a></li>
           </ul>
@@ -445,6 +435,11 @@
         <span class="footer-copy">© 2026</span>
       </div>
     </footer>
+    </section>
+
+    </main>
+
+    <!-- FOOTER -->
 
   </div>
 </div>
