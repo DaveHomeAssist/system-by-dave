@@ -38,3 +38,19 @@ Every public System by Dave route must give a visitor five reliable orientation 
 `npm run verify:public-navigation` checks shared headers, deterministic returns, required standalone skip links, focusable targets, custom-shell destinations, root-absolute `404.html` references, and every FMP page listed in `FMP_SHELL_PAGES`. An FMP page must pass the parent and skip-target checks; the home check does not apply to it. An HTML page under `fmp/` or `fmpwalk/` without an explicit entry fails.
 
 `FMP_KNOWN_SHELL_GAPS` records the FMP gaps found in the 2026-09-17 hygiene baseline, and the verifier prints each one as a warning. Any gap not on that list fails. So does a listed gap that no longer occurs, which means the `fmpwalk` export that fixes a gap must remove its entry in the same commit. Rendered keyboard testing remains part of release QA because source checks cannot prove stacking, clipping, or theme contrast.
+
+## Public subject reader
+
+The System homepage and profile use `public-viewport.css` and
+`public-viewport.js`. Authored sections stay available as a normal document
+without JavaScript. Enhancement supplies semantic subject tabs, CSS-column
+content pages, Previous/Next controls, fragment/history routing and focus reveal.
+Phone subject navigation is a bottom rail. Printing expands every subject.
+
+System marketing preferences use `sbd-theme` and default light. AV uses its
+existing `av-theme-mode.v1` owner and the approved Stage Slate first-use choice.
+The visible controls remain authoritative; layout must not reset either choice.
+
+`npm run test:public-viewport` checks both themes and all content pages at six
+viewport sizes, plus routing, keyboard, find-event, print and no-script behavior.
+Browser-chrome Find and physical-device interaction remain separate acceptance.

@@ -442,6 +442,7 @@ html[data-av-theme="light"] .code{color:#17714a}
 html[data-av-theme="light"] .btn{background:#fff;color:#141a21;border-color:#b9c2cb}
 html[data-av-theme="light"] .btn.primary{background:#141a21;color:#fff}
 button.btn{font:inherit;cursor:pointer;margin-top:16px}
+@media(max-height:500px){body{padding:8px}main{padding:12px}.code{font-size:11px;margin-bottom:4px}h1{font-size:24px;margin-bottom:6px}p{font-size:13px;line-height:1.35;margin-bottom:8px}.actions{gap:6px}.actions .btn{flex:1;min-width:0;padding:6px;font-size:12px;line-height:1.3;min-height:44px}button.btn{min-height:44px;padding:6px 12px;margin-top:8px}}
 </style>
 </head>
 <body>

@@ -1304,5 +1304,14 @@
         }
       }
     }
-  ]
+  ],
+  "websiteReleaseReview": {
+    "recordedOn": "2026-10-14",
+    "startingRevision": "d0c3d79ede69e8295e7c5226d2d4ed935151b61f",
+    "integrationBase": "fe8402efc666d37d77ee419d710dbc72604a5c28",
+    "decision": "WEBREVIEW-D1 selected October 12; preserve October 13 one-console decision. Final release approval remains pending.",
+    "state": "Integrated current native mixed-panel release. System/profile runtime and screenshot checks pass; refreshed console/cache checks and exact-head CI remain pending. No production merge or deployment; final Dave approval required.",
+    "nextAction": "Verify all current-head checks, present screenshots for Dave final approval, then merge 319, 320, 321 in order and verify deployment and both live domains.",
+    "testedRevision": "aa9ce95"
+  }
 }

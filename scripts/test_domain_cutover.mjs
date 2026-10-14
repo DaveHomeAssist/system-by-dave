@@ -460,6 +460,20 @@ try {
     assert.ok(['sbd.showOps.draft.v1', 'sbd.showOps.layout.v1'].every(key => avStorageKeys.includes(key)), 'Show Ops drafts and layout travel with its document');
   });
 
+  await test('AV not-found page keeps theme and recovery links usable at short heights', async page => {
+    const site = sites.find(entry => entry.id === 'avbydave');
+    for (const [width, height] of [[1440, 900], [375, 812], [844, 390], [320, 256]]) {
+      await page.setViewportSize({ width, height });
+      await page.goto(site.origin + '/404.html');
+      await page.locator('#themeToggle').click();
+      const theme = await page.locator('html').getAttribute('data-av-theme');
+      await page.reload();
+      assert.equal(await page.locator('html').getAttribute('data-av-theme'), theme);
+      assert(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth), `404 viewport ${width}x${height}`);
+      assert.equal(await page.getByRole('link', { name: 'Open the AV console', exact: true }).getAttribute('href'), '/av/');
+    }
+  });
+
   await test('Withdrawn Workbook aliases open the AV by Dave console without touching saved records', async (page, context) => {
     const site = sites.find(entry => entry.id === 'avbydave');
     for (const origin of [source, site.origin]) {
