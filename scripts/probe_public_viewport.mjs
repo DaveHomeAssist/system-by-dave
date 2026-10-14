@@ -53,6 +53,19 @@ try {
       await page.setViewportSize({ width, height });
       for (const mode of ['light', 'dark']) {
         if (await theme() !== mode) await page.locator('.public-theme-toggle, #themeToggle').click();
+        if (route === '/') {
+          const contrast = await page.locator('#hero-title .muted').evaluate(node => {
+            const luminance = color => {
+              const channels = color.match(/[\d.]+/g).slice(0, 3).map(Number).map(value => value / 255);
+              return channels.map(value => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4)
+                .reduce((sum, value, i) => sum + value * [.2126, .7152, .0722][i], 0);
+            };
+            const ink = luminance(getComputedStyle(node).color);
+            const paper = luminance(getComputedStyle(document.querySelector('.public-shell')).backgroundColor);
+            return (Math.max(ink, paper) + .05) / (Math.min(ink, paper) + .05);
+          });
+          assert(contrast >= 3, `Hero heading contrast ${contrast} in ${mode}`);
+        }
         const tabs = page.getByRole('tab');
         for (let i = 0; i < await tabs.count(); i++) {
           await tabs.nth(i).click();
