@@ -1300,7 +1300,8 @@
     "startingRevision": "d0c3d79ede69e8295e7c5226d2d4ed935151b61f",
     "integrationBase": "8ccdaaf",
     "decision": "WEBREVIEW-D1 selected October 12; preserve October 13 one-console decision. Final release approval remains pending.",
-    "state": "Reconciled source; final browser verification, screenshots and new exact-head CI in progress.",
-    "nextAction": "Complete runner verification and present the combined release for Dave approval before merging 319, 320, 321."
+    "state": "Source reconciled and pushed; Dominic source checks, 956 public content-page views, 56 cutover scenarios and the current AV console browser suite pass. Final screenshots refreshed. New exact-head CI and Dave final approval remain separate gates; no production merge or deployment.",
+    "nextAction": "Verify all current-head checks, present screenshots for Dave final approval, then merge 319, 320, 321 in order and verify deployment and both live domains.",
+    "testedRevision": "aa9ce95"
   }
 }
