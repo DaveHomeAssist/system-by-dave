@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-14 — Individual Calculator panels in the shared console
+
+- Complete the ninth native department pack: Audio Delay, Projection, Record Storage, Power Load, Voltage Drop, SPL Distance and Operator Summary can be selected, replaced and mixed with other departments in the existing shared workspace.
+- Reuse the Calculator engine, formulas, original inputs, field sets and autosave keys. Scope its DOM queries and styles to its own controls; retain its standalone route. Former shell Calculator tiles display as native controls within their existing bounds without rewriting saved views on opening.
+- Keep all Video panel types in the shared chooser even when optional module flags are off. Choosing a panel does not change those flags or save another department's document.
+- Extend browser coverage for mixed Calculator/Audio/Video/Lighting views, add/split/replace, reload, isolated saves, field-set recall/export, legacy layout bytes, print cleanup and touch control containment in both palettes. Advance the offline cache generation with its checked consumers.
+- Correct the suite root height inherited from standalone Audio CSS, keep the toolbar within two rows on laptops, and compact short-landscape spacing while retaining 44px controls. Short Calculator tiles put labels beside inputs and continue to paginate.
+- Fix prepared offline directory routes: the worker now resolves registered directory paths such as `/av/` to their cached `index.html`. Previously the readiness check could pass while a directory-route reload fell through to the offline notice.
+
 ## 2026-10-13 — AV by Dave is one console (slice C)
 
 - Make the AV Suite shell the AV by Dave home: `av/index.html` is staged as `/` on avbydave.com (`scripts/domain-sites.json` `landingPage`), canonical to the domain root and noindex at its source path and `/av/` alias. The console opens on an empty **Workspace** view; the Rail's top entry is now Workspace and recalls that view in place, the PWA manifest starts at `./av/`, and the shell registers the suite service worker through `js/av-offline.js` (which now resolves the site root from the registry script wherever the page lives).

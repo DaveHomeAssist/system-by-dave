@@ -46,6 +46,24 @@ the result. The engine itself is sound and is reused unchanged in spirit.
 
 ## Definition of done
 
+### October 14 completion: individual panels
+
+Dave's acceptance is any individual panel from any department selectable from
+the same menu at any time. The remaining correction uses the existing console
+design, not a second workspace or whole-application tiles: Calculator's seven
+existing controls become a native pack; the shared chooser uses each pack's
+complete library, irrespective of optional Video module visibility. Video
+module flags continue to control planning checks, not access to panels here.
+
+The Calculator engine, formulas, field sets, autosave keys and standalone
+route remain unchanged. Its DOM queries and CSS are scoped to its own controls.
+Previous shell Calculator tiles expand in memory within their saved bounds
+(Audio Delay alone in a small tile); saved layout bytes remain unchanged until
+an explicit layout action. Other department documents are never migrated.
+Verify native mixed Calculator, Audio, Video and Lighting panels, replace/add,
+shared state, view save/reload, legacy layouts, export and palette/viewport
+containment before release. No new dependencies, hardware control or redesign.
+
 - `https://avbydave.com/av/` opens one console. The Rail on the left lists the
   nine application identities plus the specialist tools. Selecting a Rail item
   recalls that application's views in the same workspace; it never navigates
@@ -101,8 +119,9 @@ concerns and leave the packs.
 **Specialist panels.** `shell` renders `<iframe src="<route>?sbdEmbed=panel">`
 with an **Open full** action. `js/av-theme-mode.js` sets
 `html[data-sbd-embed]` from the query; `css/av-theme.css` hides the public
-shell navigation under it. AV Calculator's DOM-adopting bridge stays on its
-page; the shell embeds the plain calculator the same way.
+shell navigation under it. AV Calculator is a native pack: its existing engine
+is compiled into the suite and its DOM-adopting bridge supplies individual
+controls. It is not an embedded specialist application.
 
 **Rail.** `js/sbd-rail-mount.js` is reused. The shell handles
 `sbd:rail-console-select` for every identity and dispatches

@@ -4,9 +4,18 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
+  "head": "8ccdaaf86de6d0acfc309a71b78092a75944c021",
   "status": "amber",
-  "statusReason": "Slices A\u2013C of the AV Suite shell are in source on 2026-10-13: /av/ is one console and the avbydave.com home, opening on an empty Workspace view; eight family applications run as in-process panel packs; specialists embed as chrome-less panels; av-suite.html, the landing pages, the historical index and the 34 legacy sheet pages are noindex redirect stubs; Toolbox code and Toolbox-only probes are removed. Publication and live acceptance follow the slice C pull request. Standalone family routes still exist and mount the same packs; physical/operator acceptance remains open.",
+  "statusReason": "PR340 is merged at 8ccdaaf. The October 14 correction adds native individual Calculator panels and keeps all Video panel types in the shared chooser, preserving the existing shell and saved data. Candidate verification, exact-head CI, publication and live acceptance remain separate gates. Physical/operator acceptance remains open.",
+  "individualPanelCompletion": {
+    "recordedOn": "2026-10-14",
+    "baseRevision": "8ccdaaf86de6d0acfc309a71b78092a75944c021",
+    "branch": "codex/complete-panel-composition-20261014",
+    "scope": "Nine native department packs in one chooser; Calculator individual controls and complete Video menu. No redesign, document consolidation, schema change or hardware control.",
+    "evidence": "Duncan passes both typechecks, Calculator model tests and builds, native four-department add/split/replace/store/reload, isolated saves, disabled Video module menu, field sets/export/print cleanup, legacy view-byte preservation, visible storage failures and eight sizes in both palettes. Native and standalone prepared offline reload/editing, the full standalone Calculator browser suite, AV26, Throwline47, Shader54 and domain staging pass. Navigation and consistency pass the lightweight POSIX file-only checks on the Mac; the unchanged Windows skip-path comparison fails. Exact-head CI and publication remain independent gates.",
+    "next": "Finish bounded checks, review, exact-head CI, merge, deployment and isolated live readback.",
+    "limits": "No physical touch, real virtual keyboard, browser-process crash, power loss or human acceptance is implied."
+  },
   "audioLineCheckChoiceParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "47e773d5ff17fb2b5040f9888bc06db62cf80835",
@@ -57,7 +66,7 @@
       "AVV-STREAM-KEY-1 remains unanswered and blocks only its dependent work."
     ]
   },
-  "lastActivity": "2026-10-13",
+  "lastActivity": "2026-10-14",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -82,11 +91,11 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Publish slice C, read back avbydave.com/ as the console, then decide whether standalone family routes redirect into /av/",
-    "why": "The product is one console; the eight standalone routes are the last duplicate surfaces, kept only because their probes still drive them.",
-    "doneWhen": "avbydave.com/ serves the shell on an empty Workspace; every retired route redirects; then either the family routes redirect into /av/?app=<pack> with their probes retargeted, or they are recorded as deliberate deep links.",
-    "effort": "Moderate: eight stubs plus retargeting ~10 probes to the shell.",
-    "owner": "Claude (serial)",
+    "title": "Release the individual Calculator panels and complete shared menu",
+    "why": "Any individual department panel must be selectable in one workspace; whole Calculator application tiles do not meet that requirement.",
+    "doneWhen": "Exact-head CI, merge, publication and isolated live mixed-panel/save/reload checks pass; physical/operator acceptance is recorded separately.",
+    "effort": "Bounded completion of the native panel and menu correction.",
+    "owner": "Codex (serial)",
     "blockedBy": []
   },
   "findings": [

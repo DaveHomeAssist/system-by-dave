@@ -4,7 +4,7 @@ import { readLayout, writeLayout, type LayoutState } from "../../shared/av-conso
 import type { Panel, View } from "../../shared/av-console/layout";
 import { CONTEXT_KEYS, showContext, type Pack, type PackHost } from "../../shared/av-console/pack";
 import { PACKS, SPECIALISTS, specialistHref } from "./packs";
-import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, packLibrary, saveViews, shortOf, specialistLibrary, SUITE_PREFIX, TOOL_PREFIX, viewApp } from "./views";
+import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, packLibrary, saveViews, shortOf, specialistLibrary, SUITE_PREFIX, TOOL_PREFIX, viewApp } from "./views";
 
 /* AV Suite shell (docs/av-suite-shell.md): one console. Every application is a
    panel pack mounted here; specialist tools are chrome-less panels. The Rail
@@ -39,11 +39,12 @@ export function App() {
   }])));
   // PACKS is a module constant, so this hook order never changes between renders.
   const packs: Pack[] = PACKS.map(def => def.use(hosts[def.id]));
-  const library = useMemo(() => [...packs.flatMap(packLibrary), ...specialistLibrary()], [packs.map(pack => pack.library).flat().map(def => def.type).join("|")]);
+  const library = useMemo(() => [...PACKS.flatMap(packLibrary), ...specialistLibrary()], []);
   const [initialViews] = useState(() => loadViews(localStorage, defaultViews(PACKS)));
   const [views, setViews] = useState<View[]>(initialViews.views);
   const [layoutPersist] = useState(() => {
     let initial: LayoutState | null = null; try { initial = readLayout(localStorage, LAYOUT_KEY); } catch { /* reported on write */ }
+    if (initial) initial = { ...initial, live: Object.fromEntries(Object.entries(initial.live).map(([id, panels]) => [id, nativePanels(panels)])) };
     return { initial, save: (state: LayoutState) => { let ok = false; try { ok = writeLayout(localStorage, LAYOUT_KEY, state); } catch { /* report below */ } if (!ok) setStatus({ app: "", text: "Layout could not be saved. This arrangement is available for this visit only.", error: true }); } };
   });
   const ws = useConsoleWorkspace(views, library, layoutPersist);

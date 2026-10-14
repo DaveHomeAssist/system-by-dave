@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, stat, mkdir } from 'node:fs/promises';
 import { extname, join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
@@ -47,6 +47,7 @@ const IDENTITIES = [
   ['console:infrastructure', 'Infrastructure', 'Systems'],
   ['console:lighting', 'Lighting', 'Patch'],
   ['console:av-video', 'AV Video', 'Routing'],
+  ['console:av-calculator', 'AV Calculator', 'Audio'],
 ];
 const expectedMode = width => width < 720 ? 'phone' : width < 1100 ? 'tablet' : 'desktop';
 async function assertNoOverflow(width, height, label) {
@@ -86,16 +87,30 @@ try {
   }
   await rail('console:av-calculator').click();
   await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'AV Calculator');
-  const calculatorFrame = page.locator('.console-panel iframe');
-  await calculatorFrame.waitFor();
-  const calculatorSrc = new URL(await calculatorFrame.getAttribute('src'), BASE);
-  assert.equal(calculatorSrc.pathname, '/av-calculator.html');
-  assert.equal(calculatorSrc.searchParams.get('sbdEmbed'), 'panel');
-  assert.equal(calculatorSrc.searchParams.get('sbdShow'), 'Gala');
-  assert.equal(calculatorSrc.searchParams.has('private'), false, 'unknown query data is not forwarded');
-  assert.equal(await page.locator('.suite-app-open').getAttribute('target'), '_blank');
-  await page.frameLocator('.console-panel iframe').locator('html[data-sbd-embed="panel"]').waitFor();
-  assert.equal(await page.frameLocator('.console-panel iframe').locator('.sbd-public-nav, nav.sbd-nav, .console-strip').count(), 0, 'embedded tool hides its page navigation and mounts no console of its own');
+  await page.locator('.console-panel #delayDistance').fill('123');
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem('avCalculator.v1')).delayDistance === 123);
+  assert.equal(await page.locator('.console-panel iframe').count(), 0, 'Calculator controls are native panels');
+  assert.equal(await page.locator('.console-panel[data-app="AV Calculator"]').count(), 3);
+  const calculatorValues = await storage('avCalculator.v1');
+  assert.equal(new URL(await page.locator('#summaryCard a').evaluate(link => link.href)).pathname, '/led-wall-calculator.html', 'Calculator tool links still resolve from the shared /av/ route');
+  await page.locator('.console-panel[data-panel="audioCard"]').getByRole('button', { name: 'Field sets', exact: true }).click();
+  await page.locator('#fieldSetName').fill('Mixed workspace inputs');
+  await page.locator('#fieldSetSave').click();
+  await page.waitForFunction(() => document.querySelector('#fieldSetStatus')?.textContent.includes('saved in this browser'));
+  const fieldSetExport = page.waitForEvent('download');
+  await page.locator('#fieldSetExport').click();
+  const fieldSetFile = await fieldSetExport;
+  const exportedSet = JSON.parse(await readFile(await fieldSetFile.path(), 'utf8'));
+  assert.equal(exportedSet.schema, 'system-by-dave.av-calculator-field-set.v1');
+  assert.equal(exportedSet.values.delayDistance, 123);
+  await page.locator('#fieldSetsClose').click();
+  await page.locator('.console-panel #delayDistance').fill('99');
+  await page.locator('.console-panel[data-panel="audioCard"]').getByRole('button', { name: 'Field sets', exact: true }).click();
+  await page.locator('#fieldSetRecall').click();
+  assert.equal(await page.locator('.console-panel #delayDistance').inputValue(), '123', 'field sets recall into the native panel');
+  const summaryExport = page.waitForEvent('download');
+  await page.locator('.suite-actions').getByRole('button', { name: 'Export', exact: true }).click();
+  assert.match(await readFile(await (await summaryExport).path(), 'utf8'), /123/, 'existing summary export retains current inputs');
 
   // 1b. The Rail's Workspace entry recalls the empty view in place.
   await page.locator('.sbd-rail__toolbox').click();
@@ -140,6 +155,28 @@ try {
   await page.waitForSelector('.console-panel[data-app="Lighting"][data-panel="fixtures"]');
   assert.equal(await page.locator('.console-panel[data-app="AV Video"][data-panel="flow"]').count(), 1, 'mixed view restored after reload');
 
+  // Any department, any view: replace Video Patch with Calculator Audio Delay.
+  await page.getByRole('button', { name: 'Patch options', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Change panel…' }).click();
+  await chooser.getByRole('button', { name: 'AV Calculator', exact: true }).click();
+  assert.equal(await chooser.locator('.console-choices button').count(), 7, 'all seven individual calculation panels are available');
+  await chooser.locator('.console-choices button').filter({ hasText: 'Audio Delay' }).click();
+  assert.equal(await page.locator('.console-panel #delayDistance').inputValue(), '123', 'same Calculator state survives department swaps');
+  assert.equal(await storage('avCalculator.v1'), calculatorValues);
+  assert.equal(await page.locator('.console-panel iframe').count(), 0, 'mixed panels contain no application frames');
+  await page.getByRole('button', { name: 'View options' }).click();
+  await page.getByRole('menuitem', { name: /^Update “/ }).click();
+  await page.reload();
+  await page.locator('.console-panel #delayDistance').waitFor();
+
+  assert.equal(await page.locator('.console-panel #delayDistance').inputValue(), '123');
+  assert.equal(await page.locator('.console-panel[data-app="Lighting"]').count(), 1);
+  assert.equal(await page.locator('.console-panel[data-app="AV Video"]').count(), 1);
+  if (process.env.AV_SUITE_EVIDENCE) {
+    await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });
+    await page.screenshot({ path: join(process.env.AV_SUITE_EVIDENCE, 'mixed.png') });
+  }
+
   // 4. Save writes only the active application's key; Lighting edits stay in the Lighting document.
   await page.locator('.console-panel[data-app="Lighting"] button', { hasText: 'Add fixture' }).click();
   await rail('console:lighting').click();
@@ -151,17 +188,125 @@ try {
   assert.equal(await storage('sbd.avVideo.v1'), null, 'Lighting Save never writes the Video plan');
   assert.equal(await storage('sbd.avAudio.v1'), null);
 
-  // 5. No page scrolling at phone, short landscape, tablet, desktop and ultrawide sizes in both palettes.
+  // Disabled Video modules remain selectable without mutating their flags.
+  await rail('console:av-video').click();
+  await page.getByRole('tab', { name: 'Project', exact: true }).click();
+  const moduleToggles = page.locator('.console-panel input[type="checkbox"]');
+  assert.ok(await moduleToggles.count() >= 5);
+  for (const checkbox of await moduleToggles.all()) if (await checkbox.isChecked()) await checkbox.uncheck();
+  await page.locator('.suite-actions button.primary').click();
+  const videoBefore = await storage('sbd.avVideo.v1');
+  await page.getByRole('button', { name: 'Project options', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Change panel…' }).click();
+  await chooser.getByRole('button', { name: 'AV Video', exact: true }).click();
+  assert.equal(await chooser.locator('.console-choices button').count(), 10, 'all Video panels remain in the chooser with modules disabled');
+  await chooser.locator('.console-choices button').filter({ hasText: 'Cameras' }).click();
+  await page.locator('.console-panel[data-panel="cameras"]').waitFor();
+  assert.equal(await storage('sbd.avVideo.v1'), videoBefore, 'choosing a panel does not enable or rewrite modules');
+  await rail('console:av-calculator').click();
+  await page.locator('.console-panel #delayDistance').waitFor();
+
+  // The same Add menu builds a four-department workspace from empty space.
+  await page.locator('.sbd-rail__toolbox').click();
+  for (const [group, name, splitPanel] of [['AV Calculator', 'Audio Delay'], ['Audio', 'Inputs', 'Audio Delay'], ['AV Video', 'Signal Flow'], ['Lighting', 'Fixtures', 'Signal Flow']]) {
+    if (splitPanel) {
+      await page.getByRole('button', { name: `${splitPanel} options`, exact: true }).click();
+      await page.getByRole('menuitem', { name: 'Split top and bottom', exact: true }).click();
+    } else await page.getByRole('button', { name: /Add panel/ }).click();
+    await chooser.getByRole('button', { name: group, exact: true }).click();
+    await chooser.locator('.console-choices button').filter({ hasText: name }).click();
+  }
+  assert.equal(await page.locator('.console-panel').count(), 4);
+  assert.deepEqual(new Set(await page.locator('.console-panel').evaluateAll(nodes => nodes.map(node => node.dataset.app))), new Set(['AV Calculator', 'Audio', 'AV Video', 'Lighting']));
+  assert.equal(await page.locator('iframe').count(), 0);
+  await page.getByRole('button', { name: 'View options' }).click();
+  await page.getByRole('menuitem', { name: 'Store as new view' }).click();
+  await page.reload();
+  await page.locator('.console-panel #delayDistance').waitFor();
+  assert.equal(await page.locator('.console-panel').count(), 4, 'four native departments reload in the same workspace');
+  if (process.env.AV_SUITE_EVIDENCE) await page.screenshot({ path: join(process.env.AV_SUITE_EVIDENCE, 'four-departments.png') });
+  await page.locator('.console-panel[data-app="Audio"]').getByRole('button', { name: 'Add channel', exact: true }).click();
+  await rail('console:audio').click();
+  await page.locator('.suite-actions button.primary').click();
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem('sbd.avAudio.v1'))?.channels.length === 1);
+  assert.equal(await storage('avCalculator.v1'), calculatorValues, 'Audio save leaves Calculator inputs untouched');
+  assert.equal(await storage('sbd.avVideo.v1'), videoBefore, 'Audio save leaves Video unchanged');
+  await rail('console:av-calculator').click();
+  await page.locator('.console-panel #delayDistance').waitFor();
+
+  // 5. No page scrolling or inaccessible Calculator controls in either palette.
   for (const theme of ['dark', 'light']) {
     await page.evaluate(value => { document.documentElement.dataset.avTheme = value; }, theme);
-    for (const [width, height] of [[375, 667], [667, 375], [680, 700], [1024, 690], [1100, 600], [1366, 650], [1440, 900], [3440, 1440]]) await assertNoOverflow(width, height, theme);
+    for (const [width, height] of [[375, 812], [667, 375], [680, 700], [1024, 690], [1100, 600], [1366, 650], [1440, 900], [3440, 1440]]) {
+      await assertNoOverflow(width, height, theme);
+      await page.getByRole('navigation', { name: 'Panels' }).getByRole('button', { name: 'Audio Delay', exact: true }).click();
+      await page.locator('.console-panel #audioCard').waitFor();
+      const controls = await page.locator('.console-panel .calculator-content button:visible, .console-panel .calculator-content input:visible, .console-panel .calculator-content select:visible').evaluateAll(nodes => nodes.map(node => {
+        const b = node.getBoundingClientRect(), panel = node.closest('.console-panel').getBoundingClientRect();
+        const hit = document.elementFromPoint(b.x + b.width / 2, b.y + b.height / 2);
+        return { id: node.id || node.textContent, w: b.width, h: b.height, inside: b.left >= panel.left && b.right <= panel.right + 1 && b.top >= panel.top && b.bottom <= panel.bottom + 1, hit: node === hit || node.contains(hit) };
+      }));
+      assert.ok(controls.length, `native calculator has reachable controls at ${width}x${height}`);
+      assert.deepEqual(controls.filter(c => c.w < 43.5 || c.h < 43.5 || !c.inside || !c.hit), [], `native controls touch targets and containment: ${width}x${height} ${theme}`);
+      if (process.env.AV_SUITE_EVIDENCE && [375, 667, 1440].includes(width)) await page.screenshot({ path: join(process.env.AV_SUITE_EVIDENCE, `calculator-${width}-${theme}.png`) });
+    }
   }
   await page.setViewportSize({ width: 375, height: 667 });
   assert.equal(await page.getByRole('navigation', { name: 'Panels' }).isVisible(), true, 'phone panel switcher');
   assert.equal(await page.locator('.sbd-rail-launcher').isVisible(), true, 'phone Apps launcher');
   await page.setViewportSize({ width: 1440, height: 900 });
   assert.deepEqual(errors, []);
-  console.log('AV Suite shell verification passed: nine Rail identities recall in place with one console, Calculator and Throwline embed as chrome-less panels, a mixed Lighting + Video view stores and restores through the shell, Save writes only the active application, and no page overflow at eight sizes in both palettes.');
+  // Legacy shell Calculator tiles display natively, without a storage migration.
+  const legacyView = { id: 'tool:av-calculator', name: 'My saved calculator', panels: [{ id: 'old-calc', type: 'tool:av-calculator', x: 0, y: 0, w: 12, h: 8 }] };
+  const legacyViews = JSON.stringify({ version: 1, views: [legacyView] });
+  const legacyLayout = JSON.stringify({ v: 1, viewId: legacyView.id, locked: false, live: { [legacyView.id]: legacyView.panels } });
+  await page.evaluate(({ views, layout }) => {
+    localStorage.setItem('sbd.avSuite.workspace.v1', views);
+    localStorage.setItem('sbd.avSuite.layout.v1', layout);
+  }, { views: legacyViews, layout: legacyLayout });
+  await page.goto(`${BASE}/av/`);
+  await page.locator('.console-panel #delayDistance').waitFor();
+  assert.equal(await page.locator('.console-panel #delayDistance').inputValue(), '123');
+  assert.equal(await page.locator('.console-panel iframe').count(), 0);
+  assert.equal(await page.locator('.console-panel').count(), 3);
+  assert.equal(await storage('sbd.avSuite.workspace.v1'), legacyViews, 'opening preserves legacy stored view bytes');
+  assert.equal(await storage('sbd.avSuite.layout.v1'), legacyLayout, 'opening preserves legacy device layout bytes');
+  await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
+  assert.ok(await page.locator('.calculator-native .av-print-text').count(), 'Calculator print values are created in its own controls');
+  assert.equal(await page.locator('.suite-header .av-print-text').count(), 0, 'Calculator print preparation leaves the shell controls alone');
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+  assert.equal(await page.locator('.av-print-text').count(), 0, 'temporary print values are cleaned up');
+  await page.waitForFunction(() => document.documentElement.dataset.workspaceOffline === 'ready');
+  await context.setOffline(true);
+  try {
+    await page.reload();
+    await page.locator('.console-panel #delayDistance').fill('124');
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('avCalculator.v1'))?.delayDistance === 124);
+    assert.equal(await page.locator('.console-panel iframe').count(), 0, 'native Calculator works after prepared offline reload');
+  } finally { await context.setOffline(false); }
+  const blockedContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  try {
+    await blockedContext.addInitScript(() => { Storage.prototype.setItem = function () { throw new DOMException('Storage blocked', 'QuotaExceededError'); }; });
+    const blockedPage = await blockedContext.newPage();
+    blockedPage.on('pageerror', error => errors.push(error.message));
+    await blockedPage.goto(`${BASE}/av/?app=calculator`);
+    await blockedPage.locator('.console-panel #delayDistance').fill('88');
+    await blockedPage.waitForFunction(() => /storage.*unavailable|values were not saved/i.test(document.querySelector('.suite-app > .message')?.textContent || ''));
+    assert.equal(await blockedPage.locator('.suite-app > .message.error').count(), 1, 'failed autosave is visible in the shared status line');
+    assert.equal(await blockedPage.evaluate(() => localStorage.getItem('avCalculator.v1')), null, 'failed autosave is not reported as persisted');
+  } finally { await blockedContext.close(); }
+  assert.deepEqual(errors, []);
+  console.log('AV Suite shell verification passed: nine native department packs, Calculator values shared across mixed panels and reloads, full Video menu with modules disabled, legacy layouts preserved, isolated saves, specialist embed boundary, and both palettes at eight sizes.');
+} catch (error) {
+  if (process.env.AV_SUITE_EVIDENCE) {
+    await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });
+    await page.screenshot({ path: join(process.env.AV_SUITE_EVIDENCE, 'failure.png') });
+  }
+  console.error('Layout at failure:', await page.evaluate(() => Object.fromEntries(['.suite-header', '.suite-bar', '.console-strip', '.console-grid', '.console-panel', '.console-body', '.calculator-leaf', '.calculator-content', '.console-quick', '.message'].map(selector => {
+    const element = document.querySelector(selector), box = element?.getBoundingClientRect();
+    return [selector, box && { x: box.x, y: box.y, w: box.width, h: box.height }];
+  }))));
+  throw error;
 } finally {
   await context.close();
   await browser.close();
