@@ -155,7 +155,7 @@ export function App() {
       {context && <span className="suite-context" aria-label="Read-only show context">{context}</span>}
       <div className="suite-actions">
         {activePack?.actions}
-        <button type="button" className="focus-toggle" aria-pressed={focusMode} title={focusMode ? "Restore workspace chrome" : "Collapse workspace chrome"} onClick={toggleFocus}><svg aria-hidden="true" viewBox="0 0 24 24"><path d={focusMode ? "M9 4v5H4m16 0h-5V4m0 16v-5h5M4 15h5v5" : "M9 4H4v5m16 0V4h-5m0 16h5v-5M4 15v5h5"} /></svg><span>{focusMode ? "Exit focus" : "Focus"}</span></button>
+        <button type="button" className="focus-toggle" aria-label={focusMode ? "Exit focus" : "Focus"} aria-pressed={focusMode} title={focusMode ? "Restore workspace chrome" : "Collapse workspace chrome"} onClick={toggleFocus}><svg aria-hidden="true" viewBox="0 0 24 24"><path d={focusMode ? "M9 4v5H4m16 0h-5V4m0 16v-5h5M4 15h5v5" : "M9 4H4v5m16 0V4h-5m0 16h5v-5M4 15v5h5"} /></svg><span>{focusMode ? "Exit focus" : "Focus"}</span></button>
         <label className="theme-label"><span>Palette</span><select aria-label="Palette" value={theme === "system" ? systemPalette : theme} onChange={e => changeTheme(e.target.value as Palette)}><option value="light">Light</option><option value="dark">Dark</option><option value="white">White</option><option value="black">Black</option></select></label>
         <label className="follow-system"><input type="checkbox" checked={theme === "system"} onChange={e => changeTheme(e.target.checked ? "system" : systemPalette)} /><span>Follow system</span></label>
         <button type="button" className="primary" disabled={!activePack || activePack.blocked} onClick={() => void activePack?.save()}>Save{activePack?.dirty ? " •" : ""}</button>

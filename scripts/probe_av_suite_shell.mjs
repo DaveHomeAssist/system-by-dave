@@ -280,8 +280,8 @@ try {
   await rail('console:av-calculator').click();
   await page.locator('.console-panel #delayDistance').waitFor();
 
-  // 5. No page scrolling or inaccessible Calculator controls in either palette.
-  for (const theme of ['dark', 'light']) {
+  // 5. No page scrolling or inaccessible Calculator controls in any named palette.
+  for (const theme of ['dark', 'light', 'white', 'black']) {
     await page.evaluate(value => { document.documentElement.dataset.avTheme = value; }, theme);
     for (const [width, height] of [[375, 812], [667, 375], [680, 700], [1024, 690], [1100, 600], [1366, 650], [1440, 900], [3440, 1440]]) {
       await assertNoOverflow(width, height, theme);
@@ -413,7 +413,7 @@ try {
     assert.equal(await blockedPage.evaluate(() => localStorage.getItem('avCalculator.v1')), null, 'failed autosave is not reported as persisted');
   } finally { await blockedContext.close(); }
   assert.deepEqual(errors, []);
-  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across nine native departments, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, no whole-app tiles, and both palettes at eight sizes.`);
+  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across nine native departments, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, no whole-app tiles, and all four named palettes at eight sizes.`);
 } catch (error) {
   if (process.env.AV_SUITE_EVIDENCE) {
     await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });
