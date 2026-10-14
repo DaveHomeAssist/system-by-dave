@@ -1,11 +1,12 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "node:path";
+import { calculatorNative } from "./calculatorNative";
 
 export default defineConfig({
   root: resolve(__dirname),
   base: "/av/",
-  plugins: [react()],
+  plugins: [react(), calculatorNative()],
   build: {
     outDir: resolve(__dirname, "../../av"),
     emptyOutDir: true,
