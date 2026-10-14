@@ -105,7 +105,9 @@
         "av-workbook/"
       ],
       "assets": [
-        "img/av-by-dave-og.png"
+        "img/av-by-dave-og.png",
+        "js/av-landing-theme.js",
+        "fonts/dm-sans.woff2"
       ],
       "robotsDisallow": [
         "/404.html",
