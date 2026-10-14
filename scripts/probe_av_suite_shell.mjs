@@ -57,6 +57,7 @@ async function assertNoOverflow(width, height, label) {
   assert.ok(metrics.sw <= metrics.cw + 1, `horizontal overflow at ${width}x${height} (${label})`);
   assert.ok(metrics.sh <= metrics.ch + 1, `vertical overflow at ${width}x${height} (${label})`);
   assert.equal(await page.locator('.console-strip').count(), 1, `one view strip at ${width}x${height}`);
+  assert(await page.locator('.console-quick button').evaluateAll(buttons => buttons.every(button => button.scrollWidth <= button.clientWidth + 1)), `Panel names must fit their buttons at ${width}x${height}`);
 }
 
 try {

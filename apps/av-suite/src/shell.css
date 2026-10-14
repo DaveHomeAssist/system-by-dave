@@ -44,3 +44,6 @@
   .suite-app .console-grid{padding:2px 4px}
   .suite-app .console-bar{padding:0 4px;min-height:44px}
 }
+
+/* Keep panel names readable inside the existing horizontal phone rail. */
+.suite-app .console-quick button{flex:0 0 auto}
