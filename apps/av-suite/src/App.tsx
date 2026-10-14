@@ -120,7 +120,12 @@ export function App() {
   const dirtyApps = packs.filter(pack => pack.dirty).map(pack => pack.label);
   // Hidden legacy app slots must not collide with a newly chosen native panel.
   // Only an explicit arrangement action changes the live layout; saved views stay intact.
-  const panelWorkspace = { ...ws, hidden: 0, setPanels: (change: (panels: Panel[]) => Panel[]) => ws.setPanels(current => change(current.filter(panel => library.some(def => def.type === panel.type)))) };
+  const panelWorkspace = {
+    ...ws, hidden: 0,
+    setPanels: (change: (panels: Panel[]) => Panel[]) => ws.setPanels(current => change(current.filter(panel => library.some(def => def.type === panel.type)))),
+    // Menu selection must supersede the phone quick bar's previously selected type.
+    setFocus: (id: Parameters<typeof ws.setFocus>[0]) => { ws.setPhoneType(null); ws.setFocus(id); },
+  };
   return <div className="suite-app" data-active-app={activeApp}>
     <header className="suite-header">
       <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : "Empty workspace · add any panel"}</p></div></div>

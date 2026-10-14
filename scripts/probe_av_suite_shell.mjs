@@ -228,6 +228,18 @@ try {
   await page.locator('.console-panel #delayDistance').waitFor();
   assert.equal(await page.locator('.console-panel').count(), 4, 'four native departments reload in the same workspace');
   if (process.env.AV_SUITE_EVIDENCE) await page.screenshot({ path: join(process.env.AV_SUITE_EVIDENCE, 'four-departments.png') });
+  // On a full mixed phone workspace, the menu must bring an existing department forward.
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.getByRole('navigation', { name: 'Panels' }).getByRole('button', { name: 'Audio Delay', exact: true }).click();
+  await page.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
+  await chooser.getByRole('button', { name: 'Replace the focused panel', exact: true }).click();
+  await chooser.getByRole('button', { name: 'Audio', exact: true }).click();
+  await chooser.locator('.console-choices button').filter({ hasText: 'Inputs' }).click();
+  assert.equal(await page.locator('.console-panel').getAttribute('data-app'), 'Audio', 'phone selection supersedes the previous department quick-bar choice');
+  assert.equal(await page.locator('iframe').count(), 0);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.locator('.console-shell.mode-desktop').waitFor();
+  assert.equal(await page.locator('.console-panel').count(), 4, 'phone selection preserves all four mixed panels');
   await page.locator('.console-panel[data-app="Audio"]').getByRole('button', { name: 'Add channel', exact: true }).click();
   await rail('console:audio').click();
   await page.locator('.suite-actions button.primary').click();
@@ -350,6 +362,7 @@ try {
     await menuPage.keyboard.press('Escape');
     for (const [width, height] of [[375, 812], [667, 375], [680, 700], [1024, 690], [1440, 900], [3440, 1440]]) {
       await menuPage.setViewportSize({ width, height });
+      await menuPage.locator(`.console-shell.mode-${expectedMode(width)}`).waitFor();
       await openMenu();
       await menu.getByRole('button', { name: 'AV Video', exact: true }).click();
       await menu.locator('.console-choices button').last().click();
