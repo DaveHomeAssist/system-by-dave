@@ -4,6 +4,18 @@
 
 - Retain the approved System/profile subject tabs, pagination and saved light/dark controls; preserve contact/PDF corrections and accessible mobile navigation. AV lands directly in the current console.
 - Reconcile the landing PR with the released single AV console. Preserve retired route redirects and current application builds; retain AV social artwork, development-file exclusions and the branded not-found page. Final Dave approval remains required before merging the website stack.
+## 2026-10-14 — Individual Calculator panels in the shared console
+
+- Remove all whole-app specialist tiles from the shared chooser and new views. Standalone tools keep their normal Rail links. Existing saved specialist slots remain stored unchanged, with separate-page recovery links instead of iframes. Exercise every native menu choice as a replacement in the same workspace.
+- Bound the shared chooser to its placement height and wrap the nine department buttons, keeping the last panel choice reachable. Recall legacy Calculator views by their normalized identity rather than choosing a new default.
+- Keep old specialist slots from blocking new native panels: explicit layout edits clear unavailable slots from the working arrangement, without rewriting the saved view until Store/Update View.
+- On phones, choosing an already-open panel from another department brings that panel forward even after using a department quick button; the full mixed layout stays intact.
+- Complete the ninth native department pack: Audio Delay, Projection, Record Storage, Power Load, Voltage Drop, SPL Distance and Operator Summary can be selected, replaced and mixed with other departments in the existing shared workspace.
+- Reuse the Calculator engine, formulas, original inputs, field sets and autosave keys. Scope its DOM queries and styles to its own controls; retain its standalone route. Former shell Calculator tiles display as native controls within their existing bounds without rewriting saved views on opening.
+- Keep all Video panel types in the shared chooser even when optional module flags are off. Choosing a panel does not change those flags or save another department's document.
+- Extend browser coverage for mixed Calculator/Audio/Video/Lighting views, add/split/replace, reload, isolated saves, field-set recall/export, legacy layout bytes, print cleanup and touch control containment in both palettes. Advance the offline cache generation with its checked consumers.
+- Correct the suite root height inherited from standalone Audio CSS, keep the toolbar within two rows on laptops, and compact short-landscape spacing while retaining 44px controls. Short Calculator tiles put labels beside inputs and continue to paginate.
+- Fix prepared offline directory routes: the worker now resolves registered directory paths such as `/av/` to their cached `index.html`. Previously the readiness check could pass while a directory-route reload fell through to the offline notice.
 
 ## 2026-10-13 — AV by Dave is one console (slice C)
 

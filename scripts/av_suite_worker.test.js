@@ -43,6 +43,32 @@ for (const destination of ['script', 'style']) {
   });
 }
 
+for (const route of ['av/', 'av/?app=calculator', 'av/index.html?app=calculator']) {
+  test(`prepared console ${route} reopens from its index cache offline`, async () => {
+    const listeners = {}, index = 'https://example.test/av/index.html';
+    const context = {
+      URL, Response, Promise, importScripts() {},
+      caches: { open: async () => ({
+        match: async key => key === index ? new Response('native console') : undefined,
+        put: async () => assert.fail('Offline navigation must not write a response')
+      }) },
+      fetch: async () => { throw new Error('offline'); },
+      self: {
+        location: { origin: 'https://example.test' },
+        registration: { scope: 'https://example.test/' },
+        SBD_REGISTRY: { version: 'test', offlineAssets: () => ['./av/index.html'] },
+        addEventListener: (type, listener) => { listeners[type] = listener; }
+      }
+    };
+    vm.runInNewContext(source, context);
+    let response;
+    listeners.fetch({ request: { url: `https://example.test/${route}`, method: 'GET', mode: 'navigate' }, respondWith: promise => { response = promise; } });
+    assert.equal(await (await response).text(), 'native console');
+    assert.equal(context.canonicalUrl('https://example.test/unknown/'), 'https://example.test/unknown/');
+    assert.equal(context.canonicalUrl('https://example.test/'), 'https://example.test/', 'site root caching stays unchanged');
+  });
+}
+
 test('install precaches every local Rail asset in the bumped cache generation', async () => {
   const registryContext = { self: {} };
   vm.createContext(registryContext);
@@ -59,7 +85,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261014-public-release');
+      assert.equal(name, 'sbd-av-suite-v20261014-website-release');
       return cache;
     } },
     fetch: async () => new Response('ok'),
