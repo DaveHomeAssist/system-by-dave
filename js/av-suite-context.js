@@ -10,7 +10,7 @@
     var mode = 'dark'; /* Stage Slate first-use default (docs/av-console.md) */
     try{
       var stored = localStorage.getItem('av-theme-mode.v1');
-      if(stored === 'dark' || stored === 'light' || stored === 'system') mode = stored;
+      if(stored === 'dark' || stored === 'light' || stored === 'white' || stored === 'black' || stored === 'system') mode = stored;
     }catch(e){}
     root.setAttribute('data-av-theme', mode);
   })();

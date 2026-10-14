@@ -56,7 +56,7 @@ export function App() {
     const errors = new MutationObserver(revealError);
     errors.observe(status, { childList: true, attributes: true, attributeFilter: ['class'] });
     revealError(); // The original engine reports startup failures before React mounts.
-    const theme = (event: StorageEvent) => { if (event.key === 'av-theme-mode.v1' && ['light', 'dark', 'system'].includes(event.newValue || '')) { document.documentElement.dataset.avTheme = event.newValue!; const dark = event.newValue === 'dark' || (event.newValue === 'system' && matchMedia('(prefers-color-scheme: dark)').matches); const node = nodes.get('themeToggle')!; node.textContent = dark ? 'Light mode' : 'Dark mode'; node.setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} mode`); } };
+    const theme = (event: StorageEvent) => { if (event.key === 'av-theme-mode.v1' && ['light', 'dark', 'white', 'black', 'system'].includes(event.newValue || '')) { document.documentElement.dataset.avTheme = event.newValue!; const dark = event.newValue === 'dark' || event.newValue === 'black' || (event.newValue === 'system' && matchMedia('(prefers-color-scheme: dark)').matches); const node = nodes.get('themeToggle')!; node.textContent = dark ? 'Light mode' : 'Dark mode'; node.setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} mode`); } };
     addEventListener('storage', theme); return () => { errors.disconnect(); removeEventListener('storage', theme); };
   }, []);
   useEffect(() => {

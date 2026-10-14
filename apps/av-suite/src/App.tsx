@@ -11,6 +11,10 @@ import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, p
    recalls each application's views in this same workspace. */
 const RAIL_SELECT_EVENT = "sbd:rail-console-select";
 const RAIL_ACTIVE_EVENT = "sbd:console-snapshot-active";
+const FOCUS_KEY = "sbd.avSuite.focus.v1";
+const PALETTES = ["light", "dark", "white", "black"] as const;
+type Palette = typeof PALETTES[number];
+type ThemeMode = Palette | "system";
 type Status = { app: string; text: string; error: boolean };
 
 function railRef(app: string, toolId?: string) {
@@ -87,15 +91,34 @@ export function App() {
     const leave = (event: BeforeUnloadEvent) => { if (packs.some(pack => pack.dirty || pack.pending)) { event.preventDefault(); event.returnValue = ""; } };
     window.addEventListener("beforeunload", leave); return () => window.removeEventListener("beforeunload", leave);
   }, [packs.map(pack => pack.dirty || pack.pending).join(",")]);
-  const [theme, setTheme] = useState(document.documentElement.dataset.avTheme || "dark");
+  const systemQuery = useMemo(() => matchMedia("(prefers-color-scheme: dark)"), []);
+  const [systemPalette, setSystemPalette] = useState<Palette>(() => systemQuery.matches ? "dark" : "light");
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    const value = document.documentElement.dataset.avTheme;
+    return value === "system" || PALETTES.includes(value as Palette) ? value as ThemeMode : "dark";
+  });
+  const [focusMode, setFocusMode] = useState(() => {
+    let active = false; try { active = localStorage.getItem(FOCUS_KEY) === "true"; } catch { /* focus remains available for this visit */ }
+    document.documentElement.dataset.avFocus = active ? "true" : "false";
+    return active;
+  });
   useEffect(() => {
-    const receive = (event: StorageEvent) => { if (event.key === "av-theme-mode.v1" && ["light", "dark", "system"].includes(event.newValue || "")) { document.documentElement.dataset.avTheme = event.newValue!; setTheme(event.newValue!); } };
+    const receive = (event: MediaQueryListEvent) => setSystemPalette(event.matches ? "dark" : "light");
+    systemQuery.addEventListener("change", receive); return () => systemQuery.removeEventListener("change", receive);
+  }, [systemQuery]);
+  useEffect(() => {
+    const receive = (event: StorageEvent) => { if (event.key === "av-theme-mode.v1" && (event.newValue === "system" || PALETTES.includes(event.newValue as Palette))) { document.documentElement.dataset.avTheme = event.newValue!; setTheme(event.newValue as ThemeMode); } };
     window.addEventListener("storage", receive); return () => window.removeEventListener("storage", receive);
   }, []);
-  function changeTheme(value: string) {
+  function changeTheme(value: ThemeMode) {
     document.documentElement.dataset.avTheme = value; setTheme(value);
-    for (const meta of Array.from(document.querySelectorAll<HTMLMetaElement>("meta[data-av-theme-color]"))) meta.media = value === "system" ? `(prefers-color-scheme: ${meta.dataset.avThemeColor})` : meta.dataset.avThemeColor === value ? "all" : "not all";
+    for (const meta of Array.from(document.querySelectorAll<HTMLMetaElement>("meta[data-av-theme-color]"))) meta.media = value === "system" ? (["light", "dark"].includes(meta.dataset.avThemeColor || "") ? `(prefers-color-scheme: ${meta.dataset.avThemeColor})` : "not all") : meta.dataset.avThemeColor === value ? "all" : "not all";
     try { localStorage.setItem("av-theme-mode.v1", value); } catch { setStatus({ app: "", text: "Theme changed for this visit; browser preferences could not be saved.", error: true }); }
+  }
+  function toggleFocus() {
+    const next = !focusMode;
+    document.documentElement.dataset.avFocus = next ? "true" : "false"; setFocusMode(next);
+    try { localStorage.setItem(FOCUS_KEY, String(next)); } catch { setStatus({ app: "", text: "Focus mode changed for this visit; browser preferences could not be saved.", error: true }); }
   }
   function storeViews(next: View[], text: string) {
     try { saveViews(localStorage, next); setViews(next); setStatus({ app: "", text: text.replace(/ in the plan/, " in this console").replace(/ Save to keep it\.?/, ""), error: false }); }
@@ -132,7 +155,9 @@ export function App() {
       {context && <span className="suite-context" aria-label="Read-only show context">{context}</span>}
       <div className="suite-actions">
         {activePack?.actions}
-        <label className="theme-label"><span>Theme</span><select aria-label="Theme" value={theme} onChange={e => changeTheme(e.target.value)}><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label>
+        <button type="button" className="focus-toggle" aria-label={focusMode ? "Exit focus" : "Focus"} aria-pressed={focusMode} title={focusMode ? "Restore workspace chrome" : "Collapse workspace chrome"} onClick={toggleFocus}><svg aria-hidden="true" viewBox="0 0 24 24"><path d={focusMode ? "M9 4v5H4m16 0h-5V4m0 16v-5h5M4 15h5v5" : "M9 4H4v5m16 0V4h-5m0 16h5v-5M4 15v5h5"} /></svg><span>{focusMode ? "Exit focus" : "Focus"}</span></button>
+        <label className="theme-label"><span>Palette</span><select aria-label="Palette" value={theme === "system" ? systemPalette : theme} onChange={e => changeTheme(e.target.value as Palette)}><option value="light">Light</option><option value="dark">Dark</option><option value="white">White</option><option value="black">Black</option></select></label>
+        <label className="follow-system"><input type="checkbox" checked={theme === "system"} onChange={e => changeTheme(e.target.checked ? "system" : systemPalette)} /><span>Follow system</span></label>
         <button type="button" className="primary" disabled={!activePack || activePack.blocked} onClick={() => void activePack?.save()}>Save{activePack?.dirty ? " •" : ""}</button>
         <button type="button" disabled={!activePack} onClick={() => activePack?.exportDoc()}>Export</button>
       </div>

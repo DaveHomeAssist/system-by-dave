@@ -1,5 +1,5 @@
 /* System by Dave AV Suite theme contract.
-   Two palettes only: Warm Paper (light) and Stage Slate (dark).
+   Four named palettes: Warm Paper (light), Stage Slate (dark), White and Black.
    Pages opt in with <html data-av-theme="system" data-av-tool="…">.
    Product-specific layout and operator semantics stay local; color authority
    lives here and follows the operating-system preference by default. */
@@ -66,8 +66,47 @@
   --av-radius-card: 14px;
 }
 
+html[data-av-theme="white"] {
+  color-scheme: light;
+  --av-bg: #f2f2f2;
+  --av-surface: #ffffff;
+  --av-surface-2: #f7f7f7;
+  --av-surface-3: #ededed;
+  --av-raised: #e2e2e2;
+  --av-control: #ffffff;
+  --av-line: #d0d0d0;
+  --av-line-strong: #8a8a8a;
+  --av-text: #111111;
+  --av-text-2: #333333;
+  --av-muted: #555555;
+  --av-dim: #666666;
+  --av-accent: #8d341f;
+  --av-accent-strong: #6e2515;
+  --av-primary-ink: #ffffff;
+  --av-focus: #005fcc;
+  --av-success: #17663f;
+  --av-warning: #6d4a00;
+  --av-danger: #8f251f;
+  --av-info: #005fcc;
+  --av-purple: #5b3d85;
+  --av-accent-soft: rgba(141, 52, 31, .10);
+  --av-accent-line: rgba(141, 52, 31, .42);
+  --av-focus-soft: rgba(0, 95, 204, .10);
+  --av-focus-line: rgba(0, 95, 204, .44);
+  --av-success-soft: rgba(23, 102, 63, .10);
+  --av-success-line: rgba(23, 102, 63, .42);
+  --av-warning-soft: rgba(109, 74, 0, .10);
+  --av-warning-line: rgba(109, 74, 0, .42);
+  --av-danger-soft: rgba(143, 37, 31, .10);
+  --av-danger-line: rgba(143, 37, 31, .44);
+  --av-grid: rgba(0, 0, 0, .055);
+  --av-overlay: rgba(0, 0, 0, .52);
+  --av-shadow: 0 16px 50px -28px rgba(0, 0, 0, .30);
+  --av-shadow-pop: 0 28px 80px -26px rgba(0, 0, 0, .38);
+}
+
 @media (prefers-color-scheme: dark) {
-  html:not([data-av-theme="light"]) {
+  html[data-av-theme="system"] {
     color-scheme: dark;
 
     /* Stage Slate */
@@ -161,6 +200,45 @@ html[data-av-theme="dark"] {
   --av-brand-ink: #06120c;
   --av-brand-soft: rgba(88, 195, 139, .14);
   --av-brand-line: rgba(88, 195, 139, .46);
+}
+
+html[data-av-theme="black"] {
+  color-scheme: dark;
+  --av-bg: #000000;
+  --av-surface: #080808;
+  --av-surface-2: #101010;
+  --av-surface-3: #171717;
+  --av-raised: #202020;
+  --av-control: #050505;
+  --av-line: #2f2f2f;
+  --av-line-strong: #686868;
+  --av-text: #ffffff;
+  --av-text-2: #dedede;
+  --av-muted: #bdbdbd;
+  --av-dim: #9a9a9a;
+  --av-accent: #ff9859;
+  --av-accent-strong: #ffb07d;
+  --av-primary-ink: #170900;
+  --av-focus: #78bdff;
+  --av-success: #7bd39c;
+  --av-warning: #ffd071;
+  --av-danger: #ff9586;
+  --av-info: #78bdff;
+  --av-purple: #c5a5f3;
+  --av-accent-soft: rgba(255, 152, 89, .15);
+  --av-accent-line: rgba(255, 152, 89, .50);
+  --av-focus-soft: rgba(120, 189, 255, .14);
+  --av-focus-line: rgba(120, 189, 255, .50);
+  --av-success-soft: rgba(123, 211, 156, .13);
+  --av-success-line: rgba(123, 211, 156, .46);
+  --av-warning-soft: rgba(255, 208, 113, .13);
+  --av-warning-line: rgba(255, 208, 113, .48);
+  --av-danger-soft: rgba(255, 149, 134, .13);
+  --av-danger-line: rgba(255, 149, 134, .50);
+  --av-grid: rgba(255, 255, 255, .035);
+  --av-overlay: rgba(0, 0, 0, .80);
+  --av-shadow: 0 18px 58px -30px rgba(0, 0, 0, .95);
+  --av-shadow-pop: 0 30px 88px -24px rgba(0, 0, 0, .98);
 }
 
 /* Legacy aliases let the existing tools keep their layout and behavior while

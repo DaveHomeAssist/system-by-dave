@@ -19,12 +19,12 @@ export function App() {
   const ws = useConsoleWorkspace(pack.views, pack.library, pack.layout);
   workspace.current = ws;
   const [theme, setTheme] = useState(document.documentElement.dataset.avTheme || 'dark');
-  const darkTheme = theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+  const darkTheme = theme === 'dark' || theme === 'black' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
   const [clock, setClock] = useState(new Date().toLocaleTimeString());
   useEffect(() => {
     const timer = setInterval(() => setClock(new Date().toLocaleTimeString()), 1000);
     const resize = () => { setCompact(window.innerHeight < 500); controls.current?.close(); };
-    const receiveTheme = (event: StorageEvent) => { if (event.key === 'av-theme-mode.v1' && ['light', 'dark', 'system'].includes(event.newValue || '')) setTheme(event.newValue!); };
+    const receiveTheme = (event: StorageEvent) => { if (event.key === 'av-theme-mode.v1' && ['light', 'dark', 'white', 'black', 'system'].includes(event.newValue || '')) setTheme(event.newValue!); };
     window.addEventListener('resize', resize); window.addEventListener('storage', receiveTheme);
     return () => { clearInterval(timer); window.removeEventListener('resize', resize); window.removeEventListener('storage', receiveTheme); };
   }, []);
