@@ -90,8 +90,8 @@ metadata, and title families are release-gated by the public content contract.
 
 AV by Dave is one console. The shell at `/av/` (`apps/av-suite/`, built into
 `av/`) opens on an empty Workspace view; the Rail recalls each application's
-views in place, the chooser lists every application's panels, and the
-specialist tools open as chrome-less panels (`?sbdEmbed=panel`). On
+views in place, the chooser lists every department's individual native panels,
+and specialist tools retain standalone links rather than whole-app tiles. On
 avbydave.com the shell is also the home page (`scripts/domain-sites.json`
 `landingPage`). `av-suite.html` (the former Toolbox and Show Console doorway),
 the two landing pages and the 34 legacy sheet pages are noindex redirect stubs
@@ -103,8 +103,8 @@ explicit Save. See `docs/av-suite-shell.md`. `js/av-theme-mode.js` and
 `js/av-theme.js` apply the operator's Warm Paper, Stage Slate, or System choice.
 
 The [AV Suite shell brief](docs/av-suite-shell.md) (2026-10-13) is the current
-direction: one `/av/` console, every application as a panel pack, specialists
-as chrome-less panels, the legacy sheet pages retired. Do not start further
+direction, amended October 14: one `/av/` console, nine native department packs,
+no whole-app tiles, standalone specialist links, and legacy sheet pages retired. Do not start further
 per-family console conversions outside that brief. The earlier
 [consolidation plan](docs/av-suite-consolidation-spec.md) set the
 previous direction: Toolbox as default, focused applications with optional
