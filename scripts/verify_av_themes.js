@@ -39,7 +39,8 @@ const routes = [
 const themeCss = read('css/av-theme.css');
 [
   '--av-bg', '--av-surface', '--av-text', '--av-accent', '--av-focus',
-  '--av-success', '--av-warning', '--av-danger', 'prefers-color-scheme: dark'
+  '--av-success', '--av-warning', '--av-danger', 'prefers-color-scheme: dark',
+  'html[data-av-theme="white"]', 'html[data-av-theme="black"]'
 ].forEach((token) => {
   if (!themeCss.includes(token)) fail(`css/av-theme.css is missing ${token}.`);
 });

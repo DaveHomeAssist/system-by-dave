@@ -73,6 +73,33 @@ try {
   assert.equal(await page.locator('iframe').count(), 0, 'no application iframes on the empty view');
   assert.equal(await storage('sbd.avSuite.workspace.v1'), null, 'opening the shell writes no views');
 
+  // Workspace focus is a device preference, not part of saved panel geometry.
+  await button('Focus').click();
+  assert.equal(await page.locator('html').getAttribute('data-av-focus'), 'true');
+  assert.equal(await storage('sbd.avSuite.focus.v1'), 'true');
+  assert.equal(await page.locator('.shell-nav').isVisible(), false, 'focus hides the public breadcrumb');
+  assert.ok((await page.locator('.suite-header').boundingBox()).height <= 45, 'focus compacts the application header');
+  assert.ok((await page.locator('.sbd-rail').boundingBox()).width <= 57, 'focus collapses the desktop Rail to icons');
+  assert.equal(await storage('sbd.avSuite.workspace.v1'), null, 'focus leaves saved views untouched');
+  await page.reload();
+  await button('Exit focus').waitFor();
+  assert.equal(await page.locator('html').getAttribute('data-av-focus'), 'true', 'focus preference survives reload');
+  await button('Exit focus').click();
+  assert.equal(await page.locator('.shell-nav').isVisible(), true);
+
+  // Four named palettes remain separate from the Follow System behavior.
+  const palette = page.getByLabel('Palette');
+  for (const value of ['light', 'dark', 'white', 'black']) {
+    await palette.selectOption(value);
+    assert.equal(await page.locator('html').getAttribute('data-av-theme'), value);
+    assert.equal(await storage('av-theme-mode.v1'), value);
+  }
+  await page.getByLabel('Follow system').check();
+  assert.equal(await page.locator('html').getAttribute('data-av-theme'), 'system');
+  assert.equal(await storage('av-theme-mode.v1'), 'system');
+  await page.getByLabel('Follow system').uncheck();
+  assert.notEqual(await page.locator('html').getAttribute('data-av-theme'), 'system');
+
   // 1. Every Rail identity recalls in place: same URL, its own views, one set of controls.
   for (const [ref, label, firstView] of IDENTITIES) {
     await rail(ref).click();
@@ -84,6 +111,10 @@ try {
     assert.equal(await page.getByRole('button', { name: /Add panel/ }).count(), 1, `${label}: one Add panel`);
     assert.equal(await page.locator('.console-panel iframe').count(), 0, `${label} panels are native`);
     assert.ok(await page.locator('.console-panel').count() >= 1, `${label} renders panels`);
+    if (label === 'AV Video') {
+      assert.equal(await page.getByRole('button', { name: 'Zoom in', exact: true }).count(), 1, 'signal flow uses an explicit magnifier zoom-in control');
+      assert.equal(await page.getByRole('button', { name: 'Zoom out', exact: true }).count(), 1, 'signal flow uses an explicit magnifier zoom-out control');
+    }
   }
   await rail('console:av-calculator').click();
   await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'AV Calculator');

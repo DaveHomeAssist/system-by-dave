@@ -5,6 +5,7 @@ export const FORMAT_GROUPS = [
 ];
 export const CONNECTOR_GROUPS = [
   { label: "Digital video", values: ["HDMI", "Mini HDMI", "Micro HDMI", "DisplayPort", "Mini DisplayPort", "USB-C (DisplayPort Alt Mode)", "DVI-D", "DVI-I"] },
+  { label: "Wireless video", values: ["AirPlay"] },
   { label: "SDI · BNC", values: ["SDI", "HD-SDI", "3G SDI", "6G SDI", "12G SDI"] },
   { label: "Analog video", values: ["VGA", "Composite (BNC)", "Composite (RCA)", "Component (BNC)", "S-Video"] },
   { label: "Network / fiber", values: ["Ethernet (RJ45)", "EtherCON", "Fiber (LC)", "Fiber (SC)", "OpticalCON DUO"] },

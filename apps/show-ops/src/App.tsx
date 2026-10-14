@@ -30,12 +30,12 @@ export function App() {
     return () => window.removeEventListener("beforeunload", leave);
   }, [pack.dirty]);
   function themeToggle() {
-    const next = theme === "dark" ? "light" : "dark";
+    const next = theme === "dark" || theme === "black" ? "light" : "dark";
     document.documentElement.dataset.avTheme = next; setTheme(next);
     try { localStorage.setItem("av-theme-mode.v1", next); } catch { /* theme for this visit only */ }
   }
   const [date, ...counts] = pack.summary.split(" · ");
-  const header = <header className="ops-header"><div><small>AV BY DAVE / SHOW OPS</small><h1 id="show-title">{pack.title}</h1><span id="show-date">{date === "No date" ? "Set a date in Document" : date}</span></div><div className="ops-actions"><span id="dirty">{pack.dirty ? "Unsaved edits" : "Saved"}</span><button id="theme" onClick={themeToggle}>{theme === "dark" ? "Light mode" : "Dark mode"}</button><button className="primary" id="save" disabled={pack.blocked} onClick={() => void pack.save()}>Save show</button></div></header>;
+  const header = <header className="ops-header"><div><small>AV BY DAVE / SHOW OPS</small><h1 id="show-title">{pack.title}</h1><span id="show-date">{date === "No date" ? "Set a date in Document" : date}</span></div><div className="ops-actions"><span id="dirty">{pack.dirty ? "Unsaved edits" : "Saved"}</span><button id="theme" onClick={themeToggle}>{theme === "dark" || theme === "black" ? "Light mode" : "Dark mode"}</button><button className="primary" id="save" disabled={pack.blocked} onClick={() => void pack.save()}>Save show</button></div></header>;
   const notice = <footer id="notice" className="ops-status" role="status" aria-live="polite">{pack.status}{pack.recovery.errors.map(error => <span key={error}>{error}</span>)}</footer>;
   const recoveryControls = pack.recovery.offer && <section className="ops-recovery" aria-label="Draft recovery"><p>Unsaved draft available. Check whether the saved show changed since this draft.</p><button onClick={() => void pack.recovery.restore()}>Restore draft</button><button onClick={() => void pack.recovery.discard()}>Discard draft</button></section>;
   return <main id="main" className={`ops-app${compact ? " ops-compact" : ""}`} tabIndex={-1}>
