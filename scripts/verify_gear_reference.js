@@ -174,12 +174,10 @@ function verifyRenderer(registry) {
   ].forEach((contract) => {
     if (!page.includes(contract)) fail(`Gear Reference renderer is missing contract: ${contract}.`);
   });
-  const prep = read('gear-prep.html');
-  if (!prep.includes("fetch('data/gear/index.json'")) fail('Gear Prep does not read the authored reference index.');
-  if (!prep.includes('id="gearReferenceLink"')) fail('Gear Prep inspector has no Gear Reference link.');
+  // Gear Prep retired into The Shop panels on 2026-10-13 (docs/av-suite-shell.md); its stub redirects there.
   if (!sitemapFor('gear-reference.html').includes(`${originFor('gear-reference.html')}/gear-reference.html`)) fail('Sitemap does not include Gear Reference.');
-  const toolCount = registry.tools.length;
-  if (!read('index.html').includes(`>${toolCount}</div>`) || !read('tools.html').includes(`${toolCount} operator tools`)) {
+  const toolCount = registry.tools.filter((tool) => !tool.retired).length;
+  if (!read('index.html').includes(`>${toolCount}</div>`) || !read('tools.html').includes(`hosts ${toolCount} applications and tools`)) {
     fail(`Public AV tool count does not match the registry's ${toolCount} browser tools.`);
   }
 }

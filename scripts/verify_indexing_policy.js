@@ -56,7 +56,7 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-// 147 includes the AV by Dave landing source and noindex alternative, Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
+// 146 includes the AV by Dave landing source and noindex alternative, Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
 // /fmp/gear/, /fmp/build/ and /fmp/ptz/ pages that replaced Notion links on 2026-09-18,
 // plus the four additional equipment explorers published on 2026-09-20, and the noindex
 // FMP Camera Simulator (its page, standalone offline copy and app source) from 2026-09-23,
@@ -69,7 +69,11 @@ const robots = read('robots.txt');
 // Show Ops and Show Control add their nonpublic application source pages.
 // The Shop native source entry adds one non-published application template.
 // Infrastructure adds its non-published native source template.
-if (unlisted.length !== 150) fail(`Expected 150 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// Front Office adds one non-published native source template; its public route is unchanged.
+// The AV Suite shell adds its non-published source template under apps/av-suite/. From
+// 2026-10-13 its av/ route is the noindex source of the avbydave.com home page, and the 34
+// retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md).
+if (unlisted.length !== 187) fail(`Expected 187 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   if (!sitemapRoutes.has(route)) {
@@ -137,7 +141,7 @@ hatFiles.forEach((file) => {
 });
 
 [
-  ['av-workbook.html', 'https://avbydave.com/av-suite.html'],
+  ['av-workbook.html', 'https://avbydave.com/'],
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],

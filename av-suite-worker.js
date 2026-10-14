@@ -8,7 +8,7 @@
    cached application code. */
 importScripts('./js/sbd-registry.js');
 
-// AV by Dave console facelift: refresh the shared chrome CSS, tool brand marks and Gear Reference fixes.
+// Audio Patch status: refresh the independent working control alongside the suite host.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();
@@ -40,16 +40,15 @@ function cachedResponse(cache,request){
   });
 }
 
+/* The console shell and its runtime must install for the suite to work offline
+   (docs/av-suite-shell.md); everything else is cached as it can be. */
 var CRITICAL_ASSETS=[
-  './av-suite-landing2.html',
-  './css/av-landing-alt.css',
-  './js/av-landing-alt.js',
-  './av-suite.html',
-  './css/av-suite.css',
-  './js/av-suite/theme-bootstrap.js',
-  './js/av-suite/modal-controller.js',
-  './js/av-suite/app.js',
+  './av/index.html',
+  './av/assets/av-suite.js',
+  './av/assets/av-suite.css',
   './js/sbd-registry.js',
+  './js/av-theme-mode.js',
+  './js/av-offline.js',
   './css/sbd-public-nav.css',
   './css/av-theme.css',
   './js/vendor/gsap.min.js',

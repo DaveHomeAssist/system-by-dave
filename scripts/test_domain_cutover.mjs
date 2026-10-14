@@ -46,7 +46,7 @@ async function serve(directory) {
 let source = 'https://systembydave.com';
 const sites = [
   { id: 'housevideo', origin: 'https://housevideo.app', route: '/fmp/', key: 'fmp.cutover.acceptance', database: 'fmpPhotosV1' },
-  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av-suite.html', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' },
+  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av/', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' },
   // The preshow walk is its own origin. It claims the same fmp prefix and photo
   // database as the hub, so its acceptance key is distinct to keep the two apart.
   { id: 'housevideo-walk', origin: 'https://walk.housevideo.app', route: '/fmpwalk/', key: 'fmp.walk-cutover.acceptance', database: 'fmpPhotosV1' }
@@ -264,7 +264,7 @@ try {
         await context.setOffline(true);
         await page.reload();
         assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
-        assert.match(await page.locator('body').innerText(), /AV Suite/i, 'AV Suite page rendered');
+        assert.ok((await page.locator('body').innerText()).includes('AV by Dave'));
       }
     });
 
@@ -440,7 +440,7 @@ try {
     await page.locator('#backupFile').setInputFiles(backup);
     await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
     assert.deepEqual(await readValues(page), expected);
-    assert.equal(avStorageKeys.length, 77);
+    assert.equal(avStorageKeys.length, 83);
     assert.ok(['sbd.infrastructure.draft.v1', 'sbd.infrastructure.layout.v1'].every(key => avStorageKeys.includes(key)), 'Infrastructure drafts and layout travel with its plan');
     assert.ok(['sbd.shop.draft.v1', 'sbd.shop.layout.v1'].every(key => avStorageKeys.includes(key)), 'Shop drafts and layout travel with its plan');
     assert.ok(avStorageKeys.includes('sbd.showControl.draft.v1'));
@@ -460,14 +460,15 @@ try {
     assert.ok(['sbd.showOps.draft.v1', 'sbd.showOps.layout.v1'].every(key => avStorageKeys.includes(key)), 'Show Ops drafts and layout travel with its document');
   });
 
-  await test('Withdrawn Workbook aliases open Toolbox without touching saved records', async (page, context) => {
+  await test('Withdrawn Workbook aliases open the AV by Dave console without touching saved records', async (page, context) => {
     const site = sites.find(entry => entry.id === 'avbydave');
     for (const origin of [source, site.origin]) {
       await seedWorkbook(page, origin);
       for (const route of ['/av-workbook/', '/av-workbook/index.html', '/av-workbook.html']) {
         await page.goto(origin + route + '?sbdShow=Do%20not%20attach');
-        await page.waitForURL(site.origin + '/av-suite.html?entry=toolbox');
-        assert.equal(await page.locator('#avApp').getAttribute('data-entry'), 'toolbox');
+        await page.waitForURL(site.origin + '/av/');
+        await page.locator('.suite-header h1').waitFor();
+        assert.equal(await page.locator('.suite-header h1').textContent(), 'AV by Dave');
         assert.equal(await page.locator('a[href*=av-workbook]').count(), 0);
         const savedPage = await context.newPage();
         await savedPage.goto(origin + '/index.html');
@@ -620,10 +621,11 @@ try {
     page.setDefaultNavigationTimeout(20000);
     page.setDefaultTimeout(20000);
     const site = sites[1];
-    await page.goto(site.origin + '/av-suite.html');
+    await page.goto(site.origin + '/av/');
     await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
     const manifest = await page.evaluate(async () => {
-      const expected = SBD_REGISTRY.offlineAssets().map(asset => new URL(asset, location.href).pathname);
+      // The console lives under /av/; offline assets are relative to the worker scope at the origin root.
+      const expected = SBD_REGISTRY.offlineAssets().map(asset => new URL(asset, location.origin + '/').pathname);
       const names = (await caches.keys()).filter(name => name.startsWith('sbd-av-suite-'));
       const entries = (await Promise.all(names.map(async name => (await (await caches.open(name)).keys()).map(request => new URL(request.url).pathname)))).flat();
       return { expected, entries };
@@ -693,11 +695,12 @@ try {
       await returning;
       assert.equal(await page.evaluate(() => window.acceptanceInitiallyControlled), false, 'The regression must actually start without a controller');
       await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
-      await page.locator('#offlineSummary .offline-pill').filter({ hasText: 'Worker' }).getByText('Ready', { exact: true }).waitFor({ state: 'attached' });
+      // The console reports readiness through js/av-offline.js once the worker controls it and its assets are cached.
+      await page.waitForFunction(() => document.documentElement.dataset.workspaceOffline === 'ready', null, { timeout: 60000, polling: 250 });
       await context.setOffline(true);
       await page.reload();
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'keep during activation');
-      assert.match(await page.locator('body').innerText(), /AV Suite/i, 'AV Suite page rendered');
+      assert.ok((await page.locator('body').innerText()).includes('AV by Dave'));
     } finally {
       responseHooks.delete(directory);
       releaseCache?.(); releaseNavigation?.();

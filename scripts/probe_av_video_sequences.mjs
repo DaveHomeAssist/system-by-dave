@@ -153,7 +153,7 @@ try {
   console.log('PASS hidden modules, keyboard and responsive themes');
   await page.setViewportSize({ width: 1440, height: 900 }); await save();
   const full = await saved(); await importFile(JSON.stringify(full), 'Replace with backup'); await save(); assert.deepEqual(await saved(), full);
-  await page.goto(`${BASE}/av-suite.html`);
+  await page.goto(`${BASE}/av/`);
   await page.evaluate(() => Promise.race([navigator.serviceWorker.ready, new Promise((_, reject) => setTimeout(() => reject(new Error('Offline registration timed out')), 30000))]));
   await page.goto(url);
   await page.waitForFunction(() => navigator.serviceWorker.controller);

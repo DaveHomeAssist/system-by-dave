@@ -546,32 +546,8 @@ async function main() {
     assert(state.cueSheetHref === 'cue-sheet.html', 'CueForge boundary does not provide an explicit Cue Sheet link.');
     await captureScreenshot('cueforge-product-boundary');
 
-    await evaluate(`(() => {
-      localStorage.setItem('av-suite-dashboard.v1', JSON.stringify({
-        schema:'system-by-dave.av-suite.v1',
-        favorites:['cueforge'],
-        recent:['cueforge'],
-        readiness:{cueforge:'issue'},
-        toolNotes:{cueforge:'Migrated browser tool note'},
-        commandRecent:['tool:cueforge'],
-        filters:{search:'',phase:'all',dept:'all',pin:'all'}
-      }));
-    })()`);
-    await cdp('Page.navigate', { url: new URL('av-suite.html', baseUrl).href });
-    await delay(900);
-    await evaluate(`document.querySelector('[data-fam-select="runofshow"]')?.click()`);
-    await delay(300);
-    state = await evaluate(`(() => ({
-      cueSheetVisible: document.body.innerText.includes('Cue Sheet'),
-      legacyNameVisible: document.body.innerText.includes('CueForge'),
-      pinTitle: document.querySelector('[data-pin="cue-sheet"]')?.getAttribute('title') || '',
-      readiness: document.querySelector('[data-readiness="cue-sheet"]')?.value || '',
-      note: document.querySelector('[data-note="cue-sheet"]')?.value || ''
-    }))()`);
-    assert(state.cueSheetVisible && !state.legacyNameVisible, 'AV Suite did not render Cue Sheet under its correct name.');
-    assert(state.pinTitle === 'Unpin Cue Sheet', `Legacy cueforge favorite did not migrate to Cue Sheet: ${JSON.stringify(state)}.`);
-    assert(state.readiness === 'issue', `Legacy cueforge readiness did not migrate to Cue Sheet: ${JSON.stringify(state)}.`);
-    assert(state.note === 'Migrated browser tool note', `Legacy cueforge note did not migrate to Cue Sheet: ${JSON.stringify(state)}.`);
+    // The Toolbox pin migration for legacy 'cueforge' ids retired with the Toolbox (2026-10-13);
+    // the registry alias is covered by scripts/verify_av_suite.js.
 
     if (runtimeExceptions.length) {
       runtimeExceptions.forEach((error) => failures.push(`Runtime exception: ${error}`));

@@ -17,7 +17,7 @@ and the browser storage its tools own. AV by Dave pages come from
 avbydave.com without editing the config. Paths are unchanged on the new domains:
 `systembydave.com/fmp/house/` is `housevideo.app/fmp/house/`. The bare domain
 redirects to the site's home (`/fmp/` or `/fmpwalk/`). AV by Dave serves the
-source-controlled `av-suite-landing2.html` at `/`; the direct source path is
+source-controlled `av/index.html` at `/`; the direct source path is
 noindex and canonical to `/`. It keeps direct Show Console and Toolbox routes
 and is cached with the AV shell for offline return visits. The previous
 `av-suite-landing.html` was retired (UX-005): it is now a noindex redirect to
@@ -80,8 +80,8 @@ Each staged site gets its own `index.html` (home page or redirect), `404.html`,
 `robots.txt`, `CNAME`, `source.json` (source commit and artifact digest) and
 `transfer.html`.
 
-AV by Dave's generated `404.html` uses the landing's dark style and offers the AV
-Toolbox and the home page; the FMP sites keep the plain page. The stager never
+AV by Dave's generated `404.html` uses shared AV branding and offers the AV
+console and the home page; the FMP sites keep the plain page. The stager never
 publishes development files that sit beside tools: browser probes (`probe.*`,
 `*-probe.*`), unit tests (`*.test.*`), `README.md`, `CHANGELOG.md` and anything
 under `node_modules/`. Vendored third-party code keeps its notices. AV by Dave

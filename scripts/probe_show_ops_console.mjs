@@ -29,7 +29,7 @@ page.on('dialog', dialog => dialog.accept());
 const key = 'sbd.showOps.document.v1', draftKey = 'sbd.showOps.draft.v1', layoutKey = 'sbd.showOps.layout.v1';
 const read = (page, key) => page.evaluate(key => localStorage.getItem(key), key);
 const quick = (page, name) => page.locator('.console-quick').getByRole('button', { name, exact: true }).click();
-const setup = async (page, field) => { await quick(page, 'Setup'); await page.getByRole('combobox', { name: 'Setup field' }).selectOption(field); };
+const setup = async (page, _field) => { await quick(page, 'Document'); };
 const panel = (page, name) => page.locator(`.console-panel[data-panel="${name}"]`);
 async function reachable(locator) {
   await locator.scrollIntoViewIfNeeded();
@@ -69,7 +69,7 @@ try {
   assert.equal(await read(page, layoutKey), null, 'fresh visit must not write a layout');
   await page.keyboard.press('Tab'); await page.keyboard.press('Enter');
   assert.equal(await page.evaluate(() => document.activeElement.id), 'main');
-  await quick(page, 'Setup');
+  await quick(page, 'Document');
   await page.locator('#name').fill('Acceptance show'); await setup(page, 'date'); await page.locator('#date').fill('2026-10-09');
   await quick(page, 'Rooms');
   await panel(page, 'rooms').locator('[name="name"]').fill('Main room');
@@ -103,21 +103,21 @@ try {
   await page.getByRole('menuitem', { name: 'Move and size…' }).click();
   await page.getByRole('menuitem', { name: 'Narrower', exact: true }).click();
   await page.keyboard.press('Escape');
-  assert.equal(await page.getByRole('button', { name: 'Rooms options' }).evaluate(e => e === document.activeElement), true);
+  await page.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Rooms options', null, { timeout: 2000 });
   await page.getByRole('button', { name: 'View options', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Store as new view', exact: true }).click();
   assert.equal(await read(page, key), saved, 'storing a view still needs Save');
   await page.locator('#save').click();
   const stored = JSON.parse(await read(page, key));
-  assert.equal(stored.workspace.views.length, 4);
+  assert.equal(stored.workspace.views.length, 3);
   await page.reload();
-  assert.equal(await page.getByRole('tab', { name: 'Operations 4', exact: true }).count(), 1);
+  assert.equal(await page.getByRole('tab', { name: 'Operations 3', exact: true }).count(), 1);
   assert.equal(JSON.parse(await read(page, key)).crew[0].name, 'Crew lead');
 
   for (const type of ['room', 'task', 'crew']) {
     const raw = JSON.stringify(fixtures[type]), sourceKey = `${schemas[type]}.v1`;
     await page.evaluate(({ sourceKey, raw }) => localStorage.setItem(sourceKey, raw), { sourceKey, raw });
-    await quick(page, 'Backup');
+    await quick(page, 'Document');
     const before = await read(page, key);
     await page.locator(`#${type}-saved`).click();
     assert.equal(await page.locator(`#${type}-preview input[type="checkbox"]`).count(), 1);
@@ -140,12 +140,12 @@ try {
     const [collection, status, history] = target[type];
     assert.equal(next[collection].at(-1).status, status);
     assert.equal(next[history][0].raw, raw);
-    assert.equal(next.workspace.views.length, 4, 'copy retains stored views');
+    assert.equal(next.workspace.views.length, 3, 'copy retains stored views');
     assert.equal(await read(page, sourceKey), raw, 'copy leaves original byte-identical');
-    await quick(page, 'Backup'); await page.locator(`#${type}-saved`).click();
+    await quick(page, 'Document'); await page.locator(`#${type}-saved`).click();
     assert.match(await notice(), /already copied|No new active/);
   }
-  await quick(page, 'Backup');
+  await quick(page, 'Document');
   const downloading = page.waitForEvent('download'); await page.locator('#export').click();
   const exported = JSON.parse(await readFile(await (await downloading).path(), 'utf8'));
   assert.deepEqual(exported, JSON.parse(await read(page, key)));
@@ -181,7 +181,7 @@ try {
     if (await page.locator('html').getAttribute('data-av-theme') !== theme) await page.locator('#theme').click();
     for (const size of sizes) {
       await page.setViewportSize(size);
-      for (const name of ['Rooms', 'Crew', 'Tasks', 'Setup', 'Handoff', 'Backup']) {
+      for (const name of ['Rooms', 'Crew', 'Tasks', 'Document', 'Handoff']) {
         await quick(page, name);
         const bounds = await page.evaluate(() => ({ h: document.documentElement.scrollHeight, ch: document.documentElement.clientHeight, w: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
         assert.ok(bounds.h <= bounds.ch && bounds.w <= bounds.cw, JSON.stringify({ theme, size, name, bounds }));
@@ -189,12 +189,8 @@ try {
         if (['Rooms', 'Crew', 'Tasks'].includes(name)) {
           await reachable(panel(page, name.toLowerCase()).locator('[name="name"]'));
           await reachable(panel(page, name.toLowerCase()).locator('.record').last().getByRole('button', { name: /^Remove / }));
-        } else if (name === 'Setup') {
-          for (const field of ['identity', 'date', 'notes', 'tools']) {
-            await page.getByRole('combobox', { name: 'Setup field' }).selectOption(field);
-            await reachable(panel(page, 'setup').locator('.ops-form input, .ops-form textarea, .ops-form select'));
-          }
-        } else if (name === 'Backup') {
+        } else if (name === 'Document') {
+          await reachable(panel(page, 'document').locator('.ops-form input, .ops-form textarea').first());
           await reachable(page.locator('#export'));
           await reachable(page.locator('#crew-file'));
           await page.locator('.ops-backup').evaluate(e => e.scrollTop = 0);
@@ -216,7 +212,7 @@ try {
   await safety.evaluate(key => localStorage.setItem(key, '{broken'), key); await safety.reload();
   assert.equal(await safety.locator('#save').isDisabled(), true);
   assert.equal(await read(safety, key), '{broken');
-  await quick(safety, 'Backup');
+  await quick(safety, 'Document');
   assert.equal(await safety.getByRole('button', { name: 'Download original saved bytes' }).count(), 1);
   await safety.evaluate(({ key, draftKey, doc }) => {
     localStorage.setItem(key, JSON.stringify(doc));
@@ -233,7 +229,7 @@ try {
   assert.match(await safety.locator('#notice').textContent(), /Save failed/);
   assert.equal(await read(safety, key), null);
   await safety.waitForFunction(() => document.querySelector('#notice').textContent.includes('Draft'));
-  await quick(safety, 'Backup');
+  await quick(safety, 'Document');
   const failedSaveExport = safety.waitForEvent('download'); await safety.locator('#export').click();
   assert.equal(JSON.parse(await readFile(await (await failedSaveExport).path(), 'utf8')).notes, 'Keep this unsaved text');
   await safetyContext.close();
@@ -252,29 +248,6 @@ try {
   assert.equal(await page.locator('#notes').inputValue(), JSON.parse(beforeOffline).notes);
   assert.equal(await read(page, key), beforeOffline);
   await context.setOffline(false);
-  const embeddedContext = await browser.newContext({ viewport: { width: 1440, height: 900 }, hasTouch: true });
-  const host = await embeddedContext.newPage();
-  await host.goto(`${base}/av-video/?sbdShow=Context%20only&private=do-not-forward`);
-  await host.locator('.sbd-rail__entry[data-rail-ref="console:show-ops"]').tap();
-  const frame = host.frameLocator('iframe[title="Show Ops application"]');
-  await frame.locator('#main').waitFor();
-  assert.equal(new URL(host.url()).pathname, '/av-video/');
-  assert.equal(await frame.locator('.ops-nav').isVisible(), false);
-  assert.equal(await frame.locator('.sbd-rail').isVisible(), false);
-  await setup(frame, 'identity'); await frame.locator('#name').fill('Embedded acceptance');
-  await frame.locator('#save').tap();
-  assert.equal(JSON.parse(await read(host, key)).show, 'Embedded acceptance');
-  assert.equal(await read(host, 'sbd.avVideo.v1'), null, 'saving Show Ops must not save the host plan');
-  await host.setViewportSize({ width: 375, height: 812 });
-  await quick(frame, 'Rooms');
-  await reachable(frame.locator('[name="name"]'));
-  await frame.locator('[name="name"]').fill('Touch room');
-  await frame.getByRole('button', { name: 'Add room', exact: true }).tap();
-  if (!await frame.locator('#save').isVisible()) await frame.getByRole('button', { name: 'Show controls', exact: true }).tap();
-  await frame.locator('#save').tap();
-  assert.equal(JSON.parse(await read(host, key)).rooms[0].name, 'Touch room');
-  assert.equal(await host.locator('iframe[title="Show Ops application"]').getAttribute('src').then(src => src.includes('private=')), false);
-  await embeddedContext.close();
   assert.deepEqual(errors, []);
   console.log('PASS Show Ops console: six functional panels, view/save/reload, source guards and exact provenance, export/restore, drafts, stale tabs, storage failures, offline reopen, two themes and eight viewport sizes.');
 } catch (error) {

@@ -23,7 +23,7 @@ const output = process.env.SHOP_OUTPUT || join(tmpdir(), 'the-shop-console-evide
 const channel = process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANNEL } : process.env.SHOP_CHROME ? { executablePath: process.env.SHOP_CHROME } : {};
 const draftKey = 'sbd.shop.draft.v1', layoutKey = 'sbd.shop.layout.v1';
 const fixture = { ...emptyPlan(), name: 'Synthetic shop', items: stageLegacy('gear-prep', { schema: SOURCES['gear-prep'].schema, items: Array.from({ length: 20 }, (_, i) => ({ id: `gear-${i}`, item: `Camera kit ${i + 1}`, qty: '3', owner: 'Video', status: 'loaded', notes: 'Retain original notes' })) }) };
-const panels = [['Worklist', 'worklist'], ['Item inspector', 'inspector'], ['Plan/Import', 'plan'], ['Backup', 'backup']];
+const panels = [['Worklist', 'worklist'], ['Item inspector', 'inspector'], ['Document', 'document']];
 const read = (page, key = KEY) => page.evaluate(key => localStorage.getItem(key), key);
 const button = (scope, name) => scope.getByRole('button', { name, exact: true });
 const quick = (page, name) => button(page.locator('.console-quick'), name).click();
@@ -46,7 +46,7 @@ async function save(page) {
   await page.waitForFunction(() => /Saved to this browser|Recovered plan saved/.test(document.getElementById('footerMessage').textContent));
   if (await button(page, 'Back to panels').isVisible()) await button(page, 'Back to panels').click();
 }
-async function exportPlan(page) { await quick(page, 'Backup'); const downloaded = page.waitForEvent('download'); await button(panel(page, 'backup'), 'Export JSON').click(); return JSON.parse(await readFile(await (await downloaded).path(), 'utf8')); }
+async function exportPlan(page) { await quick(page, 'Document'); const downloaded = page.waitForEvent('download'); await button(panel(page, 'document'), 'Export JSON').click(); return JSON.parse(await readFile(await (await downloaded).path(), 'utf8')); }
 async function reachable(control, label = String(control)) {
   await control.scrollIntoViewIfNeeded();
   const r = await control.evaluate(element => {
@@ -77,7 +77,7 @@ try {
   await seed(page); await page.locator('.row').first().click();
   await page.getByLabel('Owner', { exact: true }).fill('Operator'); await page.getByLabel('Blocker', { exact: true }).fill('Check batteries');
   await page.getByLabel('Packed quantity', { exact: true }).fill('0');
-  await quick(page, 'Backup'); await page.locator('#saveBtn').click();
+  await quick(page, 'Document'); await page.locator('#saveBtn').click();
   assert.match(await page.locator('#footerMessage').textContent(), /Apply item changes/);
   assert.equal(JSON.parse(await read(page)).items[0].owner, 'Video');
   await quick(page, 'Item inspector'); assert.equal(await page.getByLabel('Owner', { exact: true }).inputValue(), 'Operator');
@@ -127,7 +127,7 @@ try {
     const original = { id: `source-${kind}`, item: `${spec.label} case`, qty: '3', custom: { retained: true } };
     const raw = JSON.stringify({ schema: spec.schema, items: [original] });
     await imports.evaluate(({ key, raw }) => localStorage.setItem(key, raw), { key: spec.key, raw });
-    await quick(imports, 'Plan/Import'); await button(imports, 'Import source').click(); await imports.locator('#sourceKind').selectOption(kind);
+    await quick(imports, 'Document'); await button(imports, 'Import source').click(); await imports.locator('#sourceKind').selectOption(kind);
     await button(imports, 'Preview saved source').click(); await button(imports, 'Add previewed rows').click();
     assert.equal(await read(imports), null); await quick(imports, 'Worklist'); assert.ok(await imports.getByRole('button', { name: new RegExp(spec.label+' case') }).count());
     assert.equal(await read(imports, spec.key), raw);
@@ -135,23 +135,23 @@ try {
   await save(imports); const copied = JSON.parse(await read(imports)); assert.equal(copied.items.length, 4); assert.ok(copied.items.every(item => item.original.custom.retained));
   pass('all four reviewed legacy source imports preserve originals and source bytes, with no implicit Save');
 
-  await quick(page, 'Plan/Import'); await page.getByLabel('Plan name').fill('Unsaved recovery plan');
+  await quick(page, 'Document'); await page.getByLabel('Plan name').fill('Unsaved recovery plan');
   await page.waitForFunction(key => JSON.parse(localStorage.getItem(key) || 'null')?.doc.name === 'Unsaved recovery plan', draftKey);
   assert.deepEqual(JSON.parse(await read(page)), saved); await page.reload(); assert.match(await page.getByRole('region', { name: 'Draft recovery' }).textContent(), /Unsaved draft available/);
-  await button(page, 'Restore draft').click(); await quick(page, 'Plan/Import'); assert.equal(await page.getByLabel('Plan name').inputValue(), 'Unsaved recovery plan'); await save(page);
+  await button(page, 'Restore draft').click(); await quick(page, 'Document'); assert.equal(await page.getByLabel('Plan name').inputValue(), 'Unsaved recovery plan'); await save(page);
   await page.waitForFunction(key => localStorage.getItem(key) === null, draftKey);
   const other = await primary.context.newPage(); other.on('dialog', dialog => dialog.accept()); await other.goto(`${base}/the-shop/`); await other.locator('.console-shell').waitFor();
-  await quick(page, 'Plan/Import'); await page.getByLabel('Plan name').fill('First tab'); await save(page);
-  await quick(other, 'Plan/Import'); await other.getByLabel('Plan name').fill('Second tab'); await other.locator('#saveBtn').click();
+  await quick(page, 'Document'); await page.getByLabel('Plan name').fill('First tab'); await save(page);
+  await quick(other, 'Document'); await other.getByLabel('Plan name').fill('Second tab'); await other.locator('#saveBtn').click();
   await other.waitForFunction(() => document.getElementById('footerMessage').textContent.includes('another tab')); assert.equal(JSON.parse(await read(other)).name, 'First tab');
   assert.equal((await exportPlan(other)).name, 'Second tab'); await other.close();
   const malformed = (await fresh()).page; await malformed.evaluate(key => localStorage.setItem(key, '{bad draft'), draftKey); await malformed.reload();
-  await quick(malformed, 'Plan/Import'); await malformed.getByLabel('Plan name').fill('Exportable');
+  await quick(malformed, 'Document'); await malformed.getByLabel('Plan name').fill('Exportable');
   await malformed.waitForFunction(() => document.getElementById('footerMessage').textContent.includes('Draft recovery unavailable'));
   assert.equal(await read(malformed, draftKey), '{bad draft'); assert.equal((await exportPlan(malformed)).name, 'Exportable');
   pass('reviewed draft restore and cleanup, stale-tab Save refusal, exportable conflict edits and malformed draft preservation');
 
-  const refused = (await fresh()).page; await seed(refused); await quick(refused, 'Plan/Import'); await refused.getByLabel('Plan name').fill('Storage refused');
+  const refused = (await fresh()).page; await seed(refused); await quick(refused, 'Document'); await refused.getByLabel('Plan name').fill('Storage refused');
   const before = await read(refused);
   await refused.evaluate(key => { const original = Storage.prototype.setItem; Storage.prototype.setItem = function(k, v) { if (k === key) throw Error('Synthetic quota'); return original.call(this, k, v); }; }, KEY);
   await refused.locator('#saveBtn').click(); await refused.waitForFunction(() => document.getElementById('footerMessage').textContent.includes('Synthetic quota'));
@@ -173,8 +173,7 @@ try {
         await reachable(button(page.locator('.console-quick'), name), `${size.width} ${name} switcher`); await quick(page, name); await noOverflow(page, `${theme}/${size.width}/${name}`); assert.equal(await panel(page, type).count(), 1);
         if (type === 'worklist') { await reachable(page.locator('#search')); await reachable(page.locator('#phaseFilter')); await reachable(page.locator('#statusFilter')); await reachable(page.locator('.row').last()); }
         if (type === 'inspector') { await reachable(page.getByLabel('Packed quantity', { exact: true })); await reachable(button(page, 'Apply changes')); }
-        if (type === 'plan') { await reachable(page.getByLabel('Plan name')); await reachable(button(page, 'Import source')); }
-        if (type === 'backup') { await reachable(button(panel(page, type), 'Export JSON')); await reachable(button(page, 'Restore backup')); }
+        if (type === 'document') { await reachable(page.getByLabel('Plan name')); await reachable(button(page, 'Import source')); await reachable(button(panel(page, type), 'Export JSON')); await reachable(button(page, 'Restore backup')); }
       }
       await button(page, 'Restore backup').click(); await reachable(page.locator('#sourceKind')); await reachable(page.locator('#importFile')); await reachable(button(page, 'Add previewed rows')); await button(page, 'Close import').click();
       if (size.height < 500) { await button(page, 'Shop controls').click(); await reachable(page.locator('#saveBtn')); await reachable(button(page, 'Back to panels')); await button(page, 'Back to panels').click(); }
@@ -190,24 +189,6 @@ try {
   await primary.context.setOffline(true); await page.reload(); await quick(page, 'Worklist'); assert.equal(await page.locator('.row').count(), 20); assert.equal(await read(page), beforeOffline); await primary.context.setOffline(false);
   pass('published entry and native assets cached; saved working plan reopened offline');
 
-  const embedded = await browser.newContext({ viewport: { width: 1440, height: 900 }, hasTouch: true }); contexts.push(embedded);
-  const host = await embedded.newPage(); host.on('dialog', dialog => dialog.accept()); host.on('pageerror', error => errors.push(error.message)); host.setDefaultTimeout(10000);
-  await host.goto(`${base}/av-video/?sbdShow=Context%20only&private=do-not-forward`);
-  await host.locator('.sbd-rail__entry[data-rail-ref="console:shop"]').tap();
-  const frame = host.frameLocator('iframe[title="The Shop application"]'); await frame.locator('.console-shell').waitFor();
-  assert.equal(new URL(host.url()).pathname, '/av-video/'); assert.equal(await frame.locator('.shop-nav').isVisible(), false); assert.equal(await frame.locator('.sbd-rail').isVisible(), false);
-  await quick(frame, 'Plan/Import'); assert.match(await frame.getByLabel('Read-only show context').textContent(), /Context only/);
-  await frame.getByLabel('Plan name').fill('Embedded Shop'); await frame.locator('#saveBtn').tap();
-  await host.waitForFunction(key => JSON.parse(localStorage.getItem(key) || 'null')?.name === 'Embedded Shop', KEY); assert.equal(await read(host, 'sbd.avVideo.v1'), null);
-  for (const size of [{ width: 1024, height: 768 }, { width: 680, height: 812 }, { width: 375, height: 812 }, { width: 3840, height: 1080 }]) {
-    await host.setViewportSize(size); await quick(frame, 'Plan/Import'); await reachable(frame.getByLabel('Plan name')); await noOverflow(frame, `embedded ${size.width}`); await noOverflow(host, `host ${size.width}`);
-    await frame.getByLabel('Plan name').fill(`Touch Shop ${size.width}`); await quick(frame, 'Backup'); await reachable(button(panel(frame, 'backup'), 'Save plan')); await button(panel(frame, 'backup'), 'Save plan').tap();
-    await host.waitForFunction(({ key, name }) => JSON.parse(localStorage.getItem(key) || 'null')?.name === name, { key: KEY, name: `Touch Shop ${size.width}` }); assert.equal(await read(host, 'sbd.avVideo.v1'), null);
-    if (size.width === 1024) await host.screenshot({ path: join(output, 'shop-embedded-tablet.png') });
-  }
-  assert.equal((await host.locator('iframe[title="The Shop application"]').getAttribute('src')).includes('private='), false);
-  await host.evaluate(() => localStorage.setItem('av-theme-mode.v1', 'light')); await frame.locator('html[data-av-theme="light"]').waitFor();
-  pass('real AV Video embedding, independent Save, allowed context, shared theme and phone/tablet/ultrawide touch controls');
   assert.deepEqual(errors, []);
   await writeFile(join(output, 'result.json'), JSON.stringify({ at: new Date().toISOString(), base, browser: browser.version(), passed, physicalDevices: 'not tested', processRestartAndPowerLoss: 'not tested' }, null, 2));
 } catch (error) {

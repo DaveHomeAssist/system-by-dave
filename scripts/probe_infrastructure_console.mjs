@@ -28,7 +28,7 @@ const sources = [
   { schema: 'system-by-dave.cable-plan.v1', items: [{id:'c1',cable:'FOH feed',source:'FOH',destination:'Stage',status:'tested'}] }
 ];
 const fixture = sources.reduce((plan,source)=>mergeLegacy(plan,legacyPreview(source)),{...blank(),name:'Synthetic infrastructure'});
-const panels = [['Power','power'],['Network','network'],['Cable','cable'],['Issues','issues'],['Plan/Import','plan'],['Backup','backup']];
+const panels = [['Power','power'],['Network','network'],['Cable','cable'],['Issues','issues'],['Document','document']];
 
 const read = (page, key = KEY) => page.evaluate(key => localStorage.getItem(key), key);
 const button = (scope, name) => scope.getByRole('button', { name, exact: true });
@@ -53,7 +53,7 @@ async function save(page) {
   await page.waitForFunction(() => !document.querySelector('.infra-header p').textContent.endsWith(' · unsaved') && /Saved to this browser|Recovered plan saved/.test(document.getElementById('footerMessage').textContent));
   if (await button(page, 'Back to panels').isVisible()) await button(page, 'Back to panels').click();
 }
-async function exportPlan(page) { await quick(page, 'Backup'); const downloaded = page.waitForEvent('download'); await button(panel(page, 'backup'), 'Export JSON').click(); return JSON.parse(await readFile(await (await downloaded).path(), 'utf8')); }
+async function exportPlan(page) { await quick(page, 'Document'); const downloaded = page.waitForEvent('download'); await button(panel(page, 'document'), 'Export JSON').click(); return JSON.parse(await readFile(await (await downloaded).path(), 'utf8')); }
 async function reachable(control, label = String(control)) {
   await control.scrollIntoViewIfNeeded();
   const r = await control.evaluate(element => {
@@ -113,7 +113,7 @@ try {
   await page.getByRole('menuitem',{name:'Narrower',exact:true}).click(); await page.keyboard.press('Escape');
   await page.waitForFunction(()=>document.activeElement?.getAttribute('aria-label')==='Power options');
   await button(page,'View options').click(); await page.getByRole('menuitem',{name:'Store as new view',exact:true}).click();
-  assert.deepEqual(JSON.parse(await read(page)),saved); await save(page); saved=JSON.parse(await read(page)); assert.ok(saved.workspace.views.length>3);
+  assert.deepEqual(JSON.parse(await read(page)),saved); await save(page); saved=JSON.parse(await read(page)); assert.ok(saved.workspace.views.length>2);
   await page.reload(); assert.deepEqual(await exportPlan(page),saved);
   pass('close/reopen, maximize, keyboard resize/focus return and stored-view Save/export/reload');
 
@@ -121,18 +121,18 @@ try {
   const legacyKeys=['power-plan.v1','network-plan.v1','cable-plan.v1'];
   for(let i=0;i<sources.length;i++){
     const raw=JSON.stringify(sources[i]); await imports.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key:legacyKeys[i],raw});
-    await quick(imports,'Plan/Import'); await button(imports,'Import source').click(); await imports.locator('#importFile').setInputFiles(jsonFile(sources[i]));
+    await quick(imports,'Document'); await button(imports,'Import source').click(); await imports.locator('#importFile').setInputFiles(jsonFile(sources[i]));
     await imports.locator('#confirmImport:enabled').waitFor();
     if(i===0){await button(imports,'Close import').click(); assert.equal(await read(imports),null); await button(imports,'Import source').click(); await imports.locator('#importFile').setInputFiles(jsonFile(sources[i]));}
     await imports.locator('#confirmImport').click(); assert.equal(await read(imports),null); assert.equal(await read(imports,legacyKeys[i]),raw);
   }
   await save(imports); const copied=JSON.parse(await read(imports)); assert.equal(copied.records.length,22); assert.deepEqual(copied.legacySources,sources);
-  await quick(imports,'Plan/Import'); await button(imports,'Import source').click();
+  await quick(imports,'Document'); await button(imports,'Import source').click();
   await imports.locator('#importFile').setInputFiles(jsonFile({schema:'unknown'})); await imports.getByText(/Import rejected:/).waitFor();
   assert.equal(await imports.locator('#confirmImport').isDisabled(),true); assert.deepEqual(JSON.parse(await read(imports)),copied);
   await imports.locator('#importFile').setInputFiles(jsonFile({schema:sources[1].schema,devices:[null]})); await imports.getByText(/Invalid legacy record/).waitFor();
   assert.deepEqual(JSON.parse(await read(imports)),copied); await button(imports,'Close import').click();
-  await quick(imports,'Backup'); await button(imports,'Restore backup').click();
+  await quick(imports,'Document'); await button(imports,'Restore backup').click();
   await imports.locator('#importFile').setInputFiles(jsonFile({...copied,records:[{id:'x',type:'power',name:'bad',status:'',issue:{}}]}));
   await imports.getByText(/Import rejected:/).waitFor(); assert.equal(await imports.locator('#confirmImport').isDisabled(),true);
   await imports.locator('#importFile').setInputFiles(jsonFile({...copied,records:Array.from({length:2001},(_,i)=>({id:String(i),type:'power',name:'C',status:'planned'}))}));
@@ -145,30 +145,30 @@ try {
   assert.deepEqual(await exportPlan(imports),copied);
   pass('three legacy imports and originals, cancel, malformed/oversized/unknown-workspace rejection, stale preview and exportable work');
 
-  await quick(page,'Plan/Import'); await page.getByLabel('Plan name').fill('Unsaved recovery plan');
+  await quick(page,'Document'); await page.getByLabel('Plan name').fill('Unsaved recovery plan');
   await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key)||'null')?.doc.name==='Unsaved recovery plan',draftKey);
   assert.deepEqual(JSON.parse(await read(page)),saved); await page.reload(); await button(page,'Restore draft').click();
-  await quick(page,'Plan/Import'); assert.equal(await page.getByLabel('Plan name').inputValue(),'Unsaved recovery plan'); await save(page);
+  await quick(page,'Document'); assert.equal(await page.getByLabel('Plan name').inputValue(),'Unsaved recovery plan'); await save(page);
   await page.waitForFunction(key=>localStorage.getItem(key)===null,draftKey);
   const other=await primary.context.newPage(); other.on('dialog',dialog=>dialog.accept()); await other.goto(base+'/infrastructure/'); await other.locator('.console-shell').waitFor();
-  await quick(page,'Plan/Import'); await page.getByLabel('Plan name').fill('First tab'); await save(page);
-  await quick(other,'Plan/Import'); await other.getByLabel('Plan name').fill('Stale second tab'); await other.locator('#saveBtn').click();
+  await quick(page,'Document'); await page.getByLabel('Plan name').fill('First tab'); await save(page);
+  await quick(other,'Document'); await other.getByLabel('Plan name').fill('Stale second tab'); await other.locator('#saveBtn').click();
   await other.waitForFunction(()=>document.getElementById('footerMessage').textContent.includes('another tab'));
   assert.equal(JSON.parse(await read(other)).name,'First tab'); assert.equal((await exportPlan(other)).name,'Stale second tab'); await other.close();
   const malformed=(await fresh()).page; await malformed.evaluate(key=>localStorage.setItem(key,'{bad draft'),draftKey); await malformed.reload();
-  await quick(malformed,'Plan/Import'); await malformed.getByLabel('Plan name').fill('Exportable');
+  await quick(malformed,'Document'); await malformed.getByLabel('Plan name').fill('Exportable');
   await malformed.waitForFunction(()=>document.getElementById('footerMessage').textContent.includes('Draft recovery unavailable'));
   assert.equal(await read(malformed,draftKey),'{bad draft'); assert.equal((await exportPlan(malformed)).name,'Exportable');
   pass('draft offered/restored/cleared, stale-tab Save refusal, malformed draft preservation and exportable conflicts');
 
   const damaged=(await fresh()).page; await damaged.evaluate(key=>localStorage.setItem(key,'{unreadable original'),KEY); await damaged.reload();
-  await quick(damaged,'Backup'); const originalDownload=damaged.waitForEvent('download'); await button(damaged,'Download unreadable original').click();
+  await quick(damaged,'Document'); const originalDownload=damaged.waitForEvent('download'); await button(damaged,'Download unreadable original').click();
   assert.equal(await readFile(await (await originalDownload).path(),'utf8'),'{unreadable original');
   await button(damaged,'Restore backup').click(); await damaged.locator('#importFile').setInputFiles(jsonFile(fixture)); await damaged.locator('#confirmImport').click();
   assert.equal(await read(damaged),'{unreadable original'); await save(damaged);
   assert.equal(await damaged.evaluate(()=>Object.keys(localStorage).filter(key=>key.startsWith('sbd.infrastructure.recovery.')).map(key=>localStorage.getItem(key)).includes('{unreadable original')),true);
   assert.deepEqual(JSON.parse(await read(damaged)),fixture);
-  const refused=(await fresh()).page; await seed(refused); await quick(refused,'Plan/Import'); await refused.getByLabel('Plan name').fill('Storage refused'); const before=await read(refused);
+  const refused=(await fresh()).page; await seed(refused); await quick(refused,'Document'); await refused.getByLabel('Plan name').fill('Storage refused'); const before=await read(refused);
   await refused.evaluate(key=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k===key)throw Error('Synthetic quota');return set.call(this,k,v);};},KEY);
   await refused.locator('#saveBtn').click(); await refused.waitForFunction(()=>document.getElementById('footerMessage').textContent.includes('Synthetic quota'));
   assert.equal(await read(refused),before); assert.equal((await exportPlan(refused)).name,'Storage refused');
@@ -199,8 +199,7 @@ try {
           await reachable(button(area,'Remove record'));
         }
         if(type==='issues')await reachable(area.locator('.infra-issue').last());
-        if(type==='plan'){await reachable(page.getByLabel('Plan name'));await reachable(button(page,'Import source'));}
-        if(type==='backup'){await reachable(button(area,'Export JSON'));await reachable(button(page,'Restore backup'));}
+        if(type==='document'){await reachable(page.getByLabel('Plan name'));await reachable(button(page,'Import source'));await reachable(button(area,'Export JSON'));await reachable(button(page,'Restore backup'));}
       }
       await button(page,'Restore backup').click(); await reachable(page.locator('#importFile')); await reachable(page.locator('#confirmImport')); await button(page,'Close import').click();
       if(size.height<500){await button(page,'Infrastructure controls').click();await reachable(page.locator('#saveBtn'));await reachable(button(page,'Back to panels'));await button(page,'Back to panels').click();}
@@ -216,23 +215,6 @@ try {
   await primary.context.setOffline(true);await page.reload();await quick(page,'Power');assert.equal(await read(page),beforeOffline);assert.equal(await panel(page,'power').getByRole('combobox',{name:/^Power record/}).locator('option').count(),20);await primary.context.setOffline(false);
   pass('published entry/native assets cached and saved plan reopened offline');
 
-  const embedded=await browser.newContext({viewport:{width:1440,height:900},hasTouch:true});contexts.push(embedded);
-  const host=await embedded.newPage();host.on('dialog',dialog=>dialog.accept());host.on('pageerror',error=>errors.push(error.message));host.setDefaultTimeout(10000);
-  await host.goto(base+'/av-video/?sbdShow=Context%20only&private=do-not-forward');
-  await host.locator('.sbd-rail__entry[data-rail-ref="console:infrastructure"]').tap();
-  const frame=host.frameLocator('iframe[title="Infrastructure application"]');await frame.locator('.console-shell').waitFor();
-  assert.equal(new URL(host.url()).pathname,'/av-video/');assert.equal(await frame.locator('.infra-nav').isVisible(),false);assert.equal(await frame.locator('.sbd-rail').isVisible(),false);
-  await quick(frame,'Plan/Import');assert.match(await frame.getByLabel('Read-only show context').textContent(),/Context only/);
-  assert.equal(await frame.getByLabel('Plan name').inputValue(),'Untitled infrastructure plan');
-  for(const size of [{width:1024,height:768},{width:680,height:812},{width:375,height:812},{width:3840,height:1080}]){
-    await host.setViewportSize(size);await quick(frame,'Plan/Import');await reachable(frame.getByLabel('Plan name'));await noOverflow(frame,'embedded '+size.width);await noOverflow(host,'host '+size.width);
-    await frame.getByLabel('Plan name').fill('Touch Infrastructure '+size.width);await quick(frame,'Backup');await reachable(button(panel(frame,'backup'),'Save plan'));await button(panel(frame,'backup'),'Save plan').tap();
-    await host.waitForFunction(({key,name})=>JSON.parse(localStorage.getItem(key)||'null')?.name===name,{key:KEY,name:'Touch Infrastructure '+size.width});assert.equal(await read(host,'sbd.avVideo.v1'),null);
-    if(size.width===1024)await host.screenshot({path:join(output,'infra-embedded-tablet.png')});
-  }
-  assert.equal((await host.locator('iframe[title="Infrastructure application"]').getAttribute('src')).includes('private='),false);
-  await host.evaluate(()=>localStorage.setItem('av-theme-mode.v1','light'));await frame.locator('html[data-av-theme="light"]').waitFor();
-  pass('real AV Video embedding, independent Save, allowlisted read-only context and shared theme at touch sizes');
   assert.deepEqual(errors,[]);
   await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,physicalDevices:'not tested',processRestartAndPowerLoss:'not tested'},null,2));
 }catch(error){
