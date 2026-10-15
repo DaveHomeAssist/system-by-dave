@@ -29,6 +29,11 @@ export function connectionProblem(flow: AudioFlow, wire: Connection): string {
   if (wire.level === "speaker" && ["mixer", "crossover", "powered"].includes(source.kind)) return "This device's external output is line level in this model.";
   return "";
 }
+export function deviceConnectionProblem(flow: AudioFlow, device: Device): string {
+  const candidate = { ...flow, devices: flow.devices.map(d => d.id === device.id ? device : d) };
+  const invalid = candidate.connections.find(w => (w.source === device.id || w.target === device.id) && connectionProblem(candidate, w));
+  return invalid ? `${invalid.label || "Attached connection"}: ${connectionProblem(candidate, invalid)} Update the connection first, or mark its level unconfirmed.` : "";
+}
 export function traceFlow(flow: AudioFlow, selected: string) {
   const devices = new Set<string>(selected ? [selected] : flow.devices.map(d => d.id));
   const connections = new Set<string>();

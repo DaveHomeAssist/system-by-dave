@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { connectionProblem, flowSchema, poweredTemplate, traceFlow } from "./flow";
+import { connectionProblem, deviceConnectionProblem, flowSchema, poweredTemplate, traceFlow } from "./flow";
 import { apply, blank, load, preview, save, STORE } from "./model";
 
 describe("audio signal flow", () => {
@@ -15,6 +15,14 @@ describe("audio signal flow", () => {
     for (const target of ["top-l", "amp", "crossover", "mixer"]) expect(connectionProblem(flow, { ...wire, source: "amp", target, level: "speaker" })).not.toBe("");
     expect(connectionProblem(flow, { ...wire, source: "crossover", target: "subs", level: "line" })).toContain("power amplifier");
     expect(connectionProblem(flow, { ...wire, source: "crossover", target: "subs", level: "unknown" })).toBe("");
+  });
+  it("rejects role changes that invalidate attached input or output connections", () => {
+    const flow = poweredTemplate(), top = flow.devices.find(d => d.id === "top-l")!, amp = flow.devices.find(d => d.id === "amp")!;
+    expect(deviceConnectionProblem(flow, { ...top, kind: "passive" })).toContain("power amplifier");
+    expect(deviceConnectionProblem(flow, { ...amp, kind: "crossover" })).toContain("external output");
+    expect(deviceConnectionProblem(flow, { ...top, name: "Renamed top" })).toBe("");
+    flow.connections = flow.connections.map(w => w.target === top.id ? { ...w, level: "unknown" } : w);
+    expect(deviceConnectionProblem(flow, { ...top, kind: "passive" })).toBe("");
   });
   it("traces one speaker upstream without highlighting its sibling branches", () => {
     const flow = poweredTemplate(), trace = traceFlow(flow, "top-l");

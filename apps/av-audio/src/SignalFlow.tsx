@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { connectionProblem, emptyFlow, KINDS, LEVELS, newConnection, newDevice, poweredTemplate, traceFlow, type AudioFlow, type Connection, type Device } from "./flow";
+import { connectionProblem, deviceConnectionProblem, emptyFlow, KINDS, LEVELS, newConnection, newDevice, poweredTemplate, traceFlow, type AudioFlow, type Connection, type Device } from "./flow";
 import "./flow.css";
 
 type Props = { value?: AudioFlow; onChange: (flow: AudioFlow) => void };
@@ -31,6 +31,8 @@ export function SignalFlow({ value, onChange }: Props) {
   function saveDevice() {
     if (!device?.name.trim()) { setError("Enter a device name."); return; }
     if (flow.devices.length >= 100 && !flow.devices.some(d => d.id === device.id)) { setError("This flow supports up to 100 devices."); return; }
+    const attachedProblem = deviceConnectionProblem(flow, device);
+    if (attachedProblem) { setError(attachedProblem); return; }
     onChange({ ...flow, devices: flow.devices.some(d => d.id === device.id) ? flow.devices.map(d => d.id === device.id ? device : d) : [...flow.devices, device] });
     setSelected(device.id); setDevice(null); setError("");
   }

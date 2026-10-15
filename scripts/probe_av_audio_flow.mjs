@@ -53,6 +53,12 @@ try {
   await page.getByLabel('To device',{exact:true}).selectOption('subs');
   await page.getByLabel('Input connector / pins',{exact:true}).fill('Pinout unconfirmed');
   await button('Apply connection').click();
+  await page.getByLabel('Trace device',{exact:true}).selectOption('top-l');
+  await button('Edit selected device').click();
+  await page.getByLabel('Device role',{exact:true}).selectOption('passive');
+  await button('Apply device').click();
+  assert.match(await page.getByRole('alert').innerText(),/passive speaker requires/);
+  await button('Cancel edit').click();
   await page.getByLabel('Trace device',{exact:true}).selectOption('amp');
   await button('Edit selected device').click();
   await page.getByLabel('Name',{exact:true}).fill('Sub amp — model unconfirmed');
