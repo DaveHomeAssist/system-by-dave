@@ -1,7 +1,7 @@
 # AV Suite shell: one console
 
 **Date:** October 13, 2026
-**Status:** Slice A delivered (direction, hold). Slice B delivered in source on 2026-10-13: the shell at `/av/`, eight panel packs, specialist embed mode, Document panels, shell probe; publication and live acceptance follow its pull request. Slice C delivered in source on 2026-10-13: the console is the avbydave.com home and opens on an empty Workspace view; `av-suite.html`, both landing pages, the historical tool index and the 34 sheet pages are redirect stubs; the Toolbox code, Toolbox families and their probes are removed. Standalone family routes still exist and mount the same packs. Supersedes the
+**Status:** Slice A delivered (direction, hold). Slice B delivered in source on 2026-10-13: the shell at `/av/`, eight panel packs, specialist embed mode, Document panels, shell probe; publication and live acceptance follow its pull request. Slice C delivered in source on 2026-10-13: the console is the avbydave.com home and opens on an empty Workspace view; `av-suite.html`, both landing pages, the historical tool index and the 34 sheet pages are redirect stubs; the Toolbox code, Toolbox families and their probes are removed. Standalone family routes still exist and mount the same packs. On 2026-10-15 Dave confirmed the specialist panels stay (see the October 15 ruling below). Supersedes the
 [console snapshot Rail](av-suite-console-snapshot-rail.md) as the definition of
 done and pauses further per-family console conversions under the
 [October 9 rollout](av-console-rollout.md).
@@ -46,15 +46,23 @@ the result. The engine itself is sound and is reused unchanged in spirit.
 
 ## Definition of done
 
-**October 14 clarification:** only individual native department panels belong
-in the shared chooser. No whole-application tiles, including specialist
-iframes. This supersedes the specialist-embed direction recorded above.
-Standalone specialist routes remain reachable through normal Rail links.
-Existing saved specialist slots remain in stored layouts, with an explanation
-and separate-page link instead of an embedded app; no automatic data rewrite.
-An explicit add/rearrange action removes unavailable slots from the live
-arrangement so their old geometry cannot block new native panels. Saved views
-remain unchanged until the operator explicitly stores or updates a view.
+**October 15 ruling (Dave, 2026-10-15).** The "October 14 clarification" that
+removed whole-application tiles, including the seven specialist panels, from
+the shared chooser was a Codex session's own decision, not Dave's; Dave
+confirmed it on 2026-10-15 when it was surfaced. The 2026-10-13 direction
+stands, with the native work kept:
+
+- Native department panels wherever a pack exists. AV Calculator stays the
+  native nine-panel pack from October 14; its former app tile is still shown
+  as native controls inside its saved bounds without rewriting stored bytes.
+- The seven specialists without a pack (Throwline, LED Wall Calculator,
+  Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter) are offered
+  again as chrome-less panels of their own pages under a **Tools** group, with
+  a default view each and "Open full" to the standalone route. A specialist
+  leaves the chooser only when it gains a native pack, as the Calculator did.
+- Saved views remain unchanged until the operator explicitly stores or updates
+  a view; a slot whose type the console no longer knows is retained with a
+  notice and never blocks adding native panels.
 
 ### October 14 completion: individual panels
 
@@ -79,15 +87,17 @@ containment before release. No new dependencies, hardware control or redesign.
   recalls its views in the same workspace and never renders a second console.
 - The panel chooser offers every application's panels in one library, grouped
   by application, so a stored view can mix Video routes, Lighting fixtures and
-  Calculator controls side by side. Only native panels appear in this chooser.
+  Calculator controls side by side, plus a Tools group for the specialists
+  that have no native pack yet.
 - One view strip, one Add panel, one lock, one maximize, one status line.
   Views are owned by the shell (`sbd.avSuite.workspace.v1`), device-local
   arrangement in `sbd.avSuite.layout.v1`, both exportable as a layout file.
 - Each application keeps its own document, storage key, schema, validation and
   explicit Save. The shell header saves the active application; a dirty marker
   per Rail item shows which applications hold unsaved edits.
-- Specialist tools open on their own routes, never inside workspace tiles.
-  Their documents and full-screen modes remain unchanged.
+- Specialist tools run as chrome-less panels of their own pages
+  (`?sbdEmbed=panel`) until each has a native pack; "Open full" reaches the
+  standalone route. Their documents and full-screen modes remain unchanged.
 - One **Document** panel per active application replaces the per-family
   Plan/Import and Backup panels: title and metadata, Save, Export, Restore,
   and one-time import of legacy sheet data.
@@ -124,11 +134,14 @@ Panel types are namespaced `<app>:<type>` by the shell; packs keep their own
 short names. Theme, compact-height handling and `beforeunload` are shell
 concerns and leave the packs.
 
-**Specialist links.** Standalone tools are absent from the panel chooser and
-new default views. Previously saved slots remain stored but are not rendered;
-the shell offers separate-page recovery links. AV Calculator is a native pack: its existing engine
-is compiled into the suite and its DOM-adopting bridge supplies individual
-controls. It is not an embedded specialist application.
+**Specialist panels.** `SPECIALISTS` in `packs.ts` lists the tools without a
+native pack. `specialistLibrary()` offers each as a `tool:<id>` panel in the
+Tools group, `defaultViews()` gives each a full-size default view, and the
+shell renders the panel as an iframe of the tool's own route with the show
+context forwarded and `sbdEmbed=panel` set, so the page hides its navigation
+and mounts no console of its own. AV Calculator is a native pack: its existing
+engine is compiled into the suite and its DOM-adopting bridge supplies
+individual controls. It is not an embedded specialist application.
 
 **Rail.** `js/sbd-rail-mount.js` is reused. The shell handles
 `sbd:rail-console-select` for every native department and dispatches
@@ -163,9 +176,10 @@ standalone routes still live; they redirect in C.
    reload and layout export/import.
 3. Each application's Save writes only its own storage key; Export produces
    the same schema as before; existing saved documents open unchanged.
-4. Every chooser entry renders an individual native panel with no iframe.
-   Specialist links open standalone routes. Old specialist layout bytes remain
-   unchanged on opening, with a clear recovery link and no app tile.
+4. Every department chooser entry renders an individual native panel with no
+   iframe. Every Tools entry renders its tool's page as a chrome-less panel
+   with "Open full" to the standalone route. Saved layout bytes remain
+   unchanged on opening.
 5. Phone (under 720px) shows one panel with the shell's panel switcher; tablet
    shows two across; desktop the 12×8 grid. No page scrolling at 375, 680,
    1024×690, 1100, 1440 and 3440 widths in both palettes.

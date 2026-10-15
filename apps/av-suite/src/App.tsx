@@ -2,13 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/Workspace";
 import { readLayout, writeLayout, type LayoutState } from "../../shared/av-console/drafts";
 import type { Panel, View } from "../../shared/av-console/layout";
-import { showContext, type Pack, type PackHost } from "../../shared/av-console/pack";
+import { CONTEXT_KEYS, showContext, type Pack, type PackHost } from "../../shared/av-console/pack";
 import { PACKS, SPECIALISTS, specialistHref } from "./packs";
-import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, packLibrary, saveViews, shortOf, SUITE_PREFIX, TOOL_PREFIX, viewApp } from "./views";
+import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, packLibrary, saveViews, shortOf, specialistLibrary, SUITE_PREFIX, TOOL_PREFIX, viewApp, viewTool } from "./views";
 
 /* AV Suite shell (docs/av-suite-shell.md): one console. Every application is a
-   native panel pack mounted here; standalone tools are links, never tiles. The Rail
-   recalls each application's views in this same workspace. */
+   native panel pack mounted here; specialist tools without a pack yet are
+   chrome-less panels of their own pages (Dave, 2026-10-15). The Rail recalls
+   each application's views in this same workspace. */
 const RAIL_SELECT_EVENT = "sbd:rail-console-select";
 const RAIL_ACTIVE_EVENT = "sbd:console-snapshot-active";
 const FOCUS_KEY = "sbd.avSuite.focus.v1";
@@ -23,6 +24,15 @@ function railRef(app: string, toolId?: string) {
   const pack = PACKS.find(entry => entry.id === app);
   return pack ? `console:${pack.consoleId}` : "";
 }
+/* A specialist panel is its own page with the show context forwarded and its
+   chrome hidden; nothing else from this page's query reaches it. */
+function embedHref(href: string) {
+  const target = new URL(href, location.origin);
+  const source = new URLSearchParams(location.search);
+  for (const key of CONTEXT_KEYS) if (source.has(key)) target.searchParams.set(key, source.get(key)!);
+  target.searchParams.set("sbdEmbed", "panel");
+  return `${target.pathname}${target.search}`;
+}
 
 export function App() {
   const workspace = useRef<ReturnType<typeof useConsoleWorkspace> | null>(null);
@@ -36,7 +46,7 @@ export function App() {
   }])));
   // PACKS is a module constant, so this hook order never changes between renders.
   const packs: Pack[] = PACKS.map(def => def.use(hosts[def.id]));
-  const library = useMemo(() => PACKS.flatMap(packLibrary), []);
+  const library = useMemo(() => [...PACKS.flatMap(packLibrary), ...specialistLibrary()], []);
   const [initialViews] = useState(() => loadViews(localStorage, defaultViews(PACKS)));
   const [views, setViews] = useState<View[]>(initialViews.views);
   const [layoutPersist] = useState(() => {
@@ -47,12 +57,13 @@ export function App() {
   const ws = useConsoleWorkspace(views, library, layoutPersist);
   workspace.current = ws;
   const activeApp = viewApp(ws.view);
-  const activeTool = activeApp === TOOL_PREFIX ? shortOf(ws.viewId) : "";
+  const activeTool = viewTool(ws.view);
   const activePack = packs.find(pack => pack.id === activeApp);
+  // The view each application or specialist was last on, so the Rail recalls stored arrangements, not defaults.
   const lastView = useRef<Record<string, string>>({});
   const viewsRef = useRef(views); viewsRef.current = views;
   useEffect(() => {
-    if (activeApp) lastView.current[activeApp === TOOL_PREFIX ? ws.viewId : activeApp] = ws.viewId;
+    if (activeApp) lastView.current[activeApp === TOOL_PREFIX ? `${TOOL_PREFIX}:${activeTool}` : activeApp] = ws.viewId;
     const ref = railRef(activeApp, activeTool);
     if (ref) window.dispatchEvent(new CustomEvent(RAIL_ACTIVE_EVENT, { detail: { ref } }));
   }, [ws.viewId, activeApp, activeTool]);
@@ -74,8 +85,12 @@ export function App() {
       if (!target) return false;
       ws.setViewId(target.id); setStatus({ app: pack.label, text: `${pack.label} ready.`, error: false }); return true;
     }
-    // Standalone tools retain their normal Rail links, not nested applications.
-    return false;
+    const tool = SPECIALISTS.find(entry => entry.id === id || entry.consoleId === id);
+    if (!tool) return false;
+    const key = `${TOOL_PREFIX}:${tool.id}`;
+    const target = current.find(view => view.id === lastView.current[key]) || current.find(view => view.id === key) || current.find(view => viewTool(view) === tool.id);
+    if (!target) return false;
+    ws.setViewId(target.id); setStatus({ app: tool.label, text: `${tool.label} opened as a panel. Open full for its own page.`, error: false }); return true;
   }
   useEffect(() => {
     const select = (event: Event) => {
@@ -126,10 +141,16 @@ export function App() {
   }
   function render(type: string, panel: Panel) {
     const app = appOf(type), short = shortOf(type);
+    if (app === TOOL_PREFIX) {
+      const tool = SPECIALISTS.find(entry => entry.id === short);
+      if (!tool) return { body: <p className="muted">This tool is not available.</p> };
+      const href = specialistHref(tool);
+      return { body: <iframe className="suite-app-frame" src={embedHref(href)} title={tool.label} />, context: "Own page and saved data", actions: <a className="suite-app-open" href={href} target="_blank" rel="noreferrer">Open full</a> };
+    }
     const pack = packs.find(entry => entry.id === app);
     return pack ? pack.render(short, panel) : { body: <p className="muted">This panel is not available.</p> };
   }
-  const viewTabs = views.filter(view => viewApp(view) === activeApp && (activeApp !== TOOL_PREFIX || view.id === ws.viewId));
+  const viewTabs = views.filter(view => viewApp(view) === activeApp && (activeApp !== TOOL_PREFIX || viewTool(view) === activeTool));
   const quick = activePack ? activePack.quick.map(item => ({ ...item, type: `${activePack.id}:${item.type}` })) : [];
   const activeTitle = activePack ? activePack.label : SPECIALISTS.find(entry => entry.id === activeTool)?.label || "AV by Dave";
   const [offline, setOffline] = useState(document.documentElement.dataset.workspaceOffline || "");
@@ -162,11 +183,11 @@ export function App() {
         <button type="button" disabled={!activePack} onClick={() => activePack?.exportDoc()}>Export</button>
       </div>
     </header>
-    <div className="suite-bar"><span className="suite-summary">{activePack ? activePack.summary : "Tap empty space or + Add panel to call up any individual panel from any department. Store the arrangement as a view."}{offline === "ready" && <span className="suite-offline">Offline ready</span>}</span>{dirtyApps.length > 0 && <span className="suite-dirty" title={dirtyApps.join(", ")}>Unsaved: {dirtyApps.join(", ")}</span>}</div>
+    <div className="suite-bar"><span className="suite-summary">{activePack ? activePack.summary : activeTool ? "Panels keep working while this tool runs; its Save lives inside the panel." : "Tap empty space or + Add panel to call up any panel from any department or tool. Store the arrangement as a view."}{offline === "ready" && <span className="suite-offline">Offline ready</span>}</span>{dirtyApps.length > 0 && <span className="suite-dirty" title={dirtyApps.join(", ")}>Unsaved: {dirtyApps.join(", ")}</span>}</div>
     {offer && activePack && <div className="draft-offer" role="alert"><p><strong>{activePack.label} unsaved edits</strong> from {new Date(offer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={() => void activePack.recovery.restore()}>Restore draft</button><button type="button" onClick={() => void activePack.recovery.discard()}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
-      {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Whole apps no longer run inside tiles. Add individual panels here; standalone tools keep their own saved data.{SPECIALISTS.filter(tool => (ws.live[ws.viewId] || ws.view?.panels || []).some(panel => panel.type === `${TOOL_PREFIX}:${tool.id}`)).map(tool => <a key={tool.id} href={specialistHref(tool)} target="_blank" rel="noopener noreferrer"> Open {tool.label} separately</a>)}</div>}
-      <ConsoleWorkspace ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || "AV Video"} />
+      {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Add panels here; the saved view changes only when you store or update it.</div>}
+      <ConsoleWorkspace ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : "AV Video")} />
     </main>
     <footer role="status" className={`message ${status.error || activePack?.problem ? "error" : ""}`}>{[...(activePack?.recovery.errors || []), status.app ? `${status.app}: ${status.text}` : status.text].join(" ")}</footer>
     {packs.map(pack => <div key={pack.id} data-pack-dialogs={pack.id}>{pack.dialogs}</div>)}

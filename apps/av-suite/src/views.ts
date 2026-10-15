@@ -1,6 +1,7 @@
 import { workspaceSchema, type Panel, type PanelDef, type View } from "../../shared/av-console/layout";
 import type { Pack, PackDef } from "../../shared/av-console/pack";
 import { DEFAULT_VIEWS as calculatorViews } from "../../av-calculator/src/model";
+import { SPECIALISTS, type Specialist } from "./packs";
 
 /* Shell-owned views (docs/av-suite-shell.md). Panel types and view ids are
    namespaced `<app>:<name>`; application documents never hold them. The
@@ -35,10 +36,17 @@ export function nativePanels(panels: Panel[]): Panel[] {
     });
   });
 }
-export function defaultViews(packs: PackDef[]): View[] {
+/* Specialist tools that have no native pack yet are offered as chrome-less
+   panels of their own pages (Dave, 2026-10-15); each leaves the chooser the
+   day it gains a pack, as AV Calculator did. */
+export function specialistLibrary(specialists: Specialist[] = SPECIALISTS): PanelDef[] {
+  return specialists.map(tool => ({ type: `${TOOL_PREFIX}:${tool.id}`, key: tool.id, name: tool.label, group: "Utilities", description: tool.description, minW: tool.minW, minH: tool.minH, app: "Tools" }));
+}
+export function defaultViews(packs: PackDef[], specialists: Specialist[] = SPECIALISTS): View[] {
   return [
     BLANK_VIEW,
     ...packs.flatMap(pack => pack.defaultViews.map(view => ({ id: `${pack.id}:${view.id}`, name: view.name, panels: view.panels.map(panel => namespaced(pack.id, panel)) }))),
+    ...specialists.map(tool => ({ id: `${TOOL_PREFIX}:${tool.id}`, name: tool.label, panels: [{ id: `${TOOL_PREFIX}:${tool.id}:main`, type: `${TOOL_PREFIX}:${tool.id}`, x: 0, y: 0, w: 12, h: 8 }] })),
   ];
 }
 /* Stored views plus any default view that a newer pack adds, in memory only. */
@@ -71,5 +79,16 @@ export function viewApp(view: View | undefined): string {
   for (const panel of view.panels) { const app = appOf(panel.type); counts.set(app, (counts.get(app) || 0) + 1); }
   let best = SUITE_PREFIX, max = 0;
   for (const [app, count] of counts) if (count > max) { best = app; max = count; }
+  return best;
+}
+/* The specialist a tool view belongs to: its id, or for a view the engine
+   named itself the tool with most panels. Empty for non-tool views. */
+export function viewTool(view: View | undefined): string {
+  if (!view || viewApp(view) !== TOOL_PREFIX) return "";
+  if (appOf(view.id) === TOOL_PREFIX) return shortOf(view.id);
+  const counts = new Map<string, number>();
+  for (const panel of view.panels) if (appOf(panel.type) === TOOL_PREFIX) { const id = shortOf(panel.type); counts.set(id, (counts.get(id) || 0) + 1); }
+  let best = "", max = 0;
+  for (const [id, count] of counts) if (count > max) { best = id; max = count; }
   return best;
 }
