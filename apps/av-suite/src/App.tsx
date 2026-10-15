@@ -4,7 +4,7 @@ import { readLayout, writeLayout, type LayoutState } from "../../shared/av-conso
 import type { Panel, View } from "../../shared/av-console/layout";
 import { CONTEXT_KEYS, showContext, type Pack, type PackHost } from "../../shared/av-console/pack";
 import { PACKS, SPECIALISTS, specialistHref } from "./packs";
-import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, packLibrary, saveViews, shortOf, specialistLibrary, SUITE_PREFIX, TOOL_PREFIX, viewApp } from "./views";
+import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, packLibrary, saveViews, shortOf, specialistLibrary, SUITE_PREFIX, TOOL_PREFIX, viewApp, viewTool } from "./views";
 
 /* AV Suite shell (docs/av-suite-shell.md): one console. Every application is a
    native panel pack mounted here; specialist tools without a pack yet are
@@ -57,12 +57,13 @@ export function App() {
   const ws = useConsoleWorkspace(views, library, layoutPersist);
   workspace.current = ws;
   const activeApp = viewApp(ws.view);
-  const activeTool = activeApp === TOOL_PREFIX ? shortOf(ws.viewId) : "";
+  const activeTool = viewTool(ws.view);
   const activePack = packs.find(pack => pack.id === activeApp);
+  // The view each application or specialist was last on, so the Rail recalls stored arrangements, not defaults.
   const lastView = useRef<Record<string, string>>({});
   const viewsRef = useRef(views); viewsRef.current = views;
   useEffect(() => {
-    if (activeApp) lastView.current[activeApp === TOOL_PREFIX ? ws.viewId : activeApp] = ws.viewId;
+    if (activeApp) lastView.current[activeApp === TOOL_PREFIX ? `${TOOL_PREFIX}:${activeTool}` : activeApp] = ws.viewId;
     const ref = railRef(activeApp, activeTool);
     if (ref) window.dispatchEvent(new CustomEvent(RAIL_ACTIVE_EVENT, { detail: { ref } }));
   }, [ws.viewId, activeApp, activeTool]);
@@ -86,7 +87,8 @@ export function App() {
     }
     const tool = SPECIALISTS.find(entry => entry.id === id || entry.consoleId === id);
     if (!tool) return false;
-    const target = current.find(view => view.id === `${TOOL_PREFIX}:${tool.id}`) || current.find(view => view.panels.some(panel => panel.type === `${TOOL_PREFIX}:${tool.id}`));
+    const key = `${TOOL_PREFIX}:${tool.id}`;
+    const target = current.find(view => view.id === lastView.current[key]) || current.find(view => view.id === key) || current.find(view => viewTool(view) === tool.id);
     if (!target) return false;
     ws.setViewId(target.id); setStatus({ app: tool.label, text: `${tool.label} opened as a panel. Open full for its own page.`, error: false }); return true;
   }
@@ -148,7 +150,7 @@ export function App() {
     const pack = packs.find(entry => entry.id === app);
     return pack ? pack.render(short, panel) : { body: <p className="muted">This panel is not available.</p> };
   }
-  const viewTabs = views.filter(view => viewApp(view) === activeApp && (activeApp !== TOOL_PREFIX || view.id === ws.viewId));
+  const viewTabs = views.filter(view => viewApp(view) === activeApp && (activeApp !== TOOL_PREFIX || viewTool(view) === activeTool));
   const quick = activePack ? activePack.quick.map(item => ({ ...item, type: `${activePack.id}:${item.type}` })) : [];
   const activeTitle = activePack ? activePack.label : SPECIALISTS.find(entry => entry.id === activeTool)?.label || "AV by Dave";
   const [offline, setOffline] = useState(document.documentElement.dataset.workspaceOffline || "");

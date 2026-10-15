@@ -171,6 +171,19 @@ try {
   await page.frameLocator('.console-panel iframe').locator('html[data-sbd-embed="panel"]').waitFor();
   assert.equal(await page.frameLocator('.console-panel iframe').locator('.sbd-public-nav, nav.sbd-nav, .console-strip').count(), 0, 'embedded tool hides its page navigation and mounts no console of its own');
   assert.equal(await page.locator('.console-strip').count(), 1, 'still exactly one console strip');
+  // A stored specialist arrangement is what the Rail recalls, not the generated default.
+  await page.getByRole('button', { name: 'View options' }).click();
+  await page.getByRole('menuitem', { name: 'Store as new view' }).click();
+  await page.getByRole('tab', { name: /^Throwline \d+$/ }).waitFor();
+  assert.equal(await tabs().count(), 2, 'the specialist strip lists its default and the stored view');
+  await rail('console:av-video').click();
+  await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'AV Video');
+  await page.locator('.sbd-rail__all').click();
+  await allApps.waitFor({ state: 'visible' });
+  await allApps.locator('[data-rail-ref="tool:throwline"]').click();
+  await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'Throwline');
+  assert.equal(await page.getByRole('tab', { name: /^Throwline \d+$/ }).getAttribute('aria-selected'), 'true', 'the Rail recalls the stored specialist view');
+  assert.equal(await page.locator('.console-panel iframe').count(), 1);
   await page.goto(url);
   await heading().waitFor();
 

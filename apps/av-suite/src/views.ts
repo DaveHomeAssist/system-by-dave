@@ -81,3 +81,14 @@ export function viewApp(view: View | undefined): string {
   for (const [app, count] of counts) if (count > max) { best = app; max = count; }
   return best;
 }
+/* The specialist a tool view belongs to: its id, or for a view the engine
+   named itself the tool with most panels. Empty for non-tool views. */
+export function viewTool(view: View | undefined): string {
+  if (!view || viewApp(view) !== TOOL_PREFIX) return "";
+  if (appOf(view.id) === TOOL_PREFIX) return shortOf(view.id);
+  const counts = new Map<string, number>();
+  for (const panel of view.panels) if (appOf(panel.type) === TOOL_PREFIX) { const id = shortOf(panel.type); counts.set(id, (counts.get(id) || 0) + 1); }
+  let best = "", max = 0;
+  for (const [id, count] of counts) if (count > max) { best = id; max = count; }
+  return best;
+}
