@@ -152,15 +152,25 @@ try {
   assert.equal(await page.locator('.sbd-rail__toolbox').getAttribute('aria-current'), 'page');
   assert.equal(await page.locator('.sbd-rail__entry[aria-current="page"]').count(), 0);
 
-  // 2. Specialist tools remain links, never whole applications in tiles.
+  // 2. Specialist tools open as chrome-less panels in the same console; their own pages stay one click away.
   await page.locator('.sbd-rail__all').click();
   const allApps = page.locator('#sbdRailAllApps');
   await allApps.waitFor({ state: 'visible' });
   const specialistLink = allApps.locator('[data-rail-ref="tool:throwline"]');
   assert.equal(new URL(await specialistLink.getAttribute('href'), BASE).pathname, '/ProjectorThrow/');
   await specialistLink.click();
-  await page.waitForURL('**/ProjectorThrow/**');
-  assert.equal(new URL(page.url()).searchParams.has('sbdEmbed'), false);
+  await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'Throwline');
+  assert.equal(new URL(page.url()).pathname, '/av/', 'a specialist opens inside the console');
+  const throwlineFrame = page.locator('.console-panel iframe');
+  await throwlineFrame.waitFor();
+  const throwlineSrc = new URL(await throwlineFrame.getAttribute('src'), BASE);
+  assert.equal(throwlineSrc.pathname, '/ProjectorThrow/');
+  assert.equal(throwlineSrc.searchParams.get('sbdEmbed'), 'panel');
+  assert.equal(new URL(await page.locator('.suite-app-open').getAttribute('href'), BASE).pathname, '/ProjectorThrow/', 'Open full leads to the tool\'s own page');
+  assert.equal(await page.locator('.suite-app-open').getAttribute('target'), '_blank');
+  await page.frameLocator('.console-panel iframe').locator('html[data-sbd-embed="panel"]').waitFor();
+  assert.equal(await page.frameLocator('.console-panel iframe').locator('.sbd-public-nav, nav.sbd-nav, .console-strip').count(), 0, 'embedded tool hides its page navigation and mounts no console of its own');
+  assert.equal(await page.locator('.console-strip').count(), 1, 'still exactly one console strip');
   await page.goto(url);
   await heading().waitFor();
 
@@ -171,8 +181,8 @@ try {
   await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   const chooser = page.getByRole('dialog', { name: 'Add panel' });
   assert.deepEqual((await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents()).slice(0, 3), ['AV Video', 'Audio', 'Show Control'], 'chooser groups panels by application');
-  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 9, 'only the nine native departments are offered');
-  assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 0, 'no whole-app choices');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 10, 'the nine native departments plus a Tools group are offered');
+  assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 1, 'specialist tools are offered as a Tools group');
   await chooser.getByRole('button', { name: 'Lighting', exact: true }).click();
   await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).click();
   assert.equal(await page.locator('.console-panel[data-app="Lighting"][data-panel="fixtures"]').count(), 1);
@@ -336,7 +346,7 @@ try {
     await page.waitForFunction(() => JSON.parse(localStorage.getItem('avCalculator.v1'))?.delayDistance === 124);
     assert.equal(await page.locator('.console-panel iframe').count(), 0, 'native Calculator works after prepared offline reload');
   } finally { await context.setOffline(false); }
-  // Previous specialist slots and their data are retained, never embedded or silently rewritten.
+  // Previously saved specialist slots render as chrome-less panels again; stored bytes stay untouched.
   const specialistView = { id: 'tool:throwline', name: 'Saved projector workspace', panels: [{ id: 'old-projector', type: 'tool:throwline', x: 0, y: 0, w: 12, h: 8 }] };
   const specialistViews = JSON.stringify({ version: 1, views: [specialistView] });
   const specialistLayout = JSON.stringify({ v: 1, viewId: specialistView.id, locked: false, live: { [specialistView.id]: specialistView.panels } });
@@ -345,15 +355,17 @@ try {
     localStorage.setItem('sbd.avSuite.layout.v1', layout);
   }, { views: specialistViews, layout: specialistLayout });
   await page.goto(`${BASE}/av/`);
-  await page.getByRole('link', { name: 'Open Throwline separately' }).waitFor();
-  assert.equal(await page.locator('iframe').count(), 0);
+  await page.locator('.console-panel iframe').waitFor();
+  assert.equal(new URL(await page.locator('.console-panel iframe').getAttribute('src'), BASE).pathname, '/ProjectorThrow/', 'a saved Throwline slot embeds Throwline');
+  assert.equal(await page.locator('.console-notice').count(), 0, 'no unavailable-slot notice for a specialist panel');
   assert.equal(await storage('sbd.avSuite.workspace.v1'), specialistViews);
   assert.equal(await storage('sbd.avSuite.layout.v1'), specialistLayout);
   assert.equal(await storage('avCalculator.v1'), JSON.stringify({ ...JSON.parse(calculatorValues), delayDistance: 124 }));
-  await page.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
+  await page.getByRole('button', { name: 'Throwline options', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   await chooser.getByRole('button', { name: 'Audio', exact: true }).click();
   await chooser.locator('.console-choices button').filter({ hasText: 'Inputs' }).click();
-  assert.equal(await page.locator('.console-panel[data-app="Audio"]').count(), 1, 'hidden legacy app geometry does not block adding a native panel');
+  assert.equal(await page.locator('.console-panel[data-app="Audio"]').count(), 1, 'a specialist slot can be replaced by a native panel');
   assert.equal(await storage('sbd.avSuite.workspace.v1'), specialistViews, 'editing the live arrangement leaves the saved legacy view intact');
   await page.reload();
   await page.locator('.console-panel[data-app="Audio"]').waitFor();
@@ -375,7 +387,7 @@ try {
     };
     await openMenu();
     const groups = await menu.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents();
-    assert.equal(groups.length, 9);
+    assert.equal(groups.length, 10);
     for (const group of groups) {
       await menu.getByRole('button', { name: group, exact: true }).click();
       const count = await menu.locator('.console-choices button').count();
@@ -384,7 +396,7 @@ try {
         await menu.locator('.console-choices button').nth(index).click();
         assert.equal(await menuPage.locator('.console-panel').count(), 1, `${group}: replacement stays in the same slot`);
         assert.equal(await menuPage.locator('.console-panel').getAttribute('data-app'), group);
-        assert.equal(await menuPage.locator('iframe').count(), 0, `${group}: every choice renders natively`);
+        assert.equal(await menuPage.locator('iframe').count(), group === 'Tools' ? 1 : 0, group === 'Tools' ? `${group}: a specialist choice renders its own page as a chrome-less panel` : `${group}: every choice renders natively`);
         assert.equal(await menuPage.locator('.console-panel .console-body').isVisible(), true);
         panelCount++;
       }
@@ -414,7 +426,7 @@ try {
     assert.equal(await blockedPage.evaluate(() => localStorage.getItem('avCalculator.v1')), null, 'failed autosave is not reported as persisted');
   } finally { await blockedContext.close(); }
   assert.deepEqual(errors, []);
-  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across nine native departments, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, no whole-app tiles, and all four named palettes at eight sizes.`);
+  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across nine native departments and seven specialist panels, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, no whole-app tiles, and all four named palettes at eight sizes.`);
 } catch (error) {
   if (process.env.AV_SUITE_EVIDENCE) {
     await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });

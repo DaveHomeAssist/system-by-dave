@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-15 — Specialist panels return to the console
+
+- Restore the seven specialist tools without a native pack (Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter) as chrome-less panels of their own pages in the AV Suite shell: a **Tools** group in the chooser, a default view each, the Rail and All apps opening them inside `/av/`, and "Open full" to the standalone route. The October 14 removal of whole-application tiles was a Codex session's own decision; Dave confirmed on 2026-10-15 that the 2026-10-13 direction stands. AV Calculator remains the native nine-panel pack, and a saved specialist slot renders again instead of a recovery notice; stored view and layout bytes are untouched on opening.
+- `scripts/probe_av_suite_shell.mjs` checks Throwline opens as a panel from All apps with its navigation hidden, the Tools group is offered beside the nine departments, every Tools choice renders its page as a panel, and a saved Throwline slot embeds and can be replaced without rewriting the saved view. Cache generation `v20261015-av-specialist-panels`.
+
 ## 2026-10-14 — Website release reconciliation
 
 - Retain the approved System/profile subject tabs, pagination and saved light/dark controls; preserve contact/PDF corrections and accessible mobile navigation. AV lands directly in the current console.
