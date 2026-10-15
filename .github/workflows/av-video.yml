@@ -37,6 +37,7 @@ on:
       - 'package*.json'
       - 'scripts/probe_av_video*.mjs'
       - 'scripts/probe_av_audio_connector.mjs'
+      - 'scripts/probe_av_audio_flow.mjs'
       - 'js/sbd-registry.js'
       - '.github/workflows/av-video.yml'
       - '.github/workflows/deploy-pages.yml'
@@ -75,6 +76,7 @@ jobs:
           test -z "$(git status --porcelain -- av)"
           npx playwright install --with-deps chromium
           npm run test:av-suite-browser
+          npm run test:av-audio-flow-browser
       - name: Audio shared-console consumer matches its source
         run: |
           npm run typecheck:av-audio

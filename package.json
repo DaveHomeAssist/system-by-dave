@@ -96,7 +96,8 @@
     "sync:av-workspace": "node scripts/sync_av_workspace.js",
     "test:av-workspace": "node scripts/probe_av_workspace.mjs",
     "verify:private-exposure": "node --test scripts/verify_private_exposure.test.js && node scripts/verify_private_exposure.js",
-    "verify:workbook-withdrawal": "node scripts/verify_workbook_withdrawal.cjs"
+    "verify:workbook-withdrawal": "node scripts/verify_workbook_withdrawal.cjs",
+    "test:av-audio-flow-browser": "node scripts/probe_av_audio_flow.mjs"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
