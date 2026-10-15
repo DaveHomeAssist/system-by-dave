@@ -257,7 +257,7 @@ try {
     if (splitPanel) {
       await page.getByRole('button', { name: `${splitPanel} options`, exact: true }).click();
       await page.getByRole('menuitem', { name: 'Split top and bottom', exact: true }).click();
-    } else await page.getByRole('button', { name: /Add panel/ }).click();
+    } else await page.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
     await chooser.getByRole('button', { name: group, exact: true }).click();
     await chooser.locator('.console-choices button').filter({ hasText: name }).click();
   }
@@ -426,7 +426,7 @@ try {
     assert.equal(await blockedPage.evaluate(() => localStorage.getItem('avCalculator.v1')), null, 'failed autosave is not reported as persisted');
   } finally { await blockedContext.close(); }
   assert.deepEqual(errors, []);
-  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across nine native departments and seven specialist panels, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, no whole-app tiles, and all four named palettes at eight sizes.`);
+  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across nine native departments and seven specialist panels, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
 } catch (error) {
   if (process.env.AV_SUITE_EVIDENCE) {
     await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });
