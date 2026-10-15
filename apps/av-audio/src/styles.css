@@ -7,3 +7,13 @@
   .audio-app .console-shell:fullscreen .console-views,.audio-app .console-shell:fullscreen .console-tools{flex-shrink:0}
   .audio-app .console-shell:fullscreen .console-strip .console-quick{flex:0 0 auto;order:0}
 }
+/* Keep the new flow view reachable in short standalone windows. At very short
+   heights the existing Full screen focused panel control frees the page chrome. */
+@media(max-height:500px){
+  .audio-header{flex-shrink:0;padding:4px 10px}
+  .audio-header p,.audio-header small{display:none}
+  .audio-status{flex-shrink:0;max-height:28px;min-height:0;overflow:auto;padding:4px 10px}
+  .audio-app .console-strip{flex-wrap:nowrap;overflow-x:auto;flex-shrink:0}
+  .audio-app .console-views,.audio-app .console-tools{flex-shrink:0}
+  .audio-app .console-strip .console-quick{flex:0 0 auto;order:0}
+}

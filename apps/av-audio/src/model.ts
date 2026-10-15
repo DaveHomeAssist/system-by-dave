@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { flowSchema } from "./flow";
 import { workspaceSchema } from "../../shared/av-console/layout";
 export const STORE = "sbd.avAudio.v1";
 export const SCHEMA = "system-by-dave.av-audio.v1";
@@ -14,7 +15,7 @@ export const LEGACY = [
 const fields = ["channel","source","type","conn","location","console","stagebox","input","phantom","gain","destination","monitor","status","inputStatus","patchStatus","lineCheckStatus","tech","talkback","problem","notes"] as const;
 const speakerFields = ["zone","speaker","type","processor","output","amp","cable","trim","delay","coverage","status","backup","notes"] as const;
 const row = z.object({ id: z.string(), origin: z.string(), legacy: z.record(z.unknown()) }).and(z.record(z.unknown()));
-const docSchema = z.object({ schema: z.literal(SCHEMA), title: z.string(), channels: z.array(row), speakers: z.array(row), imports: z.array(z.object({ id: z.string(), name: z.string(), raw: z.string(), count: z.number() })), workspace: workspaceSchema.optional() });
+const docSchema = z.object({ schema: z.literal(SCHEMA), title: z.string(), channels: z.array(row), speakers: z.array(row), imports: z.array(z.object({ id: z.string(), name: z.string(), raw: z.string(), count: z.number() })), signalFlow: flowSchema.optional(), workspace: workspaceSchema.optional() });
 export type AudioDoc = z.infer<typeof docSchema>;
 export const blank = (): AudioDoc => ({ schema: SCHEMA, title: "Untitled audio plan", channels: [], speakers: [], imports: [] });
 export function load(storage: Pick<Storage,"getItem">) { const raw = storage.getItem(STORE); try { return { raw, doc: raw ? docSchema.parse(JSON.parse(raw)) : blank(), error: "" }; } catch { return { raw, doc: blank(), error: "Saved plan is unreadable. Saving is blocked; download the original bytes before recovery." }; } }

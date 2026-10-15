@@ -325,7 +325,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261015-av-specialist-panels',
+    version:'v20261015-audio-signal-flow',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

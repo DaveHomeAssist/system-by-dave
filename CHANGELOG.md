@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-15 — Audio signal flow
+
+- Add a native Audio Signal flow panel and view with editable devices, directed connections, upstream/downstream tracing and an accessible connection list. Distinguish labelled line level, speaker level and unknown signals; retain unconfirmed routes and device details.
+- Offer a reviewed powered-top/passive-sub template without inferring models, quantities, settings or wiring from planning tables. Block known signal-domain mismatches.
+- Save the optional graph inside the existing Audio v1 document, preserving old plans, tables, source snapshots and export/import behaviour. Include compatibility and browser regression coverage.
+
+
 ## 2026-10-15 — Specialist panels return to the console
 
 - Restore the seven specialist tools without a native pack (Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter) as chrome-less panels of their own pages in the AV Suite shell: a **Tools** group in the chooser, a default view each, the Rail and All apps opening them inside `/av/`, and "Open full" to the standalone route. The October 14 removal of whole-application tiles was a Codex session's own decision; Dave confirmed on 2026-10-15 that the 2026-10-13 direction stands. AV Calculator remains the native nine-panel pack, and a saved specialist slot renders again instead of a recovery notice; stored view and layout bytes are untouched on opening.
