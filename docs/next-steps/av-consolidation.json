@@ -1328,11 +1328,17 @@
     "baseRevision": "a2303b3",
     "branch": "codex/audio-signal-flow",
     "scope": "Native Audio signal-flow panel: explicit devices/connections, line versus speaker level, trace, uncertainty, optional v1 persistence and reviewed powered-top/passive-sub template.",
-    "state": "Implemented; Dominic source and browser checks passed; exact-head CI and release pending.",
+    "state": "Merged and deployed; live saved-plan import, Save/reload and export equality verified.",
     "brief": "docs/av-audio-signal-flow.md",
-    "next": "Complete focused browser checks, exact-head CI, merge, deployment and live readback.",
+    "next": "Operator review and physical equipment/wiring verification; restore private board availability for synchronization.",
     "limits": "No inferred wiring, acoustic/load approval, hardware control or physical/operator acceptance.",
-    "verification": "57 Audio tests, Audio/Suite typechecks and builds, focused flow workflow and 24 viewport/palette checks (320x256 in fullscreen), full 58-choice Suite browser regression, AV and domain-site gates passed on Dominic.",
-    "boardSync": "Private board unavailable at verification; source projection retained for later synchronization."
+    "verification": "58 Audio tests, Audio/Suite typechecks and builds, focused flow workflow and 24 viewport/palette checks (320x256 fullscreen), full 58-choice Suite regression, AV/domain gates on Dominic; all nine exact-head PR checks passed. Live browser Save/reload/export preserved original records.",
+    "boardSync": "Private board unavailable at verification; source projection retained for later synchronization.",
+    "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/347",
+    "testedRevision": "d4c286b6a27dee2f0f4b531a27e3aa9ee59d27cd",
+    "mergeRevision": "fa22e740c885a8630c49b08c6c029506b406f7d2",
+    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38794347013",
+    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/38797244610",
+    "liveSource": "https://avbydave.com/source.json"
   }
 }
