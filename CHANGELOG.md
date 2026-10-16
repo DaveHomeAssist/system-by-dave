@@ -2,6 +2,8 @@
 
 ## 2026-10-16 — FMP 3D Gear Models
 
+- Preserve direct explorer links when JavaScript is unavailable and hide the enhanced model launcher until it works. Keep the camera-rig summary visible beneath mobile equipment navigation.
+
 - Add a shared equipment dropdown to all five explorers and repair ATEM label proportions, rear contrast and straight-on inspection views.
 
 - Make 3D Gear Models a primary destination with a prominent hub header link and consistent explorer/reference navigation. Keep existing model bookmarks and local practice controls.

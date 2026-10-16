@@ -151,7 +151,7 @@ body[data-public-release] .attention { background: var(--av-danger-soft); color:
 .fallback-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .fallback-links a { display: flex; align-items: center; min-height: 44px; padding: 8px 12px; background: var(--av-surface); border: 1px solid var(--av-line-strong); border-radius: 6px; color: var(--av-accent); }
 html[data-enhanced] .startup-guidance { display: none; }
-html:not([data-enhanced]) .portal-tabs, html:not([data-enhanced]) .portal-panel { display: none; }
+html:not([data-enhanced]) .models-launch, html:not([data-enhanced]) .portal-tabs, html:not([data-enhanced]) .portal-panel { display: none; }
 html:not([data-enhanced]) .startup-guidance { grid-column: 1 / -1; }
 @media (min-width: 1700px) {
   .portal { --space: 32px; }

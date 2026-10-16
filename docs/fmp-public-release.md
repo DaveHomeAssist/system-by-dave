@@ -54,6 +54,11 @@ belong to a control-room check, not the visual walk (Dave, 2026-09-18).
 any released file or hand-maintained FMP page, naming the file and a count, never
 the address.
 
+The prominent model launcher appears after the hub enhances successfully. Without
+JavaScript, or if the shell script fails, startup guidance retains direct links to
+all five equipment explorers. The standalone SuperJoy simulator remains available
+offline.
+
 ## Managed source
 
 Canonical app: `DaveHomeAssist/fmp-suite`. Do not hand-edit generated `fmp/` or

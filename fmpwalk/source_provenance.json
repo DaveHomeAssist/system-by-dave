@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "94e759547d28b94908f8c9441cd6c470ceddd80b",
+  "sourceCommit": "aa627f2edc861557ddb4e779a2c9e0a8b08e5b97",
   "mode": "local-first",
   "files": {
     "assets/walk-photos/2026-08-28-bacardi-concession-menu-displays-closeup.jpg": "8d503de7ddd3f8fd678edbf66c3b85882990b807d4cafd3feebcbe8d4059149b",

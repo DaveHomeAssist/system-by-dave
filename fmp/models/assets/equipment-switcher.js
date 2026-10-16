@@ -24,5 +24,7 @@
   }
   select.addEventListener('change', () => location.assign(select.value));
   label.append(select);
-  nav.querySelector('a[href$="#models"]').after(label);
+  // Keep the rig's theme control on its first mobile row before the full-width menu.
+  if (nav.matches('.r-site-nav')) nav.append(label);
+  else nav.querySelector('a[href$="#models"]').after(label);
 })();

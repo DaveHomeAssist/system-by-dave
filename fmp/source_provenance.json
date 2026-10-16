@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "94e759547d28b94908f8c9441cd6c470ceddd80b",
+  "sourceCommit": "aa627f2edc861557ddb4e779a2c9e0a8b08e5b97",
   "mode": "commissioning",
   "files": {
     "build/index.html": "88afb4f8e9f081a3f55b65cb869a4d75be3b308929bb15632d58289ba5ce8ea0",
@@ -9,11 +9,11 @@
     "camera-view.js": "794e85363e56d12aaad203d016e968dc0b7896ae5d6f22cea72b29590b89c4c7",
     "camera.css": "16d13c9cc14dfc61965b614eac072e0c10e45266a41557bdfb76acd0203d77ff",
     "camera.js": "65415f5c95dec759fafdb18a65b1f7bcca5cc4530e06caac536237bad6a79953",
-    "camera/catwalk/index.html": "73d0cf2b5542a01986bf90b19135e33f3527f07794748bc9f3de59061d458210",
-    "camera/front-of-house/index.html": "4bd2b345659cd07c3a3e4489169a4c3e56f5c0ded2e58cd11e357f061722f359",
-    "camera/index.html": "098be9fd6ca5ef820f26eb5ed0234cbe1015732e7e1409ea7f8080a8d8bcf4f4",
-    "camera/pit-center/index.html": "c8f02eac14e3b80e9e201f3c2901f82a1f857b2c3d0abdb1e13933204f14b855",
-    "camera/pit-stage-left/index.html": "1c0d6fe5e10b45fa25e7c4674d3fc340ee6d3bf550159d062fcd5699f63b02d6",
+    "camera/catwalk/index.html": "f3cac7191459c367011f2c0bd9e573b82cd375966278b8cd0f5ba499a85b728f",
+    "camera/front-of-house/index.html": "2d86a5b8284da873f88980e7348cfbfc768f19913e10040738783fe81d42bf5b",
+    "camera/index.html": "23f41d68757b3c1b5a920206578489b313078b8c1c5ce17ff159dc720b550d70",
+    "camera/pit-center/index.html": "9b94a5b6acb4dafba8e0219c78637e8558e91c8a6ff29fd25219f05bb4be8481",
+    "camera/pit-stage-left/index.html": "3d72bfde2019a64213b5f65bf2f7f35671df7fc3efd22df7c62e1a01d2fb9b37",
     "chrome.css": "3201f877bc9863492cbe1a5f953684507bde22ac33faa5fc05b935009ad3a938",
     "chrome.js": "b0d758a281f359e4a0db6fe0c8ce8814fc90b84869f9545e96485434c7ebe3e7",
     "fmp-social-card.png": "651832f5377dc395b846be4da71d6211f227024ce51520b4e84fdaaebcf8a890",
@@ -26,7 +26,7 @@
     "house/house.js": "8f2e076733f4e3e26da7d63d39d377076dd88b0af9e8ab308a397992e337e0dd",
     "house/index.html": "89ce0efa21a83360273b4002f0cec9278fb7d94b535274e5adebb68f0ad984cb",
     "house/site-plan.png": "655d27449a2f686ad17b74bed39b11edc69af9d342d46d079b98c042e4876f2e",
-    "index.html": "46145276e5885482375c04d00b3921250dec1b5f2aac115889b3808f7067f3ab",
+    "index.html": "815dc44ad1734dab185ea5cff6b59f469bc19e9803a33e49807159646b0737bd",
     "mail.js": "fe07a45a7b6d11537a05f44f5349b4b1e4407f4891fb3a8037377a5ccba0022a",
     "models/assets/atem-hd8-iso-0.js": "a7b138d09313c7b7ae5d846ec9dd63bbcbf12d624b46ef5124797dd04c569a15",
     "models/assets/atem-hd8-iso-1.js": "c8e396eb457048488a10e71169fe4b9ebdcbda72e48007a52438285d46fe836d",
@@ -42,7 +42,7 @@
     "models/assets/ccu4-0.js": "7005192118347731f670b3e860e9ce5ab74e32e724ffa9c5c715c8266123121b",
     "models/assets/ccu4-catalog.json": "473ae898a06575db8d57c0dedb57e60a6fc4810dad63a3a6efb6d6a3e4bde851",
     "models/assets/equipment-switcher.css": "fac7db76fe814c660b6f1f08c813239875bab87377b15246cd0a56eecfadb5ce",
-    "models/assets/equipment-switcher.js": "e027f35436681dd0aaa658c685e292a932e9a7534994bdb5dd903e3afe0c47d2",
+    "models/assets/equipment-switcher.js": "157aa8172a7ddc76d90d82386999d646eeb2f74b8b2131df814475e2f084627e",
     "models/assets/model-shell.css": "3e74e5c1b2d575db2f7a48b5fe7c1f477723f3cb6d2a406804f3daa8a44bc839",
     "models/assets/model-shell.js": "74b43475c2654acbe70dfd9c386ae3dc627df32c73aa4259d100f5079cf1a15f",
     "models/assets/p240-0.js": "4e07d4b2e0877535129aa6a604a44f17a4083330b62dbc53bbbff033e69bc742",
@@ -61,7 +61,7 @@
     "photos.js": "56a96b43f5b35693ec72e0876fb30b8a989edb9197b469dcc9099d544da5164e",
     "ptz/SuperJoy-G1-Interactive-Guide.html": "c08bbfaaf6999d4597ec914a57f6069cc3246e13acbfa12e8d49bbfccbff8e9f",
     "ptz/index.html": "755cfa1448a5e9b6fac81816fe97a09f3ebf41a07d9a6babf04aa8f065639dff",
-    "public.css": "dbaa4f0a9e7f1bd7aed289b8ed44ae4fb8546dfbf1eca9986dc6d0a5195c8df6",
+    "public.css": "4f75d1b8d475ee2901fdc4344af56121950378b34c1fcbf507bcd0128f744d59",
     "public.js": "b20019e13c274f2f81052690df1aaf0f7cd94aa0d7f7a5c45a04d9a1ee70b2c1",
     "ref.css": "06116202f4e535153c538bf4c8495fc404f13df39f32c0c41f1b8db6574562a6",
     "ref.js": "2dbb9a82f204bb5173360b7c52ffe4296afb6ae1618a69825398138508dd9fc5",
@@ -92,5 +92,5 @@
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a",
     "walk/index.html": "156b0f0945696e9b7e63e266caca959c4f68d363454f2d663d52e6ec2db4a925"
   },
-  "artifactSha256": "526c9f466635bb4511586d6df337b0aca6da8704139a7839faebf48d98b24107"
+  "artifactSha256": "cac4cf6a15f29d771e0aa0fadd3b49d6ac472f293ce89fe16a9badfe27d4fe07"
 }
