@@ -6,7 +6,7 @@
   let state=data.initialState(),selected='atem.transition.cut',venue=false,currentView='overview',diagram=false,diagramFocus=null,sceneKit=null,renderer=null,scene=null,camera=null,highlighted=[],meshMap=new Map(),pendingFrame=false;
   let autoFrame=0,blackFrame=0,lesson=null,attempts=0;
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const presets={overview:{target:[0,2.1,0],theta:.22,phi:.78,width:31,height:22},switching:{target:[-3.5,1.7,3.1],theta:.04,phi:.38,width:20,height:14},audio:{target:[-6.3,2,-2],theta:.05,phi:.48,width:15,height:10},console:{target:[-.8,4,-5.5],theta:0,phi:1.1,width:28,height:13},rear:{target:[0,1.8,-6.6],theta:Math.PI,phi:1.29,width:29,height:14}};
+  const presets={overview:{target:[0,2.1,0],theta:.22,phi:.78,width:31,height:22},switching:{target:[-3.5,1.7,3.1],theta:.04,phi:.38,width:20,height:14},audio:{target:[-6.3,2,-2],theta:.05,phi:.48,width:15,height:10},console:{target:[-.8,4,-5.5],theta:0,phi:1.1,width:28,height:13},rear:{target:[0,1.02,-7.18],theta:Math.PI,phi:Math.PI/2,width:29,height:6}};
   let orbit={theta:.22,phi:.78,distance:44,target:null};
   function escapeText(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function label(n){return (venue?data.venueLabels:data.hardwareLabels)[n-1];}
@@ -28,7 +28,7 @@
   function fitPreset(){if(!camera)return;const p=presets[currentView];orbit.theta=p.theta;orbit.phi=p.phi;orbit.target.set(...p.target);orbit.distance=Math.max(p.width/camera.aspect,p.height)/(2*Math.tan(camera.fov*Math.PI/360));updateCamera();}
   function setView(name){currentView=name;diagramFocus=null;root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===name)));fitPreset();drawDiagram();}
   function boundsFor(id){const box=new THREE.Box3();for(const m of meshMap.get(id)||[])box.expandByObject(m);return box;}
-  function focusPart(){const c=byId.get(selected);if(diagram){const s=c.shape;currentView=s.surface==='rear'?'rear':s.surface==='console'?'console':'switching';const p=diagramPosition(c);diagramFocus=c.kind==='chassis'?null:[p.x-3.3,p.y-2.6,6.6,5.2];drawDiagram();return;}if(!camera)return;const box=boundsFor(selected);if(box.isEmpty())return;const center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());orbit.target.copy(center);orbit.distance=Math.max(4.8,Math.max(size.x/camera.aspect,size.y,size.z)*2.6);orbit.theta=c.shape.surface==='rear'?Math.PI:0;orbit.phi=c.shape.surface==='deck'?.35:1.22;updateCamera();}
+  function focusPart(){const c=byId.get(selected);if(diagram){const s=c.shape;currentView=s.surface==='rear'?'rear':s.surface==='console'?'console':'switching';const p=diagramPosition(c);diagramFocus=c.kind==='chassis'?null:[p.x-3.3,p.y-2.6,6.6,5.2];drawDiagram();return;}if(!camera)return;const box=boundsFor(selected);if(box.isEmpty())return;const center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());orbit.target.copy(center);orbit.distance=Math.max(4.8,Math.max(size.x/camera.aspect,size.y,size.z)*2.6);orbit.theta=c.shape.surface==='rear'?Math.PI:0;orbit.phi=c.shape.surface==='rear'?Math.PI/2:c.shape.surface==='deck'?.35:1.22;updateCamera();}
   function clearSelection(){
     selected='';$('component').value='';
     $('category').textContent='Overview';$('label').textContent='Whole device';

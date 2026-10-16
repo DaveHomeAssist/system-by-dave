@@ -29,6 +29,7 @@ const releases = [
       ...cameraRoutes.map(route => `${route}index.html`),
       'house/index.html', 'house/house.css', 'house/house.js', 'house/house-data.js', 'house/house-tokens.css', 'house/site-plan.png', 'house/display-estate.csv',
       ...modelFiles,
+      ...['rig', 'atem', 'superjoy', 'p240', 'ccu4'].map(name => `models/previews/${name}.png`),
       'guide/index.html', 'gear/index.html', 'build/index.html', 'ptz/index.html', 'ref.css', 'ref.js',
       // A typed /fmp/walk/ redirects to the walk on its own origin (FMP open issues plan A4).
       'walk/index.html',
@@ -145,9 +146,9 @@ for (const name of ['camera.js', 'house/index.html', 'guide/index.html']) {
   assert.doesNotMatch(fs.readFileSync(path.join(site, 'fmp', name), 'utf8'), /(?:href=["'](?:https:\/\/walk\.housevideo\.app)?\/fmpwalk\/|['"]https:\/\/walk\.housevideo\.app\/fmpwalk\/['"])/, `${name}: walk launch remains in the operator/reference site`);
 }
 for (const target of ['https://housevideo.app/camera-sim/', '/shader/practice.html', 'rig/', 'models/atem-hd8-iso.html', 'ptz/SuperJoy-G1-Interactive-Guide.html', 'models/p240.html', 'models/ccu4.html']) {
-  assert.ok(entry.includes(`<a class="model-card" href="${target}"`), `The Practice tab must reach ${target}`);
+  assert.ok(entry.includes(`<a class="model-card" href="${target}"`), `The 3D Gear Models tab must reach ${target}`);
 }
-assert.match(entry, /<span>Practice<\/span>/, 'fmp/index.html: the models panel is labelled Practice');
+assert.match(entry, /<span>3D Gear Models<\/span>/, 'fmp/index.html: the models panel is labelled 3D Gear Models');
 assert.match(entry, /id="models"/);
 const cameraView = fs.readFileSync(path.join(site, 'fmp/camera-view.js'), 'utf8');
 assert.match(cameraView, /href="#screenTitle"/);

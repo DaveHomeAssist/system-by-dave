@@ -1,0 +1,8 @@
+.equipment-switcher { display:flex; align-items:center; gap:8px; min-width:0; font:inherit; }
+.equipment-switcher select { width:230px; max-width:100%; min-height:44px; padding:6px 8px; font:inherit; color:inherit; background:var(--surface, Canvas); border:1px solid var(--border, #888); border-radius:4px; }
+@media(max-width:600px) {
+  .equipment-switcher { flex:1 1 100%; }
+  .equipment-switcher select { flex:1; width:auto; min-width:0; }
+}
+.model-site-nav .equipment-switcher { margin-left:0; }
+.model-site-nav .equipment-switcher select { max-width:100%; }

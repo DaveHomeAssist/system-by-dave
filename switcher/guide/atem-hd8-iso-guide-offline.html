@@ -7,7 +7,7 @@
 <meta name="description" content="Interactive ATEM Television Studio HD8 ISO study model with 227 sourced components and local switching practice.">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7leWoDV9kEgIB3JHIkmr8xEk7wNT3mOYzCOqAAjVrUA=' 'sha256-AsJzSR0/OszrAnx9RW35VxXi+yOUC/Qv49zfNKkRoJk=' 'sha256-NSy4Y03S5TiCankfsbnOUg4LCS4N06XG60CfDO4kOGs=' 'sha256-yOOW60VwSEiKEOcRaf5Lnr3L2nLkgAelJDgoXUb+g20=' 'sha256-0+xHxO3i6s+kho4CIZlAAvI+Zs0zi8DGcOjRoqCxlT4=' 'sha256-S7hKeMT2q2UPSgEUe6ha7BbBKdWy/Tj/1x9c6zXCh/Y=' 'sha256-dLQ0dcJlSsvnDf2cOGrj3GJ98yxzqkJZ0QD1B5zxoV8='; style-src 'unsafe-inline'; img-src data: blob:; font-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7leWoDV9kEgIB3JHIkmr8xEk7wNT3mOYzCOqAAjVrUA=' 'sha256-AsJzSR0/OszrAnx9RW35VxXi+yOUC/Qv49zfNKkRoJk=' 'sha256-NSy4Y03S5TiCankfsbnOUg4LCS4N06XG60CfDO4kOGs=' 'sha256-yOOW60VwSEiKEOcRaf5Lnr3L2nLkgAelJDgoXUb+g20=' 'sha256-lSKppIqRvZNQnAALZNMfMgPaC8mhiRkKFkdvaMz7YFQ=' 'sha256-ac3Yn506KUzexaBe8/UIoiXIFOoVjmJjgKd18eJxHEA=' 'sha256-dLQ0dcJlSsvnDf2cOGrj3GJ98yxzqkJZ0QD1B5zxoV8='; style-src 'unsafe-inline'; img-src data: blob:; font-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://housevideo.app/switcher/guide/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="FMP Video Operations">
@@ -327,7 +327,7 @@ html,body{background:var(--model-bg)!important;color:var(--model-ink);margin:0;p
 .model-skip{position:fixed;left:12px;top:-100px;z-index:99999;padding:14px;background:var(--model-panel);color:var(--model-ink)}.model-skip:focus{top:8px}.model-notice{padding:16px;background:var(--model-panel);color:var(--model-ink)}
 #model-content:focus{outline:none}[hidden]{display:none!important}
 .model-site-nav :focus-visible{outline:3px solid #bf722d;outline-offset:3px}
-@media(max-width:700px){.model-site-nav{gap:5px 12px;padding:6px 12px;font-size:12px}.model-site-nav a:first-child{display:none}.model-site-nav label{margin-left:auto}.model-site-nav select{max-width:90px}}
+@media(max-width:700px){.model-site-nav{gap:5px 12px;padding:6px 12px;font-size:12px}.model-site-nav a:first-child{display:inline-flex;flex-basis:100%}.model-site-nav label{margin-left:auto}.model-site-nav select{max-width:90px}}
 @media(min-width:2300px){#model-content #atem-explorer{max-width:none}.bench .workspace{grid-template-columns:minmax(0,1fr) minmax(360px,24vw)}.bench .practice-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .model-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:10px 20px;background:var(--model-panel);border-bottom:1px solid var(--model-line)}.model-tabs button{min-height:44px;border:1px solid var(--model-line);border-radius:5px;padding:9px 15px;font:600 14px system-ui;background:var(--model-bg);color:var(--model-ink)}.model-tabs button[aria-pressed=true]{background:#334a40;color:#fff}.model-tabs button:focus-visible{outline:3px solid #bf722d;outline-offset:3px}
 @media(min-width:1000px){#atem-explorer{height:calc(100dvh - 61px);display:flex;flex-direction:column}#atem-explorer .masthead{padding:14px 24px}#atem-explorer [data-model-panel]{flex:1;min-height:0;overflow:auto}#atem-explorer .workspace{overflow:hidden}#atem-explorer .visual-column{display:flex;flex-direction:column}#atem-explorer .stage{flex:1;min-height:180px;max-height:none;height:auto}#atem-explorer .inspector{overflow:auto}#atem-explorer .footer{padding:24px}#atem-explorer .footer details{font-size:14px}}
@@ -355,6 +355,15 @@ html{background:#d8d4cc}body{margin:0;padding:18px} @media(max-width:680px){body
 
 /* Keep the model inside the desktop workspace without clipping its controls. */
 @media(min-width:1000px){#atem-explorer .visual-column{min-height:0}#atem-explorer .stage{height:auto;min-height:180px;max-height:none}}
+
+.equipment-switcher { display:flex; align-items:center; gap:8px; min-width:0; font:inherit; }
+.equipment-switcher select { width:230px; max-width:100%; min-height:44px; padding:6px 8px; font:inherit; color:inherit; background:var(--surface, Canvas); border:1px solid var(--border, #888); border-radius:4px; }
+@media(max-width:600px) {
+  .equipment-switcher { flex:1 1 100%; }
+  .equipment-switcher select { flex:1; width:auto; min-width:0; }
+}
+.model-site-nav .equipment-switcher { margin-left:0; }
+.model-site-nav .equipment-switcher select { max-width:100%; }
 
 .switcher-guide-tools{justify-content:flex-end}</style>
 <script>// One FMP theme preference, stored in the preshow walk's fmpTheme key. A first visit is light (WEB-1),
@@ -4759,8 +4768,19 @@ void main() {
     function ring(p,r,t,mat,x=0,y=0,z=0){return mesh(new T.TorusGeometry(r,t,6,24),mat,p,x,y,z);}
     function canvasTexture(w,h,paint) {const c=makeCanvas(w,h);paint(c.getContext('2d'),w,h);const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;tx.anisotropy=4;textures.push(tx);return {canvas:c,texture:tx};}
     function textPlane(p,text,w,h,x=0,y=0,z=.25,color='#182126',bg=null) {
-      const tx=canvasTexture(256,128,(ctx,cw,ch)=>{ctx.clearRect(0,0,cw,ch);if(bg){ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch);}ctx.fillStyle=color;const rows=text.split('\n'),fontSize=rows.length>1?35:text.length>10?22:text.length>6?30:46;ctx.font='600 '+fontSize+'px Arial';ctx.textAlign='center';ctx.textBaseline='middle';rows.forEach((s,i)=>ctx.fillText(s,cw/2,ch/2+(i-(rows.length-1)/2)*39,235));});
-      const m=mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tx.texture,transparent:!bg,depthWrite:false}),p,x,y,z);m.castShadow=false;return m;
+      // Match the texture to the physical label so glyphs are never stretched flat.
+      const cw=512,ch=Math.max(32,Math.round(cw*h/w));
+      const tx=canvasTexture(cw,ch,(ctx,cw,ch)=>{
+        ctx.clearRect(0,0,cw,ch);if(bg){ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch);}
+        ctx.fillStyle=color;const rows=text.split('\n');
+        let fontSize=ch*.78/rows.length;
+        ctx.font='600 '+fontSize+'px Arial';
+        const widest=Math.max(...rows.map(row=>ctx.measureText(row).width));
+        fontSize*=Math.min(1,cw*.92/widest);
+        ctx.font='600 '+fontSize+'px Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+        rows.forEach((row,i)=>ctx.fillText(row,cw/2,ch/2+(i-(rows.length-1)/2)*fontSize*1.15));
+      });
+      const m=mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tx.texture,transparent:!bg,depthWrite:false,toneMapped:false}),p,x,y,z);m.castShadow=false;return m;
     }
     const shell=new T.Group();shell.userData.componentId='atem.chassis';model.add(shell);groups.set('atem.chassis',shell);
     // Photo reconstruction in arbitrary model units, not manufacturing dimensions.
@@ -4833,7 +4853,7 @@ void main() {
       if(s.surface==='rear') {
         let label=c.label.replace('Camera return SDI OUT ','OUT ').replace('SDI INPUT ','IN ').replace(' · SDI output','').replace(' · RJ12 RS-422','').replace(' · RJ45 expansion','').replace(' · RCA','').replace('ANALOG AUDIO IN CH ','CH ');
         if(label.length>20)label=label.replace('MULTIVIEW','M/V').replace('TALKBACK','TALK');
-        textPlane(g,label,.84,.15,0,s.y>0?-.34:-.37,.075,'#c6cccc');
+        textPlane(g,label,.88,.24,0,s.y>0?-.38:-.41,.075,'#ffffff');
       }
     }
     // Enclosure face meshes carry their own IDs for ray picking.
@@ -4878,7 +4898,7 @@ void main() {
   let state=data.initialState(),selected='atem.transition.cut',venue=false,currentView='overview',diagram=false,diagramFocus=null,sceneKit=null,renderer=null,scene=null,camera=null,highlighted=[],meshMap=new Map(),pendingFrame=false;
   let autoFrame=0,blackFrame=0,lesson=null,attempts=0;
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const presets={overview:{target:[0,2.1,0],theta:.22,phi:.78,width:31,height:22},switching:{target:[-3.5,1.7,3.1],theta:.04,phi:.38,width:20,height:14},audio:{target:[-6.3,2,-2],theta:.05,phi:.48,width:15,height:10},console:{target:[-.8,4,-5.5],theta:0,phi:1.1,width:28,height:13},rear:{target:[0,1.8,-6.6],theta:Math.PI,phi:1.29,width:29,height:14}};
+  const presets={overview:{target:[0,2.1,0],theta:.22,phi:.78,width:31,height:22},switching:{target:[-3.5,1.7,3.1],theta:.04,phi:.38,width:20,height:14},audio:{target:[-6.3,2,-2],theta:.05,phi:.48,width:15,height:10},console:{target:[-.8,4,-5.5],theta:0,phi:1.1,width:28,height:13},rear:{target:[0,1.02,-7.18],theta:Math.PI,phi:Math.PI/2,width:29,height:6}};
   let orbit={theta:.22,phi:.78,distance:44,target:null};
   function escapeText(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function label(n){return (venue?data.venueLabels:data.hardwareLabels)[n-1];}
@@ -4900,7 +4920,7 @@ void main() {
   function fitPreset(){if(!camera)return;const p=presets[currentView];orbit.theta=p.theta;orbit.phi=p.phi;orbit.target.set(...p.target);orbit.distance=Math.max(p.width/camera.aspect,p.height)/(2*Math.tan(camera.fov*Math.PI/360));updateCamera();}
   function setView(name){currentView=name;diagramFocus=null;root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===name)));fitPreset();drawDiagram();}
   function boundsFor(id){const box=new THREE.Box3();for(const m of meshMap.get(id)||[])box.expandByObject(m);return box;}
-  function focusPart(){const c=byId.get(selected);if(diagram){const s=c.shape;currentView=s.surface==='rear'?'rear':s.surface==='console'?'console':'switching';const p=diagramPosition(c);diagramFocus=c.kind==='chassis'?null:[p.x-3.3,p.y-2.6,6.6,5.2];drawDiagram();return;}if(!camera)return;const box=boundsFor(selected);if(box.isEmpty())return;const center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());orbit.target.copy(center);orbit.distance=Math.max(4.8,Math.max(size.x/camera.aspect,size.y,size.z)*2.6);orbit.theta=c.shape.surface==='rear'?Math.PI:0;orbit.phi=c.shape.surface==='deck'?.35:1.22;updateCamera();}
+  function focusPart(){const c=byId.get(selected);if(diagram){const s=c.shape;currentView=s.surface==='rear'?'rear':s.surface==='console'?'console':'switching';const p=diagramPosition(c);diagramFocus=c.kind==='chassis'?null:[p.x-3.3,p.y-2.6,6.6,5.2];drawDiagram();return;}if(!camera)return;const box=boundsFor(selected);if(box.isEmpty())return;const center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());orbit.target.copy(center);orbit.distance=Math.max(4.8,Math.max(size.x/camera.aspect,size.y,size.z)*2.6);orbit.theta=c.shape.surface==='rear'?Math.PI:0;orbit.phi=c.shape.surface==='rear'?Math.PI/2:c.shape.surface==='deck'?.35:1.22;updateCamera();}
   function clearSelection(){
     selected='';$('component').value='';
     $('category').textContent='Overview';$('label').textContent='Whole device';

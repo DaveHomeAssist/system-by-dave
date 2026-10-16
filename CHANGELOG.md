@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-16 — FMP 3D Gear Models
+
+- Preserve direct explorer links when JavaScript is unavailable and hide the enhanced model launcher until it works. Keep the camera-rig summary visible beneath mobile equipment navigation.
+
+- Add a shared equipment dropdown to all five explorers and repair ATEM label proportions, rear contrast and straight-on inspection views.
+
+- Make 3D Gear Models a primary destination with a prominent hub header link and consistent explorer/reference navigation. Keep existing model bookmarks and local practice controls.
+- Show captures of the five actual equipment models, describe supported interactions and group camera/shading simulators separately. Restore mobile FMP return links.
+- Export the canonical fmp-suite change with exact provenance and explicitly allowlist the reviewed model previews.
+
 ## 2026-10-15 — Audio signal flow
 
 - Add a native Audio Signal flow panel and view with editable devices, directed connections, upstream/downstream tracing and an accessible connection list. Distinguish labelled line level, speaker level and unknown signals; retain unconfirmed routes and device details.

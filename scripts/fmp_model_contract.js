@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 // Exact managed equipment artifacts. The release verifier also checks provenance.
 const modelFiles = [
   ...['atem-hd8-iso', 'p240', 'ccu4'].map(name => `models/${name}.html`),
-  ...['bench-core.js', 'bench.css', 'model-shell.js', 'model-shell.css', 'atem-hd8-iso.css',
+  ...['equipment-switcher.js', 'equipment-switcher.css', 'bench-core.js', 'bench.css', 'model-shell.js', 'model-shell.css', 'atem-hd8-iso.css',
     'atem-hd8-iso-0.js', 'atem-hd8-iso-1.js', 'atem-hd8-iso-2.js', 'atem-hd8-iso-3.js',
     'p240-0.js', 'p240-catalog.json', 'ccu4-0.js', 'ccu4-catalog.json',
     // Supplied HD8 ISO reference views; served as files since fmp-suite e643c91,

@@ -88,7 +88,7 @@ header.top > nav { margin-right: auto; }
   header.top { gap: 8px; padding: 8px 12px; }
   header.top > nav { gap: 6px; font-size: 12px; }
   header.top > nav > span { display: none; }
-  header.top > nav a:first-child { display: none; }
+  header.top > nav a:first-child { display: inline-flex; }
   header.top .theme-label select { max-width: 80px; font-size: 12px; padding-inline: 8px; }
   .workspace-menu { font-size: 12px; }
   .workspace-menu summary { padding-inline: 10px; }
@@ -155,3 +155,9 @@ header.top > nav { margin-right: auto; }
   :root[data-fmp-guide-fonts] .guide-responsive-table td { display: block; padding: 6px 0; border: 0; }
   :root[data-fmp-guide-fonts] .guide-responsive-table td::before { content: attr(data-column-label); display: block; font: 600 12px/1.5 "JetBrains Mono", ui-monospace, monospace; color: var(--av-accent); margin-bottom: 4px; }
 }
+
+/* Keep the equipment directory directly available beside the workspace menu. */
+header.top { flex-wrap: wrap; }
+.equipment-directory { display: inline-flex; align-items: center; min-height: 44px; color: var(--av-accent); font-size: 13px; }
+.equipment-directory:focus-visible { outline: 3px solid var(--av-focus); outline-offset: 3px; }
+@media (max-width: 680px) { header.top > nav { flex-basis: 100%; } .equipment-directory { margin-right: auto; font-size: 12px; } }
