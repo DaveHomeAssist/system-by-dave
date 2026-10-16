@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-16 — FMP 3D Gear Models
+
+- Make 3D Gear Models a primary destination with a prominent hub header link and consistent explorer/reference navigation. Keep existing model bookmarks and local practice controls.
+- Show captures of the five actual equipment models, describe supported interactions and group camera/shading simulators separately. Restore mobile FMP return links.
+- Export the canonical fmp-suite change with exact provenance and explicitly allowlist the reviewed model previews.
+
 ## 2026-10-15 — Audio signal flow
 
 - Add a native Audio Signal flow panel and view with editable devices, directed connections, upstream/downstream tracing and an accessible connection list. Distinguish labelled line level, speaker level and unknown signals; retain unconfirmed routes and device details.

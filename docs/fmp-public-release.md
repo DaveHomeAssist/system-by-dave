@@ -10,7 +10,7 @@ access control.
 
 ## Product boundaries
 
-- `/fmp/`: choose Operators, Reference, 3D Models or House at `#cameras`, `#learn`,
+- `/fmp/`: choose Operators, Reference, 3D Gear Models or House at `#cameras`, `#learn`,
   `#models` or `#house`. A separate access/setup link remains at `#setup`.
 - `/fmp/house/`: dated house-video reference, display inventory, bowl schematic,
   rack views and visitor map. Source conflicts stay visible; there is no live
