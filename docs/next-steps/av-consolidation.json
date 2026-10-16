@@ -4,7 +4,7 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "4c446ed6aca5b18ce0ab3af9a3c65fab4a2126cb",
+  "head": "fa22e740c885a8630c49b08c6c029506b406f7d2",
   "status": "amber",
   "statusReason": "PR345 is merged at 4c446ed and live (Pages run 38712124711). Dave ruled on 2026-10-15 that the October 14 removal of whole-application tiles was a Codex decision, not his: AV Calculator stays the native nine-panel pack, and the seven specialists without a pack (Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter) are chrome-less panels of their own pages again under a Tools group. Family-route redirects and physical/operator acceptance remain open.",
   "specialistPanelRestoration": {
