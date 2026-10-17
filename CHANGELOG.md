@@ -4,6 +4,7 @@
 
 - Add Ion and Universal 2×20 to the workspace panel chooser with an internal viewer, checked handshake, access recovery and per-panel camera snapshots.
 - Keep Ion private and online-only. Authenticated cross-origin browser acceptance remains a release gate.
+- Update the AV Suite shell browser probe for the new Gear 3D chooser group (11 groups; Gear 3D panels render as framed viewers).
 
 ## 2026-10-16 — FMP 3D Gear Models
 
