@@ -71,27 +71,7 @@ jobs:
           npm run verify:domain-sites
           npm run test:camera-training-links
 
-      - name: Verify AV suite import safety
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-suite-import-browser
-
-      - name: Verify AV Video legacy pages
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-video-legacy-browser
-
-      - name: Verify AV save safety
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-save-safety-browser
-
-      - name: Verify AV navigation clearance
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-nav-browser
-
-      - name: Verify AV domain views and responsive tools
+      - name: Verify AV themes and LED configurator
         run: |
           export CHROME_BIN="$(command -v google-chrome)"
           test -n "$CHROME_BIN"
@@ -99,19 +79,12 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           for attempt in 1 2 3 4 5 6 7 8 9 10; do
-            if curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null; then break; fi
+            if curl --silent --fail http://127.0.0.1:8000/av/ >/dev/null; then break; fi
             sleep 1
           done
-          curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null
-          node scripts/probe_av_domain_views.js
+          curl --silent --fail http://127.0.0.1:8000/av/ >/dev/null
           node scripts/probe_av_themes.js
-          node scripts/probe_av_suite_responsive.js
           node scripts/probe_led_wall_configurator.js
-
-      - name: Verify AV show context fill
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:av-context-fill-browser
 
       - name: Verify ATEM switcher guide
         env:
@@ -141,6 +114,15 @@ jobs:
           npm run test:av-video
           npm run build:av-video
           npm run test:av-video-browser
+
+      - name: Verify AV Suite shell
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:av-suite
+          npm run build:av-suite
+          git diff --exit-code -- av
+          npm run test:av-suite-browser
 
       - name: Verify AV Audio
         run: |

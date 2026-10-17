@@ -7,7 +7,7 @@ import "./styles.css";
 try {
   const shared = localStorage.getItem('av-theme-mode.v1');
   const previous = localStorage.getItem('sbd.showControl.theme.v1');
-  if (!['light', 'dark', 'system'].includes(shared || '') && ['light', 'dark'].includes(previous || '')) {
+  if (!['light', 'dark', 'white', 'black', 'system'].includes(shared || '') && ['light', 'dark'].includes(previous || '')) {
     document.documentElement.dataset.avTheme = previous!;
     localStorage.setItem('av-theme-mode.v1', previous!);
   }

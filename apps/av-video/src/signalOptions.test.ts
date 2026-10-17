@@ -4,7 +4,7 @@ const wall = { ledMode: "layout", ledCabinetRotation: "0", ledCabinetPixelsWide:
 it("offers distinct broadcast rates and fixed common connector choices", () => {
   expect(isPresetFormat("1080p59.94")).toBe(true); expect(isPresetFormat("1080p60")).toBe(true);
   expect(isPresetFormat("2160p50")).toBe(true); expect(isPresetFormat("1920x1200p60")).toBe(true);
-  expect(CONNECTOR_GROUPS.flatMap(g => g.values)).toEqual(expect.arrayContaining(["HDMI", "DisplayPort", "3G SDI", "12G SDI", "DVI-D"]));
+  expect(CONNECTOR_GROUPS.flatMap(g => g.values)).toEqual(expect.arrayContaining(["HDMI", "DisplayPort", "AirPlay", "3G SDI", "12G SDI", "DVI-D"]));
 });
 it("keeps custom LED raster dimensions exact and rejects incomplete or invalid timings", () => {
   expect(customFormat(3072, 512, 59.94)).toBe("3072x512p59.94");

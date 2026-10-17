@@ -1,6 +1,4 @@
-// Interaction + motion controller.
-// Copy-to-clipboard runs always. Motion runs only if GSAP loaded (progressive
-// enhancement: if GSAP is blocked/missing, CSS keeps all content visible).
+// Profile contact controls. The shared public reader owns layout and deep links.
 (function () {
   "use strict";
 
@@ -39,70 +37,4 @@
     });
   });
 
-  /* ---------------- Motion (GSAP) ---------------- */
-  var gsap = window.gsap;
-  if (!gsap) { return; } // No GSAP -> CSS leaves everything visible. Done.
-
-  var ST = window.ScrollTrigger || null;
-  if (ST) { gsap.registerPlugin(ST); }
-
-  // Take ownership of initial hidden states (see html.js rules in styles.css).
-  document.documentElement.classList.add("js");
-
-  var mm = gsap.matchMedia();
-
-  // Full motion
-  mm.add("(prefers-reduced-motion: no-preference)", function () {
-    // Hero entrance
-    gsap.set(".hero .anim-in", { opacity: 0, y: 20 });
-    gsap.set(".hero-portrait img", { opacity: 0, scale: 1.05 });
-
-    var tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.7 } });
-    tl.to(".hero .eyebrow", { opacity: 1, y: 0 })
-      .to(".hero h1", { opacity: 1, y: 0 }, "-=0.45")
-      .to(".hero .lede", { opacity: 1, y: 0 }, "-=0.45")
-      .to(".hero .chips", { opacity: 1, y: 0 }, "-=0.45")
-      .to(".hero-portrait img", { opacity: 1, scale: 1, duration: 0.9, ease: "power2.out" }, "-=0.75");
-
-    if (ST) {
-      // Section reveals, staggered as each enters
-      gsap.set(".reveal", { opacity: 0, y: 24 });
-      ScrollTrigger.batch(".reveal", {
-        start: "top 86%",
-        onEnter: function (batch) {
-          gsap.to(batch, {
-            opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
-            stagger: 0.12, overwrite: true
-          });
-        }
-      });
-
-      // Stat count-up
-      gsap.utils.toArray(".stat .num").forEach(function (el) {
-        var target = parseInt(el.textContent, 10) || 0;
-        var obj = { v: 0 };
-        ScrollTrigger.create({
-          trigger: el, start: "top 90%", once: true,
-          onEnter: function () {
-            gsap.to(obj, {
-              v: target, duration: 1.2, ease: "power2.out",
-              onUpdate: function () { el.textContent = Math.round(obj.v); }
-            });
-          }
-        });
-      });
-
-      // Recompute positions after fonts/images settle
-      window.addEventListener("load", function () { ScrollTrigger.refresh(); });
-    } else {
-      // No ScrollTrigger: reveal everything so nothing stays hidden
-      gsap.set(".reveal", { opacity: 1, y: 0 });
-    }
-  });
-
-  // Reduced motion: snap to final, no scroll choreography, no count-up
-  mm.add("(prefers-reduced-motion: reduce)", function () {
-    gsap.set(".reveal, .hero .anim-in", { opacity: 1, y: 0 });
-    gsap.set(".hero-portrait img", { opacity: 1, scale: 1 });
-  });
 })();

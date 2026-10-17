@@ -107,8 +107,8 @@ function downloadStoredWorkbook(readOnly: WorkbookReadOnly): void {
   downloadText(`${id}-read-only.json`, storedWorkbookText(readOnly.raw));
 }
 
-type ThemeMode = "light" | "dark" | "system";
-const themeModes: ThemeMode[] = ["light", "dark", "system"];
+type ThemeMode = "light" | "dark" | "white" | "black" | "system";
+const themeModes: ThemeMode[] = ["light", "dark", "white", "black", "system"];
 
 function applyThemeMode(mode: ThemeMode) {
   document.documentElement.setAttribute("data-av-theme", mode);

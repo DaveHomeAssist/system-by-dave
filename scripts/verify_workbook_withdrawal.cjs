@@ -10,7 +10,7 @@ for (const name of ['av-suite.html', 'tools.html']) {
 }
 for (const name of ['av-workbook.html', 'av-workbook/index.html']) {
   const html = fs.readFileSync(path.join(root, name), 'utf8');
-  assert(html.includes("location.replace('/av-suite.html?entry=toolbox')"), `${name} does not return directly to Toolbox`);
+  assert(html.includes("location.replace('/av/')"), `${name} does not return directly to the AV by Dave console`);
   assert(!/localStorage|indexedDB|av-workbook\.js/.test(html), `${name} loads the editor or touches saved data`);
 }
 assert(!fs.existsSync(path.join(root, 'av-workbook/assets')), 'Public editor assets must be removed');

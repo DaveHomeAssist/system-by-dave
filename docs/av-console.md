@@ -2,6 +2,8 @@
 
 ## Suite definition of done
 
+**Revised 2026-10-13:** the [AV Suite shell brief](av-suite-shell.md) replaces the paragraph below. One `/av/` console hosts every application as a panel pack; `/av-video/` is no longer the host and the embedded full-application panels are removed.
+
 As clarified on October 9, 2026, the complete application Rail is part of the console rather than only a route launcher. AV Video and the other eight primary applications are selectable Rail snapshots inside the shared workspace. Their panels use the same move, resize, split, maximize, replace, lock and stored-view controls. Full details and compatibility boundaries are in [AV Suite console snapshot Rail](av-suite-console-snapshot-rail.md).
 
 Standalone application routes remain available. Each application continues to own its records, storage, schemas, import history, Save and Export behavior; the suite snapshot stores arrangement only.
@@ -17,6 +19,8 @@ adopts it in the October 9 functional-panel conversion. The engine lives in
 - `console.css` holds the shell styles on the `css/av-theme.css` tokens.
 
 ## What is shared and what is not
+
+Since 2026-10-13 an application supplies these as a **panel pack** (`apps/<app>/src/pack.tsx`, contract in `apps/shared/av-console/pack.ts`): a hook that owns the document, recovery and actions and returns the renderer. The AV Suite shell at `/av/` mounts every pack in one workspace and namespaces its panel types; the application's standalone route mounts the same pack inside its own workspace.
 
 A console supplies four things:
 - **Its panel library:** type, name, category, description, minimum size, optional module, and whether it is the lit panel.

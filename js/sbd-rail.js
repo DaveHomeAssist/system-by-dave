@@ -5,7 +5,7 @@
 
   var STORAGE_KEY='sbd.rail.v1';
   var PREFERENCE_VERSION=1;
-  var REFERENCE_PATTERN=/^(console|family|tool|external):[^:]+$/;
+  var REFERENCE_PATTERN=/^(console|tool|external):[^:]+$/;
   var STATIC_ICONS={
     toolbox:['M2 7h20v13H2z','M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2','M2 12h20','M10 12v3h4v-3'],
     all:['M3.4 3.4h3.2v3.2H3.4z','M10.4 3.4h3.2v3.2h-3.2z','M17.4 3.4h3.2v3.2h-3.2z','M3.4 10.4h3.2v3.2H3.4z','M10.4 10.4h3.2v3.2h-3.2z','M17.4 10.4h3.2v3.2h-3.2z','M3.4 17.4h3.2v3.2H3.4z','M10.4 17.4h3.2v3.2h-3.2z','M17.4 17.4h3.2v3.2h-3.2z'],
@@ -38,10 +38,6 @@
     return null;
   }
 
-  function toolboxFamilyHref(id){
-    return 'av-suite.html?entry=toolbox&family='+encodeURIComponent(id);
-  }
-
   function resolveRef(reference,registry){
     registry=registryOrDefault(registry);
     reference=String(reference||'');
@@ -68,12 +64,6 @@
         href:item.availability==='available'&&tool?tool.href:null,
         source:item
       };
-    }
-
-    if(namespace==='family'){
-      item=exactById(registry.consoleFamilies,id);
-      if(!item) return null;
-      return {ref:reference,namespace:namespace,id:id,label:item.label,icon:(item.icon||[]).slice(),availability:'available',pinnable:true,navigable:true,href:toolboxFamilyHref(id),source:item};
     }
 
     if(namespace==='tool'){
@@ -331,12 +321,15 @@
 
     var toolbox=documentRef.createElement('a');
     toolbox.className='sbd-rail__action sbd-rail__toolbox';
-    toolbox.setAttribute('href',options.toolboxHref||'av-suite.html?entry=toolbox');
-    toolbox.setAttribute('data-label','Toolbox');
-    toolbox.setAttribute('title','Toolbox');
+    toolbox.setAttribute('href',options.toolboxHref||'av/');
+    toolbox.setAttribute('data-label','Workspace');
+    toolbox.setAttribute('title','Workspace');
+    toolbox.setAttribute('data-rail-ref','toolbox');
     if(options.currentRef==='toolbox') toolbox.setAttribute('aria-current','page');
     toolbox.appendChild(svgIcon(documentRef,STATIC_ICONS.toolbox));
-    toolbox.appendChild(labelSpan(documentRef,'Toolbox'));
+    toolbox.appendChild(labelSpan(documentRef,'Workspace'));
+    /* Inside the AV Suite shell the Workspace entry recalls the empty view in place. */
+    if(typeof options.onNavigate==='function') toolbox.addEventListener('click',function(event){options.onNavigate({ref:'toolbox',namespace:'toolbox',id:'toolbox',label:'Workspace',href:toolbox.getAttribute('href')},event);});
     nav.appendChild(toolbox);
 
     var list=documentRef.createElement('ol');

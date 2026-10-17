@@ -5,7 +5,69 @@
 - Add the original seven Speaker status choices and labels alongside existing custom entry. Preserve blank/custom/absent/null records and explicit Save; only the selected speaker's status changes.
 - Keep status `coverage` (Coverage Checked) independent from the separate coverage field, all other speaker fields, channel statuses and original source bytes. Same-ID changed-source imports still preserve working rows; no schema, key or import-policy change.
 - Duncan passes typecheck, 69 model tests, build, AV/23 Rail-worker cases, Throwline/47 and Shader Practice/54. Thirteen browser groups pass, then Inputs expansion is blocked by overlapping panel headers at 844×390 before the probe enters Full screen. Preserve the failed run; no retry or release progression. Remaining browser, CI and published acceptance are open; physical/operator and interruption/power-loss proof is not implied.
+- Merge main (2026-10-17): port the Speaker status control into the Audio pack (`apps/av-audio/src/pack.tsx`) after the App→pack refactor, drop the obsolete embedded `/av-video/` iframe probe section that main removed, and move the cache generation to `v20261017-audio-speaker-status` after main's `v20261015-audio-signal-flow`.
 - Advance shared cache generation and all intentional consumers together. PR #336's Line Check release at `94b1ce7` is the completed baseline, not evidence for this changed control.
+
+## 2026-10-16 — FMP 3D Gear Models
+
+- Preserve direct explorer links when JavaScript is unavailable and hide the enhanced model launcher until it works. Keep the camera-rig summary visible beneath mobile equipment navigation.
+
+- Add a shared equipment dropdown to all five explorers and repair ATEM label proportions, rear contrast and straight-on inspection views.
+
+- Make 3D Gear Models a primary destination with a prominent hub header link and consistent explorer/reference navigation. Keep existing model bookmarks and local practice controls.
+- Show captures of the five actual equipment models, describe supported interactions and group camera/shading simulators separately. Restore mobile FMP return links.
+- Export the canonical fmp-suite change with exact provenance and explicitly allowlist the reviewed model previews.
+
+## 2026-10-15 — Audio signal flow
+
+- Add a native Audio Signal flow panel and view with editable devices, directed connections, upstream/downstream tracing and an accessible connection list. Distinguish labelled line level, speaker level and unknown signals; retain unconfirmed routes and device details.
+- Offer a reviewed powered-top/passive-sub template without inferring models, quantities, settings or wiring from planning tables. Block known signal-domain mismatches.
+- Save the optional graph inside the existing Audio v1 document, preserving old plans, tables, source snapshots and export/import behaviour. Include compatibility and browser regression coverage.
+
+
+## 2026-10-15 — Specialist panels return to the console
+
+- Restore the seven specialist tools without a native pack (Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter) as chrome-less panels of their own pages in the AV Suite shell: a **Tools** group in the chooser, a default view each, the Rail and All apps opening them inside `/av/`, and "Open full" to the standalone route. The October 14 removal of whole-application tiles was a Codex session's own decision; Dave confirmed on 2026-10-15 that the 2026-10-13 direction stands. AV Calculator remains the native nine-panel pack, and a saved specialist slot renders again instead of a recovery notice; stored view and layout bytes are untouched on opening.
+- `scripts/probe_av_suite_shell.mjs` checks Throwline opens as a panel from All apps with its navigation hidden, the Tools group is offered beside the nine departments, every Tools choice renders its page as a panel, and a saved Throwline slot embeds and can be replaced without rewriting the saved view. Cache generation `v20261015-av-specialist-panels`.
+
+## 2026-10-14 — Website release reconciliation
+
+- Retain the approved System/profile subject tabs, pagination and saved light/dark controls; preserve contact/PDF corrections and accessible mobile navigation. AV lands directly in the current console.
+- Reconcile the landing PR with the released single AV console. Preserve retired route redirects and current application builds; retain AV social artwork, development-file exclusions and the branded not-found page. Final Dave approval remains required before merging the website stack.
+## 2026-10-14 — Individual Calculator panels in the shared console
+
+- Remove all whole-app specialist tiles from the shared chooser and new views. Standalone tools keep their normal Rail links. Existing saved specialist slots remain stored unchanged, with separate-page recovery links instead of iframes. Exercise every native menu choice as a replacement in the same workspace.
+- Bound the shared chooser to its placement height and wrap the nine department buttons, keeping the last panel choice reachable. Recall legacy Calculator views by their normalized identity rather than choosing a new default.
+- Keep old specialist slots from blocking new native panels: explicit layout edits clear unavailable slots from the working arrangement, without rewriting the saved view until Store/Update View.
+- On phones, choosing an already-open panel from another department brings that panel forward even after using a department quick button; the full mixed layout stays intact.
+- Complete the ninth native department pack: Audio Delay, Projection, Record Storage, Power Load, Voltage Drop, SPL Distance and Operator Summary can be selected, replaced and mixed with other departments in the existing shared workspace.
+- Reuse the Calculator engine, formulas, original inputs, field sets and autosave keys. Scope its DOM queries and styles to its own controls; retain its standalone route. Former shell Calculator tiles display as native controls within their existing bounds without rewriting saved views on opening.
+- Keep all Video panel types in the shared chooser even when optional module flags are off. Choosing a panel does not change those flags or save another department's document.
+- Extend browser coverage for mixed Calculator/Audio/Video/Lighting views, add/split/replace, reload, isolated saves, field-set recall/export, legacy layout bytes, print cleanup and touch control containment in both palettes. Advance the offline cache generation with its checked consumers.
+- Correct the suite root height inherited from standalone Audio CSS, keep the toolbar within two rows on laptops, and compact short-landscape spacing while retaining 44px controls. Short Calculator tiles put labels beside inputs and continue to paginate.
+- Fix prepared offline directory routes: the worker now resolves registered directory paths such as `/av/` to their cached `index.html`. Previously the readiness check could pass while a directory-route reload fell through to the offline notice.
+
+## 2026-10-13 — AV by Dave is one console (slice C)
+
+- Make the AV Suite shell the AV by Dave home: `av/index.html` is staged as `/` on avbydave.com (`scripts/domain-sites.json` `landingPage`), canonical to the domain root and noindex at its source path and `/av/` alias. The console opens on an empty **Workspace** view; the Rail's top entry is now Workspace and recalls that view in place, the PWA manifest starts at `./av/`, and the shell registers the suite service worker through `js/av-offline.js` (which now resolves the site root from the registry script wherever the page lives).
+- Retire the 34 legacy sheet pages, `av-suite.html` (Toolbox and Show Console), both landing pages and the historical AV Tool Suite index as noindex redirect stubs into the console: sheets go to their owning application (`/av/?app=<pack>`), `av-suite.html` keeps `sbd*` show context and maps `?entry=show` to Show Control. Registry entries carry `retired:'<pack>'`, keep their storage keys for domain transfer and one-time import, and leave `offlineAssets()`, the sitemap and the public counts (18 live tools). `verify:av` checks every stub.
+- Remove the Toolbox code (`js/av-suite/`, `css/av-suite.css`), the landing and domain-view scripts, the Toolbox family taxonomy and `family:` Rail references, and the probes that only tested those surfaces (nav dock, suite import, context fill, legacy video pages, save safety, responsive hub, domain views, logistics exceptions, viewport navigation, worksheet viewport). Nav scripts, the Rail's All apps dialog and the theme, gear-reference, indexing, navigation, consistency and cutover verifiers skip retired routes; the AV Video probes register offline through the console.
+- Repoint every non-managed Toolbox and Show Console link (site header, home, tools directory, README, Throwline, Stage 3D, Calculator, LED Wall, StagePlotter, CueForge boundary, shader and switcher references, application breadcrumbs) at the console; managed FMP pages keep their `av-suite.html?entry=show&sbd…` links, which the stub forwards. Advance the cache generation to `v20261013-av-suite-retire-sheets`.
+
+## 2026-10-13 — AV Suite shell (slice B)
+
+- Add the AV Suite shell at `/av/` (`apps/av-suite/`, built into `av/`): one shared-engine workspace with shell-owned views (`sbd.avSuite.workspace.v1`, device-local arrangement in `sbd.avSuite.layout.v1`), the production Rail, a chooser grouped by application, and a status line that names the application reporting.
+- Convert AV Video, Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure and Lighting from standalone consoles into panel packs (`apps/<app>/src/pack.tsx`, contract in `apps/shared/av-console/pack.ts`). Each pack keeps its own document, storage key, schema, recovery and explicit Save; the shell mounts all eight in process and namespaces their panel types. The standalone routes mount the same packs with their page chrome.
+- Replace each application's separate Plan/Import and Backup panels with one Document panel (AV Video keeps Project). Show Control keeps Setup for cues.
+- Host AV Calculator, Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge and StagePlotter as chrome-less panels: `?sbdEmbed=panel` marks the page, `js/sbd-nav.js` and `js/sbd-public-nav.js` skip their navigation, `css/sbd-public-nav.css` hides static breadcrumbs, and the Calculator serves its plain page. Rail `tool:` entries dispatch the same cancelable selection as consoles so All apps opens them in the shell.
+- Remove the embedded full-application iframes from `/av-video/` and the `probe_show_control_embed.mjs` probe; the family probes drop their AV Video embedding sections and follow the Document panel. Add `scripts/probe_av_suite_shell.mjs` (nine identities recall in place, Calculator and Throwline embed, a mixed Lighting + Video view stores and restores, Save writes one key, no overflow at eight sizes in both palettes) to the AV Video and Pages workflows.
+- Register `av/` and its bundle as offline assets, advance the cache generation to `v20261013-av-suite-shell` (worker test and Stage 3D pin), publish `av/` on avbydave.com and regenerate the consolidation inventory.
+
+## 2026-10-13 — AV Suite shell direction
+
+- Record Dave's 2026-10-13 direction in `docs/av-suite-shell.md`: one `/av/` console with a single shared-engine instance, every application mounted as an in-process panel pack, Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter and AV Calculator as chrome-less panels, and the 34 legacy sheet pages retired. Three list-style record panels remain; the repeated Plan/Import and Backup panels do not.
+- Mark the October 9 console snapshot Rail, the Rail launcher and the console expansion assessment as superseded or paused. The `/av-video/` host that iframes eight standalone consoles is an interim release, not the product.
+- Reset the AV consolidation next-steps record: status red, next step is slice B (shell and pack conversions) then slice C (sheet retirement). No further per-family console or parity slices are dispatched outside the shell brief.
 
 ## 2026-10-13 — Audio Line Check choice parity
 

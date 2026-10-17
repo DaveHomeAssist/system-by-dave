@@ -43,6 +43,32 @@ for (const destination of ['script', 'style']) {
   });
 }
 
+for (const route of ['av/', 'av/?app=calculator', 'av/index.html?app=calculator']) {
+  test(`prepared console ${route} reopens from its index cache offline`, async () => {
+    const listeners = {}, index = 'https://example.test/av/index.html';
+    const context = {
+      URL, Response, Promise, importScripts() {},
+      caches: { open: async () => ({
+        match: async key => key === index ? new Response('native console') : undefined,
+        put: async () => assert.fail('Offline navigation must not write a response')
+      }) },
+      fetch: async () => { throw new Error('offline'); },
+      self: {
+        location: { origin: 'https://example.test' },
+        registration: { scope: 'https://example.test/' },
+        SBD_REGISTRY: { version: 'test', offlineAssets: () => ['./av/index.html'] },
+        addEventListener: (type, listener) => { listeners[type] = listener; }
+      }
+    };
+    vm.runInNewContext(source, context);
+    let response;
+    listeners.fetch({ request: { url: `https://example.test/${route}`, method: 'GET', mode: 'navigate' }, respondWith: promise => { response = promise; } });
+    assert.equal(await (await response).text(), 'native console');
+    assert.equal(context.canonicalUrl('https://example.test/unknown/'), 'https://example.test/unknown/');
+    assert.equal(context.canonicalUrl('https://example.test/'), 'https://example.test/', 'site root caching stays unchanged');
+  });
+}
+
 test('install precaches every local Rail asset in the bumped cache generation', async () => {
   const registryContext = { self: {} };
   vm.createContext(registryContext);
@@ -59,7 +85,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261013-audio-speaker-status');
+      assert.equal(name, 'sbd-av-suite-v20261017-audio-speaker-status');
       return cache;
     } },
     fetch: async () => new Response('ok'),
@@ -95,5 +121,8 @@ test('install precaches every local Rail asset in the bumped cache generation', 
   ];
   railAssets.forEach(asset => assert.ok(optional.includes(asset), `${asset} was not precached`));
   assert.equal(critical.some(asset => railAssets.includes(asset)), false);
+  // The console shell itself must install; a missing optional asset never blocks it.
+  ['./av/index.html', './av/assets/av-suite.js', './av/assets/av-suite.css', './js/av-offline.js'].forEach(asset => assert.ok(critical.includes(asset), `${asset} is not a critical shell asset`));
+  assert.equal(critical.some(asset => /av-suite\.html|av-suite-landing|js\/av-suite\//.test(asset)), false, 'retired Toolbox assets are no longer critical');
   assert.equal(registry.offlineAssets().some(asset => /^https?:/.test(asset)), false);
 });

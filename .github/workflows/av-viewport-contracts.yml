@@ -13,7 +13,6 @@ on:
       - 'design/**'
       - 'scripts/probe_av_*.js'
       - 'scripts/probe_calculator_viewport.cjs'
-      - 'scripts/probe_viewport_navigation.cjs'
       - 'package*.json'
       - '.github/workflows/av-viewport-contracts.yml'
 
@@ -50,5 +49,3 @@ jobs:
           node scripts/probe_av_themes.js --base="$VIEWPORT_BASE" --width=390
           node scripts/probe_av_themes.js --base="$VIEWPORT_BASE" --width=1280
           node scripts/probe_calculator_viewport.cjs
-          node scripts/probe_viewport_navigation.cjs
-          node scripts/probe_av_suite_responsive.js --base="$VIEWPORT_BASE" --target=hub-toolbox

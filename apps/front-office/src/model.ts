@@ -9,8 +9,7 @@ export const LIBRARY: PanelDef[] = [
   { type: 'clients', name: 'Clients', group: 'Common', description: 'Client identity, contact and notes.', minW: 3, minH: 3 },
   { type: 'venues', name: 'Venues', group: 'Common', description: 'Venue identity, location and notes.', minW: 3, minH: 3 },
   { type: 'updates', name: 'Job updates', group: 'Common', description: 'Set a stage, next action and dated update.', minW: 3, minH: 3 },
-  { type: 'advance', name: 'Advance import', group: 'Utilities', description: 'Review a Show Advance and explicitly bind identities.', minW: 3, minH: 3 },
-  { type: 'backup', name: 'Backup', group: 'Utilities', description: 'Explicit Save, export, restore and recovery.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Document', group: 'Utilities', description: 'Save, export, restore and Show Advance imports with explicit identity binding.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'desk', name: 'Desk', panels: [
@@ -20,9 +19,8 @@ export const DEFAULT_VIEWS: View[] = [
   ] },
   { id: 'job', name: 'Job', panels: [
     { id: 'updates', type: 'updates', x: 0, y: 0, w: 6, h: 8 },
-    { id: 'advance', type: 'advance', x: 6, y: 0, w: 6, h: 8 },
+    { id: 'document', type: 'document', x: 6, y: 0, w: 6, h: 8 },
   ] },
-  { id: 'backup', name: 'Backup', panels: [{ id: 'backup', type: 'backup', x: 0, y: 0, w: 12, h: 8 }] },
 ];
 export function parsePlan(value: unknown): Plan {
   const doc = validateDocument(value);

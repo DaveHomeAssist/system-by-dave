@@ -3,6 +3,9 @@ name: Verify AV Video
 on:
   pull_request:
     paths:
+      - 'apps/av-suite/**'
+      - 'av/**'
+      - 'scripts/probe_av_suite_shell.mjs'
       - 'apps/av-video/**'
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
@@ -30,14 +33,12 @@ on:
       - 'av-video/**'
       - 'av-audio/**'
       - 'show-ops/**'
-      - 'scripts/probe_show_control_embed.mjs'
       - 'scripts/probe_show_ops_console.mjs'
       - 'package*.json'
       - 'scripts/probe_av_video*.mjs'
       - 'scripts/probe_av_audio_connector.mjs'
-      - 'scripts/probe_av_suite_responsive.js'
+      - 'scripts/probe_av_audio_flow.mjs'
       - 'js/sbd-registry.js'
-      - 'js/av-suite/**'
       - '.github/workflows/av-video.yml'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
@@ -65,6 +66,17 @@ jobs:
         run: |
           git diff --exit-code -- av-video
           test -z "$(git status --porcelain -- av-video)"
+      - name: AV Suite shell typecheck, build parity and browser
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run typecheck:av-suite
+          npm run build:av-suite
+          git diff --exit-code -- av
+          test -z "$(git status --porcelain -- av)"
+          npx playwright install --with-deps chromium
+          npm run test:av-suite-browser
+          npm run test:av-audio-flow-browser
       - name: Audio shared-console consumer matches its source
         run: |
           npm run typecheck:av-audio
@@ -134,15 +146,3 @@ jobs:
           npm run test:the-shop-browser
       - name: AV source checks
         run: npm run verify:av
-      - name: Toolbox entry and consolidation contract
-        run: |
-          export CHROME_BIN="$(command -v google-chrome)"
-          test -n "$CHROME_BIN"
-          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/av-toolbox-server.log 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid"' EXIT
-          for attempt in 1 2 3 4 5 6 7 8 9 10; do
-            if curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null; then break; fi
-            sleep 1
-          done
-          node scripts/probe_av_suite_responsive.js --target=hub-toolbox

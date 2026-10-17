@@ -74,8 +74,8 @@ async function speakerStatus(scope) {
   return {choice:panel.getByRole('combobox',{name:'Speaker status choices',exact:true}),custom:panel.getByRole('textbox',{name:'Speaker status',exact:true})};
 }
 async function imported(scope, raw, saved = false, source = 'Input List') {
-  await quick(scope,'Project');
-  await scope.locator('.console-panel[data-panel="project"]').getByRole('combobox',{name:/^legacy tool/i}).selectOption({label:source});
+  await quick(scope,'Document');
+  await scope.locator('.console-panel[data-panel="document"]').getByRole('combobox',{name:/^legacy tool/i}).selectOption({label:source});
   if (saved) await button(scope,'Preview saved browser sheet').click();
   else await scope.locator('input[type=file]').setInputFiles(file(raw));
   await button(scope,'Confirm import').click();
@@ -168,7 +168,7 @@ try {
   await imported(restore,JSON.stringify(old)); assert.equal(await (await connection(restore)).inputValue(),'');
   assert.deepEqual(await exported(restore,restore),old,'missing connection is not silently migrated from original');
   await save(restore); const before=await read(restore);
-  await quick(restore,'Project'); await restore.locator('input[type=file]').setInputFiles(file('{bad'));
+  await quick(restore,'Document'); await restore.locator('input[type=file]').setInputFiles(file('{bad'));
   assert.equal(await button(restore,'Confirm import').count(),0);
   assert.equal(await read(restore),before); assert.deepEqual(await exported(restore,restore),old);
   await (await connection(restore)).fill('Temporary connection');
@@ -483,77 +483,6 @@ try {
   await primary.context.setOffline(false);
   pass('prepared offline Speaker choices/custom edits survive Save/reload with only speaker status changed, separate coverage and source bytes preserved');
 
-  const hostContext=await browser.newContext({viewport:{width:1440,height:900},hasTouch:true,acceptDownloads:true}); contexts.push(hostContext);
-  host=await hostContext.newPage(); host.on('pageerror',error=>errors.push(error.message));
-  await host.goto(base+'/av-video/');
-  await host.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').click();
-  const frame=host.frameLocator('iframe[title="Audio application"]'); await frame.locator('.console-shell').waitFor();
-  await imported(frame,original); assert.equal(await read(host),null);
-  assert.equal(await (await connection(frame)).inputValue(),'XLR');
-  await (await connection(frame)).fill('Embedded edit'); await save(frame);
-  assert.equal(JSON.parse(await read(host)).channels[0].conn,'Embedded edit');
-  assert.equal(await read(host,'sbd.avVideo.v1'),null,'Audio Save must not save AV Video');
-  const backup=await exported(frame,host); assert.equal(backup.channels[0].legacy.conn,'XLR');
-  await host.reload(); await frame.locator('.console-shell').waitFor();
-  assert.equal(await (await connection(frame)).inputValue(),'Embedded edit');
-  await imported(frame,patchSource,false,'Audio Patch'); await imported(frame,checkSource,false,'Line Check');
-  await (await patchStatus(frame)).selectOption('gained'); await save(frame);
-  await (await inputStatus(frame)).selectOption('checked'); await save(frame);
-  line=await lineCheck(frame);await line.choice.selectOption('muted');await save(frame);
-  assert.equal(JSON.parse(await read(host)).channels[0].status,'muted');
-  await line.custom.fill('Custom embedded check');await save(frame);await host.reload();await frame.locator('.console-shell').waitFor();
-  line=await lineCheck(frame);assert.equal(await line.choice.inputValue(),'Custom embedded check');
-  await line.choice.selectOption('issue');await save(frame);
-  const embedded=await exported(frame,host);
-  await imported(frame,speakerSource,false,'Speaker Plan');speaker=await speakerStatus(frame);
-  const beforeEmbeddedSpeaker=await exported(frame,host);
-  await speaker.choice.selectOption('coverage');await save(frame);await host.reload();await frame.locator('.console-shell').waitFor();
-  speaker=await speakerStatus(frame);assert.equal(await speaker.custom.inputValue(),'coverage');
-  await speaker.custom.fill('Custom embedded speaker');await save(frame);await host.reload();await frame.locator('.console-shell').waitFor();
-  speaker=await speakerStatus(frame);assert.equal(await speaker.choice.inputValue(),'Custom embedded speaker');
-  const expectedEmbeddedSpeaker=structuredClone(beforeEmbeddedSpeaker);expectedEmbeddedSpeaker.speakers[0].status='Custom embedded speaker';
-  assert.deepEqual(await exported(frame,host),expectedEmbeddedSpeaker);assert.equal(await read(host,'sbd.avVideo.v1'),null);
-  assert.equal(embedded.channels[0].inputStatus,'checked');
-  assert.equal(embedded.channels[0].patchStatus,'gained'); assert.equal(embedded.channels[0].lineCheckStatus,'issue');
-  assert.equal(embedded.channels[0].conn,'Embedded edit'); assert.equal(await read(host,'sbd.avVideo.v1'),null);
-  await host.reload(); await frame.locator('.console-shell').waitFor();
-  assert.equal(await (await patchStatus(frame)).inputValue(),'gained');
-  const embeddedSizes=[{width:1024,height:768},{width:680,height:812},{width:375,height:812},{width:680,height:812},{width:1024,height:768},{width:1440,height:900},{width:375,height:812}];
-  for(const size of [...embeddedSizes,...embeddedSizes]) {
-    const mode=await resizeEmbedded(size), input=await connection(frame);
-    if(mode==='phone')assert.equal(await button(frame,'Maximize Inputs').count(),0);
-    else {await button(frame,'Maximize Inputs').click();await button(frame,'Restore Inputs').waitFor();}
-    await reachable(input,'embedded/'+size.width);
-    assert.equal(await input.inputValue(),'Embedded edit');
-    const inputState=await inputStatus(frame);
-    await reachable(inputState,'embedded Input/'+size.width);
-    assert.equal(await inputState.inputValue(),'checked');
-    if(mode!=='phone')await button(frame,'Restore Inputs').click();
-    const patch=await patchStatus(frame);
-    if(mode==='phone')assert.equal(await button(frame,'Maximize Patch').count(),0);
-    else {await button(frame,'Maximize Patch').click();await button(frame,'Restore Patch').waitFor();}
-    await reachable(patch,'embedded Patch/'+size.width);
-    assert.equal(await patch.inputValue(),'gained');
-    if(mode!=='phone')await button(frame,'Restore Patch').click();
-    const check=await lineCheck(frame);
-    if(mode==='phone')assert.equal(await button(frame,'Maximize Line check').count(),0);
-    else {await button(frame,'Maximize Line check').click();await button(frame,'Restore Line check').waitFor();}
-    for(const [name,field]of Object.entries(check)) {await reachable(field,'embedded Line Check '+name+'/'+size.width);assert.equal(await field.inputValue(),'issue');}
-    if(mode!=='phone')await button(frame,'Restore Line check').click();
-    const speaker=await speakerStatus(frame);
-    if(mode==='phone')assert.equal(await button(frame,'Maximize Speakers').count(),0);
-    else {await button(frame,'Maximize Speakers').click();await button(frame,'Restore Speakers').waitFor();}
-    for(const [name,field]of Object.entries(speaker)) {await reachable(field,'embedded Speaker '+name+'/'+size.width);assert.equal(await field.inputValue(),'Custom embedded speaker');}
-    if(mode!=='phone')await button(frame,'Restore Speakers').click();
-    const saved=JSON.parse(await read(host));
-    assert.equal(saved.channels[0].inputStatus,'checked');
-    assert.equal(saved.channels[0].patchStatus,'gained');assert.equal(saved.channels[0].lineCheckStatus,'issue');
-    assert.equal(saved.channels[0].conn,'Embedded edit');assert.equal(await read(host,'sbd.avVideo.v1'),null);
-    await noOverflow(frame); await noOverflow(host);
-  }
-  await host.screenshot({path:join(output,'audio-embedded-phone.png')});
-  pass('actual AV Video embedded Connection/Input/Patch and Line Check picker/custom import/edit/Save/export/reload, independent document and touch-size access using panel maximize where needed');
-  pass('actual AV Video embedded Speaker choice/custom import/edit/Save/export/reload remains independent across fourteen resize transitions');
   assert.deepEqual(errors,[]);
   assert.equal(shortHeightActivations.length,4,'both short heights tested in both themes');
   await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,resizeTransitions,shortHeightActivations,physicalDevice:'not tested',virtualKeyboard:'not tested',processRestartAndPowerLoss:'not tested'},null,2));

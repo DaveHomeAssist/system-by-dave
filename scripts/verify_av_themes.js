@@ -30,16 +30,17 @@ function routeFile(href) {
 const avRegistry = registry();
 const SYSTEM_THEME_EXCEPTIONS = new Set(['throwline']);
 const routes = [
-  { id: 'av-suite', href: 'av-suite.html', file: 'av-suite.html' },
+  { id: 'av-suite', href: 'av/', file: 'av/index.html' },
   ...avRegistry.tools
-    .filter((tool) => !SYSTEM_THEME_EXCEPTIONS.has(tool.id))
+    .filter((tool) => !SYSTEM_THEME_EXCEPTIONS.has(tool.id) && !tool.retired)
     .map((tool) => ({ ...tool, file: routeFile(tool.href) }))
 ];
 
 const themeCss = read('css/av-theme.css');
 [
   '--av-bg', '--av-surface', '--av-text', '--av-accent', '--av-focus',
-  '--av-success', '--av-warning', '--av-danger', 'prefers-color-scheme: dark'
+  '--av-success', '--av-warning', '--av-danger', 'prefers-color-scheme: dark',
+  'html[data-av-theme="white"]', 'html[data-av-theme="black"]'
 ].forEach((token) => {
   if (!themeCss.includes(token)) fail(`css/av-theme.css is missing ${token}.`);
 });
@@ -110,10 +111,7 @@ routes.forEach((route) => {
   }
 });
 
-const showBoard = read('show-board.html');
-if (/id="themebtn"/.test(showBoard) || !/matchMedia\("\(prefers-color-scheme: dark\)"\)/.test(showBoard)) {
-  fail('Show Board still owns a persistent page-level startup theme.');
-}
+// Show Board retired into Show Ops on 2026-10-13; its stub carries no theme of its own.
 
 const pixelForge = read('pixelforge/index.html');
 if (!pixelForge.includes('src="../js/av-theme.js"')) {
@@ -126,7 +124,7 @@ const offlineAssets = avRegistry.offlineAssets();
 });
 
 const audit = read('docs/av-suite-theme-audit-2026-08-12.md');
-avRegistry.tools.filter((tool) => !SYSTEM_THEME_EXCEPTIONS.has(tool.id)).forEach((tool) => {
+avRegistry.tools.filter((tool) => !SYSTEM_THEME_EXCEPTIONS.has(tool.id) && !tool.retired).forEach((tool) => {
   if (!audit.includes(`| ${tool.name} |`) || !audit.includes(`\`${tool.href.startsWith('/') ? tool.href : `/${tool.href}`}\``)) {
     fail(`Theme audit does not record ${tool.name} (${tool.href}).`);
   }
@@ -138,4 +136,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`AV theme verification passed (${avRegistry.tools.length} tools + hub, registry=${avRegistry.version}).`);
+console.log(`AV theme verification passed (${avRegistry.tools.filter((tool) => !tool.retired).length} tools + console, registry=${avRegistry.version}).`);

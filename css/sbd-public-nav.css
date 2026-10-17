@@ -1,3 +1,13 @@
+/* Hosted as a panel inside the AV Suite shell (docs/av-suite-shell.md): the
+   shell owns navigation, so page escape navigation and static breadcrumbs hide. */
+html[data-sbd-embed="panel"] .sbd-public-nav,
+html[data-sbd-embed="panel"] .sbd-skip-link,
+html[data-sbd-embed="panel"] nav.sbd-nav,
+html[data-sbd-embed="panel"] .sbd-site-return,
+html[data-sbd-embed="panel"] .sbd-site-header {
+  display: none !important;
+}
+
 .sbd-public-nav {
   position: fixed;
   left: max(12px, env(safe-area-inset-left));
@@ -211,21 +221,36 @@
 @media (max-width: 680px) {
   .sbd-site-header__inner {
     width: calc(100% - 24px);
-    padding: 8px 0 10px;
+    min-height: 56px;
+    padding: 4px 0;
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
   }
 
   .sbd-site-brand {
     justify-self: start;
   }
 
+  .sbd-site-brand__word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .sbd-site-links {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 4px;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 2px;
   }
 
   .sbd-site-links a,

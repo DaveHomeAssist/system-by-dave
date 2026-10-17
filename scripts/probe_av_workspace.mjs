@@ -55,6 +55,8 @@ try{
     await page.setViewportSize({width,height});
     if(engine==='chromium')await (await context.newCDPSession(page)).send('Emulation.setDeviceMetricsOverride',{width,height,mobile:true,deviceScaleFactor:3,screenWidth:width,screenHeight:height,screenOrientation:{type:orientation==='portrait'?'portraitPrimary':'landscapePrimary',angle:orientation==='portrait'?0:90}});
     await page.waitForFunction(()=>{const root=document.documentElement,pane=parseFloat(getComputedStyle(root).getPropertyValue('--av-pane-min'));return root.dataset.workspaceShort===String(visualViewport.height<pane*2)&&root.style.getPropertyValue('--av-available-height')===`${visualViewport.height}px`;});
+    // Pagination measures text; settle web fonts before reading geometry (a Linux CI flake at 360x800 on 2026-10-13).
+    await page.evaluate(()=>document.fonts.ready);
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     const state=await page.evaluate(geometry);state.tool=tool;state.theme=theme;state.orientation=orientation;
     const fail=[];

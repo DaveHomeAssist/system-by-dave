@@ -22,8 +22,19 @@
     function ring(p,r,t,mat,x=0,y=0,z=0){return mesh(new T.TorusGeometry(r,t,6,24),mat,p,x,y,z);}
     function canvasTexture(w,h,paint) {const c=makeCanvas(w,h);paint(c.getContext('2d'),w,h);const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;tx.anisotropy=4;textures.push(tx);return {canvas:c,texture:tx};}
     function textPlane(p,text,w,h,x=0,y=0,z=.25,color='#182126',bg=null) {
-      const tx=canvasTexture(256,128,(ctx,cw,ch)=>{ctx.clearRect(0,0,cw,ch);if(bg){ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch);}ctx.fillStyle=color;const rows=text.split('\n'),fontSize=rows.length>1?35:text.length>10?22:text.length>6?30:46;ctx.font='600 '+fontSize+'px Arial';ctx.textAlign='center';ctx.textBaseline='middle';rows.forEach((s,i)=>ctx.fillText(s,cw/2,ch/2+(i-(rows.length-1)/2)*39,235));});
-      const m=mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tx.texture,transparent:!bg,depthWrite:false}),p,x,y,z);m.castShadow=false;return m;
+      // Match the texture to the physical label so glyphs are never stretched flat.
+      const cw=512,ch=Math.max(32,Math.round(cw*h/w));
+      const tx=canvasTexture(cw,ch,(ctx,cw,ch)=>{
+        ctx.clearRect(0,0,cw,ch);if(bg){ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch);}
+        ctx.fillStyle=color;const rows=text.split('\n');
+        let fontSize=ch*.78/rows.length;
+        ctx.font='600 '+fontSize+'px Arial';
+        const widest=Math.max(...rows.map(row=>ctx.measureText(row).width));
+        fontSize*=Math.min(1,cw*.92/widest);
+        ctx.font='600 '+fontSize+'px Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+        rows.forEach((row,i)=>ctx.fillText(row,cw/2,ch/2+(i-(rows.length-1)/2)*fontSize*1.15));
+      });
+      const m=mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tx.texture,transparent:!bg,depthWrite:false,toneMapped:false}),p,x,y,z);m.castShadow=false;return m;
     }
     const shell=new T.Group();shell.userData.componentId='atem.chassis';model.add(shell);groups.set('atem.chassis',shell);
     // Photo reconstruction in arbitrary model units, not manufacturing dimensions.
@@ -96,7 +107,7 @@
       if(s.surface==='rear') {
         let label=c.label.replace('Camera return SDI OUT ','OUT ').replace('SDI INPUT ','IN ').replace(' · SDI output','').replace(' · RJ12 RS-422','').replace(' · RJ45 expansion','').replace(' · RCA','').replace('ANALOG AUDIO IN CH ','CH ');
         if(label.length>20)label=label.replace('MULTIVIEW','M/V').replace('TALKBACK','TALK');
-        textPlane(g,label,.84,.15,0,s.y>0?-.34:-.37,.075,'#c6cccc');
+        textPlane(g,label,.88,.24,0,s.y>0?-.38:-.41,.075,'#ffffff');
       }
     }
     // Enclosure face meshes carry their own IDs for ray picking.

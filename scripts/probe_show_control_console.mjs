@@ -72,13 +72,13 @@ async function reachable(locator) {
   assert.ok(result.width >= 44 && result.height >= 44 && result.inside && result.hit, `Unreachable ${locator}: ${JSON.stringify(result)}`);
 }
 async function openImport(page, kind) {
-  await quick(page, kind === 'restore' ? 'Backup' : 'Setup/Import');
-  const launcher = button(page, kind === 'restore' ? 'Backup controls' : 'Setup and imports');
+  await quick(page, kind === 'restore' ? 'Document' : 'Setup');
+  const launcher = button(page, kind === 'restore' ? 'Document controls' : 'Setup and imports');
   if (await launcher.isVisible()) await launcher.click();
   await button(page, kind === 'restore' ? 'Restore backup' : kind === 'forge' ? 'Review CueForge file' : 'Review Cue Sheet').click();
 }
 async function exportRun(page) {
-  await quick(page, 'Backup');
+  await quick(page, 'Document');
   const download = page.waitForEvent('download'); await button(page, 'Export backup').click();
   return JSON.parse(await readFile(await (await download).path(), 'utf8'));
 }
@@ -114,7 +114,7 @@ try {
   await button(page, 'Restore On Deck').click();
   await button(page, 'On Deck options').click(); await page.getByRole('menuitem', { name: 'Move and size…', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Narrower', exact: true }).click(); await page.keyboard.press('Escape');
-  assert.equal(await button(page, 'On Deck options').evaluate(e => e === document.activeElement), true);
+  await page.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'On Deck options', null, { timeout: 2000 });
   await button(page, 'View options').click(); await page.getByRole('menuitem', { name: 'Store as new view', exact: true }).click();
   assert.deepEqual(JSON.parse(await read(page)), saved, 'view storage still requires explicit Save');
   await button(page, 'Save run').click(); saved = JSON.parse(await read(page));
@@ -122,7 +122,7 @@ try {
   assert.deepEqual(JSON.parse(await read(page)), saved);
   pass('legacy run, cue selection, Hold/Resume/Go, source rows, closed panel, keyboard size, maximize and saved views');
 
-  await quick(page, 'Setup/Import'); await button(page, 'Add a cue').click();
+  await quick(page, 'Setup'); await button(page, 'Add a cue').click();
   await page.getByLabel('Cue number', { exact: true }).fill('004');
   await button(page, 'Next field').click(); await page.getByLabel('Action', { exact: true }).fill('Curtain call');
   await button(page, 'Add to run').click();
@@ -182,13 +182,13 @@ try {
 
   const safety = (await fresh({ width: 375, height: 812 })).page;
   await safety.evaluate(key => localStorage.setItem(key, '{damaged'), STORE); await safety.reload();
-  assert.equal(await button(safety, 'Save run').isDisabled(), true); await quick(safety, 'Backup');
+  assert.equal(await button(safety, 'Save run').isDisabled(), true); await quick(safety, 'Document');
   assert.equal(await button(safety, 'Replace damaged saved run').isDisabled(), true);
   const damagedDownload = safety.waitForEvent('download'); await button(safety, 'Download unreadable saved data').click();
   assert.equal(await readFile(await (await damagedDownload).path(), 'utf8'), '{damaged');
   await safety.evaluate(key => localStorage.setItem(key, '{newer damaged'), STORE);
   await button(safety, 'Replace damaged saved run').click(); assert.match(await safety.locator('#notice').textContent(), /Another tab changed/);
-  assert.equal(await read(safety), '{newer damaged'); await safety.reload(); await quick(safety, 'Backup');
+  assert.equal(await read(safety), '{newer damaged'); await safety.reload(); await quick(safety, 'Document');
   const secondDownload = safety.waitForEvent('download'); await button(safety, 'Download unreadable saved data').click(); await secondDownload;
   await button(safety, 'Replace damaged saved run').click(); assert.equal(await read(safety), null);
   await safety.evaluate(({ key, draftKey, doc }) => {
@@ -212,7 +212,7 @@ try {
     if (await page.locator('html').getAttribute('data-av-theme') !== theme) await page.locator('#theme').click();
     for (const size of sizes) {
       await page.setViewportSize(size);
-      for (const [name, type] of [['On Deck', 'deck'], ['Cues', 'cues'], ['Notes', 'notes'], ['Call Log', 'log'], ['Setup/Import', 'setup'], ['Backup', 'backup']]) {
+      for (const [name, type] of [['On Deck', 'deck'], ['Cues', 'cues'], ['Notes', 'notes'], ['Call Log', 'log'], ['Setup', 'setup'], ['Document', 'document']]) {
         await quick(page, name); await noOverflow(page, `${theme}/${size.width}/${name}`);
         assert.equal(await panel(page, type).count(), 1);
         if (type === 'deck') {
@@ -224,8 +224,8 @@ try {
         }
         if (type === 'cues') await reachable(panel(page, 'cues').locator('.call-cue').last());
         if (type === 'notes') await reachable(page.getByLabel('Operator notes'));
-        if (type === 'setup' || type === 'backup') {
-          const target = button(page, size.height < 500 ? type === 'setup' ? 'Setup and imports' : 'Backup controls' : type === 'setup' ? 'Add a cue' : 'Export backup');
+        if (type === 'setup' || type === 'document') {
+          const target = button(page, size.height < 500 ? type === 'setup' ? 'Setup and imports' : 'Document controls' : type === 'setup' ? 'Add a cue' : 'Export backup');
           await reachable(target);
           if (size.height < 500) { await target.click(); await reachable(button(page, type === 'setup' ? 'Add a cue' : 'Export backup')); await button(page, 'Close dialog').click(); }
         }
@@ -254,20 +254,6 @@ try {
   assert.equal(await page.getByLabel('Operator notes').inputValue(), JSON.parse(beforeOffline).notes); assert.equal(await read(page), beforeOffline);
   await primary.context.setOffline(false); pass('entry and built assets cached, saved run reopened offline');
 
-  const embedded = await browser.newContext({ viewport: { width: 1440, height: 900 }, hasTouch: true }); contexts.push(embedded);
-  const host = await embedded.newPage(); host.setDefaultTimeout(10000); host.on('pageerror', error => errors.push(error.message));
-  await host.goto(`${base}/av-video/?sbdShow=Context%20only&private=do-not-forward`);
-  await host.locator('.sbd-rail__entry[data-rail-ref="console:show-control"]').tap();
-  const frame = host.frameLocator('iframe[title="Show Control application"]'); await frame.locator('.console-shell').waitFor();
-  assert.equal(new URL(host.url()).pathname, '/av-video/'); assert.equal(await frame.locator('.call-nav').isVisible(), false); assert.equal(await frame.locator('.sbd-rail').isVisible(), false);
-  await quick(frame, 'Notes'); await frame.getByLabel('Operator notes').fill('Embedded caller notes'); await button(frame, 'Save run').tap();
-  assert.equal(JSON.parse(await read(host)).notes, 'Embedded caller notes'); assert.equal(await read(host, 'sbd.avVideo.v1'), null);
-  await host.setViewportSize({ width: 375, height: 812 }); await quick(frame, 'Notes'); await reachable(frame.getByLabel('Operator notes'));
-  await frame.getByLabel('Operator notes').fill('Touch caller notes');
-  if (!await button(frame, 'Save run').isVisible()) await button(frame, 'Show controls').tap();
-  await button(frame, 'Save run').tap(); assert.equal(JSON.parse(await read(host)).notes, 'Touch caller notes');
-  assert.equal((await host.locator('iframe[title="Show Control application"]').getAttribute('src')).includes('private='), false);
-  pass('real AV Video embedding, independent saved data, allowlisted context and emulated phone touch');
   assert.deepEqual(errors, []);
   await writeFile(join(output, 'result.json'), JSON.stringify({ at: new Date().toISOString(), base, browser: browser.version(), passed, physicalDevices: 'not tested', processRestartAndPowerLoss: 'not tested' }, null, 2));
 } catch (error) {

@@ -70,7 +70,10 @@ const robots = read('robots.txt');
 // The Shop native source entry adds one non-published application template.
 // Infrastructure adds its non-published native source template.
 // Front Office adds one non-published native source template; its public route is unchanged.
-if (unlisted.length !== 151) fail(`Expected 151 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// The AV Suite shell adds its non-published source template under apps/av-suite/. From
+// 2026-10-13 its av/ route is the noindex source of the avbydave.com home page, and the 34
+// retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md).
+if (unlisted.length !== 187) fail(`Expected 187 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   if (!sitemapRoutes.has(route)) {
@@ -138,7 +141,7 @@ hatFiles.forEach((file) => {
 });
 
 [
-  ['av-workbook.html', 'https://avbydave.com/av-suite.html'],
+  ['av-workbook.html', 'https://avbydave.com/'],
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],

@@ -10,7 +10,7 @@ access control.
 
 ## Product boundaries
 
-- `/fmp/`: choose Operators, Reference, 3D Models or House at `#cameras`, `#learn`,
+- `/fmp/`: choose Operators, Reference, 3D Gear Models or House at `#cameras`, `#learn`,
   `#models` or `#house`. A separate access/setup link remains at `#setup`.
 - `/fmp/house/`: dated house-video reference, display inventory, bowl schematic,
   rack views and visitor map. Source conflicts stay visible; there is no live
@@ -53,6 +53,11 @@ belong to a control-room check, not the visual walk (Dave, 2026-09-18).
 `npm run verify:fmp` and the canonical exporter reject a private IPv4 address in
 any released file or hand-maintained FMP page, naming the file and a count, never
 the address.
+
+The prominent model launcher appears after the hub enhances successfully. Without
+JavaScript, or if the shell script fails, startup guidance retains direct links to
+all five equipment explorers. The standalone SuperJoy simulator remains available
+offline.
 
 ## Managed source
 

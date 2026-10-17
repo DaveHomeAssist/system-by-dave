@@ -1,5 +1,7 @@
 # AV Suite console expansion
 
+**Paused 2026-10-13.** No further per-family console conversions or parity slices under this assessment. Dave's direction and the replacement definition of done are in the [AV Suite shell brief](av-suite-shell.md); the per-family work below is retained as the source for its panel packs.
+
 ## Accepted product target
 
 On October 9 Dave clarified that AV Video is the interaction model to expand

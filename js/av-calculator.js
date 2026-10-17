@@ -261,10 +261,10 @@
 
   const themeToggle = document.getElementById('themeToggle');
   const savedTheme = storage.get('av-theme-mode.v1');
-  if (!['light', 'dark', 'system'].includes(savedTheme)) document.documentElement.dataset.avTheme = 'dark';
+  if (!['light', 'dark', 'white', 'black', 'system'].includes(savedTheme)) document.documentElement.dataset.avTheme = 'dark';
   function syncThemeToggle() {
     const chosen = document.documentElement.dataset.avTheme;
-    const dark = chosen === 'dark' || (chosen === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const dark = chosen === 'dark' || chosen === 'black' || (chosen === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
     const next = dark ? 'Light mode' : 'Dark mode';
     themeToggle.textContent = next;
     themeToggle.setAttribute('aria-label', `Switch to ${next.toLowerCase()}`);

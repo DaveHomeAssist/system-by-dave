@@ -10,7 +10,7 @@ documenting the Notion skills, agents, widgets, and templates I build and use.
 - JavaScript where needed
 - App-grade surfaces may use framework code, package tooling, or generated
   assets when that is the right product architecture
-- The canonical AV registry currently contains **52 browser tools**; public
+- The canonical AV registry currently contains **18 browser tools** (34 retired sheet routes redirect into the console); public
   count copy is release-gated against `js/sbd-registry.js`
 - Hosted on GitHub Pages with a custom domain (`CNAME`)
 
@@ -54,12 +54,12 @@ use the tooling selected for that surface.
 | `fmp-index/index.html` | Retired FMP working index: noindex redirect to the `/fmp/` hub, keeping query and hash |
 | `fmp/` | Managed FMP video operations hub, camera commissioning, bowl training, and rig reference; authenticated camera API remains SETUP TEST only; [release and sync contract](docs/fmp-public-release.md) |
 | `fmpwalk/` | Managed local-first preshow venue walk; configured for walk.housevideo.app with destination verification before cutover; explicit download, Gmail, and Notion actions; no silent writes |
-| `av-suite.html?entry=show` | Show Console for show-attached AV operations |
-| `av-suite.html?entry=toolbox` | Show-independent AV Toolbox directory |
+| `av/` | AV by Dave: one console, nine departments of individual native panels; standalone tool links (`docs/av-suite-shell.md`) |
+| `av-suite.html` | Redirect stub into the console (keeps `sbd*` show context) |
 | `docs/av-suite-development-assets-index.md` | AV Suite source, spec, migration, release, and historical-asset authority map |
 | `av-calculator.html` | Six quick AV calculations and a copyable field summary on avbydave.com |
 | `led-wall-calculator.html` | Viewport LED wall planner with cabinet preview, mobile results and section jumps, manufacturer-PF-gated current estimates, and a Power Load handoff on avbydave.com; [operator and verification notes](docs/led-wall-calculator.md) |
-| `av-suite-landing2.html` | Source for the avbydave.com home page, staged as `/` on that domain |
+| `av/index.html` | Also staged as `/` on avbydave.com (`scripts/domain-sites.json`) |
 | `av-suite-landing.html` | Retired previous landing; a noindex redirect to the current AV by Dave home (UX-005) |
 | `depotops/index.html` | Local-first project shopping, inventory, and tool tracking |
 | `pixelforge/` | PixelForge editor |

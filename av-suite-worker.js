@@ -18,6 +18,12 @@ function canonicalUrl(requestUrl){
   var url=new URL(requestUrl);
   url.search='';
   url.hash='';
+  // Directory routes use the manifest's index entry; /av/ must reopen the
+  // same cached shell that the readiness check verified as /av/index.html.
+  if(url.pathname.endsWith('/')&&url.pathname!==new URL('./',self.registration.scope).pathname){
+    var indexUrl=new URL('index.html',url).href;
+    if(OFFLINE_URLS.indexOf(indexUrl)>=0) return indexUrl;
+  }
   return url.href;
 }
 
@@ -40,16 +46,15 @@ function cachedResponse(cache,request){
   });
 }
 
+/* The console shell and its runtime must install for the suite to work offline
+   (docs/av-suite-shell.md); everything else is cached as it can be. */
 var CRITICAL_ASSETS=[
-  './av-suite-landing2.html',
-  './css/av-landing-alt.css',
-  './js/av-landing-alt.js',
-  './av-suite.html',
-  './css/av-suite.css',
-  './js/av-suite/theme-bootstrap.js',
-  './js/av-suite/modal-controller.js',
-  './js/av-suite/app.js',
+  './av/index.html',
+  './av/assets/av-suite.js',
+  './av/assets/av-suite.css',
   './js/sbd-registry.js',
+  './js/av-theme-mode.js',
+  './js/av-offline.js',
   './css/sbd-public-nav.css',
   './css/av-theme.css',
   './js/vendor/gsap.min.js',
