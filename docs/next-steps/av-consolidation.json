@@ -7,6 +7,16 @@
   "head": "fa22e740c885a8630c49b08c6c029506b406f7d2",
   "status": "amber",
   "statusReason": "PR345 is merged at 4c446ed and live (Pages run 38712124711). Dave ruled on 2026-10-15 that the October 14 removal of whole-application tiles was a Codex decision, not his: AV Calculator stays the native nine-panel pack, and the seven specialists without a pack (Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter) are chrome-less panels of their own pages again under a Tools group. Family-route redirects and physical/operator acceptance remain open.",
+  "audioSpeakerStatusParity": {
+    "recordedOn": "2026-10-13",
+    "baseRevision": "94b1ce79499de92416a5c30357298d619fb74ecb",
+    "branch": "codex/audio-speaker-status-control-parity-20261013",
+    "scope": "Original planned/Planned, patched/Patched, tuned/Tuned, coverage/Coverage Checked, ready/Ready, issue/Issue and spare/Spare chooser alongside editable custom entry. Preserve blank/absent/null records, explicit Save and current Speaker import/restore behavior; other speaker fields and channels stay independent.",
+    "candidateEvidence": "Duncan passes typecheck,69 Audio model tests,build,AV23,Throwline47 and Shader Practice54. Thirteen browser groups pass including Speaker choices/custom/blank, status-only changes, save/reopen/restore, repeated imports and absent/null records. At2026-10-13T13:56:26.239Z the Light844x390 Inputs expansion times out on intercepting panel headers before Full screen. No retry or weakened assertion. Runner released13:56:26.6339872Z,claim absent,Node0.",
+    "next": "Diagnose and correct the bounded short-height probe ordering only after continuation authority; then rerun required browser acceptance before exact-head review/CI, merge, publications and live proof. No release claim from this candidate.",
+    "blocker": "Required browser gate failed. Likely cause: Speakers changes selected row, so the next Inputs visit needs expansion in a clipped short-height panel before the probe invokes Full screen. Screenshot and call trace retained; hypothesis not validated by a repair run. Private Board synchronization also unavailable:ENOENT; no replacement created.",
+    "limits": "No schema/storage/import-policy change, speaker type/coverage chooser, other application, new workflow, full52-tool parity, Stream/Record decision, physical touch, real virtual keyboard, browser-process interruption, power loss or operator acceptance."
+  },
   "specialistPanelRestoration": {
     "recordedOn": "2026-10-15",
     "baseRevision": "4c446ed6aca5b18ce0ab3af9a3c65fab4a2126cb",
@@ -32,7 +42,8 @@
     "branch": "codex/audio-line-check-control-parity-20261013",
     "scope": "Original pending/patched/checked/passed/issue/muted/spare picker alongside existing custom entry. Preserve blank/absent/null fallback, Line Check/generic alias, explicit Save/restore and current import semantics; Input/Patch/Connection and originals stay independent.",
     "candidateEvidence": "Duncan Windows Chrome155: typecheck,51 Audio model tests, build, full AV verification/23 Rail-worker cases, Throwline47 and Shader Practice54 pass. All16 focused browser groups and14 embedded transitions pass, including keyboard/44px reachability, both themes/seven sizes, old/custom/blank values, exact edit comparisons, Save/page reopen/backup/repeat imports and prepared offline use.",
-    "next": "Complete exact-head review/CI, merge, both publications and isolated live proof. The final pull-request release receipt owns post-candidate evidence; earlier releases do not prove this changed control.",
+    "next": "Bounded Line Check choice release completed through PR336. Preserve its exact release evidence as the baseline for the separately scoped Speaker status chooser.",
+    "completedRelease": "PR336 merge94b1ce79499de92416a5c30357298d619fb74ecb equals tested candidate61892dac0370e535a8bfeba2a93938588a3d794d. Six exact-head checks, source38400352053 and AV38404414033 publications passed. Live16groups/14transitions/13before-and-after asset hashes passed2026-10-13T13:24:29.311Z. Receipt: https://github.com/DaveHomeAssist/system-by-dave/pull/336#issuecomment-6146604898.",
     "limits": "No storage/schema or import-policy change, new workflow, full52-tool parity, Stream/Record decision, physical touch, real virtual keyboard, browser-process interruption, power loss or operator acceptance is implied."
   },
   "audioInputStatusParity": {
