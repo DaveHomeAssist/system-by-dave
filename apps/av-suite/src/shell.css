@@ -70,3 +70,8 @@ html[data-av-focus="true"] .focus-toggle span{display:none}
 
 /* Keep panel names readable inside the existing horizontal phone rail. */
 .suite-app .console-quick button{flex:0 0 auto}
+
+/* Gear scenes occupy a single workspace panel; the shell owns maximize/close. */
+.suite-gear-panel{display:flex;flex-direction:column;width:100%;height:100%;min-height:0;min-width:0}
+.suite-gear-panel>.gear-panel-mount{flex:1;height:auto}
+.suite-gear-panel>p{margin:0;padding:8px;font-size:12px}
