@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Local reel capture for the frame-sync demo (docs/launch/README.md).
-// Not part of CI. Renders av/frame-sync/?capture=1 frame by frame on a virtual
+// Not part of CI. Renders frame-sync/?capture=1 frame by frame on a virtual
 // clock (no dropped frames), then encodes with ffmpeg:
 //   - main cut (9:16, 1080x1920, 30 fps) opening on the step-3 tear
 //   - 15 s cut (steps 3 -> 4)
@@ -69,7 +69,7 @@ async function openCut(browser, base, cut) {
   page.on('pageerror', (e) => errors.push(String(e)));
   const query = new URLSearchParams({ capture: '1', order: cut.order.join(','), durations: cut.durations.join(',') });
   if (cut.aspect === '4x5') query.set('aspect', '4x5');
-  await page.goto(`${base}/av/frame-sync/?${query}`);
+  await page.goto(`${base}/frame-sync/?${query}`);
   await page.waitForFunction(() => window.FrameSync && document.fonts.status === 'loaded');
   await page.evaluate((overlays) => window.FrameSync.setOverlays(overlays), cut.overlays || []);
   return { page, errors };
@@ -134,7 +134,7 @@ function firstFixTime(schedule) {
 const server = await serve();
 const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch();
-const manifest = { generated: new Date().toISOString(), source: 'av/frame-sync/?capture=1', outputs: [], checks: [] };
+const manifest = { generated: new Date().toISOString(), source: 'frame-sync/?capture=1', outputs: [], checks: [] };
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'frame-sync-frames-'));
 let failed = false;
 

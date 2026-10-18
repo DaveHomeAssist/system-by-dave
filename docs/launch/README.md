@@ -8,15 +8,17 @@ until Dave picks it.
 
 | Route | Published at | Indexing | Purpose |
 |---|---|---|---|
-| `av/frame-sync/` | `https://avbydave.com/av/frame-sync/` | Indexed (avbydave.com sitemap) | The free, open interactive demo the Reel points to |
-| `av/field-kit/` | `https://avbydave.com/av/field-kit/` | `noindex,nofollow`, not linked from navigation | Draft product page; price TBD, checkout closed |
+| `frame-sync/` | `https://avbydave.com/frame-sync/` | Indexed (avbydave.com sitemap) | The free, open interactive demo the Reel points to |
+| `field-kit/` | `https://avbydave.com/field-kit/` | `noindex,nofollow`, not linked from navigation | Draft product page; price TBD, checkout closed |
 
-Both live under `av/`, so `scripts/domain-sites.json` publishes them on
-avbydave.com and the systembydave.com path becomes a redirect stub that keeps the
-query string (UTM tags survive). **Proposed Reel URL:**
-`https://avbydave.com/av/frame-sync/`. Linking the systembydave.com path also
-works but adds a redirect hop in Instagram's in-app browser. Dave approves the
-final URL before anything is posted.
+Both are listed in the avbydave site's `pages` in `scripts/domain-sites.json`,
+so they publish on avbydave.com, and the systembydave.com paths become redirect
+stubs that keep the query string (UTM tags survive). They are top-level routes,
+not under `av/`, because `av/` is the AV Suite build output (`npm run
+build:av-suite` empties it). **Proposed Reel URL:**
+`https://avbydave.com/frame-sync/`. Linking the systembydave.com path also works
+but adds a redirect hop in Instagram's in-app browser. Dave approves the final URL
+before anything is posted.
 
 Neither page is in the AV offline cache, so no cache generation bump is needed.
 

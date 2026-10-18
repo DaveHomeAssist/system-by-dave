@@ -1,6 +1,6 @@
 # Frame-sync launch copy (drafts for Dave's approval)
 
-Status: **draft, nothing posted.** Every line below needs Dave's approval before it goes anywhere public. Demo URL in the links is the proposed one (`https://avbydave.com/av/frame-sync/`); swap it if Dave picks another.
+Status: **draft, nothing posted.** Every line below needs Dave's approval before it goes anywhere public. Demo URL in the links is the proposed one (`https://avbydave.com/frame-sync/`); swap it if Dave picks another.
 
 Copy rules used: recognition hook first, no greeting or title card, fix by 8–10 s, one share prompt, one CTA keyword (SYNC), all text as on-screen overlays (no speech, so the Captions sticker has nothing to transcribe). Claims match the demo: it's a simplified single-display model.
 
@@ -78,14 +78,14 @@ Scheme: `?utm_source=instagram&utm_medium={route}&utm_campaign=framesync_launch&
 
 | Route (`utm_medium`) | Asset (`utm_content`) | Where it's used | Link |
 |---|---|---|---|
-| dm | reel_main | Auto-DM 2 for the main Reel (35–45 s cut) | https://avbydave.com/av/frame-sync/?utm_source=instagram&utm_medium=dm&utm_campaign=framesync_launch&utm_content=reel_main |
-| dm | reel_15s | Auto-DM 2 for the 15 s Trial Reel | https://avbydave.com/av/frame-sync/?utm_source=instagram&utm_medium=dm&utm_campaign=framesync_launch&utm_content=reel_15s |
-| dm | reel_voice | Auto-DM 2 for the music/voice variant (week 2) | https://avbydave.com/av/frame-sync/?utm_source=instagram&utm_medium=dm&utm_campaign=framesync_launch&utm_content=reel_voice |
-| dm | carousel | Auto-DM 2 if the carousel also runs the SYNC keyword | https://avbydave.com/av/frame-sync/?utm_source=instagram&utm_medium=dm&utm_campaign=framesync_launch&utm_content=carousel |
-| bio | profile | Single bio link (all weeks). `profile` is not in the brief's asset list; it marks clicks that aren't tied to one post | https://avbydave.com/av/frame-sync/?utm_source=instagram&utm_medium=bio&utm_campaign=framesync_launch&utm_content=profile |
-| story | story_w1 | Story link sticker, Reel day (week 1) | https://avbydave.com/av/frame-sync/?utm_source=instagram&utm_medium=story&utm_campaign=framesync_launch&utm_content=story_w1 |
-| story | story_w3 | Story link sticker, week 3 (Field Kit push) | https://avbydave.com/av/frame-sync/?utm_source=instagram&utm_medium=story&utm_campaign=framesync_launch&utm_content=story_w3 |
-| carousel | carousel | Only if a carousel ever carries its own link (e.g. a Story re-share); otherwise unused | https://avbydave.com/av/frame-sync/?utm_source=instagram&utm_medium=carousel&utm_campaign=framesync_launch&utm_content=carousel |
+| dm | reel_main | Auto-DM 2 for the main Reel (35–45 s cut) | https://avbydave.com/frame-sync/?utm_source=instagram&utm_medium=dm&utm_campaign=framesync_launch&utm_content=reel_main |
+| dm | reel_15s | Auto-DM 2 for the 15 s Trial Reel | https://avbydave.com/frame-sync/?utm_source=instagram&utm_medium=dm&utm_campaign=framesync_launch&utm_content=reel_15s |
+| dm | reel_voice | Auto-DM 2 for the music/voice variant (week 2) | https://avbydave.com/frame-sync/?utm_source=instagram&utm_medium=dm&utm_campaign=framesync_launch&utm_content=reel_voice |
+| dm | carousel | Auto-DM 2 if the carousel also runs the SYNC keyword | https://avbydave.com/frame-sync/?utm_source=instagram&utm_medium=dm&utm_campaign=framesync_launch&utm_content=carousel |
+| bio | profile | Single bio link (all weeks). `profile` is not in the brief's asset list; it marks clicks that aren't tied to one post | https://avbydave.com/frame-sync/?utm_source=instagram&utm_medium=bio&utm_campaign=framesync_launch&utm_content=profile |
+| story | story_w1 | Story link sticker, Reel day (week 1) | https://avbydave.com/frame-sync/?utm_source=instagram&utm_medium=story&utm_campaign=framesync_launch&utm_content=story_w1 |
+| story | story_w3 | Story link sticker, week 3 (Field Kit push) | https://avbydave.com/frame-sync/?utm_source=instagram&utm_medium=story&utm_campaign=framesync_launch&utm_content=story_w3 |
+| carousel | carousel | Only if a carousel ever carries its own link (e.g. a Story re-share); otherwise unused | https://avbydave.com/frame-sync/?utm_source=instagram&utm_medium=carousel&utm_campaign=framesync_launch&utm_content=carousel |
 
 The demo's event dispatcher copies these UTM values onto every event, so routes can be compared once Dave turns on an analytics provider (`docs/launch/analytics.md`).
 

@@ -71,7 +71,7 @@ const VIEWPORTS = { phone: { width: 390, height: 844 }, desktop: { width: 1280, 
 try {
   // 1. Interactive break/fix flow on both viewports, landing with UTM parameters.
   for (const [label, viewport] of Object.entries(VIEWPORTS)) {
-    const { page, context, errors } = await open(`/av/frame-sync/?${UTM}`, viewport);
+    const { page, context, errors } = await open(`/frame-sync/?${UTM}`, viewport);
     await page.waitForTimeout(400);
     await noHorizontalScroll(page, `${label} step 1`);
     await shot(page, `${label}-step1.png`);
@@ -127,7 +127,7 @@ try {
 
   // 2. Auto-play timing (4 s per step to keep the probe short) and the clamp.
   {
-    const { page, context, errors } = await open('/av/frame-sync/?autoplay=1&step_s=4', VIEWPORTS.phone);
+    const { page, context, errors } = await open('/frame-sync/?autoplay=1&step_s=4', VIEWPORTS.phone);
     await page.waitForTimeout(13000);
     await shot(page, 'phone-autoplay-step4.png');
     await page.waitForFunction(() => window.__events.some((e) => e.name === 'demo_complete'), null, { timeout: 25000 });
@@ -146,7 +146,7 @@ try {
     await context.close();
   }
   for (const [query, expected] of [['', 35], ['&step_s=10', 42], ['&step_s=1', 28]]) {
-    const { page, context } = await open(`/av/frame-sync/?capture=1${query}`, VIEWPORTS.phone);
+    const { page, context } = await open(`/frame-sync/?capture=1${query}`, VIEWPORTS.phone);
     const total = await page.evaluate(() => window.FrameSync.total);
     if (total !== expected) fail(`auto-play length for "${query || 'default'}": expected ${expected} s, got ${total}`);
     await context.close();
@@ -158,7 +158,7 @@ try {
   //    link appears and records kit_click.
   {
     const config = "window.SBD_LAUNCH={analytics:{provider:null},email:{provider:'test',endpoint:'https://signup.example.invalid/subscribe',fallbackMailto:'avbydave@gmail.com'},fieldKit:{url:'../field-kit/',priceLabel:'Price TBD'}};";
-    const { page, context, errors } = await open('/av/frame-sync/', VIEWPORTS.phone, {
+    const { page, context, errors } = await open('/frame-sync/', VIEWPORTS.phone, {
       routes: [['**/js/sbd-launch-config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: config })]]
     });
     if (await page.locator('#fs-kit').isHidden()) fail('configured kit URL did not reveal the Field Kit slot');
@@ -184,7 +184,7 @@ try {
 
   // 4. Reduced motion starts paused; no-JS shows every step; skip link is first.
   {
-    const { page, context, errors } = await open('/av/frame-sync/', VIEWPORTS.phone, { reducedMotion: 'reduce' });
+    const { page, context, errors } = await open('/frame-sync/', VIEWPORTS.phone, { reducedMotion: 'reduce' });
     if ((await page.textContent('#fs-play')).trim() !== 'Play motion') fail('reduced motion does not start paused');
     await page.keyboard.press('Tab');
     const focused = await page.evaluate(() => document.activeElement.className);
@@ -193,7 +193,7 @@ try {
     await context.close();
   }
   {
-    const { page, context } = await open('/av/frame-sync/', VIEWPORTS.phone, { javaScriptEnabled: false });
+    const { page, context } = await open('/frame-sync/', VIEWPORTS.phone, { javaScriptEnabled: false });
     const visible = await page.locator('#fs-steps li:visible').count();
     if (visible !== 7) fail(`no-JS shows ${visible} of 7 steps`);
     await shotFull(page, 'phone-no-js.png');
@@ -202,7 +202,7 @@ try {
 
   // 5. Field Kit draft page.
   for (const [label, viewport] of Object.entries(VIEWPORTS)) {
-    const { page, context, errors } = await open('/av/field-kit/', viewport);
+    const { page, context, errors } = await open('/field-kit/', viewport);
     await noHorizontalScroll(page, `field kit ${label}`);
     const robots = await page.getAttribute('meta[name="robots"]', 'content');
     if (!/noindex/.test(robots || '')) fail('Field Kit draft is not noindex');
