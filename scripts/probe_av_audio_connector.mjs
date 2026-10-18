@@ -24,12 +24,15 @@ const key = 'sbd.avAudio.v1', producer = 'input-list.v1';
 const original = JSON.stringify({schema:producer,rows:[{id:'input-7',ch:7,source:'Synthetic vocal',type:'Mic',conn:'XLR',patch:'SB A/7',stand:'Downstage',owner:'A2',status:'open',notes:'Original note'}]});
 const patchSource=JSON.stringify({items:[{id:'patch-7',channel:'7',source:'Synthetic vocal',status:'patched'}]});
 const checkSource=JSON.stringify({items:[{id:'check-7',channel:'7',source:'Synthetic vocal',status:'issue',problem:'Synthetic no signal'}]});
+const speakerKey='sbd.speakerPlan.v1';
+const speakerSource=JSON.stringify({items:[{id:'speaker-1',zone:'House L',speaker:'Synthetic array',type:'main',processor:'DSP A',output:'1',amp:'Amp A',cable:'NL8',trim:'-2 dB',delay:'4 ms',coverage:'checked',status:'patched',backup:'Spare array',notes:'Keep speaker note'}]});
+const speakerChoices=[['planned','Planned'],['patched','Patched'],['tuned','Tuned'],['coverage','Coverage Checked'],['ready','Ready'],['issue','Issue'],['spare','Spare']];
 const button = (scope, name) => scope.getByRole('button', {name,exact:true});
 const quick = (scope, name) => button(scope.locator('.console-quick'),name).click();
 const read = (page, name = key) => page.evaluate(name => localStorage.getItem(name), name);
 const file = raw => ({name:'synthetic.json',mimeType:'application/json',buffer:Buffer.from(raw)});
-const contexts = [], errors = [], passed = [], resizeTransitions = [];
-let browser, page, host, linePage;
+const contexts = [], errors = [], passed = [], resizeTransitions = [], shortHeightActivations = [];
+let browser, page, host, linePage, speakerPage;
 async function fresh() {
   const context = await browser.newContext({viewport:{width:1440,height:900},hasTouch:true,acceptDownloads:true});
   contexts.push(context);
@@ -62,6 +65,13 @@ async function lineCheck(scope) {
   const toggle=panel.locator('.audio-row-title').first();
   if(await toggle.getAttribute('aria-expanded')!=='true')await toggle.click();
   return {choice:panel.getByRole('combobox',{name:'Line Check choices',exact:true}),custom:panel.getByRole('textbox',{name:'Line Check Status',exact:true})};
+}
+async function speakerStatus(scope) {
+  await quick(scope,'Speakers');
+  const panel=scope.locator('.console-panel[data-panel="speakers"]');
+  const toggle=panel.locator('.audio-row-title').first();
+  if(await toggle.getAttribute('aria-expanded')!=='true')await toggle.click();
+  return {choice:panel.getByRole('combobox',{name:'Speaker status choices',exact:true}),custom:panel.getByRole('textbox',{name:'Speaker status',exact:true})};
 }
 async function imported(scope, raw, saved = false, source = 'Input List') {
   await quick(scope,'Document');
@@ -328,14 +338,78 @@ try {
   }
   pass('old absent/null Line Check fallback and explicit blank display correctly without writes, coercion or migration');
 
+
+  const speakerFixture=await fresh();speakerPage=speakerFixture.page;
+  await speakerPage.evaluate(({speakerKey,speakerSource})=>localStorage.setItem(speakerKey,speakerSource),{speakerKey,speakerSource});
+  await imported(speakerPage,original);await imported(speakerPage,patchSource,false,'Audio Patch');await imported(speakerPage,checkSource,false,'Line Check');
+  await imported(speakerPage,speakerSource,true,'Speaker Plan');
+  const speakerBaseline=await exported(speakerPage,speakerPage);await save(speakerPage);
+  const storedSpeakerBaseline=await read(speakerPage);let speaker=await speakerStatus(speakerPage);
+  assert.deepEqual(await speaker.choice.locator('option').evaluateAll(options=>options.map(option=>[option.value,option.textContent])),[['','Not set'],...speakerChoices]);
+  await speaker.choice.selectOption('planned');await speaker.choice.focus();await speaker.choice.press('ArrowDown');
+  assert.equal(await speaker.custom.inputValue(),'patched','keyboard choice updates custom entry');
+  for(const value of [...speakerChoices.map(([value])=>value),'Custom speaker status','']) {
+    if(value==='Custom speaker status')await speaker.custom.fill(value);else await speaker.choice.selectOption(value);
+    assert.equal(await speaker.choice.inputValue(),value);assert.equal(await speaker.custom.inputValue(),value);
+    const expected=structuredClone(speakerBaseline);expected.speakers[0].status=value;
+    assert.deepEqual(await exported(speakerPage,speakerPage),expected,'Speaker edit changes only selected speaker status');
+    assert.equal(await read(speakerPage),storedSpeakerBaseline,'Speaker edits require explicit Save');
+  }
+  await save(speakerPage);await speakerPage.reload();speaker=await speakerStatus(speakerPage);
+  assert.equal(await speaker.choice.inputValue(),'');assert.equal(await speaker.custom.inputValue(),'');
+  await speaker.custom.fill('Custom saved speaker');await save(speakerPage);
+  const speakerBackup=await exported(speakerPage,speakerPage);
+  const speakerRestore=(await fresh()).page;await imported(speakerRestore,JSON.stringify(speakerBackup));
+  assert.deepEqual(await exported(speakerRestore,speakerRestore),speakerBackup);await save(speakerRestore);await speakerRestore.reload();
+  assert.equal(await (await speakerStatus(speakerRestore)).choice.inputValue(),'Custom saved speaker');
+  assert.equal(await read(speakerPage,speakerKey),speakerSource);
+  pass('Speaker original seven values/labels and keyboard choices, editable custom/blank synchronization, status-only changes, explicit Save/restore and source independence');
+
+  await speakerPage.close();speakerPage=await speakerFixture.context.newPage();await speakerPage.goto(base+'/av-audio/');
+  assert.equal(await (await speakerStatus(speakerPage)).custom.inputValue(),'Custom saved speaker');
+  const speakerSaved=await read(speakerPage);await imported(speakerPage,speakerSource,true,'Speaker Plan');
+  assert.match(await speakerPage.getByRole('status').textContent(),/already been imported/);assert.equal(await read(speakerPage),speakerSaved);
+  const repeatedSpeaker=JSON.parse(speakerSource);repeatedSpeaker.exportedAt='synthetic changed metadata';
+  await imported(speakerPage,JSON.stringify(repeatedSpeaker),false,'Speaker Plan');
+  assert.match(await speakerPage.getByRole('status').textContent(),/already been imported/);
+  assert.deepEqual(await exported(speakerPage,speakerPage),speakerBackup);
+  const changedSpeaker=JSON.parse(speakerSource);changedSpeaker.items[0].status='ready';changedSpeaker.items[0].coverage='walked';
+  await imported(speakerPage,JSON.stringify(changedSpeaker),false,'Speaker Plan');
+  const afterSpeakerImport=await exported(speakerPage,speakerPage);
+  assert.deepEqual(afterSpeakerImport.speakers,speakerBackup.speakers,'same-ID source never overwrites working speakers');
+  assert.deepEqual(afterSpeakerImport.channels,speakerBackup.channels);
+  assert.equal(afterSpeakerImport.imports.at(-1).raw,JSON.stringify(changedSpeaker));
+  assert.equal(afterSpeakerImport.imports[3].raw,speakerSource);assert.equal(await read(speakerPage,speakerKey),speakerSource);
+  pass('Speaker custom status survives page reopen; exact/metadata-only repeats rejected and changed-source same-ID rows preserved');
+
+  for(const value of [undefined,null,'']) {
+    const old=structuredClone(speakerBackup);if(value===undefined)delete old.speakers[0].status;else old.speakers[0].status=value;
+    const raw=JSON.stringify(old);
+    await speakerRestore.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key,raw});await speakerRestore.reload();
+    speaker=await speakerStatus(speakerRestore);
+    assert.equal(await speaker.choice.inputValue(),'');assert.equal(await speaker.custom.inputValue(),'');
+    assert.deepEqual(await exported(speakerRestore,speakerRestore),old);assert.equal(await read(speakerRestore),raw,'opening missing/null/blank status never writes or defaults to planned');
+  }
+  pass('Speaker old absent/null/blank status opens unchanged without normalization, migration or automatic Save');
+
+  await page.evaluate(({speakerKey,speakerSource})=>localStorage.setItem(speakerKey,speakerSource),{speakerKey,speakerSource});
+  await imported(page,speakerSource,true,'Speaker Plan');await save(page);
   for(const theme of ['light','dark']) {
     await page.evaluate(theme=>localStorage.setItem('av-theme-mode.v1',theme),theme); await page.reload();
     for(const size of [{width:1440,height:900},{width:375,height:812},{width:680,height:812},{width:1024,height:768},{width:844,height:390},{width:320,height:256},{width:3840,height:1080}]) {
-      await page.setViewportSize(size); control=await connection(page);
+      await page.setViewportSize(size);
       if(size.height<500) {
+        // Speakers selects a different row. Focus the panel before expanding its
+        // now-collapsed row: the ordinary short-height grid has no body space.
+        await quick(page,'Inputs');
+        assert.equal(await page.locator('[data-panel="inputs"] .audio-row-title').first().getAttribute('aria-expanded'),'false','exercise collapsed Inputs after Speakers');
         await button(page,'Full screen focused panel').click();
         await page.locator('.console-shell:fullscreen').waitFor();
+        const activation=await page.locator('[data-panel="inputs"]').evaluate(panel=>({viewport:{width:innerWidth,height:innerHeight},activeView:document.querySelector('.console-views [aria-selected="true"]')?.textContent,body:panel.querySelector('.console-body').getBoundingClientRect().toJSON(),fullscreen:Boolean(document.fullscreenElement)}));
+        assert.ok(activation.fullscreen&&activation.body.height>=44,'Full screen makes the collapsed Inputs row reachable');
+        shortHeightActivations.push({theme,...activation});
       }
+      control=await connection(page);
       await noOverflow(page); await reachable(control,theme+'/'+size.width+'x'+size.height);
       await control.focus(); assert.equal(await control.evaluate(el=>el===document.activeElement),true);
       assert.equal(await control.inputValue(),'TRS / operator patch');
@@ -354,10 +428,19 @@ try {
         assert.equal(await field.inputValue(),'issue');
       }
       if([1440,375,3840].includes(size.width))await page.screenshot({path:join(output,`audio-line-check-${theme}-${size.width}.png`)});
+      const speaker=await speakerStatus(page);
+      for(const [name,field]of Object.entries(speaker)) {
+        await reachable(field,'Speaker '+name+'/'+theme+'/'+size.width+'x'+size.height);
+        await field.focus();assert.equal(await field.evaluate(el=>el===document.activeElement),true);
+        assert.equal(await field.inputValue(),'patched');
+      }
+      await noOverflow(page);
+      if([1440,375,3840].includes(size.width))await page.screenshot({path:join(output,`audio-speaker-${theme}-${size.width}.png`)});
       if(size.height<500)await page.evaluate(()=>document.exitFullscreen());
     }
   }
   pass('Connection, Input/Patch and both Line Check controls have keyboard focus and full 44px reachability in both themes at seven sizes; existing full-screen panel path at short heights');
+  pass('Speaker choice/custom controls have keyboard focus, full 44px reachability and bounded roots in both themes at seven sizes');
   await page.setViewportSize({width:1440,height:900});
   await page.evaluate(async()=>{await navigator.serviceWorker.register('/av-suite-worker.js',{scope:'/',updateViaCache:'none'});await navigator.serviceWorker.ready;});
   await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
@@ -389,13 +472,25 @@ try {
   Object.assign(expectedOffline.channels[0],{lineCheckStatus:'Custom offline check',status:'Custom offline check'});
   assert.deepEqual(offlineCheck,expectedOffline);await primary.context.setOffline(false);
   pass('prepared offline Line Check picker/custom edits survive Save/reload with only the existing alias pair changed');
+  await primary.context.setOffline(true);speaker=await speakerStatus(page);
+  await speaker.choice.selectOption('coverage');await save(page);await page.reload();
+  speaker=await speakerStatus(page);assert.equal(await speaker.custom.inputValue(),'coverage');
+  assert.equal(JSON.parse(await read(page)).speakers[0].coverage,'checked');
+  await speaker.custom.fill('Custom offline speaker');await save(page);await page.reload();
+  assert.equal(await (await speakerStatus(page)).choice.inputValue(),'Custom offline speaker');
+  const expectedSpeakerOffline=structuredClone(offlineCheck);expectedSpeakerOffline.speakers[0].status='Custom offline speaker';
+  assert.deepEqual(JSON.parse(await read(page)),expectedSpeakerOffline);assert.equal(await read(page,speakerKey),speakerSource);
+  await primary.context.setOffline(false);
+  pass('prepared offline Speaker choices/custom edits survive Save/reload with only speaker status changed, separate coverage and source bytes preserved');
 
   assert.deepEqual(errors,[]);
-  await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,resizeTransitions,physicalDevice:'not tested',virtualKeyboard:'not tested',processRestartAndPowerLoss:'not tested'},null,2));
+  assert.equal(shortHeightActivations.length,4,'both short heights tested in both themes');
+  await writeFile(join(output,'result.json'),JSON.stringify({at:new Date().toISOString(),base,browser:browser.version(),passed,resizeTransitions,shortHeightActivations,physicalDevice:'not tested',virtualKeyboard:'not tested',processRestartAndPowerLoss:'not tested'},null,2));
 } catch(error) {
-  await writeFile(join(output,'failure.json'),JSON.stringify({at:new Date().toISOString(),passed,resizeTransitions,error:String(error),stack:error.stack},null,2));
+  await writeFile(join(output,'failure.json'),JSON.stringify({at:new Date().toISOString(),passed,resizeTransitions,shortHeightActivations,error:String(error),stack:error.stack},null,2));
   if(host&&!host.isClosed())await host.screenshot({path:join(output,'embedded-failure.png')}).catch(()=>{});
   if(linePage&&!linePage.isClosed())await linePage.screenshot({path:join(output,'line-check-failure.png')}).catch(()=>{});
+  if(speakerPage&&!speakerPage.isClosed())await speakerPage.screenshot({path:join(output,'speaker-failure.png')}).catch(()=>{});
   if(page&&!page.isClosed())await page.screenshot({path:join(output,'failure.png')}).catch(()=>{});
   throw error;
 } finally {

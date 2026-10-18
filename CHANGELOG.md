@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-13 — Audio Speaker status choice parity
+
+- Add the original seven Speaker status choices and labels alongside existing custom entry. Preserve blank/custom/absent/null records and explicit Save; only the selected speaker's status changes.
+- Keep status `coverage` (Coverage Checked) independent from the separate coverage field, all other speaker fields, channel statuses and original source bytes. Same-ID changed-source imports still preserve working rows; no schema, key or import-policy change.
+- Duncan passes typecheck, 69 model tests, build, AV/23 Rail-worker cases, Throwline/47 and Shader Practice/54. Thirteen browser groups pass, then Inputs expansion is blocked by overlapping panel headers at 844×390 before the probe enters Full screen. Preserve the failed run; no retry or release progression. Remaining browser, CI and published acceptance are open; physical/operator and interruption/power-loss proof is not implied.
+- Merge main (2026-10-17): port the Speaker status control into the Audio pack (`apps/av-audio/src/pack.tsx`) after the App→pack refactor, drop the obsolete embedded `/av-video/` iframe probe section that main removed, and move the cache generation to `v20261017-audio-speaker-status` after main's `v20261015-audio-signal-flow`.
+- Advance shared cache generation and all intentional consumers together. PR #336's Line Check release at `94b1ce7` is the completed baseline, not evidence for this changed control.
+
 ## 2026-10-16 — FMP 3D Gear Models
 
 - Preserve direct explorer links when JavaScript is unavailable and hide the enhanced model launcher until it works. Keep the camera-rig summary visible beneath mobile equipment navigation.
