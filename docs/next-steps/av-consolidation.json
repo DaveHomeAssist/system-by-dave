@@ -1351,5 +1351,26 @@
     "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/38794347013",
     "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/38797244610",
     "liveSource": "https://avbydave.com/source.json"
+  },
+  "streamRecordPreparation": {
+    "itemId": "AVV-SR-DESIGN-1",
+    "recordedOn": "2026-10-18",
+    "reviewedBase": "4561f20a4ed854fdb807a5439d2867427885f670",
+    "state": "Independent test-only design implemented; Stream/Record runtime remains unimplemented and gated.",
+    "brief": "docs/av-video-stream-record-contract.md",
+    "authority": "Independent design work explicitly permitted by docs/av-video-stream-record-credential-decision.md; Stage 2.1\u20132.3 field and source-preservation contract.",
+    "acceptanceDelta": "Typed working row shapes, complete invented field/metadata fixtures, blank/custom/duration cases, and documented preview/cancel/apply/repeat/restore requirements. Existing six-family model still rejects Stream and Record imports and document extensions.",
+    "verification": "Dominic: Video typecheck, 82 tests (four new contract/boundary tests), Video build and unchanged JS/CSS hashes pass. Initial transfer sidecar failure retained; exact AppleDouble sidecars moved to private evidence before unchanged rerun.",
+    "delivery": "Source, review, exact-head CI, merge and publication are separate gates; the owning PR retains their provider receipts. This record makes no Stream/Record runtime or human acceptance claim.",
+    "remainingGate": "AVV-STREAM-KEY-1 before any dependent runtime; no policy selected, no provider/device/credential operation.",
+    "queueReconciliation": [
+      "Cameras/Playback acceptance at 338ea85 is delivered; do not reopen it.",
+      "Current native packs and restored specialist page panels supersede the October 9 snapshot-host direction; preserve the October 15 hybrid ruling.",
+      "Standalone-family route and first-native-specialist choices remain unanswered; no conversion selected.",
+      "October 14 Audio persona suggestions are review evidence, not approval for new features.",
+      "AVV-05 skip-link task retention is eligible for bounded current-source/browser revalidation; no defect fix is inferred from historical evidence.",
+      "AVV-06 retains a source-level checkVisibility compatibility risk; minimum OS/support decisions and physical acceptance remain separate."
+    ],
+    "boardSync": "Configured Downloads board path is absent; the existing relocated private board is the only permitted synchronization target. Verify parity with the scoped updater and retain failures."
   }
 }
