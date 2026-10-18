@@ -106,6 +106,14 @@ The following design work can proceed without choosing a policy, but no dependen
 - Define optional-module visibility, empty states and reversible document storage.
 - Build synthetic non-secret fixtures and acceptance cases for import preview, cancel, apply, repeat import and restore.
 
+The bounded [Stream and Record preparation contract](av-video-stream-record-contract.md)
+records this independent work as **AVV-SR-DESIGN-1**: prospective typed rows,
+synthetic fixtures and later acceptance cases. These definitions are test-only;
+they do not enable imports, select a credential policy or change the live document.
+The legacy producer behavior audited above is historical: PR #340 replaced the
+Stream Plan and Record Log pages with redirect stubs. Existing saved payloads
+still require the decision before any new AV Video runtime can consume them.
+
 ## Acceptance for the later implementation
 
 - Synthetic unsafe candidates are rejected before preview adoption, save and export without their values appearing in UI, logs, snapshots or test output.

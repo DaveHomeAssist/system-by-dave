@@ -8,6 +8,12 @@
 - Add `field-kit/`, a noindex, unlinked Sync & Signal Field Kit draft page with the price shown as TBD and checkout closed. The indexing verifier now expects 188 routes outside the sitemaps.
 - Add local-only `scripts/launch/capture_frame_sync_reel.mjs` (1080×1920/30 fps main and 15 s cuts, 4:5 carousel loops, cover with 3:4 crop check; fails on safe-area violations) and `scripts/launch/probe_frame_sync.mjs`. Draft Reel copy in `docs/launch/reel-copy.md`; nothing posted.
 
+## 2026-10-18 — Stream and Record independent preparation
+
+- Define test-only typed Stream/Record rows and invented fixtures from the maintained field matrix and the last legacy producer source. Preserve text, blank/custom statuses, duration strings and explicit provenance/link fields in the prospective contract.
+- Record preview/cancel/apply/repeat/restore, ordering and optional-module acceptance requirements without enabling either pending import family. AVV-STREAM-KEY-1 remains unanswered; no credential policy, application schema, storage, route or generated runtime change is included.
+- Dominic passes Video typecheck and all 82 tests, including four contract/boundary cases; rebuilding Video preserves both asset hashes. Retain the initial AppleDouble transfer-metadata failure separately from the corrected run. Normal PR/publication and physical/operator gates remain separate.
+
 ## 2026-10-13 — Audio Speaker status choice parity
 
 - Add the original seven Speaker status choices and labels alongside existing custom entry. Preserve blank/custom/absent/null records and explicit Save; only the selected speaker's status changes.
