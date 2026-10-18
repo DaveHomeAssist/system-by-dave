@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-18 — Frame sync demo and launch drafts (AV by Dave)
+
+- Add `av/frame-sync/`, a free seven-step interactive demo (published at `https://avbydave.com/av/frame-sync/`, in that site's sitemap): cause a screen tear (step 3), fix it with frame sync (step 4), then drift, genlock and a field check. Mobile-first, readable without JavaScript, reduced-motion start paused, `?autoplay=1` (4–6 s per step) and a `?capture=1` recording layout.
+- Add an optional, inline "Get the next demo" block after the fix that never blocks the demo. No email tool is configured, so it is a mailto link to avbydave@gmail.com; `js/sbd-launch-config.js` holds the hooks for the email endpoint, the Field Kit link (hidden until set) and an analytics provider.
+- Add `js/sbd-events.js`, a no-op launch event dispatcher (`page_view` with UTM tags through `affiliate_click`). No provider and no third-party script: the privacy policy's no-analytics statement stays true. `docs/launch/analytics.md` lists what must change before one is turned on (Dave's decision).
+- Add `av/field-kit/`, a noindex, unlinked Sync & Signal Field Kit draft page with the price shown as TBD and checkout closed. The indexing verifier now expects 188 routes outside the sitemaps.
+- Add local-only `scripts/launch/capture_frame_sync_reel.mjs` (1080×1920/30 fps main and 15 s cuts, 4:5 carousel loops, cover with 3:4 crop check; fails on safe-area violations) and `scripts/launch/probe_frame_sync.mjs`. Draft Reel copy in `docs/launch/reel-copy.md`; nothing posted.
+
 ## 2026-10-13 — Audio Speaker status choice parity
 
 - Add the original seven Speaker status choices and labels alongside existing custom entry. Preserve blank/custom/absent/null records and explicit Save; only the selected speaker's status changes.

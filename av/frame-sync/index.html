@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en" data-av-theme="dark" data-av-theme-lock="dark" data-av-tool="frame-sync">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'" />
+    <title>Frame Sync Demo | AV by Dave</title>
+    <meta name="description" content="Cause a screen tear yourself, then fix it. A seven-step interactive demo of scan-out, frame sync and genlock from a working AV tech. Free, no sign-up, works on a phone." />
+    <link rel="canonical" href="https://avbydave.com/av/frame-sync/" />
+    <meta name="theme-color" content="#0C1016" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AV by Dave" />
+    <meta property="og:title" content="Cause a screen tear, then fix it | AV by Dave" />
+    <meta property="og:description" content="Seven steps from a working AV tech: why a line rips across a screen, and how frame sync and genlock stop it." />
+    <meta property="og:url" content="https://avbydave.com/av/frame-sync/" />
+    <meta property="og:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cause a screen tear, then fix it | AV by Dave" />
+    <meta name="twitter:description" content="Seven steps from a working AV tech: why a line rips across a screen, and how frame sync and genlock stop it." />
+    <meta name="twitter:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+    <link rel="icon" href="../../svg/system_by_dave_logo_rust.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../css/av-theme.css" />
+    <script src="../../js/av-theme-mode.js"></script>
+    <style>
+      html, body { margin: 0; background: var(--av-bg); color: var(--av-text); }
+      body { font-family: var(--av-font-ui); line-height: 1.5; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      a { color: var(--av-brand-strong); }
+      :focus-visible { outline: 3px solid var(--av-focus); outline-offset: 2px; }
+      .sbd-skip-link { position: absolute; left: 12px; top: -80px; z-index: 50; padding: 12px 16px; min-height: 44px; border-radius: var(--av-radius-control); font-weight: 700; text-decoration: none; }
+      .sbd-skip-link:focus { top: 12px; }
+      .sbd-site-return { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; max-width: 1120px; margin: 0 auto; padding: 4px 16px; font-size: 13px; }
+      .sbd-site-return a { display: inline-flex; align-items: center; min-height: 44px; color: var(--av-text-2); text-decoration: none; font-weight: 600; }
+      .sbd-site-return a:hover { color: var(--av-text); text-decoration: underline; }
+      main { max-width: 1120px; margin: 0 auto; padding: 4px 16px 40px; }
+      .fs-intro h1 { margin: 4px 0 6px; font-size: clamp(26px, 6.4vw, 40px); line-height: 1.1; letter-spacing: -.01em; }
+      .fs-intro p { margin: 0 0 14px; color: var(--av-text-2); max-width: 62ch; }
+      .fs-demo { display: grid; gap: 16px; outline: none; }
+      .fs-stage { position: relative; display: grid; gap: 8px; }
+      .fs-screen-wrap { position: relative; border-radius: var(--av-radius-card); overflow: hidden; background: #05070a; border: 1px solid var(--av-line); aspect-ratio: 4 / 3; }
+      .fs-screen-wrap canvas { display: block; width: 100%; height: 100%; }
+      .fs-strip { display: block; width: 100%; height: 64px; border-radius: var(--av-radius-control); background: var(--av-surface); border: 1px solid var(--av-line); }
+      .fs-chip { position: absolute; right: 8px; top: 8px; padding: 3px 9px; border-radius: 999px; background: rgba(5, 7, 10, .78); color: var(--av-text); font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+      .fs-panel { display: grid; gap: 12px; align-content: start; }
+      .fs-progress { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 0; padding: 0; list-style: none; }
+      .fs-progress li { height: 6px; border-radius: 3px; background: var(--av-line); }
+      .fs-progress li.is-done { background: var(--av-brand-line); }
+      .fs-progress li.is-current { background: var(--av-brand); }
+      .fs-steps { margin: 0; padding: 0; list-style: none; }
+      .fs-steps li { margin: 0 0 14px; }
+      .fs-steps h2 { margin: 0 0 4px; font-size: 20px; line-height: 1.2; }
+      .fs-steps .fs-step-num { display: block; color: var(--av-muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+      .fs-steps p { margin: 0; color: var(--av-text-2); }
+      .is-enhanced .fs-steps li { display: none; margin: 0; }
+      .is-enhanced .fs-steps li.is-current { display: block; }
+      .fs-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .fs-btn { min-height: 44px; padding: 10px 14px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-surface-2); color: var(--av-text); font: inherit; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+      .fs-btn:hover { background: var(--av-surface-3); }
+      .fs-btn[disabled] { opacity: .45; cursor: default; }
+      .fs-btn--primary { grid-column: 1 / -1; background: var(--av-brand); border-color: var(--av-brand); color: #04140b; font-size: 17px; }
+      .fs-btn--primary:hover { background: var(--av-brand-strong); }
+      .fs-btn--break { background: var(--av-danger); border-color: var(--av-danger); color: #1d0703; }
+      .fs-btn--break:hover { background: #f6a596; }
+      .fs-btn--quiet { background: transparent; }
+      .fs-js-only { display: none; }
+      .is-enhanced .fs-js-only { display: grid; }
+      .is-enhanced .fs-btn.fs-js-only { display: block; }
+      .fs-noscript { color: var(--av-muted); font-size: 14px; }
+      .fs-signup, .fs-notes, .fs-kit { margin-top: 28px; padding: 18px; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-line); }
+      .fs-signup h2, .fs-notes h2, .fs-kit h2 { margin: 0 0 6px; font-size: 20px; }
+      .fs-signup p, .fs-notes p, .fs-kit p { margin: 0 0 10px; color: var(--av-text-2); }
+      .fs-signup form { display: flex; flex-wrap: wrap; gap: 8px; }
+      .fs-signup input[type="email"] { flex: 1 1 220px; min-height: 44px; padding: 10px 12px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-control); color: var(--av-text); font: inherit; }
+      .fs-signup .fs-small, .fs-kit .fs-small { font-size: 13px; color: var(--av-muted); }
+      .fs-mailto { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; border-radius: var(--av-radius-control); background: var(--av-surface-3); border: 1px solid var(--av-line-strong); color: var(--av-text); font-weight: 700; text-decoration: none; }
+      .fs-notes dl { margin: 0; display: grid; gap: 8px; }
+      .fs-notes dt { font-weight: 700; }
+      .fs-notes dd { margin: 0; color: var(--av-text-2); }
+      footer { max-width: 1120px; margin: 0 auto; padding: 20px 16px 40px; color: var(--av-muted); font-size: 13px; border-top: 1px solid var(--av-line); }
+      footer a { color: var(--av-text-2); display: inline-flex; min-height: 44px; align-items: center; margin-right: 14px; }
+      .fs-capture-overlay { display: none; }
+      @media (min-width: 900px) {
+        .fs-demo { grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr); align-items: start; }
+        .fs-strip { height: 76px; }
+      }
+      @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+      /* Capture mode (?capture=1) is for the local reel runner only
+         (scripts/launch/capture_frame_sync_reel.mjs). Everything is positioned
+         in CSS pixels of a 360-wide viewport recorded at 3x; text stays inside
+         Instagram's interface-safe area (top 84, bottom 140, right 36). */
+      html.fs-capture, html.fs-capture body { width: 100%; height: 100%; overflow: hidden; background: #07090c; }
+      .fs-capture .sbd-skip-link, .fs-capture .sbd-site-return, .fs-capture .fs-intro, .fs-capture .fs-panel,
+      .fs-capture .fs-signup, .fs-capture .fs-notes, .fs-capture .fs-kit, .fs-capture footer { display: none !important; }
+      .fs-capture main { padding: 0; max-width: none; }
+      .fs-capture .fs-demo { display: block; }
+      .fs-capture .fs-stage { position: fixed; inset: 0; display: block; }
+      .fs-capture .fs-screen-wrap { position: absolute; left: 24px; width: 300px; top: 160px; height: 225px; border-radius: 12px; border-color: #2d3948; }
+      .fs-capture .fs-strip { position: absolute; left: 24px; width: 300px; top: 392px; height: 52px; border-radius: 8px; }
+      .fs-capture .fs-capture-overlay { display: block; }
+      .fs-capture .fs-ov { position: absolute; left: 24px; width: 300px; margin: 0; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+      .fs-capture .fs-ov[hidden] { display: none; }
+      .fs-capture .fs-ov--top { top: 86px; min-height: 66px; display: flex; align-items: flex-end; font-size: 24px; line-height: 1.13; font-weight: 800; letter-spacing: -.01em; }
+      .fs-capture .fs-ov--bottom { top: 452px; font-size: 17px; line-height: 1.25; font-weight: 700; color: #ffe2b8; }
+      .fs-capture .fs-ov--end { top: 150px; height: 340px; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 22px; border-radius: 16px; background: rgba(7, 9, 12, .9); border: 1px solid #526174; text-align: center; }
+      .fs-capture .fs-ov--end strong { font-size: 40px; line-height: 1.05; color: #7bd6a6; }
+      .fs-capture .fs-ov--end span { font-size: 20px; line-height: 1.25; font-weight: 700; }
+      .fs-capture .fs-ov--end small { font-size: 16px; color: #d0c8bc; font-weight: 600; }
+      .fs-capture.fs-capture--4x5 .fs-screen-wrap { top: 84px; }
+      .fs-capture.fs-capture--4x5 .fs-strip { top: 316px; }
+      .fs-capture.fs-capture--4x5 .fs-ov--top { top: 12px; }
+      .fs-capture.fs-capture--4x5 .fs-ov--bottom { top: 376px; }
+    </style>
+  </head>
+  <body>
+    <a class="sbd-skip-link" href="#demo">Skip to the frame sync demo</a>
+    <nav class="sbd-site-return" aria-label="Breadcrumb">
+      <a href="https://systembydave.com/">System by Dave</a>
+      <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+      <a href="../">AV by Dave</a>
+      <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+      <span class="sbd-site-return__current" aria-current="page">Frame Sync Demo</span>
+    </nav>
+    <main>
+      <header class="fs-intro">
+        <h1>Cause a screen tear, then fix it</h1>
+        <p>Seven short steps on why a line rips across a screen and how frame sync and genlock stop it. Free, no sign-up. Motion is slowed down so you can see it.</p>
+      </header>
+
+      <section id="demo" class="fs-demo" tabindex="-1" aria-label="Frame sync demo">
+        <div class="fs-stage">
+          <div class="fs-screen-wrap">
+            <canvas id="fs-screen" class="fs-js-only" width="640" height="480" role="img" aria-label="Simulated screen showing moving vertical bars"></canvas>
+            <span class="fs-chip fs-js-only" id="fs-chip" aria-hidden="true">1 / 7</span>
+          </div>
+          <canvas id="fs-strip" class="fs-strip fs-js-only" width="640" height="64" role="img" aria-label="Timing strip: display refresh passes and source frame swaps"></canvas>
+          <div class="fs-capture-overlay" aria-hidden="true">
+            <p class="fs-ov fs-ov--top" data-ov="top" hidden></p>
+            <p class="fs-ov fs-ov--bottom" data-ov="bottom" hidden></p>
+            <div class="fs-ov fs-ov--end" data-ov="end" hidden></div>
+          </div>
+        </div>
+
+        <div class="fs-panel">
+          <ol class="fs-progress fs-js-only" id="fs-progress" aria-hidden="true">
+            <li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+          </ol>
+          <ol class="fs-steps" id="fs-steps" aria-live="polite">
+            <li data-step="1" data-title="One line at a time">
+              <span class="fs-step-num">Step 1 of 7</span>
+              <h2>A screen paints one line at a time</h2>
+              <p>A display doesn't show a picture all at once. It draws it from the top down, line by line, then pauses briefly (the blanking interval) before starting the next pass. The bright line is where it's drawing right now.</p>
+            </li>
+            <li data-step="2" data-title="New frame each pass">
+              <span class="fs-step-num">Step 2 of 7</span>
+              <h2>The new frame arrives during the pause</h2>
+              <p>The source (a computer, media server or camera) hands over a new frame for each pass. When that handover happens during the pause, every pass shows one whole frame. The green ticks below mark handovers that landed in the pause.</p>
+            </li>
+            <li data-step="3" data-title="The tear">
+              <span class="fs-step-num">Step 3 of 7</span>
+              <h2>Break it: swap frames mid-pass</h2>
+              <p>Now the source swaps frames whenever it's ready, even halfway down the screen. Everything above that point still shows the old frame and everything below shows the new one. The seam between them is a tear.</p>
+            </li>
+            <li data-step="4" data-title="The fix">
+              <span class="fs-step-num">Step 4 of 7</span>
+              <h2>Fix it: only swap during the pause</h2>
+              <p>Hold each new frame until the screen finishes its pass, then swap in the pause. On a computer that's vsync; on video gear it's frame sync or frame lock. Every pass is one whole frame again, so the tear is gone.</p>
+            </li>
+            <li data-step="5" data-title="Why it crawls">
+              <span class="fs-step-num">Step 5 of 7</span>
+              <h2>Clocks that almost match make the tear crawl</h2>
+              <p>Two devices running on their own clocks never match exactly. 59.94 and 60 frames per second slip a whole frame about every 17 seconds, so the swap lands somewhere new on each pass and the tear wanders. It's sped up here so you can watch it move.</p>
+            </li>
+            <li data-step="6" data-title="One reference">
+              <span class="fs-step-num">Step 6 of 7</span>
+              <h2>On a show, lock everything to one reference</h2>
+              <p>In a rig, gear that supports it (cameras, switchers, media servers, LED processors) can lock to one reference signal, such as black burst or tri-level sync. That's genlock. Everything shares one clock and one frame boundary, so nothing drifts.</p>
+            </li>
+            <li data-step="7" data-title="Field check">
+              <span class="fs-step-num">Step 7 of 7</span>
+              <h2>Next time a line rips across a screen</h2>
+              <p>Check sync before you blame the cable: is the source syncing its output to the display (vsync, frame lock)? Do the frame rates match exactly (59.94 isn't 60)? Is everything that should be on reference actually locked to it?</p>
+            </li>
+          </ol>
+          <p class="fs-noscript" id="fs-noscript">The interactive screen needs JavaScript. All seven steps are written out above.</p>
+          <div class="fs-controls fs-js-only" id="fs-controls">
+            <button type="button" class="fs-btn fs-btn--primary" id="fs-action" hidden>Cause the tear</button>
+            <button type="button" class="fs-btn" id="fs-prev">← Back</button>
+            <button type="button" class="fs-btn" id="fs-next">Next →</button>
+            <button type="button" class="fs-btn fs-btn--quiet" id="fs-play" aria-pressed="false">Pause motion</button>
+            <button type="button" class="fs-btn fs-btn--quiet" id="fs-auto">Auto-play all steps</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="fs-signup" id="fs-signup" aria-labelledby="fs-signup-title" hidden>
+        <h2 id="fs-signup-title">Get the next demo</h2>
+        <p>Want the next interactive demo when it's ready? This is optional; the demo above keeps working either way.</p>
+        <form id="fs-signup-form" novalidate hidden>
+          <label class="fs-small" for="fs-email" style="flex-basis:100%">Email address</label>
+          <input id="fs-email" name="email" type="email" autocomplete="email" inputmode="email" required />
+          <button type="submit" class="fs-btn">Send me the next demo</button>
+          <p class="fs-small" id="fs-signup-status" role="status" style="flex-basis:100%;margin:0"></p>
+        </form>
+        <div id="fs-signup-fallback">
+          <a class="fs-mailto" id="fs-mailto" href="mailto:avbydave@gmail.com?subject=Next%20demo%20please">Email Dave: "next demo, please"</a>
+          <p class="fs-small" style="margin-top:8px">Automatic sign-up isn't set up yet. This opens your own email app with a short note to avbydave@gmail.com; this site doesn't collect or store anything.</p>
+        </div>
+      </section>
+
+      <section class="fs-kit" id="fs-kit" aria-labelledby="fs-kit-title" hidden>
+        <h2 id="fs-kit-title">Sync &amp; Signal Field Kit</h2>
+        <p>The tearing troubleshooting card, an EDID/HDCP decision tree, a genlock checklist and a browser tear-test page, in one download.</p>
+        <a class="fs-mailto" id="fs-kit-link" href="#">See the Field Kit</a>
+      </section>
+
+      <section class="fs-notes" aria-labelledby="fs-notes-title">
+        <h2 id="fs-notes-title">The words, briefly</h2>
+        <dl>
+          <dt>Scan-out</dt><dd>The display drawing each frame top to bottom, line by line.</dd>
+          <dt>Blanking interval</dt><dd>The short pause between passes. Swapping frames here never shows a seam.</dd>
+          <dt>Vsync, frame sync, frame lock</dt><dd>Making the source wait for that pause, or retiming its frames to the display, instead of swapping mid-pass.</dd>
+          <dt>Genlock and reference</dt><dd>Locking several devices to one shared timing signal (black burst or tri-level sync) so their frames start together.</dd>
+        </dl>
+        <p class="fs-small" style="margin-top:10px">This is a simplified model of a single display. Real gear differs in the details (some processors buffer or drop frames instead of tearing), but the cause and the fix are the same idea.</p>
+      </section>
+    </main>
+    <footer>
+      <p style="margin:0 0 4px">Made by Dave, a working AV tech.</p>
+      <a href="../">AV by Dave tools</a><a href="https://systembydave.com/privacy-policy.html">Privacy</a>
+    </footer>
+    <script src="../../js/sbd-events.js"></script>
+    <script src="../../js/sbd-launch-config.js"></script>
+    <script src="frame-sync.js"></script>
+  </body>
+</html>

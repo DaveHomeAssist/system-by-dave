@@ -1,0 +1,65 @@
+{
+  "schema": "system-by-dave.frame-sync-reel-plan.v1",
+  "note": "Draft overlay copy for Dave's approval (docs/launch/reel-copy.md). Times are seconds. The capture runner checks every overlay against the Instagram safe area and the 3:4 grid crop.",
+  "fps": 30,
+  "safeArea": { "left": 20, "right": 324, "top": 84, "bottom": 500, "units": "CSS px of a 360x640 viewport recorded at 3x (1080x1920)" },
+  "cuts": [
+    {
+      "id": "main",
+      "file": "frame-sync-main-1080x1920.mp4",
+      "aspect": "9x16",
+      "order": [3, 4, 1, 2, 5, 6, 7],
+      "durations": [5, 5, 5, 5, 6, 6, 9],
+      "overlays": [
+        { "slot": "top", "from": 0, "to": 5, "text": "Ever seen a line rip across a live feed?" },
+        { "slot": "bottom", "from": 1.5, "to": 5, "text": "That's a tear. Here's the fix." },
+        { "slot": "top", "from": 5, "to": 10, "text": "Fix: only swap frames in the pause" },
+        { "slot": "bottom", "from": 6.2, "to": 10, "text": "Clean. Same screen, same source." },
+        { "slot": "top", "from": 10, "to": 15, "text": "Why? A screen paints top to bottom" },
+        { "slot": "top", "from": 15, "to": 20, "text": "New frames belong in the pause" },
+        { "slot": "top", "from": 20, "to": 26, "text": "Almost-matching clocks make it crawl" },
+        { "slot": "bottom", "from": 20, "to": 26, "text": "59.94 vs 60 fps slips a frame about every 17 s" },
+        { "slot": "top", "from": 26, "to": 32, "text": "The rig-wide fix: one reference" },
+        { "slot": "bottom", "from": 26, "to": 32, "text": "That's genlock." },
+        { "slot": "top", "from": 32, "to": 37, "text": "Next time a line rips: check sync" },
+        { "slot": "bottom", "from": 32, "to": 37, "text": "Send this to whoever blamed the cable." },
+        { "slot": "end", "from": 37, "to": 41, "title": "Comment SYNC", "text": "I'll DM you the demo where you can cause the tear yourself.", "sub": "or tap the link in bio" }
+      ]
+    },
+    {
+      "id": "short15",
+      "file": "frame-sync-15s-1080x1920.mp4",
+      "aspect": "9x16",
+      "order": [3, 4],
+      "durations": [6, 9],
+      "overlays": [
+        { "slot": "top", "from": 0, "to": 6, "text": "Ever seen a line rip across a live feed?" },
+        { "slot": "bottom", "from": 1.5, "to": 6, "text": "That's a tear. Here's the fix." },
+        { "slot": "top", "from": 6, "to": 15, "text": "Fix: only swap frames in the pause" },
+        { "slot": "bottom", "from": 8, "to": 11.5, "text": "Send this to whoever blamed the cable." },
+        { "slot": "bottom", "from": 11.5, "to": 15, "text": "Comment SYNC and I'll DM you the demo." }
+      ]
+    }
+  ],
+  "loops": {
+    "aspect": "4x5",
+    "seconds": 5,
+    "fileTemplate": "loop-step{step}-1080x1350.mp4",
+    "titles": {
+      "1": "1/7 A screen paints one line at a time",
+      "2": "2/7 New frames arrive in the pause",
+      "3": "3/7 Swap mid-pass and it tears",
+      "4": "4/7 Fix: only swap in the pause",
+      "5": "5/7 Almost-matching clocks make it crawl",
+      "6": "6/7 The rig-wide fix: one reference",
+      "7": "7/7 Line rips? Check sync first"
+    }
+  },
+  "cover": {
+    "file": "cover-step3-1080x1920.png",
+    "cropFile": "cover-step3-grid-3x4-1080x1440.png",
+    "checkFile": "cover-step3-safe-area-check.png",
+    "cut": "main",
+    "time": 0
+  }
+}
