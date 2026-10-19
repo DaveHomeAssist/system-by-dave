@@ -1,6 +1,15 @@
 /* Opt-in viewport mechanics. Product adapters own panels; this module never writes documents. */
 (() => {
   'use strict';
+  function isVisible(element) {
+    if (typeof element.checkVisibility === 'function') return element.checkVisibility();
+    // Match the default box check; opacity and CSS visibility are not opted in.
+    if (!element.getClientRects().length) return false;
+    for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+      if (getComputedStyle(parent).contentVisibility === 'hidden') return false;
+    }
+    return true;
+  }
   function paginate(card, items, { units: supplied, label, hiddenClass = 'av-page-away', navClass = 'av-pages', beforeMeasure = () => {}, singlePageLabel = 'All controls' }) {
     const paging = document.createElement('nav'); paging.className = navClass;
     paging.setAttribute('aria-label', `${label} pages`);
@@ -17,7 +26,7 @@
       card.dataset.pages = String(pages.length); card.dataset.page = String(page + 1);
     }
     function refresh() {
-      if (matchMedia('print').matches || card.hidden || !card.checkVisibility()) return;
+      if (matchMedia('print').matches || card.hidden || !isVisible(card)) return;
       units = typeof supplied === 'function' ? supplied() : supplied;
       units.forEach(unit => unit.classList.remove(hiddenClass));
       const available = items.clientHeight;
@@ -25,7 +34,7 @@
       const style = getComputedStyle(items);
       const gap = parseFloat(style.rowGap) || 0;
       const columns = style.gridTemplateColumns.split(' ').length;
-      const visible = units.filter(unit => !unit.hidden && unit.checkVisibility());
+      const visible = units.filter(unit => !unit.hidden && isVisible(unit));
       pages = []; let group = [], height = 0;
       for (let i = 0; i < visible.length; i += columns) {
         const row = visible.slice(i, i + columns);
@@ -101,5 +110,5 @@
     });
   });
   window.addEventListener('afterprint', () => document.querySelectorAll('.av-print-text').forEach(node => node.remove()));
-  window.AVViewport = { paginate, tabs };
+  window.AVViewport = { paginate, tabs, isVisible };
 })();

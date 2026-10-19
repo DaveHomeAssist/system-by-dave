@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-18 — Shared paging visibility compatibility
+
+- Guard missing `Element.checkVisibility` in the two current shared paging helpers and active Cue Sheet/StagePlotter callbacks. Preserve the native default check where available; use layout boxes and hidden light-DOM ancestor contents as the fallback. Synthetic missing-method failures reproduced in live Calculator and LED before the repair.
+- Add a focused native/masked API regression to the existing workspace probe. Chromium and WebKit cover both helpers, paging/value preservation and the current standalone/shared-console consumers. Preserve physical older-device and minimum-OS policy gaps; no global polyfill or saved-data change.
+- Regenerate embedded workspace runtimes and the native suite bundle, and advance the existing offline cache generation and Stage 3D readiness pin together. Preserve CSS, calculation engines, routes, schemas, keys and original imports.
+
+
 ## 2026-10-18 — Stream and Record independent preparation
 
 - Define test-only typed Stream/Record rows and invented fixtures from the maintained field matrix and the last legacy producer source. Preserve text, blank/custom statuses, duration strings and explicit provenance/link fields in the prospective contract.
