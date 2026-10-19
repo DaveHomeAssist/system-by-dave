@@ -1381,6 +1381,23 @@
     "state": "Superseded for current standalone Calculator; focused source/live evidence, no runtime repair.",
     "brief": "docs/av-calculator-app.md#skip-link-revalidation--2026-10-18",
     "limits": "Only the current standalone Calculator keyboard path was revalidated. No screen-reader, physical-device, older-iPad, suite-wide skip-link, durability or operator acceptance claim. No runtime or test suite change.",
-    "nextEligible": "AVV-13 bounded current-source/live revalidation of embedded navigation targets; no inferred repair or product choice."
+    "nextEligible": "AVV-06 bounded current-source consumer/feature-detection revalidation; establish the compatibility boundary before any repair or minimum-OS choice. No inferred support policy or physical-device acceptance."
+  },
+  "embeddedNavigationRevalidation": {
+    "findingId": "AVV-13",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "liveSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "state": "Completed current embedded-navigation revalidation; no present root-route defect found. Future subdirectory adoption remains gated.",
+    "brief": "docs/av-workspace.md#embedded-navigation-revalidation--2026-10-18",
+    "currentConsumers": [
+      "av-calculator.html",
+      "cue-sheet.html",
+      "stage-plot.html"
+    ],
+    "independentChecks": "Current source inventory; each opt-in HTML has one slot, includes js/sbd-nav.js and has no base element. Six native URL-resolution checks (plain and synthetic show-context/hash URL for each root route) resolve Home to / and AV by Dave to /av/. All three published HTML files, navigation JS, viewport CSS and console index byte-match reviewed source; /av/ returns that console index. Production source.json matches the reviewed source. No new browser sweep or click test.",
+    "remainingGate": "Before any future subdirectory consumer adopts embedded navigation, define intended base/destination resolution and verify its navigation, show-context, save-guard and embedded-panel compatibility. No current adopter or implementation inferred.",
+    "limits": "No runtime/CSS change, user-data write, hypothetical subdirectory test, browser/remote job, physical-device, screen-reader or older-iPad acceptance. The legacy source URL claim is superseded, not the future adoption gate.",
+    "nextEligible": "AVV-06 bounded current-source consumer/feature-detection revalidation; establish the compatibility boundary before any repair or minimum-OS choice. No inferred support policy or physical-device acceptance."
   }
 }

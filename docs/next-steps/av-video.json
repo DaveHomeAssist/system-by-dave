@@ -76,14 +76,15 @@
       "id": "AVV-13",
       "type": "nav",
       "sev": "P3",
-      "title": "Embedded nav from #238 uses a relative Toolbox link",
-      "detail": "Current embedded navigation still uses relative av-suite.html?entry=toolbox. Root-level migrated routes passed comparison; future subdirectory adoption requires explicit resolution and compatibility checks.",
+      "title": "Future subdirectory adoption needs explicit embedded navigation resolution",
+      "detail": "Revalidated at 885a3ab on 2026-10-18: current embedded navigation emits Home / and AV by Dave av/. Current consumers av-calculator.html, cue-sheet.html and stage-plot.html are root-level with no base element, so av/ resolves to https://avbydave.com/av/. Published files byte-match source; six current-route URL-resolution checks pass. The old Toolbox target is superseded. No present route defect found or runtime repair required. Before a future subdirectory route opts in, define destination/base resolution and verify compatibility; no such adoption is implemented or accepted by this record.",
       "files": [
         "js/sbd-nav.js",
         "css/av-viewport.css"
       ],
-      "evidence": "code-read",
-      "phase": 0
+      "evidence": "source/live-file parity and URL-resolution check; prior root-route browser comparisons retained",
+      "phase": 0,
+      "status": "Future adoption gate; current revalidation completed"
     },
     {
       "id": "AVV-14",
@@ -106,7 +107,7 @@
       "goal": "Close the confirmed coverage gap; revalidate recorded shell risks before fixes.",
       "items": [
         "AVV-02 delivered: theme, Calculator and navigation parity probes gate relevant PRs.",
-        "AVV-05 superseded by focused current Calculator keyboard/source proof; AVV-06 and AVV-13 remain independent compatibility/navigation follow-ups."
+        "AVV-05 superseded by focused current Calculator keyboard/source proof; AVV-06 remains a compatibility follow-up; AVV-13 current-route revalidation is complete, with only a future subdirectory adoption gate retained."
       ],
       "gate": "Relevant PR gate execution and focused regression proof; no weakened assertions."
     },
@@ -601,6 +602,23 @@
       "checkedOn": "2026-10-18",
       "reviewedSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
       "note": "Historical unknown-hash risk retained. Current standalone native Calculator preserves Video/Power task, panels and synthetic storage on keyboard skip-to-main at1440x900 and375x812; focus reaches main-content. See calculatorSkipLinkRevalidation and docs/av-calculator-app.md. No runtime repair or broad accessibility claim."
+    },
+    {
+      "id": "AVV-13",
+      "type": "nav",
+      "sev": "P3",
+      "title": "Embedded nav from #238 uses a relative Toolbox link",
+      "detail": "Current embedded navigation still uses relative av-suite.html?entry=toolbox. Root-level migrated routes passed comparison; future subdirectory adoption requires explicit resolution and compatibility checks.",
+      "files": [
+        "js/sbd-nav.js",
+        "css/av-viewport.css"
+      ],
+      "evidence": "code-read",
+      "phase": 0,
+      "status": "Superseded",
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+      "note": "The historical target av-suite.html?entry=toolbox is no longer emitted. Current embedded navigation emits relative av/, and the three current opt-in HTML routes are all root-level. No present destination defect found; retain AVV-13 only as an explicit future subdirectory adoption gate. See embeddedNavigationRevalidation."
     }
   ],
   "decisionsResolved": [
@@ -822,6 +840,29 @@
     ],
     "verification": "First Tab reaches Skip to calculators at both sizes; Shift+Tab then Enter preserves nonfirst Video/Power tasks and panels, focuses main-content, changes only the navigation hash, and preserves synthetic localStorage. Four cases pass; no page errors; screenshots inspected. Live bundle/helper byte-match reviewed source.",
     "limits": "Only the current standalone Calculator keyboard path was revalidated. No screen-reader, physical-device, older-iPad, suite-wide skip-link, durability or operator acceptance claim. No runtime or test suite change.",
-    "nextEligible": "AVV-13 bounded current-source/live revalidation of embedded navigation targets; no inferred repair or product choice."
+    "nextEligible": "AVV-06 bounded current-source consumer/feature-detection revalidation; establish the compatibility boundary before any repair or minimum-OS choice. No inferred support policy or physical-device acceptance."
+  },
+  "embeddedNavigationRevalidation": {
+    "findingId": "AVV-13",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "liveSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "state": "Completed current embedded-navigation revalidation; no present root-route defect found. Future subdirectory adoption remains gated.",
+    "brief": "docs/av-workspace.md#embedded-navigation-revalidation--2026-10-18",
+    "emittedLinks": {
+      "Home": "/",
+      "AV by Dave": "av/"
+    },
+    "expectedConsole": "https://avbydave.com/av/",
+    "currentConsumers": [
+      "av-calculator.html",
+      "cue-sheet.html",
+      "stage-plot.html"
+    ],
+    "independentChecks": "Current source inventory; each opt-in HTML has one slot, includes js/sbd-nav.js and has no base element. Six native URL-resolution checks (plain and synthetic show-context/hash URL for each root route) resolve Home to / and AV by Dave to /av/. All three published HTML files, navigation JS, viewport CSS and console index byte-match reviewed source; /av/ returns that console index. Production source.json matches the reviewed source. No new browser sweep or click test.",
+    "reusedReportedChecks": "Existing root-route comparisons recorded in the finding and docs/av-workspace.md (92 legacy navigation comparisons) are retained as historical reported evidence, not represented as newly run current-source browser checks.",
+    "remainingGate": "Before any future subdirectory consumer adopts embedded navigation, define intended base/destination resolution and verify its navigation, show-context, save-guard and embedded-panel compatibility. No current adopter or implementation inferred.",
+    "limits": "No runtime/CSS change, user-data write, hypothetical subdirectory test, browser/remote job, physical-device, screen-reader or older-iPad acceptance. The legacy source URL claim is superseded, not the future adoption gate.",
+    "nextEligible": "AVV-06 bounded current-source consumer/feature-detection revalidation; establish the compatibility boundary before any repair or minimum-OS choice. No inferred support policy or physical-device acceptance."
   }
 }
