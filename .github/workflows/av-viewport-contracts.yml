@@ -38,6 +38,7 @@ jobs:
           VIEWPORT_BASE: http://127.0.0.1:4173/
         run: |
           export CHROME_BIN="$(command -v google-chrome)"
+          node --test scripts/probe_av_theme_readiness.test.js
           python3 -m http.server 4173 --bind 127.0.0.1 >"$RUNNER_TEMP/av-server.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid"' EXIT

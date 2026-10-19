@@ -873,7 +873,7 @@
     "findingId": "AVV-06",
     "checkedOn": "2026-10-18",
     "reviewedSource": "ba164f9487e7b921dbb04c22a92be2e547d1377b",
-    "state": "Runtime repair published at f7dc459 and focused production checks pass with the corrected fixture loader; checker-source review, CI and publication evidence remain separate.",
+    "state": "Runtime repair remains published at f7dc459; deployed-origin fixture and document-readiness probe corrections are separate checker changes with their own delivery gates.",
     "brief": "docs/av-workspace.md#visibility-api-compatibility--2026-10-18",
     "reproduction": "At the reviewed live source, masking only Element.checkVisibility in disposable modern-browser contexts reproduces TypeError in standalone Calculator and LED paging. This is a current JavaScript feature-absence reproduction, not an observed physical older-iPad failure.",
     "repair": "Both shared paging helpers feature-detect the method, delegate without options when available and otherwise check layout boxes and content-visibility:hidden light-DOM ancestors. Active Cue Sheet and StagePlotter callbacks use the shared guard. Formulas, CSS, saved values, schemas, storage keys and imports are unchanged.",
@@ -898,6 +898,17 @@
       "repair": "Read the managed LED runtime and isolate its AVWorkspace module for the fixture, excluding offline initialization. Existing workspace CI watches the probe module directly.",
       "verification": "Dominic Chromium/WebKit each pass 12 groups including 11 helper states, actual focus/page/value retention and 10 current production route cases with native/masked API. All 11 production file hashes match f7dc459; Video JavaScript/CSS remain unchanged.",
       "boundary": "Checker, existing CI path and records only; no application assets, CSS, calculations, cache version, saved keys, schemas or original imports changed. Runtime acceptance stays at f7dc459; checker review/CI/publication evidence is separate. Physical/older-OS/operator and existing product-policy gaps remain open."
+    },
+    "themeProbeReadiness": {
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "d93e0f5933983b4a2f3d28e4d0a90443ef21ef36",
+      "brief": "docs/av-workspace.md#theme-probe-document-readiness--2026-10-18",
+      "trigger": "Checker-only source publication39193117004 failed before deployment on StagePlotter light theme. Production remains acceptedf7dc459; the original failure is retained.",
+      "diagnostic": "One bounded exact-source light/dark diagnostic on Dominic observed both early samples loading with the static system marker, then complete with their correct stored mode; no captured request failures or page errors. This confirms premature sampling, not the entire original CI empty-CSS/browser-specific cause.",
+      "repair": "Probe-only bounded newer-document/complete wait before mode seeding and theme sampling; follows client redirects while excluding the previous document, with ten-second URL/document/stylesheet diagnostics. Expected mode, colors and contrast remain independent unchanged assertions.",
+      "verification": "Five focused disposable browser cases pass on Dominic Node24/Playwright1.63/ChromeForTesting153: delayed CSS/bootstrap in both modes; client redirect; genuine fully loaded wrong theme rejected; missing theme CSS rejected; unfinished load times out with document diagnostics. Existing viewport/theme CI runs the test.",
+      "boundary": "Only checker, focused test, existing CI and records; no application assets/build/cache/formulas/routes/saved keys/schemas/original imports change. Runtime acceptance remainsf7dc459 and unchanged Video JS/CSS; new source review/CI/merge/publication stay separate. Physical/olderOS/operator and unanswered product-policy gates remain open.",
+      "redirectCorrection": "First candidate d8ec325 CI39195166501 passed all four initial fixtures, then caught a strict-loader assumption at the existing Throwline client redirect to Stage3D.html. Guard corrected and redirect regression added; original failed run retained and application route unchanged."
     }
   }
 }

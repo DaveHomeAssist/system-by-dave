@@ -192,3 +192,39 @@ All eleven checked production files match that source, including unchanged
 Video JavaScript and CSS. This correction changes only the checker, its CI
 path and records; it does not rebuild or change application assets or select
 an older-OS support policy. The failed fixture run remains separate evidence.
+
+### Theme probe document readiness — 2026-10-18
+
+The subsequent checker-only publication at source `d93e0f5` stopped before
+deployment in its StagePlotter light-theme check. The probe sampled after a
+fixed navigation delay without confirming document readiness. A bounded
+diagnostic on that exact source observed both light and dark pages still
+loading with the static `system` marker at the early sample; after load, each
+had its correct stored mode. No request failures or page errors were captured.
+This confirms premature sampling is possible; it does not prove every detail
+of the original CI failure, including its empty CSS tokens or browser version.
+
+The probe now waits up to ten seconds for a document newer than the previous
+loader and `readyState="complete"` before storage seeding or theme sampling. It reports
+the requested URL, last document state and stylesheet status on timeout.
+Readiness does not depend on the expected theme, colors or contrast passing:
+those assertions remain unchanged and still reject fully loaded bad pages.
+Existing animation-settling waits follow the load boundary.
+
+`CHROME_BIN` selects the qualified browser for
+`node --test scripts/probe_av_theme_readiness.test.js`. The existing viewport
+and theme workflow runs these five focused disposable cases: delayed CSS and
+bootstrap in both modes, a client redirect, fully loaded wrong themes, missing
+theme CSS, and a never-completed bootstrap response. Dominic passes all five
+using Node 24,
+Playwright 1.63 and Google Chrome for Testing 153 in a capped container. No
+application source, assets, cache generation, saved keys, schemas or imports
+change. Runtime acceptance remains at `f7dc459`; publication of later checker
+revisions and all physical/operator gates require their separate evidence.
+
+The first candidate's CI passed the four initial regression cases and then
+caught an overly strict loader check at Throwline's existing client redirect
+to `Stage3D.html`. The corrected guard excludes the previous document without
+requiring the first requested loader to remain current. The added redirect
+case exercises that boundary; the application route and assertions are intact.
+The failed candidate run remains release evidence.
