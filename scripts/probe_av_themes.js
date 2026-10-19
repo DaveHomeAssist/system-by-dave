@@ -152,10 +152,49 @@ async function main() {
       else callbacks.resolve(message.result);
     };
 
-    function cdp(method, params = {}) {
+    function cdp(method, params = {}, timeoutMs) {
       const id = sequence += 1;
-      socket.send(JSON.stringify({ id, method, params }));
-      return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
+      return new Promise((resolve, reject) => {
+        const timer = timeoutMs === undefined ? null : setTimeout(() => {
+          pending.delete(id);
+          reject(new Error(`${method} timed out`));
+        }, timeoutMs);
+        pending.set(id, {
+          resolve: (value) => { clearTimeout(timer); resolve(value); },
+          reject: (error) => { clearTimeout(timer); reject(error); }
+        });
+        socket.send(JSON.stringify({ id, method, params }));
+      });
+    }
+
+    async function navigateReady(url) {
+      const deadline = Date.now() + 10000;
+      const request = (method, params) => cdp(method, params, Math.max(1, deadline - Date.now()));
+      let documentState = null;
+      try {
+        const navigation = await request('Page.navigate', { url });
+        if (navigation.errorText) throw new Error(navigation.errorText);
+        while (Date.now() < deadline) {
+          const tree = await request('Page.getFrameTree');
+          const observed = await request('Runtime.evaluate', {
+            expression: `({
+              href: location.href,
+              readyState: document.readyState,
+              theme: document.documentElement.getAttribute('data-av-theme'),
+              stylesheets: Array.from(document.querySelectorAll('link[rel="stylesheet"]'), link => ({href: link.href, loaded: Boolean(link.sheet)}))
+            })`,
+            returnByValue: true
+          });
+          documentState = observed.result.value;
+          // Match the new loader so a completed previous page cannot satisfy the wait.
+          if ((!navigation.loaderId || tree.frameTree.frame.loaderId === navigation.loaderId)
+            && documentState?.readyState === 'complete') return;
+          await delay(50);
+        }
+        throw new Error('document load deadline exceeded');
+      } catch (error) {
+        throw new Error(`Navigation readiness failed for ${url}: ${error.message}; last document=${JSON.stringify(documentState)}`);
+      }
     }
 
     await cdp('Page.enable');
@@ -294,15 +333,14 @@ async function main() {
       // The AV suite honors the operator's stored mode and defaults to dark,
       // so seed the requested mode before each pass instead of relying on the
       // operating-system preference alone.
-      await cdp('Page.navigate', { url: baseUrl });
-      await delay(180);
+      await navigateReady(baseUrl);
       await cdp('Runtime.evaluate', {
         expression: `localStorage.setItem('av-theme-mode.v1', ${JSON.stringify(preference)})`
       });
 
       for (const target of targets) {
         exceptions = [];
-        await cdp('Page.navigate', { url: new URL(target.href, baseUrl).href });
+        await navigateReady(new URL(target.href, baseUrl).href);
         if (target.id === 'av-workbook' && sampleWorkbook) {
           await delay(900);
           await cdp('Runtime.evaluate', {

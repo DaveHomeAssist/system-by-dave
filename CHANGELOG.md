@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-18 — Theme probe document readiness
+
+- Wait for the navigated document to finish loading before seeding its stored theme or sampling theme contracts. Match its loader so an old completed document cannot satisfy the wait; bound it to ten seconds and report the URL, document state and stylesheet status on failure.
+- A focused exact-source diagnostic demonstrated premature theme sampling in both StagePlotter modes. Four disposable browser cases cover delayed assets, genuine wrong themes, missing CSS and an unfinished load. Existing theme/color/contrast assertions and application assets remain unchanged; the original publication failure is retained without claiming its entire cause was reproduced.
+
 ## 2026-10-18 — Visibility probe on published AV pages
 
 - Load the fixture's workspace helper from the managed LED runtime, matching the AV destination's inline delivery. The documented deployed-origin command no longer requests a raw helper file that is not published there; the separate offline initializer stays outside the fixture.
