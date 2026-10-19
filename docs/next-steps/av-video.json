@@ -45,19 +45,6 @@
       "phase": 0
     },
     {
-      "id": "AVV-05",
-      "type": "nav",
-      "sev": "P2",
-      "title": "Skip link resets calculator to first task (hash routing)",
-      "detail": "Source still activates task zero when fromLocation cannot map the hash. The earlier skip-link observation is not re-tested here; preserve this follow-up rather than infer it fixed by broad passing matrices.",
-      "files": [
-        "js/av-viewport.js",
-        "av-calculator.html"
-      ],
-      "evidence": "code-read",
-      "phase": 0
-    },
-    {
       "id": "AVV-06",
       "type": "responsive",
       "sev": "P2",
@@ -119,7 +106,7 @@
       "goal": "Close the confirmed coverage gap; revalidate recorded shell risks before fixes.",
       "items": [
         "AVV-02 delivered: theme, Calculator and navigation parity probes gate relevant PRs.",
-        "AVV-05 / AVV-06 / AVV-13: preserve hash, compatibility and subdirectory follow-ups."
+        "AVV-05 superseded by focused current Calculator keyboard/source proof; AVV-06 and AVV-13 remain independent compatibility/navigation follow-ups."
       ],
       "gate": "Relevant PR gate execution and focused regression proof; no weakened assertions."
     },
@@ -597,6 +584,23 @@
       "title": "Raw stream keys can travel in Stream Plan exports",
       "status": "Confirmed current",
       "note": "Revalidated at b0effc8 on 2026-10-07. stream-plan.html stores keyLabel and exports it in JSON and CSV; looksLikeRawKey adds a row/summary warning but does not block or transform the value. AVV-STREAM-KEY-1 recommends rejecting unsafe candidates before AV Video retains imports[].raw."
+    },
+    {
+      "id": "AVV-05",
+      "type": "nav",
+      "sev": "P2",
+      "title": "Skip link resets calculator to first task (hash routing)",
+      "detail": "Source still activates task zero when fromLocation cannot map the hash. The earlier skip-link observation is not re-tested here; preserve this follow-up rather than infer it fixed by broad passing matrices.",
+      "files": [
+        "js/av-viewport.js",
+        "av-calculator.html"
+      ],
+      "evidence": "code-read",
+      "phase": 0,
+      "status": "Superseded",
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+      "note": "Historical unknown-hash risk retained. Current standalone native Calculator preserves Video/Power task, panels and synthetic storage on keyboard skip-to-main at1440x900 and375x812; focus reaches main-content. See calculatorSkipLinkRevalidation and docs/av-calculator-app.md. No runtime repair or broad accessibility claim."
     }
   ],
   "decisionsResolved": [
@@ -744,9 +748,80 @@
       "Current native packs and restored specialist page panels supersede the October 9 snapshot-host direction; preserve the October 15 hybrid ruling.",
       "Standalone-family route and first-native-specialist choices remain unanswered; no conversion selected.",
       "October 14 Audio persona suggestions are review evidence, not approval for new features.",
-      "AVV-05 skip-link task retention is eligible for bounded current-source/browser revalidation; no defect fix is inferred from historical evidence.",
+      "AVV-05 superseded on 2026-10-18 by focused native Calculator source/live keyboard evidence; do not redispatch as an active defect.",
       "AVV-06 retains a source-level checkVisibility compatibility risk; minimum OS/support decisions and physical acceptance remain separate."
     ],
     "boardSync": "Configured Downloads board path is absent; the existing relocated private board is the only permitted synchronization target. Verify parity with the scoped updater and retain failures."
+  },
+  "calculatorSkipLinkRevalidation": {
+    "findingId": "AVV-05",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "liveSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "state": "Superseded for current standalone Calculator; focused source/live evidence, no runtime repair.",
+    "brief": "docs/av-calculator-app.md#skip-link-revalidation--2026-10-18",
+    "cause": "The old unknown-hash fallback remains in AVViewport.tabs, but current Calculator uses its native known-panel-only hash handler and AVViewport.paginate. #main-content does not select a different task.",
+    "runner": "Dominic; Playwright1.63.0 Chromium; isolated disposable contexts with service workers blocked.",
+    "cases": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "startTask": "storageCard",
+        "beforeView": "Video",
+        "afterView": "Video",
+        "beforeHash": "#storageCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      },
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "startTask": "powerCard",
+        "beforeView": "Power",
+        "afterView": "Power",
+        "beforeHash": "#powerCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      },
+      {
+        "viewport": {
+          "width": 375,
+          "height": 812
+        },
+        "startTask": "storageCard",
+        "beforeView": "Video",
+        "afterView": "Video",
+        "beforeHash": "#storageCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      },
+      {
+        "viewport": {
+          "width": 375,
+          "height": 812
+        },
+        "startTask": "powerCard",
+        "beforeView": "Power",
+        "afterView": "Power",
+        "beforeHash": "#powerCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      }
+    ],
+    "verification": "First Tab reaches Skip to calculators at both sizes; Shift+Tab then Enter preserves nonfirst Video/Power tasks and panels, focuses main-content, changes only the navigation hash, and preserves synthetic localStorage. Four cases pass; no page errors; screenshots inspected. Live bundle/helper byte-match reviewed source.",
+    "limits": "Only the current standalone Calculator keyboard path was revalidated. No screen-reader, physical-device, older-iPad, suite-wide skip-link, durability or operator acceptance claim. No runtime or test suite change.",
+    "nextEligible": "AVV-13 bounded current-source/live revalidation of embedded navigation targets; no inferred repair or product choice."
   }
 }
