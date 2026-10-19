@@ -49,12 +49,16 @@ export async function verifyVisibilityCompatibility(browser, base, output) {
         const items = document.getElementById('items');
         const pager = AVViewport.paginate(document.getElementById('card'), items, {units: [...items.children], label: 'Fixture'});
         pager.refresh();
-        pager.reveal(items.querySelectorAll('input')[2]);
+        const focused = items.querySelectorAll('input')[2];
+        pager.reveal(focused); focused.focus({preventScroll: true}); pager.refresh();
+        const viewportFocusPreserved = document.activeElement === focused;
         const viewportPage = document.getElementById('card').dataset.page;
         const viewportPages = document.getElementById('card').dataset.pages;
         const workspace = document.getElementById('workspace');
         const legacy = AVWorkspace.paginate(workspace, {label: 'Fixture'});
-        legacy.refresh(); legacy.reveal(workspace.querySelectorAll('input')[2]);
+        const legacyFocused = workspace.querySelectorAll('input')[2];
+        legacy.refresh(); legacy.reveal(legacyFocused); legacyFocused.focus({preventScroll: true}); legacy.refresh();
+        const workspaceFocusPreserved = document.activeElement === legacyFocused;
         const values = [...document.querySelectorAll('input')].map(input => input.value);
         let delegated = null;
         if (typeof Element.prototype.checkVisibility === 'function') {
@@ -63,7 +67,7 @@ export async function verifyVisibilityCompatibility(browser, base, output) {
           node.checkVisibility = function(...args) {calls.push(args.length); return false;};
           delegated = {viewport: AVViewport.isVisible(node), workspace: AVWorkspace.isVisible(node), calls};
         }
-        return {matrix, viewportPage, viewportPages, workspacePage: workspace.dataset.page, workspacePages: workspace.dataset.pages, values, delegated};
+        return {matrix, viewportPage, viewportPages, viewportFocusPreserved, workspaceFocusPreserved, workspacePage: workspace.dataset.page, workspacePages: workspace.dataset.pages, values, delegated};
       });
       if (!missing) expected = Object.fromEntries(Object.entries(state.matrix).map(([id, value]) => [id, value.native]));
       for (const [id, value] of Object.entries(state.matrix)) {
@@ -72,6 +76,7 @@ export async function verifyVisibilityCompatibility(browser, base, output) {
       }
       assert.equal(state.viewportPage, '3'); assert.equal(state.viewportPages, '3');
       assert.equal(state.workspacePage, '3'); assert.equal(state.workspacePages, '3');
+      assert.equal(state.viewportFocusPreserved, true); assert.equal(state.workspaceFocusPreserved, true);
       assert.deepEqual(state.values, ['one', 'two', 'three', 'hidden', 'first', 'second', 'third']);
       if (!missing) assert.deepEqual(state.delegated, {viewport: false, workspace: false, calls: [0, 0]});
       results.push({fixture: true, missing, ...state});
