@@ -1368,9 +1368,19 @@
       "Current native packs and restored specialist page panels supersede the October 9 snapshot-host direction; preserve the October 15 hybrid ruling.",
       "Standalone-family route and first-native-specialist choices remain unanswered; no conversion selected.",
       "October 14 Audio persona suggestions are review evidence, not approval for new features.",
-      "AVV-05 skip-link task retention is eligible for bounded current-source/browser revalidation; no defect fix is inferred from historical evidence.",
+      "AVV-05 superseded on 2026-10-18 by focused native Calculator source/live keyboard evidence; do not redispatch as an active defect.",
       "AVV-06 retains a source-level checkVisibility compatibility risk; minimum OS/support decisions and physical acceptance remain separate."
     ],
     "boardSync": "Configured Downloads board path is absent; the existing relocated private board is the only permitted synchronization target. Verify parity with the scoped updater and retain failures."
+  },
+  "calculatorSkipLinkRevalidation": {
+    "findingId": "AVV-05",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "liveSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "state": "Superseded for current standalone Calculator; focused source/live evidence, no runtime repair.",
+    "brief": "docs/av-calculator-app.md#skip-link-revalidation--2026-10-18",
+    "limits": "Only the current standalone Calculator keyboard path was revalidated. No screen-reader, physical-device, older-iPad, suite-wide skip-link, durability or operator acceptance claim. No runtime or test suite change.",
+    "nextEligible": "AVV-13 bounded current-source/live revalidation of embedded navigation targets; no inferred repair or product choice."
   }
 }
