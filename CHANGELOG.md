@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-18 — Visibility probe on published AV pages
+
+- Load the fixture's workspace helper from the managed LED runtime, matching the AV destination's inline delivery. The documented deployed-origin command no longer requests a raw helper file that is not published there; the separate offline initializer stays outside the fixture.
+- Include the probe module in the existing workspace workflow's path filter. Chromium and WebKit pass the focused checks against published runtime f7dc459. Application assets, cache generation and saved-data contracts are unchanged; preserve the first failed fixture run and physical-device gaps.
+
 ## 2026-10-18 — Shared paging visibility compatibility
 
 - Guard missing `Element.checkVisibility` in the two current shared paging helpers and active Cue Sheet/StagePlotter callbacks. Preserve the native default check where available; use layout boxes and hidden light-DOM ancestor contents as the fallback. Synthetic missing-method failures reproduced in live Calculator and LED before the repair.

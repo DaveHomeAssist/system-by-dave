@@ -12,6 +12,7 @@ on:
       - 'css/av-*.css'
       - 'design/av-workspace.tokens.json'
       - 'scripts/*av_workspace*'
+      - 'scripts/probe_av_visibility.mjs'
       - 'scripts/probe_throwline_stage3d.js'
       - 'package*.json'
       - '.github/workflows/av-workspace.yml'

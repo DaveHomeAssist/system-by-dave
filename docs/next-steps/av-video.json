@@ -873,7 +873,7 @@
     "findingId": "AVV-06",
     "checkedOn": "2026-10-18",
     "reviewedSource": "ba164f9487e7b921dbb04c22a92be2e547d1377b",
-    "state": "Missing-method compatibility repair implemented; focused Chromium/WebKit and source checks pass. Review, exact-head CI, publication and live release proof remain separate provider gates.",
+    "state": "Runtime repair published at f7dc459 and focused production checks pass with the corrected fixture loader; checker-source review, CI and publication evidence remain separate.",
     "brief": "docs/av-workspace.md#visibility-api-compatibility--2026-10-18",
     "reproduction": "At the reviewed live source, masking only Element.checkVisibility in disposable modern-browser contexts reproduces TypeError in standalone Calculator and LED paging. This is a current JavaScript feature-absence reproduction, not an observed physical older-iPad failure.",
     "repair": "Both shared paging helpers feature-detect the method, delegate without options when available and otherwise check layout boxes and content-visibility:hidden light-DOM ancestors. Active Cue Sheet and StagePlotter callbacks use the shared guard. Formulas, CSS, saved values, schemas, storage keys and imports are unchanged.",
@@ -889,6 +889,15 @@
     "verification": "Dominic, Playwright1.63.0: Chromium and WebKit each pass11 box states for both helpers with native/masked API, native delegation, focused-page/value preservation and10 current-route cases. The current route cases cover standalone Calculator, LED, Cue Sheet, StagePlotter and shared-console Calculator in both API states. AV verification and26 Rail/worker tests pass; Throwline verification and47 tests pass after aligning the existing Stage3D cache pin. Shared runtime synchronization, native suite build and diff checks pass.",
     "cacheGeneration": "v20261018-visibility-compatibility; registry, worker update, generated workspace copies, existing Stage3D readiness pin and exact-generation assertions advance together.",
     "limits": "Synthetic API absence in current automated engines is not physical-device, full older-OS, screen-reader, touch ergonomics, installed-returning-client or operator acceptance. No minimum support policy, polyfill on Element.prototype, user-data change or new dependency.",
-    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred.",
+    "liveFixtureCorrection": {
+      "checkedOn": "2026-10-18",
+      "runtimeSource": "f7dc45954c22686ce50bdb20dfa7c0308f66821e",
+      "brief": "docs/av-workspace.md#published-fixture-correction--2026-10-18",
+      "trigger": "The deployed-origin fixture requested the unpublished raw js/av-workspace.js; the application already delivers that helper inline.",
+      "repair": "Read the managed LED runtime and isolate its AVWorkspace module for the fixture, excluding offline initialization. Existing workspace CI watches the probe module directly.",
+      "verification": "Dominic Chromium/WebKit each pass 12 groups including 11 helper states, actual focus/page/value retention and 10 current production route cases with native/masked API. All 11 production file hashes match f7dc459; Video JavaScript/CSS remain unchanged.",
+      "boundary": "Checker, existing CI path and records only; no application assets, CSS, calculations, cache version, saved keys, schemas or original imports changed. Runtime acceptance stays at f7dc459; checker review/CI/publication evidence is separate. Physical/older-OS/operator and existing product-policy gaps remain open."
+    }
   }
 }

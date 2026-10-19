@@ -28,6 +28,18 @@ const settle = page => page.evaluate(() => new Promise(resolve => requestAnimati
 
 export async function verifyVisibilityCompatibility(browser, base, output) {
   const results = [];
+  // The AV destination publishes this helper inside the managed LED runtime.
+  const response = await fetch(new URL('led-wall-calculator.html', base));
+  assert.ok(response.ok, 'LED workspace fixture source is reachable');
+  const html = await response.text();
+  const block = html.match(/<!-- AV workspace runtime:start -->\s*<script>([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(block, 'managed workspace runtime is present');
+  const start = block.indexOf('(function(global){');
+  const closing = '})(window);';
+  const end = block.indexOf(closing, start);
+  assert.ok(start >= 0 && end > start, 'workspace helper has a complete module');
+  const workspaceRuntime = block.slice(start, end + closing.length);
+  assert.match(workspaceRuntime, /global\.AVWorkspace\s*=/);
   let expected;
   for (const missing of [false, true]) {
     const context = await browser.newContext({viewport: {width: 1440, height: 900}, serviceWorkers: 'block'});
@@ -37,7 +49,7 @@ export async function verifyVisibilityCompatibility(browser, base, output) {
       const page = await context.newPage();
       await page.goto(new URL('avv06-fixture.html', base).href);
       await page.addScriptTag({url: new URL('js/av-viewport.js', base).href});
-      await page.addScriptTag({url: new URL('js/av-workspace.js', base).href});
+      await page.addScriptTag({content: workspaceRuntime});
       const state = await page.evaluate(() => {
         const ids = ['visible', 'hidden', 'hiddenParent', 'visibility', 'opacity', 'contents', 'zero', 'fixed', 'skippedSelf', 'skippedChild'];
         const nodes = ids.map(id => [id, document.getElementById(id)]);

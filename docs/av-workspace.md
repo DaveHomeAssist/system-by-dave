@@ -150,7 +150,9 @@ WebKit, `AV_WORKSPACE_BASE` selects a deployed origin, and
 `AV_VISIBILITY_EVIDENCE` records the result and screenshots. The standalone
 Chromium launch honors `CHROME_CHANNEL` and defaults to installed Chrome,
 matching the existing workspace probe; managed runners can select
-`CHROME_CHANNEL=chromium` for their bundled browser. It compares eleven
+`CHROME_CHANNEL=chromium` for their bundled browser. The fixture reads the
+managed workspace module from the LED page, matching its published inline
+delivery; it excludes the separate offline initializer. It compares eleven
 box states for both helpers with native and missing API, verifies native
 zero-option delegation, paginates to focused fields without changing values,
 and checks five current routes in both API states. The shared-console case
@@ -172,3 +174,21 @@ or dependency change. Physical devices, older OS/browser combinations,
 screen-reader use, touch ergonomics, installed returning-client transitions and
 operator acceptance remain open under AVV-14 and the existing acceptance
 records. Stream/Record credentials and other product choices are unchanged.
+
+### Published fixture correction — 2026-10-18
+
+The first post-publication check exposed a probe dependency assumption:
+`js/av-workspace.js` is a canonical source file, but the AV destination delivers
+it inside the managed LED/Throwline runtime rather than publishing that raw
+file. The checker now reads the managed LED script and isolates its
+`AVWorkspace` module for the synthetic fixture. Current route cases continue
+to load their normal production pages. The existing workspace workflow also
+watches the new probe module directly.
+
+With that correction, Chromium and WebKit each pass the eleven-state helper
+comparison, actual focus/page/value retention and ten native/masked API route
+cases against published runtime `f7dc45954c22686ce50bdb20dfa7c0308f66821e`.
+All eleven checked production files match that source, including unchanged
+Video JavaScript and CSS. This correction changes only the checker, its CI
+path and records; it does not rebuild or change application assets or select
+an older-OS support policy. The failed fixture run remains separate evidence.
