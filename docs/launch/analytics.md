@@ -1,5 +1,10 @@
 # Launch analytics events
 
+**Decision (2026-10-18): analytics stays OFF.** No provider is configured and
+none is planned. The dispatcher stays a no-op and the privacy policy's
+"no analytics" statement stays true. The rest of this page records what would be
+needed if that ever changes.
+
 Status: **dispatcher built, no provider.** `js/sbd-events.js` defines the launch
 brief's events and is a no-op until a provider is registered. Nothing is sent
 anywhere today, and no third-party script is loaded.

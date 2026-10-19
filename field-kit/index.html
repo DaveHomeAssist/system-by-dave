@@ -43,6 +43,15 @@
       .kit-price small { display: block; font-size: 13px; font-weight: 600; color: var(--av-muted); }
       .kit-btn { min-height: 44px; padding: 10px 18px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-surface-3); color: var(--av-text); font: inherit; font-weight: 800; }
       .kit-btn[disabled] { opacity: .55; }
+      a.kit-btn { display: inline-flex; align-items: center; text-decoration: none; background: var(--av-brand); border-color: var(--av-brand); color: #04140b; }
+      a.kit-btn:hover { background: var(--av-brand-strong); }
+      .kit-buy-note { margin: 0; color: var(--av-muted); font-size: 14px; flex-basis: 100%; }
+      .kit-grid img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; object-position: top; margin: 0 0 12px; border-radius: 8px; border: 1px solid var(--av-line); background: #0c1016; }
+      .kit-terms { display: grid; gap: 12px; margin: 0 0 24px; }
+      .kit-terms section { padding: 16px; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-line); }
+      .kit-terms h2 { margin: 0 0 6px; font-size: 18px; }
+      .kit-terms p { margin: 0 0 8px; color: var(--av-text-2); }
+      .kit-dave { padding: 8px 10px; border-radius: 8px; border: 1px dashed var(--av-warning-line); background: var(--av-warning-soft); color: var(--av-warning) !important; font-size: 14px; font-weight: 700; }
       .kit-grid { display: grid; gap: 12px; margin: 0 0 24px; padding: 0; list-style: none; }
       .kit-grid li { padding: 16px; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-line); }
       .kit-grid h2 { margin: 0 0 4px; font-size: 18px; }
@@ -69,18 +78,35 @@
       <h1>Sync &amp; Signal Field Kit</h1>
       <p class="kit-lede">Four quick references for the moment a picture tears, drops or won't handshake, from a working AV tech. Printable, and sized to read on a phone at the rack.</p>
 
-      <div class="kit-buy">
-        <p class="kit-price" id="kit-price">Price TBD<small>Placeholder. Digital download; price not set.</small></p>
-        <button type="button" class="kit-btn" disabled aria-describedby="kit-buy-note">Checkout not open yet</button>
-        <p id="kit-buy-note" style="margin:0;color:var(--av-muted);font-size:14px;flex-basis:100%">Want it when it's ready? Email <a href="mailto:avbydave@gmail.com?subject=Field%20Kit">avbydave@gmail.com</a>.</p>
+      <div class="kit-buy" id="kit-buy-box">
+        <p class="kit-price" id="kit-price">Price TBD<small>Digital download (PDF + web page). Price not set yet.</small></p>
+        <button type="button" class="kit-btn" id="kit-buy-disabled" disabled aria-describedby="kit-buy-note">Checkout not open yet</button>
+        <a class="kit-btn" id="kit-buy" href="#" rel="noopener" hidden>Buy the Field Kit</a>
+        <p class="kit-buy-note" id="kit-buy-note">Want it when it's ready? Email <a href="mailto:avbydave@gmail.com?subject=Field%20Kit">avbydave@gmail.com</a>.</p>
       </div>
 
       <ul class="kit-grid" aria-label="What's in the kit">
-        <li><h2>Tearing troubleshooting card</h2><p>The checks in order, from "is it the source or the display?" to frame rate, vsync/frame lock and reference. One printable page, one phone-sized version.</p></li>
-        <li><h2>EDID/HDCP decision tree</h2><p>No picture, wrong resolution, or a black screen that flickers back: a yes/no path through the handshake, with what to swap or reset at each branch.</p></li>
-        <li><h2>Genlock and reference checklist</h2><p>Reference type and format, termination, which devices should lock, and how to confirm each one actually did, before doors.</p></li>
-        <li><h2>Browser tear-test page</h2><p>Open it on any screen to see whether the path tears or stutters: moving bars, a frame counter and a refresh-rate readout.</p></li>
+        <li><img src="img/troubleshooting-card-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the tearing troubleshooting card: a symptom table, with the rest of the page blurred" /><h2>Tearing troubleshooting card</h2><p>The checks in order, from "is it the source or the display?" to frame rate, vsync/frame lock and reference. One printable page, one phone-sized version.</p></li>
+        <li><img src="img/edid-hdcp-tree-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the EDID/HDCP decision tree: the first two yes/no questions, with the rest blurred" /><h2>EDID/HDCP decision tree</h2><p>No picture, wrong resolution, or a black screen that flickers back: a yes/no path through the handshake, with what to swap or reset at each branch.</p></li>
+        <li><img src="img/genlock-checklist-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the genlock and reference checklist: the planning tick boxes, with the rest blurred" /><h2>Genlock and reference checklist</h2><p>Reference type and format, termination, which devices should lock, and how to confirm each one actually did, before doors.</p></li>
+        <li><img src="img/tear-test-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the browser tear-test page: moving white bars with frame and late-frame counters" /><h2>Browser tear-test page</h2><p>Open it on any screen to see whether the path tears or stutters: moving bars, a frame counter and a refresh-rate readout.</p></li>
       </ul>
+
+      <div class="kit-terms" aria-label="Delivery, refunds and licence">
+        <section aria-labelledby="kit-delivery-title">
+          <h2 id="kit-delivery-title">Delivery</h2>
+          <p>Instant download after checkout: three PDFs (printable and phone-sized) and a link to the tear-test page.</p>
+          <p class="kit-dave" data-dave-placeholder>[DAVE: confirm delivery: the checkout's own download email, or a link you send. Say how long the download link lasts.]</p>
+        </section>
+        <section aria-labelledby="kit-refund-title">
+          <h2 id="kit-refund-title">Refunds</h2>
+          <p class="kit-dave" data-dave-placeholder>[DAVE: refund policy, e.g. "If it doesn't help, email within 14 days for a full refund." Pick the window and check it matches the checkout provider's settings.]</p>
+        </section>
+        <section aria-labelledby="kit-licence-title">
+          <h2 id="kit-licence-title">Licence</h2>
+          <p class="kit-dave" data-dave-placeholder>[DAVE: licence, e.g. "For you and your crew. Print as many copies as you need for your own shows; please don't resell or repost the files."]</p>
+        </section>
+      </div>
 
       <section class="kit-notes" aria-labelledby="kit-notes-title">
         <h2 id="kit-notes-title">Good to know</h2>
@@ -95,6 +121,7 @@
     </footer>
     <script src="../js/sbd-events.js"></script>
     <script src="../js/sbd-launch-config.js"></script>
+    <script src="../js/sbd-checkout.js"></script>
     <script src="field-kit.js"></script>
   </body>
 </html>

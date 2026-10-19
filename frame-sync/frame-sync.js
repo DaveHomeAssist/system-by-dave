@@ -39,6 +39,8 @@
   var btnPlay = document.getElementById('fs-play');
   var btnAuto = document.getElementById('fs-auto');
   var signup = document.getElementById('fs-signup');
+  var stepList = document.getElementById('fs-steps');
+  var stage = document.querySelector('.fs-stage');
   var kit = document.getElementById('fs-kit');
 
   var STEP_COUNT = 7;
@@ -381,6 +383,19 @@
     if ((st.step === 4 && st.fixed) || st.step >= 5) revealSignup();
   }
 
+  var SCREEN_TEXT = {
+    ok: 'every pass shows one whole frame',
+    bad: 'torn: the top of the screen shows the old frame and the bottom shows the new one',
+    warn: 'out of step: the seam moves to a new place on each pass'
+  };
+  var lastLabel = '';
+  function describeScreen(st, s) {
+    var label = 'Simulated screen, step ' + st.step + ' of ' + STEP_COUNT + ': ' + s.badge.toLowerCase() + ', ' + SCREEN_TEXT[s.tone] + '.';
+    if (label === lastLabel) return;
+    lastLabel = label;
+    screen.setAttribute('aria-label', label);
+  }
+
   function revealSignup() {
     if (signupShown || CAPTURE || !signup) return;
     signupShown = true;
@@ -411,6 +426,7 @@
     var s = drawScreen(simTime, st);
     drawStrip(simTime, st, s);
     showStep(st);
+    describeScreen(st, s);
     if (autoplay) {
       var prev = autoplay.last || {};
       if (st.step === 3 && prev.step !== 3) track('tear_triggered', { source: 'autoplay' });
@@ -423,6 +439,7 @@
   /* ---------- clock ---------- */
   var lastFrame = 0;
   var rafId = 0;
+  var onScreen = true;        // stop drawing while the demo is scrolled away (battery, in-app browsers)
   function loop(now) {
     rafId = 0;
     var dt = lastFrame ? Math.min(0.1, (now - lastFrame) / 1000) : 0;
@@ -434,10 +451,10 @@
       simTime += dt;
     }
     render();
-    if (autoplay || !paused) rafId = requestAnimationFrame(loop);
+    if ((autoplay || !paused) && onScreen) rafId = requestAnimationFrame(loop);
   }
   function kick() {
-    if (CAPTURE) return;
+    if (CAPTURE || !onScreen) return;
     if (!rafId) { lastFrame = 0; rafId = requestAnimationFrame(loop); }
   }
 
@@ -447,6 +464,7 @@
     paused = false;
     syncPlayButton();
     btnAuto.textContent = 'Stop auto-play';
+    if (stepList) stepList.setAttribute('aria-live', 'off');
     track('autoplay_started', { order: schedule.map(function (e) { return e.step; }).join('-') });
     kick();
   }
@@ -459,6 +477,7 @@
     simTime = autoplay.t;
     autoplay = null;
     btnAuto.textContent = 'Auto-play all steps';
+    if (stepList) stepList.setAttribute('aria-live', 'polite');
     render();
   }
 
@@ -492,7 +511,7 @@
     if (action.event) track(action.event, { source: 'user' });
     render();
     kick();
-    btnNext.focus();
+    try { btnNext.focus({ preventScroll: true }); } catch (error) { btnNext.focus(); }
   });
   btnPlay.addEventListener('click', function () {
     if (autoplay) stopAutoplay();
@@ -508,39 +527,19 @@
 
   /* ---------- signup, kit, affiliate ---------- */
   (function setupSignup() {
-    var email = cfg.email || {};
-    var form = document.getElementById('fs-signup-form');
-    var fallback = document.getElementById('fs-signup-fallback');
-    var mailto = document.getElementById('fs-mailto');
-    var status = document.getElementById('fs-signup-status');
-    var address = email.fallbackMailto || 'avbydave@gmail.com';
-    if (mailto) {
-      mailto.href = 'mailto:' + address + '?subject=' + encodeURIComponent('Next demo, please') +
-        '&body=' + encodeURIComponent('Send me the next AV by Dave demo when it is ready.');
-      mailto.addEventListener('click', function () { track('signup_submit', { method: 'mailto' }); });
-    }
-    var endpoint = typeof email.endpoint === 'string' && /^https:\/\//.test(email.endpoint) ? email.endpoint : '';
-    if (!endpoint || !form) return;
-    // A provider is configured: show the real form. Submitting never blocks the demo.
-    form.hidden = false;
-    if (fallback) fallback.hidden = true;
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
-      var input = document.getElementById('fs-email');
-      if (!input.value || !input.checkValidity()) { status.textContent = 'Enter an email address.'; input.focus(); return; }
-      track('signup_submit', { method: email.provider || 'form' });
-      status.textContent = 'Sending…';
-      fetch(endpoint, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } })
-        .then(function (res) { status.textContent = res.ok ? 'Thanks. Check your inbox to confirm.' : 'That didn\u2019t go through. Try again later.'; })
-        .catch(function () { status.textContent = 'That didn\u2019t go through. Try again later.'; });
+    if (CAPTURE || !window.SBDSignup) return;
+    window.SBDSignup.mount({
+      config: cfg.email || {},
+      track: track,
+      utm: events.utm ? events.utm() : {}
     });
   })();
 
+  // The kit block appears only once checkout is configured (docs/launch/checkout.md).
   (function setupKit() {
-    var url = cfg.fieldKit && typeof cfg.fieldKit.url === 'string' ? cfg.fieldKit.url : '';
-    if (!kit || !url || CAPTURE) return;
+    var checkout = window.SBDCheckout && window.SBDCheckout.resolve((cfg.fieldKit || {}).checkout);
+    if (!kit || !checkout || CAPTURE) return;
     var link = document.getElementById('fs-kit-link');
-    link.href = url;
     kit.hidden = false;
     link.addEventListener('click', function () { track('kit_click', { placement: 'demo' }); });
   })();
@@ -603,5 +602,15 @@
   if (AUTOPLAY_PARAM) startAutoplay();
   else { render(); kick(); }
   window.addEventListener('resize', function () { render(); });
+  if (stage && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      var visible = entries.some(function (e) { return e.isIntersecting; });
+      if (visible === onScreen) return;
+      onScreen = visible;
+      if (visible) kick();
+    }).observe(stage);
+  }
+  // Redraw once the UI font is in, so canvas labels don't stay in the fallback font.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { render(); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) kick(); });
 })();

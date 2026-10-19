@@ -110,7 +110,9 @@
         "img/av-by-dave-og.png",
         "js/av-landing-theme.js",
         "js/sbd-events.js",
+        "js/sbd-checkout.js",
         "js/sbd-launch-config.js",
+        "js/sbd-signup.js",
         "fonts/dm-sans.woff2"
       ],
       "robotsDisallow": [

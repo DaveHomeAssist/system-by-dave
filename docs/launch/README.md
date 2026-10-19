@@ -39,13 +39,12 @@ Neither page is in the AV offline cache, so no cache generation bump is needed.
 
 | Key | Today | When set |
 |---|---|---|
-| `analytics.provider` | `null` (no-op dispatcher) | See `analytics.md`; privacy policy first |
-| `email.endpoint` | empty → mailto link to avbydave@gmail.com | HTTPS endpoint from Dave's email tool; the email form appears and posts there. Add the host to the page CSP `connect-src` and update the privacy policy |
-| `fieldKit.url` | empty → kit block hidden | The kit page or checkout URL; the block appears below the signup and records `kit_click` |
+| `analytics.provider` | `null`: **OFF by decision (2026-10-18)**, no-op dispatcher | Not planned; `analytics.md` lists what would be needed |
+| `email` | `provider: null` → mailto link to avbydave@gmail.com | One block per provider (Buttondown, Kit, MailerLite, beehiiv, custom): see `email.md`; privacy section in `privacy-email-section.md` first |
+| `fieldKit.checkout` | `provider: null` → checkout disabled, demo kit block hidden | One block per provider (Gumroad, Lemon Squeezy, Stripe Payment Links): see `checkout.md`. Stays closed while `[DAVE]` placeholders remain |
 | `fieldKit.priceLabel` | `Price TBD` | Dave's price, shown on the Field Kit page |
 
-Affiliate links: none. Add them only for gear the page actually shows, with a
-disclosure next to them, using `data-affiliate="<id>"`.
+Affiliate links: none, and none planned for now (decision 2026-10-18).
 
 ## Reel capture (local only, not in CI)
 
@@ -63,6 +62,21 @@ the run fails if any overlay leaves the Instagram safe area, overlaps the screen
 the cut doesn't open on the tear, the fix lands after 10 s, or the cover text
 falls outside the 3:4 crop. Videos are never committed.
 
+Music (decision: music, no voice):
+
+```sh
+npm run mix:frame-sync-reel-music -- --reel /path/outside/repo [--track licensed.wav]
+```
+
+`scripts/launch/mix_reel_music.sh` trims the track to each cut, fades it in
+(0.4 s) and out (2 s), normalizes to −14 LUFS integrated / −1.5 dBTP with a
+two-pass `loudnorm`, copies the video stream untouched, and re-measures the
+result. It fails if the result is more than 1 LU off target. Without `--track`
+it synthesizes a clearly named `PLACEHOLDER-synth-bed-NOT-FINAL` test bed (pure
+tones, nothing downloaded), and the outputs are named `*-MUSIC-PLACEHOLDER.mp4`.
+They're not for posting. Dave picks the real track, or posts the silent master
+and adds a song from Instagram's music library.
+
 ## Probe (local only)
 
 ```sh
@@ -72,20 +86,25 @@ npm run probe:frame-sync -- --screens /path/outside/repo
 Phone 390×844 and desktop 1280×800: console errors, horizontal scroll, the
 interactive break/fix flow, event order with UTM tags, auto-play timing (4 s
 steps, fix 1.2 s into step 4), the step_s clamp, that the signup never blocks the
-controls (also with a configured provider whose request fails), the hidden kit
+controls, every email provider against local mocks (success, network error, honeypot, bad config), the checkout interlock and providers, the hidden kit
 slot, reduced motion, no-JavaScript content, the skip link, and the Field Kit
 draft (noindex, price TBD).
 
 ## Copy
 
 `reel-copy.md` holds the draft overlay text, captions, pinned comment, DM 1/2,
-UTM link table, bio and Story text and the voice-variant script. All of it
+UTM link table, bio and Story text and the music notes. All of it
 needs Dave's approval. Field Kit contents are kept out of this public repository
 because they are the paid product.
 
+## Decisions so far (2026-10-18)
+
+Analytics OFF (no provider) · Reel uses music, not voice · no affiliate
+programs · no Meta One subscription.
+
 ## Dave decides
 
-Final demo URL · analytics provider and the privacy-policy change · email tool
-and account · DM tool and Instagram professional account · Field Kit price,
-checkout and where the kit files are hosted · affiliate sign-ups · posting all
-copy · the voice or music variant.
+Final demo URL · email tool and account (then `email.md`) · Field Kit price,
+checkout provider, terms and where the kit files are hosted (then
+`checkout.md`) · DM tool and Instagram professional account · the music track ·
+posting all copy.

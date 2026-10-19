@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://app.kit.com https://assets.mailerlite.com; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action https://buttondown.com https://app.kit.com https://assets.mailerlite.com" />
     <title>Frame Sync Demo | AV by Dave</title>
     <meta name="description" content="Cause a screen tear yourself, then fix it. A seven-step interactive demo of scan-out, frame sync and genlock from a working AV tech. Free, no sign-up, works on a phone." />
     <link rel="canonical" href="https://avbydave.com/frame-sync/" />
@@ -71,6 +71,11 @@
       .fs-signup h2, .fs-notes h2, .fs-kit h2 { margin: 0 0 6px; font-size: 20px; }
       .fs-signup p, .fs-notes p, .fs-kit p { margin: 0 0 10px; color: var(--av-text-2); }
       .fs-signup form { display: flex; flex-wrap: wrap; gap: 8px; }
+      .fs-signup input[aria-invalid="true"] { border-color: var(--av-danger); }
+      .fs-signup [role="status"]:empty { display: none; }
+      .fs-signup form[data-state="success"] [role="status"] { color: #7bd6a6; font-weight: 700; font-size: 15px; }
+      .fs-signup form[data-state^="error"] [role="status"] { color: var(--av-danger); font-weight: 700; }
+      .fs-hp { position: absolute !important; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
       .fs-signup input[type="email"] { flex: 1 1 220px; min-height: 44px; padding: 10px 12px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-control); color: var(--av-text); font: inherit; }
       .fs-signup .fs-small, .fs-kit .fs-small { font-size: 13px; color: var(--av-muted); }
       .fs-mailto { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; border-radius: var(--av-radius-control); background: var(--av-surface-3); border: 1px solid var(--av-line-strong); color: var(--av-text); font-weight: 700; text-decoration: none; }
@@ -155,7 +160,7 @@
             <li data-step="2" data-title="New frame each pass">
               <span class="fs-step-num">Step 2 of 7</span>
               <h2>The new frame arrives during the pause</h2>
-              <p>The source (a computer, media server or camera) hands over a new frame for each pass. When that handover happens during the pause, every pass shows one whole frame. The green ticks below mark handovers that landed in the pause.</p>
+              <p>The source (a computer, media server or camera) hands over a new frame for each pass. When that handover happens during the pause, every pass shows one whole frame. In the timing strip under the screen, green marks on the SWAPS line are handovers that landed in the pause.</p>
             </li>
             <li data-step="3" data-title="The tear">
               <span class="fs-step-num">Step 3 of 7</span>
@@ -183,7 +188,7 @@
               <p>Check sync before you blame the cable: is the source syncing its output to the display (vsync, frame lock)? Do the frame rates match exactly (59.94 isn't 60)? Is everything that should be on reference actually locked to it?</p>
             </li>
           </ol>
-          <p class="fs-noscript" id="fs-noscript">The interactive screen needs JavaScript. All seven steps are written out above.</p>
+          <p class="fs-noscript" id="fs-noscript">The interactive screen needs JavaScript. All seven steps are written out above. Want the next demo? Email <a href="mailto:avbydave@gmail.com?subject=Next%20demo%20please">avbydave@gmail.com</a>.</p>
           <div class="fs-controls fs-js-only" id="fs-controls">
             <button type="button" class="fs-btn fs-btn--primary" id="fs-action" hidden>Cause the tear</button>
             <button type="button" class="fs-btn" id="fs-prev">← Back</button>
@@ -199,10 +204,14 @@
         <p>Want the next interactive demo when it's ready? This is optional; the demo above keeps working either way.</p>
         <form id="fs-signup-form" novalidate hidden>
           <label class="fs-small" for="fs-email" style="flex-basis:100%">Email address</label>
-          <input id="fs-email" name="email" type="email" autocomplete="email" inputmode="email" required />
+          <input id="fs-email" name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" enterkeyhint="send" required />
+          <div class="fs-hp" aria-hidden="true"><label for="fs-company">Leave this empty</label><input id="fs-company" name="company" type="text" tabindex="-1" autocomplete="off" data-honeypot /></div>
           <button type="submit" class="fs-btn">Send me the next demo</button>
-          <p class="fs-small" id="fs-signup-status" role="status" style="flex-basis:100%;margin:0"></p>
+          <p class="fs-small" id="fs-signup-status" role="status" aria-live="polite" style="flex-basis:100%;margin:0"></p>
+          <button type="button" class="fs-btn fs-btn--quiet" data-retry hidden>Finish on the sign-up page</button>
+          <p class="fs-small" style="flex-basis:100%;margin:0">One email when the next demo is ready. Unsubscribe any time. See the <a href="https://systembydave.com/privacy-policy.html">privacy policy</a>.</p>
         </form>
+        <a class="fs-mailto" id="fs-signup-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Sign up for the next demo</a>
         <div id="fs-signup-fallback">
           <a class="fs-mailto" id="fs-mailto" href="mailto:avbydave@gmail.com?subject=Next%20demo%20please">Email Dave: "next demo, please"</a>
           <p class="fs-small" style="margin-top:8px">Automatic sign-up isn't set up yet. This opens your own email app with a short note to avbydave@gmail.com; this site doesn't collect or store anything.</p>
@@ -212,7 +221,7 @@
       <section class="fs-kit" id="fs-kit" aria-labelledby="fs-kit-title" hidden>
         <h2 id="fs-kit-title">Sync &amp; Signal Field Kit</h2>
         <p>The tearing troubleshooting card, an EDID/HDCP decision tree, a genlock checklist and a browser tear-test page, in one download.</p>
-        <a class="fs-mailto" id="fs-kit-link" href="#">See the Field Kit</a>
+        <a class="fs-mailto" id="fs-kit-link" href="../field-kit/">See the Field Kit</a>
       </section>
 
       <section class="fs-notes" aria-labelledby="fs-notes-title">
@@ -232,6 +241,8 @@
     </footer>
     <script src="../js/sbd-events.js"></script>
     <script src="../js/sbd-launch-config.js"></script>
+    <script src="../js/sbd-signup.js"></script>
+    <script src="../js/sbd-checkout.js"></script>
     <script src="frame-sync.js"></script>
   </body>
 </html>

@@ -48,6 +48,7 @@
     "verify:public-consistency": "node scripts/verify_public_consistency.js",
     "probe:frame-sync": "node scripts/launch/probe_frame_sync.mjs",
     "capture:frame-sync-reel": "node scripts/launch/capture_frame_sync_reel.mjs",
+    "mix:frame-sync-reel-music": "bash scripts/launch/mix_reel_music.sh",
     "test:shader-practice": "node --test shader/shading-practice-state.test.js shader/fmp-training.test.js scripts/shader_practice_worker.test.js",
     "probe:shader-practice": "node scripts/probe_shader_practice.js",
     "verify:shader-practice": "node --test shader/shading-practice-state.test.js shader/fmp-training.test.js scripts/shader_practice_worker.test.js && node scripts/verify_shader_practice.js",
