@@ -147,7 +147,10 @@ blanket compatibility approval for those dormant adapters.
 The focused regression is `node scripts/probe_av_visibility.mjs`, also called
 by the existing workspace browser probe. `AV_WORKSPACE_BROWSER=webkit` selects
 WebKit, `AV_WORKSPACE_BASE` selects a deployed origin, and
-`AV_VISIBILITY_EVIDENCE` records the result and screenshots. It compares eleven
+`AV_VISIBILITY_EVIDENCE` records the result and screenshots. The standalone
+Chromium launch honors `CHROME_CHANNEL` and defaults to installed Chrome,
+matching the existing workspace probe; managed runners can select
+`CHROME_CHANNEL=chromium` for their bundled browser. It compares eleven
 box states for both helpers with native and missing API, verifies native
 zero-option delegation, paginates to focused fields without changing values,
 and checks five current routes in both API states. The shared-console case

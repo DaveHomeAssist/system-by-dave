@@ -148,7 +148,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   let browser;
   try {
-    browser = engine === 'webkit' ? await webkit.launch({headless: true}) : await chromium.launch({headless: true, args: ['--enable-unsafe-swiftshader']});
+    browser = engine === 'webkit' ? await webkit.launch({headless: true}) : await chromium.launch({channel: process.env.CHROME_CHANNEL || 'chrome', headless: true, args: ['--enable-unsafe-swiftshader']});
     await verifyVisibilityCompatibility(browser, process.env.AV_WORKSPACE_BASE || `http://127.0.0.1:${server.address().port}/`, output);
   } finally {
     try {await browser?.close();} finally {await new Promise(resolve => server.close(resolve));}
