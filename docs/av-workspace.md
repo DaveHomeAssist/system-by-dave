@@ -114,6 +114,58 @@ physical-device, screen-reader or older-iPad acceptance.
 AVV-13 remains only a future adoption gate: before a subdirectory route opts
 into this navigation, define its intended base and destination resolution and
 verify navigation, show-context, save-guard and embedded-panel compatibility.
-This record does not authorize or implement that adoption. AVV-06 is the next
-independent compatibility item to revalidate before any repair or minimum-OS
-policy decision.
+This record does not authorize or implement that adoption. The later AVV-06
+visibility revalidation and repair are recorded below; no minimum-OS policy
+decision follows from either review.
+
+
+## Visibility API compatibility — 2026-10-18
+
+AVV-06 was reproduced at source/live
+`ba164f9487e7b921dbb04c22a92be2e547d1377b`: removing only
+`Element.checkVisibility` in disposable browser contexts causes a `TypeError`
+in the current standalone Calculator and LED paging paths. This proves a
+reachable JavaScript feature-absence failure, not a failure observed on an
+actual older iPad.
+
+`AVViewport.isVisible` and `AVWorkspace.isVisible` now feature-detect the
+method. Browsers providing it retain their native zero-option check. The
+fallback checks associated layout boxes and hidden ancestor contents in the
+current light-DOM panels. It deliberately does not substitute opacity,
+`visibility:hidden` or `offsetParent` tests for the native default. The
+[CSSOM View default check](https://drafts.csswg.org/cssom-view/#dom-element-checkvisibility)
+provides the semantics; this repair does not set a minimum supported OS or
+install a global prototype polyfill.
+
+Current callers include the standalone Calculator bridge, the suite's compiled
+native Calculator, Cue Sheet, StagePlotter, LED and Stage 3D. The active Cue
+Sheet and StagePlotter callbacks use the shared guard. The older board,
+worksheet and calculator viewport adapters have no current published HTML or
+native-pack script consumer; they remain unadopted and unchanged. This is not
+blanket compatibility approval for those dormant adapters.
+
+The focused regression is `node scripts/probe_av_visibility.mjs`, also called
+by the existing workspace browser probe. `AV_WORKSPACE_BROWSER=webkit` selects
+WebKit, `AV_WORKSPACE_BASE` selects a deployed origin, and
+`AV_VISIBILITY_EVIDENCE` records the result and screenshots. It compares eleven
+box states for both helpers with native and missing API, verifies native
+zero-option delegation, paginates to focused fields without changing values,
+and checks five current routes in both API states. The shared-console case
+opens the existing native Calculator on desktop and then narrows to phone
+width; StagePlotter uses its existing narrow-screen view selector.
+
+Dominic passes the focused Chromium and WebKit checks, AV verification and
+26 Rail/worker tests, Throwline verification and 47 tests, shared-runtime
+synchronization, the native suite build and diff checks. The initial new-test
+selector/readiness failures and the cache-pin mismatch are retained separately
+from the corrected checks; no failed gate was waived. Exact-head CI, merge,
+publication and production readback remain separate release evidence.
+
+The existing offline cache generation advances to
+`v20261018-visibility-compatibility`, with the registry, worker update, generated
+workspace copies, Stage 3D readiness pin and generation assertions aligned.
+There is no CSS, calculation, schema, document key, imported source, saved-data
+or dependency change. Physical devices, older OS/browser combinations,
+screen-reader use, touch ergonomics, installed returning-client transitions and
+operator acceptance remain open under AVV-14 and the existing acceptance
+records. Stream/Record credentials and other product choices are unchanged.

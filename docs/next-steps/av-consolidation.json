@@ -1369,7 +1369,7 @@
       "Standalone-family route and first-native-specialist choices remain unanswered; no conversion selected.",
       "October 14 Audio persona suggestions are review evidence, not approval for new features.",
       "AVV-05 superseded on 2026-10-18 by focused native Calculator source/live keyboard evidence; do not redispatch as an active defect.",
-      "AVV-06 retains a source-level checkVisibility compatibility risk; minimum OS/support decisions and physical acceptance remain separate."
+      "AVV-06 current missing-checkVisibility failure is repaired with focused automated proof; minimum OS/support policy and physical acceptance remain separate."
     ],
     "boardSync": "Configured Downloads board path is absent; the existing relocated private board is the only permitted synchronization target. Verify parity with the scoped updater and retain failures."
   },
@@ -1381,7 +1381,7 @@
     "state": "Superseded for current standalone Calculator; focused source/live evidence, no runtime repair.",
     "brief": "docs/av-calculator-app.md#skip-link-revalidation--2026-10-18",
     "limits": "Only the current standalone Calculator keyboard path was revalidated. No screen-reader, physical-device, older-iPad, suite-wide skip-link, durability or operator acceptance claim. No runtime or test suite change.",
-    "nextEligible": "AVV-06 bounded current-source consumer/feature-detection revalidation; establish the compatibility boundary before any repair or minimum-OS choice. No inferred support policy or physical-device acceptance."
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
   },
   "embeddedNavigationRevalidation": {
     "findingId": "AVV-13",
@@ -1398,6 +1398,28 @@
     "independentChecks": "Current source inventory; each opt-in HTML has one slot, includes js/sbd-nav.js and has no base element. Six native URL-resolution checks (plain and synthetic show-context/hash URL for each root route) resolve Home to / and AV by Dave to /av/. All three published HTML files, navigation JS, viewport CSS and console index byte-match reviewed source; /av/ returns that console index. Production source.json matches the reviewed source. No new browser sweep or click test.",
     "remainingGate": "Before any future subdirectory consumer adopts embedded navigation, define intended base/destination resolution and verify its navigation, show-context, save-guard and embedded-panel compatibility. No current adopter or implementation inferred.",
     "limits": "No runtime/CSS change, user-data write, hypothetical subdirectory test, browser/remote job, physical-device, screen-reader or older-iPad acceptance. The legacy source URL claim is superseded, not the future adoption gate.",
-    "nextEligible": "AVV-06 bounded current-source consumer/feature-detection revalidation; establish the compatibility boundary before any repair or minimum-OS choice. No inferred support policy or physical-device acceptance."
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
+  },
+  "visibilityCompatibility": {
+    "findingId": "AVV-06",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "ba164f9487e7b921dbb04c22a92be2e547d1377b",
+    "state": "Missing-method compatibility repair implemented; focused Chromium/WebKit and source checks pass. Review, exact-head CI, publication and live release proof remain separate provider gates.",
+    "brief": "docs/av-workspace.md#visibility-api-compatibility--2026-10-18",
+    "reproduction": "At the reviewed live source, masking only Element.checkVisibility in disposable modern-browser contexts reproduces TypeError in standalone Calculator and LED paging. This is a current JavaScript feature-absence reproduction, not an observed physical older-iPad failure.",
+    "repair": "Both shared paging helpers feature-detect the method, delegate without options when available and otherwise check layout boxes and content-visibility:hidden light-DOM ancestors. Active Cue Sheet and StagePlotter callbacks use the shared guard. Formulas, CSS, saved values, schemas, storage keys and imports are unchanged.",
+    "currentConsumers": [
+      "av-calculator.html via its native bridge",
+      "av/ via the compiled native Calculator pack",
+      "cue-sheet.html",
+      "stage-plot.html",
+      "led-wall-calculator.html",
+      "ProjectorThrow/Stage3D.html"
+    ],
+    "dormantCallers": "av-board-viewport.js, av-calculator-viewport.js and av-worksheet-viewport.js have no current published HTML or native-pack script consumer; they are not promoted or rewritten by this repair. Any future adoption needs compatibility review.",
+    "verification": "Dominic, Playwright1.63.0: Chromium and WebKit each pass11 box states for both helpers with native/masked API, native delegation, focused-page/value preservation and10 current-route cases. The current route cases cover standalone Calculator, LED, Cue Sheet, StagePlotter and shared-console Calculator in both API states. AV verification and26 Rail/worker tests pass; Throwline verification and47 tests pass after aligning the existing Stage3D cache pin. Shared runtime synchronization, native suite build and diff checks pass.",
+    "cacheGeneration": "v20261018-visibility-compatibility; registry, worker update, generated workspace copies, existing Stage3D readiness pin and exact-generation assertions advance together.",
+    "limits": "Synthetic API absence in current automated engines is not physical-device, full older-OS, screen-reader, touch ergonomics, installed-returning-client or operator acceptance. No minimum support policy, polyfill on Element.prototype, user-data change or new dependency.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
   }
 }
