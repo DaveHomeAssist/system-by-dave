@@ -172,6 +172,7 @@ async function main() {
       const request = (method, params) => cdp(method, params, Math.max(1, deadline - Date.now()));
       let documentState = null;
       try {
+        const previous = (await request('Page.getFrameTree')).frameTree.frame.loaderId;
         const navigation = await request('Page.navigate', { url });
         if (navigation.errorText) throw new Error(navigation.errorText);
         while (Date.now() < deadline) {
@@ -186,8 +187,8 @@ async function main() {
             returnByValue: true
           });
           documentState = observed.result.value;
-          // Match the new loader so a completed previous page cannot satisfy the wait.
-          if ((!navigation.loaderId || tree.frameTree.frame.loaderId === navigation.loaderId)
+          // Follow client redirects, but never accept the completed previous document.
+          if ((!navigation.loaderId || tree.frameTree.frame.loaderId !== previous)
             && documentState?.readyState === 'complete') return;
           await delay(50);
         }

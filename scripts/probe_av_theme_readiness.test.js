@@ -15,12 +15,20 @@ const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/cs
 async function probe(fixture) {
   assert.ok(process.env.CHROME_BIN, 'CHROME_BIN must select the qualified test browser');
   let delayed = 0;
+  let redirects = 0;
   const server = http.createServer(async (request, response) => {
     try {
-      const pathname = new URL(request.url, 'http://localhost').pathname;
+      const url = new URL(request.url, 'http://localhost');
+      const pathname = url.pathname;
       if (pathname === '/') {
         response.setHeader('Content-Type', 'text/html');
         response.end('<!doctype html><title>Theme probe fixture origin</title>');
+        return;
+      }
+      if (fixture === 'redirect' && pathname === '/stage-plot.html' && !url.searchParams.has('arrived')) {
+        redirects += 1;
+        response.setHeader('Content-Type', 'text/html');
+        response.end("<!doctype html><script>location.replace('stage-plot.html?arrived=1')</script>");
         return;
       }
       const css = pathname === '/css/av-theme.css';
@@ -59,7 +67,7 @@ async function probe(fixture) {
       const result = await execute(process.execPath, [path.join(root, 'scripts/probe_av_themes.js'), `--base=${base}`, '--target=stageplotter'], {
         cwd: root, timeout: 45000, maxBuffer: 4 * 1024 * 1024
       });
-      return { ...result, code: 0, delayed };
+      return { ...result, code: 0, delayed, redirects };
     } catch (error) {
       assert.equal(error.signal, null, error.message);
       return { stdout: error.stdout, stderr: error.stderr, code: error.code, delayed };
@@ -82,6 +90,13 @@ test('theme probe still rejects a fully loaded wrong theme', { timeout: 45000 },
   assert.equal(result.code, 1);
   assert.match(result.stderr, /stageplotter light: wrong theme identity \(stageplotter\/black\)/);
   assert.match(result.stderr, /stageplotter dark: wrong theme identity \(stageplotter\/black\)/);
+});
+
+test('theme probe follows a client redirect without accepting the previous document', { timeout: 45000 }, async () => {
+  const result = await probe('redirect');
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(result.redirects, 2, 'both modes navigate through a new redirect document');
+  assert.match(result.stdout, /AV theme browser probe passed \(1 surfaces × 2 preferences/);
 });
 
 test('theme probe still rejects a missing stylesheet', { timeout: 45000 }, async () => {
