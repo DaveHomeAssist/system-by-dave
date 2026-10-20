@@ -1444,14 +1444,14 @@
   },
   "smartFade1248": {
     "recordedOn": "2026-10-19",
-    "state": "Viewer published; authorized AVByDave prototype integration in release checks",
+    "state": "Inspection prototype published; private embedded authentication blocked in observed browser",
     "parent": "https://github.com/DaveHomeAssist/system-by-dave/pull/351",
     "viewerBaseline": "adc1e48548ded055d96c67faf3f1cd86347b5b91",
     "viewerRevision": "0.12",
     "modelRevision": "0.1",
     "scope": "Additive equipment adapter and two independent SmartFade panel choices, same private viewer origin and mount-session checks; physical positions only",
     "verification": "Dominic: existing 81 host tests before change, 82 after, AV Suite typecheck/build; source viewer tests and headless renderer evidence recorded separately. Authenticated production embedding and device acceptance pending.",
-    "next": "Verify AVByDave deployment and authenticated embedding, then retain exact rear/travel calibration, physical Surface/iPad and historical-state acceptance as open follow-up gates.",
+    "next": "Repair or establish a supported private cross-site sign-in path. Use the full viewer for trial meanwhile. Keep physical Surface/iPad, historical-state, performance and exact rear/travel checks open.",
     "unknowns": [
       "Historical Ion browser bookmarks",
       "Exact rear geometry and travel",
@@ -1461,8 +1461,13 @@
     ],
     "candidate": "https://github.com/DaveHomeAssist/system-by-dave/pull/359",
     "hostImplementation": "75af3faef47ae8b3cd0bacc6f79b97cfb2d4bbd4",
-    "viewerCandidateSource": "dde5fc5275b058429e69136ece630baac1383033",
-    "savedSiteVersion": 13,
-    "deployment": "Viewer Sites version 13 published on explicit user authorization; AVByDave host release in progress. Rear geometry and travel approximate; physical device checks remain open."
+    "viewerCandidateSource": "03823eea24cab8190d656ed262a2f2b73766d83e",
+    "savedSiteVersion": "appgprj_6ad2b21361fc8191aa5bb68f12a19cbc~appgver_d8cacc8eb8188191972d13f5a6dd7796",
+    "deployment": "Host a740564e7fc42fff89e79bfe8b3ec3271893dd22 published by run 39361577808; destination run 39363551116 succeeded and live source.json matched. Refined private viewer deployment appgdep_6ad6dd5d9d1481918a77c49f55a1ec60 succeeded.",
+    "productionRuntime": {
+      "fullViewer": "Authenticated model and refined controls observed in actual browser",
+      "embedded": "Failed in observed in-app browser: private frame sign-in required, OAuth content blocked; host correctly became unavailable. No access widening or authentication bypass.",
+      "physicalDeviceChecks": "Open; not executed"
+    }
   }
 }

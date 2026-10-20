@@ -19,3 +19,9 @@ Acceptance: preserve baseline Ion suites and like-for-like renders; verify physi
 ## Authorized prototype publication
 
 Dave authorized publication on 19 October 2026 for inspection and trial, with approximate rear geometry and fader travel and open device checks. Sites version 13 is published at https://ion-workbench.davein4k.chatgpt.site/?gear=smartfade1248 (deployment appgdep_6ad6d4fcfa988191b6314424b5a7549d). AVByDave registration includes the required Ion host foundation. This prototype publication does not close the reference-accuracy, device, historical-state or performance gates above.
+
+## Publication readback
+
+Host PR359 merged as a740564e7fc42fff89e79bfe8b3ec3271893dd22, including the Ion foundation. Source publication run 39361577808 and AVByDave destination run 39363551116 passed; live source.json matched a740564. The refined viewer source 03823eea24cab8190d656ed262a2f2b73766d83e is published in deployment appgdep_6ad6dd5d9d1481918a77c49f55a1ec60. Curved caps, rounded grip detail, layered keys and aspect-correct labels preserve all physical IDs and motion endpoints. Four Ion rendered comparisons remain byte-identical, and SmartFade interaction/fallback/isolation checks pass on Dominic.
+
+The actual AVByDave panel loads the private sign-in page in the observed in-app browser; OAuth content is then blocked in the cross-site frame and the host correctly reports unavailable. The authenticated full viewer works. **Embedded authentication is a known failed check in this browser**, not completed acceptance. Use Open full for trial; do not weaken sharing or pass credentials to the viewer to bypass it. Device checks and the remaining reference-accuracy gates stay open.
