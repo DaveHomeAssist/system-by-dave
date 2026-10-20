@@ -2,17 +2,25 @@
 """Regenerate sitemap.xml for systembydave.com.
 
 Tool pages come from js/sbd-registry.js (single source of truth); static and
-hub pages are listed below. lastmod is each file's last git-commit date, or
-today when the file has uncommitted changes.
+hub pages are listed below.
 
-Usage (repo root):  python scripts/gen_sitemap.py
+Usage (repo root):  python scripts/gen_sitemap.py           # write sitemap.xml
+                    python scripts/gen_sitemap.py --check   # fail if it is stale
+
+The committed sitemap.xml lists routes only, with no <lastmod>, so it is a pure
+function of the route list and the registry: the same tree regenerates the same
+bytes on any day, in any clone, mid-merge or after a rebase. The Pages deploy
+stamps the published copy with --lastmod, which takes each page's last commit
+date (git log %cs) from the full history of the deployed commit. Dates never
+come from the clock, file mtimes or uncommitted changes. Without full history
+(a shallow clone or no .git) --lastmod omits the dates and says so on stderr.
 
 Pages that moved to another domain (scripts/domain-sites.json) leave this
 sitemap at their site's cutover. The same list, rooted at the new domain, is
 written with:  python scripts/gen_sitemap.py --site <id> --out <path>
 """
 import argparse
-import datetime
+import difflib
 import io
 import json
 import os
@@ -122,28 +130,38 @@ def is_indexable(path):
     return not re.search(r'<meta\s+name=["\']robots["\'][^>]*content=["\'][^"\']*noindex', source, re.I)
 
 
-def dirty_paths():
-    out = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT,
-                         capture_output=True, text=True).stdout
-    return {line[3:].strip().strip('"') for line in out.splitlines() if line.strip()}
+def full_history():
+    """True when git history is complete, so last-commit dates are real."""
+    out = subprocess.run(["git", "rev-parse", "--is-shallow-repository"], cwd=ROOT,
+                         capture_output=True, text=True)
+    return out.returncode == 0 and out.stdout.strip() == "false"
 
 
-def lastmod_for(path, dirty):
+def lastmod_for(path):
+    """The page's last commit date at HEAD, or None when it has no commit."""
     probe = path if path else "index.html"
     if path.endswith("/"):
         probe = path + "index.html"
-    if probe in dirty:
-        return datetime.date.today().isoformat()
-    out = subprocess.run(["git", "log", "-1", "--format=%cs", "--", probe], cwd=ROOT,
+    out = subprocess.run(["git", "log", "-1", "--format=%cs", "HEAD", "--", probe], cwd=ROOT,
                          capture_output=True, text=True).stdout.strip()
-    return out or datetime.date.today().isoformat()
+    return out or None
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--site", help="write the sitemap for this scripts/domain-sites.json site id")
     parser.add_argument("--out", help="output path (default: sitemap.xml in the repository root)")
+    parser.add_argument("--lastmod", action="store_true",
+                        help="add each page's last commit date (published copies only; needs full git history)")
+    parser.add_argument("--check", action="store_true",
+                        help="write nothing; exit 1 with a diff when the output file is out of date")
     args = parser.parse_args()
+    if args.check and args.lastmod:
+        parser.error("--check compares the committed, date-free sitemap; do not combine it with --lastmod")
+    stamp = args.lastmod and full_history()
+    if args.lastmod and not stamp:
+        print("gen_sitemap: no full git history (shallow clone or no .git); lastmod omitted", file=sys.stderr)
+    when = lastmod_for if stamp else (lambda path: None)
     sites = load_domain_sites()
     hrefs = registry_hrefs()
     site = None
@@ -159,15 +177,14 @@ def main():
             return owner is not None and owner["id"] == site["id"]
         return owner is None or not owner.get("cutover")
 
-    dirty = dirty_paths()
     entries = []
     if site and site.get('home') == '/' and site.get('landingPage'):
-        entries.append(('', lastmod_for(site['landingPage'], dirty), 'weekly', '1.0'))
+        entries.append(('', when(site['landingPage']), 'weekly', '1.0'))
     for path, freq, prio in STATIC_PAGES:
         if not belongs(path):
             continue
         if not path or is_indexable(path):
-            entries.append((path, lastmod_for(path, dirty), freq, prio))
+            entries.append((path, when(path), freq, prio))
     listed = {path for path, _, _, _ in entries}
     for href in registry_tool_pages():
         if href in listed or not belongs(href):
@@ -176,20 +193,32 @@ def main():
             print("skip (missing file):", href, file=sys.stderr)
             continue
         if is_indexable(href):
-            entries.append((href, lastmod_for(href, dirty), TOOL_CHANGEFREQ, TOOL_PRIORITY))
+            entries.append((href, when(href), TOOL_CHANGEFREQ, TOOL_PRIORITY))
 
     lines = ['<?xml version="1.0" encoding="UTF-8"?>',
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for path, mod, freq, prio in entries:
-        lines += ["  <url>",
-                  "    <loc>%s%s</loc>" % (base, path),
-                  "    <lastmod>%s</lastmod>" % mod,
-                  "    <changefreq>%s</changefreq>" % freq,
+        lines += ["  <url>", "    <loc>%s%s</loc>" % (base, path)]
+        if mod:
+            lines.append("    <lastmod>%s</lastmod>" % mod)
+        lines += ["    <changefreq>%s</changefreq>" % freq,
                   "    <priority>%s</priority>" % prio,
                   "  </url>"]
     lines.append("</urlset>")
+    text = "\n".join(lines) + "\n"
     out = args.out or os.path.join(ROOT, "sitemap.xml")
-    io.open(out, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
+    if args.check:
+        current = io.open(out, encoding="utf-8").read() if os.path.exists(out) else ""
+        if current == text:
+            print("%s is current: %d urls" % (os.path.relpath(out, ROOT), len(entries)))
+            return
+        sys.stdout.writelines(difflib.unified_diff(
+            current.splitlines(True), text.splitlines(True),
+            "committed/" + os.path.relpath(out, ROOT), "regenerated/" + os.path.relpath(out, ROOT)))
+        print("%s is stale: run python3 scripts/gen_sitemap.py and commit the result"
+              % os.path.relpath(out, ROOT), file=sys.stderr)
+        sys.exit(1)
+    io.open(out, "w", encoding="utf-8", newline="\n").write(text)
     print("%s written: %d urls" % (os.path.relpath(out, ROOT) if not args.out else out, len(entries)))
 
 

@@ -2,6 +2,12 @@
 
 # Changelog
 
+## 2026-10-20 — Deterministic sitemap
+
+- `sitemap.xml` is now a date-free route list, so `python3 scripts/gen_sitemap.py` regenerates the same bytes on any day, in any clone, mid-merge or after a rebase. It no longer stamps uncommitted (or mid-merge staged) files with today's date, which is what put 2026-10-20 on 15 pages in the `demos-hosting` merge and failed the Pages deploy's generated-file check (as on 2026-10-14 and 2026-09-17).
+- The Pages deploy stamps the published `_site/sitemap.xml`, and domain-site staging stamps each site's sitemap, with `--lastmod`: each page's last commit date from full git history. Without full history it omits the dates rather than guess.
+- `python3 scripts/gen_sitemap.py --check` fails with a diff when the committed sitemap is stale, and now runs on every pull request in Public site contracts, so route drift is caught before merge instead of on `main`.
+
 ## 2026-10-20 — AV by Dave interactive demos
 
 - Add `demos/`: the frame-sync (008) and fault-finding (010) concept demos as public, ungated pages with a hub at `/demos/`, the public shell (skip link, breadcrumb, shared nav), canonical URLs and sitemap entries. GSAP comes from the vendored build.
