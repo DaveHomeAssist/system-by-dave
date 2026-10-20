@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloud.umami.is; object-src 'none'; base-uri 'self'; form-action 'self' https://buttondown.com https://app.kit.com https://app.convertkit.com">
+<meta name="theme-color" content="#0E1116">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AV by Dave demos</title>
+<meta name="description" content="Interactive AV concepts you can actually manipulate. Each demo is a working model of one real production problem: see it break, see why, fix it yourself.">
+<link rel="canonical" href="https://systembydave.com/demos/">
+<link rel="stylesheet" href="fonts.css">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AV by Dave demos — real AV problems you can break yourself">
+<meta property="og:description" content="Interactive AV concepts you can actually manipulate. Each demo is a working model of one real production problem: see it break, see why, fix it yourself.">
+<meta property="og:url" content="https://systembydave.com/demos/">
+<meta property="og:image" content="https://systembydave.com/demos/og/hub.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AV by Dave demos — real AV problems you can break yourself">
+<meta name="twitter:description" content="Interactive AV concepts you can actually manipulate. Each demo is a working model of one real production problem: see it break, see why, fix it yourself.">
+<meta name="twitter:image" content="https://systembydave.com/demos/og/hub.png">
+<link rel="stylesheet" href="../css/sbd-public-nav.css">
+<script src="../js/sbd-public-nav.js" defer></script>
+<script src="config.js"></script>
+<style>
+  :root{--g:#0E1116;--p:#1B2029;--p2:#2A3140;--ink:#F5F7FA;--ink2:#AEB6C2;--mute:#7C879A;--orange:#FF5A1F;--cyan:#5AC8FA;--yellow:#FFC531}
+  html{background:var(--g);color:var(--ink);font-family:"Barlow",system-ui,sans-serif;font-size:18px;line-height:1.45}
+  body{margin:0}
+  .sbd-skip-link{position:absolute;left:8px;top:-100px;padding:10px 14px;background:var(--orange);color:#111;font-weight:700;border-radius:8px}
+  .sbd-skip-link:focus{top:8px;outline:3px solid #fff}
+  .sbd-site-return{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 16px;background:#0B0D11;border-bottom:1px solid var(--p2);font:600 14px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em;color:var(--ink2)}
+  .sbd-site-return a{color:var(--ink);text-decoration:none;padding:12px 0}
+  .sbd-site-return a:hover,.sbd-site-return a:focus{color:var(--yellow);text-decoration:underline;outline:none}
+  .sbd-site-return__separator{color:var(--mute)} .sbd-site-return__current{color:var(--yellow)}
+  main{max-width:960px;margin:0 auto;padding:40px 20px 80px}
+  .eyebrow{font:600 13px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+  h1{font:800 clamp(2.4rem,7vw,4.2rem)/.98 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:-.01em;margin:12px 0 10px}
+  h1 em{font-style:normal;color:var(--orange)}
+  .lede{color:var(--ink2);max-width:60ch;margin:0 0 36px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+  .card{display:block;background:var(--p);border:2px solid var(--p2);border-radius:18px;padding:22px 22px 20px;color:inherit;text-decoration:none;transition:border-color .15s}
+  .card:hover,.card:focus{border-color:var(--cyan);outline:none}
+  .card .n{font:600 13px/1 "IBM Plex Mono",monospace;letter-spacing:.12em;color:var(--mute)}
+  .card h2{font:800 1.9rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase;margin:10px 0 8px}
+  .card p{margin:0 0 14px;color:var(--ink2);font-size:1rem}
+  .card .go{font:800 15px/1 "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--orange)}
+  .card .fact{font:500 13px/1.4 "IBM Plex Mono",monospace;color:var(--mute);margin-top:14px;border-top:1px solid var(--p2);padding-top:10px}
+  footer{margin-top:48px;color:var(--mute);font-size:.9rem;max-width:64ch}
+</style>
+</head>
+<body>
+<a class="sbd-skip-link" href="#demos">Skip to the demos</a>
+<nav class="sbd-site-return" aria-label="Breadcrumb">
+  <a href="https://systembydave.com/">System by Dave</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <a href="/av-suite.html">AV Suite</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <span class="sbd-site-return__current" aria-current="page">AV by Dave demos</span>
+</nav>
+<main>
+  <div class="eyebrow">AV by Dave</div>
+  <h1>Real AV problems. <em>Break them yourself.</em></h1>
+  <p class="lede">Each demo is a slowed-down working model of one production problem. See it fail, see why, then fix it. One true thing per demo, with the manufacturer's page to prove it.</p>
+  <div class="grid" id="demos" tabindex="-1">
+    <a class="card" href="frame-sync.html" data-umami-event="hub_open" data-umami-event-demo="frame-sync">
+      <div class="n">008 · CAMERAS</div>
+      <h2>Why your screen is late</h2>
+      <p>A camera with its own clock, a room with one clock, and the waiting room in between. Watch the picture tear, fix it, then find out why "one frame of delay" is a myth.</p>
+      <div class="go">Play →</div>
+      <div class="fact">AJA FS4 manual v3.1, Frame Delay: about four frames in HD modes</div>
+    </a>
+    <a class="card" href="fault-finding.html" data-umami-event="hub_open" data-umami-event-demo="fault-finding">
+      <div class="n">010 · TROUBLESHOOTING</div>
+      <h2>Was it the cable?</h2>
+      <p>Camera, cable, box, cable, screen. One of them is broken. Swap one thing at a time, watch the suspects list shrink, and learn why a cable swap also re-plugs the port.</p>
+      <div class="go">Play →</div>
+      <div class="fact">AJA Support FAQ 7308: two different cables, two different ports, a known-good cable</div>
+    </a>
+  </div>
+  <footer>More demos follow the daily archive's rotation: transport, bandwidth, color, sync, cameras, displays, IP and fiber, troubleshooting. Built as web pages so you can touch the mechanism, not just watch it.</footer>
+</main>
+<script src="demo-shell.js"></script>
+</body>
+</html>

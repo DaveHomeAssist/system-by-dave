@@ -1,0 +1,33 @@
+/* Shell around the AV by Dave demo stage: breadcrumb bar on top, completion panel below. */
+body.demo { background: #0E1116; }
+body.demo .sbd-skip-link { position: absolute; left: 8px; top: -100px; z-index: 50; padding: 10px 14px; background: #FF5A1F; color: #111; font: 700 16px/1 "Barlow", system-ui, sans-serif; border-radius: 8px; }
+body.demo .sbd-skip-link:focus { top: 8px; outline: 3px solid #fff; }
+body.demo .sbd-site-return {
+  position: fixed; left: 0; right: 0; top: 0; z-index: 40; min-height: 44px;
+  display: flex; align-items: center; gap: 10px; padding: 0 14px;
+  background: #0B0D11; border-bottom: 1px solid #2A3140;
+  font: 600 14px/1 "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .04em; color: #AEB6C2;
+}
+body.demo .sbd-site-return a { color: #F5F7FA; text-decoration: none; padding: 12px 0; }
+body.demo .sbd-site-return a:hover, body.demo .sbd-site-return a:focus { color: #FFC531; outline: none; text-decoration: underline; }
+body.demo .sbd-site-return__separator { color: #7C879A; }
+body.demo .sbd-site-return__current { color: #FFC531; }
+body.demo #fit { top: 50%; }
+body.capture .sbd-site-return, body.capture .sbd-skip-link { display: none; }
+
+#sbd-after {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  background: #0B0D11; border-top: 1px solid #2A3140; color: #F5F7FA;
+  font-family: "Barlow", system-ui, sans-serif;
+}
+#sbd-after[hidden] { display: none; }
+.sbd-after__inner { position: relative; max-width: 720px; margin: 0 auto; padding: 14px 56px 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.sbd-after__label { margin: 0; font: 700 18px/1.2 "Barlow Condensed", "Barlow", sans-serif; text-transform: uppercase; letter-spacing: .03em; }
+.sbd-after__row { display: flex; gap: 8px; flex-wrap: wrap; }
+.sbd-after__row input { flex: 1 1 220px; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 2px solid #2A3140; background: #1B2029; color: #F5F7FA; font: 500 16px/1 "Barlow", sans-serif; }
+.sbd-after__row input:focus { outline: none; border-color: #5AC8FA; }
+.sbd-after__row button { min-height: 44px; padding: 0 16px; border-radius: 10px; border: 0; background: #FF5A1F; color: #111; font: 800 16px/1 "Barlow Condensed", "Barlow", sans-serif; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.sbd-after__links { display: flex; gap: 16px; flex-wrap: wrap; }
+.sbd-after__alt { color: #5AC8FA; font: 600 14px/1.3 "Barlow", sans-serif; text-decoration: underline; }
+.sbd-after__close { position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #2A3140; background: transparent; color: #AEB6C2; font: 700 20px/1 sans-serif; cursor: pointer; }
+.sbd-after__close:hover, .sbd-after__close:focus { color: #F5F7FA; border-color: #7C879A; outline: none; }
