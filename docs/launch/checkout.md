@@ -20,8 +20,8 @@ Checkout opens only when **both** of these are true:
    `data-dave-placeholder` attribute with each one. While any remain, the
    button stays disabled and the console says how many are left.
 
-The demo page's Field Kit block (`#fs-kit`) also appears only once checkout is
-configured, and links to `/field-kit/`.
+The demo itself (`demos/frame-sync.html`) doesn't carry a Field Kit block; link the
+kit from its optional `checklistUrl` in `demos/config.js` once checkout is live.
 
 ## Turn it on (Dave)
 
@@ -57,12 +57,12 @@ occasionally change the hosts their overlay needs.
    add `field-kit/` to `STATIC_PAGES` in `scripts/gen_sitemap.py`, regenerate the
    sitemaps, and lower the `unlisted` count in `scripts/verify_indexing_policy.js`
    by one.
-5. Test: `npm run probe:frame-sync` (mock checks), then one real test purchase
+5. Test: `npm run probe:field-kit` (mock checks), then one real test purchase
    (most providers have a test mode) from a phone. Confirm the download email
    arrives and the refund path works.
 6. CHANGELOG entry.
 
 ## Events
 
-`kit_click` with `placement` (`field-kit` or `demo`) and `provider`, sent to the
+`kit_click` with `placement` (`field-kit`) and `provider`, sent to the
 no-op dispatcher (analytics OFF).

@@ -1,5 +1,11 @@
 # Launch analytics events
 
+> The frame-sync demo is now `demos/frame-sync.html` (PR #360), whose optional
+> Umami events are configured in `demos/config.js` and documented in
+> `demos/README.md`. The `js/sbd-events.js` dispatcher below now serves only the
+> Field Kit page; the per-step demo events listed here belonged to the removed
+> `frame-sync/` page.
+
 **Decision (2026-10-18): analytics stays OFF.** No provider is configured and
 none is planned. The dispatcher stays a no-op and the privacy policy's
 "no analytics" statement stays true. The rest of this page records what would be

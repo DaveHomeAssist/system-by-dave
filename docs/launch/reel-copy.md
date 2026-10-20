@@ -2,7 +2,7 @@
 
 Status: **ready for review, nothing posted.** Decisions applied (2026-10-18): music
 variant (no voiceover), no affiliate links, no Meta One, analytics OFF. Links use
-the proposed demo URL `https://avbydave.com/frame-sync/`; swap it if Dave picks another.
+the demo URL `https://avbydave.com/demos/frame-sync.html` (PR #360's page, the single home for the demo).
 
 Rules: the tear is on screen in frame 0, no greeting or title card, the fix lands
 by 8–10 s, one share prompt, one CTA keyword (**SYNC**). All words are on-screen

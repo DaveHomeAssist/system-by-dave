@@ -12,7 +12,7 @@ statement that the site has no analytics or advertising trackers.
 
 ## Email signup (AV by Dave demos)
 
-The frame sync demo on avbydave.com has an optional "Get the next demo" form.
+The demos on avbydave.com (`/demos/`) have an optional "Want the next AV problem to play with?" form after each demo is completed.
 It's the only place this site asks for personal information.
 
 - **What's collected:** the email address you type. If you arrived from a link

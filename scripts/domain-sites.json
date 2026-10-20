@@ -103,7 +103,6 @@
         "av-workbook.html",
         "av-tool-suite/",
         "av-workbook/",
-        "frame-sync/",
         "field-kit/"
       ],
       "assets": [
@@ -112,7 +111,6 @@
         "js/sbd-events.js",
         "js/sbd-checkout.js",
         "js/sbd-launch-config.js",
-        "js/sbd-signup.js",
         "fonts/dm-sans.woff2"
       ],
       "robotsDisallow": [

@@ -8,59 +8,41 @@ until Dave picks it.
 
 | Route | Published at | Indexing | Purpose |
 |---|---|---|---|
-| `frame-sync/` | `https://avbydave.com/frame-sync/` | Indexed (avbydave.com sitemap) | The free, open interactive demo the Reel points to |
+| `demos/frame-sync.html` (PR #360) | `https://avbydave.com/demos/frame-sync.html` | Indexed (avbydave.com sitemap) | The free, open interactive demo the Reel points to. Its single home; see `demos/README.md` |
 | `field-kit/` | `https://avbydave.com/field-kit/` | `noindex,nofollow`, not linked from navigation | Draft product page; price TBD, checkout closed |
 
-Both are listed in the avbydave site's `pages` in `scripts/domain-sites.json`,
-so they publish on avbydave.com, and the systembydave.com paths become redirect
-stubs that keep the query string (UTM tags survive). They are top-level routes,
-not under `av/`, because `av/` is the AV Suite build output (`npm run
-build:av-suite` empties it). **Proposed Reel URL:**
-`https://avbydave.com/frame-sync/`. Linking the systembydave.com path also works
-but adds a redirect hop in Instagram's in-app browser. Dave approves the final URL
-before anything is posted.
+`field-kit/` is listed in the avbydave site's `pages` in `scripts/domain-sites.json`,
+so it publishes on avbydave.com, and the systembydave.com path becomes a redirect
+stub that keeps the query string (UTM tags survive). It is a top-level route, not
+under `av/`, because `av/` is the AV Suite build output (`npm run build:av-suite`
+empties it). **Reel URL:** `https://avbydave.com/demos/frame-sync.html`. Dave
+approves the final URL before anything is posted.
 
-Neither page is in the AV offline cache, so no cache generation bump is needed.
+The page is not in the AV offline cache, so no cache generation bump is needed.
 
-## Demo behavior
+An earlier draft of this branch carried a second frame-sync demo at
+`frame-sync/`. It was never on `main` or live, and was removed so the demo has one
+home; no redirect is needed.
 
-- Seven steps; step 3 causes the tear, step 4 fixes it (vsync / frame sync),
-  then drift (5), genlock (6) and a field check (7). Fully open, no gate.
-- Works without JavaScript as a written seven-step explainer.
-- `?autoplay=1` plays every step at 5 s; `&step_s=4..6` changes the pace,
-  `&order=3,4,1,2,5,6,7` the order. Any control press stops auto-play.
-- Reduced motion starts paused, with a Play control. There's always a Pause control.
-- After the fix, an optional "Get the next demo" block appears inline below the
-  controls. It never covers or blocks the demo.
-- `?capture=1` is the recording layout used by the reel runner (virtual clock,
-  9:16 or `&aspect=4x5`, events disabled).
+## Configuration
 
-## Configuration hooks (`js/sbd-launch-config.js`)
-
-| Key | Today | When set |
+| Where | Key | Today |
 |---|---|---|
-| `analytics.provider` | `null`: **OFF by decision (2026-10-18)**, no-op dispatcher | Not planned; `analytics.md` lists what would be needed |
-| `email` | `provider: null` → mailto link to avbydave@gmail.com | One block per provider (Buttondown, Kit, MailerLite, beehiiv, custom): see `email.md`; privacy section in `privacy-email-section.md` first |
-| `fieldKit.checkout` | `provider: null` → checkout disabled, demo kit block hidden | One block per provider (Gumroad, Lemon Squeezy, Stripe Payment Links): see `checkout.md`. Stays closed while `[DAVE]` placeholders remain |
-| `fieldKit.priceLabel` | `Price TBD` | Dave's price, shown on the Field Kit page |
+| `demos/config.js` | `umamiWebsiteId`, `emailFormAction`, `checklistUrl` | Empty: no analytics, no email form, no second action (see `demos/README.md`, `email.md`) |
+| `js/sbd-launch-config.js` | `analytics.provider` | `null`: **OFF by decision (2026-10-18)**, no-op dispatcher (`analytics.md`) |
+| `js/sbd-launch-config.js` | `fieldKit.checkout` | `provider: null`: checkout disabled. One block per provider (Gumroad, Lemon Squeezy, Stripe Payment Links): see `checkout.md`. Stays closed while `[DAVE]` placeholders remain |
+| `js/sbd-launch-config.js` | `fieldKit.priceLabel` | `Price TBD` |
 
 Affiliate links: none, and none planned for now (decision 2026-10-18).
 
-## Reel capture (local only, not in CI)
+## Reel
 
-```sh
-npm run capture:frame-sync-reel -- --out /path/outside/repo
-```
-
-`scripts/launch/capture_frame_sync_reel.mjs` renders the capture layout frame by
-frame at 1080×1920 / 30 fps (no dropped frames), encodes H.264 + silent AAC
-(no watermark), and writes the main cut (41 s, opens on the step-3 tear, fix at
-6.2 s), the 15 s cut (steps 3→4, fix at 7.2 s), seven 4:5 carousel loops, the
-cover (step-3 tear) with its 3:4 grid crop and a safe-area check image, and a
-`manifest.json`. Overlay copy and timing live in `scripts/launch/reel-plan.json`;
-the run fails if any overlay leaves the Instagram safe area, overlaps the screen,
-the cut doesn't open on the tear, the fix lands after 10 s, or the cover text
-falls outside the 3:4 crop. Videos are never committed.
+The existing reel files (`/workspace/launch/reel/`, never committed) were rendered
+from the removed `frame-sync/` page. They still show the same seven-step story,
+but the page a viewer lands on is `demos/frame-sync.html`, which looks different.
+Re-render from the landing page with `demos/capture.mjs` (`demos/README.md`) if
+the reel should match it. Overlay copy and timing for the existing cuts are
+recorded in `scripts/launch/reel-plan.json`.
 
 Music (decision: music, no voice):
 
@@ -71,40 +53,37 @@ npm run mix:frame-sync-reel-music -- --reel /path/outside/repo [--track licensed
 `scripts/launch/mix_reel_music.sh` trims the track to each cut, fades it in
 (0.4 s) and out (2 s), normalizes to −14 LUFS integrated / −1.5 dBTP with a
 two-pass `loudnorm`, copies the video stream untouched, and re-measures the
-result. It fails if the result is more than 1 LU off target. Without `--track`
-it synthesizes a clearly named `PLACEHOLDER-synth-bed-NOT-FINAL` test bed (pure
-tones, nothing downloaded), and the outputs are named `*-MUSIC-PLACEHOLDER.mp4`.
-They're not for posting. Dave picks the real track, or posts the silent master
-and adds a song from Instagram's music library.
+result. Without `--track` it synthesizes a clearly named
+`PLACEHOLDER-synth-bed-NOT-FINAL` test bed and names the outputs
+`*-MUSIC-PLACEHOLDER.mp4`. They're not for posting.
 
 ## Probe (local only)
 
 ```sh
-npm run probe:frame-sync -- --screens /path/outside/repo
+npm run probe:field-kit -- --screens /path/outside/repo
 ```
 
-Phone 390×844 and desktop 1280×800: console errors, horizontal scroll, the
-interactive break/fix flow, event order with UTM tags, auto-play timing (4 s
-steps, fix 1.2 s into step 4), the step_s clamp, that the signup never blocks the
-controls, every email provider against local mocks (success, network error, honeypot, bad config), the checkout interlock and providers, the hidden kit
-slot, reduced motion, no-JavaScript content, the skip link, and the Field Kit
-draft (noindex, price TBD).
+Phone 390×844 and desktop 1280×800: the Field Kit draft (noindex, price TBD, no
+console errors or horizontal scroll) and the checkout interlock and providers
+against local mocks. The demo is checked by `demos/check-states.js`.
 
 ## Copy
 
 `reel-copy.md` holds the draft overlay text, captions, pinned comment, DM 1/2,
-UTM link table, bio and Story text and the music notes. All of it
-needs Dave's approval. Field Kit contents are kept out of this public repository
-because they are the paid product.
+UTM link table, bio and Story text and the music notes. All of it needs Dave's
+approval. Field Kit contents are kept out of this public repository because they
+are the paid product.
 
-## Decisions so far (2026-10-18)
+## Decisions so far
 
-Analytics OFF (no provider) · Reel uses music, not voice · no affiliate
-programs · no Meta One subscription.
+Analytics OFF (no provider, 2026-10-18) · Reel uses music, not voice · no
+affiliate programs · no Meta One subscription · email: beehiiv free; Field Kit
+checkout: Stripe Payment Links (2026-10-19) · the demo's single home is
+`demos/frame-sync.html` (2026-10-20).
 
 ## Dave decides
 
-Final demo URL · email tool and account (then `email.md`) · Field Kit price,
-checkout provider, terms and where the kit files are hosted (then
-`checkout.md`) · DM tool and Instagram professional account · the music track ·
-posting all copy.
+Email account (then `email.md`) · Field Kit price, terms and where the kit files
+are hosted (then `checkout.md`) · DM tool and Instagram professional account ·
+the music track · whether to re-render the reel from the landing page · posting
+all copy.

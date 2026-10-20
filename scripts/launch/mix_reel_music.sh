@@ -57,7 +57,7 @@ TRACK_DUR="$(dur "$TRACK")"
 for cut in main:frame-sync-main-1080x1920.mp4 short15:frame-sync-15s-1080x1920.mp4; do
   id="${cut%%:*}"; file="${cut#*:}"
   src="$REEL/$file"
-  [ -f "$src" ] || { echo "missing $src (run npm run capture:frame-sync-reel first)" >&2; exit 2; }
+  [ -f "$src" ] || { echo "missing $src (render the reel first; see docs/launch/README.md)" >&2; exit 2; }
   D="$(dur "$src")"
   awk -v a="$TRACK_DUR" -v b="$D" 'BEGIN{exit !(a+0 >= b+0)}' || echo "note: track ($TRACK_DUR s) is shorter than $file ($D s); it will end early" >&2
   FO_START="$(awk -v d="$D" -v f="$FADE_OUT" 'BEGIN{printf "%.3f", d-f}')"
