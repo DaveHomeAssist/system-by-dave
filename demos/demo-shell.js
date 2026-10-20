@@ -1,10 +1,18 @@
 // Shared shell for the AV by Dave demo pages: layout around the public breadcrumb and the
 // completion panel, analytics (Umami, optional), and the post-completion email ask.
-// Does nothing in capture mode (?drive or ?auto), so rendered frames are unchanged.
+// Does nothing in capture mode (?drive or ?auto), so rendered frames are unchanged, except
+// that ?reels in capture mode fits the stage into Instagram's Reels safe area.
 (() => {
   const cfg = window.SBD_DEMOS || {};
   const params = new URLSearchParams(location.search);
   const capture = params.has('drive') || params.has('auto');
+  // Capture-only Instagram Reels layout (?drive&reels or ?auto=...&reels; ignored without
+  // a capture flag, so visitors never see it). Clear area of a 1080x1920 Reel, outside
+  // the top bar, the bottom caption/username band and the right-hand action buttons
+  // (scripts/launch/reel-plan.json safeArea, x3).
+  const reels = capture && params.has('reels');
+  const REELS_SAFE = { left: 60, right: 972, top: 252, bottom: 1500 };
+  if (reels) document.documentElement.dataset.captureLayout = 'reels';
   const $ = (id) => document.getElementById(id);
 
   // ---------- analytics ----------
@@ -39,7 +47,21 @@
   const vh = () => document.documentElement.clientHeight || innerHeight;
   function layout() {
     if (!fit) return;
-    if (capture) { fit.style.top = '50%'; fit.style.transform = `translate(-50%,-50%) scale(${Math.min(vw() / 1080, vh() / 1920)})`; return; }
+    if (capture) {
+      const k = Math.min(vw() / 1080, vh() / 1920);
+      fit.style.top = '50%';
+      if (!reels) { fit.style.transform = `translate(-50%,-50%) scale(${k})`; return; }
+      // Reels-safe capture layout: shrink the stage's content box into the area Instagram
+      // leaves clear and paint the rest of the frame in the stage colour.
+      const [l, t, r, b] = (document.body.dataset.captureBox || '0 0 1080 1920').split(/\s+/).map(Number);
+      const s = Math.min((REELS_SAFE.right - REELS_SAFE.left) / (r - l), (REELS_SAFE.bottom - REELS_SAFE.top) / (b - t));
+      const dx = (REELS_SAFE.left + REELS_SAFE.right) / 2 - (540 + ((l + r) / 2 - 540) * s);
+      const dy = (REELS_SAFE.top + REELS_SAFE.bottom) / 2 - (960 + ((t + b) / 2 - 960) * s);
+      fit.style.transform = `translate(calc(-50% + ${dx * k}px), calc(-50% + ${dy * k}px)) scale(${s * k})`;
+      const bg = getComputedStyle(fit).backgroundColor;
+      document.documentElement.style.background = bg; document.body.style.background = bg;
+      return;
+    }
     const bar = document.querySelector('.sbd-site-return');
     const panel = $('sbd-after');
     const top = bar ? bar.offsetHeight : 0;

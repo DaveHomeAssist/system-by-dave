@@ -35,6 +35,10 @@
 - Add a focused native/masked API regression to the existing workspace probe. Chromium and WebKit cover both helpers, paging/value preservation and the current standalone/shared-console consumers. Preserve physical older-device and minimum-OS policy gaps; no global polyfill or saved-data change.
 - Regenerate embedded workspace runtimes and the native suite bundle, and advance the existing offline cache generation and Stage 3D readiness pin together. Preserve CSS, calculation engines, routes, schemas, keys and original imports.
 
+## 2026-10-20 — Reels-safe capture layout for the demos
+
+- `demos/demo-shell.js`: capture-only `?reels` layout (needs `?drive` or `?auto`, so visitors never see it) that fits the stage's content box into Instagram's Reels safe area (x 60–972, y 252–1500 of 1080×1920). `demos/frame-sync.html` declares its content box (`data-capture-box`). The reel renderer uses it; a glyph-level check of every cut finds no text under the top bar, the caption band or the right-hand buttons. On-screen copy, including "link in bio", is unchanged. `probe:demos-viewport` checks that `?reels` alone changes nothing. Posting checklist: drag the profile-grid crop to the top.
+
 ## 2026-10-20 — Demos fit phone widths
 
 - The demo pages (`demos/frame-sync.html`, `demos/fault-finding.html`) laid out 446–539 px wide on 360–430 px phones: the page zoomed out and the stage, breadcrumb and completion panel ran past the screen edge. Cause: the 1080 px stage rendered unscaled until `demo-shell.js` ran, so mobile browsers zoomed the page out at load (1275 px with JavaScript off), and `layout()` then sized the stage from `innerWidth`/`innerHeight`, which report the zoomed-out visual viewport, so it stayed too wide. The stage now starts scaled down in `demos/demo-shell.css`, and `layout()` uses the layout viewport (`documentElement.clientWidth/Height`). New local probe `npm run probe:demos-viewport` (320, 360, 390, 430 px under mobile emulation: width equals the viewport, no horizontal scroll, nothing crossing an edge or clipped).

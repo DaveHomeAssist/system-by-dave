@@ -5,7 +5,8 @@
 // scrollWidth equal the viewport (no zoom-out, no horizontal scroll). Nothing outside
 // the scaled stage may cross the edges, the scaled stage must fit, and no text box may
 // be clipped (scrollWidth > clientWidth) in the breadcrumb, the completion panel or
-// the hub. Runs before and after the completion panel appears.
+// the hub. Runs before and after the completion panel appears, and checks that the
+// capture-only Reels layout (?drive&reels) never applies without a capture flag.
 //   node scripts/launch/probe_demos_viewport.mjs [--screens /path/to/dir] [--width 390]
 import { chromium } from 'playwright';
 import fs from 'node:fs';
@@ -93,6 +94,18 @@ try {
         if (m.crossing.length) fail(`${label}: crosses the edge: ${m.crossing.slice(0, 6).join(', ')}`);
         if (m.clipped.length) fail(`${label}: clipped: ${m.clipped.slice(0, 6).join(', ')}`);
         results.push({ page: demo, width, state, innerWidth: m.innerWidth, scrollWidth: m.scrollWidth, fit: m.fit });
+      }
+      if (demo === 'frame-sync.html') {
+        // The Reels capture layout needs a capture flag; ?reels alone must change nothing.
+        await page.goto(`${BASE}/demos/${demo}`);
+        await page.waitForLoadState('load');
+        const plain = await page.evaluate(() => document.getElementById('fit').style.transform);
+        await page.goto(`${BASE}/demos/${demo}?reels`);
+        await page.waitForLoadState('load');
+        const r = await page.evaluate(() => ({ layout: document.documentElement.dataset.captureLayout || null, t: document.getElementById('fit').style.transform }));
+        if (r.layout || r.t !== plain) fail(`${demo} @${width}: ?reels without a capture flag changed the page (${JSON.stringify(r)})`);
+        const m = await measure(page, width);
+        if (m.innerWidth !== width || m.scrollWidth !== width) fail(`${demo}?reels @${width}: lays out ${m.innerWidth}/${m.scrollWidth}`);
       }
       if (errors.length) fail(`${demo} @${width}: page errors ${errors.join(' | ')}`);
       await context.close();

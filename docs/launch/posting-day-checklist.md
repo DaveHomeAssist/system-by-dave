@@ -21,11 +21,13 @@ Dave does every step; nothing here has been done. Tick in order.
 
 - [ ] Upload the silent master. Don't trim the start; the tear is in frame 0.
 - [ ] Music: add a song from the Instagram library (instrumental, steady), or upload
-      your own licensed mix from `reel/music/` instead of the silent master. Never
+      your own licensed mix from `reel-v2/music/` instead of the silent master. Never
       post the `MUSIC-PLACEHOLDER` files.
-- [ ] Music volume low enough to read the text; check the beat near the 6 s fix.
-- [ ] Cover: upload `cover-step3-1080x1920.png`. Check the grid preview shows the
-      headline and the screen (it's inside the 3:4 crop).
+- [ ] Music volume low enough to read the text; check the beat near the 5 s fix.
+- [ ] Cover: upload `cover-step3-1080x1920.png` (from `reel-v2/`).
+- [ ] Profile grid crop: on the cover screen tap "Profile grid" / "Edit profile
+      grid crop" and **drag the crop to the top**, so the brand bar, headline and
+      screen all show in the 3:4 tile. Check the grid preview before sharing.
 - [ ] Caption from `reel-copy.md` §2 (main). Hashtags optional.
 - [ ] Captions sticker / auto-captions off (there's no speech).
 - [ ] Share to feed: on.
