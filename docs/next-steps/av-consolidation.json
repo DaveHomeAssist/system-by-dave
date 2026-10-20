@@ -1444,14 +1444,14 @@
   },
   "smartFade1248": {
     "recordedOn": "2026-10-19",
-    "state": "Implementation candidate; not merged or deployed",
+    "state": "Viewer published; authorized AVByDave prototype integration in release checks",
     "parent": "https://github.com/DaveHomeAssist/system-by-dave/pull/351",
     "viewerBaseline": "adc1e48548ded055d96c67faf3f1cd86347b5b91",
     "viewerRevision": "0.12",
     "modelRevision": "0.1",
     "scope": "Additive equipment adapter and two independent SmartFade panel choices, same private viewer origin and mount-session checks; physical positions only",
     "verification": "Dominic: existing 81 host tests before change, 82 after, AV Suite typecheck/build; source viewer tests and headless renderer evidence recorded separately. Authenticated production embedding and device acceptance pending.",
-    "next": "Finish exact-model rear/travel calibration and actual Surface/iPad/authenticated host acceptance before releasing stacked candidates.",
+    "next": "Verify AVByDave deployment and authenticated embedding, then retain exact rear/travel calibration, physical Surface/iPad and historical-state acceptance as open follow-up gates.",
     "unknowns": [
       "Historical Ion browser bookmarks",
       "Exact rear geometry and travel",
