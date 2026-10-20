@@ -1,14 +1,16 @@
-import {PANEL_PROTOCOL,PANEL_VERSION,EQUIPMENT_ID,validEnvelope} from './panel-contract.js';
+import {PANEL_PROTOCOL,PANEL_VERSION,EQUIPMENT_ID,EQUIPMENT_TYPES,validEnvelope} from './panel-contract.js';
 export const ION_VIEWER_ORIGIN='https://ion-workbench.davein4k.chatgpt.site';
 
 // Shared by the preview and the React workspace adapter. Handshake, not iframe
 // load, establishes readiness; a sign-in/error page can also fire load.
-export function mountGearPanel({container,src=new URL('/',ION_VIEWER_ORIGIN).href,initialState,onState=()=>{},onStatus=()=>{},theme='dark',timeoutMs=15000}) {
+export function mountGearPanel({container,src=new URL('/',ION_VIEWER_ORIGIN).href,initialState,onState=()=>{},onStatus=()=>{},theme='dark',timeoutMs=15000,workspaceView='default',panelInstanceId}) {
  const url=new URL(src,location.href);
  if(![location.origin,ION_VIEWER_ORIGIN].includes(url.origin))throw Error('Unsupported gear viewer origin.');
+ const equipment=EQUIPMENT_TYPES[url.searchParams.get('gear')]||EQUIPMENT_ID;
+ if(equipment!==EQUIPMENT_ID){url.searchParams.set('workspaceView',workspaceView);url.searchParams.set('panelInstanceId',panelInstanceId||'panel_'+crypto.randomUUID().replaceAll('-',''));}
  url.searchParams.set('sbdEmbed','panel');
  const session='gear_'+crypto.randomUUID().replaceAll('-','');
- const frame=document.createElement('iframe');frame.className='gear-panel-frame';frame.title='ETC Ion and Universal 2×20 3D viewer';
+ const frame=document.createElement('iframe');frame.className='gear-panel-frame';frame.title=equipment===EQUIPMENT_ID?'ETC Ion and Universal 2×20 3D viewer':'ETC SmartFade 1248 3D viewer';
  frame.allow='fullscreen';frame.referrerPolicy='strict-origin-when-cross-origin';
  const feedback=document.createElement('div');feedback.className='gear-panel-feedback';feedback.setAttribute('role','status');
  const message=document.createElement('span');
@@ -27,8 +29,8 @@ export function mountGearPanel({container,src=new URL('/',ION_VIEWER_ORIGIN).hre
  };
  const receive=event=>{
   const msg=event.data;
-  if(disposed||event.source!==frame.contentWindow||event.origin!==url.origin||!validEnvelope(msg)||msg.session!==session||msg.equipment!==EQUIPMENT_ID)return;
-  if(!['ready','state'].includes(msg.type)||!msg.state||msg.state.version!==1||msg.state.equipment!==EQUIPMENT_ID)return;
+  if(disposed||event.source!==frame.contentWindow||event.origin!==url.origin||!validEnvelope(msg)||msg.session!==session||msg.equipment!==equipment)return;
+  if(!['ready','state'].includes(msg.type)||!msg.state||msg.state.version!==1||msg.state.equipment!==equipment)return;
   if(msg.type==='ready'){ready=true;clear();report('ready','Viewer connected.');}
   if(!ready)return;
   lastState=msg.state;onState(msg.state);

@@ -74,7 +74,7 @@ export function App() {
     const requested = new URLSearchParams(location.search).get("app");
     if (requested) openApp(requested);
     const gear = new URLSearchParams(location.search).get("gear");
-    if ((gear === "ion" || gear === "wing") && !requestedGearOpened.current) {
+    if ((gear === "ion" || gear === "wing" || gear === "smartfade1248" || gear === "smartfade1248-second") && !requestedGearOpened.current) {
       requestedGearOpened.current = true;
       if (!ws.show(`gear:${gear}`)) setStatus({ app: "Gear 3D", text: "No room in this view. Add the gear panel to an empty workspace area.", error: true });
     }
@@ -148,7 +148,7 @@ export function App() {
   }
   function render(type: string, panel: Panel) {
     const app = appOf(type), short = shortOf(type);
-    if (app === "gear" && (short === "ion" || short === "wing")) return {
+    if (app === "gear" && (short === "ion" || short === "wing" || short === "smartfade1248" || short === "smartfade1248-second")) return {
       body: <GearViewerPanel viewId={ws.viewId} panelId={panel.id} gear={short} theme={theme === "system" ? systemPalette : theme} />,
       context: "Private gear viewer · local practice only",
       actions: <a className="suite-app-open" href={gearHref(short)} target="_blank" rel="noopener noreferrer">Open full</a>,

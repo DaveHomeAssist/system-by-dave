@@ -1,5 +1,10 @@
 # Changelog
 
+## SmartFade 1248 integration candidate — 2026-10-19
+
+- Add a distinct SmartFade 1248 prototype panel through the existing private gear viewer registration and handshake. Isolate its snapshots by equipment, workspace view and panel without changing Ion keys.
+- Keep rear geometry, measured travel, practice and physical/authenticated acceptance as open release gates; no production release is claimed.
+
 ## 2026-10-17 — Gear panel integration candidate
 
 - Add Ion and Universal 2×20 to the workspace panel chooser with an internal viewer, checked handshake, access recovery and per-panel camera snapshots.
