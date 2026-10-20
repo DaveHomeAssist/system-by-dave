@@ -1,0 +1,4 @@
+export type GearViewState = { version: 1; equipment: 'etc-ion-universal-2x20' | 'etc-smartfade-1248'; assembly?: 'ion' | 'wing' | 'combined' | 'smartfade1248'; selected?: string; inspector?: boolean; index?: boolean; photo?: boolean; interaction?: 'orbit' | 'adjust'; camera?: { aspect?: number; yaw: number; pitch: number; distance: number; target: [number, number, number] }; levels?: Record<string, number> };
+export type GearPanelHost = { command(type: string, payload?: object): void; restore(state: GearViewState): void; setTheme(theme: string): void; getState(): GearViewState | undefined; dispose(): void };
+export const ION_VIEWER_ORIGIN: string;
+export function mountGearPanel(options: { container: HTMLElement; src?: string; initialState?: GearViewState; onState?: (state: GearViewState) => void; onStatus?: (status: string, text: string) => void; theme?: string; timeoutMs?: number; workspaceView?: string; panelInstanceId?: string }): GearPanelHost;

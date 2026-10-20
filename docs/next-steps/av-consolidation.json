@@ -1441,5 +1441,28 @@
       "boundary": "Only checker, focused test, existing CI and records; no application assets/build/cache/formulas/routes/saved keys/schemas/original imports change. Runtime acceptance remainsf7dc459 and unchanged Video JS/CSS; new source review/CI/merge/publication stay separate. Physical/olderOS/operator and unanswered product-policy gates remain open.",
       "redirectCorrection": "First candidate d8ec325 CI39195166501 passed all four initial fixtures, then caught a strict-loader assumption at the existing Throwline client redirect to Stage3D.html. Guard corrected and redirect regression added; original failed run retained and application route unchanged."
     }
+  },
+  "smartFade1248": {
+    "recordedOn": "2026-10-19",
+    "state": "Viewer published; authorized AVByDave prototype integration in release checks",
+    "parent": "https://github.com/DaveHomeAssist/system-by-dave/pull/351",
+    "viewerBaseline": "adc1e48548ded055d96c67faf3f1cd86347b5b91",
+    "viewerRevision": "0.12",
+    "modelRevision": "0.1",
+    "scope": "Additive equipment adapter and two independent SmartFade panel choices, same private viewer origin and mount-session checks; physical positions only",
+    "verification": "Dominic: existing 81 host tests before change, 82 after, AV Suite typecheck/build; source viewer tests and headless renderer evidence recorded separately. Authenticated production embedding and device acceptance pending.",
+    "next": "Verify AVByDave deployment and authenticated embedding, then retain exact rear/travel calibration, physical Surface/iPad and historical-state acceptance as open follow-up gates.",
+    "unknowns": [
+      "Historical Ion browser bookmarks",
+      "Exact rear geometry and travel",
+      "Physical Surface Pro 9 and iPad Pro M4 input",
+      "Production authentication and denied/signed-out recovery",
+      "Same-device performance"
+    ],
+    "candidate": "https://github.com/DaveHomeAssist/system-by-dave/pull/359",
+    "hostImplementation": "75af3faef47ae8b3cd0bacc6f79b97cfb2d4bbd4",
+    "viewerCandidateSource": "dde5fc5275b058429e69136ece630baac1383033",
+    "savedSiteVersion": 13,
+    "deployment": "Viewer Sites version 13 published on explicit user authorization; AVByDave host release in progress. Rear geometry and travel approximate; physical device checks remain open."
   }
 }

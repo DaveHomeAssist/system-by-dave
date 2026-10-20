@@ -1,5 +1,16 @@
 # Changelog
 
+## SmartFade 1248 integration candidate — 2026-10-19
+
+- Add a distinct SmartFade 1248 prototype panel through the existing private gear viewer registration and handshake. Isolate its snapshots by equipment, workspace view and panel without changing Ion keys.
+- Publish the inspection prototype on explicit user authorization. Rear geometry and fader travel remain approximate; practice, physical-device and reference-accurate acceptance stay open.
+
+## 2026-10-17 — Gear panel integration candidate
+
+- Add Ion and Universal 2×20 to the workspace panel chooser with an internal viewer, checked handshake, access recovery and per-panel camera snapshots.
+- Keep Ion private and online-only. Authenticated cross-origin browser acceptance remains a release gate.
+- Update the AV Suite shell browser probe for the new Gear 3D chooser group (11 groups; Gear 3D panels render as framed viewers).
+- Fix the gear viewer loading/recovery overlay text colour: use host body text (`--text`) instead of the on-accent `--ink`, which was unreadable in both palettes.
 ## 2026-10-18 — Theme probe document readiness
 
 - Wait for the navigated document to finish loading before seeding its stored theme or sampling theme contracts. Exclude the previous document while following client redirects; bound the wait to ten seconds and report the URL, document state and stylesheet status on failure.
