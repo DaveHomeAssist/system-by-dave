@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloud.umami.is; object-src 'none'; base-uri 'self'; form-action 'self' https://buttondown.com https://app.kit.com https://app.convertkit.com">
+<meta name="theme-color" content="#0E1116">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Was it the cable?</title>
+<meta name="description" content="A cable swap also re-plugs the port, so one swap can't tell a bad cable from a loose port. Find the fault in a five-piece chain in as few moves as you can.">
+<link rel="canonical" href="https://systembydave.com/demos/fault-finding.html">
+<link rel="stylesheet" href="../css/sbd-public-nav.css">
+<link rel="stylesheet" href="demo-shell.css">
+<script src="../js/sbd-public-nav.js" defer></script>
+<script src="config.js"></script>
+<link rel="stylesheet" href="fonts.css">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Was it the cable? — AV by Dave demo">
+<meta property="og:description" content="A cable swap also re-plugs the port, so one swap can't tell a bad cable from a loose port. Find the fault in a five-piece chain in as few moves as you can.">
+<meta property="og:url" content="https://systembydave.com/demos/fault-finding.html">
+<meta property="og:image" content="https://systembydave.com/demos/og/fault-finding.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Was it the cable? — AV by Dave demo">
+<meta name="twitter:description" content="A cable swap also re-plugs the port, so one swap can't tell a bad cable from a loose port. Find the fault in a five-piece chain in as few moves as you can.">
+<meta name="twitter:image" content="https://systembydave.com/demos/og/fault-finding.png">
+<style>
+  :root{
+    --g:#0E1116; --p:#1B2029; --p2:#2A3140; --ink:#F5F7FA; --ink2:#B4BCC9; --mute:#7C879A;
+    --orange:#FF5A1F; --cyan:#5AC8FA; --yellow:#FFC531; --green:#3DDC97; --red:#FF3B2F;
+    --hook:"Barlow Condensed"; --body:"Barlow"; --mono:"IBM Plex Mono";
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(--body);color:var(--ink)}
+  #fit{position:absolute;left:50%;top:50%;transform-origin:center;width:1080px;height:1920px;background:var(--g);overflow:hidden}
+  #brand{position:absolute;left:64px;top:72px;display:flex;align-items:center;gap:18px;font:600 26px/1 var(--mono);letter-spacing:3px;color:var(--mute)}
+  #brand i{display:block;width:10px;height:22px}
+  #step{position:absolute;left:64px;top:150px;width:952px}
+  #stepNum{font:600 28px/1 var(--mono);color:var(--mute);letter-spacing:3px;margin-bottom:22px}
+  #stepText{font:800 96px/0.98 var(--hook);text-transform:uppercase;letter-spacing:-1px;min-height:196px}
+  #stepText em{font-style:normal;color:var(--orange)}
+  #stepSub{font:500 36px/1.25 var(--body);color:var(--ink2);margin-top:22px;min-height:100px}
+  #receipt{position:absolute;left:64px;top:548px;font:500 24px/1 var(--mono);color:var(--mute);letter-spacing:1px;opacity:0;white-space:nowrap}
+
+  /* the chain */
+  #chain{position:absolute;left:64px;top:680px;width:952px;height:520px}
+  .unit{position:absolute;border-radius:20px;background:var(--p);border:5px solid var(--yellow);display:flex;align-items:center;justify-content:center;font:700 30px/1 var(--hook);letter-spacing:2px;color:var(--yellow)}
+  .unit.spare{border-color:var(--cyan);color:var(--cyan)}
+  .unit.bad{border-color:var(--red);color:var(--red)}
+  #uCam{left:0;top:160px;width:150px;height:200px}
+  #uBox{left:400px;top:180px;width:150px;height:160px}
+  .cable{position:absolute;top:255px;height:12px;border-radius:6px;background:var(--yellow)}
+  .cable.spare{background:var(--cyan)} .cable.bad{background:var(--red)}
+  .cable .lab{position:absolute;left:0;right:0;top:-46px;text-align:center;font:600 26px/1 var(--mono);letter-spacing:2px;color:var(--mute);white-space:nowrap}
+  #c1{left:155px;width:240px} #c2{left:555px;width:158px}
+  #port{position:absolute;left:712px;top:238px;width:26px;height:46px;border-radius:4px;background:var(--p2);border:4px solid var(--yellow)}
+  #port.bad{border-color:var(--red)} #port.ok{border-color:var(--green)}
+  #portLab{position:absolute;left:660px;top:300px;font:600 26px/1 var(--mono);letter-spacing:2px;color:var(--mute)}
+  #screen{position:absolute;left:740px;top:80px;width:212px;height:360px;border-radius:20px;background:#000;border:6px solid var(--p2);overflow:hidden}
+  #screen .t{position:absolute;left:0;right:0;top:-54px;text-align:center;font:600 26px/1 var(--mono);letter-spacing:3px;color:var(--mute)}
+  #bars{position:absolute;inset:0;display:flex;opacity:0}
+  #bars i{flex:1}
+  #noPic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:800 36px/1 var(--hook);color:var(--mute);letter-spacing:2px;white-space:nowrap}
+  #case{position:absolute;left:0;top:420px;width:300px;height:90px;border-radius:14px;border:4px dashed var(--mute);display:flex;align-items:center;justify-content:center;font:600 24px/1 var(--mono);letter-spacing:2px;color:var(--mute);gap:14px}
+  #case b{font:800 30px/1 var(--hook);color:var(--ink2)}
+  .chip{position:absolute;width:40px;height:52px;border-radius:8px;background:var(--p);border:4px solid var(--yellow);will-change:transform}
+  .tape{position:absolute;left:690px;top:160px;padding:8px 14px;background:var(--yellow);color:#111;font:800 26px/1 var(--hook);letter-spacing:2px;transform:rotate(-8deg);opacity:0}
+
+  /* readouts */
+  #read{position:absolute;left:64px;top:1250px;width:952px;display:flex;gap:18px;opacity:0}
+  .ro{background:var(--p);border-radius:18px;padding:22px 24px;border:3px solid var(--p2)}
+  .ro b{display:block;font:600 24px/1 var(--mono);letter-spacing:2px;color:var(--mute);margin-bottom:12px}
+  #roActs{flex:0 0 230px} #roActs span{font:800 72px/1 var(--hook);color:var(--orange)}
+  #roSus{flex:1}
+  #sus{display:flex;gap:12px;flex-wrap:wrap}
+  .s{font:700 30px/1 var(--hook);letter-spacing:2px;padding:14px 18px;border-radius:12px;border:3px solid var(--orange);color:var(--orange)}
+  .s.out{border-color:var(--p2);color:var(--mute);text-decoration:line-through}
+  .s.found{border-color:var(--green);color:var(--green)}
+
+  /* controls */
+  #ctl{position:absolute;left:64px;top:1500px;width:952px;display:flex;gap:16px;align-items:stretch}
+  button{appearance:none;border:4px solid var(--p2);background:var(--p);color:var(--ink);font:800 36px/1 var(--hook);letter-spacing:2px;text-transform:uppercase;padding:0 30px;height:120px;border-radius:18px;cursor:pointer;flex:1}
+  button.primary{background:var(--orange);border-color:var(--orange);color:#111}
+  button:disabled{opacity:.35;cursor:default}
+  #play{display:none}
+  #ctl.free #next{display:none} #ctl.free #play{display:flex;flex-direction:column;flex:1;gap:14px}
+  #play .r{display:flex;gap:14px} #play button{height:96px;font-size:28px;padding:0 10px}
+  body.auto #ctl{display:none}
+  #cta{position:absolute;left:64px;top:420px;width:952px;padding:22px 28px;border-radius:18px;background:var(--orange);color:#111;font:800 44px/1.05 var(--hook);letter-spacing:1px;text-transform:uppercase;opacity:0;transform:translateY(16px)}
+</style>
+</head>
+<body class="demo" data-demo="fault-finding" data-next-demo="frame-sync.html">
+<a class="sbd-skip-link" href="#fit">Skip to the demo</a>
+<nav class="sbd-site-return" aria-label="Breadcrumb">
+  <a href="https://systembydave.com/">System by Dave</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <a href="./">AV by Dave demos</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <span class="sbd-site-return__current" aria-current="page">Was it the cable?</span>
+</nav>
+<div id="fit" tabindex="-1">
+  <div id="brand"><i style="background:#C0C000"></i><i style="background:#00C0C0"></i><i style="background:#3DDC97"></i><i style="background:#C000C0"></i><i style="background:#FF3B2F"></i><i style="background:#5AC8FA"></i>&nbsp;AV BY DAVE · 010</div>
+
+  <div id="step"><div id="stepNum">STEP 1 OF 7</div><div id="stepText"></div><div id="stepSub"></div></div>
+  <div id="cta">Found it. Now find yours → link in bio</div>
+  <div id="receipt">✓ AJA SUPPORT FAQ 7308 · U-TAP · TWO CABLES, TWO PORTS</div>
+
+  <div id="chain">
+    <div class="unit" id="uCam">CAMERA</div>
+    <div class="cable" id="c1"><div class="lab">CABLE 1</div></div>
+    <div class="unit" id="uBox">BOX</div>
+    <div class="cable" id="c2"><div class="lab">CABLE 2</div></div>
+    <div id="port"></div><div id="portLab">PORT</div>
+    <div id="screen"><div class="t">SCREEN</div><div id="noPic">NO SIGNAL</div><div id="bars"><i style="background:#C0C0C0"></i><i style="background:#C0C000"></i><i style="background:#00C0C0"></i><i style="background:#00C000"></i><i style="background:#C000C0"></i><i style="background:#C00000"></i><i style="background:#0000C0"></i></div></div>
+    <div id="case">THE CASE <b id="caseN">0</b> PARTS</div>
+    <div class="tape" id="tape">BAD PORT</div>
+  </div>
+
+  <div id="read">
+    <div class="ro" id="roActs"><b>MOVES</b><span id="vActs">0</span></div>
+    <div class="ro" id="roSus"><b>COULD STILL BE</b><div id="sus"><div class="s" data-k="c1">CABLE 1</div><div class="s" data-k="box">BOX</div><div class="s" data-k="c2">CABLE 2</div><div class="s" data-k="port">PORT</div></div></div>
+  </div>
+
+  <div id="ctl">
+    <button id="next" class="primary">NEXT</button>
+    <div id="play">
+      <div class="r"><button id="bC1">SWAP CABLE 1</button><button id="bBox">SWAP BOX</button><button id="bC2">SWAP CABLE 2</button><button id="bPort">RE-PLUG PORT</button></div>
+      <div class="r"><button id="bAll">SWAP ALL</button><button id="bUndo">UNDO LAST</button><button id="bNew" class="primary">NEW FAULT</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/vendor/gsap.min.js"></script>
+<script>
+(() => {
+  const fit = document.getElementById('fit');
+  if (/[?&](drive|auto)(=|&|$)/.test(location.search)) document.body.classList.add('capture');
+  const resize = () => { if (window.sbdLayout) return window.sbdLayout(); const s = Math.min(innerWidth/1080, innerHeight/1920); fit.style.transform = `translate(-50%,-50%) scale(${s})`; };
+  addEventListener('resize', resize); resize();
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const D = reduce ? 0.01 : 1;
+
+  // ---------- the model ----------
+  // Four things can be wrong: cable 1, the box, cable 2, or a loose port on the screen.
+  // Swapping a part replaces it with a spare. Swapping cable 2 or re-plugging also re-seats the port.
+  const KEYS = ['c1', 'box', 'c2', 'port'];
+  let fault = 'port';
+  let state = { c1: 'orig', box: 'orig', c2: 'orig', seated: false };
+  let history = [];      // actions taken since the last reset, for undo and for the suspects list
+  let moves = 0;
+  let showRead = false;
+
+  function pictureFor(f, st) {
+    if (f === 'port') return st.seated;
+    return st[f] === 'spare';
+  }
+  function apply(st, action) {
+    const n = { ...st };
+    if (action === 'c1' || action === 'box') n[action] = n[action] === 'orig' ? 'spare' : 'orig';
+    if (action === 'c2') { n.c2 = n.c2 === 'orig' ? 'spare' : 'orig'; n.seated = true; }
+    if (action === 'port') n.seated = true;
+    if (action === 'all') { n.c1 = 'spare'; n.box = 'spare'; n.c2 = 'spare'; n.seated = true; }
+    return n;
+  }
+  // undo an action on a state (puts the old part back; touching the screen end re-seats the port again)
+  function unapply(st, k) {
+    const n = { ...st };
+    if (k === 'all') return { c1: 'orig', box: 'orig', c2: 'orig', seated: true };
+    if (k === 'port') { n.seated = true; return n; }
+    n[k] = n[k] === 'orig' ? 'spare' : 'orig'; if (k === 'c2') n.seated = true; return n;
+  }
+  // which faults are still consistent with everything seen so far?
+  function suspects() {
+    const out = [];
+    for (const f of KEYS) {
+      let st = { c1: 'orig', box: 'orig', c2: 'orig', seated: false }, ok = pictureFor(f, st) === false; // it started black
+      for (const a of history) { st = a.undo ? unapply(st, a.action.slice(5)) : apply(st, a.action); if (pictureFor(f, st) !== a.saw) ok = false; }
+      if (ok) out.push(f);
+    }
+    return out;
+  }
+
+  // ---------- the view ----------
+  function paintParts() {
+    for (const k of ['c1', 'box', 'c2']) {
+      const el = $(k === 'box' ? 'uBox' : k);
+      el.classList.toggle('spare', state[k] === 'spare');
+    }
+  }
+  let deadPulse = null;
+  function showPicture(on) {
+    if (deadPulse) { deadPulse.kill(); deadPulse = null; }
+    if (!on) deadPulse = gsap.fromTo('#screen', { borderColor: '#2A3140' }, { borderColor: '#FF3B2F', duration: 0.5 * D, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 0.8 * D });
+    gsap.to('#bars', { opacity: on ? 1 : 0, duration: 0.25 * D });
+    gsap.to('#noPic', { opacity: on ? 0 : 1, duration: 0.25 * D });
+    gsap.fromTo('#screen', { borderColor: on ? '#3DDC97' : '#FF3B2F' }, { borderColor: '#2A3140', duration: 0.8 * D });
+  }
+  function paintSuspects() {
+    const s = suspects();
+    for (const el of document.querySelectorAll('#sus .s')) {
+      const k = el.dataset.k; el.classList.toggle('out', !s.includes(k)); el.classList.toggle('found', s.length === 1 && s[0] === k);
+    }
+  }
+  let caseN = 0;
+  function toCase(fromEl) {
+    // a swapped-out part drops into the case
+    const r = fromEl.getBoundingClientRect(), c = $('chain').getBoundingClientRect(), sc = c.width / 952;
+    const chip = document.createElement('div'); chip.className = 'chip'; $('chain').appendChild(chip);
+    gsap.set(chip, { x: (r.left - c.left) / sc + (r.width / sc) / 2 - 20, y: (r.top - c.top) / sc + (r.height / sc) / 2 - 26 });
+    gsap.to(chip, { x: 60 + caseN * 48, y: 440, rotation: gsap.utils.random(-20, 20), duration: 0.6 * D, ease: 'power2.in', onComplete: () => { chip.remove(); caseN++; $('caseN').textContent = caseN; gsap.fromTo('#case', { scale: 1.04 }, { scale: 1, duration: 0.25 * D }); } });
+  }
+  function reseatFlash() { gsap.fromTo('#port', { scale: 1.6 }, { scale: 1, duration: 0.35 * D, ease: 'back.out(2)' }); }
+
+  function doAction(action, { silent } = {}) {
+    const before = { ...state };
+    state = apply(state, action);
+    moves++; $('vActs').textContent = moves;
+    if (action === 'all') { for (const k of ['c1', 'box', 'c2']) if (before[k] === 'orig') toCase($(k === 'box' ? 'uBox' : k)); reseatFlash(); }
+    else if (action === 'port') reseatFlash();
+    else { if (before[action] === 'orig') toCase($(action === 'box' ? 'uBox' : action)); if (action === 'c2') reseatFlash(); }
+    paintParts();
+    const saw = pictureFor(fault, state);
+    history.push({ action, saw });
+    gsap.delayedCall(0.35 * D, () => { showPicture(saw); paintSuspects(); });
+  }
+  function undo() {
+    if (!history.length) return;
+    const last = history[history.length - 1];
+    const k = last.undo ? null : last.action;
+    if (!k) return;                       // undoing an undo is just the swap again; use the swap button
+    // the original swap stays in the history: the undo is a second observation, not an erasure
+    state = unapply(state, k);
+    moves++; $('vActs').textContent = moves;
+    if (k === 'c2' || k === 'all' || k === 'port') reseatFlash();
+    paintParts();
+    const saw = pictureFor(fault, state);
+    history.push({ action: 'undo:' + k, saw, undo: true });
+    gsap.delayedCall(0.35 * D, () => { showPicture(saw); paintSuspects(); });
+  }
+
+  function reset(newFault) {
+    fault = newFault; state = { c1: 'orig', box: 'orig', c2: 'orig', seated: false }; history = []; moves = 0; caseN = 0;
+    $('vActs').textContent = 0; $('caseN').textContent = 0;
+    for (const el of document.querySelectorAll('.unit, .cable, #port')) el.classList.remove('spare', 'bad', 'ok');
+    gsap.set('#tape', { opacity: 0 }); paintSuspects(); showPicture(false);
+  }
+
+  // actions a step schedules are cancelled if the viewer moves on before they fire
+  let stepCalls = [];
+  const later = (sec, fn) => stepCalls.push(gsap.delayedCall(sec, fn));
+
+  // ---------- the story ----------
+  // One scenario all the way through: the port is loose.
+  const steps = [
+    { text: 'THE SCREEN IS <em>BLACK.</em>', sub: 'Camera, cable, box, cable, screen. One of them is broken. You don\'t know which.',
+      enter() { reset('port'); } },
+    { text: 'SWAP EVERYTHING AND YOU LEARN <em>NOTHING.</em>', sub: 'Picture\'s back. Great. The broken part just went into the case for the next show.',
+      enter() { later(0.8 * D, () => doAction('all')); later(2.2 * D, () => { showRead = true; gsap.to('#read', { opacity: 1, duration: 0.4 * D }); }); } },
+    { text: 'SWAP ONE THING. LOOK. THEN THE <em>NEXT.</em>', sub: 'Each swap crosses a suspect off the list. Watch the list shrink.',
+      enter() { reset('port'); later(0.8 * D, () => doAction('c1')); later(2.0 * D, () => doAction('box')); later(3.2 * D, () => doAction('c2')); } },
+    { text: 'A CABLE SWAP ALSO RE-PLUGS THE <em>PORT.</em>', sub: 'So "new cable fixed it" might mean the plug was loose. Two suspects, one move.',
+      enter() { later(0.6 * D, () => { reseatFlash(); gsap.fromTo('#port', { borderColor: '#FF5A1F' }, { borderColor: '#FFC531', duration: 1.2 * D }); }); } },
+    { text: 'PUT THE OLD CABLE BACK. STILL WORKS? IT WAS THE <em>PORT.</em>', sub: 'The undo is the test. It costs nothing and it settles the argument.',
+      enter() { later(1.0 * D, () => undo()); later(2.4 * D, () => { $('port').classList.add('bad'); }); } },
+    { text: 'THAT\'S WHY THE MANUAL SAYS TWO CABLES, <em>TWO PORTS.</em>', sub: 'Try each one on its own before you blame either. One swap is a guess.',
+      enter() {} },
+    { text: '"IT WAS THE CABLE" IS A GUESS UNTIL YOU <em>PROVE IT.</em>', sub: 'Prove it, then tape the bad part and label it. Future you says thanks.',
+      enter() { gsap.to('#receipt', { opacity: 1, duration: 0.5 * D }); later(0.8 * D, () => gsap.fromTo('#tape', { opacity: 0, scale: 1.4, rotation: -8 }, { opacity: 1, scale: 1, rotation: -8, duration: 0.3 * D, ease: 'back.out(2)' })); } },
+  ];
+  const endCard = { text: 'PLAY WITH IT. <em>LINK IN BIO.</em>', sub: 'Random fault. Find it in as few moves as you can.', enter() {} };
+  let si = -1, cutLabel = null;
+  const track = (name, data) => { if (window.sbdTrack && !cutLabel) window.sbdTrack(name, Object.assign({ demo: document.body.dataset.demo }, data || {})); };
+  function goStep(i, instant, override) {
+    if (!cutLabel) { if (i === 1) track('demo_start'); if (i === 3) track('demo_step_4'); if (i === steps.length - 1 && window.sbdComplete) window.sbdComplete(); }
+    si = i; const base = i === steps.length ? endCard : steps[i]; const s = override ? { ...base, ...override } : base;
+    stepCalls.forEach(c => c.kill()); stepCalls = [];
+    $('stepNum').textContent = cutLabel ? cutLabel(i) : `STEP ${i + 1} OF ${steps.length}`;
+    if (instant) {
+      $('stepText').innerHTML = s.text; $('stepSub').textContent = s.sub; s.enter();
+      if (s.textAfter) { gsap.set('#stepText, #stepSub', { opacity: 0, y: 12 }); gsap.to('#stepText, #stepSub', { opacity: 1, y: 0, duration: 0.35 * D, delay: s.textAfter / 1000, ease: 'expo.out' }); }
+      else gsap.set('#stepText, #stepSub', { opacity: 1, y: 0 });
+    } else {
+      const tl = gsap.timeline();
+      tl.to('#stepText, #stepSub', { opacity: 0, y: -10, duration: 0.18 * D })
+        .add(() => { $('stepText').innerHTML = s.text; $('stepSub').textContent = s.sub; s.enter(); })
+        .fromTo('#stepText', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45 * D, ease: 'expo.out' })
+        .fromTo('#stepSub', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45 * D, ease: 'expo.out' }, '-=0.3');
+    }
+    $('next').textContent = i === steps.length - 1 ? 'PLAY WITH IT' : 'NEXT';
+    if (i === steps.length - 1) $('next').onclick = () => { $('ctl').classList.add('free'); newFault(); track('play_start'); };
+  }
+  $('next').onclick = () => goStep(Math.min(si + 1, steps.length - 1));
+  addEventListener('keydown', e => { if (e.key === 'ArrowRight' && si < steps.length - 1) goStep(si + 1); });
+
+  // ---------- auto-play cuts ----------
+  // cuts: [step index, ms, override?]. Both cuts open on the failure (the dead screen) with the question over it.
+  const open = { text: 'WHICH ONE IS <em>BROKEN?</em>', sub: 'Camera, cable, box, cable, screen. One of them. You don\'t know which.', textAfter: 500 };
+  const cuts = {
+    full:   { steps: [[0, 4000, open], [1, 5000], [2, 6000], [3, 5000], [4, 5500], [5, 4500], [6, 5000]], cta: 3000 },
+    main:   { steps: [[0, 4000, open], [1, 5000], [2, 6000], [3, 5000], [4, 5500], [5, 4500], [6, 5000]], cta: 3000 },
+    teaser: { steps: [[0, 4000, open], [1, 4500], [2, 6000]], cta: 3000 },
+  };
+  function runCut(name) {
+    const cut = cuts[name]; if (!cut) return false;
+    document.body.classList.add('auto');
+    const total = cut.steps.length;
+    const order = cut.steps.map(x => x[0]);
+    cutLabel = i => `${order.indexOf(i) + 1} / ${total}`;
+    const first = cut.steps[0][0];
+    for (let i = 0; i < first; i++) steps[i].enter();
+    let at = 0;
+    cut.steps.forEach(([idx, ms, ov], k) => { if (k === 0) goStep(idx, true, ov); else gsap.delayedCall(at / 1000, () => goStep(idx, false, ov)); at += ms; });
+    if (cut.hold) at += cut.hold;
+    if (cut.cta) gsap.delayedCall((at - cut.cta) / 1000, () => {
+      // the CTA takes the subtitle's place under the hook, so it never sits on the picture
+      const r = $('stepText').getBoundingClientRect(), f = $('fit').getBoundingClientRect(), sc = f.width / 1080;
+      $('cta').style.top = Math.round((r.bottom - f.top) / sc + 24) + 'px';
+      gsap.to('#stepSub', { opacity: 0, duration: 0.2 * D });
+      gsap.to('#cta', { opacity: 1, y: 0, duration: 0.4 * D, ease: 'expo.out', delay: 0.15 * D });
+    });
+    gsap.delayedCall(at / 1000, () => { if (window.hr) window.hr.done = true; });
+    if (window.hr) { window.hr.cutLength = at; window.hr.coverAt = 6600; }   // cover: everything swapped, picture back
+    return true;
+  }
+
+  // ---------- free play ----------
+  function newFault() { reset(KEYS[Math.floor(Math.random() * KEYS.length)]); showRead = true; gsap.to('#read', { opacity: 1, duration: 0.3 * D }); }
+  $('bC1').onclick = () => doAction('c1'); $('bBox').onclick = () => doAction('box'); $('bC2').onclick = () => doAction('c2');
+  $('bPort').onclick = () => doAction('port'); $('bAll').onclick = () => doAction('all'); $('bUndo').onclick = () => undo(); $('bNew').onclick = () => newFault();
+
+  // ---------- clocks ----------
+  if (new URLSearchParams(location.search).has('drive')) {
+    gsap.ticker.remove(gsap.updateRoot);
+    gsap.ticker.sleep();
+    let rootT = 0;
+    window.hr = { advance(ms) { let s = ms / 1000; while (s > 0) { const step = Math.min(s, 0.05); rootT += step; gsap.updateRoot(rootT); s -= step; } }, time: () => rootT };
+  } else {
+    window.hr = { time: () => gsap.globalTimeline.time(), mode: 'realtime' };
+  }
+  const autoCut = new URLSearchParams(location.search).get('auto');
+  if (!(autoCut && runCut(autoCut))) goStep(0);
+})();
+</script>
+<script src="demo-shell.js"></script>
+</body>
+</html>

@@ -186,3 +186,49 @@ standalone routes still live; they redirect in C.
 6. After slice C, every retired route answers with a redirect stub, is absent
    from Toolbox, sitemap, offline assets and public counts, and
    `verify:public-consistency` passes with the new counts.
+
+## Gear panel candidate (October 17, 2026)
+
+The chooser adds a Gear 3D group with original ETC Ion and Universal 2×20
+views. `?gear=ion` or `?gear=wing` requests the panel in the current workspace.
+The original Ion Workbench remains owner-private at its existing Site origin.
+Only that origin is added to frame-src. A frame load alone never reports ready: a
+versioned, source-window and exact-origin checked message handshake is required.
+A missing handshake offers Open full and Retry so authentication or an embedding
+policy failure cannot appear to be an empty working model. No credentials or
+show context are sent to the viewer.
+
+Panel snapshots are device-local under `sbd.avSuite.gear.v1:<view,panel>`: camera,
+selected component, inspector and practice levels. Existing show documents and
+workspace schemas are unchanged. Layout exports preserve the gear panel type and
+arrangement; camera snapshots are not yet included in exported layouts. This is
+an explicit follow-up, not a portable-state claim.
+
+The viewer is remote and online-only; its assets are not added to the AV offline
+cache. Host code does not bundle another Three.js release. The two apps retain
+separate rendering realms. The candidate requires actual authenticated embedding
+acceptance at avbydave.com plus the usual responsive/browser/release gates before
+merge. A signed-in top-level Ion page does not prove third-party-frame access.
+
+Adapter source: Ion Workbench revision 0.9, `panel-host.js`, `panel-contract.js` and
+`panel-host.css`. Copy these three files together when upgrading the contract.
+
+### SmartFade 1248 candidate (19 October 2026)
+
+The additive `gear:smartfade1248` panel (and independent `gear:smartfade1248-second` choice) and `?gear=smartfade1248` launch use the
+same private Ion Site and origin/source/session-bound panel host. Existing Ion
+and wing URLs, equipment identity and saved-state keys are retained. SmartFade
+snapshots use equipment `etc-smartfade-1248` and a separate equipment/view/panel
+key. Its scoped view and panel IDs are sent as opaque viewer namespace parameters,
+without show context or credentials. The viewer must contain the SmartFade
+adapter before this host candidate can be released.
+
+This is a prototype inspection model: 24 main plus four auxiliary sliders,
+separate bump/function keys and a wheel/LCD/SD opening. Physical slider position
+is not simulated output. Rear socket placement, exact travel, historical Ion
+bookmarks, Surface/iPad touch and authenticated production embedding remain
+unverified. No practice emulation, live output or portable snapshot export is
+claimed. This candidate is stacked on PR351 and cannot merge ahead of its parent
+or bypass its authenticated/device release gates.
+
+The existing workspace focuses an already-open panel type. Two explicit SmartFade instance choices therefore provide simultaneous independent desks without changing shared layout behavior. Both use the same canonical equipment ID; neither assigns an ECOG patch or simulated output.

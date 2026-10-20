@@ -1,5 +1,36 @@
 # AV Calculator application slice
 
+## Skip-link revalidation — 2026-10-18
+
+**AVV-05: superseded for the current standalone Calculator.** Reviewed source
+and production both name `a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb`.
+This is a finding closure, not a runtime repair or full accessibility acceptance.
+
+The historical risk came from `AVViewport.tabs().fromLocation()`: an unknown
+hash falls back to the first tab. The current native Calculator uses
+`apps/av-calculator/src/App.tsx` instead. Its hash handler selects a panel only
+when the hash matches a known library type; `#main-content` does not select
+another task. Its bridge uses `AVViewport.paginate`, not `AVViewport.tabs`.
+The old helper's behavior remains outside this finding's verified route.
+
+Dominic ran a focused live Chromium probe with Playwright 1.63.0 in disposable
+contexts at 1440×900 and 375×812. First Tab reached **Skip to calculators**.
+For each size, open `/av-calculator.html#storageCard` (Video view) and
+`/av-calculator.html#powerCard` (Power view), use Shift+Tab to reach the skip
+link, then Enter. All four cases changed the hash to `#main-content`, focused
+that main element, preserved the selected view and visible panels, and left
+the complete synthetic browser storage snapshot byte-identical. No page errors
+were observed; desktop and phone screenshots were inspected.
+
+The live Calculator bundle SHA-256 was
+`383a5e8fe1347cd962fd76cc5b7706c540f3273fdbb2e7caf4bd61ed32fd9f6a`;
+the shared viewport helper was
+`3ad4c2eb54518dd7e4a1578d70b8f90d16aa8a5cfb19251d28d66a0222213d21`.
+Both matched the reviewed source. No runtime, saved values, layout, route or
+test suite changed. The fixture used no existing browser profile or user data.
+Physical keyboard/device and screen-reader acceptance remain separate;
+AVV-06 compatibility, AVV-13 navigation and all product choices remain open.
+
 ## Native panel workspace brief — 2026-10-12
 
 The accepted product direction is AV Video's configurable touch workspace

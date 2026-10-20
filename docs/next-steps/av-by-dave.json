@@ -1,0 +1,270 @@
+{
+  "id": "house-reference",
+  "name": "AV by Dave (video engineering concept demos → Instagram page)",
+  "status": "amber",
+  "head": "DaveHomeAssist/system-by-dave branch demos-hosting (PR #360); demos/ in that repo is now the source of truth",
+  "lastActivity": "2026-10-20",
+  "statusReason": "Demos hosted: PR #360 adds /demos/ (hub, frame-sync, fault-finding) to systembydave.com with the public shell, canonical/social metadata, CSP, self-hosted fonts, sitemap entries, vendored GSAP, optional Umami events and a post-completion email ask (both inert until config.js is filled). All site gates pass locally; both pages verified interactive and in capture mode. Awaiting CI and merge; Dave must supply the Umami website ID and the email form action.",
+  "nextStep": "Merge PR #360 when green; Dave fills demos/config.js (Umami website ID; email provider form action; optional checklist URL); then set the bio link to https://systembydave.com/demos/?utm_source=instagram&utm_medium=profile&utm_campaign=launch&utm_content=profile and post.",
+  "findings": [
+    {
+      "id": "HR-01",
+      "date": "2026-10-17",
+      "finding": "Existing story cards are textbook figures with no hook; the picture is secondary. Direction v1 inverts priority: hook and picture first, fact second, citation last.",
+      "state": "accepted direction"
+    },
+    {
+      "id": "HR-02",
+      "date": "2026-10-17",
+      "finding": "Hook size must be 100 px at Archivo width 80 with ≤ 20 characters per line to fit the 950 px core; 136 px / width 88 overflows (measured 1237 px).",
+      "state": "measured"
+    },
+    {
+      "id": "HR-03",
+      "date": "2026-10-17",
+      "finding": "Reels safe-zone pixel figures differ across third-party guides; system designed to the strict 14/35/6 percent case pending Meta confirmation.",
+      "state": "open"
+    },
+    {
+      "id": "HR-04",
+      "date": "2026-10-17",
+      "finding": "Archive currently stores editions as JSON inside one HTML file; reel pipeline needs per-edition folders. Archive restyle deferred until after pilot.",
+      "state": "proposed"
+    },
+    {
+      "id": "HR-05",
+      "date": "2026-10-17",
+      "finding": "v1 palette (warm near-black, cream paper) read as brown; Archivo + JetBrains Mono rejected. Replaced by three explorations; B overflow at 168 px fixed to 150 px four-line hook (measured).",
+      "state": "open, awaiting pick"
+    },
+    {
+      "id": "HR-06",
+      "date": "2026-10-17",
+      "finding": "Static cards and style explorations rejected as boring. The product is now interactive, narrated concept demos built with GSAP; one plain sentence per step, animation proves each sentence (mom test).",
+      "state": "accepted direction"
+    },
+    {
+      "id": "HR-07",
+      "date": "2026-10-17",
+      "finding": "GSAP gotcha: a tweened property named 'delay' is swallowed as the tween's own delay option; renamed to 'wait'. Wait is measured at the hand-over tick, not at screen arrival, so it stays inside 0–1 frame in minimum mode.",
+      "state": "fixed"
+    },
+    {
+      "id": "HR-08",
+      "date": "2026-10-17",
+      "finding": "Every-state check found a story bug (tearing began at step 2 before 'plug it in'), frames spawning over the CAMERA label, pipeline labels under frames, drops falling through a caption, stacked arrivals, and copies spawning on stage-1 frames. All fixed; the waiting room is now modelled as a frame store that keeps its frame and outputs copies, which is also more accurate.",
+      "state": "fixed, verified"
+    },
+    {
+      "id": "HR-09",
+      "date": "2026-10-17",
+      "finding": "GSAP's ticker stops when the browser pane is hidden, which silently invalidated one check run (zero drops over a 70 s soak). The demo now has a manual clock (gsap.ticker.sleep + gsap.updateRoot) behind ?drive, and the checker flags stalled runs.",
+      "state": "fixed"
+    },
+    {
+      "id": "HR-10",
+      "date": "2026-10-17",
+      "finding": "Name 'House Reference' rejected as an insider-only joke. Parked; plain-English options due once the format is settled.",
+      "state": "open"
+    },
+    {
+      "id": "HR-11",
+      "date": "2026-10-17",
+      "finding": "Auto cuts scheduled on GSAP's clock; first step rendered synchronously so frame 0 carries the hook; camera pre-armed so the tear lands at 0.8 s. capture.mjs steps the manual clock per frame, screenshots the stage, encodes with ffmpeg; cover = tear + 8 frames. Runs in house-reference-capture:pw1.63 on Dominic (~5 fps render).",
+      "state": "built, verified"
+    },
+    {
+      "id": "HR-12",
+      "date": "2026-10-17",
+      "finding": "First renders ran the step schedule ~2× fast: gsap.ticker.sleep() is not a manual clock because the ticker wakes when animations are created; headless Chromium's rAF advanced timelines on top of hr.advance(). Fixed with gsap.ticker.remove(gsap.updateRoot). Local checks missed it because the hidden browser pane has no rAF. Checker now records step-change times.",
+      "state": "fixed, verified on re-render"
+    },
+    {
+      "id": "HR-13",
+      "date": "2026-10-17",
+      "finding": "Second concept demo built: design/demos/fault-finding.html (troubleshooting). Fact: a cable swap also re-plugs the port, so one swap cannot separate a damaged cable from an unreliable port; AJA Support FAQ 7308 (U-TAP) says try at least two different cables and two different ports and a known-good cable. Demo models four faults, a shrinking suspects list computed from observations, undo as a test, swap-all as the anti-pattern. Every-state check: 3,520 samples, 0 overlaps/outside/screen leaks/errors.",
+      "state": "built, verified"
+    },
+    {
+      "id": "HR-14",
+      "date": "2026-10-17",
+      "finding": "The scheduled 08:00 daily run (another session) appended edition 9 to the archive at 08:06 with a different troubleshooting fact (Equalizer Reach Is Not a Cable Guarantee, AJA FiDO 3G manual) and story card 009. The demo was relabeled edition 010 to avoid colliding with the record; the archive was not modified by this session.",
+      "state": "noted"
+    },
+    {
+      "id": "HR-15",
+      "date": "2026-10-17",
+      "finding": "Checker made demo-agnostic (presses every #play control, sets sliders min/mid/max, random-press soak; tear element optional). Cuts are index-based so a cut can skip a step; pages declare hr.coverAt. Step actions scheduled via later() are cancelled on step change.",
+      "state": "built"
+    },
+    {
+      "id": "HR-16",
+      "date": "2026-10-17",
+      "finding": "Name decided by Dave: AV by Dave. Brand line on demos and reels is 'AV BY DAVE · <edition>'. House Reference retired as a working title.",
+      "state": "decided"
+    },
+    {
+      "id": "HR-17",
+      "date": "2026-10-17",
+      "finding": "Stage One research (Dave's, Socialinsider 2026 datasets) applied: main reel = full ~35 s run; cuts open on the failure at frame zero with the question set in over the motion at 0.5 s; CTA overlays the final picture (no end card). Carousel-for-saves and categorizing covers noted as follow-ups.",
+      "state": "applied, re-render pending"
+    },
+    {
+      "id": "HR-18",
+      "date": "2026-10-17",
+      "finding": "Re-render verified: frame-sync main 35 s (tear on frame 1, question in by 0.9 s, steps at 5/9/13/18/24/29 s), teaser 13 s; fault-finding main 35 s (dead screen pulsing from frame zero, steps at 4/9/15/20/25.5/30 s), teaser 14.5 s. CTA replaces the subtitle under the hook in the last 3–3.5 s so it never covers the picture.",
+      "state": "verified"
+    },
+    {
+      "id": "HR-19",
+      "date": "2026-10-20",
+      "finding": "Hosting: demos moved into system-by-dave under demos/ (hub + two pages). Site contracts required: skip link first, .sbd-site-return breadcrumb, shared nav CSS/JS, canonical, description, theme-color, CSP meta, og/twitter set, no Google Fonts on sitemap routes (fonts self-hosted as latin woff2 subsets), vendored GSAP. demo-shell.js lays the stage out around the bar and completion panel; in ?drive/?auto the shell is hidden and layout is unchanged (verified: step times identical, teaser re-rendered on Dominic from the synced tree).",
+      "state": "built; PR #360 open"
+    },
+    {
+      "id": "HR-20",
+      "date": "2026-10-20",
+      "finding": "Regression found: frame-sync had lost its NEXT click handler and arrow-key listener in the 10-17 cut rework, and the every-state sweep passed anyway because it never asserted a step changed. Restored; checker now presses NEXT and fails on a stuck step (findings.stuck).",
+      "state": "fixed, verified"
+    }
+  ],
+  "phases": [
+    {
+      "name": "Direction v1",
+      "state": "written, rendered, reviewed in browser",
+      "evidence": "design/Design Direction v1.html"
+    },
+    {
+      "name": "Frame-sync concept demo (GSAP, 7 steps, free play)",
+      "state": "built; passes every-state check; not reviewed by Dave on phone",
+      "evidence": "design/demos/frame-sync.html"
+    },
+    {
+      "name": "Auto-play cuts + Dominic capture pipeline",
+      "state": "built; renders verified against schedule",
+      "evidence": "design/demos/out/frame-sync-main.mp4, frame-sync-teaser.mp4, *.json receipts, labels-main.png"
+    },
+    {
+      "name": "Edition 010 fault-finding demo + cuts",
+      "state": "built; passes every-state check; renders in progress at record time",
+      "evidence": "design/demos/fault-finding.html"
+    },
+    {
+      "name": "Edition 9 pilot (reel, cover, card, feed crop, checks)",
+      "state": "proposed"
+    },
+    {
+      "name": "Archive page restyle to House Reference system",
+      "state": "deferred"
+    },
+    {
+      "name": "Move project into a git repository under ~/Code and register on the board",
+      "state": "proposed"
+    }
+  ],
+  "files": [
+    "design/demos/frame-sync.html",
+    "design/demos/fault-finding.html",
+    "design/demos/check-states.js",
+    "design/Design Direction v1.html",
+    "design/Style Explorations.html",
+    "outputs/Video Engineering Daily Archive.html",
+    "outputs/Story Cards/",
+    "work/exportStories.cjs",
+    "work/verifyIllustrations.cjs",
+    "design/demos/capture.mjs",
+    "design/demos/README.md",
+    "design/demos/out/"
+  ],
+  "decisionsForDave": [
+    {
+      "id": "HR-D7",
+      "question": "Email provider for the post-demo ask",
+      "options": [
+        "A. Buttondown (recommended): plain-HTML form action https://buttondown.com/api/emails/embed-subscribe/<username>, field 'email'; free tier historically up to 100 subscribers (verify current pricing)",
+        "B. Kit (ConvertKit): paste the HTML embed's form action + field name into config.js",
+        "C. Something else: give me the form action URL and the email field name"
+      ],
+      "status": "open",
+      "unlocks": "the email ask goes live"
+    },
+    {
+      "id": "HR-D8",
+      "question": "Umami Cloud",
+      "options": [
+        "A. Create a free Umami Cloud (Hobby) account, add systembydave.com, paste the website ID into demos/config.js (recommended)",
+        "B. Plausible instead (paid): I adapt demo-shell.js"
+      ],
+      "status": "open",
+      "unlocks": "all demo events"
+    },
+    {
+      "id": "HR-D6",
+      "question": "Numbering: the daily run owns the archive sequence (it wrote 009 today). Should demos follow the archive numbers (one demo per archive fact) or run their own sequence?",
+      "options": [
+        "A. Demos follow the archive: next demo animates the archive's current fact (recommended)",
+        "B. Demos run their own sequence (010, 011…) independent of the archive",
+        "C. Replace the archive's 009 with the two-cables fact"
+      ],
+      "status": "open",
+      "unlocks": "how the 08:00 run and the demo pipeline connect"
+    },
+    {
+      "id": "HR-D5",
+      "question": "Is the interactive narrated demo the product (reel = screen capture of it, page = the demos themselves)?",
+      "options": [
+        "A. Yes, build one demo per fact (recommended)",
+        "B. Demos as a bonus, cards remain primary",
+        "C. Different format entirely"
+      ],
+      "status": "open",
+      "unlocks": "the per-edition production pipeline"
+    },
+    {
+      "id": "HR-D0",
+      "question": "Which visual direction?",
+      "options": [
+        "B. Broadcast: cool graphite, international orange, Barlow Condensed caps (recommended, with C's track-color bar borrowed)",
+        "A. Signal: neutral black, white, red/cyan, Unbounded",
+        "C. Track Color: saturated ground per track, black type, Bricolage Grotesque"
+      ],
+      "status": "open",
+      "unlocks": "rewrite of Direction v1 color and type, then the edition 9 pilot"
+    },
+    {
+      "id": "HR-D2",
+      "question": "Instagram cadence",
+      "options": [
+        "A. Five reels Mon–Fri + Sunday recap carousel, Saturday dark (recommended)",
+        "B. Daily seven days",
+        "C. Three per week"
+      ],
+      "status": "open",
+      "unlocks": "schedule design for the daily run"
+    },
+    {
+      "id": "HR-D3",
+      "question": "Audio",
+      "options": [
+        "A. Silent, decide after pilot (recommended)",
+        "B. Single tick sting from day one"
+      ],
+      "status": "open",
+      "unlocks": "nothing before pilot"
+    }
+  ],
+  "context": "Decided by Dave on 2026-10-17: reel + static card from one source (1a); illustrated metaphor vector house style with diagram as reveal (2a); dry show-site humor, one joke per edition (3a); name delegated. Name decided 2026-10-17: AV by Dave.",
+  "verify": "Open design/Design Direction v1.html; confirm wordmark, type scale, safe-zone diagram and edition 8 mock render without overflow at desktop and phone widths.",
+  "links": {
+    "direction": "design/Design Direction v1.html",
+    "archive": "outputs/Video Engineering Daily Archive.html",
+    "explorations": "design/Style Explorations.html"
+  },
+  "kickoffPrompt": "Build the next House Reference concept demo on the troubleshooting track in the same form as design/demos/frame-sync.html: a 7-step guided GSAP simulation at 1080×1920, one plain sentence per step (mom test), the animation proves each sentence, a live readout, free-play controls, and a manufacturer-documented fact as the final step.",
+  "confidence": "medium: direction is specified and measured; production craft per edition is unproven",
+  "unknowns": [
+    "Meta's current Reels overlay percentages",
+    "Playwright screenshot appears one frame behind the DOM (cover taken 8 frames after tear onset as a workaround)",
+    "Buttondown current free-tier limit (docs seen were dated 2023)"
+  ]
+}

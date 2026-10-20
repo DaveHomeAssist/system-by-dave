@@ -1,3 +1,4 @@
+import { GEAR_PANELS, GearViewerPanel, gearHref } from './gear-panel/GearViewerPanel';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/Workspace";
 import { readLayout, writeLayout, type LayoutState } from "../../shared/av-console/drafts";
@@ -46,7 +47,7 @@ export function App() {
   }])));
   // PACKS is a module constant, so this hook order never changes between renders.
   const packs: Pack[] = PACKS.map(def => def.use(hosts[def.id]));
-  const library = useMemo(() => [...PACKS.flatMap(packLibrary), ...specialistLibrary()], []);
+  const library = useMemo(() => [...PACKS.flatMap(packLibrary), ...specialistLibrary(), ...GEAR_PANELS], []);
   const [initialViews] = useState(() => loadViews(localStorage, defaultViews(PACKS)));
   const [views, setViews] = useState<View[]>(initialViews.views);
   const [layoutPersist] = useState(() => {
@@ -67,10 +68,16 @@ export function App() {
     const ref = railRef(activeApp, activeTool);
     if (ref) window.dispatchEvent(new CustomEvent(RAIL_ACTIVE_EVENT, { detail: { ref } }));
   }, [ws.viewId, activeApp, activeTool]);
+  const requestedGearOpened = useRef(false);
   useEffect(() => {
     if (initialViews.error) setStatus({ app: "", text: initialViews.error, error: true });
     const requested = new URLSearchParams(location.search).get("app");
     if (requested) openApp(requested);
+    const gear = new URLSearchParams(location.search).get("gear");
+    if ((gear === "ion" || gear === "wing" || gear === "smartfade1248" || gear === "smartfade1248-second") && !requestedGearOpened.current) {
+      requestedGearOpened.current = true;
+      if (!ws.show(`gear:${gear}`)) setStatus({ app: "Gear 3D", text: "No room in this view. Add the gear panel to an empty workspace area.", error: true });
+    }
   }, []);
   function openApp(id: string): boolean {
     const current = viewsRef.current;
@@ -141,6 +148,11 @@ export function App() {
   }
   function render(type: string, panel: Panel) {
     const app = appOf(type), short = shortOf(type);
+    if (app === "gear" && (short === "ion" || short === "wing" || short === "smartfade1248" || short === "smartfade1248-second")) return {
+      body: <GearViewerPanel viewId={ws.viewId} panelId={panel.id} gear={short} theme={theme === "system" ? systemPalette : theme} />,
+      context: "Private gear viewer · local practice only",
+      actions: <a className="suite-app-open" href={gearHref(short)} target="_blank" rel="noopener noreferrer">Open full</a>,
+    };
     if (app === TOOL_PREFIX) {
       const tool = SPECIALISTS.find(entry => entry.id === short);
       if (!tool) return { body: <p className="muted">This tool is not available.</p> };

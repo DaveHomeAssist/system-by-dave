@@ -1,5 +1,40 @@
 # Changelog
 
+# Changelog
+
+## 2026-10-20 — AV by Dave interactive demos
+
+- Add `demos/`: the frame-sync (008) and fault-finding (010) concept demos as public, ungated pages with a hub at `/demos/`, the public shell (skip link, breadcrumb, shared nav), canonical URLs and sitemap entries. GSAP comes from the vendored build.
+- Add `demos/demo-shell.js` and `config.js`: optional Umami Cloud analytics (`demo_view`, `demo_start`, `demo_step_4`, `demo_complete`, `play_start`, `email_submit`, `checklist_interest`, `next_demo_click`), and a post-completion email ask that posts straight to the provider. Both stay off until `config.js` is filled in.
+- Carry the demo pipeline here: `check-states.js` (every-state layout check), `capture.mjs` (frame-by-frame reel render on Dominic) and the README. Capture and checks run with the shell hidden, so rendered frames are unchanged.
+
+## SmartFade 1248 integration candidate — 2026-10-19
+
+- Add a distinct SmartFade 1248 prototype panel through the existing private gear viewer registration and handshake. Isolate its snapshots by equipment, workspace view and panel without changing Ion keys.
+- Publish the inspection prototype on explicit user authorization. Rear geometry and fader travel remain approximate; practice, physical-device and reference-accurate acceptance stay open.
+
+## 2026-10-17 — Gear panel integration candidate
+
+- Add Ion and Universal 2×20 to the workspace panel chooser with an internal viewer, checked handshake, access recovery and per-panel camera snapshots.
+- Keep Ion private and online-only. Authenticated cross-origin browser acceptance remains a release gate.
+- Update the AV Suite shell browser probe for the new Gear 3D chooser group (11 groups; Gear 3D panels render as framed viewers).
+- Fix the gear viewer loading/recovery overlay text colour: use host body text (`--text`) instead of the on-accent `--ink`, which was unreadable in both palettes.
+## 2026-10-18 — Theme probe document readiness
+
+- Wait for the navigated document to finish loading before seeding its stored theme or sampling theme contracts. Exclude the previous document while following client redirects; bound the wait to ten seconds and report the URL, document state and stylesheet status on failure.
+- A focused exact-source diagnostic demonstrated premature theme sampling in both StagePlotter modes. Five disposable browser cases cover delayed assets, client redirects, genuine wrong themes, missing CSS and an unfinished load. Existing theme/color/contrast assertions and application assets remain unchanged; the original publication failure is retained without claiming its entire cause was reproduced.
+
+## 2026-10-18 — Visibility probe on published AV pages
+
+- Load the fixture's workspace helper from the managed LED runtime, matching the AV destination's inline delivery. The documented deployed-origin command no longer requests a raw helper file that is not published there; the separate offline initializer stays outside the fixture.
+- Include the probe module in the existing workspace workflow's path filter. Chromium and WebKit pass the focused checks against published runtime f7dc459. Application assets, cache generation and saved-data contracts are unchanged; preserve the first failed fixture run and physical-device gaps.
+
+## 2026-10-18 — Shared paging visibility compatibility
+
+- Guard missing `Element.checkVisibility` in the two current shared paging helpers and active Cue Sheet/StagePlotter callbacks. Preserve the native default check where available; use layout boxes and hidden light-DOM ancestor contents as the fallback. Synthetic missing-method failures reproduced in live Calculator and LED before the repair.
+- Add a focused native/masked API regression to the existing workspace probe. Chromium and WebKit cover both helpers, paging/value preservation and the current standalone/shared-console consumers. Preserve physical older-device and minimum-OS policy gaps; no global polyfill or saved-data change.
+- Regenerate embedded workspace runtimes and the native suite bundle, and advance the existing offline cache generation and Stage 3D readiness pin together. Preserve CSS, calculation engines, routes, schemas, keys and original imports.
+
 ## 2026-10-18 — Frame sync demo and launch drafts (AV by Dave)
 
 - Add `frame-sync/`, a free seven-step interactive demo (published at `https://avbydave.com/frame-sync/` through the avbydave site's `pages`, in that site's sitemap; kept out of `av/`, which is the AV Suite build output): cause a screen tear (step 3), fix it with frame sync (step 4), then drift, genlock and a field check. Mobile-first, readable without JavaScript, reduced-motion start paused, `?autoplay=1` (4–6 s per step) and a `?capture=1` recording layout.

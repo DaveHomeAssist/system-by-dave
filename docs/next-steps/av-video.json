@@ -45,33 +45,6 @@
       "phase": 0
     },
     {
-      "id": "AVV-05",
-      "type": "nav",
-      "sev": "P2",
-      "title": "Skip link resets calculator to first task (hash routing)",
-      "detail": "Source still activates task zero when fromLocation cannot map the hash. The earlier skip-link observation is not re-tested here; preserve this follow-up rather than infer it fixed by broad passing matrices.",
-      "files": [
-        "js/av-viewport.js",
-        "av-calculator.html"
-      ],
-      "evidence": "code-read",
-      "phase": 0
-    },
-    {
-      "id": "AVV-06",
-      "type": "responsive",
-      "sev": "P2",
-      "title": "Unguarded Element.checkVisibility in shared paging runtime",
-      "detail": "Current shared AVViewport still calls Element.checkVisibility without feature detection. Older-iPad compatibility remains a source-level risk, not a reproduced physical-device failure.",
-      "files": [
-        "js/av-workspace.js",
-        "js/av-viewport.js",
-        "led-wall-calculator.html"
-      ],
-      "evidence": "code-read",
-      "phase": 0
-    },
-    {
       "id": "AVV-10",
       "type": "feature",
       "sev": "P2",
@@ -89,14 +62,15 @@
       "id": "AVV-13",
       "type": "nav",
       "sev": "P3",
-      "title": "Embedded nav from #238 uses a relative Toolbox link",
-      "detail": "Current embedded navigation still uses relative av-suite.html?entry=toolbox. Root-level migrated routes passed comparison; future subdirectory adoption requires explicit resolution and compatibility checks.",
+      "title": "Future subdirectory adoption needs explicit embedded navigation resolution",
+      "detail": "Revalidated at 885a3ab on 2026-10-18: current embedded navigation emits Home / and AV by Dave av/. Current consumers av-calculator.html, cue-sheet.html and stage-plot.html are root-level with no base element, so av/ resolves to https://avbydave.com/av/. Published files byte-match source; six current-route URL-resolution checks pass. The old Toolbox target is superseded. No present route defect found or runtime repair required. Before a future subdirectory route opts in, define destination/base resolution and verify compatibility; no such adoption is implemented or accepted by this record.",
       "files": [
         "js/sbd-nav.js",
         "css/av-viewport.css"
       ],
-      "evidence": "code-read",
-      "phase": 0
+      "evidence": "source/live-file parity and URL-resolution check; prior root-route browser comparisons retained",
+      "phase": 0,
+      "status": "Future adoption gate; current revalidation completed"
     },
     {
       "id": "AVV-14",
@@ -119,7 +93,7 @@
       "goal": "Close the confirmed coverage gap; revalidate recorded shell risks before fixes.",
       "items": [
         "AVV-02 delivered: theme, Calculator and navigation parity probes gate relevant PRs.",
-        "AVV-05 / AVV-06 / AVV-13: preserve hash, compatibility and subdirectory follow-ups."
+        "AVV-05 superseded by focused current Calculator keyboard/source proof; AVV-06 current feature-absence failure is repaired with focused native/masked API proof; physical older-device acceptance remains separate; AVV-13 current-route revalidation is complete, with only a future subdirectory adoption gate retained."
       ],
       "gate": "Relevant PR gate execution and focused regression proof; no weakened assertions."
     },
@@ -597,6 +571,58 @@
       "title": "Raw stream keys can travel in Stream Plan exports",
       "status": "Confirmed current",
       "note": "Revalidated at b0effc8 on 2026-10-07. stream-plan.html stores keyLabel and exports it in JSON and CSV; looksLikeRawKey adds a row/summary warning but does not block or transform the value. AVV-STREAM-KEY-1 recommends rejecting unsafe candidates before AV Video retains imports[].raw."
+    },
+    {
+      "id": "AVV-05",
+      "type": "nav",
+      "sev": "P2",
+      "title": "Skip link resets calculator to first task (hash routing)",
+      "detail": "Source still activates task zero when fromLocation cannot map the hash. The earlier skip-link observation is not re-tested here; preserve this follow-up rather than infer it fixed by broad passing matrices.",
+      "files": [
+        "js/av-viewport.js",
+        "av-calculator.html"
+      ],
+      "evidence": "code-read",
+      "phase": 0,
+      "status": "Superseded",
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+      "note": "Historical unknown-hash risk retained. Current standalone native Calculator preserves Video/Power task, panels and synthetic storage on keyboard skip-to-main at1440x900 and375x812; focus reaches main-content. See calculatorSkipLinkRevalidation and docs/av-calculator-app.md. No runtime repair or broad accessibility claim."
+    },
+    {
+      "id": "AVV-13",
+      "type": "nav",
+      "sev": "P3",
+      "title": "Embedded nav from #238 uses a relative Toolbox link",
+      "detail": "Current embedded navigation still uses relative av-suite.html?entry=toolbox. Root-level migrated routes passed comparison; future subdirectory adoption requires explicit resolution and compatibility checks.",
+      "files": [
+        "js/sbd-nav.js",
+        "css/av-viewport.css"
+      ],
+      "evidence": "code-read",
+      "phase": 0,
+      "status": "Superseded",
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+      "note": "The historical target av-suite.html?entry=toolbox is no longer emitted. Current embedded navigation emits relative av/, and the three current opt-in HTML routes are all root-level. No present destination defect found; retain AVV-13 only as an explicit future subdirectory adoption gate. See embeddedNavigationRevalidation."
+    },
+    {
+      "id": "AVV-06",
+      "type": "responsive",
+      "sev": "P2",
+      "title": "Unguarded Element.checkVisibility in shared paging runtime",
+      "detail": "Current shared AVViewport still calls Element.checkVisibility without feature detection. Older-iPad compatibility remains a source-level risk, not a reproduced physical-device failure.",
+      "files": [
+        "js/av-workspace.js",
+        "js/av-viewport.js",
+        "led-wall-calculator.html"
+      ],
+      "evidence": "code-read",
+      "phase": 0,
+      "status": "Repaired for current consumers",
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "ba164f9487e7b921dbb04c22a92be2e547d1377b",
+      "note": "Current feature-absence failures were reproduced, then repaired with shared feature detection and focused native/masked API regression. See visibilityCompatibility. Physical older-device acceptance and minimum-OS policy remain separate; inactive adapters were not adopted."
     }
   ],
   "decisionsResolved": [
@@ -744,9 +770,145 @@
       "Current native packs and restored specialist page panels supersede the October 9 snapshot-host direction; preserve the October 15 hybrid ruling.",
       "Standalone-family route and first-native-specialist choices remain unanswered; no conversion selected.",
       "October 14 Audio persona suggestions are review evidence, not approval for new features.",
-      "AVV-05 skip-link task retention is eligible for bounded current-source/browser revalidation; no defect fix is inferred from historical evidence.",
-      "AVV-06 retains a source-level checkVisibility compatibility risk; minimum OS/support decisions and physical acceptance remain separate."
+      "AVV-05 superseded on 2026-10-18 by focused native Calculator source/live keyboard evidence; do not redispatch as an active defect.",
+      "AVV-06 current missing-checkVisibility failure is repaired with focused automated proof; minimum OS/support policy and physical acceptance remain separate."
     ],
     "boardSync": "Configured Downloads board path is absent; the existing relocated private board is the only permitted synchronization target. Verify parity with the scoped updater and retain failures."
+  },
+  "calculatorSkipLinkRevalidation": {
+    "findingId": "AVV-05",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "liveSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "state": "Superseded for current standalone Calculator; focused source/live evidence, no runtime repair.",
+    "brief": "docs/av-calculator-app.md#skip-link-revalidation--2026-10-18",
+    "cause": "The old unknown-hash fallback remains in AVViewport.tabs, but current Calculator uses its native known-panel-only hash handler and AVViewport.paginate. #main-content does not select a different task.",
+    "runner": "Dominic; Playwright1.63.0 Chromium; isolated disposable contexts with service workers blocked.",
+    "cases": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "startTask": "storageCard",
+        "beforeView": "Video",
+        "afterView": "Video",
+        "beforeHash": "#storageCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      },
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "startTask": "powerCard",
+        "beforeView": "Power",
+        "afterView": "Power",
+        "beforeHash": "#powerCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      },
+      {
+        "viewport": {
+          "width": 375,
+          "height": 812
+        },
+        "startTask": "storageCard",
+        "beforeView": "Video",
+        "afterView": "Video",
+        "beforeHash": "#storageCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      },
+      {
+        "viewport": {
+          "width": 375,
+          "height": 812
+        },
+        "startTask": "powerCard",
+        "beforeView": "Power",
+        "afterView": "Power",
+        "beforeHash": "#powerCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      }
+    ],
+    "verification": "First Tab reaches Skip to calculators at both sizes; Shift+Tab then Enter preserves nonfirst Video/Power tasks and panels, focuses main-content, changes only the navigation hash, and preserves synthetic localStorage. Four cases pass; no page errors; screenshots inspected. Live bundle/helper byte-match reviewed source.",
+    "limits": "Only the current standalone Calculator keyboard path was revalidated. No screen-reader, physical-device, older-iPad, suite-wide skip-link, durability or operator acceptance claim. No runtime or test suite change.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
+  },
+  "embeddedNavigationRevalidation": {
+    "findingId": "AVV-13",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "liveSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "state": "Completed current embedded-navigation revalidation; no present root-route defect found. Future subdirectory adoption remains gated.",
+    "brief": "docs/av-workspace.md#embedded-navigation-revalidation--2026-10-18",
+    "emittedLinks": {
+      "Home": "/",
+      "AV by Dave": "av/"
+    },
+    "expectedConsole": "https://avbydave.com/av/",
+    "currentConsumers": [
+      "av-calculator.html",
+      "cue-sheet.html",
+      "stage-plot.html"
+    ],
+    "independentChecks": "Current source inventory; each opt-in HTML has one slot, includes js/sbd-nav.js and has no base element. Six native URL-resolution checks (plain and synthetic show-context/hash URL for each root route) resolve Home to / and AV by Dave to /av/. All three published HTML files, navigation JS, viewport CSS and console index byte-match reviewed source; /av/ returns that console index. Production source.json matches the reviewed source. No new browser sweep or click test.",
+    "reusedReportedChecks": "Existing root-route comparisons recorded in the finding and docs/av-workspace.md (92 legacy navigation comparisons) are retained as historical reported evidence, not represented as newly run current-source browser checks.",
+    "remainingGate": "Before any future subdirectory consumer adopts embedded navigation, define intended base/destination resolution and verify its navigation, show-context, save-guard and embedded-panel compatibility. No current adopter or implementation inferred.",
+    "limits": "No runtime/CSS change, user-data write, hypothetical subdirectory test, browser/remote job, physical-device, screen-reader or older-iPad acceptance. The legacy source URL claim is superseded, not the future adoption gate.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
+  },
+  "visibilityCompatibility": {
+    "findingId": "AVV-06",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "ba164f9487e7b921dbb04c22a92be2e547d1377b",
+    "state": "Runtime repair remains published at f7dc459; deployed-origin fixture and document-readiness probe corrections are separate checker changes with their own delivery gates.",
+    "brief": "docs/av-workspace.md#visibility-api-compatibility--2026-10-18",
+    "reproduction": "At the reviewed live source, masking only Element.checkVisibility in disposable modern-browser contexts reproduces TypeError in standalone Calculator and LED paging. This is a current JavaScript feature-absence reproduction, not an observed physical older-iPad failure.",
+    "repair": "Both shared paging helpers feature-detect the method, delegate without options when available and otherwise check layout boxes and content-visibility:hidden light-DOM ancestors. Active Cue Sheet and StagePlotter callbacks use the shared guard. Formulas, CSS, saved values, schemas, storage keys and imports are unchanged.",
+    "currentConsumers": [
+      "av-calculator.html via its native bridge",
+      "av/ via the compiled native Calculator pack",
+      "cue-sheet.html",
+      "stage-plot.html",
+      "led-wall-calculator.html",
+      "ProjectorThrow/Stage3D.html"
+    ],
+    "dormantCallers": "av-board-viewport.js, av-calculator-viewport.js and av-worksheet-viewport.js have no current published HTML or native-pack script consumer; they are not promoted or rewritten by this repair. Any future adoption needs compatibility review.",
+    "verification": "Dominic, Playwright1.63.0: Chromium and WebKit each pass11 box states for both helpers with native/masked API, native delegation, focused-page/value preservation and10 current-route cases. The current route cases cover standalone Calculator, LED, Cue Sheet, StagePlotter and shared-console Calculator in both API states. AV verification and26 Rail/worker tests pass; Throwline verification and47 tests pass after aligning the existing Stage3D cache pin. Shared runtime synchronization, native suite build and diff checks pass.",
+    "cacheGeneration": "v20261018-visibility-compatibility; registry, worker update, generated workspace copies, existing Stage3D readiness pin and exact-generation assertions advance together.",
+    "limits": "Synthetic API absence in current automated engines is not physical-device, full older-OS, screen-reader, touch ergonomics, installed-returning-client or operator acceptance. No minimum support policy, polyfill on Element.prototype, user-data change or new dependency.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred.",
+    "liveFixtureCorrection": {
+      "checkedOn": "2026-10-18",
+      "runtimeSource": "f7dc45954c22686ce50bdb20dfa7c0308f66821e",
+      "brief": "docs/av-workspace.md#published-fixture-correction--2026-10-18",
+      "trigger": "The deployed-origin fixture requested the unpublished raw js/av-workspace.js; the application already delivers that helper inline.",
+      "repair": "Read the managed LED runtime and isolate its AVWorkspace module for the fixture, excluding offline initialization. Existing workspace CI watches the probe module directly.",
+      "verification": "Dominic Chromium/WebKit each pass 12 groups including 11 helper states, actual focus/page/value retention and 10 current production route cases with native/masked API. All 11 production file hashes match f7dc459; Video JavaScript/CSS remain unchanged.",
+      "boundary": "Checker, existing CI path and records only; no application assets, CSS, calculations, cache version, saved keys, schemas or original imports changed. Runtime acceptance stays at f7dc459; checker review/CI/publication evidence is separate. Physical/older-OS/operator and existing product-policy gaps remain open."
+    },
+    "themeProbeReadiness": {
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "d93e0f5933983b4a2f3d28e4d0a90443ef21ef36",
+      "brief": "docs/av-workspace.md#theme-probe-document-readiness--2026-10-18",
+      "trigger": "Checker-only source publication39193117004 failed before deployment on StagePlotter light theme. Production remains acceptedf7dc459; the original failure is retained.",
+      "diagnostic": "One bounded exact-source light/dark diagnostic on Dominic observed both early samples loading with the static system marker, then complete with their correct stored mode; no captured request failures or page errors. This confirms premature sampling, not the entire original CI empty-CSS/browser-specific cause.",
+      "repair": "Probe-only bounded newer-document/complete wait before mode seeding and theme sampling; follows client redirects while excluding the previous document, with ten-second URL/document/stylesheet diagnostics. Expected mode, colors and contrast remain independent unchanged assertions.",
+      "verification": "Five focused disposable browser cases pass on Dominic Node24/Playwright1.63/ChromeForTesting153: delayed CSS/bootstrap in both modes; client redirect; genuine fully loaded wrong theme rejected; missing theme CSS rejected; unfinished load times out with document diagnostics. Existing viewport/theme CI runs the test.",
+      "boundary": "Only checker, focused test, existing CI and records; no application assets/build/cache/formulas/routes/saved keys/schemas/original imports change. Runtime acceptance remainsf7dc459 and unchanged Video JS/CSS; new source review/CI/merge/publication stay separate. Physical/olderOS/operator and unanswered product-policy gates remain open.",
+      "redirectCorrection": "First candidate d8ec325 CI39195166501 passed all four initial fixtures, then caught a strict-loader assumption at the existing Throwline client redirect to Stage3D.html. Guard corrected and redirect regression added; original failed run retained and application route unchanged."
+    }
   }
 }
