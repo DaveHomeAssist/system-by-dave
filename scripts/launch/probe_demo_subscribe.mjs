@@ -43,11 +43,7 @@ if (!shippedValue || !/^\[DAVE/.test(shippedValue)) fail(`demos/config.js emailS
 
 // config: null = the shipped file; otherwise emailSubscribeUrl (and emailFormAction) replaced.
 async function openDemo(demo, viewport, { subscribe = null, formAction = null, query = '' } = {}) {
-  // isMobile stays off: under Chrome's mobile emulation the demo pages lay out at
-  // 501px on a 390px phone (the unscaled 1080px stage, a demos/ issue outside this
-  // change, reported by the check at the end), which pushes the fixed panel below the
-  // visible area and makes the click land on the stage.
-  const context = await browser.newContext({ viewport, deviceScaleFactor: 2, hasTouch: viewport.width < 600 });
+  const context = await browser.newContext({ viewport, deviceScaleFactor: 2, hasTouch: viewport.width < 600, isMobile: viewport.width < 600 });
   const errors = [];
   const external = [];
   await context.route(/^https:\/\//, (route) => { external.push(route.request().url()); return route.fulfill({ status: 200, contentType: 'text/html', body: '<p>ok</p>' }); });
@@ -136,15 +132,6 @@ try {
     await page.goto(`${BASE}/demos/frame-sync.html?drive`);
     await page.evaluate(() => window.sbdComplete && window.sbdComplete());
     if (await page.locator('#sbd-after').count()) fail('capture mode rendered the completion panel');
-    await context.close();
-  }
-  // 6. Report (not fail) the mobile-emulation layout width noted above.
-  for (const demo of ['frame-sync.html', 'fault-finding.html']) {
-    const context = await browser.newContext({ viewport: VIEWPORTS.phone, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
-    const page = await context.newPage();
-    await page.goto(`${BASE}/demos/${demo}`); await page.waitForLoadState('load');
-    const w = await page.evaluate(() => innerWidth);
-    if (w !== 390) notes.push(`WARNING (pre-existing, demos/): ${demo} lays out ${w}px wide on a 390px phone under mobile emulation; check on a real phone`);
     await context.close();
   }
   notes.push('shipped [DAVE] placeholder: unchanged no-provider ask, no link, no form, no visible placeholder');

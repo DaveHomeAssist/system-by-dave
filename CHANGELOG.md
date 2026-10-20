@@ -35,6 +35,10 @@
 - Add a focused native/masked API regression to the existing workspace probe. Chromium and WebKit cover both helpers, paging/value preservation and the current standalone/shared-console consumers. Preserve physical older-device and minimum-OS policy gaps; no global polyfill or saved-data change.
 - Regenerate embedded workspace runtimes and the native suite bundle, and advance the existing offline cache generation and Stage 3D readiness pin together. Preserve CSS, calculation engines, routes, schemas, keys and original imports.
 
+## 2026-10-20 — Demos fit phone widths
+
+- The demo pages (`demos/frame-sync.html`, `demos/fault-finding.html`) laid out 446–539 px wide on 360–430 px phones: the page zoomed out and the stage, breadcrumb and completion panel ran past the screen edge. Cause: the 1080 px stage rendered unscaled until `demo-shell.js` ran, so mobile browsers zoomed the page out at load (1275 px with JavaScript off), and `layout()` then sized the stage from `innerWidth`/`innerHeight`, which report the zoomed-out visual viewport, so it stayed too wide. The stage now starts scaled down in `demos/demo-shell.css`, and `layout()` uses the layout viewport (`documentElement.clientWidth/Height`). New local probe `npm run probe:demos-viewport` (320, 360, 390, 430 px under mobile emulation: width equals the viewport, no horizontal scroll, nothing crossing an edge or clipped).
+
 ## 2026-10-20 — beehiiv subscribe link and Stripe checkout prep (AV by Dave)
 
 - Demos: `demos/demo-shell.js` gains a hosted-subscribe-link mode. When `emailSubscribeUrl` in `demos/config.js` is an https `beehiiv.com` link, the post-completion ask becomes a "Send me the next demo" button to beehiiv's subscribe page (new tab, `rel="noopener"`, the visitor's UTM tags or demo defaults). It ships as a marked `[DAVE: …]` placeholder, so the ask is unchanged until Dave fills it in. No CSP change. New local probe `npm run probe:demo-subscribe`.

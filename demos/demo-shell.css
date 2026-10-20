@@ -13,6 +13,9 @@ body.demo .sbd-site-return a:hover, body.demo .sbd-site-return a:focus { color: 
 body.demo .sbd-site-return__separator { color: #7C879A; }
 body.demo .sbd-site-return__current { color: #FFC531; }
 body.demo #fit { top: 50%; }
+/* Start the 1080 px stage scaled down so it never overflows a phone before demo-shell.js
+   sizes it (an overflow at load makes mobile browsers zoom the page out). */
+body.demo #fit { transform: translate(-50%, -50%) scale(.25); }
 body.capture .sbd-site-return, body.capture .sbd-skip-link { display: none; }
 
 #sbd-after {

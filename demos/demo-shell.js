@@ -31,15 +31,21 @@
 
   // ---------- layout: the stage sits between the breadcrumb bar and the completion panel ----------
   const fit = $('fit');
+  // Size against the layout viewport (documentElement.clientWidth/Height), not
+  // innerWidth/innerHeight: on a phone those report the zoomed-out visual viewport, so
+  // a page that ever overflowed (the unscaled 1080 px stage before this runs) kept
+  // scaling the stage to the inflated width and laid out 446-501 px wide on a 390 px phone.
+  const vw = () => document.documentElement.clientWidth || innerWidth;
+  const vh = () => document.documentElement.clientHeight || innerHeight;
   function layout() {
     if (!fit) return;
-    if (capture) { fit.style.top = '50%'; fit.style.transform = `translate(-50%,-50%) scale(${Math.min(innerWidth / 1080, innerHeight / 1920)})`; return; }
+    if (capture) { fit.style.top = '50%'; fit.style.transform = `translate(-50%,-50%) scale(${Math.min(vw() / 1080, vh() / 1920)})`; return; }
     const bar = document.querySelector('.sbd-site-return');
     const panel = $('sbd-after');
     const top = bar ? bar.offsetHeight : 0;
     const bottom = panel && !panel.hidden ? panel.offsetHeight : 0;
-    const avail = Math.max(200, innerHeight - top - bottom);
-    const s = Math.min(innerWidth / 1080, avail / 1920);
+    const avail = Math.max(200, vh() - top - bottom);
+    const s = Math.min(vw() / 1080, avail / 1920);
     fit.style.top = `${top + avail / 2}px`;
     fit.style.transform = `translate(-50%,-50%) scale(${s})`;
   }
