@@ -1,5 +1,13 @@
 # Changelog
 
+# Changelog
+
+## 2026-10-20 — AV by Dave interactive demos
+
+- Add `demos/`: the frame-sync (008) and fault-finding (010) concept demos as public, ungated pages with a hub at `/demos/`, the public shell (skip link, breadcrumb, shared nav), canonical URLs and sitemap entries. GSAP comes from the vendored build.
+- Add `demos/demo-shell.js` and `config.js`: optional Umami Cloud analytics (`demo_view`, `demo_start`, `demo_step_4`, `demo_complete`, `play_start`, `email_submit`, `checklist_interest`, `next_demo_click`), and a post-completion email ask that posts straight to the provider. Both stay off until `config.js` is filled in.
+- Carry the demo pipeline here: `check-states.js` (every-state layout check), `capture.mjs` (frame-by-frame reel render on Dominic) and the README. Capture and checks run with the shell hidden, so rendered frames are unchanged.
+
 ## SmartFade 1248 integration candidate — 2026-10-19
 
 - Add a distinct SmartFade 1248 prototype panel through the existing private gear viewer registration and handshake. Isolate its snapshots by equipment, workspace view and panel without changing Ion keys.

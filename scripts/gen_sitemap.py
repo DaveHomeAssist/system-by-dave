@@ -50,6 +50,9 @@ STATIC_PAGES = [
     ("fifa-pitch-crew/", "weekly", "0.6"),
     ("scorecard/", "monthly", "0.6"),
     ("noteforge/", "monthly", "0.7"),
+    ("demos/", "weekly", "0.8"),
+    ("demos/frame-sync.html", "monthly", "0.8"),
+    ("demos/fault-finding.html", "monthly", "0.8"),
     # hat-in-ring/ is a noindex handoff; production lives at hatinring.com.
     # marsscape/ moved to mixmash.games/mars/ (2026-07-03); the page there is a
     # save-migration redirect and should not be indexed.

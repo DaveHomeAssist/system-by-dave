@@ -32,3 +32,6 @@ cross-project-*
 
 # Workbook is retained as source, outside every public artifact.
 apps/av-workbook/dist/
+
+# AV by Dave demo renders (built on Dominic, delivered separately)
+demos/out/

@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloud.umami.is; object-src 'none'; base-uri 'self'; form-action 'self' https://buttondown.com https://app.kit.com https://app.convertkit.com">
+<meta name="theme-color" content="#0E1116">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Why your screen is late</title>
+<meta name="description" content="Why your IMAG is late: a working model of a frame synchronizer. Plug a free-running camera into a room with one clock, watch the picture tear, add the waiting room, and measure the wait yourself.">
+<link rel="canonical" href="https://systembydave.com/demos/frame-sync.html">
+<link rel="stylesheet" href="../css/sbd-public-nav.css">
+<link rel="stylesheet" href="demo-shell.css">
+<script src="../js/sbd-public-nav.js" defer></script>
+<script src="config.js"></script>
+<link rel="stylesheet" href="fonts.css">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Why your screen is late — AV by Dave demo">
+<meta property="og:description" content="Why your IMAG is late: a working model of a frame synchronizer. Plug a free-running camera into a room with one clock, watch the picture tear, add the waiting room, and measure the wait yourself.">
+<meta property="og:url" content="https://systembydave.com/demos/frame-sync.html">
+<meta property="og:image" content="https://systembydave.com/demos/og/frame-sync.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why your screen is late — AV by Dave demo">
+<meta name="twitter:description" content="Why your IMAG is late: a working model of a frame synchronizer. Plug a free-running camera into a room with one clock, watch the picture tear, add the waiting room, and measure the wait yourself.">
+<meta name="twitter:image" content="https://systembydave.com/demos/og/frame-sync.png">
+<style>
+  :root{
+    --g:#0E1116; --p:#171B22; --p2:#222835; --ink:#F5F7FA; --ink2:#AEB6C2; --mute:#6C7584;
+    --orange:#FF5A1F; --cyan:#5AC8FA; --yellow:#FFC531; --green:#3DDC97; --red:#FF3B2F;
+    --hook:"Barlow Condensed"; --body:"Barlow"; --mono:"IBM Plex Mono";
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(--body);color:var(--ink)}
+  #fit{position:absolute;left:50%;top:50%;transform-origin:center;width:1080px;height:1920px;background:var(--g);overflow:hidden}
+
+  /* story text */
+  #step{position:absolute;left:64px;top:150px;width:952px}
+  #stepNum{font:600 28px/1 var(--mono);color:var(--mute);letter-spacing:3px;margin-bottom:22px}
+  #stepText{font:800 96px/0.98 var(--hook);text-transform:uppercase;letter-spacing:-1px;min-height:196px}
+  #stepText em{font-style:normal;color:var(--orange)}
+  #stepSub{font:500 36px/1.25 var(--body);color:var(--ink2);margin-top:22px;min-height:100px}
+
+  /* rows */
+  .row{position:absolute;left:64px;width:952px;height:150px}
+  .label{position:absolute;left:0;top:0;font:600 26px/1 var(--mono);letter-spacing:3px;color:var(--mute)}
+  .bar{position:absolute;left:0;top:44px;width:952px;height:6px;background:var(--p2);border-radius:3px;overflow:visible}
+  .tick{position:absolute;top:-14px;width:6px;height:34px;border-radius:3px}
+  #houseRow{top:600px}
+  #camRow{top:800px}
+  #houseRow .tick{background:var(--cyan)} #camRow .tick{background:var(--yellow)}
+
+  .emitter{position:absolute;left:0;top:70px;width:170px;height:70px;border-radius:14px;background:var(--p);border:4px solid var(--p2);display:flex;align-items:center;justify-content:center;font:700 30px/1 var(--hook);letter-spacing:2px}
+  #houseEm{border-color:var(--cyan);color:var(--cyan)} #camEm{border-color:var(--yellow);color:var(--yellow)}
+
+  /* machine area */
+  #machine{position:absolute;left:64px;top:1020px;width:952px;height:470px}
+  #sync{position:absolute;left:300px;top:40px;width:360px;height:360px;border-radius:24px;background:var(--p);border:5px solid var(--p2);opacity:0}
+  #sync .t{position:absolute;left:0;right:0;top:-54px;text-align:center;font:600 26px/1 var(--mono);letter-spacing:3px;color:var(--mute)}
+  #slot{position:absolute;left:30px;top:40px;width:140px;height:160px;border-radius:16px;border:4px dashed var(--mute)}
+  #slot .cap{position:absolute;left:-60px;right:-60px;bottom:-40px;text-align:center;white-space:nowrap;font:600 24px/1 var(--mono);color:var(--mute)}
+  #pipe{position:absolute;left:185px;top:40px;width:160px;height:280px;display:flex;flex-direction:column;gap:14px;opacity:0}
+  #pipe .ps{height:84px;border-radius:12px;border:4px dashed var(--mute)}
+  #pipe .pcap{position:absolute;left:-20px;right:-20px;top:290px;text-align:center;white-space:nowrap;font:600 22px/1 var(--mono);color:var(--mute)}
+  #screen{position:absolute;left:740px;top:40px;width:212px;height:360px;border-radius:20px;background:#000;border:6px solid var(--p2);overflow:hidden}
+  #screen .t{position:absolute;left:0;right:0;top:-54px;text-align:center;font:600 26px/1 var(--mono);letter-spacing:3px;color:var(--mute)}
+  #scrWhole,#scrTop,#scrBot{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:800 150px/1 var(--hook);color:var(--ink)}
+  #scrTop{clip-path:inset(0 0 50% 0);opacity:0} #scrBot{clip-path:inset(50% 0 0 0);opacity:0}
+  #tear{position:absolute;left:-10px;right:-10px;top:50%;height:8px;background:var(--red);opacity:0}
+  #camBox{position:absolute;left:0;top:120px;width:170px;height:200px;border-radius:20px;background:var(--p);border:5px solid var(--yellow);display:flex;align-items:center;justify-content:center;font:700 30px/1 var(--hook);color:var(--yellow);letter-spacing:2px}
+
+  .frame{position:absolute;width:120px;height:140px;border-radius:14px;background:var(--p2);border:5px solid var(--yellow);display:flex;align-items:center;justify-content:center;font:800 64px/1 var(--hook);color:var(--ink);will-change:transform;left:0;top:0}
+  .frame.out{border-color:var(--cyan)}
+  .frame.rep{border-color:var(--mute);color:var(--mute)}
+
+  /* readouts */
+  #read{position:absolute;left:64px;top:1520px;width:952px;display:flex;gap:18px;opacity:0}
+  .ro{flex:1;background:var(--p);border-radius:18px;padding:22px 24px;border:3px solid var(--p2)}
+  .ro b{display:block;font:600 24px/1 var(--mono);letter-spacing:2px;color:var(--mute);margin-bottom:12px}
+  .ro span{font:800 72px/1 var(--hook)} .ro small{display:block;margin-top:8px;font:500 22px/1 var(--mono);color:var(--mute)}
+  #roDelay span{color:var(--orange)} #roRep span{color:var(--mute)} #roDrop span{color:var(--red)}
+
+  /* controls */
+  #ctl{position:absolute;left:64px;top:1700px;width:952px;display:flex;gap:16px;align-items:stretch}
+  button{appearance:none;border:4px solid var(--p2);background:var(--p);color:var(--ink);font:800 36px/1 var(--hook);letter-spacing:2px;text-transform:uppercase;padding:0 30px;height:120px;border-radius:18px;cursor:pointer;flex:1}
+  button.primary{background:var(--orange);border-color:var(--orange);color:#111}
+  button[aria-pressed="true"]{border-color:var(--cyan);color:var(--cyan)}
+  button:disabled{opacity:.35;cursor:default}
+  #play{display:none}
+  #ctl.free #next{display:none} #ctl.free #play{display:flex;flex-direction:column;flex:3;gap:14px}
+  #play .r{display:flex;gap:14px} #play button{height:100px;font-size:30px}
+  #ratebox{display:flex;align-items:center;gap:16px;background:var(--p);border:4px solid var(--p2);border-radius:18px;padding:0 24px;flex:1;font:700 28px/1 var(--hook);letter-spacing:2px;color:var(--ink2)}
+  input[type=range]{flex:1;accent-color:var(--yellow);height:40px}
+
+  #brand{position:absolute;left:64px;top:72px;display:flex;align-items:center;gap:18px;font:600 26px/1 var(--mono);letter-spacing:3px;color:var(--mute)}
+  #brand i{display:block;width:10px;height:22px}
+  body.auto #ctl{display:none}
+  #cta{position:absolute;left:64px;top:420px;width:952px;padding:22px 28px;border-radius:18px;background:var(--orange);color:#111;font:800 44px/1.05 var(--hook);letter-spacing:1px;text-transform:uppercase;opacity:0;transform:translateY(16px)}
+  #receipt{position:absolute;left:64px;top:548px;font:500 24px/1 var(--mono);color:var(--mute);letter-spacing:1px;opacity:0}
+</style>
+</head>
+<body class="demo" data-demo="frame-sync" data-next-demo="fault-finding.html">
+<a class="sbd-skip-link" href="#fit">Skip to the demo</a>
+<nav class="sbd-site-return" aria-label="Breadcrumb">
+  <a href="https://systembydave.com/">System by Dave</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <a href="./">AV by Dave demos</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <span class="sbd-site-return__current" aria-current="page">Frame sync</span>
+</nav>
+<div id="fit" tabindex="-1">
+  <div id="brand"><i style="background:#C0C000"></i><i style="background:#00C0C0"></i><i style="background:#3DDC97"></i><i style="background:#C000C0"></i><i style="background:#FF3B2F"></i><i style="background:#5AC8FA"></i>&nbsp;AV BY DAVE · 008</div>
+
+  <div id="step">
+    <div id="stepNum">STEP 1 OF 7</div>
+    <div id="stepText"></div>
+    <div id="stepSub"></div>
+  </div>
+
+  <div class="row" id="houseRow"><div class="label">THE ROOM'S CLOCK</div><div class="bar"></div><div class="emitter" id="houseEm">TICK</div></div>
+  <div class="row" id="camRow" style="opacity:0"><div class="label">THE CAMERA'S CLOCK</div><div class="bar"></div><div class="emitter" id="camEm">TICK</div></div>
+
+  <div id="machine">
+    <div id="camBox">CAMERA</div>
+    <div id="sync"><div class="t">WAITING ROOM</div><div id="slot"><div class="cap">latest frame</div></div><div id="pipe"><div class="ps"></div><div class="ps"></div><div class="ps"></div><div class="pcap">3 more rooms</div></div></div>
+    <div id="screen"><div class="t">BIG SCREEN</div><div id="scrWhole">—</div><div id="scrTop">—</div><div id="scrBot">—</div><div id="tear"></div></div>
+  </div>
+
+  <div id="read">
+    <div class="ro" id="roDelay"><b>WAIT, IN FRAMES</b><span id="vDelay">0.0</span><small id="vMs">≈ 0 ms at 60 fps</small></div>
+    <div class="ro" id="roRep"><b>REPEATS</b><span id="vRep">0</span></div>
+    <div class="ro" id="roDrop"><b>DROPS</b><span id="vDrop">0</span></div>
+  </div>
+
+  <div id="ctl">
+    <button id="next" class="primary">NEXT</button>
+    <div id="play">
+      <div class="r"><button id="bMode" aria-pressed="false">4K BOX</button><button id="bBypass" aria-pressed="false">NO WAITING ROOM</button><button id="bNudge">NUDGE CAMERA</button></div>
+      <div class="r"><div id="ratebox">CAMERA SPEED <input id="rate" type="range" min="-8" max="8" step="1" value="6"><span id="rateV">+6%</span></div><button id="bReset" style="flex:0 0 200px">RESTART</button></div>
+    </div>
+  </div>
+  <div id="cta">Fixed. Now break it yourself → link in bio</div>
+  <div id="receipt">✓ AJA FS4 MANUAL v3.1 · FRAME DELAY · ABOUT 4 FRAMES IN HD MODES</div>
+</div>
+
+<script src="../js/vendor/gsap.min.js"></script>
+<script>
+(() => {
+  // ---------- fit 1080x1920 to the viewport ----------
+  const fit = document.getElementById('fit');
+  if (/[?&](drive|auto)(=|&|$)/.test(location.search)) document.body.classList.add('capture');
+  const resize = () => { if (window.sbdLayout) return window.sbdLayout(); const s = Math.min(innerWidth/1080, innerHeight/1920); fit.style.transform = `translate(-50%,-50%) scale(${s})`; };
+  addEventListener('resize', resize); resize();
+
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const D = reduce ? 0.01 : 1; // duration multiplier
+
+  // ---------- simulation ----------
+  // One real second here = one "frame" in the slowed-down world. 59.94 fps would be 16.7 ms per frame.
+  const P = 1.0;              // house period (s)
+  let camRate = 1.06;         // camera speed relative to house (1.06 = 6% fast, exaggerated so the drift is visible)
+  let camPhase = 0.35;        // camera offset, in frames
+  let mode = 'min';           // 'min' | 'pipe'
+  let bypass = false;
+  let plugged = false;      // step 3 plugs the camera into the room
+  let running = false;
+  let showCam = false, showSync = false, showRead = false;
+
+  let t = 0, lastHouse = -1, lastCam = -1, camT = 0;
+  let frameNo = 0;
+  let slot = null;            // the one frame the waiting room holds: {no, el, arrived, sent}
+  let pipe = [];              // frames moving through the 4K box, one stage per tick
+  let repeats = 0, drops = 0;
+  const vals = { wait: 0 };
+
+  const houseBar = $('houseRow').querySelector('.bar'), camBar = $('camRow').querySelector('.bar');
+  const machine = $('machine');
+
+  function spawnTick(bar) {
+    const el = document.createElement('div'); el.className = 'tick'; bar.appendChild(el);
+    gsap.fromTo(el, { x: 0, opacity: 1 }, { x: 952, opacity: 0.25, duration: 8 * P, ease: 'none', onComplete: () => el.remove() });
+  }
+  function pulse(el, color) {
+    gsap.fromTo(el, { boxShadow: `0 0 0px ${color}` }, { boxShadow: `0 0 40px ${color}`, duration: 0.12 * D, yoyo: true, repeat: 1 });
+  }
+
+  function emitFrame() {
+    frameNo++;
+    const el = document.createElement('div'); el.className = 'frame'; el.textContent = frameNo % 100; machine.appendChild(el);
+    gsap.set(el, { x: 190, y: 150, scale: 0.6, opacity: 0 });
+    pulse($('camEm'), 'rgba(255,197,49,.9)');
+    const rec = { no: frameNo, el, arrived: null };
+    if (!plugged) {
+      // not connected to anything yet: the frame appears and is gone
+      gsap.to(el, { x: 230, scale: 1, opacity: 1, duration: 0.25 * D, ease: 'power2.out' });
+      gsap.to(el, { opacity: 0, duration: 0.3 * D, delay: 0.45 * D, onComplete: () => el.remove() });
+    } else if (bypass || !showSync) {
+      // straight to the screen: arrives whenever the camera says so
+      gsap.to(el, { x: 770, y: 150, scale: 1, opacity: 1, duration: 0.5 * D, ease: 'power2.inOut', onComplete: () => { showOnScreen(rec, true); } });
+    } else {
+      // the frame in the slot starts to fade while the new one is still on its way, so they never sit on top of each other
+      const dying = slot;
+      if (dying) gsap.to(dying.el, { scale: 0, opacity: 0, duration: 0.25 * D, delay: 0.2 * D });
+      gsap.to(el, { x: 330 + 10, y: 40 + 10, scale: 1, opacity: 1, duration: 0.5 * D, ease: 'power2.inOut', onComplete: () => {
+        rec.arrived = t;
+        // the new frame overwrites the old one. If the old one was never sent out, it is lost.
+        if (dying) {
+          if (!dying.sent) { drops++; $('vDrop').textContent = drops; flash($('roDrop')); }
+          dying.el.remove();
+        }
+        slot = rec;
+      } });
+    }
+  }
+
+  function houseTick() {
+    spawnTick(houseBar); pulse($('houseEm'), 'rgba(90,200,250,.9)');
+    gsap.fromTo('#screen', { borderColor: '#5AC8FA' }, { borderColor: '#222835', duration: 0.5 * D });
+    if (!showSync || bypass || !slot) return;
+    // 1. on the tick, the room reads out a copy of whatever frame it holds. The frame itself stays until overwritten.
+    const isRepeat = slot.sent;
+    if (isRepeat) { repeats++; $('vRep').textContent = repeats; flash($('roRep')); }
+    slot.sent = true;
+    const out = copyOf(slot, isRepeat);
+    out.wait = t - slot.arrived;
+    // 2. either show it now, or push it through the 4K box
+    if (mode === 'min') {
+      gsap.to(out.el, { x: 770, y: 150, scale: 1, duration: 0.35 * D, ease: 'power2.inOut', onComplete: () => showOnScreen(out, false) });
+    } else {
+      pipe.unshift(out);
+      const leaving = pipe.length > 3 ? pipe.pop() : null;
+      pipe.forEach((f, i) => gsap.to(f.el, { x: 505, y: 52 + i * 98, scale: 0.6, duration: 0.3 * D, delay: i === 0 ? 0.15 * D : 0, ease: 'power2.inOut' }));
+      if (leaving) { leaving.wait += 3; gsap.to(leaving.el, { x: 770, y: 150, scale: 1, duration: 0.35 * D, ease: 'power2.inOut', onComplete: () => showOnScreen(leaving, false) }); }
+    }
+  }
+
+  function copyOf(rec, isRepeat) {
+    // a read-out copy emerges from the right edge of the slot, clear of the arrival lane
+    const el = rec.el.cloneNode(true); el.classList.add('out'); el.classList.toggle('rep', isRepeat); machine.appendChild(el);
+    gsap.set(el, { x: 440, y: 52, scale: 0.45, opacity: 1 });
+    return { no: rec.no, el, arrived: rec.arrived, wait: 0 };
+  }
+
+  function showOnScreen(rec, raw) {
+    const scr = $('screen');
+    if (raw && showCam) {
+      // no waiting room: the new frame lands part way through the room's refresh. The top half is old, the bottom half is new.
+      $('scrTop').textContent = $('scrWhole').textContent;   // old frame, top half
+      $('scrBot').textContent = rec.no % 100;                 // new frame, bottom half
+      $('scrWhole').textContent = rec.no % 100;
+      const tl = gsap.timeline();
+      tl.set('#scrWhole', { opacity: 0 })
+        .set('#scrTop', { opacity: 1, x: -14 })
+        .set('#scrBot', { opacity: 1, x: 14 })
+        .set('#tear', { opacity: 1 })
+        .to('#scrBot', { x: 24, duration: 0.07 * D, yoyo: true, repeat: 5, ease: 'none' })
+        .to('#scrTop, #scrBot, #tear', { opacity: 0, duration: 0.15 * D }, 0.75 * D)
+        .set('#scrWhole', { opacity: 1 }, 0.75 * D)
+        .set('#scrTop, #scrBot', { x: 0 });
+    } else {
+      $('scrWhole').textContent = rec.no % 100;
+      gsap.fromTo(scr, { borderColor: '#5AC8FA' }, { borderColor: '#222835', duration: 0.6 * D });
+      if (rec.wait != null) {
+        const d = rec.wait;
+        gsap.to(vals, { wait: d, duration: 0.3 * D, onUpdate: () => { $('vDelay').textContent = vals.wait.toFixed(1); $('vMs').textContent = '≈ ' + Math.round(vals.wait * 16.7) + ' ms at 60 fps'; } });
+      }
+    }
+    rec.el.remove();
+  }
+  function flash(el) { gsap.fromTo(el, { borderColor: '#FF5A1F' }, { borderColor: '#222835', duration: 0.6 * D }); }
+
+  function simStep(step) {
+    if (!running) return;
+    t += step; camT += step * camRate;
+    const h = Math.floor(t / P);
+    if (h !== lastHouse) { lastHouse = h; houseTick(); }
+    if (showCam) {
+      const c = Math.floor((camT + camPhase * P) / P);
+      if (c !== lastCam) { lastCam = c; spawnTick(camBar); emitFrame(); }
+    }
+  }
+  if (new URLSearchParams(location.search).has('drive')) {
+    // manual clock for checks and frame capture: nothing moves unless hr.advance() is called.
+    // The ticker wakes itself whenever an animation is created, so detach the root update from it entirely.
+    gsap.ticker.remove(gsap.updateRoot);
+    gsap.ticker.sleep();
+    let rootT = 0;
+    window.hr = { advance(ms) { let s = ms / 1000; while (s > 0) { const step = Math.min(s, 0.05); simStep(step); rootT += step; gsap.updateRoot(rootT); s -= step; } }, time: () => rootT };
+  } else {
+    gsap.ticker.add((time, dt) => simStep(Math.min(dt / 1000, 0.05)));
+    window.hr = { time: () => t, mode: 'realtime' };
+  }
+
+  // a tear right now (for cuts that open on the failure): a frame that has already landed
+  function tearNow() {
+    frameNo++; const el = document.createElement('div'); el.className = 'frame'; el.textContent = frameNo % 100; machine.appendChild(el);
+    gsap.set(el, { x: 770, y: 150, opacity: 0 });
+    $('scrWhole').textContent = (frameNo - 1) % 100 || 99;
+    showOnScreen({ no: frameNo, el, arrived: null }, true);
+  }
+
+  // ---------- the story ----------
+  const steps = [
+    { text: 'EVERY SCREEN IN THE ROOM UPDATES ON <em>ONE CLOCK.</em>', sub: 'Watch the tick. The big screen flashes blue each time it is allowed to change.',
+      enter() { running = true; } },
+    { text: 'THE CAMERA HAS ITS <em>OWN</em> CLOCK.', sub: 'Close, but not the same. Watch the yellow ticks slide away from the blue ones.',
+      enter() { showCam = true; lastCam = Math.floor((camT + camPhase * P) / P); gsap.to('#camRow', { opacity: 1, duration: 0.5 * D }); } },
+    { text: 'PLUG IT STRAIGHT IN AND THE PICTURE <em>TEARS.</em>', sub: 'The new frame lands while the screen is half way through drawing the old one. Top half old, bottom half new.',
+      enter() { plugged = true; bypass = true; } },
+    { text: 'SO WE ADD A <em>WAITING ROOM.</em>', sub: 'Frames go in whenever the camera sends them. They only leave on the room\'s tick. No more tearing.',
+      enter() { bypass = false; showSync = true; gsap.to('#sync', { opacity: 1, duration: 0.5 * D }); } },
+    { text: 'THE WAIT IS <em>NOT FIXED.</em>', sub: 'It depends on when the frame shows up. Just missed the tick? Almost a whole frame. Just made it? Almost nothing.',
+      enter() { showRead = true; gsap.to('#read', { opacity: 1, duration: 0.5 * D }); $('ctl').classList.add('free'); $('bNudge').focus(); } },
+    { text: 'SOME BOXES MAKE IT WAIT <em>LONGER.</em>', sub: 'Converting 4K or changing frame rate adds rooms. Each one costs a tick. This one adds three.',
+      enter() { setMode('pipe'); } },
+    { text: '"ONE FRAME OF DELAY" IS A <em>MYTH.</em>', sub: 'One well-known box lists about four frames in HD. Yours is whatever you measure. Measure it. Write it on the rack.',
+      enter() { gsap.to('#receipt', { opacity: 1, duration: 0.5 * D }); } },
+  ];
+  const endCard = { text: 'PLAY WITH IT. <em>LINK IN BIO.</em>', sub: 'Drag the camera speed. Pull the waiting room out. Watch what happens.', enter() {} };
+  let si = -1;
+  let cutLabel = null; // in auto mode: i => label
+  const track = (name, data) => { if (window.sbdTrack && !cutLabel) window.sbdTrack(name, Object.assign({ demo: document.body.dataset.demo }, data || {})); };
+  function goStep(i, instant, override) {
+    if (!cutLabel) { if (i === 1) track('demo_start'); if (i === 3) track('demo_step_4'); if (i === steps.length - 1 && window.sbdComplete) window.sbdComplete(); }
+    si = i; const base = i === steps.length ? endCard : steps[i]; const s = override ? { ...base, ...override } : base;
+    $('stepNum').textContent = cutLabel ? cutLabel(i) : `STEP ${i + 1} OF ${steps.length}`;
+    if (instant) {
+      // the first frame of an auto cut shows its text at once: no timeline, nothing to race the clock
+      $('stepText').innerHTML = s.text; $('stepSub').textContent = s.sub; s.enter();
+      if (s.textAfter) { gsap.set('#stepText, #stepSub', { opacity: 0, y: 12 }); gsap.to('#stepText, #stepSub', { opacity: 1, y: 0, duration: 0.35 * D, delay: s.textAfter / 1000, ease: 'expo.out' }); }
+      else gsap.set('#stepText, #stepSub', { opacity: 1, y: 0 });
+    } else {
+      const tl = gsap.timeline();
+      tl.to('#stepText, #stepSub', { opacity: 0, y: -10, duration: 0.18 * D })
+        .add(() => { $('stepText').innerHTML = s.text; $('stepSub').textContent = s.sub; s.enter(); })
+        .fromTo('#stepText', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45 * D, ease: 'expo.out' })
+        .fromTo('#stepSub', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45 * D, ease: 'expo.out' }, '-=0.3');
+    }
+    $('next').textContent = i === steps.length - 1 ? 'PLAY WITH IT' : 'NEXT';
+    if (i === steps.length - 1) $('next').onclick = () => { $('ctl').classList.add('free'); track('play_start'); };
+  }
+
+  $('next').onclick = () => goStep(Math.min(si + 1, steps.length - 1));
+  addEventListener('keydown', e => { if (e.key === 'ArrowRight' && si < steps.length - 1) goStep(si + 1); });
+
+  // ---------- auto-play cuts (for the reel) ----------
+  // ?auto=full|main|teaser. Scheduled on GSAP's clock so the manual clock (?drive) drives them frame-exactly.
+  // cuts: [step index, ms, override?]. The main cut opens on the failure, then explains it.
+  const open = { text: 'WHY DOES THE PICTURE <em>TEAR?</em>', sub: 'Top half old, bottom half new. Something is arriving at the wrong time.', textAfter: 500 };
+  const cuts = {
+    full:   { steps: [[0, 4000], [1, 5000], [2, 5000], [3, 5000], [4, 6000], [5, 5000], [6, 6000]], cta: 3000 },
+    main:   { steps: [[2, 5000, open], [0, 4000], [1, 4000], [3, 5000], [4, 6000], [5, 5000], [6, 6000]], cta: 3000 },
+    teaser: { steps: [[2, 4500, open], [3, 5000]], cta: 3500, hold: 3500 },
+  };
+  function runCut(name) {
+    const cut = cuts[name]; if (!cut) return false;
+    document.body.classList.add('auto');
+    const total = cut.steps.length;
+    const order = cut.steps.map(x => x[0]);
+    cutLabel = i => `${order.indexOf(i) + 1} / ${total}`;
+    const first = cut.steps[0][0];
+    for (let i = 0; i < first; i++) steps[i].enter();          // arm what the opening depends on, silently
+    if (first >= 2) camT = (1 - camPhase) * P - 0.6;            // next camera frame lands ~0.6 s after the opening tear
+    let at = 0;
+    cut.steps.forEach(([idx, ms, ov], k) => {
+      if (k === 0) { goStep(idx, true, ov); if (idx === 2) tearNow(); }
+      else gsap.delayedCall(at / 1000, () => goStep(idx, false, ov));
+      at += ms;
+    });
+    if (cut.hold) at += cut.hold;                                // let the final picture sit under the CTA
+    if (cut.cta) gsap.delayedCall((at - cut.cta) / 1000, () => {
+      // the CTA takes the subtitle's place under the hook, so it never sits on the picture
+      const r = $('stepText').getBoundingClientRect(), f = $('fit').getBoundingClientRect(), sc = f.width / 1080;
+      $('cta').style.top = Math.round((r.bottom - f.top) / sc + 24) + 'px';
+      gsap.to('#stepSub', { opacity: 0, duration: 0.2 * D });
+      gsap.to('#cta', { opacity: 1, y: 0, duration: 0.4 * D, ease: 'expo.out', delay: 0.15 * D });
+    });
+    gsap.delayedCall(at / 1000, () => { if (window.hr) window.hr.done = true; });
+    if (window.hr) window.hr.cutLength = at;
+    return true;
+  }
+
+  // ---------- free-play controls ----------
+  function setMode(m) { mode = m; $('bMode').setAttribute('aria-pressed', m === 'pipe'); gsap.to('#pipe', { opacity: m === 'pipe' ? 1 : 0, duration: 0.4 * D }); if (m === 'min') { pipe.forEach(f => f.el.remove()); pipe = []; } }
+  $('bMode').onclick = () => setMode(mode === 'pipe' ? 'min' : 'pipe');
+  $('bBypass').onclick = () => { bypass = !bypass; $('bBypass').setAttribute('aria-pressed', bypass); gsap.to('#sync', { opacity: bypass ? 0 : 1, duration: 0.3 * D }); if (bypass) { if (slot) { slot.el.remove(); slot = null; } pipe.forEach(f => f.el.remove()); pipe = []; } };
+  $('bNudge').onclick = () => { camPhase += 0.3; gsap.fromTo('#camEm', { x: 0 }, { x: 24, duration: 0.15 * D, yoyo: true, repeat: 1 }); };
+  $('rate').oninput = e => { camRate = 1 + parseFloat(e.target.value) / 100; $('rateV').textContent = (parseFloat(e.target.value) >= 0 ? '+' : '') + e.target.value + '%'; };
+  $('bReset').onclick = () => location.reload();
+
+  const autoCut = new URLSearchParams(location.search).get('auto');
+  if (!(autoCut && runCut(autoCut))) goStep(0);
+})();
+</script>
+<script src="demo-shell.js"></script>
+</body>
+</html>
