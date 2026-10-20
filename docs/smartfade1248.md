@@ -15,3 +15,7 @@ Evidence: supplied Photo 3 establishes full top layout; Photos 1 and 2 show cap 
 Compatibility: ECP-1.0 revision 1.0. Producer: procedural millimeter equipment/control definition with explicit 0.001 adapter into the existing meter scene. Consumer: Ion inspection renderer/panel protocol only. GLB, plot, rig, game, hardware and other consumers are unverified. Runtime instance state does not belong in the immutable definition.
 
 Acceptance: preserve baseline Ion suites and like-for-like renders; verify physical counts, geometry/catalog correspondence, moving compound contours, state rejection/isolation, fallback, cancellation and camera presets. Test desktop, 680px, phone and emulated tablet sizes. Physical Surface/iPad, historical-state compatibility, exact rear/motion calibration, authenticated production embedding and same-device performance remain release gates. This increment cannot be called reference-accurate or release-complete while those gates remain open.
+
+## Authorized prototype publication
+
+Dave authorized publication on 19 October 2026 for inspection and trial, with approximate rear geometry and fader travel and open device checks. Sites version 13 is published at https://ion-workbench.davein4k.chatgpt.site/?gear=smartfade1248 (deployment appgdep_6ad6d4fcfa988191b6314424b5a7549d). AVByDave registration includes the required Ion host foundation. This prototype publication does not close the reference-accuracy, device, historical-state or performance gates above.

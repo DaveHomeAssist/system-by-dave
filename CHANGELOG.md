@@ -3,7 +3,7 @@
 ## SmartFade 1248 integration candidate — 2026-10-19
 
 - Add a distinct SmartFade 1248 prototype panel through the existing private gear viewer registration and handshake. Isolate its snapshots by equipment, workspace view and panel without changing Ion keys.
-- Keep rear geometry, measured travel, practice and physical/authenticated acceptance as open release gates; no production release is claimed.
+- Publish the inspection prototype on explicit user authorization. Rear geometry and fader travel remain approximate; practice, physical-device and reference-accurate acceptance stay open.
 
 ## 2026-10-17 — Gear panel integration candidate
 
@@ -11,6 +11,28 @@
 - Keep Ion private and online-only. Authenticated cross-origin browser acceptance remains a release gate.
 - Update the AV Suite shell browser probe for the new Gear 3D chooser group (11 groups; Gear 3D panels render as framed viewers).
 - Fix the gear viewer loading/recovery overlay text colour: use host body text (`--text`) instead of the on-accent `--ink`, which was unreadable in both palettes.
+## 2026-10-18 — Theme probe document readiness
+
+- Wait for the navigated document to finish loading before seeding its stored theme or sampling theme contracts. Exclude the previous document while following client redirects; bound the wait to ten seconds and report the URL, document state and stylesheet status on failure.
+- A focused exact-source diagnostic demonstrated premature theme sampling in both StagePlotter modes. Five disposable browser cases cover delayed assets, client redirects, genuine wrong themes, missing CSS and an unfinished load. Existing theme/color/contrast assertions and application assets remain unchanged; the original publication failure is retained without claiming its entire cause was reproduced.
+
+## 2026-10-18 — Visibility probe on published AV pages
+
+- Load the fixture's workspace helper from the managed LED runtime, matching the AV destination's inline delivery. The documented deployed-origin command no longer requests a raw helper file that is not published there; the separate offline initializer stays outside the fixture.
+- Include the probe module in the existing workspace workflow's path filter. Chromium and WebKit pass the focused checks against published runtime f7dc459. Application assets, cache generation and saved-data contracts are unchanged; preserve the first failed fixture run and physical-device gaps.
+
+## 2026-10-18 — Shared paging visibility compatibility
+
+- Guard missing `Element.checkVisibility` in the two current shared paging helpers and active Cue Sheet/StagePlotter callbacks. Preserve the native default check where available; use layout boxes and hidden light-DOM ancestor contents as the fallback. Synthetic missing-method failures reproduced in live Calculator and LED before the repair.
+- Add a focused native/masked API regression to the existing workspace probe. Chromium and WebKit cover both helpers, paging/value preservation and the current standalone/shared-console consumers. Preserve physical older-device and minimum-OS policy gaps; no global polyfill or saved-data change.
+- Regenerate embedded workspace runtimes and the native suite bundle, and advance the existing offline cache generation and Stage 3D readiness pin together. Preserve CSS, calculation engines, routes, schemas, keys and original imports.
+
+
+## 2026-10-18 — Stream and Record independent preparation
+
+- Define test-only typed Stream/Record rows and invented fixtures from the maintained field matrix and the last legacy producer source. Preserve text, blank/custom statuses, duration strings and explicit provenance/link fields in the prospective contract.
+- Record preview/cancel/apply/repeat/restore, ordering and optional-module acceptance requirements without enabling either pending import family. AVV-STREAM-KEY-1 remains unanswered; no credential policy, application schema, storage, route or generated runtime change is included.
+- Dominic passes Video typecheck and all 82 tests, including four contract/boundary cases; rebuilding Video preserves both asset hashes. Retain the initial AppleDouble transfer-metadata failure separately from the corrected run. Normal PR/publication and physical/operator gates remain separate.
 
 ## 2026-10-13 — Audio Speaker status choice parity
 

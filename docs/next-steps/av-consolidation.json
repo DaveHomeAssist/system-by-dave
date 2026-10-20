@@ -1352,6 +1352,96 @@
     "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/38797244610",
     "liveSource": "https://avbydave.com/source.json"
   },
+  "streamRecordPreparation": {
+    "itemId": "AVV-SR-DESIGN-1",
+    "recordedOn": "2026-10-18",
+    "reviewedBase": "4561f20a4ed854fdb807a5439d2867427885f670",
+    "state": "Independent test-only design implemented; Stream/Record runtime remains unimplemented and gated.",
+    "brief": "docs/av-video-stream-record-contract.md",
+    "authority": "Independent design work explicitly permitted by docs/av-video-stream-record-credential-decision.md; Stage 2.1\u20132.3 field and source-preservation contract.",
+    "acceptanceDelta": "Typed working row shapes, complete invented field/metadata fixtures, blank/custom/duration cases, and documented preview/cancel/apply/repeat/restore requirements. Existing six-family model still rejects Stream and Record imports and document extensions.",
+    "verification": "Dominic: Video typecheck, 82 tests (four new contract/boundary tests), Video build and unchanged JS/CSS hashes pass. Initial transfer sidecar failure retained; exact AppleDouble sidecars moved to private evidence before unchanged rerun.",
+    "delivery": "Source, review, exact-head CI, merge and publication are separate gates; the owning PR retains their provider receipts. This record makes no Stream/Record runtime or human acceptance claim.",
+    "remainingGate": "AVV-STREAM-KEY-1 before any dependent runtime; no policy selected, no provider/device/credential operation.",
+    "queueReconciliation": [
+      "Cameras/Playback acceptance at 338ea85 is delivered; do not reopen it.",
+      "Current native packs and restored specialist page panels supersede the October 9 snapshot-host direction; preserve the October 15 hybrid ruling.",
+      "Standalone-family route and first-native-specialist choices remain unanswered; no conversion selected.",
+      "October 14 Audio persona suggestions are review evidence, not approval for new features.",
+      "AVV-05 superseded on 2026-10-18 by focused native Calculator source/live keyboard evidence; do not redispatch as an active defect.",
+      "AVV-06 current missing-checkVisibility failure is repaired with focused automated proof; minimum OS/support policy and physical acceptance remain separate."
+    ],
+    "boardSync": "Configured Downloads board path is absent; the existing relocated private board is the only permitted synchronization target. Verify parity with the scoped updater and retain failures."
+  },
+  "calculatorSkipLinkRevalidation": {
+    "findingId": "AVV-05",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "liveSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "state": "Superseded for current standalone Calculator; focused source/live evidence, no runtime repair.",
+    "brief": "docs/av-calculator-app.md#skip-link-revalidation--2026-10-18",
+    "limits": "Only the current standalone Calculator keyboard path was revalidated. No screen-reader, physical-device, older-iPad, suite-wide skip-link, durability or operator acceptance claim. No runtime or test suite change.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
+  },
+  "embeddedNavigationRevalidation": {
+    "findingId": "AVV-13",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "liveSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "state": "Completed current embedded-navigation revalidation; no present root-route defect found. Future subdirectory adoption remains gated.",
+    "brief": "docs/av-workspace.md#embedded-navigation-revalidation--2026-10-18",
+    "currentConsumers": [
+      "av-calculator.html",
+      "cue-sheet.html",
+      "stage-plot.html"
+    ],
+    "independentChecks": "Current source inventory; each opt-in HTML has one slot, includes js/sbd-nav.js and has no base element. Six native URL-resolution checks (plain and synthetic show-context/hash URL for each root route) resolve Home to / and AV by Dave to /av/. All three published HTML files, navigation JS, viewport CSS and console index byte-match reviewed source; /av/ returns that console index. Production source.json matches the reviewed source. No new browser sweep or click test.",
+    "remainingGate": "Before any future subdirectory consumer adopts embedded navigation, define intended base/destination resolution and verify its navigation, show-context, save-guard and embedded-panel compatibility. No current adopter or implementation inferred.",
+    "limits": "No runtime/CSS change, user-data write, hypothetical subdirectory test, browser/remote job, physical-device, screen-reader or older-iPad acceptance. The legacy source URL claim is superseded, not the future adoption gate.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
+  },
+  "visibilityCompatibility": {
+    "findingId": "AVV-06",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "ba164f9487e7b921dbb04c22a92be2e547d1377b",
+    "state": "Runtime repair remains published at f7dc459; deployed-origin fixture and document-readiness probe corrections are separate checker changes with their own delivery gates.",
+    "brief": "docs/av-workspace.md#visibility-api-compatibility--2026-10-18",
+    "reproduction": "At the reviewed live source, masking only Element.checkVisibility in disposable modern-browser contexts reproduces TypeError in standalone Calculator and LED paging. This is a current JavaScript feature-absence reproduction, not an observed physical older-iPad failure.",
+    "repair": "Both shared paging helpers feature-detect the method, delegate without options when available and otherwise check layout boxes and content-visibility:hidden light-DOM ancestors. Active Cue Sheet and StagePlotter callbacks use the shared guard. Formulas, CSS, saved values, schemas, storage keys and imports are unchanged.",
+    "currentConsumers": [
+      "av-calculator.html via its native bridge",
+      "av/ via the compiled native Calculator pack",
+      "cue-sheet.html",
+      "stage-plot.html",
+      "led-wall-calculator.html",
+      "ProjectorThrow/Stage3D.html"
+    ],
+    "dormantCallers": "av-board-viewport.js, av-calculator-viewport.js and av-worksheet-viewport.js have no current published HTML or native-pack script consumer; they are not promoted or rewritten by this repair. Any future adoption needs compatibility review.",
+    "verification": "Dominic, Playwright1.63.0: Chromium and WebKit each pass11 box states for both helpers with native/masked API, native delegation, focused-page/value preservation and10 current-route cases. The current route cases cover standalone Calculator, LED, Cue Sheet, StagePlotter and shared-console Calculator in both API states. AV verification and26 Rail/worker tests pass; Throwline verification and47 tests pass after aligning the existing Stage3D cache pin. Shared runtime synchronization, native suite build and diff checks pass.",
+    "cacheGeneration": "v20261018-visibility-compatibility; registry, worker update, generated workspace copies, existing Stage3D readiness pin and exact-generation assertions advance together.",
+    "limits": "Synthetic API absence in current automated engines is not physical-device, full older-OS, screen-reader, touch ergonomics, installed-returning-client or operator acceptance. No minimum support policy, polyfill on Element.prototype, user-data change or new dependency.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred.",
+    "liveFixtureCorrection": {
+      "checkedOn": "2026-10-18",
+      "runtimeSource": "f7dc45954c22686ce50bdb20dfa7c0308f66821e",
+      "brief": "docs/av-workspace.md#published-fixture-correction--2026-10-18",
+      "trigger": "The deployed-origin fixture requested the unpublished raw js/av-workspace.js; the application already delivers that helper inline.",
+      "repair": "Read the managed LED runtime and isolate its AVWorkspace module for the fixture, excluding offline initialization. Existing workspace CI watches the probe module directly.",
+      "verification": "Dominic Chromium/WebKit each pass 12 groups including 11 helper states, actual focus/page/value retention and 10 current production route cases with native/masked API. All 11 production file hashes match f7dc459; Video JavaScript/CSS remain unchanged.",
+      "boundary": "Checker, existing CI path and records only; no application assets, CSS, calculations, cache version, saved keys, schemas or original imports changed. Runtime acceptance stays at f7dc459; checker review/CI/publication evidence is separate. Physical/older-OS/operator and existing product-policy gaps remain open."
+    },
+    "themeProbeReadiness": {
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "d93e0f5933983b4a2f3d28e4d0a90443ef21ef36",
+      "brief": "docs/av-workspace.md#theme-probe-document-readiness--2026-10-18",
+      "trigger": "Checker-only source publication39193117004 failed before deployment on StagePlotter light theme. Production remains acceptedf7dc459; the original failure is retained.",
+      "diagnostic": "One bounded exact-source light/dark diagnostic on Dominic observed both early samples loading with the static system marker, then complete with their correct stored mode; no captured request failures or page errors. This confirms premature sampling, not the entire original CI empty-CSS/browser-specific cause.",
+      "repair": "Probe-only bounded newer-document/complete wait before mode seeding and theme sampling; follows client redirects while excluding the previous document, with ten-second URL/document/stylesheet diagnostics. Expected mode, colors and contrast remain independent unchanged assertions.",
+      "verification": "Five focused disposable browser cases pass on Dominic Node24/Playwright1.63/ChromeForTesting153: delayed CSS/bootstrap in both modes; client redirect; genuine fully loaded wrong theme rejected; missing theme CSS rejected; unfinished load times out with document diagnostics. Existing viewport/theme CI runs the test.",
+      "boundary": "Only checker, focused test, existing CI and records; no application assets/build/cache/formulas/routes/saved keys/schemas/original imports change. Runtime acceptance remainsf7dc459 and unchanged Video JS/CSS; new source review/CI/merge/publication stay separate. Physical/olderOS/operator and unanswered product-policy gates remain open.",
+      "redirectCorrection": "First candidate d8ec325 CI39195166501 passed all four initial fixtures, then caught a strict-loader assumption at the existing Throwline client redirect to Stage3D.html. Guard corrected and redirect regression added; original failed run retained and application route unchanged."
+    }
+  },
   "smartFade1248": {
     "recordedOn": "2026-10-19",
     "state": "Implementation candidate; not merged or deployed",
@@ -1373,6 +1463,6 @@
     "hostImplementation": "75af3faef47ae8b3cd0bacc6f79b97cfb2d4bbd4",
     "viewerCandidateSource": "dde5fc5275b058429e69136ece630baac1383033",
     "savedSiteVersion": 13,
-    "deployment": "Withheld; saved version has no deployment ID"
+    "deployment": "Viewer Sites version 13 published on explicit user authorization; AVByDave host release in progress. Rear geometry and travel approximate; physical device checks remain open."
   }
 }
