@@ -103,7 +103,8 @@
         "av-workbook.html",
         "av-tool-suite/",
         "av-workbook/",
-        "field-kit/"
+        "field-kit/",
+        "field-kit/thanks/"
       ],
       "assets": [
         "img/av-by-dave-og.png",

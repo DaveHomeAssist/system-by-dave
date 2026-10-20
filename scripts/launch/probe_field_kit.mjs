@@ -4,7 +4,8 @@
 // (checked by demos/check-states.js). This checks the Field Kit page on phone
 // (390x844) and desktop (1280x800): noindex, TBD price, no console errors or
 // horizontal scroll, and that checkout stays closed until both a valid provider
-// link and the [DAVE] terms are in place.
+// link, a real price and the [DAVE] terms are in place, plus the noindex
+// after-payment download page (field-kit/thanks/).
 //   node scripts/launch/probe_field_kit.mjs [--screens /path/to/dir]
 import { chromium } from 'playwright';
 import fs from 'node:fs';
@@ -62,11 +63,11 @@ const VIEWPORTS = { phone: { width: 390, height: 844 }, desktop: { width: 1280, 
 
 try {
   // Every provider request is answered by a local route; nothing reaches a real service.
-  const cfgScript = (checkout) => `window.SBD_LAUNCH={analytics:{provider:null},fieldKit:{checkout:${JSON.stringify(checkout || { provider: null, url: '', mode: 'link' })},priceLabel:'Price TBD'}};`;
-  async function openWith(url, checkout, extraRoutes = [], viewport = VIEWPORTS.phone) {
+  const cfgScript = (checkout, priceLabel) => `window.SBD_LAUNCH={analytics:{provider:null},fieldKit:{checkout:${JSON.stringify(checkout || { provider: null, url: '', mode: 'link' })},priceLabel:${JSON.stringify(priceLabel)}}};`;
+  async function openWith(url, checkout, extraRoutes = [], viewport = VIEWPORTS.phone, priceLabel = '$19') {
     const hits = [];
     const routes = [
-      ['**/js/sbd-launch-config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: cfgScript(checkout) })],
+      ['**/js/sbd-launch-config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: cfgScript(checkout, priceLabel) })],
       // Playwright tries the most recently added route first, so the catch-all goes first.
       [/^https:\/\//, (route) => { const r = route.request(); hits.push({ url: r.url(), method: r.method(), body: r.postData() || '' }); return route.fulfill({ status: 200, contentType: 'text/html', body: '<p>ok</p>' }); }],
       ...extraRoutes
@@ -110,7 +111,20 @@ try {
     if ((await page.getAttribute('#kit-buy', 'target')) !== '_blank') fail('stripe: overlay request did not fall back to a new-tab link');
     await context.close();
   }
-  notes.push('checkout: closed while [DAVE] placeholders remain; gumroad link, lemonsqueezy overlay (embed=1 + class) and stripe new-tab work; non-provider hosts, http and unknown providers stay closed');
+  for (const priceLabel of ['Price TBD', '[DAVE: price, e.g. $19]', '']) {
+    const { page, context } = await openWith('/field-kit/', { provider: 'stripe', url: 'https://buy.stripe.com/test_123', mode: 'link' }, [noPlaceholders], VIEWPORTS.phone, priceLabel);
+    if (!(await page.locator('#kit-buy').isHidden())) fail(`checkout opened with placeholder price ${JSON.stringify(priceLabel)}`);
+    if (!/TBD/.test(await page.textContent('#kit-price'))) fail(`placeholder price ${JSON.stringify(priceLabel)} was shown on the page`);
+    await context.close();
+  }
+  {
+    const { page, context } = await openWith('/field-kit/', { provider: 'stripe', url: 'https://buy.stripe.com/test_123', mode: 'link' }, [noPlaceholders]);
+    if (await page.locator('#kit-buy').isHidden() || (await page.getAttribute('#kit-buy', 'href')) !== 'https://buy.stripe.com/test_123') fail('stripe link checkout did not open with a real price');
+    if (!/\$19/.test(await page.textContent('#kit-price'))) fail('real price not shown');
+    if (!/download link appears right after payment/.test(await page.textContent('#kit-buy-note'))) fail('buy note does not describe the after-payment download page');
+    await context.close();
+  }
+  notes.push('checkout: closed while [DAVE] placeholders remain or the price is a placeholder (Price TBD, [DAVE: …], empty); gumroad link, lemonsqueezy overlay (embed=1 + class) and stripe new-tab work; non-provider hosts, http and unknown providers stay closed');
 
   // 2. Field Kit draft page.
   for (const [label, viewport] of Object.entries(VIEWPORTS)) {
@@ -119,10 +133,35 @@ try {
     const robots = await page.getAttribute('meta[name="robots"]', 'content');
     if (!/noindex/.test(robots || '')) fail('Field Kit draft is not noindex');
     if (!/TBD/.test(await page.textContent('#kit-price'))) fail('Field Kit price is not a TBD placeholder');
+    if (!(await page.locator('#kit-buy').isHidden())) fail('shipped config opened checkout (Payment Link and price are placeholders)');
     if (errors.length) fail(`field kit ${label} console errors: ${errors.join(' | ')}`);
     await shotFull(page, `field-kit-${label}.png`);
     await context.close();
   }
+  notes.push('shipped config (Stripe, [DAVE] Payment Link and price placeholders): checkout closed, Price TBD shown');
+
+  // 3. After-payment download page (Stripe redirect target).
+  const DL = 'https://drive.google.com/drive/folders/abc123';
+  for (const [label, viewport] of Object.entries(VIEWPORTS)) {
+    const { page, context, errors } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(DL)}&session_id=cs_test_a1B2c3D4e5F6g7H8`, viewport);
+    const robots = await page.getAttribute('meta[name="robots"]', 'content');
+    if (!/noindex/.test(robots || '')) fail('thanks page is not noindex');
+    if (await page.locator('#ty-ready').isHidden() || (await page.getAttribute('#ty-download', 'href')) !== DL) fail(`thanks ${label}: download button missing for an allowed host`);
+    if (await page.evaluate(() => location.search)) fail(`thanks ${label}: query not removed from the address bar`);
+    if (!/e5F6g7H8/.test(await page.textContent('#ty-ref'))) fail(`thanks ${label}: order reference not shown`);
+    await page.reload(); await page.waitForLoadState('load');
+    if (await page.locator('#ty-ready').isHidden()) fail(`thanks ${label}: button lost after reload in the same tab`);
+    await noHorizontalScroll(page, `thanks ${label}`);
+    if (errors.length) fail(`thanks ${label} console errors: ${errors.join(' | ')}`);
+    await shotFull(page, `field-kit-thanks-${label}.png`);
+    await context.close();
+  }
+  for (const bad of ['https://evil.example/kit.zip', 'http://drive.google.com/x', 'javascript:alert(1)', 'https://drive.google.com.evil.example/x', '']) {
+    const { page, context } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(bad)}`, VIEWPORTS.phone);
+    if (!(await page.locator('#ty-ready').isHidden()) || await page.locator('#ty-missing').isHidden()) fail(`thanks accepted a bad link ${JSON.stringify(bad)}`);
+    await context.close();
+  }
+  notes.push('thanks page: noindex, button only for https links on known file hosts, query stripped, survives reload, bad links fall back to "email me"');
 } finally {
   await browser.close();
   server.close();

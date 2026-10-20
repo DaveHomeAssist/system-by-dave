@@ -21,7 +21,13 @@ window.SBD_LAUNCH = {
   //       and falls back to the link if the script is blocked).
   // Until provider and url are both valid, checkout stays disabled.
   fieldKit: {
-    checkout: { provider: null, url: '', mode: 'link' },
-    priceLabel: 'Price TBD'
+    // Chosen: Stripe Payment Links (2026-10-19). Replace the placeholder with the
+    // Payment Link, e.g. 'https://buy.stripe.com/xxxxxxxx'. Until it's a valid
+    // buy.stripe.com link, checkout stays closed.
+    checkout: { provider: 'stripe', url: '[DAVE: Stripe Payment Link]', mode: 'link' },
+    // Replace with the price buyers see, matching the Stripe price, e.g. '$19'.
+    // While it's a [DAVE: …] placeholder (or 'Price TBD'), the page shows
+    // "Price TBD" and checkout stays closed.
+    priceLabel: '[DAVE: price, e.g. $19]'
   }
 };

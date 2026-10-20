@@ -10,6 +10,14 @@ window.SBD_DEMOS = {
   // so a static site can use it. Leave emailFormAction empty to hide the form.
   //   Buttondown: 'https://buttondown.com/api/emails/embed-subscribe/<username>', field 'email'
   //   Kit:        paste the action URL and field name from the form's HTML embed
+  // beehiiv hosted subscribe page (Dave's choice, 2026-10-19). Replace the whole
+  // placeholder with the publication's public subscribe URL, e.g.
+  // 'https://YOURPUB.beehiiv.com/subscribe'. When it's a valid https beehiiv.com
+  // link, the ask becomes a button to that page (UTM-tagged, new tab) and
+  // emailFormAction is ignored. Anything else (this placeholder, '', a typo)
+  // leaves the ask exactly as it is without it. No CSP change: it's a link.
+  emailSubscribeUrl: '[DAVE: beehiiv subscribe URL]',
+
   emailFormAction: '',
   emailFieldName: 'email',
   emailTag: 'demos',           // Buttondown: sent as a hidden "tag" input; ignored elsewhere

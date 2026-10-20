@@ -35,6 +35,12 @@
 - Add a focused native/masked API regression to the existing workspace probe. Chromium and WebKit cover both helpers, paging/value preservation and the current standalone/shared-console consumers. Preserve physical older-device and minimum-OS policy gaps; no global polyfill or saved-data change.
 - Regenerate embedded workspace runtimes and the native suite bundle, and advance the existing offline cache generation and Stage 3D readiness pin together. Preserve CSS, calculation engines, routes, schemas, keys and original imports.
 
+## 2026-10-20 — beehiiv subscribe link and Stripe checkout prep (AV by Dave)
+
+- Demos: `demos/demo-shell.js` gains a hosted-subscribe-link mode. When `emailSubscribeUrl` in `demos/config.js` is an https `beehiiv.com` link, the post-completion ask becomes a "Send me the next demo" button to beehiiv's subscribe page (new tab, `rel="noopener"`, the visitor's UTM tags or demo defaults). It ships as a marked `[DAVE: …]` placeholder, so the ask is unchanged until Dave fills it in. No CSP change. New local probe `npm run probe:demo-subscribe`.
+- Field Kit: Stripe Payment Links chosen. `js/sbd-launch-config.js` ships `provider: 'stripe'` with `[DAVE: …]` Payment Link and price placeholders; checkout now also stays closed until the price is real. New noindex buyers-only download page `field-kit/thanks/` for Stripe's after-payment redirect (the file link lives only in that Stripe setting; known file hosts only, no referrer, query stripped). Delivery, statement-descriptor, refund and licence wording is DRAFT for Dave. The indexing policy now expects 189 unlisted routes.
+- Privacy policy: AV by Dave email list (beehiiv) and Field Kit purchases (Stripe) sections.
+
 ## 2026-10-18 — Field Kit draft and launch drafts (AV by Dave)
 
 - The frame sync demo's single home is `demos/frame-sync.html` (2026-10-20 entry), published at `https://avbydave.com/demos/frame-sync.html`. This branch's earlier duplicate `frame-sync/` page, its `js/sbd-signup.js` signup, its sitemap and domain-site entries and its reel capture script were removed before merge. `frame-sync/` was never on `main` or live, so no redirect. The Field Kit page, the launch docs, the reel copy and UTM links point at the demos page.

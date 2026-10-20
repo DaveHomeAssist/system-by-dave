@@ -10,6 +10,7 @@ until Dave picks it.
 |---|---|---|---|
 | `demos/frame-sync.html` (PR #360) | `https://avbydave.com/demos/frame-sync.html` | Indexed (avbydave.com sitemap) | The free, open interactive demo the Reel points to. Its single home; see `demos/README.md` |
 | `field-kit/` | `https://avbydave.com/field-kit/` | `noindex,nofollow`, not linked from navigation | Draft product page; price TBD, checkout closed |
+| `field-kit/thanks/` | `https://avbydave.com/field-kit/thanks/` | `noindex,nofollow,noarchive` | Buyers-only download page Stripe's after-payment redirect lands on |
 
 `field-kit/` is listed in the avbydave site's `pages` in `scripts/domain-sites.json`,
 so it publishes on avbydave.com, and the systembydave.com path becomes a redirect
@@ -28,10 +29,11 @@ home; no redirect is needed.
 
 | Where | Key | Today |
 |---|---|---|
-| `demos/config.js` | `umamiWebsiteId`, `emailFormAction`, `checklistUrl` | Empty: no analytics, no email form, no second action (see `demos/README.md`, `email.md`) |
+| `demos/config.js` | `emailSubscribeUrl` | `[DAVE: beehiiv subscribe URL]` placeholder: no signup link yet. Set → UTM-tagged button to beehiiv's hosted page (`email.md`) |
+| `demos/config.js` | `umamiWebsiteId`, `emailFormAction`, `checklistUrl` | Empty: no analytics, no email form, no second action (see `demos/README.md`) |
 | `js/sbd-launch-config.js` | `analytics.provider` | `null`: **OFF by decision (2026-10-18)**, no-op dispatcher (`analytics.md`) |
-| `js/sbd-launch-config.js` | `fieldKit.checkout` | `provider: null`: checkout disabled. One block per provider (Gumroad, Lemon Squeezy, Stripe Payment Links): see `checkout.md`. Stays closed while `[DAVE]` placeholders remain |
-| `js/sbd-launch-config.js` | `fieldKit.priceLabel` | `Price TBD` |
+| `js/sbd-launch-config.js` | `fieldKit.checkout` | `provider: 'stripe'`, `url: '[DAVE: Stripe Payment Link]'`: checkout disabled. After payment, Stripe redirects to the noindex `field-kit/thanks/` download page. One block per provider (Gumroad, Lemon Squeezy, Stripe Payment Links): see `checkout.md`. Stays closed while `[DAVE]` placeholders remain |
+| `js/sbd-launch-config.js` | `fieldKit.priceLabel` | `[DAVE: price, e.g. $19]` placeholder: page shows Price TBD and checkout stays closed |
 
 Affiliate links: none, and none planned for now (decision 2026-10-18).
 
@@ -65,7 +67,9 @@ npm run probe:field-kit -- --screens /path/outside/repo
 
 Phone 390×844 and desktop 1280×800: the Field Kit draft (noindex, price TBD, no
 console errors or horizontal scroll) and the checkout interlock and providers
-against local mocks. The demo is checked by `demos/check-states.js`.
+against local mocks, and the `field-kit/thanks/` download page. The demo itself is
+checked by `demos/check-states.js`; its email ask by
+`npm run probe:demo-subscribe` (placeholder, beehiiv link, UTM tags, bad URLs).
 
 ## Copy
 
