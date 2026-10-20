@@ -9,7 +9,7 @@ GitHub Pages repository.
 | --- | --- | --- | --- | --- |
 | `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/ursa-broadcast-g2/`, `/backfocus/`, `/camera-sim/` | 2026-09-18 |
 | `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | 2026-09-20; authenticated walk acceptance pending |
-| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Show-first landing at `/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/`, `/demos/` (hub, frame-sync, fault-finding; since 2026-10-20) | 2026-09-18 |
+| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Show-first landing at `/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
 and the browser storage its tools own. AV by Dave pages come from

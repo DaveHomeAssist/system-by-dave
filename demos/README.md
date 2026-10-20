@@ -1,6 +1,6 @@
 # AV by Dave — concept demos
 
-Public at <https://avbydave.com/demos/> (published from here; systembydave.com/demos/ redirects there). This folder is the source of truth for the demos
+Public at <https://systembydave.com/demos/>. This folder is the source of truth for the demos
 and their pipeline (it moved here from the Codex project folder on 2026-10-20).
 
 Site integration: each demo carries the public shell (skip link, `.sbd-site-return` breadcrumb,

@@ -102,8 +102,7 @@
         "av-suite.html",
         "av-workbook.html",
         "av-tool-suite/",
-        "av-workbook/",
-        "demos/"
+        "av-workbook/"
       ],
       "assets": [
         "img/av-by-dave-og.png",
