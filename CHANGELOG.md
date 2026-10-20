@@ -8,6 +8,10 @@
 - The Pages deploy stamps the published `_site/sitemap.xml`, and domain-site staging stamps each site's sitemap, with `--lastmod`: each page's last commit date from full git history. Without full history it omits the dates rather than guess.
 - `python3 scripts/gen_sitemap.py --check` fails with a diff when the committed sitemap is stale, and now runs on every pull request in Public site contracts, so route drift is caught before merge instead of on `main`.
 
+## 2026-10-20 — Demos publish on avbydave.com
+
+- Add `demos/` to the avbydave site in `scripts/domain-sites.json`: the hub, frame-sync and fault-finding demos (with their fonts, GSAP and public-nav assets) publish at `https://avbydave.com/demos/`, and `systembydave.com/demos/…` becomes the usual noindex redirect stub. Canonical, `og:url` and preview-image URLs name avbydave.com (`domain_cutover_rewrite.mjs --site avbydave --write`); the three routes move from `sitemap.xml` to the avbydave sitemap.
+
 ## 2026-10-20 — AV by Dave interactive demos
 
 - Add `demos/`: the frame-sync (008) and fault-finding (010) concept demos as public, ungated pages with a hub at `/demos/`, the public shell (skip link, breadcrumb, shared nav), canonical URLs and sitemap entries. GSAP comes from the vendored build.

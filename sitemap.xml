@@ -66,21 +66,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://systembydave.com/demos/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://systembydave.com/demos/frame-sync.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://systembydave.com/demos/fault-finding.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://systembydave.com/resume/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
