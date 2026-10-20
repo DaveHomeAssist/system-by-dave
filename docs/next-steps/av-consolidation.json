@@ -1368,6 +1368,11 @@
       "Physical Surface Pro 9 and iPad Pro M4 input",
       "Production authentication and denied/signed-out recovery",
       "Same-device performance"
-    ]
+    ],
+    "candidate": "https://github.com/DaveHomeAssist/system-by-dave/pull/359",
+    "hostImplementation": "75af3faef47ae8b3cd0bacc6f79b97cfb2d4bbd4",
+    "viewerCandidateSource": "dde5fc5275b058429e69136ece630baac1383033",
+    "savedSiteVersion": 13,
+    "deployment": "Withheld; saved version has no deployment ID"
   }
 }
