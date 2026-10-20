@@ -1,0 +1,26 @@
+# The Shop changelog
+
+## 2026-10-11
+
+- Adopt four working console panels: Worklist, Item inspector, Plan/Import and Backup. Reuse the shared layout engine for arrangements, maximize, lock and stored views.
+- Preserve Shop v1 plans, reviewed imports, original rows, quantity/status separation and guarded malformed-save replacement. Pending item edits survive panel switches and require Apply before Save/export/recovery.
+- Add optional workspace metadata, independent draft/layout recovery, shared theme/context and embedded AV Video operation without duplicate navigation.
+- Retain legacy model tests and browser assertions; add native panel, saved-data, responsive, offline and embedding gates.
+
+## 2026-10-08
+
+- Show Gear Prep requested quantity and operator-entered packed quantity in previews, worklist rows and the inspector. Blank counts remain unknown; partial packs do not imply readiness.
+- Keep Shop v1 backup compatibility and original-source retention. Reject malformed, repeated, or stale Gear Prep source previews without changing saved plans.
+- Prevent a low-contrast flash during theme changes and unlock bounded panels for printing.
+
+## 2026-10-07
+
+- Created a standalone logistics worklist spanning prep, pack, load in and strike.
+- Added explicit local save, source import previews, original-record retention, Shop backup export and restore, and visible save failure/conflict feedback.
+- Added responsive desktop and phone layouts, light and dark modes, keyboard access, model tests and a browser acceptance probe.
+
+The route is awaiting shared Rail registration and deployment through the serialized integration owner.
+
+- Review repair: valid backup recovery preserves unreadable saved bytes before replacement; Truck Pack strapped maps to ready; blank item titles leave live rows intact; Skip to worklist moves focus to its target.
+
+- Adopted shared AV theme identity, palette tokens and persisted operator preference; corrected theme contrast in the app mark and kept the app's light/dark toggle.

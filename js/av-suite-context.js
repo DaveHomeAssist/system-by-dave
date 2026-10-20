@@ -10,7 +10,7 @@
     var mode = 'dark'; /* Stage Slate first-use default (docs/av-console.md) */
     try{
       var stored = localStorage.getItem('av-theme-mode.v1');
-      if(stored === 'dark' || stored === 'light' || stored === 'system') mode = stored;
+      if(stored === 'dark' || stored === 'light' || stored === 'white' || stored === 'black' || stored === 'system') mode = stored;
     }catch(e){}
     root.setAttribute('data-av-theme', mode);
   })();
@@ -100,6 +100,7 @@
     Object.keys(REG.recommended).forEach(function(phase){
       next[phase] = REG.recommended[phase].map(function(id){
         var tool = REG.toolById(id);
+        if(tool && tool.retired) tool = null;
         return tool ? {name: tool.name, href: tool.href} : null;
       }).filter(Boolean);
     });
@@ -344,7 +345,7 @@
   }
 
   function suiteHref(){
-    return contextHref('av-suite.html');
+    return contextHref('av/');
   }
 
   function currentRoute(){
@@ -752,7 +753,8 @@
       'sbd-suite-link sbd-suite-step',
       contextHref(tool.href),
       direction + ' ' + tool.name,
-      direction + ' phase tool: ' + tool.name
+      // The accessible name starts with the visible text (WCAG 2.5.3).
+      direction + ' ' + tool.name + ' (' + (direction === 'Prev' ? 'previous' : 'next') + ' phase tool)'
     );
     link.title = direction + ' phase tool: ' + tool.name;
     dock.appendChild(link);

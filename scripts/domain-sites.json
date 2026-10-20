@@ -95,24 +95,27 @@
       "deployKeySecret": "AVBYDAVE_DEPLOY_KEY",
       "cutover": true,
       "home": "/",
-      "landingPage": "av-suite-landing2.html",
+      "landingPage": "av/index.html",
       "registry": true,
       "pages": [
-        "av-suite-landing.html",
-        "av-suite-landing2.html",
+        "av/",
         "av-suite.html",
         "av-workbook.html",
         "av-tool-suite/",
         "av-workbook/"
       ],
-      "assets": [],
+      "assets": [
+        "img/av-by-dave-og.png",
+        "js/av-landing-theme.js",
+        "fonts/dm-sans.woff2"
+      ],
       "robotsDisallow": [
         "/404.html",
         "/transfer.html"
       ],
       "storage": {
         "registryKeys": true,
-        "revision": 3,
+        "revision": 4,
         "keys": [
           "av-suite-dashboard.v1",
           "av-suite-ui.v1",
@@ -123,7 +126,9 @@
           "system-by-dave.av-workbook.fallback.v1"
         ],
         "prefixes": [
+          "sbd.avLighting.v1.recovery.",
           "sbd.handoff.",
+          "sbd.shop.recovery.",
           "sbd.showboard."
         ],
         "indexedDB": [

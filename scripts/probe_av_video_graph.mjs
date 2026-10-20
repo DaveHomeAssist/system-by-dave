@@ -237,7 +237,7 @@ try {
   }
   await page.setViewportSize({ width: 1440, height: 900 }); await button('Fit View').click();
   const zoomBefore = await page.locator('.react-flow__viewport').getAttribute('style');
-  await button('Zoom In').click();
+  await button('Zoom in').click();
   assert.notEqual(await page.locator('.react-flow__viewport').getAttribute('style'), zoomBefore);
   await button('Toggle overview').click(); assert.ok(await page.locator('.react-flow__minimap').isVisible());
   assert.deepEqual(errors, []);

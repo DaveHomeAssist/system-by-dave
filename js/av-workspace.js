@@ -1,6 +1,15 @@
 /* View state only: existing form nodes and product calculation state remain authoritative. */
 (function(global){
   'use strict';
+  function isVisible(element){
+    if(typeof element.checkVisibility==='function')return element.checkVisibility();
+    // Match the native default box check, including skipped ancestor contents.
+    if(!element.getClientRects().length)return false;
+    for(let parent=element.parentElement;parent;parent=parent.parentElement){
+      if(getComputedStyle(parent).contentVisibility==='hidden')return false;
+    }
+    return true;
+  }
   const root=document.documentElement;
   const pagers=new Set();
   let frame=0;
@@ -39,7 +48,7 @@
     }
     const api={
       refresh(){
-        if(!panel.checkVisibility()||win.clientWidth===0||win.clientHeight===0)return;
+        if(!isVisible(panel)||win.clientWidth===0||win.clientHeight===0)return;
         width=win.getBoundingClientRect().width;gap=parseFloat(getComputedStyle(root).getPropertyValue('--av-page-gap'))||16;
         content.style.setProperty('--av-page-width',`${width}px`);
         total=Math.max(1,Math.ceil((content.scrollWidth+gap)/(width+gap)));
@@ -58,7 +67,7 @@
     new MutationObserver(refresh).observe(content,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['hidden','open']});
     panel.avPager=api;pagers.add(api);refresh();return api;
   }
-  global.AVWorkspace={paginate,refresh};
+  global.AVWorkspace={paginate,refresh,isVisible};
   if(root.hasAttribute('data-av-workspace')){
     viewport();global.addEventListener('resize',viewport);global.visualViewport?.addEventListener('resize',viewport);
   }

@@ -5,6 +5,7 @@ import { launchContextChanges, readLaunchContext, withLaunchContext } from "./la
 describe("launch context", () => {
   it("treats URL values as a bounded offer without mutating the workbook", () => {
     const workbook = createBlankWorkbook();
+    workbook.show.targetDate = "2026-10-08";
     const original = { ...workbook.show };
     const context = readLaunchContext("?sbdShow=  Harbor%20Gala  &sbdVenue=Pier%2068&sbdDate=2026-10-09&sbdOperator=CAM%201");
     const changes = launchContextChanges(workbook, context);

@@ -2,6 +2,8 @@
 
 **Implementation update 2026-10-05:** [AV Video](../av-video/) combines Signal Flow and Video Patch as one standalone application launched from Toolbox, with optional modules and its own versioned document. See [the implemented workflow](av-video.md). Cross-application document linking remains deferred; it is not a prerequisite for this independently saved route-and-patch slice. The October 3 Displays & Projection slice adds destination records, explicit route links and lossless imports from Display Plan and Projection Plan. The October 5 Cameras/Playback slice adds ordered records, operator status actions, route links and two lossless imports. Stream Plan and Record Log remain planned; release proof is tracked in the existing next-steps records. Full capability and operator acceptance, and legacy entry retirement, remain open.
 
+**Shell decision 2026-10-13:** one `/av/` console replaces Toolbox and the per-application consoles; the 34 legacy sheet pages are retired. See the [AV Suite shell brief](av-suite-shell.md).
+
 **Console update 2026-10-05:** AV Video now runs in the shared panel console ([contract and recorded decisions](av-console.md)). Dave's 10-05 decisions add: Stage Slate dark as the first-use default (shipped 10-05), a per-console draft store, a read-only show chip, every application in scope with its own panel library, and family consoles with lossless imports. The "keep live apps separate" boundary below is under review for a unified Show Control console.
 
 **Decision revision:** 2026-10-02, requested by Dave. The October 2 clarification removes assumed Workbook adoption, recovery and migration requirements from public withdrawal. This is the maintained product and migration plan. It supersedes the September 23 seven-workspace proposal and the September 29 recommendation to build Video inside Workbook. The [dated specification](av-suite-consolidation-spec-2026-09-23.md) remains historical evidence.
@@ -91,6 +93,12 @@ The capability is settled. The shipped AV Video modules (Patch, Displays, Checks
 7. **Persistence:** Preserve the shipped AV Video contract: module visibility belongs to its versioned document and travels in a full backup. Toolbox application visibility is a separate personal preference, not a write to a Video document or Show Console readiness. For future applications, choose document-owned versus device-local module preferences before the affected persistence/import UI is implemented. Account sync and team policy are not prerequisites. Do not retroactively move Video preferences to a different store as a routine cleanup.
 
 Example: a projection operator opens Video from Toolbox, keeps Switching & Routes and Displays & Projection, and turns Cameras, Playback and Stream & Record off. The interface stays focused; saved stream records remain in backups and return unchanged when that module is enabled.
+
+### Toolbox to Video module-management slice
+
+An operator browsing Toolbox should be able to find the shipped AV Video module controls without first learning that they live under Project. The smallest useful slice adds a clearly labeled **Manage modules** link to the AV Video application card and opens its existing Project & modules panel. That panel remains the document-owned place to enable or disable Video modules; simply following the link must not write a plan, Toolbox preference, Show Console record, or Rail preference.
+
+This slice does not add universal application visibility, new module presets, cross-document preferences, or controls for the eight Planned Rail consoles. It depends only on the existing AV Video route and Project panel, not the Stream/Record credential decision. Verify the direct link and loaded/saved-module cases in a browser at desktop and phone widths, including a customized layout that hides Project in a full grid; the link must reveal the panel without replacing that layout or saving a plan. Check root containment, a 44px target, and unchanged Toolbox/Show/Rail storage on navigation. Full Stage 6 management, including restore-defaults behavior and future application ownership, remains a separate acceptance item.
 
 ## Workbook public withdrawal and retained concept
 

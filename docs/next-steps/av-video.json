@@ -4,10 +4,10 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "338ea85d3162a55e30a0c40f07955e2390ad46c2",
+  "head": "9c370be5dc7125eacdfb4591aa85d670a87ba48d",
   "status": "amber",
-  "statusReason": "Cameras/Playback and console recovery are delivered with automated live proof. The dependency-security blocker is resolved. Stream/Record, Rail integration and physical/operator acceptance remain open.",
-  "lastActivity": "2026-10-05",
+  "statusReason": "All nine primary Rail identities now recall inside AV Video's shared console. PR #314 and the 9c370be publication preserve selectable, resizable and reconfigurable snapshot panels, stored arrangements, standalone routes and independent app data; production provenance, isolated live browser acceptance and ten-asset parity pass. Stream/Record and physical/operator acceptance remain open.",
+  "lastActivity": "2026-10-09",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -15,15 +15,19 @@
     "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan.",
     "The shared console workspace, Stage Slate first-use theme, offered draft recovery and device-local layout persistence shipped through #264 at 66b3d66; source deployment 37282446471 and AV deployment 37286283303 succeeded.",
     "Console recovery hardening (#266): visible storage failures, guarded tab conflicts, cached geometry validation; pre-merge checks on Walter and live recovery checks on Duncan at 73a7bbe.",
-    "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter."
+    "Cameras/Playback (#268, dependency repair #271): six legacy import families, ordered shots/cues, explicit route links, operator actions and reversible modules. Source/destination publication and isolated live acceptance verified at 338ea85 on Walter.",
+    "Application Rail (#279): AV Video now mounts the exact nine RAIL-1B console slots with eight non-actionable Planned entries, RAIL-2A phone/compact/labeled layouts, typed routes, device-local customization and offline assets. Source and AV publications succeeded; Walter live acceptance, seven-asset parity and the returning-client cache transition from published adf1f1e to reviewed 55bec1a passed.",
+    "AV Video Manage modules (#283): the Toolbox card opens the guarded Project view; source and AV publication, Walter live navigation/browser checks and four-asset parity passed at a6241a9.",
+    "All nine published primary AV applications are navigable from the Rail (#312) at c77b0cd. Source deployment 37893934453 and AV destination deployment 37895712977 passed; production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified. Physical/operator and connected-workflow acceptance remain separate.",
+    "In-console application snapshots (#314, publication repairs #317/#316) are published at 9c370be. All eight non-Video Rail applications open within AV Video as selectable, resizable and reconfigurable panels; stored arrangements, Change/Close state, focus, standalone routes and independent app data passed isolated live production checks on Walter."
   ],
   "nextStep": {
-    "title": "Prepare Stream and Record after resolving stream-key handling",
-    "why": "Cameras/Playback is published and live-verified. Define credential handling across Stream/Record imports, original payloads and exports before its dependent implementation.",
-    "doneWhen": "Video increments preserve legacy fields/statuses and imports with independent saved documents, reversible modules and verified publication.",
-    "effort": "L",
-    "owner": "Codex",
-    "blockedBy": "Stream-key handling decision before dependent Stream/Record implementation"
+    "title": "Decide the Stream and Record credential boundary",
+    "why": "AVV-STREAM-KEY-1 documents current warning-only leakage through legacy storage/exports and AV Video original-payload retention. Approve block-raw or accept the warning-only disclosure risk before dependent implementation.",
+    "doneWhen": "Dave selects Option 1 (block raw keys at every AV Video boundary, recommended) or Option 2 (warning-only) and the answer is recorded before Stream/Record runtime work.",
+    "effort": "S",
+    "owner": "Dave",
+    "blockedBy": "Dave decision AVV-STREAM-KEY-1 gates runtime only; AVV-SR-DESIGN-1 now records the independent typed contract and synthetic preparation. Do not redispatch that preparation as missing."
   },
   "findings": [
     {
@@ -36,33 +40,6 @@
         "scripts/probe_calculator_viewport.cjs",
         ".github/workflows/av-workspace.yml",
         ".github/workflows/deploy-pages.yml"
-      ],
-      "evidence": "code-read",
-      "phase": 0
-    },
-    {
-      "id": "AVV-05",
-      "type": "nav",
-      "sev": "P2",
-      "title": "Skip link resets calculator to first task (hash routing)",
-      "detail": "Source still activates task zero when fromLocation cannot map the hash. The earlier skip-link observation is not re-tested here; preserve this follow-up rather than infer it fixed by broad passing matrices.",
-      "files": [
-        "js/av-viewport.js",
-        "av-calculator.html"
-      ],
-      "evidence": "code-read",
-      "phase": 0
-    },
-    {
-      "id": "AVV-06",
-      "type": "responsive",
-      "sev": "P2",
-      "title": "Unguarded Element.checkVisibility in shared paging runtime",
-      "detail": "Current shared AVViewport still calls Element.checkVisibility without feature detection. Older-iPad compatibility remains a source-level risk, not a reproduced physical-device failure.",
-      "files": [
-        "js/av-workspace.js",
-        "js/av-viewport.js",
-        "led-wall-calculator.html"
       ],
       "evidence": "code-read",
       "phase": 0
@@ -85,14 +62,15 @@
       "id": "AVV-13",
       "type": "nav",
       "sev": "P3",
-      "title": "Embedded nav from #238 uses a relative Toolbox link",
-      "detail": "Current embedded navigation still uses relative av-suite.html?entry=toolbox. Root-level migrated routes passed comparison; future subdirectory adoption requires explicit resolution and compatibility checks.",
+      "title": "Future subdirectory adoption needs explicit embedded navigation resolution",
+      "detail": "Revalidated at 885a3ab on 2026-10-18: current embedded navigation emits Home / and AV by Dave av/. Current consumers av-calculator.html, cue-sheet.html and stage-plot.html are root-level with no base element, so av/ resolves to https://avbydave.com/av/. Published files byte-match source; six current-route URL-resolution checks pass. The old Toolbox target is superseded. No present route defect found or runtime repair required. Before a future subdirectory route opts in, define destination/base resolution and verify compatibility; no such adoption is implemented or accepted by this record.",
       "files": [
         "js/sbd-nav.js",
         "css/av-viewport.css"
       ],
-      "evidence": "code-read",
-      "phase": 0
+      "evidence": "source/live-file parity and URL-resolution check; prior root-route browser comparisons retained",
+      "phase": 0,
+      "status": "Future adoption gate; current revalidation completed"
     },
     {
       "id": "AVV-14",
@@ -107,20 +85,6 @@
       ],
       "evidence": "doc",
       "phase": 4
-    },
-    {
-      "id": "AVV-15",
-      "type": "decision",
-      "sev": "P1",
-      "title": "Nine Rail slots and responsive/customization choices approved; integration remains",
-      "detail": "Dave selected RAIL-1B on 2026-10-05: Toolbox; AV Video, Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator; then All apps and Customize. At 66b3d66 only AV Video is a production console, so the other eight slots must be visibly Planned and status-only. Dave approved RAIL-2A (phone Apps below 720px, compact rail at 720\u20131439px, labeled rail at 1440px+) and RAIL-3A (device-local pin, unpin, reorder and reset) on October 5. The Rail owner handles isolated implementation and later integration; no deployed Rail runtime or visual parity is claimed.",
-      "files": [
-        "docs/2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md",
-        "docs/av-console.md",
-        "js/sbd-registry.js"
-      ],
-      "evidence": "doc",
-      "phase": 3
     }
   ],
   "phases": [
@@ -129,7 +93,7 @@
       "goal": "Close the confirmed coverage gap; revalidate recorded shell risks before fixes.",
       "items": [
         "AVV-02 delivered: theme, Calculator and navigation parity probes gate relevant PRs.",
-        "AVV-05 / AVV-06 / AVV-13: preserve hash, compatibility and subdirectory follow-ups."
+        "AVV-05 superseded by focused current Calculator keyboard/source proof; AVV-06 current feature-absence failure is repaired with focused native/masked API proof; physical older-device acceptance remains separate; AVV-13 current-route revalidation is complete, with only a future subdirectory adoption gate retained."
       ],
       "gate": "Relevant PR gate execution and focused regression proof; no weakened assertions."
     },
@@ -153,14 +117,20 @@
       "gate": "PRs #237\u2013#243 merged; both destination/source deployment evidence verified. Unselected catalog tools are not claimed refactored."
     },
     {
-      "name": "Application rail \u2014 Approved choices; integration pending",
-      "goal": "Carry the complete v3 console order without presenting planned consoles as available products.",
+      "name": "Application rail and console snapshots \u2014 Delivered",
+      "goal": "Recall all nine published primary applications inside AV Video's shared console while retaining standalone routes and independent application data.",
       "items": [
         "RAIL-1B selected October 5: nine source-ordered console slots appear by default between fixed Toolbox and All apps / Customize controls.",
-        "At the current production baseline only AV Video is available; Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator are Planned/status-only console identities.",
-        "RAIL-2A responsive presentation and RAIL-3A device-local customization are approved. The Rail owner handles isolated implementation and integration; no public runtime acceptance is claimed."
+        "PR #312 maps all nine published primary applications to canonical routes; every Rail entry and Console card is navigable, zero entries remain Planned, and mapped apps are not duplicated under Specialist tools.",
+        "RAIL-2A responsive presentation and device-local customization are mounted around AV Video. Typed routes, data isolation, explicit recovery, focus return and five local offline assets are covered.",
+        "PR #279, source deployment 37572814064 and AV destination deployment 37574460288 passed. Walter live acceptance covered 11 viewport fixtures; seven published Rail/AV assets matched 55bec1a byte-for-byte.",
+        "Walter's isolated returning-client fixture kept one browser context from published adf1f1e through reviewed 55bec1a: AV Video data, UI-written Rail customization and typed context survived the worker update, the old cache was removed, all seven Rail/AV assets were cached and the updated app reopened offline.",
+        "Source deployment 37893934453 and AV destination deployment 37895712977 passed at c77b0cd. Production source.json, live Audio launch and ten AV Video page-asset matches were verified; physical/operator acceptance remains open.",
+        "PR #314 turns all eight non-Video Rail entries into same-origin application snapshot panels without leaving /av-video/; AV Video remains the native ninth identity.",
+        "Snapshot panels use the shared 12\u00d78 engine for selection, add/change/close, move/size/split, maximize, layout lock and stored arrangements; Save remains explicit and application data stays app-owned.",
+        "Source workflow 37906183659 and AV destination workflow 37910550653 passed at 9c370be; Walter's isolated production run exercised all eight embedded routes, resize/store/reload and active Rail behavior, and ten release assets matched source."
       ],
-      "gate": "Integrate the approved profile through the Rail owner, preserving exact nine slots, eight truthful Planned states, data and accessibility contracts."
+      "gate": "Exact-head CI, repaired generated-output parity, both publications, production provenance, live console journeys and asset parity passed. Physical devices and operator acceptance remain separate."
     },
     {
       "name": "Physical and operator acceptance \u2014 Open",
@@ -197,7 +167,7 @@
     "Retire the 8 legacy Video pages once AV Video imports all 8 keys, or keep them live indefinitely?",
     "Minimum iOS/iPadOS for field use: 17.4+ (checkVisibility) or add fallbacks for older iPads?",
     "Throwline: keep explicit-save only (edited width resets on reload) or add a draft autosave?",
-    "Stream & Record: block raw stream keys outright on import/export, or keep warning-only?"
+    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?"
   ],
   "files": [
     {
@@ -205,8 +175,8 @@
       "why": "Public-safe evidence projection; underlying product specifications and implementation remain authoritative."
     },
     {
-      "path": "docs/2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md",
-      "why": "Source-aligned Rail brief, RAIL-1B decision record and explicit RAIL-2/RAIL-3 choice gates"
+      "path": "docs/2026-10-05_Rail-Implementation-Spec-v2.3-Runtime-Profile.md",
+      "why": "Implemented Rail runtime profile, breakpoints, storage, routing, recovery and verification contract"
     },
     {
       "path": "docs/av-workspace.md",
@@ -252,11 +222,13 @@
   "verify": [
     "git diff --check",
     "npm run verify:av",
+    "npm run test:av-offline-transition",
+    "AV_VIDEO_BASE=https://avbydave.com node scripts/probe_av_video_rail.mjs --no-sandbox",
     "VIEWPORT_BASE=https://avbydave.com/ node scripts/probe_calculator_viewport.cjs",
     "VIEWPORT_BASE=https://avbydave.com/ VIEWPORT_BROWSER=webkit node scripts/probe_calculator_viewport.cjs"
   ],
   "context": [
-    "RAIL-1B was selected October 5, 2026: the default rail reproduces all nine v3 console slots in source order; production-unbuilt consoles remain clearly Planned and status-only.",
+    "RAIL-1B was selected October 5, 2026. Its original status-only baseline is superseded by #312: all nine published primary applications are canonical Rail destinations; physical/operator acceptance remains separate.",
     "The original v3 source archive was inspected at SHA-256 71b72c70ab3e004fd324f98cec7ed05a2cf16d054a4c05fce74fe298c5dd5e02; browser-rendered parity remains unverified.",
     "All six viewport candidates are deployed; the earlier not-live statements are superseded.",
     "AV Video owns sbd.avVideo.v1; layout reuse does not merge stores or make Workbook a dependency.",
@@ -264,9 +236,54 @@
     "Workbook redesign and legacy Video rebuild were excluded from the viewport work.",
     "WebKit Calculator geometry/function checks passed; its offline reload lane is excluded. Chromium offline proof is not physical Safari acceptance.",
     "Historical audit details remain in private updater backups; stable finding IDs preserve traceability.",
-    "The prior design-only console assessment is superseded by #262-#264. Recovery hardening #266 is delivered; the recorded RAIL-1B default decision and open RAIL-2/RAIL-3 choices are preserved as planning, not implementation evidence."
+    "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open.",
+    "PR #312 delivered the application-launcher model: Rail availability means the published primary route opens, not that physical/operator or deeper connected-workflow acceptance is complete."
   ],
   "links": [
+    {
+      "label": "In-console application snapshots #314",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/314"
+    },
+    {
+      "label": "Audio bundle parity guard #316",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/316"
+    },
+    {
+      "label": "Audio bundle publication repair #317",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/317"
+    },
+    {
+      "label": "Console snapshot source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37906183659"
+    },
+    {
+      "label": "Console snapshot AV destination deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37910550653"
+    },
+    {
+      "label": "Live AV Video console",
+      "url": "https://avbydave.com/av-video/"
+    },
+    {
+      "label": "Rail application launcher #312",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/312"
+    },
+    {
+      "label": "Rail application launcher source deployment",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37893934453"
+    },
+    {
+      "label": "Rail application launcher AV deployment",
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37895712977"
+    },
+    {
+      "label": "Stream and Record credential decision",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/av-video-stream-record-credential-decision.md"
+    },
+    {
+      "label": "Application Rail release #279",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/279"
+    },
     {
       "label": "Console recovery release #266",
       "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/266"
@@ -276,8 +293,8 @@
       "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/75132ba7a111b5a33b1b5df52f65ceb44df63dbc/docs/av-console.md"
     },
     {
-      "label": "Rail implementation specification v2.2",
-      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/2026-10-05_Rail-Implementation-Spec-v2.2-v3-Source-Alignment.md"
+      "label": "Rail runtime profile v2.3",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/2026-10-05_Rail-Implementation-Spec-v2.3-Runtime-Profile.md"
     },
     {
       "label": "Maintained consolidation plan",
@@ -297,19 +314,19 @@
     },
     {
       "label": "Source deployment",
-      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37385110411"
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37572814064"
     },
     {
       "label": "AV deployment",
-      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37387293386"
+      "url": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37574460288"
     },
     {
       "label": "Toolbox",
       "url": "https://avbydave.com/av-suite.html?entry=toolbox"
     }
   ],
-  "kickoffPrompt": "Continue the maintained AV Video increments from fresh remote main. AVV-02 pre-merge theme, Calculator and navigation coverage is delivered. Preserve independently saved Video documents and explicit legacy imports while preparing Stream/Record after its credential-handling decision; test optional-module off states, export/reload, unchanged original data, CI and public release. Physical acceptance remains separate.",
-  "confidence": "High for the cited console release and scoped automated checks; physical acceptance and historical follow-ups remain open.",
+  "kickoffPrompt": "Continue AV Video from accepted application source 9c370be. The nine-identity in-console snapshot Rail is delivered; do not rebuild it. Preserve standalone routes, app-owned data, typed context and stored arrangements. Prepare Stream/Record only after AVV-STREAM-KEY-1, and keep physical/operator acceptance separate.",
+  "confidence": "High for the cited in-console snapshot release, exact source/live asset parity, production provenance and isolated live browser journeys; physical/operator acceptance and historical follow-ups remain open.",
   "unknowns": [
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
@@ -345,12 +362,168 @@
     ],
     "limits": [
       "Physical phones/tablets, virtual keyboards and operator rehearsal are not established by browser automation.",
-      "Rail choices are approved; this release does not establish Rail runtime or visual parity.",
+      "Rail runtime and its returning-client update are verified in isolated automated Chromium; physical/operator acceptance is not established.",
       "Stream/Record credential policy, legacy retirement and cross-app synchronization remain separate decisions/work.",
       "Historical shell findings retain their own revalidation requirements."
-    ]
+    ],
+    "railRelease": {
+      "checkedOn": "2026-10-07",
+      "scope": "AV Video production Rail mount with RAIL-1B, RAIL-2A, device-local customization, typed routing, recovery and offline assets; no Stream/Record or physical/operator acceptance claim.",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/279",
+      "featureMerge": "55bec1afdd3b9e8e14f5a7ac3ed0a0caef858915",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37572814064",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37574460288",
+      "destinationCommit": "708e324e86005f98b866bfc7456b6a7b634084b6",
+      "offlineTransition": {
+        "runner": "Walter",
+        "origin": "Ephemeral loopback origin; one persistent isolated Chromium context",
+        "oldRevision": "adf1f1eda565b51b13d42b08968ca081e0f547a7",
+        "oldDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37433638295",
+        "oldCache": "sbd-av-suite-v20261005-video-sequences",
+        "newRevision": "55bec1afdd3b9e8e14f5a7ac3ed0a0caef858915",
+        "newCache": "sbd-av-suite-v20261007-av-video-rail",
+        "preserved": [
+          "sbd.avVideo.v1 saved through the real AV Video UI",
+          "sbd.rail.v1 written through the real Customize dialog while the old worker controlled the network-first Rail page",
+          "sbdShow, sbdVenue, sbdDate, sbdOperator and sbdPhase typed context; unrelated private query data stayed excluded"
+        ],
+        "result": "PASS: controller changed, old cache was removed, seven Rail/AV assets were present in the new cache and the updated contextual app reopened offline.",
+        "limit": "Isolated Chromium lifecycle evidence only; no production cache, Dave browser profile, physical device or operator workflow was mutated or accepted."
+      },
+      "publishedSource": "https://avbydave.com/source.json",
+      "liveProbeRunner": "Walter",
+      "runtime": [
+        "Nine exact-head PR jobs passed at 4b3e3fc; final Codex review reported no major issues after two focus/access fixes.",
+        "Walter verify:av passed 23 Rail/worker tests; the live Rail probe passed 11 viewport fixtures, routing, state preservation, customization, corrupt-preference recovery, focus, zoom and reduced-motion checks.",
+        "Published source.json named 55bec1a; AV Video HTML, both Rail stylesheets, three Rail scripts and the registry matched the merge byte-for-byte.",
+        "Walter returning-client transition passed from published adf1f1e/old cache to reviewed 55bec1a/new cache in one persistent isolated browser context, followed by an offline reopen."
+      ],
+      "limits": [
+        "The returning-client fixture reproduces the browser lifecycle on an isolated loopback origin; it is not Dave's production profile or a physical device.",
+        "Physical phones/tablets, virtual keyboards, touch ergonomics and operator rehearsal remain open."
+      ]
+    },
+    "moduleManagementRelease": {
+      "checkedOn": "2026-10-07",
+      "status": "Published; isolated live browser acceptance passed",
+      "scope": "AV Video Project module-management deep link from Toolbox, preserving saved layouts and document state",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/283",
+      "head": "192bbf2cb40405038af994820474d8689b25607e",
+      "featureMerge": "a6241a9a57805992100b6c26df23fcfdcb3db82b",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37643453450",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37647082283",
+      "destinationCommit": "0eae673774fc1b1c1dd0f71404702f3f3e6cc4cb",
+      "liveReadback": "avbydave.com/source.json names a6241a9; Walter Chrome fresh-profile Toolbox Manage modules click opened /av-video/?view=project with six module controls and eight Planned Rail entries. Full live AV Video probe passed at 1440, 680, 375 and 3440 widths; four deployed assets matched the merge byte-for-byte.",
+      "offlineTransition": "Walter isolated Chromium PASS from published 642a47e/old Rail cache to a6241a9/new module-management cache; saved AV Video data and Rail preferences survived, old cache removed, updated app reopened offline.",
+      "limits": [
+        "Physical devices, Dave's browser profile and operator acceptance remain untested."
+      ]
+    },
+    "credentialDecision": {
+      "checkedOn": "2026-10-07",
+      "sourceRevision": "b0effc822acad9786c528f99c8731c022028093c",
+      "status": "Open; documentation and recommendation only",
+      "decisionId": "AVV-STREAM-KEY-1",
+      "brief": "docs/av-video-stream-record-credential-decision.md",
+      "verifiedFacts": [
+        "Legacy Stream Plan stores keyLabel and includes it in JSON and CSV exports; its detector warns but does not block or transform the value.",
+        "AV Video stores accepted legacy source text verbatim in imports[].raw and includes that text in saved documents and full backups.",
+        "Record Log has no credential field."
+      ],
+      "recommendation": "Block raw stream keys at every AV Video boundary and reject unsafe candidates before preview adoption or persistence.",
+      "limits": [
+        "No runtime implementation or provider/device operation is included.",
+        "Only synthetic examples may be used in dependent tests."
+      ]
+    },
+    "applicationLauncherRelease": {
+      "checkedOn": "2026-10-09",
+      "scope": "All nine published primary AV applications navigable from the Rail and listed once in All apps; no document, schema, storage, physical-device, operator or connected-workflow acceptance change.",
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/312",
+      "sourceRevision": "c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec",
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37893934453",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37895712977",
+      "destinationCommit": "9412f690e3dbcacc0903a5a1f506bb4b58a92a5e",
+      "publishedSource": "https://avbydave.com/source.json",
+      "artifactSha256": "b9d9267789f6c51f8db09c9d0cad848e6541ee6135b592503e8780bf60f9d41d",
+      "runtime": [
+        "All six required exact-head PR checks passed at a14e487 after the Stage 3D offline cache pin was aligned; the resolved review thread identified the same repair.",
+        "Source workflow 37893934453 and AV destination workflow 37895712977 passed; production source.json named c77b0cd5562f9ce0dc582f414744e3d1b7f9eaec.",
+        "Live AV Video showed nine canonical Rail links and zero Planned entries. All apps showed nine Console links without repeating the mapped primary applications under Specialist tools.",
+        "The live Audio Console card opened https://avbydave.com/av-audio/ and rendered the Audio workspace.",
+        "AV Video JavaScript, CSS, registry, Rail scripts and shared theme assets matched the c77b0cd source byte-for-byte."
+      ],
+      "limits": [
+        "Browser navigation and exact asset parity do not establish physical-device, operator or connected cross-application workflow acceptance.",
+        "Stream Plan, Record Log and the AVV-STREAM-KEY-1 credential decision remain separate AV Video work."
+      ]
+    },
+    "consoleSnapshotRelease": {
+      "checkedOn": "2026-10-09",
+      "sourceRevision": "9c370be5dc7125eacdfb4591aa85d670a87ba48d",
+      "status": "Published; isolated live browser acceptance passed; physical/operator acceptance open",
+      "scope": "All nine primary AV Rail identities recall inside AV Video's shared console; the eight non-Video applications run as selectable, resizable and reconfigurable same-origin snapshot panels with stored arrangements, while standalone routes and app-owned data remain independent.",
+      "sources": [
+        "apps/av-video/src/App.tsx",
+        "apps/shared/av-console/Workspace.tsx",
+        "js/sbd-rail-mount.js",
+        "js/sbd-rail-dialogs.js",
+        "js/sbd-registry.js",
+        "scripts/probe_av_console.mjs"
+      ],
+      "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/314",
+      "head": "1ce4660402a82e71f831ea8e88461b93894281e8",
+      "featureMerge": "9c992ff2ab393efb3918d6878b4813452a07d916",
+      "publicationRepairs": {
+        "#317": "6b64fb443e5e53606f13528f2e732b8c5bc430b6",
+        "#316": "9c370be5dc7125eacdfb4591aa85d670a87ba48d"
+      },
+      "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37906183659",
+      "sourceDeploymentAttempt": 2,
+      "transientWorkspaceGateAttempt": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37906183659/attempts/1",
+      "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/37910550653",
+      "destinationCommit": "9619276ae6a0725d78e2447baa7b41c37230bcea",
+      "failedSourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/37903086664",
+      "publishedSource": "https://avbydave.com/source.json",
+      "artifactSha256": "c6355361546f58beaef930e4d4fcb225bbdc18f55e149702fb1d11d95b6bcbda",
+      "liveProbeSourceRevision": "9c370be5dc7125eacdfb4591aa85d670a87ba48d",
+      "liveProbeRunner": "Walter",
+      "cacheVersion": "v20261009-show-ops-console",
+      "assetSha256": {
+        "av-video/assets/av-video.js": "5526372651036cb4a553a5c2488e47b93ca065814c7aa7f3df84ff539bd7a2d5",
+        "av-video/assets/av-video.css": "2061bd71adfe740d6afd217e7736105c76d58b61e8a21dde8600c7b35dbb4be0",
+        "av-audio/assets/av-audio.js": "99a9148d49ee648da948c4c83f4ff665a97b7e86dc82293404642e668f99db5a",
+        "js/sbd-rail-mount.js": "4c3d0d000a037c6af7d12a2433b9009caf6f343e1a85b378d5c563d086f72f6e",
+        "js/sbd-rail-dialogs.js": "8c3578d0c47a5ceaf1ebf4ecfc2a515fe685ee5d073b18a1817ac0642bb47cf0",
+        "js/sbd-registry.js": "ff13a85bfde59259a320442e268a47bb03bf24412c4d690562052fddb0af201c",
+        "av-suite-worker.js": "4e215cc043f07add2bf8b251ff870de1a8cf5c0d55f617869d25cac751f7c10f",
+        "show-ops/assets/show-ops.js": "45c82c7b692e80338845bc18c959e9e79892ba92e3c377d8350faa1810e755d5",
+        "show-ops/assets/index.css": "55d8797fda333349e03176952988d2a169c224faa41634022e42d35bb3b03992",
+        "ProjectorThrow/Stage3D.html": "f796a32c74612a21b110d1af507df8ce48495bda024018d08b0c73a347e818ff"
+      },
+      "runtime": [
+        "PR #314 passed six exact-head checks at 1ce4660 after all review threads were resolved; it merged normally as 9c992ff.",
+        "The first source deployment stopped before staging because Audio's generated bundle had not been rebuilt after the shared workspace change. PR #317 supplied the byte-identical rebuild and PR #316 added Audio typecheck, test, build and drift coverage to the AV Video workflow; the combined accepted source is 9c370be.",
+        "Source run attempt 1 later stopped before staging on one LED 360x800 dark geometry assertion. The unchanged source passed all 80 touch viewport/theme cases and three offline reloads on Duncan; same-head attempt 2 then passed the release gate and publication.",
+        "Source workflow 37906183659 and AV destination workflow 37910550653 passed; production source.json named 9c370be5dc7125eacdfb4591aa85d670a87ba48d.",
+        "Walter's isolated production Chromium runs passed all nine Rail identities, all eight in-console application frame routes, Rail/All Apps selection, keyboard focus, Change/Close active-state tracking, resize, stored-view Save/reload, responsive layouts, recovery and zero page errors.",
+        "Production AV Video JavaScript/CSS, Audio JavaScript, Show Ops JavaScript/CSS, Stage3D HTML, both Rail scripts, registry and worker matched the accepted source byte-for-byte."
+      ],
+      "limits": [
+        "Physical phones/tablets, virtual keyboards, touch ergonomics and operator rehearsal remain open.",
+        "Embedding preserves each application's existing behavior; it does not establish missing specialist parity, cross-application synchronization or external hardware/output acceptance.",
+        "Stream Plan, Record Log and AVV-STREAM-KEY-1 remain separate AV Video work.",
+        "On Walter, the standalone npm test:av-audio command exits when Vitest finds no Audio test files; Linux exact-head and source workflows pass the Audio tests, typecheck, build parity and complete AV release gates."
+      ]
+    }
   },
   "historicalFindings": [
+    {
+      "id": "AVV-15",
+      "title": "Nine Rail slots and responsive/local customization delivered",
+      "status": "Delivered",
+      "note": "Delivered in #279 at 55bec1a. AV Video mounts the exact nine RAIL-1B slots with eight Planned/status-only consoles, RAIL-2A layouts and device-local customization. Both publications, Walter live acceptance across 11 viewports, seven-asset parity and the isolated returning-client cache transition from published adf1f1e passed. Physical/operator acceptance remains separate."
+    },
     {
       "id": "AVV-01",
       "title": "Fixed: deploy red since #237 (run 383 green after #239)",
@@ -396,8 +569,60 @@
     {
       "id": "AVV-12",
       "title": "Raw stream keys can travel in Stream Plan exports",
-      "status": "Needs revalidation",
-      "note": "Historical finding retained by ID; not reverified in this scoped board reconciliation."
+      "status": "Confirmed current",
+      "note": "Revalidated at b0effc8 on 2026-10-07. stream-plan.html stores keyLabel and exports it in JSON and CSV; looksLikeRawKey adds a row/summary warning but does not block or transform the value. AVV-STREAM-KEY-1 recommends rejecting unsafe candidates before AV Video retains imports[].raw."
+    },
+    {
+      "id": "AVV-05",
+      "type": "nav",
+      "sev": "P2",
+      "title": "Skip link resets calculator to first task (hash routing)",
+      "detail": "Source still activates task zero when fromLocation cannot map the hash. The earlier skip-link observation is not re-tested here; preserve this follow-up rather than infer it fixed by broad passing matrices.",
+      "files": [
+        "js/av-viewport.js",
+        "av-calculator.html"
+      ],
+      "evidence": "code-read",
+      "phase": 0,
+      "status": "Superseded",
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+      "note": "Historical unknown-hash risk retained. Current standalone native Calculator preserves Video/Power task, panels and synthetic storage on keyboard skip-to-main at1440x900 and375x812; focus reaches main-content. See calculatorSkipLinkRevalidation and docs/av-calculator-app.md. No runtime repair or broad accessibility claim."
+    },
+    {
+      "id": "AVV-13",
+      "type": "nav",
+      "sev": "P3",
+      "title": "Embedded nav from #238 uses a relative Toolbox link",
+      "detail": "Current embedded navigation still uses relative av-suite.html?entry=toolbox. Root-level migrated routes passed comparison; future subdirectory adoption requires explicit resolution and compatibility checks.",
+      "files": [
+        "js/sbd-nav.js",
+        "css/av-viewport.css"
+      ],
+      "evidence": "code-read",
+      "phase": 0,
+      "status": "Superseded",
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+      "note": "The historical target av-suite.html?entry=toolbox is no longer emitted. Current embedded navigation emits relative av/, and the three current opt-in HTML routes are all root-level. No present destination defect found; retain AVV-13 only as an explicit future subdirectory adoption gate. See embeddedNavigationRevalidation."
+    },
+    {
+      "id": "AVV-06",
+      "type": "responsive",
+      "sev": "P2",
+      "title": "Unguarded Element.checkVisibility in shared paging runtime",
+      "detail": "Current shared AVViewport still calls Element.checkVisibility without feature detection. Older-iPad compatibility remains a source-level risk, not a reproduced physical-device failure.",
+      "files": [
+        "js/av-workspace.js",
+        "js/av-viewport.js",
+        "led-wall-calculator.html"
+      ],
+      "evidence": "code-read",
+      "phase": 0,
+      "status": "Repaired for current consumers",
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "ba164f9487e7b921dbb04c22a92be2e547d1377b",
+      "note": "Current feature-absence failures were reproduced, then repaired with shared feature detection and focused native/masked API regression. See visibilityCompatibility. Physical older-device acceptance and minimum-OS policy remain separate; inactive adapters were not adopted."
     }
   ],
   "decisionsResolved": [
@@ -528,5 +753,162 @@
         }
       }
     }
-  ]
+  ],
+  "streamRecordPreparation": {
+    "itemId": "AVV-SR-DESIGN-1",
+    "recordedOn": "2026-10-18",
+    "reviewedBase": "4561f20a4ed854fdb807a5439d2867427885f670",
+    "state": "Independent test-only design implemented; Stream/Record runtime remains unimplemented and gated.",
+    "brief": "docs/av-video-stream-record-contract.md",
+    "authority": "Independent design work explicitly permitted by docs/av-video-stream-record-credential-decision.md; Stage 2.1\u20132.3 field and source-preservation contract.",
+    "acceptanceDelta": "Typed working row shapes, complete invented field/metadata fixtures, blank/custom/duration cases, and documented preview/cancel/apply/repeat/restore requirements. Existing six-family model still rejects Stream and Record imports and document extensions.",
+    "verification": "Dominic: Video typecheck, 82 tests (four new contract/boundary tests), Video build and unchanged JS/CSS hashes pass. Initial transfer sidecar failure retained; exact AppleDouble sidecars moved to private evidence before unchanged rerun.",
+    "delivery": "Source, review, exact-head CI, merge and publication are separate gates; the owning PR retains their provider receipts. This record makes no Stream/Record runtime or human acceptance claim.",
+    "remainingGate": "AVV-STREAM-KEY-1 before any dependent runtime; no policy selected, no provider/device/credential operation.",
+    "queueReconciliation": [
+      "Cameras/Playback acceptance at 338ea85 is delivered; do not reopen it.",
+      "Current native packs and restored specialist page panels supersede the October 9 snapshot-host direction; preserve the October 15 hybrid ruling.",
+      "Standalone-family route and first-native-specialist choices remain unanswered; no conversion selected.",
+      "October 14 Audio persona suggestions are review evidence, not approval for new features.",
+      "AVV-05 superseded on 2026-10-18 by focused native Calculator source/live keyboard evidence; do not redispatch as an active defect.",
+      "AVV-06 current missing-checkVisibility failure is repaired with focused automated proof; minimum OS/support policy and physical acceptance remain separate."
+    ],
+    "boardSync": "Configured Downloads board path is absent; the existing relocated private board is the only permitted synchronization target. Verify parity with the scoped updater and retain failures."
+  },
+  "calculatorSkipLinkRevalidation": {
+    "findingId": "AVV-05",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "liveSource": "a38a9a8ab41b89289a50c4d4f5359bb8bc1cefbb",
+    "state": "Superseded for current standalone Calculator; focused source/live evidence, no runtime repair.",
+    "brief": "docs/av-calculator-app.md#skip-link-revalidation--2026-10-18",
+    "cause": "The old unknown-hash fallback remains in AVViewport.tabs, but current Calculator uses its native known-panel-only hash handler and AVViewport.paginate. #main-content does not select a different task.",
+    "runner": "Dominic; Playwright1.63.0 Chromium; isolated disposable contexts with service workers blocked.",
+    "cases": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "startTask": "storageCard",
+        "beforeView": "Video",
+        "afterView": "Video",
+        "beforeHash": "#storageCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      },
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "startTask": "powerCard",
+        "beforeView": "Power",
+        "afterView": "Power",
+        "beforeHash": "#powerCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      },
+      {
+        "viewport": {
+          "width": 375,
+          "height": 812
+        },
+        "startTask": "storageCard",
+        "beforeView": "Video",
+        "afterView": "Video",
+        "beforeHash": "#storageCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      },
+      {
+        "viewport": {
+          "width": 375,
+          "height": 812
+        },
+        "startTask": "powerCard",
+        "beforeView": "Power",
+        "afterView": "Power",
+        "beforeHash": "#powerCard",
+        "afterHash": "#main-content",
+        "focusAfter": "main-content",
+        "panelsPreserved": true,
+        "storageByteIdentical": true
+      }
+    ],
+    "verification": "First Tab reaches Skip to calculators at both sizes; Shift+Tab then Enter preserves nonfirst Video/Power tasks and panels, focuses main-content, changes only the navigation hash, and preserves synthetic localStorage. Four cases pass; no page errors; screenshots inspected. Live bundle/helper byte-match reviewed source.",
+    "limits": "Only the current standalone Calculator keyboard path was revalidated. No screen-reader, physical-device, older-iPad, suite-wide skip-link, durability or operator acceptance claim. No runtime or test suite change.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
+  },
+  "embeddedNavigationRevalidation": {
+    "findingId": "AVV-13",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "liveSource": "885a3ab42d621aef7923dbcc5979f2fd1cc301f1",
+    "state": "Completed current embedded-navigation revalidation; no present root-route defect found. Future subdirectory adoption remains gated.",
+    "brief": "docs/av-workspace.md#embedded-navigation-revalidation--2026-10-18",
+    "emittedLinks": {
+      "Home": "/",
+      "AV by Dave": "av/"
+    },
+    "expectedConsole": "https://avbydave.com/av/",
+    "currentConsumers": [
+      "av-calculator.html",
+      "cue-sheet.html",
+      "stage-plot.html"
+    ],
+    "independentChecks": "Current source inventory; each opt-in HTML has one slot, includes js/sbd-nav.js and has no base element. Six native URL-resolution checks (plain and synthetic show-context/hash URL for each root route) resolve Home to / and AV by Dave to /av/. All three published HTML files, navigation JS, viewport CSS and console index byte-match reviewed source; /av/ returns that console index. Production source.json matches the reviewed source. No new browser sweep or click test.",
+    "reusedReportedChecks": "Existing root-route comparisons recorded in the finding and docs/av-workspace.md (92 legacy navigation comparisons) are retained as historical reported evidence, not represented as newly run current-source browser checks.",
+    "remainingGate": "Before any future subdirectory consumer adopts embedded navigation, define intended base/destination resolution and verify its navigation, show-context, save-guard and embedded-panel compatibility. No current adopter or implementation inferred.",
+    "limits": "No runtime/CSS change, user-data write, hypothetical subdirectory test, browser/remote job, physical-device, screen-reader or older-iPad acceptance. The legacy source URL claim is superseded, not the future adoption gate.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred."
+  },
+  "visibilityCompatibility": {
+    "findingId": "AVV-06",
+    "checkedOn": "2026-10-18",
+    "reviewedSource": "ba164f9487e7b921dbb04c22a92be2e547d1377b",
+    "state": "Runtime repair remains published at f7dc459; deployed-origin fixture and document-readiness probe corrections are separate checker changes with their own delivery gates.",
+    "brief": "docs/av-workspace.md#visibility-api-compatibility--2026-10-18",
+    "reproduction": "At the reviewed live source, masking only Element.checkVisibility in disposable modern-browser contexts reproduces TypeError in standalone Calculator and LED paging. This is a current JavaScript feature-absence reproduction, not an observed physical older-iPad failure.",
+    "repair": "Both shared paging helpers feature-detect the method, delegate without options when available and otherwise check layout boxes and content-visibility:hidden light-DOM ancestors. Active Cue Sheet and StagePlotter callbacks use the shared guard. Formulas, CSS, saved values, schemas, storage keys and imports are unchanged.",
+    "currentConsumers": [
+      "av-calculator.html via its native bridge",
+      "av/ via the compiled native Calculator pack",
+      "cue-sheet.html",
+      "stage-plot.html",
+      "led-wall-calculator.html",
+      "ProjectorThrow/Stage3D.html"
+    ],
+    "dormantCallers": "av-board-viewport.js, av-calculator-viewport.js and av-worksheet-viewport.js have no current published HTML or native-pack script consumer; they are not promoted or rewritten by this repair. Any future adoption needs compatibility review.",
+    "verification": "Dominic, Playwright1.63.0: Chromium and WebKit each pass11 box states for both helpers with native/masked API, native delegation, focused-page/value preservation and10 current-route cases. The current route cases cover standalone Calculator, LED, Cue Sheet, StagePlotter and shared-console Calculator in both API states. AV verification and26 Rail/worker tests pass; Throwline verification and47 tests pass after aligning the existing Stage3D cache pin. Shared runtime synchronization, native suite build and diff checks pass.",
+    "cacheGeneration": "v20261018-visibility-compatibility; registry, worker update, generated workspace copies, existing Stage3D readiness pin and exact-generation assertions advance together.",
+    "limits": "Synthetic API absence in current automated engines is not physical-device, full older-OS, screen-reader, touch ergonomics, installed-returning-client or operator acceptance. No minimum support policy, polyfill on Element.prototype, user-data change or new dependency.",
+    "nextEligible": "AVV-14 physical-device/operator acceptance requires actual device and operator evidence. AVV-STREAM-KEY-1 still gates Stream/Record runtime; standalone-family route and first-native-specialist choices remain unanswered. No minimum-OS policy or new feature approval inferred.",
+    "liveFixtureCorrection": {
+      "checkedOn": "2026-10-18",
+      "runtimeSource": "f7dc45954c22686ce50bdb20dfa7c0308f66821e",
+      "brief": "docs/av-workspace.md#published-fixture-correction--2026-10-18",
+      "trigger": "The deployed-origin fixture requested the unpublished raw js/av-workspace.js; the application already delivers that helper inline.",
+      "repair": "Read the managed LED runtime and isolate its AVWorkspace module for the fixture, excluding offline initialization. Existing workspace CI watches the probe module directly.",
+      "verification": "Dominic Chromium/WebKit each pass 12 groups including 11 helper states, actual focus/page/value retention and 10 current production route cases with native/masked API. All 11 production file hashes match f7dc459; Video JavaScript/CSS remain unchanged.",
+      "boundary": "Checker, existing CI path and records only; no application assets, CSS, calculations, cache version, saved keys, schemas or original imports changed. Runtime acceptance stays at f7dc459; checker review/CI/publication evidence is separate. Physical/older-OS/operator and existing product-policy gaps remain open."
+    },
+    "themeProbeReadiness": {
+      "checkedOn": "2026-10-18",
+      "reviewedSource": "d93e0f5933983b4a2f3d28e4d0a90443ef21ef36",
+      "brief": "docs/av-workspace.md#theme-probe-document-readiness--2026-10-18",
+      "trigger": "Checker-only source publication39193117004 failed before deployment on StagePlotter light theme. Production remains acceptedf7dc459; the original failure is retained.",
+      "diagnostic": "One bounded exact-source light/dark diagnostic on Dominic observed both early samples loading with the static system marker, then complete with their correct stored mode; no captured request failures or page errors. This confirms premature sampling, not the entire original CI empty-CSS/browser-specific cause.",
+      "repair": "Probe-only bounded newer-document/complete wait before mode seeding and theme sampling; follows client redirects while excluding the previous document, with ten-second URL/document/stylesheet diagnostics. Expected mode, colors and contrast remain independent unchanged assertions.",
+      "verification": "Five focused disposable browser cases pass on Dominic Node24/Playwright1.63/ChromeForTesting153: delayed CSS/bootstrap in both modes; client redirect; genuine fully loaded wrong theme rejected; missing theme CSS rejected; unfinished load times out with document diagnostics. Existing viewport/theme CI runs the test.",
+      "boundary": "Only checker, focused test, existing CI and records; no application assets/build/cache/formulas/routes/saved keys/schemas/original imports change. Runtime acceptance remainsf7dc459 and unchanged Video JS/CSS; new source review/CI/merge/publication stay separate. Physical/olderOS/operator and unanswered product-policy gates remain open.",
+      "redirectCorrection": "First candidate d8ec325 CI39195166501 passed all four initial fixtures, then caught a strict-loader assumption at the existing Throwline client redirect to Stage3D.html. Guard corrected and redirect regression added; original failed run retained and application route unchanged."
+    }
+  }
 }

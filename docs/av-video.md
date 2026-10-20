@@ -4,6 +4,16 @@
 
 Signal Flow is an interactive device-and-connection canvas backed by the same routes as Video Patch. Create or edit a route in either view: source, destination, processor, format, connector, input, converter, status, backup and notes stay together. Checks show missing fields and reported issues without changing the operator's status or claiming that a physical signal has been tested. No show setup or Workbook is required.
 
+## Application Rail
+
+AV Video is mounted beside the shared AV application Rail. The Rail lists the exact nine-console v3 order: AV Video is available; Audio, Show Control, Show Ops, Front Office, The Shop, Infrastructure, Lighting and AV Calculator are visibly **Planned** and do not navigate. Planned console identities do not imply an application, route, document or storage contract.
+
+Below 720 CSS pixels, **Apps** opens the application dialog and the existing bottom control continues to switch panels inside AV Video. From 720–1439 pixels the Rail is a compact icon column; at 1440 pixels and above it shows labels. AV Video still chooses phone, tablet and desktop workspace modes from the viewport width, not the remaining content width.
+
+**All apps** resolves typed console, Toolbox-family, specialist-tool and external destinations. Recognized show context is carried only to eligible same-origin consoles and tools; Toolbox, family and external destinations do not receive it. **Customize** stores device-local pin order under `sbd.rail.v1` only after an explicit pin, unpin, move or reset. Opening or rendering the Rail does not write preferences, repair drafts or change the active AV Video plan.
+
+The Rail assets are part of the AV Suite offline manifest. A returning installation still depends on the normal service-worker update cycle before the new cache generation controls that client.
+
 ## Canvas clarity
 
 Cables use orthogonal obstacle routing in both the canvas and exported SVG. They route around devices, including after dragging; enclosed ports show an Arrange warning instead of a false connection through overlapping equipment. Arrowheads stop before the target port so the device cannot cover them. HDMI is dashed and SDI is solid; compact connector labels and accessible full signal descriptions replace repeated long cable labels. The selected route shows its source format once above the canvas; different explicit formats can label individual cables when there is room.
@@ -95,6 +105,12 @@ Signal Flow and Video Patch legacy URLs and storage contracts remain usable. The
 Preset references: [Blackmagic video standards](https://www.blackmagicdesign.com/products/atemtelevisionstudio/techspecs) and [Extron EDID timing tables](https://media.extron.com/public/download/files/userman/dtp_t_hwp_uwp_D_series_68-2547-01_H.pdf). These inform useful planning choices, not a claim that every device supports every format.
 
 The sequence probe checks camera/playback import parity, ordering and status actions, route links, CSV/full backups, recovery, module retention, keyboard and responsive themes, and offline edits. Run it through `npm run test:av-video-browser`.
+
+### Application Rail returning-client transition evidence, October 7
+
+`npm run test:av-offline-transition` replays the successfully published pre-Rail revision `adf1f1eda565b51b13d42b08968ca081e0f547a7` (deployment `37433638295`) and the exact reviewed Rail runtime `55bec1afdd3b9e8e14f5a7ac3ed0a0caef858915` on one isolated origin. One persistent Chromium context installs and is controlled by cache `sbd-av-suite-v20261005-video-sequences`, creates and saves a real sample AV Video plan, then loads the network-first Rail UI while that older worker still controls the page and unpins Audio through the real Customize dialog. The registration then updates to `sbd-av-suite-v20261007-av-video-rail`, removes the old cache, precaches all seven checked Rail/AV assets and reopens the same contextual AV Video URL offline. The saved `sbd.avVideo.v1` document and `sbd.rail.v1` preference remain byte-identical; the Rail retains the five typed show fields and drops the unrelated `private` parameter.
+
+Walter passed this protocol on exact detached old/new Git trees. The fixture exercises a genuine worker install, control, update, `controllerchange`, cache replacement and offline navigation in one browser context; it does not modify production, Dave's browser profile or real saved data. It is automated Chromium evidence, not physical-device or operator acceptance.
 
 ### Cameras/Playback release evidence, October 5
 

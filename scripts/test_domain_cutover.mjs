@@ -46,7 +46,7 @@ async function serve(directory) {
 let source = 'https://systembydave.com';
 const sites = [
   { id: 'housevideo', origin: 'https://housevideo.app', route: '/fmp/', key: 'fmp.cutover.acceptance', database: 'fmpPhotosV1' },
-  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av-suite.html', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' },
+  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av/', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' },
   // The preshow walk is its own origin. It claims the same fmp prefix and photo
   // database as the hub, so its acceptance key is distinct to keep the two apart.
   { id: 'housevideo-walk', origin: 'https://walk.housevideo.app', route: '/fmpwalk/', key: 'fmp.walk-cutover.acceptance', database: 'fmpPhotosV1' }
@@ -264,7 +264,7 @@ try {
         await context.setOffline(true);
         await page.reload();
         assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
-        assert.ok((await page.locator('body').innerText()).includes('AV SUITE'));
+        assert.ok((await page.locator('body').innerText()).includes('AV by Dave'));
       }
     });
 
@@ -377,7 +377,7 @@ try {
       const original = await context.newPage();
       await original.goto(source + '/index.html');
       assert.deepEqual(await readWorkbook(original), { active: workbookFixture.workbookId, workbook: workbookFixture });
-      assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 3);
+      assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 4);
     });
   }
 
@@ -414,9 +414,15 @@ try {
     // Kept copies of unreadable saves travel and restore with their keys.
     expected['signal-flow.v1.unreadable'] = '{"routes":[{"route":"SF 001"';
     expected['av-suite-dashboard.v1.unreadable'] = '{"showName":"Unreadable show"';
+    expected['sbd.avLighting.v1.recovery.1728300000000.fixture'] = '{"lighting":"Unreadable original"';
+    expected['sbd.shop.recovery.fixture'] = '{"shop":"Unreadable original"';
     await page.goto(source + '/index.html');
-    await page.evaluate(values => Object.entries(values).forEach(([key, value]) => localStorage.setItem(key, value)), expected);
+    await page.evaluate(values => {
+      Object.entries(values).forEach(([key, value]) => localStorage.setItem(key, value));
+      localStorage.setItem('sbd.domainMove.avbydave.v1', JSON.stringify({ state: 'moved', revision: 3, at: '2026-10-07T00:00:00.000Z' }));
+    }, expected);
     await page.goto(source + site.route + '?cutover=registry-keys');
+    await page.getByRole('button', { name: 'Move my data and continue' }).waitFor();
     const downloaded = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download a backup' }).click();
     const backup = await (await downloaded).path();
@@ -424,24 +430,59 @@ try {
     await page.waitForURL(site.origin + site.route + '?cutover=registry-keys');
     const readValues = current => current.evaluate(keys => Object.fromEntries(keys.map(key => [key, localStorage.getItem(key)])), Object.keys(expected));
     assert.deepEqual(await readValues(page), expected);
+    const original = await context.newPage();
+    await original.goto(source + '/index.html');
+    assert.deepEqual(await readValues(original), expected);
+    assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 4);
+    await original.close();
     await page.evaluate(keys => keys.forEach(key => localStorage.removeItem(key)), Object.keys(expected));
     await page.goto(site.origin + '/transfer.html');
     await page.locator('#backupFile').setInputFiles(backup);
     await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
     assert.deepEqual(await readValues(page), expected);
-    assert.equal(avStorageKeys.length, 61);
+    assert.equal(avStorageKeys.length, 83);
+    assert.ok(['sbd.infrastructure.draft.v1', 'sbd.infrastructure.layout.v1'].every(key => avStorageKeys.includes(key)), 'Infrastructure drafts and layout travel with its plan');
+    assert.ok(['sbd.shop.draft.v1', 'sbd.shop.layout.v1'].every(key => avStorageKeys.includes(key)), 'Shop drafts and layout travel with its plan');
+    assert.ok(avStorageKeys.includes('sbd.showControl.draft.v1'));
+    assert.ok(avStorageKeys.includes('sbd.showControl.layout.v1'));
+    assert.ok([
+      'sbd.avAudio.v1',
+      'sbd.showControl.v1',
+      'sbd.showOps.document.v1',
+      'sbd.frontOffice.document.v1',
+      'sbd.shop.v1',
+      'sbd.infrastructure.v1',
+      'sbd.avLighting.v1',
+      'avCalculator.fieldSets.v1'
+    ].every(key => avStorageKeys.includes(key)), 'New app plans and Calculator field sets must survive transfer and backup restore');
     assert.ok(avStorageKeys.includes('sbd.avVideo.v1'), 'AV Video must participate in cross-domain backup and restore');
     assert.ok(['sbd.avVideo.draft.v1', 'sbd.avVideo.layout.v1'].every(key => avStorageKeys.includes(key)), 'AV Video drafts and layout travel with its plan');
+    assert.ok(['sbd.showOps.draft.v1', 'sbd.showOps.layout.v1'].every(key => avStorageKeys.includes(key)), 'Show Ops drafts and layout travel with its document');
   });
 
-  await test('Withdrawn Workbook aliases open Toolbox without touching saved records', async (page, context) => {
+  await test('AV not-found page keeps theme and recovery links usable at short heights', async page => {
+    const site = sites.find(entry => entry.id === 'avbydave');
+    for (const [width, height] of [[1440, 900], [375, 812], [844, 390], [320, 256]]) {
+      await page.setViewportSize({ width, height });
+      await page.goto(site.origin + '/404.html');
+      await page.locator('#themeToggle').click();
+      const theme = await page.locator('html').getAttribute('data-av-theme');
+      await page.reload();
+      assert.equal(await page.locator('html').getAttribute('data-av-theme'), theme);
+      assert(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth), `404 viewport ${width}x${height}`);
+      assert.equal(await page.getByRole('link', { name: 'Open the AV console', exact: true }).getAttribute('href'), '/av/');
+    }
+  });
+
+  await test('Withdrawn Workbook aliases open the AV by Dave console without touching saved records', async (page, context) => {
     const site = sites.find(entry => entry.id === 'avbydave');
     for (const origin of [source, site.origin]) {
       await seedWorkbook(page, origin);
       for (const route of ['/av-workbook/', '/av-workbook/index.html', '/av-workbook.html']) {
         await page.goto(origin + route + '?sbdShow=Do%20not%20attach');
-        await page.waitForURL(site.origin + '/av-suite.html?entry=toolbox');
-        assert.equal(await page.locator('#avApp').getAttribute('data-entry'), 'toolbox');
+        await page.waitForURL(site.origin + '/av/');
+        await page.locator('.suite-header h1').waitFor();
+        assert.equal(await page.locator('.suite-header h1').textContent(), 'AV by Dave');
         assert.equal(await page.locator('a[href*=av-workbook]').count(), 0);
         const savedPage = await context.newPage();
         await savedPage.goto(origin + '/index.html');
@@ -594,10 +635,11 @@ try {
     page.setDefaultNavigationTimeout(20000);
     page.setDefaultTimeout(20000);
     const site = sites[1];
-    await page.goto(site.origin + '/av-suite.html');
+    await page.goto(site.origin + '/av/');
     await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
     const manifest = await page.evaluate(async () => {
-      const expected = SBD_REGISTRY.offlineAssets().map(asset => new URL(asset, location.href).pathname);
+      // The console lives under /av/; offline assets are relative to the worker scope at the origin root.
+      const expected = SBD_REGISTRY.offlineAssets().map(asset => new URL(asset, location.origin + '/').pathname);
       const names = (await caches.keys()).filter(name => name.startsWith('sbd-av-suite-'));
       const entries = (await Promise.all(names.map(async name => (await (await caches.open(name)).keys()).map(request => new URL(request.url).pathname)))).flat();
       return { expected, entries };
@@ -667,11 +709,12 @@ try {
       await returning;
       assert.equal(await page.evaluate(() => window.acceptanceInitiallyControlled), false, 'The regression must actually start without a controller');
       await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
-      await page.locator('#offlineSummary .offline-pill').filter({ hasText: 'Worker' }).getByText('Ready', { exact: true }).waitFor({ state: 'attached' });
+      // The console reports readiness through js/av-offline.js once the worker controls it and its assets are cached.
+      await page.waitForFunction(() => document.documentElement.dataset.workspaceOffline === 'ready', null, { timeout: 60000, polling: 250 });
       await context.setOffline(true);
       await page.reload();
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'keep during activation');
-      assert.ok((await page.locator('body').innerText()).includes('AV SUITE'));
+      assert.ok((await page.locator('body').innerText()).includes('AV by Dave'));
     } finally {
       responseHooks.delete(directory);
       releaseCache?.(); releaseNavigation?.();

@@ -1,0 +1,4 @@
+.gear-panel-mount{position:relative;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;background:#142a2e}
+.gear-panel-frame{display:block;width:100%;height:100%;border:0}
+.gear-panel-feedback{position:absolute;inset:0;z-index:3;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:12px;padding:24px;text-align:center;background:var(--panel,#172e32);color:var(--ink,#eef0e6)}
+.gear-panel-feedback[hidden]{display:none}.gear-panel-feedback span{flex-basis:100%;max-width:560px}.gear-panel-feedback button,.gear-panel-feedback a{display:inline-flex;align-items:center;min-height:44px;border:1px solid currentColor;border-radius:5px;padding:8px 12px;background:transparent;color:inherit;font:inherit;text-decoration:none}.gear-panel-feedback :focus-visible{outline:3px solid #ebbc79;outline-offset:3px}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createDraftSession, draftSnapshot, clearDraft, DRAFT_INDEX, draftIndex, readDraft, readLayout, writeDraft, writeLayout } from "./drafts";
+import { createDraftSession, draftSnapshot, clearDraft, DRAFT_CHANGE_EVENT, DRAFT_INDEX, draftIndex, readDraft, readLayout, writeDraft, writeLayout } from "./drafts";
 
 function memory(fail = false) {
   const map = new Map<string, string>();
@@ -94,5 +94,20 @@ describe("draft ownership", () => {
     const pending=a.sync({title:"edit"},null,true,"A");
     await a.sync({title:"saved"},null,false,"A"); release!(); await pending;
     expect(s.getItem("k")).toBeNull();
+  });
+  it("invalidates the rail after each attempted draft write or clear", async () => {
+    const s=memory(), changes:string[]=[];
+    const a=createDraftSession(s,"k","av-video",draftSnapshot(s,"k","av-video",asDoc),lock,detail=>changes.push(`${DRAFT_CHANGE_EVENT}:${detail.consoleId}`));
+    await a.sync({title:"edit"},null,true,"A");
+    await a.sync({title:"saved"},null,false,"A");
+    expect(changes).toEqual([
+      "sbd:console-draft-change:av-video",
+      "sbd:console-draft-change:av-video"
+    ]);
+
+    const blocked=memory(true), failed:string[]=[];
+    const b=createDraftSession(blocked,"k","av-video",draftSnapshot(blocked,"k","av-video",asDoc),lock,detail=>failed.push(detail.consoleId));
+    expect((await b.sync({title:"edit"},null,true,"A")).ok).toBe(false);
+    expect(failed).toEqual(["av-video"]);
   });
 });

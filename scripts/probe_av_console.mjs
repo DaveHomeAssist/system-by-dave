@@ -177,8 +177,12 @@ try {
   assert.equal(await page.getByRole('tab', { name: /^Troubleshooting/ }).getAttribute('aria-selected'), 'true');
   assert.deepEqual((await panels()).sort(), ['flow', 'inspector']);
   assert.equal(JSON.stringify(await readSaved()), savedBefore, 'layout state never writes the plan');
+
+  // Other Rail applications live in the AV Suite shell at /av/ (docs/av-suite-shell.md); here their entries keep standalone links.
+  assert.equal(await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').getAttribute('href') !== null, true);
+  assert.equal(await page.locator('.suite-app-frame').count(), 0);
   assert.deepEqual(errors, []);
-  console.log(`AV console workspace verification passed: default views, panel buttons, chooser by keyboard, menus and Escape focus, move/size, store/update/rename/delete views with Save, reload, module-hidden panels, maximize/restore, lock, phone switcher, draft restore/discard and layout persistence (${BASE}).`);
+  console.log(`AV console workspace verification passed: default views, panel buttons, chooser by keyboard, menus and Escape focus, move/size, store/update/rename/delete views with Save, reload, module-hidden panels, maximize/restore, lock, phone switcher, draft restore/discard, layout persistence, and all eight in-console Rail snapshots (${BASE}).`);
 } finally {
   await context.close(); await browser.close(); await new Promise(resolve => server.close(resolve));
 }

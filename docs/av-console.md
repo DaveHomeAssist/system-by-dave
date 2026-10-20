@@ -1,14 +1,26 @@
 # AV console workspace
 
+## Suite definition of done
+
+**Revised 2026-10-13:** the [AV Suite shell brief](av-suite-shell.md) replaces the paragraph below. One `/av/` console hosts every application as a panel pack; `/av-video/` is no longer the host and the embedded full-application panels are removed.
+
+As clarified on October 9, 2026, the complete application Rail is part of the console rather than only a route launcher. AV Video and the other eight primary applications are selectable Rail snapshots inside the shared workspace. Their panels use the same move, resize, split, maximize, replace, lock and stored-view controls. Full details and compatibility boundaries are in [AV Suite console snapshot Rail](av-suite-console-snapshot-rail.md).
+
+Standalone application routes remain available. Each application continues to own its records, storage, schemas, import history, Save and Export behavior; the suite snapshot stores arrangement only.
+
 The console workspace is the grandMA-style panel host that AV by Dave consoles share. You tap empty space, choose a panel, work in that space, and store the arrangement as a named view. Window sizing, layout lock and stored views follow Hog-style conventions. The design source is the Claude Design prototype *AV Suite Prototype v3*, built from the [unified console manifest](#decisions).
 
-AV Video is the first console. The engine lives in [`apps/shared/av-console/`](../apps/shared/av-console/):
+AV Video is the reference console. Audio already uses this engine; Show Ops
+adopts it in the October 9 functional-panel conversion. The engine lives in
+[`apps/shared/av-console/`](../apps/shared/av-console/):
 
 - `layout.ts` holds the pure grid model: fit, suggest, trim, nudge and split, plus the view operations and the persisted `workspace` shape. Its tests are in `layout.test.ts`.
 - `Workspace.tsx` holds `useConsoleWorkspace` (live arrangement state) and `ConsoleWorkspace` (view strip, panel buttons, grid, chooser, menus, pointer and keyboard paths).
 - `console.css` holds the shell styles on the `css/av-theme.css` tokens.
 
 ## What is shared and what is not
+
+Since 2026-10-13 an application supplies these as a **panel pack** (`apps/<app>/src/pack.tsx`, contract in `apps/shared/av-console/pack.ts`): a hook that owns the document, recovery and actions and returns the renderer. The AV Suite shell at `/av/` mounts every pack in one workspace and namespaces its panel types; the application's standalone route mounts the same pack inside its own workspace.
 
 A console supplies four things:
 - **Its panel library:** type, name, category, description, minimum size, optional module, and whether it is the lit panel.
@@ -17,6 +29,10 @@ A console supplies four things:
 - **A renderer** for each panel type.
 
 The engine owns presentation only. It never reads or writes records. Panel content, selection, records, validation and saving stay with the console. Specialist consoles (Throwline, CueForge-style live surfaces) may scope their own tokens and chrome inside `.console-shell`.
+
+The [October 9 rollout assessment](av-console-rollout.md) maps the current toolset
+to actual panel capabilities. A primary application's Rail link proves navigation,
+not shared-workspace adoption or legacy tool parity.
 
 ## Interaction contract
 
@@ -82,6 +98,7 @@ Recorded on 2026-10-05 from Dave's review of the console manifest:
 3. **Show chip.** Show and phase appear read-only, only when a console is opened with show context. Consoles never swap each other's data.
 4. **Scope.** Every application adopts the system, including products outside the registry, each with its own panel library and character. No generic sheet template.
 5. **Unification.** Related tools join family consoles with one document and one selection. Every absorbed tool's data imports losslessly.
+6. **Rail snapshots.** The nine primary Rail identities recall in-console snapshots. The Rail retains standalone destinations as fallback links, while the mounted suite shell handles ordinary selection without page navigation.
 
 The console order follows the manifest:
 1. AV Video, with its Switcher bus and Multiview live panels (this release).

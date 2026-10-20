@@ -44,7 +44,7 @@ Verification: `node scripts/probe_calculator_viewport.cjs` against a local serve
 
 [`AVViewport`](../js/av-viewport.js) extracts the pilot's measured field pagination and semantic task navigation. An adapter supplies real nodes and decides which content is a task or a genuinely long panel. The helper owns no application documents, storage migrations or readiness state. It retains focused fields while recalculating page boundaries, uses roving tabs and a labeled task selector, and preserves unrelated URL parameters. Existing hash contracts can opt into hash routing; new adapters use `taskView` without replacing specialist hashes.
 
-[`sbd-nav.js`](../js/sbd-nav.js) supports `data-sbd-nav="embedded"` with a `[data-sbd-nav-slot]` supplied before its deferred initialization. It mounts compact Home and Toolbox links inside that slot. [`av-viewport.css`](../css/av-viewport.css) styles those controls without adding a floating block or body clearance. The adapter supplies current location and any show-context operating view; the original show dock handlers remain authoritative. Existing default consumers retain the full legacy bar, and `data-sbd-nav="off"` remains a specialist opt-out. Save guards run in all three modes.
+[`sbd-nav.js`](../js/sbd-nav.js) supports `data-sbd-nav="embedded"` with a `[data-sbd-nav-slot]` supplied before its deferred initialization. It mounts compact Home (`/`) and AV by Dave (`av/`) links inside that slot. [`av-viewport.css`](../css/av-viewport.css) styles those controls without adding a floating block or body clearance. The adapter supplies current location and any show-context operating view; the original show dock handlers remain authoritative. Existing default consumers retain the full legacy bar, and `data-sbd-nav="off"` remains a specialist opt-out. Save guards run in all three modes.
 
 Run [`probe_viewport_navigation.cjs`](../scripts/probe_viewport_navigation.cjs) to compare every current registry consumer's navigation links, runtime errors and save-guard presence against the pre-extraction script. Existing page overflow in unmigrated applications is recorded separately; this extraction does not claim a catalog-wide layout redesign.
 
@@ -74,3 +74,157 @@ The Exceptions view reads a shallow copy of records selected by the owning tool'
 The [StagePlotter adapter](../js/av-stage-viewport.js) provides Canvas, Tools, Selected, Setup, Items, Outputs and Status views. A 1120×630 drawing coordinate surface preserves the original 16:9 aspect and percent-based geometry while a view transform fits it to the available screen. Fit, zoom and pan are transient interface state; they never rewrite `stage-plot.v1` or the legacy `system-by-dave.plotforge.v1` export. Pointer geometry still uses the transformed surface bounds. Original item dragging and keyboard nudges remain available; Pan mode redirects arrows and drag gestures to the view. Task navigation consumes its own arrow keys before the plot model sees them.
 
 The drawing is intentionally a clipped spatial view at magnification. Its scaled labels are accompanied by complete item labels/coordinates in Items, all properties in Selected, and the original operator summary. The viewport checker documents that narrow geometric exclusion; `probe_stage_viewport.cjs` separately tests drawing placement, mouse/Chromium touch emulation, view zoom/pan, keyboard behavior, geometry/identity round trips, rejected imports, save/reload and print. Run it on port 4183 (`VIEWPORT_BASE` overrides), then with `VIEWPORT_BROWSER=webkit`. Physical touch accuracy and operator acceptance remain separate.
+
+
+## Embedded navigation revalidation — 2026-10-18
+
+AVV-13 was revalidated against source and published provenance
+`885a3ab42d621aef7923dbcc5979f2fd1cc301f1`. The earlier finding's
+`av-suite.html?entry=toolbox` target is superseded: the current embedded branch
+of `js/sbd-nav.js` emits Home (`/`) and AV by Dave (`av/`).
+
+The current opted-in HTML consumers are all at the site root:
+
+| Consumer | Expected and resolved console destination |
+| --- | --- |
+| `av-calculator.html` | `https://avbydave.com/av/` |
+| `cue-sheet.html` | `https://avbydave.com/av/` |
+| `stage-plot.html` | `https://avbydave.com/av/` |
+
+Each supplies one navigation slot, includes the shared script and has no
+`base` element. Calculator's bridge moves its existing slot into the native
+header. `css/av-viewport.css` styles the embedded links; it does not resolve
+URLs. Specialist pages embedded with `sbdEmbed=panel` suppress the shared nav,
+so that mode does not add a new subdirectory navigation consumer.
+
+Independent checks in this pass covered source inventory, published-file
+parity and six standard URL-resolution cases: the plain URL and a synthetic
+show-context/hash URL for each current route. All resolve Home to the site
+root and AV by Dave to `/av/`. The three HTML files, navigation script,
+viewport stylesheet and console index byte-match the reviewed source;
+`/av/` serves that index, and production `source.json` names the reviewed
+revision. No present destination defect was found, and no runtime repair was
+made.
+
+The previously recorded root-route browser comparisons remain historical
+reported evidence. This pass did not repeat that browser sweep, run a new
+click test, simulate a hypothetical subdirectory adopter or establish
+physical-device, screen-reader or older-iPad acceptance.
+
+AVV-13 remains only a future adoption gate: before a subdirectory route opts
+into this navigation, define its intended base and destination resolution and
+verify navigation, show-context, save-guard and embedded-panel compatibility.
+This record does not authorize or implement that adoption. The later AVV-06
+visibility revalidation and repair are recorded below; no minimum-OS policy
+decision follows from either review.
+
+
+## Visibility API compatibility — 2026-10-18
+
+AVV-06 was reproduced at source/live
+`ba164f9487e7b921dbb04c22a92be2e547d1377b`: removing only
+`Element.checkVisibility` in disposable browser contexts causes a `TypeError`
+in the current standalone Calculator and LED paging paths. This proves a
+reachable JavaScript feature-absence failure, not a failure observed on an
+actual older iPad.
+
+`AVViewport.isVisible` and `AVWorkspace.isVisible` now feature-detect the
+method. Browsers providing it retain their native zero-option check. The
+fallback checks associated layout boxes and hidden ancestor contents in the
+current light-DOM panels. It deliberately does not substitute opacity,
+`visibility:hidden` or `offsetParent` tests for the native default. The
+[CSSOM View default check](https://drafts.csswg.org/cssom-view/#dom-element-checkvisibility)
+provides the semantics; this repair does not set a minimum supported OS or
+install a global prototype polyfill.
+
+Current callers include the standalone Calculator bridge, the suite's compiled
+native Calculator, Cue Sheet, StagePlotter, LED and Stage 3D. The active Cue
+Sheet and StagePlotter callbacks use the shared guard. The older board,
+worksheet and calculator viewport adapters have no current published HTML or
+native-pack script consumer; they remain unadopted and unchanged. This is not
+blanket compatibility approval for those dormant adapters.
+
+The focused regression is `node scripts/probe_av_visibility.mjs`, also called
+by the existing workspace browser probe. `AV_WORKSPACE_BROWSER=webkit` selects
+WebKit, `AV_WORKSPACE_BASE` selects a deployed origin, and
+`AV_VISIBILITY_EVIDENCE` records the result and screenshots. The standalone
+Chromium launch honors `CHROME_CHANNEL` and defaults to installed Chrome,
+matching the existing workspace probe; managed runners can select
+`CHROME_CHANNEL=chromium` for their bundled browser. The fixture reads the
+managed workspace module from the LED page, matching its published inline
+delivery; it excludes the separate offline initializer. It compares eleven
+box states for both helpers with native and missing API, verifies native
+zero-option delegation, paginates to focused fields without changing values,
+and checks five current routes in both API states. The shared-console case
+opens the existing native Calculator on desktop and then narrows to phone
+width; StagePlotter uses its existing narrow-screen view selector.
+
+Dominic passes the focused Chromium and WebKit checks, AV verification and
+26 Rail/worker tests, Throwline verification and 47 tests, shared-runtime
+synchronization, the native suite build and diff checks. The initial new-test
+selector/readiness failures and the cache-pin mismatch are retained separately
+from the corrected checks; no failed gate was waived. Exact-head CI, merge,
+publication and production readback remain separate release evidence.
+
+The existing offline cache generation advances to
+`v20261018-visibility-compatibility`, with the registry, worker update, generated
+workspace copies, Stage 3D readiness pin and generation assertions aligned.
+There is no CSS, calculation, schema, document key, imported source, saved-data
+or dependency change. Physical devices, older OS/browser combinations,
+screen-reader use, touch ergonomics, installed returning-client transitions and
+operator acceptance remain open under AVV-14 and the existing acceptance
+records. Stream/Record credentials and other product choices are unchanged.
+
+### Published fixture correction — 2026-10-18
+
+The first post-publication check exposed a probe dependency assumption:
+`js/av-workspace.js` is a canonical source file, but the AV destination delivers
+it inside the managed LED/Throwline runtime rather than publishing that raw
+file. The checker now reads the managed LED script and isolates its
+`AVWorkspace` module for the synthetic fixture. Current route cases continue
+to load their normal production pages. The existing workspace workflow also
+watches the new probe module directly.
+
+With that correction, Chromium and WebKit each pass the eleven-state helper
+comparison, actual focus/page/value retention and ten native/masked API route
+cases against published runtime `f7dc45954c22686ce50bdb20dfa7c0308f66821e`.
+All eleven checked production files match that source, including unchanged
+Video JavaScript and CSS. This correction changes only the checker, its CI
+path and records; it does not rebuild or change application assets or select
+an older-OS support policy. The failed fixture run remains separate evidence.
+
+### Theme probe document readiness — 2026-10-18
+
+The subsequent checker-only publication at source `d93e0f5` stopped before
+deployment in its StagePlotter light-theme check. The probe sampled after a
+fixed navigation delay without confirming document readiness. A bounded
+diagnostic on that exact source observed both light and dark pages still
+loading with the static `system` marker at the early sample; after load, each
+had its correct stored mode. No request failures or page errors were captured.
+This confirms premature sampling is possible; it does not prove every detail
+of the original CI failure, including its empty CSS tokens or browser version.
+
+The probe now waits up to ten seconds for a document newer than the previous
+loader and `readyState="complete"` before storage seeding or theme sampling. It reports
+the requested URL, last document state and stylesheet status on timeout.
+Readiness does not depend on the expected theme, colors or contrast passing:
+those assertions remain unchanged and still reject fully loaded bad pages.
+Existing animation-settling waits follow the load boundary.
+
+`CHROME_BIN` selects the qualified browser for
+`node --test scripts/probe_av_theme_readiness.test.js`. The existing viewport
+and theme workflow runs these five focused disposable cases: delayed CSS and
+bootstrap in both modes, a client redirect, fully loaded wrong themes, missing
+theme CSS, and a never-completed bootstrap response. Dominic passes all five
+using Node 24,
+Playwright 1.63 and Google Chrome for Testing 153 in a capped container. No
+application source, assets, cache generation, saved keys, schemas or imports
+change. Runtime acceptance remains at `f7dc459`; publication of later checker
+revisions and all physical/operator gates require their separate evidence.
+
+The first candidate's CI passed the four initial regression cases and then
+caught an overly strict loader check at Throwline's existing client redirect
+to `Stage3D.html`. The corrected guard excludes the previous document without
+requiring the first requested loader to remain current. The added redirect
+case exercises that boundary; the application route and assertions are intact.
+The failed candidate run remains release evidence.

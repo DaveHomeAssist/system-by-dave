@@ -261,10 +261,10 @@
 
   const themeToggle = document.getElementById('themeToggle');
   const savedTheme = storage.get('av-theme-mode.v1');
-  if (!['light', 'dark', 'system'].includes(savedTheme)) document.documentElement.dataset.avTheme = 'dark';
+  if (!['light', 'dark', 'white', 'black', 'system'].includes(savedTheme)) document.documentElement.dataset.avTheme = 'dark';
   function syncThemeToggle() {
     const chosen = document.documentElement.dataset.avTheme;
-    const dark = chosen === 'dark' || (chosen === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const dark = chosen === 'dark' || chosen === 'black' || (chosen === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
     const next = dark ? 'Light mode' : 'Dark mode';
     themeToggle.textContent = next;
     themeToggle.setAttribute('aria-label', `Switch to ${next.toLowerCase()}`);
@@ -493,6 +493,32 @@
     const saved = storage.set(STORE, JSON.stringify(state));
     els.saveStatus.textContent = saved ? 'Saved' : 'Storage blocked';
     return saved;
+  }
+
+  if (!isLedPage) {
+    window.AvCalculatorFieldSets = Object.freeze({
+      keys: Object.freeze([...activeKeys]),
+      capture: () => Object.fromEntries([...activeKeys].map(key => [key, state[key]])),
+      restore(values) {
+        if (!values || typeof values !== 'object' || Array.isArray(values) ||
+          [...activeKeys].some(key => !Object.prototype.hasOwnProperty.call(values, key))) return false;
+        const previous = { ...state };
+        activeKeys.forEach(key => { state[key] = values[key]; });
+        setFieldValues();
+        syncPowerMethodUI();
+        const corrections = normalizeFields();
+        if (corrections.length) {
+          state = previous;
+          setFieldValues();
+          syncPowerMethodUI();
+          return false;
+        }
+        const saved = saveState();
+        calculate();
+        announceAction(saved ? 'Field set recalled and saved.' : 'Field set recalled, but browser storage is unavailable.', saved ? 'success' : 'error');
+        return true;
+      }
+    });
   }
 
   function numberValue(key) {

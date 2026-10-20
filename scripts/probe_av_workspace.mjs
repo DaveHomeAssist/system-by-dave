@@ -6,6 +6,7 @@ import {readFile,stat,mkdir,writeFile} from 'node:fs/promises';
 import {join,extname,resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {chromium,webkit,devices} from 'playwright';
+import {verifyVisibilityCompatibility} from './probe_av_visibility.mjs';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const MIME={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.woff2':'font/woff2'};
 const server=createServer(async(req,res)=>{try{let file=join(ROOT,new URL(req.url,'http://local').pathname);if((await stat(file)).isDirectory())file=join(file,'index.html');res.writeHead(200,{'content-type':MIME[extname(file)]||'application/octet-stream'});res.end(await readFile(file));}catch{res.writeHead(404).end();}});
@@ -42,6 +43,7 @@ function geometry(){
  return {width:innerWidth,height:innerHeight,touch:navigator.maxTouchPoints,touchEvent:window.workspaceTouchObserved===true,coarse:matchMedia('(pointer:coarse)').matches,meta:document.querySelector('meta[name=viewport]').content,root:{width:root.scrollWidth,height:root.scrollHeight,overflow:getComputedStyle(root).overflow},bodyOverflow:getComputedStyle(document.body).overflow,bad,small,results,fields:[...document.querySelectorAll('input,select,textarea')].filter(e=>e.checkVisibility()).map(e=>({id:e.id,font:parseFloat(getComputedStyle(e).fontSize)}))};
 }
 try{
+ await verifyVisibilityCompatibility(browser, base);
  for(const [tool,route] of [['stage','ProjectorThrow/Stage3D.html'],['led','led-wall-calculator.html']]){
   const context=await browser.newContext({...devices['iPhone 13'],viewport:{width:390,height:844},serviceWorkers:'block',reducedMotion:'reduce'});
   await context.addInitScript(()=>document.addEventListener('touchstart',()=>{window.workspaceTouchObserved=true;},{once:true}));
@@ -55,6 +57,8 @@ try{
     await page.setViewportSize({width,height});
     if(engine==='chromium')await (await context.newCDPSession(page)).send('Emulation.setDeviceMetricsOverride',{width,height,mobile:true,deviceScaleFactor:3,screenWidth:width,screenHeight:height,screenOrientation:{type:orientation==='portrait'?'portraitPrimary':'landscapePrimary',angle:orientation==='portrait'?0:90}});
     await page.waitForFunction(()=>{const root=document.documentElement,pane=parseFloat(getComputedStyle(root).getPropertyValue('--av-pane-min'));return root.dataset.workspaceShort===String(visualViewport.height<pane*2)&&root.style.getPropertyValue('--av-available-height')===`${visualViewport.height}px`;});
+    // Pagination measures text; settle web fonts before reading geometry (a Linux CI flake at 360x800 on 2026-10-13).
+    await page.evaluate(()=>document.fonts.ready);
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     const state=await page.evaluate(geometry);state.tool=tool;state.theme=theme;state.orientation=orientation;
     const fail=[];

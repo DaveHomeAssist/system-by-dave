@@ -93,7 +93,8 @@ try {
   assert.equal(await page.getByLabel('Backup route', { exact: true }).count(), 0);
   assert.equal(await page.locator('.react-flow__node').filter({hasText:'HDMI to SDI'}).count(), 0);
   const hidden = await exportPlan(); assert.equal(hidden.routes[0].input, 'Input 9'); assert.equal(hidden.routes[0].backup, 'Camera 2 wide');
-  await save(); await page.reload(); await goProject();
+  await save(); await page.goto(`${url}?view=project`);
+  await page.getByRole('heading', { name: 'Project & modules' }).waitFor();
   assert.equal(await page.getByRole('checkbox', { name: /Patch view/ }).isChecked(), false);
   await page.getByRole('checkbox', { name: /Patch view/ }).check(); await page.getByRole('checkbox', { name: /Backup details/ }).check();
   await save();
@@ -160,17 +161,14 @@ try {
   assert.match(await bad.getByRole('status').textContent(), /blocked/);
   assert.equal(await bad.evaluate(key => localStorage.getItem(key), key), 'broken saved source');
   await broken.close();
+  // The console shell registers the suite worker; AV Video then edits and reloads offline.
   const toolbox = await browser.newContext(); const hub = await toolbox.newPage();
-  await hub.goto(`${BASE}/av-suite.html`); await hub.locator('#shopOfficeView').waitFor();
-  assert.equal(await hub.locator('#avApp').getAttribute('data-entry'), 'toolbox');
-  assert.ok(await hub.locator('#toolboxGroups a[data-tool=av-video]').isVisible());
-  assert.equal(await hub.locator('#toolboxGroups a[data-tool=signal-flow]').count(), 0);
-  assert.equal(await hub.locator('#toolboxGroups a[data-tool=video-patch]').count(), 0);
-  assert.equal(await hub.evaluate(() => localStorage.getItem('av-suite-dashboard.v1')), null);
-  await hub.evaluate(() => navigator.serviceWorker.ready);
-  await hub.locator('#toolboxGroups a[data-tool=av-video]').click(); await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
+  await hub.goto(`${BASE}/av/`); await hub.evaluate(() => navigator.serviceWorker.ready);
+  await hub.goto(url); await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
+  await hub.waitForFunction(() => navigator.serviceWorker.controller);
   await toolbox.setOffline(true); await hub.reload();
   await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
+  await hub.getByRole('button', { name: 'Signal flow', exact: true }).click();
   await hub.getByRole('button', { name: 'Add route', exact: true }).click();
   await hub.getByLabel('Source', { exact: true }).fill('Offline camera');
   await hub.getByRole('button', { name: /^Save/ }).click();
@@ -178,7 +176,7 @@ try {
   await toolbox.setOffline(false);
   await toolbox.close();
   assert.deepEqual(errors, []);
-  console.log(`AV Video browser verification passed: shared route edits, persistence, imports, export, module scope, stale writes, corrupt storage, Toolbox, offline edit/reload, themes and 4 viewport sizes (${BASE}). Screenshots: ${shots}`);
+  console.log(`AV Video browser verification passed: shared route edits, persistence, imports, export, module scope, stale writes, corrupt storage, console-registered offline edit/reload, themes and 4 viewport sizes (${BASE}). Screenshots: ${shots}`);
 } finally {
   await context.close(); await browser.close(); await new Promise(resolve => server.close(resolve));
 }

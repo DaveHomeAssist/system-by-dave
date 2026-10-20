@@ -1,0 +1,86 @@
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import adapter from './calculator_console_adapter.cjs';
+const { reveal, fieldSets } = adapter;
+
+const base = process.env.CALCULATOR_BASE || 'http://127.0.0.1:4173/';
+const output = process.env.CALCULATOR_SCREENSHOT || '/tmp/av-calculator-field-sets.png';
+const launch = process.env.CHROME_CHANNEL ? {channel:process.env.CHROME_CHANNEL} : process.env.CALCULATOR_CHROME ? {executablePath:process.env.CALCULATOR_CHROME} : {};
+const browser = await chromium.launch({ headless: true, ...launch, args: ['--no-sandbox'] });
+try {
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 375, height: 812 }]) {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto(new URL('av-calculator.html', base).href);
+    await page.waitForSelector('html[data-calculator-viewport="ready"]');
+    await (await reveal(page, '#delayDistance')).fill('90');
+    await fieldSets(page);
+    await page.locator('#fieldSetName').fill('Ballroom A');
+    await page.locator('#fieldSetSave').click();
+    assert.match(await page.locator('#fieldSetStatus').innerText(), /saved in this browser/);
+    const saved = await page.evaluate(() => localStorage.getItem('avCalculator.fieldSets.v1'));
+    assert.ok(saved?.includes('Ballroom A'));
+    await page.locator('#fieldSetsClose').click();
+    await page.reload();
+    await page.waitForSelector('html[data-calculator-viewport="ready"]');
+    assert.equal(await page.locator('#delayDistance').inputValue(), '90');
+    await fieldSets(page);
+    await page.locator('#fieldSetSelect').selectOption({ label: 'Ballroom A' });
+    await page.locator('#fieldSetExport').click();
+    const exported = await page.evaluate(() => JSON.parse(localStorage.getItem('avCalculator.fieldSets.v1')).sets[0]);
+    const before = await page.evaluate(() => localStorage.getItem('avCalculator.v1'));
+    await page.locator('#fieldSetImport').setInputFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{broken') });
+    await page.getByText('Import failed: this is not a valid AV Calculator field set.', { exact: false }).waitFor();
+    assert.match(await page.locator('#fieldSetStatus').innerText(), /Import failed/);
+    assert.equal(await page.evaluate(() => localStorage.getItem('avCalculator.v1')), before);
+    await page.locator('#fieldSetExport').click();
+    await page.locator('#fieldSetImport').setInputFiles({ name: 'bad-step.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ schema: 'system-by-dave.av-calculator-field-set.v1', name: 'Bad step', values: { ...exported.values, delayDistance: 90.05 } })) });
+    await page.getByText('Import failed: this is not a valid AV Calculator field set.', { exact: false }).waitFor();
+    assert.equal(await page.locator('#fieldSetPreview').isVisible(), false);
+    assert.equal(await page.evaluate(() => localStorage.getItem('avCalculator.v1')), before);
+    await page.locator('#fieldSetImport').setInputFiles({ name: 'good.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ schema: 'system-by-dave.av-calculator-field-set.v1', name: 'Imported A', values: exported.values })) });
+    await page.getByText('Ready to add “Imported A”', { exact: false }).waitFor();
+    assert.equal(await page.locator('#fieldSetPreview').isVisible(), true);
+    assert.match(await page.locator('#fieldSetPreviewValues').innerText(), /Distance[\s\S]*90/);
+    await page.screenshot({ path: viewport.width === 375 ? output.replace(/\.png$/, '-preview.png') : output.replace(/\.png$/, '-desktop-preview.png') });
+    await page.locator('#fieldSetApply').click();
+    assert.equal(await page.locator('#fieldSetSelect option').count(), 3);
+    await page.screenshot({ path: viewport.width === 375 ? output : output.replace(/\.png$/, '-desktop.png') });
+    await page.locator('#fieldSetsClose').click();
+    await (await reveal(page, '#delayDistance')).fill('120');
+    await fieldSets(page);
+    await page.locator('#fieldSetSelect').selectOption({ label: 'Ballroom A' });
+    await page.locator('#fieldSetRecall').click();
+    assert.equal(await page.locator('#delayDistance').inputValue(), '90');
+    await page.reload();
+    assert.equal(await page.locator('#delayDistance').inputValue(), '90');
+    await page.evaluate(() => {
+      const key = 'avCalculator.fieldSets.v1';
+      const first = JSON.parse(localStorage.getItem(key)).sets[0];
+      localStorage.setItem(key, JSON.stringify({ version: 1, sets: Array.from({ length: 100 }, (_, index) => ({ ...first, id: `fixture-${index}`, name: `Fixture ${index}` })) }));
+    });
+    await page.reload();
+    await fieldSets(page);
+    await page.locator('#fieldSetName').fill('Set 101');
+    await page.locator('#fieldSetSave').click();
+    assert.match(await page.locator('#fieldSetStatus').innerText(), /full \(100\)/);
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('avCalculator.fieldSets.v1')).sets.length), 100);
+    await page.locator('#fieldSetImport').setInputFiles({ name: 'set-101.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ schema: 'system-by-dave.av-calculator-field-set.v1', name: 'Imported 101', values: exported.values })) });
+    await page.getByText('Ready to add “Imported 101”', { exact: false }).waitFor();
+    await page.locator('#fieldSetApply').click();
+    assert.match(await page.locator('#fieldSetStatus').innerText(), /full \(100\)/);
+    await page.reload();
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('avCalculator.fieldSets.v1')).sets.length), 100);
+    const overflow = await page.evaluate(() => ({ width: document.documentElement.scrollWidth - document.documentElement.clientWidth, height: document.documentElement.scrollHeight - document.documentElement.clientHeight }));
+    assert.ok(overflow.width <= 0 && overflow.height <= 0, JSON.stringify(overflow));
+    assert.deepEqual(errors, []);
+    await context.close();
+  }
+  await fs.stat(output);
+  console.log(`AV Calculator field sets: desktop and phone passed; screenshot ${output}`);
+} finally {
+  await browser.close();
+}

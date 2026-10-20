@@ -1,99 +1,1717 @@
-%PDF-1.4
-%“Œ‹ž ReportLab Generated PDF document (opensource)
+%PDF-1.3
+%âãÏÓ
 1 0 obj
 <<
-/F1 2 0 R /F2 3 0 R /F3 4 0 R
+/PageMode /UseNone
+/Pages 2 0 R
+/Type /Catalog
 >>
 endobj
 2 0 obj
 <<
-/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+/Count 1
+/Kids [ 3 0 R ]
+/Type /Pages
 >>
 endobj
 3 0 obj
 <<
-/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+/Contents 4 0 R
+/MediaBox [ 0 0 612 792 ]
+/Parent 2 0 R
+/Resources <<
+/ExtGState <<
+/gRLs0 <<
+/CA 0.25
+>>
+/gRLs1 <<
+/CA 1
+>>
+/gRLs2 <<
+/CA 0.15
+>>
+/gRLs3 <<
+/CA 0.2
+>>
+/gRLs4 <<
+/CA 0.4
+>>
+/gRLs5 <<
+/ca 0.5
+>>
+/gRLs6 <<
+/ca 1
+>>
+/gRLs7 <<
+/CA 0.3
+>>
+>>
+/Font 5 0 R
+/ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
 >>
 endobj
 4 0 obj
 <<
-/BaseFont /ZapfDingbats /Name /F3 /Subtype /Type1 /Type /Font
+/Length 20857
 >>
+stream
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+0.039216 0.039216 0.039216 rg
+n
+0 0 612 792 re
+f*
+0.066667 0.066667 0.066667 rg
+n
+0 0 180 792 re
+f*
+0.164706 0.12549 0.062745 RG
+0.5 w
+n
+180 0 m
+180 792 l
+S
+0.831373 0.658824 0.262745 RG
+0.3 w
+/gRLs0 gs
+n
+180.5 792 m
+180.5 554.4 l
+S
+n
+180.5 0 m
+180.5 237.6 l
+S
+/gRLs1 gs
+0.831373 0.658824 0.262745 RG
+0.4 w
+/gRLs2 gs
+n
+8 784 m
+22 784 l
+S
+n
+8 784 m
+8 770 l
+S
+n
+604 784 m
+590 784 l
+S
+n
+604 784 m
+604 770 l
+S
+n
+8 8 m
+22 8 l
+S
+n
+8 8 m
+8 22 l
+S
+n
+604 8 m
+590 8 l
+S
+n
+604 8 m
+604 22 l
+S
+/gRLs1 gs
+BT
+/F2 24 Tf
+28.8 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 18 756 Tm
+(DAVID) Tj
+T*
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 732 Tm
+(ROBERTSON) Tj
+T*
+ET
+BT
+/F1 8 Tf
+9.6 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 716 Tm
+(VIDEO  \046  LIGHTING  TECHNICIAN) Tj
+T*
+ET
+0.831373 0.658824 0.262745 RG
+/gRLs3 gs
+0.5 w
+n
+18 708 m
+162 708 l
+S
+/gRLs1 gs
+BT
+/F2 8.5 Tf
+10.2 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 690 Tm
+(CONTACT) Tj
+T*
+ET
+0.831373 0.658824 0.262745 RG
+/gRLs4 gs
+0.5 w
+n
+18 685 m
+34 685 l
+S
+/gRLs1 gs
+BT
+/F1 6 Tf
+7.2 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 673 Tm
+(EMAIL) Tj
+T*
+ET
+BT
+/F1 7.5 Tf
+9 TL
+ET
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 56 673 Tm
+(avbydave\100gmail\056com) Tj
+T*
+ET
+BT
+/F1 6 Tf
+7.2 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 661 Tm
+(UNION) Tj
+T*
+ET
+BT
+/F1 7.5 Tf
+9 TL
+ET
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 56 661 Tm
+(IATSE Local 8) Tj
+T*
+ET
+BT
+/F1 6 Tf
+7.2 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 649 Tm
+(BASE) Tj
+T*
+ET
+BT
+/F1 7.5 Tf
+9 TL
+ET
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 56 649 Tm
+(Philadelphia\054 PA) Tj
+T*
+ET
+BT
+/F2 8.5 Tf
+10.2 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 631 Tm
+(CORE SKILLS) Tj
+T*
+ET
+0.831373 0.658824 0.262745 RG
+/gRLs4 gs
+0.5 w
+n
+18 626 m
+34 626 l
+S
+/gRLs1 gs
+BT
+/F2 6.5 Tf
+7.8 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 613 Tm
+(VIDEO \057 SWITCHING) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.121569 0.101961 0.054902 rg
+0.352941 0.270588 0.12549 RG
+0.4 w
+n
+19 610 m
+75.035 610 l
+75.5878 610 76.035 610.4472 76.035 611 c
+76.035 620 l
+76.035 620.5528 75.5878 621 75.035 621 c
+19 621 l
+18.4472 621 18 620.5528 18 620 c
+18 611 l
+18 610.4472 18.4472 610 19 610 c
+h
+B*
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 23 613 Tm
+(ATEM Switchers) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.121569 0.101961 0.054902 rg
+0.352941 0.270588 0.12549 RG
+0.4 w
+n
+80.035 610 m
+131.377 610 l
+131.9298 610 132.377 610.4472 132.377 611 c
+132.377 620 l
+132.377 620.5528 131.9298 621 131.377 621 c
+80.035 621 l
+79.4822 621 79.035 620.5528 79.035 620 c
+79.035 611 l
+79.035 610.4472 79.4822 610 80.035 610 c
+h
+B*
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 84.035 613 Tm
+(IMAG Systems) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.121569 0.101961 0.054902 rg
+0.352941 0.270588 0.12549 RG
+0.4 w
+n
+19 596 m
+57.3355 596 l
+57.8883 596 58.3355 596.4472 58.3355 597 c
+58.3355 606 l
+58.3355 606.5528 57.8883 607 57.3355 607 c
+19 607 l
+18.4472 607 18 606.5528 18 606 c
+18 597 l
+18 596.4472 18.4472 596 19 596 c
+h
+B*
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 23 599 Tm
+(LED Walls) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.121569 0.101961 0.054902 rg
+0.352941 0.270588 0.12549 RG
+0.4 w
+n
+62.3355 596 m
+111.5195 596 l
+112.0723 596 112.5195 596.4472 112.5195 597 c
+112.5195 606 l
+112.5195 606.5528 112.0723 607 111.5195 607 c
+62.3355 607 l
+61.7827 607 61.3355 606.5528 61.3355 606 c
+61.3355 597 l
+61.3355 596.4472 61.7827 596 62.3355 596 c
+h
+B*
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 66.3355 599 Tm
+(PVP Playback) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+19 582 m
+86.2475 582 l
+86.8003 582 87.2475 582.4472 87.2475 583 c
+87.2475 592 l
+87.2475 592.5528 86.8003 593 86.2475 593 c
+19 593 l
+18.4472 593 18 592.5528 18 592 c
+18 583 l
+18 582.4472 18.4472 582 19 582 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 23 585 Tm
+(Projection \057 Mapping) Tj
+T*
+ET
+BT
+/F2 6.5 Tf
+7.8 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 568 Tm
+(SIGNAL \057 NETWORKING) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.121569 0.101961 0.054902 rg
+0.352941 0.270588 0.12549 RG
+0.4 w
+n
+19 565 m
+95.991 565 l
+96.5438 565 96.991 565.4472 96.991 566 c
+96.991 575 l
+96.991 575.5528 96.5438 576 95.991 576 c
+19 576 l
+18.4472 576 18 575.5528 18 575 c
+18 566 l
+18 565.4472 18.4472 565 19 565 c
+h
+B*
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 23 568 Tm
+(SDI \057 ST Fiber \057 SMPTE) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+100.991 565 m
+125.9625 565 l
+126.5153 565 126.9625 565.4472 126.9625 566 c
+126.9625 575 l
+126.9625 575.5528 126.5153 576 125.9625 576 c
+100.991 576 l
+100.4382 576 99.991 575.5528 99.991 575 c
+99.991 566 l
+99.991 565.4472 100.4382 565 100.991 565 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 104.991 568 Tm
+(sACN) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+19 551 m
+47.228 551 l
+47.7808 551 48.228 551.4472 48.228 552 c
+48.228 561 l
+48.228 561.5528 47.7808 562 47.228 562 c
+19 562 l
+18.4472 562 18 561.5528 18 561 c
+18 552 l
+18 551.4472 18.4472 551 19 551 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 23 554 Tm
+(Art Net) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+52.228 551 m
+92.013 551 l
+92.5658 551 93.013 551.4472 93.013 552 c
+93.013 561 l
+93.013 561.5528 92.5658 562 92.013 562 c
+52.228 562 l
+51.6752 562 51.228 561.5528 51.228 561 c
+51.228 552 l
+51.228 551.4472 51.6752 551 52.228 551 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 56.228 554 Tm
+(DMX512\055A) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+19 537 m
+81.912 537 l
+82.4648 537 82.912 537.4472 82.912 538 c
+82.912 547 l
+82.912 547.5528 82.4648 548 81.912 548 c
+19 548 l
+18.4472 548 18 547.5528 18 547 c
+18 538 l
+18 537.4472 18.4472 537 19 537 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 23 540 Tm
+(Managed Switches) Tj
+T*
+ET
+BT
+/F2 6.5 Tf
+7.8 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 523 Tm
+(LIGHTING CONSOLES) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+19 520 m
+98.5325 520 l
+99.0853 520 99.5325 520.4472 99.5325 521 c
+99.5325 530 l
+99.5325 530.5528 99.0853 531 98.5325 531 c
+19 531 l
+18.4472 531 18 530.5528 18 530 c
+18 521 l
+18 520.4472 18.4472 520 19 520 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 23 523 Tm
+(ETC Eos \057 Apex \057 Ti \057 Ion) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+103.5325 520 m
+143.6815 520 l
+144.2343 520 144.6815 520.4472 144.6815 521 c
+144.6815 530 l
+144.6815 530.5528 144.2343 531 143.6815 531 c
+103.5325 531 l
+102.9797 531 102.5325 530.5528 102.5325 530 c
+102.5325 521 l
+102.5325 520.4472 102.9797 520 103.5325 520 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 107.5325 523 Tm
+(MA2 \057 MA3) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+19 506 m
+44.342 506 l
+44.8948 506 45.342 506.4472 45.342 507 c
+45.342 516 l
+45.342 516.5528 44.8948 517 44.342 517 c
+19 517 l
+18.4472 517 18 516.5528 18 516 c
+18 507 l
+18 506.4472 18.4472 506 19 506 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 23 509 Tm
+(Hog 4) Tj
+T*
+ET
+BT
+/F2 6.5 Tf
+7.8 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 492 Tm
+(ELECTRICAL \057 RIGGING) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+19 489 m
+82.991 489 l
+83.5438 489 83.991 489.4472 83.991 490 c
+83.991 499 l
+83.991 499.5528 83.5438 500 82.991 500 c
+19 500 l
+18.4472 500 18 499.5528 18 499 c
+18 490 l
+18 489.4472 18.4472 489 19 489 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 23 492 Tm
+(Three Phase Distro) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+87.991 489 m
+121.2695 489 l
+121.8223 489 122.2695 489.4472 122.2695 490 c
+122.2695 499 l
+122.2695 499.5528 121.8223 500 121.2695 500 c
+87.991 500 l
+87.4382 500 86.991 499.5528 86.991 499 c
+86.991 490 l
+86.991 489.4472 87.4382 489 87.991 489 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 91.991 492 Tm
+(Camlock) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+19 475 m
+71.0635 475 l
+71.6163 475 72.0635 475.4472 72.0635 476 c
+72.0635 485 l
+72.0635 485.5528 71.6163 486 71.0635 486 c
+19 486 l
+18.4472 486 18 485.5528 18 485 c
+18 476 l
+18 475.4472 18.4472 475 19 475 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 23 478 Tm
+(Truss \046 Motors) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+76.0635 475 m
+125.605 475 l
+126.1578 475 126.605 475.4472 126.605 476 c
+126.605 485 l
+126.605 485.5528 126.1578 486 125.605 486 c
+76.0635 486 l
+75.5107 486 75.0635 485.5528 75.0635 485 c
+75.0635 476 l
+75.0635 475.4472 75.5107 475 76.0635 475 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 80.0635 478 Tm
+(Fall Protection) Tj
+T*
+ET
+BT
+/F2 6.5 Tf
+7.8 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 461 Tm
+(LEADERSHIP) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.121569 0.101961 0.054902 rg
+0.352941 0.270588 0.12549 RG
+0.4 w
+n
+19 458 m
+80.82 458 l
+81.3728 458 81.82 458.4472 81.82 459 c
+81.82 468 l
+81.82 468.5528 81.3728 469 80.82 469 c
+19 469 l
+18.4472 469 18 468.5528 18 468 c
+18 459 l
+18 458.4472 18.4472 458 19 458 c
+h
+B*
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 23 461 Tm
+(Crew Coordination) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.121569 0.101961 0.054902 rg
+0.352941 0.270588 0.12549 RG
+0.4 w
+n
+85.82 458 m
+148.3745 458 l
+148.9273 458 149.3745 458.4472 149.3745 459 c
+149.3745 468 l
+149.3745 468.5528 148.9273 469 148.3745 469 c
+85.82 469 l
+85.2672 469 84.82 468.5528 84.82 468 c
+84.82 459 l
+84.82 458.4472 85.2672 458 85.82 458 c
+h
+B*
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 89.82 461 Tm
+(Touring Integration) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+19 444 m
+86.6115 444 l
+87.1643 444 87.6115 444.4472 87.6115 445 c
+87.6115 454 l
+87.6115 454.5528 87.1643 455 86.6115 455 c
+19 455 l
+18.4472 455 18 454.5528 18 454 c
+18 445 l
+18 444.4472 18.4472 444 19 444 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 23 447 Tm
+(Equipment Inventory) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.070588 0.066667 0.054902 rg
+0.239216 0.180392 0.078431 RG
+0.4 w
+n
+91.6115 444 m
+148.7385 444 l
+149.2913 444 149.7385 444.4472 149.7385 445 c
+149.7385 454 l
+149.7385 454.5528 149.2913 455 148.7385 455 c
+91.6115 455 l
+91.0587 455 90.6115 454.5528 90.6115 454 c
+90.6115 445 l
+90.6115 444.4472 91.0587 444 91.6115 444 c
+h
+B*
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 95.6115 447 Tm
+(Teleprompter Op) Tj
+T*
+ET
+BT
+/F2 8.5 Tf
+10.2 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 425 Tm
+(EDUCATION) Tj
+T*
+ET
+0.831373 0.658824 0.262745 RG
+/gRLs4 gs
+0.5 w
+n
+18 420 m
+34 420 l
+S
+/gRLs1 gs
+BT
+/F2 7.5 Tf
+9 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 18 409 Tm
+(Loyola University Maryland) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 399 Tm
+(Computer Science Coursework) Tj
+T*
+ET
+BT
+/F2 7.5 Tf
+9 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 18 387 Tm
+(Bishop Eustace Preparatory) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.533333 0.533333 0.533333 rg
+BT
+1 0 0 1 18 377 Tm
+(Class of 2012) Tj
+T*
+ET
+BT
+/F2 8.5 Tf
+10.2 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 359 Tm
+(CERTIFICATIONS) Tj
+T*
+ET
+0.831373 0.658824 0.262745 RG
+/gRLs4 gs
+0.5 w
+n
+18 354 m
+34 354 l
+S
+/gRLs1 gs
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 343 Tm
+/F3 6.5 Tf
+7.8 TL
+(n) Tj
+/F1 6.5 Tf
+7.8 TL
+T*
+ET
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 28 343 Tm
+(OSHA 10) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 332 Tm
+/F3 6.5 Tf
+7.8 TL
+(n) Tj
+/F1 6.5 Tf
+7.8 TL
+T*
+ET
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 28 332 Tm
+(MEWP Operator) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 321 Tm
+/F3 6.5 Tf
+7.8 TL
+(n) Tj
+/F1 6.5 Tf
+7.8 TL
+T*
+ET
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 28 321 Tm
+(Avolites Titan Training) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 18 310 Tm
+/F3 6.5 Tf
+7.8 TL
+(n) Tj
+/F1 6.5 Tf
+7.8 TL
+T*
+ET
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 28 310 Tm
+(Rigging \046 Fall Protection \050L8\051) Tj
+T*
+ET
+0.239216 0.180392 0.078431 RG
+0.101961 0.082353 0.031373 rg
+0.5 w
+n
+19 288 m
+122 288 l
+122.5528 288 123 288.4472 123 289 c
+123 301 l
+123 301.5528 122.5528 302 122 302 c
+19 302 l
+18.4472 302 18 301.5528 18 301 c
+18 289 l
+18 288.4472 18.4472 288 19 288 c
+h
+B*
+0.831373 0.658824 0.262745 rg
+n
+30.5 295 m
+30.5 296.3807 29.38071 297.5 28 297.5 c
+26.61929 297.5 25.5 296.3807 25.5 295 c
+25.5 293.6193 26.61929 292.5 28 292.5 c
+29.38071 292.5 30.5 293.6193 30.5 295 c
+f*
+BT
+/F2 7 Tf
+8.4 TL
+ET
+BT
+1 0 0 1 36 291.5 Tm
+(IATSE LOCAL 8) Tj
+T*
+ET
+BT
+/F2 10 Tf
+12 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 202 736 Tm
+(PROFILE) Tj
+T*
+ET
+0.831373 0.658824 0.262745 RG
+/gRLs0 gs
+0.5 w
+n
+253.34 740 m
+590 740 l
+S
+/gRLs1 gs
+q
+1 0 0 1 202 661 cm
+q
+BT
+1 0 0 1 0 61.5 Tm
+11.5 TL
+/F1 7.5 Tf
+0.909804 0.886275 0.839216 rg
+(Union stage technician and crew lead with nine plus years across arena\054 theatrical\054 corporate\054 and broadcast) Tj
+T*
+(environments\056 Deep experience with IMAG systems\054 LED wall deployment\054 production switching\054 projection\054 and) Tj
+T*
+(video signal routing alongside full lighting operations\056 Proven track record coordinating local crews and integrating) Tj
+T*
+(touring production teams at major Philadelphia venues including The Mann Center\056 Freelance portfolio spans) Tj
+T*
+(NASA\057Kennedy Space Center\054 AT) Tj
+(\046) Tj
+(T national events\054 and nationally televised political productions\056 IATSE Local 8) Tj
+T*
+(member known for reliable execution\054 calm troubleshooting\054 and cross department flexibility\056) Tj
+T*
+ET
+Q
+Q
+BT
+/F2 10 Tf
+12 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 202 641 Tm
+(EXPERIENCE) Tj
+T*
+ET
+0.831373 0.658824 0.262745 RG
+/gRLs0 gs
+0.5 w
+n
+274.46 645 m
+590 645 l
+S
+/gRLs1 gs
+BT
+/F2 8.5 Tf
+10.2 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 202 627 Tm
+(Stage Electrician \057 Video \046 Lighting Technician) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.721569 0.572549 0.180392 rg
+BT
+1 0 0 1 534.7305 627 Tm
+(2016 \227 PRESENT) Tj
+T*
+ET
+BT
+/F1 7.5 Tf
+9 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 202 616 Tm
+(IATSE Local 8) Tj
+T*
+ET
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 608 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 604 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Operate IMAG\054 LED wall\054 and projection systems alongside lighting rigs for concerts\054 theater\054 and broadcast) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 597 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 593 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Serve as liaison between touring video\057lighting leads and house infrastructure at major venues) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 586 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 582 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Lead and coordinate local stagehand crews across video\054 lighting\054 audio\054 and carpentry departments) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 575 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 571 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Manage signal distribution and routing for SDI\054 fiber\054 and multi universe lighting networks) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 564 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 560 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Support load in\057load out operations and troubleshoot signal flow under show conditions) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 553 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 549 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Cross department flexibility\072 assist audio\054 carpentry\054 barricade\054 and general venue ops as needed) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 RG
+/gRLs7 gs
+2 w
+n
+194 638 m
+194 555 l
+S
+/gRLs1 gs
+0.5 w
+BT
+/F2 8.5 Tf
+10.2 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 202 532 Tm
+(Owner \057 Video\054 Lighting \046 Teleprompter Technician) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.721569 0.572549 0.180392 rg
+BT
+1 0 0 1 534.7305 532 Tm
+(2022 \227 PRESENT) Tj
+T*
+ET
+BT
+/F1 7.5 Tf
+9 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 202 521 Tm
+(Digital Footprints LLC) Tj
+T*
+ET
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 513 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 509 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Provide video playback\054 LED integration\054 lighting\054 and teleprompter services for corporate\054 aerospace\054 and political clients) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 502 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 498 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Build show files and integrated video\057lighting workflows for hybrid and broadcast events) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 491 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 487 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Operate production switchers and coordinate video feeds for multi camera productions) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 480 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 476 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Maintain and track professional video and teleprompter equipment inventory) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 RG
+/gRLs7 gs
+2 w
+n
+194 543 m
+194 482 l
+S
+/gRLs1 gs
+0.5 w
+BT
+/F2 8.5 Tf
+10.2 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 202 459 Tm
+(Head Electrician) Tj
+T*
+ET
+BT
+/F1 6.5 Tf
+7.8 TL
+ET
+0.721569 0.572549 0.180392 rg
+BT
+1 0 0 1 550.974 459 Tm
+(2019 \227 2022) Tj
+T*
+ET
+BT
+/F1 7.5 Tf
+9 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 202 448 Tm
+(Lansdowne Theater) Tj
+T*
+ET
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 440 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 436 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Led all venue production operations including video\054 lighting\054 and electrical for concerts and touring acts) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 rg
+/gRLs5 gs
+q
+0.707107 0.707107 -0.707107 0.707107 204 429 cm
+n
+-1.5 -1.5 3 3 re
+S
+Q
+/gRLs6 gs
+q
+1 0 0 1 210 425 cm
+q
+0.909804 0.886275 0.839216 rg
+BT
+1 0 0 1 0 3 Tm
+/F1 7 Tf
+10 TL
+(Managed equipment inventory\054 fixture maintenance\054 and venue technical documentation) Tj
+T*
+ET
+Q
+Q
+0.831373 0.658824 0.262745 RG
+/gRLs7 gs
+2 w
+n
+194 470 m
+194 431 l
+S
+/gRLs1 gs
+0.5 w
+BT
+/F2 10 Tf
+12 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 202 406 Tm
+(NOTABLE CREDITS) Tj
+T*
+ET
+0.831373 0.658824 0.262745 RG
+/gRLs0 gs
+0.5 w
+n
+305 410 m
+590 410 l
+S
+/gRLs1 gs
+BT
+/F2 7 Tf
+8.4 TL
+ET
+0.831373 0.658824 0.262745 rg
+BT
+1 0 0 1 202 391 Tm
+(The Mann Center) Tj
+T*
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 396 391 Tm
+(NASA \057 Kennedy Space Center) Tj
+T*
+ET
+BT
+/F2 7 Tf
+8.4 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 202 380 Tm
+(AT\046T National Roadshow) Tj
+T*
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 396 380 Tm
+(National Political Events) Tj
+T*
+ET
+BT
+/F2 7 Tf
+8.4 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 202 369 Tm
+(Metallica) Tj
+T*
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 396 369 Tm
+(Lauryn Hill \057 Nas \057 Wu Tang) Tj
+T*
+ET
+BT
+/F2 7 Tf
+8.4 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 202 358 Tm
+(Lincoln Financial Field) Tj
+T*
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 396 358 Tm
+(Wells Fargo Center) Tj
+T*
+ET
+BT
+/F2 7 Tf
+8.4 TL
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 202 347 Tm
+(Usher) Tj
+T*
+ET
+0.941176 0.92549 0.894118 rg
+BT
+1 0 0 1 396 347 Tm
+(Kimmel Center) Tj
+T*
+ET
+
+endstream
 endobj
 5 0 obj
 <<
-/Contents 9 0 R /MediaBox [ 0 0 612 792 ] /Parent 8 0 R /Resources <<
-/ExtGState <<
-/gRLs0 <<
-/CA .25
->> /gRLs1 <<
-/CA 1
->> /gRLs2 <<
-/CA .15
->> /gRLs3 <<
-/CA .2
->> /gRLs4 <<
-/CA .4
->> /gRLs5 <<
-/ca .5
->> 
-  /gRLs6 <<
-/ca 1
->> /gRLs7 <<
-/CA .3
->>
->> /Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
+/F1 6 0 R
+/F2 7 0 R
+/F3 8 0 R
 >>
 endobj
 6 0 obj
 <<
-/PageMode /UseNone /Pages 8 0 R /Type /Catalog
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
 >>
 endobj
 7 0 obj
 <<
-/Author (anonymous) /CreationDate (D:20260325074154-04'00') /Creator (anonymous) /Keywords () /ModDate (D:20260325074154-04'00') /Producer (ReportLab PDF Library - \(opensource\)) 
-  /Subject (unspecified) /Title (untitled) /Trapped /False
+/BaseFont /Helvetica-Bold
+/Encoding /WinAnsiEncoding
+/Name /F2
+/Subtype /Type1
+/Type /Font
 >>
 endobj
 8 0 obj
 <<
-/Count 1 /Kids [ 5 0 R ] /Type /Pages
+/BaseFont /ZapfDingbats
+/Name /F3
+/Subtype /Type1
+/Type /Font
 >>
 endobj
 9 0 obj
 <<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 5857
+/Author (anonymous)
+/CreationDate (D\07220260325074154\05504\04700\047)
+/Creator (anonymous)
+/Keywords ()
+/ModDate (D\07220260325074154\05504\04700\047)
+/Producer (ReportLab PDF Library \055 \050opensource\051)
+/Subject (unspecified)
+/Title (untitled)
+/Trapped /False
 >>
-stream
-Gau`8?$G$]ZL@W)GfoRM\-`NT,e-XNaE""Rq;YXnZO_Im,hcj'O]kY?l[OCs0E[E&SK:@glfL%@J==;^^'B>N$P373k3r+DLefhsn_=qp'XM$&L](&n-=Sgtot;K1IO)?dlapJ;O<[#I'.N3?h#7F`O5RcTCk'%"qqC@bh2fG*"00(7@=mC&EN$h#k?_MP#=-,/HXc6d$8Lr@Fl3LE+Sq5K>)&b)>H@h/52P*h)Gf-GKFa:YF3.pgE-"Rj55!\e)8uKp4>SgAV"&Z0Km#=FX(`13&?&07#.02WK[8<2\]>/(<[D)8]C!6K\aO>/A'!p_',mcP9[35%ef9/0(Ya?UKhDG.!ej;'f2gj%kkd*5,U&FdKJb4j0RU;IR#"`fAkR,a2Y_-:p+J/t6d1!7pcjklErpnL"E(A+NG`@WX31tb[RQ7h-(kl_D.h9\nHPMCY(ZQm`+8fAbA;S%=btaEpuQNY*"OZG?lG8G,Sh4iYU1f.&&mg(dYqLsX+kPf-[C-N0D?'W&@ilh?-WYlfcFsa:YC]6!]G\X$sql?(D63T[k+NZrtF.ZcWLAtON#Vd?p&_;\!T(G30WnG%5ukj)Yd>%l!d2=/D-.4]1B\LFnI>ef1f6lJI;Bt[nQCf5HgC!(HZjPO`)$4olBtnm2`hE-9E9mVB[gpk%Q"2&\/+<7.QrSe'SbqAuaJWH''_b@We<@VrE$,]u'+%3q1h*Dan44bBPe1^;@<i`3q8,,;sT]&Z9Uffli[d+*>B?7kss'SdiG"oQWZ]gPbuC*\s7h,)E/2k9jX]I1N'Q-ZS[*THjYCfQ$8ohJG$T$)[(b$*XP8WY[0V^WHN[!_UMe5]L<VoYWAK/aSC@cN;O&3M<R?`%]J9Ub=9EM-.89%#UX[M'bPYn;KqKr2)@['f9;.*#<M6r6K`a]h^l[Q=+7]ZnRl,0#[B*?dJ2I\p5Y<5^?``^[1cIh[e_6omfj_'2jK*8Ge5)i$OCZ/L1YO5qGo($>"'U1$YtO(mW$25Lbiq!op0cFYKgZEHY0cJ2Is4"o.NPD]^k$OO6U!j,:`d0n!lhg%)fj"h(9@#Rrp3pOb^[!u2)UXTJYSm@KC^g5-YiDkY6.Lb2$c[?Mjg(3U-,PK1J3j"UP-:KUR7PK2Tb"V%3(*eQ$70)"oSPu&0eN6]AnZmad(#E`gk&)Q=CIH;hW'>?-s?7\Y_#hWc@Km(JWe:OKU0$#fUjG^>1;PXlI#AGLTqluHlJRJCTX.9PboNQqr3`'?s)H"?lFSEA-\t[:*ET[5e>$Mm.j0s.0kA/T0YteR(eZ)>a#7%pPN8P:i)N^,SqMp;*WMcN*%&$umW'En#?=4lr]-ek^Fs=^MAYI$b[Lc$`;+^oKejol5*?;H#K95U5l$N_mP4.UbIE-BeY^f1!Ki>uD,nQLieAt)kFnJ6_?ftDqRK"I:Xn)&NGo:^KEM4RnesVO_?OeEe`oUn-p$1\+G:bII"J%k4;>hd1%8c]4fMrc%"2U?HOI.&I2K+/6Yo"Uk3@`qtQ@'[W_W.SqE.CbI(6cb>n0hb">7MVgE6%nF)_A*4cGiuGc,=l;%0m@rY%KDPf)Lg>HCiRdKMDgtMkjgIp_"A6<C"/#^cl7rZnk1g%ZE!F"^/^&*/`T)7I%.*OH';B/Wu9[A4slO7UnuZAJ?_()0BDNs3=C6nl=QT)3GWc%#-FBDuX(\<'FtFKM[HCJ\j_]J67.$L"\^5))rHXPQ`7`jT(IEUCp.,a[_M"-^%ceM'PM*^NH*gB@g"D?,q!DY^egtJ+$L=67U7G[CFH3mj3B.S^8O)5onkgX9$N`cpo!&$1%a(?5?"5>/4gE"k^+4'p,UFD_ti<2Hg*l;63:r0Rfb6(.Kk4WP3$Hk/pO%N][-l9/A&,4OVO.`IF.+It#tes-(_?`)oc"=5upU5Z%M13srBH@*B.kR'<g7>(V<eYo)Ck_GYsb/br5LF24I/*$I=q`M>4M8"eNq/-cXm\7>O4G)hZEmk3$D]uq2"Fa[;L^T**Oe8Vs.c/I47oP-.M^8J+[p;VpnVD4't%MpmNV_Q'h"Cq=^*RRUVPW9!V(stZ&b7Gt%eu]PR5m7`Z)@oA.6$lFZ6qQEdUsX5AYbX:X:t"**j/e6fCa_bQ"#\#)Q2Lk.ZQ/r_=69<Z'1&Z.-mum)+)0U^`t(N[&X%;KYg6E*m>MX`!s=Ht5o-dOL[oX^OcCD+UaZi03JQ\=Hkh10]'di\AD%knd02,"NZ;r4]B;<bMqDL%4td*QH[nEOSmLMe%h56B6>:rO!@V]jJO3oiE-Yl#N*@(e%@.++]WbB5=BP,X+(O6%j%mBL`c.;%Aq0C<0o!/cN8`/=L)97G:EK2I?`H1"*]%Ve$,(?t9h*%Rc$3puYFG(Fc`_0!?E)s]-^Z3V.;KNGHl#W:KFj+<!G=uY'=;Z_0GXb\-(0Y]4Mg)u836IWY)YZ+"I(kd,>"Y?>fc-]EF?&546D$"*EuOfmcuD;fCs!CM6jitf@>3s6H;k#fQfc2(+"jgJY8=M2XX[>pWReeG/iaA!toV^g<PVu)6qqm82\TqW<WE<Qr&@]Q?"")=HTqH_?%qiR#3VqG*dQT/Fdud;VNm2(=g$g<8lNXZ5<Cg+".4+#Xs1V(at^<#p4B'$&hCbdKZt1p_;O^dZJKaBKirA60gQ;)<YZD/s%Kl%Nf\t>WAh;**e0eT%u'R?qcRKXPPdnp`M2hFnN<^,HjrJ^/2*RTG*7)ZhhHN#%,?<Fpe:7C<nDD_B)bq86\cBg;=7AV<P49SjrX,bNajhMa8[;c)GQf[M+Iq>)OdiO>RkJ$*C25bJ!P%03/@@P]iW6Kt+:d24ZHC27rCJkK.CV2S,<*).1/9JRSn%o+GD6@G"H0ASHO]Klr/+*?37EHt(G*1)`ZA6=ULMQ3+;0PbWmp1.o,!$'::)DETc'm#`c+O0krL/7=Dsht&8D$@Z)i%q8X@occ'<QaHWc]rY16lr`jpOBSSb$OA(7%VW=[ih"hlhp!"[3\Vc=(:5s6-&3[g9,Y,k(Ig27Q4[n%LJP<m5su$]+V\g1D8]=;o5XZ^lWn'g$^%T(eY^X84#&A>fj4PkD7qiqKd"-QM1"NT&2LfRO.`%1#fcRp9BeR4W+I/C0qsA(`0QQa_QBLG]8fcpf)`rP8(bB_&1,p7't]Lf_I3J']SjIe=Vt(/rkD1A>%Zk72"DYNWqu8!oTApN)T[Kh5[1@`&'2[:[3/kL[1:,2MB.L<AW\QX*QXC2_7QP&EZ?/j6NFrg@KRq5QA.I7M!27d;03rCd8>K9FSE@R4fBnUl#2k&frD3@X*%I$X4:'#%Y^'Pc&L"t*=c[WDen`cD(*>T&A0oSK,:^#4hF%ggNCT!He(d]=;@h1[EQBuFd'!N`C3rp(2:>3_45^Eo`;fb*eM0d..QOaccUM;fk45BfgAb(/'SU]=eJ@(TCV-Y>)CY(=f8LPFe,X4#b8LelL$`lBshB36?-5c$L.BWW7DY2QJLb:2Ei4H7D7\->+e2;.3-!JbOV&XG31Y=-W(u3K.S8pPc^NUk:Q$9Ibb&Q=48f)OQJ0agmNAthtr/@o*+-3dFW.>3LMVAU[CDDDnH0Ui+2>j.e7`5LfqGe9/3Kr]R8\l_5m:hHZ-P5>2\Hg^UqD#l@[`(Fi<_r'E.gC\rQJCWS!KL=p?IlT,j;I@KKW>C6I:M\5Jb-*OM2ULnG9t"ao$)'*2%[_C4ot3AQS1Hc`4;B9%&WVl>_rd+1_LZ0pP<1"AclF)0/UbFaM2in#O1+7$&q"m39"$22h1N;A*[:/iS&'BG]l0ZT`Q_7YQjZCf4V5#G,&'[q^'d4i@SK1K/sC$A3`f<0c?bQah&roUoKT3QP*e'[T-,9>eM,5AJ$=5@Z>=*XH8lrl4ejdWKg?Vm)^PW5<ds4922kMsZtO)XN0_RWW3+!PtMHM46SiHCXY^Ku+e]^7jh_ISEBr(RUeei04bma^YGqia!jU&j$Pdd(0c^hN5[I%E\bJD*<5Z*c-gF<M^rot>n>OGQuBBuFMIer<5`FTq"bXg9cG($k`J?.\m7/Pa9tW`Kp'`pD4%q,US]@\,LGSc),\Ia@>[`6u9^MmFs=M<ll$VGp?Ye]bGHL9>Zj$G9[>J?HT,<^l\;Lo1;H^Vtr_]J8k:+U"08^.W$<GADZR(Ki&Qr2r^$;-05E#)opfb.@kLLt`A80Cl`%1LHQk%Q&]!LaLIgLio96rtKS[Rfh'JL)[j3R/?S*XiB]d\*[H?9i'?qqK7$hBB^$?emb'H;:VCf%:6i%)[O]63A38u`1,Rq:t1c,(rFk1\hD@p/;"9?`!)lAha/lLc)oFBS]RF-%]4l>^LUoD/KVlQL%Q*&T8E[J^uOJXIEVg7*Pa9_m"65)S"2)OJ_)+CSi>=(<eIK)C@5mAK_47W%o/GD'(7dX=]Q'0\:mZ.=coW>M@A"*br;FD5Zr\\Wt!9?[9'Ji)T`!,^_U&DX\G:.>@`6Fhf@Z5Z/>)[s+<P>p#RTtZoIpNp#p!M\f;dXc7u[gq!/.'mYmoHJ$--,i=BrZWFDD:^E"%sn235o8+E''oFGD?NHs[AHC*\6o,3XIM$M=i>IQeJ&@t>,3C]ZNNl:B!T^/)pFEBNi^=7<VYe+ZFQW69HFj&Z=1,;oF6MiLu(<B2Co4Mug7RE&m4H71b'L-(I21Ip__4M34_9*2"BIb?\c/Gk^9M"$BFR]L#fKQ,cZs'DcW1M4,lt^)Pq*H%OCfKa(0,M+_r2qc72Qn5[eEG"$0Vd+3(lI!nN[dA:MgB:RRQJ'`(?%*N^Lna-5U:(#J?Zb!l\>nd2[<`S#!P)!@="]II:$i[$mP+V%H=?1Y\eo!(S)ut^T#`P]u'bH_ct0bQJ)J*]SX-VY@X6S9OVmYWr\RZN>,0Zh19Q3R]8>^VtCCKFoBsLgi"]'Hp=pOjC8,pP+rCd[]EThbN/Sj8Sgj3[a%.)S=Y^9`@YEk,rmP9`B"eS3je/HE![:aeUP<8aJ//8O[\+]>]d<hOp)7F`EMN$q#i^#MCp-GDFn4>Hs9P\+L2.b'eoZ<@;_2HPW+kn$4`16AC&k#C\ThGd(^aN2.1IUqjci?MJm3g`V>$Xn@Pb)fbP:A5gTspa>1pSfj[Iffhs3;NCl6e8g%CDk#]Y2$>I,r0a5tjCE:Aa/lrR[\L[\!`?&+;Hk9*!J`!ceZ)dq0nu\o4`TK$iq-C]=Q(<R'Y97ti)_m`hhl?$?r]qn!*Q,h#_87[V3j]Y%+GgGu]R<fR,i)jUk\@e^]V!M+>Ptl,B*S?f]an1AY'ZQQq4$On:ECY-0[WCPl).6^/1=!Ejq'qQ1oAX>D3[DSE%n_`r9bZAebS3=_8r2+>KSHir'TPAj!0lHcd!61]%O6FaA-XsHBPcdOjDK&OQ^l,D^m:)*?qOD3_IX!L'7NtQH!DHf_'(c\]C9aOF3Y1B]e0[jtFAa4WsKt0]:_"lKs(8j@Hg/jS(Q>YX%W`fuH`;b3LEpkSAb63hacL3Tc-3,n0#jcm13470TY)O-Hk'I&i2=L'LjpE"!,F5_R&(67R1?52@YBgU"<Nbm]tW`lc;qZdV^6=`Z6acJLT(b2a*G8p.M\B(;&9@MeX&BoeSt$*k2)+\?DoE'?e3L8^PZ&:+/Ub5pH@`h)jH][-UFDa4""0_FRrl1/RIpbWkFiQ^S&4PT$FD>+kYbJhi;8,>2kq9Arg2]0/J)^Kg/kiop&QePet>`_@6'HS)YIJqTVnI%#D[i"![U'B?3IpqBT9O-:]k8U?TYZNoAIAZ4a?+V;!ZsC#NQMH?2oL/tLGl^PX`%MdlUmq4c'OPkd<$+C?p`#g.)_jumqX+$n*%MNr&FQQm'^%K&CQ<g3Se[09ph,asZ_D-OH!9**a0u\qiU^i+J"TLlJRA!01+Ssf-[Pe'5=2rN~>endstream
 endobj
 xref
 0 10
 0000000000 65535 f 
-0000000061 00000 n 
-0000000112 00000 n 
-0000000219 00000 n 
-0000000331 00000 n 
-0000000414 00000 n 
-0000000787 00000 n 
-0000000855 00000 n 
-0000001116 00000 n 
-0000001175 00000 n 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000142 00000 n 
+0000000514 00000 n 
+0000021424 00000 n 
+0000021475 00000 n 
+0000021582 00000 n 
+0000021694 00000 n 
+0000021777 00000 n 
 trailer
 <<
-/ID 
-[<5e3e0cf16d6ddbc52a109163fd03ceeb><5e3e0cf16d6ddbc52a109163fd03ceeb>]
-% ReportLab generated PDF document -- digest (opensource)
-
-/Info 7 0 R
-/Root 6 0 R
 /Size 10
+/Root 1 0 R
+/Info 9 0 R
+/ID [ (\136\076\014\361mm\333\305\052\020\221c\375\003\316\353) (\136\076\014\361mm\333\305\052\020\221c\375\003\316\353) ]
 >>
 startxref
-7123
+22066
 %%EOF

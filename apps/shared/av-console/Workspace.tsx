@@ -72,23 +72,31 @@ type Props = {
   render: (type: string, panel: Panel) => PanelRender;
   onViewsChange: (views: View[], message: string) => void;
   notify: (text: string) => void;
+  viewTabs?: View[];
   extraViews?: ReactNode;
+  /* Chooser group to open on: an application name when the library carries
+     `app`, otherwise one of the three categories. */
+  defaultGroup?: string;
 };
 
-export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, extraViews }: Props) {
+export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, viewTabs, extraViews, defaultGroup }: Props) {
   const grid = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLElement | null>(null);
   const [chooser, setChooser] = useState<Chooser | null>(null);
   const [query, setQuery] = useState("");
-  const [group, setGroup] = useState<PanelDef["group"]>("Common");
+  const [group, setGroup] = useState<string>(defaultGroup || "Common");
   const [menu, setMenu] = useState<Menu | null>(null);
   const [rename, setRename] = useState("");
   const [drag, setDrag] = useState<Drag | null>(null);
   const [draw, setDraw] = useState<{ anchor: { x: number; y: number }; px: number; py: number; rect?: Rect } | null>(null);
   const { view, panels, mode, locked } = ws;
+  const visibleViewTabs = viewTabs || ws.views;
   const maxId = view ? ws.max[view.id] || null : null;
   const def = (type: string) => ws.library.find(d => d.type === type);
+  const apps = Array.from(new Set(ws.library.map(d => d.app).filter((app): app is string => Boolean(app))));
+  const groups: string[] = apps.length ? apps : ["Common", "Planning", "Utilities"];
+  const startGroup = defaultGroup && groups.includes(defaultGroup) ? defaultGroup : groups[0];
   const stored = view ? sanitizeView(view).panels : [];
   const changed = view ? !sameLayout(ws.live[view.id] || stored, stored) : false;
 
@@ -111,7 +119,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   }
   function openChooser(c: Omit<Chooser, "left" | "top">, left: number, top: number) {
     trigger.current = (document.activeElement as HTMLElement) || null;
-    setQuery(""); setGroup("Common"); setMenu(null);
+    setQuery(""); setGroup(startGroup); setMenu(null);
     setChooser({ ...c, ...clampPos(left, top, 460, 420) });
   }
   function addPanelButton(e: React.MouseEvent<HTMLButtonElement>) {
@@ -226,16 +234,18 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   const phoneShown = mode === "phone" ? (panels.find(p => p.type === ws.phoneType) || panels.find(p => p.id === ws.focus) || panels.find(p => def(p.type)?.lit) || panels[0]) : undefined;
   const ordered = [...panels].sort((a, b) => a.y - b.y || a.x - b.x);
   const visible = maxId ? panels.filter(p => p.id === maxId) : mode === "phone" ? (phoneShown ? [phoneShown] : []) : panels;
+  // A lone tablet panel uses the available workspace without changing its stored desktop geometry.
+  const singleTabletPanel = mode === "tablet" && panels.length === 1;
   const area = (p: Panel) => {
-    if (maxId || mode === "phone") return { gridColumn: "1 / -1", gridRow: "1 / -1" };
+    if (maxId || mode === "phone" || singleTabletPanel) return { gridColumn: "1 / -1", gridRow: "1 / -1" };
     if (mode === "tablet") { const i = ordered.findIndex(x => x.id === p.id); return { gridColumn: String(i % 2 + 1), gridRow: String(Math.floor(i / 2) + 1) }; }
     return { gridColumn: `${p.x + 1} / ${p.x + p.w + 1}`, gridRow: `${p.y + 1} / ${p.y + p.h + 1}` };
   };
-  const gridStyle = maxId || mode === "phone" ? { gridTemplateColumns: "minmax(0,1fr)", gridTemplateRows: "minmax(0,1fr)" }
+  const gridStyle = maxId || mode === "phone" || singleTabletPanel ? { gridTemplateColumns: "minmax(0,1fr)", gridTemplateRows: "minmax(0,1fr)" }
     : mode === "tablet" ? { gridTemplateColumns: "repeat(2,minmax(0,1fr))", gridTemplateRows: `repeat(${Math.max(1, Math.ceil(panels.length / 2))},minmax(0,1fr))` }
     : { gridTemplateColumns: `repeat(${COLS},minmax(0,1fr))`, gridTemplateRows: `repeat(${ROWS},minmax(0,1fr))` };
   const shownTypes = new Set((mode === "phone" ? visible : panels).map(p => p.type));
-  const choices = ws.library.filter(d => (!query || `${d.name} ${d.description}`.toLowerCase().includes(query.toLowerCase())) && (query || d.group === group));
+  const choices = ws.library.filter(d => (!query || `${d.name} ${d.app || ""} ${d.description}`.toLowerCase().includes(query.toLowerCase())) && (query || (apps.length ? d.app === group : d.group === group)));
   const ghost = drag?.rect || draw?.rect || (chooser?.rect && chooser.mode !== "replace" ? chooser.rect : undefined);
 
   const quickBar = <nav className="console-quick" aria-label="Panels">
@@ -244,7 +254,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   return <div ref={shell} className={`console-shell mode-${mode} ${locked ? "is-locked" : ""}`}>
     <div className="console-strip">
       <div role="tablist" aria-label={`${label} views`} className="console-views">
-        {ws.views.map(v => <button key={v.id} type="button" role="tab" aria-selected={v.id === ws.viewId} onClick={() => { ws.setViewId(v.id); close(); }}>{v.name}{v.id === ws.viewId && changed && <span className="console-dot" title="Arrangement changed. Store or update the view to keep it." aria-label="arrangement changed" />}</button>)}
+        {visibleViewTabs.map(v => <button key={v.id} type="button" role="tab" aria-selected={v.id === ws.viewId} onClick={() => { ws.setViewId(v.id); close(); }}>{v.name}{v.id === ws.viewId && changed && <span className="console-dot" title="Arrangement changed. Store or update the view to keep it." aria-label="arrangement changed" />}</button>)}
         {extraViews}
       </div>
       <button type="button" className="console-icon" aria-label="View options" aria-haspopup="menu" onClick={e => { trigger.current = e.currentTarget; const p = at(e.currentTarget); setChooser(null); setMenu({ kind: "view", id: ws.viewId, ...clampPos(p.left, p.top, 260, 340) }); }}>▾</button>
@@ -263,7 +273,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
         const out = render(p.type, p);
         const focused = ws.focus === p.id; const isMax = maxId === p.id;
         const canDrag = !locked && !maxId && mode === "desktop";
-        return <section key={p.id} className={`console-panel ${d.lit ? "is-lit" : ""} ${focused ? "is-focused" : ""} ${drag?.id === p.id ? "is-dragging" : ""}`} style={area(p)} data-panel={p.type} onPointerDownCapture={() => { if (!focused) ws.setFocus(p.id); }}>
+        return <section key={p.id} className={`console-panel ${d.lit ? "is-lit" : ""} ${focused ? "is-focused" : ""} ${drag?.id === p.id ? "is-dragging" : ""}`} style={area(p)} data-panel={d.key || p.type} data-app={d.app} onPointerDownCapture={() => { if (!focused) ws.setFocus(p.id); }}>
           <header className={`console-bar ${canDrag ? "can-drag" : ""}`} onPointerDown={dragStart(p, "move")} onPointerMove={dragMove} onPointerUp={dragEnd}>
             <strong className="console-title">{out.title || d.name}</strong>{out.context && <span className="console-context">{out.context}</span>}
             <span className="console-bar-actions">{out.actions}
@@ -290,7 +300,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
       </> : <>
         <h3>{chooser.mode === "replace" ? "Change panel" : "Add panel"}</h3>
         <input type="search" aria-label="Search panels" placeholder="Search panels…" value={query} autoFocus onChange={e => setQuery(e.target.value)} />
-        {!query && <div className="console-groups" role="group" aria-label="Panel categories">{(["Common", "Planning", "Utilities"] as const).map(g => <button key={g} type="button" aria-pressed={group === g} onClick={() => setGroup(g)}>{g}</button>)}</div>}
+        {!query && <div className="console-groups" role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" aria-pressed={group === g} onClick={() => setGroup(g)}>{g}</button>)}</div>}
         <div className="console-choices">
           {choices.length ? choices.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}{panels.some(p => p.type === d.type) && <small> · open</small>}</strong><span>{d.description}</span></button>) : <p>No panels match.</p>}
         </div>

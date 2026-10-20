@@ -11,22 +11,23 @@
   if(!hasLock){
     try{
       var stored = localStorage.getItem('av-theme-mode.v1');
-      if(stored === 'dark' || stored === 'light' || stored === 'system') mode = stored;
+      if(stored === 'dark' || stored === 'light' || stored === 'white' || stored === 'black' || stored === 'system') mode = stored;
     }catch(e){}
   }
 
   root.setAttribute('data-av-theme', mode);
 
-  var lightColor = document.querySelector('meta[name="theme-color"][data-av-theme-color="light"]');
-  var darkColor = document.querySelector('meta[name="theme-color"][data-av-theme-color="dark"]');
+  var colors = Array.prototype.slice.call(document.querySelectorAll('meta[name="theme-color"][data-av-theme-color]'));
+  var lightColor = colors.find(function(meta){return meta.getAttribute('data-av-theme-color') === 'light';});
+  var darkColor = colors.find(function(meta){return meta.getAttribute('data-av-theme-color') === 'dark';});
   if(!lightColor || !darkColor) return;
 
   if(mode === 'system'){
     lightColor.setAttribute('media', '(prefers-color-scheme: light)');
     darkColor.setAttribute('media', '(prefers-color-scheme: dark)');
+    colors.forEach(function(meta){if(meta !== lightColor && meta !== darkColor) meta.setAttribute('media', 'not all');});
     return;
   }
 
-  lightColor.setAttribute('media', mode === 'light' ? 'all' : 'not all');
-  darkColor.setAttribute('media', mode === 'dark' ? 'all' : 'not all');
+  colors.forEach(function(meta){meta.setAttribute('media', meta.getAttribute('data-av-theme-color') === mode ? 'all' : 'not all');});
 })();

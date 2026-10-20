@@ -10,7 +10,7 @@ documenting the Notion skills, agents, widgets, and templates I build and use.
 - JavaScript where needed
 - App-grade surfaces may use framework code, package tooling, or generated
   assets when that is the right product architecture
-- The canonical AV registry currently contains **45 browser tools**; public
+- The canonical AV registry currently contains **18 browser tools** (34 retired sheet routes redirect into the console); public
   count copy is release-gated against `js/sbd-registry.js`
 - Hosted on GitHub Pages with a custom domain (`CNAME`)
 
@@ -18,9 +18,17 @@ documenting the Notion skills, agents, widgets, and templates I build and use.
 
 [AV Video](https://avbydave.com/av-video/) combines an interactive Signal Flow canvas, Video Patch, Displays & Projection, Cameras and Playback in one independent application. Source lives in `apps/av-video/`; `npm run build:av-video` regenerates the committed `av-video/` artifact. Use `npm run typecheck:av-video`, `npm run test:av-video` and `npm run test:av-video-browser` to verify it. See [the workflow and data contract](docs/av-video.md).
 
+[The Shop](https://avbydave.com/the-shop/) uses the same console engine for Worklist, Item inspector, Plan/Import and Backup panels, standalone or embedded in AV Video. Source is in `apps/the-shop/`; `npm run build:the-shop` regenerates the committed entry and assets without removing the existing logistics model. Verify with `npm run typecheck:the-shop`, `npm run test:the-shop` and `npm run test:the-shop-browser`. See [its scope, saved-data and verification contract](docs/the-shop.md).
+
 ## Local development
 
-No toolchain required. Any static file server works:
+[Infrastructure](https://avbydave.com/infrastructure/) has a native-console candidate in `apps/infrastructure/`: Power, Network, Cable, Issues, Plan/Import and Backup share its existing model. Use `npm run typecheck:infrastructure`, `npm run test:infrastructure`, `npm run build:infrastructure` and `npm run test:infrastructure-browser`. The build preserves the standalone model and writes the committed entry/assets. See [the brief and compatibility contract](docs/infrastructure-app.md); source presence does not establish release or browser acceptance.
+
+[Lighting](https://avbydave.com/av-lighting/) has a native-panel candidate in `apps/av-lighting/`: Fixtures, Fixture details, Focus, Plan/Import and Backup preserve existing patch/focus fields and reviewed PlotForge imports. Use `npm run typecheck:av-lighting`, `npm run test:av-lighting`, `npm run build:av-lighting` and `npm run test:av-lighting-browser`. See [the brief and compatibility contract](docs/av-lighting.md); candidate checks and publication/live proof are separate.
+
+[AV Calculator](https://avbydave.com/av-calculator.html) uses the shared console workspace around its original six calculation engines. Source is in `apps/av-calculator/`; `npm run build:av-calculator` writes only its native JS/CSS, leaving the canonical HTML and shared LED engine maintained separately. Verify with `npm run typecheck:av-calculator`, `npm run test:av-calculator` and `npm run test:av-calculator-browser`. See [the panel and field-set contract](docs/av-calculator-app.md). Inputs autosave; workspace views save separately.
+
+No toolchain is needed to serve the committed artifacts. Any static file server works:
 
 ```bash
 # Python
@@ -46,12 +54,12 @@ use the tooling selected for that surface.
 | `fmp-index/index.html` | Retired FMP working index: noindex redirect to the `/fmp/` hub, keeping query and hash |
 | `fmp/` | Managed FMP video operations hub, camera commissioning, bowl training, and rig reference; authenticated camera API remains SETUP TEST only; [release and sync contract](docs/fmp-public-release.md) |
 | `fmpwalk/` | Managed local-first preshow venue walk; configured for walk.housevideo.app with destination verification before cutover; explicit download, Gmail, and Notion actions; no silent writes |
-| `av-suite.html?entry=show` | Show Console for show-attached AV operations |
-| `av-suite.html?entry=toolbox` | Show-independent AV Toolbox directory |
+| `av/` | AV by Dave: one console, nine departments of individual native panels; standalone tool links (`docs/av-suite-shell.md`) |
+| `av-suite.html` | Redirect stub into the console (keeps `sbd*` show context) |
 | `docs/av-suite-development-assets-index.md` | AV Suite source, spec, migration, release, and historical-asset authority map |
 | `av-calculator.html` | Six quick AV calculations and a copyable field summary on avbydave.com |
 | `led-wall-calculator.html` | Viewport LED wall planner with cabinet preview, mobile results and section jumps, manufacturer-PF-gated current estimates, and a Power Load handoff on avbydave.com; [operator and verification notes](docs/led-wall-calculator.md) |
-| `av-suite-landing2.html` | Source for the avbydave.com home page, staged as `/` on that domain |
+| `av/index.html` | Also staged as `/` on avbydave.com (`scripts/domain-sites.json`) |
 | `av-suite-landing.html` | Retired previous landing; a noindex redirect to the current AV by Dave home (UX-005) |
 | `depotops/index.html` | Local-first project shopping, inventory, and tool tracking |
 | `pixelforge/` | PixelForge editor |

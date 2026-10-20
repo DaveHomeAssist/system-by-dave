@@ -99,3 +99,22 @@ The LED Wall Calculator split from AV Calculator after this historical 44-tool b
 | LED Wall Calculator | `/led-wall-calculator.html` | Warm Paper / Stage Slate with dark planning stage | Cabinet inputs, live build map, estimates, and saved profiles | Specialist Translation |
 
 | AV Video | `/av-video/` | Shared Warm Paper / Stage Slate; visible theme selector; defaults to light. |
+
+## 2026-10-07 candidate application extension
+
+The eight-application integration is a draft, not a theme acceptance. The seven
+new registry routes below are recorded so the registry-derived theme gate can
+track them. Audio uses the shared theme but lacks the required light/dark
+browser-chrome colors. The other six candidate pages have not yet opted into
+the shared theme contract. Their app owners must close those gaps before the
+integration can merge; a row here does not mean the route is published.
+
+| Surface | Canonical route | Candidate theme state | Required gate |
+|---|---|---|---|
+| Audio | `/av-audio/` | Shared theme present; browser-chrome colors missing | Add both theme-color variants and pass light/dark probe |
+| Show Control | `/show-control/` | Shared theme opt-in missing | Add system AV theme, browser-chrome colors and stylesheet; pass probe |
+| Show Ops | `/show-ops/` | Shared theme opt-in missing | Add system AV theme, browser-chrome colors and stylesheet; pass probe |
+| Front Office | `/front-office/` | Shared theme opt-in missing | Add system AV theme, browser-chrome colors and stylesheet; pass probe |
+| The Shop | `/the-shop/` | Shared theme opt-in missing | Add system AV theme, browser-chrome colors and stylesheet; pass probe |
+| Infrastructure | `/infrastructure/` | Shared theme opt-in missing | Add system AV theme, browser-chrome colors and stylesheet; pass probe |
+| Lighting | `/av-lighting/` | Shared theme opt-in missing | Add system AV theme, browser-chrome colors and stylesheet; pass probe |

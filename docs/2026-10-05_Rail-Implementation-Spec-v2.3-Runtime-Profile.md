@@ -14,7 +14,13 @@ This version records the three settled product decisions and the first bounded s
 - **RAIL-2A:** use a phone Apps dialog below 720 CSS pixels, a compact rail from 720 through 1439, and a labeled rail from 1440 upward.
 - **RAIL-3A:** support device-local pin, unpin, reorder, and reset preferences in `sbd.rail.v1`.
 
-The rail owns application navigation preferences only. It does not own show data, console documents, modules, draft recovery, or panel layouts.
+**Implementation update — October 7, 2026:** sequence steps 5–6 are implemented in source. AV Video now mounts the selected Rail profile outside its React root, the production bundle is rebuilt, and the five local Rail assets ship in cache generation `v20261007-av-video-rail` with focused source and browser verification. Merge, publication, live revision proof and operator acceptance remain separate sequence-step-7 evidence.
+
+**Application-launcher update — October 9, 2026:** the eight primary applications that were later published are promoted from status-only identities to canonical Rail destinations under the [application-launcher brief](av-rail-application-launcher.md). Rail availability now means a published primary route exists. Physical-device, operator and deeper workflow acceptance remain separate evidence and do not block basic navigation.
+
+**Console-snapshot update — October 9, 2026:** ordinary selection in the mounted AV Video suite shell recalls the matching in-console application snapshot under the [console snapshot Rail contract](av-suite-console-snapshot-rail.md). The published destinations remain fallback links and continue to handle modifier-clicks and pages without a suite selection handler.
+
+The rail owns application order and navigation preferences only. It signals snapshot selection but does not own show data, console documents, modules, draft recovery, or panel layouts. The receiving console workspace owns the recalled arrangement.
 
 ## 1. Source authority and scope
 
@@ -194,14 +200,36 @@ The registry slice must assert:
 
 Later runtime verification must cover the responsive fixtures, keyboard order, visible focus, 44px targets, 200% zoom, reduced motion, preference reload/reset/failure behavior, Planned status semantics, route context isolation, and unchanged AV Video document state.
 
+### Standalone runtime source boundary
+
+Sequence step 2 is implemented as an unmounted source layer in `js/sbd-rail.js` and `css/sbd-rail.css`. The runtime exports exact typed-reference resolution, `sbd.rail.v1` reads, and explicit `pin`, `unpin`, `move`, and `reset` operations. It does not inspect storage or the DOM when loaded and does not mount itself.
+
+The preference parser renders defaults without writing when the key is absent. It preserves known Planned entries in order, suppresses unresolved or non-pinnable entries, and retains only unresolved references after visible entries on the next explicit successful edit. Known non-pinnable records are dropped by that explicit edit. Duplicate references are removed by exact string identity without invoking tool aliases. Unreadable or unsupported payloads remain untouched until explicit reset.
+
+The standalone renderer uses native links and buttons, a non-interactive Planned treatment, visible and screen-reader-readable status text, a focusable bounded scroll region, 44px targets, a phone Apps trigger below 720px, compact presentation from 720 through 1439px, and labeled presentation from 1440px upward. Production mounting, cache changes, and live acceptance remain later steps.
+
+### Standalone dialogs, routing, and draft invalidation boundary
+
+Sequence step 3 is implemented as an unmounted source layer in `js/sbd-rail-dialogs.js` and `css/sbd-rail-dialogs.css`. It provides bounded native dialogs for All apps and Customize, focus trapping and trigger-focus return, keyboard pin/unpin/reorder/reset controls, and explicit session-only failure feedback. Opening, closing, catalog rendering, route resolution, and draft reads do not write `sbd.rail.v1` or application storage.
+
+The shared typed route builder resolves registry-relative paths against an explicit suite base. It forwards only `sbdShow`, `sbdVenue`, `sbdDate`, `sbdOperator`, and `sbdPhase` from the supplied source URL to eligible same-origin console/tool routes. Toolbox, family and external routes receive no source context or source hash; status-only and Planned entries remain non-navigable.
+
+Draft indicators validate each console's declared direct key and supported envelope without reading the advisory index or parsing the application document. The observer re-reads on `sbd:console-draft-change`, native storage events, storage clear, and page restoration. AV Video's existing draft session emits the same-page invalidation after each attempted write or clear; the event never claims persistence success and does not change its locking, conflict, save, restore, discard, or failure behavior.
+
+### Toolbox family and external command boundary
+
+Sequence step 4 is implemented in the existing Toolbox application. A recognized `family=` value in resolved Toolbox mode creates an effective view with empty search and the All filter without writing either `av-suite-ui.v1` or the saved-show payload. Unknown families use the persisted Toolbox fallback; recognized show context and Front Office retain precedence. Popstate recomputes the effective family from the current URL, while an explicit Toolbox control action adopts the visible family and resumes the existing page-local persistence behavior.
+
+The quick switcher now validates, renders, executes, and records exact `external:` command IDs for registry handoffs with safe HTTP(S) destinations. External routes are built without source show parameters or hashes. Status-only externals do not enter the command pool or valid recent-command state. Existing `tool:cueforge` and `tool:plotforge` compatibility remains unchanged and continues to resolve to Cue Sheet and StagePlotter.
+
 ## 9. Implementation sequence
 
 1. **Complete in this source slice:** add identities, default pins, external records, exact lookup, and focused verifier coverage. Defer the cache-version bump until the rail runtime and offline assets are introduced together.
-2. Implement the standalone rail renderer and preference parser without mounting it.
-3. Add All apps and Customize dialogs, typed route resolution, and AV Video draft invalidation.
-4. Implement Toolbox family and external command support explicitly.
-5. Mount the selected RAIL-2A profile around AV Video and rebuild production assets.
-6. Add rail assets to the offline set, add browser probes, and run the full AV verification matrix.
+2. **Implemented in the stacked standalone-runtime review slice:** rail renderer and preference parser, without production mounting.
+3. **Implemented in the stacked standalone-dialog review slice:** All apps and Customize dialogs, typed route resolution, and AV Video draft invalidation, without production mounting.
+4. **Implemented in the stacked Toolbox integration review slice:** non-mutating `family=` effective state and exact external quick-switcher commands.
+5. **Implemented in the AV Video Rail integration slice:** mount the selected RAIL-2A profile around AV Video and rebuild production assets.
+6. **Implemented in the AV Video Rail integration slice:** add local Rail assets to the offline set, bump the cache generation, add browser probes, and run the full AV verification matrix.
 7. Merge, deploy, verify the live revision, and obtain rendered and operator acceptance.
 
 No step creates an unbuilt console. Planned entries remain status-only until a separate console implementation brief, source, route, persistence contract, and verification exist.

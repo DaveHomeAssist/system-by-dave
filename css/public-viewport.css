@@ -1,0 +1,132 @@
+/* Shared marketing reader. Operational AV applications own their own shells. */
+html { --reader-bg: #f4f6f8; --reader-surface: #fff; --reader-ink: #18212c; --reader-muted: #4d5b6b; --reader-line: #ccd4de; --reader-accent: #176440; color-scheme: light; }
+html[data-theme="dark"], html[data-av-theme="dark"] { --reader-bg: #0a0d14; --reader-surface: #141926; --reader-ink: #f3f4f7; --reader-muted: #b3bdca; --reader-line: #384456; --reader-accent: #72d9a4; color-scheme: dark; }
+html[data-theme="light"] { --bg: #f4f6f8; --bg-2: #eaf0f5; --surface: #fff; --surface-2: #eaf0f5; --panel: #fff; --ink: #18212c; --ink-2: #425061; --ink-3: #526171; --muted: #4d5b6b; --faint: #526171; --line: #ccd4de; --line-2: #9daab9; --blue: #255bb3; --red: #a33e28; --green: #176440; --amber: #8c550b; --amber-soft: #8c550b; --signal: #14675f; }
+.public-theme-toggle { min-width: 96px; min-height: 44px; padding: 6px 10px; border: 1px solid var(--reader-line); border-radius: 8px; background: var(--reader-surface); color: var(--reader-ink); font: 600 13px/1.2 "DM Sans",sans-serif; cursor: pointer; }
+.public-enhanced, .public-enhanced body { height: 100%; height: 100dvh; min-height: 0; width: 100%; overflow: clip; scroll-behavior: auto; }
+.public-shell { position: relative; z-index: 1; display: grid; grid-template-rows: auto auto minmax(0,1fr) auto; height: 100%; height: 100dvh; min-height: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); background: var(--reader-bg); color: var(--reader-ink); }
+.public-shell > header { position: static; margin: 0; padding: 0; background: var(--reader-surface); color: var(--reader-ink); border-color: var(--reader-line); }
+.public-shell .sbd-site-header__inner, .public-shell .site-header > .inner { width: 100%; max-width: none; padding: 4px 20px; min-height: 60px; gap: 16px; }
+.public-shell .sbd-site-links a { color: var(--reader-muted); }
+.public-shell .sbd-site-links a:hover, .public-shell .sbd-site-links a[aria-current] { color: var(--reader-ink); background: var(--reader-bg); }
+.public-shell .sbd-site-brand__mark { background: var(--reader-ink); color: var(--reader-bg); }
+.public-tabs { display: flex; justify-content: center; gap: 8px; padding: 6px 16px; border-bottom: 1px solid var(--reader-line); font-family: "DM Sans",sans-serif; }
+.public-tabs button, .public-pager button { min-height: 44px; min-width: 44px; padding: 6px 16px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--reader-muted); font: 600 14px/1.2 "DM Sans",sans-serif; cursor: pointer; }
+.public-tabs [aria-selected="true"] { color: var(--reader-accent); background: var(--reader-surface); border-color: var(--reader-line); }
+.public-shell button:focus-visible, .public-shell a:focus-visible, .public-stage:focus-visible, .public-stage [role="tabpanel"]:focus-visible { outline: 2px solid var(--reader-accent); outline-offset: -2px; }
+.public-stage { position: relative; min-height: 0; min-width: 0; margin: 0; padding: 16px 24px; overflow: clip; }
+.public-stage > [data-public-panel] { display: block; position: relative; height: 100%; min-height: 0; width: 100%; max-width: none; margin: 0; padding: 0; border: 0; }
+.public-stage > [data-public-panel][hidden="until-found"] { display: block !important; content-visibility: hidden; position: absolute; inset: 16px 24px; width: auto; height: auto; padding: 0; overflow: clip; }
+.public-frame { height: 100%; width: 100%; overflow: hidden; }
+.public-pages { height: 100%; width: 100%; column-count: 1; column-gap: 32px; column-fill: auto; transform: translateX(0); }
+/* Include the gap inside each page stride; the frame clips only the page gutter. */
+.public-pages { width: 100%; padding-right: 32px; box-sizing: border-box; }
+.public-pages > :first-child { margin-top: 0; }
+.public-pages .wrap { width: 100%; max-width: none; padding: 0; }
+.public-pages section, .public-pages .hero, .public-pages footer { margin: 0 0 24px; padding: 0; border: 0; }
+.public-pages .hero-grid { padding: 0; gap: 28px; }
+.public-pages h1 { font-size: clamp(32px, 4vw, 56px); margin: 0 0 16px; }
+.public-pages h2 { font-size: clamp(24px, 3vw, 32px); }
+.public-pages .section-head, .public-pages .sec-head { margin: 0 0 16px; }
+.public-pages .hero-sub, .public-pages .hero-lead { margin: 0 auto 20px; }
+.public-pages .hero-actions, .public-pages .hero-ctas { margin: 0 0 20px; }
+.public-pages .badge { margin-bottom: 20px; }
+.public-pages .stats { margin-top: 20px; padding: 20px 0; }
+.public-pages .hero-portrait img { max-height: 360px; width: 100%; object-fit: contain; }
+.public-pages .feat-shot img { max-height: 200px; object-fit: cover; }
+.public-pages .product-card { max-width: 800px; margin: 20px auto; }
+.public-pages .feature, .public-pages .quick-tool { margin-bottom: 16px; }
+.public-pages .hero { text-align: left; }
+.public-pages .reveal, .public-pages .anim-in { opacity: 1 !important; transform: none !important; }
+.public-pages .comms, .public-pages .card, .public-pages .feature, .public-pages .quick-tool { background-color: var(--reader-surface); border-color: var(--reader-line); }
+.public-pages .footer-inner, .public-pages .foot-grid { padding: 16px 0; }
+.public-pages .footer-links { margin-left: 0; }
+.public-pages .stats, .public-pages .card, .public-pages .product-card, .public-pages .quick-tool, .public-pages .feature, .public-pages .channel, .public-pages .hero-portrait { break-inside: avoid-column; }
+.public-pages .card:hover { background: var(--reader-surface); }
+.public-pages .trust { margin: 16px 0; }
+.public-pages .comms-head { background: var(--reader-surface); }
+.public-pages .btn-primary, .public-pages .btn--primary { background: var(--reader-ink); color: var(--reader-bg); }
+.public-pages .btn-secondary, .public-pages .copy-btn { background: var(--reader-surface); color: var(--reader-ink); border-color: var(--reader-line); }
+.public-pages .copy-btn { min-height: 44px; min-width: 44px; }
+.public-pages .logos { background: #14161b; border-radius: 12px; padding: 16px; }
+.public-pager { position: static; display: flex; justify-content: center; align-items: center; gap: 20px; padding: 4px 16px; border-top: 1px solid var(--reader-line); background: var(--reader-surface); font: 13px/1.3 "DM Sans",sans-serif; }
+.public-pager button { border-color: var(--reader-line); color: var(--reader-ink); }
+.public-pager button:disabled { opacity: .45; cursor: default; }
+.public-pager span { min-width: 150px; text-align: center; }
+@media(min-width:960px) { [data-public-site="av"] #overview .public-pages { column-count: 2; } [data-public-site="av"] #overview .product-card { break-before: column; margin-top: 0; } }
+@media(min-width:2400px) { .public-pages { column-count: 2; } .public-stage { padding-inline: 40px; } }
+@media(max-width:680px) {
+  .public-shell { grid-template-rows: auto minmax(0,1fr) auto auto; }
+  .public-tabs { grid-row: 4; padding: 4px; gap: 2px; border-top: 1px solid var(--reader-line); border-bottom: 0; }
+  .public-tabs button { flex: 1; min-width: 0; padding: 4px 2px; font-size: 12px; }
+  .public-stage { grid-row: 2; padding: 12px; }
+  .public-pager { grid-row: 3; gap: 6px; padding: 2px 6px; }
+  .public-pager button { padding: 4px 8px; font-size: 12px; }
+  .public-pager span { min-width: 0; flex: 1; font-size: 12px; }
+  .public-shell .sbd-site-header__inner, .public-shell .site-header > .inner { display: flex; flex-wrap: wrap; padding: 2px 8px; gap: 0 8px; min-height: 0; }
+  .public-shell .sbd-site-brand, .public-shell .brand { min-height: 44px; margin-right: auto; }
+  .public-shell .sbd-site-brand__word { font-size: 14px; }
+  .public-shell .sbd-site-brand__mark, .public-shell .brand-mark { width: 28px; height: 28px; font-size: 14px; }
+  .public-shell .sbd-site-links, .public-shell .nav { order: 3; width: 100%; display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 0; }
+  .public-shell .sbd-site-links a, .public-shell .nav a { flex: 1; min-width: 0; min-height: 44px; padding: 4px; font-size: 11px; text-align: center; white-space: normal; }
+  .public-shell .brand-text > span { display: none; }
+  .public-shell .brand-text strong { font-size: 14px; }
+  .public-shell .header-actions { margin: 0; }
+  .public-shell .theme-toggle { min-height: 44px; padding: 6px 8px; font-size: 12px; }
+  .public-pages .grid-3, .public-pages .feat-grid, .public-pages .feat-side, .public-pages .approach, .public-pages .hero-grid, .public-pages .grid, .public-pages .lead-col, .public-pages .glance, .public-pages .values, .public-pages .quick-tools-grid { display: block; }
+  .public-pages .card, .public-pages .value { margin-bottom: 12px; padding: 16px; }
+  .public-pages .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .public-pages .hero-portrait img { max-height: 240px; }
+  .public-pages .hero-actions, .public-pages .hero-ctas { display: block; }
+  .public-pages .hero-actions a, .public-pages .hero-ctas a { display: flex; margin-bottom: 8px; }
+  .public-pages .section-intro, .public-pages .body { font-size: 16px; }
+  .public-pages .comms-cta { display: block; }
+  .public-pages .comms-cta a { display: flex; margin: 8px 0; padding: 10px; }
+  .public-pages .channel { padding: 12px 8px; }
+  .public-pages .val { overflow-wrap: anywhere; }
+}
+@media(max-height:500px) {
+  .public-stage { padding: 4px 12px; }
+  .public-tabs { padding-block: 0; }
+  .public-pages h1, .public-pages h2 { font-size: 24px; line-height: 1.2; }
+  .public-pages *, .public-pages .card { break-inside: auto; }
+  .public-pages .grid, .public-pages .grid-3, .public-pages .stats, .public-pages .logos, .public-pages .hero-grid, .public-pages .comms, .public-pages .channels, .public-pages .channel, .public-pages .hero-actions, .public-pages .hero-ctas { display: block; }
+  .public-pages img, .public-pages svg { max-height: 50px; width: auto; object-fit: contain; }
+  .public-pages .hero-actions a, .public-pages .hero-ctas a { display: block; min-height: 0; padding: 4px; }
+  .public-pages .card, .public-pages .quick-tool { padding: 4px; }
+}
+/* Fragmentable content must not become an unbreakable clipped formatting box. */
+.public-pages .hero, .public-pages .stats, .public-pages .line, .public-pages .card.feat-main, .public-pages .comms, .public-pages .table-wrap, .public-pages .product-card { overflow: visible; min-height: 0; }
+.public-pages .hero::after, .public-pages .feat-shot::after { content: none; }
+.public-pages p.body, .public-pages .lede { color: var(--reader-muted); }
+.public-pages .feat-shot { aspect-ratio: auto; overflow: visible; background: transparent; }
+.public-pages .feat-shot img { position: static; width: 100%; height: auto; max-width: 100%; max-height: 200px; object-fit: contain; }
+.public-pages .agent-table { min-width: 0; width: 100%; table-layout: fixed; }
+.public-pages .agent-table td.agent { width: 28%; }
+.public-pages .channel .val { white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+.public-shell .sbd-site-brand__word { display: inline; position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; }
+@media(max-width:680px) {
+  .public-pages .hero .wrap.hero-grid { display: block; }
+  .public-pages .footer-inner, .public-pages .footer-links, .public-pages .channels { display: block; }
+  .public-pages .footer-links li { display: block; }
+  .public-pages .comms-cta a { display: block; }
+}
+@media(max-height:500px) {
+  .public-pages .hero .wrap.hero-grid, .public-pages .chips, .public-pages .footer-inner, .public-pages .footer-links, .public-pages .product-chrome, .public-pages .mv-grid, .public-pages .triage, .public-pages .hero-stats, .public-pages .feat-grid, .public-pages .feat-side, .public-pages .agent-table, .public-pages .agent-table tbody, .public-pages .agent-table thead, .public-pages .agent-table tr, .public-pages .agent-table td, .public-pages .agent-table th { display: block; }
+  .public-pages .agent-table td.agent { width: auto; }
+  .public-pages .chips li, .public-pages .chips a, .public-pages .footer-links li { display: block; }
+  .public-pages .stat { padding: 4px; }
+  .public-pages .hero-portrait img, .public-pages .feat-shot img { max-height: 50px; width: auto; }
+  .public-pages .comms-head, .public-pages .comms-cta { display: block; padding: 4px; }
+  .public-pages .channel .val, .public-pages .channel .ch { display: block; width: auto; }
+  .public-pages .tile, .public-pages .tile-body { min-height: 0; }
+  .public-pages .comms-cta a { display: block; min-height: 44px; padding: 4px; }
+  .public-pages .quick-tool { display: block; }
+}
+@media print {
+  html { --reader-bg: #fff !important; --reader-surface: #fff !important; --reader-ink: #111 !important; --reader-muted: #333 !important; --bg: #fff !important; --ink: #111 !important; --ink-2: #333 !important; --ink-3: #444 !important; --muted: #333 !important; --landing-text: #111 !important; --landing-muted: #333 !important; --landing-canvas: #fff !important; }
+  html.public-enhanced, .public-enhanced body, .public-shell, .public-stage, .public-stage > [data-public-panel], .public-frame, .public-pages { display: block !important; height: auto !important; min-height: 0 !important; width: auto !important; overflow: visible !important; position: static !important; transform: none !important; column-count: auto !important; padding: 0 !important; }
+  .public-stage > [data-public-panel][hidden="until-found"] { content-visibility: visible !important; display: block !important; width: auto !important; height: auto !important; position: static !important; overflow: visible !important; }
+  .public-tabs, .public-pager, .public-shell > header, .public-theme-toggle, .skip, .skip-link, .sbd-skip-link { display: none !important; }
+  .public-stage > [data-public-panel] { margin-bottom: 32px !important; }
+}
