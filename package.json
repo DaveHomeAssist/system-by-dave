@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "smoke:live": "node scripts/launch/smoke_live_domain.mjs",
+    "test:smoke-live-local": "node --test scripts/launch/smoke_live_domain.test.mjs",
     "verify:fmp": "node scripts/verify_fmp_release.js && node scripts/build_switcher_guide.mjs --check && node scripts/build_gear_from_fmp.js --check",
     "build:switcher-guide": "node scripts/build_switcher_guide.mjs",
     "verify:domain-sites": "node --test scripts/domain_robots.test.mjs scripts/housevideo_manifest.test.mjs && node scripts/stage_domain_sites.mjs --check",
