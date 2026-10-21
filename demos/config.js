@@ -23,6 +23,6 @@ window.SBD_DEMOS = {
   emailTag: 'demos',           // Buttondown: sent as a hidden "tag" input; ignored elsewhere
 
   // Optional second action after completion. Leave empty to hide.
-  checklistUrl: '',
-  checklistLabel: 'Get the troubleshooting checklist',
+  checklistUrl: '/field-kit/',
+  checklistLabel: 'Get the Field Kit',
 };

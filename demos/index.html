@@ -45,10 +45,19 @@
   .card p{margin:0 0 14px;color:var(--ink2);font-size:1rem}
   .card .go{font:800 15px/1 "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--orange)}
   .card .fact{font:500 13px/1.4 "IBM Plex Mono",monospace;color:var(--mute);margin-top:14px;border-top:1px solid var(--p2);padding-top:10px}
+  .card--kit{border-color:#5a3a22;background:linear-gradient(180deg,#22201f,var(--p))}
+  .card--kit .n{color:var(--yellow)}
+  .subscribe{margin-top:40px;padding:22px;border:2px solid var(--p2);border-radius:18px;background:var(--p)}
+  .subscribe h2{font:800 1.6rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase;margin:0 0 8px}
+  .subscribe p{margin:0 0 14px;color:var(--ink2);font-size:1rem}
+  .subscribe__btn{display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--orange);color:#111;font:800 16px/1 "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+  .subscribe__btn[hidden],.subscribe__soon[hidden]{display:none}
+  .subscribe__btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+  .subscribe__soon{font:500 14px/1.4 "IBM Plex Mono",monospace;color:var(--mute)}
   footer{margin-top:48px;color:var(--mute);font-size:.9rem;max-width:64ch}
 </style>
 </head>
-<body>
+<body data-demo="hub">
 <a class="sbd-skip-link" href="#demos">Skip to the demos</a>
 <nav class="sbd-site-return" aria-label="Breadcrumb">
   <a href="https://systembydave.com/">System by Dave</a>
@@ -76,9 +85,31 @@
       <div class="go">Play →</div>
       <div class="fact">AJA Support FAQ 7308: two different cables, two different ports, a known-good cable</div>
     </a>
+    <a class="card card--kit" href="/field-kit/" data-umami-event="hub_open" data-umami-event-demo="field-kit">
+      <div class="n">FIELD KIT</div>
+      <h2>Sync &amp; Signal Field Kit</h2>
+      <p>Four quick references for when a picture tears, drops or won't handshake: the tearing card, the genlock checklist, the EDID/HDCP tree and a browser tear test.</p>
+      <div class="go">See the Field Kit →</div>
+    </a>
   </div>
+  <section class="subscribe" id="subscribe" aria-labelledby="subscribe-title" tabindex="-1">
+    <h2 id="subscribe-title">Get the next demo</h2>
+    <p>New demos and the Field Kit launch, by email.</p>
+    <a class="subscribe__btn" id="subscribe-link" href="#subscribe" target="_blank" rel="noopener" data-umami-event="hub_subscribe" hidden>Subscribe by email</a>
+    <p class="subscribe__soon" id="subscribe-soon">Email sign-up opens soon. Until then, check back here for new demos.</p>
+  </section>
   <footer>More demos follow the daily archive's rotation: transport, bandwidth, color, sync, cameras, displays, IP and fiber, troubleshooting. Built as web pages so you can touch the mechanism, not just watch it.</footer>
 </main>
 <script src="demo-shell.js"></script>
+<script>
+  // Hub subscribe link: only a validated beehiiv URL from config.js (see demo-shell.js).
+  (function () {
+    var href = typeof window.sbdSubscribeHref === 'function' ? window.sbdSubscribeHref() : null;
+    if (!href) return;
+    var link = document.getElementById('subscribe-link');
+    link.href = href; link.hidden = false;
+    document.getElementById('subscribe-soon').hidden = true;
+  })();
+</script>
 </body>
 </html>
