@@ -453,7 +453,7 @@ button.btn{font:inherit;cursor:pointer;margin-top:16px}
 <p>That address is not part of ${title}. The tool may have moved; open the AV console to choose a panel.</p>
 <div class="actions">
 <a class="btn primary" href="/av/">Open the AV console</a>
-<a class="btn" href="${site.home}">${title} home</a>
+${(site.pages || []).includes('demos/') ? '<a class="btn" href="/demos/">Try a demo</a>\n' : ''}<a class="btn" href="${site.home}">${title} home</a>
 </div>
 <button class="btn" id="themeToggle" type="button" aria-label="Use light mode" aria-pressed="true" hidden>Light mode</button>
 </main>
