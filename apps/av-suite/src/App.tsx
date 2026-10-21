@@ -14,6 +14,20 @@ import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, p
 const RAIL_SELECT_EVENT = "sbd:rail-console-select";
 const RAIL_ACTIVE_EVENT = "sbd:console-snapshot-active";
 const FOCUS_KEY = "sbd.avSuite.focus.v1";
+/* First-visit explainer (AUD-004): shown only when this browser has no saved AV by Dave
+   state at all and the visit is not a deep link. Dismissing it (or following one of its
+   links) is remembered; any saved state also marks a returning visitor. It sits in the
+   page flow above the workspace, never over it. */
+const INTRO_KEY = "sbd.avSuite.intro.v1";
+function firstVisit(): boolean {
+  const query = new URLSearchParams(location.search);
+  if (query.has("app") || query.has("gear") || query.has("sbdEmbed")) return false;
+  try {
+    if (localStorage.getItem(INTRO_KEY)) return false;
+    for (let i = 0; i < localStorage.length; i++) if (localStorage.key(i) !== INTRO_KEY) return false;
+  } catch { /* storage blocked: show it; dismissal then lasts for this visit */ }
+  return true;
+}
 const PALETTES = ["light", "dark", "white", "black"] as const;
 type Palette = typeof PALETTES[number];
 type ThemeMode = Palette | "system";
@@ -171,6 +185,12 @@ export function App() {
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-workspace-offline"] });
     return () => observer.disconnect();
   }, []);
+  const [intro, setIntro] = useState(firstVisit);
+  function closeIntro(moveFocus: boolean) {
+    setIntro(false);
+    try { localStorage.setItem(INTRO_KEY, "dismissed"); } catch { /* dismissed for this visit */ }
+    if (moveFocus) requestAnimationFrame(() => document.getElementById("workspace")?.focus());
+  }
   const context = showContext();
   const offer = activePack?.recovery.offer;
   const dirtyApps = packs.filter(pack => pack.dirty).map(pack => pack.label);
@@ -196,6 +216,10 @@ export function App() {
       </div>
     </header>
     <div className="suite-bar"><span className="suite-summary">{activePack ? activePack.summary : activeTool ? "Panels keep working while this tool runs; its Save lives inside the panel." : "Tap empty space or + Add panel to call up any panel from any department or tool. Store the arrangement as a view."}{offline === "ready" && <span className="suite-offline">Offline ready</span>}</span>{dirtyApps.length > 0 && <span className="suite-dirty" title={dirtyApps.join(", ")}>Unsaved: {dirtyApps.join(", ")}</span>}</div>
+    {intro && <section className="suite-intro" aria-labelledby="suite-intro-title">
+      <div className="suite-intro__text"><h2 id="suite-intro-title">New to AV by Dave?</h2><p>This is a working console of AV production tools (video, audio, lighting, show control and more) that runs in your browser. Add any panel to the workspace below; what you save stays in this browser.</p></div>
+      <div className="suite-intro__actions"><a className="suite-intro__primary" href="/demos/" onClick={() => closeIntro(false)}>Try a demo</a><a href="/field-kit/" onClick={() => closeIntro(false)}>See the Field Kit</a><button type="button" onClick={() => closeIntro(true)}>Dismiss</button></div>
+    </section>}
     {offer && activePack && <div className="draft-offer" role="alert"><p><strong>{activePack.label} unsaved edits</strong> from {new Date(offer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={() => void activePack.recovery.restore()}>Restore draft</button><button type="button" onClick={() => void activePack.recovery.discard()}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
       {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Add panels here; the saved view changes only when you store or update it.</div>}

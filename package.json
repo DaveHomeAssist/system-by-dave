@@ -102,7 +102,8 @@
     "verify:private-exposure": "node --test scripts/verify_private_exposure.test.js && node scripts/verify_private_exposure.js",
     "verify:workbook-withdrawal": "node scripts/verify_workbook_withdrawal.cjs",
     "test:av-audio-flow-browser": "node scripts/probe_av_audio_flow.mjs",
-    "probe:av-nav-funnel": "node scripts/launch/probe_av_nav_funnel.mjs"
+    "probe:av-nav-funnel": "node scripts/launch/probe_av_nav_funnel.mjs",
+    "probe:home-explainer": "node scripts/launch/probe_home_explainer.mjs"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
