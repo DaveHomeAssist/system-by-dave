@@ -1,7 +1,7 @@
 # Field Kit checkout
 
 Status: **closed**. `field-kit/` is a noindex draft that isn't linked from
-navigation or the sitemap. It shows "Price TBD" and a disabled "Checkout not
+navigation or the sitemap. It shows the $19 price and a disabled "Checkout not
 open yet" button. Paid kit files are **not** in this repository. Only the
 blurred preview images in `field-kit/img/` are.
 
@@ -24,13 +24,16 @@ Checkout opens only when **all three** of these are true:
    `[DAVE: …]` placeholder keeps checkout closed and the page shows "Price TBD".
 
 The demo itself (`demos/frame-sync.html`) doesn't carry a Field Kit block; link the
-kit from its optional `checklistUrl` in `demos/config.js` once checkout is live.
+kit from its `checklistUrl` in `demos/config.js` (set: the absolute avbydave.com/field-kit/ link, because the demos live on systembydave.com).
 
 ## Chosen: Stripe Payment Links (2026-10-19)
 
-The config ships `provider: 'stripe'` with marked placeholders,
-`url: '[DAVE: Stripe Payment Link]'` and `priceLabel: '[DAVE: price, e.g. $19]'`,
-so checkout stays closed. The four blocks on the page carry **DRAFT** wording for
+The config ships `provider: 'stripe'` with the marked placeholder
+`url: '[DAVE: Stripe Payment Link]'` and `priceLabel: '$19'` (Dave, 2026-10-23),
+so checkout stays closed until a real `buy.stripe.com` link replaces the placeholder.
+**Account:** a separate AV by Dave Stripe account (Dave, 2026-10-23), not the System
+by Dave one. Its statement descriptor isn't known yet, so `[STATEMENT DESCRIPTOR]`
+stays a placeholder. The four blocks on the page carry **DRAFT** wording for
 Dave to approve, including `[STATEMENT DESCRIPTOR]`. Dave's click-steps live
 outside the repo (`/workspace/launch/setup-stripe.md`).
 
