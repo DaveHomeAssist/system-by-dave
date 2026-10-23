@@ -73,7 +73,7 @@ const robots = read('robots.txt');
 // The AV Suite shell adds its non-published source template under apps/av-suite/. From
 // 2026-10-13 its av/ route is the noindex source of the avbydave.com home page, and the 34
 // retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md).
-if (unlisted.length !== 187) fail(`Expected 187 tracked routes outside the sitemap; found ${unlisted.length}.`);
+if (unlisted.length !== 188) fail(`Expected 188 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   if (!sitemapRoutes.has(route)) {

@@ -910,5 +910,21 @@
       "boundary": "Only checker, focused test, existing CI and records; no application assets/build/cache/formulas/routes/saved keys/schemas/original imports change. Runtime acceptance remainsf7dc459 and unchanged Video JS/CSS; new source review/CI/merge/publication stay separate. Physical/olderOS/operator and unanswered product-policy gates remain open.",
       "redirectCorrection": "First candidate d8ec325 CI39195166501 passed all four initial fixtures, then caught a strict-loader assumption at the existing Throwline client redirect to Stage3D.html. Guard corrected and redirect regression added; original failed run retained and application route unchanged."
     }
+  },
+  "boxlensReference": {
+    "checkedOn": "2026-10-23",
+    "scope": "Standalone camera inspection reference requested directly by Dave; existing Stream/Record and other product gates remain unchanged.",
+    "sourceBrief": "docs/boxlens.md",
+    "route": "https://avbydave.com/boxlens/",
+    "viewer": "https://ion-workbench.davein4k.chatgpt.site/camera/",
+    "viewerSource": "9a7620ac8f6da3a67a318025f5343164746ae9b0",
+    "state": "Implemented and browser-verified candidate; production release pending.",
+    "verification": "Dominic Chromium: five embedded viewports, 23 controls, selection, back-focus/F.f lock, balance reset, head views, both themes and no root overflow. Very short phone viewport shows direct-viewer recovery. Host navigation/copy/indexing/domain staging and deterministic sitemap pass.",
+    "remaining": [
+      "PR and CI",
+      "Merge and deployment",
+      "Exact live route readback",
+      "Physical-device/operator and actual equipment identification"
+    ]
   }
 }
