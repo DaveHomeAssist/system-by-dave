@@ -52,5 +52,8 @@ host/viewer roots. At 320x256 the host presents bounded direct-viewer recovery;
 the direct public viewer renders with all 23 controls. Page errors were absent.
 Physical-device, operator and real equipment acceptance remain separate.
 
-Production publication remains subject to PR, CI, merge, deployment and live
-readback; these browser observations use the local host with the public viewer.
+PR [#363](https://github.com/DaveHomeAssist/system-by-dave/pull/363) passed both
+checks and merged at `105620f655876a099d95e1990301b254c91c770d`. Its release
+receipt maintains the current deployment and exact live acceptance evidence.
+The browser observations above are the pre-publication host checks; consult
+the receipt for production results. Physical/operator acceptance stays open.
