@@ -62,7 +62,8 @@ try {
     }, INTRO);
     if (!s) { fail(`${tag} first visit shows no explainer`); await context.close(); continue; }
     if (!s.labelled || s.role !== 'SECTION' || s.modal) fail(`${tag} explainer should be a labelled, non-modal section (${JSON.stringify({ labelled: s.labelled, role: s.role, modal: s.modal })})`);
-    const want = [['Try a demo', '/demos/'], ['See the Field Kit', '/field-kit/'], ['Dismiss', null]];
+    // The demos live on systembydave.com (Dave, c4b517e); the Field Kit is same-site.
+    const want = [['Try a demo', 'https://systembydave.com/demos/?utm_source=avbydave&utm_medium=home-explainer&utm_campaign=console'], ['See the Field Kit', '/field-kit/'], ['Dismiss', null]];
     if (JSON.stringify(s.ctl.map((c) => [c.text, c.href])) !== JSON.stringify(want)) fail(`${tag} controls ${JSON.stringify(s.ctl)}`);
     for (const c of s.ctl) if (!c.visible || c.h < 44 || c.right > s.vw) fail(`${tag} ${c.text} not a visible 44px target in view (${JSON.stringify(c)})`);
     if (s.sw > s.vw) fail(`${tag} page overflows ${s.sw}/${s.vw}`);
@@ -86,7 +87,7 @@ try {
   {
     const { context, page } = await open({ width: 390, height: 844 });
     await page.getByRole('link', { name: 'Try a demo' }).click();
-    await page.waitForURL('**/demos/');
+    await page.waitForURL(/systembydave\.com\/demos\//);
     await page.goto(`${BASE}/av/`, { waitUntil: 'load' }); await page.locator('#workspace').waitFor(); await page.waitForTimeout(300);
     if (await page.locator(INTRO).count()) fail('explainer shown again after following Try a demo');
     await context.close();
