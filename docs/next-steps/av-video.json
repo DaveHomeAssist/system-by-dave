@@ -918,13 +918,13 @@
     "route": "https://avbydave.com/boxlens/",
     "viewer": "https://ion-workbench.davein4k.chatgpt.site/camera/",
     "viewerSource": "9a7620ac8f6da3a67a318025f5343164746ae9b0",
-    "state": "Implemented and browser-verified candidate; production release pending.",
+    "state": "Merged in PR #363; current publication and live-acceptance evidence is maintained in its release receipt.",
     "verification": "Dominic Chromium: five embedded viewports, 23 controls, selection, back-focus/F.f lock, balance reset, head views, both themes and no root overflow. Very short phone viewport shows direct-viewer recovery. Host navigation/copy/indexing/domain staging and deterministic sitemap pass.",
     "remaining": [
-      "PR and CI",
-      "Merge and deployment",
-      "Exact live route readback",
+      "Consult the release receipt for production deployment and exact live acceptance",
       "Physical-device/operator and actual equipment identification"
-    ]
+    ],
+    "releaseReceipt": "https://github.com/DaveHomeAssist/system-by-dave/pull/363",
+    "mergedSource": "105620f655876a099d95e1990301b254c91c770d"
   }
 }
