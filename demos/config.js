@@ -23,6 +23,8 @@ window.SBD_DEMOS = {
   emailTag: 'demos',           // Buttondown: sent as a hidden "tag" input; ignored elsewhere
 
   // Optional second action after completion. Leave empty to hide.
-  checklistUrl: '',
-  checklistLabel: 'Get the troubleshooting checklist',
+  // The demos live on systembydave.com and the Field Kit on avbydave.com, so this
+  // is an absolute, UTM-tagged link (a navigation, so the demo CSP doesn't block it).
+  checklistUrl: 'https://avbydave.com/field-kit/?utm_source=systembydave&utm_medium=demo&utm_campaign=demos&utm_content=completion',
+  checklistLabel: 'Get the Field Kit',
 };

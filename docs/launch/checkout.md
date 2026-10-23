@@ -24,7 +24,7 @@ Checkout opens only when **all three** of these are true:
    `[DAVE: …]` placeholder keeps checkout closed and the page shows "Price TBD".
 
 The demo itself (`demos/frame-sync.html`) doesn't carry a Field Kit block; link the
-kit from its optional `checklistUrl` in `demos/config.js` once checkout is live.
+kit from its `checklistUrl` in `demos/config.js` (set: the absolute avbydave.com/field-kit/ link, because the demos live on systembydave.com).
 
 ## Chosen: Stripe Payment Links (2026-10-19)
 

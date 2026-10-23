@@ -4,7 +4,7 @@ Dave does every step; nothing here has been done. Tick in order.
 
 ## The day before
 
-- [ ] PR #352 merged and deployed. https://avbydave.com/demos/frame-sync.html loads on your phone
+- [ ] PR #352 merged and deployed. https://systembydave.com/demos/frame-sync.html loads on your phone
       **inside Instagram's in-app browser** (send yourself the link in a DM, tap it):
       step 3 tears, step 4 fixes, nothing scrolls sideways, Pause works.
 - [ ] Open the `utm-links.csv` links once each; each lands on the demo.

@@ -8,7 +8,7 @@ until Dave picks it.
 
 | Route | Published at | Indexing | Purpose |
 |---|---|---|---|
-| `demos/frame-sync.html` (PR #360) | `https://avbydave.com/demos/frame-sync.html` | Indexed (avbydave.com sitemap) | The free, open interactive demo the Reel points to. Its single home; see `demos/README.md` |
+| `demos/frame-sync.html` (PR #360) | `https://systembydave.com/demos/frame-sync.html` | Indexed (systembydave.com sitemap) | The free, open interactive demo the Reel points to. Its single home; see `demos/README.md` |
 | `field-kit/` | `https://avbydave.com/field-kit/` | `noindex,nofollow`, not linked from navigation | Draft product page; $19, checkout closed |
 | `field-kit/thanks/` | `https://avbydave.com/field-kit/thanks/` | `noindex,nofollow,noarchive` | Buyers-only download page Stripe's after-payment redirect lands on |
 
@@ -16,7 +16,7 @@ until Dave picks it.
 so it publishes on avbydave.com, and the systembydave.com path becomes a redirect
 stub that keeps the query string (UTM tags survive). It is a top-level route, not
 under `av/`, because `av/` is the AV Suite build output (`npm run build:av-suite`
-empties it). **Reel URL:** `https://avbydave.com/demos/frame-sync.html`. Dave
+empties it). **Reel URL:** `https://systembydave.com/demos/frame-sync.html`. Dave
 approves the final URL before anything is posted.
 
 The page is not in the AV offline cache, so no cache generation bump is needed.
@@ -30,7 +30,7 @@ home; no redirect is needed.
 | Where | Key | Today |
 |---|---|---|
 | `demos/config.js` | `emailSubscribeUrl` | `[DAVE: beehiiv subscribe URL]` placeholder: no signup link yet. Set → UTM-tagged button to beehiiv's hosted page (`email.md`) |
-| `demos/config.js` | `umamiWebsiteId`, `emailFormAction`, `checklistUrl` | Empty: no analytics, no email form, no second action (see `demos/README.md`) |
+| `demos/config.js` | `umamiWebsiteId`, `emailFormAction`, `checklistUrl` | No analytics, no email form; `checklistUrl` is the absolute, UTM-tagged Field Kit link on avbydave.com (see `demos/README.md`) |
 | `js/sbd-launch-config.js` | `analytics.provider` | `null`: **OFF by decision (2026-10-18)**, no-op dispatcher (`analytics.md`) |
 | `js/sbd-launch-config.js` | `fieldKit.checkout` | `provider: 'stripe'`, `url: '[DAVE: Stripe Payment Link]'`: checkout disabled. After payment, Stripe redirects to the noindex `field-kit/thanks/` download page. One block per provider (Gumroad, Lemon Squeezy, Stripe Payment Links): see `checkout.md`. Stays closed while `[DAVE]` placeholders remain |
 | `js/sbd-launch-config.js` | `fieldKit.priceLabel` | `$19` (Dave, 2026-10-23); checkout stays closed until the Payment Link is real |
