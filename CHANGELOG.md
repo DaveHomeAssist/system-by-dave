@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-23 — Boxlens social preview
+
+- Give the Boxlens page a dedicated camera-model social card and metadata for its interactive guide and PDF download.
+
 ## 2026-10-23 — Camera field guide download
 
 - Add the approved labeled camera field guide as a PDF download on the standalone Boxlens page.

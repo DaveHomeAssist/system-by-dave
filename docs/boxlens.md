@@ -72,3 +72,18 @@ remain bounded; the PDF link stays reachable; an actual browser download must
 match the approved PDF byte for byte. Release and live download proof are
 recorded in the follow-up pull request receipt. Direct current-session scope
 uses the workspace project-intake exception.
+
+## Page-specific social preview — October 23, 2026
+
+Directly requested by Dave under the project-intake exception. Replace only
+this page's generic social card with `BoxlensOG.png`, an original 1200×630
+HTML/3D composition rendered from the public camera model on Dominic. The
+card names the camera guide, interactive rig and labeled PDF, and visibly
+marks the rig as an illustrative reference with actual gear unconfirmed.
+Open Graph and Twitter image/title/description/alt metadata name this page;
+explicit image MIME and dimensions support preview clients. The visible
+viewer, PDF bytes and other pages' previews remain unchanged.
+
+Acceptance: inspect the rendered card, confirm metadata consistency and
+staged image inclusion, then verify the actual published metadata and image
+bytes. Third-party preview cache refresh remains outside the site release.
