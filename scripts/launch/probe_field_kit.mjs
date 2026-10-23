@@ -132,13 +132,14 @@ try {
     await noHorizontalScroll(page, `field kit ${label}`);
     const robots = await page.getAttribute('meta[name="robots"]', 'content');
     if (!/noindex/.test(robots || '')) fail('Field Kit draft is not noindex');
-    if (!/TBD/.test(await page.textContent('#kit-price'))) fail('Field Kit price is not a TBD placeholder');
-    if (!(await page.locator('#kit-buy').isHidden())) fail('shipped config opened checkout (Payment Link and price are placeholders)');
+    const shownPrice = await page.textContent('#kit-price');
+    if (!/^\$19/.test(shownPrice.trim()) || /not set yet|TBD/.test(shownPrice)) fail(`Field Kit should show the $19 price (got ${JSON.stringify(shownPrice)})`);
+    if (!(await page.locator('#kit-buy').isHidden()) || await page.locator('#kit-buy-disabled').isHidden()) fail('shipped config opened checkout (Payment Link is still a placeholder)');
     if (errors.length) fail(`field kit ${label} console errors: ${errors.join(' | ')}`);
     await shotFull(page, `field-kit-${label}.png`);
     await context.close();
   }
-  notes.push('shipped config (Stripe, [DAVE] Payment Link and price placeholders): checkout closed, Price TBD shown');
+  notes.push('shipped config (Stripe, [DAVE] Payment Link placeholder, price $19): $19 shown, checkout closed');
 
   // 3. After-payment download page (Stripe redirect target).
   const DL = 'https://drive.google.com/drive/folders/abc123';

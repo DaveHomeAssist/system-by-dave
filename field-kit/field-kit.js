@@ -12,7 +12,11 @@
   var price = document.getElementById('kit-price');
   var priceSet = typeof cfg.priceLabel === 'string' && cfg.priceLabel.trim() !== '' &&
     cfg.priceLabel !== 'Price TBD' && !/^\s*\[/.test(cfg.priceLabel);
-  if (price && priceSet) price.firstChild.nodeValue = cfg.priceLabel;
+  if (price && priceSet) {
+    price.firstChild.nodeValue = cfg.priceLabel;
+    var small = price.querySelector('small');
+    if (small) small.textContent = small.textContent.replace(/\s*Price not set yet\.?/, '');
+  }
   events.track('page_view', { page: 'field-kit' });
 
   var checkout = window.SBDCheckout ? window.SBDCheckout.resolve(cfg.checkout) : null;
