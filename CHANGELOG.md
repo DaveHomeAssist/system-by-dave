@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-23 — Camera field guide download
+
+- Add the approved labeled camera field guide as a PDF download on the standalone Boxlens page.
+
 ## 2026-10-23 — Standalone box lens model
 
 - Add the public `/boxlens/` AV by Dave route for the existing public Ion Workbench camera model. Preserve the source viewer, selectable controls, reference-accuracy notes and generic Panasonic body; include deterministic home/console links and a direct-viewer fallback.

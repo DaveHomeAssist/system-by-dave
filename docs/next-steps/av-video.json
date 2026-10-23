@@ -925,6 +925,15 @@
       "Physical-device/operator and actual equipment identification"
     ],
     "releaseReceipt": "https://github.com/DaveHomeAssist/system-by-dave/pull/363",
-    "mergedSource": "105620f655876a099d95e1990301b254c91c770d"
+    "mergedSource": "105620f655876a099d95e1990301b254c91c770d",
+    "pdfDownload": {
+      "requestedOn": "2026-10-23",
+      "url": "https://avbydave.com/boxlens/MikeCameraFieldGuide.pdf",
+      "pages": 5,
+      "bytes": 2407560,
+      "sha256": "fb5985c4fdac66d6592cacdb2318851e3ddbab11f22b2490f5e2df330afe2ff2",
+      "state": "Public download requested directly by Dave; exact release and live download acceptance recorded in the follow-up pull request.",
+      "remaining": "Physical device/operator acceptance and actual equipment identification remain separate."
+    }
   }
 }

@@ -57,3 +57,18 @@ checks and merged at `105620f655876a099d95e1990301b254c91c770d`. Its release
 receipt maintains the current deployment and exact live acceptance evidence.
 The browser observations above are the pre-publication host checks; consult
 the receipt for production results. Physical/operator acceptance stays open.
+
+## PDF download — October 23, 2026
+
+Dave explicitly requested public hosting of the existing approved field guide
+so Mike needs one shared link. The header now links to the same-origin
+`MikeCameraFieldGuide.pdf` with a native download attribute and a readable
+suggested filename. The PDF is unchanged: five pages, five labeled reference
+images, and explicit unconfirmed-equipment notices. The full call transcript
+is not published. Model catalog, geometry and controls remain unchanged.
+
+Acceptance: desktop, phone, landscape, ultrawide and short-screen navigation
+remain bounded; the PDF link stays reachable; an actual browser download must
+match the approved PDF byte for byte. Release and live download proof are
+recorded in the follow-up pull request receipt. Direct current-session scope
+uses the workspace project-intake exception.
