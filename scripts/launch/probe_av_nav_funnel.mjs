@@ -54,8 +54,9 @@ try {
       const links = [...(funnel?.querySelectorAll('a') || [])].map((a) => { const r = a.getBoundingClientRect(); return { text: a.textContent.trim(), href: a.getAttribute('href'), left: r.left, right: r.right, height: r.height, visible: r.width > 0 }; });
       return { label: funnel?.getAttribute('aria-label'), crumb: !!row?.querySelector('nav[aria-label="Breadcrumb"] [aria-current="page"]'), links, sw: document.documentElement.scrollWidth, vw: innerWidth, rowSW: row?.scrollWidth, rowCW: row?.clientWidth };
     });
-    const want = [['Demos', '/demos/'], ['Field Kit', '/field-kit/'], ['Subscribe', '/demos/#subscribe']];
-    if (JSON.stringify(state.links.map((l) => [l.text, l.href])) !== JSON.stringify(want)) fail(`${tag} console funnel links: ${JSON.stringify(state.links)}`);
+    // Demos live on systembydave.com (Dave, c4b517e): absolute, UTM-tagged; the Field Kit is same-site.
+    const want = [['Demos', /^https:\/\/systembydave\.com\/demos\/\?utm_source=avbydave&utm_medium=nav&utm_campaign=console&utm_content=demos$/], ['Field Kit', /^\/field-kit\/$/], ['Subscribe', /^https:\/\/systembydave\.com\/demos\/\?utm_source=avbydave&utm_medium=nav&utm_campaign=console&utm_content=subscribe#subscribe$/]];
+    if (state.links.length !== want.length || want.some(([t, re], i) => state.links[i].text !== t || !re.test(state.links[i].href))) fail(`${tag} console funnel links: ${JSON.stringify(state.links)}`);
     if (!state.label) fail(`${tag} funnel nav has no aria-label`);
     if (!state.crumb) fail(`${tag} breadcrumb lost its aria-current item`);
     if (state.sw > state.vw || state.rowSW > state.rowCW) fail(`${tag} header overflows (${state.sw}/${state.vw}, row ${state.rowSW}/${state.rowCW})`);
@@ -74,17 +75,17 @@ try {
     const tag = `${viewport.width}`;
     let { context, page, errors } = await open('demos/', viewport);
     const hub = await page.evaluate(() => ({
-      kit: document.querySelector('#demos a.card[href="/field-kit/"] h2')?.textContent,
+      kit: document.querySelector('#demos a.card[href^="https://avbydave.com/field-kit/?utm_source=systembydave"] h2')?.textContent,
       subscribe: !!document.querySelector('section#subscribe'),
       linkHidden: !document.getElementById('subscribe-link')?.checkVisibility(),
       soonHidden: !document.getElementById('subscribe-soon')?.checkVisibility(),
       checklistUrl: window.SBD_DEMOS?.checklistUrl,
       sw: document.documentElement.scrollWidth, vw: innerWidth,
     }));
-    if (!hub.kit) fail(`${tag} hub has no Field Kit card linking to /field-kit/`);
+    if (!hub.kit) fail(`${tag} hub has no Field Kit card linking to https://avbydave.com/field-kit/`);
     if (!hub.subscribe) fail(`${tag} hub has no #subscribe section`);
     if (hub.linkHidden !== true || hub.soonHidden !== false) fail(`${tag} placeholder config should show the "soon" note, not a link`);
-    if (hub.checklistUrl !== '/field-kit/') fail(`checklistUrl is ${hub.checklistUrl}`);
+    if (!/^https:\/\/avbydave\.com\/field-kit\/\?utm_source=systembydave&/.test(hub.checklistUrl || '')) fail(`checklistUrl is ${hub.checklistUrl}`);
     if (hub.sw > hub.vw) fail(`${tag} hub overflows ${hub.sw}/${hub.vw}`);
     if (errors.length) fail(`${tag} hub errors: ${errors.join(' | ')}`);
     await context.close();
@@ -100,7 +101,7 @@ try {
     await context.close();
 
     ({ context, page, errors } = await open('field-kit/', viewport));
-    if (!(await page.locator('footer a[href="/demos/"]').count())) fail(`${tag} Field Kit footer has no Demos link`);
+    if (!(await page.locator('footer a[href^="https://systembydave.com/demos/?utm_source=avbydave"]').count())) fail(`${tag} Field Kit footer has no Demos link`);
     await context.close();
   }
 } finally {
