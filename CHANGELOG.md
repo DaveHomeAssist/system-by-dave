@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-23 — Standalone box lens model
+
+- Add the public `/boxlens/` AV by Dave route for the existing public Ion Workbench camera model. Preserve the source viewer, selectable controls, reference-accuracy notes and generic Panasonic body; include deterministic home/console links and a direct-viewer fallback.
+- Add the route to canonical domain staging without changing Site access or registering another AV workspace panel.
+
 ## 2026-10-20 — Deployment correction validation
 
 - Keep the demo hub and both interactive demos on systembydave.com. Remove the unrelated avbydave.com route migration from the sitemap correction; existing domain configuration, canonical URLs and sitemap membership remain unchanged.
