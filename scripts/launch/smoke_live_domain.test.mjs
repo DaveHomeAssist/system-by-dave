@@ -27,7 +27,7 @@ const base = (o = {}) => ({ ...parseArgs([]), retries: 1, delay: 0, ...o });
 test('staged folder with all three pages passes', async () => {
   const r = await run(base({ dir: site() }), quiet);
   assert.equal(r.ok, true, JSON.stringify(r.pages));
-  assert.deepEqual(r.pages.map((p) => [p.path, p.status]), [['/', 200], ['/demos/frame-sync.html', 200], ['/field-kit/', 200]]);
+  assert.deepEqual(r.pages.map((p) => [p.path, p.status, !!p.skipped]), [['/', 200, false], ['/demos/frame-sync.html', null, true], ['/field-kit/', 200, false]], 'the systembydave.com demo is skipped in --dir mode');
   assert.equal(r.source.commit, SHA);
 });
 
@@ -35,14 +35,28 @@ test('a missing page or marker fails and names the page', async () => {
   let r = await run(base({ dir: site({ kit: null }) }), quiet);
   assert.equal(r.ok, false);
   assert.deepEqual(r.pages.filter((p) => !p.ok).map((p) => [p.path, p.status]), [['/field-kit/', 404]]);
-  r = await run(base({ dir: site({ frame: '<title>Why your screen is late</title>' }) }), quiet);
-  assert.match(r.pages[1].problems.join(), /missing "demo-shell.js"/);
+  r = await run(base({ dir: site({ kit: '<h1>Field Kit</h1>' }) }), quiet);
+  assert.match(r.pages[2].problems.join(), /missing "sbd-launch-config.js"/);
 });
 
 test('a 200 that is really the not-found page fails', async () => {
-  const r = await run(base({ dir: site({ frame: '<title>Page not found | AV by Dave</title><title>Why your screen is late</title>demo-shell.js' }) }), quiet);
-  assert.equal(r.pages[1].ok, false);
-  assert.match(r.pages[1].problems.join(), /not-found page/);
+  const r = await run(base({ dir: site({ kit: '<title>Page not found | AV by Dave</title>Field Kit sbd-launch-config.js' }) }), quiet);
+  assert.equal(r.pages[2].ok, false);
+  assert.match(r.pages[2].problems.join(), /not-found page/);
+});
+
+test('a check with its own base is fetched from that origin', async () => {
+  const other = site();
+  const srv = http.createServer((req, res) => { let f = path.join(other, new URL(req.url, 'http://x').pathname); if (f.endsWith('/')) f = path.join(f, 'index.html'); if (fs.existsSync(f) && fs.statSync(f).isFile()) { res.writeHead(200); res.end(fs.readFileSync(f)); } else { res.writeHead(404); res.end(); } });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const cfgFile = path.join(other, 'cfg.json');
+  const cfg = JSON.parse(fs.readFileSync(parseArgs([]).config, 'utf8'));
+  cfg.base = `http://127.0.0.1:${srv.address().port}`;
+  cfg.checks = cfg.checks.map((c) => (c.base ? { ...c, base: cfg.base } : c));
+  fs.writeFileSync(cfgFile, JSON.stringify(cfg));
+  const r = await run(base({ config: cfgFile }), quiet); srv.close();
+  assert.equal(r.ok, true, JSON.stringify(r.pages));
+  assert.equal(r.pages[1].skipped, undefined);
 });
 
 test('--expect-commit passes on a match and fails on a stale source.json', async () => {

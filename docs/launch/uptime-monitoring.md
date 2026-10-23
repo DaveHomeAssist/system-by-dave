@@ -9,16 +9,18 @@ whoever sets it up owns that account.
 | URL | Expect | Published by |
 | --- | --- | --- |
 | `https://avbydave.com/` | 200, `<title>AV by Dave</title>` | live today |
-| `https://avbydave.com/demos/frame-sync.html` | 200, demo title, `demo-shell.js` | #361 (demos staged for avbydave.com) |
+| `https://systembydave.com/demos/frame-sync.html` | 200, demo title, `demo-shell.js` | #361 (unblocks the #360 deploy; the demos stay on systembydave.com, Dave's c4b517e) |
 | `https://avbydave.com/field-kit/` | 200, `Field Kit`, `sbd-launch-config.js` | #352 (the Field Kit page) |
 | `https://avbydave.com/source.json` | `sourceCommit` = main HEAD | every deploy (`scripts/stage_domain_sites.mjs`) |
 
-The targets live in `scripts/launch/smoke-live.json`. Until #361 and #352 publish, the last
-two pages return GitHub Pages' 404 and the check reports which change ships each one.
+The targets live in `scripts/launch/smoke-live.json`. A check can carry its own `base`
+(the demo is on systembydave.com, everything else on avbydave.com). With `--dir`
+(a staged avbydave folder) checks on another origin are skipped.
 
-On 2026-10-21 at about 3:30 AM ET the check found `/` up and both other pages returning 404.
-`source.json` was a740564e, 5 commits behind main, because the #360 deploy stopped at the
-`npm audit --audit-level=high` gate (AUD-001).
+On 2026-10-23 at about 4 AM ET the check found avbydave.com `/` up, and both the systembydave.com
+demo and `/field-kit/` returning 404. `source.json` was a740564e, 5 commits behind main,
+because the #360 deploy stopped at the `npm audit --audit-level=high` gate (AUD-001; the
+vite update in #361 clears it).
 
 ## 1. Uptime: free options (pick one, no change to this repo needed)
 

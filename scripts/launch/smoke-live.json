@@ -1,12 +1,12 @@
 {
-  "comment": "Post-publish smoke check targets (docs/launch/uptime-monitoring.md). 'since' notes the change that first publishes a page; a page listed before it ships fails, by design.",
+  "comment": "Post-publish smoke check targets (docs/launch/uptime-monitoring.md). A check's own 'base' overrides the site base (the demos live on systembydave.com). 'since' notes the change that first publishes a page; a page listed before it ships fails, by design.",
   "site": "avbydave",
   "base": "https://avbydave.com",
   "sourceRepository": "DaveHomeAssist/system-by-dave",
   "mainBranch": "main",
   "checks": [
     { "path": "/", "status": 200, "contains": ["<title>AV by Dave</title>"], "since": "live" },
-    { "path": "/demos/frame-sync.html", "status": 200, "contains": ["<title>Why your screen is late</title>", "demo-shell.js"], "since": "#361 (demos on avbydave.com)" },
+    { "path": "/demos/frame-sync.html", "base": "https://systembydave.com", "status": 200, "contains": ["<title>Why your screen is late</title>", "demo-shell.js"], "since": "#361 (unblocks the #360 deploy; demos stay on systembydave.com, Dave c4b517e)" },
     { "path": "/field-kit/", "status": 200, "contains": ["Field Kit", "sbd-launch-config.js"], "since": "#352 (Field Kit page)" }
   ],
   "notFoundMarker": "<title>Page not found |",

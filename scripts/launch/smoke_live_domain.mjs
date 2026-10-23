@@ -62,6 +62,7 @@ async function get(url, { timeoutMs = 20000, headers = {} } = {}) {
 
 // One page: right status, not the site's 404 page, every marker present. Retries transient failures.
 export async function checkPage(base, check, cfg, opts) {
+  base = check.base || base;
   const url = new URL(check.path, base.endsWith('/') ? base : `${base}/`).toString();
   let last;
   for (let attempt = 1; attempt <= Math.max(1, opts.retries); attempt++) {
@@ -148,12 +149,16 @@ export async function run(opts, log = console.log) {
     }
     result.source = source;
     const checks = cfg.checks.filter((c) => !opts.only || opts.only.includes(c.path));
-    for (const check of checks) result.pages.push(await checkPage(base, check, cfg, opts));
+    for (const check of checks) {
+      // A staged folder holds one site, so checks on another origin are skipped in --dir mode.
+      if (opts.dir && check.base) { result.pages.push({ path: check.path, url: `${check.base}${check.path}`, ok: true, skipped: true, status: null, ms: 0, attempts: 0, problems: [], since: check.since }); continue; }
+      result.pages.push(await checkPage(base, check, cfg, opts));
+    }
     if (cfg.analytics?.umamiWebsiteId) {
       // Wired only once Dave provides the ID (placeholder: null in smoke-live.json).
-      const demo = result.pages.find((p) => p.path.startsWith('/demos/'));
-      if (demo) {
-        const cfgJs = await get(new URL('/demos/config.js', base).toString());
+      const demo = cfg.checks.find((c) => c.path.startsWith('/demos/'));
+      if (demo && !(opts.dir && demo.base)) {
+        const cfgJs = await get(new URL('/demos/config.js', demo.base || base).toString());
         const okA = cfgJs.status === 200 && cfgJs.body.includes(cfg.analytics.umamiWebsiteId);
         result.analytics = { ok: okA, problem: okA ? undefined : 'demos/config.js does not carry the Umami website ID' };
       }
@@ -169,7 +174,7 @@ export async function run(opts, log = console.log) {
     log(`smoke ${result.base}  ${result.ok ? 'OK' : 'FAIL'}`);
     log(`  source.json: ${result.source?.ok ? `${short(result.source.commit)} (${result.source.files} files)` : result.source?.problem}`);
     if (result.deploy) log(`  deploy: ${result.deploy.ok ? `live is ${short(result.deploy.live)}` : result.deploy.problem}`);
-    for (const p of result.pages) log(`  ${p.ok ? 'ok  ' : 'FAIL'} ${p.path}  HTTP ${p.status} ${p.ms}ms${p.attempts > 1 ? ` (${p.attempts} tries)` : ''}${p.ok ? '' : `  ${p.problems.join('; ')}  [ships with: ${p.since}]`}`);
+    for (const p of result.pages) log(p.skipped ? `  skip ${p.url}  (other origin; not in --dir)` : `  ${p.ok ? 'ok  ' : 'FAIL'} ${new URL(p.url).origin === new URL(result.base.startsWith('dir:') ? 'http://x' : result.base).origin ? p.path : p.url.replace(/\?.*$/, '')}  HTTP ${p.status} ${p.ms}ms${p.attempts > 1 ? ` (${p.attempts} tries)` : ''}${p.ok ? '' : `  ${p.problems.join('; ')}  [ships with: ${p.since}]`}`);
     if (result.analytics) log(`  analytics: ${result.analytics.ok ? 'ok' : result.analytics.problem}`);
     if (result.main) log(`  main: ${result.main.state}${result.main.aheadBy ? `, ${result.main.aheadBy} commit(s) unpublished${result.main.minutesBehind != null ? `, oldest ${result.main.minutesBehind} min` : ''}` : ''}${result.main.ok ? '' : `  FAIL ${result.main.problem}`}`);
   }
