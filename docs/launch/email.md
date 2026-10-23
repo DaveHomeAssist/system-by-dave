@@ -1,7 +1,7 @@
 # Email capture: "the next demo"
 
 Status: **off**. The frame-sync demo's home is `demos/frame-sync.html`
-(`https://avbydave.com/demos/frame-sync.html`, PR #360), and its email ask is the
+(`https://systembydave.com/demos/frame-sync.html`, PR #360), and its email ask is the
 post-completion panel in `demos/demo-shell.js`. Until `emailSubscribeUrl` (beehiiv)
 or `emailFormAction` in `demos/config.js` is set, the panel only says the next demo
 is coming, and the site collects nothing.
