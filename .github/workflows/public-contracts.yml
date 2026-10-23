@@ -17,8 +17,10 @@ jobs:
           node-version: 24
       - run: npm run verify:private-exposure
       - run: npm run verify:indexing
+      - run: python3 scripts/gen_sitemap.py --check
       - run: npm run verify:public-navigation
       - run: npm run verify:public-consistency
       - run: npm ci --no-audit --no-fund
+      - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
       - run: npm run test:public-viewport

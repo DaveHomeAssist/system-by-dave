@@ -756,7 +756,7 @@ function stageSite(site, closed, policy, options) {
   })};\n`);
   let hasSitemap = false;
   if (options.cutover) {
-    execFileSync('python3', [path.join(ROOT, 'scripts/gen_sitemap.py'), '--site', site.id, '--out', path.join(dir, 'sitemap.xml')], { cwd: ROOT, stdio: ['ignore', 'ignore', 'inherit'] });
+    execFileSync('python3', [path.join(ROOT, 'scripts/gen_sitemap.py'), '--site', site.id, '--lastmod', '--out', path.join(dir, 'sitemap.xml')], { cwd: ROOT, stdio: ['ignore', 'ignore', 'inherit'] });
     hasSitemap = fs.existsSync(path.join(dir, 'sitemap.xml'));
   }
   const baseRules = robotsRules(robots(site, origin, options.cutover, hasSitemap));
