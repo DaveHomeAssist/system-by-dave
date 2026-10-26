@@ -1,0 +1,47 @@
+[
+  {
+    "expected": 312,
+    "disposed": 312,
+    "memory": {
+      "geometries": 417,
+      "textures": 38
+    },
+    "ids": 23
+  },
+  {
+    "expected": 312,
+    "disposed": 312,
+    "memory": {
+      "geometries": 417,
+      "textures": 38
+    },
+    "ids": 23
+  },
+  {
+    "expected": 312,
+    "disposed": 312,
+    "memory": {
+      "geometries": 417,
+      "textures": 38
+    },
+    "ids": 23
+  },
+  {
+    "expected": 312,
+    "disposed": 312,
+    "memory": {
+      "geometries": 417,
+      "textures": 38
+    },
+    "ids": 23
+  },
+  {
+    "expected": 312,
+    "disposed": 312,
+    "memory": {
+      "geometries": 417,
+      "textures": 38
+    },
+    "ids": 23
+  }
+]

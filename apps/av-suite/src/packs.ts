@@ -1,3 +1,4 @@
+import { equipmentLabPack } from '../../equipment-lab/src/pack';
 import type { PackDef } from "../../shared/av-console/pack";
 import { videoPack } from "../../av-video/src/pack";
 import { audioPack } from "../../av-audio/src/pack";
@@ -9,8 +10,8 @@ import { infrastructurePack } from "../../infrastructure/src/pack";
 import { lightingPack } from "../../av-lighting/src/pack";
 import { calculatorPack } from "../../av-calculator/src/pack";
 
-/* All nine Rail identities expose individual, in-process panels. */
-export const PACKS: PackDef[] = [videoPack, audioPack, showControlPack, showOpsPack, frontOfficePack, shopPack, infrastructurePack, lightingPack, calculatorPack];
+/* All native Rail identities expose individual, in-process panels. */
+export const PACKS: PackDef[] = [videoPack, audioPack, showControlPack, showOpsPack, frontOfficePack, shopPack, infrastructurePack, lightingPack, calculatorPack, equipmentLabPack];
 
 /* Standalone tools are links, never panel choices. Keep this catalog for
    recovery links in old layouts; their documents and storage stay untouched. */

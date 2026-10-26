@@ -6,6 +6,13 @@
 - Migrate the only zod 4 break in use: single-argument `z.record(value)` becomes `z.record(z.string(), value)` in AV Video, AV Audio, AV Calculator and the shared console drafts. Saved plan formats, storage keys and import/export shapes are unchanged.
 - Update Vitest from 4.1.11 to 4.1.12 to clear the moderate `@vitest/mocker` advisories (GHSA-qxg6-89mg-rqv8, GHSA-xp26-3454-mjgp). Rebuilt console bundles are committed.
 
+## 2026-10-26
+
+- Add Equipment Lab as a standalone AV module and four native workspace panels.
+- Import the hash-pinned 43-entry shared catalog and unchanged Cartoni reference GLB.
+- Preserve existing model links and control IDs, with generic Panasonic context.
+
+
 ## 2026-10-23 — Boxlens social preview
 
 - Give the Boxlens page a dedicated camera-model social card and metadata for its interactive guide and PDF download.

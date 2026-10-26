@@ -1,0 +1,17 @@
+{
+  "scope": "rig",
+  "tab": "balance",
+  "selected": "head.counterbalance",
+  "pan": 0,
+  "tilt": 25,
+  "plate": 0,
+  "counterbalance": 50,
+  "tiltDrag": 0,
+  "panDrag": 20,
+  "panLock": true,
+  "tiltLock": false,
+  "horizontalLock": false,
+  "ff": 0,
+  "ffLock": true,
+  "extender": false
+}

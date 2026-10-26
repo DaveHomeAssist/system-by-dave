@@ -32,8 +32,8 @@ const SKIP_FILES = new Set(['.DS_Store', '.agent-claim']);
 // Development-only files that sit beside published tools (browser probes, unit
 // tests, release notes, package code they import) are never part of a site.
 const DEV_FILE = /(?:^|\/)(?:node_modules\/|[^/]*\.test\.[cm]?[jt]s$|(?:[^/]*[-_.])?probe\.[cm]?[jt]s$|(?:CHANGELOG|README)\.md$)/i;
-// Vendored third-party code keeps its notices.
-const isDevFile = (rel) => DEV_FILE.test(rel) && !/(?:^|\/)vendor\//.test(rel);
+// Vendored code and the integrity-checked Equipment Lab package keep their notices.
+const isDevFile = (rel) => DEV_FILE.test(rel) && !/(?:^|\/)vendor\//.test(rel) && !rel.startsWith('equipment-lab/data/');
 const TRANSFER_ASSETS = ['js/domain-storage.js', 'js/domain-transfer.js', 'css/domain-move.css'];
 const RETIRED_WORKER = 'av-suite-worker.js';
 

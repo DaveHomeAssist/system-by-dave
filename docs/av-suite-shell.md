@@ -83,7 +83,7 @@ shared state, view save/reload, legacy layouts, export and palette/viewport
 containment before release. No new dependencies, hardware control or redesign.
 
 - `https://avbydave.com/av/` opens one console. The Rail on the left lists the
-  nine application identities plus standalone tool links. Selecting a department
+  ten application identities plus standalone tool links. Selecting a department
   recalls its views in the same workspace and never renders a second console.
 - The panel chooser offers every application's panels in one library, grouped
   by application, so a stored view can mix Video routes, Lighting fixtures and
@@ -232,3 +232,11 @@ claimed. This candidate is stacked on PR351 and cannot merge ahead of its parent
 or bypass its authenticated/device release gates.
 
 The existing workspace focuses an already-open panel type. Two explicit SmartFade instance choices therefore provide simultaneous independent desks without changing shared layout behavior. Both use the same canonical equipment ID; neither assigns an ECOG patch or simulated output.
+
+## Equipment Lab, 26 October 2026
+
+Option A adds the tenth native pack: Equipment library, Model inspector,
+Equipment practice and Equipment reference. The same implementation serves
+`/equipment-lab/`. The shared catalog contains 43 confirmed entries. The Cartoni
+GLB is the first native representation; other entries retain their existing
+viewers during migration. See [the module brief](equipment-lab.md).
