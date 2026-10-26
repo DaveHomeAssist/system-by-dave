@@ -1158,7 +1158,7 @@
       "sharedRepository": "https://github.com/DaveHomeAssist/equipment-lab",
       "sharedRevision": "00e8dbeeb190ad9b0cd8c8b72b81e80e0dae428d",
       "hostBase": "aec4f98158f841be4cf9591cda4c4aa1867cc589",
-      "status": "Implemented and verified on Dominic; host pull request and live release pending",
+      "status": "Pushed; scoped checks pass; CI and publication remain separate gates",
       "entries": 43,
       "nativeRepresentations": [
         "C02"
@@ -1187,8 +1187,12 @@
         "fallbackCases": 4,
         "packageFiles": 44,
         "sourceFiles": 355,
-        "result": "Passed scoped builds, typechecks, package integrity, native AV menu, indexing, public navigation, themes and domain staging"
-      }
+        "result": "Passed scoped builds, typechecks, package integrity, native AV menu, indexing, public navigation, themes and domain staging",
+        "lifecycle": "Idle drawing stops; synthetic pagehide/pageshow restores the viewer; real WebGL context loss retains ten controls",
+        "offline": "Cartoni reload succeeds after preparing the shared offline cache, with all 22 textures"
+      },
+      "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/369",
+      "verifiedImplementation": "64ba7bf0fb85972e1e0e4f616192adfe14f88707"
     }
   },
   "historicalFindings": [

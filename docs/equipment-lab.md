@@ -99,3 +99,11 @@ Equipment Lab probe checks 43 entries, model picking, 61 layout cases, WebGL
 fallback and three invalid-package cases. The AV shell probe checks all 66
 menu choices and existing mixed-panel saves and reloads. Source package hashes
 remain unchanged. Publication and live acceptance are separate release gates.
+
+The supplemental consumer check confirms no idle drawing, cleanup and reload
+under synthetic page lifecycle events, real WebGL context-loss fallback with
+ten retained controls, and a prepared offline reload with all 22 textures.
+This does not qualify physical devices or an unprepared first offline visit.
+[Pull request 369](https://github.com/DaveHomeAssist/system-by-dave/pull/369)
+records host delivery; the shared repository migration record owns subsequent
+release evidence and the remaining family work.
