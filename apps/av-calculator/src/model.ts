@@ -27,7 +27,7 @@ export function parseViews(value: unknown): View[] {
   for (const v of views) if (v.id.length > 100 || !v.name.trim() || v.name.length > 80 || v.panels.length > types.size || sanitizeView(v).panels.length !== v.panels.length || new Set(v.panels.map(p => p.type)).size !== v.panels.length || v.panels.some(p => !types.has(p.type))) throw Error('Invalid panel arrangement.');
   return views;
 }
-const liveShape = z.object({ v: z.literal(1), viewId: z.string(), locked: z.boolean(), live: z.record(z.unknown()) }).strict();
+const liveShape = z.object({ v: z.literal(1), viewId: z.string(), locked: z.boolean(), live: z.record(z.string(), z.unknown()) }).strict();
 export function parseLayout(value: unknown): LayoutState {
   const data = liveShape.parse(value);
   if (Object.keys(data.live).length > 40) throw Error('Too many arrangements.');

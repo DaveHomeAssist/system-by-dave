@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-26 — Dependency audit: zod 4 and Vitest 4.1.12
+
+- Upgrade the AV console schema library from zod 3.25.76 to 4.6.7 to clear the high-severity audit failure (GHSA-mrhx-c7xc-m3w5, memory exhaustion validating oversized constrained collections; no 3.x fix exists). The `npm audit --audit-level=high` step in Public site contracts and the Pages deploy was failing on every run.
+- Migrate the only zod 4 break in use: single-argument `z.record(value)` becomes `z.record(z.string(), value)` in AV Video, AV Audio, AV Calculator and the shared console drafts. Saved plan formats, storage keys and import/export shapes are unchanged.
+- Update Vitest from 4.1.11 to 4.1.12 to clear the moderate `@vitest/mocker` advisories (GHSA-qxg6-89mg-rqv8, GHSA-xp26-3454-mjgp). Rebuilt console bundles are committed.
+
 ## 2026-10-23 — Boxlens social preview
 
 - Give the Boxlens page a dedicated camera-model social card and metadata for its interactive guide and PDF download.
