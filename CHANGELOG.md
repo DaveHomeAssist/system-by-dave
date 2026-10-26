@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-26 — Domain cutover browser install
+
+- Install only Playwright's headless Chromium shell in the Domain cutover acceptance job, without `--with-deps`. The runner image already provides every Chromium library; the flag only added fonts from the Ubuntu mirror, which stalled at a few kB/s and cancelled the job at its 10-minute timeout, blocking the Pages deploy for all three sites.
+
 ## 2026-10-26 — Dependency audit: zod 4 and Vitest 4.1.12
 
 - Upgrade the AV console schema library from zod 3.25.76 to 4.6.7 to clear the high-severity audit failure (GHSA-mrhx-c7xc-m3w5, memory exhaustion validating oversized constrained collections; no 3.x fix exists). The `npm audit --audit-level=high` step in Public site contracts and the Pages deploy was failing on every run.
