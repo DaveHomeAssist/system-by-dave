@@ -24,6 +24,11 @@
 - The Pages deploy stamps the published `_site/sitemap.xml`, and domain-site staging stamps each site's sitemap, with `--lastmod`: each page's last commit date from full git history. Without full history it omits the dates rather than guess.
 - `python3 scripts/gen_sitemap.py --check` fails with a diff when the committed sitemap is stale, and now runs on every pull request in Public site contracts, so route drift is caught before merge instead of on `main`.
 
+## 2026-10-20 — AV social preview branding
+
+- AV console and department templates, plus the LED calculator, use the existing AV by Dave preview artwork instead of the System by Dave banner. Correct AV publisher names on specialist pages and concept demos; preserve distinct System by Dave metadata and demo-specific artwork.
+- Publication remains coordinated with the separate sitemap fix in PR #361.
+
 ## 2026-10-20 — AV by Dave interactive demos
 
 - Add `demos/`: the frame-sync (008) and fault-finding (010) concept demos as public, ungated pages with a hub at `/demos/`, the public shell (skip link, breadcrumb, shared nav), canonical URLs and sitemap entries. GSAP comes from the vendored build.
