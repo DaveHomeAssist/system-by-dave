@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - 'apps/av-suite/**'
+      - 'apps/equipment-lab/**'
+      - 'equipment-lab/**'
+      - 'scripts/*equipment_lab*'
       - 'av/**'
       - 'scripts/probe_av_suite_shell.mjs'
       - 'apps/av-video/**'
@@ -66,6 +69,16 @@ jobs:
         run: |
           git diff --exit-code -- av-video
           test -z "$(git status --porcelain -- av-video)"
+      - name: Equipment Lab package and native consumer
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run verify:equipment-lab
+          npm run typecheck:equipment-lab
+          npm run build:equipment-lab
+          git diff --exit-code -- equipment-lab
+          test -z "$(git status --porcelain -- equipment-lab)"
+          npm run test:equipment-lab-browser
       - name: AV Suite shell typecheck, build parity and browser
         env:
           CHROME_CHANNEL: chrome

@@ -283,7 +283,7 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.equal(allTrigger.getAttribute('aria-expanded'), 'true');
   assert.equal(document.activeElement.getAttribute('aria-label'), 'Close All apps');
   const consoleCards = descendants(controller.allAppsDialog).filter((element) => (element.getAttribute('data-rail-ref') || '').startsWith('console:'));
-  assert.equal(consoleCards.length, 9);
+  assert.equal(consoleCards.length, 10);
   const plannedCards = consoleCards.filter((element) => element.getAttribute('data-entry-type') === 'Planned console');
   assert.equal(plannedCards.length, 0);
   consoleCards.forEach((card) => {
@@ -338,7 +338,7 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.equal(document.activeElement.getAttribute('data-action'), 'unpin');
   click(action(controller.customizeDialog, 'console:audio', 'move-up'));
   assert.equal(preferenceStorage.setCalls.length, 3);
-  assert.equal(controller.customizeDialog.children[1].textContent, 'Audio moved to position 8 of 9.');
+  assert.equal(controller.customizeDialog.children[1].textContent, 'Audio moved to position 9 of 10.');
   assert.equal(document.activeElement.getAttribute('data-action'), 'move-up');
   click(action(controller.customizeDialog, 'defaults', 'reset'));
   assert.deepEqual(JSON.parse(preferenceStorage.data['sbd.rail.v1']).pinned, Array.from(registry.rail.defaultPinned));
