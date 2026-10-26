@@ -2,10 +2,17 @@
   "id": "house-reference",
   "name": "AV by Dave (video engineering concept demos → Instagram page)",
   "status": "amber",
-  "head": "DaveHomeAssist/system-by-dave branch demos-hosting (PR #360); demos/ in that repo is now the source of truth",
-  "lastActivity": "2026-10-20",
-  "statusReason": "Demos hosted: PR #360 adds /demos/ (hub, frame-sync, fault-finding) to systembydave.com with the public shell, canonical/social metadata, CSP, self-hosted fonts, sitemap entries, vendored GSAP, optional Umami events and a post-completion email ask (both inert until config.js is filled). All site gates pass locally; both pages verified interactive and in capture mode. Awaiting CI and merge; Dave must supply the Umami website ID and the email form action.",
-  "nextStep": "Merge PR #360 when green; Dave fills demos/config.js (Umami website ID; email provider form action; optional checklist URL); then set the bio link to https://systembydave.com/demos/?utm_source=instagram&utm_medium=profile&utm_campaign=launch&utm_content=profile and post.",
+  "head": "DaveHomeAssist/system-by-dave main aec4f98; demos/ in that repo is the source of truth (served at systembydave.com/demos/)",
+  "lastActivity": "2026-10-26",
+  "statusReason": "Demos are live: PR #360 merged 2026-10-20 and first deployed 2026-10-23; systembydave.com/demos/, frame-sync.html and fault-finding.html return 200. The Umami website ID and email form action in demos/config.js are still blank, so analytics and the post-demo email ask are inert until Dave answers HR-D7 and HR-D8. Site deploys were blocked 2026-10-26 by an npm audit failure (zod) until PR #368 merged (aec4f98); deploy 40311565958 then published systembydave.com and avbydave.com.",
+  "nextStep": {
+    "title": "Answer HR-D7 and HR-D8 so the demo email ask and analytics go live",
+    "why": "Both are inert: demos/config.js has an empty umamiWebsiteId and emailFormAction. The Instagram bio link should not go out until completions are measured and the email ask works.",
+    "doneWhen": "demos/config.js carries the Umami website ID and the chosen provider's form action, the change is deployed, and a live demo completion records an Umami event and shows the email ask.",
+    "effort": "S",
+    "owner": "Dave (choices), agent (config, deploy and live readback)",
+    "blockedBy": "HR-D7 and HR-D8 are open."
+  },
   "findings": [
     {
       "id": "HR-01",
@@ -126,6 +133,18 @@
       "date": "2026-10-20",
       "finding": "Regression found: frame-sync had lost its NEXT click handler and arrow-key listener in the 10-17 cut rework, and the every-state sweep passed anyway because it never asserted a step changed. Restored; checker now presses NEXT and fails on a stuck step (findings.stuck).",
       "state": "fixed, verified"
+    },
+    {
+      "id": "HR-21",
+      "date": "2026-10-26",
+      "finding": "Live check: systembydave.com/demos/, frame-sync.html and fault-finding.html return 200; demos/config.js umamiWebsiteId and emailFormAction are blank. avbydave.com/demos/ returns 404 by design: PR #361 (2026-10-20) preserved the domain routing Dave requested, reverting the avbydave.com move in 449b2b5, so demos/ is not in the avbydave pages list.",
+      "state": "verified"
+    },
+    {
+      "id": "HR-22",
+      "date": "2026-10-26",
+      "finding": "Every System by Dave Pages deploy after 2026-10-23 failed at npm audit (zod <4.6.6 high, @vitest/mocker <=4.1.11 moderate), so no site change reached either domain. PR #368 (zod 4.6.7, Vitest 4.1.12) cleared it: audit 0 vulnerabilities and domain cutover 57/57 on Dominic at 4414b5d; merged as aec4f98; deploy 40311565958 succeeded and avbydave publish 40315942438 followed.",
+      "state": "fixed, deployed"
     }
   ],
   "phases": [
@@ -159,7 +178,12 @@
     },
     {
       "name": "Move project into a git repository under ~/Code and register on the board",
-      "state": "proposed"
+      "state": "partly done: demos/ moved into system-by-dave (#360) and this record registered on the board as house-reference on 2026-10-26; the design/, outputs/ and work/ workspace location was not verified"
+    },
+    {
+      "name": "Demos hosted on systembydave.com",
+      "state": "live since 2026-10-23; analytics and email ask inert",
+      "evidence": "https://systembydave.com/demos/"
     }
   ],
   "files": [
@@ -174,7 +198,13 @@
     "work/verifyIllustrations.cjs",
     "design/demos/capture.mjs",
     "design/demos/README.md",
-    "design/demos/out/"
+    "design/demos/out/",
+    "demos/index.html",
+    "demos/frame-sync.html",
+    "demos/fault-finding.html",
+    "demos/config.js",
+    "demos/demo-shell.js",
+    "scripts/domain-sites.json"
   ],
   "decisionsForDave": [
     {
@@ -253,18 +283,83 @@
       "unlocks": "nothing before pilot"
     }
   ],
-  "context": "Decided by Dave on 2026-10-17: reel + static card from one source (1a); illustrated metaphor vector house style with diagram as reveal (2a); dry show-site humor, one joke per edition (3a); name delegated. Name decided 2026-10-17: AV by Dave.",
-  "verify": "Open design/Design Direction v1.html; confirm wordmark, type scale, safe-zone diagram and edition 8 mock render without overflow at desktop and phone widths.",
-  "links": {
-    "direction": "design/Design Direction v1.html",
-    "archive": "outputs/Video Engineering Daily Archive.html",
-    "explorations": "design/Style Explorations.html"
-  },
-  "kickoffPrompt": "Build the next House Reference concept demo on the troubleshooting track in the same form as design/demos/frame-sync.html: a 7-step guided GSAP simulation at 1080×1920, one plain sentence per step (mom test), the animation proves each sentence, a live readout, free-play controls, and a manufacturer-documented fact as the final step.",
+  "context": [
+    "Decided by Dave on 2026-10-17: reel + static card from one source (1a); illustrated metaphor vector house style with diagram as reveal (2a); dry show-site humor, one joke per edition (3a); name delegated. Name decided 2026-10-17: AV by Dave.",
+    "demos/ in system-by-dave is the source of truth since PR #360 (merged 2026-10-20)."
+  ],
+  "verify": [
+    "Open design/Design Direction v1.html; confirm wordmark, type scale, safe-zone diagram and edition 8 mock render without overflow at desktop and phone widths.",
+    "curl -sI https://systembydave.com/demos/ (expect 200) and confirm frame-sync.html and fault-finding.html",
+    "curl -s https://systembydave.com/demos/config.js and confirm umamiWebsiteId and emailFormAction once HR-D7/HR-D8 are answered",
+    "npm run verify:domain-sites"
+  ],
+  "links": [
+    {
+      "label": "direction (original design workspace path)",
+      "url": "design/Design Direction v1.html"
+    },
+    {
+      "label": "archive (original design workspace path)",
+      "url": "outputs/Video Engineering Daily Archive.html"
+    },
+    {
+      "label": "explorations (original design workspace path)",
+      "url": "design/Style Explorations.html"
+    },
+    {
+      "label": "Live demos hub",
+      "url": "https://systembydave.com/demos/"
+    },
+    {
+      "label": "Demos hosting PR #360",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/360"
+    },
+    {
+      "label": "Audit fix PR #368",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/pull/368"
+    },
+    {
+      "label": "Deploy after #368",
+      "url": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/40311565958"
+    }
+  ],
+  "kickoffPrompt": "Continue AV by Dave (house-reference) from system-by-dave main. Do not rebuild the demos. If Dave has answered HR-D7 or HR-D8, record the answers here, apply them in demos/config.js, open a PR, merge when green, then read back the live demo pages and a test completion event. Otherwise build the next concept demo in the same form as demos/frame-sync.html: a 7-step guided GSAP simulation at 1080x1920, one plain sentence per step, the animation proves each sentence, a live readout, free-play controls and a manufacturer-documented fact as the final step.",
   "confidence": "medium: direction is specified and measured; production craft per edition is unproven",
   "unknowns": [
     "Meta's current Reels overlay percentages",
     "Playwright screenshot appears one frame behind the DOM (cover taken 8 frames after tear onset as a workaround)",
-    "Buttondown current free-tier limit (docs seen were dated 2023)"
-  ]
+    "Buttondown current free-tier limit (docs seen were dated 2023)",
+    "Whether the Instagram bio link has been set or a launch post made (not checked).",
+    "Where the design/, outputs/ and work/ source workspace now lives."
+  ],
+  "historicalNextSteps": [
+    {
+      "recordedOn": "2026-10-20",
+      "nextStep": "Merge PR #360 when green; Dave fills demos/config.js (Umami website ID; email provider form action; optional checklist URL); then set the bio link to https://systembydave.com/demos/?utm_source=instagram&utm_medium=profile&utm_campaign=launch&utm_content=profile and post.",
+      "supersededOn": "2026-10-26",
+      "reason": "PR #360 merged 2026-10-20; demos deployed 2026-10-23."
+    }
+  ],
+  "evidence": {
+    "checkedOn": "2026-10-26",
+    "sourceRevision": "aec4f98158f841be4cf9591cda4c4aa1867cc589",
+    "scope": "AV by Dave systems check: live avbydave.com and demos routes, Pages deploy chain and the npm audit blocker. No design-workspace, Instagram or physical-device acceptance claim.",
+    "sources": [
+      "demos/config.js",
+      "scripts/domain-sites.json",
+      ".github/workflows/deploy-pages.yml",
+      ".github/workflows/domain-cutover.yml"
+    ],
+    "release": "https://github.com/DaveHomeAssist/system-by-dave/pull/360",
+    "auditFix": "https://github.com/DaveHomeAssist/system-by-dave/pull/368",
+    "auditFixMerge": "aec4f98158f841be4cf9591cda4c4aa1867cc589",
+    "sourceDeployment": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/40311565958",
+    "destinationDeployment": "https://github.com/DaveHomeAssist/avbydave/actions/runs/40315942438",
+    "liveChecks": [
+      "2026-10-26 11:35 UTC: avbydave.com source.json sourceCommit aec4f98 (223 files); 20/20 avbydave.com sitemap URLs return 200",
+      "2026-10-26 11:35 UTC: systembydave.com/demos/, demos/frame-sync.html and demos/fault-finding.html return 200",
+      "2026-10-26 11:35 UTC: systembydave.com/demos/config.js umamiWebsiteId and emailFormAction are empty strings",
+      "2026-10-26: avbydave.com/demos/ returns 404 by design (demos/ is not in the avbydave pages list)"
+    ]
+  }
 }
