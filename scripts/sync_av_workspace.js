@@ -16,6 +16,7 @@ for(const file of ['ProjectorThrow/index.html','ProjectorThrow/Stage3D.html','le
   if(rx.test(next))next=next.replace(rx,()=>block);
   else {const at=next.indexOf('</head>');next=next.slice(0,at)+block+'\n'+next.slice(at);}
  }
+ if(file==='ProjectorThrow/Stage3D.html') next=next.replace(/const OFFLINE_CACHE_VERSION = '[^']+';/, `const OFFLINE_CACHE_VERSION = '${version}';`);
  if(next!==old){if(check){console.error(`Stale workspace output: ${file}`);stale=true;}else fs.writeFileSync(target,next);}
 }
 if(stale)process.exitCode=1;
