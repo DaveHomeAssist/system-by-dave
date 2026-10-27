@@ -338,7 +338,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261026-equipment-lab',
+    version:'v20261027-offline-console-recovery',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

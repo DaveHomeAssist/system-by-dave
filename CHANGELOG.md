@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-27: Offline console recovery
+
+- Return offline recovery links and cached navigation fallback to the native AV console. Retired Toolbox and Show Console redirect pages are not cached.
+- Verify recovery navigation for root and subdirectory scopes with the worker harness; physical-device offline acceptance remains open.
+
 ## 2026-10-26 — Domain cutover browser install
 
 - Install only Playwright's headless Chromium shell in the Domain cutover acceptance job, without `--with-deps`. The runner image already provides every Chromium library; the flag only added fonts from the Ubuntu mirror, which stalled at a few kB/s and cancelled the job at its 10-minute timeout, blocking the Pages deploy for all three sites.

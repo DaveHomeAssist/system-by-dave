@@ -1527,5 +1527,13 @@
       "Open PRs #362 and #352 need main merged in before their audit step can pass",
       "Optional: move the console schemas to zod/mini to recover the bundle size"
     ]
+  },
+  "offlineConsoleRecovery": {
+    "status": "implemented and unit tested; PR review pending",
+    "sourceRevision": "3e819ac8442505f949c6b3cce186054c1e81cdb4",
+    "observedAt": "2026-10-27T22:00:09.524886+00:00",
+    "scope": "Offline error links and navigation cache fallback open the native console instead of retired uncached redirect pages.",
+    "verification": "Dominic Node 22 worker harness: 2 new tests fail before the fix; 8 tests pass afterward. Root and subdirectory recovery covered.",
+    "nextAction": "Review the scoped PR. Browser service-worker lifecycle and physical-device offline acceptance remain open; no merge or deployment in this cycle."
   }
 }
