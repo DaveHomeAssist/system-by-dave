@@ -1,5 +1,5 @@
 /* Equipment Lab splash: discipline rail, render grid and a bench sheet. Renders are baked on the paper stage colour. */
-.lab-splash{--splash-stage:#e9eae0;--splash-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--splash-display:Georgia,"Times New Roman",serif;container:splash/inline-size;height:100%;min-height:0;min-width:0;overflow:hidden;color:var(--av-text,#222);background:var(--av-bg,#eee8df)}
+.lab-splash{--splash-stage:#e9eae0;--splash-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--splash-display:Georgia,"Times New Roman",serif;container:splash/inline-size;position:relative;height:100%;min-height:0;min-width:0;overflow:hidden;color:var(--av-text,#222);background:var(--av-bg,#eee8df)}
 .lab-splash *{box-sizing:border-box}
 .lab-splash :focus-visible{outline:3px solid var(--av-focus,#b46b30);outline-offset:2px}
 .splash-layout{display:grid;grid-template-columns:210px minmax(0,1fr) 340px;height:100%;min-height:0}
@@ -10,7 +10,7 @@
 .splash-rail{display:flex;flex-direction:column;gap:18px;min-height:0;overflow:auto;padding:16px 10px;border-right:1px solid var(--av-line,#c7c2ba);background:var(--av-surface,#f8f5f0)}
 .splash-rail>.splash-eyebrow{padding:0 10px}
 .splash-tabs{display:flex;flex-direction:column;gap:2px}
-.splash-tabs button{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:8px 10px;border:0;border-radius:7px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.splash-tabs button{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:8px 10px;border:0;border-radius:7px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .splash-tabs button:hover{background:var(--av-surface-2,#efe9e0)}
 .splash-tabs button[aria-selected=true]{background:var(--av-accent-soft,#f0e0cd);font-weight:700}
 .splash-tabs .short{display:none}
@@ -30,11 +30,11 @@
 .splash-featured img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .splash-featured figcaption{position:absolute;left:10px;right:10px;bottom:10px;display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--av-line,#c7c2ba);border-radius:10px;background:var(--av-surface,#f8f5f0)}
 .splash-featured-text{flex:1;display:grid;gap:2px;min-width:0}
-.lab-splash .splash-featured-name{display:flex;align-items:center;gap:8px;min-width:0;min-height:32px;padding:0;border:0;background:none;color:inherit;font:400 1rem/1.2 var(--splash-display);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.lab-splash .splash-featured-name{display:flex;align-items:center;gap:8px;min-width:0;min-height:32px;padding:0;border:0;background:none;color:inherit;font:400 1rem/1.2 var(--splash-display);text-align:left;text-wrap:balance;cursor:pointer}
 .splash-featured-name:hover{text-decoration:underline;text-underline-offset:3px}
 
 .splash-toolbar{display:flex;flex-wrap:wrap;align-items:end;gap:8px 12px;min-width:0;padding:14px 20px 8px}
-.splash-search{display:grid;flex:1 1 220px;gap:4px;min-width:0;max-width:380px;font-size:.78rem;font-weight:650}
+.splash-search{position:relative;display:grid;flex:1 1 220px;gap:4px;min-width:0;max-width:380px;font-size:.78rem;font-weight:650}
 .splash-search input{width:100%;min-height:40px;padding:6px 10px;border:1px solid var(--av-line,#c7c2ba);border-radius:8px;background:var(--av-surface,#f8f5f0);color:inherit;font:inherit;font-size:.9rem;font-weight:400}
 .splash-chips{display:flex;flex:1 1 300px;gap:6px;min-width:0;padding:2px;overflow-x:auto;scrollbar-width:none}
 .splash-chips::-webkit-scrollbar{display:none}
@@ -87,7 +87,7 @@
 .splash-facts dt{color:var(--av-muted,#666)}
 .splash-facts dd{margin:0}
 .splash-actions{display:grid;gap:8px}
-.splash-primary,.splash-secondary{display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:8px;font-weight:700;text-decoration:none;white-space:nowrap}
+.splash-primary,.splash-secondary{position:relative;display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:8px;font-weight:700;text-decoration:none;white-space:nowrap}
 .splash-primary{border:1px solid var(--av-text,#222);background:var(--av-text,#222);color:var(--av-bg,#eee8df)}
 .splash-primary.small{flex:none;min-height:36px;padding:0 12px;font-size:.8rem}
 .splash-secondary{border:1px solid var(--av-line,#c7c2ba);color:var(--av-text,#222)}
