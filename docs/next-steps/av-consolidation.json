@@ -87,7 +87,7 @@
       "AVV-STREAM-KEY-1 remains unanswered and blocks only its dependent work."
     ]
   },
-  "lastActivity": "2026-10-26",
+  "lastActivity": "2026-10-28",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -212,6 +212,86 @@
       ],
       "evidence": "code-read",
       "phase": 0
+    },
+    {
+      "id": "AVC-15",
+      "type": "logic",
+      "sev": "P1",
+      "title": "A render error blanks the whole AV console",
+      "detail": "No AV app on avbydave.com has a React error boundary (av-suite, av-audio, av-calculator, av-lighting, av-video, equipment-lab, front-office, infrastructure, show-control, show-ops, the-shop). Each mounts with React 18 createRoot and no fallback, and no page installs a window error or unhandledrejection handler. A render error in any one panel unmounts the whole console and leaves a blank page; the error appears only in that device's developer console. Only apps/fmp-camera-sim (housevideo.app) has a boundary. Containment does not depend on DIAG-1; what the recovery panel offers does.",
+      "files": [
+        "apps/av-suite/src/main.tsx",
+        "apps/equipment-lab/src/main.tsx",
+        "apps/show-control/src/main.tsx",
+        "apps/fmp-camera-sim/src/ui/ErrorBoundary.tsx"
+      ],
+      "evidence": "code-read",
+      "phase": 8
+    },
+    {
+      "id": "AVC-16",
+      "type": "infra",
+      "sev": "P2",
+      "title": "Production errors are never collected or reported",
+      "detail": "avbydave.com sends no error telemetry. The meta CSP allows connect-src 'self' blob: only, so a third-party reporter would be blocked. GitHub Pages cannot run a receiver or send Report-To or CSP headers, and a meta CSP cannot carry report-uri or report-to, so CSP violations are also invisible. Errors on a field device are seen only if someone opens developer tools on it. Approach awaits DIAG-1.",
+      "files": [
+        "av/index.html",
+        "404.html"
+      ],
+      "evidence": "code-read",
+      "phase": 8
+    },
+    {
+      "id": "AVC-17",
+      "type": "infra",
+      "sev": "P2",
+      "title": "No live check of avbydave.com after a deploy",
+      "detail": "The Publish avbydave.com step runs scripts/publish_domain_site.sh, which pushes to DaveHomeAssist/avbydave and exits; that repository's own Pages workflow deploys later. walk.housevideo.app gets check_domain_cutover_ready.mjs --live, avbydave.com gets nothing, so a failed or stale avbydave Pages deploy leaves this repository's run green. No scheduled drift check exists either, although https://avbydave.com/source.json carries sourceCommit and noteforge-drift.yml already shows the pattern. Done when the publish step waits for the live sourceCommit to equal GITHUB_SHA and a nightly job flags drift.",
+      "files": [
+        ".github/workflows/deploy-pages.yml",
+        "scripts/publish_domain_site.sh",
+        ".github/workflows/noteforge-drift.yml"
+      ],
+      "evidence": "code-read",
+      "phase": 8
+    },
+    {
+      "id": "AVC-18",
+      "type": "infra",
+      "sev": "P3",
+      "title": "No uptime monitoring, request logs or search-console reports",
+      "detail": "Nothing probes avbydave.com on a schedule. GitHub Pages and its CDN expose no access, 404 or traffic logs. No Google Search Console or Bing verification token exists (DNS TXT, meta tag or file), so crawl errors and indexing problems are not reported. The branded 404.html records nothing about the addresses visitors miss.",
+      "files": [
+        "404.html",
+        "robots.txt"
+      ],
+      "evidence": "observed",
+      "phase": 8
+    },
+    {
+      "id": "AVC-19",
+      "type": "logic",
+      "sev": "P2",
+      "title": "Offline cache failures are silent",
+      "detail": "av-suite-worker.js cacheOptionalAssets() records ok:false for each optional asset that fails to cache, then discards the list. js/av-offline.js reports Offline unavailable on any exception without the cause, and its readiness check covers only the current page's assets. A tool never opened online can be missing at a venue with no network, with no warning beforehand. Unchanged by #373.",
+      "files": [
+        "av-suite-worker.js",
+        "js/av-offline.js"
+      ],
+      "evidence": "code-read",
+      "phase": 8
+    },
+    {
+      "id": "AVC-20",
+      "type": "infra",
+      "sev": "P3",
+      "title": "Domain and DNS hygiene for avbydave.com",
+      "detail": "Account actions for Dave. DNS publishes 3 of GitHub Pages' 4 A records (185.199.108.153 missing) and no AAAA records. The domain is not verified on the GitHub account (Pages API protected_domain_state is null), which leaves takeover protection off. No CAA record and no /.well-known/security.txt, so outside visitors have no published way to report a problem. HTTPS is enforced and the certificate is approved.",
+      "files": [
+        "CNAME"
+      ],
+      "evidence": "observed",
+      "phase": 8
     }
   ],
   "phases": [
@@ -321,7 +401,8 @@
     "D6: Throwline tokens - keep specialist tokens (CLAUDE.md) or generate them from one authored token source?",
     "D7: fixes in other repos (fmp-suite, DeckForge, BPM Delay, Lansdowne, PlotForge) - do upstream now or defer?",
     "D8: record the audit outcome in the repo like docs/fmp-camera-simulator-audit-2026-09.md? (recommended)",
-    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?"
+    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?",
+    "DIAG-1 [unlocks AVC-16 and the AVC-15 recovery panel; held by Dave 2026-10-28]: how production errors reach Dave. Option A local-only recovery panel with Copy diagnostics (version, source commit, browser, recent errors, offline status) kept on the device, with no third party and no CSP change (recommended); Option B hosted error tracker such as Sentry, with a connect-src change and a third-party script; Option C self-hosted report endpoint, with a connect-src change and a service to maintain."
   ],
   "files": [
     {
@@ -576,7 +657,8 @@
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
     "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
-    "Catalog-wide overflow counts from the earlier pilot are superseded; no new whole-catalog overflow count is asserted."
+    "Catalog-wide overflow counts from the earlier pilot are superseded; no new whole-catalog overflow count is asserted.",
+    "Whether anyone is notified when the DaveHomeAssist/avbydave Pages workflow fails after a publish (AVC-17)."
   ],
   "short": "AV Suite",
   "evidence": {
@@ -1535,5 +1617,29 @@
     "scope": "Offline error links and navigation cache fallback open the native console instead of retired uncached redirect pages.",
     "verification": "Dominic Node 22 worker harness: 2 new tests fail before the fix; 8 tests pass afterward. Root and subdirectory recovery covered.",
     "nextAction": "Review the scoped PR. Browser service-worker lifecycle and physical-device offline acceptance remain open; no merge or deployment in this cycle."
+  },
+  "diagnosticsAudit20261027": {
+    "recordedOn": "2026-10-27",
+    "revalidatedOn": "2026-10-28",
+    "sourceRevision": "f3ba0cc1e0f5a3e977ed4e66874b216c24b37eee",
+    "scope": "Read-only audit of the diagnostics and error reporting available for avbydave.com. No product behavior, storage key, saved data or deployment changed.",
+    "method": "Code read of origin/main apps, js, av-suite-worker.js and the Pages and publish workflows; live response headers and DNS; GitHub Pages API for DaveHomeAssist/avbydave; browser load of /, /av/, /equipment-lab/ and an unknown path.",
+    "liveObservation": "Live source.json matched sourceRevision. /, /av/ and /equipment-lab/ logged no console errors; /av/ reported Offline ready; an unknown path served the branded 404 page. The last 15 DaveHomeAssist/avbydave Pages runs succeeded.",
+    "strengths": [
+      "deploy-pages.yml runs the release gates and browser probes before any publish",
+      "source.json on the live site names the source commit and artifact digest",
+      "AV Suite status footer reports save, storage, import and layout failures in plain language",
+      "Saves are verified after writing and unreadable saved data is preserved before replacement",
+      "The offline badge distinguishes ready, not ready and unavailable"
+    ],
+    "findings": [
+      "AVC-15",
+      "AVC-16",
+      "AVC-17",
+      "AVC-18",
+      "AVC-19",
+      "AVC-20"
+    ],
+    "decision": "DIAG-1 open; Dave asked on 2026-10-28 to hold it while the findings are recorded."
   }
 }
