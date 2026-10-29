@@ -227,8 +227,74 @@ tr:has(.entry[aria-pressed="true"]) {background:var(--surface-raised)}
 .dailySkip:focus {top:8px}
 .appIdentity h1 a {color:inherit;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
 .appHeader .appIcon {display:grid;flex-shrink:0;width:44px;height:44px;text-decoration:none}
-@media(max-height:330px) {.appHeader .appIdentity {display:block}.appHeader {grid-column:1/-1;justify-content:space-between}.appIdentity h1 {font-size:12px}.appHeader .appIcon {width:28px;height:44px}.toolbar {display:none}}
+@media(max-height:330px) {.appHeader .appIdentity {display:block}.appHeader {grid-column:1/-1;justify-content:space-between}.appIdentity h1 {font-size:12px}.appHeader .appIcon {width:44px;height:44px}.toolbar {display:none}}
 noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var(--ink);padding:24px}
+</style>
+<style>
+.app button,.app select,.app input {min-height:44px;min-width:44px}
+.app input[type="range"] {height:44px}
+.app .storyLink,.app #selectedStory,.app #labSource {min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
+.app .sourcePanel a {display:inline-flex;align-items:center;min-height:44px;min-width:44px}
+.labControlPager,.compactFilterButton {display:none}
+.app[data-workspace="lab"] .compactFilterButton {display:none}
+.compactFilterDialog {max-width:calc(100vw - 12px);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:12px}
+.compactFilterDialog label {display:grid;gap:8px}.compactFilterDialog button,.compactFilterDialog select {min-height:44px;min-width:44px;max-width:100%}.compactFilterDialog button {margin-top:8px}
+.calendarShell[data-paged="true"] {grid-template-rows:auto minmax(0,1fr) 44px}
+.calendarShell[data-paged="true"] .calendarWeekdays {display:none}
+.calendarShell[data-paged="true"] .calendarGrid {grid-template-columns:minmax(0,1fr)}
+.calendarShell[data-paged="true"] .calendarDay {display:grid;grid-template-columns:28px 44px minmax(0,1fr);align-items:center;gap:6px;padding:4px 8px;min-height:44px}
+.calendarShell[data-paged="true"] .calendarPreview {display:block;font-size:11px;line-height:1.25;max-height:30px}
+.calendarShell[data-paged="true"] .calendarFooter {display:flex;padding:0 4px;align-items:center;height:44px}
+.calendarShell[data-paged="true"] .calendarFooter>span:last-of-type {display:none}
+#calendarDatePager {display:flex;align-items:center;gap:2px;flex-shrink:0}
+#calendarDatePager[hidden] {display:none}
+@media(max-height:500px) {
+ .labControls {position:relative;height:100%;margin:0;max-width:none;padding:4px;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);align-content:stretch;gap:2px}
+ .labControls fieldset {display:contents}
+ .labControls fieldset legend,.labControls fieldset>p {display:none}
+ .labControls .controlStep {display:none}
+ .labControls .controlStep[data-control-active="true"] {display:grid;grid-row:2;grid-column:1;align-self:center;margin:0 48px;gap:0}
+ .labControls .buttonRow[data-control-active="true"] {display:flex}
+ .labControls .controlStep[hidden] {display:none!important}
+ .labControls label.controlStep {grid-template-columns:auto auto;align-items:center;font-size:11px}
+ .labControls label.controlStep input {grid-column:1/-1}
+ .labControlFeedback {grid-row:1;padding:2px 4px;font-size:10px;line-height:1.2}
+ .labControls .labControlFeedback p {display:block;font-size:10px;line-height:1.2;margin:0}
+ .labControlFeedback::after {content:attr(data-control-page);display:block;font:9px var(--mono);color:var(--muted)}
+ .labControlPager {display:contents}.labControlPager button {position:absolute;bottom:8px;width:44px;height:44px}
+ .labControlPager button:first-child {left:2px}.labControlPager button:last-child {right:2px}
+ .labTabs button {white-space:nowrap;padding:2px 4px}.labBar {padding:2px 4px;gap:4px}
+ .labGuide {height:100%;padding:4px 6px;gap:2px;max-height:none}.labGuide>div:nth-child(2) {min-height:0}
+ .labGuide h3 {font-size:13px;line-height:1.2}.labGuide p {font-size:11px;line-height:1.3}.labGuide .guideFooter {gap:2px;font-size:10px}
+}
+@media(max-height:330px) {
+ .app {padding:2px;gap:2px;grid-template-columns:minmax(0,1fr);grid-template-rows:44px minmax(0,1fr) 44px}
+ .app[data-workspace="lab"] {grid-template-rows:44px minmax(0,1fr) 44px}
+ .app .appHeader {grid-column:1;grid-row:1;justify-content:space-between;gap:4px}.appIdentity {display:block}.appIdentity h1 {font-size:12px}.appTools {gap:2px}.app .appTools button {font-size:11px;padding:2px 4px}
+ .app .toolbar,.app .statusbar {display:none}.app .workbench {grid-row:2;grid-column:1}.app .workspaceNav {grid-row:3;gap:2px;padding:0}
+ .app .workspaceNav button {font-size:10px;padding:2px;min-width:44px;min-height:44px}.compactFilterButton {display:block}
+ .calendarHeader {padding:0 4px;min-height:44px}.calendarHeader h2 {font-size:14px}.calendarActions {gap:2px}.calendarActions button {padding:2px}
+ .calendarShell[data-paged="true"] .calendarCount {display:block}.calendarFooter {font-size:9px}
+ .reader {position:relative;grid-template-rows:52px 44px minmax(0,1fr)}
+ .readerHeader {padding:4px 6px}.readerHeader h2 {font-size:13px;line-height:1.2}.readerHeader .topline {font-size:9px;margin:0 0 2px}
+ .readerHeader:has(.sameDay:not([hidden])) .topline {display:none}
+ .readerHeader:has(.sameDay:not([hidden])) h2 {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+ .readerHeader .sameDay {margin:0;font-size:10px}.readerHeader .sameDay select {font-size:11px;min-height:44px}
+ .reader .tabbar {width:132px;padding:0;gap:0}.reader .tabbar button {width:44px;min-width:44px;padding:1px;font-size:9px}
+ #tab-why:not([aria-selected="true"]),#tab-takeaway:not([aria-selected="true"]) {display:none}
+ .tabbar:has(#tab-why[aria-selected="true"]) #tab-fact,.tabbar:has(#tab-takeaway[aria-selected="true"]) #tab-fact {display:none}
+ .readerFooter {position:absolute;right:0;top:52px;width:calc(100% - 132px);height:44px;padding:0;gap:0;border:0;justify-content:space-between}
+ .readerFooter #selectedStory {font-size:0}.readerFooter #selectedStory::after {content:'PNG';font-size:10px}
+ .textPager {gap:0;margin:0}.textPager button {padding:1px}.textPager span {font-size:9px;min-width:24px;text-align:center}
+ .textPanel {padding:4px 6px}#readerText {font-size:13px;line-height:1.4}
+ .archive {position:relative;grid-template-rows:44px minmax(0,1fr)}
+ .archive:has(.selectionContext:not([hidden])) {grid-template-rows:44px 44px minmax(0,1fr)}
+ .archive .panelHead {display:none}.archive .searchRow {padding:0 2px;width:calc(100% - 134px);grid-row:1}
+ .archive .selectionContext {grid-row:2;padding:0 2px;gap:2px;font-size:10px}.selectionContext button {font-size:10px;padding:2px;max-width:110px}
+ .archive .archiveFooter {position:absolute;right:0;top:0;height:44px;padding:0;gap:0;border:0}.archiveFooter #tableRange {display:none}.pagination {gap:0}.pagination span {font-size:9px;min-width:42px;text-align:center}
+ .archive th {padding:2px;font-size:9px}.archive td {padding:2px}.archive th:first-child {width:32px}.archive th:nth-child(2) {width:66px}.archive th:last-child {width:48px}
+ .archive .entry {font-size:11px}.archive .storyLink {font-size:9px}
+}
 </style>
 </head>
 <body>
@@ -243,7 +309,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
       <div class="calendarHeader"><h2 id="calendarMonth" aria-live="polite"></h2><nav class="calendarActions" aria-label="Calendar month"><button id="calendarPrev" type="button" aria-label="Previous month">←</button><button id="calendarToday" type="button">Today</button><button id="calendarNext" type="button" aria-label="Next month">→</button></nav></div>
       <div class="calendarWeekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
       <div id="calendarGrid" class="calendarGrid" role="group" aria-labelledby="calendarMonth"></div>
-      <div class="calendarFooter"><span id="calendarSummary" role="status"></span><span>Select a date to read · Underline = today</span></div>
+      <div class="calendarFooter"><span id="calendarSummary" role="status"></span><span>Select a date to read · Underline = today</span><nav id="calendarDatePager" aria-label="Calendar date pages" hidden><button id="calendarDatesPrev" type="button" aria-label="Previous dates">←</button><span id="calendarDatePage"></span><button id="calendarDatesNext" type="button" aria-label="Next dates">→</button></nav></div>
     </section>
     <article class="reader featured" data-section="fact" aria-label="Selected edition">
       <div class="readerHeader"><div class="topline"><span id="editionLabel"></span><span id="trackLabel"></span><span id="editionState" class="editionState"></span></div><h2 id="title" tabindex="-1"></h2><label class="sameDay" id="sameDayControl" hidden>Same date<select id="sameDayEditions" aria-label="Choose edition from this date"></select></label></div>
@@ -775,6 +841,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 
 const storyPath = fact => "Story Cards/Edition " + String(fact.id).padStart(3,"0") + ".png";
 let readerSection = "fact", textIndex = 0, textPages = [], tableIndex = 0, pageSize = 8, search = "", printing = false;
+let calendarPage=0,calendarPageSize=31,calendarPageMonth="",calendarPageSelection="",controlPage=0;
 let restoringNavigation = true, routeQueued = false, libraryWorkspace = "reader";
 const newYorkDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 let calendarMonth=selected?.date.slice(0,7)||newYorkDate().slice(0,7);
@@ -807,11 +874,14 @@ function navigationHash() {
   if(search) state.set("search",search);
   if(filter!=="all") state.set("category",filter);
   if(tableIndex) state.set("page",String(tableIndex));
+  if(calendarPage)state.set("daypage",String(calendarPage));
+  if(controlPage)state.set("controlpage",String(controlPage));
   if(textIndex) state.set("text",String(textIndex));
   if(window.signalLab) {
     state.set("model",document.getElementById("labMode").value);
     state.set("panel",document.getElementById("signalLab").dataset.page);
     const scenario=signalLab.snapshot();
+    if(scenario.guidePart)state.set('guidepart',String(scenario.guidePart));
     for(const key of ["progress","phase","angle","elevation","radius","guide"]) state.set(key,String(Math.round(scenario[key]*1000000)/1000000));
     state.set("failed",String(scenario.failed));
   }
@@ -831,11 +901,13 @@ function queueNavigation(mode = "push") {
 function restoreNavigation() {
   restoringNavigation=true;
   const route=new URLSearchParams(location.hash.slice(1));
+  controlPage=Math.max(0,Math.min(5,Number.parseInt(route.get('controlpage'),10)||0));
   const month=route.get("month")||"";
   calendarMonth=/^\d{4}-(0[1-9]|1[0-2])$/.test(month)&&Number(month.slice(0,4))>=100?month:(facts.find(f=>String(f.id)===route.get("edition"))||facts[0])?.date.slice(0,7)||newYorkDate().slice(0,7);
   const requestedEdition=route.get("edition");
   const requestedFact=facts.find(f=>String(f.id)===requestedEdition);
   const fact=requestedFact||facts[0];
+  calendarPage=Math.max(0,Math.min(30,Number.parseInt(route.get("daypage"),10)||0));calendarPageMonth=calendarMonth;calendarPageSelection=route.has('daypage')?(fact?.date||''):'';
   filter=tracks.includes(route.get("category"))?route.get("category"):"all";
   search=(route.get("search")||"").slice(0,300).toLowerCase().trim();
   document.getElementById("category").value=filter;
@@ -935,6 +1007,28 @@ function renderCalendar() {
   const grid=document.getElementById("calendarGrid");grid.style.gridTemplateRows="repeat("+weeks+",minmax(0,1fr))";grid.replaceChildren(...nodes);
   const focusDay=grid.querySelector('.calendarDay[aria-pressed="true"]:not(:disabled)')||grid.querySelector(".calendarDay:not(:disabled)");if(focusDay)focusDay.tabIndex=0;
   document.getElementById("calendarSummary").textContent=entries.length+" editions · "+byDate.size+" dates"+(filter!=="all"?" · Filtered":"");
+  paginateCalendarDates();
+}
+function paginateCalendarDates() {
+  const shell=document.querySelector('.calendarShell'),grid=document.getElementById('calendarGrid');
+  if(!shell.clientHeight)return;
+  const dates=[...grid.querySelectorAll('.calendarDay')],weeks=Math.ceil(grid.children.length/7);
+  const available=shell.clientHeight-document.querySelector('.calendarHeader').offsetHeight-44-24;
+  const paged=grid.clientWidth<314||available<weeks*44;
+  shell.dataset.paged=String(paged);document.getElementById('calendarDatePager').hidden=!paged;
+  const priorSize=calendarPageSize;calendarPageSize=paged?Math.max(1,Math.floor(grid.clientHeight/44)):31;
+  if(calendarPageMonth!==calendarMonth||calendarPageSelection!==selected?.date||(!restoringNavigation&&priorSize!==calendarPageSize)){
+    calendarPageMonth=calendarMonth;calendarPageSelection=selected?.date||'';
+    const index=dates.findIndex(day=>day.dataset.date===selected?.date);calendarPage=index<0?0:Math.floor(index/calendarPageSize);
+  }
+  calendarPage=Math.min(calendarPage,Math.max(0,Math.ceil(dates.length/calendarPageSize)-1));
+  const start=calendarPage*calendarPageSize;
+  [...grid.children].forEach(day=>day.hidden=paged&&(day.classList.contains('calendarBlank')||dates.indexOf(day)<start||dates.indexOf(day)>=start+calendarPageSize));
+  grid.style.gridTemplateRows=paged?'repeat('+Math.min(calendarPageSize,dates.length-start)+',minmax(44px,1fr))':'repeat('+weeks+',minmax(0,1fr))';
+  document.getElementById('calendarDatePage').textContent=(calendarPage+1)+' / '+Math.max(1,Math.ceil(dates.length/calendarPageSize));
+  document.getElementById('calendarDatesPrev').disabled=calendarPage===0;document.getElementById('calendarDatesNext').disabled=start+calendarPageSize>=dates.length;
+  const active=dates.find(day=>!day.hidden&&!day.disabled&&day.getAttribute('aria-pressed')==='true')||dates.find(day=>!day.hidden&&!day.disabled);
+  dates.forEach(day=>day.tabIndex=day===active?0:-1);
 }
 function changeCalendarMonth(delta) {
   const [year,month]=calendarMonth.split("-").map(Number),date=new Date(Date.UTC(year,month-1+delta,1));
@@ -954,7 +1048,7 @@ document.getElementById("calendarGrid").addEventListener("keydown",event=>{
   else if(event.key==="End")target=buttons.at(-1);
   else if(step){for(let next=slot+step;next>=0&&next<42;next+=step){target=buttons.find(button=>Number(button.dataset.slot)===next);if(target)break;}}
   else return;
-  event.preventDefault();if(target){buttons.forEach(button=>button.tabIndex=-1);target.tabIndex=0;target.focus();}
+  event.preventDefault();if(target){if(target.hidden){const all=[...document.querySelectorAll('.calendarDay')];calendarPage=Math.floor(all.indexOf(target)/calendarPageSize);paginateCalendarDates();queueNavigation();}buttons.forEach(button=>button.tabIndex=-1);target.tabIndex=0;target.focus({preventScroll:true});}
 });
 function renderList() {
   const visible=facts.filter(f=>(filter==="all"||f.track===filter)&&(!search||[f.title,f.date,f.trackShort,String(f.id).padStart(3,"0")].join(" ").toLowerCase().includes(search)));
@@ -1007,11 +1101,30 @@ let initialTheme="light";try{initialTheme=localStorage.getItem("videoEngineering
 document.getElementById("latestButton").onclick=()=>showWorkspace(libraryWorkspace);
 document.getElementById("latestEditionButton").onclick=()=>{if(facts[0]){revealEdition(facts[0].id);display(facts[0]);setReaderTab("fact");showWorkspace("reader");}};
 document.getElementById("latestDate").textContent=facts.length?"Updated "+facts[0].date:"No editions available";
+const datePager=document.getElementById('calendarDatePager');
+document.getElementById('calendarDatesPrev').onclick=()=>{calendarPage--;paginateCalendarDates();queueNavigation();};
+document.getElementById('calendarDatesNext').onclick=()=>{calendarPage++;paginateCalendarDates();queueNavigation();};
+const controlSteps=[document.getElementById('labPhaseControl'),document.getElementById('labFailureControl'),document.getElementById('labReset'),document.querySelector('.labControls .buttonRow'),document.getElementById('labZoom').closest('label'),document.getElementById('labCameraReset')];
+controlSteps.forEach(node=>node.classList.add('controlStep'));
+const controlPager=document.createElement('nav');controlPager.className='labControlPager';controlPager.setAttribute('aria-label','Model control pages');
+for(const [delta,label] of [[-1,'Previous control'],[1,'Next control']]){const button=document.createElement('button');button.type='button';button.textContent=delta<0?'←':'→';button.setAttribute('aria-label',label);button.dataset.delta=String(delta);button.onclick=()=>{controlPage+=delta;updateControlSteps();queueNavigation();};controlPager.append(button);}
+document.querySelector('.labControls').append(controlPager);
+function updateControlSteps(){
+ const steps=controlSteps.filter(node=>!node.hidden);controlPage=Math.max(0,Math.min(controlPage,steps.length-1));
+ controlSteps.forEach(node=>node.dataset.controlActive=String(node===steps[controlPage]));
+ controlPager.querySelector('[data-delta="-1"]').disabled=controlPage===0;controlPager.querySelector('[data-delta="1"]').disabled=controlPage===steps.length-1;
+ document.querySelector('.labControlFeedback').dataset.controlPage='Control '+(controlPage+1)+' of '+steps.length;
+}
+updateControlSteps();
+const filterDialog=document.createElement('dialog');filterDialog.className='compactFilterDialog';filterDialog.setAttribute('aria-label','Filter editions by category');
+const filterLabel=document.createElement('label');filterLabel.textContent='Category';const closeFilters=document.createElement('button');closeFilters.type='button';closeFilters.textContent='Done';closeFilters.onclick=()=>filterDialog.close();filterDialog.append(filterLabel,closeFilters);document.body.append(filterDialog);
+const filterButton=document.createElement('button');filterButton.type='button';filterButton.className='compactFilterButton';filterButton.textContent='Filter';filterButton.onclick=()=>{filterLabel.append(category);filterDialog.showModal();category.focus();};
+filterDialog.addEventListener('close',()=>{document.querySelector('.toolbar').insertBefore(category,document.getElementById('entryCount'));filterButton.focus({preventScroll:true});});document.querySelector('.workspaceNav').append(filterButton);
 document.getElementById("entryCount").textContent=facts.length+" editions";
 const message=document.getElementById("archiveMessage");message.textContent=archiveProblem||(facts.length?"":"No editions have been archived yet.");message.hidden=!message.textContent;
 document.querySelector(".featured").hidden=!selected;
 renderList();if(selected)display(selected);
-new ResizeObserver(()=>{paginateTable();paginateText();}).observe(document.querySelector(".workbench"));
+new ResizeObserver(()=>{paginateTable();paginateText();paginateCalendarDates();updateControlSteps();}).observe(document.querySelector(".workbench"));
 window.addEventListener("beforeprint",()=>{printing=true;document.getElementById("readerText").textContent=selected?[selected.fact,selected.why,selected.takeaway].join("\n\n"):"";document.querySelectorAll("#list tr").forEach(r=>r.hidden=false);});
 window.addEventListener("afterprint",()=>{printing=false;paginateText();paginateTable();});
 </script>
@@ -5182,7 +5295,7 @@ void main() {
       ["Check the real limits","Hitless reconstruction depends on matching streams and receiver timing limits. Route diversity is a design requirement, not something two colored lines can prove."]
     ]
   };
-  let guideIndex=0, scene, camera, renderer, model, packetA, packetB, outputPacket, reference, labels=[];
+  let guideIndex=0,guidePart=0,guideParts=[], scene, camera, renderer, model, packetA, packetB, outputPacket, reference, labels=[];
   let timeline=null, ready=false, error="", drawn=0;
   const modelTitle=()=>state.mode==="sync"?"Frame synchronization":"Redundant packet paths";
   const visible=()=>app.dataset.workspace==="lab" && panel.dataset.page==="view" && !document.hidden;
@@ -5194,8 +5307,15 @@ void main() {
   function updateGuide() {
     const item=guides[state.mode][guideIndex];
     $("labGuideTitle").textContent=item[0];$("labGuideText").textContent=item[1];
-    $("labGuideCount").textContent=(guideIndex+1)+" / 4";
-    $("labGuidePrev").disabled=guideIndex===0;$("labGuideNext").disabled=guideIndex===3;
+    const node=$("labGuideText"),container=node.parentElement,available=container.clientHeight-$("labGuideTitle").offsetHeight;
+    guideParts=[];
+    if(panel.dataset.page==='guide'&&available>0&&matchMedia('(max-height:500px)').matches){
+      const words=item[1].split(/\s+/);let offset=0;
+      while(offset<words.length){let low=1,high=words.length-offset,best=1;while(low<=high){const mid=Math.floor((low+high)/2);node.textContent=words.slice(offset,offset+mid).join(' ');if(node.getBoundingClientRect().height<=available){best=mid;low=mid+1;}else high=mid-1;}guideParts.push(words.slice(offset,offset+best).join(' '));offset+=best;}
+    }else guideParts=[item[1]];
+    guidePart=Math.min(guidePart,guideParts.length-1);node.textContent=guideParts[guidePart];
+    $("labGuideCount").textContent=(guideIndex+1)+" / 4"+(guideParts.length>1?' · '+(guidePart+1)+'/'+guideParts.length:'');
+    $("labGuidePrev").disabled=guideIndex===0&&guidePart===0;$("labGuideNext").disabled=guideIndex===3&&guidePart===guideParts.length-1;
     const f=facts.find(f=>f.title===(state.mode==="sync"?"Frame synchronizer latency":"ST 2022-7 packet redundancy"));
     $("labSource").href=f?.sourceUrl||"https://www.smpte.org/standards/st2022-7";
     $("labSource").textContent="Reference ↗";
@@ -5214,6 +5334,7 @@ void main() {
     $("labControlCondition").textContent=state.mode==="sync"?"Input phase: "+Math.round(state.phase*100)+"% of illustrative interval":"Path A: "+(state.failed?"interrupted":"available")+". Path B: available.";
     $("labControlOutcome").textContent="Illustrated output: "+text;
     $("labModeTitle").textContent=modelTitle();
+    updateControlSteps();
   }
   function point(x,y,z){return new THREE.Vector3(x,y,z);}
   function mesh(geometry,color,x=0,y=0,z=0){
@@ -5338,12 +5459,12 @@ void main() {
   function setPage(page){
     stop();panel.dataset.page=page;
     document.querySelectorAll("[data-lab-page]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.labPage===page)));
-    requestAnimationFrame(render);
+    requestAnimationFrame(()=>{updateGuide();render();});
   }
   $("labPlay").onclick=play;
   $("labProgress").oninput=e=>{stop();if(timeline)timeline.progress(Number(e.target.value)/1000);else{state.t=Number(e.target.value)/1000;render();}};
   $("labMode").onchange=e=>{
-    stop();state.mode=e.target.value;state.t=0;timeline?.progress(0);guideIndex=0;build();updateGuide();
+    stop();state.mode=e.target.value;state.t=0;timeline?.progress(0);guideIndex=0;guidePart=0;build();updateGuide();
     $("labPhaseControl").hidden=state.mode!=="sync";$("labFailureControl").hidden=state.mode!=="redundancy";readout();
   };
   $("labPhase").oninput=e=>{state.phase=Number(e.target.value)/100;$("labPhaseValue").textContent=e.target.value+"%";render();};
@@ -5352,8 +5473,8 @@ void main() {
   $("labOrbitLeft").onclick=()=>{state.angle-=.35;render();};$("labOrbitRight").onclick=()=>{state.angle+=.35;render();};
   $("labCameraReset").onclick=()=>{state.angle=.65;state.elevation=.58;state.radius=15;$("labZoom").value="15";render();};
   $("labReset").onclick=()=>{stop();timeline?.progress(0);state.t=0;render();};
-  $("labGuideNext").onclick=()=>{guideIndex=Math.min(3,guideIndex+1);updateGuide();};
-  $("labGuidePrev").onclick=()=>{guideIndex=Math.max(0,guideIndex-1);updateGuide();};
+  $("labGuideNext").onclick=()=>{if(guidePart<guideParts.length-1)guidePart++;else{guideIndex=Math.min(3,guideIndex+1);guidePart=0;}updateGuide();};
+  $("labGuidePrev").onclick=()=>{if(guidePart>0)guidePart--;else{guideIndex=Math.max(0,guideIndex-1);guidePart=100000;}updateGuide();};
   document.querySelectorAll("[data-lab-page]").forEach(b=>b.onclick=()=>setPage(b.dataset.labPage));
   $("labButton").onclick=()=>showWorkspace("lab");
   let drag=null;
@@ -5386,10 +5507,11 @@ void main() {
     if(timeline)timeline.progress(progress);state.t=progress;
     $("labPhase").value=String(state.phase*100);$("labPhaseValue").textContent=Math.round(state.phase*100)+"%";$("labZoom").value=String(state.radius);
     $("labFailure").setAttribute("aria-pressed",String(state.failed));$("labFailure").textContent=state.failed?"Restore Path A":"Interrupt Path A";
-    build();updateGuide();render();
+    build();updateGuide();render();guidePart=Math.floor(number('guidepart',0,0,10000));
   }
-  window.signalLab={state,stop,render,setPage,restoreScenario,snapshot:()=>({ready,error,drawn,playing:!!timeline&&!timeline.paused(),mode:state.mode,progress:state.t,phase:state.phase,failed:state.failed,angle:state.angle,elevation:state.elevation,radius:state.radius,guide:guideIndex,packets:renderer?{a:packetA.visible,b:packetB.visible,output:outputPacket.visible}:null})};
+  window.signalLab={state,stop,render,setPage,restoreScenario,snapshot:()=>({ready,error,drawn,playing:!!timeline&&!timeline.paused(),mode:state.mode,progress:state.t,phase:state.phase,failed:state.failed,angle:state.angle,elevation:state.elevation,radius:state.radius,guide:guideIndex,guidePart,packets:renderer?{a:packetA.visible,b:packetB.visible,output:outputPacket.visible}:null})};
   init();window.initializeNavigation();
+  new ResizeObserver(()=>{if(panel.dataset.page==='guide')updateGuide();}).observe(document.querySelector('.labBody'));
   document.querySelectorAll("[data-lab-page]").forEach(button=>button.addEventListener("click",queueNavigation));
   $("labMode").addEventListener("change",queueNavigation);
   // Commit interactions, not every animation frame. Restored links remain paused.

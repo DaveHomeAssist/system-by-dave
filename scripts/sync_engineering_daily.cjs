@@ -30,7 +30,7 @@ html=html.replace('</style>',`.dailySkip {position:fixed;top:-100px;left:8px;z-i
 .dailySkip:focus {top:8px}
 .appIdentity h1 a {color:inherit;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
 .appHeader .appIcon {display:grid;flex-shrink:0;width:44px;height:44px;text-decoration:none}
-@media(max-height:330px) {.appHeader .appIdentity {display:block}.appHeader {grid-column:1/-1;justify-content:space-between}.appIdentity h1 {font-size:12px}.appHeader .appIcon {width:28px;height:44px}.toolbar {display:none}}
+@media(max-height:330px) {.appHeader .appIdentity {display:block}.appHeader {grid-column:1/-1;justify-content:space-between}.appIdentity h1 {font-size:12px}.appHeader .appIcon {width:44px;height:44px}.toolbar {display:none}}
 noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var(--ink);padding:24px}
 </style>`);
 html=html.split('\n').map(line=>line.replace(/[ \t]+$/,'').replace(/^ +(?=\t)/,'')).join('\n');
