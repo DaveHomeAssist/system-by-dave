@@ -1,0 +1,251 @@
+{
+  "schema": "equipment-lab.previews.v1",
+  "description": "Renders of approximate 3D models for the Equipment Lab splash. They are not product photographs and prove nothing about physical accuracy.",
+  "pending": [
+    "I01",
+    "I02"
+  ],
+  "images": [
+    {
+      "file": "atem-hd8-iso.jpg",
+      "inventoryIds": [
+        "F01"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 39713,
+      "sha256": "7373fc85f1592a9b36d82283404a1cfbfd552d2b26f74fcf472feac4c5cec516"
+    },
+    {
+      "file": "camera-rig.jpg",
+      "inventoryIds": [
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07"
+      ],
+      "source": "Ion Workbench camera viewer capture from the Cartoni pilot at source revision 26108848220775fe258d1aa6b66c716877ed855c, cropped to the stage",
+      "bytes": 25700,
+      "sha256": "b9cf2583605d6de39583d276abdd92472602e4e7c3e3787a2f0e2178504cc944"
+    },
+    {
+      "file": "cartoni-maxima30.jpg",
+      "inventoryIds": [
+        "C02"
+      ],
+      "source": "Ion Workbench camera viewer capture from the Cartoni pilot at source revision 26108848220775fe258d1aa6b66c716877ed855c, cropped to the stage",
+      "bytes": 28753,
+      "sha256": "b935235dbc91561273d587450b73c6c6a6c4c1ba9c8438ea421a6aefd66b68c8"
+    },
+    {
+      "file": "ccu4.jpg",
+      "inventoryIds": [
+        "F02"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 40767,
+      "sha256": "425dc1e4be86ec42f5be6ea899ff263e01ed6a184fde97fb5e8ad43c00659f5a"
+    },
+    {
+      "file": "fmp-rig.jpg",
+      "inventoryIds": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "R07",
+        "R08",
+        "R09",
+        "R10",
+        "R11",
+        "R12",
+        "R13"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 38155,
+      "sha256": "3676fd83638a984bf003115b7552f0a7c6e325b296d10922ece8a13797e01455"
+    },
+    {
+      "file": "fujinon-digipower66.jpg",
+      "inventoryIds": [
+        "C01"
+      ],
+      "source": "Ion Workbench camera viewer capture from the Cartoni pilot at source revision 26108848220775fe258d1aa6b66c716877ed855c, cropped to the stage",
+      "bytes": 22168,
+      "sha256": "13aaa2825a47e8dae6ef0119d90880770be097364545fdc34ed10160c652ab08"
+    },
+    {
+      "file": "nnc-cdj-3000.jpg",
+      "inventoryIds": [
+        "N05"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 22795,
+      "sha256": "b57df011fb0d58545f6ed6de468ca3d965bb6410bc490b8a2e820db7995653f4"
+    },
+    {
+      "file": "nnc-cva-118.jpg",
+      "inventoryIds": [
+        "N09"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 12361,
+      "sha256": "c83d233b934ca2b2121a12b646d7a04fe1a3d0cd33e582bbb378267f4b761daf"
+    },
+    {
+      "file": "nnc-djm-a9.jpg",
+      "inventoryIds": [
+        "N06"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 21013,
+      "sha256": "518c29c73a25fc2d650f9907c920b790dc8067dd12865950deb2939a0dd936d8"
+    },
+    {
+      "file": "nnc-ekx-15sp.jpg",
+      "inventoryIds": [
+        "N10"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 13013,
+      "sha256": "f11a7678765a2a679e19a2a24784d7d30da064787842f2961c9011328b37251c"
+    },
+    {
+      "file": "nnc-gx5.jpg",
+      "inventoryIds": [
+        "N04"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 23109,
+      "sha256": "6d5f50fda9bdcb2be659399f19ecbd082eb490ec02bb3100e50d055def4bed55"
+    },
+    {
+      "file": "nnc-gx7.jpg",
+      "inventoryIds": [
+        "N03"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 22994,
+      "sha256": "e4c06af1cebe979fba67ed36a51265a261d8c373f07aadd9d0650ee4ca1c00ab"
+    },
+    {
+      "file": "nnc-haze-1dx.jpg",
+      "inventoryIds": [
+        "N13"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 14101,
+      "sha256": "a563d1b6adc62d489d30f9b29240b9af80213044c30011fb6f855ab8264a34e6"
+    },
+    {
+      "file": "nnc-j-six.jpg",
+      "inventoryIds": [
+        "N11"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 21539,
+      "sha256": "2507c25b4abd83e9e4e85f951c8df74e38e6716146f199651372ef51df3b9911"
+    },
+    {
+      "file": "nnc-lasercube-2w.jpg",
+      "inventoryIds": [
+        "N14"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 16349,
+      "sha256": "409ee73d0eaeed1de5e5bbe3a712239d4c6247a88ff8b10710168fb8b77f1a65"
+    },
+    {
+      "file": "nnc-prime-4.jpg",
+      "inventoryIds": [
+        "N08"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 26086,
+      "sha256": "6ec9e1aa7ceb2200351dd8702c724d1f4c7ef2c9a82750f92751e35ee980b49d"
+    },
+    {
+      "file": "nnc-s181.jpg",
+      "inventoryIds": [
+        "N01"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 12584,
+      "sha256": "41b517daf86e6a023265c2b12d1723e3a022a88580b88b597c92a4dbfe8634d0"
+    },
+    {
+      "file": "nnc-sm58.jpg",
+      "inventoryIds": [
+        "N16"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 13837,
+      "sha256": "3db43bc7730f2617ec11354c0878911856e5fcac4be58d54f8ae943040986bfe"
+    },
+    {
+      "file": "nnc-tl60.jpg",
+      "inventoryIds": [
+        "N15"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 7527,
+      "sha256": "b7e5aea992edadb860118e44f891056c242f00ec380b079f2e83298d533b3e49"
+    },
+    {
+      "file": "nnc-vertigo-tri-led.jpg",
+      "inventoryIds": [
+        "N12"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 21140,
+      "sha256": "c31e397765e3612c852c253625c912d8237900d2c69d9cdd884c85179254cd5c"
+    },
+    {
+      "file": "nnc-xdj-xz.jpg",
+      "inventoryIds": [
+        "N07"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 26421,
+      "sha256": "f5811b324a7701fa39a47c0d43ce48630266e9393494510d9b237e316cc1bd4b"
+    },
+    {
+      "file": "nnc-zlx-15bt.jpg",
+      "inventoryIds": [
+        "N02"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
+      "bytes": 11231,
+      "sha256": "5e8032b2754387d96db30611d3a0658aebdcd7a060afb81d9ad776a538ccaa6e"
+    },
+    {
+      "file": "p240.jpg",
+      "inventoryIds": [
+        "F03"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 26233,
+      "sha256": "470fd417fe358f5d9cb6fe68de4a91101787be3ee0366d26e40c1a0344019f39"
+    },
+    {
+      "file": "smartfade-1248.jpg",
+      "inventoryIds": [
+        "I03"
+      ],
+      "source": "Ion Workbench SmartFade 1248 viewer capture, cropped to the stage",
+      "bytes": 62733,
+      "sha256": "c046d18bafacbbdec2d53cc58031978f0a4f9042a003a3abd046cea935294d1c"
+    },
+    {
+      "file": "superjoy-g1.jpg",
+      "inventoryIds": [
+        "F04"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 32895,
+      "sha256": "bb37702a1319b06eb8c52199f4d6ef1381e396d4934cc42af628366279d2a8b2"
+    }
+  ]
+}
