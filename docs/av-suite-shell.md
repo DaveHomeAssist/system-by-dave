@@ -1,7 +1,7 @@
 # AV Suite shell: one console
 
 **Date:** October 13, 2026
-**Status:** Slice A delivered (direction, hold). Slice B delivered in source on 2026-10-13: the shell at `/av/`, eight panel packs, specialist embed mode, Document panels, shell probe; publication and live acceptance follow its pull request. Slice C delivered in source on 2026-10-13: the console is the avbydave.com home and opens on an empty Workspace view; `av-suite.html`, both landing pages, the historical tool index and the 34 sheet pages are redirect stubs; the Toolbox code, Toolbox families and their probes are removed. Standalone family routes still exist and mount the same packs. On 2026-10-15 Dave confirmed the specialist panels stay (see the October 15 ruling below). Supersedes the
+**Status:** Slice A delivered (direction, hold). Slice B delivered in source on 2026-10-13: the shell at `/av/`, eight panel packs, specialist embed mode, Document panels, shell probe; publication and live acceptance follow its pull request. Slice C delivered in source on 2026-10-13: the console is the avbydave.com home and opens on an empty Workspace view; `av-suite.html`, both landing pages, the historical tool index and the 34 sheet pages are redirect stubs; the Toolbox code, Toolbox families and their probes are removed. The eight original family routes now redirect to `/av/?app=<pack>`; retained builds stay in ignored `apps/<family>/dist/` for source regression tests. On 2026-10-15 Dave confirmed the specialist panels stay (see the October 15 ruling below). Supersedes the
 [console snapshot Rail](av-suite-console-snapshot-rail.md) as the definition of
 done and pauses further per-family console conversions under the
 [October 9 rollout](av-console-rollout.md).
@@ -83,7 +83,7 @@ shared state, view save/reload, legacy layouts, export and palette/viewport
 containment before release. No new dependencies, hardware control or redesign.
 
 - `https://avbydave.com/av/` opens one console. The Rail on the left lists the
-  ten application identities plus standalone tool links. Selecting a department
+  nine original application identities plus Equipment Lab and specialist tool links. Selecting a department
   recalls its views in the same workspace and never renders a second console.
 - The panel chooser offers every application's panels in one library, grouped
   by application, so a stored view can mix Video routes, Lighting fixtures and
@@ -122,8 +122,8 @@ apps/<family>/src/pack.tsx
                           useXPack(host): the application's state, document,
                           recovery and render(type) — everything its App()
                           held except the workspace and page chrome
-apps/<family>/src/App.tsx thin standalone host around the same hook, retained
-                          only until its route redirects to the shell
+apps/<family>/src/App.tsx retained source regression host around the same hook;
+                          ignored dist output is never published
 ```
 
 **Pack contract.** `usePack(host) → { id, label, library, defaultViews,
@@ -240,3 +240,29 @@ Equipment practice and Equipment reference. The same implementation serves
 `/equipment-lab/`. The shared catalog contains 43 confirmed entries. The Cartoni
 GLB is the first native representation; other entries retain their existing
 viewers during migration. See [the module brief](equipment-lab.md).
+
+## Family route cutover, October 29, 2026
+
+Dave selected the existing redirect option: `/av-video/`, `/av-audio/`,
+`/show-control/`, `/show-ops/`, `/front-office/`, `/the-shop/`,
+`/infrastructure/` and `/av-lighting/` redirect to `/av/?app=<pack>`.
+The stubs allow only the five shared show-context parameters, cap each at
+200 characters and drop unrelated queries and fragments. Meta refresh and a
+visible link provide a JavaScript-free fallback. Pack source, saved keys and
+import/export contracts remain owned by each application. Calculator and the
+newer Equipment Lab routes are outside this eight-route cutover.
+
+Public family probes use `scripts/av-family-probe.mjs` against the shared
+console. They check every default view, a real edit, explicit isolated Save,
+export, reload, two palettes and desktop, breakpoint, phone and ultrawide
+containment. `npm run test:av-routes-browser` checks the empty Workspace, nine
+original Rail identities, Throwline panel and all 34 sheet plus eight family
+redirects. Set `AV_ROUTES_BASE=https://avbydave.com` to check the published root.
+
+The detailed previous host regressions are retained behind
+`npm run test:av-retained-browser`. Build all eight applications first. This
+runner serves their ignored `apps/<family>/dist/` output as disposable fixtures
+and invokes the original import, recovery, data and layout checks with
+`AV_RETAINED_HOST=1`. These fixtures establish source compatibility, not public
+standalone availability. The Pages pipeline excludes all `dist` directories,
+and the release verifier rejects a standalone bundle replacing any route stub.

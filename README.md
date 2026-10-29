@@ -23,13 +23,21 @@ and `npm run test:equipment-lab-browser`. See [the module brief](docs/equipment-
 
 ## AV Video
 
-[AV Video](https://avbydave.com/av-video/) combines an interactive Signal Flow canvas, Video Patch, Displays & Projection, Cameras and Playback in one independent application. Source lives in `apps/av-video/`; `npm run build:av-video` regenerates the committed `av-video/` artifact. Use `npm run typecheck:av-video`, `npm run test:av-video` and `npm run test:av-video-browser` to verify it. See [the workflow and data contract](docs/av-video.md).
+[AV Video](https://avbydave.com/av-video/) combines an interactive Signal Flow canvas, Video Patch, Displays & Projection, Cameras and Playback in one independent application. Source lives in `apps/av-video/`; `npm run build:av-video` writes an ignored source regression fixture in `apps/av-video/dist/`. The public route redirects into `/av/?app=video`; its native pack is compiled into the shared shell. Use `npm run typecheck:av-video`, `npm run test:av-video` and `npm run test:av-video-browser` to verify it. See [the workflow and data contract](docs/av-video.md).
 
-[The Shop](https://avbydave.com/the-shop/) uses the same console engine for Worklist, Item inspector, Plan/Import and Backup panels, standalone or embedded in AV Video. Source is in `apps/the-shop/`; `npm run build:the-shop` regenerates the committed entry and assets without removing the existing logistics model. Verify with `npm run typecheck:the-shop`, `npm run test:the-shop` and `npm run test:the-shop-browser`. See [its scope, saved-data and verification contract](docs/the-shop.md).
+[The Shop](https://avbydave.com/the-shop/) uses the same console engine for Worklist, Item inspector and Document panels inside the shared AV by Dave console. Source is in `apps/the-shop/`; `npm run build:the-shop` writes an ignored source regression fixture; the public route redirects into `/av/?app=shop`. Verify with `npm run typecheck:the-shop`, `npm run test:the-shop` and `npm run test:the-shop-browser`. See [its scope, saved-data and verification contract](docs/the-shop.md).
+
+The eight original family routes are redirect stubs into `/av/?app=<pack>`.
+Their `apps/<family>/src/pack.tsx` modules remain the native implementations.
+Family build commands write ignored `dist` fixtures. After building all eight,
+`npm run test:av-retained-browser` runs the detailed source host regressions;
+public family probes use the shared shell. `npm run test:av-routes-browser`
+checks the console entry and all 42 sheet/family redirects. See the
+[cutover contract](docs/av-suite-shell.md#family-route-cutover-october-29-2026).
 
 ## Local development
 
-[Infrastructure](https://avbydave.com/infrastructure/) has a native-console candidate in `apps/infrastructure/`: Power, Network, Cable, Issues, Plan/Import and Backup share its existing model. Use `npm run typecheck:infrastructure`, `npm run test:infrastructure`, `npm run build:infrastructure` and `npm run test:infrastructure-browser`. The build preserves the standalone model and writes the committed entry/assets. See [the brief and compatibility contract](docs/infrastructure-app.md); source presence does not establish release or browser acceptance.
+[Infrastructure](https://avbydave.com/infrastructure/) has a native-console candidate in `apps/infrastructure/`: Power, Network, Cable, Issues, Plan/Import and Backup share its existing model. Use `npm run typecheck:infrastructure`, `npm run test:infrastructure`, `npm run build:infrastructure` and `npm run test:infrastructure-browser`. The build preserves the model and writes an ignored fixture in `apps/infrastructure/dist/`; the public route redirects into `/av/?app=infrastructure`. See [the brief and compatibility contract](docs/infrastructure-app.md); source presence does not establish release or browser acceptance.
 
 [Lighting](https://avbydave.com/av-lighting/) has a native-panel candidate in `apps/av-lighting/`: Fixtures, Fixture details, Focus, Plan/Import and Backup preserve existing patch/focus fields and reviewed PlotForge imports. Use `npm run typecheck:av-lighting`, `npm run test:av-lighting`, `npm run build:av-lighting` and `npm run test:av-lighting-browser`. See [the brief and compatibility contract](docs/av-lighting.md); candidate checks and publication/live proof are separate.
 

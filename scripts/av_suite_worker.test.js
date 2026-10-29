@@ -85,7 +85,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261027-offline-console-recovery');
+      assert.equal(name, 'sbd-av-suite-v20261029-family-console-redirects');
       return cache;
     } },
     fetch: async () => new Response('ok'),
