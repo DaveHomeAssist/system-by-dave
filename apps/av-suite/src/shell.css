@@ -110,3 +110,7 @@ html[data-av-focus="true"] .suite-intro{display:none}
   .suite-intro__text{flex:1 1 auto}
   .suite-intro__actions{width:auto}
 }
+
+/* Server-rendered page heading for search and screen readers before the console mounts;
+   React replaces #root's children on first render, so it never duplicates the app's <h1> (SEO-06). */
+.shell-static-title{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
