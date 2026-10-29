@@ -103,7 +103,7 @@ explicit Save. See `docs/av-suite-shell.md`. `js/av-theme-mode.js` and
 `js/av-theme.js` apply the operator's Warm Paper, Stage Slate, or System choice.
 
 The [AV Suite shell brief](docs/av-suite-shell.md) (2026-10-13) is the current
-direction, amended October 14: one `/av/` console, nine native department packs,
+direction, amended October 14: one `/av/` console, ten native department packs,
 no whole-app tiles, standalone specialist links, and legacy sheet pages retired. Do not start further
 per-family console conversions outside that brief. The earlier
 [consolidation plan](docs/av-suite-consolidation-spec.md) set the

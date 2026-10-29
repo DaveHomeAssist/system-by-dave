@@ -910,5 +910,40 @@
       "boundary": "Only checker, focused test, existing CI and records; no application assets/build/cache/formulas/routes/saved keys/schemas/original imports change. Runtime acceptance remainsf7dc459 and unchanged Video JS/CSS; new source review/CI/merge/publication stay separate. Physical/olderOS/operator and unanswered product-policy gates remain open.",
       "redirectCorrection": "First candidate d8ec325 CI39195166501 passed all four initial fixtures, then caught a strict-loader assumption at the existing Throwline client redirect to Stage3D.html. Guard corrected and redirect regression added; original failed run retained and application route unchanged."
     }
+  },
+  "boxlensReference": {
+    "checkedOn": "2026-10-23",
+    "scope": "Standalone camera inspection reference requested directly by Dave; existing Stream/Record and other product gates remain unchanged.",
+    "sourceBrief": "docs/boxlens.md",
+    "route": "https://avbydave.com/boxlens/",
+    "viewer": "https://ion-workbench.davein4k.chatgpt.site/camera/",
+    "viewerSource": "9a7620ac8f6da3a67a318025f5343164746ae9b0",
+    "state": "Merged in PR #363; current publication and live-acceptance evidence is maintained in its release receipt.",
+    "verification": "Dominic Chromium: five embedded viewports, 23 controls, selection, back-focus/F.f lock, balance reset, head views, both themes and no root overflow. Very short phone viewport shows direct-viewer recovery. Host navigation/copy/indexing/domain staging and deterministic sitemap pass.",
+    "remaining": [
+      "Consult the release receipt for production deployment and exact live acceptance",
+      "Physical-device/operator and actual equipment identification"
+    ],
+    "releaseReceipt": "https://github.com/DaveHomeAssist/system-by-dave/pull/363",
+    "mergedSource": "105620f655876a099d95e1990301b254c91c770d",
+    "pdfDownload": {
+      "requestedOn": "2026-10-23",
+      "url": "https://avbydave.com/boxlens/MikeCameraFieldGuide.pdf",
+      "pages": 5,
+      "bytes": 2407560,
+      "sha256": "fb5985c4fdac66d6592cacdb2318851e3ddbab11f22b2490f5e2df330afe2ff2",
+      "state": "Public download requested directly by Dave; exact release and live download acceptance recorded in the follow-up pull request.",
+      "remaining": "Physical device/operator acceptance and actual equipment identification remain separate."
+    },
+    "socialPreview": {
+      "requestedOn": "2026-10-23",
+      "image": "https://avbydave.com/boxlens/BoxlensOG.png",
+      "dimensions": [
+        1200,
+        630
+      ],
+      "scope": "Page-specific Open Graph and Twitter card, actual model render, labeled PDF and reference accuracy notice; other pages unchanged.",
+      "releaseReceipt": "Current follow-up pull request; production metadata/image readback required, third-party cache refresh separate."
+    }
   }
 }

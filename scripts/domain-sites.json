@@ -104,7 +104,8 @@
         "av-tool-suite/",
         "av-workbook/",
         "field-kit/",
-        "field-kit/thanks/"
+        "field-kit/thanks/",
+        "boxlens/"
       ],
       "assets": [
         "img/av-by-dave-og.png",
@@ -116,7 +117,8 @@
       ],
       "robotsDisallow": [
         "/404.html",
-        "/transfer.html"
+        "/transfer.html",
+        "/equipment-lab/data/"
       ],
       "storage": {
         "registryKeys": true,

@@ -85,7 +85,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261018-visibility-compatibility');
+      assert.equal(name, 'sbd-av-suite-v20261027-offline-console-recovery');
       return cache;
     } },
     fetch: async () => new Response('ok'),
@@ -126,3 +126,34 @@ test('install precaches every local Rail asset in the bumped cache generation', 
   assert.equal(critical.some(asset => /av-suite\.html|av-suite-landing|js\/av-suite\//.test(asset)), false, 'retired Toolbox assets are no longer critical');
   assert.equal(registry.offlineAssets().some(asset => /^https?:/.test(asset)), false);
 });
+
+for (const scope of ['https://example.test/', 'https://example.test/project/']) {
+  test(`offline recovery opens the cached console within ${scope}`, async () => {
+    const listeners = {}, index = new URL('av/index.html', scope).href;
+    const context = {
+      URL, Response, Promise, importScripts() {},
+      caches: { open: async () => ({
+        match: async key => key === index ? new Response('native console') : undefined,
+        put: async () => assert.fail('Offline recovery must not write a response')
+      }) },
+      fetch: async () => { throw new Error('offline'); },
+      self: {
+        location: { origin: 'https://example.test' }, registration: { scope },
+        SBD_REGISTRY: { version: 'test', offlineAssets: () => ['./av/index.html'] },
+        addEventListener: (type, listener) => { listeners[type] = listener; }
+      }
+    };
+    vm.runInNewContext(source, context);
+    const navigate = url => {
+      let response;
+      listeners.fetch({ request: { url, method: 'GET', mode: 'navigate' }, respondWith: promise => { response = promise; } });
+      return response;
+    };
+    const fallback = await navigate(new URL('uncached.html', scope).href);
+    assert.equal(fallback.status, 503);
+    const links = [...(await fallback.text()).matchAll(/href="([^"]+)"/g)].map(match => match[1]);
+    assert.deepEqual(links, [new URL('av/', scope).href]);
+    assert.equal(await (await navigate(links[0])).text(), 'native console');
+    assert.equal(await (await navigate(scope)).text(), 'native console', 'uncached site root falls back to the prepared shell');
+  });
+}

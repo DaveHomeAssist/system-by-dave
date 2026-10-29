@@ -23,6 +23,7 @@
   /* dept = console grouping (fine-grained). storageKeys = localStorage keys the
      tool writes (used by saved-data scan + show-package export/import). */
   var TOOLS=[
+    {id:'equipment-lab',name:'Equipment Lab',href:'equipment-lab/',dept:'Reference',phases:['prep','loadin'],tag:'Application',desc:'Shared equipment library, native model inspection, practice and source references.',storageKeys:[]},
     {id:'av-video',name:'AV Video',href:'av-video/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Signal Flow, Video Patch, Displays and Projection: connected routes, destination plans, checks, and optional modules.',storageKeys:[{key:'sbd.avVideo.v1',label:'AV Video plan'},{key:'sbd.avVideo.draft.v1',label:'AV Video unsaved draft'},{key:'sbd.avVideo.layout.v1',label:'AV Video panel layout'}]},
     {id:'av-audio',name:'Audio',href:'av-audio/',dept:'Audio',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Inputs, patch, line checks and speaker zones in one saved Audio plan.',storageKeys:[{key:'sbd.avAudio.v1',label:'Audio plan'}]},
     {id:'show-control',name:'Show Control',href:'show-control/',dept:'Show Flow',phases:['prep','show'],tag:'Application',desc:'Configurable calling, rundown, notes and log panels; CueForge remains the executable show-control product.',storageKeys:[{key:'sbd.showControl.v1',label:'Show Control run'},{key:'sbd.showControl.draft.v1',label:'Show Control recovery draft'},{key:'sbd.showControl.layout.v1',label:'Show Control device layout'}]},
@@ -101,6 +102,7 @@
     {label:'Logistics',toolIds:['the-shop','gear-prep','gear-reference','truck-pack','load-in-plan','strike-plan','show-advance']},
     {label:'Crew',toolIds:['crew-call','crew-time-log']},
     {label:'Show docs & client',toolIds:['front-office','show-handoff','show-report','show-task-board','change-order','client-signoff']},
+    {label:'Equipment',toolIds:['equipment-lab','gear-reference']},
     {label:'Calculators',toolIds:['av-calculator','led-wall-calculator']},
     {label:'Music',toolIds:['ontrack']}
   ];
@@ -115,6 +117,15 @@
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
+    './equipment-lab/index.html',
+    './equipment-lab/assets/equipment-lab.js',
+    './equipment-lab/assets/equipment-lab-Viewer.js',
+    './equipment-lab/assets/index.css',
+    './av/assets/av-suite-Viewer.js',
+    './equipment-lab/data/catalog.json',
+    './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.manifest.json',
+    './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.definition.json',
+    './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.inspection.glb',
     './av-suite-worker.js',
     './js/sbd-registry.js',
     './js/av-suite-context.js',
@@ -264,6 +275,7 @@
     {id:'shop',prototypeId:'shop',label:'The Shop',availability:'available',toolId:'the-shop',panelGroup:'Planning',draftKey:'sbd.shop.draft.v1',layoutKey:'sbd.shop.layout.v1',icon:['M4 4h16v13H4z','M4 9h16','M10 12h4','M8 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z','M16 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z']},
     {id:'infrastructure',prototypeId:'infra',label:'Infrastructure',availability:'available',toolId:'infrastructure',panelGroup:'Planning',draftKey:'sbd.infrastructure.draft.v1',layoutKey:'sbd.infrastructure.layout.v1',icon:['M13 2 4 14h7l-1 8 9-12h-7z']},
     {id:'lighting',prototypeId:'lighting',label:'Lighting',availability:'available',toolId:'av-lighting',panelGroup:'Utilities',draftKey:'sbd.avLighting.draft.v1',layoutKey:'sbd.avLighting.layout.v1',icon:['M9 18h6','M10 21h4','M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z']},
+    {id:'equipment-lab',prototypeId:'equipmentlab',label:'Equipment Lab',availability:'available',toolId:'equipment-lab',panelGroup:'Utilities',icon:['M3 7l9-5 9 5v10l-9 5-9-5z','M3 7l9 5 9-5','M12 12v10']},
     {id:'av-calculator',prototypeId:'calc',label:'AV Calculator',availability:'available',toolId:'av-calculator',panelGroup:'Utilities',icon:['M5 3h14v18H5z','M8 7h8v3H8z','M8 14h2','M11 14h2','M14 14h2','M8 17.5h2','M11 17.5h2','M14 17.5h2']}
   ];
 
@@ -277,6 +289,7 @@
       'console:shop',
       'console:infrastructure',
       'console:lighting',
+      'console:equipment-lab',
       'console:av-calculator'
     ]
   };
@@ -325,7 +338,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261018-visibility-compatibility',
+    version:'v20261027-offline-console-recovery',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

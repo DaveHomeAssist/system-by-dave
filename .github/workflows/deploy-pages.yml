@@ -39,7 +39,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -85,6 +85,8 @@ jobs:
           curl --silent --fail http://127.0.0.1:8000/av/ >/dev/null
           node scripts/probe_av_themes.js
           node scripts/probe_led_wall_configurator.js
+          node scripts/probe_engineering_daily.cjs
+          node scripts/probe_engineering_entry.cjs
 
       - name: Verify ATEM switcher guide
         env:
@@ -114,6 +116,15 @@ jobs:
           npm run test:av-video
           npm run build:av-video
           npm run test:av-video-browser
+
+      - name: Verify Equipment Lab
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run verify:equipment-lab
+          npm run typecheck:equipment-lab
+          npm run build:equipment-lab
+          npm run test:equipment-lab-browser
 
       - name: Verify AV Suite shell
         env:
@@ -218,14 +229,18 @@ jobs:
         run: |
           npm audit --audit-level=high
           python3 scripts/gen_sitemap.py
-          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim sitemap.xml
-          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim sitemap.xml)"
+          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim equipment-lab sitemap.xml
+          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim equipment-lab sitemap.xml)"
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |
           mkdir -p _site
           rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='package.json' --exclude='package-lock.json' --exclude='/flooring-contract-review.html' --exclude='/house' --exclude='/cross-project-*' --exclude='.agent-claim' --exclude='/apps/av-workbook' --exclude='/av-workbook/assets' ./ _site/
           # Check the actual publish artifact as well as the tracked source.
+          # The committed sitemap lists routes only; stamp the published copy with
+          # each page's last commit date from this commit's full history.
+          python3 scripts/gen_sitemap.py --lastmod --out _site/sitemap.xml
+          grep -q '<lastmod>' _site/sitemap.xml
           node scripts/verify_private_exposure.js _site
           node scripts/verify_workbook_withdrawal.cjs _site
           echo "Staged $(find _site -type f | wc -l) files."
