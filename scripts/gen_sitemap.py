@@ -59,6 +59,7 @@ STATIC_PAGES = [
     ("scorecard/", "monthly", "0.6"),
     ("noteforge/", "monthly", "0.7"),
     ("demos/", "weekly", "0.8"),
+    ("demos/engineering-daily/", "daily", "0.7"),
     ("demos/frame-sync.html", "monthly", "0.8"),
     ("demos/fault-finding.html", "monthly", "0.8"),
     # hat-in-ring/ is a noindex handoff; production lives at hatinring.com.

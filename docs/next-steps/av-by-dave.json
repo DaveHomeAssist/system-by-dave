@@ -1,5 +1,17 @@
 {
   "id": "house-reference",
+  "engineeringDailyUx": {
+    "date": "2026-10-28",
+    "state": "Implemented and browser verified; exact publication evidence belongs to the Pages deployment for this revision",
+    "scope": "UX-01 filtered selection recovery, UX-02 complete Summary, UX-03 model feedback beside Controls; calendar and all 21 lessons retained",
+    "route": "https://systembydave.com/demos/engineering-daily/",
+    "entryGate": "Demos hub uses the existing subject reader, complete text pages, neutral light/dark themes and the archive preference key; entry and return are checked across six viewports and both themes without changing the simulations.",
+    "source": "demos/engineering-daily/release.json",
+    "refresh": "node scripts/sync_engineering_daily.cjs with the verified authoring archive path; public snapshot is not an automatic feed",
+    "next": "Refresh the public snapshot after verified authoring changes; retain physical device and human acceptance as separate evidence",
+    "releaseReview": "https://github.com/DaveHomeAssist/system-by-dave/pull/377",
+    "boundaries": "Physical device and human acceptance remain separate. Existing demo, Instagram and provider decisions are preserved."
+  },
   "name": "AV by Dave (video engineering concept demos → Instagram page)",
   "status": "amber",
   "head": "DaveHomeAssist/system-by-dave main aec4f98; demos/ in that repo is the source of truth (served at systembydave.com/demos/)",

@@ -71,6 +71,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://systembydave.com/demos/engineering-daily/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://systembydave.com/demos/frame-sync.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

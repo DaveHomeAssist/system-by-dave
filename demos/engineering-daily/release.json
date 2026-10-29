@@ -1,0 +1,302 @@
+{
+  "schema": 1,
+  "sourceSha256": "18ad6b1a07b605bb95434d5edb4c646d5993824770b2fd9fbfad9132667476d6",
+  "publicSha256": "b17f6cdc20abc35d370cee0b7e170b57f27f828e856e97e77af53327e80a367d",
+  "editions": 21,
+  "files": [
+    {
+      "name": "Edition 021.svg",
+      "id": 21,
+      "date": "2026-10-28",
+      "title": "Timecode versus genlock",
+      "sha256": "f0cf5472bd096d40fba2a2364c00b053f6c3f876602daca4caf2ac951394ee42"
+    },
+    {
+      "name": "Edition 021.png",
+      "id": 21,
+      "date": "2026-10-28",
+      "title": "Timecode versus genlock",
+      "sha256": "42b13d8156b6d5e4a7a44f0569b710fb030f5c584e570406c55b5bba1e82158c"
+    },
+    {
+      "name": "Edition 020.svg",
+      "id": 20,
+      "date": "2026-10-27",
+      "title": "Chroma sampling and fine text",
+      "sha256": "313cbc7b59050e85dd31fe4c56a1662747b12a7d0780d9934b942731d35b0ba8"
+    },
+    {
+      "name": "Edition 020.png",
+      "id": 20,
+      "date": "2026-10-27",
+      "title": "Chroma sampling and fine text",
+      "sha256": "3c9951bdc38e24ef0d9857bcac15ad41fb047d0525775cfde22d7b03a91ff753"
+    },
+    {
+      "name": "Edition 019.svg",
+      "id": 19,
+      "date": "2026-10-26",
+      "title": "SDI reclocking rate coverage",
+      "sha256": "3d0605e43d7227622984cc04466a5e610c40feba323ac375fa26508a5aa2196e"
+    },
+    {
+      "name": "Edition 019.png",
+      "id": 19,
+      "date": "2026-10-26",
+      "title": "SDI reclocking rate coverage",
+      "sha256": "8824420cdd7ad8dea6e9af723988f9a9c07cd2785fe2a7745e668259f3ff348f"
+    },
+    {
+      "name": "Edition 018.svg",
+      "id": 18,
+      "date": "2026-10-25",
+      "title": "NDI discovery and media paths",
+      "sha256": "befb2f6b9a57283650a84d51365acd373f911afed134b2d73d25160e0cfcea1d"
+    },
+    {
+      "name": "Edition 018.png",
+      "id": 18,
+      "date": "2026-10-25",
+      "title": "NDI discovery and media paths",
+      "sha256": "b2845e8c10d308a8821cd418f2f88a7b751561a9453894b03a585d94ae02449d"
+    },
+    {
+      "name": "Edition 017.svg",
+      "id": 17,
+      "date": "2026-10-24",
+      "title": "Projection throw ratio",
+      "sha256": "6a8b5e11a6ffe582789125ba8a473ea7714cc55d097315fd05fee9d9797f0c8a"
+    },
+    {
+      "name": "Edition 017.png",
+      "id": 17,
+      "date": "2026-10-24",
+      "title": "Projection throw ratio",
+      "sha256": "6900aa0009ba5c8833a11c8c2adf37f7f7fc537fe9e98d313b906dba71d4a135"
+    },
+    {
+      "name": "Edition 016.svg",
+      "id": 16,
+      "date": "2026-10-23",
+      "title": "Drop-frame timecode numbering",
+      "sha256": "1102376a0e22e640aee29ecf9a7b1ac6a0d04832599913923a8e4198c2e846db"
+    },
+    {
+      "name": "Edition 016.png",
+      "id": 16,
+      "date": "2026-10-23",
+      "title": "Drop-frame timecode numbering",
+      "sha256": "b7af16f361059fe2583050941e781f00220aee45fb5a3c407d953473b38a9238"
+    },
+    {
+      "name": "Edition 015.svg",
+      "id": 15,
+      "date": "2026-10-22",
+      "title": "Optical link power budget",
+      "sha256": "e0eb088910fa013ac44eaf81692b06c41b752c3cbf4813ec06002d75c7a22752"
+    },
+    {
+      "name": "Edition 015.png",
+      "id": 15,
+      "date": "2026-10-22",
+      "title": "Optical link power budget",
+      "sha256": "161a0348ea20a864cb89349501a8a8ec84421e694574ae0a88660874b9d49e95"
+    },
+    {
+      "name": "Edition 014.svg",
+      "id": 14,
+      "date": "2026-10-21",
+      "title": "Progressive segmented frame transport",
+      "sha256": "594059936b97a8e88b5ea54a269d00448bc457ad8fb260bddfd7d7cd78f7ff8f"
+    },
+    {
+      "name": "Edition 014.png",
+      "id": 14,
+      "date": "2026-10-21",
+      "title": "Progressive segmented frame transport",
+      "sha256": "eac0ded11743e854cce2629ce3c6edeb9c3f420be7f1def87f28d73ff4242e2b"
+    },
+    {
+      "name": "Edition 013.svg",
+      "id": 13,
+      "date": "2026-10-20",
+      "title": "BT.709 signal ranges",
+      "sha256": "81cfa7bfe06cdcdebc5648664d79109facc3eaef7de72e03bb7e966b5d45965a"
+    },
+    {
+      "name": "Edition 013.png",
+      "id": 13,
+      "date": "2026-10-20",
+      "title": "BT.709 signal ranges",
+      "sha256": "3a6be71265217f2867527dc6b1c89b0b0053445d32840c55a2ee9e9c905c0f20"
+    },
+    {
+      "name": "Edition 012.svg",
+      "id": 12,
+      "date": "2026-10-19",
+      "title": "10-bit 4:2:2 data rate",
+      "sha256": "3eeb96ab9717945bbf11950548b83673d9a1600b8d18c9fd3361c894cf8bf523"
+    },
+    {
+      "name": "Edition 012.png",
+      "id": 12,
+      "date": "2026-10-19",
+      "title": "10-bit 4:2:2 data rate",
+      "sha256": "92d07d9b6b17a5294c69907279c65bc1e8857bd92fe9c3ab2777f5420957c3c6"
+    },
+    {
+      "name": "Edition 011.svg",
+      "id": 11,
+      "date": "2026-10-18",
+      "title": "12G-SDI interface and image mapping",
+      "sha256": "fa2cb9ae6b59a6e3113324719f8a7b71e8789e242d38db2c9b00f3f9453698cc"
+    },
+    {
+      "name": "Edition 011.png",
+      "id": 11,
+      "date": "2026-10-18",
+      "title": "12G-SDI interface and image mapping",
+      "sha256": "2f4998f3db1af6dbb0b6c41ad7b3cbe61f8628c54faecf647d40dba102a3a0d5"
+    },
+    {
+      "name": "Edition 010.svg",
+      "id": 10,
+      "date": "2026-10-17",
+      "title": "SDI equalizer reach",
+      "sha256": "76358afee0ff08a8845246e86eab8e1d3df18d6c9272b1415dea54b33990c7c5"
+    },
+    {
+      "name": "Edition 010.png",
+      "id": 10,
+      "date": "2026-10-17",
+      "title": "SDI equalizer reach",
+      "sha256": "806b886f3b4469fd89b89ba26c8cce5f2a13dc41f99b02be27d5ed98f20d15a3"
+    },
+    {
+      "name": "Edition 009.svg",
+      "id": 9,
+      "date": "2026-10-16",
+      "title": "Frame synchronizer latency",
+      "sha256": "66080171bc34f958953c1ab0aba51137d3fceed0a0bbddf291607d0e417081f1"
+    },
+    {
+      "name": "Edition 009.png",
+      "id": 9,
+      "date": "2026-10-16",
+      "title": "Frame synchronizer latency",
+      "sha256": "9461f4a0f5c22edd1c4f432f6fe60ff31268e37267078564913b7cd7a6112e66"
+    },
+    {
+      "name": "Edition 008.svg",
+      "id": 8,
+      "date": "2026-10-15",
+      "title": "EDID changes and source detection",
+      "sha256": "b5facf9e118f9ae8d95ccb2eaa4e86a8e11d0e39eff7fc1586c690e3ebc29924"
+    },
+    {
+      "name": "Edition 008.png",
+      "id": 8,
+      "date": "2026-10-15",
+      "title": "EDID changes and source detection",
+      "sha256": "73b0bfd9cf57a4dff440eb55a7a034e203bf594d4fe0703cc63d1a7f17c85b09"
+    },
+    {
+      "name": "Edition 007.svg",
+      "id": 7,
+      "date": "2026-10-14",
+      "title": "ST 2022-7 packet redundancy",
+      "sha256": "2913797b8c5fcdbbe9210d23a869634b2595d2e7b60dcff712411af8b0da20bf"
+    },
+    {
+      "name": "Edition 007.png",
+      "id": 7,
+      "date": "2026-10-14",
+      "title": "ST 2022-7 packet redundancy",
+      "sha256": "a1f1ca896dee0d68e80879235c76020ff980d25ea14550a36c96d07e9909a9a6"
+    },
+    {
+      "name": "Edition 006.svg",
+      "id": 6,
+      "date": "2026-10-14",
+      "title": "3G-SDI mapping levels",
+      "sha256": "29dee36cd8de87fef5cc97054426183f320926fec50d0518de96f2dd75d07008"
+    },
+    {
+      "name": "Edition 006.png",
+      "id": 6,
+      "date": "2026-10-14",
+      "title": "3G-SDI mapping levels",
+      "sha256": "9183cef4687ccecfad62624a29d90592e733ad51f165d9f1c75d34f36378c163"
+    },
+    {
+      "name": "Edition 005.svg",
+      "id": 5,
+      "date": "2026-10-13",
+      "title": "HDMI cable and device capabilities",
+      "sha256": "938ebe9d9d4cbe4dc59809d39065d226e1480deeb434a2f781248efc1524ef84"
+    },
+    {
+      "name": "Edition 005.png",
+      "id": 5,
+      "date": "2026-10-13",
+      "title": "HDMI cable and device capabilities",
+      "sha256": "7a002b3cb767b14ca3b9470ef0e1b64614f56377ec7c09f49828dea679195151"
+    },
+    {
+      "name": "Edition 004.svg",
+      "id": 4,
+      "date": "2026-10-12",
+      "title": "PQ and HLG transfer functions",
+      "sha256": "ac7218e0c5da9eec97bf38f3a112a43cd89c482d063a03f02f69c20b603e2c8b"
+    },
+    {
+      "name": "Edition 004.png",
+      "id": 4,
+      "date": "2026-10-12",
+      "title": "PQ and HLG transfer functions",
+      "sha256": "2aff4fcae7efdaff33edb7e8e7a931b9f2e94cdcee28adaaa7fd0798f3dee2e8"
+    },
+    {
+      "name": "Edition 003.svg",
+      "id": 3,
+      "date": "2026-10-11",
+      "title": "RTP timestamps at 59.94 fps",
+      "sha256": "d414ecc52fea72db73ea0e0a3859a3ecb04e21b31bfbfd074f14226317a6597c"
+    },
+    {
+      "name": "Edition 003.png",
+      "id": 3,
+      "date": "2026-10-11",
+      "title": "RTP timestamps at 59.94 fps",
+      "sha256": "853b84aeb08cc7419fd70f3bab7b0bf5d2edd9c4a6dee52b096b2cb4104ed1cd"
+    },
+    {
+      "name": "Edition 002.svg",
+      "id": 2,
+      "date": "2026-10-10",
+      "title": "HDCP status indicators",
+      "sha256": "96442639d882d90d96531c3cc9eea950283188c039b08fa51e8789d231edfb19"
+    },
+    {
+      "name": "Edition 002.png",
+      "id": 2,
+      "date": "2026-10-10",
+      "title": "HDCP status indicators",
+      "sha256": "494cff5b3642067c2d04571624777d77f3d3441333952cbac9586a201b7f293f"
+    },
+    {
+      "name": "Edition 001.svg",
+      "id": 1,
+      "date": "2026-10-09",
+      "title": "PTP timing in SMPTE ST 2110",
+      "sha256": "d1f6ab49ba03cc5d6f012faff6ff33c333feffe796ec86b9ef8841d17d0e67a4"
+    },
+    {
+      "name": "Edition 001.png",
+      "id": 1,
+      "date": "2026-10-09",
+      "title": "PTP timing in SMPTE ST 2110",
+      "sha256": "58db8e58d18323aa1870616a9421a3eb749d13b18dcd30bf290e1d5b59f0d29c"
+    }
+  ]
+}

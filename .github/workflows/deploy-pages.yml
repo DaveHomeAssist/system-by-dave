@@ -85,6 +85,8 @@ jobs:
           curl --silent --fail http://127.0.0.1:8000/av/ >/dev/null
           node scripts/probe_av_themes.js
           node scripts/probe_led_wall_configurator.js
+          node scripts/probe_engineering_daily.cjs
+          node scripts/probe_engineering_entry.cjs
 
       - name: Verify ATEM switcher guide
         env:

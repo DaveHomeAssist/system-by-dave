@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">10-bit 4:2:2 data rate</title><desc id="desc">Two horizontal pixels contain two Y samples and one Cb/Cr pair. Four 10-bit samples occupy 40 bits: 20 bits per pixel on average. Grouping schematic, not a spatial sampling plot.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 012</text>
+<text x="108" y="228" font-size="54" class="story-title">10-bit 4:2:2 data rate</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect width="240" height="400" rx="8" class="canvas"/><text x="12" y="26" class="diagram-index">12</text><text x="48" y="26" class="diagram-heading">COUNT SAMPLES</text><path d="M12 40H228" class="rule"/><text x="120" y="64" text-anchor="middle">Two adjacent pixels</text><rect x="28" y="78" width="80" height="46" rx="6" class="blue-packet"/><rect x="132" y="78" width="80" height="46" rx="6" class="blue-packet"/><text x="68" y="107" text-anchor="middle" class="blue-label">Y0</text><text x="172" y="107" text-anchor="middle" class="blue-label">Y1</text><text x="120" y="151" text-anchor="middle">One chroma pair</text><rect x="28" y="165" width="80" height="42" rx="6" class="amber-packet"/><rect x="132" y="165" width="80" height="42" rx="6" class="amber-packet"/><text x="68" y="192" text-anchor="middle" class="note">Cb</text><text x="172" y="192" text-anchor="middle" class="note">Cr</text><path d="M68 207V228H172V207M120 228V246" class="reference"/><rect x="14" y="252" width="50" height="40" rx="6" class="amber-packet"/><rect x="68" y="252" width="50" height="40" rx="6" class="blue-packet"/><rect x="122" y="252" width="50" height="40" rx="6" class="amber-packet"/><rect x="176" y="252" width="50" height="40" rx="6" class="blue-packet"/><text x="39" y="278" text-anchor="middle">Cb</text><text x="93" y="278" text-anchor="middle">Y0</text><text x="147" y="278" text-anchor="middle">Cr</text><text x="201" y="278" text-anchor="middle">Y1</text><text x="120" y="320" text-anchor="middle">4 × 10 = 40 bits</text><rect x="20" y="338" width="200" height="42" rx="6" class="result"/><text x="120" y="365" text-anchor="middle" class="good-label">20 bits / pixel</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">Two horizontal pixels contain two Y</text>
+<text x="108" y="1558" font-size="40" class="story-caption">samples and one Cb/Cr pair. Four</text>
+<text x="108" y="1610" font-size="40" class="story-caption">10-bit samples occupy 40 bits: 20</text>
+<text x="108" y="1662" font-size="40" class="story-caption">bits per pixel on average. Grouping</text>
+<text x="108" y="1714" font-size="40" class="story-caption">schematic, not a spatial sampling</text>
+<text x="108" y="1766" font-size="40" class="story-caption">plot.</text>
+<a href="https://www.rfc-editor.org/rfc/rfc4175.html"><text x="108" y="1808" font-size="28" class="story-source">IETF RFC 4175, sections 2, 3 and 4.3</text></a>
+</svg>

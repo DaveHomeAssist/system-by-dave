@@ -5,6 +5,14 @@
 - Contain React render failures at the main AV console root with an accessible recovery screen and manual reload. Saved plans, workspace data and routes are preserved.
 - Verify the real boundary with a deliberately failing child, keyboard focus, theme controls and phone through ultrawide containment. Standalone application roots remain outside this repair; diagnostic capture and reporting remain pending.
 
+## 2026-10-28: Engineering daily archive
+
+- Keep the demos entry and return hub inside the viewport with the existing subject reader, shared neutral light and dark preferences, complete text pagination and direct archive entry. Preserve the existing demo content and links.
+
+- Publish the calendar based Video Engineering Daily reference archive alongside AV demos, with 21 sourced editions and their diagram and story assets.
+- Keep selected editions understandable across filtered views, combine the core lesson in Summary, and expose model condition and output beside Signal lab controls.
+- Add a reproducible export with metadata, asset validation and content hashes. The authoring archive remains separate from the public snapshot.
+
 ## 2026-10-27: Offline console recovery
 
 - Return offline recovery links and cached navigation fallback to the native AV console. Retired Toolbox and Show Console redirect pages are not cached.
