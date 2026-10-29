@@ -286,7 +286,7 @@ html[data-sbd-embed="panel"] .sbd-site-header {
   }
 }
 
-/* Global header Menu button: shown by sbd-public-nav.js below 480px only. */
+/* Global header Menu button: the public nav script shows it below 480px only. */
 .sbd-site-menu {
   display: none;
   align-items: center;
