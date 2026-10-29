@@ -48,8 +48,15 @@
 .console-menu-note{font-size:11px}
 .console-groups{display:flex;gap:4px}
 .console-groups button{flex:1;background:transparent}
-.console-groups button[aria-pressed=true]{border-color:var(--av-accent);background:var(--av-accent-soft)}
-.console-choices{display:flex;flex-direction:column;gap:6px}
+.console-groups button[aria-current=true]{border-color:var(--av-accent);background:var(--av-accent-soft)}
+.console-sub{display:flex;align-items:center;gap:10px;min-width:0}
+.console-sub strong{font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.console-back{background:transparent;flex-shrink:0}
+/* The chooser may use the height below where it opened; a long group scrolls
+   inside its own list and the chooser frame stays put. */
+.console-chooser{max-height:calc(100dvh - var(--pop-top,8px) - 8px)}
+.console-choices{display:flex;flex-direction:column;gap:6px;min-height:0;overflow:auto;padding:2px}
+.console-choices>*{flex-shrink:0}
 .console-choices button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:10px 12px;background:var(--av-surface-2)}
 .console-choices button span{font-size:12px;color:var(--av-muted)}
 .console-choices small{font-weight:400}

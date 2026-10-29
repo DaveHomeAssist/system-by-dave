@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-29: Two-step Add panel menu
+
+- Open the Add panel chooser on search and the group tiles only. Picking a tile replaces the tiles with that group's panels, a Back button and the placement preview; Back or Escape returns to the tiles with focus on the tile just left. The active application's tile is marked.
+- Let the chooser use the height below where it opened and scroll only its panel list, so every panel in a group stays reachable (Front Office now shows all five, not two).
+- The retained family hosts share the engine, so they get the same two steps over their Common, Planning and Utilities categories; category tiles that hold no panels are dropped.
+- Rebuild the AV Suite, AV Calculator and Equipment Lab bundles and bump the AV offline cache generation to `v20261029-two-step-panel-chooser`. Panel types, views, layouts and saved documents are unchanged.
+
 ## October 29, 2026
 
 - Redirect the eight original AV family routes into the shared console with

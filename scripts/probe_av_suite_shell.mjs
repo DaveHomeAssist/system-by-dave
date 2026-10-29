@@ -197,6 +197,23 @@ try {
   assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'the ten native departments plus Tools and Gear 3D groups are offered');
   assert.equal(await chooser.getByRole('button', { name: 'Gear 3D', exact: true }).count(), 1, 'remote gear viewers are offered as a Gear 3D group');
   assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 1, 'specialist tools are offered as a Tools group');
+  // Two steps: the group tiles come first, then the picked group's panels replace them.
+  assert.equal(await chooser.locator('.console-choices button').count(), 0, 'no panel choices before a group is picked');
+  assert.equal(await chooser.locator('.console-groups button[aria-current="true"]').textContent(), 'AV Video', 'the active application is marked');
+  await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).count(), 0, 'the other groups leave once one is picked');
+  assert.equal(await chooser.locator('.console-sub strong').textContent(), 'Front Office');
+  assert.equal(await chooser.locator('.console-choices button').count(), 5, 'every Front Office panel is listed');
+  await page.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null); // focus moves to the first panel choice
+  await page.keyboard.press('Escape');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).count(), 1, 'Escape steps back to the groups');
+  await page.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office'); // focus returns to the group just left
+  await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
+  await chooser.getByRole('button', { name: 'Back', exact: true }).click();
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'Back restores every group');
+  await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('fixture');
+  assert.ok(await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).count() >= 1, 'search lists matches across groups');
+  await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('');
   await chooser.getByRole('button', { name: 'Lighting', exact: true }).click();
   await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).click();
   assert.equal(await page.locator('.console-panel[data-app="Lighting"][data-panel="fixtures"]').count(), 1);
