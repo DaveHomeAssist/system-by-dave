@@ -111,7 +111,7 @@ test('runtime loads without a DOM or storage side effect', () => {
   assert.equal(rail.storageKey, 'sbd.rail.v1');
 });
 
-test('missing preferences read the exact nine-console defaults without writing', () => {
+test('missing preferences read the exact ten-console defaults without writing', () => {
   const { rail, registry } = loadRuntime();
   const storage = new MemoryStorage({ unrelated: 'keep' });
   const store = rail.createPreferenceStore({ storage, registry });
@@ -250,7 +250,7 @@ test('storage failures are explicit and preserve unrelated data', () => {
   assert.deepEqual(JSON.parse(blockedWrite.data['sbd.rail.v1']).pinned, Array.from(registry.rail.defaultPinned));
 });
 
-test('standalone renderer exposes nine ordered application links', () => {
+test('standalone renderer exposes ten ordered application links', () => {
   const { rail, registry } = loadRuntime();
   const storage = new MemoryStorage();
   const store = rail.createPreferenceStore({ storage, registry });
@@ -270,7 +270,7 @@ test('standalone renderer exposes nine ordered application links', () => {
     resolveHref: (entry) => `https://avbydave.com/${entry.href}`
   });
 
-  assert.equal(rendered.entries.length, 9);
+  assert.equal(rendered.entries.length, 10);
   assert.deepEqual(Array.from(rendered.entries, (entry) => entry.getAttribute('data-rail-ref')), Array.from(registry.rail.defaultPinned));
   assert.equal(rendered.rail.tagName, 'NAV');
   assert.equal(rendered.rail.getAttribute('aria-label'), 'Applications');
@@ -296,7 +296,8 @@ test('standalone renderer exposes nine ordered application links', () => {
   assert.equal(rendered.entries[5].getAttribute('href'), 'https://avbydave.com/the-shop/');
   assert.equal(rendered.entries[6].getAttribute('href'), 'https://avbydave.com/infrastructure/');
   assert.equal(rendered.entries[7].getAttribute('href'), 'https://avbydave.com/av-lighting/');
-  assert.equal(rendered.entries[8].getAttribute('href'), 'https://avbydave.com/av-calculator.html');
+  assert.equal(rendered.entries[8].getAttribute('href'), 'https://avbydave.com/equipment-lab/');
+  assert.equal(rendered.entries[9].getAttribute('href'), 'https://avbydave.com/av-calculator.html');
   assert.equal(elementsByClass(rendered.shell, 'sbd-rail__toolbox')[0].getAttribute('href'), 'https://avbydave.com/av/');
   assert.equal(rendered.allAppsButton, elementsByClass(rendered.shell, 'sbd-rail__all')[0]);
   assert.equal(rendered.customizeButton, elementsByClass(rendered.shell, 'sbd-rail__customize')[0]);

@@ -1,0 +1,9 @@
+{
+  "basis": "Pinned version 18 in the same 1440x900 Chromium SwiftShader profile; frozen before pilot measurement",
+  "maxTriangles": 65938,
+  "maxDrawCalls": 454,
+  "maxGeometries": 417,
+  "maxTextures": 38,
+  "maxMedianMs": 22.650000035762787,
+  "rationale": "Keep the existing inspection geometry and draw cost; allow 50% timing variance on shared software rendering. No physical-device performance claim."
+}

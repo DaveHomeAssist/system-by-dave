@@ -97,11 +97,12 @@
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
   <span class="sbd-site-return__current" aria-current="page">Was it the cable?</span>
 </nav>
+<h1 class="visually-hidden">Was it the cable? An interactive AV fault-finding demo</h1>
 <div id="fit" tabindex="-1">
   <div id="brand"><i style="background:#C0C000"></i><i style="background:#00C0C0"></i><i style="background:#3DDC97"></i><i style="background:#C000C0"></i><i style="background:#FF3B2F"></i><i style="background:#5AC8FA"></i>&nbsp;AV BY DAVE · 010</div>
 
   <div id="step"><div id="stepNum">STEP 1 OF 7</div><div id="stepText"></div><div id="stepSub"></div></div>
-  <div id="cta">Found it. Now find yours → link in bio</div>
+  <div id="cta" data-reel-text="Found it. Now find yours → link in bio">Found it. Now find yours.</div>
   <div id="receipt">✓ AJA SUPPORT FAQ 7308 · U-TAP · TWO CABLES, TWO PORTS</div>
 
   <div id="chain">
@@ -134,6 +135,10 @@
 (() => {
   const fit = document.getElementById('fit');
   if (/[?&](drive|auto)(=|&|$)/.test(location.search)) document.body.classList.add('capture');
+  // "Link in bio" only makes sense inside the Reel; capture mode (?drive / ?auto) keeps it so
+  // rendered frames are unchanged, and the website says "try it yourself" instead.
+  const inReel = document.body.classList.contains('capture');
+  if (inReel) document.getElementById('cta').textContent = document.getElementById('cta').dataset.reelText;
   const resize = () => { if (window.sbdLayout) return window.sbdLayout(); const s = Math.min(innerWidth/1080, innerHeight/1920); fit.style.transform = `translate(-50%,-50%) scale(${s})`; };
   addEventListener('resize', resize); resize();
   const $ = id => document.getElementById(id);
@@ -267,7 +272,7 @@
     { text: '"IT WAS THE CABLE" IS A GUESS UNTIL YOU <em>PROVE IT.</em>', sub: 'Prove it, then tape the bad part and label it. Future you says thanks.',
       enter() { gsap.to('#receipt', { opacity: 1, duration: 0.5 * D }); later(0.8 * D, () => gsap.fromTo('#tape', { opacity: 0, scale: 1.4, rotation: -8 }, { opacity: 1, scale: 1, rotation: -8, duration: 0.3 * D, ease: 'back.out(2)' })); } },
   ];
-  const endCard = { text: 'PLAY WITH IT. <em>LINK IN BIO.</em>', sub: 'Random fault. Find it in as few moves as you can.', enter() {} };
+  const endCard = { text: inReel ? 'PLAY WITH IT. <em>LINK IN BIO.</em>' : 'PLAY WITH IT. <em>TRY IT YOURSELF.</em>', sub: 'Random fault. Find it in as few moves as you can.', enter() {} };
   let si = -1, cutLabel = null;
   const track = (name, data) => { if (window.sbdTrack && !cutLabel) window.sbdTrack(name, Object.assign({ demo: document.body.dataset.demo }, data || {})); };
   function goStep(i, instant, override) {

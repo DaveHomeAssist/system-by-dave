@@ -194,7 +194,7 @@ try {
   await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   const chooser = page.getByRole('dialog', { name: 'Add panel' });
   assert.deepEqual((await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents()).slice(0, 3), ['AV Video', 'Audio', 'Show Control'], 'chooser groups panels by application');
-  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 11, 'the nine native departments plus Tools and Gear 3D groups are offered');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'the ten native departments plus Tools and Gear 3D groups are offered');
   assert.equal(await chooser.getByRole('button', { name: 'Gear 3D', exact: true }).count(), 1, 'remote gear viewers are offered as a Gear 3D group');
   assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 1, 'specialist tools are offered as a Tools group');
   await chooser.getByRole('button', { name: 'Lighting', exact: true }).click();
@@ -401,7 +401,7 @@ try {
     };
     await openMenu();
     const groups = await menu.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents();
-    assert.equal(groups.length, 11);
+    assert.equal(groups.length, 12);
     const framed = new Set(['Tools', 'Gear 3D']);
     for (const group of groups) {
       await menu.getByRole('button', { name: group, exact: true }).click();
@@ -441,7 +441,7 @@ try {
     assert.equal(await blockedPage.evaluate(() => localStorage.getItem('avCalculator.v1')), null, 'failed autosave is not reported as persisted');
   } finally { await blockedContext.close(); }
   assert.deepEqual(errors, []);
-  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across nine native departments, seven specialist panels and two Gear 3D viewers, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
+  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across ten native departments, seven specialist panels and two Gear 3D viewers, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
 } catch (error) {
   if (process.env.AV_SUITE_EVIDENCE) {
     await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });

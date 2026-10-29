@@ -1,0 +1,1316 @@
+{
+  "schema": "equipment.lab.catalog.v1",
+  "revision": "1.0.0",
+  "compatibility": "ECP-1.0 revision 1.0",
+  "inventoryConfirmed": "2026-10-23",
+  "entries": [
+    {
+      "inventoryId": "N01",
+      "name": "Electro-Voice S-181 (modified, Bauder plate)",
+      "collection": "NNC",
+      "role": "Subwoofer; modified owned-unit study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/s181/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-s181"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-s181-0.js",
+          "sources/nnc/models/assets/nnc-s181-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N02",
+      "name": "Electro-Voice ZLX-15BT (first generation)",
+      "collection": "NNC",
+      "role": "Powered loudspeaker study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/zlx-15bt/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-zlx-15bt"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-zlx-15bt-0.js",
+          "sources/nnc/models/assets/nnc-zlx-15bt-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N03",
+      "name": "QSC GX7",
+      "collection": "NNC",
+      "role": "Two-channel amplifier study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/gx7/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-gx7"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-gx7-0.js",
+          "sources/nnc/models/assets/nnc-gx7-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N04",
+      "name": "QSC GX5",
+      "collection": "NNC",
+      "role": "Two-channel amplifier study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/gx5/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-gx5"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-gx5-0.js",
+          "sources/nnc/models/assets/nnc-gx5-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N05",
+      "name": "Pioneer DJ CDJ-3000",
+      "collection": "NNC",
+      "role": "DJ media player study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/cdj-3000/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-cdj-3000"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-cdj-3000-0.js",
+          "sources/nnc/models/assets/nnc-cdj-3000-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N06",
+      "name": "Pioneer DJ DJM-A9",
+      "collection": "NNC",
+      "role": "DJ mixer study and local control practice",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/djm-a9/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-djm-a9"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-djm-a9-0.js",
+          "sources/nnc/models/assets/nnc-djm-a9-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N07",
+      "name": "Pioneer DJ XDJ-XZ",
+      "collection": "NNC",
+      "role": "DJ system study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/xdj-xz/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-xdj-xz"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-xdj-xz-0.js",
+          "sources/nnc/models/assets/nnc-xdj-xz-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N08",
+      "name": "Denon DJ PRIME 4 (original)",
+      "collection": "NNC",
+      "role": "DJ system study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/prime-4/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-prime-4"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-prime-4-0.js",
+          "sources/nnc/models/assets/nnc-prime-4-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N09",
+      "name": "Cerwin-Vega CVA-118 (CVA-118X)",
+      "collection": "NNC",
+      "role": "Powered subwoofer study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/cva-118/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-cva-118"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-cva-118-0.js",
+          "sources/nnc/models/assets/nnc-cva-118-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N10",
+      "name": "Electro-Voice EKX-15SP",
+      "collection": "NNC",
+      "role": "Powered subwoofer study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/ekx-15sp/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-ekx-15sp"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-ekx-15sp-0.js",
+          "sources/nnc/models/assets/nnc-ekx-15sp-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N11",
+      "name": "Chauvet DJ J-Six",
+      "collection": "NNC",
+      "role": "Lighting effect study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/j-six/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-j-six"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-j-six-0.js",
+          "sources/nnc/models/assets/nnc-j-six-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N12",
+      "name": "ADJ Vertigo Tri LED",
+      "collection": "NNC",
+      "role": "Lighting effect study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/vertigo-tri-led/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-vertigo-tri-led"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-vertigo-tri-led-0.js",
+          "sources/nnc/models/assets/nnc-vertigo-tri-led-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N13",
+      "name": "Chauvet DJ Hurricane Haze 1DX",
+      "collection": "NNC",
+      "role": "Haze machine study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/haze-1dx/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-haze-1dx"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-haze-1dx-0.js",
+          "sources/nnc/models/assets/nnc-haze-1dx-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N14",
+      "name": "X-Laser LaserCube 2W (LC-1000)",
+      "collection": "NNC",
+      "role": "Laser effect study",
+      "notes": "Catalog identity retained; the exact owned variant is not established by this inventory.",
+      "viewUrl": "https://nononsensephilly.com/gear/lasercube-2w/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-lasercube-2w"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-lasercube-2w-0.js",
+          "sources/nnc/models/assets/nnc-lasercube-2w-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N15",
+      "name": "Godox TL60",
+      "collection": "NNC",
+      "role": "Tube light study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/tl60/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-tl60"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-tl60-0.js",
+          "sources/nnc/models/assets/nnc-tl60-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "N16",
+      "name": "Shure SM58",
+      "collection": "NNC",
+      "role": "Handheld microphone study",
+      "notes": "",
+      "viewUrl": "https://nononsensephilly.com/gear/sm58/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "nnc-sm58"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "0.1.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212",
+        "paths": [
+          "sources/nnc/models/assets/nnc-sm58-0.js",
+          "sources/nnc/models/assets/nnc-sm58-catalog.json"
+        ],
+        "state": "unmerged migration input"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "F01",
+      "name": "Blackmagic ATEM Television Studio HD8 ISO",
+      "collection": "FMP standalone",
+      "role": "Video switcher study and local simulation",
+      "notes": "The -0 file packages photo references and -3 supplies browser interaction; neither is another model.",
+      "viewUrl": "https://housevideo.app/fmp/models/atem-hd8-iso.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/models/assets/atem-hd8-iso-2.js",
+          "sources/fmp/models/assets/atem-hd8-iso-1.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "F02",
+      "name": "Blackmagic ATEM Camera Control Panel",
+      "collection": "FMP standalone",
+      "role": "Four-channel camera shading panel study",
+      "notes": "",
+      "viewUrl": "https://housevideo.app/fmp/models/ccu4.html",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "fmp-ccu4"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "1.0.0"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/models/assets/ccu4-0.js",
+          "sources/fmp/models/assets/ccu4-catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "F03",
+      "name": "BirdDog P240",
+      "collection": "FMP standalone",
+      "role": "PTZ camera study and local pose practice",
+      "notes": "",
+      "viewUrl": "https://housevideo.app/fmp/models/p240.html",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "fmp-p240"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.1"
+        },
+        {
+          "field": "revision",
+          "value": "1.0.1"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/models/assets/p240-0.js",
+          "sources/fmp/models/assets/p240-catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "F04",
+      "name": "PTZOptics SuperJoy G1",
+      "collection": "FMP standalone",
+      "role": "PTZ controller study",
+      "notes": "The generated standalone HTML embeds the geometry, catalog and dependencies.",
+      "viewUrl": "https://housevideo.app/fmp/ptz/SuperJoy-G1-Interactive-Guide.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/tools/superjoy/model.js",
+          "sources/fmp/tools/superjoy/catalog.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R01",
+      "name": "Blackmagic URSA Broadcast G2 body",
+      "collection": "FMP rig and fiber",
+      "role": "Camera body in the FMP composite rig",
+      "notes": "body; handle and flip-out LCD belong to the body",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R02",
+      "name": "Fujinon LA16x8BRM-XB1A",
+      "collection": "FMP rig and fiber",
+      "role": "Broadcast lens in the FMP composite rig",
+      "notes": "lens-barrel, hood, focus, zoom, iris, grip and associated controls",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R03",
+      "name": "Blackmagic URSA Studio Viewfinder G2, 7-inch",
+      "collection": "FMP rig and fiber",
+      "role": "Mounted viewfinder",
+      "notes": "viewfinder and vf-* parts",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R04",
+      "name": "Blackmagic Camera Fiber Converter",
+      "collection": "FMP rig and fiber",
+      "role": "Camera-mounted fiber interface",
+      "notes": "camera-fiber and associated fiber-* parts",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R05",
+      "name": "Blackmagic Studio Fiber Converter",
+      "collection": "FMP rig and fiber",
+      "role": "Separate studio-side converter assembly",
+      "notes": "studio-body and studio-* parts; separate models.studio root",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R06",
+      "name": "Vinten-style pan-and-tilt head",
+      "collection": "FMP rig and fiber",
+      "role": "Camera support head",
+      "notes": "fluid-head and its controls; exact head model unidentified",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R07",
+      "name": "Vinten-style tripod legs and bowl",
+      "collection": "FMP rig and fiber",
+      "role": "Camera support",
+      "notes": "tripod; exact leg model unidentified",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R08",
+      "name": "Fujinon FMM-X1 manual focus module",
+      "collection": "FMP rig and fiber",
+      "role": "Lens-mounted accessory model",
+      "notes": "focus-module",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R09",
+      "name": "Handle-mounted zoom demand",
+      "collection": "FMP rig and fiber",
+      "role": "Generic control accessory",
+      "notes": "zoom-demand; exact demand model unidentified",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R10",
+      "name": "Twist-focus grip, mounting clamp and mechanical cable",
+      "collection": "FMP rig and fiber",
+      "role": "Generic control accessory assembly",
+      "notes": "focus-demand, focus-clamp, focus-cable; exact grip model unidentified",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R11",
+      "name": "Twin pan bars and clamps",
+      "collection": "FMP rig and fiber",
+      "role": "Support accessory assembly",
+      "notes": "pan-bars",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R12",
+      "name": "Camera plate and mounting assembly",
+      "collection": "FMP rig and fiber",
+      "role": "Support accessory assembly",
+      "notes": "mount and plate controls",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "R13",
+      "name": "Ground-level spreader",
+      "collection": "FMP rig and fiber",
+      "role": "Support accessory model",
+      "notes": "spreader",
+      "viewUrl": "https://housevideo.app/fmp/rig/index.html",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/fmp-suite",
+        "revision": "541af46c184ad056e141afe6f47ff0d53c9f23f5",
+        "paths": [
+          "sources/fmp/rig/rig-model.js",
+          "sources/fmp/rig/fmp-guide-data.js"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "I01",
+      "name": "ETC Ion (original/classic)",
+      "collection": "Ion Workbench",
+      "role": "Lighting console study",
+      "notes": "buildIon(); rear I/O geometry is in dist/rear-io.js.",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "ion-classic-universal-2x20"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.0"
+        },
+        {
+          "field": "revision",
+          "value": "0.13"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/app.js",
+          "sources/ion/dist/control-catalog.js",
+          "sources/ion/dist/assets/catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "I02",
+      "name": "ETC Universal 2\u00d720 fader wing",
+      "collection": "Ion Workbench",
+      "role": "Lighting console expansion and local fader practice",
+      "notes": "buildWing(); shares the Ion viewer; it is a distinct equipment assembly.",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/#wing-upper-01-fader",
+      "nativeIdentity": [
+        {
+          "field": "guide_id",
+          "value": "ion-classic-universal-2x20"
+        },
+        {
+          "field": "schema_version",
+          "value": "1.0"
+        },
+        {
+          "field": "revision",
+          "value": "0.13"
+        }
+      ],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/app.js",
+          "sources/ion/dist/control-catalog.js",
+          "sources/ion/dist/assets/catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "I03",
+      "name": "ETC SmartFade 1248",
+      "collection": "Ion Workbench",
+      "role": "Lighting console study",
+      "notes": "Selected through ?gear=smartfade1248; buildSmartFade() factory.",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/?gear=smartfade1248",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/equipment/smartfade1248-model.js",
+          "sources/ion/dist/equipment/smartfade1248.js",
+          "sources/ion/dist/assets/smartfade1248-catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "C01",
+      "name": "Fujinon DigiPower 66 / XA66x9.3BESM family",
+      "collection": "Fujinon and Cartoni rig",
+      "role": "Box lens; principal model",
+      "notes": "lens.*; exact photographed unit suffix remains unknown",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/camera/#lens.housing",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/camera/model.js",
+          "sources/ion/dist/camera/catalog.js",
+          "sources/ion/dist/camera/catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "C02",
+      "name": "Cartoni Maxima 30",
+      "collection": "Fujinon and Cartoni rig",
+      "role": "Fluid head; principal model",
+      "notes": "head.* excluding the separately listed pan-bar/accessory group",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/camera/#head.tiltDrag",
+      "nativeIdentity": [],
+      "migration": "native-pilot",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/camera/model.js",
+          "sources/ion/dist/camera/catalog.js",
+          "sources/ion/dist/camera/catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "glb",
+        "base": "models/cartoni.maxima30.reference/",
+        "manifest": "cartoni.maxima30.manifest.json"
+      }
+    },
+    {
+      "inventoryId": "C03",
+      "name": "Generic Panasonic broadcast camera body",
+      "collection": "Fujinon and Cartoni rig",
+      "role": "Context model",
+      "notes": "camera.body; keep generic as requested",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/camera/#camera.body",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "generic",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/camera/model.js",
+          "sources/ion/dist/camera/catalog.js",
+          "sources/ion/dist/camera/catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      },
+      "identity": {
+        "manufacturer": "Panasonic",
+        "model": "unknown",
+        "geometry": "generic"
+      }
+    },
+    {
+      "inventoryId": "C04",
+      "name": "Generic studio viewfinder",
+      "collection": "Fujinon and Cartoni rig",
+      "role": "Context model",
+      "notes": "camera.finder; no exact device identity asserted",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/camera/#camera.finder",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "generic",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/camera/model.js",
+          "sources/ion/dist/camera/catalog.js",
+          "sources/ion/dist/camera/catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "C05",
+      "name": "Generic lens support cradle",
+      "collection": "Fujinon and Cartoni rig",
+      "role": "Support context model",
+      "notes": "support.cradle",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/camera/#support.cradle",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "generic",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/camera/model.js",
+          "sources/ion/dist/camera/catalog.js",
+          "sources/ion/dist/camera/catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "C06",
+      "name": "Generic tripod",
+      "collection": "Fujinon and Cartoni rig",
+      "role": "Support context model",
+      "notes": "support.tripod",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/camera/#support.tripod",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "generic",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/camera/model.js",
+          "sources/ion/dist/camera/catalog.js",
+          "sources/ion/dist/camera/catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    },
+    {
+      "inventoryId": "C07",
+      "name": "Pan bars, rosettes and generic lens demand units",
+      "collection": "Fujinon and Cartoni rig",
+      "role": "Control/support accessory assembly",
+      "notes": "head.panBars; demand units are generic visual context",
+      "viewUrl": "https://ion-workbench.davein4k.chatgpt.site/camera/#head.panBars",
+      "nativeIdentity": [],
+      "migration": "cataloged",
+      "geometryConfidence": "generic",
+      "source": {
+        "repository": "Ion Workbench Site",
+        "revision": "26108848220775fe258d1aa6b66c716877ed855c",
+        "paths": [
+          "sources/ion/dist/camera/model.js",
+          "sources/ion/dist/camera/catalog.js",
+          "sources/ion/dist/camera/catalog.json"
+        ],
+        "state": "pinned source"
+      },
+      "representation": {
+        "kind": "procedural",
+        "access": "existing-viewer"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1103 @@
+{
+  "schema": "equipment.reference.acceptance.v1",
+  "revision": "1.0.0",
+  "assetId": "C02",
+  "result": "qualified for approximate inspection in the recorded Ion software profile",
+  "summary": {
+    "pass": 58,
+    "notApplicable": 2,
+    "fail": 0,
+    "notEvaluated": 0
+  },
+  "reviewedAt": "2026-10-23T11:01:41.996Z",
+  "owner": "Ion asset maintainer",
+  "physicalAcceptance": "Not claimed; future physical review owner: Dave",
+  "realDeviceAcceptance": "Not claimed; recorded viewport sizes are browser emulations",
+  "familyRemediation": "C02 only; remaining 42 entries unchanged",
+  "proof": {
+    "result": "pass",
+    "time": "2026-10-23T11:01:41.996Z",
+    "validator": "2.0.0-dev.3.10",
+    "headIDs": 10,
+    "rigIDs": 23,
+    "pointerPicks": 10,
+    "viewportCases": 40,
+    "resourceCycles": 5,
+    "frameMaxError": 2.449293598294707e-16,
+    "physicalAcceptance": false,
+    "realDeviceAcceptance": false
+  },
+  "metrics": {
+    "meshes": 145,
+    "triangles": 32508,
+    "materials": 145,
+    "textures": 22,
+    "semanticOwned": 80,
+    "decorativeOwned": 65,
+    "unowned": 0,
+    "glbBytes": 3075048
+  },
+  "validator": {
+    "version": "2.0.0-dev.3.10",
+    "errors": 0,
+    "warnings": 0,
+    "infos": 143,
+    "informationalInterpretation": "123 unused untextured UV channels retained intentionally; 20 non-power-of-two label images supported by the qualified consumer."
+  },
+  "checks": [
+    {
+      "id": "Q01",
+      "area": "Identity",
+      "requirement": "Record C02 scope, native rig identity and separate C01/C03–C07 context.",
+      "evidence_required": "Manifest and inclusion/exclusion list.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R01",
+        "R09"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "C02 is the head only; C01 and C03–C07 are explicit exclusions. All context remains separate in Ion.",
+      "evidence": "cartoni.maxima30.manifest.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q02",
+      "area": "Identity",
+      "requirement": "Pin source, native definition, generator, adapter and consumer revisions.",
+      "evidence_required": "Revision/hash receipt with owning paths.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R01",
+        "R09",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Source file hashes pin generator, catalog, adapter, runtime and consumer. Native catalog is 1.2.0; adapter/package are 1.0.0. Delivery commit is recorded separately.",
+      "evidence": "cartoni.maxima30.manifest.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q03",
+      "area": "Identity",
+      "requirement": "Preserve the ten existing head IDs and unresolved exact variants.",
+      "evidence_required": "Catalog comparison and portable component map.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R01",
+        "R02"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "All ten original head IDs and all 23 rig IDs survive. Exact Fujinon unit variant remains unknown.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q04",
+      "area": "Evidence",
+      "requirement": "Record sources, rights and status for identity, location, function and dimensions separately.",
+      "evidence_required": "Per-claim evidence and provenance record.",
+      "owner_role": "Evidence reviewer",
+      "rule_refs": [
+        "R01",
+        "R09"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Manufacturer identity/function, approximate photo-informed layout, unmeasured dimensions, original geometry and generated-label rights are recorded separately. Reference photos/drawings are not redistributed.",
+      "evidence": "cartoni.maxima30.definition.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q05",
+      "area": "Evidence",
+      "requirement": "Separate nominal dimensions, modeled bounds and measured dimensions; resolve discrepancies for each claimed use.",
+      "evidence_required": "Dimension table with axes, pose, source and applicable tolerance.",
+      "owner_role": "Evidence reviewer",
+      "rule_refs": [
+        "R01",
+        "R03",
+        "R04"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Only modeled bounds are reported. Nominal head dimensions and physical measurements are null. No tolerance or measured-fit claim is made.",
+      "evidence": "cartoni.maxima30.definition.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q06",
+      "area": "Generic context",
+      "requirement": "Keep Panasonic model unknown and body generic, with no inferred switch map, connectors, mass or center of gravity.",
+      "evidence_required": "Catalog, manifest and UI/context wording inspection.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R01",
+        "R07"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Panasonic model remains unknown/generic. Body and finder geometry, material, label-pixel and rounded world-transform fingerprints match the baseline.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q07",
+      "area": "Consumer",
+      "requirement": "Name the intended consumer and inspection role, with producer/consumer responsibilities.",
+      "evidence_required": "Consumer profile and owner roles.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R09",
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Ion /camera/ is the actual consumer; Ion owns generator, adapter, package and software qualification. Physical acceptance remains a separate owner decision.",
+      "evidence": "README.md",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q08",
+      "area": "Naming",
+      "requirement": "Selectable group names equal existing component IDs; stable metadata resolves selection.",
+      "evidence_required": "Group/name/metadata comparison for all ten controls.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R02"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Component groups retain exact existing IDs. Import restores dotted names from nodeName extras and resolves componentId metadata.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q09",
+      "area": "Naming",
+      "requirement": "Name every delivered mesh/node deterministically and without ambiguous collisions.",
+      "evidence_required": "Node-name inventory and duplicate-name review.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R02"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "All 145 mesh names and all delivered node names are nonempty and collision checked. Structural groups and moving joints have explicit names.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q10",
+      "area": "Naming",
+      "requirement": "Name unique and shared geometry resources according to the reference convention.",
+      "evidence_required": "Geometry resource inventory with ownership/sharing.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R02"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "145 geometry buffers use their owning mesh name plus .geometry. No shared geometry resource is introduced.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q11",
+      "area": "Naming",
+      "requirement": "Name materials and textures by role; instance sharing is deliberate.",
+      "evidence_required": "Resource name/role inventory.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R02",
+        "R06"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "145 materials and 22 textures have deterministic owner/role names. Per-mesh material ownership preserves independent highlighting and disposal.",
+      "evidence": "cartoni.maxima30.definition.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q12",
+      "area": "Ownership",
+      "requirement": "Classify every drawable as component-owned, asset-owned decoration or excluded helper.",
+      "evidence_required": "Coverage report, including the baseline 65 unowned meshes.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R01",
+        "R02",
+        "R08"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "80 meshes belong to semantic components; 65 belong to C02 decoration/structure; zero drawables are unowned. Decoration does not receive invented control IDs.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q13",
+      "area": "Identity",
+      "requirement": "Preserve saved component references and any required aliases through rebuild/export/reload.",
+      "evidence_required": "Before/after ID comparison and saved-reference exercise.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R02",
+        "R09",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "The same ten IDs survive source build, GLB import, second export/import and viewer reload. No aliases or ID migration are needed.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q14",
+      "area": "Geometry",
+      "requirement": "All positions, required attributes and indices are valid; normals support the intended shading.",
+      "evidence_required": "Geometry report plus rendered normal/shading review.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R03"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Khronos validation has zero errors/warnings; attributes are finite, normals present, indices valid. Source and imported topology agree.",
+      "evidence": "evidence/gltf-validation.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q15",
+      "area": "Geometry",
+      "requirement": "Remove unintended degenerate triangles and duplicate faces.",
+      "evidence_required": "Per-representation topology report with method and tolerance.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R03"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Zero degenerate triangles and duplicate faces at the recorded per-buffer weld tolerance.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q16",
+      "area": "Topology",
+      "requirement": "Declare closed shells versus intentional open/assembly surfaces and assess non-manifold edges/vertices against that role.",
+      "evidence_required": "Surface-role list and topology exceptions.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R03"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Rigid solids have no unintended boundary or non-manifold edges/vertices. The 22 decal planes account for 88 intentional boundary edges. Vertex links are checked and calibrated; assemblies are not claimed to be a single watertight manufacturing mesh.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q17",
+      "area": "Fidelity",
+      "requirement": "Verify silhouette, casing, plate and front/side/rear control placement in comparable reference views.",
+      "evidence_required": "Annotated comparison views with uncertainty retained.",
+      "owner_role": "Evidence reviewer",
+      "rule_refs": [
+        "R01",
+        "R03"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Front, side, rear and overview renders preserve the photo-informed casting, plate and recognizable control positions. Comparison is an approximate inspection review, not photogrammetry or dimensional certification.",
+      "evidence": "evidence/visual-review.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q18",
+      "area": "Geometry hygiene",
+      "requirement": "Resolve accidental loose geometry and unused buffer entries without damaging intended seams or primitives.",
+      "evidence_required": "Before/after counts and documented retained cases.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R03",
+        "R08"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Zero loose/unused position-buffer vertices. Seams, split normals and independent rigid parts remain intentional.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q19",
+      "area": "Counts",
+      "requirement": "Record meshes, unique buffers, triangles, instances, materials, textures and hidden variants separately.",
+      "evidence_required": "Metrics for exact exported subset and representative consumer scene.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R03",
+        "R08",
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "145 meshes/buffers/materials, 32,508 triangles, 71,023 attribute vertices, 22 textures; no instanced meshes, hidden variants, bones, skins or clips.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q20",
+      "area": "Budgets",
+      "requirement": "Set numerical limits from representative consumer profiling, not Task 2 counts alone.",
+      "evidence_required": "Named profile with measurements, limits and acceptance.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R03",
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Numerical scene budgets were frozen from the pinned version 18 consumer profile before pilot measurement; draw/resource limits are unchanged and timing allows documented software-renderer variance.",
+      "evidence": "evidence/consumer-profile.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q21",
+      "area": "LOD",
+      "requirement": "Keep one inspection representation; any added LOD/reduced variant has measured need and preserved semantics.",
+      "evidence_required": "No-LOD declaration or variant benefit/switch/identity evidence.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R03",
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "One inspection representation. Its measured scene profile meets budget; no LOD or reduced proxy is justified for this qualified consumer.",
+      "evidence": "evidence/consumer-profile.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q22",
+      "area": "Units",
+      "requirement": "Declare native units, axes, forward direction and origin without guessing unknown source units.",
+      "evidence_required": "Definition and coordinate mapping record.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R04"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Native meters, +Y up, -Z forward and tilt-axis origin are declared from the authored source.",
+      "evidence": "cartoni.maxima30.definition.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q23",
+      "area": "Units",
+      "requirement": "Convert to meters once and verify mapped bounds/landmarks after reload.",
+      "evidence_required": "Source/export/import coordinate comparison.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R04",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Meters are retained once. Native and imported world bounds match, and three articulated poses match within 1e-6.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q24",
+      "area": "Origins",
+      "requirement": "Record the native tilt-axis datum, exported base datum, joint/mount offsets and inverse mapping.",
+      "evidence_required": "Datum diagram or coordinate table and transformation matrix.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R04",
+        "R07"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Portable origin is the base contact plane on the pan axis. The native/base offset is 0.205 modeled meters, with explicit transform and inverse, tilt datum and payload mount.",
+      "evidence": "cartoni.maxima30.definition.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q25",
+      "area": "Axes",
+      "requirement": "Map native -Z forward to package +Z front without mirroring equipment left/right.",
+      "evidence_required": "Landmark/axis checks in native and imported views.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R04"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "The 180-degree Y rotation maps -Z to +Z. Matrix determinant is +1, inverse multiplies to identity, and control-side selection survives.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q26",
+      "area": "Transforms",
+      "requirement": "Export neutral root identity while preserving articulated child transforms and explicit instance transforms.",
+      "evidence_required": "Hierarchy/transform comparison and movement exercise.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R04",
+        "R07"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Portable root is identity; a named frame carries conversion. Neutral child TRS and relative quaternion joint rotations survive import without Euler decomposition errors.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q27",
+      "area": "UVs",
+      "requirement": "All UV-dependent textures use finite usable UVs; missing/collapsed mappings are resolved.",
+      "evidence_required": "UV attribute/channel report and texture inspection.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R05"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "All 145 buffers retain finite UVs, with zero collapsed UV triangles and no textured mesh lacking UVs.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q28",
+      "area": "UVs",
+      "requirement": "Record intentional overlap, repetition and out-of-range UVs with correct sampler behavior.",
+      "evidence_required": "UV exception list and rendered evidence.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R05"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "5,679 exact UV overlaps and 36,821 out-of-range references are intentional primitive mappings on untextured rigid surfaces. Labels use individual 0–1 mappings and clamp samplers. No bake/atlas packing claim is made.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q29",
+      "area": "UVs",
+      "requirement": "Check label orientation, seams and coverage at intended inspection distance.",
+      "evidence_required": "Closest-view and seam captures in the consumer.",
+      "owner_role": "Evidence reviewer",
+      "rule_refs": [
+        "R05",
+        "R06"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Front/side/rear label orientation and coverage were visually reviewed at inspection scale. Small viewports use the semantic inspector and zoom for fine print.",
+      "evidence": "evidence/visual-review.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q30",
+      "area": "Baking",
+      "requirement": "Provide a dedicated qualified unwrap when the representation requires baking.",
+      "evidence_required": "Bake-specific overlap, padding, seams and texel-density evidence; otherwise N/A rationale.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R05"
+      ],
+      "applicability": "Conditional: baking representation",
+      "result": "N/A",
+      "detail": "N/A: this inspection representation has no baked textures or lightmap workflow; no dedicated baking unwrap is required.",
+      "evidence": "cartoni.maxima30.definition.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q31",
+      "area": "Materials",
+      "requirement": "Assign explicit physical surface versus unlit label/readout roles.",
+      "evidence_required": "Material-role table and appearance review.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R06"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "123 physical MeshStandard surfaces and 22 unlit label/readout materials retain explicit roles; unlit export uses KHR_materials_unlit.",
+      "evidence": "cartoni.maxima30.definition.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q32",
+      "area": "Materials",
+      "requirement": "Keep metalness/roughness within 0–1 and alpha/sidedness/depth behavior intentional.",
+      "evidence_required": "Material value report and rendered transparency check.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R06"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Physical scalar values are valid; label blending, double sidedness, depthWrite=false and graphic polygon offset are intentional and restored by the adapter.",
+      "evidence": "evidence/gltf-validation.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q33",
+      "area": "Textures",
+      "requirement": "Separate color and data texture roles/encoding; do not reuse incorrectly encoded texture objects.",
+      "evidence_required": "Texture-role/encoding report and consumer comparison.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R06"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "All 22 textures are sRGB color labels. There are no data/normal/roughness texture objects to misencode or reuse as color.",
+      "evidence": "cartoni.maxima30.definition.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q34",
+      "area": "Labels",
+      "requirement": "Preserve correct semantic label content, orientation and legibility.",
+      "evidence_required": "All-control label review in intended views.",
+      "owner_role": "Evidence reviewer",
+      "rule_refs": [
+        "R06"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Generated CARTONI, MAXIMA 30, counterbalance, readout and plate labels retain content and orientation. Controls remain readable through semantic labels.",
+      "evidence": "evidence/visual-review.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q35",
+      "area": "Textures",
+      "requirement": "Retain reproducible label sources, dimensions, font/raster provenance and rights.",
+      "evidence_required": "Generation inputs/resource manifest.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R06",
+        "R09"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Label text/paint recipes, canvas dimensions, colors and requested Arial font are retained in semantic JSON/extras. The raster runner resolves Arial to Liberation Sans; delivered PNGs do not need a client font.",
+      "evidence": "evidence/visual-review.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q36",
+      "area": "Textures",
+      "requirement": "Portable images survive GLB reload without live CanvasTexture dependencies.",
+      "evidence_required": "Embedded-resource inventory and unloaded-source consumer render.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R06",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "All 22 images are embedded PNGs; GLB has no external image/buffer URI. Actual loader/reload works without CanvasTexture source objects.",
+      "evidence": "evidence/gltf-validation.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q37",
+      "area": "Rig",
+      "requirement": "Pan moves the intended upper assembly while declared fixed support remains fixed.",
+      "evidence_required": "Hierarchy and movement evidence at neutral and representative angles.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R07"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Fixed base world matrix remains unchanged under pan/tilt poses. Pan rotates the intended upper assembly.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q38",
+      "area": "Rig",
+      "requirement": "Tilt and plate movement carry their proper payload/mounts; independent controls and pan bars keep the correct parents.",
+      "evidence_required": "Context-fixture exercise with C01 and generic C03.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R07"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Plate and payload translate together by 0.06 m in the tested slide pose; pan bars remain tilt children. Native/imported posed matrices agree.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q39",
+      "area": "Rig",
+      "requirement": "Store/reset local control states, axes and travel limits with evidence or illustrative status.",
+      "evidence_required": "Motion metadata, reset and round-trip behavior evidence.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R07",
+        "R09"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Native practice state, explicit axes and illustrative ranges are recorded; reset restores the centered plate and matched relative spring state. Locks and lens F.f gating retain their behavior.",
+      "evidence": "evidence/practice-reset.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q40",
+      "area": "Behavior",
+      "requirement": "Keep counterbalance/drag/locks qualitative; do not claim optical, mass or hardware calibration.",
+      "evidence_required": "UI/catalog review and behavior boundary record.",
+      "owner_role": "Evidence reviewer",
+      "rule_refs": [
+        "R01",
+        "R07",
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Counterbalance/drag/locks are local qualitative teaching controls. No mass, center of gravity, optics or live hardware output is calculated or certified.",
+      "evidence": "cartoni.maxima30.definition.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q41",
+      "area": "Rigging applicability",
+      "requirement": "Document rigid hierarchy and N/A armature/bone/weight/constraint checks; a future deforming asset needs its own policy.",
+      "evidence_required": "Rigging applicability record.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R07"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Rigid hierarchy documented; armature, bone hierarchy, skin weights and deforming constraints are not applicable. Counts are zero; a future deforming asset requires its own policy.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q42",
+      "area": "Scene hygiene",
+      "requirement": "Classify hidden alternatives and remove proven orphan/helper content from the delivered subset.",
+      "evidence_required": "Object/resource disposition and export subset comparison.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R08",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "No hidden variants, camera context, viewer floor/lights or helpers are in C02. Retained primitive UV channels are intentional source attributes, not orphan meshes or materials.",
+      "evidence": "cartoni.maxima30.manifest.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q43",
+      "area": "Lifecycle",
+      "requirement": "Create/interact/reload/dispose cycles meet the consumer resource profile without disposing still-shared resources.",
+      "evidence_required": "Lifecycle resource/memory observations and acceptance.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R08",
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Five load/interact/replace/dispose cycles dispose every old head geometry/material/texture and keep renderer memory counts stable; context survives.",
+      "evidence": "evidence/lifecycle.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q44",
+      "area": "Optimization",
+      "requirement": "Any batching/instancing preserves selection, component ownership, pivots and material state.",
+      "evidence_required": "Before/after identity, motion and appearance comparison; N/A if unused.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R08"
+      ],
+      "applicability": "Conditional: batching or instancing",
+      "result": "N/A",
+      "detail": "N/A: no new batching or instancing is used. Existing independent controls/resources meet the measured profile.",
+      "evidence": "evidence/consumer-profile.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q45",
+      "area": "Files",
+      "requirement": "Owning source remains authoritative and distribution files are generated through its adapter.",
+      "evidence_required": "Source-to-package provenance and generation instructions.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R09",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "The procedural factory and native catalog remain authoritative. tools/cartoni-pilot.cjs generates the distribution package; the consumer uses the versioned adapter.",
+      "evidence": "cartoni.maxima30.manifest.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q46",
+      "area": "Metadata",
+      "requirement": "Version the small adapter envelope; preserve native schema, unknown fields and per-claim evidence.",
+      "evidence_required": "Envelope validation/mapping review and unknown-field round trip.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R09"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Versioned envelope retains the native schema and unknown fields. Nested future fields survive validation and a second GLB plus JSON round trip.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q47",
+      "area": "Subset",
+      "requirement": "Export all C02 structure and ten controls, excluding C01/C03–C07 and viewer helpers.",
+      "evidence_required": "Explicit node inclusion map; account for unlabelled casing.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R01",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "All 145 C02 surfaces, including the 65 structural/decorative surfaces and ten controls, export. C01 and C03–C07 and viewer helpers are excluded.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q48",
+      "area": "Export",
+      "requirement": "Record exact exporter/loader/runtime versions and initial profile settings or documented qualified changes.",
+      "evidence_required": "Export manifest and generation receipt.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Three.js exporter/loader/runtime r180 are pinned. Binary, TRS, all curated visibility, native label resolution, no clips/compression/custom extensions are explicit.",
+      "evidence": "cartoni.maxima30.manifest.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q49",
+      "area": "Metadata",
+      "requirement": "Export/reload stable component metadata and the matching semantic JSON map.",
+      "evidence_required": "All-ten-control resolution after fresh import.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R02",
+        "R09",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "All componentId/nodeName extras and the ten-entry semantic map survive both GLB round trips and actual viewer selection.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q50",
+      "area": "Package",
+      "requirement": "GLB/JSON parse and validate; hashes/dependencies/rights are complete and private coordination data is absent.",
+      "evidence_required": "Validator output, manifest verification and package inspection.",
+      "owner_role": "Asset maintainer",
+      "rule_refs": [
+        "R09",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "GLB/JSON validation and integrity hashes pass. Dependencies/licenses/provenance are recorded. Generated public package contains no source credentials, coordination paths or reference photographs. Validator informational notices are retained.",
+      "evidence": "evidence/gltf-validation.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q51",
+      "area": "Round trip",
+      "requirement": "Exact GLB+JSON loads in the named Ion camera consumer with matched bounds, pivots, labels, materials and all controls.",
+      "evidence_required": "Consumer revision and comparison/interaction evidence.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R04",
+        "R06",
+        "R07",
+        "R10"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "The default Ion /camera/ loads this exact GLB+JSON, installs it with native context, and preserves tested bounds, pivots, labels, materials and all controls.",
+      "evidence": "evidence/verification-summary.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q52",
+      "area": "Failures",
+      "requirement": "Unknown fields survive; invalid schemas, absent assets and stale/unknown selected IDs fail visibly without corrupting valid state.",
+      "evidence_required": "Valid/invalid/unknown-case observations.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R09"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Nested unknown fields survive. Unsupported/stale schemas, unknown/duplicate control IDs, corrupt/missing files and unknown selections are rejected; visible feedback retains valid model and practice state.",
+      "evidence": "evidence/failure-cases.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q53",
+      "area": "Behavior",
+      "requirement": "Selection is inert; explicit local practice alone changes simulation, with no hardware output.",
+      "evidence_required": "Selection/practice interaction evidence and route boundary review.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R07",
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "All 23 selections leave practice settings unchanged. Explicit local practice alone changes them; no hardware transport exists.",
+      "evidence": "evidence/interactions.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q54",
+      "area": "Fallback",
+      "requirement": "The existing accessible control list/fallback retains the declared component identities when 3D is unavailable.",
+      "evidence_required": "Keyboard/control-list and no-3D fallback evidence for the consumer.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R09",
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "The accessible selector retains all 23 controls with WebGL unavailable. Keyboard selection and the head pan-lock guide work.",
+      "evidence": "evidence/fallback.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q55",
+      "area": "Performance",
+      "requirement": "Representative scene and device measurements satisfy the declared numerical profile.",
+      "evidence_required": "Recorded timings, draw calls, memory/resource behavior, viewport and exact build.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "The recorded Chromium SwiftShader profile meets frozen draw/triangle/resource/timing limits. Forty viewport/theme/tab cases cover 1440x900, 375x812, 844x390, 320x256 and 3840x1080; these are emulations, not physical devices.",
+      "evidence": "evidence/consumer-profile.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q56",
+      "area": "Evidence",
+      "requirement": "Keep source, rendered, interaction, export, deployed and physical proof distinct.",
+      "evidence_required": "Qualification summary with explicit pending/unsupported claims.",
+      "owner_role": "Acceptance owner",
+      "rule_refs": [
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Source, render, interaction and export proofs are recorded independently. Production release/live hashes have a separate receipt. Physical and real-device acceptance are not claimed.",
+      "evidence": "README.md",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q57",
+      "area": "Context",
+      "requirement": "Check assembly integration while retaining separate context identities and generic Panasonic status.",
+      "evidence_required": "Context fixture manifest and payload movement/selection observations.",
+      "owner_role": "Consumer maintainer",
+      "rule_refs": [
+        "R01",
+        "R07"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Assembled consumer retains all context identities; generic body/finder fingerprints match baseline and lens back-focus gating remains intact.",
+      "evidence": "evidence/geometry-roundtrip.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q58",
+      "area": "Completion",
+      "requirement": "Every required item has Pass plus evidence; each conditional N/A has a defensible rationale.",
+      "evidence_required": "Completed checklist with reviewer/date/asset and consumer revisions.",
+      "owner_role": "Acceptance owner",
+      "rule_refs": [
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "Every required item is Pass with evidence. Only the two conditional checks are N/A, with explicit reasons. Reviewer/date are attached to every entry.",
+      "evidence": "cartoni.maxima30.acceptance.json",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q59",
+      "area": "Exceptions",
+      "requirement": "Record each exception, affected requirement, narrower claim, impact and accepting owner; unknown is never Pass.",
+      "evidence_required": "Exception register linked to checklist IDs.",
+      "owner_role": "Acceptance owner",
+      "rule_refs": [
+        "R11"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "No failing requirement is waived. Qualification is limited to approximate inspection and the recorded software consumer; measured fit, physical balance, actual-device acceptance and other family assets remain outside this claim.",
+      "evidence": "README.md",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    },
+    {
+      "id": "Q60",
+      "area": "Release",
+      "requirement": "Record a qualified reference package separately from any later merge, deployment or family-wide remediation.",
+      "evidence_required": "Signed qualification record and distinct release evidence when applicable.",
+      "owner_role": "Acceptance owner",
+      "rule_refs": [
+        "R10",
+        "R11",
+        "R12"
+      ],
+      "applicability": "Required",
+      "result": "Pass",
+      "detail": "This is the qualified C02 reference package. Publication and live verification are separate release evidence; the other 42 family entries are not remediated by this pilot.",
+      "evidence": "README.md",
+      "reviewer": "Codex, within the user-authorized inspection scope",
+      "reviewDate": "2026-10-23T11:01:41.996Z"
+    }
+  ],
+  "files": {
+    "model": {
+      "name": "cartoni.maxima30.inspection.glb",
+      "bytes": 3075048,
+      "sha256": "6dae6e4981686c37dcd7e9de1649bce1bfb9f730e2c726a9e461969e8f0962eb"
+    },
+    "definition": {
+      "name": "cartoni.maxima30.definition.json",
+      "bytes": 120125,
+      "sha256": "6cd239d58fc330627f7c3a2ac00be82169fb1a43b2cd6282cf683332e6d91e41"
+    },
+    "manifestSha256": "40e5272e6d1c8b5902aa612c8e6fbfa4001a2d1e39fa2e1f6fd5449c1f6bb1fb"
+  },
+  "evidenceHashes": {
+    "assembled-rig.png": "203c3368f6cd1fb982ec83148734f4bcd0dbd51a67453b8d8a065e402dac02e4",
+    "baseline.json": "caee2d00c3d96d9b67b87e39154722d08262fd3cdc76ab65f00dee0b9d3d114c",
+    "budgets.json": "fcdab8ec716366c593efc9d0c42f9a13de9417363a76e06a72b2e035d7f5e4c9",
+    "consumer-profile.json": "2b987aef427c0d82b94021073dec25de62d98d94d0edf5742a3cf080198f3ccd",
+    "failure-cases.json": "68bf26f948572be563397f60a66297154ad0ed7677966743cacbad4b5f94fc01",
+    "fallback.json": "4c1ed01a8b5790bbf22faf6bdf7aa39d57c3706e3a71f142da1b8b362035ad43",
+    "geometry-roundtrip.json": "b566810a27602c69c5a71ab9cef913553a04e4925255ca69ea9ea4afdbf0719d",
+    "gltf-validation.json": "476b288b2bf15459d9d21745dfff61265f9a7375930a0a4f4b26abc3089bf4fc",
+    "head-1440x900-dark.png": "9a65cb512cf8ccb2c03493c535878df9ea36386cdaa81af0c76e28da48f0902c",
+    "head-1440x900-light.png": "65e5fa9ed7d1b877159de67558c2912b1e0fd340b7d25f06b56fa61aab2b64a4",
+    "head-320x256-dark.png": "728fcf2195d8918b5c60aa5609ddb0f506c74525ab9976207ae6937ddf4ad66a",
+    "head-320x256-light.png": "0e811ae304a9bc60f12d3b8f3101cb50089c78b1ee6715db7a4b21517c33058f",
+    "head-375x812-dark.png": "75a4c039482a9e445aa8bfd1236feebf81870d3be433f8f3e8b78e2cd5f376c1",
+    "head-375x812-light.png": "22841338a3c9cd4a5d641c1ffb75904ddf8149d1622dbca23b0a3a96cbca070c",
+    "head-3840x1080-dark.png": "1f7a7fcb237949955f0a9c34c809e608254190873d887c90afaa0a6409edb0c8",
+    "head-3840x1080-light.png": "9c04489f3269030b3681ad1a8f21aa79269b072037918fb10c2ba3c3b75b5cc4",
+    "head-844x390-dark.png": "213a64bd88ff1dd792d0e3823afe88c296fdee570ce31042e3cbc805f0bcce61",
+    "head-844x390-light.png": "1f087caf1607ccaa59e8673e29deff30e7bd7506371243de55af2a1308a67d27",
+    "head.png": "215f135e42a7d0477ec6c7f5675164eb76d4a59a373a51a17f37e6790321a38d",
+    "headFront.png": "9a65cb512cf8ccb2c03493c535878df9ea36386cdaa81af0c76e28da48f0902c",
+    "headFrontRight.png": "3a1f3ec53af823ebc1cc855b136c21675c6267d7e5ed05826929609e255caecb",
+    "headRear.png": "0aff8c16ec8131b6011d574553e077a6e1d754cf4bdff828523189f27fbd4b63",
+    "headSide.png": "b90706e0935dde8bc55578b90271afa16978f8f0dbc5e0f854849eb6785de459",
+    "interactions.json": "349381a08b47635dbff342805457872f32f8451b7be3e2d6fc5bb2d25ac12e2d",
+    "keyboard.json": "7c7e09796a493d0dc5d7dc574b4e9b5712b5ac9a79ccd6fc8e0fdc2af261444e",
+    "lifecycle.json": "7a14997e293193a38d4ebdf59827202d5a44f36c629af68389957339403fc151",
+    "no-webgl.png": "9c52d1e0ac71e1537319e271e0692046d2f7848d16603522b37b8eb7fda71f4d",
+    "page-errors.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "pointer-picking.json": "7d257debde990e4610bf84ea96614041f5deedab5616839fea8f40eb836c63c9",
+    "practice-reset.json": "37bca679f7a6393c5c0dd7a34b87e15ec15aff81a6efaba225f849a71b792cd5",
+    "top.png": "61082f824f6c8bebb8fb3f51a2c70ece3f3efb5a58decfda9745ee462511e825",
+    "unknown-selection.json": "924a4c558f2c7580bfbb680129039265ac31ab5dcdc3b77c1b6de071e1b5af4f",
+    "verification-summary.json": "ead240e49f7ff5cda0fc7e1f922032fd160e81bad7509ba5e9f0b326c0c1a102",
+    "viewports.json": "0f7e3d8d927cd2def67bbe07faf46dcc06ca70f037847c23c80e888150a1f62d",
+    "visual-review.json": "9684c276bbaba282beacc40fc778723151586f7ada71fb946f4b9bc636eff007"
+  }
+}

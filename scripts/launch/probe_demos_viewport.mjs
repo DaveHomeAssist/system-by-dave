@@ -50,6 +50,8 @@ async function measure(page, width) {
     for (const el of document.querySelectorAll('body *')) {
       if (fit && fit.contains(el)) continue;
       if (!shown(el)) continue;
+      // main's tabbed hub keeps inactive tabs as hidden="until-found" panels: laid out, never painted
+      if (el.closest('[hidden]')) continue;
       if (el.matches('.sbd-skip-link, .sr-only, .visually-hidden') || el.closest('.sbd-skip-link')) continue;
       const r = el.getBoundingClientRect();
       if (!r.width) continue;
@@ -59,7 +61,7 @@ async function measure(page, width) {
     // text that wraps out of its box without overflow:hidden (e.g. a long unbroken string)
     for (const el of document.querySelectorAll('.sbd-site-return *, #sbd-after *, main *')) {
       if (fit && fit.contains(el)) continue;
-      if (!shown(el) || !el.clientWidth) continue;
+      if (!shown(el) || !el.clientWidth || el.closest('[hidden]')) continue;
       if (el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflowX === 'visible' && getComputedStyle(el).display !== 'inline') out.clipped.push(`${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''} overflows its box (${el.scrollWidth} > ${el.clientWidth})`);
     }
     return out;

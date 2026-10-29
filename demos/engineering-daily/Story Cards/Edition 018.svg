@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">NDI discovery and media paths</title><desc id="desc">Logical example: amber discovery succeeds, but the separate blue media session is blocked. The Discovery Server is not a media relay. Lines are not cable routes.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 018</text>
+<text x="108" y="228" font-size="54" class="story-title">NDI discovery and media paths</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect x="0" y="0" width="240" height="400" rx="6" class="canvas"/><text x="12" y="26" class="diagram-index">18</text><text x="48" y="26" class="diagram-heading">DISCOVERY / MEDIA</text><path d="M12 40H228" class="rule"/><rect x="32" y="58" width="176" height="62" rx="6" class="limit"/><text x="120" y="84" text-anchor="middle" class="note">Discovery</text><text x="120" y="108" text-anchor="middle" class="note">Server</text><path d="M58 190V148H72V120m-4 6l4-6l4 6M168 120V148H182V190m-4-6l4 6l4-6" class="reference"/><text x="120" y="174" text-anchor="middle" class="note">Discovery</text><rect x="12" y="190" width="92" height="68" rx="6" class="node"/><rect x="136" y="190" width="92" height="68" rx="6" class="node"/><text x="58" y="216" text-anchor="middle">Sender</text><text x="58" y="240" text-anchor="middle" class="blue-label">Camera</text><text x="182" y="216" text-anchor="middle">Receiver</text><text x="182" y="240" text-anchor="middle" class="blue-label">Monitor</text><text x="120" y="282" text-anchor="middle" class="blue-label">Media session</text><path d="M58 258V304H100M140 304H182V258m-4 6l4-6l4 6" class="wire"/><path d="M112 296l16 16M128 296l-16 16" stroke="var(--red)" fill="none" stroke-width="3"/><rect x="12" y="330" width="216" height="58" rx="6" class="result"/><text x="120" y="353" text-anchor="middle" class="good-label">Source listed</text><text x="120" y="377" text-anchor="middle" class="fault">Media blocked</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">Logical example: amber discovery</text>
+<text x="108" y="1558" font-size="40" class="story-caption">succeeds, but the separate blue</text>
+<text x="108" y="1610" font-size="40" class="story-caption">media session is blocked. The</text>
+<text x="108" y="1662" font-size="40" class="story-caption">Discovery Server is not a media</text>
+<text x="108" y="1714" font-size="40" class="story-caption">relay. Lines are not cable routes.</text>
+<a href="https://docs.ndi.video/all/getting-started/white-paper/discovery-and-registration/discovery-server"><text x="108" y="1808" font-size="28" class="story-source">NDI White Paper, Discovery Server</text></a>
+</svg>

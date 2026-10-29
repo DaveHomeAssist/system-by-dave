@@ -9,7 +9,7 @@ export type DraftChangeDetail = { consoleId: string };
 export type DraftChangeNotifier = (detail: DraftChangeDetail) => void;
 const draftShape = z.object({ v: z.literal(1), console: z.string(), at: z.string(), baseline: z.string().nullable(), doc: z.unknown() }).strict();
 const panelShape = z.object({ id: z.string(), type: z.string(), x: z.number().int(), y: z.number().int(), w: z.number().int(), h: z.number().int() }).strict();
-const layoutShape = z.object({ v: z.literal(1), viewId: z.string(), locked: z.boolean(), live: z.record(z.array(panelShape)) }).strict();
+const layoutShape = z.object({ v: z.literal(1), viewId: z.string(), locked: z.boolean(), live: z.record(z.string(), z.array(panelShape)) }).strict();
 export type LayoutState = { viewId: string; locked: boolean; live: Record<string, Panel[]> };
 export type DraftResult = { ok: boolean; error?: string; indexError?: string; indexChecked?: boolean };
 export type DraftSnapshot<T> = { raw: string | null; draft: Draft<T> | null; error?: string };

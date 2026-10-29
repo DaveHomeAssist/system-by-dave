@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">BT.709 signal ranges</title><desc id="desc">BT.709 video-range luma maps codes 64 and 940 to nominal black and white. Full-range decoding uses 0 and 1023 instead. Match encoding and decoding; code comparisons are not luminance plots.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 013</text>
+<text x="108" y="228" font-size="54" class="story-title">BT.709 signal ranges</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect x="0" y="0" width="240" height="400" rx="6" class="canvas"/><text x="12" y="26" class="diagram-index">13</text><text x="48" y="26" class="diagram-heading">LUMA RANGE</text><path d="M12 40H228" class="rule"/><rect x="12" y="54" width="216" height="135" rx="6" class="panel"/><text x="120" y="79" text-anchor="middle" class="blue-label">BT.709 video range</text><text x="120" y="106" text-anchor="middle" class="">10-bit luma codes</text><text x="62" y="136" text-anchor="middle" class="">64</text><text x="178" y="136" text-anchor="middle" class="">940</text><path d="M62 143V158M178 143V158" class="wire"/><text x="62" y="178" text-anchor="middle" class="">Black</text><text x="178" y="178" text-anchor="middle" class="">White</text><rect x="12" y="205" width="216" height="117" rx="6" class="limit"/><text x="120" y="231" text-anchor="middle" class="note">Full-range decoding</text><text x="62" y="260" text-anchor="middle" class="">0</text><text x="178" y="260" text-anchor="middle" class="">1023</text><path d="M62 267V285M178 267V285" class="reference"/><text x="62" y="307" text-anchor="middle" class="">Black</text><text x="178" y="307" text-anchor="middle" class="">White</text><text x="120" y="348" text-anchor="middle" class="">Same bits, different levels</text><text x="120" y="378" text-anchor="middle" class="good-label">Match the range setting</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">BT.709 video-range luma maps codes</text>
+<text x="108" y="1558" font-size="40" class="story-caption">64 and 940 to nominal black and</text>
+<text x="108" y="1610" font-size="40" class="story-caption">white. Full-range decoding uses 0</text>
+<text x="108" y="1662" font-size="40" class="story-caption">and 1023 instead. Match encoding and</text>
+<text x="108" y="1714" font-size="40" class="story-caption">decoding; code comparisons are not</text>
+<text x="108" y="1766" font-size="40" class="story-caption">luminance plots.</text>
+<a href="https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.709-6-201506-I%21%21PDF-E.pdf"><text x="108" y="1808" font-size="28" class="story-source">ITU-R BT.709-6, §3.4 and §4.6</text></a>
+</svg>
