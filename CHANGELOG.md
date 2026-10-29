@@ -8,6 +8,8 @@
 - Retarget public family probes to `/av/?app=<pack>`. Keep detailed previous
   host regressions on ignored build fixtures and exclude those fixtures from
   publication. Add root-console and 42-route browser checks.
+- Honor the configured Chrome browser in the retained Audio flow probe so
+  publication does not require a separate downloaded headless browser.
 
 ## 2026-10-28: Engineering daily archive
 

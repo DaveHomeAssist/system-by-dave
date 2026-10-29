@@ -31,7 +31,8 @@ const server = createServer(async (request, response) => {
 });
 await new Promise(ready => server.listen(0, '127.0.0.1', ready));
 const BASE = process.env.AV_AUDIO_BASE || `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({headless:true, args:['--no-sandbox']});
+const channel = process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANNEL } : process.env.CHROME_BIN ? { executablePath: process.env.CHROME_BIN } : {};
+const browser = await chromium.launch({headless:true, ...channel, args:['--no-sandbox']});
 const context = await browser.newContext({viewport:{width:1440,height:900}, reducedMotion:'reduce'});
 const page = await context.newPage();
 page.setDefaultTimeout(12000);
