@@ -26,6 +26,16 @@ Checkout opens only when **all three** of these are true:
 The demo itself (`demos/frame-sync.html`) doesn't carry a Field Kit block; link the
 kit from its `checklistUrl` in `demos/config.js` (set: the absolute avbydave.com/field-kit/ link, because the demos live on systembydave.com).
 
+## Smoke test (after publish)
+
+`node scripts/smoke_field_kit_checkout.mjs [base-url]` (default
+`https://avbydave.com`; `npm run smoke:field-kit-checkout`). GET requests only, no
+dependencies, never submits a payment. It checks that `/field-kit/` returns 200
+and shows $19, that `fieldKit.checkout.url` matches `^https://buy\.stripe\.com/`
+and that Payment Link answers 200, and that `/field-kit/thanks/` loads. Exit 0 =
+checkout live, 2 = pages fine but the Payment Link is still a placeholder,
+1 = a check failed.
+
 ## Chosen: Stripe Payment Links (2026-10-19)
 
 The config ships `provider: 'stripe'` with the marked placeholder
