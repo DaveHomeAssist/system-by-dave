@@ -67,7 +67,8 @@ themeCss.split('\n').forEach((line, index) => {
 routes.forEach((route) => {
   const html = read(route.file);
   const escapedId = route.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const expectedTheme = 'system';
+  // Equipment Lab follows the current light-first contract; older shells retain their existing opt-in.
+  const expectedTheme = route.id === 'equipment-lab' ? 'light' : 'system';
   if (!new RegExp(`<html[^>]+data-av-theme="${expectedTheme}"[^>]+data-av-tool="${escapedId}"`, 'i').test(html)) {
     fail(`${route.file} does not opt into the ${expectedTheme} AV theme as ${route.id}.`);
   }

@@ -11,6 +11,7 @@ import "../../front-office/src/styles.css";
 import "../../the-shop/src/styles.css";
 import "../../infrastructure/src/styles.css";
 import "../../av-lighting/src/styles.css";
+import "../../equipment-lab/src/styles.css";
 import "./shell.css";
 import "virtual:calculator-native.css";
 createRoot(document.getElementById("root")!).render(<React.StrictMode><App /></React.StrictMode>);

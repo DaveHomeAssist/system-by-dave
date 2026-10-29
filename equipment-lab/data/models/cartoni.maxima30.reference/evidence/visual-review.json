@@ -1,0 +1,33 @@
+{
+  "result": "pass",
+  "reviewer": "Codex",
+  "reviewedAt": "2026-10-23T10:50:56.840218+00:00",
+  "claim": "Approximate inspection model; no dimensional certification",
+  "references": [
+    "User supplied circled Cartoni Maxima 30 photograph",
+    "Cartoni HM3100 manual v1.0, June 2019, control diagrams pp.5-7"
+  ],
+  "reviewedViews": [
+    "head-1440x900-light.png",
+    "head.png",
+    "headSide.png",
+    "headRear.png",
+    "head-320x256-light.png"
+  ],
+  "findings": [
+    "Photo-informed circular side covers, stepped casting, plate and control-side layout retained from version 18.",
+    "Tilt drag is on the photographed cover side; pan lock is at the opposite front corner; rear counterbalance, readouts and side lock are recognizable and selectable.",
+    "Labels read correctly in front, side and rear inspection presets. Compact windows use the text inspector and zoom for small labels.",
+    "Short-window inspector obstruction found during visual review was corrected; the control selector and scrollable inspector are reachable at 320x256."
+  ],
+  "limits": [
+    "No matched-camera photogrammetry or measured dimensional tolerance.",
+    "No manufacturer CAD or physical equipment acceptance.",
+    "Generic context is excluded from the C02 GLB."
+  ],
+  "fontRasterization": {
+    "requested": "Arial",
+    "runnerFontconfigMatch": "Liberation Sans Regular",
+    "delivery": "Embedded PNG; no font dependency on reload"
+  }
+}

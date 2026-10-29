@@ -1,0 +1,167 @@
+name: Sync cheesesteak heatmap
+
+# Keeps https://systembydave.com/cheesesteaks/ at the latest weekly snapshot of
+# the private DaveHomeAssist/philly-cheesesteak-heatmap repository. That repo's
+# Weekly snapshot workflow rebuilds its data every Monday at 11:23 UTC; until
+# 2026-10-26 the site only changed when someone re-synced it by hand, so its
+# freshness-based confidence decayed between syncs (heatmap
+# docs/SEARCH_AND_WEEKLY_SYNC.md, decision CHS-SYNC).
+#
+# Triggers
+# - schedule: Monday 14:41 UTC, after the heatmap's snapshot has committed.
+# - workflow_dispatch: the same job by hand, optionally for a specific commit:
+#     gh workflow run cheesesteaks-sync.yml --repo DaveHomeAssist/system-by-dave -f sha=<40-char sha>
+#
+# The heatmap repository is private. It is read with a read-only deploy key
+# (secret PHILLY_HEATMAP_DEPLOY_KEY; public half on the heatmap repo). The job
+# refuses a commit that is not on heatmap main, runs its unit tests, builds the
+# static export (basePath /cheesesteaks), syncs cheesesteaks/, runs the site
+# gates, commits `cheesesteaks: sync to <sha>` straight to main and dispatches
+# deploy-pages.yml, like noteforge-sync.yml: Actions cannot open pull requests
+# here, and pushes made with GITHUB_TOKEN never start `push` workflows.
+# deploy-pages.yml still runs every public-site gate before publishing. An
+# unchanged export makes no commit.
+on:
+  schedule:
+    - cron: "41 14 * * 1"
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Heatmap commit to publish (40-character SHA on main; default the latest main)
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+# One sync at a time; a later run waits rather than racing the push.
+concurrency:
+  group: cheesesteaks-sync
+  cancel-in-progress: false
+
+env:
+  SOURCE_REPO: DaveHomeAssist/philly-cheesesteak-heatmap
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out system-by-dave
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          path: site
+          fetch-depth: 0
+
+      - name: Check out the heatmap (read-only deploy key)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: DaveHomeAssist/philly-cheesesteak-heatmap
+          ref: ${{ inputs.sha || 'main' }}
+          ssh-key: ${{ secrets.PHILLY_HEATMAP_DEPLOY_KEY }}
+          persist-credentials: false
+          path: source
+          fetch-depth: 0 # the ancestry check below needs main's history
+
+      - name: Require a commit on heatmap main
+        id: source
+        working-directory: source
+        env:
+          INPUT_SHA: ${{ inputs.sha }}
+        run: |
+          sha="$(git rev-parse HEAD)"
+          if [ -n "$INPUT_SHA" ] && [ "$sha" != "$INPUT_SHA" ]; then
+            echo "::error::checked out $sha, expected $INPUT_SHA (use a full 40-character SHA)"
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$sha" refs/remotes/origin/main; then
+            echo "::error::$sha is not on $SOURCE_REPO main; only main is published"
+            exit 1
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Source: $SOURCE_REPO@$sha ($(git log -1 --format='%cI %s'))"
+
+      - name: Set up Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+
+      - name: Test and build the heatmap static export
+        working-directory: source
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: |
+          npm ci --no-audit --no-fund
+          # Unit tests gate the data the weekly bot commits, which no CI run checks.
+          npx vitest run
+          npm run build:static
+
+      - name: Sync and verify cheesesteaks/
+        id: sync
+        working-directory: site
+        run: |
+          npm run sync:cheesesteaks -- "$GITHUB_WORKSPACE/source"
+          npm run verify:indexing
+          npm run verify:public-navigation
+          git add cheesesteaks
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "cheesesteaks/ already matches; nothing to commit."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git --no-pager diff --cached --stat | tail -n 3
+          fi
+
+      - name: Commit and push to main
+        id: push
+        if: steps.sync.outputs.changed == 'true'
+        working-directory: site
+        env:
+          SHA: ${{ steps.source.outputs.sha }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -q -m "cheesesteaks: sync to ${SHA:0:7}" \
+            -m "Built from $SOURCE_REPO@$SHA by $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID ($EVENT)."
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [ "$attempt" = 3 ]; then
+              echo "::error::push to main failed three times"
+              exit 1
+            fi
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy the site (GITHUB_TOKEN pushes do not start push workflows)
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT: ${{ steps.push.outputs.commit }}
+        run: |
+          gh workflow run deploy-pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+          echo "Dispatched deploy-pages.yml for $COMMIT"
+
+      - name: Summary
+        if: always()
+        env:
+          SHA: ${{ steps.source.outputs.sha }}
+          CHANGED: ${{ steps.sync.outputs.changed }}
+          COMMIT: ${{ steps.push.outputs.commit }}
+        run: |
+          {
+            echo "## Cheesesteak heatmap sync"
+            echo "- Source: \`$SOURCE_REPO@${SHA:-unknown}\`"
+            echo "- Changed: ${CHANGED:-not reached}"
+            if [ -n "$COMMIT" ]; then
+              echo "- Commit: \`$COMMIT\` (deploy-pages.yml dispatched)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

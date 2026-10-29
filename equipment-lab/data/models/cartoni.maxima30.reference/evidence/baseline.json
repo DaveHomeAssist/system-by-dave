@@ -1,0 +1,22 @@
+{
+  "sourceCommit": "9a7620ac8f6da3a67a318025f5343164746ae9b0",
+  "browser": "153.0.8010.12",
+  "profile": {
+    "medianMs": 15.100000023841858,
+    "p95Ms": 85.40000003576279,
+    "calls": 454,
+    "triangles": 65938,
+    "memory": {
+      "geometries": 417,
+      "textures": 38
+    },
+    "viewport": [
+      1440,
+      900
+    ],
+    "dpr": 1,
+    "samples": 40,
+    "renderer": "WebKit WebGL"
+  },
+  "errors": []
+}

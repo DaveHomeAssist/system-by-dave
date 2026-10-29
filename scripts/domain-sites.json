@@ -102,7 +102,8 @@
         "av-suite.html",
         "av-workbook.html",
         "av-tool-suite/",
-        "av-workbook/"
+        "av-workbook/",
+        "boxlens/"
       ],
       "assets": [
         "img/av-by-dave-og.png",
@@ -111,7 +112,8 @@
       ],
       "robotsDisallow": [
         "/404.html",
-        "/transfer.html"
+        "/transfer.html",
+        "/equipment-lab/data/"
       ],
       "storage": {
         "registryKeys": true,

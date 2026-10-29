@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">PTP timing in SMPTE ST 2110</title><desc id="desc">Senders and the receiver share PTP time. Their separate media streams use related timestamps; PTP lock alone does not prove correct alignment or buffering. Lines show logical relationships.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 001</text>
+<text x="108" y="228" font-size="54" class="story-title">PTP timing in SMPTE ST 2110</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect x="0" y="0" width="240" height="400" rx="8" class="canvas"/><text x="12" y="26" class="diagram-index" text-anchor="start">01</text><text x="48" y="26" class="diagram-heading" text-anchor="start">TIME + MEDIA</text><path d="M12 40H228" class="rule"/><rect x="32" y="56" width="176" height="42" rx="8" class="panel"/><text x="120" y="83" class="" text-anchor="middle">PTP grandmaster</text><path d="M120 98V125M44 125H196M44 125V174M120 125V174M196 125V174" class="reference"/><path d="M208 77H237V323H208m6-4l-6 4l6 4" class="reference"/><rect x="8" y="180" width="68" height="42" rx="8" class="panel"/><text x="42" y="207" class="" text-anchor="middle">Video</text><rect x="86" y="180" width="68" height="42" rx="8" class="panel"/><text x="120" y="207" class="" text-anchor="middle">Audio</text><rect x="164" y="180" width="68" height="42" rx="8" class="panel"/><text x="198" y="207" class="" text-anchor="middle">ANC</text><path d="M42 222V264H72V302M120 222V302M198 222V264H168V302" class="wire"/><rect x="32" y="302" width="176" height="42" rx="8" class="result"/><text x="120" y="329" class="good-label" text-anchor="middle">Receiver timing</text><path d="M14 367H39" class="reference"/><text x="48" y="373" class="" text-anchor="start">PTP time</text><path d="M134 367H159" class="wire"/><text x="168" y="373" class="" text-anchor="start">Media</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">Senders and the receiver share PTP</text>
+<text x="108" y="1558" font-size="40" class="story-caption">time. Their separate media streams</text>
+<text x="108" y="1610" font-size="40" class="story-caption">use related timestamps; PTP lock</text>
+<text x="108" y="1662" font-size="40" class="story-caption">alone does not prove correct</text>
+<text x="108" y="1714" font-size="40" class="story-caption">alignment or buffering. Lines show</text>
+<text x="108" y="1766" font-size="40" class="story-caption">logical relationships.</text>
+<a href="https://pub.smpte.org/doc/st2110-10/20220328-pub/st2110-10-2022.pdf"><text x="108" y="1808" font-size="28" class="story-source">SMPTE ST 2110-10:2022</text></a>
+</svg>

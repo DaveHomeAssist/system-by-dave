@@ -99,7 +99,12 @@
     "test:av-workspace": "node scripts/probe_av_workspace.mjs",
     "verify:private-exposure": "node --test scripts/verify_private_exposure.test.js && node scripts/verify_private_exposure.js",
     "verify:workbook-withdrawal": "node scripts/verify_workbook_withdrawal.cjs",
-    "test:av-audio-flow-browser": "node scripts/probe_av_audio_flow.mjs"
+    "test:av-audio-flow-browser": "node scripts/probe_av_audio_flow.mjs",
+    "build:equipment-lab": "vite build --config apps/equipment-lab/vite.config.ts",
+    "typecheck:equipment-lab": "tsc -p apps/equipment-lab/tsconfig.json --noEmit",
+    "verify:equipment-lab": "node scripts/equipment_lab_release.mjs --check",
+    "sync:equipment-lab": "node scripts/equipment_lab_release.mjs",
+    "test:equipment-lab-browser": "node scripts/probe_equipment_lab.mjs"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
@@ -113,8 +118,8 @@
     "three": "0.184.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.7",
-    "vitest": "4.1.11",
-    "zod": "^3.24.1"
+    "vitest": "4.1.12",
+    "zod": "^4.6.7"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

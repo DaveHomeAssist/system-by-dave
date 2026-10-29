@@ -92,6 +92,7 @@ function assertRailRegistryContracts(registry) {
     ['shop', 'shop', 'The Shop', 'available'],
     ['infrastructure', 'infra', 'Infrastructure', 'available'],
     ['lighting', 'lighting', 'Lighting', 'available'],
+    ['equipment-lab', 'equipmentlab', 'Equipment Lab', 'available'],
     ['av-calculator', 'calc', 'AV Calculator', 'available']
   ];
   const actualConsoles = (registry.consoles || []).map((console) => [
@@ -117,6 +118,7 @@ function assertRailRegistryContracts(registry) {
     shop: ['M4 4h16v13H4z', 'M4 9h16', 'M10 12h4', 'M8 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z', 'M16 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z'],
     infrastructure: ['M13 2 4 14h7l-1 8 9-12h-7z'],
     lighting: ['M9 18h6', 'M10 21h4', 'M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z'],
+    'equipment-lab': ['M3 7l9-5 9 5v10l-9 5-9-5z','M3 7l9 5 9-5','M12 12v10'],
     'av-calculator': ['M5 3h14v18H5z', 'M8 7h8v3H8z', 'M8 14h2', 'M11 14h2', 'M14 14h2', 'M8 17.5h2', 'M11 17.5h2', 'M14 17.5h2']
   };
   (registry.consoles || []).forEach((console) => {
@@ -146,7 +148,7 @@ function assertRailRegistryContracts(registry) {
       if (Object.prototype.hasOwnProperty.call(console, field)) fail(`Planned console ${console.id} fabricates ${field} metadata.`);
     });
   });
-  const expectedToolIds = ['av-video', 'av-audio', 'show-control', 'show-ops', 'front-office', 'the-shop', 'infrastructure', 'av-lighting', 'av-calculator'];
+  const expectedToolIds = ['av-video', 'av-audio', 'show-control', 'show-ops', 'front-office', 'the-shop', 'infrastructure', 'av-lighting', 'equipment-lab', 'av-calculator'];
   const available = (registry.consoles || []).filter((console) => console.availability === 'available');
   if (JSON.stringify(available.map((console) => console.toolId)) !== JSON.stringify(expectedToolIds)) {
     fail(`Rail application tool mappings are wrong: ${available.map((console) => console.toolId || '(missing)').join(', ')}.`);
@@ -206,7 +208,7 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261018-visibility-compatibility') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261027-offline-console-recovery') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
@@ -214,14 +216,14 @@ function assertRailRegistryContracts(registry) {
   // 34 sheet routes are retired redirect stubs (docs/av-suite-shell.md): they keep their
   // storage keys for data transfer but leave the offline suite; Toolbox assets are gone.
   const retiredTools = registry.tools.filter((tool) => tool.retired);
-  if (retiredTools.length !== 34 || registry.tools.length - retiredTools.length !== 18) fail(`Retired sheet count changed: ${retiredTools.length} retired of ${registry.tools.length}.`);
+  if (retiredTools.length !== 34 || registry.tools.length - retiredTools.length !== 19) fail(`Retired sheet count changed: ${retiredTools.length} retired of ${registry.tools.length}.`);
   retiredTools.forEach((tool) => {
     if (!['video', 'audio', 'show-control', 'show-ops', 'front-office', 'shop', 'infrastructure', 'lighting'].includes(tool.retired)) fail(`Retired tool ${tool.id} names an unknown pack ${tool.retired}.`);
     if (registry.offlineAssets().includes(`./${tool.href}`)) fail(`Retired route ${tool.href} must not be an offline asset.`);
     const stub = read(tool.href);
     if (!/<meta name="robots" content="noindex,follow">/.test(stub) || !stub.includes(`location.replace('/av/?app=${tool.retired}')`) || !/rel="canonical" href="https:\/\/avbydave\.com\/"/.test(stub)) fail(`Retired route ${tool.href} is not a noindex redirect stub into /av/?app=${tool.retired}.`);
   });
-  if (registry.tools.length !== 52 || registry.baseAssets.length !== 135 || registry.offlineAssets().length !== 153 || storageKeyCount !== 83) {
+  if (registry.tools.length !== 53 || registry.baseAssets.length !== 144 || registry.offlineAssets().length !== 163 || storageKeyCount !== 83) {
     fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {
