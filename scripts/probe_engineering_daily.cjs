@@ -24,6 +24,7 @@ const {chromium}=require('playwright');
    const expectedDays=await page.evaluate(()=>{const [year,month]=calendarMonth.split('-').map(Number);return new Date(Date.UTC(year,month,0)).getUTCDate();});assert.equal(dates.size,expectedDays);const last=await page.locator('#calendarDatePage').textContent();await page.reload();await page.waitForFunction(()=>window.signalLab);assert.equal(await page.locator('#calendarDatePage').textContent(),last);
   }
   assert.equal(await page.locator('.dailySkip').getAttribute('href'),'#daily-main');
+  await page.locator('#calendarToday').click();assert(await page.locator('.calendarDay[aria-current="date"]').isVisible(),'Today is hidden behind date pagination');
   assert(await page.locator('.appHeader a[href="/"]').isVisible());assert(await page.locator('.appHeader a[href="/demos/"]').isVisible());
   for(const theme of ['light','dark']){
    await page.evaluate(theme=>{setTheme(theme);search='optical';document.getElementById('search').value=search;renderList();display(facts.find(f=>![f.title,f.date,f.trackShort,String(f.id).padStart(3,'0')].join(' ').toLowerCase().includes(search)));showWorkspace('archive');},theme);

@@ -1037,7 +1037,7 @@ function changeCalendarMonth(delta) {
 }
 document.getElementById("calendarPrev").onclick=()=>changeCalendarMonth(-1);
 document.getElementById("calendarNext").onclick=()=>changeCalendarMonth(1);
-document.getElementById("calendarToday").onclick=()=>{calendarMonth=newYorkDate().slice(0,7);renderCalendar();queueNavigation();};
+document.getElementById("calendarToday").onclick=()=>{const today=newYorkDate();calendarMonth=today.slice(0,7);renderCalendar();calendarPage=Math.floor((Number(today.slice(8))-1)/calendarPageSize);paginateCalendarDates();queueNavigation();};
 document.getElementById("calendarButton").onclick=()=>showWorkspace("calendar");
 document.getElementById("sameDayEditions").onchange=e=>{const fact=facts.find(f=>String(f.id)===e.target.value);if(fact)display(fact);};
 document.getElementById("calendarGrid").addEventListener("keydown",event=>{
