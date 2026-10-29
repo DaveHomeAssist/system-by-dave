@@ -197,6 +197,8 @@ jobs:
           npm run typecheck:the-shop
           npm run test:the-shop
           npm run build:the-shop
+          npm run test:av-retained-browser
+          npm run test:av-routes-browser
           npm run test:the-shop-browser
 
       - name: Verify NoteForge release contract
@@ -235,7 +237,7 @@ jobs:
       - name: Stage site (everything except VCS + CI tooling)
         run: |
           mkdir -p _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='package.json' --exclude='package-lock.json' --exclude='/flooring-contract-review.html' --exclude='/house' --exclude='/cross-project-*' --exclude='.agent-claim' --exclude='/apps/av-workbook' --exclude='/av-workbook/assets' ./ _site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='dist' --exclude='package.json' --exclude='package-lock.json' --exclude='/flooring-contract-review.html' --exclude='/house' --exclude='/cross-project-*' --exclude='.agent-claim' --exclude='/apps/av-workbook' --exclude='/av-workbook/assets' ./ _site/
           # Check the actual publish artifact as well as the tracked source.
           # The committed sitemap lists routes only; stamp the published copy with
           # each page's last commit date from this commit's full history.

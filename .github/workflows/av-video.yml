@@ -9,6 +9,9 @@ on:
       - 'scripts/*equipment_lab*'
       - 'av/**'
       - 'scripts/probe_av_suite_shell.mjs'
+      - 'scripts/av-family-probe.mjs'
+      - 'scripts/probe_av_retained.mjs'
+      - 'scripts/probe_av_routes.mjs'
       - 'apps/av-video/**'
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
@@ -154,6 +157,8 @@ jobs:
           npm run typecheck:the-shop
           npm run test:the-shop
           npm run build:the-shop
+          npm run test:av-retained-browser
+          npm run test:av-routes-browser
           git diff --exit-code -- the-shop
           test -z "$(git status --porcelain -- the-shop)"
           npm run test:the-shop-browser
