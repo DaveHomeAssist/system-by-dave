@@ -26,8 +26,8 @@ const {chromium}=require('playwright');
    const bounds=await page.evaluate(()=>{
     const shell=document.querySelector('.labShell').getBoundingClientRect();
     const clipped=[...document.querySelectorAll('.labBar button,.labBar select,.labControls button,.labControls input,#labControlOutcome')].filter(el=>el.getClientRects().length).filter(el=>{const r=el.getBoundingClientRect();return r.top<shell.top-1||r.bottom>shell.bottom+1||r.left<shell.left-1||r.right>shell.right+1;}).map(el=>el.id||el.textContent);
-    return {root:document.documentElement.scrollHeight<=innerHeight&&document.documentElement.scrollWidth<=innerWidth,clipped};
-   });assert(bounds.root);assert.deepEqual(bounds.clipped,[],'Clipped controls '+width+'x'+height);
+    return {root:document.documentElement.scrollHeight<=innerHeight&&document.documentElement.scrollWidth<=innerWidth,headerTop:document.querySelector('.appHeader').getBoundingClientRect().top,clipped};
+   });assert(bounds.root);assert(bounds.headerTop>=0,'Header scrolled out of view '+width+'x'+height);assert.deepEqual(bounds.clipped,[],'Clipped controls '+width+'x'+height);
    views.push({width,height,theme,...bounds});
    if(process.env.EVIDENCE_DIR)await page.screenshot({path:process.env.EVIDENCE_DIR+'/public-'+width+'-'+height+'-'+theme+'.png'});
   }
