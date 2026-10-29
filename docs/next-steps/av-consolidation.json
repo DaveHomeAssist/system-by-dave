@@ -6,7 +6,7 @@
   ],
   "head": "fa22e740c885a8630c49b08c6c029506b406f7d2",
   "status": "amber",
-  "statusReason": "PR345 is merged at 4c446ed and live (Pages run 38712124711). Dave ruled on 2026-10-15 that the October 14 removal of whole-application tiles was a Codex decision, not his: AV Calculator stays the native nine-panel pack, and the seven specialists without a pack (Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter) are chrome-less panels of their own pages again under a Tools group. Family-route redirects and physical/operator acceptance remain open.",
+  "statusReason": "Eight original family routes now redirect into the shared console in source, selected directly by Dave on October 29. Live root, nine original Rail identities, Throwline and all 34 retired sheets passed browser checks on Dominic. Publication of this candidate remains gated by exact-head CI and live readback. Other specialist, diagnostics and physical acceptance decisions stay open.",
   "audioSpeakerStatusParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "94b1ce79499de92416a5c30357298d619fb74ecb",
@@ -87,7 +87,7 @@
       "AVV-STREAM-KEY-1 remains unanswered and blocks only its dependent work."
     ]
   },
-  "lastActivity": "2026-10-28",
+  "lastActivity": "2026-10-29",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -112,11 +112,11 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Decide the standalone family routes and the first native specialist pack",
-    "why": "Eight standalone family routes (/av-video/ and siblings) still mount the packs outside the console; the specialists run as page panels until each has a native pack.",
-    "doneWhen": "Dave chooses A (redirect the family routes into /av/?app=<pack> and retarget their probes) or B (keep them as deep links), and the first specialist conversion (LED Wall Calculator is the smallest) is scoped.",
-    "effort": "One decision plus one bounded conversion brief.",
-    "owner": "Dave (decision); Claude or Codex (serial) for the conversion",
+    "title": "Verify the family route cutover release",
+    "why": "Dave selected redirects on October 29; native pack source and saved keys remain independent. Source checks and public-console probes pass; final release evidence belongs to the candidate pull request.",
+    "doneWhen": "Exact-head CI passes, the candidate merges, both Pages publications succeed and live root plus all 42 redirect routes pass readback.",
+    "effort": "Bounded release verification.",
+    "owner": "Codex, serial",
     "blockedBy": []
   },
   "findings": [
@@ -479,7 +479,8 @@
     "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open.",
     "Room Check v1 checks can be copied selectively into Show Ops as unsaved Needs check rows with exact source provenance; this does not synchronize the tools, and route availability does not certify the handoff.",
     "Crew Call v1 active members can be copied selectively into Show Ops as unsaved Called rows with exact source provenance and no automatic attendance inference; the producer remains unchanged, and route availability does not certify the handoff.",
-    "PR #312 supersedes the status-only Rail baseline: all nine published primary applications are canonical Rail destinations, while physical/operator and connected-workflow acceptance remain separate."
+    "PR #312 supersedes the status-only Rail baseline: all nine published primary applications are canonical Rail destinations, while physical/operator and connected-workflow acceptance remain separate.",
+    "2026-10-29: Dave selected the family route redirect option. Historical references to that choice as unanswered are superseded; the first native specialist choice remains open."
   ],
   "links": [
     {
@@ -1641,5 +1642,14 @@
       "AVC-20"
     ],
     "decision": "DIAG-1 open; Dave asked on 2026-10-28 to hold it while the findings are recorded."
+  },
+  "familyRouteCutover": {
+    "recordedOn": "2026-10-29",
+    "baseRevision": "a04c90d",
+    "decision": "Dave explicitly selected redirect stubs for the eight original standalone family routes and retargeted public probes at /av/?app=<pack>.",
+    "implementation": "Native packs remain in apps/<app>/src/pack.tsx. Retained hosts build only to ignored dist directories and are excluded from publication. Detailed host regressions remain executable as source fixtures.",
+    "verification": "Dominic Playwright 1.63: live root, nine original identities, Throwline panel and 34 sheet redirects pass. All eight new shared-console family probes and 42 candidate redirects pass. Typechecks, model tests and retained builds pass for all eight families.",
+    "delivery": "Candidate pending exact-head CI, merge, source/destination deployment and live family-redirect readback.",
+    "limits": "No saved-key/schema change, first native specialist selection, diagnostics decision or physical/operator acceptance."
   }
 }

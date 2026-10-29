@@ -1,5 +1,14 @@
 # Changelog
 
+## October 29, 2026
+
+- Redirect the eight original AV family routes into the shared console with
+  their native pack selected. Preserve the five shared show-context fields,
+  per-pack source, saved documents and import/export behavior.
+- Retarget public family probes to `/av/?app=<pack>`. Keep detailed previous
+  host regressions on ignored build fixtures and exclude those fixtures from
+  publication. Add root-console and 42-route browser checks.
+
 ## 2026-10-28: Engineering daily archive
 
 - Keep the demos entry and return hub inside the viewport with the existing subject reader, shared neutral light and dark preferences, complete text pagination and direct archive entry. Preserve the existing demo content and links.
