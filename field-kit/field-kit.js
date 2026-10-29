@@ -12,10 +12,16 @@
   var price = document.getElementById('kit-price');
   var priceSet = typeof cfg.priceLabel === 'string' && cfg.priceLabel.trim() !== '' &&
     cfg.priceLabel !== 'Price TBD' && !/^\s*\[/.test(cfg.priceLabel);
+  // The static page shows $19 (Dave, 2026-10-23) so it reads right without
+  // JavaScript. A placeholder in the config still shows "Price TBD".
   if (price && priceSet) {
     price.firstChild.nodeValue = cfg.priceLabel;
     var small = price.querySelector('small');
     if (small) small.textContent = small.textContent.replace(/\s*Price not set yet\.?/, '');
+  } else if (price) {
+    price.firstChild.nodeValue = 'Price TBD';
+    var note0 = price.querySelector('small');
+    if (note0 && !/not set yet/.test(note0.textContent)) note0.textContent += ' Price not set yet.';
   }
   events.track('page_view', { page: 'field-kit' });
 
