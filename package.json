@@ -47,6 +47,7 @@
     "verify:public-navigation": "node scripts/verify_public_navigation.js",
     "verify:public-consistency": "node scripts/verify_public_consistency.js",
     "probe:field-kit": "node scripts/launch/probe_field_kit.mjs",
+    "smoke:field-kit-checkout": "node scripts/smoke_field_kit_checkout.mjs",
     "probe:demo-subscribe": "node scripts/launch/probe_demo_subscribe.mjs",
     "probe:demos-viewport": "node scripts/launch/probe_demos_viewport.mjs",
     "mix:frame-sync-reel-music": "bash scripts/launch/mix_reel_music.sh",
