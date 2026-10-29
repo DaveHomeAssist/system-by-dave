@@ -150,6 +150,7 @@ try {
     if (await page.locator('#ty-ready').isHidden() || (await page.getAttribute('#ty-download', 'href')) !== DL) fail(`thanks ${label}: download button missing for an allowed host`);
     if (await page.evaluate(() => location.search)) fail(`thanks ${label}: query not removed from the address bar`);
     if (!/e5F6g7H8/.test(await page.textContent('#ty-ref'))) fail(`thanks ${label}: order reference not shown`);
+    if (await page.locator('#ty-paid').isHidden()) fail(`thanks ${label}: payment line hidden despite a Stripe session id`);
     await page.reload(); await page.waitForLoadState('load');
     if (await page.locator('#ty-ready').isHidden()) fail(`thanks ${label}: button lost after reload in the same tab`);
     await noHorizontalScroll(page, `thanks ${label}`);
@@ -160,6 +161,7 @@ try {
   for (const bad of ['https://evil.example/kit.zip', 'http://drive.google.com/x', 'javascript:alert(1)', 'https://drive.google.com.evil.example/x', '']) {
     const { page, context } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(bad)}`, VIEWPORTS.phone);
     if (!(await page.locator('#ty-ready').isHidden()) || await page.locator('#ty-missing').isHidden()) fail(`thanks accepted a bad link ${JSON.stringify(bad)}`);
+    if (!(await page.locator('#ty-paid').isHidden()) || /Thanks/.test(await page.textContent('#ty-title'))) fail('thanks page claims a payment without a Stripe session id');
     await context.close();
   }
   notes.push('thanks page: noindex, button only for https links on known file hosts, query stripped, survives reload, bad links fall back to "email me"');

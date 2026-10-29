@@ -37,7 +37,21 @@
   }
 
   var ref = params.get('session_id') || '';
-  if (/^cs_(test_|live_)?[A-Za-z0-9]{8,}$/.test(ref)) {
+  var validRef = /^cs_(test_|live_)?[A-Za-z0-9]{8,}$/.test(ref);
+  // Only say the payment went through when Stripe's redirect brought a checkout
+  // session id (kept for this tab so a reload after the query is dropped still
+  // shows it). A direct visit gets the neutral heading and the "email me" card.
+  var PAID = 'sbd-field-kit-paid';
+  var paid = validRef;
+  try {
+    if (validRef) sessionStorage.setItem(PAID, '1');
+    else paid = sessionStorage.getItem(PAID) === '1';
+  } catch (error) {}
+  if (paid) {
+    document.getElementById('ty-title').textContent = 'Thanks. Your Field Kit is ready.';
+    document.getElementById('ty-paid').hidden = false;
+  }
+  if (validRef) {
     var shortRef = ref.slice(-10);
     document.getElementById('ty-ref').textContent = '…' + shortRef;
     document.getElementById('ty-ref-line').hidden = false;
