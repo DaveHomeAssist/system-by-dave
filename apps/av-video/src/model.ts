@@ -18,13 +18,13 @@ const routeSchema = z.object({
   processorOutput: text.default(""), processorConnector: text.default(""), processorFormat: text.default(""), destinationInput: text.default(""),
 }).strict();
 const documentSchema = z.object({
-  schema: z.literal(SCHEMA), id: text, title: text, meta: z.record(text),
+  schema: z.literal(SCHEMA), id: text, title: text, meta: z.record(z.string(), text),
   routes: z.array(routeSchema), modules: z.object({ patch: z.boolean(), checks: z.boolean(), backups: z.boolean(), displays: z.boolean().default(true), cameras: z.boolean().default(true), playback: z.boolean().default(true) }).strict(),
   displays: z.array(displaySchema).default([]),
   shots: z.array(shotSchema).default([]), cues: z.array(playbackSchema).default([]),
   imports: z.array(z.object({ id: text, name: text, raw: text }).strict()),
   graphDevices: z.array(z.object({ id: text, label: text, kind: deviceKind }).strict()).default([]),
-  graphPositions: z.record(z.object({ x: z.number().finite(), y: z.number().finite() }).strict()).default({}),
+  graphPositions: z.record(z.string(), z.object({ x: z.number().finite(), y: z.number().finite() }).strict()).default({}),
   /* Stored console views (panel arrangements only). Absent in older plans, which open with the default views. */
   workspace: workspaceSchema.optional(),
 }).strict().superRefine((doc, ctx) => {
@@ -75,7 +75,7 @@ export function routeChain(route: Route, patch = true): { label: string; value: 
 export async function previewImport(raw: string, name: string, browserKey?: string): Promise<Preview> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(raw));
   const fingerprint = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, "0")).join("");
-  const value = z.record(z.unknown()).parse(JSON.parse(raw));
+  const value = z.record(z.string(), z.unknown()).parse(JSON.parse(raw));
   if (value.schema === SCHEMA) {
     const restore = parseDocument(raw);
     return { name, raw, fingerprint, routes: restore.routes, displays: restore.displays, shots: restore.shots, cues: restore.cues, meta: restore.meta, restore, browserKey };
@@ -88,7 +88,7 @@ export async function previewImport(raw: string, name: string, browserKey?: stri
     const key = camera ? "shots" : "cues";
     if (families[0] !== key) throw new Error("The sheet schema and record collection do not agree.");
     const fields = camera ? shotFields : playbackFields;
-    const rows = z.array(z.record(z.unknown())).parse(value[key]);
+    const rows = z.array(z.record(z.string(), z.unknown())).parse(value[key]);
     const records = rows.map((row, index) => {
       if (!fields.some(field => typeof row[field] === "string")) throw new Error(`Row ${index + 1} is not a recognized ${camera ? "shot" : "cue"}.`);
       const result: Record<string, string> = camera ? newShot() : newPlayback();
@@ -101,7 +101,7 @@ export async function previewImport(raw: string, name: string, browserKey?: stri
     });
     return { name: `${camera ? "Camera Shot List" : "Playback Check"} · ${name}`, raw, fingerprint, routes: [], displays: [],
       shots: camera ? records.map(row => shotSchema.parse(row)) : [], cues: playback ? records.map(row => playbackSchema.parse(row)) : [],
-      meta: value.meta === undefined ? {} : z.record(text).parse(value.meta), browserKey };
+      meta: value.meta === undefined ? {} : z.record(z.string(), text).parse(value.meta), browserKey };
   }
   const rowsValue = Array.isArray(value.items) ? value.items : [];
   const has = (key: string) => rowsValue.some(row => row && typeof row === "object" && key in row);
@@ -113,7 +113,7 @@ export async function previewImport(raw: string, name: string, browserKey?: stri
   if ([display, projection, signal, patch].filter(Boolean).length !== 1) throw new Error("Choose an AV Video backup or a Signal Flow, Video Patch, Display Plan, Projection Plan, Camera Shot List or Playback Check export. Unlabelled sheets must have recognizable rows.");
   if (display || projection) {
     const fields = display ? displayFields : projectionFields;
-    const rows = z.array(z.record(z.unknown())).parse(value.items);
+    const rows = z.array(z.record(z.string(), z.unknown())).parse(value.items);
     const displays = rows.map((row, index) => {
       if (!fields.some(field => typeof row[field] === "string")) throw new Error(`Row ${index + 1} is not a recognized destination.`);
       const result = newDisplay(display ? "display" : "projection");
@@ -124,10 +124,10 @@ export async function previewImport(raw: string, name: string, browserKey?: stri
       });
       return { ...result, id: `${fingerprint}:${index}`, origin: fingerprint };
     });
-    return { name: `${display ? "Display Plan" : "Projection Plan"} · ${name}`, raw, fingerprint, routes: [], displays, shots: [], cues: [], meta: value.meta === undefined ? {} : z.record(text).parse(value.meta), browserKey };
+    return { name: `${display ? "Display Plan" : "Projection Plan"} · ${name}`, raw, fingerprint, routes: [], displays, shots: [], cues: [], meta: value.meta === undefined ? {} : z.record(z.string(), text).parse(value.meta), browserKey };
   }
   const fields = signal ? ["route", "system", "source", "format", "connector", "processor", "destination", "status", "backup", "notes"] : ["source", "type", "format", "connector", "input", "converter", "destination", "route", "backup", "status", "notes"];
-  const rows = z.array(z.record(z.unknown())).parse(signal ? value.routes : value.items);
+  const rows = z.array(z.record(z.string(), z.unknown())).parse(signal ? value.routes : value.items);
   if (rows.some(row => !fields.some(field => typeof row[field] === "string"))) throw new Error("The file contains unrecognized rows; nothing was imported.");
   const routes = rows.map((row, index) => {
     const result = newRoute();
@@ -141,7 +141,7 @@ export async function previewImport(raw: string, name: string, browserKey?: stri
     result.origin = fingerprint;
     return result;
   });
-  const meta = value.meta === undefined ? {} : z.record(text).parse(value.meta);
+  const meta = value.meta === undefined ? {} : z.record(z.string(), text).parse(value.meta);
   return { name: `${signal ? "Signal Flow" : "Video Patch"} · ${name}`, raw, fingerprint, routes, displays: [], shots: [], cues: [], meta, browserKey };
 }
 export function applyImport(doc: VideoDocument, preview: Preview): VideoDocument {

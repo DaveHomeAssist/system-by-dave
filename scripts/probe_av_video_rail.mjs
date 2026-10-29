@@ -108,9 +108,9 @@ try {
 
   await page.setViewportSize({ width: 375, height: 667 });
   await openAllApps();
-  assert.equal(await allAppsDialog().locator('[data-entry-type="Console"], [data-entry-type="Planned console"]').count(), 9);
+  assert.equal(await allAppsDialog().locator('[data-entry-type="Console"], [data-entry-type="Planned console"]').count(), 10);
   assert.equal(await allAppsDialog().locator('[data-entry-type="Planned console"]').count(), 0);
-  assert.equal(await allAppsDialog().locator('[data-entry-type="Console"][href]').count(), 9);
+  assert.equal(await allAppsDialog().locator('[data-entry-type="Console"][href]').count(), 10);
   const audioRailHref = new URL(await allAppsDialog().locator('[data-rail-ref="console:audio"]').getAttribute('href'));
   assert.equal(audioRailHref.pathname, '/av-audio/');
   assert.equal(audioRailHref.searchParams.get('sbdShow'), 'Gala');
@@ -183,7 +183,7 @@ try {
   assert.equal(changed.pinned.at(-2), 'console:audio');
   await customizeDialog().locator('[data-rail-ref="defaults"][data-action="reset"]').click();
   await page.getByRole('button', { name: 'Close Customize rail', exact: true }).click();
-  assert.equal(await page.locator('.sbd-rail__entry').count(), 9);
+  assert.equal(await page.locator('.sbd-rail__entry').count(), 10);
 
   await page.evaluate(key => localStorage.setItem(key, '{broken'), railKey);
   await page.reload();
@@ -191,7 +191,7 @@ try {
   assert.equal(await page.evaluate(key => localStorage.getItem(key), railKey), '{broken', 'invalid preferences must remain untouched');
   await page.getByRole('button', { name: 'Reset rail', exact: true }).click();
   const reset = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), railKey);
-  assert.equal(reset.pinned.length, 9);
+  assert.equal(reset.pinned.length, 10);
   assert.deepEqual(errors, []);
   console.log(`AV Video Rail browser verification passed: RAIL-1B slots, RAIL-2A breakpoints, typed routing, state preservation, local customization, focus return, zoom/reduced-motion smoke checks, and ${11} viewport fixtures (${BASE}).`);
 } finally {

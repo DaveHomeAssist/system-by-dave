@@ -1,7 +1,8 @@
 # AV next steps projections
 
-These two public-safe JSON projections maintain the existing `av-consolidation`
-and `av-video` entries in the private cross-project board. They summarize the
+These public-safe JSON projections maintain the existing `av-consolidation`,
+`av-video` and `house-reference` entries in the private cross-project board. The
+first two summarize the
 [maintained consolidation specification](../av-suite-consolidation-spec.md),
 [Video phase plan](../av-suite-consolidation-stage2-video.md),
 [viewport workflow contract](../av-workspace.md), and verified release evidence.
@@ -11,6 +12,9 @@ They are not a second roadmap or permission to execute embedded kickoff text.
   remaining application consolidation.
 - [AV Video and viewport projection](av-video.json): delivered viewport work,
   open PR coverage, specialist follow-ups and physical acceptance.
+- [AV by Dave demos projection](av-by-dave.json): the `house-reference` board
+  entry for the concept demos under `demos/` and the Instagram launch. Its ID is
+  the original working title and stays stable.
 
 After meaningful work, recheck the owning source and release evidence; update
 only the affected projection. Preserve stable IDs, unanswered choices, historical

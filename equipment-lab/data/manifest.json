@@ -1,0 +1,183 @@
+{
+  "schema": "equipment.lab.release.v1",
+  "revision": "1.0.0",
+  "catalog": "catalog.json",
+  "files": {
+    "catalog.json": {
+      "bytes": 40078,
+      "sha256": "0adc5a52fb9c3587e26423c1b4197edb2080b6c2491c1b1859b885f859381fce"
+    },
+    "models/cartoni.maxima30.reference/README.md": {
+      "bytes": 3599,
+      "sha256": "abbc34426e404cca4546d04ae813c3d18d67750e11e07ebd1db516efa0416df3"
+    },
+    "models/cartoni.maxima30.reference/cartoni.maxima30.acceptance.json": {
+      "bytes": 50690,
+      "sha256": "acdd89607324eba64d84e8491d5f67de5500457f4eae92b8fc154d482b4c0207"
+    },
+    "models/cartoni.maxima30.reference/cartoni.maxima30.definition.json": {
+      "bytes": 120125,
+      "sha256": "6cd239d58fc330627f7c3a2ac00be82169fb1a43b2cd6282cf683332e6d91e41"
+    },
+    "models/cartoni.maxima30.reference/cartoni.maxima30.inspection.glb": {
+      "bytes": 3075048,
+      "sha256": "6dae6e4981686c37dcd7e9de1649bce1bfb9f730e2c726a9e461969e8f0962eb"
+    },
+    "models/cartoni.maxima30.reference/cartoni.maxima30.manifest.json": {
+      "bytes": 2553,
+      "sha256": "40e5272e6d1c8b5902aa612c8e6fbfa4001a2d1e39fa2e1f6fd5449c1f6bb1fb"
+    },
+    "models/cartoni.maxima30.reference/checklist.csv": {
+      "bytes": 22634,
+      "sha256": "c6fb4f4b638547ad662091b9328d93b4f3d5f2218ee80a805cebda6cfa7292af"
+    },
+    "models/cartoni.maxima30.reference/checklist.html": {
+      "bytes": 28027,
+      "sha256": "eb097b52b998b7e4bc6a8e4a4ea90c5a8de75772ef64cd3e3f3ded6d444cd7ac"
+    },
+    "models/cartoni.maxima30.reference/checklist.md": {
+      "bytes": 19124,
+      "sha256": "d3111db32c2a6c95f81a6a777f08fdd2a16c4c78526e31800d4bd2e52ac659ee"
+    },
+    "models/cartoni.maxima30.reference/evidence/assembled-rig.png": {
+      "bytes": 218482,
+      "sha256": "203c3368f6cd1fb982ec83148734f4bcd0dbd51a67453b8d8a065e402dac02e4"
+    },
+    "models/cartoni.maxima30.reference/evidence/baseline.json": {
+      "bytes": 421,
+      "sha256": "caee2d00c3d96d9b67b87e39154722d08262fd3cdc76ab65f00dee0b9d3d114c"
+    },
+    "models/cartoni.maxima30.reference/evidence/budgets.json": {
+      "bytes": 413,
+      "sha256": "fcdab8ec716366c593efc9d0c42f9a13de9417363a76e06a72b2e035d7f5e4c9"
+    },
+    "models/cartoni.maxima30.reference/evidence/consumer-profile.json": {
+      "bytes": 927,
+      "sha256": "2b987aef427c0d82b94021073dec25de62d98d94d0edf5742a3cf080198f3ccd"
+    },
+    "models/cartoni.maxima30.reference/evidence/failure-cases.json": {
+      "bytes": 2052,
+      "sha256": "68bf26f948572be563397f60a66297154ad0ed7677966743cacbad4b5f94fc01"
+    },
+    "models/cartoni.maxima30.reference/evidence/fallback.json": {
+      "bytes": 74,
+      "sha256": "4c1ed01a8b5790bbf22faf6bdf7aa39d57c3706e3a71f142da1b8b362035ad43"
+    },
+    "models/cartoni.maxima30.reference/evidence/geometry-roundtrip.json": {
+      "bytes": 742248,
+      "sha256": "b566810a27602c69c5a71ab9cef913553a04e4925255ca69ea9ea4afdbf0719d"
+    },
+    "models/cartoni.maxima30.reference/evidence/gltf-validation.json": {
+      "bytes": 34593,
+      "sha256": "476b288b2bf15459d9d21745dfff61265f9a7375930a0a4f4b26abc3089bf4fc"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-1440x900-dark.png": {
+      "bytes": 204431,
+      "sha256": "9a65cb512cf8ccb2c03493c535878df9ea36386cdaa81af0c76e28da48f0902c"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-1440x900-light.png": {
+      "bytes": 199719,
+      "sha256": "65e5fa9ed7d1b877159de67558c2912b1e0fd340b7d25f06b56fa61aab2b64a4"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-320x256-dark.png": {
+      "bytes": 18458,
+      "sha256": "728fcf2195d8918b5c60aa5609ddb0f506c74525ab9976207ae6937ddf4ad66a"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-320x256-light.png": {
+      "bytes": 18360,
+      "sha256": "0e811ae304a9bc60f12d3b8f3101cb50089c78b1ee6715db7a4b21517c33058f"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-375x812-dark.png": {
+      "bytes": 69109,
+      "sha256": "75a4c039482a9e445aa8bfd1236feebf81870d3be433f8f3e8b78e2cd5f376c1"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-375x812-light.png": {
+      "bytes": 67619,
+      "sha256": "22841338a3c9cd4a5d641c1ffb75904ddf8149d1622dbca23b0a3a96cbca070c"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-3840x1080-dark.png": {
+      "bytes": 242988,
+      "sha256": "1f7a7fcb237949955f0a9c34c809e608254190873d887c90afaa0a6409edb0c8"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-3840x1080-light.png": {
+      "bytes": 241506,
+      "sha256": "9c04489f3269030b3681ad1a8f21aa79269b072037918fb10c2ba3c3b75b5cc4"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-844x390-dark.png": {
+      "bytes": 67496,
+      "sha256": "213a64bd88ff1dd792d0e3823afe88c296fdee570ce31042e3cbc805f0bcce61"
+    },
+    "models/cartoni.maxima30.reference/evidence/head-844x390-light.png": {
+      "bytes": 66273,
+      "sha256": "1f087caf1607ccaa59e8673e29deff30e7bd7506371243de55af2a1308a67d27"
+    },
+    "models/cartoni.maxima30.reference/evidence/head.png": {
+      "bytes": 214295,
+      "sha256": "215f135e42a7d0477ec6c7f5675164eb76d4a59a373a51a17f37e6790321a38d"
+    },
+    "models/cartoni.maxima30.reference/evidence/headFront.png": {
+      "bytes": 204431,
+      "sha256": "9a65cb512cf8ccb2c03493c535878df9ea36386cdaa81af0c76e28da48f0902c"
+    },
+    "models/cartoni.maxima30.reference/evidence/headFrontRight.png": {
+      "bytes": 214082,
+      "sha256": "3a1f3ec53af823ebc1cc855b136c21675c6267d7e5ed05826929609e255caecb"
+    },
+    "models/cartoni.maxima30.reference/evidence/headRear.png": {
+      "bytes": 194779,
+      "sha256": "0aff8c16ec8131b6011d574553e077a6e1d754cf4bdff828523189f27fbd4b63"
+    },
+    "models/cartoni.maxima30.reference/evidence/headSide.png": {
+      "bytes": 208953,
+      "sha256": "b90706e0935dde8bc55578b90271afa16978f8f0dbc5e0f854849eb6785de459"
+    },
+    "models/cartoni.maxima30.reference/evidence/interactions.json": {
+      "bytes": 2825,
+      "sha256": "349381a08b47635dbff342805457872f32f8451b7be3e2d6fc5bb2d25ac12e2d"
+    },
+    "models/cartoni.maxima30.reference/evidence/keyboard.json": {
+      "bytes": 61,
+      "sha256": "7c7e09796a493d0dc5d7dc574b4e9b5712b5ac9a79ccd6fc8e0fdc2af261444e"
+    },
+    "models/cartoni.maxima30.reference/evidence/lifecycle.json": {
+      "bytes": 673,
+      "sha256": "7a14997e293193a38d4ebdf59827202d5a44f36c629af68389957339403fc151"
+    },
+    "models/cartoni.maxima30.reference/evidence/no-webgl.png": {
+      "bytes": 53441,
+      "sha256": "9c52d1e0ac71e1537319e271e0692046d2f7848d16603522b37b8eb7fda71f4d"
+    },
+    "models/cartoni.maxima30.reference/evidence/page-errors.json": {
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    "models/cartoni.maxima30.reference/evidence/pointer-picking.json": {
+      "bytes": 948,
+      "sha256": "7d257debde990e4610bf84ea96614041f5deedab5616839fea8f40eb836c63c9"
+    },
+    "models/cartoni.maxima30.reference/evidence/practice-reset.json": {
+      "bytes": 293,
+      "sha256": "37bca679f7a6393c5c0dd7a34b87e15ec15aff81a6efaba225f849a71b792cd5"
+    },
+    "models/cartoni.maxima30.reference/evidence/top.png": {
+      "bytes": 130907,
+      "sha256": "61082f824f6c8bebb8fb3f51a2c70ece3f3efb5a58decfda9745ee462511e825"
+    },
+    "models/cartoni.maxima30.reference/evidence/unknown-selection.json": {
+      "bytes": 783,
+      "sha256": "924a4c558f2c7580bfbb680129039265ac31ab5dcdc3b77c1b6de071e1b5af4f"
+    },
+    "models/cartoni.maxima30.reference/evidence/verification-summary.json": {
+      "bytes": 301,
+      "sha256": "ead240e49f7ff5cda0fc7e1f922032fd160e81bad7509ba5e9f0b326c0c1a102"
+    },
+    "models/cartoni.maxima30.reference/evidence/viewports.json": {
+      "bytes": 15011,
+      "sha256": "0f7e3d8d927cd2def67bbe07faf46dcc06ca70f037847c23c80e888150a1f62d"
+    },
+    "models/cartoni.maxima30.reference/evidence/visual-review.json": {
+      "bytes": 1446,
+      "sha256": "9684c276bbaba282beacc40fc778723151586f7ada71fb946f4b9bc636eff007"
+    }
+  }
+}

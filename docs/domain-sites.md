@@ -103,7 +103,8 @@ When `cutover` is `true`:
 - systembydave.com's `av-suite-worker.js` becomes a retiring worker that deletes
   the old `sbd-av-suite-*` caches, unregisters itself and reloads open pages;
 - the moved pages leave systembydave.com's sitemap, the new domain gets its own
-  (`python3 scripts/gen_sitemap.py --site <id> --out <path>`), and its
+  (`python3 scripts/gen_sitemap.py --site <id> --lastmod --out <path>`, dated
+  from git history at deploy time), and its
   `robots.txt` allows crawling with the configured disallow rules.
 
 ### Crawl policy for blocked routes

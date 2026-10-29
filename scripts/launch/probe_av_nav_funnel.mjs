@@ -73,9 +73,11 @@ try {
 
   for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
     const tag = `${viewport.width}`;
-    let { context, page, errors } = await open('demos/', viewport);
+    // The Field Kit card and subscribe section are the hub's own "Field Kit" tab (main's tabbed
+    // Video Engineering Daily hub); #field-kit opens it.
+    let { context, page, errors } = await open('demos/#field-kit', viewport);
     const hub = await page.evaluate(() => ({
-      kit: document.querySelector('#demos a.card[href^="https://avbydave.com/field-kit/?utm_source=systembydave"] h2')?.textContent,
+      kit: document.querySelector('#field-kit a.card[href^="https://avbydave.com/field-kit/?utm_source=systembydave"] h2')?.textContent,
       subscribe: !!document.querySelector('section#subscribe'),
       linkHidden: !document.getElementById('subscribe-link')?.checkVisibility(),
       soonHidden: !document.getElementById('subscribe-soon')?.checkVisibility(),
@@ -90,13 +92,13 @@ try {
     if (errors.length) fail(`${tag} hub errors: ${errors.join(' | ')}`);
     await context.close();
 
-    ({ context, page, errors } = await open('demos/', viewport, SHIPPED.replace(/emailSubscribeUrl:\s*'[^']*'/, "emailSubscribeUrl: 'https://example-pub.beehiiv.com/subscribe'")));
+    ({ context, page, errors } = await open('demos/#field-kit', viewport, SHIPPED.replace(/emailSubscribeUrl:\s*'[^']*'/, "emailSubscribeUrl: 'https://example-pub.beehiiv.com/subscribe'")));
     const live = await page.evaluate(() => { const a = document.getElementById('subscribe-link'); return { hidden: !a.checkVisibility(), href: a.href, target: a.target, rel: a.rel, soon: !document.getElementById('subscribe-soon').checkVisibility(), height: a.getBoundingClientRect().height }; });
     const u = new URL(live.href);
     if (live.hidden || !live.soon || u.hostname !== 'example-pub.beehiiv.com' || u.searchParams.get('utm_content') !== 'hub' || live.target !== '_blank' || live.height < 44 || !/noopener/.test(live.rel)) fail(`${tag} configured subscribe link wrong: ${JSON.stringify(live)}`);
     await context.close();
 
-    ({ context, page, errors } = await open('demos/', viewport, SHIPPED.replace(/emailSubscribeUrl:\s*'[^']*'/, "emailSubscribeUrl: 'https://evil.example/subscribe'")));
+    ({ context, page, errors } = await open('demos/#field-kit', viewport, SHIPPED.replace(/emailSubscribeUrl:\s*'[^']*'/, "emailSubscribeUrl: 'https://evil.example/subscribe'")));
     if (await page.evaluate(() => document.getElementById('subscribe-link').checkVisibility())) fail(`${tag} non-beehiiv subscribe URL was used`);
     await context.close();
 

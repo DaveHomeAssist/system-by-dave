@@ -1,6 +1,58 @@
 # Changelog
 
-# Changelog
+## 2026-10-28: Engineering daily archive
+
+- Keep the demos entry and return hub inside the viewport with the existing subject reader, shared neutral light and dark preferences, complete text pagination and direct archive entry. Preserve the existing demo content and links.
+
+- Publish the calendar based Video Engineering Daily reference archive alongside AV demos, with 21 sourced editions and their diagram and story assets.
+- Keep selected editions understandable across filtered views, combine the core lesson in Summary, and expose model condition and output beside Signal lab controls.
+- Add a reproducible export with metadata, asset validation and content hashes. The authoring archive remains separate from the public snapshot.
+
+## 2026-10-27: Offline console recovery
+
+- Return offline recovery links and cached navigation fallback to the native AV console. Retired Toolbox and Show Console redirect pages are not cached.
+- Verify recovery navigation for root and subdirectory scopes with the worker harness; physical-device offline acceptance remains open.
+
+## 2026-10-26 — Domain cutover browser install
+
+- Install only Playwright's headless Chromium shell in the Domain cutover acceptance job, without `--with-deps`. The runner image already provides every Chromium library; the flag only added fonts from the Ubuntu mirror, which stalled at a few kB/s and cancelled the job at its 10-minute timeout, blocking the Pages deploy for all three sites.
+
+## 2026-10-26 — Dependency audit: zod 4 and Vitest 4.1.12
+
+- Upgrade the AV console schema library from zod 3.25.76 to 4.6.7 to clear the high-severity audit failure (GHSA-mrhx-c7xc-m3w5, memory exhaustion validating oversized constrained collections; no 3.x fix exists). The `npm audit --audit-level=high` step in Public site contracts and the Pages deploy was failing on every run.
+- Migrate the only zod 4 break in use: single-argument `z.record(value)` becomes `z.record(z.string(), value)` in AV Video, AV Audio, AV Calculator and the shared console drafts. Saved plan formats, storage keys and import/export shapes are unchanged.
+- Update Vitest from 4.1.11 to 4.1.12 to clear the moderate `@vitest/mocker` advisories (GHSA-qxg6-89mg-rqv8, GHSA-xp26-3454-mjgp). Rebuilt console bundles are committed.
+
+## 2026-10-26
+
+- Add Equipment Lab as a standalone AV module and four native workspace panels.
+- Import the hash-pinned 43-entry shared catalog and unchanged Cartoni reference GLB.
+- Preserve existing model links and control IDs, with generic Panasonic context.
+
+
+## 2026-10-23 — Boxlens social preview
+
+- Give the Boxlens page a dedicated camera-model social card and metadata for its interactive guide and PDF download.
+
+## 2026-10-23 — Camera field guide download
+
+- Add the approved labeled camera field guide as a PDF download on the standalone Boxlens page.
+
+## 2026-10-23 — Standalone box lens model
+
+- Add the public `/boxlens/` AV by Dave route for the existing public Ion Workbench camera model. Preserve the source viewer, selectable controls, reference-accuracy notes and generic Panasonic body; include deterministic home/console links and a direct-viewer fallback.
+- Add the route to canonical domain staging without changing Site access or registering another AV workspace panel.
+
+## 2026-10-20 — Deployment correction validation
+
+- Keep the demo hub and both interactive demos on systembydave.com. Remove the unrelated avbydave.com route migration from the sitemap correction; existing domain configuration, canonical URLs and sitemap membership remain unchanged.
+- Update the locked Vite build dependency from 6.4.3 to 6.4.4 to clear the high-severity dependency audit failure found during fresh deployment validation. Run the same audit threshold on pull requests before publication.
+
+## 2026-10-20 — Deterministic sitemap
+
+- `sitemap.xml` is now a date-free route list, so `python3 scripts/gen_sitemap.py` regenerates the same bytes on any day, in any clone, mid-merge or after a rebase. It no longer stamps uncommitted (or mid-merge staged) files with today's date, which is what put 2026-10-20 on 15 pages in the `demos-hosting` merge and failed the Pages deploy's generated-file check (as on 2026-10-14 and 2026-09-17).
+- The Pages deploy stamps the published `_site/sitemap.xml`, and domain-site staging stamps each site's sitemap, with `--lastmod`: each page's last commit date from full git history. Without full history it omits the dates rather than guess.
+- `python3 scripts/gen_sitemap.py --check` fails with a diff when the committed sitemap is stale, and now runs on every pull request in Public site contracts, so route drift is caught before merge instead of on `main`.
 
 ## 2026-10-20 — AV by Dave interactive demos
 

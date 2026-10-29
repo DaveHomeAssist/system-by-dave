@@ -8,7 +8,7 @@
    cached application code. */
 importScripts('./js/sbd-registry.js');
 
-// Visibility compatibility: refresh shared paging helpers and their embedded copies.
+// Offline recovery: return directly to the cached native console.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();
@@ -121,8 +121,7 @@ function offlinePage(){
     +'main{max-width:34rem}h1{font-size:1.5rem;margin:0 0 .5rem}a{color:#9c4a1c;font-weight:700}'
     +'ul{padding-left:1.2rem}li{margin:.35rem 0}</style></head><body><main>'
     +'<h1>You\u2019re offline</h1><p>This page isn\u2019t saved on this device, so it can\u2019t open without a connection. Your saved AV by Dave work is still here.</p>'
-    +'<ul><li><a href="'+new URL('./av-suite.html?entry=show',self.registration.scope).href+'">Open the Show Console</a></li>'
-    +'<li><a href="'+new URL('./av-suite.html?entry=toolbox',self.registration.scope).href+'">Open the AV Toolbox</a></li></ul>'
+    +'<p><a href="'+new URL('./av/',self.registration.scope).href+'">Open the AV Console</a></p>'
     +'<p>Reconnect and reload to open this page.</p></main></body></html>';
   return new Response(html,{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
 }
@@ -145,7 +144,7 @@ self.addEventListener('fetch',function(event){
         return cachedResponse(cache,request).then(function(found){
           if(found) return found;
           if(request.mode!=='navigate') throw new Error('Offline asset is unavailable');
-          var fallback=new URL(request.url).pathname===new URL('./',self.registration.scope).pathname?'./av-suite-landing2.html':'./av-suite.html';
+          var fallback='./av/index.html';
           return cache.match(new URL(fallback,self.registration.scope).href).then(function(page){return page||offlinePage();});
         });
       });

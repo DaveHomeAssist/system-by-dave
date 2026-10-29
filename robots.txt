@@ -27,3 +27,7 @@ Disallow: /wedding-ops.html
 Sitemap: https://systembydave.com/sitemap.xml
 Sitemap: https://systembydave.com/systembydave/sitemap.xml
 Host: systembydave.com
+
+# Equipment Lab source and original downloadable reference package
+Disallow: /apps/equipment-lab/
+Disallow: /equipment-lab/data/
