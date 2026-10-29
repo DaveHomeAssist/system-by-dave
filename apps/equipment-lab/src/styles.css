@@ -5,5 +5,3 @@
 @media print{html:has(.lab-shell),body:has(.lab-shell),.lab-shell,#root,.lab-standalone,.equipment-lab-native,.lab-copy,.lab-list{height:auto;overflow:visible;display:block}.lab-header,.lab-view-buttons,.sbd-rail-host{display:none}}
 
 .lab-shell #root{grid-column:2;grid-row:1;min-width:0;overflow:hidden}.lab-standalone{font:14px system-ui,sans-serif}.lab-standalone button{font:inherit;min-height:44px;color:var(--av-text);background:var(--av-surface);border:1px solid var(--av-line);border-radius:6px;padding:6px 10px}.lab-standalone *{box-sizing:border-box}.lab-standalone :focus-visible{outline:3px solid var(--av-focus);outline-offset:2px}.lab-standalone .console-title{font-size:12px}.lab-standalone .console-views button{font-size:12px}.lab-standalone .console-quick{overflow-x:auto}
-.lab-header h1 .lab-title{color:inherit;text-decoration:none}.lab-header h1 .lab-title:hover{text-decoration:underline;text-underline-offset:3px}
-@media(max-width:680px){.lab-header .lab-all{display:none}}
