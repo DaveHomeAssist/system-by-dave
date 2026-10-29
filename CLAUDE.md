@@ -60,8 +60,9 @@ handoffs.
 - `apps/av-suite/`: React/TypeScript source for the AV Suite shell; `av/` is its
   generated artifact (one console; `docs/av-suite-shell.md`)
 - `apps/<family>/src/pack.tsx`: each application's panel pack (contract in
-  `apps/shared/av-console/pack.ts`), mounted by the shell and by the
-  application's own standalone route
+  `apps/shared/av-console/pack.ts`), mounted by the shell. The eight original
+  family routes redirect into it; ignored standalone builds remain source
+  regression fixtures
 - `apps/av-workbook/`: React/TypeScript source for AV Workbook
 - `av-workbook/`: noindex redirect to Toolbox; no editor artifact
 - `apps/fmp-camera-sim/`: React/TypeScript/Three.js source for the FMP Camera

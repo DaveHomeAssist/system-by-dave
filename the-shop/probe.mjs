@@ -1,3 +1,6 @@
+import { probeFamily } from '../scripts/av-family-probe.mjs';
+if (!process.env.AV_RETAINED_HOST) { await probeFamily('shop', process.env.SHOP_BASE); process.exit(0); }
+
 import {chromium} from 'playwright';
 import {createServer} from 'node:http';
 import {readFile,mkdir} from 'node:fs/promises';
