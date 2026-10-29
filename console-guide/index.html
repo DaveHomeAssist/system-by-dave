@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" data-av-theme="dark" data-av-theme-lock="dark" data-av-tool="console-guide">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'" />
+    <title>Lighting Console Spec Guide: sizes, weights and outputs | AV by Dave</title>
+    <meta name="description" content="Free, searchable comparison of lighting consoles from ETC Eos, Hog, grandMA, Avolites, ChamSys and Obsidian Onyx: dimensions, weight, flight case weight, universes and DMX ports, each linked to the manufacturer's spec page." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://avbydave.com/console-guide/" />
+    <meta name="theme-color" content="#0C1016" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AV by Dave" />
+    <meta property="og:title" content="Lighting Console Spec Guide | AV by Dave" />
+    <meta property="og:description" content="Sizes, weights, case weights, universes and DMX ports for about 50 lighting consoles, each sourced from the manufacturer." />
+    <meta property="og:url" content="https://avbydave.com/console-guide/" />
+    <meta property="og:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lighting Console Spec Guide | AV by Dave" />
+    <meta name="twitter:description" content="Sizes, weights, case weights, universes and DMX ports for about 50 lighting consoles, each sourced from the manufacturer." />
+    <meta name="twitter:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+    <link rel="icon" href="../svg/system_by_dave_logo_rust.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../css/av-theme.css" />
+    <script src="../js/av-theme-mode.js"></script>
+    <style>
+      html, body { margin: 0; background: var(--av-bg); color: var(--av-text); }
+      body { font-family: var(--av-font-ui); line-height: 1.5; overflow-x: hidden; }
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      a { color: var(--av-brand-strong); }
+      :focus-visible { outline: 3px solid var(--av-focus); outline-offset: 2px; }
+      .sbd-skip-link { position: absolute; left: 12px; top: -80px; z-index: 50; padding: 12px 16px; min-height: 44px; border-radius: var(--av-radius-control); font-weight: 700; text-decoration: none; background: var(--av-surface-3); }
+      .sbd-skip-link:focus { top: 12px; }
+      .sbd-site-return { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; max-width: 1180px; margin: 0 auto; padding: 4px 16px; font-size: 13px; }
+      .sbd-site-return a { display: inline-flex; align-items: center; min-height: 44px; color: var(--av-text-2); text-decoration: none; font-weight: 600; }
+      main { max-width: 1180px; margin: 0 auto; padding: 8px 16px 40px; outline: none; }
+      .cg-badge { display: inline-block; margin: 0 0 10px; padding: 4px 10px; border-radius: 999px; background: var(--av-success-soft); border: 1px solid var(--av-success-line); color: var(--av-success); font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+      h1 { margin: 0 0 8px; font-size: clamp(28px, 6.2vw, 42px); line-height: 1.08; }
+      .cg-lede { margin: 0 0 18px; color: var(--av-text-2); max-width: 68ch; }
+      .cg-controls { display: grid; gap: 10px; padding: 14px; margin: 0 0 12px; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-line); }
+      .cg-controls label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--av-text-2); }
+      .cg-controls input, .cg-controls select { width: 100%; min-height: 44px; padding: 8px 12px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-surface-2); color: var(--av-text); font: inherit; font-size: 16px; }
+      .cg-check { display: flex !important; align-items: center; gap: 10px !important; min-height: 44px; }
+      .cg-check input { width: 22px; min-height: 22px; height: 22px; }
+      .cg-reset { min-height: 44px; padding: 8px 14px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-surface-3); color: var(--av-text); font: inherit; font-weight: 700; align-self: end; }
+      @media (min-width: 720px) { .cg-controls { grid-template-columns: 2fr 1fr 1fr 1fr auto; align-items: end; } }
+      .cg-status { margin: 0 0 12px; color: var(--av-muted); font-size: 14px; }
+      .cg-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      .cg-table th, .cg-table td { padding: 10px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--av-line); }
+      .cg-table thead th { position: sticky; top: 0; background: var(--av-bg); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--av-muted); z-index: 1; }
+      .cg-model { font-weight: 800; font-size: 15px; }
+      .cg-meta { display: block; color: var(--av-muted); font-size: 12px; font-weight: 600; }
+      .cg-tag { display: inline-block; margin: 2px 4px 0 0; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--av-line-strong); font-size: 11px; font-weight: 700; color: var(--av-text-2); text-transform: uppercase; letter-spacing: .04em; }
+      .cg-np { color: var(--av-muted); font-style: italic; }
+      .cg-note { display: block; margin-top: 4px; color: var(--av-muted); font-size: 12px; }
+      .cg-links a { display: inline-flex; align-items: center; min-height: 32px; margin-right: 10px; font-weight: 700; white-space: nowrap; }
+      .cg-empty { padding: 20px; text-align: center; color: var(--av-text-2); border: 1px dashed var(--av-line-strong); border-radius: var(--av-radius-card); }
+      @media (max-width: 899px) {
+        .cg-table thead { display: none; }
+        .cg-table, .cg-table tbody, .cg-table tr, .cg-table td { display: block; width: 100%; }
+        .cg-table tr { margin: 0 0 12px; padding: 12px 14px; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-line); }
+        .cg-table td { padding: 4px 0; border: 0; display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 8px; overflow-wrap: anywhere; }
+        .cg-table td::before { content: attr(data-label); color: var(--av-muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+        .cg-table td.cg-head { display: block; padding-bottom: 6px; }
+        .cg-table td.cg-head::before { content: none; }
+      }
+      .cg-cta { display: grid; gap: 10px; padding: 18px; margin: 24px 0; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-brand-line); }
+      .cg-cta h2 { margin: 0; font-size: 20px; }
+      .cg-cta p { margin: 0; color: var(--av-text-2); }
+      .cg-cta a.cg-btn { justify-self: start; display: inline-flex; align-items: center; min-height: 44px; padding: 10px 18px; border-radius: var(--av-radius-control); background: var(--av-brand); border: 1px solid var(--av-brand); color: #04140b; font-weight: 800; text-decoration: none; }
+      .cg-cta a.cg-btn:hover { background: var(--av-brand-strong); }
+      .cg-about { margin: 24px 0 0; color: var(--av-text-2); font-size: 14px; max-width: 75ch; }
+      .cg-about h2 { font-size: 18px; color: var(--av-text); margin: 0 0 6px; }
+      .cg-about ul { margin: 0; padding-left: 20px; }
+      footer { max-width: 1180px; margin: 0 auto; padding: 20px 16px 40px; color: var(--av-muted); font-size: 13px; border-top: 1px solid var(--av-line); }
+      footer a { color: var(--av-text-2); display: inline-flex; min-height: 44px; align-items: center; margin-right: 14px; }
+    </style>
+  </head>
+  <body>
+    <a class="sbd-skip-link" href="#cg-results">Skip to the console list</a>
+    <nav class="sbd-site-return" aria-label="Breadcrumb">
+      <a href="https://systembydave.com/">System by Dave</a>
+      <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+      <a href="/">AV by Dave</a>
+      <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+      <span class="sbd-site-return__current" aria-current="page">Console Spec Guide</span>
+    </nav>
+    <main id="cg" tabindex="-1">
+      <p class="cg-badge">Free reference</p>
+      <h1>Lighting Console Spec Guide</h1>
+      <p class="cg-lede">Will it fit the FOH riser, the case or the truck? Sizes, weights, case weights, universes and DMX ports for consoles from ETC Eos, Hog, grandMA, Avolites, ChamSys and Obsidian Onyx. Every number comes from the manufacturer's own page, linked on each row. If a maker doesn't publish a value, it says so.</p>
+
+      <form class="cg-controls" id="cg-form" role="search" aria-label="Filter consoles">
+        <label>Search
+          <input type="search" id="cg-q" name="q" placeholder="Model, brand or spec, e.g. Apex, MQ, 64 universes" autocomplete="off" />
+        </label>
+        <label>Brand
+          <select id="cg-brand" name="brand"><option value="">All brands</option></select>
+        </label>
+        <label>Size (width)
+          <select id="cg-size" name="size">
+            <option value="">Any size</option>
+            <option value="s">Small: under 600 mm</option>
+            <option value="m">Medium: 600 to 999 mm</option>
+            <option value="l">Large: 1000 mm and up</option>
+            <option value="x">Width not published</option>
+          </select>
+        </label>
+        <label>Sort
+          <select id="cg-sort" name="sort">
+            <option value="">Brand, then model</option>
+            <option value="w">Width, smallest first</option>
+            <option value="kg">Weight, lightest first</option>
+          </select>
+        </label>
+        <button type="reset" class="cg-reset" id="cg-reset">Clear</button>
+        <label class="cg-check"><input type="checkbox" id="cg-legacy" name="legacy" checked /> Include legacy and discontinued models</label>
+        <label class="cg-check"><input type="checkbox" id="cg-wings" name="wings" checked /> Include wings, rack units, panels and software</label>
+      </form>
+
+      <p class="cg-status" id="cg-status" role="status" aria-live="polite">Loading the console list…</p>
+      <noscript><p class="cg-empty">The search needs JavaScript. The full list is in <a href="consoles.json">consoles.json</a>.</p></noscript>
+
+      <div id="cg-results" tabindex="-1">
+        <table class="cg-table" id="cg-table" hidden>
+          <caption class="cg-meta" style="text-align:left;caption-side:bottom;padding-top:8px">W × D × H as each maker publishes them. "Not published" means the maker's page doesn't list it.</caption>
+          <thead>
+            <tr><th scope="col">Console</th><th scope="col">Width</th><th scope="col">Depth</th><th scope="col">Height</th><th scope="col">Weight</th><th scope="col">In case</th><th scope="col">Universes / outputs</th><th scope="col">DMX ports</th><th scope="col">Specs and photos</th></tr>
+          </thead>
+          <tbody id="cg-body"></tbody>
+        </table>
+        <p class="cg-empty" id="cg-empty" hidden>No console matches. <button type="button" class="cg-reset" id="cg-empty-reset">Clear the filters</button></p>
+      </div>
+
+      <aside class="cg-cta" aria-labelledby="cg-cta-title">
+        <h2 id="cg-cta-title">Picture tearing on the LED wall or projectors?</h2>
+        <p>The Sync &amp; Signal Field Kit is four quick references for when video tears, drops or won't handshake: a tearing troubleshooting card, an EDID/HDCP decision tree, a genlock checklist and a browser tear-test page. Printable and phone-sized. $19.</p>
+        <a class="cg-btn" href="https://avbydave.com/field-kit/?utm_source=avbydave&amp;utm_medium=referral&amp;utm_campaign=field-kit&amp;utm_content=console-guide">See the Field Kit</a>
+      </aside>
+
+      <section class="cg-about" aria-labelledby="cg-about-title">
+        <h2 id="cg-about-title">How this list is built</h2>
+        <ul>
+          <li>Specs were checked against each manufacturer's product or tech-spec page on 28 October 2026. Makers change pages; follow the link before you book a truck.</li>
+          <li>ETC lists Eos capacity as outputs (DMX addresses); MA lists parameters; others list universes. Each is shown in the maker's own terms.</li>
+          <li>Many makers call their sizes and weights typical. Folding consoles show each published position.</li>
+          <li>No photos are copied here. Use "Photos and specs" to see the console on the maker's site.</li>
+          <li>Spotted a wrong number? Email <a href="mailto:avbydave@gmail.com?subject=Console%20Spec%20Guide">avbydave@gmail.com</a> with the maker's link.</li>
+        </ul>
+      </section>
+    </main>
+    <footer>
+      <a href="/">AV by Dave tools</a><a href="consoles.json">Data (JSON)</a><a href="https://systembydave.com/privacy-policy.html">Privacy</a>
+      <p>Product names are trademarks of their owners. AV by Dave is not affiliated with any manufacturer listed.</p>
+    </footer>
+    <script src="console-guide.js"></script>
+  </body>
+</html>
