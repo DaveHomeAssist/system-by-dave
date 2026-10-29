@@ -86,6 +86,7 @@ jobs:
           node scripts/probe_av_themes.js
           node scripts/probe_led_wall_configurator.js
           node scripts/probe_engineering_daily.cjs
+          node scripts/probe_engineering_entry.cjs
 
       - name: Verify ATEM switcher guide
         env:
