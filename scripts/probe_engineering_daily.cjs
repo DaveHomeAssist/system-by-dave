@@ -21,12 +21,12 @@ const {chromium}=require('playwright');
    while(await page.locator('#calendarDatesPrev').isEnabled())await page.locator('#calendarDatesPrev').click();
    const dates=new Set();let count=0;
    for(;;){for(const date of await page.locator('.calendarDay:visible').evaluateAll(nodes=>nodes.map(node=>node.dataset.date)))dates.add(date);await targets();if(!await page.locator('#calendarDatesNext').isEnabled())break;await page.locator('#calendarDatesNext').click();assert(++count<31);}
-   assert.equal(dates.size,31);const last=await page.locator('#calendarDatePage').textContent();await page.reload();await page.waitForFunction(()=>window.signalLab);assert.equal(await page.locator('#calendarDatePage').textContent(),last);
+   const expectedDays=await page.evaluate(()=>{const [year,month]=calendarMonth.split('-').map(Number);return new Date(Date.UTC(year,month,0)).getUTCDate();});assert.equal(dates.size,expectedDays);const last=await page.locator('#calendarDatePage').textContent();await page.reload();await page.waitForFunction(()=>window.signalLab);assert.equal(await page.locator('#calendarDatePage').textContent(),last);
   }
   assert.equal(await page.locator('.dailySkip').getAttribute('href'),'#daily-main');
   assert(await page.locator('.appHeader a[href="/"]').isVisible());assert(await page.locator('.appHeader a[href="/demos/"]').isVisible());
   for(const theme of ['light','dark']){
-   await page.evaluate(theme=>{setTheme(theme);search='optical';document.getElementById('search').value=search;renderList();display(facts[0]);showWorkspace('archive');},theme);
+   await page.evaluate(theme=>{setTheme(theme);search='optical';document.getElementById('search').value=search;renderList();display(facts.find(f=>![f.title,f.date,f.trackShort,String(f.id).padStart(3,'0')].join(' ').toLowerCase().includes(search)));showWorkspace('archive');},theme);
    assert(await page.locator('#selectionContext').isVisible());await page.locator('#revealSelection').click();
    await targets();
    assert.equal(await page.locator('#search').inputValue(),'');assert(await page.locator('#selectionContext').isHidden());
