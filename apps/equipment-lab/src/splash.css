@@ -28,8 +28,8 @@
 .splash-stats b{margin-right:5px;font-size:1rem;color:var(--av-text,#222);font-variant-numeric:tabular-nums}
 .splash-featured{position:relative;min-width:0;min-height:160px;margin:0;border-left:1px solid var(--av-line,#c7c2ba);background:var(--splash-stage)}
 .splash-featured img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.splash-featured figcaption{position:absolute;left:10px;right:10px;bottom:10px;display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--av-line,#c7c2ba);border-radius:10px;background:var(--av-surface,#f8f5f0)}
-.splash-featured-text{flex:1;display:grid;gap:2px;min-width:0}
+.splash-featured figcaption{position:absolute;left:10px;right:10px;bottom:10px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--av-line,#c7c2ba);border-radius:10px;background:var(--av-surface,#f8f5f0)}
+.splash-featured-text{flex:1 1 150px;display:grid;gap:2px;min-width:0}
 .lab-splash .splash-featured-name{display:flex;align-items:center;gap:8px;min-width:0;min-height:32px;padding:0;border:0;background:none;color:inherit;font:400 1rem/1.2 var(--splash-display);text-align:left;text-wrap:balance;cursor:pointer}
 .splash-featured-name:hover{text-decoration:underline;text-underline-offset:3px}
 
@@ -100,6 +100,10 @@
 .splash-scrim{position:fixed;inset:0;z-index:40;background:rgb(10 14 18 / .45)}
 .lab-splash[data-overlay] .splash-layout{grid-template-columns:190px minmax(0,1fr)}
 .lab-splash[data-overlay] .splash-sheet{position:fixed;z-index:41;top:0;right:0;bottom:0;width:min(400px,92vw);padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));box-shadow:var(--av-shadow,0 12px 38px rgb(0 0 0 / .25))}
+
+/* The featured strip needs about 280px; below that the sheet or the grid already shows the reference model */
+@container splash (max-width:1179px){.lab-splash:not([data-overlay]) .splash-intro{grid-template-columns:minmax(0,1fr)}.lab-splash:not([data-overlay]) .splash-featured{display:none}}
+@container splash (max-width:779px){.splash-intro{grid-template-columns:minmax(0,1fr)}.splash-featured{display:none}}
 
 @container splash (max-width:640px){
   .lab-splash[data-overlay] .splash-layout,.splash-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
