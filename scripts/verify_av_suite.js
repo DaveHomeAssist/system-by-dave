@@ -208,7 +208,7 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261027-offline-console-recovery') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261029-family-console-redirects') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
@@ -247,20 +247,12 @@ function assertPageContracts(registry) {
 
   const index = read('index.html');
   const tools = read('tools.html');
-  const avVideo = read('av-video/index.html');
-  [
-    '../css/sbd-rail.css',
-    '../css/sbd-rail-dialogs.css',
-    '../js/sbd-rail.js',
-    '../js/sbd-rail-dialogs.js',
-    '../js/sbd-rail-mount.js'
-  ].forEach((asset) => {
-    if (!avVideo.includes(asset)) fail(`AV Video production build does not load ${asset}.`);
-  });
-  if (!/data-sbd-rail-host[^>]*data-current-ref="console:av-video"/.test(avVideo)
-      || !/class="av-video-shell__workspace"/.test(avVideo)
-      || !/data-sbd-rail-dialogs/.test(avVideo)) {
-    fail('AV Video production build does not mount the Rail outside the React root.');
+  const familyRoutes = { 'av-video': 'video', 'av-audio': 'audio', 'show-control': 'show-control', 'show-ops': 'show-ops', 'front-office': 'front-office', 'the-shop': 'shop', infrastructure: 'infrastructure', 'av-lighting': 'lighting' };
+  for (const [route, pack] of Object.entries(familyRoutes)) {
+    const stub = read(`${route}/index.html`);
+    if (!stub.includes(`content="0;url=/av/?app=${pack}"`) || !stub.includes(`target.searchParams.set('app', '${pack}')`) || !stub.includes('location.replace(target.pathname + target.search)') || !stub.includes('noindex,follow') || /<script[^>]+src=/.test(stub)) fail(`${route} must remain a redirect stub into the ${pack} pack.`);
+    if (!read(`apps/${route}/src/pack.tsx`)) fail(`${route} lost its retained native pack.`);
+    if (!read(`apps/${route}/vite.config.ts`).includes("'dist'") && !read(`apps/${route}/vite.config.ts`).includes('"dist"')) fail(`${route} build must stay in its ignored dist directory.`);
   }
   if (/(^|[^0-9])40\+/.test(index + tools) || /~40/.test(index + tools)) {
     fail('Public AV Suite copy still contains stale 40+ or ~40 count.');

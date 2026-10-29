@@ -44,12 +44,16 @@ for (const tool of registry.tools) {
   }
   const file = routeFile(tool.href);
   if (!fs.existsSync(file)) throw new Error(`Missing registry route: ${tool.href}`);
-  const source = fs.readFileSync(file, 'utf8');
+  const routeSource = fs.readFileSync(file, 'utf8');
+  const consolePack = routeSource.match(/content="0;url=\/av\/\?app=([^"]+)"/);
+  const packFile = path.join(root, 'apps', tool.href.replace(/\/$/, ''), 'src/pack.tsx');
+  const source = consolePack && fs.existsSync(packFile) ? fs.readFileSync(packFile, 'utf8') : routeSource;
   const declared = tool.storageKeys.map(item => item.key).join(', ') || 'None declared';
   const extra = exceptionStores[tool.id];
   const storage = extra ? `${declared}; ${extra}` : declared;
   const normalizedRoute = tool.href.replace(/^\.\//, '');
-  lines.push(`| **${escape(tool.name)}** — ${escape(tool.desc)} | \`/${escape(normalizedRoute)}\` | ${escape(domainSites.originFor(normalizedRoute))} | ${escape(storage)} | ${signal(source, /download|export|\.csv|\.json|\.png|\.pdf/i)} | ${signal(source, /window\.print|printBtn|@media print/i)} | ${signal(source, /keydown|keyup|accesskey/i)} | ${offline.has(normalizedRoute) ? 'Named' : 'Not named'} |`);
+  const routeLabel = consolePack ? `\`/${escape(normalizedRoute)}\` → \`/av/?app=${escape(consolePack[1])}\` (native pack source)` : `\`/${escape(normalizedRoute)}\``;
+  lines.push(`| **${escape(tool.name)}**${consolePack ? ':' : ' \u2014'} ${escape(tool.desc)} | ${routeLabel} | ${escape(domainSites.originFor(normalizedRoute))} | ${escape(storage)} | ${signal(source, /download|export|\.csv|\.json|\.png|\.pdf/i)} | ${signal(source, /window\.print|printBtn|@media print/i)} | ${signal(source, /keydown|keyup|accesskey/i)} | ${offline.has(normalizedRoute) ? 'Named' : 'Not named'} |`);
 }
 
 lines.push('', `**Count:** ${registry.tools.length} registry tools (${registry.tools.filter(tool => !tool.retired).length} live, ${registry.tools.filter(tool => tool.retired).length} retired redirect stubs); ${registry.tools.reduce((sum, tool) => sum + tool.storageKeys.length, 0)} declared local-storage keys.`, '',

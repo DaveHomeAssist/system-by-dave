@@ -99,11 +99,15 @@ try {
       }
       if (demo === 'frame-sync.html') {
         // The Reels capture layout needs a capture flag; ?reels alone must change nothing.
+        // Let fonts and the post-load resize settle before comparing (the stage scale was read
+        // mid-resize now and then, which made this check flaky).
         await page.goto(`${BASE}/demos/${demo}`);
         await page.waitForLoadState('load');
+        await page.evaluate(() => document.fonts.ready.then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))));
         const plain = await page.evaluate(() => document.getElementById('fit').style.transform);
         await page.goto(`${BASE}/demos/${demo}?reels`);
         await page.waitForLoadState('load');
+        await page.evaluate(() => document.fonts.ready.then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))));
         const r = await page.evaluate(() => ({ layout: document.documentElement.dataset.captureLayout || null, t: document.getElementById('fit').style.transform }));
         if (r.layout || r.t !== plain) fail(`${demo} @${width}: ?reels without a capture flag changed the page (${JSON.stringify(r)})`);
         const m = await measure(page, width);

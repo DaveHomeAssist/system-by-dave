@@ -96,7 +96,7 @@
     "typecheck:show-ops": "tsc -p apps/show-ops/tsconfig.json --noEmit",
     "test:show-ops": "node --test show-ops/model.test.mjs && vitest run --config apps/show-ops/vitest.config.ts",
     "test:show-ops-browser": "node scripts/probe_show_ops_console.mjs --no-sandbox",
-    "test:av-video-browser": "node scripts/probe_av_video_rail.mjs --no-sandbox && node scripts/probe_av_video.mjs --no-sandbox && node scripts/probe_av_video_graph.mjs --no-sandbox && node scripts/probe_av_video_displays.mjs --no-sandbox && node scripts/probe_av_console.mjs --no-sandbox && node scripts/probe_av_console_recovery.mjs --no-sandbox && node scripts/probe_av_video_sequences.mjs --no-sandbox && node scripts/probe_av_audio_connector.mjs --no-sandbox",
+    "test:av-video-browser": "node scripts/probe_av_video.mjs --no-sandbox",
     "test:av-offline-transition": "node scripts/probe_av_offline_transition.mjs --no-sandbox",
     "sync:av-workspace": "node scripts/sync_av_workspace.js",
     "test:av-workspace": "node scripts/probe_av_workspace.mjs",
@@ -108,6 +108,9 @@
     "verify:equipment-lab": "node scripts/equipment_lab_release.mjs --check",
     "sync:equipment-lab": "node scripts/equipment_lab_release.mjs",
     "test:equipment-lab-browser": "node scripts/probe_equipment_lab.mjs",
+    "test:av-routes-browser": "AV_FAMILY_REDIRECTS=1 node scripts/probe_av_routes.mjs",
+    "test:av-retained-browser": "node scripts/probe_av_retained.mjs",
+    "test:av-families-browser": "node scripts/av-family-probe.mjs",
     "probe:av-nav-funnel": "node scripts/launch/probe_av_nav_funnel.mjs"
   },
   "devDependencies": {
