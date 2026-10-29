@@ -21,9 +21,10 @@
 .suite-app .workspace-host{flex:1;min-height:0;display:flex;flex-direction:column}
 .av-video-shell__workspace>#root{height:100%;min-height:0}
 .suite-app .console-views{flex:1}
-/* Match the chooser's 420px placement bound so its last choice stays reachable. */
-.suite-app .console-chooser{max-height:min(420px,calc(100dvh - 16px))}
+/* The chooser's height comes from where it opened (console.css); only its
+   panel list shrinks, so the last choice stays reachable inside that list. */
 .suite-app .console-chooser>*{flex-shrink:0}
+.suite-app .console-chooser .console-choices{flex-shrink:1}
 .suite-app .console-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
 .suite-app .console-groups button{min-width:0;padding:8px 4px}
 .suite-app .message{flex-shrink:0}
