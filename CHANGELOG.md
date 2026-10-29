@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-28: AV console render recovery
+
+- Contain React render failures at the main AV console root with an accessible recovery screen and manual reload. Saved plans, workspace data and routes are preserved.
+- Verify the real boundary with a deliberately failing child, keyboard focus, theme controls and phone through ultrawide containment. Standalone application roots remain outside this repair; diagnostic capture and reporting remain pending.
+
 ## 2026-10-27: Offline console recovery
 
 - Return offline recovery links and cached navigation fallback to the native AV console. Retired Toolbox and Show Console redirect pages are not cached.

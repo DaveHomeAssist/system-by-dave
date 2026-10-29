@@ -218,7 +218,7 @@
       "type": "logic",
       "sev": "P1",
       "title": "A render error blanks the whole AV console",
-      "detail": "No AV app on avbydave.com has a React error boundary (av-suite, av-audio, av-calculator, av-lighting, av-video, equipment-lab, front-office, infrastructure, show-control, show-ops, the-shop). Each mounts with React 18 createRoot and no fallback, and no page installs a window error or unhandledrejection handler. A render error in any one panel unmounts the whole console and leaves a blank page; the error appears only in that device's developer console. Only apps/fmp-camera-sim (housevideo.app) has a boundary. Containment does not depend on DIAG-1; what the recovery panel offers does.",
+      "detail": "The AV Suite root now has a local render error boundary with a focused recovery screen and explicit manual reload. It preserves saved data and offers a temporary light or dark switch without diagnostic capture or reporting. Candidate verification and delivery are tracked with the pull request. Standalone roots remain uncovered (av-audio, av-calculator, av-lighting, av-video, equipment-lab, front-office, infrastructure, show-control, show-ops, the-shop), so AVC-15 remains open. Those standalone roots mount with React 18 createRoot and no fallback, and no page installs a window error or unhandledrejection handler. A render error in those standalone apps can still leave a blank page; the error appears only in that device's developer console. apps/fmp-camera-sim (housevideo.app) retains its existing boundary. Containment does not depend on DIAG-1; what the recovery panel offers does.",
       "files": [
         "apps/av-suite/src/main.tsx",
         "apps/equipment-lab/src/main.tsx",
