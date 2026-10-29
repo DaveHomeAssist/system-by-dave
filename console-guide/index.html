@@ -41,9 +41,14 @@
       .cg-controls label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--av-text-2); }
       .cg-controls input, .cg-controls select { width: 100%; min-height: 44px; padding: 8px 12px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-surface-2); color: var(--av-text); font: inherit; font-size: 16px; }
       .cg-check { display: flex !important; align-items: center; gap: 10px !important; min-height: 44px; }
-      .cg-check input { width: 22px; min-height: 22px; height: 22px; }
+      .cg-check input { flex: none; width: 22px; min-height: 22px; height: 22px; margin: 0; }
+      .cg-key { margin: 0 0 8px; }
+      .cg-linkset { display: flex; flex-wrap: wrap; gap: 0 12px; }
+      .cg-q, .cg-check { grid-column: 1 / -1; }
       .cg-reset { min-height: 44px; padding: 8px 14px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-surface-3); color: var(--av-text); font: inherit; font-weight: 700; align-self: end; }
-      @media (min-width: 720px) { .cg-controls { grid-template-columns: 2fr 1fr 1fr 1fr auto; align-items: end; } }
+      .cg-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .cg-controls label, .cg-controls select { min-width: 0; }
+      @media (min-width: 720px) { .cg-controls { grid-template-columns: 2fr 1fr 1fr 1fr auto; align-items: end; } .cg-q { grid-column: auto; } .cg-check { grid-column: span 2; } }
       .cg-status { margin: 0 0 12px; color: var(--av-muted); font-size: 14px; }
       .cg-table { width: 100%; border-collapse: collapse; font-size: 14px; }
       .cg-table th, .cg-table td { padding: 10px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--av-line); }
@@ -53,7 +58,7 @@
       .cg-tag { display: inline-block; margin: 2px 4px 0 0; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--av-line-strong); font-size: 11px; font-weight: 700; color: var(--av-text-2); text-transform: uppercase; letter-spacing: .04em; }
       .cg-np { color: var(--av-muted); font-style: italic; }
       .cg-note { display: block; margin-top: 4px; color: var(--av-muted); font-size: 12px; }
-      .cg-links a { display: inline-flex; align-items: center; min-height: 32px; margin-right: 10px; font-weight: 700; white-space: nowrap; }
+      .cg-links a { display: inline-flex; align-items: center; min-height: 32px; font-weight: 700; white-space: nowrap; }
       .cg-empty { padding: 20px; text-align: center; color: var(--av-text-2); border: 1px dashed var(--av-line-strong); border-radius: var(--av-radius-card); }
       @media (max-width: 899px) {
         .cg-table thead { display: none; }
@@ -91,7 +96,7 @@
       <p class="cg-lede">Will it fit the FOH riser, the case or the truck? Sizes, weights, case weights, universes and DMX ports for consoles from ETC Eos, Hog, grandMA, Avolites, ChamSys and Obsidian Onyx. Every number comes from the manufacturer's own page, linked on each row. If a maker doesn't publish a value, it says so.</p>
 
       <form class="cg-controls" id="cg-form" role="search" aria-label="Filter consoles">
-        <label>Search
+        <label class="cg-q">Search
           <input type="search" id="cg-q" name="q" placeholder="Model, brand or spec, e.g. Apex, MQ, 64 universes" autocomplete="off" />
         </label>
         <label>Brand
@@ -122,8 +127,8 @@
       <noscript><p class="cg-empty">The search needs JavaScript. The full list is in <a href="consoles.json">consoles.json</a>.</p></noscript>
 
       <div id="cg-results" tabindex="-1">
+        <p class="cg-meta cg-key">Width × depth × height as each maker publishes them. "Not published" means the maker's page doesn't list it.</p>
         <table class="cg-table" id="cg-table" hidden>
-          <caption class="cg-meta" style="text-align:left;caption-side:bottom;padding-top:8px">W × D × H as each maker publishes them. "Not published" means the maker's page doesn't list it.</caption>
           <thead>
             <tr><th scope="col">Console</th><th scope="col">Width</th><th scope="col">Depth</th><th scope="col">Height</th><th scope="col">Weight</th><th scope="col">In case</th><th scope="col">Universes / outputs</th><th scope="col">DMX ports</th><th scope="col">Specs and photos</th></tr>
           </thead>

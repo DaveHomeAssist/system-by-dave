@@ -73,8 +73,10 @@
       tr.appendChild(cell('In case', r.caseWeight));
       tr.appendChild(cell('Universes', r.capacity));
       tr.appendChild(cell('DMX ports', r.dmxPorts));
-      var links = el('td', 'cg-links');
-      links.setAttribute('data-label', 'Links');
+      var linkCell = el('td', 'cg-links');
+      linkCell.setAttribute('data-label', 'Links');
+      var links = el('span', 'cg-linkset');
+      linkCell.appendChild(links);
       var prod = safeUrl(r.productUrl), src = safeUrl(r.source);
       if (prod) {
         var a = el('a', null, 'Photos and specs ↗');
@@ -92,12 +94,14 @@
       if (extra.length) {
         var fs = safeUrl(r.fieldSources[extra[0]]);
         if (fs) {
-          var f = el('a', null, extra.join(', ') + ' source ↗');
+          var f = el('a', null, 'More sources ↗');
           f.href = fs; f.target = '_blank'; f.rel = 'noopener noreferrer';
+          f.title = 'Also confirms: ' + extra.join(', ');
+          f.setAttribute('aria-label', 'Second source for ' + r.model + ' ' + extra.join(', ') + ' (opens in a new tab)');
           links.appendChild(f);
         }
       }
-      tr.appendChild(links);
+      tr.appendChild(linkCell);
       body.appendChild(tr);
     });
     table.hidden = list.length === 0;
