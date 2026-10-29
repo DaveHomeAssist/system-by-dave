@@ -48,7 +48,9 @@
       .cg-reset { min-height: 44px; padding: 8px 14px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-surface-3); color: var(--av-text); font: inherit; font-weight: 700; align-self: end; }
       .cg-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
       .cg-controls label, .cg-controls select { min-width: 0; }
-      @media (min-width: 720px) { .cg-controls { grid-template-columns: 2fr 1fr 1fr 1fr auto; align-items: end; } .cg-q { grid-column: auto; } .cg-check { grid-column: span 2; } }
+      @media (min-width: 720px) { .cg-controls { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; } .cg-q { grid-column: auto; } .cg-check { grid-column: span 2; } }
+      /* Hold one screen of space for the list while consoles.json loads, so the CTA and notes below it are never painted in the first view and then pushed down (layout shift). */
+      #cg-results.cg-loading { min-height: 100vh; }
       .cg-status { margin: 0 0 12px; color: var(--av-muted); font-size: 14px; }
       .cg-table { width: 100%; border-collapse: collapse; font-size: 14px; }
       .cg-table th, .cg-table td { padding: 10px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--av-line); }
@@ -68,6 +70,14 @@
         .cg-table td::before { content: attr(data-label); color: var(--av-muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
         .cg-table td.cg-head { display: block; padding-bottom: 6px; }
         .cg-table td.cg-head::before { content: none; }
+      }
+      @media (min-width: 900px) and (max-width: 1139px) {
+        /* Nine columns: tighten spacing so the table fits the viewport instead of scrolling the page sideways. */
+        .cg-table { font-size: 13px; }
+        .cg-table th, .cg-table td { padding: 8px 6px; }
+        .cg-table thead th { letter-spacing: .02em; }
+        .cg-model { font-size: 14px; }
+        .cg-links a { white-space: normal; }
       }
       .cg-cta { display: grid; gap: 10px; padding: 18px; margin: 24px 0; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-brand-line); }
       .cg-cta h2 { margin: 0; font-size: 20px; }
@@ -124,9 +134,9 @@
       </form>
 
       <p class="cg-status" id="cg-status" role="status" aria-live="polite">Loading the console list…</p>
-      <noscript><p class="cg-empty">The search needs JavaScript. The full list is in <a href="consoles.json">consoles.json</a>.</p></noscript>
+      <noscript><style>#cg-results.cg-loading { min-height: 0; }</style><p class="cg-empty">The search needs JavaScript. The full list is in <a href="consoles.json">consoles.json</a>.</p></noscript>
 
-      <div id="cg-results" tabindex="-1">
+      <div id="cg-results" class="cg-loading" tabindex="-1">
         <p class="cg-meta cg-key">Width × depth × height as each maker publishes them. "Not published" means the maker's page doesn't list it.</p>
         <table class="cg-table" id="cg-table" hidden>
           <thead>

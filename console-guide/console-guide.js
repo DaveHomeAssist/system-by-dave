@@ -5,7 +5,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var form = $('cg-form'), q = $('cg-q'), brand = $('cg-brand'), size = $('cg-size'), sort = $('cg-sort');
   var legacy = $('cg-legacy'), wings = $('cg-wings'), body = $('cg-body'), table = $('cg-table');
-  var status = $('cg-status'), empty = $('cg-empty');
+  var status = $('cg-status'), empty = $('cg-empty'), results = $('cg-results');
   var rows = [];
   var NP = 'Not published';
   var TYPE = { console: 'Console', wing: 'Wing', rack: 'Rack unit', panel: 'Touch panel', software: 'Software' };
@@ -137,12 +137,14 @@
       brands.forEach(function (b) { var o = el('option', null, b); o.value = b; brand.appendChild(o); });
       restore();
       render();
+      results.classList.remove('cg-loading');
       ['input', 'change'].forEach(function (ev) { form.addEventListener(ev, render); });
       form.addEventListener('submit', function (e) { e.preventDefault(); });
       form.addEventListener('reset', reset);
       $('cg-empty-reset').addEventListener('click', function () { form.reset(); });
     })
     .catch(function () {
+      results.classList.remove('cg-loading');
       status.textContent = 'The console list could not load. Try again, or open consoles.json directly.';
     });
 })();
