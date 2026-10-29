@@ -223,14 +223,8 @@ tr:has(.entry[aria-pressed="true"]) {background:var(--surface-raised)}
 @media(max-height:330px) {.calendarCount {display:none}.calendarNumber {font-size:10px}.calendarDay,.calendarBlank {padding:1px 4px}.calendarFooter {display:none}.calendarShell {grid-template-rows:auto auto minmax(0,1fr)}}
 @media print {.calendarShell {display:none!important}}
 @media(max-height:330px) {.labTabs button {white-space:nowrap}.labBar {gap:4px;padding:2px 4px}.labControls .buttonRow {gap:2px}.labGuide {padding:4px 6px;gap:3px}.labGuide h3 {font-size:14px}.labGuide p {font-size:11px;line-height:1.3}.labGuide .guideFooter {gap:4px}}
-.dailySkip {position:fixed;top:-100px;left:8px;z-index:100;background:var(--surface);padding:12px;color:var(--ink)}
-.dailySkip:focus {top:8px}
-.appIdentity h1 a {color:inherit;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
-.appHeader .appIcon {display:grid;flex-shrink:0;width:44px;height:44px;text-decoration:none}
-@media(max-height:330px) {.appHeader .appIdentity {display:block}.appHeader {grid-column:1/-1;justify-content:space-between}.appIdentity h1 {font-size:12px}.appHeader .appIcon {width:44px;height:44px}.toolbar {display:none}}
-noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var(--ink);padding:24px}
-</style>
-<style>
+
+
 .app button,.app select,.app input {min-height:44px;min-width:44px}
 .app input[type="range"] {height:44px}
 .app .storyLink,.app #selectedStory,.app #labSource {min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
@@ -295,6 +289,12 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
  .archive th {padding:2px;font-size:9px}.archive td {padding:2px}.archive th:first-child {width:32px}.archive th:nth-child(2) {width:66px}.archive th:last-child {width:48px}
  .archive .entry {font-size:11px}.archive .storyLink {font-size:9px}
 }
+.dailySkip {position:fixed;top:-100px;left:8px;z-index:100;background:var(--surface);padding:12px;color:var(--ink)}
+.dailySkip:focus {top:8px}
+.appIdentity h1 a {color:inherit;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+.appHeader .appIcon {display:grid;flex-shrink:0;width:44px;height:44px;text-decoration:none}
+@media(max-height:330px) {.appHeader .appIdentity {display:block}.appHeader {grid-column:1/-1;justify-content:space-between}.appIdentity h1 {font-size:12px}.appHeader .appIcon {width:44px;height:44px}.toolbar {display:none}}
+noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var(--ink);padding:24px}
 </style>
 </head>
 <body>

@@ -22,6 +22,7 @@ const metadata=`<meta name="description" content="A practical video engineering 
 <meta name="twitter:description" content="Practical lessons, sourced diagrams and interactive signal models.">
 <meta name="twitter:image" content="https://systembydave.com/demos/og/hub.png">`;
 let html=source.replace('<title>Video Engineering / Reference</title>','<title>Video Engineering Daily | System by Dave</title>\n'+metadata);
+html=html.replace('</style>\n<style>','\n');
 html=html.replace('<body>','<body>\n<a class="dailySkip" href="#daily-main">Skip to Video Engineering</a>\n<noscript>Video Engineering Daily requires JavaScript for its calendar and models. <a href="/demos/">Return to AV demos</a>.</noscript>');
 html=html.replace('<main class="workbench">','<main class="workbench" id="daily-main" tabindex="-1">');
 html=html.replace('<div class="appIcon" aria-hidden="true">V/</div>','<a class="appIcon" href="/" aria-label="System by Dave home">⌂</a>');
