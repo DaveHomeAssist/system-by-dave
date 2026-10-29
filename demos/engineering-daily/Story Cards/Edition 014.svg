@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">Progressive segmented frame transport</title><desc id="desc">25PsF splits each captured picture into odd-line and even-line segments sent in sequence. The link carries 50 segments/s but only 25 pictures/s. Paths show grouping, not separate cables.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 014</text>
+<text x="108" y="228" font-size="54" class="story-title">Progressive segmented frame</text>
+<text x="108" y="304" font-size="54" class="story-title">transport</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect x="0" y="0" width="240" height="400" rx="6" class="canvas"/><text x="12" y="26" class="diagram-index">14</text><text x="48" y="26" class="diagram-heading">PsF TRANSPORT</text><path d="M12 40H228" class="rule"/><text x="120" y="66" text-anchor="middle" class="">25 progressive frames/s</text><rect x="24" y="80" width="192" height="79" rx="6" class="panel"/><text x="120" y="103" text-anchor="middle" class="">One captured frame</text><path d="M40 116H200M40 140H200" class="wire"/><path d="M40 128H200M40 152H200" class="wire alternate"/><path d="M72 159V180H62V195M168 159V180H178V195" class="wire"/><rect x="14" y="195" width="96" height="62" rx="6" class="blue-packet"/><rect x="130" y="195" width="96" height="62" rx="6" class="amber-packet"/><text x="62" y="220" text-anchor="middle" class="blue-label">Odd lines</text><text x="178" y="220" text-anchor="middle" class="note">Even lines</text><text x="62" y="244" text-anchor="middle" class="">Segment 1</text><text x="178" y="244" text-anchor="middle" class="">Segment 2</text><text x="120" y="284" text-anchor="middle" class="">50 segments/s on link</text><path d="M62 257H14V302H120V319M178 257H226V302H120" class="wire"/><rect x="16" y="319" width="208" height="48" rx="6" class="result"/><text x="120" y="348" text-anchor="middle" class="good-label">25 frames/s recovered</text><text x="120" y="391" text-anchor="middle" class="">Grouping schematic</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">25PsF splits each captured picture</text>
+<text x="108" y="1558" font-size="40" class="story-caption">into odd-line and even-line segments</text>
+<text x="108" y="1610" font-size="40" class="story-caption">sent in sequence. The link carries</text>
+<text x="108" y="1662" font-size="40" class="story-caption">50 segments/s but only 25</text>
+<text x="108" y="1714" font-size="40" class="story-caption">pictures/s. Paths show grouping, not</text>
+<text x="108" y="1766" font-size="40" class="story-caption">separate cables.</text>
+<a href="https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.709-6-201506-I%21%21PDF-E.pdf"><text x="108" y="1808" font-size="28" class="story-source">ITU-R BT.709-6, Introduction and Attachment 2</text></a>
+</svg>

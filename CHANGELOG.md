@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28: Engineering daily archive
+
+- Publish the calendar based Video Engineering Daily reference archive alongside AV demos, with 21 sourced editions and their diagram and story assets.
+- Keep selected editions understandable across filtered views, combine the core lesson in Summary, and expose model condition and output beside Signal lab controls.
+- Add a reproducible export with metadata, asset validation and content hashes. The authoring archive remains separate from the public snapshot.
+
 ## 2026-10-27: Offline console recovery
 
 - Return offline recovery links and cached navigation fallback to the native AV console. Retired Toolbox and Show Console redirect pages are not cached.
