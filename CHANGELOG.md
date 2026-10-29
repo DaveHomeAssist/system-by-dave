@@ -2,6 +2,10 @@
 
 ## October 29, 2026
 
+- Add Video Engineering Daily Edition 022, Fiber mode and wavelength, with
+  its sourced diagram and verified SVG and PNG story card. Daily releases use
+  the existing reviewed export and Pages verification path.
+
 - Redirect the eight original AV family routes into the shared console with
   their native pack selected. Preserve the five shared show-context fields,
   per-pack source, saved documents and import/export behavior.

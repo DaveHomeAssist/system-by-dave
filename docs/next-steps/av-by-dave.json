@@ -1,5 +1,16 @@
 {
   "id": "house-reference",
+  "engineeringDailyPublication": {
+    "date": "2026-10-29",
+    "edition": 22,
+    "title": "Fiber mode and wavelength",
+    "state": "Verified publication input; exact CI, merge and deployment evidence belongs to the provider records for this revision",
+    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=22&month=2026-10",
+    "evidence": "demos/engineering-daily/release.json",
+    "verification": "Dominic: 44 archive and 44 story views, 10 calendar views, 10 dashboard views, 3 navigation journeys, 60 Signal lab views, 10 served archive views and 48 served entry views passed. All 22 SVG/PNG mappings and PNG dimensions validated; new card visually inspected. Public source contracts passed.",
+    "next": "Require exact-head CI, Pages deployment and matching live manifest/assets/browser journeys before publication completion; continue the same gates for future daily releases.",
+    "boundaries": "No change to facts 001 through 021 beyond clearing the previous current marker. No backfills or renumbering required. Human acceptance is separate."
+  },
   "engineeringDailyUx": {
     "date": "2026-10-28",
     "state": "Implemented and browser verified; exact publication evidence belongs to the Pages deployment for this revision",
@@ -7,8 +18,8 @@
     "route": "https://systembydave.com/demos/engineering-daily/",
     "entryGate": "Demos hub uses the existing subject reader, complete text pages, neutral light/dark themes and the archive preference key; entry and return are checked across six viewports and both themes without changing the simulations.",
     "source": "demos/engineering-daily/release.json",
-    "refresh": "node scripts/sync_engineering_daily.cjs with the verified authoring archive path; public snapshot is not an automatic feed",
-    "next": "Refresh the public snapshot after verified authoring changes; retain physical device and human acceptance as separate evidence",
+    "refresh": "The existing daily task runs node scripts/sync_engineering_daily.cjs after complete authoring verification, then uses reviewed PR, CI, Pages and live verification gates.",
+    "next": "Continue verified daily releases; retain physical device and human acceptance as separate evidence",
     "releaseReview": "https://github.com/DaveHomeAssist/system-by-dave/pull/377",
     "boundaries": "Physical device and human acceptance remain separate. Existing demo, Instagram and provider decisions are preserved."
   },
