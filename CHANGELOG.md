@@ -2,6 +2,8 @@
 
 ## 2026-10-28: Engineering daily archive
 
+- Keep the demos entry and return hub inside the viewport with the existing subject reader, shared neutral light and dark preferences, complete text pagination and direct archive entry. Preserve the existing demo content and links.
+
 - Publish the calendar based Video Engineering Daily reference archive alongside AV demos, with 21 sourced editions and their diagram and story assets.
 - Keep selected editions understandable across filtered views, combine the core lesson in Summary, and expose model condition and output beside Signal lab controls.
 - Add a reproducible export with metadata, asset validation and content hashes. The authoring archive remains separate from the public snapshot.

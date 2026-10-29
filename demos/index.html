@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloud.umami.is; object-src 'none'; base-uri 'self'; form-action 'self' https://buttondown.com https://app.kit.com https://app.convertkit.com">
@@ -9,6 +9,9 @@
 <meta name="description" content="Interactive AV concepts you can actually manipulate. Each demo is a working model of one real production problem: see it break, see why, fix it yourself.">
 <link rel="canonical" href="https://systembydave.com/demos/">
 <link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="../css/public-viewport.css">
+<script src="hub-theme.js" defer></script>
+<script src="../js/public-viewport.js" defer></script>
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:type" content="website">
 <meta property="og:title" content="AV by Dave demos — real AV problems you can break yourself">
@@ -46,44 +49,63 @@
   .card .go{font:800 15px/1 "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--orange)}
   .card .fact{font:500 13px/1.4 "IBM Plex Mono",monospace;color:var(--mute);margin-top:14px;border-top:1px solid var(--p2);padding-top:10px}
   footer{margin-top:48px;color:var(--mute);font-size:.9rem;max-width:64ch}
+
+  html[data-theme="light"] {--g:#eeeeee;--p:#fafafa;--p2:#c7c7c7;--ink:#222222;--ink2:#585858;--mute:#656565;--orange:#725b30;--cyan:#345a85;--yellow:#345a85;--reader-bg:#eeeeee;--reader-surface:#fafafa;--reader-ink:#222222;--reader-muted:#585858;--reader-line:#c7c7c7;--reader-accent:#345a85}
+  html[data-theme="dark"] {--g:#111111;--p:#191919;--p2:#3c3c3c;--ink:#eeeeee;--ink2:#b6b6b6;--mute:#a0a0a0;--orange:#d0c0a0;--cyan:#a8bed9;--yellow:#a8bed9;--reader-bg:#111111;--reader-surface:#191919;--reader-ink:#eeeeee;--reader-muted:#b6b6b6;--reader-line:#3c3c3c;--reader-accent:#a8bed9}
+  .public-shell .site-header>.inner {display:flex;flex-wrap:nowrap;align-items:center;gap:4px;padding:2px 6px;min-height:44px}
+  .public-shell .sbd-site-return {flex:1;min-width:0;background:var(--p);border:0;color:var(--ink2);padding:0;gap:5px;font-size:11px;letter-spacing:0}
+  .sbd-site-return a {display:inline-flex;align-items:center;min-width:44px;min-height:44px;padding:2px;color:var(--ink)}
+  .public-shell #demoTheme {min-width:60px;min-height:44px;padding:4px;font:600 12px Barlow,system-ui,sans-serif}
+  .public-pages .card {display:block;background:var(--p);color:var(--ink);border:1px solid var(--p2);max-width:none}
+  .public-pages .card p,.public-pages footer {max-width:70ch}
+  .public-pages .go {display:flex;align-items:center;min-width:44px;min-height:44px;padding:4px 12px;border:1px solid var(--p2);border-radius:6px;color:var(--cyan);text-decoration:none;margin-bottom:12px}
+  .public-pages .card .n {margin:8px 0;line-height:1.5}.public-pages .card .fact,.public-pages .eyebrow {line-height:1.5}.public-pages .card h2 {margin:0 0 8px;max-width:36ch}
+  .public-pages .card:hover {border-color:var(--p2)}
+  [data-public-site="demos"] [data-public-panel][hidden="until-found"] {pointer-events:none}
+  @media(max-height:500px) {.public-shell .site-header>.inner {padding:0 4px}.public-stage {padding:4px}.public-pages .card {padding:4px}.public-pages .card h2 {font-size:20px;line-height:1.2;margin:0 0 4px}.public-pages .go {margin:0 0 6px}.public-pages p,.public-pages footer {font-size:14px;line-height:1.4}.public-pages .card .fact {font-size:11px}}
 </style>
 </head>
-<body>
+<body data-public-site="demos">
 <a class="sbd-skip-link" href="#demos">Skip to the demos</a>
-<nav class="sbd-site-return" aria-label="Breadcrumb">
+<header class="site-header"><div class="inner"><nav class="sbd-site-return" aria-label="Breadcrumb">
   <a href="https://systembydave.com/">System by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
   <a href="/av/">AV by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
   <span class="sbd-site-return__current" aria-current="page">AV by Dave demos</span>
-</nav>
+</nav><button id="demoTheme" class="public-theme-toggle" type="button" hidden>Dark</button></div></header>
 <main>
-  <div class="eyebrow">AV by Dave</div>
-  <h1>Real AV problems. <em>Break them yourself.</em></h1>
-  <p class="lede">Each demo is a slowed-down working model of one production problem. See it fail, see why, then fix it. One true thing per demo, with the manufacturer's page to prove it.</p>
-  <div class="grid" id="demos" tabindex="-1">
-    <a class="card" href="engineering-daily/">
+<section data-public-panel="Daily" id="demos"><article class="card"><h2>Video Engineering Daily</h2>
+<a class="go" href="engineering-daily/">Open calendar →</a>
+
       <div class="n">REFERENCE LIBRARY</div>
-      <h2>Video Engineering Daily</h2>
+
       <p>Browse practical lessons by date, read the full summary, download story cards and explore the signal models.</p>
-      <div class="go">Open calendar →</div>
-    </a>
-    <a class="card" href="frame-sync.html" data-umami-event="hub_open" data-umami-event-demo="frame-sync">
+
+    </article></section>
+<section data-public-panel="Frame sync" id="frame-topic"><article class="card"><h2>Why your screen is late</h2>
+<a class="go" href="frame-sync.html" data-umami-event="hub_open" data-umami-event-demo="frame-sync">Play →</a>
+
       <div class="n">008 · CAMERAS</div>
-      <h2>Why your screen is late</h2>
+
       <p>A camera with its own clock, a room with one clock, and the waiting room in between. Watch the picture tear, fix it, then find out why "one frame of delay" is a myth.</p>
-      <div class="go">Play →</div>
+
       <div class="fact">AJA FS4 manual v3.1, Frame Delay: about four frames in HD modes</div>
-    </a>
-    <a class="card" href="fault-finding.html" data-umami-event="hub_open" data-umami-event-demo="fault-finding">
+    </article></section>
+<section data-public-panel="Troubleshoot" id="fault-topic"><article class="card"><h2>Was it the cable?</h2>
+<a class="go" href="fault-finding.html" data-umami-event="hub_open" data-umami-event-demo="fault-finding">Play →</a>
+
       <div class="n">010 · TROUBLESHOOTING</div>
-      <h2>Was it the cable?</h2>
+
       <p>Camera, cable, box, cable, screen. One of them is broken. Swap one thing at a time, watch the suspects list shrink, and learn why a cable swap also re-plugs the port.</p>
-      <div class="go">Play →</div>
+
       <div class="fact">AJA Support FAQ 7308: two different cables, two different ports, a known-good cable</div>
-    </a>
-  </div>
-  <footer>More demos follow the daily archive's rotation: transport, bandwidth, color, sync, cameras, displays, IP and fiber, troubleshooting. Built as web pages so you can touch the mechanism, not just watch it.</footer>
+    </article></section>
+<section data-public-panel="About" id="demo-about">
+  <div class="eyebrow">AV by Dave</div>
+  <h2>Real AV problems. <em>Break them yourself.</em></h2>
+  <p class="lede">Each demo is a slowed-down working model of one production problem. See it fail, see why, then fix it. One true thing per demo, with the manufacturer's page to prove it.</p>
+<footer>More demos follow the daily archive's rotation: transport, bandwidth, color, sync, cameras, displays, IP and fiber, troubleshooting. Built as web pages so you can touch the mechanism, not just watch it.</footer></section>
 </main>
 <script src="demo-shell.js"></script>
 </body>

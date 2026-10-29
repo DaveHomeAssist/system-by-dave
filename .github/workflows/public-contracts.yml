@@ -34,3 +34,4 @@ jobs:
             sleep 1
           done
           node scripts/probe_engineering_daily.cjs
+          node scripts/probe_engineering_entry.cjs
