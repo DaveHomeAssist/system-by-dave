@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
 <meta name="description" content="Every tool, app, tracker and widget built by Dave Robertson — AV show utilities, Notion tools, apps & games, live trackers, and dev labs. Filter by category.">
 <link rel="canonical" href="https://systembydave.com/tools.html">
 <meta name="robots" content="index,follow">
-<meta name="theme-color" content="#0d1217">
+<meta name="theme-color" content="#f4f6f8">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="Tools — System by Dave">
@@ -21,7 +21,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/fonts.css">
-<script>(function(d){d.classList.add('tools-js');try{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('tools-motion');}catch(e){}})(document.documentElement);</script>
+<script src="js/public-theme.js"></script>
+<link rel="stylesheet" href="css/sbd-public-nav.css">
 <style>
   :root{--bg:#0d1217;--ink:#f3f5f8;--rust:oklch(0.65 0.19 33);
     --card:#192027;--card-border:#303943;--muted:#a3aeba;
@@ -54,7 +55,6 @@
   .tools-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding-bottom:24px;}
   .tool-card{--accent:#a47ce7;--badge:#30243f;display:flex;flex-direction:column;align-items:center;justify-content:space-between;min-width:0;min-height:214px;padding:9px 10px 12px;border:1px solid var(--card-border);border-radius:12px;background:linear-gradient(145deg,#202630 0%,var(--card) 58%,#172027 100%);box-shadow:0 5px 13px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.04);text-align:center;text-decoration:none;color:inherit;position:relative;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;}
   .tool-card[hidden]{display:none;}
-  .tools-motion .tool-card:nth-child(-n+12){opacity:0;}
   .tool-card[data-tone="blue"]{--accent:#87baff;--badge:#203750;}
   .tool-card[data-tone="teal"]{--accent:#6fe0dc;--badge:#173e42;}
   .tool-card[data-tone="green"]{--accent:#89dc86;--badge:#233d2c;}
@@ -81,13 +81,76 @@
   @media (max-width:680px){:root{--shell-width:calc(100% - 24px);}.tools-hero{padding-top:30px;}.tools-controls{top:0;}.tools-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}.tool-card{min-height:208px;padding-inline:7px;}.tool-card h2{font-size:14px;}.tc-art{width:min(100%,150px);}.tc-badge{font-size:9px;padding-inline:8px;gap:5px;}.tc-badge::before{width:7px;height:7px;}.chips .count{width:100%;margin:4px 0 0;}}
   @media (max-width:360px){.tools-grid{grid-template-columns:1fr;}.tool-card{min-height:220px;}.tool-card h2{font-size:17px;}}
   @media (prefers-reduced-motion:reduce){.tool-card,.chip-filter{transition:none;}.tool-card:hover{transform:none;}}
+
+  /* The directory is inherently long; only its named panel scrolls. */
+  :root{--bg:#f4f6f8;--ink:#20252b;--muted:#52606d;--line:#bbc4cc;--surface:#fff;--focus:#8b3a17;}
+  :root[data-theme="dark"]{--bg:#0d1217;--ink:#f3f5f8;--muted:#a3aeba;--line:#46515d;--surface:#192027;--focus:#ffad75;}
+  html,body{height:100%;overflow:hidden;}
+  .tools-shell{height:100vh;height:100dvh;display:grid;grid-template-rows:auto minmax(0,1fr);position:relative;z-index:1;}
+  .tools-shell main{min-height:0;min-width:0;display:grid;grid-template-rows:auto minmax(0,1fr);}
+  .tools-shell main:focus{outline:none;}
+  .tools-shell .sbd-site-header{position:static;background:var(--surface);color:var(--ink);border-color:var(--line);}
+  .tools-shell .sbd-site-header__inner{gap:12px;}
+  .tools-shell .sbd-site-links a{color:var(--muted);}
+  .tools-shell .sbd-site-links a[aria-current="page"]{color:var(--ink);}
+  .tools-shell .sbd-site-brand__mark{border-color:var(--line);color:var(--focus);}
+  .public-theme-toggle{min-height:44px;min-width:44px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;}
+  .tools-controls{position:static;margin:0;padding:6px 0;background:var(--surface);border-color:var(--line);backdrop-filter:none;}
+  .tools-controls>.container{display:flex;align-items:center;gap:12px;}
+  .tools-controls .chips{flex:1;}
+  .chip-filter{background:var(--surface);border-color:var(--line);color:var(--ink);}
+  .chip-filter:hover{color:var(--ink);border-color:var(--focus);}
+  .count{font:12px var(--ff-mono);color:var(--muted);}
+  .compact-filter{display:none;}
+  .directory-panel{grid-row:2;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scroll-padding:10px;}
+  .tools-hero{padding:20px 0;}
+  .tools-hero h1{font-size:clamp(24px,3vw,42px);}
+  .tools-hero p,.tools-empty{color:var(--muted);}
+  .tools-hero .eyebrow,.tools-note a{color:var(--focus);}
+  .tool-card{color:#f3f5f8;}
+  .tools-shell :focus-visible{outline:3px solid var(--focus);outline-offset:2px;}
+  .tools-shell .tool-card:focus-visible{outline-offset:-4px;}
+  .tools-shell .nav-link{color:var(--muted);min-height:44px;display:inline-flex;align-items:center;}
+  .tools-shell footer{border-color:var(--line);margin:0;}
+  .tools-shell .foot{padding:16px 0;}
+  .tools-shell footer span{color:var(--muted)!important;}
+  @media(min-width:1800px){.tools-shell .container,.tools-shell .sbd-site-header__inner{width:min(2400px,calc(100% - 64px));}.tools-grid{grid-template-columns:repeat(8,minmax(0,1fr));}}
+  @media(max-width:680px){
+    .tools-shell{grid-template-rows:minmax(0,1fr) auto;}
+    .tools-shell>.sbd-site-header{grid-row:2;padding-bottom:env(safe-area-inset-bottom);}
+    .tools-shell>main{grid-row:1;}
+    .tools-shell .sbd-site-header__inner{display:flex;flex-wrap:wrap;gap:0 8px;min-height:0;}
+    .tools-shell .sbd-site-brand{margin-right:auto;min-width:44px;}
+    .tools-shell .sbd-site-brand__word{position:static;width:auto;height:auto;clip:auto;overflow:visible;font-size:13px;}
+    .tools-shell .sbd-site-links{order:3;width:100%;justify-content:space-between;}
+    .tools-shell .sbd-site-links a{padding:4px;white-space:normal;text-align:center;flex:1;}
+    .tools-controls .chips{display:none;}
+    .compact-filter{display:flex;gap:8px;align-items:center;font-size:13px;flex:1;}
+    .compact-filter select{min-height:44px;min-width:0;max-width:150px;flex:1;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;border-radius:6px;padding:4px;}
+    .tools-hero{padding:12px 0;}.tools-hero p{font-size:15px;}
+  }
+  @media(max-width:680px) and (max-height:400px){
+    .tools-shell .sbd-site-header__inner{width:100%;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;padding:2px;}
+    .tools-shell .sbd-site-links{display:contents;}
+    .tools-shell .sbd-site-brand{margin:0;justify-content:center;min-width:44px;}
+    .tools-shell .sbd-site-brand__word{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+    .tools-shell .sbd-site-links a,.public-theme-toggle{font-size:10px;padding:3px;letter-spacing:0;overflow-wrap:anywhere;}
+    .public-theme-toggle{grid-column:7;grid-row:1;}
+  }
+  @media print{
+    html,body,.tools-shell,.tools-shell main,.directory-panel{height:auto!important;overflow:visible!important;display:block!important;}
+    .tools-shell{--bg:#fff;--ink:#111;--muted:#333;--focus:#111;}
+    .tools-shell>.sbd-site-header,.tools-controls{display:none!important;}
+    .tool-card,.tool-card[hidden]{display:flex!important;background:#fff;color:#111;break-inside:avoid;box-shadow:none;transform:none;}
+    .tc-badge{background:#fff;color:#111;}.tc-art{display:none;}.tools-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.tool-card{min-height:90px;}
+    .tools-empty{display:none;}
+  }
 </style>
-<link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
 <body>
 <a class="sbd-skip-link" href="#main-content">Skip to content</a>
   <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
-  <div style="position:relative;z-index:1;">
+  <div class="tools-shell">
   <header class="sbd-site-header">
   <nav class="sbd-site-header__inner" aria-label="Primary">
     <a class="sbd-site-brand" href="/">
@@ -104,17 +167,10 @@
   </nav>
 </header>
 
-  <main id="main-content">
-    <section class="tools-hero">
-      <div class="container">
-        <div class="eyebrow">Curated product directory</div>
-        <h1>Tools, apps &amp; trackers</h1>
-        <p>Start with the major products and systems: AV operations, Notion resources, apps, trackers, and field references. AV Suite contains the full operator-tool catalog.</p>
-      </div>
-    </section>
-
+  <main id="main-content" tabindex="-1">
     <div class="tools-controls">
       <div class="container">
+        <label class="compact-filter" for="categorySelect">Category <select id="categorySelect"><option value="All">All</option><option value="AV">AV</option><option value="Notion">Notion</option><option value="Apps">Apps</option><option value="Games">Games</option><option value="Trackers">Trackers</option><option value="Sports">Sports</option><option value="Labs">Labs</option></select></label>
         <div class="chips" id="filterChips" role="group" aria-label="Filter tools by category">
           <button type="button" class="chip-filter" data-chip="All" aria-pressed="true">All</button>
           <button type="button" class="chip-filter" data-chip="AV" aria-pressed="false">AV</button>
@@ -124,15 +180,23 @@
           <button type="button" class="chip-filter" data-chip="Trackers" aria-pressed="false">Trackers</button>
           <button type="button" class="chip-filter" data-chip="Sports" aria-pressed="false">Sports</button>
           <button type="button" class="chip-filter" data-chip="Labs" aria-pressed="false">Labs</button>
-          <span class="count" id="toolCount" aria-live="polite"></span>
         </div>
+        <span class="count" id="toolCount" aria-live="polite"></span>
       </div>
     </div>
 
+    <section class="directory-panel" id="directoryPanel" tabindex="0" aria-label="Tool directory" data-web2-scroll>
+    <section class="tools-hero">
+      <div class="container">
+        <div class="eyebrow">Curated product directory</div>
+        <h1>Tools, apps &amp; trackers</h1>
+        <p>Start with the major products and systems: AV operations, Notion resources, apps, trackers, and field references. AV Suite contains the full operator-tool catalog.</p>
+      </div>
+    </section>
     <div class="container">
       <!-- Curated overlay: the public-facing set, in display order (daily AV operation,
            AV references and apps, Notion, labs, then apps, games and trackers).
-           Adding a tool = add one card here (kept in sync with project-registry-public.js).
+           Adding a tool = add one card here; the dated public registry is a separate directory.
            data-chips drives the filters. A card for an AV registry tool carries
            data-registry-id and shows that tool's navigation department from
            js/sbd-registry.js as its badge (verify:av checks it); other cards keep their
@@ -334,11 +398,16 @@
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">A dark editorial &quot;magazine&quot; tracking frontier-compute signals, refreshed from a scraper pipeline. Opens davehomeassist.github.io/frontier-signals-pipeline in a new tab.</span>
         </a>
+        <a class="tool-card" data-chips="Apps Trackers" data-tone="orange" data-track-cta="tools:depotops" href="depotops/">
+          <span class="tc-art tc-art--text" aria-hidden="true"><span class="tc-mark">DO</span></span>
+          <h2>DepotOps</h2>
+          <span class="tc-badge">Apps / Trackers</span>
+          <span class="sr-only">Home project shopping, warehouse inventory and tool tracking, saved on this device.</span>
+        </a>
         <p class="tools-empty" id="toolsEmpty" hidden>No tools in this category yet.</p>
       </div>
       <p class="tools-note tools-note--after">The AV by Dave console hosts 19 applications and tools as panels. <a href="av/">Open the console</a>.</p>
     </div>
-  </main>
 
   <footer>
     <div class="container">
@@ -358,64 +427,11 @@
       </div>
     </div>
   </footer>
+    </section>
+  </main>
   </div>
 
-  <!-- the full project inventory is available for enrichment / future-proofing -->
-  <script src="project-registry-public.js"></script>
-  <script src="js/vendor/gsap.min.js"></script>
-  <script>
-  (function(){
-    var root = document.documentElement;
-    try {
-      var CHIP_ORDER = ['AV','Notion','Apps','Games','Trackers','Sports','Labs'];
-      var grid = document.getElementById('toolsGrid');
-      var chipsBar = document.getElementById('filterChips');
-      var empty = document.getElementById('toolsEmpty');
-      var count = document.getElementById('toolCount');
-      var cards = Array.prototype.slice.call(grid.querySelectorAll('.tool-card'));
-      var buttons = Array.prototype.slice.call(chipsBar.querySelectorAll('.chip-filter'));
-      var reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-      var active = 'All';
-      var cardTween = null;
-
-      function inFilter(card){
-        return active === 'All' || card.getAttribute('data-chips').split(' ').indexOf(active) >= 0;
-      }
-
-      // Fade in only the first 12 visible cards; links stay usable throughout.
-      function animate(shown){
-        if (cardTween){ cardTween.kill(); cardTween = null; window.gsap.set(cards, {clearProps:'opacity'}); }
-        if (!window.gsap || (reduceMotion && reduceMotion.matches)) return;
-        cardTween = window.gsap.fromTo(shown.slice(0, 12), {opacity:0}, {opacity:1,duration:0.38,stagger:{amount:0.3,grid:'auto'},ease:'power2.out',clearProps:'opacity',onComplete:function(){ cardTween = null; }});
-      }
-
-      function setActive(chip){
-        active = chip;
-        if (history.replaceState) history.replaceState(null, '', chip === 'All' ? location.pathname : '#' + chip.toLowerCase());
-        buttons.forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-chip') === active)); });
-        var shown = cards.filter(function(card){ var on = inFilter(card); card.hidden = !on; return on; });
-        empty.hidden = shown.length > 0;
-        count.textContent = shown.length + ' / ' + cards.length + ' projects';
-        animate(shown);
-      }
-
-      function chipFromHash(){
-        var h = (location.hash || '').replace('#','').toLowerCase();
-        var match = CHIP_ORDER.filter(function(c){ return c.toLowerCase() === h; })[0];
-        return match || 'All';
-      }
-
-      buttons.forEach(function(b){
-        b.addEventListener('click', function(){ setActive(b.getAttribute('data-chip')); });
-      });
-      setActive(chipFromHash());
-      window.addEventListener('hashchange', function(){ setActive(chipFromHash()); });
-    } finally {
-      // The pre-paint hide only covers the gap until GSAP takes over; never leave cards hidden.
-      root.classList.remove('tools-motion');
-    }
-  })();
-  </script>
+  <script src="js/tools-directory.js"></script>
   <script src="js/sbd-cta-metrics.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
 </body>
