@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  deployments: read
   pages: write
   id-token: write
 
@@ -55,6 +56,9 @@ jobs:
           DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_WALK_DEPLOY_KEY }}
           CUTOVER_AUTH_VERIFIED: ${{ vars.HOUSEVIDEO_WALK_AUTH_VERIFIED }}
         run: node scripts/check_domain_cutover_ready.mjs housevideo-walk --preflight
+
+      - name: Verify root asset retention
+        run: node --test scripts/root_asset_retention.test.mjs
 
       - name: Verify public site contracts
         run: |
@@ -235,6 +239,11 @@ jobs:
           git diff --exit-code -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim equipment-lab sitemap.xml
           test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim equipment-lab sitemap.xml)"
 
+      - name: Verify root asset release transition
+        env:
+          CHROME_CHANNEL: chrome
+        run: node scripts/probe_root_asset_retention.mjs
+
       - name: Stage site (everything except VCS + CI tooling)
         run: |
           mkdir -p _site
@@ -250,6 +259,14 @@ jobs:
 
       - name: Stage domain sites
         run: node scripts/stage_domain_sites.mjs --out _sites --site-root _site
+
+      - name: Retain previous root assets
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/root_asset_retention.mjs --stage _site
+          node scripts/verify_private_exposure.js _site
+          node scripts/verify_workbook_withdrawal.cjs _site
 
       # Publish and read back the destination before any old origin redirects.
       - name: Publish walk.housevideo.app
