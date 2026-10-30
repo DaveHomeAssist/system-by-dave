@@ -338,7 +338,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261029-family-console-redirects',
+    version:'v20261029-two-step-panel-chooser-verified',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

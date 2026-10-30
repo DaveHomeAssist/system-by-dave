@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "18ad6b1a07b605bb95434d5edb4c646d5993824770b2fd9fbfad9132667476d6",
-  "publicSha256": "b17f6cdc20abc35d370cee0b7e170b57f27f828e856e97e77af53327e80a367d",
-  "editions": 21,
+  "sourceSha256": "f6d2de11af54728f8a27f4d9f9ee271a73233eaa7b5594e1cdd5139c8527537b",
+  "publicSha256": "011dd718164b2db0a599835b8f0e110f32a63914b9de7b94787081beacde9a58",
+  "editions": 22,
   "files": [
+    {
+      "name": "Edition 022.svg",
+      "id": 22,
+      "date": "2026-10-29",
+      "title": "Fiber mode and wavelength",
+      "sha256": "ce026d2ea8696e326949bb570ee9d860f5e2b8a74b3a550bd55b9c35ef00367d"
+    },
+    {
+      "name": "Edition 022.png",
+      "id": 22,
+      "date": "2026-10-29",
+      "title": "Fiber mode and wavelength",
+      "sha256": "b23093c49bf5999a96113903b2c431ae94661cdcf5aefba85c332f2bb929fa3e"
+    },
     {
       "name": "Edition 021.svg",
       "id": 21,
