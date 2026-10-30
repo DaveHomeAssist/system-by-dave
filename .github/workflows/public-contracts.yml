@@ -24,6 +24,7 @@ jobs:
       - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
       - run: npm run test:public-viewport
+      - run: npm run test:tools-browser
       - name: Verify engineering daily journeys
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/daily-server.log 2>&1 &
