@@ -15,6 +15,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: 24
+      - run: npm run test:release-readback
       - run: npm run verify:private-exposure
       - run: npm run verify:indexing
       - run: python3 scripts/gen_sitemap.py --check

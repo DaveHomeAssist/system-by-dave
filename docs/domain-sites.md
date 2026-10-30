@@ -298,3 +298,27 @@ suite remains online-only under `docs/fmp-public-release.md`; no protected API
 response or authentication state is cached. Its strict `connect-src 'none'`
 reference pages are tested by navigation; a deliberately blocked test fetch is
 recorded as expected CSP enforcement.
+
+## Release readback contract
+
+The workflow must distinguish a successful publish from the bytes visitors receive.
+After the main Pages deployment and each remaining domain publish, compare staged
+content with HTTPS responses. Preserve the walk's existing pre-redirect gate.
+
+The smallest useful check covers the main home, Tools, robots and sitemap; each
+configured domain's home, HTML beneath its configured page entries, transfer page, robots, sitemap
+and source receipt; and same-origin JavaScript and CSS directly referenced by those
+HTML pages. Resolve domains and page entries from `scripts/domain-sites.json`.
+Reject redirects, non-200 responses, stale provenance and changed bytes. Retry
+propagation within a ten-minute budget per site and save a terminal JSON report,
+including failures, as a 30-day workflow artifact. Never record response bodies.
+
+The main site has no domain source receipt, so its report attributes the expected
+commit to the staging input and proves selected byte parity only. Domain reports
+also compare their served source receipt.
+
+This check makes read-only requests without credentials and changes no application
+storage, routing, publisher credentials or release order. It does not verify all
+registry routes outside those configured page entries, transitive assets, authenticated flows, browser execution, physical
+equipment or human acceptance. Fixture tests must cover good output, stale/missing
+files, redirects, propagation recovery and terminal failure without deploying.
