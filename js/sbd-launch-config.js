@@ -29,10 +29,10 @@ window.SBD_LAUNCH = {
     // 'https://buy.stripe.com/xxxxxxxx'. Until it's a valid buy.stripe.com link,
     // checkout stays closed.
     checkout: { provider: 'stripe', url: '[DAVE: Stripe Payment Link]', mode: 'link' },
-    // Price buyers see (Dave, 2026-10-23); the Stripe price must match it.
+    // Price buyers see (Dave, 2026-10-30); the Stripe price must match it.
     // A [DAVE: …] placeholder, 'Price TBD' or '' shows "Price TBD" and keeps
     // checkout closed. A real price alone does not open checkout: the
     // Payment Link and the page's DRAFT blocks still gate it.
-    priceLabel: '$19'
+    priceLabel: '$12'
   }
 };

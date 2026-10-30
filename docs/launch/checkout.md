@@ -1,7 +1,7 @@
 # Field Kit checkout
 
 Status: **closed**. `field-kit/` is a noindex draft that isn't linked from
-navigation or the sitemap. It shows the $19 price and a disabled "Checkout not
+navigation or the sitemap. It shows the $12 price and a disabled "Checkout not
 open yet" button. Paid kit files are **not** in this repository. Only the
 blurred preview images in `field-kit/img/` are.
 
@@ -31,7 +31,7 @@ kit from its `checklistUrl` in `demos/config.js` (set: the absolute avbydave.com
 `node scripts/smoke_field_kit_checkout.mjs [base-url]` (default
 `https://avbydave.com`; `npm run smoke:field-kit-checkout`). GET requests only, no
 dependencies, never submits a payment. It checks that `/field-kit/` returns 200
-and shows $19, that `fieldKit.checkout.url` matches `^https://buy\.stripe\.com/`
+and shows $12, that `fieldKit.checkout.url` matches `^https://buy\.stripe\.com/`
 and that Payment Link answers 200, and that `/field-kit/thanks/` loads. Exit 0 =
 checkout live, 2 = pages fine but the Payment Link is still a placeholder,
 1 = a check failed.
@@ -39,7 +39,7 @@ checkout live, 2 = pages fine but the Payment Link is still a placeholder,
 ## Chosen: Stripe Payment Links (2026-10-19)
 
 The config ships `provider: 'stripe'` with the marked placeholder
-`url: '[DAVE: Stripe Payment Link]'` and `priceLabel: '$19'` (Dave, 2026-10-23),
+`url: '[DAVE: Stripe Payment Link]'` and `priceLabel: '$12'` (Dave, 2026-10-30),
 so checkout stays closed until a real `buy.stripe.com` link replaces the placeholder.
 **Account:** a separate AV by Dave Stripe account (Dave, 2026-10-23), not the System
 by Dave one. Its statement descriptor isn't known yet, so `[STATEMENT DESCRIPTOR]`
@@ -78,7 +78,7 @@ link and update the redirect in Stripe. No code change or push is needed.
    attribute.
 3. Replace the `url` placeholder in `js/sbd-launch-config.js` with the Payment
    Link (or paste another provider's block below), and set `priceLabel` to the
-   Stripe price (for example `'$19'`):
+   Stripe price (for example `'$12'`):
 
 | Provider | Paste | Link to copy | Modes |
 |---|---|---|---|

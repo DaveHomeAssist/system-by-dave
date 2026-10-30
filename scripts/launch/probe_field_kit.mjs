@@ -64,7 +64,7 @@ const VIEWPORTS = { phone: { width: 390, height: 844 }, desktop: { width: 1280, 
 try {
   // Every provider request is answered by a local route; nothing reaches a real service.
   const cfgScript = (checkout, priceLabel) => `window.SBD_LAUNCH={analytics:{provider:null},fieldKit:{checkout:${JSON.stringify(checkout || { provider: null, url: '', mode: 'link' })},priceLabel:${JSON.stringify(priceLabel)}}};`;
-  async function openWith(url, checkout, extraRoutes = [], viewport = VIEWPORTS.phone, priceLabel = '$19') {
+  async function openWith(url, checkout, extraRoutes = [], viewport = VIEWPORTS.phone, priceLabel = '$12') {
     const hits = [];
     const routes = [
       ['**/js/sbd-launch-config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: cfgScript(checkout, priceLabel) })],
@@ -111,7 +111,7 @@ try {
     if ((await page.getAttribute('#kit-buy', 'target')) !== '_blank') fail('stripe: overlay request did not fall back to a new-tab link');
     await context.close();
   }
-  for (const priceLabel of ['Price TBD', '[DAVE: price, e.g. $19]', '']) {
+  for (const priceLabel of ['Price TBD', '[DAVE: price, e.g. $12]', '']) {
     const { page, context } = await openWith('/field-kit/', { provider: 'stripe', url: 'https://buy.stripe.com/test_123', mode: 'link' }, [noPlaceholders], VIEWPORTS.phone, priceLabel);
     if (!(await page.locator('#kit-buy').isHidden())) fail(`checkout opened with placeholder price ${JSON.stringify(priceLabel)}`);
     if (!/TBD/.test(await page.textContent('#kit-price'))) fail(`placeholder price ${JSON.stringify(priceLabel)} was shown on the page`);
@@ -120,7 +120,7 @@ try {
   {
     const { page, context } = await openWith('/field-kit/', { provider: 'stripe', url: 'https://buy.stripe.com/test_123', mode: 'link' }, [noPlaceholders]);
     if (await page.locator('#kit-buy').isHidden() || (await page.getAttribute('#kit-buy', 'href')) !== 'https://buy.stripe.com/test_123') fail('stripe link checkout did not open with a real price');
-    if (!/\$19/.test(await page.textContent('#kit-price'))) fail('real price not shown');
+    if (!/\$12/.test(await page.textContent('#kit-price'))) fail('real price not shown');
     if (!/download link appears right after payment/.test(await page.textContent('#kit-buy-note'))) fail('buy note does not describe the after-payment download page');
     await context.close();
   }
@@ -133,13 +133,13 @@ try {
     const robots = await page.getAttribute('meta[name="robots"]', 'content');
     if (!/noindex/.test(robots || '')) fail('Field Kit draft is not noindex');
     const shownPrice = await page.textContent('#kit-price');
-    if (!/^\$19/.test(shownPrice.trim()) || /not set yet|TBD/.test(shownPrice)) fail(`Field Kit should show the $19 price (got ${JSON.stringify(shownPrice)})`);
+    if (!/^\$12/.test(shownPrice.trim()) || /not set yet|TBD/.test(shownPrice)) fail(`Field Kit should show the $12 price (got ${JSON.stringify(shownPrice)})`);
     if (!(await page.locator('#kit-buy').isHidden()) || await page.locator('#kit-buy-disabled').isHidden()) fail('shipped config opened checkout (Payment Link is still a placeholder)');
     if (errors.length) fail(`field kit ${label} console errors: ${errors.join(' | ')}`);
     await shotFull(page, `field-kit-${label}.png`);
     await context.close();
   }
-  notes.push('shipped config (Stripe, [DAVE] Payment Link placeholder, price $19): $19 shown, checkout closed');
+  notes.push('shipped config (Stripe, [DAVE] Payment Link placeholder, price $12): $12 shown, checkout closed');
 
   // 3. After-payment download page (Stripe redirect target).
   const DL = 'https://drive.google.com/drive/folders/abc123';
