@@ -1,3 +1,4 @@
+import { closeTopics, suiteTopic, selectView, viewNames, recallPanel, savePack } from "./av-menu-journey.mjs";
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
@@ -58,7 +59,6 @@ export async function probeFamily(pack, baseOverride) {
     page.on('dialog', dialog => dialog.accept());
     const url = `${base}/av/?app=${pack}`;
     const header = page.locator('.suite-header');
-    const quick = name => page.locator('.console-quick').getByRole('button', { name, exact: true });
     const saved = () => page.evaluate(key => localStorage.getItem(key), family.key);
     await page.goto(url);
     await page.locator(`.suite-app[data-active-app="${pack}"]`).waitFor();
@@ -66,34 +66,37 @@ export async function probeFamily(pack, baseOverride) {
     assert.equal(await page.locator('.console-strip').count(), 1);
     assert.equal(await page.locator('.console-panel iframe').count(), 0);
     assert.equal(await saved(), null, 'opening a pack never saves its document');
-    const tabs = await page.getByRole('tab').allTextContents();
+    const tabs = await viewNames(page);
     assert.ok(tabs.length > 0, `${pack} exposes default views`);
     for (const name of tabs) {
-      await page.getByRole('tab', { name, exact: true }).click();
+      await selectView(page, name);
       assert.ok(await page.locator('.console-panel').count() > 0, `${pack}/${name} renders panels`);
       assert.equal(await page.locator('.console-panel iframe').count(), 0);
     }
-    await quick(family.document).click();
+    await recallPanel(page, family.document);
     const field = page.getByLabel(family.field, { exact: true });
     await field.fill(`Synthetic ${pack} cutover`);
     if (pack === 'front-office') await page.getByRole('button', { name: 'Add client', exact: true }).click();
     assert.equal(await saved(), null, 'edits remain unsaved');
     const before = await page.evaluate(() => Object.fromEntries(Object.keys(localStorage).filter(k => !/draft|recovery/i.test(k)).map(k => [k, localStorage.getItem(k)])));
-    await header.getByRole('button', { name: /^Save/ }).click();
+    await savePack(page);
     await page.waitForFunction(({ key, value }) => localStorage.getItem(key)?.includes(value), { key: family.key, value: `Synthetic ${pack} cutover` });
     const raw = await saved();
     const after = await page.evaluate(() => Object.fromEntries(Object.keys(localStorage).filter(k => !/draft|recovery/i.test(k)).map(k => [k, localStorage.getItem(k)])));
     for (const key of new Set([...Object.keys(before), ...Object.keys(after)])) if (key !== family.key) assert.equal(after[key], before[key], `Save keeps ${key}`);
+    await suiteTopic(page, 'Project');
     const download = page.waitForEvent('download');
     await header.getByRole('button', { name: 'Export', exact: true }).click();
     assert.deepEqual(JSON.parse(await readFile(await (await download).path(), 'utf8')), JSON.parse(raw));
     await page.reload();
-    await quick(family.document).click();
+    await recallPanel(page, family.document);
     if (pack === 'front-office') await page.getByRole('heading', { name: `Synthetic ${pack} cutover`, exact: true }).waitFor();
     else assert.equal(await field.inputValue(), `Synthetic ${pack} cutover`);
     assert.equal(await saved(), raw, 'reload preserves exact saved bytes');
     for (const theme of ['light', 'dark']) {
+      await suiteTopic(page, 'Appearance');
       await page.getByLabel('Palette', { exact: true }).selectOption(theme);
+      await closeTopics(page);
       for (const [width, height] of [[1440, 900], [680, 700], [375, 812], [3840, 1080]]) {
         await page.setViewportSize({ width, height });
         const metrics = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, h: document.documentElement.scrollHeight, ch: document.documentElement.clientHeight }));

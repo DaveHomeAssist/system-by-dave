@@ -1,5 +1,6 @@
 import { GEAR_PANELS, GearViewerPanel, gearHref } from './gear-panel/GearViewerPanel';
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TopicMenu } from "../../shared/av-console/TopicMenu";
 import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/Workspace";
 import { readLayout, writeLayout, type LayoutState } from "../../shared/av-console/drafts";
 import type { Panel, View } from "../../shared/av-console/layout";
@@ -187,19 +188,24 @@ export function App() {
       <div className="suite-identity"><span className="suite-mark" aria-hidden="true">AV</span><div><h1>{activeTitle}</h1><p className="suite-plan" title={activePack?.title}>{activePack ? `${activePack.title} · ${activePack.dirty ? "Unsaved" : "Saved"}` : activeTool ? "Specialist tool · own saved data" : "Empty workspace · add any panel"}</p></div></div>
       {context && <span className="suite-context" aria-label="Read-only show context">{context}</span>}
       <div className="suite-actions">
-        {activePack?.actions}
-        <button type="button" className="focus-toggle" aria-label={focusMode ? "Exit focus" : "Focus"} aria-pressed={focusMode} title={focusMode ? "Restore workspace chrome" : "Collapse workspace chrome"} onClick={toggleFocus}><svg aria-hidden="true" viewBox="0 0 24 24"><path d={focusMode ? "M9 4v5H4m16 0h-5V4m0 16v-5h5M4 15h5v5" : "M9 4H4v5m16 0V4h-5m0 16h5v-5M4 15v5h5"} /></svg><span>{focusMode ? "Exit focus" : "Focus"}</span></button>
-        <label className="theme-label"><span>Palette</span><select aria-label="Palette" value={theme === "system" ? systemPalette : theme} onChange={e => changeTheme(e.target.value as Palette)}><option value="light">Light</option><option value="dark">Dark</option><option value="white">White</option><option value="black">Black</option></select></label>
+        <TopicMenu label="Menu" topics={[
+          { name: "Project", description: "Save, export and edit history", content: <>{activePack?.actions}
+            <button type="button" className="primary" disabled={!activePack || activePack.blocked} onClick={() => void activePack?.save()}>Save{activePack?.dirty ? " •" : ""}</button>
+        <button type="button" disabled={!activePack} onClick={() => activePack?.exportDoc()}>Export</button></> },
+          { name: "Appearance", description: "Palette, system theme and focus", content: <>
+            <label className="theme-label"><span>Palette</span><select aria-label="Palette" value={theme === "system" ? systemPalette : theme} onChange={e => changeTheme(e.target.value as Palette)}><option value="light">Light</option><option value="dark">Dark</option><option value="white">White</option><option value="black">Black</option></select></label>
         <label className="follow-system"><input type="checkbox" checked={theme === "system"} onChange={e => changeTheme(e.target.checked ? "system" : systemPalette)} /><span>Follow system</span></label>
-        <button type="button" className="primary" disabled={!activePack || activePack.blocked} onClick={() => void activePack?.save()}>Save{activePack?.dirty ? " •" : ""}</button>
-        <button type="button" disabled={!activePack} onClick={() => activePack?.exportDoc()}>Export</button>
+        <button type="button" className="focus-toggle" aria-label={focusMode ? "Exit focus" : "Focus"} aria-pressed={focusMode} title={focusMode ? "Restore workspace chrome" : "Collapse workspace chrome"} onClick={toggleFocus}><svg aria-hidden="true" viewBox="0 0 24 24"><path d={focusMode ? "M9 4v5H4m16 0h-5V4m0 16v-5h5M4 15h5v5" : "M9 4H4v5m16 0V4h-5m0 16h5v-5M4 15v5h5"} /></svg><span>{focusMode ? "Exit focus" : "Focus"}</span></button>
+          </> },
+          { name: "Status", description: "Plan summary, saved state and offline readiness", content: <><p>{activePack?.title || "Workspace"}</p><p>{activePack?.summary || "Add any panel to this workspace."}</p><p>{offline === "ready" ? "Offline ready" : "Offline cache preparing"}</p>{context && <p>{context}</p>}{dirtyApps.length > 0 && <p>Unsaved: {dirtyApps.join(", ")}</p>}</> },
+        ]} />
       </div>
     </header>
-    <div className="suite-bar"><span className="suite-summary">{activePack ? activePack.summary : activeTool ? "Panels keep working while this tool runs; its Save lives inside the panel." : "Tap empty space or + Add panel to call up any panel from any department or tool. Store the arrangement as a view."}{offline === "ready" && <span className="suite-offline">Offline ready</span>}</span>{dirtyApps.length > 0 && <span className="suite-dirty" title={dirtyApps.join(", ")}>Unsaved: {dirtyApps.join(", ")}</span>}</div>
+
     {offer && activePack && <div className="draft-offer" role="alert"><p><strong>{activePack.label} unsaved edits</strong> from {new Date(offer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={() => void activePack.recovery.restore()}>Restore draft</button><button type="button" onClick={() => void activePack.recovery.discard()}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
       {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Add panels here; the saved view changes only when you store or update it.</div>}
-      <ConsoleWorkspace ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} currentGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : undefined)} />
+      <ConsoleWorkspace compact ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : undefined)} />
     </main>
     <footer role="status" className={`message ${status.error || activePack?.problem ? "error" : ""}`}>{[...(activePack?.recovery.errors || []), status.app ? `${status.app}: ${status.text}` : status.text].join(" ")}</footer>
     {packs.map(pack => <div key={pack.id} data-pack-dialogs={pack.id}>{pack.dialogs}</div>)}
