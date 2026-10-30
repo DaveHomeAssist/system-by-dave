@@ -11,9 +11,21 @@ export const LED_LIBRARY: PanelDef[] = [
 ].map(([type, name]) => ({ type, name, description: `LED wall ${name.toLowerCase()}. Planning estimates only.`, group: "Planning", minW: 4, minH: 4 }));
 const view = (type: string): View => ({ id: type, name: `LED ${LED_LIBRARY.find(p => p.type === type)!.name}`, panels: [{ id: `led-${type}`, type, x: 0, y: 0, w: 12, h: 8 }] });
 const nodes = new Map<string, HTMLElement>();
-const pagers = new Map<string, {refresh: () => void}>();
+const pagers = new Map<string, {refresh: () => void; reveal: (element: Element) => void}>();
 let initializePromise: Promise<void> | null = null;
 let initialized = false, parking: HTMLElement, action: HTMLElement, saved: HTMLElement;
+let pendingInspection = false;
+
+function revealInspection() {
+  const inspector = nodes.get("tools")?.querySelector<HTMLElement>("#ledCabinetInspector");
+  if (!pendingInspection || !inspector?.closest(".led-native-content")) return;
+  pagers.get("tools")?.reveal(inspector);
+  const report = inspector.querySelector<HTMLElement>("#ledCabinetInspection");
+  if (report?.getClientRects().length) {
+    report.focus({preventScroll:true});
+    pendingInspection = false;
+  }
+}
 
 function initialize(host: PackHost): Promise<void> {
   if (initialized) return Promise.resolve();
@@ -61,24 +73,79 @@ async function prepare(host: PackHost) {
     node.hidden = false;
     const fields = node.querySelector<HTMLElement>(".led-module-fields"); if (fields) fields.hidden = false;
     const items = document.createElement("div"); items.className = "led-native-items";
-    const units = fields ? Array.from(fields.children) : Array.from(node.children);
     if (type === "preview") continue;
+    // Page individual results and actions, not an entire expanding disclosure grid.
+    const units = fields ? Array.from(fields.children) : type === "results"
+      ? [...Array.from(node.querySelector("#ledResultStrip")!.children), ...Array.from(node.querySelector(".led-detail-grid")!.children)]
+      : [...Array.from(node.querySelector(".led-suite-actions")!.children), node.querySelector("#ledCabinetInspector")!, node.querySelector(".led-disclaimer")!];
+    if (type === "tools") {
+      const inspector = node.querySelector<HTMLElement>("#ledCabinetInspector")!;
+      const coordinates = inspector.querySelector(".led-cabinet-coordinates")!;
+      const controls = Array.from(coordinates.querySelectorAll("label")).map(label => {
+        const field = document.createElement("div"); field.className = "field";
+        field.append(label, coordinates.querySelector(`#${label.htmlFor}`)!); return field;
+      });
+      units.splice(units.indexOf(inspector), 0, ...controls); coordinates.remove();
+      const report = inspector.querySelector<HTMLElement>("#ledCabinetInspection")!;
+      report.classList.add("led-detail-body");
+    }
     items.append(...units); if (fields) fields.remove();
+    if (type === "results" || type === "tools") node.replaceChildren();
     node.querySelector("legend")?.remove(); node.setAttribute("aria-label", LED_LIBRARY.find(p => p.type === type)!.name); node.append(items);
-    pagers.set(type, window.AVViewport.paginate(node, items, {units: units as HTMLElement[], label: LED_LIBRARY.find(p => p.type === type)!.name, hiddenClass: "led-native-away", navClass: "led-native-pages"}));
+    for (const text of items.querySelectorAll<HTMLElement>(".led-detail-body, .field-note, .led-disclaimer, .model-note")) {
+      text.dataset.web2Scroll = ""; text.tabIndex = 0;
+      text.setAttribute("aria-label", text.closest("details")?.querySelector("summary")?.textContent || "LED planning notes");
+    }
+    const pager = window.AVViewport.paginate(node, items, {units: () => units.flatMap(unit => unit.classList.contains("led-mode-fields") ? Array.from(unit.children) : [unit]) as HTMLElement[], label: LED_LIBRARY.find(p => p.type === type)!.name, hiddenClass: "led-native-away", navClass: "led-native-pages", beforeMeasure: available => {
+      node.style.setProperty("--led-page-height", `${Math.max(0, available)}px`);
+    }});
+    pagers.set(type, pager);
+    node.addEventListener("toggle", event => {
+      const detail = event.target as HTMLDetailsElement;
+      if (detail.open) pager.reveal(detail); else pager.refresh();
+    }, true);
   }
-  query("#ledWallPreview")[0].addEventListener("led-wall:select", () => host.show("tools"));
+  query("#ledWallPreview")[0].addEventListener("led-wall:select", () => {
+    pendingInspection = true;
+    host.show("tools");
+    requestAnimationFrame(revealInspection);
+  });
   initialized = true;
 }
 
 function Leaf({type}: {type: string}) {
   const ref = useRef<HTMLDivElement>(null);
+  const content = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState(false), [expanded, setExpanded] = useState(false);
+  const [expandError, setExpandError] = useState(false);
   useEffect(() => {
-    const node = nodes.get(type); if (!node || !ref.current) return;
-    ref.current.append(node); pagers.get(type)?.refresh();
+    const leaf = ref.current; if (!leaf) return;
+    const resize = new ResizeObserver(() => setCompact(leaf.clientHeight < 160)); resize.observe(leaf);
+    const update = () => {setExpanded(document.fullscreenElement === leaf); requestAnimationFrame(() => pagers.get(type)?.refresh());};
+    document.addEventListener("fullscreenchange", update);
+    return () => {resize.disconnect(); document.removeEventListener("fullscreenchange", update);};
+  }, [type]);
+  useEffect(() => {
+    const node = nodes.get(type); if (!node || !content.current) return;
+    content.current.append(node); pagers.get(type)?.refresh();
+    if (type === "tools") revealInspection();
     return () => {parking.append(node);};
   }, [type]);
-  return <div className="led-native led-suite led-native-leaf" ref={ref} />;
+  const expand = async () => {
+    try {
+      if (expanded) await document.exitFullscreen();
+      else if (ref.current?.requestFullscreen) await ref.current.requestFullscreen();
+      else throw Error("Fullscreen unavailable");
+      setExpandError(false);
+    } catch {setExpandError(true);}
+  };
+  return <div className={`led-native led-suite led-native-leaf${compact && !expanded ? " led-native-compact" : ""}`} ref={ref}>
+    <div className="led-native-expand" hidden={!compact && !expanded}>
+      <button type="button" onClick={expand}>{expanded ? "Restore panel" : expandError ? "Retry full screen" : "Expand LED panel"}</button>
+      {!expanded && <a href="/led-wall-calculator.html">Open standalone</a>}
+    </div>
+    <div className="led-native-content" ref={content} />
+  </div>;
 }
 function useLEDPack(host: PackHost): Pack {
   const [ready, setReady] = useState(initialized), [problem, setProblem] = useState(false);

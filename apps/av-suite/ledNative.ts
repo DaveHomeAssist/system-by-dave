@@ -25,7 +25,7 @@ export function ledNative(): Plugin {
           if (rule.parent?.type === "atrule" && /keyframes$/.test(rule.parent.name)) return;
           rule.selectors = rule.selectors.map(selector => {
             const local = selector.replace(/^html(?:\[[^\]]*\])?\s*|^body\s*|^:root\s*/, "").trim();
-            return local ? `.led-native ${local}` : ".led-native";
+            return local ? `.led-native${local.startsWith("::") ? "" : " "}${local}` : ".led-native";
           });
         });
         return css.toString();

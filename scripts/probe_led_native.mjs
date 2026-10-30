@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {verifyLEDReachability} from './probe_led_reachability.mjs';
 import {createServer} from 'node:http';
 import {readFile,mkdir} from 'node:fs/promises';
 import {extname,resolve} from 'node:path';
@@ -19,6 +20,13 @@ const seed={delayDistance:123,ledCabinetsWide:9,ledCabinetsHigh:4,ledCabinetPixe
 const results=['ledPreviewArray','ledNativeRaster','ledWallDimensions','ledPower','ledContentFit'];
 const readResults=page=>page.evaluate(ids=>Object.fromEntries(ids.map(id=>[id,document.getElementById(id)?.textContent])),results);
 const errors=[];
+async function reveal(page, locator) {
+  const previous=page.locator('.console-panel .led-native-pages button').first();
+  while(!await locator.isVisible()&&!await previous.isDisabled())await previous.click();
+  const next=page.locator('.console-panel .led-native-pages button').last();
+  for(let n=0;!await locator.isVisible()&&n<40&&!await next.isDisabled();n++)await next.click();
+  assert.equal(await locator.isVisible(),true,'requested LED control is on a reachable page');
+}
 try{
   const standalone=await browser.newPage();
   await standalone.addInitScript(value=>localStorage.setItem('avCalculator.v1',JSON.stringify(value)),seed);
@@ -57,6 +65,7 @@ try{
       assert.ok(await page.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('avCalculator.ledProfiles.v1'))).length>0),'preset save retained');
     }
     if(type==='results'){
+      await reveal(page,page.getByText('Power / Viewing / Assumptions',{exact:true}));
       await page.getByText('Power / Viewing / Assumptions',{exact:true}).click();
       await page.locator('.console-panel #sendLedTypicalPowerBtn').click();
       await page.waitForURL('**/av-calculator.html?app=led#powerCard');
@@ -82,6 +91,7 @@ try{
   },null,{timeout:30000});
   await offline.setOffline(true);await offlinePage.reload();await offlinePage.locator('.console-panel .led-native-leaf').waitFor();
   assert.equal(await offlinePage.locator('.console-panel iframe').count(),0,'native LED pack reopens offline');await offline.close();
+  await verifyLEDReachability(browser,base);
   assert.deepEqual(errors,[]);
   console.log('LED native: seven native panels, standalone calculation parity, unrelated saved values and three viewport shells passed.');
 }finally{await browser.close();server.close();}
