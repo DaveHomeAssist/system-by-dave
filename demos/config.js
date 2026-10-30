@@ -1,8 +1,11 @@
 // AV by Dave demos: site-level configuration.
 // Fill these in and commit; nothing else needs to change.
 window.SBD_DEMOS = {
-  // Umami Cloud: the website ID from the "Tracking code" section of the Umami dashboard.
-  // Leave empty to run with no analytics (every track() call becomes a no-op).
+  // Umami Cloud: OFF. No website ID is set and the demos' CSP no longer allows
+  // https://cloud.umami.is (tracker sweep 2026-10-30, A5/A11), so every track()
+  // call is a no-op. Turning it on is Dave's decision and needs, in one PR: the ID
+  // here, cloud.umami.is back in script-src and connect-src of each demos/*.html
+  // CSP, and a privacy-policy.html update disclosing it.
   umamiWebsiteId: '',
   umamiScript: 'https://cloud.umami.is/script.js',
 
