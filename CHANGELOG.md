@@ -1,5 +1,15 @@
 # Changelog
 
+## October 30, 2026: LED panel control reachability
+
+- Keep result details and cabinet inspection reachable when expanded. Page individual results, actions and active planning fields, and keep the pager outside the content area.
+- Reveal the selected cabinet readout, retain bounded keyboard-accessible result tables and notes, and offer full-screen expansion or the standalone calculator when a console tile is too short for its controls.
+- Add browser regressions for panel clipping, all planning modes, cabinet-selection handoff and alternating LED/calculator saves. Calculation and persistence contracts remain unchanged.
+
+## October 30, 2026: Native LED planning panels
+
+- Expose Profile, Layout, Data, Power, Results, Tools and Preview as native console panels. Reuse the existing calculator engine, cabinet viewer, saved values and profile store. Preserve the standalone page and translate former LED page slots in memory without rewriting saved layout bytes.
+
 ## October 30, 2026: Render recovery integration
 
 - Integrate current main into the draft recovery candidate, retain newer workspace menus and both changelog histories, and regenerate AV Suite assets from the combined source.

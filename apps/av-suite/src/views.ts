@@ -23,6 +23,13 @@ export function packLibrary(pack: Pick<Pack, "id" | "label" | "library">): Panel
    A former Calculator app tile becomes native controls inside its old bounds.
    Small tiles show Audio Delay; every other calculation remains in the menu. */
 export function nativePanels(panels: Panel[]): Panel[] {
+  let hasLEDLayout = panels.some(panel => panel.type === "led:layout");
+  panels = panels.flatMap(panel => {
+    if (panel.type !== "tool:led-wall-calculator") return [panel];
+    if (hasLEDLayout) return [];
+    hasLEDLayout = true;
+    return [{...panel, type:"led:layout"}];
+  });
   const occupied = new Set(panels.filter(panel => panel.type !== "tool:av-calculator").map(panel => panel.type));
   return panels.flatMap(panel => {
     if (panel.type !== "tool:av-calculator") return [panel];
@@ -73,6 +80,7 @@ export function saveViews(storage: Pick<Storage, "setItem" | "getItem">, views: 
 export function viewApp(view: View | undefined): string {
   if (!view) return "";
   if (view.id === "tool:av-calculator") return "calculator";
+  if (view.id === "tool:led-wall-calculator") return "led";
   const prefix = appOf(view.id);
   if (prefix) return prefix;
   const counts = new Map<string, number>();

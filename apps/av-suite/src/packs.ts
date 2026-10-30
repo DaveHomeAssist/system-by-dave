@@ -1,3 +1,4 @@
+import { ledPack } from "../../led-wall/src/pack";
 import { equipmentLabPack } from '../../equipment-lab/src/pack';
 import type { PackDef } from "../../shared/av-console/pack";
 import { videoPack } from "../../av-video/src/pack";
@@ -11,14 +12,13 @@ import { lightingPack } from "../../av-lighting/src/pack";
 import { calculatorPack } from "../../av-calculator/src/pack";
 
 /* All native Rail identities expose individual, in-process panels. */
-export const PACKS: PackDef[] = [videoPack, audioPack, showControlPack, showOpsPack, frontOfficePack, shopPack, infrastructurePack, lightingPack, calculatorPack, equipmentLabPack];
+export const PACKS: PackDef[] = [videoPack, audioPack, showControlPack, showOpsPack, frontOfficePack, shopPack, infrastructurePack, lightingPack, calculatorPack, equipmentLabPack, ledPack];
 
 /* Standalone tools are links, never panel choices. Keep this catalog for
    recovery links in old layouts; their documents and storage stay untouched. */
 export type Specialist = { id: string; label: string; description: string; consoleId?: string; fallbackHref: string; minW: number; minH: number };
 export const SPECIALISTS: Specialist[] = [
   { id: "throwline", label: "Throwline", description: "Projector throw, fit, brightness and multi-projector layouts with Stage 3D.", fallbackHref: "ProjectorThrow/", minW: 5, minH: 4 },
-  { id: "led-wall-calculator", label: "LED Wall Calculator", description: "Cabinet layout, native raster, processor ports and power planning.", fallbackHref: "led-wall-calculator.html", minW: 4, minH: 4 },
   { id: "teleprompter", label: "Teleprompter", description: "Scripts, cues, remote mode, rundown and read view.", fallbackHref: "teleprompter.html", minW: 4, minH: 3 },
   { id: "show-timer", label: "Show Timer", description: "Countdown, count up, clock, stage view and warnings.", fallbackHref: "show-timer.html", minW: 3, minH: 2 },
   { id: "cue-sheet", label: "Cue Sheet", description: "Cue lists with layered playback, monitor output and capture inputs.", fallbackHref: "cue-sheet.html", minW: 4, minH: 3 },

@@ -122,6 +122,7 @@
     './equipment-lab/assets/equipment-lab-Viewer.js',
     './equipment-lab/assets/index.css',
     './av/assets/av-suite-Viewer.js',
+    './av/assets/av-suite-_led-native.js',
     './equipment-lab/data/catalog.json',
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.manifest.json',
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.definition.json',
@@ -338,7 +339,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261029-two-step-panel-chooser-verified',
+    version:'v20261030-led-native-panels',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

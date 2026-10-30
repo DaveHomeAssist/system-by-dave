@@ -1,0 +1,32 @@
+.led-native-leaf{height:100%;min-height:0;min-width:0;overflow:hidden;display:flex;flex-direction:column;background:var(--av-surface);color:var(--av-text)}
+.led-native-content>fieldset,.led-native-content>section,.led-native-content>.led-stage{margin:0!important;border:0!important;padding:8px!important;height:100%!important;min-height:0!important;width:100%;max-width:none!important;box-sizing:border-box;position:static!important;transform:none!important}
+.led-native .led-native-items{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:10px;overflow:hidden}
+.led-native .led-native-items>.full,.led-native .led-native-items>.led-result-strip,.led-native .led-native-items>.led-detail-grid,.led-native .led-native-items>.led-suite-actions,.led-native .led-native-items>.led-disclaimer,.led-native .led-native-items>details{grid-column:1/-1}
+.led-native .led-native-away{display:none!important}.led-native .led-native-pages{display:flex;gap:8px;align-items:center;justify-content:space-between}.led-native .led-native-pages button{min-height:44px}.led-native-leaf .led-stage{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) auto!important}.led-native-leaf .led-stage-view{min-height:0!important}.led-native .led-detail-grid{display:block!important}.led-native .led-detail-body{overflow:auto;max-height:35vh}.led-native .led-native-items :is(input,select,button){max-width:100%;box-sizing:border-box}.led-native .led-native-items p{overflow-wrap:anywhere}.led-native .led-stage-data{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;padding:6px!important}.led-native .led-stage-rails,.led-native .led-stage-kicker,.led-native .led-stage-axis{display:none!important}.led-native .led-stage-data>div:first-child{display:none}.led-native .led-wall-preview{height:100%!important;min-height:0!important}.led-native .led-native-items .led-input-grid{display:contents}
+@media(max-width:680px){.led-native .led-native-items{grid-template-columns:minmax(0,1fr)}}
+/* Each page keeps its navigation outside the measured content area. */
+.led-native-leaf{container-type:size}
+.led-native-content>fieldset,.led-native-content>section{display:flex!important;flex-direction:column;gap:6px;overflow:hidden}
+.led-native .led-native-items{flex:1;grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content}
+.led-native .led-native-pages{flex:none;min-height:44px}
+.led-native .led-native-items>details{margin:0!important;padding:0!important;min-height:0}
+.led-native .led-native-items>details>summary{min-height:44px;box-sizing:border-box;margin:0;padding:6px 8px}
+.led-native .led-native-items .led-detail-body{box-sizing:border-box;max-height:max(0px,calc(var(--led-page-height) - 54px));margin:0;padding:4px 8px;overscroll-behavior:contain}
+.led-native .led-native-items :is(.field-note,.model-note,.led-disclaimer){max-height:var(--led-page-height);overflow:auto;overscroll-behavior:contain;margin:0}
+.led-native .led-native-items>button{min-height:44px;margin:0}
+.led-native .led-native-items>.led-result{padding:4px 8px}
+@container(max-height:220px){
+ .led-native-content>fieldset,.led-native-content>section{padding:2px!important;gap:2px}
+ .led-native .led-native-items .field{display:grid;grid-template-columns:minmax(70px,.8fr) minmax(0,1fr);align-items:center;gap:6px}
+ .led-native .led-native-items .field>label{margin:0}
+}
+.led-native .led-native-items>.led-mode-fields:not([hidden]){display:contents}
+
+.led-native-content{flex:1;min-height:0;min-width:0;overflow:hidden}
+.led-native-expand{display:flex;flex:none;align-items:center;gap:6px}
+.led-native-expand[hidden]{display:none}
+.led-native-expand :is(button,a){min-height:44px;display:inline-flex;align-items:center;justify-content:center;flex:1;font-size:12px;padding:4px;box-sizing:border-box}
+.led-native-compact .led-native-content{display:none}
+.led-native-leaf:fullscreen{width:100%;height:100%;padding:4px;box-sizing:border-box}
+.led-native{--text:var(--av-text);--muted:var(--av-muted);--bg:var(--av-bg);--panel:var(--av-surface);--panel-2:var(--av-surface-2);--panel-3:var(--av-raised);--line:var(--av-line);--line-strong:var(--av-line-strong);--blue:var(--av-focus)}
+.led-native::before{content:none}
