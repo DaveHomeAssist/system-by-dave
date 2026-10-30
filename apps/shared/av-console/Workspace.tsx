@@ -1,3 +1,4 @@
+import { TopicMenu } from "./TopicMenu";
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { LayoutState } from "./drafts";
 import { clone, COLS, deleteView, firstFree, fits, nudge, Panel, PanelDef, Rect, renameView, ROWS, sameLayout, sanitizeView, split, storeAsNew, suggest, trim, updateView, View } from "./layout";
@@ -77,12 +78,14 @@ type Props = {
   /* Chooser group to open on: an application name when the library carries
      `app`, otherwise one of the three categories. */
   defaultGroup?: string;
+  compact?: boolean;
 };
 
-export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, viewTabs, extraViews, defaultGroup }: Props) {
+export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, viewTabs, extraViews, defaultGroup, compact = false }: Props) {
   const grid = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLElement | null>(null);
+  const chooserDialog = useRef<HTMLDialogElement>(null);
   const [chooser, setChooser] = useState<Chooser | null>(null);
   const [query, setQuery] = useState("");
   const [group, setGroup] = useState<string>(defaultGroup || "Common");
@@ -109,6 +112,9 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     const key = (e: KeyboardEvent) => { if (e.key === "Escape" && (chooser || menu || drag || draw)) { e.preventDefault(); setDrag(null); setDraw(null); close(); } };
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
   }, [chooser, menu, drag, draw, close]);
+  useEffect(() => {
+    if (compact && chooser && !chooserDialog.current?.open) chooserDialog.current?.showModal();
+  }, [compact, chooser]);
   const at = (el: HTMLElement) => { const r = el.getBoundingClientRect(); return { left: r.left, top: r.bottom + 6 }; };
   const clampPos = (left: number, top: number, w: number, h: number) => ({ left: Math.max(8, Math.min(left, window.innerWidth - w - 8)), top: Math.max(8, Math.min(top, window.innerHeight - h - 8)) });
 
@@ -118,8 +124,8 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     return { x: Math.max(0, Math.min(COLS - 1, Math.floor((clientX - box.left) / sx))), y: Math.max(0, Math.min(ROWS - 1, Math.floor((clientY - box.top) / sy))), sx, sy };
   }
   function openChooser(c: Omit<Chooser, "left" | "top">, left: number, top: number) {
-    trigger.current = (document.activeElement as HTMLElement) || null;
-    setQuery(""); setGroup(startGroup); setMenu(null);
+    if (!trigger.current || !document.contains(trigger.current)) trigger.current = (document.activeElement as HTMLElement) || null;
+    setQuery(""); setGroup(compact ? "" : startGroup); setMenu(null);
     setChooser({ ...c, ...clampPos(left, top, 460, 420) });
   }
   function addPanelButton(e: React.MouseEvent<HTMLButtonElement>) {
@@ -248,21 +254,28 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   const choices = ws.library.filter(d => (!query || `${d.name} ${d.app || ""} ${d.description}`.toLowerCase().includes(query.toLowerCase())) && (query || (apps.length ? d.app === group : d.group === group)));
   const ghost = drag?.rect || draw?.rect || (chooser?.rect && chooser.mode !== "replace" ? chooser.rect : undefined);
 
+  const viewBar = <div role="tablist" aria-label={`${label} views`} className="console-views">
+        {visibleViewTabs.map(v => <button key={v.id} type="button" role="tab" aria-selected={v.id === ws.viewId} onClick={() => { ws.setViewId(v.id); close(); }}>{v.name}{v.id === ws.viewId && changed && <span className="console-dot" title="Arrangement changed. Store or update the view to keep it." aria-label="arrangement changed" />}</button>)}
+        {extraViews}
+      </div>;
   const quickBar = <nav className="console-quick" aria-label="Panels">
         {quick.map(q => <button key={q.type} type="button" aria-pressed={shownTypes.has(q.type) && (mode !== "phone" || phoneShown?.type === q.type)} onClick={() => { if (!ws.show(q.type)) notify(`${q.label} is not available. Check Project modules.`); }}>{q.label}{q.badge !== undefined && <span className="console-badge">{q.badge}</span>}</button>)}
       </nav>;
-  return <div ref={shell} className={`console-shell mode-${mode} ${locked ? "is-locked" : ""}`}>
+  return <div ref={shell} className={`console-shell ${compact ? "console-compact" : ""} mode-${mode} ${locked ? "is-locked" : ""}`}>
     <div className="console-strip">
-      <div role="tablist" aria-label={`${label} views`} className="console-views">
-        {visibleViewTabs.map(v => <button key={v.id} type="button" role="tab" aria-selected={v.id === ws.viewId} onClick={() => { ws.setViewId(v.id); close(); }}>{v.name}{v.id === ws.viewId && changed && <span className="console-dot" title="Arrangement changed. Store or update the view to keep it." aria-label="arrangement changed" />}</button>)}
-        {extraViews}
-      </div>
+      {compact ? <TopicMenu label={view?.name || "Workspace"} topics={[
+        { name: "Views", closeOnAction: true, description: "Switch the workspace arrangement", content: viewBar },
+        { name: "Panels", closeOnAction: true, description: "Recall panels in this topic", content: quickBar },
+        { name: "Layout", closeOnAction: true, description: "Lock the arrangement or focus a panel", content: <><button type="button" aria-pressed={locked} onClick={() => { ws.setLocked(!locked); notify(locked ? "Layout unlocked." : "Layout locked."); }}>{locked ? "Locked" : "Unlocked"}</button><button type="button" onClick={fullScreen}>Full screen focused panel</button></> },
+      ]} /> : viewBar}
       <button type="button" className="console-icon" aria-label="View options" aria-haspopup="menu" onClick={e => { trigger.current = e.currentTarget; const p = at(e.currentTarget); setChooser(null); setMenu({ kind: "view", id: ws.viewId, ...clampPos(p.left, p.top, 260, 340) }); }}>▾</button>
-      {mode !== "phone" && quickBar}
+      {mode !== "phone" && !compact && quickBar}
       <div className="console-tools">
         <button type="button" onClick={addPanelButton}>＋ Add panel</button>
+        {!compact && <>
         <button type="button" aria-pressed={locked} onClick={() => { ws.setLocked(!locked); notify(locked ? "Layout unlocked. Drag title bars and corner handles, or draw across empty space." : "Layout locked. Menu commands still work."); }}>{locked ? "Locked" : "Unlocked"}</button>
         <button type="button" className="console-icon" aria-label="Full screen focused panel" onClick={fullScreen}>⛶</button>
+        </>}
       </div>
     </div>
     {ws.hidden > 0 && <p className="console-notice">{ws.hidden} panel{ws.hidden === 1 ? " is" : "s are"} hidden because {ws.hidden === 1 ? "its module is" : "their modules are"} off. The view keeps {ws.hidden === 1 ? "it" : "them"} for when the module returns.</p>}
@@ -278,7 +291,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
             <strong className="console-title">{out.title || d.name}</strong>{out.context && <span className="console-context">{out.context}</span>}
             <span className="console-bar-actions">{out.actions}
               <button type="button" className="console-icon" aria-label={`${d.name} options`} aria-haspopup="menu" onClick={e => { trigger.current = e.currentTarget; const r = e.currentTarget.getBoundingClientRect(); setChooser(null); setMenu({ kind: "panel", id: p.id, ...clampPos(r.right - 260, r.bottom + 6, 260, 380) }); }}>⋯</button>
-              {mode !== "phone" && <button type="button" className="console-icon" aria-label={isMax ? `Restore ${d.name}` : `Maximize ${d.name}`} onClick={() => toggleMax(p.id)}>{isMax ? "▭" : "▢"}</button>}
+              {!compact && mode !== "phone" && <button type="button" className="console-icon" aria-label={isMax ? `Restore ${d.name}` : `Maximize ${d.name}`} onClick={() => toggleMax(p.id)}>{isMax ? "▭" : "▢"}</button>}
             </span>
           </header>
           <div className="console-body">{out.body}</div>
@@ -289,7 +302,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     </div>
     {mode === "phone" && quickBar}
 
-    {chooser && <div className="console-pop console-chooser" role="dialog" aria-label="Add panel" style={{ left: chooser.left, top: chooser.top }}>
+    {chooser && <dialog ref={chooserDialog} open={compact ? undefined : true} className="console-pop console-chooser" aria-label="Add panel" onCancel={event => { event.preventDefault(); close(); }} style={{ left: chooser.left, top: chooser.top, margin: 0 }}>
       {chooser.mode === "nospace" ? <>
         <h3>No room for another panel</h3><p>Nothing is covered silently. Choose how to make space.</p>
         <div className="console-choice-actions">
@@ -298,16 +311,17 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
           <button type="button" onClick={() => { if (!view) return; const id = `v-${uid()}`; onViewsChange(storeAsNew(ws.views, [], "New view", id), "New empty view created. Save to keep it."); ws.setViewId(id); setChooser(c => c && { ...c, mode: "add", rect: { x: 0, y: 0, w: COLS, h: ROWS } }); }}>Create a new view</button>
         </div>
       </> : <>
-        <h3>{chooser.mode === "replace" ? "Change panel" : "Add panel"}</h3>
+        <h3>{compact && group && !query ? group : chooser.mode === "replace" ? "Change panel" : "Add panel"}</h3>
         <input type="search" aria-label="Search panels" placeholder="Search panels…" value={query} autoFocus onChange={e => setQuery(e.target.value)} />
-        {!query && <div className="console-groups" role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" aria-pressed={group === g} onClick={() => setGroup(g)}>{g}</button>)}</div>}
-        <div className="console-choices">
+        {!query && (!compact || !group) && <div className="console-groups" role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" aria-pressed={group === g} onClick={() => { setGroup(g); if (compact) requestAnimationFrame(() => chooserDialog.current?.querySelector<HTMLButtonElement>(".console-back")?.focus()); }}>{g}</button>)}</div>}
+        {compact && group && !query && <button type="button" className="console-back" onClick={() => { setGroup(""); requestAnimationFrame(() => chooserDialog.current?.querySelector<HTMLInputElement>("input")?.focus()); }}>← Back to topics</button>}
+        {(!compact || group || query) && <div className="console-choices">
           {choices.length ? choices.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}{panels.some(p => p.type === d.type) && <small> · open</small>}</strong><span>{d.description}</span></button>) : <p>No panels match.</p>}
-        </div>
+        </div>}
         {chooser.rect && <div className="console-preview" aria-hidden="true">{panels.map(p => <i key={p.id} style={{ gridColumn: `${p.x + 1} / ${p.x + p.w + 1}`, gridRow: `${p.y + 1} / ${p.y + p.h + 1}` }} />)}<b style={{ gridColumn: `${chooser.rect.x + 1} / ${chooser.rect.x + chooser.rect.w + 1}`, gridRow: `${chooser.rect.y + 1} / ${chooser.rect.y + chooser.rect.h + 1}` }} /></div>}
       </>}
       <button type="button" className="console-close" onClick={close}>Close</button>
-    </div>}
+    </dialog>}
 
     {menu && <div className="console-pop console-menu" role="menu" aria-label={menu.kind === "panel" ? "Panel options" : "View options"} style={{ left: menu.left, top: menu.top }}>
       {menu.kind === "panel" && menuPanel && (menu.sub === "move" ? <>

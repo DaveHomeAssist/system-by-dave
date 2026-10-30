@@ -6,7 +6,7 @@
   ],
   "head": "fe549a22f558f57af70ffae99e26466e009349ca",
   "status": "amber",
-  "statusReason": "Dave selected and implemented the eight family route redirects on October 29. All eight shared-console family journeys and 42 sheet/family redirects pass on Dominic. PR #379 owns current CI, merge and publication evidence. Specialist, diagnostics and physical acceptance decisions stay open.",
+  "statusReason": "October 29 canvas menu redesign passes targeted and full shell checks on Dominic. Exact-head CI, merge, publication and live readback remain pending. Earlier family redirects remain shipped; other AV roadmap decisions remain open.",
   "audioSpeakerStatusParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "94b1ce79499de92416a5c30357298d619fb74ecb",
@@ -1653,5 +1653,15 @@
     "limits": "No saved-key/schema change, first native specialist selection, diagnostics decision or physical/operator acceptance.",
     "sourceRevision": "fe549a22f558f57af70ffae99e26466e009349ca",
     "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/379"
+  },
+  "canvasMenus": {
+    "recordedOn": "2026-10-29",
+    "baseRevision": "2892ae1",
+    "branch": "codex/av-canvas-menus",
+    "request": "Canvas workspace first. Topic selection enters one submenu with Back. Remove React Flow attribution, verify and ship.",
+    "scope": "Compact identity and workspace rows; topic menus for project, appearance, status, views, panels, layout and diagram tools; panel chooser topic drilldown. Existing pack sources, document keys, schemas and saved geometry remain unchanged.",
+    "candidateEvidence": "Dominic: both typechecks, 86 model/layout tests, suite build, eight family edit/isolated Save/export/reload journeys, all 66 shell menu choices, mixed layouts, legacy bytes and four palettes at eight sizes pass. Menu acceptance passes at seven sizes: 1051 by 881 workspace starts at 140px; canvas fills 86 percent of its panel; no attribution; Back, Escape and focus return pass. AV/offline/Rail 28, Throwline 47, domain 12, navigation and consistency checks pass.",
+    "next": "Complete exact-head CI, PR merge, publication and live menu readback. Private board synchronization remains unavailable because its existing file is missing.",
+    "limits": "No physical touch, virtual keyboard, power loss or human acceptance is implied."
   }
 }

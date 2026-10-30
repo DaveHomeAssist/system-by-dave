@@ -40,10 +40,7 @@ html[data-av-focus="true"] .suite-header{min-height:44px;padding:0 10px;gap:8px}
 html[data-av-focus="true"] .suite-mark,
 html[data-av-focus="true"] .suite-plan,
 html[data-av-focus="true"] .suite-context,
-html[data-av-focus="true"] .suite-bar,
-html[data-av-focus="true"] .suite-actions .theme-label,
-html[data-av-focus="true"] .suite-actions .follow-system,
-html[data-av-focus="true"] .suite-actions>button:not(.primary):not(.focus-toggle){display:none}
+html[data-av-focus="true"] .suite-bar{display:none}
 html[data-av-focus="true"] .focus-toggle span{display:none}
 @media(min-width:1440px){
   html[data-av-focus="true"] .sbd-rail{width:56px;min-width:56px;padding-inline:6px}
@@ -77,3 +74,39 @@ html[data-av-focus="true"] .focus-toggle span{display:none}
 .suite-gear-panel>p{margin:0;padding:8px;font-size:12px}
 /* Host --ink is the on-accent colour; the gear feedback overlay needs body text. */
 .suite-gear-panel .gear-panel-feedback{color:var(--text)}
+
+/* Workspace first: only identity and entry points stay above the canvas. */
+.suite-header{padding:0 12px;min-height:48px;gap:8px}
+.suite-mark{width:28px;height:28px}
+.suite-identity{gap:8px}
+.suite-identity h1{font-size:16px;margin:0}
+.suite-plan{max-width:55vw}
+.suite-context{display:none}
+.suite-actions .topic-menu .theme-label{display:flex}
+.suite-actions .topic-menu .follow-system{display:flex}
+.suite-actions .topic-menu .focus-toggle{display:flex}
+.suite-app .console-strip{flex-wrap:nowrap;padding:0 8px;gap:4px;min-height:48px}
+.topic-menu .console-views,.topic-menu .console-quick{display:flex;flex-direction:column;align-items:stretch;flex-basis:auto;margin:0;border:0;gap:4px}
+.suite-app .console-bar{min-height:44px;padding:0 4px 0 10px}
+.suite-app .console-grid{padding:6px;gap:6px}
+.suite-app .console-context{font-size:11px}
+.suite-app .console-groups{display:flex;flex-direction:column}
+.suite-app .console-groups button{text-align:left;padding:10px 12px;min-height:48px}
+.suite-app .flow-workspace{position:relative}
+.flow-compact-tools{position:absolute;top:8px;left:8px;z-index:5}
+.flow-compact-tools>button{background:var(--av-surface);box-shadow:0 2px 8px #0002}
+.topic-menu .flow-route-bar{position:static;display:flex;flex-direction:column;align-items:stretch;padding:0;border:0;max-width:none;height:auto}
+.topic-menu .flow-route-bar label{flex-direction:column;align-items:stretch}
+.topic-menu .flow-route-bar select{width:100%;min-width:0}
+.topic-menu .flow-context{padding:8px 0;white-space:normal}
+.suite-app .flow-empty{padding:16px;top:50%;max-height:calc(100% - 72px)}
+.suite-app .flow-empty-symbol{display:none}
+.suite-app .flow-empty h3{font-size:18px}
+.suite-app .flow-empty p{font-size:12px}
+
+@media(max-width:719px){.suite-header{padding:0 8px}.suite-identity h1{font-size:15px}.suite-app .console-strip{gap:2px;padding:0 4px}.suite-app .console-tools>button{padding:0 8px}.suite-app .console-grid{padding:4px}.suite-app .console-quick{min-height:44px}.suite-app .console-context{display:none}}
+html[data-av-focus="true"] .suite-actions>button[aria-haspopup="dialog"]{display:inline-flex}
+.topic-menu .console-views button,.topic-menu .console-quick button{flex:0 0 auto;text-align:left}
+.console-compact>.console-strip>button[aria-haspopup="dialog"]{max-width:45vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.suite-app .flow-empty>button:not(.primary){display:none}

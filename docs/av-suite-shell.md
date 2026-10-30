@@ -6,6 +6,29 @@
 done and pauses further per-family console conversions under the
 [October 9 rollout](av-console-rollout.md).
 
+## October 29 menu redesign
+
+Dave requested a canvas-first layout and topic selection that enters a submenu.
+The shared console keeps a compact identity row and workspace row. Menu opens
+Project (Save, export and history), Appearance (palette and focus), or Status.
+The current view opens Views, Panels, or Layout. Each topic shows one submenu
+with Back and Close; Escape dismisses the native modal and returns focus.
+The Add panel chooser starts with application topics; choosing one replaces
+that list with its panels and a Back to topics action. Search spans the library.
+Phone panel shortcuts remain directly available below the workspace.
+
+Video diagram tools use the same pattern for Devices, Routes, and Arrange and
+export. The canvas fills the reclaimed toolbar space. React Flow attribution
+is hidden using the library's supported proOptions setting. Dependency license
+notices remain intact. Document keys, schemas, stored view geometry, imports,
+offline operation and specialist embedding are unchanged.
+
+Acceptance: all existing shell and family document journeys, topic Back,
+Escape and focus return, populated diagram interaction, no attribution link,
+and containment at desktop, 1051 by 881, 680, phone, short phone and ultrawide.
+Build and browser checks run on Dominic; production needs the normal PR,
+Pages publication and fresh live browser readback.
+
 ## What Dave asked for (2026-10-13)
 
 The AV Toolbox becomes one grandMA-style console: a touch-friendly, resizable

@@ -1,0 +1,55 @@
+import assert from 'node:assert/strict';
+import { chromium } from 'playwright';
+import { serveFamilies } from './av-family-probe.mjs';
+import { suiteTopic, closeTopics } from './av-menu-journey.mjs';
+const server=await serveFamilies();
+const browser=await chromium.launch({headless:true,...(process.env.CHROME_CHANNEL ? {channel:process.env.CHROME_CHANNEL} : process.env.CHROME_BIN ? {executablePath:process.env.CHROME_BIN} : {}),args:['--no-sandbox']});
+try {
+ const page=await browser.newPage({viewport:{width:1051,height:881}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(`${process.env.AV_MENU_BASE || server.base}/av/?app=video`);
+ await page.locator('.react-flow').waitFor();
+ assert.equal(await page.locator('.react-flow__attribution').count(),0);
+ const metrics=await page.evaluate(()=>{const grid=document.querySelector('.console-grid').getBoundingClientRect();const panel=document.querySelector('[data-panel="flow"]').getBoundingClientRect();const canvas=document.querySelector('.flow-canvas').getBoundingClientRect();return {gridTop:grid.top,workspaceHeight:grid.height,canvasHeight:canvas.height,panelHeight:panel.height}});
+ assert.ok(metrics.gridTop<=160,JSON.stringify(metrics));
+ assert.ok(metrics.canvasHeight/metrics.panelHeight>.75,JSON.stringify(metrics));
+ if (process.env.AV_MENU_EVIDENCE) await page.screenshot({path:process.env.AV_MENU_EVIDENCE});
+ await suiteTopic(page,'Appearance');
+ await page.getByLabel('Palette',{exact:true}).selectOption('light');
+ await page.getByRole('button',{name:'Back to Menu',exact:true}).click();
+ assert.equal(await page.locator('dialog[open]').getByRole('heading',{name:'Menu',exact:true}).count(),1);
+ assert.equal(await page.getByLabel('Palette',{exact:true}).count(),0);
+ await page.keyboard.press('Escape');
+ assert.equal(await page.locator('dialog[open]').count(),0);
+ assert.ok(await page.locator('.suite-header > .suite-actions > button').evaluate(e=>e===document.activeElement));
+ await page.getByRole('button',{name:/^Diagram/}).click();
+ await page.locator('dialog[open]').getByRole('button',{name:/^Devices/}).click();
+ await page.locator('dialog[open]').getByRole('button',{name:'Add device',exact:true}).click();
+ await page.getByLabel('Device name',{exact:true}).fill('Synthetic camera');
+ await page.getByRole('button',{name:'Add to diagram',exact:true}).click();
+ await page.locator('.react-flow__node').waitFor();
+ assert.equal(await page.locator('.react-flow__attribution').count(),0);
+ for(const [width,height] of [[1440,900],[1051,881],[680,700],[375,812],[844,390],[320,256],[3840,1080]]){
+  await page.setViewportSize({width,height});
+  await suiteTopic(page,'Appearance');
+  const d=await page.locator('dialog[open]').boundingBox(); assert.ok(d.x>=0&&d.y>=0&&d.x+d.width<=width+1&&d.y+d.height<=height+1,JSON.stringify(d));
+  await page.keyboard.press('Tab');
+  assert.ok(await page.locator('dialog[open]').evaluate(e=>e.contains(document.activeElement)));
+  await closeTopics(page);
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight));
+ }
+ await page.setViewportSize({width:1051,height:881});
+ await page.getByRole('button',{name:'Signal Flow options',exact:true}).click();
+ await page.getByRole('menuitem',{name:'Change panel…',exact:true}).click();
+ const chooser=page.getByRole('dialog',{name:'Add panel',exact:true});
+ await chooser.getByRole('button',{name:'Lighting',exact:true}).click();
+ assert.equal(await chooser.getByRole('group',{name:'Panel categories'}).count(),0);
+ assert.ok(await chooser.locator('.console-choices button').count()>0);
+ await chooser.getByRole('button',{name:'Back to topics',exact:false}).click();
+ assert.equal(await chooser.locator('.console-choices').count(),0);
+ assert.equal(await chooser.getByRole('group',{name:'Panel categories'}).count(),1);
+ await page.keyboard.press('Escape');
+ assert.equal(await page.locator('dialog[open]').count(),0);
+ await page.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Signal Flow options');
+ assert.deepEqual(errors,[]); console.log('PASS menu acceptance',metrics);
+} finally {await browser.close();await server.close();}

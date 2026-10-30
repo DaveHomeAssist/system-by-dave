@@ -85,7 +85,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261029-family-console-redirects');
+      assert.equal(name, 'sbd-av-suite-v20261029-canvas-menus');
       return cache;
     } },
     fetch: async () => new Response('ok'),
