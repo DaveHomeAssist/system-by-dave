@@ -140,3 +140,13 @@ html[data-av-focus="true"] .suite-actions>button[aria-haspopup="dialog"]{display
 
 /* Keep the long group list within the chooser, with Close always available. */
 .suite-app .console-chooser .console-groups{min-height:0;overflow:auto;flex-shrink:1}
+
+/* Public breadcrumb row: breadcrumb on the left, demos and Field Kit links on the right (AUD-003). */
+.shell-crumbs{display:flex;align-items:center;gap:inherit;min-width:0}
+.shell-funnel{display:flex;align-items:center;gap:12px;margin-left:auto;white-space:nowrap}
+.shell-funnel a{color:inherit;font-weight:600}
+.shell-funnel a:hover{color:var(--av-accent,#e08a4f)}
+@media(max-width:420px){
+  .shell-crumbs__current{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+  .shell-funnel{gap:10px}
+}

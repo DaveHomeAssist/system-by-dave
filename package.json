@@ -111,7 +111,8 @@
     "test:av-routes-browser": "AV_FAMILY_REDIRECTS=1 node scripts/probe_av_routes.mjs",
     "test:av-retained-browser": "node scripts/probe_av_retained.mjs",
     "test:av-families-browser": "node scripts/av-family-probe.mjs",
-    "test:av-canvas-menus-browser": "node scripts/probe_av_canvas_menus.mjs"
+    "test:av-canvas-menus-browser": "node scripts/probe_av_canvas_menus.mjs",
+    "probe:av-nav-funnel": "node scripts/launch/probe_av_nav_funnel.mjs"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
