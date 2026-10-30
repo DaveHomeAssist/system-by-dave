@@ -1706,7 +1706,7 @@
       "finding": "Expanded results and cabinet inspection could be clipped or left on a hidden page; root bounds alone missed these failures. Short tiles had insufficient space for controls.",
       "change": "Page individual result/action/active-field units, bound long readouts, reveal and focus cabinet inspection after panel mounting, correct scoped palette/pseudo-element styling, and offer full-screen expansion with standalone recovery for short tiles.",
       "verification": "Dominic Node24.20 / Playwright1.63 Chromium: typecheck/build, AV contracts, 72 panel/size/theme cases, four planning modes, cabinet selection, alternating LED/calculator save/reload and denied fullscreen fallback pass. Original seven-panel numerical parity, preset/export/power handoff, legacy bytes and offline reopen pass. Full 72-choice shell and nine-size Add flow in both themes pass. Eleven source/probe/artifact hashes match; phone/short/inspector screenshots reviewed.",
-      "delivery": "Local commits prepared for existing draft PR393. Exact-head remote and CI verification follow; no merge or deployment.",
+      "delivery": "Repair ce0941dc35a466f02362f48e867e56405f76452f pushed to existing draft PR393 and remote verified. Required CI on the final PR head remains separate; no merge or deployment.",
       "limits": "Physical touch, actual browser zoom, assistive technology, human acceptance and production behavior are not established by candidate browser checks."
     }
   },
