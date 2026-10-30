@@ -1662,6 +1662,8 @@
     "scope": "Compact identity and workspace rows; topic menus for project, appearance, status, views, panels, layout and diagram tools; panel chooser topic drilldown. Existing pack sources, document keys, schemas and saved geometry remain unchanged.",
     "candidateEvidence": "Dominic: both typechecks, 86 model/layout tests, suite build, eight family edit/isolated Save/export/reload journeys, all 66 shell menu choices, mixed layouts, legacy bytes and four palettes at eight sizes pass. Menu acceptance passes at seven sizes: 1051 by 881 workspace starts at 140px; canvas fills 86 percent of its panel; no attribution; Back, Escape and focus return pass. AV/offline/Rail 28, Throwline 47, domain 12, navigation and consistency checks pass.",
     "next": "Complete exact-head CI, PR merge, publication and live menu readback. Private board synchronization remains unavailable because its existing file is missing.",
-    "limits": "No physical touch, virtual keyboard, power loss or human acceptance is implied."
+    "limits": "No physical touch, virtual keyboard, power loss or human acceptance is implied.",
+    "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/388",
+    "publishedConsumers": "Rebuilt the suite, Equipment Lab and AV Calculator from the shared workspace source. Initial PR CI correctly stopped on Equipment Lab artifact parity; synchronized generated consumers are included in the follow-up revision."
   }
 }

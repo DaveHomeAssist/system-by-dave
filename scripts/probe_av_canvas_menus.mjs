@@ -33,6 +33,8 @@ try {
   await page.setViewportSize({width,height});
   await suiteTopic(page,'Appearance');
   const d=await page.locator('dialog[open]').boundingBox(); assert.ok(d.x>=0&&d.y>=0&&d.x+d.width<=width+1&&d.y+d.height<=height+1,JSON.stringify(d));
+  const targets = await page.locator('dialog[open] button:visible').evaluateAll(buttons => buttons.map(button => { const box = button.getBoundingClientRect(); return { width: box.width, height: box.height }; }));
+  assert.ok(targets.every(box => box.width >= 44 && box.height >= 44), JSON.stringify(targets));
   await page.keyboard.press('Tab');
   assert.ok(await page.locator('dialog[open]').evaluate(e=>e.contains(document.activeElement)));
   await closeTopics(page);

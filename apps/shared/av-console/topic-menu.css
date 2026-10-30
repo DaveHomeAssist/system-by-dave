@@ -3,7 +3,7 @@
 .topic-menu-page{display:flex;flex-direction:column;max-height:calc(100dvh - 26px)}
 .topic-menu-page>header{display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--av-line);flex-shrink:0}
 .topic-menu-page>header h2{flex:1;margin:0;font-size:16px;min-width:0}
-.topic-menu button{min-height:44px;white-space:normal}
+.topic-menu button{min-width:44px;min-height:44px;white-space:normal}
 .topic-menu-content{display:flex;flex-direction:column;gap:8px;padding:12px;overflow:auto;min-height:0}
 .topic-menu-topic{display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;padding:12px}
 .topic-menu-topic span:first-child{display:flex;flex-direction:column;gap:4px}
