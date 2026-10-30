@@ -1,5 +1,11 @@
 # Changelog
 
+## October 30, 2026: Public registry refresh
+
+- Refresh the existing public repository directory from GitHub through an explicit repository allowlist. Preserve the route and curated categories, resolve public renames, and show current descriptions, languages, archive state and default-branch activity.
+- Reject private, missing or incomplete results before replacing the saved snapshot. Add deterministic static links, freshness and parity checks, and repeatable refresh commands without a scheduled publication job.
+- Keep search, filters and sorting in a viewport-contained light and dark directory, with static repository links available without JavaScript.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced

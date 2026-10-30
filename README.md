@@ -58,6 +58,13 @@ Then open <http://localhost:8000>.
 For static pages, edit HTML/CSS directly and refresh. For app-grade surfaces,
 use the tooling selected for that surface.
 
+## Public project registry
+
+The [public directory](project-registry.html) keeps an explicit repository
+allowlist and a generated GitHub snapshot. Run `npm run sync:public-registry`
+with an authenticated `gh` CLI, then `npm run verify:public-registry` and
+`npm run test:public-registry`. See the [refresh scope and browser checks](docs/public-project-registry.md).
+
 ## Pages
 
 | File | Purpose |

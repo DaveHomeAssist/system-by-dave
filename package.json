@@ -113,7 +113,11 @@
     "test:av-families-browser": "node scripts/av-family-probe.mjs",
     "test:av-canvas-menus-browser": "node scripts/probe_av_canvas_menus.mjs",
     "probe:av-nav-funnel": "node scripts/launch/probe_av_nav_funnel.mjs",
-    "probe:home-explainer": "node scripts/launch/probe_home_explainer.mjs"
+    "probe:home-explainer": "node scripts/launch/probe_home_explainer.mjs",
+    "sync:public-registry": "node scripts/sync_public_registry.mjs",
+    "verify:public-registry": "node scripts/sync_public_registry.mjs --check",
+    "test:public-registry": "node --test scripts/public_registry.test.mjs",
+    "test:public-registry-browser": "node scripts/probe_public_registry.mjs"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

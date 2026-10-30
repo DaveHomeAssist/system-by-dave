@@ -20,9 +20,12 @@ jobs:
       - run: python3 scripts/gen_sitemap.py --check
       - run: npm run verify:public-navigation
       - run: npm run verify:public-consistency
+      - run: npm run verify:public-registry
+      - run: npm run test:public-registry
       - run: npm ci --no-audit --no-fund
       - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
+      - run: npm run test:public-registry-browser
       - run: npm run test:public-viewport
       - name: Verify engineering daily journeys
         run: |
