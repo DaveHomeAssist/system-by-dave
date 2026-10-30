@@ -46,16 +46,22 @@
       back.disabled=page===0;next.disabled=page===total-1;
       panel.dataset.page=String(page+1);panel.dataset.pages=String(total);
     }
+    function measure(){
+      if(!isVisible(panel)||win.clientWidth===0||win.clientHeight===0)return;
+      width=win.getBoundingClientRect().width;gap=parseFloat(getComputedStyle(root).getPropertyValue('--av-page-gap'))||16;
+      content.style.setProperty('--av-page-width',`${width}px`);
+      total=Math.max(1,Math.ceil((content.scrollWidth+gap)/(width+gap)));
+      return true;
+    }
     const api={
       refresh(){
-        if(!isVisible(panel)||win.clientWidth===0||win.clientHeight===0)return;
-        width=win.getBoundingClientRect().width;gap=parseFloat(getComputedStyle(root).getPropertyValue('--av-page-gap'))||16;
-        content.style.setProperty('--av-page-width',`${width}px`);
-        total=Math.max(1,Math.ceil((content.scrollWidth+gap)/(width+gap)));
+        if(!measure())return;
         const active=document.activeElement;
         if(content.contains(active))api.reveal(active);else show(page);
       },
       reveal(element){
+        // Focus can arrive before the deferred resize refresh updates the columns.
+        if(!content.contains(element)||!measure())return;
         const x=element.getBoundingClientRect().left-content.getBoundingClientRect().left;
         show(Math.floor((x+1)/(width+gap)));
       }

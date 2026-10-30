@@ -1,5 +1,10 @@
 # Changelog
 
+## October 30, 2026: Workspace focus after resize
+
+- Measure current pagination dimensions when revealing a focused control, so a resize cannot route keyboard focus using stale column widths. Preserve existing inputs, labels and saved data.
+- Add an immediate resize and focus regression to the shared visibility probe and refresh the generated planner runtimes and offline cache generation.
+
 ## October 30, 2026: Legacy handoff recovery
 
 - Add restrictive content policies and accessible light and dark fallbacks to the Command Center and MarsScape handoffs, preserving their routes and destinations.

@@ -228,3 +228,14 @@ to `Stage3D.html`. The corrected guard excludes the previous document without
 requiring the first requested loader to remain current. The added redirect
 case exercises that boundary; the application route and assertions are intact.
 The failed candidate run remains release evidence.
+
+### Immediate focus after resize (October 30, 2026)
+
+Focus reveal measures the current page window and column count synchronously.
+ResizeObserver still schedules the ordinary layout refresh, but focus does not
+rely on that frame having run. The visibility fixture narrows a populated panel
+and focuses its third input in the same task, checking the selected page and
+actual input containment with both native and fallback visibility detection.
+The regression fails against the earlier embedded runtime. The original CI LED
+clipping was intermittent; the full unchanged viewport matrix remains a separate
+gate. No saved keys, field values or import/export shapes change.

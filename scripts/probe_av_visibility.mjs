@@ -12,8 +12,9 @@ const fixture = `<!doctype html><style>
   #card{width:220px;height:180px}#items{height:100px;display:grid;grid-template-columns:1fr;gap:0}
   .unit{height:60px;box-sizing:border-box}.av-page-away{display:none!important}
   .av-page-window{width:200px;height:90px;overflow:hidden}
-  .av-page-content{height:90px;columns:200px;column-gap:16px;column-fill:auto;transform:translateX(var(--av-page-offset,0px))}
+  .av-page-content{height:90px;columns:var(--av-page-width,200px);column-gap:16px;column-fill:auto;transform:translateX(var(--av-page-offset,0px))}
   .av-page-content>div{height:60px;break-inside:avoid}
+  .av-page-content input{width:100%;box-sizing:border-box}
 </style><div id="visible" class="box"></div><div id="hidden" hidden class="box"></div>
 <div style="display:none"><div id="hiddenParent" class="box"></div></div>
 <div id="visibility" class="box" style="visibility:hidden"></div>
@@ -71,6 +72,13 @@ export async function verifyVisibilityCompatibility(browser, base, output) {
         const legacyFocused = workspace.querySelectorAll('input')[2];
         legacy.refresh(); legacy.reveal(legacyFocused); legacyFocused.focus({preventScroll: true}); legacy.refresh();
         const workspaceFocusPreserved = document.activeElement === legacyFocused;
+        // Focus can arrive before the queued ResizeObserver animation frame.
+        const window = workspace.querySelector('.av-page-window');
+        window.style.width = '120px';
+        workspace.querySelector('input').focus({preventScroll: true});
+        legacyFocused.focus({preventScroll: true});
+        const inputBox = legacyFocused.getBoundingClientRect(), windowBox = window.getBoundingClientRect();
+        const resizedFocusVisible = inputBox.left >= windowBox.left - 1 && inputBox.right <= windowBox.right + 1;
         const values = [...document.querySelectorAll('input')].map(input => input.value);
         let delegated = null;
         if (typeof Element.prototype.checkVisibility === 'function') {
@@ -79,7 +87,7 @@ export async function verifyVisibilityCompatibility(browser, base, output) {
           node.checkVisibility = function(...args) {calls.push(args.length); return false;};
           delegated = {viewport: AVViewport.isVisible(node), workspace: AVWorkspace.isVisible(node), calls};
         }
-        return {matrix, viewportPage, viewportPages, viewportFocusPreserved, workspaceFocusPreserved, workspacePage: workspace.dataset.page, workspacePages: workspace.dataset.pages, values, delegated};
+        return {matrix, viewportPage, viewportPages, viewportFocusPreserved, workspaceFocusPreserved, resizedFocusVisible, workspacePage: workspace.dataset.page, workspacePages: workspace.dataset.pages, values, delegated};
       });
       if (!missing) expected = Object.fromEntries(Object.entries(state.matrix).map(([id, value]) => [id, value.native]));
       for (const [id, value] of Object.entries(state.matrix)) {
@@ -89,6 +97,7 @@ export async function verifyVisibilityCompatibility(browser, base, output) {
       assert.equal(state.viewportPage, '3'); assert.equal(state.viewportPages, '3');
       assert.equal(state.workspacePage, '3'); assert.equal(state.workspacePages, '3');
       assert.equal(state.viewportFocusPreserved, true); assert.equal(state.workspaceFocusPreserved, true);
+      assert.equal(state.resizedFocusVisible, true, 'focus reveals the current column before deferred resize refresh');
       assert.deepEqual(state.values, ['one', 'two', 'three', 'hidden', 'first', 'second', 'third']);
       if (!missing) assert.deepEqual(state.delegated, {viewport: false, workspace: false, calls: [0, 0]});
       results.push({fixture: true, missing, ...state});
