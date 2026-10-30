@@ -103,9 +103,9 @@
     const controls = focusable();
     if (!controls.length) { event.preventDefault(); sheet.focus(); return; }
     const first = controls[0], last = controls.at(-1);
-    if (event.shiftKey && (document.activeElement === first || document.activeElement === sheet)) {
+    if (event.shiftKey && (document.activeElement === first || !controls.includes(document.activeElement))) {
       event.preventDefault(); last.focus();
-    } else if (!event.shiftKey && (document.activeElement === last || document.activeElement === sheet)) {
+    } else if (!event.shiftKey && (document.activeElement === last || !controls.includes(document.activeElement))) {
       event.preventDefault(); first.focus();
     }
   });

@@ -38,6 +38,30 @@ It also checks focus, containment, print, no JavaScript and deliberate content
 policy violations. Run it inside a network-disabled container for an independent
 barrier against external requests.
 
-This is bounded functional regression coverage. Corrupt saved-data recovery,
-concurrent-tab conflict handling, physical devices, assistive technology, actual
-browser zoom and human acceptance remain separate work.
+## Failed saved-data reads
+
+Problem: malformed saved JSON previously fell back to sample data silently. A
+later theme edit autosaved that sample over the original bytes. A disposable
+browser fixture reproduced the overwrite before the repair.
+
+On a read, parse or structural validation failure, the board now displays a
+persistent warning and disables all writes to its existing saved key. The
+sample remains usable as a temporary view. Recovery offers an exact-text
+recovery file when the original text was readable, and an explicit reload to
+retry the saved board. Reload discards temporary sample edits. Missing storage
+still starts a new board; unreadable storage does not count as missing.
+The new download uses `system-by-dave.aom-recovery.v1` with `storageKey` and
+`raw` fields. JSON string encoding preserves every original string code unit,
+including malformed Unicode. It is a recovery container, not a board import.
+
+Write rejection preserves the previous saved value and keeps failure feedback
+visible. A later successful save may clear that feedback. This does not add
+transactions or change the existing 250ms save debounce.
+
+Run `node scripts/probe_aom_storage.mjs` for isolated localStorage and artifact
+storage fixtures: malformed/empty/invalid shape, read rejection, exact original
+export, explicit retry, valid reload and rejected writes. Structural validation
+fails closed for unrecognized data rather than silently dropping fields. No
+historical format migration is specified or claimed. Concurrent tabs, process
+termination during debounce, storage-engine corruption recovery, physical
+devices, assistive technology and human acceptance remain unverified.

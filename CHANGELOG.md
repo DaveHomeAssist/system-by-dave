@@ -2,6 +2,11 @@
 
 ## 2026-10-30
 
+- AOM now preserves existing saved bytes after failed reads or invalid saved
+  JSON. Block autosave of fallback sample data, retain visible failure feedback,
+  and offer an exact original-text download plus explicit reload retry.
+  Disposable local and artifact storage fixtures cover the failure boundary.
+
 - AOM show board now has an explicit resource policy and bounded Timeline, Live,
   Turns and Tools views. Preserve the route, saved board key and data, import
   confirmation and photo transcription request. Add keyboard room/session

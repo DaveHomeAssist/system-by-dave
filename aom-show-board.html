@@ -332,8 +332,13 @@ body.edit #addroom{display:inline-block}
 html,body{height:100%;overflow:hidden}
 body{max-width:none;padding:0;transition:none}
 body.dark{--txdead:#F0A58D}
-#aom-shell{height:100vh;height:100dvh;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);gap:8px;padding:10px max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
-.masthead{margin:0;padding:0 0 8px;align-items:center}
+#aom-shell{height:100vh;height:100dvh;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr);gap:8px;padding:10px max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.masthead{margin:0;padding:0 0 8px;align-items:center;flex-wrap:wrap;min-width:0}
+#storage-warning{flex-basis:100%;display:flex;gap:8px;align-items:center;min-width:0;color:var(--txdead)}
+#storage-warning[hidden]{display:none}
+#storage-warning span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+#storage-warning button{margin-left:auto;flex-shrink:0}
+#sheet p{margin-bottom:12px}
 .masthead h1{font-size:clamp(18px,2vw,28px)}
 .masthead .sub{font-size:10px;letter-spacing:0}
 .hdr-actions{gap:4px;flex-shrink:0}
@@ -389,6 +394,7 @@ noscript{position:fixed;inset:0;background:var(--ink);color:var(--parchment);pad
     <button class="btn" id="settingsbtn">Days</button>
     <button class="btn" id="editbtn">Edit</button>
   </div>
+<div id="storage-warning" hidden role="status"><span>Saved board unavailable; changes are not saved.</span><button class="btn" id="storage-details">Recovery</button></div>
 </header>
 <span id="savestate" role="status">saved</span>
 

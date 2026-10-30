@@ -21,18 +21,60 @@ const floorName=f=>f==="R"?"Rooftop":"Floor "+f;
 
 /* ================= storage ================= */
 /* Uses Claude artifact storage when present, otherwise this browser's localStorage. */
+let storageBlocked=false;
+let unreadSavedData=null;
+function validBoard(value){
+  const object=v=>v!==null&&typeof v==="object"&&!Array.isArray(v);
+  const time=v=>typeof v==="string"&&/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(v);
+  return object(value)&&Array.isArray(value.days)&&value.days.length>0
+    &&Number.isInteger(value.active)&&value.active>=0&&value.active<value.days.length
+    &&value.days.every(d=>object(d)&&typeof d.label==="string"&&Array.isArray(d.rooms)
+      &&d.rooms.every(r=>object(r)&&typeof r.name==="string"&&Array.isArray(r.sessions)
+        &&r.sessions.every(x=>object(x)&&time(x.s)&&time(x.e)&&m(x.e)>m(x.s))));
+}
 async function loadBoard(){
+  let raw=null;
   try{
     if(window.storage){
       const r=await window.storage.get(KEY);
-      if(r&&r.value){board=JSON.parse(r.value);return}
-    }else{
-      const v=localStorage.getItem(KEY);
-      if(v){board=JSON.parse(v);return}
+      if(r!=null){
+        if(typeof r.value!=="string")throw new Error("Unreadable storage response");
+        raw=r.value;
+      }
+    }else raw=localStorage.getItem(KEY);
+    if(raw!==null){
+      const saved=JSON.parse(raw);
+      if(!validBoard(saved))throw new Error("Unrecognized saved board");
+      board=saved;
+      return;
     }
-  }catch(e){}
+  }catch(e){
+    // A read error is not an empty store. Never autosave sample data over it.
+    storageBlocked=true;
+    unreadSavedData=raw;
+    $("storage-warning").hidden=false;
+  }
   board=clone(DEFAULT_BOARD);
 }
+function openStorageRecovery(){
+  openSheet('<h2>Saved board unavailable</h2>'
+    +'<p>The saved board could not be read. You are viewing sample data. Changes here are not saved, and the existing stored data has not been replaced.</p>'
+    +'<p>Reload saved board retries the original storage read and discards changes made to this temporary sample. If the read still fails, saving stays blocked.</p>'
+    +(unreadSavedData!==null?'<p>Download original data wraps the exact stored text in a recovery file. Its raw field preserves the original, even if it is not valid board JSON. Keep it private.</p>':'<p>The original bytes could not be read, so a recovery download is unavailable.</p>')
+    +'<div class="sheet-actions"><button class="btn primary" id="storage-retry">Reload saved board</button>'
+    +(unreadSavedData!==null?'<button class="btn" id="storage-original">Download original data</button>':'')
+    +'<button class="btn" id="f_cancel">Close</button></div>');
+  $("f_cancel").addEventListener("click",closeSheet);
+  $("storage-retry").addEventListener("click",()=>location.reload());
+  queueMicrotask(()=>{const title=$("sheet").querySelector("h2");title.tabIndex=-1;title.focus()});
+  if($("storage-original"))$("storage-original").addEventListener("click",()=>{
+    const url=URL.createObjectURL(new Blob([JSON.stringify({schema:"system-by-dave.aom-recovery.v1",storageKey:KEY,raw:unreadSavedData})],{type:"application/json"}));
+    const a=document.createElement("a");a.href=url;a.download="aom-original-saved-data.json";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+}
+$("storage-details").addEventListener("click",openStorageRecovery);
 function applyTheme(){
   if(!board.theme)board.theme="light";
   document.body.classList.toggle("dark",board.theme==="dark");
@@ -40,10 +82,18 @@ function applyTheme(){
   if(tb)tb.textContent=board.theme==="dark"?"Light":"Dark";
 }
 let saveTimer=null;
+let saveStatusTimer=null;
 function saveBoard(){
   clearTimeout(saveTimer);
+  clearTimeout(saveStatusTimer);
+  if(storageBlocked){
+    $("savestate").textContent="not saved · saved board unavailable";
+    $("savestate").className="show bad";
+    return;
+  }
   saveTimer=setTimeout(async()=>{
     const el=$("savestate");
+    let saved=false;
     try{
       let ok;
       if(window.storage){
@@ -52,13 +102,14 @@ function saveBoard(){
         localStorage.setItem(KEY,JSON.stringify(board));
         ok=true;
       }
+      saved=!!ok;
       el.textContent=ok?"saved":"save failed";
       el.className="show "+(ok?"ok":"bad");
     }catch(e){
       el.textContent="not saved · session only";
       el.className="show bad";
     }
-    setTimeout(()=>el.classList.remove("show"),2000);
+    if(saved)saveStatusTimer=setTimeout(()=>el.classList.remove("show"),2000);
   },250);
 }
 
