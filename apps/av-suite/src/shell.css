@@ -166,6 +166,19 @@ html[data-av-focus="true"] .suite-intro{display:none}
   .suite-intro__actions{width:auto}
 }
 
+/* Very short screens (e.g. 320x256): the intro collapses to its three actions on one row so the
+   workspace keeps usable height; the heading stays for screen readers (aria-labelledby). */
+@media(max-height:300px){
+  .suite-intro{padding:4px 8px}
+  .suite-intro__text{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+  .suite-intro__actions{width:100%;flex-wrap:nowrap}
+  .suite-intro__actions a,.suite-intro__actions button{flex:1 1 auto;padding:0 6px;font-size:12px;white-space:nowrap}
+}
+/* The empty-view placeholder is centred in the grid; when the grid is short its content must not
+   spill over the console strip and swallow clicks meant for the toolbar's Add panel button. */
+.suite-app .console-empty{min-height:0;overflow:hidden;justify-content:safe center}
+.suite-app .console-empty p{pointer-events:none}
+
 /* Server-rendered page heading for search and screen readers before the console mounts;
    React replaces #root's children on first render, so it never duplicates the app's <h1> (SEO-06). */
 .shell-static-title{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
