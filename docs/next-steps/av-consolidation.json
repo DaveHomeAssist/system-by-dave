@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "fe549a22f558f57af70ffae99e26466e009349ca",
+  "head": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
   "status": "amber",
-  "statusReason": "October 29 canvas menu redesign passes targeted and full shell checks on Dominic. Exact-head CI, merge, publication and live readback remain pending. Earlier family redirects remain shipped; other AV roadmap decisions remain open.",
+  "statusReason": "PR #386 is merged and live at source d769f1e. Source and AV destination publications succeeded; independent Chromium/WebKit live Add checks and the full 66-choice shell probe pass on Dominic. PR #388 compact menus are preserved. Physical/operator acceptance and other AV roadmap decisions remain open.",
   "audioSpeakerStatusParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "94b1ce79499de92416a5c30357298d619fb74ecb",
@@ -87,7 +87,7 @@
       "AVV-STREAM-KEY-1 remains unanswered and blocks only its dependent work."
     ]
   },
-  "lastActivity": "2026-10-29",
+  "lastActivity": "2026-10-30",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -1673,9 +1673,23 @@
     "finding": "Original two-step flow matches the request, but Add into empty space leaves a 4px list at 667x375 because fixed controls and the placement preview consume the phone chooser height. Replacement-only viewport checks miss this path.",
     "correction": "Allow phone chooser height, omit the decorative preview on short screens, and scroll long group lists. Preserve PR #388 compact topic menus and native modal, restore first-choice/group focus and Escape stepping, mark the actual active application, and explicitly wrap modal Tab navigation. Preserve placement and stored data shapes.",
     "verification": "Dominic Linux, Playwright 1.63: original and reconciled 66-choice Chromium shell probes pass, including mixed arrangements, isolated saves, legacy view/layout bytes and offline reload. Reconciled PR #388 canvas/menu acceptance passes. Final Add path passes in Chromium and WebKit at nine sizes in light/dark with reduced motion, including five Front Office choices, Enter, Space, forward/reverse Tab, Back, Escape, focus restoration, final-choice placement and root containment. AV verification and three builds pass. The clean follow-up passes 86 Video/shared/shell unit tests, relevant typechecks, 42 route checks and domain staging.",
-    "nextAction": "Check correction CI on PR #386, then Dave accepts the candidate on desktop and a physical phone before separately authorizing merge and deployment.",
-    "limits": "No merge or deployment authorized. Accessibility tree inspection supports button/search/dialog semantics; actual screen reader, physical touch, browser chrome and virtual keyboard acceptance remain unverified.",
+    "nextAction": "Dave may perform physical phone/tablet, actual screen reader and operator acceptance. Merge, production publication and automated live verification for PR #386 are complete.",
+    "limits": "Merge and deployment authorized on October 30. Accessibility tree inspection supports button/search/dialog semantics; actual screen reader, physical touch, browser chrome and virtual keyboard acceptance remain unverified.",
     "integratedMain": "7cd5658a0812cc42cd25d9a2f78f9cbd6cea3928",
-    "retainedFailure": "Mac archive transfer metadata produced 12 synthetic ._ test inputs containing NUL bytes. The 649 sidecars were preserved outside the runner inputs before a clean rerun; tracked source and test assertions were not changed to suppress that failure."
+    "retainedFailure": "Mac archive transfer metadata produced 12 synthetic ._ test inputs containing NUL bytes. The 649 sidecars were preserved outside the runner inputs before a clean rerun; tracked source and test assertions were not changed to suppress that failure.",
+    "mergedRevision": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
+    "authorization": "Dave explicitly authorized merge, deployment and live verification on October 30, 2026.",
+    "delivery": "PR #386 merged as d769f1ee88e1ffa3daaee04af13c73a52e4ae24e. Source Pages workflow 41015446539 and AV destination workflow 41017765962 both succeeded. AV destination commit 2ea3cd17cc9292efbc14f1024e309534b0ca79b7 publishes that source revision.",
+    "destinationCommit": "2ea3cd17cc9292efbc14f1024e309534b0ca79b7",
+    "sourceWorkflow": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/41015446539",
+    "destinationWorkflow": "https://github.com/DaveHomeAssist/avbydave/actions/runs/41017765962",
+    "liveVerification": {
+      "checkedAt": "2026-10-30T07:07:40.326Z",
+      "sourceRevision": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
+      "artifactSha256": "7fcb9cbb0f85d5ce3f67e884e1db11cdf3ebc0694cfb1a23d299dc2470ea56ac",
+      "url": "https://avbydave.com/av/",
+      "runner": "Dominic, Linux, Playwright 1.63 Chromium and WebKit",
+      "result": "Live Add flow passes nine sizes in light/dark with reduced motion: all five Front Office choices, group replacement, forward/reverse Tab, Enter, Space, Back, Escape, restored focus, cross-group and empty search, final-choice placement and no page overflow. Focused checks report no console errors or uncaught page errors. Full Chromium shell passes all 66 choices, mixed views/reloads, legacy view/layout bytes, isolated saves and prepared offline use. Source revision and JavaScript/CSS/registry hashes match before and after testing."
+    }
   }
 }
