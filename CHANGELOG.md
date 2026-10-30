@@ -2,6 +2,10 @@
 
 ## 2026-10-30
 
+- AOM Copy text now reports confirmed clipboard results and offers selected
+  manual-copy text when permission or the fallback fails. Preserve an editor
+  opened during a pending permission request.
+
 - AOM now preserves existing saved bytes after failed reads or invalid saved
   JSON. Block autosave of fallback sample data, retain visible failure feedback,
   and offer an exact original-text download plus explicit reload retry.

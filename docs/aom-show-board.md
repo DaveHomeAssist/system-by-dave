@@ -65,3 +65,20 @@ fails closed for unrecognized data rather than silently dropping fields. No
 historical format migration is specified or claimed. Concurrent tabs, process
 termination during debounce, storage-engine corruption recovery, physical
 devices, assistive technology and human acceptance remain unverified.
+
+## Clipboard receipts
+
+Copy text reports success only after the clipboard API resolves or the legacy
+copy command returns true. Failure offers a selected, read-only snapshot for
+manual copying. Snapshot text is assigned as a textarea value, never markup.
+An outstanding permission request disables duplicate copies; a delayed failure
+keeps any newly opened editor intact instead of replacing it with recovery.
+The button retains Copy failed so the operator can retry after closing the editor.
+
+Run `node scripts/probe_aom_clipboard.mjs` for real isolated Chromium clipboard
+write/read parity, simulated modern and legacy success, absent/rejected/throwing
+clipboard paths, exact Unicode and markup-like text preservation, delayed failure,
+focus restoration and 12 layout cases.
+The disposable Chromium fixture reproduced a false Copied receipt before the
+repair. Synthetic permission responses do not prove native operating-system
+clipboard or physical-device acceptance.

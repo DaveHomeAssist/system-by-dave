@@ -27,6 +27,7 @@ jobs:
         run: |
           node scripts/probe_aom_show_board.mjs
           node scripts/probe_aom_storage.mjs
+          node scripts/probe_aom_clipboard.mjs
       - run: npm run test:public-viewport
       - name: Verify engineering daily journeys
         run: |

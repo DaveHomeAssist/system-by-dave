@@ -534,17 +534,44 @@ function boardText(){
   if(last)out+="\nLast out: "+lr+" "+fmt(last);
   return out;
 }
+let copyStatusTimer=null;
+$("copybtn").setAttribute("aria-live","polite");
 $("copybtn").addEventListener("click",async()=>{
-  const t=boardText();
-  try{await navigator.clipboard.writeText(t)}
-  catch(e){
-    const ta=document.createElement("textarea");ta.value=t;
-    document.body.appendChild(ta);ta.select();
-    try{document.execCommand("copy")}catch(_){}
-    ta.remove();
+  const t=boardText(),b=$("copybtn");
+  clearTimeout(copyStatusTimer);
+  b.disabled=true;b.textContent="Copying";
+  let copied=false;
+  try{
+    await navigator.clipboard.writeText(t);
+    copied=true;
+  }catch(e){
+    // Do not steal selection from an editor opened while permission was pending.
+    if(!$("sheet").classList.contains("open")){
+      const ta=document.createElement("textarea");ta.value=t;
+      ta.style.cssText="position:fixed;top:0;left:0;opacity:0;pointer-events:none";
+      document.body.appendChild(ta);ta.select();
+      try{copied=document.execCommand("copy")===true}catch(_){}
+      finally{ta.remove()}
+    }
   }
-  const b=$("copybtn"),o=b.textContent;
-  b.textContent="Copied";setTimeout(()=>b.textContent=o,1500);
+  b.disabled=false;
+  if(document.activeElement===document.body&&!$("sheet").classList.contains("open"))b.focus();
+  if(copied){
+    b.textContent="Copied snapshot";
+    copyStatusTimer=setTimeout(()=>b.textContent="Copy text",1500);
+  }else{
+    b.textContent="Copy failed";
+    if(!$("sheet").classList.contains("open")){
+      b.focus();
+      openSheet('<h2>Copy board text</h2>'
+        +'<p>Automatic copy failed. Select and copy the text below using your device copy command. This is the board snapshot from when you pressed Copy.</p>'
+        +'<div class="field"><label for="copy-manual">Board text</label><textarea id="copy-manual" rows="8" readonly></textarea></div>'
+        +'<div class="sheet-actions"><button class="btn" id="f_cancel">Close</button></div>');
+      const text=$("copy-manual");text.value=t;
+      $("f_cancel").addEventListener("click",closeSheet);
+      queueMicrotask(()=>{if(text.isConnected){text.focus();text.select()}});
+    }
+  }
 });
 
 /* ---------- scan a door sign ---------- */
