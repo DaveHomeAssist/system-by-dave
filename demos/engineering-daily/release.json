@@ -1,9 +1,37 @@
 {
   "schema": 1,
-  "sourceSha256": "18ad6b1a07b605bb95434d5edb4c646d5993824770b2fd9fbfad9132667476d6",
-  "publicSha256": "b17f6cdc20abc35d370cee0b7e170b57f27f828e856e97e77af53327e80a367d",
-  "editions": 21,
+  "sourceSha256": "999df798c42def64b6e6cd1b9ac3f0d364db3b27e542d734477be3b1e71a5f70",
+  "publicSha256": "557d619e718dcb4ca242848f7a6c5d60f0fa407412e532f5fb63d24ab99d8533",
+  "editions": 23,
   "files": [
+    {
+      "name": "Edition 023.svg",
+      "id": 23,
+      "date": "2026-10-30",
+      "title": "Frame rate conversion families",
+      "sha256": "d71e22f46b627bfe62862d3e0ca63607703bf6c60e8bcfaedcca2d7c84712ed3"
+    },
+    {
+      "name": "Edition 023.png",
+      "id": 23,
+      "date": "2026-10-30",
+      "title": "Frame rate conversion families",
+      "sha256": "641061485ab3afe229aa5e110cbe9cecfcd6bffb09ce77d1082300e8fb8c7d89"
+    },
+    {
+      "name": "Edition 022.svg",
+      "id": 22,
+      "date": "2026-10-29",
+      "title": "Fiber mode and wavelength",
+      "sha256": "ce026d2ea8696e326949bb570ee9d860f5e2b8a74b3a550bd55b9c35ef00367d"
+    },
+    {
+      "name": "Edition 022.png",
+      "id": 22,
+      "date": "2026-10-29",
+      "title": "Fiber mode and wavelength",
+      "sha256": "b23093c49bf5999a96113903b2c431ae94661cdcf5aefba85c332f2bb929fa3e"
+    },
     {
       "name": "Edition 021.svg",
       "id": 21,

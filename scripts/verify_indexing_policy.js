@@ -20,10 +20,8 @@ function read(rel) {
 
 function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === '.git' || entry.name === 'node_modules' || entry.name === '_hat-in-ring-src') continue;
+    if (entry.name === '.git' || entry.name === 'node_modules' || entry.name === 'dist' || entry.name === '_hat-in-ring-src') continue;
     const absolute = path.join(dir, entry.name);
-    // Retained Workbook verification output is ignored and excluded from every publish artifact.
-    if (path.relative(ROOT, absolute) === path.join("apps", "av-workbook", "dist")) continue;
     if (entry.isDirectory()) walk(absolute, out);
     else if (entry.isFile() && entry.name.endsWith('.html')) {
       out.push(path.relative(ROOT, absolute).split(path.sep).join('/'));
@@ -74,10 +72,16 @@ const robots = read('robots.txt');
 // 2026-10-13 its av/ route is the noindex source of the avbydave.com home page, and the 34
 // retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md).
 // Equipment Lab adds its source template, original checklist and package return route.
-if (unlisted.length !== 191) fail(`Expected 191 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// Eight original family entries now redirect into the shared console.
+// The noindex Sync & Signal Field Kit draft (field-kit/, docs/launch/README.md) adds one,
+// and its buyers-only download page (field-kit/thanks/, noindex, reached from Stripe's
+// after-payment redirect) adds one more.
+if (unlisted.length !== 201) fail(`Expected 201 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
-  if (!sitemapRoutes.has(route)) {
+  const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);
+  const consoleRedirect = source.includes('content="0;url=/av/?app=') && hasNoIndex(source) && canonical(source) === 'https://avbydave.com/';
+  if (!sitemapRoutes.has(route) && !consoleRedirect) {
     fail(`Registered application ${route} is absent from the public sitemap; inspect its noindex and domain metadata.`);
   }
 });

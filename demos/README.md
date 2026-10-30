@@ -33,6 +33,7 @@ Current demos
 | `?auto=main` | The main reel cut, about 35 s. Opens on the failure already happening (tear on frame zero, dead screen pulsing) with the question setting in over the motion at 0.5 s, then explains. Ends with the CTA laid over the final picture. |
 | `?auto=teaser` | Failure → fix → CTA. 13 to 15 s, built to loop. |
 | `?drive&auto=main` | Auto cut on the manual clock. `hr.cutLength` gives the cut length in ms and `hr.done` turns true at the end. |
+| `?drive&reels` (with any cut) | Capture only: fits the stage's content box (`data-capture-box` on `<body>`, default the whole stage) into the Instagram Reels safe area (x 60–972, y 252–1500 of 1080×1920), clear of the top bar, the caption band and the right-hand buttons, and paints the rest of the frame in the stage colour. Ignored without `?drive` or `?auto`, so visitors never see it. |
 
 Auto cuts are scheduled on GSAP's own clock (`gsap.delayedCall`), so under `?drive` they are
 frame-exact and identical on every render.

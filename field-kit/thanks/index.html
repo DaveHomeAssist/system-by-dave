@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-av-theme="dark" data-av-theme-lock="dark" data-av-tool="field-kit-thanks">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'none'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'" />
+    <!-- The download link arrives in this page's URL from Stripe's after-payment
+         redirect (docs/launch/checkout.md). Never send it on as a referrer. -->
+    <meta name="referrer" content="no-referrer" />
+    <!-- Buyers only: never in a sitemap, never linked from the site. -->
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <title>Your Sync &amp; Signal Field Kit | AV by Dave</title>
+    <meta name="description" content="Download page for Sync &amp; Signal Field Kit buyers." />
+    <link rel="canonical" href="https://avbydave.com/field-kit/thanks/" />
+    <meta name="theme-color" content="#0C1016" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AV by Dave" />
+    <meta property="og:title" content="Sync &amp; Signal Field Kit | AV by Dave" />
+    <meta property="og:description" content="Download page for Field Kit buyers." />
+    <meta property="og:url" content="https://avbydave.com/field-kit/thanks/" />
+    <meta property="og:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sync &amp; Signal Field Kit | AV by Dave" />
+    <meta name="twitter:description" content="Download page for Field Kit buyers." />
+    <meta name="twitter:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+    <link rel="icon" href="../../svg/system_by_dave_logo_rust.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../css/av-theme.css" />
+    <script src="../../js/av-theme-mode.js"></script>
+    <style>
+      html, body { margin: 0; background: var(--av-bg); color: var(--av-text); }
+      body { font-family: var(--av-font-ui); line-height: 1.55; overflow-x: hidden; }
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      a { color: var(--av-brand-strong); }
+      :focus-visible { outline: 3px solid var(--av-focus); outline-offset: 2px; }
+      .sbd-skip-link { position: absolute; left: 12px; top: -80px; z-index: 50; padding: 12px 16px; min-height: 44px; border-radius: var(--av-radius-control); font-weight: 700; text-decoration: none; }
+      .sbd-skip-link:focus { top: 12px; }
+      .sbd-site-return { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; max-width: 720px; margin: 0 auto; padding: 4px 16px; font-size: 13px; }
+      .sbd-site-return a { display: inline-flex; align-items: center; min-height: 44px; color: var(--av-text-2); text-decoration: none; font-weight: 600; }
+      main { max-width: 720px; margin: 0 auto; padding: 8px 16px 48px; outline: none; }
+      h1 { margin: 0 0 8px; font-size: clamp(28px, 6.6vw, 40px); line-height: 1.1; }
+      .ty-lede { margin: 0 0 20px; color: var(--av-text-2); }
+      .ty-card { padding: 18px; margin: 0 0 18px; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-line); }
+      .ty-card h2 { margin: 0 0 6px; font-size: 19px; }
+      .ty-card p, .ty-card li { margin: 0 0 8px; color: var(--av-text-2); }
+      .ty-card ul { margin: 0; padding-left: 20px; }
+      .ty-btn { display: inline-flex; align-items: center; min-height: 48px; padding: 12px 20px; border-radius: var(--av-radius-control); background: var(--av-brand); border: 1px solid var(--av-brand); color: #04140b; font-weight: 800; font-size: 17px; text-decoration: none; }
+      .ty-btn:hover { background: var(--av-brand-strong); }
+      .ty-small { font-size: 13px; color: var(--av-muted); }
+      .ty-ref { font-family: var(--av-font-mono, monospace); }
+      footer { max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; color: var(--av-muted); font-size: 13px; border-top: 1px solid var(--av-line); }
+      footer a { color: var(--av-text-2); display: inline-flex; min-height: 44px; align-items: center; margin-right: 14px; }
+    </style>
+  </head>
+  <body>
+    <a class="sbd-skip-link" href="#thanks">Skip to your download</a>
+    <nav class="sbd-site-return" aria-label="Breadcrumb">
+      <a href="https://systembydave.com/">System by Dave</a>
+      <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+      <a href="/">AV by Dave</a>
+      <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+      <span class="sbd-site-return__current" aria-current="page">Field Kit download</span>
+    </nav>
+    <main id="thanks" tabindex="-1">
+      <h1 id="ty-title">Your Field Kit download</h1>
+      <p class="ty-lede" id="ty-paid" hidden>Your payment went through and Stripe has emailed you a receipt.</p>
+
+      <section class="ty-card" id="ty-ready" aria-labelledby="ty-ready-title" hidden>
+        <h2 id="ty-ready-title">Download it now</h2>
+        <p>Save the files to your phone and laptop so you have them at the rack, even without signal.</p>
+        <p><a class="ty-btn" id="ty-download" href="#" rel="noopener noreferrer" target="_blank">Open the Field Kit files</a></p>
+        <p class="ty-small">The files open in a new tab. This link is for you and your crew; please don't post it publicly.</p>
+      </section>
+
+      <section class="ty-card" id="ty-missing" aria-labelledby="ty-missing-title">
+        <h2 id="ty-missing-title">Your download link didn't come through</h2>
+        <p>Sorry about that. Email <a id="ty-mail" href="mailto:avbydave@gmail.com?subject=Field%20Kit%20download">avbydave@gmail.com</a> from the address you paid with, or reply to your Stripe receipt, and I'll send the link.</p>
+      </section>
+
+      <section class="ty-card" aria-labelledby="ty-inside-title">
+        <h2 id="ty-inside-title">What's inside</h2>
+        <ul>
+          <li>Tearing troubleshooting card (printable page + phone-sized version)</li>
+          <li>EDID/HDCP handshake decision tree</li>
+          <li>Genlock and reference checklist</li>
+          <li>Browser tear-test page</li>
+        </ul>
+      </section>
+
+      <section class="ty-card" aria-labelledby="ty-help-title">
+        <h2 id="ty-help-title">Lost the link later?</h2>
+        <p>Email <a href="mailto:avbydave@gmail.com?subject=Field%20Kit%20link">avbydave@gmail.com</a> with your receipt number and I'll resend it. The refund and licence terms are on the <a href="../">Field Kit page</a>.</p>
+        <p class="ty-small" id="ty-ref-line" hidden>Order reference: <span class="ty-ref" id="ty-ref"></span></p>
+      </section>
+    </main>
+    <footer>
+      <a href="/">AV by Dave tools</a><a href="https://systembydave.com/privacy-policy.html">Privacy</a>
+    </footer>
+    <script src="thanks.js"></script>
+  </body>
+</html>

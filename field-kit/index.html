@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" data-av-theme="dark" data-av-theme-lock="dark" data-av-tool="field-kit">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'" />
+    <title>Sync &amp; Signal Field Kit (draft) | AV by Dave</title>
+    <meta name="description" content="Draft product page for the Sync &amp; Signal Field Kit: a tearing troubleshooting card, an EDID/HDCP decision tree, a genlock checklist and a browser tear-test page. Not on sale yet." />
+    <!-- Draft: not linked from navigation and kept out of search until Dave sets the price and checkout (docs/launch/README.md). -->
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="canonical" href="https://avbydave.com/field-kit/" />
+    <meta name="theme-color" content="#0C1016" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AV by Dave" />
+    <meta property="og:title" content="Sync &amp; Signal Field Kit | AV by Dave" />
+    <meta property="og:description" content="Printable and phone-sized sync and signal troubleshooting references from a working AV tech." />
+    <meta property="og:url" content="https://avbydave.com/field-kit/" />
+    <meta property="og:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sync &amp; Signal Field Kit | AV by Dave" />
+    <meta name="twitter:description" content="Printable and phone-sized sync and signal troubleshooting references from a working AV tech." />
+    <meta name="twitter:image" content="https://avbydave.com/img/av-by-dave-og.png" />
+    <link rel="icon" href="../svg/system_by_dave_logo_rust.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../css/av-theme.css" />
+    <script src="../js/av-theme-mode.js"></script>
+    <style>
+      html, body { margin: 0; background: var(--av-bg); color: var(--av-text); }
+      body { font-family: var(--av-font-ui); line-height: 1.55; overflow-x: hidden; }
+      *, *::before, *::after { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      a { color: var(--av-brand-strong); }
+      :focus-visible { outline: 3px solid var(--av-focus); outline-offset: 2px; }
+      .sbd-skip-link { position: absolute; left: 12px; top: -80px; z-index: 50; padding: 12px 16px; min-height: 44px; border-radius: var(--av-radius-control); font-weight: 700; text-decoration: none; }
+      .sbd-skip-link:focus { top: 12px; }
+      .sbd-site-return { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; max-width: 880px; margin: 0 auto; padding: 4px 16px; font-size: 13px; }
+      .sbd-site-return a { display: inline-flex; align-items: center; min-height: 44px; color: var(--av-text-2); text-decoration: none; font-weight: 600; }
+      main { max-width: 880px; margin: 0 auto; padding: 8px 16px 48px; outline: none; }
+      .kit-draft { display: inline-block; margin: 0 0 10px; padding: 4px 10px; border-radius: 999px; background: var(--av-warning-soft); border: 1px solid var(--av-warning-line); color: var(--av-warning); font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+      h1 { margin: 0 0 8px; font-size: clamp(28px, 6.6vw, 44px); line-height: 1.08; }
+      .kit-lede { margin: 0 0 20px; color: var(--av-text-2); max-width: 60ch; }
+      .kit-buy { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; padding: 16px; margin: 0 0 24px; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-line); }
+      .kit-price { font-size: 26px; font-weight: 800; }
+      .kit-price small { display: block; font-size: 13px; font-weight: 600; color: var(--av-muted); }
+      .kit-btn { min-height: 44px; padding: 10px 18px; border-radius: var(--av-radius-control); border: 1px solid var(--av-line-strong); background: var(--av-surface-3); color: var(--av-text); font: inherit; font-weight: 800; }
+      .kit-btn[disabled] { opacity: .55; }
+      a.kit-btn { display: inline-flex; align-items: center; text-decoration: none; background: var(--av-brand); border-color: var(--av-brand); color: #04140b; }
+      a.kit-btn:hover { background: var(--av-brand-strong); }
+      .kit-buy-note { margin: 0; color: var(--av-muted); font-size: 14px; flex-basis: 100%; }
+      .kit-grid img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; object-position: top; margin: 0 0 12px; border-radius: 8px; border: 1px solid var(--av-line); background: #0c1016; }
+      .kit-terms { display: grid; gap: 12px; margin: 0 0 24px; }
+      .kit-terms section { padding: 16px; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-line); }
+      .kit-terms h2 { margin: 0 0 6px; font-size: 18px; }
+      .kit-terms p { margin: 0 0 8px; color: var(--av-text-2); }
+      .kit-dave { padding: 8px 10px; border-radius: 8px; border: 1px dashed var(--av-warning-line); background: var(--av-warning-soft); color: var(--av-warning) !important; font-size: 14px; font-weight: 700; }
+      .kit-grid { display: grid; gap: 12px; margin: 0 0 24px; padding: 0; list-style: none; }
+      .kit-grid li { padding: 16px; border-radius: var(--av-radius-card); background: var(--av-surface); border: 1px solid var(--av-line); }
+      .kit-grid h2 { margin: 0 0 4px; font-size: 18px; }
+      .kit-grid p, .kit-notes p, .kit-notes li { margin: 0; color: var(--av-text-2); }
+      .kit-notes { margin: 0 0 24px; }
+      .kit-notes h2 { font-size: 20px; margin: 0 0 6px; }
+      .kit-notes ul { margin: 0; padding-left: 20px; }
+      footer { max-width: 880px; margin: 0 auto; padding: 20px 16px 40px; color: var(--av-muted); font-size: 13px; border-top: 1px solid var(--av-line); }
+      footer a { color: var(--av-text-2); display: inline-flex; min-height: 44px; align-items: center; margin-right: 14px; }
+      @media (min-width: 720px) { .kit-grid { grid-template-columns: 1fr 1fr; } }
+    </style>
+  </head>
+  <body>
+    <a class="sbd-skip-link" href="#kit">Skip to the Field Kit details</a>
+    <nav class="sbd-site-return" aria-label="Breadcrumb">
+      <a href="https://systembydave.com/">System by Dave</a>
+      <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+      <a href="/">AV by Dave</a>
+      <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+      <span class="sbd-site-return__current" aria-current="page">Field Kit</span>
+    </nav>
+    <main id="kit" tabindex="-1">
+      <p class="kit-draft">Draft · not on sale yet</p>
+      <h1>Sync &amp; Signal Field Kit</h1>
+      <p class="kit-lede">Four quick references for the moment a picture tears, drops or won't handshake, from a working AV tech. Printable, and sized to read on a phone at the rack.</p>
+
+      <div class="kit-buy" id="kit-buy-box">
+        <p class="kit-price" id="kit-price">$12<small>Digital download (PDF + web page).</small></p>
+        <button type="button" class="kit-btn" id="kit-buy-disabled" disabled aria-describedby="kit-buy-note">Checkout not open yet</button>
+        <a class="kit-btn" id="kit-buy" href="#" rel="noopener" hidden>Buy the Field Kit</a>
+        <p class="kit-buy-note" id="kit-buy-note">Want it when it's ready? Email <a href="mailto:avbydave@gmail.com?subject=Field%20Kit">avbydave@gmail.com</a>.</p>
+      </div>
+
+      <ul class="kit-grid" aria-label="What's in the kit">
+        <li><img src="img/troubleshooting-card-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the tearing troubleshooting card: a symptom table, with the rest of the page blurred" /><h2>Tearing troubleshooting card</h2><p>The checks in order, from "is it the source or the display?" to frame rate, vsync/frame lock and reference. One printable page, one phone-sized version.</p></li>
+        <li><img src="img/edid-hdcp-tree-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the EDID/HDCP decision tree: the first two yes/no questions, with the rest blurred" /><h2>EDID/HDCP decision tree</h2><p>No picture, wrong resolution, or a black screen that flickers back: a yes/no path through the handshake, with what to swap or reset at each branch.</p></li>
+        <li><img src="img/genlock-checklist-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the genlock and reference checklist: the planning tick boxes, with the rest blurred" /><h2>Genlock and reference checklist</h2><p>Reference type and format, termination, which devices should lock, and how to confirm each one actually did, before doors.</p></li>
+        <li><img src="img/tear-test-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the browser tear-test page: moving white bars with frame and late-frame counters" /><h2>Browser tear-test page</h2><p>Open it on any screen to see whether the path tears or stutters: moving bars, a frame counter and a refresh-rate readout.</p></li>
+      </ul>
+
+      <div class="kit-terms" aria-label="Delivery, refunds and licence">
+        <section aria-labelledby="kit-delivery-title">
+          <h2 id="kit-delivery-title">Delivery</h2>
+          <p class="kit-dave" data-dave-placeholder><strong>DRAFT, Dave approves:</strong> Digital download. Right after payment you're taken to your download page with a link to the files: three PDFs (printable and phone-sized) and the tear-test page. Stripe emails your receipt. Lost the link? Email <a href="mailto:avbydave@gmail.com?subject=Field%20Kit%20link">avbydave@gmail.com</a> with your receipt number and I'll resend it.</p>
+          <p class="kit-dave" data-dave-placeholder><strong>DRAFT, Dave fills:</strong> Payment is handled by Stripe. Your card statement will show <strong>[STATEMENT DESCRIPTOR]</strong>.</p>
+        </section>
+        <section aria-labelledby="kit-refund-title">
+          <h2 id="kit-refund-title">Refunds</h2>
+          <p class="kit-dave" data-dave-placeholder><strong>DRAFT, Dave approves:</strong> If the kit doesn't help, email <a href="mailto:avbydave@gmail.com?subject=Field%20Kit%20refund">avbydave@gmail.com</a> within 14 days of buying it and I'll refund you in full; no need to explain. The refund goes back to the card you paid with; banks usually take 5–10 business days to show it.</p>
+        </section>
+        <section aria-labelledby="kit-licence-title">
+          <h2 id="kit-licence-title">Licence</h2>
+          <p class="kit-dave" data-dave-placeholder><strong>DRAFT, Dave approves:</strong> For you and your crew. Use the files on your own shows and print as many copies as you need. Please don't resell, repost or publicly share the files or your download link. The kit is general troubleshooting guidance, not a manufacturer procedure; follow your gear's manual and your venue's rules.</p>
+        </section>
+      </div>
+
+      <section class="kit-notes" aria-labelledby="kit-notes-title">
+        <h2 id="kit-notes-title">Good to know</h2>
+        <ul>
+          <li>General troubleshooting guidance, not a manufacturer procedure. Follow your gear's manual and your venue's rules.</li>
+          <li>The free <a href="https://systembydave.com/demos/frame-sync.html?utm_source=avbydave&amp;utm_medium=referral&amp;utm_campaign=field-kit&amp;utm_content=kit-page">frame sync demo</a> covers the basics; the kit is the field reference.</li>
+        </ul>
+      </section>
+    </main>
+    <footer>
+      <a href="/">AV by Dave tools</a><a href="https://systembydave.com/demos/?utm_source=avbydave&amp;utm_medium=referral&amp;utm_campaign=field-kit&amp;utm_content=footer">Demos</a><a href="https://systembydave.com/privacy-policy.html">Privacy</a>
+    </footer>
+    <script src="../js/sbd-events.js"></script>
+    <script src="../js/sbd-launch-config.js"></script>
+    <script src="../js/sbd-checkout.js"></script>
+    <script src="field-kit.js"></script>
+  </body>
+</html>

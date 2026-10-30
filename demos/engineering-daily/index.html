@@ -348,6 +348,44 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
   {
+    "id": 23,
+    "date": "2026-10-30",
+    "track": "Cameras, switchers, scalers, and capture systems",
+    "trackShort": "Cameras",
+    "title": "Frame rate conversion families",
+    "fact": "A frame synchronizer's format conversion does not imply arbitrary frame rate conversion. AJA lists FS4 conversion within three frame rate families (fps): 59.94/29.97/23.98, 50/25, and 60/30/24. A 50 to 59.94 fps conversion crosses those families and is outside that specified capability. This is an FS4 limitation, not a universal frame-sync rule.",
+    "why": "A 1080p source and a 1080p production switcher can share a raster yet still require a different converter when their frame rates belong to different families.",
+    "takeaway": "Write raster, scan type and exact rate on both sides of the converter. Check its supported input-to-output combinations in the intended mode; same resolution and a frame-sync label are insufficient.",
+    "sourceLabel": "AJA FS4 technical specifications, Format Conversion",
+    "sourceUrl": "https://www.aja.com/products/fs4",
+    "basis": "Manufacturer-specific FS4 conversion families; supported raster, scan and processing-mode restrictions still apply",
+    "current": true,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">23</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">RATE FAMILIES</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"50\" width=\"216\" height=\"70\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"73\" class=\"blue-label\">1 / Fractional fps</text><text x=\"120\" y=\"99\" text-anchor=\"middle\">59.94 / 29.97 / 23.98</text><path d=\"M32 109H208\" class=\"wire\"/><rect x=\"12\" y=\"132\" width=\"216\" height=\"70\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"155\" class=\"blue-label\">2 / 50 fps family</text><text x=\"120\" y=\"181\" text-anchor=\"middle\">50 / 25 fps</text><path d=\"M32 191H208\" class=\"wire\"/><rect x=\"12\" y=\"214\" width=\"216\" height=\"70\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"237\" class=\"blue-label\">3 / 60 fps family</text><text x=\"120\" y=\"263\" text-anchor=\"middle\">60 / 30 / 24 fps</text><path d=\"M32 273H208\" class=\"wire\"/><rect x=\"12\" y=\"296\" width=\"216\" height=\"76\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"319\" class=\"note\">Cross-family request</text><text x=\"24\" y=\"350\">50 fps</text><text x=\"140\" y=\"350\">59.94 fps</text><path d=\"M78 345H132m-6-5l6 5l-6 5M101 336l18 18m0-18l-18 18\" class=\"reference\"/><text x=\"120\" y=\"392\" text-anchor=\"middle\" class=\"note\">Outside FS4 capability</text>",
+      "caption": "FS4 rate families, in fps. Blue lines group rates within a family. The amber cross marks a 50 to 59.94 fps request outside these families. Conceptual grouping, not physical wiring."
+    }
+  },
+  {
+    "id": 22,
+    "date": "2026-10-29",
+    "track": "Fiber, video over IP, NDI, and SMPTE ST 2110",
+    "trackShort": "IP & fiber",
+    "title": "Fiber mode and wavelength",
+    "fact": "A matching LC connector does not establish optical compatibility. Extron specifies 850 nm optics for its FOX3 T/R 101 multimode models and 1310 nm optics for its singlemode models; both use LC connectors. Those wavelengths describe this product family, not universal rules for every fiber system.",
+    "why": "A show-site patch can physically fit while using the wrong fiber type or incompatible endpoint optics. Connector fit alone is an incomplete acceptance check for a camera or display extension.",
+    "takeaway": "Record both endpoint model variants, specified wavelength and required fiber type before patching. Check the complete optical interface and supported distance in the manufacturer documentation; matching wavelength alone does not prove protocol compatibility.",
+    "sourceLabel": "Extron FOX3 T/R 101 specifications, optical interconnection",
+    "sourceUrl": "https://media.extron.com/public/download/files/specs/fox3_tr_101_5145-D1.pdf",
+    "basis": "Manufacturer specifications for FOX3 T/R 101; no universal wavelength or interoperability claim",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">22</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">OPTICAL MATCH</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"54\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"79\" class=\"blue-label\">MM / 850 nm</text><rect x=\"24\" y=\"100\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"58\" y=\"127\" text-anchor=\"middle\">TX</text><rect x=\"148\" y=\"100\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"182\" y=\"127\" text-anchor=\"middle\">RX</text><path d=\"M92 122H148m-6-5l6 5l-6 5\" class=\"wire\"/><text x=\"120\" y=\"179\" text-anchor=\"middle\" class=\"good-label\">Multimode fiber</text><rect x=\"12\" y=\"212\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"237\" class=\"blue-label\">SM / 1310 nm</text><rect x=\"24\" y=\"258\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"58\" y=\"285\" text-anchor=\"middle\">TX</text><rect x=\"148\" y=\"258\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"182\" y=\"285\" text-anchor=\"middle\">RX</text><path d=\"M92 280H148m-6-5l6 5l-6 5\" class=\"wire\"/><text x=\"120\" y=\"337\" text-anchor=\"middle\" class=\"good-label\">Singlemode fiber</text><text x=\"120\" y=\"383\" text-anchor=\"middle\" class=\"note\">LC shape ≠ fiber mode</text>",
+      "caption": "FOX3 alternatives: MM means multimode; SM means singlemode. Blue arrows show separate optical paths between matching TX and RX models. LC shape does not identify fiber mode."
+    }
+  },
+  {
     "id": 21,
     "date": "2026-10-28",
     "track": "Genlock, timecode, synchronization, and latency",
@@ -359,7 +397,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "sourceLabel": "PTZOptics, Genlock and Timecode",
     "sourceUrl": "https://docs.ptzoptics.com/docs/cameras/rise-4k/broadcast-advanced-connections/",
     "basis": "General functional distinction, supported by manufacturer documentation; no universal connector or reference format assumed",
-    "current": true,
+    "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
       "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">21</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">TIMING / LABELS</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"54\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"note\">Timecode alone</text><text x=\"24\" y=\"111\">A</text><text x=\"24\" y=\"147\">B</text><path d=\"M52 106H212M52 142H212\" class=\"rule\"/><path d=\"M68 94V118M116 94V118M164 94V118\" class=\"wire\"/><path d=\"M86 130V154M134 130V154M182 130V154\" class=\"reference\"/><text x=\"24\" y=\"181\" class=\"note\">Same labels ≠ phase</text><rect x=\"12\" y=\"212\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"238\" class=\"blue-label\">Common genlock</text><text x=\"24\" y=\"271\">A</text><text x=\"24\" y=\"307\">B</text><path d=\"M52 266H212M52 302H212\" class=\"rule\"/><path d=\"M80 254V278M128 254V278M176 254V278\" class=\"wire\"/><path d=\"M80 290V314M128 290V314M176 290V314\" class=\"reference\"/><text x=\"24\" y=\"340\" class=\"good-label\">Aligned timing</text><text x=\"120\" y=\"382\" text-anchor=\"middle\" class=\"note\">Timing sketch, not to scale</text>",

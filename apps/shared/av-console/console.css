@@ -17,7 +17,15 @@
 .console-icon{min-width:44px;padding:0 10px;display:inline-grid;place-items:center;background:transparent}
 .console-notice{margin:0;padding:8px 14px;font-size:12px;background:var(--av-warning-soft);border-bottom:1px solid var(--av-warning-line);color:var(--av-text)}
 .console-grid{position:relative;flex:1;min-height:0;display:grid;gap:8px;padding:10px 12px;touch-action:none}
-.console-grid{background-image:radial-gradient(var(--av-grid,var(--av-line)) 1px,transparent 1px);background-size:24px 24px;background-position:12px 10px}
+/* Snap-grid dots: visible on every palette (about 1.2-1.4:1 against the canvas) yet light
+   enough that body and muted text still clear WCAG AA 4.5:1 even where a glyph sits on a dot. */
+.console-grid{--av-dot:rgba(77,57,39,.12);background-image:radial-gradient(circle,var(--av-dot) 1.25px,transparent 1.6px);background-size:24px 24px;background-position:12px 10px}
+html[data-av-theme="white"] .console-grid{--av-dot:rgba(0,0,0,.13)}
+html[data-av-theme="dark"] .console-grid{--av-dot:rgba(255,255,255,.12)}
+html[data-av-theme="black"] .console-grid{--av-dot:rgba(255,255,255,.13)}
+@media(prefers-color-scheme:dark){html[data-av-theme="system"] .console-grid{--av-dot:rgba(255,255,255,.12)}}
+@media(prefers-contrast:less){.console-grid,html[data-av-theme] .console-grid{--av-dot:var(--av-grid,var(--av-line))}}
+@media(prefers-contrast:more),(forced-colors:active){.console-grid{background-image:none}}
 .mode-phone .console-grid,.mode-tablet .console-grid{touch-action:auto;background-image:none}
 .console-panel{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--av-surface);border:2px solid var(--av-line);border-radius:6px;overflow:hidden;touch-action:auto}
 .console-panel.is-lit{background:var(--av-surface-2);border-color:var(--av-line-strong);box-shadow:0 0 0 1px var(--av-accent-soft),0 0 34px var(--av-accent-soft)}
@@ -46,10 +54,24 @@
 .console-menu button.danger{color:var(--av-danger)}
 .console-menu-title{font-weight:700;color:var(--av-text)!important}
 .console-menu-note{font-size:11px}
+/* Options menus: clear hover, focus and pressed states; destructive items and Close sit below a separator. */
+.console-menu [role=menuitem]:not(:disabled):hover{background:var(--av-surface-3,var(--av-surface-2))}
+.console-menu [role=menuitem]:not(:disabled):active{background:var(--av-accent-soft,var(--av-surface-3))}
+.console-menu [role=menuitem]:focus-visible,.console-menu .console-close:focus-visible{outline:2px solid var(--av-focus,var(--av-accent));outline-offset:-2px;background:var(--av-surface-3,var(--av-surface-2))}
+.console-menu>button.danger,.console-menu>.console-close{margin-top:4px;box-shadow:0 -5px 0 -4px var(--av-line)}
+.console-icon[aria-expanded=true]{border-color:var(--av-focus-line,var(--av-line-strong));background:var(--av-focus-soft,var(--av-surface-2))}
+@media(forced-colors:active){.console-menu [role=menuitem]:focus-visible{outline:3px solid Highlight}}
 .console-groups{display:flex;gap:4px}
 .console-groups button{flex:1;background:transparent}
-.console-groups button[aria-pressed=true]{border-color:var(--av-accent);background:var(--av-accent-soft)}
-.console-choices{display:flex;flex-direction:column;gap:6px}
+.console-groups button[aria-current=true]{border-color:var(--av-accent);background:var(--av-accent-soft)}
+.console-sub{display:flex;align-items:center;gap:10px;min-width:0}
+.console-sub strong{font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.console-back{background:transparent;flex-shrink:0}
+/* The chooser may use the height below where it opened; a long group scrolls
+   inside its own list and the chooser frame stays put. */
+.console-chooser{max-height:calc(100dvh - var(--pop-top,8px) - 8px)}
+.console-choices{display:flex;flex-direction:column;gap:6px;min-height:0;overflow:auto;padding:2px}
+.console-choices>*{flex-shrink:0}
 .console-choices button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:10px 12px;background:var(--av-surface-2)}
 .console-choices button span{font-size:12px;color:var(--av-muted)}
 .console-choices small{font-weight:400}
@@ -68,5 +90,11 @@
   .console-quick button{flex:1;min-width:0;padding:8px 6px;font-size:12px;justify-content:center}
   .console-tools button:first-child{padding:0 10px}
   .console-pop{left:8px!important;right:8px;width:auto;top:auto!important;bottom:8px;max-height:70dvh}
+  .console-pop.console-chooser{max-height:calc(100dvh - 16px)}
+}
+/* On short screens reserve space for choices instead of the decorative map. */
+@media(max-height:500px){
+  .console-pop.console-chooser{top:8px!important;bottom:8px;max-height:calc(100dvh - 16px);padding:8px;gap:4px}
+  .console-chooser .console-preview{display:none}
 }
 @media(prefers-reduced-motion:reduce){.console-shell *{transition:none!important;animation:none!important}}

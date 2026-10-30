@@ -52,7 +52,7 @@
 
   html[data-theme="light"] {--g:#eeeeee;--p:#fafafa;--p2:#c7c7c7;--ink:#222222;--ink2:#585858;--mute:#656565;--orange:#725b30;--cyan:#345a85;--yellow:#345a85;--reader-bg:#eeeeee;--reader-surface:#fafafa;--reader-ink:#222222;--reader-muted:#585858;--reader-line:#c7c7c7;--reader-accent:#345a85}
   html[data-theme="dark"] {--g:#111111;--p:#191919;--p2:#3c3c3c;--ink:#eeeeee;--ink2:#b6b6b6;--mute:#a0a0a0;--orange:#d0c0a0;--cyan:#a8bed9;--yellow:#a8bed9;--reader-bg:#111111;--reader-surface:#191919;--reader-ink:#eeeeee;--reader-muted:#b6b6b6;--reader-line:#3c3c3c;--reader-accent:#a8bed9}
-  .public-shell .site-header>.inner {display:flex;flex-wrap:nowrap;align-items:center;gap:4px;padding:2px 6px;min-height:44px}
+  .public-shell .site-header>.inner {display:flex;flex-wrap:nowrap;align-items:center;gap:4px;padding:2px 6px;min-height:44px;box-sizing:border-box;max-width:100%}
   .public-shell .sbd-site-return {flex:1;min-width:0;background:var(--p);border:0;color:var(--ink2);padding:0;gap:5px;font-size:11px;letter-spacing:0}
   .sbd-site-return a {display:inline-flex;align-items:center;min-width:44px;min-height:44px;padding:2px;color:var(--ink)}
   .public-shell #demoTheme {min-width:60px;min-height:44px;padding:4px;font:600 12px Barlow,system-ui,sans-serif}
@@ -62,19 +62,31 @@
   .public-pages .card .n {margin:8px 0;line-height:1.5}.public-pages .card .fact,.public-pages .eyebrow {line-height:1.5}.public-pages .card h2 {margin:0 0 8px;max-width:36ch}
   .public-pages .card:hover {border-color:var(--p2)}
   [data-public-site="demos"] [data-public-panel][hidden="until-found"] {pointer-events:none}
+  /* Field Kit card and email ask on the hub (launch/av-funnel-links, AUD-003). */
+  .public-pages .card--kit {border-color:var(--orange)}
+  .card--kit .n {color:var(--orange)}
+  .subscribe {margin-top:16px;padding:22px;border:1px solid var(--p2);border-radius:18px;background:var(--p)}
+  .subscribe h2 {font:800 1.6rem/1.2 "Barlow Condensed",sans-serif;text-transform:uppercase;margin:0 0 8px}
+  .subscribe p {margin:0 0 14px;color:var(--ink2);font-size:1rem}
+  .subscribe__btn {display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--orange);color:var(--g);font:800 16px/1 "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+  .subscribe__btn[hidden],.subscribe__soon[hidden] {display:none}
+  .subscribe__btn:focus-visible {outline:3px solid var(--ink);outline-offset:3px}
+  .subscribe__soon {font:500 14px/1.4 "IBM Plex Mono",monospace;color:var(--mute)}
+  .visually-hidden {position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
   @media(max-height:500px) {.public-shell .site-header>.inner {padding:0 4px}.public-stage {padding:4px}.public-pages .card {padding:4px}.public-pages .card h2 {font-size:20px;line-height:1.2;margin:0 0 4px}.public-pages .go {margin:0 0 6px}.public-pages p,.public-pages footer {font-size:14px;line-height:1.4}.public-pages .card .fact {font-size:11px}}
 </style>
 </head>
-<body data-public-site="demos">
+<body data-public-site="demos" data-demo="hub">
 <a class="sbd-skip-link" href="#demos">Skip to the demos</a>
 <header class="site-header"><div class="inner"><nav class="sbd-site-return" aria-label="Breadcrumb">
   <a href="https://systembydave.com/">System by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
-  <a href="/av/">AV by Dave</a>
+  <a href="https://avbydave.com/">AV by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
   <span class="sbd-site-return__current" aria-current="page">AV by Dave demos</span>
 </nav><button id="demoTheme" class="public-theme-toggle" type="button" hidden>Dark</button></div></header>
 <main>
+<h1 class="visually-hidden">AV by Dave demos: real AV problems you can break yourself</h1>
 <section data-public-panel="Daily" id="demos"><article class="card"><h2>Video Engineering Daily</h2>
 <a class="go" href="engineering-daily/">Open calendar →</a>
 
@@ -101,6 +113,18 @@
 
       <div class="fact">AJA Support FAQ 7308: two different cables, two different ports, a known-good cable</div>
     </article></section>
+<section data-public-panel="Field Kit" id="field-kit"><a class="card card--kit" href="https://avbydave.com/field-kit/?utm_source=systembydave&amp;utm_medium=demos-hub&amp;utm_campaign=demos&amp;utm_content=card" data-umami-event="hub_open" data-umami-event-demo="field-kit">
+      <div class="n">FIELD KIT</div>
+      <h2>Sync &amp; Signal Field Kit</h2>
+      <p>Four quick references for when a picture tears, drops or won't handshake: the tearing card, the genlock checklist, the EDID/HDCP tree and a browser tear test.</p>
+      <div class="go">See the Field Kit →</div>
+    </a>
+<section class="subscribe" id="subscribe" aria-labelledby="subscribe-title" tabindex="-1">
+      <h2 id="subscribe-title">Get the next demo</h2>
+      <p>New demos and the Field Kit launch, by email.</p>
+      <a class="subscribe__btn" id="subscribe-link" href="#subscribe" target="_blank" rel="noopener" data-umami-event="hub_subscribe" hidden>Subscribe by email</a>
+      <p class="subscribe__soon" id="subscribe-soon">Email sign-up opens soon. Until then, check back here for new demos.</p>
+    </section></section>
 <section data-public-panel="About" id="demo-about">
   <div class="eyebrow">AV by Dave</div>
   <h2>Real AV problems. <em>Break them yourself.</em></h2>
@@ -108,5 +132,15 @@
 <footer>More demos follow the daily archive's rotation: transport, bandwidth, color, sync, cameras, displays, IP and fiber, troubleshooting. Built as web pages so you can touch the mechanism, not just watch it.</footer></section>
 </main>
 <script src="demo-shell.js"></script>
+<script>
+  // Hub subscribe link: only a validated beehiiv URL from config.js (see demo-shell.js).
+  (function () {
+    var href = typeof window.sbdSubscribeHref === 'function' ? window.sbdSubscribeHref() : null;
+    if (!href) return;
+    var link = document.getElementById('subscribe-link');
+    link.href = href; link.hidden = false;
+    document.getElementById('subscribe-soon').hidden = true;
+  })();
+</script>
 </body>
 </html>
