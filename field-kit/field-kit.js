@@ -12,7 +12,7 @@
   var price = document.getElementById('kit-price');
   var priceSet = typeof cfg.priceLabel === 'string' && cfg.priceLabel.trim() !== '' &&
     cfg.priceLabel !== 'Price TBD' && !/^\s*\[/.test(cfg.priceLabel);
-  // The static page shows $19 (Dave, 2026-10-23) so it reads right without
+  // The static page shows $12 (Dave, 2026-10-30) so it reads right without
   // JavaScript. A placeholder in the config still shows "Price TBD".
   if (price && priceSet) {
     price.firstChild.nodeValue = cfg.priceLabel;
