@@ -105,6 +105,7 @@ jobs:
         working-directory: site
         run: |
           npm run sync:cheesesteaks -- "$GITHUB_WORKSPACE/source"
+          npm run verify:cheesesteaks -- "$GITHUB_WORKSPACE/source"
           npm run verify:indexing
           npm run verify:public-navigation
           git add cheesesteaks
