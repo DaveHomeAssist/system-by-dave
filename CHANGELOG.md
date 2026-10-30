@@ -1,5 +1,9 @@
 # Changelog
 
+## October 30, 2026: PixelForge alias policies
+
+- Add restrictive content policies to twelve legacy PixelForge aliases, replacing inline redirect scripts with a same-origin helper. Preserve every destination and noindex canonical. Give interrupted redirects keyboard-accessible, viewport-contained light and dark fallbacks without loading or changing editor data.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced

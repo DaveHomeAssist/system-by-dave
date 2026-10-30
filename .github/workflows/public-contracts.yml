@@ -23,6 +23,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
+      - run: npm run test:pixelforge-aliases
       - run: npm run test:public-viewport
       - name: Verify engineering daily journeys
         run: |

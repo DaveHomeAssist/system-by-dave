@@ -1,7 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="redirect-page">
 <head>
   <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'none'">
+    <meta name="theme-color" content="#f4f6f8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PixelForge Onboarding | PixelForge</title>
   <meta name="description" content="Legacy PixelForge redirect page for the browser image editor.">
@@ -19,9 +21,23 @@
   <meta name="twitter:image" content="https://avbydave.com/pixelforge/og-image.svg">
   <meta http-equiv="refresh" content="0; url=./#/onboarding">
 <link rel="stylesheet" href="../css/sbd-public-nav.css">
+<link rel="stylesheet" href="../css/redirect-fallback.css">
+<script src="../js/public-theme.js" defer></script>
+<script src="../js/redirect-target.js" defer></script>
 <script src="../js/sbd-public-nav.js" defer></script>
   </head>
 <body>
-  <p><a href="./#/onboarding">Open PixelForge Onboarding</a></p>
+  <a class="redirect-skip" href="#redirect-main">Skip to PixelForge destination</a>
+  <header class="sbd-site-header">
+    <nav class="sbd-site-header__inner" aria-label="Page navigation">
+      <a href="https://systembydave.com/">System by Dave</a>
+      <a href="../av/">AV by Dave</a>
+    </nav>
+  </header>
+  <main id="redirect-main" tabindex="-1">
+    <h1>PixelForge Onboarding</h1>
+    <p>This address opens the current PixelForge workspace.</p>
+    <a class="redirect-destination" data-redirect-target href="./#/onboarding">Open PixelForge Onboarding</a>
+  </main>
 </body>
 </html>
