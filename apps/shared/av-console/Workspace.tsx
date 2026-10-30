@@ -86,6 +86,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   const shell = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLElement | null>(null);
   const chooserDialog = useRef<HTMLDialogElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [chooser, setChooser] = useState<Chooser | null>(null);
   const [query, setQuery] = useState("");
   /* Chooser step: null shows the group tiles; a name shows that group's panels. */
@@ -139,6 +140,22 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   useEffect(() => {
     if (compact && chooser && !chooserDialog.current?.open) chooserDialog.current?.showModal();
   }, [compact, chooser]);
+  /* Options menus take focus on open (or on a sub-page change) unless a field already has it. */
+  const menuKey = menu ? `${menu.kind}:${menu.id}:${menu.sub || ""}` : "";
+  useEffect(() => {
+    const el = menuRef.current;
+    if (!menuKey || !el || el.contains(document.activeElement)) return;
+    el.querySelector<HTMLElement>('[role="menuitem"]:not(:disabled)')?.focus();
+  }, [menuKey]);
+  function menuKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key) || (e.target as HTMLElement).matches("input, select, textarea")) return;
+    const items = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]:not(:disabled)'));
+    if (!items.length) return;
+    e.preventDefault();
+    const at = items.indexOf(document.activeElement as HTMLElement);
+    const next = e.key === "Home" ? 0 : e.key === "End" ? items.length - 1 : e.key === "ArrowDown" ? (at + 1) % items.length : (at <= 0 ? items.length - 1 : at - 1);
+    items[next].focus();
+  }
   const at = (el: HTMLElement) => { const r = el.getBoundingClientRect(); return { left: r.left, top: r.bottom + 6 }; };
   const clampPos = (left: number, top: number, w: number, h: number) => ({ left: Math.max(8, Math.min(left, window.innerWidth - w - 8)), top: Math.max(8, Math.min(top, window.innerHeight - h - 8)) });
 
@@ -293,7 +310,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
         { name: "Panels", closeOnAction: true, description: "Recall panels in this topic", content: quickBar },
         { name: "Layout", closeOnAction: true, description: "Lock the arrangement or focus a panel", content: <><button type="button" aria-pressed={locked} onClick={() => { ws.setLocked(!locked); notify(locked ? "Layout unlocked." : "Layout locked."); }}>{locked ? "Locked" : "Unlocked"}</button><button type="button" onClick={fullScreen}>Full screen focused panel</button></> },
       ]} /> : viewBar}
-      <button type="button" className="console-icon" aria-label="View options" aria-haspopup="menu" onClick={e => { trigger.current = e.currentTarget; const p = at(e.currentTarget); setChooser(null); setMenu({ kind: "view", id: ws.viewId, ...clampPos(p.left, p.top, 260, 340) }); }}>▾</button>
+      <button type="button" className="console-icon" aria-label="View options" aria-haspopup="menu" aria-expanded={menu?.kind === "view"} onClick={e => { trigger.current = e.currentTarget; const p = at(e.currentTarget); setChooser(null); setMenu({ kind: "view", id: ws.viewId, ...clampPos(p.left, p.top, 260, 340) }); }}>▾</button>
       {mode !== "phone" && !compact && quickBar}
       <div className="console-tools">
         <button type="button" onClick={addPanelButton}>＋ Add panel</button>
@@ -315,7 +332,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
           <header className={`console-bar ${canDrag ? "can-drag" : ""}`} onPointerDown={dragStart(p, "move")} onPointerMove={dragMove} onPointerUp={dragEnd}>
             <strong className="console-title">{out.title || d.name}</strong>{out.context && <span className="console-context">{out.context}</span>}
             <span className="console-bar-actions">{out.actions}
-              <button type="button" className="console-icon" aria-label={`${d.name} options`} aria-haspopup="menu" onClick={e => { trigger.current = e.currentTarget; const r = e.currentTarget.getBoundingClientRect(); setChooser(null); setMenu({ kind: "panel", id: p.id, ...clampPos(r.right - 260, r.bottom + 6, 260, 380) }); }}>⋯</button>
+              <button type="button" className="console-icon" aria-label={`${d.name} options`} aria-haspopup="menu" aria-expanded={menu?.kind === "panel" && menu.id === p.id} onClick={e => { trigger.current = e.currentTarget; const r = e.currentTarget.getBoundingClientRect(); setChooser(null); setMenu({ kind: "panel", id: p.id, ...clampPos(r.right - 260, r.bottom + 6, 260, 380) }); }}>⋯</button>
               {!compact && mode !== "phone" && <button type="button" className="console-icon" aria-label={isMax ? `Restore ${d.name}` : `Maximize ${d.name}`} onClick={() => toggleMax(p.id)}>{isMax ? "▭" : "▢"}</button>}
             </span>
           </header>
@@ -349,7 +366,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
       <button type="button" className="console-close" onClick={close}>Close</button>
     </dialog>}
 
-    {menu && <div className="console-pop console-menu" role="menu" aria-label={menu.kind === "panel" ? "Panel options" : "View options"} style={{ left: menu.left, top: menu.top }}>
+    {menu && <div ref={menuRef} className="console-pop console-menu" role="menu" aria-orientation="vertical" onKeyDown={menuKeyDown} aria-label={menu.kind === "panel" ? "Panel options" : "View options"} style={{ left: menu.left, top: menu.top }}>
       {menu.kind === "panel" && menuPanel && (menu.sub === "move" ? <>
         <p className="console-menu-title">Move and size · {def(menuPanel.type)?.name}</p>
         <div className="console-pad">

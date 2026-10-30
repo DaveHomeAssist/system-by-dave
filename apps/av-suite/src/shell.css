@@ -14,6 +14,14 @@
 .suite-actions .follow-system input{width:18px;min-width:18px;min-height:18px;margin:0;accent-color:var(--av-accent)}
 .focus-toggle{display:inline-flex;align-items:center;gap:6px}
 .focus-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* Menu › Appearance: labelled rows with separators, readable at 320px and on touch. */
+.suite-actions .topic-menu .theme-label{justify-content:space-between;min-height:48px;font-size:14px}
+.suite-actions .topic-menu .theme-label>span{display:inline}
+.suite-actions .topic-menu .follow-system{flex-direction:row;justify-content:flex-start;gap:12px;min-height:48px;font-size:14px;white-space:normal}
+.suite-actions .topic-menu .follow-system input{width:20px;min-width:20px;min-height:20px}
+.suite-actions .topic-menu .focus-toggle{justify-content:flex-start;gap:10px}
+.suite-actions .topic-menu .theme-label+.follow-system,.suite-actions .topic-menu .follow-system+.focus-toggle{position:relative;margin-top:9px}
+.suite-actions .topic-menu .theme-label+.follow-system:before,.suite-actions .topic-menu .follow-system+.focus-toggle:before{content:"";position:absolute;left:0;right:0;top:-9px;border-top:1px solid var(--av-line)}
 .suite-bar{display:flex;align-items:center;gap:16px;padding:4px 16px;border-bottom:1px solid var(--av-line);background:var(--av-surface-2);font-size:12px;color:var(--av-muted);min-width:0}
 .suite-summary{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .suite-offline{flex-shrink:0;color:var(--av-success,var(--av-muted));white-space:nowrap}
