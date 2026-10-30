@@ -20,10 +20,14 @@ jobs:
       - run: python3 scripts/gen_sitemap.py --check
       - run: npm run verify:public-navigation
       - run: npm run verify:public-consistency
+      - run: npm run verify:davai
+      - run: npm run verify:gear-reference
+      - run: npm run verify:portfolio-schemas
       - run: npm ci --no-audit --no-fund
       - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
       - run: npm run test:public-viewport
+      - run: npm run test:switcher-guide-browser
       - name: Verify engineering daily journeys
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/daily-server.log 2>&1 &
