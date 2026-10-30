@@ -1,5 +1,14 @@
 # Changelog
 
+## October 30, 2026: Root asset retention
+
+- Preserve missing immutable assets from the previous successful root Pages
+  deployment so open applications can load their older chunks after a release.
+  Keep current files and pages authoritative, bound retention to one prior
+  source generation, and reject unsafe paths before publishing.
+- Add deployment selection, copy safety and isolated browser transition checks
+  to the existing verification workflows. Live release acceptance is separate.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced
