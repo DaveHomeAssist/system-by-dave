@@ -208,7 +208,7 @@ try {
   await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   const chooser = page.getByRole('dialog', { name: 'Add panel' });
   assert.deepEqual((await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents()).slice(0, 3), ['AV Video', 'Audio', 'Show Control'], 'chooser groups panels by application');
-  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'the ten native departments plus Tools and Gear 3D groups are offered');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 13, 'the eleven native departments plus Tools and Gear 3D groups are offered');
   assert.equal(await chooser.getByRole('button', { name: 'Gear 3D', exact: true }).count(), 1, 'remote gear viewers are offered as a Gear 3D group');
   assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 1, 'specialist tools are offered as a Tools group');
   // Two steps: the group tiles come first, then the picked group's panels replace them.
@@ -224,7 +224,7 @@ try {
   await page.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office'); // focus returns to the group just left
   await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
   await chooser.getByRole('button', { name: 'Back', exact: true }).click();
-  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'Back restores every group');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 13, 'Back restores every group');
   await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('fixture');
   assert.ok(await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).count() >= 1, 'search lists matches across groups');
   await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('');
@@ -435,7 +435,7 @@ try {
     };
     await openMenu();
     const groups = await menu.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents();
-    assert.equal(groups.length, 12);
+    assert.equal(groups.length, 13);
     const framed = new Set(['Tools', 'Gear 3D']);
     for (const group of groups) {
       await menu.getByRole('button', { name: group, exact: true }).click();
@@ -530,7 +530,7 @@ try {
     assert.equal(await blockedPage.evaluate(() => localStorage.getItem('avCalculator.v1')), null, 'failed autosave is not reported as persisted');
   } finally { await blockedContext.close(); }
   assert.deepEqual(errors, []);
-  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across ten native departments, seven specialist panels and two Gear 3D viewers, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
+  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across eleven native departments, six specialist panels and two Gear 3D viewers, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
 } catch (error) {
   if (process.env.AV_SUITE_EVIDENCE) {
     await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });

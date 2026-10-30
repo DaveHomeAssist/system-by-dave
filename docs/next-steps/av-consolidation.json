@@ -6,7 +6,7 @@
   ],
   "head": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
   "status": "amber",
-  "statusReason": "PR #386 is merged and live at source d769f1e. Source and AV destination publications succeeded; independent Chromium/WebKit live Add checks and the full 66-choice shell probe pass on Dominic. PR #388 compact menus are preserved. Physical/operator acceptance and other AV roadmap decisions remain open.",
+  "statusReason": "PR #386 is merged and live at source d769f1e. Source and AV destination publications succeeded; independent Chromium/WebKit live Add checks and the full 66-choice shell probe pass on Dominic. PR #388 compact menus are preserved. Physical/operator acceptance and other AV roadmap decisions remain open. October 30 source candidate: seven native LED panels are implemented and verified on Dominic, including offline reopen. Merge, deployment and operator acceptance remain open.",
   "audioSpeakerStatusParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "94b1ce79499de92416a5c30357298d619fb74ecb",
@@ -112,12 +112,12 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Scope the first native specialist pack",
-    "why": "The eight original family routes now point into the shared console in source. The seven specialist tools still run as page panels until each has a native pack.",
-    "doneWhen": "Dave selects the first specialist conversion and approves its bounded scope. Confirm PR #379 release evidence before treating the family route cutover as live.",
-    "effort": "One product decision and a scoped brief.",
-    "owner": "Dave, with serial implementation after scope approval",
-    "blockedBy": []
+    "title": "Review the native LED panel candidate",
+    "why": "LED Wall Calculator now exposes seven native panels while retaining its standalone engine and saved values.",
+    "doneWhen": "Required source review and CI pass before separately authorized merge and deployment; operator acceptance remains separate.",
+    "owner": "Codex",
+    "effort": "Source review",
+    "blockedBy": "Current sprint excludes merges and deployments."
   },
   "findings": [
     {
@@ -1691,5 +1691,12 @@
       "runner": "Dominic, Linux, Playwright 1.63 Chromium and WebKit",
       "result": "Live Add flow passes nine sizes in light/dark with reduced motion: all five Front Office choices, group replacement, forward/reverse Tab, Enter, Space, Back, Escape, restored focus, cross-group and empty search, final-choice placement and no page overflow. Focused checks report no console errors or uncaught page errors. Full Chromium shell passes all 66 choices, mixed views/reloads, legacy view/layout bytes, isolated saves and prepared offline use. Source revision and JavaScript/CSS/registry hashes match before and after testing."
     }
+  },
+  "nativeLED20261030": {
+    "decision": "AV-SPECIALIST-01: Dave selected LED Wall Calculator on October30.",
+    "sourceBase": "320f4d31e833bb6753c7b7be65d094ccff5171e9",
+    "scope": "Seven native LED panels reuse the original calculator engine, viewer and storage. Standalone page remains intact. Legacy slot conversion is display-only.",
+    "verification": "Dominic: AV Suite typecheck/build, AV contracts, original72-choice shell probe, native/standalone numerical parity, saved-input reload, preset save, TXT export, legacy layout bytes and phone/desktop/ultrawide root containment pass. Phone profile and 3D preview screenshots inspected. Native viewer loads lazily only for LED; the new chunk is precached. Offline reload into the native pack passes. The standalone cache generation is synchronized.",
+    "limits": "Source candidate only. Merge, deployment, physical output and human acceptance excluded."
   }
 }

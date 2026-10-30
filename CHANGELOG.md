@@ -1,5 +1,9 @@
 # Changelog
 
+## October 30, 2026: Native LED planning panels
+
+- Expose Profile, Layout, Data, Power, Results, Tools and Preview as native console panels. Reuse the existing calculator engine, cabinet viewer, saved values and profile store. Preserve the standalone page and translate former LED page slots in memory without rewriting saved layout bytes.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced

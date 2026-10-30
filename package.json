@@ -60,7 +60,7 @@
     "build:av-video": "vite build --config apps/av-video/vite.config.ts",
     "build:av-suite": "vite build --config apps/av-suite/vite.config.ts",
     "typecheck:av-suite": "tsc -p apps/av-suite/tsconfig.json --noEmit",
-    "test:av-suite-browser": "node scripts/probe_av_suite_shell.mjs --no-sandbox",
+    "test:av-suite-browser": "node scripts/probe_av_suite_shell.mjs --no-sandbox && node scripts/probe_led_native.mjs",
     "dev:av-video": "vite --config apps/av-video/vite.config.ts",
     "test:av-video": "vitest run --config apps/av-video/vitest.config.ts",
     "typecheck:av-video": "tsc -p apps/av-video/tsconfig.json --noEmit",
