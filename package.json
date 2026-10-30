@@ -5,6 +5,7 @@
   "scripts": {
     "verify:fmp": "node scripts/verify_fmp_release.js && node scripts/build_switcher_guide.mjs --check && node scripts/build_gear_from_fmp.js --check",
     "build:switcher-guide": "node scripts/build_switcher_guide.mjs",
+    "test:release-readback": "node --test scripts/verify_live_release.test.mjs",
     "verify:domain-sites": "node --test scripts/domain_robots.test.mjs scripts/housevideo_manifest.test.mjs && node scripts/stage_domain_sites.mjs --check",
     "manifest:housevideo": "node scripts/build_housevideo_manifest.mjs",
     "test:domain-cutover": "node --test scripts/domain_keep_previous_assets.test.mjs && node scripts/test_domain_cutover.mjs",
