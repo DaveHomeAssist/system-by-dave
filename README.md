@@ -35,6 +35,13 @@ public family probes use the shared shell. `npm run test:av-routes-browser`
 checks the console entry and all 42 sheet/family redirects. See the
 [cutover contract](docs/av-suite-shell.md#family-route-cutover-october-29-2026).
 
+## OnTrack
+
+[OnTrack](https://avbydave.com/ontrack.html) retains its standalone DJ library,
+set planning and debrief workflow. Keyboard controls, responsive containment,
+shared theme preferences and backup compatibility are covered by
+`npm run test:ontrack-browser`. See [the repair scope and verification commands](docs/ontrack-accessibility.md).
+
 ## Local development
 
 [Infrastructure](https://avbydave.com/infrastructure/) has a native-console candidate in `apps/infrastructure/`: Power, Network, Cable, Issues, Plan/Import and Backup share its existing model. Use `npm run typecheck:infrastructure`, `npm run test:infrastructure`, `npm run build:infrastructure` and `npm run test:infrastructure-browser`. The build preserves the model and writes an ignored fixture in `apps/infrastructure/dist/`; the public route redirects into `/av/?app=infrastructure`. See [the brief and compatibility contract](docs/infrastructure-app.md); source presence does not establish release or browser acceptance.

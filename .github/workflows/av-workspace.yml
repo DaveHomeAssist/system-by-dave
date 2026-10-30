@@ -5,6 +5,8 @@ on:
     paths:
       - 'ProjectorThrow/**'
       - 'led-wall-calculator.html'
+      - 'ontrack.html'
+      - 'scripts/probe_ontrack.mjs'
       - 'js/av-*.js'
       - 'js/led-*.js'
       - 'js/sbd-registry.js'
@@ -36,3 +38,6 @@ jobs:
       - run: npx playwright install --with-deps webkit
       - run: AV_WORKSPACE_BROWSER=webkit npm run test:av-workspace
       - run: npm run test:throwline-browser
+      - run: npm run test:ontrack-browser
+        env:
+          CHROME_CHANNEL: chrome
