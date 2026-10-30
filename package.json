@@ -105,7 +105,8 @@
     "test:equipment-lab-browser": "node scripts/probe_equipment_lab.mjs",
     "test:av-routes-browser": "AV_FAMILY_REDIRECTS=1 node scripts/probe_av_routes.mjs",
     "test:av-retained-browser": "node scripts/probe_av_retained.mjs",
-    "test:av-families-browser": "node scripts/av-family-probe.mjs"
+    "test:av-families-browser": "node scripts/av-family-probe.mjs",
+    "test:av-canvas-menus-browser": "node scripts/probe_av_canvas_menus.mjs"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

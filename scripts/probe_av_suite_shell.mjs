@@ -1,3 +1,4 @@
+import { closeTopics, suiteTopic, workspaceTopic, selectView, viewNames, recallPanel, savePack } from "./av-menu-journey.mjs";
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFile, stat, mkdir } from 'node:fs/promises';
@@ -75,7 +76,9 @@ try {
   assert.equal(await storage('sbd.avSuite.workspace.v1'), null, 'opening the shell writes no views');
 
   // Workspace focus is a device preference, not part of saved panel geometry.
+  await suiteTopic(page, 'Appearance');
   await button('Focus').click();
+  await closeTopics(page);
   assert.equal(await page.locator('html').getAttribute('data-av-focus'), 'true');
   assert.equal(await storage('sbd.avSuite.focus.v1'), 'true');
   assert.equal(await page.locator('.shell-nav').isVisible(), false, 'focus hides the public breadcrumb');
@@ -83,12 +86,15 @@ try {
   assert.ok((await page.locator('.sbd-rail').boundingBox()).width <= 57, 'focus collapses the desktop Rail to icons');
   assert.equal(await storage('sbd.avSuite.workspace.v1'), null, 'focus leaves saved views untouched');
   await page.reload();
+  await suiteTopic(page, 'Appearance');
   await button('Exit focus').waitFor();
   assert.equal(await page.locator('html').getAttribute('data-av-focus'), 'true', 'focus preference survives reload');
   await button('Exit focus').click();
+  await closeTopics(page);
   assert.equal(await page.locator('.shell-nav').isVisible(), true);
 
   // Four named palettes remain separate from the Follow System behavior.
+  await suiteTopic(page, 'Appearance');
   const palette = page.getByLabel('Palette');
   for (const value of ['light', 'dark', 'white', 'black']) {
     await palette.selectOption(value);
@@ -101,6 +107,8 @@ try {
   await page.getByLabel('Follow system').uncheck();
   assert.notEqual(await page.locator('html').getAttribute('data-av-theme'), 'system');
 
+  await closeTopics(page);
+
   // 1. Every Rail identity recalls in place: same URL, its own views, one set of controls.
   for (const [ref, label, firstView] of IDENTITIES) {
     await rail(ref).click();
@@ -108,7 +116,7 @@ try {
     assert.equal(new URL(page.url()).pathname, '/av/', `${label} stays on /av/`);
     assert.equal(await rail(ref).getAttribute('aria-current'), 'page', `${label} is current on the Rail`);
     assert.equal(await page.locator('.sbd-rail__entry[aria-current="page"]').count(), 1);
-    assert.equal((await tabs().allTextContents())[0].replace(/\s+$/, ''), firstView, `${label} shows its own views`);
+    assert.equal((await viewNames(page))[0].replace(/\s+$/, ''), firstView, `${label} shows its own views`);
     assert.equal(await page.getByRole('button', { name: /Add panel/ }).count(), 1, `${label}: one Add panel`);
     assert.equal(await page.locator('.console-panel iframe').count(), 0, `${label} panels are native`);
     assert.ok(await page.locator('.console-panel').count() >= 1, `${label} renders panels`);
@@ -141,7 +149,9 @@ try {
   await page.locator('#fieldSetRecall').click();
   assert.equal(await page.locator('.console-panel #delayDistance').inputValue(), '123', 'field sets recall into the native panel');
   const summaryExport = page.waitForEvent('download');
+  await suiteTopic(page, 'Project');
   await page.locator('.suite-actions').getByRole('button', { name: 'Export', exact: true }).click();
+  await closeTopics(page);
   assert.match(await readFile(await (await summaryExport).path(), 'utf8'), /123/, 'existing summary export retains current inputs');
 
   // 1b. The Rail's Workspace entry recalls the empty view in place.
@@ -174,15 +184,19 @@ try {
   // A stored specialist arrangement is what the Rail recalls, not the generated default.
   await page.getByRole('button', { name: 'View options' }).click();
   await page.getByRole('menuitem', { name: 'Store as new view' }).click();
+  await workspaceTopic(page, 'Views');
   await page.getByRole('tab', { name: /^Throwline \d+$/ }).waitFor();
   assert.equal(await tabs().count(), 2, 'the specialist strip lists its default and the stored view');
+  await closeTopics(page);
   await rail('console:av-video').click();
   await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'AV Video');
   await page.locator('.sbd-rail__all').click();
   await allApps.waitFor({ state: 'visible' });
   await allApps.locator('[data-rail-ref="tool:throwline"]').click();
   await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'Throwline');
+  await workspaceTopic(page, 'Views');
   assert.equal(await page.getByRole('tab', { name: /^Throwline \d+$/ }).getAttribute('aria-selected'), 'true', 'the Rail recalls the stored specialist view');
+  await closeTopics(page);
   assert.equal(await page.locator('.console-panel iframe').count(), 1);
   await page.goto(url);
   await heading().waitFor();
@@ -241,7 +255,7 @@ try {
   await rail('console:lighting').click();
   await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'Lighting');
   assert.match(await page.locator('.suite-plan').textContent(), /Unsaved/);
-  await page.locator('.suite-actions button.primary').click();
+  await savePack(page);
   await page.waitForFunction(() => /Saved/.test(document.querySelector('.suite-plan')?.textContent || ''));
   assert.equal(JSON.parse(await storage('sbd.avLighting.v1')).items.length, 1, 'Lighting saved one fixture');
   assert.equal(await storage('sbd.avVideo.v1'), null, 'Lighting Save never writes the Video plan');
@@ -249,11 +263,11 @@ try {
 
   // Disabled Video modules remain selectable without mutating their flags.
   await rail('console:av-video').click();
-  await page.getByRole('tab', { name: 'Project', exact: true }).click();
+  await selectView(page, 'Project');
   const moduleToggles = page.locator('.console-panel input[type="checkbox"]');
   assert.ok(await moduleToggles.count() >= 5);
   for (const checkbox of await moduleToggles.all()) if (await checkbox.isChecked()) await checkbox.uncheck();
-  await page.locator('.suite-actions button.primary').click();
+  await savePack(page);
   const videoBefore = await storage('sbd.avVideo.v1');
   await page.getByRole('button', { name: 'Project options', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Change panel…' }).click();
@@ -286,7 +300,7 @@ try {
   if (process.env.AV_SUITE_EVIDENCE) await page.screenshot({ path: join(process.env.AV_SUITE_EVIDENCE, 'four-departments.png') });
   // On a full mixed phone workspace, the menu must bring an existing department forward.
   await page.setViewportSize({ width: 375, height: 812 });
-  await page.getByRole('navigation', { name: 'Panels' }).getByRole('button', { name: 'Audio Delay', exact: true }).click();
+  await recallPanel(page, 'Audio Delay');
   await page.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
   await chooser.getByRole('button', { name: 'Replace the focused panel', exact: true }).click();
   await chooser.getByRole('button', { name: 'Audio', exact: true }).click();
@@ -298,7 +312,7 @@ try {
   assert.equal(await page.locator('.console-panel').count(), 4, 'phone selection preserves all four mixed panels');
   await page.locator('.console-panel[data-app="Audio"]').getByRole('button', { name: 'Add channel', exact: true }).click();
   await rail('console:audio').click();
-  await page.locator('.suite-actions button.primary').click();
+  await savePack(page);
   await page.waitForFunction(() => JSON.parse(localStorage.getItem('sbd.avAudio.v1'))?.channels.length === 1);
   assert.equal(await storage('avCalculator.v1'), calculatorValues, 'Audio save leaves Calculator inputs untouched');
   assert.equal(await storage('sbd.avVideo.v1'), videoBefore, 'Audio save leaves Video unchanged');
@@ -310,7 +324,7 @@ try {
     await page.evaluate(value => { document.documentElement.dataset.avTheme = value; }, theme);
     for (const [width, height] of [[375, 812], [667, 375], [680, 700], [1024, 690], [1100, 600], [1366, 650], [1440, 900], [3440, 1440]]) {
       await assertNoOverflow(width, height, theme);
-      await page.getByRole('navigation', { name: 'Panels' }).getByRole('button', { name: 'Audio Delay', exact: true }).click();
+      await recallPanel(page, 'Audio Delay');
       await page.locator('.console-panel #audioCard').waitFor();
       const controls = await page.locator('.console-panel .calculator-content button:visible, .console-panel .calculator-content input:visible, .console-panel .calculator-content select:visible').evaluateAll(nodes => nodes.map(node => {
         const b = node.getBoundingClientRect(), panel = node.closest('.console-panel').getBoundingClientRect();
@@ -323,6 +337,7 @@ try {
     }
   }
   await page.setViewportSize({ width: 375, height: 667 });
+  await page.locator('.console-shell.mode-phone > .console-quick').waitFor({ state: 'visible' });
   assert.equal(await page.getByRole('navigation', { name: 'Panels' }).isVisible(), true, 'phone panel switcher');
   assert.equal(await page.locator('.sbd-rail-launcher').isVisible(), true, 'phone Apps launcher');
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -350,7 +365,9 @@ try {
   await page.evaluate(layout => localStorage.setItem('sbd.avSuite.layout.v1', JSON.stringify({ ...JSON.parse(layout), viewId: 'suite:workspace' })), legacyLayout);
   await page.goto(`${BASE}/av/`);
   await rail('console:av-calculator').click();
+  await workspaceTopic(page, 'Views');
   assert.equal(await page.getByRole('tab', { name: 'My saved calculator', exact: true }).getAttribute('aria-selected'), 'true', 'Rail recalls the legacy Calculator view instead of a new default');
+  await closeTopics(page);
   assert.equal(await storage('sbd.avSuite.workspace.v1'), legacyViews, 'Rail recall does not rewrite saved views');
   await page.waitForFunction(() => document.documentElement.dataset.workspaceOffline === 'ready');
   await context.setOffline(true);

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-29: AV workspace topic menus
+
+- Reclaim workspace space with compact console controls and topic submenus with Back, Close and Escape.
+- Put project, appearance, status, views, panel recall and layout controls in focused menu pages.
+- Make the shared panel chooser enter an application submenu and keep phone panel shortcuts available.
+- Move Video diagram controls into topic menus and hide React Flow attribution through its supported option.
+
 ## October 29, 2026
 
 - Add Video Engineering Daily Edition 022, Fiber mode and wavelength, with
