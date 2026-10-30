@@ -1,3 +1,4 @@
+import { selectView } from "./av-menu-journey.mjs";
 import { probeFamily } from './av-family-probe.mjs';
 // Detailed retained-host regressions remain available through test:av-retained-browser.
 if (!process.env.AV_RETAINED_HOST) {
@@ -109,7 +110,7 @@ try {
   assert.equal(await page.locator('.audio-flow-node').count(),6,'backup restores graph');
   await page.goto(`${BASE}/av/`);
   await page.locator('.sbd-rail__entry[data-rail-ref="console:audio"]').click();
-  await openFlow(); assert.equal(await page.locator('.audio-flow-node').count(),6);
+  await selectView(page, "Signal flow"); await flow().waitFor(); assert.equal(await page.locator('.audio-flow-node').count(),6);
   assert.deepEqual(await read(),saved,'opening in shared console preserves exact document');
   await button('Connections').click();
   assert.equal(await page.locator('.route-speaker').count(),1);
