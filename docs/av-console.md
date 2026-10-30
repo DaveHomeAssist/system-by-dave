@@ -38,7 +38,8 @@ not shared-workspace adoption or legacy tool parity.
 
 - **Workspace.** A 12 × 8 snapping grid. Panels never overlap and respect their minimum size. Long content scrolls inside its panel; the page never scrolls.
 - **Add panel.**
-  - Tapping empty space, or pressing **Add panel**, opens the chooser near that spot. It has search, the Common / Planning / Utilities categories, large labelled choices, and a preview of the space the panel will take.
+  - Tapping empty space, or pressing **Add panel**, opens the chooser near that spot. It works in two steps. First it shows search and one tile per group: the Common / Planning / Utilities categories, or one tile per application in the AV Suite shell, with the active application marked. Picking a tile replaces the tiles with that group's large labelled choices and a preview of the space the panel will take. **Back**, or Escape, returns to the tiles. Search lists matches from every group at once. A group with no panels gets no tile, and a console with a single group skips the first step.
+  - The chooser uses the height below where it opened. On phones it can use the full available height; on short screens the decorative placement preview is omitted to keep choices reachable. A long group scrolls inside its list.
   - With the layout unlocked, dragging across empty space draws the rectangle first.
   - When nothing fits, the chooser offers **Replace**, **Split** or **New view**. It never covers a panel silently.
 - **Panel menu.** Change panel, Move and size (explicit grid commands), Split side by side / top and bottom, Maximize / Restore, and Close panel.
@@ -52,7 +53,7 @@ not shared-workspace adoption or legacy tool parity.
   - A view stores panel types and positions only.
 - **Modules.** Disabling a module hides its panels without removing them from stored views. A notice says how many are hidden. Re-enabling the module brings them back. Recalling a view never enables a module.
 - **Focus.** The focused panel has a stronger border. The lit panel (AV Video: Signal Flow) is the brightest surface.
-- **Keyboard and accessibility.** Every layout operation has a keyboard path. Escape closes a menu or chooser and returns focus to its trigger. Controls are at least 44 × 44 CSS pixels. Reduced motion is honoured.
+- **Keyboard and accessibility.** Every layout operation has a keyboard path. Escape closes a menu or chooser and returns focus to its trigger; inside a chooser group it first steps back to the group tiles, with focus on the tile just left. Opening a group moves focus to its first choice. Controls are at least 44 × 44 CSS pixels. Reduced motion is honoured.
 - **Responsive.**
   - Desktop: the full grid.
   - Tablet (under 1100px): two panels across, in reading order.

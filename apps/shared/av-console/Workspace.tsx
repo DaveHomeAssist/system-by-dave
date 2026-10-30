@@ -75,20 +75,21 @@ type Props = {
   notify: (text: string) => void;
   viewTabs?: View[];
   extraViews?: ReactNode;
-  /* Chooser group to open on: an application name when the library carries
-     `app`, otherwise one of the three categories. */
+  /* Chooser group marked as the current one on its first step: an
+     application name when the library carries `app`, otherwise a category. */
   defaultGroup?: string;
   compact?: boolean;
 };
 
-export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, viewTabs, extraViews, defaultGroup, compact = false }: Props) {
+export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, viewTabs, extraViews, defaultGroup: currentGroup, compact = false }: Props) {
   const grid = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLElement | null>(null);
   const chooserDialog = useRef<HTMLDialogElement>(null);
   const [chooser, setChooser] = useState<Chooser | null>(null);
   const [query, setQuery] = useState("");
-  const [group, setGroup] = useState<string>(defaultGroup || "Common");
+  /* Chooser step: null shows the group tiles; a name shows that group's panels. */
+  const [group, setGroup] = useState<string | null>(null);
   const [menu, setMenu] = useState<Menu | null>(null);
   const [rename, setRename] = useState("");
   const [drag, setDrag] = useState<Drag | null>(null);
@@ -98,8 +99,12 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   const maxId = view ? ws.max[view.id] || null : null;
   const def = (type: string) => ws.library.find(d => d.type === type);
   const apps = Array.from(new Set(ws.library.map(d => d.app).filter((app): app is string => Boolean(app))));
-  const groups: string[] = apps.length ? apps : ["Common", "Planning", "Utilities"];
-  const startGroup = defaultGroup && groups.includes(defaultGroup) ? defaultGroup : groups[0];
+  const groupOf = (d: PanelDef) => apps.length ? d.app : d.group;
+  // Only groups that hold a panel: a tile never opens onto an empty list.
+  const groups: string[] = (apps.length ? apps : ["Common", "Planning", "Utilities"]).filter(g => ws.library.some(d => groupOf(d) === g));
+  // One group needs no first step; its panels show straight away.
+  const activeGroup = groups.length > 1 ? group : groups[0] ?? null;
+  const drilled = Boolean(group) && groups.length > 1 && !query;
   const stored = view ? sanitizeView(view).panels : [];
   const changed = view ? !sameLayout(ws.live[view.id] || stored, stored) : false;
 
@@ -108,10 +113,29 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     const t = trigger.current; trigger.current = null;
     if (t && document.contains(t)) setTimeout(() => t.focus(), 0);
   }, []);
+  /* Two-step chooser: a group tile opens its panels in place of the tiles, and
+     Back (or Escape) returns to the tiles with focus on the group just left. */
+  const focusIn = (selector: string) => setTimeout(() => chooserDialog.current?.querySelector<HTMLElement>(selector)?.focus(), 0);
+  function openGroup(g: string) { setGroup(g); focusIn(".console-choices button"); }
+  const backToGroups = useCallback(() => {
+    const from = group; setGroup(null);
+    if (from) focusIn(`.console-groups button[data-group="${CSS.escape(from)}"]`);
+  }, [group]);
+  function chooserKeyDown(e: React.KeyboardEvent<HTMLDialogElement>) {
+    if (!compact || e.key !== "Tab") return;
+    const controls = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled)')).filter(el => el.getClientRects().length > 0);
+    const first = controls[0], last = controls[controls.length - 1];
+    if (e.shiftKey && e.target === first) { e.preventDefault(); last?.focus(); }
+    else if (!e.shiftKey && e.target === last) { e.preventDefault(); first?.focus(); }
+  }
   useEffect(() => {
-    const key = (e: KeyboardEvent) => { if (e.key === "Escape" && (chooser || menu || drag || draw)) { e.preventDefault(); setDrag(null); setDraw(null); close(); } };
+    const key = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (chooser && drilled && !menu && !drag && !draw) { e.preventDefault(); backToGroups(); return; }
+      if (chooser || menu || drag || draw) { e.preventDefault(); setDrag(null); setDraw(null); close(); }
+    };
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
-  }, [chooser, menu, drag, draw, close]);
+  }, [chooser, menu, drag, draw, close, drilled, backToGroups]);
   useEffect(() => {
     if (compact && chooser && !chooserDialog.current?.open) chooserDialog.current?.showModal();
   }, [compact, chooser]);
@@ -125,7 +149,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   }
   function openChooser(c: Omit<Chooser, "left" | "top">, left: number, top: number) {
     if (!trigger.current || !document.contains(trigger.current)) trigger.current = (document.activeElement as HTMLElement) || null;
-    setQuery(""); setGroup(compact ? "" : startGroup); setMenu(null);
+    setQuery(""); setGroup(null); setMenu(null);
     setChooser({ ...c, ...clampPos(left, top, 460, 420) });
   }
   function addPanelButton(e: React.MouseEvent<HTMLButtonElement>) {
@@ -251,7 +275,8 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     : mode === "tablet" ? { gridTemplateColumns: "repeat(2,minmax(0,1fr))", gridTemplateRows: `repeat(${Math.max(1, Math.ceil(panels.length / 2))},minmax(0,1fr))` }
     : { gridTemplateColumns: `repeat(${COLS},minmax(0,1fr))`, gridTemplateRows: `repeat(${ROWS},minmax(0,1fr))` };
   const shownTypes = new Set((mode === "phone" ? visible : panels).map(p => p.type));
-  const choices = ws.library.filter(d => (!query || `${d.name} ${d.app || ""} ${d.description}`.toLowerCase().includes(query.toLowerCase())) && (query || (apps.length ? d.app === group : d.group === group)));
+  const choices = query ? ws.library.filter(d => `${d.name} ${d.app || ""} ${d.description}`.toLowerCase().includes(query.toLowerCase()))
+    : activeGroup ? ws.library.filter(d => groupOf(d) === activeGroup) : [];
   const ghost = drag?.rect || draw?.rect || (chooser?.rect && chooser.mode !== "replace" ? chooser.rect : undefined);
 
   const viewBar = <div role="tablist" aria-label={`${label} views`} className="console-views">
@@ -302,7 +327,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     </div>
     {mode === "phone" && quickBar}
 
-    {chooser && <dialog ref={chooserDialog} open={compact ? undefined : true} className="console-pop console-chooser" aria-label="Add panel" onCancel={event => { event.preventDefault(); close(); }} style={{ left: chooser.left, top: chooser.top, margin: 0 }}>
+    {chooser && <dialog ref={chooserDialog} open={compact ? undefined : true} className="console-pop console-chooser" aria-label="Add panel" onKeyDown={chooserKeyDown} onCancel={event => { event.preventDefault(); if (drilled) backToGroups(); else close(); }} style={{ left: chooser.left, top: chooser.top, margin: 0, "--pop-top": `${chooser.top}px` } as React.CSSProperties}>
       {chooser.mode === "nospace" ? <>
         <h3>No room for another panel</h3><p>Nothing is covered silently. Choose how to make space.</p>
         <div className="console-choice-actions">
@@ -313,12 +338,13 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
       </> : <>
         <h3>{compact && group && !query ? group : chooser.mode === "replace" ? "Change panel" : "Add panel"}</h3>
         <input type="search" aria-label="Search panels" placeholder="Search panels…" value={query} autoFocus onChange={e => setQuery(e.target.value)} />
-        {!query && (!compact || !group) && <div className="console-groups" role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" aria-pressed={group === g} onClick={() => { setGroup(g); if (compact) requestAnimationFrame(() => chooserDialog.current?.querySelector<HTMLButtonElement>(".console-back")?.focus()); }}>{g}</button>)}</div>}
-        {compact && group && !query && <button type="button" className="console-back" onClick={() => { setGroup(""); requestAnimationFrame(() => chooserDialog.current?.querySelector<HTMLInputElement>("input")?.focus()); }}>← Back to topics</button>}
-        {(!compact || group || query) && <div className="console-choices">
-          {choices.length ? choices.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}{panels.some(p => p.type === d.type) && <small> · open</small>}</strong><span>{d.description}</span></button>) : <p>No panels match.</p>}
-        </div>}
-        {chooser.rect && <div className="console-preview" aria-hidden="true">{panels.map(p => <i key={p.id} style={{ gridColumn: `${p.x + 1} / ${p.x + p.w + 1}`, gridRow: `${p.y + 1} / ${p.y + p.h + 1}` }} />)}<b style={{ gridColumn: `${chooser.rect.x + 1} / ${chooser.rect.x + chooser.rect.w + 1}`, gridRow: `${chooser.rect.y + 1} / ${chooser.rect.y + chooser.rect.h + 1}` }} /></div>}
+        {!query && !activeGroup ? <div className="console-groups" role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" data-group={g} aria-current={g === currentGroup || undefined} onClick={() => openGroup(g)}>{g}</button>)}</div> : <>
+          {drilled && <div className="console-sub"><button type="button" className="console-back" onClick={backToGroups}><span aria-hidden="true">‹ </span>Back</button><strong>{activeGroup}</strong></div>}
+          <div className="console-choices">
+            {choices.length ? choices.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}{panels.some(p => p.type === d.type) && <small> · open</small>}</strong><span>{d.description}</span></button>) : <p>No panels match.</p>}
+          </div>
+          {chooser.rect && <div className="console-preview" aria-hidden="true">{panels.map(p => <i key={p.id} style={{ gridColumn: `${p.x + 1} / ${p.x + p.w + 1}`, gridRow: `${p.y + 1} / ${p.y + p.h + 1}` }} />)}<b style={{ gridColumn: `${chooser.rect.x + 1} / ${chooser.rect.x + chooser.rect.w + 1}`, gridRow: `${chooser.rect.y + 1} / ${chooser.rect.y + chooser.rect.h + 1}` }} /></div>}
+        </>}
       </>}
       <button type="button" className="console-close" onClick={close}>Close</button>
     </dialog>}

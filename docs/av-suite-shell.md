@@ -14,7 +14,7 @@ Project (Save, export and history), Appearance (palette and focus), or Status.
 The current view opens Views, Panels, or Layout. Each topic shows one submenu
 with Back and Close; Escape dismisses the native modal and returns focus.
 The Add panel chooser starts with application topics; choosing one replaces
-that list with its panels and a Back to topics action. Search spans the library.
+that list with its panels and a Back action. Back or Escape inside a group returns to the group list with focus on the group just left; Escape from the list closes the chooser. Search spans the library.
 Phone panel shortcuts remain directly available below the workspace. Short
 screens combine the header and workspace controls into one row so Diagram
 tools remain reachable at 320 by 256 and 844 by 390.
@@ -115,7 +115,9 @@ containment before release. No new dependencies, hardware control or redesign.
 - The panel chooser offers every application's panels in one library, grouped
   by application, so a stored view can mix Video routes, Lighting fixtures and
   Calculator controls side by side, plus a Tools group for the specialists
-  that have no native pack yet.
+  that have no native pack yet. Since October 29 it works in two steps: pick an
+  application, Tools or Gear 3D from the tiles, then pick a panel from that
+  group's list, which replaces the tiles (see the October 29 section below).
 - One view strip, one Add panel, one lock, one maximize, one status line.
   Views are owned by the shell (`sbd.avSuite.workspace.v1`), device-local
   arrangement in `sbd.avSuite.layout.v1`, both exportable as a layout file.
@@ -293,3 +295,23 @@ and invokes the original import, recovery, data and layout checks with
 `AV_RETAINED_HOST=1`. These fixtures establish source compatibility, not public
 standalone availability. The Pages pipeline excludes all `dist` directories,
 and the release verifier rejects a standalone bundle replacing any route stub.
+
+## Two-step chooser, 29 October 2026
+
+Dave marked up the Add panel menu: pick from the group tiles, then get that
+group's panels, with the other tiles gone. With twelve tiles above the list,
+only the first two panels of a group fitted (Front Office showed Jobs and
+Clients of its five).
+
+- The chooser opens on search and the twelve tiles. The active application's
+  tile is marked; nothing is preselected.
+- Picking a tile replaces the tiles with **Back**, the group name, every panel
+  in that group and the placement preview. Back or Escape returns to the tiles.
+- The chooser may use the height below where it opened, and only the panel
+  list scrolls, so every panel of the longest group (AV Video, ten) stays
+  reachable without the chooser or the page scrolling.
+- The engine is shared, so the retained family hosts (`npm run
+  test:av-retained-browser`) get the same two steps over their Common,
+  Planning and Utilities categories.
+
+Panel types, views, layouts and saved documents are unchanged.

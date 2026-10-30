@@ -54,7 +54,7 @@ try {
  await chooser.getByRole('button',{name:'Lighting',exact:true}).click();
  assert.equal(await chooser.getByRole('group',{name:'Panel categories'}).count(),0);
  assert.ok(await chooser.locator('.console-choices button').count()>0);
- await chooser.getByRole('button',{name:'Back to topics',exact:false}).click();
+ await chooser.getByRole('button',{name:'Back',exact:true}).click();
  assert.equal(await chooser.locator('.console-choices').count(),0);
  assert.equal(await chooser.getByRole('group',{name:'Panel categories'}).count(),1);
  await page.keyboard.press('Escape');

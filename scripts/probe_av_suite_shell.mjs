@@ -211,6 +211,23 @@ try {
   assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'the ten native departments plus Tools and Gear 3D groups are offered');
   assert.equal(await chooser.getByRole('button', { name: 'Gear 3D', exact: true }).count(), 1, 'remote gear viewers are offered as a Gear 3D group');
   assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 1, 'specialist tools are offered as a Tools group');
+  // Two steps: the group tiles come first, then the picked group's panels replace them.
+  assert.equal(await chooser.locator('.console-choices button').count(), 0, 'no panel choices before a group is picked');
+  assert.equal(await chooser.locator('.console-groups button[aria-current="true"]').textContent(), 'AV Video', 'the active application is marked');
+  await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).count(), 0, 'the other groups leave once one is picked');
+  assert.equal(await chooser.locator('.console-sub strong').textContent(), 'Front Office');
+  assert.equal(await chooser.locator('.console-choices button').count(), 5, 'every Front Office panel is listed');
+  await page.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null); // focus moves to the first panel choice
+  await page.keyboard.press('Escape');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).count(), 1, 'Escape steps back to the groups');
+  await page.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office'); // focus returns to the group just left
+  await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
+  await chooser.getByRole('button', { name: 'Back', exact: true }).click();
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'Back restores every group');
+  await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('fixture');
+  assert.ok(await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).count() >= 1, 'search lists matches across groups');
+  await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('');
   await chooser.getByRole('button', { name: 'Lighting', exact: true }).click();
   await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).click();
   assert.equal(await page.locator('.console-panel[data-app="Lighting"][data-panel="fixtures"]').count(), 1);
@@ -446,6 +463,61 @@ try {
       assert.equal(await menuPage.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
     }
   } finally { await menuContext.close(); }
+  // Adding to empty space includes a placement preview; replacement alone misses this path.
+  for (const theme of ['light', 'dark']) {
+    for (const [width, height] of [[375, 812], [375, 667], [667, 375], [680, 700], [844, 390], [320, 256], [1440, 900], [3440, 1440], [3840, 1080]]) {
+      const addContext = await browser.newContext({ viewport: { width, height }, reducedMotion: 'reduce' });
+      try {
+        const addPage = await addContext.newPage();
+        addPage.on('pageerror', error => errors.push(error.message));
+        await addPage.goto(`${BASE}/av/`);
+        await suiteTopic(addPage, 'Appearance');
+        await addPage.getByLabel('Palette').selectOption(theme);
+        await closeTopics(addPage);
+        const addTrigger = addPage.locator('.console-tools').getByRole('button', { name: /Add panel/ });
+        await addTrigger.click();
+        const addChooser = addPage.getByRole('dialog', { name: 'Add panel' });
+        await addPage.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Search panels');
+        await addPage.keyboard.press('Shift+Tab');
+        assert.equal(await addChooser.getByRole('button', { name: 'Close', exact: true }).evaluate(el => el === document.activeElement), true, 'modal retains reverse Tab focus');
+        await addPage.keyboard.press('Tab');
+        assert.equal(await addChooser.getByRole('searchbox').evaluate(el => el === document.activeElement), true, 'modal retains forward Tab focus');
+        assert.equal(await addChooser.locator('[aria-current]').count(), 0, 'empty Workspace marks no application as current');
+        const frontOffice = addChooser.getByRole('button', { name: 'Front Office', exact: true });
+        await frontOffice.focus();
+        await addPage.keyboard.press('Enter');
+        await addPage.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null);
+        assert.deepEqual(await addChooser.locator('.console-choices strong').allTextContents(), ['Jobs', 'Clients', 'Venues', 'Job updates', 'Document']);
+        assert.ok(await addChooser.locator('.console-choices').evaluate(el => el.clientHeight >= 44), `Add list has a usable visible row at ${width}x${height} ${theme}`);
+        for (let index = 0; index < 5; index++) {
+          if (index) await addPage.keyboard.press('Tab');
+          const choice = addChooser.locator('.console-choices button').nth(index);
+          assert.equal(await choice.evaluate(el => el === document.activeElement), true);
+          assert.equal(await choice.evaluate(el => {
+            const r = el.getBoundingClientRect(), list = el.parentElement.getBoundingClientRect();
+            const top = Math.max(r.top, list.top), bottom = Math.min(r.bottom, list.bottom);
+            const hit = document.elementFromPoint(r.x + r.width / 2, (top + bottom) / 2);
+            return bottom - top >= 44 && (hit === el || el.contains(hit));
+          }), true, `keyboard focused choice is visible at ${width}x${height} ${theme}`);
+        }
+        await addPage.keyboard.press('Escape');
+        await addPage.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office');
+        await addPage.keyboard.press('Space');
+        await addChooser.getByRole('button', { name: 'Back', exact: true }).click();
+        await addPage.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office');
+        await addPage.keyboard.press('Escape');
+        await addPage.waitForFunction(() => document.activeElement?.closest('.console-tools') !== null);
+        await addTrigger.click();
+        await addChooser.getByRole('button', { name: 'Front Office', exact: true }).click();
+        await addChooser.locator('.console-choices button').last().click();
+        assert.equal(await addPage.locator('.console-panel').getAttribute('data-app'), 'Front Office');
+        assert.equal(await addPage.locator('.console-panel').getAttribute('data-panel'), 'document');
+        assert.equal(await addPage.evaluate(() => localStorage.getItem('sbd.avSuite.workspace.v1')), null, 'choosing a panel does not store a view');
+        assert.equal(await addPage.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
+      } finally { await addContext.close(); }
+    }
+  }
+  console.log('Add from empty space: five Front Office choices, keyboard focus, Back, Escape and final choice passed at nine sizes in both themes.');
   const blockedContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   try {
     await blockedContext.addInitScript(() => { Storage.prototype.setItem = function () { throw new DOMException('Storage blocked', 'QuotaExceededError'); }; });
