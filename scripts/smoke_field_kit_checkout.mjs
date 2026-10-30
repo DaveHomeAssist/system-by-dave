@@ -3,7 +3,7 @@
 // GET requests only; it never submits a payment or touches Stripe's API.
 //   node scripts/smoke_field_kit_checkout.mjs [base-url]   (default https://avbydave.com)
 // Checks:
-//   1. /field-kit/ returns 200, is noindex, shows the $19 label and loads the
+//   1. /field-kit/ returns 200, is noindex, shows the $12 label and loads the
 //      launch config and checkout scripts.
 //   2. The checkout url in /js/sbd-launch-config.js matches ^https://buy\.stripe\.com/
 //      and that Payment Link answers 200 (redirects followed).
@@ -11,7 +11,7 @@
 // Exit codes: 0 all pass (checkout live), 2 pages fine but checkout not
 // configured yet (Payment Link still a placeholder), 1 a check failed.
 const BASE = (process.argv[2] || 'https://avbydave.com').replace(/\/+$/, '');
-const PRICE = '$19';
+const PRICE = '$12';
 const STRIPE = /^https:\/\/buy\.stripe\.com\//;
 const failures = [];
 const notes = [];
