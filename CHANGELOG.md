@@ -1,5 +1,9 @@
 # Changelog
 
+## October 30, 2026: Lighting probe render boundaries
+
+- Wait for the new fixture selection and duplicate-start summary before asserting retained Lighting edits. Keep exact duplicate counts and verify edited values; do not change application logic or add fixed delays.
+
 ## October 30, 2026: Public registry refresh
 
 - Refresh the existing public repository directory from GitHub through an explicit repository allowlist. Preserve the route and curated categories, resolve public renames, and show current descriptions, languages, archive state and default-branch activity.
