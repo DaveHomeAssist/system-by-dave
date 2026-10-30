@@ -1,5 +1,10 @@
 # Changelog
 
+## October 30, 2026: Platform setup documentation
+
+- Declare Node.js 24 for local package tooling, matching CI, with `.nvmrc`.
+- Include the venue walk publishing domain in repository orientation and the domain source map. Replace stale pre-cutover wording while preserving the separate authenticated acceptance gate.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced

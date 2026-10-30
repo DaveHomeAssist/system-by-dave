@@ -37,6 +37,12 @@ checks the console entry and all 42 sheet/family redirects. See the
 
 ## Local development
 
+Use Node.js 24 for package scripts and builds, matching CI. The repository's
+`.nvmrc` selects that major version for version managers that support it.
+With nvm installed, run `nvm install` followed by `nvm use`, then `npm ci`.
+Python 3 is required for the site generators and their parity checks.
+Serving existing static files does not require installing Node dependencies.
+
 [Infrastructure](https://avbydave.com/infrastructure/) has a native-console candidate in `apps/infrastructure/`: Power, Network, Cable, Issues, Plan/Import and Backup share its existing model. Use `npm run typecheck:infrastructure`, `npm run test:infrastructure`, `npm run build:infrastructure` and `npm run test:infrastructure-browser`. The build preserves the model and writes an ignored fixture in `apps/infrastructure/dist/`; the public route redirects into `/av/?app=infrastructure`. See [the brief and compatibility contract](docs/infrastructure-app.md); source presence does not establish release or browser acceptance.
 
 [Lighting](https://avbydave.com/av-lighting/) has a native-panel candidate in `apps/av-lighting/`: Fixtures, Fixture details, Focus, Plan/Import and Backup preserve existing patch/focus fields and reviewed PlotForge imports. Use `npm run typecheck:av-lighting`, `npm run test:av-lighting`, `npm run build:av-lighting` and `npm run test:av-lighting-browser`. See [the brief and compatibility contract](docs/av-lighting.md); candidate checks and publication/live proof are separate.
@@ -68,7 +74,7 @@ use the tooling selected for that surface.
 | `widgets.html` | Widget gallery |
 | `fmp-index/index.html` | Retired FMP working index: noindex redirect to the `/fmp/` hub, keeping query and hash |
 | `fmp/` | Managed FMP video operations hub, camera commissioning, bowl training, and rig reference; authenticated camera API remains SETUP TEST only; [release and sync contract](docs/fmp-public-release.md) |
-| `fmpwalk/` | Managed local-first preshow venue walk; configured for walk.housevideo.app with destination verification before cutover; explicit download, Gmail, and Notion actions; no silent writes |
+| `fmpwalk/` | Managed local-first preshow venue walk; published to [walk.housevideo.app](https://walk.housevideo.app/fmpwalk/), with cutover enabled in `scripts/domain-sites.json`; authenticated acceptance remains a separate gate in the [release contract](docs/fmp-public-release.md); explicit download, Gmail, and Notion actions; no silent writes |
 | `av/` | AV by Dave: one console, ten departments of individual native panels; standalone tool links (`docs/av-suite-shell.md`) |
 | `av-suite.html` | Redirect stub into the console (keeps `sbd*` show context) |
 | `docs/av-suite-development-assets-index.md` | AV Suite source, spec, migration, release, and historical-asset authority map |

@@ -96,7 +96,8 @@ to make stale documentation true.
   generator, run `python3 build_site.py`, and gate with `npm run verify:davai`.
   Do not hand-edit the generated pages.
 - **Domain sites:** `scripts/domain-sites.json` owns which pages are also
-  published on housevideo.app and avbydave.com, and each site's cutover state.
+  published on housevideo.app, walk.housevideo.app and avbydave.com, and each
+  site's cutover state.
   Those pages link systembydave.com-only destinations absolutely
   (`https://systembydave.com/...`); see `docs/domain-sites.md`. Release gates
   take expected canonical origins and sitemap membership from
