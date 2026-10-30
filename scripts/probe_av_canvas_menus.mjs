@@ -31,12 +31,18 @@ try {
  assert.equal(await page.locator('.react-flow__attribution').count(),0);
  for(const [width,height] of [[1440,900],[1051,881],[680,700],[375,812],[844,390],[320,256],[3840,1080]]){
   await page.setViewportSize({width,height});
+  await page.locator(`.console-shell.mode-${width < 720 ? "phone" : width < 1100 ? "tablet" : "desktop"}`).waitFor();
   await suiteTopic(page,'Appearance');
   const d=await page.locator('dialog[open]').boundingBox(); assert.ok(d.x>=0&&d.y>=0&&d.x+d.width<=width+1&&d.y+d.height<=height+1,JSON.stringify(d));
   const targets = await page.locator('dialog[open] button:visible').evaluateAll(buttons => buttons.map(button => { const box = button.getBoundingClientRect(); return { width: box.width, height: box.height }; }));
   assert.ok(targets.every(box => box.width >= 44 && box.height >= 44), JSON.stringify(targets));
   await page.keyboard.press('Tab');
   assert.ok(await page.locator('dialog[open]').evaluate(e=>e.contains(document.activeElement)));
+  await closeTopics(page);
+  const diagram = page.getByRole('button', { name: 'Diagram', exact: true });
+  assert.ok(await diagram.evaluate(button => { const box = button.getBoundingClientRect(), panel = button.closest('.console-panel').getBoundingClientRect(); const hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2); return box.top >= panel.top && box.bottom <= panel.bottom && Boolean(hit && (hit === button || button.contains(hit))); }), `Diagram tools reachable at ${width} by ${height}`);
+  await diagram.click();
+  await page.locator('dialog[open]').getByRole('heading', { name: 'Diagram', exact: true }).waitFor();
   await closeTopics(page);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight));
  }

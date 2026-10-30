@@ -337,6 +337,7 @@ try {
     }
   }
   await page.setViewportSize({ width: 375, height: 667 });
+  await page.locator('.console-shell.mode-phone > .console-quick').waitFor({ state: 'visible' });
   assert.equal(await page.getByRole('navigation', { name: 'Panels' }).isVisible(), true, 'phone panel switcher');
   assert.equal(await page.locator('.sbd-rail-launcher').isVisible(), true, 'phone Apps launcher');
   await page.setViewportSize({ width: 1440, height: 900 });

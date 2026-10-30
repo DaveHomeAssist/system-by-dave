@@ -15,7 +15,9 @@ The current view opens Views, Panels, or Layout. Each topic shows one submenu
 with Back and Close; Escape dismisses the native modal and returns focus.
 The Add panel chooser starts with application topics; choosing one replaces
 that list with its panels and a Back to topics action. Search spans the library.
-Phone panel shortcuts remain directly available below the workspace.
+Phone panel shortcuts remain directly available below the workspace. Short
+screens combine the header and workspace controls into one row so Diagram
+tools remain reachable at 320 by 256 and 844 by 390.
 
 Video diagram tools use the same pattern for Devices, Routes, and Arrange and
 export. The canvas fills the reclaimed toolbar space. React Flow attribution
@@ -26,6 +28,8 @@ offline operation and specialist embedding are unchanged.
 Acceptance: all existing shell and family document journeys, topic Back,
 Escape and focus return, populated diagram interaction, no attribution link,
 and containment at desktop, 1051 by 881, 680, phone, short phone and ultrawide.
+Run `npm run test:av-canvas-menus-browser` for the focused menu journey and
+`npm run test:av-suite-browser` for panel and saved-layout compatibility.
 Build and browser checks run on Dominic; production needs the normal PR,
 Pages publication and fresh live browser readback.
 
