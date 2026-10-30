@@ -1,15 +1,15 @@
 {
   "id": "house-reference",
   "engineeringDailyPublication": {
-    "date": "2026-10-29",
-    "edition": 22,
-    "title": "Fiber mode and wavelength",
+    "date": "2026-10-30",
+    "edition": 23,
+    "title": "Frame rate conversion families",
     "state": "Verified publication input; exact CI, merge and deployment evidence belongs to the provider records for this revision",
-    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=22&month=2026-10",
+    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=23&month=2026-10",
     "evidence": "demos/engineering-daily/release.json",
-    "verification": "Dominic: 44 archive and 44 story views, 10 calendar views, 10 dashboard views, 3 navigation journeys, 60 Signal lab views, 10 served archive views and 48 served entry views passed. All 22 SVG/PNG mappings and PNG dimensions validated; new card visually inspected. Public source contracts passed.",
+    "verification": "Dominic: 46 archive and 46 story views, 10 calendar views, 10 dashboard views, 3 navigation journeys, 60 Signal lab views, 10 served archive views and 60 served entry views passed. All 23 SVG/PNG mappings and PNG dimensions validated; new card visually inspected. Public source contracts passed.",
     "next": "Require exact-head CI, Pages deployment and matching live manifest/assets/browser journeys before publication completion; continue the same gates for future daily releases.",
-    "boundaries": "No change to facts 001 through 021 beyond clearing the previous current marker. No backfills or renumbering required. Human acceptance is separate."
+    "boundaries": "No change to facts 001 through 022 beyond clearing the previous current marker. No backfills or renumbering required. Human acceptance is separate."
   },
   "engineeringDailyUx": {
     "date": "2026-10-28",

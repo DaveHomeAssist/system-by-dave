@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "f6d2de11af54728f8a27f4d9f9ee271a73233eaa7b5594e1cdd5139c8527537b",
-  "publicSha256": "011dd718164b2db0a599835b8f0e110f32a63914b9de7b94787081beacde9a58",
-  "editions": 22,
+  "sourceSha256": "999df798c42def64b6e6cd1b9ac3f0d364db3b27e542d734477be3b1e71a5f70",
+  "publicSha256": "557d619e718dcb4ca242848f7a6c5d60f0fa407412e532f5fb63d24ab99d8533",
+  "editions": 23,
   "files": [
+    {
+      "name": "Edition 023.svg",
+      "id": 23,
+      "date": "2026-10-30",
+      "title": "Frame rate conversion families",
+      "sha256": "d71e22f46b627bfe62862d3e0ca63607703bf6c60e8bcfaedcca2d7c84712ed3"
+    },
+    {
+      "name": "Edition 023.png",
+      "id": 23,
+      "date": "2026-10-30",
+      "title": "Frame rate conversion families",
+      "sha256": "641061485ab3afe229aa5e110cbe9cecfcd6bffb09ce77d1082300e8fb8c7d89"
+    },
     {
       "name": "Edition 022.svg",
       "id": 22,

@@ -1,5 +1,11 @@
 # Changelog
 
+## October 30, 2026: Video Engineering Daily
+
+- Add Edition 023, Frame rate conversion families, with an AJA sourced
+  conversion-family diagram and matching SVG and PNG story card. Preserve
+  prior lessons, numbering, calendar behavior and the reviewed release gates.
+
 ## October 29, 2026: Add panel short screen verification
 
 - Keep the Add panel list usable on short screens when adding into empty space. Phones can use the available viewport height; short screens omit the decorative placement map.

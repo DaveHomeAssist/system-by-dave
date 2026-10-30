@@ -348,6 +348,25 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
   {
+    "id": 23,
+    "date": "2026-10-30",
+    "track": "Cameras, switchers, scalers, and capture systems",
+    "trackShort": "Cameras",
+    "title": "Frame rate conversion families",
+    "fact": "A frame synchronizer's format conversion does not imply arbitrary frame rate conversion. AJA lists FS4 conversion within three frame rate families (fps): 59.94/29.97/23.98, 50/25, and 60/30/24. A 50 to 59.94 fps conversion crosses those families and is outside that specified capability. This is an FS4 limitation, not a universal frame-sync rule.",
+    "why": "A 1080p source and a 1080p production switcher can share a raster yet still require a different converter when their frame rates belong to different families.",
+    "takeaway": "Write raster, scan type and exact rate on both sides of the converter. Check its supported input-to-output combinations in the intended mode; same resolution and a frame-sync label are insufficient.",
+    "sourceLabel": "AJA FS4 technical specifications, Format Conversion",
+    "sourceUrl": "https://www.aja.com/products/fs4",
+    "basis": "Manufacturer-specific FS4 conversion families; supported raster, scan and processing-mode restrictions still apply",
+    "current": true,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">23</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">RATE FAMILIES</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"50\" width=\"216\" height=\"70\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"73\" class=\"blue-label\">1 / Fractional fps</text><text x=\"120\" y=\"99\" text-anchor=\"middle\">59.94 / 29.97 / 23.98</text><path d=\"M32 109H208\" class=\"wire\"/><rect x=\"12\" y=\"132\" width=\"216\" height=\"70\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"155\" class=\"blue-label\">2 / 50 fps family</text><text x=\"120\" y=\"181\" text-anchor=\"middle\">50 / 25 fps</text><path d=\"M32 191H208\" class=\"wire\"/><rect x=\"12\" y=\"214\" width=\"216\" height=\"70\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"237\" class=\"blue-label\">3 / 60 fps family</text><text x=\"120\" y=\"263\" text-anchor=\"middle\">60 / 30 / 24 fps</text><path d=\"M32 273H208\" class=\"wire\"/><rect x=\"12\" y=\"296\" width=\"216\" height=\"76\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"319\" class=\"note\">Cross-family request</text><text x=\"24\" y=\"350\">50 fps</text><text x=\"140\" y=\"350\">59.94 fps</text><path d=\"M78 345H132m-6-5l6 5l-6 5M101 336l18 18m0-18l-18 18\" class=\"reference\"/><text x=\"120\" y=\"392\" text-anchor=\"middle\" class=\"note\">Outside FS4 capability</text>",
+      "caption": "FS4 rate families, in fps. Blue lines group rates within a family. The amber cross marks a 50 to 59.94 fps request outside these families. Conceptual grouping, not physical wiring."
+    }
+  },
+  {
     "id": 22,
     "date": "2026-10-29",
     "track": "Fiber, video over IP, NDI, and SMPTE ST 2110",
@@ -359,7 +378,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "sourceLabel": "Extron FOX3 T/R 101 specifications, optical interconnection",
     "sourceUrl": "https://media.extron.com/public/download/files/specs/fox3_tr_101_5145-D1.pdf",
     "basis": "Manufacturer specifications for FOX3 T/R 101; no universal wavelength or interoperability claim",
-    "current": true,
+    "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
       "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">22</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">OPTICAL MATCH</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"54\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"79\" class=\"blue-label\">MM / 850 nm</text><rect x=\"24\" y=\"100\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"58\" y=\"127\" text-anchor=\"middle\">TX</text><rect x=\"148\" y=\"100\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"182\" y=\"127\" text-anchor=\"middle\">RX</text><path d=\"M92 122H148m-6-5l6 5l-6 5\" class=\"wire\"/><text x=\"120\" y=\"179\" text-anchor=\"middle\" class=\"good-label\">Multimode fiber</text><rect x=\"12\" y=\"212\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"237\" class=\"blue-label\">SM / 1310 nm</text><rect x=\"24\" y=\"258\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"58\" y=\"285\" text-anchor=\"middle\">TX</text><rect x=\"148\" y=\"258\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"182\" y=\"285\" text-anchor=\"middle\">RX</text><path d=\"M92 280H148m-6-5l6 5l-6 5\" class=\"wire\"/><text x=\"120\" y=\"337\" text-anchor=\"middle\" class=\"good-label\">Singlemode fiber</text><text x=\"120\" y=\"383\" text-anchor=\"middle\" class=\"note\">LC shape ≠ fiber mode</text>",
