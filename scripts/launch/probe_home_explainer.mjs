@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { suiteTopic, closeTopics } from '../av-menu-journey.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.json': 'application/json', '.webmanifest': 'application/manifest+json' };
@@ -107,7 +108,9 @@ try {
   // Light palette renders it too (no theme-specific breakage).
   {
     const { context, page } = await open({ width: 1280, height: 800 });
-    await page.getByLabel('Palette').selectOption('light');
+    await suiteTopic(page, 'Appearance');
+    await page.getByLabel('Palette', { exact: true }).selectOption('light');
+    await closeTopics(page);
     if (!(await page.locator(INTRO).isVisible())) fail('explainer vanished on palette change');
     await context.close();
   }
