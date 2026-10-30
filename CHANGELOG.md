@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-30
+
+- Indexing verification accepts new explicitly excluded routes without updating a fixed route count. Every unlisted page still requires an explicit indexing policy; CLI regression coverage checks both accepted additions and unexplained omissions.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced

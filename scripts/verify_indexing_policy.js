@@ -54,29 +54,8 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-// 146 includes the AV by Dave landing source and noindex alternative, Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
-// /fmp/gear/, /fmp/build/ and /fmp/ptz/ pages that replaced Notion links on 2026-09-18,
-// plus the four additional equipment explorers published on 2026-09-20, and the noindex
-// FMP Camera Simulator (its page, standalone offline copy and app source) from 2026-09-23,
-// the noindex offline copy of the ATEM HD8 ISO interactive guide from 2026-09-25, and the noindex
-// /fmp/walk/ redirect to the walk's own origin from 2026-10-01, and the five noindex pages of the
-// managed /cheesesteaks/ static export (map, rankings, neighborhoods, methodology, about) from 2026-10-01.
-// AV Audio adds one nonpublic source page under apps/av-audio/. The seven new
-// public application routes belong in the AV-origin sitemap through the registry,
-// so they must not increase the count of tracked routes outside all sitemaps.
-// Show Ops and Show Control add their nonpublic application source pages.
-// The Shop native source entry adds one non-published application template.
-// Infrastructure adds its non-published native source template.
-// Front Office adds one non-published native source template; its public route is unchanged.
-// The AV Suite shell adds its non-published source template under apps/av-suite/. From
-// 2026-10-13 its av/ route is the noindex source of the avbydave.com home page, and the 34
-// retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md).
-// Equipment Lab adds its source template, original checklist and package return route.
-// Eight original family entries now redirect into the shared console.
-// The noindex Sync & Signal Field Kit draft (field-kit/, docs/launch/README.md) adds one,
-// and its buyers-only download page (field-kit/thanks/, noindex, reached from Stripe's
-// after-payment redirect) adds one more.
-if (unlisted.length !== 201) fail(`Expected 201 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// The route inventory grows with the site. Require an explicit policy for each
+// unlisted route below, rather than coupling valid additions to a fixed total.
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);
@@ -86,8 +65,7 @@ SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) =
   }
 });
 
-// The count above only detects new unlisted routes; this enforces the documented policy itself
-// (scripts/indexing_policy.js) for every one of them.
+// Enforce the documented policy (scripts/indexing_policy.js) for every unlisted route.
 const otherOrigins = otherDomainOrigins();
 const policies = {};
 unlisted.forEach((file) => {
