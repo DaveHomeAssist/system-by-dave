@@ -75,5 +75,11 @@
   .console-quick button{flex:1;min-width:0;padding:8px 6px;font-size:12px;justify-content:center}
   .console-tools button:first-child{padding:0 10px}
   .console-pop{left:8px!important;right:8px;width:auto;top:auto!important;bottom:8px;max-height:70dvh}
+  .console-pop.console-chooser{max-height:calc(100dvh - 16px)}
+}
+/* On short screens reserve space for choices instead of the decorative map. */
+@media(max-height:500px){
+  .console-pop.console-chooser{top:8px!important;bottom:8px;max-height:calc(100dvh - 16px);padding:8px;gap:4px}
+  .console-chooser .console-preview{display:none}
 }
 @media(prefers-reduced-motion:reduce){.console-shell *{transition:none!important;animation:none!important}}

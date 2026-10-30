@@ -1653,5 +1653,15 @@
     "limits": "No saved-key/schema change, first native specialist selection, diagnostics decision or physical/operator acceptance.",
     "sourceRevision": "fe549a22f558f57af70ffae99e26466e009349ca",
     "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/379"
+  },
+  "addPanelVerification": {
+    "recordedOn": "2026-10-29",
+    "sourceRevision": "bda7cca148addf939fcef68760f4d3c27c01ab13",
+    "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/386",
+    "finding": "Original two-step flow matches the request, but Add into empty space leaves a 4px list at 667x375 because fixed controls and the placement preview consume the phone chooser height. Replacement-only viewport checks miss this path.",
+    "correction": "Allow the phone chooser the available viewport height. Omit its decorative placement preview on short screens. Preserve placement, panel definitions and stored data shapes.",
+    "verification": "Dominic Linux, Playwright 1.63 Chromium: original and corrected 66-choice shell probes pass, including mixed arrangements, isolated saves, legacy view/layout bytes and offline reload. Corrected Add path passes five Front Office choices, Enter, Space, Tab, Back, Escape, focus restoration, final-choice placement and root containment at seven sizes in light/dark with reduced motion. AV verification, 86 Video/shared/shell unit tests, three builds, relevant typechecks and 42 route checks pass. Supplemental WebKit inspection confirms six viewport flows, search results, accessible names and focus return.",
+    "nextAction": "Check correction CI on PR #386, then Dave accepts the candidate on desktop and a physical phone before separately authorizing merge and deployment.",
+    "limits": "No merge or deployment authorized. Accessibility tree inspection supports button/search/dialog semantics; actual screen reader, physical touch, browser chrome and virtual keyboard acceptance remain unverified."
   }
 }

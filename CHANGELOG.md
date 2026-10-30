@@ -1,5 +1,10 @@
 # Changelog
 
+## October 29, 2026: Add panel short screen verification
+
+- Keep the Add panel list usable on short screens when adding into empty space. Phones can use the available viewport height; short screens omit the decorative placement map.
+- Add browser regression coverage for all five Front Office choices, Enter, Space, Tab, Back, Escape, focus return and final-choice placement at seven viewport sizes in light and dark themes. Saved views and application storage contracts are unchanged.
+
 ## 2026-10-29: Two-step Add panel menu
 
 - Open the Add panel chooser on search and the group tiles only. Picking a tile replaces the tiles with that group's panels, a Back button and the placement preview; Back or Escape returns to the tiles with focus on the tile just left. The active application's tile is marked.

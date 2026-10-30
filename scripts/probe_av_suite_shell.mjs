@@ -446,6 +446,53 @@ try {
       assert.equal(await menuPage.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
     }
   } finally { await menuContext.close(); }
+  // Adding to empty space includes a placement preview; replacement alone misses this path.
+  for (const theme of ['light', 'dark']) {
+    for (const [width, height] of [[375, 812], [375, 667], [667, 375], [680, 700], [844, 390], [1440, 900], [3440, 1440]]) {
+      const addContext = await browser.newContext({ viewport: { width, height }, reducedMotion: 'reduce' });
+      try {
+        const addPage = await addContext.newPage();
+        addPage.on('pageerror', error => errors.push(error.message));
+        await addPage.goto(`${BASE}/av/`);
+        await addPage.getByLabel('Palette').selectOption(theme);
+        const addTrigger = addPage.locator('.console-tools').getByRole('button', { name: /Add panel/ });
+        await addTrigger.click();
+        const addChooser = addPage.getByRole('dialog', { name: 'Add panel' });
+        const frontOffice = addChooser.getByRole('button', { name: 'Front Office', exact: true });
+        await frontOffice.focus();
+        await addPage.keyboard.press('Enter');
+        await addPage.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null);
+        assert.deepEqual(await addChooser.locator('.console-choices strong').allTextContents(), ['Jobs', 'Clients', 'Venues', 'Job updates', 'Document']);
+        assert.ok(await addChooser.locator('.console-choices').evaluate(el => el.clientHeight >= 44), `Add list has a usable visible row at ${width}x${height} ${theme}`);
+        for (let index = 0; index < 5; index++) {
+          if (index) await addPage.keyboard.press('Tab');
+          const choice = addChooser.locator('.console-choices button').nth(index);
+          assert.equal(await choice.evaluate(el => el === document.activeElement), true);
+          assert.equal(await choice.evaluate(el => {
+            const r = el.getBoundingClientRect(), list = el.parentElement.getBoundingClientRect();
+            const top = Math.max(r.top, list.top), bottom = Math.min(r.bottom, list.bottom);
+            const hit = document.elementFromPoint(r.x + r.width / 2, (top + bottom) / 2);
+            return bottom - top >= 44 && (hit === el || el.contains(hit));
+          }), true, `keyboard focused choice is visible at ${width}x${height} ${theme}`);
+        }
+        await addPage.keyboard.press('Escape');
+        await addPage.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office');
+        await addPage.keyboard.press('Space');
+        await addChooser.getByRole('button', { name: 'Back', exact: true }).click();
+        await addPage.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office');
+        await addPage.keyboard.press('Escape');
+        await addPage.waitForFunction(() => document.activeElement?.closest('.console-tools') !== null);
+        await addTrigger.click();
+        await addChooser.getByRole('button', { name: 'Front Office', exact: true }).click();
+        await addChooser.locator('.console-choices button').last().click();
+        assert.equal(await addPage.locator('.console-panel').getAttribute('data-app'), 'Front Office');
+        assert.equal(await addPage.locator('.console-panel').getAttribute('data-panel'), 'document');
+        assert.equal(await addPage.evaluate(() => localStorage.getItem('sbd.avSuite.workspace.v1')), null, 'choosing a panel does not store a view');
+        assert.equal(await addPage.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
+      } finally { await addContext.close(); }
+    }
+  }
+  console.log('Add from empty space: five Front Office choices, keyboard focus, Back, Escape and final choice passed at seven sizes in both themes.');
   const blockedContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   try {
     await blockedContext.addInitScript(() => { Storage.prototype.setItem = function () { throw new DOMException('Storage blocked', 'QuotaExceededError'); }; });
