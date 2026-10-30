@@ -1,5 +1,9 @@
 # Changelog
 
+## October 30, 2026: Render recovery integration
+
+- Integrate current main into the draft recovery candidate, retain newer workspace menus and both changelog histories, and regenerate AV Suite assets from the combined source.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced
@@ -39,6 +43,11 @@
   publication. Add root-console and 42-route browser checks.
 - Honor the configured Chrome browser in the retained Audio flow probe so
   publication does not require a separate downloaded headless browser.
+
+## 2026-10-28: AV console render recovery
+
+- Contain React render failures at the main AV console root with an accessible recovery screen and manual reload. Saved plans, workspace data and routes are preserved.
+- Verify the real boundary with a deliberately failing child, keyboard focus, theme controls and phone through ultrawide containment. Standalone application roots remain outside this repair; diagnostic capture and reporting remain pending.
 
 ## 2026-10-28: Engineering daily archive
 
