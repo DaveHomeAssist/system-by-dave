@@ -98,7 +98,7 @@
   #receipt{position:absolute;left:64px;top:548px;font:500 24px/1 var(--mono);color:var(--mute);letter-spacing:1px;opacity:0}
 </style>
 </head>
-<body class="demo" data-demo="frame-sync" data-next-demo="fault-finding.html">
+<body class="demo" data-demo="frame-sync" data-next-demo="fault-finding.html" data-capture-box="40 60 1040 1720">
 <a class="sbd-skip-link" href="#fit">Skip to the demo</a>
 <nav class="sbd-site-return" aria-label="Breadcrumb">
   <a href="https://systembydave.com/">System by Dave</a>
@@ -107,6 +107,7 @@
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
   <span class="sbd-site-return__current" aria-current="page">Frame sync</span>
 </nav>
+<h1 class="visually-hidden">Why your screen is late: an interactive frame sync demo</h1>
 <div id="fit" tabindex="-1">
   <div id="brand"><i style="background:#C0C000"></i><i style="background:#00C0C0"></i><i style="background:#3DDC97"></i><i style="background:#C000C0"></i><i style="background:#FF3B2F"></i><i style="background:#5AC8FA"></i>&nbsp;AV BY DAVE · 008</div>
 
@@ -138,7 +139,7 @@
       <div class="r"><div id="ratebox">CAMERA SPEED <input id="rate" type="range" min="-8" max="8" step="1" value="6"><span id="rateV">+6%</span></div><button id="bReset" style="flex:0 0 200px">RESTART</button></div>
     </div>
   </div>
-  <div id="cta">Fixed. Now break it yourself → link in bio</div>
+  <div id="cta" data-reel-text="Fixed. Now break it yourself → link in bio">Fixed. Now break it yourself.</div>
   <div id="receipt">✓ AJA FS4 MANUAL v3.1 · FRAME DELAY · ABOUT 4 FRAMES IN HD MODES</div>
 </div>
 
@@ -148,6 +149,10 @@
   // ---------- fit 1080x1920 to the viewport ----------
   const fit = document.getElementById('fit');
   if (/[?&](drive|auto)(=|&|$)/.test(location.search)) document.body.classList.add('capture');
+  // "Link in bio" only makes sense inside the Reel; capture mode (?drive / ?auto) keeps it so
+  // rendered frames are unchanged, and the website says "try it yourself" instead.
+  const inReel = document.body.classList.contains('capture');
+  if (inReel) document.getElementById('cta').textContent = document.getElementById('cta').dataset.reelText;
   const resize = () => { if (window.sbdLayout) return window.sbdLayout(); const s = Math.min(innerWidth/1080, innerHeight/1920); fit.style.transform = `translate(-50%,-50%) scale(${s})`; };
   addEventListener('resize', resize); resize();
 
@@ -316,7 +321,7 @@
     { text: '"ONE FRAME OF DELAY" IS A <em>MYTH.</em>', sub: 'One well-known box lists about four frames in HD. Yours is whatever you measure. Measure it. Write it on the rack.',
       enter() { gsap.to('#receipt', { opacity: 1, duration: 0.5 * D }); } },
   ];
-  const endCard = { text: 'PLAY WITH IT. <em>LINK IN BIO.</em>', sub: 'Drag the camera speed. Pull the waiting room out. Watch what happens.', enter() {} };
+  const endCard = { text: inReel ? 'PLAY WITH IT. <em>LINK IN BIO.</em>' : 'PLAY WITH IT. <em>TRY IT YOURSELF.</em>', sub: 'Drag the camera speed. Pull the waiting room out. Watch what happens.', enter() {} };
   let si = -1;
   let cutLabel = null; // in auto mode: i => label
   const track = (name, data) => { if (window.sbdTrack && !cutLabel) window.sbdTrack(name, Object.assign({ demo: document.body.dataset.demo }, data || {})); };

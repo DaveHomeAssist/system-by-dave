@@ -121,6 +121,26 @@
 - Add a focused native/masked API regression to the existing workspace probe. Chromium and WebKit cover both helpers, paging/value preservation and the current standalone/shared-console consumers. Preserve physical older-device and minimum-OS policy gaps; no global polyfill or saved-data change.
 - Regenerate embedded workspace runtimes and the native suite bundle, and advance the existing offline cache generation and Stage 3D readiness pin together. Preserve CSS, calculation engines, routes, schemas, keys and original imports.
 
+## 2026-10-20 — Reels-safe capture layout for the demos
+
+- `demos/demo-shell.js`: capture-only `?reels` layout (needs `?drive` or `?auto`, so visitors never see it) that fits the stage's content box into Instagram's Reels safe area (x 60–972, y 252–1500 of 1080×1920). `demos/frame-sync.html` declares its content box (`data-capture-box`). The reel renderer uses it; a glyph-level check of every cut finds no text under the top bar, the caption band or the right-hand buttons. On-screen copy, including "link in bio", is unchanged. `probe:demos-viewport` checks that `?reels` alone changes nothing. Posting checklist: drag the profile-grid crop to the top.
+
+## 2026-10-20 — Demos fit phone widths
+
+- The demo pages (`demos/frame-sync.html`, `demos/fault-finding.html`) laid out 446–539 px wide on 360–430 px phones: the page zoomed out and the stage, breadcrumb and completion panel ran past the screen edge. Cause: the 1080 px stage rendered unscaled until `demo-shell.js` ran, so mobile browsers zoomed the page out at load (1275 px with JavaScript off), and `layout()` then sized the stage from `innerWidth`/`innerHeight`, which report the zoomed-out visual viewport, so it stayed too wide. The stage now starts scaled down in `demos/demo-shell.css`, and `layout()` uses the layout viewport (`documentElement.clientWidth/Height`). New local probe `npm run probe:demos-viewport` (320, 360, 390, 430 px under mobile emulation: width equals the viewport, no horizontal scroll, nothing crossing an edge or clipped).
+
+## 2026-10-20 — beehiiv subscribe link and Stripe checkout prep (AV by Dave)
+
+- Demos: `demos/demo-shell.js` gains a hosted-subscribe-link mode. When `emailSubscribeUrl` in `demos/config.js` is an https `beehiiv.com` link, the post-completion ask becomes a "Send me the next demo" button to beehiiv's subscribe page (new tab, `rel="noopener"`, the visitor's UTM tags or demo defaults). It ships as a marked `[DAVE: …]` placeholder, so the ask is unchanged until Dave fills it in. No CSP change. New local probe `npm run probe:demo-subscribe`.
+- Field Kit: Stripe Payment Links chosen. `js/sbd-launch-config.js` ships `provider: 'stripe'` with `[DAVE: …]` Payment Link and price placeholders; checkout now also stays closed until the price is real. New noindex buyers-only download page `field-kit/thanks/` for Stripe's after-payment redirect (the file link lives only in that Stripe setting; known file hosts only, no referrer, query stripped). Delivery, statement-descriptor, refund and licence wording is DRAFT for Dave. The indexing policy now expects 189 unlisted routes.
+- Privacy policy: AV by Dave email list (beehiiv) and Field Kit purchases (Stripe) sections.
+
+## 2026-10-18 — Field Kit draft and launch drafts (AV by Dave)
+
+- The frame sync demo's single home is `demos/frame-sync.html` (2026-10-20 entry), published at `https://avbydave.com/demos/frame-sync.html`. This branch's earlier duplicate `frame-sync/` page, its `js/sbd-signup.js` signup, its sitemap and domain-site entries and its reel capture script were removed before merge. `frame-sync/` was never on `main` or live, so no redirect. The Field Kit page, the launch docs, the reel copy and UTM links point at the demos page.
+- Add `js/sbd-events.js`, a no-op launch event dispatcher. Analytics stays off by decision: no provider and no third-party script, so the privacy policy's no-analytics statement stays true (`docs/launch/analytics.md`).
+- Add `field-kit/`, a noindex, unlinked Sync & Signal Field Kit draft page: price TBD, blurred preview images of the kit pages (the paid files stay out of the repository), and delivery/refund/licence placeholders marked for Dave. One `fieldKit.checkout` value turns on Gumroad, Lemon Squeezy or Stripe Payment Links (link or overlay, `js/sbd-checkout.js`, provider hosts only). Checkout stays disabled until that value is valid and every placeholder is replaced (`docs/launch/checkout.md`). The indexing verifier now expects 188 routes outside the sitemaps.
+- Add local-only `scripts/launch/mix_reel_music.sh` (music under the reel cuts at −14 LUFS with fades; synthesized placeholder bed only) and `scripts/launch/probe_field_kit.mjs` (Field Kit page and checkout interlock against local mocks). Email capture setup for the demos is in `docs/launch/email.md`, with `docs/launch/privacy-email-section.md` as the policy section to apply first (not applied). Reel copy and a posting-day checklist in `docs/launch/`, ready for review; nothing posted.
 
 ## 2026-10-18 — Stream and Record independent preparation
 
