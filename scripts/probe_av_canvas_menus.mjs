@@ -32,6 +32,7 @@ try {
  for(const [width,height] of [[1440,900],[1051,881],[680,700],[375,812],[844,390],[320,256],[3840,1080]]){
   await page.setViewportSize({width,height});
   await page.locator(`.console-shell.mode-${width < 720 ? "phone" : width < 1100 ? "tablet" : "desktop"}`).waitFor();
+  if (width >= 720 && height <= 500) assert.ok(await page.locator('.suite-header h1').evaluate(title => { const box = title.getBoundingClientRect(); return document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2) === title; }), 'Active app title remains visible in the short control row');
   await suiteTopic(page,'Appearance');
   const d=await page.locator('dialog[open]').boundingBox(); assert.ok(d.x>=0&&d.y>=0&&d.x+d.width<=width+1&&d.y+d.height<=height+1,JSON.stringify(d));
   const targets = await page.locator('dialog[open] button:visible').evaluateAll(buttons => buttons.map(button => { const box = button.getBoundingClientRect(); return { width: box.width, height: box.height }; }));

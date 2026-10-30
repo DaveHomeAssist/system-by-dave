@@ -121,9 +121,10 @@ html[data-av-focus="true"] .suite-actions>button[aria-haspopup="dialog"]{display
   .suite-app .console-tools>button:after{content:'+';font-size:20px}
   .suite-app .console-grid{padding:2px}
   .suite-app .flow-compact-tools{top:0;left:0}
+  .suite-app .flow-empty{display:none}
 }
 
 @media(min-width:720px) and (max-width:1099px) and (max-height:500px){
-  .suite-header .suite-identity{left:12px;top:0;width:160px;height:44px;margin:0;overflow:hidden;clip-path:none}
+  .suite-header .suite-identity{left:12px;top:0;width:160px;height:44px;margin:0;overflow:hidden;clip-path:none;z-index:20}
   .suite-app .console-strip{padding-left:180px}
 }
