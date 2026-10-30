@@ -1,92 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="robots" content="noindex,follow" />
-<title>MarsScape has moved — mixmash.games</title>
-<link rel="canonical" href="https://mixmash.games/mars/" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-<style>
-  :root{--rust:#c0623a;--rust-deep:#8f3f22;--ink:#1c1917;--panel:#2a231e;--line:#463a31;--sand:#e8dece;--sand-dim:#b9ac9b;--parch:#f2ede6;--cyan:#4db8d4;--green:#78b25b}
-  *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
-    font-family:"DM Sans",system-ui,sans-serif;color:var(--sand);
-    background:radial-gradient(1200px 600px at 70% -10%, #3a1c12 0%, transparent 60%), var(--ink)}
-  .card{max-width:560px;width:100%;background:linear-gradient(180deg,#2c231d,#221a15);
-    border:1px solid var(--rust-deep);border-radius:16px;padding:28px 26px;box-shadow:0 30px 80px rgba(0,0,0,.7)}
-  .kick{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:2px;color:var(--cyan);text-transform:uppercase}
-  h1{font-family:"Syne",sans-serif;font-weight:800;font-size:28px;color:var(--parch);margin:8px 0 6px}
-  h1 span{color:var(--rust)}
-  p{font-size:14px;color:var(--sand-dim);line-height:1.6}
-  ol{font-size:14px;color:var(--sand);line-height:1.9;padding-left:20px}
-  textarea{width:100%;height:88px;background:#1a1512;border:1px solid var(--line);border-radius:9px;
-    color:var(--sand);font-family:"DM Mono",monospace;font-size:11px;padding:10px;resize:none}
-  .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-  button,.go{flex:1;min-width:150px;padding:12px 16px;border-radius:9px;border:1px solid var(--rust-deep);
-    background:linear-gradient(180deg,var(--rust),var(--rust-deep));color:var(--parch);cursor:pointer;
-    font-family:"DM Mono",monospace;font-size:13px;letter-spacing:.4px;text-align:center;text-decoration:none}
-  button:hover,.go:hover{filter:brightness(1.1)}
-  button.ghost{background:transparent;color:var(--cyan);border-color:#2b7f96}
-  .ok{color:var(--green);font-family:"DM Mono",monospace;font-size:12px;margin-top:8px;display:none}
-  .count{color:var(--sand-dim);font-family:"DM Mono",monospace;font-size:12px;margin-top:14px}
-</style>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'sha256-fO+mel0yqIGnFpse9iwv/chCW4i9AoXFcVhD5DYtD5U='; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#f4f6f8">
+<title>MarsScape has moved | MixMash</title>
+<meta name="description" content="Take your existing MarsScape save to the game's current home at MixMash.">
+<link rel="canonical" href="https://mixmash.games/mars/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MixMash">
+<meta property="og:title" content="MarsScape has moved | MixMash">
+<meta property="og:description" content="Copy your existing local save before opening the current MarsScape game.">
+<meta property="og:url" content="https://mixmash.games/mars/">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MarsScape has moved | MixMash">
+<meta name="twitter:description" content="Copy your existing local save before opening the current MarsScape game.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="stylesheet" href="../css/sbd-public-nav.css">
+<style>
+:root { --move-bg: #f4f6f8; --move-ink: #18212c; --move-surface: #fff; --move-line: #667687; --move-accent: #175b92; color-scheme: light; }
+:root[data-theme="dark"] { --move-bg: #0a0d14; --move-ink: #f3f4f7; --move-surface: #141926; --move-line: #b3bdca; --move-accent: #8bc8ff; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; height: 100dvh; width: 100%; overflow: clip; }
+body { display: grid; grid-template-rows: auto auto minmax(0,1fr); background: var(--move-bg); color: var(--move-ink); font: 16px/1.45 system-ui,sans-serif; }
+[hidden] { display: none !important; }
+.sbd-site-header__inner, .tabs, .actions { display: flex; align-items: center; gap: 8px; }
+.sbd-site-header__inner { padding: 4px 12px; border-bottom: 1px solid var(--move-line); }
+a, button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: 6px 12px; color: var(--move-accent); }
+button { border: 1px solid var(--move-line); border-radius: 8px; background: var(--move-surface); font: inherit; cursor: pointer; }
+button:disabled { cursor: default; opacity: .65; }
+.public-theme-toggle { margin-left: auto; }
+.tabs { padding: 4px 12px; }
+.tabs button { flex: 1; }
+.tabs [aria-selected="true"] { border: 2px solid var(--move-accent); font-weight: 700; }
+.content { min-height: 0; min-width: 0; padding: 16px; }
+main, [role="tabpanel"] { height: 100%; min-height: 0; min-width: 0; }
+[role="tabpanel"] { display: flex; flex-direction: column; justify-content: center; gap: 12px; max-width: 72ch; margin-inline: auto; }
+h1, h2, p, ol { margin: 0; }
+h1, h2 { font-size: clamp(22px, 3vw, 36px); line-height: 1.3; }
+.actions { flex-wrap: wrap; }
+.actions > * { flex: 1; text-align: center; }
+#panel-save { display: grid; grid-template-rows: auto minmax(44px,1fr) auto; align-content: center; }
+.save-actions { display: flex; align-items: center; gap: 8px; }
+.save-actions button { margin-left: auto; }
+label { font-weight: 700; }
+textarea { width: 100%; height: 100%; min-height: 44px; resize: none; padding: 8px; border: 1px solid var(--move-line); border-radius: 8px; background: var(--move-surface); color: var(--move-ink); font: 13px/1.4 ui-monospace,monospace; }
+#copied { min-height: 1.45em; }
+aside { display: none; }
+:focus-visible { outline: 3px solid var(--move-accent); outline-offset: -3px; }
+.skip { position: fixed; top: -100px; left: 8px; z-index: 10; background: var(--move-bg); }
+.skip:focus { top: 4px; }
+@media(min-width:2400px) { .content { display: grid; grid-template-columns: 2fr 1fr; gap: 48px; padding: 40px; } aside { display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 24px; border-left: 1px solid var(--move-line); } }
+@media(max-width:680px) { body { grid-template-rows: auto minmax(0,1fr) auto; } .content { grid-row: 2; padding: 12px; } .tabs { grid-row: 3; padding: 4px; border-top: 1px solid var(--move-line); } .tabs button { padding: 4px; } .sbd-site-header__inner { padding: 2px 4px; gap: 4px; } nav a, nav button { font-size: 13px; padding: 4px 8px; } }
+@media(max-height:400px) { .content { padding: 6px 12px; } [role="tabpanel"] { gap: 4px; font-size: 14px; } h1,h2 { font-size: 22px; } #panel-save { font-size: 13px; } .tabs { padding-block: 2px; } }
+@media print { html,body,main,[role="tabpanel"] { height: auto; overflow: visible; } body, [role="tabpanel"], [role="tabpanel"][hidden] { display: block !important; } header,.tabs,.skip,button,aside { display: none !important; } [role="tabpanel"] { margin-bottom: 24px; } textarea { height: 160px; } }
+</style>
+<script src="../js/public-theme.js" defer></script>
+<script src="../js/marsscape-move.js" defer></script>
 </head>
 <body>
-<div class="card">
-  <div class="kick">MISSION CONTROL · RELOCATION NOTICE</div>
-  <h1>Mars<span>Scape</span> has moved</h1>
-  <p>The colony's new home is <b style="color:var(--parch)">mixmash.games/mars</b> — part of MixMash Studio. This address no longer hosts the game.</p>
-
-  <div id="hasSave" style="display:none">
-    <p><b style="color:var(--parch)">Your colony is safe.</b> Saves live in this browser, so take yours with you:</p>
-    <ol>
-      <li>Copy your save code below</li>
-      <li>Open the new home and press <b>Import</b> (bottom-right)</li>
-      <li>Paste the code — your colony continues exactly where it left off</li>
-    </ol>
-    <textarea id="code" readonly></textarea>
-    <div class="row">
-      <button id="copy" class="ghost">Copy save code</button>
-      <a class="go" href="https://mixmash.games/mars/" rel="noopener noreferrer">Continue to the new home →</a>
-    </div>
-    <div class="ok" id="copied">✓ Copied — paste it with Import at the new home.</div>
-  </div>
-
-  <div id="noSave" style="display:none">
-    <p>No local save detected — sending you straight to the red planet.</p>
-    <div class="row"><a class="go" href="https://mixmash.games/mars/" rel="noopener noreferrer">Go now →</a></div>
-    <div class="count" id="count">Redirecting in 5…</div>
-  </div>
+<a class="skip" href="#move-main">Skip to MarsScape transfer</a>
+<header class="sbd-site-header"><nav class="sbd-site-header__inner" aria-label="Page navigation"><a href="/">Home</a><a href="https://mixmash.games/" rel="noopener noreferrer">Games</a></nav></header>
+<nav class="tabs" role="tablist" aria-label="Move your save">
+<button type="button" id="tab-status" role="tab" aria-controls="panel-status" aria-selected="true" disabled>Status</button>
+<button type="button" id="tab-save" role="tab" aria-controls="panel-save" aria-selected="false" tabindex="-1" disabled>Save code</button>
+<button type="button" id="tab-next" role="tab" aria-controls="panel-next" aria-selected="false" tabindex="-1" disabled>New home</button>
+</nav>
+<div class="content">
+<main id="move-main" tabindex="-1">
+<section id="panel-status" role="tabpanel" aria-labelledby="tab-status">
+<h1>MarsScape has moved</h1>
+<p id="save-status" role="status">Enable JavaScript to read this browser's save before leaving.</p>
+<div class="actions"><button type="button" id="show-save" hidden>Open save code</button><a href="https://mixmash.games/mars/" rel="noopener noreferrer">Open game</a><button type="button" id="cancel-redirect" hidden>Stay here (5)</button></div>
+</section>
+<section id="panel-save" role="tabpanel" aria-labelledby="tab-save" hidden>
+<div class="save-actions"><label for="code">Your save code</label><button type="button" id="copy" disabled>Copy save code</button></div>
+<textarea id="code" readonly aria-describedby="copied" spellcheck="false"></textarea>
+<p id="copied" role="status">Your original save stays in this browser.</p>
+</section>
+<section id="panel-next" role="tabpanel" aria-labelledby="tab-next" hidden>
+<ol><li>Copy the code here.</li><li>Open the game. Choose Import Save.</li><li>Paste the code and review.</li></ol>
+<a href="https://mixmash.games/mars/" rel="noopener noreferrer">Open MarsScape</a>
+</section>
+</main>
+<aside aria-label="Transfer details"><h2>Keep the original</h2><p>This page only reads the existing marsscape_v1 save. It does not erase or replace it.</p><p>Copy the complete code, then use Import Save at the new home. Import acceptance is checked by the game.</p></aside>
 </div>
-<script>
-(function(){
-  var raw=null;
-  try{ raw=localStorage.getItem("marsscape_v1"); }catch(e){}
-  if(raw){
-    document.getElementById("hasSave").style.display="block";
-    var code=btoa(unescape(encodeURIComponent(raw)));
-    document.getElementById("code").value=code;
-    document.getElementById("copy").addEventListener("click",function(){
-      var t=document.getElementById("code");
-      t.select(); t.setSelectionRange(0, 999999);
-      var done=function(){ document.getElementById("copied").style.display="block"; };
-      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(code).then(done, done); }
-      else { try{ document.execCommand("copy"); }catch(e){} done(); }
-    });
-  } else {
-    document.getElementById("noSave").style.display="block";
-    var n=5, el=document.getElementById("count");
-    var iv=setInterval(function(){
-      n--; el.textContent="Redirecting in "+n+"…";
-      if(n<=0){ clearInterval(iv); location.href="https://mixmash.games/mars/"; }
-    },1000);
-  }
-})();
-</script>
-<script src="../js/sbd-public-nav.js" defer></script>
 </body>
 </html>
