@@ -5,6 +5,7 @@ import { readFile, stat, mkdir } from 'node:fs/promises';
 import { extname, join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { build } from 'esbuild';
 
 /* AV Suite shell (docs/av-suite-shell.md): one console at /av/. Every Rail
    identity recalls its views in place, standalone tools are not panel choices,
@@ -61,7 +62,82 @@ async function assertNoOverflow(width, height, label) {
   assert(await page.locator('.console-quick button').evaluateAll(buttons => buttons.every(button => button.scrollWidth <= button.clientWidth + 1)), `Panel names must fit their buttons at ${width}x${height}`);
 }
 
+async function verifyRenderRecovery() {
+  // Bundle the real boundary with a deliberately failing child. Only this isolated
+  // context intercepts the application entry; production has no failure switch.
+  const fixture = await build({
+    stdin: { contents: `
+      import React, { useState } from 'react';
+      import { createRoot } from 'react-dom/client';
+      import { RenderRecovery } from './apps/av-suite/src/RenderRecovery';
+      function BrokenPanel() { throw new Error('Intentional render recovery probe'); }
+      function Fixture() {
+        const [failed, fail] = useState(false);
+        return <RenderRecovery>{failed ? <BrokenPanel /> : <button onClick={() => fail(true)}>Throw render error</button>}</RenderRecovery>;
+      }
+      createRoot(document.getElementById('root')).render(<React.StrictMode><Fixture /></React.StrictMode>);
+    `, resolveDir: ROOT, loader: 'tsx' },
+    bundle: true, write: false, format: 'esm', jsx: 'automatic',
+    define: { 'process.env.NODE_ENV': '"production"' }
+  });
+  const recoveryContext = await browser.newContext({ serviceWorkers: 'block' });
+  await recoveryContext.route('**/av/assets/av-suite.js', route => route.fulfill({ contentType: 'text/javascript', body: fixture.outputFiles[0].text }));
+  const recoveryPage = await recoveryContext.newPage();
+  const unexpected = [];
+  recoveryPage.on('pageerror', error => { if (!error.message.includes('Intentional render recovery probe')) unexpected.push(error.message); });
+  let navigations = 0;
+  recoveryPage.on('framenavigated', frame => { if (frame === recoveryPage.mainFrame()) navigations++; });
+  try {
+    await recoveryPage.goto(`${BASE}/av/?recovery-probe=1`);
+    await recoveryPage.getByRole('button', { name: 'Throw render error' }).waitFor();
+    await recoveryPage.evaluate(() => {
+      localStorage.setItem('avCalculator.v1', '{"probe":"saved plan"}');
+      localStorage.setItem('sbd.avSuite.workspace.v1', '{"probe":"saved workspace"}');
+    });
+    const saved = await recoveryPage.evaluate(() => JSON.stringify(Object.entries(localStorage).sort()));
+    const initialUrl = recoveryPage.url();
+    const beforeFailure = navigations;
+    await recoveryPage.getByRole('button', { name: 'Throw render error' }).click();
+    await recoveryPage.getByRole('heading', { name: 'The console could not display this workspace' }).waitFor();
+    assert.equal(await recoveryPage.locator('main').evaluate(el => el === document.activeElement), true, 'recovery receives focus');
+    assert.match(await recoveryPage.getByRole('alert').textContent(), /does not clear your saved plans/);
+    await recoveryPage.keyboard.press('Tab');
+    assert.equal(await recoveryPage.getByRole('button', { name: 'Reload console', exact: true }).evaluate(el => el === document.activeElement), true, 'reload is first recovery action');
+    assert.notEqual(await recoveryPage.getByRole('button', { name: 'Reload console', exact: true }).evaluate(el => getComputedStyle(el).outlineStyle), 'none', 'keyboard focus stays visible');
+    for (const theme of ['light', 'dark', 'white', 'black', 'system']) {
+      await recoveryPage.evaluate(value => document.documentElement.dataset.avTheme = value, theme);
+      for (const [width, height] of [[375, 812], [680, 900], [1440, 900], [3840, 1080]]) {
+        await recoveryPage.setViewportSize({ width, height });
+        const metrics = await recoveryPage.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, sh: document.documentElement.scrollHeight, ch: document.documentElement.clientHeight }));
+        assert.ok(metrics.sw <= metrics.cw && metrics.sh <= metrics.ch, `recovery fits ${theme} ${width}x${height}`);
+        const reload = recoveryPage.getByRole('button', { name: 'Reload console', exact: true });
+        const box = await reload.boundingBox();
+        assert.ok(box.height >= 44 && box.x >= 0 && box.x + box.width <= width, 'recovery action remains reachable');
+        if (process.env.AV_SUITE_EVIDENCE && ['light', 'dark'].includes(theme) && [375, 1440, 3840].includes(width)) {
+          await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });
+          await recoveryPage.screenshot({ path: join(process.env.AV_SUITE_EVIDENCE, `recovery-${theme}-${width}.png`) });
+        }
+      }
+    }
+    await recoveryPage.evaluate(() => document.documentElement.dataset.avTheme = 'dark');
+    await recoveryPage.getByRole('button', { name: 'Switch light or dark theme' }).click();
+    assert.equal(await recoveryPage.locator('html').getAttribute('data-av-theme'), 'light');
+    await recoveryPage.getByRole('button', { name: 'Switch light or dark theme' }).click();
+    assert.equal(await recoveryPage.locator('html').getAttribute('data-av-theme'), 'dark');
+    assert.equal(await recoveryPage.evaluate(() => JSON.stringify(Object.entries(localStorage).sort())), saved, 'recovery and temporary theme change preserve every saved byte');
+    assert.equal(navigations, beforeFailure, 'failure and fallback controls never navigate or automatically reload');
+    assert.equal(recoveryPage.url(), initialUrl, 'recovery preserves the route');
+    await recoveryPage.getByRole('button', { name: 'Reload console', exact: true }).click();
+    await recoveryPage.getByRole('button', { name: 'Throw render error' }).waitFor();
+    assert.equal(navigations, beforeFailure + 1, 'manual reload navigates exactly once');
+    assert.equal(await recoveryPage.evaluate(() => JSON.stringify(Object.entries(localStorage).sort())), saved, 'manual reload preserves saved data');
+    assert.deepEqual(unexpected, []);
+    console.log('Render recovery passed: real boundary child throw, accessible focus, five themes, phone through 32:9, saved bytes preserved, manual reload and no automatic retry.');
+  } finally { await recoveryContext.close(); }
+}
+
 try {
+  await verifyRenderRecovery();
   await page.goto(url);
   await heading().waitFor();
   // The console opens on an empty Workspace: no application, no panels, one Add panel.

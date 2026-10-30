@@ -218,7 +218,7 @@
       "type": "logic",
       "sev": "P1",
       "title": "A render error blanks the whole AV console",
-      "detail": "No AV app on avbydave.com has a React error boundary (av-suite, av-audio, av-calculator, av-lighting, av-video, equipment-lab, front-office, infrastructure, show-control, show-ops, the-shop). Each mounts with React 18 createRoot and no fallback, and no page installs a window error or unhandledrejection handler. A render error in any one panel unmounts the whole console and leaves a blank page; the error appears only in that device's developer console. Only apps/fmp-camera-sim (housevideo.app) has a boundary. Containment does not depend on DIAG-1; what the recovery panel offers does.",
+      "detail": "The AV Suite root now has a local render error boundary with a focused recovery screen and explicit manual reload. It preserves saved data and offers a temporary light or dark switch without diagnostic capture or reporting. Candidate verification and delivery are tracked with the pull request. Standalone roots remain uncovered (av-audio, av-calculator, av-lighting, av-video, equipment-lab, front-office, infrastructure, show-control, show-ops, the-shop), so AVC-15 remains open. Those standalone roots mount with React 18 createRoot and no fallback, and no page installs a window error or unhandledrejection handler. A render error in those standalone apps can still leave a blank page; the error appears only in that device's developer console. apps/fmp-camera-sim (housevideo.app) retains its existing boundary. Containment does not depend on DIAG-1; what the recovery panel offers does. October 29 PR376 refresh: main a04c90d integrated; both changelog histories retained. Dominic Node 24.20.0 with Playwright 1.63.0 passed clean install, AV Suite typecheck/build, verify:av and the original browser probe including recovery focus, saved bytes, manual reload and all 66 menu choices. Rebuilt assets match the committed bytes. Tested combined tree 798b916473c7542293fc531c6670354e6ec6473f; this receipt changes only documentation. PR remains draft; CI, deployment and human acceptance are separate.",
       "files": [
         "apps/av-suite/src/main.tsx",
         "apps/equipment-lab/src/main.tsx",
@@ -1697,6 +1697,15 @@
     "sourceBase": "320f4d31e833bb6753c7b7be65d094ccff5171e9",
     "scope": "Seven native LED panels reuse the original calculator engine, viewer and storage. Standalone page remains intact. Legacy slot conversion is display-only.",
     "verification": "Dominic: AV Suite typecheck/build, AV contracts, original72-choice shell probe, native/standalone numerical parity, saved-input reload, preset save, TXT export, legacy layout bytes and phone/desktop/ultrawide root containment pass. Phone profile and 3D preview screenshots inspected. Native viewer loads lazily only for LED; the new chunk is precached. Offline reload into the native pack passes. The standalone cache generation is synchronized.",
-    "limits": "Source candidate only. Merge, deployment, physical output and human acceptance excluded."
+    "limits": "Source candidate only. Merge, deployment, physical output and human acceptance excluded.",
+    "stackedOn": "PR376 at265b9c1; candidate includes current render recovery. Combined typecheck/build, real recovery probe,72 menu choices and dedicated native/offline/handoff checks passed on Dominic."
+  },
+  "renderRecoveryRefresh20261030": {
+    "sourceBase": "320f4d31e833bb6753c7b7be65d094ccff5171e9",
+    "priorHead": "33740d7a3aaec5f0dc59372bf5464436aa763e34",
+    "finding": "PR API base metadata retained a04c90d while main had advanced. The old head merges cleanly with that old base; merging actual main reproduces changelog and generated-bundle conflicts.",
+    "resolution": "Preserved both changelog histories, merged current source, regenerated AV Suite assets on Dominic.",
+    "verification": "Dominic: clean npm install, AV Suite typecheck/build, AV contracts, real recovery boundary and full 66-choice browser probe pass; current main short-screen Add checks also pass at nine sizes in both themes.",
+    "limits": "PR376 stays draft. No merge, deployment, diagnostic reporting, hardware or human acceptance."
   }
 }

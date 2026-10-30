@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { RenderRecovery } from "./RenderRecovery";
 import "../../shared/av-console/console.css";
 import "../../av-video/src/styles.css";
 import "../../av-video/src/flow.css";
@@ -14,4 +15,4 @@ import "../../av-lighting/src/styles.css";
 import "../../equipment-lab/src/styles.css";
 import "./shell.css";
 import "virtual:calculator-native.css";
-createRoot(document.getElementById("root")!).render(<React.StrictMode><App /></React.StrictMode>);
+createRoot(document.getElementById("root")!).render(<React.StrictMode><RenderRecovery><App /></RenderRecovery></React.StrictMode>);
