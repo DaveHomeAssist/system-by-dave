@@ -23,6 +23,8 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
+      - name: Verify AOM board policy and operator views
+        run: node scripts/probe_aom_show_board.mjs
       - run: npm run test:public-viewport
       - name: Verify engineering daily journeys
         run: |

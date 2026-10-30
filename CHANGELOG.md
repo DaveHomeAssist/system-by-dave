@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-30
+
+- AOM show board now has an explicit resource policy and bounded Timeline, Live,
+  Turns and Tools views. Preserve the route, saved board key and data, import
+  confirmation and photo transcription request. Add keyboard room/session
+  controls and dialog focus handling. Mocked scan regression makes no inference
+  calls. Source validation and deployment remain separate.
+
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced
