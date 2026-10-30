@@ -1,6 +1,29 @@
 # Changelog
 
+## October 29, 2026: Add panel short screen verification
+
+- Keep the Add panel list usable on short screens when adding into empty space. Phones can use the available viewport height; short screens omit the decorative placement map.
+- Preserve the compact topic menus and native modal from PR #388, restore group and panel focus transitions, and wrap Tab in the modal. Add browser regression coverage for all five Front Office choices, Enter, Space, Tab, Back, Escape, focus return and final-choice placement at nine viewport sizes in light and dark themes. Saved views and application storage contracts are unchanged.
+
+## 2026-10-29: Two-step Add panel menu
+
+- Open the Add panel chooser on search and the group tiles only. Picking a tile replaces the tiles with that group's panels, a Back button and the placement preview; Back or Escape returns to the tiles with focus on the tile just left. The active application's tile is marked.
+- Let the chooser use the height below where it opened and scroll only its panel list, so every panel in a group stays reachable (Front Office now shows all five, not two).
+- The retained family hosts share the engine, so they get the same two steps over their Common, Planning and Utilities categories; category tiles that hold no panels are dropped.
+- Rebuild the AV Suite, AV Calculator and Equipment Lab bundles and bump the AV offline cache generation to `v20261029-two-step-panel-chooser`. Panel types, views, layouts and saved documents are unchanged.
+
+## 2026-10-29: AV workspace topic menus
+
+- Reclaim workspace space with compact console controls and topic submenus with Back, Close and Escape.
+- Put project, appearance, status, views, panel recall and layout controls in focused menu pages.
+- Make the shared panel chooser enter an application submenu and keep phone panel shortcuts available.
+- Move Video diagram controls into topic menus and hide React Flow attribution through its supported option.
+
 ## October 29, 2026
+
+- Add Video Engineering Daily Edition 022, Fiber mode and wavelength, with
+  its sourced diagram and verified SVG and PNG story card. Daily releases use
+  the existing reviewed export and Pages verification path.
 
 - Redirect the eight original AV family routes into the shared console with
   their native pack selected. Preserve the five shared show-context fields,
@@ -8,6 +31,8 @@
 - Retarget public family probes to `/av/?app=<pack>`. Keep detailed previous
   host regressions on ignored build fixtures and exclude those fixtures from
   publication. Add root-console and 42-route browser checks.
+- Honor the configured Chrome browser in the retained Audio flow probe so
+  publication does not require a separate downloaded headless browser.
 
 ## 2026-10-28: Engineering daily archive
 

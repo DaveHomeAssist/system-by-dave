@@ -9,6 +9,8 @@ on:
       - 'scripts/*equipment_lab*'
       - 'av/**'
       - 'scripts/probe_av_suite_shell.mjs'
+      - 'scripts/probe_av_canvas_menus.mjs'
+      - 'scripts/av-menu-journey.mjs'
       - 'scripts/av-family-probe.mjs'
       - 'scripts/probe_av_retained.mjs'
       - 'scripts/probe_av_routes.mjs'
@@ -92,6 +94,7 @@ jobs:
           test -z "$(git status --porcelain -- av)"
           npx playwright install --with-deps chromium
           npm run test:av-suite-browser
+          npm run test:av-canvas-menus-browser
           npm run test:av-audio-flow-browser
       - name: Audio shared-console consumer matches its source
         run: |

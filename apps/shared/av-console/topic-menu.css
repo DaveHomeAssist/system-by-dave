@@ -1,0 +1,14 @@
+.topic-menu{position:fixed;inset:0;margin:auto;width:min(420px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);padding:0;border:1px solid var(--av-line-strong);border-radius:12px;background:var(--av-surface);color:var(--av-text);box-shadow:0 20px 80px #0005}
+.topic-menu::backdrop{background:#0006}
+.topic-menu-page{display:flex;flex-direction:column;max-height:calc(100dvh - 26px)}
+.topic-menu-page>header{display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--av-line);flex-shrink:0}
+.topic-menu-page>header h2{flex:1;margin:0;font-size:16px;min-width:0}
+.topic-menu button{min-width:44px;min-height:44px;white-space:normal}
+.topic-menu-content{display:flex;flex-direction:column;gap:8px;padding:12px;overflow:auto;min-height:0}
+.topic-menu-topic{display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;padding:12px}
+.topic-menu-topic span:first-child{display:flex;flex-direction:column;gap:4px}
+.topic-menu-topic small{font-size:12px;color:var(--av-muted);font-weight:400}
+.topic-menu-content label{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.topic-menu-content label select{width:auto;min-width:120px}
+.topic-menu-content .history-actions{display:flex;gap:8px}
+.topic-menu :focus-visible{outline:2px solid var(--av-accent);outline-offset:2px}

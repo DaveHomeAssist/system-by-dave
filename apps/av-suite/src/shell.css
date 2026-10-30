@@ -21,9 +21,10 @@
 .suite-app .workspace-host{flex:1;min-height:0;display:flex;flex-direction:column}
 .av-video-shell__workspace>#root{height:100%;min-height:0}
 .suite-app .console-views{flex:1}
-/* Match the chooser's 420px placement bound so its last choice stays reachable. */
-.suite-app .console-chooser{max-height:min(420px,calc(100dvh - 16px))}
+/* The chooser's height comes from where it opened (console.css); only its
+   panel list shrinks, so the last choice stays reachable inside that list. */
 .suite-app .console-chooser>*{flex-shrink:0}
+.suite-app .console-chooser .console-choices{flex-shrink:1}
 .suite-app .console-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
 .suite-app .console-groups button{min-width:0;padding:8px 4px}
 .suite-app .message{flex-shrink:0}
@@ -40,10 +41,7 @@ html[data-av-focus="true"] .suite-header{min-height:44px;padding:0 10px;gap:8px}
 html[data-av-focus="true"] .suite-mark,
 html[data-av-focus="true"] .suite-plan,
 html[data-av-focus="true"] .suite-context,
-html[data-av-focus="true"] .suite-bar,
-html[data-av-focus="true"] .suite-actions .theme-label,
-html[data-av-focus="true"] .suite-actions .follow-system,
-html[data-av-focus="true"] .suite-actions>button:not(.primary):not(.focus-toggle){display:none}
+html[data-av-focus="true"] .suite-bar{display:none}
 html[data-av-focus="true"] .focus-toggle span{display:none}
 @media(min-width:1440px){
   html[data-av-focus="true"] .sbd-rail{width:56px;min-width:56px;padding-inline:6px}
@@ -77,6 +75,63 @@ html[data-av-focus="true"] .focus-toggle span{display:none}
 .suite-gear-panel>p{margin:0;padding:8px;font-size:12px}
 /* Host --ink is the on-accent colour; the gear feedback overlay needs body text. */
 .suite-gear-panel .gear-panel-feedback{color:var(--text)}
+
+/* Workspace first: only identity and entry points stay above the canvas. */
+.suite-header{padding:0 12px;min-height:48px;gap:8px}
+.suite-mark{width:28px;height:28px}
+.suite-identity{gap:8px}
+.suite-identity h1{font-size:16px;margin:0}
+.suite-plan{max-width:55vw}
+.suite-context{display:none}
+.suite-actions .topic-menu .theme-label{display:flex}
+.suite-actions .topic-menu .follow-system{display:flex}
+.suite-actions .topic-menu .focus-toggle{display:flex}
+.suite-app .console-strip{flex-wrap:nowrap;padding:0 8px;gap:4px;min-height:48px}
+.topic-menu .console-views,.topic-menu .console-quick{display:flex;flex-direction:column;align-items:stretch;flex-basis:auto;margin:0;border:0;gap:4px}
+.suite-app .console-bar{min-height:44px;padding:0 4px 0 10px}
+.suite-app .console-grid{padding:6px;gap:6px}
+.suite-app .console-context{font-size:11px}
+.suite-app .console-groups{display:flex;flex-direction:column}
+.suite-app .console-groups button{text-align:left;padding:10px 12px;min-height:48px}
+.suite-app .flow-workspace{position:relative}
+.flow-compact-tools{position:absolute;top:8px;left:8px;z-index:5}
+.flow-compact-tools>button{background:var(--av-surface);box-shadow:0 2px 8px #0002}
+.topic-menu .flow-route-bar{position:static;display:flex;flex-direction:column;align-items:stretch;padding:0;border:0;max-width:none;height:auto}
+.topic-menu .flow-route-bar label{flex-direction:column;align-items:stretch}
+.topic-menu .flow-route-bar select{width:100%;min-width:0}
+.topic-menu .flow-context{padding:8px 0;white-space:normal}
+.suite-app .flow-empty{padding:16px;top:50%;max-height:calc(100% - 72px)}
+.suite-app .flow-empty-symbol{display:none}
+.suite-app .flow-empty h3{font-size:18px}
+.suite-app .flow-empty p{font-size:12px}
+
+@media(max-width:719px){.suite-header{padding:0 8px}.suite-identity h1{font-size:15px}.suite-app .console-strip{gap:2px;padding:0 4px}.suite-app .console-tools>button{padding:0 8px}.suite-app .console-grid{padding:4px}.suite-app .console-quick{min-height:44px}.suite-app .console-context{display:none}}
+html[data-av-focus="true"] .suite-actions>button[aria-haspopup="dialog"]{display:inline-flex}
+.topic-menu .console-views button,.topic-menu .console-quick button{flex:0 0 auto;text-align:left}
+.console-compact>.console-strip>button[aria-haspopup="dialog"]{max-width:45vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.suite-app .flow-empty>button:not(.primary){display:none}
+
+/* Short screens share one control row so the panel still has a usable body. */
+@media(max-width:1099px) and (max-height:500px){
+  html .suite-app .suite-header{position:relative;height:0;min-height:0;flex:0 0 0;padding:0;border:0}
+  .suite-header .suite-identity{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%)}
+  .suite-header .suite-actions{position:absolute;top:0;right:4px;z-index:20}
+  .suite-app .console-strip{min-height:44px;padding:0 96px 0 4px}
+  .suite-app .console-tools>button{width:44px;min-width:44px;padding:0;font-size:0}
+  .suite-app .console-tools>button:after{content:'+';font-size:20px}
+  .suite-app .console-grid{padding:2px}
+  .suite-app .flow-compact-tools{top:0;left:0}
+  .suite-app .flow-empty{display:none}
+}
+
+@media(min-width:720px) and (max-width:1099px) and (max-height:500px){
+  .suite-header .suite-identity{left:12px;top:0;width:160px;height:44px;margin:0;overflow:hidden;clip-path:none;z-index:20}
+  .suite-app .console-strip{padding-left:180px}
+}
+
+/* Keep the long group list within the chooser, with Close always available. */
+.suite-app .console-chooser .console-groups{min-height:0;overflow:auto;flex-shrink:1}
 
 /* Public breadcrumb row: breadcrumb on the left, demos and Field Kit links on the right (AUD-003). */
 .shell-crumbs{display:flex;align-items:center;gap:inherit;min-width:0}
