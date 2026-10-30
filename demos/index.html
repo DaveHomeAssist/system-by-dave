@@ -52,7 +52,7 @@
 
   html[data-theme="light"] {--g:#eeeeee;--p:#fafafa;--p2:#c7c7c7;--ink:#222222;--ink2:#585858;--mute:#656565;--orange:#725b30;--cyan:#345a85;--yellow:#345a85;--reader-bg:#eeeeee;--reader-surface:#fafafa;--reader-ink:#222222;--reader-muted:#585858;--reader-line:#c7c7c7;--reader-accent:#345a85}
   html[data-theme="dark"] {--g:#111111;--p:#191919;--p2:#3c3c3c;--ink:#eeeeee;--ink2:#b6b6b6;--mute:#a0a0a0;--orange:#d0c0a0;--cyan:#a8bed9;--yellow:#a8bed9;--reader-bg:#111111;--reader-surface:#191919;--reader-ink:#eeeeee;--reader-muted:#b6b6b6;--reader-line:#3c3c3c;--reader-accent:#a8bed9}
-  .public-shell .site-header>.inner {display:flex;flex-wrap:nowrap;align-items:center;gap:4px;padding:2px 6px;min-height:44px}
+  .public-shell .site-header>.inner {display:flex;flex-wrap:nowrap;align-items:center;gap:4px;padding:2px 6px;min-height:44px;box-sizing:border-box;max-width:100%}
   .public-shell .sbd-site-return {flex:1;min-width:0;background:var(--p);border:0;color:var(--ink2);padding:0;gap:5px;font-size:11px;letter-spacing:0}
   .sbd-site-return a {display:inline-flex;align-items:center;min-width:44px;min-height:44px;padding:2px;color:var(--ink)}
   .public-shell #demoTheme {min-width:60px;min-height:44px;padding:4px;font:600 12px Barlow,system-ui,sans-serif}
@@ -70,7 +70,7 @@
 <header class="site-header"><div class="inner"><nav class="sbd-site-return" aria-label="Breadcrumb">
   <a href="https://systembydave.com/">System by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
-  <a href="/av/">AV by Dave</a>
+  <a href="https://avbydave.com/">AV by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
   <span class="sbd-site-return__current" aria-current="page">AV by Dave demos</span>
 </nav><button id="demoTheme" class="public-theme-toggle" type="button" hidden>Dark</button></div></header>

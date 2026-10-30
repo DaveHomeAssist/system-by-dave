@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "fe549a22f558f57af70ffae99e26466e009349ca",
+  "head": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
   "status": "amber",
-  "statusReason": "Dave selected and implemented the eight family route redirects on October 29. All eight shared-console family journeys and 42 sheet/family redirects pass on Dominic. PR #379 owns current CI, merge and publication evidence. Specialist, diagnostics and physical acceptance decisions stay open.",
+  "statusReason": "PR #386 is merged and live at source d769f1e. Source and AV destination publications succeeded; independent Chromium/WebKit live Add checks and the full 66-choice shell probe pass on Dominic. PR #388 compact menus are preserved. Physical/operator acceptance and other AV roadmap decisions remain open.",
   "audioSpeakerStatusParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "94b1ce79499de92416a5c30357298d619fb74ecb",
@@ -87,7 +87,7 @@
       "AVV-STREAM-KEY-1 remains unanswered and blocks only its dependent work."
     ]
   },
-  "lastActivity": "2026-10-29",
+  "lastActivity": "2026-10-30",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -1653,5 +1653,43 @@
     "limits": "No saved-key/schema change, first native specialist selection, diagnostics decision or physical/operator acceptance.",
     "sourceRevision": "fe549a22f558f57af70ffae99e26466e009349ca",
     "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/379"
+  },
+  "canvasMenus": {
+    "recordedOn": "2026-10-29",
+    "baseRevision": "2892ae1",
+    "branch": "codex/av-canvas-menus",
+    "request": "Canvas workspace first. Topic selection enters one submenu with Back. Remove React Flow attribution, verify and ship.",
+    "scope": "Compact identity and workspace rows; topic menus for project, appearance, status, views, panels, layout and diagram tools; panel chooser topic drilldown. Existing pack sources, document keys, schemas and saved geometry remain unchanged.",
+    "candidateEvidence": "Dominic: both typechecks, 86 model/layout tests, suite build, eight family edit/isolated Save/export/reload journeys, all 66 shell menu choices, mixed layouts, legacy bytes and four palettes at eight sizes pass. Menu acceptance passes at seven sizes: 1051 by 881 workspace starts at 140px; canvas fills 86 percent of its panel; no attribution; Back, Escape and focus return pass. AV/offline/Rail 28, Throwline 47, domain 12, navigation and consistency checks pass.",
+    "next": "Complete exact-head CI, PR merge, publication and live menu readback. Private board synchronization remains unavailable because its existing file is missing.",
+    "limits": "No physical touch, virtual keyboard, power loss or human acceptance is implied.",
+    "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/388",
+    "publishedConsumers": "Rebuilt the suite, Equipment Lab and AV Calculator from the shared workspace source. Initial PR CI correctly stopped on Equipment Lab artifact parity; synchronized generated consumers are included in the follow-up revision."
+  },
+  "addPanelVerification": {
+    "recordedOn": "2026-10-29",
+    "sourceRevision": "bda7cca148addf939fcef68760f4d3c27c01ab13",
+    "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/386",
+    "finding": "Original two-step flow matches the request, but Add into empty space leaves a 4px list at 667x375 because fixed controls and the placement preview consume the phone chooser height. Replacement-only viewport checks miss this path.",
+    "correction": "Allow phone chooser height, omit the decorative preview on short screens, and scroll long group lists. Preserve PR #388 compact topic menus and native modal, restore first-choice/group focus and Escape stepping, mark the actual active application, and explicitly wrap modal Tab navigation. Preserve placement and stored data shapes.",
+    "verification": "Dominic Linux, Playwright 1.63: original and reconciled 66-choice Chromium shell probes pass, including mixed arrangements, isolated saves, legacy view/layout bytes and offline reload. Reconciled PR #388 canvas/menu acceptance passes. Final Add path passes in Chromium and WebKit at nine sizes in light/dark with reduced motion, including five Front Office choices, Enter, Space, forward/reverse Tab, Back, Escape, focus restoration, final-choice placement and root containment. AV verification and three builds pass. The clean follow-up passes 86 Video/shared/shell unit tests, relevant typechecks, 42 route checks and domain staging.",
+    "nextAction": "Dave may perform physical phone/tablet, actual screen reader and operator acceptance. Merge, production publication and automated live verification for PR #386 are complete.",
+    "limits": "Merge and deployment authorized on October 30. Accessibility tree inspection supports button/search/dialog semantics; actual screen reader, physical touch, browser chrome and virtual keyboard acceptance remain unverified.",
+    "integratedMain": "7cd5658a0812cc42cd25d9a2f78f9cbd6cea3928",
+    "retainedFailure": "Mac archive transfer metadata produced 12 synthetic ._ test inputs containing NUL bytes. The 649 sidecars were preserved outside the runner inputs before a clean rerun; tracked source and test assertions were not changed to suppress that failure.",
+    "mergedRevision": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
+    "authorization": "Dave explicitly authorized merge, deployment and live verification on October 30, 2026.",
+    "delivery": "PR #386 merged as d769f1ee88e1ffa3daaee04af13c73a52e4ae24e. Source Pages workflow 41015446539 and AV destination workflow 41017765962 both succeeded. AV destination commit 2ea3cd17cc9292efbc14f1024e309534b0ca79b7 publishes that source revision.",
+    "destinationCommit": "2ea3cd17cc9292efbc14f1024e309534b0ca79b7",
+    "sourceWorkflow": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/41015446539",
+    "destinationWorkflow": "https://github.com/DaveHomeAssist/avbydave/actions/runs/41017765962",
+    "liveVerification": {
+      "checkedAt": "2026-10-30T07:07:40.326Z",
+      "sourceRevision": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
+      "artifactSha256": "7fcb9cbb0f85d5ce3f67e884e1db11cdf3ebc0694cfb1a23d299dc2470ea56ac",
+      "url": "https://avbydave.com/av/",
+      "runner": "Dominic, Linux, Playwright 1.63 Chromium and WebKit",
+      "result": "Live Add flow passes nine sizes in light/dark with reduced motion: all five Front Office choices, group replacement, forward/reverse Tab, Enter, Space, Back, Escape, restored focus, cross-group and empty search, final-choice placement and no page overflow. Focused checks report no console errors or uncaught page errors. Full Chromium shell passes all 66 choices, mixed views/reloads, legacy view/layout bytes, isolated saves and prepared offline use. Source revision and JavaScript/CSS/registry hashes match before and after testing."
+    }
   }
 }

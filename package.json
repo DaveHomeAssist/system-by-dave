@@ -47,6 +47,11 @@
     "verify:public-navigation": "node scripts/verify_public_navigation.js",
     "verify:public-consistency": "node scripts/verify_public_consistency.js",
     "probe:console-guide": "node scripts/probe_console_guide.mjs",
+    "probe:field-kit": "node scripts/launch/probe_field_kit.mjs",
+    "smoke:field-kit-checkout": "node scripts/smoke_field_kit_checkout.mjs",
+    "probe:demo-subscribe": "node scripts/launch/probe_demo_subscribe.mjs",
+    "probe:demos-viewport": "node scripts/launch/probe_demos_viewport.mjs",
+    "mix:frame-sync-reel-music": "bash scripts/launch/mix_reel_music.sh",
     "test:shader-practice": "node --test shader/shading-practice-state.test.js shader/fmp-training.test.js scripts/shader_practice_worker.test.js",
     "probe:shader-practice": "node scripts/probe_shader_practice.js",
     "verify:shader-practice": "node --test shader/shading-practice-state.test.js shader/fmp-training.test.js scripts/shader_practice_worker.test.js && node scripts/verify_shader_practice.js",
@@ -106,7 +111,8 @@
     "test:equipment-lab-browser": "node scripts/probe_equipment_lab.mjs",
     "test:av-routes-browser": "AV_FAMILY_REDIRECTS=1 node scripts/probe_av_routes.mjs",
     "test:av-retained-browser": "node scripts/probe_av_retained.mjs",
-    "test:av-families-browser": "node scripts/av-family-probe.mjs"
+    "test:av-families-browser": "node scripts/av-family-probe.mjs",
+    "test:av-canvas-menus-browser": "node scripts/probe_av_canvas_menus.mjs"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

@@ -101,6 +101,7 @@ try {
   assert.equal(await panel(page, 'crew').count(), 0);
   assert.equal(await read(page, key), saved, 'close is presentation only');
   await page.getByRole('button', { name: '＋ Add panel', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Add panel' }).getByRole('button', { name: 'Common', exact: true }).click();
   await page.getByRole('dialog', { name: 'Add panel' }).getByRole('button', { name: /^Crew/ }).click();
   assert.equal(await panel(page, 'crew').locator('.record').count(), 1, 'reopening retains records');
   await page.getByRole('button', { name: 'Maximize Rooms' }).click();
