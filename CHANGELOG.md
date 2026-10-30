@@ -1,5 +1,11 @@
 # Changelog
 
+## October 30, 2026: Legacy handoff recovery
+
+- Add restrictive content policies and accessible light and dark fallbacks to the Command Center and MarsScape handoffs, preserving their routes and destinations.
+- Keep MarsScape saves read-only with the existing export encoding. Distinguish unavailable storage from an empty save, stop automatic navigation when a save arrives, and retain the last recovery code if storage disappears.
+- Report clipboard rejection and stale copy attempts honestly. Add browser coverage for save preservation, concurrent changes, disabled storage, large and invalid input, keyboard access, printing and short screens.
+
 ## October 30, 2026: PixelForge alias policies
 
 - Add restrictive content policies to twelve legacy PixelForge aliases, replacing inline redirect scripts with a same-origin helper. Preserve every destination and noindex canonical. Give interrupted redirects keyboard-accessible, viewport-contained light and dark fallbacks without loading or changing editor data.

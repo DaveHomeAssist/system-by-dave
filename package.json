@@ -43,6 +43,7 @@
     "verify:noteforge": "node scripts/verify_noteforge_release.js",
     "test:noteforge-shell-browser": "node scripts/probe_noteforge_shell.mjs",
     "verify:portfolio-schemas": "node scripts/verify_portfolio_schemas.js",
+    "test:legacy-handoffs": "node scripts/probe_legacy_handoffs.mjs",
     "test:pixelforge-aliases": "node scripts/probe_pixelforge_aliases.mjs",
     "test:public-viewport": "node scripts/probe_public_viewport.mjs",
     "verify:public-navigation": "node scripts/verify_public_navigation.js",
