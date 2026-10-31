@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "owner": "DaveHomeAssist",
+  "repositories": [
+    {
+      "name": "phillies-wire",
+      "category": "Web/static"
+    },
+    {
+      "name": "system-by-dave",
+      "category": "Web/static"
+    },
+    {
+      "name": "daily-prophet",
+      "category": "Web/static"
+    },
+    {
+      "name": "web-templates",
+      "category": "Web/static"
+    },
+    {
+      "name": "prompt-lab",
+      "category": "AI/automation"
+    },
+    {
+      "name": "notion-banners",
+      "category": "AI/automation"
+    },
+    {
+      "name": "deckforge",
+      "category": "Web/static"
+    },
+    {
+      "name": "festival-atlas",
+      "category": "Planning/tools"
+    },
+    {
+      "name": "stereo-field-compressor",
+      "category": "AV/audio"
+    },
+    {
+      "name": "shieldbox-security-event-quote-request-v4-gold-master.html",
+      "category": "Business/client"
+    },
+    {
+      "name": "PixelForge",
+      "category": "Web/static"
+    },
+    {
+      "name": "garden-os",
+      "category": "Planning/tools"
+    },
+    {
+      "name": "clever-paws",
+      "category": "Web/static"
+    },
+    {
+      "name": "DaveHomeAssist.github.io",
+      "category": "Web/static"
+    },
+    {
+      "name": "mlb-ballparks-quest",
+      "category": "Planning/tools"
+    },
+    {
+      "name": "readout",
+      "category": "Web/static"
+    },
+    {
+      "name": "trailkeeper",
+      "category": "Planning/tools"
+    },
+    {
+      "name": "act-two-catering",
+      "category": "Business/client"
+    },
+    {
+      "name": "gemini-api-cost-calculator",
+      "category": "AI/automation"
+    },
+    {
+      "name": "sap-music",
+      "category": "Business/client"
+    },
+    {
+      "name": "curl-plan",
+      "category": "Planning/tools"
+    },
+    {
+      "name": "metagrid",
+      "category": "Web/static"
+    },
+    {
+      "name": "recipe-tracker",
+      "category": "Planning/tools"
+    },
+    {
+      "name": "DaveLLM",
+      "category": "AI/automation"
+    },
+    {
+      "name": "home-comic-dashboard",
+      "category": "AI/automation"
+    },
+    {
+      "name": "contractor",
+      "category": "Business/client"
+    },
+    {
+      "name": "freelance",
+      "category": "Business/client"
+    },
+    {
+      "name": "freelance-landing",
+      "category": "Business/client"
+    },
+    {
+      "name": "graph-explorer",
+      "category": "Web/static"
+    },
+    {
+      "name": "home-os",
+      "category": "Web/static"
+    },
+    {
+      "name": "nesy",
+      "category": "Web/static"
+    },
+    {
+      "name": "new-land-pages",
+      "category": "AI/automation"
+    },
+    {
+      "name": "NotionWidgets",
+      "category": "AI/automation"
+    },
+    {
+      "name": "quest-platform",
+      "category": "Games/interactive"
+    },
+    {
+      "name": "Utility",
+      "category": "Web/static"
+    },
+    {
+      "name": "VeronicaLucasWedding",
+      "category": "Business/client"
+    },
+    {
+      "name": "skills",
+      "category": "AI/automation"
+    },
+    {
+      "name": "bpm-delay-calculator",
+      "category": "AV/audio"
+    },
+    {
+      "name": "mixmash",
+      "category": "Web/static"
+    },
+    {
+      "name": "park-rave-005",
+      "category": "Games/interactive"
+    },
+    {
+      "name": "theme-organizer-resource",
+      "category": "Web/static"
+    },
+    {
+      "name": "codedash-mar24",
+      "category": "Web/static"
+    },
+    {
+      "name": "code-dashboard",
+      "category": "AI/automation"
+    },
+    {
+      "name": "sdlc-tool-stack-map",
+      "category": "Web/static"
+    },
+    {
+      "name": "av-resume",
+      "category": "Business/client"
+    },
+    {
+      "name": "curling-simulator",
+      "category": "Planning/tools"
+    },
+    {
+      "name": "lansdowne-lighting-plot",
+      "category": "Web/static"
+    },
+    {
+      "name": "ai-agent-personalities",
+      "category": "AI/automation"
+    },
+    {
+      "name": "repo-favicons",
+      "category": "Web/static"
+    },
+    {
+      "name": "elysium-landing",
+      "category": "Web/static"
+    },
+    {
+      "name": "garden-cage-build-guide",
+      "category": "Planning/tools"
+    },
+    {
+      "name": "garden-planner",
+      "category": "Planning/tools"
+    }
+  ]
+}

@@ -102,3 +102,13 @@ Source/model/build checks are candidate evidence, not publication or operator
 acceptance. Follow the existing AV consolidation projection for exact revision,
 browser, CI, publication and live proof; the entire specialist toolset is not
 declared complete by this five-panel conversion.
+
+The retained-host duplicate-start probe waits for the newly selected fixture
+and exact summary text before checking edits. Its ten-second locator timeout
+still fails missing updates; it checks the entered universe, address and spare
+status as well as both duplicate counts. It uses no fixed delay. An intermittent
+CI assertion observed zero duplicates immediately after editing; the unchanged
+probe and 30 focused repetitions passed on the runner, so the underlying cause
+is not established and no application logic changed. Run the retained case with
+`AV_RETAINED_FROM=probe_av_lighting_console npm run test:av-retained-browser`
+after building the retained Lighting host.

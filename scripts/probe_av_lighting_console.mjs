@@ -99,7 +99,22 @@ try {
   await quick(page,'Document');await page.getByLabel('Show name',{exact:true}).fill('Working show');await page.getByLabel('Venue',{exact:true}).fill('Working venue');await page.getByLabel('Lighting lead').fill('Operator');
   assert.equal(await read(page),null);await save(page);let saved=JSON.parse(await read(page));assert.deepEqual(Object.fromEntries(FIELDS.map(f=>[f,saved.items[0][f]])),{...values,status:'patched'});assert.equal(saved.meta.showName,'Working show');await page.reload();assert.deepEqual(await exportPlan(page),saved);
   await quick(page,'Fixtures');await page.locator('#search').fill('not-found');assert.equal(await page.locator('.lighting-fixture').count(),0);await page.locator('#search').fill('Wash');assert.equal(await page.locator('.lighting-fixture').count(),1);await page.locator('#search').fill('');
-  await button(page,'Add fixture').click();await details.locator('[name=universe]').fill('1');await details.locator('[name=address]').fill('101');assert.match(await page.locator('.lighting-summary').textContent(),/2 duplicate starts/);await details.locator('[name=status]').selectOption('spare');assert.match(await page.locator('.lighting-summary').textContent(),/0 duplicate starts/);
+  const firstFixture=saved.items[0].id;
+  await button(page,'Add fixture').click();
+  // React selection and summary commits are observable boundaries, not sleeps.
+  await page.waitForFunction(first=>{
+    const select=document.querySelector('.console-panel[data-panel="details"] select');
+    return select?.options.length===2 && select.value!==first;
+  },firstFixture);
+  await details.locator('[name=universe]').fill('1');await details.locator('[name=address]').fill('101');
+  await page.locator('.lighting-summary').getByText('2 duplicate starts',{exact:true}).waitFor();
+  assert.equal(await details.locator('[name=universe]').inputValue(),'1');
+  assert.equal(await details.locator('[name=address]').inputValue(),'101');
+  assert.match(await page.locator('.lighting-summary').textContent(),/2 duplicate starts/);
+  await details.locator('[name=status]').selectOption('spare');
+  await page.locator('.lighting-summary').getByText('0 duplicate starts',{exact:true}).waitFor();
+  assert.equal(await details.locator('[name=status]').inputValue(),'spare');
+  assert.match(await page.locator('.lighting-summary').textContent(),/0 duplicate starts/);
   page.removeAllListeners('dialog');page.once('dialog',dialog=>dialog.dismiss());await button(page,'Remove fixture').click();assert.equal((await exportPlan(page)).items.length,2);page.on('dialog',dialog=>dialog.accept());await quick(page,'Fixture details');await button(page,'Remove fixture').click();assert.equal((await exportPlan(page)).items.length,1);
   pass('all fixture and metadata fields, status/focus/search, duplicate starts/spares, confirmed removal and explicit Save/reload/export');
 
