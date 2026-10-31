@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#f2ede6">
+<script src="../js/sbd-brand-reference.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>System by Dave — Brand Reference</title>
 <meta name="description" content="Reference page for the System by Dave brand system, including identity marks, color tokens, typography, and visual usage notes.">
@@ -505,9 +508,51 @@
     }
     html { scroll-behavior: auto; }
   }
+
+  /* Reference reading shell. Specimen colors remain fixed in either theme. */
+  :root { color-scheme: light; --bg:#f2ede6; --bg2:#e8dece; --bg3:#ddd4c5; --sand:#2e2b28; --sand-dim:#51463d; --mid:#62564d; --faint:#cbbfb0; --border:#cbbfb0; --border2:#b8afa2; --rust:#8a4428; --rust-pale:#8a4428; }
+  :root[data-theme="dark"] { color-scheme:dark; --bg:#1c1917; --bg2:#222019; --bg3:#2a2623; --sand:#e8dece; --sand-dim:#b8afa2; --mid:#b8afa2; --faint:#494039; --border:#62564d; --border2:#78695e; --rust:#e8a882; --rust-pale:#e8a882; }
+  html,body { height:100%; overflow:hidden; scroll-behavior:auto; }
+  .page { width:100%; max-width:none; height:100vh; height:100dvh; padding:12px max(12px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); display:grid; grid-template-rows:auto auto auto minmax(0,1fr) auto; gap:8px; }
+  header { margin:0; padding:0 0 8px; gap:12px; }
+  header .mark-svg { width:24px; height:30px; }
+  .header-wordmark h1 { font-size:20px; }
+  .header-wordmark span { margin:0; font-size:10px; }
+  .header-meta { font-size:10px; letter-spacing:0; line-height:1.4; }
+  .brand-controls { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .brand-controls a,.brand-controls button,.brand-tabs a { min-height:44px; display:inline-flex; align-items:center; justify-content:center; padding:8px 12px; color:var(--sand); background:var(--bg2); border:1px solid var(--border); font:inherit; text-decoration:none; cursor:pointer; }
+  .brand-controls button[hidden] { display:none; }
+  .brand-tabs { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:4px; min-width:0; }
+  .brand-tabs a { padding:6px; font-size:13px; }
+  .brand-tabs a[aria-selected="true"] { border-color:var(--rust); box-shadow:inset 0 -3px var(--rust); font-weight:bold; }
+  :focus-visible { outline:3px solid var(--rust); outline-offset:-3px; }
+  .brand-skip { position:fixed; top:0; left:12px; transform:translateY(-150%); z-index:20; padding:12px; color:var(--sand); background:var(--bg); }
+  .brand-skip:focus { transform:none; }
+  main { min-height:0; min-width:0; overflow:auto; overscroll-behavior:contain; overflow-anchor:none; padding:12px; border:1px solid var(--border); scroll-padding:12px; }
+  main section { margin:0 0 24px; animation:none; min-width:0; }
+  main section[hidden] { display:none; }
+  .section-label { margin-bottom:12px; letter-spacing:2px; }
+  .logo-swatch { padding:24px 12px; }
+  .logo-swatch.dark { background:#1c1917; }
+  .logo-swatch.light { background:#f2ede6; }
+  .logo-swatch.rust-bg { background:#c0623a; }
+  .logo-swatch figure { min-width:0; }
+  main svg { max-width:100%; height:auto; }
+  .palette { grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); }
+  .swatch { min-height:100px; }
+  .type-row { grid-template-columns:120px minmax(0,1fr) 100px; gap:12px; padding:16px; }
+  .specimen-display { font-size:clamp(28px,4vw,52px); overflow-wrap:anywhere; }
+  .mark-anatomy { gap:24px; padding:24px; }
+  footer { padding:0; gap:8px; }
+  footer p { font-size:9px; letter-spacing:0; }
+  @media(min-width:2000px) { .page { grid-template-columns:240px minmax(0,1fr); grid-template-rows:auto auto minmax(0,1fr) auto; } header,.brand-controls,footer { grid-column:1/-1; } .brand-tabs { grid-column:1; grid-row:3; grid-template-columns:1fr; align-content:start; } main { grid-column:2; grid-row:3; } .usage-grid,.logo-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+  @media(max-width:680px) { .page { grid-template-rows:auto auto minmax(0,1fr) auto; } .brand-tabs { grid-row:4; grid-template-columns:repeat(4,minmax(0,1fr)); } main { grid-row:3; } footer { display:none; } .header-meta { display:none; } .logo-grid,.usage-grid,.rules-grid { grid-template-columns:1fr; } .type-row { grid-template-columns:1fr; } .type-usage { text-align:left; } .mark-anatomy { flex-direction:column; padding:16px; } .header-wordmark span { display:none; } }
+  @media(max-height:400px) { header,footer { display:none; } .page { grid-template-rows:auto minmax(0,1fr) auto; } main { grid-row:2; } .brand-tabs { grid-row:3; } .brand-controls a,.brand-controls button { padding:4px 8px; } }
+  @media print { html,body { height:auto; overflow:visible; } .page { display:block; height:auto; padding:0; } .brand-controls,.brand-tabs,.brand-skip { display:none; } header,footer { display:flex; } main { overflow:visible; border:0; padding:0; } main section[hidden] { content-visibility:visible; display:block; } main section { break-inside:avoid; } }
 </style>
 </head>
 <body>
+<a class="brand-skip" href="#brand-main">Skip to brand reference</a>
 <div class="page">
 
   <!-- Header -->
@@ -532,8 +577,12 @@
     </div>
   </header>
 
+  <div class="brand-controls"><a href="/">System by Dave</a><button id="brand-theme" type="button" hidden>Dark theme</button></div>
+  <nav class="brand-tabs" aria-label="Reference sections"><a id="tab-logo" href="#logo">Logo</a><a id="tab-anatomy" href="#anatomy">Anatomy</a><a id="tab-palette" href="#palette">Palette</a><a id="tab-type" href="#type">Type</a><a id="tab-spacing" href="#spacing">Spacing</a><a id="tab-usage" href="#usage">Usage</a><a id="tab-rules" href="#rules">Rules</a><a id="tab-all" href="#all">All</a></nav>
+  <main id="brand-main" tabindex="-1" aria-label="Brand reference" data-web2-scroll>
+  <span id="all"></span>
   <!-- 01 Logo -->
-  <section>
+  <section id="logo" aria-label="Logo">
     <div class="section-label">01 — Logo lockup</div>
     <div class="logo-grid">
       <div class="logo-swatch dark">
@@ -608,7 +657,7 @@
   </section>
 
   <!-- 02 Mark anatomy -->
-  <section>
+  <section id="anatomy" aria-label="Anatomy">
     <div class="section-label">02 — Mark anatomy</div>
     <div class="mark-anatomy">
       <svg width="140" height="170" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
@@ -658,7 +707,7 @@
   </section>
 
   <!-- 03 Color -->
-  <section>
+  <section id="palette" aria-label="Palette">
     <div class="section-label">03 — Color palette</div>
     <div class="palette">
       <div class="swatch" style="background:#1c1917;">
@@ -686,7 +735,7 @@
   </section>
 
   <!-- 04 Typography -->
-  <section>
+  <section id="type" aria-label="Type">
     <div class="section-label">04 — Typography</div>
     <div class="type-specimen">
       <div class="type-row">
@@ -718,7 +767,7 @@
   </section>
 
   <!-- 05 Spacing -->
-  <section>
+  <section id="spacing" aria-label="Spacing">
     <div class="section-label">05 — Spacing scale</div>
     <div class="spacing-stack">
       <div class="spacing-row">
@@ -755,7 +804,7 @@
   </section>
 
   <!-- 06 Usage examples -->
-  <section>
+  <section id="usage" aria-label="Usage">
     <div class="section-label">06 — Usage examples</div>
     <div class="usage-grid">
       <div class="usage-card">
@@ -790,7 +839,7 @@
   </section>
 
   <!-- 07 Do / Don't -->
-  <section>
+  <section id="rules" aria-label="Rules">
     <div class="section-label">07 — Brand rules</div>
     <div class="rules-grid">
       <div class="rule-block do">
@@ -822,6 +871,7 @@
     </div>
   </section>
 
+  </main>
   <!-- Footer -->
   <footer>
     <p>SYSTEM BY DAVE — BRAND REFERENCE v1.0</p>
