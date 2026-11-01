@@ -46,6 +46,7 @@ const STANDALONE_RETURNS = [
   'noteforge/index.html'
 ];
 const REQUIRED_SKIP_LINKS = new Map([
+  ['ontrack.html', 'ontrack-workspace'],
   ['switcher/index.html', 'reference-main'],
   ['switcher/guide/index.html', 'atem-explorer'],
   ['switcher/guide/atem-hd8-iso-guide-offline.html', 'atem-explorer'],

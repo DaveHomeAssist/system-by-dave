@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-av-theme="system" data-av-tool="ontrack">
+<html lang="en" data-av-theme="light" data-av-theme-default="light" data-av-tool="ontrack" data-sbd-nav="embedded">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -244,31 +244,132 @@
     font-size:13px;opacity:0;transition:.25s;z-index:99;pointer-events:none;max-width:80vw}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  @media(max-width:880px){
-    html,body{overflow:auto}
-    .unit{width:100%;max-width:100vw;height:auto;min-height:100dvh}
-    .plate{flex-wrap:wrap}
-    .plate .status{width:100%;margin-left:0;justify-content:space-between;gap:8px;flex-wrap:wrap}
-    .body,.screen{min-width:0}
-    .body{width:calc(100vw - 32px);max-width:100%;grid-template-columns:minmax(0,1fr)}
-    .rail{width:100%;min-width:0;flex-direction:row;flex-wrap:nowrap;order:-1}
-    .rail .sp,.rail .foot{display:none}
-    .vbtn{width:auto;min-width:0;flex:1 1 0;justify-content:center;padding-inline:4px}
-    .vbtn .k{display:none}
-    .screen{min-height:78vh}
-    .setcols{grid-template-columns:1fr}
-    .dbstage{grid-template-columns:1fr}
-    .datagrid{grid-template-columns:1fr}
-    #q{width:100%}
+  /* The shell owns navigation space; only record collections scroll. */
+  .unit{max-width:none;grid-template-rows:auto minmax(0,1fr);
+    padding:max(8px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+  .body{grid-template-columns:168px minmax(0,1fr)}
+  .screen,.view,.setcols,.setdetail,.dbstage,.dbcard,.datagrid{min-width:0;min-height:0}
+  .plate{gap:10px;flex-wrap:wrap;padding:6px 12px}
+  .plate .status{gap:10px}
+  .sbd-nav-embedded{display:flex;gap:6px}
+  .sbd-nav-embedded a{display:inline-flex;align-items:center;min-height:44px;padding:6px 9px;color:var(--txt)}
+  button,input,select,summary{min-height:44px}
+  button{min-width:44px}
+  summary{cursor:pointer;align-content:center;font-weight:600}
+  :focus-visible{outline:3px solid var(--av-focus);outline-offset:2px}
+  .filter-panel{margin-bottom:8px;flex-shrink:0}
+  .filter-panel > summary,.dcard > summary{position:sticky;top:0;z-index:3;background:var(--panel)}
+  .filters{margin:6px 0}
+  .filters input,.filters select{max-width:100%}
+  .tblwrap,.setlist,.setdetail,.dbody,.dblist,.dbcard{overscroll-behavior:contain;scroll-padding:48px 8px}
+  .vtitle{flex-shrink:0}
+  .datagrid{overflow:visible;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .dcard{padding:8px 14px;min-width:0}
+  .dcard summary{color:var(--txt)}
+  .dcard p{max-width:65ch}
+  .dcard:not([open]){align-self:start}
+  .emptybig{padding:24px 16px}
+  #tblwrap table{min-width:760px}
+  .track-open{background:none;border:0;color:var(--txt);text-align:left;padding:2px 6px;font:inherit;max-width:100%;overflow-wrap:anywhere}
+  th button{background:none;border:0;color:inherit;font:inherit;letter-spacing:inherit;text-align:left;padding:0 4px}
+  .dbrow{width:100%;text-align:left;border:0;background:none;font:inherit}
+  .dhead .x{width:44px;height:44px}
+  .dhead h3,.dhead .sub,.note p,.setdetail h3,.dbcard h3,.dbcard .pos{overflow-wrap:anywhere}
+  .dhead h3{padding-right:46px}
+  .toast{background:var(--txt);color:var(--bg)}
+  #contextDialog{margin:auto;width:min(700px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--txt)}
+  #contextDialog::backdrop{background:var(--av-overlay)}
+  #contextDialog form{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+  #contextTitle{font-size:16px}
+  #contextContents .sbd-suite-dock{position:static;display:flex;flex-wrap:wrap;max-width:100%;box-sizing:border-box}
+  #contextContents .sbd-suite-main{white-space:normal}
+  #contextContents .sbd-suite-link,#contextContents .sbd-suite-button{min-height:44px}
+  #contextContents .sbd-suite-note-editor{min-width:0;width:100%}
+
+  .setitem:hover,.dbrow:hover,tbody tr:hover td{background:var(--surface-2)}
+  .setitem.sel,.dbrow.cur{background:var(--surface-3)}
+  tbody td,.setitem,.stl td{border-color:var(--line)}
+  .kind.planned,.badge.add{background:var(--av-focus-soft)}
+  .kind.played{background:var(--av-warning-soft)}
+  .badge.plan{background:var(--av-success-soft)}
+  @media(min-width:2200px){
+    .body{grid-template-columns:220px minmax(0,1fr)}
+    .setcols{grid-template-columns:minmax(340px,25%) minmax(0,1fr)}
+    .dbstage{grid-template-columns:minmax(0,1fr) minmax(360px,30%)}
+    .datagrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .dbcard{padding:28px max(28px,calc((100% - 1000px)/2))}
   }
+  @media(max-width:880px){
+    .unit{gap:6px;padding:6px max(8px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+    .plate{gap:6px;padding:4px 8px}
+    .plate .status{width:100%;margin-left:0;justify-content:space-between}
+    .logo{font-size:14px}
+    #themeToggle{margin-left:auto;padding-inline:8px}
+    .body{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:6px}
+    .rail{grid-row:2;flex-direction:row;padding:4px;gap:2px}
+    .rail .sp,.rail .foot,.vbtn .k{display:none}
+    .vbtn{min-width:0;flex:1;justify-content:center;padding:8px 4px}
+    .screen{grid-row:1;padding:10px}
+    .vtitle{gap:6px;margin-bottom:6px}
+    .vtitle .right{gap:6px}
+    .btn{padding:6px 10px}
+    .setcols{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(70px,25%) minmax(0,1fr)}
+    .setdetail{padding:10px}
+    .dbstage{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(44px,20%)}
+    .dbcard{padding:12px;gap:10px}
+    .dbtop{min-width:0}
+    .dbtop select{max-width:100%}
+    .datagrid{grid-template-columns:minmax(0,1fr);gap:5px}
+    #q{width:100%}
+    .toast{bottom:76px}
+  }
+  @media(max-height:500px){
+    .plate .status{display:none}
+    .unit{gap:4px;padding-block:4px}
+    .screen{padding:6px}
+    .vtitle h2,.vtitle .meta{display:none}
+    .vtitle{margin-bottom:4px}
+    .filter-panel{margin-bottom:4px}
+    .filter-panel[open]{position:absolute;inset:0;z-index:10;background:var(--panel);padding:8px;overflow:auto}
+    .dcard{padding:0 8px}
+    .dcard[open]{position:absolute;inset:6px;background:var(--panel);z-index:5;overflow:auto}
+    .dcard[open] summary::after{content:' (close)'}
+  }
+  @media(max-height:360px){
+    .plate .logo{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+    .plate{flex-wrap:nowrap;gap:4px}
+    .sbd-nav-embedded{gap:2px}
+    .sbd-nav-embedded a{font-size:12px;padding-inline:5px}
+    #view-library > .vtitle{height:0;margin:0}
+    #view-library > .vtitle .right{display:none}
+    #view-library:has(.filter-panel[open]) > .vtitle .right{display:flex;position:absolute;top:58px;right:16px;z-index:11}
+    #view-library .filter-panel[open] .filters{padding-top:48px}
+    #tblwrap thead th{position:static;padding-block:0}
+    .datagrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+    .setcols{grid-template-rows:minmax(0,35%) minmax(0,1fr)}
+    .dbstage{grid-template-rows:minmax(0,1fr) 44px}
+  }
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+  @media print{
+    html,body{height:auto!important;overflow:visible!important}
+    .unit,.body,.screen,.view,.setcols,.setdetail,.dbstage,.dbcard,.datagrid,.tblwrap,.setlist,.dblist{display:block;height:auto;max-height:none;overflow:visible}
+    .rail,.plate,.sbd-skip-link,.drawer,.toast,button,.filter-panel{display:none!important}
+    .view{margin-bottom:24px}
+    details::details-content{content-visibility:visible}
+  }
+
 </style>
 <link rel="stylesheet" href="css/av-theme.css">
 </head>
 <body>
+<a class="sbd-skip-link" href="#ontrack-workspace">Skip to workspace</a>
 <noscript><div style="position:fixed;inset:auto 16px 16px;z-index:1000;padding:12px 14px;border-radius:9px;background:#ffd5d5;color:#220707;font:600 13px system-ui,sans-serif">OnTrack needs JavaScript for imports, notes, filtering, and browser saved state.</div></noscript>
 <div class="unit">
   <div class="plate">
     <h1 class="logo">ON<b>TRACK</b></h1>
+    <div data-sbd-nav-slot></div>
+    <button class="btn" id="showContext" type="button" hidden>Show context</button>
+    <button class="btn" id="themeToggle" type="button" aria-pressed="false">Dark mode</button>
     <div class="status">
       <span id="savestat"><span class="savedot"></span>LOCAL</span>
       <span><b id="statTracks">0</b> TRACKS</span>
@@ -278,26 +379,26 @@
   </div>
 
   <div class="body">
-    <nav class="rail">
-      <button class="vbtn active" data-view="library" aria-pressed="true"><span class="k">1</span><span class="n">Library</span></button>
-      <button class="vbtn" data-view="sets" aria-pressed="false"><span class="k">2</span><span class="n">Sets</span></button>
-      <button class="vbtn" data-view="debrief" aria-pressed="false"><span class="k">3</span><span class="n">Debrief</span></button>
-      <button class="vbtn" data-view="data" aria-pressed="false"><span class="k">4</span><span class="n">Data</span></button>
+    <nav class="rail" aria-label="OnTrack views" role="tablist">
+      <button class="vbtn active" data-view="library" id="tab-library" role="tab" aria-selected="true" aria-controls="view-library" tabindex="0"><span class="k">1</span><span class="n">Library</span></button>
+      <button class="vbtn" data-view="sets" id="tab-sets" role="tab" aria-selected="false" aria-controls="view-sets" tabindex="-1"><span class="k">2</span><span class="n">Sets</span></button>
+      <button class="vbtn" data-view="debrief" id="tab-debrief" role="tab" aria-selected="false" aria-controls="view-debrief" tabindex="-1"><span class="k">3</span><span class="n">Debrief</span></button>
+      <button class="vbtn" data-view="data" id="tab-data" role="tab" aria-selected="false" aria-controls="view-data" tabindex="-1"><span class="k">4</span><span class="n">Data</span></button>
       <div class="sp"></div>
       <div class="foot">ONTRACK V1<br>ALL DATA LOCAL<br>NOTHING SUGGESTED</div>
     </nav>
 
-    <main class="screen">
+    <main class="screen" id="ontrack-workspace" tabindex="-1" aria-label="OnTrack workspace">
 
       <!-- LIBRARY -->
-      <section class="view on" id="view-library">
+      <section class="view on" id="view-library" role="tabpanel" aria-labelledby="tab-library">
         <div class="vtitle">
           <h2>LIBRARY</h2><span class="meta" id="libmeta"></span>
           <div class="right">
             <button class="btn pri" id="btnXml">Import collection XML</button>
           </div>
         </div>
-        <div class="filters">
+        <details class="filter-panel"><summary>Import, search and filters</summary><div class="filters">
           <input id="q" placeholder="Search artist / title / genre / tags / notes" aria-label="Search tracks">
           <div class="bpmbox">BPM <input id="bpmMin" placeholder="min" inputmode="numeric" aria-label="Minimum BPM"> – <input id="bpmMax" placeholder="max" inputmode="numeric" aria-label="Maximum BPM"></div>
           <select id="selKey" aria-label="Filter by musical key"><option value="">Key: all</option></select>
@@ -305,26 +406,27 @@
           <select id="selTag" aria-label="Filter by tag"><option value="">Tag: all</option></select>
           <button class="btn ghost" id="clearF">Clear</button>
         </div>
-        <div class="tblwrap" id="tblwrap"></div>
+        </details>
+        <div class="tblwrap" id="tblwrap" tabindex="0" role="region" aria-label="Track library"></div>
       </section>
 
       <!-- SETS -->
-      <section class="view" id="view-sets">
+      <section class="view" id="view-sets" role="tabpanel" aria-labelledby="tab-sets">
         <div class="vtitle">
           <h2>SETS</h2><span class="meta" id="setmeta"></span>
           <div class="right">
-            <button class="btn" id="btnPlanned">Import planned (.txt)</button>
-            <button class="btn pri" id="btnPlayed">Import played history (.txt)</button>
+            <button class="btn" id="btnPlanned">Import plan</button>
+            <button class="btn pri" id="btnPlayed">Import history</button>
           </div>
         </div>
         <div class="setcols">
-          <div class="setlist" id="setlist"></div>
-          <div class="setdetail" id="setdetail"><div class="dbempty">Select a set.</div></div>
+          <div class="setlist" id="setlist" tabindex="0" role="region" aria-label="Sets"></div>
+          <div class="setdetail" id="setdetail" tabindex="0" role="region" aria-label="Selected set"><div class="dbempty">Select a set.</div></div>
         </div>
       </section>
 
       <!-- DEBRIEF -->
-      <section class="view" id="view-debrief">
+      <section class="view" id="view-debrief" role="tabpanel" aria-labelledby="tab-debrief">
         <div class="vtitle">
           <h2>DEBRIEF</h2>
           <div class="dbtop" style="flex:1">
@@ -336,33 +438,33 @@
       </section>
 
       <!-- DATA -->
-      <section class="view" id="view-data">
+      <section class="view" id="view-data" role="tabpanel" aria-labelledby="tab-data">
         <div class="vtitle"><h2>DATA</h2></div>
         <div class="datagrid">
-          <div class="dcard">
-            <div class="lbl">Status</div>
+          <details class="dcard" name="data-card">
+            <summary>Status</summary>
             <div class="statline" id="dataStats"></div>
-          </div>
-          <div class="dcard">
-            <div class="lbl">Backup</div>
+          </details>
+          <details class="dcard" name="data-card">
+            <summary>Backup</summary>
             <p>Everything — library, sets, tags, notes — exports as one JSON file. Import restores or merges it.</p>
             <div class="row">
               <button class="btn pri" id="btnExport">Export JSON</button>
               <button class="btn" id="btnImportJson">Import JSON</button>
             </div>
-          </div>
-          <div class="dcard">
-            <div class="lbl">Storage</div>
+          </details>
+          <details class="dcard" name="data-card">
+            <summary>Storage</summary>
             <p id="storageNote">This browser saves your data locally on this machine as you work. Export a JSON backup anyway — it's your data, keep a copy.</p>
-          </div>
-          <div class="dcard">
-            <div class="lbl">Reset</div>
+          </details>
+          <details class="dcard" name="data-card">
+            <summary>Reset</summary>
             <p>Wipes everything in this browser. Export first.</p>
             <div class="row">
               <button class="btn danger" id="btnWipe">Clear all data</button>
               <button class="btn ghost" id="btnSample">Load sample data</button>
             </div>
-          </div>
+          </details>
         </div>
       </section>
 
@@ -394,11 +496,15 @@
   </div>
 </div>
 
+<dialog id="contextDialog" aria-labelledby="contextTitle">
+  <form method="dialog"><h2 id="contextTitle">Show context</h2><button class="btn">Close</button></form>
+  <div id="contextContents"></div>
+</dialog>
 <input type="file" id="fileXml" accept=".xml" hidden>
 <input type="file" id="filePlanned" accept=".txt,.m3u8,.m3u" hidden>
 <input type="file" id="filePlayed" accept=".txt,.m3u8,.m3u" hidden>
 <input type="file" id="fileJson" accept=".json" hidden>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 "use strict";
@@ -686,11 +792,11 @@ function renderLibrary(){
   }
   const cols=[["artist","ARTIST"],["title","TITLE"],["bpm","BPM"],["key","KEY"],["genre","GENRE"],["tags","TAGS"],["notes","NOTES"]];
   wrap.innerHTML=`<table><thead><tr>${cols.map(([k,l])=>
-    `<th data-s="${k}">${l}${sortBy===k?`<span class="arr">${sortDir>0?"▲":"▼"}</span>`:""}</th>`).join("")}</tr></thead>
+    `<th data-s="${k}" scope="col"${sortBy===k?` aria-sort="${sortDir>0?"ascending":"descending"}"`:""}>${k!=="tags"?`<button type="button" aria-label="Sort by ${l.toLowerCase()}">`:""}${l}${sortBy===k?`<span class="arr">${sortDir>0?"▲":"▼"}</span>`:""}${k!=="tags"?"</button>":""}</th>`).join("")}</tr></thead>
     <tbody>${rows.map(t=>{
       const nc=notesFor(t.id).length;
       return `<tr data-id="${esc(t.id)}">
-        <td>${esc(t.artist)}</td><td>${esc(t.title)}</td>
+        <td>${esc(t.artist)}</td><td><button class="track-open" type="button" data-track="${esc(t.id)}" aria-label="Open ${esc(t.title)} by ${esc(t.artist)}">${esc(t.title)||"(untitled)"}</button></td>
         <td class="mono">${esc(t.bpm)||"—"}</td><td class="mono">${esc(t.key)||"—"}</td>
         <td class="mono">${esc(t.genre)||"—"}</td>
         <td>${t.tags.map(g=>`<span class="tag">${esc(g)}</span>`).join("")||'<span class="mono">—</span>'}</td>
@@ -699,6 +805,7 @@ function renderLibrary(){
     const s=th.dataset.s;if(s==="tags")return;
     if(sortBy===s)sortDir*=-1;else{sortBy=s;sortDir=1;}
     renderLibrary();
+    wrap.querySelector(`th[data-s="${s}"] button`).focus();
   }));
   wrap.querySelectorAll("tbody tr").forEach(tr=>tr.addEventListener("click",()=>openDrawer(tr.dataset.id)));
 }
@@ -710,12 +817,16 @@ function closeDrawer(restoreFocus=true){
   drawer.classList.remove("open");
   drawer.setAttribute("aria-hidden","true");
   drawer.setAttribute("inert","");
-  if(restoreFocus&&drawerReturnFocus&&typeof drawerReturnFocus.focus==="function")drawerReturnFocus.focus();
+  document.querySelectorAll(".plate,.rail,.screen > .view").forEach(el=>el.inert=false);
+  if(restoreFocus){
+    const current=[...document.querySelectorAll("[data-track]")].find(b=>b.dataset.track===drawerId);
+    (current||(drawerReturnFocus?.isConnected?drawerReturnFocus:document.getElementById("tblwrap"))).focus();
+  }
 }
 function openDrawer(id){
   drawerId=id;
   const t=S.tracks[id];if(!t)return;
-  drawerReturnFocus=document.activeElement;
+  drawerReturnFocus=[...document.querySelectorAll("[data-track]")].find(b=>b.dataset.track===id)||document.activeElement;
   document.getElementById("dTitle").textContent=t.title||"(untitled)";
   document.getElementById("dSub").textContent=[t.artist,t.bpm&&t.bpm+" BPM",t.key,t.genre].filter(Boolean).join(" · ");
   renderDrawerTags();renderDrawerNotes();
@@ -723,6 +834,7 @@ function openDrawer(id){
   document.getElementById("drawer").classList.add("open");
   document.getElementById("drawer").setAttribute("aria-hidden","false");
   document.getElementById("drawer").removeAttribute("inert");
+  document.querySelectorAll(".plate,.rail,.screen > .view").forEach(el=>el.inert=true);
   document.getElementById("drawerX").focus();
 }
 document.getElementById("drawerX").addEventListener("click",()=>closeDrawer());
@@ -889,12 +1001,12 @@ function renderDebrief(){
   // side list
   const side=`<div class="dblist">${st.trackIds.map((tid,i)=>{
     const t=S.tracks[tid];
-    return `<div class="dbrow ${i===dbIdx?"cur":""}" data-i="${i}">
+    return `<button type="button" class="dbrow ${i===dbIdx?"cur":""}" data-i="${i}" aria-label="Debrief ${esc(t?t.title:"track")}">
       <span class="st ${trackHasSetNote(tid,st.id)?"done":""}">${trackHasSetNote(tid,st.id)?"●":String(i+1).padStart(2,"0")}</span>
-      <span class="tn">${esc(t?t.artist+" — "+t.title:"?")}</span></div>`;}).join("")}
-    <div class="dbrow ${dbIdx>=total?"cur":""}" data-i="${total}">
+      <span class="tn">${esc(t?t.artist+" — "+t.title:"?")}</span></button>`;}).join("")}
+    <button type="button" class="dbrow ${dbIdx>=total?"cur":""}" data-i="${total}">
       <span class="st">${setNotesCount(st.id)&&S.notes.some(n=>n.setId===st.id&&!n.trackId)?"●":"±"}</span>
-      <span class="tn">Set note</span></div></div>`;
+      <span class="tn">Set note</span></button></div>`;
 
   let card;
   if(dbIdx<total){
@@ -985,13 +1097,28 @@ document.getElementById("btnSample").addEventListener("click",()=>{
 /* =============== NAV =============== */
 const views=["library","sets","debrief","data"];
 document.querySelectorAll(".vbtn").forEach(b=>b.addEventListener("click",()=>{
-  document.querySelectorAll(".vbtn").forEach(x=>{x.classList.toggle("active",x===b);x.setAttribute("aria-pressed",String(x===b));});
+  document.querySelectorAll(".vbtn").forEach(x=>{x.classList.toggle("active",x===b);x.setAttribute("aria-selected",String(x===b));x.tabIndex=x===b?0:-1;});
   views.forEach(v=>document.getElementById("view-"+v).classList.toggle("on",v===b.dataset.view));
   closeDrawer(false);
   if(b.dataset.view==="debrief")renderDebriefSel();
+  b.focus();
 }));
+document.querySelector('.rail').addEventListener('keydown',e=>{
+  const tabs=[...document.querySelectorAll('.vbtn')];
+  const index=tabs.indexOf(document.activeElement);
+  if(index<0)return;
+  const step={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];
+  if(step||e.key==='Home'||e.key==='End'){
+    e.preventDefault();
+    const next=e.key==='Home'?0:e.key==='End'?tabs.length-1:(index+step+tabs.length)%tabs.length;
+    tabs[next].click();
+  }
+});
+const railLayout=matchMedia('(max-width:880px)');
+function orientRail(){document.querySelector('.rail').setAttribute('aria-orientation',railLayout.matches?'horizontal':'vertical');}
+orientRail();railLayout.addEventListener('change',orientRail);
 document.addEventListener("keydown",e=>{
-  if(["INPUT","SELECT","TEXTAREA"].includes(e.target.tagName))return;
+  if(e.ctrlKey||e.metaKey||e.altKey||document.getElementById("drawer").classList.contains("open")||["INPUT","SELECT","TEXTAREA"].includes(e.target.tagName))return;
   const i=parseInt(e.key,10);
   if(i>=1&&i<=4)document.querySelectorAll(".vbtn")[i-1].click();
 });
@@ -1003,6 +1130,31 @@ renderAll();
 </script>
 <script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
+<script>
+(function(){
+  const root=document.documentElement,button=document.getElementById('themeToggle');
+  const dark=()=>['dark','black'].includes(root.dataset.avTheme)||(root.dataset.avTheme==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);
+  function sync(){button.setAttribute('aria-pressed',String(dark()));}
+  sync();
+  button.addEventListener('click',()=>{
+    root.dataset.avTheme=dark()?'light':'dark';
+    try{localStorage.setItem('av-theme-mode.v1',root.dataset.avTheme);}catch{}
+    sync();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',sync);
+  const dialog=document.getElementById('contextDialog'),show=document.getElementById('showContext');
+  show.addEventListener('click',()=>dialog.showModal());
+  const contextObserver=new MutationObserver(()=>{
+    const dock=document.querySelector('body > [data-sbd-suite-dock]');
+    if(!dock)return;
+    document.getElementById('contextContents').appendChild(dock);
+    show.hidden=false;
+    contextObserver.disconnect();
+  });
+  contextObserver.observe(document.body,{childList:true});
+  window.addEventListener('pagehide',()=>contextObserver.disconnect(),{once:true});
+})();
+</script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>

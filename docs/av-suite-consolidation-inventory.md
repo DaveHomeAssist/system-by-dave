@@ -58,7 +58,7 @@ The feature text and declared keys come from the registry. Export, print, and ke
 | **Strike Plan** — retired 2026-10-13; redirect stub into the shop panels | `/strike-plan.html` → `/av/?app=shop` | https://avbydave.com | strike-plan.v1 (import once from the console) | — | — | — | not cached |
 | **AV Calculator** — Working calculation and summary panels with named field sets and configurable views. | `/av-calculator.html` | https://avbydave.com | avCalculator.v1, avCalculator.fieldSets.v1, avCalculator.views.v1, avCalculator.layout.v1 | Source signal | Not found | Not found | Named |
 | **LED Wall Calculator** — Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning. | `/led-wall-calculator.html` | https://avbydave.com | avCalculator.ledProfiles.v1; working state in avCalculator.v1 (declared under av-calculator) | Source signal | Not found | Not found | Named |
-| **OnTrack** — DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes. | `/ontrack.html` | https://avbydave.com | ontrack_v1 | Source signal | Not found | Source signal | Named |
+| **OnTrack** — DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes. | `/ontrack.html` | https://avbydave.com | ontrack_v1 | Source signal | Source signal | Source signal | Named |
 
 **Count:** 53 registry tools (19 live, 34 retired redirect stubs); 83 declared local-storage keys.
 
