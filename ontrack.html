@@ -991,7 +991,8 @@ document.querySelectorAll(".vbtn").forEach(b=>b.addEventListener("click",()=>{
   if(b.dataset.view==="debrief")renderDebriefSel();
 }));
 document.addEventListener("keydown",e=>{
-  if(["INPUT","SELECT","TEXTAREA"].includes(e.target.tagName))return;
+  if(["INPUT","SELECT","TEXTAREA"].includes(e.target.tagName)||e.target.isContentEditable)return;
+  if(e.ctrlKey||e.metaKey||e.altKey)return; // Cmd/Ctrl+1-4 switch browser tabs
   const i=parseInt(e.key,10);
   if(i>=1&&i<=4)document.querySelectorAll(".vbtn")[i-1].click();
 });
@@ -1006,5 +1007,6 @@ renderAll();
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
+<script src="js/sbd-shortcuts.js" defer></script>
 </body>
 </html>
