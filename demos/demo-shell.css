@@ -13,7 +13,12 @@ body.demo .sbd-site-return a:hover, body.demo .sbd-site-return a:focus { color: 
 body.demo .sbd-site-return__separator { color: #7C879A; }
 body.demo .sbd-site-return__current { color: #FFC531; }
 body.demo #fit { top: 50%; }
+/* Start the 1080 px stage scaled down so it never overflows a phone before demo-shell.js
+   sizes it (an overflow at load makes mobile browsers zoom the page out). */
+body.demo #fit { transform: translate(-50%, -50%) scale(.25); }
 body.capture .sbd-site-return, body.capture .sbd-skip-link { display: none; }
+/* Page heading for search and screen readers; the stage's step text is the visible title. */
+body.demo .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 
 #sbd-after {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
@@ -27,6 +32,8 @@ body.capture .sbd-site-return, body.capture .sbd-skip-link { display: none; }
 .sbd-after__row input { flex: 1 1 220px; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 2px solid #2A3140; background: #1B2029; color: #F5F7FA; font: 500 16px/1 "Barlow", sans-serif; }
 .sbd-after__row input:focus { outline: none; border-color: #5AC8FA; }
 .sbd-after__row button { min-height: 44px; padding: 0 16px; border-radius: 10px; border: 0; background: #FF5A1F; color: #111; font: 800 16px/1 "Barlow Condensed", "Barlow", sans-serif; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.sbd-after__cta { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 10px; background: #FF5A1F; color: #111; font: 800 16px/1 "Barlow Condensed", "Barlow", sans-serif; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; }
+.sbd-after__cta:focus-visible { outline: 3px solid #5AC8FA; outline-offset: 2px; }
 .sbd-after__links { display: flex; gap: 16px; flex-wrap: wrap; }
 .sbd-after__alt { color: #5AC8FA; font: 600 14px/1.3 "Barlow", sans-serif; text-decoration: underline; }
 .sbd-after__close { position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #2A3140; background: transparent; color: #AEB6C2; font: 700 20px/1 sans-serif; cursor: pointer; }

@@ -12,8 +12,8 @@ const assert=require('node:assert/strict'),{chromium}=require('playwright');
   for(const theme of ['light','dark']){
    if(await page.locator('html').getAttribute('data-theme')!==theme)await page.locator('#demoTheme').click();
    const contrast=await page.evaluate(()=>{const heading=document.querySelector('#demos h2'),card=heading.closest('.card');const lum=color=>color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);const a=lum(getComputedStyle(heading).color),b=lum(getComputedStyle(card).backgroundColor);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);});assert(contrast>=4.5,'Catalog heading contrast '+contrast);
-   const tabs=page.getByRole('tab');assert.equal(await tabs.count(),4);
-   for(let tab=0;tab<4;tab++){
+   const tabs=page.getByRole('tab');assert.equal(await tabs.count(),5,'Hub tabs: Daily, Frame sync, Troubleshoot, Field Kit, About');
+   for(let tab=0;tab<5;tab++){
     await tabs.nth(tab).click();const prev=page.getByRole('button',{name:'← Previous',exact:true}),next=page.getByRole('button',{name:'Next →',exact:true});while(await prev.isEnabled())await prev.click();
     const seen=new Map();let pages=0,total=[];
     for(;;){

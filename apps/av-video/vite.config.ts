@@ -7,7 +7,7 @@ export default defineConfig({
   base: "/av-video/",
   plugins: [react()],
   build: {
-    outDir: resolve(__dirname, "../../av-video"),
+    outDir: resolve(__dirname, "dist"),
     emptyOutDir: true,
     sourcemap: false,
     rollupOptions: {

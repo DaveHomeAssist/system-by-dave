@@ -21,6 +21,7 @@ jobs:
       - run: npm run verify:public-navigation
       - run: npm run verify:public-consistency
       - run: npm ci --no-audit --no-fund
+      - run: npm run test:vite-fs-deny
       - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
       - run: npm run test:public-viewport

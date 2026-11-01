@@ -1,9 +1,65 @@
 {
   "schema": 1,
-  "sourceSha256": "18ad6b1a07b605bb95434d5edb4c646d5993824770b2fd9fbfad9132667476d6",
-  "publicSha256": "b17f6cdc20abc35d370cee0b7e170b57f27f828e856e97e77af53327e80a367d",
-  "editions": 21,
+  "sourceSha256": "c5e4093195f6cffa20cf3191e0d08532c031657938163e251a009ba086141eee",
+  "publicSha256": "3c0b612aedf88548746ee1722519a222e338403cb1e3ec85f22d5adfbdb4415a",
+  "editions": 25,
   "files": [
+    {
+      "name": "Edition 025.svg",
+      "id": 25,
+      "date": "2026-11-01",
+      "title": "LED refresh and shutter exposure",
+      "sha256": "c8b47dc0952448770b8a0263350cabb4553680f1b2e7fb3201d254ac94f190f6"
+    },
+    {
+      "name": "Edition 025.png",
+      "id": 25,
+      "date": "2026-11-01",
+      "title": "LED refresh and shutter exposure",
+      "sha256": "25cef70f442cfc587a4c0284f58f454d7ed69a49595c4dc30bd1bb7240311d8a"
+    },
+    {
+      "name": "Edition 024.svg",
+      "id": 24,
+      "date": "2026-10-31",
+      "title": "B frame reordering",
+      "sha256": "055822e5f1ccee4c2c7cd1dc0e3b504cf92482b0d3855555aadf5b76fb2e7669"
+    },
+    {
+      "name": "Edition 024.png",
+      "id": 24,
+      "date": "2026-10-31",
+      "title": "B frame reordering",
+      "sha256": "07ccc2db5ff2a6c548f0f0f9ad4af4ea769f9e228c8aa74c5528e423b93c059c"
+    },
+    {
+      "name": "Edition 023.svg",
+      "id": 23,
+      "date": "2026-10-30",
+      "title": "Frame rate conversion families",
+      "sha256": "d71e22f46b627bfe62862d3e0ca63607703bf6c60e8bcfaedcca2d7c84712ed3"
+    },
+    {
+      "name": "Edition 023.png",
+      "id": 23,
+      "date": "2026-10-30",
+      "title": "Frame rate conversion families",
+      "sha256": "641061485ab3afe229aa5e110cbe9cecfcd6bffb09ce77d1082300e8fb8c7d89"
+    },
+    {
+      "name": "Edition 022.svg",
+      "id": 22,
+      "date": "2026-10-29",
+      "title": "Fiber mode and wavelength",
+      "sha256": "ce026d2ea8696e326949bb570ee9d860f5e2b8a74b3a550bd55b9c35ef00367d"
+    },
+    {
+      "name": "Edition 022.png",
+      "id": 22,
+      "date": "2026-10-29",
+      "title": "Fiber mode and wavelength",
+      "sha256": "b23093c49bf5999a96113903b2c431ae94661cdcf5aefba85c332f2bb929fa3e"
+    },
     {
       "name": "Edition 021.svg",
       "id": 21,

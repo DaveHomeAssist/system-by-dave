@@ -1,26 +1,19 @@
 <!doctype html>
-<html lang="en" data-av-theme="system" data-av-tool="the-shop">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
-  <title>The Shop — AV by Dave</title>
-  <meta name="description" content="Touch friendly worklist, item inspector, imports and backup panels with explicit Save.">
-  <link rel="canonical" href="https://avbydave.com/the-shop/">
-  <meta name="theme-color" content="#EEE8DF" media="(prefers-color-scheme: light)" data-av-theme-color="light">
-  <meta name="theme-color" content="#0C1016" media="(prefers-color-scheme: dark)" data-av-theme-color="dark">
-  <meta property="og:type" content="website"><meta property="og:title" content="The Shop"><meta property="og:description" content="Prep, pack, load in and strike in a touch friendly console."><meta property="og:url" content="https://avbydave.com/the-shop/"><meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
-  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="The Shop"><meta name="twitter:description" content="Prep, pack, load in and strike in a touch friendly console."><meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
-  <link rel="icon" href="../svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="../css/av-theme.css"><link rel="stylesheet" href="../css/sbd-rail.css"><link rel="stylesheet" href="../css/sbd-rail-dialogs.css">
-  <script src="../js/av-theme-mode.js"></script><script src="../js/sbd-registry.js"></script><script src="../js/sbd-rail.js"></script><script src="../js/sbd-rail-dialogs.js"></script><script src="../js/sbd-rail-mount.js"></script>
-  <script type="module" crossorigin src="/the-shop/assets/the-shop.js"></script>
-  <link rel="stylesheet" crossorigin href="/the-shop/assets/index.css">
-</head>
-<body>
-  <a class="skip" href="#main">Skip to The Shop</a>
-  <nav class="shop-nav" aria-label="Breadcrumb"><a href="/">Home</a><a href="/av/">Toolbox</a><span aria-current="page">The Shop</span></nav>
-  <noscript><p>The Shop requires JavaScript to edit plans. Existing data remains unchanged. <a href="/av/">Return to AV by Dave</a>.</p></noscript>
-  <div class="shop-shell"><div class="sbd-rail-host" data-sbd-rail-host data-current-ref="console:shop"></div><div id="root"><p role="status">Loading The Shop. If this message remains, the application could not start. Saved data has not been changed.</p></div></div>
-  <div data-sbd-rail-dialogs></div>
-</body>
-</html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>The Shop in AV by Dave</title><meta name="description" content="Open The Shop panels in the AV by Dave console."><meta name="robots" content="noindex,follow">
+<link rel="canonical" href="https://avbydave.com/">
+<meta name="theme-color" content="#f5f2eb"><meta property="og:title" content="The Shop in AV by Dave"><meta name="twitter:title" content="The Shop in AV by Dave">
+<meta http-equiv="refresh" content="0;url=/av/?app=shop">
+<style>html,body{margin:0;height:100%;overflow:hidden}body{display:grid;place-items:center;font:16px system-ui;text-align:center;background:#f5f2eb;color:#242424}main{padding:24px}a{color:inherit}</style>
+</head><body><main><p>The Shop now opens inside the AV by Dave console.</p><a href="/av/?app=shop">Open The Shop</a> · <a href="https://systembydave.com/">System by Dave</a></main>
+<script>
+const target = new URL('/av/', location.origin);
+target.searchParams.set('app', 'shop');
+for (const key of ['sbdShow', 'sbdVenue', 'sbdDate', 'sbdOperator', 'sbdPhase']) {
+  const value = new URLSearchParams(location.search).get(key);
+  if (value !== null) target.searchParams.set(key, value.slice(0, 200));
+}
+location.replace(target.pathname + target.search);
+</script></body></html>
