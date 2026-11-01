@@ -75,8 +75,13 @@ const robots = read('robots.txt');
 // Eight original family entries now redirect into the shared console.
 // The noindex Sync & Signal Field Kit draft (field-kit/, docs/launch/README.md) adds one,
 // and its buyers-only download page (field-kit/thanks/, noindex, reached from Stripe's
-// after-payment redirect) adds one more.
-if (unlisted.length !== 201) fail(`Expected 201 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// after-payment redirect) adds one more. The noindex frame-sync/ short link (avbydave.com/frame-sync/,
+// canonical to systembydave.com/demos/frame-sync.html, used in the frame sync reel) adds one more.
+// Once checkout is live the Field Kit page joins the avbydave.com sitemap (scripts/field_kit_launch.mjs)
+// and leaves this count.
+const fieldKitListed = sitemapRoutes.has('/field-kit/');
+const expectedUnlisted = fieldKitListed ? 201 : 202;
+if (unlisted.length !== expectedUnlisted) fail(`Expected ${expectedUnlisted} tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);

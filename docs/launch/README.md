@@ -9,7 +9,8 @@ until Dave picks it.
 | Route | Published at | Indexing | Purpose |
 |---|---|---|---|
 | `demos/frame-sync.html` (PR #360) | `https://systembydave.com/demos/frame-sync.html` | Indexed (systembydave.com sitemap) | The free, open interactive demo the Reel points to. Its single home; see `demos/README.md` |
-| `field-kit/` | `https://avbydave.com/field-kit/` | `noindex,nofollow`, not linked from navigation | Draft product page; $12, checkout closed |
+| `field-kit/` | `https://avbydave.com/field-kit/` | `noindex,nofollow` at source; published `index,follow` and in the avbydave.com sitemap once checkout is live (`docs/launch/checkout.md`) | Product page; $12, Stripe Payment Link |
+| `frame-sync/` | `https://avbydave.com/frame-sync/` | `noindex,follow`, canonical to the demo | Reel short link: redirects (meta refresh + script, query kept) to `https://systembydave.com/demos/frame-sync.html` |
 | `field-kit/thanks/` | `https://avbydave.com/field-kit/thanks/` | `noindex,nofollow,noarchive` | Buyers-only download page Stripe's after-payment redirect lands on |
 
 `field-kit/` is listed in the avbydave site's `pages` in `scripts/domain-sites.json`,
@@ -23,7 +24,8 @@ The page is not in the AV offline cache, so no cache generation bump is needed.
 
 An earlier draft of this branch carried a second frame-sync demo at
 `frame-sync/`. It was never on `main` or live, and was removed so the demo has one
-home; no redirect is needed.
+home. Since 2026-11-01 `frame-sync/` is only a short-link redirect to that demo
+(avbydave.com/frame-sync/, for the Reel); it carries no demo of its own.
 
 ## Configuration
 

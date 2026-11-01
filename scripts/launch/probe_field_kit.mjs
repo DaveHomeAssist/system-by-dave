@@ -2,7 +2,7 @@
 // Browser probe for the Sync & Signal Field Kit draft (docs/launch/README.md).
 // Local only (not wired into CI). The frame-sync demo itself is demos/frame-sync.html
 // (checked by demos/check-states.js). This checks the Field Kit page on phone
-// (390x844) and desktop (1280x800): noindex, TBD price, no console errors or
+// (390x844) and desktop (1280x800): noindex at source, $12 price, no console errors or
 // horizontal scroll, and that checkout stays closed until both a valid provider
 // link, a real price and the [DAVE] terms are in place, plus the noindex
 // after-payment download page (field-kit/thanks/).
@@ -59,6 +59,8 @@ async function noHorizontalScroll(page, label) {
 }
 async function shotFull(page, name) { if (SCREENS) await page.screenshot({ path: path.join(SCREENS, name), fullPage: true }); }
 
+// The committed Payment Link, if any (js/sbd-launch-config.js); the page must open checkout on it.
+const SHIPPED_LINK = ((fs.readFileSync(path.join(ROOT, 'js/sbd-launch-config.js'), 'utf8').match(/checkout\s*:\s*\{[^}]*url:\s*'(https:\/\/buy\.stripe\.com\/[A-Za-z0-9_]+)'/) || [])[1]) || '';
 const VIEWPORTS = { phone: { width: 390, height: 844 }, desktop: { width: 1280, height: 800 } };
 
 try {
@@ -81,8 +83,15 @@ try {
     const html = fs.readFileSync(path.join(ROOT, 'field-kit/index.html'), 'utf8').replace(/ data-dave-placeholder/g, '');
     await route.fulfill({ contentType: 'text/html', body: html });
   }];
+  // The shipped page has no placeholders since the terms were approved (2026-11-01);
+  // this re-adds one to prove the interlock still holds.
+  const withPlaceholder = ['**/field-kit/', async (route) => {
+    const html = fs.readFileSync(path.join(ROOT, 'field-kit/index.html'), 'utf8').replace('<p>Digital download.', '<p data-dave-placeholder>Digital download.');
+    if (!/data-dave-placeholder/.test(html)) throw new Error('could not mark a terms block as a placeholder');
+    await route.fulfill({ contentType: 'text/html', body: html });
+  }];
   {
-    const { page, context } = await openWith('/field-kit/', { provider: 'gumroad', url: 'https://avbydave.gumroad.com/l/fieldkit', mode: 'link' });
+    const { page, context } = await openWith('/field-kit/', { provider: 'gumroad', url: 'https://avbydave.gumroad.com/l/fieldkit', mode: 'link' }, [withPlaceholder]);
     if (!(await page.locator('#kit-buy').isHidden()) || await page.locator('#kit-buy-disabled').isHidden()) fail('checkout opened while [DAVE] placeholders remain');
     await context.close();
   }
@@ -122,6 +131,7 @@ try {
     if (await page.locator('#kit-buy').isHidden() || (await page.getAttribute('#kit-buy', 'href')) !== 'https://buy.stripe.com/test_123') fail('stripe link checkout did not open with a real price');
     if (!/\$12/.test(await page.textContent('#kit-price'))) fail('real price not shown');
     if (!/download link appears right after payment/.test(await page.textContent('#kit-buy-note'))) fail('buy note does not describe the after-payment download page');
+    if (!(await page.locator('#kit-status').isHidden())) fail('"Checkout opens soon" badge still shows after checkout opened');
     await context.close();
   }
   notes.push('checkout: closed while [DAVE] placeholders remain or the price is a placeholder (Price TBD, [DAVE: …], empty); gumroad link, lemonsqueezy overlay (embed=1 + class) and stripe new-tab work; non-provider hosts, http and unknown providers stay closed');
@@ -134,12 +144,16 @@ try {
     if (!/noindex/.test(robots || '')) fail('Field Kit draft is not noindex');
     const shownPrice = await page.textContent('#kit-price');
     if (!/^\$12/.test(shownPrice.trim()) || /not set yet|TBD/.test(shownPrice)) fail(`Field Kit should show the $12 price (got ${JSON.stringify(shownPrice)})`);
-    if (!(await page.locator('#kit-buy').isHidden()) || await page.locator('#kit-buy-disabled').isHidden()) fail('shipped config opened checkout (Payment Link is still a placeholder)');
+    if (SHIPPED_LINK) {
+      if (await page.locator('#kit-buy').isHidden() || (await page.getAttribute('#kit-buy', 'href')) !== SHIPPED_LINK || (await page.getAttribute('#kit-buy', 'target')) !== '_blank') fail('shipped config has a Payment Link but checkout did not open on it');
+    } else if (!(await page.locator('#kit-buy').isHidden()) || await page.locator('#kit-buy-disabled').isHidden()) fail('shipped config opened checkout (Payment Link is still a placeholder)');
+    if (await page.locator('[data-dave-placeholder]').count()) fail('Field Kit page still has [DAVE] placeholder blocks');
+    if (/DRAFT/.test(await page.textContent('body'))) fail('Field Kit page shows a DRAFT marker');
     if (errors.length) fail(`field kit ${label} console errors: ${errors.join(' | ')}`);
     await shotFull(page, `field-kit-${label}.png`);
     await context.close();
   }
-  notes.push('shipped config (Stripe, [DAVE] Payment Link placeholder, price $12): $12 shown, checkout closed');
+  notes.push(SHIPPED_LINK ? 'shipped config (Stripe Payment Link, price $12): $12 shown, Buy button opens buy.stripe.com in a new tab (never clicked)' : 'shipped config (Stripe, [DAVE] Payment Link placeholder, price $12): $12 shown, checkout closed');
 
   // 3. After-payment download page (Stripe redirect target).
   const DL = 'https://drive.google.com/drive/folders/abc123';

@@ -22,17 +22,19 @@ window.SBD_LAUNCH = {
   // Until provider and url are both valid, checkout stays disabled.
   fieldKit: {
     // Chosen: Stripe Payment Links (2026-10-19), on a SEPARATE AV by Dave Stripe
-    // account (Dave, 2026-10-23), not the System by Dave one. The statement
-    // descriptor on field-kit/index.html stays a [STATEMENT DESCRIPTOR] placeholder
-    // until that account exists and its descriptor is known. Replace the
+    // account (Dave, 2026-10-23), not the System by Dave one. Set that
+    // account's statement descriptor to AVBYDAVE FIELD KIT, which
+    // field-kit/index.html names. Replace the
     // placeholder below with that account's Payment Link, e.g.
     // 'https://buy.stripe.com/xxxxxxxx'. Until it's a valid buy.stripe.com link,
-    // checkout stays closed.
-    checkout: { provider: 'stripe', url: '[DAVE: Stripe Payment Link]', mode: 'link' },
+    // checkout stays closed. The same link also makes the publish step index
+    // /field-kit/ and list it in the avbydave.com sitemap
+    // (scripts/field_kit_launch.mjs, scripts/gen_sitemap.py).
+    checkout: { provider: 'stripe', url: 'https://buy.stripe.com/cNifZg4N98oy776fKgdEs00', mode: 'link' },
     // Price buyers see (Dave, 2026-10-30); the Stripe price must match it.
     // A [DAVE: …] placeholder, 'Price TBD' or '' shows "Price TBD" and keeps
     // checkout closed. A real price alone does not open checkout: the
-    // Payment Link and the page's DRAFT blocks still gate it.
+    // Payment Link still gates it.
     priceLabel: '$12'
   }
 };

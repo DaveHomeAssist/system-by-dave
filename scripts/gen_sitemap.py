@@ -62,6 +62,8 @@ STATIC_PAGES = [
     ("demos/engineering-daily/", "daily", "0.7"),
     ("demos/frame-sync.html", "monthly", "0.8"),
     ("demos/fault-finding.html", "monthly", "0.8"),
+    # avbydave.com's Field Kit: listed only once checkout is live (field_kit_checkout_live).
+    ("field-kit/", "monthly", "0.8"),
     # hat-in-ring/ is a noindex handoff; production lives at hatinring.com.
     # marsscape/ moved to mixmash.games/mars/ (2026-07-03); the page there is a
     # save-migration redirect and should not be indexed.
@@ -123,7 +125,28 @@ def registry_tool_pages():
     return pages
 
 
+FIELD_KIT = "field-kit/"
+STRIPE_LINK = re.compile(r"^https://buy\.stripe\.com/[A-Za-z0-9_]+$")
+
+
+def field_kit_checkout_live(config_text=None, page_html=None):
+    """Same rule as scripts/field_kit_launch.mjs: the committed field-kit page is
+    noindex, and it is indexed only once js/sbd-launch-config.js has a
+    buy.stripe.com Payment Link and a real price and no DRAFT block remains."""
+    if config_text is None:
+        config_text = io.open(os.path.join(ROOT, "js", "sbd-launch-config.js"), encoding="utf-8").read()
+    if page_html is None:
+        page_html = io.open(os.path.join(ROOT, FIELD_KIT, "index.html"), encoding="utf-8").read()
+    block = re.search(r"checkout\s*:\s*\{[^}]*\}", config_text)
+    url = block and re.search(r"url\s*:\s*(['\"])(.*?)\1", block.group(0))
+    price = re.search(r"priceLabel\s*:\s*(['\"])(.*?)\1", config_text)
+    price_set = bool(price) and price.group(2).strip() not in ("", "Price TBD") and not price.group(2).lstrip().startswith("[")
+    return bool(url and STRIPE_LINK.match(url.group(2).strip())) and price_set and "data-dave-placeholder" not in page_html
+
+
 def is_indexable(path):
+    if path == FIELD_KIT:
+        return os.path.exists(os.path.join(ROOT, FIELD_KIT, "index.html")) and field_kit_checkout_live()
     probe = os.path.join(ROOT, path, "index.html") if path.endswith("/") else os.path.join(ROOT, path)
     if not os.path.exists(probe):
         return False
