@@ -3098,7 +3098,10 @@ window.AVWorkspaceVersion="v20261029-two-step-panel-chooser-verified";
         const cache=await caches.open(info.cache);
         const matches=await Promise.all(assets.filter(url=>new URL(url).origin===location.origin).map(url=>cache.match(url,{ignoreSearch:true})));
         if(matches.some(item=>!item))return false;
-        report('ready','Offline ready');return true;
+        const missing=Array.isArray(info.missing)?info.missing.length:0;
+        if(missing){root.dataset.workspaceOfflineMissing=String(missing);report('ready',`Offline ready · ${missing} file${missing===1?'':'s'} not saved yet — stay online to finish`);}
+        else{delete root.dataset.workspaceOfflineMissing;report('ready','Offline ready');}
+        return true;
       };
       if(await ready())return true;
       registration.active?.postMessage({type:'SBD_CLAIM_CLIENTS'});
