@@ -1,15 +1,15 @@
 {
   "id": "house-reference",
   "engineeringDailyPublication": {
-    "date": "2026-10-30",
-    "edition": 23,
-    "title": "Frame rate conversion families",
+    "date": "2026-11-01",
+    "edition": 25,
+    "title": "LED refresh and shutter exposure",
     "state": "Verified publication input; exact CI, merge and deployment evidence belongs to the provider records for this revision",
-    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=23&month=2026-10",
+    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=25&month=2026-11",
     "evidence": "demos/engineering-daily/release.json",
-    "verification": "Dominic: 46 archive and 46 story views, 10 calendar views, 10 dashboard views, 3 navigation journeys, 60 Signal lab views, 10 served archive views and 60 served entry views passed. All 23 SVG/PNG mappings and PNG dimensions validated; new card visually inspected. Public source contracts passed.",
+    "verification": "Dominic: 50 archive and 50 story views, 10 calendar views, 10 dashboard views, 3 navigation journeys and 60 Signal lab views passed. All 25 SVG/PNG mappings and PNG dimensions validated; both new cards visually inspected. Candidate source and served browser gates remain required before release.",
     "next": "Require exact-head CI, Pages deployment and matching live manifest/assets/browser journeys before publication completion; continue the same gates for future daily releases.",
-    "boundaries": "No change to facts 001 through 022 beyond clearing the previous current marker. No backfills or renumbering required. Human acceptance is separate."
+    "boundaries": "Preserve facts 001 through 023 beyond clearing the previous current marker. October 31 is newly authored as a backfill on November 1, not a historical delivery claim. No existing editions renumbered. Human acceptance is separate."
   },
   "engineeringDailyUx": {
     "date": "2026-10-28",
