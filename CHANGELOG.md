@@ -1,5 +1,9 @@
 # Changelog
 
+## October 30, 2026: Check release contracts before merge
+
+- Run Davai generation, Gear Reference, portfolio schema and ATEM switcher guide browser checks in the existing public pull request workflow. Retain the deployment gates and existing permissions; no publication or branch protection changes.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced

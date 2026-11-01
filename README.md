@@ -194,3 +194,13 @@ contributor (human or agent) should follow.
 ### AV workspace foundation
 
 The first bounded workspace consumers are Throwline Stage 3D and LED Wall Calculator. See [architecture, generated sources and device acceptance](docs/av-workspace.md). Run `npm run sync:av-workspace` to regenerate the shared inline blocks, `npm run verify:av` to check them, and `npm run test:av-workspace` for the touch viewport and offline matrix.
+
+### Pull request release checks
+
+The existing Public site contracts workflow runs on every pull request. It also
+runs Davai generation parity, Gear Reference generation and adapter checks,
+portfolio schema checks, and the ATEM switcher guide browser probe before merge.
+The browser probe covers shared model parity, file-based offline loading, and
+no-WebGL fallback using the Chromium installation already used by this job.
+These are the same commands retained in the Pages deployment gates. Workflow
+coverage does not change branch protections or prove a deployment or human acceptance.
