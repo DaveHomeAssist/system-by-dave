@@ -1,5 +1,12 @@
 # Changelog
 
+## November 1, 2026: Video Engineering Daily
+
+- Add Edition 025, LED refresh and shutter exposure, with a Brompton sourced
+  lesson and matching diagram and story card. Backfill October 31 as Edition
+  024, B frame reordering, with an AWS sourced lesson and matching assets.
+  Preserve all prior editions, chronological numbering and calendar behavior.
+
 ## October 30, 2026: Vite development server patch
 
 - Upgrade Vite from 6.4.4 to 6.4.5 for GHSA-8g5g-mxqh-grgj and raise the minimum compatible version. Add a loopback regression proving raw/import queries cannot retrieve a denied synthetic file, enforced by the existing pull request contract job.

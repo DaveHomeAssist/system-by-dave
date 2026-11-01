@@ -1,9 +1,37 @@
 {
   "schema": 1,
-  "sourceSha256": "999df798c42def64b6e6cd1b9ac3f0d364db3b27e542d734477be3b1e71a5f70",
-  "publicSha256": "557d619e718dcb4ca242848f7a6c5d60f0fa407412e532f5fb63d24ab99d8533",
-  "editions": 23,
+  "sourceSha256": "c5e4093195f6cffa20cf3191e0d08532c031657938163e251a009ba086141eee",
+  "publicSha256": "3c0b612aedf88548746ee1722519a222e338403cb1e3ec85f22d5adfbdb4415a",
+  "editions": 25,
   "files": [
+    {
+      "name": "Edition 025.svg",
+      "id": 25,
+      "date": "2026-11-01",
+      "title": "LED refresh and shutter exposure",
+      "sha256": "c8b47dc0952448770b8a0263350cabb4553680f1b2e7fb3201d254ac94f190f6"
+    },
+    {
+      "name": "Edition 025.png",
+      "id": 25,
+      "date": "2026-11-01",
+      "title": "LED refresh and shutter exposure",
+      "sha256": "25cef70f442cfc587a4c0284f58f454d7ed69a49595c4dc30bd1bb7240311d8a"
+    },
+    {
+      "name": "Edition 024.svg",
+      "id": 24,
+      "date": "2026-10-31",
+      "title": "B frame reordering",
+      "sha256": "055822e5f1ccee4c2c7cd1dc0e3b504cf92482b0d3855555aadf5b76fb2e7669"
+    },
+    {
+      "name": "Edition 024.png",
+      "id": 24,
+      "date": "2026-10-31",
+      "title": "B frame reordering",
+      "sha256": "07ccc2db5ff2a6c548f0f0f9ad4af4ea769f9e228c8aa74c5528e423b93c059c"
+    },
     {
       "name": "Edition 023.svg",
       "id": 23,
