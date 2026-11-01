@@ -170,8 +170,9 @@
     var seen = {};
     rows.forEach(function (r) { seen[r[0].join('+').toLowerCase()] = true; });
     Array.prototype.forEach.call(document.querySelectorAll('[aria-keyshortcuts]'), function (n) {
-      if (host.contains(n)) return;
+      if (host.contains(n) || !n.getClientRects().length) return; // only controls on screen now
       var ks = (n.getAttribute('aria-keyshortcuts') || '').split(/\s+/)[0];
+      if (/^(Escape|Esc)$/i.test(ks)) return; // Esc is listed under Everywhere
       var label = labelFor(n);
       if (!ks || !label || seen[ks.toLowerCase()]) return;
       seen[ks.toLowerCase()] = true;
