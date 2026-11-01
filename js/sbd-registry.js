@@ -172,6 +172,7 @@
     './js/sbd-rail.js',
     './js/sbd-rail-dialogs.js',
     './js/sbd-rail-mount.js',
+    './js/sbd-shortcuts.js',
     './js/av-offline.js',
     './css/responsive-tables.css',
     './css/fonts.css',
@@ -338,7 +339,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261029-two-step-panel-chooser-verified',
+    version:'v20261101-keyboard-shortcuts',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
