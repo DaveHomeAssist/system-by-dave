@@ -1,5 +1,5 @@
 type Pager = { refresh: () => void; destroy: () => void; reveal: (element: Element) => void };
-declare global { interface Window { AVViewport: { paginate: (card: HTMLElement, items: HTMLElement, options: { units: HTMLElement[]; label: string; hiddenClass: string; navClass: string; beforeMeasure?: (available: number) => void }) => Pager } } }
+declare global { interface Window { AVViewport: { paginate: (card: HTMLElement, items: HTMLElement, options: { units: HTMLElement[] | (() => HTMLElement[]); label: string; hiddenClass: string; navClass: string; beforeMeasure?: (available: number) => void }) => Pager } } }
 export const nodes = new Map<string, HTMLElement>();
 export const pagers = new Map<string, Pager>();
 export let parking: HTMLElement;
