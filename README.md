@@ -194,3 +194,5 @@ contributor (human or agent) should follow.
 ### AV workspace foundation
 
 The first bounded workspace consumers are Throwline Stage 3D and LED Wall Calculator. See [architecture, generated sources and device acceptance](docs/av-workspace.md). Run `npm run sync:av-workspace` to regenerate the shared inline blocks, `npm run verify:av` to check them, and `npm run test:av-workspace` for the touch viewport and offline matrix.
+
+Davai reference navigation and verification: [reference contract](docs/davai-navigation.md). Run `npm run verify:davai` and `npm run test:davai-browser` after generator changes.
