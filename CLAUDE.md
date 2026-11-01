@@ -13,8 +13,9 @@ handoffs.
 - Production: [systembydave.com](https://systembydave.com)
 - Repository: `DaveHomeAssist/system-by-dave`
 - Hosting: GitHub Pages from `main`, with `CNAME` preserving the custom domain.
-  The FMP suite and AV by Dave are also published from here to housevideo.app
-  and avbydave.com (`docs/domain-sites.md`).
+  The FMP suite, venue walk and AV by Dave are also published from here to
+  housevideo.app, walk.housevideo.app and avbydave.com
+  ([domain publishing contract](docs/domain-sites.md)).
 
 ## Architecture
 
