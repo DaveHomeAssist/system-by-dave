@@ -24,6 +24,7 @@ import vm from 'node:vm';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { FIELD_KIT_PAGE, stagedFieldKitPage } from './field_kit_launch.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_FILE = 'scripts/domain-sites.json';
@@ -718,7 +719,12 @@ function stageSite(site, closed, policy, options) {
   for (const file of [...closed.files].sort()) {
     const target = path.join(dir, file);
     fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.copyFileSync(abs(file), target);
+    if (file === FIELD_KIT_PAGE) {
+      // Indexed only once checkout is live (scripts/field_kit_launch.mjs).
+      fs.writeFileSync(target, stagedFieldKitPage(read('js/sbd-launch-config.js'), read(file)));
+    } else {
+      fs.copyFileSync(abs(file), target);
+    }
   }
   const origin = options.siteOrigins[site.id] || `https://${site.domain}`;
   const sourceOrigin = options.sourceOrigin || options.config.origin;

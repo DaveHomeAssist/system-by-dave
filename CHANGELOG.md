@@ -1,5 +1,11 @@
 # Changelog
 
+## November 1, 2026: Field Kit checkout
+
+- Wire the AV by Dave Stripe Payment Link ($12) into `js/sbd-launch-config.js`, finalise the Field Kit delivery, statement descriptor (AVBYDAVE FIELD KIT), refund and licence text, and remove the DRAFT markers, so the Buy button opens.
+- Index `/field-kit/` on avbydave.com only while checkout is live: the source stays noindex and the publish step swaps it, with a matching avbydave.com sitemap entry (`scripts/field_kit_launch.mjs`, `scripts/gen_sitemap.py`, tested in `verify:domain-sites`).
+- Add the avbydave.com/frame-sync/ Reel short link, a noindex redirect to systembydave.com/demos/frame-sync.html that keeps the query string.
+
 ## October 30, 2026: Vite development server patch
 
 - Upgrade Vite from 6.4.4 to 6.4.5 for GHSA-8g5g-mxqh-grgj and raise the minimum compatible version. Add a loopback regression proving raw/import queries cannot retrieve a denied synthetic file, enforced by the existing pull request contract job.

@@ -15,11 +15,10 @@ Checkout opens only when **all three** of these are true:
 1. `fieldKit.checkout` names a provider and an HTTPS link on that provider's own
    hosts. Anything else stays closed: another host, `http:`, a typo or an
    unknown provider.
-2. Every Dave-approval block on `field-kit/index.html` (delivery, statement
-   descriptor, refunds, licence; marked `data-dave-placeholder`) has been
-   approved or replaced. Delete the `data-dave-placeholder` attribute with each
-   one. While any remain, the button stays disabled and the console says how
-   many are left.
+2. No block on `field-kit/index.html` is marked `data-dave-placeholder`. The
+   delivery, statement descriptor, refund and licence text was approved on
+   2026-11-01 and the markers removed. Re-adding the attribute to any block
+   closes checkout again, and the console says how many are left.
 3. `fieldKit.priceLabel` is a real price. `'Price TBD'`, an empty string or a
    `[DAVE: …]` placeholder keeps checkout closed and the page shows "Price TBD".
 
@@ -42,10 +41,21 @@ The config ships `provider: 'stripe'` with the marked placeholder
 `url: '[DAVE: Stripe Payment Link]'` and `priceLabel: '$12'` (Dave, 2026-10-30),
 so checkout stays closed until a real `buy.stripe.com` link replaces the placeholder.
 **Account:** a separate AV by Dave Stripe account (Dave, 2026-10-23), not the System
-by Dave one. Its statement descriptor isn't known yet, so `[STATEMENT DESCRIPTOR]`
-stays a placeholder. The four blocks on the page carry **DRAFT** wording for
-Dave to approve, including `[STATEMENT DESCRIPTOR]`. Dave's click-steps live
-outside the repo (`/workspace/launch/setup-stripe.md`).
+by Dave one. Statement descriptor: **AVBYDAVE FIELD KIT** (18 characters; set it
+in that account's Stripe settings so the card statement matches the page). The
+Payment Link went in on 2026-11-01. Dave's click-steps live outside the repo
+(`/workspace/launch/setup-stripe.md`).
+
+## Search indexing
+
+`field-kit/index.html` is committed `noindex,nofollow`. When
+`js/sbd-launch-config.js` has a `buy.stripe.com` Payment Link and a real price,
+and no `data-dave-placeholder` block remains, the publish step
+(`scripts/stage_domain_sites.mjs` via `scripts/field_kit_launch.mjs`) stages the
+page as `index,follow` and `scripts/gen_sitemap.py --site avbydave` lists
+`/field-kit/` in the avbydave.com sitemap. Put the placeholder back and both
+revert. `scripts/field_kit_launch.test.mjs` (in `npm run verify:domain-sites`)
+keeps the JavaScript and Python rules in step.
 
 Delivery: Stripe doesn't host files. The Payment Link's "After payment" →
 "Don't show confirmation page" → redirect setting sends buyers to the noindex page
@@ -72,10 +82,8 @@ link and update the redirect in Stripe. No code change or push is needed.
 
 1. Create the product with the provider, upload the kit files there (not to the
    repo), and set the price, tax and refund settings.
-2. Approve or edit the four DRAFT blocks (delivery, statement descriptor,
-   refunds, licence), fill in `[STATEMENT DESCRIPTOR]`, and remove the
-   `DRAFT, Dave …:` labels, the `kit-dave` class and the `data-dave-placeholder`
-   attribute.
+2. Done 2026-11-01: the delivery, statement descriptor, refund and licence
+   text is final and the DRAFT markers are gone.
 3. Replace the `url` placeholder in `js/sbd-launch-config.js` with the Payment
    Link (or paste another provider's block below), and set `priceLabel` to the
    Stripe price (for example `'$12'`):
