@@ -1,0 +1,52 @@
+[
+  {
+    "id": "head.bubble",
+    "selected": "head.bubble",
+    "view": "headRear"
+  },
+  {
+    "id": "head.counterbalance",
+    "selected": "head.counterbalance",
+    "view": "headRear"
+  },
+  {
+    "id": "head.display",
+    "selected": "head.display",
+    "view": "headRear"
+  },
+  {
+    "id": "head.horizontalLock",
+    "selected": "head.horizontalLock",
+    "view": "headFrontRight"
+  },
+  {
+    "id": "head.panDrag",
+    "selected": "head.panDrag",
+    "view": "headFrontRight"
+  },
+  {
+    "id": "head.panLock",
+    "selected": "head.panLock",
+    "view": "headFront"
+  },
+  {
+    "id": "head.plate",
+    "selected": "head.plate",
+    "view": "headFront"
+  },
+  {
+    "id": "head.slideLock",
+    "selected": "head.slideLock",
+    "view": "headRear"
+  },
+  {
+    "id": "head.tiltDrag",
+    "selected": "head.tiltDrag",
+    "view": "headFront"
+  },
+  {
+    "id": "head.tiltLock",
+    "selected": "head.tiltLock",
+    "view": "headRear"
+  }
+]

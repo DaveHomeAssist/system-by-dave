@@ -1,3 +1,10 @@
+import { probeFamily } from './av-family-probe.mjs';
+// Detailed retained-host regressions remain available through test:av-retained-browser.
+if (!process.env.AV_RETAINED_HOST) {
+  await probeFamily('video', process.env.AV_VIDEO_BASE);
+  process.exit(0);
+}
+
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFile, stat, mkdir } from 'node:fs/promises';

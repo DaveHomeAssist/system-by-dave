@@ -75,7 +75,9 @@ to make stale documentation true.
   assets. Consumers must not maintain competing inventories.
 - **Indexable routes:** `scripts/gen_sitemap.py` owns the static route list and
   adds indexable AV routes from the registry. Run it; do not hand-edit
-  `sitemap.xml`.
+  `sitemap.xml`. The committed file lists routes only (no `<lastmod>`), so it
+  regenerates identically on any day; the Pages deploy stamps the published
+  copy from git history with `--lastmod`.
 - **Public shell and naming:** `docs/public-shell-contract.md` and
   `docs/public-content-contract.md` own navigation behavior, canonical names,
   title families, and checked public counts.
@@ -197,7 +199,8 @@ Pages workflow before a production claim.
 
 - **All changes:** `git diff --check` and review the complete diff.
 - **Sitemap or public-route changes:** `python3 scripts/gen_sitemap.py`,
-  `npm run verify:indexing`, and confirm no unexpected generated diff.
+  `npm run verify:indexing`, and `python3 scripts/gen_sitemap.py --check`
+  (also run on every pull request) to confirm no unexpected generated diff.
 - **Public shell or public copy:** `npm run verify:public-navigation` and
   `npm run verify:public-consistency`.
 - **AV registry, tools, themes, or offline assets:** `npm run verify:av`; add

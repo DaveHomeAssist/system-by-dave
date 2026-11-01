@@ -1,2 +1,4 @@
-:HL["/cheesesteaks/_next/static/chunks/2_083z2h1ocb6.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"rankings","param":null,"prefetchHints":4160,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"wyaJ_bdVm6lxbriaPpa5G"}
+:HL["/cheesesteaks/_next/static/chunks/3i59zbodi8aoh.css","style"]
+2:[["children",{"s":"__PAGE__","h":160}]]
+1:[["children",{"s":"rankings","h":64,"c":"$Q2"}]]
+0:{"b":"ZvprTkrgJktmL9y4caXba","t":{"t":{"s":"","h":16,"c":"$Q1"}}}

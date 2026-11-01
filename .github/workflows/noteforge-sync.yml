@@ -71,7 +71,7 @@ jobs:
         with:
           ref: main
           path: site
-          fetch-depth: 0 # scripts/gen_sitemap.py reads git commit dates
+          fetch-depth: 0
 
       - name: Check out NoteForge at the exact commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

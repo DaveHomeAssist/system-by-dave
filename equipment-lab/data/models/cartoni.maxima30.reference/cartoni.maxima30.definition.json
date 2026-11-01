@@ -1,0 +1,4385 @@
+{
+  "schema": "equipment.reference.v1",
+  "revision": "1.0.0",
+  "assetId": "C02",
+  "representation": "inspection",
+  "native": {
+    "definition": {
+      "schema": "equipment.inspection.v1",
+      "revision": "1.2.0",
+      "equipment_id": "fujinon66-cartoni30-rig",
+      "compatibility": "ECP-1.0 revision 1.0",
+      "units": "m",
+      "up": "+Y",
+      "forward": "-Z",
+      "origin": "Head tilt axis",
+      "lens": {
+        "manufacturer": "Fujinon",
+        "family": "DigiPower 66 / XA66x9.3BESM",
+        "exact_unit_variant": "unknown",
+        "nominal_hood_inclusive_length_m": 0.644
+      },
+      "head": {
+        "manufacturer": "Cartoni",
+        "model": "Maxima 30",
+        "reference": "HM3100"
+      },
+      "camera": {
+        "manufacturer": "Panasonic",
+        "model": "unknown",
+        "geometry": "generic"
+      },
+      "geometry": "Photo-informed shroud and head casting; manufacturer-referenced control layout. Dimensions remain approximate. Not CAD.",
+      "geometry_revision": "2026-10-23 Cartoni reference pilot",
+      "behavior": "Local illustrative practice only. No optical, payload or hardware calibration."
+    },
+    "components": [
+      {
+        "id": "head.plate",
+        "label": "Sliding camera plate",
+        "assembly": "head",
+        "purpose": "Moves the complete payload fore and aft over the head’s tilt axis.",
+        "action": "Support the rig, release the captured slide and adjust near level. Nose heavy: move rearward. Tail heavy: move forward. Secure the plate before tilting.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "8",
+        "view": "head",
+        "practice": "plate"
+      },
+      {
+        "id": "head.slideLock",
+        "label": "Slide lock lever",
+        "assembly": "head",
+        "purpose": "Secures the camera plate. The removal position also requires the safety button.",
+        "action": "Cartoni positions: 0 locked, 1 captured sliding, 2 removal. Use captured sliding for balance and return to 0 afterwards.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "14",
+        "view": "headSide"
+      },
+      {
+        "id": "head.tiltDrag",
+        "label": "Tilt drag selector",
+        "assembly": "head",
+        "purpose": "Sets resistance during up/down camera movement.",
+        "action": "This is the left control you circled. Reduce drag for balancing; add the operating feel after the rig holds its angle.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "4",
+        "view": "headFront",
+        "practice": "tiltDrag",
+        "note": "Drag controls motion resistance; counterbalance supports the load."
+      },
+      {
+        "id": "head.panLock",
+        "label": "Pan lock lever",
+        "assembly": "head",
+        "purpose": "Locks left/right rotation of the head.",
+        "action": "This is the right control you circled. Keep pan locked while mounting and balancing, then release it for operation.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "11",
+        "view": "headFrontRight",
+        "practice": "panLock"
+      },
+      {
+        "id": "head.panDrag",
+        "label": "Pan drag selector",
+        "assembly": "head",
+        "purpose": "Sets resistance during horizontal camera movement.",
+        "action": "Release the pan lock, then set a comfortable drag for the focal length and shot.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "12",
+        "view": "headSide",
+        "practice": "panDrag"
+      },
+      {
+        "id": "head.tiltLock",
+        "label": "Tilt lock lever",
+        "assembly": "head",
+        "purpose": "Secures tilt movement.",
+        "action": "Support the camera before releasing it. A locked head cannot reveal whether the rig is balanced.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "13",
+        "view": "headSide",
+        "practice": "tiltLock"
+      },
+      {
+        "id": "head.horizontalLock",
+        "label": "Horizontal lock",
+        "assembly": "head",
+        "purpose": "The on/off buttons hold the head at its horizontal mounting position.",
+        "action": "Engage at level for setup. Hold the pan bar firmly before disengaging the horizontal lock.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "15 / 19",
+        "view": "headSide",
+        "practice": "horizontalLock"
+      },
+      {
+        "id": "head.counterbalance",
+        "label": "Counterbalance selector",
+        "assembly": "head",
+        "purpose": "Adjusts the spring torque opposing the weight of the tilted payload.",
+        "action": "After fore/aft balance, increase counterbalance until the rig holds both upward and downward angles. Too little falls farther; too much returns toward level.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "20",
+        "view": "headRear",
+        "practice": "counterbalance",
+        "note": "Rear of the head, above the PAN / BALANCE / TILT readouts."
+      },
+      {
+        "id": "head.display",
+        "label": "Pan / balance / tilt readouts",
+        "assembly": "head",
+        "purpose": "Displays head settings with an illumination button.",
+        "action": "Use as a repeatable reference after balance is established. No real setting number is prescribed for this unknown payload.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "17 / 18",
+        "view": "headRear"
+      },
+      {
+        "id": "head.bubble",
+        "label": "Bubble level",
+        "assembly": "head",
+        "purpose": "Shows whether the head base is level.",
+        "action": "Level the support before balancing and check it again after repositioning.",
+        "source": "cartoni",
+        "geometry": "approximate",
+        "number": "16",
+        "view": "headSide"
+      }
+    ],
+    "sources": {
+      "fuji": {
+        "label": "Fujinon XA66 original leaflet · p. 2",
+        "url": "https://optavideo.com/images/pdf/Fileofitems1C/XA66x9.3BESM_Leaflet_2006.08_03.pdf"
+      },
+      "cartoni": {
+        "label": "Cartoni Maxima 30 manual · pp. 5–9",
+        "url": "https://www.cartoni.com/wp-content/uploads/ProductDocuments/FluidHeads/Cartoni_FluidHeads_HM3100_Maxima30_UserManual.pdf"
+      },
+      "procedure": {
+        "label": "Related XA77 operating manual · pp. 8–9",
+        "url": "https://asset.fujifilm.com/global/files/2021-09/f152d99c8a566aebb115a42a36f14ba4/XA77x95BESM.pdf#page=20"
+      },
+      "capacity": {
+        "label": "Cartoni Maxima 30 product & capacity",
+        "url": "https://www.cartoni.com/products/fluid-heads/fluid-heads-flat-base/hm3100-maxima-30/"
+      }
+    }
+  },
+  "componentMap": {
+    "head.plate": "head.plate",
+    "head.slideLock": "head.slideLock",
+    "head.tiltDrag": "head.tiltDrag",
+    "head.panDrag": "head.panDrag",
+    "head.panLock": "head.panLock",
+    "head.tiltLock": "head.tiltLock",
+    "head.horizontalLock": "head.horizontalLock",
+    "head.counterbalance": "head.counterbalance",
+    "head.display": "head.display",
+    "head.bubble": "head.bubble"
+  },
+  "frame": {
+    "units": "m",
+    "up": "+Y",
+    "front": "+Z",
+    "origin": "head base contact plane on pan axis",
+    "nativeToPortable": [
+      -1,
+      0,
+      -1.2246467991473532e-16,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1.2246467991473532e-16,
+      0,
+      -1,
+      0,
+      0,
+      0.205,
+      0,
+      1
+    ],
+    "portableToNative": [
+      -1,
+      0,
+      1.2246467991473532e-16,
+      0,
+      0,
+      1,
+      0,
+      0,
+      -1.2246467991473532e-16,
+      0,
+      -1,
+      0,
+      0,
+      -0.205,
+      0,
+      1
+    ],
+    "nativeOrigin": "head tilt axis",
+    "nativeFront": "-Z"
+  },
+  "dimensions": {
+    "nominal": null,
+    "measured": null,
+    "modeled": {
+      "min": [
+        -0.15709999999403954,
+        -1.0430814545436817e-10,
+        -0.18350000679492953
+      ],
+      "max": [
+        0.15709999999403954,
+        0.3584999996945262,
+        0.18350000679492953
+      ],
+      "size": [
+        0.31419999998807907,
+        0.3584999997988343,
+        0.36700001358985906
+      ]
+    },
+    "use": "approximate inspection only; not measured fit"
+  },
+  "rig": {
+    "kind": "rigid hierarchy",
+    "bones": 0,
+    "skins": 0,
+    "clips": 0,
+    "joints": {
+      "pan": {
+        "node": "maxima30.panPivot",
+        "axis": "+Y",
+        "units": "degrees",
+        "practiceRange": [
+          -180,
+          180
+        ]
+      },
+      "tilt": {
+        "node": "maxima30.tiltPivot",
+        "axis": "+X",
+        "units": "degrees",
+        "practiceRange": [
+          -55,
+          55
+        ]
+      },
+      "slide": {
+        "node": "head.plate",
+        "axis": "+Z native",
+        "units": "mm",
+        "practiceRange": [
+          -60,
+          60
+        ]
+      },
+      "counterbalance": {
+        "node": "head.counterbalance.grip",
+        "axis": "+Z",
+        "practiceRange": [
+          0,
+          100
+        ],
+        "default": 50,
+        "meaning": "relative illustrative value; no physical spring calibration"
+      }
+    },
+    "payloadMount": "maxima30.payloadMount",
+    "baseDatum": [
+      0,
+      0,
+      0
+    ],
+    "tiltDatum": [
+      0,
+      0.205,
+      0
+    ],
+    "context": "C01 and C03-C07 excluded; imported separately by Ion"
+  },
+  "materials": [
+    {
+      "name": "maxima30.material.maxima30.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.09084171117479915,
+        0.09989872823822872,
+        0.09305896283800832
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.torus.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.23455058215026167,
+        0.25818285291079235,
+        0.23839757380151394
+      ],
+      "metalness": 0.5,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.005",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.006",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.005",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.006",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.007",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.008",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.009",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.torus.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.09084171117479915,
+        0.09989872823822872,
+        0.09305896283800832
+      ],
+      "metalness": 0.5,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.010",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.011",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.012",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.013",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.014",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.015",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.016",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.017",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.018",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.2917706498067337,
+        0.3231432091022285,
+        0.29613827078752575
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.019",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.020",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.021",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.022",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.023",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.label.001",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.024",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.025",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.torus.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.09084171117479915,
+        0.09989872823822872,
+        0.09305896283800832
+      ],
+      "metalness": 0.5,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.026",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.027",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.028",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.029",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.030",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.031",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.032",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.033",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.034",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.2917706498067337,
+        0.3231432091022285,
+        0.29613827078752575
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.035",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.036",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.037",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.038",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.039",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.label.002",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.007",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.label.003",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.008",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.label.004",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.maxima30.label.005",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.040",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.041",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.042",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.043",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.009",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.044",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.23455058215026167,
+        0.25818285291079235,
+        0.23074004851362043
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.010",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.cylinder.045",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.23455058215026167,
+        0.25818285291079235,
+        0.23074004851362043
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.extrude.011",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.maxima30.label.006",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.plate.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.extrude.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.05286064701616471,
+        0.057805430183792694,
+        0.05286064701616471
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.label.001",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.plate.extrude.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.05286064701616471,
+        0.057805430183792694,
+        0.05286064701616471
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.label.002",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.plate.extrude.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.05286064701616471,
+        0.057805430183792694,
+        0.05286064701616471
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.label.003",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.plate.extrude.005",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.05286064701616471,
+        0.057805430183792694,
+        0.05286064701616471
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.label.004",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.plate.extrude.006",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.05286064701616471,
+        0.057805430183792694,
+        0.05286064701616471
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.label.005",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.plate.extrude.007",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.05286064701616471,
+        0.057805430183792694,
+        0.05286064701616471
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.label.006",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.plate.extrude.008",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.05286064701616471,
+        0.057805430183792694,
+        0.05286064701616471
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.label.007",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.plate.extrude.009",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.05286064701616471,
+        0.057805430183792694,
+        0.05286064701616471
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.label.008",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.plate.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.cylinder.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.2746773120495699,
+        0.3049873140591091,
+        0.2788942634659966
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.cylinder.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.plate.cylinder.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.2746773120495699,
+        0.3049873140591091,
+        0.2788942634659966
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.slideLock.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.slideLock.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.4019777798219466,
+        0.4232676699760063,
+        0.4178850708380236
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.tiltDrag.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.02121901037134225,
+        0.023153366173251363,
+        0.024157632443547246
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.tiltDrag.cylinder.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0069954101845983935,
+        0.008023192982520563,
+        0.008023192982520563
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.tiltDrag.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.01764195448412081,
+        0.019382360952473074,
+        0.02121901037134225
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.tiltDrag.cylinder.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0027317428517647058,
+        0.004024717016506897,
+        0.004391442035325718
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.tiltDrag.torus.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.4019777798219466,
+        0.12213877222015301,
+        0.09758734713304495
+      ],
+      "metalness": 0.5,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.tiltDrag.cylinder.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0343398068028541,
+        0.040915196900556984,
+        0.04231141061442144
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.panDrag.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.02121901037134225,
+        0.023153366173251363,
+        0.024157632443547246
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.panDrag.cylinder.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0069954101845983935,
+        0.008023192982520563,
+        0.008023192982520563
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.panDrag.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.01764195448412081,
+        0.019382360952473074,
+        0.02121901037134225
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.panDrag.cylinder.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0027317428517647058,
+        0.004024717016506897,
+        0.004391442035325718
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.panDrag.torus.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.4019777798219466,
+        0.12213877222015301,
+        0.09758734713304495
+      ],
+      "metalness": 0.5,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.panDrag.cylinder.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0343398068028541,
+        0.040915196900556984,
+        0.04231141061442144
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.panLock.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.panLock.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.014443843592229466,
+        0.02028856305209031,
+        0.023153366173251363
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.panLock.extrude.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.tiltLock.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.tiltLock.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.014443843592229466,
+        0.02028856305209031,
+        0.023153366173251363
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.horizontalLock.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024157632443547246,
+        0.026241221889696346,
+        0.026241221889696346
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.horizontalLock.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.25818285291079235,
+        0.28314874041918053,
+        0.26225065751888765
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.horizontalLock.cylinder.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.horizontalLock.cylinder.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.25818285291079235,
+        0.28314874041918053,
+        0.26225065751888765
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.horizontalLock.cylinder.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.cylinder.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4019777798219466,
+        0.35640014413537763
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.torus.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.033104766565152086,
+        0.04231141061442144,
+        0.035601314869097636
+      ],
+      "metalness": 0.5,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.label.001",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.extrude.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.22322795730611386,
+        0.2541520943200296,
+        0.22696587349938613
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.extrude.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.3915724777393922,
+        0.4396571738310091,
+        0.3915724777393922
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.cylinder.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.extrude.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.3915724777393922,
+        0.4396571738310091,
+        0.3915724777393922
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.cylinder.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.cylinder.005",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.counterbalance.cylinder.006",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.extrude.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.158960835050774,
+        0.1878207722902346,
+        0.16513219449147767
+      ],
+      "metalness": 0.12,
+      "roughness": 0.65,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.label.001",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.display.extrude.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.extrude.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.08650046202808521,
+        0.12743768042608497,
+        0.10224173307914941
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.label.002",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.display.label.003",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.display.extrude.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.extrude.005",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.08650046202808521,
+        0.12743768042608497,
+        0.10224173307914941
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.label.004",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.display.label.005",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.display.extrude.006",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.extrude.007",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.08650046202808521,
+        0.12743768042608497,
+        0.10224173307914941
+      ],
+      "metalness": 0.15,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.label.006",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.display.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.cylinder.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.cylinder.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.cylinder.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.cylinder.005",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.36625259558833256,
+        0.4286904966038916,
+        0.43415363616478553
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.cylinder.006",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.display.label.007",
+      "type": "MeshBasicMaterial",
+      "role": "unlit label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "depthWrite": false
+    },
+    {
+      "name": "maxima30.material.head.bubble.cylinder.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.00972121731707524,
+        0.011612245176281512,
+        0.011612245176281512
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.bubble.cylinder.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.46207699964472876,
+        0.5647115056965487,
+        0.09084171117479915
+      ],
+      "metalness": 0.45,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "maxima30.material.head.bubble.torus.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.02121901037134225,
+        0.05126945836711539,
+        0.023153366173251363
+      ],
+      "metalness": 0.5,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    }
+  ],
+  "textures": [
+    {
+      "name": "maxima30.texture.maxima30.label.001.color",
+      "width": 1024,
+      "height": 307,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.maxima30.label.002.color",
+      "width": 1024,
+      "height": 307,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.maxima30.label.003.color",
+      "width": 1024,
+      "height": 307,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.maxima30.label.004.color",
+      "width": 1024,
+      "height": 176,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.maxima30.label.005.color",
+      "width": 1024,
+      "height": 432,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.maxima30.label.006.color",
+      "width": 1024,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.plate.label.001.color",
+      "width": 1024,
+      "height": 205,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.plate.label.002.color",
+      "width": 1024,
+      "height": 205,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.plate.label.003.color",
+      "width": 1024,
+      "height": 205,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.plate.label.004.color",
+      "width": 1024,
+      "height": 205,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.plate.label.005.color",
+      "width": 1024,
+      "height": 205,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.plate.label.006.color",
+      "width": 1024,
+      "height": 205,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.plate.label.007.color",
+      "width": 1024,
+      "height": 171,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.plate.label.008.color",
+      "width": 1024,
+      "height": 171,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.counterbalance.label.001.color",
+      "width": 1024,
+      "height": 1024,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.display.label.001.color",
+      "width": 1024,
+      "height": 209,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.display.label.002.color",
+      "width": 1024,
+      "height": 341,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.display.label.003.color",
+      "width": 1024,
+      "height": 209,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.display.label.004.color",
+      "width": 1024,
+      "height": 341,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.display.label.005.color",
+      "width": 1024,
+      "height": 209,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.display.label.006.color",
+      "width": 1024,
+      "height": 341,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "maxima30.texture.head.display.label.007.color",
+      "width": 1024,
+      "height": 279,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    }
+  ],
+  "surfaces": [
+    {
+      "name": "maxima30.cylinder.001",
+      "geometry": "maxima30.cylinder.001.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.002",
+      "geometry": "maxima30.cylinder.002.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.torus.001",
+      "geometry": "maxima30.torus.001.geometry",
+      "owner": "C02",
+      "role": "torus",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.extrude.001",
+      "geometry": "maxima30.extrude.001.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.extrude.002",
+      "geometry": "maxima30.extrude.002.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.extrude.003",
+      "geometry": "maxima30.extrude.003.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.extrude.004",
+      "geometry": "maxima30.extrude.004.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.003",
+      "geometry": "maxima30.cylinder.003.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.004",
+      "geometry": "maxima30.cylinder.004.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.extrude.005",
+      "geometry": "maxima30.extrude.005.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.extrude.006",
+      "geometry": "maxima30.extrude.006.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.005",
+      "geometry": "maxima30.cylinder.005.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.006",
+      "geometry": "maxima30.cylinder.006.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.007",
+      "geometry": "maxima30.cylinder.007.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.008",
+      "geometry": "maxima30.cylinder.008.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.009",
+      "geometry": "maxima30.cylinder.009.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.torus.002",
+      "geometry": "maxima30.torus.002.geometry",
+      "owner": "C02",
+      "role": "torus",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.010",
+      "geometry": "maxima30.cylinder.010.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.011",
+      "geometry": "maxima30.cylinder.011.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.012",
+      "geometry": "maxima30.cylinder.012.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.013",
+      "geometry": "maxima30.cylinder.013.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.014",
+      "geometry": "maxima30.cylinder.014.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.015",
+      "geometry": "maxima30.cylinder.015.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.016",
+      "geometry": "maxima30.cylinder.016.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.017",
+      "geometry": "maxima30.cylinder.017.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.018",
+      "geometry": "maxima30.cylinder.018.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.019",
+      "geometry": "maxima30.cylinder.019.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.020",
+      "geometry": "maxima30.cylinder.020.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.021",
+      "geometry": "maxima30.cylinder.021.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.022",
+      "geometry": "maxima30.cylinder.022.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.023",
+      "geometry": "maxima30.cylinder.023.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.label.001",
+      "geometry": "maxima30.label.001.geometry",
+      "owner": "C02",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "graphic",
+        "w": 0.085,
+        "h": 0.025500000000000002,
+        "face": "left",
+        "paint": "(c,w,h)=>{c.strokeStyle=c.fillStyle='#d6d4ca';c.lineWidth=3;c.strokeRect(18,12,w-36,h-24);c.textAlign='center';c.textBaseline='middle';c.font=`500 ${h*.66}px Arial`;c.fillText('CARTONI',w/2,h*.52,w*.85);}",
+        "canvas": [
+          1024,
+          307
+        ]
+      }
+    },
+    {
+      "name": "maxima30.cylinder.024",
+      "geometry": "maxima30.cylinder.024.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.025",
+      "geometry": "maxima30.cylinder.025.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.torus.003",
+      "geometry": "maxima30.torus.003.geometry",
+      "owner": "C02",
+      "role": "torus",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.026",
+      "geometry": "maxima30.cylinder.026.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.027",
+      "geometry": "maxima30.cylinder.027.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.028",
+      "geometry": "maxima30.cylinder.028.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.029",
+      "geometry": "maxima30.cylinder.029.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.030",
+      "geometry": "maxima30.cylinder.030.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.031",
+      "geometry": "maxima30.cylinder.031.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.032",
+      "geometry": "maxima30.cylinder.032.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.033",
+      "geometry": "maxima30.cylinder.033.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.034",
+      "geometry": "maxima30.cylinder.034.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.035",
+      "geometry": "maxima30.cylinder.035.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.036",
+      "geometry": "maxima30.cylinder.036.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.037",
+      "geometry": "maxima30.cylinder.037.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.038",
+      "geometry": "maxima30.cylinder.038.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.039",
+      "geometry": "maxima30.cylinder.039.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.label.002",
+      "geometry": "maxima30.label.002.geometry",
+      "owner": "C02",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "graphic",
+        "w": 0.085,
+        "h": 0.025500000000000002,
+        "face": "right",
+        "paint": "(c,w,h)=>{c.strokeStyle=c.fillStyle='#d6d4ca';c.lineWidth=3;c.strokeRect(18,12,w-36,h-24);c.textAlign='center';c.textBaseline='middle';c.font=`500 ${h*.66}px Arial`;c.fillText('CARTONI',w/2,h*.52,w*.85);}",
+        "canvas": [
+          1024,
+          307
+        ]
+      }
+    },
+    {
+      "name": "maxima30.extrude.007",
+      "geometry": "maxima30.extrude.007.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.label.003",
+      "geometry": "maxima30.label.003.geometry",
+      "owner": "C02",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "graphic",
+        "w": 0.105,
+        "h": 0.0315,
+        "face": "front",
+        "paint": "(c,w,h)=>{c.strokeStyle=c.fillStyle='#d6d4ca';c.lineWidth=3;c.strokeRect(18,12,w-36,h-24);c.textAlign='center';c.textBaseline='middle';c.font=`500 ${h*.66}px Arial`;c.fillText('CARTONI',w/2,h*.52,w*.85);}",
+        "canvas": [
+          1024,
+          307
+        ]
+      }
+    },
+    {
+      "name": "maxima30.extrude.008",
+      "geometry": "maxima30.extrude.008.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.label.004",
+      "geometry": "maxima30.label.004.geometry",
+      "owner": "C02",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "MAXIMA",
+        "w": 0.105,
+        "h": 0.018,
+        "face": "front",
+        "fg": "#c8cbc4",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          176
+        ]
+      }
+    },
+    {
+      "name": "maxima30.label.005",
+      "geometry": "maxima30.label.005.geometry",
+      "owner": "C02",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "30",
+        "w": 0.045,
+        "h": 0.019,
+        "face": "front",
+        "fg": "#c8cbc4",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          432
+        ]
+      }
+    },
+    {
+      "name": "maxima30.cylinder.040",
+      "geometry": "maxima30.cylinder.040.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.041",
+      "geometry": "maxima30.cylinder.041.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.042",
+      "geometry": "maxima30.cylinder.042.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.043",
+      "geometry": "maxima30.cylinder.043.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.extrude.009",
+      "geometry": "maxima30.extrude.009.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.044",
+      "geometry": "maxima30.cylinder.044.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.extrude.010",
+      "geometry": "maxima30.extrude.010.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.cylinder.045",
+      "geometry": "maxima30.cylinder.045.geometry",
+      "owner": "C02",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.extrude.011",
+      "geometry": "maxima30.extrude.011.geometry",
+      "owner": "C02",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "maxima30.label.006",
+      "geometry": "maxima30.label.006.geometry",
+      "owner": "C02",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "graphic",
+        "w": 0.17,
+        "h": 0.012,
+        "face": "top",
+        "paint": "(c,w,h)=>{c.strokeStyle=c.fillStyle='#c4c5bb';c.font=`${h*.55}px Arial`;c.textAlign='center';for(let i=0;i<=16;i++){const x=16+i*(w-32)/16;c.fillRect(x,0,2,h*(i%2?.26:.48));if(i%2===0)c.fillText(String(Math.abs(i-8)),x,h*.95);}}",
+        "canvas": [
+          1024,
+          128
+        ]
+      }
+    },
+    {
+      "name": "head.plate.extrude.001",
+      "geometry": "head.plate.extrude.001.geometry",
+      "owner": "head.plate",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.extrude.002",
+      "geometry": "head.plate.extrude.002.geometry",
+      "owner": "head.plate",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.label.001",
+      "geometry": "head.plate.label.001.geometry",
+      "owner": "head.plate",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "CARTONI",
+        "w": 0.045,
+        "h": 0.009,
+        "face": "top",
+        "fg": "#b3b5ac",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          205
+        ]
+      }
+    },
+    {
+      "name": "head.plate.extrude.003",
+      "geometry": "head.plate.extrude.003.geometry",
+      "owner": "head.plate",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.label.002",
+      "geometry": "head.plate.label.002.geometry",
+      "owner": "head.plate",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "CARTONI",
+        "w": 0.045,
+        "h": 0.009,
+        "face": "top",
+        "fg": "#b3b5ac",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          205
+        ]
+      }
+    },
+    {
+      "name": "head.plate.extrude.004",
+      "geometry": "head.plate.extrude.004.geometry",
+      "owner": "head.plate",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.label.003",
+      "geometry": "head.plate.label.003.geometry",
+      "owner": "head.plate",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "CARTONI",
+        "w": 0.045,
+        "h": 0.009,
+        "face": "top",
+        "fg": "#b3b5ac",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          205
+        ]
+      }
+    },
+    {
+      "name": "head.plate.extrude.005",
+      "geometry": "head.plate.extrude.005.geometry",
+      "owner": "head.plate",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.label.004",
+      "geometry": "head.plate.label.004.geometry",
+      "owner": "head.plate",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "CARTONI",
+        "w": 0.045,
+        "h": 0.009,
+        "face": "top",
+        "fg": "#b3b5ac",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          205
+        ]
+      }
+    },
+    {
+      "name": "head.plate.extrude.006",
+      "geometry": "head.plate.extrude.006.geometry",
+      "owner": "head.plate",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.label.005",
+      "geometry": "head.plate.label.005.geometry",
+      "owner": "head.plate",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "CARTONI",
+        "w": 0.045,
+        "h": 0.009,
+        "face": "top",
+        "fg": "#b3b5ac",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          205
+        ]
+      }
+    },
+    {
+      "name": "head.plate.extrude.007",
+      "geometry": "head.plate.extrude.007.geometry",
+      "owner": "head.plate",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.label.006",
+      "geometry": "head.plate.label.006.geometry",
+      "owner": "head.plate",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "CARTONI",
+        "w": 0.045,
+        "h": 0.009,
+        "face": "top",
+        "fg": "#b3b5ac",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          205
+        ]
+      }
+    },
+    {
+      "name": "head.plate.extrude.008",
+      "geometry": "head.plate.extrude.008.geometry",
+      "owner": "head.plate",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.label.007",
+      "geometry": "head.plate.label.007.geometry",
+      "owner": "head.plate",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "CARTONI",
+        "w": 0.048,
+        "h": 0.008,
+        "face": "top",
+        "fg": "#b3b5ac",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          171
+        ]
+      }
+    },
+    {
+      "name": "head.plate.extrude.009",
+      "geometry": "head.plate.extrude.009.geometry",
+      "owner": "head.plate",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.label.008",
+      "geometry": "head.plate.label.008.geometry",
+      "owner": "head.plate",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "CARTONI",
+        "w": 0.048,
+        "h": 0.008,
+        "face": "top",
+        "fg": "#b3b5ac",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          171
+        ]
+      }
+    },
+    {
+      "name": "head.plate.cylinder.001",
+      "geometry": "head.plate.cylinder.001.geometry",
+      "owner": "head.plate",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.cylinder.002",
+      "geometry": "head.plate.cylinder.002.geometry",
+      "owner": "head.plate",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.cylinder.003",
+      "geometry": "head.plate.cylinder.003.geometry",
+      "owner": "head.plate",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.plate.cylinder.004",
+      "geometry": "head.plate.cylinder.004.geometry",
+      "owner": "head.plate",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.slideLock.extrude.001",
+      "geometry": "head.slideLock.extrude.001.geometry",
+      "owner": "head.slideLock",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.slideLock.cylinder.001",
+      "geometry": "head.slideLock.cylinder.001.geometry",
+      "owner": "head.slideLock",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.tiltDrag.cylinder.001",
+      "geometry": "head.tiltDrag.cylinder.001.geometry",
+      "owner": "head.tiltDrag",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.tiltDrag.cylinder.002",
+      "geometry": "head.tiltDrag.cylinder.002.geometry",
+      "owner": "head.tiltDrag",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.tiltDrag.extrude.001",
+      "geometry": "head.tiltDrag.extrude.001.geometry",
+      "owner": "head.tiltDrag",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.tiltDrag.cylinder.003",
+      "geometry": "head.tiltDrag.cylinder.003.geometry",
+      "owner": "head.tiltDrag",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.tiltDrag.torus.001",
+      "geometry": "head.tiltDrag.torus.001.geometry",
+      "owner": "head.tiltDrag",
+      "role": "torus",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.tiltDrag.cylinder.004",
+      "geometry": "head.tiltDrag.cylinder.004.geometry",
+      "owner": "head.tiltDrag",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.panDrag.cylinder.001",
+      "geometry": "head.panDrag.cylinder.001.geometry",
+      "owner": "head.panDrag",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.panDrag.cylinder.002",
+      "geometry": "head.panDrag.cylinder.002.geometry",
+      "owner": "head.panDrag",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.panDrag.extrude.001",
+      "geometry": "head.panDrag.extrude.001.geometry",
+      "owner": "head.panDrag",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.panDrag.cylinder.003",
+      "geometry": "head.panDrag.cylinder.003.geometry",
+      "owner": "head.panDrag",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.panDrag.torus.001",
+      "geometry": "head.panDrag.torus.001.geometry",
+      "owner": "head.panDrag",
+      "role": "torus",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.panDrag.cylinder.004",
+      "geometry": "head.panDrag.cylinder.004.geometry",
+      "owner": "head.panDrag",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.panLock.cylinder.001",
+      "geometry": "head.panLock.cylinder.001.geometry",
+      "owner": "head.panLock",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.panLock.extrude.001",
+      "geometry": "head.panLock.extrude.001.geometry",
+      "owner": "head.panLock",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.panLock.extrude.002",
+      "geometry": "head.panLock.extrude.002.geometry",
+      "owner": "head.panLock",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.tiltLock.cylinder.001",
+      "geometry": "head.tiltLock.cylinder.001.geometry",
+      "owner": "head.tiltLock",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.tiltLock.extrude.001",
+      "geometry": "head.tiltLock.extrude.001.geometry",
+      "owner": "head.tiltLock",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.horizontalLock.extrude.001",
+      "geometry": "head.horizontalLock.extrude.001.geometry",
+      "owner": "head.horizontalLock",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.horizontalLock.cylinder.001",
+      "geometry": "head.horizontalLock.cylinder.001.geometry",
+      "owner": "head.horizontalLock",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.horizontalLock.cylinder.002",
+      "geometry": "head.horizontalLock.cylinder.002.geometry",
+      "owner": "head.horizontalLock",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.horizontalLock.cylinder.003",
+      "geometry": "head.horizontalLock.cylinder.003.geometry",
+      "owner": "head.horizontalLock",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.horizontalLock.cylinder.004",
+      "geometry": "head.horizontalLock.cylinder.004.geometry",
+      "owner": "head.horizontalLock",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.cylinder.001",
+      "geometry": "head.counterbalance.cylinder.001.geometry",
+      "owner": "head.counterbalance",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.cylinder.002",
+      "geometry": "head.counterbalance.cylinder.002.geometry",
+      "owner": "head.counterbalance",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.torus.001",
+      "geometry": "head.counterbalance.torus.001.geometry",
+      "owner": "head.counterbalance",
+      "role": "torus",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.label.001",
+      "geometry": "head.counterbalance.label.001.geometry",
+      "owner": "head.counterbalance",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "graphic",
+        "w": 0.077,
+        "h": 0.077,
+        "face": "rear",
+        "paint": "(c,w,h)=>{c.fillStyle='#26322a';c.textAlign='center';c.font=`600 ${h*.105}px Arial`;const label='COUNTERBALANCE';[...label].forEach((s,i)=>{const a=-Math.PI*.88+i*Math.PI*.76/(label.length-1);c.save();c.translate(w/2+Math.cos(a)*w*.405,h/2+Math.sin(a)*h*.405);c.rotate(a+Math.PI/2);c.fillText(s,0,0);c.restore();});}",
+        "canvas": [
+          1024,
+          1024
+        ]
+      }
+    },
+    {
+      "name": "head.counterbalance.extrude.001",
+      "geometry": "head.counterbalance.extrude.001.geometry",
+      "owner": "head.counterbalance",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.extrude.002",
+      "geometry": "head.counterbalance.extrude.002.geometry",
+      "owner": "head.counterbalance",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.extrude.003",
+      "geometry": "head.counterbalance.extrude.003.geometry",
+      "owner": "head.counterbalance",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.cylinder.003",
+      "geometry": "head.counterbalance.cylinder.003.geometry",
+      "owner": "head.counterbalance",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.extrude.004",
+      "geometry": "head.counterbalance.extrude.004.geometry",
+      "owner": "head.counterbalance",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.cylinder.004",
+      "geometry": "head.counterbalance.cylinder.004.geometry",
+      "owner": "head.counterbalance",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.cylinder.005",
+      "geometry": "head.counterbalance.cylinder.005.geometry",
+      "owner": "head.counterbalance",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.counterbalance.cylinder.006",
+      "geometry": "head.counterbalance.cylinder.006.geometry",
+      "owner": "head.counterbalance",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.extrude.001",
+      "geometry": "head.display.extrude.001.geometry",
+      "owner": "head.display",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.label.001",
+      "geometry": "head.display.label.001.geometry",
+      "owner": "head.display",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "PAN",
+        "w": 0.044,
+        "h": 0.009,
+        "face": "rear",
+        "fg": "#e0e1d5",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          209
+        ]
+      }
+    },
+    {
+      "name": "head.display.extrude.002",
+      "geometry": "head.display.extrude.002.geometry",
+      "owner": "head.display",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.extrude.003",
+      "geometry": "head.display.extrude.003.geometry",
+      "owner": "head.display",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.label.002",
+      "geometry": "head.display.label.002.geometry",
+      "owner": "head.display",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "— — —",
+        "w": 0.03,
+        "h": 0.01,
+        "face": "rear",
+        "fg": "#b6c5af",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          341
+        ]
+      }
+    },
+    {
+      "name": "head.display.label.003",
+      "geometry": "head.display.label.003.geometry",
+      "owner": "head.display",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "BALANCE",
+        "w": 0.044,
+        "h": 0.009,
+        "face": "rear",
+        "fg": "#e0e1d5",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          209
+        ]
+      }
+    },
+    {
+      "name": "head.display.extrude.004",
+      "geometry": "head.display.extrude.004.geometry",
+      "owner": "head.display",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.extrude.005",
+      "geometry": "head.display.extrude.005.geometry",
+      "owner": "head.display",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.label.004",
+      "geometry": "head.display.label.004.geometry",
+      "owner": "head.display",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "— — —",
+        "w": 0.03,
+        "h": 0.01,
+        "face": "rear",
+        "fg": "#b6c5af",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          341
+        ]
+      }
+    },
+    {
+      "name": "head.display.label.005",
+      "geometry": "head.display.label.005.geometry",
+      "owner": "head.display",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "TILT",
+        "w": 0.044,
+        "h": 0.009,
+        "face": "rear",
+        "fg": "#e0e1d5",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          209
+        ]
+      }
+    },
+    {
+      "name": "head.display.extrude.006",
+      "geometry": "head.display.extrude.006.geometry",
+      "owner": "head.display",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.extrude.007",
+      "geometry": "head.display.extrude.007.geometry",
+      "owner": "head.display",
+      "role": "extrude",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.label.006",
+      "geometry": "head.display.label.006.geometry",
+      "owner": "head.display",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "— — —",
+        "w": 0.03,
+        "h": 0.01,
+        "face": "rear",
+        "fg": "#b6c5af",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          341
+        ]
+      }
+    },
+    {
+      "name": "head.display.cylinder.001",
+      "geometry": "head.display.cylinder.001.geometry",
+      "owner": "head.display",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.cylinder.002",
+      "geometry": "head.display.cylinder.002.geometry",
+      "owner": "head.display",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.cylinder.003",
+      "geometry": "head.display.cylinder.003.geometry",
+      "owner": "head.display",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.cylinder.004",
+      "geometry": "head.display.cylinder.004.geometry",
+      "owner": "head.display",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.cylinder.005",
+      "geometry": "head.display.cylinder.005.geometry",
+      "owner": "head.display",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.cylinder.006",
+      "geometry": "head.display.cylinder.006.geometry",
+      "owner": "head.display",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.display.label.007",
+      "geometry": "head.display.label.007.geometry",
+      "owner": "head.display",
+      "role": "label",
+      "policy": "intentional open decal plane",
+      "uvPolicy": "unique label UV",
+      "labelGenerator": {
+        "kind": "text",
+        "value": "LIGHT",
+        "w": 0.011,
+        "h": 0.003,
+        "face": "rear",
+        "fg": "#d4d9ce",
+        "bg": null,
+        "font": "Arial",
+        "weight": 600,
+        "canvas": [
+          1024,
+          279
+        ]
+      }
+    },
+    {
+      "name": "head.bubble.cylinder.001",
+      "geometry": "head.bubble.cylinder.001.geometry",
+      "owner": "head.bubble",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.bubble.cylinder.002",
+      "geometry": "head.bubble.cylinder.002.geometry",
+      "owner": "head.bubble",
+      "role": "cylinder",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    },
+    {
+      "name": "head.bubble.torus.001",
+      "geometry": "head.bubble.torus.001.geometry",
+      "owner": "head.bubble",
+      "role": "torus",
+      "policy": "closed rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null
+    }
+  ],
+  "evidence": {
+    "identity": {
+      "status": "manufacturer referenced",
+      "source": "https://www.cartoni.com/wp-content/uploads/ProductDocuments/FluidHeads/Cartoni_FluidHeads_HM3100_Maxima30_UserManual.pdf"
+    },
+    "layout": {
+      "status": "approximate",
+      "basis": "HM3100 manual June 2019 pages 5-7 and user supplied circled reference photograph"
+    },
+    "dimensions": {
+      "status": "unmeasured",
+      "basis": "procedural model bounds only"
+    },
+    "functions": {
+      "status": "manufacturer referenced, software practice illustrative"
+    },
+    "rights": {
+      "geometry": "Independently authored procedural geometry",
+      "labels": "Generated identifying text; manufacturer marks are not a claim of endorsement",
+      "referenceImages": "User photographs and manufacturer drawings referenced only; not embedded or redistributed",
+      "runtime": "Three.js MIT license; see vendor license"
+    }
+  }
+}

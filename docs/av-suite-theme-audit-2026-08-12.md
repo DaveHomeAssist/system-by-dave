@@ -118,3 +118,9 @@ integration can merge; a row here does not mean the route is published.
 | The Shop | `/the-shop/` | Shared theme opt-in missing | Add system AV theme, browser-chrome colors and stylesheet; pass probe |
 | Infrastructure | `/infrastructure/` | Shared theme opt-in missing | Add system AV theme, browser-chrome colors and stylesheet; pass probe |
 | Lighting | `/av-lighting/` | Shared theme opt-in missing | Add system AV theme, browser-chrome colors and stylesheet; pass probe |
+
+## Equipment Lab, 26 October 2026
+
+| Surface | Canonical route | Theme state | Required gate |
+|---|---|---|---|
+| Equipment Lab | `/equipment-lab/` | Shared tokens, light first, visible light/dark toggle, stored preference respected | Native and standalone viewport probe; deployment remains separately evidenced |

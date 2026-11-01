@@ -1,0 +1,13 @@
+{
+  "result": "pass",
+  "time": "2026-10-23T11:01:41.996Z",
+  "validator": "2.0.0-dev.3.10",
+  "headIDs": 10,
+  "rigIDs": 23,
+  "pointerPicks": 10,
+  "viewportCases": 40,
+  "resourceCycles": 5,
+  "frameMaxError": 2.449293598294707e-16,
+  "physicalAcceptance": false,
+  "realDeviceAcceptance": false
+}

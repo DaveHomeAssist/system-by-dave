@@ -4,9 +4,9 @@
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
-  "head": "fa22e740c885a8630c49b08c6c029506b406f7d2",
+  "head": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
   "status": "amber",
-  "statusReason": "PR345 is merged at 4c446ed and live (Pages run 38712124711). Dave ruled on 2026-10-15 that the October 14 removal of whole-application tiles was a Codex decision, not his: AV Calculator stays the native nine-panel pack, and the seven specialists without a pack (Throwline, LED Wall Calculator, Teleprompter, Show Timer, Cue Sheet, PixelForge, StagePlotter) are chrome-less panels of their own pages again under a Tools group. Family-route redirects and physical/operator acceptance remain open.",
+  "statusReason": "PR #386 is merged and live at source d769f1e. Source and AV destination publications succeeded; independent Chromium/WebKit live Add checks and the full 66-choice shell probe pass on Dominic. PR #388 compact menus are preserved. Physical/operator acceptance and other AV roadmap decisions remain open.",
   "audioSpeakerStatusParity": {
     "recordedOn": "2026-10-13",
     "baseRevision": "94b1ce79499de92416a5c30357298d619fb74ecb",
@@ -87,7 +87,7 @@
       "AVV-STREAM-KEY-1 remains unanswered and blocks only its dependent work."
     ]
   },
-  "lastActivity": "2026-10-15",
+  "lastActivity": "2026-10-30",
   "shipped": [
     "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
     "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
@@ -112,11 +112,11 @@
     "Infrastructure's Power, Network, Cable, Issues, Plan/Import and Backup panels (#325) are published at 0d08fc5. Nine exact-head checks, source run38279336293, AV destination run38282101734, eight live browser groups and eight-asset parity pass. Independent Save, old plans/originals, named views, guarded recovery, offline reopening and actual AV Video embedding are verified; physical/operator acceptance remains separate."
   ],
   "nextStep": {
-    "title": "Decide the standalone family routes and the first native specialist pack",
-    "why": "Eight standalone family routes (/av-video/ and siblings) still mount the packs outside the console; the specialists run as page panels until each has a native pack.",
-    "doneWhen": "Dave chooses A (redirect the family routes into /av/?app=<pack> and retarget their probes) or B (keep them as deep links), and the first specialist conversion (LED Wall Calculator is the smallest) is scoped.",
-    "effort": "One decision plus one bounded conversion brief.",
-    "owner": "Dave (decision); Claude or Codex (serial) for the conversion",
+    "title": "Scope the first native specialist pack",
+    "why": "The eight original family routes now point into the shared console in source. The seven specialist tools still run as page panels until each has a native pack.",
+    "doneWhen": "Dave selects the first specialist conversion and approves its bounded scope. Confirm PR #379 release evidence before treating the family route cutover as live.",
+    "effort": "One product decision and a scoped brief.",
+    "owner": "Dave, with serial implementation after scope approval",
     "blockedBy": []
   },
   "findings": [
@@ -212,6 +212,86 @@
       ],
       "evidence": "code-read",
       "phase": 0
+    },
+    {
+      "id": "AVC-15",
+      "type": "logic",
+      "sev": "P1",
+      "title": "A render error blanks the whole AV console",
+      "detail": "No AV app on avbydave.com has a React error boundary (av-suite, av-audio, av-calculator, av-lighting, av-video, equipment-lab, front-office, infrastructure, show-control, show-ops, the-shop). Each mounts with React 18 createRoot and no fallback, and no page installs a window error or unhandledrejection handler. A render error in any one panel unmounts the whole console and leaves a blank page; the error appears only in that device's developer console. Only apps/fmp-camera-sim (housevideo.app) has a boundary. Containment does not depend on DIAG-1; what the recovery panel offers does.",
+      "files": [
+        "apps/av-suite/src/main.tsx",
+        "apps/equipment-lab/src/main.tsx",
+        "apps/show-control/src/main.tsx",
+        "apps/fmp-camera-sim/src/ui/ErrorBoundary.tsx"
+      ],
+      "evidence": "code-read",
+      "phase": 8
+    },
+    {
+      "id": "AVC-16",
+      "type": "infra",
+      "sev": "P2",
+      "title": "Production errors are never collected or reported",
+      "detail": "avbydave.com sends no error telemetry. The meta CSP allows connect-src 'self' blob: only, so a third-party reporter would be blocked. GitHub Pages cannot run a receiver or send Report-To or CSP headers, and a meta CSP cannot carry report-uri or report-to, so CSP violations are also invisible. Errors on a field device are seen only if someone opens developer tools on it. Approach awaits DIAG-1.",
+      "files": [
+        "av/index.html",
+        "404.html"
+      ],
+      "evidence": "code-read",
+      "phase": 8
+    },
+    {
+      "id": "AVC-17",
+      "type": "infra",
+      "sev": "P2",
+      "title": "No live check of avbydave.com after a deploy",
+      "detail": "The Publish avbydave.com step runs scripts/publish_domain_site.sh, which pushes to DaveHomeAssist/avbydave and exits; that repository's own Pages workflow deploys later. walk.housevideo.app gets check_domain_cutover_ready.mjs --live, avbydave.com gets nothing, so a failed or stale avbydave Pages deploy leaves this repository's run green. No scheduled drift check exists either, although https://avbydave.com/source.json carries sourceCommit and noteforge-drift.yml already shows the pattern. Done when the publish step waits for the live sourceCommit to equal GITHUB_SHA and a nightly job flags drift.",
+      "files": [
+        ".github/workflows/deploy-pages.yml",
+        "scripts/publish_domain_site.sh",
+        ".github/workflows/noteforge-drift.yml"
+      ],
+      "evidence": "code-read",
+      "phase": 8
+    },
+    {
+      "id": "AVC-18",
+      "type": "infra",
+      "sev": "P3",
+      "title": "No uptime monitoring, request logs or search-console reports",
+      "detail": "Nothing probes avbydave.com on a schedule. GitHub Pages and its CDN expose no access, 404 or traffic logs. No Google Search Console or Bing verification token exists (DNS TXT, meta tag or file), so crawl errors and indexing problems are not reported. The branded 404.html records nothing about the addresses visitors miss.",
+      "files": [
+        "404.html",
+        "robots.txt"
+      ],
+      "evidence": "observed",
+      "phase": 8
+    },
+    {
+      "id": "AVC-19",
+      "type": "logic",
+      "sev": "P2",
+      "title": "Offline cache failures are silent",
+      "detail": "av-suite-worker.js cacheOptionalAssets() records ok:false for each optional asset that fails to cache, then discards the list. js/av-offline.js reports Offline unavailable on any exception without the cause, and its readiness check covers only the current page's assets. A tool never opened online can be missing at a venue with no network, with no warning beforehand. Unchanged by #373.",
+      "files": [
+        "av-suite-worker.js",
+        "js/av-offline.js"
+      ],
+      "evidence": "code-read",
+      "phase": 8
+    },
+    {
+      "id": "AVC-20",
+      "type": "infra",
+      "sev": "P3",
+      "title": "Domain and DNS hygiene for avbydave.com",
+      "detail": "Account actions for Dave. DNS publishes 3 of GitHub Pages' 4 A records (185.199.108.153 missing) and no AAAA records. The domain is not verified on the GitHub account (Pages API protected_domain_state is null), which leaves takeover protection off. No CAA record and no /.well-known/security.txt, so outside visitors have no published way to report a problem. HTTPS is enforced and the certificate is approved.",
+      "files": [
+        "CNAME"
+      ],
+      "evidence": "observed",
+      "phase": 8
     }
   ],
   "phases": [
@@ -321,7 +401,8 @@
     "D6: Throwline tokens - keep specialist tokens (CLAUDE.md) or generate them from one authored token source?",
     "D7: fixes in other repos (fmp-suite, DeckForge, BPM Delay, Lansdowne, PlotForge) - do upstream now or defer?",
     "D8: record the audit outcome in the repo like docs/fmp-camera-simulator-audit-2026-09.md? (recommended)",
-    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?"
+    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?",
+    "DIAG-1 [unlocks AVC-16 and the AVC-15 recovery panel; held by Dave 2026-10-28]: how production errors reach Dave. Option A local-only recovery panel with Copy diagnostics (version, source commit, browser, recent errors, offline status) kept on the device, with no third party and no CSP change (recommended); Option B hosted error tracker such as Sentry, with a connect-src change and a third-party script; Option C self-hosted report endpoint, with a connect-src change and a service to maintain."
   ],
   "files": [
     {
@@ -398,7 +479,8 @@
     "The prior design-only Rail assessment is superseded by #272, #274, #276 and production mount #279. RAIL-1B, RAIL-2A, device-local customization and the isolated returning-client offline transition are delivered; physical/operator acceptance remains open.",
     "Room Check v1 checks can be copied selectively into Show Ops as unsaved Needs check rows with exact source provenance; this does not synchronize the tools, and route availability does not certify the handoff.",
     "Crew Call v1 active members can be copied selectively into Show Ops as unsaved Called rows with exact source provenance and no automatic attendance inference; the producer remains unchanged, and route availability does not certify the handoff.",
-    "PR #312 supersedes the status-only Rail baseline: all nine published primary applications are canonical Rail destinations, while physical/operator and connected-workflow acceptance remain separate."
+    "PR #312 supersedes the status-only Rail baseline: all nine published primary applications are canonical Rail destinations, while physical/operator and connected-workflow acceptance remain separate.",
+    "2026-10-29: Dave selected the family route redirect option. Historical references to that choice as unanswered are superseded; the first native specialist choice remains open."
   ],
   "links": [
     {
@@ -576,7 +658,8 @@
     "Physical phones/tablets, virtual keyboards, touch ergonomics, live operator rehearsal, capture/NDI hardware and external display/audio routing remain unaccepted.",
     "The remaining canonical specialist handoffs and representative connected workflows are not established by isolated application browser jobs.",
     "Historical findings explicitly marked for revalidation are not reproduced failures at this source revision.",
-    "Catalog-wide overflow counts from the earlier pilot are superseded; no new whole-catalog overflow count is asserted."
+    "Catalog-wide overflow counts from the earlier pilot are superseded; no new whole-catalog overflow count is asserted.",
+    "Whether anyone is notified when the DaveHomeAssist/avbydave Pages workflow fails after a publish (AVC-17)."
   ],
   "short": "AV Suite",
   "evidence": {
@@ -1151,6 +1234,48 @@
         "Crew Time Log, breakout/timeline behavior, client-facing Show Report parity and other specialist functions remain separate.",
         "No physical device, venue operator or connected hardware acceptance is claimed."
       ]
+    },
+    "equipmentLab": {
+      "checkedOn": "2026-10-26",
+      "scope": "Option A phases 1 and 2; shared catalog and native Cartoni pilot",
+      "sharedRepository": "https://github.com/DaveHomeAssist/equipment-lab",
+      "sharedRevision": "00e8dbeeb190ad9b0cd8c8b72b81e80e0dae428d",
+      "hostBase": "aec4f98158f841be4cf9591cda4c4aa1867cc589",
+      "status": "Pushed; scoped checks pass; CI and publication remain separate gates",
+      "entries": 43,
+      "nativeRepresentations": [
+        "C02"
+      ],
+      "nativePanels": [
+        "library",
+        "inspector",
+        "practice",
+        "reference"
+      ],
+      "compatibility": "ECP-1.0 revision 1.0; ten existing head IDs; generic Panasonic",
+      "remainingRecord": "https://github.com/DaveHomeAssist/equipment-lab/blob/main/docs/NEXT_STEPS.md",
+      "nextAction": "Finish the host release, then migrate remaining families with per-consumer parity; integrate Claude splash design after its handoff.",
+      "limits": [
+        "Other 42 entries retain their existing viewers while native adapters migrate.",
+        "Source package qualification is separate from physical hardware and operator acceptance.",
+        "Claude owns the splash and menu scratchpad; this release supplies the functional catalog and panel interfaces."
+      ],
+      "verification": {
+        "runner": "Dominic, Linux Chromium with SwiftShader",
+        "entries": 43,
+        "controls": 10,
+        "textures": 22,
+        "viewportChecks": 61,
+        "nativeMenuChoices": 66,
+        "fallbackCases": 4,
+        "packageFiles": 44,
+        "sourceFiles": 355,
+        "result": "Passed scoped builds, typechecks, package integrity, native AV menu, indexing, public navigation, themes and domain staging",
+        "lifecycle": "Idle drawing stops; synthetic pagehide/pageshow restores the viewer; real WebGL context loss retains ten controls",
+        "offline": "Cartoni reload succeeds after preparing the shared offline cache, with all 22 textures"
+      },
+      "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/369",
+      "verifiedImplementation": "64ba7bf0fb85972e1e0e4f616192adfe14f88707"
     }
   },
   "historicalFindings": [
@@ -1468,6 +1593,103 @@
       "fullViewer": "Authenticated model and refined controls observed in actual browser",
       "embedded": "Failed in observed in-app browser: private frame sign-in required, OAuth content blocked; host correctly became unavailable. No access widening or authentication bypass.",
       "physicalDeviceChecks": "Open; not executed"
+    }
+  },
+  "dependencyAudit20261026": {
+    "recordedOn": "2026-10-26",
+    "scope": "Dependency security upgrade requested directly by Dave. No product behavior, storage key, saved-plan or import/export change; existing decisions, findings and next step are unchanged.",
+    "problem": "npm audit --audit-level=high failed on every Public site contracts run and in the Pages deploy: zod <4.6.6 (high, GHSA-mrhx-c7xc-m3w5, no 3.x fix) and vitest/@vitest/mocker <=4.1.11 (moderate, GHSA-qxg6-89mg-rqv8, GHSA-xp26-3454-mjgp).",
+    "change": "zod 3.25.76 to 4.6.7 and vitest 4.1.11 to 4.1.12. Single-argument z.record migrated to z.record(z.string(), value) in AV Video, AV Audio, AV Calculator and the shared console drafts. Ten console bundles rebuilt; zod 4 adds about 14 KB gzipped to each.",
+    "sourceRevision": "081e333c7c226cd04b0a17f7b0e43b0eadea3514",
+    "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/368",
+    "state": "Implemented and verified on Dominic; PR #368 open with CI pending. Not merged or deployed.",
+    "verification": "Dominic node:24-bookworm-slim (npm 11.19.1): typecheck, vitest and build pass for all 12 apps; verify:av and verify:public-navigation pass; npm audit --audit-level=high reports 0 vulnerabilities. Committed bundles match the Dominic build byte for byte.",
+    "remaining": [
+      "PR #368 CI: Public site contracts, AV rebuild-diff and browser probes",
+      "Merge, Pages deploy and live console read-back",
+      "Open PRs #362 and #352 need main merged in before their audit step can pass",
+      "Optional: move the console schemas to zod/mini to recover the bundle size"
+    ]
+  },
+  "offlineConsoleRecovery": {
+    "status": "implemented and unit tested; PR review pending",
+    "sourceRevision": "3e819ac8442505f949c6b3cce186054c1e81cdb4",
+    "observedAt": "2026-10-27T22:00:09.524886+00:00",
+    "scope": "Offline error links and navigation cache fallback open the native console instead of retired uncached redirect pages.",
+    "verification": "Dominic Node 22 worker harness: 2 new tests fail before the fix; 8 tests pass afterward. Root and subdirectory recovery covered.",
+    "nextAction": "Review the scoped PR. Browser service-worker lifecycle and physical-device offline acceptance remain open; no merge or deployment in this cycle."
+  },
+  "diagnosticsAudit20261027": {
+    "recordedOn": "2026-10-27",
+    "revalidatedOn": "2026-10-28",
+    "sourceRevision": "f3ba0cc1e0f5a3e977ed4e66874b216c24b37eee",
+    "scope": "Read-only audit of the diagnostics and error reporting available for avbydave.com. No product behavior, storage key, saved data or deployment changed.",
+    "method": "Code read of origin/main apps, js, av-suite-worker.js and the Pages and publish workflows; live response headers and DNS; GitHub Pages API for DaveHomeAssist/avbydave; browser load of /, /av/, /equipment-lab/ and an unknown path.",
+    "liveObservation": "Live source.json matched sourceRevision. /, /av/ and /equipment-lab/ logged no console errors; /av/ reported Offline ready; an unknown path served the branded 404 page. The last 15 DaveHomeAssist/avbydave Pages runs succeeded.",
+    "strengths": [
+      "deploy-pages.yml runs the release gates and browser probes before any publish",
+      "source.json on the live site names the source commit and artifact digest",
+      "AV Suite status footer reports save, storage, import and layout failures in plain language",
+      "Saves are verified after writing and unreadable saved data is preserved before replacement",
+      "The offline badge distinguishes ready, not ready and unavailable"
+    ],
+    "findings": [
+      "AVC-15",
+      "AVC-16",
+      "AVC-17",
+      "AVC-18",
+      "AVC-19",
+      "AVC-20"
+    ],
+    "decision": "DIAG-1 open; Dave asked on 2026-10-28 to hold it while the findings are recorded."
+  },
+  "familyRouteCutover": {
+    "recordedOn": "2026-10-29",
+    "baseRevision": "a04c90d",
+    "decision": "Dave explicitly selected redirect stubs for the eight original standalone family routes and retargeted public probes at /av/?app=<pack>.",
+    "implementation": "Native packs remain in apps/<app>/src/pack.tsx. Retained hosts build only to ignored dist directories and are excluded from publication. Detailed host regressions remain executable as source fixtures.",
+    "verification": "Dominic Playwright 1.63: live root, nine original identities, Throwline panel and 34 sheet redirects pass. All eight new shared-console family probes and 42 candidate redirects pass. Typechecks, model tests and retained builds pass for all eight families.",
+    "delivery": "PR #379 is the owning source for exact-head CI, merge and publication evidence. Live behavior requires the root and all 42 redirects plus the eight shared-console family journeys.",
+    "limits": "No saved-key/schema change, first native specialist selection, diagnostics decision or physical/operator acceptance.",
+    "sourceRevision": "fe549a22f558f57af70ffae99e26466e009349ca",
+    "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/379"
+  },
+  "canvasMenus": {
+    "recordedOn": "2026-10-29",
+    "baseRevision": "2892ae1",
+    "branch": "codex/av-canvas-menus",
+    "request": "Canvas workspace first. Topic selection enters one submenu with Back. Remove React Flow attribution, verify and ship.",
+    "scope": "Compact identity and workspace rows; topic menus for project, appearance, status, views, panels, layout and diagram tools; panel chooser topic drilldown. Existing pack sources, document keys, schemas and saved geometry remain unchanged.",
+    "candidateEvidence": "Dominic: both typechecks, 86 model/layout tests, suite build, eight family edit/isolated Save/export/reload journeys, all 66 shell menu choices, mixed layouts, legacy bytes and four palettes at eight sizes pass. Menu acceptance passes at seven sizes: 1051 by 881 workspace starts at 140px; canvas fills 86 percent of its panel; no attribution; Back, Escape and focus return pass. AV/offline/Rail 28, Throwline 47, domain 12, navigation and consistency checks pass.",
+    "next": "Complete exact-head CI, PR merge, publication and live menu readback. Private board synchronization remains unavailable because its existing file is missing.",
+    "limits": "No physical touch, virtual keyboard, power loss or human acceptance is implied.",
+    "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/388",
+    "publishedConsumers": "Rebuilt the suite, Equipment Lab and AV Calculator from the shared workspace source. Initial PR CI correctly stopped on Equipment Lab artifact parity; synchronized generated consumers are included in the follow-up revision."
+  },
+  "addPanelVerification": {
+    "recordedOn": "2026-10-29",
+    "sourceRevision": "bda7cca148addf939fcef68760f4d3c27c01ab13",
+    "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/386",
+    "finding": "Original two-step flow matches the request, but Add into empty space leaves a 4px list at 667x375 because fixed controls and the placement preview consume the phone chooser height. Replacement-only viewport checks miss this path.",
+    "correction": "Allow phone chooser height, omit the decorative preview on short screens, and scroll long group lists. Preserve PR #388 compact topic menus and native modal, restore first-choice/group focus and Escape stepping, mark the actual active application, and explicitly wrap modal Tab navigation. Preserve placement and stored data shapes.",
+    "verification": "Dominic Linux, Playwright 1.63: original and reconciled 66-choice Chromium shell probes pass, including mixed arrangements, isolated saves, legacy view/layout bytes and offline reload. Reconciled PR #388 canvas/menu acceptance passes. Final Add path passes in Chromium and WebKit at nine sizes in light/dark with reduced motion, including five Front Office choices, Enter, Space, forward/reverse Tab, Back, Escape, focus restoration, final-choice placement and root containment. AV verification and three builds pass. The clean follow-up passes 86 Video/shared/shell unit tests, relevant typechecks, 42 route checks and domain staging.",
+    "nextAction": "Dave may perform physical phone/tablet, actual screen reader and operator acceptance. Merge, production publication and automated live verification for PR #386 are complete.",
+    "limits": "Merge and deployment authorized on October 30. Accessibility tree inspection supports button/search/dialog semantics; actual screen reader, physical touch, browser chrome and virtual keyboard acceptance remain unverified.",
+    "integratedMain": "7cd5658a0812cc42cd25d9a2f78f9cbd6cea3928",
+    "retainedFailure": "Mac archive transfer metadata produced 12 synthetic ._ test inputs containing NUL bytes. The 649 sidecars were preserved outside the runner inputs before a clean rerun; tracked source and test assertions were not changed to suppress that failure.",
+    "mergedRevision": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
+    "authorization": "Dave explicitly authorized merge, deployment and live verification on October 30, 2026.",
+    "delivery": "PR #386 merged as d769f1ee88e1ffa3daaee04af13c73a52e4ae24e. Source Pages workflow 41015446539 and AV destination workflow 41017765962 both succeeded. AV destination commit 2ea3cd17cc9292efbc14f1024e309534b0ca79b7 publishes that source revision.",
+    "destinationCommit": "2ea3cd17cc9292efbc14f1024e309534b0ca79b7",
+    "sourceWorkflow": "https://github.com/DaveHomeAssist/system-by-dave/actions/runs/41015446539",
+    "destinationWorkflow": "https://github.com/DaveHomeAssist/avbydave/actions/runs/41017765962",
+    "liveVerification": {
+      "checkedAt": "2026-10-30T07:07:40.326Z",
+      "sourceRevision": "d769f1ee88e1ffa3daaee04af13c73a52e4ae24e",
+      "artifactSha256": "7fcb9cbb0f85d5ce3f67e884e1db11cdf3ebc0694cfb1a23d299dc2470ea56ac",
+      "url": "https://avbydave.com/av/",
+      "runner": "Dominic, Linux, Playwright 1.63 Chromium and WebKit",
+      "result": "Live Add flow passes nine sizes in light/dark with reduced motion: all five Front Office choices, group replacement, forward/reverse Tab, Enter, Space, Back, Escape, restored focus, cross-group and empty search, final-choice placement and no page overflow. Focused checks report no console errors or uncaught page errors. Full Chromium shell passes all 66 choices, mixed views/reloads, legacy view/layout bytes, isolated saves and prepared offline use. Source revision and JavaScript/CSS/registry hashes match before and after testing."
     }
   }
 }

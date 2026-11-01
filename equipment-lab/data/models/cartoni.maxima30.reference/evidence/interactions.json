@@ -1,0 +1,143 @@
+{
+  "selected": [
+    {
+      "id": "support.tripod",
+      "selected": "support.tripod",
+      "unchanged": true
+    },
+    {
+      "id": "head.plate",
+      "selected": "head.plate",
+      "unchanged": true
+    },
+    {
+      "id": "head.slideLock",
+      "selected": "head.slideLock",
+      "unchanged": true
+    },
+    {
+      "id": "head.tiltDrag",
+      "selected": "head.tiltDrag",
+      "unchanged": true
+    },
+    {
+      "id": "head.panDrag",
+      "selected": "head.panDrag",
+      "unchanged": true
+    },
+    {
+      "id": "head.panLock",
+      "selected": "head.panLock",
+      "unchanged": true
+    },
+    {
+      "id": "head.tiltLock",
+      "selected": "head.tiltLock",
+      "unchanged": true
+    },
+    {
+      "id": "head.horizontalLock",
+      "selected": "head.horizontalLock",
+      "unchanged": true
+    },
+    {
+      "id": "head.counterbalance",
+      "selected": "head.counterbalance",
+      "unchanged": true
+    },
+    {
+      "id": "head.display",
+      "selected": "head.display",
+      "unchanged": true
+    },
+    {
+      "id": "head.bubble",
+      "selected": "head.bubble",
+      "unchanged": true
+    },
+    {
+      "id": "head.panBars",
+      "selected": "head.panBars",
+      "unchanged": true
+    },
+    {
+      "id": "support.cradle",
+      "selected": "support.cradle",
+      "unchanged": true
+    },
+    {
+      "id": "lens.housing",
+      "selected": "lens.housing",
+      "unchanged": true
+    },
+    {
+      "id": "lens.handle",
+      "selected": "lens.handle",
+      "unchanged": true
+    },
+    {
+      "id": "lens.front",
+      "selected": "lens.front",
+      "unchanged": true
+    },
+    {
+      "id": "lens.indicator",
+      "selected": "lens.indicator",
+      "unchanged": true
+    },
+    {
+      "id": "lens.extender",
+      "selected": "lens.extender",
+      "unchanged": true
+    },
+    {
+      "id": "lens.ff.lock",
+      "selected": "lens.ff.lock",
+      "unchanged": true
+    },
+    {
+      "id": "lens.ff.adjust",
+      "selected": "lens.ff.adjust",
+      "unchanged": true
+    },
+    {
+      "id": "lens.mount",
+      "selected": "lens.mount",
+      "unchanged": true
+    },
+    {
+      "id": "camera.body",
+      "selected": "camera.body",
+      "unchanged": true
+    },
+    {
+      "id": "camera.finder",
+      "selected": "camera.finder",
+      "unchanged": true
+    }
+  ],
+  "visibleLens": 112,
+  "visibleHead": 0,
+  "practiceState": {
+    "scope": "rig",
+    "tab": "explore",
+    "selected": "camera.finder",
+    "pan": 30,
+    "tilt": 20,
+    "plate": 40,
+    "counterbalance": 50,
+    "tiltDrag": 0,
+    "panDrag": 20,
+    "panLock": false,
+    "tiltLock": false,
+    "horizontalLock": false,
+    "ff": 0,
+    "ffLock": true,
+    "extender": false
+  },
+  "generic": {
+    "manufacturer": "Panasonic",
+    "model": "unknown",
+    "geometry": "generic"
+  }
+}

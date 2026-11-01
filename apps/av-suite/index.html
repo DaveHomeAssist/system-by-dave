@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:; frame-src 'self' https://ion-workbench.davein4k.chatgpt.site; object-src 'none'; base-uri 'self'; form-action 'none'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; worker-src 'self'; connect-src 'self' blob:; img-src 'self' data: blob:; font-src 'self' data:; frame-src 'self' https://ion-workbench.davein4k.chatgpt.site; object-src 'none'; base-uri 'self'; form-action 'none'" />
     <title>AV by Dave</title>
     <meta name="description" content="One console for live-show crews: video, audio, show control, show ops, front office, the shop, infrastructure, lighting and the specialist tools as resizable panels. Opens on an empty workspace; call up any panel." />
     <!-- Published as the avbydave.com home page; this source path and /av/ are its noindex aliases (scripts/domain-sites.json). -->
@@ -37,11 +37,11 @@
   </head>
   <body>
     <a class="skip-link" href="#workspace">Skip to the console workspace</a>
-    <nav class="shell-nav" aria-label="Breadcrumb"><a class="brand-link sbd-site-return" href="https://systembydave.com/">System by Dave</a><span aria-current="page">AV by Dave</span></nav>
+    <div class="shell-nav"><nav class="shell-crumbs" aria-label="Breadcrumb"><a class="brand-link sbd-site-return" href="https://systembydave.com/">System by Dave</a><span class="shell-crumbs__current" aria-current="page">AV by Dave</span></nav><nav class="shell-funnel" aria-label="Demos, Field Kit and email"><a href="https://systembydave.com/demos/?utm_source=avbydave&amp;utm_medium=nav&amp;utm_campaign=console&amp;utm_content=demos" data-funnel="demos">Demos</a><a href="/field-kit/" data-funnel="field-kit">Field Kit</a><a href="https://systembydave.com/demos/?utm_source=avbydave&amp;utm_medium=nav&amp;utm_campaign=console&amp;utm_content=subscribe#subscribe" data-funnel="subscribe">Subscribe</a></nav></div>
     <noscript><p>The AV by Dave console requires JavaScript. <a href="https://systembydave.com/tools.html">Browse the tools directory</a>.</p></noscript>
     <div class="av-video-shell">
       <div class="sbd-rail-host" data-sbd-rail-host data-current-ref="toolbox"></div>
-      <div class="av-video-shell__workspace"><div id="root"></div></div>
+      <div class="av-video-shell__workspace"><div id="root"><h1 class="shell-static-title">AV by Dave</h1><p class="shell-static-title">One console for live-show crews: video, audio, show control, lighting and the specialist tools as resizable panels.</p></div></div>
     </div>
     <div data-sbd-rail-dialogs></div>
     <span id="workspaceOffline" hidden></span>

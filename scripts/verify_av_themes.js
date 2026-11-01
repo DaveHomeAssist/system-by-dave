@@ -66,8 +66,13 @@ themeCss.split('\n').forEach((line, index) => {
 
 routes.forEach((route) => {
   const html = read(route.file);
+  // Family redirect stubs inherit the destination console's theme. Their exact
+  // destinations and retained source packs are gated by verify_av_suite.js.
+  if (/<meta http-equiv="refresh" content="0;url=\/av\/\?app=/.test(html)
+      && html.includes('noindex,follow') && html.includes('location.replace(target.pathname + target.search)')) return;
   const escapedId = route.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const expectedTheme = 'system';
+  // Equipment Lab follows the current light-first contract; older shells retain their existing opt-in.
+  const expectedTheme = route.id === 'equipment-lab' ? 'light' : 'system';
   if (!new RegExp(`<html[^>]+data-av-theme="${expectedTheme}"[^>]+data-av-tool="${escapedId}"`, 'i').test(html)) {
     fail(`${route.file} does not opt into the ${expectedTheme} AV theme as ${route.id}.`);
   }

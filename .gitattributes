@@ -6,3 +6,7 @@ camera-sim/fmp-camera-simulator-offline.html -whitespace
 
 # Preserve the supplied CSV byte for byte, including its CRLF record endings.
 fmp/house/display-estate.csv -text whitespace=cr-at-eol
+
+# Generated Equipment Lab consumers preserve three.js shader string whitespace.
+av/assets/av-suite-Viewer.js -whitespace
+equipment-lab/assets/equipment-lab-Viewer.js -whitespace

@@ -1,0 +1,63 @@
+{
+  "schema": "equipment.reference.manifest.v1",
+  "revision": "1.0.0",
+  "assetId": "C02",
+  "representation": "inspection",
+  "owner": "Ion Workbench",
+  "baselineCommit": "9a7620ac8f6da3a67a318025f5343164746ae9b0",
+  "generator": "camera/model.js",
+  "adapter": "camera/reference.js",
+  "adapterRevision": "1.0.0",
+  "consumer": "Ion Workbench /camera/",
+  "runtime": "Three.js r180",
+  "files": {
+    "model": {
+      "name": "cartoni.maxima30.inspection.glb",
+      "bytes": 3075048,
+      "sha256": "6dae6e4981686c37dcd7e9de1649bce1bfb9f730e2c726a9e461969e8f0962eb"
+    },
+    "definition": {
+      "name": "cartoni.maxima30.definition.json",
+      "bytes": 120125,
+      "sha256": "6cd239d58fc330627f7c3a2ac00be82169fb1a43b2cd6282cf683332e6d91e41"
+    }
+  },
+  "sourceHashes": {
+    "camera/app.js": "3dd6410be7b484eebc940e3bba5fce3ce79b319932ad11880a30f2a597a2cf9b",
+    "camera/style.css": "2bb52dfc1be06316fe7bdc8f55484d311d18cc5f8c8056e4881c070f9d5f19fb",
+    "camera/index.html": "3722093f64bec22c974278a2807420f0422103fedb42cbb92425b5422621262d",
+    "camera/model.js": "72149f1c437c0c1dd0b0a1c084ec76c734c448ce0710fdeca19b5c531a44fa59",
+    "camera/catalog.js": "f29426b5685f982891d7e648871cf3fd00233f9aea6da596a3de0ca29447174b",
+    "camera/cartoni-contract.js": "7d405651459c0e5fe3ec77a36b730eae5a091401ee4952d96875757ab95a5085",
+    "camera/reference.js": "154fa12953bb4e6bf358613df0d8f2ce3846c25a5d02081f9296cacf26632d95",
+    "vendor/three.module.js": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+    "vendor/three.core.js": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+    "vendor/addons/loaders/GLTFLoader.js": "979269c237f704ffa4a37d3800ec21f237c017e40f8e28b1cd7accf5b2377574",
+    "vendor/addons/exporters/GLTFExporter.js": "c3462aec753006797689fef9ce8ec121d982b0956ff08527060f8d75bca784b9",
+    "vendor/addons/utils/BufferGeometryUtils.js": "748066188940e858e5d48985866e84a6e6691fc31776ea59d9d89c1a7f6fe6cd"
+  },
+  "included": [
+    "C02"
+  ],
+  "excluded": [
+    "C01 Fujinon",
+    "C03 generic Panasonic",
+    "C04 finder",
+    "C05 cradle",
+    "C06 tripod",
+    "C07 pan bars and demands",
+    "lights",
+    "floor",
+    "helpers"
+  ],
+  "export": {
+    "binary": true,
+    "trs": true,
+    "onlyVisible": false,
+    "maxTextureSize": "unbounded; retain generated texture dimensions",
+    "animations": [],
+    "includeCustomExtensions": false,
+    "compression": "none"
+  },
+  "qualification": "See cartoni.maxima30.acceptance.json; no physical-fit or hardware-balance claim"
+}

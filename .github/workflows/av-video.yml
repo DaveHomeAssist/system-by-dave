@@ -4,8 +4,16 @@ on:
   pull_request:
     paths:
       - 'apps/av-suite/**'
+      - 'apps/equipment-lab/**'
+      - 'equipment-lab/**'
+      - 'scripts/*equipment_lab*'
       - 'av/**'
       - 'scripts/probe_av_suite_shell.mjs'
+      - 'scripts/probe_av_canvas_menus.mjs'
+      - 'scripts/av-menu-journey.mjs'
+      - 'scripts/av-family-probe.mjs'
+      - 'scripts/probe_av_retained.mjs'
+      - 'scripts/probe_av_routes.mjs'
       - 'apps/av-video/**'
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
@@ -66,6 +74,16 @@ jobs:
         run: |
           git diff --exit-code -- av-video
           test -z "$(git status --porcelain -- av-video)"
+      - name: Equipment Lab package and native consumer
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run verify:equipment-lab
+          npm run typecheck:equipment-lab
+          npm run build:equipment-lab
+          git diff --exit-code -- equipment-lab
+          test -z "$(git status --porcelain -- equipment-lab)"
+          npm run test:equipment-lab-browser
       - name: AV Suite shell typecheck, build parity and browser
         env:
           CHROME_CHANNEL: chrome
@@ -76,6 +94,7 @@ jobs:
           test -z "$(git status --porcelain -- av)"
           npx playwright install --with-deps chromium
           npm run test:av-suite-browser
+          npm run test:av-canvas-menus-browser
           npm run test:av-audio-flow-browser
       - name: Audio shared-console consumer matches its source
         run: |
@@ -141,6 +160,8 @@ jobs:
           npm run typecheck:the-shop
           npm run test:the-shop
           npm run build:the-shop
+          npm run test:av-retained-browser
+          npm run test:av-routes-browser
           git diff --exit-code -- the-shop
           test -z "$(git status --porcelain -- the-shop)"
           npm run test:the-shop-browser

@@ -1,6 +1,109 @@
 # Changelog
 
-# Changelog
+## November 1, 2026: Video Engineering Daily
+
+- Add Edition 025, LED refresh and shutter exposure, with a Brompton sourced
+  lesson and matching diagram and story card. Backfill October 31 as Edition
+  024, B frame reordering, with an AWS sourced lesson and matching assets.
+  Preserve all prior editions, chronological numbering and calendar behavior.
+
+## October 30, 2026: Vite development server patch
+
+- Upgrade Vite from 6.4.4 to 6.4.5 for GHSA-8g5g-mxqh-grgj and raise the minimum compatible version. Add a loopback regression proving raw/import queries cannot retrieve a denied synthetic file, enforced by the existing pull request contract job.
+
+## October 30, 2026: Video Engineering Daily
+
+- Add Edition 023, Frame rate conversion families, with an AJA sourced
+  conversion-family diagram and matching SVG and PNG story card. Preserve
+  prior lessons, numbering, calendar behavior and the reviewed release gates.
+
+## October 29, 2026: Add panel short screen verification
+
+- Keep the Add panel list usable on short screens when adding into empty space. Phones can use the available viewport height; short screens omit the decorative placement map.
+- Preserve the compact topic menus and native modal from PR #388, restore group and panel focus transitions, and wrap Tab in the modal. Add browser regression coverage for all five Front Office choices, Enter, Space, Tab, Back, Escape, focus return and final-choice placement at nine viewport sizes in light and dark themes. Saved views and application storage contracts are unchanged.
+
+## 2026-10-29: Two-step Add panel menu
+
+- Open the Add panel chooser on search and the group tiles only. Picking a tile replaces the tiles with that group's panels, a Back button and the placement preview; Back or Escape returns to the tiles with focus on the tile just left. The active application's tile is marked.
+- Let the chooser use the height below where it opened and scroll only its panel list, so every panel in a group stays reachable (Front Office now shows all five, not two).
+- The retained family hosts share the engine, so they get the same two steps over their Common, Planning and Utilities categories; category tiles that hold no panels are dropped.
+- Rebuild the AV Suite, AV Calculator and Equipment Lab bundles and bump the AV offline cache generation to `v20261029-two-step-panel-chooser`. Panel types, views, layouts and saved documents are unchanged.
+
+## 2026-10-29: AV workspace topic menus
+
+- Reclaim workspace space with compact console controls and topic submenus with Back, Close and Escape.
+- Put project, appearance, status, views, panel recall and layout controls in focused menu pages.
+- Make the shared panel chooser enter an application submenu and keep phone panel shortcuts available.
+- Move Video diagram controls into topic menus and hide React Flow attribution through its supported option.
+
+## October 29, 2026
+
+- Add Video Engineering Daily Edition 022, Fiber mode and wavelength, with
+  its sourced diagram and verified SVG and PNG story card. Daily releases use
+  the existing reviewed export and Pages verification path.
+
+- Redirect the eight original AV family routes into the shared console with
+  their native pack selected. Preserve the five shared show-context fields,
+  per-pack source, saved documents and import/export behavior.
+- Retarget public family probes to `/av/?app=<pack>`. Keep detailed previous
+  host regressions on ignored build fixtures and exclude those fixtures from
+  publication. Add root-console and 42-route browser checks.
+- Honor the configured Chrome browser in the retained Audio flow probe so
+  publication does not require a separate downloaded headless browser.
+
+## 2026-10-28: Engineering daily archive
+
+- Keep the demos entry and return hub inside the viewport with the existing subject reader, shared neutral light and dark preferences, complete text pagination and direct archive entry. Preserve the existing demo content and links.
+
+- Publish the calendar based Video Engineering Daily reference archive alongside AV demos, with 21 sourced editions and their diagram and story assets.
+- Keep selected editions understandable across filtered views, combine the core lesson in Summary, and expose model condition and output beside Signal lab controls.
+- Add a reproducible export with metadata, asset validation and content hashes. The authoring archive remains separate from the public snapshot.
+
+## 2026-10-27: Offline console recovery
+
+- Return offline recovery links and cached navigation fallback to the native AV console. Retired Toolbox and Show Console redirect pages are not cached.
+- Verify recovery navigation for root and subdirectory scopes with the worker harness; physical-device offline acceptance remains open.
+
+## 2026-10-26 — Domain cutover browser install
+
+- Install only Playwright's headless Chromium shell in the Domain cutover acceptance job, without `--with-deps`. The runner image already provides every Chromium library; the flag only added fonts from the Ubuntu mirror, which stalled at a few kB/s and cancelled the job at its 10-minute timeout, blocking the Pages deploy for all three sites.
+
+## 2026-10-26 — Dependency audit: zod 4 and Vitest 4.1.12
+
+- Upgrade the AV console schema library from zod 3.25.76 to 4.6.7 to clear the high-severity audit failure (GHSA-mrhx-c7xc-m3w5, memory exhaustion validating oversized constrained collections; no 3.x fix exists). The `npm audit --audit-level=high` step in Public site contracts and the Pages deploy was failing on every run.
+- Migrate the only zod 4 break in use: single-argument `z.record(value)` becomes `z.record(z.string(), value)` in AV Video, AV Audio, AV Calculator and the shared console drafts. Saved plan formats, storage keys and import/export shapes are unchanged.
+- Update Vitest from 4.1.11 to 4.1.12 to clear the moderate `@vitest/mocker` advisories (GHSA-qxg6-89mg-rqv8, GHSA-xp26-3454-mjgp). Rebuilt console bundles are committed.
+
+## 2026-10-26
+
+- Add Equipment Lab as a standalone AV module and four native workspace panels.
+- Import the hash-pinned 43-entry shared catalog and unchanged Cartoni reference GLB.
+- Preserve existing model links and control IDs, with generic Panasonic context.
+
+
+## 2026-10-23 — Boxlens social preview
+
+- Give the Boxlens page a dedicated camera-model social card and metadata for its interactive guide and PDF download.
+
+## 2026-10-23 — Camera field guide download
+
+- Add the approved labeled camera field guide as a PDF download on the standalone Boxlens page.
+
+## 2026-10-23 — Standalone box lens model
+
+- Add the public `/boxlens/` AV by Dave route for the existing public Ion Workbench camera model. Preserve the source viewer, selectable controls, reference-accuracy notes and generic Panasonic body; include deterministic home/console links and a direct-viewer fallback.
+- Add the route to canonical domain staging without changing Site access or registering another AV workspace panel.
+
+## 2026-10-20 — Deployment correction validation
+
+- Keep the demo hub and both interactive demos on systembydave.com. Remove the unrelated avbydave.com route migration from the sitemap correction; existing domain configuration, canonical URLs and sitemap membership remain unchanged.
+- Update the locked Vite build dependency from 6.4.3 to 6.4.4 to clear the high-severity dependency audit failure found during fresh deployment validation. Run the same audit threshold on pull requests before publication.
+
+## 2026-10-20 — Deterministic sitemap
+
+- `sitemap.xml` is now a date-free route list, so `python3 scripts/gen_sitemap.py` regenerates the same bytes on any day, in any clone, mid-merge or after a rebase. It no longer stamps uncommitted (or mid-merge staged) files with today's date, which is what put 2026-10-20 on 15 pages in the `demos-hosting` merge and failed the Pages deploy's generated-file check (as on 2026-10-14 and 2026-09-17).
+- The Pages deploy stamps the published `_site/sitemap.xml`, and domain-site staging stamps each site's sitemap, with `--lastmod`: each page's last commit date from full git history. Without full history it omits the dates rather than guess.
+- `python3 scripts/gen_sitemap.py --check` fails with a diff when the committed sitemap is stale, and now runs on every pull request in Public site contracts, so route drift is caught before merge instead of on `main`.
 
 ## 2026-10-20 — AV social preview branding
 
@@ -40,6 +143,26 @@
 - Add a focused native/masked API regression to the existing workspace probe. Chromium and WebKit cover both helpers, paging/value preservation and the current standalone/shared-console consumers. Preserve physical older-device and minimum-OS policy gaps; no global polyfill or saved-data change.
 - Regenerate embedded workspace runtimes and the native suite bundle, and advance the existing offline cache generation and Stage 3D readiness pin together. Preserve CSS, calculation engines, routes, schemas, keys and original imports.
 
+## 2026-10-20 — Reels-safe capture layout for the demos
+
+- `demos/demo-shell.js`: capture-only `?reels` layout (needs `?drive` or `?auto`, so visitors never see it) that fits the stage's content box into Instagram's Reels safe area (x 60–972, y 252–1500 of 1080×1920). `demos/frame-sync.html` declares its content box (`data-capture-box`). The reel renderer uses it; a glyph-level check of every cut finds no text under the top bar, the caption band or the right-hand buttons. On-screen copy, including "link in bio", is unchanged. `probe:demos-viewport` checks that `?reels` alone changes nothing. Posting checklist: drag the profile-grid crop to the top.
+
+## 2026-10-20 — Demos fit phone widths
+
+- The demo pages (`demos/frame-sync.html`, `demos/fault-finding.html`) laid out 446–539 px wide on 360–430 px phones: the page zoomed out and the stage, breadcrumb and completion panel ran past the screen edge. Cause: the 1080 px stage rendered unscaled until `demo-shell.js` ran, so mobile browsers zoomed the page out at load (1275 px with JavaScript off), and `layout()` then sized the stage from `innerWidth`/`innerHeight`, which report the zoomed-out visual viewport, so it stayed too wide. The stage now starts scaled down in `demos/demo-shell.css`, and `layout()` uses the layout viewport (`documentElement.clientWidth/Height`). New local probe `npm run probe:demos-viewport` (320, 360, 390, 430 px under mobile emulation: width equals the viewport, no horizontal scroll, nothing crossing an edge or clipped).
+
+## 2026-10-20 — beehiiv subscribe link and Stripe checkout prep (AV by Dave)
+
+- Demos: `demos/demo-shell.js` gains a hosted-subscribe-link mode. When `emailSubscribeUrl` in `demos/config.js` is an https `beehiiv.com` link, the post-completion ask becomes a "Send me the next demo" button to beehiiv's subscribe page (new tab, `rel="noopener"`, the visitor's UTM tags or demo defaults). It ships as a marked `[DAVE: …]` placeholder, so the ask is unchanged until Dave fills it in. No CSP change. New local probe `npm run probe:demo-subscribe`.
+- Field Kit: Stripe Payment Links chosen. `js/sbd-launch-config.js` ships `provider: 'stripe'` with `[DAVE: …]` Payment Link and price placeholders; checkout now also stays closed until the price is real. New noindex buyers-only download page `field-kit/thanks/` for Stripe's after-payment redirect (the file link lives only in that Stripe setting; known file hosts only, no referrer, query stripped). Delivery, statement-descriptor, refund and licence wording is DRAFT for Dave. The indexing policy now expects 189 unlisted routes.
+- Privacy policy: AV by Dave email list (beehiiv) and Field Kit purchases (Stripe) sections.
+
+## 2026-10-18 — Field Kit draft and launch drafts (AV by Dave)
+
+- The frame sync demo's single home is `demos/frame-sync.html` (2026-10-20 entry), published at `https://avbydave.com/demos/frame-sync.html`. This branch's earlier duplicate `frame-sync/` page, its `js/sbd-signup.js` signup, its sitemap and domain-site entries and its reel capture script were removed before merge. `frame-sync/` was never on `main` or live, so no redirect. The Field Kit page, the launch docs, the reel copy and UTM links point at the demos page.
+- Add `js/sbd-events.js`, a no-op launch event dispatcher. Analytics stays off by decision: no provider and no third-party script, so the privacy policy's no-analytics statement stays true (`docs/launch/analytics.md`).
+- Add `field-kit/`, a noindex, unlinked Sync & Signal Field Kit draft page: price TBD, blurred preview images of the kit pages (the paid files stay out of the repository), and delivery/refund/licence placeholders marked for Dave. One `fieldKit.checkout` value turns on Gumroad, Lemon Squeezy or Stripe Payment Links (link or overlay, `js/sbd-checkout.js`, provider hosts only). Checkout stays disabled until that value is valid and every placeholder is replaced (`docs/launch/checkout.md`). The indexing verifier now expects 188 routes outside the sitemaps.
+- Add local-only `scripts/launch/mix_reel_music.sh` (music under the reel cuts at −14 LUFS with fades; synthesized placeholder bed only) and `scripts/launch/probe_field_kit.mjs` (Field Kit page and checkout interlock against local mocks). Email capture setup for the demos is in `docs/launch/email.md`, with `docs/launch/privacy-email-section.md` as the policy section to apply first (not applied). Reel copy and a posting-day checklist in `docs/launch/`, ready for review; nothing posted.
 
 ## 2026-10-18 — Stream and Record independent preparation
 

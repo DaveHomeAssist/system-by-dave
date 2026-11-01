@@ -1,0 +1,86 @@
+[
+  {
+    "kind": "missing GLB",
+    "reference": {
+      "status": "error",
+      "representation": "GLB",
+      "revision": "1.0.0",
+      "error": "Reference unavailable (404)"
+    },
+    "notice": "Cartoni reference could not load. The last valid model is retained. Retry from Sources.",
+    "ids": 23,
+    "state": {
+      "scope": "rig",
+      "tab": "explore",
+      "selected": "head.tiltLock",
+      "pan": 30,
+      "tilt": 20,
+      "plate": 40,
+      "counterbalance": 50,
+      "tiltDrag": 0,
+      "panDrag": 20,
+      "panLock": false,
+      "tiltLock": false,
+      "horizontalLock": false,
+      "ff": 0,
+      "ffLock": true,
+      "extender": false
+    }
+  },
+  {
+    "kind": "corrupt GLB",
+    "reference": {
+      "status": "error",
+      "representation": "GLB",
+      "revision": "1.0.0",
+      "error": "Reference integrity check failed: model"
+    },
+    "notice": "Cartoni reference could not load. The last valid model is retained. Retry from Sources.",
+    "ids": 23,
+    "state": {
+      "scope": "rig",
+      "tab": "explore",
+      "selected": "head.tiltLock",
+      "pan": 30,
+      "tilt": 20,
+      "plate": 40,
+      "counterbalance": 50,
+      "tiltDrag": 0,
+      "panDrag": 20,
+      "panLock": false,
+      "tiltLock": false,
+      "horizontalLock": false,
+      "ff": 0,
+      "ffLock": true,
+      "extender": false
+    }
+  },
+  {
+    "kind": "stale manifest",
+    "reference": {
+      "status": "error",
+      "representation": "GLB",
+      "revision": "1.0.0",
+      "error": "Unsupported reference manifest"
+    },
+    "notice": "Cartoni reference could not load. The last valid model is retained. Retry from Sources.",
+    "ids": 23,
+    "state": {
+      "scope": "rig",
+      "tab": "explore",
+      "selected": "head.tiltLock",
+      "pan": 30,
+      "tilt": 20,
+      "plate": 40,
+      "counterbalance": 50,
+      "tiltDrag": 0,
+      "panDrag": 20,
+      "panLock": false,
+      "tiltLock": false,
+      "horizontalLock": false,
+      "ff": 0,
+      "ffLock": true,
+      "extender": false
+    }
+  }
+]

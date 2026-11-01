@@ -1,0 +1,38 @@
+{
+  "before": {
+    "scope": "rig",
+    "tab": "explore",
+    "selected": "lens.housing",
+    "pan": 0,
+    "tilt": 0,
+    "plate": 0,
+    "counterbalance": 50,
+    "tiltDrag": 0,
+    "panDrag": 20,
+    "panLock": true,
+    "tiltLock": false,
+    "horizontalLock": false,
+    "ff": 0,
+    "ffLock": true,
+    "extender": false
+  },
+  "after": {
+    "scope": "rig",
+    "tab": "explore",
+    "selected": "lens.housing",
+    "pan": 0,
+    "tilt": 0,
+    "plate": 0,
+    "counterbalance": 50,
+    "tiltDrag": 0,
+    "panDrag": 20,
+    "panLock": true,
+    "tiltLock": false,
+    "horizontalLock": false,
+    "ff": 0,
+    "ffLock": true,
+    "extender": false
+  },
+  "visible": true,
+  "message": "Unknown control reference. The previous selection and practice settings are retained."
+}

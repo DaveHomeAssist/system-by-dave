@@ -45,7 +45,11 @@ jobs:
           npm run verify:av
           npm run verify:throwline
           npm run verify:shader-practice
-      - run: npx playwright install --with-deps chromium
+      # The runner image already has every library Chromium needs. --with-deps
+      # only added fonts from the Ubuntu mirror, whose stalls ran this job past
+      # its timeout and blocked the Pages deploy. The tests launch headless, so
+      # the headless shell is the only browser they use.
+      - run: npx playwright install --only-shell chromium
       - run: npm run verify:domain-sites
       - run: node --test scripts/check_domain_cutover_ready.test.mjs
       - run: npm run test:domain-cutover
