@@ -1,5 +1,10 @@
 # Changelog
 
+## October 30, 2026: Preserve heatmap exports during sync
+
+- Validate source revisions and stage and compare heatmap exports before replacement. Restore the previous export when promotion fails, and retain its backup if restoration fails.
+- Add read-only build parity verification and regression coverage for invalid inputs, copy failures, promotion failures and recovery. Public heatmap files are unchanged.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced

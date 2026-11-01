@@ -150,6 +150,7 @@ The heatmap at `/cheesesteaks/` is a static export of the private
 
 ```bash
 npm run sync:cheesesteaks -- /absolute/path/to/philly-cheesesteak-heatmap
+npm run verify:cheesesteaks -- /absolute/path/to/philly-cheesesteak-heatmap
 npm run verify:indexing
 npm run verify:public-navigation
 ```
@@ -157,6 +158,14 @@ npm run verify:public-navigation
 The sync replaces `cheesesteaks/`, drops the export's own 404 pages (Pages serves
 only the root `404.html`), and records the source commit in
 `cheesesteaks/SOURCE.txt`. Do not hand-edit `cheesesteaks/`.
+
+The importer validates the source revision and stages and compares the entire
+export before replacing the previous directory. A failed promotion restores the
+previous directory; if restoration itself fails, the error identifies the retained
+backup for recovery. The read-only verifier compares file paths, bytes and
+provenance with the supplied build. It does not prove that `out/` was freshly
+built from that revision or that the live deployment matches. Run
+`npm run test:cheesesteaks-sync` for failure-path regression fixtures.
 
 ### NoteForge canonical release
 
