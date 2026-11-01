@@ -1,5 +1,10 @@
 # Changelog
 
+## October 30, 2026: Tools directory access
+
+- Add DepotOps to the static directory, preserving existing product links and category fragments.
+- Add shared theme selection, a bounded directory panel with category reading-position restoration, compact filters and phone bottom navigation. Printing expands all cards; no-script visitors retain every link.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced
