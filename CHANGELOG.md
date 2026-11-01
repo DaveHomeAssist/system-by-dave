@@ -1,5 +1,10 @@
 # Changelog
 
+## October 30, 2026: Retain release readback evidence
+
+- Compare the main site and remaining published domains with their staged entry pages, provenance and directly linked scripts/styles after publication. Keep the existing walk gate before redirects.
+- Retry propagation within a bounded budget and retain terminal readback reports for 30 days. Browser behavior, authenticated flows and human acceptance remain separate.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced

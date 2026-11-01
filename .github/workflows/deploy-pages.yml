@@ -273,18 +273,40 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
 
+      - name: Verify main site readback
+        run: node scripts/verify_live_release.mjs systembydave _site "$GITHUB_SHA" _release-readback/systembydave.json
+
       # Each target repository deploys its own Pages site when this push lands.
       # These remaining publishes are independent; the walk is already verified.
       - name: Publish housevideo.app
+        id: publish-housevideo
         if: ${{ !cancelled() && steps.deployment.outcome == 'success' && github.ref == 'refs/heads/main' }}
         env:
           DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_DEPLOY_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
         run: scripts/publish_domain_site.sh housevideo _sites/housevideo DaveHomeAssist/housevideo "$GITHUB_SHA"
 
+      - name: Verify housevideo readback
+        if: ${{ !cancelled() && steps.publish-housevideo.outcome == 'success' }}
+        run: node scripts/verify_live_release.mjs housevideo _sites/housevideo "$GITHUB_SHA" _release-readback/housevideo.json
+
       - name: Publish avbydave.com
+        id: publish-avbydave
         if: ${{ !cancelled() && steps.deployment.outcome == 'success' && github.ref == 'refs/heads/main' }}
         env:
           DEPLOY_KEY: ${{ secrets.AVBYDAVE_DEPLOY_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
         run: scripts/publish_domain_site.sh avbydave _sites/avbydave DaveHomeAssist/avbydave "$GITHUB_SHA"
+
+      - name: Verify AV by Dave readback
+        if: ${{ !cancelled() && steps.publish-avbydave.outcome == 'success' }}
+        run: node scripts/verify_live_release.mjs avbydave _sites/avbydave "$GITHUB_SHA" _release-readback/avbydave.json
+
+      - name: Retain release readback evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-readback
+          path: _release-readback/*.json
+          if-no-files-found: ignore
+          retention-days: 30
