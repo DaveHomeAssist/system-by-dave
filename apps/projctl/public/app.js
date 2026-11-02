@@ -24,6 +24,7 @@ function toast(msg, ms = 2200) { const t = $('#toast'); t.textContent = msg; t.c
 
 async function api(path, body) {
   const r = await fetch('/api/' + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) });
+  if (r.status === 401) { location.href = '/login.html'; throw new Error('login required'); }
   const j = await r.json(); if (!r.ok) throw new Error(j.error || r.statusText); return j;
 }
 
@@ -214,7 +215,7 @@ function setConn(on) { const d = $('#conn .avd-dot'); d.className = 'avd-dot ' +
 function connect() {
   const ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
   ws.onopen = () => setConn(true);
-  ws.onclose = () => { setConn(false); setTimeout(connect, 1500); };
+  ws.onclose = () => { setConn(false); fetch('/api/state').then((r) => { if (r.status === 401) location.href = '/login.html'; else setTimeout(connect, 1500); }).catch(() => setTimeout(connect, 1500)); };
   ws.onmessage = (m) => {
     const msg = JSON.parse(m.data);
     if (msg.type === 'snapshot') { state = msg; renderAll(); }

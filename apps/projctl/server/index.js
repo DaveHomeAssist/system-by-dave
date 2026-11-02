@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
+import { createHash, timingSafeEqual, randomBytes } from 'node:crypto';
 import { openStore, simRig } from './store.js';
 import { makeDriver } from './drivers/index.js';
 import { PATTERNS, pictureSchema } from './drivers/panasonic.js';
@@ -17,6 +18,18 @@ const OSC_PORT = Number(process.env.OSC_PORT || 9000);
 const TCP_PORT = Number(process.env.TCP_PORT || 9001);
 const POLL_MS = Number(process.env.POLL_MS || 5000);
 const SIM = process.env.SIM === '1';
+// ---- Login (optional). Set PJ_PASSCODE to require it: needed before exposing the relay beyond the LAN.
+const PASSCODE = (process.env.PJ_PASSCODE || '').trim();
+const SESSION_SECRET = randomBytes(32).toString('hex'); // sessions end when the relay restarts
+const SESSION = createHash('sha256').update(`pj:${SESSION_SECRET}:${PASSCODE}`).digest('hex');
+const loginFails = new Map(); // ip -> { n, until }
+function cookies(req) { return Object.fromEntries((req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((kv) => kv[0]).map(([k, ...v]) => [k, v.join('=')])); }
+function authed(req) {
+  if (!PASSCODE) return true;
+  const c = cookies(req).pj || ''; const want = Buffer.from(SESSION), got = Buffer.from(c);
+  return got.length === want.length && timingSafeEqual(got, want);
+}
+function clientIp(req) { return (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '?'; }
 const DATA = process.env.RIG || path.join(__dirname, '..', 'data', SIM ? 'rig.sim.json' : 'rig.json');
 
 const store = openStore(DATA);
@@ -175,7 +188,7 @@ startTcpLines({ port: TCP_PORT, onMessage: onCue });
 
 // ---- HTTP ----
 function httpErr(status, message) { return Object.assign(new Error(message), { status }); }
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png' };
 const PUB = path.join(__dirname, '..', 'public');
 async function body(req) { let b = ''; for await (const c of req) b += c; return b ? JSON.parse(b) : {}; }
 function json(res, code, obj) { res.writeHead(code, { 'content-type': 'application/json', 'access-control-allow-origin': '*' }); res.end(JSON.stringify(obj)); }
@@ -184,6 +197,23 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   try {
     if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'content-type', 'access-control-allow-methods': 'GET,POST' }); return res.end(); }
+    if (url.pathname === '/api/login' && req.method === 'POST') {
+      if (!PASSCODE) return json(res, 200, { ok: true, open: true });
+      const ip = clientIp(req); const f = loginFails.get(ip) || { n: 0, until: 0 };
+      if (f.until > Date.now()) throw httpErr(429, `too many tries, wait ${Math.ceil((f.until - Date.now()) / 1000)} s`);
+      const { code } = await body(req);
+      const a = Buffer.from(String(code || '')), b = Buffer.from(PASSCODE);
+      if (a.length !== b.length || !timingSafeEqual(a, b)) { f.n++; f.until = Date.now() + Math.min(60000, 1000 * 2 ** f.n); loginFails.set(ip, f); store.event({ source: 'ui', slot: '*', command: 'login', result: 'ERR', detail: `wrong passcode from ${ip}` }); throw httpErr(401, 'wrong passcode'); }
+      loginFails.delete(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'OK', detail: ip });
+      const secure = (req.headers['x-forwarded-proto'] === 'https') ? '; Secure' : '';
+      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': `pj=${SESSION}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 90}${secure}` }); return res.end(JSON.stringify({ ok: true }));
+    }
+    if (url.pathname === '/api/logout' && req.method === 'POST') { res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': 'pj=; Path=/; HttpOnly; Max-Age=0' }); return res.end('{"ok":true}'); }
+    if (url.pathname === '/login.html' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css') { /* public assets */ }
+    else if (!authed(req)) {
+      if (url.pathname.startsWith('/api/')) throw httpErr(401, 'login required');
+      res.writeHead(302, { location: '/login.html' }); return res.end();
+    }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
     if (url.pathname === '/api/schema') return json(res, 200, { patterns: PATTERNS, picture: pictureSchema() });
     if (url.pathname === '/api/picture' && req.method === 'GET') {
@@ -221,7 +251,8 @@ const server = http.createServer(async (req, res) => {
   } catch (e) { json(res, e.status || 500, { error: e.message }); }
 });
 
-const wss = new WebSocketServer({ server, path: '/ws' });
+const wss = new WebSocketServer({ noServer: true });
+server.on('upgrade', (req, sock, head) => { if (new URL(req.url, 'http://x').pathname !== '/ws' || !authed(req)) { sock.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); return sock.destroy(); } wss.handleUpgrade(req, sock, head, (ws) => wss.emit('connection', ws, req)); });
 wss.on('connection', (ws) => { clients.add(ws); ws.send(JSON.stringify(snapshot())); ws.on('close', () => clients.delete(ws)); });
 
-server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${PORT}  rig=${DATA}`));
+server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${PORT}  rig=${DATA}  login=${PASSCODE ? 'passcode' : 'open (LAN only)'}`));
