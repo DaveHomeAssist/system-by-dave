@@ -14,9 +14,15 @@ export const PULSE_PATTERNS = {
   'internal:vertical-graybars': 'Grey bars (vertical)', 'internal:color-gradients': 'Colour gradients', 'internal:3d-stereo': '3D stereo',
 };
 
-export function pulseDriver({ host, port = 9090, timeoutMs = 3000, inputProperty = 'image.window.main.source' }) {
+export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty = 'image.window.main.source' }) {
   let id = 0;
+  // One call at a time per projector: the poll's string of gets and a UI command otherwise race for the socket and the loser times out.
+  let chain = Promise.resolve();
   function rpc(method, params) {
+    const run = () => rpcOnce(method, params);
+    const p = chain.then(run, run); chain = p.catch(() => {}); return p;
+  }
+  function rpcOnce(method, params) {
     return new Promise((resolve, reject) => {
       const sock = net.createConnection({ host, port });
       let buf = '', done = false;
