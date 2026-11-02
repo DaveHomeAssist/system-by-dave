@@ -132,7 +132,7 @@ async function command(slot, cmd, arg, source = 'ui', confirmToken) {
     if (cmd === 'power') result = await d.power(!!arg);
     else if (cmd === 'shutter') result = await d.shutter(!!arg);
     else if (cmd === 'input') result = await d.input(String(arg));
-    else if (cmd === 'pattern') { if (!d.pattern) throw httpErr(400, `${slot}: test pattern not supported by ${d.kind} driver`); result = await d.pattern(arg); }
+    else if (cmd === 'pattern') { if (!d.pattern) throw httpErr(400, `${slot}: test pattern not supported by ${d.kind} driver`); let code = String(arg); if (d.kind === 'pulse') code = code === '08' ? 'internal:colorbars' : code === '00' ? 'off' : code; result = await d.pattern(code); }
     else if (cmd === 'lens') { if (!d.lens) throw httpErr(400, `${slot}: lens not supported by ${d.kind} driver`); result = await d.lens(arg); }
     else if (cmd === 'picture') { if (!d.picture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`); result = await d.picture(arg.key, arg.value); }
     else throw httpErr(400, `unknown command ${cmd}`);
