@@ -1,5 +1,10 @@
 # Changelog
 
+## November 2, 2026: Video Engineering Daily
+
+- Add Edition 026, Active HDMI cable direction, with an Extron sourced lesson,
+  matching diagram and SVG/PNG story card. Preserve previous editions and behavior.
+
 ## November 1, 2026: Video Engineering Daily
 
 - Add Edition 025, LED refresh and shutter exposure, with a Brompton sourced

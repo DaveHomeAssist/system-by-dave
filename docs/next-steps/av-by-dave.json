@@ -1,15 +1,15 @@
 {
   "id": "house-reference",
   "engineeringDailyPublication": {
-    "date": "2026-11-01",
-    "edition": 25,
-    "title": "LED refresh and shutter exposure",
+    "date": "2026-11-02",
+    "edition": 26,
+    "title": "Active HDMI cable direction",
     "state": "Verified publication input; exact CI, merge and deployment evidence belongs to the provider records for this revision",
-    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=25&month=2026-11",
+    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=26&month=2026-11",
     "evidence": "demos/engineering-daily/release.json",
-    "verification": "Dominic: 50 archive and 50 story views, 10 calendar views, 10 dashboard views, 3 navigation journeys and 60 Signal lab views passed. All 25 SVG/PNG mappings and PNG dimensions validated; both new cards visually inspected. Candidate source and served browser gates remain required before release.",
+    "verification": "Dominic: 52 archive and52 story views; calendar10, dashboard10, navigation3, Signal lab60 passed. All26 card pairs rendered, new card visually inspected. Candidate, CI, deployment and live gates required before publication completion.",
     "next": "Require exact-head CI, Pages deployment and matching live manifest/assets/browser journeys before publication completion; continue the same gates for future daily releases.",
-    "boundaries": "Preserve facts 001 through 023 beyond clearing the previous current marker. October 31 is newly authored as a backfill on November 1, not a historical delivery claim. No existing editions renumbered. Human acceptance is separate."
+    "boundaries": "Prior25 records and50 assets preserved, apart from clearing previous current marker. No backfills or renumbering. Human acceptance separate."
   },
   "engineeringDailyUx": {
     "date": "2026-10-28",

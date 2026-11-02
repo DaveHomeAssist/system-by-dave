@@ -348,6 +348,25 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
 {
+  "id": 26,
+  "date": "2026-11-02",
+  "track": "Signal troubleshooting and system design",
+  "trackShort": "Troubleshooting",
+  "title": "Active HDMI cable direction",
+  "fact": "Matching HDMI plugs do not make an active cable reversible. Extron specifies its HD Pro Plenum hybrid optical-copper cables as unidirectional and powered from the HDMI source. Direction and power requirements belong to the cable design; they are not universal properties of every HDMI cable.",
+  "why": "A long cable pulled backward through a truss or conduit can leave a display dark even when its connectors fit and the source format is supported.",
+  "takeaway": "Identify the designated source and display ends before routing. Bench-test the complete path in its intended direction and format, and label both ends before the pull.",
+  "sourceLabel": "Extron HD Pro Plenum Series specifications",
+  "sourceUrl": "https://www.extron.com/product/hdproplenum",
+  "basis": "Manufacturer-specific unidirectional active hybrid cable behavior; conceptual main video path only",
+  "current": true,
+  "illustration": {
+    "viewBox": "0 0 240 400",
+    "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">26</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">CABLE DIRECTION</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"135\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Correct orientation</text><text x=\"24\" y=\"110\">Source</text><text x=\"157\" y=\"110\">Display</text><path d=\"M30 137H207m-8-7l8 7l-8 7\" class=\"wire\"/><text x=\"24\" y=\"171\" class=\"good-label\">Designated video path</text><rect x=\"12\" y=\"205\" width=\"216\" height=\"135\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"231\" class=\"note\">2 / Reversed cable</text><text x=\"24\" y=\"263\">Source</text><text x=\"157\" y=\"263\">Display</text><path d=\"M207 290H30m8-7l-8 7l8 7M110 279l22 22m0-22l-22 22\" class=\"reference\"/><text x=\"24\" y=\"325\" class=\"note\">Unsupported direction</text><text x=\"120\" y=\"369\" text-anchor=\"middle\">HD Pro Plenum example</text><text x=\"120\" y=\"393\" text-anchor=\"middle\">Check before cable pull</text>",
+    "caption": "The active cable has a designated video direction. Reversing the assembly opposes the source-to-display path. Blue is main video; amber is the reversed orientation, not a return channel."
+  }
+},
+{
   "id": 25,
   "date": "2026-11-01",
   "track": "LED walls, projection, EDID, and HDCP",
@@ -359,7 +378,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
   "sourceLabel": "Brompton Tessera online manual, ShutterSync",
   "sourceUrl": "https://www.bromptontech.com/online-help/Content/Tessera%20User%20Manual/03.%20Features/12.3.4%20-%20ShutterSync.htm",
   "basis": "Manufacturer-specific ShutterSync Camera Viewer behavior; exposure times calculated as shutter angle / 360 / frame rate",
-  "current": true,
+  "current": false,
   "illustration": {
     "viewBox": "0 0 240 400",
     "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">25</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">EXPOSURE WINDOW</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"104\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"77\" class=\"blue-label\">1 / 50 fps camera</text><text x=\"24\" y=\"103\">180 degrees = 10 ms</text><path d=\"M24 132H216M24 124v16m192-16v16\" class=\"wire\"/><rect x=\"12\" y=\"170\" width=\"216\" height=\"104\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"195\" class=\"note\">2 / Shorter shutter</text><text x=\"24\" y=\"221\">90 degrees = 5 ms</text><path d=\"M24 250H120M24 242v16m96-16v16\" class=\"wire\"/><path d=\"M120 250H216\" class=\"reference\"/><rect x=\"12\" y=\"290\" width=\"216\" height=\"81\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"315\">Same LED drive cycle</text><path d=\"M24 351v-16h24v16h24v-16h24v16h24v-16h24v16h24v-16h24v16h24\" class=\"wire\"/><path d=\"M120 325V361\" class=\"reference\"/><text x=\"120\" y=\"394\" text-anchor=\"middle\" class=\"note\">Cycle may be cut short</text>",
