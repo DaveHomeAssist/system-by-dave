@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "c5e4093195f6cffa20cf3191e0d08532c031657938163e251a009ba086141eee",
-  "publicSha256": "3c0b612aedf88548746ee1722519a222e338403cb1e3ec85f22d5adfbdb4415a",
-  "editions": 25,
+  "sourceSha256": "29ccd790e554d28605eb1835fb92fb9f9835ed06556f416fa223d8bc9f1e076e",
+  "publicSha256": "71d5f3f1766c87ce65740bc49f60f4a53787d5be2c2b2b082df1b8b131c2e873",
+  "editions": 26,
   "files": [
+    {
+      "name": "Edition 026.svg",
+      "id": 26,
+      "date": "2026-11-02",
+      "title": "Active HDMI cable direction",
+      "sha256": "d4a65c36ce5a31ab6440b1b14faa852e87d56402161249d600760ddab4146e6f"
+    },
+    {
+      "name": "Edition 026.png",
+      "id": 26,
+      "date": "2026-11-02",
+      "title": "Active HDMI cable direction",
+      "sha256": "f278b85ae137190085fb8d5a24dc92904c2a46a25a0c98c4301359c7fa1f5700"
+    },
     {
       "name": "Edition 025.svg",
       "id": 25,
