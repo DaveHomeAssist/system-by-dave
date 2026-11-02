@@ -58,7 +58,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       try { s.power = mapPower(await get('system.state')); } catch { s.power = POWER.UNKNOWN; }
       try { const sh = String(await get('optics.shutter.target')).toLowerCase(); s.shutter = sh === 'closed' ? SHUTTER.CLOSED : SHUTTER.OPEN; } catch { s.shutter = SHUTTER.UNKNOWN; }
       try { s.input = String(await get(inputProperty)); } catch { s.input = null; }
-      // Laser runtime property name not found on firmware 2.10.4 (tried illumination.* and statistics.*); left null.
+      try { s.lightHours = Math.round(Number(await get('statistics.laserruntime.value')) / 3600); } catch {} // seconds on the UDM
       try { s.name = String(await get('system.name')); } catch {}
       try { s.pattern = (await get('image.testpattern.show')) ? String(await get('image.testpattern.selected')) : 'off'; } catch { s.pattern = null; }
       try { s.lens = { zoom: await get('optics.zoom.position'), focus: await get('optics.focus.position'), h: await get('optics.lensshift.horizontal.position'), v: await get('optics.lensshift.vertical.position') }; } catch {}
@@ -69,12 +69,12 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     input: (idv) => set(inputProperty, idv).then(() => 'OK'),
     // Lens jog over Pulse: optics.focus.stepforward / stepreverse { steps },
     // optics.zoom.*, optics.lensshift.horizontal.* and .vertical.*; home = optics.shifttocenter.
-    // Method names from the Pulse JSON reference (barco-pulse-rs bindings). Step counts per speed
-    // are a starting guess until tried on the UDM; the API console at http://<ip>/ lists them.
+    // Method names from the Pulse JSON reference (barco-pulse-rs bindings). Step counts per speed measured on the UDM.
     async lens(op = {}) {
       if (op.op === 'home') { await rpc('optics.shifttocenter'); return 'OK'; }
       const axis = { h: 'optics.lensshift.horizontal', v: 'optics.lensshift.vertical', focus: 'optics.focus', zoom: 'optics.zoom' }[op.axis];
-      const steps = { slow: 1, normal: 5, fast: 20 }[op.speed || 'normal'];
+      // UDM 4K22: one step is about 40 encoder units over a 0..65535 travel (measured 2026-11-02), so ~1600 steps end to end.
+      const steps = { slow: 10, normal: 50, fast: 200 }[op.speed || 'normal'];
       if (!axis || !steps || !['+', '-'].includes(op.dir)) throw new Error('lens needs axis h|v|focus|zoom, speed slow|normal|fast, dir + or -');
       await rpc(`${axis}.${op.dir === '+' ? 'stepforward' : 'stepreverse'}`, { steps });
       return 'OK';
