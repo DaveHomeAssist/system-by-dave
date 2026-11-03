@@ -77,7 +77,6 @@
       "at": "2026-11-02T18:15:29.934Z",
       "source": "poll",
       "slot": "P1",
-      "lane": "C",
       "command": "online",
       "result": "OK"
     },
@@ -85,7 +84,6 @@
       "at": "2026-11-02T18:15:29.934Z",
       "source": "poll",
       "slot": "P2",
-      "lane": "A",
       "command": "online",
       "result": "OK"
     },
@@ -93,7 +91,6 @@
       "at": "2026-11-02T18:15:29.934Z",
       "source": "poll",
       "slot": "P3",
-      "lane": "D",
       "command": "online",
       "result": "OK"
     },
@@ -101,7 +98,6 @@
       "at": "2026-11-02T18:15:29.934Z",
       "source": "poll",
       "slot": "P4",
-      "lane": "B",
       "command": "online",
       "result": "OK"
     },
@@ -109,7 +105,6 @@
       "at": "2026-11-02T18:18:11.149Z",
       "source": "poll",
       "slot": "P1",
-      "lane": "C",
       "command": "online",
       "result": "OK"
     },
@@ -117,7 +112,6 @@
       "at": "2026-11-02T18:18:11.149Z",
       "source": "poll",
       "slot": "P2",
-      "lane": "A",
       "command": "online",
       "result": "OK"
     },
@@ -125,7 +119,6 @@
       "at": "2026-11-02T18:18:11.149Z",
       "source": "poll",
       "slot": "P3",
-      "lane": "D",
       "command": "online",
       "result": "OK"
     },
@@ -133,7 +126,6 @@
       "at": "2026-11-02T18:18:11.149Z",
       "source": "poll",
       "slot": "P4",
-      "lane": "B",
       "command": "online",
       "result": "OK"
     },
@@ -141,7 +133,6 @@
       "at": "2026-11-02T18:47:18.646Z",
       "source": "ui",
       "slot": "P1",
-      "lane": "C",
       "command": "shutter 0",
       "result": "OK"
     },
@@ -149,7 +140,6 @@
       "at": "2026-11-02T18:47:21.245Z",
       "source": "ui",
       "slot": "P1",
-      "lane": "C",
       "command": "shutter 1",
       "result": "OK"
     },
@@ -157,7 +147,6 @@
       "at": "2026-11-02T18:47:22.595Z",
       "source": "ui",
       "slot": "P1",
-      "lane": "C",
       "command": "shutter 1",
       "result": "OK"
     },
@@ -165,7 +154,6 @@
       "at": "2026-11-02T20:08:10.637Z",
       "source": "ui",
       "slot": "P1",
-      "lane": "C",
       "command": "shutter 1",
       "result": "OK"
     },
@@ -173,7 +161,6 @@
       "at": "2026-11-02T20:08:11.213Z",
       "source": "ui",
       "slot": "P1",
-      "lane": "C",
       "command": "shutter 1",
       "result": "OK"
     }
