@@ -14,6 +14,7 @@ import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
 import { confirmations } from './confirmations.js';
 import { readStagePlot } from './stage-plot.js';
+import { readVenue, readVenueAsset } from './venue-model.js';
 import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,6 +37,7 @@ function authed(req) {
 function clientIp(req) { return (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '?'; }
 const DATA = process.env.RIG || path.join(__dirname, '..', 'data', SIM ? 'rig.sim.json' : 'rig.json');
 const STAGE_PLOT = process.env.STAGE_PLOT || path.join(path.dirname(DATA), 'stage-plot.json');
+const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 'venue');
 
 const store = openStore(DATA);
 if (SIM) simRig(store.rig);
@@ -281,6 +283,14 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
     if (url.pathname === '/api/schema') return json(res, 200, { patterns: PATTERNS, picture: pictureSchema() });
     if (url.pathname === '/api/stage-plot' && req.method === 'GET') return json(res, 200, { plot: await readStagePlot(STAGE_PLOT) });
+    if ((url.pathname === '/api/venue-model' || url.pathname.startsWith('/api/venue-model/')) && req.method === 'GET') {
+      res.setHeader('cache-control', 'no-store');
+      if (url.pathname === '/api/venue-model') return json(res, 200, { venue: await readVenue(VENUE_MODEL) });
+      const asset = await readVenueAsset(VENUE_MODEL, url.pathname.slice('/api/venue-model/'.length));
+      if (!asset) throw httpErr(404, 'No building asset');
+      res.writeHead(200, { 'content-type': asset.type, 'content-length': asset.bytes.length });
+      return res.end(asset.bytes);
+    }
     if (url.pathname === '/api/picture' && req.method === 'GET') {
       const slot = url.searchParams.get('slot'); const p = store.projector(slot); if (!p) throw httpErr(404, 'no slot');
       const d = driverFor(p); if (!d.getPicture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`);
