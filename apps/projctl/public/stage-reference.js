@@ -42,7 +42,7 @@ export function stageReference(plot) {
     if (p) { projector[0] = p.x; projector[2] = p.z ?? projector[2]; }
     const body = p ? (p.portrait ? [p.body[1], p.body[0], p.body[2]] : [...p.body])
       : lane === 'A' || lane === 'D' ? [.2, .5, .52] : [.5, .2, .54];
-    lanes[lane] = { coverage, projector, body, heightKnown: !!p && p.y !== null,
+    lanes[lane] = { coverage, planEdge: ends.map(p => planPoint(p)), projector, body, heightKnown: !!p && p.y !== null,
       yaw: p?.yaw ?? null, model: p?.model || null, metric: !!p };
   }
   return { height, lanes, metric: !!measurements,
