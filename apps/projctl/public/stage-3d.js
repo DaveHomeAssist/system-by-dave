@@ -53,7 +53,7 @@ export async function createStage3D(host, plot, openLane) {
     coverage.add(line([...data.coverage, data.coverage[0]], color, .9));
     // Unknown heights only support plan rays, not a fabricated 3D beam cone.
     const rays = data.metric && !data.heightKnown
-      ? [data.coverage[0], data.coverage[1]].map(p => [p[0], 0, p[2]]) : data.coverage;
+      ? data.planEdge : data.coverage;
     for (const p of rays) {
       coverage.add(line([data.projector, p], color, .3));
     }

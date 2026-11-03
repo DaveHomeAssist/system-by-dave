@@ -69,6 +69,21 @@ test('metric reference preserves dimensions, lens offsets and unknown elevations
   }
   assert.equal(model.lanes.C.coverage[1][0] - model.lanes.C.coverage[0][0], 8);
   assert.equal(model.lanes.C.coverage[0][1] - model.lanes.C.coverage[3][1], 5);
+  for (let rotation = 0; rotation < 4; rotation++) {
+    for (const reverse of [false, true]) {
+      const reordered = structuredClone(plot);
+      for (const lane of Object.keys(model.lanes)) {
+        const polygon = reordered.views.front.lanes[lane].coverage;
+        reordered.views.front.lanes[lane].coverage = [...polygon.slice(rotation), ...polygon.slice(0, rotation)];
+        if (reverse) reordered.views.front.lanes[lane].coverage.reverse();
+      }
+      const result = stageReference(reordered);
+      for (const lane of Object.keys(model.lanes)) {
+        assert.deepEqual(result.lanes[lane].planEdge, model.lanes[lane].planEdge);
+        assert.notDeepEqual(result.lanes[lane].planEdge[0], result.lanes[lane].planEdge[1]);
+      }
+    }
+  }
   plot.measurements.projectors.C.y = 4.2;
   plot.measurements.projectors.C.z = 12.3;
   const measured = stageReference(plot).lanes.C;

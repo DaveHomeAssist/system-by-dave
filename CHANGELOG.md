@@ -7,6 +7,8 @@
 - Remove the invented balcony rail and duplicate scenic elevation from the 3D
   adapter. Keep colored coverage, correctly sized portrait bodies and clickable
   lane controls, with explicit limits on physical clearance claims.
+- Preserve both plan rays regardless of the front polygon's starting vertex
+  or winding order.
 - Verify metric and legacy plots, renderer interaction, mobile layouts, existing
   relay controls and the separate private Building view.
 
