@@ -87,3 +87,35 @@ test('Pulse uses discovered inputs, validated picture ranges and waits for bound
   await d.lens({ op: 'stop' });
   assert.equal(requests.filter((r) => r.method.endsWith('.stop')).length, 5);
 });
+
+test('Stop cancels a pending target, and monitoring failure requests a stop', async (t) => {
+  let mode = 'pending', moved = false, running = false, stops = 0, releaseQuery;
+  const queryStarted = new Promise((resolve) => { releaseQuery = resolve; });
+  const sockets = new Set();
+  const server = net.createServer((socket) => {
+    sockets.add(socket); socket.on('close', () => sockets.delete(socket)); let text = '';
+    socket.on('data', (b) => {
+      text += b; if (!text.includes('\n')) return;
+      const r = JSON.parse(text), p = r.params?.property;
+      let result = true, error;
+      if (r.method === 'property.get') {
+        result = p === 'system.state' ? 'on' : p.endsWith('.state') ? 'Stopped' : p.endsWith('.safetooperate') ? true : p.endsWith('.minposition') ? 0 : p.endsWith('.maxposition') ? 65535 : 1000;
+        if (mode === 'monitor-error' && moved && p.endsWith('.state')) error = { code: -1, message: 'motor telemetry lost' };
+      } else if (r.method === 'property.set') { moved = true; running = true; }
+      else if (r.method.endsWith('.stop')) { stops++; running = false; }
+      const reply = () => socket.end(JSON.stringify({ jsonrpc: '2.0', id: r.id, ...(error ? { error } : { result }) }));
+      if (mode === 'pending' && p?.endsWith('.minposition')) { releaseQuery(); setTimeout(reply, 60); } else reply();
+    });
+  });
+  server.listen(0, '127.0.0.1'); await once(server, 'listening');
+  t.after(() => { for (const socket of sockets) socket.destroy(); server.close(); });
+  const d = pulseDriver({ host: '127.0.0.1', port: server.address().port, motionPollMs: 10, motionSettleMs: 0 });
+  const cancelled = assert.rejects(d.lens({ axis: 'focus', dir: '+' }), /cancelled by Stop lens/);
+  await queryStarted;
+  await d.lens({ op: 'stop' }); await cancelled;
+  assert.equal(moved, false, 'a pending target must never start after Stop');
+  assert.equal(stops, 4);
+  mode = 'monitor-error';
+  await assert.rejects(d.lens({ axis: 'focus', dir: '+' }), /motor telemetry lost; stop requested/);
+  assert.equal(moved, true); assert.equal(running, false); assert.equal(stops, 5);
+});

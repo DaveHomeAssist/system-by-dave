@@ -15,15 +15,15 @@ export const PULSE_PATTERNS = {
 };
 
 export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty = 'image.window.main.source', motionTimeoutMs = 90000, motionPollMs = 200, motionSettleMs = 750 }) {
-  let id = 0;
+  let id = 0, motionGeneration = 0;
   let sources = {}, pictureSchema = {}, refreshed = 0;
   const axes = { h: 'optics.lensshift.horizontal', v: 'optics.lensshift.vertical', focus: 'optics.focus', zoom: 'optics.zoom' };
   const pictureProperties = { brightness: 'brightness', contrast: 'contrast', color: 'saturation', gamma: 'gamma', sharpness: 'sharpness', intensity: 'intensity' };
   const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   // One call at a time per projector: the poll's string of gets and a UI command otherwise race for the socket and the loser times out.
   let chain = Promise.resolve();
-  function rpc(method, params, callTimeoutMs = timeoutMs) {
-    const run = () => rpcOnce(method, params, callTimeoutMs);
+  function rpc(method, params, callTimeoutMs = timeoutMs, guard) {
+    const run = () => { guard?.(); return rpcOnce(method, params, callTimeoutMs); };
     const p = chain.then(run, run); chain = p.catch(() => {}); return p;
   }
   function rpcOnce(method, params, callTimeoutMs) {
@@ -68,19 +68,24 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     } catch { pictureSchema = {}; }
     refreshed = Date.now();
   }
-  async function waitStopped(selected) {
+  async function waitStopped(selected, checkMove) {
     const started = Date.now(), deadline = started + motionTimeoutMs;
-    // The acknowledgement can precede motor startup. Require two stopped reads.
     let stopped = 0;
-    while (Date.now() < deadline) {
-      await pause(motionPollMs);
-      const states = [];
-      for (const axis of selected) states.push(await get(axis + '.state'));
-      if (Date.now() - started >= motionSettleMs && states.every((v) => v === 'Stopped')) { if (++stopped >= 2) return; }
-      else stopped = 0;
+    try {
+      while (Date.now() < deadline) {
+        await pause(motionPollMs);
+        checkMove();
+        const states = [];
+        for (const axis of selected) states.push(await get(axis + '.state'));
+        // Acknowledgement can precede motor startup. Allow settling and require two stopped reads.
+        if (Date.now() - started >= motionSettleMs && states.every((v) => v === 'Stopped')) { if (++stopped >= 2) return; }
+        else stopped = 0;
+      }
+      throw new Error('Lens movement timed out');
+    } catch (e) {
+      for (const axis of selected) await rpc(axis + '.stop').catch(() => {});
+      throw new Error(`${e.message}; stop requested. Check the projector before retrying.`);
     }
-    for (const axis of selected) await rpc(axis + '.stop').catch(() => {});
-    throw new Error('Lens movement timed out; stop requested. Check the projector before retrying.');
   }
   async function lensReadback() {
     const out = {};
@@ -145,9 +150,12 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     },
     async lens(op = {}) {
       if (op.op === 'stop') {
+        motionGeneration++;
         for (const axis of Object.values(axes)) await rpc(axis + '.stop');
         return 'OK';
       }
+      const generation = motionGeneration;
+      const checkMove = () => { if (generation !== motionGeneration) throw new Error('Lens movement cancelled by Stop lens'); };
       if (mapPower(await get('system.state')) !== POWER.ON) throw new Error('Power on the projector before moving the lens.');
       const selected = op.op === 'home' ? [axes.h, axes.v] : [axes[op.axis]];
       if (selected.some((axis) => !axis)) throw new Error('Unknown lens axis.');
@@ -155,7 +163,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
         if (await get(axis + '.state') !== 'Stopped') throw new Error('Lens is moving. Wait or use Stop lens.');
         if (!await get(axis + '.safetooperate')) throw new Error('Projector reports lens movement unavailable.');
       }
-      if (op.op === 'home') await rpc('optics.shifttocenter');
+      if (op.op === 'home') await rpc('optics.shifttocenter', undefined, timeoutMs, checkMove);
       else {
         // Encoder targets give consistent bounded increments across the motor types.
         const increment = { slow: 128, normal: 512, fast: 2048 }[op.speed || 'slow'];
@@ -165,9 +173,10 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
         if (![before, min, max].every(Number.isFinite)) throw new Error('Lens limits are unavailable.');
         const target = Math.max(min, Math.min(max, before + (op.dir === '+' ? increment : -increment)));
         if (target === before) throw new Error('Lens travel limit reached.');
-        await set(axis + '.target', target);
+        // Check inside the serialized queue, so a queued write cannot follow an accepted Stop.
+        await rpc('property.set', { property: axis + '.target', value: target }, timeoutMs, checkMove);
       }
-      await waitStopped(selected);
+      await waitStopped(selected, checkMove);
       return 'OK';
     },
   };
