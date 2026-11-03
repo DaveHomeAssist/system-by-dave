@@ -121,6 +121,15 @@ public directory and Git; the authenticated `GET /api/stage-plot` endpoint serve
 only validated drawing fields. Reload the page after changing the file. Missing
 or invalid files show an explicit message and leave the Rig controls available.
 
+Stage opens in an embedded Throwline 3D reference with orbit, zoom, audience and
+overhead cameras. Click a projector model or its letter to open its current
+controls; dragging only moves the camera. Native lane cards remain available for
+keyboard and touch operation. Front and Plan retain the original drawing views.
+The 3D adapter aligns the two drawings at lane C's reference width in diagram
+units, not calibrated meters. Mounting heights are illustrative, and scenery
+depth is not inferred. No catalog calculation, Throwline job import or model
+export is performed. WebGL failure leaves Front, Plan and the controls usable.
+
 Front and Plan use the drawing's own coordinates and orientation. Coverage
 buttons toggle reference layers only. Projector buttons and the adjacent cards
 open the existing lens, pattern and picture dialog for the lane's current slot.
@@ -128,9 +137,19 @@ The view reports power and shutter separately: closing a shutter does not erase
 the drawing. Disconnected, offline, unassigned or ambiguous lanes cannot open
 controls. Show Lock still applies in the dialog. Simulator status is labeled.
 
-Throwline opens separately on AV by Dave for planning. This link does not transfer
+The Open Throwline link opens the full planner separately on AV by Dave. It does not transfer
 plot data, calibrate geometry, alter a saved Throwline scene or send commands.
 The Stage view is a drawing reference, not optical calculation or live beam tracking.
+
+The source checkout serves an exact allowlist from the canonical
+`ProjectorThrow/` viewer and injects its local import map into the relay's HTML
+response. The published static copy has no local runtime or private plot.
+Before copying Projctl to another machine, run
+`npm run bundle:throwline` inside `apps/projctl`; this packages the pinned viewer
+into ignored `runtime/throwline/` with a SHA-256 manifest. The service installer
+does this automatically. Copy the runtime with the app and refresh it from the
+canonical source on updates. `THROWLINE_ASSETS` can select an explicit local
+runtime directory. No external CDN or new dependency version is required.
 
 ### Local plot format
 

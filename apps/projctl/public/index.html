@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="avd/bundle.css">
 <link rel="stylesheet" href="app.css">
 <link rel="stylesheet" href="stage.css">
+<!-- Local Throwline import map: supplied by the relay. -->
 </head>
 <body>
 <a class="pj-skip" href="#tab-rig">Skip to rig</a>
@@ -59,7 +60,8 @@
       <div class="pj-stage-head">
         <div><span class="avd-eyebrow">Projection plot</span><h2 id="stage-title">Stage view</h2></div>
         <div class="avd-seg" role="group" aria-label="Stage viewpoint">
-          <button class="avd-seg__btn" type="button" data-stage-view="front" aria-pressed="true">Front</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="3d" aria-pressed="true">3D</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="front" aria-pressed="false">Front</button>
           <button class="avd-seg__btn" type="button" data-stage-view="plan" aria-pressed="false">Plan</button>
         </div>
       </div>
@@ -70,8 +72,11 @@
             <span id="stage-caption" class="pj-mono"></span>
             <div class="pj-stage-layers" role="group" aria-label="Show coverage layers"><span class="pj-mono">Coverage</span></div>
           </div>
-          <div class="pj-stage-viewport"><div id="stage-canvas" class="pj-stage-canvas"></div></div>
-          <p class="pj-stage-foot pj-mono">Plot reference · coverage is not live beam position</p>
+          <div class="pj-stage-viewport">
+            <div id="stage-canvas" class="pj-stage-canvas" hidden></div>
+            <div id="stage-3d" class="pj-stage-3d"><p id="stage-3d-message" role="status">Loading Throwline 3D…</p></div>
+          </div>
+          <p id="stage-foot" class="pj-stage-foot pj-mono">Plot reference · coverage is not live beam position</p>
         </div>
         <aside class="pj-stage-sidebar" aria-label="Stage projectors" data-web2-scroll>
           <div class="pj-rowhead"><h3>Projectors</h3><span id="stage-status-kind" class="pj-mono"></span></div>

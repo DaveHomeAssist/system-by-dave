@@ -1,5 +1,17 @@
 # Changelog
 
+## November 3, 2026: Throwline in projector Stage
+
+- Embed the canonical Throwline 3D viewer in Projctl with colored coverage,
+  crossed throw references, orbit/zoom/camera presets and clickable projector
+  models routed to the current lane's guarded controls. Keep Front and Plan.
+- Label diagram scale and illustrative mounting heights. Preserve private plot
+  storage, rig identity, show lock and command ownership; no optical claims or
+  job imports. Package the existing local renderer for standalone installations.
+- Verify inert model activation, drag rejection, camera and layer changes,
+  current slot targeting, idle/hidden rendering, context recovery and WebGL
+  fallback alongside the existing simulator and responsive checks.
+
 ## November 3, 2026: Projector stage view
 
 - Add front and plan views with colored coverage layers and clickable projector

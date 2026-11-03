@@ -1,5 +1,6 @@
 import { LANES } from './lanes.js';
 import { normalizePlot, projectorForLane } from './stage-plot.js';
+import { createStage3D } from './stage-3d.js';
 
 const svgNode = (name, attrs = {}) => {
   const el = document.createElementNS('http://www.w3.org/2000/svg', name);
@@ -10,9 +11,10 @@ const svgNode = (name, attrs = {}) => {
 export function createStageView(root, openControls, canAdjust) {
   const $ = (s) => root.querySelector(s);
   const canvas = $('#stage-canvas');
-  let plot, view = 'front', current = { projectors: [] }, connected = false;
+  let plot, view = '3d', current = { projectors: [] }, connected = false, viewer, loading3D;
+  const spatial = $('#stage-3d');
   const hidden = new Set(), cards = new Map(), markers = new Map();
-  const highlight = (lane) => { canvas.dataset.highlight = lane || ''; };
+  const highlight = (lane) => { canvas.dataset.highlight = lane || ''; viewer?.highlight(lane); };
 
   function openLane(lane) {
     const p = projectorForLane(current.projectors, lane);
@@ -36,9 +38,32 @@ export function createStageView(root, openControls, canAdjust) {
   }
   function updateLayers() {
     canvas.querySelectorAll('.pj-stage-coverage').forEach((node) => { node.style.display = hidden.has(node.dataset.lane) ? 'none' : ''; });
+    viewer?.layers(hidden);
+  }
+  async function load3D() {
+    if (loading3D || !plot || root.hidden || view !== '3d') return;
+    loading3D = true;
+    try {
+      viewer = await createStage3D(spatial, plot, lane => { cards.get(lane)?.focus({ preventScroll: true }); openLane(lane); });
+      $('#stage-3d-message').hidden = true;
+      updateLayers(); viewer.active(!root.hidden && view === '3d');
+    } catch (error) {
+      spatial.dataset.state = 'unavailable';
+      $('#stage-3d-message').textContent = error.message.includes('triangular') ? error.message : '3D could not start. Use Front or Plan above; projector controls remain available.';
+    }
   }
   function draw() {
     if (!plot) return;
+    canvas.hidden = view === '3d'; spatial.hidden = view !== '3d';
+    viewer?.active(!root.hidden && view === '3d');
+    $('#stage-foot').textContent = view === '3d'
+      ? 'Plot reference · diagram scale · mounting heights illustrative'
+      : 'Plot reference · coverage is not live beam position';
+    if (view === '3d') {
+      $('#stage-caption').textContent = 'Throwline 3D';
+      for (const lane of Object.keys(LANES)) cards.get(lane).querySelector('.pj-stage-note').textContent = plot.views.plan.lanes[lane].note;
+      load3D(); return;
+    }
     canvas.replaceChildren(); markers.clear();
     const data = plot.views[view];
     $('#stage-caption').textContent = data.caption;
@@ -111,5 +136,8 @@ export function createStageView(root, openControls, canAdjust) {
     } catch (error) { $('#stage-message').textContent = error.message; }
   }
   load();
+  const visibility = new MutationObserver(() => { viewer?.active(!root.hidden && view === '3d'); load3D(); });
+  visibility.observe(root, { attributes: true, attributeFilter: ['hidden'] });
+  window.addEventListener('pagehide', event => { if (!event.persisted) visibility.disconnect(); });
   return { update };
 }

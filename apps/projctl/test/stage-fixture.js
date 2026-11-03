@@ -4,8 +4,12 @@ export function stageFixture() {
     const x = 125 + i * 250;
     return [lane, { projector: [x, 300], coverage: [[x - 100, 100], [x + 100, 100], [x + 100, 450], [x - 100, 450]], note: 'Synthetic drawing' }];
   }));
+  const planLanes = Object.fromEntries(Object.entries(lanes).map(([lane, item], i) => {
+    const x = 125 + i * 250, target = 1000 - x;
+    return [lane, { ...item, projector: [x, 480], control: [x, 520], coverage: [[x, 480], [target - 100, 120], [target + 100, 120]] }];
+  }));
   return { version: 1, title: 'Test stage', source: 'Synthetic plot fixture', views: {
     front: { caption: 'Audience view', outline: [[[25, 460], [975, 460]]], labels: [{ at: [500, 50], text: '<script>literal label</script>' }], lanes },
-    plan: { caption: 'Plan view', outline: [[[25, 480], [975, 480]]], labels: [], lanes: structuredClone(lanes) },
+    plan: { caption: 'Plan view', outline: [[[25, 480], [975, 480]]], labels: [], lanes: planLanes },
   } };
 }
