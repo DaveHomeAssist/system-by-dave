@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node server/index.js",
     "sim": "SIM=1 node server/index.js",
+    "bundle:throwline": "node scripts/bundle-throwline.js",
     "test": "node --test test/*.test.js",
     "test:browser": "node test/browser.cjs"
   },

@@ -8,6 +8,16 @@ PASSCODE=""; PORT=8080
 while [ $# -gt 0 ]; do case "$1" in --passcode) PASSCODE="$2"; shift 2;; --port) PORT="$2"; shift 2;; *) echo "unknown arg $1"; exit 1;; esac; done
 command -v node >/dev/null || { echo "node is not installed. macOS: brew install node. Debian/Pi: sudo apt install nodejs npm"; exit 1; }
 NODE="$(command -v node)"
+# Bundle before copying the app away from its canonical repository. A packaged
+# standalone copy can refresh from its own runtime without a sibling checkout.
+if [ -f "$HERE/../../ProjectorThrow/three-d-stage.js" ]; then
+  (cd "$HERE" && npm run bundle:throwline)
+elif [ -f "$HERE/runtime/throwline/three-d-stage.js" ]; then
+  (cd "$HERE" && npm run bundle:throwline -- "$HERE/runtime/throwline")
+else
+  echo "Throwline runtime missing. Run npm run bundle:throwline in the source checkout before installing."
+  exit 1
+fi
 if [ -z "$PASSCODE" ]; then read -r -s -p "Passcode for the web UI (blank = open, LAN only): " PASSCODE; echo; fi
 
 if [ "$(uname)" = "Darwin" ]; then

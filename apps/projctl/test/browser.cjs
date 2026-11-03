@@ -3,17 +3,20 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { checkStage, checkStageLayout } = require('./stage-browser.cjs');
+const { instrument3D } = require('./stage-3d-browser.cjs');
 
 (async () => {
   const { startRelay, until } = await import('./relay-helper.js');
   const { stageFixture } = await import('./stage-fixture.js');
-  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
+  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox', '--enable-unsafe-swiftshader'] });
   try {
     for (const offline of [false, true]) {
       const relay = await startRelay();
       fs.writeFileSync(path.join(path.dirname(relay.rigFile), 'stage-plot.json'), JSON.stringify(stageFixture()));
       const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+      await instrument3D(page);
       const errors = []; page.on('pageerror', (e) => errors.push(e.message));
+      page.on('console', message => { if (['warning', 'error'].includes(message.type()) && /^THREE\./.test(message.text())) errors.push(message.text()); });
       try {
         if (offline) await relay.api('projector', { slot: 'P1', ip: '' });
         await relay.api('command', { slot: 'all', cmd: 'power', arg: 1 });

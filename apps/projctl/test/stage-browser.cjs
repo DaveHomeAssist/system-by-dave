@@ -1,8 +1,10 @@
 const assert = require('node:assert/strict');
+const { check3D, check3DLayout } = require('./stage-3d-browser.cjs');
 
 exports.checkStage = async (page, relay, offline, until) => {
   await page.locator('[data-tab="stage"]').click();
   await page.locator('#stage-workspace').waitFor();
+  await check3D(page, relay, offline, until);
   assert.equal(await page.locator('#stage-canvas script').count(), 0);
   assert.equal(await page.locator('#stage-status-kind').innerText(), 'Simulated status');
   await relay.api('command', { slot: 'P4', cmd: 'shutter', arg: 1 });
@@ -42,7 +44,9 @@ exports.checkStage = async (page, relay, offline, until) => {
   await relay.api('projector', { slot: 'P3', lane: '' });
   await relay.api('projector', { slot: 'P3', lane: 'A' });
   await until(async () => (await page.locator('.pj-stage-card[data-lane="A"]').getAttribute('data-slot')) === 'P3');
-  await page.locator('.pj-stage-card[data-lane="A"]').click();
+  await page.locator('[data-stage-view="3d"]').click();
+  const remapped = await page.locator('three-d-stage').evaluate(stage => stage.getActivationTargetScreenPoint('A'));
+  await page.mouse.click(remapped.x, remapped.y);
   assert.match(await page.locator('#adj-sub').innerText(), /^P3/);
   await page.keyboard.press('Escape');
   await relay.api('projector', { slot: 'P3', lane: '' });
@@ -72,6 +76,7 @@ exports.checkStage = async (page, relay, offline, until) => {
 };
 
 exports.checkStageLayout = async (page, width, height, theme) => {
+  await check3DLayout(page, width, height);
   for (const view of ['front', 'plan']) {
     await page.locator(`[data-stage-view="${view}"]`).click();
     const canvas = await page.locator('#stage-canvas').boundingBox();

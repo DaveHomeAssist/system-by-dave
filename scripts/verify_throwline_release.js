@@ -547,6 +547,18 @@ localThreeAssets.forEach((asset) => {
   if (!avRegistry?.offlineAssets?.().includes(`./${asset}`)) fail(`Stage 3D offline manifest is missing ./${asset}.`);
 });
 requireMatch(sidecar, /renderer\.shadowMap\.type = THREE\.PCFShadowMap;/, 'Stage 3D must use PCFShadowMap.');
+try {
+  let Viewer;
+  vm.runInNewContext(sidecar, { HTMLElement: class {}, customElements: { define(name, component) { if (name === 'three-d-stage') Viewer = component; } } });
+  const host = {};
+  Viewer.prototype.setActivationTargets.call(host, [
+    { id: 'lane-A', objects: [{ isObject3D: true }] },
+    { id: 'lane-A', objects: [{ isObject3D: true }] },
+    { id: 'invalid', objects: [{}] },
+  ], { context: 'inspection.fixture.v1' });
+  if (host._activationTargets.length !== 1 || host._activationTargets[0].id !== 'lane-A' || host._activationContext !== 'inspection.fixture.v1') fail('Inspection target registration must retain exact IDs/context and reject duplicates or non-scene objects.');
+  if (!Viewer.observedAttributes.includes('paused')) fail('Embedded viewers must support hidden-panel suspension.');
+} catch (error) { fail(`Throwline inspection API failed: ${error.message}`); }
 if (/PCFSoftShadowMap/.test(stage) || /PCFSoftShadowMap/.test(sidecar)) fail('Stage 3D must not use deprecated PCFSoftShadowMap.');
 const stageCameraIds = Array.from(stage.matchAll(/<button\b[^>]*\bdata-cam=["']([^"']+)["'][^>]*>/g), (match) => match[1]);
 const expectedStageCameraIds = ['three', 'side', 'front', 'top', 'op'];

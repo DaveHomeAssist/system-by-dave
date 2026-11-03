@@ -14,6 +14,7 @@ import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
 import { confirmations } from './confirmations.js';
 import { readStagePlot } from './stage-plot.js';
+import { throwlineAsset } from './throwline-assets.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -308,6 +309,12 @@ const server = http.createServer(async (req, res) => {
       const { slot, offline } = await body(req); const d = driverFor(store.projector(slot)); d._state.flaky = !!offline; return json(res, 200, { ok: true });
     }
     // static
+    if (url.pathname.startsWith('/ProjectorThrow/')) {
+      const asset = throwlineAsset(url.pathname);
+      if (!asset) { res.writeHead(404); return res.end('not found'); }
+      res.writeHead(200, { 'content-type': 'application/javascript' });
+      return fs.createReadStream(asset).pipe(res);
+    }
     let f = url.pathname === '/' ? '/index.html' : url.pathname;
     const fp = path.join(PUB, path.normalize(f));
     if (!fp.startsWith(PUB) || !fs.existsSync(fp)) { res.writeHead(404); return res.end('not found'); }

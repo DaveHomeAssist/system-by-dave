@@ -83,3 +83,37 @@ keyboard focus; offline and Show Lock gates still apply; missing, malformed and
 ambiguous data fail clearly. Verify both themes and the existing six viewports on
 the isolated simulator. Physical coverage and house slot identities remain for
 venue acceptance.
+
+## Embedded Throwline 3D brief
+
+Add an orbitable 3D reference to Stage, retaining Front, Plan, coverage toggles
+and the current lane-to-slot control path. Reuse Throwline's canonical
+`three-d-stage` viewer and its pinned local three.js modules. Projctl supplies
+a transient model from the validated private drawing; it does not import a
+Throwline job, modify either app's saved state or run catalog optical calculations.
+
+The adapter aligns front elevation and plan coverage at lane C's reference width.
+Coordinates are diagram units, y up, x audience right and z toward the balcony.
+Plan projector positions and coverage edges remain authoritative drawing inputs;
+mounting heights are illustrative because the supplied two-view format lacks
+elevation data. State that limitation beside the viewer. Do not present throw
+ratios, distances, fit verdicts, field verification or model exports.
+
+ECP-1.0 revision 1.0: the viewer owns graphics and inert object activation;
+Projctl owns private plot data, stable lane IDs, current slot mapping and every
+physical command. Activation carries a context and instance ID, and only an
+exact current lane can open the existing guarded dialog. Camera drags must not
+activate a projector. Native lane cards provide keyboard and touch alternatives.
+
+Keep the model lazy, render on demand, suspend while its tab is hidden, dispose
+on page exit, and expose the two-dimensional views when WebGL is unavailable.
+Serve a strict allowlist of canonical viewer files through the local relay;
+standalone installations package those same bytes outside the public directory.
+No new dependency version, network authority, rig schema or plot schema.
+
+Acceptance: real 3D pixels, orbit/zoom/reset, colored faces and crossed throw
+volumes, direct model activation and current-slot targeting, no commands from
+inspection, layer/status/lock parity, no idle or hidden draws, context recovery,
+dependency failure fallback, both themes and six viewport sizes. Run the
+existing Throwline release/browser gates plus isolated Projctl tests. Physical
+coverage and house-unit identity remain separate venue checks.
