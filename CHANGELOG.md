@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-02
+
+- Projector control: add optional drawing lanes with letter badges, target names,
+  orientation and matching accents; retain slot IDs and cue routing when cards
+  sort by lane. Setup validates assignments and keeps older rigs compatible.
+
 ## November 3, 2026: Frozen projector control desk
 
 - Add light ice and dark aurora themes, a snowflake mark, mobile bottom navigation, searchable command history and accessible adjustment dialogs. Preserve focus across status refreshes and unsaved setup fields across snapshots.

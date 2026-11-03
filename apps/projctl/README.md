@@ -99,3 +99,16 @@ movement, and refreshes position before replying. Stop lens remains available un
 An acknowledged request still needs the expected physical result checked on the actual rig.
 
 The acceptance scope and remaining physical checks are in [Show readiness](docs/show-readiness.md).
+
+## Drawing lanes
+
+Setup has an optional Drawing lane selector: A / SL Portal, B / Top Portal,
+C / Stage, D / SR Portal. Cards sort by drawing letter and show the matching
+magenta, cyan, amber or green accent plus orientation. Labels remain editable;
+slot IDs (P1 through P4), preset keys and OSC/TCP addresses never change.
+The adjustment dialog, preset summaries and log retain the slot beside the lane.
+Clear an existing assignment before assigning its lane to another projector.
+Older rig files remain unassigned until the operator chooses their mapping.
+
+The bundled simulator illustrates P2=A, P4=B, P1=C and P3=D. These demo
+assignments do not migrate or verify physical house-projector identities.
