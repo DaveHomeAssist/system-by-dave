@@ -67,3 +67,51 @@ select.avd-input{appearance:none;-webkit-appearance:none;background-image:linear
   .pj-setup{grid-template-columns:1fr 1fr}
   .lens>div{grid-template-columns:72px 1fr 1fr}
 }
+
+/* Frozen control desk: static ice and aurora, with operational state colors retained. */
+:root,[data-theme="light"]{
+  --ground:#edf5fa;--surface:#ffffff;--surface-raised:#e2eff7;--surface-sunken:#e8f2f8;
+  --ink:#153149;--ink-muted:#465f73;--ink-faint:#526b7e;--hairline:#c4d9e6;--line-control:#728fa3;
+  --tape:#175778;--on-tape:#ffffff;--focus-ring:#006c96;--action-hover:#10425d;
+  --radius-md:10px;--radius-lg:14px;--aurora:#d8eef0;
+}
+[data-theme="dark"]{
+  --ground:#081421;--surface:#102438;--surface-raised:#18334a;--surface-sunken:#0a1b2c;
+  --ink:#edf7ff;--ink-muted:#b1cbdc;--ink-faint:#a2bdd1;--hairline:#2b4b63;--line-control:#7192aa;
+  --tape:#a3e6ee;--on-tape:#0b2536;--focus-ring:#b1f5f5;--action-hover:#d1ffff;--aurora:#173f4c;
+  --state-blocked:#ff9b91;--state-waiting:#ffc18a;--state-done:#79dfa2;
+}
+html{color-scheme:light}html[data-theme="dark"]{color-scheme:dark}
+.avd-shell{height:100dvh;min-width:0;background:radial-gradient(ellipse at 95% 0,var(--aurora),transparent 45%),var(--ground)}
+.pj-header{padding-block:16px;background:var(--surface);border-top:3px solid var(--tape)}
+.pj-brand{display:flex;gap:12px;align-items:center;margin-right:auto;min-width:0}
+.pj-snowmark{color:var(--tape);flex-shrink:0}.pj-brand h1{font:700 clamp(18px,2vw,26px)/1.2 var(--font-display);margin:4px 0 0;letter-spacing:-.04em}
+.pj-kicker{font:500 10px/1.4 var(--font-mono);letter-spacing:.12em;color:var(--ink-muted)}
+.pj-summary{margin-left:0}.pj-tile{border-radius:14px;overflow:hidden;border-top:3px solid var(--tape)}
+.pj-tile.offline{border-top-color:var(--line-control)}.pj-tile.offline .avd-panel__body>*:not(.pj-tile-top){opacity:1}
+.pj-tile .avd-panel__title{font-size:13px;line-height:20px;overflow-wrap:anywhere}
+.pj-tile .avd-panel__body{padding:16px}.pj-meta{font-size:11px;flex-wrap:wrap}.pj-well{overflow-wrap:anywhere}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
+button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter:brightness(.96)}[data-theme="dark"] button:not(:disabled):hover{filter:brightness(1.12)}
+.pj-skip{position:fixed;left:16px;top:-100px;z-index:100;padding:12px;background:var(--tape);color:var(--on-tape)}.pj-skip:focus{top:12px}
+.pj-modal{position:fixed;inset:0;border:0;padding:16px;margin:auto;width:100%;height:100%;max-width:100%;max-height:100%;background:transparent;color:var(--ink)}
+.pj-modal:not([open]){display:none}.pj-modal::backdrop{background:rgba(4,16,29,.7)}
+.pj-sheet{border-radius:16px;width:min(760px,100%);max-height:100%;overflow:hidden}.pj-sheet-head{flex-shrink:0}.pj-sheet-body{min-height:0;overscroll-behavior:contain}.pj-sheet-tabs{flex-shrink:0;overflow:visible}
+.pj-feedback{margin:0;padding:0 16px;color:var(--ink)}.pj-feedback:empty{display:none}.pj-feedback:not(:empty){padding-block:8px;border-bottom:1px solid var(--hairline)}
+#adj-motion:empty,#adj-position:empty{display:none}#adj-position{overflow-wrap:anywhere;font-size:12px}
+#toast{z-index:30;bottom:24px}.pj-grid,.pj-list,.pj-sheet-body,.pj-fill{scrollbar-width:thin;scrollbar-color:var(--line-control) var(--surface-sunken)}
+@media(min-width:2000px){.pj-main{padding-inline:48px}.pj-grid{gap:24px}.pj-tile .avd-panel__body{padding:24px;gap:20px}.pj-tile .avd-panel__title{font-size:17px}}
+@media(max-width:680px){
+  .avd-shell{grid-template-rows:auto minmax(0,1fr) auto}.avd-shell__tabs{grid-row:3;padding:0 8px env(safe-area-inset-bottom);border-top:1px solid var(--hairline);background:var(--surface)}
+  .pj-main{grid-row:2}.pj-header{padding:8px 12px;gap:8px}.pj-kicker{font-size:8px}.pj-brand{flex-basis:calc(100% - 60px)}.pj-brand h1{font-size:19px}
+  #conn{margin-right:auto}.avd-tab{min-height:48px;flex:1;justify-content:center}.avd-tabs{display:flex}.pj-allbar{gap:8px;padding:8px}.pj-allbar .avd-eyebrow{flex-basis:100%}
+  #toast{bottom:76px}.pj-modal{padding:8px}.pj-sheet-head{padding:12px}.pj-sheet-title strong{font-size:17px}.pj-sheet-body{padding:12px}
+}
+@media(max-height:450px){.pj-header{padding-block:4px}.pj-kicker,.pj-snowmark{display:none}.pj-brand h1{margin:0;font-size:16px}.pj-main{padding-block:6px}.pj-modal{padding:4px}.pj-sheet-head{padding:4px 12px}.pj-feedback{font-size:11px}}
+@media(max-height:450px){.tab.on{overflow:auto}.pj-grid{min-height:180px;flex-shrink:0}.pj-feedback{max-height:60px;overflow:auto}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{html,body,.avd-shell,.pj-main,.tab,.pj-grid,.pj-list{height:auto!important;overflow:visible!important;display:block!important}.pj-header button,.avd-shell__tabs,.pj-allbar,.pj-modal,#toast{display:none!important}}
+
+/* Keep each complete projector card reachable in the bounded rig panel. */
+.pj-main,.tab{min-width:0}.pj-grid{grid-auto-rows:max-content}.pj-tile{min-height:max-content}.pj-tile .avd-panel__body{flex:none;overflow:visible}.pj-tile .avd-panel__index{flex-shrink:0}.pj-tile [data-adj]{white-space:normal;padding-block:10px;line-height:18px}
+@media(max-width:360px){.avd-tab{padding-inline:8px;font-size:10px;gap:4px}.pj-allbar .avd-btn{padding-inline:10px;font-size:11px}.pj-vrule{display:none}.pj-header{column-gap:6px}}
