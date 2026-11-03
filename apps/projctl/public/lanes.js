@@ -5,7 +5,7 @@ export const LANES = Object.freeze({
   C: { target: 'Stage', orientation: 'Landscape', role: 'Main stage' },
   D: { target: 'SR Portal', orientation: 'Portrait', role: 'Stage right portal' },
 });
-export const laneOf = (p) => Object.hasOwn(LANES, p.lane) ? LANES[p.lane] : null;
+export const laneOf = (p) => typeof p.lane === 'string' && Object.hasOwn(LANES, p.lane) ? LANES[p.lane] : null;
 export const projectorName = (p) => laneOf(p) ? `Projector ${p.lane} · ${laneOf(p).target}` : p.label;
 export const orderedProjectors = (projectors) => [...projectors].sort((a, b) =>
   (laneOf(a) ? a.lane.charCodeAt(0) : 1000) - (laneOf(b) ? b.lane.charCodeAt(0) : 1000));
