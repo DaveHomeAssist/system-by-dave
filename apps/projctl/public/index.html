@@ -60,6 +60,7 @@
       <div class="pj-stage-head">
         <div><span class="avd-eyebrow">Projection plot</span><h2 id="stage-title">Stage view</h2></div>
         <div class="avd-seg" role="group" aria-label="Stage viewpoint">
+          <button class="avd-seg__btn" type="button" data-stage-view="building" aria-pressed="false" hidden>Building</button>
           <button class="avd-seg__btn" type="button" data-stage-view="3d" aria-pressed="true">3D</button>
           <button class="avd-seg__btn" type="button" data-stage-view="front" aria-pressed="false">Front</button>
           <button class="avd-seg__btn" type="button" data-stage-view="plan" aria-pressed="false">Plan</button>
@@ -75,6 +76,7 @@
           <div class="pj-stage-viewport">
             <div id="stage-canvas" class="pj-stage-canvas" hidden></div>
             <div id="stage-3d" class="pj-stage-3d"><p id="stage-3d-message" role="status">Loading Throwline 3D…</p></div>
+            <div id="stage-building" class="pj-stage-3d" hidden><p id="stage-building-message" role="status">Loading building…</p></div>
           </div>
           <p id="stage-foot" class="pj-stage-foot pj-mono">Plot reference · coverage is not live beam position</p>
         </div>

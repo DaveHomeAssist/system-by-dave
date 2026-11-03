@@ -1,5 +1,16 @@
 # Changelog
 
+## November 3, 2026: Private building models in Projctl
+
+- Add a metric Building view beside the existing drawing views, with optional
+  drawing and LiDAR layers, camera controls and a preview fallback. Preserve
+  saved rig assignments and keep geometry inspection free of device commands.
+- Serve local venue bundles behind the relay's existing authentication, with
+  bounded reads, embedded GLBs, checksums and fixed asset roles. Keep actual
+  venue geometry private and bundle the pinned Three.js loader for offline use.
+- Verify source-only and model-only installations, existing bulk power behavior,
+  mobile layout, lazy layers, idle/hidden rendering and context recovery.
+
 ## November 3, 2026: Throwline in projector Stage
 
 - Embed the canonical Throwline 3D viewer in Projctl with colored coverage,

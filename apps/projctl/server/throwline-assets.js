@@ -7,6 +7,9 @@ export const THROWLINE_FILES = Object.freeze([
   'vendor/three/three.module.min.js',
   'vendor/three/three.core.min.js',
   'vendor/three/addons/controls/OrbitControls.js',
+  'vendor/three/addons/loaders/GLTFLoader.js',
+  'vendor/three/addons/utils/BufferGeometryUtils.js',
+  'vendor/three/addons/utils/SkeletonUtils.js',
 ]);
 export const canonicalThrowline = fileURLToPath(new URL('../../../ProjectorThrow/', import.meta.url));
 export const bundledThrowline = fileURLToPath(new URL('../runtime/throwline/', import.meta.url));

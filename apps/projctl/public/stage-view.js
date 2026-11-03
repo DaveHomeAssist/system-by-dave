@@ -1,6 +1,7 @@
 import { LANES } from './lanes.js';
 import { normalizePlot, projectorForLane } from './stage-plot.js';
 import { createStage3D } from './stage-3d.js';
+import { createVenueView } from './venue-view.js';
 
 const svgNode = (name, attrs = {}) => {
   const el = document.createElementNS('http://www.w3.org/2000/svg', name);
@@ -13,6 +14,8 @@ export function createStageView(root, openControls, canAdjust) {
   const canvas = $('#stage-canvas');
   let plot, view = '3d', current = { projectors: [] }, connected = false, viewer, loading3D;
   const spatial = $('#stage-3d');
+  const building = $('#stage-building');
+  let venue, buildingViewer, loadingBuilding;
   const hidden = new Set(), cards = new Map(), markers = new Map();
   const highlight = (lane) => { canvas.dataset.highlight = lane || ''; viewer?.highlight(lane); };
 
@@ -52,10 +55,38 @@ export function createStageView(root, openControls, canAdjust) {
       $('#stage-3d-message').textContent = error.message.includes('triangular') ? error.message : '3D could not start. Use Front or Plan above; projector controls remain available.';
     }
   }
+  async function loadBuilding() {
+    if (loadingBuilding || !venue || root.hidden || view !== 'building') return;
+    loadingBuilding = true;
+    try {
+      buildingViewer = await createVenueView(building, venue);
+      $('#stage-building-message').hidden = true;
+      buildingViewer.active(!root.hidden && view === 'building');
+    } catch {
+      building.dataset.state = 'unavailable';
+      $('#stage-building-message').textContent = '3D could not start. The Rig controls remain available.';
+      if (venue.assets.preview) {
+        const preview = document.createElement('img'); preview.src = venue.assets.preview.url;
+        preview.alt = `${venue.title} model preview. ${venue.notes}`;
+        preview.className = 'pj-venue-preview'; building.append(preview);
+      }
+    }
+  }
   function draw() {
-    if (!plot) return;
-    canvas.hidden = view === '3d'; spatial.hidden = view !== '3d';
+    if (!plot && !venue) return;
+    canvas.hidden = view === '3d' || view === 'building'; spatial.hidden = view !== '3d';
+    building.hidden = view !== 'building';
+    $('.pj-stage-layers').hidden = view === 'building';
     viewer?.active(!root.hidden && view === '3d');
+    buildingViewer?.active(!root.hidden && view === 'building');
+    $('#stage-title').textContent = view === 'building' ? venue.title : plot.title;
+    $('#stage-source').textContent = view === 'building' ? venue.notes : plot.source;
+    if (view === 'building') {
+      $('#stage-caption').textContent = `Building · ${venue.modelVersion} · metres`;
+      $('#stage-foot').textContent = 'Provisional room and drawing alignment · mounting heights unknown';
+      for (const card of cards.values()) card.querySelector('.pj-stage-note').textContent = '';
+      loadBuilding(); return;
+    }
     $('#stage-foot').textContent = view === '3d'
       ? 'Plot reference · diagram scale · mounting heights illustrative'
       : 'Plot reference · coverage is not live beam position';
@@ -125,18 +156,35 @@ export function createStageView(root, openControls, canAdjust) {
     }
   }
   async function load() {
+    const [plotResult, venueResult] = await Promise.allSettled([
+      fetch('/api/stage-plot', { signal: AbortSignal.timeout(10000) }).then(async response => {
+        if (!response.ok) throw new Error('The local plot could not be loaded. Check the relay and reload.');
+        const data = await response.json(); return data.plot ? normalizePlot(data.plot) : null;
+      }),
+      fetch('/api/venue-model', { signal: AbortSignal.timeout(10000) }).then(async response => {
+        if (!response.ok) throw new Error('The building bundle could not be loaded. Check the relay and reload.');
+        return (await response.json()).venue;
+      }),
+    ]);
     try {
-      const response = await fetch('/api/stage-plot', { signal: AbortSignal.timeout(10000) });
-      if (!response.ok) throw new Error('The local plot could not be loaded. Check the relay and reload.');
-      const data = await response.json();
-      if (!data.plot) throw new Error('No stage plot loaded. Add a stage plot beside the relay’s rig file, then reload.');
-      plot = normalizePlot(data.plot);
-      $('#stage-title').textContent = plot.title; $('#stage-source').textContent = plot.source;
+      plot = plotResult.status === 'fulfilled' ? plotResult.value : null;
+      venue = venueResult.status === 'fulfilled' ? venueResult.value : null;
+      if (!plot && !venue) throw new Error(plotResult.reason?.message || venueResult.reason?.message || 'No stage plot loaded. Add a stage plot or building bundle beside the relay’s rig file, then reload.');
+      if (venue) view = 'building';
+      root.querySelectorAll('[data-stage-view]').forEach(b => {
+        b.hidden = b.dataset.stageView === 'building' ? !venue : !plot;
+        b.setAttribute('aria-pressed', String(b.dataset.stageView === view));
+      });
       $('#stage-message').hidden = true; $('#stage-workspace').hidden = false; draw();
+      const warning = plotResult.reason?.message || venueResult.reason?.message;
+      if (warning) { $('#stage-message').textContent = warning; $('#stage-message').hidden = false; }
     } catch (error) { $('#stage-message').textContent = error.message; }
   }
   load();
-  const visibility = new MutationObserver(() => { viewer?.active(!root.hidden && view === '3d'); load3D(); });
+  const visibility = new MutationObserver(() => {
+    viewer?.active(!root.hidden && view === '3d'); buildingViewer?.active(!root.hidden && view === 'building');
+    load3D(); loadBuilding();
+  });
   visibility.observe(root, { attributes: true, attributeFilter: ['hidden'] });
   window.addEventListener('pagehide', event => { if (!event.persisted) visibility.disconnect(); });
   return { update };

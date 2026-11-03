@@ -29,6 +29,7 @@ jobs:
           npm ci --prefix apps/projctl --ignore-scripts --no-audit --no-fund
           npm test --prefix apps/projctl
           npm run test:browser --prefix apps/projctl
+          npm run test:venue-browser --prefix apps/projctl
       - run: npm run test:public-viewport
       - name: Verify engineering daily journeys
         run: |

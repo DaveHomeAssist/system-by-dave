@@ -100,7 +100,34 @@ An acknowledged request still needs the expected physical result checked on the 
 
 The acceptance scope and remaining physical checks are in [Show readiness](docs/show-readiness.md).
 
-## Drawing lanes
+## Building model
+
+Stage includes a Building view when a private venue bundle is present in
+`data/venue/` beside the active rig (`VENUE_MODEL` overrides the directory).
+It works with or without a stage plot. Room, Drawing and LiDAR remain separate
+layers in their shared metric coordinates; large layers load on demand. The
+existing 3D/Front/Plan drawing views remain available when a plot is present.
+Only the existing lane cards open projector controls; inspecting geometry sends
+no commands and never changes saved rig assignments. A preview is shown if 3D
+cannot start and the bundle includes one. See [the bundle contract](docs/venue-model.md)
+for provenance, limits and installation. Private model assets are not published.
+
+Run `npm run bundle:throwline` before copying a standalone installation; this
+includes the pinned local GLB loader as well as the viewer. The additional
+`npm run test:venue-browser` checks model loading, mobile layout, rendering
+lifecycle and drawing coexistence using synthetic geometry.
+
+To prepare a synchronized update from a clean source checkout, run
+`node scripts/package-update.js /path/to/new-output /path/to/private-venue`.
+Omit the last argument for a code-only update. The resulting directory has a
+source commit/model version manifest and file checksums, without a saved rig.
+On the Mac, stop the relay, then double-click **Update Existing Projctl.command**
+in that directory. It backs up `~/Desktop/projctl`, updates code and the supplied
+model, and preserves rig files, presets, the stage plot and existing launchers.
+Restart with the existing launcher and reload clients. A custom installation
+can set `PROJCTL_UPDATE_TARGET`; custom-port relays must also be stopped first.
+
+## Drawing lane assignments
 
 Setup has an optional Drawing lane selector: A / SL Portal, B / Top Portal,
 C / Stage, D / SR Portal. Cards sort by drawing letter and show the matching
