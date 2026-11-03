@@ -112,3 +112,39 @@ Older rig files remain unassigned until the operator chooses their mapping.
 
 The bundled simulator illustrates P2=A, P4=B, P1=C and P3=D. These demo
 assignments do not migrate or verify physical house-projector identities.
+
+## Stage view
+
+The Stage tab reads a private plot from `stage-plot.json` beside the active rig
+file. Set `STAGE_PLOT` to use a different local path. The plot stays outside the
+public directory and Git; the authenticated `GET /api/stage-plot` endpoint serves
+only validated drawing fields. Reload the page after changing the file. Missing
+or invalid files show an explicit message and leave the Rig controls available.
+
+Front and Plan use the drawing's own coordinates and orientation. Coverage
+buttons toggle reference layers only. Projector buttons and the adjacent cards
+open the existing lens, pattern and picture dialog for the lane's current slot.
+The view reports power and shutter separately: closing a shutter does not erase
+the drawing. Disconnected, offline, unassigned or ambiguous lanes cannot open
+controls. Show Lock still applies in the dialog. Simulator status is labeled.
+
+Throwline opens separately on AV by Dave for planning. This link does not transfer
+plot data, calibrate geometry, alter a saved Throwline scene or send commands.
+The Stage view is a drawing reference, not optical calculation or live beam tracking.
+
+### Local plot format
+
+Version 1 has `title`, `source`, and `views.front` / `views.plan`. Each view contains
+`caption`, `outline` (arrays of polyline points), `labels` (`at` point and `text`),
+and `lanes` keyed A through D. Each lane supplies a `coverage` polygon, a
+`projector` point, a readable `note`, and an optional `control` point for a
+spaced button with a leader line back to the projector. Front views may use
+coverage keys in place of physical projector positions. Coordinates use a
+1000 by 600 drawing canvas, with origin at the upper left. They are not feet or
+meters. Preserve drawing dimensions as labeled notes rather than inferring optics.
+
+Files are limited to 64 KB. Coordinates must be finite and within the canvas;
+strings are limited to 160 characters. Unsupported versions and missing lanes
+are rejected. Unknown fields are discarded, including any slot, command or
+network address. The synthetic example in `test/stage-fixture.js` illustrates the
+format without publishing venue data. Keep the original plot as the authority.

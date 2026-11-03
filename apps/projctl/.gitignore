@@ -1,3 +1,4 @@
 node_modules/
 data/rig.json
+data/stage-plot.json
 *.pre-avd

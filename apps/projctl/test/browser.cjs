@@ -1,13 +1,17 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const path = require('node:path');
+const { checkStage, checkStageLayout } = require('./stage-browser.cjs');
 
 (async () => {
   const { startRelay, until } = await import('./relay-helper.js');
+  const { stageFixture } = await import('./stage-fixture.js');
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
   try {
     for (const offline of [false, true]) {
       const relay = await startRelay();
+      fs.writeFileSync(path.join(path.dirname(relay.rigFile), 'stage-plot.json'), JSON.stringify(stageFixture()));
       const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
       const errors = []; page.on('pageerror', (e) => errors.push(e.message));
       try {
@@ -50,6 +54,8 @@ const fs = require('node:fs');
         await until(async () => !(await page.locator('#adj-picture input').first().isDisabled()));
         await page.keyboard.press('Escape');
 
+        await checkStage(page, relay, offline, until);
+
         for (const [width, height] of [[1440, 900], [680, 900], [375, 812], [844, 390], [320, 256], [3840, 1080]]) {
           await page.setViewportSize({ width, height });
           for (const theme of ['light', 'dark']) {
@@ -60,8 +66,9 @@ const fs = require('node:fs');
             assert.equal(await page.locator('.pj-tile').first().evaluate((el) => el.scrollHeight <= el.clientHeight + 1), true, `clipped projector tile ${width}`);
             await bulk.scrollIntoViewIfNeeded(); const box = await bulk.boundingBox(); assert.ok(box.x >= 0 && box.x + box.width <= width && box.y >= 0 && box.y + box.height <= height, `bulk button outside viewport ${width}x${height}: ${JSON.stringify(box)}`);
             await bulk.focus(); assert.ok(await bulk.evaluate((el) => document.activeElement === el));
-            for (const name of ['Presets', 'Log', 'Setup', 'Rig']) {
+            for (const name of ['Stage', 'Presets', 'Log', 'Setup', 'Rig']) {
               await page.locator(`[data-tab="${name.toLowerCase()}"]`).click();
+              if (name === 'Stage') await checkStageLayout(page, width, height, theme);
               const overflow = await page.evaluate(() => document.documentElement.scrollHeight > innerHeight || document.documentElement.scrollWidth > innerWidth);
               assert.equal(overflow, false, `${name} overflow at ${width}x${height} ${theme}`);
             }
@@ -94,10 +101,23 @@ const fs = require('node:fs');
         await until(async () => (await relay.state()).projectors[1].status.shutter === 'closed');
         await page.waitForTimeout(100);
         assert.equal(await adjust.evaluate((el) => document.activeElement === el), true);
+        const plotFile = path.join(path.dirname(relay.rigFile), 'stage-plot.json');
+        fs.renameSync(plotFile, plotFile + '.saved');
+        await page.reload(); await page.locator('[data-tab="stage"]').click();
+        await page.locator('#stage-message').filter({ hasText: 'No stage plot loaded' }).waitFor();
+        fs.writeFileSync(plotFile, '{broken');
+        await page.reload(); await page.locator('[data-tab="stage"]').click();
+        await page.locator('#stage-message').filter({ hasText: 'could not be loaded' }).waitFor();
+        fs.writeFileSync(plotFile, JSON.stringify(stageFixture()));
+        await page.reload(); await page.locator('[data-tab="stage"]').click();
+        await page.locator('#stage-workspace').waitFor();
         await relay.close();
         await page.locator('#conn-word').filter({ hasText: 'Relay offline' }).waitFor();
         assert.equal(await bulk.isDisabled(), true);
         assert.equal(await page.locator('[data-all="shutter"]').first().isDisabled(), true);
+        await page.locator('[data-tab="stage"]').click();
+        assert.equal(await page.locator('#stage-status-kind').innerText(), 'Relay offline');
+        assert.equal(await page.locator('.pj-stage-card[data-lane="A"]').getAttribute('aria-disabled'), 'true');
         assert.deepEqual(errors, []);
         console.log(`Browser bulk off, picture lock, themes and viewport checks passed (P1 offline: ${offline})`);
       } finally { await page.close(); await relay.close(); }

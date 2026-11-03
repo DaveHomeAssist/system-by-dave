@@ -13,6 +13,7 @@ import { emptyStatus, POWER } from './drivers/base.js';
 import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
 import { confirmations } from './confirmations.js';
+import { readStagePlot } from './stage-plot.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -33,6 +34,7 @@ function authed(req) {
 }
 function clientIp(req) { return (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '?'; }
 const DATA = process.env.RIG || path.join(__dirname, '..', 'data', SIM ? 'rig.sim.json' : 'rig.json');
+const STAGE_PLOT = process.env.STAGE_PLOT || path.join(path.dirname(DATA), 'stage-plot.json');
 
 const store = openStore(DATA);
 if (SIM) simRig(store.rig);
@@ -57,7 +59,7 @@ const clients = new Set();
 function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients) if (c.readyState === 1) c.send(s); }
 function snapshot() {
   return {
-    type: 'snapshot', show: rig.show, lock: rig.lock,
+    type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM,
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
       return { ...p, password: undefined, status: status.get(p.slot), busy: busy.get(p.slot) || null,
@@ -277,6 +279,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
     if (url.pathname === '/api/schema') return json(res, 200, { patterns: PATTERNS, picture: pictureSchema() });
+    if (url.pathname === '/api/stage-plot' && req.method === 'GET') return json(res, 200, { plot: await readStagePlot(STAGE_PLOT) });
     if (url.pathname === '/api/picture' && req.method === 'GET') {
       const slot = url.searchParams.get('slot'); const p = store.projector(slot); if (!p) throw httpErr(404, 'no slot');
       const d = driverFor(p); if (!d.getPicture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`);
