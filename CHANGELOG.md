@@ -1,5 +1,13 @@
 # Changelog
 
+## November 3, 2026: Projctl bulk commands and relay reliability
+
+- Confirm All Power Off once for the displayed reachable targets, then dispatch to each with per-projector results. Keep individual confirmation, bind tokens to the action and connection settings, and skip newly online/reconfigured targets until reconfirmed.
+- Continue OSC/TCP bulk cues after a slot fails; reject malformed power/shutter arguments and safely drop malformed OSC datagrams.
+- Require a successful Barco core status query before reporting it online, and enforce Show Lock for picture controls as well as lens, pattern, input and power off.
+- Add isolated relay/protocol regressions and browser checks for bulk confirmation, live picture locking, both themes and desktop/phone containment to the pull-request contract job. Saved rigs and cue addresses are unchanged; physical projector testing is still required on the installed relay.
+- Mark the relay's control and login pages noindex and account for them in the indexing inventory.
+
 ## November 2, 2026: Video Engineering Daily
 
 - Add Edition 026, Active HDMI cable direction, with an Extron sourced lesson,

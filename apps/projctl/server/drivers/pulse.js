@@ -26,11 +26,12 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     return new Promise((resolve, reject) => {
       const sock = net.createConnection({ host, port });
       let buf = '', done = false;
-      const fail = (e) => { if (!done) { done = true; sock.destroy(); reject(e); } };
+      const fail = (e) => { if (!done) { done = true; clearTimeout(t); sock.destroy(); reject(e); } };
       const t = setTimeout(() => fail(new Error('timeout')), timeoutMs);
       const req = { jsonrpc: '2.0', id: ++id, method };
       if (params !== undefined) req.params = params;
       sock.on('error', fail);
+      sock.on('end', () => fail(new Error('connection closed before Pulse reply')));
       sock.on('connect', () => sock.write(JSON.stringify(req) + '\n'));
       sock.on('data', (d) => {
         buf += d.toString();
@@ -54,8 +55,9 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       await set('image.testpattern.selected', code); await set('image.testpattern.show', true); return 'OK';
     },
     async getStatus() {
-      const s = { online: true };
-      try { s.power = mapPower(await get('system.state')); } catch { s.power = POWER.UNKNOWN; }
+      // A successful core query proves liveness. Optional properties may be
+      // unsupported, but total transport failure must reach the relay's offline policy.
+      const s = { online: true, power: mapPower(await get('system.state')) };
       try { const sh = String(await get('optics.shutter.target')).toLowerCase(); s.shutter = sh === 'closed' ? SHUTTER.CLOSED : SHUTTER.OPEN; } catch { s.shutter = SHUTTER.UNKNOWN; }
       try { s.input = String(await get(inputProperty)); } catch { s.input = null; }
       try { s.lightHours = Math.round(Number(await get('statistics.laserruntime.value')) / 3600); } catch {} // seconds on the UDM

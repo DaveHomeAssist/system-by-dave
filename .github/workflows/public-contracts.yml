@@ -24,6 +24,11 @@ jobs:
       - run: npm run test:vite-fs-deny
       - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
+      - name: Verify Projctl relay and operator controls
+        run: |
+          npm ci --prefix apps/projctl --ignore-scripts --no-audit --no-fund
+          npm test --prefix apps/projctl
+          npm run test:browser --prefix apps/projctl
       - run: npm run test:public-viewport
       - name: Verify engineering daily journeys
         run: |

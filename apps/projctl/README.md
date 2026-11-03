@@ -21,6 +21,19 @@ Env overrides: PORT, OSC_PORT, TCP_PORT, POLL_MS, RIG.
 
 With DHCP the relay re-finds projectors by MAC every 60 s using PJLink class 2 search. The Find projectors button does it on demand.
 
+## Power off and Show Lock
+
+Tap All projectors → Power off twice within three seconds. The first tap lists the reachable
+targets; the second sends one command to each of those targets and reports each result.
+An offline slot does not block the others. A projector that comes online after the first tap
+is skipped until a new confirmation, as is a slot whose connection settings changed.
+Individual power-off uses the same two-tap confirmation. Expired or reused confirmations
+require another first tap. Changing Show Lock clears pending confirmations.
+
+“Command accepted” means the driver acknowledged the request. Watch the reported tile state
+change through Cooling to Standby before removing power. Show Lock blocks power off, input,
+test patterns, lens movement and picture changes; shutter and read-only status remain available.
+
 ## Cues from Millumin or QLab
 
 Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
@@ -30,6 +43,12 @@ Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
     /proj/P2/input 31           select input
     /proj/all/shutter 0         every projector
     /proj/preset/preshow        recall a saved preset
+
+Bulk cues try every slot and log failures per projector; an offline first slot does not
+prevent later slots receiving the cue. Power and shutter require an explicit 0 or 1.
+Cues and preset recall retain their deliberate-action behavior without the UI double tap,
+and still obey Show Lock. TCP `OK` acknowledges line receipt only; use the Log and reported
+tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles remain unsupported.
 
 ## Layout
 
@@ -45,4 +64,23 @@ Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
 - simulator: complete.
 - pulse (Barco): power and shutter use commands confirmed by other operators. Input property name
   needs confirming in the projector's API console. Status property names are best guesses.
-- panasonic: delegates to PJLink for now. Native 1024 protocol and lens commands are phase 3 and 5.
+- panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls.
+
+Pulse status requires a successful `system.state` query. Failed core queries count toward the
+relay's offline policy; unsupported optional properties remain unknown rather than preventing
+an otherwise reachable projector from reporting status.
+
+## Verify changes
+
+From this directory, `npm ci` then `npm test` runs isolated simulator, loopback protocol and
+confirmation regressions. `npm run test:browser` additionally uses the repository's Playwright
+installation and Chromium to exercise the real controls at desktop, 680px and phone widths
+in both themes. Set `CHROMIUM_PATH` only to use an existing browser binary. Tests use temporary
+rig files and ephemeral ports, and never connect to physical projectors. CI runs both suites.
+
+Compatibility: ECP-1.0 revision 1.0; Projctl remains the physical-command owner. Rig files,
+slot IDs and cue addresses retain their existing formats. The bulk HTTP first-tap response
+now includes `all.confirm` and `all.targets`; individual responses retain their slot key.
+Confirmation tokens are opaque, one-use and bound to the requested scope and connection
+settings. Restart the relay and reload clients together when updating the server/UI.
+Physical projector acceptance remains separate from simulator verification.

@@ -1,6 +1,7 @@
 const $ = (s, r = document) => r.querySelector(s);
 let state = { projectors: [], presets: [], events: [], lock: false };
-let confirmTokens = {}; // slot -> token
+const confirmTokens = {}; // command key -> one-use token
+const commandsInFlight = new Set();
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // theme: Gaffer (dark) by default, Call Sheet (light) saved per browser
@@ -29,14 +30,24 @@ async function api(path, body) {
 }
 
 async function cmd(slot, c, arg) {
+  const key = `${slot}:${c}:${JSON.stringify(arg)}`;
+  if (commandsInFlight.has(key)) return;
+  commandsInFlight.add(key);
   try {
-    const out = await api('command', { slot, cmd: c, arg, confirm: confirmTokens[slot] });
-    const r = out[slot] || Object.values(out)[0];
-    if (r?.confirm) { confirmTokens[slot] = r.confirm; toast(r.message); setTimeout(() => delete confirmTokens[slot], 3000); return; }
-    delete confirmTokens[slot];
+    const out = await api('command', { slot, cmd: c, arg, confirm: confirmTokens[key] });
+    const r = out[slot];
     const errs = Object.entries(out).filter(([, v]) => v.error).map(([k, v]) => `${k}: ${v.error}`);
-    if (errs.length) toast(errs.join(' · '), 4000);
+    if (r?.confirm) {
+      confirmTokens[key] = r.confirm;
+      toast([r.message, ...errs].join(' · '), 3000);
+      setTimeout(() => { if (confirmTokens[key] === r.confirm) delete confirmTokens[key]; }, 3000);
+      return;
+    }
+    delete confirmTokens[key];
+    if (slot === 'all') toast(Object.entries(out).map(([k, v]) => `${k}: ${v.error || (v.result === 'OK' ? 'command accepted' : v.result)}`).join(' · '), 6000);
+    else if (errs.length) toast(errs.join(' · '), 4000);
   } catch (e) { toast(e.message, 4000); }
+  finally { commandsInFlight.delete(key); }
 }
 document.querySelectorAll('[data-all]').forEach((b) => b.onclick = () => cmd('all', b.dataset.all, b.dataset.all === 'pattern' ? b.dataset.arg : Number(b.dataset.arg)));
 
@@ -174,6 +185,10 @@ function renderAdjust() {
   }
   $('#adj-speed').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.s === adjSpeed)));
   document.querySelectorAll('.lens button, #adj-home').forEach((b) => b.disabled = state.lock);
+  updatePictureLock();
+}
+function updatePictureLock() {
+  document.querySelectorAll('#adj-picture input, #adj-picture select').forEach((el) => { el.disabled = state.lock || el.dataset.unavailable === 'true'; });
 }
 $('#adj-close').onclick = closeAdjust;
 $('#adjust').onclick = (e) => { if (e.target === $('#adjust')) closeAdjust(); };
@@ -197,7 +212,7 @@ async function loadPicture() {
     const row = document.createElement('label'); row.className = 'pic-row' + (vals[k] == null ? ' na' : '');
     const v = vals[k];
     if (d.type === 'range') {
-      row.innerHTML = `<span>${esc(d.label)}${v == null ? ', needs a signal' : ''}</span><input type="range" min="${d.min}" max="${d.max}" value="${v ?? 0}" ${v == null ? 'disabled' : ''}><output>${v ?? '—'}</output>`;
+      row.innerHTML = `<span>${esc(d.label)}${v == null ? ', needs a signal' : ''}</span><input type="range" min="${d.min}" max="${d.max}" value="${v ?? 0}" data-unavailable="${v == null}"><output>${v ?? '—'}</output>`;
       const inp = row.querySelector('input'), out = row.querySelector('output');
       inp.oninput = () => out.textContent = inp.value;
       inp.onchange = () => cmd(slot, 'picture', { key: k, value: Number(inp.value) }).then(() => { row.classList.remove('na'); });
@@ -208,6 +223,7 @@ async function loadPicture() {
     }
     el.appendChild(row);
   }
+  updatePictureLock();
 }
 
 // websocket
