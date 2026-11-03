@@ -87,7 +87,7 @@ export function createStageView(root, openControls, canAdjust) {
       const reason = !p ? matches ? 'Duplicate lane. Check Setup.' : 'Assign this lane in Setup.' : !online ? 'Relay offline' : !s?.online ? 'Projector offline' : !canAdjust(p) ? 'Adjustment controls unavailable' : null;
       const power = { on: 'Powered', off: 'Standby', cooling: 'Cooling', warming: 'Warming' }[s?.power] || 'Power unknown';
       const shutter = ['open', 'closed'].includes(s?.shutter) ? `Shutter ${s.shutter}` : 'Shutter unknown';
-      const status = reason || `${power} · ${shutter}`;
+      const status = !p || !online || !s?.online ? reason : [power, shutter, !canAdjust(p) && 'Adjustments unavailable'].filter(Boolean).join(' · ');
       const card = cards.get(lane), marker = markers.get(lane);
       card.querySelector('.pj-stage-device').textContent = p ? `${p.slot} · ${info.orientation}` : 'No unique control slot';
       card.querySelector('.pj-stage-state').textContent = status;

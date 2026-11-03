@@ -48,6 +48,26 @@ exports.checkStage = async (page, relay, offline, until) => {
   await relay.api('projector', { slot: 'P3', lane: '' });
   await relay.api('projector', { slot: 'P3', lane: 'D' });
   await relay.api('projector', { slot: 'P2', lane: 'A' });
+  // Change only the browser's capability snapshot, keeping all drivers simulated.
+  const limited = await page.context().browser().newPage();
+  try {
+    await limited.routeWebSocket('**/ws', (ws) => {
+      const server = ws.connectToServer();
+      server.onMessage((raw) => {
+        const message = JSON.parse(String(raw));
+        if (message.type === 'snapshot') {
+          const p = message.projectors.find((p) => p.slot === 'P4');
+          p.driver = 'pjlink'; p.patterns = null;
+        }
+        ws.send(JSON.stringify(message));
+      });
+    });
+    await limited.goto(relay.base); await limited.locator('[data-tab="stage"]').click();
+    const card = limited.locator('.pj-stage-card[data-lane="B"]');
+    await until(async () => (await card.getAttribute('aria-disabled')) === 'true');
+    await until(async () => (await card.innerText()).includes('Adjustments unavailable'));
+    assert.match(await card.innerText(), /(?:Powered|Standby|Cooling|Warming) · Shutter open · Adjustments unavailable/);
+  } finally { await limited.close(); }
   await page.locator('[data-tab="rig"]').click();
 };
 
