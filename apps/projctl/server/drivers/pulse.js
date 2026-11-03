@@ -123,7 +123,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       if (!Object.hasOwn(sources, idv)) throw new Error('Select an available projector input.');
       // Source changes can keep Pulse busy while the input electronics relock.
       await rpc('property.set', { property: inputProperty, value: idv }, Math.max(timeoutMs, 15000));
-      if (await get(inputProperty) !== idv) throw new Error('Projector input did not match the requested source.');
+      if (await rpc('property.get', { property: inputProperty }, Math.max(timeoutMs, 15000)) !== idv) throw new Error('Projector input did not match the requested source.');
       return 'OK';
     },
     async getPicture() {

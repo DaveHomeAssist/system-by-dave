@@ -39,7 +39,7 @@ test('Pulse requires a core reply, tolerates unsupported optional fields, and re
 test('Pulse uses discovered inputs, validated picture ranges and waits for bounded lens movement', async (t) => {
   const values = { 'system.state': 'on', 'image.window.main.source': 'L1 HDMI', 'image.brightness': 0 };
   const requests = [];
-  let running = false, position = 1000, target = 1000, hold = false;
+  let running = false, position = 1000, target = 1000, hold = false, sourceChanged = false;
   const sockets = new Set();
   const server = net.createServer((socket) => {
     sockets.add(socket); socket.on('close', () => sockets.delete(socket)); let text = '';
@@ -54,11 +54,11 @@ test('Pulse uses discovered inputs, validated picture ranges and waits for bound
         if (result === undefined) error = { code: -32601, message: 'unsupported' };
       } else if (r.method === 'property.set') {
         if (r.params.property.endsWith('.target')) { target = r.params.value; running = true; if (!hold) setTimeout(() => { position = target; running = false; }, 70); }
-        else values[r.params.property] = r.params.value;
+        else { values[r.params.property] = r.params.value; if (r.params.property === 'image.window.main.source') sourceChanged = true; }
         result = true;
       } else if (r.method.endsWith('.stop')) { running = false; result = null; }
       const reply = () => socket.end(JSON.stringify({ jsonrpc: '2.0', id: r.id, ...(error ? { error } : { result }) }));
-      if (r.method === 'property.set' && r.params.property === 'image.window.main.source') setTimeout(reply, 70); else reply();
+      if (r.params?.property === 'image.window.main.source' && (r.method === 'property.set' || sourceChanged)) { if (r.method === 'property.get') sourceChanged = false; setTimeout(reply, 70); } else reply();
     });
   });
   server.listen(0, '127.0.0.1'); await once(server, 'listening');
