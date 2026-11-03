@@ -31,7 +31,8 @@ const fs = require('node:fs');
         }
         await until(async () => (await page.locator('.pj-tile').first().getAttribute('data-slot')) === 'P2');
         assert.deepEqual(await page.locator('.pj-tile').evaluateAll((els) => els.map((el) => el.dataset.slot)), ['P2', 'P4', 'P1', 'P3']);
-        await relay.api('command', { slot: 'P4', cmd: 'shutter', arg: 0 });
+        await relay.api('command', { slot: 'all', cmd: 'shutter', arg: 0 });
+        await until(async () => (await relay.state()).projectors.filter((p) => ['P2', 'P4'].includes(p.slot)).every((p) => p.status.shutter === 'open'));
         await page.locator('.pj-tile[data-lane="A"] [data-c="shutter"][data-a="1"]').click();
         await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P2').status.shutter === 'closed');
         assert.equal((await relay.state()).projectors.find((p) => p.slot === 'P4').status.shutter, 'open');
