@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "29ccd790e554d28605eb1835fb92fb9f9835ed06556f416fa223d8bc9f1e076e",
-  "publicSha256": "71d5f3f1766c87ce65740bc49f60f4a53787d5be2c2b2b082df1b8b131c2e873",
-  "editions": 26,
+  "sourceSha256": "e268734065cef718e91863b5d24aa1cd4256a80f1af82400a10bc8acedb9a34c",
+  "publicSha256": "b21babc21e3c3a32b23c8a8a50bbb4de923f1dae0a2ad51a52b7bf3eb52aa072",
+  "editions": 27,
   "files": [
+    {
+      "name": "Edition 027.svg",
+      "id": 27,
+      "date": "2026-11-03",
+      "title": "Quad link image mapping",
+      "sha256": "1cb67c7dc03702ad0259181304bade85bae7c1ef7986344af5513002b3620c75"
+    },
+    {
+      "name": "Edition 027.png",
+      "id": 27,
+      "date": "2026-11-03",
+      "title": "Quad link image mapping",
+      "sha256": "f3027fca378af5b68e6a915cb30a82af24cbeb1e48247a847d049fa0b66d1cce"
+    },
     {
       "name": "Edition 026.svg",
       "id": 26,
