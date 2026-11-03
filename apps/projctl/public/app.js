@@ -1,10 +1,12 @@
 import { LANES, laneOf, projectorName, orderedProjectors } from './lanes.js';
+import { createStageView } from './stage-view.js';
 const $ = (s, r = document) => r.querySelector(s);
 let state = { projectors: [], presets: [], events: [], lock: false };
 const confirmTokens = {}; // command key -> one-use token
 const commandsInFlight = new Set();
 let connected = false;
 const dirtySetup = new Set();
+const stageView = createStageView(document.querySelector('#tab-stage'), (slot) => openAdjust(slot), (p) => canPattern(p));
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // Respect saved operator choice; a fresh browser starts in the light theme.
@@ -190,7 +192,7 @@ function renderAll() {
   $('#summary').textContent = `${state.projectors.length} slots · ${online} online`;
   $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = state.presets.length || '';
   document.querySelectorAll('[data-all="power"][data-arg="0"], [data-all="pattern"]').forEach((b) => b.disabled = state.lock || !connected);
-  renderGrid(); renderPresets(); renderLog(); renderSetup(); if (adjSlot) renderAdjust();
+  renderGrid(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
 }
 
 // ---- Adjust sheet: patterns, lens, picture ----
@@ -278,7 +280,7 @@ async function loadPicture() {
 }
 
 // websocket
-function setConn(on) { connected = on; const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#lock-on').disabled = !on; $('#lock-off').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderGrid(); if (adjSlot) renderAdjust(); }
+function setConn(on) { connected = on; const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#lock-on').disabled = !on; $('#lock-off').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
 function connect() {
   const ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
   ws.onopen = () => setConn(true);
@@ -286,8 +288,8 @@ function connect() {
   ws.onmessage = (m) => {
     const msg = JSON.parse(m.data);
     if (msg.type === 'snapshot') { state = msg; renderAll(); }
-    else if (msg.type === 'status') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); if (adjSlot) renderAdjust(); const online = state.projectors.filter((x) => x.status?.online).length; $('#summary').textContent = `${state.projectors.length} slots · ${online} online`; } }
-    else if (msg.type === 'busy') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); if (adjSlot) renderAdjust(); }
+    else if (msg.type === 'status') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); const online = state.projectors.filter((x) => x.status?.online).length; $('#summary').textContent = `${state.projectors.length} slots · ${online} online`; } }
+    else if (msg.type === 'busy') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
     else if (msg.type === 'event') { state.events.push(msg.event); if (state.events.length > 200) state.events.shift(); renderLog(); }
   };
 }

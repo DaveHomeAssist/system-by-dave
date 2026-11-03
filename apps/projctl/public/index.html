@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="avd/tokens.css">
 <link rel="stylesheet" href="avd/bundle.css">
 <link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="stage.css">
 </head>
 <body>
 <a class="pj-skip" href="#tab-rig">Skip to rig</a>
@@ -30,6 +31,7 @@
   <div class="avd-shell__tabs">
     <div class="avd-tabs" role="tablist" aria-label="Views">
       <button class="avd-tab" role="tab" id="tab-btn-rig" aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">Rig <span class="avd-tab__count" id="count-rig"></span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-stage" aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">Stage</button>
       <button class="avd-tab" role="tab" id="tab-btn-presets" aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
       <button class="avd-tab" role="tab" id="tab-btn-log" aria-selected="false" aria-controls="tab-log" data-tab="log" type="button" tabindex="-1">Log</button>
       <button class="avd-tab" role="tab" id="tab-btn-setup" aria-selected="false" aria-controls="tab-setup" data-tab="setup" type="button" tabindex="-1">Setup</button>
@@ -51,6 +53,34 @@
         <button class="avd-btn avd-btn--quiet" data-all="pattern" data-arg="00" type="button">Pattern off</button>
       </div>
       <div id="grid" class="pj-grid" role="region" aria-label="Projector controls" tabindex="0" data-web2-scroll></div>
+    </section>
+
+    <section id="tab-stage" class="tab" role="tabpanel" aria-labelledby="tab-btn-stage" hidden>
+      <div class="pj-stage-head">
+        <div><span class="avd-eyebrow">Projection plot</span><h2 id="stage-title">Stage view</h2></div>
+        <div class="avd-seg" role="group" aria-label="Stage viewpoint">
+          <button class="avd-seg__btn" type="button" data-stage-view="front" aria-pressed="true">Front</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="plan" aria-pressed="false">Plan</button>
+        </div>
+      </div>
+      <div id="stage-message" class="pj-stage-empty" role="status">Loading local plot…</div>
+      <div id="stage-workspace" class="pj-stage-workspace" hidden>
+        <div class="pj-stage-drawing">
+          <div class="pj-stage-toolbar">
+            <span id="stage-caption" class="pj-mono"></span>
+            <div class="pj-stage-layers" role="group" aria-label="Show coverage layers"><span class="pj-mono">Coverage</span></div>
+          </div>
+          <div class="pj-stage-viewport"><div id="stage-canvas" class="pj-stage-canvas"></div></div>
+          <p class="pj-stage-foot pj-mono">Plot reference · coverage is not live beam position</p>
+        </div>
+        <aside class="pj-stage-sidebar" aria-label="Stage projectors" data-web2-scroll>
+          <div class="pj-rowhead"><h3>Projectors</h3><span id="stage-status-kind" class="pj-mono"></span></div>
+          <p class="pj-mono pj-note">Select a projector to open lens, pattern and picture controls.</p>
+          <div id="stage-projectors" class="pj-stage-projectors"></div>
+          <p id="stage-source" class="pj-mono pj-note"></p>
+          <a class="pj-stage-planner" href="https://avbydave.com/ProjectorThrow/" target="_blank" rel="noopener noreferrer">Open Throwline ↗<span>Separate planning workspace · opens a new tab</span></a>
+        </aside>
+      </div>
     </section>
 
     <section id="tab-presets" class="tab" role="tabpanel" aria-labelledby="tab-btn-presets" hidden>

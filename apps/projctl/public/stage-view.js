@@ -1,0 +1,115 @@
+import { LANES } from './lanes.js';
+import { normalizePlot, projectorForLane } from './stage-plot.js';
+
+const svgNode = (name, attrs = {}) => {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+  for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+  return el;
+};
+
+export function createStageView(root, openControls, canAdjust) {
+  const $ = (s) => root.querySelector(s);
+  const canvas = $('#stage-canvas');
+  let plot, view = 'front', current = { projectors: [] }, connected = false;
+  const hidden = new Set(), cards = new Map(), markers = new Map();
+  const highlight = (lane) => { canvas.dataset.highlight = lane || ''; };
+
+  function openLane(lane) {
+    const p = projectorForLane(current.projectors, lane);
+    if (p && connected && p.status?.online && canAdjust(p)) openControls(p.slot);
+  }
+  function buttonFor(lane, className) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = className; b.dataset.lane = lane;
+    b.onclick = () => openLane(lane);
+    b.onpointerenter = () => highlight(lane); b.onpointerleave = () => highlight();
+    b.onfocus = () => highlight(lane); b.onblur = () => highlight();
+    return b;
+  }
+  for (const [lane, info] of Object.entries(LANES)) {
+    const b = buttonFor(lane, 'pj-stage-card');
+    b.innerHTML = `<span class="pj-stage-letter">${lane}</span><span class="pj-stage-card-copy"><strong>${info.target}</strong><span class="pj-stage-device"></span><span class="pj-stage-state"></span><span class="pj-stage-note"></span></span><span aria-hidden="true">↗</span>`;
+    $('#stage-projectors').append(b); cards.set(lane, b);
+    const layer = document.createElement('button'); layer.type = 'button'; layer.dataset.lane = lane; layer.dataset.coverage = lane;
+    layer.textContent = lane; layer.setAttribute('aria-label', `${lane} ${info.target} coverage`); layer.setAttribute('aria-pressed', 'true');
+    layer.onclick = () => { hidden.has(lane) ? hidden.delete(lane) : hidden.add(lane); layer.setAttribute('aria-pressed', String(!hidden.has(lane))); updateLayers(); };
+    $('.pj-stage-layers').append(layer);
+  }
+  function updateLayers() {
+    canvas.querySelectorAll('.pj-stage-coverage').forEach((node) => { node.style.display = hidden.has(node.dataset.lane) ? 'none' : ''; });
+  }
+  function draw() {
+    if (!plot) return;
+    canvas.replaceChildren(); markers.clear();
+    const data = plot.views[view];
+    $('#stage-caption').textContent = data.caption;
+    const svg = svgNode('svg', { viewBox: '0 0 1000 600', role: 'img', 'aria-label': `${plot.title}. ${data.caption}. Colored areas are drawing reference, not live beam positions.` });
+    svg.append(svgNode('line', { x1: 500, x2: 500, y1: 40, y2: 560, class: 'pj-stage-center' }));
+    for (const pts of data.outline) svg.append(svgNode('polyline', { points: pts.map((p) => p.join(',')).join(' '), class: 'pj-stage-outline' }));
+    // Paint broad coverage first so portal boundaries remain legible.
+    for (const lane of ['C', 'B', 'D', 'A']) {
+      const group = svgNode('g', { 'data-lane': lane, class: 'pj-stage-coverage' });
+      group.append(svgNode('polygon', { points: data.lanes[lane].coverage.map((p) => p.join(',')).join(' ') }));
+      svg.append(group);
+    }
+    for (const label of data.labels) {
+      const el = svgNode('text', { x: label.at[0], y: label.at[1], class: 'pj-stage-label', 'text-anchor': 'middle' });
+      el.textContent = label.text; svg.append(el);
+    }
+    canvas.append(svg);
+    for (const [lane, info] of Object.entries(LANES)) {
+      const marker = buttonFor(lane, 'pj-stage-marker');
+      marker.innerHTML = `<svg viewBox="0 0 32 24" aria-hidden="true"><rect x="2" y="6" width="20" height="14" rx="3"/><path d="M22 10l8-4v14l-8-4M7 2h10M12 2v4"/></svg><b>${lane}</b>`;
+      const { projector, control } = data.lanes[lane];
+      if (projector.some((value, i) => value !== control[i])) {
+        svg.append(svgNode('line', { x1: projector[0], y1: projector[1], x2: control[0], y2: control[1], class: 'pj-stage-leader' }));
+        svg.append(svgNode('circle', { cx: projector[0], cy: projector[1], r: 6, class: 'pj-stage-origin', 'data-lane': lane }));
+      }
+      marker.style.left = `${control[0] / 10}%`; marker.style.top = `${control[1] / 6}%`;
+      marker.title = `${lane} · ${info.target}`;
+      canvas.append(marker); markers.set(lane, marker);
+      cards.get(lane).querySelector('.pj-stage-note').textContent = data.lanes[lane].note;
+    }
+    updateLayers(); update(current, connected);
+  }
+  root.querySelectorAll('[data-stage-view]').forEach((b) => {
+    b.onclick = () => {
+      view = b.dataset.stageView;
+      root.querySelectorAll('[data-stage-view]').forEach((other) => other.setAttribute('aria-pressed', String(other === b)));
+      highlight(); draw();
+    };
+  });
+  function update(state, online) {
+    current = state; connected = online;
+    $('#stage-status-kind').textContent = !online ? 'Relay offline' : state.simulation ? 'Simulated status' : 'Reported status';
+    for (const [lane, info] of Object.entries(LANES)) {
+      const p = projectorForLane(state.projectors, lane), s = p?.status;
+      const matches = state.projectors.filter((p) => p.lane === lane).length;
+      const reason = !p ? matches ? 'Duplicate lane. Check Setup.' : 'Assign this lane in Setup.' : !online ? 'Relay offline' : !s?.online ? 'Projector offline' : !canAdjust(p) ? 'Adjustment controls unavailable' : null;
+      const power = { on: 'Powered', off: 'Standby', cooling: 'Cooling', warming: 'Warming' }[s?.power] || 'Power unknown';
+      const shutter = ['open', 'closed'].includes(s?.shutter) ? `Shutter ${s.shutter}` : 'Shutter unknown';
+      const status = reason || `${power} · ${shutter}`;
+      const card = cards.get(lane), marker = markers.get(lane);
+      card.querySelector('.pj-stage-device').textContent = p ? `${p.slot} · ${info.orientation}` : 'No unique control slot';
+      card.querySelector('.pj-stage-state').textContent = status;
+      // Keep buttons in the keyboard order so unavailable states remain discoverable.
+      for (const b of [card, marker].filter(Boolean)) {
+        b.setAttribute('aria-disabled', String(!!reason));
+        b.setAttribute('aria-label', `${lane} ${info.target}. ${p ? p.slot + '. ' : ''}${status}${reason ? '' : '. Open controls'}`);
+        b.dataset.slot = p?.slot || '';
+      }
+    }
+  }
+  async function load() {
+    try {
+      const response = await fetch('/api/stage-plot', { signal: AbortSignal.timeout(10000) });
+      if (!response.ok) throw new Error('The local plot could not be loaded. Check the relay and reload.');
+      const data = await response.json();
+      if (!data.plot) throw new Error('No stage plot loaded. Add a stage plot beside the relay’s rig file, then reload.');
+      plot = normalizePlot(data.plot);
+      $('#stage-title').textContent = plot.title; $('#stage-source').textContent = plot.source;
+      $('#stage-message').hidden = true; $('#stage-workspace').hidden = false; draw();
+    } catch (error) { $('#stage-message').textContent = error.message; }
+  }
+  load();
+  return { update };
+}

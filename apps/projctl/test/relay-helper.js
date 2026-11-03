@@ -16,7 +16,7 @@ export async function startRelay() {
   const dir = await mkdtemp(path.join(tmpdir(), 'projctl-test-'));
   const child = spawn(process.execPath, ['server/index.js'], {
     cwd: fileURLToPath(new URL('../', import.meta.url)),
-    env: { ...process.env, SIM: '1', PJ_PASSCODE: '', RIG: path.join(dir, 'rig.json'), PORT: '0', OSC_PORT: '0', TCP_PORT: '0', POLL_MS: '50' },
+    env: { ...process.env, SIM: '1', PJ_PASSCODE: '', RIG: path.join(dir, 'rig.json'), STAGE_PLOT: path.join(dir, 'stage-plot.json'), PORT: '0', OSC_PORT: '0', TCP_PORT: '0', POLL_MS: '50' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let log = '';

@@ -1,5 +1,17 @@
 # Changelog
 
+## November 3, 2026: Projector stage view
+
+- Add front and plan views with colored coverage layers and clickable projector
+  keys that open the existing controls through current drawing lane assignments.
+  Show reported power and shutter separately from the drawing reference.
+- Load a validated private plot beside the active rig without publishing venue
+  geometry. Keep missing or ambiguous lanes unavailable and preserve Show Lock,
+  offline gates, keyboard focus and existing cue routes. Link to Throwline as a
+  separate planning workspace without transferring data or control authority.
+- Add plot validation, slot reassignment and browser coverage for both viewpoints,
+  themes, keyboard operation and six viewport sizes.
+
 ## 2026-11-02
 
 - Projector control: add optional drawing lanes with letter badges, target names,

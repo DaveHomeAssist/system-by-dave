@@ -51,3 +51,35 @@ reordering cards does not redirect a command; each letter has readable contrast
 in both themes and the established viewport checks pass. The home simulator may
 illustrate all four lanes, but physical house-projector mapping requires operator
 confirmation before applying it to the venue rig.
+
+## Stage view brief
+
+Operators need to identify a coverage area on their drawing and reach the matching
+projector without translating drawing letters into control slots. Add a Stage tab
+with front and plan views, colored coverage layers, keyboard accessible projector
+buttons and the current status for each assigned lane. Clicking a projector opens
+the existing adjustment dialog. Selection never sends a physical command.
+
+The smallest slice is a local, read-only plot adapter: versioned JSON beside the
+active rig supplies normalized drawing coordinates and source labels. Keep the
+private drawing and its traced venue geometry out of public bundles. A missing or
+invalid plot shows an explicit recovery state. The browser receives only validated
+fields; arbitrary markup, URLs and network identities are not part of this format.
+
+Drawing coordinates are schematic reference, not calculated optical geometry or
+live lens feedback. Coverage remains visible when a shutter is closed, with status
+reported separately. Resolve each letter from current rig lane assignments, never
+from display order or presumed house identities. Missing and ambiguous assignments
+cannot open a control target. No rig, preset, cue or equipment schema changes.
+
+Reuse the current AV by Dave theme and existing controls. Offer Throwline as an
+explicit separate planning workspace, with no automatic import, shared state,
+invented throw distance or control authority. ECP-1.0 revision 1.0 applies: Projctl
+owns execution; this adapter consumes private plot reference only.
+
+Acceptance: both views preserve plot orientation and colors; each click opens the
+correct existing slot; layer visibility never changes hardware; polling preserves
+keyboard focus; offline and Show Lock gates still apply; missing, malformed and
+ambiguous data fail clearly. Verify both themes and the existing six viewports on
+the isolated simulator. Physical coverage and house slot identities remain for
+venue acceptance.
