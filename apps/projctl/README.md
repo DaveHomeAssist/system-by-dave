@@ -142,7 +142,9 @@ plot data, calibrate geometry, alter a saved Throwline scene or send commands.
 The Stage view is a drawing reference, not optical calculation or live beam tracking.
 
 The source checkout serves an exact allowlist from the canonical
-`ProjectorThrow/` viewer. Before copying Projctl to another machine, run
+`ProjectorThrow/` viewer and injects its local import map into the relay's HTML
+response. The published static copy has no local runtime or private plot.
+Before copying Projctl to another machine, run
 `npm run bundle:throwline` inside `apps/projctl`; this packages the pinned viewer
 into ignored `runtime/throwline/` with a SHA-256 manifest. The service installer
 does this automatically. Copy the runtime with the app and refresh it from the

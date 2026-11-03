@@ -10,6 +10,15 @@ export const THROWLINE_FILES = Object.freeze([
 ]);
 export const canonicalThrowline = fileURLToPath(new URL('../../../ProjectorThrow/', import.meta.url));
 export const bundledThrowline = fileURLToPath(new URL('../runtime/throwline/', import.meta.url));
+// The static public copy has no relay or private plot. Only the local relay
+// advertises its same-origin renderer, independently of public domain cutover.
+export function withThrowlineImports(html) {
+  const imports = {
+    three: '/ProjectorThrow/vendor/three/three.module.min.js',
+    'three/addons/controls/OrbitControls.js': '/ProjectorThrow/vendor/three/addons/controls/OrbitControls.js',
+  };
+  return html.replace('<!-- Local Throwline import map: supplied by the relay. -->', `<script type="importmap">${JSON.stringify({ imports })}</script>`);
+}
 export function throwlineAsset(pathname) {
   const name = pathname.slice('/ProjectorThrow/'.length);
   if (!pathname.startsWith('/ProjectorThrow/') || !THROWLINE_FILES.includes(name)) return null;

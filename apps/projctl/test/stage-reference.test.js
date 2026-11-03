@@ -26,6 +26,13 @@ test('3D reference preserves drawing edges and crossed paths without mutating th
 
 test('relay serves only the canonical Throwline runtime allowlist', async t => {
   const relay = await startRelay(); t.after(relay.close);
+  for (const route of ['/', '/index.html']) {
+    const html = await (await fetch(relay.base + route)).text();
+    const map = JSON.parse(html.match(/<script type="importmap">([^<]+)<\/script>/)[1]);
+    assert.deepEqual(Object.keys(map.imports), ['three', 'three/addons/controls/OrbitControls.js']);
+    for (const asset of Object.values(map.imports)) assert.equal((await fetch(relay.base + asset)).status, 200);
+    assert.ok(html.indexOf('type="importmap"') < html.indexOf('type="module"'), 'configure imports before app modules');
+  }
   for (const name of THROWLINE_FILES) {
     const response = await fetch(relay.base + '/ProjectorThrow/' + name);
     assert.equal(response.status, 200);
