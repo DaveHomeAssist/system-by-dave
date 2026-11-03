@@ -1,18 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Frozen Projectors</title>
+<title>Frozen | Projector control</title>
+<meta name="description" content="Frozen projector control: rig status, presets, lens and picture tools.">
+<meta name="theme-color" content="#10273d">
 <link rel="stylesheet" href="avd/tokens.css">
 <link rel="stylesheet" href="avd/bundle.css">
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
+<a class="pj-skip" href="#tab-rig">Skip to rig</a>
 <div id="app" class="avd-shell">
   <header class="pj-header">
-    <span class="avd-tape" id="show">Projectors</span>
+    <div class="pj-brand"><svg class="pj-snowmark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 2v28M4 9l24 14M4 23L28 9M12 5l4 4 4-4M12 27l4-4 4 4M5 13l6-1-2-6M27 19l-6 1 2 6M9 26l2-6-6-1M23 6l-2 6 6 1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><div><span class="pj-kicker">AV BY DAVE · VIDEO CONTROL</span><h1 id="show">Frozen</h1></div></div>
     <span class="avd-state" id="conn" aria-live="polite"><span class="avd-dot avd-dot--blocked" aria-hidden="true"></span><span id="conn-word">Relay offline</span></span>
     <span class="pj-mono pj-summary" id="summary"></span>
     <div class="avd-seg" role="group" aria-label="Show lock">
@@ -34,7 +37,7 @@
   </div>
 
   <main class="pj-main">
-    <section id="tab-rig" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
+    <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
       <div class="pj-allbar" aria-labelledby="all-label">
         <span id="all-label" class="avd-eyebrow">All projectors</span>
         <div class="avd-seg" role="group" aria-label="Shutter, all projectors">
@@ -47,7 +50,7 @@
         <button class="avd-btn avd-btn--quiet" data-all="pattern" data-arg="08" type="button">Colour bars</button>
         <button class="avd-btn avd-btn--quiet" data-all="pattern" data-arg="00" type="button">Pattern off</button>
       </div>
-      <div id="grid" class="pj-grid"></div>
+      <div id="grid" class="pj-grid" role="region" aria-label="Projector controls" tabindex="0" data-web2-scroll></div>
     </section>
 
     <section id="tab-presets" class="tab" role="tabpanel" aria-labelledby="tab-btn-presets" hidden>
@@ -59,33 +62,35 @@
     </section>
 
     <section id="tab-log" class="tab" role="tabpanel" aria-labelledby="tab-btn-log" hidden>
-      <div class="avd-table-wrap pj-fill"><table id="log" class="avd-table"><caption>Command log</caption><thead><tr><th>Time</th><th>Slot</th><th>Command</th><th>Result</th><th>Source</th></tr></thead><tbody></tbody></table></div>
+      <div class="pj-allbar"><label class="avd-field pj-grow"><span class="avd-field__label">Search command log</span><input class="avd-input" id="log-search" type="search" placeholder="Slot, command or result"></label></div>
+      <div class="avd-table-wrap pj-fill" role="region" aria-label="Command history" tabindex="0" data-web2-scroll><table id="log" class="avd-table"><caption>Command log</caption><thead><tr><th>Time</th><th>Slot</th><th>Command</th><th>Result</th><th>Source</th></tr></thead><tbody></tbody></table></div>
     </section>
 
     <section id="tab-setup" class="tab" role="tabpanel" aria-labelledby="tab-btn-setup" hidden>
       <div class="pj-allbar"><button id="discover" class="avd-btn" type="button">Find projectors</button><span id="discover-out" class="pj-mono" aria-live="polite"></span></div>
-      <div id="setup" class="pj-list pj-fill"></div>
+      <div id="setup" class="pj-list pj-fill" role="region" aria-label="Projector setup" tabindex="0" data-web2-scroll></div>
       <p class="pj-mono pj-note">Cue input: OSC on UDP 9000 or a text line on TCP 9001. Forms: <code>/proj/P4/shutter 1</code>, <code>/proj/all/power 0</code>, <code>/proj/preset/preshow</code>.</p>
     </section>
   </main>
 
-  <div id="adjust" class="pj-modal" hidden>
-    <div class="pj-sheet" role="dialog" aria-modal="true" aria-labelledby="adj-title">
+  <dialog id="adjust" class="pj-modal" aria-labelledby="adj-title" hidden>
+    <div class="pj-sheet">
       <div class="pj-sheet-head">
         <div class="pj-sheet-title"><strong id="adj-title">Adjust</strong><span id="adj-sub" class="pj-mono"></span></div>
         <button id="adj-close" class="avd-btn avd-btn--quiet" type="button">Close</button>
       </div>
       <div class="avd-tabs pj-sheet-tabs" role="tablist" aria-label="Adjust sections">
-        <button class="avd-tab" role="tab" aria-selected="true" data-adjtab="pattern" type="button">Pattern</button>
-        <button class="avd-tab" role="tab" aria-selected="false" data-adjtab="lens" type="button" tabindex="-1">Lens</button>
-        <button class="avd-tab" role="tab" aria-selected="false" data-adjtab="picture" type="button" tabindex="-1">Picture</button>
+        <button class="avd-tab" role="tab" aria-selected="true" id="adj-tab-pattern" aria-controls="adj-panel-pattern" data-adjtab="pattern" type="button">Pattern</button>
+        <button class="avd-tab" role="tab" aria-selected="false" id="adj-tab-lens" aria-controls="adj-panel-lens" data-adjtab="lens" type="button" tabindex="-1">Lens</button>
+        <button class="avd-tab" role="tab" aria-selected="false" id="adj-tab-picture" aria-controls="adj-panel-picture" data-adjtab="picture" type="button" tabindex="-1">Picture</button>
       </div>
-      <div class="pj-sheet-body">
-        <div class="adjtab on" data-adjpanel="pattern">
+      <p id="adj-feedback" class="pj-mono pj-feedback" role="status" aria-live="polite"></p>
+      <div class="pj-sheet-body" role="region" aria-label="Adjustment controls" tabindex="0" data-web2-scroll>
+        <div class="adjtab on" id="adj-panel-pattern" role="tabpanel" aria-labelledby="adj-tab-pattern" data-adjpanel="pattern">
           <div class="pj-rowhead"><span class="avd-eyebrow">Test pattern</span><span class="pj-mono pj-ink" id="adj-pattern-now"></span></div>
           <div id="adj-patterns" class="pj-chips"></div>
         </div>
-        <div class="adjtab" data-adjpanel="lens">
+        <div class="adjtab" id="adj-panel-lens" role="tabpanel" aria-labelledby="adj-tab-lens" data-adjpanel="lens" hidden>
           <div class="pj-rowhead"><span class="avd-eyebrow">Step size</span>
             <div class="avd-seg" id="adj-speed" role="group" aria-label="Lens step size"><button class="avd-seg__btn" data-s="slow" type="button">Slow</button><button class="avd-seg__btn" data-s="normal" aria-pressed="true" type="button">Normal</button><button class="avd-seg__btn" data-s="fast" type="button">Fast</button></div>
           </div>
@@ -95,19 +100,22 @@
             <div><span>Focus</span><button class="avd-btn" data-l="focus" data-d="-" type="button" aria-label="Focus back">Back</button><button class="avd-btn" data-l="focus" data-d="+" type="button" aria-label="Focus forward">Forward</button></div>
             <div><span>Zoom</span><button class="avd-btn" data-l="zoom" data-d="-" type="button" aria-label="Zoom out">Out</button><button class="avd-btn" data-l="zoom" data-d="+" type="button" aria-label="Zoom in">In</button></div>
           </div>
+          <p class="pj-mono" id="adj-motion" role="status" aria-live="polite"></p><p class="pj-mono" id="adj-position"></p>
+          <button id="adj-stop" class="avd-btn avd-btn--block" type="button">Stop lens</button>
           <button id="adj-home" class="avd-btn avd-btn--danger avd-btn--block" type="button">Lens shift home, tap twice</button>
-          <p class="pj-mono pj-note">One step per tap. The projector answers slowly while the lens moves, so wait for the log before the next tap.</p>
+          <p class="pj-mono pj-note">One movement per tap. Controls unlock after the Barco reports stopped. Stop lens remains available during movement and Show Lock.</p>
         </div>
-        <div class="adjtab" data-adjpanel="picture">
+        <div class="adjtab" id="adj-panel-picture" role="tabpanel" aria-labelledby="adj-tab-picture" data-adjpanel="picture" hidden>
           <div class="pj-rowhead"><span class="avd-eyebrow">Picture</span><button id="adj-pic-reload" class="avd-btn avd-btn--quiet avd-btn--sm" type="button">Reload values</button></div>
           <p id="adj-pic-note" class="pj-mono pj-note" aria-live="polite"></p>
           <div id="adj-picture" class="picture"></div>
         </div>
       </div>
     </div>
-  </div>
+  </dialog>
   <div id="toast" role="status" aria-live="polite"></div>
 </div>
+<noscript>Projector controls require JavaScript. Use the projector remote if the relay is unavailable.</noscript>
 <script src="app.js"></script>
 </body>
 </html>

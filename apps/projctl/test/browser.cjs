@@ -1,5 +1,6 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 
 (async () => {
   const { startRelay, until } = await import('./relay-helper.js');
@@ -35,16 +36,53 @@ const assert = require('node:assert/strict');
         await until(async () => !(await page.locator('#adj-picture input').first().isDisabled()));
         await page.keyboard.press('Escape');
 
-        for (const [width, height] of [[1440, 900], [680, 900], [375, 812]]) {
+        for (const [width, height] of [[1440, 900], [680, 900], [375, 812], [844, 390], [320, 256], [3840, 1080]]) {
           await page.setViewportSize({ width, height });
           for (const theme of ['light', 'dark']) {
             await page.evaluate((theme) => { document.documentElement.dataset.theme = theme; }, theme);
             const sizes = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, cw: document.documentElement.clientWidth, ch: document.documentElement.clientHeight }));
             assert.ok(sizes.w <= sizes.cw && sizes.h <= sizes.ch, `viewport overflow ${width} ${theme}`);
-            const box = await bulk.boundingBox(); assert.ok(box.x >= 0 && box.x + box.width <= width && box.y + box.height <= height);
+            assert.equal(await page.locator('.pj-allbar').first().evaluate((el) => el.scrollWidth <= el.clientWidth), true, `bulk controls overflow ${width}`);
+            assert.equal(await page.locator('.pj-tile').first().evaluate((el) => el.scrollHeight <= el.clientHeight + 1), true, `clipped projector tile ${width}`);
+            await bulk.scrollIntoViewIfNeeded(); const box = await bulk.boundingBox(); assert.ok(box.x >= 0 && box.x + box.width <= width && box.y >= 0 && box.y + box.height <= height, `bulk button outside viewport ${width}x${height}: ${JSON.stringify(box)}`);
             await bulk.focus(); assert.ok(await bulk.evaluate((el) => document.activeElement === el));
+            for (const name of ['Presets', 'Log', 'Setup', 'Rig']) {
+              await page.locator(`[data-tab="${name.toLowerCase()}"]`).click();
+              const overflow = await page.evaluate(() => document.documentElement.scrollHeight > innerHeight || document.documentElement.scrollWidth > innerWidth);
+              assert.equal(overflow, false, `${name} overflow at ${width}x${height} ${theme}`);
+            }
+            if (process.env.ARTIFACT_DIR && !offline) {
+              fs.mkdirSync(process.env.ARTIFACT_DIR, { recursive: true });
+              await page.screenshot({ path: `${process.env.ARTIFACT_DIR}/rig-${width}-${height}-${theme}.png` });
+            }
           }
         }
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await page.locator('[data-tab="setup"]').click();
+        const label = page.locator('[data-slot="P2"] [data-k="label"]');
+        await label.fill('Unsaved operator edit');
+        await relay.api('lock', { lock: true });
+        assert.equal(await label.inputValue(), 'Unsaved operator edit');
+        assert.equal(await label.evaluate((el) => document.activeElement === el), true);
+        await relay.api('lock', { lock: false });
+        await page.locator('[data-tab="rig"]').click();
+        const adjust = page.locator('section[aria-label="P2 House Panasonic A"] [data-adj]');
+        await adjust.click();
+        assert.equal(await page.locator('#adjust').evaluate((el) => el.open), true);
+        await page.locator('#adj-close').focus();
+        await page.keyboard.press('Shift+Tab');
+        assert.equal(await page.evaluate(() => document.querySelector('#adjust').contains(document.activeElement)), true);
+        await page.keyboard.press('Escape');
+        assert.equal(await adjust.evaluate((el) => document.activeElement === el), true);
+        // Polling must preserve a focused tile control.
+        await relay.api('command', { slot: 'P2', cmd: 'shutter', arg: 1 });
+        await until(async () => (await relay.state()).projectors[1].status.shutter === 'closed');
+        await page.waitForTimeout(100);
+        assert.equal(await adjust.evaluate((el) => document.activeElement === el), true);
+        await relay.close();
+        await page.locator('#conn-word').filter({ hasText: 'Relay offline' }).waitFor();
+        assert.equal(await bulk.isDisabled(), true);
+        assert.equal(await page.locator('[data-all="shutter"]').first().isDisabled(), true);
         assert.deepEqual(errors, []);
         console.log(`Browser bulk off, picture lock, themes and viewport checks passed (P1 offline: ${offline})`);
       } finally { await page.close(); await relay.close(); }

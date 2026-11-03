@@ -62,8 +62,7 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
 
 - pjlink: complete for power, shutter, input, status, light hours (where the projector answers LAMP).
 - simulator: complete.
-- pulse (Barco): power and shutter use commands confirmed by other operators. Input property name
-  needs confirming in the projector's API console. Status property names are best guesses.
+- pulse (Barco): core state, power, shutter, internal patterns, discovered inputs, bounded lens targets and supported picture ranges use the Pulse API. Optional alarm telemetry remains unknown, rather than implying a clear alarm panel.
 - panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls.
 
 Pulse status requires a successful `system.state` query. Failed core queries count toward the
@@ -84,3 +83,19 @@ now includes `all.confirm` and `all.targets`; individual responses retain their 
 Confirmation tokens are opaque, one-use and bound to the requested scope and connection
 settings. Restart the relay and reload clients together when updating the server/UI.
 Physical projector acceptance remains separate from simulator verification.
+
+## Frozen control desk
+
+Fresh browsers use the light ice theme; the visible theme button retains an operator's choice.
+Small screens place view tabs at the bottom. Adjustment dialogs contain keyboard focus and
+return it to the originating tile on close. Setup edits survive incoming status snapshots,
+and command history can be searched by slot, command or result.
+
+Barco input choices come from `image.source.list`, including the device's exact source names.
+Picture controls come from writable `image` metadata and use its actual ranges and increments.
+Lens taps use bounded encoder targets: Slow 128, Normal 512 and Fast 2048, limited to device
+travel. Slow is the default. The relay waits for stopped feedback, blocks overlapping
+movement, and refreshes position before replying. Stop lens remains available under Show Lock.
+An acknowledged request still needs the expected physical result checked on the actual rig.
+
+The acceptance scope and remaining physical checks are in [Show readiness](docs/show-readiness.md).

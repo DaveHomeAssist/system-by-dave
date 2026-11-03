@@ -1,5 +1,11 @@
 # Changelog
 
+## November 3, 2026: Frozen projector control desk
+
+- Add light ice and dark aurora themes, a snowflake mark, mobile bottom navigation, searchable command history and accessible adjustment dialogs. Preserve focus across status refreshes and unsaved setup fields across snapshots.
+- Discover Barco input names and picture ranges from the connected device. Use bounded lens targets, wait for stopped feedback, expose Stop lens and prevent overlapping movement. Report unavailable alarm telemetry explicitly.
+- Add protocol and browser regressions for discovered controls, movement completion, keyboard focus, disconnected controls and six viewport sizes in both themes. Physical rig acceptance remains separate.
+
 ## November 3, 2026: Projctl bulk commands and relay reliability
 
 - Confirm All Power Off once for the displayed reachable targets, then dispatch to each with per-projector results. Keep individual confirmation, bind tokens to the action and connection settings, and skip newly online/reconfigured targets until reconfirmed.

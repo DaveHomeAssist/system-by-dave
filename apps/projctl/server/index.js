@@ -39,6 +39,8 @@ const rig = store.rig;
 
 const drivers = new Map();   // slot -> driver
 const status = new Map();    // slot -> status
+const polling = new Map();
+const busy = new Map();
 const missed = new Map();    // slot -> consecutive poll failures
 for (const p of rig.projectors) { status.set(p.slot, emptyStatus()); missed.set(p.slot, 0); }
 
@@ -55,13 +57,25 @@ function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients
 function snapshot() {
   return {
     type: 'snapshot', show: rig.show, lock: rig.lock,
-    projectors: rig.projectors.map((p) => ({ ...p, password: undefined, status: status.get(p.slot), patterns: p.ip ? (driverFor(p).patterns || null) : null })),
+    projectors: rig.projectors.map((p) => {
+      const d = driverFor(p);
+      return { ...p, password: undefined, status: status.get(p.slot), busy: busy.get(p.slot) || null,
+        inputs: d.inputs ?? p.inputs, patterns: p.ip ? (d.patterns || null) : null,
+        pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
+        capabilities: { lens: !!d.lens, picture: !!d.getPicture } };
+    }),
     presets: rig.presets, events: rig.events.slice(-200),
   };
 }
 
 // ---- Polling ----
-async function poll(p) {
+function poll(p) {
+  if (polling.has(p.slot)) return polling.get(p.slot);
+  const work = pollOnce(p).finally(() => polling.delete(p.slot));
+  polling.set(p.slot, work);
+  return work;
+}
+async function pollOnce(p) {
   if (!p.ip) { setOffline(p.slot, 'no address'); return; }
   try {
     const s = await driverFor(p).getStatus();
@@ -71,7 +85,8 @@ async function poll(p) {
     status.set(p.slot, next);
     if (JSON.stringify({ ...prev, updatedAt: 0 }) !== JSON.stringify({ ...next, updatedAt: 0 })) {
       if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
-      broadcast({ type: 'status', slot: p.slot, status: next });
+      const d = driverFor(p);
+      broadcast({ type: 'status', slot: p.slot, status: next, inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
     }
   } catch (e) {
     const n = missed.get(p.slot) + 1; missed.set(p.slot, n);
@@ -114,9 +129,13 @@ async function command(slot, cmd, arg, source = 'ui') {
   if (!p) throw httpErr(404, `no projector ${slot}`);
   const st = status.get(slot);
   if (!st.online) throw httpErr(409, `${slot} is offline`);
-  if (rig.lock && (cmd === 'power' && !arg || cmd === 'input' || cmd === 'pattern' || cmd === 'lens' || cmd === 'picture')) throw httpErr(423, 'show lock is on');
+  if (rig.lock && (cmd === 'power' && !arg || cmd === 'input' || cmd === 'pattern' || cmd === 'lens' && arg?.op !== 'stop' || cmd === 'picture')) throw httpErr(423, 'show lock is on');
   if (cmd === 'power' && arg && st.power === POWER.COOLING) throw httpErr(409, `${slot} is cooling, wait before power on`);
+  const stop = cmd === 'lens' && arg?.op === 'stop';
+  if (busy.has(slot) && !stop && cmd !== 'shutter') throw httpErr(409, `${slot}: lens is moving. Wait or use Stop lens.`);
   const d = driverFor(p);
+  const moving = cmd === 'lens' && !stop;
+  if (moving) { busy.set(slot, 'lens'); broadcast({ type: 'busy', slot, busy: 'lens' }); }
   let result, detail;
   try {
     if (cmd === 'power') result = await d.power(!!arg);
@@ -127,10 +146,12 @@ async function command(slot, cmd, arg, source = 'ui') {
     else if (cmd === 'picture') { if (!d.picture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`); result = await d.picture(arg.key, arg.value); }
     else throw httpErr(400, `unknown command ${cmd}`);
   } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw httpErr(502, e.message); }
+  finally { if (moving) { busy.delete(slot); broadcast({ type: 'busy', slot, busy: null }); } }
   store.event({ source, slot, command: `${cmd} ${fmtArg(arg)}`, result, detail });
   broadcast({ type: 'event', event: rig.events.at(-1) });
-  setTimeout(() => poll(p), 400);
-  return { result };
+  if (cmd === 'lens' || cmd === 'input' || cmd === 'picture') { await polling.get(slot); await poll(p); }
+  else setTimeout(() => poll(p), 400);
+  return { result, status: status.get(slot) };
 }
 
 async function uiCommand(slot, cmd, arg, confirm) {
