@@ -88,11 +88,20 @@ export function createStageView(root, openControls, canAdjust) {
       loadBuilding(); return;
     }
     $('#stage-foot').textContent = view === '3d'
-      ? 'Plot reference · diagram scale · mounting heights illustrative'
+      ? plot.measurements
+        ? Object.values(plot.measurements.projectors).some(p => p.y === null)
+          ? 'Metres · heights unknown: projectors shown in plan · enclosure offsets schematic'
+          : 'Metres · dimensioned plot reference · enclosure offsets schematic'
+        : 'Plot reference · diagram scale · mounting heights illustrative'
       : 'Plot reference · coverage is not live beam position';
     if (view === '3d') {
       $('#stage-caption').textContent = 'Throwline 3D';
-      for (const lane of Object.keys(LANES)) cards.get(lane).querySelector('.pj-stage-note').textContent = plot.views.plan.lanes[lane].note;
+      for (const lane of Object.keys(LANES)) {
+        const p = plot.measurements?.projectors[lane];
+        cards.get(lane).querySelector('.pj-stage-note').textContent = p
+          ? `${plot.views.plan.lanes[lane].note}. Body W/H/D: ${p.body.map(v => Math.round(v * 1000)).join(' / ')} mm. Lens height: ${p.y === null ? 'not measured' : p.y.toFixed(3) + ' m'}.`
+          : plot.views.plan.lanes[lane].note;
+      }
       load3D(); return;
     }
     canvas.replaceChildren(); markers.clear();

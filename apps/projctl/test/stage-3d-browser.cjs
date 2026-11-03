@@ -16,6 +16,12 @@ exports.check3D = async (page, relay, offline, until) => {
   await page.locator('#stage-3d[data-state="ready"]').waitFor();
   const canvas = page.locator('three-d-stage canvas');
   assert.ok(await page.evaluate(() => window.stageDraws > 0), '3D must actually draw');
+  if (!offline) {
+    assert.match(await page.locator('#stage-foot').innerText(), /Metres.*heights unknown/);
+    assert.match(await page.locator('.pj-stage-card[data-lane="A"]').innerText(), /500 \/ 200 \/ 600 mm/);
+    assert.equal(await page.locator('three-d-stage').evaluate(stage => stage._object.getObjectByName('A enclosure').geometry.parameters.width), .2);
+    assert.equal(await page.locator('three-d-stage').evaluate(stage => stage._object.getObjectByName('B enclosure').geometry.parameters.width), .5);
+  }
   const writes = [];
   const onRequest = req => { if (req.method() === 'POST' && req.url().includes('/api/command')) writes.push(req.postDataJSON()); };
   page.on('request', onRequest);

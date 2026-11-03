@@ -7,12 +7,12 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
 
 (async () => {
   const { startRelay, until } = await import('./relay-helper.js');
-  const { stageFixture } = await import('./stage-fixture.js');
+  const { stageFixture, measuredStageFixture } = await import('./stage-fixture.js');
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox', '--enable-unsafe-swiftshader'] });
   try {
     for (const offline of [false, true]) {
       const relay = await startRelay();
-      fs.writeFileSync(path.join(path.dirname(relay.rigFile), 'stage-plot.json'), JSON.stringify(stageFixture()));
+      fs.writeFileSync(path.join(path.dirname(relay.rigFile), 'stage-plot.json'), JSON.stringify(offline ? stageFixture() : measuredStageFixture()));
       const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
       await instrument3D(page);
       const errors = []; page.on('pageerror', (e) => errors.push(e.message));

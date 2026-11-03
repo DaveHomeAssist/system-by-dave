@@ -152,10 +152,15 @@ Stage opens in an embedded Throwline 3D reference with orbit, zoom, audience and
 overhead cameras. Click a projector model or its letter to open its current
 controls; dragging only moves the camera. Native lane cards remain available for
 keyboard and touch operation. Front and Plan retain the original drawing views.
-The 3D adapter aligns the two drawings at lane C's reference width in diagram
-units, not calibrated meters. Mounting heights are illustrative, and scenery
-depth is not inferred. No catalog calculation, Throwline job import or model
-export is performed. WebGL failure leaves Front, Plan and the controls usable.
+The 3D adapter accepts optional metric measurements in the private plot. These
+set drawing scale, exact supplied lens offsets, mounting heights and manufacturer
+enclosure sizes. Portrait bodies rotate their dimensions; labels remain separate
+click targets. Unknown heights remain unknown and open in Top view with plan
+rays, rather than fabricated 3D cones. The unregistered scenic elevation stays
+in Front, and no mounting rail is invented. See [Measured stage reference](docs/measured-stage.md)
+for the data and evidence boundary. Legacy drawings keep diagram scale.
+No catalog calculation, Throwline job import or model export is performed.
+WebGL failure leaves Front, Plan and the controls usable.
 
 Front and Plan use the drawing's own coordinates and orientation. Coverage
 buttons toggle reference layers only. Projector buttons and the adjacent cards
