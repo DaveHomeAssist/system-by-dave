@@ -1,5 +1,10 @@
 # Changelog
 
+## November 3, 2026: Video Engineering Daily
+
+- Add Edition 027, Quad link image mapping, with an AJA sourced lesson,
+  SQD quadrant diagram and matching story card. Preserve previous editions.
+
 ## November 3, 2026: Private building models in Projctl
 
 - Add a metric Building view beside the existing drawing views, with optional

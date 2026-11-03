@@ -348,6 +348,25 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
 {
+  "id": 27,
+  "date": "2026-11-03",
+  "track": "SDI, HDMI, DisplayPort, and signal transport",
+  "trackShort": "Transport",
+  "title": "Quad link image mapping",
+  "fact": "Four SDI cables do not uniquely identify a UHD image mapping. Square Division (SQD) divides the picture into four spatial quadrants; Two Sample Interleave (2SI) distributes samples across subimages instead. AJA's FS4 documents both mappings. Support and automatic detection depend on the device and operating mode.",
+  "why": "A quad-link source and receiver can agree on raster and frame rate yet still reconstruct the picture incorrectly when their mappings differ.",
+  "takeaway": "Record SQD or 2SI alongside resolution, exact rate and link order. Check both endpoints' mapping settings before troubleshooting the four cable paths individually.",
+  "sourceLabel": "AJA FS4 manual v1.1, Output Image Mapping",
+  "sourceUrl": "https://www.aja.com/support/item-download/3738/AJA_manual_FS4_v1.1.pdf",
+  "basis": "Distinct SMPTE image mappings; FS4 support is manufacturer and mode specific",
+  "current": true,
+  "illustration": {
+    "viewBox": "0 0 240 400",
+    "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">27</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">SQD LINK ORDER</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"230\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Spatial quadrants</text><rect x=\"32\" y=\"100\" width=\"176\" height=\"144\" class=\"node\"/><path d=\"M120 100V244M32 172H208\" class=\"wire\"/><text x=\"76\" y=\"142\" text-anchor=\"middle\">SDI 1</text><text x=\"164\" y=\"142\" text-anchor=\"middle\">SDI 2</text><text x=\"76\" y=\"214\" text-anchor=\"middle\">SDI 3</text><text x=\"164\" y=\"214\" text-anchor=\"middle\">SDI 4</text><text x=\"120\" y=\"268\" text-anchor=\"middle\">One quadrant per link</text><rect x=\"12\" y=\"298\" width=\"216\" height=\"75\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"322\" class=\"note\">2 / Receiver check</text><text x=\"24\" y=\"350\">SQD mapping + order</text><text x=\"120\" y=\"395\" text-anchor=\"middle\">2SI is a different map</text>",
+    "caption": "SQD assigns four spatial quadrants to four SDI links. This is a conceptual picture map, not physical wiring. A receiver set for 2SI expects a different sample arrangement."
+  }
+},
+{
   "id": 26,
   "date": "2026-11-02",
   "track": "Signal troubleshooting and system design",
@@ -359,7 +378,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
   "sourceLabel": "Extron HD Pro Plenum Series specifications",
   "sourceUrl": "https://www.extron.com/product/hdproplenum",
   "basis": "Manufacturer-specific unidirectional active hybrid cable behavior; conceptual main video path only",
-  "current": true,
+  "current": false,
   "illustration": {
     "viewBox": "0 0 240 400",
     "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">26</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">CABLE DIRECTION</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"135\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Correct orientation</text><text x=\"24\" y=\"110\">Source</text><text x=\"157\" y=\"110\">Display</text><path d=\"M30 137H207m-8-7l8 7l-8 7\" class=\"wire\"/><text x=\"24\" y=\"171\" class=\"good-label\">Designated video path</text><rect x=\"12\" y=\"205\" width=\"216\" height=\"135\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"231\" class=\"note\">2 / Reversed cable</text><text x=\"24\" y=\"263\">Source</text><text x=\"157\" y=\"263\">Display</text><path d=\"M207 290H30m8-7l-8 7l8 7M110 279l22 22m0-22l-22 22\" class=\"reference\"/><text x=\"24\" y=\"325\" class=\"note\">Unsupported direction</text><text x=\"120\" y=\"369\" text-anchor=\"middle\">HD Pro Plenum example</text><text x=\"120\" y=\"393\" text-anchor=\"middle\">Check before cable pull</text>",

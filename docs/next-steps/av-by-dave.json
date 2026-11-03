@@ -1,15 +1,15 @@
 {
   "id": "house-reference",
   "engineeringDailyPublication": {
-    "date": "2026-11-02",
-    "edition": 26,
-    "title": "Active HDMI cable direction",
+    "date": "2026-11-03",
+    "edition": 27,
+    "title": "Quad link image mapping",
     "state": "Verified publication input; exact CI, merge and deployment evidence belongs to the provider records for this revision",
-    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=26&month=2026-11",
+    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=27&month=2026-11",
     "evidence": "demos/engineering-daily/release.json",
-    "verification": "Dominic: 52 archive and52 story views; calendar10, dashboard10, navigation3, Signal lab60 passed. All26 card pairs rendered, new card visually inspected. Candidate, CI, deployment and live gates required before publication completion.",
+    "verification": "Dominic: full27 edition illustration and story verification required; normal candidate, CI, deployment and live gates apply.",
     "next": "Require exact-head CI, Pages deployment and matching live manifest/assets/browser journeys before publication completion; continue the same gates for future daily releases.",
-    "boundaries": "Prior25 records and50 assets preserved, apart from clearing previous current marker. No backfills or renumbering. Human acceptance separate."
+    "boundaries": "Prior26 records and52 assets preserved; no backfills or renumbering; human acceptance separate."
   },
   "engineeringDailyUx": {
     "date": "2026-10-28",
