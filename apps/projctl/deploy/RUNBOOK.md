@@ -16,8 +16,8 @@ can reach it from anywhere through Tailscale. Prepared by Dave Robertson (AV by 
 ## Daily
 
 1. Open the Rig tab. Every tile should show Powered or Standby with a circle beside the word. Offline means the relay cannot reach that projector: check its network cable and that it has an address.
-2. Preshow: recall the preshow preset (tap Recall twice). Then turn on Show lock in the header. Lock blocks power off, input changes, test patterns and lens moves from every phone.
-3. Postshow: turn Show lock off, then All projectors, Power off (tap twice). Wait for Cooling to become Standby before cutting power at the rail.
+2. Preshow: recall the preshow preset (tap Recall twice). Then turn on Show lock in the header. Lock blocks power off, input changes, test patterns, lens moves and picture changes from every phone.
+3. Postshow: turn Show lock off, then All projectors, Power off. Check the listed targets and tap again within three seconds. Each confirmed target receives the command even if another slot is offline. Read the per-projector result, then wait for Cooling to become Standby before cutting power at the rail. A newly online or reconfigured slot needs a fresh confirmation.
 
 ## If something is wrong
 
@@ -26,7 +26,7 @@ can reach it from anywhere through Tailscale. Prepared by Dave Robertson (AV by 
 | Tile says Offline, projector is on | Setup tab, press Find projectors. The relay rediscovers by MAC every minute on its own. |
 | "auth failed" in the Log | The projector's PJLink or admin password changed. Setup tab, enter it, Save. |
 | Shutter button does nothing | Wait 5 s; the projector answers slowly while the shutter moves. Then check the Log tab. |
-| Picture sliders greyed | The input has no signal. They come back when playback is up. |
+| Picture sliders greyed | Check Show Lock and the input signal. Unlocking restores available settings; missing-signal values remain disabled. |
 | Page asks for a passcode again | The relay restarted. Sign in again. |
 | Nothing loads at all | On the relay box: macOS `launchctl kickstart -k gui/$(id -u)/com.avbydave.projctl`; Linux `sudo systemctl restart projctl`. |
 

@@ -11,6 +11,7 @@ import { PATTERNS, pictureSchema } from './drivers/panasonic.js';
 import { pjlinkSearch } from './drivers/pjlink.js';
 import { emptyStatus, POWER } from './drivers/base.js';
 import { startOsc, startTcpLines } from './osc.js';
+import { confirmations } from './confirmations.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -104,27 +105,16 @@ async function discover(source = 'ui') {
 setInterval(() => discover('auto').catch(() => {}), 60000);
 
 // ---- Commands ----
-const pendingConfirm = new Map(); // key -> expiry
-// token 'preset' skips the double tap: preset and cue paths are deliberate acts already.
-function needsConfirm(key, token) {
-  const now = Date.now();
-  if (token === 'preset') return null;
-  if (token && pendingConfirm.get(token) > now) { pendingConfirm.delete(token); return null; }
-  const t = `${key}:${now}`; pendingConfirm.set(t, now + 3000);
-  return t;
-}
+const pendingConfirm = confirmations();
+const targetIdentity = (p) => JSON.stringify([p.slot, p.driver, p.ip, p.user, p.password, p.model]);
 
 function fmtArg(a) { return a && typeof a === 'object' ? Object.values(a).join(' ') : String(a); }
-async function command(slot, cmd, arg, source = 'ui', confirmToken) {
+async function command(slot, cmd, arg, source = 'ui') {
   const p = store.projector(slot);
   if (!p) throw httpErr(404, `no projector ${slot}`);
   const st = status.get(slot);
   if (!st.online) throw httpErr(409, `${slot} is offline`);
-  if (rig.lock && (cmd === 'power' && !arg || cmd === 'input' || cmd === 'pattern' || cmd === 'lens')) throw httpErr(423, 'show lock is on');
-  if (cmd === 'power' && !arg && source === 'ui' && confirmToken !== 'preset') {
-    const t = needsConfirm(`${slot}:off`, confirmToken);
-    if (t) return { confirm: t, message: `Tap again within 3 s to power off ${slot}` };
-  }
+  if (rig.lock && (cmd === 'power' && !arg || cmd === 'input' || cmd === 'pattern' || cmd === 'lens' || cmd === 'picture')) throw httpErr(423, 'show lock is on');
   if (cmd === 'power' && arg && st.power === POWER.COOLING) throw httpErr(409, `${slot} is cooling, wait before power on`);
   const d = driverFor(p);
   let result, detail;
@@ -143,6 +133,44 @@ async function command(slot, cmd, arg, source = 'ui', confirmToken) {
   return { result };
 }
 
+async function uiCommand(slot, cmd, arg, confirm) {
+  if ((cmd === 'power' || cmd === 'shutter') && ![0, 1, false, true].includes(arg)) throw httpErr(400, `${cmd} needs 0 or 1`);
+  const slots = slot === 'all' ? rig.projectors.map((p) => p.slot) : [slot];
+  const out = {};
+  let targets = slots.map((s) => ({ slot: s }));
+  if (cmd === 'power' && !arg) {
+    if (rig.lock) throw httpErr(423, 'show lock is on');
+    const key = `${slot}:power:off`;
+    const confirmed = pendingConfirm.take(key, confirm);
+    if (!confirmed) {
+      targets = [];
+      for (const s of slots) {
+        const p = store.projector(s);
+        if (!p || !status.get(s)?.online) { out[s] = { error: p ? `${s} is offline` : `no projector ${s}` }; continue; }
+        targets.push({ slot: s, identity: targetIdentity(p) });
+      }
+      if (targets.length) out[slot] = {
+        confirm: pendingConfirm.issue(key, targets),
+        targets: targets.map((t) => t.slot),
+        message: `Tap again within 3 s to power off ${targets.map((t) => t.slot).join(', ')}`,
+      };
+      return out;
+    }
+    targets = confirmed;
+    for (const s of slots) if (!targets.some((t) => t.slot === s)) out[s] = { error: 'not in confirmed target list; skipped' };
+  }
+  // Consume the batch confirmation before any network wait. A slow target must not
+  // expire confirmations for later devices, and a failed target must not stop them.
+  for (const target of targets) {
+    try {
+      const p = store.projector(target.slot);
+      if (target.identity && (!p || targetIdentity(p) !== target.identity)) throw httpErr(409, 'configuration changed; confirm again');
+      out[target.slot] = await command(target.slot, cmd, arg);
+    } catch (e) { out[target.slot] = { error: e.message }; }
+  }
+  return out;
+}
+
 async function recallPreset(name, source = 'ui') {
   const pr = rig.presets.find((x) => x.name === name);
   if (!pr) throw httpErr(404, `no preset ${name}`);
@@ -150,7 +178,7 @@ async function recallPreset(name, source = 'ui') {
   for (const [slot, want] of Object.entries(pr.perSlot)) {
     const st = status.get(slot); if (!st?.online) { out[slot] = 'offline'; continue; }
     try {
-      if (want.power !== undefined) await command(slot, 'power', want.power, `${source} preset ${name}`, 'preset');
+      if (want.power !== undefined) await command(slot, 'power', want.power, `${source} preset ${name}`);
       if (want.input) await command(slot, 'input', want.input, `${source} preset ${name}`);
       if (want.shutter !== undefined) await command(slot, 'shutter', want.shutter === 'closed', `${source} preset ${name}`);
       out[slot] = 'OK';
@@ -177,11 +205,22 @@ async function onCue(addr, args, source) {
   const parts = addr.split('/').filter(Boolean);
   if (parts[0] !== 'proj') return;
   try {
-    if (parts[1] === 'preset') { await recallPreset(parts.slice(2).join('/'), source); return; }
+    if (parts[1] === 'preset') return await recallPreset(parts.slice(2).join('/'), source);
+    if (!parts[1] || !['power', 'shutter', 'input'].includes(parts[2]) || args.length !== 1) throw new Error('cue needs slot, power/shutter/input and one argument');
     const slots = parts[1] === 'all' ? rig.projectors.map((p) => p.slot) : [parts[1].toUpperCase()];
     const cmd = parts[2]; const arg = args[0];
-    for (const s of slots) await command(s, cmd, cmd === 'input' ? arg : Number(arg) === 1, source, 'preset');
-  } catch (e) { store.event({ source, slot: parts[1], command: addr, result: 'ERR', detail: e.message }); broadcast({ type: 'event', event: rig.events.at(-1) }); }
+    if (cmd !== 'input' && ![0, 1, '0', '1'].includes(arg)) throw new Error(`${cmd} needs 0 or 1`);
+    const out = {};
+    for (const s of slots) {
+      try { out[s] = await command(s, cmd, cmd === 'input' ? arg : Number(arg) === 1, source); }
+      catch (e) {
+        out[s] = { error: e.message };
+        store.event({ source, slot: s, command: addr, result: 'ERR', detail: e.message });
+        broadcast({ type: 'event', event: rig.events.at(-1) });
+      }
+    }
+    return out;
+  } catch (e) { store.event({ source, slot: parts[1], command: addr, result: 'ERR', detail: e.message }); broadcast({ type: 'event', event: rig.events.at(-1) }); return { error: e.message }; }
 }
 startOsc({ port: OSC_PORT, onMessage: onCue });
 startTcpLines({ port: TCP_PORT, onMessage: onCue });
@@ -224,15 +263,12 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/command' && req.method === 'POST') {
       const { slot, cmd, arg, confirm } = await body(req);
-      const slots = slot === 'all' ? rig.projectors.map((p) => p.slot) : [slot];
-      const out = {};
-      for (const s of slots) { try { out[s] = await command(s, cmd, arg, 'ui', confirm); } catch (e) { out[s] = { error: e.message }; } }
-      return json(res, 200, out);
+      return json(res, 200, await uiCommand(slot, cmd, arg, confirm));
     }
     if (url.pathname === '/api/preset/save' && req.method === 'POST') { const { name } = await body(req); if (!name) throw httpErr(400, 'name required'); savePreset(name); return json(res, 200, { ok: true }); }
     if (url.pathname === '/api/preset/recall' && req.method === 'POST') { const { name } = await body(req); return json(res, 200, await recallPreset(name)); }
     if (url.pathname === '/api/preset/delete' && req.method === 'POST') { const { name } = await body(req); rig.presets = rig.presets.filter((x) => x.name !== name); store.save(); broadcast(snapshot()); return json(res, 200, { ok: true }); }
-    if (url.pathname === '/api/lock' && req.method === 'POST') { const { lock } = await body(req); rig.lock = !!lock; store.save(); store.event({ source: 'ui', slot: '*', command: `lock ${rig.lock ? 'on' : 'off'}`, result: 'OK' }); broadcast(snapshot()); return json(res, 200, { lock: rig.lock }); }
+    if (url.pathname === '/api/lock' && req.method === 'POST') { const { lock } = await body(req); rig.lock = !!lock; pendingConfirm.clear(); store.save(); store.event({ source: 'ui', slot: '*', command: `lock ${rig.lock ? 'on' : 'off'}`, result: 'OK' }); broadcast(snapshot()); return json(res, 200, { lock: rig.lock }); }
     if (url.pathname === '/api/projector' && req.method === 'POST') {
       const upd = await body(req); const p = store.projector(upd.slot); if (!p) throw httpErr(404, 'no slot');
       for (const k of ['label', 'make', 'model', 'owner', 'driver', 'mac', 'ip', 'notes', 'user', 'password', 'inputs']) if (k in upd) p[k] = upd[k];
@@ -255,4 +291,4 @@ const wss = new WebSocketServer({ noServer: true });
 server.on('upgrade', (req, sock, head) => { if (new URL(req.url, 'http://x').pathname !== '/ws' || !authed(req)) { sock.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); return sock.destroy(); } wss.handleUpgrade(req, sock, head, (ws) => wss.emit('connection', ws, req)); });
 wss.on('connection', (ws) => { clients.add(ws); ws.send(JSON.stringify(snapshot())); ws.on('close', () => clients.delete(ws)); });
 
-server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${PORT}  rig=${DATA}  login=${PASSCODE ? 'passcode' : 'open (LAN only)'}`));
+server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${server.address().port}  rig=${DATA}  login=${PASSCODE ? 'passcode' : 'open (LAN only)'}`));

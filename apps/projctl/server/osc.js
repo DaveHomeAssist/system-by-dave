@@ -4,31 +4,42 @@ import dgram from 'node:dgram';
 import net from 'node:net';
 
 function readPadded(buf, off) {
-  const end = buf.indexOf(0, off); const s = buf.toString('utf8', off, end);
-  return [s, (end + 4) & ~3];
+  if (off >= buf.length) throw new Error('missing OSC string');
+  const end = buf.indexOf(0, off);
+  const next = (end + 4) & ~3;
+  if (end < off || next > buf.length || buf.subarray(end, next).some((b) => b !== 0)) throw new Error('invalid OSC string padding');
+  return [buf.toString('utf8', off, end), next];
 }
 export function parseOsc(buf) {
-  if (buf.toString('latin1', 0, 7) === '#bundle') return []; // bundles not needed here
-  let [addr, off] = readPadded(buf, 0);
-  if (!addr.startsWith('/')) return [];
-  let args = [];
-  if (buf[off] === 0x2c) { // ','
-    let tags; [tags, off] = readPadded(buf, off);
-    for (const t of tags.slice(1)) {
-      if (t === 'i') { args.push(buf.readInt32BE(off)); off += 4; }
-      else if (t === 'f') { args.push(buf.readFloatBE(off)); off += 4; }
-      else if (t === 's') { let s; [s, off] = readPadded(buf, off); args.push(s); }
-      else if (t === 'T') args.push(1); else if (t === 'F') args.push(0);
+  try {
+    if (!buf.length || buf.length % 4) return [];
+    if (buf.toString('latin1', 0, 7) === '#bundle') return []; // bundles not needed here
+    let [addr, off] = readPadded(buf, 0);
+    if (!addr.startsWith('/')) return [];
+    let args = [];
+    if (buf[off] === 0x2c) { // ','
+      let tags; [tags, off] = readPadded(buf, off);
+      for (const t of tags.slice(1)) {
+        if ((t === 'i' || t === 'f') && off + 4 > buf.length) return [];
+        if (t === 'i') { args.push(buf.readInt32BE(off)); off += 4; }
+        else if (t === 'f') { args.push(buf.readFloatBE(off)); off += 4; }
+        else if (t === 's') { let s; [s, off] = readPadded(buf, off); args.push(s); }
+        else if (t === 'T') args.push(1); else if (t === 'F') args.push(0);
+        else return []; // Do not misalign later arguments by skipping unknown types.
+      }
     }
-  }
-  return [{ addr, args }];
+    if (off !== buf.length || args.some((a) => typeof a === 'number' && !Number.isFinite(a))) return [];
+    return [{ addr, args }];
+  } catch { return []; } // A malformed datagram must not terminate the relay.
 }
 
 export function startOsc({ port, onMessage }) {
   const sock = dgram.createSocket('udp4');
-  sock.on('message', (msg, rinfo) => { for (const m of parseOsc(msg)) onMessage(m.addr, m.args, `osc ${rinfo.address}`); });
+  sock.on('message', (msg, rinfo) => {
+    for (const m of parseOsc(msg)) Promise.resolve().then(() => onMessage(m.addr, m.args, `osc ${rinfo.address}`)).catch((e) => console.error('[osc]', e.message));
+  });
   sock.on('error', (e) => console.error('[osc]', e.message));
-  sock.bind(port, () => console.log(`[osc] listening udp ${port}`));
+  sock.bind(port, () => console.log(`[osc] listening udp ${sock.address().port}`));
   return sock;
 }
 
@@ -47,6 +58,6 @@ export function startTcpLines({ port, onMessage }) {
     });
     sock.on('error', () => {});
   });
-  srv.listen(port, () => console.log(`[tcp] listening ${port}`));
+  srv.listen(port, () => console.log(`[tcp] listening ${srv.address().port}`));
   return srv;
 }
