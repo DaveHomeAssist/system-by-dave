@@ -1,5 +1,15 @@
 # Changelog
 
+## November 3, 2026: Dimensioned projector references
+
+- Add optional metric plot metadata for lens offsets, enclosure dimensions and
+  supplied mounting heights. Preserve unknown heights in a labeled plan view.
+- Remove the invented balcony rail and duplicate scenic elevation from the 3D
+  adapter. Keep colored coverage, correctly sized portrait bodies and clickable
+  lane controls, with explicit limits on physical clearance claims.
+- Verify metric and legacy plots, renderer interaction, mobile layouts, existing
+  relay controls and the separate private Building view.
+
 ## November 3, 2026: Video Engineering Daily
 
 - Add Edition 027, Quad link image mapping, with an AJA sourced lesson,

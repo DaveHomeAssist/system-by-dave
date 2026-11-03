@@ -13,3 +13,17 @@ export function stageFixture() {
     plan: { caption: 'Plan view', outline: [[[25, 480], [975, 480]]], labels: [], lanes: planLanes },
   } };
 }
+
+export function measuredStageFixture() {
+  const plot = stageFixture();
+  plot.measurements = {
+    version: 1, units: 'metres', source: 'Synthetic metric fixture',
+    referenceWidth: 8, referenceHeight: 5,
+    projectors: Object.fromEntries(['A', 'B', 'C', 'D'].map((lane, i) => [lane, {
+      model: 'Synthetic enclosure', x: [-2, -1, .5, 2][i], y: null, z: null,
+      body: [.5, .2, .6], portrait: lane === 'A' || lane === 'D', yaw: lane === 'C' ? 90 : null,
+      dimensionsSource: 'Synthetic manufacturer envelope', positionSource: 'Synthetic plot offsets',
+    }])),
+  };
+  return plot;
+}
