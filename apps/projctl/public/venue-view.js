@@ -34,7 +34,8 @@ export async function createVenueView(host, venue) {
   const cutawayNodes = [];
   try {
     const room = await load('room');
-    room.traverse(o => { if (venue.cutaway.includes(o.name)) { cutawayNodes.push(o); o.visible = false; } });
+    // GLTFLoader sanitizes/uniquifies runtime names; manifests use source names.
+    room.traverse(o => { if (venue.cutaway.includes(o.userData.name ?? o.name)) { cutawayNodes.push(o); o.visible = false; } });
     stage.setObject(model);
   }
   catch (error) { disposed = true; abort.abort(); dispose(model); stage.destroy(); stage.remove(); throw error; }

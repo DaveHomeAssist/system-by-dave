@@ -5,7 +5,7 @@ import path from 'node:path';
 export function fixtureGLB(uri) {
   const floats = new Float32Array([-2, 0, -2, 2, 0, -2, 0, 3, 0]);
   const binary = Buffer.from(floats.buffer);
-  const gltf = { asset: { version: '2.0' }, scene: 0, scenes: [{ nodes: [0, 1] }], nodes: [{ mesh: 0 }, { mesh: 0, name: 'Roof', translation: [0, 3, 0] }],
+  const gltf = { asset: { version: '2.0' }, scene: 0, scenes: [{ nodes: [0, 1] }], nodes: [{ mesh: 0 }, { mesh: 0, name: 'Roof.001', translation: [0, 3, 0] }],
     meshes: [{ primitives: [{ attributes: { POSITION: 0 }, material: 0 }] }],
     materials: [{ doubleSided: true, pbrMetallicRoughness: { baseColorFactor: [.4, .7, .8, 1], metallicFactor: 0 } }],
     buffers: [{ byteLength: binary.length, ...(uri ? { uri } : {}) }], bufferViews: [{ buffer: 0, byteLength: binary.length }],
@@ -19,7 +19,7 @@ export function fixtureGLB(uri) {
 }
 export async function writeVenueFixture(root, glb = fixtureGLB()) {
   await mkdir(root, { recursive: true });
-  const manifest = { version: 1, title: 'Synthetic venue', modelVersion: 'test', notes: 'Synthetic geometry; no real venue measurements.', units: 'metres', up: 'Y', upstage: '-Z', cutaway: ['Roof'], assets: {} };
+  const manifest = { version: 1, title: 'Synthetic venue', modelVersion: 'test', notes: 'Synthetic geometry; no real venue measurements.', units: 'metres', up: 'Y', upstage: '-Z', cutaway: ['Roof.001'], assets: {} };
   for (const role of ['room', 'plot', 'scan']) {
     await writeFile(path.join(root, `${role}.glb`), glb);
     manifest.assets[role] = { bytes: glb.length, sha256: createHash('sha256').update(glb).digest('hex') };
