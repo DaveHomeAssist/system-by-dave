@@ -38,7 +38,7 @@ export async function startRelay() {
     };
     const state = async () => (await api('state')).body;
     await until(async () => (await state()).projectors.every((p) => p.status.online));
-    return { base, api, state, close, child, udp: Number(log.match(/udp (\d+)/)[1]), tcp: Number(log.match(/\[tcp\] listening (\d+)/)[1]) };
+    return { base, api, state, close, child, rigFile: path.join(dir, 'rig.json'), udp: Number(log.match(/udp (\d+)/)[1]), tcp: Number(log.match(/\[tcp\] listening (\d+)/)[1]) };
   } catch (e) { await close(); throw e; }
 }
 

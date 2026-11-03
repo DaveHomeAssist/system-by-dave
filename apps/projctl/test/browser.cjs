@@ -25,8 +25,22 @@ const fs = require('node:fs');
         await page.locator('#toast').filter({ hasText: 'P4: command accepted' }).waitFor();
         if (offline) assert.match(await page.locator('#toast').innerText(), /P1:.*skipped/);
 
+        // Drawing order must never change the command target.
+        for (const [slot, lane] of Object.entries({ P1: 'C', P2: 'A', P3: 'D', P4: 'B' })) {
+          await relay.api('projector', { slot, lane });
+        }
+        await until(async () => (await page.locator('.pj-tile').first().getAttribute('data-slot')) === 'P2');
+        assert.deepEqual(await page.locator('.pj-tile').evaluateAll((els) => els.map((el) => el.dataset.slot)), ['P2', 'P4', 'P1', 'P3']);
+        await relay.api('command', { slot: 'all', cmd: 'shutter', arg: 0 });
+        await until(async () => (await relay.state()).projectors.filter((p) => ['P2', 'P4'].includes(p.slot)).every((p) => p.status.shutter === 'open'));
+        await page.locator('.pj-tile[data-lane="A"] [data-c="shutter"][data-a="1"]').click();
+        await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P2').status.shutter === 'closed');
+        assert.equal((await relay.state()).projectors.find((p) => p.slot === 'P4').status.shutter, 'open');
+        await page.reload();
+        await page.locator('.pj-tile[data-lane="A"] h3').filter({ hasText: 'SL Portal' }).waitFor();
+
         // Picture controls already open must follow subsequent lock broadcasts.
-        await page.locator('section[aria-label="P2 House Panasonic A"] [data-adj]').click();
+        await page.locator('.pj-tile[data-slot="P2"] [data-adj]').click();
         await page.getByRole('tab', { name: 'Picture', exact: true }).click();
         await page.locator('#adj-picture input').first().waitFor();
         await relay.api('lock', { lock: true });
@@ -66,9 +80,10 @@ const fs = require('node:fs');
         assert.equal(await label.evaluate((el) => document.activeElement === el), true);
         await relay.api('lock', { lock: false });
         await page.locator('[data-tab="rig"]').click();
-        const adjust = page.locator('section[aria-label="P2 House Panasonic A"] [data-adj]');
+        const adjust = page.locator('.pj-tile[data-slot="P2"] [data-adj]');
         await adjust.click();
         assert.equal(await page.locator('#adjust').evaluate((el) => el.open), true);
+        assert.equal(await page.locator('#adj-title').innerText(), 'Projector A · SL Portal');
         await page.locator('#adj-close').focus();
         await page.keyboard.press('Shift+Tab');
         assert.equal(await page.evaluate(() => document.querySelector('#adjust').contains(document.activeElement)), true);

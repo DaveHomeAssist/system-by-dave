@@ -31,3 +31,23 @@ Use an ice-blue light theme and deep navy dark theme. A static aurora accent and
 snowflake mark identify the show without animation behind controls. Shutter, lock,
 connection and per-device results retain words and operational colors. Mobile tabs
 move to a bottom rail, with long rig, Setup, log and adjustment panels scrolling locally.
+
+## Projection lane identity
+
+Operator cards should match drawing letters and target surfaces: A / SL Portal
+(magenta, portrait), B / Top Portal (cyan, landscape), C / Stage (amber,
+landscape), D / SR Portal (green, portrait). Color supports the written letter
+and destination; operational status retains its existing meaning.
+
+Add optional `lane` metadata, editable in Setup and retained in rig saves.
+Sort the display by drawing letter without changing slot IDs, cue addresses,
+network settings, presets or model identity. Existing rigs without lane metadata
+retain their labels. Invalid or duplicate assignments must fail before any edit.
+The adjustment dialog, presets and log should carry the same lane identity.
+No equipment specifications or lens parameters are inferred from the drawing.
+
+Acceptance: saved lane assignments survive reload; legacy rigs still load;
+reordering cards does not redirect a command; each letter has readable contrast
+in both themes and the established viewport checks pass. The home simulator may
+illustrate all four lanes, but physical house-projector mapping requires operator
+confirmation before applying it to the venue rig.

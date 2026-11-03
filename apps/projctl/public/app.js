@@ -1,3 +1,4 @@
+import { LANES, laneOf, projectorName, orderedProjectors } from './lanes.js';
 const $ = (s, r = document) => r.querySelector(s);
 let state = { projectors: [], presets: [], events: [], lock: false };
 const confirmTokens = {}; // command key -> one-use token
@@ -84,7 +85,8 @@ const seg = (label, opts, cur, attrs) => `<div class="avd-seg avd-seg--fill" rol
 
 function renderGrid() {
   const g = $('#grid'); const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop; g.innerHTML = '';
-  state.projectors.forEach((p, idx) => {
+  orderedProjectors(state.projectors).forEach((p, idx) => {
+    const lane = laneOf(p);
     const s = p.status || {}; const off = !connected || !s.online; const lock = state.lock;
     const { st, word } = stateOf(p);
     const errs = Object.entries(s.errors || {}).filter(([, v]) => v > 0).map(([k, v]) => `${k}${v === 2 ? ' fault' : ' warning'}`);
@@ -92,10 +94,11 @@ function renderGrid() {
     const busy = !!p.busy;
 
     const pat = s.pattern ? ((p.patterns || PATTERNS)[s.pattern] || s.pattern) : '—';
-    const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card.setAttribute('aria-label', `${p.slot} ${p.label}`);
+    const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', `${p.slot} ${projectorName(p)}`);
     card.innerHTML = `
-      <div class="avd-panel__head"><h2 class="avd-panel__title"><span class="avd-panel__index">${String(idx + 1).padStart(2, '0')}</span>${esc(p.slot)} · ${esc(p.label)}<span class="avd-dot avd-dot--${st}" aria-hidden="true"></span></h2></div>
+      <div class="avd-panel__head"><h2 class="avd-panel__title"><span class="avd-panel__index">${lane ? esc(p.lane) : String(idx + 1).padStart(2, '0')}</span>${esc(lane ? 'Projector ' + p.lane : p.slot + ' · ' + p.label)}<span class="avd-dot avd-dot--${st}" aria-hidden="true"></span></h2></div>
       <div class="avd-panel__body">
+        ${lane ? `<div class="pj-lane"><h3>${esc(lane.target)}</h3><span class="pj-mono">${esc(lane.role)} · ${esc(lane.orientation)}</span><span class="pj-lane-device pj-mono">${esc(p.slot)} · ${esc(p.label)}</span></div>` : ''}
         <div class="pj-tile-top">${pill(st, word)}<span class="pj-mono">${esc(p.owner)} · ${esc(p.ip || 'no address')}</span></div>
         ${s.errors == null ? '<p class="pj-mono">Alarm telemetry unavailable</p>' : ''}
         ${busy ? '<p class="pj-mono" role="status">Lens moving</p>' : ''}
@@ -132,12 +135,13 @@ function renderGrid() {
   g.scrollTop = scroll;
   if (focusKey) [...g.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === focusKey)?.focus({ preventScroll: true });
 }
+function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); return p && laneOf(p) ? `${slot} · ${p.lane} / ${laneOf(p).target}` : slot; }
 function renderPresets() {
   const el = $('#presets'); el.innerHTML = '';
   if (!state.presets.length) el.innerHTML = '<p class="pj-mono">No presets yet. Set the rig how you want it, name it, save.</p>';
   for (const pr of state.presets) {
     const d = document.createElement('div'); d.className = 'pj-item';
-    const sum = Object.entries(pr.perSlot).map(([k, v]) => `${k}: ${v.power ? 'on' : 'off'}, ${v.shutter}, ${v.input ?? ''}`).join(' · ');
+    const sum = Object.entries(pr.perSlot).map(([k, v]) => `${slotName(k)}: ${v.power ? 'on' : 'off'}, ${v.shutter}, ${v.input ?? ''}`).join(' · ');
     d.innerHTML = `<span class="name">${esc(pr.name)}</span><button class="avd-btn" data-r type="button">Recall, tap twice</button><button class="avd-btn avd-btn--danger" data-d type="button">Remove preset</button><span class="sum pj-mono">${esc(sum)}</span>`;
     let armed = 0;
     d.querySelector('[data-r]').onclick = () => { if (Date.now() - armed > 3000) { armed = Date.now(); toast(`Tap again within 3 s to recall ${pr.name}`); return; } armed = 0; api('preset/recall', { name: pr.name }).then((r) => toast(Object.entries(r).map(([k, v]) => `${k} ${v}`).join(' · '), 3500)).catch((e) => toast(e.message)); };
@@ -148,9 +152,9 @@ function renderPresets() {
 function renderLog() {
   const tb = $('#log tbody'); tb.innerHTML = '';
   const query = $('#log-search').value.toLowerCase();
-  for (const e of [...state.events].reverse().filter((e) => !query || [e.slot, e.command, e.result, e.detail, e.source].join(' ').toLowerCase().includes(query))) {
+  for (const e of [...state.events].reverse().filter((e) => !query || [e.slot, slotName(e.slot), e.command, e.result, e.detail, e.source].join(' ').toLowerCase().includes(query))) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td class="avd-td--mono">${new Date(e.at).toLocaleTimeString()}</td><td class="avd-td--mono">${esc(e.slot)}</td><td>${esc(e.command)}</td><td class="${e.result === 'OK' ? 'ok' : e.result === 'ERR' ? 'err' : ''}">${esc(e.result)}${e.detail ? ' · ' + esc(e.detail) : ''}</td><td class="pj-mono">${esc(e.source)}</td>`;
+    tr.innerHTML = `<td class="avd-td--mono">${new Date(e.at).toLocaleTimeString()}</td><td class="avd-td--mono">${esc(slotName(e.slot))}</td><td>${esc(e.command)}</td><td class="${e.result === 'OK' ? 'ok' : e.result === 'ERR' ? 'err' : ''}">${esc(e.result)}${e.detail ? ' · ' + esc(e.detail) : ''}</td><td class="pj-mono">${esc(e.source)}</td>`;
     tb.appendChild(tr);
   }
 }
@@ -164,6 +168,7 @@ function renderSetup() {
     const d = document.createElement('div'); d.className = 'pj-item pj-setup'; d.dataset.slot = p.slot;
     d.innerHTML = `<strong>${esc(p.slot)}</strong>
       ${field('Label', `<input class="avd-input" value="${esc(p.label)}" data-k="label">`)}
+      ${field('Drawing lane', `<select class="avd-input" data-k="lane"><option value="">Unassigned</option>${Object.entries(LANES).map(([id, lane]) => `<option value="${id}" ${p.lane === id ? 'selected' : ''}>${id} · ${lane.target}</option>`).join('')}</select>`)}
       ${field('MAC', `<input class="avd-input" value="${esc(p.mac || '')}" placeholder="aa:bb:cc:dd:ee:ff" data-k="mac">`)}
       ${field('IP', `<input class="avd-input" value="${esc(p.ip || '')}" placeholder="192.168.1.x" data-k="ip">`)}
       ${field('Admin user', `<input class="avd-input" value="${esc(p.user || '')}" placeholder="admin1" data-k="user">`)}
@@ -173,6 +178,7 @@ function renderSetup() {
       <button class="avd-btn avd-btn--primary" type="button">Save</button>`;
     d.querySelector('button').onclick = () => { const upd = { slot: p.slot }; d.querySelectorAll('[data-k]').forEach((i) => { const v = i.value.trim(); if (i.dataset.k === 'password' && !v) return; upd[i.dataset.k] = v; }); api('projector', upd).then(() => { dirtySetup.delete(p.slot); toast(`${p.slot} saved`); }).catch((e) => toast(e.message)); };
     d.addEventListener('input', () => dirtySetup.add(p.slot));
+    d.addEventListener('change', () => dirtySetup.add(p.slot));
     const order = state.projectors.map((x) => x.slot);
     el.insertBefore(d, [...el.children].find((node) => order.indexOf(node.dataset.slot) > order.indexOf(p.slot)) || null);
   }
@@ -192,7 +198,8 @@ let adjSlot = null, adjSpeed = 'slow', adjHomeArmed = 0, adjReturnFocus = null;
 function openAdjust(slot) {
   adjSlot = slot; const p = state.projectors.find((x) => x.slot === slot); if (!p) return;
   adjReturnFocus = document.activeElement;
-  $('#adj-title').textContent = `${slot} · ${p.label}`; $('#adj-sub').textContent = [p.model, p.ip].filter(Boolean).join(' · ');
+  $('#adj-title').textContent = projectorName(p); $('#adj-sub').textContent = [slot, laneOf(p)?.orientation, p.model, p.ip].filter(Boolean).join(' · ');
+  $('#adjust').dataset.lane = laneOf(p) ? p.lane : '';
   $('#adjust').hidden = false; $('#adjust').showModal(); $('#adj-feedback').textContent = ''; $('#adj-motion').textContent = ''; renderAdjust(); loadPicture(); $('#adj-close').focus();
 }
 function closeAdjust() { const slot = adjSlot; $('#adjust').close(); $('#adjust').hidden = true; adjSlot = null; const trigger = adjReturnFocus?.isConnected ? adjReturnFocus : [...$('#grid').children].find((el) => el.getAttribute('aria-label')?.startsWith(slot + ' '))?.querySelector('[data-adj]'); trigger?.focus(); }
