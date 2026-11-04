@@ -1,5 +1,10 @@
 # Changelog
 
+## November 4, 2026: Video Engineering Daily
+
+- Add Edition 028, Processing depth and input depth, with an EIZO sourced
+  lesson and matching diagram and story card. Preserve previous editions.
+
 ## November 3, 2026: Dimensioned projector references
 
 - Add optional metric plot metadata for lens offsets, enclosure dimensions and
