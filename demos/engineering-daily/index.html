@@ -348,6 +348,25 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
 {
+  "id": 28,
+  "date": "2026-11-04",
+  "track": "Color spaces, chroma subsampling, bit depth, and HDR",
+  "trackShort": "Color & HDR",
+  "title": "Processing depth and input depth",
+  "fact": "A monitor's internal LUT (look-up table) precision does not establish the incoming signal's bit depth. EIZO's CG247 uses a 16-bit LUT, but its documented 10-bit DisplayPort display also requires a graphics board and software that support 10-bit output. Internal processing precision and transport depth are separate specifications.",
+  "why": "A playback computer can feed 8-bit graphics into a monitor with high-precision processing. The monitor's LUT specification alone does not confirm a 10-bit production path.",
+  "takeaway": "Check the application's output support, GPU settings and monitor input status. Use a known gradient to inspect the complete path; count 256 possible component codes at 8 bits versus 1024 at 10 bits, before range restrictions.",
+  "sourceLabel": "EIZO CG247, 10-Bit Simultaneous Display",
+  "sourceUrl": "https://www.eizo.com/products/coloredge/cg247/",
+  "basis": "Manufacturer-specific CG247 DisplayPort requirements; binary code counts are arithmetic, not nominal video-range limits",
+  "current": true,
+  "illustration": {
+    "viewBox": "0 0 240 400",
+    "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">28</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">DEPTH CHECKS</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"90\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Input code space</text><text x=\"24\" y=\"106\">8 bits = 256 codes</text><text x=\"24\" y=\"130\">10 bits = 1024 codes</text><path d=\"M120 149V178m-7-8l7 8l7-8\" class=\"wire\"/><rect x=\"12\" y=\"192\" width=\"216\" height=\"90\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"218\" class=\"blue-label\">2 / Monitor processing</text><text x=\"24\" y=\"246\">CG247: 16-bit LUT</text><text x=\"24\" y=\"270\">Separate specification</text><rect x=\"12\" y=\"302\" width=\"216\" height=\"69\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"326\" class=\"note\">Verify source + input</text><text x=\"24\" y=\"353\">Then check gradients</text><text x=\"120\" y=\"395\" text-anchor=\"middle\">Codes per component</text>",
+    "caption": "Input code space and internal LUT precision describe different stages. Blue shows signal flow into monitor processing. Code totals precede range limits; the CG247 example is product specific."
+  }
+},
+{
   "id": 27,
   "date": "2026-11-03",
   "track": "SDI, HDMI, DisplayPort, and signal transport",
@@ -359,7 +378,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
   "sourceLabel": "AJA FS4 manual v1.1, Output Image Mapping",
   "sourceUrl": "https://www.aja.com/support/item-download/3738/AJA_manual_FS4_v1.1.pdf",
   "basis": "Distinct SMPTE image mappings; FS4 support is manufacturer and mode specific",
-  "current": true,
+  "current": false,
   "illustration": {
     "viewBox": "0 0 240 400",
     "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">27</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">SQD LINK ORDER</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"230\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Spatial quadrants</text><rect x=\"32\" y=\"100\" width=\"176\" height=\"144\" class=\"node\"/><path d=\"M120 100V244M32 172H208\" class=\"wire\"/><text x=\"76\" y=\"142\" text-anchor=\"middle\">SDI 1</text><text x=\"164\" y=\"142\" text-anchor=\"middle\">SDI 2</text><text x=\"76\" y=\"214\" text-anchor=\"middle\">SDI 3</text><text x=\"164\" y=\"214\" text-anchor=\"middle\">SDI 4</text><text x=\"120\" y=\"268\" text-anchor=\"middle\">One quadrant per link</text><rect x=\"12\" y=\"298\" width=\"216\" height=\"75\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"322\" class=\"note\">2 / Receiver check</text><text x=\"24\" y=\"350\">SQD mapping + order</text><text x=\"120\" y=\"395\" text-anchor=\"middle\">2SI is a different map</text>",

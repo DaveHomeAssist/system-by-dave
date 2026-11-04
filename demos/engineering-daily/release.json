@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "e268734065cef718e91863b5d24aa1cd4256a80f1af82400a10bc8acedb9a34c",
-  "publicSha256": "b21babc21e3c3a32b23c8a8a50bbb4de923f1dae0a2ad51a52b7bf3eb52aa072",
-  "editions": 27,
+  "sourceSha256": "e702fbe3a5b31515fe97eabe7034dbad026a92c57d4a5fa80797dffce4ee7bc6",
+  "publicSha256": "8353079b4b81e615c0d6f2e3dc1800acb4f8939909a7847639379c3f7266ca95",
+  "editions": 28,
   "files": [
+    {
+      "name": "Edition 028.svg",
+      "id": 28,
+      "date": "2026-11-04",
+      "title": "Processing depth and input depth",
+      "sha256": "4216ec52c355f8ac24af37ae049376372494a6cf94be7f9ea6329e7cd49eadc8"
+    },
+    {
+      "name": "Edition 028.png",
+      "id": 28,
+      "date": "2026-11-04",
+      "title": "Processing depth and input depth",
+      "sha256": "fc6793c83b5e11d41dab6cc3a4508d98f0f5d24efb9bff4cdb16c21755d85dec"
+    },
     {
       "name": "Edition 027.svg",
       "id": 27,
