@@ -1937,10 +1937,17 @@ def styles_css() -> str:
             font-size: 2rem;
           }
 
+          /* One scrollable row instead of a two-column grid, so the header no longer pushes
+             the page ~330 px down on phones (navigation audit fix 6). The layer rail scrolls too. */
           .primary-nav {
             width: 100%;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+          }
+
+          .primary-nav .nav-link {
+            flex: 0 0 auto;
           }
 
           .nav-link {

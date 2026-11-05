@@ -271,12 +271,13 @@
       <span class="sbd-site-brand__mark" aria-hidden="true">SD</span>
       <span class="sbd-site-brand__word">System by Dave</span>
     </a>
-    <div class="sbd-site-links">
-      <a href="/tools.html" aria-current="page">Tools</a>
-      <a href="/av/">AV Suite</a>
+    <button class="sbd-site-menu" type="button" aria-expanded="false" aria-controls="sbd-site-links" hidden>Menu</button>
+    <div class="sbd-site-links" id="sbd-site-links">
       <a href="/notion.html">Notion</a>
+      <a href="https://avbydave.com/">AV by Dave<span class="sbd-site-links__ext" aria-hidden="true"> ↗</span></a>
+      <a href="/demos/">Demos</a>
       <a href="/prompt-lab.html">Prompt Lab</a>
-      <a href="/profile/">Dave</a>
+      <a href="/tools.html" aria-current="page">Tools</a>
     </div>
   </nav>
 </header>
@@ -358,50 +359,30 @@
     </section>
   </main>
 
-  <footer>
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <a href="index.html" class="nav-brand">
-            <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
-            <span class="nav-brand-text">System by Dave</span>
-          </a>
-          <p class="footer-brand-desc">Handcrafted Notion tools for people who take their workflows seriously.</p>
-        </div>
-        <div class="footer-col">
-          <h4>Products</h4>
-          <ul>
-            <li><a href="skills.html">Skills</a></li>
-            <li><a href="agents.html">Agents</a></li>
-            <li><a href="widgets.html">Widgets</a></li>
-            <li><a href="prompts/">Prompts</a></li>
-            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt Lab</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Resources</h4>
-          <ul>
-            <li><a href="project-registry.html">Project Registry</a></li>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer">Project Repo</a></li>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog</a></li>
-            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Connect</h4>
-          <ul>
-            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">promptlab.tools</a></li>
-            <li><a href="profile/">Profile</a></li>
-            <li><a href="prompts/">Prompts</a></li>
-            <li><a href="privacy-policy.html">Privacy Policy</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span class="footer-copy">&copy; 2026 System by Dave. All rights reserved.</span>
-      </div>
-    </div>
+  <footer class="sbd-site-footer-host">
+  <div class="sbd-site-footer__wrap">
+    <nav class="sbd-site-footer" aria-label="Site">
+      <div class="sbd-site-footer__group"><p class="sbd-site-footer__title">Products</p><ul role="list">
+        <li><a href="/notion.html">Notion agents &amp; widgets</a></li>
+        <li><a href="https://avbydave.com/">AV by Dave<span aria-hidden="true"> ↗</span></a></li>
+        <li><a href="/demos/">AV demos</a></li>
+        <li><a href="/prompt-lab.html">Prompt Lab</a></li>
+      </ul></div>
+      <div class="sbd-site-footer__group"><p class="sbd-site-footer__title">More</p><ul role="list">
+        <li><a href="/tools.html">All tools</a></li>
+        <li><a href="/project-registry.html">Project registry</a></li>
+        <li><a href="/systembydave/">Davai docs</a></li>
+        <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog<span aria-hidden="true"> ↗</span></a></li>
+      </ul></div>
+      <div class="sbd-site-footer__group"><p class="sbd-site-footer__title">About</p><ul role="list">
+        <li><a href="/profile/">About / Hire Dave</a></li>
+        <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub<span aria-hidden="true"> ↗</span></a></li>
+        <li><a href="/privacy-policy.html">Privacy</a></li>
+        <li><a href="mailto:avbydave@gmail.com?subject=System%20by%20Dave">avbydave@gmail.com</a></li>
+      </ul></div>
+    </nav>
+    <p class="sbd-site-footer__copy">© 2026 System by Dave</p>
+  </div>
   </footer>
 </div>
 
