@@ -307,11 +307,14 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/lock' && req.method === 'POST') { const { lock } = await body(req); rig.lock = !!lock; pendingConfirm.clear(); store.save(); store.event({ source: 'ui', slot: '*', command: `lock ${rig.lock ? 'on' : 'off'}`, result: 'OK' }); broadcast(snapshot()); return json(res, 200, { lock: rig.lock }); }
     if (url.pathname === '/api/projector' && req.method === 'POST') {
       const upd = await body(req); const p = store.projector(upd.slot); if (!p) throw httpErr(404, 'no slot');
+      for (const k of ['reverseH', 'reverseV']) {
+        if (k in upd && typeof upd[k] !== 'boolean') throw httpErr(400, `${k} must be true or false`);
+      }
       if ('lane' in upd) {
         if (typeof upd.lane !== 'string' || (upd.lane !== '' && !Object.hasOwn(LANES, upd.lane))) throw httpErr(400, 'Unknown drawing lane');
         if (upd.lane && rig.projectors.some((other) => other.slot !== p.slot && other.lane === upd.lane)) throw httpErr(409, 'Drawing lane already assigned. Clear its current assignment first.');
       }
-      for (const k of ['lane', 'label', 'make', 'model', 'owner', 'driver', 'mac', 'ip', 'notes', 'user', 'password', 'inputs']) if (k in upd) p[k] = upd[k];
+      for (const k of ['lane', 'label', 'make', 'model', 'owner', 'driver', 'mac', 'ip', 'notes', 'user', 'password', 'inputs', 'reverseH', 'reverseV']) if (k in upd) p[k] = upd[k];
       store.save(); store.event({ source: 'ui', slot: p.slot, command: 'edit', result: 'OK' }); broadcast(snapshot()); poll(p); return json(res, 200, { ok: true });
     }
     if (url.pathname === '/api/discover' && req.method === 'POST') return json(res, 200, await discover('ui'));
