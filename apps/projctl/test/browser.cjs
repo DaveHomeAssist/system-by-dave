@@ -46,6 +46,27 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await page.reload();
         await page.locator('.pj-tile[data-lane="A"] h3').filter({ hasText: 'SL Portal' }).waitFor();
 
+        // Operator direction labels use the selected slot's saved mounting correction.
+        await page.locator('[data-tab="setup"]').click();
+        const slotSetup = page.locator('.pj-setup[data-slot="P2"]');
+        await slotSetup.locator('[data-k="reverseH"]').selectOption('true');
+        await slotSetup.locator('[data-k="reverseV"]').selectOption('true');
+        await slotSetup.getByRole('button', { name: 'Save', exact: true }).click();
+        await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P2').reverseV === true);
+        await page.reload();
+        await page.locator('[data-tab="rig"]').click();
+        await page.locator('.pj-tile[data-slot="P2"] [data-adj]').click();
+        await page.getByRole('tab', { name: 'Lens', exact: true }).click();
+        for (const [label, axis, dir] of [['Shift left', 'h', '+'], ['Shift right', 'h', '-'], ['Shift up', 'v', '-'], ['Shift down', 'v', '+'], ['Focus forward', 'focus', '+'], ['Zoom out', 'zoom', '-']]) {
+          const sent = page.waitForRequest((r) => r.url().endsWith('/api/command') && r.method() === 'POST');
+          await page.getByRole('button', { name: label, exact: true }).click();
+          const body = (await sent).postDataJSON();
+          assert.equal(body.slot, 'P2'); assert.equal(body.cmd, 'lens');
+          assert.equal(body.arg.axis, axis); assert.equal(body.arg.dir, dir);
+          await until(async () => !(await page.getByRole('button', { name: label, exact: true }).isDisabled()));
+        }
+        await page.keyboard.press('Escape');
+
         // Picture controls already open must follow subsequent lock broadcasts.
         await page.locator('.pj-tile[data-slot="P2"] [data-adj]').click();
         await page.getByRole('tab', { name: 'Picture', exact: true }).click();

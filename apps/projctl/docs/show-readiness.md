@@ -8,6 +8,20 @@ rig files, credentials, presets, slot IDs, cue addresses and existing confirmati
 No new dependency or runtime is required. Projctl remains the physical-command owner
 under ECP-1.0 revision 1.0; no equipment catalog or cross-app schema changes are involved.
 
+## Image shift direction correction
+
+Mounted or mirrored installations can move the image opposite the UI shift labels.
+Preserve stable Left/Right and Up/Down labels, with independent per-projector reversal
+settings saved in the owning rig. Legacy rigs keep their current mapping. Only UI shift
+buttons translate directions; device-native API commands, focus, zoom, Home, Stop,
+readbacks and reference geometry do not change. No model-wide orientation is inferred.
+
+Acceptance: both directions of each reversed axis send the opposite native direction,
+normal slots and other lens axes remain unchanged, invalid edits are atomic, settings
+survive save/reload/reset, and actual image motion is checked on the installed unit.
+This is an additive private rig setting under ECP-1.0 revision 1.0; no shared equipment,
+plot or execution-authority contract changes.
+
 ## Acceptance
 
 - Input choices come from the connected Pulse projector, with selected-source readback.

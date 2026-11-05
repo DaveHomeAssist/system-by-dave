@@ -1,5 +1,6 @@
 import { LANES, laneOf, projectorName, orderedProjectors } from './lanes.js';
 import { createStageView } from './stage-view.js';
+import { lensDirection } from './lens-direction.js';
 const $ = (s, r = document) => r.querySelector(s);
 let state = { projectors: [], presets: [], events: [], lock: false };
 const confirmTokens = {}; // command key -> one-use token
@@ -175,10 +176,12 @@ function renderSetup() {
       ${field('IP', `<input class="avd-input" value="${esc(p.ip || '')}" placeholder="192.168.1.x" data-k="ip">`)}
       ${field('Admin user', `<input class="avd-input" value="${esc(p.user || '')}" placeholder="admin1" data-k="user">`)}
       ${field('Driver', `<select class="avd-input" data-k="driver">${['pjlink', 'panasonic', 'pulse', 'simulator'].map((x) => `<option ${p.driver === x ? 'selected' : ''}>${x}</option>`).join('')}</select>`)}
+      ${field('Left / right image shift', `<select class="avd-input" data-k="reverseH"><option value="false">Normal</option><option value="true" ${p.reverseH === true ? 'selected' : ''}>Reversed</option></select>`)}
+      ${field('Up / down image shift', `<select class="avd-input" data-k="reverseV"><option value="false">Normal</option><option value="true" ${p.reverseV === true ? 'selected' : ''}>Reversed</option></select>`)}
       ${field('PJLink password <span class="avd-field__opt">(blank keeps current)</span>', `<input class="avd-input" type="password" value="" data-k="password" autocomplete="new-password">`)}
       ${field('Notes', `<input class="avd-input" value="${esc(p.notes || '')}" data-k="notes">`)}
       <button class="avd-btn avd-btn--primary" type="button">Save</button>`;
-    d.querySelector('button').onclick = () => { const upd = { slot: p.slot }; d.querySelectorAll('[data-k]').forEach((i) => { const v = i.value.trim(); if (i.dataset.k === 'password' && !v) return; upd[i.dataset.k] = v; }); api('projector', upd).then(() => { dirtySetup.delete(p.slot); toast(`${p.slot} saved`); }).catch((e) => toast(e.message)); };
+    d.querySelector('button').onclick = () => { const upd = { slot: p.slot }; d.querySelectorAll('[data-k]').forEach((i) => { const v = i.value.trim(); if (i.dataset.k === 'password' && !v) return; upd[i.dataset.k] = ['reverseH', 'reverseV'].includes(i.dataset.k) ? v === 'true' : v; }); api('projector', upd).then(() => { dirtySetup.delete(p.slot); toast(`${p.slot} saved`); }).catch((e) => toast(e.message)); };
     d.addEventListener('input', () => dirtySetup.add(p.slot));
     d.addEventListener('change', () => dirtySetup.add(p.slot));
     const order = state.projectors.map((x) => x.slot);
@@ -244,7 +247,11 @@ $('#adj-stop').onclick = () => cmd(adjSlot, 'lens', { op: 'stop' });
 $('#adjust').onclick = (e) => { if (e.target === $('#adjust')) closeAdjust(); };
 
 $('#adj-speed').querySelectorAll('button').forEach((b) => b.onclick = () => { adjSpeed = b.dataset.s; renderAdjust(); });
-document.querySelectorAll('.lens button[data-l]').forEach((b) => b.onclick = () => cmd(adjSlot, 'lens', { axis: b.dataset.l, speed: adjSpeed, dir: b.dataset.d }));
+document.querySelectorAll('.lens button[data-l]').forEach((b) => b.onclick = () => {
+  const p = state.projectors.find((x) => x.slot === adjSlot);
+  if (!p) return;
+  cmd(adjSlot, 'lens', { axis: b.dataset.l, speed: adjSpeed, dir: lensDirection(p, b.dataset.l, b.dataset.d) });
+});
 $('#adj-home').onclick = () => {
   if (Date.now() - adjHomeArmed > 3000) { adjHomeArmed = Date.now(); toast('Tap again within 3 s to send lens shift to home'); return; }
   adjHomeArmed = 0; cmd(adjSlot, 'lens', { op: 'home' });

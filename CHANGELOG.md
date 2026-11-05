@@ -1,5 +1,11 @@
 # Changelog
 
+## November 5, 2026: Projector image shift directions
+
+- Add independent per-projector horizontal and vertical shift reversal settings so
+  operator labels can follow the projected image on mounted or mirrored installations.
+- Preserve legacy mappings, device-native API directions, focus, zoom and drawing views.
+
 ## November 5, 2026: Video Engineering Daily
 
 - Add Edition 029, Rolling shutter row timing, with a Basler sourced lesson,

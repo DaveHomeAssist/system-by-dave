@@ -98,6 +98,14 @@ travel. Slow is the default. The relay waits for stopped feedback, blocks overla
 movement, and refreshes position before replying. Stop lens remains available under Show Lock.
 An acknowledged request still needs the expected physical result checked on the actual rig.
 
+Shift button labels describe image movement from the audience's view. Setup can reverse
+Left / right and Up / down independently for each installed projector. These optional
+`reverseH` / `reverseV` booleans persist with the rig; older rigs default to normal.
+They change only the UI shift-button mapping. Focus, zoom, Home, Stop, API directions,
+encoder readbacks, cues, presets and drawing geometry retain their existing meaning.
+Check a small movement on the actual installation before selecting a reversal; mounting
+and mirror arrangements differ even between projectors of the same model.
+
 The acceptance scope and remaining physical checks are in [Show readiness](docs/show-readiness.md).
 
 ## Building model
