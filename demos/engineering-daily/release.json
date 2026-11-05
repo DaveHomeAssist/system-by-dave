@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "e702fbe3a5b31515fe97eabe7034dbad026a92c57d4a5fa80797dffce4ee7bc6",
-  "publicSha256": "8353079b4b81e615c0d6f2e3dc1800acb4f8939909a7847639379c3f7266ca95",
-  "editions": 28,
+  "sourceSha256": "75d5e7e25f3a0f56ac7ae84fa885353268bcc34685c919ee719ff2e206e89884",
+  "publicSha256": "902432eb5ec0d1301fe3fcc1d0d500115647c074620664d19ba5c46547e5319a",
+  "editions": 29,
   "files": [
+    {
+      "name": "Edition 029.svg",
+      "id": 29,
+      "date": "2026-11-05",
+      "title": "Rolling shutter row timing",
+      "sha256": "39def560efa2098f5386e9044971fedabcc41dd9530ac71d1dc73d6580687372"
+    },
+    {
+      "name": "Edition 029.png",
+      "id": 29,
+      "date": "2026-11-05",
+      "title": "Rolling shutter row timing",
+      "sha256": "eef6da87813673a0356494b0c385eeb4f6f65c988565885ab492038580489ecb"
+    },
     {
       "name": "Edition 028.svg",
       "id": 28,

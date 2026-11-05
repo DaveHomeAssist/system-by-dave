@@ -1,15 +1,15 @@
 {
   "id": "house-reference",
   "engineeringDailyPublication": {
-    "date": "2026-11-04",
-    "edition": 28,
-    "title": "Processing depth and input depth",
+    "date": "2026-11-05",
+    "edition": 29,
+    "title": "Rolling shutter row timing",
     "state": "Verified publication input; exact CI, merge and deployment evidence belongs to the provider records for this revision",
-    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=28&month=2026-11",
+    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=29&month=2026-11",
     "evidence": "demos/engineering-daily/release.json",
-    "verification": "Dominic: full28 edition illustration/story verification; normal candidate, CI, deployment and live gates required.",
+    "verification": "Dominic: full 29 edition illustration/story verification; normal candidate, CI, deployment and live gates required.",
     "next": "Require exact-head CI, Pages deployment and matching live manifest/assets/browser journeys before publication completion; continue the same gates for future daily releases.",
-    "boundaries": "Prior27 records and54 assets preserved; no gaps or renumbering; human acceptance separate."
+    "boundaries": "Prior 28 records and 56 assets preserved; no gaps or renumbering; human acceptance separate."
   },
   "engineeringDailyUx": {
     "date": "2026-10-28",
