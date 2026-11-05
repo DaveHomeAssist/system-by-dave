@@ -1,5 +1,10 @@
 # Changelog
 
+## November 5, 2026: Video Engineering Daily
+
+- Add Edition 029, Rolling shutter row timing, with a Basler sourced lesson,
+  timing comparison diagram and matching story card. Preserve previous editions.
+
 ## November 4, 2026: Video Engineering Daily
 
 - Add Edition 028, Processing depth and input depth, with an EIZO sourced

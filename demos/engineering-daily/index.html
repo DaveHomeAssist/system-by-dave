@@ -345,104 +345,122 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
   <footer class="statusbar"><span>LOCAL REFERENCE / <span id="statusSelection"></span></span><span>AMERICA/NEW_YORK · SOURCES RETAINED</span></footer>
   <nav class="workspaceNav" aria-label="Calendar, library and signal lab"><button type="button" data-workspace="calendar" aria-pressed="true">Calendar</button><button type="button" data-workspace="reader" aria-pressed="false">Read</button><button type="button" data-workspace="archive" aria-pressed="false">List</button><button type="button" data-workspace="lab" aria-pressed="false">Signal lab</button></nav>
 </div>
-<script id="archive-data" type="application/json">
-[
-{
-  "id": 28,
-  "date": "2026-11-04",
-  "track": "Color spaces, chroma subsampling, bit depth, and HDR",
-  "trackShort": "Color & HDR",
-  "title": "Processing depth and input depth",
-  "fact": "A monitor's internal LUT (look-up table) precision does not establish the incoming signal's bit depth. EIZO's CG247 uses a 16-bit LUT, but its documented 10-bit DisplayPort display also requires a graphics board and software that support 10-bit output. Internal processing precision and transport depth are separate specifications.",
-  "why": "A playback computer can feed 8-bit graphics into a monitor with high-precision processing. The monitor's LUT specification alone does not confirm a 10-bit production path.",
-  "takeaway": "Check the application's output support, GPU settings and monitor input status. Use a known gradient to inspect the complete path; count 256 possible component codes at 8 bits versus 1024 at 10 bits, before range restrictions.",
-  "sourceLabel": "EIZO CG247, 10-Bit Simultaneous Display",
-  "sourceUrl": "https://www.eizo.com/products/coloredge/cg247/",
-  "basis": "Manufacturer-specific CG247 DisplayPort requirements; binary code counts are arithmetic, not nominal video-range limits",
-  "current": true,
-  "illustration": {
-    "viewBox": "0 0 240 400",
-    "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">28</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">DEPTH CHECKS</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"90\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Input code space</text><text x=\"24\" y=\"106\">8 bits = 256 codes</text><text x=\"24\" y=\"130\">10 bits = 1024 codes</text><path d=\"M120 149V178m-7-8l7 8l7-8\" class=\"wire\"/><rect x=\"12\" y=\"192\" width=\"216\" height=\"90\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"218\" class=\"blue-label\">2 / Monitor processing</text><text x=\"24\" y=\"246\">CG247: 16-bit LUT</text><text x=\"24\" y=\"270\">Separate specification</text><rect x=\"12\" y=\"302\" width=\"216\" height=\"69\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"326\" class=\"note\">Verify source + input</text><text x=\"24\" y=\"353\">Then check gradients</text><text x=\"120\" y=\"395\" text-anchor=\"middle\">Codes per component</text>",
-    "caption": "Input code space and internal LUT precision describe different stages. Blue shows signal flow into monitor processing. Code totals precede range limits; the CG247 example is product specific."
-  }
-},
-{
-  "id": 27,
-  "date": "2026-11-03",
-  "track": "SDI, HDMI, DisplayPort, and signal transport",
-  "trackShort": "Transport",
-  "title": "Quad link image mapping",
-  "fact": "Four SDI cables do not uniquely identify a UHD image mapping. Square Division (SQD) divides the picture into four spatial quadrants; Two Sample Interleave (2SI) distributes samples across subimages instead. AJA's FS4 documents both mappings. Support and automatic detection depend on the device and operating mode.",
-  "why": "A quad-link source and receiver can agree on raster and frame rate yet still reconstruct the picture incorrectly when their mappings differ.",
-  "takeaway": "Record SQD or 2SI alongside resolution, exact rate and link order. Check both endpoints' mapping settings before troubleshooting the four cable paths individually.",
-  "sourceLabel": "AJA FS4 manual v1.1, Output Image Mapping",
-  "sourceUrl": "https://www.aja.com/support/item-download/3738/AJA_manual_FS4_v1.1.pdf",
-  "basis": "Distinct SMPTE image mappings; FS4 support is manufacturer and mode specific",
-  "current": false,
-  "illustration": {
-    "viewBox": "0 0 240 400",
-    "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">27</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">SQD LINK ORDER</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"230\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Spatial quadrants</text><rect x=\"32\" y=\"100\" width=\"176\" height=\"144\" class=\"node\"/><path d=\"M120 100V244M32 172H208\" class=\"wire\"/><text x=\"76\" y=\"142\" text-anchor=\"middle\">SDI 1</text><text x=\"164\" y=\"142\" text-anchor=\"middle\">SDI 2</text><text x=\"76\" y=\"214\" text-anchor=\"middle\">SDI 3</text><text x=\"164\" y=\"214\" text-anchor=\"middle\">SDI 4</text><text x=\"120\" y=\"268\" text-anchor=\"middle\">One quadrant per link</text><rect x=\"12\" y=\"298\" width=\"216\" height=\"75\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"322\" class=\"note\">2 / Receiver check</text><text x=\"24\" y=\"350\">SQD mapping + order</text><text x=\"120\" y=\"395\" text-anchor=\"middle\">2SI is a different map</text>",
-    "caption": "SQD assigns four spatial quadrants to four SDI links. This is a conceptual picture map, not physical wiring. A receiver set for 2SI expects a different sample arrangement."
-  }
-},
-{
-  "id": 26,
-  "date": "2026-11-02",
-  "track": "Signal troubleshooting and system design",
-  "trackShort": "Troubleshooting",
-  "title": "Active HDMI cable direction",
-  "fact": "Matching HDMI plugs do not make an active cable reversible. Extron specifies its HD Pro Plenum hybrid optical-copper cables as unidirectional and powered from the HDMI source. Direction and power requirements belong to the cable design; they are not universal properties of every HDMI cable.",
-  "why": "A long cable pulled backward through a truss or conduit can leave a display dark even when its connectors fit and the source format is supported.",
-  "takeaway": "Identify the designated source and display ends before routing. Bench-test the complete path in its intended direction and format, and label both ends before the pull.",
-  "sourceLabel": "Extron HD Pro Plenum Series specifications",
-  "sourceUrl": "https://www.extron.com/product/hdproplenum",
-  "basis": "Manufacturer-specific unidirectional active hybrid cable behavior; conceptual main video path only",
-  "current": false,
-  "illustration": {
-    "viewBox": "0 0 240 400",
-    "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">26</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">CABLE DIRECTION</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"135\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Correct orientation</text><text x=\"24\" y=\"110\">Source</text><text x=\"157\" y=\"110\">Display</text><path d=\"M30 137H207m-8-7l8 7l-8 7\" class=\"wire\"/><text x=\"24\" y=\"171\" class=\"good-label\">Designated video path</text><rect x=\"12\" y=\"205\" width=\"216\" height=\"135\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"231\" class=\"note\">2 / Reversed cable</text><text x=\"24\" y=\"263\">Source</text><text x=\"157\" y=\"263\">Display</text><path d=\"M207 290H30m8-7l-8 7l8 7M110 279l22 22m0-22l-22 22\" class=\"reference\"/><text x=\"24\" y=\"325\" class=\"note\">Unsupported direction</text><text x=\"120\" y=\"369\" text-anchor=\"middle\">HD Pro Plenum example</text><text x=\"120\" y=\"393\" text-anchor=\"middle\">Check before cable pull</text>",
-    "caption": "The active cable has a designated video direction. Reversing the assembly opposes the source-to-display path. Blue is main video; amber is the reversed orientation, not a return channel."
-  }
-},
-{
-  "id": 25,
-  "date": "2026-11-01",
-  "track": "LED walls, projection, EDID, and HDCP",
-  "trackShort": "Displays",
-  "title": "LED refresh and shutter exposure",
-  "fact": "An LED panel's PWM (pulse width modulation) cycle may extend beyond the camera's exposure, producing scan lines or uneven exposure. Brompton's ShutterSync tunes panel refresh to camera settings and requires genlock in its Camera Viewer mode. This is a manufacturer-specific feature; supported shutter ranges depend on the panel.",
-  "why": "A wall that looks clean to the audience can show artifacts on the broadcast camera, especially after a shutter change.",
-  "takeaway": "At 50 fps, 180 degrees gives 10 ms exposure; 90 degrees gives 5 ms. Enter the actual shutter settings, confirm reference lock, and test the wall through each production camera. Refresh adjustment does not replace camera tests.",
-  "sourceLabel": "Brompton Tessera online manual, ShutterSync",
-  "sourceUrl": "https://www.bromptontech.com/online-help/Content/Tessera%20User%20Manual/03.%20Features/12.3.4%20-%20ShutterSync.htm",
-  "basis": "Manufacturer-specific ShutterSync Camera Viewer behavior; exposure times calculated as shutter angle / 360 / frame rate",
-  "current": false,
-  "illustration": {
-    "viewBox": "0 0 240 400",
-    "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">25</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">EXPOSURE WINDOW</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"104\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"77\" class=\"blue-label\">1 / 50 fps camera</text><text x=\"24\" y=\"103\">180 degrees = 10 ms</text><path d=\"M24 132H216M24 124v16m192-16v16\" class=\"wire\"/><rect x=\"12\" y=\"170\" width=\"216\" height=\"104\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"195\" class=\"note\">2 / Shorter shutter</text><text x=\"24\" y=\"221\">90 degrees = 5 ms</text><path d=\"M24 250H120M24 242v16m96-16v16\" class=\"wire\"/><path d=\"M120 250H216\" class=\"reference\"/><rect x=\"12\" y=\"290\" width=\"216\" height=\"81\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"315\">Same LED drive cycle</text><path d=\"M24 351v-16h24v16h24v-16h24v16h24v-16h24v16h24v-16h24v16h24\" class=\"wire\"/><path d=\"M120 325V361\" class=\"reference\"/><text x=\"120\" y=\"394\" text-anchor=\"middle\" class=\"note\">Cycle may be cut short</text>",
-    "caption": "At 50 fps, halving shutter angle halves exposure. A shorter window may cut an LED PWM cycle. Blue shows exposure or drive; amber marks a cutoff. Timing schematic, not to scale."
-  }
-},
-{
-  "id": 24,
-  "date": "2026-10-31",
-  "backfilledOn": "2026-11-01",
-  "track": "Resolution, frame rates, bandwidth, and compression",
-  "trackShort": "Bandwidth",
-  "title": "B frame reordering",
-  "fact": "A B frame that references a later picture in display order cannot be reconstructed until that reference is available. In a simple I0 B1 B2 P3 sequence, the decoder receives the reference P3 before B1 and B2, then restores display order. This reordering can add buffering latency; B frames do not universally imply one fixed delay.",
-  "why": "A low bitrate contribution feed can look sharp yet arrive late on an IMAG screen because temporal compression, which predicts across pictures, has introduced buffering.",
-  "takeaway": "Check the encoder's B frame and lookahead settings, then measure end-to-end latency in the intended mode. GOP length alone is not a latency specification.",
-  "sourceLabel": "AWS Media Blog, Back to basics: GOPs explained",
-  "sourceUrl": "https://aws.amazon.com/blogs/media/part-1-back-to-basics-gops-explained/",
-  "basis": "General temporal prediction mechanism; illustrative sequence only, implementation-dependent delay",
-  "current": false,
-  "illustration": {
-    "viewBox": "0 0 240 400",
-    "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">24</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">FRAME ORDER</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"82\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"76\" class=\"blue-label\">1 / Display order</text><rect x=\"24\" y=\"89\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"45\" y=\"112\" text-anchor=\"middle\">I0</text><rect x=\"73\" y=\"89\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"94\" y=\"112\" text-anchor=\"middle\">B1</text><rect x=\"122\" y=\"89\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"143\" y=\"112\" text-anchor=\"middle\">B2</text><rect x=\"171\" y=\"89\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"192\" y=\"112\" text-anchor=\"middle\">P3</text><rect x=\"12\" y=\"150\" width=\"216\" height=\"82\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"174\" class=\"blue-label\">2 / Decoder input</text><rect x=\"24\" y=\"187\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"45\" y=\"210\" text-anchor=\"middle\">I0</text><rect x=\"73\" y=\"187\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"94\" y=\"210\" text-anchor=\"middle\">P3</text><rect x=\"122\" y=\"187\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"143\" y=\"210\" text-anchor=\"middle\">B1</text><rect x=\"171\" y=\"187\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"192\" y=\"210\" text-anchor=\"middle\">B2</text><path d=\"M94 224V245H168V224m-6 7l6-7l6 7\" class=\"wire\"/><text x=\"120\" y=\"272\" text-anchor=\"middle\" class=\"blue-label\">P3 available first</text><rect x=\"12\" y=\"291\" width=\"216\" height=\"80\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"315\" class=\"note\">Future reference</text><text x=\"24\" y=\"340\">Buffer, then reorder</text><text x=\"24\" y=\"363\" class=\"good-label\">Show I0 B1 B2 P3</text><text x=\"120\" y=\"393\" text-anchor=\"middle\">Example, not a delay spec</text>",
-    "caption": "Example with future-referenced B pictures: P3 arrives before B1 and B2; a buffer restores display order. The blue arrow shows a prediction dependency, not a cable or measured delay."
-  }
-},
+<script id="archive-data" type="application/json">[
+  {
+    "id": 29,
+    "date": "2026-11-05",
+    "track": "Cameras, switchers, scalers, and capture systems",
+    "trackShort": "Cameras",
+    "title": "Rolling shutter row timing",
+    "fact": "With rolling shutter, sensor rows begin and end exposure at different times. Shortening exposure does not by itself remove the time offset between rows, so a sharp image can still show geometric skew during motion. Row timing depends on the sensor and operating mode.",
+    "why": "On a fast pan across stage columns, increasing shutter speed can reduce motion blur while the columns still lean. Exposure duration and sensor scan timing need separate checks.",
+    "takeaway": "Test the intended camera mode with a controlled pan across vertical lines. Compare skew separately from blur; repeat after changing resolution or readout mode rather than assuming a shorter shutter fixes both.",
+    "sourceLabel": "Basler, CMOS Rolling Shutter Cameras",
+    "sourceUrl": "https://www.baslerweb.com/en/learning/cmos-rolling-shutter-cameras/",
+    "basis": "Sensor acquisition principle, not a transport standard or a universal timing specification. Diagram compares equal row offsets at two exposure durations; illustrative only.",
+    "current": true,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">29</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">SCAN TIMING</text><path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"110\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"77\" class=\"blue-label\">1 / Longer exposure</text><text x=\"24\" y=\"108\">First</text><text x=\"24\" y=\"144\">Last</text><path d=\"M90 102H160M138 138H208\" class=\"wire\"/>\n<rect x=\"12\" y=\"182\" width=\"216\" height=\"110\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"207\" class=\"blue-label\">2 / Shorter exposure</text><text x=\"24\" y=\"238\">First</text><text x=\"24\" y=\"274\">Last</text><path d=\"M90 232H114M138 268H162\" class=\"wire\"/>\n<path d=\"M90 89V151M138 89V151M90 219V281M138 219V281\" fill=\"none\" stroke=\"var(--amber)\" stroke-dasharray=\"4 5\"/>\n<path d=\"M90 309H138m-6-5l6 5l-6 5m-36-10l-6 5l6 5\" fill=\"none\" stroke=\"var(--cyan)\"/><text x=\"24\" y=\"341\">Same row start offset</text><text x=\"24\" y=\"368\" class=\"note\">Time \u2192  Not to scale</text><text x=\"24\" y=\"394\">Blue = exposure time</text>",
+      "caption": "Blue bars show first and last row exposure. Shorter bars retain the same start offset, marked by amber timing references. Timing schematic, not to scale; actual offsets depend on camera mode."
+    }
+  },
+  {
+    "id": 28,
+    "date": "2026-11-04",
+    "track": "Color spaces, chroma subsampling, bit depth, and HDR",
+    "trackShort": "Color & HDR",
+    "title": "Processing depth and input depth",
+    "fact": "A monitor's internal LUT (look-up table) precision does not establish the incoming signal's bit depth. EIZO's CG247 uses a 16-bit LUT, but its documented 10-bit DisplayPort display also requires a graphics board and software that support 10-bit output. Internal processing precision and transport depth are separate specifications.",
+    "why": "A playback computer can feed 8-bit graphics into a monitor with high-precision processing. The monitor's LUT specification alone does not confirm a 10-bit production path.",
+    "takeaway": "Check the application's output support, GPU settings and monitor input status. Use a known gradient to inspect the complete path; count 256 possible component codes at 8 bits versus 1024 at 10 bits, before range restrictions.",
+    "sourceLabel": "EIZO CG247, 10-Bit Simultaneous Display",
+    "sourceUrl": "https://www.eizo.com/products/coloredge/cg247/",
+    "basis": "Manufacturer-specific CG247 DisplayPort requirements; binary code counts are arithmetic, not nominal video-range limits",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">28</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">DEPTH CHECKS</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"90\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Input code space</text><text x=\"24\" y=\"106\">8 bits = 256 codes</text><text x=\"24\" y=\"130\">10 bits = 1024 codes</text><path d=\"M120 149V178m-7-8l7 8l7-8\" class=\"wire\"/><rect x=\"12\" y=\"192\" width=\"216\" height=\"90\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"218\" class=\"blue-label\">2 / Monitor processing</text><text x=\"24\" y=\"246\">CG247: 16-bit LUT</text><text x=\"24\" y=\"270\">Separate specification</text><rect x=\"12\" y=\"302\" width=\"216\" height=\"69\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"326\" class=\"note\">Verify source + input</text><text x=\"24\" y=\"353\">Then check gradients</text><text x=\"120\" y=\"395\" text-anchor=\"middle\">Codes per component</text>",
+      "caption": "Input code space and internal LUT precision describe different stages. Blue shows signal flow into monitor processing. Code totals precede range limits; the CG247 example is product specific."
+    }
+  },
+  {
+    "id": 27,
+    "date": "2026-11-03",
+    "track": "SDI, HDMI, DisplayPort, and signal transport",
+    "trackShort": "Transport",
+    "title": "Quad link image mapping",
+    "fact": "Four SDI cables do not uniquely identify a UHD image mapping. Square Division (SQD) divides the picture into four spatial quadrants; Two Sample Interleave (2SI) distributes samples across subimages instead. AJA's FS4 documents both mappings. Support and automatic detection depend on the device and operating mode.",
+    "why": "A quad-link source and receiver can agree on raster and frame rate yet still reconstruct the picture incorrectly when their mappings differ.",
+    "takeaway": "Record SQD or 2SI alongside resolution, exact rate and link order. Check both endpoints' mapping settings before troubleshooting the four cable paths individually.",
+    "sourceLabel": "AJA FS4 manual v1.1, Output Image Mapping",
+    "sourceUrl": "https://www.aja.com/support/item-download/3738/AJA_manual_FS4_v1.1.pdf",
+    "basis": "Distinct SMPTE image mappings; FS4 support is manufacturer and mode specific",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">27</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">SQD LINK ORDER</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"230\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Spatial quadrants</text><rect x=\"32\" y=\"100\" width=\"176\" height=\"144\" class=\"node\"/><path d=\"M120 100V244M32 172H208\" class=\"wire\"/><text x=\"76\" y=\"142\" text-anchor=\"middle\">SDI 1</text><text x=\"164\" y=\"142\" text-anchor=\"middle\">SDI 2</text><text x=\"76\" y=\"214\" text-anchor=\"middle\">SDI 3</text><text x=\"164\" y=\"214\" text-anchor=\"middle\">SDI 4</text><text x=\"120\" y=\"268\" text-anchor=\"middle\">One quadrant per link</text><rect x=\"12\" y=\"298\" width=\"216\" height=\"75\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"322\" class=\"note\">2 / Receiver check</text><text x=\"24\" y=\"350\">SQD mapping + order</text><text x=\"120\" y=\"395\" text-anchor=\"middle\">2SI is a different map</text>",
+      "caption": "SQD assigns four spatial quadrants to four SDI links. This is a conceptual picture map, not physical wiring. A receiver set for 2SI expects a different sample arrangement."
+    }
+  },
+  {
+    "id": 26,
+    "date": "2026-11-02",
+    "track": "Signal troubleshooting and system design",
+    "trackShort": "Troubleshooting",
+    "title": "Active HDMI cable direction",
+    "fact": "Matching HDMI plugs do not make an active cable reversible. Extron specifies its HD Pro Plenum hybrid optical-copper cables as unidirectional and powered from the HDMI source. Direction and power requirements belong to the cable design; they are not universal properties of every HDMI cable.",
+    "why": "A long cable pulled backward through a truss or conduit can leave a display dark even when its connectors fit and the source format is supported.",
+    "takeaway": "Identify the designated source and display ends before routing. Bench-test the complete path in its intended direction and format, and label both ends before the pull.",
+    "sourceLabel": "Extron HD Pro Plenum Series specifications",
+    "sourceUrl": "https://www.extron.com/product/hdproplenum",
+    "basis": "Manufacturer-specific unidirectional active hybrid cable behavior; conceptual main video path only",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">26</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">CABLE DIRECTION</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"135\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Correct orientation</text><text x=\"24\" y=\"110\">Source</text><text x=\"157\" y=\"110\">Display</text><path d=\"M30 137H207m-8-7l8 7l-8 7\" class=\"wire\"/><text x=\"24\" y=\"171\" class=\"good-label\">Designated video path</text><rect x=\"12\" y=\"205\" width=\"216\" height=\"135\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"231\" class=\"note\">2 / Reversed cable</text><text x=\"24\" y=\"263\">Source</text><text x=\"157\" y=\"263\">Display</text><path d=\"M207 290H30m8-7l-8 7l8 7M110 279l22 22m0-22l-22 22\" class=\"reference\"/><text x=\"24\" y=\"325\" class=\"note\">Unsupported direction</text><text x=\"120\" y=\"369\" text-anchor=\"middle\">HD Pro Plenum example</text><text x=\"120\" y=\"393\" text-anchor=\"middle\">Check before cable pull</text>",
+      "caption": "The active cable has a designated video direction. Reversing the assembly opposes the source-to-display path. Blue is main video; amber is the reversed orientation, not a return channel."
+    }
+  },
+  {
+    "id": 25,
+    "date": "2026-11-01",
+    "track": "LED walls, projection, EDID, and HDCP",
+    "trackShort": "Displays",
+    "title": "LED refresh and shutter exposure",
+    "fact": "An LED panel's PWM (pulse width modulation) cycle may extend beyond the camera's exposure, producing scan lines or uneven exposure. Brompton's ShutterSync tunes panel refresh to camera settings and requires genlock in its Camera Viewer mode. This is a manufacturer-specific feature; supported shutter ranges depend on the panel.",
+    "why": "A wall that looks clean to the audience can show artifacts on the broadcast camera, especially after a shutter change.",
+    "takeaway": "At 50 fps, 180 degrees gives 10 ms exposure; 90 degrees gives 5 ms. Enter the actual shutter settings, confirm reference lock, and test the wall through each production camera. Refresh adjustment does not replace camera tests.",
+    "sourceLabel": "Brompton Tessera online manual, ShutterSync",
+    "sourceUrl": "https://www.bromptontech.com/online-help/Content/Tessera%20User%20Manual/03.%20Features/12.3.4%20-%20ShutterSync.htm",
+    "basis": "Manufacturer-specific ShutterSync Camera Viewer behavior; exposure times calculated as shutter angle / 360 / frame rate",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">25</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">EXPOSURE WINDOW</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"104\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"77\" class=\"blue-label\">1 / 50 fps camera</text><text x=\"24\" y=\"103\">180 degrees = 10 ms</text><path d=\"M24 132H216M24 124v16m192-16v16\" class=\"wire\"/><rect x=\"12\" y=\"170\" width=\"216\" height=\"104\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"195\" class=\"note\">2 / Shorter shutter</text><text x=\"24\" y=\"221\">90 degrees = 5 ms</text><path d=\"M24 250H120M24 242v16m96-16v16\" class=\"wire\"/><path d=\"M120 250H216\" class=\"reference\"/><rect x=\"12\" y=\"290\" width=\"216\" height=\"81\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"315\">Same LED drive cycle</text><path d=\"M24 351v-16h24v16h24v-16h24v16h24v-16h24v16h24v-16h24v16h24\" class=\"wire\"/><path d=\"M120 325V361\" class=\"reference\"/><text x=\"120\" y=\"394\" text-anchor=\"middle\" class=\"note\">Cycle may be cut short</text>",
+      "caption": "At 50 fps, halving shutter angle halves exposure. A shorter window may cut an LED PWM cycle. Blue shows exposure or drive; amber marks a cutoff. Timing schematic, not to scale."
+    }
+  },
+  {
+    "id": 24,
+    "date": "2026-10-31",
+    "backfilledOn": "2026-11-01",
+    "track": "Resolution, frame rates, bandwidth, and compression",
+    "trackShort": "Bandwidth",
+    "title": "B frame reordering",
+    "fact": "A B frame that references a later picture in display order cannot be reconstructed until that reference is available. In a simple I0 B1 B2 P3 sequence, the decoder receives the reference P3 before B1 and B2, then restores display order. This reordering can add buffering latency; B frames do not universally imply one fixed delay.",
+    "why": "A low bitrate contribution feed can look sharp yet arrive late on an IMAG screen because temporal compression, which predicts across pictures, has introduced buffering.",
+    "takeaway": "Check the encoder's B frame and lookahead settings, then measure end-to-end latency in the intended mode. GOP length alone is not a latency specification.",
+    "sourceLabel": "AWS Media Blog, Back to basics: GOPs explained",
+    "sourceUrl": "https://aws.amazon.com/blogs/media/part-1-back-to-basics-gops-explained/",
+    "basis": "General temporal prediction mechanism; illustrative sequence only, implementation-dependent delay",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">24</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">FRAME ORDER</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"52\" width=\"216\" height=\"82\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"76\" class=\"blue-label\">1 / Display order</text><rect x=\"24\" y=\"89\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"45\" y=\"112\" text-anchor=\"middle\">I0</text><rect x=\"73\" y=\"89\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"94\" y=\"112\" text-anchor=\"middle\">B1</text><rect x=\"122\" y=\"89\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"143\" y=\"112\" text-anchor=\"middle\">B2</text><rect x=\"171\" y=\"89\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"192\" y=\"112\" text-anchor=\"middle\">P3</text><rect x=\"12\" y=\"150\" width=\"216\" height=\"82\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"174\" class=\"blue-label\">2 / Decoder input</text><rect x=\"24\" y=\"187\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"45\" y=\"210\" text-anchor=\"middle\">I0</text><rect x=\"73\" y=\"187\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"94\" y=\"210\" text-anchor=\"middle\">P3</text><rect x=\"122\" y=\"187\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"143\" y=\"210\" text-anchor=\"middle\">B1</text><rect x=\"171\" y=\"187\" width=\"43\" height=\"34\" rx=\"4\" class=\"node\"/><text x=\"192\" y=\"210\" text-anchor=\"middle\">B2</text><path d=\"M94 224V245H168V224m-6 7l6-7l6 7\" class=\"wire\"/><text x=\"120\" y=\"272\" text-anchor=\"middle\" class=\"blue-label\">P3 available first</text><rect x=\"12\" y=\"291\" width=\"216\" height=\"80\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"315\" class=\"note\">Future reference</text><text x=\"24\" y=\"340\">Buffer, then reorder</text><text x=\"24\" y=\"363\" class=\"good-label\">Show I0 B1 B2 P3</text><text x=\"120\" y=\"393\" text-anchor=\"middle\">Example, not a delay spec</text>",
+      "caption": "Example with future-referenced B pictures: P3 arrives before B1 and B2; a buffer restores display order. The blue arrow shows a prediction dependency, not a cable or measured delay."
+    }
+  },
   {
     "id": 23,
     "date": "2026-10-30",
@@ -455,7 +473,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "sourceLabel": "AJA FS4 technical specifications, Format Conversion",
     "sourceUrl": "https://www.aja.com/products/fs4",
     "basis": "Manufacturer-specific FS4 conversion families; supported raster, scan and processing-mode restrictions still apply",
-  "current": false,
+    "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
       "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">23</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">RATE FAMILIES</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"50\" width=\"216\" height=\"70\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"73\" class=\"blue-label\">1 / Fractional fps</text><text x=\"120\" y=\"99\" text-anchor=\"middle\">59.94 / 29.97 / 23.98</text><path d=\"M32 109H208\" class=\"wire\"/><rect x=\"12\" y=\"132\" width=\"216\" height=\"70\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"155\" class=\"blue-label\">2 / 50 fps family</text><text x=\"120\" y=\"181\" text-anchor=\"middle\">50 / 25 fps</text><path d=\"M32 191H208\" class=\"wire\"/><rect x=\"12\" y=\"214\" width=\"216\" height=\"70\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"237\" class=\"blue-label\">3 / 60 fps family</text><text x=\"120\" y=\"263\" text-anchor=\"middle\">60 / 30 / 24 fps</text><path d=\"M32 273H208\" class=\"wire\"/><rect x=\"12\" y=\"296\" width=\"216\" height=\"76\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"319\" class=\"note\">Cross-family request</text><text x=\"24\" y=\"350\">50 fps</text><text x=\"140\" y=\"350\">59.94 fps</text><path d=\"M78 345H132m-6-5l6 5l-6 5M101 336l18 18m0-18l-18 18\" class=\"reference\"/><text x=\"120\" y=\"392\" text-anchor=\"middle\" class=\"note\">Outside FS4 capability</text>",
@@ -477,7 +495,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
-      "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">22</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">OPTICAL MATCH</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"54\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"79\" class=\"blue-label\">MM / 850 nm</text><rect x=\"24\" y=\"100\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"58\" y=\"127\" text-anchor=\"middle\">TX</text><rect x=\"148\" y=\"100\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"182\" y=\"127\" text-anchor=\"middle\">RX</text><path d=\"M92 122H148m-6-5l6 5l-6 5\" class=\"wire\"/><text x=\"120\" y=\"179\" text-anchor=\"middle\" class=\"good-label\">Multimode fiber</text><rect x=\"12\" y=\"212\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"237\" class=\"blue-label\">SM / 1310 nm</text><rect x=\"24\" y=\"258\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"58\" y=\"285\" text-anchor=\"middle\">TX</text><rect x=\"148\" y=\"258\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"182\" y=\"285\" text-anchor=\"middle\">RX</text><path d=\"M92 280H148m-6-5l6 5l-6 5\" class=\"wire\"/><text x=\"120\" y=\"337\" text-anchor=\"middle\" class=\"good-label\">Singlemode fiber</text><text x=\"120\" y=\"383\" text-anchor=\"middle\" class=\"note\">LC shape ≠ fiber mode</text>",
+      "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">22</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">OPTICAL MATCH</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"54\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"79\" class=\"blue-label\">MM / 850 nm</text><rect x=\"24\" y=\"100\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"58\" y=\"127\" text-anchor=\"middle\">TX</text><rect x=\"148\" y=\"100\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"182\" y=\"127\" text-anchor=\"middle\">RX</text><path d=\"M92 122H148m-6-5l6 5l-6 5\" class=\"wire\"/><text x=\"120\" y=\"179\" text-anchor=\"middle\" class=\"good-label\">Multimode fiber</text><rect x=\"12\" y=\"212\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"237\" class=\"blue-label\">SM / 1310 nm</text><rect x=\"24\" y=\"258\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"58\" y=\"285\" text-anchor=\"middle\">TX</text><rect x=\"148\" y=\"258\" width=\"68\" height=\"44\" rx=\"4\" class=\"node\"/><text x=\"182\" y=\"285\" text-anchor=\"middle\">RX</text><path d=\"M92 280H148m-6-5l6 5l-6 5\" class=\"wire\"/><text x=\"120\" y=\"337\" text-anchor=\"middle\" class=\"good-label\">Singlemode fiber</text><text x=\"120\" y=\"383\" text-anchor=\"middle\" class=\"note\">LC shape \u2260 fiber mode</text>",
       "caption": "FOX3 alternatives: MM means multimode; SM means singlemode. Blue arrows show separate optical paths between matching TX and RX models. LC shape does not identify fiber mode."
     }
   },
@@ -496,7 +514,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
-      "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">21</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">TIMING / LABELS</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"54\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"note\">Timecode alone</text><text x=\"24\" y=\"111\">A</text><text x=\"24\" y=\"147\">B</text><path d=\"M52 106H212M52 142H212\" class=\"rule\"/><path d=\"M68 94V118M116 94V118M164 94V118\" class=\"wire\"/><path d=\"M86 130V154M134 130V154M182 130V154\" class=\"reference\"/><text x=\"24\" y=\"181\" class=\"note\">Same labels ≠ phase</text><rect x=\"12\" y=\"212\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"238\" class=\"blue-label\">Common genlock</text><text x=\"24\" y=\"271\">A</text><text x=\"24\" y=\"307\">B</text><path d=\"M52 266H212M52 302H212\" class=\"rule\"/><path d=\"M80 254V278M128 254V278M176 254V278\" class=\"wire\"/><path d=\"M80 290V314M128 290V314M176 290V314\" class=\"reference\"/><text x=\"24\" y=\"340\" class=\"good-label\">Aligned timing</text><text x=\"120\" y=\"382\" text-anchor=\"middle\" class=\"note\">Timing sketch, not to scale</text>",
+      "body": "<rect width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">21</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">TIMING / LABELS</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"54\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"note\">Timecode alone</text><text x=\"24\" y=\"111\">A</text><text x=\"24\" y=\"147\">B</text><path d=\"M52 106H212M52 142H212\" class=\"rule\"/><path d=\"M68 94V118M116 94V118M164 94V118\" class=\"wire\"/><path d=\"M86 130V154M134 130V154M182 130V154\" class=\"reference\"/><text x=\"24\" y=\"181\" class=\"note\">Same labels \u2260 phase</text><rect x=\"12\" y=\"212\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"238\" class=\"blue-label\">Common genlock</text><text x=\"24\" y=\"271\">A</text><text x=\"24\" y=\"307\">B</text><path d=\"M52 266H212M52 302H212\" class=\"rule\"/><path d=\"M80 254V278M128 254V278M176 254V278\" class=\"wire\"/><path d=\"M80 290V314M128 290V314M176 290V314\" class=\"reference\"/><text x=\"24\" y=\"340\" class=\"good-label\">Aligned timing</text><text x=\"120\" y=\"382\" text-anchor=\"middle\" class=\"note\">Timing sketch, not to scale</text>",
       "caption": "Vertical marks show frame boundaries: blue camera A, amber camera B. Timecode labels alone do not align phase; common genlock aligns timing. Not a latency comparison."
     }
   },
@@ -544,7 +562,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "track": "Fiber, video over IP, NDI, and SMPTE ST 2110",
     "trackShort": "IP & fiber",
     "title": "NDI discovery and media paths",
-    "fact": "NDI Discovery Server is a source registry, not a media relay. For a direct NDI sender/receiver connection, discovery and media transfer are separate network steps: a source appearing in the receiver’s list does not prove that its media path is reachable. This is NDI behavior, not a SMPTE ST 2110 requirement.",
+    "fact": "NDI Discovery Server is a source registry, not a media relay. For a direct NDI sender/receiver connection, discovery and media transfer are separate network steps: a source appearing in the receiver\u2019s list does not prove that its media path is reachable. This is NDI behavior, not a SMPTE ST 2110 requirement.",
     "why": "A routed show network can advertise a camera successfully yet deliver no picture if routing or firewall rules block the sender/receiver media session.",
     "takeaway": "Test discovery and an actual receive session separately. Verify the advertised source address, endpoint routing and media-port policy. Do not assume opening only the Discovery Server port enables video.",
     "sourceLabel": "NDI White Paper, Discovery Server",
@@ -563,9 +581,9 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "track": "LED walls, projection, EDID, and HDCP",
     "trackShort": "Displays",
     "title": "Projection throw ratio",
-    "fact": "Throw ratio relates projection distance to image width, not diagonal. As a first estimate, distance = width × throw ratio. A nominal ratio is not a mounting drawing: confirm the exact projector/lens, image format and manufacturer distance calculator.",
-    "why": "Planning from a screen’s diagonal can put the projector at the wrong throw or lead to the wrong lens selection on a live-event setup.",
-    "takeaway": "For a 2 m wide image and a 1.5:1 ratio, estimate 3 m of throw. Then verify the model’s specified measurement reference and zoom range before fixing the mounting position.",
+    "fact": "Throw ratio relates projection distance to image width, not diagonal. As a first estimate, distance = width \u00d7 throw ratio. A nominal ratio is not a mounting drawing: confirm the exact projector/lens, image format and manufacturer distance calculator.",
+    "why": "Planning from a screen\u2019s diagonal can put the projector at the wrong throw or lead to the wrong lens selection on a live-event setup.",
+    "takeaway": "For a 2 m wide image and a 1.5:1 ratio, estimate 3 m of throw. Then verify the model\u2019s specified measurement reference and zoom range before fixing the mounting position.",
     "sourceLabel": "BenQ, Measure an Ideal Screen Size by Throw Ratio Calculator",
     "sourceUrl": "https://www.benq.com/en-us/knowledge-center/knowledge/projector-installation-calculator.html",
     "additionalSources": [
@@ -608,16 +626,16 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "track": "Fiber, video over IP, NDI, and SMPTE ST 2110",
     "trackShort": "IP & fiber",
     "title": "Optical link power budget",
-    "fact": "An optical link’s power budget is transmitter output minus receiver sensitivity. For conservative planning, use minimum specified transmit power and the applicable receiver sensitivity, then subtract path losses and required allowances. Power levels use dBm; their difference is in dB. Endpoint values are product-specific.",
+    "fact": "An optical link\u2019s power budget is transmitter output minus receiver sensitivity. For conservative planning, use minimum specified transmit power and the applicable receiver sensitivity, then subtract path losses and required allowances. Power levels use dBm; their difference is in dB. Endpoint values are product-specific.",
     "why": "A fiber video route can fall short despite being within a quoted distance if connectors, splices, or passive devices consume its margin. Sufficient received power alone does not prove compatibility or acceptable dispersion.",
-    "takeaway": "For a hypothetical −2 dBm transmitter and −14 dBm sensitivity, budget is 12 dB. A 6 dB path leaves 6 dB margin before additional allowances. Also check maximum received power against the receiver’s overload limit.",
+    "takeaway": "For a hypothetical \u22122 dBm transmitter and \u221214 dBm sensitivity, budget is 12 dB. A 6 dB path leaves 6 dB margin before additional allowances. Also check maximum received power against the receiver\u2019s overload limit.",
     "sourceLabel": "Cisco, ATM Network Modules: Power Budget and Margin",
     "sourceUrl": "https://www.cisco.com/c/en/us/td/docs/routers/access/interfaces/nm/hardware/installation/guide/ConntATM.html",
     "basis": "Engineering calculation; manufacturer documentation",
     "illustration": {
       "viewBox": "0 0 240 400",
-      "body": "<rect x=\"0\" y=\"0\" width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">15</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">OPTICAL BUDGET</text><path d=\"M12 40H228\" class=\"rule\"/><text x=\"120\" y=\"64\" text-anchor=\"middle\" class=\"note\">Hypothetical example</text><rect x=\"20\" y=\"80\" width=\"200\" height=\"50\" rx=\"6\" class=\"panel\"/><text x=\"120\" y=\"111\" text-anchor=\"middle\" class=\"blue-label\">TX min: −2 dBm</text><path d=\"M80 130V176m-4-6l4 6l4-6\" class=\"wire\"/><text x=\"164\" y=\"157\" text-anchor=\"middle\" class=\"note\">6 dB loss</text><rect x=\"20\" y=\"182\" width=\"200\" height=\"54\" rx=\"6\" class=\"panel\"/><text x=\"120\" y=\"215\" text-anchor=\"middle\" class=\"blue-label\">RX: −8 dBm</text><path d=\"M20 253H220\" class=\"reference\"/><text x=\"120\" y=\"281\" text-anchor=\"middle\" class=\"\">Sensitivity: −14 dBm</text><rect x=\"20\" y=\"302\" width=\"200\" height=\"64\" rx=\"6\" class=\"result\"/><text x=\"120\" y=\"328\" text-anchor=\"middle\" class=\"\">−8 − (−14) = 6 dB</text><text x=\"120\" y=\"352\" text-anchor=\"middle\" class=\"good-label\">Power margin</text><text x=\"120\" y=\"391\" text-anchor=\"middle\" class=\"note\">Also check overload</text>",
-      "caption": "Illustrative values, not product ratings: −2 dBm minus 6 dB path loss gives −8 dBm at the receiver. Against −14 dBm sensitivity, 6 dB remains before other allowances. Check overload separately."
+      "body": "<rect x=\"0\" y=\"0\" width=\"240\" height=\"400\" rx=\"6\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">15</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">OPTICAL BUDGET</text><path d=\"M12 40H228\" class=\"rule\"/><text x=\"120\" y=\"64\" text-anchor=\"middle\" class=\"note\">Hypothetical example</text><rect x=\"20\" y=\"80\" width=\"200\" height=\"50\" rx=\"6\" class=\"panel\"/><text x=\"120\" y=\"111\" text-anchor=\"middle\" class=\"blue-label\">TX min: \u22122 dBm</text><path d=\"M80 130V176m-4-6l4 6l4-6\" class=\"wire\"/><text x=\"164\" y=\"157\" text-anchor=\"middle\" class=\"note\">6 dB loss</text><rect x=\"20\" y=\"182\" width=\"200\" height=\"54\" rx=\"6\" class=\"panel\"/><text x=\"120\" y=\"215\" text-anchor=\"middle\" class=\"blue-label\">RX: \u22128 dBm</text><path d=\"M20 253H220\" class=\"reference\"/><text x=\"120\" y=\"281\" text-anchor=\"middle\" class=\"\">Sensitivity: \u221214 dBm</text><rect x=\"20\" y=\"302\" width=\"200\" height=\"64\" rx=\"6\" class=\"result\"/><text x=\"120\" y=\"328\" text-anchor=\"middle\" class=\"\">\u22128 \u2212 (\u221214) = 6 dB</text><text x=\"120\" y=\"352\" text-anchor=\"middle\" class=\"good-label\">Power margin</text><text x=\"120\" y=\"391\" text-anchor=\"middle\" class=\"note\">Also check overload</text>",
+      "caption": "Illustrative values, not product ratings: \u22122 dBm minus 6 dB path loss gives \u22128 dBm at the receiver. Against \u221214 dBm sensitivity, 6 dB remains before other allowances. Check overload separately."
     },
     "current": false,
     "backfilledOn": "2026-10-23",
@@ -631,7 +649,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "title": "Progressive segmented frame transport",
     "fact": "Progressive segmented frame (PsF) transport separates a progressively captured picture into odd-line and even-line segments. Both segments belong to the same captured frame. In BT.709, 25PsF carries 25 pictures per second as 50 segments; it does not provide the 50 distinct motion samples of 50i capture.",
     "why": "A switcher or capture device can report an interlaced-looking transport even though the source pictures are progressive. Unnecessary deinterlacing can reduce detail; correct reconstruction depends on identifying PsF and pairing the right segments.",
-    "takeaway": "Check the camera output mode and the receiver’s documented PsF support. Use a moving test image and fine horizontal detail to confirm reconstruction. Do not infer capture cadence from segment rate alone.",
+    "takeaway": "Check the camera output mode and the receiver\u2019s documented PsF support. Use a moving test image and fine horizontal detail to confirm reconstruction. Do not infer capture cadence from segment rate alone.",
     "sourceLabel": "ITU-R BT.709-6, Introduction and Attachment 2",
     "sourceUrl": "https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.709-6-201506-I%21%21PDF-E.pdf",
     "basis": "Standard; informative attachment",
@@ -650,10 +668,10 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "track": "Color spaces, chroma subsampling, bit depth, and HDR",
     "trackShort": "Color & HDR",
     "title": "BT.709 signal ranges",
-    "fact": "For BT.709 video-range 10-bit luma (Y′), nominal black is code 64 and nominal white is 940. Nominal chroma spans 64–960, with neutral at 512. These reference levels differ from full-range coding; bit depth alone does not identify the range. Nominal picture limits are not the entire available code space.",
+    "fact": "For BT.709 video-range 10-bit luma (Y\u2032), nominal black is code 64 and nominal white is 940. Nominal chroma spans 64\u2013960, with neutral at 512. These reference levels differ from full-range coding; bit depth alone does not identify the range. Nominal picture limits are not the entire available code space.",
     "why": "A laptop, converter, or capture input interpreting the wrong range can produce raised blacks, reduced whites, or clipping even when resolution and frame rate match. Automatic range selection depends on the devices and signaling.",
     "takeaway": "Send a known grayscale with black and near-black steps. Check code levels on a waveform monitor and match the source and receiver range settings before changing camera exposure or display brightness.",
-    "sourceLabel": "ITU-R BT.709-6, §3.4 and §4.6",
+    "sourceLabel": "ITU-R BT.709-6, \u00a73.4 and \u00a74.6",
     "sourceUrl": "https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.709-6-201506-I%21%21PDF-E.pdf",
     "basis": "Standard",
     "current": false,
@@ -671,8 +689,8 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "trackShort": "Bandwidth",
     "title": "10-bit 4:2:2 data rate",
     "fact": "Uncompressed 10-bit YCbCr 4:2:2 uses two luma samples (Y) and one sample of each color-difference component (Cb and Cr) per two horizontal pixels: four 10-bit samples, or 20 bits per pixel on average. RFC 4175 packs that two-pixel group into five octets (40 bits).",
-    "why": "For 1920 × 1080 at exactly 60 progressive frames/s, active picture data alone is 2.48832 Gb/s. That already exceeds a 1 Gb/s link; transport headers and link overhead increase the required capacity.",
-    "takeaway": "Calculate width × height × frames/s × 20 for this sampling and bit depth. At 60000/1001 frames/s, divide the 60 fps result by 1.001. Treat this as picture data only, not the SDI line rate or a complete network budget.",
+    "why": "For 1920 \u00d7 1080 at exactly 60 progressive frames/s, active picture data alone is 2.48832 Gb/s. That already exceeds a 1 Gb/s link; transport headers and link overhead increase the required capacity.",
+    "takeaway": "Calculate width \u00d7 height \u00d7 frames/s \u00d7 20 for this sampling and bit depth. At 60000/1001 frames/s, divide the 60 fps result by 1.001. Treat this as picture data only, not the SDI line rate or a complete network budget.",
     "sourceLabel": "IETF RFC 4175, sections 2, 3 and 4.3",
     "sourceUrl": "https://www.rfc-editor.org/rfc/rfc4175.html",
     "basis": "Standard + calculation",
@@ -680,7 +698,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "illustration": {
       "viewBox": "0 0 240 400",
       "caption": "Two horizontal pixels contain two Y samples and one Cb/Cr pair. Four 10-bit samples occupy 40 bits: 20 bits per pixel on average. Grouping schematic, not a spatial sampling plot.",
-      "body": "<rect width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">12</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">COUNT SAMPLES</text><path d=\"M12 40H228\" class=\"rule\"/><text x=\"120\" y=\"64\" text-anchor=\"middle\">Two adjacent pixels</text><rect x=\"28\" y=\"78\" width=\"80\" height=\"46\" rx=\"6\" class=\"blue-packet\"/><rect x=\"132\" y=\"78\" width=\"80\" height=\"46\" rx=\"6\" class=\"blue-packet\"/><text x=\"68\" y=\"107\" text-anchor=\"middle\" class=\"blue-label\">Y0</text><text x=\"172\" y=\"107\" text-anchor=\"middle\" class=\"blue-label\">Y1</text><text x=\"120\" y=\"151\" text-anchor=\"middle\">One chroma pair</text><rect x=\"28\" y=\"165\" width=\"80\" height=\"42\" rx=\"6\" class=\"amber-packet\"/><rect x=\"132\" y=\"165\" width=\"80\" height=\"42\" rx=\"6\" class=\"amber-packet\"/><text x=\"68\" y=\"192\" text-anchor=\"middle\" class=\"note\">Cb</text><text x=\"172\" y=\"192\" text-anchor=\"middle\" class=\"note\">Cr</text><path d=\"M68 207V228H172V207M120 228V246\" class=\"reference\"/><rect x=\"14\" y=\"252\" width=\"50\" height=\"40\" rx=\"6\" class=\"amber-packet\"/><rect x=\"68\" y=\"252\" width=\"50\" height=\"40\" rx=\"6\" class=\"blue-packet\"/><rect x=\"122\" y=\"252\" width=\"50\" height=\"40\" rx=\"6\" class=\"amber-packet\"/><rect x=\"176\" y=\"252\" width=\"50\" height=\"40\" rx=\"6\" class=\"blue-packet\"/><text x=\"39\" y=\"278\" text-anchor=\"middle\">Cb</text><text x=\"93\" y=\"278\" text-anchor=\"middle\">Y0</text><text x=\"147\" y=\"278\" text-anchor=\"middle\">Cr</text><text x=\"201\" y=\"278\" text-anchor=\"middle\">Y1</text><text x=\"120\" y=\"320\" text-anchor=\"middle\">4 × 10 = 40 bits</text><rect x=\"20\" y=\"338\" width=\"200\" height=\"42\" rx=\"6\" class=\"result\"/><text x=\"120\" y=\"365\" text-anchor=\"middle\" class=\"good-label\">20 bits / pixel</text>"
+      "body": "<rect width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">12</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">COUNT SAMPLES</text><path d=\"M12 40H228\" class=\"rule\"/><text x=\"120\" y=\"64\" text-anchor=\"middle\">Two adjacent pixels</text><rect x=\"28\" y=\"78\" width=\"80\" height=\"46\" rx=\"6\" class=\"blue-packet\"/><rect x=\"132\" y=\"78\" width=\"80\" height=\"46\" rx=\"6\" class=\"blue-packet\"/><text x=\"68\" y=\"107\" text-anchor=\"middle\" class=\"blue-label\">Y0</text><text x=\"172\" y=\"107\" text-anchor=\"middle\" class=\"blue-label\">Y1</text><text x=\"120\" y=\"151\" text-anchor=\"middle\">One chroma pair</text><rect x=\"28\" y=\"165\" width=\"80\" height=\"42\" rx=\"6\" class=\"amber-packet\"/><rect x=\"132\" y=\"165\" width=\"80\" height=\"42\" rx=\"6\" class=\"amber-packet\"/><text x=\"68\" y=\"192\" text-anchor=\"middle\" class=\"note\">Cb</text><text x=\"172\" y=\"192\" text-anchor=\"middle\" class=\"note\">Cr</text><path d=\"M68 207V228H172V207M120 228V246\" class=\"reference\"/><rect x=\"14\" y=\"252\" width=\"50\" height=\"40\" rx=\"6\" class=\"amber-packet\"/><rect x=\"68\" y=\"252\" width=\"50\" height=\"40\" rx=\"6\" class=\"blue-packet\"/><rect x=\"122\" y=\"252\" width=\"50\" height=\"40\" rx=\"6\" class=\"amber-packet\"/><rect x=\"176\" y=\"252\" width=\"50\" height=\"40\" rx=\"6\" class=\"blue-packet\"/><text x=\"39\" y=\"278\" text-anchor=\"middle\">Cb</text><text x=\"93\" y=\"278\" text-anchor=\"middle\">Y0</text><text x=\"147\" y=\"278\" text-anchor=\"middle\">Cr</text><text x=\"201\" y=\"278\" text-anchor=\"middle\">Y1</text><text x=\"120\" y=\"320\" text-anchor=\"middle\">4 \u00d7 10 = 40 bits</text><rect x=\"20\" y=\"338\" width=\"200\" height=\"42\" rx=\"6\" class=\"result\"/><text x=\"120\" y=\"365\" text-anchor=\"middle\" class=\"good-label\">20 bits / pixel</text>"
     },
     "previousTitle": "10-bit 4:2:2 Means 20 Bits per Pixel"
   },
@@ -691,7 +709,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "trackShort": "Transport",
     "title": "12G-SDI interface and image mapping",
     "fact": "SMPTE ST 2082-1 defines the 12G-SDI electrical interface at 11.88 Gb/s (or 11.88/1.001 Gb/s) payload. It does not by itself identify the picture format; image and ancillary-data mappings are specified separately, such as ST 2082-10. A connector marked 12G therefore establishes link capability, not automatic support for every 4K/UHD raster, rate, sampling, or mapping.",
-    "why": "A 12G-capable router, converter, or monitor can still reject a source that uses an unsupported raster or mapping. In a live handoff, calling a feed “12G” leaves the receiving engineer without enough information to prove interoperability.",
+    "why": "A 12G-capable router, converter, or monitor can still reject a source that uses an unsupported raster or mapping. In a live handoff, calling a feed \u201c12G\u201d leaves the receiving engineer without enough information to prove interoperability.",
     "takeaway": "Put the complete signal description on the patch sheet: raster, frame rate, sampling/bit depth, link count, and mapping. Confirm those fields in both endpoint format tables before assuming a 12G BNC route will pass the source.",
     "sourceLabel": "SMPTE ST 2082-1:2023, 12 Gb/s SDI Electrical",
     "sourceUrl": "https://pub.smpte.org/latest/st2082-1/st2082-1-2023.pdf",
@@ -699,7 +717,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "current": false,
     "illustration": {
       "caption": "The 12G-SDI electrical link is only one layer. A successful handoff also needs a supported image mapping and matching endpoint format capability.",
-      "body": "<rect x=\"0\" y=\"0\" width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\" text-anchor=\"start\">11</text><text x=\"48\" y=\"26\" class=\"diagram-heading\" text-anchor=\"start\">12G IS A LAYER</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"18\" y=\"61\" width=\"204\" height=\"71\" rx=\"8\" class=\"panel\"/><text x=\"34\" y=\"87\" class=\"diagram-heading\" text-anchor=\"start\">1  Format description</text><text x=\"34\" y=\"111\" class=\"note\" text-anchor=\"start\">raster · rate · sampling</text><path d=\"M120 132V153m-4-6l4 6l4-6\" class=\"wire\"/><rect x=\"18\" y=\"153\" width=\"204\" height=\"73\" rx=\"8\" class=\"panel\"/><text x=\"34\" y=\"179\" class=\"diagram-heading\" text-anchor=\"start\">2  Image mapping</text><text x=\"34\" y=\"203\" class=\"blue-label\" text-anchor=\"start\">e.g. ST 2082-10</text><path d=\"M120 226V247m-4-6l4 6l4-6\" class=\"wire\"/><rect x=\"18\" y=\"247\" width=\"204\" height=\"61\" rx=\"8\" class=\"panel\"/><text x=\"34\" y=\"273\" class=\"diagram-heading\" text-anchor=\"start\">3  Electrical link</text><text x=\"34\" y=\"295\" class=\"amber-label\" text-anchor=\"start\">12G · 11.88 Gb/s payload</text><path d=\"M120 308V330m-4-6l4 6l4-6\" class=\"wire\"/><rect x=\"18\" y=\"330\" width=\"204\" height=\"51\" rx=\"8\" class=\"result\"/><text x=\"120\" y=\"358\" class=\"good-label\" text-anchor=\"middle\">Both endpoints must agree</text><text x=\"120\" y=\"376\" class=\"note\" text-anchor=\"middle\">link alone is not enough</text>",
+      "body": "<rect x=\"0\" y=\"0\" width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\" text-anchor=\"start\">11</text><text x=\"48\" y=\"26\" class=\"diagram-heading\" text-anchor=\"start\">12G IS A LAYER</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"18\" y=\"61\" width=\"204\" height=\"71\" rx=\"8\" class=\"panel\"/><text x=\"34\" y=\"87\" class=\"diagram-heading\" text-anchor=\"start\">1  Format description</text><text x=\"34\" y=\"111\" class=\"note\" text-anchor=\"start\">raster \u00b7 rate \u00b7 sampling</text><path d=\"M120 132V153m-4-6l4 6l4-6\" class=\"wire\"/><rect x=\"18\" y=\"153\" width=\"204\" height=\"73\" rx=\"8\" class=\"panel\"/><text x=\"34\" y=\"179\" class=\"diagram-heading\" text-anchor=\"start\">2  Image mapping</text><text x=\"34\" y=\"203\" class=\"blue-label\" text-anchor=\"start\">e.g. ST 2082-10</text><path d=\"M120 226V247m-4-6l4 6l4-6\" class=\"wire\"/><rect x=\"18\" y=\"247\" width=\"204\" height=\"61\" rx=\"8\" class=\"panel\"/><text x=\"34\" y=\"273\" class=\"diagram-heading\" text-anchor=\"start\">3  Electrical link</text><text x=\"34\" y=\"295\" class=\"amber-label\" text-anchor=\"start\">12G \u00b7 11.88 Gb/s payload</text><path d=\"M120 308V330m-4-6l4 6l4-6\" class=\"wire\"/><rect x=\"18\" y=\"330\" width=\"204\" height=\"51\" rx=\"8\" class=\"result\"/><text x=\"120\" y=\"358\" class=\"good-label\" text-anchor=\"middle\">Both endpoints must agree</text><text x=\"120\" y=\"376\" class=\"note\" text-anchor=\"middle\">link alone is not enough</text>",
       "viewBox": "0 0 240 400"
     },
     "previousTitle": "12G-SDI Is an Interface, Not a Format"
@@ -753,7 +771,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "fact": "Changing EDID (Extended Display Identification Data, the display capability information read by a source) does not guarantee an immediate output-format change. Some sources read EDID only at startup or fail to detect a hot-plug notification. Lightware documents this behavior; its HDMI-3D-OPT-DD router signals an EDID change with a two-second hot-plug toggle. That duration is product-specific, not a universal requirement.",
     "why": "A laptop can keep its previous output after you select a projector-friendly EDID, making a successful configuration change look ineffective.",
     "takeaway": "During rehearsal, save the presented EDID and measure the actual output timing after changing it. If unchanged, follow the source's documented re-detection procedure; schedule any required restart before the show.",
-    "sourceLabel": "Lightware HDMI-3D-OPT-DD user manual, sections 9.1.1–9.1.2",
+    "sourceLabel": "Lightware HDMI-3D-OPT-DD user manual, sections 9.1.1\u20139.1.2",
     "sourceUrl": "https://assets.prod.pim.lightware.com/assets/File-Downloads/Guides-and-Manuals/User-Manual/HTML/HDMI-3D-OPT-DD_series/UM.html",
     "basis": "Manufacturer documentation",
     "current": false,
@@ -771,15 +789,15 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "trackShort": "IP & fiber",
     "title": "ST 2022-7 packet redundancy",
     "fact": "SMPTE ST 2022-7 enables hitless reconstruction by sending duplicate RTP streams. A receiver can select packets from either path, so the RTP headers and payloads must be identical between the two streams. Redundancy only improves availability when the paths do not share the same failure point.",
-    "why": "A redundant ST 2110 feed can survive a fiber, switch-port, or path failure without a visible interruption—provided A and B are genuinely diverse. Two streams on the same switch, power domain, or fiber trunk are not resilient to that shared fault.",
+    "why": "A redundant ST 2110 feed can survive a fiber, switch-port, or path failure without a visible interruption\u2014provided A and B are genuinely diverse. Two streams on the same switch, power domain, or fiber trunk are not resilient to that shared fault.",
     "takeaway": "Document Path A and B from sender NIC through receiver NIC. Check separate ports, physical routes, switch power, and, where needed, independent network fabrics.",
-    "sourceLabel": "SMPTE ST 2110-10:2022, §8.5 and Annex B",
+    "sourceLabel": "SMPTE ST 2110-10:2022, \u00a78.5 and Annex B",
     "sourceUrl": "https://pub.smpte.org/doc/st2110-10/20220328-pub/st2110-10-2022.pdf",
     "basis": "Standard",
     "current": false,
     "illustration": {
       "caption": "The receiver uses B's packet #42 when A's copy is missing; packets do not cross between paths. Protection depends on matching copies and receiver timing limits.",
-      "body": "<rect x=\"0\" y=\"0\" width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\" text-anchor=\"start\">07</text><text x=\"48\" y=\"26\" class=\"diagram-heading\" text-anchor=\"start\">PACKET SELECTION</text><path d=\"M12 40H228\" class=\"rule\"/><text x=\"120\" y=\"68\" class=\"\" text-anchor=\"middle\">Matching A/B packet copies</text><text x=\"19\" y=\"100\" class=\"blue-label\" text-anchor=\"start\">PATH A</text><text x=\"145\" y=\"100\" class=\"note\" text-anchor=\"start\">PATH B</text><rect x=\"19\" y=\"116\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet blue-packet\"/><text x=\"47\" y=\"137\" class=\"packet-label\" text-anchor=\"middle\">#41</text><rect x=\"145\" y=\"116\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet amber-packet\"/><text x=\"173\" y=\"137\" class=\"packet-label\" text-anchor=\"middle\">#41</text><rect x=\"19\" y=\"160\" width=\"56\" height=\"30\" rx=\"8\" class=\"missing\"/><text x=\"47\" y=\"181\" class=\"fault\" text-anchor=\"middle\">×</text><rect x=\"145\" y=\"160\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet amber-packet\"/><text x=\"173\" y=\"181\" class=\"packet-label\" text-anchor=\"middle\">#42</text><rect x=\"19\" y=\"204\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet blue-packet\"/><text x=\"47\" y=\"225\" class=\"packet-label\" text-anchor=\"middle\">#43</text><rect x=\"145\" y=\"204\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet amber-packet\"/><text x=\"173\" y=\"225\" class=\"packet-label\" text-anchor=\"middle\">#43</text><text x=\"120\" y=\"262\" class=\"\" text-anchor=\"middle\">Receiver selects A or B</text><path d=\"M120 276V296m-4 -6l4 6l4 -6\" class=\"wire\"/><rect x=\"12\" y=\"306\" width=\"216\" height=\"74\" rx=\"8\" class=\"result\"/><rect x=\"24\" y=\"320\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet blue-packet\"/><text x=\"52\" y=\"341\" class=\"packet-label\" text-anchor=\"middle\">#41</text><rect x=\"92\" y=\"320\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet amber-packet\"/><text x=\"120\" y=\"341\" class=\"packet-label\" text-anchor=\"middle\">#42</text><rect x=\"160\" y=\"320\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet blue-packet\"/><text x=\"188\" y=\"341\" class=\"packet-label\" text-anchor=\"middle\">#43</text><text x=\"120\" y=\"369\" class=\"good-label\" text-anchor=\"middle\">Continuous output</text>",
+      "body": "<rect x=\"0\" y=\"0\" width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\" text-anchor=\"start\">07</text><text x=\"48\" y=\"26\" class=\"diagram-heading\" text-anchor=\"start\">PACKET SELECTION</text><path d=\"M12 40H228\" class=\"rule\"/><text x=\"120\" y=\"68\" class=\"\" text-anchor=\"middle\">Matching A/B packet copies</text><text x=\"19\" y=\"100\" class=\"blue-label\" text-anchor=\"start\">PATH A</text><text x=\"145\" y=\"100\" class=\"note\" text-anchor=\"start\">PATH B</text><rect x=\"19\" y=\"116\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet blue-packet\"/><text x=\"47\" y=\"137\" class=\"packet-label\" text-anchor=\"middle\">#41</text><rect x=\"145\" y=\"116\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet amber-packet\"/><text x=\"173\" y=\"137\" class=\"packet-label\" text-anchor=\"middle\">#41</text><rect x=\"19\" y=\"160\" width=\"56\" height=\"30\" rx=\"8\" class=\"missing\"/><text x=\"47\" y=\"181\" class=\"fault\" text-anchor=\"middle\">\u00d7</text><rect x=\"145\" y=\"160\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet amber-packet\"/><text x=\"173\" y=\"181\" class=\"packet-label\" text-anchor=\"middle\">#42</text><rect x=\"19\" y=\"204\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet blue-packet\"/><text x=\"47\" y=\"225\" class=\"packet-label\" text-anchor=\"middle\">#43</text><rect x=\"145\" y=\"204\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet amber-packet\"/><text x=\"173\" y=\"225\" class=\"packet-label\" text-anchor=\"middle\">#43</text><text x=\"120\" y=\"262\" class=\"\" text-anchor=\"middle\">Receiver selects A or B</text><path d=\"M120 276V296m-4 -6l4 6l4 -6\" class=\"wire\"/><rect x=\"12\" y=\"306\" width=\"216\" height=\"74\" rx=\"8\" class=\"result\"/><rect x=\"24\" y=\"320\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet blue-packet\"/><text x=\"52\" y=\"341\" class=\"packet-label\" text-anchor=\"middle\">#41</text><rect x=\"92\" y=\"320\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet amber-packet\"/><text x=\"120\" y=\"341\" class=\"packet-label\" text-anchor=\"middle\">#42</text><rect x=\"160\" y=\"320\" width=\"56\" height=\"30\" rx=\"8\" class=\"packet blue-packet\"/><text x=\"188\" y=\"341\" class=\"packet-label\" text-anchor=\"middle\">#43</text><text x=\"120\" y=\"369\" class=\"good-label\" text-anchor=\"middle\">Continuous output</text>",
       "viewBox": "0 0 240 400"
     },
     "previousTitle": "Hitless Protection Needs Matching Packets"
@@ -792,7 +810,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "title": "3G-SDI mapping levels",
     "fact": "SMPTE ST 425-1 defines multiple mappings for 1080p50/59.94/60 on one 3 Gb/s link. Level A maps a 4:2:2 10-bit picture directly; Level B-DL carries a dual-link mapping, and Level B-DS carries two independent HD-SDI streams. The standard does not require a device to support every mapping.",
     "why": "Two devices can both be labeled 3G-SDI yet fail to interoperate. An input that supports only Level A will not accept Level B, even when lower-rate HD formats pass.",
-    "takeaway": "Before replacing cable, verify the source’s 3G-SDI level setting and inspect the ST 352 payload ID with a suitable analyzer. Auto-detect behavior is manufacturer-specific.",
+    "takeaway": "Before replacing cable, verify the source\u2019s 3G-SDI level setting and inspect the ST 352 payload ID with a suitable analyzer. Auto-detect behavior is manufacturer-specific.",
     "sourceLabel": "SMPTE ST 425-1:2017; AJA, Dual-Link and 3G Overview",
     "sourceUrl": "https://www.aja.com/pdf/qa/Dual_Link_and_3G_Overview.pdf",
     "basis": "Standard + vendor note",
@@ -812,7 +830,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "title": "HDMI cable and device capabilities",
     "fact": "An Ultra High Speed HDMI cable is certified for configurations up to 48 Gb/s, but it does not make a source, repeater, scaler, or display support HDMI 2.1 features or a particular 4K/8K format. Endpoint capability and intermediate-device behavior determine the negotiated signal.",
     "why": "A show system may work source-to-display, then fail after a switcher, extender, or capture device is inserted. A cable replacement cannot add unsupported FRL bandwidth, HDR handling, chroma modes, or HDCP behavior to that device.",
-    "takeaway": "Test the complete intended format directly, then insert one active device at a time. Record the negotiated resolution, refresh rate, chroma, bit depth, HDR state, and HDCP state—not only the cable label.",
+    "takeaway": "Test the complete intended format directly, then insert one active device at a time. Record the negotiated resolution, refresh rate, chroma, bit depth, HDR state, and HDCP state\u2014not only the cable label.",
     "sourceLabel": "HDMI 2.1 / Ultra High Speed cable overview",
     "sourceUrl": "https://www.hdmi.org/spec/hdmi2_1/",
     "basis": "Standard program",
@@ -830,7 +848,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "track": "Color spaces, chroma subsampling, bit depth, and HDR",
     "trackShort": "Color & HDR",
     "title": "PQ and HLG transfer functions",
-    "fact": "ITU-R BT.2100 defines both PQ and HLG HDR transfer functions. PQ maps code values to an absolute luminance reference; HLG’s displayed luminance is relative to the display’s peak capability. They are not interchangeable solely because both are HDR.",
+    "fact": "ITU-R BT.2100 defines both PQ and HLG HDR transfer functions. PQ maps code values to an absolute luminance reference; HLG\u2019s displayed luminance is relative to the display\u2019s peak capability. They are not interchangeable solely because both are HDR.",
     "why": "Feeding HLG camera shading into a PQ production monitor, or converting without an intentional transform, can distort exposure judgement, highlight roll-off, and LED-wall imagery.",
     "takeaway": "At line-up, confirm the transfer function at camera output, switcher format, conversion LUT, multiviewer, record path, and reference display. An HDR label alone is insufficient.",
     "sourceLabel": "ITU-R BT.2100-3; ITU-R BT.2408-4",
@@ -853,12 +871,12 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "fact": "For ST 2110 video at 60/1.001 Hz, a 90 kHz RTP clock cannot advance by the same whole-number count every frame. SMPTE ST 2110-10 notes the increment effectively alternates between 1501 and 1502 ticks; that is correct timing, not timestamp jitter.",
     "why": "A monitor, analyzer, or custom control tool that expects a fixed 1501.5-tick increment can misidentify a healthy 59.94 stream as discontinuous.",
     "takeaway": "Validate the long-term timestamp cadence and frame-rate relationship, rather than requiring identical frame-to-frame deltas.",
-    "sourceLabel": "SMPTE ST 2110-10:2022, §7.6.1",
+    "sourceLabel": "SMPTE ST 2110-10:2022, \u00a77.6.1",
     "sourceUrl": "https://pub.smpte.org/doc/st2110-10/20220328-pub/st2110-10-2022.pdf",
     "basis": "Standard",
     "illustration": {
       "caption": "Example relative RTP timestamps advance by 1501, then 1502, then 1501 ticks. The initial phase and timestamp offset can differ; the two-frame average is 1501.5 ticks.",
-      "body": "<rect x=\"0\" y=\"0\" width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\" text-anchor=\"start\">03</text><text x=\"48\" y=\"26\" class=\"diagram-heading\" text-anchor=\"start\">INTEGER CLOCK STEPS</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"56\" width=\"216\" height=\"67\" rx=\"8\" class=\"panel\"/><text x=\"120\" y=\"83\" class=\"\" text-anchor=\"middle\">90,000 × 1.001 ÷ 60</text><text x=\"120\" y=\"109\" class=\"note\" text-anchor=\"middle\">1501.5 ticks / frame</text><text x=\"22\" y=\"153\" class=\"diagram-heading\" text-anchor=\"start\">Frame</text><text x=\"100\" y=\"153\" class=\"diagram-heading\" text-anchor=\"start\">Relative RTP ticks</text><path d=\"M20 164H220\" class=\"rule\"/><text x=\"26\" y=\"191\" class=\"\" text-anchor=\"start\">F1</text><text x=\"117\" y=\"191\" class=\"\" text-anchor=\"start\">0</text><text x=\"163\" y=\"213\" class=\"blue-label\" text-anchor=\"start\">+1501</text><text x=\"26\" y=\"235\" class=\"\" text-anchor=\"start\">F2</text><text x=\"117\" y=\"235\" class=\"\" text-anchor=\"start\">1501</text><text x=\"163\" y=\"257\" class=\"note\" text-anchor=\"start\">+1502</text><text x=\"26\" y=\"279\" class=\"\" text-anchor=\"start\">F3</text><text x=\"117\" y=\"279\" class=\"\" text-anchor=\"start\">3003</text><text x=\"163\" y=\"301\" class=\"blue-label\" text-anchor=\"start\">+1501</text><text x=\"26\" y=\"323\" class=\"\" text-anchor=\"start\">F4</text><text x=\"117\" y=\"323\" class=\"\" text-anchor=\"start\">4504</text><rect x=\"12\" y=\"346\" width=\"216\" height=\"40\" rx=\"8\" class=\"result\"/><text x=\"120\" y=\"372\" class=\"good-label\" text-anchor=\"middle\">Check cadence, not equality</text>",
+      "body": "<rect x=\"0\" y=\"0\" width=\"240\" height=\"400\" rx=\"8\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\" text-anchor=\"start\">03</text><text x=\"48\" y=\"26\" class=\"diagram-heading\" text-anchor=\"start\">INTEGER CLOCK STEPS</text><path d=\"M12 40H228\" class=\"rule\"/><rect x=\"12\" y=\"56\" width=\"216\" height=\"67\" rx=\"8\" class=\"panel\"/><text x=\"120\" y=\"83\" class=\"\" text-anchor=\"middle\">90,000 \u00d7 1.001 \u00f7 60</text><text x=\"120\" y=\"109\" class=\"note\" text-anchor=\"middle\">1501.5 ticks / frame</text><text x=\"22\" y=\"153\" class=\"diagram-heading\" text-anchor=\"start\">Frame</text><text x=\"100\" y=\"153\" class=\"diagram-heading\" text-anchor=\"start\">Relative RTP ticks</text><path d=\"M20 164H220\" class=\"rule\"/><text x=\"26\" y=\"191\" class=\"\" text-anchor=\"start\">F1</text><text x=\"117\" y=\"191\" class=\"\" text-anchor=\"start\">0</text><text x=\"163\" y=\"213\" class=\"blue-label\" text-anchor=\"start\">+1501</text><text x=\"26\" y=\"235\" class=\"\" text-anchor=\"start\">F2</text><text x=\"117\" y=\"235\" class=\"\" text-anchor=\"start\">1501</text><text x=\"163\" y=\"257\" class=\"note\" text-anchor=\"start\">+1502</text><text x=\"26\" y=\"279\" class=\"\" text-anchor=\"start\">F3</text><text x=\"117\" y=\"279\" class=\"\" text-anchor=\"start\">3003</text><text x=\"163\" y=\"301\" class=\"blue-label\" text-anchor=\"start\">+1501</text><text x=\"26\" y=\"323\" class=\"\" text-anchor=\"start\">F4</text><text x=\"117\" y=\"323\" class=\"\" text-anchor=\"start\">4504</text><rect x=\"12\" y=\"346\" width=\"216\" height=\"40\" rx=\"8\" class=\"result\"/><text x=\"120\" y=\"372\" class=\"good-label\" text-anchor=\"middle\">Check cadence, not equality</text>",
       "viewBox": "0 0 240 400"
     },
     "current": false,
@@ -872,7 +890,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "title": "HDCP status indicators",
     "fact": "On the Extron EDID 101H 4K PLUS, the OUT HDCP LED lights when protected content is authenticated to the connected sink. It remains off if the source does not require HDCP or the sink is not HDCP compliant. This indicator behavior is specific to that product; an unlit HDCP LED alone does not establish a fault.",
     "why": "An unencrypted test pattern can pass with the HDCP LED off. A protected source failing on the same route calls for checking authentication and sink capability, rather than treating the LED as a general signal-present indicator.",
-    "takeaway": "Read the product’s LED definitions. Check signal presence, whether the source is encrypted, and input/output HDCP status separately. Compare protected and unprotected test sources with the same supported timing.",
+    "takeaway": "Read the product\u2019s LED definitions. Check signal presence, whether the source is encrypted, and input/output HDCP status separately. Compare protected and unprotected test sources with the same supported timing.",
     "sourceLabel": "Extron EDID 101H 4K PLUS User Guide, p. 4",
     "sourceUrl": "https://media.extron.com/public/download/files/userman/EDID101H4KPlus_68-3109-01_B.pdf",
     "basis": "Manufacturer documentation",
@@ -893,7 +911,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "title": "PTP timing in SMPTE ST 2110",
     "fact": "In SMPTE ST 2110 systems, audio, video, and ancillary-data RTP timestamps reference a common clock distributed with IEEE 1588 PTP using the SMPTE ST 2059-2 profile. This aligns separately transported essences for correct presentation timing.",
     "why": "A multiviewer or switcher can receive the right streams yet show lip-sync drift or frame misalignment when devices do not share the same PTP domain and grandmaster.",
-    "takeaway": "Before diagnosing multicast or bandwidth, verify every endpoint’s PTP state, selected grandmaster identity, domain, profile, and offset-from-master.",
+    "takeaway": "Before diagnosing multicast or bandwidth, verify every endpoint\u2019s PTP state, selected grandmaster identity, domain, profile, and offset-from-master.",
     "sourceLabel": "SMPTE ST 2110-10:2022",
     "sourceUrl": "https://pub.smpte.org/doc/st2110-10/20220328-pub/st2110-10-2022.pdf",
     "basis": "Standard",
@@ -905,8 +923,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "current": false,
     "previousTitle": "PTP Is the House Sync for ST 2110"
   }
-]
-</script>
+]</script>
 <script>
 "use strict";
     const tracks = ["SDI, HDMI, DisplayPort, and signal transport","Resolution, frame rates, bandwidth, and compression","Color spaces, chroma subsampling, bit depth, and HDR","Genlock, timecode, synchronization, and latency","Cameras, switchers, scalers, and capture systems","LED walls, projection, EDID, and HDCP","Fiber, video over IP, NDI, and SMPTE ST 2110","Signal troubleshooting and system design"];
