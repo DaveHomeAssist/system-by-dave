@@ -30,6 +30,9 @@ notes.addEventListener('input', () => {
     status.textContent = 'Could not save. Keep this page open and export your notes.';
   }
 });
+// Enable editing only after saved content and its autosave listener are ready.
+notes.setAttribute('data-notes-ready', 'true');
+notes.disabled = false;
 theme.addEventListener('click', () => {
   const value = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   showTheme(value);
