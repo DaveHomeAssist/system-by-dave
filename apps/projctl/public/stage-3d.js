@@ -100,6 +100,7 @@ export async function createStage3D(host, plot, openLane) {
   let camera = defaultCamera, selectedLane = 'D', framedSideLane = 'D', currentProposal = null;
   const hiddenLanes = new Set();
   const viewVisibility = () => {
+    roomLayers?.cutawayForCamera(camera === 0 ? ['seats'] : []); roomControls?.sync(); host.dataset.coverageSeatMeshes = String(roomLayers?.count('seats') || 0);
     proposal.visible = camera !== 2 || currentProposal?.lane === framedSideLane;
     for (const [lane, group] of groups) group.visible = !hiddenLanes.has(lane) && (camera !== 2 || lane === framedSideLane);
     labels.forEach((label,lane) => { label.visible = camera === 3 || (camera === 2 && lane === framedSideLane); label.userData.screenPixels = camera === 3 ? 44 : 30; leaders.get(lane).visible = label.visible; });
@@ -175,6 +176,7 @@ export async function createStage3D(host, plot, openLane) {
           room.name = 'Approximate venue reference'; room.traverse(object => { object.castShadow = false; object.receiveShadow = false; for (const material of [object.material].flat().filter(Boolean)) { material.transparent = true; material.opacity = .22; material.depthWrite = false; } });
           roomLayers = createRoomLayers(room, venue.cutaway); host.dataset.roofMeshes = String(roomLayers.count('roof'));
           roomControls = addRoomLayerControls(controls, roomLayers, () => stage.requestRender());
+          roomLayers.cutawayForCamera(camera === 0 ? ['seats'] : []); roomControls.sync();
           model.add(room);
         } finally { roomLoading = false; }
       }

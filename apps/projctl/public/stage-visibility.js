@@ -35,8 +35,8 @@ export function roomLayerNames(raw) {
   if (/(^|\W)(roof|ceiling)(\W|$)|recess perimeter|luminous ceiling/.test(name)) names.push('roof');
   if (/side (?:auditorium wall|wall pilaster)|rear (?:orchestra wall|upper wall|support pier)|sconce (?:plate|diffuser)/.test(name)) names.push('walls');
   if (/mezzanine (?:terrace|aisle handrail)|balcony|cove (?:lip|lintel|black|fixture|glass|cable)|rear (?:technical recess|recess mullion|recess trim)|monitor (?:black frame|blue screen)/.test(name)) names.push('balcony');
-  if (/^(?:orchestra (?:center|right 300|left 200)|upper mezzanine center|mezzanine side)\b|\b(?:chair|seat)\b/.test(name)) names.push('seats');
-  if (/^(?:upper mezzanine center|mezzanine side)\b/.test(name) && !names.includes('balcony')) names.push('balcony');
+  if (/^(?:orchestra (?:center|right 300|left 200)|(?:upper|lower) mezzanine center|mezzanine side)\b|\b(?:chair|seat)\b/.test(name)) names.push('seats');
+  if (/^(?:(?:upper|lower) mezzanine center|mezzanine side)\b/.test(name) && !names.includes('balcony')) names.push('balcony');
   return names;
 }
 export function createRoomLayers(model, supplied = []) {
@@ -44,6 +44,7 @@ export function createRoomLayers(model, supplied = []) {
   const items = [], enabled = {roof:false, walls:true, balcony:true, seats:true};
   const initialRootVisible = model.visible;
   let visible = initialRootVisible;
+  let cameraCutaway = new Set();
   model.traverse(object => {
     const memberships = new Set();
     for (let parent = object; parent && parent !== model.parent; parent = parent.parent) {
@@ -53,10 +54,12 @@ export function createRoomLayers(model, supplied = []) {
     }
     items.push({object, initial:object.visible, memberships});
   });
-  const apply = () => { items.forEach(({object, initial, memberships}) => { object.visible = initial && [...memberships].every(key => enabled[key]); }); model.visible = visible; };
+  const apply = () => { items.forEach(({object, initial, memberships}) => { object.visible = initial && [...memberships].every(key => enabled[key] && !cameraCutaway.has(key)); }); model.visible = visible; };
   apply();
   return {
-    enabled, get visible() { return visible; },
+    enabled, get cameraCutaway() { return cameraCutaway; },
+    cutawayForCamera(keys = []) { cameraCutaway = new Set(keys); apply(); },
+    get visible() { return visible; },
     count(key) { return items.filter(item => item.memberships.has(key)).length; },
     set(key, on) { enabled[key] = on; apply(); },
     show(on) { visible = on; apply(); },
@@ -79,7 +82,7 @@ export function addRoomLayerControls(container, layers, render, projectorContext
       const key = button.dataset.roomLayer;
       if (key === 'restore') return;
       button.setAttribute('aria-pressed',String(key === 'room' ? !layers.visible : layers.enabled[key]));
-      if (key !== 'room') button.disabled = !layers.count(key);
+      if (key !== 'room') { button.disabled = !layers.count(key); button.title = layers.cameraCutaway.has(key) ? 'Temporarily hidden by Coverage camera cutaway; preference retained' : ''; button.textContent = key === 'seats' && layers.cameraCutaway.has(key) ? 'Seats · coverage cutaway' : key[0].toUpperCase()+key.slice(1); }
     });
   };
   roof.onclick = () => { layers.set('roof',!layers.enabled.roof); sync(); render(); };
