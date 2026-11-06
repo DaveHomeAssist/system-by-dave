@@ -62,7 +62,7 @@ async function cmd(slot, c, arg) {
   } catch (e) { toast(e.message, 6000); if (c === 'lens') $('#adj-motion').textContent = e.message; return false; }
   finally { commandsInFlight.delete(key); if (c === 'lens' && adjSlot) renderAdjust(); }
 }
-document.querySelectorAll('[data-all]').forEach((b) => b.onclick = () => cmd('all', b.dataset.all, b.dataset.all === 'pattern' ? b.dataset.arg : Number(b.dataset.arg)));
+document.querySelectorAll('[data-all]').forEach((b) => b.onclick = () => cmd('all', b.dataset.all, b.dataset.all === 'resetInput' ? undefined : b.dataset.all === 'pattern' ? b.dataset.arg : Number(b.dataset.arg)));
 
 $('#lock-on').onclick = () => api('lock', { lock: true }).catch((e) => toast(e.message));
 $('#lock-off').onclick = () => api('lock', { lock: false }).catch((e) => toast(e.message));
@@ -88,6 +88,7 @@ const pill = (st, word) => `<span class="avd-state"><span class="avd-dot avd-dot
 const seg = (label, opts, cur, attrs) => `<div class="avd-seg avd-seg--fill" role="group" aria-label="${esc(label)}">${opts.map(([v, lab]) => `<button class="avd-seg__btn" type="button" aria-pressed="${String(cur) === String(v)}" ${attrs(v)}>${esc(lab)}</button>`).join('')}</div>`;
 
 function renderOverview() {
+  $('[data-all="resetInput"]').disabled = !connected || state.lock || !state.projectors.some((p) => p.inputPreference?.available && p.status?.online && !p.busy);
   const online = state.projectors.filter((p) => p.status?.online).length;
   const assigned = rigLanes(state.projectors).filter((x) => x.projector).length;
   $('#relay-mode').textContent = state.simulation === true ? 'DEMO · simulated devices' : state.simulation === false ? 'REAL RELAY' : 'Connecting…';
@@ -108,7 +109,9 @@ function renderGrid() {
   // Keep the native input menu alive during polling. Safety changes always render immediately.
   if (editing && active.dataset.editing === 'true' && connected && editing.status?.online && !state.lock && !editing.busy && Object.keys(editing.inputs || {}).length && !active.disabled) return;
   const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop;
-  const unassignedOpen = g.querySelector('.pj-unassigned')?.open || false; g.innerHTML = '';
+  const unassignedOpen = g.querySelector('.pj-unassigned')?.open || false;
+  const inputOptionsOpen = new Set([...g.querySelectorAll('details[data-input-options][open]')].map((el) => el.dataset.inputOptions));
+  g.innerHTML = '';
   function deviceCard(p, lane = laneOf(p)) {
     const s = p.status || {}; const off = !connected || !s.online; const lock = state.lock;
     const { st, word } = stateOf(p);
@@ -118,6 +121,9 @@ function renderGrid() {
     const inputMatched = s.input != null && inputs.some(([id]) => id === String(s.input));
     const inputPlaceholder = s.input == null || s.input === '' ? 'No input reported' : `Reported input: ${s.input} (not in available options)`;
     const busy = !!p.busy;
+    const preference = p.inputPreference;
+    const preferredLabel = preference?.label || state.preferredInput || 'HDMI';
+    const resetAvailable = preference?.available === true;
 
     const pat = s.pattern ? ((p.patterns || PATTERNS)[s.pattern] || s.pattern) : '—';
     const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', lane ? projectorName(p) : `Unassigned ${p.label}`);
@@ -141,9 +147,16 @@ function renderGrid() {
           <button class="avd-btn" data-c="power" data-a="1" type="button" ${off || busy || s.power === 'cooling' ? 'disabled' : ''}>Power on</button>
           <button class="avd-btn avd-btn--danger" data-c="power" data-a="0" type="button" ${off || busy || lock || s.power === 'off' ? 'disabled' : ''}>Power off</button>
         </div>
-        <label class="avd-field"><span class="avd-field__label pj-caps">Input select</span>
-          <select class="avd-input" data-c="input" ${off || busy || lock || !inputs.length ? 'disabled' : ''}>${!inputMatched ? `<option value="" disabled selected>${esc(inputPlaceholder)}</option>` : ''}${inputs.map(([id, lab]) => `<option value="${esc(id)}" ${String(s.input) === id ? 'selected' : ''}>${esc(lab)}</option>`).join('')}</select>
-        </label>
+        <div class="pj-input-actions">
+          <button class="avd-btn avd-btn--primary avd-btn--block" data-reset-input type="button" ${off || busy || lock || !resetAvailable ? 'disabled' : ''}>Reset to ${esc(preferredLabel)}</button>
+          ${!resetAvailable ? `<p class="pj-mono pj-note">${esc(preferredLabel)} input has not been verified for this projector.</p>` : ''}
+          <details class="pj-input-options" data-input-options="${esc(p.slot)}" ${inputOptionsOpen.has(p.slot) ? 'open' : ''}>
+            <summary data-focus-key="${esc(p.slot)}:input-options">Other inputs</summary>
+            <label class="avd-field"><span class="avd-field__label pj-caps">Select another input</span>
+              <select class="avd-input" data-c="input" ${off || busy || lock || !inputs.length ? 'disabled' : ''}>${!inputMatched ? `<option value="" disabled selected>${esc(inputPlaceholder)}</option>` : ''}${inputs.map(([id, lab]) => `<option value="${esc(id)}" ${String(s.input) === id ? 'selected' : ''}>${esc(lab)}</option>`).join('')}</select>
+            </label>
+          </details>
+        </div>
         <div class="pj-well"><span class="avd-eyebrow">Test pattern</span><span class="pj-mono pj-ink">${esc(pat)}</span></div>
         <div class="pj-two">
           <button class="avd-btn avd-btn--quiet" data-p="08" type="button" ${off || busy || lock || !canPattern(p) ? 'disabled' : ''}>Colour bars</button>
@@ -152,6 +165,7 @@ function renderGrid() {
         <div class="pj-adjust-links" role="group" aria-label="Details and adjustments"><button class="avd-btn" data-adj="lens" type="button">Lens</button><button class="avd-btn" data-adj="picture" type="button">Picture</button><button class="avd-btn" data-adj="pattern" type="button">Patterns</button></div>
       </div>`;
     card.querySelectorAll('button[data-c]').forEach((b) => b.onclick = () => cmd(p.slot, b.dataset.c, Number(b.dataset.a)));
+    card.querySelector('[data-reset-input]').onclick = () => cmd(p.slot, 'resetInput');
     card.querySelectorAll('button[data-p]').forEach((b) => b.onclick = () => cmd(p.slot, 'pattern', b.dataset.p));
     card.querySelectorAll('button[data-adj]').forEach((b) => b.onclick = () => openAdjust(p.slot, b.dataset.adj));
     const sel = card.querySelector('select');
@@ -159,7 +173,7 @@ function renderGrid() {
     sel.onkeydown = (e) => { if (['ArrowDown', 'ArrowUp', ' ', 'Enter'].includes(e.key)) sel.dataset.editing = 'true'; if (e.key === 'Escape') { delete sel.dataset.editing; setTimeout(renderGrid, 0); } };
     sel.onchange = () => { delete sel.dataset.editing; cmd(p.slot, 'input', sel.value); setTimeout(renderGrid, 0); };
     sel.onblur = () => { delete sel.dataset.editing; setTimeout(renderGrid, 0); };
-    card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = `${p.slot}:${n}`; });
+    card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = el.hasAttribute('data-reset-input') ? `${p.slot}:reset-input` : `${p.slot}:${n}`; });
     return card;
   }
   const bound = new Set();
@@ -242,6 +256,7 @@ function renderAll() {
   $('#show').textContent = state.show || 'Projectors';
   $('#lock-on').setAttribute('aria-pressed', String(!!state.lock)); $('#lock-off').setAttribute('aria-pressed', String(!state.lock));
   renderOverview();
+  $('[data-all="resetInput"]').textContent = `Reset all to ${state.preferredInput || 'HDMI'}`;
   $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = state.presets.length || '';
   document.querySelectorAll('[data-all="power"][data-arg="0"], [data-all="pattern"]').forEach((b) => b.disabled = state.lock || !connected);
   renderGrid(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
@@ -388,8 +403,8 @@ function connect() {
     }
     else if (!connected) return;
     else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') markAlive(); }
-    else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
-    else if (msg.type === 'busy' && typeof msg.slot === 'string') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
+    else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputPreference !== undefined) p.inputPreference = msg.inputPreference; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
+    else if (msg.type === 'busy' && typeof msg.slot === 'string') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); }
     else if (msg.type === 'event' && msg.event && typeof msg.event === 'object') { markAlive(); state.events.push(msg.event); if (state.events.length > 200) state.events.shift(); renderLog(); }
   };
 }
