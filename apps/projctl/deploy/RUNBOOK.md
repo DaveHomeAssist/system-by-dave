@@ -65,6 +65,16 @@ a signed-in user session; it is not a before-login system daemon.
 Process recovery does not prove venue network routing or restart persistence
 for network adapters. Verify those separately with the venue connection active.
 
+For a dedicated show Mac, install under the actual crew/show account and verify
+its login startup, wired projector reachability and controller access from a
+second device before handoff. A laptop preview is not the deployed show host.
+A pre-login service is a separate deployment choice; this installer does not
+create one or enable automatic login. Assess sleep prevention with the operator
+(the display may sleep while the computer remains awake); do not silently change
+power settings. Verify recovery after the planned restart/login cycle and an
+adapter reconnect while the venue network is available. Record the verified
+crew URL and authentication boundary instead of copying a preview host address.
+
 To migrate an existing installation or update a managed service, run from the
 new Projctl source/package after installing its dependencies and bundling its
 Throwline runtime:
