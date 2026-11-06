@@ -86,3 +86,6 @@
 
 @media(max-width:680px){.pj-stage-workspace:has(#stage-planner:not([hidden])){grid-template-rows:minmax(300px,1fr) minmax(150px,.65fr)}.pj-stage-workspace:has(#stage-planner:not([hidden])) .pj-stage-toolbar>span{display:none}}
 .pj-plan-actions button{white-space:normal;line-height:16px;padding-block:8px}
+.pj-stage-camera button[aria-pressed="true"],.pj-stage-camera .pj-stage-primary{background:var(--tape);color:var(--on-tape);border-color:var(--tape)}
+#stage-alignment{display:flex;flex-direction:column;gap:8px}#stage-alignment[hidden],#stage-add-room[hidden]{display:none}
+#stage-alignment>strong{font-size:12px}#stage-alignment summary{min-height:44px;padding:10px 0;cursor:pointer;font-size:13px}#stage-alignment p{font-size:11px;line-height:16px}

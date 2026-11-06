@@ -836,11 +836,12 @@
 
     /** Frame the current scene from a requested direction. Unlike setView,
      * this derives distance and target from the live object bounds so visible
-     * manipulation handles stay inside the canvas as the room and rig change. */
+     * manipulation handles stay inside the canvas as the room and rig change.
+     * Optional bounds (THREE.Box3) frames a subset without moving scene objects. */
     frameObject(direction, label, options = {}) {
       if (!this._THREE || !this._object || !this._camera || !this._controls) return false;
       const THREE = this._THREE;
-      const box = new THREE.Box3().setFromObject(this._object);
+      const box = options.bounds?.isBox3 ? options.bounds.clone() : new THREE.Box3().setFromObject(this._object);
       if (box.isEmpty()) return false;
       const sphere = box.getBoundingSphere(new THREE.Sphere());
       const view = new THREE.Vector3(
@@ -855,7 +856,7 @@
       const limitingFov = Math.max(THREE.MathUtils.degToRad(5), Math.min(verticalFov, horizontalFov));
       const padding = Number.isFinite(Number(options.padding)) ? Math.max(1, Number(options.padding)) : 1.25;
       let distance = Math.max(0.5, (sphere.radius / Math.sin(limitingFov / 2)) * padding);
-      if (options.fit === 'content') {
+      if (options.fit === 'content' && !options.bounds?.isBox3) {
         const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), view);
         if (right.lengthSq() < .000001) right.set(1, 0, 0);
         right.normalize();

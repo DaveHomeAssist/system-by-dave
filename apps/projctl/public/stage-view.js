@@ -16,7 +16,8 @@ export function createStageView(root, openControls, canAdjust) {
   let plot, view = '3d', current = { projectors: [] }, connected = false, viewer, loading3D;
   const spatial = $('#stage-3d');
   const building = $('#stage-building');
-  let venue, buildingViewer, loadingBuilding, planner, plannerLoading, planning = false, proposal;
+  let venue, buildingViewer, loadingBuilding, planner, plannerLoading, planning = false, proposal, approximateRoom = false;
+  const roomAlignment = { x: 0, y: 0, z: .2, yaw: 0 };
   const hidden = new Set(), cards = new Map(), markers = new Map();
   const highlight = (lane) => { canvas.dataset.highlight = lane || ''; viewer?.highlight(lane); };
 
@@ -51,7 +52,7 @@ export function createStageView(root, openControls, canAdjust) {
     try {
       viewer = await createStage3D(spatial, plot, lane => { cards.get(lane)?.focus({ preventScroll: true }); openLane(lane); });
       $('#stage-3d-message').hidden = true;
-      updateLayers(); if (planning) viewer.planning(proposal, true); viewer.active(!root.hidden && view === '3d');
+      updateLayers(); if (planning) viewer.planning(proposal, true); if (planning && approximateRoom) updateRoom(); viewer.active(!root.hidden && view === '3d');
     } catch (error) {
       spatial.dataset.state = 'unavailable';
       $('#stage-3d-message').textContent = error.message.includes('triangular') ? error.message : '3D could not start. Use Front or Plan above; projector controls remain available.';
@@ -61,7 +62,7 @@ export function createStageView(root, openControls, canAdjust) {
     if (loadingBuilding || !venue || root.hidden || view !== 'building') return;
     loadingBuilding = true;
     try {
-      buildingViewer = await createVenueView(building, venue);
+      buildingViewer = await createVenueView(building, venue, plot ? () => setPlanning(true, true) : null);
       $('#stage-building-message').hidden = true;
       buildingViewer.active(!root.hidden && view === 'building');
     } catch {
@@ -85,8 +86,8 @@ export function createStageView(root, openControls, canAdjust) {
     $('#stage-source').textContent = view === 'building' ? venue.notes : plot.source;
     if (view === 'building') {
       $('#stage-caption').textContent = `Venue reference · ${venue.modelVersion} · metres`;
-      if (!venue.registration?.planningOverlayAllowed) $('#stage-source').textContent = `Unregistered appearance reference. Planning overlays disabled. ${venue.notes}`;
-      $('#stage-foot').textContent = venue.registration?.planningOverlayAllowed ? 'Venue reference · confirm registration before physical decisions' : 'Appearance reference only · stage-height datum may be aligned; target-plane registration unverified · no planning overlay';
+      if (!venue.registration?.planningOverlayAllowed) $('#stage-source').textContent = `Unregistered appearance reference. Plan with this room opens a clearly approximate overlay. ${venue.notes}`;
+      $('#stage-foot').textContent = venue.registration?.planningOverlayAllowed ? 'Venue reference · confirm registration before physical decisions' : 'Appearance reference · target-plane registration unverified · approximate planning preview available';
       for (const card of cards.values()) card.querySelector('.pj-stage-note').textContent = '';
       loadBuilding(); return;
     }
@@ -99,7 +100,7 @@ export function createStageView(root, openControls, canAdjust) {
       : 'Plot reference · coverage is not live beam position';
     if (view === '3d') {
       $('#stage-caption').textContent = planning ? 'WHAT-IF · local proposal' : 'Throwline 3D';
-      if (planning) $('#stage-foot').textContent = 'Proposed optical geometry · recorded coverage retained · cove clearance not verified';
+      if (planning) $('#stage-foot').textContent = approximateRoom ? 'Approximate venue alignment · editable preview, not a clearance check' : 'Proposed optical geometry · recorded coverage retained · cove clearance not verified';
       for (const lane of Object.keys(LANES)) {
         const p = plot.measurements?.projectors[lane];
         cards.get(lane).querySelector('.pj-stage-note').textContent = p
@@ -140,8 +141,21 @@ export function createStageView(root, openControls, canAdjust) {
     }
     updateLayers(); update(current, connected);
   }
-  async function setPlanning(on) {
-    planning = on;
+  async function updateRoom() {
+    if (!viewer || !venue) return;
+    try { await viewer.venue(venue, roomAlignment); if (!planning || !approximateRoom) viewer.hideVenue(); }
+    catch { $('#stage-message').textContent = 'Room reference could not load. Optical planning remains available.'; $('#stage-message').hidden = false; }
+  }
+  $('#stage-add-room').onclick = () => setPlanning(true, true);
+  root.querySelectorAll('[data-room-axis]').forEach(input => input.addEventListener('change', () => {
+    const value = Number(input.value);
+    if (!Number.isFinite(value) || Math.abs(value) > (input.dataset.roomAxis === 'yaw' ? 360 : 100)) return;
+    roomAlignment[input.dataset.roomAxis] = value; if (planning && approximateRoom) updateRoom();
+  }));
+  async function setPlanning(on, withRoom = approximateRoom) {
+    planning = on; approximateRoom = withRoom && !!venue;
+    $('#stage-alignment').hidden = !on || !approximateRoom;
+    $('#stage-add-room').hidden = !on || !venue || approximateRoom;
     root.dataset.planning = String(on);
     root.querySelectorAll('[data-stage-mode]').forEach(button => button.setAttribute('aria-pressed', String((button.dataset.stageMode === 'planning') === on)));
     $('#stage-live-reference').hidden = on; $('#stage-planner').hidden = !on;
@@ -159,8 +173,8 @@ export function createStageView(root, openControls, canAdjust) {
         finally { plannerLoading = false; }
       }
       planner?.refresh();
-    } else viewer?.planning(null);
-    draw(); if (on) viewer?.planning(proposal, true);
+    } else { viewer?.planning(null); viewer?.hideVenue(); }
+    draw(); if (on) { viewer?.planning(proposal, true); if (approximateRoom) updateRoom(); }
   }
   root.querySelectorAll('[data-stage-mode]').forEach(button => button.onclick = () => setPlanning(button.dataset.stageMode === 'planning'));
   root.querySelectorAll('[data-stage-view]').forEach((b) => {

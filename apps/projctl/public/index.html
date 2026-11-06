@@ -85,6 +85,16 @@
           <p id="stage-foot" class="pj-stage-foot pj-mono">Plot reference · coverage is not live beam position</p>
         </div>
         <aside class="pj-stage-sidebar" aria-label="Stage projectors" data-web2-scroll>
+          <button class="avd-btn avd-btn--primary" type="button" id="stage-add-room" hidden>Plan with room reference</button>
+          <div id="stage-alignment" hidden>
+            <strong class="pj-plan-badge">Approximate venue alignment</strong>
+            <details><summary>Adjust room alignment</summary><div class="pj-plan-fields">
+              <label class="avd-field"><span class="avd-field__label">Room X offset (m)</span><input class="avd-input" type="number" step="0.1" value="0" data-room-axis="x"></label>
+              <label class="avd-field"><span class="avd-field__label">Room Y offset (m)</span><input class="avd-input" type="number" step="0.1" value="0" data-room-axis="y"></label>
+              <label class="avd-field"><span class="avd-field__label">Room Z offset (m)</span><input class="avd-input" type="number" step="0.1" value="0.2" data-room-axis="z"></label>
+              <label class="avd-field"><span class="avd-field__label">Room yaw (degrees)</span><input class="avd-input" type="number" step="1" value="0" data-room-axis="yaw"></label>
+            </div><p class="pj-mono">Stage floor aligned at Y0; room proscenium used as a tentative target-plane anchor (Z+0.2 m). No scale correction. Local preview only; not surveyed or clearance-checked. Bright enclosure outlines remain visible through room geometry as position aids.</p></details>
+          </div>
           <div id="stage-planner" hidden></div>
           <div id="stage-live-reference">
           <div class="pj-rowhead"><h3>Projectors</h3><span id="stage-status-kind" class="pj-mono"></span></div>
