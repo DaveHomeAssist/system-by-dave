@@ -2,6 +2,8 @@
 
 ## 2026-11-06
 
+- Compact the Frozen workspace into one desktop navigation row or two narrow rows, with a labelled phone menu and shared theme. Give public Stage a full canvas, one planning toolbar, a selected-projector overlay inspector, separated A–D markers and an unobstructed room/beam overview. Preserve the snow splash, browser notes, shared tasks and private hardware-control boundary.
+
 - Keep all four projector summaries visible above one selected control/lens dock, with live alarms, compact desktop framing and accessible phone flow. Add explicit Eastern power scheduling with disabled saves/edits, separate activation, fixed target identities, next-run/status/audit and durable no-replay occurrence handling. No show times or active schedules are supplied.
 
 - Redirect the portfolio Pages copies of Frozen home/Stage to the working managed WST origin while preserving its same-origin viewer bundle.
