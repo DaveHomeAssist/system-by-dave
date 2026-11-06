@@ -237,4 +237,7 @@ raster, orientation, position and shift studies. It uses canonical Throwline
 optics while retaining the loaded plot as reference. Planning changes stay in
 the browser tab and send no device or settings writes. See
 [planning boundaries and D lens study](docs/stage-planning.md). An unregistered
-private room remains a separate appearance reference without planning overlays.
+private room remains explicitly uncalibrated. Plan with this room enables a
+separately labelled approximate preview with local alignment controls, roof
+cutaway and visible projector markers; it does not validate registration or
+clearance.

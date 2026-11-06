@@ -2,6 +2,8 @@
 
 ## 2026-11-06
 
+- Projctl combines an opt-in approximate room preview with optical scenarios, roof cutaway, visible A-D markers and projector focus while preserving true enclosure sizes, original model/plot data and false calibrated-registration status.
+
 - Add the Frozen workspace with browser-local personal notes, text export, live Eastern date/time and publicly shared D1-backed tasks. Keep projector control private and retain the managed hosting source/deployment receipt.
 - Projctl Stage adds local what-if optical scenarios using canonical Throwline calculations, with independent lane settings, D lens comparisons, reset to the loaded plot and no hardware/settings writes. Private unregistered venue models remain separate appearance references without planning overlays.
 
