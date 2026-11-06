@@ -87,9 +87,9 @@ export function createPowerSchedules({ file, targets, dispatch, guard, now = Dat
     return { name: input.name.trim(), action: input.action, timeZone: TIME_ZONE, time: input.time, days: [...new Set(input.days)].sort(), targets: identities([...new Set(input.slots)]) };
   }
   function view() {
-    const at = now();
+    const at = now(), planningAnchor = Math.max(at, Date.parse(state.lastEvaluatedAt));
     return { engine: { state: engineError ? 'stopped' : timer ? 'running' : 'ready', reason: engineError }, timeZone: TIME_ZONE, maxLatenessMs: maxGapMs, schedules: state.schedules.map(s => {
-      const planned = nextOccurrence(s, at), lastRun = [...state.audit].reverse().find(e => e.scheduleId === s.id && ['claimed','acknowledged','skipped','partial','failed','interrupted'].includes(e.status)) || null;
+      const planned = nextOccurrence(s, planningAnchor), lastRun = [...state.audit].reverse().find(e => e.scheduleId === s.id && ['claimed','acknowledged','skipped','partial','failed','interrupted'].includes(e.status)) || null;
       const targetChanged = s.targets.some(t => { const current = targets().find(p => p.slot === t.slot); return !current?.assigned || current.identity !== t.identity; });
       return { id: s.id, name: s.name, slots: s.targets.map(t => t.slot), action: s.action, days: s.days, time: s.time, timeZone: s.timeZone, enabled: s.enabled, nextRunAt: s.enabled && planned !== null ? iso(planned) : null, nextPlannedAt: planned === null ? null : iso(planned), targetChanged, lastRun, createdAt: s.createdAt, updatedAt: s.updatedAt };
     }), audit: state.audit.slice(-100), clockPausedUntil: at < Date.parse(state.lastEvaluatedAt) ? state.lastEvaluatedAt : null };
@@ -154,5 +154,5 @@ export function createPowerSchedules({ file, targets, dispatch, guard, now = Dat
       }
     } finally { inFlight = false; }
   }
-  return { view, save, enable, remove, tick, start() { if (!timer) timer = setInterval(() => tick().catch(() => { clearInterval(timer); timer = null; closed = true; engineError = 'Power scheduling stopped after a storage or execution error. No automatic retry.'; changed(view()); }), 1000).unref(); }, close() { closed = true; clearInterval(timer); } };
+  return { view, save, enable, remove, tick, start() { if (!timer) timer = setInterval(() => tick().catch(() => { clearInterval(timer); timer = null; closed = true; engineError = 'Power scheduling stopped after a storage or execution error. No automatic retry.'; changed(view()); }), 1000).unref(); }, close() { if (closed) return; closed = true; clearInterval(timer); timer = null; try { persist(); } catch { /* Claims are already durable; startup never catches up missed runs. */ } } };
 }
