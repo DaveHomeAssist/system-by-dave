@@ -1,5 +1,10 @@
 # Changelog
 
+## November 6, 2026: Video Engineering Daily
+
+- Add Edition 030, ST 2110 essence routing, with a SMPTE sourced lesson,
+  independent flow diagram and matching SVG/PNG story card. Preserve prior editions.
+
 ## 2026-11-06
 
 - Keep all four projector summaries visible above one selected control/lens dock, with live alarms, compact desktop framing and accessible phone flow. Add explicit Eastern power scheduling with disabled saves/edits, separate activation, fixed target identities, next-run/status/audit and durable no-replay occurrence handling. No show times or active schedules are supplied.
