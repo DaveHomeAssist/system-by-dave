@@ -12,9 +12,10 @@ test('private model serves verified embedded geometry, strips unknown fields and
   await relay.api('projector', { slot: 'P1', notes: 'Existing saved rig' });
   await until(async () => { try { await readFile(relay.rigFile); return true; } catch { return false; } });
   const before = await readFile(relay.rigFile, 'utf8');
-  const manifest = await writeVenueFixture(root); manifest.secret = 'private path'; manifest.assets.room.file = '../rig.json';
+  const manifest = await writeVenueFixture(root); manifest.secret = 'private path'; manifest.registration = { status: 'partial-unregistered', planningOverlayAllowed: false, privateSource: 'never publish' };  manifest.assets.room.file = '../rig.json';
   await writeFile(path.join(root, 'manifest.json'), JSON.stringify(manifest));
   const descriptor = await relay.api('venue-model');
+  assert.deepEqual(descriptor.body.venue.registration, { status: 'partial-unregistered', planningOverlayAllowed: false });
   assert.equal(descriptor.body.venue.secret, undefined); assert.equal(descriptor.body.venue.assets.room.file, undefined);
   const response = await fetch(relay.base + descriptor.body.venue.assets.room.url);
   assert.equal(response.status, 200); assert.equal(response.headers.get('cache-control'), 'no-store');

@@ -2,6 +2,7 @@ import { LANES } from './lanes.js';
 import { normalizePlot, projectorForLane } from './stage-plot.js';
 import { createStage3D } from './stage-3d.js';
 import { createVenueView } from './venue-view.js';
+import { createStagePlanner } from './stage-planner.js';
 
 const svgNode = (name, attrs = {}) => {
   const el = document.createElementNS('http://www.w3.org/2000/svg', name);
@@ -15,11 +16,12 @@ export function createStageView(root, openControls, canAdjust) {
   let plot, view = '3d', current = { projectors: [] }, connected = false, viewer, loading3D;
   const spatial = $('#stage-3d');
   const building = $('#stage-building');
-  let venue, buildingViewer, loadingBuilding;
+  let venue, buildingViewer, loadingBuilding, planner, plannerLoading, planning = false, proposal;
   const hidden = new Set(), cards = new Map(), markers = new Map();
   const highlight = (lane) => { canvas.dataset.highlight = lane || ''; viewer?.highlight(lane); };
 
   function openLane(lane) {
+    if (planning) { planner?.select(lane); return; }
     const p = projectorForLane(current.projectors, lane);
     if (p && connected && p.status?.online && canAdjust(p)) openControls(p.slot);
   }
@@ -49,7 +51,7 @@ export function createStageView(root, openControls, canAdjust) {
     try {
       viewer = await createStage3D(spatial, plot, lane => { cards.get(lane)?.focus({ preventScroll: true }); openLane(lane); });
       $('#stage-3d-message').hidden = true;
-      updateLayers(); viewer.active(!root.hidden && view === '3d');
+      updateLayers(); if (planning) viewer.planning(proposal, true); viewer.active(!root.hidden && view === '3d');
     } catch (error) {
       spatial.dataset.state = 'unavailable';
       $('#stage-3d-message').textContent = error.message.includes('triangular') ? error.message : '3D could not start. Use Front or Plan above; projector controls remain available.';
@@ -82,8 +84,9 @@ export function createStageView(root, openControls, canAdjust) {
     $('#stage-title').textContent = view === 'building' ? venue.title : plot.title;
     $('#stage-source').textContent = view === 'building' ? venue.notes : plot.source;
     if (view === 'building') {
-      $('#stage-caption').textContent = `Building · ${venue.modelVersion} · metres`;
-      $('#stage-foot').textContent = 'Provisional room and drawing alignment · mounting heights unknown';
+      $('#stage-caption').textContent = `Venue reference · ${venue.modelVersion} · metres`;
+      if (!venue.registration?.planningOverlayAllowed) $('#stage-source').textContent = `Unregistered appearance reference. Planning overlays disabled. ${venue.notes}`;
+      $('#stage-foot').textContent = venue.registration?.planningOverlayAllowed ? 'Venue reference · confirm registration before physical decisions' : 'Appearance reference only · stage-height datum may be aligned; target-plane registration unverified · no planning overlay';
       for (const card of cards.values()) card.querySelector('.pj-stage-note').textContent = '';
       loadBuilding(); return;
     }
@@ -95,7 +98,8 @@ export function createStageView(root, openControls, canAdjust) {
         : 'Plot reference · diagram scale · mounting heights illustrative'
       : 'Plot reference · coverage is not live beam position';
     if (view === '3d') {
-      $('#stage-caption').textContent = 'Throwline 3D';
+      $('#stage-caption').textContent = planning ? 'WHAT-IF · local proposal' : 'Throwline 3D';
+      if (planning) $('#stage-foot').textContent = 'Proposed optical geometry · recorded coverage retained · cove clearance not verified';
       for (const lane of Object.keys(LANES)) {
         const p = plot.measurements?.projectors[lane];
         cards.get(lane).querySelector('.pj-stage-note').textContent = p
@@ -136,6 +140,29 @@ export function createStageView(root, openControls, canAdjust) {
     }
     updateLayers(); update(current, connected);
   }
+  async function setPlanning(on) {
+    planning = on;
+    root.dataset.planning = String(on);
+    root.querySelectorAll('[data-stage-mode]').forEach(button => button.setAttribute('aria-pressed', String((button.dataset.stageMode === 'planning') === on)));
+    $('#stage-live-reference').hidden = on; $('#stage-planner').hidden = !on;
+    root.querySelectorAll('[data-stage-view]').forEach(button => { button.disabled = on && button.dataset.stageView !== '3d'; });
+    if (on) {
+      view = '3d'; root.querySelectorAll('[data-stage-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.stageView === '3d')));
+      if (!planner && !plannerLoading && plot) {
+        plannerLoading = true;
+        try { planner = await createStagePlanner($('#stage-planner'), plot, (result) => { proposal = result; if (planning) viewer?.planning(result); }, lane => {
+          const p = projectorForLane(current.projectors, lane);
+          if (p && connected && p.status?.online && canAdjust(p)) openControls(p.slot);
+          else { $('#stage-message').textContent = 'Live controls unavailable for this projector. Use Rig to inspect connection status.'; $('#stage-message').hidden = false; }
+        }); }
+        catch (error) { $('#stage-planner').textContent = error.message; }
+        finally { plannerLoading = false; }
+      }
+      planner?.refresh();
+    } else viewer?.planning(null);
+    draw(); if (on) viewer?.planning(proposal, true);
+  }
+  root.querySelectorAll('[data-stage-mode]').forEach(button => button.onclick = () => setPlanning(button.dataset.stageMode === 'planning'));
   root.querySelectorAll('[data-stage-view]').forEach((b) => {
     b.onclick = () => {
       view = b.dataset.stageView;
@@ -180,7 +207,9 @@ export function createStageView(root, openControls, canAdjust) {
       venue = venueResult.status === 'fulfilled' ? venueResult.value : null;
       if (!plot && !venue) throw new Error(plotResult.reason?.message || venueResult.reason?.message || 'No stage plot loaded. Add a stage plot or building bundle beside the relay’s rig file, then reload.');
       if (venue) view = 'building';
+      root.querySelector('[data-stage-mode="planning"]').disabled = !plot;
       root.querySelectorAll('[data-stage-view]').forEach(b => {
+        if (b.dataset.stageView === 'building') b.textContent = 'Venue reference';
         b.hidden = b.dataset.stageView === 'building' ? !venue : !plot;
         b.setAttribute('aria-pressed', String(b.dataset.stageView === view));
       });
