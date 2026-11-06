@@ -65,3 +65,5 @@ Dave authorized publishing the venue/model, plot and what-if planning. Stage now
 Browser acceptance: `node apps/projctl/test/wst-public-stage-browser.cjs` with the existing Playwright runtime. Uses the real packaged Worker/model and disposable browser contexts; task reads are intercepted. Checks 1440/680/375 widths, actual GLB/WebGL room load, Front/Plan, editable lens/raster scenario, no private requests, no page errors. Does not send test notes/tasks or hardware commands.
 
 The portfolio Pages staging step replaces only its WST home and Stage entry copies with canonical redirects to this managed site. The managed HTML, same-origin viewer imports and Worker assets remain unchanged; the source repository retains the full reproducible runtime. This prevents the portfolio mirror from loading viewer modules retired from that origin.
+
+WST and mirror-helper pull requests run the domain-cutover browser gate before merge, so managed-only imports cannot first break at the publication step.
