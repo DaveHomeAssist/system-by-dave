@@ -53,7 +53,7 @@ export function createStageView(root, openControls, canAdjust) {
     try {
       viewer = await createStage3D(spatial, plot, lane => { cards.get(lane)?.focus({ preventScroll: true }); openLane(lane); });
       $('#stage-3d-message').hidden = true;
-      updateLayers(); if (planning) viewer.planning(proposal, true); if (planning && approximateRoom) updateRoom(); viewer.active(!root.hidden && view === '3d');
+      updateLayers(); if (planning) viewer.planning(proposal, true); if (approximateRoom) updateRoom(); viewer.active(!root.hidden && view === '3d');
     } catch (error) {
       spatial.dataset.state = 'unavailable';
       $('#stage-3d-message').textContent = error.message.includes('triangular') ? error.message : '3D could not start. Use Front or Plan above; projector controls remain available.';
@@ -101,7 +101,8 @@ export function createStageView(root, openControls, canAdjust) {
         : 'Plot reference · diagram scale · mounting heights illustrative'
       : 'Plot reference · coverage is not live beam position';
     if (view === '3d') {
-      $('#stage-caption').textContent = planning ? 'WHAT-IF · local proposal' : 'Throwline 3D';
+      $('#stage-caption').textContent = planning ? 'WHAT-IF · local proposal' : approximateRoom ? 'Recorded rig · approximate room' : 'Throwline 3D';
+      if (approximateRoom && !planning) $('#stage-foot').textContent = 'Approximate venue alignment · recorded projectors and beams · no clearance claim';
       if (planning) $('#stage-foot').textContent = approximateRoom ? 'Approximate venue alignment · editable preview, not a clearance check' : 'Proposed optical geometry · recorded coverage retained · cove clearance not verified';
       for (const lane of Object.keys(LANES)) {
         const p = plot.measurements?.projectors[lane];
@@ -145,23 +146,24 @@ export function createStageView(root, openControls, canAdjust) {
   }
   async function updateRoom() {
     if (!viewer || !venue) return;
-    try { await viewer.venue(venue, roomAlignment); if (!planning || !approximateRoom) viewer.hideVenue(); }
+    try { await viewer.venue(venue, roomAlignment); if (!approximateRoom) viewer.hideVenue(); }
     catch { $('#stage-message').textContent = 'Room reference could not load. Optical planning remains available.'; $('#stage-message').hidden = false; }
   }
   $('#stage-add-room').onclick = () => setPlanning(true, true);
   root.querySelectorAll('[data-room-axis]').forEach(input => input.addEventListener('change', () => {
     const value = Number(input.value);
     if (!Number.isFinite(value) || Math.abs(value) > (input.dataset.roomAxis === 'yaw' ? 360 : 100)) return;
-    roomAlignment[input.dataset.roomAxis] = value; if (planning && approximateRoom) updateRoom();
+    roomAlignment[input.dataset.roomAxis] = value; if (approximateRoom) updateRoom();
   }));
   async function setPlanning(on, withRoom = approximateRoom) {
     planning = on; approximateRoom = withRoom && !!venue;
-    $('#stage-alignment').hidden = !on || !approximateRoom;
+    $('#stage-alignment').hidden = !approximateRoom;
+    $('#stage-alignment details').hidden = !on;
     $('#stage-add-room').hidden = !on || !venue || approximateRoom;
     root.dataset.planning = String(on);
     root.querySelectorAll('[data-stage-mode]').forEach(button => button.setAttribute('aria-pressed', String((button.dataset.stageMode === 'planning') === on)));
     $('#stage-live-reference').hidden = on; $('#stage-planner').hidden = !on;
-    root.querySelectorAll('[data-stage-view]').forEach(button => { button.disabled = on && button.dataset.stageView !== '3d'; });
+    root.querySelectorAll('[data-stage-view]').forEach(button => { button.disabled = on && !['3d', 'building'].includes(button.dataset.stageView); });
     if (on) {
       view = '3d'; root.querySelectorAll('[data-stage-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.stageView === '3d')));
       if (!planner && !plannerLoading && plot) {
@@ -175,15 +177,19 @@ export function createStageView(root, openControls, canAdjust) {
         finally { plannerLoading = false; }
       }
       planner?.refresh();
-    } else { viewer?.planning(null); viewer?.hideVenue(); }
-    draw(); if (on) { viewer?.planning(proposal, true); if (approximateRoom) updateRoom(); }
+    } else { viewer?.planning(null); if (!approximateRoom) viewer?.hideVenue(); }
+    root.querySelectorAll('[data-stage-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.stageView === (approximateRoom ? 'building' : '3d'))));
+    draw(); if (on) viewer?.planning(proposal, true); if (approximateRoom) updateRoom();
   }
   root.querySelectorAll('[data-stage-mode]').forEach(button => button.onclick = () => setPlanning(button.dataset.stageMode === 'planning'));
   root.querySelectorAll('[data-stage-view]').forEach((b) => {
     b.onclick = () => {
-      view = b.dataset.stageView;
+      if (b.dataset.stageView === 'building' && plot) { view = '3d'; approximateRoom = true; }
+      else { view = b.dataset.stageView; if (view === '3d') { approximateRoom = false; viewer?.hideVenue(); } }
+      $('#stage-alignment').hidden = !approximateRoom || view !== '3d';
+      $('#stage-alignment details').hidden = !planning;
       root.querySelectorAll('[data-stage-view]').forEach((other) => other.setAttribute('aria-pressed', String(other === b)));
-      highlight(); draw();
+      highlight(); draw(); if (view === '3d' && approximateRoom) { updateRoom(); viewer?.focusProjectors(); }
     };
   });
   function update(state, online) {
@@ -222,12 +228,14 @@ export function createStageView(root, openControls, canAdjust) {
       plot = plotResult.status === 'fulfilled' ? plotResult.value : null;
       venue = venueResult.status === 'fulfilled' ? venueResult.value : null;
       if (!plot && !venue) throw new Error(plotResult.reason?.message || venueResult.reason?.message || 'No stage plot loaded. Add a stage plot or building bundle beside the relay’s rig file, then reload.');
-      if (venue) view = 'building';
+      if (venue) { view = plot ? '3d' : 'building'; approximateRoom = !!plot; }
+      $('#stage-alignment').hidden = !approximateRoom; $('#stage-alignment details').hidden = true;
       root.querySelector('[data-stage-mode="planning"]').disabled = !plot;
       root.querySelectorAll('[data-stage-view]').forEach(b => {
-        if (b.dataset.stageView === 'building') b.textContent = 'Venue reference';
+        if (b.dataset.stageView === 'building') b.textContent = plot ? 'Room + projectors' : 'Room reference';
+        if (b.dataset.stageView === '3d') b.textContent = venue ? 'Rig only' : '3D';
         b.hidden = b.dataset.stageView === 'building' ? !venue : !plot;
-        b.setAttribute('aria-pressed', String(b.dataset.stageView === view));
+        b.setAttribute('aria-pressed', String(b.dataset.stageView === (view === '3d' && approximateRoom ? 'building' : view)));
       });
       $('#stage-message').hidden = true; $('#stage-workspace').hidden = false; draw();
       const warning = plotResult.reason?.message || venueResult.reason?.message;

@@ -170,7 +170,7 @@ export async function createStage3D(host, plot, openLane) {
           if (!response.ok) throw new Error('Room reference could not load.');
           room = (await new GLTFLoader().parseAsync(await response.arrayBuffer(), '')).scene;
           room.name = 'Approximate venue reference'; room.traverse(object => { object.castShadow = false; object.receiveShadow = false; for (const material of [object.material].flat().filter(Boolean)) { material.transparent = true; material.opacity = .22; material.depthWrite = false; } });
-          roomLayers = createRoomLayers(room, venue.cutaway);
+          roomLayers = createRoomLayers(room, venue.cutaway); host.dataset.roofMeshes = String(roomLayers.count('roof'));
           roomControls = addRoomLayerControls(controls, roomLayers, () => stage.requestRender());
           model.add(room);
         } finally { roomLoading = false; }

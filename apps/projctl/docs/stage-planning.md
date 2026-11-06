@@ -95,3 +95,5 @@ separate projector/proposal geometry. Classification preserves the stage deck,
 proscenium and upstage masking; upper seating also follows the balcony group.
 
 Coverage, Plan and Selected side use viewport-aspect-aware fitting of actual optical points, not a whole-building bounding sphere. Selected side is perpendicular to the selected lens-to-target direction. Coverage/Plan suppress large 3D labels; Selected side shows only the framed lane, while Projectors retains all four 44-pixel labels.
+
+When both venue and plot are available, Stage opens directly in **Room + projectors** with the recorded A–D rig, all four labels and beams, roof hidden, and the Projectors camera. **Rig reference** keeps this combined display; **What-if planning** adds local editing. A room-only entry is used only when no projector plot is available.
