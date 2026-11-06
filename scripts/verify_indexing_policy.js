@@ -76,7 +76,8 @@ const robots = read('robots.txt');
 // The noindex Sync & Signal Field Kit draft (field-kit/, docs/launch/README.md) adds one,
 // and its buyers-only download page (field-kit/thanks/, noindex, reached from Stripe's
 // after-payment redirect) adds one more.
-if (unlisted.length !== 201) fail(`Expected 201 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// Projctl adds two nonpublic relay pages: the control UI and passcode sign-in.
+if (unlisted.length !== 205) fail(`Expected 205 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);

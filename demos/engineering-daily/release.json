@@ -1,9 +1,51 @@
 {
   "schema": 1,
-  "sourceSha256": "29ccd790e554d28605eb1835fb92fb9f9835ed06556f416fa223d8bc9f1e076e",
-  "publicSha256": "71d5f3f1766c87ce65740bc49f60f4a53787d5be2c2b2b082df1b8b131c2e873",
-  "editions": 26,
+  "sourceSha256": "75d5e7e25f3a0f56ac7ae84fa885353268bcc34685c919ee719ff2e206e89884",
+  "publicSha256": "902432eb5ec0d1301fe3fcc1d0d500115647c074620664d19ba5c46547e5319a",
+  "editions": 29,
   "files": [
+    {
+      "name": "Edition 029.svg",
+      "id": 29,
+      "date": "2026-11-05",
+      "title": "Rolling shutter row timing",
+      "sha256": "39def560efa2098f5386e9044971fedabcc41dd9530ac71d1dc73d6580687372"
+    },
+    {
+      "name": "Edition 029.png",
+      "id": 29,
+      "date": "2026-11-05",
+      "title": "Rolling shutter row timing",
+      "sha256": "eef6da87813673a0356494b0c385eeb4f6f65c988565885ab492038580489ecb"
+    },
+    {
+      "name": "Edition 028.svg",
+      "id": 28,
+      "date": "2026-11-04",
+      "title": "Processing depth and input depth",
+      "sha256": "4216ec52c355f8ac24af37ae049376372494a6cf94be7f9ea6329e7cd49eadc8"
+    },
+    {
+      "name": "Edition 028.png",
+      "id": 28,
+      "date": "2026-11-04",
+      "title": "Processing depth and input depth",
+      "sha256": "fc6793c83b5e11d41dab6cc3a4508d98f0f5d24efb9bff4cdb16c21755d85dec"
+    },
+    {
+      "name": "Edition 027.svg",
+      "id": 27,
+      "date": "2026-11-03",
+      "title": "Quad link image mapping",
+      "sha256": "1cb67c7dc03702ad0259181304bade85bae7c1ef7986344af5513002b3620c75"
+    },
+    {
+      "name": "Edition 027.png",
+      "id": 27,
+      "date": "2026-11-03",
+      "title": "Quad link image mapping",
+      "sha256": "f3027fca378af5b68e6a915cb30a82af24cbeb1e48247a847d049fa0b66d1cce"
+    },
     {
       "name": "Edition 026.svg",
       "id": 26,

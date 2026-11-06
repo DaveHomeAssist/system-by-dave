@@ -1,0 +1,42 @@
+const { chromium }=require('playwright');
+const assert=require('node:assert/strict');
+(async()=>{
+ const {startRelay,until}=await import('./relay-helper.js');
+ const relay=await startRelay(); const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+ try{
+  const state=await relay.state(); state.projectors.forEach((p,i)=>p.lane='ABCD'[i]);
+  let socket;const page=await browser.newPage();
+  await page.routeWebSocket('**/ws',ws=>{socket=ws;ws.send(JSON.stringify(state));});
+  await page.goto(relay.base);
+    await page.locator('[data-tab="rig"]').click();await page.locator('#conn-word').filter({hasText:'Relay connected'}).waitFor();
+  const p2=page.locator('[data-slot="P2"].pj-tile'),p4=page.locator('[data-slot="P4"].pj-tile');
+  await p2.locator('details > summary').click();
+  const select=p2.locator('select[data-c="input"]');await select.click();
+  await select.evaluate(el=>window.retainedSelect=el);
+  const s4={...state.projectors.find(p=>p.slot==='P4').status,online:false,errors:{lamp:2}};
+  socket.send(JSON.stringify({type:'status',slot:'P4',status:s4}));
+  await until(async()=>(await p4.innerText()).includes('No reply'));
+  assert.match(await p4.innerText(),/lamp fault/);
+  assert.equal(await p4.locator('[data-c="power"][data-a="1"]').isDisabled(),true);
+  const s2={...state.projectors.find(p=>p.slot==='P2').status,errors:{temperature:1}};
+  socket.send(JSON.stringify({type:'status',slot:'P2',status:s2}));
+  await until(async()=>(await p2.innerText()).includes('temperature warning'));
+  assert.equal(await select.evaluate(el=>el===window.retainedSelect&&el.isConnected),true);
+  state.lock=true;socket.send(JSON.stringify(state));await until(()=>select.isDisabled());
+  assert.equal(await select.evaluate(el=>el===window.retainedSelect),false);
+  state.lock=false;socket.send(JSON.stringify(state));await until(async()=>!await select.isDisabled());
+  const originalSelect=await select.elementHandle();
+  state.projectors.find(p=>p.slot==='P2').inputs={...state.projectors.find(p=>p.slot==='P2').inputs,'99':'New input metadata'};
+  socket.send(JSON.stringify(state));await until(async()=>await select.locator('option[value="99"]').count()===1);
+  assert.equal(await select.evaluate((el,old)=>el===old,originalSelect),false,'changed input metadata cancels old native select');
+  const originalCard=await p2.elementHandle(),originalAction=await p2.locator('[data-adj="picture"]').elementHandle();
+  state.projectors.find(p=>p.slot==='P2').ip='192.0.2.22';socket.send(JSON.stringify(state));
+  await until(async()=>!await originalCard.evaluate(el=>el.isConnected));
+  assert.equal(await originalAction.evaluate(el=>el.isConnected),false,'target change cancels old controls');
+  const beforeAssignment=await p2.locator('[data-adj="picture"]').elementHandle();
+  state.projectors.find(p=>p.slot==='P2').lane='D';state.projectors.find(p=>p.slot==='P4').lane='B';socket.send(JSON.stringify(state));
+  await until(async()=>!await beforeAssignment.evaluate(el=>el.isConnected));
+  await select.click();socket.close();await until(()=>select.isDisabled());
+  console.log('Live menu: other device loss/fault, same-device alarms, DOM retention, show lock and relay loss passed');
+ }finally{await browser.close();await relay.close();}
+})().catch(e=>{console.error(e);process.exitCode=1});

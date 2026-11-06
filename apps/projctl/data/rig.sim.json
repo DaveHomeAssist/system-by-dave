@@ -4,6 +4,7 @@
   "projectors": [
     {
       "slot": "P1",
+      "lane": "C",
       "label": "Barco UDM 4K22",
       "make": "Barco",
       "model": "UDM 4K22",
@@ -19,6 +20,7 @@
     },
     {
       "slot": "P2",
+      "lane": "A",
       "label": "House Panasonic A",
       "make": "Panasonic",
       "model": "TBC",
@@ -35,6 +37,7 @@
     },
     {
       "slot": "P3",
+      "lane": "D",
       "label": "House Panasonic B",
       "make": "Panasonic",
       "model": "TBC",
@@ -51,6 +54,7 @@
     },
     {
       "slot": "P4",
+      "lane": "B",
       "label": "Panasonic PT-RZ970B",
       "make": "Panasonic",
       "model": "PT-RZ970B",

@@ -1,5 +1,113 @@
 # Changelog
 
+## 2026-11-06
+
+- Projctl adds six primary views, dedicated A-D projector details, shared documented gear/catalog/signal-flow references and the canonical Throwline calculator. Forward-integrate guarded Pulse lens preset recall and password aliases, plus cached projector signal and bounded computer-display readouts with explicit unavailable EDID. Preserve managed settings and host assignment; no automatic hardware action.
+
+- Combine Notes/tasks, projector reference, Rig and Stage in one controller workspace. Notes remain browser/address-local; shared public tasks retain their separate service. Stage opens directly with the room and recorded projectors, and the public hub can connect an existing private controller in place.
+
+- Projctl combines an opt-in approximate room preview with optical scenarios, roof/wall/balcony/seat controls, visible A-D markers and purposeful Projectors/Coverage/Plan/Selected side cameras while preserving true enclosure sizes, original model/plot data and false calibrated-registration status.
+
+- Add the Frozen workspace with browser-local personal notes, text export, live Eastern date/time and publicly shared D1-backed tasks. Keep projector control private and retain the managed hosting source/deployment receipt.
+- Projctl Stage adds local what-if optical scenarios using canonical Throwline calculations, with independent lane settings, D lens comparisons, reset to the loaded plot and no hardware/settings writes. Private unregistered venue models remain separate appearance references without planning overlays.
+
+- Projctl adds a supervised macOS runtime and one launcher that waits for relay health, preserving the private rig and app settings during migration. The live controller reports relay availability separately from device reachability, including last success and sanitized failure reasons over WebSocket updates. HDMI is the preferred input with an explicit per-device or all-device reset resolved from supported metadata. Saved-rig read errors now stop safely; settings writes use atomic replacement.
+
+## November 5, 2026: Stable projector order
+
+- Keep Rig positions A, B, C and D visible when a lane is unassigned, with
+  unassigned devices in a separate expandable section.
+- Use drawing identities and models on Rig and Stage cards while preserving
+  existing relay IDs, device assignments and command destinations.
+
+## November 5, 2026: Projector image shift directions
+
+- Add independent per-projector horizontal and vertical shift reversal settings so
+  operator labels can follow the projected image on mounted or mirrored installations.
+- Preserve legacy mappings, device-native API directions, focus, zoom and drawing views.
+
+## November 5, 2026: Video Engineering Daily
+
+- Add Edition 029, Rolling shutter row timing, with a Basler sourced lesson,
+  timing comparison diagram and matching story card. Preserve previous editions.
+
+## November 4, 2026: Video Engineering Daily
+
+- Add Edition 028, Processing depth and input depth, with an EIZO sourced
+  lesson and matching diagram and story card. Preserve previous editions.
+
+## November 3, 2026: Dimensioned projector references
+
+- Add optional metric plot metadata for lens offsets, enclosure dimensions and
+  supplied mounting heights. Preserve unknown heights in a labeled plan view.
+- Remove the invented balcony rail and duplicate scenic elevation from the 3D
+  adapter. Keep colored coverage, correctly sized portrait bodies and clickable
+  lane controls, with explicit limits on physical clearance claims.
+- Preserve both plan rays regardless of the front polygon's starting vertex
+  or winding order.
+- Verify metric and legacy plots, renderer interaction, mobile layouts, existing
+  relay controls and the separate private Building view.
+
+## November 3, 2026: Video Engineering Daily
+
+- Add Edition 027, Quad link image mapping, with an AJA sourced lesson,
+  SQD quadrant diagram and matching story card. Preserve previous editions.
+
+## November 3, 2026: Private building models in Projctl
+
+- Add a metric Building view beside the existing drawing views, with optional
+  drawing and LiDAR layers, camera controls and a preview fallback. Preserve
+  saved rig assignments and keep geometry inspection free of device commands.
+- Serve local venue bundles behind the relay's existing authentication, with
+  bounded reads, embedded GLBs, checksums and fixed asset roles. Keep actual
+  venue geometry private and bundle the pinned Three.js loader for offline use.
+- Verify source-only and model-only installations, existing bulk power behavior,
+  mobile layout, lazy layers, idle/hidden rendering and context recovery.
+
+## November 3, 2026: Throwline in projector Stage
+
+- Embed the canonical Throwline 3D viewer in Projctl with colored coverage,
+  crossed throw references, orbit/zoom/camera presets and clickable projector
+  models routed to the current lane's guarded controls. Keep Front and Plan.
+- Label diagram scale and illustrative mounting heights. Preserve private plot
+  storage, rig identity, show lock and command ownership; no optical claims or
+  job imports. Package the existing local renderer for standalone installations.
+- Verify inert model activation, drag rejection, camera and layer changes,
+  current slot targeting, idle/hidden rendering, context recovery and WebGL
+  fallback alongside the existing simulator and responsive checks.
+
+## November 3, 2026: Projector stage view
+
+- Add front and plan views with colored coverage layers and clickable projector
+  keys that open the existing controls through current drawing lane assignments.
+  Show reported power and shutter separately from the drawing reference.
+- Load a validated private plot beside the active rig without publishing venue
+  geometry. Keep missing or ambiguous lanes unavailable and preserve Show Lock,
+  offline gates, keyboard focus and existing cue routes. Link to Throwline as a
+  separate planning workspace without transferring data or control authority.
+- Add plot validation, slot reassignment and browser coverage for both viewpoints,
+  themes, keyboard operation and six viewport sizes.
+
+## 2026-11-02
+
+- Projector control: add optional drawing lanes with letter badges, target names,
+  orientation and matching accents; retain slot IDs and cue routing when cards
+  sort by lane. Setup validates assignments and keeps older rigs compatible.
+
+## November 3, 2026: Frozen projector control desk
+
+- Add light ice and dark aurora themes, a snowflake mark, mobile bottom navigation, searchable command history and accessible adjustment dialogs. Preserve focus across status refreshes and unsaved setup fields across snapshots.
+- Discover Barco input names and picture ranges from the connected device. Use bounded lens targets, wait for stopped feedback, expose Stop lens and prevent overlapping movement. Report unavailable alarm telemetry explicitly.
+- Add protocol and browser regressions for discovered controls, movement completion, keyboard focus, disconnected controls and six viewport sizes in both themes. Physical rig acceptance remains separate.
+
+## November 3, 2026: Projctl bulk commands and relay reliability
+
+- Confirm All Power Off once for the displayed reachable targets, then dispatch to each with per-projector results. Keep individual confirmation, bind tokens to the action and connection settings, and skip newly online/reconfigured targets until reconfirmed.
+- Continue OSC/TCP bulk cues after a slot fails; reject malformed power/shutter arguments and safely drop malformed OSC datagrams.
+- Require a successful Barco core status query before reporting it online, and enforce Show Lock for picture controls as well as lens, pattern, input and power off.
+- Add isolated relay/protocol regressions and browser checks for bulk confirmation, live picture locking, both themes and desktop/phone containment to the pull-request contract job. Saved rigs and cue addresses are unchanged; physical projector testing is still required on the installed relay.
+- Mark the relay's control and login pages noindex and account for them in the indexing inventory.
+
 ## November 2, 2026: Video Engineering Daily
 
 - Add Edition 026, Active HDMI cable direction, with an Extron sourced lesson,

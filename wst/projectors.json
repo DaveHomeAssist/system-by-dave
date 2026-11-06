@@ -1,0 +1,279 @@
+{
+  "schema": "wst.frozen.projector-reference.v1",
+  "updated": "2026-11-06",
+  "projectors": [
+    {
+      "lane": "A",
+      "position": "SL Portal",
+      "orientation": "Portrait",
+      "model": "Unassigned",
+      "lens": "ET-DLE170 · 1.80–2.54:1 (projection plot record)",
+      "note": "Plotted raster coverage: 12 ft 5 in wide × 19 ft 11 in tall. A remains an unassigned live control position. The projection plot specifies Panasonic PT-DW830KU with ET-DLE170; this is the recorded plan, not confirmation of the unit hung here.",
+      "color": "#ff00ff",
+      "internalSlot": null,
+      "provenance": {
+        "assignment": "Owner-designated unassigned position",
+        "lens": "Walnut Frozen Projection Research and Gig Setup, projection plot, edited November 5, 2026. Physical lens barrel confirmation pending."
+      },
+      "recordSource": "https://app.notion.com/p/3fc255fc8f44811e8a5eeddcb236df1e?pvs=204",
+      "referenceIds": [
+        "panasonic-dw830",
+        "panasonic-dle170"
+      ]
+    },
+    {
+      "lane": "B",
+      "position": "Top Portal",
+      "orientation": "Landscape",
+      "model": "Panasonic PT-RZ970",
+      "lens": "ET-DLE080 (recorded)",
+      "note": "Prior rig/example records ET-DLE080; the projection plot lists 085. This discrepancy is unresolved: verify the physical lens label before treating either as installed.",
+      "color": "#00ffff",
+      "internalSlot": "P2",
+      "provenance": {
+        "assignment": "Verified saved rig assignment, November 5, 2026",
+        "lens": "Prior rig/example record, physical label not rechecked"
+      },
+      "referenceIds": [
+        "panasonic-rz970",
+        "panasonic-dle080",
+        "panasonic-dle085"
+      ]
+    },
+    {
+      "lane": "C",
+      "position": "Stage",
+      "orientation": "Landscape",
+      "model": "Barco UDM 4K22",
+      "lens": "TLD+ zoom 0.71–0.93:1 (4K), recorded",
+      "note": "Recorded with right-angle snorkel. Exact part number has not been confirmed.",
+      "color": "#fbf302",
+      "internalSlot": "P1",
+      "provenance": {
+        "assignment": "Verified saved rig assignment, November 5, 2026",
+        "lens": "Current rig notes, exact part number unknown"
+      },
+      "referenceIds": [
+        "barco-udm4k22",
+        "barco-tld-record",
+        "right-angle-assembly"
+      ]
+    },
+    {
+      "lane": "D",
+      "position": "SR Portal",
+      "orientation": "Portrait",
+      "model": "Panasonic PT-DW830U",
+      "lens": "ET-DLE170 · 1.80–2.54:1 (projection plot record)",
+      "image": "Approximately 20 ft tall (user estimate)",
+      "throwDistance": "38–39 ft (user estimate)",
+      "candidate": "ET-DLE150 · 1.36–1.98:1 WXGA 16:10",
+      "note": "Cove clearance limits upward tilt; desired extra upward coverage is approximately 3–4 ft or less. ET-DLE150 is compatible but not confirmed installed. In portrait, upward image movement normally uses native horizontal shift, with different limits from vertical shift. Additional reach and clearance are not yet established. Dave prioritizes D surface coverage over reduced brightness and resolution; the larger-raster option is worth testing, with lens identity and physical clearance still unverified. Dave also reports being at the lens-shift limit; this is an operator report, not encoder telemetry.",
+      "source": "https://eu.connect.panasonic.com/sites/default/files/media/document/2024-04/et-dle150_spec_en_2.pdf",
+      "color": "#00ab00",
+      "internalSlot": "P4",
+      "provenance": {
+        "assignment": "Verified saved rig assignment, November 5, 2026",
+        "lens": "Walnut Frozen Projection Research and Gig Setup, projection plot, edited November 5, 2026. Physical lens barrel confirmation pending.",
+        "geometry": "Owner-reported estimates, November 6, 2026; not surveyed",
+        "candidate": "Panasonic ET-DLE150 manufacturer specification; compatibility does not establish installed identity or final fit",
+        "likelyLens": "The projection plot explicitly records ET-DLE170, 1.80–2.54:1, for D; this supersedes ratio-only inference. Panasonic DW830 specification supports compatibility; physical installation remains unverified."
+      },
+      "candidateCheck": "Previously discussed candidate, retained for testing: enlarging the full portrait raster from 20 ft to 26 ft at a fixed center adds 3 ft at the top. At a 38–39 ft throw this needs approximately 1.46–1.50:1, within the ET-DLE150 range. A 20 ft mapped picture would use approximately 985 of 1280 portrait pixels. Wider black raster, spill and cove clearance need testing. A 28 ft raster is at the nominal wide limit near 38 ft; 4 ft extra is not promised.",
+      "installationCheck": "Verify the current lens, full raster center, existing shift and cove opening. Panasonic specifies ET-LAD120P/PW portrait lamps and terminal-side-down mounting (DW830 specification, page 14); current installation has not been inspected for these items.",
+      "installationSource": "https://eu.connect.panasonic.com/sites/default/files/media/document/2025-01/dw830_spec_en.pdf",
+      "likelyLens": "ET-DLE170 recorded in projection plot; barrel check pending",
+      "likelyLensSource": "https://app.notion.com/p/3fc255fc8f44811e8a5eeddcb236df1e?pvs=204",
+      "reviewPlan": "Adam reviews Friday morning, November 6; choose and implement the change in time for Saturday morning, November 7. Confirm installed lens label, current zoom and portrait-up shift stop. Check the 38–39 ft lens throw, 20 ft-tall portrait raster and requested 3–4 ft upward coverage. Consider a roughly 26 ft raster with 20 ft content positioned high in Resolume (nominal ratio 1.46–1.50:1). Verify cove beam clearance and surface coverage first; brightness and resolution are secondary.",
+      "recordSource": "https://app.notion.com/p/3fc255fc8f44811e8a5eeddcb236df1e?pvs=204",
+      "plotDimensions": "12 ft 5 in wide × 19 ft 11 in tall (plotted raster coverage)",
+      "referenceIds": [
+        "panasonic-dw830",
+        "panasonic-dle170",
+        "panasonic-dle150"
+      ]
+    }
+  ],
+  "catalog": [
+    {
+      "id": "panasonic-dw830",
+      "name": "Panasonic PT-DW830U / KU",
+      "category": "Projector",
+      "description": "WXGA 1-chip DLP projector. U is the saved D identity; KU is the projection-plot model designation.",
+      "facts": [
+        {
+          "label": "Native raster",
+          "value": "1280 × 800 · 16:10"
+        },
+        {
+          "label": "Light source",
+          "value": "Dual UHM lamps"
+        }
+      ],
+      "source": "https://eu.connect.panasonic.com/sites/default/files/media/document/2025-01/dw830_spec_en.pdf",
+      "provenance": "Manufacturer reference"
+    },
+    {
+      "id": "panasonic-rz970",
+      "name": "Panasonic PT-RZ970",
+      "category": "Projector",
+      "description": "Saved B / Top Portal model. Lens record remains disputed.",
+      "facts": [
+        {
+          "label": "Native raster",
+          "value": "1920 × 1200 · WUXGA"
+        },
+        {
+          "label": "Light source",
+          "value": "Laser · 1-chip DLP"
+        }
+      ],
+      "source": "https://eu.connect.panasonic.com/gb/en/projectors/pt-rz970",
+      "provenance": "Manufacturer reference"
+    },
+    {
+      "id": "barco-udm4k22",
+      "name": "Barco UDM-4K22",
+      "category": "Projector",
+      "description": "Saved C / Stage model; right-angle optical assembly recorded in rig notes.",
+      "facts": [
+        {
+          "label": "Output raster",
+          "value": "3840 × 2400 · 4K UHD"
+        },
+        {
+          "label": "Native device raster",
+          "value": "2560 × 1600"
+        },
+        {
+          "label": "Technology",
+          "value": "3-chip DLP · Pulse electronics"
+        }
+      ],
+      "source": "https://www.barco.com/en/product/udm-4k22",
+      "provenance": "Manufacturer reference"
+    },
+    {
+      "id": "panasonic-dle170",
+      "name": "Panasonic ET-DLE170",
+      "category": "Lens",
+      "description": "Recorded A/D projection-plot lens. Physical barrel confirmation remains separate.",
+      "facts": [
+        {
+          "label": "WXGA 16:10 ratio",
+          "value": "1.80–2.54:1"
+        },
+        {
+          "label": "WUXGA ratio",
+          "value": "1.71–2.41:1"
+        }
+      ],
+      "source": "https://eu.connect.panasonic.com/gb/en/projectors/et-dle170",
+      "provenance": "Manufacturer reference"
+    },
+    {
+      "id": "panasonic-dle150",
+      "name": "Panasonic ET-DLE150",
+      "category": "Lens",
+      "description": "Candidate D lens. Compatibility does not establish installation, remaining shift or cove clearance.",
+      "facts": [
+        {
+          "label": "WXGA 16:10 ratio",
+          "value": "1.36–1.98:1"
+        },
+        {
+          "label": "WUXGA ratio",
+          "value": "1.30–1.89:1"
+        }
+      ],
+      "source": "https://eu.connect.panasonic.com/sites/default/files/media/document/2024-04/et-dle150_spec_en_2.pdf",
+      "provenance": "Manufacturer reference"
+    },
+    {
+      "id": "panasonic-dle080",
+      "name": "Panasonic ET-DLE080",
+      "category": "Lens record",
+      "description": "Prior B rig record. The plot instead names ET-DLE085. Installed identity unresolved.",
+      "facts": [],
+      "source": "https://docs.connect.panasonic.com/projector/products/optional_accessories/index.html",
+      "provenance": "Manufacturer reference"
+    },
+    {
+      "id": "panasonic-dle085",
+      "name": "Panasonic ET-DLE085",
+      "category": "Lens",
+      "description": "B projection-plot record, conflicting with the prior ET-DLE080 rig note.",
+      "facts": [
+        {
+          "label": "WUXGA ratio",
+          "value": "0.782–0.977:1"
+        },
+        {
+          "label": "WXGA ratio",
+          "value": "0.823–1.03:1"
+        }
+      ],
+      "source": "https://eu.connect.panasonic.com/gb/en/projectors/et-dle085",
+      "provenance": "Manufacturer reference"
+    },
+    {
+      "id": "barco-tld-record",
+      "name": "TLD+ 0.71–0.93:1 (4K) record",
+      "category": "Lens record",
+      "description": "Recorded C zoom range with a right-angle snorkel. Exact lens and snorkel part numbers are unknown.",
+      "facts": [
+        {
+          "label": "Recorded ratio",
+          "value": "0.71–0.93:1 · 4K basis, rig note"
+        }
+      ],
+      "source": null,
+      "provenance": "Saved rig notes; part identity unconfirmed"
+    },
+    {
+      "id": "right-angle-assembly",
+      "name": "Right-angle / snorkel assembly",
+      "category": "Accessory record",
+      "description": "C rig notes record a right-angle output. Manufacturer part number, clearances and optical offsets have not been verified.",
+      "facts": [],
+      "source": null,
+      "provenance": "Saved rig notes; part identity unconfirmed"
+    }
+  ],
+  "signalFlow": {
+    "title": "Video and control signal flow",
+    "note": "A saved model or selected input does not verify the upstream cable path. Video links remain unknown until the actual output, transport and patch are checked. Live device replies verify control reachability only.",
+    "videoSource": {
+      "label": "Playback / media source",
+      "status": "unknown",
+      "note": "Application, machine output and cue patch not confirmed in this reference."
+    },
+    "transport": {
+      "label": "Video distribution / cable path",
+      "status": "unknown",
+      "note": "Converter, extender, splitter and cable details not recorded."
+    },
+    "preferredInput": {
+      "label": "HDMI reset target",
+      "status": "planned",
+      "note": "Explicit operator action; not proof of a connected HDMI signal."
+    },
+    "control": {
+      "from": "Operator interface",
+      "via": "Local projector relay",
+      "status": "verified",
+      "note": "Implemented software route. Per-projector reachability comes from the current relay status; no live state is implied by this public reference."
+    }
+  },
+  "plotPaletteSource": {
+    "source": "FROZEN_projector-plot-front-view.png",
+    "basis": "Sampled saturated coverage-outline pixels; orange dimension annotations are not lane C.",
+    "sampledOn": "2026-11-06",
+    "colors": {
+      "A": "#ff00ff",
+      "B": "#00ffff",
+      "C": "#fbf302",
+      "D": "#00ab00"
+    }
+  }
+}
