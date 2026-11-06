@@ -61,8 +61,7 @@ A/B/C projector coordinates remain drawing-derived; D's 38–39 ft estimate is
 used only by the D study shortcuts. No original model or plot is changed.
 
 **Projectors** focuses the true-size enclosures and their 44-pixel A–D markers,
-from the stage side toward the balcony. Orbit/Audience/Top remain whole-scene
-views. Labels are screen-size aids and bright enclosure outlines remain visible through room geometry; physical projector and beam dimensions are not enlarged. The active scenario replaces its recorded body and moves its letter/leader to the proposed lens position; returning to Rig reference restores the recorded body and marker. Roof detection recognizes supplied cutaway names and semantic
+from the stage side toward the balcony. Coverage frames only the target rasters from the audience side. Plan frames the rig-to-target layout. Selected side frames only the active projector and its beam elevation. Reset view refits the current preset without changing optical values; ordinary edits and lane selection do not move the camera. Labels are screen-size aids and bright enclosure outlines remain visible through room geometry; physical projector and beam dimensions are not enlarged. The active scenario replaces its recorded body and moves its letter/leader to the proposed lens position; returning to Rig reference restores the recorded body and marker. Roof detection recognizes supplied cutaway names and semantic
 roof/ceiling names, leaving other room meshes intact.
 
 ## Focused verification
@@ -83,3 +82,16 @@ The attached front and top-down drawings label A and D raster coverage at 19 ft 
 ET-DLE170 manufacturer reference: https://eu.connect.panasonic.com/gb/en/projectors/et-dle170 (WXGA 1.80–2.54:1).
 
 Upward-shift percentages are calculated from the achievable physical raster after the lens range constrains the requested size. The requested raster remains independently editable; a 26 ft request with a 21.39 ft achievable image uses 21.39 ft as its shift-percentage basis.
+
+## Camera and room visibility controls
+
+The combined room is ghosted for optical sightlines; it is still approximate.
+Camera bounds come from the relevant projectors or coverage, never the whole
+building. Free orbit/zoom remains available. Roof is directly toggleable. Room
+layers contains independent Walls, Balcony and Seats toggles, plus Projectors &
+beams only and Restore room. Original hidden objects stay hidden on restore.
+Room-layer choices survive scenario edits and camera changes, and never hide the
+separate projector/proposal geometry. Classification preserves the stage deck,
+proscenium and upstage masking; upper seating also follows the balcony group.
+
+Coverage, Plan and Selected side use viewport-aspect-aware fitting of actual optical points, not a whole-building bounding sphere. Selected side is perpendicular to the selected lens-to-target direction. Coverage/Plan suppress large 3D labels; Selected side shows only the framed lane, while Projectors retains all four 44-pixel labels.

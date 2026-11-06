@@ -34,7 +34,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
     await page.waitForTimeout(100);
     assert.notDeepEqual(await canvas.screenshot(), before, 'cutaway restores the named shell geometry');
     await page.locator('#stage-building').getByRole('button', { name: 'Roof', exact: true }).click();
-    await page.locator('#stage-building').getByRole('button', { name: 'Top', exact: true }).click();
+    await page.locator('#stage-building').getByRole('button', { name: 'Plan', exact: true }).click();
     await page.waitForTimeout(200);
     assert.notDeepEqual(await canvas.screenshot(), before, 'camera changes rendered geometry');
     for (const role of ['plot', 'scan']) {

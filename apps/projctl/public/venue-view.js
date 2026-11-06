@@ -1,4 +1,4 @@
-import { roofCutaway } from './stage-visibility.js';
+import { createRoomLayers, addRoomLayerControls } from './stage-visibility.js';
 
 // Private, metric geometry. No rig commands, lane bindings or optical simulation.
 export async function createVenueView(host, venue, planWithRoom) {
@@ -36,8 +36,8 @@ export async function createVenueView(host, venue, planWithRoom) {
   let cutaway;
   try {
     const room = await load('room');
-    cutaway = roofCutaway(room, venue.cutaway); cutaway.set(false);
-    host.dataset.roofMeshes = String(cutaway.count);
+    cutaway = createRoomLayers(room, venue.cutaway);
+    host.dataset.roofMeshes = String(cutaway.count('roof'));
     stage.setObject(model);
   }
   catch (error) { disposed = true; abort.abort(); dispose(model); stage.destroy(); stage.remove(); throw error; }
@@ -47,22 +47,15 @@ export async function createVenueView(host, venue, planWithRoom) {
   const status = document.createElement('p'); status.className = 'pj-venue-status'; status.setAttribute('role', 'status');
   const cameras = [[.4, 1.15, 1], [0, .18, 1], [0, 1, .001]];
   let camera = 0;
-  const frame = (index = camera) => { camera = index; stage.frameObject(cameras[index], ['Perspective', 'Audience', 'Overhead'][index], { fit: 'content', padding: 1.08, saveDefault: true }); };
+  const frame = (index = camera) => { camera = index; stage.frameObject(cameras[index], ['Room overview', 'Audience', 'Plan'][index], { fit: 'content', padding: 1.08, saveDefault: true }); };
   const button = (label, action) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.onclick = action; controls.append(b); return b; };
-  ['Orbit', 'Audience', 'Top'].forEach((label, index) => button(label, () => frame(index)));
+  ['Room overview', 'Audience', 'Plan'].forEach((label, index) => button(label, () => frame(index)));
   button('+', () => stage.zoomBy(.8)).setAttribute('aria-label', 'Zoom in');
   button('−', () => stage.zoomBy(1.25)).setAttribute('aria-label', 'Zoom out');
   button('Reset', () => frame(0));
   if (planWithRoom) button('Plan with this room', planWithRoom).className = 'pj-stage-primary';
-  if (cutaway.count) {
-    let roofVisible = false;
-    const roof = button('Roof', () => {
-      roofVisible = !roofVisible; cutaway.set(roofVisible);
-      roof.setAttribute('aria-pressed', String(roofVisible)); roof.title = roofVisible ? 'Hide roof for interior view' : 'Show roof'; stage.requestRender();
-    });
-    roof.dataset.venueRoof = ''; roof.setAttribute('aria-pressed', 'false'); roof.title = 'Roof hidden · Show roof';
-  }
-  for (const [role, label] of [['room', 'Room'], ['plot', 'Drawing'], ['scan', 'LiDAR']]) {
+  addRoomLayerControls(controls, cutaway, () => stage.requestRender(), false);
+  for (const [role, label] of [['plot', 'Drawing'], ['scan', 'LiDAR']]) {
     if (!venue.assets[role]) continue;
     const b = button(label, async () => {
       b.disabled = true;

@@ -9,7 +9,7 @@ export async function createStagePlanner(host, plot, onScenario, openLive) {
   let scenarios = structuredClone(baseline), lane = 'D';
   const field = (key, label, step = '.25', extra = '') => `<label class="avd-field"><span class="avd-field__label">${label}</span><input class="avd-input" type="number" step="${step}" data-plan="${key}" ${extra}></label>`;
   host.innerHTML = `<div class="pj-plan-heading"><strong>What-if planning</strong><span class="pj-plan-badge">Not sent to projectors</span></div>
-    <p class="pj-mono pj-note">Select A–D and edit below. Projectors frames the units; Orbit shows the full beam. In the room preview, Roof reveals the interior.</p>
+    <p class="pj-mono pj-note">Select A–D and edit below. Projectors frames the units; Coverage shows the rasters, Plan the throws, and Selected side the active beam elevation. In the room preview, Roof reveals the interior.</p>
     <div class="pj-plan-lanes" role="group" aria-label="Planning projector">${Object.keys(LANES).map(key => `<button class="avd-btn" type="button" data-plan-lane="${key}">${key}</button>`).join('')}</div>
     <p class="pj-mono pj-note" id="plan-baseline-note"></p>
     <div class="pj-plan-actions"><button class="avd-btn" type="button" id="plan-reset">Reset recorded plan</button><button class="avd-btn avd-btn--quiet" type="button" id="plan-live">Live controls</button></div>

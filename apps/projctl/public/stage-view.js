@@ -22,6 +22,7 @@ export function createStageView(root, openControls, canAdjust) {
   const highlight = (lane) => { canvas.dataset.highlight = lane || ''; viewer?.highlight(lane); };
 
   function openLane(lane) {
+    viewer?.select(lane);
     if (planning) { planner?.select(lane); return; }
     const p = projectorForLane(current.projectors, lane);
     if (p && connected && p.status?.online && canAdjust(p)) openControls(p.slot);
@@ -83,10 +84,11 @@ export function createStageView(root, openControls, canAdjust) {
     viewer?.active(!root.hidden && view === '3d');
     buildingViewer?.active(!root.hidden && view === 'building');
     $('#stage-title').textContent = view === 'building' ? venue.title : plot.title;
-    $('#stage-source').textContent = view === 'building' ? venue.notes : plot.source;
+    const venueNote = venue?.notes?.replace(/Do not align planning beams to this building yet\.\s*/gi, '') || '';
+    $('#stage-source').textContent = view === 'building' ? venueNote : plot.source;
     if (view === 'building') {
       $('#stage-caption').textContent = `Venue reference · ${venue.modelVersion} · metres`;
-      if (!venue.registration?.planningOverlayAllowed) $('#stage-source').textContent = `Unregistered appearance reference. Plan with this room opens a clearly approximate overlay. ${venue.notes}`;
+      if (!venue.registration?.planningOverlayAllowed) $('#stage-source').textContent = `Unregistered appearance reference. Plan with this room opens a clearly approximate overlay. ${venueNote}`;
       $('#stage-foot').textContent = venue.registration?.planningOverlayAllowed ? 'Venue reference · confirm registration before physical decisions' : 'Appearance reference · target-plane registration unverified · approximate planning preview available';
       for (const card of cards.values()) card.querySelector('.pj-stage-note').textContent = '';
       loadBuilding(); return;
@@ -164,7 +166,7 @@ export function createStageView(root, openControls, canAdjust) {
       view = '3d'; root.querySelectorAll('[data-stage-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.stageView === '3d')));
       if (!planner && !plannerLoading && plot) {
         plannerLoading = true;
-        try { planner = await createStagePlanner($('#stage-planner'), plot, (result) => { proposal = result; if (planning) viewer?.planning(result); }, lane => {
+        try { planner = await createStagePlanner($('#stage-planner'), plot, (result, lane) => { proposal = result; viewer?.select(lane); if (planning) viewer?.planning(result); }, lane => {
           const p = projectorForLane(current.projectors, lane);
           if (p && connected && p.status?.online && canAdjust(p)) openControls(p.slot);
           else { $('#stage-message').textContent = 'Live controls unavailable for this projector. Use Rig to inspect connection status.'; $('#stage-message').hidden = false; }

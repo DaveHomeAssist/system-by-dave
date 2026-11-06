@@ -37,11 +37,11 @@ exports.check3D = async (page, relay, offline, until) => {
   await canvas.press('ArrowLeft'); await page.waitForTimeout(700);
   assert.notDeepEqual(await canvas.screenshot(), initial, 'orbit changes the rendered scene');
   await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
-  await page.getByRole('button', { name: 'Reset', exact: true }).click();
+  await page.getByRole('button', { name: 'Reset view', exact: true }).click();
   const p = await pointFor(page, 'A');
   await page.mouse.move(p.x, p.y); await page.mouse.down(); await page.mouse.move(p.x + 80, p.y + 25, { steps: 8 }); await page.mouse.up();
   assert.equal(await page.locator('#adjust').isVisible(), false, 'orbit drag must not activate a model');
-  await page.getByRole('button', { name: 'Reset', exact: true }).click();
+  await page.getByRole('button', { name: 'Reset view', exact: true }).click();
   await page.waitForTimeout(1200);
   const visible = await canvas.screenshot();
   await page.locator('[data-coverage="A"]').click(); await page.waitForTimeout(100);
