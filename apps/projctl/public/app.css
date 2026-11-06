@@ -177,3 +177,5 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 .pj-brand>div{min-width:0}.pj-lock{width:44px;min-width:44px;min-height:44px;padding:10px}
 .pj-lock[data-lock-state="locked"]{background:var(--tape);color:var(--on-tape);border-color:var(--tape)}
 .pj-lock[data-lock-state="locked"] [data-lock-icon="unlocked"],.pj-lock[data-lock-state="unlocked"] [data-lock-icon="locked"]{display:none}
+
+.pj-workspace-link{display:inline-block;text-decoration:none;text-underline-offset:3px}.pj-workspace-link:hover{text-decoration:underline}.pj-workspace-link:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
