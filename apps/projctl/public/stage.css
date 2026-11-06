@@ -96,3 +96,7 @@
 .pj-room-layer-panel{position:absolute;bottom:calc(100% + 6px);right:0;width:270px;max-width:calc(100vw - 30px);display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;background:var(--surface);border:1px solid var(--line-control);border-radius:10px;box-shadow:var(--shadow-lift);z-index:35}
 .pj-room-layer-panel [data-room-layer="room"],.pj-room-layer-panel [data-room-layer="restore"]{grid-column:1/-1}.pj-room-layer-panel button{white-space:normal}
 @media(max-width:680px){.pj-stage-workspace:has(#stage-planner:not([hidden])) .pj-stage-toolbar{display:none}}
+@media(max-height:450px) and (max-width:680px){
+  .pj-stage-workspace:has(.pj-stage-3d:not([hidden])){grid-template-rows:minmax(420px,1fr) minmax(140px,.7fr);min-height:580px}
+  .pj-stage-3d three-d-stage{min-height:120px}
+}
