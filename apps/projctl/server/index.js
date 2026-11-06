@@ -116,7 +116,9 @@ poller = createPoller({
     const c = connections.get(p.slot);
     Object.assign(c, { lastAttemptAt: new Date(at).toISOString(), nextRetryAt: null });
     if (!p.ip) Object.assign(c, { state: 'unassigned', error: null, consecutiveFailures: 0, retryDelayMs: 0 });
-    broadcastStatus(p);
+    // Healthy reads retain the existing fresh sample until their result arrives.
+    // Broadcast start only when it changes operator-visible recovery/identity state.
+    if (identityChanged || c.state !== 'online') broadcastStatus(p);
   },
   succeeded(p, s, { at }) {
     if (!p.ip) return;
