@@ -7,6 +7,7 @@ export function simulatorDriver({ name = 'SIM', inputs = ['31', '32'] } = {}) {
   const later = (ms, fn) => { clearTimeout(timer); timer = setTimeout(fn, ms); };
   return {
     kind: 'simulator',
+    lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'bounded-step', stop: true, positionReadback: true },
     lensControls: { h: true, v: true, focus: true, zoom: true },
     _state: st,
     async getStatus() {
@@ -31,7 +32,7 @@ export function simulatorDriver({ name = 'SIM', inputs = ['31', '32'] } = {}) {
       st.input = String(id); return 'OK';
     },
     async pattern(code) { st.pattern = String(code).padStart(2, '0'); return 'OK'; },
-    async lens(op) { st.pollFocus = null; if (['h', 'v', 'focus', 'zoom'].includes(op.axis)) { st.lens[op.axis] = Math.max(0, Math.min(65535, st.lens[op.axis] + (op.dir === '+' ? 128 : -128))); st.lens[op.axis + 'State'] = 'Stopped'; } else if (op.op === 'home') { st.lens.h = st.lens.v = 0; } return 'OK'; },
+    async lens(op) { st.pollFocus = null; if (['h', 'v', 'focus', 'zoom'].includes(op.axis)) { st.lens[op.axis] = Math.max(0, Math.min(65535, st.lens[op.axis] + (op.dir === '+' ? 1 : -1) * ({ slow: 128, normal: 512, fast: 2048 }[op.speed || 'slow']))); st.lens[op.axis + 'State'] = 'Stopped'; } else if (op.op === 'home') { st.lens.h = st.lens.v = 0; } return 'OK'; },
     async recallLens(targets) { for (const [axis, target] of Object.entries(targets)) { if (Number.isFinite(target)) st.lens[axis] = target; st.lens[axis + 'State'] = 'Stopped'; } return 'OK'; },
     async getPicture() { return st.picture || (st.picture = { mode: 'STD', contrast: 0, brightness: 0, color: 0, tint: 0, sharpness: 8, gamma: 'DEF', colorTemp: '10', noise: '0', iris: '0' }); },
     async picture(key, value) { (st.picture || await this.getPicture()); st.picture[key] = value; return 'OK'; },

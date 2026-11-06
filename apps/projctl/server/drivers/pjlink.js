@@ -51,6 +51,7 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
 
   return {
     kind: 'pjlink',
+    lensJog: { axes: [], speeds: [], mode: 'unsupported', stop: false, positionReadback: false },
     async getStatus() {
       const power = powerMap[await send('POWR ?')] ?? POWER.UNKNOWN;
       const s = { power, online: true };

@@ -39,3 +39,12 @@ This does not itself create a tunnel, DNS entry, public endpoint or membership.
 Cross-site iframe authentication and the actual Studio crew endpoint require
 separate verification; Strict cookies must not be advertised as working inside
 a public cross-site iframe. Same-origin local workspace tabs remain available.
+
+`capabilities.lensJog` declares implemented axes, speeds, mode, Stop support and
+position-readback support without querying a projector. Pulse and simulation use
+bounded steps (slow/normal/fast: 128/512/2048 native units); Panasonic uses its
+three native jog speeds, with no Stop or absolute-position readback implemented.
+PJLink reports unsupported with empty axes/speeds, even though its driver exposes
+a method that throws NotSupported. The legacy `capabilities.lens` flag follows
+these implemented jog axes. Metadata does not establish current motor availability;
+connection, busy, lock and command/readback guards still apply.

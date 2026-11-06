@@ -85,6 +85,7 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
   return {
     ...pj,
     kind: 'panasonic',
+    lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'native-jog', stop: false, positionReadback: false },
     lensControls: { h: false, v: false, focus: false, zoom: false },
     patterns,
     async getStatus() {
