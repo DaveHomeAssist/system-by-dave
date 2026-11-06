@@ -169,3 +169,13 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 .pj-input-options>summary{cursor:pointer;min-height:44px;display:list-item;align-content:center;padding:10px 12px;margin-left:16px;font-size:13px;font-weight:600;color:var(--ink-muted)}
 .pj-input-options>summary:hover{color:var(--ink)}.pj-input-options>summary:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}.pj-input-options[open]>summary{margin-bottom:8px}
 @media(max-width:680px){.pj-allbar[aria-labelledby="all-label"]>[data-all="resetInput"]{grid-column:1/-1}}
+
+.pj-clock{display:flex;flex-direction:column;gap:2px;flex:0 0 auto;text-align:right;font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap;line-height:18px}
+.pj-clock>span{font-size:11px;color:var(--ink-muted)}.pj-clock>strong{font-size:14px;color:var(--ink);font-weight:600}
+@media(max-width:680px){.pj-header .pj-brand{flex:1 1 150px}.pj-clock{line-height:16px;gap:0}.pj-clock>span{font-size:9px}.pj-clock>strong{font-size:11px}.pj-header .pj-brand h1{overflow-wrap:anywhere}}
+
+.pj-brand>div{min-width:0}.pj-lock{width:44px;min-width:44px;min-height:44px;padding:10px}
+.pj-lock[data-lock-state="locked"]{background:var(--tape);color:var(--on-tape);border-color:var(--tape)}
+.pj-lock[data-lock-state="locked"] [data-lock-icon="unlocked"],.pj-lock[data-lock-state="unlocked"] [data-lock-icon="locked"]{display:none}
+
+.pj-workspace-link{display:inline-block;text-decoration:none;text-underline-offset:3px}.pj-workspace-link:hover{text-decoration:underline}.pj-workspace-link:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}

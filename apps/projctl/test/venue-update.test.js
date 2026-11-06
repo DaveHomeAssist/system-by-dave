@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import { writeVenueFixture } from './venue-fixture.js';
+import { stagePackagedVenue, applyPackagedVenue } from '../deploy/venue-update.js';
+test('explicit venue update replaces only venue, backs up old model, and invalid update stops before mutation', async t => {
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'projctl-venue-update-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+ const source=path.join(root,'source'), data=path.join(root,'data'), backup=path.join(root,'backup'), staged=path.join(root,'staged');
+ await fs.mkdir(source);await fs.mkdir(data);await fs.mkdir(backup);
+ await fs.writeFile(path.join(data,'rig.json'),'private rig bytes');await fs.writeFile(path.join(data,'stage-plot.json'),'private stage bytes');
+ await writeVenueFixture(path.join(data,'venue'));await fs.writeFile(path.join(data,'venue','old-marker'),'old');
+ assert.equal(await stagePackagedVenue(source,staged),false);
+ const manifest=await writeVenueFixture(path.join(source,'data/venue'));
+ await fs.writeFile(path.join(source,'DELIVERY.json'),JSON.stringify({modelVersion:manifest.modelVersion}));
+ assert.equal(await stagePackagedVenue(source,staged),true);await applyPackagedVenue(staged,data,backup);
+ assert.equal(await fs.readFile(path.join(backup,'venue','old-marker'),'utf8'),'old');
+ await assert.rejects(fs.access(path.join(data,'venue','old-marker')));
+ assert.equal(await fs.readFile(path.join(data,'rig.json'),'utf8'),'private rig bytes');assert.equal(await fs.readFile(path.join(data,'stage-plot.json'),'utf8'),'private stage bytes');
+ await fs.writeFile(path.join(source,'data/venue/room.glb'),'corrupt');
+ await assert.rejects(stagePackagedVenue(source,staged));await assert.rejects(fs.access(staged));
+});

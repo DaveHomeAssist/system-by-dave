@@ -6,6 +6,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { stagePackagedVenue, applyPackagedVenue } from './venue-update.js';
 import { servicePaths, servicePlist, launcherText, assertSavedRig } from './service-tools.js';
 
 if (process.platform !== 'darwin') throw new Error('This installer requires macOS launchd.');
@@ -57,6 +58,8 @@ for (const name of ['server', 'public', 'runtime', 'scripts', 'docs', 'deploy', 
 }
 if (!fs.existsSync(path.join(next, 'node_modules/ws'))) throw new Error('Run npm ci --omit=dev in the source app first.');
 if (!fs.existsSync(path.join(next, 'runtime/throwline/three-d-stage.js'))) throw new Error('Run npm run bundle:throwline in the source app first.');
+const stagedVenue = path.join(paths.root, `venue-next-${process.pid}`);
+const hasVenueUpdate = await stagePackagedVenue(source, stagedVenue);
 const backup = path.join(paths.root, `backup-${new Date().toISOString().replaceAll(':', '-')}`);
 fs.mkdirSync(backup, { mode: 0o700 });
 fs.writeFileSync(path.join(backup, 'rig.json'), original, { mode: 0o600 });
@@ -82,6 +85,7 @@ for (let n = 0; n < 40; n++) {
   if (n === 39) throw new Error('Old relay did not stop. Staged runtime and backup preserved.');
   await new Promise(resolve => setTimeout(resolve, 100));
 }
+if (hasVenueUpdate) await applyPackagedVenue(stagedVenue, data, backup);
 if (fs.existsSync(paths.app)) fs.renameSync(paths.app, path.join(backup, 'app'));
 fs.renameSync(next, paths.app);
 fs.mkdirSync(path.dirname(paths.plist), { recursive: true });

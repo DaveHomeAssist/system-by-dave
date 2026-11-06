@@ -99,6 +99,29 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await until(async () => !(await page.locator('#adj-picture input').first().isDisabled()));
         await page.keyboard.press('Escape');
 
+        // Keyboard Picture selection must load the current slot, even after a late old reply.
+        let latePicture;
+        await page.route('**/api/picture?slot=P2', route => { latePicture = route; });
+        await page.locator('.pj-tile[data-slot="P2"] [data-adj="picture"]').click();
+        await until(() => !!latePicture);
+        await page.keyboard.press('Escape');
+        await page.locator('.pj-tile[data-slot="P4"] [data-adj="lens"]').click();
+        assert.equal(await page.locator('#adj-picture input, #adj-picture select').count(), 0);
+        const currentPicture = page.waitForRequest(r => r.url().endsWith('/api/picture?slot=P4'));
+        await page.getByRole('tab', { name: 'Lens', exact: true }).focus();
+        await page.keyboard.press('ArrowRight'); await currentPicture;
+        await page.locator('#adj-picture input').first().waitFor();
+        const currentValue = await page.locator('#adj-picture input').first().inputValue();
+        await latePicture.fulfill({ contentType: 'application/json', body: JSON.stringify({ brightness: -99 }) });
+        await page.unroute('**/api/picture?slot=P2');
+        await page.waitForTimeout(50);
+        assert.equal(await page.locator('#adj-picture input').first().inputValue(), currentValue);
+        const pictureWrite = page.waitForRequest(r => r.url().endsWith('/api/command') && r.method() === 'POST');
+        await page.locator('#adj-picture input').first().evaluate(el => el.dispatchEvent(new Event('change', { bubbles: true })));
+        const pictureCommand = (await pictureWrite).postDataJSON();
+        assert.equal(pictureCommand.slot, 'P4'); assert.equal(pictureCommand.cmd, 'picture');
+        await page.keyboard.press('Escape');
+
         await checkStage(page, relay, offline, until);
 
         for (const [width, height] of [[1440, 900], [680, 900], [375, 812], [844, 390], [320, 256], [3840, 1080]]) {
