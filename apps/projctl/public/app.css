@@ -154,3 +154,5 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 .pj-setup-footer{display:flex;justify-content:flex-end}.pj-setup-footer .avd-btn{min-width:120px}
 @media(max-width:1100px){.pj-overview{align-items:flex-start;gap:12px}.pj-overview>div{flex-shrink:1}.pj-setup-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:680px){.pj-overview{padding:10px 12px;display:block}.pj-overview strong{font-size:14px;line-height:20px}.pj-overview p{font-size:11px;line-height:15px;margin-top:4px}.pj-overview .avd-eyebrow{display:none}.pj-mode{font-size:10px;padding:3px 6px}.pj-setup{padding:14px}.pj-setup-heading>strong{font-size:18px}.pj-setup-fields{gap:10px}.pj-header{column-gap:8px}}
+
+.pj-connection-help{min-width:0}.pj-connection-help a{color:var(--tape);font-weight:600;text-underline-offset:3px}.pj-connection-help a:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}#local-controller-help{margin-top:8px}#local-controller-help span{display:block;margin-top:4px}

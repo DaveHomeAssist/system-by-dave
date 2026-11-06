@@ -92,6 +92,8 @@ function renderOverview() {
   const assigned = rigLanes(state.projectors).filter((x) => x.projector).length;
   $('#relay-mode').textContent = state.simulation === true ? 'DEMO · simulated devices' : state.simulation === false ? 'REAL RELAY' : 'Connecting…';
   $('#relay-mode').classList.toggle('pj-mode--demo', state.simulation === true);
+  const staticPreview = location.pathname.includes('/apps/projctl/public') || ['systembydave.com', 'www.systembydave.com', 'davehomeassist.github.io'].includes(location.hostname);
+  $('#local-controller-help').hidden = connected || !staticPreview;
   $('#summary').textContent = connected ? `${online} / ${state.projectors.length} devices replying · ${assigned} / 4 lanes assigned` : 'Relay disconnected · device data unavailable';
   $('#connection-note').textContent = !connected ? 'Reconnecting automatically. Displayed values are last known; current projector power is unknown.' : online < state.projectors.length ? 'Relay connected. Devices without a reply: check the venue network and projector connection. No reply does not confirm power off.' : state.simulation ? 'Simulator data · no physical projector feedback. Status updates automatically.' : 'Device feedback updates automatically. Each card shows its latest successful reply.';
 }
@@ -325,16 +327,45 @@ async function loadPicture() {
 
 // websocket
 function setConn(on) { connected = on; const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#lock-on').disabled = !on; $('#lock-off').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderOverview(); renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
+let reconnectTimer = null, socketGeneration = 0;
+function scheduleReconnect() {
+  if (reconnectTimer !== null) return;
+  reconnectTimer = setTimeout(() => { reconnectTimer = null; connect(); }, 1500);
+}
 function connect() {
-  const ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
-  ws.onopen = () => setConn(true);
-  ws.onclose = () => { setConn(false); fetch('/api/state').then((r) => { if (r.status === 401) location.href = '/login.html'; else setTimeout(connect, 1500); }).catch(() => setTimeout(connect, 1500)); };
+  const generation = ++socketGeneration;
+  let ws, disconnected = false;
+  const recover = () => {
+    if (generation !== socketGeneration || disconnected) return;
+    disconnected = true;
+    setConn(false);
+    // Retry independently: an unavailable HTTP endpoint must not stall the socket.
+    scheduleReconnect();
+    fetch('/api/state', { signal: AbortSignal.timeout(4000), cache: 'no-store' })
+      .then((r) => { if (generation === socketGeneration && r.status === 401) location.href = '/login.html'; })
+      .catch(() => {});
+  };
+  try { ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws'); }
+  catch { recover(); return; }
+  // A transport connection alone does not prove we have current controller state.
+  const snapshotTimer = setTimeout(() => { recover(); ws.close(); }, 5000);
+  ws.onclose = () => { clearTimeout(snapshotTimer); recover(); };
+  ws.onerror = () => { clearTimeout(snapshotTimer); recover(); ws.close(); };
   ws.onmessage = (m) => {
-    const msg = JSON.parse(m.data);
-    if (msg.type === 'snapshot') { state = msg; renderAll(); }
+    if (generation !== socketGeneration || disconnected) return;
+    let msg;
+    try { msg = JSON.parse(m.data); } catch { recover(); ws.close(); return; }
+    if (!msg || typeof msg !== 'object') { recover(); ws.close(); return; }
+    if (msg.type === 'snapshot') {
+      if (!Array.isArray(msg.projectors) || !msg.projectors.every((p) => p && typeof p.slot === 'string') || !Array.isArray(msg.presets) || !Array.isArray(msg.events)) { recover(); ws.close(); return; }
+      clearTimeout(snapshotTimer);
+      state = msg; setConn(true); renderAll();
+    }
+    else if (!connected) return;
     else if (msg.type === 'status') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
     else if (msg.type === 'busy') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
     else if (msg.type === 'event') { state.events.push(msg.event); if (state.events.length > 200) state.events.shift(); renderLog(); }
   };
 }
+setConn(false);
 connect();
