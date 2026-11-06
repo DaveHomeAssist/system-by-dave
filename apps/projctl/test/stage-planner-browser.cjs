@@ -46,6 +46,7 @@ const path = require('node:path');
    await page.setViewportSize({ width, height });
    const fit = await page.evaluate(() => ({width:document.documentElement.scrollWidth <= document.documentElement.clientWidth, height:document.documentElement.scrollHeight <= document.documentElement.clientHeight}));
    assert.deepEqual(fit, {width:true,height:true});
+   assert.ok(await page.locator('#plan-reset').evaluate(el => el.scrollWidth <= el.clientWidth), 'reset label stays inside its button');
    const sidebar = page.locator('.pj-stage-sidebar');
    await sidebar.evaluate(node => { node.scrollTop = 0; });
    assert.ok(await sidebar.evaluate(node => node.clientHeight > 100));
