@@ -244,3 +244,16 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 @media(max-width:600px){.pj-selected-dock .pj-lens-optics{grid-template-columns:1fr}}
 #tab-rig.on{gap:8px}.pj-summary-select{gap:0;padding-block:4px}.pj-selected-dock .pj-lens-workspace{padding-block:8px}.pj-selected-dock .pj-lens-details>summary,.pj-secondary-controls summary{min-height:44px}.pj-selected-dock .pj-lens-keyboard-row button{font-size:11px}
 .pj-summary-state{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.pj-summary-state.has-alarms{color:var(--state-blocked);font-weight:700}
+/* Keep operator chrome bounded when platform fonts make the middle-width header wrap. */
+@media(min-width:760px) and (max-width:1100px) and (min-height:700px) and (max-height:1050px){
+  .pj-main{padding-block:12px}
+  .pj-header{display:grid;grid-template-columns:minmax(150px,1fr) auto auto 44px 44px;gap:4px 8px;padding:6px 12px;align-items:center}
+  .pj-header .pj-brand{grid-column:1;grid-row:1/3;min-width:0;gap:8px}.pj-header .pj-snowmark{display:none}.pj-header .pj-brand h1{font-size:20px;line-height:24px;margin:0}.pj-header .pj-kicker{font-size:8px}
+  .pj-header .pj-clock{grid-column:2;grid-row:1/3;line-height:16px}.pj-header .pj-clock>span{font-size:9px}.pj-header .pj-clock>strong{font-size:12px}
+  .pj-header #conn{grid-column:3;grid-row:1;justify-self:start}.pj-header #relay-mode{grid-column:3;grid-row:2;font-size:10px;line-height:16px;padding:2px 5px}
+  .pj-header #show-lock{grid-column:4;grid-row:1/3}.pj-header #theme{grid-column:5;grid-row:1/3}
+}
+@media(min-width:760px) and (max-width:950px) and (min-height:700px) and (max-height:1050px){
+  .avd-shell__tabs .avd-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:44px;width:100%}
+  .avd-shell__tabs .avd-tab{min-width:0;min-height:44px;padding:6px 5px;line-height:16px;font-size:10px}
+}
