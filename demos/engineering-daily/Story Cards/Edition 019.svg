@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">SDI reclocking rate coverage</title><desc id="desc">Conceptual AJA 3GDA paths: 1.485 Gbps is reclocked; other rates within its passband bypass reclocking. This is not a physical wiring diagram.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 019</text>
+<text x="108" y="228" font-size="54" class="story-title">SDI reclocking rate coverage</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect width="240" height="400" rx="6" class="canvas"/><text x="12" y="26" class="diagram-index">19</text><text x="48" y="26" class="diagram-heading">RECLOCK / BYPASS</text><path d="M12 40H228" class="rule"/><rect x="12" y="54" width="216" height="144" rx="6" class="panel"/><text x="24" y="78" class="blue-label">1.485 Gbps input</text><path d="M24 100H82m-6-5l6 5l-6 5" class="wire"/><rect x="84" y="88" width="128" height="36" rx="4" class="node"/><text x="148" y="112" text-anchor="middle">Reclocker</text><path d="M148 124V150H30m6-5l-6 5l6 5" class="wire"/><text x="24" y="178" class="good-label">Reclocked output</text><rect x="12" y="214" width="216" height="144" rx="6" class="panel"/><text x="24" y="238" class="note">Other input rate*</text><rect x="84" y="248" width="128" height="36" rx="4" class="limit"/><text x="148" y="272" text-anchor="middle" class="note">Reclocker</text><path d="M24 260H62V306H210m-6-5l6 5l-6 5" class="reference"/><text x="24" y="338" class="note">Not reclocked</text><text x="12" y="382" class="note">*Within passband</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">Conceptual AJA 3GDA paths: 1.485</text>
+<text x="108" y="1558" font-size="40" class="story-caption">Gbps is reclocked; other rates</text>
+<text x="108" y="1610" font-size="40" class="story-caption">within its passband bypass</text>
+<text x="108" y="1662" font-size="40" class="story-caption">reclocking. This is not a physical</text>
+<text x="108" y="1714" font-size="40" class="story-caption">wiring diagram.</text>
+<a href="https://www.aja.com/products/3gda"><text x="108" y="1808" font-size="28" class="story-source">AJA 3GDA technical specifications, Reclocking</text></a>
+</svg>

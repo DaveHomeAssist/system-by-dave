@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">ST 2022-7 packet redundancy</title><desc id="desc">The receiver uses B's packet #42 when A's copy is missing; packets do not cross between paths. Protection depends on matching copies and receiver timing limits.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 007</text>
+<text x="108" y="228" font-size="54" class="story-title">ST 2022-7 packet redundancy</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect x="0" y="0" width="240" height="400" rx="8" class="canvas"/><text x="12" y="26" class="diagram-index" text-anchor="start">07</text><text x="48" y="26" class="diagram-heading" text-anchor="start">PACKET SELECTION</text><path d="M12 40H228" class="rule"/><text x="120" y="68" class="" text-anchor="middle">Matching A/B packet copies</text><text x="19" y="100" class="blue-label" text-anchor="start">PATH A</text><text x="145" y="100" class="note" text-anchor="start">PATH B</text><rect x="19" y="116" width="56" height="30" rx="8" class="packet blue-packet"/><text x="47" y="137" class="packet-label" text-anchor="middle">#41</text><rect x="145" y="116" width="56" height="30" rx="8" class="packet amber-packet"/><text x="173" y="137" class="packet-label" text-anchor="middle">#41</text><rect x="19" y="160" width="56" height="30" rx="8" class="missing"/><text x="47" y="181" class="fault" text-anchor="middle">×</text><rect x="145" y="160" width="56" height="30" rx="8" class="packet amber-packet"/><text x="173" y="181" class="packet-label" text-anchor="middle">#42</text><rect x="19" y="204" width="56" height="30" rx="8" class="packet blue-packet"/><text x="47" y="225" class="packet-label" text-anchor="middle">#43</text><rect x="145" y="204" width="56" height="30" rx="8" class="packet amber-packet"/><text x="173" y="225" class="packet-label" text-anchor="middle">#43</text><text x="120" y="262" class="" text-anchor="middle">Receiver selects A or B</text><path d="M120 276V296m-4 -6l4 6l4 -6" class="wire"/><rect x="12" y="306" width="216" height="74" rx="8" class="result"/><rect x="24" y="320" width="56" height="30" rx="8" class="packet blue-packet"/><text x="52" y="341" class="packet-label" text-anchor="middle">#41</text><rect x="92" y="320" width="56" height="30" rx="8" class="packet amber-packet"/><text x="120" y="341" class="packet-label" text-anchor="middle">#42</text><rect x="160" y="320" width="56" height="30" rx="8" class="packet blue-packet"/><text x="188" y="341" class="packet-label" text-anchor="middle">#43</text><text x="120" y="369" class="good-label" text-anchor="middle">Continuous output</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">The receiver uses B's packet #42</text>
+<text x="108" y="1558" font-size="40" class="story-caption">when A's copy is missing; packets do</text>
+<text x="108" y="1610" font-size="40" class="story-caption">not cross between paths. Protection</text>
+<text x="108" y="1662" font-size="40" class="story-caption">depends on matching copies and</text>
+<text x="108" y="1714" font-size="40" class="story-caption">receiver timing limits.</text>
+<a href="https://pub.smpte.org/doc/st2110-10/20220328-pub/st2110-10-2022.pdf"><text x="108" y="1808" font-size="28" class="story-source">SMPTE ST 2110-10:2022, §8.5 and Annex B</text></a>
+</svg>

@@ -1,0 +1,164 @@
+{
+  "show": "Frozen at WST",
+  "lock": false,
+  "projectors": [
+    {
+      "slot": "P1",
+      "label": "Barco UDM 4K22",
+      "make": "Barco",
+      "model": "UDM 4K22",
+      "owner": "Rental",
+      "driver": "simulator",
+      "mac": "",
+      "ip": "sim",
+      "inputs": {
+        "HDMI": "HDMI",
+        "SDI": "SDI"
+      },
+      "notes": "Snorkel, right angle out. L6-30 cord, needs 208V for full output."
+    },
+    {
+      "slot": "P2",
+      "label": "House Panasonic A",
+      "make": "Panasonic",
+      "model": "TBC",
+      "owner": "House",
+      "driver": "simulator",
+      "mac": "",
+      "ip": "sim",
+      "inputs": {
+        "31": "HDMI",
+        "32": "DVI-D",
+        "33": "SDI"
+      },
+      "notes": "Portrait, cross shoots portal."
+    },
+    {
+      "slot": "P3",
+      "label": "House Panasonic B",
+      "make": "Panasonic",
+      "model": "TBC",
+      "owner": "House",
+      "driver": "simulator",
+      "mac": "",
+      "ip": "sim",
+      "inputs": {
+        "31": "HDMI",
+        "32": "DVI-D",
+        "33": "SDI"
+      },
+      "notes": "Portrait, cross shoots portal."
+    },
+    {
+      "slot": "P4",
+      "label": "Panasonic PT-RZ970B",
+      "make": "Panasonic",
+      "model": "PT-RZ970B",
+      "owner": "Rental",
+      "driver": "simulator",
+      "mac": "",
+      "ip": "sim",
+      "inputs": {
+        "31": "HDMI",
+        "32": "DVI-D",
+        "33": "SDI",
+        "34": "DIGITAL LINK"
+      },
+      "notes": "ET-DLE080 lens. S/N DA7610162."
+    }
+  ],
+  "presets": [],
+  "events": [
+    {
+      "at": "2026-11-02T18:15:29.934Z",
+      "source": "poll",
+      "slot": "P1",
+      "command": "online",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:15:29.934Z",
+      "source": "poll",
+      "slot": "P2",
+      "command": "online",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:15:29.934Z",
+      "source": "poll",
+      "slot": "P3",
+      "command": "online",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:15:29.934Z",
+      "source": "poll",
+      "slot": "P4",
+      "command": "online",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:18:11.149Z",
+      "source": "poll",
+      "slot": "P1",
+      "command": "online",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:18:11.149Z",
+      "source": "poll",
+      "slot": "P2",
+      "command": "online",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:18:11.149Z",
+      "source": "poll",
+      "slot": "P3",
+      "command": "online",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:18:11.149Z",
+      "source": "poll",
+      "slot": "P4",
+      "command": "online",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:47:18.646Z",
+      "source": "ui",
+      "slot": "P1",
+      "command": "shutter 0",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:47:21.245Z",
+      "source": "ui",
+      "slot": "P1",
+      "command": "shutter 1",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T18:47:22.595Z",
+      "source": "ui",
+      "slot": "P1",
+      "command": "shutter 1",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T20:08:10.637Z",
+      "source": "ui",
+      "slot": "P1",
+      "command": "shutter 1",
+      "result": "OK"
+    },
+    {
+      "at": "2026-11-02T20:08:11.213Z",
+      "source": "ui",
+      "slot": "P1",
+      "command": "shutter 1",
+      "result": "OK"
+    }
+  ]
+}

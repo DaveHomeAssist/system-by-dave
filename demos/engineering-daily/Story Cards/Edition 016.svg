@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">Drop-frame timecode numbering</title><desc id="desc">At 29.97 fps DF, ordinary minutes skip labels ;00 and ;01. Tenth minutes retain them. Each arrow joins consecutive picture frames; the label jump removes no pictures.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 016</text>
+<text x="108" y="228" font-size="54" class="story-title">Drop-frame timecode numbering</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect x="0" y="0" width="240" height="400" rx="6" class="canvas"/><text x="12" y="26" class="diagram-index">16</text><text x="48" y="26" class="diagram-heading">29.97 fps DF</text><path d="M12 40H228" class="rule"/><rect x="12" y="54" width="216" height="141" rx="6" class="panel"/><text x="120" y="80" text-anchor="middle" class="blue-label">Ordinary minute</text><text x="120" y="108" text-anchor="middle" class="packet-label">00:00:59;29</text><path d="M120 116V136m-4-6l4 6l4-6" class="wire"/><text x="120" y="159" text-anchor="middle" class="packet-label">00:01:00;02</text><text x="120" y="184" text-anchor="middle" class="note">Labels ;00, ;01 skipped</text><rect x="12" y="211" width="216" height="122" rx="6" class="panel"/><text x="120" y="238" text-anchor="middle" class="blue-label">Every tenth minute</text><text x="120" y="265" text-anchor="middle" class="packet-label">00:09:59;29</text><path d="M120 273V291m-4-6l4 6l4-6" class="wire"/><text x="120" y="317" text-anchor="middle" class="packet-label">00:10:00;00</text><text x="120" y="358" text-anchor="middle" class="">Each arrow: next picture</text><text x="120" y="385" text-anchor="middle" class="good-label">No video frames removed</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">At 29.97 fps DF, ordinary minutes</text>
+<text x="108" y="1558" font-size="40" class="story-caption">skip labels ;00 and ;01. Tenth</text>
+<text x="108" y="1610" font-size="40" class="story-caption">minutes retain them. Each arrow</text>
+<text x="108" y="1662" font-size="40" class="story-caption">joins consecutive picture frames;</text>
+<text x="108" y="1714" font-size="40" class="story-caption">the label jump removes no pictures.</text>
+<a href="https://developer.apple.com/library/archive/technotes/tn2310/_index.html"><text x="108" y="1808" font-size="28" class="story-source">Apple Technical Note TN2310, About Timecodes</text></a>
+</svg>

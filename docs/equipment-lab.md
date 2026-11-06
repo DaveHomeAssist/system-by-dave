@@ -115,7 +115,8 @@ treating them as published product imagery. The camera bench captures are
 cropped from viewer screenshots and still show a viewer label.
 
 Not yet built: the in-workspace Library presentation, a jump palette and
-recently opened entries. The splash is pending Dave's review before release.
+recently opened entries. Dave reviewed the preview and approved its release on
+2 November 2026.
 
 ## Verification record
 

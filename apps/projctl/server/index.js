@@ -1,0 +1,227 @@
+// projctl relay: HTTP + WebSocket API, status polling, presets, OSC/TCP cue input.
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { WebSocketServer } from 'ws';
+import { openStore, simRig } from './store.js';
+import { makeDriver } from './drivers/index.js';
+import { PATTERNS, pictureSchema } from './drivers/panasonic.js';
+import { pjlinkSearch } from './drivers/pjlink.js';
+import { emptyStatus, POWER } from './drivers/base.js';
+import { startOsc, startTcpLines } from './osc.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PORT = Number(process.env.PORT || 8080);
+const OSC_PORT = Number(process.env.OSC_PORT || 9000);
+const TCP_PORT = Number(process.env.TCP_PORT || 9001);
+const POLL_MS = Number(process.env.POLL_MS || 5000);
+const SIM = process.env.SIM === '1';
+const DATA = process.env.RIG || path.join(__dirname, '..', 'data', SIM ? 'rig.sim.json' : 'rig.json');
+
+const store = openStore(DATA);
+if (SIM) simRig(store.rig);
+const rig = store.rig;
+
+const drivers = new Map();   // slot -> driver
+const status = new Map();    // slot -> status
+const missed = new Map();    // slot -> consecutive poll failures
+for (const p of rig.projectors) { status.set(p.slot, emptyStatus()); missed.set(p.slot, 0); }
+
+function driverFor(p) {
+  const key = `${p.slot}|${p.driver}|${p.ip}|${p.user || ''}|${p.password || ''}`;
+  let d = drivers.get(p.slot);
+  if (!d || d._key !== key) { d = makeDriver(p); d._key = key; drivers.set(p.slot, d); }
+  return d;
+}
+
+// ---- WebSocket broadcast ----
+const clients = new Set();
+function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients) if (c.readyState === 1) c.send(s); }
+function snapshot() {
+  return {
+    type: 'snapshot', show: rig.show, lock: rig.lock,
+    projectors: rig.projectors.map((p) => ({ ...p, password: undefined, status: status.get(p.slot), patterns: p.ip ? (driverFor(p).patterns || null) : null })),
+    presets: rig.presets, events: rig.events.slice(-200),
+  };
+}
+
+// ---- Polling ----
+async function poll(p) {
+  if (!p.ip) { setOffline(p.slot, 'no address'); return; }
+  try {
+    const s = await driverFor(p).getStatus();
+    missed.set(p.slot, 0);
+    const prev = status.get(p.slot);
+    const next = { ...prev, ...s, online: true, updatedAt: new Date().toISOString() };
+    status.set(p.slot, next);
+    if (JSON.stringify({ ...prev, updatedAt: 0 }) !== JSON.stringify({ ...next, updatedAt: 0 })) {
+      if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
+      broadcast({ type: 'status', slot: p.slot, status: next });
+    }
+  } catch (e) {
+    const n = missed.get(p.slot) + 1; missed.set(p.slot, n);
+    if (n >= 2) setOffline(p.slot, e.message);
+  }
+}
+function setOffline(slot, why) {
+  const prev = status.get(slot);
+  if (prev.online || prev.updatedAt === null) {
+    const next = { ...emptyStatus(), online: false, updatedAt: new Date().toISOString() };
+    status.set(slot, next);
+    if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
+    broadcast({ type: 'status', slot, status: next });
+  }
+}
+setInterval(() => rig.projectors.forEach(poll), POLL_MS);
+rig.projectors.forEach(poll);
+
+// ---- Discovery (PJLink class 2 search by MAC) ----
+async function discover(source = 'ui') {
+  if (SIM) return { found: [], note: 'simulator' };
+  const found = await pjlinkSearch();
+  let changed = 0;
+  for (const f of found) {
+    const p = rig.projectors.find((x) => x.mac && x.mac.toLowerCase() === f.mac);
+    if (p && p.ip !== f.ip) { store.event({ source, slot: p.slot, command: 'discover', result: 'OK', detail: `${p.ip || 'none'} -> ${f.ip}` }); p.ip = f.ip; changed++; }
+  }
+  if (changed) { store.save(); broadcast(snapshot()); }
+  return { found, changed };
+}
+setInterval(() => discover('auto').catch(() => {}), 60000);
+
+// ---- Commands ----
+const pendingConfirm = new Map(); // key -> expiry
+// token 'preset' skips the double tap: preset and cue paths are deliberate acts already.
+function needsConfirm(key, token) {
+  const now = Date.now();
+  if (token === 'preset') return null;
+  if (token && pendingConfirm.get(token) > now) { pendingConfirm.delete(token); return null; }
+  const t = `${key}:${now}`; pendingConfirm.set(t, now + 3000);
+  return t;
+}
+
+function fmtArg(a) { return a && typeof a === 'object' ? Object.values(a).join(' ') : String(a); }
+async function command(slot, cmd, arg, source = 'ui', confirmToken) {
+  const p = store.projector(slot);
+  if (!p) throw httpErr(404, `no projector ${slot}`);
+  const st = status.get(slot);
+  if (!st.online) throw httpErr(409, `${slot} is offline`);
+  if (rig.lock && (cmd === 'power' && !arg || cmd === 'input' || cmd === 'pattern' || cmd === 'lens')) throw httpErr(423, 'show lock is on');
+  if (cmd === 'power' && !arg && source === 'ui' && confirmToken !== 'preset') {
+    const t = needsConfirm(`${slot}:off`, confirmToken);
+    if (t) return { confirm: t, message: `Tap again within 3 s to power off ${slot}` };
+  }
+  if (cmd === 'power' && arg && st.power === POWER.COOLING) throw httpErr(409, `${slot} is cooling, wait before power on`);
+  const d = driverFor(p);
+  let result, detail;
+  try {
+    if (cmd === 'power') result = await d.power(!!arg);
+    else if (cmd === 'shutter') result = await d.shutter(!!arg);
+    else if (cmd === 'input') result = await d.input(String(arg));
+    else if (cmd === 'pattern') { if (!d.pattern) throw httpErr(400, `${slot}: test pattern not supported by ${d.kind} driver`); result = await d.pattern(arg); }
+    else if (cmd === 'lens') { if (!d.lens) throw httpErr(400, `${slot}: lens not supported by ${d.kind} driver`); result = await d.lens(arg); }
+    else if (cmd === 'picture') { if (!d.picture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`); result = await d.picture(arg.key, arg.value); }
+    else throw httpErr(400, `unknown command ${cmd}`);
+  } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw httpErr(502, e.message); }
+  store.event({ source, slot, command: `${cmd} ${fmtArg(arg)}`, result, detail });
+  broadcast({ type: 'event', event: rig.events.at(-1) });
+  setTimeout(() => poll(p), 400);
+  return { result };
+}
+
+async function recallPreset(name, source = 'ui') {
+  const pr = rig.presets.find((x) => x.name === name);
+  if (!pr) throw httpErr(404, `no preset ${name}`);
+  const out = {};
+  for (const [slot, want] of Object.entries(pr.perSlot)) {
+    const st = status.get(slot); if (!st?.online) { out[slot] = 'offline'; continue; }
+    try {
+      if (want.power !== undefined) await command(slot, 'power', want.power, `${source} preset ${name}`, 'preset');
+      if (want.input) await command(slot, 'input', want.input, `${source} preset ${name}`);
+      if (want.shutter !== undefined) await command(slot, 'shutter', want.shutter === 'closed', `${source} preset ${name}`);
+      out[slot] = 'OK';
+    } catch (e) { out[slot] = e.message; }
+  }
+  return out;
+}
+function savePreset(name) {
+  const perSlot = {};
+  for (const p of rig.projectors) {
+    const s = status.get(p.slot); if (!s.online) continue;
+    // A projector cooling at save time was on a moment ago; the operator's intent is "on".
+    perSlot[p.slot] = { power: s.power !== POWER.OFF, shutter: s.shutter, input: s.input };
+  }
+  const existing = rig.presets.find((x) => x.name === name);
+  if (existing) { existing.perSlot = perSlot; existing.createdAt = new Date().toISOString(); }
+  else rig.presets.push({ name, createdAt: new Date().toISOString(), perSlot });
+  store.save(); store.event({ source: 'ui', slot: '*', command: `preset save ${name}`, result: 'OK' });
+  broadcast(snapshot());
+}
+
+// ---- OSC / TCP cue input: /proj/<slot>/<power|shutter|input> <arg>, /proj/preset/<name>, /proj/all/<power|shutter> <arg>
+async function onCue(addr, args, source) {
+  const parts = addr.split('/').filter(Boolean);
+  if (parts[0] !== 'proj') return;
+  try {
+    if (parts[1] === 'preset') { await recallPreset(parts.slice(2).join('/'), source); return; }
+    const slots = parts[1] === 'all' ? rig.projectors.map((p) => p.slot) : [parts[1].toUpperCase()];
+    const cmd = parts[2]; const arg = args[0];
+    for (const s of slots) await command(s, cmd, cmd === 'input' ? arg : Number(arg) === 1, source, 'preset');
+  } catch (e) { store.event({ source, slot: parts[1], command: addr, result: 'ERR', detail: e.message }); broadcast({ type: 'event', event: rig.events.at(-1) }); }
+}
+startOsc({ port: OSC_PORT, onMessage: onCue });
+startTcpLines({ port: TCP_PORT, onMessage: onCue });
+
+// ---- HTTP ----
+function httpErr(status, message) { return Object.assign(new Error(message), { status }); }
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml' };
+const PUB = path.join(__dirname, '..', 'public');
+async function body(req) { let b = ''; for await (const c of req) b += c; return b ? JSON.parse(b) : {}; }
+function json(res, code, obj) { res.writeHead(code, { 'content-type': 'application/json', 'access-control-allow-origin': '*' }); res.end(JSON.stringify(obj)); }
+
+const server = http.createServer(async (req, res) => {
+  const url = new URL(req.url, 'http://x');
+  try {
+    if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'content-type', 'access-control-allow-methods': 'GET,POST' }); return res.end(); }
+    if (url.pathname === '/api/state') return json(res, 200, snapshot());
+    if (url.pathname === '/api/schema') return json(res, 200, { patterns: PATTERNS, picture: pictureSchema() });
+    if (url.pathname === '/api/picture' && req.method === 'GET') {
+      const slot = url.searchParams.get('slot'); const p = store.projector(slot); if (!p) throw httpErr(404, 'no slot');
+      const d = driverFor(p); if (!d.getPicture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`);
+      if (!status.get(slot).online) throw httpErr(409, `${slot} is offline`);
+      return json(res, 200, await d.getPicture());
+    }
+    if (url.pathname === '/api/command' && req.method === 'POST') {
+      const { slot, cmd, arg, confirm } = await body(req);
+      const slots = slot === 'all' ? rig.projectors.map((p) => p.slot) : [slot];
+      const out = {};
+      for (const s of slots) { try { out[s] = await command(s, cmd, arg, 'ui', confirm); } catch (e) { out[s] = { error: e.message }; } }
+      return json(res, 200, out);
+    }
+    if (url.pathname === '/api/preset/save' && req.method === 'POST') { const { name } = await body(req); if (!name) throw httpErr(400, 'name required'); savePreset(name); return json(res, 200, { ok: true }); }
+    if (url.pathname === '/api/preset/recall' && req.method === 'POST') { const { name } = await body(req); return json(res, 200, await recallPreset(name)); }
+    if (url.pathname === '/api/preset/delete' && req.method === 'POST') { const { name } = await body(req); rig.presets = rig.presets.filter((x) => x.name !== name); store.save(); broadcast(snapshot()); return json(res, 200, { ok: true }); }
+    if (url.pathname === '/api/lock' && req.method === 'POST') { const { lock } = await body(req); rig.lock = !!lock; store.save(); store.event({ source: 'ui', slot: '*', command: `lock ${rig.lock ? 'on' : 'off'}`, result: 'OK' }); broadcast(snapshot()); return json(res, 200, { lock: rig.lock }); }
+    if (url.pathname === '/api/projector' && req.method === 'POST') {
+      const upd = await body(req); const p = store.projector(upd.slot); if (!p) throw httpErr(404, 'no slot');
+      for (const k of ['label', 'make', 'model', 'owner', 'driver', 'mac', 'ip', 'notes', 'user', 'password', 'inputs']) if (k in upd) p[k] = upd[k];
+      store.save(); store.event({ source: 'ui', slot: p.slot, command: 'edit', result: 'OK' }); broadcast(snapshot()); poll(p); return json(res, 200, { ok: true });
+    }
+    if (url.pathname === '/api/discover' && req.method === 'POST') return json(res, 200, await discover('ui'));
+    if (url.pathname === '/api/sim' && req.method === 'POST' && SIM) { // test hook: toggle a sim projector offline
+      const { slot, offline } = await body(req); const d = driverFor(store.projector(slot)); d._state.flaky = !!offline; return json(res, 200, { ok: true });
+    }
+    // static
+    let f = url.pathname === '/' ? '/index.html' : url.pathname;
+    const fp = path.join(PUB, path.normalize(f));
+    if (!fp.startsWith(PUB) || !fs.existsSync(fp)) { res.writeHead(404); return res.end('not found'); }
+    res.writeHead(200, { 'content-type': MIME[path.extname(fp)] || 'application/octet-stream' });
+    fs.createReadStream(fp).pipe(res);
+  } catch (e) { json(res, e.status || 500, { error: e.message }); }
+});
+
+const wss = new WebSocketServer({ server, path: '/ws' });
+wss.on('connection', (ws) => { clients.add(ws); ws.send(JSON.stringify(snapshot())); ws.on('close', () => clients.delete(ws)); });
+
+server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${PORT}  rig=${DATA}`));

@@ -1,3 +1,4 @@
+import { closeTopics, suiteTopic, workspaceTopic, selectView, viewNames, recallPanel, savePack } from "./av-menu-journey.mjs";
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFile, stat, mkdir } from 'node:fs/promises';
@@ -75,7 +76,9 @@ try {
   assert.equal(await storage('sbd.avSuite.workspace.v1'), null, 'opening the shell writes no views');
 
   // Workspace focus is a device preference, not part of saved panel geometry.
+  await suiteTopic(page, 'Appearance');
   await button('Focus').click();
+  await closeTopics(page);
   assert.equal(await page.locator('html').getAttribute('data-av-focus'), 'true');
   assert.equal(await storage('sbd.avSuite.focus.v1'), 'true');
   assert.equal(await page.locator('.shell-nav').isVisible(), false, 'focus hides the public breadcrumb');
@@ -83,12 +86,15 @@ try {
   assert.ok((await page.locator('.sbd-rail').boundingBox()).width <= 57, 'focus collapses the desktop Rail to icons');
   assert.equal(await storage('sbd.avSuite.workspace.v1'), null, 'focus leaves saved views untouched');
   await page.reload();
+  await suiteTopic(page, 'Appearance');
   await button('Exit focus').waitFor();
   assert.equal(await page.locator('html').getAttribute('data-av-focus'), 'true', 'focus preference survives reload');
   await button('Exit focus').click();
+  await closeTopics(page);
   assert.equal(await page.locator('.shell-nav').isVisible(), true);
 
   // Four named palettes remain separate from the Follow System behavior.
+  await suiteTopic(page, 'Appearance');
   const palette = page.getByLabel('Palette');
   for (const value of ['light', 'dark', 'white', 'black']) {
     await palette.selectOption(value);
@@ -101,6 +107,8 @@ try {
   await page.getByLabel('Follow system').uncheck();
   assert.notEqual(await page.locator('html').getAttribute('data-av-theme'), 'system');
 
+  await closeTopics(page);
+
   // 1. Every Rail identity recalls in place: same URL, its own views, one set of controls.
   for (const [ref, label, firstView] of IDENTITIES) {
     await rail(ref).click();
@@ -108,7 +116,7 @@ try {
     assert.equal(new URL(page.url()).pathname, '/av/', `${label} stays on /av/`);
     assert.equal(await rail(ref).getAttribute('aria-current'), 'page', `${label} is current on the Rail`);
     assert.equal(await page.locator('.sbd-rail__entry[aria-current="page"]').count(), 1);
-    assert.equal((await tabs().allTextContents())[0].replace(/\s+$/, ''), firstView, `${label} shows its own views`);
+    assert.equal((await viewNames(page))[0].replace(/\s+$/, ''), firstView, `${label} shows its own views`);
     assert.equal(await page.getByRole('button', { name: /Add panel/ }).count(), 1, `${label}: one Add panel`);
     assert.equal(await page.locator('.console-panel iframe').count(), 0, `${label} panels are native`);
     assert.ok(await page.locator('.console-panel').count() >= 1, `${label} renders panels`);
@@ -141,7 +149,9 @@ try {
   await page.locator('#fieldSetRecall').click();
   assert.equal(await page.locator('.console-panel #delayDistance').inputValue(), '123', 'field sets recall into the native panel');
   const summaryExport = page.waitForEvent('download');
+  await suiteTopic(page, 'Project');
   await page.locator('.suite-actions').getByRole('button', { name: 'Export', exact: true }).click();
+  await closeTopics(page);
   assert.match(await readFile(await (await summaryExport).path(), 'utf8'), /123/, 'existing summary export retains current inputs');
 
   // 1b. The Rail's Workspace entry recalls the empty view in place.
@@ -174,15 +184,19 @@ try {
   // A stored specialist arrangement is what the Rail recalls, not the generated default.
   await page.getByRole('button', { name: 'View options' }).click();
   await page.getByRole('menuitem', { name: 'Store as new view' }).click();
+  await workspaceTopic(page, 'Views');
   await page.getByRole('tab', { name: /^Throwline \d+$/ }).waitFor();
   assert.equal(await tabs().count(), 2, 'the specialist strip lists its default and the stored view');
+  await closeTopics(page);
   await rail('console:av-video').click();
   await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'AV Video');
   await page.locator('.sbd-rail__all').click();
   await allApps.waitFor({ state: 'visible' });
   await allApps.locator('[data-rail-ref="tool:throwline"]').click();
   await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'Throwline');
+  await workspaceTopic(page, 'Views');
   assert.equal(await page.getByRole('tab', { name: /^Throwline \d+$/ }).getAttribute('aria-selected'), 'true', 'the Rail recalls the stored specialist view');
+  await closeTopics(page);
   assert.equal(await page.locator('.console-panel iframe').count(), 1);
   await page.goto(url);
   await heading().waitFor();
@@ -197,6 +211,23 @@ try {
   assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'the ten native departments plus Tools and Gear 3D groups are offered');
   assert.equal(await chooser.getByRole('button', { name: 'Gear 3D', exact: true }).count(), 1, 'remote gear viewers are offered as a Gear 3D group');
   assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 1, 'specialist tools are offered as a Tools group');
+  // Two steps: the group tiles come first, then the picked group's panels replace them.
+  assert.equal(await chooser.locator('.console-choices button').count(), 0, 'no panel choices before a group is picked');
+  assert.equal(await chooser.locator('.console-groups button[aria-current="true"]').textContent(), 'AV Video', 'the active application is marked');
+  await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).count(), 0, 'the other groups leave once one is picked');
+  assert.equal(await chooser.locator('.console-sub strong').textContent(), 'Front Office');
+  assert.equal(await chooser.locator('.console-choices button').count(), 5, 'every Front Office panel is listed');
+  await page.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null); // focus moves to the first panel choice
+  await page.keyboard.press('Escape');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).count(), 1, 'Escape steps back to the groups');
+  await page.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office'); // focus returns to the group just left
+  await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
+  await chooser.getByRole('button', { name: 'Back', exact: true }).click();
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'Back restores every group');
+  await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('fixture');
+  assert.ok(await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).count() >= 1, 'search lists matches across groups');
+  await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('');
   await chooser.getByRole('button', { name: 'Lighting', exact: true }).click();
   await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).click();
   assert.equal(await page.locator('.console-panel[data-app="Lighting"][data-panel="fixtures"]').count(), 1);
@@ -241,7 +272,7 @@ try {
   await rail('console:lighting').click();
   await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'Lighting');
   assert.match(await page.locator('.suite-plan').textContent(), /Unsaved/);
-  await page.locator('.suite-actions button.primary').click();
+  await savePack(page);
   await page.waitForFunction(() => /Saved/.test(document.querySelector('.suite-plan')?.textContent || ''));
   assert.equal(JSON.parse(await storage('sbd.avLighting.v1')).items.length, 1, 'Lighting saved one fixture');
   assert.equal(await storage('sbd.avVideo.v1'), null, 'Lighting Save never writes the Video plan');
@@ -249,11 +280,11 @@ try {
 
   // Disabled Video modules remain selectable without mutating their flags.
   await rail('console:av-video').click();
-  await page.getByRole('tab', { name: 'Project', exact: true }).click();
+  await selectView(page, 'Project');
   const moduleToggles = page.locator('.console-panel input[type="checkbox"]');
   assert.ok(await moduleToggles.count() >= 5);
   for (const checkbox of await moduleToggles.all()) if (await checkbox.isChecked()) await checkbox.uncheck();
-  await page.locator('.suite-actions button.primary').click();
+  await savePack(page);
   const videoBefore = await storage('sbd.avVideo.v1');
   await page.getByRole('button', { name: 'Project options', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Change panel…' }).click();
@@ -286,7 +317,7 @@ try {
   if (process.env.AV_SUITE_EVIDENCE) await page.screenshot({ path: join(process.env.AV_SUITE_EVIDENCE, 'four-departments.png') });
   // On a full mixed phone workspace, the menu must bring an existing department forward.
   await page.setViewportSize({ width: 375, height: 812 });
-  await page.getByRole('navigation', { name: 'Panels' }).getByRole('button', { name: 'Audio Delay', exact: true }).click();
+  await recallPanel(page, 'Audio Delay');
   await page.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
   await chooser.getByRole('button', { name: 'Replace the focused panel', exact: true }).click();
   await chooser.getByRole('button', { name: 'Audio', exact: true }).click();
@@ -298,7 +329,7 @@ try {
   assert.equal(await page.locator('.console-panel').count(), 4, 'phone selection preserves all four mixed panels');
   await page.locator('.console-panel[data-app="Audio"]').getByRole('button', { name: 'Add channel', exact: true }).click();
   await rail('console:audio').click();
-  await page.locator('.suite-actions button.primary').click();
+  await savePack(page);
   await page.waitForFunction(() => JSON.parse(localStorage.getItem('sbd.avAudio.v1'))?.channels.length === 1);
   assert.equal(await storage('avCalculator.v1'), calculatorValues, 'Audio save leaves Calculator inputs untouched');
   assert.equal(await storage('sbd.avVideo.v1'), videoBefore, 'Audio save leaves Video unchanged');
@@ -310,7 +341,7 @@ try {
     await page.evaluate(value => { document.documentElement.dataset.avTheme = value; }, theme);
     for (const [width, height] of [[375, 812], [667, 375], [680, 700], [1024, 690], [1100, 600], [1366, 650], [1440, 900], [3440, 1440]]) {
       await assertNoOverflow(width, height, theme);
-      await page.getByRole('navigation', { name: 'Panels' }).getByRole('button', { name: 'Audio Delay', exact: true }).click();
+      await recallPanel(page, 'Audio Delay');
       await page.locator('.console-panel #audioCard').waitFor();
       const controls = await page.locator('.console-panel .calculator-content button:visible, .console-panel .calculator-content input:visible, .console-panel .calculator-content select:visible').evaluateAll(nodes => nodes.map(node => {
         const b = node.getBoundingClientRect(), panel = node.closest('.console-panel').getBoundingClientRect();
@@ -323,6 +354,7 @@ try {
     }
   }
   await page.setViewportSize({ width: 375, height: 667 });
+  await page.locator('.console-shell.mode-phone > .console-quick').waitFor({ state: 'visible' });
   assert.equal(await page.getByRole('navigation', { name: 'Panels' }).isVisible(), true, 'phone panel switcher');
   assert.equal(await page.locator('.sbd-rail-launcher').isVisible(), true, 'phone Apps launcher');
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -350,7 +382,9 @@ try {
   await page.evaluate(layout => localStorage.setItem('sbd.avSuite.layout.v1', JSON.stringify({ ...JSON.parse(layout), viewId: 'suite:workspace' })), legacyLayout);
   await page.goto(`${BASE}/av/`);
   await rail('console:av-calculator').click();
+  await workspaceTopic(page, 'Views');
   assert.equal(await page.getByRole('tab', { name: 'My saved calculator', exact: true }).getAttribute('aria-selected'), 'true', 'Rail recalls the legacy Calculator view instead of a new default');
+  await closeTopics(page);
   assert.equal(await storage('sbd.avSuite.workspace.v1'), legacyViews, 'Rail recall does not rewrite saved views');
   await page.waitForFunction(() => document.documentElement.dataset.workspaceOffline === 'ready');
   await context.setOffline(true);
@@ -429,6 +463,61 @@ try {
       assert.equal(await menuPage.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
     }
   } finally { await menuContext.close(); }
+  // Adding to empty space includes a placement preview; replacement alone misses this path.
+  for (const theme of ['light', 'dark']) {
+    for (const [width, height] of [[375, 812], [375, 667], [667, 375], [680, 700], [844, 390], [320, 256], [1440, 900], [3440, 1440], [3840, 1080]]) {
+      const addContext = await browser.newContext({ viewport: { width, height }, reducedMotion: 'reduce' });
+      try {
+        const addPage = await addContext.newPage();
+        addPage.on('pageerror', error => errors.push(error.message));
+        await addPage.goto(`${BASE}/av/`);
+        await suiteTopic(addPage, 'Appearance');
+        await addPage.getByLabel('Palette').selectOption(theme);
+        await closeTopics(addPage);
+        const addTrigger = addPage.locator('.console-tools').getByRole('button', { name: /Add panel/ });
+        await addTrigger.click();
+        const addChooser = addPage.getByRole('dialog', { name: 'Add panel' });
+        await addPage.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Search panels');
+        await addPage.keyboard.press('Shift+Tab');
+        assert.equal(await addChooser.getByRole('button', { name: 'Close', exact: true }).evaluate(el => el === document.activeElement), true, 'modal retains reverse Tab focus');
+        await addPage.keyboard.press('Tab');
+        assert.equal(await addChooser.getByRole('searchbox').evaluate(el => el === document.activeElement), true, 'modal retains forward Tab focus');
+        assert.equal(await addChooser.locator('[aria-current]').count(), 0, 'empty Workspace marks no application as current');
+        const frontOffice = addChooser.getByRole('button', { name: 'Front Office', exact: true });
+        await frontOffice.focus();
+        await addPage.keyboard.press('Enter');
+        await addPage.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null);
+        assert.deepEqual(await addChooser.locator('.console-choices strong').allTextContents(), ['Jobs', 'Clients', 'Venues', 'Job updates', 'Document']);
+        assert.ok(await addChooser.locator('.console-choices').evaluate(el => el.clientHeight >= 44), `Add list has a usable visible row at ${width}x${height} ${theme}`);
+        for (let index = 0; index < 5; index++) {
+          if (index) await addPage.keyboard.press('Tab');
+          const choice = addChooser.locator('.console-choices button').nth(index);
+          assert.equal(await choice.evaluate(el => el === document.activeElement), true);
+          assert.equal(await choice.evaluate(el => {
+            const r = el.getBoundingClientRect(), list = el.parentElement.getBoundingClientRect();
+            const top = Math.max(r.top, list.top), bottom = Math.min(r.bottom, list.bottom);
+            const hit = document.elementFromPoint(r.x + r.width / 2, (top + bottom) / 2);
+            return bottom - top >= 44 && (hit === el || el.contains(hit));
+          }), true, `keyboard focused choice is visible at ${width}x${height} ${theme}`);
+        }
+        await addPage.keyboard.press('Escape');
+        await addPage.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office');
+        await addPage.keyboard.press('Space');
+        await addChooser.getByRole('button', { name: 'Back', exact: true }).click();
+        await addPage.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office');
+        await addPage.keyboard.press('Escape');
+        await addPage.waitForFunction(() => document.activeElement?.closest('.console-tools') !== null);
+        await addTrigger.click();
+        await addChooser.getByRole('button', { name: 'Front Office', exact: true }).click();
+        await addChooser.locator('.console-choices button').last().click();
+        assert.equal(await addPage.locator('.console-panel').getAttribute('data-app'), 'Front Office');
+        assert.equal(await addPage.locator('.console-panel').getAttribute('data-panel'), 'document');
+        assert.equal(await addPage.evaluate(() => localStorage.getItem('sbd.avSuite.workspace.v1')), null, 'choosing a panel does not store a view');
+        assert.equal(await addPage.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
+      } finally { await addContext.close(); }
+    }
+  }
+  console.log('Add from empty space: five Front Office choices, keyboard focus, Back, Escape and final choice passed at nine sizes in both themes.');
   const blockedContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   try {
     await blockedContext.addInitScript(() => { Storage.prototype.setItem = function () { throw new DOMException('Storage blocked', 'QuotaExceededError'); }; });

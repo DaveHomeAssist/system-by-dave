@@ -43,7 +43,11 @@ function loadRegistry() {
 const registry = loadRegistry();
 const allTargets = [
   { id: 'av-suite', href: 'av/' },
-  ...registry.tools.filter((tool) => !tool.retired).map((tool) => ({ id: tool.id, href: tool.href }))
+  ...registry.tools.filter((tool) => !tool.retired).map((tool) => {
+    const file = path.join(root, tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);
+    const redirect = fs.readFileSync(file, 'utf8').match(/content="0;url=\/av\/\?app=([^"]+)"/);
+    return redirect ? { id: tool.id, href: `av/?app=${redirect[1]}`, themeId: 'av-suite', pack: redirect[1] } : { id: tool.id, href: tool.href };
+  })
 ];
 const requestedTargets = targetArg ? new Set(targetArg.slice('--target='.length).split(',').filter(Boolean)) : null;
 const targets = requestedTargets ? allTargets.filter((target) => requestedTargets.has(target.id)) : allTargets;
@@ -293,6 +297,7 @@ async function main() {
       return {
         title: document.title,
         tool: root.getAttribute('data-av-tool'),
+        activePack: document.querySelector('.suite-app')?.getAttribute('data-active-app') || null,
         optIn: root.getAttribute('data-av-theme'),
         darkPreference: matchMedia('(prefers-color-scheme: dark)').matches,
         tokens: location.pathname.includes('/ProjectorThrow/') ? {
@@ -509,9 +514,10 @@ async function main() {
 
         if (throwlineStandalone) {
           if (value.tool !== null || value.optIn !== null) failures.push(`throwline ${preference}: standalone app must not opt into the shared system theme (${value.tool}/${value.optIn}).`);
-        } else if (value.tool !== target.id || value.optIn !== (systemManagedTargets.has(target.id) ? 'system' : preference)) {
+        } else if (value.tool !== (target.themeId || target.id) || value.optIn !== (systemManagedTargets.has(target.id) ? 'system' : preference)) {
           failures.push(`${target.id} ${preference}: wrong theme identity (${value.tool}/${value.optIn}).`);
         }
+        if (target.pack && value.activePack !== target.pack) failures.push(`${target.id} ${preference}: expected shared pack ${target.pack}, found ${value.activePack}.`);
         if (value.tokens.bg.toLowerCase() !== expectedBg) failures.push(`${target.id} ${preference}: --av-bg is ${value.tokens.bg}, expected ${expectedBg}.`);
         if (ratios.text < 4.5 || ratios.muted < 4.5 || ratios.accent < 4.5 || ratios.primary < 4.5 || ratios.focus < 3) {
           failures.push(`${target.id} ${preference}: contrast contract failed ${JSON.stringify(ratios)}.`);

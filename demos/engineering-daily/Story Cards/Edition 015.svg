@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">Optical link power budget</title><desc id="desc">Illustrative values, not product ratings: −2 dBm minus 6 dB path loss gives −8 dBm at the receiver. Against −14 dBm sensitivity, 6 dB remains before other allowances. Check overload separately.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 015</text>
+<text x="108" y="228" font-size="54" class="story-title">Optical link power budget</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect x="0" y="0" width="240" height="400" rx="6" class="canvas"/><text x="12" y="26" class="diagram-index">15</text><text x="48" y="26" class="diagram-heading">OPTICAL BUDGET</text><path d="M12 40H228" class="rule"/><text x="120" y="64" text-anchor="middle" class="note">Hypothetical example</text><rect x="20" y="80" width="200" height="50" rx="6" class="panel"/><text x="120" y="111" text-anchor="middle" class="blue-label">TX min: −2 dBm</text><path d="M80 130V176m-4-6l4 6l4-6" class="wire"/><text x="164" y="157" text-anchor="middle" class="note">6 dB loss</text><rect x="20" y="182" width="200" height="54" rx="6" class="panel"/><text x="120" y="215" text-anchor="middle" class="blue-label">RX: −8 dBm</text><path d="M20 253H220" class="reference"/><text x="120" y="281" text-anchor="middle" class="">Sensitivity: −14 dBm</text><rect x="20" y="302" width="200" height="64" rx="6" class="result"/><text x="120" y="328" text-anchor="middle" class="">−8 − (−14) = 6 dB</text><text x="120" y="352" text-anchor="middle" class="good-label">Power margin</text><text x="120" y="391" text-anchor="middle" class="note">Also check overload</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">Illustrative values, not product</text>
+<text x="108" y="1558" font-size="40" class="story-caption">ratings: −2 dBm minus 6 dB path loss</text>
+<text x="108" y="1610" font-size="40" class="story-caption">gives −8 dBm at the receiver.</text>
+<text x="108" y="1662" font-size="40" class="story-caption">Against −14 dBm sensitivity, 6 dB</text>
+<text x="108" y="1714" font-size="40" class="story-caption">remains before other allowances.</text>
+<text x="108" y="1766" font-size="40" class="story-caption">Check overload separately.</text>
+<a href="https://www.cisco.com/c/en/us/td/docs/routers/access/interfaces/nm/hardware/installation/guide/ConntATM.html"><text x="108" y="1808" font-size="28" class="story-source">Cisco, ATM Network Modules: Power Budget and Margin</text></a>
+</svg>

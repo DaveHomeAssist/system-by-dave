@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">Timecode versus genlock</title><desc id="desc">Vertical marks show frame boundaries: blue camera A, amber camera B. Timecode labels alone do not align phase; common genlock aligns timing. Not a latency comparison.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 021</text>
+<text x="108" y="228" font-size="54" class="story-title">Timecode versus genlock</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect width="240" height="400" rx="6" class="canvas"/><text x="12" y="26" class="diagram-index">21</text><text x="48" y="26" class="diagram-heading">TIMING / LABELS</text><path d="M12 40H228" class="rule"/><rect x="12" y="54" width="216" height="144" rx="6" class="panel"/><text x="24" y="78" class="note">Timecode alone</text><text x="24" y="111">A</text><text x="24" y="147">B</text><path d="M52 106H212M52 142H212" class="rule"/><path d="M68 94V118M116 94V118M164 94V118" class="wire"/><path d="M86 130V154M134 130V154M182 130V154" class="reference"/><text x="24" y="181" class="note">Same labels ≠ phase</text><rect x="12" y="212" width="216" height="144" rx="6" class="panel"/><text x="24" y="238" class="blue-label">Common genlock</text><text x="24" y="271">A</text><text x="24" y="307">B</text><path d="M52 266H212M52 302H212" class="rule"/><path d="M80 254V278M128 254V278M176 254V278" class="wire"/><path d="M80 290V314M128 290V314M176 290V314" class="reference"/><text x="24" y="340" class="good-label">Aligned timing</text><text x="120" y="382" text-anchor="middle" class="note">Timing sketch, not to scale</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">Vertical marks show frame</text>
+<text x="108" y="1558" font-size="40" class="story-caption">boundaries: blue camera A, amber</text>
+<text x="108" y="1610" font-size="40" class="story-caption">camera B. Timecode labels alone do</text>
+<text x="108" y="1662" font-size="40" class="story-caption">not align phase; common genlock</text>
+<text x="108" y="1714" font-size="40" class="story-caption">aligns timing. Not a latency</text>
+<text x="108" y="1766" font-size="40" class="story-caption">comparison.</text>
+<a href="https://docs.ptzoptics.com/docs/cameras/rise-4k/broadcast-advanced-connections/"><text x="108" y="1808" font-size="28" class="story-source">PTZOptics, Genlock and Timecode</text></a>
+</svg>
