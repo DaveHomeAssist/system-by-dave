@@ -91,6 +91,33 @@ of a rendered preview or known part count. Preserve explicit pending states.
 Claude's prototype can replace the functional Library presentation without
 changing the shared model package, native panel IDs or saved AV arrangements.
 
+## Splash library
+
+The standalone route without an `equipment` parameter opens a splash library:
+a discipline rail, collection filters, search and a card grid of all 43 catalog
+entries, with a sheet for the selected entry. Every link that names `equipment`
+opens the existing workspace unchanged, so deep links, native AV panels, saved
+arrangements and the ten head control IDs are untouched. The title links back
+to the library from the workspace.
+
+The sheet opens the Equipment Lab 3D inspector for entries whose representation
+is a GLB, and the existing viewer for everything else, with the workspace
+reference as a secondary link. Disciplines, previews and the reference flag are
+host presentation data in `apps/equipment-lab/src/splash.ts` because the shared
+catalog does not carry them. Practice and generic flags and assembly grouping
+derive from catalog role, geometry confidence and viewer link.
+
+Previews in `/equipment-lab/previews/` are renders of approximate models, listed
+with source revision and hash in its `manifest.json`. Ion and the fader wing
+have no render and show a pending state. The sixteen NNC renders were regenerated from approved No Nonsense source
+`3cfdc6e1c76872336cc217237e29834af834e342` on 6 November 2026, on the
+light Equipment Lab stage. The manifest records each source file hash. The camera bench captures are
+cropped from viewer screenshots and still show a viewer label.
+
+Not yet built: the in-workspace Library presentation, a jump palette and
+recently opened entries. Dave reviewed the preview and approved its release on
+2 November 2026.
+
 ## Verification record
 
 The candidate was built and checked on Dominic with Node 24 and Chromium.
