@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { stagePackagedVenue, applyPackagedVenue } from './venue-update.js';
-import { servicePaths, servicePlist, launcherText, assertSavedRig } from './service-tools.js';
+import { servicePaths, servicePlist, launcherText, assertSavedRig, snapshotSettingsAfterStop } from './service-tools.js';
 
 if (process.platform !== 'darwin') throw new Error('This installer requires macOS launchd.');
 const existing = fs.realpathSync(process.argv[2] || '');
@@ -17,9 +17,8 @@ const oldData = path.join(existing, 'data');
 const data = paths.data;
 const rig = path.join(data, 'rig.json');
 const sourceRig = fs.existsSync(rig) ? rig : path.join(oldData, 'rig.json');
-const original = assertSavedRig(sourceRig);
+assertSavedRig(sourceRig); // Preflight only; the authoritative snapshot follows writer shutdown.
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
-const before = digest(original);
 const uid = process.getuid(), domain = `gui/${uid}`, label = `${domain}/com.avbydave.projctl`;
 const run = (cmd, args, options = {}) => execFileSync(cmd, args, { encoding: 'utf8', stdio: 'pipe', ...options });
 // Keep a stable PATH shim (for example Homebrew's bin/node) across runtime upgrades.
@@ -62,29 +61,23 @@ const stagedVenue = path.join(paths.root, `venue-next-${process.pid}`);
 const hasVenueUpdate = await stagePackagedVenue(source, stagedVenue);
 const backup = path.join(paths.root, `backup-${new Date().toISOString().replaceAll(':', '-')}`);
 fs.mkdirSync(backup, { mode: 0o700 });
-fs.writeFileSync(path.join(backup, 'rig.json'), original, { mode: 0o600 });
-// Migrate app settings only on first install. Never merge older settings on update.
-if (!fs.existsSync(rig)) {
-  const stagedData = path.join(paths.root, `data-next-${process.pid}`);
-  fs.mkdirSync(stagedData, { mode: 0o700 });
-  for (const name of ['rig.json', 'stage-plot.json', 'venue']) {
-    const from = path.join(oldData, name);
-    if (fs.existsSync(from)) fs.cpSync(from, path.join(stagedData, name), { recursive: true });
-  }
-  if (digest(fs.readFileSync(path.join(stagedData, 'rig.json'))) !== before) throw new Error('Rig copy verification failed. Original preserved.');
-  fs.renameSync(stagedData, data);
-}
 if (fs.existsSync(paths.plist)) fs.copyFileSync(paths.plist, path.join(backup, 'service.plist'));
-// Only stop the verified relay after staging and backing up everything needed.
-try { run('launchctl', ['bootout', label]); } catch {}
-for (const pid of pids) { try { process.kill(Number(pid), 'SIGTERM'); } catch (e) { if (e.code !== 'ESRCH') throw e; } }
-for (let n = 0; n < 40; n++) {
-  let occupied = false;
-  try { occupied = !!run('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN']).trim(); } catch {}
-  if (!occupied) break;
-  if (n === 39) throw new Error('Old relay did not stop. Staged runtime and backup preserved.');
-  await new Promise(resolve => setTimeout(resolve, 100));
-}
+// Only stop the verified relay after code, dependencies and venue have staged.
+const original = await snapshotSettingsAfterStop({ sourceData: path.dirname(sourceRig), data, backup, stop: async () => {
+  try { run('launchctl', ['bootout', label]); } catch {}
+  for (const pid of pids) { try { process.kill(Number(pid), 'SIGTERM'); } catch (e) { if (e.code !== 'ESRCH') throw e; } }
+  for (let n = 0; n < 40; n++) {
+    let occupied = false;
+    try { occupied = !!run('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN']).trim(); } catch {}
+    const writersAlive = pids.some(pid => {
+      try { return !run('ps', ['-p', pid, '-o', 'stat=']).trim().startsWith('Z'); } catch { return false; }
+    });
+    if (!occupied && !writersAlive) break;
+    if (n === 39) throw new Error('Old relay did not stop. Staged runtime and backup preserved.');
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+} });
+const before = digest(original);
 if (hasVenueUpdate) await applyPackagedVenue(stagedVenue, data, backup);
 if (fs.existsSync(paths.app)) fs.renameSync(paths.app, path.join(backup, 'app'));
 fs.renameSync(next, paths.app);
