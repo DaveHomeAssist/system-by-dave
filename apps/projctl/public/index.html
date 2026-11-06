@@ -17,13 +17,14 @@
 <a class="pj-skip" href="#tab-rig">Skip to rig</a>
 <div id="app" class="avd-shell">
   <header class="pj-header">
-    <div class="pj-brand"><svg class="pj-snowmark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 2v28M4 9l24 14M4 23L28 9M12 5l4 4 4-4M12 27l4-4 4 4M5 13l6-1-2-6M27 19l-6 1 2 6M9 26l2-6-6-1M23 6l-2 6 6 1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><div><span class="pj-kicker">AV BY DAVE · VIDEO CONTROL</span><h1 id="show">Frozen</h1></div></div>
+    <div class="pj-brand"><svg class="pj-snowmark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 2v28M4 9l24 14M4 23L28 9M12 5l4 4 4-4M12 27l4-4 4 4M5 13l6-1-2-6M27 19l-6 1 2 6M9 26l2-6-6-1M23 6l-2 6 6 1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><div><a class="pj-kicker pj-workspace-link" href="https://wst.housevideo.app/" rel="noopener noreferrer">Frozen workspace ↗</a><h1 id="show">Frozen</h1></div></div>
+    <time class="pj-clock" id="operator-clock" title="America/New_York · Eastern time" aria-live="off"><span data-clock-date></span><strong data-clock-time></strong></time>
     <span class="avd-state" id="conn" aria-live="polite"><span class="avd-dot avd-dot--blocked" aria-hidden="true"></span><span id="conn-word">Relay offline</span></span>
-    <span class="pj-mono pj-summary" id="summary"></span>
-    <div class="avd-seg" role="group" aria-label="Show lock">
-      <button class="avd-seg__btn" id="lock-off" aria-pressed="true" type="button">Unlocked</button>
-      <button class="avd-seg__btn" id="lock-on" aria-pressed="false" type="button">Show lock</button>
-    </div>
+    <span class="pj-mode" id="relay-mode">Connecting…</span>
+    <button class="avd-btn avd-btn--icon pj-lock" id="show-lock" type="button" aria-pressed="false" aria-label="Show lock off. Enable show lock" title="Show lock off · Enable show lock" data-lock-state="unlocked" disabled>
+      <svg class="avd-icon" data-lock-icon="locked" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3"/></svg>
+      <svg class="avd-icon" data-lock-icon="unlocked" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 7.5-2M12 14v3"/></svg>
+    </button>
     <button class="avd-btn avd-btn--quiet avd-btn--icon" id="theme" type="button" aria-label="Switch light and dark theme">
       <svg class="avd-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 4v16"></path><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"></path></svg>
     </button>
@@ -41,8 +42,10 @@
 
   <main class="pj-main">
     <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
+      <div class="pj-overview" aria-label="Rig connection overview"><div><span class="avd-eyebrow">Projector connection</span><strong id="summary">Waiting for relay…</strong></div><div class="pj-connection-help"><p class="pj-mono" id="connection-note" role="status">Connecting to the local relay. Device status will update here automatically.</p><p class="pj-mono" id="local-controller-help" hidden>This page needs the local controller. <a href="http://localhost:8080/">Open controller on this Mac</a><span>On a phone or another computer, use the controller Mac’s network address; localhost points to the device you are using.</span></p></div></div>
       <div class="pj-allbar" aria-labelledby="all-label">
         <span id="all-label" class="avd-eyebrow">All projectors</span>
+        <button class="avd-btn avd-btn--primary" data-all="resetInput" type="button" disabled>Reset all to HDMI</button>
         <div class="avd-seg" role="group" aria-label="Shutter, all projectors">
           <button class="avd-seg__btn" data-all="shutter" data-arg="0" type="button">Open</button>
           <button class="avd-seg__btn" data-all="shutter" data-arg="1" type="button">Closed</button>

@@ -19,7 +19,7 @@ if (venueRoot) {
 const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: app, encoding: 'utf8' }).trim();
 await fs.mkdir(output); // Deliberately refuse an existing output directory.
 execFileSync(process.execPath, [path.join(app, 'scripts/bundle-throwline.js')], { cwd: app, stdio: 'inherit' });
-for (const name of ['server', 'public', 'runtime', 'scripts', 'docs', 'package.json', 'package-lock.json', 'README.md']) {
+for (const name of ['server', 'public', 'runtime', 'scripts', 'docs', 'deploy', 'package.json', 'package-lock.json', 'README.md']) {
   await fs.cp(path.join(app, name), path.join(output, name), { recursive: true });
 }
 await fs.copyFile(path.join(app, 'deploy/Update Existing Projctl.command'), path.join(output, 'Update Existing Projctl.command'));

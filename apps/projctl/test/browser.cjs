@@ -76,7 +76,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P2').reverseV === true);
         await page.reload();
         await page.locator('[data-tab="rig"]').click();
-        await page.locator('.pj-tile[data-slot="P2"] [data-adj]').click();
+        await page.locator('.pj-tile[data-slot="P2"] [data-adj="lens"]').click();
         await page.getByRole('tab', { name: 'Lens', exact: true }).click();
         for (const [label, axis, dir] of [['Shift left', 'h', '+'], ['Shift right', 'h', '-'], ['Shift up', 'v', '-'], ['Shift down', 'v', '+'], ['Focus forward', 'focus', '+'], ['Zoom out', 'zoom', '-']]) {
           const sent = page.waitForRequest((r) => r.url().endsWith('/api/command') && r.method() === 'POST');
@@ -89,7 +89,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await page.keyboard.press('Escape');
 
         // Picture controls already open must follow subsequent lock broadcasts.
-        await page.locator('.pj-tile[data-slot="P2"] [data-adj]').click();
+        await page.locator('.pj-tile[data-slot="P2"] [data-adj="picture"]').click();
         await page.getByRole('tab', { name: 'Picture', exact: true }).click();
         await page.locator('#adj-picture input').first().waitFor();
         await relay.api('lock', { lock: true });
@@ -97,6 +97,29 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         assert.equal(await page.locator('#adj-picture select:enabled').count(), 0);
         await relay.api('lock', { lock: false });
         await until(async () => !(await page.locator('#adj-picture input').first().isDisabled()));
+        await page.keyboard.press('Escape');
+
+        // Keyboard Picture selection must load the current slot, even after a late old reply.
+        let latePicture;
+        await page.route('**/api/picture?slot=P2', route => { latePicture = route; });
+        await page.locator('.pj-tile[data-slot="P2"] [data-adj="picture"]').click();
+        await until(() => !!latePicture);
+        await page.keyboard.press('Escape');
+        await page.locator('.pj-tile[data-slot="P4"] [data-adj="lens"]').click();
+        assert.equal(await page.locator('#adj-picture input, #adj-picture select').count(), 0);
+        const currentPicture = page.waitForRequest(r => r.url().endsWith('/api/picture?slot=P4'));
+        await page.getByRole('tab', { name: 'Lens', exact: true }).focus();
+        await page.keyboard.press('ArrowRight'); await currentPicture;
+        await page.locator('#adj-picture input').first().waitFor();
+        const currentValue = await page.locator('#adj-picture input').first().inputValue();
+        await latePicture.fulfill({ contentType: 'application/json', body: JSON.stringify({ brightness: -99 }) });
+        await page.unroute('**/api/picture?slot=P2');
+        await page.waitForTimeout(50);
+        assert.equal(await page.locator('#adj-picture input').first().inputValue(), currentValue);
+        const pictureWrite = page.waitForRequest(r => r.url().endsWith('/api/command') && r.method() === 'POST');
+        await page.locator('#adj-picture input').first().evaluate(el => el.dispatchEvent(new Event('change', { bubbles: true })));
+        const pictureCommand = (await pictureWrite).postDataJSON();
+        assert.equal(pictureCommand.slot, 'P4'); assert.equal(pictureCommand.cmd, 'picture');
         await page.keyboard.press('Escape');
 
         await checkStage(page, relay, offline, until);
@@ -118,6 +141,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
               assert.equal(overflow, false, `${name} overflow at ${width}x${height} ${theme}`);
             }
             if (process.env.ARTIFACT_DIR && !offline) {
+              await page.locator('#grid').evaluate(el => { el.scrollTop = 0; });
               fs.mkdirSync(process.env.ARTIFACT_DIR, { recursive: true });
               await page.screenshot({ path: `${process.env.ARTIFACT_DIR}/rig-${width}-${height}-${theme}.png` });
             }
@@ -132,7 +156,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         assert.equal(await label.evaluate((el) => document.activeElement === el), true);
         await relay.api('lock', { lock: false });
         await page.locator('[data-tab="rig"]').click();
-        const adjust = page.locator('.pj-tile[data-slot="P2"] [data-adj]');
+        const adjust = page.locator('.pj-tile[data-slot="P2"] [data-adj="lens"]');
         await adjust.click();
         assert.equal(await page.locator('#adjust').evaluate((el) => el.open), true);
         assert.equal(await page.locator('#adj-title').innerText(), 'Projector A · SL Portal');
@@ -140,12 +164,12 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await page.keyboard.press('Shift+Tab');
         assert.equal(await page.evaluate(() => document.querySelector('#adjust').contains(document.activeElement)), true);
         await page.keyboard.press('Escape');
-        assert.equal(await adjust.evaluate((el) => document.activeElement === el), true);
+        assert.equal(await page.evaluate(() => document.activeElement.matches('.pj-tile[data-slot="P2"] [data-adj="lens"]')), true);
         // Polling must preserve a focused tile control.
         await relay.api('command', { slot: 'P2', cmd: 'shutter', arg: 1 });
         await until(async () => (await relay.state()).projectors[1].status.shutter === 'closed');
         await page.waitForTimeout(100);
-        assert.equal(await adjust.evaluate((el) => document.activeElement === el), true);
+        assert.equal(await page.evaluate(() => document.activeElement.matches('.pj-tile[data-slot="P2"] [data-adj="lens"]')), true);
         const plotFile = path.join(path.dirname(relay.rigFile), 'stage-plot.json');
         fs.renameSync(plotFile, plotFile + '.saved');
         await page.reload(); await page.locator('[data-tab="stage"]').click();

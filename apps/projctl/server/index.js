@@ -16,6 +16,7 @@ import { confirmations } from './confirmations.js';
 import { readStagePlot } from './stage-plot.js';
 import { readVenue, readVenueAsset } from './venue-model.js';
 import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
+import { resolveInputPreference } from './input-preference.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -23,6 +24,7 @@ const OSC_PORT = Number(process.env.OSC_PORT || 9000);
 const TCP_PORT = Number(process.env.TCP_PORT || 9001);
 const POLL_MS = Number(process.env.POLL_MS || 5000);
 const SIM = process.env.SIM === '1';
+const STARTED_AT = new Date().toISOString();
 // ---- Login (optional). Set PJ_PASSCODE to require it: needed before exposing the relay beyond the LAN.
 const PASSCODE = (process.env.PJ_PASSCODE || '').trim();
 const SESSION_SECRET = randomBytes(32).toString('hex'); // sessions end when the relay restarts
@@ -39,16 +41,26 @@ const DATA = process.env.RIG || path.join(__dirname, '..', 'data', SIM ? 'rig.si
 const STAGE_PLOT = process.env.STAGE_PLOT || path.join(path.dirname(DATA), 'stage-plot.json');
 const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 'venue');
 
-const store = openStore(DATA);
+const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
 if (SIM) simRig(store.rig);
 const rig = store.rig;
+for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => { store.close(); process.exit(0); });
 
 const drivers = new Map();   // slot -> driver
 const status = new Map();    // slot -> status
 const polling = new Map();
 const busy = new Map();
+const connections = new Map();
 const missed = new Map();    // slot -> consecutive poll failures
-for (const p of rig.projectors) { status.set(p.slot, emptyStatus()); missed.set(p.slot, 0); }
+for (const p of rig.projectors) {
+  status.set(p.slot, emptyStatus()); missed.set(p.slot, 0);
+  connections.set(p.slot, { state: p.ip ? 'checking' : 'unassigned', lastAttemptAt: null, lastSuccessAt: null, error: null, consecutiveFailures: 0 });
+}
+function connectionError(p, error) {
+  let message = String(error?.message || error);
+  for (const secret of [p.password, PASSCODE]) if (secret) message = message.split(secret).join('[redacted]');
+  return message.slice(0, 240);
+}
 
 function driverFor(p) {
   const key = `${p.slot}|${p.driver}|${p.ip}|${p.user || ''}|${p.password || ''}`;
@@ -57,16 +69,21 @@ function driverFor(p) {
   return d;
 }
 
+function inputPreferenceFor(p) { return resolveInputPreference(driverFor(p).inputs ?? p.inputs, rig.preferredInput || 'HDMI'); }
+
 // ---- WebSocket broadcast ----
 const clients = new Set();
 function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients) if (c.readyState === 1) c.send(s); }
+// Relay liveness is independent of potentially slow device polling.
+setInterval(() => broadcast({ type: 'heartbeat', at: new Date().toISOString() }), 5000).unref();
 function snapshot() {
   return {
-    type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM,
+    type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM, preferredInput: rig.preferredInput || 'HDMI',
+    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
-      return { ...p, password: undefined, status: status.get(p.slot), busy: busy.get(p.slot) || null,
-        inputs: d.inputs ?? p.inputs, patterns: p.ip ? (d.patterns || null) : null,
+      return { ...p, password: undefined, status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null,
+        inputs: d.inputs ?? p.inputs, inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lens, picture: !!d.getPicture } };
     }),
@@ -82,31 +99,32 @@ function poll(p) {
   return work;
 }
 async function pollOnce(p) {
-  if (!p.ip) { setOffline(p.slot, 'no address'); return; }
+  const connection = connections.get(p.slot);
+  connection.lastAttemptAt = new Date().toISOString();
+  if (!p.ip) { Object.assign(connection, { state: 'unassigned', error: null, consecutiveFailures: 0 }); setOffline(p.slot, 'no address'); return; }
   try {
     const s = await driverFor(p).getStatus();
     missed.set(p.slot, 0);
+    Object.assign(connection, { state: 'online', lastSuccessAt: new Date().toISOString(), error: null, consecutiveFailures: 0 });
     const prev = status.get(p.slot);
     const next = { ...prev, ...s, online: true, updatedAt: new Date().toISOString() };
     status.set(p.slot, next);
-    if (JSON.stringify({ ...prev, updatedAt: 0 }) !== JSON.stringify({ ...next, updatedAt: 0 })) {
-      if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
-      const d = driverFor(p);
-      broadcast({ type: 'status', slot: p.slot, status: next, inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
-    }
+    if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
+    const d = driverFor(p);
+    broadcast({ type: 'status', slot: p.slot, status: { ...next, connection }, inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
   } catch (e) {
     const n = missed.get(p.slot) + 1; missed.set(p.slot, n);
-    if (n >= 2) setOffline(p.slot, e.message);
+    Object.assign(connection, { state: 'unreachable', error: connectionError(p, e), consecutiveFailures: n });
+    setOffline(p.slot, connection.error);
   }
 }
 function setOffline(slot, why) {
   const prev = status.get(slot);
-  if (prev.online || prev.updatedAt === null) {
-    const next = { ...emptyStatus(), online: false, updatedAt: new Date().toISOString() };
-    status.set(slot, next);
-    if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
-    broadcast({ type: 'status', slot, status: next });
-  }
+  // Keep the last reply available, explicitly marked unavailable until a new reply.
+  const next = { ...prev, online: false, updatedAt: new Date().toISOString() };
+  status.set(slot, next);
+  if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
+  broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, inputPreference: inputPreferenceFor(store.projector(slot)) });
 }
 setInterval(() => rig.projectors.forEach(poll), POLL_MS);
 rig.projectors.forEach(poll);
@@ -135,6 +153,12 @@ async function command(slot, cmd, arg, source = 'ui') {
   if (!p) throw httpErr(404, `no projector ${slot}`);
   const st = status.get(slot);
   if (!st.online) throw httpErr(409, `${slot} is offline`);
+  const resettingInput = cmd === 'resetInput';
+  if (resettingInput) {
+    const preference = inputPreferenceFor(p);
+    if (!preference.available) throw httpErr(409, preference.reason);
+    cmd = 'input'; arg = preference.value;
+  }
   if (rig.lock && (cmd === 'power' && !arg || cmd === 'input' || cmd === 'pattern' || cmd === 'lens' && arg?.op !== 'stop' || cmd === 'picture')) throw httpErr(423, 'show lock is on');
   if (cmd === 'power' && arg && st.power === POWER.COOLING) throw httpErr(409, `${slot} is cooling, wait before power on`);
   const stop = cmd === 'lens' && arg?.op === 'stop';
@@ -151,13 +175,13 @@ async function command(slot, cmd, arg, source = 'ui') {
     else if (cmd === 'lens') { if (!d.lens) throw httpErr(400, `${slot}: lens not supported by ${d.kind} driver`); result = await d.lens(arg); }
     else if (cmd === 'picture') { if (!d.picture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`); result = await d.picture(arg.key, arg.value); }
     else throw httpErr(400, `unknown command ${cmd}`);
-  } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw httpErr(502, e.message); }
+  } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw httpErr(502, e.message); }
   finally { if (moving) { busy.delete(slot); broadcast({ type: 'busy', slot, busy: null }); } }
-  store.event({ source, slot, command: `${cmd} ${fmtArg(arg)}`, result, detail });
+  store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail });
   broadcast({ type: 'event', event: rig.events.at(-1) });
   if (cmd === 'lens' || cmd === 'input' || cmd === 'picture') { await polling.get(slot); await poll(p); }
   else setTimeout(() => poll(p), 400);
-  return { result, status: status.get(slot) };
+  return { result, status: { ...status.get(slot), connection: connections.get(slot) } };
 }
 
 async function uiCommand(slot, cmd, arg, confirm) {
@@ -262,6 +286,8 @@ function json(res, code, obj) { res.writeHead(code, { 'content-type': 'applicati
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   try {
+    res.setHeader('cache-control', 'no-store');
+    if (url.pathname === '/api/health' && req.method === 'GET') return json(res, 200, { ok: true, service: 'projctl', simulation: SIM, uptimeSeconds: Math.floor(process.uptime()) });
     if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'content-type', 'access-control-allow-methods': 'GET,POST' }); return res.end(); }
     if (url.pathname === '/api/login' && req.method === 'POST') {
       if (!PASSCODE) return json(res, 200, { ok: true, open: true });
@@ -281,6 +307,12 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(302, { location: '/login.html' }); return res.end();
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
+    if (url.pathname === '/api/preferred-input' && req.method === 'POST') {
+      const { input } = await body(req);
+      if (input !== 'HDMI') throw httpErr(400, 'The supported default input is HDMI.');
+      rig.preferredInput = input; store.save(); broadcast(snapshot());
+      return json(res, 200, { preferredInput: input });
+    }
     if (url.pathname === '/api/schema') return json(res, 200, { patterns: PATTERNS, picture: pictureSchema() });
     if (url.pathname === '/api/stage-plot' && req.method === 'GET') return json(res, 200, { plot: await readStagePlot(STAGE_PLOT) });
     if ((url.pathname === '/api/venue-model' || url.pathname.startsWith('/api/venue-model/')) && req.method === 'GET') {
