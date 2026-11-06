@@ -10,7 +10,7 @@ const svgNode = (name, attrs = {}) => {
   return el;
 };
 
-export function createStageView(root, openControls, canAdjust) {
+export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/stage-plot", venueUrl = "/api/venue-model", referenceOnly = false} = {}) {
   const $ = (s) => root.querySelector(s);
   const canvas = $('#stage-canvas');
   let plot, view = '3d', current = { projectors: [] }, connected = false, viewer, loading3D;
@@ -194,6 +194,7 @@ export function createStageView(root, openControls, canAdjust) {
   });
   function update(state, online) {
     current = state; connected = online;
+    if(referenceOnly){$('#stage-status-kind').textContent='Recorded reference';for(const [lane,card] of cards){card.querySelector('.pj-stage-device').textContent=LANES[lane].orientation;card.querySelector('.pj-stage-state').textContent='Plot reference · not live telemetry';card.setAttribute('aria-disabled','true');}return;}
     $('#stage-status-kind').textContent = !online ? 'Relay offline' : state.simulation ? 'Simulated status' : 'Reported status';
     for (const [lane, info] of Object.entries(LANES)) {
       const p = projectorForLane(state.projectors, lane), s = p?.status;
@@ -215,11 +216,11 @@ export function createStageView(root, openControls, canAdjust) {
   }
   async function load() {
     const [plotResult, venueResult] = await Promise.allSettled([
-      fetch('/api/stage-plot', { signal: AbortSignal.timeout(10000) }).then(async response => {
+      fetch(plotUrl, { signal: AbortSignal.timeout(10000) }).then(async response => {
         if (!response.ok) throw new Error('The local plot could not be loaded. Check the relay and reload.');
         const data = await response.json(); return data.plot ? normalizePlot(data.plot) : null;
       }),
-      fetch('/api/venue-model', { signal: AbortSignal.timeout(10000) }).then(async response => {
+      fetch(venueUrl, { signal: AbortSignal.timeout(10000) }).then(async response => {
         if (!response.ok) throw new Error('The building bundle could not be loaded. Check the relay and reload.');
         return (await response.json()).venue;
       }),
