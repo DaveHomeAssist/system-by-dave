@@ -19,16 +19,16 @@ try { const t = localStorage.getItem('theme'); if (['light', 'dark'].includes(t)
 $('#theme').onclick = () => { root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light'; try { localStorage.setItem('theme', root.dataset.theme); } catch {} };
 
 // tabs (WAI-ARIA tabs: arrow keys move, Home/End jump)
-function wireTabs(list, attr, panelFor) {
+function wireTabs(list, attr, panelFor, onSelect = () => {}) {
   const tabs = [...list.querySelectorAll('[role="tab"]')];
-  const select = (t) => { tabs.forEach((x) => { const on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; const panel = panelFor(x); panel.classList.toggle('on', on); panel.hidden = !on; }); };
+  const select = (t) => { tabs.forEach((x) => { const on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; const panel = panelFor(x); panel.classList.toggle('on', on); panel.hidden = !on; }); onSelect(t); };
   tabs.forEach((t, i) => {
     t.onclick = () => select(t);
     t.onkeydown = (e) => { const n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null; if (n == null) return; e.preventDefault(); const x = tabs[(n + tabs.length) % tabs.length]; x.focus(); select(x); };
   });
 }
 wireTabs($('.avd-tabs[aria-label="Views"]'), 'tab', (t) => $('#tab-' + t.dataset.tab));
-wireTabs($('.pj-sheet-tabs'), 'adjtab', (t) => $(`[data-adjpanel="${t.dataset.adjtab}"]`));
+wireTabs($('.pj-sheet-tabs'), 'adjtab', (t) => $(`[data-adjpanel="${t.dataset.adjtab}"]`), (t) => { if (t.dataset.adjtab === 'picture' && adjSlot) loadPicture(); });
 
 function toast(msg, ms = 4000) { if (!$('#adjust').hidden) $('#adj-feedback').textContent = msg; const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), ms); }
 
@@ -268,8 +268,9 @@ function renderAll() {
 }
 
 // ---- Adjust sheet: patterns, lens, picture ----
-let adjSlot = null, adjSpeed = 'slow', adjHomeArmed = 0, adjReturnFocus = null, adjReturnSection = 'pattern';
+let adjSlot = null, adjSpeed = 'slow', adjHomeArmed = 0, adjReturnFocus = null, adjReturnSection = 'pattern', pictureRequestId = 0;
 function openAdjust(slot, section = 'pattern') {
+  pictureRequestId++; $('#adj-picture').replaceChildren(); $('#adj-pic-note').textContent = '';
   adjSlot = slot; const p = state.projectors.find((x) => x.slot === slot); if (!p) return;
   adjReturnFocus = document.activeElement; adjReturnSection = section;
   $('#adj-title').textContent = projectorName(p); $('#adj-sub').textContent = [slot, laneOf(p)?.orientation, p.model, p.ip].filter(Boolean).join(' · ');
@@ -279,6 +280,7 @@ function openAdjust(slot, section = 'pattern') {
 function closeAdjust() {
   const slot = adjSlot, section = adjReturnSection;
   $('#adjust').close(); $('#adjust').hidden = true; adjSlot = null;
+  pictureRequestId++; $('#adj-picture').replaceChildren(); $('#adj-pic-note').textContent = '';
   const card = [...$('#grid').querySelectorAll('[data-slot]')].find((el) => el.dataset.slot === slot);
   const currentTrigger = card?.querySelector(`[data-adj="${section}"]:not(:disabled)`);
   const originalTrigger = adjReturnFocus?.isConnected && adjReturnFocus.matches('button:not(:disabled), [role="button"]') ? adjReturnFocus : null;
@@ -334,17 +336,16 @@ $('#adj-home').onclick = () => {
   adjHomeArmed = 0; cmd(adjSlot, 'lens', { op: 'home' });
 };
 $('#adj-pic-reload').onclick = () => loadPicture();
-$('[data-adjtab="picture"]').addEventListener('click', () => { if (adjSlot) loadPicture(); });
 async function loadPicture() {
-  const slot = adjSlot; const el = $('#adj-picture'); el.innerHTML = ''; $('#adj-pic-note').textContent = 'Reading values…';
+  const slot = adjSlot, requestId = ++pictureRequestId; const el = $('#adj-picture'); el.innerHTML = ''; $('#adj-pic-note').textContent = 'Reading values…';
   const p = state.projectors.find((x) => x.slot === slot);
   if (!connected || !p?.status?.online) { $('#adj-pic-note').textContent = 'Current picture values unavailable. Waiting for projector connection.'; return; }
   const schema = p?.pictureSchema ?? PICTURE;
   if (!Object.keys(schema).length) { $('#adj-pic-note').textContent = 'No picture controls reported by this projector.'; return; }
   let vals = {};
   try { const r = await fetch('/api/picture?slot=' + slot); vals = await r.json(); if (!r.ok) throw new Error(vals.error); }
-  catch (e) { $('#adj-pic-note').textContent = e.message; return; }
-  if (slot !== adjSlot) return;
+  catch (e) { if (slot === adjSlot && requestId === pictureRequestId) $('#adj-pic-note').textContent = e.message; return; }
+  if (slot !== adjSlot || requestId !== pictureRequestId) return;
   const missing = Object.keys(schema).filter((k) => vals[k] == null);
   $('#adj-pic-note').textContent = missing.length ? 'Greyed values need a signal on the input.' : '';
   for (const [k, d] of Object.entries(schema)) {
@@ -354,11 +355,11 @@ async function loadPicture() {
       row.innerHTML = `<span>${esc(d.label)}${v == null ? ', needs a signal' : ''}</span><input type="range" min="${d.min}" max="${d.max}" step="${d.step || 1}" value="${v ?? 0}" data-unavailable="${v == null}"><output>${v ?? '—'}</output>`;
       const inp = row.querySelector('input'), out = row.querySelector('output');
       inp.oninput = () => out.textContent = inp.value;
-      inp.onchange = () => cmd(slot, 'picture', { key: k, value: Number(inp.value) }).then((ok) => { if (ok) row.classList.remove('na'); });
+      inp.onchange = () => { if (slot !== adjSlot || requestId !== pictureRequestId) return; return cmd(slot, 'picture', { key: k, value: Number(inp.value) }).then((ok) => { if (ok) row.classList.remove('na'); }); };
     } else {
       row.innerHTML = `<span>${esc(d.label)}</span><select class="avd-input">${Object.entries(d.options).map(([val, lab]) => `<option value="${esc(val)}" ${String(v) === val ? 'selected' : ''}>${esc(lab)}</option>`).join('')}</select>`;
       const sel = row.querySelector('select'); if (v == null) sel.value = '';
-      sel.onchange = () => cmd(slot, 'picture', { key: k, value: sel.value }).then((ok) => { if (ok) row.classList.remove('na'); });
+      sel.onchange = () => { if (slot !== adjSlot || requestId !== pictureRequestId) return; return cmd(slot, 'picture', { key: k, value: sel.value }).then((ok) => { if (ok) row.classList.remove('na'); }); };
     }
     el.appendChild(row);
   }
