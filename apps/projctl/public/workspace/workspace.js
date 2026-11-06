@@ -1,5 +1,6 @@
 const LOCAL_CONTROLLER = !['wst.housevideo.app','wst-frozen.davein4k.chatgpt.site'].includes(location.hostname);
 const TASK_BASE = LOCAL_CONTROLLER ? 'https://wst.housevideo.app' : '';
+const scopeNotice=document.querySelector('#privacy');if(scopeNotice&&LOCAL_CONTROLLER)scopeNotice.textContent='Saved in this browser on the controller address only. These personal notes are not shared or synced to the website. Export a backup before clearing browser data.';
 const NOTE_KEY = 'wst.frozen.personal-notes.v1';
 const THEME_KEY = 'wst.frozen.theme.v1';
 const notes = document.querySelector('#notes');
