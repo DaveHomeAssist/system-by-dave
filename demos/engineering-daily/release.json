@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "75d5e7e25f3a0f56ac7ae84fa885353268bcc34685c919ee719ff2e206e89884",
-  "publicSha256": "902432eb5ec0d1301fe3fcc1d0d500115647c074620664d19ba5c46547e5319a",
-  "editions": 29,
+  "sourceSha256": "74f58ba374f86920df97f86a0eab6f8b0441fae4072cae2e5c852980c69a75e2",
+  "publicSha256": "eedf66ccc89540ffc2f06861ee9008154e326022d0aa5eb56613e83920cbb8e7",
+  "editions": 30,
   "files": [
+    {
+      "name": "Edition 030.svg",
+      "id": 30,
+      "date": "2026-11-06",
+      "title": "ST 2110 essence routing",
+      "sha256": "c67dd87f854ee405f294631977cd9b5b83b97db750a196c9c8952bbae60cb938"
+    },
+    {
+      "name": "Edition 030.png",
+      "id": 30,
+      "date": "2026-11-06",
+      "title": "ST 2110 essence routing",
+      "sha256": "62946a0fd45e9fcc3a79f8e70b697e4a3f44b2519b2513538a4af7c8cfad2943"
+    },
     {
       "name": "Edition 029.svg",
       "id": 29,
