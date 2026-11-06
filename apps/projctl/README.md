@@ -241,3 +241,8 @@ private room remains explicitly uncalibrated. Plan with this room enables a
 separately labelled approximate preview with local alignment controls, roof
 cutaway and visible projector markers; it does not validate registration or
 clearance.
+
+Use Projectors for the rig, Coverage for target rasters, Plan for the complete
+throw layout, or Selected side for the active beam. Reset view fits the chosen
+camera; ordinary scenario edits preserve it. Room layers controls Roof, Walls,
+Balcony and Seats, with a projectors/beams-only view and Restore room.
