@@ -111,6 +111,24 @@ function replyTime(s) {
   const at = s.connection?.lastSuccessAt || (s.online ? s.updatedAt : null);
   return at ? new Date(at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'No successful reply yet';
 }
+// Keep interactive nodes stable through status polls; only changed content is patched.
+function patchControls(current, desired, protectedNode = null) {
+  const before = [...current.childNodes], after = [...desired.childNodes];
+  after.forEach((next,index) => {
+    const old = before[index];
+    if (old === protectedNode) return;
+    if (!old || old.nodeType !== next.nodeType || old.nodeName !== next.nodeName) { if(old)old.replaceWith(next);else current.append(next); return; }
+    if (old.nodeType === 3) { if(old.textContent !== next.textContent)old.textContent=next.textContent; return; }
+    if (old.nodeType !== 1) return;
+    for(const attr of [...old.attributes])if(!next.hasAttribute(attr.name))old.removeAttribute(attr.name);
+    for(const attr of [...next.attributes])if(old.getAttribute(attr.name)!==attr.value)old.setAttribute(attr.name,attr.value);
+    for(const event of ['onclick','onpointerdown','onkeydown','onchange','onblur'])old[event]=next[event];
+    if(next._inputOptions!==undefined)old._inputOptions=next._inputOptions;
+    patchControls(old,next,protectedNode);
+    if(old.matches('select,input') && old.value!==next.value)old.value=next.value;
+  });
+  before.slice(after.length).forEach(node=>node.remove());
+}
 function renderGrid() {
   const g = $('#grid');
   const active = document.activeElement;
@@ -119,7 +137,7 @@ function renderGrid() {
   const keepSelect = editing && active.dataset.editing === 'true' && connected && editing.status?.online && !state.lock && !editing.busy && !active.disabled && active._inputOptions === JSON.stringify(Object.entries(editing.inputs || {}));
   const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop;
   const unassignedOpen = g.querySelector('.pj-unassigned')?.open || false;
-  const inputOptionsOpen = new Set([...g.querySelectorAll('details[data-input-options][open]')].map((el) => el.dataset.inputOptions));
+  const inputOptionsOpen = new Set([...document.querySelectorAll('#grid details[data-input-options][open], #projector-controls details[data-input-options][open]')].map((el) => el.dataset.inputOptions));
   const output = document.createElement('div');
   function deviceCard(p, lane = laneOf(p)) {
     const s = p.status || {}; const off = !connected || !s.online; const lock = state.lock;
@@ -174,16 +192,16 @@ function renderGrid() {
         </div>
         <div class="pj-adjust-links" role="group" aria-label="Details and adjustments"><button class="avd-btn" data-adj="lens" type="button">Lens</button><button class="avd-btn" data-adj="picture" type="button">Picture</button><button class="avd-btn" data-adj="pattern" type="button">Patterns</button></div>
       </div>`;
-    card.querySelector('[data-open-projector]')?.addEventListener('click', () => openProjector(p.lane));
+    if(card.querySelector('[data-open-projector]'))card.querySelector('[data-open-projector]').onclick = () => openProjector(p.lane);
     card.querySelectorAll('button[data-c]').forEach((b) => b.onclick = () => cmd(p.slot, b.dataset.c, Number(b.dataset.a)));
     card.querySelector('[data-reset-input]').onclick = () => cmd(p.slot, 'resetInput');
     card.querySelectorAll('button[data-p]').forEach((b) => b.onclick = () => cmd(p.slot, 'pattern', b.dataset.p));
     card.querySelectorAll('button[data-adj]').forEach((b) => b.onclick = () => openAdjust(p.slot, b.dataset.adj));
     const sel = card.querySelector('select'); sel._inputOptions = JSON.stringify(inputs);
-    sel.onpointerdown = () => { sel.dataset.editing = 'true'; };
-    sel.onkeydown = (e) => { if (['ArrowDown', 'ArrowUp', ' ', 'Enter'].includes(e.key)) sel.dataset.editing = 'true'; if (e.key === 'Escape') { delete sel.dataset.editing; setTimeout(renderGrid, 0); } };
-    sel.onchange = () => { delete sel.dataset.editing; cmd(p.slot, 'input', sel.value); setTimeout(renderGrid, 0); };
-    sel.onblur = () => { delete sel.dataset.editing; setTimeout(renderGrid, 0); };
+    sel.onpointerdown = (e) => { e.currentTarget.dataset.editing = 'true'; };
+    sel.onkeydown = (e) => { if (['ArrowDown', 'ArrowUp', ' ', 'Enter'].includes(e.key)) e.currentTarget.dataset.editing = 'true'; if (e.key === 'Escape') { delete e.currentTarget.dataset.editing; setTimeout(renderGrid, 0); } };
+    sel.onchange = (e) => { delete e.currentTarget.dataset.editing; cmd(p.slot, 'input', e.currentTarget.value); setTimeout(renderGrid, 0); };
+    sel.onblur = (e) => { delete e.currentTarget.dataset.editing; setTimeout(renderGrid, 0); };
     card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = el.hasAttribute('data-reset-input') ? `${p.slot}:reset-input` : `${p.slot}:${n}`; });
     return card;
   }
@@ -211,23 +229,7 @@ function renderGrid() {
   const nextSelect = [...output.querySelectorAll('select[data-c="input"]')].find(node => node.closest('[data-slot]')?.dataset.slot === editing?.slot);
   const pathTo = (node, root) => { const path = []; while (node && node !== root) { path.unshift([...node.parentNode.childNodes].indexOf(node)); node = node.parentNode; } return node === root ? path.join('.') : null; };
   const retained = keepSelect && nextSelect && pathTo(active, g) === pathTo(nextSelect, output);
-  if (retained) {
-    const patch = (current, desired) => {
-      const before = [...current.childNodes], after = [...desired.childNodes];
-      after.forEach((next, index) => {
-        const old = before[index];
-        if (old === active) return; // Never detach or repopulate an open native menu.
-        if (old?.nodeType === 1 && old.contains(active)) {
-          for (const attr of [...old.attributes]) if (!next.hasAttribute(attr.name)) old.removeAttribute(attr.name);
-          for (const attr of [...next.attributes]) old.setAttribute(attr.name, attr.value);
-          patch(old, next);
-        } else if (old) old.replaceWith(next);
-        else current.append(next);
-      });
-      before.slice(after.length).forEach(node => node.remove());
-    };
-    patch(g, output);
-  } else g.replaceChildren(...output.childNodes);
+  patchControls(g,output,retained ? active : null);
   if (selectedDetailLane) {
     const selected = rigLanes(state.projectors).find(item => item.lane === selectedDetailLane)?.projector;
     if (selected) {
@@ -250,11 +252,7 @@ function updateDetailControls(card) {
   const path = (node, root) => { const out = []; while (node && node !== root) { out.unshift([...node.parentNode.childNodes].indexOf(node)); node = node.parentNode; } return node === root ? out.join('.') : null; };
   const next = card.querySelector('select[data-c="input"]');
   const retain = keep && path(active,host) === path(next,desired);
-  const patch = (old, fresh) => {
-    const before=[...old.childNodes],after=[...fresh.childNodes];
-    after.forEach((node,i) => {const prev=before[i];if(prev===active)return;if(prev?.nodeType===1&&prev.contains(active)){for(const attr of [...prev.attributes])if(!node.hasAttribute(attr.name))prev.removeAttribute(attr.name);for(const attr of [...node.attributes])prev.setAttribute(attr.name,attr.value);patch(prev,node);}else if(prev)prev.replaceWith(node);else old.append(node);});before.slice(after.length).forEach(node=>node.remove());
-  };
-  if(retain)patch(host,desired);else host.replaceChildren(card);
+  patchControls(host,desired,retain ? active : null);
   if(key&&!retain)[...host.querySelectorAll('[data-focus-key]')].find(node=>node.dataset.focusKey===key)?.focus({preventScroll:true});
 }
 async function ensureReference() {
