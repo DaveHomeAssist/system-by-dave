@@ -13,10 +13,13 @@ export async function until(fn, timeout = 10000) {
 }
 
 export async function startRelay(overrides = {}) {
-  const dir = await mkdtemp(path.join(tmpdir(), 'projctl-test-'));
+  const rigFile = overrides.REUSE_RIG || '';
+  const ownedDir = rigFile ? null : await mkdtemp(path.join(tmpdir(), 'projctl-test-'));
+  const dataFile = rigFile || path.join(ownedDir, 'rig.json');
+  const dir = path.dirname(dataFile);
   const child = spawn(process.execPath, ['server/index.js'], {
     cwd: fileURLToPath(new URL('../', import.meta.url)),
-    env: { ...process.env, SIM: '1', PJ_PASSCODE: '', RIG: path.join(dir, 'rig.json'), STAGE_PLOT: path.join(dir, 'stage-plot.json'), VENUE_MODEL: path.join(dir, 'venue'), PORT: '0', OSC_PORT: '0', TCP_PORT: '0', POLL_MS: '50', ...overrides },
+    env: { ...process.env, SIM: '1', PJ_PASSCODE: '', RIG: dataFile, STAGE_PLOT: path.join(dir, 'stage-plot.json'), VENUE_MODEL: path.join(dir, 'venue'), PORT: '0', OSC_PORT: '0', TCP_PORT: '0', POLL_MS: '50', ...overrides },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let log = '';
@@ -24,7 +27,7 @@ export async function startRelay(overrides = {}) {
   child.stderr.on('data', (b) => { log += b; });
   async function close() {
     if (child.exitCode === null && child.signalCode === null) { const exited = once(child, 'exit'); child.kill(); await exited; }
-    await rm(dir, { recursive: true, force: true });
+    if (ownedDir) await rm(dir, { recursive: true, force: true });
   }
   try {
     await until(() => {
@@ -37,8 +40,8 @@ export async function startRelay(overrides = {}) {
       return { status: r.status, body: await r.json() };
     };
     const state = async () => (await api('state')).body;
-    if (!overrides.PJ_PASSCODE) await until(async () => (await state()).projectors.every((p) => p.status.online));
-    return { base, api, state, close, child, rigFile: path.join(dir, 'rig.json'), udp: Number(log.match(/udp (\d+)/)[1]), tcp: Number(log.match(/\[tcp\] listening (\d+)/)[1]) };
+    if (!overrides.PJ_PASSCODE && !overrides.PROJCTL_PASSWORD) await until(async () => (await state()).projectors.every((p) => p.status.online));
+    return { base, api, state, close, child, rigFile: dataFile, udp: Number(log.match(/udp (\d+)/)[1]), tcp: Number(log.match(/\[tcp\] listening (\d+)/)[1]) };
   } catch (e) { await close(); throw e; }
 }
 

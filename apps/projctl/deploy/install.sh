@@ -18,7 +18,7 @@ else
   echo "Throwline runtime missing. Run npm run bundle:throwline in the source checkout before installing."
   exit 1
 fi
-if [ -z "$PASSCODE" ]; then read -r -s -p "Passcode for the web UI (blank = open, LAN only): " PASSCODE; echo; fi
+if [ -z "$PASSCODE" ]; then read -r -s -p "Password for the web UI (blank = open, LAN only): " PASSCODE; echo; fi
 
 if [ "$(uname)" = "Darwin" ]; then
   APP="$HOME/projctl"
@@ -37,7 +37,7 @@ else
   sudo mkdir -p "$APP"; sudo rsync -a --exclude node_modules --exclude '.git' "$HERE"/ "$APP"/; sudo chown -R "$USER_NAME" "$APP"
   (cd "$APP" && npm ci --omit=dev 2>/dev/null || npm install --omit=dev)
   [ -f "$APP/data/rig.json" ] || cp "$APP/data/rig.example.json" "$APP/data/rig.json"
-  printf 'PORT=%s\nPJ_PASSCODE=%s\n' "$PORT" "$PASSCODE" > "$APP/data/projctl.env"; chmod 600 "$APP/data/projctl.env"
+  printf 'PORT=%s\nPROJCTL_PASSWORD=%s\n' "$PORT" "$PASSCODE" > "$APP/data/projctl.env"; chmod 600 "$APP/data/projctl.env"
   sed -e "s#__NODE__#$NODE#g" -e "s#__APP__#$APP#g" -e "s#__USER__#$USER_NAME#g" "$HERE/deploy/projctl.service" | sudo tee /etc/systemd/system/projctl.service >/dev/null
   sudo systemctl daemon-reload; sudo systemctl enable --now projctl
   echo "projctl installed at $APP, running under systemd. Logs: journalctl -u projctl -f"

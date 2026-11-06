@@ -44,3 +44,24 @@ test('model descriptor and geometry require the same authentication as the rig',
     assert.equal((await fetch(relay.base + '/api/' + route, { headers: { cookie } })).status, 200);
   }
 });
+
+
+test('password auth protects HTTP and WebSocket and still works on loopback', async (t) => {
+  const { WebSocket } = await import('ws');
+  const r = await startRelay({ PROJCTL_PASSWORD: 'local-operator' }); t.after(r.close);
+  assert.equal((await r.api('state')).status, 401);
+  const rejected = new WebSocket(r.base.replace('http:', 'ws:') + '/ws');
+  rejected.on('error', () => {});
+  t.after(() => rejected.terminate());
+  assert.equal(await new Promise((resolve) => rejected.once('unexpected-response', (_, response) => resolve(response.statusCode))), 401);
+  const login = await fetch(r.base + '/api/login', { method: 'POST', headers: { 'content-type': 'application/json', 'x-forwarded-proto': 'https' }, body: JSON.stringify({ code: 'local-operator' }) });
+  assert.equal(login.status, 200);
+  const setCookie = login.headers.get('set-cookie');
+  assert.match(setCookie, /HttpOnly/); assert.match(setCookie, /SameSite=Strict/); assert.match(setCookie, /Secure/);
+  const cookie = setCookie.split(';')[0];
+  assert.equal((await fetch(r.base + '/api/state', { headers: { cookie } })).status, 200);
+  const ws = new WebSocket(r.base.replace('http:', 'ws:') + '/ws', { headers: { cookie } });
+  t.after(() => ws.terminate());
+  const msg = await new Promise((resolve, reject) => { ws.once('message', (data) => resolve(JSON.parse(data))); ws.once('error', reject); });
+  assert.equal(msg.type, 'snapshot');
+});

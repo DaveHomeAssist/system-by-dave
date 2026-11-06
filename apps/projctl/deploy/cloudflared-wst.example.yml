@@ -1,0 +1,10 @@
+# Example only. Do not route OSC UDP 9000, TCP 9001, PJLink, Pulse or Panasonic.
+# Replace <TUNNEL-UUID> and <TUNNEL-CREDENTIALS.json> after Dave creates a tunnel.
+tunnel: <TUNNEL-UUID>
+credentials-file: /Users/daverobertson/.cloudflared/<TUNNEL-CREDENTIALS.json>
+ingress:
+  - hostname: wst.housevideo.app
+    service: http://localhost:8080
+    originRequest:
+      noTLSVerify: false
+  - service: http_status:404

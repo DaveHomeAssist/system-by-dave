@@ -90,14 +90,31 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
   async function lensReadback() {
     const out = {};
     for (const [key, axis] of Object.entries(axes)) {
-      out[key] = await get(axis + '.position');
-      out[key + 'State'] = await get(axis + '.state');
+      try { out[key] = await get(axis + '.position'); } catch { out[key] = null; }
+      try { out[key + 'State'] = await get(axis + '.state'); } catch { out[key + 'State'] = null; }
     }
     return out;
+  }
+  async function moveTargets(targetList) {
+      const generation = motionGeneration;
+      const checkMove = () => { if (generation !== motionGeneration) throw new Error('Lens movement cancelled by Stop lens'); };
+      if (mapPower(await get('system.state')) !== POWER.ON) throw new Error('Power on the projector before moving the lens.');
+      if (!targetList.length) throw new Error('No supported lens positions.');
+      const selected = targetList.map(([axis]) => axis);
+      for (const [axis, target] of targetList) {
+        if (await get(axis + '.state') !== 'Stopped') throw new Error('Lens is moving. Wait or use Stop lens.');
+        if (!await get(axis + '.safetooperate')) throw new Error('Projector reports lens movement unavailable.');
+        const min = await get(axis + '.minposition'), max = await get(axis + '.maxposition');
+        if (![min, max].every(Number.isFinite) || target < min || target > max) throw new Error('Lens target is outside the reported travel limits.');
+        await rpc('property.set', { property: axis + '.target', value: target }, timeoutMs, checkMove);
+      }
+      await waitStopped(selected, checkMove);
+      return 'OK';
   }
   const mapPower = (v) => ({ on: POWER.ON, ready: POWER.OFF, eco: POWER.OFF, boot: POWER.WARMING, conditioning: POWER.WARMING, deconditioning: POWER.COOLING }[String(v).toLowerCase()] ?? POWER.UNKNOWN);
   return {
     kind: 'pulse',
+    lensControls: { h: true, v: true, focus: true, zoom: true },
     patterns: PULSE_PATTERNS,
     get inputs() { return sources; },
     get pictureSchema() { return pictureSchema; },
@@ -147,6 +164,9 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       const actual = await get('image.' + pictureProperties[key]);
       if (!Number.isFinite(actual) || Math.abs(actual - value) > d.step / 2) throw new Error('Picture readback did not match the requested value.');
       return 'OK';
+    },
+    async recallLens(targets) {
+      return moveTargets(Object.entries(targets).filter(([axis, target]) => axes[axis] && Number.isFinite(target)).map(([axis, target]) => [axes[axis], target]));
     },
     async lens(op = {}) {
       if (op.op === 'stop') {

@@ -79,6 +79,9 @@ test('Pulse uses discovered inputs, validated picture ranges and waits for bound
   assert.ok(Date.now() - start >= 70); assert.equal(position, 1128); assert.equal(running, false);
   assert.equal(requests.some((r) => /stepforward/.test(r.method)), false);
   for (const [speed, delta] of [['normal', 512], ['fast', 2048]]) { const before = position; await d.lens({ axis: 'focus', dir: '+', speed }); assert.equal(position, before + delta); }
+  const mismatch = pulseDriver({ host: '127.0.0.1', port: server.address().port, motionPollMs: 10, motionSettleMs: 0 });
+  await mismatch.recallLens({ focus: 2500 });
+  assert.equal(position, 2500, 'fresh readback is the saved target in this fixture');
   hold = true;
   await assert.rejects(d.lens({ axis: 'focus', dir: '+', speed: 'slow' }), /timed out; stop requested/);
   assert.equal(running, false);

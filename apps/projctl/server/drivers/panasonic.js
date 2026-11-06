@@ -85,6 +85,7 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
   return {
     ...pj,
     kind: 'panasonic',
+    lensControls: { h: false, v: false, focus: false, zoom: false },
     patterns,
     async getStatus() {
       const s = await pj.getStatus();

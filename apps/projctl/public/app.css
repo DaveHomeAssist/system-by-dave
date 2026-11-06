@@ -136,3 +136,5 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 .pj-setup{grid-template-columns:48px repeat(4,minmax(0,1fr))}
 .pj-setup .avd-field{min-width:0}
 @media(max-width:720px){.pj-setup{grid-template-columns:1fr 1fr}}
+
+.pj-preset-slot{display:block;padding-block:4px}.pj-lens-data{color:var(--ink);font-variant-numeric:tabular-nums}.pj-preset-result{flex-basis:100%;margin:0;overflow-wrap:anywhere}

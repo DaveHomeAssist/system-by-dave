@@ -18,10 +18,10 @@
   <form id="f" autocomplete="off">
     <span class="avd-tape">Frozen at WST</span>
     <h1 style="margin:0;font-size:20px;line-height:26px;font-weight:600">Projector control</h1>
-    <label class="avd-field"><span class="avd-field__label">Passcode</span><input id="code" class="avd-input" type="password" inputmode="numeric" autocomplete="current-password" required autofocus></label>
+    <label class="avd-field"><span class="avd-field__label">Password</span><input id="code" class="avd-input" type="password" autocomplete="current-password" required autofocus></label>
     <p id="err" class="pj-mono" role="alert" style="margin:0;color:var(--state-blocked)"></p>
     <button class="avd-btn avd-btn--primary avd-btn--block" type="submit">Sign in</button>
-    <p class="pj-mono pj-note">Ask the video lead for the passcode. Sessions last until the relay restarts.</p>
+    <p class="pj-mono pj-note">Use the relay password for both LAN and tunnel access. Local access does not depend on Cloudflare; sessions last until the relay restarts.</p>
   </form>
 </main>
 <script>
