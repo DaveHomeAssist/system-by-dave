@@ -33,6 +33,15 @@ const path = require('node:path');
   await page.locator('[data-plan="upShift"]').fill('10');
   await page.locator('[data-plan="upShift"]').press('Tab');
   assert.match(await page.locator('#plan-result').innerText(), /H 10%/);
+  await page.locator('[data-plan="lens"]').selectOption('current');
+  await page.locator('[data-plan="raster"]').fill('26');
+  await page.locator('[data-plan="raster"]').press('Tab');
+  await page.locator('[data-plan="upShift"]').fill('10');
+  await page.locator('[data-plan="upShift"]').press('Tab');
+  assert.equal(await page.locator('[data-plan="upShift"]').inputValue(),'10');
+  assert.match(await page.locator('#plan-result').innerText(), /H 10%/);
+  assert.match(await page.locator('#plan-result').innerText(), /21.39 ft/);
+  assert.equal(await page.locator('[data-plan="raster"]').inputValue(),'26');
   for (const lane of ['A', 'B', 'C', 'D']) {
    await page.locator(`[data-plan-lane="${lane}"]`).click();
    await page.locator('[data-plan="lensOffset"]').fill('0');

@@ -1,6 +1,6 @@
 import { LANES } from './lanes.js';
 import { stageReference } from './stage-reference.js';
-import { scenarioBaseline, calculateScenario, DLE150_SOURCE } from './stage-scenario.js';
+import { scenarioBaseline, calculateScenario, scenarioUpwardShift, withScenarioUpwardShift, DLE150_SOURCE } from './stage-scenario.js';
 const number = value => Number(value.toFixed(2));
 export async function createStagePlanner(host, plot, onScenario, openLive) {
   await import('/ProjectorThrow/throwline-scene-state.js');
@@ -48,7 +48,7 @@ export async function createStagePlanner(host, plot, onScenario, openLive) {
   };
   const sync = () => {
     const scenario = scenarios[lane];
-    scenario.upShift = scenario.lensHeight == null ? null : (scenario.centerHeight - scenario.lensHeight) / (scenario.portrait ? scenario.raster : scenario.raster / scenario.aspect) * 100;
+    try { scenario.upShift = scenarioUpwardShift(engine, scenario); } catch { scenario.upShift = null; }
     host.querySelectorAll('[data-plan]').forEach(input => { const value = scenario[input.dataset.plan]; input.value = value == null ? '' : typeof value === 'number' ? number(value) : String(value); });
     host.querySelectorAll('[data-plan-lane]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.planLane === lane)));
     $('[data-plan="lens"] option[value="dle150"]').disabled = lane !== 'D';
@@ -64,7 +64,9 @@ export async function createStagePlanner(host, plot, onScenario, openLive) {
   host.querySelectorAll('[data-plan]').forEach(input => input.addEventListener('change', () => {
     const key = input.dataset.plan, next = scenarios[lane];
     next[key] = input.type === 'number' ? input.value === '' ? null : Number(input.value) : key === 'portrait' ? input.value === 'true' : input.value;
-    if (key === 'upShift' && next.lensHeight != null) next.centerHeight = next.lensHeight + next.upShift / 100 * (next.portrait ? next.raster : next.raster / next.aspect);
+    if (key === 'upShift' && next.lensHeight != null) {
+      try { next.centerHeight = withScenarioUpwardShift(engine, next, next.upShift).centerHeight; } catch { /* sync shows invalid planning fields */ }
+    }
     if (key === 'min' || key === 'max') next.lens = 'manual';
     if (key === 'lens' && next.lens === 'current') { next.min = 1.8; next.max = 2.54; next.aspect = 1.6; }
     if (key === 'lens' && next.lens === 'dle150') { next.min = 1.36; next.max = 1.98; next.aspect = 1.6; }

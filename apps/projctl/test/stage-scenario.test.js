@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { measuredStageFixture, stageFixture } from './stage-fixture.js';
 import { normalizePlot } from '../public/stage-plot.js';
 import { stageReference } from '../public/stage-reference.js';
-import { FT, scenarioBaseline, calculateScenario } from '../public/stage-scenario.js';
+import { FT, scenarioBaseline, calculateScenario, scenarioUpwardShift, withScenarioUpwardShift } from '../public/stage-scenario.js';
 const engine = createRequire(import.meta.url)('../../../ProjectorThrow/throwline-scene-state.js');
 const baseline = () => scenarioBaseline(stageReference(normalizePlot(measuredStageFixture())));
 const dStudy = () => ({ ...baseline().D, lens: 'dle150', min: 1.36, max: 1.98, distance: 38.5, raster: 20, aspect: 1.6, portrait: true, lensHeight: 9, centerHeight: 15, contentHeight: 20 });
@@ -56,4 +56,16 @@ test('proposal travels along a rotated target normal without changing world heig
  near(result.projector[0], 2 + 38.5 * FT);
  near(result.projector[1], 9 * FT);
  near(result.projector[2], 3);
+});
+
+test('shift percentage round-trips against achievable height when the requested raster is lens limited', () => {
+ const requested = { ...dStudy(), lens:'current', min:1.8, max:2.54, raster:26 };
+ const proposed = withScenarioUpwardShift(engine, requested, 10);
+ near(calculateScenario(engine, proposed).height, 38.5 / 1.8);
+ near(proposed.centerHeight, 9 + (38.5 / 1.8) * .1);
+ near(scenarioUpwardShift(engine, proposed), 10);
+ near(calculateScenario(engine, proposed).geometry.image.horizontalShiftPercent, 10);
+ assert.equal(calculateScenario(engine, proposed).geometry.shift.horizontal.exceeded, false);
+ assert.equal(proposed.raster,26);
+ assert.equal(requested.centerHeight,15);
 });

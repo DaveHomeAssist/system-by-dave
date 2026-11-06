@@ -63,3 +63,18 @@ export function calculateScenario(engine, input) {
     top: input.centerHeight + height / 2, bottom: input.centerHeight - height / 2,
     requestedHeight: physicalHeight, contentFraction: contentHeight / height };
 }
+
+// Percentages are relative to the achievable footprint, not an unattainable
+// requested raster. Keep the requested target unchanged when moving its centre.
+export function scenarioUpwardShift(engine, input) {
+  return (input.centerHeight - input.lensHeight) / calculateScenario(engine, input).height * 100;
+}
+export function withScenarioUpwardShift(engine, input, percent) {
+  if (typeof percent !== 'number' || !Number.isFinite(percent)) throw new Error('Enter a finite upward shift percentage.');
+  const height = calculateScenario(engine, input).height;
+  const center = input.lensHeight + height * percent / 100;
+  // Bias by machine precision toward the lens so a boundary such as 10%
+  // cannot round upward into Throwline's strict greater-than limit check.
+  const roundingGuard = Math.sign(percent) * Number.EPSILON * Math.max(1, Math.abs(center)) * 8;
+  return { ...input, centerHeight: center - roundingGuard };
+}

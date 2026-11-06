@@ -71,3 +71,5 @@ The optional venue descriptor exposes only registration status and the planning-
 The attached front and top-down drawings label A and D raster coverage at 19 ft 11 in, C at 20 ft 3 in, and B at 18 ft 4 in. These are plotted raster-coverage dimensions, not measurements of every scenic target. Each lane has an independent scenario. The D 20 ft shortcut remains a rounded operator estimate for comparison; no revised A height is inferred.
 
 ET-DLE170 manufacturer reference: https://eu.connect.panasonic.com/gb/en/projectors/et-dle170 (WXGA 1.80–2.54:1).
+
+Upward-shift percentages are calculated from the achievable physical raster after the lens range constrains the requested size. The requested raster remains independently editable; a 26 ft request with a 21.39 ft achievable image uses 21.39 ft as its shift-percentage basis.
