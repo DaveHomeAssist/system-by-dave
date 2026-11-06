@@ -21,6 +21,8 @@ test('only staged WST entries redirect; managed source and adjacent files stay e
       assert.ok(html.includes(`<link rel="canonical" href="${target}">`));
       assert.ok(html.includes(`<a href="${target}">`));
       assert.ok(!html.includes('/ProjectorThrow/'));
+      for (const field of ['name="description"','name="theme-color"','property="og:title"','property="og:description"','property="og:url"','name="twitter:card"','name="twitter:title"','name="twitter:description"','http-equiv="Content-Security-Policy"']) assert.ok(html.includes(field), field);
+      assert.ok(html.includes("default-src 'none'; base-uri 'none'; form-action 'none'"));
     }
     assert.equal(fs.readFileSync(path.join(staged, 'wst/stage/stage-3d.js'), 'utf8'), original);
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }

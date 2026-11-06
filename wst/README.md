@@ -43,6 +43,8 @@ The owner's actual desktop browser reached the new bounded failure message inste
 
 Dave requested a choice-first landing screen. Home is now the initial view on both the public website and non-embedded local controller, with four in-page choices: Notes + tasks, Projector info, Stage / room, and Controls. Notes remain one click away. Embedded controller frames continue opening Rig/Stage directly rather than showing a nested Home screen. This changes navigation only; no storage migration, backend restart or projector commands are involved. The user's actual local Home routes were verified; public Home routes are awaiting the final owner-browser readback. Existing local-network permission limitations remain unchanged.
 
+Home renders that choice screen as a dark snow splash (`snow-splash.css`, `snow-splash.js`, and vendored `vendor/gsap.min.js`). The aurora, falling snow and Frozen letter reveal stay inside the home panel. Destination buttons keep `data-route` and the existing `navigate()` path. The theme toggle still changes Notes, Rig and the other panels. Snow and the reveal pause while Home is hidden, and they do not run for `prefers-reduced-motion`. Styles and scripts are same-origin files embedded with the Worker; the CSP is unchanged.
+
 ## Six-menu shell
 
 The public shell's primary navigation is My Projector Rig, 3D Stage View, Presets, Log, Configuration and Throw Calc. Home and Notes + to-dos remain separate utility choices. Rig gear, the searchable catalog and signal-flow diagrams use `apps/projctl/public/reference-view.js` / `.css` and canonical `wst/projectors.json`; the embed script copies these shared renderer bytes rather than maintaining another catalog.

@@ -3,6 +3,7 @@
 ## 2026-11-06
 
 - Redirect the portfolio Pages copies of Frozen home/Stage to the working managed WST origin while preserving its same-origin viewer bundle.
+- The Frozen workspace home is the snow splash: aurora, canvas snow, a staggered Frozen title and frosted destination cards. Routes, the theme toggle and the same-origin CSP stay as they were. Snow and the title reveal pause off Home and do not run when reduced motion is requested.
 
 - Add a guarded per-projector lens workspace with supported Fine/Normal/Coarse steps, explicit focused arrow-key opt-in, release/Stop behavior where supported, readbacks and confirmed rig-preset recall. Show command acknowledgement separately from actual state; fresh confirmed shutters expose only the opposite action, while unknown or stale readings retain explicit choices.
 
