@@ -28,7 +28,7 @@ An input selection, signal timing or stored model specification is not EDID.
 
 `GET /api/host-displays` returns `scope: "relay-computer"`, `state`,
 `collectedAt`, `reason` and `displays`. Each display has an ephemeral `id`, name,
-connection, resolution, pixelResolution, rotation, online/main/mirror flags,
+connection, resolution, pixelResolution, numeric rotation when actually reported, rotationSupport, online/main/mirror flags,
 manufacturerId/productId when the OS supplies them, `assignedSlot: null` and an
 explicit unavailable raw-EDID result. Serial numbers, hostname and raw OS command
 output are excluded. No computer output is automatically bound to an A-D lane.

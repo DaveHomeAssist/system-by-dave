@@ -28,13 +28,15 @@ export function projectorDisplayInfo(projector, status = {}, inputs = {}) {
   };
 }
 
-const yes = value => value === true || value === 'spdisplays_yes' ? true : value === false || value === 'spdisplays_no' ? false : null;
+const yes = value => value === true || ['spdisplays_yes', 'spdisplays_on'].includes(value) ? true : value === false || ['spdisplays_no', 'spdisplays_off'].includes(value) ? false : null;
+const osLabel = value => text(value)?.replace(/^spdisplays_/, '').replace(/_/g, ' ') || null;
 export function normalizeHostDisplays(report) {
   return (report?.SPDisplaysDataType || []).flatMap(gpu => Array.isArray(gpu.spdisplays_ndrvs) ? gpu.spdisplays_ndrvs : []).slice(0, 32).map((display, index) => ({
     id: `display-${index + 1}`, name: text(display._name) || 'Unnamed display',
-    connection: text(display.spdisplays_connection_type), resolution: text(display.spdisplays_resolution),
-    pixelResolution: text(display.spdisplays_pixelresolution || display._spdisplays_pixels),
-    rotation: text(display.spdisplays_rotation), online: yes(display.spdisplays_online), main: yes(display.spdisplays_main), mirror: yes(display.spdisplays_mirror),
+    connection: osLabel(display.spdisplays_connection_type), resolution: text(display.spdisplays_resolution),
+    pixelResolution: osLabel(display.spdisplays_pixelresolution || display._spdisplays_pixels),
+    rotation: /^\d+(?:\.\d+)?(?:°| degrees)?$/.test(String(display.spdisplays_rotation)) ? Number.parseFloat(display.spdisplays_rotation) : null,
+    rotationSupport: display.spdisplays_rotation === 'spdisplays_supported' ? true : display.spdisplays_rotation === 'spdisplays_unsupported' ? false : null, online: yes(display.spdisplays_online), main: yes(display.spdisplays_main), mirror: yes(display.spdisplays_mirror),
     manufacturerId: text(display['_spdisplays_display-vendor-id']), productId: text(display['_spdisplays_display-product-id']),
     edid: { state: 'unavailable', value: null, reason: 'Raw EDID is not provided by this OS display report.' }, assignedSlot: null,
   }));

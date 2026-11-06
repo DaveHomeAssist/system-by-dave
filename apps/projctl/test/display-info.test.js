@@ -18,8 +18,9 @@ test('projector input and signal remain separate from unsupported EDID, with tru
 });
 
 test('OS report exposes only whitelisted display metadata and never assigns a projector or invents raw EDID', () => {
-  const rows = normalizeHostDisplays({ SPDisplaysDataType: [{ spdisplays_ndrvs: [{ _name: 'Source display', spdisplays_resolution: '1920 x 1080 @ 60Hz', spdisplays_online: 'spdisplays_yes', '_spdisplays_display-serial-number': 'private', '_spdisplays_display-vendor-id': '0x1234' }] }] });
+  const rows = normalizeHostDisplays({ SPDisplaysDataType: [{ spdisplays_ndrvs: [{ _name: 'Source display', spdisplays_resolution: '1920 x 1080 @ 60Hz', spdisplays_online: 'spdisplays_yes', spdisplays_rotation: 'spdisplays_supported', spdisplays_mirror: 'spdisplays_off', spdisplays_connection_type: 'spdisplays_internal', '_spdisplays_display-serial-number': 'private', '_spdisplays_display-vendor-id': '0x1234' }] }] });
   assert.equal(rows[0].resolution, '1920 x 1080 @ 60Hz'); assert.equal(rows[0].online, true);
+  assert.equal(rows[0].rotation, null); assert.equal(rows[0].rotationSupport, true); assert.equal(rows[0].mirror, false); assert.equal(rows[0].connection, 'internal');
   assert.equal(rows[0].manufacturerId, '0x1234'); assert.equal(rows[0].assignedSlot, null);
   assert.equal(rows[0].edid.state, 'unavailable'); assert.doesNotMatch(JSON.stringify(rows), /private|serial/);
 });
