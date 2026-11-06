@@ -37,7 +37,8 @@ export async function readVenue(root) {
       assets[role] = { bytes: entry.bytes, sha256: entry.sha256, url: `/api/venue-model/${role}` };
     }
     return { version: 1, title: value.title, modelVersion: value.modelVersion, notes: value.notes,
-      units: 'metres', up: 'Y', upstage: '-Z', cutaway, assets };
+      units: 'metres', up: 'Y', upstage: '-Z', cutaway, assets,
+      registration: { status: short(value.registration?.status, 80) ? value.registration.status : 'unregistered', planningOverlayAllowed: value.registration?.planningOverlayAllowed === true } };
   } catch { throw fail(); }
 }
 function embeddedGLB(bytes) {

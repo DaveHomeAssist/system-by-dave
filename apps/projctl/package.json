@@ -9,11 +9,13 @@
     "sim": "SIM=1 node server/index.js",
     "bundle:throwline": "node scripts/bundle-throwline.js",
     "test": "node --test test/*.test.js",
-    "test:browser": "node test/browser.cjs && node test/reconnect-browser.cjs",
+    "test:browser": "node test/browser.cjs && node test/reconnect-browser.cjs && node test/stage-planner-browser.cjs && node test/live-menu-browser.cjs",
     "test:venue-browser": "node test/venue-browser.cjs"
   },
   "dependencies": {
     "ws": "^8.18.0"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

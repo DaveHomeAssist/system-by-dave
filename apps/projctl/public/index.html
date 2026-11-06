@@ -62,6 +62,7 @@
     <section id="tab-stage" class="tab" role="tabpanel" aria-labelledby="tab-btn-stage" hidden>
       <div class="pj-stage-head">
         <div><span class="avd-eyebrow">Projection plot</span><h2 id="stage-title">Stage view</h2></div>
+        <div class="avd-seg pj-stage-mode" role="group" aria-label="Stage mode"><button class="avd-seg__btn" type="button" data-stage-mode="reference" aria-pressed="true">Rig reference</button><button class="avd-seg__btn" type="button" data-stage-mode="planning" aria-pressed="false">What-if planning</button></div>
         <div class="avd-seg" role="group" aria-label="Stage viewpoint">
           <button class="avd-seg__btn" type="button" data-stage-view="building" aria-pressed="false" hidden>Building</button>
           <button class="avd-seg__btn" type="button" data-stage-view="3d" aria-pressed="true">3D</button>
@@ -84,11 +85,14 @@
           <p id="stage-foot" class="pj-stage-foot pj-mono">Plot reference · coverage is not live beam position</p>
         </div>
         <aside class="pj-stage-sidebar" aria-label="Stage projectors" data-web2-scroll>
+          <div id="stage-planner" hidden></div>
+          <div id="stage-live-reference">
           <div class="pj-rowhead"><h3>Projectors</h3><span id="stage-status-kind" class="pj-mono"></span></div>
           <p class="pj-mono pj-note">Select a projector to open lens, pattern and picture controls.</p>
           <div id="stage-projectors" class="pj-stage-projectors"></div>
           <p id="stage-source" class="pj-mono pj-note"></p>
           <a class="pj-stage-planner" href="https://avbydave.com/ProjectorThrow/" target="_blank" rel="noopener noreferrer">Open Throwline ↗<span>Separate planning workspace · opens a new tab</span></a>
+          </div>
         </aside>
       </div>
     </section>

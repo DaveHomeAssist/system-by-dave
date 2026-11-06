@@ -35,3 +35,21 @@ export function launcherText({ node, app }) {
   const quote = s => "'" + s.replaceAll("'", "'\\''") + "'";
   return `#!/bin/bash\nexec ${quote(node)} ${quote(path.join(app, 'deploy/open-service.js'))}\n`;
 }
+
+// Stage code/dependencies first; snapshot settings only after the writer is stopped.
+export async function snapshotSettingsAfterStop({ sourceData, data, backup, stop }) {
+  await stop();
+  const original = assertSavedRig(path.join(sourceData, 'rig.json'));
+  fs.writeFileSync(path.join(backup, 'rig.json'), original, { mode: 0o600 });
+  if (!fs.existsSync(path.join(data, 'rig.json'))) {
+    const staged = path.join(path.dirname(data), `data-next-${process.pid}`);
+    fs.mkdirSync(staged, { mode: 0o700 });
+    for (const name of ['rig.json', 'stage-plot.json', 'venue']) {
+      const from = path.join(sourceData, name);
+      if (fs.existsSync(from)) fs.cpSync(from, path.join(staged, name), { recursive: true });
+    }
+    if (!fs.readFileSync(path.join(staged, 'rig.json')).equals(original)) throw new Error('Rig copy verification failed. Original preserved.');
+    fs.renameSync(staged, data);
+  }
+  return original;
+}

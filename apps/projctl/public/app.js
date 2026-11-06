@@ -107,12 +107,12 @@ function renderGrid() {
   const g = $('#grid');
   const active = document.activeElement;
   const editing = g.contains(active) && active.matches('select[data-c="input"]') ? state.projectors.find((p) => p.slot === active.closest('[data-slot]')?.dataset.slot) : null;
-  // Keep the native input menu alive during polling. Safety changes always render immediately.
-  if (editing && active.dataset.editing === 'true' && connected && editing.status?.online && !state.lock && !editing.busy && Object.keys(editing.inputs || {}).length && !active.disabled) return;
+  // Preserve only the active native select. Other telemetry and safety state must keep updating.
+  const keepSelect = editing && active.dataset.editing === 'true' && connected && editing.status?.online && !state.lock && !editing.busy && !active.disabled && active._inputOptions === JSON.stringify(Object.entries(editing.inputs || {}));
   const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop;
   const unassignedOpen = g.querySelector('.pj-unassigned')?.open || false;
   const inputOptionsOpen = new Set([...g.querySelectorAll('details[data-input-options][open]')].map((el) => el.dataset.inputOptions));
-  g.innerHTML = '';
+  const output = document.createElement('div');
   function deviceCard(p, lane = laneOf(p)) {
     const s = p.status || {}; const off = !connected || !s.online; const lock = state.lock;
     const { st, word } = stateOf(p);
@@ -134,8 +134,8 @@ function renderGrid() {
         ${lane ? `<div class="pj-lane"><h3>${esc(lane.target)}</h3><span class="pj-mono">${esc(lane.role)} · ${esc(lane.orientation)}</span><span class="pj-lane-device pj-mono">${esc(p.model || p.label)}</span></div>` : `<p class="pj-mono">Unassigned · Relay ${esc(p.slot)}</p>`}
         <div class="pj-tile-top">${pill(st, word)}<span class="pj-mono">${esc(p.owner)} · ${esc(p.ip || 'no address')}</span></div>
         <div class="pj-telemetry-note pj-mono">${off ? 'Current values unavailable · last known below' : state.simulation ? 'Simulated feedback' : 'Projector feedback'}<span>Last reply: ${esc(replyTime(s))}</span>${off && s.connection?.error ? `<span>${esc(s.connection.error)}</span>` : ''}</div>
-        ${busy ? '<p class="pj-mono" role="status">Lens moving</p>' : ''}
-        ${errs.length ? `<div class="pj-tile-top">${errs.map((e) => pill('blocked', e)).join('')}</div>` : ''}
+        <p class="pj-mono" role="status" ${busy ? '' : 'style="display:none"'}>Lens moving</p>
+        <div class="pj-tile-top" ${errs.length ? '' : 'style="display:none"'}>${errs.map((e) => pill('blocked', e)).join('')}</div>
         <div class="pj-two">
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Input</span><span class="avd-readout__value">${esc(s.input ? (p.inputs?.[s.input] || s.input) : '—')}</span></div>
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Light source</span><span class="avd-readout__value">${s.lightHours != null ? esc(s.lightHours) + '<span class="avd-readout__unit">h</span>' : '—'}</span></div>
@@ -150,7 +150,7 @@ function renderGrid() {
         </div>
         <div class="pj-input-actions">
           <button class="avd-btn avd-btn--primary avd-btn--block" data-reset-input type="button" ${off || busy || lock || !resetAvailable ? 'disabled' : ''}>Reset to ${esc(preferredLabel)}</button>
-          ${!resetAvailable ? `<p class="pj-mono pj-note">${esc(preferredLabel)} input has not been verified for this projector.</p>` : ''}
+          <p class="pj-mono pj-note" ${resetAvailable ? 'style="display:none"' : ''}>${esc(preferredLabel)} input has not been verified for this projector.</p>
           <details class="pj-input-options" data-input-options="${esc(p.slot)}" ${inputOptionsOpen.has(p.slot) ? 'open' : ''}>
             <summary data-focus-key="${esc(p.slot)}:input-options">Other inputs</summary>
             <label class="avd-field"><span class="avd-field__label pj-caps">Select another input</span>
@@ -169,7 +169,7 @@ function renderGrid() {
     card.querySelector('[data-reset-input]').onclick = () => cmd(p.slot, 'resetInput');
     card.querySelectorAll('button[data-p]').forEach((b) => b.onclick = () => cmd(p.slot, 'pattern', b.dataset.p));
     card.querySelectorAll('button[data-adj]').forEach((b) => b.onclick = () => openAdjust(p.slot, b.dataset.adj));
-    const sel = card.querySelector('select');
+    const sel = card.querySelector('select'); sel._inputOptions = JSON.stringify(inputs);
     sel.onpointerdown = () => { sel.dataset.editing = 'true'; };
     sel.onkeydown = (e) => { if (['ArrowDown', 'ArrowUp', ' ', 'Enter'].includes(e.key)) sel.dataset.editing = 'true'; if (e.key === 'Escape') { delete sel.dataset.editing; setTimeout(renderGrid, 0); } };
     sel.onchange = () => { delete sel.dataset.editing; cmd(p.slot, 'input', sel.value); setTimeout(renderGrid, 0); };
@@ -179,7 +179,7 @@ function renderGrid() {
   }
   const bound = new Set();
   for (const { lane, projector, conflict } of rigLanes(state.projectors)) {
-    if (projector) { bound.add(projector); g.appendChild(deviceCard(projector)); continue; }
+    if (projector) { bound.add(projector); output.appendChild(deviceCard(projector)); continue; }
     const info = LANES[lane], card = document.createElement('section');
     card.className = 'avd-panel pj-tile pj-unbound'; card.dataset.lane = lane;
     card.setAttribute('aria-label', `Projector ${lane} · ${info.target} · ${conflict ? 'Assignment conflict' : 'Unassigned'}`);
@@ -188,17 +188,37 @@ function renderGrid() {
       ${pill('idle', conflict ? 'Assignment conflict' : 'Unassigned')}<p class="pj-mono">${conflict ? 'More than one device uses this lane. Check Setup.' : 'No device assigned to this position.'}</p>
       <button class="avd-btn" type="button" data-focus-key="lane:${lane}:setup">Open Setup</button></div>`;
     card.querySelector('button').onclick = () => { $('[data-tab="setup"]').click(); $('[data-tab="setup"]').focus(); };
-    g.appendChild(card);
+    output.appendChild(card);
   }
   const unassigned = state.projectors.filter((p) => !bound.has(p));
   if (unassigned.length) {
     const extra = document.createElement('details'); extra.className = 'pj-unassigned'; extra.open = unassignedOpen;
     extra.innerHTML = `<summary class="avd-btn" data-focus-key="unassigned">Unassigned devices (${unassigned.length})</summary><div class="pj-grid"></div>`;
     unassigned.forEach((p) => extra.querySelector('.pj-grid').appendChild(deviceCard(p, null)));
-    g.appendChild(extra);
+    output.appendChild(extra);
   }
+  const nextSelect = [...output.querySelectorAll('select[data-c="input"]')].find(node => node.closest('[data-slot]')?.dataset.slot === editing?.slot);
+  const pathTo = (node, root) => { const path = []; while (node && node !== root) { path.unshift([...node.parentNode.childNodes].indexOf(node)); node = node.parentNode; } return node === root ? path.join('.') : null; };
+  const retained = keepSelect && nextSelect && pathTo(active, g) === pathTo(nextSelect, output);
+  if (retained) {
+    const patch = (current, desired) => {
+      const before = [...current.childNodes], after = [...desired.childNodes];
+      after.forEach((next, index) => {
+        const old = before[index];
+        if (old === active) return; // Never detach or repopulate an open native menu.
+        if (old?.nodeType === 1 && old.contains(active)) {
+          for (const attr of [...old.attributes]) if (!next.hasAttribute(attr.name)) old.removeAttribute(attr.name);
+          for (const attr of [...next.attributes]) old.setAttribute(attr.name, attr.value);
+          patch(old, next);
+        } else if (old) old.replaceWith(next);
+        else current.append(next);
+      });
+      before.slice(after.length).forEach(node => node.remove());
+    };
+    patch(g, output);
+  } else g.replaceChildren(...output.childNodes);
   g.scrollTop = scroll;
-  if (focusKey) [...g.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === focusKey)?.focus({ preventScroll: true });
+  if (focusKey && !retained) [...g.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === focusKey)?.focus({ preventScroll: true });
 }
 function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); return p && laneOf(p) ? `${slot} · ${p.lane} / ${laneOf(p).target}` : slot; }
 function renderPresets() {
