@@ -2,6 +2,8 @@
 
 ## 2026-11-06
 
+- Projctl adds six primary views, dedicated A-D projector details, shared documented gear/catalog/signal-flow references and the canonical Throwline calculator. Forward-integrate guarded Pulse lens preset recall and password aliases, plus cached projector signal and bounded computer-display readouts with explicit unavailable EDID. Preserve managed settings and host assignment; no automatic hardware action.
+
 - Combine Notes/tasks, projector reference, Rig and Stage in one controller workspace. Notes remain browser/address-local; shared public tasks retain their separate service. Stage opens directly with the room and recorded projectors, and the public hub can connect an existing private controller in place.
 
 - Projctl combines an opt-in approximate room preview with optical scenarios, roof/wall/balcony/seat controls, visible A-D markers and purposeful Projectors/Coverage/Plan/Selected side cameras while preserving true enclosure sizes, original model/plot data and false calibrated-registration status.

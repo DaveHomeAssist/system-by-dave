@@ -1,6 +1,7 @@
 import { LANES, laneOf, projectorName, orderedProjectors, rigLanes } from './lanes.js';
 import { createStageView } from './stage-view.js';
 import { lensDirection } from './lens-direction.js';
+import { loadReference, mountReference, referenceGearHTML } from './reference-view.js';
 import { startHeaderClock } from './header-clock.js';
 startHeaderClock(document.querySelector('#operator-clock'));
 const $ = (s, r = document) => r.querySelector(s);
@@ -9,6 +10,8 @@ const confirmTokens = {}; // command key -> one-use token
 const commandsInFlight = new Set();
 let connected = false;
 const dirtySetup = new Set();
+let selectedDetailLane = null, referenceData = null, referenceView = null;
+const referenceReady = loadReference('./workspace/projectors.json').then(data => { referenceData = data; if (selectedDetailLane) renderProjectorInfo(); return data; }).catch(() => null);
 const stageView = createStageView(document.querySelector('#tab-stage'), (slot) => openAdjust(slot), (p) => canPattern(p));
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -27,7 +30,11 @@ function wireTabs(list, attr, panelFor, onSelect = () => {}) {
     t.onkeydown = (e) => { const n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null; if (n == null) return; e.preventDefault(); const x = tabs[(n + tabs.length) % tabs.length]; x.focus(); select(x); };
   });
 }
-wireTabs($('.avd-tabs[aria-label="Views"]'), 'tab', (t) => $('#tab-' + t.dataset.tab));
+wireTabs($('.avd-tabs[aria-label="Views"]'), 'tab', (t) => $('#tab-' + t.dataset.tab), t => {
+  selectedDetailLane = null; $('#tab-projector').hidden = true; $('#tab-projector').classList.remove('on');
+  if (t.dataset.tab === 'info') ensureReference();
+  if (t.dataset.tab === 'throw' && !$('#throw-calc-frame').getAttribute('src')) $('#throw-calc-frame').src = 'https://avbydave.com/ProjectorThrow/';
+});
 wireTabs($('.pj-sheet-tabs'), 'adjtab', (t) => $(`[data-adjpanel="${t.dataset.adjtab}"]`), (t) => { if (t.dataset.adjtab === 'picture' && adjSlot) loadPicture(); });
 
 function toast(msg, ms = 4000) { if (!$('#adjust').hidden) $('#adj-feedback').textContent = msg; const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), ms); }
@@ -89,6 +96,7 @@ const pill = (st, word) => `<span class="avd-state"><span class="avd-dot avd-dot
 const seg = (label, opts, cur, attrs) => `<div class="avd-seg avd-seg--fill" role="group" aria-label="${esc(label)}">${opts.map(([v, lab]) => `<button class="avd-seg__btn" type="button" aria-pressed="${String(cur) === String(v)}" ${attrs(v)}>${esc(lab)}</button>`).join('')}</div>`;
 
 function renderOverview() {
+  referenceView?.updateLive(state,connected);
   $('[data-all="resetInput"]').disabled = !connected || state.lock || !state.projectors.some((p) => p.inputPreference?.available && p.status?.online && !p.busy);
   const online = state.projectors.filter((p) => p.status?.online).length;
   const assigned = rigLanes(state.projectors).filter((x) => x.projector).length;
@@ -103,6 +111,28 @@ function replyTime(s) {
   const at = s.connection?.lastSuccessAt || (s.online ? s.updatedAt : null);
   return at ? new Date(at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'No successful reply yet';
 }
+// Keep interactive nodes stable through status polls; only changed content is patched.
+function patchControls(current, desired, protectedNode = null) {
+  const before = [...current.childNodes], after = [...desired.childNodes];
+  after.forEach((next,index) => {
+    const old = before[index];
+    if (!old || old.nodeType !== next.nodeType || old.nodeName !== next.nodeName) { if(old)old.replaceWith(next);else current.append(next); return; }
+    if (old.nodeType === 3) { if(old.textContent !== next.textContent)old.textContent=next.textContent; return; }
+    if (old.nodeType !== 1) return;
+    const targetChanged = old._controlIdentity !== next._controlIdentity;
+    const actionChanged = old.dataset.focusKey !== next.dataset.focusKey;
+    const unsafeSelect = old.matches('select') && (old.disabled !== next.disabled || old._inputOptions !== next._inputOptions);
+    if (targetChanged || actionChanged || unsafeSelect) { old.replaceWith(next); return; }
+    if (old === protectedNode) return; // An unchanged, safely editable native menu stays open.
+    for(const attr of [...old.attributes])if(!next.hasAttribute(attr.name))old.removeAttribute(attr.name);
+    for(const attr of [...next.attributes])if(old.getAttribute(attr.name)!==attr.value)old.setAttribute(attr.name,attr.value);
+    for(const event of ['onclick','onpointerdown','onkeydown','onchange','onblur'])old[event]=next[event];
+    if(next._inputOptions!==undefined)old._inputOptions=next._inputOptions;
+    patchControls(old,next,protectedNode);
+    if(old.matches('select,input') && old.value!==next.value)old.value=next.value;
+  });
+  before.slice(after.length).forEach(node=>node.remove());
+}
 function renderGrid() {
   const g = $('#grid');
   const active = document.activeElement;
@@ -111,7 +141,7 @@ function renderGrid() {
   const keepSelect = editing && active.dataset.editing === 'true' && connected && editing.status?.online && !state.lock && !editing.busy && !active.disabled && active._inputOptions === JSON.stringify(Object.entries(editing.inputs || {}));
   const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop;
   const unassignedOpen = g.querySelector('.pj-unassigned')?.open || false;
-  const inputOptionsOpen = new Set([...g.querySelectorAll('details[data-input-options][open]')].map((el) => el.dataset.inputOptions));
+  const inputOptionsOpen = new Set([...document.querySelectorAll('#grid details[data-input-options][open], #projector-controls details[data-input-options][open]')].map((el) => el.dataset.inputOptions));
   const output = document.createElement('div');
   function deviceCard(p, lane = laneOf(p)) {
     const s = p.status || {}; const off = !connected || !s.online; const lock = state.lock;
@@ -127,7 +157,7 @@ function renderGrid() {
     const resetAvailable = preference?.available === true;
 
     const pat = s.pattern ? ((p.patterns || PATTERNS)[s.pattern] || s.pattern) : '—';
-    const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', lane ? projectorName(p) : `Unassigned ${p.label}`);
+    const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card._controlIdentity = JSON.stringify([p.slot,p.driver,p.ip,p.mac]); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', lane ? projectorName(p) : `Unassigned ${p.label}`);
     card.innerHTML = `
       <div class="avd-panel__head"><h2 class="avd-panel__title"><span class="avd-panel__index">${lane ? esc(p.lane) : '—'}</span>${esc(lane ? 'Projector ' + p.lane : p.label)}<span class="avd-dot avd-dot--${st}" aria-hidden="true"></span></h2></div>
       <div class="avd-panel__body">
@@ -140,6 +170,7 @@ function renderGrid() {
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Input</span><span class="avd-readout__value">${esc(s.input ? (p.inputs?.[s.input] || s.input) : '—')}</span></div>
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Light source</span><span class="avd-readout__value">${s.lightHours != null ? esc(s.lightHours) + '<span class="avd-readout__unit">h</span>' : '—'}</span></div>
         </div>
+        ${lane ? `<button class="avd-btn pj-open-projector" type="button" data-open-projector="${esc(p.lane)}">Open ${esc(p.lane)} · controls &amp; info</button>` : ''}
         <div class="pj-health pj-mono"><span>Shutter <strong>${esc(s.shutter || 'Unknown')}</strong></span><span>Alarms <strong>${!alarmKnown ? 'Unavailable' : errs.length ? esc(errs.length + ' reported') : 'None reported'}</strong></span></div>
         <div class="avd-field"><span class="avd-field__label pj-caps">Shutter control</span>
           ${seg(`Shutter, ${lane ? 'Projector ' + p.lane : p.label}`, [['open', 'Open'], ['closed', 'Closed']], s.shutter, (v) => `data-c="shutter" data-a="${v === 'closed' ? 1 : 0}" ${off ? 'disabled' : ''}`)}
@@ -165,15 +196,16 @@ function renderGrid() {
         </div>
         <div class="pj-adjust-links" role="group" aria-label="Details and adjustments"><button class="avd-btn" data-adj="lens" type="button">Lens</button><button class="avd-btn" data-adj="picture" type="button">Picture</button><button class="avd-btn" data-adj="pattern" type="button">Patterns</button></div>
       </div>`;
+    if(card.querySelector('[data-open-projector]'))card.querySelector('[data-open-projector]').onclick = () => openProjector(p.lane);
     card.querySelectorAll('button[data-c]').forEach((b) => b.onclick = () => cmd(p.slot, b.dataset.c, Number(b.dataset.a)));
     card.querySelector('[data-reset-input]').onclick = () => cmd(p.slot, 'resetInput');
     card.querySelectorAll('button[data-p]').forEach((b) => b.onclick = () => cmd(p.slot, 'pattern', b.dataset.p));
     card.querySelectorAll('button[data-adj]').forEach((b) => b.onclick = () => openAdjust(p.slot, b.dataset.adj));
     const sel = card.querySelector('select'); sel._inputOptions = JSON.stringify(inputs);
-    sel.onpointerdown = () => { sel.dataset.editing = 'true'; };
-    sel.onkeydown = (e) => { if (['ArrowDown', 'ArrowUp', ' ', 'Enter'].includes(e.key)) sel.dataset.editing = 'true'; if (e.key === 'Escape') { delete sel.dataset.editing; setTimeout(renderGrid, 0); } };
-    sel.onchange = () => { delete sel.dataset.editing; cmd(p.slot, 'input', sel.value); setTimeout(renderGrid, 0); };
-    sel.onblur = () => { delete sel.dataset.editing; setTimeout(renderGrid, 0); };
+    sel.onpointerdown = (e) => { e.currentTarget.dataset.editing = 'true'; };
+    sel.onkeydown = (e) => { if (['ArrowDown', 'ArrowUp', ' ', 'Enter'].includes(e.key)) e.currentTarget.dataset.editing = 'true'; if (e.key === 'Escape') { delete e.currentTarget.dataset.editing; setTimeout(renderGrid, 0); } };
+    sel.onchange = (e) => { delete e.currentTarget.dataset.editing; cmd(p.slot, 'input', e.currentTarget.value); setTimeout(renderGrid, 0); };
+    sel.onblur = (e) => { delete e.currentTarget.dataset.editing; setTimeout(renderGrid, 0); };
     card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = el.hasAttribute('data-reset-input') ? `${p.slot}:reset-input` : `${p.slot}:${n}`; });
     return card;
   }
@@ -186,8 +218,9 @@ function renderGrid() {
     card.innerHTML = `<div class="avd-panel__head"><h2 class="avd-panel__title"><span class="avd-panel__index">${lane}</span>Projector ${lane}</h2></div>
       <div class="avd-panel__body"><div class="pj-lane"><h3>${esc(info.target)}</h3><span class="pj-mono">${esc(info.role)} · ${esc(info.orientation)}</span></div>
       ${pill('idle', conflict ? 'Assignment conflict' : 'Unassigned')}<p class="pj-mono">${conflict ? 'More than one device uses this lane. Check Setup.' : 'No device assigned to this position.'}</p>
-      <button class="avd-btn" type="button" data-focus-key="lane:${lane}:setup">Open Setup</button></div>`;
-    card.querySelector('button').onclick = () => { $('[data-tab="setup"]').click(); $('[data-tab="setup"]').focus(); };
+      <button class="avd-btn" type="button" data-open-projector="${lane}" data-focus-key="lane:${lane}:info">Open ${lane} · info</button><button class="avd-btn" type="button" data-open-setup data-focus-key="lane:${lane}:setup">Open Configuration</button></div>`;
+    card.querySelector('[data-open-projector]').onclick = () => openProjector(lane);
+    card.querySelector('[data-open-setup]').onclick = () => { $('[data-tab="setup"]').click(); $('[data-tab="setup"]').focus(); };
     output.appendChild(card);
   }
   const unassigned = state.projectors.filter((p) => !bound.has(p));
@@ -200,40 +233,101 @@ function renderGrid() {
   const nextSelect = [...output.querySelectorAll('select[data-c="input"]')].find(node => node.closest('[data-slot]')?.dataset.slot === editing?.slot);
   const pathTo = (node, root) => { const path = []; while (node && node !== root) { path.unshift([...node.parentNode.childNodes].indexOf(node)); node = node.parentNode; } return node === root ? path.join('.') : null; };
   const retained = keepSelect && nextSelect && pathTo(active, g) === pathTo(nextSelect, output);
-  if (retained) {
-    const patch = (current, desired) => {
-      const before = [...current.childNodes], after = [...desired.childNodes];
-      after.forEach((next, index) => {
-        const old = before[index];
-        if (old === active) return; // Never detach or repopulate an open native menu.
-        if (old?.nodeType === 1 && old.contains(active)) {
-          for (const attr of [...old.attributes]) if (!next.hasAttribute(attr.name)) old.removeAttribute(attr.name);
-          for (const attr of [...next.attributes]) old.setAttribute(attr.name, attr.value);
-          patch(old, next);
-        } else if (old) old.replaceWith(next);
-        else current.append(next);
-      });
-      before.slice(after.length).forEach(node => node.remove());
-    };
-    patch(g, output);
-  } else g.replaceChildren(...output.childNodes);
+  patchControls(g,output,retained ? active : null);
+  if (selectedDetailLane) {
+    const selected = rigLanes(state.projectors).find(item => item.lane === selectedDetailLane)?.projector;
+    if (selected) {
+      const detailCard = deviceCard(selected); detailCard.classList.remove('pj-tile'); detailCard.classList.add('pj-detail-controls');
+      detailCard.querySelector('[data-open-projector]')?.remove();
+      updateDetailControls(detailCard);
+    } else {
+      $('#projector-controls').innerHTML = '<div class="pj-device-note"><h3>No assigned live device</h3><p>This lane remains available for recorded gear and planning information. Controls become available after a unique device is assigned in Configuration.</p></div>';
+    }
+    renderDisplayInfo(selected);
+  }
   g.scrollTop = scroll;
   if (focusKey && !retained) [...g.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === focusKey)?.focus({ preventScroll: true });
 }
+function updateDetailControls(card) {
+  const host = $('#projector-controls'), active = document.activeElement, key = host.contains(active) ? active.dataset.focusKey : null;
+  const desired = document.createElement('div'); desired.append(card);
+  const p = state.projectors.find(item => item.slot === card.dataset.slot);
+  const keep = host.contains(active) && active.matches('select[data-c="input"]') && active.dataset.editing === 'true' && connected && p?.status?.online && !state.lock && !p.busy && active._inputOptions === JSON.stringify(Object.entries(p.inputs || {}));
+  const path = (node, root) => { const out = []; while (node && node !== root) { out.unshift([...node.parentNode.childNodes].indexOf(node)); node = node.parentNode; } return node === root ? out.join('.') : null; };
+  const next = card.querySelector('select[data-c="input"]');
+  const retain = keep && path(active,host) === path(next,desired);
+  patchControls(host,desired,retain ? active : null);
+  if(key&&!retain)[...host.querySelectorAll('[data-focus-key]')].find(node=>node.dataset.focusKey===key)?.focus({preventScroll:true});
+}
+async function ensureReference() {
+  if (referenceView) return referenceView;
+  try { referenceView = await mountReference($('#reference-view'), {dataUrl:'./workspace/projectors.json',onProjectorSelect:openProjector}); referenceView.updateLive(state,connected); }
+  catch(error){$('#reference-view').textContent=error.message;}
+  return referenceView;
+}
+function openProjector(lane) {
+  if (!Object.hasOwn(LANES,lane)) return;
+  $('#tab-btn-rig').click(); selectedDetailLane=lane;
+  $('#tab-rig').hidden=true;$('#tab-rig').classList.remove('on');
+  const detail=$('#tab-projector');detail.hidden=false;detail.classList.add('on');detail.dataset.lane=lane;
+  $('#projector-detail-title').textContent=`${lane} · ${LANES[lane].target}`;
+  document.querySelectorAll('[data-detail-lane]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.detailLane===lane)));
+  renderGrid();renderProjectorInfo();$('#projector-detail-title').focus();
+}
+function renderProjectorInfo() {
+  const lane=selectedDetailLane;if(!lane)return;
+  const item=referenceData?.projectors.find(item=>item.lane===lane);
+  $('#projector-static-info').innerHTML=item?`<h3>Recorded gear &amp; planning</h3><p>${esc(item.note)}</p><div class="fr-gear-grid">${referenceGearHTML(referenceData,lane)}</div>`:'<p>Loading recorded gear reference…</p>';
+}
+function reportedValue(value) { return value == null || value === '' ? 'Unavailable' : typeof value === 'object' ? JSON.stringify(value) : String(value); }
+function renderDisplayInfo(p) {
+  const info=p?.displayInfo?.scope==='projector'?p.displayInfo:null;
+  const status=p?.status||{};
+  const input=info?.input || (status.input!=null ? {state:connected&&status.online?'reported':'offline',value:status.input,label:p.inputs?.[status.input]||status.input,observedAt:status.connection?.lastSuccessAt||status.updatedAt} : null),signal=info?.signal,edid=info?.edid;
+  const field=(label,data,fallback)=>{const stale=!connected||data?.state==='offline';return `<div><dt>${label}</dt><dd>${esc(data?.value!=null ? (data.label || reportedValue(data.value)) : fallback)}<br><span class="pj-mono">${esc(stale&&data?.value!=null?'Last known · ': '')}${esc(data?.state || (p?'unsupported':'unassigned'))}${data?.observedAt?' · '+esc(new Date(data.observedAt).toLocaleString()):''}</span></dd></div>`;};
+  $('#projector-display-info').innerHTML=`<dl>${field('Reported input',input,'No input reported')}${field('Driver signal readout',signal,'Signal information unavailable')}<div><dt>Projector EDID</dt><dd>${esc(edid?.state==='reported'&&edid.value!=null?reportedValue(edid.value):edid?.reason||(p?'EDID is not read by this driver.':'No device is assigned to this lane; projector EDID is unavailable.'))}<br><span class="pj-mono">${esc(edid?.state||(p?'unsupported':'unassigned'))} · projector scope</span></dd></div></dl><p class="pj-detail-unavailable">Input names and signal readings are separate from EDID. No resolution or EDID is inferred from the selected input.</p>`;
+}
+$('#projector-back').onclick=()=>$('#tab-btn-rig').click();
+document.querySelectorAll('[data-detail-lane]').forEach(button=>button.onclick=()=>openProjector(button.dataset.detailLane));
+$('#host-displays-load').onclick=async()=>{
+  const output=$('#host-display-results');output.textContent='Reading relay computer display records…';
+  try{const response=await fetch('/api/host-displays',{cache:'no-store',signal:AbortSignal.timeout(10000)});if(response.status===401){location.href='/login.html';return;}const data=await response.json();if(!response.ok||data.scope!=='relay-computer')throw Error(data.reason||'Computer display information unavailable.');output.innerHTML=`<p class="pj-mono">${esc(data.state)} · ${esc(data.reason||'OS records only; no projector assignment implied.')}</p>${(data.displays||[]).map(display=>`<article><strong>${esc(display.name||display.id)}</strong><p>${esc(reportedValue(display.resolution))} · ${esc(display.connection||'Connection unknown')}</p><p class="pj-mono">EDID ${esc(display.edid?.state||'unavailable')} · unassigned to A–D</p></article>`).join('')}`;}catch(error){output.textContent=error.message;}
+};
+window.addEventListener('projctl:navigate',event=>{const {panel,projector}=event.detail||{};if(!['home','notes','info','rig','stage','presets','log','setup','throw'].includes(panel))return;document.querySelector(`#tab-btn-${panel}`)?.click();if(projector&&Object.hasOwn(LANES,projector))openProjector(projector);});
+
 function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); return p && laneOf(p) ? `${slot} · ${p.lane} / ${laneOf(p).target}` : slot; }
+const presetResults = new Map(), presetConfirmations = new Map();
 function renderPresets() {
   const el = $('#presets'); el.innerHTML = '';
   if (!state.presets.length) el.innerHTML = '<p class="pj-mono">No presets yet. Set the rig how you want it, name it, save.</p>';
-  for (const pr of state.presets) {
-    const d = document.createElement('div'); d.className = 'pj-item';
-    const sum = Object.entries(pr.perSlot).map(([k, v]) => `${slotName(k)}: ${v.power ? 'on' : 'off'}, ${v.shutter}, ${v.input ?? ''}`).join(' · ');
-    d.innerHTML = `<span class="name">${esc(pr.name)}</span><button class="avd-btn" data-r type="button">Recall, tap twice</button><button class="avd-btn avd-btn--danger" data-d type="button">Remove preset</button><span class="sum pj-mono">${esc(sum)}</span>`;
+  for (const preset of state.presets) {
+    const hasLens = Object.values(preset.perSlot).some(want => want.lens && Object.keys(want.lens).length);
+    const node = document.createElement('div'); node.className = 'pj-item'; node.dataset.preset = preset.name;
+    const summary = Object.entries(preset.perSlot).map(([slot,want]) => {
+      const projector = state.projectors.find(p=>p.slot===slot);
+      const axes = Object.entries(want.lens||{}).map(([axis,value])=>`${axis}: ${value}`).join(' · ');
+      const lens = projector?.capabilities?.lensRecall ? axes || 'No absolute lens position stored' : 'Absolute lens recall unsupported / not stored';
+      return `<span class="pj-preset-slot"><strong>${esc(slotName(slot))}</strong> · ${want.power?'on':'off'} · ${esc(want.shutter)} · ${esc(want.input??'input unknown')}<br><span class="pj-mono">${esc(lens)}</span></span>`;
+    }).join('');
+    const output = presetResults.get(preset.name);
+    node.innerHTML = `<strong class="name">${esc(preset.name)}</strong><button class="avd-btn" type="button" data-recall ${!connected||state.lock?'disabled':''}>${presetConfirmations.has(preset.name)?'Confirm lens recall':'Recall'}</button><button class="avd-btn avd-btn--danger" type="button" data-delete>Remove preset</button><div class="sum">${summary}</div>${hasLens?'<p class="pj-mono pj-note">Lens recall requires a separate confirmation. Readbacks report position matching separately from motor state; alignment and focus still need checking.</p>':''}<p class="pj-mono" role="status">${esc(output||'')}</p>`;
     let armed = 0;
-    d.querySelector('[data-r]').onclick = () => { if (Date.now() - armed > 3000) { armed = Date.now(); toast(`Tap again within 3 s to recall ${pr.name}`); return; } armed = 0; api('preset/recall', { name: pr.name }).then((r) => toast(Object.entries(r).map(([k, v]) => `${k} ${v}`).join(' · '), 3500)).catch((e) => toast(e.message)); };
-    d.querySelector('[data-d]').onclick = () => api('preset/delete', { name: pr.name }).catch((e) => toast(e.message));
-    el.appendChild(d);
+    node.querySelector('[data-recall]').onclick = async () => {
+      if (!connected || state.lock) return;
+      if (!hasLens && Date.now()-armed>3000) { armed=Date.now();toast(`Tap again within 3 s to recall ${preset.name}`);return; }
+      const token=presetConfirmations.get(preset.name);
+      try {
+        const response=await api('preset/recall',{name:preset.name,...(token?{confirmLens:token}:{})});
+        if(response.confirm){presetConfirmations.set(preset.name,response.confirm);presetResults.set(preset.name,response.message||'Confirm the lens recall to send movement commands.');}
+        else{presetConfirmations.delete(preset.name);const results=response.projectors||response;presetResults.set(preset.name,Object.entries(results).map(([slot,result])=>`${slotName(slot)}: ${typeof result==='string'?result:JSON.stringify(result)}`).join(' · '));}
+        armed=0;renderPresets();
+      }catch(error){presetConfirmations.delete(preset.name);presetResults.set(preset.name,error.message);renderPresets();}
+    };
+    node.querySelector('[data-delete]').onclick=()=>api('preset/delete',{name:preset.name}).then(()=>{presetResults.delete(preset.name);presetConfirmations.delete(preset.name);}).catch(error=>toast(error.message));
+    el.append(node);
   }
 }
+
 function renderLog() {
   const tb = $('#log tbody'); tb.innerHTML = '';
   const query = $('#log-search').value.toLowerCase();
@@ -301,7 +395,7 @@ function closeAdjust() {
   const slot = adjSlot, section = adjReturnSection;
   $('#adjust').close(); $('#adjust').hidden = true; adjSlot = null;
   pictureRequestId++; $('#adj-picture').replaceChildren(); $('#adj-pic-note').textContent = '';
-  const card = [...$('#grid').querySelectorAll('[data-slot]')].find((el) => el.dataset.slot === slot);
+  const card = [...$(selectedDetailLane ? '#projector-controls' : '#grid').querySelectorAll('[data-slot]')].find((el) => el.dataset.slot === slot);
   const currentTrigger = card?.querySelector(`[data-adj="${section}"]:not(:disabled)`);
   const originalTrigger = adjReturnFocus?.isConnected && adjReturnFocus.matches('button:not(:disabled), [role="button"]') ? adjReturnFocus : null;
   (currentTrigger || originalTrigger || card?.querySelector('[data-adj]:not(:disabled)') || $('#tab-btn-rig')).focus();
@@ -429,7 +523,7 @@ function connect() {
     }
     else if (!connected) return;
     else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') markAlive(); }
-    else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputPreference !== undefined) p.inputPreference = msg.inputPreference; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
+    else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.displayInfo !== undefined) p.displayInfo = msg.displayInfo; if (msg.inputPreference !== undefined) p.inputPreference = msg.inputPreference; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
     else if (msg.type === 'busy' && typeof msg.slot === 'string') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); }
     else if (msg.type === 'event' && msg.event && typeof msg.event === 'object') { markAlive(); state.events.push(msg.event); if (state.events.length > 200) state.events.shift(); renderLog(); }
   };

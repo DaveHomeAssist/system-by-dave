@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { stagePackagedVenue, applyPackagedVenue } from './venue-update.js';
-import { servicePaths, servicePlist, launcherText, assertSavedRig, snapshotSettingsAfterStop } from './service-tools.js';
+import { withAuthEnvironment, servicePaths, servicePlist, launcherText, assertSavedRig, snapshotSettingsAfterStop } from './service-tools.js';
 
 if (process.platform !== 'darwin') throw new Error('This installer requires macOS launchd.');
 const existing = fs.realpathSync(process.argv[2] || '');
@@ -32,7 +32,7 @@ let env = {};
 if (fs.existsSync(paths.plist)) {
   env = JSON.parse(run('plutil', ['-convert', 'json', '-o', '-', paths.plist])).EnvironmentVariables || {};
 }
-if (Object.hasOwn(process.env, 'PJ_PASSCODE')) env.PJ_PASSCODE = process.env.PJ_PASSCODE;
+env = withAuthEnvironment(env, process.env);
 const port = process.env.PROJCTL_PORT || env.PORT || '8080';
 if (!/^\d+$/.test(port) || Number(port) < 1 || Number(port) > 65535) throw new Error('Invalid relay port.');
 const url = `http://localhost:${port}`;
@@ -44,9 +44,9 @@ for (const pid of pids) {
   const command = run('ps', ['-p', pid, '-o', 'command=']).trim();
   if (![path.join(existing, 'server/index.js'), path.join(paths.app, 'server/index.js')].some(p => command.endsWith(p))) throw new Error('The relay port belongs to another application. No changes made.');
 }
-if (pids.length && !fs.existsSync(paths.plist) && !Object.hasOwn(process.env, 'PJ_PASSCODE')) {
+if (pids.length && !fs.existsSync(paths.plist) && !Object.hasOwn(process.env, 'PJ_PASSCODE') && !Object.hasOwn(process.env, 'PROJCTL_PASSWORD')) {
   const response = await fetch(`${url}/api/state`, { signal: AbortSignal.timeout(3000) });
-  if (response.status === 401) throw new Error('Existing relay requires login but has no saved service configuration. Preserve its PJ_PASSCODE before installing.');
+  if (response.status === 401) throw new Error('Existing relay requires login but has no saved service configuration. Preserve its configured control password before installing.');
 }
 const next = path.join(paths.root, `app-next-${process.pid}`);
 fs.mkdirSync(paths.root, { recursive: true, mode: 0o700 });

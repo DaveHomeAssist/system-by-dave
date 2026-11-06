@@ -24,3 +24,14 @@ test('room groups preserve stage floor and can be restored without affecting pro
  layers.set('balcony',false);assert.equal(nodes[2].visible,false);assert.equal(nodes[4].visible,false);assert.equal(nodes[3].visible,true);
  layers.show(false);assert.equal(root.visible,false);layers.restore();assert.equal(nodes.every(node=>node.visible),true);
 });
+
+test('Coverage cutaway hides every seat family without changing retained layer choices', async () => {
+ const {createRoomLayers,roomLayerNames}=await import('../public/stage-visibility.js');
+ assert.deepEqual(roomLayerNames('Lower_mezzanine_center_A_1'),['seats','balcony']);
+ const nodes=['Room','Orchestra center A 101','Lower mezzanine center A 1','Stage deck'].map(name=>({name,userData:{},visible:true,parent:null}));
+ const root=nodes[0];root.traverse=visit=>nodes.forEach(visit);nodes.slice(1).forEach(node=>node.parent=root);
+ const layers=createRoomLayers(root);layers.cutawayForCamera(['seats']);
+ assert.equal(layers.enabled.seats,true);assert.equal(nodes[1].visible,false);assert.equal(nodes[2].visible,false);assert.equal(nodes[3].visible,true);
+ layers.cutawayForCamera([]);assert.equal(nodes.every(node=>node.visible),true);
+ layers.set('seats',false);layers.cutawayForCamera(['seats']);layers.cutawayForCamera([]);assert.equal(nodes[1].visible,false);
+});

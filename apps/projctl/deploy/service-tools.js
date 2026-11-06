@@ -8,6 +8,17 @@ export function servicePaths(home) {
     plist: path.join(home, 'Library', 'LaunchAgents', 'com.avbydave.projctl.plist'),
     launcher: path.join(home, 'Applications', 'Open Projctl.command') };
 }
+// Preserve existing private configuration unless an operator explicitly supplies
+// one password variable. A new choice replaces the alias, avoiding two authorities.
+export function withAuthEnvironment(previous, supplied) {
+  const next = { ...previous };
+  const key = Object.hasOwn(supplied, 'PROJCTL_PASSWORD') ? 'PROJCTL_PASSWORD' : Object.hasOwn(supplied, 'PJ_PASSCODE') ? 'PJ_PASSCODE' : null;
+  if (key) {
+    delete next.PROJCTL_PASSWORD; delete next.PJ_PASSCODE;
+    next[key] = supplied[key];
+  }
+  return next;
+}
 export function xml(value) { return String(value).replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[c])); }
 export function servicePlist({ node, app, log, env }) {
   const pair = (k, v) => `<key>${xml(k)}</key><string>${xml(v)}</string>`;

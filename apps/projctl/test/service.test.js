@@ -79,3 +79,12 @@ test('relay heartbeat continues independently of projector commands', async t =>
   await until(() => messages.some(m => m.type === 'heartbeat'), 7000);
   assert.ok(messages.find(m => m.type === 'heartbeat').at);
 });
+
+
+test('an explicit password update replaces its alias while an ordinary update preserves private auth', async () => {
+  const { withAuthEnvironment } = await import('../deploy/service-tools.js');
+  const old = { PROJCTL_PASSWORD: 'old-fixture', PORT: '8080' };
+  assert.deepEqual(withAuthEnvironment(old, {}), old);
+  assert.deepEqual(withAuthEnvironment(old, { PJ_PASSCODE: 'new-fixture' }), { PJ_PASSCODE: 'new-fixture', PORT: '8080' });
+  assert.deepEqual(withAuthEnvironment({ PJ_PASSCODE: 'legacy' }, { PROJCTL_PASSWORD: 'new-fixture' }), { PROJCTL_PASSWORD: 'new-fixture' });
+});

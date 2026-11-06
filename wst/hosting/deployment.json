@@ -1,12 +1,15 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "9f941f2b8093f20c0600b54dc88993b22902342b",
-  "deploymentId": "appgdep_6aed79cff6908191986eb9ead4f9db3a",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_949efb72c9cc81919bf269544f64991f",
+  "managedSourceCommit": "ab5f47765c7f86e512fc6148daf8f98d7211187c",
+  "deploymentId": "appgdep_6aed89afa6948191b61dadeb6f08ddde",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_8089b50d3ca48191ab539688020eb790",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
-  "customDomainVerifiedAt": "2026-11-06T05:49:13Z"
+  "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
+  "versionNumber": 15,
+  "acceptedSourceCommit": "70a501e8c63a18fac45497aa2458b0badc49b19d",
+  "publicVerifiedAt": "2026-11-06T08:03:24.145433+00:00"
 }
