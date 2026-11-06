@@ -141,11 +141,13 @@ export function createPowerSchedules({ file, targets, dispatch, guard, now = Dat
       state.lastEvaluatedAt = iso(at); if (work.length || at - lastPersistedAt >= 30000) persist(); // Claims/checkpoint are durable before dispatch; idle writes are bounded.
       for (const { s, due, entry } of work) {
         for (const target of s.targets) {
-          const currentSchedule = state.schedules.find(item => item.id === s.id);
-          let reason = !currentSchedule?.enabled || currentSchedule.revision !== s.revision ? 'Schedule changed, disabled or deleted before dispatch.' : now() - due > maxGapMs ? 'Occurrence is now overdue; skipped without replay.' : !targets().some(p => p.slot === target.slot && p.assigned && p.identity === target.identity) ? 'Projector configuration changed.' : guard(target.slot, s.action);
-          if (reason) { entry.targets[target.slot] = { status: 'skipped', reason }; continue; }
-          try { await dispatch(target.slot, s.action); entry.targets[target.slot] = { status: 'acknowledged' }; }
-          catch (error) { entry.targets[target.slot] = { status: 'failed', reason: String(error.message || 'Command failed').slice(0, 240) }; }
+          const assertSafe = () => {
+            const currentSchedule = state.schedules.find(item => item.id === s.id);
+            const reason = !currentSchedule?.enabled || currentSchedule.revision !== s.revision ? 'Schedule changed, disabled or deleted before dispatch.' : now() - due > maxGapMs ? 'Occurrence is now overdue; skipped without replay.' : !targets().some(p => p.slot === target.slot && p.assigned && p.identity === target.identity) ? 'Projector configuration changed.' : guard(target.slot, s.action);
+            if (reason) throw Object.assign(new Error(reason), { scheduleSkip: true });
+          };
+          try { assertSafe(); await dispatch(target.slot, s.action, assertSafe); entry.targets[target.slot] = { status: 'acknowledged' }; }
+          catch (error) { entry.targets[target.slot] = { status: error.scheduleSkip ? 'skipped' : 'failed', reason: String(error.message || 'Command failed').slice(0, 240) }; }
           persist();
         }
         const outcomes = Object.values(entry.targets).map(t => t.status);

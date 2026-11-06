@@ -8,7 +8,7 @@ const schedule = { name: 'Fixture only', slots: ['P1'], action: 'off', days: [5]
 function harness(t, start = '2026-11-06T16:59:59Z') {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'power-schedule-test-')); t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   let time = Date.parse(start), blocked = '', identity = 'fixture-projector'; const sent = [];
-  const options = { file: path.join(dir, 'schedules.json'), now: () => time, targets: () => [{ slot: 'P1', assigned: true, identity }], guard: () => blocked, dispatch: async (...args) => sent.push(args) };
+  const options = { file: path.join(dir, 'schedules.json'), now: () => time, targets: () => [{ slot: 'P1', assigned: true, identity }], guard: () => blocked, dispatch: async (slot, action) => sent.push([slot, action]) };
   const engine = createPowerSchedules(options); t.after(() => engine.close());
   return { engine, options, sent, set: value => { time = typeof value === 'string' ? Date.parse(value) : value; }, block: value => { blocked = value; }, retarget: () => { identity = 'different-projector'; } };
 }
@@ -67,4 +67,12 @@ test('actual scheduled guard preserves show-lock semantics and rejects unsafe fe
   assert.equal(scheduledPowerGuard(ready, 'on', at), null);
   assert.match(scheduledPowerGuard(ready, 'off', at), /Show lock/);
   for (const patch of [{assigned:false},{online:false},{busy:true},{lastReplyAt:null},{lastReplyAt:new Date(at-16000).toISOString()},{power:'cooling'}]) assert.ok(scheduledPowerGuard({...ready,lock:false,...patch}, 'on', at));
+});
+
+
+test('a queued dispatch rechecks deadline and explicit disable before its write', async t => {
+  const h = harness(t); let queuedGuard;
+  const options = { ...h.options, dispatch: async (slot, action, guard) => { queuedGuard = guard; h.set('2026-11-06T17:00:04Z'); guard(); h.sent.push([slot,action]); } };
+  const engine = createPowerSchedules(options); t.after(() => engine.close()); engine.save(schedule); engine.enable(engine.view().schedules[0].id, true); h.set('2026-11-06T17:00:00Z'); await engine.tick();
+  assert.equal(h.sent.length, 0); assert.ok(queuedGuard); assert.equal(engine.view().schedules[0].lastRun.status, 'skipped'); assert.match(engine.view().schedules[0].lastRun.targets.P1.reason, /overdue/);
 });

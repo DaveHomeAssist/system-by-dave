@@ -155,7 +155,8 @@ const pendingConfirm = confirmations();
 const targetIdentity = (p) => JSON.stringify([p.slot, p.driver, p.ip, p.user, p.password, p.model]);
 
 function fmtArg(a) { return a && typeof a === 'object' ? Object.values(a).join(' ') : String(a); }
-async function command(slot, cmd, arg, source = 'ui') {
+async function command(slot, cmd, arg, source = 'ui', executionGuard) {
+  executionGuard?.();
   const p = store.projector(slot);
   if (!p) throw httpErr(404, `no projector ${slot}`);
   const st = status.get(slot);
@@ -175,14 +176,14 @@ async function command(slot, cmd, arg, source = 'ui') {
   if (moving) { busy.set(slot, 'lens'); broadcast({ type: 'busy', slot, busy: 'lens' }); }
   let result, detail;
   try {
-    if (cmd === 'power') result = await d.power(!!arg);
+    if (cmd === 'power') result = await d.power(!!arg, { guard: executionGuard });
     else if (cmd === 'shutter') result = await d.shutter(!!arg);
     else if (cmd === 'input') result = await d.input(String(arg));
     else if (cmd === 'pattern') { if (!d.pattern) throw httpErr(400, `${slot}: test pattern not supported by ${d.kind} driver`); let code = String(arg); if (d.kind === 'pulse') code = code === '08' ? 'internal:colorbars' : code === '00' ? 'off' : code; result = await d.pattern(code); }
     else if (cmd === 'lens') { if (arg?.op === 'recall') { if (!d.recallLens) throw httpErr(400, `${slot}: absolute lens recall not stored by this driver`); result = await d.recallLens(arg.targets || {}); } else { if (!d.lens) throw httpErr(400, `${slot}: lens not supported by ${d.kind} driver`); result = await d.lens(arg); } }
     else if (cmd === 'picture') { if (!d.picture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`); result = await d.picture(arg.key, arg.value); }
     else throw httpErr(400, `unknown command ${cmd}`);
-  } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw httpErr(502, e.message); }
+  } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw Object.assign(httpErr(502, e.message), { scheduleSkip: !!e.scheduleSkip }); }
   finally { if (moving) { busy.delete(slot); broadcast({ type: 'busy', slot, busy: null }); } }
   store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail });
   broadcast({ type: 'event', event: rig.events.at(-1) });
@@ -200,9 +201,9 @@ try {
       const p = store.projector(slot), st = status.get(slot), connection = connections.get(slot);
       return scheduledPowerGuard({ assigned: !!p?.ip && Object.hasOwn(LANES, p?.lane || ''), online: !!st?.online && connection?.state === 'online', lastReplyAt: connection?.lastSuccessAt, busy: busy.has(slot), lock: rig.lock, power: st?.power }, action, Date.now(), Math.max(15000, POLL_MS * 3));
     },
-    dispatch: async (slot, action) => {
-      try { return await command(slot, 'power', action === 'on', 'schedule'); }
-      catch (error) { throw new Error(connectionError(store.projector(slot) || {}, error)); }
+    dispatch: async (slot, action, guard) => {
+      try { return await command(slot, 'power', action === 'on', 'schedule', guard); }
+      catch (error) { throw Object.assign(new Error(connectionError(store.projector(slot) || {}, error)), { scheduleSkip: !!error.scheduleSkip }); }
     },
     changed: schedules => broadcast({ type: 'powerSchedules', schedules }),
   });

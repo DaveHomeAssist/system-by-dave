@@ -17,7 +17,8 @@ export function simulatorDriver({ name = 'SIM', inputs = ['31', '32'] } = {}) {
       const result = { power, shutter, input, lightHours, name, lens: { ...lens }, pattern, errors: { fan: 0, lamp: 0, temp: 0, cover: 0, filter: 0, other: 0 }, online: true };
       return result;
     },
-    async power(on) {
+    async power(on, { guard } = {}) {
+      guard?.();
       if (on) {
         if (st.power === POWER.COOLING) throw Object.assign(new Error('Unavailable at this time'), { code: 'ERR3' });
         if (st.power === POWER.OFF) { st.power = POWER.WARMING; later(4000, () => { st.power = POWER.ON; }); }
