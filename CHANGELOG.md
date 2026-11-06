@@ -2,6 +2,8 @@
 
 ## 2026-11-06
 
+- The Frozen workspace home is the snow splash: aurora, canvas snow, a staggered Frozen title and frosted destination cards. Routes, the theme toggle and the same-origin CSP stay as they were. Snow and the title reveal pause off Home and do not run when reduced motion is requested.
+
 - Add a guarded per-projector lens workspace with supported Fine/Normal/Coarse steps, explicit focused arrow-key opt-in, release/Stop behavior where supported, readbacks and confirmed rig-preset recall. Show command acknowledgement separately from actual state; fresh confirmed shutters expose only the opposite action, while unknown or stale readings retain explicit choices.
 
 - Report lens verification as unknown when the post-recall status read fails, rather than comparing retained cached positions and showing a false match. Keep rig cards responsive to their actual pane width and contain control labels in narrow views.
