@@ -1,5 +1,6 @@
 import { LANES, laneOf, projectorName, orderedProjectors, rigLanes } from './lanes.js';
 import { createStageView } from './stage-view.js';
+import { createLensWorkspace } from './lens-workspace.js';
 import { lensDirection } from './lens-direction.js';
 import { loadReference, mountReference, referenceGearHTML } from './reference-view.js';
 import { startHeaderClock } from './header-clock.js';
@@ -13,6 +14,13 @@ const dirtySetup = new Set();
 let selectedDetailLane = null, referenceData = null, referenceView = null;
 const referenceReady = loadReference('./workspace/projectors.json').then(data => { referenceData = data; if (selectedDetailLane) renderProjectorInfo(); return data; }).catch(() => null);
 const stageView = createStageView(document.querySelector('#tab-stage'), (slot) => openAdjust(slot), (p) => canPattern(p));
+const lensWorkspace = createLensWorkspace($('#projector-lens-workspace'), {
+  send: (target,arg) => { const current=state.projectors.find(p=>p.slot===target.slot); if(!current||JSON.stringify([current.driver,current.ip,current.mac])!==JSON.stringify([target.driver,target.ip,target.mac]))throw new Error('Projector target changed; select it again.'); return cmd(target.slot,'lens',arg); },
+  onSave: async name => { await api('preset/save',{name}); toast(`Saved rig preset ${name}. Only supported reported lens positions are stored.`); },
+  onRecall: name => recallDetailLensPreset(name),
+  onPresets: () => $('#tab-btn-presets').click(),
+});
+function updateLensWorkspace(){ const p=selectedDetailLane?rigLanes(state.projectors).find(item=>item.lane===selectedDetailLane)?.projector:null;lensWorkspace.update({projector:p,connected,lock:state.lock,active:!!selectedDetailLane,presets:state.presets.map(item=>({...item,confirm:presetConfirmations.get(item.name),result:presetResults.get(item.name)}))}); }
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // Respect saved operator choice; a fresh browser starts in the light theme.
@@ -31,7 +39,7 @@ function wireTabs(list, attr, panelFor, onSelect = () => {}) {
   });
 }
 wireTabs($('.avd-tabs[aria-label="Views"]'), 'tab', (t) => $('#tab-' + t.dataset.tab), t => {
-  selectedDetailLane = null; $('#tab-projector').hidden = true; $('#tab-projector').classList.remove('on');
+  selectedDetailLane = null; updateLensWorkspace(); $('#tab-projector').hidden = true; $('#tab-projector').classList.remove('on');
   if (t.dataset.tab === 'info') ensureReference();
   if (t.dataset.tab === 'throw' && !$('#throw-calc-frame').getAttribute('src')) $('#throw-calc-frame').src = 'https://avbydave.com/ProjectorThrow/';
 });
@@ -45,33 +53,34 @@ async function api(path, body) {
   const j = await r.json(); if (!r.ok) throw new Error(j.error || r.statusText); return j;
 }
 
-async function cmd(slot, c, arg) {
+function commandFeedback(button,phase,message){if(!button)return;clearTimeout(button._feedbackTimer);button.dataset.commandState=phase;button.setAttribute('aria-busy',String(phase==='sending'));button.title=message;if(['acknowledged','error'].includes(phase))button._feedbackTimer=setTimeout(()=>{if(button.dataset.commandState===phase)delete button.dataset.commandState;},2500);}
+async function cmd(slot, c, arg, source) {
   const key = c === 'lens' ? `${slot}:lens:${arg?.op === 'stop' ? 'stop' : 'move'}` : `${slot}:${c}:${JSON.stringify(arg)}`;
   if (!connected) { toast('Relay disconnected. Reconnect before sending commands.'); return false; }
   if (commandsInFlight.has(key)) return;
-  commandsInFlight.add(key);
+  commandsInFlight.add(key);commandFeedback(source,'sending','Sending command; waiting for acknowledgement.');
   if (c === 'lens') { $('#adj-motion').textContent = arg?.op === 'stop' ? 'Stopping lens...' : 'Lens moving. Waiting for stopped feedback...'; renderAdjust(); }
   try {
     const out = await api('command', { slot, cmd: c, arg, confirm: confirmTokens[key] });
     const r = out[slot];
     const errs = Object.entries(out).filter(([, v]) => v.error).map(([k, v]) => `${k}: ${v.error}`);
     if (r?.confirm) {
-      confirmTokens[key] = r.confirm;
+      confirmTokens[key] = r.confirm;commandFeedback(source,'confirmation','Confirmation required; no action sent yet.');
       toast([r.message, ...errs].join(' · '), 3000);
       setTimeout(() => { if (confirmTokens[key] === r.confirm) delete confirmTokens[key]; }, 3000);
       return;
     }
-    delete confirmTokens[key];
+    delete confirmTokens[key];commandFeedback(source,errs.length?'error':'acknowledged',errs.length?errs.join(' · '):'Command acknowledged. Check the live status; acknowledgement is not position verification.');
     if (slot === 'all') toast(Object.entries(out).map(([k, v]) => `${k}: ${v.error || (v.result === 'OK' ? 'command accepted' : v.result)}`).join(' · '), 6000);
     else if (errs.length) toast(errs.join(' · '), 6000);
-    else toast(c === 'lens' ? `${slot}: lens stopped; position refreshed` : `${slot}: command accepted`);
+    else toast(c === 'lens' ? `${slot}: lens command completed; check the reported position and image` : `${slot}: command accepted`);
     if (r?.status) { const p = state.projectors.find((x) => x.slot === slot); if (p) p.status = r.status; }
-    if (c === 'lens') $('#adj-motion').textContent = errs.length ? errs.join(' · ') : 'Lens stopped. Position confirmed by the projector.';
+    if (c === 'lens') $('#adj-motion').textContent = errs.length ? errs.join(' · ') : 'Lens command completed. Check the reported position and image; absolute readback may be unavailable.';
     return !errs.length;
-  } catch (e) { toast(e.message, 6000); if (c === 'lens') $('#adj-motion').textContent = e.message; return false; }
-  finally { commandsInFlight.delete(key); if (c === 'lens' && adjSlot) renderAdjust(); }
+  } catch (e) { commandFeedback(source,'error',e.message);toast(e.message, 6000); if (c === 'lens') $('#adj-motion').textContent = e.message; return false; }
+  finally { commandsInFlight.delete(key); if (c === 'lens') { if(adjSlot)renderAdjust(); updateLensWorkspace(); } }
 }
-document.querySelectorAll('[data-all]').forEach((b) => b.onclick = () => cmd('all', b.dataset.all, b.dataset.all === 'resetInput' ? undefined : b.dataset.all === 'pattern' ? b.dataset.arg : Number(b.dataset.arg)));
+document.querySelectorAll('[data-all]').forEach((b) => b.onclick = () => cmd('all', b.dataset.all, b.dataset.all === 'resetInput' ? undefined : b.dataset.all === 'pattern' ? b.dataset.arg : Number(b.dataset.arg),b));
 
 $('#show-lock').onclick = () => api('lock', { lock: !state.lock }).catch((e) => toast(e.message));
 $('#preset-save').onclick = () => { const n = $('#preset-name').value.trim(); if (!n) return toast('Name the preset first'); api('preset/save', { name: n }).then(() => { $('#preset-name').value = ''; toast(`Saved ${n}`); }).catch((e) => toast(e.message)); };
@@ -124,6 +133,7 @@ function patchControls(current, desired, protectedNode = null) {
     const unsafeSelect = old.matches('select') && (old.disabled !== next.disabled || old._inputOptions !== next._inputOptions);
     if (targetChanged || actionChanged || unsafeSelect) { old.replaceWith(next); return; }
     if (old === protectedNode) return; // An unchanged, safely editable native menu stays open.
+    if(old.hasAttribute('data-command-state'))for(const key of ['data-command-state','aria-busy','title'])if(old.hasAttribute(key))next.setAttribute(key,old.getAttribute(key));
     for(const attr of [...old.attributes])if(!next.hasAttribute(attr.name))old.removeAttribute(attr.name);
     for(const attr of [...next.attributes])if(old.getAttribute(attr.name)!==attr.value)old.setAttribute(attr.name,attr.value);
     for(const event of ['onclick','onpointerdown','onkeydown','onchange','onblur'])old[event]=next[event];
@@ -155,6 +165,9 @@ function renderGrid() {
     const preference = p.inputPreference;
     const preferredLabel = preference?.label || state.preferredInput || 'HDMI';
     const resetAvailable = preference?.available === true;
+    const shutterAt = new Date(s.connection?.lastSuccessAt || s.updatedAt || NaN).getTime();
+    const freshShutter = Number.isFinite(shutterAt) && Date.now()-shutterAt <= Math.max(15000,(state.relay?.pollIntervalMs||5000)*3) && connected && s.online && (!s.connection || s.connection.state === 'online') && ['open','closed'].includes(s.shutter);
+    const shutterActions = freshShutter ? (s.shutter === 'open' ? [['closed','Close shutter']] : [['open','Open shutter']]) : [['open','Open shutter'],['closed','Close shutter']];
 
     const pat = s.pattern ? ((p.patterns || PATTERNS)[s.pattern] || s.pattern) : '—';
     const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card._controlIdentity = JSON.stringify([p.slot,p.driver,p.ip,p.mac]); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', lane ? projectorName(p) : `Unassigned ${p.label}`);
@@ -173,7 +186,7 @@ function renderGrid() {
         ${lane ? `<button class="avd-btn pj-open-projector" type="button" data-open-projector="${esc(p.lane)}">Open ${esc(p.lane)} · controls &amp; info</button>` : ''}
         <div class="pj-health pj-mono"><span>Shutter <strong>${esc(s.shutter || 'Unknown')}</strong></span><span>Alarms <strong>${!alarmKnown ? 'Unavailable' : errs.length ? esc(errs.length + ' reported') : 'None reported'}</strong></span></div>
         <div class="avd-field"><span class="avd-field__label pj-caps">Shutter control</span>
-          ${seg(`Shutter, ${lane ? 'Projector ' + p.lane : p.label}`, [['open', 'Open'], ['closed', 'Closed']], s.shutter, (v) => `data-c="shutter" data-a="${v === 'closed' ? 1 : 0}" ${off ? 'disabled' : ''}`)}
+          ${seg(`Shutter, ${lane ? 'Projector ' + p.lane : p.label}`, shutterActions, null, (v) => `data-c="shutter" data-a="${v === 'closed' ? 1 : 0}" ${off ? 'disabled' : ''}`)}
         </div>
         <div class="pj-two">
           <button class="avd-btn" data-c="power" data-a="1" type="button" ${off || busy || s.power === 'cooling' ? 'disabled' : ''}>Power on</button>
@@ -197,16 +210,16 @@ function renderGrid() {
         <div class="pj-adjust-links" role="group" aria-label="Details and adjustments"><button class="avd-btn" data-adj="lens" type="button">Lens</button><button class="avd-btn" data-adj="picture" type="button">Picture</button><button class="avd-btn" data-adj="pattern" type="button">Patterns</button></div>
       </div>`;
     if(card.querySelector('[data-open-projector]'))card.querySelector('[data-open-projector]').onclick = () => openProjector(p.lane);
-    card.querySelectorAll('button[data-c]').forEach((b) => b.onclick = () => cmd(p.slot, b.dataset.c, Number(b.dataset.a)));
-    card.querySelector('[data-reset-input]').onclick = () => cmd(p.slot, 'resetInput');
-    card.querySelectorAll('button[data-p]').forEach((b) => b.onclick = () => cmd(p.slot, 'pattern', b.dataset.p));
+    card.querySelectorAll('button[data-c]').forEach((b) => b.onclick = (e) => cmd(p.slot, b.dataset.c, Number(b.dataset.a),e.currentTarget));
+    card.querySelector('[data-reset-input]').onclick = (e) => cmd(p.slot, 'resetInput',undefined,e.currentTarget);
+    card.querySelectorAll('button[data-p]').forEach((b) => b.onclick = (e) => cmd(p.slot, 'pattern', b.dataset.p,e.currentTarget));
     card.querySelectorAll('button[data-adj]').forEach((b) => b.onclick = () => openAdjust(p.slot, b.dataset.adj));
     const sel = card.querySelector('select'); sel._inputOptions = JSON.stringify(inputs);
     sel.onpointerdown = (e) => { e.currentTarget.dataset.editing = 'true'; };
     sel.onkeydown = (e) => { if (['ArrowDown', 'ArrowUp', ' ', 'Enter'].includes(e.key)) e.currentTarget.dataset.editing = 'true'; if (e.key === 'Escape') { delete e.currentTarget.dataset.editing; setTimeout(renderGrid, 0); } };
     sel.onchange = (e) => { delete e.currentTarget.dataset.editing; cmd(p.slot, 'input', e.currentTarget.value); setTimeout(renderGrid, 0); };
     sel.onblur = (e) => { delete e.currentTarget.dataset.editing; setTimeout(renderGrid, 0); };
-    card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = el.hasAttribute('data-reset-input') ? `${p.slot}:reset-input` : `${p.slot}:${n}`; });
+    card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = el.hasAttribute('data-reset-input') ? `${p.slot}:reset-input` : el.dataset.c ? `${p.slot}:${el.dataset.c}:${el.dataset.a||''}` : el.dataset.p ? `${p.slot}:pattern:${el.dataset.p}` : el.dataset.adj ? `${p.slot}:adjust:${el.dataset.adj}` : el.dataset.openProjector ? `${p.slot}:info` : `${p.slot}:${n}`; });
     return card;
   }
   const bound = new Set();
@@ -245,6 +258,7 @@ function renderGrid() {
     }
     renderDisplayInfo(selected);
   }
+  updateLensWorkspace();
   g.scrollTop = scroll;
   if (focusKey && !retained) [...g.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === focusKey)?.focus({ preventScroll: true });
 }
@@ -297,6 +311,16 @@ window.addEventListener('projctl:navigate',event=>{const {panel,projector}=event
 
 function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); return p && laneOf(p) ? `${slot} · ${p.lane} / ${laneOf(p).target}` : slot; }
 const presetResults = new Map(), presetConfirmations = new Map();
+async function recallDetailLensPreset(name){
+  if(!connected||state.lock)throw new Error('Connect and disable show lock before recalling lenses.');
+  const preset=state.presets.find(item=>item.name===name),p=rigLanes(state.projectors).find(item=>item.lane===selectedDetailLane)?.projector;
+  if(!p||!preset?.perSlot?.[p.slot]?.lens)throw new Error('No stored lens positions for the selected unit.');
+  const token=presetConfirmations.get(name);
+  try{const response=await api('preset/recall',{name,...(token?{confirmLens:token}:{})});if(response.confirm){presetConfirmations.set(name,response.confirm);presetResults.set(name,response.message||'Confirm the rig lens recall to send movement commands.');}else{presetConfirmations.delete(name);presetResults.set(name,Object.entries(response.projectors||response).map(([slot,result])=>`${slotName(slot)}: ${typeof result==='string'?result:JSON.stringify(result)}`).join(' · '));}}
+  catch(error){presetConfirmations.delete(name);presetResults.set(name,error.message);throw error;}
+  finally{renderPresets();updateLensWorkspace();}
+}
+
 function renderPresets() {
   const el = $('#presets'); el.innerHTML = '';
   if (!state.presets.length) el.innerHTML = '<p class="pj-mono">No presets yet. Set the rig how you want it, name it, save.</p>';
