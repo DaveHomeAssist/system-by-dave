@@ -243,3 +243,4 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 #tab-rig>.pj-overview{padding-block:0}
 @media(max-width:600px){.pj-selected-dock .pj-lens-optics{grid-template-columns:1fr}}
 #tab-rig.on{gap:8px}.pj-summary-select{gap:0;padding-block:4px}.pj-selected-dock .pj-lens-workspace{padding-block:8px}.pj-selected-dock .pj-lens-details>summary,.pj-secondary-controls summary{min-height:44px}.pj-selected-dock .pj-lens-keyboard-row button{font-size:11px}
+.pj-summary-state{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.pj-summary-state.has-alarms{color:var(--state-blocked);font-weight:700}
