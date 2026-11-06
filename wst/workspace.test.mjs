@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-const source = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8').split('let currentTasks = []')[0];
 function boot({ failStorage = false, initial = '' } = {}) {
   const elements = Object.fromEntries(['#notes', '#save-status', '#theme', '#export'].map(id => [id, { value: '', listeners: {}, addEventListener(event, fn) { this.listeners[event] = fn; }, setAttribute(name, value) { this[name] = value; } }]));
   const saved = new Map([['wst.frozen.personal-notes.v1', initial]]), links = [], listeners = {};

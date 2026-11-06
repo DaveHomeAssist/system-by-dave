@@ -1,11 +1,18 @@
-# Frozen workspace frontend
+# Frozen workspace
 
-Follow-on source slice for `wst.housevideo.app`. No domain or hosted backend is configured by this change.
+Live managed deployment: https://wst-frozen.davein4k.chatgpt.site
+Requested custom hostname: https://wst.housevideo.app (DNS/TLS pending at this receipt).
 
-Personal notes autosave only in this browser's `wst.frozen.personal-notes.v1` localStorage key. The visible notice explains device/origin scope, clearing-site-data loss and text export. They are never uploaded. Private cross-device synchronization is deferred, not a project-wide storage policy.
+Personal notes autosave only in this browser/origin under `wst.frozen.personal-notes.v1`, with text export and storage-failure recovery. They never enter the task API. Clearing browser site data loses local notes; notes at the temporary hostname do not automatically transfer to the custom hostname. Private cross-device notes are deferred, not a project-wide storage policy.
 
-Team tasks are explicitly not connected. Do not label browser-local task data as shared. Dave's current access decision is that anyone opening the page may view and update shared tasks without sign-in. Do not add existing private notes or expose the projector controller.
+Team tasks are public by Dave's explicit choice: anyone opening the page can view, add, edit, complete and delete. D1 stores tasks separately. The API caps text at 500 characters, request JSON at 2KB, total tasks at 200, and writes per IP per Worker isolate at 30/minute. The isolate limiter is a modest abuse safeguard, not a global quota. Revision checks reject lost updates. No projector endpoints, existing private data or account credentials are included.
 
-Smallest hosted follow-up: deploy the same frontend and a public task API with Sites Worker/D1, preserving this repository as source and recording the exact deployment source. D1 tasks need ID, text, completion, revision and timestamps; enforce text/body limits, bounded result count, write rate limit and optimistic revision checks. No personal-notes API. Apply schema migrations outside request handling. The Sites custom-domain tool returns the CNAME and validation records for the existing Namecheap DNS owner; no apex or other housevideo routes need changing.
+## Source and release
 
-Verify API persistence across visitors, conflict behavior, malformed/oversized requests and write throttling before calling team tasks complete. Then confirm public domain HTTPS and browser rendering. Local verification: `node --test wst/workspace.test.mjs`. Browser layout and actual downloads remain to be verified.
+This GitHub directory retains the frontend and the exact managed source snapshot in `hosting/`. The Sites hosting repository is a deployment mirror, not a separate feature authority. `hosting/deployment.json` records the managed commit and successful deployment. Update source here first, synchronize the managed repository via the Sites helper and record the resulting receipt. Do not create another Site: reuse `.openai/hosting.json` project ID. Generated single-file Worker contains embedded frontend assets; keep these synchronized with the three files in this directory before release. `hosting/drizzle` owns schema migrations, never apply schema changes in request handling.
+
+The managed Worker/D1 service is separate from GitHub Pages and existing FMP services. DNS adds only the requested WST hostname; housevideo.app and walk.housevideo.app stay unchanged.
+
+## Verification
+
+`node --test wst/workspace.test.mjs` verifies local notes recovery/export without networking. Built Worker validation: `cd wst/hosting && bash scripts/build.sh && node scripts/validate-artifact.mjs`. Production API acceptance passed with independent clients: create/read/update, stale-write 409, oversized-text 400, cross-origin-write 403, delete and absence after deletion. All synthetic tasks removed. Browser visual/layout and download acceptance remain pending.
