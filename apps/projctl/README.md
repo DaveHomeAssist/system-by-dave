@@ -229,3 +229,12 @@ strings are limited to 160 characters. Unsupported versions and missing lanes
 are rejected. Unknown fields are discarded, including any slot, command or
 network address. The synthetic example in `test/stage-fixture.js` illustrates the
 format without publishing venue data. Keep the original plot as the authority.
+
+## Stage scenario planning
+
+Stage offers a local What-if planning mode for independent A/B/C/D lens, throw,
+raster, orientation, position and shift studies. It uses canonical Throwline
+optics while retaining the loaded plot as reference. Planning changes stay in
+the browser tab and send no device or settings writes. See
+[planning boundaries and D lens study](docs/stage-planning.md). An unregistered
+private room remains a separate appearance reference without planning overlays.
