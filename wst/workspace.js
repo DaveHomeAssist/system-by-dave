@@ -1,3 +1,5 @@
+const LOCAL_CONTROLLER = !['wst.housevideo.app','wst-frozen.davein4k.chatgpt.site'].includes(location.hostname);
+const TASK_BASE = LOCAL_CONTROLLER ? 'https://wst.housevideo.app' : '';
 const NOTE_KEY = 'wst.frozen.personal-notes.v1';
 const THEME_KEY = 'wst.frozen.theme.v1';
 const notes = document.querySelector('#notes');
@@ -49,7 +51,7 @@ window.addEventListener('beforeunload', event => {
 let currentTasks = [];
 const feedback = document.querySelector('#task-feedback');
 async function taskAPI(path = '', data) {
- const response = await fetch('/api/tasks' + path, {method:data ? 'POST':'GET', headers:data ? {'Content-Type':'application/json'}:{}, body:data ? JSON.stringify(data):undefined, cache:'no-store'});
+ const response = await fetch(TASK_BASE + '/api/tasks' + path, {method:data ? 'POST':'GET', headers:data ? {'Content-Type':'application/json'}:{}, body:data ? JSON.stringify(data):undefined, cache:'no-store'});
  const result = await response.json(); if(!response.ok) throw Error(result.error || 'Task request failed.'); return result;
 }
 function renderTasks() {
@@ -72,22 +74,26 @@ document.querySelector('#refresh').onclick=loadTasks;loadTasks();setInterval(()=
 const clock = document.querySelector('#clock');
 function tick(){clock.textContent = new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date());clock.dateTime=new Date().toISOString();}tick();setInterval(tick,1000);
 
-const controlAccess=document.querySelector('#control-access');
-document.querySelector('#open-control').addEventListener('click',async()=>{
- controlAccess.showModal();
- try{const response=await fetch('/workspace-config.json',{cache:'no-store'});if(!response.ok)return;const config=await response.json();if(!config.control?.verified||!config.control.url)return;const url=new URL(config.control.url);if(!['http:','https:'].includes(url.protocol)||url.username||url.password)return;const link=document.querySelector('#control-link');link.href=url.href;link.hidden=false;document.querySelector('#control-status').textContent=config.control.label||'Theatre controller';document.querySelector('#control-guidance').textContent=config.control.guidance||'Opens the separately protected theatre controller in a new tab.';}catch{/* Keep the explicit setup state; never substitute this browser’s localhost. */}
-});
-document.querySelector('#close-control').addEventListener('click',()=>controlAccess.close());
-controlAccess.addEventListener('close',()=>document.querySelector('#open-control').focus());
-
 const projectorInfo=document.querySelector('#projector-info'),workspacePanels=document.querySelector('#workspace-panels');
-function showSection(info){projectorInfo.hidden=!info;workspacePanels.hidden=info;for(const [id,active] of [['#show-workspace',!info],['#show-projectors',info]]){const el=document.querySelector(id);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');}if(info)document.querySelector('#projector-info-title').focus();}
+function showSection(info){document.querySelector('#relay-panel').hidden=true;projectorInfo.hidden=!info;workspacePanels.hidden=info;for(const [id,active] of [['#show-workspace',!info],['#show-projectors',info]]){const el=document.querySelector(id);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');}if(info)document.querySelector('#projector-info-title').focus();}
 document.querySelector('#show-workspace').onclick=()=>showSection(false);
 document.querySelector('#show-projectors').onclick=()=>showSection(true);
 async function renderProjectorReference(){
-const response=await fetch('/projectors.json',{cache:'no-store'});if(!response.ok)throw Error('Projector reference unavailable.');const {projectors:projectionReference}=await response.json();
+const response=await fetch(new URL('projectors.json',import.meta.url),{cache:'no-store'});if(!response.ok)throw Error('Projector reference unavailable.');const {projectors:projectionReference}=await response.json();
 
 for(const p of projectionReference){const card=document.createElement('article');card.className='projector-card';card.style.setProperty('--lane',p.color);const h=document.createElement('h3');h.textContent='Projector '+p.lane;const position=document.createElement('span');position.textContent=p.position;h.append(position);const model=document.createElement('h4');model.textContent=p.model;const dl=document.createElement('dl');for(const [label,value] of [['Position',p.position],['Orientation',p.orientation],['Installed lens',p.lens],['Lens evidence',p.provenance.lens],...(p.image?[['Image',p.image],['Lens to surface',p.throwDistance],['Candidate lens',p.candidate],['Recorded lens model',p.likelyLens],['Plot dimensions',p.plotDimensions]]:[])]){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);}const note=document.createElement('p');note.textContent=p.note;card.append(h,model,dl,note);if(p.recordSource){const record=document.createElement('a');record.href=p.recordSource;record.target='_blank';record.rel='noopener noreferrer';record.textContent='Projection plot source ↗';card.append(record);}if(p.reviewPlan){const plan=document.createElement('p');plan.className='review-plan';plan.textContent=p.reviewPlan;card.append(plan);}if(p.candidateCheck){const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Sizing and installation checks';details.append(summary);for(const value of [p.provenance.likelyLens,p.candidateCheck,p.installationCheck]){const paragraph=document.createElement('p');paragraph.textContent=value;details.append(paragraph);}const spec=document.createElement('a');spec.href=p.installationSource;spec.target='_blank';spec.rel='noopener noreferrer';spec.textContent='Projector installation specification ↗';details.append(spec);const likely=document.createElement('a');likely.href=p.likelyLensSource;likely.target='_blank';likely.rel='noopener noreferrer';likely.textContent='Projection research record ↗';details.append(document.createElement('br'),likely);card.append(details);}if(p.source){const link=document.createElement('a');link.href=p.source;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Manufacturer lens specification ↗';card.append(link);}document.querySelector('#projector-cards').append(card);}
 
 }
 renderProjectorReference().catch(()=>{document.querySelector('#projector-cards').textContent='Projector reference could not load. Refresh to retry.';});
+
+const relayPanel=document.querySelector('#relay-panel'),relayFrame=document.querySelector('#relay-frame'),relayStatus=document.querySelector('#relay-status');
+let relayOrigin=null,relayReady=false,relayView='rig',relayTimer;
+function selectRelayView(view){relayView=view;projectorInfo.hidden=true;workspacePanels.hidden=true;relayPanel.hidden=false;for(const id of ['#show-workspace','#show-projectors'])document.querySelector(id).removeAttribute('aria-current');document.querySelector('#show-stage').setAttribute('aria-pressed',String(view==='stage'));document.querySelector('#open-control').setAttribute('aria-pressed',String(view==='rig'));if(relayReady)relayFrame.contentWindow.postMessage({type:'wst:show-panel',panel:view},relayOrigin);}
+function connectRelay(url,label){const target=new URL(url);if(!['http:','https:'].includes(target.protocol)||target.username||target.password)throw Error('Invalid controller address');relayOrigin=target.origin;relayReady=false;relayStatus.textContent='Connecting to '+label+'…';relayFrame.hidden=false;target.searchParams.set('workspaceEmbed','1');relayFrame.src=target.href;clearTimeout(relayTimer);relayTimer=setTimeout(()=>{if(!relayReady)relayStatus.textContent='Connection not confirmed. Start the controller and allow local network access in your browser if prompted. Private controls have not connected.';},12000);}
+relayFrame.addEventListener('load',()=>{if(relayOrigin)relayFrame.contentWindow.postMessage({type:'wst:hello'},relayOrigin);});
+window.addEventListener('message',event=>{if(event.source!==relayFrame.contentWindow||event.origin!==relayOrigin||event.data?.type!=='projctl:ready')return;if(event.data.relayConnected!==true){relayReady=false;relayStatus.textContent='Controller page loaded; relay is reconnecting.';return;}relayReady=true;clearTimeout(relayTimer);relayStatus.textContent='Private controller connected · '+(relayOrigin.includes('localhost')?'this Mac':new URL(relayOrigin).hostname);relayFrame.contentWindow.postMessage({type:'wst:show-panel',panel:relayView},relayOrigin);});
+document.querySelector('#show-stage').onclick=()=>selectRelayView('stage');document.querySelector('#open-control').onclick=()=>selectRelayView('rig');
+document.querySelector('#connect-mac').onclick=()=>connectRelay('http://localhost:8080/','this Mac');
+(async()=>{try{const response=await fetch(new URL('workspace-config.json',import.meta.url),{cache:'no-store'});const cfg=await response.json();if(cfg.control?.verified&&cfg.control.url){const button=document.querySelector('#connect-venue');button.hidden=false;button.onclick=()=>connectRelay(cfg.control.url,cfg.control.label||'theatre controller');}}catch{/* Keep explicit connection options. */}})();
+const embed=new URL(location.href).searchParams.get('embed');if(embed==='notes'||embed==='info'){document.body.classList.add('embedded-workspace');showSection(embed==='info');}
+window.addEventListener('message',event=>{if(event.source===parent&&event.origin===location.origin&&event.data?.type==='workspace:theme'&&['light','dark'].includes(event.data.theme))showTheme(event.data.theme);});
