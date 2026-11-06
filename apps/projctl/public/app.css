@@ -131,6 +131,9 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 .pj-lane{display:flex;flex-direction:column;gap:6px;min-width:0}
 .pj-lane h3{margin:0;font:700 clamp(23px,2vw,32px)/1.15 var(--font-display);letter-spacing:-.03em;color:var(--lane-ink)}
 .pj-lane-device{overflow-wrap:anywhere}
+.pj-unassigned{grid-column:1/-1;min-width:0}
+.pj-unassigned>summary{justify-self:start;cursor:pointer}
+.pj-unassigned>.pj-grid{padding-top:var(--space-3);overflow:visible}
 .pj-modal[data-lane]:not([data-lane=""]) .pj-sheet{border-top:4px solid var(--lane-accent)}
 .pj-modal[data-lane]:not([data-lane=""]) #adj-title{color:var(--lane-ink)}
 .pj-setup{grid-template-columns:48px repeat(4,minmax(0,1fr))}

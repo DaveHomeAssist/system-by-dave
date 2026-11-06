@@ -1,5 +1,12 @@
 # Changelog
 
+## November 5, 2026: Stable projector order
+
+- Keep Rig positions A, B, C and D visible when a lane is unassigned, with
+  unassigned devices in a separate expandable section.
+- Use drawing identities and models on Rig and Stage cards while preserving
+  existing relay IDs, device assignments and command destinations.
+
 ## November 5, 2026: Projector image shift directions
 
 - Add independent per-projector horizontal and vertical shift reversal settings so

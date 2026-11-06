@@ -1,4 +1,4 @@
-import { LANES, laneOf, projectorName, orderedProjectors } from './lanes.js';
+import { LANES, laneOf, projectorName, orderedProjectors, rigLanes } from './lanes.js';
 import { createStageView } from './stage-view.js';
 import { lensDirection } from './lens-direction.js';
 const $ = (s, r = document) => r.querySelector(s);
@@ -87,9 +87,9 @@ const pill = (st, word) => `<span class="avd-state"><span class="avd-dot avd-dot
 const seg = (label, opts, cur, attrs) => `<div class="avd-seg avd-seg--fill" role="group" aria-label="${esc(label)}">${opts.map(([v, lab]) => `<button class="avd-seg__btn" type="button" aria-pressed="${String(cur) === String(v)}" ${attrs(v)}>${esc(lab)}</button>`).join('')}</div>`;
 
 function renderGrid() {
-  const g = $('#grid'); const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop; g.innerHTML = '';
-  orderedProjectors(state.projectors).forEach((p, idx) => {
-    const lane = laneOf(p);
+  const g = $('#grid'); const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop;
+  const unassignedOpen = g.querySelector('.pj-unassigned')?.open || false; g.innerHTML = '';
+  function deviceCard(p, lane = laneOf(p)) {
     const s = p.status || {}; const off = !connected || !s.online; const lock = state.lock;
     const { st, word } = stateOf(p);
     const errs = Object.entries(s.errors || {}).filter(([, v]) => v > 0).map(([k, v]) => `${k}${v === 2 ? ' fault' : ' warning'}`);
@@ -97,11 +97,11 @@ function renderGrid() {
     const busy = !!p.busy;
 
     const pat = s.pattern ? ((p.patterns || PATTERNS)[s.pattern] || s.pattern) : '—';
-    const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', `${p.slot} ${projectorName(p)}`);
+    const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', lane ? projectorName(p) : `Unassigned ${p.label}`);
     card.innerHTML = `
-      <div class="avd-panel__head"><h2 class="avd-panel__title"><span class="avd-panel__index">${lane ? esc(p.lane) : String(idx + 1).padStart(2, '0')}</span>${esc(lane ? 'Projector ' + p.lane : p.slot + ' · ' + p.label)}<span class="avd-dot avd-dot--${st}" aria-hidden="true"></span></h2></div>
+      <div class="avd-panel__head"><h2 class="avd-panel__title"><span class="avd-panel__index">${lane ? esc(p.lane) : '—'}</span>${esc(lane ? 'Projector ' + p.lane : p.label)}<span class="avd-dot avd-dot--${st}" aria-hidden="true"></span></h2></div>
       <div class="avd-panel__body">
-        ${lane ? `<div class="pj-lane"><h3>${esc(lane.target)}</h3><span class="pj-mono">${esc(lane.role)} · ${esc(lane.orientation)}</span><span class="pj-lane-device pj-mono">${esc(p.slot)} · ${esc(p.label)}</span></div>` : ''}
+        ${lane ? `<div class="pj-lane"><h3>${esc(lane.target)}</h3><span class="pj-mono">${esc(lane.role)} · ${esc(lane.orientation)}</span><span class="pj-lane-device pj-mono">${esc(p.model || p.label)}</span></div>` : `<p class="pj-mono">Unassigned · Relay ${esc(p.slot)}</p>`}
         <div class="pj-tile-top">${pill(st, word)}<span class="pj-mono">${esc(p.owner)} · ${esc(p.ip || 'no address')}</span></div>
         ${s.errors == null ? '<p class="pj-mono">Alarm telemetry unavailable</p>' : ''}
         ${busy ? '<p class="pj-mono" role="status">Lens moving</p>' : ''}
@@ -111,7 +111,7 @@ function renderGrid() {
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Light source</span><span class="avd-readout__value">${s.lightHours != null ? esc(s.lightHours) + '<span class="avd-readout__unit">h</span>' : '—'}</span></div>
         </div>
         <div class="avd-field"><span class="avd-field__label pj-caps">Shutter</span>
-          ${seg(`Shutter, ${p.slot}`, [['open', 'Open'], ['closed', 'Closed']], s.shutter, (v) => `data-c="shutter" data-a="${v === 'closed' ? 1 : 0}" ${off ? 'disabled' : ''}`)}
+          ${seg(`Shutter, ${lane ? 'Projector ' + p.lane : p.label}`, [['open', 'Open'], ['closed', 'Closed']], s.shutter, (v) => `data-c="shutter" data-a="${v === 'closed' ? 1 : 0}" ${off ? 'disabled' : ''}`)}
         </div>
         <div class="pj-two">
           <button class="avd-btn" data-c="power" data-a="1" type="button" ${off || busy || s.power === 'cooling' ? 'disabled' : ''}>Power on</button>
@@ -133,8 +133,28 @@ function renderGrid() {
     card.querySelector('button[data-adj]').onclick = () => openAdjust(p.slot);
     const sel = card.querySelector('select'); sel.onchange = () => cmd(p.slot, 'input', sel.value);
     card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = `${p.slot}:${n}`; });
+    return card;
+  }
+  const bound = new Set();
+  for (const { lane, projector, conflict } of rigLanes(state.projectors)) {
+    if (projector) { bound.add(projector); g.appendChild(deviceCard(projector)); continue; }
+    const info = LANES[lane], card = document.createElement('section');
+    card.className = 'avd-panel pj-tile pj-unbound'; card.dataset.lane = lane;
+    card.setAttribute('aria-label', `Projector ${lane} · ${info.target} · ${conflict ? 'Assignment conflict' : 'Unassigned'}`);
+    card.innerHTML = `<div class="avd-panel__head"><h2 class="avd-panel__title"><span class="avd-panel__index">${lane}</span>Projector ${lane}</h2></div>
+      <div class="avd-panel__body"><div class="pj-lane"><h3>${esc(info.target)}</h3><span class="pj-mono">${esc(info.role)} · ${esc(info.orientation)}</span></div>
+      ${pill('idle', conflict ? 'Assignment conflict' : 'Unassigned')}<p class="pj-mono">${conflict ? 'More than one device uses this lane. Check Setup.' : 'No device assigned to this position.'}</p>
+      <button class="avd-btn" type="button" data-focus-key="lane:${lane}:setup">Open Setup</button></div>`;
+    card.querySelector('button').onclick = () => { $('[data-tab="setup"]').click(); $('[data-tab="setup"]').focus(); };
     g.appendChild(card);
-  });
+  }
+  const unassigned = state.projectors.filter((p) => !bound.has(p));
+  if (unassigned.length) {
+    const extra = document.createElement('details'); extra.className = 'pj-unassigned'; extra.open = unassignedOpen;
+    extra.innerHTML = `<summary class="avd-btn" data-focus-key="unassigned">Unassigned devices (${unassigned.length})</summary><div class="pj-grid"></div>`;
+    unassigned.forEach((p) => extra.querySelector('.pj-grid').appendChild(deviceCard(p, null)));
+    g.appendChild(extra);
+  }
   g.scrollTop = scroll;
   if (focusKey) [...g.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === focusKey)?.focus({ preventScroll: true });
 }
@@ -207,7 +227,7 @@ function openAdjust(slot) {
   $('#adjust').dataset.lane = laneOf(p) ? p.lane : '';
   $('#adjust').hidden = false; $('#adjust').showModal(); $('#adj-feedback').textContent = ''; $('#adj-motion').textContent = ''; renderAdjust(); loadPicture(); $('#adj-close').focus();
 }
-function closeAdjust() { const slot = adjSlot; $('#adjust').close(); $('#adjust').hidden = true; adjSlot = null; const trigger = adjReturnFocus?.isConnected ? adjReturnFocus : [...$('#grid').children].find((el) => el.getAttribute('aria-label')?.startsWith(slot + ' '))?.querySelector('[data-adj]'); trigger?.focus(); }
+function closeAdjust() { const slot = adjSlot; $('#adjust').close(); $('#adjust').hidden = true; adjSlot = null; const trigger = adjReturnFocus?.isConnected ? adjReturnFocus : [...$('#grid').querySelectorAll('[data-slot]')].find((el) => el.dataset.slot === slot)?.querySelector('[data-adj]'); trigger?.focus(); }
 function renderAdjust() {
   const p = state.projectors.find((x) => x.slot === adjSlot); if (!p) return;
   const off = !connected || !p.status?.online;
