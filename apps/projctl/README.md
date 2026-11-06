@@ -268,3 +268,20 @@ Read-only [display and EDID data](docs/display-readouts.md) distinguishes cached
 projector input/signal from relay-computer displays and unavailable raw EDID.
 [Lens presets and login compatibility](docs/lens-presets-auth.md) documents the
 forward integration of the supplied branch and its physical acceptance limits.
+
+## Projector workspace
+
+The six primary views are My Projector Rig, 3D Stage View, Presets, Log,
+Configuration and Throw Calc. Home also opens notes/tasks and projector reference.
+Select an A-D card for that projector's guarded controls and separate recorded
+gear, live feedback and EDID availability. Unassigned/offline lanes remain
+inspectable without enabling setters. The shared reference includes a searchable
+documented projector/lens catalog and a signal-flow view that labels unknown
+patches rather than inventing transport. Throw Calc embeds the existing canonical
+Throwline calculator and requires access to its public host.
+
+The public Frozen workspace uses the same reference source and can navigate an
+explicitly connected private controller. It checks the controller's advertised
+view capabilities, so an older controller cannot falsely show a requested pane.
+Browser local-network permission and the actual theatre endpoint still require
+verification; no private controller is hosted or exposed publicly by this UI.
