@@ -102,7 +102,12 @@ function replyTime(s) {
   return at ? new Date(at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'No successful reply yet';
 }
 function renderGrid() {
-  const g = $('#grid'); const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop;
+  const g = $('#grid');
+  const active = document.activeElement;
+  const editing = g.contains(active) && active.matches('select[data-c="input"]') ? state.projectors.find((p) => p.slot === active.closest('[data-slot]')?.dataset.slot) : null;
+  // Keep the native input menu alive during polling. Safety changes always render immediately.
+  if (editing && active.dataset.editing === 'true' && connected && editing.status?.online && !state.lock && !editing.busy && Object.keys(editing.inputs || {}).length && !active.disabled) return;
+  const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop;
   const unassignedOpen = g.querySelector('.pj-unassigned')?.open || false; g.innerHTML = '';
   function deviceCard(p, lane = laneOf(p)) {
     const s = p.status || {}; const off = !connected || !s.online; const lock = state.lock;
@@ -146,7 +151,11 @@ function renderGrid() {
     card.querySelectorAll('button[data-c]').forEach((b) => b.onclick = () => cmd(p.slot, b.dataset.c, Number(b.dataset.a)));
     card.querySelectorAll('button[data-p]').forEach((b) => b.onclick = () => cmd(p.slot, 'pattern', b.dataset.p));
     card.querySelectorAll('button[data-adj]').forEach((b) => b.onclick = () => openAdjust(p.slot, b.dataset.adj));
-    const sel = card.querySelector('select'); sel.onchange = () => cmd(p.slot, 'input', sel.value);
+    const sel = card.querySelector('select');
+    sel.onpointerdown = () => { sel.dataset.editing = 'true'; };
+    sel.onkeydown = (e) => { if (['ArrowDown', 'ArrowUp', ' ', 'Enter'].includes(e.key)) sel.dataset.editing = 'true'; if (e.key === 'Escape') { delete sel.dataset.editing; setTimeout(renderGrid, 0); } };
+    sel.onchange = () => { delete sel.dataset.editing; cmd(p.slot, 'input', sel.value); setTimeout(renderGrid, 0); };
+    sel.onblur = () => { delete sel.dataset.editing; setTimeout(renderGrid, 0); };
     card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = `${p.slot}:${n}`; });
     return card;
   }
@@ -342,10 +351,11 @@ function scheduleReconnect() {
 }
 function connect() {
   const generation = ++socketGeneration;
-  let ws, disconnected = false;
+  let ws, disconnected = false, snapshotTimer = null, silenceTimer = null;
   const recover = () => {
     if (generation !== socketGeneration || disconnected) return;
     disconnected = true;
+    clearTimeout(snapshotTimer); clearTimeout(silenceTimer);
     setConn(false);
     // Retry independently: an unavailable HTTP endpoint must not stall the socket.
     scheduleReconnect();
@@ -353,10 +363,14 @@ function connect() {
       .then((r) => { if (generation === socketGeneration && r.status === 401) location.href = '/login.html'; })
       .catch(() => {});
   };
+  const markAlive = () => {
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(() => { recover(); ws.close(); }, 15000);
+  };
   try { ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws'); }
   catch { recover(); return; }
   // A transport connection alone does not prove we have current controller state.
-  const snapshotTimer = setTimeout(() => { recover(); ws.close(); }, 5000);
+  snapshotTimer = setTimeout(() => { recover(); ws.close(); }, 5000);
   ws.onclose = () => { clearTimeout(snapshotTimer); recover(); };
   ws.onerror = () => { clearTimeout(snapshotTimer); recover(); ws.close(); };
   ws.onmessage = (m) => {
@@ -367,12 +381,13 @@ function connect() {
     if (msg.type === 'snapshot') {
       if (!Array.isArray(msg.projectors) || !msg.projectors.every((p) => p && typeof p.slot === 'string') || !Array.isArray(msg.presets) || !Array.isArray(msg.events)) { recover(); ws.close(); return; }
       clearTimeout(snapshotTimer);
-      state = msg; setConn(true); renderAll();
+      markAlive(); state = msg; setConn(true); renderAll();
     }
     else if (!connected) return;
-    else if (msg.type === 'status') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
-    else if (msg.type === 'busy') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
-    else if (msg.type === 'event') { state.events.push(msg.event); if (state.events.length > 200) state.events.shift(); renderLog(); }
+    else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') markAlive(); }
+    else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
+    else if (msg.type === 'busy' && typeof msg.slot === 'string') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
+    else if (msg.type === 'event' && msg.event && typeof msg.event === 'object') { markAlive(); state.events.push(msg.event); if (state.events.length > 200) state.events.shift(); renderLog(); }
   };
 }
 setConn(false);

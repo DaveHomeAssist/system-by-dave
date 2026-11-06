@@ -156,3 +156,11 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 @media(max-width:680px){.pj-overview{padding:10px 12px;display:block}.pj-overview strong{font-size:14px;line-height:20px}.pj-overview p{font-size:11px;line-height:15px;margin-top:4px}.pj-overview .avd-eyebrow{display:none}.pj-mode{font-size:10px;padding:3px 6px}.pj-setup{padding:14px}.pj-setup-heading>strong{font-size:18px}.pj-setup-fields{gap:10px}.pj-header{column-gap:8px}}
 
 .pj-connection-help{min-width:0}.pj-connection-help a{color:var(--tape);font-weight:600;text-underline-offset:3px}.pj-connection-help a:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}#local-controller-help{margin-top:8px}#local-controller-help span{display:block;margin-top:4px}
+
+@media(max-width:680px){
+  .pj-allbar[aria-labelledby="all-label"]{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .pj-allbar[aria-labelledby="all-label"]>.avd-eyebrow{grid-column:1/-1}
+  .pj-allbar[aria-labelledby="all-label"]>.avd-seg{grid-column:span 2;min-width:0}
+  .pj-allbar[aria-labelledby="all-label"] .avd-btn,.pj-allbar[aria-labelledby="all-label"] .avd-seg__btn{min-width:0;min-height:44px;padding:6px 4px;white-space:normal;font-size:10px;line-height:14px}
+  .pj-allbar[aria-labelledby="all-label"]>.pj-vrule{display:none}
+}
