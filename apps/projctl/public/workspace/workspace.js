@@ -76,7 +76,7 @@ const clock = document.querySelector('#clock');
 function tick(){clock.textContent = new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date());clock.dateTime=new Date().toISOString();}tick();setInterval(tick,1000);
 
 const projectorInfo=document.querySelector('#projector-info'),workspacePanels=document.querySelector('#workspace-panels');
-function showSection(info){document.querySelector('#home-panel').hidden=true;document.querySelector('#show-home').removeAttribute('aria-current');document.querySelector('#relay-panel').hidden=true;projectorInfo.hidden=!info;workspacePanels.hidden=info;for(const [id,active] of [['#show-workspace',!info],['#show-projectors',info]]){const el=document.querySelector(id);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');}if(info)document.querySelector('#projector-info-title').focus();}
+function showSection(info){for(const id of ['#show-stage','#open-control'])document.querySelector(id).setAttribute('aria-pressed','false');document.querySelector('#home-panel').hidden=true;document.querySelector('#show-home').removeAttribute('aria-current');document.querySelector('#relay-panel').hidden=true;projectorInfo.hidden=!info;workspacePanels.hidden=info;for(const [id,active] of [['#show-workspace',!info],['#show-projectors',info]]){const el=document.querySelector(id);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');}if(info)document.querySelector('#projector-info-title').focus();}
 document.querySelector('#show-workspace').onclick=()=>showSection(false);
 document.querySelector('#show-projectors').onclick=()=>showSection(true);
 async function renderProjectorReference(){
@@ -103,6 +103,6 @@ document.querySelector('#connect-mac').onclick=()=>connectRelay('http://localhos
 const embed=new URL(location.href).searchParams.get('embed');if(embed==='notes'||embed==='info'){document.body.classList.add('embedded-workspace');showSection(embed==='info');}
 window.addEventListener('message',event=>{if(event.source===parent&&event.origin===location.origin&&event.data?.type==='workspace:theme'&&['light','dark'].includes(event.data.theme))showTheme(event.data.theme);});
 
-function showHome(){document.querySelector('#home-panel').hidden=false;workspacePanels.hidden=true;projectorInfo.hidden=true;relayPanel.hidden=true;for(const id of ['#show-workspace','#show-projectors'])document.querySelector(id).removeAttribute('aria-current');document.querySelector('#show-home').setAttribute('aria-current','page');}
+function showHome(){for(const id of ['#show-stage','#open-control'])document.querySelector(id).setAttribute('aria-pressed','false');document.querySelector('#home-panel').hidden=false;workspacePanels.hidden=true;projectorInfo.hidden=true;relayPanel.hidden=true;for(const id of ['#show-workspace','#show-projectors'])document.querySelector(id).removeAttribute('aria-current');document.querySelector('#show-home').setAttribute('aria-current','page');}
 document.querySelector('#show-home').onclick=showHome;
 for(const choice of document.querySelectorAll('[data-home-target]'))choice.onclick=()=>document.getElementById(choice.dataset.homeTarget).click();
