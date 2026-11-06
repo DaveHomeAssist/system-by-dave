@@ -1,0 +1,73 @@
+# Frozen Stage what-if planning
+
+The Stage tab has a local **What-if planning** mode. It addresses a gap in the
+recorded plot: operators could inspect coverage but could not compare another
+lens, distance, raster size, orientation or optical position.
+
+Planning edits live only in this browser tab. They do not write rig configuration,
+change the saved plot, issue projector commands or change connected equipment.
+**Live controls** remains a separate, explicitly labelled entry. Reloading or
+**Reset recorded plan** discards proposed values. The loaded drawing is retained
+as reference coverage behind a coloured proposal and white mapped-content outline.
+
+The adapter uses the canonical `ProjectorThrow/throwline-scene-state.js`
+`calculateProjectorGeometry` contract, including the ratio-limited actual image
+size. Its existing `three-d-stage` renderer displays the proposal; it is not a
+second optical calculator. Both canonical files are shipped by the relay's
+explicit Throwline asset allowlist. Fields are in feet; renderer coordinates
+remain metres. The selected target edge establishes the sideways axis and
+perpendicular throw plane. Height is above the stage floor.
+
+A metric plot is required. Unknown recorded lens heights remain empty until the
+operator enters a proposed height. A drawing-matched initial ratio is an estimate,
+not an identified installed lens. No geometry is promoted to a surveyed value.
+
+For portrait, native raster width becomes physical height. The optical adapter
+rotates the coordinate inputs before invoking Throwline, then rotates the output
+footprint back into the stage frame. A displayed upward-shift percentage is in
+world coordinates; it is not necessarily the projector's native vertical axis.
+The model flags documented individual-axis limits for the A/D Panasonic lens candidates; it does not certify combined shift limits or remaining motor travel.
+
+## D lens study
+
+The D shortcuts compare user-reported 20 ft portrait height at an estimated
+38.5 ft throw (within the stated 38–39 ft range), using the ET-DLE170 named in the recorded A/D plot
+(official WXGA range 1.80–2.54:1; physical barrel not inspected), against proposed 26 or 28 ft rasters with 20 ft mapped content.
+The recorded lens identity is documented rather than read from the physical barrel. ET-DLE150 is a candidate only; its
+Panasonic-published DW830/WXGA 16:10 range is 1.36–1.98:1:
+https://eu.connect.panasonic.com/sites/default/files/media/document/2024-04/et-dle150_spec_en_2.pdf
+
+The shortcuts preserve the entered centre. A larger raster therefore raises its
+top by half the height increase. To study another optical shift, edit the centre
+or upward-shift percentage explicitly. No shortcut assumes additional lens travel.
+Out-of-range requested sizes show the actual achievable footprint and a ratio
+warning, rather than drawing a physically impossible requested size.
+
+Mapped content is a framing aid, not a simulated media server. Unused raster can
+spill light; resolution and black level need venue acceptance. Cove clearance,
+rigging, tilt limits and enclosure-to-lens offsets are not certified.
+
+## Building model boundary
+
+The existing private venue-model loader remains available in Rig reference mode.
+An unregistered building cannot be overlaid with calibrated projection beams.
+A future room overlay needs an explicit verified transform into the stage frame:
+metres, Y up with stage floor at zero, and the C target plane defining Z zero.
+The original model and saved plot remain separate from proposed optical geometry.
+
+## Focused verification
+
+- `node --test test/stage-scenario.test.js` checks units, portrait rotation,
+  exact D ratios, mapped-content framing, impossible size handling, unknown
+  heights and unchanged input objects.
+- `node test/stage-planner-browser.cjs` uses only simulator fixtures, checks
+  actual WebGL proposal updates, reset and lane switching, and asserts no POST/PUT/PATCH/DELETE requests from planning.
+- Desktop/mobile screenshots must show the same actual renderer and bounded
+  controls, with no document overflow. Tests use synthetic dimensioned geometry;
+  no private venue assets are release fixtures.
+
+The optional venue descriptor exposes only registration status and the planning-overlay flag. Other private registration metadata is stripped. Unregistered venue models stay in the separate Venue reference view, with planning overlays disabled.
+
+The operator reports that the required A and D heights differ, despite the recorded drawing labelling both approximately 19 ft 11 in. Each lane has an independent scenario. The drawing remains a reference, not proof of equal actual target heights; no revised A height is inferred. The D 20 ft shortcut is an operator estimate for comparison.
+
+ET-DLE170 manufacturer reference: https://eu.connect.panasonic.com/gb/en/projectors/et-dle170 (WXGA 1.80–2.54:1).
