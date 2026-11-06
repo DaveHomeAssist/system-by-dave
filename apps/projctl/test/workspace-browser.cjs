@@ -28,7 +28,7 @@ const assert = require('node:assert/strict');
       assert.equal(await notes.locator('#notes').evaluate(el => localStorage.getItem('wst.frozen.personal-notes.v1')), 'Isolated browser fixture note');
       await notes.locator('#task-list').getByText('Shared fixture task').waitFor();
       await page.locator('#tab-btn-info').click();
-      await page.frameLocator('[data-workspace="info"]').locator('#projector-cards h3').filter({ hasText: 'Projector D' }).waitFor();
+      await page.locator('#reference-view .fr-projector[data-lane="D"] h3').filter({hasText:'SR Portal'}).waitFor();
       await page.locator('#tab-btn-stage').click();
       assert.equal(await page.locator('#tab-stage').isVisible(), true);
       await page.locator('#tab-btn-rig').click();

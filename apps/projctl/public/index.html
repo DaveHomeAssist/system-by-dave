@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="avd/tokens.css">
 <link rel="stylesheet" href="avd/bundle.css">
 <link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="reference-view.css" data-frozen-reference>
 <link rel="stylesheet" href="stage.css">
 <!-- Local Throwline import map: supplied by the relay. -->
 <link rel="stylesheet" href="workspace-bridge.css">
@@ -34,19 +35,20 @@
   <div class="avd-shell__tabs">
     <div class="avd-tabs" role="tablist" aria-label="Views"><button class="avd-tab" role="tab" id="tab-btn-home" aria-selected="false" aria-controls="tab-home" data-tab="home" type="button" tabindex="-1">Home</button>
       <button class="avd-tab" role="tab" id="tab-btn-notes" aria-selected="false" aria-controls="tab-notes" data-tab="notes" type="button" tabindex="-1">Notes + tasks</button>
-      <button class="avd-tab" role="tab" id="tab-btn-info" aria-selected="false" aria-controls="tab-info" data-tab="info" type="button" tabindex="-1">Projector info</button>
-      <button class="avd-tab" role="tab" id="tab-btn-rig" aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">Rig <span class="avd-tab__count" id="count-rig"></span></button>
-      <button class="avd-tab" role="tab" id="tab-btn-stage" aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">Stage</button>
-      <button class="avd-tab" role="tab" id="tab-btn-presets" aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
-      <button class="avd-tab" role="tab" id="tab-btn-log" aria-selected="false" aria-controls="tab-log" data-tab="log" type="button" tabindex="-1">Log</button>
-      <button class="avd-tab" role="tab" id="tab-btn-setup" aria-selected="false" aria-controls="tab-setup" data-tab="setup" type="button" tabindex="-1">Setup</button>
+      <button class="avd-tab" role="tab" id="tab-btn-info" aria-selected="false" aria-controls="tab-info" data-tab="info" type="button" tabindex="-1">Gear &amp; signal flow</button>
+      <button class="avd-tab" role="tab" id="tab-btn-rig" data-primary-nav aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">My Projector Rig <span class="avd-tab__count" id="count-rig"></span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-stage" data-primary-nav aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">3D Stage View</button>
+      <button class="avd-tab" role="tab" id="tab-btn-presets" data-primary-nav aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-log" data-primary-nav aria-selected="false" aria-controls="tab-log" data-tab="log" type="button" tabindex="-1">Log</button>
+      <button class="avd-tab" role="tab" id="tab-btn-setup" data-primary-nav aria-selected="false" aria-controls="tab-setup" data-tab="setup" type="button" tabindex="-1">Configuration</button>
+      <button class="avd-tab" role="tab" id="tab-btn-throw" data-primary-nav aria-selected="false" aria-controls="tab-throw" data-tab="throw" type="button" tabindex="-1">Throw Calc</button>
     </div>
   </div>
 
   <main class="pj-main">
 <section class="tab home-panel" role="tabpanel" aria-labelledby="tab-btn-home" id="tab-home" hidden><div><p class="eyebrow">FROZEN / WALNUT STREET THEATRE</p><h2 id="local-home-title">Where would you like to go?</h2><p class="hint">One workspace for show notes, the projector reference and private controls.</p></div><div class="home-choices"><button type="button" data-local-target="notes"><strong>Notes + tasks</strong><span>Your personal notes and the shared to-do list</span></button><button type="button" data-local-target="info"><strong>Projector info</strong><span>A–D models, lenses and planning notes</span></button><button type="button" data-local-target="stage"><strong>Stage / room</strong><span>Room view and projection planning</span></button><button type="button" data-local-target="rig"><strong>Controls</strong><span>Connect to the private projector controller</span></button></div><p class="hint">Notes stay in this browser. Shared tasks are public. Private controls require a connected controller.</p></section>
     <section id="tab-notes" class="tab" role="tabpanel" aria-labelledby="tab-btn-notes" hidden><iframe class="pj-workspace-frame" data-workspace="notes" title="Frozen notes and shared team tasks"></iframe></section>
-    <section id="tab-info" class="tab" role="tabpanel" aria-labelledby="tab-btn-info" hidden><iframe class="pj-workspace-frame" data-workspace="info" title="Frozen projector information"></iframe></section>
+    <section id="tab-info" class="tab" role="tabpanel" aria-labelledby="tab-btn-info" hidden><div id="reference-view" class="pj-fill"></div></section>
     <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
       <div class="pj-overview" aria-label="Rig connection overview"><div><span class="avd-eyebrow">Projector connection</span><strong id="summary">Waiting for relay…</strong></div><div class="pj-connection-help"><p class="pj-mono" id="connection-note" role="status">Connecting to the local relay. Device status will update here automatically.</p><p class="pj-mono" id="local-controller-help" hidden>This page needs the local controller. <a href="http://localhost:8080/">Open controller on this Mac</a><span>On a phone or another computer, use the controller Mac’s network address; localhost points to the device you are using.</span></p></div></div>
       <div class="pj-allbar" aria-labelledby="all-label">
@@ -65,6 +67,11 @@
       <div id="grid" class="pj-grid" role="region" aria-label="Projector controls" tabindex="0" data-web2-scroll></div>
     </section>
 
+    <section id="tab-projector" class="tab pj-projector-page" role="region" aria-labelledby="projector-detail-title" hidden>
+      <div class="pj-projector-heading"><button class="avd-btn" type="button" id="projector-back">← My Projector Rig</button><div><span class="avd-eyebrow">Projector controls &amp; information</span><h2 id="projector-detail-title" tabindex="-1"></h2></div><div class="pj-detail-lanes" role="group" aria-label="Select projector"><button class="avd-btn" type="button" data-detail-lane="A">A</button><button class="avd-btn" type="button" data-detail-lane="B">B</button><button class="avd-btn" type="button" data-detail-lane="C">C</button><button class="avd-btn" type="button" data-detail-lane="D">D</button></div></div>
+      <div class="pj-projector-body" id="projector-detail-body" tabindex="0"><div id="projector-controls"></div><div class="pj-projector-information"><section class="avd-panel pj-detail-panel"><h3>Input, signal &amp; EDID</h3><div id="projector-display-info"></div><details id="host-displays"><summary>Relay computer displays</summary><p class="pj-mono">These are the relay computer’s OS display records, not projector EDID. They are not automatically assigned to A–D.</p><button class="avd-btn" type="button" id="host-displays-load">Read computer display info</button><div id="host-display-results"></div></details></section><section class="frozen-reference pj-projector-info" id="projector-static-info"></section></div></div>
+    </section>
+    <section id="tab-throw" class="tab" role="tabpanel" aria-labelledby="tab-btn-throw" hidden><div class="pj-allbar"><strong>Throw Calc · Throwline</strong><span class="pj-mono">Planning calculations only · no projector commands</span><a class="pj-mono" href="https://avbydave.com/ProjectorThrow/" target="_blank" rel="noopener noreferrer">Open separately ↗</a></div><iframe id="throw-calc-frame" class="pj-workspace-frame" title="Throwline projector throw calculator"></iframe></section>
     <section id="tab-stage" class="tab" role="tabpanel" aria-labelledby="tab-btn-stage" hidden>
       <div class="pj-stage-head">
         <div><span class="avd-eyebrow">Projection plot</span><h2 id="stage-title">Stage view</h2></div>
