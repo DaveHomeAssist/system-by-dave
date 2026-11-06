@@ -24,6 +24,7 @@ import vm from 'node:vm';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { applyManagedSiteMirrors } from './managed_site_mirrors.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_FILE = 'scripts/domain-sites.json';
@@ -946,6 +947,7 @@ function main() {
       applyCutover(siteRoot, site, entries, options).forEach((file) => removed.add(file));
       console.log(`${site.id}: systembydave.com now redirects ${[...entries.pages].filter((file) => /\.html?$/i.test(file)).length} pages to ${site.domain}`);
     }
+    applyManagedSiteMirrors(siteRoot);
     if (staged.some((item) => item.cutover)) {
       writeFile(siteRoot, 'js/domain-move-sites.js', moveSitesScript(config, policies, options));
       const problems = checkRemovedAssets(siteRoot, removed);
