@@ -15,17 +15,29 @@ const DEFAULT_RIG = {
   events: [],
 };
 
-export function openStore(file) {
+export function openStore(file, { allowCreate = true } = {}) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   let rig;
   try { rig = JSON.parse(fs.readFileSync(file, 'utf8')); }
-  catch { rig = structuredClone(DEFAULT_RIG); }
+  catch (error) {
+    if (error.code !== 'ENOENT' || !allowCreate) {
+      const reason = /^E[A-Z]+$/.test(error.code || '') ? error.code : 'invalid JSON';
+      throw new Error(`Cannot read saved rig (${reason}): ${file}. Restore a readable valid rig before starting; existing data was preserved.`);
+    }
+    rig = structuredClone(DEFAULT_RIG);
+  }
+  if (!rig || !Array.isArray(rig.projectors) || !Array.isArray(rig.presets) || !Array.isArray(rig.events)) throw new Error('Invalid saved rig shape. Existing data was preserved.');
   let pending = null;
-  const save = () => {
-    if (pending) return; pending = setTimeout(() => { pending = null; fs.writeFileSync(file, JSON.stringify(rig, null, 2)); }, 150);
+  const flush = () => {
+    if (pending) clearTimeout(pending);
+    pending = null;
+    const temporary = file + '.tmp';
+    fs.writeFileSync(temporary, JSON.stringify(rig, null, 2), { mode: 0o600 });
+    fs.renameSync(temporary, file);
   };
+  const save = () => { if (!pending) pending = setTimeout(flush, 150); };
   return {
-    rig, save,
+    rig, save, flush, close: () => { if (pending) flush(); },
     projector(slot) { return rig.projectors.find((p) => p.slot === slot); },
     event(e) {
       rig.events.push({ at: new Date().toISOString(), ...e });

@@ -28,7 +28,7 @@ can reach it from anywhere through Tailscale. Prepared by Dave Robertson (AV by 
 | Shutter button does nothing | Wait 5 s; the projector answers slowly while the shutter moves. Then check the Log tab. |
 | Picture sliders greyed | Check Show Lock and the input signal. Unlocking restores available settings; missing-signal values remain disabled. |
 | Page asks for a passcode again | The relay restarted. Sign in again. |
-| Nothing loads at all | On the relay box: macOS `launchctl kickstart -k gui/$(id -u)/com.avbydave.projctl`; Linux `sudo systemctl restart projctl`. |
+| Nothing loads at all | On the relay box: macOS: open `~/Applications/Open Projctl.command`; Linux `sudo systemctl restart projctl`. |
 
 ## Install on the venue box (one time)
 
@@ -46,7 +46,7 @@ Keep the box awake. macOS: System Settings, Energy, Prevent automatic sleeping. 
 
     deploy/backup.sh [DEST]      # rig file, presets, log; keeps 30 snapshots
 
-Cron it nightly on the box. The copy named `rig.nocreds.json` is safe to commit.
+Cron it nightly on the box. Backups contain private operational data. Keep them private, including redacted copies.
 
 ## Strike (early January)
 
@@ -54,3 +54,57 @@ Cron it nightly on the box. The copy named `rig.nocreds.json` is safe to commit.
 2. `deploy/uninstall.sh` removes the service and resets Tailscale serve/funnel.
 3. Sign the box out of Tailscale if it is house gear: `tailscale logout`.
 4. Delete the app folder and the passcode from the install notes.
+
+## Managed macOS access and recovery
+
+Use `~/Applications/Open Projctl.command` or `http://localhost:8080/`.
+Opening the launcher checks relay health, loads the service if needed, waits for
+readiness and opens the controller. It does not stop an already healthy relay.
+The LaunchAgent starts at login and restarts after a process exit. This requires
+a signed-in user session; it is not a before-login system daemon.
+Process recovery does not prove venue network routing or restart persistence
+for network adapters. Verify those separately with the venue connection active.
+
+To migrate an existing installation or update a managed service, run from the
+new Projctl source/package after installing its dependencies and bundling its
+Throwline runtime:
+
+```sh
+node deploy/install-service.js /absolute/path/to/existing/projctl
+```
+
+The source/package contains `deploy/`, `server/`, `public/`, `runtime/` and its
+Node dependency. The installer refuses an unrelated listener on port 8080 and
+backs up the old service before replacing it. It verifies the saved rig bytes,
+keeps the original installation untouched, and migrates only the app's rig,
+stage plot and private venue assets. It never moves project or media folders.
+Subsequent updates preserve the managed settings rather than recopying an old
+rig. Do not resume an old manually launched relay after migration.
+
+| Purpose | Managed location |
+| --- | --- |
+| Controller | `http://localhost:8080/` |
+| Launcher | `~/Applications/Open Projctl.command` |
+| Runtime | `~/Library/Application Support/Projctl/app/` |
+| Live settings | `~/Library/Application Support/Projctl/data/` |
+| Service log | `~/Library/Application Support/Projctl/relay.log` |
+| Before-state backups | `~/Library/Application Support/Projctl/backup-*/` |
+| Login service | `~/Library/LaunchAgents/com.avbydave.projctl.plist` |
+
+`GET /api/health` reports relay availability and live/simulation mode without
+revealing the rig. A healthy relay with unreachable projectors means check the
+venue network, power and device address. Restarting the relay cannot repair a
+missing venue connection. Device status carries last attempt, last successful
+reply, failure count and a sanitized reason. Polling continues while devices
+are unreachable; WebSocket updates report recovery without reloading the page.
+An unassigned lane remains unassigned and is never filled by this recovery path.
+
+If startup cannot read the saved rig, it stops with a clear error rather than
+using a default rig. Inspect the log and restore the correct settings from a
+verified backup. A corrupt or unavailable configuration must not become a new
+control assignment. Writes use a temporary file and atomic rename; normal
+termination flushes pending settings.
+
+For a deliberate rollback, unload the managed LaunchAgent first, restore its
+backed-up service/runtime, and verify its configured settings path before
+starting it. Do not run old and new copies simultaneously.
