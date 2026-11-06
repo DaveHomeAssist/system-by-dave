@@ -7,4 +7,4 @@
 :root[data-theme=dark] .fr-projector{background:color-mix(in srgb,var(--fr-lane) 18%,var(--surface))}
 .fr-flow-row>span{pointer-events:none;display:block;justify-self:center;width:20px;height:20px;line-height:20px;text-align:center}
 
-.fr-projector[data-lane="A"]{--fr-lane:#d900dc}.fr-projector[data-lane="B"]{--fr-lane:#00cbd3}.fr-projector[data-lane="C"]{--fr-lane:#f3b600}.fr-projector[data-lane="D"]{--fr-lane:#16b834}
+.fr-projector[data-lane="A"]{--fr-lane:#ff00ff}.fr-projector[data-lane="B"]{--fr-lane:#00ffff}.fr-projector[data-lane="C"]{--fr-lane:#fbf302}.fr-projector[data-lane="D"]{--fr-lane:#00ab00}

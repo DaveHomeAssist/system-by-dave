@@ -117,17 +117,17 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 @media(max-width:360px){.avd-tab{padding-inline:8px;font-size:10px;gap:4px}.pj-allbar .avd-btn{padding-inline:10px;font-size:11px}.pj-vrule{display:none}.pj-header{column-gap:6px}}
 
 /* Drawing colors identify destinations, independently of operational state. */
-[data-lane="A"]{--lane-accent:#d900dc;--lane-ink:#941098;--lane-wash:#fbedf9}
-[data-lane="B"]{--lane-accent:#00cbd3;--lane-ink:#006b73;--lane-wash:#e5f8fa}
-[data-lane="C"]{--lane-accent:#f3b600;--lane-ink:#805400;--lane-wash:#fff5da}
-[data-lane="D"]{--lane-accent:#16b834;--lane-ink:#176b2a;--lane-wash:#eaf8eb}
+[data-lane="A"]{--lane-accent:#ff00ff;--lane-ink:#870087;--lane-wash:#ffe0ff}
+[data-lane="B"]{--lane-accent:#00ffff;--lane-ink:#005f65;--lane-wash:#d9ffff}
+[data-lane="C"]{--lane-accent:#fbf302;--lane-ink:#5a5700;--lane-wash:#fffed8}
+[data-lane="D"]{--lane-accent:#00ab00;--lane-ink:#07570b;--lane-wash:#def4de}
 [data-theme="dark"] [data-lane="A"]{--lane-ink:#fa9df7;--lane-wash:#38213f}
 [data-theme="dark"] [data-lane="B"]{--lane-ink:#68e7ee;--lane-wash:#133841}
-[data-theme="dark"] [data-lane="C"]{--lane-ink:#f9d267;--lane-wash:#3c3320}
+[data-theme="dark"] [data-lane="C"]{--lane-ink:#fff98a;--lane-wash:#34330c}
 [data-theme="dark"] [data-lane="D"]{--lane-ink:#8ce9a0;--lane-wash:#193b30}
 .pj-tile[data-lane]:not([data-lane=""]){border-top-color:var(--lane-accent)}
 .pj-tile[data-lane]:not([data-lane=""]) .avd-panel__head{background:var(--lane-wash)}
-.pj-tile[data-lane]:not([data-lane=""]) .avd-panel__index{background:var(--lane-ink);color:var(--lane-wash);border-radius:6px;width:32px;height:32px;display:inline-grid;place-items:center;font-size:20px}
+.pj-tile[data-lane]:not([data-lane=""]) .avd-panel__index{background:var(--lane-accent);color:#102131;border-radius:6px;width:32px;height:32px;display:inline-grid;place-items:center;font-size:20px}
 .pj-lane{display:flex;flex-direction:column;gap:6px;min-width:0}
 .pj-lane h3{margin:0;font:700 clamp(23px,2vw,32px)/1.15 var(--font-display);letter-spacing:-.03em;color:var(--lane-ink)}
 .pj-lane-device{overflow-wrap:anywhere}
@@ -186,7 +186,7 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 .pj-projector-body{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:20px;overflow:auto;min-height:0;align-items:start}.pj-projector-information{display:flex;flex-direction:column;gap:16px;min-width:0}.pj-detail-controls{border:1px solid var(--hairline);border-top:4px solid var(--lane-accent);border-radius:12px;background:var(--surface);overflow:hidden}.pj-detail-controls .avd-panel__body{padding:16px;gap:12px;overflow:visible;max-height:none}.pj-detail-panel{padding:18px;border-radius:12px}.pj-detail-panel h3{margin:0 0 12px}.pj-detail-panel dl>div{padding:10px 0;border-top:1px solid var(--hairline)}.pj-detail-panel dt{font-size:12px;color:var(--ink-muted)}.pj-detail-panel dd{margin:4px 0;overflow-wrap:anywhere}.pj-detail-panel summary{cursor:pointer;min-height:44px;padding-block:10px}.pj-projector-info.frozen-reference{height:auto}.pj-projector-info h3{margin:0 0 8px}.pj-open-projector{width:100%}#reference-view{overflow:hidden;min-height:0}#projector-controls{min-width:0}.pj-device-note{padding:16px;background:var(--surface);border:1px solid var(--hairline);border-radius:12px}.pj-detail-unavailable{color:var(--ink-muted);font-size:13px}
 @media(max-width:900px){.avd-shell__tabs .avd-tab{font-size:10px;padding-inline:9px}.pj-projector-body{grid-template-columns:minmax(240px,310px) minmax(0,1fr)}}
 @media(max-width:680px){.avd-shell__tabs .avd-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}.avd-shell__tabs .avd-tab{font-size:9px;padding:6px 3px}.pj-projector-body{grid-template-columns:1fr}.pj-projector-heading{gap:8px}.pj-projector-heading h2{font-size:21px}.pj-detail-lanes{margin-left:0}.pj-projector-heading>div:nth-child(2){flex:1}.pj-projector-heading .avd-eyebrow{display:none}}
-.pj-tile[data-lane]:not([data-lane=""]) .avd-panel__body,.pj-detail-controls[data-lane] .avd-panel__body{background:color-mix(in srgb,var(--lane-accent) 9%,var(--surface))}.pj-preset-slot{display:block;margin-block:8px}.pj-preset-slot .pj-mono{font-size:12px}
+.pj-tile[data-lane]:not([data-lane=""]) .avd-panel__body,.pj-detail-controls[data-lane] .avd-panel__body{background:color-mix(in srgb,var(--lane-accent) 16%,var(--surface))}.pj-preset-slot{display:block;margin-block:8px}.pj-preset-slot .pj-mono{font-size:12px}
 /* Short windows reserve room for the active workspace; every destination remains scrollable. */
 @media(max-height:450px){
   .avd-shell__tabs{min-width:0;overflow-x:auto;overflow-y:hidden}

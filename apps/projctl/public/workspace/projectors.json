@@ -9,7 +9,7 @@
       "model": "Unassigned",
       "lens": "ET-DLE170 · 1.80–2.54:1 (projection plot record)",
       "note": "Plotted raster coverage: 12 ft 5 in wide × 19 ft 11 in tall. A remains an unassigned live control position. The projection plot specifies Panasonic PT-DW830KU with ET-DLE170; this is the recorded plan, not confirmation of the unit hung here.",
-      "color": "#c65cba",
+      "color": "#ff00ff",
       "internalSlot": null,
       "provenance": {
         "assignment": "Owner-designated unassigned position",
@@ -28,7 +28,7 @@
       "model": "Panasonic PT-RZ970",
       "lens": "ET-DLE080 (recorded)",
       "note": "Prior rig/example records ET-DLE080; the projection plot lists 085. This discrepancy is unresolved: verify the physical lens label before treating either as installed.",
-      "color": "#2491af",
+      "color": "#00ffff",
       "internalSlot": "P2",
       "provenance": {
         "assignment": "Verified saved rig assignment, November 5, 2026",
@@ -47,7 +47,7 @@
       "model": "Barco UDM 4K22",
       "lens": "TLD+ zoom 0.71–0.93:1 (4K), recorded",
       "note": "Recorded with right-angle snorkel. Exact part number has not been confirmed.",
-      "color": "#b68527",
+      "color": "#fbf302",
       "internalSlot": "P1",
       "provenance": {
         "assignment": "Verified saved rig assignment, November 5, 2026",
@@ -70,7 +70,7 @@
       "candidate": "ET-DLE150 · 1.36–1.98:1 WXGA 16:10",
       "note": "Cove clearance limits upward tilt; desired extra upward coverage is approximately 3–4 ft or less. ET-DLE150 is compatible but not confirmed installed. In portrait, upward image movement normally uses native horizontal shift, with different limits from vertical shift. Additional reach and clearance are not yet established. Dave prioritizes D surface coverage over reduced brightness and resolution; the larger-raster option is worth testing, with lens identity and physical clearance still unverified. Dave also reports being at the lens-shift limit; this is an operator report, not encoder telemetry.",
       "source": "https://eu.connect.panasonic.com/sites/default/files/media/document/2024-04/et-dle150_spec_en_2.pdf",
-      "color": "#429873",
+      "color": "#00ab00",
       "internalSlot": "P4",
       "provenance": {
         "assignment": "Verified saved rig assignment, November 5, 2026",
@@ -263,6 +263,17 @@
       "via": "Local projector relay",
       "status": "verified",
       "note": "Implemented software route. Per-projector reachability comes from the current relay status; no live state is implied by this public reference."
+    }
+  },
+  "plotPaletteSource": {
+    "source": "FROZEN_projector-plot-front-view.png",
+    "basis": "Sampled saturated coverage-outline pixels; orange dimension annotations are not lane C.",
+    "sampledOn": "2026-11-06",
+    "colors": {
+      "A": "#ff00ff",
+      "B": "#00ffff",
+      "C": "#fbf302",
+      "D": "#00ab00"
     }
   }
 }
