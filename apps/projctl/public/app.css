@@ -187,3 +187,9 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 @media(max-width:900px){.avd-shell__tabs .avd-tab{font-size:10px;padding-inline:9px}.pj-projector-body{grid-template-columns:minmax(240px,310px) minmax(0,1fr)}}
 @media(max-width:680px){.avd-shell__tabs .avd-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}.avd-shell__tabs .avd-tab{font-size:9px;padding:6px 3px}.pj-projector-body{grid-template-columns:1fr}.pj-projector-heading{gap:8px}.pj-projector-heading h2{font-size:21px}.pj-detail-lanes{margin-left:0}.pj-projector-heading>div:nth-child(2){flex:1}.pj-projector-heading .avd-eyebrow{display:none}}
 .pj-tile[data-lane]:not([data-lane=""]) .avd-panel__body,.pj-detail-controls[data-lane] .avd-panel__body{background:color-mix(in srgb,var(--lane-accent) 9%,var(--surface))}.pj-preset-slot{display:block;margin-block:8px}.pj-preset-slot .pj-mono{font-size:12px}
+/* Short windows reserve room for the active workspace; every destination remains scrollable. */
+@media(max-height:450px){
+  .avd-shell__tabs{min-width:0;overflow-x:auto;overflow-y:hidden}
+  .avd-shell__tabs .avd-tabs{display:flex;flex-wrap:nowrap;width:max-content;min-width:100%}
+  .avd-shell__tabs .avd-tab{flex:0 0 auto;min-width:110px;max-width:170px;min-height:44px;padding:6px 10px;font-size:10px}
+}
