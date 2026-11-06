@@ -32,7 +32,7 @@
   </header>
 
   <div class="avd-shell__tabs">
-    <div class="avd-tabs" role="tablist" aria-label="Views">
+    <div class="avd-tabs" role="tablist" aria-label="Views"><button class="avd-tab" role="tab" id="tab-btn-home" aria-selected="false" aria-controls="tab-home" data-tab="home" type="button" tabindex="-1">Home</button>
       <button class="avd-tab" role="tab" id="tab-btn-notes" aria-selected="false" aria-controls="tab-notes" data-tab="notes" type="button" tabindex="-1">Notes + tasks</button>
       <button class="avd-tab" role="tab" id="tab-btn-info" aria-selected="false" aria-controls="tab-info" data-tab="info" type="button" tabindex="-1">Projector info</button>
       <button class="avd-tab" role="tab" id="tab-btn-rig" aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">Rig <span class="avd-tab__count" id="count-rig"></span></button>
@@ -44,6 +44,7 @@
   </div>
 
   <main class="pj-main">
+<section class="tab home-panel" role="tabpanel" aria-labelledby="tab-btn-home" id="tab-home" hidden aria-labelledby="local-home-title"><div><p class="eyebrow">FROZEN / WALNUT STREET THEATRE</p><h2 id="local-home-title">Where would you like to go?</h2><p class="hint">One workspace for show notes, the projector reference and private controls.</p></div><div class="home-choices"><button type="button" data-local-target="notes"><strong>Notes + tasks</strong><span>Your personal notes and the shared to-do list</span></button><button type="button" data-local-target="info"><strong>Projector info</strong><span>A–D models, lenses and planning notes</span></button><button type="button" data-local-target="stage"><strong>Stage / room</strong><span>Room view and projection planning</span></button><button type="button" data-local-target="rig"><strong>Controls</strong><span>Connect to the private projector controller</span></button></div><p class="hint">Notes stay in this browser. Shared tasks are public. Private controls require a connected controller.</p></section>
     <section id="tab-notes" class="tab" role="tabpanel" aria-labelledby="tab-btn-notes" hidden><iframe class="pj-workspace-frame" data-workspace="notes" title="Frozen notes and shared team tasks"></iframe></section>
     <section id="tab-info" class="tab" role="tabpanel" aria-labelledby="tab-btn-info" hidden><iframe class="pj-workspace-frame" data-workspace="info" title="Frozen projector information"></iframe></section>
     <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">

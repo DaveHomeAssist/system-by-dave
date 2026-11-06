@@ -13,9 +13,10 @@
 <a class="skip" href="#notes">Skip to notes</a>
 <div class="shell">
 <header><div><p class="eyebrow">WALNUT STREET THEATRE / WORKSPACE</p><h1>Frozen<span class="snow" aria-hidden="true">✳</span></h1></div><time id="clock" aria-label="Current Eastern time"></time><button id="theme" type="button" aria-pressed="false">Dark theme</button></header>
-<nav class="workspace-nav" aria-label="Frozen workspace"><button id="show-workspace" aria-current="page" type="button">Notes + tasks</button><button id="show-projectors" type="button">Projector info</button><button id="show-stage" type="button">Stage / room</button><button id="open-control" type="button">Controls</button></nav>
+<nav class="workspace-nav" aria-label="Frozen workspace"><button id="show-home" aria-current="page" type="button">Home</button><button id="show-workspace" type="button">Notes + tasks</button><button id="show-projectors" type="button">Projector info</button><button id="show-stage" type="button">Stage / room</button><button id="open-control" type="button">Controls</button></nav>
 
-<main id="workspace-panels">
+<section class="panel home-panel" id="home-panel" aria-labelledby="home-title"><div><p class="eyebrow">FROZEN / WALNUT STREET THEATRE</p><h2 id="home-title">Where would you like to go?</h2><p class="hint">One workspace for show notes, the projector reference and private controls.</p></div><div class="home-choices"><button type="button" data-home-target="show-workspace"><strong>Notes + tasks</strong><span>Your personal notes and the shared to-do list</span></button><button type="button" data-home-target="show-projectors"><strong>Projector info</strong><span>A–D models, lenses and planning notes</span></button><button type="button" data-home-target="show-stage"><strong>Stage / room</strong><span>Room view and projection planning</span></button><button type="button" data-home-target="open-control"><strong>Controls</strong><span>Connect to the private projector controller</span></button></div><p class="hint">Notes stay in this browser. Shared tasks are public. Private controls require a connected controller.</p></section>
+<main id="workspace-panels" hidden>
 <section class="panel notes" aria-labelledby="notes-title">
 <div class="panel-head"><div><p class="eyebrow">01 / PERSONAL</p><h2 id="notes-title">Your notes</h2></div><span class="tag">This browser only</span></div>
 <p class="hint" id="privacy">Saved on this device in this browser. Not shared with the team or uploaded. Clearing site data removes these notes; export a backup to keep them.</p>
