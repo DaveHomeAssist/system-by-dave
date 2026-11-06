@@ -65,3 +65,7 @@ Dave authorized publishing the venue/model, plot and what-if planning. Stage now
 `node embed-hosted-assets.mjs` selects the canonical renderer dependencies and embeds the authorized model as gzip/base64 in the existing Worker. The Worker serves fixed public visual assets, not a proxy to the relay. Standalone planning has no sockets, hardware API calls, saved rig writes, logs, credentials, or command handlers. Scenarios are transient browser state. Notes keys and shared tasks are unchanged; actual controls/presets/log/configuration still use the private relay.
 
 Browser acceptance: `node apps/projctl/test/wst-public-stage-browser.cjs` with the existing Playwright runtime. Uses the real packaged Worker/model and disposable browser contexts; task reads are intercepted. Checks 1440/680/375 widths, actual GLB/WebGL room load, Front/Plan, editable lens/raster scenario, no private requests, no page errors. Does not send test notes/tasks or hardware commands.
+
+The portfolio Pages staging step replaces only its WST home and Stage entry copies with canonical redirects to this managed site. The managed HTML, same-origin viewer imports and Worker assets remain unchanged; the source repository retains the full reproducible runtime. This prevents the portfolio mirror from loading viewer modules retired from that origin.
+
+WST and mirror-helper pull requests run the domain-cutover browser gate before merge, so managed-only imports cannot first break at the publication step.
