@@ -2,7 +2,7 @@ import { stageReference } from './stage-reference.js';
 import { LANES } from './lanes.js';
 import { createRoomLayers, addRoomLayerControls, screenLaneLabel } from './stage-visibility.js';
 
-const COLORS = { A: '#ed23dc', B: '#00cfe5', C: '#ffbc00', D: '#20bd42' };
+const COLORS = { A: '#ff00ff', B: '#00ffff', C: '#fbf302', D: '#00ab00' };
 const CAMERAS = [
   { name: 'Coverage', direction: [0, .03, 1] },
   { name: 'Plan', direction: [0, 1, .001] },
