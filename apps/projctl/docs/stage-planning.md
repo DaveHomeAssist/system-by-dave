@@ -68,6 +68,6 @@ The original model and saved plot remain separate from proposed optical geometry
 
 The optional venue descriptor exposes only registration status and the planning-overlay flag. Other private registration metadata is stripped. Unregistered venue models stay in the separate Venue reference view, with planning overlays disabled.
 
-The operator reports that the required A and D heights differ, despite the recorded drawing labelling both approximately 19 ft 11 in. Each lane has an independent scenario. The drawing remains a reference, not proof of equal actual target heights; no revised A height is inferred. The D 20 ft shortcut is an operator estimate for comparison.
+The attached front and top-down drawings label A and D raster coverage at 19 ft 11 in, C at 20 ft 3 in, and B at 18 ft 4 in. These are plotted raster-coverage dimensions, not measurements of every scenic target. Each lane has an independent scenario. The D 20 ft shortcut remains a rounded operator estimate for comparison; no revised A height is inferred.
 
 ET-DLE170 manufacturer reference: https://eu.connect.panasonic.com/gb/en/projectors/et-dle170 (WXGA 1.80–2.54:1).

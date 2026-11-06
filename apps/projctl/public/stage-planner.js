@@ -57,7 +57,7 @@ export async function createStagePlanner(host, plot, onScenario, openLive) {
     $('[data-plan="aspect"]').readOnly = ['dle150', 'current'].includes(scenario.lens);
     $('.pj-plan-presets').hidden = lane !== 'D';
     $('[data-plan="raster"]').previousElementSibling.textContent = scenario.portrait ? 'Full raster height (ft, portrait)' : 'Full raster width (ft, landscape)';
-    $('#plan-baseline-note').textContent = `${lane} · ${LANES[lane].target}. ${baseline[lane].heightKnown ? 'Recorded lens height.' : 'Recorded lens height unknown: enter a proposed height to preview.'} A/D recorded heights may differ from the venue; confirm each side independently. Edits stay in this tab; reset restores the loaded drawing.`;
+    $('#plan-baseline-note').textContent = `${lane} · ${LANES[lane].target}. ${baseline[lane].heightKnown ? 'Recorded lens height.' : 'Recorded lens height unknown: enter a proposed height to preview.'} Dimensions describe plotted raster coverage; each lane can be explored independently. Edits stay in this tab; reset restores the loaded drawing.`;
     update();
   };
   host.querySelectorAll('[data-plan-lane]').forEach(button => button.onclick = () => { lane = button.dataset.planLane; sync(); });
