@@ -21,6 +21,12 @@ const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const before = digest(original);
 const uid = process.getuid(), domain = `gui/${uid}`, label = `${domain}/com.avbydave.projctl`;
 const run = (cmd, args, options = {}) => execFileSync(cmd, args, { encoding: 'utf8', stdio: 'pipe', ...options });
+// Keep a stable PATH shim (for example Homebrew's bin/node) across runtime upgrades.
+let node = process.execPath;
+try {
+  const candidate = run('/usr/bin/which', ['node']).trim();
+  if (fs.realpathSync(candidate) === fs.realpathSync(process.execPath)) node = candidate;
+} catch {}
 // Preserve any previously installed service environment, including authentication.
 let env = {};
 if (fs.existsSync(paths.plist)) {
@@ -79,9 +85,9 @@ for (let n = 0; n < 40; n++) {
 if (fs.existsSync(paths.app)) fs.renameSync(paths.app, path.join(backup, 'app'));
 fs.renameSync(next, paths.app);
 fs.mkdirSync(path.dirname(paths.plist), { recursive: true });
-fs.writeFileSync(paths.plist, servicePlist({ node: process.execPath, app: paths.app, log: paths.log, env }), { mode: 0o600 });
+fs.writeFileSync(paths.plist, servicePlist({ node, app: paths.app, log: paths.log, env }), { mode: 0o600 });
 fs.mkdirSync(path.dirname(paths.launcher), { recursive: true });
-fs.writeFileSync(paths.launcher, launcherText({ node: process.execPath, app: paths.app }), { mode: 0o755 });
+fs.writeFileSync(paths.launcher, launcherText({ node, app: paths.app }), { mode: 0o755 });
 fs.chmodSync(paths.launcher, 0o755);
 if (digest(fs.readFileSync(rig)) !== before) throw new Error('Saved rig changed during installation. Backup preserved; service not started.');
 run('launchctl', ['bootstrap', domain, paths.plist]);

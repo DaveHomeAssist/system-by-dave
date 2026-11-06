@@ -2,7 +2,7 @@
 
 ## 2026-11-06
 
-- Projctl adds a supervised macOS runtime and one launcher that waits for relay health, preserving the private rig and app settings during migration. The live controller reports relay availability separately from device reachability, including last success and sanitized failure reasons over WebSocket updates. Saved-rig read errors now stop safely; settings writes use atomic replacement.
+- Projctl adds a supervised macOS runtime and one launcher that waits for relay health, preserving the private rig and app settings during migration. The live controller reports relay availability separately from device reachability, including last success and sanitized failure reasons over WebSocket updates. HDMI is the preferred input with an explicit per-device or all-device reset resolved from supported metadata. Saved-rig read errors now stop safely; settings writes use atomic replacement.
 
 ## November 5, 2026: Stable projector order
 

@@ -4,6 +4,7 @@ import path from 'node:path';
 
 const DEFAULT_RIG = {
   show: 'Frozen at WST',
+  preferredInput: 'HDMI',
   lock: false,
   projectors: [
     { slot: 'P1', label: 'Barco UDM 4K22', make: 'Barco', model: 'UDM 4K22', owner: 'Rental', driver: 'pulse', mac: '', ip: '', inputs: { 'HDMI': 'HDMI', 'SDI': 'SDI' }, notes: 'Snorkel, right angle out. L6-30 cord, needs 208V for full output.' },

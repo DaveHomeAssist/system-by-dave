@@ -1,5 +1,6 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 
 (async () => {
   const { startRelay, until } = await import('./relay-helper.js');
@@ -24,6 +25,75 @@ const assert = require('node:assert/strict');
     assert.equal(await label.inputValue(), 'Keep unsaved edit');
     assert.equal(await page.locator('[data-tab="setup"]').getAttribute('aria-selected'), 'true');
     await page.close();
+
+    // Cold unreachable devices cannot imply a healthy alarm state or guessed input.
+    const cold = await browser.newPage();
+    const coldState = structuredClone(snapshot);
+    const device = coldState.projectors.find(p => p.slot === 'P2');
+    device.status = { ...device.status, online: false, input: null, power: 'unknown', shutter: 'unknown', errors: {}, connection: { state: 'unreachable', lastSuccessAt: null, error: 'timeout' } };
+    let coldSocket;
+    await cold.routeWebSocket('**/ws', ws => { coldSocket = ws; ws.send(JSON.stringify(coldState)); });
+    await cold.goto(relay.base);
+    await cold.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
+    const coldUnassigned = cold.locator('.pj-unassigned');
+    if (await coldUnassigned.count() && !await coldUnassigned.evaluate(el => el.open)) await coldUnassigned.locator(':scope > summary').click();
+    const coldCard = cold.locator('.pj-tile[data-slot="P2"]');
+    await coldCard.locator('details[data-input-options] > summary').click();
+    assert.match(await coldCard.locator('.pj-health').innerText(), /Alarms\s+Unavailable/i);
+    assert.equal(await coldCard.locator('select[data-c="input"]').inputValue(), '');
+    assert.match(await coldCard.locator('option:checked').innerText(), /No input reported/);
+    const successful = { ...device.status, online: true, input: '31', connection: { state: 'online', lastSuccessAt: new Date().toISOString(), error: null } };
+    coldSocket.send(JSON.stringify({ type: 'status', slot: 'P2', status: successful }));
+    await until(async () => (await coldCard.locator('select[data-c="input"]').inputValue()) === '31');
+    assert.match(await coldCard.locator('.pj-health').innerText(), /Alarms\s+None reported/i);
+    coldSocket.send(JSON.stringify({ type: 'status', slot: 'P2', status: { ...successful, online: false, connection: { ...successful.connection, state: 'unreachable', error: 'timeout' } } }));
+    await until(() => coldCard.locator('select[data-c="input"]').isDisabled());
+    assert.equal(await coldCard.locator('select[data-c="input"]').inputValue(), '31');
+    assert.match(await coldCard.locator('.pj-telemetry-note').innerText(), /last known/);
+    coldSocket.send(JSON.stringify({ type: 'status', slot: 'P2', status: { ...successful, input: 'opaque-input' } }));
+    await until(async () => (await coldCard.locator('option:checked').textContent()).includes('opaque-input'));
+    assert.match(await coldCard.locator('option:checked').innerText(), /Reported input: opaque-input/);
+    await cold.close();
+
+    // Default reset is explicit, live metadata enables it, and guards stay active.
+    const hdmi = await browser.newPage();
+    const hdmiState = structuredClone(snapshot), requests = [];
+    hdmiState.projectors.find(p => p.slot === 'P2').inputPreference = { label: 'HDMI', value: null, available: false };
+    let hdmiSocket;
+    await hdmi.routeWebSocket('**/ws', ws => { hdmiSocket = ws; ws.send(JSON.stringify(hdmiState)); });
+    await hdmi.route('**/api/command', route => { const body = route.request().postDataJSON(); requests.push(body); return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ [body.slot]: { result: 'OK' } }) }); });
+    await hdmi.goto(relay.base);
+    await hdmi.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
+    const hdmiUnassigned = hdmi.locator('.pj-unassigned');
+    if (await hdmiUnassigned.count()) await hdmiUnassigned.locator(':scope > summary').click();
+    const hdmiCard = hdmi.locator('.pj-tile[data-slot="P2"]');
+    assert.equal(await hdmiCard.locator('[data-reset-input]').isDisabled(), true);
+    assert.equal(requests.length, 0, 'boot must never reset hardware');
+    const report = hdmiState.projectors.find(p => p.slot === 'P2');
+    hdmiSocket.send(JSON.stringify({ type: 'status', slot: 'P2', status: report.status, inputPreference: { label: 'HDMI', value: '32', available: true } }));
+    await until(async () => !await hdmiCard.locator('[data-reset-input]').isDisabled());
+    await hdmiCard.locator('details[data-input-options] > summary').click();
+    await hdmiCard.locator('[data-reset-input]').click();
+    await until(() => requests.length === 1);
+    assert.deepEqual(requests[0], { slot: 'P2', cmd: 'resetInput' });
+    assert.equal(await hdmiCard.locator('details[data-input-options]').evaluate(el => el.open), true);
+    await hdmi.locator('[data-all="resetInput"]').click();
+    await until(() => requests.length === 2);
+    assert.deepEqual(requests[1], { slot: 'all', cmd: 'resetInput' });
+    for (const [width, height] of [[1440, 900], [375, 812], [320, 256], [3840, 1080]]) {
+      await hdmi.setViewportSize({ width, height });
+      const size = await hdmi.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, cw: innerWidth, ch: innerHeight }));
+      assert.ok(size.w <= size.cw && size.h <= size.ch, `HDMI layout overflow at ${width}x${height}`);
+      if (process.env.ARTIFACT_DIR) { fs.mkdirSync(process.env.ARTIFACT_DIR, { recursive: true }); await hdmi.screenshot({ path: `${process.env.ARTIFACT_DIR}/hdmi-${width}-${height}.png` }); }
+    }
+    hdmiSocket.send(JSON.stringify({ type: 'busy', slot: 'P2', busy: 'lens' }));
+    await until(() => hdmiCard.locator('[data-reset-input]').isDisabled());
+    hdmiState.lock = true;
+    hdmiSocket.send(JSON.stringify(hdmiState));
+    await until(() => hdmi.locator('[data-all="resetInput"]').isDisabled());
+    assert.equal(await hdmiCard.locator('details[data-input-options]').evaluate(el => el.open), true);
+    assert.equal(requests.length, 2, 'polls and fresh snapshots must never reset inputs');
+    await hdmi.close();
 
     // An open socket without a snapshot cannot enable commands, and is retried.
     const waiting = await browser.newPage();
@@ -60,7 +130,8 @@ const assert = require('node:assert/strict');
     await choosing.goto(relay.base);
     await choosing.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
     const unassigned = choosing.locator('.pj-unassigned');
-    if (await unassigned.count() && !await unassigned.evaluate(el => el.open)) await unassigned.locator('summary').click();
+    if (await unassigned.count() && !await unassigned.evaluate(el => el.open)) await unassigned.locator(':scope > summary').click();
+    await choosing.locator('details[data-input-options="P2"] > summary').click();
     const select = choosing.locator('.pj-tile[data-slot="P2"] select[data-c="input"]');
     await select.evaluate(el => { el.focus(); el.dataset.fixtureToken = 'keep'; el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); });
     await new Promise(resolve => setTimeout(resolve, 200));
@@ -77,6 +148,6 @@ const assert = require('node:assert/strict');
     await expired.goto(relay.base);
     await expired.waitForURL('**/login.html');
     await expired.close();
-    console.log('Reconnect: hanging HTTP, missing snapshot, dirty setup retention, heartbeat/silence, input-menu safety and 401 redirect passed');
+    console.log('Reconnect: hanging HTTP, missing snapshot, dirty setup retention, heartbeat/silence, input-menu safety, cold telemetry and 401 redirect passed');
   } finally { await browser.close(); await relay.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

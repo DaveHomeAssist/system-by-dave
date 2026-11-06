@@ -143,6 +143,17 @@ For an older, manually managed installation, **Update Existing Projctl.command**
 remains available with `PROJCTL_UPDATE_TARGET` set to that installation. Stop
 that legacy relay first. See the runbook for the recommended managed migration.
 
+## Preferred input
+
+HDMI is the preferred input for every device and future lane assignment.
+**Reset to HDMI** is an explicit operator action, not an automatic action on
+startup or reconnect. Current input readback remains separate from that target.
+The relay resolves HDMI from each device's available input labels, so different
+models may use different protocol values. Ambiguous HDMI ports or missing
+metadata require an explicit choice in Other inputs. Show Lock, unavailable
+devices and active lens movement retain their normal input-change protection.
+The all-device reset reports successful and skipped targets independently.
+
 ## Drawing lane assignments
 
 Setup has an optional Drawing lane selector: A / SL Portal, B / Top Portal,

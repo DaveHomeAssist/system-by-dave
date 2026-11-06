@@ -16,6 +16,7 @@ import { confirmations } from './confirmations.js';
 import { readStagePlot } from './stage-plot.js';
 import { readVenue, readVenueAsset } from './venue-model.js';
 import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
+import { resolveInputPreference } from './input-preference.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -68,6 +69,8 @@ function driverFor(p) {
   return d;
 }
 
+function inputPreferenceFor(p) { return resolveInputPreference(driverFor(p).inputs ?? p.inputs, rig.preferredInput || 'HDMI'); }
+
 // ---- WebSocket broadcast ----
 const clients = new Set();
 function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients) if (c.readyState === 1) c.send(s); }
@@ -75,12 +78,12 @@ function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients
 setInterval(() => broadcast({ type: 'heartbeat', at: new Date().toISOString() }), 5000).unref();
 function snapshot() {
   return {
-    type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM,
+    type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM, preferredInput: rig.preferredInput || 'HDMI',
     relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
       return { ...p, password: undefined, status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null,
-        inputs: d.inputs ?? p.inputs, patterns: p.ip ? (d.patterns || null) : null,
+        inputs: d.inputs ?? p.inputs, inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lens, picture: !!d.getPicture } };
     }),
@@ -108,7 +111,7 @@ async function pollOnce(p) {
     status.set(p.slot, next);
     if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
     const d = driverFor(p);
-    broadcast({ type: 'status', slot: p.slot, status: { ...next, connection }, inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
+    broadcast({ type: 'status', slot: p.slot, status: { ...next, connection }, inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
   } catch (e) {
     const n = missed.get(p.slot) + 1; missed.set(p.slot, n);
     Object.assign(connection, { state: 'unreachable', error: connectionError(p, e), consecutiveFailures: n });
@@ -121,7 +124,7 @@ function setOffline(slot, why) {
   const next = { ...prev, online: false, updatedAt: new Date().toISOString() };
   status.set(slot, next);
   if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
-  broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) } });
+  broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, inputPreference: inputPreferenceFor(store.projector(slot)) });
 }
 setInterval(() => rig.projectors.forEach(poll), POLL_MS);
 rig.projectors.forEach(poll);
@@ -150,6 +153,12 @@ async function command(slot, cmd, arg, source = 'ui') {
   if (!p) throw httpErr(404, `no projector ${slot}`);
   const st = status.get(slot);
   if (!st.online) throw httpErr(409, `${slot} is offline`);
+  const resettingInput = cmd === 'resetInput';
+  if (resettingInput) {
+    const preference = inputPreferenceFor(p);
+    if (!preference.available) throw httpErr(409, preference.reason);
+    cmd = 'input'; arg = preference.value;
+  }
   if (rig.lock && (cmd === 'power' && !arg || cmd === 'input' || cmd === 'pattern' || cmd === 'lens' && arg?.op !== 'stop' || cmd === 'picture')) throw httpErr(423, 'show lock is on');
   if (cmd === 'power' && arg && st.power === POWER.COOLING) throw httpErr(409, `${slot} is cooling, wait before power on`);
   const stop = cmd === 'lens' && arg?.op === 'stop';
@@ -166,9 +175,9 @@ async function command(slot, cmd, arg, source = 'ui') {
     else if (cmd === 'lens') { if (!d.lens) throw httpErr(400, `${slot}: lens not supported by ${d.kind} driver`); result = await d.lens(arg); }
     else if (cmd === 'picture') { if (!d.picture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`); result = await d.picture(arg.key, arg.value); }
     else throw httpErr(400, `unknown command ${cmd}`);
-  } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw httpErr(502, e.message); }
+  } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw httpErr(502, e.message); }
   finally { if (moving) { busy.delete(slot); broadcast({ type: 'busy', slot, busy: null }); } }
-  store.event({ source, slot, command: `${cmd} ${fmtArg(arg)}`, result, detail });
+  store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail });
   broadcast({ type: 'event', event: rig.events.at(-1) });
   if (cmd === 'lens' || cmd === 'input' || cmd === 'picture') { await polling.get(slot); await poll(p); }
   else setTimeout(() => poll(p), 400);
@@ -298,6 +307,12 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(302, { location: '/login.html' }); return res.end();
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
+    if (url.pathname === '/api/preferred-input' && req.method === 'POST') {
+      const { input } = await body(req);
+      if (input !== 'HDMI') throw httpErr(400, 'The supported default input is HDMI.');
+      rig.preferredInput = input; store.save(); broadcast(snapshot());
+      return json(res, 200, { preferredInput: input });
+    }
     if (url.pathname === '/api/schema') return json(res, 200, { patterns: PATTERNS, picture: pictureSchema() });
     if (url.pathname === '/api/stage-plot' && req.method === 'GET') return json(res, 200, { plot: await readStagePlot(STAGE_PLOT) });
     if ((url.pathname === '/api/venue-model' || url.pathname.startsWith('/api/venue-model/')) && req.method === 'GET') {
