@@ -116,10 +116,14 @@ function patchControls(current, desired, protectedNode = null) {
   const before = [...current.childNodes], after = [...desired.childNodes];
   after.forEach((next,index) => {
     const old = before[index];
-    if (old === protectedNode) return;
     if (!old || old.nodeType !== next.nodeType || old.nodeName !== next.nodeName) { if(old)old.replaceWith(next);else current.append(next); return; }
     if (old.nodeType === 3) { if(old.textContent !== next.textContent)old.textContent=next.textContent; return; }
     if (old.nodeType !== 1) return;
+    const targetChanged = old._controlIdentity !== next._controlIdentity;
+    const actionChanged = old.dataset.focusKey !== next.dataset.focusKey;
+    const unsafeSelect = old.matches('select') && (old.disabled !== next.disabled || old._inputOptions !== next._inputOptions);
+    if (targetChanged || actionChanged || unsafeSelect) { old.replaceWith(next); return; }
+    if (old === protectedNode) return; // An unchanged, safely editable native menu stays open.
     for(const attr of [...old.attributes])if(!next.hasAttribute(attr.name))old.removeAttribute(attr.name);
     for(const attr of [...next.attributes])if(old.getAttribute(attr.name)!==attr.value)old.setAttribute(attr.name,attr.value);
     for(const event of ['onclick','onpointerdown','onkeydown','onchange','onblur'])old[event]=next[event];
@@ -153,7 +157,7 @@ function renderGrid() {
     const resetAvailable = preference?.available === true;
 
     const pat = s.pattern ? ((p.patterns || PATTERNS)[s.pattern] || s.pattern) : '—';
-    const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', lane ? projectorName(p) : `Unassigned ${p.label}`);
+    const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card._controlIdentity = JSON.stringify([p.slot,p.driver,p.ip,p.mac]); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', lane ? projectorName(p) : `Unassigned ${p.label}`);
     card.innerHTML = `
       <div class="avd-panel__head"><h2 class="avd-panel__title"><span class="avd-panel__index">${lane ? esc(p.lane) : '—'}</span>${esc(lane ? 'Projector ' + p.lane : p.label)}<span class="avd-dot avd-dot--${st}" aria-hidden="true"></span></h2></div>
       <div class="avd-panel__body">

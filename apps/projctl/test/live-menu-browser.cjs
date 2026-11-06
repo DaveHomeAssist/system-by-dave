@@ -25,6 +25,17 @@ const assert=require('node:assert/strict');
   state.lock=true;socket.send(JSON.stringify(state));await until(()=>select.isDisabled());
   assert.equal(await select.evaluate(el=>el===window.retainedSelect),false);
   state.lock=false;socket.send(JSON.stringify(state));await until(async()=>!await select.isDisabled());
+  const originalSelect=await select.elementHandle();
+  state.projectors.find(p=>p.slot==='P2').inputs={...state.projectors.find(p=>p.slot==='P2').inputs,'99':'New input metadata'};
+  socket.send(JSON.stringify(state));await until(async()=>await select.locator('option[value="99"]').count()===1);
+  assert.equal(await select.evaluate((el,old)=>el===old,originalSelect),false,'changed input metadata cancels old native select');
+  const originalCard=await p2.elementHandle(),originalAction=await p2.locator('[data-adj="picture"]').elementHandle();
+  state.projectors.find(p=>p.slot==='P2').ip='192.0.2.22';socket.send(JSON.stringify(state));
+  await until(async()=>!await originalCard.evaluate(el=>el.isConnected));
+  assert.equal(await originalAction.evaluate(el=>el.isConnected),false,'target change cancels old controls');
+  const beforeAssignment=await p2.locator('[data-adj="picture"]').elementHandle();
+  state.projectors.find(p=>p.slot==='P2').lane='D';state.projectors.find(p=>p.slot==='P4').lane='B';socket.send(JSON.stringify(state));
+  await until(async()=>!await beforeAssignment.evaluate(el=>el.isConnected));
   await select.click();socket.close();await until(()=>select.isDisabled());
   console.log('Live menu: other device loss/fault, same-device alarms, DOM retention, show lock and relay loss passed');
  }finally{await browser.close();await relay.close();}
