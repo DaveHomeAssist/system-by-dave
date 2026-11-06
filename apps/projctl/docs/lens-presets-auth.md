@@ -39,3 +39,29 @@ This does not itself create a tunnel, DNS entry, public endpoint or membership.
 Cross-site iframe authentication and the actual Studio crew endpoint require
 separate verification; Strict cookies must not be advertised as working inside
 a public cross-site iframe. Same-origin local workspace tabs remain available.
+
+`capabilities.lensJog` declares implemented axes, speeds, mode, Stop support and
+position-readback support without querying a projector. Pulse and simulation use
+bounded steps (slow/normal/fast: 128/512/2048 native units); Panasonic uses its
+three native jog speeds, with no Stop or absolute-position readback implemented.
+PJLink reports unsupported with empty axes/speeds, even though its driver exposes
+a method that throws NotSupported. The legacy `capabilities.lens` flag follows
+these implemented jog axes. Metadata does not establish current motor availability;
+connection, busy, lock and command/readback guards still apply.
+
+
+Selecting an assigned projector opens its lens workspace. Fine/Normal/Coarse
+select the supported native increments or jog speeds; they are not a duration or
+an absolute distance. Arrow keys affect shift only after explicit Enable arrow
+keys and while the dedicated keyboard area has focus. One press sends one jog;
+auto-repeat is ignored. Release requests Stop only when supported and a move is
+pending. Escape, blur, hidden page, target changes, disconnection, offline state
+or Show Lock disarm keyboard control. Ordinary edits elsewhere do not move a lens.
+Panasonic exposes no Stop button because that driver implements native jogs only.
+
+Button acknowledgement describes the command response, never an optimistic power,
+shutter or lens state. A fresh confirmed shutter reading exposes its opposite
+action only; unknown/stale/offline telemetry retains both explicit choices with
+existing guards. Group shutter choices remain explicit. Saving/recalling from the
+lens panel is a **rig preset** action: review its summary and explicitly confirm
+all involved targets, rather than assuming it moves only the selected projector.

@@ -2,6 +2,8 @@
 
 ## 2026-11-06
 
+- Add a guarded per-projector lens workspace with supported Fine/Normal/Coarse steps, explicit focused arrow-key opt-in, release/Stop behavior where supported, readbacks and confirmed rig-preset recall. Show command acknowledgement separately from actual state; fresh confirmed shutters expose only the opposite action, while unknown or stale readings retain explicit choices.
+
 - Report lens verification as unknown when the post-recall status read fails, rather than comparing retained cached positions and showing a false match. Keep rig cards responsive to their actual pane width and contain control labels in narrow views.
 
 - Projctl adds six primary views, dedicated A-D projector details, shared documented gear/catalog/signal-flow references and the canonical Throwline calculator. Forward-integrate guarded Pulse lens preset recall and password aliases, plus cached projector signal and bounded computer-display readouts with explicit unavailable EDID. Preserve managed settings and host assignment; no automatic hardware action.
