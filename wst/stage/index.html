@@ -1,0 +1,49 @@
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Frozen public Stage</title><link rel="stylesheet" href="/stage/avd/tokens.css"><link rel="stylesheet" href="/stage/avd/bundle.css"><link rel="stylesheet" href="/stage/app.css"><link rel="stylesheet" href="/stage/stage.css"><link rel="stylesheet" href="/stage/public-stage.css"><script type="importmap">{"imports":{"three":"/ProjectorThrow/vendor/three/three.module.min.js","three/addons/controls/OrbitControls.js":"/ProjectorThrow/vendor/three/addons/controls/OrbitControls.js"}}</script><script type="module" src="/stage/public-stage.js"></script></head><body><p class="public-stage-notice"><a href="/" target="_top">Frozen Home</a> · Public room &amp; plot reference · local what-if planning · no hardware commands</p>    <section id="tab-stage" class="tab on" role="tabpanel" aria-labelledby="tab-btn-stage">
+      <div class="pj-stage-head">
+        <div><span class="avd-eyebrow">Projection plot</span><h2 id="stage-title">Stage view</h2></div>
+        <div class="avd-seg pj-stage-mode" role="group" aria-label="Stage mode"><button class="avd-seg__btn" type="button" data-stage-mode="reference" aria-pressed="true">Rig reference</button><button class="avd-seg__btn" type="button" data-stage-mode="planning" aria-pressed="false">What-if planning</button></div>
+        <div class="avd-seg" role="group" aria-label="Stage viewpoint">
+          <button class="avd-seg__btn" type="button" data-stage-view="building" aria-pressed="false" hidden>Building</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="3d" aria-pressed="true">3D</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="front" aria-pressed="false">Front 2D</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="plan" aria-pressed="false">Plan 2D</button>
+        </div>
+      </div>
+      <div id="stage-message" class="pj-stage-empty" role="status">Loading local plot…</div>
+      <div id="stage-workspace" class="pj-stage-workspace" hidden>
+        <div class="pj-stage-drawing">
+          <div class="pj-stage-toolbar">
+            <span id="stage-caption" class="pj-mono"></span>
+            <div class="pj-stage-layers" role="group" aria-label="Show coverage layers"><span class="pj-mono">Coverage</span></div>
+          </div>
+          <div class="pj-stage-viewport">
+            <div id="stage-canvas" class="pj-stage-canvas" hidden></div>
+            <div id="stage-3d" class="pj-stage-3d"><p id="stage-3d-message" role="status">Loading Throwline 3D…</p></div>
+            <div id="stage-building" class="pj-stage-3d" hidden><p id="stage-building-message" role="status">Loading building…</p></div>
+          </div>
+          <p id="stage-foot" class="pj-stage-foot pj-mono">Plot reference · coverage is not live beam position</p>
+        </div>
+        <aside class="pj-stage-sidebar" aria-label="Stage projectors" data-web2-scroll>
+          <button class="avd-btn avd-btn--primary" type="button" id="stage-add-room" hidden>Plan with room reference</button>
+          <div id="stage-alignment" hidden>
+            <strong class="pj-plan-badge">Approximate venue alignment</strong>
+            <details><summary>Adjust room alignment</summary><div class="pj-plan-fields">
+              <label class="avd-field"><span class="avd-field__label">Room X offset (m)</span><input class="avd-input" type="number" step="0.1" value="0" data-room-axis="x"></label>
+              <label class="avd-field"><span class="avd-field__label">Room Y offset (m)</span><input class="avd-input" type="number" step="0.1" value="0" data-room-axis="y"></label>
+              <label class="avd-field"><span class="avd-field__label">Room Z offset (m)</span><input class="avd-input" type="number" step="0.1" value="0.2" data-room-axis="z"></label>
+              <label class="avd-field"><span class="avd-field__label">Room yaw (degrees)</span><input class="avd-input" type="number" step="1" value="0" data-room-axis="yaw"></label>
+            </div><p class="pj-mono">Stage floor aligned at Y0; room proscenium used as a tentative target-plane anchor (Z+0.2 m). No scale correction. Local preview only; not surveyed or clearance-checked. Bright enclosure outlines remain visible through room geometry as position aids.</p></details>
+          </div>
+          <div id="stage-planner" hidden></div>
+          <div id="stage-live-reference">
+          <div class="pj-rowhead"><h3>Projectors</h3><span id="stage-status-kind" class="pj-mono"></span></div>
+          <p class="pj-mono pj-note">Recorded projector reference. What-if edits never operate hardware.</p>
+          <div id="stage-projectors" class="pj-stage-projectors"></div>
+          <p id="stage-source" class="pj-mono pj-note"></p>
+          <a class="pj-stage-planner" href="https://avbydave.com/ProjectorThrow/" target="_blank" rel="noopener noreferrer">Open Throwline ↗<span>Separate planning workspace · opens a new tab</span></a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+</body></html>
