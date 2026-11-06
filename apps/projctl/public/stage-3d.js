@@ -83,6 +83,7 @@ export async function createStage3D(host, plot, openLane) {
     model.add(line([data.projector, label.position.toArray()], color, .8));
     targets.push({ id: lane, label: `${lane} ${LANES[lane].target}`, objects: [projector, label] });
   }
+  const proposal = new THREE.Group(); proposal.name = 'Local what-if proposal'; model.add(proposal);
   stage.setObject(model);
   // Reference faces must remain translucent and never cast artificial beam shadows.
   model.traverse(o => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; } });
@@ -119,6 +120,27 @@ export async function createStage3D(host, plot, openLane) {
   window.addEventListener('pagehide', onPageHide);
   theme(); frame(); host.dataset.state = 'ready';
   return {
+    planning(result, reframe = false) {
+      for (const child of [...proposal.children]) {
+        child.traverse(object => { object.geometry?.dispose(); for (const material of [object.material].flat().filter(Boolean)) material.dispose(); });
+        proposal.remove(child);
+      }
+      host.dataset.planningLane = result?.lane || '';
+      if (result) {
+        const color = COLORS[result.lane];
+        const face = polygon(result.corners, color, .4); face.renderOrder = 6; proposal.add(face);
+        const outline = line([...result.corners, result.corners[0]], color); outline.renderOrder = 7; proposal.add(outline);
+        const content = line([...result.content, result.content[0]], '#ffffff'); content.material.depthTest = false; content.renderOrder = 8; proposal.add(content);
+        for (const corner of result.corners) proposal.add(line([result.projector, corner], color, .65));
+        const marker = box(result.body, result.projector.map((v, i) => v + result.normal[i] * result.body[2] / 2), color);
+        marker.rotation.y = Math.atan2(result.normal[0], result.normal[2]);
+        marker.material.wireframe = true; marker.name = 'Proposed lens position and schematic enclosure'; proposal.add(marker);
+        const datum = new THREE.Mesh(new THREE.SphereGeometry(.07, 12, 8), new THREE.MeshBasicMaterial({ color }));
+        datum.position.set(...result.projector); proposal.add(datum);
+      }
+      if (reframe && result) frame(0);
+      stage.requestRender();
+    },
     layers(hidden) { for (const [lane, group] of groups) group.visible = !hidden.has(lane); stage.requestRender(); },
     highlight(lane) { for (const [key, group] of groups) group.traverse(o => { if (o.material) { o.material.opacity = o.material.userData.baseOpacity ?? o.material.opacity; o.material.userData.baseOpacity = o.material.opacity; if (lane && lane !== key) o.material.opacity *= .15; } }); stage.requestRender(); },
     active(on) { stage.toggleAttribute('paused', !on); if (on) stage.requestRender(); },

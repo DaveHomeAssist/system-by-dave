@@ -4,7 +4,7 @@ set -euo pipefail
 if [ "$(uname)" = "Darwin" ]; then
   PLIST="$HOME/Library/LaunchAgents/com.avbydave.projctl.plist"
   launchctl bootout "gui/$(id -u)" "$PLIST" 2>/dev/null || true; rm -f "$PLIST"
-  echo "LaunchAgent removed. App folder left at $HOME/projctl (delete it after backing up data/)."
+  echo "LaunchAgent removed. Runtime and settings left at $HOME/Library/Application Support/Projctl. Launcher left in $HOME/Applications."
 else
   sudo systemctl disable --now projctl 2>/dev/null || true; sudo rm -f /etc/systemd/system/projctl.service; sudo systemctl daemon-reload
   echo "systemd unit removed. App folder left at /opt/projctl (delete it after backing up data/)."

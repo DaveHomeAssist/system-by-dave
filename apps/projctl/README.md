@@ -1,5 +1,11 @@
 # projctl: Frozen at WST projector control
 
+
+For managed macOS access, use `~/Applications/Open Projctl.command` or
+`http://localhost:8080/`. The service starts at login and recovers after exit.
+See [managed service access and recovery](deploy/RUNBOOK.md#managed-macos-access-and-recovery)
+for installation, the one live settings location, logs and backups.
+
 One relay, one web page, four projectors. Spec: Frozen at WST | Projector Control App Spec.
 
 ## Run
@@ -129,11 +135,24 @@ To prepare a synchronized update from a clean source checkout, run
 `node scripts/package-update.js /path/to/new-output /path/to/private-venue`.
 Omit the last argument for a code-only update. The resulting directory has a
 source commit/model version manifest and file checksums, without a saved rig.
-On the Mac, stop the relay, then double-click **Update Existing Projctl.command**
-in that directory. It backs up `~/Desktop/projctl`, updates code and the supplied
-model, and preserves rig files, presets, the stage plot and existing launchers.
-Restart with the existing launcher and reload clients. A custom installation
-can set `PROJCTL_UPDATE_TARGET`; custom-port relays must also be stopped first.
+For the managed Mac service, run `node deploy/install-service.js` followed by
+the existing installation path. The installer handles the verified relay,
+backups and restart; use **Open Projctl.command** in `~/Applications` afterward.
+Live settings stay in Application Support and are not replaced by package data.
+For an older, manually managed installation, **Update Existing Projctl.command**
+remains available with `PROJCTL_UPDATE_TARGET` set to that installation. Stop
+that legacy relay first. See the runbook for the recommended managed migration.
+
+## Preferred input
+
+HDMI is the preferred input for every device and future lane assignment.
+**Reset to HDMI** is an explicit operator action, not an automatic action on
+startup or reconnect. Current input readback remains separate from that target.
+The relay resolves HDMI from each device's available input labels, so different
+models may use different protocol values. Ambiguous HDMI ports or missing
+metadata require an explicit choice in Other inputs. Show Lock, unavailable
+devices and active lens movement retain their normal input-change protection.
+The all-device reset reports successful and skipped targets independently.
 
 ## Drawing lane assignments
 
@@ -210,3 +229,12 @@ strings are limited to 160 characters. Unsupported versions and missing lanes
 are rejected. Unknown fields are discarded, including any slot, command or
 network address. The synthetic example in `test/stage-fixture.js` illustrates the
 format without publishing venue data. Keep the original plot as the authority.
+
+## Stage scenario planning
+
+Stage offers a local What-if planning mode for independent A/B/C/D lens, throw,
+raster, orientation, position and shift studies. It uses canonical Throwline
+optics while retaining the loaded plot as reference. Planning changes stay in
+the browser tab and send no device or settings writes. See
+[planning boundaries and D lens study](docs/stage-planning.md). An unregistered
+private room remains a separate appearance reference without planning overlays.

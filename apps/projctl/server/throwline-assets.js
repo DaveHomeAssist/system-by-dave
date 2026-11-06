@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 export const THROWLINE_FILES = Object.freeze([
   'three-d-stage.js',
+  'throwline-scene-state.js',
   'vendor/three/three.module.min.js',
   'vendor/three/three.core.min.js',
   'vendor/three/addons/controls/OrbitControls.js',

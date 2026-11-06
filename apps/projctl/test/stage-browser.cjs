@@ -44,9 +44,13 @@ exports.checkStage = async (page, relay, offline, until) => {
   await relay.api('projector', { slot: 'P3', lane: '' });
   await relay.api('projector', { slot: 'P3', lane: 'A' });
   await until(async () => (await page.locator('.pj-stage-card[data-lane="A"]').getAttribute('data-slot')) === 'P3');
+  const beforeRemapDraw = await page.evaluate(() => window.stageDraws);
   await page.locator('[data-stage-view="3d"]').click();
+  // Returning from a hidden view resizes the canvas on the next frame.
+  await until(async () => (await page.evaluate(() => window.stageDraws)) > beforeRemapDraw);
   const remapped = await page.locator('three-d-stage').evaluate(stage => stage.getActivationTargetScreenPoint('A'));
   await page.mouse.click(remapped.x, remapped.y);
+  await page.locator('#adjust').waitFor();
   assert.match(await page.locator('#adj-sub').innerText(), /^P3/);
   await page.keyboard.press('Escape');
   await relay.api('projector', { slot: 'P3', lane: '' });
