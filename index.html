@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>System by Dave — Tools that do the unglamorous work</title>
 <meta name="robots" content="index,follow">
 <meta name="twitter:title" content="System by Dave — Tools that do the unglamorous work">
@@ -21,12 +21,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/fonts.css">
-<script>
-  if (window.location.pathname.endsWith('/index.html')) {
-    const p = window.location.pathname.replace(/index\.html$/, '');
-    window.location.replace(`${window.location.origin}${p}${window.location.search}${window.location.hash}`);
-  }
-</script>
+<script src="js/sbd-clean-index-url.js"></script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"System by Dave","url":"https://systembydave.com/","description":"Offline-capable browser tools for live-show crews, the Prompt Lab prompt workbench, and agents and widgets for Notion. Built by Dave Robertson.","publisher":{"@type":"Person","name":"Dave Robertson"},"sameAs":["https://github.com/DaveHomeAssist/system-by-dave","https://promptlab.tools"]}
 </script>
