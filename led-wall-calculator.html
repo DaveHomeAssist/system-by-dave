@@ -293,8 +293,22 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       });
     }catch(error){report('error','Offline unavailable — keep connection');return false;}
   }
-  global.AVOffline={prepare};
-  function start(){badge=document.getElementById('workspaceOffline');if(badge)prepare();}
+  /* Saved AV data lives only in this browser. Ask once per load for persistent
+     storage so iOS/Safari and Chromium are less likely to evict it (AUD-017).
+     Firefox asks the user with a permission prompt, so it is skipped there.
+     The outcome is recorded on data-storage-persisted; nothing else changes. */
+  async function persistStorage(){
+    const storage=navigator.storage;
+    if(!isSecureContext||!storage||typeof storage.persist!=='function')return null;
+    try{
+      let persisted=typeof storage.persisted==='function'?await storage.persisted():false;
+      if(!persisted&&!/\bFirefox\//.test(navigator.userAgent))persisted=await storage.persist();
+      root.dataset.storagePersisted=String(Boolean(persisted));
+      return Boolean(persisted);
+    }catch{return null;}
+  }
+  global.AVOffline={prepare,persistStorage};
+  function start(){persistStorage();badge=document.getElementById('workspaceOffline');if(badge)prepare();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })(window);
 
