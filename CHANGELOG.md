@@ -2,7 +2,7 @@
 
 ## 2026-11-06
 
-- Report lens verification as unknown when the post-recall status read fails, rather than comparing retained cached positions and showing a false match.
+- Report lens verification as unknown when the post-recall status read fails, rather than comparing retained cached positions and showing a false match. Keep rig cards responsive to their actual pane width and contain control labels in narrow views.
 
 - Projctl adds six primary views, dedicated A-D projector details, shared documented gear/catalog/signal-flow references and the canonical Throwline calculator. Forward-integrate guarded Pulse lens preset recall and password aliases, plus cached projector signal and bounded computer-display readouts with explicit unavailable EDID. Preserve managed settings and host assignment; no automatic hardware action.
 
