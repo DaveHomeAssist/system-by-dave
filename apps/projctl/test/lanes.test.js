@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { startRelay, until } from './relay-helper.js';
-import { laneOf, orderedProjectors } from '../public/lanes.js';
+import { laneOf, orderedProjectors, rigLanes } from '../public/lanes.js';
 import { openStore } from '../server/store.js';
 
 test('lane edits preserve legacy identity and persist without changing routes', async () => {
@@ -30,4 +30,16 @@ test('invalid imported lane metadata falls back without losing slot order', () =
   assert.equal(laneOf(projectors[0]), null);
   assert.deepEqual(orderedProjectors(projectors).map((p) => p.slot), ['P3', 'P1', 'P2']);
   assert.deepEqual(projectors.map((p) => p.slot), ['P1', 'P2', 'P3']);
+});
+
+test('missing and duplicate lanes keep A B C D positions without guessing routes', () => {
+  const projectors = [{ slot: 'P1', lane: 'C' }, { slot: 'P2', lane: 'B' }, { slot: 'P3', lane: '' }, { slot: 'P4', lane: 'D' }];
+  const rows = rigLanes(projectors);
+  assert.deepEqual(rows.map(({ lane }) => lane), ['A', 'B', 'C', 'D']);
+  assert.deepEqual(rows.map(({ projector }) => projector?.slot || null), [null, 'P2', 'P1', 'P4']);
+  assert.equal(rows[1].projector, projectors[1]);
+  const ambiguous = rigLanes([...projectors, { slot: 'P5', lane: 'C' }]);
+  assert.equal(ambiguous[2].projector, null);
+  assert.equal(ambiguous[2].conflict, true);
+  assert.deepEqual(projectors.map((p) => p.slot), ['P1', 'P2', 'P3', 'P4']);
 });

@@ -138,8 +138,11 @@ can set `PROJCTL_UPDATE_TARGET`; custom-port relays must also be stopped first.
 ## Drawing lane assignments
 
 Setup has an optional Drawing lane selector: A / SL Portal, B / Top Portal,
-C / Stage, D / SR Portal. Cards sort by drawing letter and show the matching
-magenta, cyan, amber or green accent plus orientation. Labels remain editable;
+C / Stage, D / SR Portal. Rig always shows A, B, C and D in that order, with
+an explicit placeholder when a lane has no unique device. Unassigned devices
+remain available in a separate expandable section. Rig and Stage cards use
+the drawing identity and model; relay IDs remain in Setup and control details.
+Cards show the matching magenta, cyan, amber or green accent plus orientation. Labels remain editable;
 slot IDs (P1 through P4), preset keys and OSC/TCP addresses never change.
 The adjustment dialog, preset summaries and log retain the slot beside the lane.
 Clear an existing assignment before assigning its lane to another projector.

@@ -154,12 +154,12 @@ export function createStageView(root, openControls, canAdjust) {
       const shutter = ['open', 'closed'].includes(s?.shutter) ? `Shutter ${s.shutter}` : 'Shutter unknown';
       const status = !p || !online || !s?.online ? reason : [power, shutter, !canAdjust(p) && 'Adjustments unavailable'].filter(Boolean).join(' · ');
       const card = cards.get(lane), marker = markers.get(lane);
-      card.querySelector('.pj-stage-device').textContent = p ? `${p.slot} · ${info.orientation}` : 'No unique control slot';
+      card.querySelector('.pj-stage-device').textContent = p ? `${p.model || p.make || 'Projector'} · ${info.orientation}` : 'No unique control slot';
       card.querySelector('.pj-stage-state').textContent = status;
       // Keep buttons in the keyboard order so unavailable states remain discoverable.
       for (const b of [card, marker].filter(Boolean)) {
         b.setAttribute('aria-disabled', String(!!reason));
-        b.setAttribute('aria-label', `${lane} ${info.target}. ${p ? p.slot + '. ' : ''}${status}${reason ? '' : '. Open controls'}`);
+        b.setAttribute('aria-label', `${lane} ${info.target}. ${status}${reason ? '' : '. Open controls'}`);
         b.dataset.slot = p?.slot || '';
       }
     }

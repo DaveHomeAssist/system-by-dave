@@ -32,6 +32,27 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await page.locator('#toast').filter({ hasText: 'P4: command accepted' }).waitFor();
         if (offline) assert.match(await page.locator('#toast').innerText(), /P1:.*skipped/);
 
+        // An unassigned first lane must not shift B/C/D or steal a device.
+        for (const [slot, lane] of Object.entries({ P1: 'C', P2: 'B', P4: 'D' })) await relay.api('projector', { slot, lane });
+        await page.locator('#grid > .pj-tile[data-lane="B"][data-slot="P2"]').waitFor();
+        const laneOrder = () => page.locator('#grid > .pj-tile').evaluateAll(els => els.map(el => [el.dataset.lane, el.dataset.slot || null]));
+        assert.deepEqual(await laneOrder(), [['A', null], ['B', 'P2'], ['C', 'P1'], ['D', 'P4']]);
+        assert.equal(await page.locator('.pj-unbound[data-lane="A"] [data-c]').count(), 0);
+        assert.doesNotMatch(await page.locator('#grid > .pj-tile[data-lane="C"]').innerText(), /\bP1\b/);
+        await page.locator('.pj-unassigned > summary').click();
+        await page.locator('.pj-unassigned .pj-tile[data-slot="P3"]').waitFor();
+        await relay.api('command', { slot: 'all', cmd: 'shutter', arg: 0 });
+        await until(async () => (await relay.state()).projectors.find(p => p.slot === 'P2').status.shutter === 'open');
+        await page.locator('#grid > .pj-tile[data-lane="B"] [data-c="shutter"][data-a="1"]').click();
+        await until(async () => (await relay.state()).projectors.find(p => p.slot === 'P2').status.shutter === 'closed');
+        assert.equal((await relay.state()).projectors.find(p => p.slot === 'P4').status.shutter, 'open');
+        assert.equal(await page.locator('.pj-unassigned').evaluate(el => el.open), true);
+        await page.reload();
+        await page.locator('#grid > .pj-tile[data-lane="D"][data-slot="P4"]').waitFor();
+        assert.deepEqual(await laneOrder(), [['A', null], ['B', 'P2'], ['C', 'P1'], ['D', 'P4']]);
+        await relay.api('projector', { slot: 'P2', lane: '' });
+        await relay.api('projector', { slot: 'P4', lane: '' });
+
         // Drawing order must never change the command target.
         for (const [slot, lane] of Object.entries({ P1: 'C', P2: 'A', P3: 'D', P4: 'B' })) {
           await relay.api('projector', { slot, lane });
