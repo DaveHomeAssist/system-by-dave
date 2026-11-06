@@ -79,6 +79,9 @@ test('Pulse uses discovered inputs, validated picture ranges and waits for bound
   assert.ok(Date.now() - start >= 70); assert.equal(position, 1128); assert.equal(running, false);
   assert.equal(requests.some((r) => /stepforward/.test(r.method)), false);
   for (const [speed, delta] of [['normal', 512], ['fast', 2048]]) { const before = position; await d.lens({ axis: 'focus', dir: '+', speed }); assert.equal(position, before + delta); }
+  const mismatch = pulseDriver({ host: '127.0.0.1', port: server.address().port, motionPollMs: 10, motionSettleMs: 0 });
+  await mismatch.recallLens({ focus: 2500 });
+  assert.equal(position, 2500, 'fresh readback is the saved target in this fixture');
   hold = true;
   await assert.rejects(d.lens({ axis: 'focus', dir: '+', speed: 'slow' }), /timed out; stop requested/);
   assert.equal(running, false);
@@ -118,4 +121,32 @@ test('Stop cancels a pending target, and monitoring failure requests a stop', as
   mode = 'monitor-error';
   await assert.rejects(d.lens({ axis: 'focus', dir: '+' }), /motor telemetry lost; stop requested/);
   assert.equal(moved, true); assert.equal(running, false); assert.equal(stops, 5);
+});
+
+test('compound recall validates all axes before targets and stops all axes on a partial send failure', async (t) => {
+  const requests = [], sockets = new Set(); let failZoom = false;
+  const server = net.createServer(socket => {
+    sockets.add(socket); socket.on('close', () => sockets.delete(socket)); let data = '';
+    socket.on('data', bytes => {
+      data += bytes; if (!data.includes('\n')) return;
+      const request = JSON.parse(data.trim()); requests.push(request);
+      const property = request.params?.property;
+      let result = true, error;
+      if (property === 'system.state') result = 'on';
+      else if (property?.endsWith('.state')) result = 'Stopped';
+      else if (property?.endsWith('.minposition')) result = 0;
+      else if (property?.endsWith('.maxposition')) result = 100;
+      else if (request.method === 'property.set' && property === 'optics.zoom.target' && failZoom) error = { message: 'fixture target refused' };
+      socket.end(JSON.stringify({ jsonrpc: '2.0', id: request.id, ...(error ? { error } : { result }) }));
+    });
+  });
+  server.listen(0, '127.0.0.1'); await once(server, 'listening');
+  t.after(() => { for (const socket of sockets) socket.destroy(); server.close(); });
+  const driver = pulseDriver({ host: '127.0.0.1', port: server.address().port });
+  await assert.rejects(driver.recallLens({ focus: 10, zoom: 101 }), /travel limits/);
+  assert.equal(requests.filter(r => r.method === 'property.set').length, 0);
+  await assert.rejects(driver.recallLens({ focus: 10, bogus: 5 }), /Invalid/);
+  failZoom = true;
+  await assert.rejects(driver.recallLens({ focus: 10, zoom: 20 }), /stop requested/);
+  assert.deepEqual(requests.filter(r => r.method.endsWith('.stop')).map(r => r.method), ['optics.focus.stop', 'optics.zoom.stop']);
 });

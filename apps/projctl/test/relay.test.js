@@ -62,9 +62,31 @@ test('a confirmed target going offline does not stop later targets; presets stil
   assert.match(out.P2.error, /offline/);
   for (const s of ['P1', 'P3', 'P4']) assert.equal(out[s].result, 'OK');
   await r.api('lock', { lock: true });
-  assert.match((await r.api('preset/recall', { name: 'standby' })).body.P3, /lock/);
+  assert.equal((await r.api('preset/recall', { name: 'standby' })).status, 423);
   await r.api('lock', { lock: false });
-  assert.equal((await r.api('preset/recall', { name: 'standby' })).body.P3, 'OK');
+});
+
+test('legacy shapes stay recognizable and confirmed presets verify each reported position', async (t) => {
+  const r = await startRelay(); t.after(r.close);
+  const legacy = { standby: { perSlot: { P1: { power: true, shutter: 'open', input: '31' } } } };
+  const previewOnly = (await import('../server/preset-lens.js')).hasLens(legacy.standby);
+  assert.equal(previewOnly, false);
+  await r.api('preset/save', { name: 'lenses' });
+  assert.ok(Object.values((await r.state()).presets[0].perSlot).every((p) => Object.keys(p.lens).length === 4));
+  const before = JSON.stringify((await r.state()).projectors.map((p) => p.status.lens));
+  const first = (await r.api('preset/recall', { name: 'lenses' })).body;
+  assert.ok(first.confirm); assert.ok(first.projectors.P2);
+  assert.equal(JSON.stringify((await r.state()).projectors.map((p) => p.status.lens)), before);
+  await r.api('command', { slot: 'P1', cmd: 'lens', arg: { axis: 'focus', dir: '+', speed: 'slow' } });
+  const second = (await r.api('preset/recall', { name: 'lenses', confirmLens: first.confirm })).body;
+  for (const result of Object.values(second.projectors)) assert.equal(result.position.focus, 'match');
+  await r.api('command', { slot: 'P2', cmd: 'lens', arg: { axis: 'focus', dir: '+', speed: 'slow' } });
+  await r.api('sim', { slot: 'P2', lens: { _pollFocus: 500 } });
+  const third = (await r.api('preset/recall', { name: 'lenses' })).body;
+  const mismatch = (await r.api('preset/recall', { name: 'lenses', confirmLens: third.confirm })).body;
+  assert.match(mismatch.projectors.P2.position.focus, /mismatch/);
+  await r.api('lock', { lock: true });
+  assert.equal((await r.api('preset/recall', { name: 'lenses' })).status, 423);
 });
 
 test('OSC and TCP all cues survive offline slots; malformed UDP cannot stop the relay', async (t) => {

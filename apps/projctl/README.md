@@ -263,3 +263,8 @@ Use Projectors for the rig, Coverage for target rasters, Plan for the complete
 throw layout, or Selected side for the active beam. Reset view fits the chosen
 camera; ordinary scenario edits preserve it. Room layers controls Roof, Walls,
 Balcony and Seats, with a projectors/beams-only view and Restore room.
+
+Read-only [display and EDID data](docs/display-readouts.md) distinguishes cached
+projector input/signal from relay-computer displays and unavailable raw EDID.
+[Lens presets and login compatibility](docs/lens-presets-auth.md) documents the
+forward integration of the supplied branch and its physical acceptance limits.

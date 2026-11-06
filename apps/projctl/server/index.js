@@ -10,6 +10,8 @@ import { makeDriver } from './drivers/index.js';
 import { PATTERNS, pictureSchema } from './drivers/panasonic.js';
 import { pjlinkSearch } from './drivers/pjlink.js';
 import { emptyStatus, POWER } from './drivers/base.js';
+import { projectorDisplayInfo, createHostDisplayReader } from './display-info.js';
+import { hasLens, lensSummary, lensPositionMatch, lensMotorState, LENS_AXES } from './preset-lens.js';
 import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
 import { confirmations } from './confirmations.js';
@@ -24,9 +26,10 @@ const OSC_PORT = Number(process.env.OSC_PORT || 9000);
 const TCP_PORT = Number(process.env.TCP_PORT || 9001);
 const POLL_MS = Number(process.env.POLL_MS || 5000);
 const SIM = process.env.SIM === '1';
+const readHostDisplays = createHostDisplayReader({ sim: SIM });
 const STARTED_AT = new Date().toISOString();
 // ---- Login (optional). Set PJ_PASSCODE to require it: needed before exposing the relay beyond the LAN.
-const PASSCODE = (process.env.PJ_PASSCODE || '').trim();
+const PASSCODE = (process.env.PROJCTL_PASSWORD || process.env.PJ_PASSCODE || '').trim();
 const SESSION_SECRET = randomBytes(32).toString('hex'); // sessions end when the relay restarts
 const SESSION = createHash('sha256').update(`pj:${SESSION_SECRET}:${PASSCODE}`).digest('hex');
 const loginFails = new Map(); // ip -> { n, until }
@@ -69,6 +72,8 @@ function driverFor(p) {
   return d;
 }
 
+function displayInfoFor(p, current = status.get(p.slot)) { return projectorDisplayInfo(p, { ...current, connection: connections.get(p.slot) }, driverFor(p).inputs ?? p.inputs); }
+
 function inputPreferenceFor(p) { return resolveInputPreference(driverFor(p).inputs ?? p.inputs, rig.preferredInput || 'HDMI'); }
 
 // ---- WebSocket broadcast ----
@@ -83,9 +88,9 @@ function snapshot() {
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
       return { ...p, password: undefined, status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null,
-        inputs: d.inputs ?? p.inputs, inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
+        inputs: d.inputs ?? p.inputs, displayInfo: displayInfoFor(p), inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
-        capabilities: { lens: !!d.lens, picture: !!d.getPicture } };
+        capabilities: { lens: !!d.lens, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
     }),
     presets: rig.presets, events: rig.events.slice(-200),
   };
@@ -111,7 +116,7 @@ async function pollOnce(p) {
     status.set(p.slot, next);
     if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
     const d = driverFor(p);
-    broadcast({ type: 'status', slot: p.slot, status: { ...next, connection }, inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
+    broadcast({ type: 'status', slot: p.slot, status: { ...next, connection }, displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
   } catch (e) {
     const n = missed.get(p.slot) + 1; missed.set(p.slot, n);
     Object.assign(connection, { state: 'unreachable', error: connectionError(p, e), consecutiveFailures: n });
@@ -124,7 +129,7 @@ function setOffline(slot, why) {
   const next = { ...prev, online: false, updatedAt: new Date().toISOString() };
   status.set(slot, next);
   if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
-  broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, inputPreference: inputPreferenceFor(store.projector(slot)) });
+  broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, displayInfo: displayInfoFor(store.projector(slot), next), inputPreference: inputPreferenceFor(store.projector(slot)) });
 }
 setInterval(() => rig.projectors.forEach(poll), POLL_MS);
 rig.projectors.forEach(poll);
@@ -172,7 +177,7 @@ async function command(slot, cmd, arg, source = 'ui') {
     else if (cmd === 'shutter') result = await d.shutter(!!arg);
     else if (cmd === 'input') result = await d.input(String(arg));
     else if (cmd === 'pattern') { if (!d.pattern) throw httpErr(400, `${slot}: test pattern not supported by ${d.kind} driver`); let code = String(arg); if (d.kind === 'pulse') code = code === '08' ? 'internal:colorbars' : code === '00' ? 'off' : code; result = await d.pattern(code); }
-    else if (cmd === 'lens') { if (!d.lens) throw httpErr(400, `${slot}: lens not supported by ${d.kind} driver`); result = await d.lens(arg); }
+    else if (cmd === 'lens') { if (arg?.op === 'recall') { if (!d.recallLens) throw httpErr(400, `${slot}: absolute lens recall not stored by this driver`); result = await d.recallLens(arg.targets || {}); } else { if (!d.lens) throw httpErr(400, `${slot}: lens not supported by ${d.kind} driver`); result = await d.lens(arg); } }
     else if (cmd === 'picture') { if (!d.picture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`); result = await d.picture(arg.key, arg.value); }
     else throw httpErr(400, `unknown command ${cmd}`);
   } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw httpErr(502, e.message); }
@@ -222,16 +227,41 @@ async function uiCommand(slot, cmd, arg, confirm) {
   return out;
 }
 
-async function recallPreset(name, source = 'ui') {
+async function recallPreset(name, source = 'ui', confirmedLens = false) {
   const pr = rig.presets.find((x) => x.name === name);
   if (!pr) throw httpErr(404, `no preset ${name}`);
+  if (!hasLens(pr)) return recallOldPreset(pr, source);
+  const key = `preset:${name}:lens`;
+  const summary = lensSummary(pr, (slot) => { const p = store.projector(slot); return p ? driverFor(p).lensControls || {} : {}; });
+  if (!confirmedLens) {
+    const targets = Object.entries(summary).filter(([, v]) => v.supported.length).map(([slot]) => slot);
+    if (rig.lock && targets.some((slot) => status.get(slot)?.online)) throw httpErr(423, 'show lock is on');
+    return { preset: name, confirm: targets.length ? pendingConfirm.issue(key, targets.map((slot) => ({ slot, identity: targetIdentity(store.projector(slot)) }))) : null,
+      message: targets.length ? `Recall lens positions for ${targets.join(', ')}? Re-hang still needs alignment and focus checked.` : 'No absolute lens recall is stored for this rig.',
+      projectors: summary };
+  }
+  const targetsForRecall = (items) => Object.entries(items).filter(([, v]) => v.supported.length).map(([slot]) => slot);
+  const confirmed = confirmedLens === true ? targetsForRecall(summary).map((slot) => ({ slot, identity: targetIdentity(store.projector(slot)) })) : pendingConfirm.take(key, confirmedLens);
+  if (!confirmed) return { preset: name, confirm: null, message: 'Lens confirmation expired. Recall and confirm again.', projectors: summary };
+  const out = {};
+  for (const [slot, info] of Object.entries(summary)) {
+    if (!confirmed.some((t) => t.slot === slot)) { out[slot] = { ...info, result: 'not confirmed', lens: 'unknown' }; continue; }
+    if (targetIdentity(store.projector(slot)) !== confirmed.find((t) => t.slot === slot).identity) { out[slot] = { ...info, result: 'configuration changed; confirm again', lens: 'unknown' }; continue; }
+    try {
+      const r = await command(slot, 'lens', { op: 'recall', targets: Object.fromEntries(info.supported.map((k) => [k, info.saved[k]])) }, `${source} preset ${name}`);
+      out[slot] = { ...info, position: lensPositionMatch(r.status?.lens, info.saved, info.supported), motors: lensMotorState(r.status?.lens, info.supported), result: 'stopped feedback reported; verify position per axis', lens: r.status?.lens ?? null, status: r.status };
+    } catch (e) { out[slot] = { ...info, result: e.message, lens: 'unknown' }; }
+  }
+  return { preset: name, projectors: out, message: 'Motors stopped and position match are reported separately. Check alignment and focus after any re-hang.' };
+}
+async function recallOldPreset(pr, source) {
   const out = {};
   for (const [slot, want] of Object.entries(pr.perSlot)) {
     const st = status.get(slot); if (!st?.online) { out[slot] = 'offline'; continue; }
     try {
-      if (want.power !== undefined) await command(slot, 'power', want.power, `${source} preset ${name}`);
-      if (want.input) await command(slot, 'input', want.input, `${source} preset ${name}`);
-      if (want.shutter !== undefined) await command(slot, 'shutter', want.shutter === 'closed', `${source} preset ${name}`);
+      if (want.power !== undefined) await command(slot, 'power', want.power, `${source} preset ${pr.name}`);
+      if (want.input) await command(slot, 'input', want.input, `${source} preset ${pr.name}`);
+      if (want.shutter !== undefined) await command(slot, 'shutter', want.shutter === 'closed', `${source} preset ${pr.name}`);
       out[slot] = 'OK';
     } catch (e) { out[slot] = e.message; }
   }
@@ -241,8 +271,11 @@ function savePreset(name) {
   const perSlot = {};
   for (const p of rig.projectors) {
     const s = status.get(p.slot); if (!s.online) continue;
-    // A projector cooling at save time was on a moment ago; the operator's intent is "on".
     perSlot[p.slot] = { power: s.power !== POWER.OFF, shutter: s.shutter, input: s.input };
+    if (driverFor(p).recallLens && s.lens) {
+      perSlot[p.slot].lens = Object.fromEntries(LENS_AXES.filter((k) => Number.isFinite(s.lens[k])).map((k) => [k, s.lens[k]]));
+      if (!Object.keys(perSlot[p.slot].lens).length) delete perSlot[p.slot].lens;
+    }
   }
   const existing = rig.presets.find((x) => x.name === name);
   if (existing) { existing.perSlot = perSlot; existing.createdAt = new Date().toISOString(); }
@@ -256,6 +289,10 @@ async function onCue(addr, args, source) {
   const parts = addr.split('/').filter(Boolean);
   if (parts[0] !== 'proj') return;
   try {
+    if (parts[1] === 'preset' && parts[2] === 'lens' && args.length === 1 && args[0] === 1) {
+      // An explicit numeric 1 is the local cue equivalent of the UI's deliberate confirmation.
+      return await recallPreset(parts.slice(3).join('/'), source, true);
+    }
     if (parts[1] === 'preset') return await recallPreset(parts.slice(2).join('/'), source);
     if (!parts[1] || !['power', 'shutter', 'input'].includes(parts[2]) || args.length !== 1) throw new Error('cue needs slot, power/shutter/input and one argument');
     const slots = parts[1] === 'all' ? rig.projectors.map((p) => p.slot) : [parts[1].toUpperCase()];
@@ -281,6 +318,7 @@ function httpErr(status, message) { return Object.assign(new Error(message), { s
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png' };
 const PUB = path.join(__dirname, '..', 'public');
 async function body(req) { let b = ''; for await (const c of req) b += c; return b ? JSON.parse(b) : {}; }
+function confirmTokenFor(_name, token) { return typeof token === 'string' && token.length <= 256 ? token : ''; }
 function json(res, code, obj) { res.writeHead(code, { 'content-type': 'application/json', 'access-control-allow-origin': '*' }); res.end(JSON.stringify(obj)); }
 
 const server = http.createServer(async (req, res) => {
@@ -292,13 +330,13 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/login' && req.method === 'POST') {
       if (!PASSCODE) return json(res, 200, { ok: true, open: true });
       const ip = clientIp(req); const f = loginFails.get(ip) || { n: 0, until: 0 };
-      if (f.until > Date.now()) throw httpErr(429, `too many tries, wait ${Math.ceil((f.until - Date.now()) / 1000)} s`);
+      if (f.until > Date.now()) { res.setHeader('retry-after', Math.ceil((f.until - Date.now()) / 1000)); throw httpErr(429, `too many tries, wait ${Math.ceil((f.until - Date.now()) / 1000)} s`); }
       const { code } = await body(req);
       const a = Buffer.from(String(code || '')), b = Buffer.from(PASSCODE);
       if (a.length !== b.length || !timingSafeEqual(a, b)) { f.n++; f.until = Date.now() + Math.min(60000, 1000 * 2 ** f.n); loginFails.set(ip, f); store.event({ source: 'ui', slot: '*', command: 'login', result: 'ERR', detail: `wrong passcode from ${ip}` }); throw httpErr(401, 'wrong passcode'); }
       loginFails.delete(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'OK', detail: ip });
       const secure = (req.headers['x-forwarded-proto'] === 'https') ? '; Secure' : '';
-      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': `pj=${SESSION}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 90}${secure}` }); return res.end(JSON.stringify({ ok: true }));
+      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': `pj=${SESSION}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${60 * 60 * 24 * 90}${secure}` }); return res.end(JSON.stringify({ ok: true }));
     }
     if (url.pathname === '/api/logout' && req.method === 'POST') { res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': 'pj=; Path=/; HttpOnly; Max-Age=0' }); return res.end('{"ok":true}'); }
     if (url.pathname === '/login.html' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css') { /* public assets */ }
@@ -307,6 +345,12 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(302, { location: '/login.html' }); return res.end();
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
+    if (url.pathname === '/api/display-info' && req.method === 'GET') {
+      const p = store.projector(url.searchParams.get('slot'));
+      if (!p) throw httpErr(404, 'no slot');
+      return json(res, 200, displayInfoFor(p));
+    }
+    if (url.pathname === '/api/host-displays' && req.method === 'GET') return json(res, 200, await readHostDisplays());
     if (url.pathname === '/api/preferred-input' && req.method === 'POST') {
       const { input } = await body(req);
       if (input !== 'HDMI') throw httpErr(400, 'The supported default input is HDMI.');
@@ -334,7 +378,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, await uiCommand(slot, cmd, arg, confirm));
     }
     if (url.pathname === '/api/preset/save' && req.method === 'POST') { const { name } = await body(req); if (!name) throw httpErr(400, 'name required'); savePreset(name); return json(res, 200, { ok: true }); }
-    if (url.pathname === '/api/preset/recall' && req.method === 'POST') { const { name } = await body(req); return json(res, 200, await recallPreset(name)); }
+    if (url.pathname === '/api/preset/recall' && req.method === 'POST') { const { name, confirmLens } = await body(req); return json(res, 200, await recallPreset(name, 'ui', confirmTokenFor(name, confirmLens) || false)); }
     if (url.pathname === '/api/preset/delete' && req.method === 'POST') { const { name } = await body(req); rig.presets = rig.presets.filter((x) => x.name !== name); store.save(); broadcast(snapshot()); return json(res, 200, { ok: true }); }
     if (url.pathname === '/api/lock' && req.method === 'POST') { const { lock } = await body(req); rig.lock = !!lock; pendingConfirm.clear(); store.save(); store.event({ source: 'ui', slot: '*', command: `lock ${rig.lock ? 'on' : 'off'}`, result: 'OK' }); broadcast(snapshot()); return json(res, 200, { lock: rig.lock }); }
     if (url.pathname === '/api/projector' && req.method === 'POST') {
@@ -350,8 +394,8 @@ const server = http.createServer(async (req, res) => {
       store.save(); store.event({ source: 'ui', slot: p.slot, command: 'edit', result: 'OK' }); broadcast(snapshot()); poll(p); return json(res, 200, { ok: true });
     }
     if (url.pathname === '/api/discover' && req.method === 'POST') return json(res, 200, await discover('ui'));
-    if (url.pathname === '/api/sim' && req.method === 'POST' && SIM) { // test hook: toggle a sim projector offline
-      const { slot, offline } = await body(req); const d = driverFor(store.projector(slot)); d._state.flaky = !!offline; return json(res, 200, { ok: true });
+    if (url.pathname === '/api/sim' && req.method === 'POST' && SIM) { // test hook: toggle offline or set an out-of-position reported lens readback
+      const { slot, offline, lens } = await body(req); const d = driverFor(store.projector(slot)); if (offline !== undefined) d._state.flaky = !!offline; if (lens) Object.assign(d._state.lens, lens); if (lens?._pollFocus != null) d._state.pollFocus = lens._pollFocus; return json(res, 200, { ok: true });
     }
     // static
     if (url.pathname.startsWith('/ProjectorThrow/')) {
@@ -360,8 +404,8 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'content-type': 'application/javascript' });
       return fs.createReadStream(asset).pipe(res);
     }
-    let f = url.pathname === '/' ? '/index.html' : url.pathname;
-    const fp = path.join(PUB, path.normalize(f));
+    let filePath = url.pathname === '/' ? '/index.html' : url.pathname;
+    const fp = path.join(PUB, path.normalize(filePath));
     if (!fp.startsWith(PUB) || !fs.existsSync(fp)) { res.writeHead(404); return res.end('not found'); }
     if (fp === path.join(PUB, 'index.html')) {
       const html = withThrowlineImports(fs.readFileSync(fp, 'utf8'));
