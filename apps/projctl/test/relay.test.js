@@ -105,3 +105,21 @@ test('OSC and TCP all cues survive offline slots; malformed UDP cannot stop the 
   assert.equal(r.child.exitCode, null);
   assert.ok((await r.state()).events.some((e) => e.source.startsWith('tcp') && e.slot === 'P1' && e.result === 'ERR'));
 });
+
+
+test('failed post-recall readback cannot verify cached matching lens positions', async (t) => {
+  const r = await startRelay({ POLL_MS: '60000' }); t.after(r.close);
+  await r.api('preset/save', { name: 'Readback failure fixture' });
+  const first = (await r.api('preset/recall', { name: 'Readback failure fixture' })).body;
+  assert.ok(first.confirm);
+  // Keep the last successful sample online until the command's own fresh poll.
+  // The simulated motor acknowledges, then telemetry fails after completion.
+  await r.api('sim', { slot: 'P1', offline: true });
+  const out = (await r.api('preset/recall', { name: 'Readback failure fixture', confirmLens: first.confirm })).body;
+  const failed = out.projectors.P1;
+  assert.equal(failed.status.online, false);
+  assert.deepEqual(Object.values(failed.position), ['unknown', 'unknown', 'unknown', 'unknown']);
+  assert.deepEqual(Object.values(failed.motors), ['unknown', 'unknown', 'unknown', 'unknown']);
+  assert.equal(failed.lens, null); assert.match(failed.result, /unavailable/);
+  assert.equal(out.projectors.P2.position.focus, 'match', 'a successful fresh sample still verifies normally');
+});

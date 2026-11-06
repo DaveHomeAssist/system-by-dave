@@ -249,10 +249,13 @@ async function recallPreset(name, source = 'ui', confirmedLens = false) {
     if (targetIdentity(store.projector(slot)) !== confirmed.find((t) => t.slot === slot).identity) { out[slot] = { ...info, result: 'configuration changed; confirm again', lens: 'unknown' }; continue; }
     try {
       const r = await command(slot, 'lens', { op: 'recall', targets: Object.fromEntries(info.supported.map((k) => [k, info.saved[k]])) }, `${source} preset ${name}`);
-      out[slot] = { ...info, position: lensPositionMatch(r.status?.lens, info.saved, info.supported), motors: lensMotorState(r.status?.lens, info.supported), result: 'stopped feedback reported; verify position per axis', lens: r.status?.lens ?? null, status: r.status };
+      // Failed polls preserve last-known status for the UI. Those cached values
+      // must not verify the movement that just finished.
+      const freshLens = r.status?.online && r.status?.connection?.state === 'online' ? r.status.lens : null;
+      out[slot] = { ...info, position: lensPositionMatch(freshLens, info.saved, info.supported), motors: lensMotorState(freshLens, info.supported), result: freshLens ? 'fresh feedback received; verify position per axis' : 'fresh lens feedback unavailable; cached values are not verification', lens: freshLens ?? null, status: r.status };
     } catch (e) { out[slot] = { ...info, result: e.message, lens: 'unknown' }; }
   }
-  return { preset: name, projectors: out, message: 'Motors stopped and position match are reported separately. Check alignment and focus after any re-hang.' };
+  return { preset: name, projectors: out, message: 'Position and motor feedback are reported separately. Check alignment and focus after any re-hang.' };
 }
 async function recallOldPreset(pr, source) {
   const out = {};
