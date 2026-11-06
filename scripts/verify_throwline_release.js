@@ -601,7 +601,7 @@ requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["'
 });
 if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
 requireMatch(browserProbe, /no-WebGL mode visibly replaces the failed canvas with a populated 2D plan[\s\S]*?2D fallback redraws from the same live scene state/, 'The browser probe must hard-fail unless the no-WebGL 2D fallback is visible, populated, and live.');
-if (packageJson?.scripts?.['test:throwline-browser'] !== 'node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl') fail('Throwline browser verification must hard-fail WebGL and degraded-renderer probe runs.');
+if (packageJson?.scripts?.['test:throwline-browser'] !== 'node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl && node scripts/probe_throwline_portrait.cjs') fail('Throwline browser verification must hard-fail WebGL and degraded-renderer probe runs.');
 requireMatch(pagesWorkflow, /Verify Throwline browser runtime[\s\S]*?run:\s*npm run test:throwline-browser/, 'The Pages release gate must run the hard-fail Throwline browser regression suite.');
 const stageTryIndex = stage.indexOf('const { THREE } = await stage.ready');
 ['function rebuildFacts(', 'function readout(', 'function updateWorkspaceFacts(', 'function applySceneIntent(', 'SceneState.createSceneState('].forEach((token) => {
@@ -624,7 +624,7 @@ requireMatch(stage, /shape===['"]linear['"][\s\S]*?shape===['"]ellipse['"]/, 'St
 });
 requireMatch(main, /function\s+catalogShiftProfileFor\s*\(/, 'The planner must fill shift limits from the catalog pair.');
 requireMatch(main, /put\(["']sl["'][\s\S]*?put\(["']sr["'][\s\S]*?put\(["']sc["']/, 'The planner must transfer sideways limits and the combined rule to Stage 3D.');
-requireMatch(main, /sceneApi\.resolveProfileRatio\(catalogSelection\.profile,\s*raster\.asp\)/, 'The planner must resolve verified catalog ratios by picture shape.');
+requireMatch(main, /sceneApi\.resolveProfileRatio\(catalogSelection\.profile,\s*nativeRaster\.asp\)/, 'The planner must resolve verified catalog ratios by picture shape.');
 requireMatch(main, /put\(["']tolPct["']/, 'The planner must transfer its planning tolerance to Stage 3D.');
 ['assessInstallation', "'set-tolerance'", 'axisOverlapInterval', 'COVERAGE_TOLERANCE'].forEach((token) => {
   if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);

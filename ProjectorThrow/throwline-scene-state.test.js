@@ -676,3 +676,77 @@ test('named scenario snapshots compare state and provide bounded undo and redo',
   assert.equal(history.present.name, 'Raised screen');
   assert.equal(history.future.length, 0);
 });
+
+test('portrait native width becomes world height and preserves landscape defaults', () => {
+  const landscape = Scene.createSceneState({ w: 9, ar: 9/16, basisW: 16, rasterAr: 16/9, dist: 24, wide: 1.5, tele: 1.5, mode: 'manual', allowed: true });
+  assert.equal(Scene.activeProjector(landscape).orientation, 'landscape');
+  for (const orientation of ['portrait-cw', 'portrait-ccw']) {
+    const portrait = Scene.normalizeSceneState({...landscape, projectors: landscape.projectors.map(p => ({...p, orientation}))});
+    const geometry = Scene.calculateProjectorGeometry(portrait);
+    assert.equal(geometry.image.width, 9);
+    assert.equal(geometry.image.height, 16);
+    assert.equal(geometry.envelope.nominal, 24);
+    assert.equal(geometry.coverage.maxEdgeVariance, 0);
+    const params = Scene.transferParamsFor(portrait);
+    assert.equal(params.orientation, orientation);
+    assert.equal(params.basisW, '16');
+    assert.equal(Scene.normalizeSceneState(JSON.parse(JSON.stringify(portrait))).projectors[0].orientation, orientation);
+    assert.ok(Scene.assessInstallation(portrait).issues.some(i => i.kind === 'portrait-mounting'));
+  }
+});
+
+test('both portrait directions remap asymmetric native shift limits', () => {
+  const limits = {up: 60, down: 20, left: 10, right: 15, combined: {shape: 'linear', basis: 'maker_formula'}};
+  assert.deepEqual(Scene.orientedShift(limits, 'portrait-cw'), {...limits, up:10, down:15, left:20, right:60});
+  assert.deepEqual(Scene.orientedShift(limits, 'portrait-ccw'), {...limits, up:15, down:10, left:60, right:20});
+  const scene = Scene.createSceneState({w:9, ar:9/16, bottom:0, basisW:16, rasterAr:16/9, orientation:'portrait-cw', lh:6, dist:24, wide:1.5, tele:1.5, mode:'manual', allowed:true, shift:limits});
+  const g=Scene.calculateProjectorGeometry(scene);
+  assert.equal(g.shift.vertical.limit,10);
+  assert.equal(g.shift.vertical.percent,12.5);
+  assert.equal(g.shift.vertical.exceeded,true);
+  assert.equal(g.shiftEnvelope.up,10);
+});
+
+test('portrait rotates body clearances and orientation edits invalidate field verification', () => {
+  let scene = Scene.createSceneState({w:9, ar:9/16, basisW:9, rasterAr:16/9, lh:6, dist:24, wide:1.5, tele:1.5, mode:'manual', allowed:true, body:{width:4,height:2,depth:3,lensProtrusion:0.5,source:'manual'}});
+  scene = Scene.stampFieldVerification(scene,{measuredDistance:24,measuredWidth:9,verifiedBy:'Crew'});
+  scene = Scene.applyIntent(scene,{type:'set-orientation',value:'portrait-cw'});
+  const p=Scene.activeProjector(scene), extents=Scene.bodyExtents(p);
+  assert.equal(p.provenance.mode,'manual');
+  assert.equal(p.optical.basisWidth,16);
+  assert.equal(extents.right-extents.left,2);
+  assert.equal(extents.top-extents.bottom,4);
+  assert.equal(extents.rear,27.5);
+  scene = Scene.applyIntent(scene,{type:'set-orientation',value:'landscape'});
+  assert.equal(Scene.activeProjector(scene).optical.basisWidth,9);
+});
+
+test('portrait field measurement uses world width converted to native width', () => {
+  let scene=Scene.createSceneState({w:9, ar:9/16, basisW:16, rasterAr:16/9, orientation:'portrait-ccw', dist:24, wide:1,tele:2,mode:'manual',allowed:true});
+  scene=Scene.stampFieldVerification(scene,{measuredDistance:24,measuredWidth:9,verifiedBy:'Crew'});
+  assert.equal(Scene.activeProjector(scene).optical.min,1.5);
+  assert.equal(Scene.calculateProjectorGeometry(scene).image.width,9);
+  assert.equal(Scene.transferParamsFor(scene).mw,'16');
+});
+
+test('portrait edits stale commissioning geometry and preserve historical measurements', () => {
+  let scene = manualScene();
+  const planned = Scene.calculateProjectorGeometry(scene).image.width;
+  scene = Scene.stampCommissioningRecord(scene,{measured:{throwDistance:22.8,imageWidth:planned,lensHeight:6,horizontalOffset:0,targetOffset:0},verifiedBy:'Crew',verifiedAt:'2026-11-05T12:00:00Z'});
+  scene = Scene.applyIntent(scene,{type:'set-orientation',value:'portrait-cw'});
+  const record = Scene.commissioningRecordFor(scene);
+  assert.equal(record.validity.imageWidth.status,'stale');
+  assert.equal(record.validity.focus.status,'stale');
+  assert.equal(record.measured.imageWidth,planned);
+});
+
+test('portrait keeps absent shift limits unknown and rejects mismatched stacked raster shapes', () => {
+  const shift = Scene.orientedShift({up:50,down:20},'portrait-cw');
+  assert.equal(shift.up,undefined); assert.equal(shift.down,undefined);
+  let scene=manualScene();
+  scene=Scene.applyIntent(scene,{type:'add-projector'});
+  scene=Scene.applyIntent(scene,{type:'set-orientation',value:'portrait-cw'});
+  scene=Scene.applyIntent(scene,{type:'arrange-projectors',mode:'stack'});
+  const layout=Scene.calculateMultiProjectorLayout(scene);
+  assert.ok(layout.warnings.some(w=>w.kind==='stack-aspect-mismatch'));
+});

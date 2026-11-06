@@ -2991,7 +2991,7 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 <!-- AV workspace styles:end -->
 <!-- AV workspace runtime:start -->
 <script>
-window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
+window.AVWorkspaceVersion="v20261105-throwline-portrait";
 /* View state only: existing form nodes and product calculation state remain authoritative. */
 (function(global){
   'use strict';
@@ -3187,7 +3187,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
         <div class="row compact">
           <div class="f"><label for="sasp">Lock aspect</label><select id="sasp">
               <option value="0">Free</option>
-              <option value="1.7777778">16:9</option>
+              <option value="1.7777778">16:9</option><option value="0.5625">9:16 · portrait</option><option value="0.625">10:16 · portrait</option>
               <option value="1.6">16:10</option>
               <option value="1.3333333">4:3</option>
               <option value="1.8962963">DCI 1.90</option>
@@ -3240,14 +3240,14 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
               placeholder="1.320"></div>
         </div>
         <div class="row compact">
-          <div class="f"><label for="raster">Projector picture shape</label><select id="raster">
+          <div class="f"><label for="raster">Native projector picture shape</label><select id="raster">
               <option value="1.3333333|1024|768">4:3 · XGA</option>
               <option value="1.6|1920|1200">16:10 · WUXGA</option>
               <option value="1.7777778|1920|1080">16:9 · HD</option>
               <option value="1.7777778|3840|2160">16:9 · 4K UHD</option>
               <option value="1.8962963|4096|2160">DCI 4K · 4096×2160</option>
             </select></div>
-          <div class="f"><label for="lumens">Lumens each</label><input id="lumens" type="number" step="100" min="0"
+          <div class="f"><label for="orientation">Projector orientation</label><select id="orientation" aria-describedby="orientationHint"><option value="landscape">Landscape</option><option value="portrait-cw">Portrait · clockwise 90°</option><option value="portrait-ccw">Portrait · counterclockwise 90°</option></select></div><div class="f"><label for="lumens">Lumens each</label><input id="lumens" type="number" step="100" min="0"
               placeholder="20000"></div>
         </div>
         <div class="row compact">
@@ -3256,7 +3256,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
           <div class="f"><label for="gain">Screen gain</label><input id="gain" type="number" step="0.1" min="0.1"
               value="1.0"></div>
         </div>
-        <div class="checkrow"><input id="includeEstimated" type="checkbox"><label for="includeEstimated"
+        <p class="hint" id="orientationHint">Rotation is viewed from behind the projector toward the screen. Portrait throw uses image height. Check the exact model’s mounting and cooling instructions; catalog optical data does not approve portrait installation.</p><div class="checkrow"><input id="includeEstimated" type="checkbox"><label for="includeEstimated"
             style="margin:0;text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:12px">Include
             estimated / derived lens rows in finder</label></div>
         <p class="hint"><strong>Keeping to one projector family stops the finder suggesting lenses that don’t fit.</strong> It doesn’t
@@ -3764,7 +3764,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
     const el = {
       job: $("job"), preset: $("preset"), sw: $("sw"), sh: $("sh"), sbottom: $("sbottom"), sasp: $("sasp"), sdiag: $("sdiag"), diagUnit: $("diagUnit"),
       catalogProjector: $("catalogProjector"), catalogLens: $("catalogLens"), catalogEvidence: $("catalogEvidence"), catalogEvidenceBody: $("catalogEvidenceBody"), calculationGate: $("calculationGate"), verifyReset: $("verifyReset"),
-      family: $("family"), familyNotice: $("familyNotice"), lens: $("lens"), trmin: $("trmin"), trmax: $("trmax"), raster: $("raster"),
+      family: $("family"), familyNotice: $("familyNotice"), lens: $("lens"), trmin: $("trmin"), trmax: $("trmax"), raster: $("raster"), orientation: $("orientation"),
       inventoryToggle: $("inventoryToggle"), shiftProfile: $("shiftProfile"), projectorModel: $("projectorModel"), shiftUp: $("shiftUp"), shiftDown: $("shiftDown"), shiftLeft: $("shiftLeft"), shiftRight: $("shiftRight"), shiftSource: $("shiftSource"), shiftCatalogNote: $("shiftCatalogNote"),
       lumens: $("lumens"), qty: $("qty"), gain: $("gain"), includeEstimated: $("includeEstimated"), dist: $("dist"), depth: $("depth"), lensHeight: $("lensHeight"), body: $("body"), tol: $("tol"),
       eff: $("eff"), stackEff: $("stackEff"), targetFl: $("targetFl"), fitMode: $("fitMode"), nPlusOne: $("nPlusOne"),
@@ -4215,7 +4215,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       const actualDist = readLen("actualDist"), actualWidth = readLen("actualWidth"), actualFl = el.actualFl.value === "" ? NaN : Number(el.actualFl.value);
       const result = { actualDist, actualWidth, actualFl: finite(actualFl) && actualFl >= 0 ? actualFl : NaN, verifiedBy: el.verifiedBy.value.trim(), verifiedAt };
       if (c.img && finite(actualDist) && actualDist > 0 && finite(actualWidth) && actualWidth > 0) {
-        result.observedRatio = actualDist / actualWidth; result.desiredDist = result.observedRatio * c.img.w; result.move = result.desiredDist - actualDist; result.widthError = (actualWidth - c.img.w) / c.img.w * 100;
+        result.observedRatio = actualDist / actualWidth; result.desiredDist = result.observedRatio * c.throwBasis; result.move = result.desiredDist - actualDist; result.widthError = (actualWidth - c.throwBasis) / c.throwBasis * 100;
         const error = Math.abs(result.widthError); result.kind = error <= .5 ? "go" : error <= 5 ? "warn" : "bad"; result.label = error <= .5 ? "picture matches the plan" : error <= 5 ? "small adjustment needed" : "fix before the show";
       } else { result.kind = "info"; result.label = "waiting for measurements"; }
       if (c.brightness && finite(result.actualFl)) result.lightFactor = result.actualFl / c.brightness.fl;
@@ -4232,13 +4232,14 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       else if (scope === "inventory") pool = [];
       const results = [];
       pool.forEach(lens => {
-        const expected = expectedRasterForLens(lens), candidateImg = expected ? rasterFor(c.w, c.h, expected.asp, c.fitMode) : c.img; if (!candidateImg) return;
-        const nominalNear = lens.min * candidateImg.w, nominalFar = lens.max * candidateImg.w;
+        const expected = expectedRasterForLens(lens), candidateImg = expected ? rasterFor(c.w, c.h, (c.portrait ? 1 / expected.asp : expected.asp), c.fitMode) : c.img; if (!candidateImg) return;
+        const candidateBasis = c.portrait ? candidateImg.h : candidateImg.w;
+        const nominalNear = lens.min * candidateBasis, nominalFar = lens.max * candidateBasis;
         const overlapNear = Math.max(zoneNear, nominalNear), overlapFar = Math.min(zoneFar, nominalFar); if (overlapNear > overlapFar + 1e-6) return;
         const fixed = Math.abs(nominalFar - nominalNear) < .001;
-        const safeNear = fixed ? nominalNear * (1 - c.tol) : lens.min * candidateImg.w * (1 + c.tol), safeFar = fixed ? nominalFar * (1 + c.tol) : lens.max * candidateImg.w * (1 - c.tol);
+        const safeNear = fixed ? nominalNear * (1 - c.tol) : lens.min * candidateBasis * (1 + c.tol), safeFar = fixed ? nominalFar * (1 + c.tol) : lens.max * candidateBasis * (1 - c.tol);
         const safeOverlapNear = Math.max(zoneNear, safeNear), safeOverlapFar = Math.min(zoneFar, safeFar), hasSafe = safeOverlapNear <= safeOverlapFar;
-        const pick = hasSafe ? (safeOverlapNear + safeOverlapFar) / 2 : (overlapNear + overlapFar) / 2, ratio = pick / candidateImg.w, span = lens.max - lens.min, zoom = span > .0001 ? (ratio - lens.min) / span : .5, edge = span > .0001 ? Math.min(zoom, 1 - zoom) : .5;
+        const pick = hasSafe ? (safeOverlapNear + safeOverlapFar) / 2 : (overlapNear + overlapFar) / 2, ratio = pick / candidateBasis, span = lens.max - lens.min, zoom = span > .0001 ? (ratio - lens.min) / span : .5, edge = span > .0001 ? Math.min(zoom, 1 - zoom) : .5;
         const sourceScore = lens.status === "verified" ? 15 : lens.status === "custom" ? 5 : 0, inventoryScore = inventory.has(lens.id) ? 8 : 0, score = (hasSafe ? 100 : 45) + edge * 40 + sourceScore + inventoryScore;
         results.push({ lens, pick, ratio, zoom, hasSafe, score, overlapNear, overlapFar, candidateImg });
       });
@@ -4249,11 +4250,13 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
     function readState() {
       const w = readLen("sw"), h = readLen("sh");
       const rawMin = el.trmin.value === "" ? NaN : Number(el.trmin.value), rawMax = el.trmax.value === "" ? NaN : Number(el.trmax.value);
-      const raster = rasterSpec();
+      const nativeRaster = rasterSpec(), orientation = el.orientation.value;
+      const portrait = window.ThrowlineSceneState.isPortrait(orientation);
+      const raster = portrait ? { ...nativeRaster, asp: 1 / nativeRaster.asp, pxW: nativeRaster.pxH, pxH: nativeRaster.pxW } : nativeRaster;
       const lens = getLens(), family = getFamily();
       const catalogSelection = resolveCatalogSelection();
       const state = {
-        job: el.job.value.trim(), w, h, trA: NaN, trB: NaN, rawMin, rawMax, raster, lens, family, catalogSelection,
+        job: el.job.value.trim(), w, h, trA: NaN, trB: NaN, rawMin, rawMax, raster, nativeRaster, orientation, portrait, lens, family, catalogSelection,
         screenBottom: readLen("sbottom"), dist: readLen("dist"), depth: readLen("depth"), lensHeight: readLen("lensHeight"), bodyDepth: readLen("body"), bodyFromCatalog: bodyAutoFilled,
         lumens: Number(el.lumens.value), qty: clamp(Math.round(Number(el.qty.value) || 1), 1, 8), gain: Math.max(.1, Number(el.gain.value) || 1),
         tol: clamp(Number(el.tol.value) || 0, 0, 15) / 100, eff: clamp(Number(el.eff.value) || 85, 1, 100), stackEff: clamp(Number(el.stackEff.value) || 92, 1, 100),
@@ -4261,9 +4264,10 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
         solverNear: readLen("solverNear"), solverFar: readLen("solverFar"), solverScope: el.solverScope.value
       };
       state.img = rasterFor(w, h, raster.asp, state.fitMode);
+      state.throwBasis = state.img ? (portrait ? state.img.h : state.img.w) : NaN;
       state.fieldVerification = fieldVerificationFor(state);
       const sceneApi = window.ThrowlineSceneState;
-      const resolvedProfile = catalogSelection.profile && sceneApi ? sceneApi.resolveProfileRatio(catalogSelection.profile, raster.asp) : null;
+      const resolvedProfile = catalogSelection.profile && sceneApi ? sceneApi.resolveProfileRatio(catalogSelection.profile, nativeRaster.asp) : null;
       state.profileShape = resolvedProfile;
       const profileForCalc = !resolvedProfile || !resolvedProfile.eligible ? catalogSelection.profile
         : resolvedProfile.matched ? { ...catalogSelection.profile, throw_ratio_min: resolvedProfile.min, throw_ratio_max: resolvedProfile.max }
@@ -4281,9 +4285,9 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       if (state.calculationInput) { state.trA = state.calculationInput.min; state.trB = state.calculationInput.max; }
       const trA = state.trA, trB = state.trB;
       state.expected = resolvedProfile && Number.isFinite(resolvedProfile.aspect) ? { asp: resolvedProfile.aspect, label: `${resolvedProfile.label || "maker"} basis` } : expectedRasterForLens(lens);
-      state.basisMismatch = resolvedProfile ? (resolvedProfile.eligible && !resolvedProfile.matched) : !!(state.expected && Math.abs(state.expected.asp - raster.asp) > .02);
+      state.basisMismatch = resolvedProfile ? (resolvedProfile.eligible && !resolvedProfile.matched) : !!(state.expected && Math.abs(state.expected.asp - nativeRaster.asp) > .02);
       if (state.img && finite(trA)) {
-        state.near = trA * state.img.w; state.far = trB * state.img.w; state.mid = (state.near + state.far) / 2;
+        state.near = trA * state.throwBasis; state.far = trB * state.throwBasis; state.mid = (state.near + state.far) / 2;
         state.fixed = Math.abs(state.far - state.near) < .001;
         if (state.fixed) {
           state.tolNear = state.near * (1 - state.tol); state.tolFar = state.near * (1 + state.tol); state.safeNear = NaN; state.safeFar = NaN;
@@ -4303,7 +4307,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
         else if (finite(state.safeNear) && state.dist >= state.safeNear && state.dist <= state.safeFar) state.place = { code: "safe", label: "good distance", kind: "go" };
         else state.place = { code: "edge", label: "close to the lens limit", kind: "warn" };
         state.zoomPos = state.fixed ? .5 : clamp((state.shown - state.near) / Math.max(.001, state.far - state.near), 0, 1);
-        state.requiredRatio = state.shown / state.img.w;
+        state.requiredRatio = state.shown / state.throwBasis;
         state.rearValid = finite(state.bodyDepth) && state.bodyDepth > 0 && !(state.lens?.folded);
         state.rear = state.rearValid ? state.shown + state.bodyDepth : NaN;
         state.ppi = state.raster.pxW / state.img.w;
@@ -4316,7 +4320,9 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
           state.verticalShiftHalf = state.verticalShift * 2;
         }
       }
-      state.shiftProfile = resolveShiftProfile(lens);
+      state.nativeShiftProfile = resolveShiftProfile(lens);
+      const worldShift = window.ThrowlineSceneState.orientedShift(state.nativeShiftProfile, orientation);
+      state.shiftProfile = worldShift && finite(worldShift.up) && finite(worldShift.down) ? worldShift : null;
       if (finite(state.verticalShift) && state.shiftProfile) {
         const direction = state.shiftInches >= 0 ? "up" : "down", required = Math.abs(state.verticalShift), limit = direction === "up" ? state.shiftProfile.up : state.shiftProfile.down, utilization = limit > 0 ? required / limit * 100 : Infinity;
         let kind = required > limit + .001 ? "bad" : utilization >= 90 || state.shiftProfile.status !== "verified" ? "warn" : "go";
@@ -4333,6 +4339,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
     }
     function render() {
       const c = readState(); lastCalc = c;
+      document.querySelector('label[for="actualWidth"]').textContent = c.portrait ? "Measured image height" : "Measured image width";
       el.stage3dLink.href = stage3dUrlFor(c);
       renderCatalogEvidence(c); renderReadout(c); renderPlan(c); renderStage(c); renderImage(c); renderBrightness(c); renderVerification(c); renderSolver(c); renderFinder(c); renderShowBoard(c); renderWarnings(c); renderSummary(c); renderMethod(c); renderSavedJobs(); updateInventoryToggle();
       clearTimeout(hashTimer); hashTimer = setTimeout(() => writeHash(c), 120);
@@ -4495,7 +4502,8 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       const lensHeight = finite(c.lensHeight) ? c.lensHeight : imageCenter;
       const bodyDepth = finite(c.bodyDepth) && c.bodyDepth > 0 ? c.bodyDepth : clamp(c.w * .13, 24, 42);
       const catalogBody = c.catalogSelection?.projector?.body;
-      const bodyWidth = catalogBody && finite(catalogBody.width_mm) ? catalogBody.width_mm / 25.4 : clamp(c.w * .14, 24, 44), bodyHeight = catalogBody && finite(catalogBody.height_mm) ? catalogBody.height_mm / 25.4 : clamp(c.h * .13, 11, 20);
+      const nativeBodyWidth = catalogBody && finite(catalogBody.width_mm) ? catalogBody.width_mm / 25.4 : clamp(c.w * .14, 24, 44), nativeBodyHeight = catalogBody && finite(catalogBody.height_mm) ? catalogBody.height_mm / 25.4 : clamp(c.h * .13, 11, 20);
+      const bodyWidth = c.portrait ? nativeBodyHeight : nativeBodyWidth, bodyHeight = c.portrait ? nativeBodyWidth : nativeBodyHeight;
       const maxDepth = Math.max(c.far, c.shown + bodyDepth, finite(c.depth) ? c.depth : 0, 144) * 1.08;
       const deckHalf = Math.max(c.w, c.img.w, 144) * .68;
       const guardLow = c.shiftProfile ? imageCenter - c.shiftProfile.up * c.img.h / 100 : 0;
@@ -4608,11 +4616,11 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
     function renderImage(c) {
       if (!c.img) { el.imageOut.innerHTML = '<p class="empty">Enter a valid screen width and height.</p>'; return; }
       const diag = Math.hypot(c.w, c.h), screenAsp = c.w / c.h;
-      let rows = tableRow("Screen", `${fmtLen(c.w)} × ${fmtLen(c.h)}`, `${Math.round(diag)}in diagonal · ${aspectName(screenAsp)}`);
+      let rows = tableRow("Projector orientation", window.ThrowlineSceneState.orientationLabel(c.orientation), c.portrait ? "Confirm model-specific portrait mounting and cooling permission" : "") + tableRow("Screen", `${fmtLen(c.w)} × ${fmtLen(c.h)}`, `${Math.round(diag)}in diagonal · ${aspectName(screenAsp)}`);
       if (c.img.relation === "exact") rows += tableRow("Projected raster", `${fmtLen(c.img.w)} × ${fmtLen(c.img.h)}`, "native raster shape matches the screen");
       else if (c.img.relation === "spill") rows += tableRow("Projected raster", `${fmtLen(c.img.w)} × ${fmtLen(c.img.h)}`, `${fmtLen(c.img.amount)} spills ${c.img.axis === "horizontal" ? "past each side" : "above and below"}`);
       else rows += tableRow("Projected raster", `${fmtLen(c.img.w)} × ${fmtLen(c.img.h)}`, `${fmtLen(c.img.amount)} of screen remains unused ${c.img.axis === "horizontal" ? "at each side" : "above and below"}`);
-      rows += tableRow("Throw basis", `${fmtLen(c.img.w)} raster width`, c.fitMode === "screen" ? "screen is fully covered" : "full native raster remains on the screen");
+      rows += tableRow("Throw basis", `${fmtLen(c.throwBasis)} ${c.portrait ? "image height (rotated native width)" : "raster width"}`, c.fitMode === "screen" ? "screen is fully covered" : "full native raster remains on the screen");
       if (finite(c.verticalShift)) {
         const direction = c.shiftInches >= 0 ? "image center above lens axis" : "image center below lens axis";
         rows += tableRow("Vertical shift", `${c.verticalShift >= 0 ? "+" : ""}${c.verticalShift.toFixed(1)}%`, `${direction} · full image height basis`);
@@ -4686,13 +4694,13 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       const target = finite(c.dist) ? c.dist : (finite(c.depth) ? c.depth : NaN);
       if (!finite(target)) { el.finderOut.innerHTML = '<p class="empty">Enter a set distance or usable room depth to search the selected projector family.</p>'; return; }
       if (!c.family) { el.finderOut.innerHTML = '<p class="empty">Select a projector family before searching lenses.</p>'; return; }
-      const need = target / c.img.w;
+      const need = target / c.throwBasis;
       const candidates = allLenses().filter(l => l.familyId === c.family.id && eligibleProfile(l));
       const fits = candidates.filter(l => need >= l.min - 1e-9 && need <= l.max + 1e-9).map(l => {
         const span = l.max - l.min, head = span > .0001 ? (need - l.min) / span : .5, edge = span > .0001 ? Math.min(head, 1 - head) : .5;
         return { lens: l, head, edge };
       }).sort((a, b) => b.edge - a.edge || a.lens.min - b.lens.min);
-      let html = `<p class="hint" style="margin:0 0 11px">At ${esc(fmtLen(target))} for a ${esc(fmtLen(c.img.w))}-wide picture, the lens needs a ratio of <strong style="color:var(--chalk)">${need.toFixed(3)}:1</strong>. Showing: ${esc(c.family.brand)} · ${esc(c.family.label)}.</p>`;
+      let html = `<p class="hint" style="margin:0 0 11px">At ${esc(fmtLen(target))} using ${esc(fmtLen(c.throwBasis))} of ${c.portrait ? "image height" : "image width"}, the lens needs a ratio of <strong style="color:var(--chalk)">${need.toFixed(3)}:1</strong>. Showing: ${esc(c.family.brand)} · ${esc(c.family.label)}.</p>`;
       if (!fits.length) { html += '<p class="empty">Nothing in the catalog is ready to calculate from yet. Pick an exact projector and lens, type in a throw ratio yourself, or stamp an on-site measurement.</p>'; el.finderOut.innerHTML = html; return; }
       html += '<table><thead><tr><th>Lens pairing</th><th class="num">Range</th><th class="num">Zoom</th></tr></thead><tbody>';
       fits.slice(0, 18).forEach(({ lens, head }) => {
@@ -4792,6 +4800,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       }
       lines.push(line("Projector", c.family ? `${c.family.brand} · ${c.family.label}` : "Manual / unknown family"));
       lines.push(line("Lens", c.lens ? `${c.lens.model} · ${c.lens.min === c.lens.max ? c.lens.min.toFixed(3) + ":1 fixed" : c.lens.min.toFixed(3) + "–" + c.lens.max.toFixed(3) + ":1"} · ${c.lens.status === "verified" ? "manufacturer sourced" : c.lens.status}` : `custom ratio · ${c.trA.toFixed(3)}${c.trB !== c.trA ? "–" + c.trB.toFixed(3) : ""}:1`));
+      lines.push(line("Orientation", window.ThrowlineSceneState.orientationLabel(c.orientation) + (c.portrait ? " · confirm model mounting permission" : "")));
       lines.push(line("Raster", `${c.raster.pxW}×${c.raster.pxH} · projected ${fmtLen(c.img.w)} × ${fmtLen(c.img.h)}`));
       if (c.img.relation !== "exact") lines.push(line(c.img.relation === "spill" ? "Spill" : "Unused", `${fmtLen(c.img.amount)} ${c.img.axis === "horizontal" ? "each side" : "top + bottom"}`));
       lines.push(line("Throw", c.fixed ? `${fmtLen(c.near)} set distance · check on site ±${Math.round(c.tol * 1000) / 10}%` : `${fmtLen(c.near)} closest → ${fmtLen(c.far)} farthest`));
@@ -4892,14 +4901,14 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       suppress = true; Object.entries(values).forEach(([id, v]) => setLenInput(el[id], v)); suppress = false; syncDiag(); scheduleRender();
     }
     function stage3dUrlFor(c = readState()) {
-      const p = new URLSearchParams();
+      const p = new URLSearchParams(); p.set("orientation", c.orientation);
       const put = (key, value) => { if (value !== "" && value !== null && value !== undefined && !(typeof value === "number" && !finite(value))) p.set(key, String(value)); };
       const sceneApi = window.ThrowlineSceneState;
-      const scene = sceneApi?.createSceneState({ mode: c.calculationMode, allowed: !!c.calculationInput, w: c.w / 12, bottom: c.screenBottom / 12, ar: c.w / c.h, basisW: c.img?.w / 12, rasterAr: c.img?.w / c.img?.h, lh: c.lensHeight / 12, dist: c.shown / 12, wide: c.trA, tele: c.trB, reason: c.calculationGate?.reason || c.calculationInput?.reason });
+      const scene = sceneApi?.createSceneState({ mode: c.calculationMode, allowed: !!c.calculationInput, w: c.w / 12, bottom: c.screenBottom / 12, ar: c.w / c.h, orientation: c.orientation, basisW: c.throwBasis / 12, rasterAr: c.nativeRaster.asp, lh: c.lensHeight / 12, dist: c.shown / 12, wide: c.trA, tele: c.trB, reason: c.calculationGate?.reason || c.calculationInput?.reason });
       const shared = scene ? { screen: scene.screen, projector: sceneApi.activeProjector(scene) } : null;
-      put("mode", shared?.projector.provenance.mode || c.calculationMode); put("u", "ft"); put("w", cleanNum(shared?.screen.width ?? c.w / 12, 4)); put("bottom", cleanNum(shared?.screen.bottom ?? c.screenBottom / 12, 4)); put("ar", cleanNum(shared?.screen.aspect ?? c.w / c.h, 6)); put("basisW", cleanNum(shared?.projector.optical.basisWidth ?? c.img?.w / 12, 4)); put("rasterAr", cleanNum(shared?.projector.optical.rasterAspect ?? c.img?.w / c.img?.h, 6)); put("lh", cleanNum(shared?.projector.position.lensHeight ?? c.lensHeight / 12, 4)); put("dist", cleanNum(shared?.projector.position.distance ?? c.shown / 12, 4));
+      put("mode", shared?.projector.provenance.mode || c.calculationMode); put("u", "ft"); put("w", cleanNum(shared?.screen.width ?? c.w / 12, 4)); put("bottom", cleanNum(shared?.screen.bottom ?? c.screenBottom / 12, 4)); put("ar", cleanNum(shared?.screen.aspect ?? c.w / c.h, 6)); put("basisW", cleanNum(shared?.projector.optical.basisWidth ?? c.throwBasis / 12, 4)); put("rasterAr", cleanNum(shared?.projector.optical.rasterAspect ?? c.nativeRaster.asp, 6)); put("lh", cleanNum(shared?.projector.position.lensHeight ?? c.lensHeight / 12, 4)); put("dist", cleanNum(shared?.projector.position.distance ?? c.shown / 12, 4));
       put("projector", c.catalogSelection.projector?.projector_id || ""); put("lens", c.catalogSelection.lens?.lens_id || ""); put("profile", c.catalogSelection.profile?.optical_profile_id || "");
-      if (c.shiftProfile) { put("su", cleanNum(c.shiftProfile.up, 2)); put("sd", cleanNum(c.shiftProfile.down, 2)); put("sl", cleanNum(c.shiftProfile.left, 2)); put("sr", cleanNum(c.shiftProfile.right, 2)); if (c.shiftProfile.combined) put("sc", `${c.shiftProfile.combined.shape}.${c.shiftProfile.combined.basis}`); }
+      if (c.nativeShiftProfile) { const shift=c.nativeShiftProfile; put("su", cleanNum(shift.up, 2)); put("sd", cleanNum(shift.down, 2)); put("sl", cleanNum(shift.left, 2)); put("sr", cleanNum(shift.right, 2)); if (shift.combined) put("sc", `${shift.combined.shape}.${shift.combined.basis}`); }
       put("tolPct", cleanNum(c.tol * 100, 2)); put("clr", 1);
       const bodyForStage = c.catalogSelection?.projector?.body;
       if (bodyForStage && c.catalogSelection.lens) { put("bw", cleanNum(bodyForStage.width_mm / 304.8, 3)); put("bh", cleanNum(bodyForStage.height_mm / 304.8, 3)); put("bd", cleanNum(bodyForStage.depth_mm / 304.8, 3)); put("lp", cleanNum((Number(c.catalogSelection.lens.lens_protrusion_mm) || 0) / 304.8, 3)); }
@@ -4911,7 +4920,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       return {
         version: APP_VERSION, unit, job: c.job, w: c.w, h: c.h, aspect: Number(el.sasp.value) || 0, preset: el.preset.value,
         catalogProjectorId: c.catalogSelection.projector?.projector_id || "", catalogLensId: c.catalogSelection.lens?.lens_id || "", calculationState: c.calculationMode,
-        familyId: c.family?.id || el.family.value, lensId: c.lens?.id || "", trA: finite(c.rawMin) ? c.rawMin : c.trA, trB: finite(c.rawMax) ? c.rawMax : c.trB, raster: el.raster.value,
+        familyId: c.family?.id || el.family.value, lensId: c.lens?.id || "", trA: finite(c.rawMin) ? c.rawMin : c.trA, trB: finite(c.rawMax) ? c.rawMax : c.trB, raster: el.raster.value, orientation: c.orientation,
         shiftProfileId: c.shiftProfile?.id || "", projectorModel: el.projectorModel.value.trim(), shiftUp: el.shiftUp.value === "" ? NaN : Number(el.shiftUp.value), shiftDown: el.shiftDown.value === "" ? NaN : Number(el.shiftDown.value), shiftLeft: el.shiftLeft.value === "" ? NaN : Number(el.shiftLeft.value), shiftRight: el.shiftRight.value === "" ? NaN : Number(el.shiftRight.value), shiftSource: el.shiftSource.value.trim(),
         screenBottom: c.screenBottom, dist: c.dist, depth: c.depth, lensHeight: c.lensHeight, bodyDepth: c.bodyDepth, tol: c.tol * 100, lumens: c.lumens, qty: c.qty, gain: c.gain,
         eff: c.eff, stackEff: c.stackEff, targetFl: c.targetFl, fitMode: c.fitMode, includeEstimated: c.includeEstimated, nPlusOne: c.nPlusOne,
@@ -4927,6 +4936,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       el.job.value = String(data.job || "");
       setLenInput(el.sw, storedNumber(data.w)); setLenInput(el.sh, storedNumber(data.h));
       setLenInput(el.sbottom, storedNumber(data.screenBottom));
+      el.orientation.value = window.ThrowlineSceneState.normalizeOrientation(data.orientation);
       const aspect = storedNumber(data.aspect); el.sasp.value = [...el.sasp.options].some(o => Number(o.value) === aspect) ? String(aspect) : "0";
       el.preset.value = [...el.preset.options].some(o => o.value === data.preset) ? data.preset : "";
       el.catalogProjector.value = [...el.catalogProjector.options].some(o => o.value === data.catalogProjectorId) ? data.catalogProjectorId : ""; buildCatalogLensOptions(data.catalogLensId || "");
@@ -4955,7 +4965,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
       const s = stateObject(c), p = new URLSearchParams(); p.set("v", String(APP_VERSION)); p.set("u", s.unit);
       const put = (k, v) => { if (v !== "" && v !== null && v !== undefined && !(typeof v === "number" && !finite(v))) p.set(k, String(v)); };
       put("job", s.job); put("w", cleanNum(s.w, 4)); put("h", cleanNum(s.h, 4)); put("asp", s.aspect); put("screen", s.preset); put("cp", s.catalogProjectorId); put("cl", s.catalogLensId); put("cs", s.calculationState); put("family", s.familyId); put("lens", s.lensId);
-      put("a", cleanNum(s.trA, 4)); put("z", cleanNum(s.trB, 4)); put("r", s.raster); put("sp", s.shiftProfileId); put("pm", s.projectorModel); put("su", cleanNum(s.shiftUp, 2)); put("sd", cleanNum(s.shiftDown, 2)); put("sl", cleanNum(s.shiftLeft, 2)); put("sr", cleanNum(s.shiftRight, 2)); put("ss", s.shiftSource); put("sb", cleanNum(s.screenBottom, 4)); put("d", cleanNum(s.dist, 4)); put("D", cleanNum(s.depth, 4)); put("lh", cleanNum(s.lensHeight, 4)); put("b", cleanNum(s.bodyDepth, 4));
+      put("a", cleanNum(s.trA, 4)); put("z", cleanNum(s.trB, 4)); put("r", s.raster); put("orientation", s.orientation); put("sp", s.shiftProfileId); put("pm", s.projectorModel); put("su", cleanNum(s.shiftUp, 2)); put("sd", cleanNum(s.shiftDown, 2)); put("sl", cleanNum(s.shiftLeft, 2)); put("sr", cleanNum(s.shiftRight, 2)); put("ss", s.shiftSource); put("sb", cleanNum(s.screenBottom, 4)); put("d", cleanNum(s.dist, 4)); put("D", cleanNum(s.depth, 4)); put("lh", cleanNum(s.lensHeight, 4)); put("b", cleanNum(s.bodyDepth, 4));
       put("tol", cleanNum(s.tol, 2)); put("lm", s.lumens); put("q", s.qty); put("g", s.gain); put("eff", s.eff); put("se", s.stackEff); put("target", s.targetFl); put("fit", s.fitMode); if (s.nPlusOne) p.set("n1", "1"); put("ad", cleanNum(s.actualDist, 4)); put("aw", cleanNum(s.actualWidth, 4)); put("af", cleanNum(s.actualFl, 2)); put("vb", s.verifiedBy); put("va", s.verifiedAt); put("sn", cleanNum(s.solverNear, 4)); put("sf", cleanNum(s.solverFar, 4)); put("sc", s.solverScope); put("view", s.drawingView); put("cam", s.stageCamera); if (s.includeEstimated) p.set("est", "1");
       try { history.replaceState(null, "", `#${p.toString()}`); } catch (_) { }
     }
@@ -4966,7 +4976,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
         const num = key => p.has(key) ? Number(p.get(key)) : NaN;
         return applyState({
           unit: p.get("u") || "ftin", job: p.get("job") || "", w: num("w"), h: num("h"), aspect: num("asp"), preset: p.get("screen") || "",
-          catalogProjectorId: p.get("cp") || "", catalogLensId: p.get("cl") || "", calculationState: p.get("cs") || "legacy_unverified", familyId: p.get("family") || "", lensId: p.get("lens") || "", trA: num("a"), trB: num("z"), raster: p.get("r") || "", shiftProfileId: p.get("sp") || "", projectorModel: p.get("pm") || "", shiftUp: num("su"), shiftDown: num("sd"), shiftLeft: num("sl"), shiftRight: num("sr"), shiftSource: p.get("ss") || "",
+          catalogProjectorId: p.get("cp") || "", catalogLensId: p.get("cl") || "", calculationState: p.get("cs") || "legacy_unverified", familyId: p.get("family") || "", lensId: p.get("lens") || "", trA: num("a"), trB: num("z"), raster: p.get("r") || "", orientation: p.get("orientation"), shiftProfileId: p.get("sp") || "", projectorModel: p.get("pm") || "", shiftUp: num("su"), shiftDown: num("sd"), shiftLeft: num("sl"), shiftRight: num("sr"), shiftSource: p.get("ss") || "",
           screenBottom: num("sb"), dist: num("d"), depth: num("D"), lensHeight: num("lh"), bodyDepth: num("b"), tol: num("tol"), lumens: num("lm"), qty: num("q"), gain: num("g"),
           eff: num("eff"), stackEff: num("se"), targetFl: num("target"), fitMode: p.get("fit"), includeEstimated: p.get("est") === "1", nPlusOne: version >= 4 ? p.get("n1") === "1" : true,
           actualDist: num("ad"), actualWidth: num("aw"), actualFl: num("af"), verifiedBy: p.get("vb") || "", verifiedAt: p.get("va") || "", solverNear: num("sn"), solverFar: num("sf"), solverScope: p.get("sc") || "all", drawingView: p.get("view"), stageCamera: p.get("cam")
@@ -5040,7 +5050,7 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
 
     function applyDefaults() {
       unit = "ftin"; document.querySelectorAll("[data-unit]").forEach(b => b.setAttribute("aria-pressed", b.dataset.unit === unit ? "true" : "false"));
-      suppress = true; el.job.value = ""; el.sasp.value = "1.7777778";
+      suppress = true; el.job.value = ""; el.orientation.value = "landscape"; el.sasp.value = "1.7777778";
       const screen = SCREENS.find(s => s.w === 240 && s.h === 135 && s.group.includes("Heavy-Duty")) || SCREENS[0]; el.preset.value = screen.id; setLenInput(el.sw, screen.w); setLenInput(el.sh, screen.h); setLenInput(el.sbottom, 48);
       el.catalogProjector.value = ""; buildCatalogLensOptions();
       const lens = BUILTIN_LENSES.find(l => l.brand === "Panasonic" && l.model === "ET-DLE105" && l.note === "WUXGA") || BUILTIN_LENSES[0]; el.family.value = lens.familyId; buildLensOptions(); el.lens.value = ""; el.trmin.value = cleanNum(lens.min, 3); el.trmax.value = cleanNum(lens.max, 3); el.raster.value = "1.6|1920|1200"; buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: false });
@@ -5060,9 +5070,9 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
     ["job", "sbottom", "body", "dist", "depth", "lensHeight", "lumens", "qty", "gain", "tol", "eff", "stackEff", "projectorModel", "shiftUp", "shiftDown", "shiftLeft", "shiftRight", "shiftSource", "solverNear", "solverFar"].forEach(id => el[id].addEventListener("input", scheduleRender));
     ["actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].addEventListener("input", () => { verifiedAt = ""; verificationReset = ""; scheduleRender(); }));
     el.body.addEventListener("input", () => { bodyAutoFilled = false; });
-    ["raster", "targetFl", "fitMode", "solverScope"].forEach(id => el[id].addEventListener("change", scheduleRender));
+    ["orientation", "raster", "targetFl", "fitMode", "solverScope"].forEach(id => el[id].addEventListener("change", scheduleRender));
     ["sbottom", "dist", "lensHeight"].forEach(id => el[id].addEventListener("input", noteDrivingEdit));
-    ["raster", "fitMode"].forEach(id => el[id].addEventListener("change", noteDrivingEdit));
+    ["orientation", "raster", "fitMode"].forEach(id => el[id].addEventListener("change", noteDrivingEdit));
     [el.includeEstimated, el.nPlusOne].forEach(node => node.addEventListener("change", scheduleRender));
     el.inventoryToggle.addEventListener("click", () => { const lens = getLens(); if (!lens) return; if (inventory.has(lens.id)) { inventory.delete(lens.id); toast("Lens removed from crew inventory"); } else { inventory.add(lens.id); toast("Lens added to crew inventory"); } saveInventoryStorage(); render(); });
     $("saveProfile").addEventListener("click", () => {

@@ -35,7 +35,7 @@
     "probe:import-xss": "node scripts/probe_import_xss.mjs",
     "probe:led-configurator": "node scripts/probe_led_wall_configurator.js",
     "probe:throwline-stage": "node scripts/probe_throwline_stage3d.js",
-    "test:throwline-browser": "node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl",
+    "test:throwline-browser": "node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl && node scripts/probe_throwline_portrait.cjs",
     "probe:portfolio-browser": "node scripts/portfolio_browser_audit.js",
     "verify:gear-reference": "node scripts/build_gear_from_fmp.js --check && node --test scripts/gear_equipment_adapter.test.js && node scripts/verify_gear_reference.js",
     "build:gear-from-fmp": "node scripts/build_gear_from_fmp.js",

@@ -8,6 +8,17 @@
 
   const SCHEMA_VERSION = 1;
   const STORAGE_KEY = 'throwline:stage-scene:v1';
+  const ORIENTATIONS = Object.freeze(['landscape', 'portrait-cw', 'portrait-ccw']);
+  const normalizeOrientation = value => ORIENTATIONS.includes(value) ? value : 'landscape';
+  const orientationLabel = value => ({landscape:'Landscape', 'portrait-cw':'Portrait · clockwise 90°', 'portrait-ccw':'Portrait · counterclockwise 90°'})[normalizeOrientation(value)];
+  const isPortrait = value => normalizeOrientation(value) !== 'landscape';
+  // Clockwise is viewed from behind the projector, looking toward the screen.
+  function orientedShift(shift, orientation) {
+    if (!shift || !isPortrait(orientation)) return shift;
+    return orientation === 'portrait-cw'
+      ? { ...shift, up: shift.left, down: shift.right, left: shift.down, right: shift.up }
+      : { ...shift, up: shift.right, down: shift.left, left: shift.up, right: shift.down };
+  }
   const MODES = new Set(['manual', 'verified_image_width', 'field_verified', 'manufacturer_unspecified', 'conflicting', 'partial', 'legacy_unverified', 'blocked']);
   const finite = value => (typeof value === 'number' || (typeof value === 'string' && value.trim() !== '')) && Number.isFinite(Number(value));
   const clamp = (value, min, max) => Math.min(max, Math.max(min, Number(value)));
@@ -58,6 +69,7 @@
   const COMMISSIONING_VERSION = 1;
   const COMMISSIONING_FIELDS = Object.freeze(['throwDistance', 'imageWidth', 'lensHeight', 'horizontalOffset', 'targetOffset', 'shift', 'focus', 'alignment']);
   const COMMISSIONING_IMPACTS = Object.freeze({
+    'set-orientation': Object.freeze(['throwDistance', 'imageWidth', 'shift', 'focus', 'alignment']),
     'set-distance': Object.freeze(['throwDistance', 'imageWidth', 'shift', 'focus', 'alignment']),
     'snap-distance': Object.freeze(['throwDistance', 'imageWidth', 'shift', 'focus', 'alignment']),
     'set-lens-height': Object.freeze(['lensHeight', 'shift', 'alignment']),
@@ -142,7 +154,7 @@
     const projector = scene.projectors.find(item => item.id === projectorId) || activeProjector(scene);
     const num = (value, digits = 4) => finite(value) ? String(Number(Number(value).toFixed(digits))) : undefined;
     const params = {
-      mode: projector.provenance.mode, u: 'ft',
+      mode: projector.provenance.mode, u: 'ft', orientation: projector.orientation,
       w: num(scene.screen.width), bottom: num(scene.screen.bottom), ar: num(scene.screen.aspect, 6),
       basisW: num(projector.optical.basisWidth), rasterAr: num(projector.optical.rasterAspect, 6),
       lh: num(projector.position.lensHeight), dist: num(projector.position.distance), px: num(projector.position.x), tx: num(projector.position.targetX),
@@ -175,6 +187,7 @@
     return {
       id: cleanId(input.id, `projector-${index + 1}`),
       label: String(input.label || `Unit ${String.fromCharCode(65 + index)}`).slice(0, 80),
+      orientation: normalizeOrientation(input.orientation),
       position: {
         x: finite(position.x) ? clamp(position.x, -100, 100) : index * 2,
         distance: finite(position.distance) ? clamp(position.distance, 1, 300) : 22,
@@ -313,6 +326,7 @@
       projectors: [{
         id: 'projector-a',
         label: transfer.label || 'Unit A',
+        orientation: transfer.orientation,
         position: { x: transfer.x, distance: transfer.dist, lensHeight: transfer.lh, targetX: transfer.targetX },
         body: transfer.body,
         optical: { min: transfer.wide, max: transfer.tele, basisWidth: transfer.basisW, rasterAspect: transfer.rasterAr, shift: transfer.shift, mode },
@@ -383,10 +397,12 @@
     const body = projector.body;
     if (!body) return undefined;
     const front = projector.position.distance + body.lensProtrusion;
+    const width = isPortrait(projector.orientation) ? body.height : body.width;
+    const height = isPortrait(projector.orientation) ? body.width : body.height;
     return {
       front, rear: front + body.depth,
-      top: projector.position.lensHeight + body.height / 2, bottom: projector.position.lensHeight - body.height / 2,
-      left: projector.position.x - body.width / 2, right: projector.position.x + body.width / 2
+      top: projector.position.lensHeight + height / 2, bottom: projector.position.lensHeight - height / 2,
+      left: projector.position.x - width / 2, right: projector.position.x + width / 2
     };
   }
 
@@ -456,8 +472,9 @@
     const distance = projector.position.distance;
     const requiredRatio = distance / optical.basisWidth;
     const currentRatio = clamp(requiredRatio, optical.min, optical.max);
-    const imageWidth = distance / currentRatio;
-    const imageHeight = imageWidth / optical.rasterAspect;
+    const nativeWidth = distance / currentRatio;
+    const imageWidth = isPortrait(projector.orientation) ? nativeWidth / optical.rasterAspect : nativeWidth;
+    const imageHeight = isPortrait(projector.orientation) ? nativeWidth : nativeWidth / optical.rasterAspect;
     let kind = 'near-limit'; let rawLabel = 'In range, but close to the lens limit'; let tone = 'warn';
     const measured = projector.provenance.mode === 'field_verified';
     const verifyLow = fixed && !measured ? nominal * (1 - factor) : wideDistance, verifyHigh = fixed && !measured ? nominal * (1 + factor) : teleDistance;
@@ -473,7 +490,8 @@
     const shiftPercent = ((base.screen.centerY - projector.position.lensHeight) / imageHeight) * 100;
     const horizontalShiftPercent = ((projector.position.targetX - projector.position.x) / imageWidth) * 100;
     const image = { width: imageWidth, height: imageHeight, centerX: projector.position.targetX, requiredRatio, currentRatio, shiftPercent, horizontalShiftPercent };
-    const shift = { vertical: assessShift(shiftPercent, optical.shift, 'up', 'down'), horizontal: assessShift(horizontalShiftPercent, optical.shift, 'right', 'left') };
+    const worldShift = orientedShift(optical.shift, projector.orientation);
+    const shift = { vertical: assessShift(shiftPercent, worldShift, 'up', 'down'), horizontal: assessShift(horizontalShiftPercent, worldShift, 'right', 'left') };
     shift.combined = assessCombinedShift(shift.vertical, shift.horizontal, optical.shift);
     const collisions = scene.obstacles.filter(obstacle => obstacleIntersectsBeam(obstacle, scene, projector, image)).map(obstacle => ({ obstacleId: obstacle.id, label: obstacle.label, kind: 'beam-obstruction' }));
     const screenLeft = -scene.screen.width / 2, screenRight = scene.screen.width / 2;
@@ -484,7 +502,7 @@
       missing: Math.max(0, imageLeft - screenLeft, screenRight - imageRight, -heightVariance)
     };
     coverage.maxEdgeVariance = Math.max(coverage.spill, coverage.missing);
-    return { ...base, placement: { kind, label, tone }, reason: collisions.length ? `${collisions.length} obstruction${collisions.length === 1 ? '' : 's'} block${collisions.length === 1 ? 's' : ''} the light path.` : '', envelope: { wideDistance, teleDistance, safeLow, safeHigh, tolerance, fixed, nominal }, image, shift, shiftEnvelope: optical.shift, coverage, collisions };
+    return { ...base, placement: { kind, label, tone }, reason: collisions.length ? `${collisions.length} obstruction${collisions.length === 1 ? '' : 's'} block${collisions.length === 1 ? 's' : ''} the light path.` : '', envelope: { wideDistance, teleDistance, safeLow, safeHigh, tolerance, fixed, nominal }, image, shift, shiftEnvelope: worldShift, coverage, collisions };
   }
 
   function rectangleIntersection(first, second) {
@@ -547,7 +565,7 @@
         placement: geometry.placement,
         provenance: projector.provenance,
         position: copy(projector.position),
-        rasterAspect: projector.optical.rasterAspect
+        rasterAspect: isPortrait(projector.orientation) ? 1 / projector.optical.rasterAspect : projector.optical.rasterAspect
       };
     });
     const calculated = units.filter(unit => unit.calculated);
@@ -665,6 +683,7 @@
     scene.projectors.forEach(projector => {
       const name = scene.projectors.length > 1 ? `${projector.label}: ` : '';
       const geometry = calculateProjectorGeometry(scene, projector.id);
+      if (isPortrait(projector.orientation)) push('warn', 'portrait-mounting', `${name}confirm portrait mounting and cooling permission in the exact model manual`, projector.id);
       if (!geometry.allowed) { push('bad', 'blocked', `${name}can\u2019t calculate yet`, projector.id); return; }
       if (geometry.placement.tone !== 'go') push(geometry.placement.tone, `placement-${geometry.placement.kind}`, `${name}${geometry.placement.label.charAt(0).toLowerCase()}${geometry.placement.label.slice(1)}`, projector.id);
       if (geometry.coverage.missing > COVERAGE_TOLERANCE) push('bad', 'coverage-missing', `${name}the picture doesn\u2019t fill the screen`, projector.id);
@@ -694,7 +713,7 @@
   // installation, so any edit that moves the picture or the projector (a driving edit) drops the stamp and says why.
   const FIELD_VERIFICATION = Object.freeze({
     reason: 'MANUAL ESTIMATE · something changed after the on-site check, so please measure again.',
-    drivingIntents: Object.freeze(['set-distance', 'snap-distance', 'set-lens-height', 'set-projector-x', 'set-projector-target-x', 'set-screen-width', 'set-screen-bottom', 'set-screen-aspect', 'set-optical-range', 'set-body', 'clear-body', 'arrange-projectors'])
+    drivingIntents: Object.freeze(['set-orientation', 'set-distance', 'snap-distance', 'set-lens-height', 'set-projector-x', 'set-projector-target-x', 'set-screen-width', 'set-screen-bottom', 'set-screen-aspect', 'set-optical-range', 'set-body', 'clear-body', 'arrange-projectors'])
   });
   function invalidatesFieldVerification(intentType) { return FIELD_VERIFICATION.drivingIntents.includes(String(intentType || '')); }
 
@@ -746,6 +765,11 @@
     }
     else if (type === 'set-screen-bottom') { const previous = scene.screen.bottom; scene.screen.bottom = clamp(stepped(intent.value, 0.25), 0, 100); if (scene.screen.bottom !== previous) scene.projectors = scene.projectors.map(item => invalidateCommissioning(invalidateFieldVerification(item), type, changedAt)); }
     else if (type === 'set-screen-aspect') { const previous = scene.screen.aspect; scene.screen.aspect = clamp(Number(intent.value), 0.2, 10); if (scene.screen.aspect !== previous) scene.projectors = scene.projectors.map(item => invalidateCommissioning(invalidateFieldVerification(item), type, changedAt)); }
+    else if (type === 'set-orientation' && ORIENTATIONS.includes(intent.value) && intent.value !== projector.orientation) {
+      const before = isPortrait(projector.orientation), after = isPortrait(intent.value);
+      const scale = before === after ? 1 : after ? projector.optical.rasterAspect : 1 / projector.optical.rasterAspect;
+      updateProjector({ ...projector, orientation: intent.value, optical: { ...projector.optical, basisWidth: projector.optical.basisWidth * scale } });
+    }
     else if (type === 'set-optical-range' && finite(intent.min) && Number(intent.min) > 0 && finite(intent.max) && Number(intent.max) >= Number(intent.min)) updateProjector({ ...projector, allowed: true, optical: { ...projector.optical, min: Number(intent.min), max: Number(intent.max) }, provenance: normalizeProvenance({ mode: 'manual', reason: 'MANUAL ESTIMATE · throw ratio entered by hand.' }) });
     else if (type === 'set-tolerance' && finite(intent.value)) scene.tolerance = clamp(intent.value, 0, 15);
     else if (type === 'set-room' && intent.key === 'clearance' && finite(intent.value)) scene.room.clearance = clamp(stepped(intent.value, 0.25), 0, 10);
@@ -919,14 +943,15 @@
     const projector = scene.projectors[index];
     const measuredDistance = Number(values.measuredDistance); const measuredWidth = Number(values.measuredWidth);
     if (!finite(measuredDistance) || measuredDistance <= 0 || !finite(measuredWidth) || measuredWidth <= 0) throw new TypeError('Enter the measured throw distance and picture width first.');
-    const ratio = measuredDistance / measuredWidth;
+    const measuredBasis = measuredWidth * (isPortrait(projector.orientation) ? projector.optical.rasterAspect : 1);
+    const ratio = measuredDistance / measuredBasis;
     if (ratio < 0.05 || ratio > 20) throw new RangeError(`That works out to ${ratio.toFixed(3)}:1, which is outside the 0.05\u201320:1 range this tool covers. Please double-check the measurements.`);
     // The measurement certifies the throw ratio only. The planned raster basis stays, so the corrected mark is ratio × basis
     // (the same relationship the planner uses), not the measured throw itself.
-    scene.projectors[index] = normalizeProjector({ ...projector, allowed: true, optical: { ...projector.optical, min: ratio, max: ratio }, provenance: { mode: 'field_verified', reason: 'FIELD VERIFIED · measured on site for this job.', verification: { ratio, measuredDistance, measuredWidth, verifiedBy: values.verifiedBy, verifiedAt: values.verifiedAt || new Date().toISOString(), note: values.note } } }, index);
+    scene.projectors[index] = normalizeProjector({ ...projector, allowed: true, optical: { ...projector.optical, min: ratio, max: ratio }, provenance: { mode: 'field_verified', reason: 'FIELD VERIFIED · measured on site for this job.', verification: { ratio, measuredDistance, measuredWidth: measuredBasis, verifiedBy: values.verifiedBy, verifiedAt: values.verifiedAt || new Date().toISOString(), note: values.note } } }, index);
     scene.updatedAt = new Date().toISOString();
     return normalizeSceneState(scene);
   }
 
-  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, COMMISSIONING_VERSION, COMMISSIONING_FIELDS, COMMISSIONING_IMPACTS, SCENARIO_SNAPSHOT_VERSION, SCENARIO_HISTORY_VERSION, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, calculateMultiProjectorLayout, roomConflicts, bodyExtents, assessInstallation, assessCombinedShift, resolveProfileRatio, transferParamsFor, FIELD_VERIFICATION, invalidatesFieldVerification, lengthToFeet, LENGTH_UNITS, obstacleIntersectsBeam, applyIntent, commissioningRecordFor, stampCommissioningRecord, createScenarioSnapshot, compareScenarioSnapshots, createScenarioHistory, commitScenario, undoScenario, redoScenario, stampFieldVerification });
+  return Object.freeze({ ORIENTATIONS, normalizeOrientation, orientationLabel, isPortrait, orientedShift, SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, COMMISSIONING_VERSION, COMMISSIONING_FIELDS, COMMISSIONING_IMPACTS, SCENARIO_SNAPSHOT_VERSION, SCENARIO_HISTORY_VERSION, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, calculateMultiProjectorLayout, roomConflicts, bodyExtents, assessInstallation, assessCombinedShift, resolveProfileRatio, transferParamsFor, FIELD_VERIFICATION, invalidatesFieldVerification, lengthToFeet, LENGTH_UNITS, obstacleIntersectsBeam, applyIntent, commissioningRecordFor, stampCommissioningRecord, createScenarioSnapshot, compareScenarioSnapshots, createScenarioHistory, commitScenario, undoScenario, redoScenario, stampFieldVerification });
 });

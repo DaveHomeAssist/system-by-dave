@@ -525,7 +525,7 @@ html[data-av-workspace] body{margin:0;padding:var(--av-safe-top) var(--av-safe-r
 <!-- AV workspace styles:end -->
 <!-- AV workspace runtime:start -->
 <script>
-window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
+window.AVWorkspaceVersion="v20261105-throwline-portrait";
 /* View state only: existing form nodes and product calculation state remain authoritative. */
 (function(global){
   'use strict';
@@ -698,10 +698,10 @@ window.AVWorkspaceVersion="v20261103-throwline-stage-inspection";
           <p class="online-note"><strong id="offlineStatusTitle">Offline after this first successful load.</strong> <span id="offlineStatusDetail">The pinned 3D engine is local and Throwline is preparing its cache.</span> <span class="online-note-fallback">If WebGL is unavailable, calculation data remains safe in the <a href="index.html?workspace=planner">Throwline planner</a>.</span></p>
           <section class="control-block" id="sectionScreen" aria-labelledby="screenControlsTitle">
             <div class="grp">
-              <h3 id="screenControlsTitle">Screen</h3>
+              <h3 id="screenControlsTitle">Screen</h3><div><label class="lab" for="orientation">Projector orientation</label><select id="orientation" aria-describedby="orientationHint"><option value="landscape">Landscape</option><option value="portrait-cw">Portrait · clockwise 90°</option><option value="portrait-ccw">Portrait · counterclockwise 90°</option></select></div><p class="hint" id="orientationHint">Viewed from behind toward the screen. Confirm the exact model permits portrait mounting and cooling. Optical catalog data does not approve installation.</p>
               <div><label class="lab" for="sw">Width <span class="val" id="swv">20' 0"</span></label><input id="sw" type="range" min="8" max="40" step="0.5" value="20"></div>
               <div><label class="lab" for="st">Bottom edge height <span class="val" id="stv">4' 0"</span></label><input id="st" type="range" min="0" max="10" step="0.25" value="4"></div>
-              <div><label class="lab" for="ar">Aspect</label><select id="ar"><option value="1.7778">16:9 · HD / UHD</option><option value="1.6">16:10 · WUXGA</option><option value="2.39">2.39:1 · scope</option><option value="1.3333">4:3 · legacy</option></select></div>
+              <div><label class="lab" for="ar">Aspect</label><select id="ar"><option value="1.7778">16:9 · HD / UHD</option><option value="1.6">16:10 · WUXGA</option><option value="0.5625">9:16 · portrait</option><option value="0.625">10:16 · portrait</option><option value="2.39">2.39:1 · scope</option><option value="1.3333">4:3 · legacy</option></select></div>
             </div>
           </section>
           <section class="control-block" id="sectionProjector" aria-labelledby="projectorControlsTitle">
@@ -1007,7 +1007,7 @@ const offlineBadge = document.getElementById('offlineBadge');
 const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
-const OFFLINE_CACHE_VERSION = 'v20261103-throwline-stage-inspection';
+const OFFLINE_CACHE_VERSION = 'v20261105-throwline-portrait';
 const WORKFLOW_STAGES = ['setup','place','room','deliver'];
 const workflowTabs = [...document.querySelectorAll('[data-workflow-tab]')];
 const workflowPanels = [...document.querySelectorAll('[data-workflow-panel]')];
@@ -1276,7 +1276,7 @@ function resolveStageTransfer(){
   // Position, room, and catalog identity round-trip through job-sheet links (px, tx, rw, rd, rh; projector/lens/profile).
   const catalog = validIds ? {projector:projectorId,lens:lensId,profile:profile?.optical_profile_id||''} : undefined;
   const room = {clearance:boundedLength('clr',1,0,10),width:length('rw',undefined),depth:length('rd',undefined),height:length('rh',undefined)};
-  const base = {w:screenWidth,bottom:boundedLength('bottom',4,0,100),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:boundedLength('lh',6,0,100),dist:boundedLength('dist',22,1,300),x:boundedLength('px',0,-100,100),targetX:boundedLength('tx',0,-100,100),linkUnit,shift,shiftSource,tolerance:bounded('tolPct',5,0,15),body:catalogBody||paramBody,room,catalog};
+  const base = {orientation:window.ThrowlineSceneState.normalizeOrientation(params.get('orientation')),w:screenWidth,bottom:boundedLength('bottom',4,0,100),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:boundedLength('lh',6,0,100),dist:boundedLength('dist',22,1,300),x:boundedLength('px',0,-100,100),targetX:boundedLength('tx',0,-100,100),linkUnit,shift,shiftSource,tolerance:bounded('tolPct',5,0,15),body:catalogBody||paramBody,room,catalog};
   const ratio = number('ratio',NaN), stamp = params.get('stamp') || '';
   if (requestedMode === 'field_verified' && hasIds && (!STAGE_CATALOG.ok || !validIds)) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid field transfer',reason:'CAN’T CALCULATE YET · this link names a projector and lens that don’t match a known pair.',profile:null};
   if (requestedMode === 'field_verified') {
@@ -1376,7 +1376,7 @@ stage.addEventListener('stage-context-restored',()=>{
 const els = id => document.getElementById(id);
 let sceneState = SceneState.createSceneState({
   w:STAGE_TRANSFER.w,bottom:STAGE_TRANSFER.bottom,ar:STAGE_TRANSFER.ar,
-  basisW:STAGE_TRANSFER.basisW,rasterAr:STAGE_TRANSFER.rasterAr,
+  orientation:STAGE_TRANSFER.orientation,basisW:STAGE_TRANSFER.basisW,rasterAr:STAGE_TRANSFER.rasterAr,
   wide:STAGE_TRANSFER.wide,tele:STAGE_TRANSFER.tele,lh:STAGE_TRANSFER.lh,
   dist:STAGE_TRANSFER.dist,x:STAGE_TRANSFER.x,targetX:STAGE_TRANSFER.targetX,catalog:STAGE_TRANSFER.catalog,mode:STAGE_TRANSFER.mode,allowed:STAGE_TRANSFER.allowed,
   label:STAGE_TRANSFER.label,reason:STAGE_TRANSFER.reason,shift:STAGE_TRANSFER.shift,verification:STAGE_TRANSFER.verification,tolerance:STAGE_TRANSFER.tolerance,
@@ -1420,7 +1420,7 @@ function syncFlatState(){
   Object.assign(state,{
     w:sceneState.screen.width,bottom:sceneState.screen.bottom,ar:sceneState.screen.aspect,
     basisW:projector.optical.basisWidth,basisScale:projector.optical.basisWidth/sceneState.screen.width,
-    rasterAr:projector.optical.rasterAspect,wide:projector.optical.min,tele:projector.optical.max,
+    orientation:projector.orientation,rasterAr:projector.optical.rasterAspect,wide:projector.optical.min,tele:projector.optical.max,
     lh:projector.position.lensHeight,dist:projector.position.distance,x:projector.position.x,targetX:projector.position.targetX,
     mode:projector.provenance.mode,allowed:projector.allowed,label:projector.label,gateReason:projector.provenance.reason,
     cone:sceneState.overlays.beam,room:sceneState.overlays.room,grid:sceneState.overlays.grid
@@ -1539,7 +1539,7 @@ function readout(geometry,w,h,pstate){
   els('fLens').textContent = lensName.split('·')[0].trim();
   els('fHeight').textContent = fmt(state.lh);
   els('adjustSummary').textContent = `${fmt(state.w)} screen · ${fmt(state.dist)} set`;
-  els('sceneSummary').textContent = `${pstate.label}. ${geometry.provenance.label}. Set mark ${fmt(d)}. ${lensName}. Image ${fmt(iw)} by ${fmt(ih)}; screen ${fmt(sw)} by ${fmt(sh)}. ${spill<0.02?'No edge variance.':`${fmt(spill)} maximum spill or missing coverage.`} Optical height ${fmt(state.lh)}. Required ratio ${(state.dist/state.basisW).toFixed(3)} to one. Shift ${shiftPct>=0?'plus ':'minus '}${Math.abs(shiftPct).toFixed(1)} percent.${combinedExceeded?' Up-and-sideways shift together is past what the lens allows.':''}`;
+  els('sceneSummary').textContent = `${pstate.label}. ${SceneState.orientationLabel(state.orientation)}. ${geometry.provenance.label}. Set mark ${fmt(d)}. ${lensName}. Image ${fmt(iw)} by ${fmt(ih)}; screen ${fmt(sw)} by ${fmt(sh)}. ${spill<0.02?'No edge variance.':`${fmt(spill)} maximum spill or missing coverage.`} Optical height ${fmt(state.lh)}. Required ratio ${(state.dist/state.basisW).toFixed(3)} to one. Shift ${shiftPct>=0?'plus ':'minus '}${Math.abs(shiftPct).toFixed(1)} percent.${combinedExceeded?' Up-and-sideways shift together is past what the lens allows.':''}`;
 }
 
 /* ---------- controls ---------- */
@@ -1584,7 +1584,7 @@ function updateWorkspaceFacts(geometry){
   const mustFix=geometry.collisions.length>0||roomConflicts.some(item=>item.tone!=='warn');
   collisionAlert.dataset.active=String(alerts.length>0); collisionAlert.textContent=alerts.length?`${mustFix?'Fix':'Check'} · ${alerts.join(' · ')}`:'Nothing in the way';
   const body=SceneState.activeProjector(sceneState).body;
-  els('fBody').textContent=body?`${fmt(body.width)} W × ${fmt(body.height)} H × ${fmt(body.depth)} D · lens +${fmt(body.lensProtrusion)} · ${body.source==='catalog'?'from maker data':'typed in'}`:'not set · lens position only';
+  els('fBody').textContent=body?`${fmt(SceneState.isPortrait(SceneState.activeProjector(sceneState).orientation)?body.height:body.width)} W × ${fmt(SceneState.isPortrait(SceneState.activeProjector(sceneState).orientation)?body.width:body.height)} H × ${fmt(body.depth)} D · lens +${fmt(body.lensProtrusion)} · ${body.source==='catalog'?'from maker data':'typed in'}`:'not set · lens position only';
   renderLayoutAnalysis();
   const verdict=`${geometry.placement.label}|${geometry.provenance.label}|${alerts.join('|')}`;
   if(verdict!==lastVerdict&&alerts.length)window.gsap?.fromTo(collisionAlert,{scale:.98,opacity:.45},{scale:1,opacity:1,duration:.28,ease:'power2.out'});
@@ -1649,6 +1649,7 @@ function syncCommissioningSummary(){
 }
 
 function syncInputsFromState(){
+  els('orientation').value=SceneState.activeProjector(sceneState).orientation;
   syncFlatState();
   const values={sw:state.w,st:state.bottom,lh:state.lh,d:state.dist,px:state.x,targetX:state.targetX,roomW:sceneState.room.width,roomD:sceneState.room.depth,roomH:sceneState.room.height,roomC:sceneState.room.clearance};
   const body=SceneState.activeProjector(sceneState).body;
@@ -1688,6 +1689,7 @@ function bindSceneRange(id,type){const input=els(id);input.addEventListener('inp
 [['bodyW','width'],['bodyH','height'],['bodyD','depth'],['bodyLp','lensProtrusion']].forEach(([id,key])=>els(id).addEventListener('input',event=>{const value=Number(event.target.value);if(Number.isFinite(value)&&event.target.value!=='')applySceneIntent({type:'set-body',key,value});}));
 els('clearBody').onclick=()=>applySceneIntent({type:'clear-body'},{announceText:'Projector body cleared. The room check uses the lens position only.'});
 els('ar').addEventListener('change',event=>applySceneIntent({type:'set-screen-aspect',value:Number(event.target.value)},{announceText:`Aspect ${event.target.selectedOptions[0].textContent}`}));
+els('orientation').addEventListener('change',event=>applySceneIntent({type:'set-orientation',value:event.target.value},{announceText:'Projector orientation changed. Confirm mounting instructions.'}));
 els('lens').addEventListener('change',event=>{const[min,max]=event.target.value.split(',').map(Number);applySceneIntent({type:'set-optical-range',min,max},{announceText:`Lens ${event.target.selectedOptions[0].textContent}`});});
 const snapDist=(target,label)=>applySceneIntent({type:'snap-distance',target},{announceText:`${label} ${fmt(state.dist)}`});
 els('bw').onclick=()=>snapDist('wide','Moved to the closest distance this lens allows,');els('bt').onclick=()=>snapDist('tele','Moved to the farthest distance this lens allows,');els('bm').onclick=()=>snapDist('mid','Moved to the middle of the comfort zone,');
@@ -1811,7 +1813,8 @@ function buildJobSheet(){
   set('jsHeadline',verdict.label);
   const side=sideText(projector.position.x,'right','left'), aim=sideText(projector.position.targetX,'right','left');
   const placement=[`Lens front ${fmt(projector.position.distance)} from the screen surface.`,`Lens centre ${fmt(projector.position.lensHeight)} above the floor.`,side?`Projector ${side} of the screen centre, looking at the screen.`:'Projector in line with the screen centre.',aim?`Picture aimed ${aim} of the screen centre.`:'Picture aimed at the screen centre.'];
-  if(extents)placement.push(`Back of the projector ${fmt(extents.rear)} from the screen. Body ${fmt(body.width)} wide, ${fmt(body.height)} high, ${fmt(body.depth)} deep (${body.source==='catalog'?'maker data':'typed in'}).`);
+  placement.push(`Orientation: ${SceneState.orientationLabel(projector.orientation)}. ${SceneState.isPortrait(projector.orientation)?'Confirm portrait mounting and cooling permission in the exact model manual.':''}`);
+  if(extents)placement.push(`Back of the projector ${fmt(extents.rear)} from the screen. Installed body ${fmt(extents.right-extents.left)} wide, ${fmt(extents.top-extents.bottom)} high, ${fmt(body.depth)} deep (${body.source==='catalog'?'maker data':'typed in'}).`);
   list('jsPlacement',placement);
   const screen=[`Screen ${fmt(sceneState.screen.width)} wide by ${fmt(sceneState.screen.width/sceneState.screen.aspect)} high, bottom edge ${fmt(sceneState.screen.bottom)} above the floor (${sceneState.screen.aspect.toFixed(3)}:1).`];
   if(geometry.image){screen.push(`Picture at this distance: ${fmt(geometry.image.width)} by ${fmt(geometry.image.height)}.`);screen.push(geometry.coverage.maxEdgeVariance<0.02?'The picture matches the screen edges.':geometry.coverage.missing>0.02?`The picture leaves ${fmt(geometry.coverage.missing)} of screen uncovered at the worst edge.`:`The picture spills ${fmt(geometry.coverage.spill)} past the screen at the widest edge.`);}
@@ -2049,7 +2052,7 @@ function cyl(rt,rb,h,seg,mat,name){
 /* ---------- projector on a cart ---------- */
 // Body local space: +Z points toward the screen (the throw direction).
 function bodyDims(item){ const body=item?.body; return body?{width:body.width*FT,height:body.height*FT,depth:body.depth*FT,lensProtrusion:body.lensProtrusion*FT}:null; }
-function buildProjector(dims){
+function buildProjector(dims,orientation){
   const g = new THREE.Group(); g.name = 'projector';
 
   // Generic silhouette by default; true maker dimensions when the scene carries a body (lens on the body's centre line).
@@ -2104,6 +2107,12 @@ function buildProjector(dims){
   });
 
   g.userData.lensY = BH*lensYf;
+  if(SceneState.isPortrait(orientation)){
+    const housing=new THREE.Group(); housing.name='rotated_projector_housing';
+    [...g.children].forEach(child=>{child.position.y-=BH*lensYf;housing.add(child);});
+    housing.rotation.z=orientation==='portrait-cw'?Math.PI/2:-Math.PI/2;
+    housing.position.y=BW/2;g.add(housing);g.userData.lensY=BW/2;
+  }
   g.userData.lensZ = BD/2 + 0.246*k;
   return g;
 }
@@ -2355,8 +2364,8 @@ function rebuildScene(){
   roomGrp.getObjectByName('deck_grid').visible = state.grid;
 
   // projector: lens front element sits exactly at the set distance; rebuild the model when the body dimensions change
-  const bodySignature = JSON.stringify(active.body || null);
-  if (bodySignature !== projSignature) { root.remove(proj); disposeObject3D(proj); proj = buildProjector(bodyDims(active)); root.add(proj); projSignature = bodySignature; }
+  const bodySignature = JSON.stringify([active.body || null,active.orientation]);
+  if (bodySignature !== projSignature) { root.remove(proj); disposeObject3D(proj); proj = buildProjector(bodyDims(active),active.orientation); root.add(proj); projSignature = bodySignature; }
   proj.rotation.y = Math.PI;                       // face the screen (-Z)
   proj.position.set(state.x*FT, lensY - proj.userData.lensY, dist + proj.userData.lensZ);
 
@@ -2368,7 +2377,7 @@ function rebuildScene(){
 
   const extras=new THREE.Group(); extras.name='additional_projector_units';
   sceneState.projectors.filter(item=>item.id!==active.id).forEach(item=>{
-    const unit=buildProjector(bodyDims(item)); unit.rotation.y=Math.PI;
+    const unit=buildProjector(bodyDims(item),item.orientation); unit.rotation.y=Math.PI;
     unit.position.set(item.position.x*FT,item.position.lensHeight*FT-unit.userData.lensY,item.position.distance*FT+unit.userData.lensZ);
     unit.userData.projectorId=item.id; extras.add(unit);
   });

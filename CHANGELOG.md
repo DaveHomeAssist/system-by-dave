@@ -1,5 +1,11 @@
 # Changelog
 
+## November 5, 2026: Throwline portrait projectors
+
+- Add clockwise and counterclockwise portrait orientation in the planner and Stage 3D, with native-width throw math, rotated lens-shift limits, body clearances and housing geometry.
+- Preserve orientation in saved jobs, links, scenes and crew handoffs; legacy scenes remain landscape. Orientation changes invalidate field stamps and affected commissioning checks.
+- Add 9:16 and 10:16 screen presets, geometry/browser regression coverage and an offline cache refresh. Model-specific portrait mounting and cooling permission remains a manual check.
+
 ## November 5, 2026: Stable projector order
 
 - Keep Rig positions A, B, C and D visible when a lane is unassigned, with
