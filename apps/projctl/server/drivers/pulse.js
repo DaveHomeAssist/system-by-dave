@@ -23,10 +23,10 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
   // One call at a time per projector: the poll's string of gets and a UI command otherwise race for the socket and the loser times out.
   let chain = Promise.resolve();
   function rpc(method, params, callTimeoutMs = timeoutMs, guard) {
-    const run = () => { guard?.(); return rpcOnce(method, params, callTimeoutMs); };
+    const run = () => { guard?.(); return rpcOnce(method, params, callTimeoutMs, guard); };
     const p = chain.then(run, run); chain = p.catch(() => {}); return p;
   }
-  function rpcOnce(method, params, callTimeoutMs) {
+  function rpcOnce(method, params, callTimeoutMs, guard) {
     return new Promise((resolve, reject) => {
       const sock = net.createConnection({ host, port });
       let buf = '', done = false;
@@ -36,7 +36,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       if (params !== undefined) req.params = params;
       sock.on('error', fail);
       sock.on('end', () => fail(new Error('connection closed before Pulse reply')));
-      sock.on('connect', () => sock.write(JSON.stringify(req) + '\n'));
+      sock.on('connect', () => { try { guard?.(); sock.write(JSON.stringify(req) + '\n'); } catch (error) { fail(error); } });
       sock.on('data', (d) => {
         buf += d.toString();
         // The UDM answers with one JSON object and no newline (seen on the WST unit 2026-11-02): parse when it is complete.
@@ -146,7 +146,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       try { s.signal = await get('image.window.main.activesignal'); } catch { s.signal = null; }
       return s;
     },
-    power: (on) => rpc(on ? 'system.poweron' : 'system.poweroff').then(() => 'OK'),
+    power: (on, { guard } = {}) => rpc(on ? 'system.poweron' : 'system.poweroff', undefined, timeoutMs, guard).then(() => 'OK'),
     shutter: (closed) => set('optics.shutter.target', closed ? 'Closed' : 'Open').then(() => 'OK'),
     async input(idv) {
       await discover();

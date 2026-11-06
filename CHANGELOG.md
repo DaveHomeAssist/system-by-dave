@@ -2,6 +2,8 @@
 
 ## 2026-11-06
 
+- Keep all four projector summaries visible above one selected control/lens dock, with live alarms, compact desktop framing and accessible phone flow. Add explicit Eastern power scheduling with disabled saves/edits, separate activation, fixed target identities, next-run/status/audit and durable no-replay occurrence handling. No show times or active schedules are supplied.
+
 - Redirect the portfolio Pages copies of Frozen home/Stage to the working managed WST origin while preserving its same-origin viewer bundle.
 - The Frozen workspace home is the snow splash: aurora, canvas snow, a staggered Frozen title and frosted destination cards. Routes, the theme toggle and the same-origin CSP stay as they were. Snow and the title reveal pause off Home and do not run when reduced motion is requested.
 

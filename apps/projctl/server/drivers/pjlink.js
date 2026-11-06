@@ -13,7 +13,7 @@ const ERR = {
 };
 
 export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 5000 }) {
-  async function send(cmd) {
+  async function send(cmd, { guard } = {}) {
     return new Promise((resolve, reject) => {
       const sock = net.createConnection({ host, port });
       let buf = '', prefix = null, done = false;
@@ -32,7 +32,7 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
               const rnd = line.slice(9, 17);
               prefix = createHash('md5').update(rnd + password).digest('hex');
             } else return fail(new Error('bad handshake: ' + line));
-            sock.write(prefix + '%1' + cmd + '\r');
+            try { guard?.(); sock.write(prefix + '%1' + cmd + '\r'); } catch (error) { return fail(error); }
           } else {
             clearTimeout(t); done = true; sock.end();
             if (line.startsWith('PJLINK ERRA')) return reject(Object.assign(new Error('auth failed: PJLink password wrong or not set (Setup tab)'), { code: 'ERRA' }));
@@ -66,7 +66,7 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
       try { s.name = await send('NAME ?'); } catch {}
       return s;
     },
-    power: (on) => send(`POWR ${on ? 1 : 0}`),
+    power: (on, options) => send(`POWR ${on ? 1 : 0}`, options),
     shutter: (closed) => send(`AVMT ${closed ? 31 : 30}`),
     input: (id) => send(`INPT ${id}`),
     async lens() { throw new NotSupported('lens'); },

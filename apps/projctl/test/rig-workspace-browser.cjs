@@ -1,3 +1,4 @@
+const {openDisclosure}=require('./operator-ui.cjs');
 const {chromium}=require('playwright');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 (async()=>{
  const{startRelay}=await import('./relay-helper.js');const relay=await startRelay();const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
@@ -11,12 +12,12 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
    await page.goto(relay.base);await page.locator('#tab-home.on').waitFor();
    assert.deepEqual(await page.locator('[data-primary-nav]').evaluateAll(nodes=>nodes.map(n=>n.childNodes[0].textContent.trim())),['My Projector Rig','3D Stage View','Presets','Log','Configuration','Throw Calc']);
    await page.locator('#tab-btn-rig').click();await page.locator('#grid [data-lane="B"] [data-open-projector]').click();
-   await page.locator('#tab-projector.on').waitFor();assert.match(await page.locator('#projector-detail-title').innerText(),/^B/);
+   await page.locator('#tab-projector.on').waitFor();await openDisclosure(page,'#projector-more-controls');await openDisclosure(page,'#projector-info-panel');assert.match(await page.locator('#projector-detail-title').innerText(),/^B/);
    assert.equal(await page.locator('#projector-controls [data-reset-input]').isDisabled(),true);
    assert.match(await page.locator('#projector-display-info').innerText(),/HDMI/);assert.match(await page.locator('#projector-display-info').innerText(),/EDID is not read/);assert.match(await page.locator('#projector-display-info').innerText(),/Last known/);
-   await page.locator('[data-detail-lane="A"]').click();assert.match(await page.locator('#projector-detail-title').innerText(),/^A/);assert.match(await page.locator('#projector-controls').innerText(),/No assigned live device/);
+   await page.locator('#grid [data-open-projector="A"]').click();assert.match(await page.locator('#projector-detail-title').innerText(),/^A/);assert.match(await page.locator('#projector-controls').innerText(),/No assigned live device/);
    await page.locator('#projector-static-info').filter({hasText:'ET-DLE170'}).waitFor();
-   for(const lane of ['B','C','D']){await page.locator(`[data-detail-lane="${lane}"]`).click();assert.match(await page.locator('#projector-detail-title').innerText(),new RegExp('^'+lane));}
+   for(const lane of ['B','C','D']){await page.locator(`#grid [data-open-projector="${lane}"]`).click();assert.match(await page.locator('#projector-detail-title').innerText(),new RegExp('^'+lane));}
    await page.locator('#tab-btn-info').click();await page.locator('[data-reference-view="catalog"]').click();await page.locator('.fr-search input').fill('ET-DLE150');
    assert.match(await page.locator('[data-catalog-count]').innerText(),/^1 documented/);assert.match(await page.locator('[data-catalog-results]').innerText(),/1.36–1.98/);
    await page.locator('[data-reference-view="flow"]').click();assert.match(await page.locator('#reference-view').innerText(),/Patch and transport unknown/);
@@ -38,7 +39,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   // A fresh snapshot rebuilds presets: the explicit confirmation must retain its token.
   socket.send(JSON.stringify(online));await page.locator('[data-recall]').filter({hasText:'Confirm lens recall'}).click();assert.deepEqual(calls[1],{name:'Lens fixture',confirmLens:'fixture-token'});
   await page.locator('[role=status]').filter({hasText:'match'}).waitFor();
-  await page.locator('#tab-btn-rig').click();await page.locator('#grid [data-lane=D] [data-open-projector]').click();
+  await page.locator('#tab-btn-rig').click();await page.locator('#grid [data-lane=D] [data-open-projector]').click();await openDisclosure(page,'#projector-info-panel');
   const d=online.projectors.find(p=>p.lane==='D');socket.send(JSON.stringify({type:'status',slot:d.slot,status:d.status,displayInfo:{...d.displayInfo,input:{state:'offline',label:'Updated fixture input',value:'new',observedAt:'2026-11-06T05:00:00Z'}}}));
   await page.locator('#projector-display-info').filter({hasText:'Updated fixture input'}).waitFor();await page.close();
   console.log('Rig workspace: six menus, offline/unassigned A–D details, truthful EDID, catalog, signal flow, embedded Throw Calc and zero writes passed');
