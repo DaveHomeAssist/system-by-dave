@@ -49,21 +49,21 @@
       "position": "SR Portal",
       "orientation": "Portrait",
       "model": "Panasonic PT-DW830U",
-      "lens": "Not yet confirmed",
+      "lens": "Approximately 1.8\u20132.5:1 (Dave-reported; part unverified)",
       "image": "Approximately 20 ft tall (user estimate)",
       "throwDistance": "38\u201339 ft (user estimate)",
       "candidate": "ET-DLE150 \u00b7 1.36\u20131.98:1 WXGA 16:10",
-      "note": "Cove clearance limits upward tilt; desired extra upward coverage is approximately 3\u20134 ft or less. ET-DLE150 is compatible but not confirmed installed. In portrait, upward image movement normally uses native horizontal shift, with different limits from vertical shift. Additional reach and clearance are not yet established. Dave prioritizes D surface coverage over reduced brightness and resolution; the larger-raster option is worth testing, with lens identity and physical clearance still unverified.",
+      "note": "Cove clearance limits upward tilt; desired extra upward coverage is approximately 3\u20134 ft or less. ET-DLE150 is compatible but not confirmed installed. In portrait, upward image movement normally uses native horizontal shift, with different limits from vertical shift. Additional reach and clearance are not yet established. Dave prioritizes D surface coverage over reduced brightness and resolution; the larger-raster option is worth testing, with lens identity and physical clearance still unverified. Dave also reports being at the lens-shift limit; this is an operator report, not encoder telemetry.",
       "source": "https://eu.connect.panasonic.com/sites/default/files/media/document/2024-04/et-dle150_spec_en_2.pdf",
       "color": "#429873",
       "internalSlot": "P4",
       "provenance": {
         "assignment": "Verified saved rig assignment, November 5, 2026",
-        "lens": "Installed lens not recorded",
+        "lens": "Dave previously reported an approximately 1.8\u20132.5:1 current lens; exact installed model not verified",
         "geometry": "Owner-reported estimates, November 6, 2026; not surveyed",
         "candidate": "Panasonic ET-DLE150 manufacturer specification; compatibility does not establish installed identity or final fit"
       },
-      "candidateCheck": "Candidate to test: enlarging the full portrait raster from 20 ft to 26 ft at a fixed center adds 3 ft at the top. At a 38\u201339 ft throw this needs approximately 1.46\u20131.50:1, within the ET-DLE150 range. A 20 ft mapped picture would use approximately 985 of 1280 portrait pixels. Wider black raster, spill and cove clearance need testing. A 28 ft raster is at the nominal wide limit near 38 ft; 4 ft extra is not promised.",
+      "candidateCheck": "Previously discussed candidate, retained for testing: enlarging the full portrait raster from 20 ft to 26 ft at a fixed center adds 3 ft at the top. At a 38\u201339 ft throw this needs approximately 1.46\u20131.50:1, within the ET-DLE150 range. A 20 ft mapped picture would use approximately 985 of 1280 portrait pixels. Wider black raster, spill and cove clearance need testing. A 28 ft raster is at the nominal wide limit near 38 ft; 4 ft extra is not promised.",
       "installationCheck": "Verify the current lens, full raster center, existing shift and cove opening. Panasonic specifies ET-LAD120P/PW portrait lamps and terminal-side-down mounting (DW830 specification, page 14); current installation has not been inspected for these items.",
       "installationSource": "https://eu.connect.panasonic.com/sites/default/files/media/document/2025-01/dw830_spec_en.pdf"
     }
