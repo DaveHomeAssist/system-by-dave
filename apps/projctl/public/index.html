@@ -19,7 +19,7 @@
   <header class="pj-header">
     <div class="pj-brand"><svg class="pj-snowmark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 2v28M4 9l24 14M4 23L28 9M12 5l4 4 4-4M12 27l4-4 4 4M5 13l6-1-2-6M27 19l-6 1 2 6M9 26l2-6-6-1M23 6l-2 6 6 1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><div><span class="pj-kicker">AV BY DAVE · VIDEO CONTROL</span><h1 id="show">Frozen</h1></div></div>
     <span class="avd-state" id="conn" aria-live="polite"><span class="avd-dot avd-dot--blocked" aria-hidden="true"></span><span id="conn-word">Relay offline</span></span>
-    <span class="pj-mono pj-summary" id="summary"></span>
+    <span class="pj-mode" id="relay-mode">Connecting…</span>
     <div class="avd-seg" role="group" aria-label="Show lock">
       <button class="avd-seg__btn" id="lock-off" aria-pressed="true" type="button">Unlocked</button>
       <button class="avd-seg__btn" id="lock-on" aria-pressed="false" type="button">Show lock</button>
@@ -41,6 +41,7 @@
 
   <main class="pj-main">
     <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
+      <div class="pj-overview" aria-label="Rig connection overview"><div><span class="avd-eyebrow">Projector connection</span><strong id="summary">Waiting for relay…</strong></div><p class="pj-mono" id="connection-note" role="status">Connecting to the local relay. Device status will update here automatically.</p></div>
       <div class="pj-allbar" aria-labelledby="all-label">
         <span id="all-label" class="avd-eyebrow">All projectors</span>
         <div class="avd-seg" role="group" aria-label="Shutter, all projectors">

@@ -76,7 +76,8 @@ function canPattern(p) { return !!p.patterns || p.driver === 'panasonic' || p.dr
 // Circle plus word. online+on: done "Powered"; standby: queued; cooling/warming: waiting; offline: blocked.
 function stateOf(p) {
   const s = p.status || {};
-  if (!s.online) return { st: 'blocked', word: 'Offline' };
+  if (!connected) return { st: 'blocked', word: 'Relay disconnected' };
+  if (!s.online) return { st: 'blocked', word: s.connection?.state === 'checking' ? 'Checking connection' : s.connection?.state === 'unassigned' || !p.ip ? 'No address' : 'No reply' };
   if (s.power === 'on') return { st: 'done', word: 'Powered' };
   if (s.power === 'cooling') return { st: 'waiting', word: 'Cooling' };
   if (s.power === 'warming') return { st: 'waiting', word: 'Warming' };
@@ -86,6 +87,18 @@ function stateOf(p) {
 const pill = (st, word) => `<span class="avd-state"><span class="avd-dot avd-dot--${st}" aria-hidden="true"></span>${esc(word)}</span>`;
 const seg = (label, opts, cur, attrs) => `<div class="avd-seg avd-seg--fill" role="group" aria-label="${esc(label)}">${opts.map(([v, lab]) => `<button class="avd-seg__btn" type="button" aria-pressed="${String(cur) === String(v)}" ${attrs(v)}>${esc(lab)}</button>`).join('')}</div>`;
 
+function renderOverview() {
+  const online = state.projectors.filter((p) => p.status?.online).length;
+  const assigned = rigLanes(state.projectors).filter((x) => x.projector).length;
+  $('#relay-mode').textContent = state.simulation === true ? 'DEMO · simulated devices' : state.simulation === false ? 'REAL RELAY' : 'Connecting…';
+  $('#relay-mode').classList.toggle('pj-mode--demo', state.simulation === true);
+  $('#summary').textContent = connected ? `${online} / ${state.projectors.length} devices replying · ${assigned} / 4 lanes assigned` : 'Relay disconnected · device data unavailable';
+  $('#connection-note').textContent = !connected ? 'Reconnecting automatically. Displayed values are last known; current projector power is unknown.' : online < state.projectors.length ? 'Relay connected. Devices without a reply: check the venue network and projector connection. No reply does not confirm power off.' : state.simulation ? 'Simulator data · no physical projector feedback. Status updates automatically.' : 'Device feedback updates automatically. Each card shows its latest successful reply.';
+}
+function replyTime(s) {
+  const at = s.connection?.lastSuccessAt || (s.online ? s.updatedAt : null);
+  return at ? new Date(at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'No successful reply yet';
+}
 function renderGrid() {
   const g = $('#grid'); const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop;
   const unassignedOpen = g.querySelector('.pj-unassigned')?.open || false; g.innerHTML = '';
@@ -103,14 +116,15 @@ function renderGrid() {
       <div class="avd-panel__body">
         ${lane ? `<div class="pj-lane"><h3>${esc(lane.target)}</h3><span class="pj-mono">${esc(lane.role)} · ${esc(lane.orientation)}</span><span class="pj-lane-device pj-mono">${esc(p.model || p.label)}</span></div>` : `<p class="pj-mono">Unassigned · Relay ${esc(p.slot)}</p>`}
         <div class="pj-tile-top">${pill(st, word)}<span class="pj-mono">${esc(p.owner)} · ${esc(p.ip || 'no address')}</span></div>
-        ${s.errors == null ? '<p class="pj-mono">Alarm telemetry unavailable</p>' : ''}
+        <div class="pj-telemetry-note pj-mono">${off ? 'Current values unavailable · last known below' : state.simulation ? 'Simulated feedback' : 'Projector feedback'}<span>Last reply: ${esc(replyTime(s))}</span>${off && s.connection?.error ? `<span>${esc(s.connection.error)}</span>` : ''}</div>
         ${busy ? '<p class="pj-mono" role="status">Lens moving</p>' : ''}
         ${errs.length ? `<div class="pj-tile-top">${errs.map((e) => pill('blocked', e)).join('')}</div>` : ''}
         <div class="pj-two">
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Input</span><span class="avd-readout__value">${esc(s.input ? (p.inputs?.[s.input] || s.input) : '—')}</span></div>
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Light source</span><span class="avd-readout__value">${s.lightHours != null ? esc(s.lightHours) + '<span class="avd-readout__unit">h</span>' : '—'}</span></div>
         </div>
-        <div class="avd-field"><span class="avd-field__label pj-caps">Shutter</span>
+        <div class="pj-health pj-mono"><span>Shutter <strong>${esc(s.shutter || 'Unknown')}</strong></span><span>Alarms <strong>${s.errors == null ? 'Unavailable' : errs.length ? esc(errs.length + ' reported') : 'None reported'}</strong></span></div>
+        <div class="avd-field"><span class="avd-field__label pj-caps">Shutter control</span>
           ${seg(`Shutter, ${lane ? 'Projector ' + p.lane : p.label}`, [['open', 'Open'], ['closed', 'Closed']], s.shutter, (v) => `data-c="shutter" data-a="${v === 'closed' ? 1 : 0}" ${off ? 'disabled' : ''}`)}
         </div>
         <div class="pj-two">
@@ -125,12 +139,11 @@ function renderGrid() {
           <button class="avd-btn avd-btn--quiet" data-p="08" type="button" ${off || busy || lock || !canPattern(p) ? 'disabled' : ''}>Colour bars</button>
           <button class="avd-btn avd-btn--quiet" data-p="00" type="button" ${off || busy || lock || !canPattern(p) ? 'disabled' : ''}>Pattern off</button>
         </div>
-        <button class="avd-btn" data-adj type="button" ${off || !canPattern(p) ? 'disabled' : ''}>Adjust lens, pattern, picture</button>
-        <div class="pj-meta pj-mono"><span>${esc(p.model || '')}</span><span>${s.updatedAt ? 'Updated ' + new Date(s.updatedAt).toLocaleTimeString() : ''}</span></div>
+        <div class="pj-adjust-links" role="group" aria-label="Details and adjustments"><button class="avd-btn" data-adj="lens" type="button">Lens</button><button class="avd-btn" data-adj="picture" type="button">Picture</button><button class="avd-btn" data-adj="pattern" type="button">Patterns</button></div>
       </div>`;
     card.querySelectorAll('button[data-c]').forEach((b) => b.onclick = () => cmd(p.slot, b.dataset.c, Number(b.dataset.a)));
     card.querySelectorAll('button[data-p]').forEach((b) => b.onclick = () => cmd(p.slot, 'pattern', b.dataset.p));
-    card.querySelector('button[data-adj]').onclick = () => openAdjust(p.slot);
+    card.querySelectorAll('button[data-adj]').forEach((b) => b.onclick = () => openAdjust(p.slot, b.dataset.adj));
     const sel = card.querySelector('select'); sel.onchange = () => cmd(p.slot, 'input', sel.value);
     card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = `${p.slot}:${n}`; });
     return card;
@@ -184,35 +197,37 @@ function renderLog() {
 $('#log-search').oninput = renderLog;
 function renderSetup() {
   const el = $('#setup');
-  [...el.children].filter((node) => !dirtySetup.has(node.dataset.slot)).forEach((node) => node.remove());
+  [...el.children].filter((node) => !dirtySetup.has(node.dataset.slot) && !node.contains(document.activeElement)).forEach((node) => node.remove());
   const field = (label, inner) => `<label class="avd-field"><span class="avd-field__label">${label}</span>${inner}</label>`;
   for (const p of state.projectors) {
-    if (dirtySetup.has(p.slot)) continue;
+    if (dirtySetup.has(p.slot) || [...el.children].some((node) => node.dataset.slot === p.slot && node.contains(document.activeElement))) continue;
     const d = document.createElement('div'); d.className = 'pj-item pj-setup'; d.dataset.slot = p.slot;
-    d.innerHTML = `<strong>${esc(p.slot)}</strong>
+    d.innerHTML = `<div class="pj-setup-heading"><strong>${esc(projectorName(p))}</strong><span class="pj-mono">${esc(p.model || p.label)} · Relay ${esc(p.slot)}</span></div>
+      <fieldset class="pj-setup-fields"><legend>Identity &amp; position</legend>
       ${field('Label', `<input class="avd-input" value="${esc(p.label)}" data-k="label">`)}
       ${field('Drawing lane', `<select class="avd-input" data-k="lane"><option value="">Unassigned</option>${Object.entries(LANES).map(([id, lane]) => `<option value="${id}" ${p.lane === id ? 'selected' : ''}>${id} · ${lane.target}</option>`).join('')}</select>`)}
+      </fieldset><fieldset class="pj-setup-fields"><legend>Connection</legend>
       ${field('MAC', `<input class="avd-input" value="${esc(p.mac || '')}" placeholder="aa:bb:cc:dd:ee:ff" data-k="mac">`)}
       ${field('IP', `<input class="avd-input" value="${esc(p.ip || '')}" placeholder="192.168.1.x" data-k="ip">`)}
       ${field('Admin user', `<input class="avd-input" value="${esc(p.user || '')}" placeholder="admin1" data-k="user">`)}
       ${field('Driver', `<select class="avd-input" data-k="driver">${['pjlink', 'panasonic', 'pulse', 'simulator'].map((x) => `<option ${p.driver === x ? 'selected' : ''}>${x}</option>`).join('')}</select>`)}
+      </fieldset><fieldset class="pj-setup-fields"><legend>Mounting &amp; access</legend>
       ${field('Left / right image shift', `<select class="avd-input" data-k="reverseH"><option value="false">Normal</option><option value="true" ${p.reverseH === true ? 'selected' : ''}>Reversed</option></select>`)}
       ${field('Up / down image shift', `<select class="avd-input" data-k="reverseV"><option value="false">Normal</option><option value="true" ${p.reverseV === true ? 'selected' : ''}>Reversed</option></select>`)}
       ${field('PJLink password <span class="avd-field__opt">(blank keeps current)</span>', `<input class="avd-input" type="password" value="" data-k="password" autocomplete="new-password">`)}
       ${field('Notes', `<input class="avd-input" value="${esc(p.notes || '')}" data-k="notes">`)}
-      <button class="avd-btn avd-btn--primary" type="button">Save</button>`;
+      </fieldset><div class="pj-setup-footer"><button class="avd-btn avd-btn--primary" type="button">Save</button></div>`;
     d.querySelector('button').onclick = () => { const upd = { slot: p.slot }; d.querySelectorAll('[data-k]').forEach((i) => { const v = i.value.trim(); if (i.dataset.k === 'password' && !v) return; upd[i.dataset.k] = ['reverseH', 'reverseV'].includes(i.dataset.k) ? v === 'true' : v; }); api('projector', upd).then(() => { dirtySetup.delete(p.slot); toast(`${p.slot} saved`); }).catch((e) => toast(e.message)); };
     d.addEventListener('input', () => dirtySetup.add(p.slot));
     d.addEventListener('change', () => dirtySetup.add(p.slot));
-    const order = state.projectors.map((x) => x.slot);
+    const order = orderedProjectors(state.projectors).map((x) => x.slot);
     el.insertBefore(d, [...el.children].find((node) => order.indexOf(node.dataset.slot) > order.indexOf(p.slot)) || null);
   }
 }
 function renderAll() {
   $('#show').textContent = state.show || 'Projectors';
   $('#lock-on').setAttribute('aria-pressed', String(!!state.lock)); $('#lock-off').setAttribute('aria-pressed', String(!state.lock));
-  const online = state.projectors.filter((p) => p.status?.online).length;
-  $('#summary').textContent = `${state.projectors.length} slots · ${online} online`;
+  renderOverview();
   $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = state.presets.length || '';
   document.querySelectorAll('[data-all="power"][data-arg="0"], [data-all="pattern"]').forEach((b) => b.disabled = state.lock || !connected);
   renderGrid(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
@@ -220,12 +235,12 @@ function renderAll() {
 
 // ---- Adjust sheet: patterns, lens, picture ----
 let adjSlot = null, adjSpeed = 'slow', adjHomeArmed = 0, adjReturnFocus = null;
-function openAdjust(slot) {
+function openAdjust(slot, section = 'pattern') {
   adjSlot = slot; const p = state.projectors.find((x) => x.slot === slot); if (!p) return;
   adjReturnFocus = document.activeElement;
   $('#adj-title').textContent = projectorName(p); $('#adj-sub').textContent = [slot, laneOf(p)?.orientation, p.model, p.ip].filter(Boolean).join(' · ');
   $('#adjust').dataset.lane = laneOf(p) ? p.lane : '';
-  $('#adjust').hidden = false; $('#adjust').showModal(); $('#adj-feedback').textContent = ''; $('#adj-motion').textContent = ''; renderAdjust(); loadPicture(); $('#adj-close').focus();
+  $('#adjust').hidden = false; $('#adjust').showModal(); $('#adj-feedback').textContent = ''; $('#adj-motion').textContent = ''; renderAdjust(); $(`[data-adjtab="${section}"]`).click(); $('#adj-close').focus();
 }
 function closeAdjust() { const slot = adjSlot; $('#adjust').close(); $('#adjust').hidden = true; adjSlot = null; const trigger = adjReturnFocus?.isConnected ? adjReturnFocus : [...$('#grid').querySelectorAll('[data-slot]')].find((el) => el.dataset.slot === slot)?.querySelector('[data-adj]'); trigger?.focus(); }
 function renderAdjust() {
@@ -241,7 +256,7 @@ function renderAdjust() {
   const el = $('#adj-patterns'); el.innerHTML = '';
   for (const [code, name] of Object.entries(table)) {
     const b = document.createElement('button'); b.type = 'button'; b.dataset.pattern = code; b.className = 'avd-btn'; b.textContent = name; b.setAttribute('aria-pressed', String(cur === code));
-    b.disabled = state.lock || off || !!moving; b.onclick = () => cmd(adjSlot, 'pattern', code); el.appendChild(b);
+    b.disabled = state.lock || off || !!moving || !canPattern(p); b.onclick = () => cmd(adjSlot, 'pattern', code); el.appendChild(b);
   }
   if (patternFocus) [...el.children].find((b) => b.dataset.pattern === patternFocus)?.focus({ preventScroll: true });
   $('#adj-speed').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.s === adjSpeed)));
@@ -277,9 +292,11 @@ $('#adj-home').onclick = () => {
   adjHomeArmed = 0; cmd(adjSlot, 'lens', { op: 'home' });
 };
 $('#adj-pic-reload').onclick = () => loadPicture();
+$('[data-adjtab="picture"]').addEventListener('click', () => { if (adjSlot) loadPicture(); });
 async function loadPicture() {
   const slot = adjSlot; const el = $('#adj-picture'); el.innerHTML = ''; $('#adj-pic-note').textContent = 'Reading values…';
   const p = state.projectors.find((x) => x.slot === slot);
+  if (!connected || !p?.status?.online) { $('#adj-pic-note').textContent = 'Current picture values unavailable. Waiting for projector connection.'; return; }
   const schema = p?.pictureSchema ?? PICTURE;
   if (!Object.keys(schema).length) { $('#adj-pic-note').textContent = 'No picture controls reported by this projector.'; return; }
   let vals = {};
@@ -307,7 +324,7 @@ async function loadPicture() {
 }
 
 // websocket
-function setConn(on) { connected = on; const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#lock-on').disabled = !on; $('#lock-off').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
+function setConn(on) { connected = on; const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#lock-on').disabled = !on; $('#lock-off').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderOverview(); renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
 function connect() {
   const ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
   ws.onopen = () => setConn(true);
@@ -315,7 +332,7 @@ function connect() {
   ws.onmessage = (m) => {
     const msg = JSON.parse(m.data);
     if (msg.type === 'snapshot') { state = msg; renderAll(); }
-    else if (msg.type === 'status') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); const online = state.projectors.filter((x) => x.status?.online).length; $('#summary').textContent = `${state.projectors.length} slots · ${online} online`; } }
+    else if (msg.type === 'status') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
     else if (msg.type === 'busy') { const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
     else if (msg.type === 'event') { state.events.push(msg.event); if (state.events.length > 200) state.events.shift(); renderLog(); }
   };
