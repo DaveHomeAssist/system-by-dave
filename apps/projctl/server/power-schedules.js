@@ -116,7 +116,7 @@ export function createPowerSchedules({ file, targets, dispatch, guard, now = Dat
     state.schedules = state.schedules.filter(s => s.id !== id); audit(s, 'deleted'); persist(); notify(); return view();
   }
   function claim(s, due) {
-    const date = localParts(due), key = `${s.id}:${date.year}-${date.month}-${date.day}`;
+    const date = localParts(due), key = `${s.id}:${date.year}-${date.month}-${date.day}:${s.time}`;
     const file = path.join(claims, createHash('sha256').update(key).digest('hex') + '.json');
     let fd;
     try { fd = fs.openSync(file, 'wx', 0o600); }

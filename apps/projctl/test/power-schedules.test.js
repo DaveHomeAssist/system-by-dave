@@ -86,3 +86,9 @@ test('a slow projector reply cannot hold independent healthy targets past their 
   const pending=engine.tick();await fast;assert.deepEqual(h.sent,[['P2','off']]);assert.ok(releaseSlow,'slow reply is still pending');h.set('2026-11-06T17:00:05Z');releaseSlow();await pending;
   assert.equal(engine.view().schedules[0].lastRun.targets.P2.status,'acknowledged');assert.equal(h.sent.length,2);
 });
+
+
+test('an explicitly edited and re-enabled later time is a new occurrence, not a replay', async t => {
+ const h=harness(t);h.engine.save(schedule);const id=h.engine.view().schedules[0].id;h.engine.enable(id,true);h.set('2026-11-06T17:00:00Z');await h.engine.tick();assert.equal(h.sent.length,1);
+ h.set('2026-11-06T17:00:10Z');h.engine.save({...schedule,id,time:'12:01'});h.engine.enable(id,true);await h.engine.tick();h.set('2026-11-06T17:00:59Z');await h.engine.tick();h.set('2026-11-06T17:01:00Z');await h.engine.tick();assert.equal(h.sent.length,2);assert.equal(fs.readdirSync(h.options.file+'.claims').length,2);
+});

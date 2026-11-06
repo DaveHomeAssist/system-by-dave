@@ -19,8 +19,10 @@ retains existing Show Lock semantics. Offline, stale-feedback, busy, cooling or
 changed targets are skipped. An acknowledgement is a command response, not proof
 that a projector completed its power transition. Check live telemetry and image.
 
-The relay claims an occurrence durably before dispatch. A schedule fires at most
-once per local date; repeated fall-DST times use the first occurrence only, and
+The relay claims an occurrence durably before dispatch. Independent projector
+targets dispatch concurrently, each retaining the guard at its actual network
+write so one slow reply does not delay healthy targets. A schedule fires at most
+once per scheduled local-date/time occurrence; repeated fall-DST times use the first occurrence only, and
 nonexistent spring-DST times are skipped. New activation never catches up the
 current or an older minute. Startup, interrupted claims, delayed ticks or sleep
 produce skipped/interrupted audit records, without replaying overdue power off
