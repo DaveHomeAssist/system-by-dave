@@ -18,3 +18,19 @@ test('relay reconnect and replacement target cannot imply projector recovery',()
  assert.equal(view(null,true,5000,now).state,'unassigned');
  const initial={...p,status:{online:false,connection:{state:'checking'}}};assert.equal(view(initial,true,5000,now).label,'Checking saved IP');assert.equal(view(initial,true,5000,now).lastReply,'No successful reply yet');
 });
+
+test('numeric epoch replies retain fresh, stale and recovery semantics',()=>{
+ const view=createConnectionMonitor();
+ const numeric={...p,status:{...p.status,updatedAt:now,connection:{state:'online',lastSuccessAt:now}}};
+ assert.equal(view(numeric,true,5000,now).current,true);
+ assert.equal(view(numeric,true,5000,now).lastReply,'10:00:00 AM EST');
+ assert.equal(view(numeric,true,5000,now+16000).state,'stale');
+ const fresh={...numeric,status:{...numeric.status,connection:{state:'online',lastSuccessAt:now+17000}}};
+ assert.equal(view(fresh,true,5000,now+17000).label,'Reply recovered');
+ const legacy={...numeric,status:{online:true,updatedAt:now}};
+ assert.equal(createConnectionMonitor()(legacy,true,5000,now).current,true);
+ for(const invalid of [NaN,Infinity,1e100,null,'invalid']){
+  const bad={...numeric,status:{online:true,connection:{state:'online',lastSuccessAt:invalid}}};
+  assert.equal(createConnectionMonitor()(bad,true,5000,now).current,false);
+ }
+});
