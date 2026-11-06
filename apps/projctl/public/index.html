@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="app.css">
 <link rel="stylesheet" href="stage.css">
 <!-- Local Throwline import map: supplied by the relay. -->
+<link rel="stylesheet" href="workspace-bridge.css">
 </head>
 <body>
 <a class="pj-skip" href="#tab-rig">Skip to rig</a>
@@ -32,6 +33,8 @@
 
   <div class="avd-shell__tabs">
     <div class="avd-tabs" role="tablist" aria-label="Views">
+      <button class="avd-tab" role="tab" id="tab-btn-notes" aria-selected="false" aria-controls="tab-notes" data-tab="notes" type="button" tabindex="-1">Notes + tasks</button>
+      <button class="avd-tab" role="tab" id="tab-btn-info" aria-selected="false" aria-controls="tab-info" data-tab="info" type="button" tabindex="-1">Projector info</button>
       <button class="avd-tab" role="tab" id="tab-btn-rig" aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">Rig <span class="avd-tab__count" id="count-rig"></span></button>
       <button class="avd-tab" role="tab" id="tab-btn-stage" aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">Stage</button>
       <button class="avd-tab" role="tab" id="tab-btn-presets" aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
@@ -41,6 +44,8 @@
   </div>
 
   <main class="pj-main">
+    <section id="tab-notes" class="tab" role="tabpanel" aria-labelledby="tab-btn-notes" hidden><iframe class="pj-workspace-frame" data-workspace="notes" title="Frozen notes and shared team tasks"></iframe></section>
+    <section id="tab-info" class="tab" role="tabpanel" aria-labelledby="tab-btn-info" hidden><iframe class="pj-workspace-frame" data-workspace="info" title="Frozen projector information"></iframe></section>
     <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
       <div class="pj-overview" aria-label="Rig connection overview"><div><span class="avd-eyebrow">Projector connection</span><strong id="summary">Waiting for relay…</strong></div><div class="pj-connection-help"><p class="pj-mono" id="connection-note" role="status">Connecting to the local relay. Device status will update here automatically.</p><p class="pj-mono" id="local-controller-help" hidden>This page needs the local controller. <a href="http://localhost:8080/">Open controller on this Mac</a><span>On a phone or another computer, use the controller Mac’s network address; localhost points to the device you are using.</span></p></div></div>
       <div class="pj-allbar" aria-labelledby="all-label">
@@ -171,5 +176,6 @@
 </div>
 <noscript>Projector controls require JavaScript. Use the projector remote if the relay is unavailable.</noscript>
 <script type="module" src="app.js"></script>
+<script type="module" src="workspace-bridge.js"></script>
 </body>
 </html>

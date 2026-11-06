@@ -1,0 +1,4 @@
+.pj-workspace-frame{width:100%;height:100%;min-height:0;flex:1;border:0;background:var(--surface)}
+body.pj-embedded-control .pj-header,body.pj-embedded-control .avd-shell__tabs{display:none}
+body.pj-embedded-control .avd-shell{grid-template-rows:minmax(0,1fr)}
+body.pj-embedded-control .pj-main{padding:8px}
