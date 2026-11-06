@@ -121,6 +121,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
   const mapPower = (v) => ({ on: POWER.ON, ready: POWER.OFF, eco: POWER.OFF, boot: POWER.WARMING, conditioning: POWER.WARMING, deconditioning: POWER.COOLING }[String(v).toLowerCase()] ?? POWER.UNKNOWN);
   return {
     kind: 'pulse',
+    lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'bounded-step', stop: true, positionReadback: true },
     lensControls: { h: true, v: true, focus: true, zoom: true },
     patterns: PULSE_PATTERNS,
     get inputs() { return sources; },

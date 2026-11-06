@@ -90,7 +90,7 @@ function snapshot() {
       return { ...p, password: undefined, status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null,
         inputs: d.inputs ?? p.inputs, displayInfo: displayInfoFor(p), inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
-        capabilities: { lens: !!d.lens, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
+        capabilities: { lens: !!d.lensJog?.axes.length, lensJog: d.lensJog, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
     }),
     presets: rig.presets, events: rig.events.slice(-200),
   };
