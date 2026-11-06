@@ -2,7 +2,7 @@ import { LANES, laneOf, projectorName, orderedProjectors } from './lanes.js';
 import { createStageView } from './stage-view.js';
 import { lensDirection } from './lens-direction.js';
 const $ = (s, r = document) => r.querySelector(s);
-let state = { projectors: [], presets: [], events: [], lock: false };
+let state = { projectors: [], presets: [], showPresets: [], showInputs: { show: {}, backup: {} }, events: [], lock: false };
 const confirmTokens = {}; // command key -> one-use token
 const commandsInFlight = new Set();
 let connected = false;
@@ -139,6 +139,103 @@ function renderGrid() {
   if (focusKey) [...g.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === focusKey)?.focus({ preventScroll: true });
 }
 function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); return p && laneOf(p) ? `${slot} · ${p.lane} / ${laneOf(p).target}` : slot; }
+
+const showPresetResults = new Map();
+let showConfirm = null; // { id, token, message, targets }
+function renderShowPresets() {
+  const el = $('#show-presets'); if (!el) return; el.innerHTML = '';
+  const list = state.showPresets || [];
+  if (!list.length) { el.innerHTML = '<p class="pj-mono">No built-in show presets.</p>'; return; }
+  for (const pr of list) {
+    const d = document.createElement('div'); d.className = 'pj-item pj-show-preset'; d.dataset.showPreset = pr.id;
+    const out = showPresetResults.get(pr.id);
+    const plan = out?.plan || pr.plan || {};
+    const planLines = Object.keys(plan).length
+      ? Object.entries(plan).map(([slot, acts]) => {
+          const bits = acts.map((a) => a.status === 'ok'
+            ? `${a.cmd} ${a.detail || a.arg || ''}`
+            : `<span class="pj-unsupported">${a.cmd}: ${esc(a.status)}${a.detail ? ' · ' + esc(a.detail) : ''}</span>`);
+          return `<span class="pj-preset-slot"><strong>${esc(slotName(slot))}</strong>: ${bits.join(' · ')}</span>`;
+        }).join('')
+      : `<span class="pj-mono">${esc(pr.summary || '')}</span>`;
+    d.innerHTML = `<span class="name">${esc(pr.name)}</span>
+      <span class="pj-badge">${pr.confirmPowerOff ? 'two-tap power off' : 'show'}</span>
+      <button class="avd-btn" data-r type="button">Recall</button>
+      <span class="sum">${planLines}</span>
+      <p class="pj-mono pj-note pj-fill">OSC: <code>${esc(pr.osc || '')}</code></p>
+      <p class="pj-mono pj-preset-result" role="status">${esc(out?.message || '')}</p>`;
+    d.querySelector('[data-r]').onclick = async () => {
+      try {
+        const token = showConfirm?.id === pr.id ? showConfirm.token : undefined;
+        const response = await api('show-preset/recall', { id: pr.id, confirm: token });
+        showPresetResults.set(pr.id, response);
+        if (response.confirm) {
+          showConfirm = { id: pr.id, token: response.confirm, message: response.message, targets: response.targets || [] };
+          openShowConfirm(pr, response);
+        } else {
+          showConfirm = null;
+          closeShowConfirm();
+          toast(response.message || `${pr.name} recalled`, 6000);
+        }
+        renderShowPresets();
+      } catch (e) { toast(e.message, 6000); }
+    };
+    el.appendChild(d);
+  }
+}
+function openShowConfirm(pr, response) {
+  let dlg = $('#show-confirm');
+  if (!dlg) {
+    dlg = document.createElement('div'); dlg.id = 'show-confirm'; dlg.className = 'pj-show-confirm'; dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true');
+    document.body.appendChild(dlg);
+  }
+  dlg.hidden = false;
+  dlg.innerHTML = `<div class="pj-show-confirm__card">
+    <h3>Confirm ${esc(pr.name)}</h3>
+    <p class="pj-mono">${esc(response.message || 'Tap confirm to continue.')}</p>
+    <p class="pj-mono">Targets: ${esc((response.targets || []).join(', ') || 'none')}</p>
+    <div class="pj-show-confirm__actions">
+      <button type="button" class="avd-btn avd-btn--danger" data-yes>Confirm power off</button>
+      <button type="button" class="avd-btn avd-btn--quiet" data-no>Cancel</button>
+    </div>
+  </div>`;
+  dlg.querySelector('[data-no]').onclick = () => { showConfirm = null; closeShowConfirm(); };
+  dlg.querySelector('[data-yes]').onclick = async () => {
+    try {
+      const response2 = await api('show-preset/recall', { id: pr.id, confirm: showConfirm?.token });
+      showPresetResults.set(pr.id, response2);
+      showConfirm = null; closeShowConfirm(); renderShowPresets();
+      toast(response2.message || 'Strike complete', 6000);
+    } catch (e) { toast(e.message, 6000); }
+  };
+  setTimeout(() => { if (showConfirm?.id === pr.id) { showConfirm = null; closeShowConfirm(); } }, 3000);
+}
+function closeShowConfirm() { const dlg = $('#show-confirm'); if (dlg) dlg.hidden = true; }
+
+function renderShowInputs() {
+  const el = $('#show-inputs'); if (!el) return; el.innerHTML = '';
+  const show = state.showInputs?.show || {};
+  const backup = state.showInputs?.backup || {};
+  const wrap = document.createElement('div'); wrap.className = 'pj-item'; wrap.style.display = 'grid'; wrap.style.gridTemplateColumns = '80px 1fr 1fr auto'; wrap.style.gap = '8px'; wrap.style.alignItems = 'end';
+  wrap.innerHTML = `<span class="pj-mono">Slot</span><span class="avd-field__label">Show input</span><span class="avd-field__label">Backup input</span><span></span>`;
+  el.appendChild(wrap);
+  for (const p of state.projectors) {
+    const row = document.createElement('div'); row.className = 'pj-item'; row.style.display = 'grid'; row.style.gridTemplateColumns = '80px 1fr 1fr auto'; row.style.gap = '8px'; row.style.alignItems = 'end';
+    const opts = Object.entries(p.inputs || {}).map(([id, lab]) => `<option value="${esc(id)}">${esc(lab)} (${esc(id)})</option>`).join('');
+    row.innerHTML = `<strong>${esc(p.slot)}</strong>
+      <select class="avd-input" data-k="show"><option value="">— not set —</option>${opts}</select>
+      <select class="avd-input" data-k="backup"><option value="">— not set —</option>${opts}</select>
+      <button class="avd-btn" type="button">Save</button>`;
+    row.querySelector('[data-k="show"]').value = show[p.slot] || '';
+    row.querySelector('[data-k="backup"]').value = backup[p.slot] || '';
+    row.querySelector('button').onclick = () => {
+      const body = { show: { [p.slot]: row.querySelector('[data-k="show"]').value }, backup: { [p.slot]: row.querySelector('[data-k="backup"]').value } };
+      api('show-inputs', body).then(() => toast(`${p.slot} show inputs saved`)).catch((e) => toast(e.message));
+    };
+    el.appendChild(row);
+  }
+}
+
 const presetResults = new Map();
 function lensText(p, want) {
   const saved = want.lens || {};
@@ -222,9 +319,9 @@ function renderAll() {
   $('#lock-on').setAttribute('aria-pressed', String(!!state.lock)); $('#lock-off').setAttribute('aria-pressed', String(!state.lock));
   const online = state.projectors.filter((p) => p.status?.online).length;
   $('#summary').textContent = `${state.projectors.length} slots · ${online} online`;
-  $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = state.presets.length || '';
+  $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = ((state.showPresets?.length || 0) + (state.presets?.length || 0)) || '';
   document.querySelectorAll('[data-all="power"][data-arg="0"], [data-all="pattern"]').forEach((b) => b.disabled = state.lock || !connected);
-  renderGrid(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
+  renderGrid(); renderShowPresets(); renderShowInputs(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
 }
 
 // ---- Adjust sheet: patterns, lens, picture ----

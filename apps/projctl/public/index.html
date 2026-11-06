@@ -95,6 +95,12 @@
         <label class="avd-field pj-grow"><span class="avd-field__label">Preset name</span><input id="preset-name" class="avd-input" placeholder="preshow, intermission, strike"></label>
         <button id="preset-save" class="avd-btn avd-btn--primary" type="button">Save current rig</button>
       </div>
+      <div class="pj-rowhead"><h2 class="pj-section-title">Show presets</h2><span class="pj-mono">Built-in · Frozen WST</span></div>
+      <p class="pj-mono pj-note">Unsupported steps stay marked and are not faked. Show/backup inputs are placeholders set below. Blackout OSC: <code>/proj/all/shutter 1</code>. Strike keeps the two-tap power-off confirm.</p>
+      <div id="show-presets" class="pj-list"></div>
+      <div class="pj-rowhead"><h2 class="pj-section-title">Show / backup inputs</h2><span class="pj-mono">Configurable placeholders</span></div>
+      <div id="show-inputs" class="pj-list"></div>
+      <div class="pj-rowhead"><h2 class="pj-section-title">Saved presets</h2><span class="pj-mono">Operator captures</span></div>
       <div id="presets" class="pj-list"></div>
     </section>
 
@@ -106,7 +112,7 @@
     <section id="tab-setup" class="tab" role="tabpanel" aria-labelledby="tab-btn-setup" hidden>
       <div class="pj-allbar"><button id="discover" class="avd-btn" type="button">Find projectors</button><span id="discover-out" class="pj-mono" aria-live="polite"></span></div>
       <div id="setup" class="pj-list pj-fill" role="region" aria-label="Projector setup" tabindex="0" data-web2-scroll></div>
-      <p class="pj-mono pj-note">Cue input: OSC on UDP 9000 or a text line on TCP 9001. Forms: <code>/proj/P4/shutter 1</code>, <code>/proj/all/power 0</code>, <code>/proj/preset/preshow</code>.</p>
+      <p class="pj-mono pj-note">Cue input: OSC on UDP 9000 or a text line on TCP 9001. Forms: <code>/proj/P4/shutter 1</code>, <code>/proj/all/shutter 1</code> (blackout), <code>/proj/all/power 0</code>, <code>/proj/show/preshow</code>, <code>/proj/preset/&lt;saved&gt;</code>.</p>
     </section>
   </main>
 

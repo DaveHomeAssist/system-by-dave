@@ -138,3 +138,12 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 @media(max-width:720px){.pj-setup{grid-template-columns:1fr 1fr}}
 
 .pj-preset-slot{display:block;padding-block:4px}.pj-lens-data{color:var(--ink);font-variant-numeric:tabular-nums}.pj-preset-result{flex-basis:100%;margin:0;overflow-wrap:anywhere}
+
+.pj-section-title{font:700 16px/22px var(--font-display);margin:0;letter-spacing:-.02em}
+.pj-show-preset .pj-badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--hairline);font:500 11px/16px var(--font-mono);color:var(--ink-muted)}
+.pj-show-preset .pj-unsupported{color:var(--state-waiting, #b45309)}
+.pj-show-confirm{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(4,16,29,.55);padding:24px}
+.pj-show-confirm[hidden]{display:none}
+.pj-show-confirm__card{background:var(--surface);border:1px solid var(--hairline);border-radius:14px;padding:20px;max-width:440px;width:min(440px,92vw);box-shadow:var(--shadow-lift);display:flex;flex-direction:column;gap:12px}
+.pj-show-confirm__card h3{margin:0;font:700 18px/24px var(--font-display)}
+.pj-show-confirm__actions{display:flex;gap:8px;flex-wrap:wrap}

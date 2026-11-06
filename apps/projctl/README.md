@@ -42,7 +42,10 @@ Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
     /proj/P1/power 1            power on (0 off)
     /proj/P2/input 31           select input
     /proj/all/shutter 0         every projector
-    /proj/preset/preshow        recall a saved preset
+    /proj/all/shutter 1         blackout (CueForge Panic target)
+    /proj/show/preshow          built-in show preset
+    /proj/show/strike 1         strike power-off confirm (after first cue)
+    /proj/preset/preshow        recall a saved operator preset
 
 Bulk cues try every slot and log failures per projector; an offline first slot does not
 prevent later slots receiving the cue. Power and shutter require an explicit 0 or 1.
@@ -105,6 +108,14 @@ They change only the UI shift-button mapping. Focus, zoom, Home, Stop, API direc
 encoder readbacks, cues, presets and drawing geometry retain their existing meaning.
 Check a small movement on the actual installation before selecting a reversal; mounting
 and mirror arrangements differ even between projectors of the same model.
+
+## Show presets
+
+Built-in Frozen WST show presets live on the Presets tab alongside operator-saved captures.
+They only send commands the active driver supports (PJLink, Panasonic native, Barco Pulse, simulator).
+Steps a driver cannot do — test patterns on PJLink, or show/backup inputs until `rig.showInputs` is set — are marked **unsupported/unverified** and are not faked.
+Blackout is shutter-only and stays available under Show Lock; its OSC address is `/proj/all/shutter 1`.
+Strike closes shutters first, then keeps the existing two-tap power-off confirm.
 
 ## Lens in presets
 

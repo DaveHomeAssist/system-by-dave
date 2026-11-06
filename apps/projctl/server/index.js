@@ -11,6 +11,7 @@ import { PATTERNS, pictureSchema } from './drivers/panasonic.js';
 import { pjlinkSearch } from './drivers/pjlink.js';
 import { emptyStatus, POWER } from './drivers/base.js';
 import { hasLens, lensSummary, lensPositionMatch, lensMotorState, LENS_AXES } from './preset-lens.js';
+import { showPreset, listShowPresets, planShowPreset, summarizePlan } from './show-presets.js';
 import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
 import { confirmations } from './confirmations.js';
@@ -72,7 +73,11 @@ function snapshot() {
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lens, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
     }),
-    presets: rig.presets, events: rig.events.slice(-200),
+    presets: rig.presets, showPresets: listShowPresets().map((sp) => {
+      const full = showPreset(sp.id);
+      const plan = planShowPreset(full, rig.projectors, (slot) => { const p = store.projector(slot); return p ? driverFor(p) : {}; }, rig.showInputs || {});
+      return { ...sp, plan: summarizePlan(plan) };
+    }), showInputs: rig.showInputs || { show: {}, backup: {} }, events: rig.events.slice(-200),
   };
 }
 
@@ -257,11 +262,91 @@ function savePreset(name) {
   broadcast(snapshot());
 }
 
+
+async function recallShowPreset(id, source = 'ui', confirm = false) {
+  const pr = showPreset(id);
+  if (!pr) throw httpErr(404, `no show preset ${id}`);
+  const plan = planShowPreset(pr, rig.projectors, (slot) => {
+    const p = store.projector(slot);
+    return p ? driverFor(p) : {};
+  }, rig.showInputs || {});
+  const actionable = plan.filter((a) => a.status === 'ok');
+  const powerOffs = actionable.filter((a) => a.cmd === 'power' && !a.arg);
+  const others = actionable.filter((a) => !(a.cmd === 'power' && !a.arg));
+
+  // Show lock: shutter-only blackout stays allowed; power-off / input / pattern blocked.
+  if (rig.lock) {
+    const wantsRestricted = (pr.steps || []).some((s) => s.cmd === 'input' || s.cmd === 'pattern' || (s.cmd === 'power' && s.arg === false));
+    if (wantsRestricted) throw httpErr(423, 'show lock is on');
+  }
+
+  // Strike: close shutters (and pattern off) first, then require the two-tap power-off confirm.
+  if (pr.confirmPowerOff && powerOffs.length) {
+    const key = `show:${pr.id}:power:off`;
+    const confirmed = pendingConfirm.take(key, confirm);
+    if (!confirmed) {
+      const outEarly = {};
+      for (const a of others) {
+        try { outEarly[`${a.slot}:${a.cmd}`] = await command(a.slot, a.cmd, a.arg, `${source} show ${pr.id}`); }
+        catch (e) { outEarly[`${a.slot}:${a.cmd}`] = { error: e.message }; }
+      }
+      const targets = [];
+      for (const a of powerOffs) {
+        const p = store.projector(a.slot);
+        const st = status.get(a.slot);
+        if (!p || !st?.online) { outEarly[`${a.slot}:power`] = { error: p ? `${a.slot} is offline` : `no projector ${a.slot}` }; continue; }
+        targets.push({ slot: a.slot, identity: targetIdentity(p) });
+      }
+      return {
+        preset: pr.id, name: pr.name, builtin: true,
+        confirm: targets.length ? pendingConfirm.issue(key, targets) : null,
+        targets: targets.map((t) => t.slot),
+        message: targets.length
+          ? `Shutters closed. Tap again within 3 s to power off ${targets.map((t) => t.slot).join(', ')}`
+          : 'No online projectors to power off.',
+        plan: summarizePlan(plan),
+        results: outEarly,
+        osc: pr.osc,
+      };
+    }
+    const out = {};
+    for (const target of confirmed) {
+      try {
+        const p = store.projector(target.slot);
+        if (!p || targetIdentity(p) !== target.identity) throw httpErr(409, 'configuration changed; confirm again');
+        out[`${target.slot}:power`] = await command(target.slot, 'power', false, `${source} show ${pr.id}`);
+      } catch (e) { out[`${target.slot}:power`] = { error: e.message }; }
+    }
+    for (const a of powerOffs) if (!confirmed.some((t) => t.slot === a.slot) && !out[`${a.slot}:power`]) {
+      out[`${a.slot}:power`] = { error: 'not in confirmed target list; skipped' };
+    }
+    return { preset: pr.id, name: pr.name, builtin: true, plan: summarizePlan(plan), results: out, osc: pr.osc, message: 'Strike power-off sent.' };
+  }
+
+  const out = {};
+  for (const a of plan) {
+    if (a.status !== 'ok') { out[`${a.slot}:${a.cmd}`] = { result: a.status, detail: a.detail }; continue; }
+    try { out[`${a.slot}:${a.cmd}`] = await command(a.slot, a.cmd, a.arg, `${source} show ${pr.id}`); }
+    catch (e) { out[`${a.slot}:${a.cmd}`] = { error: e.message }; }
+  }
+  return {
+    preset: pr.id, name: pr.name, builtin: true,
+    plan: summarizePlan(plan), results: out, osc: pr.osc,
+    message: Object.values(out).some((v) => v.result === 'unsupported/unverified')
+      ? 'Recalled with unsupported/unverified steps left alone.'
+      : `${pr.name} recalled.`,
+  };
+}
+
 // ---- OSC / TCP cue input: /proj/<slot>/<power|shutter|input> <arg>, /proj/preset/<name>, /proj/all/<power|shutter> <arg>
 async function onCue(addr, args, source) {
   const parts = addr.split('/').filter(Boolean);
   if (parts[0] !== 'proj') return;
   try {
+    if (parts[1] === 'show' && parts[2]) {
+      const confirm = args.length === 1 && (args[0] === 1 || args[0] === '1');
+      return await recallShowPreset(parts.slice(2).join('/'), source, confirm || false);
+    }
     if (parts[1] === 'preset' && parts[2] === 'lens' && args.length === 1 && args[0] === 1) {
       // An explicit numeric 1 is the local cue equivalent of the UI's deliberate confirmation.
       return await recallPreset(parts.slice(3).join('/'), source, true);
@@ -339,6 +424,25 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/preset/save' && req.method === 'POST') { const { name } = await body(req); if (!name) throw httpErr(400, 'name required'); savePreset(name); return json(res, 200, { ok: true }); }
     if (url.pathname === '/api/preset/recall' && req.method === 'POST') { const { name, confirmLens } = await body(req); return json(res, 200, await recallPreset(name, 'ui', confirmTokenFor(name, confirmLens) || false)); }
     if (url.pathname === '/api/preset/delete' && req.method === 'POST') { const { name } = await body(req); rig.presets = rig.presets.filter((x) => x.name !== name); store.save(); broadcast(snapshot()); return json(res, 200, { ok: true }); }
+    if (url.pathname === '/api/show-preset/recall' && req.method === 'POST') {
+      const { id, confirm } = await body(req);
+      return json(res, 200, await recallShowPreset(id, 'ui', confirmTokenFor(id, confirm) || false));
+    }
+    if (url.pathname === '/api/show-inputs' && req.method === 'POST') {
+      const bodyIn = await body(req);
+      const next = { show: { ...(rig.showInputs?.show || {}) }, backup: { ...(rig.showInputs?.backup || {}) } };
+      for (const key of ['show', 'backup']) {
+        if (bodyIn[key] && typeof bodyIn[key] === 'object') {
+          for (const [slot, val] of Object.entries(bodyIn[key])) {
+            if (!store.projector(slot)) throw httpErr(404, `no projector ${slot}`);
+            if (val == null || val === '') delete next[key][slot];
+            else next[key][slot] = String(val);
+          }
+        }
+      }
+      rig.showInputs = next; store.save(); store.event({ source: 'ui', slot: '*', command: 'show-inputs', result: 'OK' }); broadcast(snapshot());
+      return json(res, 200, { showInputs: rig.showInputs });
+    }
     if (url.pathname === '/api/lock' && req.method === 'POST') { const { lock } = await body(req); rig.lock = !!lock; pendingConfirm.clear(); store.save(); store.event({ source: 'ui', slot: '*', command: `lock ${rig.lock ? 'on' : 'off'}`, result: 'OK' }); broadcast(snapshot()); return json(res, 200, { lock: rig.lock }); }
     if (url.pathname === '/api/projector' && req.method === 'POST') {
       const upd = await body(req); const p = store.projector(upd.slot); if (!p) throw httpErr(404, 'no slot');
