@@ -1,6 +1,8 @@
 import { LANES, laneOf, projectorName, orderedProjectors, rigLanes } from './lanes.js';
 import { createStageView } from './stage-view.js';
 import { lensDirection } from './lens-direction.js';
+import { startHeaderClock } from './header-clock.js';
+startHeaderClock(document.querySelector('#operator-clock'));
 const $ = (s, r = document) => r.querySelector(s);
 let state = { projectors: [], presets: [], events: [], lock: false };
 const confirmTokens = {}; // command key -> one-use token
@@ -64,8 +66,7 @@ async function cmd(slot, c, arg) {
 }
 document.querySelectorAll('[data-all]').forEach((b) => b.onclick = () => cmd('all', b.dataset.all, b.dataset.all === 'resetInput' ? undefined : b.dataset.all === 'pattern' ? b.dataset.arg : Number(b.dataset.arg)));
 
-$('#lock-on').onclick = () => api('lock', { lock: true }).catch((e) => toast(e.message));
-$('#lock-off').onclick = () => api('lock', { lock: false }).catch((e) => toast(e.message));
+$('#show-lock').onclick = () => api('lock', { lock: !state.lock }).catch((e) => toast(e.message));
 $('#preset-save').onclick = () => { const n = $('#preset-name').value.trim(); if (!n) return toast('Name the preset first'); api('preset/save', { name: n }).then(() => { $('#preset-name').value = ''; toast(`Saved ${n}`); }).catch((e) => toast(e.message)); };
 $('#discover').onclick = async () => { $('#discover-out').textContent = 'searching…'; try { const r = await api('discover'); $('#discover-out').textContent = r.note ? r.note : `${r.found.length} replied, ${r.changed} updated`; } catch (e) { $('#discover-out').textContent = e.message; } };
 
@@ -254,7 +255,11 @@ function renderSetup() {
 }
 function renderAll() {
   $('#show').textContent = state.show || 'Projectors';
-  $('#lock-on').setAttribute('aria-pressed', String(!!state.lock)); $('#lock-off').setAttribute('aria-pressed', String(!state.lock));
+  const lockButton = $('#show-lock');
+  const lockLabel = state.lock ? 'Show lock on. Disable show lock' : 'Show lock off. Enable show lock';
+  lockButton.setAttribute('aria-pressed', String(!!state.lock));
+  lockButton.setAttribute('aria-label', lockLabel); lockButton.title = lockLabel;
+  lockButton.dataset.lockState = state.lock ? 'locked' : 'unlocked';
   renderOverview();
   $('[data-all="resetInput"]').textContent = `Reset all to ${state.preferredInput || 'HDMI'}`;
   $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = state.presets.length || '';
@@ -361,7 +366,7 @@ async function loadPicture() {
 }
 
 // websocket
-function setConn(on) { connected = on; const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#lock-on').disabled = !on; $('#lock-off').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderOverview(); renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
+function setConn(on) { connected = on; const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#show-lock').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderOverview(); renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
 let reconnectTimer = null, socketGeneration = 0;
 function scheduleReconnect() {
   if (reconnectTimer !== null) return;
