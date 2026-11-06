@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 
-export function fixtureGLB(uri) {
+export function fixtureGLB(uri, extraNames = []) {
   const floats = new Float32Array([-2, 0, -2, 2, 0, -2, 0, 3, 0]);
   const binary = Buffer.from(floats.buffer);
   const gltf = { asset: { version: '2.0' }, scene: 0, scenes: [{ nodes: [0, 1] }], nodes: [{ mesh: 0 }, { mesh: 0, name: 'Roof.001', translation: [0, 3, 0] }],
@@ -10,6 +10,7 @@ export function fixtureGLB(uri) {
     materials: [{ doubleSided: true, pbrMetallicRoughness: { baseColorFactor: [.4, .7, .8, 1], metallicFactor: 0 } }],
     buffers: [{ byteLength: binary.length, ...(uri ? { uri } : {}) }], bufferViews: [{ buffer: 0, byteLength: binary.length }],
     accessors: [{ bufferView: 0, componentType: 5126, count: 3, type: 'VEC3', min: [-2, 0, -2], max: [2, 3, 0] }] };
+  for (const name of extraNames) { gltf.scenes[0].nodes.push(gltf.nodes.length); gltf.nodes.push({mesh:0,name,translation:[0,0,0]}); }
   const raw = Buffer.from(JSON.stringify(gltf)), json = Buffer.alloc(Math.ceil(raw.length / 4) * 4, 32); raw.copy(json);
   const head = Buffer.alloc(20), binHead = Buffer.alloc(8);
   head.writeUInt32LE(0x46546c67); head.writeUInt32LE(2, 4); head.writeUInt32LE(28 + json.length + binary.length, 8);

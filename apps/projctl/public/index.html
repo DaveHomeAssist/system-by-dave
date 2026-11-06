@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="app.css">
 <link rel="stylesheet" href="stage.css">
 <!-- Local Throwline import map: supplied by the relay. -->
+<link rel="stylesheet" href="workspace-bridge.css">
 </head>
 <body>
 <a class="pj-skip" href="#tab-rig">Skip to rig</a>
@@ -31,7 +32,9 @@
   </header>
 
   <div class="avd-shell__tabs">
-    <div class="avd-tabs" role="tablist" aria-label="Views">
+    <div class="avd-tabs" role="tablist" aria-label="Views"><button class="avd-tab" role="tab" id="tab-btn-home" aria-selected="false" aria-controls="tab-home" data-tab="home" type="button" tabindex="-1">Home</button>
+      <button class="avd-tab" role="tab" id="tab-btn-notes" aria-selected="false" aria-controls="tab-notes" data-tab="notes" type="button" tabindex="-1">Notes + tasks</button>
+      <button class="avd-tab" role="tab" id="tab-btn-info" aria-selected="false" aria-controls="tab-info" data-tab="info" type="button" tabindex="-1">Projector info</button>
       <button class="avd-tab" role="tab" id="tab-btn-rig" aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">Rig <span class="avd-tab__count" id="count-rig"></span></button>
       <button class="avd-tab" role="tab" id="tab-btn-stage" aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">Stage</button>
       <button class="avd-tab" role="tab" id="tab-btn-presets" aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
@@ -41,6 +44,9 @@
   </div>
 
   <main class="pj-main">
+<section class="tab home-panel" role="tabpanel" aria-labelledby="tab-btn-home" id="tab-home" hidden><div><p class="eyebrow">FROZEN / WALNUT STREET THEATRE</p><h2 id="local-home-title">Where would you like to go?</h2><p class="hint">One workspace for show notes, the projector reference and private controls.</p></div><div class="home-choices"><button type="button" data-local-target="notes"><strong>Notes + tasks</strong><span>Your personal notes and the shared to-do list</span></button><button type="button" data-local-target="info"><strong>Projector info</strong><span>A–D models, lenses and planning notes</span></button><button type="button" data-local-target="stage"><strong>Stage / room</strong><span>Room view and projection planning</span></button><button type="button" data-local-target="rig"><strong>Controls</strong><span>Connect to the private projector controller</span></button></div><p class="hint">Notes stay in this browser. Shared tasks are public. Private controls require a connected controller.</p></section>
+    <section id="tab-notes" class="tab" role="tabpanel" aria-labelledby="tab-btn-notes" hidden><iframe class="pj-workspace-frame" data-workspace="notes" title="Frozen notes and shared team tasks"></iframe></section>
+    <section id="tab-info" class="tab" role="tabpanel" aria-labelledby="tab-btn-info" hidden><iframe class="pj-workspace-frame" data-workspace="info" title="Frozen projector information"></iframe></section>
     <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
       <div class="pj-overview" aria-label="Rig connection overview"><div><span class="avd-eyebrow">Projector connection</span><strong id="summary">Waiting for relay…</strong></div><div class="pj-connection-help"><p class="pj-mono" id="connection-note" role="status">Connecting to the local relay. Device status will update here automatically.</p><p class="pj-mono" id="local-controller-help" hidden>This page needs the local controller. <a href="http://localhost:8080/">Open controller on this Mac</a><span>On a phone or another computer, use the controller Mac’s network address; localhost points to the device you are using.</span></p></div></div>
       <div class="pj-allbar" aria-labelledby="all-label">
@@ -66,8 +72,8 @@
         <div class="avd-seg" role="group" aria-label="Stage viewpoint">
           <button class="avd-seg__btn" type="button" data-stage-view="building" aria-pressed="false" hidden>Building</button>
           <button class="avd-seg__btn" type="button" data-stage-view="3d" aria-pressed="true">3D</button>
-          <button class="avd-seg__btn" type="button" data-stage-view="front" aria-pressed="false">Front</button>
-          <button class="avd-seg__btn" type="button" data-stage-view="plan" aria-pressed="false">Plan</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="front" aria-pressed="false">Front 2D</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="plan" aria-pressed="false">Plan 2D</button>
         </div>
       </div>
       <div id="stage-message" class="pj-stage-empty" role="status">Loading local plot…</div>
@@ -85,6 +91,16 @@
           <p id="stage-foot" class="pj-stage-foot pj-mono">Plot reference · coverage is not live beam position</p>
         </div>
         <aside class="pj-stage-sidebar" aria-label="Stage projectors" data-web2-scroll>
+          <button class="avd-btn avd-btn--primary" type="button" id="stage-add-room" hidden>Plan with room reference</button>
+          <div id="stage-alignment" hidden>
+            <strong class="pj-plan-badge">Approximate venue alignment</strong>
+            <details><summary>Adjust room alignment</summary><div class="pj-plan-fields">
+              <label class="avd-field"><span class="avd-field__label">Room X offset (m)</span><input class="avd-input" type="number" step="0.1" value="0" data-room-axis="x"></label>
+              <label class="avd-field"><span class="avd-field__label">Room Y offset (m)</span><input class="avd-input" type="number" step="0.1" value="0" data-room-axis="y"></label>
+              <label class="avd-field"><span class="avd-field__label">Room Z offset (m)</span><input class="avd-input" type="number" step="0.1" value="0.2" data-room-axis="z"></label>
+              <label class="avd-field"><span class="avd-field__label">Room yaw (degrees)</span><input class="avd-input" type="number" step="1" value="0" data-room-axis="yaw"></label>
+            </div><p class="pj-mono">Stage floor aligned at Y0; room proscenium used as a tentative target-plane anchor (Z+0.2 m). No scale correction. Local preview only; not surveyed or clearance-checked. Bright enclosure outlines remain visible through room geometry as position aids.</p></details>
+          </div>
           <div id="stage-planner" hidden></div>
           <div id="stage-live-reference">
           <div class="pj-rowhead"><h3>Projectors</h3><span id="stage-status-kind" class="pj-mono"></span></div>
@@ -161,5 +177,6 @@
 </div>
 <noscript>Projector controls require JavaScript. Use the projector remote if the relay is unavailable.</noscript>
 <script type="module" src="app.js"></script>
+<script type="module" src="workspace-bridge.js"></script>
 </body>
 </html>

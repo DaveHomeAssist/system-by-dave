@@ -49,11 +49,20 @@ rigging, tilt limits and enclosure-to-lens offsets are not certified.
 
 ## Building model boundary
 
-The existing private venue-model loader remains available in Rig reference mode.
-An unregistered building cannot be overlaid with calibrated projection beams.
-A future room overlay needs an explicit verified transform into the stage frame:
-metres, Y up with stage floor at zero, and the C target plane defining Z zero.
-The original model and saved plot remain separate from proposed optical geometry.
+The private venue model opens as an interior reference with recognised roof and
+ceiling meshes hidden; the Roof toggle restores them. **Plan with this room**
+explicitly adds that model to the optical planner as an **Approximate venue
+alignment**, even when the source's calibrated-overlay flag remains false.
+The initial room transform is translation X=0, Y=0, Z=+0.2 metres with no scale
+change: the already-normalized floor is matched to stage Y0 and the model's
+proscenium is used as a tentative target-plane anchor. X/Y/Z and yaw are local,
+editable assumptions. No surveyed C-plane registration or clearance is implied.
+A/B/C projector coordinates remain drawing-derived; D's 38–39 ft estimate is
+used only by the D study shortcuts. No original model or plot is changed.
+
+**Projectors** focuses the true-size enclosures and their 44-pixel A–D markers,
+from the stage side toward the balcony. Coverage frames only the target rasters from the audience side. Plan frames the rig-to-target layout. Selected side frames only the active projector and its beam elevation. Reset view refits the current preset without changing optical values; ordinary edits and lane selection do not move the camera. Labels are screen-size aids and bright enclosure outlines remain visible through room geometry; physical projector and beam dimensions are not enlarged. The active scenario replaces its recorded body and moves its letter/leader to the proposed lens position; returning to Rig reference restores the recorded body and marker. Roof detection recognizes supplied cutaway names and semantic
+roof/ceiling names, leaving other room meshes intact.
 
 ## Focused verification
 
@@ -66,10 +75,25 @@ The original model and saved plot remain separate from proposed optical geometry
   controls, with no document overflow. Tests use synthetic dimensioned geometry;
   no private venue assets are release fixtures.
 
-The optional venue descriptor exposes only registration status and the planning-overlay flag. Other private registration metadata is stripped. Unregistered venue models stay in the separate Venue reference view, with planning overlays disabled.
+The optional venue descriptor exposes only registration status and the planning-overlay flag. Other private registration metadata is stripped. The calibrated-overlay flag stays false for unregistered models. Approximate planning is a separately labelled, operator-enabled preview.
 
 The attached front and top-down drawings label A and D raster coverage at 19 ft 11 in, C at 20 ft 3 in, and B at 18 ft 4 in. These are plotted raster-coverage dimensions, not measurements of every scenic target. Each lane has an independent scenario. The D 20 ft shortcut remains a rounded operator estimate for comparison; no revised A height is inferred.
 
 ET-DLE170 manufacturer reference: https://eu.connect.panasonic.com/gb/en/projectors/et-dle170 (WXGA 1.80–2.54:1).
 
 Upward-shift percentages are calculated from the achievable physical raster after the lens range constrains the requested size. The requested raster remains independently editable; a 26 ft request with a 21.39 ft achievable image uses 21.39 ft as its shift-percentage basis.
+
+## Camera and room visibility controls
+
+The combined room is ghosted for optical sightlines; it is still approximate.
+Camera bounds come from the relevant projectors or coverage, never the whole
+building. Free orbit/zoom remains available. Roof is directly toggleable. Room
+layers contains independent Walls, Balcony and Seats toggles, plus Projectors &
+beams only and Restore room. Original hidden objects stay hidden on restore.
+Room-layer choices survive scenario edits and camera changes, and never hide the
+separate projector/proposal geometry. Classification preserves the stage deck,
+proscenium and upstage masking; upper seating also follows the balcony group.
+
+Coverage, Plan and Selected side use viewport-aspect-aware fitting of actual optical points, not a whole-building bounding sphere. Selected side is perpendicular to the selected lens-to-target direction. Coverage/Plan suppress large 3D labels; Selected side shows only the framed lane, while Projectors retains all four 44-pixel labels.
+
+When both venue and plot are available, Stage opens directly in **Room + projectors** with the recorded A–D rig, all four labels and beams, roof hidden, and the Projectors camera. **Rig reference** keeps this combined display; **What-if planning** adds local editing. A room-only entry is used only when no projector plot is available.

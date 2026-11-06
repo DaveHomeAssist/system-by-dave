@@ -30,11 +30,11 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
     const canvas = page.locator('#stage-building three-d-stage canvas');
     assert.ok(await page.evaluate(() => window.stageDraws > 0));
     const before = await canvas.screenshot();
-    await page.locator('#stage-building').getByRole('button', { name: 'Cutaway', exact: true }).click();
+    await page.locator('#stage-building').getByRole('button', { name: 'Roof', exact: true }).click();
     await page.waitForTimeout(100);
     assert.notDeepEqual(await canvas.screenshot(), before, 'cutaway restores the named shell geometry');
-    await page.locator('#stage-building').getByRole('button', { name: 'Cutaway', exact: true }).click();
-    await page.locator('#stage-building').getByRole('button', { name: 'Top', exact: true }).click();
+    await page.locator('#stage-building').getByRole('button', { name: 'Roof', exact: true }).click();
+    await page.locator('#stage-building').getByRole('button', { name: 'Plan', exact: true }).click();
     await page.waitForTimeout(200);
     assert.notDeepEqual(await canvas.screenshot(), before, 'camera changes rendered geometry');
     for (const role of ['plot', 'scan']) {
@@ -70,19 +70,19 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
     // Both sources coexist, with the original diagram semantics preserved.
     await fs.writeFile(path.join(dir, 'stage-plot.json'), JSON.stringify(stageFixture()));
     await page.reload(); await page.locator('[data-tab="stage"]').click();
-    await page.locator('#stage-building[data-state="ready"]').waitFor();
+    await page.locator('#stage-3d[data-state="ready"]').waitFor();
     await page.locator('[data-stage-view="front"]').click();
     assert.equal(await page.locator('.pj-stage-marker[data-lane="A"]').isVisible(), true);
     await page.locator('[data-stage-view="3d"]').click();
     await page.locator('#stage-3d[data-state="ready"]').waitFor();
     await page.locator('[data-stage-view="building"]').click();
-    assert.equal(await page.locator('#stage-3d three-d-stage').getAttribute('paused'), '');
+    assert.equal(await page.locator('#stage-3d three-d-stage').getAttribute('paused'), null);
     await page.close();
 
     const fallback = await browser.newPage();
     await fallback.addInitScript(() => { const original = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function(type, ...args) { return type.startsWith('webgl') ? null : original.call(this, type, ...args); }; });
     await fallback.goto(relay.base); await fallback.locator('[data-tab="stage"]').click();
-    await fallback.locator('#stage-building[data-state="unavailable"]').waitFor();
+    await fallback.locator('#stage-3d[data-state="unavailable"]').waitFor();
     await fallback.locator('[data-tab="rig"]').click();
     assert.equal(await fallback.locator('.pj-tile').first().isVisible(), true);
     console.log('Venue browser passed: lazy metric GLBs, inert inspection, existing lane controls, mobile, idle/hidden, context recovery, drawing coexistence and no-WebGL fallback.');

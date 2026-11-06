@@ -1,5 +1,7 @@
+import { createRoomLayers, addRoomLayerControls } from './stage-visibility.js';
+
 // Private, metric geometry. No rig commands, lane bindings or optical simulation.
-export async function createVenueView(host, venue) {
+export async function createVenueView(host, venue, planWithRoom) {
   await import('/ProjectorThrow/three-d-stage.js');
   const { GLTFLoader } = await import('/ProjectorThrow/vendor/three/addons/loaders/GLTFLoader.js');
   const stage = document.createElement('three-d-stage');
@@ -31,11 +33,11 @@ export async function createVenueView(host, venue) {
     layers.set(role, result.scene); model.add(result.scene);
     return result.scene;
   }
-  const cutawayNodes = [];
+  let cutaway;
   try {
     const room = await load('room');
-    // GLTFLoader sanitizes/uniquifies runtime names; manifests use source names.
-    room.traverse(o => { if (venue.cutaway.includes(o.userData.name ?? o.name)) { cutawayNodes.push(o); o.visible = false; } });
+    cutaway = createRoomLayers(room, venue.cutaway);
+    host.dataset.roofMeshes = String(cutaway.count('roof'));
     stage.setObject(model);
   }
   catch (error) { disposed = true; abort.abort(); dispose(model); stage.destroy(); stage.remove(); throw error; }
@@ -43,23 +45,17 @@ export async function createVenueView(host, venue) {
   const controls = document.createElement('div'); controls.className = 'pj-stage-camera';
   controls.setAttribute('role', 'group'); controls.setAttribute('aria-label', 'Building camera and layers');
   const status = document.createElement('p'); status.className = 'pj-venue-status'; status.setAttribute('role', 'status');
-  const cameras = [[1, .7, 1.6], [0, .18, 1], [0, 1, .001]];
+  const cameras = [[.4, 1.15, 1], [0, .18, 1], [0, 1, .001]];
   let camera = 0;
-  const frame = (index = camera) => { camera = index; stage.frameObject(cameras[index], ['Perspective', 'Audience', 'Overhead'][index], { fit: 'content', padding: 1.08, saveDefault: true }); };
+  const frame = (index = camera) => { camera = index; stage.frameObject(cameras[index], ['Room overview', 'Audience', 'Plan'][index], { fit: 'content', padding: 1.08, saveDefault: true }); };
   const button = (label, action) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.onclick = action; controls.append(b); return b; };
-  ['Orbit', 'Audience', 'Top'].forEach((label, index) => button(label, () => frame(index)));
+  ['Room overview', 'Audience', 'Plan'].forEach((label, index) => button(label, () => frame(index)));
   button('+', () => stage.zoomBy(.8)).setAttribute('aria-label', 'Zoom in');
   button('−', () => stage.zoomBy(1.25)).setAttribute('aria-label', 'Zoom out');
   button('Reset', () => frame(0));
-  if (cutawayNodes.length) {
-    let cutaway = true;
-    const b = button('Cutaway', () => {
-      cutaway = !cutaway; cutawayNodes.forEach(o => { o.visible = !cutaway; });
-      b.setAttribute('aria-pressed', String(cutaway)); stage.requestRender();
-    });
-    b.setAttribute('aria-pressed', 'true');
-  }
-  for (const [role, label] of [['room', 'Room'], ['plot', 'Drawing'], ['scan', 'LiDAR']]) {
+  if (planWithRoom) button('Plan with this room', planWithRoom).className = 'pj-stage-primary';
+  addRoomLayerControls(controls, cutaway, () => stage.requestRender(), false);
+  for (const [role, label] of [['plot', 'Drawing'], ['scan', 'LiDAR']]) {
     if (!venue.assets[role]) continue;
     const b = button(label, async () => {
       b.disabled = true;

@@ -22,3 +22,23 @@ The managed Worker/D1 service is separate from GitHub Pages and existing FMP ser
 Navigation includes Notes + tasks, Projector info and Projector controls. `projectors.json` is the versioned public equipment reference with assignment/lens/estimate provenance; the private rig remains controller authority. No IPs, MACs or credentials are in this reference. D lens sizing is a candidate calculation, not a calibrated optical verdict. The owner prefers coverage over reduced brightness/resolution; installed lens and physical clearance remain unverified.
 
 `workspace-config.json` owns the future control handoff. Its default is `url: null, verified: false`, visibly Mac Studio setup pending. Set a URL only after installing and testing the theatre host and crew access. Do not substitute the current MacBook or visitor localhost. The app does not proxy commands; configuring this link does not create authentication. Actual login/access belongs to the controller. Reciprocally, the controller links back to https://wst.housevideo.app/.
+
+## Unified public and local workspace
+
+The controller now includes Notes + tasks and Projector info alongside Rig and Stage, loading this same frontend as generated same-origin panels from `public/workspace/`. `node wst/embed-hosted-assets.mjs` refreshes both the managed Worker assets and this local copy. Personal notes use the same key but remain browser-and-origin-specific; local controller notes and website notes do not silently sync. Dave confirmed no saved content needed migration.
+
+The public website shows Stage / room and Controls in place. Connect this Mac explicitly requests the browser's local-network permission for `http://localhost:8080`, checks relay health, and loads the private controller frame. Connected requires a source/origin-validated child report with active relay connection, not iframe load. Parent messages can select only Rig or Stage; they cannot issue device commands. Denied/unavailable connection stays clearly disconnected. This does not expose a public relay and is not a verified Studio crew endpoint.
+
+The public tasks API permits anonymous cross-origin GET/POST/OPTIONS so the local workspace uses the same shared list. This CORS change is limited to the managed task API. Existing controller API policies were not broadened. Private authenticated Studio iframe behavior remains unverified: current controller cookies use SameSite=Lax, and the current MacBook has no passcode configured. Do not claim a future protected Studio iframe is commissioned from this local test.
+
+Verification: actual local controller panels passed desktop/mobile notes persistence across tabs, shared-list read, and projector info/Stage navigation. The public website loaded actual private Stage and Rig in place in an isolated browser with normal local-network permission explicitly granted; the denied state remains disconnected. No physical commands were sent. A temporary SSH forward bound only Walter loopback for these tests; it is not a deployed service.
+
+### Browser permission acceptance, November 6, 2026
+
+Local controller Notes / Info / Stage navigation passed in the owner's browser. An isolated Walter Chromium context, with local-network permission explicitly granted, displayed the actual Mac relay's Stage and Rig inside the public WST page. No browser security flags were disabled. The temporary SSH forward used for that test bound only Walter loopback and was stopped afterward.
+
+The owner's actual desktop browser reached the new bounded failure message instead of reporting a false connection. Its local-network permission grant remains unconfirmed: native permission UI inspection was blocked by a ScreenCaptureKit capture error. Therefore in-place public-to-private control is verified for the supported granted-permission path, not commissioned in that user browser or on the future theatre Mac Studio. The same-origin local unified app remains usable without that public-to-loopback permission path. No public tunnel was deployed.
+
+### Home entry, November 6, 2026
+
+Dave requested a choice-first landing screen. Home is now the initial view on both the public website and non-embedded local controller, with four in-page choices: Notes + tasks, Projector info, Stage / room, and Controls. Notes remain one click away. Embedded controller frames continue opening Rig/Stage directly rather than showing a nested Home screen. This changes navigation only; no storage migration, backend restart or projector commands are involved. The user's actual local Home routes were verified; public Home routes are awaiting the final owner-browser readback. Existing local-network permission limitations remain unchanged.

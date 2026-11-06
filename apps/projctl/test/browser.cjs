@@ -21,6 +21,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         if (offline) await relay.api('projector', { slot: 'P1', ip: '' });
         await relay.api('command', { slot: 'all', cmd: 'power', arg: 1 });
         await page.goto(relay.base);
+    await page.locator('[data-tab="rig"]').click();
         await page.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
         const bulk = page.locator('[data-all="power"][data-arg="0"]');
         for (let tap = 0; tap < 2; tap++) {
@@ -47,7 +48,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await until(async () => (await relay.state()).projectors.find(p => p.slot === 'P2').status.shutter === 'closed');
         assert.equal((await relay.state()).projectors.find(p => p.slot === 'P4').status.shutter, 'open');
         assert.equal(await page.locator('.pj-unassigned').evaluate(el => el.open), true);
-        await page.reload();
+        await page.reload(); await page.locator('[data-tab="rig"]').click();
         await page.locator('#grid > .pj-tile[data-lane="D"][data-slot="P4"]').waitFor();
         assert.deepEqual(await laneOrder(), [['A', null], ['B', 'P2'], ['C', 'P1'], ['D', 'P4']]);
         await relay.api('projector', { slot: 'P2', lane: '' });
@@ -64,7 +65,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await page.locator('.pj-tile[data-lane="A"] [data-c="shutter"][data-a="1"]').click();
         await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P2').status.shutter === 'closed');
         assert.equal((await relay.state()).projectors.find((p) => p.slot === 'P4').status.shutter, 'open');
-        await page.reload();
+        await page.reload(); await page.locator('[data-tab="rig"]').click();
         await page.locator('.pj-tile[data-lane="A"] h3').filter({ hasText: 'SL Portal' }).waitFor();
 
         // Operator direction labels use the selected slot's saved mounting correction.
@@ -74,7 +75,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await slotSetup.locator('[data-k="reverseV"]').selectOption('true');
         await slotSetup.getByRole('button', { name: 'Save', exact: true }).click();
         await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P2').reverseV === true);
-        await page.reload();
+        await page.reload(); await page.locator('[data-tab="rig"]').click();
         await page.locator('[data-tab="rig"]').click();
         await page.locator('.pj-tile[data-slot="P2"] [data-adj="lens"]').click();
         await page.getByRole('tab', { name: 'Lens', exact: true }).click();
