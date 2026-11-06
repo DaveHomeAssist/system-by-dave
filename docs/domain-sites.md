@@ -298,3 +298,7 @@ suite remains online-only under `docs/fmp-public-release.md`; no protected API
 response or authentication state is cached. Its strict `connect-src 'none'`
 reference pages are tested by navigation; a deliberately blocked test fetch is
 recorded as expected CSP enforcement.
+
+## Managed service snapshots
+
+The WST Stage files under `wst/stage/` are inputs to the managed WST Worker. Its root-relative renderer imports belong to that service. When producing the System by Dave Pages artifact, `stage_domain_sites.mjs` replaces only `wst/stage/index.html` with a noindex redirect to `https://wst.housevideo.app/stage/index.html`. The canonical snapshot and Worker remain unchanged; the normal removed-asset check still applies to every staged page.
