@@ -11,7 +11,9 @@ function showTheme(value) {
   document.documentElement.dataset.theme = value;
   const stageFrame=document.querySelector("#public-stage-frame");if(stageFrame?.contentWindow&&stageFrame.getAttribute("src")){const origin=new URL(stageFrame.src,location.href).origin;stageFrame.contentWindow.postMessage({type:"wst:stage-theme",theme:value},origin);}
   theme.setAttribute('aria-pressed', String(value === 'dark'));
-  theme.textContent = value === 'dark' ? 'Light theme' : 'Dark theme';
+  theme.textContent = value === 'dark' ? '☀' : '☾';
+  theme.setAttribute('aria-label',value === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+  theme.title=value === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
 }
 try {
   notes.value = localStorage.getItem(NOTE_KEY) || '';
