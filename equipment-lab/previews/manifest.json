@@ -81,144 +81,160 @@
       "inventoryIds": [
         "N05"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 22795,
-      "sha256": "b57df011fb0d58545f6ed6de468ca3d965bb6410bc490b8a2e820db7995653f4"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 23723,
+      "sha256": "db91e5be3c4e82442479b77e76ff37b3dc1a8a762f5bd5514a5e658110cc7450",
+      "geometrySourceSha256": "75c5bd076ee12a0e079360219a1d510237cbf4cbf89ebf3d008fa225b12cbf2b"
     },
     {
       "file": "nnc-cva-118.jpg",
       "inventoryIds": [
         "N09"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 12361,
-      "sha256": "c83d233b934ca2b2121a12b646d7a04fe1a3d0cd33e582bbb378267f4b761daf"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 12994,
+      "sha256": "abb55e42af9534011034939f0642d0127a5b739ec3c5aff161c0d003338f2a79",
+      "geometrySourceSha256": "bec60eb07d08834fb03177018eca5896b2df50e4c9d34a604e7d0327bab52dbf"
     },
     {
       "file": "nnc-djm-a9.jpg",
       "inventoryIds": [
         "N06"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 21013,
-      "sha256": "518c29c73a25fc2d650f9907c920b790dc8067dd12865950deb2939a0dd936d8"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 21248,
+      "sha256": "a30ef02edf2c0c06ea9544c4b69f6161a75f1ec2696635943971b0fabd1c7799",
+      "geometrySourceSha256": "941bddc212b750761882107a647aa9beb2c2c3503989d31eaa6d3fb20a272117"
     },
     {
       "file": "nnc-ekx-15sp.jpg",
       "inventoryIds": [
         "N10"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 13013,
-      "sha256": "f11a7678765a2a679e19a2a24784d7d30da064787842f2961c9011328b37251c"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 13988,
+      "sha256": "cfad7f91c0f66fe45882f138ad2c68a4a02d49fac0b9b8e8cb662f42df2c73a9",
+      "geometrySourceSha256": "d85bc8308f9114cfe0c31ab5d18bbac5c763ef94970c23b60b19f9f3ae9576ea"
     },
     {
       "file": "nnc-gx5.jpg",
       "inventoryIds": [
         "N04"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 23109,
-      "sha256": "6d5f50fda9bdcb2be659399f19ecbd082eb490ec02bb3100e50d055def4bed55"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 23944,
+      "sha256": "44155fd183ff5282c01aff2d6e0cb6bec10e59c2d0b14db5106d487d76c7ecdd",
+      "geometrySourceSha256": "d06df1e568f7e517f6d467d832a5ef44464c4204a466ed898d13f98982b4590e"
     },
     {
       "file": "nnc-gx7.jpg",
       "inventoryIds": [
         "N03"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 22994,
-      "sha256": "e4c06af1cebe979fba67ed36a51265a261d8c373f07aadd9d0650ee4ca1c00ab"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 23944,
+      "sha256": "e52a0bdd2db7e45711040a3d6c38c9e92c728907274937d50e9d0fcb2b864a15",
+      "geometrySourceSha256": "2c3499062e105f4c619cbc06d3d2a943433948f82b02eaa683ed09d19801151b"
     },
     {
       "file": "nnc-haze-1dx.jpg",
       "inventoryIds": [
         "N13"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 14101,
-      "sha256": "a563d1b6adc62d489d30f9b29240b9af80213044c30011fb6f855ab8264a34e6"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 14446,
+      "sha256": "527a6ce530595d5e03855cc9a848e985e708c5be3d4256c81f18c7408abaa8ef",
+      "geometrySourceSha256": "527938570ecc88366a6c560525c20e89fc71474eddd4fd5c73ba6520790b6748"
     },
     {
       "file": "nnc-j-six.jpg",
       "inventoryIds": [
         "N11"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 21539,
-      "sha256": "2507c25b4abd83e9e4e85f951c8df74e38e6716146f199651372ef51df3b9911"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 22769,
+      "sha256": "c7018935b71c0aa8bf1ae0e8b38d9f55feb8c3830802beebcbddcb7768a8cfb6",
+      "geometrySourceSha256": "6ffa37800cd774910c80ffd83c9703d5577a60eeaf4092af3d8360619f18e197"
     },
     {
       "file": "nnc-lasercube-2w.jpg",
       "inventoryIds": [
         "N14"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 16349,
-      "sha256": "409ee73d0eaeed1de5e5bbe3a712239d4c6247a88ff8b10710168fb8b77f1a65"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 17313,
+      "sha256": "e85650c1345a91a2f9b822477443cc6dec478ecb5bca55e4c989a8d16d9cb1da",
+      "geometrySourceSha256": "ff6e48ed55ea770a3e45a0d28df5dc58d4db991057cfc2cab4f1a8c3f6a6a65f"
     },
     {
       "file": "nnc-prime-4.jpg",
       "inventoryIds": [
         "N08"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 26086,
-      "sha256": "6ec9e1aa7ceb2200351dd8702c724d1f4c7ef2c9a82750f92751e35ee980b49d"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 27520,
+      "sha256": "a22fbf913a947c312f79654897d39278a2b890b32746dbf420cc61aac0c1b208",
+      "geometrySourceSha256": "ca8fef5817a66bb6df41a5dcb184d3b524d7c1d89c73be13c62e79fc2d701828"
     },
     {
       "file": "nnc-s181.jpg",
       "inventoryIds": [
         "N01"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 12584,
-      "sha256": "41b517daf86e6a023265c2b12d1723e3a022a88580b88b597c92a4dbfe8634d0"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 14230,
+      "sha256": "c2adda7ad563db99f3e82a40a877bd66dc3709cfd4c26acd0bbbd65828757e9c",
+      "geometrySourceSha256": "0bce09d2fb82be179a889cf8b5367a692575ac591e1b1243e0a5d44f039db2ae"
     },
     {
       "file": "nnc-sm58.jpg",
       "inventoryIds": [
         "N16"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 13837,
-      "sha256": "3db43bc7730f2617ec11354c0878911856e5fcac4be58d54f8ae943040986bfe"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 14333,
+      "sha256": "252620f330750bd4fd6d2125454f5a2cc709597d678631f35819644a95c65006",
+      "geometrySourceSha256": "2ab088bd41c95f1417dbe2056e5328731a7c35a882b894b159f01726d188b00d"
     },
     {
       "file": "nnc-tl60.jpg",
       "inventoryIds": [
         "N15"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 7527,
-      "sha256": "b7e5aea992edadb860118e44f891056c242f00ec380b079f2e83298d533b3e49"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 8045,
+      "sha256": "5571bfa66577c42a8ceb408e253be0ef87ea4824eebb5d507eeddc769dd773ab",
+      "geometrySourceSha256": "5ebe5349ccfb62acd9a7e39f395381386c221222f5cec9e52c6f0b58cc11aa4e"
     },
     {
       "file": "nnc-vertigo-tri-led.jpg",
       "inventoryIds": [
         "N12"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 21140,
-      "sha256": "c31e397765e3612c852c253625c912d8237900d2c69d9cdd884c85179254cd5c"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 21916,
+      "sha256": "9bab68d745ed8fa93ad4a18d0b50e23cdacfdceae0cacdcf4ead97d809efbf64",
+      "geometrySourceSha256": "4fc8a008e9d6b3fb996ca55e6f2ae56e5dda2c0fb04e4e09bcdaabc8e1a3c659"
     },
     {
       "file": "nnc-xdj-xz.jpg",
       "inventoryIds": [
         "N07"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 26421,
-      "sha256": "f5811b324a7701fa39a47c0d43ce48630266e9393494510d9b237e316cc1bd4b"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 24750,
+      "sha256": "baf81d073452213dd378b27cf1c8aa02b824b291b52af8946bc0e931948b1e43",
+      "geometrySourceSha256": "8d344d3a383b9b791d08df1a82a33fe378fc90b523e3504ce333570c4644f050"
     },
     {
       "file": "nnc-zlx-15bt.jpg",
       "inventoryIds": [
         "N02"
       ],
-      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 (NNC migration input) rendered with the scripts/capture-nnc-previews.mjs capture on the Equipment Lab stage #e9eae0, light theme, 2026-10-26",
-      "bytes": 11231,
-      "sha256": "5e8032b2754387d96db30611d3a0658aebdcd7a060afb81d9ad776a538ccaa6e"
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 11802,
+      "sha256": "433e673635e622a9f86b1751ebfc930533d2783886f48dac468f8989d8283c08",
+      "geometrySourceSha256": "8fe05db9a3b649e7c690af9493d868d988fdfb71529bcbb74a73bf05bb5384b9"
     },
     {
       "file": "p240.jpg",

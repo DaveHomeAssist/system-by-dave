@@ -109,9 +109,9 @@ derive from catalog role, geometry confidence and viewer link.
 
 Previews in `/equipment-lab/previews/` are renders of approximate models, listed
 with source revision and hash in its `manifest.json`. Ion and the fader wing
-have no render and show a pending state. The sixteen NNC renders come from the
-unmerged NNC migration input; replace them from the approved NNC release before
-treating them as published product imagery. The camera bench captures are
+have no render and show a pending state. The sixteen NNC renders were regenerated from approved No Nonsense source
+`3cfdc6e1c76872336cc217237e29834af834e342` on 6 November 2026, on the
+light Equipment Lab stage. The manifest records each source file hash. The camera bench captures are
 cropped from viewer screenshots and still show a viewer label.
 
 Not yet built: the in-workspace Library presentation, a jump palette and
