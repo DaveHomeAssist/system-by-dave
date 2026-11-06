@@ -19,6 +19,7 @@ import { readStagePlot } from './stage-plot.js';
 import { readVenue, readVenueAsset } from './venue-model.js';
 import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
+import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -47,7 +48,8 @@ const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 've
 const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
 if (SIM) simRig(store.rig);
 const rig = store.rig;
-for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => { store.close(); process.exit(0); });
+let powerSchedules;
+for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => { powerSchedules?.close(); store.close(); process.exit(0); });
 
 const drivers = new Map();   // slot -> driver
 const status = new Map();    // slot -> status
@@ -92,7 +94,7 @@ function snapshot() {
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lensJog?.axes.length, lensJog: d.lensJog, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
     }),
-    presets: rig.presets, events: rig.events.slice(-200),
+    presets: rig.presets, events: rig.events.slice(-200), powerSchedules: powerSchedules?.view(),
   };
 }
 
@@ -187,6 +189,29 @@ async function command(slot, cmd, arg, source = 'ui') {
   if (cmd === 'lens' || cmd === 'input' || cmd === 'picture') { await polling.get(slot); await poll(p); }
   else setTimeout(() => poll(p), 400);
   return { result, status: { ...status.get(slot), connection: connections.get(slot) } };
+}
+
+// Scheduling has separate private persistence and never replays missed occurrences.
+try {
+  powerSchedules = createPowerSchedules({
+    file: path.join(path.dirname(DATA), 'power-schedules.json'),
+    targets: () => rig.projectors.map(p => ({ slot: p.slot, assigned: !!p.ip && Object.hasOwn(LANES, p.lane || ''), identity: createHash('sha256').update(targetIdentity(p) + '|' + (p.lane || '')).digest('hex') })),
+    guard: (slot, action) => {
+      const p = store.projector(slot), st = status.get(slot), connection = connections.get(slot);
+      return scheduledPowerGuard({ assigned: !!p?.ip && Object.hasOwn(LANES, p?.lane || ''), online: !!st?.online && connection?.state === 'online', lastReplyAt: connection?.lastSuccessAt, busy: busy.has(slot), lock: rig.lock, power: st?.power }, action, Date.now(), Math.max(15000, POLL_MS * 3));
+    },
+    dispatch: async (slot, action) => {
+      try { return await command(slot, 'power', action === 'on', 'schedule'); }
+      catch (error) { throw new Error(connectionError(store.projector(slot) || {}, error)); }
+    },
+    changed: schedules => broadcast({ type: 'powerSchedules', schedules }),
+  });
+  powerSchedules.start();
+} catch {
+  const unavailable = { engine: { state: 'unavailable', reason: 'Saved power schedules are unreadable. Restore a valid power-schedules.json; controller access is still available.' }, timeZone: 'America/New_York', schedules: [], audit: [] };
+  const blocked = () => { throw httpErr(503, unavailable.engine.reason); };
+  powerSchedules = { view: () => unavailable, save: blocked, enable: blocked, remove: blocked, close() {} };
+  console.error('[schedules] Saved power schedules unavailable; scheduling disabled, controller remains available.');
 }
 
 async function uiCommand(slot, cmd, arg, confirm) {
@@ -348,6 +373,11 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(302, { location: '/login.html' }); return res.end();
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
+    if (url.pathname === '/api/power-schedules' && req.method === 'GET') return json(res, 200, powerSchedules.view());
+    if (url.pathname === '/api/power-schedules/save' && req.method === 'POST') return json(res, 200, powerSchedules.save(await body(req)));
+    if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
+    if (url.pathname === '/api/power-schedules/delete' && req.method === 'POST') { const { id } = await body(req); return json(res, 200, powerSchedules.remove(id)); }
+
     if (url.pathname === '/api/display-info' && req.method === 'GET') {
       const p = store.projector(url.searchParams.get('slot'));
       if (!p) throw httpErr(404, 'no slot');
