@@ -48,3 +48,20 @@ PJLink reports unsupported with empty axes/speeds, even though its driver expose
 a method that throws NotSupported. The legacy `capabilities.lens` flag follows
 these implemented jog axes. Metadata does not establish current motor availability;
 connection, busy, lock and command/readback guards still apply.
+
+
+Selecting an assigned projector opens its lens workspace. Fine/Normal/Coarse
+select the supported native increments or jog speeds; they are not a duration or
+an absolute distance. Arrow keys affect shift only after explicit Enable arrow
+keys and while the dedicated keyboard area has focus. One press sends one jog;
+auto-repeat is ignored. Release requests Stop only when supported and a move is
+pending. Escape, blur, hidden page, target changes, disconnection, offline state
+or Show Lock disarm keyboard control. Ordinary edits elsewhere do not move a lens.
+Panasonic exposes no Stop button because that driver implements native jogs only.
+
+Button acknowledgement describes the command response, never an optimistic power,
+shutter or lens state. A fresh confirmed shutter reading exposes its opposite
+action only; unknown/stale/offline telemetry retains both explicit choices with
+existing guards. Group shutter choices remain explicit. Saving/recalling from the
+lens panel is a **rig preset** action: review its summary and explicitly confirm
+all involved targets, rather than assuming it moves only the selected projector.
