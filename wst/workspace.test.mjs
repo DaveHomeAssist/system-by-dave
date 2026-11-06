@@ -28,6 +28,21 @@ test('storage failure retains editor contents, explains recovery, and allows exp
   assert.equal(app.links[0].clicked, true); assert.match(app.links[0].download, /^frozen-personal-notes-.*\.txt$/);
   assert.equal(app.elements['#notes'].value, 'Unsaved note');
 });
+test('snow splash stays same-origin and keeps the home routes', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const splash = readFileSync(new URL('./snow-splash.js', import.meta.url), 'utf8');
+  assert.match(html, /script-src 'self'/);
+  assert.match(html, /style-src 'self'/);
+  assert.match(html, /vendor\/gsap\.min\.js/);
+  assert.match(html, /snow-splash\.css/);
+  assert.match(html, /snow-splash\.js/);
+  assert.match(html, /id="home-title"/);
+  assert.match(html, /id="snow"[^>]*aria-hidden="true"/);
+  for (const route of ['notes', 'rig', 'stage', 'throw']) assert.match(html, new RegExp('data-route="' + route + '"'));
+  assert.doesNotMatch(html, /jsdelivr|cdn\.|<style|unsafe-inline|unsafe-eval/);
+  assert.doesNotMatch(splash, /https?:\/\//);
+  assert.match(readFileSync(new URL('./vendor/gsap.min.js', import.meta.url), 'utf8'), /3\.15\.0/);
+});
 test('theme preference toggles without touching personal notes', () => {
   const app = boot({ initial: 'Keep me' }); app.elements['#theme'].listeners.click();
   assert.equal(app.context.document.documentElement.dataset.theme, 'dark');
