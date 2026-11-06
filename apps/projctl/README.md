@@ -285,3 +285,17 @@ explicitly connected private controller. It checks the controller's advertised
 view capabilities, so an older controller cannot falsely show a requested pane.
 Browser local-network permission and the actual theatre endpoint still require
 verification; no private controller is hosted or exposed publicly by this UI.
+
+## Operator multiview and power scheduling
+
+My Projector Rig keeps A-D summaries visible while one selected projector owns the
+lens/control dock. Current feedback, other-lane alarms and explicit command
+acknowledgements remain separate. Secondary power/input/picture and reference
+information are in disclosures; unassigned A never receives an implicit device.
+
+Configuration includes [power scheduling](docs/power-scheduling.md): explicit
+America/New_York days/time and fixed assigned targets, disabled saves/edits and a
+separate Enable action. Nothing runs on save or page load, no show times are
+supplied, and startup/sleep/missed occurrences are skipped without catch-up.
+Read live status and per-target audit; acknowledgement does not prove actual
+power state. Studio startup, network and physical acceptance remain separate.
