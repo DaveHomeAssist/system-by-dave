@@ -6,7 +6,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
   for(const[width,height]of[[1440,900],[375,812]]){
    const page=await browser.newPage({viewport:{width,height}}),errors=[],writes=[];
    page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(['POST','PUT','PATCH','DELETE'].includes(r.method()))writes.push(r.url());});
-   await page.routeWebSocket('**/ws',ws=>ws.send(JSON.stringify(snapshot)));
+   let relaySocket;await page.routeWebSocket('**/ws',ws=>{relaySocket=ws;ws.send(JSON.stringify(snapshot));});
    await page.route('https://avbydave.com/ProjectorThrow/**',r=>r.fulfill({contentType:'text/html',body:'<h1>Canonical Throwline test fixture</h1><label>Distance<input value="38.5"></label>'}));
    await page.goto(relay.base);await page.locator('#tab-home.on').waitFor();
    assert.deepEqual(await page.locator('[data-primary-nav]').evaluateAll(nodes=>nodes.map(n=>n.childNodes[0].textContent.trim())),['My Projector Rig','3D Stage View','Presets','Log','Configuration','Throw Calc']);
@@ -20,6 +20,9 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
    await page.locator('#tab-btn-info').click();await page.locator('[data-reference-view="catalog"]').click();await page.locator('.fr-search input').fill('ET-DLE150');
    assert.match(await page.locator('[data-catalog-count]').innerText(),/^1 documented/);assert.match(await page.locator('[data-catalog-results]').innerText(),/1.36–1.98/);
    await page.locator('[data-reference-view="flow"]').click();assert.match(await page.locator('#reference-view').innerText(),/Patch and transport unknown/);
+   const relayNode=page.locator('[data-flow-relay]');assert.equal(await relayNode.getAttribute('data-status'),'verified');
+   const originalRelay=await relayNode.elementHandle();relaySocket.close();await relayNode.filter({hasText:'Live relay status unavailable'}).waitFor();assert.equal(await relayNode.getAttribute('data-status'),'unknown');
+   await relayNode.filter({hasText:'Connected now'}).waitFor();assert.equal(await relayNode.getAttribute('data-status'),'verified');assert.equal(await relayNode.evaluate((node,old)=>node===old,originalRelay),true,'connection updates keep the open flow view in place');
    await page.locator('.fr-flow-node[data-open-lane="B"]').click();assert.match(await page.locator('#projector-detail-title').innerText(),/^B/);
    await page.locator('#tab-btn-throw').click();assert.equal(await page.locator('#throw-calc-frame').getAttribute('src'),'https://avbydave.com/ProjectorThrow/');await page.frameLocator('#throw-calc-frame').getByRole('heading').waitFor();
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight));
