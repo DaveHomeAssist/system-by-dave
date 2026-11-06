@@ -139,19 +139,48 @@ function renderGrid() {
   if (focusKey) [...g.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === focusKey)?.focus({ preventScroll: true });
 }
 function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); return p && laneOf(p) ? `${slot} · ${p.lane} / ${laneOf(p).target}` : slot; }
+const presetResults = new Map();
+function lensText(p, want) {
+  const saved = want.lens || {};
+  const entries = Object.entries(saved).map(([k, v]) => `${k === 'h' ? 'H' : k === 'v' ? 'V' : k[0].toUpperCase() + k.slice(1)} ${v}`);
+  if (p?.driver === 'panasonic') return [...entries, 'lens recall unverified / not stored'].join(' · ');
+  if (p?.driver === 'pjlink' || !p?.capabilities?.lensRecall) return [...entries, 'absolute lens recall not stored'].join(' · ');
+  return entries.join(' · ') || 'no absolute lens position reported';
+}
+function presetOutcome(slot, info) {
+  if (typeof info === 'string') return info;
+  if (!info) return '';
+  const positions = Object.entries(info.position || {}).map(([axis, result]) => `${axis}: ${result}`).join(', ');
+  const unsupported = info.unsupported?.length ? `unverified / not recalled: ${info.unsupported.join(', ')}` : '';
+  return `${info.result || ''}${positions ? ` · ${positions}` : ''}${unsupported ? ` · ${unsupported}` : ''}`;
+}
 function renderPresets() {
   const el = $('#presets'); el.innerHTML = '';
   if (!state.presets.length) el.innerHTML = '<p class="pj-mono">No presets yet. Set the rig how you want it, name it, save.</p>';
   for (const pr of state.presets) {
-    const d = document.createElement('div'); d.className = 'pj-item';
-    const sum = Object.entries(pr.perSlot).map(([k, v]) => `${slotName(k)}: ${v.power ? 'on' : 'off'}, ${v.shutter}, ${v.input ?? ''}`).join(' · ');
-    d.innerHTML = `<span class="name">${esc(pr.name)}</span><button class="avd-btn" data-r type="button">Recall, tap twice</button><button class="avd-btn avd-btn--danger" data-d type="button">Remove preset</button><span class="sum pj-mono">${esc(sum)}</span>`;
-    let armed = 0;
-    d.querySelector('[data-r]').onclick = () => { if (Date.now() - armed > 3000) { armed = Date.now(); toast(`Tap again within 3 s to recall ${pr.name}`); return; } armed = 0; api('preset/recall', { name: pr.name }).then((r) => toast(Object.entries(r).map(([k, v]) => `${k} ${v}`).join(' · '), 3500)).catch((e) => toast(e.message)); };
-    d.querySelector('[data-d]').onclick = () => api('preset/delete', { name: pr.name }).catch((e) => toast(e.message));
+    const d = document.createElement('div'); d.className = 'pj-item'; d.dataset.preset = pr.name;
+    const sum = Object.entries(pr.perSlot).map(([slot, want]) => {
+      const p = state.projectors.find((x) => x.slot === slot);
+      return `<span class="pj-preset-slot"><strong>${esc(slotName(slot))}</strong>: ${want.power ? 'on' : 'off'}, ${esc(want.shutter)}, ${esc(want.input ?? '')}<br><span class="pj-lens-data">${esc(lensText(p, want))}</span></span>`;
+    }).join('');
+    const output = presetResults.get(pr.name);
+    d.innerHTML = `<span class="name">${esc(pr.name)}</span><button class="avd-btn" data-r type="button">Recall</button><button class="avd-btn avd-btn--danger" data-d type="button">Remove preset</button><span class="sum pj-mono">${sum}</span><p class="pj-mono pj-note pj-fill">Absolute lens presets use Pulse readbacks or simulator positions. Panasonic: lens recall unverified / not stored. A re-hang still needs alignment and focus checked.</p><p class="pj-mono pj-preset-result" role="status">${esc(output ? Object.entries(output.projectors || output).map(([slot, v]) => `${slot}: ${presetOutcome(slot, v)}`).join(' · ') : '')}</p>`;
+    let armed = 0, token = null;
+    d.querySelector('[data-r]').onclick = async () => {
+      try {
+        const hasLens = Object.values(pr.perSlot).some((want) => want.lens && Object.keys(want.lens).length);
+        if (!hasLens && Date.now() - armed > 3000) { armed = Date.now(); toast(`Tap again within 3 s to recall ${pr.name}`); return; }
+        const response = await api('preset/recall', { name: pr.name, confirmLens: token });
+        if (hasLens && response.confirm) { token = response.confirm; presetResults.set(pr.name, response); renderPresets(); toast(response.message, 6000); return; }
+        token = null; armed = 0; presetResults.set(pr.name, response); renderPresets();
+        toast(hasLens ? `${pr.name}: check every reported position; alignment and focus still require a real-rig check.` : Object.entries(response).map(([k, v]) => `${k} ${v}`).join(' · '), 6000);
+      } catch (e) { toast(e.message, 6000); }
+    };
+    d.querySelector('[data-d]').onclick = () => api('preset/delete', { name: pr.name }).then(() => presetResults.delete(pr.name)).catch((e) => toast(e.message));
     el.appendChild(d);
   }
 }
+
 function renderLog() {
   const tb = $('#log tbody'); tb.innerHTML = '';
   const query = $('#log-search').value.toLowerCase();

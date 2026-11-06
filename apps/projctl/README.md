@@ -11,7 +11,7 @@ One relay, one web page, four projectors. Spec: Frozen at WST | Projector Contro
 Open http://<relay-ip>:8080 on any phone or laptop on the same network.
 
 Ports: 8080 HTTP and WebSocket, 9000 OSC (UDP), 9001 text cues (TCP), 4352 PJLink search (UDP, outbound).
-Env overrides: PORT, OSC_PORT, TCP_PORT, POLL_MS, RIG.
+Env overrides: PORT, OSC_PORT, TCP_PORT, POLL_MS, RIG. Set PROJCTL_PASSWORD to require the same password for local LAN and optional remote access; PJ_PASSCODE remains a deprecated alias. With no password, existing open LAN behavior is unchanged. See deploy/wst.housevideo.app.md.
 
 ## First run on the real rig
 
@@ -47,7 +47,7 @@ Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
 Bulk cues try every slot and log failures per projector; an offline first slot does not
 prevent later slots receiving the cue. Power and shutter require an explicit 0 or 1.
 Cues and preset recall retain their deliberate-action behavior without the UI double tap,
-and still obey Show Lock. TCP `OK` acknowledges line receipt only; use the Log and reported
+and still obey Show Lock. Lens-position presets are deliberately confirmed: `/proj/preset/lens/NAME 1` is the explicit local-cue confirmation; ordinary preset paths never move lens motors. TCP `OK` acknowledges line receipt only; use the Log and reported
 tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles remain unsupported.
 
 ## Layout
@@ -105,6 +105,16 @@ They change only the UI shift-button mapping. Focus, zoom, Home, Stop, API direc
 encoder readbacks, cues, presets and drawing geometry retain their existing meaning.
 Check a small movement on the actual installation before selecting a reversal; mounting
 and mirror arrangements differ even between projectors of the same model.
+
+## Lens in presets
+
+Save current rig stores numeric H/V shift, zoom and focus readbacks reported by Pulse and the simulator. Old presets load unchanged and recall using their original power/input/shutter path. In a lens preset, the first Recall action is read-only and lists which controls are unconfirmed/not stored; only the following confirmation moves motors. Show Lock still blocks all movement.
+
+Pulse recall checks power, safe-to-operate, travel limits and two stopped reads per axis, then obtains fresh position telemetry. Every axis is reported `match` (within one encoder count), `mismatch`, or `unknown`; stopped is never synonymous with a matched position. Payloads also report `motors` per axis. The UI keeps those results in the Presets tab. A re-hang still needs physical alignment and focus checked.
+
+The Panasonic driver documents native port 1024 jog-only behavior: **lens recall unverified / not stored**, not an advertised unsupported hardware feature. PJLink is also not stored. Only a driver with absolute target support is a confirmed motor target. Simulator presets support all four axes and tests cover deliberate confirmation, Show Lock, legacy shape classification and stopped-with-mismatch.
+
+For authenticated remote HTTP/WebSocket access through wst.housevideo.app, see [the tunnel deployment guide](deploy/wst.housevideo.app.md). OSC UDP 9000 and TCP 9001 stay theatre-LAN only; never publish those or the projector control ports.
 
 The acceptance scope and remaining physical checks are in [Show readiness](docs/show-readiness.md).
 

@@ -7,7 +7,7 @@
   <key>WorkingDirectory</key><string>__APP__</string>
   <key>EnvironmentVariables</key><dict>
     <key>PORT</key><string>8080</string>
-    <key>PJ_PASSCODE</key><string>__PASSCODE__</string>
+    <key>PROJCTL_PASSWORD</key><string>__PASSCODE__</string>
   </dict>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
