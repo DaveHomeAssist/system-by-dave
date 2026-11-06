@@ -2,8 +2,6 @@
 
 ## 2026-11-06
 
-- Equipment Lab opens on a searchable 43-entry splash library with discipline and collection filters, model previews and an equipment sheet. Existing equipment links keep opening their workspace; the Cartoni reference retains all ten controls. NNC previews use approved source on a lighter stage.
-
 - Report lens verification as unknown when the post-recall status read fails, rather than comparing retained cached positions and showing a false match. Keep rig cards responsive to their actual pane width and contain control labels in narrow views.
 
 - Projctl adds six primary views, dedicated A-D projector details, shared documented gear/catalog/signal-flow references and the canonical Throwline calculator. Forward-integrate guarded Pulse lens preset recall and password aliases, plus cached projector signal and bounded computer-display readouts with explicit unavailable EDID. Preserve managed settings and host assignment; no automatic hardware action.
@@ -16,6 +14,8 @@
 - Projctl Stage adds local what-if optical scenarios using canonical Throwline calculations, with independent lane settings, D lens comparisons, reset to the loaded plot and no hardware/settings writes. Private unregistered venue models remain separate appearance references without planning overlays.
 
 - Projctl adds a supervised macOS runtime and one launcher that waits for relay health, preserving the private rig and app settings during migration. The live controller reports relay availability separately from device reachability, including last success and sanitized failure reasons over WebSocket updates. HDMI is the preferred input with an explicit per-device or all-device reset resolved from supported metadata. Saved-rig read errors now stop safely; settings writes use atomic replacement.
+
+- Equipment Lab opens on a searchable 43-entry splash library with discipline and collection filters, model previews and an equipment sheet. Existing equipment links keep opening their workspace; the Cartoni reference retains all ten controls. NNC previews use approved source on a lighter stage.
 
 ## November 5, 2026: Stable projector order
 
