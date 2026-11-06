@@ -6,3 +6,5 @@
 .fr-projector{background:color-mix(in srgb,var(--fr-lane) 16%,var(--surface));border-color:color-mix(in srgb,var(--fr-lane) 55%,var(--fr-line))}.fr-projector-head{padding-bottom:12px;border-bottom:2px solid var(--fr-lane)}.fr-letter{background:var(--fr-lane);color:#102131;border:0;border-radius:8px;padding:5px 9px}.fr-projector>button{background:var(--surface)}
 :root[data-theme=dark] .fr-projector{background:color-mix(in srgb,var(--fr-lane) 18%,var(--surface))}
 .fr-flow-row>span{pointer-events:none;display:block;justify-self:center;width:20px;height:20px;line-height:20px;text-align:center}
+
+.fr-projector[data-lane="A"]{--fr-lane:#d900dc}.fr-projector[data-lane="B"]{--fr-lane:#00cbd3}.fr-projector[data-lane="C"]{--fr-lane:#f3b600}.fr-projector[data-lane="D"]{--fr-lane:#16b834}
