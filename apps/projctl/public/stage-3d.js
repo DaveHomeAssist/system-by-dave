@@ -97,6 +97,7 @@ export async function createStage3D(host, plot, openLane) {
   let camera = defaultCamera, selectedLane = 'D', framedSideLane = 'D', currentProposal = null;
   const hiddenLanes = new Set();
   const viewVisibility = () => {
+    proposal.visible = camera !== 2 || currentProposal?.lane === framedSideLane;
     for (const [lane, group] of groups) group.visible = !hiddenLanes.has(lane) && (camera !== 2 || lane === framedSideLane);
     labels.forEach((label,lane) => { label.visible = camera === 3 || (camera === 2 && lane === framedSideLane); label.userData.screenPixels = camera === 3 ? 44 : 30; leaders.get(lane).visible = label.visible; });
     projectorGroups.forEach(object => { object.visible = camera !== 0 && object.userData.lane !== currentProposal?.lane && (camera !== 2 || object.userData.lane === framedSideLane); });

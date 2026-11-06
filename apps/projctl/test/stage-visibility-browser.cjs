@@ -78,6 +78,7 @@ const path = require('node:path');
   await page.locator('[data-plan="distance"]').fill('43');await page.locator('[data-plan="distance"]').press('Tab');
   assert.deepEqual(await stage.evaluate(s=>({position:s._camera.position.toArray(),target:s._controls.target.toArray()})),cameraBefore);
   await page.locator('[data-plan-lane="A"]').click();
+  assert.equal(await stage.evaluate(s=>s._object.getObjectByName('Local what-if proposal').visible),false,'a D side view must not show the new A proposal');
   assert.deepEqual(await stage.evaluate(s=>({position:s._camera.position.toArray(),target:s._controls.target.toArray()})),cameraBefore);
   const layers=page.locator('#stage-3d .pj-room-layers');await layers.locator('summary').click();
   const visible= name=>stage.evaluate((s,name)=>{let found; s._object.getObjectByName('Approximate venue reference').traverse(o=>{if((o.userData.name||o.name).replace(/_/g,' ')===name)found=o;});return found?.visible;},name);
