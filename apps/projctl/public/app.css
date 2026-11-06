@@ -193,3 +193,9 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
   .avd-shell__tabs .avd-tabs{display:flex;flex-wrap:nowrap;width:max-content;min-width:100%}
   .avd-shell__tabs .avd-tab{flex:0 0 auto;min-width:110px;max-width:170px;min-height:44px;padding:6px 10px;font-size:10px}
 }
+/* Size rig columns from the available pane, including embedded workspaces. */
+#grid,.pj-unassigned>.pj-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));min-width:0}
+.pj-tile,.pj-detail-controls{min-width:0}
+.pj-tile .avd-btn,.pj-tile .avd-seg__btn,.pj-detail-controls .avd-btn,.pj-detail-controls .avd-seg__btn{white-space:normal;overflow-wrap:anywhere;text-align:center;min-width:0;min-height:44px;height:auto;line-height:18px;padding-block:10px}
+.pj-tile .pj-two .avd-btn,.pj-detail-controls .pj-two .avd-btn{padding-inline:8px}
+.pj-adjust-links .avd-btn{font-size:11px;letter-spacing:.06em}

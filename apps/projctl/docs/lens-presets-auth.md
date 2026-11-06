@@ -18,7 +18,7 @@ and supported/unsupported axes without moving a lens. A second request with
 Show Lock, offline and busy protections still apply. A lens-bearing preset recalls
 lens positions only; legacy presets without stored lens axes retain their prior
 power/input/shutter behavior. Position match, unknown/mismatch and motor-stopped
-feedback are separate results. Re-hanging still requires alignment/focus checks.
+feedback are separate results. A failed post-recall poll reports unknown position/motor feedback; retained last-known values never verify the completed movement. Re-hanging still requires alignment/focus checks.
 
 Compound Pulse recall validates all requested axes and travel limits before its
 first target, rejects invalid axes/values, and requests stop on all involved axes
