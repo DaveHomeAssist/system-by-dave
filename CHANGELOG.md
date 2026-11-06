@@ -2,6 +2,8 @@
 
 ## 2026-11-06
 
+- Combine Notes/tasks, projector reference, Rig and Stage in one controller workspace. Notes remain browser/address-local; shared public tasks retain their separate service. Stage opens directly with the room and recorded projectors, and the public hub can connect an existing private controller in place.
+
 - Projctl combines an opt-in approximate room preview with optical scenarios, roof/wall/balcony/seat controls, visible A-D markers and purposeful Projectors/Coverage/Plan/Selected side cameras while preserving true enclosure sizes, original model/plot data and false calibrated-registration status.
 
 - Add the Frozen workspace with browser-local personal notes, text export, live Eastern date/time and publicly shared D1-backed tasks. Keep projector control private and retain the managed hosting source/deployment receipt.

@@ -21,6 +21,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         if (offline) await relay.api('projector', { slot: 'P1', ip: '' });
         await relay.api('command', { slot: 'all', cmd: 'power', arg: 1 });
         await page.goto(relay.base);
+    await page.locator('[data-tab="rig"]').click();
         await page.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
         const bulk = page.locator('[data-all="power"][data-arg="0"]');
         for (let tap = 0; tap < 2; tap++) {

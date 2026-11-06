@@ -6,7 +6,24 @@ For managed macOS access, use `~/Applications/Open Projctl.command` or
 See [managed service access and recovery](deploy/RUNBOOK.md#managed-macos-access-and-recovery)
 for installation, the one live settings location, logs and backups.
 
-One relay, one web page, four projectors. Spec: Frozen at WST | Projector Control App Spec.
+One workspace contains Notes + tasks, Projector info, Rig and Stage. The controller
+opens Notes + tasks by default; the other tabs stay in the same page. Notes save
+in this browser at this controller address, with text export. Shared team tasks
+use the public Frozen workspace service at https://wst.housevideo.app/; keep
+sensitive content out of that shared list. Private cross-device notes sync is
+not implemented.
+
+Stage opens the room and recorded A-D projectors together when a room model and
+plot are available. Its approximate room alignment is explicitly labeled and
+does not establish physical calibration or clearances. See [Stage planning](docs/stage-planning.md).
+
+The public Frozen workspace can embed an existing private controller after an
+explicit connection. This Mac connects only to a relay running on this Mac;
+crew devices still need a verified theatre controller address. No public relay
+is hosted by the workspace. Enable and verify PJ_PASSCODE on a crew destination
+before wider exposure; the optional app login is absent when it is unset.
+
+Spec: Frozen at WST | Projector Control App Spec.
 
 ## Run
 
