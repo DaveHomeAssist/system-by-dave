@@ -8,7 +8,7 @@
       "orientation": "Portrait",
       "model": "Unassigned",
       "lens": "ET-DLE170 \u00b7 1.80\u20132.54:1 (projection plot record)",
-      "note": "A remains an unassigned live control position. The projection plot specifies Panasonic PT-DW830KU with ET-DLE170; this is the recorded plan, not confirmation of the unit hung here.",
+      "note": "Plotted raster coverage: 12 ft 5 in wide \u00d7 19 ft 11 in tall. A remains an unassigned live control position. The projection plot specifies Panasonic PT-DW830KU with ET-DLE170; this is the recorded plan, not confirmation of the unit hung here.",
       "color": "#c65cba",
       "internalSlot": null,
       "provenance": {
@@ -72,7 +72,7 @@
       "likelyLensSource": "https://app.notion.com/p/3fc255fc8f44811e8a5eeddcb236df1e?pvs=204",
       "reviewPlan": "Adam reviews Friday morning, November 6; choose and implement the change in time for Saturday morning, November 7. Confirm installed lens label, current zoom and portrait-up shift stop. Check the 38\u201339 ft lens throw, 20 ft-tall portrait raster and requested 3\u20134 ft upward coverage. Consider a roughly 26 ft raster with 20 ft content positioned high in Resolume (nominal ratio 1.46\u20131.50:1). Verify cove beam clearance and surface coverage first; brightness and resolution are secondary.",
       "recordSource": "https://app.notion.com/p/3fc255fc8f44811e8a5eeddcb236df1e?pvs=204",
-      "plotDimensions": "12 ft 5 in wide \u00d7 19 ft 11 in tall (recorded plot)"
+      "plotDimensions": "12 ft 5 in wide \u00d7 19 ft 11 in tall (plotted raster coverage)"
     }
   ]
 }
