@@ -4,6 +4,7 @@
 // Sources, picture ranges and motor state are discovered from the connected projector.
 import net from 'node:net';
 import { POWER, SHUTTER } from './base.js';
+import { abortable, throwIfAborted, transportFailure } from './transport.js';
 
 // Internal test patterns on the UDM 4K22 (image.testpattern.list, WST unit 2026-11-02). Code = pattern id.
 export const PULSE_PATTERNS = {
@@ -22,26 +23,31 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
   const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   // One call at a time per projector: the poll's string of gets and a UI command otherwise race for the socket and the loser times out.
   let chain = Promise.resolve();
-  function rpc(method, params, callTimeoutMs = timeoutMs, guard) {
-    const run = () => { guard?.(); return rpcOnce(method, params, callTimeoutMs, guard); };
-    const p = chain.then(run, run); chain = p.catch(() => {}); return p;
+  function rpc(method, params, callTimeoutMs = timeoutMs, guard, signal) {
+    const run = () => { throwIfAborted(signal); guard?.(); return rpcOnce(method, params, callTimeoutMs, guard, signal); };
+    const p = chain.then(run, run); chain = p.catch(() => {}); return abortable(p, signal);
   }
-  function rpcOnce(method, params, callTimeoutMs, guard) {
+  function rpcOnce(method, params, callTimeoutMs, guard, signal) {
+    throwIfAborted(signal);
     return new Promise((resolve, reject) => {
       const sock = net.createConnection({ host, port });
       let buf = '', done = false;
-      const fail = (e) => { if (!done) { done = true; clearTimeout(t); sock.destroy(); reject(e); } };
+      const cleanup = () => { clearTimeout(t); signal?.removeEventListener('abort', abort); };
+      const fail = (e) => { if (!done) { done = true; cleanup(); sock.destroy(); reject(e); } };
+      const abort = () => fail(signal.reason || new Error('Projector poll cancelled'));
       const t = setTimeout(() => fail(new Error('timeout')), callTimeoutMs);
+      signal?.addEventListener('abort', abort, { once: true });
       const req = { jsonrpc: '2.0', id: ++id, method };
       if (params !== undefined) req.params = params;
       sock.on('error', fail);
       sock.on('end', () => fail(new Error('connection closed before Pulse reply')));
-      sock.on('connect', () => { try { guard?.(); sock.write(JSON.stringify(req) + '\n'); } catch (error) { fail(error); } });
+      sock.on('close', () => fail(new Error('connection closed before Pulse reply')));
+      sock.on('connect', () => { try { throwIfAborted(signal); guard?.(); sock.write(JSON.stringify(req) + '\n'); } catch (error) { fail(error); } });
       sock.on('data', (d) => {
         buf += d.toString();
         // The UDM answers with one JSON object and no newline (seen on the WST unit 2026-11-02): parse when it is complete.
         let res; try { res = JSON.parse(buf); } catch { return; }
-        clearTimeout(t); done = true; sock.end();
+        cleanup(); done = true; sock.end();
         if (res.error) reject(Object.assign(new Error(res.error.message || 'rpc error'), { code: res.error.code }));
         else resolve(res.result);
       });
@@ -49,15 +55,15 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
   }
   const get = (property) => rpc('property.get', { property });
   const set = (property, value) => rpc('property.set', { property, value });
-  async function discover() {
+  async function discover(signal) {
     if (Date.now() - refreshed < 60000) return;
     // Missing optional capabilities must not hide a reachable projector.
     try {
-      const list = await rpc('image.source.list');
+      const list = await rpc('image.source.list', undefined, timeoutMs, undefined, signal);
       if (Array.isArray(list)) sources = Object.fromEntries(list.filter((v) => typeof v === 'string').map((v) => [v, v]));
-    } catch { sources = {}; }
+    } catch (e) { throwIfAborted(signal); if (signal && transportFailure(e)) throw e; sources = {}; }
     try {
-      const image = await rpc('introspect', { object: 'image', recursive: false });
+      const image = await rpc('introspect', { object: 'image', recursive: false }, timeoutMs, undefined, signal);
       pictureSchema = {};
       for (const [key, property] of Object.entries(pictureProperties)) {
         const meta = image.properties?.find((p) => p.name === property && p.access === 'READ_WRITE');
@@ -65,7 +71,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
         if (!t || !Number.isFinite(t.min) || !Number.isFinite(t.max)) continue;
         pictureSchema[key] = { label: { color: 'Colour saturation', intensity: 'Intensity' }[key] || key[0].toUpperCase() + key.slice(1), type: 'range', min: t.min, max: t.max, step: t.base === 'int' ? 1 : t.precision || 0.01 };
       }
-    } catch { pictureSchema = {}; }
+    } catch (e) { throwIfAborted(signal); if (signal && transportFailure(e)) throw e; pictureSchema = {}; }
     refreshed = Date.now();
   }
   async function waitStopped(selected, checkMove) {
@@ -87,11 +93,11 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       throw new Error(`${e.message}; stop requested. Check the projector before retrying.`);
     }
   }
-  async function lensReadback() {
+  async function lensReadback(signal) {
     const out = {};
     for (const [key, axis] of Object.entries(axes)) {
-      try { out[key] = await get(axis + '.position'); } catch { out[key] = null; }
-      try { out[key + 'State'] = await get(axis + '.state'); } catch { out[key + 'State'] = null; }
+      try { out[key] = await rpc('property.get', { property: axis + '.position' }, timeoutMs, undefined, signal); } catch (e) { throwIfAborted(signal); if (signal && transportFailure(e)) throw e; out[key] = null; }
+      try { out[key + 'State'] = await rpc('property.get', { property: axis + '.state' }, timeoutMs, undefined, signal); } catch (e) { throwIfAborted(signal); if (signal && transportFailure(e)) throw e; out[key + 'State'] = null; }
     }
     return out;
   }
@@ -131,19 +137,22 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       if (!PULSE_PATTERNS[code]) throw new Error(`pattern ${code} not on this projector`);
       await set('image.testpattern.selected', code); await set('image.testpattern.show', true); return 'OK';
     },
-    async getStatus() {
+    async getStatus({ signal } = {}) {
       // A successful core query proves liveness. Optional properties may be
       // unsupported, but total transport failure must reach the relay's offline policy.
-      const s = { online: true, power: mapPower(await get('system.state')) };
-      await discover();
+      const read = (property) => rpc('property.get', { property }, timeoutMs, undefined, signal);
+      const optional = async (fn, fallback) => { try { return await fn(); } catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; return fallback; } };
+      const s = { online: true, power: mapPower(await read('system.state')) };
+      await discover(signal);
       s.errors = null; // Pulse alarm telemetry is not implemented; unknown is not clear.
-      try { const sh = String(await get('optics.shutter.target')).toLowerCase(); s.shutter = sh === 'closed' ? SHUTTER.CLOSED : sh === 'open' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; } catch { s.shutter = SHUTTER.UNKNOWN; }
-      try { s.input = String(await get(inputProperty)); } catch { s.input = null; }
-      try { s.lightHours = Math.round(Number(await get('statistics.laserruntime.value')) / 3600); } catch {} // seconds on the UDM
-      try { s.name = String(await get('system.name')); } catch {}
-      try { s.pattern = (await get('image.testpattern.show')) ? String(await get('image.testpattern.selected')) : 'off'; } catch { s.pattern = null; }
-      try { s.lens = await lensReadback(); } catch { s.lens = null; }
-      try { s.signal = await get('image.window.main.activesignal'); } catch { s.signal = null; }
+      s.shutter = await optional(async () => { const sh = String(await read('optics.shutter.target')).toLowerCase(); return sh === 'closed' ? SHUTTER.CLOSED : sh === 'open' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; }, SHUTTER.UNKNOWN);
+      s.input = await optional(async () => String(await read(inputProperty)), null);
+      s.lightHours = await optional(async () => Math.round(Number(await read('statistics.laserruntime.value')) / 3600));
+      s.name = await optional(async () => String(await read('system.name')));
+      s.pattern = await optional(async () => (await read('image.testpattern.show')) ? String(await read('image.testpattern.selected')) : 'off', null);
+      s.lens = await optional(() => lensReadback(signal), null);
+      s.signal = await optional(() => read('image.window.main.activesignal'), null);
+      throwIfAborted(signal);
       return s;
     },
     power: (on, { guard } = {}) => rpc(on ? 'system.poweron' : 'system.poweroff', undefined, timeoutMs, guard).then(() => 'OK'),

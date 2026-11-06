@@ -30,17 +30,20 @@ test('WebSocket carries unassigned, failed and recovered telemetry without page 
   await r.api('projector', { slot: 'P1', ip: 'sim' });
   await until(() => messages.some(m => m.slot === 'P1' && m.status?.connection?.state === 'online'));
   await r.api('sim', { slot: 'P1', offline: true });
-  await until(() => messages.some(m => m.slot === 'P1' && m.status?.connection?.state === 'unreachable'));
-  const firstFailure = messages.find(m => m.slot === 'P1' && m.status?.connection?.state === 'unreachable').status;
+  await until(() => messages.some(m => m.slot === 'P1' && m.status?.connection?.state === 'reconnecting'));
+  const firstFailure = messages.find(m => m.slot === 'P1' && m.status?.connection?.state === 'reconnecting').status;
   assert.equal(firstFailure.online, false);
   const failed = firstFailure.connection;
   assert.equal(failed.consecutiveFailures, 1);
   assert.ok(failed.error); assert.ok(failed.lastAttemptAt); assert.ok(failed.lastSuccessAt);
+  assert.ok(Date.parse(failed.nextRetryAt) > Date.parse(failed.lastFailureAt));
+  assert.ok(failed.retryDelayMs > 0);
   assert.equal((await r.api('health')).body.ok, true);
   messages.length = 0;
   await r.api('sim', { slot: 'P1', offline: false });
   await until(() => messages.some(m => m.slot === 'P1' && m.status?.connection?.state === 'online'));
   assert.equal(messages.find(m => m.slot === 'P1' && m.status?.connection?.state === 'online').status.connection.error, null);
+  assert.equal(messages.find(m => m.slot === 'P1' && m.status?.connection?.state === 'online').status.connection.retryDelayMs, 0);
 });
 
 test('unreadable or corrupt saved rig never becomes the default rig; writes replace atomically', t => {

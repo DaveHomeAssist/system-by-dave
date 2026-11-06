@@ -7,6 +7,7 @@
 import net from 'node:net';
 import { createHash } from 'node:crypto';
 import { pjlinkDriver } from './pjlink.js';
+import { throwIfAborted } from './transport.js';
 
 // Test pattern codes (OTS / QTS), PT-DW830 spec section 2.8.
 export const PATTERNS = {
@@ -52,13 +53,19 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
   const pj = pjlinkDriver({ host, password, ...rest, port: 4352 });
   const patterns = patternsFor(model);
 
-  function native(cmd) {
+  function native(cmd, { signal } = {}) {
+    throwIfAborted(signal);
     return new Promise((resolve, reject) => {
       const sock = net.createConnection({ host, port });
       let buf = '', prefix = null, done = false;
-      const fail = (e) => { if (!done) { done = true; sock.destroy(); reject(e); } };
+      const cleanup = () => { clearTimeout(t); signal?.removeEventListener('abort', abort); };
+      const fail = (e) => { if (!done) { done = true; cleanup(); sock.destroy(); reject(e); } };
+      const abort = () => fail(signal.reason || new Error('Projector poll cancelled'));
       const t = setTimeout(() => fail(new Error('timeout (port 1024)')), timeoutMs);
+      signal?.addEventListener('abort', abort, { once: true });
       sock.on('error', fail);
+      sock.on('end', () => fail(new Error('connection closed before Panasonic reply')));
+      sock.on('close', () => fail(new Error('connection closed before Panasonic reply')));
       sock.on('data', (d) => {
         buf += d.toString('latin1');
         let idx;
@@ -67,9 +74,9 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
           if (prefix === null) {
             if (!line.startsWith('NTCONTROL ')) return fail(new Error('not Panasonic network control: ' + line));
             prefix = line[10] === '1' ? createHash('md5').update(`${user}:${password}:${line.slice(12, 20)}`).digest('hex') : '';
-            sock.write(prefix + '00' + cmd + '\r');
+            try { throwIfAborted(signal); sock.write(prefix + '00' + cmd + '\r'); } catch (e) { return fail(e); }
           } else {
-            clearTimeout(t); done = true; sock.end();
+            cleanup(); done = true; sock.end();
             const body = line.replace(/^00/, '');
             if (body === 'ERRA') return reject(new Error('auth failed: admin user/password wrong (Setup tab)'));
             if (body.startsWith('ER401')) return reject(Object.assign(new Error('projector refuses this now (no signal, wrong state, or unsupported)'), { code: 'ER401' }));
@@ -88,9 +95,10 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'native-jog', stop: false, positionReadback: false },
     lensControls: { h: false, v: false, focus: false, zoom: false },
     patterns,
-    async getStatus() {
-      const s = await pj.getStatus();
-      try { s.pattern = await native('QTS'); } catch { s.pattern = null; }
+    async getStatus({ signal } = {}) {
+      const s = await pj.getStatus({ signal });
+      try { s.pattern = await native('QTS', { signal }); } catch { throwIfAborted(signal); s.pattern = null; }
+      throwIfAborted(signal);
       return s;
     },
     async pattern(code) {

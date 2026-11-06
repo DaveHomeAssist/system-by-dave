@@ -7,6 +7,8 @@
 
 ## 2026-11-06
 
+- Reconnect saved projector targets with bounded cancellable polls and independent retry delays. Keep stale telemetry visibly last known, restore controls only after fresh feedback, and stop background discovery from changing saved IPs. Manual discovery reports its limits/errors and refuses ambiguous identity updates; reconnect never replays hardware commands.
+
 - Keep all four projector summaries visible above one selected control/lens dock, with live alarms, compact desktop framing and accessible phone flow. Add explicit Eastern power scheduling with disabled saves/edits, separate activation, fixed target identities, next-run/status/audit and durable no-replay occurrence handling. No show times or active schedules are supplied.
 
 - Redirect the portfolio Pages copies of Frozen home/Stage to the working managed WST origin while preserving its same-origin viewer bundle.
