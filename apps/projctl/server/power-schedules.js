@@ -139,21 +139,21 @@ export function createPowerSchedules({ file, targets, dispatch, guard, now = Dat
         if (entry) work.push({ s: structuredClone(s), due, entry }); else audit(s, 'skipped', { dueAt: iso(due), reason: 'Occurrence already claimed; no duplicate firing.' });
       }
       state.lastEvaluatedAt = iso(at); if (work.length || at - lastPersistedAt >= 30000) persist(); // Claims/checkpoint are durable before dispatch; idle writes are bounded.
-      for (const { s, due, entry } of work) {
-        for (const target of s.targets) {
+      await Promise.all(work.map(async ({ s, due, entry }) => {
+        await Promise.all(s.targets.map(async target => {
           const assertSafe = () => {
             const currentSchedule = state.schedules.find(item => item.id === s.id);
-            const reason = !currentSchedule?.enabled || currentSchedule.revision !== s.revision ? 'Schedule changed, disabled or deleted before dispatch.' : now() - due > maxGapMs ? 'Occurrence is now overdue; skipped without replay.' : !targets().some(p => p.slot === target.slot && p.assigned && p.identity === target.identity) ? 'Projector configuration changed.' : guard(target.slot, s.action);
+            const reason = closed ? 'Scheduling stopped before dispatch.' : !currentSchedule?.enabled || currentSchedule.revision !== s.revision ? 'Schedule changed, disabled or deleted before dispatch.' : now() - due > maxGapMs ? 'Occurrence is now overdue; skipped without replay.' : !targets().some(p => p.slot === target.slot && p.assigned && p.identity === target.identity) ? 'Projector configuration changed.' : guard(target.slot, s.action);
             if (reason) throw Object.assign(new Error(reason), { scheduleSkip: true });
           };
           try { assertSafe(); await dispatch(target.slot, s.action, assertSafe); entry.targets[target.slot] = { status: 'acknowledged' }; }
           catch (error) { entry.targets[target.slot] = { status: error.scheduleSkip ? 'skipped' : 'failed', reason: String(error.message || 'Command failed').slice(0, 240) }; }
-          persist();
-        }
+          persist(); notify();
+        }));
         const outcomes = Object.values(entry.targets).map(t => t.status);
         entry.status = outcomes.every(s => s === 'acknowledged') ? 'acknowledged' : outcomes.every(s => s === 'skipped') ? 'skipped' : outcomes.every(s => s === 'failed') ? 'failed' : 'partial';
         entry.completedAt = iso(now()); persist(); notify();
-      }
+      }));
     } finally { inFlight = false; }
   }
   return { view, save, enable, remove, tick, start() { if (!timer) timer = setInterval(() => tick().catch(() => { clearInterval(timer); timer = null; closed = true; engineError = 'Power scheduling stopped after a storage or execution error. No automatic retry.'; changed(view()); }), 1000).unref(); }, close() { if (closed) return; closed = true; clearInterval(timer); timer = null; try { persist(); } catch { /* Claims are already durable; startup never catches up missed runs. */ } } };

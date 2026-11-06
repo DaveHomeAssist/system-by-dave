@@ -76,3 +76,13 @@ test('a queued dispatch rechecks deadline and explicit disable before its write'
   const engine = createPowerSchedules(options); t.after(() => engine.close()); engine.save(schedule); engine.enable(engine.view().schedules[0].id, true); h.set('2026-11-06T17:00:00Z'); await engine.tick();
   assert.equal(h.sent.length, 0); assert.ok(queuedGuard); assert.equal(engine.view().schedules[0].lastRun.status, 'skipped'); assert.match(engine.view().schedules[0].lastRun.targets.P1.reason, /overdue/);
 });
+
+
+test('a slow projector reply cannot hold independent healthy targets past their deadline', async t => {
+  const h = harness(t); let releaseSlow, fastStarted;
+  const fast = new Promise(resolve => { fastStarted = resolve; });
+  const options = { ...h.options, targets: () => [{slot:'P1',assigned:true,identity:'slow'},{slot:'P2',assigned:true,identity:'healthy'}], dispatch: async (slot, action, guard) => { guard(); if(slot==='P1') await new Promise(resolve => { releaseSlow=resolve; }); h.sent.push([slot,action]); if(slot==='P2')fastStarted(); } };
+  const engine=createPowerSchedules(options);t.after(()=>engine.close());engine.save({...schedule,slots:['P1','P2']});engine.enable(engine.view().schedules[0].id,true);h.set('2026-11-06T17:00:00Z');
+  const pending=engine.tick();await fast;assert.deepEqual(h.sent,[['P2','off']]);assert.ok(releaseSlow,'slow reply is still pending');h.set('2026-11-06T17:00:05Z');releaseSlow();await pending;
+  assert.equal(engine.view().schedules[0].lastRun.targets.P2.status,'acknowledged');assert.equal(h.sent.length,2);
+});
