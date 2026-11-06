@@ -162,6 +162,11 @@ that legacy relay first. See the runbook for the recommended managed migration.
 
 ## Preferred input
 
+Saved projector addresses recover automatically after a connection interruption,
+without scanning for a different unit or replaying controls. See
+[reconnection and manual-discovery behavior](docs/reconnection.md) for retry
+timing, stale feedback and safe acceptance checks.
+
 HDMI is the preferred input for every device and future lane assignment.
 **Reset to HDMI** is an explicit operator action, not an automatic action on
 startup or reconnect. Current input readback remains separate from that target.

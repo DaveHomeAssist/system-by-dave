@@ -20,6 +20,8 @@ import { readVenue, readVenueAsset } from './venue-model.js';
 import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
+import { createPoller } from './polling.js';
+import { createManualDiscovery } from './discovery.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -48,18 +50,16 @@ const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 've
 const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
 if (SIM) simRig(store.rig);
 const rig = store.rig;
-let powerSchedules;
-for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => { powerSchedules?.close(); store.close(); process.exit(0); });
+let powerSchedules, poller;
+for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => { poller?.close(); powerSchedules?.close(); store.close(); process.exit(0); });
 
 const drivers = new Map();   // slot -> driver
 const status = new Map();    // slot -> status
-const polling = new Map();
 const busy = new Map();
 const connections = new Map();
-const missed = new Map();    // slot -> consecutive poll failures
 for (const p of rig.projectors) {
-  status.set(p.slot, emptyStatus()); missed.set(p.slot, 0);
-  connections.set(p.slot, { state: p.ip ? 'checking' : 'unassigned', lastAttemptAt: null, lastSuccessAt: null, error: null, consecutiveFailures: 0 });
+  status.set(p.slot, emptyStatus());
+  connections.set(p.slot, { state: p.ip ? 'checking' : 'unassigned', lastAttemptAt: null, lastSuccessAt: null, lastFailureAt: null, error: null, consecutiveFailures: 0, nextRetryAt: null, retryDelayMs: 0 });
 }
 function connectionError(p, error) {
   let message = String(error?.message || error);
@@ -68,7 +68,7 @@ function connectionError(p, error) {
 }
 
 function driverFor(p) {
-  const key = `${p.slot}|${p.driver}|${p.ip}|${p.user || ''}|${p.password || ''}`;
+  const key = JSON.stringify([p.slot, p.driver, p.ip, p.user, p.password, p.model]);
   let d = drivers.get(p.slot);
   if (!d || d._key !== key) { d = makeDriver(p); d._key = key; drivers.set(p.slot, d); }
   return d;
@@ -100,30 +100,44 @@ function snapshot() {
 
 // ---- Polling ----
 function poll(p) {
-  if (polling.has(p.slot)) return polling.get(p.slot);
-  const work = pollOnce(p).finally(() => polling.delete(p.slot));
-  polling.set(p.slot, work);
-  return work;
+  return poller.poll(p.slot);
 }
-async function pollOnce(p) {
-  const connection = connections.get(p.slot);
-  connection.lastAttemptAt = new Date().toISOString();
-  if (!p.ip) { Object.assign(connection, { state: 'unassigned', error: null, consecutiveFailures: 0 }); setOffline(p.slot, 'no address'); return; }
-  try {
-    const s = await driverFor(p).getStatus();
-    missed.set(p.slot, 0);
-    Object.assign(connection, { state: 'online', lastSuccessAt: new Date().toISOString(), error: null, consecutiveFailures: 0 });
+poller = createPoller({
+  target: (slot) => store.projector(slot),
+  intervalMs: POLL_MS,
+  timeoutMs: 10000,
+  maxRetryMs: Math.max(POLL_MS, 15000),
+  read: (p, options) => p.ip ? driverFor(p).getStatus(options) : null,
+  started(p, { identityChanged, at }) {
+    if (identityChanged) {
+      status.set(p.slot, emptyStatus());
+      connections.set(p.slot, { state: 'checking', lastSuccessAt: null, lastFailureAt: null, error: null, consecutiveFailures: 0, retryDelayMs: 0 });
+    }
+    const c = connections.get(p.slot);
+    Object.assign(c, { lastAttemptAt: new Date(at).toISOString(), nextRetryAt: null });
+    if (!p.ip) Object.assign(c, { state: 'unassigned', error: null, consecutiveFailures: 0, retryDelayMs: 0 });
+    // Healthy reads retain the existing fresh sample until their result arrives.
+    // Broadcast start only when it changes operator-visible recovery/identity state.
+    if (identityChanged || c.state !== 'online') broadcastStatus(p);
+  },
+  succeeded(p, s, { at }) {
+    if (!p.ip) return;
+    Object.assign(connections.get(p.slot), { state: 'online', lastSuccessAt: new Date(at).toISOString(), error: null, consecutiveFailures: 0, nextRetryAt: null, retryDelayMs: 0 });
     const prev = status.get(p.slot);
     const next = { ...prev, ...s, online: true, updatedAt: new Date().toISOString() };
     status.set(p.slot, next);
     if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
-    const d = driverFor(p);
-    broadcast({ type: 'status', slot: p.slot, status: { ...next, connection }, displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
-  } catch (e) {
-    const n = missed.get(p.slot) + 1; missed.set(p.slot, n);
-    Object.assign(connection, { state: 'unreachable', error: connectionError(p, e), consecutiveFailures: n });
+    broadcastStatus(p);
+  },
+  failed(p, e, { at, consecutiveFailures, nextRetryAt, retryDelayMs }) {
+    const connection = connections.get(p.slot);
+    Object.assign(connection, { state: 'reconnecting', error: connectionError(p, e), lastFailureAt: new Date(at).toISOString(), consecutiveFailures, nextRetryAt: new Date(nextRetryAt).toISOString(), retryDelayMs });
     setOffline(p.slot, connection.error);
-  }
+  },
+});
+function broadcastStatus(p) {
+  const next = status.get(p.slot), d = driverFor(p);
+  broadcast({ type: 'status', slot: p.slot, status: { ...next, connection: connections.get(p.slot) }, displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
 }
 function setOffline(slot, why) {
   const prev = status.get(slot);
@@ -133,22 +147,23 @@ function setOffline(slot, why) {
   if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
   broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, displayInfo: displayInfoFor(store.projector(slot), next), inputPreference: inputPreferenceFor(store.projector(slot)) });
 }
-setInterval(() => rig.projectors.forEach(poll), POLL_MS);
 rig.projectors.forEach(poll);
 
 // ---- Discovery (PJLink class 2 search by MAC) ----
-async function discover(source = 'ui') {
-  if (SIM) return { found: [], note: 'simulator' };
-  const found = await pjlinkSearch();
-  let changed = 0;
-  for (const f of found) {
-    const p = rig.projectors.find((x) => x.mac && x.mac.toLowerCase() === f.mac);
-    if (p && p.ip !== f.ip) { store.event({ source, slot: p.slot, command: 'discover', result: 'OK', detail: `${p.ip || 'none'} -> ${f.ip}` }); p.ip = f.ip; changed++; }
-  }
-  if (changed) { store.save(); broadcast(snapshot()); }
-  return { found, changed };
-}
-setInterval(() => discover('auto').catch(() => {}), 60000);
+const discover = createManualDiscovery({
+  projectors: () => rig.projectors,
+  scan: () => SIM ? [] : pjlinkSearch(),
+  apply(updates) {
+    for (const update of updates) {
+      const p = store.projector(update.slot);
+      store.event({ source: 'ui', slot: p.slot, command: 'discover', result: 'OK', detail: `${p.ip || 'none'} -> ${update.ip}` });
+      p.ip = update.ip;
+      poll(p);
+    }
+    if (updates.length) { store.save(); broadcast(snapshot()); }
+  },
+});
+// Saved addresses remain authoritative. Rediscovery is an explicit operator action.
 
 // ---- Commands ----
 const pendingConfirm = confirmations();
@@ -187,7 +202,7 @@ async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   finally { if (moving) { busy.delete(slot); broadcast({ type: 'busy', slot, busy: null }); } }
   store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail });
   broadcast({ type: 'event', event: rig.events.at(-1) });
-  if (cmd === 'lens' || cmd === 'input' || cmd === 'picture') { await polling.get(slot); await poll(p); }
+  if (cmd === 'lens' || cmd === 'input' || cmd === 'picture') await poller.refresh(slot);
   else setTimeout(() => poll(p), 400);
   return { result, status: { ...status.get(slot), connection: connections.get(slot) } };
 }
@@ -425,7 +440,7 @@ const server = http.createServer(async (req, res) => {
         if (upd.lane && rig.projectors.some((other) => other.slot !== p.slot && other.lane === upd.lane)) throw httpErr(409, 'Drawing lane already assigned. Clear its current assignment first.');
       }
       for (const k of ['lane', 'label', 'make', 'model', 'owner', 'driver', 'mac', 'ip', 'notes', 'user', 'password', 'inputs', 'reverseH', 'reverseV']) if (k in upd) p[k] = upd[k];
-      store.save(); store.event({ source: 'ui', slot: p.slot, command: 'edit', result: 'OK' }); broadcast(snapshot()); poll(p); return json(res, 200, { ok: true });
+      store.save(); store.event({ source: 'ui', slot: p.slot, command: 'edit', result: 'OK' }); poll(p); broadcast(snapshot()); return json(res, 200, { ok: true });
     }
     if (url.pathname === '/api/discover' && req.method === 'POST') return json(res, 200, await discover('ui'));
     if (url.pathname === '/api/sim' && req.method === 'POST' && SIM) { // test hook: toggle offline or set an out-of-position reported lens readback
