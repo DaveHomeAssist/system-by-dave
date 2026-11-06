@@ -435,14 +435,14 @@ function renderAdjust() {
   const readback = lens && p.driver === 'pulse' ? Object.entries({ h: 'H', v: 'V', focus: 'Focus', zoom: 'Zoom' }).map(([key, label]) => `${label} ${lens[key] ?? '?'}`).join(' · ') : '';
   $('#adj-position').textContent = readback;
   const cur = p.status?.pattern; const table = p.patterns || PATTERNS;
-  $('#adj-pattern-now').textContent = 'Showing: ' + (table[cur] || (cur ? cur : 'unknown'));
-  const patternFocus = document.activeElement?.dataset.pattern;
-  const el = $('#adj-patterns'); el.innerHTML = '';
+  $('#adj-pattern-now').textContent = (off ? 'Last reported: ' : 'Showing: ') + (table[cur] || (cur ? cur : 'unknown'));
+  const el = $('#adj-patterns'), patterns = document.createElement('div');
   for (const [code, name] of Object.entries(table)) {
     const b = document.createElement('button'); b.type = 'button'; b.dataset.pattern = code; b.className = 'avd-btn'; b.textContent = name; b.setAttribute('aria-pressed', String(cur === code));
-    b.disabled = state.lock || off || !!moving || !canPattern(p); b.onclick = () => cmd(adjSlot, 'pattern', code); el.appendChild(b);
+    b._controlIdentity = JSON.stringify([p.slot,p.driver,p.ip,p.mac]); b.dataset.focusKey = `${p.slot}:adjust:pattern:${code}`;
+    b.disabled = state.lock || off || !!moving || !canPattern(p); b.onclick = event => cmd(p.slot, 'pattern', code, event.currentTarget); patterns.appendChild(b);
   }
-  if (patternFocus) [...el.children].find((b) => b.dataset.pattern === patternFocus)?.focus({ preventScroll: true });
+  patchControls(el, patterns);
   $('#adj-speed').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.s === adjSpeed)));
   document.querySelectorAll('.lens button, #adj-home, #adj-speed button').forEach((b) => b.disabled = state.lock || off || !!moving || p.capabilities?.lens === false || (p.driver === 'pulse' && p.status?.power !== 'on'));
   $('#adj-stop').hidden = p.driver !== 'pulse'; $('#adj-stop').disabled = off;
