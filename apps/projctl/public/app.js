@@ -4,6 +4,7 @@ import { mountPowerSchedules } from './power-schedules.js';
 import { createLensWorkspace } from './lens-workspace.js';
 import { lensDirection } from './lens-direction.js';
 import { loadReference, mountReference, referenceGearHTML } from './reference-view.js';
+import { createConnectionMonitor } from './projector-connection.js';
 import { startHeaderClock } from './header-clock.js';
 startHeaderClock(document.querySelector('#operator-clock'));
 const $ = (s, r = document) => r.querySelector(s);
@@ -11,6 +12,8 @@ let state = { projectors: [], presets: [], events: [], lock: false };
 const confirmTokens = {}; // command key -> one-use token
 const commandsInFlight = new Set();
 let connected = false;
+const monitorConnection = createConnectionMonitor();
+const connectionOf = p => monitorConnection(p, connected, state.relay?.pollIntervalMs);
 const dirtySetup = new Set();
 let selectedDetailLane = null, lastRigLane = null, referenceData = null, referenceView = null;
 const referenceReady = loadReference('./workspace/projectors.json').then(data => { referenceData = data; if (selectedDetailLane) renderProjectorInfo(); return data; }).catch(() => null);
@@ -21,7 +24,7 @@ const lensWorkspace = createLensWorkspace($('#projector-lens-workspace'), {
   onRecall: name => recallDetailLensPreset(name),
   onPresets: () => $('#tab-btn-presets').click(),
 });
-function updateLensWorkspace(){ const p=selectedDetailLane?rigLanes(state.projectors).find(item=>item.lane===selectedDetailLane)?.projector:null;lensWorkspace.update({projector:p,connected,lock:state.lock,active:!!selectedDetailLane,presets:state.presets.map(item=>({...item,confirm:presetConfirmations.get(item.name),result:presetResults.get(item.name)}))}); }
+function updateLensWorkspace(){ const p=selectedDetailLane?rigLanes(state.projectors).find(item=>item.lane===selectedDetailLane)?.projector:null;lensWorkspace.update({projector:p,connected,connection:connectionOf(p),lock:state.lock,active:!!selectedDetailLane,presets:state.presets.map(item=>({...item,confirm:presetConfirmations.get(item.name),result:presetResults.get(item.name)}))}); }
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // Respect saved operator choice; a fresh browser starts in the light theme.
@@ -58,6 +61,7 @@ function commandFeedback(button,phase,message){if(!button)return;clearTimeout(bu
 async function cmd(slot, c, arg, source) {
   const key = c === 'lens' ? `${slot}:lens:${arg?.op === 'stop' ? 'stop' : 'move'}` : `${slot}:${c}:${JSON.stringify(arg)}`;
   if (!connected) { toast('Relay disconnected. Reconnect before sending commands.'); return false; }
+  if (slot !== 'all' && !(c === 'lens' && arg?.op === 'stop') && !connectionOf(state.projectors.find(p=>p.slot===slot)).current) { toast('No fresh projector reply. Waiting for reconnection.'); return false; }
   if (commandsInFlight.has(key)) return;
   commandsInFlight.add(key);commandFeedback(source,'sending','Sending command; waiting for acknowledgement.');
   if (c === 'lens') { $('#adj-motion').textContent = arg?.op === 'stop' ? 'Stopping lens...' : 'Lens moving. Waiting for stopped feedback...'; renderAdjust(); }
@@ -95,7 +99,7 @@ function canPattern(p) { return !!p.patterns || p.driver === 'panasonic' || p.dr
 function stateOf(p) {
   const s = p.status || {};
   if (!connected) return { st: 'blocked', word: 'Relay disconnected' };
-  if (!s.online) return { st: 'blocked', word: s.connection?.state === 'checking' ? 'Checking connection' : s.connection?.state === 'unassigned' || !p.ip ? 'No address' : 'No reply' };
+  if (!connectionOf(p).current) return { st: 'blocked', word: connectionOf(p).label };
   if (s.power === 'on') return { st: 'done', word: 'Powered' };
   if (s.power === 'cooling') return { st: 'waiting', word: 'Cooling' };
   if (s.power === 'warming') return { st: 'waiting', word: 'Warming' };
@@ -108,8 +112,8 @@ const seg = (label, opts, cur, attrs) => `<div class="avd-seg avd-seg--fill" rol
 function renderOverview() {
   const extras=state.projectors.filter(p=>!laneOf(p)).length;$('#rig-extra-devices').hidden=!extras;$('#rig-extra-devices').textContent=`Other devices (${extras}) · Configuration`;
   referenceView?.updateLive(state,connected);
-  $('[data-all="resetInput"]').disabled = !connected || state.lock || !state.projectors.some((p) => p.inputPreference?.available && p.status?.online && !p.busy);
-  const online = state.projectors.filter((p) => p.status?.online).length;
+  $('[data-all="resetInput"]').disabled = !connected || state.lock || !state.projectors.some((p) => p.inputPreference?.available && connectionOf(p).current && !p.busy);
+  const online = state.projectors.filter((p) => connectionOf(p).current).length;
   const assigned = rigLanes(state.projectors).filter((x) => x.projector).length;
   $('#relay-mode').textContent = state.simulation === true ? 'DEMO · simulated devices' : state.simulation === false ? 'REAL RELAY' : 'Connecting…';
   $('#relay-mode').classList.toggle('pj-mode--demo', state.simulation === true);
@@ -117,10 +121,6 @@ function renderOverview() {
   $('#local-controller-help').hidden = connected || !staticPreview;
   $('#summary').textContent = connected ? `${online} / ${state.projectors.length} devices replying · ${assigned} / 4 lanes assigned` : 'Relay disconnected · device data unavailable';
   $('#connection-note').textContent = !connected ? 'Reconnecting automatically. Displayed values are last known; current projector power is unknown.' : online < state.projectors.length ? 'Relay connected. Devices without a reply: check the venue network and projector connection. No reply does not confirm power off.' : state.simulation ? 'Simulator data · no physical projector feedback. Status updates automatically.' : 'Device feedback updates automatically. Each card shows its latest successful reply.';
-}
-function replyTime(s) {
-  const at = s.connection?.lastSuccessAt || (s.online ? s.updatedAt : null);
-  return at ? new Date(at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'No successful reply yet';
 }
 // Keep interactive nodes stable through status polls; only changed content is patched.
 function patchControls(current, desired, protectedNode = null) {
@@ -150,13 +150,13 @@ function renderGrid() {
   const active = document.activeElement;
   const editing = g.contains(active) && active.matches('select[data-c="input"]') ? state.projectors.find((p) => p.slot === active.closest('[data-slot]')?.dataset.slot) : null;
   // Preserve only the active native select. Other telemetry and safety state must keep updating.
-  const keepSelect = editing && active.dataset.editing === 'true' && connected && editing.status?.online && !state.lock && !editing.busy && !active.disabled && active._inputOptions === JSON.stringify(Object.entries(editing.inputs || {}));
+  const keepSelect = editing && active.dataset.editing === 'true' && connectionOf(editing).current && !state.lock && !editing.busy && !active.disabled && active._inputOptions === JSON.stringify(Object.entries(editing.inputs || {}));
   const focusKey = g.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null; const scroll = g.scrollTop;
   const unassignedOpen = g.querySelector('.pj-unassigned')?.open || false;
   const inputOptionsOpen = new Set([...document.querySelectorAll('#grid details[data-input-options][open], #projector-controls details[data-input-options][open]')].map((el) => el.dataset.inputOptions));
   const output = document.createElement('div');
   function deviceCard(p, lane = laneOf(p)) {
-    const s = p.status || {}; const off = !connected || !s.online; const lock = state.lock;
+    const s = p.status || {}; const connection = connectionOf(p), off = !connection.current; const lock = state.lock;
     const { st, word } = stateOf(p);
     const errs = Object.entries(s.errors || {}).filter(([, v]) => v > 0).map(([k, v]) => `${k}${v === 2 ? ' fault' : ' warning'}`);
     const inputs = Object.entries(p.inputs || {});
@@ -178,7 +178,7 @@ function renderGrid() {
       <div class="avd-panel__body">
         ${lane ? `<div class="pj-lane"><h3>${esc(lane.target)}</h3><span class="pj-mono">${esc(lane.role)} · ${esc(lane.orientation)}</span><span class="pj-lane-device pj-mono">${esc(p.model || p.label)}</span></div>` : `<p class="pj-mono">Unassigned · Relay ${esc(p.slot)}</p>`}
         <div class="pj-tile-top">${pill(st, word)}<span class="pj-mono">${esc(p.owner)} · ${esc(p.ip || 'no address')}</span></div>
-        <div class="pj-telemetry-note pj-mono">${off ? 'Current values unavailable · last known below' : state.simulation ? 'Simulated feedback' : 'Projector feedback'}<span>Last reply: ${esc(replyTime(s))}</span>${off && s.connection?.error ? `<span>${esc(s.connection.error)}</span>` : ''}</div>
+        <div class="pj-telemetry-note pj-mono">${esc(connection.detail)}${off ? ' · values last known' : state.simulation ? ' · simulated feedback' : ''}<span>Last reply: ${esc(connection.lastReply)}${connection.retry ? ' · '+esc(connection.retry) : ''}</span>${off && s.connection?.error ? `<span>${esc(s.connection.error)}</span>` : ''}</div>
         <p class="pj-mono" role="status" ${busy ? '' : 'style="display:none"'}>Lens moving</p>
         <div class="pj-tile-top" ${errs.length ? '' : 'style="display:none"'}>${errs.map((e) => pill('blocked', e)).join('')}</div>
         <div class="pj-two">
@@ -225,14 +225,13 @@ function renderGrid() {
     return card;
   }
   for(const {lane,projector:p,conflict} of rigLanes(state.projectors)){
-    const info=LANES[lane],s=p?.status||{},online=connected&&s.online,card=document.createElement('section');card.className='avd-panel pj-tile pj-summary-tile';card.dataset.lane=lane;if(p)card.dataset.slot=p.slot;card._controlIdentity=p?JSON.stringify([p.slot,p.driver,p.ip,p.mac]):lane;
+    const info=LANES[lane],s=p?.status||{},health=connectionOf(p),online=health.current,card=document.createElement('section');card.className='avd-panel pj-tile pj-summary-tile';card.dataset.lane=lane;card.classList.toggle('offline',!online);if(p)card.dataset.slot=p.slot;card._controlIdentity=p?JSON.stringify([p.slot,p.driver,p.ip,p.mac]):lane;
     const input=s.input==null?'Unknown':p.inputs?.[s.input]||s.input,signal=p?.displayInfo?.signal;
     const signalText=signal?.value!=null?reportedValue(signal.value):signal?.state==='unsupported'?'Not reported':'Unknown';
-    const stamp=s.connection?.lastSuccessAt||(s.online?s.updatedAt:null);const age=stamp?Math.max(0,Math.round((Date.now()-new Date(stamp).getTime())/1000)):null;
-    const last=stamp&&Number.isFinite(age)?`Last reply ${new Date(stamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`:'No successful reply yet';
+    const last=`Last reply ${health.lastReply}`;
     const alarms=Object.entries(s.errors||{}).filter(([,value])=>value>0).sort((a,b)=>b[1]-a[1]).map(([key,value])=>`${key}${value===2?' fault':' warning'}`);
-    const connection=!p?(conflict?'Assignment conflict':'Unassigned'):!connected?'Relay offline':online?(age!=null&&age>Math.max(15,(state.relay?.pollIntervalMs||5000)*3/1000)?'Stale reply':'Reply received'):'No current reply';
-    card.innerHTML=`<button type="button" class="pj-summary-select" data-open-projector="${lane}" data-focus-key="lane:${lane}:select" aria-pressed="${selectedDetailLane===lane}"><span class="pj-summary-heading"><b class="pj-summary-letter">${lane}</b><strong>${esc(info.target)}</strong><span class="avd-dot ${online?'avd-dot--done':p?'avd-dot--blocked':'avd-dot--idle'}" aria-hidden="true"></span></span><span class="pj-summary-model">${esc(p?.model||'No assigned device')} · ${esc(info.orientation)}</span><span class="pj-summary-state ${alarms.length?'has-alarms':''}" title="${esc([connection,...alarms].join(' · '))}">${esc(alarms.length?alarms.join(' · '):connection)}</span><span class="pj-summary-values"><span>Power<strong>${esc(s.power||'Unknown')}</strong></span><span>Shutter<strong>${esc(s.shutter||'Unknown')}</strong></span><span>Input<strong>${esc(input)}</strong></span></span><span class="pj-summary-signal">${!online&&signal?.value!=null?'Last known signal':'Signal'}: ${esc(signalText)}</span><span class="pj-summary-freshness">${esc(last)}${!online&&p?' · values last known':''}</span></button>`;
+    const connection=conflict?'Assignment conflict':health.detail;
+    card.innerHTML=`<button type="button" class="pj-summary-select" data-open-projector="${lane}" data-focus-key="lane:${lane}:select" aria-pressed="${selectedDetailLane===lane}"><span class="pj-summary-heading"><b class="pj-summary-letter">${lane}</b><strong>${esc(info.target)}</strong><span class="avd-dot ${online?'avd-dot--done':p?'avd-dot--blocked':'avd-dot--idle'}" aria-hidden="true"></span></span><span class="pj-summary-model">${esc(p?.model||'No assigned device')} · ${esc(info.orientation)}</span><span class="pj-summary-state ${alarms.length?'has-alarms':''}" title="${esc([connection,...alarms].join(' · '))}">${esc([connection,...alarms].join(' · '))}</span><span class="pj-summary-values"><span>Power<strong>${esc(s.power||'Unknown')}</strong></span><span>Shutter<strong>${esc(s.shutter||'Unknown')}</strong></span><span>Input<strong>${esc(input)}</strong></span></span><span class="pj-summary-signal">${!online&&signal?.value!=null?'Last known signal':'Signal'}: ${esc(signalText)}</span><span class="pj-summary-freshness">${esc(last)}${health.retry?' · '+esc(health.retry):''}${!online&&p?' · values last known':''}</span></button>`;
     card.querySelector('button').onclick=()=>openProjector(lane);output.append(card);
   }
   const nextSelect = [...output.querySelectorAll('select[data-c="input"]')].find(node => node.closest('[data-slot]')?.dataset.slot === editing?.slot);
@@ -259,7 +258,7 @@ function updateDetailControls(card) {
   const host = $('#projector-controls'), active = document.activeElement, key = host.contains(active) ? active.dataset.focusKey : null;
   const desired = document.createElement('div'); desired.append(card);
   const p = state.projectors.find(item => item.slot === card.dataset.slot);
-  const keep = host.contains(active) && active.matches('select[data-c="input"]') && active.dataset.editing === 'true' && connected && p?.status?.online && !state.lock && !p.busy && active._inputOptions === JSON.stringify(Object.entries(p.inputs || {}));
+  const keep = host.contains(active) && active.matches('select[data-c="input"]') && active.dataset.editing === 'true' && connectionOf(p).current && !state.lock && !p.busy && active._inputOptions === JSON.stringify(Object.entries(p.inputs || {}));
   const path = (node, root) => { const out = []; while (node && node !== root) { out.unshift([...node.parentNode.childNodes].indexOf(node)); node = node.parentNode; } return node === root ? out.join('.') : null; };
   const next = card.querySelector('select[data-c="input"]');
   const retain = keep && path(active,host) === path(next,desired);
@@ -283,7 +282,7 @@ function openProjector(lane){
 function renderPrimaryControls(p){
  const host=$('#projector-primary-controls'),out=document.createElement('div');
  if(!p){out.innerHTML='<span class="pj-mono">Unassigned · lens controls unavailable</span>';patchControls(host,out);return;}
- const s=p.status||{},off=!connected||!s.online,at=new Date(s.connection?.lastSuccessAt||s.updatedAt||NaN).getTime(),fresh=Number.isFinite(at)&&Date.now()-at<=Math.max(15000,(state.relay?.pollIntervalMs||5000)*3)&&!off&&(!s.connection||s.connection.state==='online');
+ const s=p.status||{},off=!connectionOf(p).current,at=new Date(s.connection?.lastSuccessAt||s.updatedAt||NaN).getTime(),fresh=Number.isFinite(at)&&Date.now()-at<=Math.max(15000,(state.relay?.pollIntervalMs||5000)*3)&&!off&&(!s.connection||s.connection.state==='online');
  const options=fresh&&s.shutter==='open'?[['1','Close shutter']]:fresh&&s.shutter==='closed'?[['0','Open shutter']]:[['0','Open shutter'],['1','Close shutter']];
  for(const[arg,label]of options){const b=document.createElement('button');b.className='avd-btn';b.type='button';b._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);b.dataset.focusKey=`${p.slot}:dock:shutter:${arg}`;b.dataset.c='shutter';b.dataset.a=arg;b.textContent=label;b.disabled=off;b.onclick=e=>cmd(p.slot,'shutter',Number(arg),e.currentTarget);out.append(b);}
  const input=document.createElement('button');input.type='button';input.className='avd-btn';input._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);input.dataset.focusKey=`${p.slot}:dock:reset-input`;input.dataset.resetInput='';input.textContent=`Reset to ${p.inputPreference?.label||state.preferredInput||'HDMI'}`;input.disabled=off||state.lock||!!p.busy||!p.inputPreference?.available;input.onclick=e=>cmd(p.slot,'resetInput',undefined,e.currentTarget);out.append(input);patchControls(host,out);
@@ -298,7 +297,7 @@ function renderDisplayInfo(p) {
   const info=p?.displayInfo?.scope==='projector'?p.displayInfo:null;
   const status=p?.status||{};
   const input=info?.input || (status.input!=null ? {state:connected&&status.online?'reported':'offline',value:status.input,label:p.inputs?.[status.input]||status.input,observedAt:status.connection?.lastSuccessAt||status.updatedAt} : null),signal=info?.signal,edid=info?.edid;
-  const field=(label,data,fallback)=>{const stale=!connected||data?.state==='offline';return `<div><dt>${label}</dt><dd>${esc(data?.value!=null ? (data.label || reportedValue(data.value)) : fallback)}<br><span class="pj-mono">${esc(stale&&data?.value!=null?'Last known · ': '')}${esc(data?.state || (p?'unsupported':'unassigned'))}${data?.observedAt?' · '+esc(new Date(data.observedAt).toLocaleString()):''}</span></dd></div>`;};
+  const field=(label,data,fallback)=>{const stale=!connectionOf(p).current||data?.state==='offline';return `<div><dt>${label}</dt><dd>${esc(data?.value!=null ? (data.label || reportedValue(data.value)) : fallback)}<br><span class="pj-mono">${esc(stale&&data?.value!=null?'Last known · ': '')}${esc(data?.state || (p?'unsupported':'unassigned'))}${data?.observedAt?' · '+esc(new Date(data.observedAt).toLocaleString()):''}</span></dd></div>`;};
   $('#projector-display-info').innerHTML=`<dl>${field('Reported input',input,'No input reported')}${field('Driver signal readout',signal,'Signal information unavailable')}<div><dt>Projector EDID</dt><dd>${esc(edid?.state==='reported'&&edid.value!=null?reportedValue(edid.value):edid?.reason||(p?'EDID is not read by this driver.':'No device is assigned to this lane; projector EDID is unavailable.'))}<br><span class="pj-mono">${esc(edid?.state||(p?'unsupported':'unassigned'))} · projector scope</span></dd></div></dl><p class="pj-detail-unavailable">Input names and signal readings are separate from EDID. No resolution or EDID is inferred from the selected input.</p>`;
 }
 let powerSchedulesView=null;$('#power-schedule-panel').addEventListener('toggle',()=>{if($('#power-schedule-panel').open&&!powerSchedulesView)powerSchedulesView=mountPowerSchedules($('#power-schedules'),{projectors:()=>state.projectors,connected:()=>connected});});
@@ -430,7 +429,7 @@ function closeAdjust() {
 
 function renderAdjust() {
   const p = state.projectors.find((x) => x.slot === adjSlot); if (!p) return;
-  const off = !connected || !p.status?.online;
+  const off = !connectionOf(p).current;
   const moving = p.busy || commandsInFlight.has(`${adjSlot}:lens:move`);
   const lens = p.status?.lens;
   const readback = lens && p.driver === 'pulse' ? Object.entries({ h: 'H', v: 'V', focus: 'Focus', zoom: 'Zoom' }).map(([key, label]) => `${label} ${lens[key] ?? '?'}`).join(' · ') : '';
@@ -451,7 +450,7 @@ function renderAdjust() {
 }
 function updatePictureLock() {
   const p = state.projectors.find((x) => x.slot === adjSlot);
-  const unavailable = !connected || !p?.status?.online || !!p.busy;
+  const unavailable = !connectionOf(p).current || !!p?.busy;
   document.querySelectorAll('#adj-picture input, #adj-picture select').forEach((el) => { el.disabled = state.lock || unavailable || el.dataset.unavailable === 'true'; });
 }
 $('#adj-close').onclick = closeAdjust;
@@ -480,7 +479,7 @@ $('#adj-pic-reload').onclick = () => loadPicture();
 async function loadPicture() {
   const slot = adjSlot, requestId = ++pictureRequestId; const el = $('#adj-picture'); el.innerHTML = ''; $('#adj-pic-note').textContent = 'Reading values…';
   const p = state.projectors.find((x) => x.slot === slot);
-  if (!connected || !p?.status?.online) { $('#adj-pic-note').textContent = 'Current picture values unavailable. Waiting for projector connection.'; return; }
+  if (!connectionOf(p).current) { $('#adj-pic-note').textContent = 'Current picture values unavailable. Waiting for projector connection.'; return; }
   const schema = p?.pictureSchema ?? PICTURE;
   if (!Object.keys(schema).length) { $('#adj-pic-note').textContent = 'No picture controls reported by this projector.'; return; }
   let vals = {};
@@ -549,7 +548,7 @@ function connect() {
       markAlive(); state = msg;if(msg.powerSchedules&&typeof msg.powerSchedules==='object'&&Array.isArray(msg.powerSchedules.schedules)&&Array.isArray(msg.powerSchedules.audit))powerSchedulesView?.update(msg.powerSchedules); setConn(true); renderAll();
     }
     else if (!connected) return;
-    else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') markAlive(); }
+    else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') { markAlive(); renderGrid(); renderOverview(); if (adjSlot) renderAdjust(); } }
     else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.displayInfo !== undefined) p.displayInfo = msg.displayInfo; if (msg.inputPreference !== undefined) p.inputPreference = msg.inputPreference; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
     else if (msg.type === 'busy' && typeof msg.slot === 'string') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); }
     else if (msg.type === 'powerSchedules' && msg.schedules && typeof msg.schedules === 'object' && Array.isArray(msg.schedules.schedules) && Array.isArray(msg.schedules.audit)) { markAlive(); powerSchedulesView?.update(msg.schedules); }
