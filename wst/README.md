@@ -1,7 +1,7 @@
 # Frozen workspace
 
 Live managed deployment: https://wst-frozen.davein4k.chatgpt.site
-Requested custom hostname: https://wst.housevideo.app (DNS/TLS pending at this receipt).
+Primary hostname: https://wst.housevideo.app (DNS, TLS and live API verified November 6, 2026).
 
 Personal notes autosave only in this browser/origin under `wst.frozen.personal-notes.v1`, with text export and storage-failure recovery. They never enter the task API. Clearing browser site data loses local notes; notes at the temporary hostname do not automatically transfer to the custom hostname. Private cross-device notes are deferred, not a project-wide storage policy.
 

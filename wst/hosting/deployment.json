@@ -5,5 +5,8 @@
   "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_cb6a470b17dc8191ab3e330e6fe6eaeb",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
-  "customDomainStatus": "pending DNS and TLS"
+  "customDomainStatus": "active",
+  "customDomainTls": "active",
+  "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
+  "customDomainVerifiedAt": "2026-11-06T05:49:13Z"
 }
