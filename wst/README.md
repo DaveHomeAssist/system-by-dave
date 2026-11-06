@@ -16,3 +16,9 @@ The managed Worker/D1 service is separate from GitHub Pages and existing FMP ser
 ## Verification
 
 `node --test wst/workspace.test.mjs` verifies local notes recovery/export without networking. Built Worker validation: `cd wst/hosting && bash scripts/build.sh && node scripts/validate-artifact.mjs`. Production API acceptance passed with independent clients: create/read/update, stale-write 409, oversized-text 400, cross-origin-write 403, delete and absence after deletion. All synthetic tasks removed. Walter Playwright passed live desktop/mobile containment, both themes, Eastern clock, note save/reload, separate-browser note isolation, download, and shared-task completion across two browser contexts; screenshots reviewed. Synthetic browser task removed.
+
+## Combined Frozen entry point
+
+Navigation includes Notes + tasks, Projector info and Projector controls. `projectors.json` is the versioned public equipment reference with assignment/lens/estimate provenance; the private rig remains controller authority. No IPs, MACs or credentials are in this reference. D lens sizing is a candidate calculation, not a calibrated optical verdict. The owner prefers coverage over reduced brightness/resolution; installed lens and physical clearance remain unverified.
+
+`workspace-config.json` owns the future control handoff. Its default is `url: null, verified: false`, visibly Mac Studio setup pending. Set a URL only after installing and testing the theatre host and crew access. Do not substitute the current MacBook or visitor localhost. The app does not proxy commands; configuring this link does not create authentication. Actual login/access belongs to the controller. Reciprocally, the controller links back to https://wst.housevideo.app/.

@@ -71,3 +71,23 @@ document.querySelector('#refresh').onclick=loadTasks;loadTasks();setInterval(()=
 
 const clock = document.querySelector('#clock');
 function tick(){clock.textContent = new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date());clock.dateTime=new Date().toISOString();}tick();setInterval(tick,1000);
+
+const controlAccess=document.querySelector('#control-access');
+document.querySelector('#open-control').addEventListener('click',async()=>{
+ controlAccess.showModal();
+ try{const response=await fetch('/workspace-config.json',{cache:'no-store'});if(!response.ok)return;const config=await response.json();if(!config.control?.verified||!config.control.url)return;const url=new URL(config.control.url);if(!['http:','https:'].includes(url.protocol)||url.username||url.password)return;const link=document.querySelector('#control-link');link.href=url.href;link.hidden=false;document.querySelector('#control-status').textContent=config.control.label||'Theatre controller';document.querySelector('#control-guidance').textContent=config.control.guidance||'Opens the separately protected theatre controller in a new tab.';}catch{/* Keep the explicit setup state; never substitute this browser’s localhost. */}
+});
+document.querySelector('#close-control').addEventListener('click',()=>controlAccess.close());
+controlAccess.addEventListener('close',()=>document.querySelector('#open-control').focus());
+
+const projectorInfo=document.querySelector('#projector-info'),workspacePanels=document.querySelector('#workspace-panels');
+function showSection(info){projectorInfo.hidden=!info;workspacePanels.hidden=info;for(const [id,active] of [['#show-workspace',!info],['#show-projectors',info]]){const el=document.querySelector(id);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');}if(info)document.querySelector('#projector-info-title').focus();}
+document.querySelector('#show-workspace').onclick=()=>showSection(false);
+document.querySelector('#show-projectors').onclick=()=>showSection(true);
+async function renderProjectorReference(){
+const response=await fetch('/projectors.json',{cache:'no-store'});if(!response.ok)throw Error('Projector reference unavailable.');const {projectors:projectionReference}=await response.json();
+
+for(const p of projectionReference){const card=document.createElement('article');card.className='projector-card';card.style.setProperty('--lane',p.color);const h=document.createElement('h3');h.textContent='Projector '+p.lane;const position=document.createElement('span');position.textContent=p.position;h.append(position);const model=document.createElement('h4');model.textContent=p.model;const dl=document.createElement('dl');for(const [label,value] of [['Position',p.position],['Orientation',p.orientation],['Installed lens',p.lens],['Lens evidence',p.provenance.lens],...(p.image?[['Image',p.image],['Lens to surface',p.throwDistance],['Candidate lens',p.candidate]]:[])]){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);}const note=document.createElement('p');note.textContent=p.note;card.append(h,model,dl,note);if(p.candidateCheck){const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Sizing and installation checks';details.append(summary);for(const value of [p.candidateCheck,p.installationCheck]){const paragraph=document.createElement('p');paragraph.textContent=value;details.append(paragraph);}const spec=document.createElement('a');spec.href=p.installationSource;spec.target='_blank';spec.rel='noopener noreferrer';spec.textContent='Projector installation specification ↗';details.append(spec);card.append(details);}if(p.source){const link=document.createElement('a');link.href=p.source;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Manufacturer lens specification ↗';card.append(link);}document.querySelector('#projector-cards').append(card);}
+
+}
+renderProjectorReference().catch(()=>{document.querySelector('#projector-cards').textContent='Projector reference could not load. Refresh to retry.';});
