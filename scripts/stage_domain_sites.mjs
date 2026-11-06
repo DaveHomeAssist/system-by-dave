@@ -821,6 +821,22 @@ function applyCutover(siteRoot, site, entries, options) {
   return removed;
 }
 
+// WST Stage is a managed-service snapshot. Its root-relative assets are served
+// by that Worker, so the Pages copy must lead to the owning service.
+function stageManagedSnapshotRoutes(siteRoot) {
+  const rel = 'wst/stage/index.html';
+  if (!fs.existsSync(path.join(siteRoot, rel))) return;
+  const target = 'https://wst.housevideo.app/stage/index.html';
+  writeFile(siteRoot, rel, `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frozen public Stage</title><meta name="description" content="Open the public Frozen Stage at its managed service.">
+<meta name="robots" content="noindex,nofollow"><link rel="canonical" href="${target}">
+<meta http-equiv="refresh" content="0;url=${target}"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#f4f2eb"><meta property="og:title" content="Frozen public Stage"><meta property="og:type" content="website"><meta property="og:url" content="${target}"><meta property="og:description" content="Open the public Frozen Stage at its managed service."><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Frozen public Stage">
+<style>html,body{margin:0;height:100%;overflow:hidden}body{height:100dvh;display:grid;place-items:center;background:#f4f2eb;color:#233735;font:16px system-ui}main{padding:24px;box-sizing:border-box;max-width:100%;max-height:100%;overflow:auto}a{color:inherit}@media(prefers-color-scheme:dark){body{background:#15211f;color:#edf0e7}}</style></head>
+<body><main><h1>Frozen public Stage</h1><p><a href="${target}">Open the public Stage</a></p></main></body></html>\n`);
+}
+
 // After cutover, nothing left on systembydave.com may load a file that moved.
 function checkRemovedAssets(siteRoot, removed) {
   if (!removed.size) return [];
@@ -940,6 +956,7 @@ function main() {
 
   if (args.siteRoot) {
     const siteRoot = path.resolve(args.siteRoot);
+    stageManagedSnapshotRoutes(siteRoot);
     const removed = new Set();
     for (const { site, entries, cutover } of staged) {
       if (!cutover) continue;
@@ -964,7 +981,7 @@ function main() {
 
 export {
   CONFIG_FILE, read, loadRegistry, siteEntries, routeFor,
-  robots, robotsRules, robotsAllows, declaresNoindex, previewImagePaths, crawlPolicyProblems
+  robots, robotsRules, robotsAllows, declaresNoindex, previewImagePaths, crawlPolicyProblems, stageManagedSnapshotRoutes
 };
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
