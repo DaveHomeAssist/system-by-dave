@@ -69,3 +69,11 @@ Browser acceptance: `node apps/projctl/test/wst-public-stage-browser.cjs` with t
 The portfolio Pages staging step replaces only its WST home and Stage entry copies with canonical redirects to this managed site. The managed HTML, same-origin viewer imports and Worker assets remain unchanged; the source repository retains the full reproducible runtime. This prevents the portfolio mirror from loading viewer modules retired from that origin.
 
 WST and mirror-helper pull requests run the domain-cutover browser gate before merge, so managed-only imports cannot first break at the publication step.
+
+## Compact workspace and public Stage
+
+The common header now uses one row on wide desktops and two compact rows on narrower screens, with a labelled phone menu for every destination. Home’s snow splash remains. Notes storage keys, exports and the shared task service are unchanged. Theme changes are sent only to the exact Stage frame origin; the viewer accepts only its parent at the same origin and an allowlisted theme value.
+
+Embedded Stage suppresses its duplicate heading/backlink and uses a single planning toolbar. The selected projector’s inspector opens as a contained, scrolling overlay. The public-only room view starts with seats, walls and roof hidden, retains the cove, and separates A–D labels with leaders. Local controller defaults are preserved by optional viewer settings. Model/plot assets and the task API are unchanged; public what-if editing makes no private API or WebSocket requests.
+
+Checked in installed Chrome with disposable contexts: 1900×950, 845×954 and 375×812, both themes, full room WebGL, Front/Plan, candidate lens/raster edits, and inspector containment. Outer content begins at 59px wide and 93px narrow (including frame border). `scripts/test_wst_workspace.cjs` checks notes reload and responsive navigation; `apps/projctl/test/wst-public-stage-browser.cjs` checks actual packaged model/planning and theme propagation. Set `PLAYWRIGHT_EXECUTABLE_PATH` to use an existing installed browser.
