@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=path.dirname(fileURLToPath(import.meta.url));
+const worker=path.join(root,'hosting/worker/index.js');
+const source=fs.readFileSync(worker,'utf8');
+const seam=source.indexOf(';\nconst rates');
+if(seam<0)throw Error('Worker asset boundary changed; refusing to overwrite.');
+const files={'/':'index.html','/workspace.css':'workspace.css','/workspace.js':'workspace.js','/workspace-config.json':'workspace-config.json','/projectors.json':'projectors.json'};
+const assets=Object.fromEntries(Object.entries(files).map(([url,file])=>[url,fs.readFileSync(path.join(root,file),'utf8')]));
+fs.writeFileSync(worker,'const ASSETS = '+JSON.stringify(assets)+source.slice(seam));
+console.log('Embedded canonical WST assets, configuration and projector reference.');

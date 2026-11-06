@@ -61,11 +61,15 @@
         "assignment": "Verified saved rig assignment, November 5, 2026",
         "lens": "Dave previously reported an approximately 1.8\u20132.5:1 current lens; exact installed model not verified",
         "geometry": "Owner-reported estimates, November 6, 2026; not surveyed",
-        "candidate": "Panasonic ET-DLE150 manufacturer specification; compatibility does not establish installed identity or final fit"
+        "candidate": "Panasonic ET-DLE150 manufacturer specification; compatibility does not establish installed identity or final fit",
+        "likelyLens": "Panasonic lists WXGA 1.80\u20132.54:1 and DW830 compatibility; DW830 specification lists ET-DLE170 as supplied lens. Reported ratio is consistent, not proof of installed identity."
       },
       "candidateCheck": "Previously discussed candidate, retained for testing: enlarging the full portrait raster from 20 ft to 26 ft at a fixed center adds 3 ft at the top. At a 38\u201339 ft throw this needs approximately 1.46\u20131.50:1, within the ET-DLE150 range. A 20 ft mapped picture would use approximately 985 of 1280 portrait pixels. Wider black raster, spill and cove clearance need testing. A 28 ft raster is at the nominal wide limit near 38 ft; 4 ft extra is not promised.",
       "installationCheck": "Verify the current lens, full raster center, existing shift and cove opening. Panasonic specifies ET-LAD120P/PW portrait lamps and terminal-side-down mounting (DW830 specification, page 14); current installation has not been inspected for these items.",
-      "installationSource": "https://eu.connect.panasonic.com/sites/default/files/media/document/2025-01/dw830_spec_en.pdf"
+      "installationSource": "https://eu.connect.panasonic.com/sites/default/files/media/document/2025-01/dw830_spec_en.pdf",
+      "likelyLens": "ET-DLE170 is a likely match, not physically confirmed",
+      "likelyLensSource": "https://eu.connect.panasonic.com/gb/en/projectors/et-dle170",
+      "reviewPlan": "Adam reviews Friday morning, November 6; choose and implement the change in time for Saturday morning, November 7. Confirm installed lens label, current zoom and portrait-up shift stop. Check the 38\u201339 ft lens throw, 20 ft-tall portrait raster and requested 3\u20134 ft upward coverage. Consider a roughly 26 ft raster with 20 ft content positioned high in Resolume (nominal ratio 1.46\u20131.50:1). Verify cove beam clearance and surface coverage first; brightness and resolution are secondary."
     }
   ]
 }
