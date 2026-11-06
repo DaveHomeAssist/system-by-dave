@@ -70,6 +70,9 @@ export async function createStage3D(host, plot, openLane) {
     body.name = `${lane} enclosure`;
     bodies.push(body); projector.add(body);
     const silhouette = new THREE.LineSegments(new THREE.EdgesGeometry(body.geometry), new THREE.LineBasicMaterial({ color, depthTest: false }));
+    // Decorative x-ray edges must not expand the model's click target via the
+    // raycaster's line tolerance or steal clicks from another lane's label.
+    silhouette.raycast = () => {};
     silhouette.position.copy(body.position); silhouette.renderOrder = 15; silhouette.name = `${lane} physical enclosure outline`; projector.add(silhouette);
     const lens = new THREE.Mesh(new THREE.SphereGeometry(.035, 12, 8), new THREE.MeshBasicMaterial({ color }));
     lens.name = `${lane} lens datum`; projector.add(lens);
