@@ -7,14 +7,15 @@
       "position": "SL Portal",
       "orientation": "Portrait",
       "model": "Unassigned",
-      "lens": "Not yet confirmed",
-      "note": "Position reserved. Device identity and installed lens need field confirmation.",
+      "lens": "ET-DLE170 \u00b7 1.80\u20132.54:1 (projection plot record)",
+      "note": "A remains an unassigned live control position. The projection plot specifies Panasonic PT-DW830KU with ET-DLE170; this is the recorded plan, not confirmation of the unit hung here.",
       "color": "#c65cba",
       "internalSlot": null,
       "provenance": {
         "assignment": "Owner-designated unassigned position",
-        "lens": "Installed lens not recorded"
-      }
+        "lens": "Walnut Frozen Projection Research and Gig Setup, projection plot, edited November 5, 2026. Physical lens barrel confirmation pending."
+      },
+      "recordSource": "https://app.notion.com/p/3fc255fc8f44811e8a5eeddcb236df1e?pvs=204"
     },
     {
       "lane": "B",
@@ -22,7 +23,7 @@
       "orientation": "Landscape",
       "model": "Panasonic PT-RZ970",
       "lens": "ET-DLE080 (recorded)",
-      "note": "Lens model comes from the saved rig record; its physical label has not been rechecked.",
+      "note": "Prior rig/example records ET-DLE080; the projection plot lists 085. This discrepancy is unresolved: verify the physical lens label before treating either as installed.",
       "color": "#2491af",
       "internalSlot": "P2",
       "provenance": {
@@ -49,7 +50,7 @@
       "position": "SR Portal",
       "orientation": "Portrait",
       "model": "Panasonic PT-DW830U",
-      "lens": "Approximately 1.8\u20132.5:1 (Dave-reported; part unverified)",
+      "lens": "ET-DLE170 \u00b7 1.80\u20132.54:1 (projection plot record)",
       "image": "Approximately 20 ft tall (user estimate)",
       "throwDistance": "38\u201339 ft (user estimate)",
       "candidate": "ET-DLE150 \u00b7 1.36\u20131.98:1 WXGA 16:10",
@@ -59,17 +60,19 @@
       "internalSlot": "P4",
       "provenance": {
         "assignment": "Verified saved rig assignment, November 5, 2026",
-        "lens": "Dave previously reported an approximately 1.8\u20132.5:1 current lens; exact installed model not verified",
+        "lens": "Walnut Frozen Projection Research and Gig Setup, projection plot, edited November 5, 2026. Physical lens barrel confirmation pending.",
         "geometry": "Owner-reported estimates, November 6, 2026; not surveyed",
         "candidate": "Panasonic ET-DLE150 manufacturer specification; compatibility does not establish installed identity or final fit",
-        "likelyLens": "Panasonic lists WXGA 1.80\u20132.54:1 and DW830 compatibility; DW830 specification lists ET-DLE170 as supplied lens. Reported ratio is consistent, not proof of installed identity."
+        "likelyLens": "The projection plot explicitly records ET-DLE170, 1.80\u20132.54:1, for D; this supersedes ratio-only inference. Panasonic DW830 specification supports compatibility; physical installation remains unverified."
       },
       "candidateCheck": "Previously discussed candidate, retained for testing: enlarging the full portrait raster from 20 ft to 26 ft at a fixed center adds 3 ft at the top. At a 38\u201339 ft throw this needs approximately 1.46\u20131.50:1, within the ET-DLE150 range. A 20 ft mapped picture would use approximately 985 of 1280 portrait pixels. Wider black raster, spill and cove clearance need testing. A 28 ft raster is at the nominal wide limit near 38 ft; 4 ft extra is not promised.",
       "installationCheck": "Verify the current lens, full raster center, existing shift and cove opening. Panasonic specifies ET-LAD120P/PW portrait lamps and terminal-side-down mounting (DW830 specification, page 14); current installation has not been inspected for these items.",
       "installationSource": "https://eu.connect.panasonic.com/sites/default/files/media/document/2025-01/dw830_spec_en.pdf",
-      "likelyLens": "ET-DLE170 is a likely match, not physically confirmed",
-      "likelyLensSource": "https://eu.connect.panasonic.com/gb/en/projectors/et-dle170",
-      "reviewPlan": "Adam reviews Friday morning, November 6; choose and implement the change in time for Saturday morning, November 7. Confirm installed lens label, current zoom and portrait-up shift stop. Check the 38\u201339 ft lens throw, 20 ft-tall portrait raster and requested 3\u20134 ft upward coverage. Consider a roughly 26 ft raster with 20 ft content positioned high in Resolume (nominal ratio 1.46\u20131.50:1). Verify cove beam clearance and surface coverage first; brightness and resolution are secondary."
+      "likelyLens": "ET-DLE170 recorded in projection plot; barrel check pending",
+      "likelyLensSource": "https://app.notion.com/p/3fc255fc8f44811e8a5eeddcb236df1e?pvs=204",
+      "reviewPlan": "Adam reviews Friday morning, November 6; choose and implement the change in time for Saturday morning, November 7. Confirm installed lens label, current zoom and portrait-up shift stop. Check the 38\u201339 ft lens throw, 20 ft-tall portrait raster and requested 3\u20134 ft upward coverage. Consider a roughly 26 ft raster with 20 ft content positioned high in Resolume (nominal ratio 1.46\u20131.50:1). Verify cove beam clearance and surface coverage first; brightness and resolution are secondary.",
+      "recordSource": "https://app.notion.com/p/3fc255fc8f44811e8a5eeddcb236df1e?pvs=204",
+      "plotDimensions": "12 ft 5 in wide \u00d7 19 ft 11 in tall (recorded plot)"
     }
   ]
 }
