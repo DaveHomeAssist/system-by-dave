@@ -236,15 +236,23 @@ function renderAll() {
 }
 
 // ---- Adjust sheet: patterns, lens, picture ----
-let adjSlot = null, adjSpeed = 'slow', adjHomeArmed = 0, adjReturnFocus = null;
+let adjSlot = null, adjSpeed = 'slow', adjHomeArmed = 0, adjReturnFocus = null, adjReturnSection = 'pattern';
 function openAdjust(slot, section = 'pattern') {
   adjSlot = slot; const p = state.projectors.find((x) => x.slot === slot); if (!p) return;
-  adjReturnFocus = document.activeElement;
+  adjReturnFocus = document.activeElement; adjReturnSection = section;
   $('#adj-title').textContent = projectorName(p); $('#adj-sub').textContent = [slot, laneOf(p)?.orientation, p.model, p.ip].filter(Boolean).join(' · ');
   $('#adjust').dataset.lane = laneOf(p) ? p.lane : '';
   $('#adjust').hidden = false; $('#adjust').showModal(); $('#adj-feedback').textContent = ''; $('#adj-motion').textContent = ''; renderAdjust(); $(`[data-adjtab="${section}"]`).click(); $('#adj-close').focus();
 }
-function closeAdjust() { const slot = adjSlot; $('#adjust').close(); $('#adjust').hidden = true; adjSlot = null; const trigger = adjReturnFocus?.isConnected ? adjReturnFocus : [...$('#grid').querySelectorAll('[data-slot]')].find((el) => el.dataset.slot === slot)?.querySelector('[data-adj]'); trigger?.focus(); }
+function closeAdjust() {
+  const slot = adjSlot, section = adjReturnSection;
+  $('#adjust').close(); $('#adjust').hidden = true; adjSlot = null;
+  const card = [...$('#grid').querySelectorAll('[data-slot]')].find((el) => el.dataset.slot === slot);
+  const currentTrigger = card?.querySelector(`[data-adj="${section}"]:not(:disabled)`);
+  const originalTrigger = adjReturnFocus?.isConnected && adjReturnFocus.matches('button:not(:disabled), [role="button"]') ? adjReturnFocus : null;
+  (currentTrigger || originalTrigger || card?.querySelector('[data-adj]:not(:disabled)') || $('#tab-btn-rig')).focus();
+}
+
 function renderAdjust() {
   const p = state.projectors.find((x) => x.slot === adjSlot); if (!p) return;
   const off = !connected || !p.status?.online;
