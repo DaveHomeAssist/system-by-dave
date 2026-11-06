@@ -114,6 +114,9 @@ function renderGrid() {
     const { st, word } = stateOf(p);
     const errs = Object.entries(s.errors || {}).filter(([, v]) => v > 0).map(([k, v]) => `${k}${v === 2 ? ' fault' : ' warning'}`);
     const inputs = Object.entries(p.inputs || {});
+    const alarmKnown = s.errors != null && !!(s.connection?.lastSuccessAt || s.online);
+    const inputMatched = s.input != null && inputs.some(([id]) => id === String(s.input));
+    const inputPlaceholder = s.input == null || s.input === '' ? 'No input reported' : `Reported input: ${s.input} (not in available options)`;
     const busy = !!p.busy;
 
     const pat = s.pattern ? ((p.patterns || PATTERNS)[s.pattern] || s.pattern) : '—';
@@ -130,7 +133,7 @@ function renderGrid() {
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Input</span><span class="avd-readout__value">${esc(s.input ? (p.inputs?.[s.input] || s.input) : '—')}</span></div>
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Light source</span><span class="avd-readout__value">${s.lightHours != null ? esc(s.lightHours) + '<span class="avd-readout__unit">h</span>' : '—'}</span></div>
         </div>
-        <div class="pj-health pj-mono"><span>Shutter <strong>${esc(s.shutter || 'Unknown')}</strong></span><span>Alarms <strong>${s.errors == null ? 'Unavailable' : errs.length ? esc(errs.length + ' reported') : 'None reported'}</strong></span></div>
+        <div class="pj-health pj-mono"><span>Shutter <strong>${esc(s.shutter || 'Unknown')}</strong></span><span>Alarms <strong>${!alarmKnown ? 'Unavailable' : errs.length ? esc(errs.length + ' reported') : 'None reported'}</strong></span></div>
         <div class="avd-field"><span class="avd-field__label pj-caps">Shutter control</span>
           ${seg(`Shutter, ${lane ? 'Projector ' + p.lane : p.label}`, [['open', 'Open'], ['closed', 'Closed']], s.shutter, (v) => `data-c="shutter" data-a="${v === 'closed' ? 1 : 0}" ${off ? 'disabled' : ''}`)}
         </div>
@@ -139,7 +142,7 @@ function renderGrid() {
           <button class="avd-btn avd-btn--danger" data-c="power" data-a="0" type="button" ${off || busy || lock || s.power === 'off' ? 'disabled' : ''}>Power off</button>
         </div>
         <label class="avd-field"><span class="avd-field__label pj-caps">Input select</span>
-          <select class="avd-input" data-c="input" ${off || busy || lock || !inputs.length ? 'disabled' : ''}>${inputs.map(([id, lab]) => `<option value="${esc(id)}" ${String(s.input) === id ? 'selected' : ''}>${esc(lab)}</option>`).join('')}</select>
+          <select class="avd-input" data-c="input" ${off || busy || lock || !inputs.length ? 'disabled' : ''}>${!inputMatched ? `<option value="" disabled selected>${esc(inputPlaceholder)}</option>` : ''}${inputs.map(([id, lab]) => `<option value="${esc(id)}" ${String(s.input) === id ? 'selected' : ''}>${esc(lab)}</option>`).join('')}</select>
         </label>
         <div class="pj-well"><span class="avd-eyebrow">Test pattern</span><span class="pj-mono pj-ink">${esc(pat)}</span></div>
         <div class="pj-two">
