@@ -15,7 +15,8 @@ const assert = require('node:assert/strict');
       page.on('pageerror', error => errors.push(error.message));
       page.on('request', request => { if (request.url().endsWith('/api/command')) commands.push(request.method()); });
       await page.goto(relay.base);
-      assert.equal(await page.locator('#tab-btn-notes').getAttribute('aria-selected'), 'true');
+      assert.equal(await page.locator('#tab-btn-home').getAttribute('aria-selected'), 'true');
+      await page.locator('[data-local-target="notes"]').click();
       const notes = page.frameLocator('[data-workspace="notes"]');
       await notes.locator('#notes').fill('Isolated browser fixture note');
       await notes.locator('#task-list').getByText('Shared fixture task').waitFor();
@@ -28,12 +29,13 @@ const assert = require('node:assert/strict');
       await page.locator('#tab-btn-notes').click();
       assert.equal(await notes.locator('#notes').inputValue(), 'Isolated browser fixture note');
       await page.reload();
+      await page.locator('[data-local-target="notes"]').click();
       assert.equal(await notes.locator('#notes').inputValue(), 'Isolated browser fixture note');
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
       assert.ok(await notes.locator('html').evaluate(el => el.scrollWidth <= innerWidth));
       assert.deepEqual(errors, []); assert.deepEqual(commands, []);
       await context.close();
     }
-    console.log('Unified workspace: default notes, shared task read, info, Stage/Rig return, note reload and desktop/mobile containment passed');
+    console.log('Unified workspace: Home choices, shared task read, info, Stage/Rig return, note reload and desktop/mobile containment passed');
   } finally { await browser.close(); await relay.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -7,7 +7,7 @@ See [managed service access and recovery](deploy/RUNBOOK.md#managed-macos-access
 for installation, the one live settings location, logs and backups.
 
 One workspace contains Notes + tasks, Projector info, Rig and Stage. The controller
-opens Notes + tasks by default; the other tabs stay in the same page. Notes save
+opens a Home landing with four choices; the other tabs stay in the same page. Notes save
 in this browser at this controller address, with text export. Shared team tasks
 use the public Frozen workspace service at https://wst.housevideo.app/; keep
 sensitive content out of that shared list. Private cross-device notes sync is
