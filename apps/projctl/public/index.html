@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="avd/tokens.css">
 <link rel="stylesheet" href="avd/bundle.css">
 <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="power-schedules.css">
 <link rel="stylesheet" href="reference-view.css" data-frozen-reference>
 <link rel="stylesheet" href="stage.css">
 <!-- Local Throwline import map: supplied by the relay. -->
@@ -135,6 +136,7 @@
     </section>
 
     <section id="tab-setup" class="tab" role="tabpanel" aria-labelledby="tab-btn-setup" hidden>
+      <details id="power-schedule-panel"><summary>Power scheduling</summary><div id="power-schedules"></div></details>
       <div class="pj-allbar"><button id="discover" class="avd-btn" type="button">Find projectors</button><span id="discover-out" class="pj-mono" aria-live="polite"></span></div>
       <div id="setup" class="pj-list pj-fill" role="region" aria-label="Projector setup" tabindex="0" data-web2-scroll></div>
       <p class="pj-mono pj-note">Cue input: OSC on UDP 9000 or a text line on TCP 9001. Forms: <code>/proj/P4/shutter 1</code>, <code>/proj/all/power 0</code>, <code>/proj/preset/preshow</code>.</p>
