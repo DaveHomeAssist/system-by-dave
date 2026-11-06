@@ -12,3 +12,14 @@ html,body{width:100%;height:100%;margin:0;overflow:hidden}body{padding:0;backgro
 .public-stage-toolbar .pj-stage-mode{margin-left:0;flex:none}
 /* The optional 2D diagram keeps its coordinate aspect so markers stay aligned. */
 .pj-stage-viewport{display:grid;place-items:center;container-type:size}.pj-stage-canvas{position:relative;inset:auto;max-width:calc(100cqh * 5 / 3);height:auto;aspect-ratio:5/3}
+@media(max-width:700px){
+  .public-stage-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 68px 68px;grid-template-rows:44px 44px;gap:4px 5px;height:100px;min-height:100px;padding:4px 5px;align-content:start}
+  .public-stage-toolbar>.pj-stage-mode{grid-column:1;grid-row:1;width:auto;min-width:0;max-width:none;margin:0;display:flex;flex-wrap:nowrap}.public-stage-toolbar>.pj-stage-mode .avd-seg__btn{flex:1;min-width:0;padding-inline:4px;font-size:11px;letter-spacing:.02em}
+  .public-camera-label{grid-column:2/4;grid-row:1;display:block;min-width:0;margin:0}.public-camera-label select{width:100%;height:44px;min-width:0;font-size:11px}
+  .public-projector-select{grid-column:1;grid-row:2;min-width:0}.public-projector-select #stage-projectors{flex-direction:row;gap:4px;width:auto}.public-projector-select .public-lane-select{width:44px;min-width:44px}
+  .public-view-options{grid-column:2;grid-row:2;min-width:0}.public-view-options>summary{font-size:0;padding:5px;justify-content:center}.public-view-options>summary::after{content:'Layers';font:12px var(--font-sans)}
+  #public-inspector-toggle{grid-column:3;grid-row:2;min-width:0;padding:5px;font-size:0}#public-inspector-toggle::after{content:'Info';font:12px var(--font-sans)}#public-inspector-toggle[aria-expanded=true]::after{content:'Close'}
+  #stage-workspace{inset-block-start:100px}.pj-stage-viewport{bottom:28px}
+}
+
+@media(max-width:340px){.public-stage-toolbar{grid-template-columns:minmax(0,1fr) 44px 44px}.public-view-options>summary::after{font-size:11px}}
