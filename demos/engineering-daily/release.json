@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "74f58ba374f86920df97f86a0eab6f8b0441fae4072cae2e5c852980c69a75e2",
-  "publicSha256": "eedf66ccc89540ffc2f06861ee9008154e326022d0aa5eb56613e83920cbb8e7",
-  "editions": 30,
+  "sourceSha256": "c9179e919abcd0418b340e382e6392d4ce0abfe13308725abdab5df2b04a0686",
+  "publicSha256": "9eb672407fb917b4b6db75278e5f9b1ca39f1845076eb3e805b9f16613a11261",
+  "editions": 31,
   "files": [
+    {
+      "name": "Edition 031.svg",
+      "id": 31,
+      "date": "2026-11-07",
+      "title": "Return loss and reflections",
+      "sha256": "bf5abdc81dc116241070b0e812999e490827c97bccbf619727b1c7cc89fff508"
+    },
+    {
+      "name": "Edition 031.png",
+      "id": 31,
+      "date": "2026-11-07",
+      "title": "Return loss and reflections",
+      "sha256": "a8a2d579652c8db7659434e52242f6f74d2e71ccbb43e16699335db53ac7c1e0"
+    },
     {
       "name": "Edition 030.svg",
       "id": 30,

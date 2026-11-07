@@ -1,5 +1,10 @@
 # Changelog
 
+## November 7, 2026: Video Engineering Daily
+
+- Add Edition 031, Return loss and reflections, with a sourced calculation,
+  power reflection comparison and matching SVG/PNG story card. Preserve prior editions.
+
 ## November 6, 2026: Video Engineering Daily
 
 - Add Edition 030, ST 2110 essence routing, with a SMPTE sourced lesson,
