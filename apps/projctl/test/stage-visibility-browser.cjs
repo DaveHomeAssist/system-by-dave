@@ -116,6 +116,10 @@ const path = require('node:path');
      return p.left>=d.left&&p.right<=d.right&&p.top>=d.top;
    });
    assert.equal(menuFit,true,`room menu stays inside the drawing at ${width}`);
+   if(width<=680)for(const button of await page.locator('.pj-room-layer-panel button').all()){
+     await button.scrollIntoViewIfNeeded();
+     assert.equal(await button.evaluate(node=>{const r=node.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return hit===node||node.contains(hit);}),true,'each expanded room control remains reachable inside the scrolling phone workspace');
+   }
    await layers.locator('summary').press('Escape');
    assert.equal(await layers.getAttribute('open'),null);
    await page.locator('[data-room-axis="x"]').fill('0.5');

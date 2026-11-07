@@ -10,7 +10,7 @@ const svgNode = (name, attrs = {}) => {
   return el;
 };
 
-export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/stage-plot", venueUrl = "/api/venue-model", referenceOnly = false} = {}) {
+export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/stage-plot", venueUrl = "/api/venue-model", referenceOnly = false, viewerOptions = {}} = {}) {
   const $ = (s) => root.querySelector(s);
   const canvas = $('#stage-canvas');
   let plot, view = '3d', current = { projectors: [] }, connected = false, viewer, loading3D;
@@ -21,15 +21,16 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
   const hidden = new Set(), cards = new Map(), markers = new Map();
   const highlight = (lane) => { canvas.dataset.highlight = lane || ''; viewer?.highlight(lane); };
 
+  function selectMetadata(lane){root.dataset.selectedLane=lane;for(const [key,card]of cards)card.setAttribute('aria-pressed',String(key===lane));root.dispatchEvent(new CustomEvent('stage-lane-select',{detail:{lane}}));}
   function openLane(lane) {
-    viewer?.select(lane);
+    selectMetadata(lane);viewer?.select(lane);
     if (planning) { planner?.select(lane); return; }
     const p = projectorForLane(current.projectors, lane);
     if (p && connected && p.status?.online && canAdjust(p)) openControls(p.slot);
   }
   function buttonFor(lane, className) {
     const b = document.createElement('button'); b.type = 'button'; b.className = className; b.dataset.lane = lane;
-    b.onclick = () => openLane(lane);
+    b.onclick = () => openLane(lane);b.setAttribute('aria-pressed',String(lane==='D'));root.dataset.selectedLane||='D';
     b.onpointerenter = () => highlight(lane); b.onpointerleave = () => highlight();
     b.onfocus = () => highlight(lane); b.onblur = () => highlight();
     return b;
@@ -51,7 +52,7 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
     if (loading3D || !plot || root.hidden || view !== '3d') return;
     loading3D = true;
     try {
-      viewer = await createStage3D(spatial, plot, lane => { cards.get(lane)?.focus({ preventScroll: true }); openLane(lane); });
+      viewer = await createStage3D(spatial, plot, lane => { cards.get(lane)?.focus({ preventScroll: true }); openLane(lane); },viewerOptions);
       $('#stage-3d-message').hidden = true;
       updateLayers(); if (planning) viewer.planning(proposal, true); if (approximateRoom) updateRoom(); viewer.active(!root.hidden && view === '3d');
     } catch (error) {
@@ -110,7 +111,7 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
           ? `${plot.views.plan.lanes[lane].note}. Body W/H/D: ${p.body.map(v => Math.round(v * 1000)).join(' / ')} mm. Lens height: ${p.y === null ? 'not measured' : p.y.toFixed(3) + ' m'}.`
           : plot.views.plan.lanes[lane].note;
       }
-      load3D(); return;
+      update(current,connected);load3D(); return;
     }
     canvas.replaceChildren(); markers.clear();
     const data = plot.views[view];
@@ -156,6 +157,7 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
     roomAlignment[input.dataset.roomAxis] = value; if (approximateRoom) updateRoom();
   }));
   async function setPlanning(on, withRoom = approximateRoom) {
+    const selectedBefore=referenceOnly?root.dataset.selectedLane:null;
     planning = on; approximateRoom = withRoom && !!venue;
     $('#stage-alignment').hidden = !approximateRoom;
     $('#stage-alignment details').hidden = !on;
@@ -168,7 +170,7 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
       view = '3d'; root.querySelectorAll('[data-stage-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.stageView === '3d')));
       if (!planner && !plannerLoading && plot) {
         plannerLoading = true;
-        try { planner = await createStagePlanner($('#stage-planner'), plot, (result, lane) => { proposal = result; viewer?.select(lane); if (planning) viewer?.planning(result); }, lane => {
+        try { planner = await createStagePlanner($('#stage-planner'), plot, (result, lane) => { proposal = result;selectMetadata(lane); viewer?.select(lane); if (planning) viewer?.planning(result); }, lane => {
           const p = projectorForLane(current.projectors, lane);
           if (p && connected && p.status?.online && canAdjust(p)) openControls(p.slot);
           else { $('#stage-message').textContent = 'Live controls unavailable for this projector. Use Rig to inspect connection status.'; $('#stage-message').hidden = false; }
@@ -176,7 +178,7 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
         catch (error) { $('#stage-planner').textContent = error.message; }
         finally { plannerLoading = false; }
       }
-      planner?.refresh();
+      if(selectedBefore)planner?.select(selectedBefore);else planner?.refresh();
     } else { viewer?.planning(null); if (!approximateRoom) viewer?.hideVenue(); }
     root.querySelectorAll('[data-stage-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.stageView === (approximateRoom ? 'building' : '3d'))));
     draw(); if (on) viewer?.planning(proposal, true); if (approximateRoom) updateRoom();
@@ -194,7 +196,7 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
   });
   function update(state, online) {
     current = state; connected = online;
-    if(referenceOnly){$('#stage-status-kind').textContent='Recorded reference';for(const [lane,card] of cards){card.querySelector('.pj-stage-device').textContent=LANES[lane].orientation;card.querySelector('.pj-stage-state').textContent='Plot reference · not live telemetry';card.setAttribute('aria-disabled','true');}return;}
+    if(referenceOnly){$('#stage-status-kind').textContent='Recorded reference';for(const [lane,card] of cards){card.querySelector('.pj-stage-device').textContent=LANES[lane].orientation;card.querySelector('.pj-stage-state').textContent='Plot reference · not live telemetry';card.setAttribute('aria-disabled','false');card.setAttribute('aria-label',`${lane} ${LANES[lane].target}. Select recorded projector.`);}return;}
     $('#stage-status-kind').textContent = !online ? 'Relay offline' : state.simulation ? 'Simulated status' : 'Reported status';
     for (const [lane, info] of Object.entries(LANES)) {
       const p = projectorForLane(state.projectors, lane), s = p?.status;
