@@ -131,3 +131,11 @@ inspection, layer/status/lock parity, no idle or hidden draws, context recovery,
 dependency failure fallback, both themes and six viewport sizes. Run the
 existing Throwline release/browser gates plus isolated Projctl tests. Physical
 coverage and house-unit identity remain separate venue checks.
+
+## Drawing-order numbering and Stage polish, November 7
+
+Dave requested A=P1, B=P2, C=P3 and D=P4 and confirmed that only this control page uses the numbered addresses. The active backend is the Mac Studio. This explicit offline migration supersedes the earlier display-order-only restriction for that saved rig; editing lane metadata still never renumbers a device automatically.
+
+PR 448 is merged with a guarded migration, set-facing Stage camera, live lane identity in reference views, and contained disclosure layouts. Dominic passed 95 unit tests and browser checks including beam framing, connected assignment updates, phone menus, history labels and zero navigation-triggered hardware writes. Public version 24 published the visual changes, retained by concurrent version 25. The simulator uses the new numbering.
+
+Remaining: obtain working Studio access, back up its stopped rig, apply the reviewed migration and UI assets, then verify the same four physical-device identities under A/P1, B/P2, C/P3 and D/P4. Preserve projector settings, authentication, schedules, private geometry and the laptop installation. The live migration and Studio visual acceptance have not yet occurred.
