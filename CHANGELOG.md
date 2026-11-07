@@ -1,5 +1,12 @@
 # Changelog
 
+## November 7, 2026: Frozen control polish
+
+- Open Stage facing the set with the complete A-D projection beams in frame. Keep projector inspection, coverage, plan and side presets, original geometry and manual room-layer choices.
+- Resolve gear and signal-flow identities from the connected relay, correct the recorded A Panasonic PT-DW830U entry, and distinguish recorded, simulated, unassigned and conflicting lanes.
+- Align Frozen references and the simulator with A=P1, B=P2, C=P3 and D=P4. Add an explicit backed-up migration that preserves device settings, preset targets and previous event numbers. Existing installations require an external-cue review before migration.
+- Keep expanded connection details in the page flow, constrain Room layers to the drawing panel, and let phone Stage controls and planning fields scroll together without covering one another.
+
 ## November 7, 2026: Video Engineering Daily
 
 - Add Edition 031, Return loss and reflections, with a sourced calculation,

@@ -7,7 +7,10 @@ const CAMERAS = [
   { name: 'Coverage', direction: [0, .03, 1] },
   { name: 'Plan', direction: [0, 1, .001] },
   { name: 'Selected side' },
+  { name: 'Projectors' },
+  { name: 'Stage', direction: [.12, .15, 1] },
 ];
+const STAGE_CAMERA = 4;
 
 export async function createStage3D(host, plot, openLane) {
   const reference = stageReference(plot);
@@ -96,14 +99,14 @@ export async function createStage3D(host, plot, openLane) {
     const detail = event.detail;
     if (detail?.version === 1 && detail.context === 'projctl.stage.v1' && Object.hasOwn(LANES, detail.id)) openLane(detail.id);
   });
-  const defaultCamera = 3;
+  const defaultCamera = STAGE_CAMERA;
   let camera = defaultCamera, selectedLane = 'D', framedSideLane = 'D', currentProposal = null;
   const hiddenLanes = new Set();
   const viewVisibility = () => {
-    roomLayers?.cutawayForCamera(camera === 0 ? ['seats'] : []); roomControls?.sync(); host.dataset.coverageSeatMeshes = String(roomLayers?.count('seats') || 0);
+    roomLayers?.cutawayForCamera(camera === 0 || camera === STAGE_CAMERA ? ['seats'] : []); roomControls?.sync(); host.dataset.coverageSeatMeshes = String(roomLayers?.count('seats') || 0);
     proposal.visible = camera !== 2 || currentProposal?.lane === framedSideLane;
     for (const [lane, group] of groups) group.visible = !hiddenLanes.has(lane) && (camera !== 2 || lane === framedSideLane);
-    labels.forEach((label,lane) => { label.visible = camera === 3 || (camera === 2 && lane === framedSideLane); label.userData.screenPixels = camera === 3 ? 44 : 30; leaders.get(lane).visible = label.visible; });
+    labels.forEach((label,lane) => { label.visible = camera === 3 || camera === STAGE_CAMERA || (camera === 2 && lane === framedSideLane); label.userData.screenPixels = camera === 3 ? 44 : 30; leaders.get(lane).visible = label.visible; });
     projectorGroups.forEach(object => { object.visible = camera !== 0 && object.userData.lane !== currentProposal?.lane && (camera !== 2 || object.userData.lane === framedSideLane); });
   };
   const frame = (index = camera) => {
@@ -130,8 +133,11 @@ export async function createStage3D(host, plot, openLane) {
         for (const [lane, data] of Object.entries(reference.lanes)) {
           const proposed = currentProposal?.lane === lane ? currentProposal : null;
           include(proposed?.corners || data.coverage);
-          if (index === 1) include([proposed?.projector || data.projector]);
+          if (index === 1 || index === STAGE_CAMERA) include([proposed?.projector || data.projector]);
         }
+        // Frame the complete beams from the house side, keeping their labels
+        // inside the view without fitting the unrelated auditorium geometry.
+        if (index === STAGE_CAMERA) labels.forEach(label => include([label.position.toArray()]));
       }
       bounds.expandByScalar(.25); stage.frameObject(direction, name, { points, fit: 'content', padding: 1.12, saveDefault: true });
     }
@@ -140,8 +146,8 @@ export async function createStage3D(host, plot, openLane) {
     controls?.querySelectorAll('[data-camera]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.camera) === index)));
   };
   const controls = document.createElement('div'); controls.className = 'pj-stage-camera'; controls.setAttribute('role', 'group'); controls.setAttribute('aria-label', '3D camera');
-  const focusButton = document.createElement('button'); focusButton.type = 'button'; focusButton.textContent = 'Projectors'; focusButton.dataset.camera = '3'; focusButton.onclick = () => frame(3); controls.append(focusButton);
-  for (const [index, c] of CAMERAS.entries()) {
+  for (const index of [STAGE_CAMERA, 3, 0, 1, 2]) {
+    const c = CAMERAS[index];
     const button = document.createElement('button'); button.type = 'button'; button.textContent = c.label || c.name; button.title = c.name; button.dataset.camera = String(index);
     button.onclick = () => frame(index); controls.append(button);
   }
@@ -176,7 +182,7 @@ export async function createStage3D(host, plot, openLane) {
           room.name = 'Approximate venue reference'; room.traverse(object => { object.castShadow = false; object.receiveShadow = false; for (const material of [object.material].flat().filter(Boolean)) { material.transparent = true; material.opacity = .22; material.depthWrite = false; } });
           roomLayers = createRoomLayers(room, venue.cutaway); host.dataset.roofMeshes = String(roomLayers.count('roof'));
           roomControls = addRoomLayerControls(controls, roomLayers, () => stage.requestRender());
-          roomLayers.cutawayForCamera(camera === 0 ? ['seats'] : []); roomControls.sync();
+          roomLayers.cutawayForCamera(camera === 0 || camera === STAGE_CAMERA ? ['seats'] : []); roomControls.sync();
           model.add(room);
         } finally { roomLoading = false; }
       }
@@ -184,7 +190,7 @@ export async function createStage3D(host, plot, openLane) {
       stage.requestRender();
     },
     hideVenue() { if (room) room.visible = false; roomControls?.visible(false); stage.requestRender(); },
-    focusProjectors() { frame(3); },
+    focusStage() { frame(STAGE_CAMERA); },
     select(lane) { if (reference.lanes[lane]) selectedLane = lane; },
     planning(result, reframe = false) {
       currentProposal = result; if (result) selectedLane = result.lane;
@@ -215,7 +221,7 @@ export async function createStage3D(host, plot, openLane) {
         const datum = new THREE.Mesh(new THREE.SphereGeometry(.07, 12, 8), new THREE.MeshBasicMaterial({ color }));
         datum.position.set(...result.projector); proposal.add(datum);
       }
-      if (reframe && result) frame(3);
+      if (reframe && result) frame(STAGE_CAMERA);
       viewVisibility(); stage.requestRender();
     },
     layers(hidden) { hiddenLanes.clear(); hidden.forEach(lane => hiddenLanes.add(lane)); viewVisibility(); stage.requestRender(); },

@@ -189,7 +189,7 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
       $('#stage-alignment').hidden = !approximateRoom || view !== '3d';
       $('#stage-alignment details').hidden = !planning;
       root.querySelectorAll('[data-stage-view]').forEach((other) => other.setAttribute('aria-pressed', String(other === b)));
-      highlight(); draw(); if (view === '3d' && approximateRoom) { updateRoom(); viewer?.focusProjectors(); }
+      highlight(); draw(); if (view === '3d' && approximateRoom) { updateRoom(); viewer?.focusStage(); }
     };
   });
   function update(state, online) {

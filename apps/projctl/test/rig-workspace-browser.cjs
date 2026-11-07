@@ -10,8 +10,28 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
    let relaySocket;await page.routeWebSocket('**/ws',ws=>{relaySocket=ws;ws.send(JSON.stringify(snapshot));});
    await page.route('https://avbydave.com/ProjectorThrow/**',r=>r.fulfill({contentType:'text/html',body:'<h1>Canonical Throwline test fixture</h1><label>Distance<input value="38.5"></label>'}));
    await page.goto(relay.base);await page.locator('#tab-home.on').waitFor();
+   await page.locator('#tab-btn-info').click();
+   const aModel=page.locator('[data-reference-model="A"]');
+   await aModel.filter({hasText:'Unassigned'}).waitFor();
+   const assigned=structuredClone(snapshot);Object.assign(assigned.projectors.find(p=>p.slot==='P3'),{lane:'A',make:'Panasonic',model:'PT-DW830U'});
+   relaySocket.send(JSON.stringify(assigned));
+   await aModel.filter({hasText:'Panasonic PT-DW830U'}).waitFor();
+   assert.match(await page.locator('[data-reference-assignment="A"]').innerText(),/slot P3/);
+   relaySocket.send(JSON.stringify(snapshot));await aModel.filter({hasText:'Unassigned'}).waitFor();
+   const history=structuredClone(snapshot);history.events=[{at:'2026-11-07T12:00:00Z',slot:'P3',slotBeforeRenumber:'P1',command:'/proj/P1/power',result:'OK',source:'fixture'}];
+   relaySocket.send(JSON.stringify(history));await page.locator('#tab-btn-log').click();
+   await page.locator('#log tbody').filter({hasText:'previously P1'}).waitFor();
+   assert.match(await page.locator('#log tbody').innerText(),/\/proj\/P1\/power/,'original command text remains in historical events');
+   relaySocket.send(JSON.stringify(snapshot));await page.locator('#tab-btn-info').click();
    assert.deepEqual(await page.locator('[data-primary-nav]').evaluateAll(nodes=>nodes.map(n=>n.childNodes[0].textContent.trim())),['My Projector Rig','3D Stage View','Presets','Log','Configuration','Throw Calc']);
    await page.locator('#tab-btn-rig').click();await page.locator('#grid [data-lane="B"] [data-open-projector]').click();
+   await page.locator('.pj-connection-help summary').click();
+   const disclosureFits=await page.locator('.pj-connection-help').evaluate(details=>{
+     const summary=document.querySelector('#summary').getBoundingClientRect(),box=details.getBoundingClientRect(),cards=document.querySelector('#grid').getBoundingClientRect();
+     return box.top>=summary.bottom&&box.bottom<=cards.top;
+   });
+   assert.equal(disclosureFits,true,'expanded connection details do not overlap status or cards');
+   await page.locator('.pj-connection-help summary').click();
    await page.locator('#tab-projector.on').waitFor();await openDisclosure(page,'#projector-more-controls');await openDisclosure(page,'#projector-info-panel');assert.match(await page.locator('#projector-detail-title').innerText(),/^B/);
    assert.equal(await page.locator('#projector-controls [data-reset-input]').isDisabled(),true);
    assert.match(await page.locator('#projector-display-info').innerText(),/HDMI/);assert.match(await page.locator('#projector-display-info').innerText(),/EDID is not read/);assert.match(await page.locator('#projector-display-info').innerText(),/Last known/);

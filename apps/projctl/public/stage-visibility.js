@@ -82,7 +82,7 @@ export function addRoomLayerControls(container, layers, render, projectorContext
       const key = button.dataset.roomLayer;
       if (key === 'restore') return;
       button.setAttribute('aria-pressed',String(key === 'room' ? !layers.visible : layers.enabled[key]));
-      if (key !== 'room') { button.disabled = !layers.count(key); button.title = layers.cameraCutaway.has(key) ? 'Temporarily hidden by Coverage camera cutaway; preference retained' : ''; button.textContent = key === 'seats' && layers.cameraCutaway.has(key) ? 'Seats · coverage cutaway' : key[0].toUpperCase()+key.slice(1); }
+      if (key !== 'room') { button.disabled = !layers.count(key); button.title = layers.cameraCutaway.has(key) ? 'Temporarily hidden by the current camera cutaway; preference retained' : ''; button.textContent = key === 'seats' && layers.cameraCutaway.has(key) ? 'Seats · camera cutaway' : key[0].toUpperCase()+key.slice(1); }
     });
   };
   roof.onclick = () => { layers.set('roof',!layers.enabled.roof); sync(); render(); };

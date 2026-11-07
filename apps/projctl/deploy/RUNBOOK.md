@@ -118,3 +118,32 @@ termination flushes pending settings.
 For a deliberate rollback, unload the managed LaunchAgent first, restore its
 backed-up service/runtime, and verify its configured settings path before
 starting it. Do not run old and new copies simultaneously.
+
+## Align slot numbers with drawing lanes
+
+Frozen uses A / SL Portal = P1, B / Top Portal = P2, C / Stage = P3 and
+D / SR Portal = P4. A lane edit alone does not change a device's control address.
+For an older rig with different numbers, use `scripts/renumber-rig.js` during a
+maintenance window. First review Stream Deck, OSC/TCP and other external cues
+that address P1 through P4. A saved cue using the old number must be changed
+to follow the same physical projector before cue input resumes.
+
+1. Preview with `node scripts/renumber-rig.js --rig /absolute/path/to/rig.json`.
+   Output contains only the mapping, counts and hash, not connection credentials.
+2. Stop the relay using its service manager. Run the preview again after it
+   has stopped so pending settings have flushed. Retain its `beforeSha`.
+3. Apply to the same rig path with `--write --relay-stopped --expected-sha`
+   followed by that exact hash. The script refuses changed input, ambiguous
+   lanes, unknown preset targets, existing schedules/history or occurrence
+   claims. It writes an exact private backup beside the rig, then atomically
+   replaces the rig and reads it back.
+4. Restart the same managed relay and inspect all four lane/slot/model pairs.
+   Compare each lane's connection settings and lens configuration to the
+   backup; all must be identical apart from `slot`. Check the Log: migrated
+   events show their previous slot, while original command text is retained.
+
+This operation sends no projector commands and does not migrate scheduled
+power actions. An existing schedule or audit is a stop condition requiring a
+separate migration, even if currently disabled. To roll back, stop the relay,
+restore the exact before-numbering backup and revert any external cue changes
+together. Never restore it over a running relay.

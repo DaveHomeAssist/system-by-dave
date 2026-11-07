@@ -69,3 +69,14 @@ Browser acceptance: `node apps/projctl/test/wst-public-stage-browser.cjs` with t
 The portfolio Pages staging step replaces only its WST home and Stage entry copies with canonical redirects to this managed site. The managed HTML, same-origin viewer imports and Worker assets remain unchanged; the source repository retains the full reproducible runtime. This prevents the portfolio mirror from loading viewer modules retired from that origin.
 
 WST and mirror-helper pull requests run the domain-cutover browser gate before merge, so managed-only imports cannot first break at the publication step.
+
+## Stage and reference polish, November 7, 2026
+
+The shared Stage renderer opens facing the set with all projection beams framed.
+Phone planning uses one scrollable workspace; expanded room controls stay within
+the drawing. The recorded A identity is Panasonic PT-DW830U. Frozen uses drawing-order
+numbering A=P1, B=P2, C=P3 and D=P4; existing relays require the documented
+offline migration before using the new command addresses. Connected
+reference cards take current assignments from the relay, and disconnected cards
+label their saved slots as recorded. Public Stage remains inspection/planning
+only, with no hardware requests or rig writes.
