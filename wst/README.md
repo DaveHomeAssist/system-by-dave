@@ -1,7 +1,7 @@
 # Frozen workspace
 
 Live managed deployment: https://wst-frozen.davein4k.chatgpt.site
-Primary hostname: https://wst.housevideo.app (DNS, TLS and live API verified November 6, 2026).
+Primary hostname: https://wst.housevideo.app (Stage, reference and preserved schedule verified November 7, 2026).
 
 Personal notes autosave only in this browser/origin under `wst.frozen.personal-notes.v1`, with text export and storage-failure recovery. They never enter the task API. Clearing browser site data loses local notes; notes at the temporary hostname do not automatically transfer to the custom hostname. Private cross-device notes are deferred, not a project-wide storage policy.
 
@@ -9,7 +9,9 @@ Team tasks are public by Dave's explicit choice: anyone opening the page can vie
 
 ## Source and release
 
-This GitHub directory retains the frontend and the exact managed source snapshot in `hosting/`. The Sites hosting repository is a deployment mirror, not a separate feature authority. `hosting/deployment.json` records the managed commit and successful deployment. Update source here first, synchronize the managed repository via the Sites helper and record the resulting receipt. Do not create another Site: reuse `.openai/hosting.json` project ID. Generated single-file Worker contains embedded frontend assets; run `node wst/embed-hosted-assets.mjs` to synchronize the generated worker from the canonical frontend, configuration and projector JSON before release. `hosting/drizzle` owns schema migrations, never apply schema changes in request handling.
+This GitHub directory owns the shared projector frontend and retains a generated managed source snapshot in `hosting/`. The Sites hosting repository is a deployment mirror, not a separate feature authority. `hosting/deployment.json` records the managed commit and successful deployment. Update source here first, synchronize the managed repository via the Sites helper and record the resulting receipt. Do not create another Site: reuse `.openai/hosting.json` project ID. Generated single-file Worker contains embedded frontend assets; run `node wst/embed-hosted-assets.mjs` to synchronize the generated worker from the canonical frontend, configuration and projector JSON before release. `hosting/drizzle` owns schema migrations, never apply schema changes in request handling.
+
+Current production is version 25, managed source `9230efa14436b24f95b060330b7e2291c767369d`. Version 24 published the Stage/reference polish from PR 448 while preserving version 23's separately published Tech Schedule, PDF and More navigation. Version 25 added a pixel reference and retained the polish. These concurrent managed additions have not been reconciled into this directory's generated shell. Before the next publication, read the current managed source and preserve or reconcile those assets; do not replace the production Worker wholesale with the older generated snapshot.
 
 The managed Worker/D1 service is separate from GitHub Pages and existing FMP services. DNS adds only the requested WST hostname; housevideo.app and walk.housevideo.app stay unchanged.
 
@@ -47,11 +49,11 @@ Home renders that choice screen as a dark snow splash (`snow-splash.css`, `snow-
 
 ## Six-menu shell
 
-The public shell's primary navigation is My Projector Rig, 3D Stage View, Presets, Log, Configuration and Throw Calc. Home and Notes + to-dos remain separate utility choices. Rig gear, the searchable catalog and signal-flow diagrams use `apps/projctl/public/reference-view.js` / `.css` and canonical `wst/projectors.json`; the embed script copies these shared renderer bytes rather than maintaining another catalog.
+The canonical shell exposes My Projector Rig, 3D Stage View, Presets, Log, Configuration and Throw Calc. Production groups the secondary tools under More and also includes Tech Schedule. Home and Notes + to-dos remain separate utility choices. Rig gear, the searchable catalog and signal-flow diagrams use `apps/projctl/public/reference-view.js` / `.css` and canonical `wst/projectors.json`; the embed script copies these shared renderer bytes rather than maintaining another catalog.
 
 Allowlisted hash routes are `#home`, `#notes`, `#rig`, `#rig/A` through `#rig/D`, optional `/controls` on rig routes, `#stage`, `#presets`, `#log`, `#configuration` and `#throw`. Unknown action-like routes fall back to Home. Private iframe messages keep `wst:show-panel` with a view name and optional A–D projector selection only. Presets, command logs, configuration and private room assets remain at the controller. Disconnected views show connection requirements instead of sample operational data. Throw Calc uses the existing public Throwline page in place, with separate planning state and no copied calculation engine.
 
-Run `node scripts/test_wst_workspace.cjs` with existing Playwright/Chromium. This uses disposable browser contexts, intercepted task/relay fixtures and no physical device or production task writes. It verifies primary labels, Home/notes readiness and reload, lane detail routes, catalog/flow/planner navigation, disconnected state, limited child messages, full lane colors in both themes, and desktop/mobile containment. The fixture does not commission actual browser local-network permission or a future authenticated Studio iframe. The compact six-menu shell and public Stage are published as Site version 22; `hosting/deployment.json` records its exact managed source and successful deployment.
+Run `node scripts/test_wst_workspace.cjs` with existing Playwright/Chromium. This uses disposable browser contexts, intercepted task/relay fixtures and no physical device or production task writes. It verifies primary labels, Home/notes readiness and reload, lane detail routes, catalog/flow/planner navigation, disconnected state, limited child messages, full lane colors in both themes, and desktop/mobile containment. The fixture does not commission actual browser local-network permission or a future authenticated Studio iframe. The compact six-menu shell and public Stage first shipped as Site version 22. The current production receipt and the separate version 24 polish publication are in `hosting/deployment.json`.
 
 
 Version 14 publication: final HTTPS HTML contains all six primary labels and the served workspace/reference JS, CSS and JSON match the accepted source bytes. Consumer installation was confirmed by the runtime owner at `25b22e65f6710caf1505557f4e30f8e3ebe04314`, with REAL health and the expanded navigation-only bridge. No new user-browser permission attempt or hardware command was part of this publication. Actual user-browser local-network permission and the authenticated theatre Studio endpoint remain separate acceptance gaps.
@@ -83,8 +85,14 @@ only, with no hardware requests or rig writes.
 
 ## Compact workspace and public Stage
 
-The common header now uses one row on wide desktops and two compact rows on narrower screens, with all six primary destinations directly available in two rows on phones. Home’s snow splash remains. Notes storage keys, exports and the shared task service are unchanged. Theme changes are sent only to the exact Stage frame origin; the viewer accepts only its actual embedding parent origin and an allowlisted theme value.
+The canonical common header uses one row on wide desktops and two compact rows on narrower screens, with all six primary destinations directly available in two rows on phones. The production More navigation from the separate schedule update is retained. Home’s snow splash remains. Notes storage keys, exports and the shared task service are unchanged. Theme changes are sent only to the exact Stage frame origin; the viewer accepts only its actual embedding parent origin and an allowlisted theme value.
 
 Embedded Stage suppresses its duplicate heading/backlink and uses a single planning toolbar. The selected projector’s inspector opens as a contained, scrolling overlay. The public-only room view starts with seats, walls and roof hidden, retains the cove, and separates A–D labels with leaders. Local controller defaults are preserved by optional viewer settings. Model/plot assets and the task API are unchanged; public what-if editing makes no private API or WebSocket requests.
 
 Checked in installed Chrome with disposable contexts: 1900×950, 845×954 and 375×812, both themes, full room WebGL, Front/Plan, candidate lens/raster edits, and inspector containment. Outer content retains the compact wide layout; phones reserve two rows for directly accessible destinations. `scripts/test_wst_workspace.cjs` checks notes reload and responsive navigation; `apps/projctl/test/wst-public-stage-browser.cjs` checks actual packaged model/planning and theme propagation. Set `PLAYWRIGHT_EXECUTABLE_PATH` to use an existing installed browser.
+
+## November 7 delivery and remaining installation
+
+PR 448 merged as `6e0753a6153868ba2b12aa32038b54bd329d3c65` after both exact-head CI checks passed. Dominic passed 95 Projctl unit tests, the operator/browser suites, and the exact version 24 managed Stage artifact at 1440, 680 and 375 pixels. The live custom domain visibly opens on the set-facing Stage camera and shows the four requested reference slots. Projector/reference/Stage asset bytes remain exact in version 25; its CSS retains the task change plus the concurrent pixel-reference addition. Tech Schedule, its PDF and backend were preserved.
+
+Dave confirmed that only this control page uses P1 through P4 and that the Mac Studio is the active backend. The offline migration and UI installation still require working access to that Studio. Neither live rig has been renumbered, no projector command was sent, and the laptop installation was not changed. Next: back up and migrate the Studio using the runbook, install the reviewed UI assets, restart the same managed relay, and verify A/P1, B/P2, C/P3 and D/P4 against the saved device identities.
