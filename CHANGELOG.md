@@ -1,5 +1,9 @@
 # Changelog
 
+## November 7, 2026: Source-facing EDID diagnostics
+
+- Add validated raw EDID capture where macOS exposes it, base-block detailed timing readouts, browser-scoped comparison baselines and report export. Keep active output separate from advertised capabilities and withhold ambiguous output associations. Studio hardware acceptance remains pending.
+
 ## November 7, 2026: Video Engineering Daily
 
 - Add Edition 031, Return loss and reflections, with a sourced calculation,

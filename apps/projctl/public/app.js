@@ -1,3 +1,4 @@
+import { renderHostDisplays } from './display-readout.js';
 import { LANES, laneOf, projectorName, orderedProjectors, rigLanes } from './lanes.js';
 import { createStageView } from './stage-view.js';
 import { mountPowerSchedules } from './power-schedules.js';
@@ -306,7 +307,7 @@ $('#projector-back').onclick=()=>$('#tab-btn-rig').click();
 document.querySelectorAll('[data-detail-lane]').forEach(button=>button.onclick=()=>openProjector(button.dataset.detailLane));
 $('#host-displays-load').onclick=async()=>{
   const output=$('#host-display-results');output.textContent='Reading relay computer display records…';
-  try{const response=await fetch('/api/host-displays',{cache:'no-store',signal:AbortSignal.timeout(10000)});if(response.status===401){location.href='/login.html';return;}const data=await response.json();if(!response.ok||data.scope!=='relay-computer')throw Error(data.reason||'Computer display information unavailable.');output.innerHTML=`<p class="pj-mono">${esc(data.state)} · ${esc(data.reason||'OS records only; no projector assignment implied.')}</p>${(data.displays||[]).map(display=>`<article><strong>${esc(display.name||display.id)}</strong><p>${esc(reportedValue(display.resolution))} · ${esc(display.connection||'Connection unknown')}</p><p class="pj-mono">EDID ${esc(display.edid?.state||'unavailable')} · unassigned to A–D</p></article>`).join('')}`;}catch(error){output.textContent=error.message;}
+  try{const response=await fetch('/api/host-displays',{cache:'no-store',signal:AbortSignal.timeout(10000)});if(response.status===401){location.href='/login.html';return;}const data=await response.json();if(!response.ok||data.scope!=='relay-computer')throw Error(data.reason||'Computer display information unavailable.');renderHostDisplays(output,data);}catch(error){output.textContent=error.message;}
 };
 window.addEventListener('projctl:navigate',event=>{const {panel,projector}=event.detail||{};if(!['home','notes','info','rig','stage','presets','log','setup','throw'].includes(panel))return;document.querySelector(`#tab-btn-${panel}`)?.click();if(projector&&Object.hasOwn(LANES,projector))openProjector(projector);});
 
