@@ -133,6 +133,17 @@ The acceptance scope and remaining physical checks are in [Show readiness](docs/
 
 ## Building model
 
+Stage starts with an audience-facing view of the set and all projection beams.
+The Stage camera returns to this framing; Projectors keeps the closer unit
+inspection view. Camera changes, room cutaways and local planning leave the
+recorded plot, physical dimensions and rig assignments unchanged. On phones,
+the drawing and planning controls share one scrollable workspace.
+
+Gear and signal-flow cards use the connected relay for model and slot identity,
+including offline devices that still have a saved assignment. Disconnected
+views label the catalog slot as recorded; duplicate or empty live lanes stay
+explicit instead of borrowing a catalog assignment.
+
 Stage includes a Building view when a private venue bundle is present in
 `data/venue/` beside the active rig (`VENUE_MODEL` overrides the directory).
 It works with or without a stage plot. Room, Drawing and LiDAR remain separate
@@ -184,13 +195,17 @@ an explicit placeholder when a lane has no unique device. Unassigned devices
 remain available in a separate expandable section. Rig and Stage cards use
 the drawing identity and model; relay IDs remain in Setup and control details.
 Cards show the matching magenta, cyan, amber or green accent plus orientation. Labels remain editable;
-slot IDs (P1 through P4), preset keys and OSC/TCP addresses never change.
+ordinary lane edits preserve slot IDs, preset keys and OSC/TCP addresses.
 The adjustment dialog, preset summaries and log retain the slot beside the lane.
 Clear an existing assignment before assigning its lane to another projector.
 Older rig files remain unassigned until the operator chooses their mapping.
 
-The bundled simulator illustrates P2=A, P4=B, P1=C and P3=D. These demo
-assignments do not migrate or verify physical house-projector identities.
+The Frozen numbering convention and bundled simulator use A=P1, B=P2, C=P3
+and D=P4. Existing saved rigs are not silently renumbered on startup. The
+deliberate offline migration in [the runbook](deploy/RUNBOOK.md#align-slot-numbers-with-drawing-lanes)
+keeps device settings and preset values attached to their original projector,
+records previous event numbers, and requires external slot-based cues to be
+reviewed before applying it. Demo assignments do not verify physical devices.
 
 ## Stage view
 

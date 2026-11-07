@@ -4,56 +4,23 @@
   "projectors": [
     {
       "slot": "P1",
-      "lane": "C",
-      "label": "Barco UDM 4K22",
-      "make": "Barco",
-      "model": "UDM 4K22",
-      "owner": "Rental",
+      "lane": "A",
+      "label": "A Panasonic DW830U",
+      "make": "Panasonic",
+      "model": "PT-DW830U",
+      "owner": "House",
       "driver": "simulator",
       "mac": "",
       "ip": "sim",
       "inputs": {
-        "HDMI": "HDMI",
-        "SDI": "SDI"
+        "31": "HDMI",
+        "32": "DVI-D",
+        "33": "SDI"
       },
-      "notes": "Snorkel, right angle out. L6-30 cord, needs 208V for full output."
+      "notes": "Portrait, cross shoots portal."
     },
     {
       "slot": "P2",
-      "lane": "A",
-      "label": "House Panasonic A",
-      "make": "Panasonic",
-      "model": "TBC",
-      "owner": "House",
-      "driver": "simulator",
-      "mac": "",
-      "ip": "sim",
-      "inputs": {
-        "31": "HDMI",
-        "32": "DVI-D",
-        "33": "SDI"
-      },
-      "notes": "Portrait, cross shoots portal."
-    },
-    {
-      "slot": "P3",
-      "lane": "D",
-      "label": "House Panasonic B",
-      "make": "Panasonic",
-      "model": "TBC",
-      "owner": "House",
-      "driver": "simulator",
-      "mac": "",
-      "ip": "sim",
-      "inputs": {
-        "31": "HDMI",
-        "32": "DVI-D",
-        "33": "SDI"
-      },
-      "notes": "Portrait, cross shoots portal."
-    },
-    {
-      "slot": "P4",
       "lane": "B",
       "label": "Panasonic PT-RZ970B",
       "make": "Panasonic",
@@ -69,6 +36,39 @@
         "34": "DIGITAL LINK"
       },
       "notes": "ET-DLE080 lens. S/N DA7610162."
+    },
+    {
+      "slot": "P3",
+      "lane": "C",
+      "label": "Barco UDM 4K22",
+      "make": "Barco",
+      "model": "UDM 4K22",
+      "owner": "Rental",
+      "driver": "simulator",
+      "mac": "",
+      "ip": "sim",
+      "inputs": {
+        "HDMI": "HDMI",
+        "SDI": "SDI"
+      },
+      "notes": "Snorkel, right angle out. L6-30 cord, needs 208V for full output."
+    },
+    {
+      "slot": "P4",
+      "lane": "D",
+      "label": "D Panasonic DW830U",
+      "make": "Panasonic",
+      "model": "PT-DW830U",
+      "owner": "House",
+      "driver": "simulator",
+      "mac": "",
+      "ip": "sim",
+      "inputs": {
+        "31": "HDMI",
+        "32": "DVI-D",
+        "33": "SDI"
+      },
+      "notes": "Portrait, cross shoots portal."
     }
   ],
   "presets": [],
@@ -76,93 +76,133 @@
     {
       "at": "2026-11-02T18:15:29.934Z",
       "source": "poll",
-      "slot": "P1",
-      "command": "online",
-      "result": "OK"
-    },
-    {
-      "at": "2026-11-02T18:15:29.934Z",
-      "source": "poll",
-      "slot": "P2",
-      "command": "online",
-      "result": "OK"
-    },
-    {
-      "at": "2026-11-02T18:15:29.934Z",
-      "source": "poll",
       "slot": "P3",
       "command": "online",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P1"
+    },
+    {
+      "at": "2026-11-02T18:15:29.934Z",
+      "source": "poll",
+      "slot": "P1",
+      "command": "online",
+      "result": "OK",
+      "slotBeforeRenumber": "P2"
     },
     {
       "at": "2026-11-02T18:15:29.934Z",
       "source": "poll",
       "slot": "P4",
       "command": "online",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P3"
     },
     {
-      "at": "2026-11-02T18:18:11.149Z",
-      "source": "poll",
-      "slot": "P1",
-      "command": "online",
-      "result": "OK"
-    },
-    {
-      "at": "2026-11-02T18:18:11.149Z",
+      "at": "2026-11-02T18:15:29.934Z",
       "source": "poll",
       "slot": "P2",
       "command": "online",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P4"
     },
     {
       "at": "2026-11-02T18:18:11.149Z",
       "source": "poll",
       "slot": "P3",
       "command": "online",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P1"
+    },
+    {
+      "at": "2026-11-02T18:18:11.149Z",
+      "source": "poll",
+      "slot": "P1",
+      "command": "online",
+      "result": "OK",
+      "slotBeforeRenumber": "P2"
     },
     {
       "at": "2026-11-02T18:18:11.149Z",
       "source": "poll",
       "slot": "P4",
       "command": "online",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P3"
+    },
+    {
+      "at": "2026-11-02T18:18:11.149Z",
+      "source": "poll",
+      "slot": "P2",
+      "command": "online",
+      "result": "OK",
+      "slotBeforeRenumber": "P4"
     },
     {
       "at": "2026-11-02T18:47:18.646Z",
       "source": "ui",
-      "slot": "P1",
+      "slot": "P3",
       "command": "shutter 0",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P1"
     },
     {
       "at": "2026-11-02T18:47:21.245Z",
       "source": "ui",
-      "slot": "P1",
+      "slot": "P3",
       "command": "shutter 1",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P1"
     },
     {
       "at": "2026-11-02T18:47:22.595Z",
       "source": "ui",
-      "slot": "P1",
+      "slot": "P3",
       "command": "shutter 1",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P1"
     },
     {
       "at": "2026-11-02T20:08:10.637Z",
       "source": "ui",
-      "slot": "P1",
+      "slot": "P3",
       "command": "shutter 1",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P1"
     },
     {
       "at": "2026-11-02T20:08:11.213Z",
       "source": "ui",
-      "slot": "P1",
+      "slot": "P3",
       "command": "shutter 1",
-      "result": "OK"
+      "result": "OK",
+      "slotBeforeRenumber": "P1"
+    }
+  ],
+  "slotMigrations": [
+    {
+      "at": "2026-11-07T00:00:00Z",
+      "mapping": [
+        {
+          "lane": "A",
+          "from": "P2",
+          "to": "P1"
+        },
+        {
+          "lane": "B",
+          "from": "P4",
+          "to": "P2"
+        },
+        {
+          "lane": "C",
+          "from": "P1",
+          "to": "P3"
+        },
+        {
+          "lane": "D",
+          "from": "P3",
+          "to": "P4"
+        }
+      ]
     }
   ]
 }

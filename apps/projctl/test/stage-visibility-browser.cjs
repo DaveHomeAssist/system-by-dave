@@ -23,6 +23,18 @@ const path = require('node:path');
   assert.equal(await page.locator('#stage-planner').isVisible(),false);
   assert.equal(await page.locator('[data-stage-view="building"]').textContent(),'Room + projectors');
   assert.equal(await stage.evaluate(s=>s._object.children.filter(o=>o.isSprite&&o.visible).length),4);
+  assert.equal(await page.locator('#stage-3d').getAttribute('data-camera-preset'),'Stage');
+  const opening = await stage.evaluate(s => {
+    const points = [];
+    for (const group of s._object.children.filter(o=>o.name.endsWith('drawing coverage'))) {
+      for (const object of group.children) {
+        const positions = object.geometry.attributes.position;
+        for (let i=0;i<positions.count;i++) points.push(new s._THREE.Vector3().fromBufferAttribute(positions,i).project(s._camera));
+      }
+    }
+    return {towardStage:s._camera.position.z>s._controls.target.z,contained:points.every(p=>Math.abs(p.x)<1&&Math.abs(p.y)<1&&p.z<1)};
+  });
+  assert.deepEqual(opening,{towardStage:true,contained:true},'opening view faces the stage and contains every beam');
   const roof=page.locator('#stage-3d [data-venue-roof]');assert.equal(await roof.getAttribute('aria-pressed'),'false');
   assert.equal(await page.locator('#stage-3d').getAttribute('data-roof-meshes'),'1');
   await roof.click();assert.equal(await roof.getAttribute('aria-pressed'),'true');await roof.click();
@@ -96,8 +108,27 @@ const path = require('node:path');
   await layers.locator('summary').click();
   await page.locator('#stage-3d .pj-stage-camera').getByRole('button',{name:'Reset view',exact:true}).click();
   assert.equal(await page.locator('[data-plan="distance"]').inputValue()!== '',true);
-  for(const [width,height] of [[1440,900],[375,812]]) {
+  for(const [width,height] of [[1440,900],[680,900],[375,812]]) {
    await page.setViewportSize({width,height});
+   await layers.locator('summary').click();
+   const menuFit = await page.locator('.pj-room-layer-panel').evaluate(panel=>{
+     const p=panel.getBoundingClientRect(),d=panel.closest('.pj-stage-drawing').getBoundingClientRect();
+     return p.left>=d.left&&p.right<=d.right&&p.top>=d.top;
+   });
+   assert.equal(menuFit,true,`room menu stays inside the drawing at ${width}`);
+   if(width<=680)for(const button of await page.locator('.pj-room-layer-panel button').all()){
+     await button.scrollIntoViewIfNeeded();
+     assert.equal(await button.evaluate(node=>{const r=node.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return hit===node||node.contains(hit);}),true,'each expanded room control remains reachable inside the scrolling phone workspace');
+   }
+   await layers.locator('summary').press('Escape');
+   assert.equal(await layers.getAttribute('open'),null);
+   await page.locator('[data-room-axis="x"]').fill('0.5');
+   await page.locator('[data-room-axis="x"]').press('Tab');
+   const fieldFit=await page.locator('[data-room-axis="x"]').evaluate(input=>{
+     const field=input.getBoundingClientRect(),label=input.previousElementSibling.getBoundingClientRect();
+     return label.bottom<=field.top&&field.left>=0&&field.right<=innerWidth;
+   });
+   assert.equal(fieldFit,true,'expanded room alignment keeps label and field separate');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight),true);
    const out=process.env.EVIDENCE_DIR||path.join(__dirname,'../artifacts');fs.mkdirSync(out,{recursive:true});
    await page.screenshot({path:path.join(out,`stage-visibility-${width}-${height}.png`)});

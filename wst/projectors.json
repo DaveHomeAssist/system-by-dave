@@ -1,18 +1,18 @@
 {
   "schema": "wst.frozen.projector-reference.v1",
-  "updated": "2026-11-06",
+  "updated": "2026-11-07",
   "projectors": [
     {
       "lane": "A",
       "position": "SL Portal",
       "orientation": "Portrait",
-      "model": "Unassigned",
+      "model": "Panasonic PT-DW830U",
       "lens": "ET-DLE170 · 1.80–2.54:1 (projection plot record)",
-      "note": "Plotted raster coverage: 12 ft 5 in wide × 19 ft 11 in tall. A remains an unassigned live control position. The projection plot specifies Panasonic PT-DW830KU with ET-DLE170; this is the recorded plan, not confirmation of the unit hung here.",
+      "note": "Plotted raster coverage: 12 ft 5 in wide × 19 ft 11 in tall. The saved control rig records Panasonic PT-DW830U at A. Current lane assignment comes from the connected relay. The projection plot specifies PT-DW830KU with ET-DLE170; physical lens barrel confirmation remains pending.",
       "color": "#ff00ff",
-      "internalSlot": null,
+      "internalSlot": "P1",
       "provenance": {
-        "assignment": "Owner-designated unassigned position",
+        "assignment": "Drawing-order numbering A=P1, B=P2, C=P3, D=P4 requested November 7, 2026; connected relay reports the active assignment.",
         "lens": "Walnut Frozen Projection Research and Gig Setup, projection plot, edited November 5, 2026. Physical lens barrel confirmation pending."
       },
       "recordSource": "https://app.notion.com/p/3fc255fc8f44811e8a5eeddcb236df1e?pvs=204",
@@ -31,7 +31,7 @@
       "color": "#00ffff",
       "internalSlot": "P2",
       "provenance": {
-        "assignment": "Verified saved rig assignment, November 5, 2026",
+        "assignment": "Drawing-order numbering A=P1, B=P2, C=P3, D=P4 requested November 7, 2026; connected relay reports the active assignment.",
         "lens": "Prior rig/example record, physical label not rechecked"
       },
       "referenceIds": [
@@ -48,9 +48,9 @@
       "lens": "TLD+ zoom 0.71–0.93:1 (4K), recorded",
       "note": "Recorded with right-angle snorkel. Exact part number has not been confirmed.",
       "color": "#fbf302",
-      "internalSlot": "P1",
+      "internalSlot": "P3",
       "provenance": {
-        "assignment": "Verified saved rig assignment, November 5, 2026",
+        "assignment": "Drawing-order numbering A=P1, B=P2, C=P3, D=P4 requested November 7, 2026; connected relay reports the active assignment.",
         "lens": "Current rig notes, exact part number unknown"
       },
       "referenceIds": [
@@ -73,7 +73,7 @@
       "color": "#00ab00",
       "internalSlot": "P4",
       "provenance": {
-        "assignment": "Verified saved rig assignment, November 5, 2026",
+        "assignment": "Drawing-order numbering A=P1, B=P2, C=P3, D=P4 requested November 7, 2026; connected relay reports the active assignment.",
         "lens": "Walnut Frozen Projection Research and Gig Setup, projection plot, edited November 5, 2026. Physical lens barrel confirmation pending.",
         "geometry": "Owner-reported estimates, November 6, 2026; not surveyed",
         "candidate": "Panasonic ET-DLE150 manufacturer specification; compatibility does not establish installed identity or final fit",
@@ -99,7 +99,7 @@
       "id": "panasonic-dw830",
       "name": "Panasonic PT-DW830U / KU",
       "category": "Projector",
-      "description": "WXGA 1-chip DLP projector. U is the saved D identity; KU is the projection-plot model designation.",
+      "description": "WXGA 1-chip DLP projector. U is the saved A/D identity; KU is the projection-plot model designation.",
       "facts": [
         {
           "label": "Native raster",

@@ -35,3 +35,7 @@ test('Coverage cutaway hides every seat family without changing retained layer c
  layers.cutawayForCamera([]);assert.equal(nodes.every(node=>node.visible),true);
  layers.set('seats',false);layers.cutawayForCamera(['seats']);layers.cutawayForCamera([]);assert.equal(nodes[1].visible,false);
 });
+
+test('public room defaults hide seats and walls and restore those choices without hiding the cove',async()=>{
+ const{createRoomLayers}=await import('../public/stage-visibility.js');const nodes=['Room','Orchestra center A 1','Side auditorium wall','V3 cove black back','Stage deck'].map(name=>({name,userData:{},visible:true,parent:null}));const root=nodes[0];root.traverse=visit=>nodes.forEach(visit);nodes.slice(1).forEach(node=>node.parent=root);const layers=createRoomLayers(root,[],{seats:false,walls:false,roof:false});assert.equal(nodes[1].visible,false);assert.equal(nodes[2].visible,false);assert.equal(nodes[3].visible,true);assert.equal(nodes[4].visible,true);layers.set('seats',true);assert.equal(nodes[1].visible,true);layers.restore();assert.equal(nodes[1].visible,false);assert.equal(nodes[3].visible,true);
+});

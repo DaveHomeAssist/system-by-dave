@@ -311,6 +311,7 @@ $('#host-displays-load').onclick=async()=>{
 window.addEventListener('projctl:navigate',event=>{const {panel,projector}=event.detail||{};if(!['home','notes','info','rig','stage','presets','log','setup','throw'].includes(panel))return;document.querySelector(`#tab-btn-${panel}`)?.click();if(projector&&Object.hasOwn(LANES,projector))openProjector(projector);});
 
 function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); return p && laneOf(p) ? `${slot} · ${p.lane} / ${laneOf(p).target}` : slot; }
+function eventSlotName(event) { return slotName(event.slot) + (event.slotBeforeRenumber ? ` (previously ${event.slotBeforeRenumber})` : ''); }
 const presetResults = new Map(), presetConfirmations = new Map();
 async function recallDetailLensPreset(name){
   if(!connected||state.lock)throw new Error('Connect and disable show lock before recalling lenses.');
@@ -356,9 +357,9 @@ function renderPresets() {
 function renderLog() {
   const tb = $('#log tbody'); tb.innerHTML = '';
   const query = $('#log-search').value.toLowerCase();
-  for (const e of [...state.events].reverse().filter((e) => !query || [e.slot, slotName(e.slot), e.command, e.result, e.detail, e.source].join(' ').toLowerCase().includes(query))) {
+  for (const e of [...state.events].reverse().filter((e) => !query || [e.slot, eventSlotName(e), e.command, e.result, e.detail, e.source].join(' ').toLowerCase().includes(query))) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td class="avd-td--mono">${new Date(e.at).toLocaleTimeString()}</td><td class="avd-td--mono">${esc(slotName(e.slot))}</td><td>${esc(e.command)}</td><td class="${e.result === 'OK' ? 'ok' : e.result === 'ERR' ? 'err' : ''}">${esc(e.result)}${e.detail ? ' · ' + esc(e.detail) : ''}</td><td class="pj-mono">${esc(e.source)}</td>`;
+    tr.innerHTML = `<td class="avd-td--mono">${new Date(e.at).toLocaleTimeString()}</td><td class="avd-td--mono">${esc(eventSlotName(e))}</td><td>${esc(e.command)}</td><td class="${e.result === 'OK' ? 'ok' : e.result === 'ERR' ? 'err' : ''}">${esc(e.result)}${e.detail ? ' · ' + esc(e.detail) : ''}</td><td class="pj-mono">${esc(e.source)}</td>`;
     tb.appendChild(tr);
   }
 }

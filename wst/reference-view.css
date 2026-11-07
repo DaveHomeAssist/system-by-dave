@@ -8,3 +8,4 @@
 .fr-flow-row>span{pointer-events:none;display:block;justify-self:center;width:20px;height:20px;line-height:20px;text-align:center}
 
 .fr-projector[data-lane="A"]{--fr-lane:#ff00ff}.fr-projector[data-lane="B"]{--fr-lane:#00ffff}.fr-projector[data-lane="C"]{--fr-lane:#fbf302}.fr-projector[data-lane="D"]{--fr-lane:#00ab00}
+.fr-assignment{font-size:12px;color:var(--fr-muted);margin-top:-4px}
