@@ -348,6 +348,31 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
   {
+    "id": 31,
+    "date": "2026-11-07",
+    "track": "Signal troubleshooting and system design",
+    "trackShort": "Troubleshooting",
+    "title": "Return loss and reflections",
+    "fact": "Return loss quantifies how little of the incident signal is reflected. With the usual positive return loss convention, larger is better: 20 dB corresponds to 1% reflected power; 10 dB corresponds to 10%. This differs from insertion loss, the attenuation through a path.",
+    "why": "When checking an SDI cable assembly, confusing these metrics can reverse your interpretation of a specification. Good return loss alone does not establish cable reach or a valid picture.",
+    "takeaway": "Calculate reflected power percentage as 100 x 10^(-RL/10). Compare values over the specified frequency band and use the relevant SDI interface or product limits; 20 dB is an example, not a universal pass threshold.",
+    "sourceLabel": "Rohde & Schwarz, return loss (1EZ54, p.4)",
+    "sourceUrl": "https://scdn.rohde-schwarz.com/ur/pws/dl_downloads/dl_application/application_notes/1ez54/1EZ54_0E.pdf#page=4",
+    "basis": "Calculated from RL=-20log10|Gamma| and reflected power fraction |Gamma|^2. Return loss and attenuation are separate specifications; no universal SDI pass limit asserted.",
+    "supportingSources": [
+      {
+        "label": "Belden 1505FPU, electrical characteristics",
+        "url": "https://catalog.belden.com/techdata/EN/1505FPU_techdata.pdf"
+      }
+    ],
+    "current": true,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">31</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">RETURN LOSS</text><path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"132\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Return loss 20 dB</text><text x=\"24\" y=\"103\">Incident power: 100%</text><path d=\"M24 116H208m-6-5l6 5l-6 5\" class=\"wire\"/><path d=\"M216 108V148\" class=\"rule\"/><path d=\"M208 140H24m6-5l-6 5l6 5\" class=\"reference\"/><text x=\"24\" y=\"169\" class=\"note\">Reflected power: 1%</text>\n<rect x=\"12\" y=\"208\" width=\"216\" height=\"132\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"234\" class=\"blue-label\">2 / Return loss 10 dB</text><text x=\"24\" y=\"259\">Incident power: 100%</text><path d=\"M24 272H208m-6-5l6 5l-6 5\" class=\"wire\"/><path d=\"M216 264V304\" class=\"rule\"/><path d=\"M208 296H24m6-5l-6 5l6 5\" class=\"reference\"/><text x=\"24\" y=\"325\" class=\"note\">Reflected power: 10%</text><text x=\"24\" y=\"368\">Positive return loss</text><text x=\"24\" y=\"394\">Higher = less reflection</text>",
+      "caption": "Blue indicates incident power; amber indicates reflected power at one port. The examples use the positive return loss convention. Arrow lengths are not to scale."
+    }
+  },
+  {
     "id": 30,
     "date": "2026-11-06",
     "track": "Fiber, video over IP, NDI, and SMPTE ST 2110",
@@ -359,7 +384,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "sourceLabel": "SMPTE ST 2110 standards suite",
     "sourceUrl": "https://www.smpte.org/standards/st2110",
     "basis": "Standard roles for ST2110-20/-30/-40; actual endpoint support and required ancillary payloads are implementation-specific. Illustrated failure is conceptual, not a physical cable topology.",
-    "current": true,
+    "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
       "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">30</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">ESSENCE FLOWS</text><path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"64\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"77\" class=\"blue-label\">1 / SDI gateway</text><text x=\"24\" y=\"104\">Video + audio + ANC</text>\n<path d=\"M44 124V157m-5-6l5 6l5-6M120 124V157m-5-6l5 6l5-6M196 124V157m-5-6l5 6l5-6\" class=\"wire\"/>\n<rect x=\"12\" y=\"168\" width=\"64\" height=\"78\" rx=\"6\" class=\"panel\"/><rect x=\"88\" y=\"168\" width=\"64\" height=\"78\" rx=\"6\" class=\"panel\"/><rect x=\"164\" y=\"168\" width=\"64\" height=\"78\" rx=\"6\" class=\"panel\"/>\n<text x=\"44\" y=\"195\" text-anchor=\"middle\">Video</text><text x=\"44\" y=\"225\" text-anchor=\"middle\">-20</text><text x=\"120\" y=\"195\" text-anchor=\"middle\">Audio</text><text x=\"120\" y=\"225\" text-anchor=\"middle\">-30</text><text x=\"196\" y=\"195\" text-anchor=\"middle\">ANC</text><text x=\"196\" y=\"225\" text-anchor=\"middle\">-40</text>\n<path d=\"M44 254V286m-5-6l5 6l5-6M120 254V286m-5-6l5 6l5-6\" class=\"wire\"/><path d=\"M196 254V286\" class=\"reference\"/><path d=\"M188 262l16 16m0-16l-16 16\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"2\"/>\n<rect x=\"12\" y=\"300\" width=\"216\" height=\"76\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"324\" class=\"blue-label\">2 / Receiver check</text><text x=\"24\" y=\"347\">Picture + sound: yes</text><text x=\"24\" y=\"370\" class=\"note\">Required ANC: missing</text><text x=\"120\" y=\"395\" text-anchor=\"middle\">Logical flows, not cables</text>",

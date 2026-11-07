@@ -1,15 +1,15 @@
 {
   "id": "house-reference",
   "engineeringDailyPublication": {
-    "date": "2026-11-06",
-    "edition": 30,
-    "title": "ST 2110 essence routing",
+    "date": "2026-11-07",
+    "edition": 31,
+    "title": "Return loss and reflections",
     "state": "Verified publication input; exact CI, merge and deployment evidence belongs to the provider records for this revision",
-    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=30&month=2026-11",
+    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=31&month=2026-11",
     "evidence": "demos/engineering-daily/release.json",
-    "verification": "Dominic: full 30 edition illustration/story verification; normal candidate, CI, deployment and live gates required.",
+    "verification": "Dominic: full 31 edition illustration/story verification; normal candidate, CI, deployment and live gates required.",
     "next": "Require exact-head CI, Pages deployment and matching live manifest/assets/browser journeys before publication completion; continue the same gates for future daily releases.",
-    "boundaries": "Prior 29 records and 58 assets preserved; no gaps or renumbering; human acceptance separate."
+    "boundaries": "Prior 30 records and 60 assets preserved; no gaps or renumbering; human acceptance separate."
   },
   "engineeringDailyUx": {
     "date": "2026-10-28",
