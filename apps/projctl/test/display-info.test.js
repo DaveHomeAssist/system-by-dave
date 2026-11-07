@@ -28,6 +28,7 @@ test('OS report exposes only whitelisted display metadata and never assigns a pr
 test('host reader coalesces and caches bounded OS reads, sanitizes errors and does no host collection in SIM', async () => {
   let calls = 0, time = 0;
   const reader = createHostDisplayReader({ platform: 'darwin', now: () => time, run: async (file, args, options) => {
+    if(file === '/usr/sbin/ioreg') return {stdout:''};
     calls++; assert.equal(file, '/usr/sbin/system_profiler'); assert.equal(options.timeout, 8000); assert.equal(options.maxBuffer, 1024 * 1024);
     return { stdout: '{"SPDisplaysDataType":[]}' };
   } });
@@ -49,4 +50,13 @@ test('display endpoints share relay authentication and snapshots carry cached pr
   const gated = await startRelay({ PROJCTL_PASSWORD: 'fixture-password' });
   try { assert.equal((await gated.api('display-info?slot=P2')).status, 401); assert.equal((await gated.api('host-displays')).status, 401); }
   finally { await gated.close(); }
+});
+
+test('missing registry access preserves genuine OS metadata', async () => {
+ const result = await createHostDisplayReader({platform:'darwin',run:async(file)=>{
+  if(file.endsWith('ioreg')) throw Error('private OS error');
+  return {stdout:JSON.stringify({SPDisplaysDataType:[{spdisplays_ndrvs:[{_name:'Fixture',spdisplays_resolution:'1920 x 1080'}]}]})};
+ }})();
+ assert.equal(result.state,'reported');assert.equal(result.edidRead,'unavailable');
+ assert.equal(result.displays[0].resolution,'1920 x 1080');assert.doesNotMatch(JSON.stringify(result),/private OS error/);
 });

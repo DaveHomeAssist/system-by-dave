@@ -1,3 +1,5 @@
+import { hostname } from 'node:os';
+import { parseRegistryEdids, attachEdids } from './edid.js';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 const execute = promisify(execFile);
@@ -51,8 +53,15 @@ export function createHostDisplayReader({ platform = process.platform, sim = fal
     if (pending) return pending;
     pending = (async () => {
       try {
-        const { stdout } = await run('/usr/sbin/system_profiler', ['SPDisplaysDataType', '-json', '-detailLevel', 'basic'], { timeout: 8000, maxBuffer: 1024 * 1024, encoding: 'utf8' });
-        cached = { scope: 'relay-computer', state: 'reported', collectedAt: new Date(now()).toISOString(), reason: null, displays: normalizeHostDisplays(JSON.parse(stdout)) };
+        const [report, registry] = await Promise.allSettled([
+          run('/usr/sbin/system_profiler', ['SPDisplaysDataType', '-json', '-detailLevel', 'basic'], { timeout: 8000, maxBuffer: 1024 * 1024, encoding: 'utf8' }),
+          run('/usr/sbin/ioreg', ['-l', '-w0', '-r', '-c', 'IODisplayConnect'], { timeout: 4000, maxBuffer: 4 * 1024 * 1024, encoding: 'utf8' }),
+        ]);
+        if (report.status !== 'fulfilled') throw new Error('OS report unavailable');
+        const edids = registry.status === 'fulfilled' ? parseRegistryEdids(registry.value.stdout) : [];
+        cached = { scope: 'relay-computer', host: hostname(), state: 'reported', collectedAt: new Date(now()).toISOString(), reason: null,
+          edidRead: registry.status === 'fulfilled' ? (edids.length ? 'records-found' : 'not-exposed') : 'unavailable',
+          edidRecords: edids, displays: attachEdids(normalizeHostDisplays(JSON.parse(report.value.stdout)), edids) };
       } catch {
         cached = { scope: 'relay-computer', state: 'unavailable', collectedAt: null, reason: 'OS display information could not be collected. Try again shortly.', displays: [] };
       }
