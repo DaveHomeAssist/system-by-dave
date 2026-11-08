@@ -1,5 +1,10 @@
 # Changelog
 
+## November 8, 2026: Video Engineering Daily
+
+- Add Edition 032, DisplayPort MST shared capacity, with a VESA sourced lesson,
+  time slot and branch diagram and matching SVG/PNG story card. Preserve prior editions.
+
 ## November 7, 2026: Frozen control polish
 
 - Open Stage facing the set with the complete A-D projection beams in frame. Keep projector inspection, coverage, plan and side presets, original geometry and manual room-layer choices.
