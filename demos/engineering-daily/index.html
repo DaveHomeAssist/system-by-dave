@@ -348,6 +348,25 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
   {
+    "id": 32,
+    "date": "2026-11-08",
+    "track": "SDI, HDMI, DisplayPort, and signal transport",
+    "trackShort": "Transport",
+    "title": "DisplayPort MST shared capacity",
+    "fact": "DisplayPort Multi-Stream Transport (MST) carries multiple independent A/V streams through one physical link by allocating link time slots to each stream. It is not one display per lane. The streams share that link's available transport capacity.",
+    "why": "A dock or MST hub can feed separate presentation and confidence displays, but adding output connectors does not multiply upstream bandwidth. Available display combinations depend on the actual source, branch devices and display modes.",
+    "takeaway": "Verify MST support on the exact host and dock, then test all outputs simultaneously at the required resolution, refresh rate and bit depth. Use the supported combined-mode table; a successful single-display test does not prove the full configuration.",
+    "sourceLabel": "VESA, DisplayPort 1.2 overview, pp.14/17",
+    "sourceUrl": "https://www.vesa.org/wp-content/uploads/2010/12/DisplayPort-DevCon-Presentation-DP-1.2-Dec-2010-rev-2b.pdf#page=14",
+    "basis": "VESA DP1.2 overview describes multiple streams rather than one stream per lane (p14), and bandwidth-dependent virtual channel time-slot allocation (p17). Generic mechanism only; no universal display count or host support asserted.",
+    "current": true,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">32</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">DISPLAYPORT MST</text><path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"116\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Shared link</text>\n<rect x=\"24\" y=\"96\" width=\"44\" height=\"32\" class=\"packet\"/><text x=\"46\" y=\"118\" text-anchor=\"middle\" class=\"blue-label\">A</text><rect x=\"72\" y=\"96\" width=\"44\" height=\"32\" class=\"packet\"/><text x=\"94\" y=\"118\" text-anchor=\"middle\" class=\"good-label\">B</text><rect x=\"120\" y=\"96\" width=\"44\" height=\"32\" class=\"packet\"/><text x=\"142\" y=\"118\" text-anchor=\"middle\" class=\"blue-label\">A</text><rect x=\"168\" y=\"96\" width=\"44\" height=\"32\" class=\"packet\"/><text x=\"190\" y=\"118\" text-anchor=\"middle\" class=\"good-label\">B</text><text x=\"24\" y=\"152\" class=\"note\">Conceptual time slots</text>\n<rect x=\"12\" y=\"184\" width=\"216\" height=\"164\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"210\" class=\"blue-label\">2 / MST branch</text><path d=\"M120 224V246m-5-6l5 6l5-6\" class=\"wire\"/><rect x=\"80\" y=\"246\" width=\"80\" height=\"28\" rx=\"3\" class=\"node\"/><text x=\"120\" y=\"266\" text-anchor=\"middle\">Branch</text><path d=\"M100 274V290H64V310m-5-6l5 6l5-6M140 274V290H176V310m-5-6l5 6l5-6\" class=\"wire\"/><rect x=\"24\" y=\"310\" width=\"80\" height=\"26\" class=\"node\"/><text x=\"64\" y=\"329\" text-anchor=\"middle\" class=\"blue-label\">View A</text><rect x=\"136\" y=\"310\" width=\"80\" height=\"26\" class=\"node\"/><text x=\"176\" y=\"329\" text-anchor=\"middle\" class=\"good-label\">View B</text>\n<text x=\"24\" y=\"372\">A + B share capacity</text><text x=\"24\" y=\"396\">Not one stream / lane</text>",
+      "caption": "A and B are independent streams sharing one upstream link. Blue lines are physical links; slot sizes are conceptual, not to scale."
+    }
+  },
+  {
     "id": 31,
     "date": "2026-11-07",
     "track": "Signal troubleshooting and system design",
@@ -365,7 +384,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
         "url": "https://catalog.belden.com/techdata/EN/1505FPU_techdata.pdf"
       }
     ],
-    "current": true,
+    "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
       "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">31</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">RETURN LOSS</text><path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"132\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Return loss 20 dB</text><text x=\"24\" y=\"103\">Incident power: 100%</text><path d=\"M24 116H208m-6-5l6 5l-6 5\" class=\"wire\"/><path d=\"M216 108V148\" class=\"rule\"/><path d=\"M208 140H24m6-5l-6 5l6 5\" class=\"reference\"/><text x=\"24\" y=\"169\" class=\"note\">Reflected power: 1%</text>\n<rect x=\"12\" y=\"208\" width=\"216\" height=\"132\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"234\" class=\"blue-label\">2 / Return loss 10 dB</text><text x=\"24\" y=\"259\">Incident power: 100%</text><path d=\"M24 272H208m-6-5l6 5l-6 5\" class=\"wire\"/><path d=\"M216 264V304\" class=\"rule\"/><path d=\"M208 296H24m6-5l-6 5l6 5\" class=\"reference\"/><text x=\"24\" y=\"325\" class=\"note\">Reflected power: 10%</text><text x=\"24\" y=\"368\">Positive return loss</text><text x=\"24\" y=\"394\">Higher = less reflection</text>",

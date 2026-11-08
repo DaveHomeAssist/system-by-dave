@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "c9179e919abcd0418b340e382e6392d4ce0abfe13308725abdab5df2b04a0686",
-  "publicSha256": "9eb672407fb917b4b6db75278e5f9b1ca39f1845076eb3e805b9f16613a11261",
-  "editions": 31,
+  "sourceSha256": "7e14bcf68e3abd19aef6e65a9280aaa77ffabbe9246f6baa10b65a46b5ca477b",
+  "publicSha256": "9c03bf42ecabcb5252b7ac40cee87dbc75cef8fc5ab99bd0e6335a4127344107",
+  "editions": 32,
   "files": [
+    {
+      "name": "Edition 032.svg",
+      "id": 32,
+      "date": "2026-11-08",
+      "title": "DisplayPort MST shared capacity",
+      "sha256": "7128558bf5c99df1013eda3e000e66196f6b38fc451731e53b34ba17417ab0b1"
+    },
+    {
+      "name": "Edition 032.png",
+      "id": 32,
+      "date": "2026-11-08",
+      "title": "DisplayPort MST shared capacity",
+      "sha256": "a8be4588506ac4495347bde2675d0f91cd4f4b660a0e096b5beef48905ac8048"
+    },
     {
       "name": "Edition 031.svg",
       "id": 31,
