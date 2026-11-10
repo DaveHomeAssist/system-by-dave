@@ -1,6 +1,6 @@
-# Security hardening branch
+# Security hardening
 
-These changes are source changes only. They do not configure, restart, or deploy the Studio. The focused regressions listed at the end pass in isolated simulator relays. The full Node suite (`npm test`, 119 tests in 32 files) passed on 2026-11-10 at `58f3e1b`. The browser suites and physical projectors are separate acceptance steps that have not run.
+These changes are source changes only. They do not configure, restart, or deploy the Studio. The focused regressions listed at the end pass in isolated simulator relays. The full Node suite (`npm test`, 119 tests in 32 files) passed on 2026-11-10 at `58f3e1b`. Pull-request CI runs the Node and browser suites on Linux. Physical projectors are a separate acceptance step.
 
 ## Cue access
 
@@ -33,6 +33,6 @@ Outbound commands are restricted to the implemented Class 1 grammar, blocking CR
 
 ## Still open
 
-Pulse response validation, execution-time Show Lock guards, Stop-lens reliability, preset semantics, persistence failure handling and Panasonic numeric validation remain open. Do not merge or deploy this branch until the complete changes are reviewed and Node/browser tests pass.
+Pulse response validation, execution-time Show Lock guards, Stop-lens reliability, preset semantics, persistence failure handling and Panasonic numeric validation remain open. Merging publishes source only. Installing on the Studio is a separate step for a safe show window: confirm the cue environment and `PROJCTL_TRUSTED_PROXIES` there first.
 
 Run the focused regressions from apps/projctl with `node --test test/cue-ingress.test.js test/security-protocol.test.js test/http-security.test.js test/venue-model.test.js`, then run `npm test` and the browser suites. Use isolated simulator settings, never the active Studio rig, for development.
