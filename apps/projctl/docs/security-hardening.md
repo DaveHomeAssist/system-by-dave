@@ -1,6 +1,6 @@
 # Security hardening branch
 
-These changes are source changes only. They do not configure, restart, or deploy the Studio. The focused regressions listed at the end pass in isolated simulator relays; the full Node and browser suites and physical projectors are separate acceptance steps.
+These changes are source changes only. They do not configure, restart, or deploy the Studio. The focused regressions listed at the end pass in isolated simulator relays. The full Node suite (`npm test`, 119 tests in 32 files) passed on 2026-11-10 at `58f3e1b`. The browser suites and physical projectors are separate acceptance steps that have not run.
 
 ## Cue access
 
