@@ -1,5 +1,12 @@
 # Changelog
 
+## November 10, 2026: Projctl review hardening
+
+- Bound OSC and text TCP cue input (4 KiB packets and lines, connection, idle and in-flight limits) and log failed asynchronous cues. Add optional `PROJCTL_OSC_ENABLED`, `PROJCTL_TCP_ENABLED`, `PROJCTL_CUE_HOST` and `PROJCTL_CUE_ALLOWLIST` controls; existing cue exposure defaults are unchanged.
+- Validate PJLink handshakes, reply class and command, setter acknowledgements and outbound command grammar, which blocks CR/LF injection through input values. Bound reply and discovery sizes, and report unsupported optional telemetry as unknown instead of carrying earlier values forward.
+- Limit JSON request bodies to 64 KiB (login 4 KiB) with a 10 s arrival timeout and explicit 400, 408 and 413 errors. Add HTTP header and request receive timeouts and a 64 KiB WebSocket frame cap.
+- Honor forwarding headers only from `PROJCTL_TRUSTED_PROXIES` (default loopback, the `tailscale serve` hop). Bound the login throttle, forget expired records, never evict active lockouts, and recheck the lockout after the login body arrives. Details: `apps/projctl/docs/security-hardening.md`.
+
 ## November 8, 2026: Video Engineering Daily
 
 - Add Edition 032, DisplayPort MST shared capacity, with a VESA sourced lesson,

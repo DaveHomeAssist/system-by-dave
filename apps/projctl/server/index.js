@@ -22,6 +22,7 @@ import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
 import { createPoller } from './polling.js';
 import { createManualDiscovery } from './discovery.js';
+import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES } from './http-security.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -35,14 +36,22 @@ const STARTED_AT = new Date().toISOString();
 const PASSCODE = (process.env.PROJCTL_PASSWORD || process.env.PJ_PASSCODE || '').trim();
 const SESSION_SECRET = randomBytes(32).toString('hex'); // sessions end when the relay restarts
 const SESSION = createHash('sha256').update(`pj:${SESSION_SECRET}:${PASSCODE}`).digest('hex');
-const loginFails = new Map(); // ip -> { n, until }
+const loginThrottle = createLoginThrottle(); // bounded per-client backoff; active lockouts survive eviction
+const proxy = proxyPolicy(); // PROJCTL_TRUSTED_PROXIES (default loopback); invalid values stop startup
 function cookies(req) { return Object.fromEntries((req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((kv) => kv[0]).map(([k, ...v]) => [k, v.join('=')])); }
 function authed(req) {
   if (!PASSCODE) return true;
   const c = cookies(req).pj || ''; const want = Buffer.from(SESSION), got = Buffer.from(c);
   return got.length === want.length && timingSafeEqual(got, want);
 }
-function clientIp(req) { return (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '?'; }
+function clientIp(req) { return proxy.clientAddress(req); }
+function enforceLoginThrottle(ip, res) {
+  const wait = loginThrottle.retryAfterMs(ip);
+  if (!wait) return;
+  const seconds = Math.ceil(wait / 1000);
+  res.setHeader('retry-after', seconds);
+  throw httpErr(429, `too many tries, wait ${seconds} s`);
+}
 const DATA = process.env.RIG || path.join(__dirname, '..', 'data', SIM ? 'rig.sim.json' : 'rig.json');
 const STAGE_PLOT = process.env.STAGE_PLOT || path.join(path.dirname(DATA), 'stage-plot.json');
 const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 'venue');
@@ -361,7 +370,7 @@ startTcpLines({ port: TCP_PORT, onMessage: onCue });
 function httpErr(status, message) { return Object.assign(new Error(message), { status }); }
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png' };
 const PUB = path.join(__dirname, '..', 'public');
-async function body(req) { let b = ''; for await (const c of req) b += c; return b ? JSON.parse(b) : {}; }
+function body(req) { return readJsonBody(req); } // 64 KiB JSON object, 10 s to arrive
 function confirmTokenFor(_name, token) { return typeof token === 'string' && token.length <= 256 ? token : ''; }
 function json(res, code, obj) { res.writeHead(code, { 'content-type': 'application/json', 'access-control-allow-origin': '*' }); res.end(JSON.stringify(obj)); }
 
@@ -373,13 +382,15 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'content-type', 'access-control-allow-methods': 'GET,POST' }); return res.end(); }
     if (url.pathname === '/api/login' && req.method === 'POST') {
       if (!PASSCODE) return json(res, 200, { ok: true, open: true });
-      const ip = clientIp(req); const f = loginFails.get(ip) || { n: 0, until: 0 };
-      if (f.until > Date.now()) { res.setHeader('retry-after', Math.ceil((f.until - Date.now()) / 1000)); throw httpErr(429, `too many tries, wait ${Math.ceil((f.until - Date.now()) / 1000)} s`); }
-      const { code } = await body(req);
+      const ip = clientIp(req);
+      enforceLoginThrottle(ip, res);
+      const { code } = await readJsonBody(req, { maxBytes: LOGIN_BODY_BYTES });
+      // A parallel attempt may have failed while this body was arriving; check again before comparing.
+      enforceLoginThrottle(ip, res);
       const a = Buffer.from(String(code || '')), b = Buffer.from(PASSCODE);
-      if (a.length !== b.length || !timingSafeEqual(a, b)) { f.n++; f.until = Date.now() + Math.min(60000, 1000 * 2 ** f.n); loginFails.set(ip, f); store.event({ source: 'ui', slot: '*', command: 'login', result: 'ERR', detail: `wrong passcode from ${ip}` }); throw httpErr(401, 'wrong passcode'); }
-      loginFails.delete(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'OK', detail: ip });
-      const secure = (req.headers['x-forwarded-proto'] === 'https') ? '; Secure' : '';
+      if (a.length !== b.length || !timingSafeEqual(a, b)) { loginThrottle.fail(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'ERR', detail: `wrong passcode from ${ip}` }); throw httpErr(401, 'wrong passcode'); }
+      loginThrottle.succeed(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'OK', detail: ip });
+      const secure = proxy.isHttps(req) ? '; Secure' : '';
       res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': `pj=${SESSION}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${60 * 60 * 24 * 90}${secure}` }); return res.end(JSON.stringify({ ok: true }));
     }
     if (url.pathname === '/api/logout' && req.method === 'POST') { res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': 'pj=; Path=/; HttpOnly; Max-Age=0' }); return res.end('{"ok":true}'); }
@@ -463,10 +474,12 @@ const server = http.createServer(async (req, res) => {
     }
     res.writeHead(200, { 'content-type': MIME[path.extname(fp)] || 'application/octet-stream' });
     fs.createReadStream(fp).pipe(res);
-  } catch (e) { json(res, e.status || 500, { error: e.message }); }
+  } catch (e) { if (e.closeConnection) res.setHeader('connection', 'close'); json(res, e.status || 500, { error: e.message }); }
 });
+applyServerLimits(server);
 
-const wss = new WebSocketServer({ noServer: true });
+// Browsers never send messages on this socket; keep any inbound frame small.
+const wss = new WebSocketServer({ noServer: true, maxPayload: 64 * 1024 });
 server.on('upgrade', (req, sock, head) => { if (new URL(req.url, 'http://x').pathname !== '/ws' || !authed(req)) { sock.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); return sock.destroy(); } wss.handleUpgrade(req, sock, head, (ws) => wss.emit('connection', ws, req)); });
 wss.on('connection', (ws) => { clients.add(ws); ws.send(JSON.stringify(snapshot())); ws.on('close', () => clients.delete(ws)); });
 
