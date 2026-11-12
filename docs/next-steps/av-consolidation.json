@@ -1275,7 +1275,49 @@
         "offline": "Cartoni reload succeeds after preparing the shared offline cache, with all 22 textures"
       },
       "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/369",
-      "verifiedImplementation": "64ba7bf0fb85972e1e0e4f616192adfe14f88707"
+      "verifiedImplementation": "64ba7bf0fb85972e1e0e4f616192adfe14f88707",
+      "release110": {
+        "checkedOn": "2026-11-12",
+        "scope": "Shared release 1.1.0: P01 Barco UDM-4K22, and an inspector that loads any catalog GLB package",
+        "sharedRevision": "27561a2bb5a27be756df38315a6389aa2235aa17",
+        "hostBase": "c5860883b5a11def5cd392c7750442641da95875",
+        "status": "Scoped source and browser checks pass in a cloud session; CI, merge, publication and live read-back are separate gates",
+        "entries": 44,
+        "nativeRepresentations": [
+          "C02",
+          "P01"
+        ],
+        "compatibility": "ECP-1.0 revision 1.0; ten existing head IDs unchanged; 26 new P01 part IDs; generic Panasonic",
+        "verification": {
+          "runner": "Cloud session, Linux Chromium with SwiftShader, Node 22",
+          "entries": 44,
+          "packages": {
+            "C02": {
+              "controls": 10,
+              "textures": 22,
+              "views": 4
+            },
+            "P01": {
+              "controls": 26,
+              "textures": 14,
+              "views": 6
+            }
+          },
+          "viewportChecks": 135,
+          "invalidPackageCases": 8,
+          "packageFiles": 60,
+          "result": "Passed package integrity, typecheck, build parity on untouched main, the Equipment Lab probe, the suite shell, canvas menu, audio flow, bounded workspace, Throwline and offline transition probes, and the AV, indexing, navigation, consistency, private exposure and domain staging checks",
+          "contextLossCases": 2,
+          "supplemental": "P01 keyboard selection, focus ring, 44 px targets, emulated touch selection, no idle drawing, and a prepared offline reload in the suite with 26 parts and 14 textures",
+          "notChecked": "GPU, a physical phone, WebKit, an unprepared first offline visit, and any physical projector"
+        },
+        "limits": [
+          "P01 is approximate and not qualified; Barco's values were read through search excerpts, and no drawing, photograph or unit was used.",
+          "The other 42 entries retain their existing viewers while native adapters migrate.",
+          "Two small-screen limits predate this release and remain: in phone landscape (844 x 390) the console panel area collapses, and at 320 px wide the inspector is clipped at the right edge."
+        ],
+        "nextAction": "Finish the host release and read back the live route; then check P01 against Barco's primary documents."
+      }
     }
   },
   "historicalFindings": [

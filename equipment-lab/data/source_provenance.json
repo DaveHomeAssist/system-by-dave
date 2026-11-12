@@ -1,7 +1,7 @@
 {
   "schema": "equipment.lab.consumer.v1",
   "repository": "DaveHomeAssist/equipment-lab",
-  "commit": "00e8dbeeb190ad9b0cd8c8b72b81e80e0dae428d",
-  "manifestHash": "001b12edebb44f2e0f5cdf94dac6a3ee4d0b834d81e834d979f8ae23c2aeceb0",
-  "files": 44
+  "commit": "27561a2bb5a27be756df38315a6389aa2235aa17",
+  "manifestHash": "2782e82af62febdf286f031974240fb6c8c7fd8aeac3cc923274e0f1f94a341b",
+  "files": 60
 }

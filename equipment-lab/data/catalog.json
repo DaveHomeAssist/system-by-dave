@@ -1,6 +1,6 @@
 {
   "schema": "equipment.lab.catalog.v1",
-  "revision": "1.0.0",
+  "revision": "1.1.0",
   "compatibility": "ECP-1.0 revision 1.0",
   "inventoryConfirmed": "2026-10-23",
   "entries": [
@@ -1311,6 +1311,50 @@
         "kind": "procedural",
         "access": "existing-viewer"
       }
+    },
+    {
+      "inventoryId": "P01",
+      "name": "Barco UDM-4K22",
+      "collection": "Projection",
+      "role": "Large-venue laser projector; inspection model",
+      "notes": "body.*, io.* and lens.barrel. The lens is a representative TLD+ stand-in, not a specific lens. Added after the confirmed 43-entry family.",
+      "viewUrl": "https://avbydave.com/equipment-lab/?equipment=P01",
+      "nativeIdentity": [
+        {
+          "field": "equipment_id",
+          "value": "barco-udm-4k22"
+        },
+        {
+          "field": "schema",
+          "value": "equipment.inspection.v1"
+        },
+        {
+          "field": "revision",
+          "value": "1.0.0"
+        }
+      ],
+      "migration": "native",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/equipment-lab",
+        "revision": "e9e9a73c4d7b07c1589c4488e2fbd4cf2c1b0b43",
+        "paths": [
+          "models/barco-udm-4k22/model.mjs",
+          "models/barco-udm-4k22/catalog.mjs"
+        ],
+        "state": "native source"
+      },
+      "representation": {
+        "kind": "glb",
+        "base": "models/barco.udm4k22.inspection/",
+        "manifest": "barco.udm4k22.manifest.json"
+      },
+      "identity": {
+        "manufacturer": "Barco",
+        "model": "UDM-4K22",
+        "geometry": "approximate"
+      },
+      "added": "2026-11-09"
     }
   ]
 }
