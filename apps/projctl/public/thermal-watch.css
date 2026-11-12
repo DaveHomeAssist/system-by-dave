@@ -18,13 +18,13 @@
 .pj-thermal-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:var(--space-3)}
 /* Lane colours come from the shared [data-lane] palette in app.css, repeated here under a private attribute so tests and tiles keyed on [data-lane] never match these cards. */
 .pj-thermal-card[data-thermal-lane="A"]{--lane-accent:#ff00ff}.pj-thermal-card[data-thermal-lane="B"]{--lane-accent:#00ffff}.pj-thermal-card[data-thermal-lane="C"]{--lane-accent:#fbf302}.pj-thermal-card[data-thermal-lane="D"]{--lane-accent:#00ab00}
-.pj-thermal-card{min-width:0;display:flex;flex-direction:column;gap:6px;padding:6px 12px 10px;border:1px solid var(--hairline);border-top:3px solid var(--lane-accent);border-radius:10px;background:color-mix(in srgb,var(--lane-accent) 8%,var(--surface))}
+.pj-thermal-card{min-width:0;display:flex;flex-direction:column;gap:6px;padding:6px 12px 10px;border:1px solid var(--hairline);border-top:3px solid var(--lane-accent);border-radius:8px;background:var(--surface)}
 .pj-thermal-card.tightest{outline:2px solid var(--state-active);outline-offset:1px}
 .pj-thermal-card.tightest[data-level="hot"]{outline-color:var(--state-blocked)}
 .pj-thermal-top{display:flex;align-items:center;gap:8px;min-width:0}
 .pj-thermal-lane{appearance:none;flex:1;min-width:0;min-height:44px;display:flex;align-items:center;gap:8px;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .pj-thermal-lane:disabled{cursor:default;opacity:.7}
-.pj-thermal-lane strong{min-width:0;font-size:14px;line-height:18px;overflow-wrap:anywhere}
+.pj-thermal-lane strong{min-width:0;font-size:14px;line-height:18px;overflow-wrap:normal;word-break:normal}
 .pj-thermal-letter{display:inline-grid;place-items:center;flex:none;width:27px;height:27px;border-radius:6px;background:var(--lane-accent);color:#102131;font:700 16px/1 var(--font-display)}
 .pj-thermal-top .avd-state{height:auto;min-height:24px;flex:none;max-width:60%;white-space:normal;font-size:11px}
 .pj-thermal-reading{display:flex;align-items:baseline;gap:6px;margin:0;font-variant-numeric:tabular-nums}
@@ -33,7 +33,14 @@
 .pj-thermal-f{margin-left:auto;font-size:11px;color:var(--ink-muted)}
 .pj-thermal-kind{font-size:11px;color:var(--ink-muted)}
 .pj-thermal-card.empty .pj-thermal-value{color:var(--ink-faint)}
-.pj-thermal-card.stale .pj-thermal-reading,.pj-thermal-card.stale .pj-thermal-spark{opacity:.55}
+.pj-thermal-card.stale{border-style:dashed;border-top-style:solid}
+.pj-thermal-card[data-level="watch"]{box-shadow:inset 0 0 0 1px var(--state-active)}
+.pj-thermal-card[data-level="hot"]{box-shadow:inset 0 0 0 2px var(--state-blocked)}
+.pj-thermal-card[data-level="hot"] .avd-state,.pj-thermal-chip[data-level="hot"]{background:#c4232b;color:#fff;border-color:#8f1218}
+.pj-thermal-card[data-level="hot"] .avd-dot,.pj-thermal-chip[data-level="hot"] .avd-dot{background:#fff;border-radius:1px}
+.pj-thermal-card[data-level="watch"] .avd-state,.pj-thermal-chip[data-level="watch"]{background:#f3d36b;color:#1a1408;border-color:#1a1408}
+.pj-thermal-card[data-level="watch"] .avd-dot,.pj-thermal-chip[data-level="watch"] .avd-dot{background:#1a1408;border-radius:0;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.pj-thermal-card[data-level="ok"] .avd-dot,.pj-thermal-chip[data-level="ok"] .avd-dot{border-radius:50%}
 /* Meter spans the rated range 0..limit; amber and red zones mark the watch and hot headroom bands. */
 .pj-thermal-meter{position:relative;height:10px;border-radius:5px;border:1px solid var(--line-control);overflow:hidden;background:linear-gradient(90deg,var(--surface-sunken) 0 calc(var(--watch,80)*1%),var(--state-active) calc(var(--watch,80)*1%) calc(var(--hot,95)*1%),var(--state-blocked) calc(var(--hot,95)*1%) 100%)}
 .pj-thermal-meter[hidden]{display:none}
@@ -61,7 +68,8 @@
 @media(max-width:600px){
   .pj-thermal-list{gap:8px}
   .pj-thermal-card{padding:4px 8px 6px;gap:3px}
-  .pj-thermal-top{flex-wrap:wrap;gap:0 6px}.pj-thermal-lane{min-height:44px}.pj-thermal-lane strong{font-size:12px}
+  .pj-thermal-top{flex-wrap:wrap;gap:0 6px}.pj-thermal-lane{min-height:44px;min-width:0}.pj-thermal-lane strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pj-thermal-top .avd-state{flex:1 1 100%;max-width:100%;justify-content:flex-start;white-space:normal;height:auto}
   .pj-thermal-note,.pj-thermal-foot,.pj-thermal-f,.pj-thermal-kind{display:none}
   .pj-thermal-facts>div:nth-child(n+3){display:none}
   .pj-thermal-facts{grid-template-columns:repeat(2,minmax(0,1fr))}

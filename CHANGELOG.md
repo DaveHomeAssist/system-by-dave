@@ -1,5 +1,9 @@
 # Changelog
 
+## November 12, 2026: Projctl booth console
+
+- The projector console is restyled for a dark booth and a worklight: flat technical surfaces, tabular readouts, and drawing color kept to the lane letter and a thin bar. Online, offline, watch, hot and show lock are told apart by shape and wording as well as color. Stop, shutter close and power off stay large and danger-styled. On a phone the home title and configuration fields stay fully readable, and thermal lane names no longer break mid-word.
+
 ## November 12, 2026: Projctl review fixes
 
 - A folder URL, a path that leaves the public directory, or a static-file read error returns an HTTP error. It no longer crashes the relay.
