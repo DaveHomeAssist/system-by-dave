@@ -7,7 +7,20 @@
 import net from 'node:net';
 import { createHash } from 'node:crypto';
 import { pjlinkDriver } from './pjlink.js';
-import { throwIfAborted } from './transport.js';
+import { throwIfAborted, transportFailure } from './transport.js';
+
+// Temperature query QTM:n. Replies are "°C/°F" pairs, e.g. "0023/0073".
+// QTM:0 is intake air per Panasonic's command list; QTM:1/2 names are unconfirmed.
+export const QTM_SENSORS = [
+  [0, 'intake', 'Intake air (QTM:0)', 'intake'],
+  [1, 'qtm1', 'Internal (QTM:1)', 'internal'],
+  [2, 'qtm2', 'Internal (QTM:2)', 'internal'],
+];
+export function parseQtm(body) {
+  const m = /^\s*([+-]?\d{1,4})(?:\s*\/\s*[+-]?\d{1,4})?\s*$/.exec(String(body ?? ''));
+  if (!m) throw new Error('Invalid Panasonic temperature reply');
+  return Number(m[1]);
+}
 
 // Test pattern codes (OTS / QTS), PT-DW830 spec section 2.8.
 export const PATTERNS = {
@@ -100,6 +113,18 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
       try { s.pattern = await native('QTS', { signal }); } catch { throwIfAborted(signal); s.pattern = null; }
       throwIfAborted(signal);
       return s;
+    },
+    // Read-only temperatures for health reports; never part of the status poll.
+    // A refused sensor reads as null; a dead connection stops the remaining queries.
+    async healthReadings({ signal } = {}) {
+      const sensors = [];
+      for (const [n, id, label, role] of QTM_SENSORS) {
+        let c = null;
+        try { c = parseQtm(await native(`QTM:${n}`, { signal })); }
+        catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; }
+        sensors.push({ id, label, role, c });
+      }
+      return { sensors };
     },
     async pattern(code) {
       const c = String(code).padStart(2, '0');

@@ -319,3 +319,14 @@ separate Enable action. Nothing runs on save or page load, no show times are
 supplied, and startup/sleep/missed occurrences are skipped without catch-up.
 Read live status and per-target audit; acknowledgement does not prove actual
 power state. Studio startup, network and physical acceptance remain separate.
+
+## Health reports
+
+The relay writes a projector [health report](docs/health-reports.md) 2 minutes
+after the rig powers on, hourly while any unit is lit, at power off and when the
+relay stops with units lit. Readings are read-only (Panasonic `QTM` temperatures,
+Barco ambient and alarm state, PJLink flags); no command is sent or delayed.
+Reports are saved beside the rig file and, with a private `health-reports.json`
+and a Notion token on the relay machine, added as one row each to a Notion
+database. `GET /api/health-reports` lists recent reports and
+`POST /api/health-reports/run` takes one now.

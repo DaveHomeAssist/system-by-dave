@@ -21,6 +21,7 @@ import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
 import { createPoller } from './polling.js';
+import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader } from './health-reports.js';
 import { createManualDiscovery } from './discovery.js';
 import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES } from './http-security.js';
 
@@ -59,8 +60,13 @@ const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 've
 const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
 if (SIM) simRig(store.rig);
 const rig = store.rig;
-let powerSchedules, poller;
-for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => { poller?.close(); powerSchedules?.close(); store.close(); process.exit(0); });
+let powerSchedules, poller, health, stopping = false;
+// A lit rig gets a final health report before exit; health.stop() is capped at a few seconds.
+for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, async () => {
+  if (stopping) return; stopping = true;
+  try { await health?.stop(); } catch { /* exit regardless */ }
+  poller?.close(); powerSchedules?.close(); store.close(); process.exit(0);
+});
 
 const drivers = new Map();   // slot -> driver
 const status = new Map();    // slot -> status
@@ -136,6 +142,7 @@ poller = createPoller({
     const next = { ...prev, ...s, online: true, updatedAt: new Date().toISOString() };
     status.set(p.slot, next);
     if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
+    health?.observe(p.slot, next.power);
     broadcastStatus(p);
   },
   failed(p, e, { at, consecutiveFailures, nextRetryAt, retryDelayMs }) {
@@ -153,9 +160,26 @@ function setOffline(slot, why) {
   // Keep the last reply available, explicitly marked unavailable until a new reply.
   const next = { ...prev, online: false, updatedAt: new Date().toISOString() };
   status.set(slot, next);
+  health?.observe(slot, null);
   if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
   broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, displayInfo: displayInfoFor(store.projector(slot), next), inputPreference: inputPreferenceFor(store.projector(slot)) });
 }
+// ---- Health reports (read-only readings; see docs/health-reports.md) ----
+const healthConfig = readHealthConfig(path.join(path.dirname(DATA), 'health-reports.json'));
+health = createHealthReports({
+  dir: path.join(path.dirname(DATA), 'health-reports'),
+  config: healthConfig,
+  projectors: () => rig.projectors,
+  status: (slot) => status.get(slot),
+  connection: (slot) => connections.get(slot),
+  events: () => rig.events,
+  readTelemetry: (p, options) => { const d = driverFor(store.projector(p.slot) || p); return d.healthReadings ? d.healthReadings(options) : null; },
+  describeError: (p, e) => connectionError(store.projector(p.slot) || p, e),
+  publish: healthConfig.notion.databaseId ? createNotionPublisher({ databaseId: healthConfig.notion.databaseId, token: notionTokenReader({ keychain: !SIM }) }) : null,
+  powerOnDelayMs: Number(process.env.PROJCTL_HEALTH_POWER_ON_DELAY_MS || 120000),
+}).start();
+console.log(`[health] reports ${healthConfig.enabled ? 'on' : 'off'}; Notion ${healthConfig.notion.databaseId ? 'database configured' : 'not configured'}${healthConfig.error ? `; ${healthConfig.error}` : ''}`);
+
 rig.projectors.forEach(poll);
 
 // ---- Discovery (PJLink class 2 search by MAC) ----
@@ -199,6 +223,8 @@ async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   const moving = cmd === 'lens' && !stop;
   if (moving) { busy.set(slot, 'lens'); broadcast({ type: 'busy', slot, busy: 'lens' }); }
   let result, detail;
+  // Readings start alongside the off command; the command itself is never held.
+  if (cmd === 'power' && !arg) health?.powerOff(slot, source);
   try {
     if (cmd === 'power') result = await d.power(!!arg, { guard: executionGuard });
     else if (cmd === 'shutter') result = await d.shutter(!!arg);
@@ -404,6 +430,8 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/power-schedules/save' && req.method === 'POST') return json(res, 200, powerSchedules.save(await body(req)));
     if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
     if (url.pathname === '/api/power-schedules/delete' && req.method === 'POST') { const { id } = await body(req); return json(res, 200, powerSchedules.remove(id)); }
+    if (url.pathname === '/api/health-reports' && req.method === 'GET') return json(res, 200, health.view());
+    if (url.pathname === '/api/health-reports/run' && req.method === 'POST') return json(res, 200, { report: await health.run(), ...health.view() });
 
     if (url.pathname === '/api/display-info' && req.method === 'GET') {
       const p = store.projector(url.searchParams.get('slot'));
