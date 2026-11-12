@@ -33,6 +33,14 @@ window.SBD_LAUNCH = {
     // A [DAVE: …] placeholder, 'Price TBD' or '' shows "Price TBD" and keeps
     // checkout closed. A real price alone does not open checkout: the
     // Payment Link and the page's DRAFT blocks still gate it.
-    priceLabel: '$12'
+    priceLabel: '$12',
+    // After-payment download page (field-kit/thanks/, docs/launch/checkout.md).
+    // The share link to the kit files stays in Stripe's Payment Link settings;
+    // only its SHA-256 goes here, printed by
+    //   npm run hash:field-kit-link -- '<share link>'
+    // The page shows the download button and the "payment went through" line
+    // only for a link whose hash is listed. Empty keeps both off, so buyers
+    // see "email me". List the old and new hash while replacing a link.
+    download: { sha256: [] }
   }
 };

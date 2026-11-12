@@ -26,7 +26,7 @@
   "name": "AV by Dave (video engineering concept demos → Instagram page)",
   "status": "amber",
   "head": "DaveHomeAssist/system-by-dave main aec4f98; demos/ in that repo is the source of truth (served at systembydave.com/demos/)",
-  "lastActivity": "2026-10-26",
+  "lastActivity": "2026-11-11",
   "statusReason": "Demos are live: PR #360 merged 2026-10-20 and first deployed 2026-10-23; systembydave.com/demos/, frame-sync.html and fault-finding.html return 200. The Umami website ID and email form action in demos/config.js are still blank, so analytics and the post-demo email ask are inert until Dave answers HR-D7 and HR-D8. Site deploys were blocked 2026-10-26 by an npm audit failure (zod) until PR #368 merged (aec4f98); deploy 40311565958 then published systembydave.com and avbydave.com.",
   "nextStep": {
     "title": "Answer HR-D7 and HR-D8 so the demo email ask and analytics go live",
@@ -168,6 +168,36 @@
       "date": "2026-10-26",
       "finding": "Every System by Dave Pages deploy after 2026-10-23 failed at npm audit (zod <4.6.6 high, @vitest/mocker <=4.1.11 moderate), so no site change reached either domain. PR #368 (zod 4.6.7, Vitest 4.1.12) cleared it: audit 0 vulnerabilities and domain cutover 57/57 on Dominic at 4414b5d; merged as aec4f98; deploy 40311565958 succeeded and avbydave publish 40315942438 followed.",
       "state": "fixed, deployed"
+    },
+    {
+      "id": "HR-23",
+      "date": "2026-11-11",
+      "finding": "Code review of the avbydave.com publish surface at d59f04d (the revision avbydave.com/source.json named): field-kit/thanks/ showed a download button and a payment confirmation for any address carrying a link on an allowed file host and any cs_ value, reproduced on the live page. PR #453 makes the page accept only the share link registered by SHA-256 in fieldKit.download.sha256; none is registered, so every link falls back to the email card. Field Kit probe, verify:av and the console browser probe passed on Walter.",
+      "state": "fixed in PR #453; merge and deployment evidence belongs to the provider records for that pull request"
+    },
+    {
+      "id": "HR-24",
+      "date": "2026-11-11",
+      "finding": "The console Status menu showed 'Offline cache preparing' for every offline state except ready, including a failed cache and a browser that cannot keep one. PR #453 gives each state reported by js/av-offline.js its own line. The three failure lines were not forced in a browser.",
+      "state": "fixed in PR #453; merge and deployment evidence belongs to the provider records for that pull request"
+    },
+    {
+      "id": "HR-25",
+      "date": "2026-11-11",
+      "finding": "apps/av-suite/src/App.tsx reads localStorage as an argument outside its try when loading views, so the handled 'Browser storage is unavailable' path in views.ts cannot run when the browser blocks storage. Read from source; not reproduced in a browser.",
+      "state": "open"
+    },
+    {
+      "id": "HR-26",
+      "date": "2026-11-11",
+      "finding": "av-suite-worker.js returns the server's error page for a navigation that gets a 5xx response instead of the cached console, and its install step can take a data file from the HTTP cache for up to ten minutes after a deploy. Read from source; not reproduced.",
+      "state": "open"
+    },
+    {
+      "id": "HR-27",
+      "date": "2026-11-11",
+      "finding": "The avbydave.com home page uses the System by Dave card as its link preview while other AV pages use img/av-by-dave-og.png. Its navigation and first-visit box link to field-kit/, a draft that shows DRAFT approval blocks and a [STATEMENT DESCRIPTOR] placeholder; docs/launch/checkout.md still says that page is not linked from navigation.",
+      "state": "open; see HR-D9"
     }
   ],
   "phases": [
@@ -230,6 +260,17 @@
     "scripts/domain-sites.json"
   ],
   "decisionsForDave": [
+    {
+      "id": "HR-D9",
+      "question": "The avbydave.com home page links new visitors to the draft Field Kit page, which shows DRAFT approval blocks. Keep those links before checkout opens?",
+      "options": [
+        "A. Hide the home navigation and first-visit links to the Field Kit until checkout opens (recommended)",
+        "B. Keep the links and replace the DRAFT labels with plain 'coming soon' wording",
+        "C. Leave it as it is"
+      ],
+      "status": "open",
+      "unlocks": "what a first-time visitor sees between now and the Field Kit launch"
+    },
     {
       "id": "HR-D7",
       "question": "Email provider for the post-demo ask",
