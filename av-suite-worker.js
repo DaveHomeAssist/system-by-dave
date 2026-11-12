@@ -69,15 +69,22 @@ var CRITICAL_ASSETS=[
 ];
 var OPTIONAL_ASSETS=OFFLINE_ASSETS.filter(function(asset){return CRITICAL_ASSETS.indexOf(asset)<0;});
 
+/* Install reads every asset from the network, past the browser's HTTP cache.
+   A copy fetched minutes before a deploy would otherwise be stored as the new
+   generation, and images, fonts and data are then served from this cache first. */
+function fresh(asset){
+  return new Request(new URL(asset,self.registration.scope).href,{cache:'reload'});
+}
+
 function cacheOptionalAssets(cache){
   return Promise.all(OPTIONAL_ASSETS.map(function(asset){
-    return cache.add(asset).then(function(){return {asset:asset,ok:true};}).catch(function(){return {asset:asset,ok:false};});
+    return cache.add(fresh(asset)).then(function(){return {asset:asset,ok:true};}).catch(function(){return {asset:asset,ok:false};});
   }));
 }
 
 self.addEventListener('install',function(event){
   event.waitUntil(caches.open(CACHE_NAME).then(function(cache){
-    return cache.addAll(CRITICAL_ASSETS).then(function(){
+    return cache.addAll(CRITICAL_ASSETS.map(fresh)).then(function(){
       return cacheOptionalAssets(cache);
     });
   }).then(function(){
@@ -128,6 +135,13 @@ function offlinePage(){
   return new Response(html,{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
 }
 
+/* The saved copy of a known page or, failing that, the saved console. */
+function savedPage(cache,request){
+  return cachedResponse(cache,request).then(function(found){
+    return found||cache.match(new URL('./av/index.html',self.registration.scope).href);
+  });
+}
+
 self.addEventListener('fetch',function(event){
   var request=event.request;
   if(!isKnownRequest(request)){
@@ -141,13 +155,19 @@ self.addEventListener('fetch',function(event){
       var networkRequest=request.mode==='navigate'?fetch(request):fetch(request,{cache:'no-cache'});
       return networkRequest.then(function(response){
         if(request.mode!=='navigate'&&!response.ok) throw new Error('Asset request failed');
+        // A server error is not worth showing while this device holds the page:
+        // reopen what is saved, and pass the error through only when nothing is.
+        if(request.mode==='navigate'&&response.status>=500){
+          return savedPage(cache,request).then(function(page){return page||response;});
+        }
         return putClean(cache,request,response);
       }).catch(function(){
+        if(request.mode==='navigate'){
+          return savedPage(cache,request).then(function(page){return page||offlinePage();});
+        }
         return cachedResponse(cache,request).then(function(found){
           if(found) return found;
-          if(request.mode!=='navigate') throw new Error('Offline asset is unavailable');
-          var fallback='./av/index.html';
-          return cache.match(new URL(fallback,self.registration.scope).href).then(function(page){return page||offlinePage();});
+          throw new Error('Offline asset is unavailable');
         });
       });
     }

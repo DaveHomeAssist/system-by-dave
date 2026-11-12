@@ -6,6 +6,7 @@ import { readLayout, writeLayout, type LayoutState } from "../../shared/av-conso
 import type { Panel, View } from "../../shared/av-console/layout";
 import { CONTEXT_KEYS, showContext, type Pack, type PackHost } from "../../shared/av-console/pack";
 import { PACKS, SPECIALISTS, specialistHref } from "./packs";
+import { storageState } from "./storage";
 import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, packLibrary, saveViews, shortOf, specialistLibrary, SUITE_PREFIX, TOOL_PREFIX, viewApp, viewTool } from "./views";
 
 /* AV Suite shell (docs/av-suite-shell.md): one console. Every application is a
@@ -237,6 +238,7 @@ export function App() {
     </section>}
     {offer && activePack && <div className="draft-offer" role="alert"><p><strong>{activePack.label} unsaved edits</strong> from {new Date(offer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={() => void activePack.recovery.restore()}>Restore draft</button><button type="button" onClick={() => void activePack.recovery.discard()}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
+      {storageState === "blocked" && <div className="console-notice" role="note">This browser is blocking site storage, so nothing can be saved here. Your work lasts for this visit only. Export anything you need before you leave.</div>}
       {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Add panels here; the saved view changes only when you store or update it.</div>}
       <ConsoleWorkspace compact ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : undefined)} />
     </main>
