@@ -1,7 +1,7 @@
 # Remote access brief
 
-Status: brief only. Nothing here is installed or verified yet. Decisions RA-1 to RA-3
-were answered by Dave on November 12, 2026; RA-4 to RA-6 are open.
+Status: brief only. Nothing here is installed or verified yet. Dave answered RA-1 to
+RA-3 and RA-5 on November 12, 2026. RA-4 and RA-6 are open.
 
 ## Problem
 
@@ -37,7 +37,7 @@ Nothing is published to the public internet. Funnel stays off.
 | RA-2 | Does the projector network have internet? | **Answered 2026-11-12: no; it is our own network.** The box needs its own uplink. | Adds RA-4. | Network plan |
 | RA-3 | What does the tunnel expose? | **Answered 2026-11-12: both.** Relay page via serve, plus a subnet route limited to one laptop. | The route gives full device access, so the access policy must be tight. | Policy and setup |
 | RA-4 | Uplink for the box | Open. **Recommended: A, a dedicated LTE hotspot or USB modem.** B: venue guest Wi-Fi. C: a wired venue drop. | A costs a data plan but needs no venue IT and has no captive portal. B is free but captive portals break Tailscale and need venue approval. C is most reliable but needs venue IT. | Box location and cost |
-| RA-5 | Box hardware | Open. **Recommended: A, Raspberry Pi 5 (4 GB) with SSD or high-endurance card, official power supply and case.** B: Intel N100 mini PC with Debian. | A is cheap, low power and uses the shipped systemd service. B has more headroom for a future temperature logger and is x86. | Purchase |
+| RA-5 | Box hardware | **Answered 2026-11-12: Dave's own mini PC**, brought to the venue on November 13. No purchase. | Free and on hand. Its operating system, ports and power settings are unknown until it passes the arrival checks below. | Slice 1 on site |
 | RA-6 | Projector network in standby | Open. **Recommended: A, set the Panasonics' STANDBY MODE to NORMAL.** B: leave ECO. | On November 11 the Panasonics left the network about 30 s after power-off, which looks like ECO standby. A keeps them reachable in Standby (remote confirm and power-on) for a few watts more. With B, remote access works only while they are powered. Check the Barco's standby network setting too. | Remote confirm and power-on |
 
 ## Smallest useful slice
@@ -48,6 +48,24 @@ checks and power-off from home.
 
 Slice 2: subnet route for the projector subnet, approved only for the venue tag, with an
 access rule that admits one laptop. Slice 3: RA-6 projector menu change, on site.
+
+## Mini PC arrival checks
+
+Check the mini PC before installing anything on it:
+
+1. **Operating system.** `deploy/install.sh` supports Linux (systemd) and macOS. It has no
+   Windows path. If the box runs Windows, install Debian 12 first. That erases the drive,
+   so copy anything worth keeping off it beforehand.
+2. **Ports.** One Ethernet port goes to the projector switch. The uplink needs Wi-Fi, a
+   second Ethernet port or a USB Ethernet adapter.
+3. **Power.** Set the firmware's power-restore option (often "Restore on AC power loss")
+   to Power On. Turn off sleep and suspend.
+4. **Unattended start.** Disk encryption that asks for a passphrase at boot fails
+   acceptance check 4. The relay and Tailscale must both start with nobody signed in.
+5. **Software.** Node 18 or newer and `rsync`. Build the Throwline bundle in a source
+   checkout first; the installer stops without it.
+6. **Accounts.** Remove personal accounts and saved logins. The box stays at the venue.
+7. **Uplink.** RA-4 is still open. A phone hotspot is enough to test slice 1 on site.
 
 ## Rules
 
@@ -69,7 +87,7 @@ access rule that admits one laptop. Slice 3: RA-6 projector menu change, on site
 ## Effects
 
 No code, rig file format, slot ID, cue address or API change is needed for slices 1–3.
-`deploy/install.sh` already installs a systemd service on Debian and Raspberry Pi OS.
+`deploy/install.sh` already installs a systemd service on Linux (or launchd on macOS).
 A later temperature logger could run on the same box; that is a separate decision.
 
 ## Dependencies and risks
