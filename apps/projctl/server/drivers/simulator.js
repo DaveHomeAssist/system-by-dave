@@ -17,6 +17,15 @@ export function simulatorDriver({ name = 'SIM', inputs = ['31', '32'] } = {}) {
       const result = { power, shutter, input, lightHours, name, lens: { ...lens }, pattern, errors: { fan: 0, lamp: 0, temp: 0, cover: 0, filter: 0, other: 0 }, online: true };
       return result;
     },
+    async healthReadings() {
+      if (st.flaky) throw new Error('simulated offline');
+      const t = st.temps || { intake: 24, qtm1: 36, qtm2: 31 };
+      return { sensors: [
+        { id: 'intake', label: 'Intake air (simulated)', role: 'intake', c: t.intake },
+        { id: 'qtm1', label: 'Internal 1 (simulated)', role: 'internal', c: t.qtm1 },
+        { id: 'qtm2', label: 'Internal 2 (simulated)', role: 'internal', c: t.qtm2 },
+      ], alarm: st.alarm ?? null };
+    },
     async power(on, { guard } = {}) {
       guard?.();
       if (on) {

@@ -155,6 +155,19 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       throwIfAborted(signal);
       return s;
     },
+    // Read-only ambient temperature and alarm state for health reports.
+    async healthReadings({ signal } = {}) {
+      const read = (property) => rpc('property.get', { property }, timeoutMs, undefined, signal);
+      const optional = async (property) => { try { return await read(property); } catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; return null; } };
+      const raw = await optional('environment.temperature.ambient_outside.value');
+      const ambient = raw == null || raw === '' ? NaN : Number(raw);
+      const alarm = await optional('environment.alarmstate');
+      throwIfAborted(signal);
+      return {
+        sensors: [{ id: 'ambient', label: 'Ambient, outside', role: 'intake', c: Number.isFinite(ambient) ? Math.round(ambient * 10) / 10 : null }],
+        alarm: alarm == null ? null : String(alarm),
+      };
+    },
     power: (on, { guard } = {}) => rpc(on ? 'system.poweron' : 'system.poweroff', undefined, timeoutMs, guard).then(() => 'OK'),
     shutter: (closed) => set('optics.shutter.target', closed ? 'Closed' : 'Open').then(() => 'OK'),
     async input(idv) {
