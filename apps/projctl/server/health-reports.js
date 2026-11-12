@@ -107,16 +107,25 @@ const level = (v) => (v === 2 ? 'error' : 'warning');
 const lanePart = (u) => (u.lane ? `lane ${u.lane}, ` : '');
 const who = (u) => `${u.slot} (${lanePart(u)}${u.model || 'unknown model'}, ${u.ip})`;
 
-export function unitRow(p, st = {}, conn = {}, readings = null, readError = null, config = DEFAULTS) {
+// `air` comes from the Thermal watch: { sample: { c, at } | null, peakC, peakAt } with epoch-ms
+// times. `sample` is the latest watch reading, passed only when it is recent enough to stand in
+// for a report-time reading that failed. The peak is the highest watch reading since the
+// previous report.
+const isoOrNull = (ms) => (Number.isFinite(ms) ? new Date(ms).toISOString() : null);
+export function unitRow(p, st = {}, conn = {}, readings = null, readError = null, config = DEFAULTS, air = null) {
   const sensors = Array.isArray(readings?.sensors) ? readings.sensors : [];
   const intake = sensors.find((s) => s.role === 'intake' && Number.isFinite(s.c));
   const internal = sensors.filter((s) => s.role === 'internal' && Number.isFinite(s.c)).map((s) => s.c);
   const limit = ratedAmbientDetail(p, config.ratedAmbientC, { reliable: config.reliable !== false });
   const rated = limit.c;
-  const headroom = intake && rated != null ? round1(rated - intake.c) : null;
+  const online = !!st?.online;
+  const fallback = !intake && online && Number.isFinite(air?.sample?.c) ? air.sample : null;
+  const intakeC = intake ? intake.c : fallback ? fallback.c : null;
+  const headroom = intakeC != null && rated != null ? round1(rated - intakeC) : null;
+  let peakC = Number.isFinite(air?.peakC) ? air.peakC : null, peakAt = peakC != null ? isoOrNull(air.peakAt) : null;
+  if (peakC == null && intakeC != null) { peakC = intakeC; peakAt = fallback ? isoOrNull(fallback.at) : null; }
   const errors = st?.errors && typeof st.errors === 'object' ? st.errors : null; // PJLink ERST; null for Pulse
   const alarm = readings?.alarm == null ? null : String(readings.alarm);
-  const online = !!st?.online;
   const flags = [], warnings = [];
   if (online && errors) {
     if (errors.temp) flags.push(`temperature ${level(errors.temp)}`);
@@ -129,7 +138,9 @@ export function unitRow(p, st = {}, conn = {}, readings = null, readError = null
   return {
     slot: p.slot, lane: p.lane || null, model: [p.make, p.model].filter(Boolean).join(' ') || p.label || null, ip: p.ip || null, owner: p.owner || null,
     power: st?.power || 'unknown', online, lastContact: conn?.lastSuccessAt || null, lightHours: Number.isFinite(st?.lightHours) ? st.lightHours : null,
-    intakeC: intake ? intake.c : null, intakeLabel: intake?.label || null, internalC: internal, ratedC: rated, limitSource: limit.source, limitWarning: limit.warning, headroomC: headroom,
+    intakeC, intakeLabel: intake?.label || (fallback ? 'Thermal watch sample' : null),
+    intakeSource: intake ? 'report' : fallback ? 'watch' : null, intakeAt: fallback ? isoOrNull(fallback.at) : null, peakC, peakAt,
+    internalC: internal, ratedC: rated, limitSource: limit.source, limitWarning: limit.warning, headroomC: headroom,
     flags, warnings, alarm, flagSource: errors ? 'PJLink' : alarm != null ? 'Pulse' : null,
     readError: readError ? String(readError).slice(0, 200) : null, verdict,
   };
@@ -143,6 +154,7 @@ export function summarize(units) {
   const unreachable = units.filter((u) => u.verdict === 'unreachable');
   const warned = units.filter((u) => u.warnings.length);
   const notRead = reached.filter((u) => u.intakeC == null);
+  const fromWatch = reached.filter((u) => u.intakeSource === 'watch');
   const least = units.filter((u) => u.headroomC != null).sort((a, b) => a.headroomC - b.headroomC)[0];
   const findings = [];
   if (!n) findings.push('No assigned projectors.');
@@ -152,6 +164,7 @@ export function summarize(units) {
   if (least) findings.push(`Least headroom: ${who(least)} ${num(least.headroomC)} °C (${num(least.intakeC)} °C intake, ${least.ratedC} °C limit).`);
   if (warned.length) findings.push(`PJLink warnings: ${warned.map((u) => `${u.slot} ${u.warnings.join(', ')}`).join('; ')}.`);
   if (unreachable.length && reached.length) findings.push(`Not reached: ${unreachable.map(who).join(', ')}.`);
+  if (fromWatch.length) findings.push(`Report-time reading failed; latest Thermal watch sample used: ${fromWatch.map((u) => u.slot).join(', ')}.`);
   if (notRead.length) findings.push(`Temperatures not read: ${notRead.map((u) => u.slot).join(', ')}.`);
   const follow = [];
   for (const u of flagged) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): check ${u.flags.join(', ')} on the projector.`);
@@ -175,7 +188,13 @@ export function buildReport({ kind, reason = '', startedAt, finishedAt, units, e
   };
 }
 
-const UNIT_HEADER = ['Unit', 'Lane', 'Model', 'Address', 'Power', 'Intake or ambient (°C)', 'Limit (°C)', 'Headroom (°C)', 'Internal (°C)', 'Flags', 'Light hours (h)', 'Last contact'];
+const UNIT_HEADER = ['Unit', 'Lane', 'Model', 'Address', 'Power', 'Intake or ambient (°C)', 'Peak since previous report (°C)', 'Limit (°C)', 'Headroom (°C)', 'Internal (°C)', 'Flags', 'Light hours (h)', 'Last contact'];
+const timeSuffix = (iso, timeZone) => (iso ? ` (${localTime(Date.parse(iso), timeZone)})` : '');
+function intakeCell(u, timeZone) {
+  if (u.intakeC == null) return '—';
+  return u.intakeSource === 'watch' ? `${num(u.intakeC)} watch sample${timeSuffix(u.intakeAt, timeZone)}` : num(u.intakeC);
+}
+const peakCell = (u, timeZone) => (u.peakC == null ? '—' : `${num(u.peakC)}${timeSuffix(u.peakAt, timeZone)}`);
 function flagCell(u) {
   if (!u.online) return 'Not reached';
   const parts = [...u.flags, ...u.warnings];
@@ -186,7 +205,8 @@ function flagCell(u) {
 }
 export function unitTable(report) {
   return [UNIT_HEADER, ...report.units.map((u) => [
-    u.slot, u.lane || '—', u.model || '—', u.ip || '—', u.power, num(u.intakeC), u.ratedC == null ? '—' : String(u.ratedC), num(u.headroomC),
+    u.slot, u.lane || '—', u.model || '—', u.ip || '—', u.power, intakeCell(u, report.timeZone), peakCell(u, report.timeZone),
+    u.ratedC == null ? '—' : String(u.ratedC), num(u.headroomC),
     u.internalC.length ? u.internalC.join(', ') : '—', flagCell(u), u.lightHours == null ? '—' : u.lightHours.toLocaleString('en-US'),
     u.lastContact ? localTime(Date.parse(u.lastContact), report.timeZone) : '—',
   ])];
@@ -270,6 +290,8 @@ const summaryOf = (r) => ({ id: r.id, kind: r.kind, title: r.title, startedAt: r
 export function createHealthReports({
   dir, config = { ...DEFAULTS, ratedAmbientC: {}, notion: {} }, projectors, status, connection, events = () => [],
   readTelemetry = null, describeError = (p, e) => String(e?.message || e), publish = null,
+  // recentAir(p, sinceMs) -> { c, at, peakC, peakAt } | null from the Thermal watch (epoch-ms times).
+  recentAir = null, telemetryAttempts = 3, watchSampleMaxAgeMs = 3 * 60000,
   now = Date.now, timer = setTimeout, cancelTimer = clearTimeout, timeZone = TIME_ZONE,
   powerOnDelayMs = 120000, telemetryTimeoutMs = 12000, hourlyQuietMs = 15 * 60000, powerOffWindowMs = 30000,
   // Retries cover a venue without internet for up to 7 days (1008 tries at 10 minutes).
@@ -352,6 +374,15 @@ export function createHealthReports({
     return events().filter((e) => { const t = Date.parse(e.at); return t > since && t <= until; }).slice(-30).reverse()
       .map((e) => ({ at: e.at, slot: e.slot || null, text: clip([e.command, e.result, e.detail].filter(Boolean).join(' · '), 160) }));
   }
+  // Read after the report's own attempt, which also feeds the watch. A watch sample older than
+  // watchSampleMaxAgeMs is not used in place of a failed reading.
+  function airFor(p, since) {
+    if (!recentAir) return null;
+    let r = null; try { r = recentAir(p, since); } catch { return null; }
+    if (!r) return null;
+    const fresh = Number.isFinite(r.c) && Number.isFinite(r.at) && now() - r.at <= watchSampleMaxAgeMs;
+    return { sample: fresh ? { c: r.c, at: r.at } : null, peakC: r.peakC, peakAt: r.peakAt };
+  }
   async function capture(kind, reason, snapshot) {
     const startedAt = now();
     const since = lastReportAt ?? startedAt - HOUR;
@@ -361,11 +392,11 @@ export function createHealthReports({
         const controller = new AbortController();
         const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), telemetryTimeoutMs);
         deadline?.unref?.();
-        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal })), controller.signal); }
-        catch (e) { readError = describeError(p, e); }
+        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal, attempts: telemetryAttempts })), controller.signal); }
+        catch (e) { readError = describeError(p, e); if (e?.attempts > 1) readError += ` (${e.attempts} tries)`; }
         finally { cancelTimer(deadline); }
       }
-      return unitRow(p, st, conn, readings, readError, config);
+      return unitRow(p, st, conn, readings, readError, config, airFor(p, since));
     }));
     const finishedAt = now();
     const report = buildReport({ kind, reason, startedAt, finishedAt, units, events: recentEvents(since, finishedAt), config, timeZone });

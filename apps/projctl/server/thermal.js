@@ -70,6 +70,14 @@ export function createThermalMonitor({ thresholds = THRESHOLDS, retentionMs = RE
         limitC, headroomC: limitC == null ? null : round1(limitC - last.c), peakC: peak.c, peakAt: new Date(peak.t).toISOString(),
       };
     },
+    // For health reports: the latest reading, and the highest reading taken after `since`
+    // (epoch ms). Times are epoch ms. Null when the slot has no readings.
+    recent(slot, since = -Infinity) {
+      const e = slots.get(slot), last = e?.samples.at(-1);
+      if (!last) return null;
+      let peak = null; for (const s of e.samples) if (s.t > since && (!peak || s.c > peak.c)) peak = s;
+      return { c: last.c, at: last.t, kind: e.kind, peakC: peak ? peak.c : null, peakAt: peak ? peak.t : null };
+    },
     // [[epoch ms, c], ...] for the window, thinned to at most maxPoints while
     // keeping the highest reading in each bucket so a peak is never smoothed away.
     series(slot, { windowMs = 30 * 60 * 1000, maxPoints = 180 } = {}) {

@@ -45,8 +45,9 @@ in a Notion database.
   headroom; PJLink "other" or lamp, cover and filter warnings; units not reached.
 - Follow-up: one line per thing to check, or "None".
 - Page body: a unit table (slot, lane, model, address, power, intake or ambient
-  temperature, rated limit, headroom, internal temperatures, flags, light hours,
-  last contact) and the controller events since the previous report.
+  temperature, peak since the previous report, rated limit, headroom, internal
+  temperatures, flags, light hours, last contact) and the controller events since
+  the previous report.
 
 Slots are internal relay IDs. Every row also names lane, model and address,
 because production paperwork numbers the projectors differently.
@@ -65,6 +66,26 @@ listed as not read. The Thermal watch (README, "Thermal watch") takes the same
 reading about once a minute while a unit is on or cooling. Both go through one
 reader in the relay, one read at a time per projector, so a report waits for a
 sample in progress instead of querying alongside it.
+
+**Lost connections (fix 2026-11-12).** The house PT-DW830U units close a
+connection that arrives while another is open. On 12 Nov 2026, 3 of 6 reports
+listed P3 and P4 as not read with "connection closed before Panasonic reply",
+because a report's reading could start in the middle of a status poll. Now:
+
+- Every temperature reading waits for that projector's status poll to finish,
+  so it opens its connections in the gap before the next poll.
+- A report retries a lost connection up to 3 times, 1.5 s apart, within its
+  12-second limit. Refusals and bad replies are not retried. The Thermal watch
+  takes one attempt and tries again at its next sample.
+- If the report's reading still fails, the latest Thermal watch sample stands in
+  when it is at most 3 minutes old. The table marks it as a watch sample with its
+  time, and Findings name the unit. An older sample is not used; the unit is
+  listed as not read.
+- The unit table shows each unit's peak since the previous report, from the
+  Thermal watch history. Headroom and the verdict still use the report-time
+  reading (or the stand-in sample), not the peak.
+
+Status: simulator and unit tests only; not yet checked against the projectors.
 
 ### Flags and limits
 

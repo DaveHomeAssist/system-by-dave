@@ -23,6 +23,7 @@ import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js'
 import { createPoller } from './polling.js';
 import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader, ratedAmbientDetail, isLit } from './health-reports.js';
 import { createThermalMonitor, thermalThresholds, plausibleAirC, thermalCsv, RETENTION_MS } from './thermal.js';
+import { createTelemetryReader } from './telemetry-reader.js';
 import { createManualDiscovery } from './discovery.js';
 import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES, mutationAllowed, FRAME_ANCESTORS } from './http-security.js';
 import { servePublic, pipeFile } from './static-files.js';
@@ -213,6 +214,9 @@ health = createHealthReports({
   connection: (slot) => connections.get(slot),
   events: () => rig.events,
   readTelemetry, // shared with the Thermal watch below: one read at a time per projector
+  // Latest Thermal watch sample and peak since the previous report, for units whose
+  // report-time reading fails.
+  recentAir: (p, since) => thermal.recent(p.slot, since),
   describeError: (p, e) => connectionError(store.projector(p.slot) || p, e),
   publish: healthConfig.notion.databaseId ? createNotionPublisher({ databaseId: healthConfig.notion.databaseId, token: notionTokenReader({ keychain: !SIM }) }) : null,
   powerOnDelayMs: Number(process.env.PROJCTL_HEALTH_POWER_ON_DELAY_MS || 120000),
@@ -230,7 +234,8 @@ const thermal = createThermalMonitor({ thresholds: thermalLevels }); // in memor
 const thermalTargets = new Map();  // slot -> driver and address behind the history
 const thermalReads = new Map();    // slot -> { at, ok } for the latest finished temperature read
 const thermalAttempts = new Map(); // slot -> when the latest read started
-const telemetryQueue = new Map();  // slot -> tail of that projector's read chain
+// Each read waits for that projector's status poll to finish (server/telemetry-reader.js).
+const telemetry = createTelemetryReader({ settled: (slot) => poller.settled(slot) });
 const limitInfo = (p) => ratedAmbientDetail(p, healthConfig.ratedAmbientC, { reliable: healthConfig.reliable !== false });
 const limitFor = (p) => limitInfo(p).c;
 const airSource = (p) => { const d = driverFor(p); return d.healthReadings ? (d.kind === 'pulse' ? 'ambient' : 'intake') : null; };
@@ -257,13 +262,12 @@ function recordThermal(p, readings) {
 }
 // One temperature reader per projector for health reports and the Thermal watch. Reads for a
 // slot run one after another, and every finished read reaches the watch, whoever asked for it.
+// options.attempts > 1 retries a lost connection (health reports pass 3).
 function readTelemetry(p, options) {
   const current = store.projector(p.slot) || p, d = driverFor(current);
   if (!d.healthReadings) return null;
   thermalAttempts.set(current.slot, Date.now());
-  const run = () => d.healthReadings(options);
-  const read = (telemetryQueue.get(current.slot) || Promise.resolve()).then(run, run);
-  telemetryQueue.set(current.slot, read.catch(() => {}));
+  const read = telemetry.read(current.slot, d, options);
   return read.then((readings) => { try { recordThermal(current, readings); } catch (e) { console.error('[thermal]', e.message); } return readings; },
     (error) => { thermalReads.set(current.slot, { at: Date.now(), ok: false }); throw error; });
 }

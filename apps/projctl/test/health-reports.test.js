@@ -93,7 +93,7 @@ test('flags, alarms, unreachable units and missing readings are reported', () =>
   const report = buildReport({ kind: 'hourly', startedAt: Date.parse('2026-11-13T00:00:00Z'), finishedAt: Date.parse('2026-11-13T00:00:03Z'), units, config: CONFIG });
   assert.equal(report.title, 'Frozen | Projectors | Health Log | 2026-11-12 19:00 | Hourly');
   const md = renderMarkdown(report);
-  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| on \| 27 \| 40 \| 13 \| 37 \| Not reached \|/);
+  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| on \| 27 \| 27 \| 40 \| 13 \| 37 \| Not reached \|/);
   assert.match(md, /readings: timeout \(port 1024\)/);
   const none = summarize(units.map((u) => ({ ...u, online: false, verdict: 'unreachable', headroomC: null })));
   assert.match(none.findings, /^No units reachable; 0 of 4 read\./);
@@ -110,7 +110,7 @@ test('Notion page carries the four properties and a unit table', () => {
   assert.ok(page.properties.Findings.rich_text[0].text.content.length <= 2000);
   const tables = page.children.filter((b) => b.type === 'table');
   assert.equal(tables.length, 2);
-  assert.equal(tables[0].table.table_width, 12);
+  assert.equal(tables[0].table.table_width, 13);
   assert.equal(tables[0].table.children.length, 5);
   assert.ok(tables[0].table.children.every((r) => r.table_row.cells.every((c) => c[0].text.content.length > 0)));
   assert.doesNotMatch(JSON.stringify(page), /secret-1/);
@@ -315,4 +315,29 @@ test('Barco health readings read ambient and alarm state only', async (t) => {
   delete values['environment.temperature.ambient_outside.value'];
   const missing = await driver.healthReadings();
   assert.equal(missing.sensors[0].c, null, 'an unsupported sensor is not read as 0 °C');
+});
+
+test('a failed report-time reading uses a recent Thermal watch sample, and the peak since the previous report is shown', async (t) => {
+  const lost = () => Promise.reject(new Error('connection closed before Panasonic reply'));
+  const asked = [];
+  const { engine, clock, set, dir } = rigEngine(t, {
+    readTelemetry: (p, options) => { asked.push(options.attempts); return ['P3', 'P4'].includes(p.slot) ? lost() : NOV11[p.slot].readings; },
+    recentAir: (p, since) => {
+      const n = clock.now();
+      if (p.slot === 'P4') return { c: 37, at: n - 40000, peakC: 38, peakAt: n - 20 * 60000 };
+      if (p.slot === 'P3') return { c: 27, at: n - 10 * 60000, peakC: 28, peakAt: n - 30 * 60000 }; // too old to stand in
+      return null;
+    },
+  });
+  set('off'); set('on');
+  const summary = await engine.run();
+  assert.deepEqual(asked, [3, 3, 3, 3], 'reports ask the reader for three attempts');
+  assert.match(summary.findings, /Least headroom: P4 \(lane D, Panasonic PT-DW830U, 192\.168\.5\.23\) 3 °C \(37 °C intake, 40 °C limit\)\./);
+  assert.match(summary.findings, /Report-time reading failed; latest Thermal watch sample used: P4\./);
+  assert.match(summary.findings, /Temperatures not read: P3\./);
+  assert.match(summary.followUp, /P4 \(lane D, 192\.168\.5\.23\): inspect intake clearance and exhaust path, 3 °C headroom\./);
+  const md = fs.readFileSync(path.join(dir, `${engine.view().reports[0].id}.md`), 'utf8');
+  assert.match(md, /\| P4 \| D \| Panasonic PT-DW830U \| 192\.168\.5\.23 \| on \| 37 watch sample \(\d\d:\d\d:\d\d EST\) \| 38 \(\d\d:\d\d:\d\d EST\) \| 40 \| 3 \|/);
+  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| on \| — \| 28 \(\d\d:\d\d:\d\d EST\) \| 40 \| — \|/);
+  assert.match(md, /readings: connection closed before Panasonic reply/);
 });
