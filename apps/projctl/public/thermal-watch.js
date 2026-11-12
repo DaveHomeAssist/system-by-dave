@@ -108,6 +108,7 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
     // The foot carries the reason when there is no reading, otherwise what and where it was read.
     const age = has && v.at ? ageText(now - Date.parse(v.at)) : '';
     const reason = conflict ? 'Assignment conflict: two devices claim this lane.' : !p ? 'No device assigned to this lane.'
+      : !p.ip ? 'No address set for this projector.'
       : v?.source == null ? (p.driver === 'pulse' ? 'Set ambientProperty for this Barco in the rig file to read its ambient sensor.' : 'This driver does not report temperature.')
       : p.status?.air?.raw && !Number.isFinite(p.status.air.c) && !has ? `Unreadable reply: ${p.status.air.raw}` : 'No reading yet.';
     setText(li.querySelector('[data-foot]'), has ? [`Slot ${p.slot}`, p.model || p.label, age && `read ${age}`].filter(Boolean).join(' · ') : reason);

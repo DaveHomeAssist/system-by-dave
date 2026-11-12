@@ -131,6 +131,11 @@ const assert = require('node:assert/strict');
       assert.equal(await page.locator('#thermal-watch [data-thermal-lane="A"] [data-value]').innerText(), '—');
       assert.match(await page.locator('#thermal-watch [data-thermal-lane="A"] [data-foot]').innerText(), /No device assigned/);
       assert.equal(await page.locator('#thermal-watch [data-thermal-lane="A"] [data-open]').isDisabled(), true);
+      // A projector assigned to a lane but with no IP address says that, not a vague "no reading".
+      await relay.api('projector', { slot: 'P3', ip: '' });
+      await page.waitForFunction(() => /No address set/.test(document.querySelector('#thermal-watch [data-thermal-lane="C"] [data-foot]')?.textContent || ''));
+      assert.equal(await page.locator('#thermal-watch [data-thermal-lane="C"] [data-word]').innerText(), 'No reading');
+      assert.equal(await page.locator('#thermal-watch [data-thermal-lane="C"] [data-open]').isDisabled(), false, 'the lane still opens its controls');
       await page.locator('#thermal-watch [data-close]').click();
       assert.equal(await page.locator('#thermal-dialog').isVisible(), false);
     } finally { await page.close(); }
