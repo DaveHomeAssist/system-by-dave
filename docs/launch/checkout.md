@@ -1,8 +1,10 @@
 # Field Kit checkout
 
-Status: **closed**. `field-kit/` is a noindex draft that isn't linked from
-navigation or the sitemap. It shows the $12 price and a disabled "Checkout not
-open yet" button. Paid kit files are **not** in this repository. Only the
+Status: **closed**. `field-kit/` is a noindex draft that isn't in the sitemap.
+The console's navigation and first-visit box on avbydave.com link to it (whether
+they should before checkout opens is open choice HR-D9 in
+`docs/next-steps/av-by-dave.json`). It shows the $12 price and a disabled
+"Checkout not open yet" button. Paid kit files are **not** in this repository. Only the
 blurred preview images in `field-kit/img/` are.
 
 Code: `js/sbd-checkout.js` (validation), `field-kit/field-kit.js` (button),

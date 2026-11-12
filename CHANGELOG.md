@@ -1,5 +1,12 @@
 # Changelog
 
+## November 12, 2026: Console opens without site storage, saved pages on server errors
+
+- The AV console opens when the browser refuses site storage (every cookie blocked, some private and embedded contexts). It rendered nothing, because reading `window.localStorage` threw while the packs mounted. The shell now checks first, gives the page a stand-in that holds nothing and refuses writes, and shows a notice that nothing can be saved and work lasts for the visit only. Saves, drafts and layout writes report their failure as they do for full storage. A browser where no stand-in can be installed gets a plain message. Details: `docs/av-suite-shell.md`.
+- The offline worker answers a page request that gets a server error (5xx) with the saved copy of that page, or the saved console, and passes the error through only when nothing is saved. Install now reads every asset past the browser's HTTP cache, so a copy fetched just before a deploy is not stored as the new generation.
+- The console page's link preview uses the AV by Dave card (`img/av-by-dave-og.png`) with its size and description, as the other AV pages do. It used the System by Dave banner.
+- `docs/launch/checkout.md` no longer says the draft Field Kit page is unlinked; the console links to it.
+
 ## November 12, 2026: Equipment Lab adds the Barco UDM-4K22
 
 - Equipment Lab imports shared release 1.1.0 at `27561a2`: the confirmed 43-entry family plus P01, the Barco UDM-4K22, in a new Projection collection. The library, splash and counts now read from the catalog, so they show 44 entries.
