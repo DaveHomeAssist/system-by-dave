@@ -113,14 +113,15 @@ function refreshConfirmLabels() {
     button.title = button.disabled ? button.textContent : 'Confirm power off after the label changes. A double-click does not count.';
   });
   document.querySelectorAll('[data-reset-input]').forEach((button) => {
-    const slot = button.dataset.slot || button.closest('[data-slot]')?.dataset.slot;
+    const slot = button.dataset.resetSlot || button.closest('[data-slot]')?.dataset.slot;
     if (!slot) return;
     const label = button.dataset.preferred || pref;
     button.textContent = resetLabel(slot, label);
   });
   document.querySelectorAll('[data-confirm-input]').forEach((button) => {
-    const pending = pendingInput.get(button.dataset.slot);
-    const armed = pending && confirmGate.armed(`${button.dataset.slot}:input:${pending.value}`);
+    const slot = button.closest('[data-slot]')?.dataset.slot;
+    const pending = pendingInput.get(slot);
+    const armed = pending && confirmGate.armed(`${slot}:input:${pending.value}`);
     button.hidden = !armed;
     if (armed) button.textContent = `Confirm ${pending.label}`;
   });
@@ -318,14 +319,14 @@ function renderGrid() {
         </div>
         <div class="pj-power-off"><button class="avd-btn avd-btn--danger" data-c="power" data-a="0" type="button" title="${esc(powerOffLabel(p.slot))}" ${off || busy || lock || s.power === 'off' ? 'disabled' : ''}>${esc(powerOffLabel(p.slot))}</button></div>
         <div class="pj-input-actions">
-          <button class="avd-btn" data-reset-input data-slot="${esc(p.slot)}" data-preferred="${esc(preferredLabel)}" type="button" ${off || busy || lock || !resetAvailable ? 'disabled' : ''}>${esc(resetLabel(p.slot, preferredLabel))}</button>
+          <button class="avd-btn" data-reset-input data-preferred="${esc(preferredLabel)}" type="button" ${off || busy || lock || !resetAvailable ? 'disabled' : ''}>${esc(resetLabel(p.slot, preferredLabel))}</button>
           <p class="pj-mono pj-note" ${resetAvailable ? 'style="display:none"' : ''}>${esc(preferredLabel)} input has not been verified for this projector.</p>
           <details class="pj-input-options" data-input-options="${esc(p.slot)}" ${inputOptionsOpen.has(p.slot) ? 'open' : ''}>
             <summary data-focus-key="${esc(p.slot)}:input-options">Other inputs</summary>
             <label class="avd-field"><span class="avd-field__label pj-caps">Select another input</span>
               <select class="avd-input" data-c="input" ${off || busy || lock || !inputs.length ? 'disabled' : ''}>${!inputMatched ? `<option value="" disabled selected>${esc(inputPlaceholder)}</option>` : ''}${inputs.map(([id, lab]) => `<option value="${esc(id)}" ${String(s.input) === id ? 'selected' : ''}>${esc(lab)}</option>`).join('')}</select>
             </label>
-            <button class="avd-btn" type="button" data-confirm-input data-slot="${esc(p.slot)}" ${pendingInput.get(p.slot) && confirmGate.armed(`${p.slot}:input:${pendingInput.get(p.slot).value}`) ? '' : 'hidden'}>${pendingInput.get(p.slot) ? `Confirm ${esc(pendingInput.get(p.slot).label)}` : 'Confirm input'}</button>
+            <button class="avd-btn" type="button" data-confirm-input ${pendingInput.get(p.slot) && confirmGate.armed(`${p.slot}:input:${pendingInput.get(p.slot).value}`) ? '' : 'hidden'}>${pendingInput.get(p.slot) ? `Confirm ${esc(pendingInput.get(p.slot).label)}` : 'Confirm input'}</button>
           </details>
         </div>
         <div class="pj-well"><span class="avd-eyebrow">Test pattern</span><span class="pj-mono pj-ink">${esc(pat)}</span></div>
@@ -420,7 +421,7 @@ function renderPrimaryControls(p){
  const s=p.status||{},off=!connectionOf(p).current,at=new Date(s.connection?.lastSuccessAt||s.updatedAt||NaN).getTime(),fresh=Number.isFinite(at)&&Date.now()-at<=Math.max(15000,(state.relay?.pollIntervalMs||5000)*3)&&!off&&(!s.connection||s.connection.state==='online');
  const options=fresh&&s.shutter==='open'?[['1','Close shutter']]:fresh&&s.shutter==='closed'?[['0','Open shutter']]:[['0','Open shutter'],['1','Close shutter']];
  for(const[arg,label]of options){const b=document.createElement('button');b.className='avd-btn';b.type='button';b._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);b.dataset.focusKey=`${p.slot}:dock:shutter:${arg}`;b.dataset.c='shutter';b.dataset.a=arg;b.textContent=label;b.disabled=off;b.onclick=e=>cmd(p.slot,'shutter',Number(arg),e.currentTarget);out.append(b);}
- const input=document.createElement('button');input.type='button';input.className='avd-btn pj-reset-gap';input._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);input.dataset.focusKey=`${p.slot}:dock:reset-input`;input.dataset.resetInput='';input.dataset.slot=p.slot;input.dataset.preferred=p.inputPreference?.label||preferredName();input.textContent=resetLabel(p.slot, input.dataset.preferred);input.disabled=off||state.lock||!!p.busy||!p.inputPreference?.available;input.onclick=e=>cmd(p.slot,'resetInput',undefined,e.currentTarget);out.append(input);patchControls(host,out);
+ const input=document.createElement('button');input.type='button';input.className='avd-btn pj-reset-gap';input._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);input.dataset.focusKey=`${p.slot}:dock:reset-input`;input.dataset.resetInput='';input.dataset.resetSlot=p.slot;input.dataset.preferred=p.inputPreference?.label||preferredName();input.textContent=resetLabel(p.slot, input.dataset.preferred);input.disabled=off||state.lock||!!p.busy||!p.inputPreference?.available;input.onclick=e=>cmd(p.slot,'resetInput',undefined,e.currentTarget);out.append(input);patchControls(host,out);
 }
 function renderProjectorInfo() {
   const lane=selectedDetailLane;if(!lane)return;

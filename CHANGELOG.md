@@ -2,7 +2,8 @@
 
 ## November 12, 2026: Projctl show-control confirms
 
-- Power off, input changes, and input reset ask for a second tap after the confirm label has been up. A double-click does not perform them. All-projectors Power off sits on its own row, away from shutter, power on, and reset.
+- Power off, input changes, and input reset ask for a second tap after the confirm label has been up. A double-click does not perform them. All-projectors Power off sits on its own row, away from shutter, power on, and reset. On a narrow screen that menu stays in the page, so the button is not drawn off the left edge.
+- Editing a stage throw or room offset does not walk the 3D camera. A render that the orbit control reports as no move keeps the pose it already had.
 - A lens jog stays held until the motor reports stopped, and for at least a beat when the report comes back immediately. Stop still works during that hold.
 - On a phone, Stop is on the first rig screen. The command toast sits clear of the tab bar.
 - Show lock takes a second tap, and it is separated from the theme button. Save is disabled while locked. A disabled power-off control names the reason. Saving an address asks for confirmation, can be reverted, and the toast says whether the projector answered.

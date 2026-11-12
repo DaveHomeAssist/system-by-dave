@@ -314,8 +314,11 @@ html:has(#show-lock[data-lock-state="locked"]) .pj-selected-dock [data-lens-stat
 
 /* Confirmations, phone Stop, and the command toast. */
 [hidden]{display:none !important}
-.pj-power-off-row{flex:1 0 100%;display:flex;margin-top:10px;padding-top:10px;border-top:2px dashed var(--state-blocked)}
+.pj-power-off-row{flex:1 0 100%;display:flex;justify-content:flex-end;margin-top:10px;padding-top:10px;border-top:2px dashed var(--state-blocked)}
 .pj-power-off-row .avd-btn{min-height:48px;min-width:min(100%,220px)}
+@media(max-width:720px){
+  .pj-rig-all[open] .pj-allbar{position:static;width:auto;right:auto;max-width:100%}
+}
 .pj-power-off{margin-top:8px}
 .pj-power-off .avd-btn{width:100%}
 .pj-reset-gap{margin-left:18px}
