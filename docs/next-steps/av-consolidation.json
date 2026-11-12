@@ -1281,6 +1281,7 @@
         "scope": "Shared release 1.1.0: P01 Barco UDM-4K22, and an inspector that loads any catalog GLB package",
         "sharedRevision": "27561a2bb5a27be756df38315a6389aa2235aa17",
         "hostBase": "c5860883b5a11def5cd392c7750442641da95875",
+        "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/456",
         "status": "Scoped source and browser checks pass in a cloud session; CI, merge, publication and live read-back are separate gates",
         "entries": 44,
         "nativeRepresentations": [

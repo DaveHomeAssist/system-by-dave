@@ -206,5 +206,7 @@ P01 opens on the local keypad rather than the body. Selecting the body
 highlights the whole projector, which would show a black unit in the highlight
 colour on first sight.
 
-Publication and live acceptance are separate release gates. No GPU, physical
+[Pull request 456](https://github.com/DaveHomeAssist/system-by-dave/pull/456)
+records host delivery. Publication and live acceptance are separate release
+gates, and the shared repository's record owns that evidence. No GPU, physical
 phone, WebKit browser or physical projector was checked.
