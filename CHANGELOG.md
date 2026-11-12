@@ -1,5 +1,11 @@
 # Changelog
 
+## November 11, 2026: Field Kit download page link check, console offline status
+
+- The Field Kit download page (`field-kit/thanks/`) now shows its download button and "your payment went through" line only for the share link registered by SHA-256 in `fieldKit.download.sha256` (`js/sbd-launch-config.js`). Before, any address carrying a Google Drive, Dropbox, OneDrive or SharePoint link and any `cs_…` value produced a page that confirmed a payment and offered that file. No hash is registered yet, so the page shows "email me" for every link until Dave registers the real one with `npm run hash:field-kit-link`. Steps and reasoning: `docs/launch/checkout.md`.
+- `npm run probe:field-kit` covers the registered link, a crafted address against the shipped config, unregistered links and malformed hashes. `npm run smoke:field-kit-checkout` fails when checkout is live without a registered hash.
+- The console's Status menu reports the real offline state. It showed "Offline cache preparing" for every state except ready, including a cache that failed or a browser that cannot keep one; those now read "Offline not ready. Stay online.", "Offline unavailable. Keep your connection." and "Offline use is not available in this browser."
+
 ## November 10, 2026: Projctl review hardening
 
 - Bound OSC and text TCP cue input (4 KiB packets and lines, connection, idle and in-flight limits) and log failed asynchronous cues. Add optional `PROJCTL_OSC_ENABLED`, `PROJCTL_TCP_ENABLED`, `PROJCTL_CUE_HOST` and `PROJCTL_CUE_ALLOWLIST` controls; existing cue exposure defaults are unchanged.

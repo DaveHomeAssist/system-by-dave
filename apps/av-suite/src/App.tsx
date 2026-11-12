@@ -33,6 +33,15 @@ const PALETTES = ["light", "dark", "white", "black"] as const;
 type Palette = typeof PALETTES[number];
 type ThemeMode = Palette | "system";
 type Status = { app: string; text: string; error: boolean };
+/* One line per state js/av-offline.js can report, so a cache that failed or
+   cannot exist never reads as "preparing" in the Status menu. */
+const OFFLINE_STATUS: Record<string, string> = {
+  ready: "Offline ready",
+  preparing: "Offline cache preparing",
+  partial: "Offline not ready. Stay online.",
+  error: "Offline unavailable. Keep your connection.",
+  unavailable: "Offline use is not available in this browser.",
+};
 
 function railRef(app: string, toolId?: string) {
   if (app === SUITE_PREFIX) return "toolbox";
@@ -180,6 +189,7 @@ export function App() {
   const viewTabs = views.filter(view => viewApp(view) === activeApp && (activeApp !== TOOL_PREFIX || viewTool(view) === activeTool));
   const quick = activePack ? activePack.quick.map(item => ({ ...item, type: `${activePack.id}:${item.type}` })) : [];
   const activeTitle = activePack ? activePack.label : SPECIALISTS.find(entry => entry.id === activeTool)?.label || "AV by Dave";
+  // Readiness as js/av-offline.js reports it on <html data-workspace-offline>.
   const [offline, setOffline] = useState(document.documentElement.dataset.workspaceOffline || "");
   useEffect(() => {
     const observer = new MutationObserver(() => setOffline(document.documentElement.dataset.workspaceOffline || ""));
@@ -217,7 +227,7 @@ export function App() {
         <label className="follow-system"><input type="checkbox" checked={theme === "system"} onChange={e => changeTheme(e.target.checked ? "system" : systemPalette)} /><span>Follow system</span></label>
         <button type="button" className="focus-toggle" aria-label={focusMode ? "Exit focus" : "Focus"} aria-pressed={focusMode} title={focusMode ? "Restore workspace chrome" : "Collapse workspace chrome"} onClick={toggleFocus}><svg aria-hidden="true" viewBox="0 0 24 24"><path d={focusMode ? "M9 4v5H4m16 0h-5V4m0 16v-5h5M4 15h5v5" : "M9 4H4v5m16 0V4h-5m0 16h5v-5M4 15v5h5"} /></svg><span>{focusMode ? "Exit focus" : "Focus"}</span></button>
           </> },
-          { name: "Status", description: "Plan summary, saved state and offline readiness", content: <><p>{activePack?.title || "Workspace"}</p><p>{activePack?.summary || "Add any panel to this workspace."}</p><p>{offline === "ready" ? "Offline ready" : "Offline cache preparing"}</p>{context && <p>{context}</p>}{dirtyApps.length > 0 && <p>Unsaved: {dirtyApps.join(", ")}</p>}</> },
+          { name: "Status", description: "Plan summary, saved state and offline readiness", content: <><p>{activePack?.title || "Workspace"}</p><p>{activePack?.summary || "Add any panel to this workspace."}</p><p>{OFFLINE_STATUS[offline] || OFFLINE_STATUS.preparing}</p>{context && <p>{context}</p>}{dirtyApps.length > 0 && <p>Unsaved: {dirtyApps.join(", ")}</p>}</> },
         ]} />
       </div>
     </header>
