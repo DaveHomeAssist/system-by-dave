@@ -17,7 +17,7 @@ const DISCIPLINE_OF: Record<string, Exclude<Discipline, 'all'>> = {
   N01: 'audio', N02: 'audio', N03: 'audio', N04: 'audio', N09: 'audio', N10: 'audio', N16: 'audio',
   N05: 'dj', N06: 'dj', N07: 'dj', N08: 'dj',
   N11: 'lighting', N12: 'lighting', N13: 'lighting', N14: 'lighting', N15: 'lighting', I01: 'lighting', I02: 'lighting', I03: 'lighting',
-  F01: 'video', F02: 'video', F03: 'video', F04: 'video',
+  F01: 'video', F02: 'video', F03: 'video', F04: 'video', P01: 'video',
 };
 
 const PREVIEW_ROOT = '/equipment-lab/previews/';
@@ -26,7 +26,7 @@ const PREVIEWS: Record<string, string> = {
   N07: 'nnc-xdj-xz.jpg', N08: 'nnc-prime-4.jpg', N09: 'nnc-cva-118.jpg', N10: 'nnc-ekx-15sp.jpg', N11: 'nnc-j-six.jpg', N12: 'nnc-vertigo-tri-led.jpg',
   N13: 'nnc-haze-1dx.jpg', N14: 'nnc-lasercube-2w.jpg', N15: 'nnc-tl60.jpg', N16: 'nnc-sm58.jpg',
   F01: 'atem-hd8-iso.jpg', F02: 'ccu4.jpg', F03: 'p240.jpg', F04: 'superjoy-g1.jpg',
-  I03: 'smartfade-1248.jpg', C01: 'fujinon-digipower66.jpg', C02: 'cartoni-maxima30.jpg',
+  I03: 'smartfade-1248.jpg', C01: 'fujinon-digipower66.jpg', C02: 'cartoni-maxima30.jpg', P01: 'barco-udm-4k22.jpg',
 };
 // Assembly renders, shared by every entry that opens in the same viewer.
 const SHARED_PREVIEWS: Record<string, { file: string; pos: string }> = {

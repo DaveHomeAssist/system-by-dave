@@ -94,8 +94,8 @@ changing the shared model package, native panel IDs or saved AV arrangements.
 ## Splash library
 
 The standalone route without an `equipment` parameter opens a splash library:
-a discipline rail, collection filters, search and a card grid of all 43 catalog
-entries, with a sheet for the selected entry. Every link that names `equipment`
+a discipline rail, collection filters, search and a card grid of every catalog
+entry, with a sheet for the selected entry. Every link that names `equipment`
 opens the existing workspace unchanged, so deep links, native AV panels, saved
 arrangements and the ten head control IDs are untouched. The title links back
 to the library from the workspace.
@@ -118,6 +118,50 @@ Not yet built: the in-workspace Library presentation, a jump palette and
 recently opened entries. Dave reviewed the preview and approved its release on
 2 November 2026.
 
+## Release 1.1.0 and the projector package
+
+Dave asked on 9 November 2026 for a Barco 4K22 in the library and on 12 November
+to show it on avbydave.com. The shared repository registered it as P01 Barco
+UDM-4K22 in release 1.1.0. [Its brief](https://github.com/DaveHomeAssist/equipment-lab/blob/main/docs/BARCO_UDM_4K22.md)
+owns the model's scope, sources and open decisions. This section covers the host.
+
+The inspector had been written for one package: its path, asset ID, ten head
+IDs, view presets, orbit limits and copy were fixed to C02, and the import
+accepted exactly 43 entries. Any catalog entry whose representation is a GLB now
+opens in the same inspector.
+
+- **Import.** `scripts/equipment_lab_release.mjs` accepts release 1.1.0: the
+  43-entry family plus the additions that release names, here P01. It also
+  checks that every native package in the catalog is allowlisted and agrees with
+  its own manifest. A release the script does not name is still refused.
+- **Package registry.** `apps/equipment-lab/src/model.ts` holds, per package,
+  the item list, the default item, the view presets and the orbit limits. The
+  item list is bundled so it survives a missing WebGL context or package. The
+  path and manifest name come from the catalog row.
+- **Viewer.** One mount serves one package. Each package gets the same manifest,
+  hash, frame, ID and label checks. P01 has six views, including the connector
+  side and a top view.
+- **Panels.** The inspector lists P01's 26 parts by assembly and says what
+  supports where each is drawn. Practice states that P01 has no practice mode
+  and shows the operating note for the selected part. Reference shows scope,
+  downloads, Barco's documents and what is not established.
+- **Splash.** P01 sits under Video & PTZ with the preview from its package.
+  Counts derive from the catalog.
+- **Offline.** P01's manifest, definition and GLB join the offline set under
+  cache generation `v20261112-equipment-lab-projector`.
+
+Unchanged: C02's ten IDs, deep links, copy and behavior, the other 42 entries,
+routes and saved arrangements. The discipline label is unchanged; that choice
+is open as P01-D4 in the shared brief.
+
+P01 is approximate and not qualified. Barco publishes the body size, the mass
+and the face that carries each part; the rest is approximate or assumed, and
+the package lists each open question. The page says so on the card, in the
+inspector and in Reference.
+
+Rollback: revert the host commit. That restores the 1.0.0 copy, which the
+import still recognizes as a previous release.
+
 ## Verification record
 
 The candidate was built and checked on Dominic with Node 24 and Chromium.
@@ -134,3 +178,35 @@ This does not qualify physical devices or an unprepared first offline visit.
 [Pull request 369](https://github.com/DaveHomeAssist/system-by-dave/pull/369)
 records host delivery; the shared repository migration record owns subsequent
 release evidence and the remaining family work.
+
+Release 1.1.0 was built and checked on 12 November 2026 in a cloud session with
+Node 22 and Chromium on SwiftShader, pinned to shared revision
+`27561a2bb5a27be756df38315a6389aa2235aa17`. Rebuilding untouched `main` there
+reproduced the committed Equipment Lab and suite bundles byte for byte. The
+probe checks 44 entries and, for C02 and P01 alike, the deep link, every listed
+item, each view, model picking, an unknown-item link, the native AV route, the
+splash handoff, the WebGL fallback, a deliberate context loss and four
+invalid-package cases. It covers 135 layout cases and logs no error or `THREE.*`
+message other than the one line three.js writes for each deliberate loss. C02
+keeps ten controls and 22 textures; P01 loads 26 parts and 14 textures. The
+suite shell, canvas menu, audio flow, bounded workspace, Throwline and offline
+transition probes pass.
+
+A supplemental check of P01 confirms keyboard selection in the part list, a
+visible focus ring and 44 px targets on the view buttons, a tap selection under
+touch emulation, no idle drawing, and a prepared offline reload inside the suite
+with all 26 parts and 14 textures. It also measured two limits that `main`
+already has for C02 and that this release leaves alone: in phone landscape
+(844 x 390) the console's panel area collapses to about 20 px, and at 320 px
+wide the inspector is clipped at the right edge. On a phone held upright P01's
+six view buttons take two rows, which leaves its picture 187 px tall at
+390 x 844 where C02 has 307.
+
+P01 opens on the local keypad rather than the body. Selecting the body
+highlights the whole projector, which would show a black unit in the highlight
+colour on first sight.
+
+[Pull request 456](https://github.com/DaveHomeAssist/system-by-dave/pull/456)
+records host delivery. Publication and live acceptance are separate release
+gates, and the shared repository's record owns that evidence. No GPU, physical
+phone, WebKit browser or physical projector was checked.

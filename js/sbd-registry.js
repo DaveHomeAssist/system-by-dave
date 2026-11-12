@@ -126,6 +126,9 @@
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.manifest.json',
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.definition.json',
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.inspection.glb',
+    './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.manifest.json',
+    './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.definition.json',
+    './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.inspection.glb',
     './av-suite-worker.js',
     './js/sbd-registry.js',
     './js/av-suite-context.js',
@@ -338,7 +341,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261103-throwline-stage-inspection',
+    version:'v20261112-equipment-lab-projector',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

@@ -12,6 +12,7 @@ const altFor = (card: Card) => card.image?.shared ? `Render of the ${card.entry.
 function noteFor(card: Card) {
   if (card.reference) return 'Reference model: its checklist closed with 58 passing and 2 not applicable. Geometry is approximate and physical dimensions are not calibrated.';
   if (card.generic) return 'Generic context model. It stands in for a class of equipment and does not represent a specific product.';
+  if (card.native) return 'Approximate model, inspected here in 3D. It is not qualified against the reference checklist. Inspecting it never operates hardware.';
   if (card.practice) return 'Practice controls run locally in the existing viewer. Nothing here connects to or controls real equipment.';
   return 'Approximate model, shown in its existing viewer while its shared adapter is migrated. Inspecting it never operates hardware.';
 }

@@ -16,6 +16,16 @@
       "sha256": "7373fc85f1592a9b36d82283404a1cfbfd552d2b26f74fcf472feac4c5cec516"
     },
     {
+      "file": "barco-udm-4k22.jpg",
+      "inventoryIds": [
+        "P01"
+      ],
+      "source": "DaveHomeAssist/equipment-lab@27561a2bb5a27be756df38315a6389aa2235aa17 release/models/barco.udm4k22.inspection/preview.jpg, unchanged; rendered from the reloaded GLB by the package build, light stage #e9eae0",
+      "bytes": 21772,
+      "sha256": "77ddd7ac81079214b9dd0bf957bc8ad0ece5815062dc8b7b446247d72f8677d1",
+      "geometrySourceSha256": "9583dc58786b7dd54442822b1b34b269aa5b2224dcb23ce1fa5b558b712744ba"
+    },
+    {
       "file": "camera-rig.jpg",
       "inventoryIds": [
         "C03",

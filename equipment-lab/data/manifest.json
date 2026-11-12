@@ -1,11 +1,75 @@
 {
   "schema": "equipment.lab.release.v1",
-  "revision": "1.0.0",
+  "revision": "1.1.0",
   "catalog": "catalog.json",
   "files": {
     "catalog.json": {
-      "bytes": 40078,
-      "sha256": "0adc5a52fb9c3587e26423c1b4197edb2080b6c2491c1b1859b885f859381fce"
+      "bytes": 41458,
+      "sha256": "537ea5c3e82c7e06af59f6778daf094a05e480e65de8889631a083d207da9afe"
+    },
+    "models/barco.udm4k22.inspection/README.md": {
+      "bytes": 4207,
+      "sha256": "97fa6265cade72e2c1e267a83e8584c08f7b44a1d0979e9c12038ec92883bf56"
+    },
+    "models/barco.udm4k22.inspection/barco.udm4k22.definition.json": {
+      "bytes": 168138,
+      "sha256": "f1548421076bb5412a6d75157ef8bd367540e511eddcffe21a152e3ad90077b7"
+    },
+    "models/barco.udm4k22.inspection/barco.udm4k22.inspection.glb": {
+      "bytes": 1239440,
+      "sha256": "9583dc58786b7dd54442822b1b34b269aa5b2224dcb23ce1fa5b558b712744ba"
+    },
+    "models/barco.udm4k22.inspection/barco.udm4k22.manifest.json": {
+      "bytes": 2530,
+      "sha256": "df58d5efa596ff95e09605bc32d9114dfa74f7e86620f8f8283837e7e98f14a7"
+    },
+    "models/barco.udm4k22.inspection/evidence/front-light.png": {
+      "bytes": 86160,
+      "sha256": "23034131dda8a586c9da934560fdd796ba33ac5b423043e6c38869ac5d588264"
+    },
+    "models/barco.udm4k22.inspection/evidence/geometry.json": {
+      "bytes": 1114,
+      "sha256": "7aa3d1a5030c838322e6f1125fa3316f763fe7be9c2f13da07428eeb4f000d3d"
+    },
+    "models/barco.udm4k22.inspection/evidence/gltf-validation.json": {
+      "bytes": 5145,
+      "sha256": "59abfe001fd0ac1e12ce5c272b069709d0f4798105e01b9081ad3be99a7172a2"
+    },
+    "models/barco.udm4k22.inspection/evidence/io-dark.png": {
+      "bytes": 179963,
+      "sha256": "403124f28b649285b1062ecf983d8668b67309e4b0bc6ea5ef69693cb5d20f91"
+    },
+    "models/barco.udm4k22.inspection/evidence/io-light.png": {
+      "bytes": 182237,
+      "sha256": "a8e92f04e6cf47f92b807454ec96fe24639a8e0a8f3d1cf6cf09e16c85b7adce"
+    },
+    "models/barco.udm4k22.inspection/evidence/left-light.png": {
+      "bytes": 118650,
+      "sha256": "92d2ad00cd1f3f553a5599b4c7a62db3dc18a1511e5c3fa072783f6011301fc1"
+    },
+    "models/barco.udm4k22.inspection/evidence/overview-dark.png": {
+      "bytes": 258833,
+      "sha256": "476ac44349d88d9b4058f492b3212535f1270198698cc4d10ef7e89abf8e8824"
+    },
+    "models/barco.udm4k22.inspection/evidence/overview-light.png": {
+      "bytes": 262106,
+      "sha256": "d318c52227ba4d7cc6db6dbeae1a808c75dc2fd5df01a5578e61699b07ace967"
+    },
+    "models/barco.udm4k22.inspection/evidence/rear-light.png": {
+      "bytes": 204220,
+      "sha256": "29424a34e81129d3eac71af4ff33fb8b191f6018b56c70de79a800214fb6cad9"
+    },
+    "models/barco.udm4k22.inspection/evidence/roundtrip.json": {
+      "bytes": 608,
+      "sha256": "ee379a190f14b6dc4c0f023b1345d44463cc8900a6ca34430f99a2f8ed1857f6"
+    },
+    "models/barco.udm4k22.inspection/evidence/top-light.png": {
+      "bytes": 55255,
+      "sha256": "126665bdc33f4d66cd246beb3bfb751ac999b19b90ebb6b7316698b87b6678b3"
+    },
+    "models/barco.udm4k22.inspection/preview.jpg": {
+      "bytes": 21772,
+      "sha256": "77ddd7ac81079214b9dd0bf957bc8ad0ece5815062dc8b7b446247d72f8677d1"
     },
     "models/cartoni.maxima30.reference/README.md": {
       "bytes": 3599,

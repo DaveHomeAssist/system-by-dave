@@ -1,5 +1,15 @@
 # Changelog
 
+## November 12, 2026: Equipment Lab adds the Barco UDM-4K22
+
+- Equipment Lab imports shared release 1.1.0 at `27561a2`: the confirmed 43-entry family plus P01, the Barco UDM-4K22, in a new Projection collection. The library, splash and counts now read from the catalog, so they show 44 entries.
+- The 3D inspector loads any catalog entry whose representation is a GLB package. It was fixed to the Cartoni Maxima 30. Each package gets the same manifest, hash, frame, ID and label checks, and brings its own item list, view presets and orbit limits. The Cartoni's ten control IDs, deep links and behavior are unchanged.
+- P01 has 26 selectable parts grouped as body, input and communication, and lens, six views including the connector side, and a line under each part saying what supports where it is drawn. It opens on the local keypad, because selecting the body highlights the whole projector. Practice says the model has no practice mode. Reference lists the package downloads, Barco's documents and what is not established.
+- The model is approximate and not qualified. Barco publishes the body size, the mass and the face that carries each part; sizes and positions within each face are approximate or assumed.
+- `scripts/equipment_lab_release.mjs` accepts the family plus the additions each known release names, checks every native package against its own manifest, and still refuses a release it does not name.
+- The projector's manifest, definition and GLB join the offline set. Cache generation is now `v20261112-equipment-lab-projector`.
+- `npm run test:equipment-lab-browser` exercises both packages the same way, covers 135 layout cases, and now loses each package's graphics context on purpose to check that the notice and the item list remain.
+
 ## November 12, 2026: Cue Sheet cell editing keeps focus
 
 - Committing a cell edit in Cue Sheet no longer rebuilds the cue table. The rebuild destroyed the control that was taking focus (the next cell on Tab, a clicked cell, the status select between arrow keys), so focus fell to the page and the next keys ran as shortcuts: typed words marked cues done or took them live, and Backspace deleted the selected cue. Focus now stays where the operator put it, and the status and layer selects work from the keyboard.
