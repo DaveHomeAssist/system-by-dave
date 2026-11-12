@@ -21,6 +21,7 @@ import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
 import { createPoller } from './polling.js';
+import { createThermalMonitor, ratedAmbientMaxC, thermalCsv, THRESHOLDS, RETENTION_MS } from './thermal.js';
 import { createManualDiscovery } from './discovery.js';
 import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES } from './http-security.js';
 
@@ -63,6 +64,8 @@ let powerSchedules, poller;
 for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => { poller?.close(); powerSchedules?.close(); store.close(); process.exit(0); });
 
 const drivers = new Map();   // slot -> driver
+const thermal = createThermalMonitor(); // in-memory air-temperature history; restarts begin empty
+const thermalTargets = new Map(); // slot -> driver and address behind the history
 const status = new Map();    // slot -> status
 const busy = new Map();
 const connections = new Map();
@@ -83,6 +86,22 @@ function driverFor(p) {
   return d;
 }
 
+// Latest air reading, level against the rated limit and the peak in retained history.
+// `source` says what the driver can report (intake, ambient or nothing), so the UI can
+// tell "no reading yet" from "this driver does not report temperature".
+function thermalView(p) { return { ...thermal.view(p.slot, ratedAmbientMaxC(p)), source: driverFor(p).air ?? null }; }
+function logThermal(p, air, limitC, r) {
+  const where = typeof p.lane === 'string' && Object.hasOwn(LANES, p.lane) ? `${p.lane} · ${LANES[p.lane].target}` : p.slot;
+  store.event({ source: 'thermal', slot: p.slot, command: `air ${r.level}`, result: r.level === 'ok' ? 'OK' : 'WARN', detail: `${where}: ${air.kind} air ${air.c} °C, ${r.headroomC} °C below the ${limitC} °C rated limit` });
+  broadcast({ type: 'event', event: rig.events.at(-1) });
+}
+function thermalReport(minutes, points) {
+  return {
+    at: new Date().toISOString(), windowMinutes: minutes, retentionMinutes: RETENTION_MS / 60000, thresholds: THRESHOLDS,
+    projectors: rig.projectors.map((p) => ({ slot: p.slot, lane: p.lane || null, ...thermalView(p), series: thermal.series(p.slot, { windowMs: minutes * 60000, maxPoints: points }) })),
+  };
+}
+
 function displayInfoFor(p, current = status.get(p.slot)) { return projectorDisplayInfo(p, { ...current, connection: connections.get(p.slot) }, driverFor(p).inputs ?? p.inputs); }
 
 function inputPreferenceFor(p) { return resolveInputPreference(driverFor(p).inputs ?? p.inputs, rig.preferredInput || 'HDMI'); }
@@ -98,7 +117,7 @@ function snapshot() {
     relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
-      return { ...p, password: undefined, status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null,
+      return { ...p, password: undefined, status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p),
         inputs: d.inputs ?? p.inputs, displayInfo: displayInfoFor(p), inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lensJog?.axes.length, lensJog: d.lensJog, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
@@ -118,6 +137,10 @@ poller = createPoller({
   maxRetryMs: Math.max(POLL_MS, 15000),
   read: (p, options) => p.ip ? driverFor(p).getStatus(options) : null,
   started(p, { identityChanged, at }) {
+    // History follows the physical target. Correcting a model or lane label keeps it; a new driver or address starts fresh.
+    const target = JSON.stringify([p.driver, p.ip]);
+    if (thermalTargets.has(p.slot) && thermalTargets.get(p.slot) !== target) thermal.reset(p.slot);
+    thermalTargets.set(p.slot, target);
     if (identityChanged) {
       status.set(p.slot, emptyStatus());
       connections.set(p.slot, { state: 'checking', lastSuccessAt: null, lastFailureAt: null, error: null, consecutiveFailures: 0, retryDelayMs: 0 });
@@ -136,6 +159,10 @@ poller = createPoller({
     const next = { ...prev, ...s, online: true, updatedAt: new Date().toISOString() };
     status.set(p.slot, next);
     if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
+    if (Number.isFinite(s.air?.c)) {
+      const limitC = ratedAmbientMaxC(p), r = thermal.observe(p.slot, { at, c: s.air.c, kind: s.air.kind, limitC });
+      if (r?.changed) logThermal(p, s.air, limitC, r);
+    }
     broadcastStatus(p);
   },
   failed(p, e, { at, consecutiveFailures, nextRetryAt, retryDelayMs }) {
@@ -146,7 +173,7 @@ poller = createPoller({
 });
 function broadcastStatus(p) {
   const next = status.get(p.slot), d = driverFor(p);
-  broadcast({ type: 'status', slot: p.slot, status: { ...next, connection: connections.get(p.slot) }, displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
+  broadcast({ type: 'status', slot: p.slot, status: { ...next, connection: connections.get(p.slot) }, thermal: thermalView(p), displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
 }
 function setOffline(slot, why) {
   const prev = status.get(slot);
@@ -154,7 +181,7 @@ function setOffline(slot, why) {
   const next = { ...prev, online: false, updatedAt: new Date().toISOString() };
   status.set(slot, next);
   if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
-  broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, displayInfo: displayInfoFor(store.projector(slot), next), inputPreference: inputPreferenceFor(store.projector(slot)) });
+  broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, thermal: thermalView(store.projector(slot)), displayInfo: displayInfoFor(store.projector(slot), next), inputPreference: inputPreferenceFor(store.projector(slot)) });
 }
 rig.projectors.forEach(poll);
 
@@ -400,6 +427,16 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(302, { location: '/login.html' }); return res.end();
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
+    if (url.pathname === '/api/thermal' && req.method === 'GET') {
+      const minutes = Math.min(RETENTION_MS / 60000, Math.max(1, Number(url.searchParams.get('minutes')) || 30));
+      const points = Math.min(600, Math.max(20, Number(url.searchParams.get('points')) || 180));
+      return json(res, 200, thermalReport(minutes, points));
+    }
+    if (url.pathname === '/api/thermal.csv' && req.method === 'GET') {
+      const meta = (slot) => { const p = store.projector(slot); return p ? { lane: p.lane || '', model: p.model || p.label || '', limitC: ratedAmbientMaxC(p) } : {}; };
+      res.writeHead(200, { 'content-type': 'text/csv; charset=utf-8', 'content-disposition': 'attachment; filename="projctl-air-temperature.csv"' });
+      return res.end(thermalCsv(thermal.rows(), meta));
+    }
     if (url.pathname === '/api/power-schedules' && req.method === 'GET') return json(res, 200, powerSchedules.view());
     if (url.pathname === '/api/power-schedules/save' && req.method === 'POST') return json(res, 200, powerSchedules.save(await body(req)));
     if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
@@ -455,7 +492,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/discover' && req.method === 'POST') return json(res, 200, await discover('ui'));
     if (url.pathname === '/api/sim' && req.method === 'POST' && SIM) { // test hook: toggle offline or set an out-of-position reported lens readback
-      const { slot, offline, lens } = await body(req); const d = driverFor(store.projector(slot)); if (offline !== undefined) d._state.flaky = !!offline; if (lens) Object.assign(d._state.lens, lens); if (lens?._pollFocus != null) d._state.pollFocus = lens._pollFocus; return json(res, 200, { ok: true });
+      const { slot, offline, lens, airC } = await body(req); const d = driverFor(store.projector(slot)); if (offline !== undefined) d._state.flaky = !!offline; if (airC !== undefined) d._state.airC = airC === null ? null : Number(airC); if (lens) Object.assign(d._state.lens, lens); if (lens?._pollFocus != null) d._state.pollFocus = lens._pollFocus; return json(res, 200, { ok: true });
     }
     // static
     if (url.pathname.startsWith('/ProjectorThrow/')) {

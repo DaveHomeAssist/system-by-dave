@@ -9,7 +9,7 @@
     "sim": "SIM=1 node server/index.js",
     "bundle:throwline": "node scripts/bundle-throwline.js",
     "test": "node --test test/*.test.js",
-    "test:browser": "node test/browser.cjs && node test/reconnect-browser.cjs && node test/stage-planner-browser.cjs && node test/live-menu-browser.cjs && node test/stage-visibility-browser.cjs && node test/workspace-browser.cjs && node test/rig-workspace-browser.cjs && node test/short-viewport-browser.cjs && node test/poll-controls-browser.cjs && node test/card-containment-browser.cjs && node test/lens-workspace-browser.cjs && node test/shutter-feedback-browser.cjs && node test/multiview-browser.cjs && node test/power-schedules-browser.cjs && node test/power-schedules-integration-browser.cjs && node test/power-schedules-audit-browser.cjs && node test/connection-feedback-browser.cjs && node test/adjust-poll-browser.cjs",
+    "test:browser": "node test/browser.cjs && node test/reconnect-browser.cjs && node test/stage-planner-browser.cjs && node test/live-menu-browser.cjs && node test/stage-visibility-browser.cjs && node test/workspace-browser.cjs && node test/rig-workspace-browser.cjs && node test/short-viewport-browser.cjs && node test/poll-controls-browser.cjs && node test/card-containment-browser.cjs && node test/lens-workspace-browser.cjs && node test/shutter-feedback-browser.cjs && node test/multiview-browser.cjs && node test/power-schedules-browser.cjs && node test/power-schedules-integration-browser.cjs && node test/power-schedules-audit-browser.cjs && node test/connection-feedback-browser.cjs && node test/adjust-poll-browser.cjs && node test/thermal-browser.cjs",
     "test:venue-browser": "node test/venue-browser.cjs"
   },
   "dependencies": {

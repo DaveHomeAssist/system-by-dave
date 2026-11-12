@@ -7,7 +7,7 @@ export function makeDriver(proj) {
   const o = { host: proj.ip, password: proj.password || '', user: proj.user || 'admin1', model: proj.model || '' };
   switch (proj.driver) {
     case 'simulator': return simulatorDriver({ name: proj.label, inputs: Object.keys(proj.inputs || { '31': 'HDMI' }) });
-    case 'pulse': return pulseDriver(o);
+    case 'pulse': return pulseDriver({ ...o, ambientProperty: /^[\w.:-]{1,80}$/.test(proj.ambientProperty || '') ? proj.ambientProperty : null });
     case 'panasonic': return panasonicDriver(o);
     case 'pjlink':
     default: return pjlinkDriver(o);

@@ -57,6 +57,45 @@ require another first tap. Changing Show Lock clears pending confirmations.
 change through Cooling to Standby before removing power. Show Lock blocks power off, input,
 test patterns, lens movement and picture changes; shutter and read-only status remain available.
 
+## Thermal watch
+
+A status button in the Rig tab's overview row ("D Watch · 37.0 °C", or "Air OK · tightest ...") shows
+the worst state at a glance. It opens the Thermal watch panel: air temperature at each lane (A to D)
+against that projector's rated maximum ambient, with headroom, peak, a 30 minute trend, and the tightest
+unit (least headroom) outlined. Cards are keyed by lane, not slot number, because slot numbers have been
+renumbered between rig records.
+
+The panel is a non-modal overlay rather than a tab or a row, because the header, tab bar and Rig tab have no
+spare height: a tenth tab wraps the tab bar at 1440 px, a header button wraps the header at 845 px, and a
+panel above the A-D tiles squeezes the selected-projector dock to nothing at 1280 x 720. While open it
+covers the Rig tab below the overview row (never the header, tabs or its button); Escape, Close or the
+button dismiss it, and it stays open if you change tab. The button adds no height at 845 px and wider;
+below 680 px the overview row already stacks and the Rig tab scrolls, so it adds one row there.
+
+- **Readings.** Panasonic units report intake air through the native port (`QTM:0`, intake per
+  Panasonic's RS-232C list as cited in the 11 Nov health report). A Barco reports its ambient sensor only
+  when `ambientProperty` names the Pulse property in the rig file (read the name from the unit with the
+  Pulse `introspect` call; none is assumed, and the value must be a number in degrees C). PJLink-only
+  projectors report no temperature, and say so.
+- **Fail closed.** A Panasonic reply is accepted only when its two numbers agree as Celsius and
+  Fahrenheit. Anything else is shown as no reading, with the raw reply, rather than guessed.
+- **Limits.** Barco UDM 40 C, PT-RZ970 45 C, PT-DW830U 40 C (the lower figure: the spec file allows 45 C,
+  but the portrait limit it cites is unconfirmed). The model decides, and a label only decides when the model
+  matches nothing. Set `ambientLimitC` (20 to 60) on a projector in the rig file to override.
+- **Levels.** Watch is within 5 C of the limit and Hot within 2 C, with 1 C of hysteresis before a level
+  clears. The defaults are in `server/thermal.js` (`THRESHOLDS`) and are a proposal, not a Barco or
+  Panasonic specification.
+- **Freshness.** A value is current only when the projector is replying and this poll returned a
+  temperature. Otherwise the card keeps the last sample, marked Last known, with its age.
+- **Log and history.** A change of level is written to the Log tab once (source `thermal`, result `WARN`;
+  recovery is `OK`). Eight hours of readings are kept in memory and are lost when the relay restarts.
+  `GET /api/thermal?minutes=30&points=180` returns the series and `GET /api/thermal.csv` downloads the
+  retained readings for review after the show.
+
+This is advisory display only. It sends no command and does not replace the projector's own alarms.
+Checked against the simulator and loopback protocol stand-ins; the `QTM` reply framing and the Barco
+property are not yet confirmed on the installed hardware.
+
 ## Cues from Millumin or QLab
 
 Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
@@ -79,6 +118,8 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
     server/store.js        data/rig.json read and write
     server/osc.js          OSC and TCP line parsing
     server/drivers/        base.js (interface), pjlink.js, panasonic.js, pulse.js, simulator.js
+    server/thermal.js      rated limits, levels, in-memory history, CSV
+    public/thermal-watch.js  thermal panel and Rig overview status button
     public/                index.html, app.css, app.js
 
 ## Status of drivers

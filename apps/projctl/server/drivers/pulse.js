@@ -15,7 +15,10 @@ export const PULSE_PATTERNS = {
   'internal:vertical-graybars': 'Grey bars (vertical)', 'internal:color-gradients': 'Colour gradients', 'internal:3d-stereo': '3D stereo',
 };
 
-export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty = 'image.window.main.source', motionTimeoutMs = 90000, motionPollMs = 200, motionSettleMs = 750 }) {
+// ambientProperty: optional Pulse property holding the Barco's ambient air temperature
+// as a number in degrees C. The property name is read from the unit (introspect) and
+// set per projector in the rig file; none is assumed here.
+export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty = 'image.window.main.source', ambientProperty = null, motionTimeoutMs = 90000, motionPollMs = 200, motionSettleMs = 750 }) {
   let id = 0, motionGeneration = 0;
   let sources = {}, pictureSchema = {}, refreshed = 0;
   const axes = { h: 'optics.lensshift.horizontal', v: 'optics.lensshift.vertical', focus: 'optics.focus', zoom: 'optics.zoom' };
@@ -130,6 +133,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'bounded-step', stop: true, positionReadback: true },
     lensControls: { h: true, v: true, focus: true, zoom: true },
     patterns: PULSE_PATTERNS,
+    air: ambientProperty ? 'ambient' : null,
     get inputs() { return sources; },
     get pictureSchema() { return pictureSchema; },
     async pattern(code) {
@@ -152,6 +156,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       s.pattern = await optional(async () => (await read('image.testpattern.show')) ? String(await read('image.testpattern.selected')) : 'off', null);
       s.lens = await optional(() => lensReadback(signal), null);
       s.signal = await optional(() => read('image.window.main.activesignal'), null);
+      if (ambientProperty) s.air = await optional(async () => { const v = Number(await read(ambientProperty)); return Number.isFinite(v) && v > -20 && v < 120 ? { c: v, kind: 'ambient', raw: String(v) } : null; }, null);
       throwIfAborted(signal);
       return s;
     },

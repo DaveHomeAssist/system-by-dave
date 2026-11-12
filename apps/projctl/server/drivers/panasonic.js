@@ -49,8 +49,23 @@ export function pictureSchema() {
   return Object.fromEntries(Object.entries(PICTURE).map(([k, v]) => [k, { label: v.label, type: v.type, min: v.min, max: v.max, options: v.options }]));
 }
 
-export function panasonicDriver({ host, port = 1024, user = 'admin1', password = '', timeoutMs = 5000, model = '', ...rest }) {
-  const pj = pjlinkDriver({ host, password, ...rest, port: 4352 });
+// Temperature query QTM:<n> replies with a C/F pair (seen on the WST units 2026-11-11);
+// index 0 is intake air per Panasonic's RS-232C command list as cited in the 11 Nov
+// health report. The exact framing is not in the repo, so accept only two numbers
+// that agree as Celsius and Fahrenheit (whole or tenths) and otherwise report no
+// reading. A guess would put a wrong temperature on the dashboard.
+export function parseTemperaturePair(body) {
+  const nums = String(body ?? '').match(/[-+]?\d+(?:\.\d+)?/g);
+  if (!nums || nums.length !== 2) return null;
+  for (const scale of [1, 10]) {
+    const c = Number(nums[0]) / scale, f = Number(nums[1]) / scale;
+    if (c > -20 && c < 120 && Math.abs(f - (c * 1.8 + 32)) <= 2) return c;
+  }
+  return null;
+}
+
+export function panasonicDriver({ host, port = 1024, pjlinkPort = 4352, user = 'admin1', password = '', timeoutMs = 5000, model = '', ...rest }) {
+  const pj = pjlinkDriver({ host, password, ...rest, port: pjlinkPort });
   const patterns = patternsFor(model);
 
   function native(cmd, { signal } = {}) {
@@ -95,9 +110,12 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'native-jog', stop: false, positionReadback: false },
     lensControls: { h: false, v: false, focus: false, zoom: false },
     patterns,
+    air: 'intake',
     async getStatus({ signal } = {}) {
       const s = await pj.getStatus({ signal });
       try { s.pattern = await native('QTS', { signal }); } catch { throwIfAborted(signal); s.pattern = null; }
+      // Optional like the pattern read: a refusal (for example in standby) means no reading, not offline.
+      try { const raw = await native('QTM:0', { signal }); s.air = { c: parseTemperaturePair(raw), kind: 'intake', raw: String(raw).slice(0, 40) }; } catch { throwIfAborted(signal); s.air = null; }
       throwIfAborted(signal);
       return s;
     },

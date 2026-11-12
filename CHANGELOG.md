@@ -1,5 +1,13 @@
 # Changelog
 
+## November 12, 2026: Projctl thermal watch
+
+- New Thermal watch panel: air temperature per lane (A to D) against the projector's rated maximum ambient, with headroom, peak, a 30 minute trend and the tightest unit outlined. A status button in the Rig overview row shows the worst state and opens the panel as a non-modal overlay (Escape or Close dismisses it). Cards are keyed by lane because slot numbers have been renumbered between rig records. The header, tab bar and Rig tab keep their heights at 845 px and wider: a tab, a header button or a panel above the A-D tiles each broke the layout, so none is used.
+- Panasonic drivers read intake air (`QTM:0`); a reply is accepted only when its Celsius and Fahrenheit values agree, otherwise the card shows no reading. A Barco reads its ambient sensor only when `ambientProperty` is set on it in the rig file. A value counts as current only when the unit is replying and the poll returned a temperature; otherwise it is shown as last known.
+- Rated limits come from the model (a label never overrides it): UDM 40 C, PT-RZ970 45 C, PT-DW830U 40 C, with `ambientLimitC` as an override. Watch is within 5 C and Hot within 2 C, with 1 C of hysteresis. A change of level writes one Log entry (`WARN`, or `OK` on recovery).
+- New read-only `GET /api/thermal` (series) and `GET /api/thermal.csv`. Eight hours of readings are kept in memory and reset when the relay restarts or a slot's target changes. `panasonicDriver` accepts an optional `pjlinkPort`.
+- Tests: `test/thermal.test.js`, `test/panasonic-temperature.test.js`, `test/thermal-relay.test.js` and `test/thermal-browser.cjs` (in `npm run test:browser`). Verified against the simulator and loopback stand-ins only; the `QTM` reply framing and the Barco property still need checking on the installed units.
+
 ## November 12, 2026: Equipment Lab adds the Barco UDM-4K22
 
 - Equipment Lab imports shared release 1.1.0 at `27561a2`: the confirmed 43-entry family plus P01, the Barco UDM-4K22, in a new Projection collection. The library, splash and counts now read from the catalog, so they show 44 entries.

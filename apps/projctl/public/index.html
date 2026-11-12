@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="avd/bundle.css">
 <link rel="stylesheet" href="app.css">
   <link rel="stylesheet" href="power-schedules.css">
+<link rel="stylesheet" href="thermal-watch.css">
 <link rel="stylesheet" href="reference-view.css" data-frozen-reference>
 <link rel="stylesheet" href="stage.css">
 <!-- Local Throwline import map: supplied by the relay. -->
@@ -51,7 +52,7 @@
     <section id="tab-notes" class="tab" role="tabpanel" aria-labelledby="tab-btn-notes" hidden><iframe class="pj-workspace-frame" data-workspace="notes" title="Frozen notes and shared team tasks"></iframe></section>
     <section id="tab-info" class="tab" role="tabpanel" aria-labelledby="tab-btn-info" hidden><div id="reference-view" class="pj-fill"></div></section>
     <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
-      <div class="pj-overview" aria-label="Rig connection overview"><div><span class="avd-eyebrow">Projector connection</span><strong id="summary">Waiting for relay…</strong></div><details class="pj-connection-help"><summary>Connection details</summary><p class="pj-mono" id="connection-note" role="status">Connecting to the local relay. Device status will update here automatically.</p><p class="pj-mono" id="local-controller-help" hidden>This page needs the local controller. <a href="http://localhost:8080/">Open controller on this Mac</a><span>On a phone or another computer, use the controller Mac’s network address; localhost points to the device you are using.</span></p></details></div>
+      <div class="pj-overview" aria-label="Rig connection overview"><div><span class="avd-eyebrow">Projector connection</span><strong id="summary">Waiting for relay…</strong></div><button class="pj-thermal-chip" id="thermal-chip" type="button" data-level="unknown" aria-haspopup="dialog" aria-expanded="false" aria-controls="thermal-dialog" hidden><span class="avd-dot avd-dot--idle" aria-hidden="true"></span><span data-chip-text>Air</span></button><span id="thermal-live" class="avd-sr" role="status" aria-live="polite"></span><details class="pj-connection-help"><summary>Connection details</summary><p class="pj-mono" id="connection-note" role="status">Connecting to the local relay. Device status will update here automatically.</p><p class="pj-mono" id="local-controller-help" hidden>This page needs the local controller. <a href="http://localhost:8080/">Open controller on this Mac</a><span>On a phone or another computer, use the controller Mac’s network address; localhost points to the device you are using.</span></p></details></div>
       <details class="pj-rig-all"><summary>All projector actions</summary><div class="pj-allbar" aria-labelledby="all-label">
         <span id="all-label" class="avd-eyebrow">All projectors</span><button class="avd-btn" type="button" id="rig-extra-devices" hidden>Other devices · Configuration</button>
         <button class="avd-btn avd-btn--primary" data-all="resetInput" type="button" disabled>Reset all to HDMI</button>
@@ -183,6 +184,7 @@
       </div>
     </div>
   </dialog>
+  <dialog id="thermal-dialog" class="pj-thermal-dialog" aria-labelledby="thermal-title"><section id="thermal-watch" class="pj-thermal"></section></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
 </div>
 <noscript>Projector controls require JavaScript. Use the projector remote if the relay is unavailable.</noscript>

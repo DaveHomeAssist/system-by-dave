@@ -1,0 +1,71 @@
+/* Non-modal overlay: top layer, so it costs the shell no height. */
+.pj-thermal-dialog{position:fixed;inset:auto 16px auto auto;top:112px;margin:0;padding:0;width:min(1120px,calc(100vw - 32px));max-height:calc(100vh - 128px);overflow:auto;border:1px solid var(--line-control);border-radius:var(--radius-lg);background:var(--surface);color:var(--ink);box-shadow:var(--shadow-lift)}
+.pj-thermal-dialog:not([open]){display:none}
+.pj-thermal-dialog .pj-thermal{border:0;border-left:4px solid var(--line-control);border-radius:var(--radius-lg)}
+.pj-thermal-dialog .pj-thermal[data-worst="ok"]{border-left-color:var(--state-done)}.pj-thermal-dialog .pj-thermal[data-worst="watch"]{border-left-color:var(--state-active)}.pj-thermal-dialog .pj-thermal[data-worst="hot"]{border-left-color:var(--state-blocked)}
+.pj-thermal-close{min-height:44px;margin-left:auto}
+#thermal-title:focus{outline:none}#thermal-title:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+/* Thermal watch panel and header chip. Colour is never the only signal: every state also has a word. */
+.pj-thermal{flex:0 0 auto;min-width:0;display:flex;flex-direction:column;gap:var(--space-3);padding:12px 16px;background:var(--surface);border:1px solid var(--hairline);border-left:4px solid var(--line-control);border-radius:var(--radius-md)}
+.pj-thermal[data-worst="ok"]{border-left-color:var(--state-done)}
+.pj-thermal[data-worst="watch"]{border-left-color:var(--state-active)}
+.pj-thermal[data-worst="hot"]{border-left-color:var(--state-blocked)}
+.pj-thermal-head{display:flex;align-items:center;gap:var(--space-3) var(--space-5);flex-wrap:wrap}
+.pj-thermal-head>div:first-child{display:flex;flex-direction:column;gap:2px}
+.pj-thermal-head h2{margin:0;font:600 17px/24px var(--font-display)}
+.pj-thermal-summary{flex:1 1 280px;min-width:0;margin:0;font:600 14px/20px var(--font-sans);overflow-wrap:anywhere}
+.pj-thermal-csv{min-height:44px;display:inline-flex;align-items:center;text-decoration:none}
+.pj-thermal-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:var(--space-3)}
+/* Lane colours come from the shared [data-lane] palette in app.css, repeated here under a private attribute so tests and tiles keyed on [data-lane] never match these cards. */
+.pj-thermal-card[data-thermal-lane="A"]{--lane-accent:#ff00ff}.pj-thermal-card[data-thermal-lane="B"]{--lane-accent:#00ffff}.pj-thermal-card[data-thermal-lane="C"]{--lane-accent:#fbf302}.pj-thermal-card[data-thermal-lane="D"]{--lane-accent:#00ab00}
+.pj-thermal-card{min-width:0;display:flex;flex-direction:column;gap:6px;padding:6px 12px 10px;border:1px solid var(--hairline);border-top:3px solid var(--lane-accent);border-radius:10px;background:color-mix(in srgb,var(--lane-accent) 8%,var(--surface))}
+.pj-thermal-card.tightest{outline:2px solid var(--state-active);outline-offset:1px}
+.pj-thermal-card.tightest[data-level="hot"]{outline-color:var(--state-blocked)}
+.pj-thermal-top{display:flex;align-items:center;gap:8px;min-width:0}
+.pj-thermal-lane{appearance:none;flex:1;min-width:0;min-height:44px;display:flex;align-items:center;gap:8px;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.pj-thermal-lane:disabled{cursor:default;opacity:.7}
+.pj-thermal-lane strong{min-width:0;font-size:14px;line-height:18px;overflow-wrap:anywhere}
+.pj-thermal-letter{display:inline-grid;place-items:center;flex:none;width:27px;height:27px;border-radius:6px;background:var(--lane-accent);color:#102131;font:700 16px/1 var(--font-display)}
+.pj-thermal-top .avd-state{height:auto;min-height:24px;flex:none;max-width:60%;white-space:normal;font-size:11px}
+.pj-thermal-reading{display:flex;align-items:baseline;gap:6px;margin:0;font-variant-numeric:tabular-nums}
+.pj-thermal-value{font:600 40px/44px var(--font-display);letter-spacing:-.01em}
+.pj-thermal-unit{font:500 14px/18px var(--font-mono);color:var(--ink-muted)}
+.pj-thermal-f{margin-left:auto;font-size:11px;color:var(--ink-muted)}
+.pj-thermal-kind{font-size:11px;color:var(--ink-muted)}
+.pj-thermal-card.empty .pj-thermal-value{color:var(--ink-faint)}
+.pj-thermal-card.stale .pj-thermal-reading,.pj-thermal-card.stale .pj-thermal-spark{opacity:.55}
+/* Meter spans the rated range 0..limit; amber and red zones mark the watch and hot headroom bands. */
+.pj-thermal-meter{position:relative;height:10px;border-radius:5px;border:1px solid var(--line-control);overflow:hidden;background:linear-gradient(90deg,var(--surface-sunken) 0 calc(var(--watch,80)*1%),var(--state-active) calc(var(--watch,80)*1%) calc(var(--hot,95)*1%),var(--state-blocked) calc(var(--hot,95)*1%) 100%)}
+.pj-thermal-meter[hidden]{display:none}
+.pj-thermal-marker{position:absolute;top:-2px;bottom:-2px;left:calc(var(--pos,0)*1%);width:3px;margin-left:-1.5px;background:var(--ink);box-shadow:0 0 0 1px var(--surface);transition:left .4s}
+.pj-thermal-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 10px;margin:0}
+.pj-thermal-facts div{min-width:0}
+.pj-thermal-facts dt{font:500 10px/14px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted)}
+.pj-thermal-facts dd{margin:0;font:600 13px/18px var(--font-mono);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.pj-thermal-spark{width:100%;height:56px;display:block;background:var(--surface-sunken);border-radius:6px}
+.pj-thermal-line{fill:none;stroke:var(--ink);stroke-width:1.6;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.pj-thermal-zone{fill:color-mix(in srgb,var(--state-active) 22%,transparent);stroke:none}
+.pj-thermal-limit{stroke:var(--state-blocked);stroke-width:1;stroke-dasharray:4 3;vector-effect:non-scaling-stroke}
+.pj-thermal-watchline{stroke:var(--state-active);stroke-width:1;stroke-dasharray:2 3;vector-effect:non-scaling-stroke}
+.pj-thermal-foot{margin:0;font-size:11px;line-height:15px;color:var(--ink-muted);overflow-wrap:anywhere}
+.pj-thermal-note{margin:0}
+.pj-thermal-chip{display:inline-flex;align-items:center;gap:8px;flex:0 1 auto;min-width:0;min-height:44px;padding:0 12px;border:1px solid var(--hairline);border-radius:6px;background:var(--surface-sunken);color:var(--ink);font:600 12px/16px var(--font-mono);cursor:pointer;max-width:100%}
+.pj-thermal-chip[hidden]{display:none}
+.pj-thermal-chip [data-chip-text]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pj-thermal-chip[data-level="watch"]{border-color:var(--state-active)}
+.pj-thermal-chip[data-level="hot"]{border-color:var(--state-blocked);border-width:2px}
+.pj-thermal-chip:focus-visible,.pj-thermal-csv:focus-visible,.pj-thermal-lane:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.avd-table td.warn{color:var(--state-active);font-weight:600}
+@media(max-width:680px){.pj-thermal{padding:10px 12px}.pj-thermal-head h2{font-size:15px}.pj-thermal-list{grid-template-columns:repeat(2,minmax(0,1fr))}.pj-thermal-value{font-size:28px;line-height:32px}.pj-thermal-chip{font-size:11px;padding:0 8px}}
+/* Phones: all four lanes in one 2x2 view. Reading, status, headroom and peak stay; the rest is on the tiles below. */
+@media(max-width:600px){
+  .pj-thermal-list{gap:8px}
+  .pj-thermal-card{padding:4px 8px 6px;gap:3px}
+  .pj-thermal-top{flex-wrap:wrap;gap:0 6px}.pj-thermal-lane{min-height:44px}.pj-thermal-lane strong{font-size:12px}
+  .pj-thermal-note,.pj-thermal-foot,.pj-thermal-f,.pj-thermal-kind{display:none}
+  .pj-thermal-facts>div:nth-child(n+3){display:none}
+  .pj-thermal-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pj-thermal-spark{height:26px}
+  .pj-thermal-value{font-size:28px;line-height:32px}
+}
+@media print{.pj-thermal-csv,.pj-thermal-chip,.pj-thermal-dialog{display:none!important}}
