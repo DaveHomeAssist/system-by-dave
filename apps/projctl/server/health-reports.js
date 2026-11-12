@@ -218,7 +218,8 @@ export function createHealthReports({
   readTelemetry = null, describeError = (p, e) => String(e?.message || e), publish = null,
   now = Date.now, timer = setTimeout, cancelTimer = clearTimeout, timeZone = TIME_ZONE,
   powerOnDelayMs = 120000, telemetryTimeoutMs = 12000, hourlyQuietMs = 15 * 60000, powerOffWindowMs = 30000,
-  stopQuietMs = 5 * 60000, stopTimeoutMs = 6000, retryMs = 10 * 60000, maxAttempts = 24, keep = 500, log = console,
+  // Retries cover a venue without internet for up to 7 days (1008 tries at 10 minutes).
+  stopQuietMs = 5 * 60000, stopTimeoutMs = 6000, retryMs = 10 * 60000, maxAttempts = 1008, keep = 500, log = console,
 }) {
   const lastPower = new Map(), pending = new Map(), recent = [];
   let session = null, powerOnTimer = null, hourlyTimer = null, retryTimer = null, nextHourlyAt = null;

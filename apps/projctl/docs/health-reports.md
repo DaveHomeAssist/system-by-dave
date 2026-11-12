@@ -106,7 +106,8 @@ The database needs the properties `Log` (title), `Check window` (date),
 - Reports are saved as JSON and Markdown in `health-reports/` beside the rig
   file. The newest 500 are kept.
 - A report whose Notion write fails with a network error, a rate limit or a
-  server error stays pending and is retried every 10 minutes (24 attempts at most).
+  server error, or with no token yet, stays pending and is retried every 10
+  minutes for up to 7 days.
   Other refusals, such as a wrong database or a missing share, are recorded as
   failed and need fixing in Notion.
 - `GET /api/health-reports`: engine state, Notion configuration state, next
@@ -132,8 +133,9 @@ retry, the two API routes and tests. No operator-page panel.
 
 - A Notion integration with access to the target database, and its token stored
   on the relay machine.
-- Internet access from the relay machine for Notion. Without it, reports are
-  kept locally and retried.
+- Internet access from the relay machine for Notion. The projector network has
+  no internet, so this depends on the venue uplink still open in the remote
+  access brief. Until then, reports are kept locally and retried.
 
 ## Risks
 
