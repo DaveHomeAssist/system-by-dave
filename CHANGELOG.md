@@ -1,5 +1,13 @@
 # Changelog
 
+## November 12, 2026: Projctl show-control confirms
+
+- Power off, input changes, and input reset ask for a second tap after the confirm label has been up. A double-click does not perform them. All-projectors Power off sits on its own row, away from shutter, power on, and reset.
+- A lens jog stays held until the motor reports stopped, and for at least a beat when the report comes back immediately. Stop still works during that hold.
+- On a phone, Stop is on the first rig screen. The command toast sits clear of the tab bar.
+- Show lock takes a second tap, and it is separated from the theme button. Save is disabled while locked. A disabled power-off control names the reason. Saving an address asks for confirmation, can be reverted, and the toast says whether the projector answered.
+- The command log prints lens-recall targets as data. The Lens sheet Stop button stays hidden unless that driver has it. Log out ends the browser session.
+
 ## November 12, 2026: Projctl booth console
 
 - The projector console is restyled for a dark booth and a worklight: flat technical surfaces, tabular readouts, and drawing color kept to the lane letter and a thin bar. Online, offline, watch, hot and show lock are told apart by shape and wording as well as color. Stop, shutter close and power off stay large and danger-styled. On a phone the home title and configuration fields stay fully readable, and thermal lane names no longer break mid-word.

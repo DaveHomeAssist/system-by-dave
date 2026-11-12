@@ -78,10 +78,17 @@ const fs = require('node:fs');
     await until(async () => !await hdmiCard.locator('[data-reset-input]').isDisabled());
     await hdmiCard.locator('details[data-input-options] > summary').click();
     await hdmiCard.locator('[data-reset-input]').click();
+    await hdmiCard.locator('[data-reset-input]').filter({ hasText: 'Confirm' }).waitFor();
+    assert.equal(requests.length, 0, 'the first tap only arms the input reset');
+    await hdmi.waitForTimeout(500);
+    await hdmiCard.locator('[data-reset-input]').click();
     await until(() => requests.length === 1);
     assert.deepEqual(requests[0], { slot: 'P2', cmd: 'resetInput' });
     assert.equal(await hdmiCard.locator('details[data-input-options]').evaluate(el => el.open), true);
     await openBulk(hdmi);await hdmi.locator('[data-all="resetInput"]').click();
+    await hdmi.locator('[data-all="resetInput"]').filter({ hasText: 'Confirm' }).waitFor();
+    await hdmi.waitForTimeout(500);
+    await hdmi.locator('[data-all="resetInput"]').click();
     await until(() => requests.length === 2);
     assert.deepEqual(requests[1], { slot: 'all', cmd: 'resetInput' });
     for (const [width, height] of [[1440, 900], [375, 812], [320, 256], [3840, 1080]]) {

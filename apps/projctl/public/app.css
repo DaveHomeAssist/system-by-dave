@@ -311,3 +311,30 @@ html:has(#show-lock[data-lock-state="locked"]) .pj-selected-dock [data-lens-stat
   .pj-lock{width:44px;min-width:44px;padding:0}
 }
 @media(max-width:520px){.pj-setup-fields{grid-template-columns:1fr}}
+
+/* Confirmations, phone Stop, and the command toast. */
+[hidden]{display:none !important}
+.pj-power-off-row{flex:1 0 100%;display:flex;margin-top:10px;padding-top:10px;border-top:2px dashed var(--state-blocked)}
+.pj-power-off-row .avd-btn{min-height:48px;min-width:min(100%,220px)}
+.pj-power-off{margin-top:8px}
+.pj-power-off .avd-btn{width:100%}
+.pj-reset-gap{margin-left:18px}
+.pj-header #theme{margin-inline-start:28px}
+.pj-lock[data-arm="confirm"] [data-lock-word="off"],.pj-lock[data-arm="confirm"] [data-lock-word="on"]{display:none}
+.pj-lock[data-arm="confirm"] [data-lock-word="confirm"]{display:inline}
+.pj-lock:not([data-arm="confirm"]) [data-lock-word="confirm"]{display:none}
+.pj-setup-footer{gap:8px}
+.pj-setup-logout{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#toast{top:64px;bottom:auto !important;left:12px;right:auto;transform:none;width:min(520px,calc(100vw - 24px));max-height:48px;overflow:auto;pointer-events:none}
+@media(max-width:680px){
+  #toast{top:136px;bottom:auto !important;width:min(360px,calc(100vw - 24px));max-height:44px}
+  .pj-allbar[aria-labelledby="all-label"]>.pj-power-off-row{grid-column:1 / -1}
+  #tab-rig.on{display:flex;flex-direction:column}
+  #tab-rig>.pj-overview{order:0}
+  #tab-rig>.pj-rig-all{order:1}
+  #tab-projector.pj-selected-dock{order:2}
+  #grid{order:3}
+  .pj-selected-dock .pj-lens-workspace{display:flex;flex-direction:column}
+  .pj-selected-dock .pj-lens-keyboard-row{order:-1}
+  .pj-selected-dock .pj-lens-keyboard-row [data-lens-stop]{min-width:120px;min-height:48px;font-size:14px}
+}

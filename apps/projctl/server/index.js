@@ -14,6 +14,7 @@ import { projectorDisplayInfo, createHostDisplayReader } from './display-info.js
 import { hasLens, lensSummary, lensPositionMatch, lensMotorState, LENS_AXES } from './preset-lens.js';
 import { startOsc, startTcpLines, cuePowerOffMode } from './osc.js';
 import { LANES } from '../public/lanes.js';
+import { formatCommandArg } from '../public/operator-guard.js';
 import { confirmations } from './confirmations.js';
 import { readStagePlot } from './stage-plot.js';
 import { readVenue, readVenueAsset } from './venue-model.js';
@@ -308,7 +309,7 @@ const discover = createManualDiscovery({
 const pendingConfirm = confirmations();
 const targetIdentity = (p) => JSON.stringify([p.slot, p.driver, p.ip, p.user, p.password, p.model]);
 
-function fmtArg(a) { return a && typeof a === 'object' ? Object.values(a).join(' ') : String(a); }
+function fmtArg(a) { return formatCommandArg(a); }
 async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   executionGuard?.();
   const p = store.projector(slot);
