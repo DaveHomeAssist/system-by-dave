@@ -1,5 +1,12 @@
 # Changelog
 
+## November 12, 2026: Cue Sheet cell editing keeps focus
+
+- Committing a cell edit in Cue Sheet no longer rebuilds the cue table. The rebuild destroyed the control that was taking focus (the next cell on Tab, a clicked cell, the status select between arrow keys), so focus fell to the page and the next keys ran as shortcuts: typed words marked cues done or took them live, and Backspace deleted the selected cue. Focus now stays where the operator put it, and the status and layer selects work from the keyboard.
+- A cue whose own edit takes it out of the current search or status filter stays in the table while focus is in its row and leaves once focus moves on. Only that row is removed, so the control the operator moved to keeps its caret and selection, and a press in progress finishes before the rows move.
+- Cue Sheet shortcuts ignore Ctrl, Cmd and Alt chords. Ctrl+D, Ctrl+G, Cmd+L and Alt+N used to mark a cue done, take the next cue, go live and add a cue, and a modified Delete or Backspace deleted the selected cue.
+- `npm run probe:cue-sheet-editing` (`scripts/probe_cue_sheet_editing.mjs`) covers these paths and runs on every pull request. `--cue-sheet-file=<path>` serves another copy of the page; the probe fails all seven checks against the previous one.
+
 ## November 11, 2026: Field Kit download page link check, console offline status
 
 - The Field Kit download page (`field-kit/thanks/`) now shows its download button and "your payment went through" line only for the share link registered by SHA-256 in `fieldKit.download.sha256` (`js/sbd-launch-config.js`). Before, any address carrying a Google Drive, Dropbox, OneDrive or SharePoint link and any `cs_…` value produced a page that confirmed a payment and offered that file. No hash is registered yet, so the page shows "email me" for every link until Dave registers the real one with `npm run hash:field-kit-link`. Steps and reasoning: `docs/launch/checkout.md`.
