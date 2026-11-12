@@ -33,6 +33,7 @@ jobs:
           npm run test:browser --prefix apps/projctl
           npm run test:venue-browser --prefix apps/projctl
       - run: npm run test:public-viewport
+      - run: npm run probe:cue-sheet-editing
       - name: Verify engineering daily journeys
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/daily-server.log 2>&1 &
