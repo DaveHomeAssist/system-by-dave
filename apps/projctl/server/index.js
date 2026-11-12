@@ -21,7 +21,8 @@ import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
 import { createPoller } from './polling.js';
-import { createThermalMonitor, ratedAmbientMaxC, thermalCsv, THRESHOLDS, RETENTION_MS } from './thermal.js';
+import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader, ratedAmbientC, isLit } from './health-reports.js';
+import { createThermalMonitor, thermalThresholds, plausibleAirC, thermalCsv, RETENTION_MS } from './thermal.js';
 import { createManualDiscovery } from './discovery.js';
 import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES } from './http-security.js';
 
@@ -60,12 +61,15 @@ const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 've
 const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
 if (SIM) simRig(store.rig);
 const rig = store.rig;
-let powerSchedules, poller;
-for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => { poller?.close(); powerSchedules?.close(); store.close(); process.exit(0); });
+let powerSchedules, poller, health, stopping = false;
+// A lit rig gets a final health report before exit; health.stop() is capped at a few seconds.
+for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, async () => {
+  if (stopping) return; stopping = true;
+  try { await health?.stop(); } catch { /* exit regardless */ }
+  poller?.close(); powerSchedules?.close(); store.close(); process.exit(0);
+});
 
 const drivers = new Map();   // slot -> driver
-const thermal = createThermalMonitor(); // in-memory air-temperature history; restarts begin empty
-const thermalTargets = new Map(); // slot -> driver and address behind the history
 const status = new Map();    // slot -> status
 const busy = new Map();
 const connections = new Map();
@@ -84,22 +88,6 @@ function driverFor(p) {
   let d = drivers.get(p.slot);
   if (!d || d._key !== key) { d = makeDriver(p); d._key = key; drivers.set(p.slot, d); }
   return d;
-}
-
-// Latest air reading, level against the rated limit and the peak in retained history.
-// `source` says what the driver can report (intake, ambient or nothing), so the UI can
-// tell "no reading yet" from "this driver does not report temperature".
-function thermalView(p) { return { ...thermal.view(p.slot, ratedAmbientMaxC(p)), source: driverFor(p).air ?? null }; }
-function logThermal(p, air, limitC, r) {
-  const where = typeof p.lane === 'string' && Object.hasOwn(LANES, p.lane) ? `${p.lane} · ${LANES[p.lane].target}` : p.slot;
-  store.event({ source: 'thermal', slot: p.slot, command: `air ${r.level}`, result: r.level === 'ok' ? 'OK' : 'WARN', detail: `${where}: ${air.kind} air ${air.c} °C, ${r.headroomC} °C below the ${limitC} °C rated limit` });
-  broadcast({ type: 'event', event: rig.events.at(-1) });
-}
-function thermalReport(minutes, points) {
-  return {
-    at: new Date().toISOString(), windowMinutes: minutes, retentionMinutes: RETENTION_MS / 60000, thresholds: THRESHOLDS,
-    projectors: rig.projectors.map((p) => ({ slot: p.slot, lane: p.lane || null, ...thermalView(p), series: thermal.series(p.slot, { windowMs: minutes * 60000, maxPoints: points }) })),
-  };
 }
 
 function displayInfoFor(p, current = status.get(p.slot)) { return projectorDisplayInfo(p, { ...current, connection: connections.get(p.slot) }, driverFor(p).inputs ?? p.inputs); }
@@ -137,9 +125,9 @@ poller = createPoller({
   maxRetryMs: Math.max(POLL_MS, 15000),
   read: (p, options) => p.ip ? driverFor(p).getStatus(options) : null,
   started(p, { identityChanged, at }) {
-    // History follows the physical target. Correcting a model or lane label keeps it; a new driver or address starts fresh.
+    // Temperature history follows the physical target. Correcting a model or lane label keeps it; a new driver or address starts fresh.
     const target = JSON.stringify([p.driver, p.ip]);
-    if (thermalTargets.has(p.slot) && thermalTargets.get(p.slot) !== target) thermal.reset(p.slot);
+    if (thermalTargets.has(p.slot) && thermalTargets.get(p.slot) !== target) { thermal.reset(p.slot); thermalReads.delete(p.slot); }
     thermalTargets.set(p.slot, target);
     if (identityChanged) {
       status.set(p.slot, emptyStatus());
@@ -159,10 +147,8 @@ poller = createPoller({
     const next = { ...prev, ...s, online: true, updatedAt: new Date().toISOString() };
     status.set(p.slot, next);
     if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
-    if (Number.isFinite(s.air?.c)) {
-      const limitC = ratedAmbientMaxC(p), r = thermal.observe(p.slot, { at, c: s.air.c, kind: s.air.kind, limitC });
-      if (r?.changed) logThermal(p, s.air, limitC, r);
-    }
+    health?.observe(p.slot, next.power);
+    sampleThermal(p, next);
     broadcastStatus(p);
   },
   failed(p, e, { at, consecutiveFailures, nextRetryAt, retryDelayMs }) {
@@ -180,9 +166,89 @@ function setOffline(slot, why) {
   // Keep the last reply available, explicitly marked unavailable until a new reply.
   const next = { ...prev, online: false, updatedAt: new Date().toISOString() };
   status.set(slot, next);
+  health?.observe(slot, null);
   if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
   broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, thermal: thermalView(store.projector(slot)), displayInfo: displayInfoFor(store.projector(slot), next), inputPreference: inputPreferenceFor(store.projector(slot)) });
 }
+// ---- Health reports (read-only readings; see docs/health-reports.md) ----
+const healthConfig = readHealthConfig(path.join(path.dirname(DATA), 'health-reports.json'));
+health = createHealthReports({
+  dir: path.join(path.dirname(DATA), 'health-reports'),
+  config: healthConfig,
+  projectors: () => rig.projectors,
+  status: (slot) => status.get(slot),
+  connection: (slot) => connections.get(slot),
+  events: () => rig.events,
+  readTelemetry, // shared with the Thermal watch below: one read at a time per projector
+  describeError: (p, e) => connectionError(store.projector(p.slot) || p, e),
+  publish: healthConfig.notion.databaseId ? createNotionPublisher({ databaseId: healthConfig.notion.databaseId, token: notionTokenReader({ keychain: !SIM }) }) : null,
+  powerOnDelayMs: Number(process.env.PROJCTL_HEALTH_POWER_ON_DELAY_MS || 120000),
+}).start();
+console.log(`[health] reports ${healthConfig.enabled ? 'on' : 'off'}; Notion ${healthConfig.notion.databaseId ? 'database configured' : 'not configured'}${healthConfig.error ? `; ${healthConfig.error}` : ''}`);
+
+// ---- Thermal watch (operator panel; README "Thermal watch") ----
+// Air temperature between health reports: the same read-only driver query, at most once per
+// THERMAL_SAMPLE_MS per projector and only while it is on, warming or cooling. It is never part
+// of the 5-second status poll. Limits and the watch threshold are the health reports' own.
+const THERMAL_SAMPLE_MS = Math.min(600000, Math.max(50, Number(process.env.PROJCTL_THERMAL_SAMPLE_MS) || 60000));
+const THERMAL_READ_TIMEOUT_MS = 8000;
+const thermalLevels = thermalThresholds(healthConfig.watchHeadroomC);
+const thermal = createThermalMonitor({ thresholds: thermalLevels }); // in memory; a restart begins empty
+const thermalTargets = new Map();  // slot -> driver and address behind the history
+const thermalReads = new Map();    // slot -> { at, ok } for the latest finished temperature read
+const thermalAttempts = new Map(); // slot -> when the latest read started
+const telemetryQueue = new Map();  // slot -> tail of that projector's read chain
+const limitFor = (p) => ratedAmbientC(p, healthConfig.ratedAmbientC);
+const airSource = (p) => { const d = driverFor(p); return d.healthReadings ? (d.kind === 'pulse' ? 'ambient' : 'intake') : null; };
+// `source` says what the driver can report (intake, ambient or nothing), so the page can tell
+// "no reading yet" from "this driver does not report temperature".
+function thermalView(p) {
+  const read = thermalReads.get(p.slot);
+  return { ...thermal.view(p.slot, limitFor(p)), source: p.ip ? airSource(p) : null, sampleMs: THERMAL_SAMPLE_MS,
+    lastReadAt: read ? new Date(read.at).toISOString() : null, lastReadOk: read ? read.ok : null };
+}
+function recordThermal(p, readings) {
+  const sensor = readings?.sensors?.find((s) => s.role === 'intake'), c = sensor?.c, at = Date.now(), ok = plausibleAirC(c);
+  thermalReads.set(p.slot, { at, ok });
+  if (ok) {
+    const limitC = limitFor(p), kind = sensor.id === 'ambient' ? 'ambient' : 'intake';
+    const r = thermal.observe(p.slot, { at, c, kind, limitC });
+    if (r?.changed) {
+      const where = typeof p.lane === 'string' && Object.hasOwn(LANES, p.lane) ? `${p.lane} · ${LANES[p.lane].target}` : p.slot;
+      store.event({ source: 'thermal', slot: p.slot, command: `air ${r.level}`, result: r.level === 'ok' ? 'OK' : 'WARN', detail: `${where}: ${kind} air ${c} °C, ${r.headroomC} °C below the ${limitC} °C rated limit` });
+      broadcast({ type: 'event', event: rig.events.at(-1) });
+    }
+  }
+  broadcastStatus(p);
+}
+// One temperature reader per projector for health reports and the Thermal watch. Reads for a
+// slot run one after another, and every finished read reaches the watch, whoever asked for it.
+function readTelemetry(p, options) {
+  const current = store.projector(p.slot) || p, d = driverFor(current);
+  if (!d.healthReadings) return null;
+  thermalAttempts.set(current.slot, Date.now());
+  const run = () => d.healthReadings(options);
+  const read = (telemetryQueue.get(current.slot) || Promise.resolve()).then(run, run);
+  telemetryQueue.set(current.slot, read.catch(() => {}));
+  return read.then((readings) => { try { recordThermal(current, readings); } catch (e) { console.error('[thermal]', e.message); } return readings; },
+    (error) => { thermalReads.set(current.slot, { at: Date.now(), ok: false }); throw error; });
+}
+// Called after each successful status poll; takes a sample only when one is due.
+function sampleThermal(p, st) {
+  if (!p.ip || !(isLit(st.power) || st.power === POWER.COOLING) || busy.has(p.slot) || !airSource(p)) return;
+  if (Date.now() - (thermalAttempts.get(p.slot) ?? -Infinity) < THERMAL_SAMPLE_MS) return;
+  const controller = new AbortController();
+  const deadline = setTimeout(() => controller.abort(Object.assign(new Error('temperature read timed out'), { code: 'POLL_TIMEOUT' })), THERMAL_READ_TIMEOUT_MS);
+  deadline.unref?.();
+  Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal })).catch(() => {}).finally(() => clearTimeout(deadline));
+}
+function thermalReport(minutes, points) {
+  return {
+    at: new Date().toISOString(), windowMinutes: minutes, retentionMinutes: RETENTION_MS / 60000, thresholds: thermalLevels, sampleMs: THERMAL_SAMPLE_MS,
+    projectors: rig.projectors.map((p) => ({ slot: p.slot, lane: p.lane || null, ...thermalView(p), series: thermal.series(p.slot, { windowMs: minutes * 60000, maxPoints: points }) })),
+  };
+}
+
 rig.projectors.forEach(poll);
 
 // ---- Discovery (PJLink class 2 search by MAC) ----
@@ -226,6 +292,8 @@ async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   const moving = cmd === 'lens' && !stop;
   if (moving) { busy.set(slot, 'lens'); broadcast({ type: 'busy', slot, busy: 'lens' }); }
   let result, detail;
+  // Readings start alongside the off command; the command itself is never held.
+  if (cmd === 'power' && !arg) health?.powerOff(slot, source);
   try {
     if (cmd === 'power') result = await d.power(!!arg, { guard: executionGuard });
     else if (cmd === 'shutter') result = await d.shutter(!!arg);
@@ -427,20 +495,22 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(302, { location: '/login.html' }); return res.end();
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
+    if (url.pathname === '/api/power-schedules' && req.method === 'GET') return json(res, 200, powerSchedules.view());
+    if (url.pathname === '/api/power-schedules/save' && req.method === 'POST') return json(res, 200, powerSchedules.save(await body(req)));
+    if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
+    if (url.pathname === '/api/power-schedules/delete' && req.method === 'POST') { const { id } = await body(req); return json(res, 200, powerSchedules.remove(id)); }
+    if (url.pathname === '/api/health-reports' && req.method === 'GET') return json(res, 200, health.view());
+    if (url.pathname === '/api/health-reports/run' && req.method === 'POST') return json(res, 200, { report: await health.run(), ...health.view() });
     if (url.pathname === '/api/thermal' && req.method === 'GET') {
       const minutes = Math.min(RETENTION_MS / 60000, Math.max(1, Number(url.searchParams.get('minutes')) || 30));
       const points = Math.min(600, Math.max(20, Number(url.searchParams.get('points')) || 180));
       return json(res, 200, thermalReport(minutes, points));
     }
     if (url.pathname === '/api/thermal.csv' && req.method === 'GET') {
-      const meta = (slot) => { const p = store.projector(slot); return p ? { lane: p.lane || '', model: p.model || p.label || '', limitC: ratedAmbientMaxC(p) } : {}; };
+      const meta = (slot) => { const p = store.projector(slot); return p ? { lane: p.lane || '', model: p.model || p.label || '', limitC: limitFor(p) } : {}; };
       res.writeHead(200, { 'content-type': 'text/csv; charset=utf-8', 'content-disposition': 'attachment; filename="projctl-air-temperature.csv"' });
       return res.end(thermalCsv(thermal.rows(), meta));
     }
-    if (url.pathname === '/api/power-schedules' && req.method === 'GET') return json(res, 200, powerSchedules.view());
-    if (url.pathname === '/api/power-schedules/save' && req.method === 'POST') return json(res, 200, powerSchedules.save(await body(req)));
-    if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
-    if (url.pathname === '/api/power-schedules/delete' && req.method === 'POST') { const { id } = await body(req); return json(res, 200, powerSchedules.remove(id)); }
 
     if (url.pathname === '/api/display-info' && req.method === 'GET') {
       const p = store.projector(url.searchParams.get('slot'));
@@ -492,7 +562,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/discover' && req.method === 'POST') return json(res, 200, await discover('ui'));
     if (url.pathname === '/api/sim' && req.method === 'POST' && SIM) { // test hook: toggle offline or set an out-of-position reported lens readback
-      const { slot, offline, lens, airC } = await body(req); const d = driverFor(store.projector(slot)); if (offline !== undefined) d._state.flaky = !!offline; if (airC !== undefined) d._state.airC = airC === null ? null : Number(airC); if (lens) Object.assign(d._state.lens, lens); if (lens?._pollFocus != null) d._state.pollFocus = lens._pollFocus; return json(res, 200, { ok: true });
+      const { slot, offline, lens, temps } = await body(req); const d = driverFor(store.projector(slot)); if (offline !== undefined) d._state.flaky = !!offline; if (temps && typeof temps === 'object') d._state.temps = { intake: 24, qtm1: 36, qtm2: 31, ...d._state.temps, ...temps }; if (lens) Object.assign(d._state.lens, lens); if (lens?._pollFocus != null) d._state.pollFocus = lens._pollFocus; return json(res, 200, { ok: true });
     }
     // static
     if (url.pathname.startsWith('/ProjectorThrow/')) {

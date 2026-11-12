@@ -2,23 +2,29 @@
 import { POWER, SHUTTER, NotSupported } from './base.js';
 
 export function simulatorDriver({ name = 'SIM', inputs = ['31', '32'] } = {}) {
-  // airC: simulated intake air in degrees C (null reports no reading). Tests set it through /api/sim.
-  const st = { power: POWER.OFF, shutter: SHUTTER.CLOSED, input: inputs[0], lightHours: 1234, name, flaky: false, airC: 24, lens: { h: 0, v: 0, focus: 1000, zoom: 1000, hState: 'Stopped', vState: 'Stopped', focusState: 'Stopped', zoomState: 'Stopped' } };
+  const st = { power: POWER.OFF, shutter: SHUTTER.CLOSED, input: inputs[0], lightHours: 1234, name, flaky: false, lens: { h: 0, v: 0, focus: 1000, zoom: 1000, hState: 'Stopped', vState: 'Stopped', focusState: 'Stopped', zoomState: 'Stopped' } };
   let timer = null;
   const later = (ms, fn) => { clearTimeout(timer); timer = setTimeout(fn, ms); };
   return {
     kind: 'simulator',
     lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'bounded-step', stop: true, positionReadback: true },
     lensControls: { h: true, v: true, focus: true, zoom: true },
-    air: 'intake',
     _state: st,
     async getStatus() {
       if (st.flaky) throw new Error('simulated offline');
       const { power, shutter, input, lightHours, name, lens, pattern } = st;
       if (st.pollFocus != null) st.lens.focus = st.pollFocus;
       const result = { power, shutter, input, lightHours, name, lens: { ...lens }, pattern, errors: { fan: 0, lamp: 0, temp: 0, cover: 0, filter: 0, other: 0 }, online: true };
-      result.air = Number.isFinite(st.airC) ? { c: st.airC, kind: 'intake', raw: String(st.airC) } : null;
       return result;
+    },
+    async healthReadings() {
+      if (st.flaky) throw new Error('simulated offline');
+      const t = st.temps || { intake: 24, qtm1: 36, qtm2: 31 };
+      return { sensors: [
+        { id: 'intake', label: 'Intake air (simulated)', role: 'intake', c: t.intake },
+        { id: 'qtm1', label: 'Internal 1 (simulated)', role: 'internal', c: t.qtm1 },
+        { id: 'qtm2', label: 'Internal 2 (simulated)', role: 'internal', c: t.qtm2 },
+      ], alarm: st.alarm ?? null };
     },
     async power(on, { guard } = {}) {
       guard?.();

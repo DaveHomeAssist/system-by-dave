@@ -1,18 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { levelFor, ratedAmbientMaxC, createThermalMonitor, thermalCsv, THRESHOLDS } from '../server/thermal.js';
-import { parseTemperaturePair } from '../server/drivers/panasonic.js';
-
-test('rated limits come from the model, with a bounded per-projector override', () => {
-  assert.equal(ratedAmbientMaxC({ model: 'UDM 4K22' }), 40);
-  assert.equal(ratedAmbientMaxC({ model: 'PT-RZ970B' }), 45);
-  assert.equal(ratedAmbientMaxC({ model: 'PT-DW830U' }), 40);
-  assert.equal(ratedAmbientMaxC({ model: 'TBC', label: 'Barco UDM 4K22' }), 40, 'label is the fallback');
-  assert.equal(ratedAmbientMaxC({ model: 'PT-DW830U', label: 'Panasonic PT-RZ970B' }), 40, 'a stale label never overrides the model');
-  assert.equal(ratedAmbientMaxC({ model: 'TBC' }), null, 'unknown model has no limit rather than a guess');
-  assert.equal(ratedAmbientMaxC({ model: 'PT-DW830U', ambientLimitC: 45 }), 45);
-  for (const bad of [5, 99, 'warm', null, NaN]) assert.equal(ratedAmbientMaxC({ model: 'PT-DW830U', ambientLimitC: bad }), 40, `ignores ${bad}`);
-});
+import { levelFor, thermalThresholds, plausibleAirC, createThermalMonitor, thermalCsv, THRESHOLDS } from '../server/thermal.js';
 
 test('levels escalate at once and step down one level only after the hysteresis margin', () => {
   assert.deepEqual([10, 5.1, 5, 2.1, 2, -1].map((h) => levelFor(h)), ['ok', 'ok', 'watch', 'watch', 'hot', 'hot']);
@@ -23,14 +11,35 @@ test('levels escalate at once and step down one level only after the hysteresis 
   assert.equal(levelFor(5.5, 'hot'), 'watch', 'a fast drop still passes through the watch margin');
   assert.equal(levelFor(9, 'hot'), 'ok');
   assert.equal(levelFor(1, 'ok'), 'hot', 'can jump straight to hot');
-  assert.equal(THRESHOLDS.watchHeadroomC > THRESHOLDS.hotHeadroomC, true);
 });
 
-test('the 11 Nov health report P4 reading is a watch item, not a fault', () => {
+test('thresholds follow the health reports watch setting, with hot always inside the watch band', () => {
+  assert.deepEqual({ ...thermalThresholds() }, { ...THRESHOLDS });
+  assert.deepEqual({ ...thermalThresholds(5) }, { watchHeadroomC: 5, hotHeadroomC: 2, hysteresisC: 1 });
+  assert.deepEqual({ ...thermalThresholds(8) }, { watchHeadroomC: 8, hotHeadroomC: 2, hysteresisC: 1 });
+  assert.deepEqual({ ...thermalThresholds(3) }, { watchHeadroomC: 3, hotHeadroomC: 1.5, hysteresisC: 1 });
+  assert.equal(thermalThresholds(0).hotHeadroomC < 0, true, 'a zero watch threshold keeps hot below it');
+  for (const bad of [NaN, null, undefined, 'five']) assert.equal(thermalThresholds(bad).watchHeadroomC, 5, `falls back for ${bad}`);
+  const narrow = thermalThresholds(3);
+  assert.deepEqual([4, 3, 1.6, 1.5].map((h) => levelFor(h, 'ok', narrow)), ['ok', 'watch', 'watch', 'hot']);
+});
+
+test('implausible air readings are rejected', () => {
+  for (const ok of [-5, 0, 23, 37.4, 60]) assert.equal(plausibleAirC(ok), true, String(ok));
+  for (const bad of [230, 999, -40, NaN, null, undefined, '37']) assert.equal(plausibleAirC(bad), false, String(bad));
+});
+
+test('the 11 Nov health report reading for lane D is a watch item against a 40 C limit, and OK against 45 C', () => {
   const monitor = createThermalMonitor();
   const r = monitor.observe('P4', { at: Date.now(), c: 37, kind: 'intake', limitC: 40 });
   assert.equal(r.level, 'watch'); assert.equal(r.headroomC, 3); assert.equal(r.changed, true);
   assert.equal(monitor.observe('P4', { at: Date.now() + 5000, c: 36, kind: 'intake', limitC: 40 }).changed, false);
+  assert.equal(createThermalMonitor().observe('P4', { at: Date.now(), c: 37, kind: 'intake', limitC: 45 }).level, 'ok');
+});
+
+test('monitor uses the thresholds it was created with', () => {
+  const monitor = createThermalMonitor({ thresholds: thermalThresholds(8) });
+  assert.equal(monitor.observe('P1', { at: Date.now(), c: 33, limitC: 40 }).level, 'watch', '7 C of headroom is inside an 8 C watch band');
 });
 
 test('monitor ignores non-numbers, tracks the peak and keeps a unit with no limit unrated', () => {
@@ -77,13 +86,4 @@ test('CSV has a stable header, ISO times and neutralises spreadsheet formulas', 
   assert.equal(lines[0], 'time_utc,slot,lane,model,air_kind,air_c,rated_max_c');
   assert.equal(lines[1], '2026-11-12T03:00:00.000Z,P4,D,PT-DW830U,intake,37.5,40');
   assert.equal(lines[2], `2026-11-12T03:00:05.000Z,'=P5,,"'+cmd|""x""",intake,22,`);
-});
-
-test('Panasonic temperature replies are accepted only when the C and F values agree', () => {
-  assert.equal(parseTemperaturePair('023/073'), 23);
-  assert.equal(parseTemperaturePair('+037 +099'), 37);
-  assert.equal(parseTemperaturePair('37.0 98.6'), 37);
-  assert.equal(parseTemperaturePair('0230 0734'), 23, 'tenths');
-  assert.equal(parseTemperaturePair('023/090'), null, 'disagreeing pair');
-  for (const bad of ['', 'ER401', '23', '23 73 99', null, undefined, '999/999', 'abc/def']) assert.equal(parseTemperaturePair(bad), null, `rejects ${JSON.stringify(bad)}`);
 });

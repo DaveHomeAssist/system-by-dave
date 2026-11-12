@@ -72,29 +72,31 @@ covers the Rig tab below the overview row (never the header, tabs or its button)
 button dismiss it, and it stays open if you change tab. The button adds no height at 845 px and wider;
 below 680 px the overview row already stacks and the Rig tab scrolls, so it adds one row there.
 
-- **Readings.** Panasonic units report intake air through the native port (`QTM:0`, intake per
-  Panasonic's RS-232C list as cited in the 11 Nov health report). A Barco reports its ambient sensor only
-  when `ambientProperty` names the Pulse property in the rig file (read the name from the unit with the
-  Pulse `introspect` call; none is assumed, and the value must be a number in degrees C). PJLink-only
-  projectors report no temperature, and say so.
-- **Fail closed.** A Panasonic reply is accepted only when its two numbers agree as Celsius and
-  Fahrenheit. Anything else is shown as no reading, with the raw reply, rather than guessed.
-- **Limits.** Barco UDM 40 C, PT-RZ970 45 C, PT-DW830U 40 C (the lower figure: the spec file allows 45 C,
-  but the portrait limit it cites is unconfirmed). The model decides, and a label only decides when the model
-  matches nothing. Set `ambientLimitC` (20 to 60) on a projector in the rig file to override.
-- **Levels.** Watch is within 5 C of the limit and Hot within 2 C, with 1 C of hysteresis before a level
-  clears. The defaults are in `server/thermal.js` (`THRESHOLDS`) and are a proposal, not a Barco or
-  Panasonic specification.
-- **Freshness.** A value is current only when the projector is replying and this poll returned a
-  temperature. Otherwise the card keeps the last sample, marked Last known, with its age.
+- **Readings.** The watch uses the [health reports](docs/health-reports.md)' read-only driver query:
+  Panasonic intake air (`QTM:0`) and the Barco's outside-ambient sensor. PJLink-only projectors report
+  no temperature, and the card says so. The relay takes one sample per projector about once a minute
+  (`PROJCTL_THERMAL_SAMPLE_MS`, default 60000) and only while the unit is on, warming or cooling. It is
+  never part of the 5-second status poll. Health reports and the watch share one reader, so the two never
+  query a projector at the same time, and a report's own reading also reaches the watch.
+- **Limits.** The health reports' limits, so the panel and the reports cannot disagree: Barco UDM 4K22
+  40 C, PT-RZ970 45 C, PT-DW830 series 45 C, with per-slot overrides in the private `health-reports.json`
+  beside the rig (`"ratedAmbientC": { "P3": 40, "P4": 40 }` for units hung in portrait). A unit whose
+  model is not recognised shows its temperature with no level.
+- **Levels.** Watch is the health reports' `watchHeadroomC` (default: within 5 C of the limit). Hot is
+  within 2 C, or half the watch margin if that is smaller, with 1 C of hysteresis before a level clears.
+  Hot and the hysteresis exist only in the watch (`server/thermal.js`) and are a proposal, not a Barco or
+  Panasonic specification. A reading outside -20 to 120 C is treated as no reading.
+- **Freshness.** A value is current while the projector is replying and its latest sample is no older
+  than three sampling intervals. Otherwise the card keeps the last sample, marked Last known, with its age.
 - **Log and history.** A change of level is written to the Log tab once (source `thermal`, result `WARN`;
-  recovery is `OK`). Eight hours of readings are kept in memory and are lost when the relay restarts.
-  `GET /api/thermal?minutes=30&points=180` returns the series and `GET /api/thermal.csv` downloads the
-  retained readings for review after the show.
+  recovery is `OK`), so it also appears in the next health report's event list. Eight hours of samples are
+  kept in memory and are lost when the relay restarts; they also reset when a slot's driver or address
+  changes. `GET /api/thermal?minutes=30&points=180` returns the series and `GET /api/thermal.csv` downloads
+  the retained samples. Export the CSV after each show: two shows in a day can span more than eight hours.
 
 This is advisory display only. It sends no command and does not replace the projector's own alarms.
-Checked against the simulator and loopback protocol stand-ins; the `QTM` reply framing and the Barco
-property are not yet confirmed on the installed hardware.
+Checked against the simulator and loopback protocol stand-ins; the readings on the installed projectors
+are part of the health reports' open venue acceptance.
 
 ## Cues from Millumin or QLab
 
@@ -360,3 +362,14 @@ separate Enable action. Nothing runs on save or page load, no show times are
 supplied, and startup/sleep/missed occurrences are skipped without catch-up.
 Read live status and per-target audit; acknowledgement does not prove actual
 power state. Studio startup, network and physical acceptance remain separate.
+
+## Health reports
+
+The relay writes a projector [health report](docs/health-reports.md) 2 minutes
+after the rig powers on, hourly while any unit is lit, at power off and when the
+relay stops with units lit. Readings are read-only (Panasonic `QTM` temperatures,
+Barco ambient and alarm state, PJLink flags); no command is sent or delayed.
+Reports are saved beside the rig file and, with a private `health-reports.json`
+and a Notion token on the relay machine, added as one row each to a Notion
+database. `GET /api/health-reports` lists recent reports and
+`POST /api/health-reports/run` takes one now.

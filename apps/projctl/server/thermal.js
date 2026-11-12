@@ -1,36 +1,26 @@
-// Thermal watch: rated limits, level classification and a bounded in-memory history.
+// Thermal watch: level classification and a bounded in-memory history of air temperature.
 //
-// A reading is air temperature at the projector: Panasonic intake (QTM:0) or the
-// Barco's ambient sensor. The levels are advisory display logic for the operator.
-// They never send a command and never claim a projector is safe or damaged.
+// A reading is air at the projector (Panasonic intake, QTM:0, or the Barco's outside-ambient
+// sensor), taken by the same read-only driver query as the health reports. Rated limits and
+// the watch threshold are the health reports' own (health-reports.js and health-reports.json),
+// so the panel and the reports cannot disagree. The levels are advisory display logic for the
+// operator: they never send a command and never claim a projector is safe or damaged.
 
-// Headroom is the rated maximum ambient minus the air reading, in degrees C.
-// Proposed defaults, chosen from the 11 Nov health report (P4 intake peaked at
-// 37 C against a 40 C limit, 3 C of headroom, which should read as "watch").
+// Headroom is the rated maximum ambient minus the air reading, in degrees C. Watch is the
+// health reports' threshold. Hot and the hysteresis margin exist only here and are a proposal,
+// not a manufacturer specification.
 export const THRESHOLDS = Object.freeze({ watchHeadroomC: 5, hotHeadroomC: 2, hysteresisC: 1 });
 export const RETENTION_MS = 8 * 60 * 60 * 1000;
 const MAX_SAMPLES = 6000;
 
-// Rated maximum ambient or intake air, degrees C. Sources are in the 11 Nov
-// Frozen Projector Health Report: Barco UDM-4K22 spec sheet (0-40), Panasonic
-// PT-RZ970 product page (up to 45), PT-DW830U spec file (0-45, or 0-40 in High
-// Altitude mode). The DW830U row uses the lower 40 because the portrait limit
-// the report cites could not be confirmed. Override per projector with
-// `ambientLimitC` in the rig file.
-const RATED = [
-  { match: /UDM/i, maxC: 40 },
-  { match: /RZ970/i, maxC: 45 },
-  { match: /DW830/i, maxC: 40 },
-];
-
-export function ratedAmbientMaxC(projector) {
-  const override = Number(projector?.ambientLimitC);
-  if (Number.isFinite(override) && override >= 20 && override <= 60) return override;
-  // The model is authoritative. A label is free text that can be stale after a swap, so it
-  // only decides when the model matches nothing.
-  const find = (text) => RATED.find((row) => row.match.test(text))?.maxC;
-  return find(projector?.model || '') ?? find(projector?.label || '') ?? null;
+// Hot always sits inside the watch band, whatever watch threshold is configured.
+export function thermalThresholds(watchHeadroomC = THRESHOLDS.watchHeadroomC) {
+  const watch = Number.isFinite(watchHeadroomC) ? watchHeadroomC : THRESHOLDS.watchHeadroomC;
+  return Object.freeze({ watchHeadroomC: watch, hotHeadroomC: watch > 0 ? Math.min(THRESHOLDS.hotHeadroomC, watch / 2) : watch - THRESHOLDS.hotHeadroomC, hysteresisC: THRESHOLDS.hysteresisC });
 }
+
+// Air readings outside this range are treated as no reading rather than shown or logged.
+export const plausibleAirC = (c) => Number.isFinite(c) && c > -20 && c < 120;
 
 const ORDER = ['ok', 'watch', 'hot'];
 
@@ -48,7 +38,7 @@ export function levelFor(headroomC, previous = 'ok', thresholds = THRESHOLDS) {
 
 const round1 = (n) => Math.round(n * 10) / 10;
 
-export function createThermalMonitor({ retentionMs = RETENTION_MS, maxSamples = MAX_SAMPLES, now = Date.now } = {}) {
+export function createThermalMonitor({ thresholds = THRESHOLDS, retentionMs = RETENTION_MS, maxSamples = MAX_SAMPLES, now = Date.now } = {}) {
   const slots = new Map(); // slot -> { samples: [{ t, c }], level, kind }
   const entry = (slot) => { let e = slots.get(slot); if (!e) slots.set(slot, e = { samples: [], level: 'ok', kind: null }); return e; };
   const prune = (e) => {
@@ -66,7 +56,7 @@ export function createThermalMonitor({ retentionMs = RETENTION_MS, maxSamples = 
       e.samples.push({ t: Number.isFinite(at) ? at : now(), c }); e.kind = kind; prune(e);
       if (limitC == null) return { level: 'unknown', previous, changed: false, headroomC: null };
       const headroomC = round1(limitC - c);
-      e.level = levelFor(headroomC, previous);
+      e.level = levelFor(headroomC, previous, thresholds);
       return { level: e.level, previous, changed: e.level !== previous, headroomC };
     },
     // A new physical target behind a slot must not inherit the old unit's history.

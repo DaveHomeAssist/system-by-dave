@@ -3,14 +3,33 @@ const assert = require('node:assert/strict');
 
 // Thermal watch in a real browser: a status button in the Rig overview opens a non-modal panel
 // with lane-keyed cards. The shell has no spare height, so the button and panel must add none.
+// Readings come from the health reports' reader; the portrait unit's 40 C limit is set in
+// health-reports.json, as on the venue rig.
 (async () => {
   const { startRelay, until } = await import('./relay-helper.js');
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
-  const relay = await startRelay();
+  const relay = await startRelay({ PROJCTL_THERMAL_SAMPLE_MS: '150' }, { files: { 'health-reports.json': JSON.stringify({ ratedAmbientC: { P4: 40 } }) } });
   try {
     // 11 Nov health report: D (PT-DW830U, SR portal) is the unit near its 40 C limit.
     for (const [slot, lane, model] of [['P1', 'A', 'PT-DW830U'], ['P2', 'B', 'PT-RZ970'], ['P3', 'C', 'UDM 4K22'], ['P4', 'D', 'PT-DW830U']]) await relay.api('projector', { slot, lane, model });
-    for (const [slot, airC] of [['P1', 27], ['P2', 23], ['P3', 29.8], ['P4', 37]]) await relay.api('sim', { slot, airC });
+    for (const [slot, intake] of [['P1', 27], ['P2', 23], ['P3', 29.8], ['P4', 37]]) await relay.api('sim', { slot, temps: { intake } });
+
+    // Projectors that are off are not read, and the panel says why instead of showing a number.
+    {
+      const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+      try {
+        await page.goto(relay.base);
+        await page.locator('[data-tab="rig"]').click();
+        await page.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
+        await page.waitForFunction(() => document.querySelector('#thermal-chip [data-chip-text]')?.textContent === 'Air · no data');
+        await page.locator('#thermal-chip').click();
+        assert.equal(await page.locator('#thermal-watch [data-thermal-lane="D"] [data-value]').innerText(), '—');
+        assert.match(await page.locator('#thermal-watch [data-thermal-lane="D"] [data-foot]').innerText(), /read while the projector is on or cooling/);
+        assert.match(await page.locator('#thermal-watch .pj-thermal-note').innerText(), /read about every 1 s while it is on or cooling/);
+      } finally { await page.close(); }
+    }
+
+    await relay.api('command', { slot: 'all', cmd: 'power', arg: 1 });
     await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P4').thermal?.c === 37);
 
     const ready = (page) => page.waitForFunction(() => document.querySelector('#thermal-chip [data-chip-text]')?.textContent.startsWith('D Watch'));
@@ -91,7 +110,7 @@ const assert = require('node:assert/strict');
       assert.equal(await page.evaluate(() => document.activeElement?.closest('#thermal-watch [data-thermal-lane="D"]') !== null && document.activeElement.matches('[data-open]')), true, 'focus stays on the card button through updates');
 
       // Recovery changes words and the button; nothing is marked tightest when every unit is OK.
-      await relay.api('sim', { slot: 'P4', airC: 30 });
+      await relay.api('sim', { slot: 'P4', temps: { intake: 30 } });
       await page.waitForFunction(() => document.querySelector('#thermal-chip [data-chip-text]')?.textContent.startsWith('Air OK'));
       assert.equal(await page.locator('#thermal-watch .pj-thermal-card.tightest').count(), 0);
 
@@ -106,9 +125,9 @@ const assert = require('node:assert/strict');
       assert.equal(await page.locator('#log tbody tr').filter({ hasText: 'air watch' }).count(), 1, 'one entry per level change, not per poll');
       await page.locator('[data-tab="rig"]').click();
 
-      // A unit that keeps replying but stops returning a temperature keeps its last value, marked
-      // as last known with its age. It is never shown as current and never as 0.
-      await relay.api('sim', { slot: 'P2', airC: null });
+      // A unit that keeps replying but stops returning a temperature keeps its last value. Once that
+      // sample is older than three sampling intervals (3 s at least) it is marked as last known.
+      await relay.api('sim', { slot: 'P2', temps: { intake: null } });
       await page.waitForFunction(() => /Last known · OK/.test(document.querySelector('#thermal-watch [data-thermal-lane="B"] [data-word]')?.textContent || ''));
       assert.equal(await page.locator('#thermal-watch [data-thermal-lane="B"].stale').count(), 1);
       assert.equal(await page.locator('#thermal-watch [data-thermal-lane="B"] [data-delta]').innerText(), '—', 'no comparison from a stale value');

@@ -1,8 +1,9 @@
 // Thermal watch: the in-show air-temperature panel for lanes A-D.
 //
 // Readings are air at the projector (Panasonic intake, or the Barco's ambient sensor)
-// against the model's rated maximum. Cards are keyed by lane, because slot numbers have
-// been renumbered between documents and a hot unit must be found by where it hangs.
+// against its rated maximum, sampled by the relay about once a minute while the unit is on
+// or cooling. Cards are keyed by lane, because slot numbers have been renumbered between
+// documents and a hot unit must be found by where it hangs.
 // Cards are built once and patched in place so keyboard focus survives status updates.
 import { LANES, rigLanes } from './lanes.js';
 
@@ -40,7 +41,7 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
       <button class="avd-btn avd-btn--sm pj-thermal-close" type="button" data-close>Close</button>
     </div>
     <ul class="pj-thermal-list" aria-label="Air temperature by projector lane"></ul>
-    <p class="pj-mono pj-thermal-note">Air at the projector against its rated maximum ambient. Watch is within <span data-watch>${thresholds.watchHeadroomC}</span> °C of the limit, Hot within <span data-hot>${thresholds.hotHeadroomC}</span> °C. Advisory only: not the projector's own alarm. History is kept 8 hours.</p>`;
+    <p class="pj-mono pj-thermal-note">Air at the projector against its rated maximum ambient, read about every <span data-every>1 min</span> while it is on or cooling. Watch is within <span data-watch>${thresholds.watchHeadroomC}</span> °C of the limit, Hot within <span data-hot>${thresholds.hotHeadroomC}</span> °C. Advisory only: not the projector's own alarm. History is kept 8 hours.</p>`;
   const list = host.querySelector('.pj-thermal-list'), summaryEl = host.querySelector('[data-summary]');
   host.querySelector('[data-close]').onclick = () => onClose();
   let announced = '';
@@ -69,7 +70,7 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
     return points.map(([t, c], i) => `${i ? 'L' : 'M'}${x(t).toFixed(1)} ${y(c).toFixed(1)}`).join('');
   }
 
-  // live: the unit is replying AND this poll returned a temperature. Otherwise any value shown is the last sample.
+  // live: the unit is replying and its latest sample is recent. Otherwise any value shown is the last sample.
   function renderCard(li, entry, live, coolest, now) {
     const { projector: p, conflict } = entry, v = p?.thermal, has = Number.isFinite(v?.c);
     const level = has && LEVELS[v.level] ? v.level : 'unknown', info = LEVELS[level], limit = v?.limitC;
@@ -109,8 +110,9 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
     const age = has && v.at ? ageText(now - Date.parse(v.at)) : '';
     const reason = conflict ? 'Assignment conflict: two devices claim this lane.' : !p ? 'No device assigned to this lane.'
       : !p.ip ? 'No address set for this projector.'
-      : v?.source == null ? (p.driver === 'pulse' ? 'Set ambientProperty for this Barco in the rig file to read its ambient sensor.' : 'This driver does not report temperature.')
-      : p.status?.air?.raw && !Number.isFinite(p.status.air.c) && !has ? `Unreadable reply: ${p.status.air.raw}` : 'No reading yet.';
+      : v?.source == null ? 'This driver does not report temperature.'
+      : !['on', 'warming', 'cooling'].includes(p.status?.power) ? 'Temperature is read while the projector is on or cooling.'
+      : v.lastReadOk === false ? 'The projector did not return a temperature on the last read.' : 'No reading yet.';
     setText(li.querySelector('[data-foot]'), has ? [`Slot ${p.slot}`, p.model || p.label, age && `read ${age}`].filter(Boolean).join(' · ') : reason);
     li.querySelector('[data-open]').disabled = !p;
   }
@@ -123,6 +125,7 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
         thresholds = { watchHeadroomC: t.watchHeadroomC, hotHeadroomC: t.hotHeadroomC };
         setText(host.querySelector('[data-watch]'), String(thresholds.watchHeadroomC)); setText(host.querySelector('[data-hot]'), String(thresholds.hotHeadroomC));
       }
+      if (Number.isFinite(report?.sampleMs)) setText(host.querySelector('[data-every]'), report.sampleMs >= 60000 ? `${Math.round(report.sampleMs / 60000)} min` : `${Math.max(1, Math.round(report.sampleMs / 1000))} s`);
       for (const p of report?.projectors || []) if (Array.isArray(p.series)) series.set(p.slot, p.series.filter((pt) => Array.isArray(pt) && Number.isFinite(pt[0]) && Number.isFinite(pt[1])));
     },
     // One new status message for a slot: extend the local history without a refetch.
@@ -136,7 +139,9 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
       series.set(slot, drop ? arr.slice(drop) : arr);
     },
     update({ projectors, connected, connectionOf, now = Date.now() }) {
-      const lanes = rigLanes(projectors), isLive = (p) => !!p && connected && connectionOf(p).current && Number.isFinite(p.status?.air?.c);
+      // Current = the unit is replying and its latest sample is no older than three sampling intervals.
+      const isLive = (p) => { const v = p?.thermal, at = Date.parse(v?.at); return !!p && connected && connectionOf(p).current && Number.isFinite(v?.c) && Number.isFinite(at) && now - at <= Math.max(3 * (v.sampleMs || 60000), 3000); };
+      const lanes = rigLanes(projectors);
       const readings = lanes.filter(({ projector: p }) => Number.isFinite(p?.thermal?.c)), liveReadings = readings.filter(({ projector: p }) => isLive(p));
       const coolest = liveReadings.length > 1 ? Math.min(...liveReadings.map(({ projector: p }) => p.thermal.c)) : null;
       for (const entry of lanes) renderCard(cards.get(entry.lane), entry, isLive(entry.projector), coolest, now);
