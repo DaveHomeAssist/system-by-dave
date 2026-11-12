@@ -341,3 +341,27 @@ test('a failed report-time reading uses a recent Thermal watch sample, and the p
   assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| on \| — \| 28 \(\d\d:\d\d:\d\d EST\) \| 40 \| — \|/);
   assert.match(md, /readings: connection closed before Panasonic reply/);
 });
+
+test('a Panasonic connection lost after the intake reading keeps the intake and opens no more connections', async (t) => {
+  const sent = [];
+  const port = await fakeServer(t, (socket) => {
+    socket.write('NTCONTROL 0\r');
+    let text = '';
+    socket.on('data', (b) => {
+      text += b; if (!text.includes('\r')) return;
+      const cmd = text.trim().replace(/^00/, ''); sent.push(cmd);
+      if (cmd === 'QTM:0') socket.write('000036/0097\r'); else socket.destroy(); // projector drops the session
+    });
+  });
+  const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
+  const out = await driver.healthReadings();
+  assert.deepEqual(sent, ['QTM:0', 'QTM:1'], 'QTM:2 is not attempted after a lost connection');
+  assert.deepEqual(out.sensors.map((s) => [s.id, s.c]), [['intake', 36], ['qtm1', null], ['qtm2', null]]);
+  assert.match(out.partial, /connection closed/);
+});
+
+test('a Panasonic connection lost before the intake reading fails the reading so it can be retried', async (t) => {
+  const port = await fakeServer(t, (socket) => { socket.write('NTCONTROL 0\r'); socket.on('data', () => socket.destroy()); });
+  const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
+  await assert.rejects(driver.healthReadings(), /connection closed before Panasonic reply/);
+});
