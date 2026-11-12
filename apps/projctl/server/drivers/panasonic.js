@@ -97,7 +97,8 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
             const body = line.startsWith('00') ? line.slice(2) : line;
             const commandName = cmd.split('=')[0];
             const echoed = /^([A-Z]{2,}(?::[A-Z0-9]+)?)=(.*)$/.exec(body);
-            if (echoed && echoed[1] !== commandName) return fail(new Error('Panasonic reply does not match the command'));
+            // The exchange is already marked done above, so fail() would do nothing here.
+            if (echoed && echoed[1] !== commandName) return reject(new Error('Panasonic reply does not match the command'));
             const payload = echoed ? echoed[2] : body;
             if (payload === 'ERRA') return reject(new Error('auth failed: admin user/password wrong (Setup tab)'));
             if (payload.startsWith('ER401')) return reject(Object.assign(new Error('projector refuses this now (no signal, wrong state, or unsupported)'), { code: 'ER401' }));

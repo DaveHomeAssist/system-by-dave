@@ -11,6 +11,7 @@
 - Show lock also blocks address edits, discovery, presets and power schedules. Shutter and power on stay available.
 - Rig saves are fsynced and replaced atomically, with a `.bak`. A write error is reported and does not crash the relay. Simulator mode does not rewrite a rig that already has addresses.
 - Logout revokes that browser's session token. `/api/health` and the header show the version and commit.
+- A Panasonic reply that names a different command is reported as an error. It no longer leaves that pattern, lens or picture command waiting with no timeout.
 
 ## November 12, 2026: Projctl thermal watch
 

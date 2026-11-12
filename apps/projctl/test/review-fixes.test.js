@@ -6,9 +6,11 @@ import path from 'node:path';
 import { startRelay, until } from './relay-helper.js';
 import { openStore } from '../server/store.js';
 import { guardStream } from '../server/static-files.js';
-import { EventEmitter } from 'node:events';
+import { EventEmitter, once } from 'node:events';
+import net from 'node:net';
 import { funnelDecision } from '../deploy/share-guard.js';
 import { createSessions } from '../server/sessions.js';
+import { panasonicDriver } from '../server/drivers/panasonic.js';
 
 test('a folder URL, a traversal and a stream error do not kill the relay', async (t) => {
   const relay = await startRelay(); t.after(relay.close);
@@ -154,4 +156,30 @@ test('a session token can be revoked without ending the others', () => {
   assert.equal(sessions.valid(second), true);
   sessions.revokeAll();
   assert.equal(sessions.valid(second), false);
+});
+
+test('a Panasonic reply that names another command is an error, not a command left waiting', async (t) => {
+  const replies = ['00VXX:LNSI2=+00001', '00VXX:LNSI1=+00001'];
+  const sockets = new Set();
+  const server = net.createServer((socket) => {
+    sockets.add(socket); socket.on('close', () => sockets.delete(socket));
+    socket.write('NTCONTROL 0\r');
+    let text = '', answered = false;
+    socket.on('data', (bytes) => {
+      text += bytes;
+      if (answered || !text.includes('\r')) return;
+      answered = true; socket.write(replies.shift() + '\r');
+    });
+  });
+  server.listen(0, '127.0.0.1'); await once(server, 'listening');
+  t.after(() => { for (const socket of sockets) socket.destroy(); server.close(); });
+  const driver = panasonicDriver({ host: '127.0.0.1', port: server.address().port, timeoutMs: 500 });
+  // The driver's own timer is cleared once a reply arrives, so only this test's limit can show a command that never settles.
+  let limit;
+  const waited = new Promise((resolve) => { limit = setTimeout(resolve, 1500, 'still waiting'); });
+  const outcome = await Promise.race([driver.lens({ op: 'home' }).then(() => 'resolved', (error) => error), waited]);
+  clearTimeout(limit);
+  assert.ok(outcome instanceof Error, `lens home with a mismatched reply: ${outcome}`);
+  assert.match(outcome.message, /does not match the command/);
+  assert.equal(await driver.lens({ op: 'home' }), 'OK', 'a reply that echoes the command sent is still accepted');
 });
