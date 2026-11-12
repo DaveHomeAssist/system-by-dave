@@ -140,7 +140,9 @@
       <details id="power-schedule-panel"><summary>Power scheduling</summary><div id="power-schedules"></div></details>
       <div class="pj-allbar"><button id="discover" class="avd-btn" type="button">Find projectors</button><span id="discover-out" class="pj-mono" aria-live="polite"></span></div>
       <div id="setup" class="pj-list pj-fill" role="region" aria-label="Projector setup" tabindex="0" data-web2-scroll></div>
-      <p class="pj-mono pj-note">Cue input: OSC on UDP 9000 or a text line on TCP 9001. Forms: <code>/proj/P4/shutter 1</code>, <code>/proj/all/power 0</code>, <code>/proj/preset/preshow</code>.</p>
+      <p class="pj-mono" id="relay-build">Build …</p>
+      <p class="pj-mono pj-note">Show lock blocks power off, input, test pattern, picture and lens moves (Stop still works), plus address edits, discovery, presets and power schedules. Shutter and power on stay available.</p>
+      <p class="pj-mono pj-note">Cue input stays on the show LAN: OSC UDP 9000 or a text line on TCP 9001. Do not publish those ports, or the projector ports, on Funnel or a tunnel. Forms: <code>/proj/P4/shutter 1</code>, <code>/proj/all/power 0</code>, <code>/proj/preset/preshow</code>. A TCP reply of OK means the relay finished the cue with no slot error. It does not mean the picture on stage was checked. One power-off cue is accepted until <code>PROJCTL_CUE_POWER_OFF=confirm</code> (send it twice within 3 s) or <code>off</code>.</p>
     </section>
   </main>
 

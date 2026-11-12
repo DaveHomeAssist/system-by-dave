@@ -73,8 +73,14 @@ sample in progress instead of querying alongside it.
 - **Watch:** headroom (rated maximum ambient minus the intake or ambient
   reading) at or below `watchHeadroomC`, default 5 °C.
 - Rated ambient defaults by model: Barco UDM 4K22 40 °C, Panasonic PT-RZ970
-  45 °C, PT-DW830 series 45 °C. Override per slot in the settings file, for
-  example 40 °C for units hung in portrait.
+  45 °C. A PT-DW830 in portrait is 40 °C (operating instructions pp. 16 and
+  158, lamp unit ET-LAD120P/PW, under 1,400 m). A PT-DW830 marked landscape is
+  45 °C. Unknown orientation uses 40 °C. Orientation comes from the unit
+  (`orientation` or `portrait`) and otherwise from its drawing lane.
+- Overrides follow the unit's MAC or IP address. A slot key such as `P4` still
+  applies, so an existing file keeps working, and the Thermal watch marks it
+  as a slot override. An unreadable limits file does not fall back to the
+  higher rating: the panel shows the error and uses the lower model rating.
 
 ## Settings
 
@@ -86,7 +92,7 @@ supplied by the application. Without it, reports are still saved locally.
   "enabled": true,
   "titlePrefix": "Frozen | Projectors | Health Log",
   "notion": { "databaseId": "<database id>" },
-  "ratedAmbientC": { "P3": 40, "P4": 40 },
+  "ratedAmbientC": { "70:58:12:ee:27:0d": 40, "198.51.100.23": 40, "P4": 40 },
   "watchHeadroomC": 5
 }
 ```
@@ -147,8 +153,9 @@ retry, the two API routes and tests. No operator-page panel.
 
 - Panasonic units may refuse `QTM` in standby or cooling; those readings show as
   not read.
-- The 40 °C portrait limit for the PT-DW830U is not confirmed from the operating
-  instructions.
+- The 40 °C portrait limit for the PT-DW830 is the operating-instructions
+  range on pages 16 and 158 (ET-LAD120P/PW, under 1,400 m). Watch is headroom
+  at or below `watchHeadroomC` (≤), including exactly 5 °C.
 - A relay restarted while units are lit takes its first hourly report on the
   next hour; it does not write a power-on report for units already lit.
 

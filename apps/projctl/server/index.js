@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
-import { createHash, timingSafeEqual, randomBytes } from 'node:crypto';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { openStore, simRig } from './store.js';
 import { makeDriver } from './drivers/index.js';
 import { PATTERNS, pictureSchema } from './drivers/panasonic.js';
@@ -12,7 +12,7 @@ import { pjlinkSearch } from './drivers/pjlink.js';
 import { emptyStatus, POWER } from './drivers/base.js';
 import { projectorDisplayInfo, createHostDisplayReader } from './display-info.js';
 import { hasLens, lensSummary, lensPositionMatch, lensMotorState, LENS_AXES } from './preset-lens.js';
-import { startOsc, startTcpLines } from './osc.js';
+import { startOsc, startTcpLines, cuePowerOffMode } from './osc.js';
 import { LANES } from '../public/lanes.js';
 import { confirmations } from './confirmations.js';
 import { readStagePlot } from './stage-plot.js';
@@ -21,10 +21,13 @@ import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
 import { createPoller } from './polling.js';
-import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader, ratedAmbientC, isLit } from './health-reports.js';
+import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader, ratedAmbientDetail, isLit } from './health-reports.js';
 import { createThermalMonitor, thermalThresholds, plausibleAirC, thermalCsv, RETENTION_MS } from './thermal.js';
 import { createManualDiscovery } from './discovery.js';
-import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES } from './http-security.js';
+import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES, mutationAllowed, FRAME_ANCESTORS } from './http-security.js';
+import { servePublic, pipeFile } from './static-files.js';
+import { createSessions } from './sessions.js';
+import { readBuildInfo } from './build-info.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -36,15 +39,23 @@ const readHostDisplays = createHostDisplayReader({ sim: SIM });
 const STARTED_AT = new Date().toISOString();
 // ---- Login (optional). Set PJ_PASSCODE to require it: needed before exposing the relay beyond the LAN.
 const PASSCODE = (process.env.PROJCTL_PASSWORD || process.env.PJ_PASSCODE || '').trim();
-const SESSION_SECRET = randomBytes(32).toString('hex'); // sessions end when the relay restarts
-const SESSION = createHash('sha256').update(`pj:${SESSION_SECRET}:${PASSCODE}`).digest('hex');
+if (!PASSCODE && process.env.PROJCTL_OPEN !== '1') {
+  console.error('[projctl] No passcode configured. Set PJ_PASSCODE or PROJCTL_PASSWORD. Set PROJCTL_OPEN=1 only to run an explicit open relay.');
+  process.exit(1);
+}
+const sessions = createSessions(); // a restart drops every login; logout drops one token, or all of them
+const BUILD = readBuildInfo({ root: path.join(__dirname, '..') });
+const CUE_POWER_OFF = cuePowerOffMode();
 const loginThrottle = createLoginThrottle(); // bounded per-client backoff; active lockouts survive eviction
 const proxy = proxyPolicy(); // PROJCTL_TRUSTED_PROXIES (default loopback); invalid values stop startup
 function cookies(req) { return Object.fromEntries((req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((kv) => kv[0]).map(([k, ...v]) => [k, v.join('=')])); }
 function authed(req) {
   if (!PASSCODE) return true;
-  const c = cookies(req).pj || ''; const want = Buffer.from(SESSION), got = Buffer.from(c);
-  return got.length === want.length && timingSafeEqual(got, want);
+  return sessions.valid(cookies(req).pj || '');
+}
+function sessionCookie(token, req, clear = false) {
+  const secure = proxy.isHttps(req) ? '; Secure' : '';
+  return `pj=${clear ? '' : token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${clear ? 0 : 60 * 60 * 24 * 90}${secure}`;
 }
 function clientIp(req) { return proxy.clientAddress(req); }
 function enforceLoginThrottle(ip, res) {
@@ -59,7 +70,13 @@ const STAGE_PLOT = process.env.STAGE_PLOT || path.join(path.dirname(DATA), 'stag
 const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 'venue');
 
 const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
+const liveAddresses = !store.created && store.rig.projectors.some((p) => p.ip && p.ip !== 'sim');
 if (SIM) simRig(store.rig);
+if (SIM && process.env.RIG && liveAddresses) {
+  const sidecar = path.join(path.dirname(DATA), 'rig.sim-runtime.json');
+  store.setWriteFile(sidecar);
+  console.warn(`[projctl] SIM=1 left ${DATA} unchanged. Simulator state is ${sidecar}.`);
+}
 const rig = store.rig;
 let powerSchedules, poller, health, stopping = false;
 // A lit rig gets a final health report before exit; health.stop() is capped at a few seconds.
@@ -102,7 +119,8 @@ setInterval(() => broadcast({ type: 'heartbeat', at: new Date().toISOString() })
 function snapshot() {
   return {
     type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM, preferredInput: rig.preferredInput || 'HDMI',
-    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS },
+    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS, build: BUILD, storeError: store.lastError(), healthConfigError: healthConfig.error || null,
+      cuePowerOff: CUE_POWER_OFF, showLock: 'Show lock blocks power off, inputs, test patterns, picture, lens moves except Stop, address and driver edits, discovery, presets and power schedules. Shutter and power on stay available.' },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
       return { ...p, password: undefined, status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p),
@@ -118,12 +136,20 @@ function snapshot() {
 function poll(p) {
   return poller.poll(p.slot);
 }
+const freshSlots = new Set();
+const OFFLINE_AFTER = 2;
 poller = createPoller({
   target: (slot) => store.projector(slot),
   intervalMs: POLL_MS,
   timeoutMs: 10000,
   maxRetryMs: Math.max(POLL_MS, 15000),
-  read: (p, options) => p.ip ? driverFor(p).getStatus(options) : null,
+  defer: (slot) => busy.get(slot) === 'lens',
+  read: (p, options) => {
+    if (SIM && p.ip && p.ip !== 'sim') throw new Error('simulator mode will not contact a saved projector address');
+    if (!p.ip) return null;
+    const fresh = freshSlots.delete(p.slot);
+    return driverFor(p).getStatus({ ...options, fresh });
+  },
   started(p, { identityChanged, at }) {
     // Temperature history follows the physical target. Correcting a model or lane label keeps it; a new driver or address starts fresh.
     const target = JSON.stringify([p.driver, p.ip]);
@@ -142,9 +168,14 @@ poller = createPoller({
   },
   succeeded(p, s, { at }) {
     if (!p.ip) return;
-    Object.assign(connections.get(p.slot), { state: 'online', lastSuccessAt: new Date(at).toISOString(), error: null, consecutiveFailures: 0, nextRetryAt: null, retryDelayMs: 0 });
+    Object.assign(connections.get(p.slot), { state: 'online', fresh: true, lastSuccessAt: new Date(at).toISOString(), error: null, consecutiveFailures: 0, nextRetryAt: null, retryDelayMs: 0 });
     const prev = status.get(p.slot);
-    const next = { ...prev, ...s, online: true, updatedAt: new Date().toISOString() };
+    const stale = Array.isArray(s?.stale) ? s.stale : [];
+    const overlay = { ...s };
+    delete overlay.stale;
+    for (const [key, value] of Object.entries(overlay)) if (value === undefined) delete overlay[key];
+    const next = { ...prev, ...overlay, online: true, stale, updatedAt: new Date().toISOString() };
+    for (const key of stale) if (Object.hasOwn(prev, key)) next[key] = prev[key];
     status.set(p.slot, next);
     if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
     health?.observe(p.slot, next.power);
@@ -153,7 +184,9 @@ poller = createPoller({
   },
   failed(p, e, { at, consecutiveFailures, nextRetryAt, retryDelayMs }) {
     const connection = connections.get(p.slot);
-    Object.assign(connection, { state: 'reconnecting', error: connectionError(p, e), lastFailureAt: new Date(at).toISOString(), consecutiveFailures, nextRetryAt: new Date(nextRetryAt).toISOString(), retryDelayMs });
+    const keep = !!status.get(p.slot)?.online && consecutiveFailures < OFFLINE_AFTER;
+    Object.assign(connection, { state: keep ? 'online' : 'reconnecting', fresh: false, error: connectionError(p, e), lastFailureAt: new Date(at).toISOString(), consecutiveFailures, nextRetryAt: new Date(nextRetryAt).toISOString(), retryDelayMs });
+    if (keep) { broadcastStatus(p); return; }
     setOffline(p.slot, connection.error);
   },
 });
@@ -198,13 +231,14 @@ const thermalTargets = new Map();  // slot -> driver and address behind the hist
 const thermalReads = new Map();    // slot -> { at, ok } for the latest finished temperature read
 const thermalAttempts = new Map(); // slot -> when the latest read started
 const telemetryQueue = new Map();  // slot -> tail of that projector's read chain
-const limitFor = (p) => ratedAmbientC(p, healthConfig.ratedAmbientC);
+const limitInfo = (p) => ratedAmbientDetail(p, healthConfig.ratedAmbientC, { reliable: healthConfig.reliable !== false });
+const limitFor = (p) => limitInfo(p).c;
 const airSource = (p) => { const d = driverFor(p); return d.healthReadings ? (d.kind === 'pulse' ? 'ambient' : 'intake') : null; };
 // `source` says what the driver can report (intake, ambient or nothing), so the page can tell
 // "no reading yet" from "this driver does not report temperature".
 function thermalView(p) {
-  const read = thermalReads.get(p.slot);
-  return { ...thermal.view(p.slot, limitFor(p)), source: p.ip ? airSource(p) : null, sampleMs: THERMAL_SAMPLE_MS,
+  const read = thermalReads.get(p.slot), limit = limitInfo(p);
+  return { ...thermal.view(p.slot, limit.c), limitSource: limit.source, limitWarning: limit.warning, configError: healthConfig.error || null, source: p.ip ? airSource(p) : null, sampleMs: THERMAL_SAMPLE_MS,
     lastReadAt: read ? new Date(read.at).toISOString() : null, lastReadOk: read ? read.ok : null };
 }
 function recordThermal(p, readings) {
@@ -235,6 +269,9 @@ function readTelemetry(p, options) {
 }
 // Called after each successful status poll; takes a sample only when one is due.
 function sampleThermal(p, st) {
+  // A partial status read already lost a connection. Do not open the temperature port on top of it.
+  if (st?.stale?.length) return;
+  if ((connections.get(p.slot)?.consecutiveFailures || 0) > 0) return;
   if (!p.ip || !(isLit(st.power) || st.power === POWER.COOLING) || busy.has(p.slot) || !airSource(p)) return;
   if (Date.now() - (thermalAttempts.get(p.slot) ?? -Infinity) < THERMAL_SAMPLE_MS) return;
   const controller = new AbortController();
@@ -276,6 +313,7 @@ async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   executionGuard?.();
   const p = store.projector(slot);
   if (!p) throw httpErr(404, `no projector ${slot}`);
+  if (SIM && p.ip && p.ip !== 'sim') throw httpErr(409, 'simulator mode will not contact a saved projector address');
   const st = status.get(slot);
   if (!st.online) throw httpErr(409, `${slot} is offline`);
   const resettingInput = cmd === 'resetInput';
@@ -306,7 +344,7 @@ async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   finally { if (moving) { busy.delete(slot); broadcast({ type: 'busy', slot, busy: null }); } }
   store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail });
   broadcast({ type: 'event', event: rig.events.at(-1) });
-  if (cmd === 'lens' || cmd === 'input' || cmd === 'picture') await poller.refresh(slot);
+  if (cmd === 'lens' || cmd === 'input' || cmd === 'picture' || cmd === 'pattern') { freshSlots.add(slot); await poller.refresh(slot); }
   else setTimeout(() => poll(p), 400);
   return { result, status: { ...status.get(slot), connection: connections.get(slot) } };
 }
@@ -339,6 +377,19 @@ async function uiCommand(slot, cmd, arg, confirm) {
   const slots = slot === 'all' ? rig.projectors.map((p) => p.slot) : [slot];
   const out = {};
   let targets = slots.map((s) => ({ slot: s }));
+  if (cmd === 'lens' && arg?.op === 'home') {
+    if (rig.lock) throw httpErr(423, 'show lock is on');
+    const key = `${slot}:lens:home`;
+    const confirmed = pendingConfirm.take(key, confirm);
+    if (!confirmed) {
+      const p = store.projector(slot);
+      if (!p) throw httpErr(404, `no projector ${slot}`);
+      if (!status.get(slot)?.online) throw httpErr(409, `${slot} is offline`);
+      return { [slot]: { confirm: pendingConfirm.issue(key, [{ slot, identity: targetIdentity(p) }]), message: `Tap again within 3 s to send ${slot} lens shift to home` } };
+    }
+    const p = store.projector(slot);
+    if (!p || confirmed[0]?.identity !== targetIdentity(p)) throw httpErr(409, 'configuration changed; confirm again');
+  }
   if (cmd === 'power' && !arg) {
     if (rig.lock) throw httpErr(423, 'show lock is on');
     const key = `${slot}:power:off`;
@@ -396,7 +447,7 @@ async function recallPreset(name, source = 'ui', confirmedLens = false) {
       const r = await command(slot, 'lens', { op: 'recall', targets: Object.fromEntries(info.supported.map((k) => [k, info.saved[k]])) }, `${source} preset ${name}`);
       // Failed polls preserve last-known status for the UI. Those cached values
       // must not verify the movement that just finished.
-      const freshLens = r.status?.online && r.status?.connection?.state === 'online' ? r.status.lens : null;
+      const freshLens = r.status?.online && r.status?.connection?.state === 'online' && r.status?.connection?.fresh !== false ? r.status.lens : null;
       out[slot] = { ...info, position: lensPositionMatch(freshLens, info.saved, info.supported), motors: lensMotorState(freshLens, info.supported), result: freshLens ? 'fresh feedback received; verify position per axis' : 'fresh lens feedback unavailable; cached values are not verification', lens: freshLens ?? null, status: r.status };
     } catch (e) { out[slot] = { ...info, result: e.message, lens: 'unknown' }; }
   }
@@ -446,6 +497,14 @@ async function onCue(addr, args, source) {
     const slots = parts[1] === 'all' ? rig.projectors.map((p) => p.slot) : [parts[1].toUpperCase()];
     const cmd = parts[2]; const arg = args[0];
     if (cmd !== 'input' && ![0, 1, '0', '1'].includes(arg)) throw new Error(`${cmd} needs 0 or 1`);
+    if (cmd === 'power' && Number(arg) !== 1) {
+      if (CUE_POWER_OFF === 'off') throw new Error('Cue power off is disabled');
+      if (CUE_POWER_OFF === 'confirm') {
+        const armed = cueOffArmed.get(source) || 0;
+        if (armed < Date.now()) { cueOffArmed.set(source, Date.now() + 3000); throw new Error('Cue power off needs the same cue again within 3 s'); }
+        cueOffArmed.delete(source);
+      }
+    }
     const out = {};
     for (const s of slots) {
       try { out[s] = await command(s, cmd, cmd === 'input' ? arg : Number(arg) === 1, source); }
@@ -458,6 +517,8 @@ async function onCue(addr, args, source) {
     return out;
   } catch (e) { store.event({ source, slot: parts[1], command: addr, result: 'ERR', detail: e.message }); broadcast({ type: 'event', event: rig.events.at(-1) }); return { error: e.message }; }
 }
+const cueOffArmed = new Map();
+if (CUE_POWER_OFF === 'allow') console.warn('[cue] Power off cues are a single packet until PROJCTL_CUE_POWER_OFF=confirm or off. Show lock still blocks them. Do not publish UDP 9000, TCP 9001, or projector ports on Funnel or a tunnel.');
 startOsc({ port: OSC_PORT, onMessage: onCue });
 startTcpLines({ port: TCP_PORT, onMessage: onCue });
 
@@ -467,14 +528,37 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 const PUB = path.join(__dirname, '..', 'public');
 function body(req) { return readJsonBody(req); } // 64 KiB JSON object, 10 s to arrive
 function confirmTokenFor(_name, token) { return typeof token === 'string' && token.length <= 256 ? token : ''; }
-function json(res, code, obj) { res.writeHead(code, { 'content-type': 'application/json', 'access-control-allow-origin': '*' }); res.end(JSON.stringify(obj)); }
+function json(res, code, obj) { res.writeHead(code, { 'content-type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); }
+function requireUnlocked() { if (rig.lock) throw httpErr(423, 'show lock is on'); }
+function guardMutation(req) {
+  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) return;
+  if (!mutationAllowed(req, proxy)) throw httpErr(403, 'this request is not allowed from that page');
+}
+function socketAllowed(req) {
+  const site = String(req.headers['sec-fetch-site'] || '').toLowerCase();
+  if (site && site !== 'same-origin' && site !== 'none') return false;
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  try {
+    const host = new URL(origin).host.toLowerCase();
+    const names = new Set([String(req.headers.host || '').toLowerCase()]);
+    if (proxy.trusted(req.socket?.remoteAddress)) {
+      const forwarded = String(req.headers['x-forwarded-host'] || '').split(',')[0].trim().toLowerCase();
+      if (forwarded) names.add(forwarded);
+    }
+    return names.has(host);
+  } catch { return false; }
+}
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   try {
+    res.setHeader('content-security-policy', FRAME_ANCESTORS);
+    res.setHeader('x-content-type-options', 'nosniff');
     res.setHeader('cache-control', 'no-store');
-    if (url.pathname === '/api/health' && req.method === 'GET') return json(res, 200, { ok: true, service: 'projctl', simulation: SIM, uptimeSeconds: Math.floor(process.uptime()) });
-    if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'content-type', 'access-control-allow-methods': 'GET,POST' }); return res.end(); }
+    if (url.pathname === '/api/health' && req.method === 'GET') return json(res, 200, { ok: true, service: 'projctl', simulation: SIM, login: PASSCODE ? 'passcode' : 'open', uptimeSeconds: Math.floor(process.uptime()), ...BUILD });
+    if (req.method === 'OPTIONS') { res.writeHead(mutationAllowed(req, proxy, { requireJson: false }) ? 204 : 403); return res.end(); }
+    guardMutation(req);
     if (url.pathname === '/api/login' && req.method === 'POST') {
       if (!PASSCODE) return json(res, 200, { ok: true, open: true });
       const ip = clientIp(req);
@@ -485,10 +569,16 @@ const server = http.createServer(async (req, res) => {
       const a = Buffer.from(String(code || '')), b = Buffer.from(PASSCODE);
       if (a.length !== b.length || !timingSafeEqual(a, b)) { loginThrottle.fail(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'ERR', detail: `wrong passcode from ${ip}` }); throw httpErr(401, 'wrong passcode'); }
       loginThrottle.succeed(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'OK', detail: ip });
-      const secure = proxy.isHttps(req) ? '; Secure' : '';
-      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': `pj=${SESSION}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${60 * 60 * 24 * 90}${secure}` }); return res.end(JSON.stringify({ ok: true }));
+      const token = sessions.issue();
+      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': sessionCookie(token, req) }); return res.end(JSON.stringify({ ok: true }));
     }
-    if (url.pathname === '/api/logout' && req.method === 'POST') { res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': 'pj=; Path=/; HttpOnly; Max-Age=0' }); return res.end('{"ok":true}'); }
+    if (url.pathname === '/api/logout' && req.method === 'POST') {
+      const token = cookies(req).pj || '';
+      let all = false;
+      try { all = !!(await body(req)).all; } catch { /* a JSON object is required; an empty one logs out this token */ }
+      if (all) sessions.revokeAll(); else sessions.revoke(token);
+      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': sessionCookie('', req, true) }); return res.end('{"ok":true}');
+    }
     if (url.pathname === '/login.html' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css') { /* public assets */ }
     else if (!authed(req)) {
       if (url.pathname.startsWith('/api/')) throw httpErr(401, 'login required');
@@ -496,9 +586,9 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
     if (url.pathname === '/api/power-schedules' && req.method === 'GET') return json(res, 200, powerSchedules.view());
-    if (url.pathname === '/api/power-schedules/save' && req.method === 'POST') return json(res, 200, powerSchedules.save(await body(req)));
-    if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
-    if (url.pathname === '/api/power-schedules/delete' && req.method === 'POST') { const { id } = await body(req); return json(res, 200, powerSchedules.remove(id)); }
+    if (url.pathname === '/api/power-schedules/save' && req.method === 'POST') { requireUnlocked(); return json(res, 200, powerSchedules.save(await body(req))); }
+    if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { requireUnlocked(); const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
+    if (url.pathname === '/api/power-schedules/delete' && req.method === 'POST') { requireUnlocked(); const { id } = await body(req); return json(res, 200, powerSchedules.remove(id)); }
     if (url.pathname === '/api/health-reports' && req.method === 'GET') return json(res, 200, health.view());
     if (url.pathname === '/api/health-reports/run' && req.method === 'POST') return json(res, 200, { report: await health.run(), ...health.view() });
     if (url.pathname === '/api/thermal' && req.method === 'GET') {
@@ -519,6 +609,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/host-displays' && req.method === 'GET') return json(res, 200, await readHostDisplays());
     if (url.pathname === '/api/preferred-input' && req.method === 'POST') {
+      requireUnlocked();
       const { input } = await body(req);
       if (input !== 'HDMI') throw httpErr(400, 'The supported default input is HDMI.');
       rig.preferredInput = input; store.save(); broadcast(snapshot());
@@ -544,11 +635,12 @@ const server = http.createServer(async (req, res) => {
       const { slot, cmd, arg, confirm } = await body(req);
       return json(res, 200, await uiCommand(slot, cmd, arg, confirm));
     }
-    if (url.pathname === '/api/preset/save' && req.method === 'POST') { const { name } = await body(req); if (!name) throw httpErr(400, 'name required'); savePreset(name); return json(res, 200, { ok: true }); }
-    if (url.pathname === '/api/preset/recall' && req.method === 'POST') { const { name, confirmLens } = await body(req); return json(res, 200, await recallPreset(name, 'ui', confirmTokenFor(name, confirmLens) || false)); }
-    if (url.pathname === '/api/preset/delete' && req.method === 'POST') { const { name } = await body(req); rig.presets = rig.presets.filter((x) => x.name !== name); store.save(); broadcast(snapshot()); return json(res, 200, { ok: true }); }
+    if (url.pathname === '/api/preset/save' && req.method === 'POST') { requireUnlocked(); const { name } = await body(req); if (!name) throw httpErr(400, 'name required'); savePreset(name); return json(res, 200, { ok: true }); }
+    if (url.pathname === '/api/preset/recall' && req.method === 'POST') { requireUnlocked(); const { name, confirmLens } = await body(req); return json(res, 200, await recallPreset(name, 'ui', confirmTokenFor(name, confirmLens) || false)); }
+    if (url.pathname === '/api/preset/delete' && req.method === 'POST') { requireUnlocked(); const { name } = await body(req); rig.presets = rig.presets.filter((x) => x.name !== name); store.save(); broadcast(snapshot()); return json(res, 200, { ok: true }); }
     if (url.pathname === '/api/lock' && req.method === 'POST') { const { lock } = await body(req); rig.lock = !!lock; pendingConfirm.clear(); store.save(); store.event({ source: 'ui', slot: '*', command: `lock ${rig.lock ? 'on' : 'off'}`, result: 'OK' }); broadcast(snapshot()); return json(res, 200, { lock: rig.lock }); }
     if (url.pathname === '/api/projector' && req.method === 'POST') {
+      requireUnlocked();
       const upd = await body(req); const p = store.projector(upd.slot); if (!p) throw httpErr(404, 'no slot');
       for (const k of ['reverseH', 'reverseV']) {
         if (k in upd && typeof upd[k] !== 'boolean') throw httpErr(400, `${k} must be true or false`);
@@ -560,34 +652,30 @@ const server = http.createServer(async (req, res) => {
       for (const k of ['lane', 'label', 'make', 'model', 'owner', 'driver', 'mac', 'ip', 'notes', 'user', 'password', 'inputs', 'reverseH', 'reverseV']) if (k in upd) p[k] = upd[k];
       store.save(); store.event({ source: 'ui', slot: p.slot, command: 'edit', result: 'OK' }); poll(p); broadcast(snapshot()); return json(res, 200, { ok: true });
     }
-    if (url.pathname === '/api/discover' && req.method === 'POST') return json(res, 200, await discover('ui'));
+    if (url.pathname === '/api/discover' && req.method === 'POST') { requireUnlocked(); return json(res, 200, await discover('ui')); }
     if (url.pathname === '/api/sim' && req.method === 'POST' && SIM) { // test hook: toggle offline or set an out-of-position reported lens readback
       const { slot, offline, lens, temps } = await body(req); const d = driverFor(store.projector(slot)); if (offline !== undefined) d._state.flaky = !!offline; if (temps && typeof temps === 'object') d._state.temps = { intake: 24, qtm1: 36, qtm2: 31, ...d._state.temps, ...temps }; if (lens) Object.assign(d._state.lens, lens); if (lens?._pollFocus != null) d._state.pollFocus = lens._pollFocus; return json(res, 200, { ok: true });
     }
-    // static
     if (url.pathname.startsWith('/ProjectorThrow/')) {
       const asset = throwlineAsset(url.pathname);
       if (!asset) { res.writeHead(404); return res.end('not found'); }
-      res.writeHead(200, { 'content-type': 'application/javascript' });
-      return fs.createReadStream(asset).pipe(res);
+      return pipeFile(res, asset, { 'content-type': 'application/javascript' });
     }
-    let filePath = url.pathname === '/' ? '/index.html' : url.pathname;
-    const fp = path.join(PUB, path.normalize(filePath));
-    if (!fp.startsWith(PUB) || !fs.existsSync(fp)) { res.writeHead(404); return res.end('not found'); }
-    if (fp === path.join(PUB, 'index.html')) {
-      const html = withThrowlineImports(fs.readFileSync(fp, 'utf8'));
-      res.writeHead(200, { 'content-type': MIME['.html'] });
-      return res.end(html);
-    }
-    res.writeHead(200, { 'content-type': MIME[path.extname(fp)] || 'application/octet-stream' });
-    fs.createReadStream(fp).pipe(res);
+    const requestPath = url.pathname === '/' ? '/index.html' : url.pathname;
+    return servePublic(res, requestPath, {
+      root: PUB, mime: MIME, indexHtml(_res, file) {
+        const html = withThrowlineImports(fs.readFileSync(file, 'utf8'));
+        res.writeHead(200, { 'content-type': MIME['.html'] });
+        return res.end(html);
+      },
+    });
   } catch (e) { if (e.closeConnection) res.setHeader('connection', 'close'); json(res, e.status || 500, { error: e.message }); }
 });
 applyServerLimits(server);
 
 // Browsers never send messages on this socket; keep any inbound frame small.
 const wss = new WebSocketServer({ noServer: true, maxPayload: 64 * 1024 });
-server.on('upgrade', (req, sock, head) => { if (new URL(req.url, 'http://x').pathname !== '/ws' || !authed(req)) { sock.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); return sock.destroy(); } wss.handleUpgrade(req, sock, head, (ws) => wss.emit('connection', ws, req)); });
+server.on('upgrade', (req, sock, head) => { if (new URL(req.url, 'http://x').pathname !== '/ws' || !authed(req) || !socketAllowed(req)) { sock.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); return sock.destroy(); } wss.handleUpgrade(req, sock, head, (ws) => wss.emit('connection', ws, req)); });
 wss.on('connection', (ws) => { clients.add(ws); ws.send(JSON.stringify(snapshot())); ws.on('close', () => clients.delete(ws)); });
 
 server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${server.address().port}  rig=${DATA}  login=${PASSCODE ? 'passcode' : 'open (LAN only)'}`));

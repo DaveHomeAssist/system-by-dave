@@ -16,9 +16,29 @@ const DEFAULT_RIG = {
   events: [],
 };
 
+function fsyncDirectory(file) {
+  let fd;
+  try { fd = fs.openSync(path.dirname(file), 'r'); fs.fsyncSync(fd); }
+  catch (error) { if (!['EINVAL', 'ENOTSUP', 'EPERM', 'EBADF'].includes(error.code)) throw error; }
+  finally { if (fd !== undefined) fs.closeSync(fd); }
+}
+// Write the temp file, fsync it, keep the previous bytes as .bak, then rename.
+// A failure leaves the previous file in place and is reported by the caller.
+export function atomicReplace(file, text) {
+  const temporary = file + '.tmp';
+  const fd = fs.openSync(temporary, 'w', 0o600);
+  try { fs.writeFileSync(fd, text); fs.fsyncSync(fd); }
+  finally { fs.closeSync(fd); }
+  if (fs.existsSync(file)) {
+    try { fs.copyFileSync(file, file + '.bak'); } catch (error) { console.error('[store] backup not written:', error.message); }
+  }
+  fs.renameSync(temporary, file);
+  fsyncDirectory(file);
+}
+
 export function openStore(file, { allowCreate = true } = {}) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  let rig;
+  let rig, created = false;
   try { rig = JSON.parse(fs.readFileSync(file, 'utf8')); }
   catch (error) {
     if (error.code !== 'ENOENT' || !allowCreate) {
@@ -26,19 +46,22 @@ export function openStore(file, { allowCreate = true } = {}) {
       throw new Error(`Cannot read saved rig (${reason}): ${file}. Restore a readable valid rig before starting; existing data was preserved.`);
     }
     rig = structuredClone(DEFAULT_RIG);
+    created = true;
   }
   if (!rig || !Array.isArray(rig.projectors) || !Array.isArray(rig.presets) || !Array.isArray(rig.events)) throw new Error('Invalid saved rig shape. Existing data was preserved.');
-  let pending = null;
+  let pending = null, target = file, lastError = null;
   const flush = () => {
     if (pending) clearTimeout(pending);
     pending = null;
-    const temporary = file + '.tmp';
-    fs.writeFileSync(temporary, JSON.stringify(rig, null, 2), { mode: 0o600 });
-    fs.renameSync(temporary, file);
+    try { atomicReplace(target, JSON.stringify(rig, null, 2) + '\n'); lastError = null; }
+    catch (error) { lastError = error.message || 'rig file was not saved'; console.error('[store] rig not saved:', lastError); }
   };
-  const save = () => { if (!pending) pending = setTimeout(flush, 150); };
+  const save = () => { if (!pending) pending = setTimeout(() => { pending = null; flush(); }, 150); if (pending?.unref) pending.unref(); };
   return {
-    rig, save, flush, close: () => { if (pending) flush(); },
+    rig, save, flush, created, close: () => { if (pending) flush(); },
+    writeFile: () => target,
+    setWriteFile(next) { target = next; },
+    lastError: () => lastError,
     projector(slot) { return rig.projectors.find((p) => p.slot === slot); },
     event(e) {
       rig.events.push({ at: new Date().toISOString(), ...e });

@@ -42,9 +42,13 @@ test('TCP bounds pending async cue execution across connections', async t => {
   const f = await fixture(t, { maxInFlight: 1, onMessage: () => { entered++; return pending; } });
   t.after(() => release());
   const first = await f.connect();
-  const acknowledged = new Promise(resolve => first.once('data', resolve));
-  first.write('/proj/P1/power 1\n'); await acknowledged;
+  first.write('/proj/P1/power 1\n');
+  for (let i = 0; i < 50 && entered < 1; i++) await new Promise(resolve => setTimeout(resolve, 10));
+  assert.equal(entered, 1);
   const second = await f.connect(), closed = once(second, 'close');
   second.write('/proj/P2/power 1\n'); await closed;
-  assert.equal(entered, 1); release();
+  assert.equal(entered, 1);
+  release();
+  const reply = await new Promise(resolve => first.once('data', resolve));
+  assert.match(reply.toString(), /^OK\n/);
 });

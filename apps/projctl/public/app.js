@@ -133,7 +133,12 @@ function renderOverview() {
   $('[data-all="resetInput"]').disabled = !connected || state.lock || !state.projectors.some((p) => p.inputPreference?.available && connectionOf(p).current && !p.busy);
   const online = state.projectors.filter((p) => connectionOf(p).current).length;
   const assigned = rigLanes(state.projectors).filter((x) => x.projector).length;
-  $('#relay-mode').textContent = state.simulation === true ? 'DEMO · simulated devices' : state.simulation === false ? 'REAL RELAY' : 'Connecting…';
+  const build = state.relay?.build, rev = build?.commit ? String(build.commit).slice(0, 7) : 'dev';
+  const mode = state.simulation === true ? 'DEMO · simulated devices' : state.simulation === false ? 'REAL RELAY' : 'Connecting…';
+  $('#relay-mode').textContent = build ? `${mode} · ${build.version || ''} · ${rev}` : mode;
+  $('#relay-mode').title = build ? `Version ${build.version || ''}${build.commit ? ` · ${build.commit}` : ''}${build.builtAt ? ` · built ${build.builtAt}` : ''}` : '';
+  const buildNote = $('#relay-build');
+  if (buildNote) buildNote.textContent = build ? `Build ${build.version || 'unknown'}${build.commit ? ` · ${build.commit}` : ''}${build.builtAt ? ` · ${build.builtAt}` : ''}` : '';
   $('#relay-mode').classList.toggle('pj-mode--demo', state.simulation === true);
   const staticPreview = location.pathname.includes('/apps/projctl/public') || ['systembydave.com', 'www.systembydave.com', 'davehomeassist.github.io'].includes(location.hostname);
   $('#local-controller-help').hidden = connected || !staticPreview;
@@ -415,7 +420,8 @@ function renderSetup() {
 function renderAll() {
   $('#show').textContent = state.show || 'Projectors';
   const lockButton = $('#show-lock');
-  const lockLabel = state.lock ? 'Show lock on. Disable show lock' : 'Show lock off. Enable show lock';
+  const lockDetail = 'Blocks power off, inputs, patterns, picture, lens moves except Stop, address and driver edits, discovery, presets and schedules. Shutter and power on stay available.';
+  const lockLabel = state.lock ? `Show lock on. ${lockDetail}` : `Show lock off. ${lockDetail}`;
   lockButton.setAttribute('aria-pressed', String(!!state.lock));
   lockButton.setAttribute('aria-label', lockLabel); lockButton.title = lockLabel;
   lockButton.dataset.lockState = state.lock ? 'locked' : 'unlocked';
@@ -423,11 +429,12 @@ function renderAll() {
   $('[data-all="resetInput"]').textContent = `Reset all to ${state.preferredInput || 'HDMI'}`;
   $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = state.presets.length || '';
   document.querySelectorAll('[data-all="power"][data-arg="0"], [data-all="pattern"]').forEach((b) => b.disabled = state.lock || !connected);
+  const discover = $('#discover'); if (discover) discover.disabled = !connected || !!state.lock;
   renderGrid(); renderThermal(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
 }
 
 // ---- Adjust sheet: patterns, lens, picture ----
-let adjSlot = null, adjSpeed = 'slow', adjHomeArmed = 0, adjReturnFocus = null, adjReturnSection = 'pattern', pictureRequestId = 0;
+let adjSlot = null, adjSpeed = 'slow', adjReturnFocus = null, adjReturnSection = 'pattern', pictureRequestId = 0;
 function openAdjust(slot, section = 'pattern') {
   pictureRequestId++; $('#adj-picture').replaceChildren(); $('#adj-pic-note').textContent = '';
   adjSlot = slot; const p = state.projectors.find((x) => x.slot === slot); if (!p) return;
@@ -490,10 +497,7 @@ document.querySelectorAll('.lens button[data-l]').forEach((b) => b.onclick = () 
   if (!p) return;
   cmd(adjSlot, 'lens', { axis: b.dataset.l, speed: adjSpeed, dir: lensDirection(p, b.dataset.l, b.dataset.d) });
 });
-$('#adj-home').onclick = () => {
-  if (Date.now() - adjHomeArmed > 3000) { adjHomeArmed = Date.now(); toast('Tap again within 3 s to send lens shift to home'); return; }
-  adjHomeArmed = 0; cmd(adjSlot, 'lens', { op: 'home' });
-};
+$('#adj-home').onclick = (event) => cmd(adjSlot, 'lens', { op: 'home' }, event.currentTarget);
 $('#adj-pic-reload').onclick = () => loadPicture();
 async function loadPicture() {
   const slot = adjSlot, requestId = ++pictureRequestId; const el = $('#adj-picture'); el.innerHTML = ''; $('#adj-pic-note').textContent = 'Reading values…';

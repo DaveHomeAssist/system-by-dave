@@ -65,6 +65,7 @@ export function pictureSchema() {
 export function panasonicDriver({ host, port = 1024, user = 'admin1', password = '', timeoutMs = 5000, model = '', ...rest }) {
   const pj = pjlinkDriver({ host, password, ...rest, port: 4352 });
   const patterns = patternsFor(model);
+  let patternAt = 0;
 
   function native(cmd, { signal } = {}) {
     throwIfAborted(signal);
@@ -76,10 +77,13 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
       const abort = () => fail(signal.reason || new Error('Projector poll cancelled'));
       const t = setTimeout(() => fail(new Error('timeout (port 1024)')), timeoutMs);
       signal?.addEventListener('abort', abort, { once: true });
+      let bytes = 0;
       sock.on('error', fail);
       sock.on('end', () => fail(new Error('connection closed before Panasonic reply')));
       sock.on('close', () => fail(new Error('connection closed before Panasonic reply')));
       sock.on('data', (d) => {
+        bytes += d.length;
+        if (bytes > 8192) return fail(new Error('Panasonic response exceeds size limit'));
         buf += d.toString('latin1');
         let idx;
         while ((idx = buf.indexOf('\r')) >= 0) {
@@ -90,12 +94,16 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
             try { throwIfAborted(signal); sock.write(prefix + '00' + cmd + '\r'); } catch (e) { return fail(e); }
           } else {
             cleanup(); done = true; sock.end();
-            const body = line.replace(/^00/, '');
-            if (body === 'ERRA') return reject(new Error('auth failed: admin user/password wrong (Setup tab)'));
-            if (body.startsWith('ER401')) return reject(Object.assign(new Error('projector refuses this now (no signal, wrong state, or unsupported)'), { code: 'ER401' }));
-            if (body.startsWith('ER402')) return reject(new Error('invalid parameter'));
-            if (body.startsWith('ER')) return reject(new Error(body));
-            resolve(body);
+            const body = line.startsWith('00') ? line.slice(2) : line;
+            const commandName = cmd.split('=')[0];
+            const echoed = /^([A-Z]{2,}(?::[A-Z0-9]+)?)=(.*)$/.exec(body);
+            if (echoed && echoed[1] !== commandName) return fail(new Error('Panasonic reply does not match the command'));
+            const payload = echoed ? echoed[2] : body;
+            if (payload === 'ERRA') return reject(new Error('auth failed: admin user/password wrong (Setup tab)'));
+            if (payload.startsWith('ER401')) return reject(Object.assign(new Error('projector refuses this now (no signal, wrong state, or unsupported)'), { code: 'ER401' }));
+            if (payload.startsWith('ER402')) return reject(new Error('invalid parameter'));
+            if (payload.startsWith('ER')) return reject(new Error(payload));
+            resolve(payload);
           }
         }
       });
@@ -108,9 +116,16 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'native-jog', stop: false, positionReadback: false },
     lensControls: { h: false, v: false, focus: false, zoom: false },
     patterns,
-    async getStatus({ signal } = {}) {
-      const s = await pj.getStatus({ signal });
-      try { s.pattern = await native('QTS', { signal }); } catch { throwIfAborted(signal); s.pattern = null; }
+    async getStatus({ signal, fresh = false } = {}) {
+      const s = await pj.getStatus({ signal, fresh });
+      const due = fresh || !patternAt || Date.now() - patternAt >= 60000;
+      if (!due) return s;
+      try { s.pattern = await native('QTS', { signal }); patternAt = Date.now(); }
+      catch (error) {
+        throwIfAborted(signal);
+        if (transportFailure(error)) s.stale = [...(s.stale || []), 'pattern'];
+        else s.pattern = null;
+      }
       throwIfAborted(signal);
       return s;
     },

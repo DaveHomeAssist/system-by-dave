@@ -150,3 +150,43 @@ test('compound recall validates all axes before targets and stops all axes on a 
   await assert.rejects(driver.recallLens({ focus: 10, zoom: 20 }), /stop requested/);
   assert.deepEqual(requests.filter(r => r.method.endsWith('.stop')).map(r => r.method), ['optics.focus.stop', 'optics.zoom.stop']);
 });
+
+test('Stop is not queued behind a slow status read, and one axis failure still stops the others', async (t) => {
+  let release;
+  const held = new Promise((resolve) => { release = resolve; });
+  const stops = [];
+  const server = net.createServer((socket) => {
+    let text = '';
+    socket.on('data', (bytes) => {
+      text += bytes;
+      if (!text.includes('\n')) return;
+      const request = JSON.parse(text);
+      text = '';
+      const method = String(request.method);
+      if (method === 'property.get' && request.params?.property === 'system.state') {
+        held.then(() => socket.end(JSON.stringify({ jsonrpc: '2.0', id: request.id, result: 'on' })));
+        return;
+      }
+      if (method.endsWith('.stop')) {
+        stops.push(method);
+        if (method.startsWith('optics.focus')) { socket.destroy(); return; }
+        socket.end(JSON.stringify({ jsonrpc: '2.0', id: request.id, result: null }));
+        return;
+      }
+      socket.end(JSON.stringify({ jsonrpc: '2.0', id: request.id, error: { code: -32601, message: 'unsupported' } }));
+    });
+  });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  t.after(() => { release(); server.close(); });
+  const driver = pulseDriver({ host: '127.0.0.1', port: server.address().port, timeoutMs: 1000 });
+  const pending = driver.getStatus();
+  await new Promise((resolve) => setTimeout(resolve, 40));
+  assert.equal(stops.length, 0);
+  await assert.rejects(driver.lens({ op: 'stop' }), /did not acknowledge/);
+  assert.equal(stops.length, 4);
+  assert.ok(stops.includes('optics.focus.stop'));
+  release();
+  const status = await pending;
+  assert.equal(status.power, 'on');
+});

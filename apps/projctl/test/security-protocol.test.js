@@ -22,16 +22,24 @@ test('cue policy validates configuration and supports explicit disable', () => {
   assert.equal(startOsc({ port: 0, enabled: false, allowlist: '', host: '127.0.0.1' }), null);
   assert.equal(startTcpLines({ port: 0, enabled: false, allowlist: '', host: '127.0.0.1' }), null);
 });
-test('TCP refuses an unlisted peer before dispatch', { timeout: 3000 }, async t => {
+test('loopback stays allowed and an unlisted address does not', { timeout: 3000 }, async t => {
   let calls = 0;
-  const server = startTcpLines({ port: 0, host: '127.0.0.1', enabled: true, allowlist: '192.0.2.1', onMessage: () => { calls++; } });
+  const server = startTcpLines({ port: 0, host: '127.0.0.1', enabled: true, allowlist: '192.0.2.1', onMessage: () => { calls++; return { P1: { result: 'OK' } }; } });
   await once(server, 'listening');
   const client = net.connect(server.address().port, '127.0.0.1');
   client.on('error', () => {});
   t.after(async () => { client.destroy(); await new Promise(resolve => server.close(resolve)); });
-  const closed = new Promise(resolve => client.once('close', resolve));
-  client.on('connect', () => client.write('/proj/P1/power 0\n'));
-  await closed; assert.equal(calls, 0);
+  const reply = new Promise(resolve => client.once('data', resolve));
+  client.on('connect', () => client.write('/proj/P1/shutter 1\n'));
+  assert.match((await reply).toString(), /^OK\n/);
+  assert.equal(calls, 1);
+  const listed = cuePolicy('TCP', { allowlist: '192.0.2.1' }, {});
+  assert.equal(listed.permits('192.0.2.1'), true);
+  assert.equal(listed.permits('198.51.100.4'), false);
+  assert.equal(listed.permits('127.0.0.1'), true);
+  assert.equal(cuePolicy('TCP', {}, {}).permits('198.51.100.4'), true, 'an unset allowlist keeps existing show cues working');
+  assert.equal(cuePolicy('TCP', { allowlist: '' }, {}).permits('198.51.100.4'), false);
+  assert.equal(cuePolicy('TCP', { allowlist: '' }, {}).permits('::1'), true);
 });
 async function projector(t, reply, handshake = 'PJLINK 0\r') {
   const sockets = new Set();

@@ -46,22 +46,130 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
       });
     });
   }
+  // One TCP session carries as many commands as the projector keeps the socket
+  // open. Class 1 gear often closes after each reply; the rest continue on a
+  // new session instead of failing the poll. NAME and LAMP are not on the fast path.
+  let slowAt = 0;
+  function sessionOnce(commands, { signal } = {}) {
+    return new Promise((resolve, reject) => {
+      throwIfAborted(signal);
+      const sock = net.createConnection({ host, port });
+      let buf = '', bytes = 0, prefix = null, index = 0, awaiting = false, done = false, closed = false, timer, reuse;
+      const entries = [];
+      const cleanup = () => { clearTimeout(timer); clearTimeout(reuse); signal?.removeEventListener('abort', onAbort); };
+      const finish = (error, stop) => {
+        if (done) return;
+        done = true; cleanup(); sock.destroy();
+        if (error && !entries.length) reject(error);
+        else resolve({ entries, consumed: entries.length, stop: !!stop || !!error });
+      };
+      const arm = () => { clearTimeout(timer); timer = setTimeout(() => finish(new Error('timeout'), true), timeoutMs); };
+      const onAbort = () => finish(signal.reason || new Error('Projector poll cancelled'), true);
+      const writeCommand = () => {
+        awaiting = true; arm();
+        try { throwIfAborted(signal); sock.write(prefix + '%1' + commands[index] + '\r'); }
+        catch (error) { finish(error, true); }
+      };
+      arm();
+      signal?.addEventListener('abort', onAbort, { once: true });
+      sock.on('error', error => finish(error, true));
+      sock.on('end', () => {
+        closed = true;
+        if (done) return;
+        if (awaiting && !entries.length) finish(new Error('connection closed before PJLink reply'), true);
+        else finish(null, false);
+      });
+      sock.on('close', () => { if (!done && !entries.length) finish(new Error('connection closed before PJLink reply'), true); });
+      sock.on('data', data => {
+        if (done) return;
+        bytes += data.length;
+        if (bytes > 8192) return finish(new Error('PJLink response exceeds size limit'), true);
+        buf += data.toString('latin1');
+        let idx;
+        while (!done && (idx = buf.indexOf('\r')) >= 0) {
+          const line = buf.slice(0, idx); buf = buf.slice(idx + 1);
+          if (prefix === null) {
+            if (line === 'PJLINK 0') prefix = '';
+            else if (/^PJLINK 1 [0-9a-fA-F]{8}$/.test(line)) prefix = createHash('md5').update(line.slice(9) + password).digest('hex');
+            else return finish(new Error('Invalid PJLink handshake'), true);
+            writeCommand();
+            continue;
+          }
+          if (line === 'PJLINK ERRA') return finish(Object.assign(new Error('auth failed: PJLink password wrong or not set (Setup tab)'), { code: 'ERRA' }), true);
+          const match = line.match(/^%1([A-Z]{4})=(.*)$/);
+          const cmd = commands[index];
+          if (!match || match[1] !== cmd.slice(0, 4)) return finish(new Error('Mismatched or malformed PJLink reply'), true);
+          const value = match[2];
+          if (Object.hasOwn(ERR, value)) entries.push([cmd, { error: Object.assign(new Error(ERR[value]), { code: value }) }]);
+          else if (!cmd.endsWith(' ?') && value !== 'OK') return finish(new Error('Invalid PJLink command acknowledgement'), true);
+          else entries.push([cmd, { value }]);
+          index += 1; awaiting = false;
+          if (index >= commands.length) return finish(null, true);
+          // 'end' is delivered after setImmediate on this runtime. A zero timer
+          // sees the close first, so a one-reply projector is not written again.
+          reuse = setTimeout(() => {
+            if (done) return;
+            if (closed || sock.destroyed || !sock.writable) finish(null, false);
+            else writeCommand();
+          }, 0);
+        }
+      });
+    });
+  }
+  async function query(commands, options) {
+    const out = new Map();
+    let pending = commands.slice();
+    while (pending.length) {
+      let session;
+      try { session = await sessionOnce(pending, options); }
+      catch (error) { if (!out.size) throw error; break; }
+      for (const entry of session.entries) out.set(entry[0], entry[1]);
+      if (session.stop || !session.consumed) break;
+      pending = pending.slice(session.consumed);
+    }
+    return out;
+  }
   const powerMap = { '0': POWER.OFF, '1': POWER.ON, '2': POWER.COOLING, '3': POWER.WARMING };
   return {
     kind: 'pjlink',
     lensJog: { axes: [], speeds: [], mode: 'unsupported', stop: false, positionReadback: false },
-    async getStatus({ signal } = {}) {
-      const read = cmd => send(cmd, { signal });
-      const optional = async (fn, fallback) => { try { return await fn(); } catch (error) { throwIfAborted(signal); if (transportFailure(error)) throw error; return fallback; } };
-      const power = await read('POWR ?');
-      if (!Object.hasOwn(powerMap, power)) throw new Error('Invalid PJLink power status');
-      const s = { power: powerMap[power], online: true, errors: null, lightHours: null, name: null };
-      s.shutter = await optional(async () => { const value = await read('AVMT ?'); if (!['10', '11', '20', '21', '30', '31'].includes(value)) throw new Error('Invalid PJLink shutter status'); return value === '11' || value === '31' ? SHUTTER.CLOSED : SHUTTER.OPEN; }, SHUTTER.UNKNOWN);
-      s.input = await optional(async () => { const value = await read('INPT ?'); if (!/^[1-6][1-9]$/.test(value)) throw new Error('Invalid PJLink input status'); return value; }, null);
-      await optional(async () => { const value = await read('ERST ?'); if (!/^[012]{6}$/.test(value)) throw new Error('Invalid PJLink alarm status'); const [fan, lamp, temp, cover, filter, other] = [...value].map(Number); s.errors = { fan, lamp, temp, cover, filter, other }; });
-      await optional(async () => { const value = await read('LAMP ?'); if (!/^\d+ [01](?: \d+ [01])*$/.test(value)) throw new Error('Invalid PJLink lamp status'); const hours = Number(value.split(' ')[0]); if (!Number.isSafeInteger(hours)) throw new Error('Invalid PJLink lamp hours'); s.lightHours = hours; });
-      await optional(async () => { s.name = await read('NAME ?'); });
-      throwIfAborted(signal); return s;
+    async getStatus({ signal, fresh = false } = {}) {
+      const slowDue = fresh || !slowAt || Date.now() - slowAt >= 60000;
+      const commands = ['POWR ?', 'AVMT ?', 'INPT ?', 'ERST ?', ...(slowDue ? ['LAMP ?', 'NAME ?'] : [])];
+      const got = await query(commands, { signal });
+      const powerEntry = got.get('POWR ?');
+      if (!powerEntry?.value) throw powerEntry?.error || new Error('connection closed before PJLink reply');
+      if (!Object.hasOwn(powerMap, powerEntry.value)) throw new Error('Invalid PJLink power status');
+      const s = { power: powerMap[powerEntry.value], online: true, stale: [] };
+      const take = (cmd, key, apply, fallback) => {
+        const entry = got.get(cmd);
+        if (!entry) { if (commands.includes(cmd)) s.stale.push(key); return; }
+        if (entry.error) { if (transportFailure(entry.error)) s.stale.push(key); else s[key] = fallback; return; }
+        try { s[key] = apply(entry.value); }
+        catch (error) { throwIfAborted(signal); s[key] = fallback; }
+      };
+      take('AVMT ?', 'shutter', value => {
+        if (!['10', '11', '20', '21', '30', '31'].includes(value)) throw new Error('Invalid PJLink shutter status');
+        return value === '11' || value === '31' ? SHUTTER.CLOSED : SHUTTER.OPEN;
+      }, SHUTTER.UNKNOWN);
+      take('INPT ?', 'input', value => { if (!/^[1-6][1-9]$/.test(value)) throw new Error('Invalid PJLink input status'); return value; }, null);
+      take('ERST ?', 'errors', value => {
+        if (!/^[012]{6}$/.test(value)) throw new Error('Invalid PJLink alarm status');
+        const [fan, lamp, temp, cover, filter, other] = [...value].map(Number);
+        return { fan, lamp, temp, cover, filter, other };
+      }, null);
+      if (slowDue) {
+        take('LAMP ?', 'lightHours', value => {
+          if (!/^\d+ [01](?: \d+ [01])*$/.test(value)) throw new Error('Invalid PJLink lamp status');
+          const hours = Number(value.split(' ')[0]);
+          if (!Number.isSafeInteger(hours)) throw new Error('Invalid PJLink lamp hours');
+          return hours;
+        }, null);
+        take('NAME ?', 'name', value => value, null);
+        if (!s.stale.includes('lightHours') && !s.stale.includes('name')) slowAt = Date.now();
+      }
+      throwIfAborted(signal);
+      return s;
     },
     power: (on, options) => send(`POWR ${on ? 1 : 0}`, options),
     shutter: (closed, options) => send(`AVMT ${closed ? 31 : 30}`, options),

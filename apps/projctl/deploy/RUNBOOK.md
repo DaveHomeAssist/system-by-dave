@@ -11,7 +11,7 @@ can reach it from anywhere through Tailscale. Prepared by Dave Robertson (AV by 
 | In the building | http://[RELAY-IP]:8080 |
 | Off site (tailnet) | https://[BOX-NAME].[TAILNET].ts.net (Tailscale app signed in) |
 | Passcode | set at install, kept by the video lead; change with a reinstall |
-| Cue input | OSC on UDP 9000, text lines on TCP 9001, LAN only |
+| Cue input | OSC on UDP 9000, text lines on TCP 9001, show LAN only. Never Funnel or a tunnel. |
 
 ## Daily
 
@@ -36,7 +36,7 @@ can reach it from anywhere through Tailscale. Prepared by Dave Robertson (AV by 
     cd projctl
     deploy/install.sh --passcode [CODE]       # asks for the passcode if omitted
     deploy/tailscale.sh serve                 # tailnet URL for phones off site
-    deploy/tailscale.sh funnel                # only if people without Tailscale need a link; passcode required
+    deploy/tailscale.sh funnel                # web UI only, and only when the service has a passcode. Never the cue or projector ports.
 
 Then Setup tab: enter each projector's IP, MAC, admin user and PJLink password, Save. Tiles go live within 10 s.
 

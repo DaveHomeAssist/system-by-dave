@@ -79,10 +79,13 @@ below 680 px the overview row already stacks and the Rig tab scrolls, so it adds
   never part of the 5-second status poll. Health reports and the watch share one reader, so the two never
   query a projector at the same time, and a report's own reading also reaches the watch.
 - **Limits.** The health reports' limits, so the panel and the reports cannot disagree: Barco UDM 4K22
-  40 C, PT-RZ970 45 C, PT-DW830 series 45 C, with per-slot overrides in the private `health-reports.json`
-  beside the rig (`"ratedAmbientC": { "P3": 40, "P4": 40 }` for units hung in portrait). A unit whose
-  model is not recognised shows its temperature with no level.
-- **Levels.** Watch is the health reports' `watchHeadroomC` (default: within 5 C of the limit). Hot is
+  40 °C, PT-RZ970 45 °C, a portrait PT-DW830 40 °C (operating instructions pp. 16 and 158, lamp unit
+  ET-LAD120P/PW, under 1,400 m) and a landscape PT-DW830 45 °C. Unknown orientation uses 40 °C.
+  Overrides in the private `health-reports.json` are keyed by MAC or IP so they follow the unit;
+  a slot key such as `"P4": 40` still applies until it is moved. An unreadable file is shown in the
+  panel and uses the lower model rating. A unit whose model is not recognised shows its temperature
+  with no level.
+- **Levels.** Watch is the health reports' `watchHeadroomC` (default: at or below 5 °C of headroom, including exactly 5). Hot is
   within 2 C, or half the watch margin if that is smaller, with 1 C of hysteresis before a level clears.
   Hot and the hysteresis exist only in the watch (`server/thermal.js`) and are a proposal, not a Barco or
   Panasonic specification. A reading outside -20 to 120 C is treated as no reading.
@@ -100,7 +103,9 @@ are part of the health reports' open venue acceptance.
 
 ## Cues from Millumin or QLab
 
-Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
+Send OSC to UDP 9000, or a text line to TCP 9001, on the show LAN. Do not publish
+those ports, or the projector ports (PJLink 4352, Panasonic 1024, Pulse 9090),
+on Tailscale Funnel or any tunnel. Same addresses either way:
 
     /proj/P4/shutter 1          close P4 shutter (0 opens)
     /proj/P1/power 1            power on (0 off)
@@ -110,9 +115,15 @@ Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
 
 Bulk cues try every slot and log failures per projector; an offline first slot does not
 prevent later slots receiving the cue. Power and shutter require an explicit 0 or 1.
-Cues and preset recall retain their deliberate-action behavior without the UI double tap,
-and still obey Show Lock. TCP `OK` acknowledges line receipt only; use the Log and reported
-tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles remain unsupported.
+Cues still obey Show Lock. A TCP reply is sent after the cue runs: `OK` means every
+targeted slot finished with no error (the driver's acknowledgement, not a check that
+the picture on stage changed). `ERR` plus the reason means it did not. UDP has no
+reply. One power-off cue is still accepted, so an existing show keeps working, until
+`PROJCTL_CUE_POWER_OFF=confirm` (the same cue again within 3 s) or `off`.
+`PROJCTL_CUE_ALLOWLIST` is unset on an existing install and still accepts every
+source, with a startup warning. Set it to the show-control addresses; loopback is
+always allowed, and an empty value allows loopback only. Malformed OSC datagrams
+are ignored; OSC bundles remain unsupported.
 
 ## Layout
 
@@ -131,9 +142,12 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
 - pulse (Barco): core state, power, shutter, internal patterns, discovered inputs, bounded lens targets and supported picture ranges use the Pulse API. Optional alarm telemetry remains unknown, rather than implying a clear alarm panel.
 - panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls.
 
-Pulse status requires a successful `system.state` query. Failed core queries count toward the
-relay's offline policy; unsupported optional properties remain unknown rather than preventing
-an otherwise reachable projector from reporting status.
+Pulse status requires a successful `system.state` query. A failed core query counts
+toward offline. One missed poll keeps the last status and still accepts commands; the
+second consecutive core failure marks the projector offline. Optional PJLink queries
+that drop do not, by themselves, mark it offline. Name, lamp hours and the Panasonic
+test-pattern query are read about once a minute. When the projector keeps the PJLink
+socket open, one poll uses that one session.
 
 ## Verify changes
 

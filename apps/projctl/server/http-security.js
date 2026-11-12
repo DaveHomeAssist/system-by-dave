@@ -135,6 +135,39 @@ export function createLoginThrottle({ maxEntries = 1024, baseMs = 1000, maxMs = 
 
 // headersTimeout and requestTimeout bound how long a client may take to send a request.
 // They do not limit how long the relay spends answering (lens moves, polls).
+// The workspace hub may frame the controller. It is not allowed to post to it.
+export const FRAME_ANCESTORS = "frame-ancestors 'self' https://wst.housevideo.app";
+
+function headerValue(req, name) {
+  const value = req.headers?.[name];
+  return typeof value === 'string' ? value : '';
+}
+
+// State-changing requests must be JSON (so a browser preflights them) and must
+// come from this page. Same-site covers sibling *.housevideo.app hosts; those
+// are refused, as are cross-site requests. A non-browser client sends neither
+// Origin nor Sec-Fetch-Site and is still required to use JSON.
+export function mutationAllowed(req, proxy, { requireJson = true } = {}) {
+  if (requireJson) {
+    const type = headerValue(req, 'content-type').split(';')[0].trim().toLowerCase();
+    if (type !== 'application/json') return false;
+  }
+  const site = headerValue(req, 'sec-fetch-site').toLowerCase();
+  if (site && site !== 'same-origin' && site !== 'none') return false;
+  const origin = headerValue(req, 'origin');
+  if (!origin) return true;
+  let originHost = '';
+  try { originHost = new URL(origin).host.toLowerCase(); } catch { return false; }
+  const names = new Set();
+  const host = headerValue(req, 'host').toLowerCase();
+  if (host) names.add(host);
+  if (proxy?.trusted?.(req.socket?.remoteAddress)) {
+    const forwarded = headerValue(req, 'x-forwarded-host').split(',')[0].trim().toLowerCase();
+    if (forwarded) names.add(forwarded);
+  }
+  return names.has(originHost);
+}
+
 export function applyServerLimits(server, { headersTimeoutMs = 15000, requestTimeoutMs = 30000 } = {}) {
   server.headersTimeout = headersTimeoutMs;
   server.requestTimeout = requestTimeoutMs;

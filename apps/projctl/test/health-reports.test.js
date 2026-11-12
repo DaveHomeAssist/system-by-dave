@@ -37,9 +37,15 @@ test('Panasonic QTM replies parse as °C and rated limits follow model and overr
   assert.throws(() => parseQtm('ER401'), /Invalid Panasonic temperature/);
   assert.equal(ratedAmbientC(RIG[0]), 40);
   assert.equal(ratedAmbientC(RIG[1]), 45);
-  assert.equal(ratedAmbientC(RIG[3]), 45);
+  assert.equal(ratedAmbientC(RIG[3]), 40, 'lane D is portrait, so the DW830 default is 40 °C');
+  assert.equal(ratedAmbientC({ ...RIG[3], lane: 'C', orientation: 'landscape' }), 45);
+  assert.equal(ratedAmbientC({ ...RIG[3], lane: '', orientation: 'portrait' }), 40);
   assert.equal(ratedAmbientC(RIG[3], { P4: 40 }), 40);
+  const moved = { ...RIG[3], slot: 'P9', mac: '70:58:12:ee:27:0d', ip: '198.51.100.23' };
+  assert.equal(ratedAmbientC(moved, { '70:58:12:ee:27:0d': 38 }), 38, 'a MAC override follows the unit onto a new slot');
+  assert.equal(ratedAmbientC({ ...moved, mac: '' }, { '198.51.100.23': 37 }), 37);
   assert.equal(ratedAmbientC({ slot: 'X', model: 'Unknown' }), null);
+  assert.equal(ratedAmbientC({ ...RIG[3], lane: 'C', orientation: 'landscape' }, {}, { reliable: false }), 40, 'an unreadable limits file does not keep the higher landscape rating');
 });
 
 test('settings are private, validated and optional', (t) => {
