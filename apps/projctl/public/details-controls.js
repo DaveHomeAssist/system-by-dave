@@ -50,7 +50,7 @@ export function patternPanelContent({ projector: p, lane, table, supported, curr
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'avd-btn pj-pattern-tile';
-    button.dataset.pattern = code;
+    button.dataset.tilePattern = code;
     button.dataset.focusKey = `${p.slot}:details:pattern:${code}`;
     button._controlIdentity = identityOf(p);
     button.setAttribute('aria-pressed', String(!stale && String(current) === code));

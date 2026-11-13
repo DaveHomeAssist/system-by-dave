@@ -104,7 +104,7 @@ const path = require('node:path');
       assert.deepEqual(layout, { pageScroll: false, clipped: [], small: [] }, `details layout at ${width}x${height}`);
 
       if (width === 1440) {
-        const bars = detail.locator('.pj-pattern-tile[data-pattern="08"]');
+        const bars = detail.locator('.pj-pattern-tile[data-tile-pattern="08"]');
         await bars.click();
         await until(() => commands.some(c => c.cmd === 'pattern' && c.arg === '08' && c.slot === 'P1'));
         await until(async () => await bars.getAttribute('aria-pressed') === 'true');
