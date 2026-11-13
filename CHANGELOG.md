@@ -1,5 +1,11 @@
 # Changelog
 
+## November 12, 2026: Equipment Lab tab is now Video and projection
+
+- The Equipment Lab splash tab that holds the switcher, shading panel, PTZ camera, joystick and the Barco UDM-4K22 is named Video and projection. It was Video & PTZ, which did not cover the projector. The same name appears as the group heading in the results and as the discipline of each entry in the selected-equipment sheet. On narrow screens the tab still reads Video.
+- Only the label changed: the discipline id, the entries in it, their counts and every link are the same. The AV console bundle is unchanged, and the offline cache generation stays `v20261112-equipment-lab-projector`.
+- In phone landscape (844 x 390) the longer name takes two lines in the discipline rail; all six tabs still fit.
+
 ## November 12, 2026: Console opens without site storage, saved pages on server errors
 
 - The AV console opens when the browser refuses site storage (every cookie blocked, some private and embedded contexts). It rendered nothing, because reading `window.localStorage` threw while the packs mounted. The shell now checks first, gives the page a stand-in that holds nothing and refuses writes, and shows a notice that nothing can be saved and work lasts for the visit only. Saves, drafts and layout writes report their failure as they do for full storage. A browser where no stand-in can be installed gets a plain message. Details: `docs/av-suite-shell.md`.
