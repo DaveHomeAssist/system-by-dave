@@ -1,16 +1,25 @@
 import AppKit
 import CoreGraphics
+import IOKit
 
 func readDisplays() throws -> [DisplayObservation] {
-    var count: UInt32 = 0
-    guard CGGetOnlineDisplayList(0, nil, &count) == .success else { throw CheckError.message("macOS could not enumerate displays.") }
-    var ids = [CGDirectDisplayID](repeating: 0, count: max(Int(count), 1))
-    guard CGGetOnlineDisplayList(UInt32(ids.count), &ids, &count) == .success else { throw CheckError.message("Display list changed; check again.") }
-    let names = Dictionary(uniqueKeysWithValues: NSScreen.screens.compactMap { screen -> (UInt32, String)? in
+    try stableDisplaySnapshot(capture: captureDisplays)
+}
+
+private func captureDisplays() throws -> [DisplayObservation] {
+    let ids = try completeDisplayIDs { capacity in
+        var count: UInt32 = 0
+        var buffer = [CGDirectDisplayID](repeating: 0, count: capacity)
+        guard CGGetOnlineDisplayList(UInt32(capacity), &buffer, &count) == .success else {
+            throw CheckError.message("macOS could not enumerate displays.")
+        }
+        return Array(buffer.prefix(Int(count)))
+    }
+    let names = Dictionary(NSScreen.screens.compactMap { screen -> (UInt32, String)? in
         guard let n = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else { return nil }
         return (n.uint32Value, screen.localizedName)
-    })
-    return ids.prefix(Int(count)).map { id in
+    }, uniquingKeysWith: { first, _ in first })
+    return ids.map { id in
         let mode = CGDisplayCopyDisplayMode(id)
         var uuid: String?
         if let value = CGDisplayCreateUUIDFromDisplayID(id)?.takeRetainedValue() { uuid = CFUUIDCreateString(nil, value) as String }
@@ -19,6 +28,8 @@ func readDisplays() throws -> [DisplayObservation] {
                                   builtIn: CGDisplayIsBuiltin(id) != 0, active: CGDisplayIsActive(id) != 0,
                                   mirrored: CGDisplayIsInMirrorSet(id) != 0, width: mode?.width, height: mode?.height,
                                   pixelWidth: mode?.pixelWidth, pixelHeight: mode?.pixelHeight,
-                                  refreshRate: mode?.refreshRate, rotation: CGDisplayRotation(id))
+                                  refreshRate: mode?.refreshRate, rotation: CGDisplayRotation(id),
+                                  interlaced: mode.map { $0.ioFlags & UInt32(kDisplayModeInterlacedFlag) != 0 },
+                                  stretched: mode.map { $0.ioFlags & UInt32(kDisplayModeStretchedFlag) != 0 })
     }
 }

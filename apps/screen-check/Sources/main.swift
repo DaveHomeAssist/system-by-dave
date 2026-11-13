@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import ServiceManagement
+import UniformTypeIdentifiers
 
 let appID = "com.systembydave.frozen-screen-check"
 let loginPlist = appID + ".plist"
@@ -13,12 +14,6 @@ func bundledProfileURL() throws -> URL {
         throw CheckError.message("The app's show profile is missing. Reinstall the complete app bundle.")
     }
     return url
-}
-
-func loadProfile(at url: URL) throws -> ShowProfile {
-    let profile = try JSONDecoder().decode(ShowProfile.self, from: Data(contentsOf: url))
-    try profile.validate()
-    return profile
 }
 
 func displayCheckTime(_ value: String) -> String {
@@ -38,9 +33,14 @@ final class CheckModel: ObservableObject {
     @Published var loginEnabled = false
     @Published var loginApproval = false
     @Published var actionMessage: String?
+    @Published var saveWarning: String?
     var didUpdate: (() -> Void)?
     private var pending: DispatchWorkItem?
     private var observerTokens: [NSObjectProtocol] = []
+    private let session = VerificationSession(
+        read: { try evaluate(profile: loadProfile(at: profileURL), displays: readDisplays()) },
+        persist: { try encodedReport($0).write(to: supportURL.appendingPathComponent("last-report.json"), options: .atomic) }
+    )
 
     var headline: String {
         if checking { return "Checking screens…" }
@@ -71,12 +71,12 @@ final class CheckModel: ObservableObject {
 
     func check() {
         pending?.cancel(); pending = nil
-        do {
-            let current = try evaluate(profile: loadProfile(at: profileURL), displays: readDisplays())
-            // Never retain an old green result after a read or profile failure.
-            report = current; error = nil
-            try encodedReport(current).write(to: supportURL.appendingPathComponent("last-report.json"), options: .atomic)
-        } catch { report = nil; self.error = error.localizedDescription }
+        session.check()
+        publishResult()
+    }
+
+    private func publishResult() {
+        report = session.report; error = session.error; saveWarning = session.saveWarning
         checking = false; refreshLogin(); didUpdate?()
     }
 
@@ -113,13 +113,20 @@ final class CheckModel: ObservableObject {
     }
 
     func export() {
-        guard let report = report, !checking else { return }
+        guard report != nil, !checking else { return }
         let panel = NSSavePanel()
         panel.nameFieldStringValue = "Frozen-screen-check.json"
         panel.title = "Save screen verification"
+        panel.allowedContentTypes = [.json]
         if panel.runModal() == .OK, let url = panel.url {
-            do { try encodedReport(report).write(to: url, options: .atomic); actionMessage = "Report saved." }
+            guard url.resolvingSymlinksInPath().standardizedFileURL != profileURL.resolvingSymlinksInPath().standardizedFileURL else {
+                actionMessage = "Choose a different file; an exported report cannot replace your show profile."
+                return
+            }
+            pending?.cancel(); pending = nil
+            do { try session.export(to: url); actionMessage = "Fresh report saved." }
             catch { actionMessage = error.localizedDescription }
+            publishResult()
         }
     }
 
@@ -209,6 +216,7 @@ struct DashboardView: View {
                 Button(model.loginApproval ? "Open Login Settings" : (model.loginEnabled ? "Disable" : "Enable at Login")) { model.changeLogin() }
             }
             if let message = model.actionMessage { Text(message).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
+            if let warning = model.saveWarning { Text(warning).font(.caption).foregroundStyle(.orange).textSelection(.enabled) }
             Divider()
             HStack {
                 if let report = model.report {
@@ -250,7 +258,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         window.isReleasedWhenClosed = false; window.center()
         model.didUpdate = { [weak self] in self?.updateStatus() }
         model.prepare()
-        if CommandLine.arguments.contains("--login") {
+        if invocation == .gui(login: true) {
             // A screen-change debounce must not cancel the startup review.
             model.checking = true; updateStatus()
             DispatchQueue.main.asyncAfter(deadline: .now() + 12) { [weak self] in
@@ -271,8 +279,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         else if let report = model.report, report.state != .ready && report.readyCount == report.expectedCount {
             status.button?.title = " Screens: review"
         } else { status.button?.title = " Screens \(model.report?.readyCount ?? 0)/\(model.report?.expectedCount ?? 5)" }
-        status.button?.toolTip = model.headline
-        summaryItem.title = model.headline
+        let summary = model.headline + (model.saveWarning == nil ? "" : " · report not saved")
+        status.button?.toolTip = summary
+        summaryItem.title = summary
     }
     @objc func show() { window.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true) }
     @objc func check() { model.check() }
@@ -283,11 +292,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 }
 
-if CommandLine.arguments.contains("--check-json") {
+let invocation: Invocation
+do { invocation = try parseInvocation(Array(CommandLine.arguments.dropFirst())) }
+catch { fputs("\(error.localizedDescription)\n", stderr); exit(3) }
+
+if case .json(let path) = invocation {
     do {
-        let args = CommandLine.arguments
         let url: URL
-        if let index = args.firstIndex(of: "--profile"), args.indices.contains(index + 1) { url = URL(fileURLWithPath: args[index + 1]) }
+        if let path { url = URL(fileURLWithPath: path) }
         else { url = FileManager.default.fileExists(atPath: profileURL.path) ? profileURL : try bundledProfileURL() }
         let report = try evaluate(profile: loadProfile(at: url), displays: readDisplays())
         print(String(decoding: try encodedReport(report), as: UTF8.self))
@@ -296,7 +308,7 @@ if CommandLine.arguments.contains("--check-json") {
 }
 
 if let other = NSRunningApplication.runningApplications(withBundleIdentifier: appID).first(where: { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier }) {
-    if !CommandLine.arguments.contains("--login") { other.activate(options: [.activateAllWindows, .activateIgnoringOtherApps]) }
+    if invocation != .gui(login: true) { other.activate(options: [.activateAllWindows, .activateIgnoringOtherApps]) }
     exit(0)
 }
 let delegate = AppDelegate()
