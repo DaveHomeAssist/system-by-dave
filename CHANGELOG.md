@@ -2,6 +2,8 @@
 
 ## November 13, 2026: Resumable rig acceptance runner
 
+- Use an OS-held journal lock so a forced process exit or restart cannot leave
+  a stale lock blocking resumed acceptance. Test forced exit and journal reuse.
 - Add a Python operator runner that collects existing relay and Screen Check
   evidence, retains failed attempts and produces a per-lane acceptance report.
 - Require recorded release windows for disruptive test observations and distinct

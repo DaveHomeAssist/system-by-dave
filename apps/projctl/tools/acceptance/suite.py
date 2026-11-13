@@ -4,6 +4,7 @@
 import argparse
 import contextlib
 import datetime as dt
+import fcntl
 import hashlib
 import json
 import os
@@ -61,19 +62,19 @@ def atomic_json(path, data):
 
 @contextlib.contextmanager
 def transaction(run):
-    lock = run / ".lock"
+    descriptor = os.open(run / ".lock", os.O_RDWR | os.O_CREAT, 0o600)
     try:
-        lock.mkdir()
-    except FileExistsError:
-        raise ValueError("Run is locked. Close the other writer before retrying.")
-    try:
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise ValueError("Run is locked. Close the other writer before retrying.")
         data = json.loads((run / "run.json").read_text())
         if data.get("schema") != 1:
             raise ValueError("Unsupported run schema")
         yield data
         atomic_json(run / "run.json", data)
     finally:
-        lock.rmdir()
+        os.close(descriptor)
 
 
 def clean(value):

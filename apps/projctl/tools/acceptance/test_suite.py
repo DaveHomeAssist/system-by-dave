@@ -108,7 +108,19 @@ class AcceptanceTests(unittest.TestCase):
         with suite.transaction(self.run):
             with self.assertRaises(ValueError):
                 suite.add_event(self.run, {"kind": "test"})
-        self.assertFalse((self.run / ".lock").exists())
+        self.assertTrue((self.run / ".lock").is_file())
+
+    def test_forced_exit_releases_os_lock_and_preserves_journal(self):
+        before = (self.run / "run.json").read_bytes()
+        code = "import os; from pathlib import Path; import suite; ctx=suite.transaction(Path(os.environ['TEST_RUN'])); ctx.__enter__(); os._exit(17)"
+        import os
+        env = {**os.environ, "TEST_RUN": str(self.run)}
+        result = subprocess.run([sys.executable, "-c", code], cwd=Path(suite.__file__).parent, env=env)
+        self.assertEqual(result.returncode, 17)
+        self.assertEqual(before, (self.run / "run.json").read_bytes())
+        self.assertEqual(suite.report(self.run), 2)
+        suite.add_event(self.run, {"kind": "after-restart"})
+        self.assertEqual(self.data()["events"][-1]["kind"], "after-restart")
 
     def test_report_integrity_resume_and_history(self):
         evidence = self.attachment()

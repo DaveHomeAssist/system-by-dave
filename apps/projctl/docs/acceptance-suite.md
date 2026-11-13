@@ -99,7 +99,9 @@ The runner does not use the relay host's desktop as Studio display evidence.
 API fields whose names indicate credentials are redacted before saving.
 
 Each attachment is copied with a SHA-256 hash. Journal entries are append-only,
-written atomically under a per-run lock. Concurrent writers are rejected.
+written atomically under an OS-held per-run lock. Concurrent writers are rejected.
+The OS releases the lock if the process exits or the computer restarts. The
+small lock file remains on disk and can be reused by the next process.
 Copy the entire folder for handoff. Do not edit `run.json` during a run.
 Keep machine configuration backups private and inspect attachments for secrets.
 
