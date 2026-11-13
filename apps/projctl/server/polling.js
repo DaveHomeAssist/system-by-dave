@@ -4,7 +4,7 @@ export const pollIdentity = (p) => JSON.stringify([p.slot, p.driver, p.ip, p.use
 
 // One bounded, disposable read per saved target. Cable recovery never scans,
 // changes addresses, or replays the last control command.
-export function createPoller({ target, read, started, succeeded, failed,
+export function createPoller({ target, read, started, succeeded, failed, defer,
   intervalMs = 5000, timeoutMs = 12000, maxRetryMs = 15000,
   now = Date.now, timer = setTimeout, cancelTimer = clearTimeout }) {
   const active = new Map(), scheduled = new Map(), identities = new Map(), failures = new Map();
@@ -16,6 +16,8 @@ export function createPoller({ target, read, started, succeeded, failed,
   }
   function poll(slot) {
     if (closed) return Promise.resolve();
+    // A lens move owns the slot. Skip the status read instead of queueing it behind Stop.
+    if (defer?.(slot)) { schedule(slot, Math.min(intervalMs, 500)); return Promise.resolve(); }
     const current = target(slot); if (!current) return Promise.resolve();
     const p = { ...current }, key = pollIdentity(p), previous = active.get(slot);
     if (previous?.key === key) return previous.work;

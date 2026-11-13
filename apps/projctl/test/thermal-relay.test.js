@@ -57,12 +57,17 @@ test('relay samples lit projectors, applies health-report limits and logs one en
   assert.equal((await thermalOf(relay, 'P4')).peakC, 39, 'peak survives recovery');
 });
 
-test('without a settings override the PT-DW830U uses the health reports default of 45 C', { timeout: 20000 }, async (t) => {
+test('a portrait PT-DW830U defaults to 40 C and a landscape one stays at 45 C', { timeout: 20000 }, async (t) => {
   const relay = await startRelay(FAST); t.after(relay.close);
-  await describeRig(relay); await powerOn(relay); await setAir(relay, 'P4', 37);
-  await until(async () => (await thermalOf(relay, 'P4')).c === 37);
-  const v = await thermalOf(relay, 'P4');
-  assert.equal(v.limitC, 45); assert.equal(v.headroomC, 8); assert.equal(v.level, 'ok');
+  await describeRig(relay);
+  await relay.api('projector', { slot: 'P1', lane: 'C', model: 'PT-DW830U' });
+  await powerOn(relay); await setAir(relay, 'P4', 37); await setAir(relay, 'P1', 37);
+  await until(async () => (await thermalOf(relay, 'P4')).c === 37 && (await thermalOf(relay, 'P1')).c === 37);
+  const portrait = await thermalOf(relay, 'P4');
+  assert.equal(portrait.limitC, 40); assert.equal(portrait.headroomC, 3); assert.equal(portrait.level, 'watch');
+  assert.equal(portrait.limitSource, 'model');
+  const landscape = await thermalOf(relay, 'P1');
+  assert.equal(landscape.limitC, 45); assert.equal(landscape.headroomC, 8); assert.equal(landscape.level, 'ok');
 });
 
 test('sampling is rate limited, and a health report reading feeds the watch', { timeout: 30000 }, async (t) => {

@@ -4,12 +4,13 @@ These changes are source changes only. They do not configure, restart, or deploy
 
 ## Cue access
 
-Web login does not authenticate OSC or text TCP cues. Existing bind/exposure defaults remain unchanged to avoid silently breaking show cues. Configure the service environment explicitly before wider access:
+Web login does not authenticate OSC or text TCP cues. An existing install with no `PROJCTL_CUE_ALLOWLIST` still accepts every source, so show cues keep working until that setting is added. Configure it before wider access. Do not publish UDP 9000, TCP 9001, or the projector ports on Funnel or a tunnel. `deploy/tailscale.sh funnel` refuses those ports and refuses to publish the web UI unless the installed service or the running relay has a passcode.
 
 - `PROJCTL_OSC_ENABLED=0` disables OSC. `1` enables it (default).
 - `PROJCTL_TCP_ENABLED=0` disables text TCP. `1` enables it (default).
 - `PROJCTL_CUE_HOST=127.0.0.1` binds both enabled cue listeners to loopback. Use a verified local interface IP for remote show-control clients. The OSC socket is IPv4; use an IPv4 bind address when OSC is enabled.
-- `PROJCTL_CUE_ALLOWLIST=127.0.0.1,192.0.2.10` accepts only the listed source IPs. Replace example addresses with verified cue senders. An unset or empty list permits all source IPs and emits a startup warning when not explicitly loopback-bound.
+- `PROJCTL_CUE_ALLOWLIST=192.0.2.10` accepts loopback plus the listed source IPs. Replace the example with the show-control host. An empty value allows loopback only. Unset keeps the previous accept-any behavior and logs a warning. Do not put this key in the live plist until the show-control addresses are known; this change does not edit an installed service.
+- `PROJCTL_CUE_POWER_OFF=allow` (the default, including when unset) accepts one power-off cue, and Show Lock still blocks it. `confirm` requires the same cue again within 3 seconds. `off` refuses cue power-off. TCP `OK` is sent after the cue runs and means no slot reported an error. It is not proof that the picture on stage changed.
 
 Allowlist entries must be literal IPs, not hostnames or CIDR ranges. Invalid configuration fails closed at startup. IPv4-mapped addresses and equivalent IPv6 representations are handled by the policy. Source restrictions are not cryptographic authentication; use firewall/network isolation. The passcode does not secure cue ports.
 
@@ -33,6 +34,6 @@ Outbound commands are restricted to the implemented Class 1 grammar, blocking CR
 
 ## Still open
 
-Pulse response validation, execution-time Show Lock guards, Stop-lens reliability, preset semantics, persistence failure handling and Panasonic numeric validation remain open. Merging publishes source only. Installing on the Studio is a separate step for a safe show window: confirm the cue environment and `PROJCTL_TRUSTED_PROXIES` there first.
+Stop lens now has its own connections, and a rig write error no longer crashes the relay. Installing on the Studio is a separate step for a safe show window: confirm the cue allowlist and `PROJCTL_TRUSTED_PROXIES` there first. This change does not edit an installed plist.
 
 Run the focused regressions from apps/projctl with `node --test test/cue-ingress.test.js test/security-protocol.test.js test/http-security.test.js test/venue-model.test.js`, then run `npm test` and the browser suites. Use isolated simulator settings, never the active Studio rig, for development.

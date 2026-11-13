@@ -18,7 +18,7 @@ export async function startRelay(overrides = {}, { files = {} } = {}) {
   for (const [name, text] of Object.entries(files)) await writeFile(path.join(dir, path.basename(name)), text);
   const child = spawn(process.execPath, ['server/index.js'], {
     cwd: fileURLToPath(new URL('../', import.meta.url)),
-    env: { ...process.env, SIM: '1', PJ_PASSCODE: '', PROJCTL_PASSWORD: '', RIG: path.join(dir, 'rig.json'), STAGE_PLOT: path.join(dir, 'stage-plot.json'), VENUE_MODEL: path.join(dir, 'venue'), PORT: '0', OSC_PORT: '0', TCP_PORT: '0', POLL_MS: '50', ...overrides },
+    env: { ...process.env, SIM: '1', PJ_PASSCODE: '', PROJCTL_PASSWORD: '', PROJCTL_OPEN: '1', RIG: path.join(dir, 'rig.json'), STAGE_PLOT: path.join(dir, 'stage-plot.json'), VENUE_MODEL: path.join(dir, 'venue'), PORT: '0', OSC_PORT: '0', TCP_PORT: '0', POLL_MS: '50', ...overrides },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let log = '';

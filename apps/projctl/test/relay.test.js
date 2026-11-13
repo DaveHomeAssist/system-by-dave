@@ -117,7 +117,8 @@ test('failed post-recall readback cannot verify cached matching lens positions',
   await r.api('sim', { slot: 'P1', offline: true });
   const out = (await r.api('preset/recall', { name: 'Readback failure fixture', confirmLens: first.confirm })).body;
   const failed = out.projectors.P1;
-  assert.equal(failed.status.online, false);
+  assert.equal(failed.status.online, true, 'one missed read does not declare the projector offline');
+  assert.equal(failed.status.connection.fresh, false);
   assert.deepEqual(Object.values(failed.position), ['unknown', 'unknown', 'unknown', 'unknown']);
   assert.deepEqual(Object.values(failed.motors), ['unknown', 'unknown', 'unknown', 'unknown']);
   assert.equal(failed.lens, null); assert.match(failed.result, /unavailable/);

@@ -90,7 +90,10 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
       setAttr(meter, 'aria-label', `${f1(v.c)} °C within a rated range of 0 to ${limit} °C`);
     }
     setText(li.querySelector('[data-headroom]'), has && v.headroomC != null ? `${f1(v.headroomC)} °C` : has ? 'no limit' : '—');
-    setText(li.querySelector('[data-limit]'), has ? (Number.isFinite(limit) ? `${limit} °C` : 'Not rated') : '—');
+    const limitEl = li.querySelector('[data-limit]');
+    const source = v?.limitSource === 'unit' ? 'unit override' : v?.limitSource === 'slot' ? 'slot override' : v?.limitSource === 'safe-default' ? 'safe default' : v?.limitSource === 'model' ? 'model default' : '';
+    setText(limitEl, has ? (Number.isFinite(limit) ? `${limit} °C` : 'Not rated') : '—');
+    setAttr(limitEl, 'title', [source, v?.limitWarning, v?.configError].filter(Boolean).join(' · '));
     const peakEl = li.querySelector('[data-peak]');
     setText(peakEl, has ? `${f1(v.peakC)} °C` : '—'); setAttr(peakEl, 'title', has && v.peakAt ? `Peak in retained history, at ${clock(v.peakAt)}` : '');
     setText(li.querySelector('[data-delta]'), has && live && coolest != null ? (v.c - coolest < 0.05 ? 'coolest' : `+${f1(v.c - coolest)} °C`) : '—');

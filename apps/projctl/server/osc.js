@@ -9,20 +9,50 @@ export function cuePolicy(protocol, options = {}, env = process.env) {
   const enabled = flag === true || flag === '1';
   const host = options.host ?? env.PROJCTL_CUE_HOST;
   if (host !== undefined && !net.isIP(host)) throw new Error('PROJCTL_CUE_HOST must be an IP address');
-  const raw = options.allowlist ?? env.PROJCTL_CUE_ALLOWLIST ?? '';
+  // Unset keeps accepting every source so an install whose plist has no allowlist
+  // keeps its show cues. An empty or populated list is loopback plus that list.
+  const specified = options.allowlist !== undefined ? options.allowlist : env.PROJCTL_CUE_ALLOWLIST;
+  const configured = specified !== undefined;
+  const raw = configured ? specified : '';
   if (typeof raw !== 'string') throw new Error('Cue allowlist must be comma-separated IP addresses');
-  const entries = raw.trim() ? raw.split(',').map(value => value.trim()) : [];
+  const entries = raw.trim() ? raw.split(',').map(value => value.trim()).filter(Boolean) : [];
   if (entries.length > 256 || entries.some(value => !net.isIP(value))) throw new Error('Cue allowlist contains an invalid IP address');
   const block = new net.BlockList();
   const normalize = value => typeof value === 'string' && value.toLowerCase().startsWith('::ffff:') && net.isIP(value.slice(7)) === 4 ? value.slice(7) : value;
   for (const value of entries) { const ip = normalize(value); block.addAddress(ip, net.isIP(ip) === 4 ? 'ipv4' : 'ipv6'); }
-  return { enabled, host, restricted: entries.length > 0, permits(address) {
+  const loopback = ip => ip === '127.0.0.1' || ip === '::1';
+  return { enabled, host, restricted: configured, permits(address) {
     const ip = normalize(address), family = net.isIP(ip || '');
-    return !!family && (!entries.length || block.check(ip, family === 4 ? 'ipv4' : 'ipv6'));
+    if (!family) return false;
+    if (loopback(ip)) return true;
+    if (!configured) return true;
+    return block.check(ip, family === 4 ? 'ipv4' : 'ipv6');
   } };
 }
+export function cuePowerOffMode(env = process.env) {
+  const raw = env.PROJCTL_CUE_POWER_OFF;
+  if (raw === undefined || raw === '' || raw === 'allow' || raw === '1') return 'allow';
+  if (raw === 'confirm' || raw === '0' || raw === 'off') return raw === 'confirm' ? 'confirm' : 'off';
+  throw new Error('PROJCTL_CUE_POWER_OFF must be allow, confirm, or off');
+}
 function warnExposure(protocol, policy) {
-  if (!policy.restricted && !['127.0.0.1', '::1'].includes(policy.host)) console.warn(`[${protocol.toLowerCase()}] Cue listener has no source restriction; web login does not protect cues. Configure PROJCTL_CUE_HOST/PROJCTL_CUE_ALLOWLIST or disable this listener.`);
+  if (!policy.restricted && !['127.0.0.1', '::1'].includes(policy.host)) console.warn(`[${protocol.toLowerCase()}] Cue listener has no source allowlist yet. Show cues still work. Set PROJCTL_CUE_ALLOWLIST to the show-control addresses. Do not publish this port on Funnel or a tunnel.`);
+}
+const oneLine = value => String(value || '').replace(/[\r\n]/g, ' ').slice(0, 400);
+// OK means every targeted slot finished without an error. It is the driver's
+// acknowledgement, not a check that the picture on stage changed.
+export function cueReply(result) {
+  const problems = [];
+  if (result && typeof result === 'object') {
+    if (typeof result.error === 'string') problems.push(result.error);
+    const slots = result.projectors && typeof result.projectors === 'object' ? result.projectors : result;
+    for (const [key, value] of Object.entries(slots)) {
+      if (['preset', 'confirm', 'message', 'projectors', 'error'].includes(key)) continue;
+      if (value && typeof value === 'object' && value.error) problems.push(`${key}: ${value.error}`);
+      else if (value === 'offline') problems.push(`${key}: offline`);
+    }
+  }
+  return problems.length ? `ERR ${oneLine(problems.join('; '))}\n` : 'OK\n';
 }
 function readPadded(buf, off) {
   if (off >= buf.length) throw new Error('missing OSC string');
@@ -93,9 +123,9 @@ export function startTcpLines({ port, onMessage, host, enabled, allowlist, maxLi
         const [addr, ...rest] = line.split(/\s+/);
         active++;
         Promise.resolve().then(() => onMessage(addr, rest.map(x => isNaN(Number(x)) ? x : Number(x)), `tcp ${sock.remoteAddress}`))
-          .catch(e => console.error('[tcp]', e?.message || 'cue failed'))
+          .then(result => { if (!sock.destroyed) sock.write(cueReply(result)); })
+          .catch(e => { console.error('[tcp]', e?.message || 'cue failed'); if (!sock.destroyed) sock.write(`ERR ${oneLine(e?.message || 'cue failed')}\n`); })
           .finally(() => { active--; });
-        sock.write('OK\n'); // Receipt only, not execution acknowledgement.
       }
       if (buf.length + data.length - start > maxLineBytes) { sock.destroy(); return; }
       if (start < data.length) buf = Buffer.concat([buf, data.subarray(start)]);

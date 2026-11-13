@@ -21,7 +21,8 @@ export function createConnectionMonitor() {
     const state = unassigned ? 'unassigned' : !relayConnected ? 'disconnected' : current ? 'online' : c.state === 'checking' ? 'checking' : s.online ? 'stale' : 'reconnecting';
     const label = state === 'unassigned' ? 'Unassigned' : state === 'disconnected' ? 'Relay disconnected' : state === 'online' ? recovered ? 'Reply recovered' : 'Reply received' : state === 'checking' ? 'Checking saved IP' : state === 'stale' ? 'Stale reply' : 'Reconnecting';
     const retry = state === 'reconnecting' ? c.nextRetryAt && time(c.nextRetryAt) ? `Next retry ${time(c.nextRetryAt)}` : 'Retry in progress' : '';
+    const missed = c.state === 'online' && c.consecutiveFailures > 0 ? `. ${c.consecutiveFailures} poll missed; commands still accepted` : '';
     return { current, state, recovered, label, lastSuccessAt, lastReply: time(lastSuccessAt) || 'No successful reply yet', retry,
-      detail: `${label}${['checking','reconnecting'].includes(state) ? ` to saved IP ${projector.ip}` : ''}` };
+      detail: `${label}${['checking','reconnecting'].includes(state) ? ` to saved IP ${projector.ip}` : ''}${missed}` };
   };
 }

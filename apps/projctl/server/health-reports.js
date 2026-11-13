@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { abortable } from './drivers/transport.js';
+import { LANES } from '../public/lanes.js';
 
 export const KIND = { POWER_ON: 'power-on', HOURLY: 'hourly', POWER_OFF: 'power-off', RELAY_STOP: 'relay-stop', MANUAL: 'manual' };
 const KIND_LABEL = { 'power-on': 'Power on', hourly: 'Hourly', 'power-off': 'Power off', 'relay-stop': 'Relay stop', manual: 'Manual' };
@@ -14,13 +15,64 @@ const HOUR = 3600000;
 export const isLit = (power) => power === 'on' || power === 'warming';
 
 // Rated maximum operating ambient by model, from the manufacturers' specifications.
-// Override per slot (for example a portrait limit) in health-reports.json.
-const MODEL_RATED_C = [[/UDM[\s-]*4K22/i, 40], [/RZ970/i, 45], [/DW830/i, 45]];
-export function ratedAmbientC(p, overrides = {}) {
-  const override = overrides?.[p.slot];
-  if (Number.isFinite(override)) return override;
-  for (const [pattern, c] of MODEL_RATED_C) if (pattern.test(`${p.model || ''} ${p.label || ''}`)) return c;
+// PT-DW830 portrait (lamp unit ET-LAD120P/PW, under 1,400 m) is 0–40 °C in the
+// operating instructions, pages 16 and 158. Landscape stays 0–45 °C. Unknown
+// orientation uses 40 °C. Overrides follow the unit's MAC or IP. A slot key
+// still applies so an existing health-reports.json keeps working.
+const MODEL_RATED = [
+  { pattern: /UDM[\s-]*4K22/i, c: 40 },
+  { pattern: /RZ970/i, c: 45 },
+  { pattern: /DW830/i, portrait: 40, landscape: 45 },
+];
+export function normalizeMac(value) {
+  const hex = String(value || '').toLowerCase().replace(/[^0-9a-f]/g, '');
+  return hex.length === 12 ? hex.match(/.{2}/g).join(':') : '';
+}
+export function projectorOrientation(p = {}) {
+  const direct = p.orientation ?? p.mount;
+  if (typeof direct === 'string') {
+    if (/portrait/i.test(direct)) return 'portrait';
+    if (/landscape/i.test(direct)) return 'landscape';
+  }
+  if (p.portrait === true) return 'portrait';
+  if (p.portrait === false) return 'landscape';
+  const lane = typeof p.lane === 'string' ? LANES[p.lane] : null;
+  if (lane?.orientation === 'Portrait') return 'portrait';
+  if (lane?.orientation === 'Landscape') return 'landscape';
+  return 'unknown';
+}
+function ratingFor(text, p, safe) {
+  for (const row of MODEL_RATED) {
+    if (!row.pattern.test(text)) continue;
+    if (row.c != null) return row.c;
+    const orientation = projectorOrientation(p);
+    if (safe || orientation !== 'landscape') return row.portrait;
+    return row.landscape;
+  }
   return null;
+}
+function modelRating(p, { safe = false } = {}) {
+  // The model field wins. A leftover label must not keep an old, higher limit.
+  if (p?.model) { const fromModel = ratingFor(String(p.model), p, safe); if (fromModel != null) return fromModel; }
+  return p?.label ? ratingFor(String(p.label), p, safe) : null;
+}
+export function ratedAmbientDetail(p = {}, overrides = {}, { reliable = true } = {}) {
+  const modelC = modelRating(p, { safe: !reliable });
+  if (!reliable) {
+    return { c: modelC, source: modelC == null ? 'none' : 'safe-default', warning: 'Temperature limits file is unreadable. Showing the lower model rating, not a saved override.' };
+  }
+  const table = overrides && typeof overrides === 'object' ? overrides : {};
+  const mac = normalizeMac(p.mac);
+  const ip = typeof p.ip === 'string' ? p.ip.trim() : '';
+  if (mac && Number.isFinite(table[mac])) return { c: table[mac], source: 'unit', warning: null };
+  if (ip && ip !== 'sim' && Number.isFinite(table[ip])) return { c: table[ip], source: 'unit', warning: null };
+  if (p.slot && Number.isFinite(table[p.slot])) {
+    return { c: table[p.slot], source: 'slot', warning: `The ${p.slot} limit is keyed by slot. Key it by this unit's MAC or IP so renumbering does not move it.` };
+  }
+  return { c: modelC, source: modelC == null ? 'none' : 'model', warning: null };
+}
+export function ratedAmbientC(p, overrides = {}, options) {
+  return ratedAmbientDetail(p, overrides, options).c;
 }
 
 export const DEFAULTS = Object.freeze({ enabled: true, titlePrefix: 'Projectors | Health Log', watchHeadroomC: 5 });
@@ -35,8 +87,9 @@ export function readHealthConfig(file) {
     enabled: raw.enabled !== false,
     titlePrefix: typeof raw.titlePrefix === 'string' && raw.titlePrefix.trim() ? raw.titlePrefix.trim().slice(0, 120) : DEFAULTS.titlePrefix,
     watchHeadroomC: Number.isFinite(raw.watchHeadroomC) ? raw.watchHeadroomC : DEFAULTS.watchHeadroomC,
-    ratedAmbientC: Object.fromEntries(Object.entries(raw.ratedAmbientC || {}).filter(([, v]) => Number.isFinite(v))),
+    ratedAmbientC: Object.fromEntries(Object.entries(raw.ratedAmbientC || {}).filter(([, v]) => Number.isFinite(v)).map(([key, value]) => [normalizeMac(key) || key, value])),
     notion: error || !/^[0-9a-f]{32}$/i.test(id) ? {} : { databaseId: id },
+    reliable: !error,
     error,
   };
 }
@@ -58,7 +111,8 @@ export function unitRow(p, st = {}, conn = {}, readings = null, readError = null
   const sensors = Array.isArray(readings?.sensors) ? readings.sensors : [];
   const intake = sensors.find((s) => s.role === 'intake' && Number.isFinite(s.c));
   const internal = sensors.filter((s) => s.role === 'internal' && Number.isFinite(s.c)).map((s) => s.c);
-  const rated = ratedAmbientC(p, config.ratedAmbientC);
+  const limit = ratedAmbientDetail(p, config.ratedAmbientC, { reliable: config.reliable !== false });
+  const rated = limit.c;
   const headroom = intake && rated != null ? round1(rated - intake.c) : null;
   const errors = st?.errors && typeof st.errors === 'object' ? st.errors : null; // PJLink ERST; null for Pulse
   const alarm = readings?.alarm == null ? null : String(readings.alarm);
@@ -75,7 +129,7 @@ export function unitRow(p, st = {}, conn = {}, readings = null, readError = null
   return {
     slot: p.slot, lane: p.lane || null, model: [p.make, p.model].filter(Boolean).join(' ') || p.label || null, ip: p.ip || null, owner: p.owner || null,
     power: st?.power || 'unknown', online, lastContact: conn?.lastSuccessAt || null, lightHours: Number.isFinite(st?.lightHours) ? st.lightHours : null,
-    intakeC: intake ? intake.c : null, intakeLabel: intake?.label || null, internalC: internal, ratedC: rated, headroomC: headroom,
+    intakeC: intake ? intake.c : null, intakeLabel: intake?.label || null, internalC: internal, ratedC: rated, limitSource: limit.source, limitWarning: limit.warning, headroomC: headroom,
     flags, warnings, alarm, flagSource: errors ? 'PJLink' : alarm != null ? 'Pulse' : null,
     readError: readError ? String(readError).slice(0, 200) : null, verdict,
   };

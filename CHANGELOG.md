@@ -1,5 +1,19 @@
 # Changelog
 
+## November 12, 2026: Projctl review fixes
+
+- A folder URL, a path that leaves the public directory, or a static-file read error returns an HTTP error. It no longer crashes the relay.
+- Barco Stop lens uses its own connections, ahead of a status poll, and a failure on one axis still sends stop to the others. Status polls pause while a lens move is in progress.
+- A Panasonic poll reuses one PJLink session when the projector keeps the socket open, and otherwise opens a new session per command. Name, lamp hours and the test-pattern query run about once a minute. One missed poll keeps the last status and still accepts commands; the second consecutive core failure marks the projector offline. Optional query failures do not. Simulator-verified only.
+- TCP cues reply after they run. `OK` means no slot reported an error. An existing install with no cue allowlist still accepts show cues. Loopback plus `PROJCTL_CUE_ALLOWLIST` is the locked-down mode. Cue power-off stays a single packet until `PROJCTL_CUE_POWER_OFF=confirm` or `off`. Funnel will not publish cue or projector ports, and will not publish the web UI without a passcode.
+- A portrait PT-DW830 defaults to 40 °C (operating instructions pp. 16 and 158). Landscape stays 45 °C, as do the RZ970 at 45 °C and the UDM 4K22 at 40 °C. Limit overrides follow MAC or IP; a slot key still applies. An unreadable limits file is shown and uses the lower rating.
+- State-changing requests must be JSON and must come from this page. Sibling `*.housevideo.app` sites are refused. The relay will not start with no passcode unless `PROJCTL_OPEN=1`.
+- Show lock also blocks address edits, discovery, presets and power schedules. Shutter and power on stay available.
+- Rig saves are fsynced and replaced atomically, with a `.bak`. A write error is reported and does not crash the relay. Simulator mode does not rewrite a rig that already has addresses.
+- Logout revokes that browser's session token. `/api/health` and the header show the version and commit.
+- A status poll keeps one PJLink session open per projector and reuses it on the next poll. It opens a new session only when the projector has closed the old one. The password digest goes on the first command of a session, as PJLink specifies; a projector that then answers with an authentication error gets it on every command. Power, shutter and input commands still use their own connection, after closing the held session, and take turns with polls. Reason: on the rig each PT-DW830U closed about every ninth new poll session with no greeting (packet capture, November 12). Loopback-verified only; not yet run against a projector.
+- A Panasonic reply that names a different command is reported as an error. It no longer leaves that pattern, lens or picture command waiting with no timeout.
+
 ## November 12, 2026: Projctl thermal watch
 
 - New Thermal watch panel: air temperature per lane (A to D) against the projector's rated maximum ambient, with headroom, peak, a 30 minute trend and the tightest unit outlined. A status button in the Rig overview row shows the worst state and opens the panel as a non-modal overlay (Escape or Close dismisses it). Cards are keyed by lane because slot numbers have been renumbered between rig records. The header, tab bar and Rig tab keep their heights at 845 px and wider: a tab, a header button or a panel above the A-D tiles each broke the layout, so none is used.

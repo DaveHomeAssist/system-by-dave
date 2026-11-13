@@ -57,6 +57,13 @@ for (const name of ['server', 'public', 'runtime', 'scripts', 'docs', 'deploy', 
 }
 if (!fs.existsSync(path.join(next, 'node_modules/ws'))) throw new Error('Run npm ci --omit=dev in the source app first.');
 if (!fs.existsSync(path.join(next, 'runtime/throwline/three-d-stage.js'))) throw new Error('Run npm run bundle:throwline in the source app first.');
+let commit = '';
+try { commit = run('git', ['rev-parse', 'HEAD'], { cwd: source }).trim(); } catch { /* a copied tree may have no git metadata */ }
+const builtAt = new Date().toISOString();
+const version = JSON.parse(fs.readFileSync(path.join(source, 'package.json'), 'utf8')).version || '';
+fs.writeFileSync(path.join(next, 'build-info.json'), JSON.stringify({ version, commit, builtAt }, null, 2) + '\n');
+if (commit) env.PROJCTL_COMMIT = commit;
+env.PROJCTL_BUILD_TIME = builtAt;
 const stagedVenue = path.join(paths.root, `venue-next-${process.pid}`);
 const hasVenueUpdate = await stagePackagedVenue(source, stagedVenue);
 const backup = path.join(paths.root, `backup-${new Date().toISOString().replaceAll(':', '-')}`);

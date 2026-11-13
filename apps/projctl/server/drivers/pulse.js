@@ -58,12 +58,12 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
   async function discover(signal) {
     if (Date.now() - refreshed < 60000) return;
     // Missing optional capabilities must not hide a reachable projector.
-    try {
-      const list = await rpc('image.source.list', undefined, timeoutMs, undefined, signal);
-      if (Array.isArray(list)) sources = Object.fromEntries(list.filter((v) => typeof v === 'string').map((v) => [v, v]));
-    } catch (e) { throwIfAborted(signal); if (signal && transportFailure(e)) throw e; sources = {}; }
-    try {
-      const image = await rpc('introspect', { object: 'image', recursive: false }, timeoutMs, undefined, signal);
+      try {
+        const list = await rpc('image.source.list', undefined, timeoutMs, undefined, signal);
+        if (Array.isArray(list)) sources = Object.fromEntries(list.filter((v) => typeof v === 'string').map((v) => [v, v]));
+      } catch (e) { throwIfAborted(signal); sources = {}; }
+      try {
+        const image = await rpc('introspect', { object: 'image', recursive: false }, timeoutMs, undefined, signal);
       pictureSchema = {};
       for (const [key, property] of Object.entries(pictureProperties)) {
         const meta = image.properties?.find((p) => p.name === property && p.access === 'READ_WRITE');
@@ -71,7 +71,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
         if (!t || !Number.isFinite(t.min) || !Number.isFinite(t.max)) continue;
         pictureSchema[key] = { label: { color: 'Colour saturation', intensity: 'Intensity' }[key] || key[0].toUpperCase() + key.slice(1), type: 'range', min: t.min, max: t.max, step: t.base === 'int' ? 1 : t.precision || 0.01 };
       }
-    } catch (e) { throwIfAborted(signal); if (signal && transportFailure(e)) throw e; pictureSchema = {}; }
+      } catch (e) { throwIfAborted(signal); pictureSchema = {}; }
     refreshed = Date.now();
   }
   async function waitStopped(selected, checkMove) {
@@ -141,17 +141,18 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       // A successful core query proves liveness. Optional properties may be
       // unsupported, but total transport failure must reach the relay's offline policy.
       const read = (property) => rpc('property.get', { property }, timeoutMs, undefined, signal);
-      const optional = async (fn, fallback) => { try { return await fn(); } catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; return fallback; } };
       const s = { online: true, power: mapPower(await read('system.state')) };
       await discover(signal);
       s.errors = null; // Pulse alarm telemetry is not implemented; unknown is not clear.
-      s.shutter = await optional(async () => { const sh = String(await read('optics.shutter.target')).toLowerCase(); return sh === 'closed' ? SHUTTER.CLOSED : sh === 'open' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; }, SHUTTER.UNKNOWN);
-      s.input = await optional(async () => String(await read(inputProperty)), null);
-      s.lightHours = await optional(async () => Math.round(Number(await read('statistics.laserruntime.value')) / 3600));
-      s.name = await optional(async () => String(await read('system.name')));
-      s.pattern = await optional(async () => (await read('image.testpattern.show')) ? String(await read('image.testpattern.selected')) : 'off', null);
-      s.lens = await optional(() => lensReadback(signal), null);
-      s.signal = await optional(() => read('image.window.main.activesignal'), null);
+      // A dropped optional read keeps the fallback. Only system.state fails the poll.
+      const optionalRead = async (fn, fallback) => { try { return await fn(); } catch (e) { throwIfAborted(signal); return fallback; } };
+      s.shutter = await optionalRead(async () => { const sh = String(await read('optics.shutter.target')).toLowerCase(); return sh === 'closed' ? SHUTTER.CLOSED : sh === 'open' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; }, SHUTTER.UNKNOWN);
+      s.input = await optionalRead(async () => String(await read(inputProperty)), null);
+      s.lightHours = await optionalRead(async () => Math.round(Number(await read('statistics.laserruntime.value')) / 3600));
+      s.name = await optionalRead(async () => String(await read('system.name')));
+      s.pattern = await optionalRead(async () => (await read('image.testpattern.show')) ? String(await read('image.testpattern.selected')) : 'off', null);
+      s.lens = await optionalRead(() => lensReadback(signal), null);
+      s.signal = await optionalRead(() => read('image.window.main.activesignal'), null);
       throwIfAborted(signal);
       return s;
     },
@@ -200,12 +201,17 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       if (entries.some(([axis, target]) => !Object.hasOwn(axes, axis) || !Number.isFinite(target))) throw new Error('Invalid lens recall targets.');
       return moveTargets(entries.map(([axis, target]) => [axes[axis], target]));
     },
+    async stopAxes(list = Object.values(axes)) {
+      motionGeneration++;
+      // Separate connections, not the status queue, and every axis is attempted.
+      const results = await Promise.allSettled(list.map((axis) => rpcOnce(axis + '.stop', undefined, timeoutMs)));
+      const failed = results.filter((result) => result.status === 'rejected');
+      if (failed.length === results.length) throw failed[0].reason;
+      if (failed.length) throw new Error(`Stop reached every axis; ${failed.length} did not acknowledge`);
+      return 'OK';
+    },
     async lens(op = {}) {
-      if (op.op === 'stop') {
-        motionGeneration++;
-        for (const axis of Object.values(axes)) await rpc(axis + '.stop');
-        return 'OK';
-      }
+      if (op.op === 'stop') return this.stopAxes();
       const generation = motionGeneration;
       const checkMove = () => { if (generation !== motionGeneration) throw new Error('Lens movement cancelled by Stop lens'); };
       if (mapPower(await get('system.state')) !== POWER.ON) throw new Error('Power on the projector before moving the lens.');

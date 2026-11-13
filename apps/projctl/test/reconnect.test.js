@@ -104,7 +104,10 @@ test('Pulse cancellation after core reply drains no optional backlog and reconne
   a.abort(new Error('test poll deadline')); await assert.rejects(pending, /deadline/);
   await until(() => f.sockets.size === 0, 'aborted socket leaked'); assert.equal(f.requests.length, 2);
   mode = 'online'; assert.equal((await d.getStatus()).power, 'on');
-  mode = 'drop-optional'; await assert.rejects(d.getStatus(), /closed/);
+  mode = 'drop-optional';
+  const partial = await d.getStatus();
+  assert.equal(partial.power, 'on', 'a dropped optional read does not fail the poll after system.state');
+  assert.equal(partial.shutter, 'unknown');
   mode = 'online'; assert.equal((await d.getStatus()).power, 'on');
   assert.ok(f.requests.every(r => r.method === 'property.get' || r.method === 'image.source.list' || r.method === 'introspect'));
 });
