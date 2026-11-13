@@ -8,17 +8,20 @@ accepted as proof of the signal resolution. See [the brief](BRIEF.md) and
 ## Run and install
 
 Unzip the packaged app, move it to `/Applications` or `~/Applications`, and open
-it. Enable at Login registers its bundled Aqua LaunchAgent through Apple's
+it. For an upgrade, first Quit Screen Check from its menu, replace the app, then
+reopen it. Your existing profile is retained. Enable at Login registers its bundled Aqua LaunchAgent through Apple's
 `SMAppService`. The app shows the actual authorization status; if approval is
 needed, Open Login Settings takes the operator there. Do this under the Studio's
 production account. No administrator daemon or automatic login is installed.
 
 Checks run on launch, on demand, and after macOS screen-change and wake events.
-Startup waits 12 seconds; later events debounce for two seconds. Reads require
+Startup waits 12 seconds; later events debounce for two seconds, with a six-second
+maximum postponement during a continuous event burst. Reads require
 two matching snapshots, with bounded retries while connections change. There is no
 continuous polling and no network access. Closing the window leaves its menu-bar
-status visible. The on-demand instance and the login instance share a single
-bundle identity. Quit does not disable future login launches.
+status visible. The on-demand and login instances share an OS-held file lock;
+a second manual launch requests the existing checklist. A crash releases the
+lock without deleting a PID file. Quit does not disable future login launches.
 
 Expected settings live in
 `~/Library/Application Support/Frozen Screen Check/show-profile.json`. The
@@ -30,7 +33,11 @@ readings with a separate warning; an existing saved report can be older, so its
 timestamp matters. Export reads the screens again after the Save dialog closes
 and will not overwrite the show profile. Export includes current display
 handles, model IDs, display UUIDs and serial numbers when macOS provides them;
-reports remain local until the operator shares one.
+reports remain local until the operator shares one. New reports and replacements
+are created with owner-only file permissions before any content is written.
+Files already exported by older versions retain their existing permissions.
+Named pipes and directories cannot be loaded as profiles; a symlink to a regular
+profile remains supported. The loader validates the opened file descriptor.
 
 All four projector outputs require unscaled, progressive 1920×1200 near 60 Hz, and the operator
 monitor requires unscaled 1920×1080 near 60 Hz. The seed profile is based on a
@@ -46,6 +53,7 @@ On macOS with Command Line Tools:
 ```sh
 bash apps/screen-check/test.sh
 bash apps/screen-check/build.sh
+bash apps/screen-check/verify-package.sh apps/screen-check/dist/Frozen-Screen-Check-1.0.2.zip
 "apps/screen-check/dist/Frozen Screen Check.app/Contents/MacOS/FrozenScreenCheck" --check-json
 ```
 
@@ -55,6 +63,18 @@ development. Signing alone is not notarization. A distribution artifact should
 be submitted using the owner's existing notary credentials and stapled before
 sharing. Do not disable Gatekeeper or remove quarantine as an install step.
 Zip SHA-256, signature and packaged-app acceptance are recorded per build.
+The build stages a clean bundle before replacing its output, so deleted resources
+do not survive repeated builds. `BUILD-MANIFEST.txt` records source, Swift version,
+SDK, target and archive checksum. A per-output lock rejects overlapping builds.
+CI rebuilds with an obsolete-resource fixture and checks that it is removed.
+
+The extracted-package gate verifies signature integrity, architecture, metadata,
+bundled profile/instructions, login helper and a failing CLI invocation. Set
+`REQUIRE_NOTARIZED=1` when running it on a release candidate to require stapling,
+Gatekeeper acceptance and a clean source revision. Development CI is not a
+notarization or installed-app acceptance result. The declared deployment target
+is macOS 13; CI uses macOS 15. Minimum-version runtime acceptance must be recorded
+separately. No third-party runtime packages are required.
 
 CLI exit codes: 0 all expected settings match; 2 attention needed; 3 unable to
 verify. `--profile path.json` selects an explicit profile for CLI checks. The CLI
@@ -62,6 +82,24 @@ rejects missing paths, unknown flags, duplicate flags and conflicting modes; it
 never silently falls back after a malformed invocation. It does not create or
 replace a profile. This verifier deliberately has no set-mode
 or automatic-repair command.
+
+## Maintainer map
+
+| File | Responsibility |
+| --- | --- |
+| `Sources/CheckCore.swift` | Profile types, pure evaluation, bounded snapshot/debounce rules, presentation labels and CLI parsing |
+| `Sources/MacDisplays.swift` | Read-only AppKit/CoreGraphics/IOKit observations; called on the main thread |
+| `Sources/FileStore.swift` | Descriptor-validated profile loading, private atomic reports, session result/recovery and instance lock |
+| `Sources/CheckModel.swift` | Observable UI state, injected verification session, event scheduling, login actions and export flow |
+| `Sources/AppEnvironment.swift` | Bundle resources and app-owned locations |
+| `Sources/main.swift` | SwiftUI views, AppKit application lifecycle, menu and existing-window activation |
+
+`test.sh` runs both pure/file fixtures and injected model transitions without
+writing the production profile or changing displays. UI rows expose their name,
+status, target and issues as one accessibility element; unknown is distinct from
+missing. Command-R checks, Command-E exports, and Command-comma opens the profile.
+See the [operator troubleshooting card](TROUBLESHOOTING.md) and
+[ten-area review](REVIEW-2026-11-13.md) for evidence and remaining acceptance work.
 
 ## Evidence limits
 

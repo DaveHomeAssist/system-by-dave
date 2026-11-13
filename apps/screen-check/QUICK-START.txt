@@ -2,6 +2,7 @@ FROZEN SCREEN CHECK — MAC STUDIO
 
 1. Unzip the Frozen-Screen-Check ZIP.
 2. Move Frozen Screen Check.app to Applications and open it.
+   Upgrading? Quit the old Screen Check from its menu before replacing it.
 3. Click Enable at Login. If macOS requests approval, allow Frozen Screen
    Check in System Settings > General > Login Items & Extensions.
 
@@ -28,6 +29,7 @@ physical pixel counts of the projector panels.
 
 CHECK means inspect the row. It may be missing, inactive, mirrored,
 scaled, at the wrong resolution/rate, or have an unrecognized identity.
+UNKNOWN means macOS did not provide enough information for that row.
 The app never changes outputs, power, inputs, shutter, focus or mapping.
 A match does not prove that the projector is receiving or showing light.
 
@@ -36,6 +38,9 @@ edit show-profile.json, save, and Check Now. Invalid profiles fail visibly.
 Export Report reads the screens again after you choose a file, then saves those
 fresh observations. A save failure leaves the current screen readings visible
 with a warning; an older saved report may remain, so check its timestamp.
+Reports contain device identifiers and are saved with owner-only permissions.
+Keyboard shortcuts: Command-R checks, Command-E exports, Command-comma
+opens the profile folder. Reopening the app brings back its existing checklist.
 
 Requires an Apple Silicon Mac running macOS 13 or later. No Node, Python,
 browser, backend, network connection or developer tools are required.

@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 
 var passed = 0
 func expect(_ condition: Bool, _ message: String) {
@@ -145,5 +146,67 @@ do { _ = try loadProfile(at: savedProfile); expect(false, "oversized profile mus
 do { _ = try loadProfile(at: scratch); expect(false, "directory cannot be a profile") } catch { passed += 1 }
 try Data("{broken".utf8).write(to: savedProfile)
 do { _ = try loadProfile(at: savedProfile); expect(false, "damaged profile must reject") } catch { passed += 1 }
+
+// Boundary and metamorphic checks start from the documented five-screen rule.
+for hz in [59.85, 60.15] {
+    changed = healthy; changed[3].refreshRate = hz
+    expect(try result(changed).state == .ready, "inclusive refresh boundary \(hz)")
+}
+for hz in [59.849, 60.151, Double.nan, Double.infinity] {
+    changed = healthy; changed[3].refreshRate = hz
+    expect(try result(changed).state != .ready, "invalid/out-of-range refresh \(hz) cannot pass")
+}
+for i in healthy.indices {
+    changed = healthy; changed[i].pixelWidth = 3840
+    expect(try result(changed).state != .ready, "each expected screen independently gates the result")
+    changed = healthy; changed.remove(at: i)
+    expect(try result(changed).state != .ready, "removing any expected screen cannot pass")
+}
+changed = healthy.enumerated().map { index, display in
+    var copy = display; copy.id = UInt32(index + 1000); copy.name = "Renamed"; return copy
+}
+expect(try result(Array(changed.reversed())).state == .ready, "handles, names and ordering do not replace model identity")
+changed = healthy; changed[3].refreshRate = nil
+let unknownRow = try result(changed).rows[2]
+expect(unknownRow.stateLabel == "UNKNOWN" && unknownRow.accessibilitySummary.contains("refresh rate is unknown"), "unknown has a distinct visible and spoken label")
+expect(missing.rows[0].stateLabel == "CHECK", "partially missing pair is not described as entirely missing")
+
+let fifo = scratch.appendingPathComponent("profile-fifo")
+expect(mkfifo(fifo.path, 0o600) == 0, "FIFO fixture created")
+do { _ = try loadProfile(at: fifo); expect(false, "FIFO must reject without waiting for a writer") } catch { passed += 1 }
+let alias = scratch.appendingPathComponent("profile-alias.json")
+try JSONEncoder().encode(profile).write(to: savedProfile)
+try FileManager.default.createSymbolicLink(at: alias, withDestinationURL: savedProfile)
+expect(try loadProfile(at: alias).groups.count == 4, "a symlink to a valid regular profile remains supported")
+let privateReport = scratch.appendingPathComponent("private-report.json")
+try writePrivateReport(all, to: privateReport)
+let mode = try FileManager.default.attributesOfItem(atPath: privateReport.path)[.posixPermissions] as! NSNumber
+expect(mode.intValue & 0o777 == 0o600, "report is private at creation")
+let linkedReport = scratch.appendingPathComponent("linked-report.json")
+let originalProfile = try Data(contentsOf: savedProfile)
+try FileManager.default.createSymbolicLink(at: linkedReport, withDestinationURL: savedProfile)
+try writePrivateReport(all, to: linkedReport)
+expect(try Data(contentsOf: savedProfile) == originalProfile, "report rename never follows destination symlink")
+let blockedDestination = scratch.appendingPathComponent("blocked.json")
+try FileManager.default.createDirectory(at: blockedDestination, withIntermediateDirectories: true)
+let beforeChildren = Set(try FileManager.default.contentsOfDirectory(atPath: scratch.path))
+do { try writePrivateReport(all, to: blockedDestination); expect(false, "cannot replace directory with report") } catch { passed += 1 }
+expect(Set(try FileManager.default.contentsOfDirectory(atPath: scratch.path)) == beforeChildren, "failed export cleans up its temporary file")
+
+var debounce = CheckDebounce()
+expect(debounce.delay(at: 100) == 2 && debounce.delay(at: 101) == 2, "ordinary events get a settling interval")
+expect(debounce.delay(at: 105.5) == 0.5 && debounce.delay(at: 106) == 0, "continuous notifications cannot starve a check")
+debounce.reset()
+expect(debounce.delay(at: 107) == 2, "completed check resets the settling window")
+
+let lockURL = scratch.appendingPathComponent("instance.lock")
+var lease = try InstanceLease.acquire(at: lockURL)
+expect(lease != nil, "first instance owns the lock")
+expect(try InstanceLease.acquire(at: lockURL) == nil, "second instance cannot acquire the same lock")
+lease = nil
+expect(try InstanceLease.acquire(at: lockURL) != nil, "released instance lock can be reacquired without deleting a PID file")
+let lockLink = scratch.appendingPathComponent("lock-link")
+try FileManager.default.createSymbolicLink(at: lockLink, withDestinationURL: savedProfile)
+do { _ = try InstanceLease.acquire(at: lockLink); expect(false, "lock cannot follow a symlink") } catch { passed += 1 }
 
 print("PASS: \(passed) display-check cases")

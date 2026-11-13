@@ -1,5 +1,18 @@
 # Changelog
 
+## November 13, 2026: Screen checker 1.0.2 review improvements
+
+- Clear stale action feedback on checks and reconnects; distinguish unknown rows
+  and expose complete row summaries and shortcuts to keyboard/accessibility users.
+- Separate the injected UI model from views, bound event-burst postponement, and
+  use an OS-held instance lock with existing-window activation.
+- Save reports privately and atomically; validate opened profile files, including
+  rejection of non-regular inputs without waiting for a pipe writer.
+- Build clean bundles, verify extracted archives and preserve toolchain/checksum
+  evidence. Add model-transition, boundary, file and lifecycle regression checks.
+- Document operator recovery and all ten review areas, retaining explicit
+  minimum-OS, Studio hardware and notarization acceptance boundaries.
+
 ## November 13, 2026: Screen checker 1.0.1 edge cases
 
 - Preserve successful screen readings when report storage fails, and re-read
