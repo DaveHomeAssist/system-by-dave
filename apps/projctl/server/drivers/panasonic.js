@@ -76,10 +76,13 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
       const abort = () => fail(signal.reason || new Error('Projector poll cancelled'));
       const t = setTimeout(() => fail(new Error('timeout (port 1024)')), timeoutMs);
       signal?.addEventListener('abort', abort, { once: true });
+      let bytes = 0;
       sock.on('error', fail);
       sock.on('end', () => fail(new Error('connection closed before Panasonic reply')));
       sock.on('close', () => fail(new Error('connection closed before Panasonic reply')));
       sock.on('data', (d) => {
+        bytes += d.length;
+        if (bytes > 8192) return fail(new Error('Panasonic response exceeds size limit'));
         buf += d.toString('latin1');
         let idx;
         while ((idx = buf.indexOf('\r')) >= 0) {
@@ -90,12 +93,17 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
             try { throwIfAborted(signal); sock.write(prefix + '00' + cmd + '\r'); } catch (e) { return fail(e); }
           } else {
             cleanup(); done = true; sock.end();
-            const body = line.replace(/^00/, '');
-            if (body === 'ERRA') return reject(new Error('auth failed: admin user/password wrong (Setup tab)'));
-            if (body.startsWith('ER401')) return reject(Object.assign(new Error('projector refuses this now (no signal, wrong state, or unsupported)'), { code: 'ER401' }));
-            if (body.startsWith('ER402')) return reject(new Error('invalid parameter'));
-            if (body.startsWith('ER')) return reject(new Error(body));
-            resolve(body);
+            const body = line.startsWith('00') ? line.slice(2) : line;
+            const commandName = cmd.split('=')[0];
+            const echoed = /^([A-Z]{2,}(?::[A-Z0-9]+)?)=(.*)$/.exec(body);
+            // The exchange is already marked done above, so fail() would do nothing here.
+            if (echoed && echoed[1] !== commandName) return reject(new Error('Panasonic reply does not match the command'));
+            const payload = echoed ? echoed[2] : body;
+            if (payload === 'ERRA') return reject(new Error('auth failed: admin user/password wrong (Setup tab)'));
+            if (payload.startsWith('ER401')) return reject(Object.assign(new Error('projector refuses this now (no signal, wrong state, or unsupported)'), { code: 'ER401' }));
+            if (payload.startsWith('ER402')) return reject(new Error('invalid parameter'));
+            if (payload.startsWith('ER')) return reject(new Error(payload));
+            resolve(payload);
           }
         }
       });
