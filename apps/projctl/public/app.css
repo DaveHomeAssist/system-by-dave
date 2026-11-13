@@ -68,22 +68,24 @@ select.avd-input{appearance:none;-webkit-appearance:none;background-image:linear
   .lens>div{grid-template-columns:72px 1fr 1fr}
 }
 
-/* Frozen control desk: static ice and aurora, with operational state colors retained. */
+/* Booth console. Worklight (light) and booth (dark) share one technical surface.
+   Lane colors stay drawing identity. State is never color alone. */
 :root,[data-theme="light"]{
-  --ground:#edf5fa;--surface:#ffffff;--surface-raised:#e2eff7;--surface-sunken:#e8f2f8;
-  --ink:#153149;--ink-muted:#465f73;--ink-faint:#526b7e;--hairline:#c4d9e6;--line-control:#728fa3;
-  --tape:#175778;--on-tape:#ffffff;--focus-ring:#006c96;--action-hover:#10425d;
-  --radius-md:10px;--radius-lg:14px;--aurora:#d8eef0;
+  --ground:#e4e7ec;--surface:#f7f8fa;--surface-raised:#ffffff;--surface-sunken:#e8ebf0;
+  --ink:#14181f;--ink-muted:#3e4654;--ink-faint:#5c6573;--hairline:#c5cbd4;--line-control:#5e6878;
+  --tape:#1c2430;--on-tape:#f7f8fa;--focus-ring:#0b63ce;--action-hover:#000000;
+  --radius-md:6px;--radius-lg:8px;--aurora:transparent;
+  --state-done:#0e7a43;--state-blocked:#c4232b;--state-waiting:#b45309;--state-active:#8a5a00;--state-queued:#1d4e9f;
 }
 [data-theme="dark"]{
-  --ground:#081421;--surface:#102438;--surface-raised:#18334a;--surface-sunken:#0a1b2c;
-  --ink:#edf7ff;--ink-muted:#b1cbdc;--ink-faint:#a2bdd1;--hairline:#2b4b63;--line-control:#7192aa;
-  --tape:#a3e6ee;--on-tape:#0b2536;--focus-ring:#b1f5f5;--action-hover:#d1ffff;--aurora:#173f4c;
-  --state-blocked:#ff9b91;--state-waiting:#ffc18a;--state-done:#79dfa2;
+  --ground:#0c0e12;--surface:#171b22;--surface-raised:#222833;--surface-sunken:#101318;
+  --ink:#f3f5f8;--ink-muted:#b6bfcc;--ink-faint:#8e98a8;--hairline:#2d3440;--line-control:#7b8696;
+  --tape:#e7edf5;--on-tape:#12161c;--focus-ring:#9ecbff;--action-hover:#ffffff;--aurora:transparent;
+  --state-blocked:#ff5d5d;--state-waiting:#ffb020;--state-active:#f0c94d;--state-done:#3ddc84;--state-queued:#8eb6ff;
 }
 html{color-scheme:light}html[data-theme="dark"]{color-scheme:dark}
-.avd-shell{height:100dvh;min-width:0;background:radial-gradient(ellipse at 95% 0,var(--aurora),transparent 45%),var(--ground)}
-.pj-header{padding-block:16px;background:var(--surface);border-top:3px solid var(--tape)}
+.avd-shell{height:100dvh;min-width:0;background:var(--ground)}
+.pj-header{padding-block:10px;background:var(--surface);border-top:2px solid var(--ink);border-bottom:1px solid var(--hairline)}
 .pj-brand{display:flex;gap:12px;align-items:center;margin-right:auto;min-width:0}
 .pj-snowmark{color:var(--tape);flex-shrink:0}.pj-brand h1{font:700 clamp(18px,2vw,26px)/1.2 var(--font-display);margin:4px 0 0;letter-spacing:-.04em}
 .pj-kicker{font:500 10px/1.4 var(--font-mono);letter-spacing:.12em;color:var(--ink-muted)}
@@ -247,7 +249,7 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 /* Keep operator chrome bounded when platform fonts make the middle-width header wrap. */
 @media(min-width:760px) and (max-width:1100px) and (min-height:700px) and (max-height:1050px){
   .pj-main{padding-block:12px}
-  .pj-header{display:grid;grid-template-columns:minmax(150px,1fr) auto auto 44px 44px;gap:4px 8px;padding:6px 12px;align-items:center}
+  .pj-header{display:grid;grid-template-columns:minmax(150px,1fr) auto auto auto 44px;gap:4px 8px;padding:6px 12px;align-items:center}
   .pj-header .pj-brand{grid-column:1;grid-row:1/3;min-width:0;gap:8px}.pj-header .pj-snowmark{display:none}.pj-header .pj-brand h1{font-size:20px;line-height:24px;margin:0}.pj-header .pj-kicker{font-size:8px}
   .pj-header .pj-clock{grid-column:2;grid-row:1/3;line-height:16px}.pj-header .pj-clock>span{font-size:9px}.pj-header .pj-clock>strong{font-size:12px}
   .pj-header #conn{grid-column:3;grid-row:1;justify-self:start}.pj-header #relay-mode{grid-column:3;grid-row:2;font-size:10px;line-height:16px;padding:2px 5px}
@@ -260,3 +262,82 @@ button,select,input.avd-input{min-height:44px}button:not(:disabled):hover{filter
 
 /* Retained feedback stays readable without looking like current telemetry. */
 .pj-summary-tile.offline .pj-summary-values strong,.pj-summary-tile.offline .pj-summary-signal{color:var(--ink-muted)}
+
+/* Booth console pass: contrast, status shape, and control hierarchy.
+   Layout sizes that the rig already fits are left alone. */
+.avd-dot--blocked{border-radius:1px}
+.avd-dot--active{border-radius:0;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.avd-dot--waiting{background:transparent;box-shadow:inset 0 0 0 2.5px var(--state-waiting)}
+.avd-dot--queued{background:transparent;box-shadow:inset 0 0 0 2px var(--state-queued)}
+.avd-btn--danger:not(:disabled){background:var(--state-blocked);border-color:var(--state-blocked);color:#fff}
+[data-theme="dark"] .avd-btn--danger:not(:disabled){color:#1a0506}
+#adj-stop:not(:disabled){background:var(--ink);color:var(--ground);border-color:var(--ink);letter-spacing:.08em}
+.pj-primary-controls [data-c="shutter"]:not(:disabled){border-width:2px;border-color:var(--ink);background:var(--surface);color:var(--ink)}
+.pj-primary-controls [data-c="shutter"][data-a="1"]:not(:disabled){background:var(--ink);color:var(--ground)}
+.pj-lock{width:auto;min-width:44px;padding:0 12px;gap:6px}
+.pj-lock-word{font-family:var(--font-display);font-size:11px;line-height:14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.pj-lock[data-lock-state="unlocked"] [data-lock-word="on"],.pj-lock[data-lock-state="locked"] [data-lock-word="off"]{display:none}
+.pj-lock[data-lock-state="locked"],.pj-lock[data-lock-state="locked"]:disabled{background:#f3d36b;color:#1c1606;border:2px dashed #1c1606;opacity:1}
+html:has(#show-lock[data-lock-state="locked"]) .pj-header{box-shadow:inset 0 -4px 0 #e2b340}
+html:has(#show-lock[data-lock-state="locked"]) .pj-selected-dock [data-lens-state]{font-weight:700;color:var(--ink)}
+html:has(#show-lock[data-lock-state="locked"]) .pj-selected-dock [data-lens-state]::before{content:"LOCKED · ";letter-spacing:.06em}
+.pj-mode--demo{border-style:dashed}
+.pj-mode--demo::before{content:"";display:inline-block;width:7px;height:7px;margin-right:6px;background:var(--state-waiting);border-radius:1px;vertical-align:1px}
+#grid>.pj-summary-tile{background:var(--surface);border:1px solid var(--hairline);border-top:3px solid var(--lane-accent);border-radius:8px}
+#grid>.pj-summary-tile.offline{overflow:visible;min-height:max-content;background:repeating-linear-gradient(-45deg,var(--surface) 0 7px,color-mix(in srgb,var(--state-blocked) 16%,var(--surface)) 7px 8px);border-style:dashed;border-top-style:solid;border-color:var(--state-blocked);border-top-color:var(--lane-accent)}
+#grid>.pj-summary-tile.offline .pj-summary-select{height:auto}
+#grid>.pj-summary-tile.offline .pj-summary-state,#grid>.pj-summary-tile.offline .pj-summary-freshness{white-space:normal;overflow:visible;text-overflow:unset}
+.pj-summary-select[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--ink);background:var(--surface-sunken)}
+.pj-summary-state{white-space:normal}
+.pj-summary-state.has-alarms::before{content:"";display:inline-block;width:0;height:0;margin-right:6px;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:8px solid var(--state-blocked);vertical-align:1px}
+.pj-summary-values strong{font-family:var(--font-mono);font-variant-numeric:tabular-nums;letter-spacing:0}
+.pj-tile[data-lane]:not([data-lane=""]) .avd-panel__body,.pj-detail-controls[data-lane] .avd-panel__body{background:var(--surface)}
+.pj-tile,.pj-detail-controls,.pj-setup{border-radius:8px}
+.avd-shell__tabs .avd-tab[aria-selected="true"]{background:var(--surface);color:var(--ink)}
+@media(max-width:680px){
+  .pj-header{display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"brand lock theme" "clock conn conn" "mode mode mode";align-items:center;gap:4px 8px;padding:8px 10px}
+  .pj-header .pj-brand{grid-area:brand;flex-basis:auto;min-width:0}
+  .pj-header .pj-brand h1{font-size:18px;margin:0}
+  .pj-header .pj-kicker{font-size:9px}
+  .pj-header .pj-clock{grid-area:clock;text-align:left}
+  .pj-header #conn{grid-area:conn;justify-self:end;margin:0}
+  .pj-header #relay-mode{grid-area:mode;justify-self:start;max-width:100%}
+  .pj-header #show-lock{grid-area:lock}
+  .pj-header #theme{grid-area:theme}
+  .avd-shell__tabs .avd-tab{font-size:10px;letter-spacing:.03em;line-height:12px;min-height:44px;padding:4px 3px}
+}
+@media(max-width:360px),(max-height:450px){
+  .pj-lock-word{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .pj-lock{width:44px;min-width:44px;padding:0}
+}
+@media(max-width:520px){.pj-setup-fields{grid-template-columns:1fr}}
+
+/* Confirmations, phone Stop, and the command toast. */
+[hidden]{display:none !important}
+.pj-power-off-row{flex:1 0 100%;display:flex;justify-content:flex-end;margin-top:10px;padding-top:10px;border-top:2px dashed var(--state-blocked)}
+.pj-power-off-row .avd-btn{min-height:48px;min-width:min(100%,220px)}
+@media(max-width:720px){
+  .pj-rig-all[open] .pj-allbar{position:static;width:auto;right:auto;max-width:100%}
+}
+.pj-power-off{margin-top:8px}
+.pj-power-off .avd-btn{width:100%}
+.pj-reset-gap{margin-left:18px}
+.pj-header #theme{margin-inline-start:28px}
+.pj-lock[data-arm="confirm"] [data-lock-word="off"],.pj-lock[data-arm="confirm"] [data-lock-word="on"]{display:none}
+.pj-lock[data-arm="confirm"] [data-lock-word="confirm"]{display:inline}
+.pj-lock:not([data-arm="confirm"]) [data-lock-word="confirm"]{display:none}
+.pj-setup-footer{gap:8px}
+.pj-setup-logout{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#toast{top:64px;bottom:auto !important;left:12px;right:auto;transform:none;width:min(520px,calc(100vw - 24px));max-height:48px;overflow:auto;pointer-events:none}
+@media(max-width:680px){
+  #toast{top:136px;bottom:auto !important;width:min(360px,calc(100vw - 24px));max-height:44px}
+  .pj-allbar[aria-labelledby="all-label"]>.pj-power-off-row{grid-column:1 / -1}
+  #tab-rig.on{display:flex;flex-direction:column}
+  #tab-rig>.pj-overview{order:0}
+  #tab-rig>.pj-rig-all{order:1}
+  #tab-projector.pj-selected-dock{order:2}
+  #grid{order:3}
+  .pj-selected-dock .pj-lens-workspace{display:flex;flex-direction:column}
+  .pj-selected-dock .pj-lens-keyboard-row{order:-1}
+  .pj-selected-dock .pj-lens-keyboard-row [data-lens-stop]{min-width:120px;min-height:48px;font-size:14px}
+}

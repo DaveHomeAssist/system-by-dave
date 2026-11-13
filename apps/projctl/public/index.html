@@ -28,6 +28,9 @@
     <button class="avd-btn avd-btn--icon pj-lock" id="show-lock" type="button" aria-pressed="false" aria-label="Show lock off. Enable show lock" title="Show lock off · Enable show lock" data-lock-state="unlocked" disabled>
       <svg class="avd-icon" data-lock-icon="locked" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3"/></svg>
       <svg class="avd-icon" data-lock-icon="unlocked" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 7.5-2M12 14v3"/></svg>
+      <span class="pj-lock-word" data-lock-word="off">Lock</span>
+      <span class="pj-lock-word" data-lock-word="on">Locked</span>
+      <span class="pj-lock-word" data-lock-word="confirm">Confirm</span>
     </button>
     <button class="avd-btn avd-btn--quiet avd-btn--icon" id="theme" type="button" aria-label="Switch light and dark theme">
       <svg class="avd-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 4v16"></path><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"></path></svg>
@@ -61,10 +64,10 @@
           <button class="avd-seg__btn" data-all="shutter" data-arg="1" type="button">Closed</button>
         </div>
         <button class="avd-btn" data-all="power" data-arg="1" type="button">Power on</button>
-        <button class="avd-btn avd-btn--danger" data-all="power" data-arg="0" type="button">Power off</button>
         <span class="pj-vrule" aria-hidden="true"></span>
         <button class="avd-btn avd-btn--quiet" data-all="pattern" data-arg="08" type="button">Colour bars</button>
         <button class="avd-btn avd-btn--quiet" data-all="pattern" data-arg="00" type="button">Pattern off</button>
+        <div class="pj-power-off-row"><button class="avd-btn avd-btn--danger" data-all="power" data-arg="0" type="button">Power off</button></div>
       </div></details>
       <div id="grid" class="pj-grid" role="region" aria-label="A to D projector multiview" tabindex="0" data-web2-scroll></div>
     <section id="tab-projector" class="pj-projector-page pj-selected-dock" role="region" aria-labelledby="projector-detail-title" hidden>
@@ -142,6 +145,7 @@
       <div id="setup" class="pj-list pj-fill" role="region" aria-label="Projector setup" tabindex="0" data-web2-scroll></div>
       <p class="pj-mono" id="relay-build">Build …</p>
       <p class="pj-mono pj-note">Show lock blocks power off, input, test pattern, picture and lens moves (Stop still works), plus address edits, discovery, presets and power schedules. Shutter and power on stay available.</p>
+      <p class="pj-setup-logout"><button id="logout" class="avd-btn" type="button">Log out</button> <span class="pj-mono">Ends this browser's session. It does not change the projectors.</span></p>
       <p class="pj-mono pj-note">Cue input stays on the show LAN: OSC UDP 9000 or a text line on TCP 9001. Do not publish those ports, or the projector ports, on Funnel or a tunnel. Forms: <code>/proj/P4/shutter 1</code>, <code>/proj/all/power 0</code>, <code>/proj/preset/preshow</code>. A TCP reply of OK means the relay finished the cue with no slot error. It does not mean the picture on stage was checked. One power-off cue is accepted until <code>PROJCTL_CUE_POWER_OFF=confirm</code> (send it twice within 3 s) or <code>off</code>.</p>
     </section>
   </main>

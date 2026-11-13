@@ -7,6 +7,7 @@ import { loadReference, mountReference, referenceGearHTML } from './reference-vi
 import { createConnectionMonitor } from './projector-connection.js';
 import { startHeaderClock } from './header-clock.js';
 import { createThermalWatch } from './thermal-watch.js';
+import { confirmGate, lensHold, disabledDangerReason, CONFIRM_WINDOW_MS, LENS_MIN_HOLD_MS } from './operator-guard.js';
 startHeaderClock(document.querySelector('#operator-clock'));
 const $ = (s, r = document) => r.querySelector(s);
 let state = { projectors: [], presets: [], events: [], lock: false };
@@ -76,13 +77,99 @@ async function api(path, body) {
 }
 
 function commandFeedback(button,phase,message){if(!button)return;clearTimeout(button._feedbackTimer);button.dataset.commandState=phase;button.setAttribute('aria-busy',String(phase==='sending'));button.title=message;if(['acknowledged','error'].includes(phase))button._feedbackTimer=setTimeout(()=>{if(button.dataset.commandState===phase)delete button.dataset.commandState;},2500);}
+const pendingInput = new Map();
+const answerWatch = new Map();
+function confirmKey(slot, c, arg) {
+  if (c === 'power' && !Number(arg)) return `${slot}:power:off`;
+  if (c === 'resetInput') return `${slot}:resetInput`;
+  if (c === 'input') return `${slot}:input:${arg}`;
+  if (c === 'lens' && arg?.op === 'home') return `${slot}:lens:home`;
+  return null;
+}
+function serverConfirms(c, arg) { return (c === 'power' && !Number(arg)) || (c === 'lens' && arg?.op === 'home'); }
+function preferredName() { return state.preferredInput || 'HDMI'; }
+function powerOffLabel(slot) {
+  const projector = slot === 'all' ? null : state.projectors.find((item) => item.slot === slot);
+  const reason = slot === 'all'
+    ? (!connected ? 'relay offline' : state.lock ? 'show lock' : '')
+    : disabledDangerReason({ connected, offline: projector ? !connectionOf(projector).current : true, locked: !!state.lock, busy: !!projector?.busy, power: projector?.status?.power || '' });
+  if (!reason && confirmGate.armed(`${slot}:power:off`)) return 'Confirm power off';
+  return reason ? `Power off · ${reason}` : 'Power off';
+}
+function resetLabel(slot, label) {
+  const text = slot === 'all' ? `Reset all to ${label}` : `Reset to ${label}`;
+  return confirmGate.armed(`${slot}:resetInput`) ? `Confirm ${text.charAt(0).toLowerCase()}${text.slice(1)}` : text;
+}
+function refreshConfirmLabels() {
+  const pref = preferredName();
+  const allReset = $('[data-all="resetInput"]');
+  if (allReset) allReset.textContent = resetLabel('all', pref);
+  const allOff = $('[data-all="power"][data-arg="0"]');
+  if (allOff) { allOff.textContent = powerOffLabel('all'); allOff.title = allOff.disabled ? allOff.textContent : 'Powers off every projector. Confirm after the label changes. A double-click does not count.'; }
+  document.querySelectorAll('[data-c="power"][data-a="0"]').forEach((button) => {
+    const slot = button.closest('[data-slot]')?.dataset.slot;
+    if (!slot) return;
+    button.textContent = powerOffLabel(slot);
+    button.title = button.disabled ? button.textContent : 'Confirm power off after the label changes. A double-click does not count.';
+  });
+  document.querySelectorAll('[data-reset-input]').forEach((button) => {
+    const slot = button.dataset.resetSlot || button.closest('[data-slot]')?.dataset.slot;
+    if (!slot) return;
+    const label = button.dataset.preferred || pref;
+    button.textContent = resetLabel(slot, label);
+  });
+  document.querySelectorAll('[data-confirm-input]').forEach((button) => {
+    const slot = button.closest('[data-slot]')?.dataset.slot;
+    const pending = pendingInput.get(slot);
+    const armed = pending && confirmGate.armed(`${slot}:input:${pending.value}`);
+    button.hidden = !armed;
+    if (armed) button.textContent = `Confirm ${pending.label}`;
+  });
+  const lockButton = $('#show-lock');
+  if (lockButton) {
+    lockButton.dataset.arm = confirmGate.armed('show-lock') ? 'confirm' : '';
+    if (lockButton.dataset.arm === 'confirm') lockButton.setAttribute('aria-label', state.lock ? 'Confirm unlock. Tap again to turn show lock off.' : 'Confirm lock. Tap again to turn show lock on.');
+  }
+}
+function noteAnswer(slot) {
+  answerWatch.set(slot, { at: Date.now(), announced: false });
+  toast(`${slot} saved. Waiting to see if it answers.`);
+}
+function reportAnswers() {
+  for (const [slot, watch] of answerWatch) {
+    if (watch.announced || Date.now() - watch.at < 500) continue;
+    const projector = state.projectors.find((item) => item.slot === slot);
+    if (!projector) continue;
+    const stateName = projector.status?.connection?.state;
+    if (stateName === 'checking' && Date.now() - watch.at < 6000) continue;
+    watch.announced = true;
+    toast(connectionOf(projector).current ? `${slot} is answering.` : `${slot} saved, and it is not answering.`);
+  }
+}
 async function cmd(slot, c, arg, source) {
   const key = c === 'lens' ? `${slot}:lens:${arg?.op === 'stop' ? 'stop' : 'move'}` : `${slot}:${c}:${JSON.stringify(arg)}`;
+  const gateKey = confirmKey(slot, c, arg);
   if (!connected) { toast('Relay disconnected. Reconnect before sending commands.'); return false; }
   if (slot !== 'all' && !(c === 'lens' && arg?.op === 'stop') && !connectionOf(state.projectors.find(p=>p.slot===slot)).current) { toast('No fresh projector reply. Waiting for reconnection.'); return false; }
+  if (c === 'lens' && arg?.op === 'stop') lensHold.clear(slot);
+  if (c === 'lens' && arg?.axis) {
+    const moving = state.projectors.find((item) => item.slot === slot);
+    if (moving && lensHold.blocking(slot, { busy: !!moving.busy, lens: moving.status?.lens })) return false;
+  }
+  if (gateKey) {
+    const decision = confirmGate.press(gateKey);
+    refreshConfirmLabels();
+    setTimeout(refreshConfirmLabels, CONFIRM_WINDOW_MS + 40);
+    if (decision === 'ignore') return false;
+    if (decision === 'arm' && !serverConfirms(c, arg)) {
+      toast(c === 'input' ? 'Confirm the input change. Nothing was sent yet.' : c === 'resetInput' ? 'Confirm the input reset. Nothing was sent yet.' : 'Confirm before anything is sent.');
+      return false;
+    }
+  }
   if (commandsInFlight.has(key)) return;
+  if (c === 'lens' && arg?.axis) { lensHold.begin(slot); setTimeout(() => { updateLensWorkspace(); if (adjSlot) renderAdjust(); }, LENS_MIN_HOLD_MS + 30); }
   commandsInFlight.add(key);commandFeedback(source,'sending','Sending command; waiting for acknowledgement.');
-  if (c === 'lens') { $('#adj-motion').textContent = arg?.op === 'stop' ? 'Stopping lens...' : 'Lens moving. Waiting for stopped feedback...'; renderAdjust(); }
+  if (c === 'lens') { $('#adj-motion').textContent = arg?.op === 'stop' ? 'Stopping lens...' : 'Lens moving. Waiting for stopped feedback...'; renderAdjust(); updateLensWorkspace(); }
   try {
     const out = await api('command', { slot, cmd: c, arg, confirm: confirmTokens[key] });
     const r = out[slot];
@@ -90,22 +177,36 @@ async function cmd(slot, c, arg, source) {
     if (r?.confirm) {
       confirmTokens[key] = r.confirm;commandFeedback(source,'confirmation','Confirmation required; no action sent yet.');
       toast([r.message, ...errs].join(' · '), 3000);
-      setTimeout(() => { if (confirmTokens[key] === r.confirm) delete confirmTokens[key]; }, 3000);
+      refreshConfirmLabels();
+      setTimeout(() => { if (confirmTokens[key] === r.confirm) { delete confirmTokens[key]; confirmGate.clear(gateKey); refreshConfirmLabels(); } }, 3000);
       return;
     }
-    delete confirmTokens[key];commandFeedback(source,errs.length?'error':'acknowledged',errs.length?errs.join(' · '):'Command acknowledged. Check the live status; acknowledgement is not position verification.');
+    delete confirmTokens[key];
+    if (gateKey) confirmGate.clear(gateKey);
+    if (c === 'input') pendingInput.delete(slot);
+    commandFeedback(source,errs.length?'error':'acknowledged',errs.length?errs.join(' · '):'Command acknowledged. Check the live status; acknowledgement is not position verification.');
     if (slot === 'all') toast(Object.entries(out).map(([k, v]) => `${k}: ${v.error || (v.result === 'OK' ? 'command accepted' : v.result)}`).join(' · '), 6000);
     else if (errs.length) toast(errs.join(' · '), 6000);
     else toast(c === 'lens' ? `${slot}: lens command completed; check the reported position and image` : `${slot}: command accepted`);
     if (r?.status) { const p = state.projectors.find((x) => x.slot === slot); if (p) p.status = r.status; }
     if (c === 'lens') $('#adj-motion').textContent = errs.length ? errs.join(' · ') : 'Lens command completed. Check the reported position and image; absolute readback may be unavailable.';
+    refreshConfirmLabels();
     return !errs.length;
   } catch (e) { commandFeedback(source,'error',e.message);toast(e.message, 6000); if (c === 'lens') $('#adj-motion').textContent = e.message; return false; }
   finally { commandsInFlight.delete(key); if (c === 'lens') { if(adjSlot)renderAdjust(); updateLensWorkspace(); } }
 }
 document.querySelectorAll('[data-all]').forEach((b) => b.onclick = () => cmd('all', b.dataset.all, b.dataset.all === 'resetInput' ? undefined : b.dataset.all === 'pattern' ? b.dataset.arg : Number(b.dataset.arg),b));
 
-$('#show-lock').onclick = () => api('lock', { lock: !state.lock }).catch((e) => toast(e.message));
+$('#show-lock').onclick = () => {
+  if ($('#show-lock').disabled) return;
+  const decision = confirmGate.press('show-lock');
+  refreshConfirmLabels();
+  setTimeout(refreshConfirmLabels, CONFIRM_WINDOW_MS + 40);
+  if (decision === 'ignore') return;
+  if (decision === 'arm') { toast(state.lock ? 'Tap Confirm again to turn show lock off. A double-click does not count.' : 'Tap Confirm again to turn show lock on. A double-click does not count.'); return; }
+  api('lock', { lock: !state.lock }).then(() => confirmGate.clear('show-lock')).catch((e) => toast(e.message));
+};
+$('#logout').onclick = () => api('logout', {}).then(() => { location.href = '/login.html'; }).catch((e) => toast(e.message));
 $('#preset-save').onclick = () => { const n = $('#preset-name').value.trim(); if (!n) return toast('Name the preset first'); api('preset/save', { name: n }).then(() => { $('#preset-name').value = ''; toast(`Saved ${n}`); }).catch((e) => toast(e.message)); };
 $('#discover').onclick = async () => { $('#discover-out').textContent = 'searching…'; try { const r = await api('discover'); $('#discover-out').textContent = r.note ? r.note : `${r.found.length} replied, ${r.changed} updated`; } catch (e) { $('#discover-out').textContent = e.message; } };
 
@@ -215,16 +316,17 @@ function renderGrid() {
         </div>
         <div class="pj-two">
           <button class="avd-btn" data-c="power" data-a="1" type="button" ${off || busy || s.power === 'cooling' ? 'disabled' : ''}>Power on</button>
-          <button class="avd-btn avd-btn--danger" data-c="power" data-a="0" type="button" ${off || busy || lock || s.power === 'off' ? 'disabled' : ''}>Power off</button>
         </div>
+        <div class="pj-power-off"><button class="avd-btn avd-btn--danger" data-c="power" data-a="0" type="button" title="${esc(powerOffLabel(p.slot))}" ${off || busy || lock || s.power === 'off' ? 'disabled' : ''}>${esc(powerOffLabel(p.slot))}</button></div>
         <div class="pj-input-actions">
-          <button class="avd-btn avd-btn--primary avd-btn--block" data-reset-input type="button" ${off || busy || lock || !resetAvailable ? 'disabled' : ''}>Reset to ${esc(preferredLabel)}</button>
+          <button class="avd-btn" data-reset-input data-preferred="${esc(preferredLabel)}" type="button" ${off || busy || lock || !resetAvailable ? 'disabled' : ''}>${esc(resetLabel(p.slot, preferredLabel))}</button>
           <p class="pj-mono pj-note" ${resetAvailable ? 'style="display:none"' : ''}>${esc(preferredLabel)} input has not been verified for this projector.</p>
           <details class="pj-input-options" data-input-options="${esc(p.slot)}" ${inputOptionsOpen.has(p.slot) ? 'open' : ''}>
             <summary data-focus-key="${esc(p.slot)}:input-options">Other inputs</summary>
             <label class="avd-field"><span class="avd-field__label pj-caps">Select another input</span>
               <select class="avd-input" data-c="input" ${off || busy || lock || !inputs.length ? 'disabled' : ''}>${!inputMatched ? `<option value="" disabled selected>${esc(inputPlaceholder)}</option>` : ''}${inputs.map(([id, lab]) => `<option value="${esc(id)}" ${String(s.input) === id ? 'selected' : ''}>${esc(lab)}</option>`).join('')}</select>
             </label>
+            <button class="avd-btn" type="button" data-confirm-input ${pendingInput.get(p.slot) && confirmGate.armed(`${p.slot}:input:${pendingInput.get(p.slot).value}`) ? '' : 'hidden'}>${pendingInput.get(p.slot) ? `Confirm ${esc(pendingInput.get(p.slot).label)}` : 'Confirm input'}</button>
           </details>
         </div>
         <div class="pj-well"><span class="avd-eyebrow">Test pattern</span><span class="pj-mono pj-ink">${esc(pat)}</span></div>
@@ -242,7 +344,18 @@ function renderGrid() {
     const sel = card.querySelector('select'); sel._inputOptions = JSON.stringify(inputs);
     sel.onpointerdown = (e) => { e.currentTarget.dataset.editing = 'true'; };
     sel.onkeydown = (e) => { if (['ArrowDown', 'ArrowUp', ' ', 'Enter'].includes(e.key)) e.currentTarget.dataset.editing = 'true'; if (e.key === 'Escape') { delete e.currentTarget.dataset.editing; setTimeout(renderGrid, 0); } };
-    sel.onchange = (e) => { delete e.currentTarget.dataset.editing; cmd(p.slot, 'input', e.currentTarget.value); setTimeout(renderGrid, 0); };
+    sel.onchange = (e) => {
+      delete e.currentTarget.dataset.editing;
+      const value = e.currentTarget.value;
+      const label = e.currentTarget.selectedOptions[0]?.textContent || value;
+      pendingInput.set(p.slot, { value, label });
+      e.currentTarget.value = String(s.input ?? '');
+      confirmGate.clear(`${p.slot}:input:${value}`);
+      cmd(p.slot, 'input', value);
+      setTimeout(renderGrid, 0);
+    };
+    const confirmInput = card.querySelector('[data-confirm-input]');
+    if (confirmInput) confirmInput.onclick = (e) => { const pending = pendingInput.get(p.slot); if (pending) cmd(p.slot, 'input', pending.value, e.currentTarget); };
     sel.onblur = (e) => { delete e.currentTarget.dataset.editing; setTimeout(renderGrid, 0); };
     card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = el.hasAttribute('data-reset-input') ? `${p.slot}:reset-input` : el.dataset.c ? `${p.slot}:${el.dataset.c}:${el.dataset.a||''}` : el.dataset.p ? `${p.slot}:pattern:${el.dataset.p}` : el.dataset.adj ? `${p.slot}:adjust:${el.dataset.adj}` : el.dataset.openProjector ? `${p.slot}:info` : `${p.slot}:${n}`; });
     return card;
@@ -308,7 +421,7 @@ function renderPrimaryControls(p){
  const s=p.status||{},off=!connectionOf(p).current,at=new Date(s.connection?.lastSuccessAt||s.updatedAt||NaN).getTime(),fresh=Number.isFinite(at)&&Date.now()-at<=Math.max(15000,(state.relay?.pollIntervalMs||5000)*3)&&!off&&(!s.connection||s.connection.state==='online');
  const options=fresh&&s.shutter==='open'?[['1','Close shutter']]:fresh&&s.shutter==='closed'?[['0','Open shutter']]:[['0','Open shutter'],['1','Close shutter']];
  for(const[arg,label]of options){const b=document.createElement('button');b.className='avd-btn';b.type='button';b._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);b.dataset.focusKey=`${p.slot}:dock:shutter:${arg}`;b.dataset.c='shutter';b.dataset.a=arg;b.textContent=label;b.disabled=off;b.onclick=e=>cmd(p.slot,'shutter',Number(arg),e.currentTarget);out.append(b);}
- const input=document.createElement('button');input.type='button';input.className='avd-btn';input._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);input.dataset.focusKey=`${p.slot}:dock:reset-input`;input.dataset.resetInput='';input.textContent=`Reset to ${p.inputPreference?.label||state.preferredInput||'HDMI'}`;input.disabled=off||state.lock||!!p.busy||!p.inputPreference?.available;input.onclick=e=>cmd(p.slot,'resetInput',undefined,e.currentTarget);out.append(input);patchControls(host,out);
+ const input=document.createElement('button');input.type='button';input.className='avd-btn pj-reset-gap';input._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);input.dataset.focusKey=`${p.slot}:dock:reset-input`;input.dataset.resetInput='';input.dataset.resetSlot=p.slot;input.dataset.preferred=p.inputPreference?.label||preferredName();input.textContent=resetLabel(p.slot, input.dataset.preferred);input.disabled=off||state.lock||!!p.busy||!p.inputPreference?.available;input.onclick=e=>cmd(p.slot,'resetInput',undefined,e.currentTarget);out.append(input);patchControls(host,out);
 }
 function renderProjectorInfo() {
   const lane=selectedDetailLane;if(!lane)return;
@@ -409,13 +522,28 @@ function renderSetup() {
       ${field('Up / down image shift', `<select class="avd-input" data-k="reverseV"><option value="false">Normal</option><option value="true" ${p.reverseV === true ? 'selected' : ''}>Reversed</option></select>`)}
       ${field('PJLink password <span class="avd-field__opt">(blank keeps current)</span>', `<input class="avd-input" type="password" value="" data-k="password" autocomplete="new-password">`)}
       ${field('Notes', `<input class="avd-input" value="${esc(p.notes || '')}" data-k="notes">`)}
-      </fieldset><div class="pj-setup-footer"><button class="avd-btn avd-btn--primary" type="button">Save</button></div>`;
-    d.querySelector('button').onclick = () => { const upd = { slot: p.slot }; d.querySelectorAll('[data-k]').forEach((i) => { const v = i.value.trim(); if (i.dataset.k === 'password' && !v) return; upd[i.dataset.k] = ['reverseH', 'reverseV'].includes(i.dataset.k) ? v === 'true' : v; }); api('projector', upd).then(() => { dirtySetup.delete(p.slot); toast(`${p.slot} saved`); }).catch((e) => toast(e.message)); };
+      </fieldset><div class="pj-setup-footer"><button class="avd-btn" type="button" data-revert>Revert</button><button class="avd-btn avd-btn--primary" type="button" data-save ${state.lock ? 'disabled' : ''} title="${state.lock ? 'Show lock is on. Address, driver and lane changes are blocked.' : 'Confirm before this record is stored. Saving does not mean the projector answered.'}">${confirmGate.armed(`save:${p.slot}`) ? 'Confirm save' : 'Save'}</button></div>`;
+    d.querySelector('[data-revert]').onclick = () => { confirmGate.clear(`save:${p.slot}`); dirtySetup.delete(p.slot); d.remove(); renderSetup(); toast(`${p.slot} changes reverted. Nothing was saved.`); };
+    d.querySelector('[data-save]').onclick = () => {
+      if (state.lock) return;
+      const decision = confirmGate.press(`save:${p.slot}`);
+      d.querySelector('[data-save]').textContent = decision === 'send' ? 'Save' : 'Confirm save';
+      if (decision === 'ignore') return;
+      if (decision === 'arm') { toast(`Confirm save for ${p.slot}. Nothing is stored until you tap it again. Saving does not mean the projector answered.`); return; }
+      const upd = { slot: p.slot }; d.querySelectorAll('[data-k]').forEach((i) => { const v = i.value.trim(); if (i.dataset.k === 'password' && !v) return; upd[i.dataset.k] = ['reverseH', 'reverseV'].includes(i.dataset.k) ? v === 'true' : v; });
+      api('projector', upd).then(() => { dirtySetup.delete(p.slot); d.remove(); renderSetup(); noteAnswer(p.slot); }).catch((e) => toast(e.message));
+    };
     d.addEventListener('input', () => dirtySetup.add(p.slot));
     d.addEventListener('change', () => dirtySetup.add(p.slot));
     const order = orderedProjectors(state.projectors).map((x) => x.slot);
     el.insertBefore(d, [...el.children].find((node) => order.indexOf(node.dataset.slot) > order.indexOf(p.slot)) || null);
   }
+  el.querySelectorAll('[data-save]').forEach((button) => {
+    const slot = button.closest('[data-slot]')?.dataset.slot;
+    button.disabled = !!state.lock;
+    if (state.lock) button.title = 'Show lock is on. Address, driver and lane changes are blocked.';
+    if (slot && confirmGate.armed(`save:${slot}`)) button.textContent = 'Confirm save';
+  });
 }
 function renderAll() {
   $('#show').textContent = state.show || 'Projectors';
@@ -426,11 +554,13 @@ function renderAll() {
   lockButton.setAttribute('aria-label', lockLabel); lockButton.title = lockLabel;
   lockButton.dataset.lockState = state.lock ? 'locked' : 'unlocked';
   renderOverview();
-  $('[data-all="resetInput"]').textContent = `Reset all to ${state.preferredInput || 'HDMI'}`;
+  $('[data-all="resetInput"]').textContent = resetLabel('all', state.preferredInput || 'HDMI');
   $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = state.presets.length || '';
   document.querySelectorAll('[data-all="power"][data-arg="0"], [data-all="pattern"]').forEach((b) => b.disabled = state.lock || !connected);
   const discover = $('#discover'); if (discover) discover.disabled = !connected || !!state.lock;
   renderGrid(); renderThermal(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
+  refreshConfirmLabels();
+  reportAnswers();
 }
 
 // ---- Adjust sheet: patterns, lens, picture ----
@@ -456,7 +586,7 @@ function closeAdjust() {
 function renderAdjust() {
   const p = state.projectors.find((x) => x.slot === adjSlot); if (!p) return;
   const off = !connectionOf(p).current;
-  const moving = p.busy || commandsInFlight.has(`${adjSlot}:lens:move`);
+  const moving = p.busy || commandsInFlight.has(`${adjSlot}:lens:move`) || lensHold.blocking(p.slot, { busy: !!p.busy, lens: p.status?.lens });
   const lens = p.status?.lens;
   const readback = lens && p.driver === 'pulse' ? Object.entries({ h: 'H', v: 'V', focus: 'Focus', zoom: 'Zoom' }).map(([key, label]) => `${label} ${lens[key] ?? '?'}`).join(' · ') : '';
   $('#adj-position').textContent = readback;
@@ -472,6 +602,9 @@ function renderAdjust() {
   $('#adj-speed').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.s === adjSpeed)));
   document.querySelectorAll('.lens button, #adj-home, #adj-speed button').forEach((b) => b.disabled = state.lock || off || !!moving || p.capabilities?.lens === false || (p.driver === 'pulse' && p.status?.power !== 'on'));
   $('#adj-stop').hidden = p.driver !== 'pulse'; $('#adj-stop').disabled = off;
+  const homeReason = disabledDangerReason({ connected, offline: off, locked: !!state.lock, busy: !!moving, power: p.status?.power || '' });
+  $('#adj-home').textContent = homeReason ? `Lens shift home · ${homeReason}` : confirmGate.armed(`${p.slot}:lens:home`) ? 'Confirm lens home' : 'Lens shift home, tap twice';
+  $('#adj-home').title = homeReason ? $('#adj-home').textContent : 'Moves lens shift to home. Confirm after the label changes. A double-click does not count.';
   updatePictureLock();
 }
 function updatePictureLock() {

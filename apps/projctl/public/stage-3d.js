@@ -26,6 +26,24 @@ export async function createStage3D(host, plot, openLane, options = {}) {
   let THREE;
   try { ({ THREE } = await stage.ready); }
   catch (error) { stage.destroy(); stage.remove(); throw error; }
+  // OrbitControls rewrites the pose on every update, including a no-change
+  // render. Below its own epsilon that rewrite is a rounding step, so a beam
+  // edit would walk the camera. Keep the pose when the control reports no move.
+  const orbit = stage._controls;
+  const reportMove = orbit.update.bind(orbit);
+  orbit.update = function () {
+    const camera = stage._camera, target = orbit.target;
+    const px = camera.position.x, py = camera.position.y, pz = camera.position.z;
+    const qx = camera.quaternion.x, qy = camera.quaternion.y, qz = camera.quaternion.z, qw = camera.quaternion.w;
+    const tx = target.x, ty = target.y, tz = target.z;
+    const changed = reportMove();
+    if (!changed) {
+      camera.position.set(px, py, pz);
+      camera.quaternion.set(qx, qy, qz, qw);
+      target.set(tx, ty, tz);
+    }
+    return changed;
+  };
   const model = new THREE.Group(); model.name = 'Private plot reference';
   model.userData.units = reference.metric ? 'metres' : 'diagram';
   const groups = new Map(), surfaces = [], trim = [], bodies = [];
@@ -170,7 +188,14 @@ export async function createStage3D(host, plot, openLane, options = {}) {
     stage.requestRender();
   }
   const observer = new MutationObserver(theme); observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  const resize = new ResizeObserver(() => { if (stage.clientWidth && stage.clientHeight) frame(); }); resize.observe(stage);
+  let stagePixels = '';
+  const resize = new ResizeObserver(() => {
+    const width = stage.clientWidth, height = stage.clientHeight, pixels = `${width}x${height}`;
+    if (!width || !height || pixels === stagePixels) return;
+    stagePixels = pixels;
+    frame();
+  });
+  resize.observe(stage);
   const onPageHide = event => { if (!event.persisted) { observer.disconnect(); resize.disconnect(); stage.destroy(); } };
   window.addEventListener('pagehide', onPageHide);
   theme(); frame(); host.dataset.state = 'ready';

@@ -1,4 +1,5 @@
 import { lensDirection } from './lens-direction.js';
+import { lensHold } from './operator-guard.js';
 const AXES = ['h','v','focus','zoom'];
 const SPEEDS = {slow:'Fine',normal:'Normal',fast:'Coarse'};
 const ARROWS = {ArrowLeft:['h','-'],ArrowRight:['h','+'],ArrowUp:['v','+'],ArrowDown:['v','-']};
@@ -23,7 +24,7 @@ export function createLensWorkspace(host,{send,onSave,onRecall,onPresets}={}) {
   const speeds={shift:'slow',focus:'slow',zoom:'slow'};
   const caps=()=>lensJogCapability(context.projector);
   const ready=()=>context.active&&context.connected&&(context.connection?.current ?? context.projector?.status?.online)&&!context.lock&&caps().axes.length&&caps().speeds.length&&!(context.projector.driver==='pulse'&&context.projector.status?.power!=='on');
-  const moving=()=>!!pending||!!context.projector?.busy;
+  const moving=()=>{const p=context.projector;return !!pending||(p?lensHold.blocking(p.slot,{busy:!!p.busy,lens:p.status?.lens}):false);};
   const feedback=text=>{$('[data-lens-feedback]').textContent=text;$('[data-lens-feedback]').title=text;};
   function buttonState(button,phase){if(!button)return;clearTimeout(button._lensFeedbackTimer);button.dataset.commandState=phase;button.setAttribute('aria-busy',String(['sending','releasing'].includes(phase)));button.title=phase==='acknowledged'?'Command acknowledged; verify the image and readbacks.':phase==='confirmation'?'Confirmation required before movement.':phase;if(['acknowledged','error','cancelled'].includes(phase))button._lensFeedbackTimer=setTimeout(()=>{if(button.dataset.commandState===phase)delete button.dataset.commandState;},2500);}
 

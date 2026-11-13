@@ -29,7 +29,11 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         for (let tap = 0; tap < 2; tap++) {
           const response = page.waitForResponse((r) => r.url().endsWith('/api/command'));
           await bulk.click(); await response;
-          if (!tap) await page.locator('#toast').filter({ hasText: 'Tap again' }).waitFor();
+          if (!tap) {
+            await page.locator('#toast').filter({ hasText: 'Tap again' }).waitFor();
+            await bulk.filter({ hasText: 'Confirm power off' }).waitFor();
+            await page.waitForTimeout(500);
+          }
         }
         await until(async () => (await relay.state()).projectors.filter((p) => !offline || p.slot !== 'P1').every((p) => p.status.power === 'cooling'));
         await page.locator('#toast').filter({ hasText: 'P4: command accepted' }).waitFor();
@@ -79,6 +83,9 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await slotSetup.locator('[data-k="reverseH"]').selectOption('true');
         await slotSetup.locator('[data-k="reverseV"]').selectOption('true');
         await slotSetup.getByRole('button', { name: 'Save', exact: true }).click();
+        await slotSetup.getByRole('button', { name: 'Confirm save', exact: true }).waitFor();
+        await page.waitForTimeout(500);
+        await slotSetup.getByRole('button', { name: 'Confirm save', exact: true }).click();
         await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P2').reverseV === true);
         await page.reload(); await page.locator('[data-tab="rig"]').click();
         await page.locator('[data-tab="rig"]').click();
