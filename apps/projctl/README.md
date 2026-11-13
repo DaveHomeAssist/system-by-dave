@@ -15,7 +15,7 @@ A fresh browser opens on Controls, with shutter, power, quick test patterns,
 Clear pattern and Reset to HDMI on each projector. Reset clears the pattern,
 selects the reported HDMI input and confirms fresh feedback. Tools opens notes,
 reference, stage, presets, thermal watch, log and configuration. The permanent All Projectors tab holds group actions; every group action requires a target review and confirmation. Per-projector Details opens
-lens and diagnostic controls. Preferences under Tools save the selected lane and view, theme, model-specific pattern favorites and a preset-name template in this browser. Optional next-action hints highlight existing buttons and can be dismissed. See [the operator console](docs/operator-console.md). Notes save
+the lens pad with Stop lens, picture tiles for every test pattern, the projector's heat reading, a browser session timer, and diagnostic controls. A heat chip and header pill appear only when a projector reports Watch or Hot. Preferences under Tools save the selected lane and view, theme, model-specific pattern favorites and a preset-name template in this browser. Optional next-action hints highlight existing buttons and can be dismissed. See [the operator console](docs/operator-console.md). Notes save
 in this browser at this controller address, with text export. Shared team tasks
 use the public Frozen workspace service at https://wst.housevideo.app/; keep
 sensitive content out of that shared list. Private cross-device notes sync is

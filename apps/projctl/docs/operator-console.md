@@ -6,6 +6,10 @@ The default view exposes shutter, power, test patterns, Clear pattern and Reset 
 
 Each card keeps the lane, surface, model, current power/shutter/input/pattern and connection freshness visible. Power state uses prominent uppercase text. Warnings and faults use labeled high-contrast banners and matching card borders. Wide desktops show four columns. Medium screens from 681 to 1279 pixels wide and at least 700 pixels tall show a two by two grid. Phones and short medium screens select one lane at a time with persistent A to D navigation. Both themes use the existing design tokens. All Projectors is a permanent tab beside Controls. Its group actions open a target review with Cancel and Confirm; opening or cancelling that review sends no command. Changed targets or safety state require a fresh confirmation. Group power off retains the relay's additional confirmation. Group Clear and HDMI recovery report verified results for each device.
 
+## Details control surface
+
+Details on a card opens the fuller controls for that lane, so the default view stays compact. It shows the lens workspace with a larger shift pad, minus and plus focus and zoom, and a full-width Stop lens; every pattern the model reports as a picture tile, with Clear pattern; the projector's heat reading; and a browser session timer shared by all lanes. Pattern tiles use the same command and disabled conditions as the full pattern list. Heat appears outside Thermal watch only for a current Watch or Hot reading, as a card chip and a header pill that opens Thermal watch. See [the details controls brief](details-controls.md).
+
 ## Command behavior
 
 Shutter actions state the requested position. Power off retains the relay's existing two-step confirmation and ignores a rapid repeat during its first 400 ms. Cooling, offline, stale and show-lock states keep their existing command guards.
@@ -20,7 +24,7 @@ Verify every main action in the simulator, including model-specific pattern code
 
 The installed relay has newer polling and thermal sampling than main. Preserve those capabilities while applying the reviewed command-binding module and minimal index/store edits described below. The existing thermal view is retained under Tools and reads optional thermal data when the relay supplies it. It shows missing readings explicitly on relays without that capability.
 
-Deployment records the reviewed source commit, retained backend base and digests of the changed files. Overlay `app.js`, `index.html`, `workspace-bridge.js`, `operator-console.js`, `operator-console.css`, `output-recovery.js`, `thermal-watch.js`, `thermal-watch.css`, `all-projectors.js`, `workspace-navigation.js`, `operator-preferences.js` and `operator-intent.js` onto a copy of the installed public directory. Apply the reviewed backend changes to that candidate. Verify it in simulation before replacing the managed app, retain the prior app as a rollback copy, and restart the relay once. Reload the browser and verify served digests, target-binding capability and saved rig configuration.
+Deployment records the reviewed source commit, retained backend base and digests of the changed files. Overlay `app.js`, `index.html`, `workspace-bridge.js`, `operator-console.js`, `operator-console.css`, `output-recovery.js`, `thermal-watch.js`, `thermal-watch.css`, `all-projectors.js`, `workspace-navigation.js`, `operator-preferences.js`, `operator-intent.js`, `lens-workspace.js`, `details-controls.js`, `details-controls.css`, `pattern-thumbs.js`, `heat-notice.js` and `session-timer.js` onto a copy of the installed public directory. Apply the reviewed backend changes to that candidate. Verify it in simulation before replacing the managed app, retain the prior app as a rollback copy, and restart the relay once. Reload the browser and verify served digests, target-binding capability and saved rig configuration.
 
 ## Group control acceptance
 

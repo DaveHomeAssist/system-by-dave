@@ -11,7 +11,7 @@ export function quickPatterns(patterns) {
   ].map(([label, match]) => ({ label, code: Object.keys(patterns || {}).find(code => match.test(patterns[code])) })).filter(item => item.code);
 }
 
-export function operatorCard({ projector: p, lane, info, connection, lock, patterns, feedback, pending, act, details, morePatterns, preferences, dismissSuggestion }) {
+export function operatorCard({ projector: p, lane, info, connection, lock, patterns, feedback, pending, act, details, morePatterns, preferences, dismissSuggestion, heat = null }) {
   const card = document.createElement('section');
   card.className = 'avd-panel pj-tile pj-summary-tile operator-card';
   card.dataset.lane = lane;
@@ -32,6 +32,7 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
   const alarms = Object.entries(s.errors || {}).filter(([, v]) => v > 0).sort((a,b) => b[1]-a[1]).map(([key,v]) => `${key} ${v===2?'fault':'warning'}`);
   const alarmSeverity = Object.values(s.errors || {}).some(value => value === 2) ? 'fault' : alarms.length ? 'warning' : '';
   if (alarmSeverity) card.dataset.alarmSeverity = alarmSeverity;
+  if (heat) card.dataset.heat = heat.level;
   const input = s.input == null ? 'Unknown' : (p?.inputs?.[s.input] || String(s.input)) + (stale.has('input') ? ' (last known)' : '');
   const pattern = !hasPatterns ? 'Not supported' : (patternIsOff(s.pattern) ? 'Off' : table?.[s.pattern] || s.pattern || 'Unknown') + (stale.has('pattern') ? ' (last known)' : '');
   const shutter = stale.has('shutter') ? 'unknown' : s.shutter || 'unknown';
@@ -46,6 +47,7 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
     </header>
     <div class="operator-status ${alarms.length?'has-alarms':''}">
       <span class="operator-connection ${available?'online':''}">${escape(connection.detail || connection.label || 'Unassigned')}</span>
+      ${heat?`<span class="operator-heat" data-heat-level="${escape(heat.level)}" role="status" title="Air temperature ${escape(heat.text)}. Details in Thermal watch"><span class="avd-dot avd-dot--${heat.level==='hot'?'blocked':'waiting'}" aria-hidden="true"></span>Heat ${escape(heat.text)}</span>`:''}
       <strong class="pj-summary-state ${alarms.length?'operator-alert':''}" title="${escape([connection.detail,...alarms].join(' · '))}" ${alarms.length?'role="status"':''}>${alarms.length?`<span class="operator-alert-icon" aria-hidden="true">!</span><span><b>${alarmSeverity==='fault'?'Fault':'Warning'}</b> ${escape(alarms.join(' · '))}</span>`:escape(available ? s.power || 'Unknown power' : connection.detail)}</strong>
     </div>
     <section class="operator-shutter" aria-label="Shutter for ${lane}">

@@ -1,0 +1,104 @@
+/* Projector details control surface: lens, test-pattern tiles, heat and session timer.
+   Opens only inside Details; the default Controls cards keep their compact layout.
+   Scoped to #tab-projector so it overrides the older dock rules without touching other views. */
+
+/* Shared panel frame */
+.pj-dc-panel { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; min-width: 0; }
+.pj-dc-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; min-height: 24px; }
+.pj-dc-head > .avd-eyebrow { flex: none; }
+.pj-dc-state { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 12px/16px var(--font-mono); color: var(--ink-muted); }
+.pj-dc-note { margin: 0; font-size: 11px; line-height: 16px; color: var(--ink-muted); overflow-wrap: anywhere; }
+
+/* Canvas grid: one column on phones, two on tablets, three on wide screens */
+#tab-projector .pj-details-canvas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-items: start; margin-bottom: 12px; }
+#tab-projector .pj-details-rail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; }
+@media (min-width: 760px) {
+  #tab-projector .pj-details-canvas { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  #tab-projector .pj-details-rail { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+@media (min-width: 1180px) and (min-height: 700px) {
+  #tab-projector.pj-selected-dock { width: min(1240px, calc(100vw - 32px)); height: min(880px, calc(100dvh - 40px)); }
+  #tab-projector .pj-details-canvas { grid-template-columns: minmax(340px, 1.05fr) minmax(0, 1.25fr) minmax(220px, .7fr); }
+  #tab-projector .pj-details-rail { grid-column: auto; grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Lens: big pad, minus/plus optics rows, full-width Stop lens */
+#tab-projector .pj-details-canvas .pj-lens-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; padding: 14px 16px; min-height: 0; }
+#tab-projector .pj-details-canvas .pj-lens-workspace > * { grid-column: 1 / -1; grid-row: auto; margin: 0; }
+#tab-projector .pj-details-canvas .pj-lens-heading { display: flex; align-items: center; min-height: 24px; }
+#tab-projector .pj-details-canvas .pj-lens-heading h3 { margin: 0; font: 500 11px/14px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); }
+#tab-projector .pj-details-canvas .pj-lens-heading > strong { font-size: 12px; }
+#tab-projector .pj-details-canvas [data-lens-state] { font-size: 11px; line-height: 16px; }
+#tab-projector .pj-details-canvas .pj-lens-layout { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+#tab-projector .pj-details-canvas .pj-lens-pad { grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 64px); gap: 6px; width: max-content; max-width: none; margin: 0 auto; }
+#tab-projector .pj-details-canvas .pj-lens-pad button { font-size: 24px; line-height: 26px; padding: 2px; }
+#tab-projector .pj-details-canvas .pj-lens-pad button span { font-size: 10px; line-height: 13px; letter-spacing: .02em; }
+#tab-projector .pj-details-canvas .pj-lens-pad-label select { width: 100%; height: 64px; padding-inline: 4px; font-size: 12px; }
+#tab-projector .pj-details-canvas .pj-lens-optics { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+#tab-projector .pj-details-canvas .pj-lens-optics > div { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 6px 8px; }
+#tab-projector .pj-details-canvas .pj-lens-optics .avd-field { grid-column: 2; }
+#tab-projector .pj-details-canvas .pj-lens-optics strong { margin: 0; font-size: 13px; }
+#tab-projector .pj-details-canvas .pj-lens-optics .pj-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
+#tab-projector .pj-details-canvas .pj-lens-optics .avd-btn { gap: 4px; min-width: 0; min-height: 44px; font-size: 11px; letter-spacing: .02em; padding-inline: 4px; white-space: nowrap; }
+#tab-projector .pj-details-canvas .pj-lens-optics .avd-btn b { font-size: 16px; line-height: 1; }
+#tab-projector .pj-details-canvas .pj-lens-optics .avd-field { margin: 0; }
+#tab-projector .pj-details-canvas .pj-lens-optics .avd-field select { width: 100%; min-width: 0; height: 44px; font-size: 12px; padding-inline: 6px; }
+#tab-projector .pj-details-canvas .pj-lens-optics .avd-field__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+#tab-projector .pj-details-canvas .pj-lens-keyboard-row { display: contents; }
+#tab-projector .pj-details-canvas [data-lens-stop] { order: 1; grid-column: 1 / -1; min-height: 48px; font-size: 14px; letter-spacing: .06em; }
+#tab-projector .pj-details-canvas [data-lens-keyboard] { order: 2; grid-column: 1; min-height: 44px; font-size: 11px; padding: 4px 8px; }
+#tab-projector .pj-details-canvas .pj-lens-keyboard { order: 2; grid-column: 2; display: grid; align-content: center; min-height: 44px; padding: 4px 9px; font-size: 11px; line-height: 15px; }
+#tab-projector .pj-details-canvas [data-lens-feedback] { order: 3; height: auto; min-height: 16px; font-size: 11px; line-height: 16px; overflow: visible; }
+#tab-projector .pj-details-canvas .pj-lens-details { order: 4; }
+#tab-projector .pj-details-canvas [data-lens-feedback]:empty { display: none; }
+@media (min-width: 1180px) and (min-height: 700px) {
+  #tab-projector .pj-details-canvas .pj-lens-optics > div { grid-template-columns: 52px minmax(0, 1fr) minmax(84px, .55fr); }
+  #tab-projector .pj-details-canvas .pj-lens-optics .avd-field { grid-column: auto; }
+}
+
+/* Test pattern tiles */
+.pj-pattern-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
+.pj-pattern-tile.avd-btn { position: relative; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 5px; min-width: 0; min-height: 70px; height: auto; padding: 5px; font-size: 11px; line-height: 14px; letter-spacing: .02em; text-transform: none; white-space: normal; overflow-wrap: anywhere; }
+.pj-pattern-tile .pj-thumb { display: block; width: 100%; height: 34px; border: 1px solid var(--hairline); border-radius: 3px; }
+.pj-pattern-tile[aria-pressed="true"] { outline: 3px solid var(--lane-ink, var(--ink)); outline-offset: 1px; background: var(--lane-wash, var(--surface-sunken)); }
+.pj-pattern-tile[data-favorite]::after { content: '★'; position: absolute; top: 2px; right: 4px; font-size: 12px; line-height: 14px; color: var(--ink); text-shadow: 0 0 2px var(--surface); }
+.pj-pattern-tile:disabled .pj-thumb { opacity: .45; }
+.pj-pattern-foot { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.pj-pattern-foot .pj-pattern-clear { flex: none; min-height: 44px; }
+.pj-pattern-foot .pj-dc-note { flex: 1; min-width: 0; }
+
+/* Full pattern list under More: thumbnail beside each name */
+.pj-pattern-thumbed.avd-btn { display: inline-flex; align-items: center; gap: 8px; }
+.pj-pattern-thumbed .pj-thumb { flex: none; width: 36px; height: 22px; border: 1px solid var(--hairline); border-radius: 2px; }
+
+/* Heat: quiet unless a current Watch or Hot reading exists */
+.pj-heat-reading { margin: 0; display: flex; align-items: baseline; gap: 4px; }
+.pj-heat-reading strong { font: 600 32px/36px var(--font-mono); font-variant-numeric: tabular-nums; }
+.pj-heat-reading span { font-size: 13px; color: var(--ink-muted); }
+.pj-heat-panel:has([data-heat-level="watch"]) { border-color: var(--state-waiting); box-shadow: inset 0 0 0 1px var(--state-waiting); }
+.pj-heat-panel:has([data-heat-level="hot"]) { border-color: var(--state-blocked); box-shadow: inset 0 0 0 1px var(--state-blocked); }
+.pj-heat-open.avd-btn { align-self: flex-start; min-height: 44px; }
+
+/* Session timer */
+.pj-session-time { margin: 0; font: 600 32px/36px var(--font-mono); font-variant-numeric: tabular-nums; }
+.pj-session-panel[data-timer-state="paused"] .pj-session-time { color: var(--ink-muted); }
+.pj-session-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.pj-session-actions .avd-btn { min-height: 44px; min-width: 0; white-space: nowrap; }
+
+/* Heat outside details: card chip and header pill */
+.operator-heat { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 1px 8px; border: 2px solid var(--state-waiting); border-radius: 999px; color: var(--ink); background: var(--surface); font-weight: 700; white-space: nowrap; }
+.operator-heat[data-heat-level="hot"] { border-color: var(--state-blocked); }
+.pj-heat-alert { display: contents; }
+.pj-heat-pill.avd-state { height: auto; min-height: 32px; padding: 4px 10px; border: 2px solid var(--state-waiting); border-radius: 999px; cursor: pointer; }
+.pj-heat-pill.avd-state[data-level="hot"] { border-color: var(--state-blocked); }
+.pj-heat-pill[hidden] { display: none; }
+.pj-heat-pill:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+
+@media (max-width: 400px) {
+  #tab-projector .pj-details-canvas .pj-lens-pad { grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 56px); }
+  #tab-projector .pj-details-canvas .pj-lens-pad-label select { height: 56px; }
+  #tab-projector .pj-details-canvas .pj-lens-optics > div { grid-template-columns: minmax(0, 1fr); }
+  #tab-projector .pj-details-canvas .pj-lens-optics .avd-field { grid-column: auto; }
+  .pj-pattern-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pj-pattern-foot { flex-wrap: wrap; }
+}
