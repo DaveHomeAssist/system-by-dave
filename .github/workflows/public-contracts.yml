@@ -28,6 +28,7 @@ jobs:
       - run: npx playwright install --only-shell chromium
       - name: Verify Projctl relay and operator controls
         run: |
+          python3 -m unittest discover -s apps/projctl/tools/acceptance -p 'test_*.py'
           npm ci --prefix apps/projctl --ignore-scripts --no-audit --no-fund
           npm test --prefix apps/projctl
           npm run test:browser --prefix apps/projctl
