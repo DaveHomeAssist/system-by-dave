@@ -145,8 +145,9 @@ opens in the same inspector.
   supports where each is drawn. Practice states that P01 has no practice mode
   and shows the operating note for the selected part. Reference shows scope,
   downloads, Barco's documents and what is not established.
-- **Splash.** P01 sits under Video & PTZ with the preview from its package.
-  Counts derive from the catalog.
+- **Splash.** P01 sits under Video and projection with the preview from its
+  package. That tab was Video & PTZ until 12 November 2026, when Dave asked for
+  the rename. Counts derive from the catalog.
 - **Offline.** P01's manifest, definition and GLB join the offline set under
   cache generation `v20261112-equipment-lab-projector`.
 

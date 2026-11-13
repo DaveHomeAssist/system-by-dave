@@ -8,7 +8,7 @@ export const DISCIPLINES = [
   { id: 'audio', label: 'Audio', short: 'Audio' },
   { id: 'dj', label: 'DJ', short: 'DJ' },
   { id: 'lighting', label: 'Lighting & effects', short: 'Lighting' },
-  { id: 'video', label: 'Video & PTZ', short: 'Video' },
+  { id: 'video', label: 'Video and projection', short: 'Video' },
   { id: 'camera', label: 'Camera & support', short: 'Camera' },
 ] as const;
 export type Discipline = typeof DISCIPLINES[number]['id'];
