@@ -1,5 +1,10 @@
 # projctl: Frozen at WST projector control
 
+For a lightweight Mac-only output-resolution check, see the independent
+[Frozen Screen Check application](../screen-check/README.md). It verifies the
+computer's display outputs at login and on demand, without requiring this relay
+or issuing projector commands.
+
 
 For managed macOS access, use `~/Applications/Open Projctl.command` or
 `http://localhost:8080/`. The service starts at login and recovers after exit.

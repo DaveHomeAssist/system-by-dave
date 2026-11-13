@@ -1,5 +1,15 @@
 # Changelog
 
+## November 13, 2026: Native show screen checker
+
+- Added a lightweight macOS menu-bar checker with on-demand and login checks,
+  display-change detection, model/count verification, actual pixel and refresh
+  readback, and local report export. It flags scaled, mirrored, missing and
+  unexpected outputs without changing hardware or display modes.
+- The initial five-output profile comes from the production readback; identical
+  portal models are checked as a pair. Studio installation and login/reboot
+  acceptance remain separate from source and packaged-app validation.
+
 ## November 13, 2026: Video Engineering Daily
 
 - Backfill November 9–12 and add Edition 037 for November 13. The five lessons cover JPEG XS line latency, HDR graphics white, shutter angle, lens shift and RTP retransmission. Each includes an illustrated story card.

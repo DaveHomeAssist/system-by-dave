@@ -1,0 +1,19 @@
+name: Verify native screen checker
+on:
+  pull_request:
+    paths: ['apps/screen-check/**', '.github/workflows/screen-check.yml']
+  push:
+    branches: [main]
+    paths: ['apps/screen-check/**', '.github/workflows/screen-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Test identities, output modes and profile validation
+        run: bash apps/screen-check/test.sh
+      - name: Build and verify Apple Silicon application
+        run: bash apps/screen-check/build.sh
