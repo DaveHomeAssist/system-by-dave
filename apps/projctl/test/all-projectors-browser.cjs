@@ -14,7 +14,8 @@ const path = require('node:path');
     page.on('request',r=>{if(r.method()==='POST'&&r.url().endsWith('/api/command'))calls.push(r.postDataJSON());});
     page.on('pageerror',e=>errors.push(e.message));
     await page.goto(relay.base);
-    await page.locator('#tab-btn-all').click();
+    await page.evaluate(()=>window.dispatchEvent(new CustomEvent('projctl:navigate',{detail:{panel:'all'}})));
+    assert.equal(calls.length,0,'navigation events never send group commands');
     await page.locator('#tab-all.on').waitFor();
     assert.equal(await page.locator('.pj-rig-all').count(),0,'group actions are not in a disclosure');
     for(const [command,arg] of [['shutter','0'],['shutter','1'],['power','1'],['pattern','08'],['pattern','00'],['resetInput',null]]) {
