@@ -114,13 +114,15 @@ async function cmd(slot, c, arg, source) {
   finally { commandsInFlight.delete(key); renderGrid(); if (c === 'lens') { if(adjSlot)renderAdjust(); updateLensWorkspace(); } }
 }
 function setOperatorFeedback(slot, phase, text) {
-  operatorFeedback.set(slot, { phase, text });
+  operatorFeedback.set(slot, { phase, text, at: Date.now() });
   renderGrid();
 }
 async function operatorAction(projector, action, value, button) {
   if (!projector) return;
   const current = state.projectors.find(p => p.slot === projector.slot);
   if (!current || JSON.stringify([current.driver,current.ip,current.mac]) !== JSON.stringify([projector.driver,projector.ip,projector.mac])) { setOperatorFeedback(projector.slot, 'error', 'Projector assignment changed. Select the projector again.'); return; }
+  const feedback = operatorFeedback.get(projector.slot);
+  if (action === 'power' && value === '0' && feedback?.phase === 'confirmation' && Date.now() - feedback.at < 400) return;
   if (action !== 'clear' && action !== 'reset') {
     return cmd(projector.slot, action, action === 'pattern' ? value : Number(value), button);
   }
@@ -152,8 +154,10 @@ $('#workspace-menu').onclick = () => {
 };
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
+    const menuFocus = $('#workspace-nav').classList.contains('tools-open') && $('#workspace-nav').contains(document.activeElement);
     $('#workspace-nav').classList.remove('tools-open');
     $('#workspace-menu').setAttribute('aria-expanded', 'false');
+    if (menuFocus) $('#workspace-menu').focus();
   }
 });
 for (const button of document.querySelectorAll('[data-operator-lane]')) {

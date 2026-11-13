@@ -50,6 +50,9 @@ const path = require('node:path');
     await card.locator('[data-action=power][data-value="0"]').filter({ hasText: 'Confirm power off' }).waitFor();
     assert.equal((await relay.state()).projectors[0].status.power, 'on');
     await card.locator('[data-action=power][data-value="0"]').click();
+    assert.equal((await relay.state()).projectors[0].status.power, 'on', 'rapid repeat does not confirm power off');
+    await page.waitForTimeout(450);
+    await card.locator('[data-action=power][data-value="0"]').click();
     await until(async () => (await relay.state()).projectors[0].status.power === 'cooling');
     await until(() => card.locator('[data-action=power][data-value="1"]').isDisabled());
     await relay.api('lock', { lock: true });
@@ -78,6 +81,10 @@ const path = require('node:path');
       }
     }
     await page.setViewportSize({ width: 1440, height: 900 });
+    await page.locator('#workspace-menu').click();
+    await page.locator('[data-tab=health]').focus();
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('#workspace-menu').evaluate(b => b === document.activeElement), true);
     await page.locator('#workspace-menu').click();
     await page.locator('[data-tab=health]').click();
     assert.equal(await page.locator('#thermal-watch').isVisible(), true);
