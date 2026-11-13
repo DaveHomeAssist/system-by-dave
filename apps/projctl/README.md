@@ -95,6 +95,14 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
 - pulse (Barco): core state, power, shutter, internal patterns, discovered inputs, bounded lens targets and supported picture ranges use the Pulse API. Optional alarm telemetry remains unknown, rather than implying a clear alarm panel.
 - panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls.
 
+PJLink keeps one status connection open per projector between polls. Every poll
+still reads the complete status, including lamp hours and the projector name.
+Control commands run after an in-flight poll, close its connection, and use a
+separate connection. Closed status sessions are recovered without replaying a
+control command. Replacing a configured driver releases its held connection.
+Panasonic native replies validate an echoed command name and reject a mismatch
+promptly so the next operation can proceed.
+
 Pulse status requires a successful `system.state` query. Failed core queries count toward the
 relay's offline policy; unsupported optional properties remain unknown rather than preventing
 an otherwise reachable projector from reporting status.
