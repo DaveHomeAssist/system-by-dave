@@ -1,5 +1,14 @@
 # Changelog
 
+## November 13, 2026: Resumable rig acceptance runner
+
+- Add a Python operator runner that collects existing relay and Screen Check
+  evidence, retains failed attempts and produces a per-lane acceptance report.
+- Require recorded release windows for disruptive test observations and distinct
+  before/after evidence for display recovery. Preserve the separate EDID package.
+- Add isolated regression checks for resume, evidence integrity, release expiry,
+  missing evidence, simulation rejection and read-only network collection.
+
 ## November 13, 2026: Screen checker 1.0.2 review improvements
 
 - Clear stale action feedback on checks and reconnects; distinguish unknown rows
