@@ -1,6 +1,7 @@
+import { createAllProjectors } from './all-projectors.js';
 import { createThermalWatch } from './thermal-watch.js';
 import { operatorCard } from './operator-console.js';
-import { recoverOutput } from './output-recovery.js';
+import { recoverOutput, supportsPatterns } from './output-recovery.js';
 import { LANES, laneOf, projectorName, orderedProjectors, rigLanes } from './lanes.js';
 import { createStageView } from './stage-view.js';
 import { mountPowerSchedules } from './power-schedules.js';
@@ -18,6 +19,7 @@ const operatorFeedback = new Map();
 const operatorPending = new Set();
 let activeOperatorLane = 'A';
 let connected = false;
+let allProjectors = null;
 const monitorConnection = createConnectionMonitor();
 const connectionOf = p => monitorConnection(p, connected, state.relay?.pollIntervalMs);
 const thermalWatch = createThermalWatch($('#thermal-watch'), {
@@ -167,7 +169,26 @@ for (const button of document.querySelectorAll('[data-operator-lane]')) {
     document.querySelectorAll('[data-operator-lane]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
   };
 }
-document.querySelectorAll('[data-all]').forEach((b) => b.onclick = () => cmd('all', b.dataset.all, b.dataset.all === 'resetInput' ? undefined : b.dataset.all === 'pattern' ? b.dataset.arg : Number(b.dataset.arg),b));
+async function recoverAllOutputs(reset) {
+  const result = {};
+  for (const p of orderedProjectors(state.projectors).map(p => structuredClone(p))) {
+    const live = state.projectors.find(current => current.slot === p.slot);
+    if (!live || !connectionOf(live).current) { result[p.slot] = {error:'No fresh reply; skipped'}; continue; }
+    if (!reset && !supportsPatterns(p)) { result[p.slot] = {error:'Internal patterns unsupported; skipped'}; continue; }
+    try {
+      const detail = await recoverOutput({ projector:p, reset,
+        read:async()=>{const r=await fetch('/api/state',{cache:'no-store',signal:AbortSignal.timeout(5000)});if(!r.ok)throw new Error('Relay status unavailable');return r.json();},
+        send:async(cmd,arg)=>{const out=await api('command',{slot:p.slot,cmd,arg});if(out[p.slot]?.error)throw new Error(out[p.slot].error);return out[p.slot]?.result==='OK';},
+        progress:message=>{ $('#all-confirm-note').textContent = `${projectorName(p)}: ${message}`; },
+      });
+      result[p.slot] = {result:'OK',detail};
+    } catch(error) { result[p.slot] = {error:error.message}; }
+  }
+  return result;
+}
+allProjectors = createAllProjectors({ state:()=>state, connected:()=>connected, connectionOf,
+  send:body=>body.cmd==='resetInput' ? recoverAllOutputs(true) : body.cmd==='pattern'&&body.arg==='00' ? recoverAllOutputs(false) : api('command',body),
+});
 
 $('#show-lock').onclick = () => api('lock', { lock: !state.lock }).catch((e) => toast(e.message));
 $('#preset-save').onclick = () => { const n = $('#preset-name').value.trim(); if (!n) return toast('Name the preset first'); api('preset/save', { name: n }).then(() => { $('#preset-name').value = ''; toast(`Saved ${n}`); }).catch((e) => toast(e.message)); };
@@ -202,6 +223,7 @@ function renderOverview() {
   const staticPreview = location.pathname.includes('/apps/projctl/public') || ['systembydave.com', 'www.systembydave.com', 'davehomeassist.github.io'].includes(location.hostname);
   $('#local-controller-help').hidden = connected || !staticPreview;
   $('#summary').textContent = connected ? `${online} / ${state.projectors.length} devices replying · ${assigned} / 4 lanes assigned` : 'Relay disconnected · device data unavailable';
+  allProjectors?.update();
   $('#connection-note').textContent = !connected ? 'Reconnecting automatically. Displayed values are last known; current projector power is unknown.' : online < state.projectors.length ? 'Relay connected. Devices without a reply: check the venue network and projector connection. No reply does not confirm power off.' : state.simulation ? 'Simulator data · no physical projector feedback. Status updates automatically.' : 'Device feedback updates automatically. Each card shows its latest successful reply.';
 }
 // Keep interactive nodes stable through status polls; only changed content is patched.
@@ -396,7 +418,7 @@ $('#host-displays-load').onclick=async()=>{
   const output=$('#host-display-results');output.textContent='Reading relay computer display records…';
   try{const response=await fetch('/api/host-displays',{cache:'no-store',signal:AbortSignal.timeout(10000)});if(response.status===401){location.href='/login.html';return;}const data=await response.json();if(!response.ok||data.scope!=='relay-computer')throw Error(data.reason||'Computer display information unavailable.');output.innerHTML=`<p class="pj-mono">${esc(data.state)} · ${esc(data.reason||'OS records only; no projector assignment implied.')}</p>${(data.displays||[]).map(display=>`<article><strong>${esc(display.name||display.id)}</strong><p>${esc(reportedValue(display.resolution))} · ${esc(display.connection||'Connection unknown')}</p><p class="pj-mono">EDID ${esc(display.edid?.state||'unavailable')} · unassigned to A–D</p></article>`).join('')}`;}catch(error){output.textContent=error.message;}
 };
-window.addEventListener('projctl:navigate',event=>{const {panel,projector}=event.detail||{};if(!['home','notes','info','rig','stage','presets','log','setup','throw'].includes(panel))return;document.querySelector(`#tab-btn-${panel}`)?.click();if(projector&&Object.hasOwn(LANES,projector))openProjector(projector);});
+window.addEventListener('projctl:navigate',event=>{const {panel,projector}=event.detail||{};if(!['home','notes','info','rig','all','stage','presets','log','setup','throw'].includes(panel))return;document.querySelector(`#tab-btn-${panel}`)?.click();if(projector&&Object.hasOwn(LANES,projector))openProjector(projector);});
 
 function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); return p && laneOf(p) ? `${slot} · ${p.lane} / ${laneOf(p).target}` : slot; }
 function eventSlotName(event) { return slotName(event.slot) + (event.slotBeforeRenumber ? ` (previously ${event.slotBeforeRenumber})` : ''); }
@@ -490,7 +512,7 @@ function renderAll() {
   lockButton.setAttribute('aria-label', lockLabel); lockButton.title = lockLabel;
   lockButton.dataset.lockState = state.lock ? 'locked' : 'unlocked';
   renderOverview();
-  $('[data-all="resetInput"]').textContent = `Reset all to ${state.preferredInput || 'HDMI'}`;
+  $('[data-all="resetInput"]').textContent = 'Reset all to HDMI';
   $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = state.presets.length || '';
   document.querySelectorAll('[data-all="power"][data-arg="0"], [data-all="pattern"]').forEach((b) => b.disabled = state.lock || !connected);
   renderGrid(); renderThermal(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
