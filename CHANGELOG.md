@@ -11,6 +11,7 @@
 - Show lock also blocks address edits, discovery, presets and power schedules. Shutter and power on stay available.
 - Rig saves are fsynced and replaced atomically, with a `.bak`. A write error is reported and does not crash the relay. Simulator mode does not rewrite a rig that already has addresses.
 - Logout revokes that browser's session token. `/api/health` and the header show the version and commit.
+- A status poll keeps one PJLink session open per projector and reuses it on the next poll. It opens a new session only when the projector has closed the old one. The password digest goes on the first command of a session, as PJLink specifies; a projector that then answers with an authentication error gets it on every command. Power, shutter and input commands still use their own connection, after closing the held session, and take turns with polls. Reason: on the rig each PT-DW830U closed about every ninth new poll session with no greeting (packet capture, November 12). Loopback-verified only; not yet run against a projector.
 - A Panasonic reply that names a different command is reported as an error. It no longer leaves that pattern, lens or picture command waiting with no timeout.
 
 ## November 12, 2026: Projctl thermal watch

@@ -46,89 +46,127 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
       });
     });
   }
-  // One TCP session carries as many commands as the projector keeps the socket
-  // open. Class 1 gear often closes after each reply; the rest continue on a
-  // new session instead of failing the poll. NAME and LAMP are not on the fast path.
-  let slowAt = 0;
-  function sessionOnce(commands, { signal } = {}) {
+  // One PJLink session per projector stays open between status polls, so a
+  // poll does not open a new connection every few seconds. The digest goes on
+  // the first command of a session only, as PJLink specifies; a projector that
+  // answers a later command with an authentication error gets it on every
+  // command from then on. Gear that closes after each reply continues on a new
+  // session instead of failing the poll. NAME and LAMP are not on the fast path.
+  const CLOSED = 'connection closed before PJLink reply';
+  let slowAt = 0, live = null, digestEveryCommand = false, chain = Promise.resolve();
+  const cancelled = signal => signal?.reason || new Error('Projector poll cancelled');
+  function dropSession(session) {
+    if (!session) return;
+    if (!session.dead) session.dead = new Error(CLOSED);
+    if (live === session) live = null;
+    session.sock.destroy();
+    session.wake?.();
+  }
+  function openSession() {
+    const sock = net.createConnection({ host, port });
+    sock.unref(); // an idle session must not keep the relay or a test alive
+    const session = { sock, buf: '', bytes: 0, lines: [], dead: null, wake: null, prefix: null, first: true };
+    const die = error => { if (!session.dead) session.dead = error; if (live === session) live = null; session.wake?.(); };
+    sock.on('error', die);
+    sock.on('end', () => die(new Error(CLOSED)));
+    sock.on('close', () => die(new Error(CLOSED)));
+    sock.on('data', data => {
+      session.bytes += data.length;
+      if (session.bytes > 8192) { die(new Error('PJLink response exceeds size limit')); sock.destroy(); return; }
+      session.buf += data.toString('latin1');
+      let idx;
+      while ((idx = session.buf.indexOf('\r')) >= 0) { session.lines.push(session.buf.slice(0, idx)); session.buf = session.buf.slice(idx + 1); }
+      session.wake?.();
+    });
+    return session;
+  }
+  // The next reply line, or the reason there will not be one. A line that arrived
+  // before the projector closed is still delivered.
+  function nextLine(session, signal) {
     return new Promise((resolve, reject) => {
-      throwIfAborted(signal);
-      const sock = net.createConnection({ host, port });
-      let buf = '', bytes = 0, prefix = null, index = 0, awaiting = false, done = false, closed = false, timer, reuse;
-      const entries = [];
-      const cleanup = () => { clearTimeout(timer); clearTimeout(reuse); signal?.removeEventListener('abort', onAbort); };
-      const finish = (error, stop) => {
-        if (done) return;
-        done = true; cleanup(); sock.destroy();
-        if (error && !entries.length) reject(error);
-        else resolve({ entries, consumed: entries.length, stop: !!stop || !!error });
+      if (signal?.aborted) return reject(cancelled(signal));
+      let timer;
+      const settle = (fn, value) => { clearTimeout(timer); signal?.removeEventListener('abort', onAbort); session.wake = null; fn(value); };
+      const onAbort = () => settle(reject, cancelled(signal));
+      const check = () => {
+        if (session.lines.length) settle(resolve, session.lines.shift());
+        else if (session.dead) settle(reject, session.dead);
       };
-      const arm = () => { clearTimeout(timer); timer = setTimeout(() => finish(new Error('timeout'), true), timeoutMs); };
-      const onAbort = () => finish(signal.reason || new Error('Projector poll cancelled'), true);
-      const writeCommand = () => {
-        awaiting = true; arm();
-        try { throwIfAborted(signal); sock.write(prefix + '%1' + commands[index] + '\r'); }
-        catch (error) { finish(error, true); }
-      };
-      arm();
+      timer = setTimeout(() => settle(reject, new Error('timeout')), timeoutMs);
       signal?.addEventListener('abort', onAbort, { once: true });
-      sock.on('error', error => finish(error, true));
-      sock.on('end', () => {
-        closed = true;
-        if (done) return;
-        if (awaiting && !entries.length) finish(new Error('connection closed before PJLink reply'), true);
-        else finish(null, false);
-      });
-      sock.on('close', () => { if (!done && !entries.length) finish(new Error('connection closed before PJLink reply'), true); });
-      sock.on('data', data => {
-        if (done) return;
-        bytes += data.length;
-        if (bytes > 8192) return finish(new Error('PJLink response exceeds size limit'), true);
-        buf += data.toString('latin1');
-        let idx;
-        while (!done && (idx = buf.indexOf('\r')) >= 0) {
-          const line = buf.slice(0, idx); buf = buf.slice(idx + 1);
-          if (prefix === null) {
-            if (line === 'PJLINK 0') prefix = '';
-            else if (/^PJLINK 1 [0-9a-fA-F]{8}$/.test(line)) prefix = createHash('md5').update(line.slice(9) + password).digest('hex');
-            else return finish(new Error('Invalid PJLink handshake'), true);
-            writeCommand();
-            continue;
-          }
-          if (line === 'PJLINK ERRA') return finish(Object.assign(new Error('auth failed: PJLink password wrong or not set (Setup tab)'), { code: 'ERRA' }), true);
-          const match = line.match(/^%1([A-Z]{4})=(.*)$/);
-          const cmd = commands[index];
-          if (!match || match[1] !== cmd.slice(0, 4)) return finish(new Error('Mismatched or malformed PJLink reply'), true);
-          const value = match[2];
-          if (Object.hasOwn(ERR, value)) entries.push([cmd, { error: Object.assign(new Error(ERR[value]), { code: value }) }]);
-          else if (!cmd.endsWith(' ?') && value !== 'OK') return finish(new Error('Invalid PJLink command acknowledgement'), true);
-          else entries.push([cmd, { value }]);
-          index += 1; awaiting = false;
-          if (index >= commands.length) return finish(null, true);
-          // 'end' is delivered after setImmediate on this runtime. A zero timer
-          // sees the close first, so a one-reply projector is not written again.
-          reuse = setTimeout(() => {
-            if (done) return;
-            if (closed || sock.destroyed || !sock.writable) finish(null, false);
-            else writeCommand();
-          }, 0);
-        }
-      });
+      session.wake = check;
+      check();
     });
   }
-  async function query(commands, options) {
+  // 'end' is delivered after the reply's 'data'. A zero timer lets the close be
+  // seen first, so a one-reply projector is not written to again.
+  const letCloseArrive = () => new Promise(resolve => setTimeout(resolve, 0));
+  async function runQuery(commands, { signal } = {}) {
+    throwIfAborted(signal);
     const out = new Map();
-    let pending = commands.slice();
+    let pending = commands.slice(), retriedFresh = false;
     while (pending.length) {
-      let session;
-      try { session = await sessionOnce(pending, options); }
-      catch (error) { if (!out.size) throw error; break; }
-      for (const entry of session.entries) out.set(entry[0], entry[1]);
-      if (session.stop || !session.consumed) break;
-      pending = pending.slice(session.consumed);
+      let session = live && !live.dead ? live : null;
+      const reused = !!session;
+      let consumed = 0, reopen = false;
+      try {
+        if (session) { session.lines.length = 0; session.buf = ''; }
+        else {
+          session = live = openSession();
+          const greeting = await nextLine(session, signal);
+          if (greeting === 'PJLINK 0') session.prefix = '';
+          else if (/^PJLINK 1 [0-9a-fA-F]{8}$/.test(greeting)) session.prefix = createHash('md5').update(greeting.slice(9) + password).digest('hex');
+          else throw new Error('Invalid PJLink handshake');
+        }
+        session.bytes = 0;
+        for (const cmd of pending) {
+          if (consumed) { await letCloseArrive(); if (session.dead && !session.lines.length) { reopen = true; break; } }
+          throwIfAborted(signal);
+          const withDigest = session.first || digestEveryCommand;
+          session.sock.write((withDigest ? session.prefix : '') + '%1' + cmd + '\r');
+          session.first = false;
+          let line;
+          try { line = await nextLine(session, signal); }
+          catch (error) {
+            // The command went into a socket the projector had already closed: after an
+            // earlier reply (one-reply gear), or an idle session it dropped between polls.
+            const staleSession = reused && !consumed && !retriedFresh;
+            if (error.message === CLOSED && !signal?.aborted && (consumed || staleSession)) { if (!consumed) retriedFresh = true; reopen = true; break; }
+            throw error;
+          }
+          if (line === 'PJLINK ERRA') {
+            if (!withDigest && session.prefix) { digestEveryCommand = true; reopen = true; break; }
+            throw Object.assign(new Error('auth failed: PJLink password wrong or not set (Setup tab)'), { code: 'ERRA' });
+          }
+          const match = line.match(/^%1([A-Z]{4})=(.*)$/);
+          if (!match || match[1] !== cmd.slice(0, 4)) throw new Error('Mismatched or malformed PJLink reply');
+          const value = match[2];
+          if (Object.hasOwn(ERR, value)) out.set(cmd, { error: Object.assign(new Error(ERR[value]), { code: value }) });
+          else if (!cmd.endsWith(' ?') && value !== 'OK') throw new Error('Invalid PJLink command acknowledgement');
+          else out.set(cmd, { value });
+          consumed += 1;
+        }
+      } catch (error) {
+        dropSession(session);
+        if (signal?.aborted) throw cancelled(signal);
+        if (!out.size) throw error;
+        break; // keep what was read; the rest is reported stale
+      }
+      pending = pending.slice(consumed);
+      if (reopen) dropSession(session);
     }
     return out;
   }
+  // Polls and commands take turns, so a command never overlaps a poll on this projector.
+  function inTurn(work) {
+    const run = chain.then(work);
+    chain = run.catch(() => {});
+    return run;
+  }
+  const query = (commands, options) => inTurn(() => runQuery(commands, options));
+  // A command closes the held status session and uses its own connection, as it
+  // always has. The next poll opens a new session.
+  const command = (cmd, options) => inTurn(() => { dropSession(live); return send(cmd, options); });
   const powerMap = { '0': POWER.OFF, '1': POWER.ON, '2': POWER.COOLING, '3': POWER.WARMING };
   return {
     kind: 'pjlink',
@@ -171,10 +209,12 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
       throwIfAborted(signal);
       return s;
     },
-    power: (on, options) => send(`POWR ${on ? 1 : 0}`, options),
-    shutter: (closed, options) => send(`AVMT ${closed ? 31 : 30}`, options),
-    input: (id, options) => send(`INPT ${id}`, options),
+    power: (on, options) => command(`POWR ${on ? 1 : 0}`, options),
+    shutter: (closed, options) => command(`AVMT ${closed ? 31 : 30}`, options),
+    input: (id, options) => command(`INPT ${id}`, options),
     async lens() { throw new NotSupported('lens'); },
+    // Close the held status session, for a driver that is being replaced or a relay that is stopping.
+    close() { dropSession(live); },
   };
 }
 export function pjlinkSearch({ broadcast = '255.255.255.255', waitMs = 2000 } = {}) {

@@ -103,7 +103,7 @@ function connectionError(p, error) {
 function driverFor(p) {
   const key = JSON.stringify([p.slot, p.driver, p.ip, p.user, p.password, p.model]);
   let d = drivers.get(p.slot);
-  if (!d || d._key !== key) { d = makeDriver(p); d._key = key; drivers.set(p.slot, d); }
+  if (!d || d._key !== key) { d?.close?.(); d = makeDriver(p); d._key = key; drivers.set(p.slot, d); }
   return d;
 }
 
