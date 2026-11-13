@@ -17,3 +17,8 @@ jobs:
         run: bash apps/screen-check/test.sh
       - name: Build and verify Apple Silicon application
         run: bash apps/screen-check/build.sh
+      - name: Rebuild from a dirty output directory without retaining removed resources
+        run: |
+          printf 'obsolete fixture\n' > 'apps/screen-check/dist/Frozen Screen Check.app/Contents/Resources/retired-fixture.txt'
+          bash apps/screen-check/build.sh
+          test ! -e 'apps/screen-check/dist/Frozen Screen Check.app/Contents/Resources/retired-fixture.txt'

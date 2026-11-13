@@ -94,6 +94,17 @@ struct CheckRow: Codable, Identifiable {
     var observations: [DisplayObservation]
     var issues: [String]
     var note: String
+
+    var stateLabel: String {
+        if state == .ready { return "MATCH" }
+        if state == .unknown { return "UNKNOWN" }
+        return observations.isEmpty ? "MISSING" : "CHECK"
+    }
+
+    var accessibilitySummary: String {
+        ([name, stateLabel, model, "Expected: " + target] + observations.map(\.detail) + issues + [note])
+            .filter { !$0.isEmpty }.joined(separator: ". ")
+    }
 }
 
 struct CheckReport: Codable {
@@ -168,23 +179,6 @@ func evaluate(profile: ShowProfile, displays: [DisplayObservation], at: Date = D
                        readyCount: rows.reduce(0) { $0 + $1.readyCount }, expectedCount: profile.groups.reduce(0) { $0 + $1.count }, rows: rows)
 }
 
-// Bound profile reads so accidentally selecting a large file cannot exhaust
-// memory or hold the native interface while JSONDecoder reads the entire file.
-func loadProfile(at url: URL) throws -> ShowProfile {
-    let limit = 256 * 1024
-    let values = try url.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey])
-    guard values.isRegularFile == true, let size = values.fileSize, size <= limit else {
-        throw CheckError.message("The show profile must be a JSON file no larger than 256 KB.")
-    }
-    let file = try FileHandle(forReadingFrom: url)
-    defer { try? file.close() }
-    let data = try file.read(upToCount: limit + 1) ?? Data()
-    guard data.count <= limit else { throw CheckError.message("The show profile exceeds 256 KB.") }
-    let profile = try JSONDecoder().decode(ShowProfile.self, from: data)
-    try profile.validate()
-    return profile
-}
-
 // The OS list API truncates at capacity without returning an error. Grow a
 // full buffer instead of trusting a count read before a display reconnects.
 func completeDisplayIDs(query: (Int) throws -> [UInt32]) throws -> [UInt32] {
@@ -208,33 +202,17 @@ func stableDisplaySnapshot(capture: () throws -> [DisplayObservation]) throws ->
     throw CheckError.message("Displays are still changing. Check again after the connection settles.")
 }
 
-final class VerificationSession {
-    private let read: () throws -> CheckReport
-    private let persist: (CheckReport) throws -> Void
-    private(set) var report: CheckReport?
-    private(set) var error: String?
-    private(set) var saveWarning: String?
+// Quiet events settle for two seconds, but a continuous burst cannot postpone
+// the next reading forever. Call with a monotonic clock, never wall time.
+struct CheckDebounce {
+    private var firstEvent: TimeInterval?
 
-    init(read: @escaping () throws -> CheckReport, persist: @escaping (CheckReport) throws -> Void) {
-        self.read = read; self.persist = persist
+    mutating func delay(at now: TimeInterval) -> TimeInterval {
+        if firstEvent == nil { firstEvent = now }
+        return max(0, min(2, 6 - (now - firstEvent!)))
     }
 
-    func check() {
-        report = nil; error = nil; saveWarning = nil
-        let current: CheckReport
-        do { current = try read(); report = current }
-        catch { self.error = error.localizedDescription; return }
-        do { try persist(current) }
-        catch { saveWarning = "Readings are current, but the local report could not be saved: " + error.localizedDescription }
-    }
-
-    // Re-read after the Save dialog returns. Displays may have changed while
-    // that dialog's nested event loop was open.
-    func export(to url: URL) throws {
-        check()
-        guard let report else { throw CheckError.message(error ?? "Unable to verify displays.") }
-        try encodedReport(report).write(to: url, options: .atomic)
-    }
+    mutating func reset() { firstEvent = nil }
 }
 
 enum Invocation: Equatable {

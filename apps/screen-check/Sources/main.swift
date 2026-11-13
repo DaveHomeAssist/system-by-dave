@@ -3,136 +3,6 @@ import SwiftUI
 import ServiceManagement
 import UniformTypeIdentifiers
 
-let appID = "com.systembydave.frozen-screen-check"
-let loginPlist = appID + ".plist"
-let supportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-    .appendingPathComponent("Frozen Screen Check", isDirectory: true)
-let profileURL = supportURL.appendingPathComponent("show-profile.json")
-
-func bundledProfileURL() throws -> URL {
-    guard let url = Bundle.main.url(forResource: "show-profile", withExtension: "json") else {
-        throw CheckError.message("The app's show profile is missing. Reinstall the complete app bundle.")
-    }
-    return url
-}
-
-func displayCheckTime(_ value: String) -> String {
-    guard let date = ISO8601DateFormatter().date(from: value) else { return "Time unavailable" }
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "en_US")
-    formatter.timeZone = TimeZone(identifier: "America/New_York")
-    formatter.dateFormat = "MMM d, h:mm:ss a z"
-    return formatter.string(from: date)
-}
-
-final class CheckModel: ObservableObject {
-    @Published var report: CheckReport?
-    @Published var error: String?
-    @Published var checking = false
-    @Published var loginState = "Checking login setting…"
-    @Published var loginEnabled = false
-    @Published var loginApproval = false
-    @Published var actionMessage: String?
-    @Published var saveWarning: String?
-    var didUpdate: (() -> Void)?
-    private var pending: DispatchWorkItem?
-    private var observerTokens: [NSObjectProtocol] = []
-    private let session = VerificationSession(
-        read: { try evaluate(profile: loadProfile(at: profileURL), displays: readDisplays()) },
-        persist: { try encodedReport($0).write(to: supportURL.appendingPathComponent("last-report.json"), options: .atomic) }
-    )
-
-    var headline: String {
-        if checking { return "Checking screens…" }
-        if error != nil { return "Check unavailable" }
-        guard let r = report else { return "Waiting for display information" }
-        if r.state == .ready { return "All \(r.expectedCount) screens match" }
-        return r.readyCount == r.expectedCount ? "Display setup needs attention" : "\(r.readyCount) of \(r.expectedCount) screens match"
-    }
-
-    func prepare() {
-        do {
-            try FileManager.default.createDirectory(at: supportURL, withIntermediateDirectories: true)
-            if !FileManager.default.fileExists(atPath: profileURL.path) {
-                try FileManager.default.copyItem(at: bundledProfileURL(), to: profileURL)
-            }
-        } catch { self.error = error.localizedDescription }
-        refreshLogin()
-        observerTokens.append(NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in self?.schedule() })
-        observerTokens.append(NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in self?.schedule() })
-    }
-
-    func schedule(after seconds: Double = 2) {
-        pending?.cancel(); checking = true; didUpdate?()
-        let work = DispatchWorkItem { [weak self] in self?.check() }
-        pending = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: work)
-    }
-
-    func check() {
-        pending?.cancel(); pending = nil
-        session.check()
-        publishResult()
-    }
-
-    private func publishResult() {
-        report = session.report; error = session.error; saveWarning = session.saveWarning
-        checking = false; refreshLogin(); didUpdate?()
-    }
-
-    func refreshLogin() {
-        let status = SMAppService.agent(plistName: loginPlist).status
-        loginEnabled = status == .enabled
-        loginApproval = status == .requiresApproval
-        switch status {
-        case .enabled: loginState = "Checks start at login"
-        case .requiresApproval: loginState = "Login checks need macOS approval"
-        case .notRegistered: loginState = "Login checks are off"
-        case .notFound:
-            let helper = Bundle.main.bundleURL.appendingPathComponent("Contents/Library/LaunchAgents/" + loginPlist)
-            loginState = FileManager.default.fileExists(atPath: helper.path)
-                ? "Login service is not registered" : "Login helper is missing; reinstall the app"
-        @unknown default: loginState = "Login state unavailable"
-        }
-    }
-
-    func changeLogin() {
-        if loginApproval { SMAppService.openSystemSettingsLoginItems(); return }
-        let path = Bundle.main.bundleURL.standardizedFileURL.path
-        let userApps = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Applications").path + "/"
-        guard path.hasPrefix("/Applications/") || path.hasPrefix(userApps) else {
-            actionMessage = "Move Frozen Screen Check.app to Applications first, reopen it, then enable login checks."
-            return
-        }
-        do {
-            let service = SMAppService.agent(plistName: loginPlist)
-            if loginEnabled { try service.unregister() } else { try service.register() }
-            actionMessage = nil
-        } catch { actionMessage = "Login setting: " + error.localizedDescription }
-        refreshLogin(); didUpdate?()
-    }
-
-    func export() {
-        guard report != nil, !checking else { return }
-        let panel = NSSavePanel()
-        panel.nameFieldStringValue = "Frozen-screen-check.json"
-        panel.title = "Save screen verification"
-        panel.allowedContentTypes = [.json]
-        if panel.runModal() == .OK, let url = panel.url {
-            guard url.resolvingSymlinksInPath().standardizedFileURL != profileURL.resolvingSymlinksInPath().standardizedFileURL else {
-                actionMessage = "Choose a different file; an exported report cannot replace your show profile."
-                return
-            }
-            pending?.cancel(); pending = nil
-            do { try session.export(to: url); actionMessage = "Fresh report saved." }
-            catch { actionMessage = error.localizedDescription }
-            publishResult()
-        }
-    }
-
-    func profileFolder() { NSWorkspace.shared.activateFileViewerSelecting([profileURL]) }
-}
-
 func accent(_ name: String) -> Color {
     switch name {
     case "purple": return .purple
@@ -152,9 +22,9 @@ struct DisplayRowView: View {
                 HStack {
                     Text(row.name).font(.headline)
                     Spacer()
-                    Label(row.state == .ready ? "MATCH" : (row.observations.isEmpty ? "MISSING" : "CHECK"),
+                    Label(row.stateLabel,
                           systemImage: row.state == .ready ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                        .font(.caption.bold()).foregroundStyle(row.state == .ready ? Color.green : Color.orange)
+                        .font(.caption.bold())
                 }
                 HStack {
                     Text(row.model).foregroundStyle(.secondary)
@@ -168,11 +38,13 @@ struct DisplayRowView: View {
                     Text(display.detail).font(.system(size: 12, design: .monospaced)).textSelection(.enabled)
                 }
                 if !row.issues.isEmpty {
-                    Text(row.issues.joined(separator: " ")).font(.caption).foregroundStyle(.orange)
+                    Text(row.issues.joined(separator: " ")).font(.caption)
                 }
                 if !row.note.isEmpty { Text(row.note).font(.caption2).foregroundStyle(.secondary) }
             }
         }.padding(12).background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 9))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(row.accessibilitySummary)
     }
 }
 
@@ -183,7 +55,7 @@ struct DashboardView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("FROZEN / SCREEN CHECK").font(.caption.weight(.semibold)).tracking(1.5).foregroundStyle(.secondary)
-                    Text(model.headline).font(.system(size: 25, weight: .bold))
+                    Text(model.headline).font(.system(size: 25, weight: .bold)).accessibilityAddTraits(.isHeader)
                 }
                 Spacer()
                 Button(action: { model.check() }) { Label("Check Now", systemImage: "arrow.clockwise") }
@@ -203,6 +75,10 @@ struct DashboardView: View {
             }
             ScrollView {
                 VStack(spacing: 8) {
+                    if model.checking && model.report != nil {
+                        Label("Checking for changes. Previous readings shown below.", systemImage: "arrow.clockwise")
+                            .font(.caption).frame(maxWidth: .infinity, alignment: .leading)
+                    }
                     if let report = model.report {
                         ForEach(report.rows) { row in DisplayRowView(row: row) }
                     }
@@ -216,7 +92,7 @@ struct DashboardView: View {
                 Button(model.loginApproval ? "Open Login Settings" : (model.loginEnabled ? "Disable" : "Enable at Login")) { model.changeLogin() }
             }
             if let message = model.actionMessage { Text(message).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
-            if let warning = model.saveWarning { Text(warning).font(.caption).foregroundStyle(.orange).textSelection(.enabled) }
+            if let warning = model.saveWarning { Label(warning, systemImage: "exclamationmark.triangle").font(.caption).textSelection(.enabled) }
             Divider()
             HStack {
                 if let report = model.report {
@@ -224,11 +100,13 @@ struct DashboardView: View {
                 }
                 Spacer()
                 Button("Profile…") { model.profileFolder() }
+                    .keyboardShortcut(",", modifiers: .command)
                 Button("Export Report…") { model.export() }.disabled(model.report == nil || model.checking)
+                    .keyboardShortcut("e", modifiers: .command)
             }
             Text("A match confirms Mac output settings only—not cabling, projector reception or mapped content.")
                 .font(.caption2).foregroundStyle(.secondary)
-        }.padding(18).frame(minWidth: 640, minHeight: 560)
+        }.padding(16).frame(minWidth: 560, minHeight: 460)
     }
 }
 
@@ -237,6 +115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var window: NSWindow!
     var status: NSStatusItem!
     var summaryItem: NSMenuItem!
+    private var lastOpenRequest: String?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -254,8 +133,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                           styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         window.title = "Frozen Screen Check"
         window.contentView = NSHostingView(rootView: DashboardView(model: model))
-        window.minSize = NSSize(width: 680, height: 620)
+        window.minSize = NSSize(width: 580, height: 520)
         window.isReleasedWhenClosed = false; window.center()
+        DistributedNotificationCenter.default().addObserver(self, selector: #selector(openRequested(_:)), name: openRequestName, object: nil)
         model.didUpdate = { [weak self] in self?.updateStatus() }
         model.prepare()
         if invocation == .gui(login: true) {
@@ -288,6 +168,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func exportReport() { show(); model.export() }
     @objc func quit() { NSApp.terminate(nil) }
     @objc func becameActive() { model.refreshLogin() }
+    @objc func openRequested(_ notification: Notification) {
+        guard let request = notification.userInfo?["request"] as? String, request != lastOpenRequest else { return }
+        lastOpenRequest = request
+        show(); model.check()
+    }
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool { show(); model.check(); return true }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 }
@@ -307,10 +192,32 @@ if case .json(let path) = invocation {
     } catch { fputs("Unable to verify: \(error.localizedDescription)\n", stderr); exit(3) }
 }
 
-if let other = NSRunningApplication.runningApplications(withBundleIdentifier: appID).first(where: { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier }) {
-    if invocation != .gui(login: true) { other.activate(options: [.activateAllWindows, .activateIgnoringOtherApps]) }
-    exit(0)
+let instanceLease: InstanceLease
+do {
+    try FileManager.default.createDirectory(at: supportURL, withIntermediateDirectories: true)
+    guard let lease = try InstanceLease.acquire(at: supportURL.appendingPathComponent("instance.lock")) else {
+        if invocation != .gui(login: true) {
+            let request = UUID().uuidString
+            let started = Date()
+            // Retry briefly if the owning process is still creating its window.
+            // The receiver deduplicates the token, so one request causes one check.
+            for offset in [0.0, 0.1, 0.3, 0.6, 1.0] {
+                RunLoop.current.run(until: started.addingTimeInterval(offset))
+                DistributedNotificationCenter.default().postNotificationName(openRequestName, object: nil, userInfo: ["request": request], deliverImmediately: true)
+            }
+        }
+        exit(0)
+    }
+    instanceLease = lease
+} catch {
+    NSApplication.shared.setActivationPolicy(.accessory)
+    let alert = NSAlert()
+    alert.messageText = "Screen Check could not start"
+    alert.informativeText = error.localizedDescription
+    alert.addButton(withTitle: "Quit")
+    alert.runModal()
+    exit(3)
 }
 let delegate = AppDelegate()
 NSApplication.shared.delegate = delegate
-NSApplication.shared.run()
+withExtendedLifetime(instanceLease) { NSApplication.shared.run() }
