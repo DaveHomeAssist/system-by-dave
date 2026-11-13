@@ -139,7 +139,7 @@
   #operator-lanes [aria-pressed="true"] { background: var(--ink); color: var(--surface); }
   #tab-rig > #grid { grid-row: 3; grid-template-columns: 1fr; grid-template-rows: minmax(0,1fr); }
   #grid[data-active-lane="A"] > :not([data-lane="A"]),#grid[data-active-lane="B"] > :not([data-lane="B"]),#grid[data-active-lane="C"] > :not([data-lane="C"]),#grid[data-active-lane="D"] > :not([data-lane="D"]) { display: none; }
-  #grid > .operator-card { padding: 18px 24px; gap: 12px 24px; }
+  #grid > .operator-card { padding: 18px 24px; gap: 12px 24px; align-content: start; }
   .operator-shutter .operator-button { min-height: 64px; font-size: 18px; }
   .operator-pattern-buttons .operator-button { min-height: 56px; font-size: 14px; }
 }

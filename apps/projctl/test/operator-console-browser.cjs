@@ -66,7 +66,7 @@ const path = require('node:path');
     assert.equal(await page.locator('#tab-projector').isVisible(), false);
     const evidence = process.env.EVIDENCE_DIR || '/tmp/projctl-operator-evidence';
     fs.mkdirSync(evidence, { recursive: true });
-    for (const [width,height] of [[1440,900],[1024,768],[680,900],[375,812],[844,390],[3840,1080]]) {
+    for (const [width,height] of [[1440,900],[1024,768],[930,1574],[680,900],[375,812],[844,390],[3840,1080]]) {
       await page.setViewportSize({ width, height });
       if (width < 1280) {
         await page.locator('[data-operator-lane=B]').click();
@@ -75,6 +75,7 @@ const path = require('node:path');
       }
       for (const theme of ['light','dark']) {
         await page.evaluate(theme => document.documentElement.dataset.theme = theme, theme);
+        if (width === 930) assert.ok((await page.locator('#grid [data-lane=B] .reset-hdmi').evaluate(b => b.getBoundingClientRect().height)) <= 64, 'tall tablet keeps recovery buttons compact');
         const overflow = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, cw: innerWidth, ch: innerHeight }));
         assert.ok(overflow.w <= width && overflow.h <= height, JSON.stringify(overflow));
         await page.screenshot({ animations: 'disabled', path: path.join(evidence, `operator-${width}-${height}-${theme}.png`) });
@@ -121,7 +122,7 @@ const path = require('node:path');
     assert.deepEqual(simpleCalls.map(({cmd,arg}) => [cmd,arg]), [['input','32']]);
     await simple.close();
     assert.deepEqual(errors, []);
-    console.log('Operator console actions, recovery, guards, details, six viewports and both themes passed');
+    console.log('Operator console actions, recovery, guards, details, seven viewports and both themes passed');
   } finally {
     await browser.close();
     await relay.close();
