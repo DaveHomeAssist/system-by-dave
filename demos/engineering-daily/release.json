@@ -1,9 +1,79 @@
 {
   "schema": 1,
-  "sourceSha256": "7e14bcf68e3abd19aef6e65a9280aaa77ffabbe9246f6baa10b65a46b5ca477b",
-  "publicSha256": "9c03bf42ecabcb5252b7ac40cee87dbc75cef8fc5ab99bd0e6335a4127344107",
-  "editions": 32,
+  "sourceSha256": "ea2f94afb432d8fbeb7020fedaede8e324e4d9c315105ec8a71291736a3a003e",
+  "publicSha256": "be86db54c77bb7eb3caaa2fc344d2971f198103b7940b0867298ce13c68ff060",
+  "editions": 37,
   "files": [
+    {
+      "name": "Edition 037.svg",
+      "id": 37,
+      "date": "2026-11-13",
+      "title": "RTP repair before playout",
+      "sha256": "e26a5c434e4b8ae7e06302b7de2418f37d1663d22eca95268afc3191d396677c"
+    },
+    {
+      "name": "Edition 037.png",
+      "id": 37,
+      "date": "2026-11-13",
+      "title": "RTP repair before playout",
+      "sha256": "2151c4edf47b07c21fe387334decb99967b70fb1d99dc5a46c94e814cbb4da3c"
+    },
+    {
+      "name": "Edition 036.svg",
+      "id": 36,
+      "date": "2026-11-12",
+      "title": "Combined lens shift limits",
+      "sha256": "b23e68aa7d4a8871caedc1d927032414cfa4802fb373b0aec8dd39b43dce6903"
+    },
+    {
+      "name": "Edition 036.png",
+      "id": 36,
+      "date": "2026-11-12",
+      "title": "Combined lens shift limits",
+      "sha256": "4e1029a4f0b1626b7a95b215c543b53b819c61d3341d3bf99b455fb6e67c576a"
+    },
+    {
+      "name": "Edition 035.svg",
+      "id": 35,
+      "date": "2026-11-11",
+      "title": "Shutter angle and exposure",
+      "sha256": "c60898159132d2474c4f2a88c35f26b0e5dc92bb1d842b36a723c881800f4696"
+    },
+    {
+      "name": "Edition 035.png",
+      "id": 35,
+      "date": "2026-11-11",
+      "title": "Shutter angle and exposure",
+      "sha256": "3ed711aee1c321f453e31886abd72f78ebe201b27e7fd6d9e5d05b636ce001a4"
+    },
+    {
+      "name": "Edition 034.svg",
+      "id": 34,
+      "date": "2026-11-10",
+      "title": "HDR graphics white",
+      "sha256": "df6b8a249a32f83a34fea775bff44848e22fad9465d3049329ad3a75ee56f36e"
+    },
+    {
+      "name": "Edition 034.png",
+      "id": 34,
+      "date": "2026-11-10",
+      "title": "HDR graphics white",
+      "sha256": "d2a085742e6bca94f5582098164d90cf74c41a4d68057e438816d5e357299f15"
+    },
+    {
+      "name": "Edition 033.svg",
+      "id": 33,
+      "date": "2026-11-09",
+      "title": "JPEG XS line latency",
+      "sha256": "89ca9a6cdc11efa83a9ac0a4e865baabcaa3471e6f50a80429d3226027b0b68b"
+    },
+    {
+      "name": "Edition 033.png",
+      "id": 33,
+      "date": "2026-11-09",
+      "title": "JPEG XS line latency",
+      "sha256": "f09c906e98f0edbe95044f50ba657b101bb7c034d3ab2bcf1291c7a626990fbc"
+    },
     {
       "name": "Edition 032.svg",
       "id": 32,

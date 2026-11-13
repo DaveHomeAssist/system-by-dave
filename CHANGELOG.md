@@ -1,5 +1,9 @@
 # Changelog
 
+## November 13, 2026: Video Engineering Daily
+
+- Backfill November 9–12 and add Edition 037 for November 13. The five lessons cover JPEG XS line latency, HDR graphics white, shutter angle, lens shift and RTP retransmission. Each includes an illustrated story card.
+
 ## November 13, 2026 · Projctl documentation reconciliation
 
 - Distinguished source-checkout tests from installed-package acceptance checks.
