@@ -89,6 +89,11 @@
 .operator-heat { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 1px 8px; border: 2px solid var(--state-waiting); border-radius: 999px; color: var(--ink); background: var(--surface); font-weight: 700; white-space: nowrap; }
 .operator-heat[data-heat-level="hot"] { border-color: var(--state-blocked); }
 .pj-heat-alert { display: contents; }
+/* Compact tablet cards hide an online card's status row unless it carries an alarm; heat keeps it too. */
+@media (min-width: 681px) and (max-width: 1279px) and (min-height: 700px) and (max-height: 1000px) {
+  .operator-card[data-connection-state="online"] .operator-status.has-heat { display: flex; }
+  .operator-status.has-heat .operator-connection.online { display: none; }
+}
 .pj-heat-pill.avd-state { height: auto; min-height: 32px; padding: 4px 10px; border: 2px solid var(--state-waiting); border-radius: 999px; cursor: pointer; }
 .pj-heat-pill.avd-state[data-level="hot"] { border-color: var(--state-blocked); }
 .pj-heat-pill[hidden] { display: none; }

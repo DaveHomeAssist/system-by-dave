@@ -45,7 +45,7 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
       <div class="pj-summary-heading"><h2>${escape(info.target)}</h2><p>${escape(p?.model || 'No assigned projector')}</p></div>
       <button type="button" class="operator-details" data-open-projector="${lane}" aria-label="Details for ${lane} ${escape(info.target)}">Details</button>
     </header>
-    <div class="operator-status ${alarms.length?'has-alarms':''}">
+    <div class="operator-status ${alarms.length?'has-alarms':''} ${heat?'has-heat':''}">
       <span class="operator-connection ${available?'online':''}">${escape(connection.detail || connection.label || 'Unassigned')}</span>
       ${heat?`<span class="operator-heat" data-heat-level="${escape(heat.level)}" role="status" title="Air temperature ${escape(heat.text)}. Details in Thermal watch"><span class="avd-dot avd-dot--${heat.level==='hot'?'blocked':'waiting'}" aria-hidden="true"></span>Heat ${escape(heat.text)}</span>`:''}
       <strong class="pj-summary-state ${alarms.length?'operator-alert':''}" title="${escape([connection.detail,...alarms].join(' · '))}" ${alarms.length?'role="status"':''}>${alarms.length?`<span class="operator-alert-icon" aria-hidden="true">!</span><span><b>${alarmSeverity==='fault'?'Fault':'Warning'}</b> ${escape(alarms.join(' · '))}</span>`:escape(available ? s.power || 'Unknown power' : connection.detail)}</strong>
