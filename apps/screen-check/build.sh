@@ -22,6 +22,7 @@ for size in 16 32 128 256 512; do
 done
 iconutil -c icns "$iconset" -o "$app/Contents/Resources/AppIcon.icns"
 revision="$(git rev-parse --short=12 HEAD)"
+if [[ -n "$(git status --porcelain -- Sources Resources build.sh)" ]]; then revision="$revision-dirty"; fi
 /usr/libexec/PlistBuddy -c "Add :SourceRevision string $revision" "$app/Contents/Info.plist"
 # A caller supplies its own identity; no personal signing identity is committed.
 if [[ "${SIGNING_IDENTITY:--}" == "-" ]]; then
@@ -31,12 +32,14 @@ else
 fi
 codesign --verify --strict --verbose=2 "$app"
 cp QUICK-START.txt "$output/READ ME.txt"
-ditto -c -k --keepParent "$app" "$output/Frozen-Screen-Check-1.0.0.zip"
+version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")"
+archive="$output/Frozen-Screen-Check-$version.zip"
+ditto -c -k --keepParent "$app" "$archive"
 if [[ -n "${NOTARY_PROFILE:-}" ]]; then
-  xcrun notarytool submit "$output/Frozen-Screen-Check-1.0.0.zip" --keychain-profile "$NOTARY_PROFILE" --wait
+  xcrun notarytool submit "$archive" --keychain-profile "$NOTARY_PROFILE" --wait
   xcrun stapler staple "$app"
   xcrun stapler validate "$app"
-  ditto -c -k --keepParent "$app" "$output/Frozen-Screen-Check-1.0.0.zip"
+  ditto -c -k --keepParent "$app" "$archive"
 fi
-shasum -a 256 "$output/Frozen-Screen-Check-1.0.0.zip"
+shasum -a 256 "$archive"
 printf '\nBuilt %s\n' "$app"

@@ -1,6 +1,6 @@
 FROZEN SCREEN CHECK — MAC STUDIO
 
-1. Unzip Frozen-Screen-Check-1.0.0.zip.
+1. Unzip the Frozen-Screen-Check ZIP.
 2. Move Frozen Screen Check.app to Applications and open it.
 3. Click Enable at Login. If macOS requests approval, allow Frozen Screen
    Check in System Settings > General > Login Items & Extensions.
@@ -33,7 +33,9 @@ A match does not prove that the projector is receiving or showing light.
 
 Profile opens the local profile folder. If the approved show setup changes,
 edit show-profile.json, save, and Check Now. Invalid profiles fail visibly.
-Export Report saves the current observations for support.
+Export Report reads the screens again after you choose a file, then saves those
+fresh observations. A save failure leaves the current screen readings visible
+with a warning; an older saved report may remain, so check its timestamp.
 
 Requires an Apple Silicon Mac running macOS 13 or later. No Node, Python,
 browser, backend, network connection or developer tools are required.

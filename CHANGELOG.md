@@ -1,5 +1,15 @@
 # Changelog
 
+## November 13, 2026: Screen checker 1.0.1 edge cases
+
+- Preserve successful screen readings when report storage fails, and re-read
+  displays after the Save dialog so exports cannot reuse a stale passing result.
+- Reject duplicate display IDs, truncated/unstable snapshots, interlaced and
+  stretched modes, malformed command-line options and oversized profiles.
+- Keep the profile protected during export and label uncommitted local builds.
+  Regression coverage increases from 21 to 57 cases; physical Studio acceptance
+  and Apple notarization remain separate.
+
 ## November 13, 2026: Projector operator console
 
 - Added a permanent All Projectors tab with target review and explicit confirmation before every group command. Group Clear and HDMI recovery verify each device.
