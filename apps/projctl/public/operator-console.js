@@ -1,4 +1,4 @@
-import { hdmiSource, patternIsOff } from './output-recovery.js';
+import { hdmiSource, patternIsOff, supportsPatterns } from './output-recovery.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
@@ -22,11 +22,12 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
   const available = !!p && connection.current;
   const blocked = !available || lock || pending || !!p?.busy;
   const disabled = condition => condition ? 'disabled' : '';
-  const table = p?.patterns || patterns;
+  const hasPatterns = supportsPatterns(p);
+  const table = hasPatterns ? p?.patterns || patterns : {};
   const quick = quickPatterns(table);
   const alarms = Object.entries(s.errors || {}).filter(([, v]) => v > 0).sort((a,b) => b[1]-a[1]).map(([key,v]) => `${key} ${v===2?'fault':'warning'}`);
   const input = s.input == null ? 'Unknown' : (p?.inputs?.[s.input] || String(s.input)) + (stale.has('input') ? ' (last known)' : '');
-  const pattern = (patternIsOff(s.pattern) ? 'Off' : table?.[s.pattern] || s.pattern || 'Unknown') + (stale.has('pattern') ? ' (last known)' : '');
+  const pattern = !hasPatterns ? 'Not supported' : (patternIsOff(s.pattern) ? 'Off' : table?.[s.pattern] || s.pattern || 'Unknown') + (stale.has('pattern') ? ' (last known)' : '');
   const shutter = stale.has('shutter') ? 'unknown' : s.shutter || 'unknown';
   card.classList.toggle('offline', !available);
   card.innerHTML = `
@@ -55,10 +56,10 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
     </section>
     <section class="operator-patterns" aria-label="Test patterns for ${lane}">
       <div class="operator-label"><span>Test pattern</span><strong>${escape(pattern)}</strong></div>
-      <div class="operator-pattern-buttons">${quick.map(item=>`<button class="operator-button pattern-${item.label.toLowerCase()}" type="button" data-action="pattern" data-value="${escape(item.code)}" aria-pressed="${!stale.has('pattern')&&String(s.pattern)===item.code}" ${disabled(blocked)}><i aria-hidden="true"></i>${item.label}</button>`).join('')}<button type="button" class="operator-button pattern-more" data-more-patterns ${disabled(blocked)}>More</button></div>
+      <div class="operator-pattern-buttons">${quick.map(item=>`<button class="operator-button pattern-${item.label.toLowerCase()}" type="button" data-action="pattern" data-value="${escape(item.code)}" aria-pressed="${!stale.has('pattern')&&String(s.pattern)===item.code}" ${disabled(blocked)}><i aria-hidden="true"></i>${item.label}</button>`).join('')}<button type="button" class="operator-button pattern-more" data-more-patterns ${disabled(blocked||!hasPatterns)}>More</button></div>
     </section>
     <div class="operator-recovery">
-      <button class="operator-button clear-pattern" type="button" data-action="clear" ${disabled(blocked)}>Clear pattern</button>
+      <button class="operator-button clear-pattern" type="button" data-action="clear" ${disabled(blocked||!hasPatterns)}>Clear pattern</button>
       <button class="operator-button reset-hdmi" type="button" data-action="reset" ${disabled(blocked||!p||hdmiSource(p)==null)}>Reset to HDMI</button>
     </div>
     <div class="operator-readback"><span>Input <strong>${escape(input)}</strong></span><span class="pj-summary-freshness">${escape(connection.lastReply||'No reply')}</span></div>

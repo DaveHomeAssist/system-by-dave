@@ -55,3 +55,19 @@ test('quick pattern buttons use each actual driver table', () => {
   assert.deepEqual(quickPatterns(PATTERNS_RZ970).map(p => p.code), ['08', '01', '11']);
   assert.deepEqual(quickPatterns(PULSE_PATTERNS).map(p => p.code), ['internal:colorbars', 'internal:white', 'internal:crosshatch']);
 });
+
+
+test('PJLink-only HDMI recovery does not require unsupported pattern control', async () => {
+  const p = projector(), commands = [];
+  p.driver = 'pjlink'; p.status.pattern = undefined;
+  const message = await recoverOutput({ projector: p, reset: true, read: async () => ({ projectors: [p] }), progress() {}, send: async (cmd,arg) => {
+    commands.push([cmd,arg]); p.status.input = arg; p.status.updatedAt = Date.now() + 10; return true;
+  } });
+  assert.deepEqual(commands, [['input','L1 HDMI']]);
+  assert.match(message, /HDMI restored/); assert.doesNotMatch(message, /pattern is off/);
+});
+
+test('PJLink-only clear refuses before sending a command', async () => {
+  const p = projector(); p.driver = 'pjlink';
+  await assert.rejects(recoverOutput({ projector: p, reset: false, send: async () => assert.fail('no command expected'), read: async () => ({ projectors: [p] }), progress() {} }), /not supported/);
+});
