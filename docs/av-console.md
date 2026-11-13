@@ -58,6 +58,7 @@ not shared-workspace adoption or legacy tool parity.
   - Desktop: the full grid.
   - Tablet (under 1100px): two panels across, in reading order.
   - Phone (under 720px): one panel, with a labelled bottom panel switcher.
+  - A console may also choose the phone presentation for a short screen that is wider than that, such as a phone held sideways; Equipment Lab, the standalone Calculator and the retained family builds do so under 500px tall. The switcher stays a bar at any width. Its buttons and background at those widths belong to the console.
   - The desktop arrangement is never rewritten by a narrower presentation.
 
 ## Persistence
@@ -124,5 +125,7 @@ The console order follows the manifest:
   - the phone switcher.
 
 The existing AV Video, graph and Displays probes run against the panel workspace as well.
+
+`npm run test:equipment-lab-browser` checks the phone presentation on a short, wide screen (844 x 390) and at 320px: the switcher is a bar, the open panel has a body and its controls can be reached. A page that does not scroll can still hide its panel, so page containment alone does not show a usable layout.
 
 Automated checks don't establish physical touch behaviour or operator acceptance.

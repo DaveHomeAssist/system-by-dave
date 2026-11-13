@@ -402,7 +402,8 @@
     "D7: fixes in other repos (fmp-suite, DeckForge, BPM Delay, Lansdowne, PlotForge) - do upstream now or defer?",
     "D8: record the audit outcome in the repo like docs/fmp-camera-simulator-audit-2026-09.md? (recommended)",
     "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?",
-    "DIAG-1 [unlocks AVC-16 and the AVC-15 recovery panel; held by Dave 2026-10-28]: how production errors reach Dave. Option A local-only recovery panel with Copy diagnostics (version, source commit, browser, recent errors, offline status) kept on the device, with no third party and no CSP change (recommended); Option B hosted error tracker such as Sentry, with a connect-src change and a third-party script; Option C self-hosted report endpoint, with a connect-src change and a service to maintain."
+    "DIAG-1 [unlocks AVC-16 and the AVC-15 recovery panel; held by Dave 2026-10-28]: how production errors reach Dave. Option A local-only recovery panel with Copy diagnostics (version, source commit, browser, recent errors, offline status) kept on the device, with no third party and no CSP change (recommended); Option B hosted error tracker such as Sentry, with a connect-src change and a third-party script; Option C self-hosted report endpoint, with a connect-src change and a service to maintain.",
+    "PHONE-LANDSCAPE-1 [unlocks readable three-panel views on a phone held sideways]: under 500 px tall the console keeps two panels across, so a view of three or more panels gives each about 79 px of body at 844 x 390 (measured 2026-11-13; Maximize is one tap away). Keep it (A), show one panel with the switcher as the standalone pages do (B), or keep two across for views of up to two panels and use the switcher for larger views (C, recommended)?"
   ],
   "files": [
     {
@@ -1315,9 +1316,44 @@
         "limits": [
           "P01 is approximate and not qualified; Barco's values were read through search excerpts, and no drawing, photograph or unit was used.",
           "The other 42 entries retain their existing viewers while native adapters migrate.",
-          "Two small-screen limits predate this release and remain: in phone landscape (844 x 390) the console panel area collapses, and at 320 px wide the inspector is clipped at the right edge."
+          "The two small-screen limits that predated this release were fixed on 2026-11-13 (smallScreens, pull request 465): in phone landscape (844 x 390) the console panel area no longer collapses, and at 320 px wide the inspector is no longer clipped at the right edge. Both sizes are emulated; a physical phone check remains."
         ],
         "nextAction": "Finish the host release and read back the live route; then check P01 against Barco's primary documents."
+      },
+      "smallScreens": {
+        "checkedOn": "2026-11-13",
+        "scope": "Console panels on small phone screens: the shared phone switcher stays a bar at any width, the Equipment Lab page column stays the width of the screen, and the model inspector lays out by the size of its own panel",
+        "hostBase": "90444e26ad28a2752c1191bd43650b43580a6fd2",
+        "comparedWith": "efb7883f75d2216ce8cce5ab66bcd332b17c9909, which differs from the host base only in the splash tab label of pull request 464",
+        "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/465",
+        "verifiedImplementation": "d9c037808d37d1ede97c228941be76172dfde7d4",
+        "status": "Scoped source and browser checks pass in a cloud session; CI, merge, publication and live read-back are separate gates",
+        "cacheGeneration": "v20261113-console-phone-panels",
+        "compatibility": "ECP-1.0 revision 1.0 unchanged; no catalog, package, ID, deep link, storage or release import change",
+        "picture": {
+          "page844x390": "448 x 194, was 760 x 20",
+          "console844x390": "195 x 212, was 385 x 93",
+          "page320x568": "260 x 120, was 313 x 45 and clipped at the right edge",
+          "console320x568": "308 x 98, was 308 x 45 with the hint over the item list",
+          "pageP01At390x844": "330 x 236, was 330 x 187; C02 is unchanged at 330 x 307"
+        },
+        "verification": {
+          "runner": "Cloud session, Linux Chromium with SwiftShader, Node 22",
+          "viewportChecks": 163,
+          "panelChecks": 104,
+          "previousBuildFailures": 40,
+          "result": "Passed every gate in the AV Video workflow, including the Equipment Lab, suite shell and retained family probes, and the workspace, viewport and theme contract, LED wall, public contract and domain cutover checks. Rebuilding untouched main reproduced the committed bundles byte for byte.",
+          "previousBuild": "The new panel checks fail in 40 of 104 states on the previous build, all at 844 x 390 and 320 x 568, and pass the other 64.",
+          "otherConsoles": "Screenshots of the other nine packs in the console, the eight retained family builds and the standalone Calculator match the previous build at five sizes, apart from Show Control's clock.",
+          "supplemental": "Keyboard travel through the scrolling view buttons, the picture staying in place while the list scrolls, an emulated tap selection in landscape, the unknown-item notice, entries without a native model, print layout, and the probe under three other system fonts (DejaVu Sans, FreeSans, Carlito)",
+          "notChecked": "A physical phone, WebKit and GPU. WebKit runs of the workspace probe are left to CI."
+        },
+        "limits": [
+          "Sizes are emulated in Chromium; a phone's own toolbars leave less height than 390 px (448 x 144 at 844 x 340).",
+          "At 320 x 256 the header, view strip and switcher leave the panel no room; that size remains a page-containment check.",
+          "Inside the console at 844 x 390, views of three or more panels still give each panel a body about 79 px tall. That is the console's two-across layout, not this defect."
+        ],
+        "nextAction": "Dave checks both layouts on a physical phone, held sideways and upright."
       }
     }
   },
