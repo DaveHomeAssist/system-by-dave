@@ -36,6 +36,12 @@
 .operator-status { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; font-size: 11px; line-height: 16px; }
 .operator-status .pj-summary-state { white-space: normal; font-size: 11px; font-weight: 500; }
 .operator-status.has-alarms .pj-summary-state { color: var(--state-blocked); font-weight: 700; }
+.operator-status.has-alarms .operator-alert { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 10px; border: 2px solid #b87300; border-radius: 6px; color: #4d3100; background: #fff0bb; font-size: 15px; line-height: 20px; }
+.operator-alert b { text-transform: uppercase; margin-right: 5px; }
+.operator-alert-icon { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border: 2px solid currentColor; border-radius: 50%; font-size: 17px; }
+#grid > .operator-card[data-alarm-severity="warning"] { border-color: #b87300; }
+#grid > .operator-card[data-alarm-severity="fault"] { border-color: #d24d4d; }
+.operator-card[data-alarm-severity="fault"] .operator-status .operator-alert { color: #fff; background: #982b30; border-color: #d24d4d; }
 .operator-connection { color: var(--ink-muted); }
 .operator-connection::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: var(--state-waiting); }
 .operator-connection.online::before { background: var(--state-done); }
@@ -103,7 +109,7 @@
 }
 @media (min-width: 681px) and (max-width: 1279px) and (min-height: 700px) and (max-height: 1000px) {
   #grid > .operator-card { padding: 8px 12px; gap: 4px 8px; }
-  .operator-card:not(.offline) .operator-status:not(.has-alarms), .operator-card:not(.offline) .operator-feedback[data-phase="idle"] { display: none; }
+  .operator-card[data-connection-state="online"] .operator-status:not(.has-alarms), .operator-card[data-connection-state="online"] .operator-feedback[data-phase="idle"] { display: none; }
   .operator-shutter, .operator-power { grid-column: 1 / -1; }
   .operator-shutter .operator-label, .operator-patterns .operator-label, .operator-power .operator-label > span { display: none; }
   .operator-shutter-prefix { display: inline; }
@@ -112,6 +118,10 @@
   .operator-label > .operator-power-state { font-size: clamp(24px,3vw,32px); }
   .operator-power .operator-button { padding: 5px; font-size: 12px; line-height: 16px; }
   .operator-recovery .operator-button { min-height: 44px; }
+  #grid > .operator-card[data-alarm-severity] { row-gap: 2px; }
+  .operator-status.has-alarms .operator-connection.online { display: none; }
+  .operator-status.has-alarms .operator-alert { padding: 3px 7px; font-size: 14px; line-height: 18px; }
+  .operator-alert-icon { width: 18px; height: 18px; font-size: 14px; }
 }
 @media (max-width: 680px) {
   .pj-header { padding: 8px 12px; }

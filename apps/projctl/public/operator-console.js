@@ -20,12 +20,15 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
   const s = p?.status || {};
   const stale = new Set(s.stale || []);
   const available = !!p && connection.current;
+  card.dataset.connectionState = connection.recovered ? 'recovered' : connection.state;
   const blocked = !available || lock || pending || !!p?.busy;
   const disabled = condition => condition ? 'disabled' : '';
   const hasPatterns = supportsPatterns(p);
   const table = hasPatterns ? p?.patterns || patterns : {};
   const quick = quickPatterns(table);
   const alarms = Object.entries(s.errors || {}).filter(([, v]) => v > 0).sort((a,b) => b[1]-a[1]).map(([key,v]) => `${key} ${v===2?'fault':'warning'}`);
+  const alarmSeverity = Object.values(s.errors || {}).some(value => value === 2) ? 'fault' : alarms.length ? 'warning' : '';
+  if (alarmSeverity) card.dataset.alarmSeverity = alarmSeverity;
   const input = s.input == null ? 'Unknown' : (p?.inputs?.[s.input] || String(s.input)) + (stale.has('input') ? ' (last known)' : '');
   const pattern = !hasPatterns ? 'Not supported' : (patternIsOff(s.pattern) ? 'Off' : table?.[s.pattern] || s.pattern || 'Unknown') + (stale.has('pattern') ? ' (last known)' : '');
   const shutter = stale.has('shutter') ? 'unknown' : s.shutter || 'unknown';
@@ -39,7 +42,7 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
     </header>
     <div class="operator-status ${alarms.length?'has-alarms':''}">
       <span class="operator-connection ${available?'online':''}">${escape(connection.detail || connection.label || 'Unassigned')}</span>
-      <strong class="pj-summary-state" title="${escape([connection.detail,...alarms].join(' · '))}">${escape(alarms.join(' · ') || (available ? s.power || 'Unknown power' : connection.detail))}</strong>
+      <strong class="pj-summary-state ${alarms.length?'operator-alert':''}" title="${escape([connection.detail,...alarms].join(' · '))}" ${alarms.length?'role="status"':''}>${alarms.length?`<span class="operator-alert-icon" aria-hidden="true">!</span><span><b>${alarmSeverity==='fault'?'Fault':'Warning'}</b> ${escape(alarms.join(' · '))}</span>`:escape(available ? s.power || 'Unknown power' : connection.detail)}</strong>
     </div>
     <section class="operator-shutter" aria-label="Shutter for ${lane}">
       <div class="operator-label"><span>Shutter</span><strong>${available?escape(shutter):'Unknown'}</strong></div>

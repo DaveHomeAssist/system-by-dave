@@ -2,6 +2,7 @@
 
 ## November 13, 2026: Projector operator console
 
+- Made projector warnings and faults prominent with a labeled banner and matching card border.
 - Enlarged each projector power state and restored a two by two grid on medium screens before the individual-card layout.
 - Added a permanent All Projectors tab with target review and explicit confirmation before every group command. Group Clear and HDMI recovery verify each device.
 - Put shutter, power, quick patterns, Clear pattern and Reset to HDMI on each projector card. Controls is the default view. Tools and Details hold secondary functions.
