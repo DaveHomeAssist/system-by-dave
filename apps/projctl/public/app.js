@@ -172,7 +172,8 @@ for (const button of document.querySelectorAll('[data-operator-lane]')) {
 async function recoverAllOutputs(reset) {
   const result = {};
   for (const p of orderedProjectors(state.projectors).map(p => structuredClone(p))) {
-    if (!connectionOf(p).current) { result[p.slot] = {error:'No fresh reply; skipped'}; continue; }
+    const live = state.projectors.find(current => current.slot === p.slot);
+    if (!live || !connectionOf(live).current) { result[p.slot] = {error:'No fresh reply; skipped'}; continue; }
     if (!reset && !supportsPatterns(p)) { result[p.slot] = {error:'Internal patterns unsupported; skipped'}; continue; }
     try {
       const detail = await recoverOutput({ projector:p, reset,
