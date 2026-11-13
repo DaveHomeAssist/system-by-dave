@@ -302,3 +302,7 @@ buttons, the picture staying in place while the list scrolls, a tap selection
 under touch emulation in landscape, the unknown-item notice, entries without a
 native model and print layout. No physical phone, WebKit browser or GPU was
 checked; the WebKit run of the workspace probe is left to CI.
+
+[Pull request 465](https://github.com/DaveHomeAssist/system-by-dave/pull/465)
+records delivery. Publication and live read-back are separate gates, and the
+shared repository's record owns that evidence.

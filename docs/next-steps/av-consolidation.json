@@ -1316,7 +1316,7 @@
         "limits": [
           "P01 is approximate and not qualified; Barco's values were read through search excerpts, and no drawing, photograph or unit was used.",
           "The other 42 entries retain their existing viewers while native adapters migrate.",
-          "The two small-screen limits that predated this release were fixed on 2026-11-13 (smallScreens): in phone landscape (844 x 390) the console panel area no longer collapses, and at 320 px wide the inspector is no longer clipped at the right edge. Both sizes are emulated; a physical phone check remains."
+          "The two small-screen limits that predated this release were fixed on 2026-11-13 (smallScreens, pull request 465): in phone landscape (844 x 390) the console panel area no longer collapses, and at 320 px wide the inspector is no longer clipped at the right edge. Both sizes are emulated; a physical phone check remains."
         ],
         "nextAction": "Finish the host release and read back the live route; then check P01 against Barco's primary documents."
       },
@@ -1325,6 +1325,8 @@
         "scope": "Console panels on small phone screens: the shared phone switcher stays a bar at any width, the Equipment Lab page column stays the width of the screen, and the model inspector lays out by the size of its own panel",
         "hostBase": "90444e26ad28a2752c1191bd43650b43580a6fd2",
         "comparedWith": "efb7883f75d2216ce8cce5ab66bcd332b17c9909, which differs from the host base only in the splash tab label of pull request 464",
+        "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/465",
+        "verifiedImplementation": "d9c037808d37d1ede97c228941be76172dfde7d4",
         "status": "Scoped source and browser checks pass in a cloud session; CI, merge, publication and live read-back are separate gates",
         "cacheGeneration": "v20261113-console-phone-panels",
         "compatibility": "ECP-1.0 revision 1.0 unchanged; no catalog, package, ID, deep link, storage or release import change",
