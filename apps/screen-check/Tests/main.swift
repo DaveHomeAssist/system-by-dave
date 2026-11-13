@@ -11,7 +11,7 @@ try profile.validate()
 func observation(_ id: UInt32, _ vendor: UInt32, _ product: UInt32, _ height: Int = 1200) -> DisplayObservation {
     DisplayObservation(id: id, name: "Fixture", vendor: vendor, product: product, serial: 0, uuid: nil,
                        builtIn: false, active: true, mirrored: false, width: 1920, height: height,
-                       pixelWidth: 1920, pixelHeight: height, refreshRate: 60, rotation: 0)
+                       pixelWidth: 1920, pixelHeight: height, refreshRate: 60, rotation: 0, interlaced: false, stretched: false)
 }
 // Model IDs and output timings from the production readback. Display numbers are
 // deliberately arbitrary: they are runtime handles, never persistent identity.
@@ -59,4 +59,91 @@ invalid = profile; invalid.refreshTolerance = 30
 do { try invalid.validate(); expect(false, "unsafe refresh tolerance must reject") } catch { passed += 1 }
 invalid = profile; invalid.groups[0].count = 0
 do { try invalid.validate(); expect(false, "empty expected group must reject") } catch { passed += 1 }
+changed = healthy; changed[3].interlaced = true
+expect(try result(changed).state != .ready, "interlaced mode cannot pass progressive show timing")
+changed = healthy; changed[3].stretched = true
+expect(try result(changed).state != .ready, "stretched mode cannot pass unscaled show timing")
+changed = healthy; changed[3].interlaced = nil
+expect(try result(changed).rows[2].state == .unknown, "missing scan flags are unknown")
+changed = healthy; changed[1] = changed[0]
+do { _ = try result(changed); expect(false, "duplicate IDs must reject") } catch { passed += 1 }
+
+var capacities: [Int] = []
+let ids = try completeDisplayIDs { capacity in
+    capacities.append(capacity)
+    let count = capacities.count == 1 ? 8 : 12 // extra outputs arrive during enumeration
+    return Array(1...UInt32(min(capacity, count)))
+}
+expect(ids.count == 12 && capacities == [8, 16], "full buffers expand instead of accepting a truncated display list")
+expect(try completeDisplayIDs { _ in [] }.isEmpty, "empty OS display list is supported")
+do { _ = try completeDisplayIDs { _ in [1, 1] }; expect(false, "duplicate OS display list must reject") } catch { passed += 1 }
+do { _ = try completeDisplayIDs { Array(1...UInt32($0)) }; expect(false, "unbounded OS display list must reject") } catch { passed += 1 }
+
+var captures = 0
+changed = healthy; changed[3].pixelHeight = 1080
+let converged = try stableDisplaySnapshot {
+    captures += 1
+    return captures == 1 ? healthy : Array(changed.reversed())
+}
+expect(captures == 3 && converged.contains { $0.id == 72 && $0.pixelHeight == 1080 }, "reconnect read retries until the actual modes agree")
+captures = 0
+do {
+    _ = try stableDisplaySnapshot { captures += 1; return captures % 2 == 0 ? healthy : changed }
+    expect(false, "continuously changing modes must reject")
+} catch { expect(captures == 4, "unstable read is bounded and cannot pass") }
+
+let scratch = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+try FileManager.default.createDirectory(at: scratch, withIntermediateDirectories: true)
+defer { try? FileManager.default.removeItem(at: scratch) }
+var live = healthy
+var readFails = false
+var saveFails = false
+let session = VerificationSession(read: {
+    if readFails { throw CheckError.message("fixture read error") }
+    return try result(live)
+}, persist: { _ in
+    if saveFails { throw CheckError.message("fixture disk full") }
+})
+saveFails = true; session.check()
+expect(session.report?.state == .ready && session.error == nil && session.saveWarning != nil, "disk-full report write preserves valid readings with a save warning")
+saveFails = false; session.check()
+expect(session.report?.state == .ready && session.saveWarning == nil, "save warning clears after successful persistence")
+live[3].pixelHeight = 1080 // equivalent to reconnecting while the Save dialog is open
+let exportURL = scratch.appendingPathComponent("export.json")
+try session.export(to: exportURL)
+let freshExport = try JSONDecoder().decode(CheckReport.self, from: Data(contentsOf: exportURL))
+expect(freshExport.state == .attention && session.report?.state == .attention, "export rechecks and saves current failure rather than old green snapshot")
+let beforeFailure = try Data(contentsOf: exportURL)
+readFails = true
+do { try session.export(to: exportURL); expect(false, "failed fresh read must not export stale report") }
+catch { expect(try Data(contentsOf: exportURL) == beforeFailure && session.report == nil, "failed export keeps prior file intact and clears stale in-memory report") }
+expect(session.error != nil && session.saveWarning == nil, "read failures remain distinct from persistence warnings")
+readFails = false; live = healthy; session.check()
+expect(session.report?.state == .ready && session.error == nil, "read failure recovers on next check")
+
+expect(try parseInvocation([]) == .gui(login: false), "no arguments open the checklist")
+expect(try parseInvocation(["--login"]) == .gui(login: true), "registered login arguments work")
+expect(try parseInvocation(["--check-json"]) == .json(profilePath: nil), "JSON default-profile invocation works")
+expect(try parseInvocation(["--profile", "a file.json", "--check-json"]) == .json(profilePath: "a file.json"), "explicit profile survives spaces and flag order")
+for invalidArgs in [["--check-json", "--profile"], ["--profile", "x.json"], ["--check-json", "--profiel", "x.json"],
+                    ["--check-json", "--profile", "--login"], ["--check-json", "--login"], ["--login", "--login"],
+                    ["--check-json", "--check-json"], ["--check-json", "--profile", "a", "--profile", "b"],
+                    ["--check-json", "--profile", ""], ["--surprise"]] {
+    do { _ = try parseInvocation(invalidArgs); expect(false, "invalid CLI cannot fall back: \(invalidArgs)") } catch { passed += 1 }
+}
+expect(try parseInvocation(["-psn_0_1"]) == .gui(login: false), "legacy Launch Services argument remains accepted")
+
+let savedProfile = scratch.appendingPathComponent("profile.json")
+var profileData = try Data(contentsOf: url)
+try profileData.write(to: savedProfile)
+expect(try loadProfile(at: savedProfile).groups.count == 4, "bounded profile loader accepts current profile")
+profileData.append(Data(repeating: 32, count: 256 * 1024 - profileData.count))
+try profileData.write(to: savedProfile)
+expect(try loadProfile(at: savedProfile).groups.count == 4, "exact profile size limit accepted")
+profileData.append(32); try profileData.write(to: savedProfile)
+do { _ = try loadProfile(at: savedProfile); expect(false, "oversized profile must reject before unbounded read") } catch { passed += 1 }
+do { _ = try loadProfile(at: scratch); expect(false, "directory cannot be a profile") } catch { passed += 1 }
+try Data("{broken".utf8).write(to: savedProfile)
+do { _ = try loadProfile(at: savedProfile); expect(false, "damaged profile must reject") } catch { passed += 1 }
+
 print("PASS: \(passed) display-check cases")
