@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {createHash} from 'node:crypto';
+import worker from '../worker/index.js';
+const request=p=>worker.fetch(new Request('https://wst.housevideo.app'+p),{});
+const html=await (await request('/')).text(),js=await (await request('/workspace.js')).text();
+new vm.SourceTextModule(js);
+const days=await (await request('/tech-schedule.json')).json();assert.equal(days.length,29);assert.equal(days[0].date,'2026-11-01');assert.equal(days[28].date,'2026-11-29');
+assert.equal(days[8].events[0].label,'OFF');assert.equal(days[8].events[1].time,'10am-5pm');assert.equal(days[24].events[1].label,'Opening Night');assert.equal(days[28].events[1].label,'Performance (open captioning)');
+assert.match(html,/id="nav-more"/);assert.match(html,/id="schedule-panel"/);assert.match(html,/Draft October 30, 2026/);
+const pdf=await request('/frozen-tech-schedule.pdf');assert.equal(pdf.headers.get('content-type'),'application/pdf');const bytes=Buffer.from(await pdf.arrayBuffer());assert.equal(createHash('sha256').update(bytes).digest('hex'),'ee4f3b4041c0c27e237d1b6b9f2144fa4832d4a2519d7157d0da84792400c993');
+assert.equal((await worker.fetch(new Request('https://wst.housevideo.app/frozen-tech-schedule.pdf',{method:'HEAD'}),{})).status,200);
+assert.equal((await worker.fetch(new Request('https://wst.housevideo.app/frozen-tech-schedule.pdf',{method:'POST'}),{})).status,405);
+console.log('PASS: JS syntax, 29 dates, key calls, menu, PDF MIME and exact original bytes, HEAD/POST handling');

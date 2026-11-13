@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-const source = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8').split('let currentTasks = []')[0];
+const source = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8').split('let currentTasks = []')[0].replace(/^import [^\n]*\n/, '');
 function boot({ failStorage = false, initial = '' } = {}) {
   const elements = Object.fromEntries(['#notes', '#save-status', '#theme', '#export'].map(id => [id, { value: '', listeners: {}, addEventListener(event, fn) { this.listeners[event] = fn; }, setAttribute(name, value) { this[name] = value; } }]));
   const saved = new Map([['wst.frozen.personal-notes.v1', initial]]), links = [], listeners = {};
@@ -38,8 +38,14 @@ test('snow splash stays same-origin and keeps the home routes', () => {
   assert.match(html, /snow-splash\.js/);
   assert.match(html, /id="home-title"/);
   assert.match(html, /id="snow"[^>]*aria-hidden="true"/);
-  for (const route of ['notes', 'rig', 'stage', 'throw']) assert.match(html, new RegExp('data-route="' + route + '"'));
-  assert.doesNotMatch(html, /jsdelivr|cdn\.|<style|unsafe-inline|unsafe-eval/);
+  for (const route of ['notes', 'rig', 'stage', 'throw', 'schedule', 'pixels']) assert.match(html, new RegExp('data-route="' + route + '"'));
+  assert.match(html, /id="open-controller"[^>]*hidden/);
+  assert.match(html, /id="nav-more"/);
+  assert.match(html, /id="schedule-panel"/);
+  assert.match(html, /id="pixel-reference"/);
+  // Scripts, styles and images stay same-origin; the pixel reference may link out to manufacturer datasheets.
+  assert.doesNotMatch(html, /<(?:script|img|iframe)[^>]*src="https?:|<link[^>]*rel="stylesheet"[^>]*href="https?:/);
+  assert.doesNotMatch(html, /jsdelivr|<style|unsafe-inline|unsafe-eval/);
   assert.doesNotMatch(splash, /https?:\/\//);
   assert.match(readFileSync(new URL('./vendor/gsap.min.js', import.meta.url), 'utf8'), /3\.15\.0/);
 });
