@@ -43,6 +43,7 @@
       <button class="avd-tab" role="tab" id="tab-btn-all" aria-label="All projectors" aria-selected="false" aria-controls="tab-all" data-tab="all" type="button" tabindex="-1"><span class="all-label-full">All projectors</span><span class="all-label-short" aria-hidden="true">All</span></button>
       <button class="avd-tab" role="tab" id="tab-btn-stage" data-primary-nav aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">3D Stage View</button>
       <button class="avd-tab" role="tab" id="tab-btn-presets" data-primary-nav aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-preferences" aria-selected="false" aria-controls="tab-preferences" data-tab="preferences" type="button" tabindex="-1">Preferences</button>
       <button class="avd-tab" role="tab" id="tab-btn-health" aria-selected="false" aria-controls="tab-health" data-tab="health" type="button" tabindex="-1">Thermal watch</button>
       <button class="avd-tab" role="tab" id="tab-btn-log" data-primary-nav aria-selected="false" aria-controls="tab-log" data-tab="log" type="button" tabindex="-1">Log</button>
       <button class="avd-tab" role="tab" id="tab-btn-setup" data-primary-nav aria-selected="false" aria-controls="tab-setup" data-tab="setup" type="button" tabindex="-1">Configuration</button>
@@ -62,7 +63,7 @@
     <dialog id="tab-projector" class="pj-projector-page pj-selected-dock" aria-modal="true" aria-labelledby="projector-detail-title" hidden>
       <div class="pj-projector-heading"><button class="avd-btn" type="button" id="projector-back">Close details</button><div><span class="avd-eyebrow">Projector controls &amp; information</span><h2 id="projector-detail-title" tabindex="-1"></h2></div><div class="pj-detail-lanes" role="group" aria-label="Select projector"><button class="avd-btn" type="button" data-detail-lane="A">A</button><button class="avd-btn" type="button" data-detail-lane="B">B</button><button class="avd-btn" type="button" data-detail-lane="C">C</button><button class="avd-btn" type="button" data-detail-lane="D">D</button></div></div>
       <div id="projector-primary-controls" class="pj-primary-controls"></div>
-      <div class="pj-projector-body" id="projector-detail-body"><section id="projector-lens-workspace" aria-label="Selected projector lens workspace"></section><div class="pj-secondary-controls"><details id="projector-more-controls"><summary>Power, inputs & picture</summary><div id="projector-controls"></div></details><details id="projector-info-panel"><summary>Signal, EDID & gear</summary><div class="pj-projector-information"><section class="avd-panel pj-detail-panel"><h3>Input, signal & EDID</h3><div id="projector-display-info"></div><details id="host-displays"><summary>Relay computer displays</summary><p class="pj-mono">Relay computer records, not projector EDID or assigned signal paths.</p><button class="avd-btn" type="button" id="host-displays-load">Read computer display info</button><div id="host-display-results"></div></details></section><section class="frozen-reference pj-projector-info" id="projector-static-info"></section></div></details></div></div>
+      <div class="pj-projector-body" id="projector-detail-body"><section class="avd-panel pj-comparison"><label>Compare live status with <select id="operator-comparison" class="avd-input"><option value="">Choose projector</option><option value="A">A · SL Portal</option><option value="B">B · Top Portal</option><option value="C">C · Stage</option><option value="D">D · SR Portal</option></select></label><p id="operator-comparison-status" role="status"></p></section><section id="projector-lens-workspace" aria-label="Selected projector lens workspace"></section><div class="pj-secondary-controls"><details id="projector-more-controls"><summary>Power, inputs & picture</summary><div id="projector-controls"></div></details><details id="projector-info-panel"><summary>Signal, EDID & gear</summary><div class="pj-projector-information"><section class="avd-panel pj-detail-panel"><h3>Input, signal & EDID</h3><div id="projector-display-info"></div><details id="host-displays"><summary>Relay computer displays</summary><p class="pj-mono">Relay computer records, not projector EDID or assigned signal paths.</p><button class="avd-btn" type="button" id="host-displays-load">Read computer display info</button><div id="host-display-results"></div></details></section><section class="frozen-reference pj-projector-info" id="projector-static-info"></section></div></details></div></div>
     </dialog>
     </section>
 
@@ -130,6 +131,15 @@
           </div>
         </aside>
       </div>
+    </section>
+
+    <section id="tab-preferences" class="tab pj-preferences" role="tabpanel" aria-labelledby="tab-btn-preferences" hidden>
+      <h2>Interface preferences</h2>
+      <label><input id="preference-suggestions" type="checkbox"> Suggest the next action</label>
+      <label>Preset name template<input id="preference-preset-name" type="text" class="avd-input" maxlength="64" autocomplete="off"></label>
+      <p>Theme, selected projector, view and favorite patterns are saved only in this browser. Use the star in More patterns to save up to four favorites per model.</p>
+      <button id="preference-reset" type="button" class="avd-btn">Reset interface preferences</button>
+      <p id="preference-message" role="status"></p>
     </section>
 
     <section id="tab-presets" class="tab" role="tabpanel" aria-labelledby="tab-btn-presets" hidden>

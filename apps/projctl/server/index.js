@@ -15,6 +15,7 @@ import { hasLens, lensSummary, lensPositionMatch, lensMotorState, LENS_AXES } fr
 import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
 import { confirmations } from './confirmations.js';
+import { createCommandBinding } from './command-binding.js';
 import { readStagePlot } from './stage-plot.js';
 import { readVenue, readVenueAsset } from './venue-model.js';
 import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
@@ -33,6 +34,7 @@ const POLL_MS = Number(process.env.POLL_MS || 5000);
 const SIM = process.env.SIM === '1';
 const readHostDisplays = createHostDisplayReader({ sim: SIM });
 const STARTED_AT = new Date().toISOString();
+const commandBinding = createCommandBinding();
 // ---- Login (optional). Set PJ_PASSCODE to require it: needed before exposing the relay beyond the LAN.
 const PASSCODE = (process.env.PROJCTL_PASSWORD || process.env.PJ_PASSCODE || '').trim();
 const SESSION_SECRET = randomBytes(32).toString('hex'); // sessions end when the relay restarts
@@ -101,10 +103,10 @@ setInterval(() => broadcast({ type: 'heartbeat', at: new Date().toISOString() })
 function snapshot() {
   return {
     type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM, preferredInput: rig.preferredInput || 'HDMI',
-    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS },
+    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS, commandTargetBinding: 1 },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
-      return { ...p, password: undefined, status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null,
+      return { ...p, password: undefined, controlRevision: commandBinding.revision(p), status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null,
         inputs: d.inputs ?? p.inputs, displayInfo: displayInfoFor(p), inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lensJog?.axes.length, lensJog: d.lensJog, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
@@ -265,7 +267,8 @@ try {
   console.error('[schedules] Saved power schedules unavailable; scheduling disabled, controller remains available.');
 }
 
-async function uiCommand(slot, cmd, arg, confirm) {
+async function uiCommand(slot, cmd, arg, confirm, expectedTargets) {
+  const checkReviewedTarget = commandBinding.guard(expectedTargets, () => rig.projectors, slot);
   if ((cmd === 'power' || cmd === 'shutter') && ![0, 1, false, true].includes(arg)) throw httpErr(400, `${cmd} needs 0 or 1`);
   const slots = slot === 'all' ? rig.projectors.map((p) => p.slot) : [slot];
   const out = {};
@@ -295,6 +298,7 @@ async function uiCommand(slot, cmd, arg, confirm) {
   // expire confirmations for later devices, and a failed target must not stop them.
   for (const target of targets) {
     try {
+      checkReviewedTarget(target.slot);
       const p = store.projector(target.slot);
       if (target.identity && (!p || targetIdentity(p) !== target.identity)) throw httpErr(409, 'configuration changed; confirm again');
       out[target.slot] = await command(target.slot, cmd, arg);
@@ -462,8 +466,9 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, await d.getPicture());
     }
     if (url.pathname === '/api/command' && req.method === 'POST') {
-      const { slot, cmd, arg, confirm } = await body(req);
-      return json(res, 200, await uiCommand(slot, cmd, arg, confirm));
+      const { slot, cmd, arg, confirm, expectedTargets } = await body(req);
+      if (slot === 'all' && req.headers.origin && !expectedTargets) throw httpErr(409, 'Reload the controller before sending a group command.');
+      return json(res, 200, await uiCommand(slot, cmd, arg, confirm, expectedTargets));
     }
     if (url.pathname === '/api/preset/save' && req.method === 'POST') { const { name } = await body(req); if (!name) throw httpErr(400, 'name required'); savePreset(name); return json(res, 200, { ok: true }); }
     if (url.pathname === '/api/preset/recall' && req.method === 'POST') { const { name, confirmLens } = await body(req); return json(res, 200, await recallPreset(name, 'ui', confirmTokenFor(name, confirmLens) || false)); }

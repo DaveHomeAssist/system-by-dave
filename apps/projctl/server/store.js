@@ -8,9 +8,9 @@ const DEFAULT_RIG = {
   lock: false,
   projectors: [
     { slot: 'P1', label: 'Barco UDM 4K22', make: 'Barco', model: 'UDM 4K22', owner: 'Rental', driver: 'pulse', mac: '', ip: '', inputs: { 'HDMI': 'HDMI', 'SDI': 'SDI' }, notes: 'Snorkel, right angle out. L6-30 cord, needs 208V for full output.' },
-    { slot: 'P2', label: 'House Panasonic A', make: 'Panasonic', model: 'TBC', owner: 'House', driver: 'panasonic', mac: '', ip: '', inputs: { '31': 'HDMI', '32': 'DVI-D', '33': 'SDI' }, notes: 'Portrait, cross shoots portal.' },
-    { slot: 'P3', label: 'House Panasonic B', make: 'Panasonic', model: 'TBC', owner: 'House', driver: 'panasonic', mac: '', ip: '', inputs: { '31': 'HDMI', '32': 'DVI-D', '33': 'SDI' }, notes: 'Portrait, cross shoots portal.' },
-    { slot: 'P4', label: 'Panasonic PT-RZ970B', make: 'Panasonic', model: 'PT-RZ970B', owner: 'Rental', driver: 'panasonic', mac: '', ip: '192.168.1.8', inputs: { '31': 'HDMI', '32': 'DVI-D', '33': 'SDI', '34': 'DIGITAL LINK' }, notes: 'ET-DLE080 lens. S/N DA7610162.' },
+    { slot: 'P2', label: 'House Panasonic A', make: 'Panasonic', model: 'TBC', owner: 'House', driver: 'panasonic', mac: '', ip: '', inputs: { '31': 'DVI-D', '32': 'HDMI', '33': 'DIGITAL LINK' }, notes: 'Portrait, cross shoots portal.' },
+    { slot: 'P3', label: 'House Panasonic B', make: 'Panasonic', model: 'TBC', owner: 'House', driver: 'panasonic', mac: '', ip: '', inputs: { '31': 'DVI-D', '32': 'HDMI', '33': 'DIGITAL LINK' }, notes: 'Portrait, cross shoots portal.' },
+    { slot: 'P4', label: 'Panasonic PT-RZ970B', make: 'Panasonic', model: 'PT-RZ970B', owner: 'Rental', driver: 'panasonic', mac: '', ip: '192.168.1.8', inputs: { '31': 'DVI-D', '32': 'HDMI', '33': 'DIGITAL LINK', '34': 'SDI' }, notes: 'ET-DLE080 lens. S/N DA7610162.' },
   ],
   presets: [],
   events: [],
