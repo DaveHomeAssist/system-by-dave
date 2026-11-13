@@ -32,7 +32,30 @@
     return node;
   }
 
+  // Global header: below 480px the five links fold behind a Menu button. Without
+  // JavaScript the button stays hidden and the links stay visible.
+  function enhanceHeaderMenu(){
+    var header = document.querySelector('.sbd-site-header');
+    var button = header && header.querySelector('.sbd-site-menu');
+    var links = header && header.querySelector('#sbd-site-links');
+    if(!button || !links) return;
+    function setOpen(open){
+      button.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if(open) header.setAttribute('data-menu-open', ''); else header.removeAttribute('data-menu-open');
+    }
+    button.hidden = false;
+    header.setAttribute('data-menu', 'ready');
+    button.addEventListener('click', function(){ setOpen(button.getAttribute('aria-expanded') !== 'true'); });
+    document.addEventListener('keydown', function(event){
+      if(event.key === 'Escape' && header.hasAttribute('data-menu-open')){ setOpen(false); button.focus(); }
+    });
+    document.addEventListener('click', function(event){
+      if(header.hasAttribute('data-menu-open') && !header.contains(event.target)) setOpen(false);
+    });
+  }
+
   function render(){
+    enhanceHeaderMenu();
     if(isHome()) return;
     if(document.querySelector('.sbd-public-nav, .sbd-site-header, .sbd-site-return, .sbd-nav')) return;
     var nav = el('nav', 'sbd-public-nav');

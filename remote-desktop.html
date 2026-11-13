@@ -139,6 +139,7 @@
   @media (max-width:760px){.container{padding:0 20px;}.roles{grid-template-columns:1fr;}.grid2{grid-template-columns:1fr;}.hero{padding:54px 0 12px;}}
 </style>
 <link rel="stylesheet" href="css/sbd-public-nav.css">
+<script src="js/sbd-public-nav.js" defer></script>
 </head>
 <body>
 <a class="sbd-skip-link" href="#main-content">Skip to content</a>
@@ -158,12 +159,13 @@
       <span class="sbd-site-brand__mark" aria-hidden="true">SD</span>
       <span class="sbd-site-brand__word">System by Dave</span>
     </a>
-    <div class="sbd-site-links">
-      <a href="/tools.html" aria-current="page">Tools</a>
-      <a href="/av/">AV Suite</a>
+    <button class="sbd-site-menu" type="button" aria-expanded="false" aria-controls="sbd-site-links" hidden>Menu</button>
+    <div class="sbd-site-links" id="sbd-site-links">
       <a href="/notion.html">Notion</a>
+      <a href="https://avbydave.com/">AV by Dave<span class="sbd-site-links__ext" aria-hidden="true"> ↗</span></a>
+      <a href="/demos/">Demos</a>
       <a href="/prompt-lab.html">Prompt Lab</a>
-      <a href="/profile/">Dave</a>
+      <a href="/tools.html" aria-current="page">Tools</a>
     </div>
   </nav>
 </header>
@@ -335,18 +337,31 @@
     </div>
   </main>
 
-  <footer>
-    <div class="container">
-      <div class="foot">
-        <div style="display:flex;align-items:center;gap:12px;"><span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;">S</span><span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.6);">System by Dave</span></div>
-        <div style="display:flex;gap:26px;flex-wrap:wrap;">
-          <a href="tools.html" class="nav-link" style="font-size:11px;">Tools</a>
-          <a href="remote-desktop-spec-v2-2026-07-11.md" class="nav-link" style="font-size:11px;">Spec v2</a>
-          <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="nav-link" style="font-size:11px;">GitHub ↗</a>
-        </div>
-        <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
-      </div>
-    </div>
+  <footer class="sbd-site-footer-host">
+  <div class="sbd-site-footer__wrap">
+    <nav class="sbd-site-footer" aria-label="Site">
+      <div class="sbd-site-footer__group"><p class="sbd-site-footer__title">Products</p><ul role="list">
+        <li><a href="/notion.html">Notion agents &amp; widgets</a></li>
+        <li><a href="https://avbydave.com/">AV by Dave<span aria-hidden="true"> ↗</span></a></li>
+        <li><a href="/demos/">AV demos</a></li>
+        <li><a href="/prompt-lab.html">Prompt Lab</a></li>
+      </ul></div>
+      <div class="sbd-site-footer__group"><p class="sbd-site-footer__title">More</p><ul role="list">
+        <li><a href="/tools.html">All tools</a></li>
+        <li><a href="/project-registry.html">Project registry</a></li>
+        <li><a href="/systembydave/">Davai docs</a></li>
+        <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog<span aria-hidden="true"> ↗</span></a></li>
+      </ul></div>
+      <div class="sbd-site-footer__group"><p class="sbd-site-footer__title">About</p><ul role="list">
+        <li><a href="/profile/">About / Hire Dave</a></li>
+        <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub<span aria-hidden="true"> ↗</span></a></li>
+        <li><a href="/privacy-policy.html">Privacy</a></li>
+        <li><a href="mailto:avbydave@gmail.com?subject=System%20by%20Dave">avbydave@gmail.com</a></li>
+      </ul></div>
+    </nav>
+    <p class="sbd-site-footer__page">This page: <a href="remote-desktop-spec-v2-2026-07-11.md">Remote desktop spec v2</a></p>
+    <p class="sbd-site-footer__copy">© 2026 System by Dave</p>
+  </div>
   </footer>
   </div>
 
