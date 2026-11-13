@@ -1,3 +1,4 @@
+const {selectView,selectLane}=require('./operator-ui.cjs');
 const assert = require('node:assert/strict');
 
 exports.instrument3D = async page => page.addInitScript(() => {
@@ -67,7 +68,7 @@ exports.check3D = async (page, relay, offline, until) => {
     const fallback = await page.context().browser().newPage();
     try {
       await fallback.addInitScript(() => { const original = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (type, ...args) { return type.startsWith('webgl') ? null : original.call(this, type, ...args); }; });
-      await fallback.goto(relay.base); await fallback.locator('[data-tab="stage"]').click();
+      await fallback.goto(relay.base); await selectView(fallback,'stage');
       await fallback.locator('#stage-3d-message').filter({ hasText: 'Use Front or Plan' }).waitFor();
       await fallback.locator('[data-stage-view="front"]').click();
       await fallback.locator('.pj-stage-marker[data-lane="A"]').click();
@@ -76,7 +77,7 @@ exports.check3D = async (page, relay, offline, until) => {
     const unavailable = await page.context().browser().newPage();
     try {
       await unavailable.route('**/ProjectorThrow/three-d-stage.js', route => route.abort());
-      await unavailable.goto(relay.base); await unavailable.locator('[data-tab="stage"]').click();
+      await unavailable.goto(relay.base); await selectView(unavailable,'stage');
       await unavailable.locator('#stage-3d-message').filter({ hasText: 'Use Front or Plan' }).waitFor();
       await unavailable.locator('[data-stage-view="plan"]').click();
       assert.equal(await unavailable.locator('.pj-stage-marker[data-lane="A"]').isVisible(), true);

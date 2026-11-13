@@ -1,3 +1,4 @@
+const {selectView,selectLane}=require('./operator-ui.cjs');
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -15,7 +16,7 @@ const path = require('node:path');
  try {
   const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[],writes=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))writes.push(r.method()+' '+r.url());});
-  await page.goto(relay.base);await page.locator('[data-tab="stage"]').click();
+  await page.goto(relay.base);await selectView(page,'stage');
   await page.locator('#stage-3d[data-state="ready"]').waitFor();
   const stage=page.locator('#stage-3d three-d-stage');
   await until(async()=>stage.evaluate(s=>!!s._object.getObjectByName('Approximate venue reference')));

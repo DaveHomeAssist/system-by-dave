@@ -11,8 +11,11 @@ For managed macOS access, use `~/Applications/Open Projctl.command` or
 See [managed service access and recovery](deploy/RUNBOOK.md#managed-macos-access-and-recovery)
 for installation, the one live settings location, logs and backups.
 
-One workspace contains Notes + tasks, Projector info, Rig and Stage. The controller
-opens a Home landing with four choices; the other tabs stay in the same page. Notes save
+The controller opens on Controls, with shutter, power, quick test patterns,
+Clear pattern and Reset to HDMI on each projector. Reset clears the pattern,
+selects the reported HDMI input and confirms fresh feedback. Tools opens notes,
+reference, stage, presets, thermal watch, log and configuration. Per-projector Details opens
+lens and diagnostic controls. See [the operator console](docs/operator-console.md). Notes save
 in this browser at this controller address, with text export. Shared team tasks
 use the public Frozen workspace service at https://wst.housevideo.app/; keep
 sensitive content out of that shared list. Private cross-device notes sync is

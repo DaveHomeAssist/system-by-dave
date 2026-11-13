@@ -10,6 +10,8 @@
 <link rel="stylesheet" href="avd/tokens.css">
 <link rel="stylesheet" href="avd/bundle.css">
 <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="thermal-watch.css">
+  <link rel="stylesheet" href="operator-console.css">
   <link rel="stylesheet" href="power-schedules.css">
 <link rel="stylesheet" href="reference-view.css" data-frozen-reference>
 <link rel="stylesheet" href="stage.css">
@@ -33,13 +35,14 @@
     </button>
   </header>
 
-  <div class="avd-shell__tabs">
-    <div class="avd-tabs" role="tablist" aria-label="Views"><button class="avd-tab" role="tab" id="tab-btn-home" aria-selected="false" aria-controls="tab-home" data-tab="home" type="button" tabindex="-1">Home</button>
+  <div class="avd-shell__tabs" id="workspace-nav"><button id="workspace-menu" type="button" class="avd-btn" aria-expanded="false" aria-controls="workspace-views">Tools</button>
+    <div class="avd-tabs" id="workspace-views" role="tablist" aria-label="Views"><button class="avd-tab" role="tab" id="tab-btn-home" aria-selected="false" aria-controls="tab-home" data-tab="home" type="button" tabindex="-1">Home</button>
       <button class="avd-tab" role="tab" id="tab-btn-notes" aria-selected="false" aria-controls="tab-notes" data-tab="notes" type="button" tabindex="-1">Notes + tasks</button>
       <button class="avd-tab" role="tab" id="tab-btn-info" aria-selected="false" aria-controls="tab-info" data-tab="info" type="button" tabindex="-1">Gear &amp; signal flow</button>
-      <button class="avd-tab" role="tab" id="tab-btn-rig" data-primary-nav aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">My Projector Rig <span class="avd-tab__count" id="count-rig"></span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-rig" data-primary-nav aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">Controls <span class="avd-tab__count" id="count-rig"></span></button>
       <button class="avd-tab" role="tab" id="tab-btn-stage" data-primary-nav aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">3D Stage View</button>
       <button class="avd-tab" role="tab" id="tab-btn-presets" data-primary-nav aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-health" aria-selected="false" aria-controls="tab-health" data-tab="health" type="button" tabindex="-1">Thermal watch</button>
       <button class="avd-tab" role="tab" id="tab-btn-log" data-primary-nav aria-selected="false" aria-controls="tab-log" data-tab="log" type="button" tabindex="-1">Log</button>
       <button class="avd-tab" role="tab" id="tab-btn-setup" data-primary-nav aria-selected="false" aria-controls="tab-setup" data-tab="setup" type="button" tabindex="-1">Configuration</button>
       <button class="avd-tab" role="tab" id="tab-btn-throw" data-primary-nav aria-selected="false" aria-controls="tab-throw" data-tab="throw" type="button" tabindex="-1">Throw Calc</button>
@@ -65,14 +68,16 @@
         <button class="avd-btn avd-btn--quiet" data-all="pattern" data-arg="08" type="button">Colour bars</button>
         <button class="avd-btn avd-btn--quiet" data-all="pattern" data-arg="00" type="button">Pattern off</button>
       </div></details>
+      <div id="operator-lanes" role="group" aria-label="Projector"><button type="button" data-operator-lane="A" aria-pressed="true">A <span>SL Portal</span></button><button type="button" data-operator-lane="B" aria-pressed="false">B <span>Top Portal</span></button><button type="button" data-operator-lane="C" aria-pressed="false">C <span>Stage</span></button><button type="button" data-operator-lane="D" aria-pressed="false">D <span>SR Portal</span></button></div>
       <div id="grid" class="pj-grid" role="region" aria-label="A to D projector multiview" tabindex="0" data-web2-scroll></div>
-    <section id="tab-projector" class="pj-projector-page pj-selected-dock" role="region" aria-labelledby="projector-detail-title" hidden>
-      <div class="pj-projector-heading"><button class="avd-btn" type="button" id="projector-back">Selected projector</button><div><span class="avd-eyebrow">Projector controls &amp; information</span><h2 id="projector-detail-title" tabindex="-1"></h2></div><div class="pj-detail-lanes" role="group" aria-label="Select projector"><button class="avd-btn" type="button" data-detail-lane="A">A</button><button class="avd-btn" type="button" data-detail-lane="B">B</button><button class="avd-btn" type="button" data-detail-lane="C">C</button><button class="avd-btn" type="button" data-detail-lane="D">D</button></div></div>
+    <dialog id="tab-projector" class="pj-projector-page pj-selected-dock" aria-modal="true" aria-labelledby="projector-detail-title" hidden>
+      <div class="pj-projector-heading"><button class="avd-btn" type="button" id="projector-back">Close details</button><div><span class="avd-eyebrow">Projector controls &amp; information</span><h2 id="projector-detail-title" tabindex="-1"></h2></div><div class="pj-detail-lanes" role="group" aria-label="Select projector"><button class="avd-btn" type="button" data-detail-lane="A">A</button><button class="avd-btn" type="button" data-detail-lane="B">B</button><button class="avd-btn" type="button" data-detail-lane="C">C</button><button class="avd-btn" type="button" data-detail-lane="D">D</button></div></div>
       <div id="projector-primary-controls" class="pj-primary-controls"></div>
       <div class="pj-projector-body" id="projector-detail-body"><section id="projector-lens-workspace" aria-label="Selected projector lens workspace"></section><div class="pj-secondary-controls"><details id="projector-more-controls"><summary>Power, inputs & picture</summary><div id="projector-controls"></div></details><details id="projector-info-panel"><summary>Signal, EDID & gear</summary><div class="pj-projector-information"><section class="avd-panel pj-detail-panel"><h3>Input, signal & EDID</h3><div id="projector-display-info"></div><details id="host-displays"><summary>Relay computer displays</summary><p class="pj-mono">Relay computer records, not projector EDID or assigned signal paths.</p><button class="avd-btn" type="button" id="host-displays-load">Read computer display info</button><div id="host-display-results"></div></details></section><section class="frozen-reference pj-projector-info" id="projector-static-info"></section></div></details></div></div>
-    </section>
+    </dialog>
     </section>
 
+    <section id="tab-health" class="tab" role="tabpanel" aria-labelledby="tab-btn-health" hidden><section id="thermal-watch"></section></section>
     <section id="tab-throw" class="tab" role="tabpanel" aria-labelledby="tab-btn-throw" hidden><div class="pj-allbar"><strong>Throw Calc · Throwline</strong><span class="pj-mono">Planning calculations only · no projector commands</span><a class="pj-mono" href="https://avbydave.com/ProjectorThrow/" target="_blank" rel="noopener noreferrer">Open separately ↗</a></div><iframe id="throw-calc-frame" class="pj-workspace-frame" title="Throwline projector throw calculator"></iframe></section>
     <section id="tab-stage" class="tab" role="tabpanel" aria-labelledby="tab-btn-stage" hidden>
       <div class="pj-stage-head">
