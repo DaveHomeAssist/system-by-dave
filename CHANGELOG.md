@@ -1,5 +1,11 @@
 # Changelog
 
+## November 13, 2026: Projector operator console
+
+- Put shutter, power, quick patterns, Clear pattern and Reset to HDMI on each projector card. Controls is the default view. Tools and Details hold secondary functions.
+- Reset to HDMI clears the test pattern, resolves the device source and verifies fresh feedback. Partial failure, stale feedback, ambiguous HDMI and changed assignments are reported on the affected card.
+- Desktop shows the full rig. Tablet and phone provide direct A to D selection with the same primary actions.
+
 ## November 13, 2026: Native show screen checker
 
 - Added a lightweight macOS menu-bar checker with on-demand and login checks,

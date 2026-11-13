@@ -1,3 +1,6 @@
+import { createThermalWatch } from './thermal-watch.js';
+import { operatorCard } from './operator-console.js';
+import { recoverOutput } from './output-recovery.js';
 import { LANES, laneOf, projectorName, orderedProjectors, rigLanes } from './lanes.js';
 import { createStageView } from './stage-view.js';
 import { mountPowerSchedules } from './power-schedules.js';
@@ -11,9 +14,26 @@ const $ = (s, r = document) => r.querySelector(s);
 let state = { projectors: [], presets: [], events: [], lock: false };
 const confirmTokens = {}; // command key -> one-use token
 const commandsInFlight = new Set();
+const operatorFeedback = new Map();
+const operatorPending = new Set();
+let activeOperatorLane = 'A';
 let connected = false;
 const monitorConnection = createConnectionMonitor();
 const connectionOf = p => monitorConnection(p, connected, state.relay?.pollIntervalMs);
+const thermalWatch = createThermalWatch($('#thermal-watch'), {
+  onOpen: lane => { $('#tab-btn-rig').click(); openProjector(lane); },
+  onClose: () => $('#tab-btn-rig').click(),
+});
+const renderThermal = () => thermalWatch.update({ projectors: state.projectors, connected, connectionOf });
+async function loadThermal() {
+  const available = state.projectors.some(p => p.thermal != null);
+  $('#thermal-watch .pj-thermal-csv').hidden = !available;
+  if (!available) return;
+  try {
+    const response = await fetch('/api/thermal?minutes=30&points=180', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+    if (response.ok) { thermalWatch.setSeries(await response.json()); renderThermal(); }
+  } catch { /* Retain live samples if history is unavailable. */ }
+}
 const dirtySetup = new Set();
 let selectedDetailLane = null, lastRigLane = null, referenceData = null, referenceView = null;
 const referenceReady = loadReference('./workspace/projectors.json').then(data => { referenceData = data; if (selectedDetailLane) renderProjectorInfo(); return data; }).catch(() => null);
@@ -39,11 +59,14 @@ function wireTabs(list, attr, panelFor, onSelect = () => {}) {
   const select = (t) => { tabs.forEach((x) => { const on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; const panel = panelFor(x); panel.classList.toggle('on', on); panel.hidden = !on; }); onSelect(t); };
   tabs.forEach((t, i) => {
     t.onclick = () => select(t);
-    t.onkeydown = (e) => { const n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null; if (n == null) return; e.preventDefault(); const x = tabs[(n + tabs.length) % tabs.length]; x.focus(); select(x); };
+    t.onkeydown = (e) => { const visible = tabs.filter(x => x.getClientRects().length); const index = visible.indexOf(t); const n = e.key === 'ArrowRight' ? index + 1 : e.key === 'ArrowLeft' ? index - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? visible.length - 1 : null; if (n == null) return; e.preventDefault(); const x = visible[(n + visible.length) % visible.length]; select(x); x.focus(); };
   });
 }
 wireTabs($('.avd-tabs[aria-label="Views"]'), 'tab', (t) => $('#tab-' + t.dataset.tab), t => {
-  if(t.dataset.tab==='rig'){selectedDetailLane=lastRigLane||rigLanes(state.projectors).find(item=>item.projector)?.lane||'A';lastRigLane=selectedDetailLane;$('#tab-projector').hidden=false;$('#tab-projector').classList.add('on');renderGrid();renderProjectorInfo();}else{selectedDetailLane=null;updateLensWorkspace();$('#tab-projector').hidden=true;$('#tab-projector').classList.remove('on');}
+  $('#workspace-nav').classList.remove('tools-open');
+  $('#workspace-menu').setAttribute('aria-expanded', 'false');
+  if (t.dataset.tab !== 'rig') closeProjector();
+  renderGrid();
   if (t.dataset.tab === 'info') ensureReference();
   if (t.dataset.tab === 'throw' && !$('#throw-calc-frame').getAttribute('src')) $('#throw-calc-frame').src = 'https://avbydave.com/ProjectorThrow/';
 });
@@ -64,13 +87,17 @@ async function cmd(slot, c, arg, source) {
   if (slot !== 'all' && !(c === 'lens' && arg?.op === 'stop') && !connectionOf(state.projectors.find(p=>p.slot===slot)).current) { toast('No fresh projector reply. Waiting for reconnection.'); return false; }
   if (commandsInFlight.has(key)) return;
   commandsInFlight.add(key);commandFeedback(source,'sending','Sending command; waiting for acknowledgement.');
+  setOperatorFeedback(slot, 'sending', 'Sending command...');
   if (c === 'lens') { $('#adj-motion').textContent = arg?.op === 'stop' ? 'Stopping lens...' : 'Lens moving. Waiting for stopped feedback...'; renderAdjust(); }
   try {
     const out = await api('command', { slot, cmd: c, arg, confirm: confirmTokens[key] });
     const r = out[slot];
     const errs = Object.entries(out).filter(([, v]) => v.error).map(([k, v]) => `${k}: ${v.error}`);
     if (r?.confirm) {
-      confirmTokens[key] = r.confirm;commandFeedback(source,'confirmation','Confirmation required; no action sent yet.');
+      confirmTokens[key] = r.confirm;
+      setOperatorFeedback(slot, 'confirmation', 'Tap Confirm power off within 3 seconds.');
+      setTimeout(() => { if (operatorFeedback.get(slot)?.phase === 'confirmation') setOperatorFeedback(slot, 'idle', 'Power off confirmation expired.'); }, 3000);
+      commandFeedback(source,'confirmation','Confirmation required; no action sent yet.');
       toast([r.message, ...errs].join(' · '), 3000);
       setTimeout(() => { if (confirmTokens[key] === r.confirm) delete confirmTokens[key]; }, 3000);
       return;
@@ -80,10 +107,61 @@ async function cmd(slot, c, arg, source) {
     else if (errs.length) toast(errs.join(' · '), 6000);
     else toast(c === 'lens' ? `${slot}: lens command completed; check the reported position and image` : `${slot}: command accepted`);
     if (r?.status) { const p = state.projectors.find((x) => x.slot === slot); if (p) p.status = r.status; }
+    setOperatorFeedback(slot, errs.length ? 'error' : 'sent', errs.length ? errs.join(' · ') : 'Command accepted. Live state shown above.');
     if (c === 'lens') $('#adj-motion').textContent = errs.length ? errs.join(' · ') : 'Lens command completed. Check the reported position and image; absolute readback may be unavailable.';
     return !errs.length;
-  } catch (e) { commandFeedback(source,'error',e.message);toast(e.message, 6000); if (c === 'lens') $('#adj-motion').textContent = e.message; return false; }
-  finally { commandsInFlight.delete(key); if (c === 'lens') { if(adjSlot)renderAdjust(); updateLensWorkspace(); } }
+  } catch (e) { setOperatorFeedback(slot, 'error', e.message);commandFeedback(source,'error',e.message);toast(e.message, 6000); if (c === 'lens') $('#adj-motion').textContent = e.message; return false; }
+  finally { commandsInFlight.delete(key); renderGrid(); if (c === 'lens') { if(adjSlot)renderAdjust(); updateLensWorkspace(); } }
+}
+function setOperatorFeedback(slot, phase, text) {
+  operatorFeedback.set(slot, { phase, text });
+  renderGrid();
+}
+async function operatorAction(projector, action, value, button) {
+  if (!projector) return;
+  const current = state.projectors.find(p => p.slot === projector.slot);
+  if (!current || JSON.stringify([current.driver,current.ip,current.mac]) !== JSON.stringify([projector.driver,projector.ip,projector.mac])) { setOperatorFeedback(projector.slot, 'error', 'Projector assignment changed. Select the projector again.'); return; }
+  if (action !== 'clear' && action !== 'reset') {
+    return cmd(projector.slot, action, action === 'pattern' ? value : Number(value), button);
+  }
+  if (operatorPending.has(projector.slot)) return;
+  operatorPending.add(projector.slot);
+  try {
+    const message = await recoverOutput({
+      projector,
+      reset: action === 'reset',
+      send: (command, argument) => cmd(projector.slot, command, argument),
+      read: async () => {
+        const response = await fetch('/api/state', { cache: 'no-store', signal: AbortSignal.timeout(5000) });
+        if (!response.ok) throw new Error('Relay status is unavailable. Reconnect before retrying.');
+        return response.json();
+      },
+      progress: message => setOperatorFeedback(projector.slot, 'sending', message),
+    });
+    setOperatorFeedback(projector.slot, 'confirmed', message);
+  } catch (error) {
+    setOperatorFeedback(projector.slot, 'error', error.message);
+  } finally {
+    operatorPending.delete(projector.slot);
+    renderGrid();
+  }
+}
+$('#workspace-menu').onclick = () => {
+  const open = $('#workspace-nav').classList.toggle('tools-open');
+  $('#workspace-menu').setAttribute('aria-expanded', String(open));
+};
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    $('#workspace-nav').classList.remove('tools-open');
+    $('#workspace-menu').setAttribute('aria-expanded', 'false');
+  }
+});
+for (const button of document.querySelectorAll('[data-operator-lane]')) {
+  button.onclick = () => {
+    activeOperatorLane = button.dataset.operatorLane;
+    $('#grid').dataset.activeLane = activeOperatorLane;
+    document.querySelectorAll('[data-operator-lane]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+  };
 }
 document.querySelectorAll('[data-all]').forEach((b) => b.onclick = () => cmd('all', b.dataset.all, b.dataset.all === 'resetInput' ? undefined : b.dataset.all === 'pattern' ? b.dataset.arg : Number(b.dataset.arg),b));
 
@@ -224,16 +302,15 @@ function renderGrid() {
     card.querySelectorAll('button, select').forEach((el, n) => { el.dataset.focusKey = el.hasAttribute('data-reset-input') ? `${p.slot}:reset-input` : el.dataset.c ? `${p.slot}:${el.dataset.c}:${el.dataset.a||''}` : el.dataset.p ? `${p.slot}:pattern:${el.dataset.p}` : el.dataset.adj ? `${p.slot}:adjust:${el.dataset.adj}` : el.dataset.openProjector ? `${p.slot}:info` : `${p.slot}:${n}`; });
     return card;
   }
-  for(const {lane,projector:p,conflict} of rigLanes(state.projectors)){
-    const info=LANES[lane],s=p?.status||{},health=connectionOf(p),online=health.current,card=document.createElement('section');card.className='avd-panel pj-tile pj-summary-tile';card.dataset.lane=lane;card.classList.toggle('offline',!online);if(p)card.dataset.slot=p.slot;card._controlIdentity=p?JSON.stringify([p.slot,p.driver,p.ip,p.mac]):lane;
-    const input=s.input==null?'Unknown':p.inputs?.[s.input]||s.input,signal=p?.displayInfo?.signal;
-    const signalText=signal?.value!=null?reportedValue(signal.value):signal?.state==='unsupported'?'Not reported':'Unknown';
-    const last=`Last reply ${health.lastReply}`;
-    const alarms=Object.entries(s.errors||{}).filter(([,value])=>value>0).sort((a,b)=>b[1]-a[1]).map(([key,value])=>`${key}${value===2?' fault':' warning'}`);
-    const connection=conflict?'Assignment conflict':health.detail;
-    card.innerHTML=`<button type="button" class="pj-summary-select" data-open-projector="${lane}" data-focus-key="lane:${lane}:select" aria-pressed="${selectedDetailLane===lane}"><span class="pj-summary-heading"><b class="pj-summary-letter">${lane}</b><strong>${esc(info.target)}</strong><span class="avd-dot ${online?'avd-dot--done':p?'avd-dot--blocked':'avd-dot--idle'}" aria-hidden="true"></span></span><span class="pj-summary-model">${esc(p?.model||'No assigned device')} · ${esc(info.orientation)}</span><span class="pj-summary-state ${alarms.length?'has-alarms':''}" title="${esc([connection,...alarms].join(' · '))}">${esc([connection,...alarms].join(' · '))}</span><span class="pj-summary-values"><span>Power<strong>${esc(s.power||'Unknown')}</strong></span><span>Shutter<strong>${esc(s.shutter||'Unknown')}</strong></span><span>Input<strong>${esc(input)}</strong></span></span><span class="pj-summary-signal">${!online&&signal?.value!=null?'Last known signal':'Signal'}: ${esc(signalText)}</span><span class="pj-summary-freshness">${esc(last)}${health.retry?' · '+esc(health.retry):''}${!online&&p?' · values last known':''}</span></button>`;
-    card.querySelector('button').onclick=()=>openProjector(lane);output.append(card);
+  for (const { lane, projector, conflict } of rigLanes(state.projectors)) {
+    const connection = conflict ? { current: false, label: 'Assignment conflict', detail: 'Check Configuration', lastReply: 'Unknown' } : connectionOf(projector);
+    output.append(operatorCard({
+      projector, lane, info: LANES[lane], connection, lock: state.lock, patterns: PATTERNS,
+      feedback: operatorFeedback.get(projector?.slot), pending: operatorPending.has(projector?.slot) || [...commandsInFlight].some(key => key.startsWith(projector?.slot + ':')),
+      act: operatorAction, details: openProjector, morePatterns: slot => openAdjust(slot, 'pattern'),
+    }));
   }
+  g.dataset.activeLane = activeOperatorLane;
   const nextSelect = [...output.querySelectorAll('select[data-c="input"]')].find(node => node.closest('[data-slot]')?.dataset.slot === editing?.slot);
   const pathTo = (node, root) => { const path = []; while (node && node !== root) { path.unshift([...node.parentNode.childNodes].indexOf(node)); node = node.parentNode; } return node === root ? path.join('.') : null; };
   const retained = keepSelect && nextSelect && pathTo(active, g) === pathTo(nextSelect, output);
@@ -275,6 +352,7 @@ function openProjector(lane){
   if(!Object.hasOwn(LANES,lane))return;
   lastRigLane=lane;if($('#tab-btn-rig').getAttribute('aria-selected')!=='true')$('#tab-btn-rig').click();selectedDetailLane=lane;
   const detail=$('#tab-projector');detail.hidden=false;detail.classList.add('on');detail.dataset.lane=lane;
+  if (!detail.open) detail.showModal();
   $('#projector-detail-title').textContent=`${lane} · ${LANES[lane].target}`;
   document.querySelectorAll('[data-detail-lane]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.detailLane===lane)));
   renderGrid();renderProjectorInfo();
@@ -302,7 +380,13 @@ function renderDisplayInfo(p) {
 }
 let powerSchedulesView=null;$('#power-schedule-panel').addEventListener('toggle',()=>{if($('#power-schedule-panel').open&&!powerSchedulesView)powerSchedulesView=mountPowerSchedules($('#power-schedules'),{projectors:()=>state.projectors,connected:()=>connected});});
 $('#rig-extra-devices').onclick=()=>$('#tab-btn-setup').click();
-$('#projector-back').onclick=()=>$('#tab-btn-rig').click();
+function closeProjector() {
+  const detail = $('#tab-projector');
+  detail.close(); detail.hidden = true; detail.classList.remove('on');
+  selectedDetailLane = null; updateLensWorkspace();
+}
+$('#projector-back').onclick = closeProjector;
+$('#tab-projector').addEventListener('cancel', () => closeProjector());
 document.querySelectorAll('[data-detail-lane]').forEach(button=>button.onclick=()=>openProjector(button.dataset.detailLane));
 $('#host-displays-load').onclick=async()=>{
   const output=$('#host-display-results');output.textContent='Reading relay computer display records…';
@@ -405,7 +489,7 @@ function renderAll() {
   $('[data-all="resetInput"]').textContent = `Reset all to ${state.preferredInput || 'HDMI'}`;
   $('#count-rig').textContent = state.projectors.length; $('#count-presets').textContent = state.presets.length || '';
   document.querySelectorAll('[data-all="power"][data-arg="0"], [data-all="pattern"]').forEach((b) => b.disabled = state.lock || !connected);
-  renderGrid(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
+  renderGrid(); renderThermal(); renderPresets(); renderLog(); renderSetup(); stageView.update(state, connected); if (adjSlot) renderAdjust();
 }
 
 // ---- Adjust sheet: patterns, lens, picture ----
@@ -508,7 +592,7 @@ async function loadPicture() {
 }
 
 // websocket
-function setConn(on) { connected = on; powerSchedulesView?.connectionChanged(); const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#show-lock').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderOverview(); renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
+function setConn(on) { connected = on; powerSchedulesView?.connectionChanged(); const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#show-lock').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderOverview(); renderGrid(); renderThermal(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
 let reconnectTimer = null, socketGeneration = 0;
 function scheduleReconnect() {
   if (reconnectTimer !== null) return;
@@ -546,11 +630,11 @@ function connect() {
     if (msg.type === 'snapshot') {
       if (!Array.isArray(msg.projectors) || !msg.projectors.every((p) => p && typeof p.slot === 'string') || !Array.isArray(msg.presets) || !Array.isArray(msg.events)) { recover(); ws.close(); return; }
       clearTimeout(snapshotTimer);
-      markAlive(); state = msg;if(msg.powerSchedules&&typeof msg.powerSchedules==='object'&&Array.isArray(msg.powerSchedules.schedules)&&Array.isArray(msg.powerSchedules.audit))powerSchedulesView?.update(msg.powerSchedules); setConn(true); renderAll();
+      markAlive(); state = msg;if(msg.powerSchedules&&typeof msg.powerSchedules==='object'&&Array.isArray(msg.powerSchedules.schedules)&&Array.isArray(msg.powerSchedules.audit))powerSchedulesView?.update(msg.powerSchedules); setConn(true); renderAll(); loadThermal();
     }
     else if (!connected) return;
-    else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') { markAlive(); renderGrid(); renderOverview(); if (adjSlot) renderAdjust(); } }
-    else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.displayInfo !== undefined) p.displayInfo = msg.displayInfo; if (msg.inputPreference !== undefined) p.inputPreference = msg.inputPreference; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
+    else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') { markAlive(); renderGrid(); renderThermal(); renderOverview(); if (adjSlot) renderAdjust(); } }
+    else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.displayInfo !== undefined) p.displayInfo = msg.displayInfo; if (msg.inputPreference !== undefined) p.inputPreference = msg.inputPreference; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; if (msg.thermal) { p.thermal = msg.thermal; thermalWatch.append(msg.slot, msg.thermal); } renderGrid(); renderThermal(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
     else if (msg.type === 'busy' && typeof msg.slot === 'string') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); }
     else if (msg.type === 'powerSchedules' && msg.schedules && typeof msg.schedules === 'object' && Array.isArray(msg.schedules.schedules) && Array.isArray(msg.schedules.audit)) { markAlive(); powerSchedulesView?.update(msg.schedules); }
     else if (msg.type === 'event' && msg.event && typeof msg.event === 'object') { markAlive(); state.events.push(msg.event); if (state.events.length > 200) state.events.shift(); renderLog(); }

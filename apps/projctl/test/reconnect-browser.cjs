@@ -1,3 +1,4 @@
+const {selectView,selectLane}=require('./operator-ui.cjs');
 const {selectSlot,openBulk}=require('./operator-ui.cjs');
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
@@ -18,7 +19,7 @@ const fs = require('node:fs');
     await page.goto(relay.base);
     await page.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
     assert.match(await page.locator('#relay-mode').innerText(), /DEMO/);
-    await page.locator('[data-tab="setup"]').click();
+    await selectView(page,'setup');
     const label = page.locator('.pj-setup[data-slot="P2"] [data-k="label"]');
     await label.fill('Keep unsaved edit');
     sockets[0].close();
@@ -36,7 +37,7 @@ const fs = require('node:fs');
     let coldSocket;
     await cold.routeWebSocket('**/ws', ws => { coldSocket = ws; ws.send(JSON.stringify(coldState)); });
     await cold.goto(relay.base);
-    await cold.locator('[data-tab="rig"]').click();
+    await selectView(cold,'rig');
     await cold.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
     const coldUnassigned = cold.locator('.pj-unassigned');
     if (await coldUnassigned.count() && !await coldUnassigned.evaluate(el => el.open)) await coldUnassigned.locator(':scope > summary').click();
@@ -66,7 +67,7 @@ const fs = require('node:fs');
     await hdmi.routeWebSocket('**/ws', ws => { hdmiSocket = ws; ws.send(JSON.stringify(hdmiState)); });
     await hdmi.route('**/api/command', route => { const body = route.request().postDataJSON(); requests.push(body); return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ [body.slot]: { result: 'OK' } }) }); });
     await hdmi.goto(relay.base);
-    await hdmi.locator('[data-tab="rig"]').click();
+    await selectView(hdmi,'rig');
     await hdmi.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
     const hdmiUnassigned = hdmi.locator('.pj-unassigned');
     if (await hdmiUnassigned.count()) await hdmiUnassigned.locator(':scope > summary').click();
@@ -90,6 +91,7 @@ const fs = require('node:fs');
       assert.ok(size.w <= size.cw && size.h <= size.ch, `HDMI layout overflow at ${width}x${height}`);
       if (process.env.ARTIFACT_DIR) { fs.mkdirSync(process.env.ARTIFACT_DIR, { recursive: true }); await hdmi.screenshot({ path: `${process.env.ARTIFACT_DIR}/hdmi-${width}-${height}.png` }); }
     }
+    await selectSlot(hdmi, 'P2');
     hdmiSocket.send(JSON.stringify({ type: 'busy', slot: 'P2', busy: 'lens' }));
     await until(() => hdmiCard.locator('[data-reset-input]').isDisabled());
     hdmiState.lock = true;
@@ -132,7 +134,7 @@ const fs = require('node:fs');
     // Native input selection keeps the same node during polls, but lock disables it.
     const choosing = await browser.newPage();
     await choosing.goto(relay.base);
-    await choosing.locator('[data-tab="rig"]').click();
+    await selectView(choosing,'rig');
     await choosing.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
     const unassigned = choosing.locator('.pj-unassigned');
     if (await unassigned.count() && !await unassigned.evaluate(el => el.open)) await unassigned.locator(':scope > summary').click();

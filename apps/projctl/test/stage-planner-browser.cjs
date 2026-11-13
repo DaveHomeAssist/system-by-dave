@@ -1,3 +1,4 @@
+const {selectView,selectLane}=require('./operator-ui.cjs');
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -18,7 +19,7 @@ const path = require('node:path');
   page.on('request', request => { if (!['GET', 'HEAD'].includes(request.method())) writes.push(request.method() + ' ' + request.url()); });
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(relay.base);
-  await page.locator('[data-tab="stage"]').click();
+  await selectView(page,'stage');
   await page.locator('#stage-3d[data-state="ready"]').waitFor();
   await page.locator('[data-stage-mode="planning"]').click();
   await page.locator('[data-plan-preset="26"]').click();
