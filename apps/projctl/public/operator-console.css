@@ -50,7 +50,7 @@
 .operator-label > span { color: var(--ink-muted); }
 .operator-label > strong { font-weight: 600; text-transform: capitalize; }
 .operator-power .operator-label { align-items: center; flex-wrap: wrap; min-height: 40px; }
-.operator-label > .operator-power-state { font: 800 32px/1.1 var(--font-display); text-transform: uppercase; letter-spacing: -.02em; }
+.operator-label > .operator-power-state { font: 800 32px/1.1 var(--font-display); max-width: 100%; overflow-wrap: anywhere; text-transform: uppercase; letter-spacing: -.02em; }
 .operator-power-state[data-power-state="on"] { color: var(--operator-open); }
 .operator-power-state[data-power-state="off"], .operator-power-state[data-power-state="unknown"] { color: var(--ink-muted); }
 .operator-power-state[data-power-state="warming"], .operator-power-state[data-power-state="cooling"] { color: var(--state-waiting); }
@@ -116,7 +116,7 @@
   .operator-shutter-prefix { display: inline; }
   .operator-power { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); align-items: center; gap: 8px; }
   .operator-power .operator-label { margin: 0; }
-  .operator-label > .operator-power-state { font-size: clamp(24px,3vw,32px); }
+  .operator-label > .operator-power-state { font-size: clamp(20px,3vw,32px); }
   .operator-power .operator-button { padding: 5px; font-size: 12px; line-height: 16px; }
   .operator-recovery .operator-button { min-height: 44px; }
   #grid > .operator-card[data-alarm-severity] { row-gap: 2px; }
@@ -213,3 +213,16 @@
   #workspace-views > [data-tab="rig"], #workspace-views > [data-tab="all"] { min-width: 0; flex: 1; padding-inline: 8px; font-size: 10px; }
   #workspace-menu { margin-left: 0; padding-inline: 10px; font-size: 10px; }
 }
+
+.operator-button.is-suggested, .operator-details.is-suggested { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.operator-hint { display: flex; align-items: center; gap: 8px; grid-column: 1 / -1; }
+.operator-hint p { flex: 1; margin: 0; font-size: 12px; line-height: 17px; }
+.operator-hint button { flex: none; min-width: 44px; min-height: 44px; border: 1px solid var(--hairline); border-radius: 6px; color: var(--ink-muted); background: var(--surface); }
+.operator-pattern-buttons .pattern-more { overflow-wrap: anywhere; }
+.operator-pattern-buttons .pattern-more small { display: block; font-size: 10px; }
+.pj-preferences { max-width: 640px; padding: 20px; overflow: auto; }
+.pj-preferences label { display: block; margin-bottom: 18px; }
+.pj-preferences input[type=text] { width: 100%; margin-top: 6px; }
+.pj-pattern-choice { display: inline-flex; gap: 3px; align-items: stretch; }
+.pj-pattern-choice .pattern-favorite { min-width: 44px; min-height: 44px; }
+.pattern-favorite[aria-pressed=true] { color: var(--operator-open); border-color: currentColor; }

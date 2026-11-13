@@ -1,4 +1,5 @@
 import { hdmiSource, patternIsOff, supportsPatterns } from './output-recovery.js';
+import { nextOperatorAction } from './operator-intent.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
@@ -10,7 +11,7 @@ export function quickPatterns(patterns) {
   ].map(([label, match]) => ({ label, code: Object.keys(patterns || {}).find(code => match.test(patterns[code])) })).filter(item => item.code);
 }
 
-export function operatorCard({ projector: p, lane, info, connection, lock, patterns, feedback, pending, act, details, morePatterns }) {
+export function operatorCard({ projector: p, lane, info, connection, lock, patterns, feedback, pending, act, details, morePatterns, preferences, dismissSuggestion }) {
   const card = document.createElement('section');
   card.className = 'avd-panel pj-tile pj-summary-tile operator-card';
   card.dataset.lane = lane;
@@ -26,6 +27,8 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
   const hasPatterns = supportsPatterns(p);
   const table = hasPatterns ? p?.patterns || patterns : {};
   const quick = quickPatterns(table);
+  const suggestion = preferences?.showSuggestions ? nextOperatorAction(p, connection, lock) : null;
+  const hint = suggestion && !preferences.dismissedSuggestions.includes(suggestion.id) && !pending && (!feedback || ['idle', 'sent', 'confirmed'].includes(feedback.phase)) ? suggestion : null;
   const alarms = Object.entries(s.errors || {}).filter(([, v]) => v > 0).sort((a,b) => b[1]-a[1]).map(([key,v]) => `${key} ${v===2?'fault':'warning'}`);
   const alarmSeverity = Object.values(s.errors || {}).some(value => value === 2) ? 'fault' : alarms.length ? 'warning' : '';
   if (alarmSeverity) card.dataset.alarmSeverity = alarmSeverity;
@@ -34,6 +37,7 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
   const shutter = stale.has('shutter') ? 'unknown' : s.shutter || 'unknown';
   const power = available && !stale.has('power') ? s.power || 'unknown' : 'unknown';
   card.classList.toggle('offline', !available);
+  const moreLabel = hasPatterns && !patternIsOff(s.pattern) && !quick.some(item => item.code === String(s.pattern)) && s.pattern != null ? `${escape(pattern)}<small>More patterns</small>` : 'More';
   card.innerHTML = `
     <header class="operator-card-head">
       <span class="operator-lane">${lane}</span>
@@ -60,14 +64,20 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
     </section>
     <section class="operator-patterns" aria-label="Test patterns for ${lane}">
       <div class="operator-label"><span>Test pattern</span><strong>${escape(pattern)}</strong></div>
-      <div class="operator-pattern-buttons">${quick.map(item=>`<button class="operator-button pattern-${item.label.toLowerCase()}" type="button" data-action="pattern" data-value="${escape(item.code)}" aria-pressed="${!stale.has('pattern')&&String(s.pattern)===item.code}" ${disabled(blocked)}><i aria-hidden="true"></i>${item.label}</button>`).join('')}<button type="button" class="operator-button pattern-more" data-more-patterns ${disabled(blocked||!hasPatterns)}>More</button></div>
+      <div class="operator-pattern-buttons">${quick.map(item=>`<button class="operator-button pattern-${item.label.toLowerCase()}" type="button" data-action="pattern" data-value="${escape(item.code)}" aria-pressed="${!stale.has('pattern')&&String(s.pattern)===item.code}" ${disabled(blocked)}><i aria-hidden="true"></i>${item.label}</button>`).join('')}<button type="button" class="operator-button pattern-more" data-more-patterns ${disabled(blocked||!hasPatterns)}>${moreLabel}</button></div>
     </section>
     <div class="operator-recovery">
       <button class="operator-button clear-pattern" type="button" data-action="clear" ${disabled(blocked||!hasPatterns)}>Clear pattern</button>
       <button class="operator-button reset-hdmi" type="button" data-action="reset" ${disabled(blocked||!p||hdmiSource(p)==null)}>Reset to HDMI</button>
     </div>
     <div class="operator-readback"><span>Input <strong>${escape(input)}</strong></span><span class="pj-summary-freshness">${escape(connection.lastReply||'No reply')}</span></div>
+    ${hint?`<div class="operator-hint"><p>${escape(hint.text)}</p><button type="button" data-dismiss-hint aria-label="Dismiss suggestion">×</button></div>`:''}
     <p class="operator-feedback" role="status" aria-live="polite" data-phase="${escape(feedback?.phase||'idle')}">${escape(feedback?.text||(lock?'Show lock is on.':!available?[connection.detail,connection.retry,'Values last known'].filter(Boolean).join(' · '):'Ready'))}</p>`;
+  if (hint) {
+    const suggested = hint.action === 'details' ? card.querySelector('[data-open-projector]') : card.querySelector(`[data-action="${hint.action}"]`);
+    suggested?.classList.add('is-suggested');
+    card.querySelector('[data-dismiss-hint]').onclick = () => dismissSuggestion(hint.id);
+  }
   card.querySelector('[data-open-projector]').onclick = () => details(lane);
   card.querySelector('[data-more-patterns]').onclick = () => morePatterns(p.slot);
   for (const button of card.querySelectorAll('[data-action]')) {

@@ -88,7 +88,7 @@ const path = require('node:path');
       }
       for (const theme of ['light','dark']) {
         await page.evaluate(theme => document.documentElement.dataset.theme = theme, theme);
-        assert.ok(await page.locator('#grid [data-lane=B] .operator-power-state').evaluate(node => parseFloat(getComputedStyle(node).fontSize) >= 24), 'power state stays prominent');
+        assert.ok(await page.locator('#grid [data-lane=B] .operator-power-state').evaluate(node => parseFloat(getComputedStyle(node).fontSize) >= 20), 'power state stays prominent');
         if (width === 930) assert.ok((await page.locator('#grid [data-lane=B] .reset-hdmi').evaluate(b => b.getBoundingClientRect().height)) <= 64, 'tall tablet keeps recovery buttons compact');
         const overflow = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, cw: innerWidth, ch: innerHeight }));
         assert.ok(overflow.w <= width && overflow.h <= height, JSON.stringify(overflow));
@@ -142,8 +142,12 @@ const path = require('node:path');
     simpleProjector.status.stale = ['power'];
     simpleSocket.send(JSON.stringify({ type: 'status', slot: simpleProjector.slot, status: simpleProjector.status }));
     await until(async () => await simpleCard.locator('.operator-power-state').textContent() === 'unknown');
+    await simple.setViewportSize({ width: 681, height: 900 });
+    const powerStateBounds = await simpleCard.locator('.operator-power-state').boundingBox();
+    const powerButtonBounds = await simpleCard.locator('[data-action=power][data-value="1"]').boundingBox();
+    assert.ok(powerStateBounds.x + powerStateBounds.width <= powerButtonBounds.x || powerStateBounds.y + powerStateBounds.height <= powerButtonBounds.y, 'UNKNOWN does not overlap power controls');
     await simple.setViewportSize({ width: 1024, height: 768 });
-    assert.equal(await simpleCard.locator('.operator-alert').isVisible(), true);
+    await simpleCard.locator('.operator-alert').waitFor({ state: 'visible' });
     const warningBounds = await simpleCard.locator('.operator-alert').boundingBox();
     const shutterBounds = await simpleCard.locator('.operator-shutter').boundingBox();
     assert.ok(warningBounds.y + warningBounds.height <= shutterBounds.y, 'warning banner never overlaps shutter controls');

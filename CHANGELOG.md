@@ -12,6 +12,10 @@
 
 ## November 13, 2026: Projector operator console
 
+- Bound reviewed browser targets to opaque relay revisions, corrected Panasonic factory input labels and preserved detailed recovery errors.
+- Added optional next-action highlights, browser-local preferences, model-scoped favorite patterns, preset-name templates and read-only projector comparisons.
+- Fixed narrow-card power text and exposed active patterns outside the quick choices.
+
 - Made projector warnings and faults prominent with a labeled banner and matching card border.
 - Enlarged each projector power state and restored a two by two grid on medium screens before the individual-card layout.
 - Added a permanent All Projectors tab with target review and explicit confirmation before every group command. Group Clear and HDMI recovery verify each device.

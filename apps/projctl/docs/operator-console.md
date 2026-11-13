@@ -25,3 +25,15 @@ UI-only deployment records the reviewed source commit and the digest of each of 
 ## Group control acceptance
 
 Dave requested a permanent All Projectors tab and confirmation before every group command. Opening the tab or a command review, cancelling, or pressing Escape must send no command. The review names the action and target projectors. A changed target list or safety state requires another review. Group power off keeps the relay's short-lived target confirmation; repeated clicks cannot bypass it. Clear and HDMI recovery show a result for each projector, including unsupported or unreachable units.
+
+## Anticipatory controls and reviewed targets
+
+The operator can enable optional next-action hints, remember a lane and view, favorite native patterns by model, and set a preset-name template. Preferences stay in a validated versioned local record, with a reset control and a session fallback when storage is unavailable. Suggestions highlight existing controls and are dismissible. Every device action still requires an intentional button press, and every group action still requires target review.
+
+Browser commands carry opaque target revisions from the relay snapshot. The relay rejects a stale revision or changed group before sending, and rechecks each target during sequential batches. Legacy direct API and cue callers retain their existing behavior. UI and relay must be deployed together for this binding capability.
+
+Acceptance includes target replacement after confirmation, 681px power-state containment, active nonquick patterns, preserved authentication errors, default HDMI mapping, storage denial/malformed data, model-scoped favorites, preference reload/reset, and hints without command dispatch.
+
+The retained local backend receives the same reviewed command-binding module and minimal index/store edits as this source. Verify that patched backend in simulation before replacing the managed app. Preserve the rest of its newer backend, write a rollback copy, restart the managed relay once, then verify the binding capability, served asset digests and live read-only state. Record the retained base revision and patch revision separately.
+
+The Panasonic factory input labels follow the manufacturer PJLink tables: 31 DVI-D, 32 HDMI, 33 DIGITAL LINK, and 34 SDI on the RZ970. Sources: [DW830 family manual](https://eu.connect.panasonic.com/sites/default/files/media/document/2014-09/PT-DZ870-PT-DW830-PT-DX100%20Operating%20Instructions.pdf) and [RZ970 manual](https://eu.connect.panasonic.com/sites/default/files/media/document/2025-08/rz970_manual_en.pdf). Existing saved input metadata stays intact.

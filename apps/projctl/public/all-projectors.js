@@ -11,8 +11,8 @@ export function createAllProjectors({ state, connected, connectionOf, send }) {
   const results = document.querySelector('#all-results');
   let request = null, busy = false, returnFocus = null, expiry = null;
   const devices = () => orderedProjectors(state().projectors);
-  const fingerprint = () => JSON.stringify({ connected: connected(), lock: state().lock, targets: devices().map(p => [p.slot,p.lane,p.model,p.driver,p.ip,p.mac,p.inputs,p.inputPreference,!!p.busy,connectionOf(p).current,p.status?.power]) });
-  const allowed = command => connected() && (!state().lock || command === 'shutter' || request?.cmd === 'power' && request?.arg === 1);
+  const fingerprint = () => JSON.stringify({ connected: connected(), lock: state().lock, targets: devices().map(p => [p.slot,p.lane,p.model,p.driver,p.ip,p.mac,p.inputs,p.inputPreference,p.controlRevision,!!p.busy,connectionOf(p).current,p.status?.power]) });
+  const allowed = command => connected() && state().relay?.commandTargetBinding === 1 && (!state().lock || command === 'shutter' || request?.cmd === 'power' && request?.arg === 1);
   const targetHTML = projectors => projectors.map(p => `<li><strong>${escape(projectorName(p))}</strong><span>${escape(connectionOf(p).current ? p.status?.power || 'Connected' : connectionOf(p).detail)} · ${escape(p.model)}</span></li>`).join('');
   function close() {
     if (busy) return;
@@ -21,6 +21,7 @@ export function createAllProjectors({ state, connected, connectionOf, send }) {
   function review(message = 'Review every target before confirming.') {
     clearTimeout(expiry);
     request.fingerprint = fingerprint(); request.token = null;
+    request.targets = devices().map(p => ({ slot: p.slot, revision: p.controlRevision }));
     document.querySelector('#all-confirm-title').textContent = request.label + '?';
     document.querySelector('#all-confirm-targets').innerHTML = targetHTML(devices());
     note.textContent = message;
@@ -41,7 +42,7 @@ export function createAllProjectors({ state, connected, connectionOf, send }) {
     if (request.token && Date.now() - request.armedAt < 400) return;
     busy = true; confirm.disabled = true; cancel.disabled = true; dialog.setAttribute('aria-busy','true'); note.textContent = 'Sending. Waiting for the relay response...';
     try {
-      const response = await send({ slot:'all', cmd:request.cmd, arg:request.arg, ...(request.token ? {confirm:request.token} : {}) });
+      const response = await send({ slot:'all', cmd:request.cmd, arg:request.arg, expectedTargets:request.targets, ...(request.token ? {confirm:request.token} : {}) });
       if (response.all?.confirm) {
         request.token = response.all.confirm; request.armedAt = Date.now();
         const slots = response.all.targets || [];
@@ -65,7 +66,7 @@ export function createAllProjectors({ state, connected, connectionOf, send }) {
       document.querySelector('#all-targets').innerHTML = targetHTML(devices());
       for (const button of document.querySelectorAll('[data-all]')) {
         const safe = !state().lock || button.dataset.all === 'shutter' || button.dataset.all === 'power' && button.dataset.arg === '1';
-        button.disabled = !connected() || !safe || !devices().some(p => connectionOf(p).current && (button.dataset.all !== 'pattern' || supportsPatterns(p)));
+        button.disabled = !connected() || !state().relay?.commandTargetBinding || !safe || !devices().some(p => connectionOf(p).current && (button.dataset.all !== 'pattern' || supportsPatterns(p)));
       }
     },
   };

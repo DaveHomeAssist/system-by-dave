@@ -11,11 +11,11 @@ For managed macOS access, use `~/Applications/Open Projctl.command` or
 See [managed service access and recovery](deploy/RUNBOOK.md#managed-macos-access-and-recovery)
 for installation, the one live settings location, logs and backups.
 
-The controller opens on Controls, with shutter, power, quick test patterns,
+A fresh browser opens on Controls, with shutter, power, quick test patterns,
 Clear pattern and Reset to HDMI on each projector. Reset clears the pattern,
 selects the reported HDMI input and confirms fresh feedback. Tools opens notes,
 reference, stage, presets, thermal watch, log and configuration. The permanent All Projectors tab holds group actions; every group action requires a target review and confirmation. Per-projector Details opens
-lens and diagnostic controls. See [the operator console](docs/operator-console.md). Notes save
+lens and diagnostic controls. Preferences under Tools save the selected lane and view, theme, model-specific pattern favorites and a preset-name template in this browser. Optional next-action hints highlight existing buttons and can be dismissed. See [the operator console](docs/operator-console.md). Notes save
 in this browser at this controller address, with text export. Shared team tasks
 use the public Frozen workspace service at https://wst.housevideo.app/; keep
 sensitive content out of that shared list. Private cross-device notes sync is
@@ -54,8 +54,7 @@ With DHCP the relay re-finds projectors by MAC every 60 s using PJLink class 2 s
 
 ## Power off and Show Lock
 
-Tap All projectors → Power off twice within three seconds. The first tap lists the reachable
-targets; the second sends one command to each of those targets and reports each result.
+Open All Projectors and choose Power off all. Review the target list and choose Confirm and send. The relay then lists its reachable targets. Choose Confirm power off within three seconds to send the command and report each result.
 An offline slot does not block the others. A projector that comes online after the first tap
 is skipped until a new confirmation, as is a slot whose connection settings changed.
 Individual power-off uses the same two-tap confirmation. Expired or reused confirmations
