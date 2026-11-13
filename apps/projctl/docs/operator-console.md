@@ -4,7 +4,7 @@
 
 The default view exposes shutter, power, test patterns, Clear pattern and Reset to HDMI for each A to D projector. Diagnostics, lens controls, configuration, schedules, references and planning remain available through secondary controls.
 
-Each card keeps the lane, surface, model, current power/shutter/input/pattern and connection freshness visible. Desktop shows the four cards together. Tablets and phones select one lane at a time with persistent A to D navigation. Both themes use the existing design tokens.
+Each card keeps the lane, surface, model, current power/shutter/input/pattern and connection freshness visible. Desktop shows the four cards together. Tablets and phones select one lane at a time with persistent A to D navigation. Both themes use the existing design tokens. All Projectors is a permanent tab beside Controls. Its group actions open a target review with Cancel and Confirm; opening or cancelling that review sends no command. Changed targets or safety state require a fresh confirmation. Group power off retains the relay's additional confirmation. Group Clear and HDMI recovery report verified results for each device.
 
 ## Command behavior
 
@@ -20,4 +20,8 @@ Verify every main action in the simulator, including model-specific pattern code
 
 The installed relay has newer polling and thermal sampling than main. Deploy only the reviewed UI assets, leaving that backend and its managed rig configuration in place. The existing thermal view is retained under Tools and reads optional thermal data when the relay supplies it. It shows missing readings explicitly on relays without that capability.
 
-UI-only deployment records the reviewed source commit and the digest of each of these assets: `app.js`, `index.html`, `workspace-bridge.js`, `operator-console.js`, `operator-console.css`, `output-recovery.js`, `thermal-watch.js` and `thermal-watch.css`. Build a candidate public directory by preserving the installed public directory and overlaying those assets. Verify that candidate with the installed backend in simulation before replacing the live public directory. Keep the prior directory as the rollback copy. The relay process and managed data do not need to restart for this UI-only update. Reload the browser, verify served digests, and record the UI and backend revisions separately.
+UI-only deployment records the reviewed source commit and the digest of each of these UI assets: `app.js`, `index.html`, `workspace-bridge.js`, `operator-console.js`, `operator-console.css`, `output-recovery.js`, `thermal-watch.js`, `thermal-watch.css`, `all-projectors.js` and `workspace-navigation.js`. Build a candidate public directory by preserving the installed public directory and overlaying those assets. Verify that candidate with the installed backend in simulation before replacing the live public directory. Keep the prior directory as the rollback copy. The relay process and managed data do not need to restart for this UI-only update. Reload the browser, verify served digests, and record the UI and backend revisions separately.
+
+## Group control acceptance
+
+Dave requested a permanent All Projectors tab and confirmation before every group command. Opening the tab or a command review, cancelling, or pressing Escape must send no command. The review names the action and target projectors. A changed target list or safety state requires another review. Group power off keeps the relay's short-lived target confirmation; repeated clicks cannot bypass it. Clear and HDMI recovery show a result for each projector, including unsupported or unreachable units.

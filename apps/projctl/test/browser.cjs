@@ -22,6 +22,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
       try {
         if (offline) await relay.api('projector', { slot: 'P1', ip: '' });
         await relay.api('command', { slot: 'all', cmd: 'power', arg: 1 });
+        await until(async () => (await relay.state()).projectors.filter(p => !offline || p.slot !== 'P1').every(p => p.status.power === 'on'));
         await page.goto(relay.base);
     await selectView(page,'rig');
         await page.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
@@ -29,15 +30,17 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         const bulk = page.locator('[data-all="power"][data-arg="0"]');
         for (let tap = 0; tap < 2; tap++) {
           const response = page.waitForResponse((r) => r.url().endsWith('/api/command'));
-          await bulk.click(); await response;
-          if (!tap) await page.locator('#toast').filter({ hasText: 'Tap again' }).waitFor();
+          if (!tap) await bulk.click();
+          await page.locator('#all-confirm-send').click(); await response;
+          if (!tap) { await page.locator('#all-confirm-send').filter({hasText:'Confirm power off'}).waitFor(); await page.waitForTimeout(450); }
         }
         await until(async () => (await relay.state()).projectors.filter((p) => !offline || p.slot !== 'P1').every((p) => p.status.power === 'cooling'));
-        await page.locator('#toast').filter({ hasText: 'P4: command accepted' }).waitFor();
-        if (offline) assert.match(await page.locator('#toast').innerText(), /P1:.*skipped/);
+        await page.locator('#all-results').filter({hasText:'Command accepted'}).waitFor();
+        if (offline) assert.match(await page.locator('#all-results').innerText(), /skipped/);
 
         // An unassigned first lane must not shift B/C/D or steal a device.
         for (const [slot, lane] of Object.entries({ P1: 'C', P2: 'B', P4: 'D' })) await relay.api('projector', { slot, lane });
+        await selectView(page,'rig');
         await page.locator('#grid > .pj-tile[data-lane="B"][data-slot="P2"]').waitFor();
         const laneOrder = () => page.locator('#grid > .pj-tile').evaluateAll(els => els.map(el => [el.dataset.lane, el.dataset.slot || null]));
         assert.deepEqual(await laneOrder(), [['A', null], ['B', 'P2'], ['C', 'P1'], ['D', 'P4']]);
@@ -139,6 +142,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
             assert.ok(sizes.w <= sizes.cw && sizes.h <= sizes.ch, `viewport overflow ${width} ${theme}`);
             await openBulk(page);
             assert.equal(await page.locator('.pj-allbar').first().evaluate((el) => el.scrollWidth <= el.clientWidth), true, `bulk controls overflow ${width}`);
+            await selectView(page,'rig');
             assert.equal(await page.locator('.pj-tile').first().evaluate((el) => el.scrollHeight <= el.clientHeight + 1 || getComputedStyle(el).overflowY === 'auto'), true, `clipped projector tile ${width}`);
             await openBulk(page);await bulk.scrollIntoViewIfNeeded(); const box = await bulk.boundingBox(); assert.ok(box.x >= 0 && box.x + box.width <= width && box.y >= 0 && box.y + box.height <= height, `bulk button outside viewport ${width}x${height}: ${JSON.stringify(box)}`);
             await bulk.focus(); assert.ok(await bulk.evaluate((el) => document.activeElement === el));

@@ -2,6 +2,7 @@
 
 ## November 13, 2026: Projector operator console
 
+- Added a permanent All Projectors tab with target review and explicit confirmation before every group command. Group Clear and HDMI recovery verify each device.
 - Put shutter, power, quick patterns, Clear pattern and Reset to HDMI on each projector card. Controls is the default view. Tools and Details hold secondary functions.
 - Reset to HDMI clears the test pattern, resolves the device source and verifies fresh feedback. Partial failure, stale feedback, ambiguous HDMI and changed assignments are reported on the affected card.
 - Desktop shows the full rig. Tablet and phone provide direct A to D selection with the same primary actions. Tall tablet windows keep the controls compact at the top of the card.

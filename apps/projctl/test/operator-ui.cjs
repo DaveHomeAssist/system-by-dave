@@ -17,7 +17,6 @@ async function selectLane(page, lane) {
 }
 async function selectSlot(page, slot, panel = 'controls') {
   await selectView(page, 'rig');
-  if (await page.locator('.pj-rig-all').evaluate(node => node.open)) await page.locator('.pj-rig-all > summary').click();
   const card = page.locator(`#grid > .pj-summary-tile[data-slot="${slot}"]`);
   await selectLane(page, await card.getAttribute('data-lane'));
   if (panel === 'controls') await openDisclosure(page, '#projector-more-controls');
@@ -29,7 +28,6 @@ async function openLegacy(page, slot, panel) {
   await controls.locator(`[data-adj="${panel}"]`).click();
 }
 async function openBulk(page) {
-  await selectView(page, 'rig');
-  await openDisclosure(page, '.pj-rig-all');
+  await selectView(page, 'all');
 }
 module.exports = { openDisclosure, selectView, selectLane, selectSlot, openLegacy, openBulk };

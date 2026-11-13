@@ -82,9 +82,9 @@ const fs = require('node:fs');
     await until(() => requests.length === 1);
     assert.deepEqual(requests[0], { slot: 'P2', cmd: 'resetInput' });
     assert.equal(await hdmiCard.locator('details[data-input-options]').evaluate(el => el.open), true);
-    await openBulk(hdmi);await hdmi.locator('[data-all="resetInput"]').click();
+    await openBulk(hdmi);await hdmi.locator('[data-all="shutter"][data-arg="0"]').click();await hdmi.locator('#all-confirm-send').click();
     await until(() => requests.length === 2);
-    assert.deepEqual(requests[1], { slot: 'all', cmd: 'resetInput' });
+    assert.deepEqual(requests[1], { slot: 'all', cmd: 'shutter', arg: 0 });
     for (const [width, height] of [[1440, 900], [375, 812], [320, 256], [3840, 1080]]) {
       await hdmi.setViewportSize({ width, height });
       const size = await hdmi.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, cw: innerWidth, ch: innerHeight }));

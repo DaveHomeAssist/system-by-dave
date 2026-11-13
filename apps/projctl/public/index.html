@@ -40,6 +40,7 @@
       <button class="avd-tab" role="tab" id="tab-btn-notes" aria-selected="false" aria-controls="tab-notes" data-tab="notes" type="button" tabindex="-1">Notes + tasks</button>
       <button class="avd-tab" role="tab" id="tab-btn-info" aria-selected="false" aria-controls="tab-info" data-tab="info" type="button" tabindex="-1">Gear &amp; signal flow</button>
       <button class="avd-tab" role="tab" id="tab-btn-rig" data-primary-nav aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">Controls <span class="avd-tab__count" id="count-rig"></span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-all" aria-label="All projectors" aria-selected="false" aria-controls="tab-all" data-tab="all" type="button" tabindex="-1"><span class="all-label-full">All projectors</span><span class="all-label-short" aria-hidden="true">All</span></button>
       <button class="avd-tab" role="tab" id="tab-btn-stage" data-primary-nav aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">3D Stage View</button>
       <button class="avd-tab" role="tab" id="tab-btn-presets" data-primary-nav aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
       <button class="avd-tab" role="tab" id="tab-btn-health" aria-selected="false" aria-controls="tab-health" data-tab="health" type="button" tabindex="-1">Thermal watch</button>
@@ -55,19 +56,7 @@
     <section id="tab-info" class="tab" role="tabpanel" aria-labelledby="tab-btn-info" hidden><div id="reference-view" class="pj-fill"></div></section>
     <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
       <div class="pj-overview" aria-label="Rig connection overview"><div><span class="avd-eyebrow">Projector connection</span><strong id="summary">Waiting for relay…</strong></div><details class="pj-connection-help"><summary>Connection details</summary><p class="pj-mono" id="connection-note" role="status">Connecting to the local relay. Device status will update here automatically.</p><p class="pj-mono" id="local-controller-help" hidden>This page needs the local controller. <a href="http://localhost:8080/">Open controller on this Mac</a><span>On a phone or another computer, use the controller Mac’s network address; localhost points to the device you are using.</span></p></details></div>
-      <details class="pj-rig-all"><summary>All projector actions</summary><div class="pj-allbar" aria-labelledby="all-label">
-        <span id="all-label" class="avd-eyebrow">All projectors</span><button class="avd-btn" type="button" id="rig-extra-devices" hidden>Other devices · Configuration</button>
-        <button class="avd-btn avd-btn--primary" data-all="resetInput" type="button" disabled>Reset all to HDMI</button>
-        <div class="avd-seg" role="group" aria-label="Shutter, all projectors">
-          <button class="avd-seg__btn" data-all="shutter" data-arg="0" type="button">Open</button>
-          <button class="avd-seg__btn" data-all="shutter" data-arg="1" type="button">Closed</button>
-        </div>
-        <button class="avd-btn" data-all="power" data-arg="1" type="button">Power on</button>
-        <button class="avd-btn avd-btn--danger" data-all="power" data-arg="0" type="button">Power off</button>
-        <span class="pj-vrule" aria-hidden="true"></span>
-        <button class="avd-btn avd-btn--quiet" data-all="pattern" data-arg="08" type="button">Colour bars</button>
-        <button class="avd-btn avd-btn--quiet" data-all="pattern" data-arg="00" type="button">Pattern off</button>
-      </div></details>
+      <button class="avd-btn" type="button" id="rig-extra-devices" hidden>Other devices · Configuration</button>
       <div id="operator-lanes" role="group" aria-label="Projector"><button type="button" data-operator-lane="A" aria-pressed="true">A <span>SL Portal</span></button><button type="button" data-operator-lane="B" aria-pressed="false">B <span>Top Portal</span></button><button type="button" data-operator-lane="C" aria-pressed="false">C <span>Stage</span></button><button type="button" data-operator-lane="D" aria-pressed="false">D <span>SR Portal</span></button></div>
       <div id="grid" class="pj-grid" role="region" aria-label="A to D projector multiview" tabindex="0" data-web2-scroll></div>
     <dialog id="tab-projector" class="pj-projector-page pj-selected-dock" aria-modal="true" aria-labelledby="projector-detail-title" hidden>
@@ -77,6 +66,22 @@
     </dialog>
     </section>
 
+    <section id="tab-all" class="tab" role="tabpanel" aria-labelledby="tab-btn-all" hidden>
+      <div class="all-heading"><h2 id="all-label">All projectors</h2><p>Every action requires confirmation. Review the targets before sending.</p></div>
+      <div class="pj-allbar all-action-groups" aria-labelledby="all-label">
+        <section><h3>Shutter</h3><button class="avd-btn" data-all="shutter" data-arg="0" type="button">Open all shutters</button><button class="avd-btn" data-all="shutter" data-arg="1" type="button">Close all shutters</button></section>
+        <section><h3>Power</h3><button class="avd-btn" data-all="power" data-arg="1" type="button">Power on all</button><button class="avd-btn avd-btn--danger" data-all="power" data-arg="0" type="button">Power off all</button></section>
+        <section><h3>Test patterns</h3><button class="avd-btn" data-all="pattern" data-arg="08" type="button">Colour bars on all</button><button class="avd-btn" data-all="pattern" data-arg="00" type="button">Clear all patterns</button></section>
+        <section><h3>Input</h3><button class="avd-btn" data-all="resetInput" type="button">Reset all to HDMI</button></section>
+      </div>
+      <h3 class="all-section-title">Projectors</h3><ul id="all-targets" class="all-targets"></ul>
+      <p id="all-results" class="all-results" role="status" aria-live="polite">Choose an action above to review it.</p>
+    </section>
+    <dialog id="all-confirm" class="all-confirm" aria-labelledby="all-confirm-title">
+      <h2 id="all-confirm-title">Confirm group command</h2><p>This action applies to the projectors listed below.</p>
+      <ul id="all-confirm-targets" class="all-targets"></ul><p id="all-confirm-note" role="status" aria-live="polite"></p>
+      <div class="all-confirm-buttons"><button class="avd-btn" id="all-confirm-cancel" type="button">Cancel</button><button class="avd-btn avd-btn--primary" id="all-confirm-send" type="button">Confirm and send</button></div>
+    </dialog>
     <section id="tab-health" class="tab" role="tabpanel" aria-labelledby="tab-btn-health" hidden><section id="thermal-watch"></section></section>
     <section id="tab-throw" class="tab" role="tabpanel" aria-labelledby="tab-btn-throw" hidden><div class="pj-allbar"><strong>Throw Calc · Throwline</strong><span class="pj-mono">Planning calculations only · no projector commands</span><a class="pj-mono" href="https://avbydave.com/ProjectorThrow/" target="_blank" rel="noopener noreferrer">Open separately ↗</a></div><iframe id="throw-calc-frame" class="pj-workspace-frame" title="Throwline projector throw calculator"></iframe></section>
     <section id="tab-stage" class="tab" role="tabpanel" aria-labelledby="tab-btn-stage" hidden>
