@@ -94,11 +94,24 @@ an otherwise reachable projector from reporting status.
 
 ## Verify changes
 
-From this directory, `npm ci` then `npm test` runs isolated simulator, loopback protocol and
+Run the following development checks from `apps/projctl` in a full
+`DaveHomeAssist/system-by-dave` source checkout. Transfer packages omit `test/`
+and the repository's browser tooling, so their package-script names alone do
+not mean those checks are available in the package. Use the root repository's
+documented dependency setup for browser checks.
+
+From the source directory, `npm ci` then `npm test` runs isolated simulator, loopback protocol and
 confirmation regressions. `npm run test:browser` additionally uses the repository's Playwright
 installation and Chromium to exercise the real controls at desktop, 680px and phone widths
 in both themes. Set `CHROMIUM_PATH` only to use an existing browser binary. Tests use temporary
 rig files and ephemeral ports, and never connect to physical projectors. CI runs both suites.
+
+For an installed package, use the managed-service and venue acceptance checks
+in [the runbook](deploy/RUNBOOK.md#managed-macos-access-and-recovery). Record the
+package revision, configured mode, successful client connection and current
+lane-to-device identities. A health response establishes relay availability.
+Confirm device replies and expected physical results separately, in an agreed
+test window. Keep venue addresses and acceptance records in the private handoff.
 
 Compatibility: ECP-1.0 revision 1.0; Projctl remains the physical-command owner. Rig files,
 slot IDs and cue addresses retain their existing formats. The bulk HTTP first-tap response

@@ -1,7 +1,14 @@
 # projctl runbook: Frozen at Walnut Street Theatre
 
-One relay on the theatre network controls the four projectors. Crew open it in a browser; the video lead
-can reach it from anywhere through Tailscale. Prepared by Dave Robertson (AV by Dave).
+One relay on the theatre network provides manual control and monitoring for the
+four projectors. Crew open it in a browser. Record the active host and verified
+crew URL in the private venue handoff before using this runbook. Prepared by
+Dave Robertson (AV by Dave).
+
+This is a deployment template. The private house operations guide owns the
+accepted show procedure, staffing, cue route and recovery plan. Generic presets
+and optional transports described here require venue acceptance before show use.
+Remote access requires a separately configured and tested Tailscale deployment.
 
 ## Where it runs
 
@@ -9,15 +16,30 @@ can reach it from anywhere through Tailscale. Prepared by Dave Robertson (AV by 
 | --- | --- |
 | Relay box | [VENUE BOX], on the projector/sound management network, pinned DHCP lease |
 | In the building | http://[RELAY-IP]:8080 |
-| Off site (tailnet) | https://[BOX-NAME].[TAILNET].ts.net (Tailscale app signed in) |
+| Off site (tailnet) | Record the verified Serve URL after configuring Tailscale; availability is unverified until tested from off site |
 | Passcode | set at install, kept by the video lead; change with a reinstall |
 | Cue input | OSC on UDP 9000, text lines on TCP 9001, LAN only |
 
 ## Daily
 
+Use the venue's accepted power and cue sequence. The following manual-control
+sequence is a reference for the designated operator. When playback software
+sends projector commands directly, Projctl Show Lock cannot block that separate
+path. Coordinate power commands, scheduled actions and monitoring so their
+owners and targets are explicit. Run one designated Projctl relay for the rig.
+
 1. Open the Rig tab. Every tile should show Powered or Standby with a circle beside the word. Offline means the relay cannot reach that projector: check its network cable and that it has an address.
 2. Preshow: recall the preshow preset (tap Recall twice). Then turn on Show lock in the header. Lock blocks power off, input changes, test patterns, lens moves and picture changes from every phone.
-3. Postshow: turn Show lock off, then All projectors, Power off. Check the listed targets and tap again within three seconds. Each confirmed target receives the command even if another slot is offline. Read the per-projector result, then wait for Cooling to become Standby before cutting power at the rail. A newly online or reconfigured slot needs a fresh confirmation.
+3. Postshow: follow the accepted shutdown procedure. For manual power-off, turn Show Lock off, then All projectors, Power off. Check the listed targets and tap again within three seconds. Each confirmed target receives the command even if another slot is offline. Read the per-projector result. A newly online or reconfigured slot needs a fresh confirmation. Verify the manufacturer's completed cooling state before removing mains power. An unreachable device supplies no confirmation of cooling completion.
+
+Barco UDM PJLink `POWR?` reports zero for Ready, Standby and Eco Standby.
+A PJLink power-off request from On goes to Ready; another from Ready can enter
+Standby or Eco Standby when enabled. Record the configured driver and inspect
+its state evidence before repeating a shutdown request. Panasonic standby
+network behavior depends on the installed standby setting. Keep state labels,
+command acknowledgements and physical acceptance distinct.
+
+Manufacturer reference: [Barco UDM PJLink command list](https://www.barco.com/manuals/R5911443/zweecd1065fw.html).
 
 ## If something is wrong
 
@@ -36,7 +58,10 @@ can reach it from anywhere through Tailscale. Prepared by Dave Robertson (AV by 
     cd projctl
     deploy/install.sh --passcode [CODE]       # asks for the passcode if omitted
     deploy/tailscale.sh serve                 # tailnet URL for phones off site
-    deploy/tailscale.sh funnel                # only if people without Tailscale need a link; passcode required
+
+The optional Funnel mode publishes a public endpoint. Enabling it requires an
+explicitly authorized public-access plan and its authentication review. A
+private Serve deployment does not require Funnel.
 
 Then Setup tab: enter each projector's IP, MAC, admin user and PJLink password, Save. Tiles go live within 10 s.
 

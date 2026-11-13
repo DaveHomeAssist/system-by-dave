@@ -1,5 +1,11 @@
 # Changelog
 
+## November 13, 2026 · Projctl documentation reconciliation
+
+- Distinguished source-checkout tests from installed-package acceptance checks.
+- Labeled the controller runbook as a deployment template and made verified private venue procedures the show-operation reference.
+- Clarified independent playback command paths, the single-relay operating arrangement, remote-access acceptance and model-specific shutdown readback.
+
 ## November 13, 2026: Console panels on small phone screens
 
 - On a phone held sideways (844 x 390) the Equipment Lab page showed four tall switcher buttons and no panel; its 3D picture was 20 px tall. The page chooses the phone layout on short screens, and at 720 px and wider a rule meant for the switcher inside the view strip (`flex-basis:100%`) took the full height of the column instead of the full width of a row. The shared console stylesheet now keeps the phone switcher a bar at any width, and the picture is 448 x 194 px at that size. Other consoles are unchanged: seven already carried their own correction, and before-and-after screenshots of every pack in the console, the retained family builds and the standalone Calculator match, apart from Show Control's clock.
