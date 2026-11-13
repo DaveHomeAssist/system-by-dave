@@ -92,6 +92,12 @@ html[data-av-theme="black"] .console-grid{--av-dot:rgba(255,255,255,.13)}
   .console-pop{left:8px!important;right:8px;width:auto;top:auto!important;bottom:8px;max-height:70dvh}
   .console-pop.console-chooser{max-height:calc(100dvh - 16px)}
 }
+/* A console may choose phone mode for a short screen that is wider than 719px, such as a phone held
+   sideways. The switcher is then a child of the shell's column, where the strip rule above
+   (flex-basis:100%) would claim the full height and leave the panel none. This keeps it a bar at any
+   width and changes nothing else: its buttons and background stay with the console. :where() keeps
+   the specificity of the rules above, so a console's own switcher rules still win. */
+@media(min-width:720px){:where(.mode-phone)>.console-quick{flex:none;order:0;margin:0;padding:4px 6px max(4px,env(safe-area-inset-bottom));border-left:0;border-top:1px solid var(--av-line)}}
 /* On short screens reserve space for choices instead of the decorative map. */
 @media(max-height:500px){
   .console-pop.console-chooser{top:8px!important;bottom:8px;max-height:calc(100dvh - 16px);padding:8px;gap:4px}

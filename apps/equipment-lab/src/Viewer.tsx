@@ -12,7 +12,7 @@ function dispose(root: THREE.Object3D) {
 /* Loads one catalog package: `base` and `manifest` come from its catalog row, `pack` from the bundled registry.
    The parent keys this component by package, so one mount serves one package. */
 export default function Viewer({ pack, base, manifest: manifestName, name, selected, onSelect }: { pack: ModelPackage; base: string; manifest: string; name: string; selected: string; onSelect: (id: string) => void }) {
-  const mount = useRef<HTMLDivElement>(null), selectRef = useRef(onSelect), selectedRef = useRef(selected);
+  const mount = useRef<HTMLDivElement>(null), views = useRef<HTMLDivElement>(null), selectRef = useRef(onSelect), selectedRef = useRef(selected);
   const highlight = useRef<(id: string) => void>(() => {}), preset = useRef<(view: string) => void>(() => {});
   const [generation, setGeneration] = useState(0);
   useEffect(() => { const restore = (event: PageTransitionEvent) => { if (event.persisted) setGeneration(value => value + 1); }; window.addEventListener('pageshow', restore); return () => window.removeEventListener('pageshow', restore); }, []);
@@ -88,5 +88,12 @@ export default function Viewer({ pack, base, manifest: manifestName, name, selec
     window.addEventListener('pagehide', release);
     return release;
   }, [generation]);
-  return <div className="lab-viewer"><div className="lab-canvas" ref={mount} /><div className="lab-view-buttons" aria-label="Model views">{pack.views.map(view => <button key={view.id} onClick={() => preset.current(view.id)}>{view.label}</button>)}</div><p className={problem ? 'lab-error' : 'lab-help'} role="status">{status}</p></div>;
+  // Narrow panels keep the view buttons on one scrolling row. The row is marked while more buttons follow, so the stylesheet can fade that edge.
+  useEffect(() => {
+    const row = views.current!, mark = () => row.toggleAttribute('data-more', row.scrollWidth - row.clientWidth - row.scrollLeft > 1);
+    const observer = new ResizeObserver(mark); observer.observe(row); row.addEventListener('scroll', mark, { passive: true }); mark();
+    return () => { observer.disconnect(); row.removeEventListener('scroll', mark); };
+  }, []);
+  // A browser may leave a partly hidden button where it is on focus, so each one asks to be shown.
+  return <div className="lab-viewer"><div className="lab-canvas" ref={mount} /><div className="lab-view-buttons" ref={views} aria-label="Model views">{pack.views.map(view => <button key={view.id} onFocus={event => event.currentTarget.scrollIntoView({ block: 'nearest', inline: 'nearest' })} onClick={() => preset.current(view.id)}>{view.label}</button>)}</div><p className={problem ? 'lab-error' : 'lab-help'} role="status">{status}</p></div>;
 }

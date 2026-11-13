@@ -163,6 +163,66 @@ inspector and in Reference.
 Rollback: revert the host commit. That restores the 1.0.0 copy, which the
 import still recognizes as a previous release.
 
+## Small screens
+
+Recorded on 13 November 2026. Two layout defects predated release 1.1.0 and
+affected C02 and P01 alike. The page itself did not scroll, so every viewport
+check passed.
+
+- **Phone held sideways (844 x 390).** The page chooses the console's phone
+  presentation under 500 px tall. At 720 px and wider the shared console
+  stylesheet still applied its rule for a switcher inside the view strip
+  (`flex-basis:100%`), which in the shell's column claimed the full height. The
+  switcher was 272 px tall and the panel body had no height. The shared sheet
+  now keeps the phone switcher a bar at any width
+  ([console workspace](av-console.md)).
+- **320 px wide.** The page's one grid column grew to the width of the four
+  switcher labels, 53 px past the screen. It now stays the width of the screen,
+  and the header, view strip and switcher fit inside it.
+
+The model inspector lays out by the size of its own panel, through a container
+query on the panel. The same inspector is a phone screen on the page, half a
+tablet inside the AV console and any cell on a desktop, so the size of the
+screen says little about the room it has.
+
+| Panel | Layout |
+| --- | --- |
+| 420 px tall or more | Heading, picture, view buttons, hint, item list, as before. |
+| Under 420 px tall | The hint and the collection line go. The picture keeps a floor of 96 to 120 px. |
+| Under 340 px tall and 360 px wide or more | The picture sits beside the item list at the full height of the panel. |
+| Under 480 px wide, and the side column above | The view buttons stay on one scrolling row. |
+
+Whatever still cannot fit scrolls inside the inspector. In the side-by-side
+layout the picture stays in place while the list scrolls. The row of view
+buttons fades at its trailing edge while more buttons follow, and a focused
+button scrolls fully into view. View buttons keep 44 px targets on short
+screens, where they were 32 px. Entries without a native model keep their copy
+panel.
+
+Measured in emulated Chromium, the same in light and dark and for C02 and P01
+unless a row names one:
+
+| Screen | Where | Picture before | Picture now |
+| --- | --- | --- | --- |
+| 844 x 390 | Page | 760 x 20 | 448 x 194 |
+| 844 x 390 | AV console | 385 x 93 | 195 x 212 |
+| 320 x 568 | Page | 313 x 45, clipped at the right edge | 260 x 120 |
+| 320 x 568 | AV console | 308 x 45, hint over the item list | 308 x 98 |
+| 390 x 844 | Page, P01 | 330 x 187 | 330 x 236 |
+| 390 x 844 | Page, C02 | 330 x 307 | 330 x 307 |
+
+Unchanged: IDs, deep links, copy, the catalog, the release import and saved
+arrangements. Desktop and tablet renderings match the previous build, apart
+from P01's view buttons on panels narrower than 480 px. Cache generation is
+`v20261113-console-phone-panels`.
+
+Limits: these are emulated sizes, not devices. A phone's own toolbars leave less
+height than 390 px; at 844 x 340 the picture is 448 x 144. At 320 x 256 the
+header, view strip and switcher leave the panel no room, as before. No physical
+phone or WebKit browser was checked.
+
+Rollback: revert the host commit. No data, package or storage changes with it.
+
 ## Verification record
 
 The candidate was built and checked on Dominic with Node 24 and Chromium.
@@ -201,7 +261,8 @@ already has for C02 and that this release leaves alone: in phone landscape
 (844 x 390) the console's panel area collapses to about 20 px, and at 320 px
 wide the inspector is clipped at the right edge. On a phone held upright P01's
 six view buttons take two rows, which leaves its picture 187 px tall at
-390 x 844 where C02 has 307.
+390 x 844 where C02 has 307. All three were addressed on 13 November 2026;
+see Small screens.
 
 P01 opens on the local keypad rather than the body. Selecting the body
 highlights the whole projector, which would show a black unit in the highlight
@@ -211,3 +272,33 @@ colour on first sight.
 records host delivery. Publication and live acceptance are separate release
 gates, and the shared repository's record owns that evidence. No GPU, physical
 phone, WebKit browser or physical projector was checked.
+
+The small-screen change was built and checked on 13 November 2026 in a cloud
+session with Node 22 and Chromium on SwiftShader, on host base
+`90444e26ad28a2752c1191bd43650b43580a6fd2`. Rebuilding untouched `main` there
+again reproduced the committed bundles byte for byte. The measurements of the
+previous build and the screenshot comparisons used
+`efb7883f75d2216ce8cce5ab66bcd332b17c9909`; the base differs from it only in
+the splash tab label of pull request 464. The probe adds 320 x 568
+to its sizes and the AV console route at 844 x 390 and 320 x 568. At every size
+except 320 x 256 it asserts that the page frame and its controls are on screen,
+the switcher is a bar, each open panel has a body, the picture is at least
+120 px tall on a sideways phone, no part of the inspector covers another, and
+every control can be brought into the panel and is the thing under its own
+centre. It covers 163 layout cases and 104 panel checks and logs no error. Run
+unchanged against the previous build it fails in 40 of those 104 states, all at
+the two phone sizes, and passes the other 64. It also passes when the system
+font is DejaVu Sans, FreeSans or Carlito instead of Inter, which stands in for
+the fonts other machines and phones use; with the widest of them the page title
+shortens at 320 px.
+
+Every gate in `.github/workflows/av-video.yml` passes there, with the workspace
+probe in Chromium, the theme and viewport contracts, the LED wall probes, the
+public contracts and the domain cutover checks. Screenshots of the other nine
+packs inside the console, the eight retained family builds and the standalone
+Calculator match the previous build at five sizes, apart from Show Control's
+clock. A supplemental check covers keyboard travel through the scrolling view
+buttons, the picture staying in place while the list scrolls, a tap selection
+under touch emulation in landscape, the unknown-item notice, entries without a
+native model and print layout. No physical phone, WebKit browser or GPU was
+checked; the WebKit run of the workspace probe is left to CI.

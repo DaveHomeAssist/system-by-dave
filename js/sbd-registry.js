@@ -341,7 +341,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261112-equipment-lab-projector',
+    version:'v20261113-console-phone-panels',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
