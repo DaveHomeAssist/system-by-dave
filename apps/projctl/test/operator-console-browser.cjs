@@ -66,15 +66,29 @@ const path = require('node:path');
     assert.equal(await page.locator('#tab-projector').isVisible(), false);
     const evidence = process.env.EVIDENCE_DIR || '/tmp/projctl-operator-evidence';
     fs.mkdirSync(evidence, { recursive: true });
-    for (const [width,height] of [[1440,900],[1024,768],[930,1574],[680,900],[375,812],[844,390],[3840,1080]]) {
+    for (const [width,height] of [[1440,900],[1280,900],[1024,768],[681,900],[930,1574],[680,900],[375,812],[844,390],[3840,1080]]) {
       await page.setViewportSize({ width, height });
-      if (width < 1280) {
+      const singleProjector = width <= 680 || (width < 1280 && height < 700);
+      if (singleProjector) {
         await page.locator('[data-operator-lane=B]').click();
         assert.equal(await page.locator('#grid [data-lane=B]').isVisible(), true);
         assert.equal(await page.locator('#grid [data-lane=A]').isVisible(), false);
       }
+      const visibleCards = await page.locator('#grid .operator-card').filter({ visible: true }).all();
+      assert.equal(visibleCards.length, singleProjector ? 1 : 4);
+      if (width > 680 && width < 1280 && height >= 700) {
+        const boxes = await page.locator('#grid .operator-card').evaluateAll(cards => cards.map(card => {
+          const box = card.getBoundingClientRect();
+          return { x: box.x, y: box.y };
+        }));
+        assert.equal(boxes[0].y, boxes[1].y, 'first row has two projectors');
+        assert.equal(boxes[2].y, boxes[3].y, 'second row has two projectors');
+        assert.ok(boxes[2].y > boxes[0].y && boxes[1].x > boxes[0].x);
+        assert.equal(await page.locator('#operator-lanes').isVisible(), false);
+      }
       for (const theme of ['light','dark']) {
         await page.evaluate(theme => document.documentElement.dataset.theme = theme, theme);
+        assert.ok(await page.locator('#grid [data-lane=B] .operator-power-state').evaluate(node => parseFloat(getComputedStyle(node).fontSize) >= 24), 'power state stays prominent');
         if (width === 930) assert.ok((await page.locator('#grid [data-lane=B] .reset-hdmi').evaluate(b => b.getBoundingClientRect().height)) <= 64, 'tall tablet keeps recovery buttons compact');
         const overflow = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, cw: innerWidth, ch: innerHeight }));
         assert.ok(overflow.w <= width && overflow.h <= height, JSON.stringify(overflow));
@@ -120,9 +134,13 @@ const path = require('node:path');
     await simpleCard.locator('[data-action=reset]').click();
     await simpleCard.locator('.operator-feedback').filter({ hasText: 'HDMI restored.' }).waitFor();
     assert.deepEqual(simpleCalls.map(({cmd,arg}) => [cmd,arg]), [['input','32']]);
+    simpleProjector.status.power = 'on';
+    simpleProjector.status.stale = ['power'];
+    simpleSocket.send(JSON.stringify({ type: 'status', slot: simpleProjector.slot, status: simpleProjector.status }));
+    await until(async () => await simpleCard.locator('.operator-power-state').textContent() === 'unknown');
     await simple.close();
     assert.deepEqual(errors, []);
-    console.log('Operator console actions, recovery, guards, details, seven viewports and both themes passed');
+    console.log('Operator console actions, recovery, guards, details, nine viewports and both themes passed');
   } finally {
     await browser.close();
     await relay.close();

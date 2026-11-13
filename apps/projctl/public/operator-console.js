@@ -29,6 +29,7 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
   const input = s.input == null ? 'Unknown' : (p?.inputs?.[s.input] || String(s.input)) + (stale.has('input') ? ' (last known)' : '');
   const pattern = !hasPatterns ? 'Not supported' : (patternIsOff(s.pattern) ? 'Off' : table?.[s.pattern] || s.pattern || 'Unknown') + (stale.has('pattern') ? ' (last known)' : '');
   const shutter = stale.has('shutter') ? 'unknown' : s.shutter || 'unknown';
+  const power = available && !stale.has('power') ? s.power || 'unknown' : 'unknown';
   card.classList.toggle('offline', !available);
   card.innerHTML = `
     <header class="operator-card-head">
@@ -43,12 +44,12 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
     <section class="operator-shutter" aria-label="Shutter for ${lane}">
       <div class="operator-label"><span>Shutter</span><strong>${available?escape(shutter):'Unknown'}</strong></div>
       <div class="operator-pair">
-        <button class="operator-button shutter-open" type="button" data-action="shutter" data-value="0" aria-pressed="${available&&shutter==='open'}" ${disabled(!available)}>Open</button>
-        <button class="operator-button shutter-close" type="button" data-action="shutter" data-value="1" aria-pressed="${available&&shutter==='closed'}" ${disabled(!available)}>Close</button>
+        <button class="operator-button shutter-open" type="button" data-action="shutter" data-value="0" aria-pressed="${available&&shutter==='open'}" ${disabled(!available)}><span class="operator-shutter-prefix">Shutter</span> Open</button>
+        <button class="operator-button shutter-close" type="button" data-action="shutter" data-value="1" aria-pressed="${available&&shutter==='closed'}" ${disabled(!available)}><span class="operator-shutter-prefix">Shutter</span> Close</button>
       </div>
     </section>
     <section class="operator-power" aria-label="Power for ${lane}">
-      <div class="operator-label"><span>Power</span><strong>${available?escape(s.power||'Unknown'):'Unknown'}</strong></div>
+      <div class="operator-label"><span>Power</span><strong class="operator-power-state" data-power-state="${escape(power)}">${escape(power)}</strong></div>
       <div class="operator-pair">
         <button class="operator-button" type="button" data-action="power" data-value="1" ${disabled(!available||pending||p?.busy||s.power==='cooling')}>Power on</button>
         <button class="operator-button power-off" type="button" data-action="power" data-value="0" ${disabled(blocked||s.power==='off')}>${feedback?.phase==='confirmation'?'Confirm power off':'Power off'}</button>
