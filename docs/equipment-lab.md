@@ -359,6 +359,10 @@ a model click in the open lamp bay, reduced motion, three phone sizes
 motion a state applies in at most three frames. No GPU, physical phone, WebKit
 browser or physical projector was checked; phone sizes are emulated.
 
+[Pull request 479](https://github.com/DaveHomeAssist/system-by-dave/pull/479)
+records host delivery of release 1.2.0. Publication and live acceptance are
+separate release gates, and the shared repository's record owns that evidence.
+
 The small-screen change was built and checked on 13 November 2026 in a cloud
 session with Node 22 and Chromium on SwiftShader, on host base
 `90444e26ad28a2752c1191bd43650b43580a6fd2`. Rebuilding untouched `main` there

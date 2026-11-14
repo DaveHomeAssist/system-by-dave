@@ -1360,6 +1360,7 @@
         "scope": "Shared release 1.2.0: P02 Panasonic PT-DW830 with lamp and air filter access, P03 Panasonic PT-RZ970, and an inspector that reads service joints, states and procedures from a package",
         "sharedRevision": "7c81bb60335e68ff4d767093a34de32919a21601",
         "hostBase": "cafd077d8e23441c3e0a1f714cbb2001c5442358",
+        "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/479",
         "status": "Scoped source and browser checks pass in a cloud session; CI, merge, publication and live read-back are separate gates",
         "entries": 46,
         "nativeRepresentations": [
