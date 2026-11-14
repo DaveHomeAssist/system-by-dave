@@ -6,7 +6,6 @@ import path from 'node:path';
 import net from 'node:net';
 import dgram from 'node:dgram';
 import { once } from 'node:events';
-import { fileURLToPath } from 'node:url';
 import { startRelay, until, oscInt } from './relay-helper.js';
 
 async function delayedRelay(t, method) {
@@ -21,7 +20,7 @@ async function delayedRelay(t, method) {
   fs.writeFileSync(rigFile, JSON.stringify(rig));
   const relay = await startRelay({
     RIG: rigFile, PROJCTL_TEST_GATE: gate, PROJCTL_TEST_DELAY_METHOD: method,
-    NODE_OPTIONS: `--loader ${fileURLToPath(new URL('./delayed-driver-loader.mjs', import.meta.url))}`,
+    NODE_OPTIONS: `--loader ${new URL('./delayed-driver-loader.mjs', import.meta.url).href}`,
   });
   const release = () => fs.writeFileSync(gate + '.release', 'release');
   t.after(async () => { release(); await relay.close(); fs.rmSync(dir, { recursive: true, force: true }); });
