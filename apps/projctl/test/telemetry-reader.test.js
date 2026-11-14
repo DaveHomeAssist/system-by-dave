@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createPoller } from '../server/polling.js';
 import { createTelemetryReader, sleep } from '../server/telemetry-reader.js';
 
 const tick = () => new Promise((resolve) => setImmediate(resolve));
@@ -89,4 +90,37 @@ test('cancellation during retry sleep prevents another attempt', async () => {
   await assert.rejects(report, /deadline/);
   assert.equal(calls, 1);
   assert.equal(await reader.poll('P1', async () => 'available'), 'available');
+});
+
+
+test('status timeout starts after telemetry releases the queue and still bounds device I/O', async () => {
+  const telemetry = createTelemetryReader(), temperature = deferred();
+  const report = telemetry.read('P1', { healthReadings: () => temperature.promise });
+  await tick();
+  const timers = [], failures = [];
+  let reads = 0;
+  const poller = createPoller({
+    target: () => ({ slot: 'P1', ip: '127.0.0.1' }),
+    coordinate: (p, run, options) => telemetry.poll(p.slot, run, options),
+    read: (p, { signal }) => {
+      reads++;
+      return new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason), { once: true }));
+    },
+    failed: (p, error) => failures.push(error),
+    timeoutMs: 10000,
+    timer: (callback, ms) => { const timer = { callback, ms }; timers.push(timer); return timer; },
+    cancelTimer: () => {},
+  });
+  const poll = poller.poll('P1');
+  await tick();
+  assert.equal(reads, 0);
+  assert.equal(timers.length, 0, 'no device timeout while queued behind telemetry');
+  assert.equal(failures.length, 0);
+  temperature.resolve(reading); await report; await tick();
+  assert.equal(reads, 1);
+  assert.equal(timers[0].ms, 10000, 'the actual read receives its full deadline');
+  timers[0].callback(); await poll;
+  assert.equal(failures.length, 1);
+  assert.equal(failures[0].code, 'POLL_TIMEOUT');
+  poller.close();
 });

@@ -126,7 +126,8 @@ poller = createPoller({
   intervalMs: POLL_MS,
   timeoutMs: 10000,
   maxRetryMs: Math.max(POLL_MS, 15000),
-  read: (p, options) => p.ip ? telemetry.poll(p.slot, () => driverFor(p).getStatus(options), options) : null,
+  coordinate: (p, read, options) => telemetry.poll(p.slot, read, options),
+  read: (p, options) => p.ip ? driverFor(p).getStatus(options) : null,
   started(p, { identityChanged, at }) {
     if (identityChanged) {
       status.set(p.slot, emptyStatus());

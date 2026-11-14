@@ -61,7 +61,9 @@ because production paperwork numbers the projectors differently.
 
 Readings are taken only when a report runs, never on the 5-second status poll.
 Status polls and report readings share a queue for each projector, preventing
-those reads from overlapping in either direction. Different projectors remain
+those reads from overlapping in either direction. A status poll gets its full
+device timeout after acquiring the queue, so local queue waiting cannot mark a
+projector offline. Different projectors remain
 independent. Report readings retry transport failures at most twice, with a
 4-second wait between attempts. Status polls can run during that wait. Refusals,
 authentication errors and invalid replies do not trigger retries. Each unit's
