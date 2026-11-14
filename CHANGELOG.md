@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-14
+
+- WST Planning adds current R5 signal-flow diagrams, the consolidated R4 document packet and section links while preserving
+  the existing snow Home, themes and navigation. Public PDF copies omit private
+  network addresses; original documents remain unchanged.
+- WST public controller entries open localhost separately. Hosted pages no longer
+  connect to or embed the relay, and public-only generation leaves the installed
+  controller shell untouched.
+
 ## November 14, 2026: Projctl telemetry coordination
 
 - Serialize status and health reads per projector while keeping different units independent and allowing status polls between bounded report retries.
