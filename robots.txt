@@ -16,7 +16,6 @@ Disallow: /apps/fmp-camera-sim/
 Disallow: /cross-project-actions.html
 Disallow: /html/sbd-brand.html
 Disallow: /.claude/
-
 Disallow: /cross-project-dashboard.html
 Disallow: /fmp-index/
 Disallow: /fmp/
@@ -24,10 +23,9 @@ Disallow: /fmp-walk/
 Disallow: /fmpwalk/
 Disallow: /camera-sim/
 Disallow: /wedding-ops.html
-Sitemap: https://systembydave.com/sitemap.xml
-Sitemap: https://systembydave.com/systembydave/sitemap.xml
-Host: systembydave.com
-
 # Equipment Lab source and original downloadable reference package
 Disallow: /apps/equipment-lab/
 Disallow: /equipment-lab/data/
+
+Sitemap: https://systembydave.com/sitemap.xml
+Sitemap: https://systembydave.com/systembydave/sitemap.xml
