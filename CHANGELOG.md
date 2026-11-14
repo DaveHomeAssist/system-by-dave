@@ -1,5 +1,15 @@
 # Changelog
 
+## November 14, 2026: Offline receipts name missing files; AV data asks to persist
+
+- The offline status says when optional files failed to cache ("Offline ready ·
+  1 file not saved yet"), and the worker retries them once per start (PR 413,
+  AVC-19).
+- AV pages ask the browser once per load to keep saved data from eviction,
+  except in Firefox, which would prompt (PR 414, AUD-017).
+- Cache generation `v20261114-offline-cache-receipts`, so installed copies pick
+  up both changes.
+
 ## November 14, 2026: Frozen case stage 2, lens and throw in Throwline
 
 - Extend the Frozen case with eleven steps in Throwline: the console panel,
