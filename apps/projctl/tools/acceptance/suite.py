@@ -210,12 +210,18 @@ def record(run, check, lane, result, witness, notes, evidence):
                        >= dt.datetime.fromisoformat(data["created"])]
             if check == "temperature":
                 current = [item for item in current if item.get("counts", {}).get("units") == 4
-                           and item["counts"].get("reached") == 4 and item["counts"].get("flagged") == 0]
-            elif check == "shutdown-report":
-                current = [item for item in current if item.get("kind") in ("power-off", "relay-stop")]
+                           and item["counts"].get("reached") == 4 and item["counts"].get("flagged") == 0
+                           and item["counts"].get("incomplete") == 0]
             else:
-                current = [item for item in current if item.get("kind") in ("power-off", "relay-stop")
-                           and item.get("notion", {}).get("state") == "published" and item["notion"].get("url")]
+                current = [item for item in current if item.get("kind") == "power-off"]
+                shutdowns = {event["lane"]: event for event in events
+                             if event["kind"] == "result" and event["check"] == "shutdown"}
+                if any(lane not in shutdowns or shutdowns[lane]["result"] != "pass"
+                       or not set(shutdowns[lane]["evidence"]).intersection(evidence) for lane in LANES):
+                    raise ValueError("Shutdown reporting requires witnessed shutdown passes for all lanes linked to this evidence")
+                if check == "delivery":
+                    current = [item for item in current if item.get("notion", {}).get("state") == "published"
+                               and item["notion"].get("url")]
             if not current:
                 raise ValueError("Pass requires a current real-rig report in the captured relay summaries")
         if result != "not_tested" and check in DISRUPTIVE:
@@ -239,7 +245,7 @@ def record(run, check, lane, result, witness, notes, evidence):
                 raise ValueError("Reboot pass requires changed macOS boot time")
         events.append({"kind": "result", "id": uuid.uuid4().hex, "at": now(), "check": check,
                        "lane": lane, "result": result, "witness": witness, "notes": notes,
-                       "evidence": evidence})
+                       "evidence": evidence, "criteria_version": 2})
     return report(run)
 
 
@@ -250,23 +256,28 @@ def report(run):
 
 def write_report(run, data):
     latest = {(event["check"], event["lane"]): event for event in data["events"] if event["kind"] == "result"}
+    results = {key: ("legacy_unverified" if item["result"] == "pass"
+                    and key[0] in ("temperature", "shutdown-report", "delivery")
+                    and item.get("criteria_version", 1) < 2 else item["result"])
+               for key, item in latest.items()}
     integrity_errors = []
     for event in data["events"]:
         if event["kind"] == "attachment":
             path = run / event["file"]
             if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != event["sha256"]:
                 integrity_errors.append(event["id"])
-    passed = not integrity_errors and all(latest.get((check, lane), {}).get("result") == "pass"
+    passed = not integrity_errors and all(results.get((check, lane)) == "pass"
                  for check, lanes in CHECKS.items() for lane in lanes)
     lines = ["# Frozen acceptance report", "", "Overall " + ("PASS" if passed else "INCOMPLETE OR FAILED"),
              "", "Run " + data["id"], "", "Generated " + now(), "",
              "Operator " + data["operator"], "", "Results are operator attestations linked to saved evidence.", "",
+             "Legacy thermal and shutdown passes require re-verification under criteria version 2.", "",
              "Attachment integrity errors: " + (", ".join(integrity_errors) or "None"), "",
              "| Check | Lane | Result | Witness | Evidence IDs |", "| --- | --- | --- | --- | --- |"]
     for check, lanes in CHECKS.items():
         for lane in lanes:
             item = latest.get((check, lane), {})
-            row = [check, lane, item.get("result", "not_tested"), item.get("witness", ""), ", ".join(item.get("evidence", []))]
+            row = [check, lane, results.get((check, lane), "not_tested"), item.get("witness", ""), ", ".join(item.get("evidence", []))]
             lines.append("| " + " | ".join(str(cell).replace("|", "\\|").replace("\n", " ") for cell in row) + " |")
     lines += ["", "## History", ""]
     for event in data["events"]:
