@@ -1,18 +1,43 @@
 {
-  "title": "Frozen Projection Handoff R4",
-  "sourceDate": "2026-11-13",
-  "publishedCopy": "frozen-handoff-r4.pdf",
-  "pages": 17,
-  "sourceSha256": "90066f0b2f1e491bdc7423dd51dbdbc1f49b8a393eac79d3d15c53387bffad1a",
-  "publicSha256": "3fd0095ac6dadbd48db3e74d7b2eef8ad814cc1d521926d0567353599e4542fc",
-  "transformation": "Six private network addresses replaced with Private LAN. Metadata normalized. Original layout, internal links and bookmarks retained. Original source unchanged.",
-  "acceptance": "Recorded configuration; field acceptance pending.",
+  "title": "Frozen Projection Handoff R5",
+  "sourceDate": "2026-11-14",
+  "publishedCopy": "frozen-handoff-r5.pdf",
+  "pages": 18,
+  "sourceSha256": "970bff89ad509abb08d45f5aa9d11ed99514ff5a7dc6f6024a89b2d4f33d14e4",
+  "publicSha256": "8f2c6bfbefff1b8fb2262ad9f67969d21d358296d091cd9523963800b8560a97",
+  "transformation": "Five private network address occurrences replaced with Private LAN. Metadata normalized. Page layout, internal link targets and bookmarks retained. Original source unchanged. No original EDID or settings exports included.",
+  "acceptance": "Recorded configuration and November 14 evidence reconciliation; field acceptance pending.",
   "currentSignalFlow": {
-    "revision": "R5",
+    "revision": "R5 / November 14 evidence reconciliation",
     "file": "frozen-signal-flow-r5.pdf",
-    "sourceSha256": "c9f1c3689eccb6de9a282b843552668ed4692dbdd1e980fa38c51d902bf4ef17",
-    "publicSha256": "14a7f4587d5ac776344544dd8681bf33adc8a401b4c920c05a463edcd06099d8",
+    "sourceSha256": "79b8e7e4a523616454c6d934d70af742af7d465e7480d4e8ea49069d8b764dc6",
+    "publicSha256": "cca5cf644477b2759679edbca82cec4e8a165bc2ca912d3a46f7010448de71a0",
     "pages": 5,
-    "note": "AV1 legibility revision. Six private network addresses omitted. Later pixel routing reply not yet incorporated."
+    "note": "Latest R5 diagrams with Katy pixel routing corrections. Five private network address occurrences omitted."
+  },
+  "verification": {
+    "combinedInternalLinks": 35,
+    "combinedBookmarkEntries": 22,
+    "diagramInternalLinks": 25,
+    "diagramBookmarkEntries": 5,
+    "embeddedFileCount": 0
+  },
+  "previousPublication": {
+    "title": "Frozen Projection Handoff R4",
+    "sourceDate": "2026-11-13",
+    "publishedCopy": "frozen-handoff-r4.pdf",
+    "pages": 17,
+    "sourceSha256": "90066f0b2f1e491bdc7423dd51dbdbc1f49b8a393eac79d3d15c53387bffad1a",
+    "publicSha256": "3fd0095ac6dadbd48db3e74d7b2eef8ad814cc1d521926d0567353599e4542fc",
+    "transformation": "Six private network addresses replaced with Private LAN. Metadata normalized. Original layout, internal links and bookmarks retained. Original source unchanged.",
+    "acceptance": "Recorded configuration; field acceptance pending.",
+    "currentSignalFlow": {
+      "revision": "R5",
+      "file": "frozen-signal-flow-r5.pdf",
+      "sourceSha256": "c9f1c3689eccb6de9a282b843552668ed4692dbdd1e980fa38c51d902bf4ef17",
+      "publicSha256": "14a7f4587d5ac776344544dd8681bf33adc8a401b4c920c05a463edcd06099d8",
+      "pages": 5,
+      "note": "AV1 legibility revision. Six private network addresses omitted. Later pixel routing reply not yet incorporated."
+    }
   }
 }
