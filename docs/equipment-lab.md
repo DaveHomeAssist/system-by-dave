@@ -238,7 +238,8 @@ Panasonic's warnings and advice. It is the byte-for-byte copy of Dave's file
 
 - **Where.** Practice shows the video at the top of "Replacing a lamp unit",
   under the source line and above "Before you start". The steps below it are
-  its text. Reference lists a download link.
+  its text. Reference lists a download link. The AV console's Equipment Lab
+  panels show the same, since `av/` bundles the pack.
 - **Loading.** The video loads only when played (`preload="none"`). It shows its
   poster until then.
 - **Host media.** The files sit in `equipment-lab/media/`, outside the managed
