@@ -15,6 +15,7 @@ on:
       - 'scripts/probe_av_retained.mjs'
       - 'scripts/probe_av_routes.mjs'
       - 'scripts/probe_frozen_case.mjs'
+      - 'ProjectorThrow/**'
       - 'wst/projectors.json'
       - 'wst/stage/plot.json'
       - 'apps/av-video/**'

@@ -44,20 +44,36 @@ def card(name, kicker, title, lines, foot):
 
 failed = [step for step in steps if step['status'] == 'failed']
 flagged = [step for step in steps if step['status'] == 'flagged']
-intro = card('intro.png', 'AV by Dave  ·  recorded test case  ·  pilot', 'Frozen: projection lanes A to D',
-    [(RUST, 'The four projection lanes of the Frozen rig, entered into the console through its own controls.'),
-     (RUST, 'Every step is journalled and filmed. Monitors watch for page errors, failed requests, unexpected saved data and page scrolling.'),
-     (RUST, 'The application\'s planning checks must come out as exactly the unknowns in the reference.')],
+stages = summary.get('stages') or [{'n': 1, 'title': 'Projection lanes in AV Video'}]
+intro = card('intro.png', 'AV by Dave  ·  recorded test case', 'Frozen case',
+    [(RUST, f"Stage {stage['n']}: {stage['title']}.") for stage in stages] +
+    [(RUST, 'The Frozen rig is entered through the application\'s own controls. Every step is journalled and filmed.'),
+     (RUST, 'Monitors watch for page errors, failed requests, unexpected saved data and page scrolling.')],
     f"Facts come from the public Frozen reference in the repository (wst/projectors.json, updated {summary['referenceUpdated']}, and wst/stage/plot.json). "
-    f"They are plan records and operator reports, not the state of the show. Run against {summary['base']} at {summary['commit'][:8]}.")
-lines = [(GREEN, f"{sum(step['status'] == 'passed' for step in steps)} of {len(steps)} steps passed.")]
-for step in failed: lines.append((RED, f"Failed, step {step['index']}: {step['error']}"))
-for step in flagged: lines.append((AMBER, f"Flagged, step {step['index']}: {'; '.join(step['flags'])}"))
-for note in summary.get('findings', []): lines.append((AMBER, f"Noted, {note['id']}: {note['text']}"))
-checks = next((step for step in steps if step['step'] == 'checks'), None)
-if checks and checks['status'] == 'passed': lines.append((GREEN, f"Planning checks matched the reference: {checks['observed']['needAttention']} records need attention, all of them known unknowns."))
-outro = card('outro.png', 'Result', 'One step failed' if len(failed) == 1 else f'{len(failed)} steps failed' if failed else 'All steps passed', lines,
-    'Automated run in headless Chromium on SwiftShader. No hardware, no physical device, no operator acceptance. The pointer in the film is added by the recorder.')
+    f"They are plan records and operator reports, not the state of the show. Run against {summary['base']} at {(summary.get('deployed') or {}).get('commit') or summary['commit']:.8}.")
+
+def closing():
+    """The result card: totals, every failure, then as many findings as fit."""
+    image = Image.new('RGB', (W, H), INK); pen = ImageDraw.Draw(image); y = 110
+    pen.text((150, y), 'RESULT', font=font(BOLD, 30), fill='#e8a06c'); y += 66
+    title = 'One step failed' if len(failed) == 1 else f'{len(failed)} steps failed' if failed else 'All steps passed'
+    pen.text((150, y), title, font=font(BOLD, 76), fill='#ffffff'); y += 112
+    rows = [(GREEN, f"{sum(step['status'] == 'passed' for step in steps)} of {len(steps)} steps passed.")]
+    rows += [(RED, f"Failed, step {step['index']}: {step['error']}") for step in failed]
+    rows += [(AMBER, f"Flagged, step {step['index']}: {'; '.join(step['flags'])}") for step in flagged]
+    notes = summary.get('findings', []); rows += [(AMBER, f"{note['id']}: {note['text']}") for note in notes]
+    shown = 0
+    for colour, body in rows:
+        lines = textwrap.wrap(body, 118)
+        if len(lines) > 3: lines = lines[:3]; lines[-1] = lines[-1][:114].rstrip() + ' …'
+        if y + len(lines) * 36 > 950: break
+        pen.ellipse((154, y + 12, 168, y + 26), fill=colour)
+        for line in lines: pen.text((196, y), line, font=font(REGULAR, 27), fill=PAPER); y += 36
+        y += 12; shown += 1
+    if shown < len(rows): pen.text((196, y), f'and {len(rows) - shown} more in the journal', font=font(REGULAR, 27), fill=GREY)
+    pen.text((150, 990), 'Automated run in headless Chromium on SwiftShader. No hardware, no physical device, no operator acceptance. The pointer in the film is added by the recorder.', font=font(REGULAR, 23), fill=GREY)
+    image.save(work / 'outro.png'); return work / 'outro.png'
+outro = closing()
 
 # Caption band: one line for the step, one for what to expect, and the result as the step ends.
 filters = [f"[0:v]scale={VW}:{VH}:flags=lanczos,pad={W}:{H}:{(W - VW) // 2}:0:color=0x0e1114,drawbox=x=0:y={VH}:w={W}:h={H - VH}:color=0x16181b:t=fill"]
@@ -70,6 +86,7 @@ for position, step in enumerate(steps):
     start = step['film'][0]; end = steps[position + 1]['film'][0] if position + 1 < len(steps) else step['film'][1] + 1.2
     done = max(start + 0.4, step['film'][1] - 1.0)
     span = f"enable='between(t,{start:.2f},{end:.2f})'"
+    text(f"g{position}.txt", f"STAGE {step.get('stage', 1)}", fontfile=SEMI, fontsize=20, fontcolor=GREY.replace('#', '0x'), x=96, y=VH + 68, **{'enable': span[7:]})
     text(f"n{position}.txt", f"{step['index']:02d} / {len(steps):02d}", fontfile=SEMI, fontsize=30, fontcolor=RUST.replace('#', '0x'), x=96, y=VH + 22, **{'enable': span[7:]})
     text(f"t{position}.txt", step['title'], fontfile=SEMI, fontsize=36, fontcolor='white', x=250, y=VH + 18, **{'enable': span[7:]})
     note = step.get('error') if step['status'] == 'failed' else ('; '.join(step['flags']) if step['status'] == 'flagged' else step.get('detail', ''))
@@ -83,7 +100,7 @@ subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(run / 'film' / '
 def still(image, seconds, name):
     target = work / name
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-loop', '1', '-t', str(seconds), '-i', str(image), '-r', '30', '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', str(target)], check=True); return target
-parts = [still(intro, 5, 'intro.mp4'), body, still(outro, 9, 'outro.mp4')]
+parts = [still(intro, 5, 'intro.mp4'), body, still(outro, 12, 'outro.mp4')]
 (work / 'parts.txt').write_text(''.join(f"file '{part}'\n" for part in parts))
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', str(work / 'parts.txt'), '-c', 'copy', '-movflags', '+faststart', '-metadata', 'title=Frozen case pilot: projection lanes A to D in the AV by Dave console', str(out)], check=True)
 print(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration,size', '-show_entries', 'stream=codec_name,width,height,r_frame_rate,nb_frames', '-of', 'default=noprint_wrappers=1', str(out)], capture_output=True, text=True).stdout)

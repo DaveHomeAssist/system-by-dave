@@ -168,11 +168,14 @@
     "Minimum iOS/iPadOS for field use: 17.4+ (checkVisibility) or add fallbacks for older iPads?",
     "Throwline: keep explicit-save only (edited width resets on reload) or add a draft autosave?",
     "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?",
-    "FC-D1: Is the Frozen case the test case you meant? A) yes, as built in docs/frozen-case.md (recommended), or B) something else you describe?",
     "FC-D2: Where is the Frozen case monitored? A) pull requests plus a live read-back after each release (recommended, current), B) also gate the Pages deployment, or C) also a nightly live run (a scheduled job, needs approval)?",
-    "FC-D3: Which Frozen case stage next? A) Throwline for each lane (recommended), B) the PT-DW830 lamp and filter procedures in Equipment Lab, or C) another order?",
     "FC-D4: How should Equipment Lab find a model by the name on a rig record? A) search ignores case, spaces and hyphens and matches shared-catalog aliases (recommended), B) normalise in the host only, or C) leave it?",
-    "FC-D5: Should the Frozen case be visible in the product? A) no, test only (recommended), or B) a loadable demo plan in the console (a new public surface)?"
+    "FC-D5: Should the Frozen case be visible in the product? A) no, test only (recommended), or B) a loadable demo plan in the console (a new public surface)?",
+    "FC-D10: Which Frozen case stage after Throwline? A) stage 3, the PT-DW830 lamp and filter procedures in Equipment Lab (recommended), B) stage 4, infrastructure, or C) another order?",
+    "FC-D6: Portrait lanes in Throwline (FC-F5)? A) add a portrait mounting choice to the planner and Stage 3D, with its own brief (recommended), B) keep it and say that a portrait picture is entered on its side, or C) leave it?",
+    "FC-D7: The Throwline solver's default zone (FC-F6)? A) raise \"fix before you hang it\" only once the operator has set a zone (recommended), B) keep the check and reword it, or C) leave it?",
+    "FC-D8: Frozen models in Throwline's audited catalog (FC-F3, FC-F4)? A) add the PT-DW830, PT-RZ970 and UDM-4K22 with their lenses from maker data under the catalog contract (recommended; a research task), or B) leave them as typed ratios?",
+    "FC-D9: Throws for lanes A, B and C (FC-R1)? A) measure or estimate each and add throwDistance to wst/projectors.json so the case checks them (recommended), or B) leave them unknown?"
   ],
   "files": [
     {
@@ -954,22 +957,61 @@
   "frozenCase": {
     "recordedOn": "2026-11-14",
     "request": "Dave, November 13, 2026: \"methodically build out the frozen situation in the avbydave app as a recorded and monitored test case\".",
-    "state": "Stage 1 (projection lanes A to D in AV Video) built; runs on pull requests that touch the console. Publication and live read-back are separate gates recorded in the owning pull request.",
+    "state": "Stages 1 (projection lanes in AV Video) and 2 (lens and throw in Throwline) built; runs on pull requests that touch the console or Throwline. Publication and live read-back are separate gates recorded in the owning pull requests.",
     "brief": "docs/frozen-case.md",
     "probe": "scripts/probe_frozen_case.mjs",
-    "verification": "Cloud session, headless Chromium on SwiftShader: 22 of 22 steps pass against the checkout; planning checks equal the eight known unknowns in the public reference.",
+    "verification": "Cloud session, headless Chromium on SwiftShader: 33 of 33 steps pass against the checkout. Stage 1 planning checks equal the eight known unknowns in the public reference; stage 2 planner throws equal ratio times width for all four lanes and lane D's recorded throw reads as a good distance.",
     "findings": [
       {
         "id": "FC-F1",
-        "state": "Fixed in the same change",
+        "state": "Fixed in pull request 484",
         "title": "Signal Flow counted the newest connection and did not draw its cable until a reload"
       },
       {
         "id": "FC-F2",
         "state": "Open",
         "title": "Equipment Lab search needs the catalogue spelling; rig-record spellings find nothing"
+      },
+      {
+        "id": "FC-F3",
+        "state": "Open",
+        "title": "Throwline's audited catalog holds none of the Frozen projectors; every lane is a typed ratio"
+      },
+      {
+        "id": "FC-F4",
+        "state": "Open",
+        "title": "Throwline's older lens list shows ET-DLE170 at the WUXGA figure; the PT-DW830 is WXGA"
+      },
+      {
+        "id": "FC-F5",
+        "state": "Open",
+        "title": "Throwline has no portrait mounting; a portrait lane entered as drawn reads far too long a throw"
+      },
+      {
+        "id": "FC-F6",
+        "state": "Open",
+        "title": "The solver's untouched default zone marks lane C \"fix before you hang it\" and STOP on the show board"
+      },
+      {
+        "id": "FC-R1",
+        "state": "Open, a question about the records",
+        "title": "At lane D's recorded throw the lenses on record for lanes B and C would overfill their plotted coverage"
       }
     ],
-    "limits": "Plan records and operator reports, not show state. No hardware, physical device, touch or operator acceptance."
+    "limits": "Plan records and operator reports, not show state. No hardware, physical device, touch or operator acceptance.",
+    "decisionsTaken": [
+      {
+        "id": "FC-D1",
+        "on": "2026-11-14",
+        "answer": "A",
+        "words": "FC-D1 A, go ahead with stage 2"
+      },
+      {
+        "id": "FC-D3",
+        "on": "2026-11-14",
+        "answer": "A, stage 2, Throwline",
+        "words": "FC-D1 A, go ahead with stage 2"
+      }
+    ]
   }
 }

@@ -1,5 +1,21 @@
 # Changelog
 
+## November 14, 2026: Frozen case stage 2, lens and throw in Throwline
+
+- Extend the Frozen case with eleven steps in Throwline: the console panel,
+  the planner, a catalog lookup, each lane's lens and throw against its plotted
+  coverage, a portrait lane entered as drawn, the show board and its export, a
+  reload, and the hand-off to Stage 3D. 33 steps in all; `--stage 2` runs the
+  new stage alone. The planner's throw must equal ratio times width, and lane
+  D's recorded throw must read as a good distance.
+- Record five findings without changing Throwline: none of the Frozen
+  projectors is in its audited catalog, the older lens list carries the WUXGA
+  figure for a lens used on a WXGA projector, there is no portrait mounting, the
+  solver's default zone marks an output "fix before you hang it", and the
+  records for lanes B and C do not agree with lane D's throw. Decisions FC-D6
+  to FC-D9 are in `docs/frozen-case.md`.
+- The case now also runs on pull requests that touch `ProjectorThrow/`.
+
 ## November 14, 2026: Frozen recorded test case and a Signal Flow cable fix
 
 - Add the Frozen case: the four projection lanes of the Frozen rig entered into
