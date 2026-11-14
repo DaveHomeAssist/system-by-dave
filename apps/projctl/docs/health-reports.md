@@ -65,6 +65,14 @@ listed as not read.
 
 ### Flags and limits
 
+- **Incomplete** applies when a reachable unit lacks an intake or ambient temperature,
+  complete alarm feedback, or a rated ambient limit. Fault and Watch verdicts
+  take priority when their evidence is present, with missing data still listed.
+  Unreachable units retain their Unreachable verdict and count toward incomplete
+  assessment. Optional internal temperature channels do not determine completeness.
+- Reports show temperature, alarm and rated-limit coverage separately. A clear
+  alarm response means no faults were reported by that source. Missing readings
+  remain unknown. The unit table lists missing evidence alongside reported flags.
 - **Flag:** PJLink temperature or fan status above 0, or a Barco alarm state
   other than `Ok`.
 - **Watch:** headroom (rated maximum ambient minus the intake or ambient
