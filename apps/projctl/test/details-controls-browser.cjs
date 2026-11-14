@@ -1,6 +1,6 @@
 // Projector details control surface: pattern tiles, Stop lens, heat notices and the
-// session timer, at desktop, tablet and phone sizes. Thermal readings are injected because
-// the simulator does not sample them.
+// session timer, at desktop, tablet and phone sizes. Thermal readings are injected so each
+// level and age is exact; thermal-browser.cjs covers the relay's own sampling.
 const { selectLane, selectView } = require('./operator-ui.cjs');
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');

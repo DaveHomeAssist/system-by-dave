@@ -85,6 +85,41 @@ lens move was already attempted, its protective stop can still run after a later
 step is cancelled. A command acknowledgement continues to require separate state
 feedback and physical acceptance.
 
+## Thermal watch
+
+The Thermal watch tab shows air temperature at each lane (A to D) against that projector's rated maximum
+ambient, with headroom, peak, a 30 minute trend, and the tightest unit (least headroom) outlined. Cards are
+keyed by lane, not slot number, because slot numbers have been renumbered between rig records. Outside the
+tab, heat shows only for a current Watch or Hot reading: a chip on that projector's card and a header pill
+that opens Thermal watch ([details controls](docs/details-controls.md)).
+
+- **Readings.** The watch uses the [health reports](docs/health-reports.md)' read-only driver query:
+  Panasonic intake air (`QTM:0`) and the Barco's outside-ambient sensor. PJLink-only projectors report
+  no temperature, and the card says so. The relay takes one sample per projector about once a minute
+  (`PROJCTL_THERMAL_SAMPLE_MS`, default 60000) and only while the unit is on, warming or cooling. It is
+  never part of the 5-second status poll. Status polls, health reports and the watch share one queue per
+  projector (`server/telemetry-reader.js`), so they never query a projector at the same time, and a
+  report's own reading also reaches the watch.
+- **Limits.** The health reports' limits, so the panel and the reports cannot disagree: Barco UDM 4K22
+  40 C, PT-RZ970 45 C, PT-DW830 series 45 C, with per-slot overrides in the private `health-reports.json`
+  beside the rig (`"ratedAmbientC": { "P3": 40, "P4": 40 }` for units hung in portrait). A unit whose
+  model is not recognised shows its temperature with no level.
+- **Levels.** Watch is the health reports' `watchHeadroomC` (default: within 5 C of the limit). Hot is
+  within 2 C, or half the watch margin if that is smaller, with 1 C of hysteresis before a level clears.
+  Hot and the hysteresis exist only in the watch (`server/thermal.js`) and are a proposal, not a Barco or
+  Panasonic specification. A reading outside -20 to 120 C is treated as no reading.
+- **Freshness.** A value is current while the projector is replying and its latest sample is no older
+  than three sampling intervals. Otherwise the card keeps the last sample, marked Last known, with its age.
+- **Log and history.** A change of level is written to the Log tab once (source `thermal`, result `WARN`;
+  recovery is `OK`), so it also appears in the next health report's event list. Eight hours of samples are
+  kept in memory and are lost when the relay restarts; they also reset when a slot's driver or address
+  changes. `GET /api/thermal?minutes=30&points=180` returns the series and `GET /api/thermal.csv` downloads
+  the retained samples. Export the CSV after each show: two shows in a day can span more than eight hours.
+
+This is advisory display only. It sends no command and does not replace the projector's own alarms.
+Checked against the simulator and loopback protocol stand-ins; the readings on the installed projectors
+are part of the health reports' open venue acceptance.
+
 ## Cues from Millumin or QLab
 
 Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
@@ -107,6 +142,8 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
     server/store.js        data/rig.json read and write
     server/osc.js          OSC and TCP line parsing
     server/drivers/        base.js (interface), pjlink.js, panasonic.js, pulse.js, simulator.js
+    server/thermal.js      levels, in-memory history, CSV
+    public/thermal-watch.js  Thermal watch tab
     public/                index.html, app.css, app.js
 
 ## Status of drivers

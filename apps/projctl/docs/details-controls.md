@@ -43,7 +43,7 @@ The four panels above in the existing details dialog, the conditional heat chip 
 
 - The details dialog grows wider on large screens; short and narrow screens keep a single scrolling column inside the dialog.
 - Thumbnails are drawn from pattern names. An unrecognized name gets a neutral frame rather than a guessed picture.
-- Thermal data exists only on relays that sample it. The simulator does not, so acceptance injects readings in the browser test.
+- Thermal data comes from the relay's Thermal watch sampling (README, "Thermal watch"), which reads only while a projector is on or cooling. Acceptance injects readings in the browser test so each level and age is exact; `test/thermal-browser.cjs` covers the relay's own sampling.
 
 ## Acceptance
 

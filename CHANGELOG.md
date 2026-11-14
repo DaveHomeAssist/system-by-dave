@@ -1,5 +1,14 @@
 # Changelog
 
+## November 14, 2026: Projctl Thermal watch backend
+
+- Add the relay side of Thermal watch. The Thermal watch tab, the heat pill, the card chip and the Details heat reading (November 13) had no data on a relay built from main. The relay now samples air temperature per projector, compares it with the rated limit and sends it in the snapshot and in every status message.
+- Built on the automatic health reports and the November 14 telemetry coordination: the same read-only driver query (Panasonic `QTM:0` intake, Barco outside ambient), the same rated limits and per-slot overrides from `health-reports.json`, the same watch threshold, and the same per-projector queue as status polls and report reads. A report's own reading also reaches the watch.
+- One sample per projector about once a minute (`PROJCTL_THERMAL_SAMPLE_MS`), only while the unit is on, warming or cooling; never on the 5-second status poll. A value counts as current while the unit replies and its latest sample is under three intervals old; otherwise it is shown as last known. Readings outside -20 to 120 C are treated as no reading.
+- Hot (within 2 C of the limit) and 1 C of hysteresis are the watch's own. A change of level writes one Log entry (`WARN`, or `OK` on recovery).
+- New read-only `GET /api/thermal` (series) and `GET /api/thermal.csv`. Eight hours of samples are kept in memory and reset when the relay restarts or a slot's driver or address changes.
+- Tests: `test/thermal.test.js`, `test/thermal-relay.test.js` and `test/thermal-browser.cjs` (in `npm run test:browser`); `test/relay-helper.js` can write settings files beside the test rig. Verified against the simulator and loopback stand-ins only.
+
 ## November 14, 2026: Frozen Monitor on the projctl relay
 
 - Add the Frozen Monitor at `/monitor/` on the projctl relay: Monitor, Cues, Rig,
