@@ -58,6 +58,7 @@ STATIC_PAGES = [
     ("fifa-pitch-crew/", "weekly", "0.6"),
     ("scorecard/", "monthly", "0.6"),
     ("noteforge/", "monthly", "0.7"),
+    ("console-guide/", "monthly", "0.7"),
     ("demos/", "weekly", "0.8"),
     ("demos/engineering-daily/", "daily", "0.7"),
     ("demos/frame-sync.html", "monthly", "0.8"),

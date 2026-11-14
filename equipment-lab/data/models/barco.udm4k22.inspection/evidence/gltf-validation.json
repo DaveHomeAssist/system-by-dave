@@ -1,0 +1,222 @@
+{
+  "uri": "barco.udm4k22.inspection.glb",
+  "mimeType": "model/gltf-binary",
+  "validatorVersion": "2.0.0-dev.3.10",
+  "issues": {
+    "numErrors": 0,
+    "numWarnings": 0,
+    "numInfos": 0,
+    "numHints": 0,
+    "messages": [],
+    "truncated": false
+  },
+  "info": {
+    "version": "2.0",
+    "generator": "THREE.GLTFExporter r184",
+    "extensionsUsed": [
+      "KHR_materials_unlit"
+    ],
+    "resources": [
+      {
+        "pointer": "/buffers/0",
+        "mimeType": "application/gltf-buffer",
+        "storage": "glb",
+        "byteLength": 1008048
+      },
+      {
+        "pointer": "/images/0",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/1",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/2",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 256,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/3",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/4",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/5",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/6",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/7",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/8",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/9",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/10",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/11",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/12",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/13",
+        "mimeType": "image/png",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 128,
+          "format": "rgba",
+          "primaries": "srgb",
+          "transfer": "srgb",
+          "bits": 8
+        }
+      }
+    ],
+    "animationCount": 0,
+    "materialCount": 199,
+    "hasMorphTargets": false,
+    "hasSkins": false,
+    "hasTextures": true,
+    "hasDefaultScene": true,
+    "drawCallCount": 199,
+    "totalVertexCount": 30037,
+    "totalTriangleCount": 15892,
+    "maxUVs": 1,
+    "maxInfluences": 0,
+    "maxAttributes": 3
+  }
+}
