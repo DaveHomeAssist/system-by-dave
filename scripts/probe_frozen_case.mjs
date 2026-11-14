@@ -1,10 +1,13 @@
-// Frozen case, stage 1: the four projection lanes of the Frozen rig entered into the AV by Dave console through
-// its own controls, the way an operator would. Every step is journalled, photographed, filmed and monitored.
+// Frozen case: the Frozen rig built into the AV by Dave console through its own controls, the way an operator
+// would. Every step is journalled, photographed, filmed and monitored.
+//   Stage 1  the four projection lanes in AV Video, and each projector looked up in Equipment Lab
+//   Stage 2  each lane's lens and throw in Throwline, against its plotted coverage
 // Brief, record format and findings: docs/frozen-case.md.
 //
-//   node scripts/probe_frozen_case.mjs [outdir] [--film]
+//   node scripts/probe_frozen_case.mjs [outdir] [--film] [--stage N]
 //     outdir                 where the record is written (default: FROZEN_CASE_OUT, else a folder in the temp directory)
 //     --film                 operator pace, so the session film can be watched (scripts/frozen_case_film.py captions it)
+//     --stage N              run one stage on its own; the stages do not depend on each other's saved data
 //     FROZEN_CASE_BASE=...   read the same journey back against a deployment, for example https://avbydave.com
 //
 // The case facts are read at run time from the public Frozen reference in this repository (wst/projectors.json
@@ -22,7 +25,8 @@ import { closeTopics, suiteTopic, selectView, viewNames, recallPanel, savePack }
 
 const ROOT = resolve(import.meta.dirname, '..');
 const args = process.argv.slice(2), FILM = args.includes('--film');
-const OUT = resolve(args.find(arg => !arg.startsWith('--')) || process.env.FROZEN_CASE_OUT || join(tmpdir(), 'frozen-case'));
+const ONLY = args.includes('--stage') ? Number(args[args.indexOf('--stage') + 1]) : 0;
+const OUT = resolve(args.find((arg, index) => !arg.startsWith('--') && args[index - 1] !== '--stage') || process.env.FROZEN_CASE_OUT || join(tmpdir(), 'frozen-case'));
 const KEY = 'sbd.avVideo.v1';
 // Where panels sit on this device is the console's own device-local state. It changes whenever a view is chosen.
 const DEVICE_LOCAL = ['sbd.avSuite.layout.v1'];
@@ -61,6 +65,29 @@ const expectedChecks = [
   ...LANES.map(lane => ({ name: lane.record['Screen name'], gaps: [...(lane.record['Throw distance'] ? [] : ['Throw distance missing']), ...(lane.status === 'issue' ? ['Reported issue'] : [])] })).filter(row => row.gaps.length),
 ];
 const PLAN = { name: 'Frozen · projection', venue: 'Walnut Street Theatre' };
+
+// Stage 2: what each lane throws. Sizes are whole inches from the plot; a ratio comes from the lane record when it
+// writes one, otherwise from the first lens the lane names that carries a ratio for the projector's raster.
+const plotted = lane => { const m = plot.views.front.lanes[lane].note.match(/(\d+)′\s*(\d+)″\s*×\s*(\d+)′\s*(\d+)″/); assert.ok(m, `lane ${lane} has no plotted size`); return { w: m[1] * 12 + Number(m[2]), h: m[3] * 12 + Number(m[4]) }; };
+const RANGE = /(\d+(?:\.\d+)?)\s*[–-]\s*(\d+(?:\.\d+)?)\s*:\s*1/;
+const THROWS = reference.projectors.map(row => {
+  const raster = (catalog[row.referenceIds[0]].facts.find(fact => /raster/i.test(fact.label)) || {}).value || '';
+  const imager = /1280\s*×\s*800/.test(raster) ? 'WXGA' : /1920\s*×\s*1200/.test(raster) ? 'WUXGA' : '';
+  const size = plotted(row.lane), portrait = row.orientation === 'Portrait', written = row.lens.match(RANGE);
+  let ratio = written ? [Number(written[1]), Number(written[2])] : null, ratioFrom = written ? 'the lane record' : '';
+  for (const id of ratio ? [] : row.referenceIds.slice(1)) {
+    const item = catalog[id], fact = item && imager && item.facts.find(entry => entry.label.includes(imager) && RANGE.test(entry.value));
+    if (fact) { const m = fact.value.match(RANGE); ratio = [Number(m[1]), Number(m[2])]; ratioFrom = `${item.name}, ${fact.label}`; break; }
+  }
+  const told = (row.throwDistance || '').match(/(\d+(?:\.\d+)?)(?:\s*[–-]\s*(\d+(?:\.\d+)?))?\s*ft/);
+  // The ratio is measured across the imager's long side. A projector on its side throws that side up the wall.
+  return { lane: row.lane, job: `Frozen · lane ${row.lane}`, model: row.model, lens: row.lens, portrait, size, basis: portrait ? size.h : size.w, across: portrait ? size.w : size.h,
+    ratio, ratioFrom, recorded: told ? [Number(told[1]), Number(told[2] || told[1])] : null, position: plot.views.plan.lanes[row.lane].note.split(';')[0].trim() };
+});
+const feet = total => `${Math.floor(total / 12)}' ${Math.round(total % 12)}"`;
+const PARTS = { '¼': 0.25, '½': 0.5, '¾': 0.75, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875 };
+const toInches = text => { const m = String(text).match(/(\d+)'\s*(\d+)?([¼½¾⅛⅜⅝⅞])?/); return m ? m[1] * 12 + Number(m[2] || 0) + (PARTS[m[3]] || 0) : NaN; };
+const SHOW = 'Frozen · projection';
 
 // ---------------------------------------------------------------------------------------------- the recorder
 rmSync(OUT, { recursive: true, force: true });
@@ -115,11 +142,12 @@ const storage = () => page.evaluate(() => Object.fromEntries(Object.keys(localSt
 const overflow = () => page.evaluate(() => { const d = document.documentElement; return { x: d.scrollWidth - d.clientWidth, y: d.scrollHeight - d.clientHeight }; }).catch(() => null);
 const savedRaw = () => page.evaluate(key => localStorage.getItem(key), KEY);
 
-const steps = [], findings = []; let count = 0, stopped = null;
+const steps = [], findings = []; let count = 0, stopped = null, stage = 0;
 // One step: what the operator does, what must be true afterwards, and what the monitors saw while it happened.
 // `writes` names the saved keys the step may change; drafts kept for recovery and device-local layout always may.
-// A step that is not `blocking` records its failure and lets the journey go on.
-async function step(id, title, action, { writes = [], detail = '', blocking = true } = {}) {
+// A step that is not `blocking` records its failure and lets the journey go on. `scrolls` marks a page that
+// scrolls by design, where a scrolling document is not a fault.
+async function step(id, title, action, { writes = [], detail = '', blocking = true, scrolls = false } = {}) {
   if (stopped) return;
   const index = ++count, began = Date.now(), from = clock(), before = await storage();
   emit({ event: 'step_started', step: id, index, title });
@@ -131,9 +159,9 @@ async function step(id, title, action, { writes = [], detail = '', blocking = tr
   const unexpected = changed.filter(key => !writes.includes(key) && !DEVICE_LOCAL.includes(key) && !/draft|recovery/i.test(key));
   const shot = `steps/${String(index).padStart(2, '0')}-${id}.png`; await page.screenshot({ path: join(OUT, shot) }).catch(() => {});
   const monitors = { ...drain(), storageChanged: changed, unexpectedWrites: unexpected, overflow: await overflow() };
-  const flags = [...monitors.pageErrors.map(text => `page error: ${text}`), ...monitors.consoleErrors.map(text => `console error: ${text}`), ...monitors.failedRequests.map(text => `request failed: ${text}`), ...monitors.badResponses.map(text => `bad response: ${text}`), ...unexpected.map(key => `unexpected saved key changed: ${key}`), ...(monitors.overflow && (monitors.overflow.x > 0 || monitors.overflow.y > 0) ? [`page scrolls by ${monitors.overflow.x} x ${monitors.overflow.y} px`] : [])];
+  const flags = [...monitors.pageErrors.map(text => `page error: ${text}`), ...monitors.consoleErrors.map(text => `console error: ${text}`), ...monitors.failedRequests.map(text => `request failed: ${text}`), ...monitors.badResponses.map(text => `bad response: ${text}`), ...unexpected.map(key => `unexpected saved key changed: ${key}`), ...(!scrolls && monitors.overflow && (monitors.overflow.x > 0 || monitors.overflow.y > 0) ? [`page scrolls by ${monitors.overflow.x} x ${monitors.overflow.y} px`] : [])];
   if (status === 'passed' && flags.length) status = 'flagged';
-  const entry = { step: id, index, title, detail, status, duration_ms: Date.now() - began, film: [from, clock()], observed, flags, monitors, evidence: [{ file: shot, sha256: sha(join(OUT, shot)) }], ...(error ? { error } : {}) };
+  const entry = { stage, step: id, index, title, detail, status, duration_ms: Date.now() - began, film: [from, clock()], observed, flags, monitors, evidence: [{ file: shot, sha256: sha(join(OUT, shot)) }], ...(error ? { error } : {}) };
   emit({ event: 'step_finished', ...entry }); steps.push(entry);
   console.log(`${status.toUpperCase().padEnd(7)} ${String(index).padStart(2, '0')} ${id}${error ? ` :: ${error}` : ''}${flags.length ? ` :: ${flags.join('; ')}` : ''}`);
   if (status === 'failed' && blocking) stopped = id;
@@ -164,7 +192,7 @@ let deployed = null;
 if (live) { try { const response = await context.request.get(`${base}/source.json`); if (response.ok()) { const source = await response.json(); deployed = { commit: source.sourceCommit || null, files: source.files ?? null }; } } catch {} }
 emit({ event: 'run_started', base: live ? base : 'local checkout', commit, deployed, film: FILM, case: { source: ['wst/projectors.json', 'wst/stage/plot.json'], referenceUpdated: reference.updated, lanes: LANES.map(lane => lane.lane), plan: PLAN } });
 let saved = null;
-try {
+async function stageOne() {
   await step('open-console', 'Open the AV by Dave console', async () => {
     await page.goto(`${base}/av/`); await page.locator('.suite-app').first().waitFor(); await pause(900);
     ensure(await page.locator('.console-panel').count() === 0, 'the console should open on an empty Workspace view');
@@ -316,6 +344,181 @@ try {
     if (missed.length) finding('FC-F2', `Equipment Lab finds nothing for ${missed.join(' or ')} as the rig record writes ${missed.length === 1 ? 'it' : 'them'}; the catalogue spelling works.`);
     return found;
   }, { detail: 'Nothing links a projection record to the library yet; this looks each model up by hand.' });
+}
+
+// ---------------------------------------------------------------------------------------------- stage 2
+// Throwline. The console shows it as a panel; exact ratios are entered in its planner page, which keeps a show
+// board and saved jobs of its own. The planner page scrolls by design.
+const planner = {
+  tab: async id => { await page.locator(`#${id}`).click(); await settle(150); await pause(200); },
+  set: async (id, value) => { const field = page.locator(`#${id}`); await type(field, value); await field.press('Enter'); await field.blur(); await settle(120); },
+  // The hand-off card is the planner's own summary of the job; wait for it to carry this job before reading.
+  card: async job => { await planner.tab('result-tab-handoff'); const card = page.locator('#result-panel-handoff'); await card.filter({ hasText: job }).waitFor(); await settle(150); return card.innerText(); },
+  warnings: async () => {
+    await planner.tab('result-tab-warnings'); await page.locator('#result-panel-warnings').filter({ hasText: /good to know|check before|fix before/i }).waitFor(); await settle(150);
+    const lines = (await page.locator('#result-panel-warnings').innerText()).split('\n').map(line => line.trim()).filter(Boolean), found = { fix: [], check: [], note: [] }; let into = null;
+    for (const line of lines) { if (/^fix before/i.test(line)) into = 'fix'; else if (/^check before/i.test(line)) into = 'check'; else if (/^good to know/i.test(line)) into = 'note'; else if (into && !/^\d+$/.test(line)) found[into].push(line); }
+    return found;
+  },
+  read: text => {
+    const throwLine = text.match(/Throw\s+(.+?) closest → (.+?) farthest/), mark = text.match(/(Set|Plan) mark\s+(.+?) screen → optical origin · (.+)/), comfort = text.match(/Comfort zone\s+(.+?) → (.+?) ·/);
+    return { closest: throwLine && throwLine[1].trim(), farthest: throwLine && throwLine[2].trim(), comfort: comfort && [comfort[1].trim(), comfort[2].trim()], mark: mark && mark[2].trim(), verdict: mark && mark[3].trim() };
+  },
+  // Screen, ratio and picture shape for one lane. `turned` enters a portrait picture on its side.
+  enter: async (lane, { turned = lane.portrait, job = lane.job } = {}) => {
+    await planner.tab('setup-tab-screen'); await planner.set('job', job);
+    await page.locator('#sasp').selectOption({ label: 'Free' });
+    await planner.set('sw', feet(turned ? lane.basis : lane.size.w)); await planner.set('sh', feet(turned ? lane.across : lane.size.h));
+    await planner.tab('setup-tab-optics');
+    await page.locator('#lens').selectOption({ index: 0 }); await planner.set('trmin', String(lane.ratio[0])); await planner.set('trmax', String(lane.ratio[1]));
+    const shape = await page.locator('#raster option').evaluateAll(options => options.find(option => option.textContent.trim().startsWith('16:10'))?.value);
+    await page.locator('#raster').selectOption(shape); await pause(200);
+  },
+};
+const THROWLINE_KEYS = ['throwline:jobs:v2', 'throwline:show:v1'];
+const plannedThrows = {};
+
+async function stageTwo() {
+  await step('throwline-panel', 'Open Throwline in the console', async () => {
+    if (new URL(page.url()).pathname !== '/av/') { await page.goto(`${base}/av/`); await page.locator('.suite-app').first().waitFor(); const dismiss = page.getByRole('button', { name: 'Dismiss', exact: true }); if (await dismiss.count()) await dismiss.click(); }
+    await page.locator('.sbd-rail__all').click(); await page.locator('#sbdRailAllApps').waitFor({ state: 'visible' }); await pause(400);
+    await page.locator('#sbdRailAllApps [data-rail-ref="tool:throwline"]').click();
+    await page.waitForFunction(() => document.querySelector('.suite-header h1')?.textContent === 'Throwline');
+    const frame = page.locator('.console-panel iframe'); await frame.waitFor();
+    const source = new URL(await frame.getAttribute('src'), base);
+    ensure(new URL(page.url()).pathname === '/av/', 'Throwline should open inside the console');
+    ensure(source.pathname === '/ProjectorThrow/' && source.searchParams.get('sbdEmbed') === 'panel', `the panel should hold Throwline without its page chrome; it holds ${source.pathname}${source.search}`);
+    const inside = page.frameLocator('.console-panel iframe');
+    await inside.locator('html[data-sbd-embed="panel"]').waitFor(); await inside.locator('three-d-stage').waitFor(); await pause(900);
+    return { panel: `${source.pathname}${source.search}`, page: await inside.locator('title').textContent().catch(() => null), lensChoices: await inside.locator('#lens option').allTextContents(), openFull: new URL(await page.locator('.suite-app-open').getAttribute('href'), base).pathname };
+  }, { writes: ['sbd.avSuite.intro.v1'], detail: 'The panel shows Stage 3D, which offers five preset ratio ranges and no typed ratio.' });
+
+  await step('throwline-planner', 'Open the Throwline planner', async () => {
+    await page.goto(new URL(await page.locator('.suite-app-open').getAttribute('href'), `${base}/av/`).href);
+    await page.locator('three-d-stage').waitFor(); await pause(700);
+    const welcome = page.locator('#onboardingExplore'), welcomed = await welcome.isVisible().catch(() => false);
+    if (welcomed) { await welcome.click(); await pause(300); }
+    await page.getByRole('link', { name: 'Planner', exact: true }).click();
+    await page.locator('#setup-tab-screen').waitFor(); await pause(600);
+    ensure(new URL(page.url()).searchParams.get('workspace') === 'planner', 'the Planner link should open the planner page');
+    return { welcomed, planner: `${new URL(page.url()).pathname}?workspace=planner` };
+  }, { writes: ['throwline:stage-onboarding:v1'], scrolls: true, detail: 'Open full lands on Stage 3D; exact ratios are typed in the planner, one link further.' });
+
+  await step('throwline-catalog', 'Look for the Frozen projectors and lenses in Throwline', async () => {
+    await planner.tab('setup-tab-optics');
+    const plain = text => text.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const audited = (await page.locator('#catalogProjector option').allTextContents()).slice(1).map(text => text.trim());
+    const models = [...new Set(THROWS.map(lane => lane.model))], lensNames = [...new Set(reference.catalog.filter(item => /^lens/i.test(item.category)).map(item => item.name.replace(/^(Panasonic|Barco)\s+/, '')).filter(name => /^[A-Z]{2}-/.test(name)))];
+    const inAudited = models.filter(model => audited.some(entry => plain(entry).includes(plain(model.replace(/^(Panasonic|Barco)\s+/, '').replace(/U$/, '')))));
+    // The older list: which families name a Frozen model, and what ratio it shows for each Frozen lens.
+    const families = await page.locator('#family option').evaluateAll(options => options.map(option => ({ value: option.value, text: option.textContent.trim() }))), first = await page.locator('#family').inputValue(), listed = {};
+    for (const family of families) {
+      await page.locator('#family').selectOption(family.value); await settle(60);
+      for (const text of await page.locator('#lens option').allTextContents()) for (const name of lensNames) if (plain(text).includes(plain(name))) (listed[name] = listed[name] || new Set()).add((text.match(RANGE) || [text.trim()])[0].replace(/\s/g, ''));
+    }
+    await page.locator('#family').selectOption(first); await pause(300);
+    const named = Object.fromEntries(models.map(model => { const key = plain(model.replace(/^(Panasonic|Barco)\s+/, '').replace(/U$/, '').replace(/\s?4K22$/i, '')); return [model, families.filter(family => plain(family.text).includes(key)).map(family => family.text)]; }));
+    const observed = { auditedModels: audited, frozenModelsAudited: inAudited, familiesNamingModel: named, olderListRatios: Object.fromEntries(Object.entries(listed).map(([name, set]) => [name, [...set]])), portraitControl: /portrait|rotat/i.test(await page.locator('body').innerText()) };
+    if (!inAudited.length) finding('FC-F3', `Throwline's audited catalog holds none of the Frozen projectors (${models.join(', ')}). Every lane is planned from a ratio typed by hand and reads as a manual estimate.`);
+    for (const lane of THROWS.filter(entry => entry.ratioFrom === 'the lane record')) {
+      const name = lensNames.find(lensName => plain(lane.lens).includes(plain(lensName))), shown = name && observed.olderListRatios[name], wrote = `${lane.ratio[0].toFixed(3)}–${lane.ratio[1].toFixed(3)}:1`;
+      if (shown && !shown.includes(wrote) && !findings.some(entry => entry.id === 'FC-F4')) finding('FC-F4', `Throwline's older lens list shows ${name} at ${shown.join(' or ')}. The lane record gives ${lane.ratio[0]}–${lane.ratio[1]}:1 for the ${lane.model}. Picking the lens by name plans a different throw.`);
+    }
+    return observed;
+  }, { scrolls: true, detail: 'The audited catalog, then the older family and lens lists.' });
+
+  for (const lane of THROWS) {
+    await step(`throw-${lane.lane}`, `Plan lane ${lane.lane} in Throwline`, async () => {
+      ensure(lane.ratio, `the reference gives no throw ratio for lane ${lane.lane}`);
+      await planner.enter(lane);
+      await planner.tab('setup-tab-placement');
+      const want = { closest: lane.ratio[0] * lane.basis, farthest: lane.ratio[1] * lane.basis }, recorded = [];
+      for (const told of lane.recorded ? [...new Set(lane.recorded)] : []) {
+        await planner.set('dist', feet(told * 12));
+        const at = planner.read(await planner.card(lane.job)), inside = told * 12 >= want.closest * 1.05 && told * 12 <= want.farthest * 0.95;
+        recorded.push({ throw: `${told} ft`, mark: at.mark, verdict: at.verdict, insideComfortZone: inside });
+        ensure(!inside || /good/i.test(at.verdict || ''), `lane ${lane.lane} at ${told} ft is inside the lens's comfort zone by arithmetic; the planner says "${at.verdict}"`, recorded);
+        await planner.tab('setup-tab-placement');
+      }
+      await planner.set('dist', lane.recorded ? feet((lane.recorded[0] + lane.recorded[1]) * 6) : '');
+      const card = await planner.card(lane.job), got = planner.read(card), warnings = await planner.warnings();
+      const observed = { entered: { width: feet(lane.basis), height: feet(lane.across), turnedOnItsSide: lane.portrait }, ratio: lane.ratio, ratioFrom: lane.ratioFrom, throw: { closest: got.closest, farthest: got.farthest }, comfortZone: got.comfort, mark: got.mark, verdict: got.verdict, recorded, warnings };
+      ensure(Math.abs(toInches(got.closest) - want.closest) <= 0.3 && Math.abs(toInches(got.farthest) - want.farthest) <= 0.3, `lane ${lane.lane}: ${lane.ratio[0]}–${lane.ratio[1]} across ${feet(lane.basis)} is ${feet(want.closest)} to ${feet(want.farthest)}; the planner says ${got.closest} to ${got.farthest}`, observed);
+      plannedThrows[lane.lane] = { ...want, warnings };
+      await planner.tab('result-tab-show'); await page.locator('#showAdd').click(); await pause(300);
+      await planner.tab('setup-tab-jobs'); await page.locator('#saveJob').click(); await pause(300);
+      return observed;
+    }, { writes: THROWLINE_KEYS, scrolls: true, detail: `${lane.model} · ${lane.ratio ? `${lane.ratio[0]}–${lane.ratio[1]}:1` : 'no ratio on record'} · ${lane.portrait ? 'portrait, entered on its side' : 'landscape'}${lane.recorded ? ` · recorded throw ${lane.recorded[0]}–${lane.recorded[1]} ft` : ' · no throw on record'}` });
+  }
+
+  const upright = THROWS.find(lane => lane.portrait && lane.recorded) || THROWS.find(lane => lane.portrait);
+  if (upright) await step('throw-upright', `Enter lane ${upright.lane} as plotted, upright`, async () => {
+    const hasControl = /portrait|rotat/i.test(await page.locator('body').innerText());
+    await planner.enter(upright, { turned: false, job: `${upright.job} · as plotted` });
+    await planner.tab('setup-tab-placement'); await planner.set('dist', upright.recorded ? feet((upright.recorded[0] + upright.recorded[1]) * 6) : '');
+    const got = planner.read(await planner.card(`${upright.job} · as plotted`));
+    const observed = { entered: { width: feet(upright.size.w), height: feet(upright.size.h) }, throw: { closest: got.closest, farthest: got.farthest }, mark: got.mark, verdict: got.verdict, portraitControl: hasControl, onItsSide: { closest: feet(plannedThrows[upright.lane]?.closest ?? upright.ratio[0] * upright.basis), farthest: feet(plannedThrows[upright.lane]?.farthest ?? upright.ratio[1] * upright.basis) } };
+    if (!hasControl && Math.abs(toInches(got.closest) - upright.ratio[0] * upright.basis) > 6) finding('FC-F5', `Throwline has no portrait mounting. Entered as plotted (${feet(upright.size.w)} wide by ${feet(upright.size.h)} high), lane ${upright.lane} reads ${got.closest} to ${got.farthest}${upright.recorded ? ` and calls the recorded ${upright.recorded[0]}–${upright.recorded[1]} ft "${got.verdict}"` : ''}. It reads ${observed.onItsSide.closest} to ${observed.onItsSide.farthest} only when the picture is entered on its side.`);
+    return observed;
+  }, { scrolls: true, detail: 'Two of the four lanes are portrait. This is what the planner says when one is entered the way it is drawn.' });
+
+  await step('show-board', 'Name the show board and export it', async () => {
+    await planner.tab('result-tab-show');
+    await type(page.locator('#showName'), SHOW); await page.locator('#showName').blur(); await pause(300);
+    const rows = await page.locator('#showOut .board-row').evaluateAll(nodes => nodes.map(node => ({ name: node.querySelector('.board-title')?.lastChild?.textContent.trim() || '', badge: node.querySelector('.badge')?.textContent.trim() || '', mark: (node.querySelectorAll('.board-meta')[1]?.innerText || '').split('\n')[0] })));
+    same(rows.map(row => row.name), THROWS.map(lane => lane.job), 'the outputs on the show board');
+    const file = await download(() => page.locator('#showExport').click(), 'frozen-throwline-show.json'), show = JSON.parse(readFileSync(file, 'utf8')).show;
+    same(show.outputs.map(output => [output.name, output.state.trA, output.state.trB, output.state.w, output.state.h]), THROWS.map(lane => [lane.job, lane.ratio[0], lane.ratio[1], lane.basis, lane.across]), 'the exported show');
+    const stopped = rows.filter(row => /stop/i.test(row.badge)).map(row => row.name.replace('Frozen · ', '')), zone = THROWS.filter(lane => (plannedThrows[lane.lane]?.warnings.fix || []).some(text => /placement zone you entered/i.test(text))).map(lane => `lane ${lane.lane}`);
+    await planner.tab('setup-tab-solver');
+    const solverZone = [await page.locator('#solverNear').inputValue(), await page.locator('#solverFar').inputValue()];
+    if (zone.length) finding('FC-F6', `Throwline marks ${zone.join(' and ')} "Fix before you hang it: no projector and lens in the catalog can reach the placement zone you entered"${stopped.length ? ', and the show board shows STOP' : ''}. No zone was entered: the solver's default ${solverZone[0]} to ${solverZone[1]} zone raises it.`);
+    return { show: show.name, rows, solverZone, file: { file: file.slice(OUT.length + 1), bytes: readFileSync(file).length, sha256: sha(file) } };
+  }, { writes: THROWLINE_KEYS, scrolls: true, detail: 'Four outputs, one per lane, in drawing order.' });
+
+  // What the records imply together, where the reference gives one lane a throw and puts the others beside it.
+  const anchor = THROWS.find(lane => lane.recorded);
+  if (anchor) {
+    const beside = THROWS.filter(lane => lane !== anchor && !lane.recorded && lane.ratio && lane.position === anchor.position);
+    const over = beside.map(lane => ({ lane, narrowest: anchor.recorded[0] * 12 / lane.ratio[1], widest: anchor.recorded[1] * 12 / lane.ratio[0] })).filter(row => row.narrowest > row.lane.basis * 1.05);
+    if (over.length) finding('FC-R1', `Records, not the application: at lane ${anchor.lane}'s recorded ${anchor.recorded[0]}–${anchor.recorded[1]} ft, ${over.map(row => `lane ${row.lane.lane} (${row.lane.ratio[0]}–${row.lane.ratio[1]}:1 from ${row.lane.ratioFrom}) would throw ${feet(row.narrowest)} to ${feet(row.widest)} across a plotted ${feet(row.lane.basis)}`).join('; ')}. All are plotted at "${anchor.position}". Either they sit closer, or their rasters overfill the plotted coverage; the reference has no throw for them.`);
+  }
+
+  await step('throwline-reload', 'Reload the planner and read the jobs back', async () => {
+    const before = await storage();
+    await page.reload(); await page.locator('#setup-tab-screen').waitFor(); await pause(600);
+    await planner.tab('setup-tab-jobs'); await page.locator('#setup-panel-jobs').filter({ hasText: THROWS[0].job }).waitFor(); await settle(200);
+    const jobs = await page.locator('#setup-panel-jobs').innerText();
+    ensure(THROWS.every(lane => jobs.includes(lane.job)), 'every lane should still be a saved job after a reload');
+    await planner.tab('result-tab-show');
+    same(await page.locator('#showOut .board-row .board-title').evaluateAll(nodes => nodes.map(node => node.lastChild.textContent.trim())), THROWS.map(lane => lane.job), 'the show board after a reload');
+    same(await page.locator('#showName').inputValue(), SHOW, 'the show name after a reload');
+    const after = await storage();
+    return { savedJobs: THROWS.length, outputs: THROWS.length, sameBytes: THROWLINE_KEYS.every(key => before[key] === after[key]) };
+  }, { writes: THROWLINE_KEYS, scrolls: true, detail: 'Jobs and the show board live in this browser only.' });
+
+  const sent = anchor || THROWS[THROWS.length - 1];
+  await step('stage-3d', `Send lane ${sent.lane} to Stage 3D`, async () => {
+    await planner.tab('result-tab-show');
+    await page.locator('#showOut .board-row').filter({ hasText: sent.job }).locator('button[data-output-load]').first().click(); await pause(500);
+    const link = new URL(await page.locator('#stage3dLink').getAttribute('href'), page.url());
+    await page.locator('#stage3dLink').click(); await page.locator('three-d-stage').waitFor(); await pause(900);
+    const welcome = page.locator('#onboardingExplore'); if (await welcome.isVisible().catch(() => false)) { await welcome.click(); await pause(300); }
+    await settle(1200);
+    const params = new URL(page.url()).searchParams, strip = (await page.locator('[class*=flight]').first().innerText()).replace(/\s+/g, ' ').trim(), badge = (await page.locator('#provenanceBadge').innerText()).trim(), line = (await page.locator('.provenance-line').first().innerText()).replace(/\s+/g, ' ').trim();
+    const observed = { sent: link.search, ratio: [Number(params.get('min')), Number(params.get('max'))], distanceFeet: Number(params.get('dist')), screenFeet: Number(params.get('w')), provenance: badge, verdict: line, strip };
+    same(observed.ratio, sent.ratio, 'the ratio Stage 3D received');
+    ensure(Math.abs(observed.screenFeet * 12 - sent.basis) < 0.05, `Stage 3D should receive a ${feet(sent.basis)} screen; it received ${observed.screenFeet} ft`, observed);
+    ensure(/manual/i.test(badge), `a typed ratio should arrive as a manual estimate; the badge says "${badge}"`, observed);
+    ensure(strip.includes(feet(sent.basis)), `the Stage 3D strip should show a ${feet(sent.basis)} screen; it shows "${strip}"`, observed);
+    return observed;
+  }, { writes: ['throwline:stage-onboarding:v1'], detail: 'The typed ratio must arrive as a manual estimate, never as verified.' });
+}
+
+const STAGES = [{ n: 1, title: 'Projection lanes in AV Video', run: stageOne }, { n: 2, title: 'Lens and throw in Throwline', run: stageTwo }].filter(entry => !ONLY || entry.n === ONLY);
+assert.ok(STAGES.length, `no stage ${ONLY}`);
+try {
+  for (const entry of STAGES) { stage = entry.n; emit({ event: 'stage_started', stage: entry.n, title: entry.title }); await entry.run(); }
 } finally {
   const video = page.video(); await context.close(); await browser.close(); if (server) await server.close();
   const raw = video ? await video.path().catch(() => null) : null;
@@ -326,6 +529,6 @@ const tally = name => steps.filter(entry => entry.status === name).length;
 const result = tally('failed') ? 'failed' : tally('flagged') ? 'flagged' : 'passed';
 const totals = { steps: steps.length, passed: tally('passed'), flagged: tally('flagged'), failed: tally('failed'), findings: findings.length };
 emit({ event: 'run_finished', result, ...totals, stoppedAt: stopped, film_seconds: clock() });
-writeFileSync(join(OUT, 'summary.json'), JSON.stringify({ schema: 'system-by-dave.frozen-case.summary.v1', run_id: runId, result, base: live ? base : 'local checkout', commit, deployed, film: FILM, referenceUpdated: reference.updated, totals, expectedChecks, findings, steps }, null, 1));
+writeFileSync(join(OUT, 'summary.json'), JSON.stringify({ schema: 'system-by-dave.frozen-case.summary.v1', run_id: runId, result, stages: STAGES.map(entry => ({ n: entry.n, title: entry.title })), base: live ? base : 'local checkout', commit, deployed, film: FILM, referenceUpdated: reference.updated, totals, expectedChecks, findings, steps }, null, 1));
 console.log(`${result === 'failed' ? 'FAIL' : 'PASS'} frozen case: ${live ? base : 'local checkout'}, ${totals.steps} steps, ${totals.passed} passed, ${totals.flagged} flagged, ${totals.failed} failed, ${totals.findings} noted. Record: ${OUT}`);
 process.exit(result === 'failed' ? 1 : 0);

@@ -205,7 +205,7 @@ Pages workflow before a production claim.
   `npm run verify:public-consistency`.
 - **AV registry, tools, themes, or offline assets:** `npm run verify:av`; add
   the relevant Gear Reference or browser probe when affected.
-- **AV console applications or the Frozen reference in `wst/`:**
+- **AV console applications, Throwline or the Frozen reference in `wst/`:**
   `npm run test:frozen-case` (`docs/frozen-case.md`); after deployment, read
   it back with `FROZEN_CASE_BASE=https://avbydave.com`.
 - **AV Workbook:** `npm run typecheck:av-workbook`,
