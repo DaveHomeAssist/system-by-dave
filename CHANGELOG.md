@@ -1,5 +1,12 @@
 # Changelog
 
+## November 14, 2026: Monitor link inside Projctl
+
+- Projctl's header gains a Monitor button and its Home view a Frozen Monitor
+  choice; both open `/monitor/` in a new tab. The button is icon-only below
+  1100 px and hidden on short landscape phones and 320 px screens, where Home
+  keeps the way in, so the header keeps its existing rows.
+
 ## November 14, 2026: Frozen Monitor on the projctl relay
 
 - Add the Frozen Monitor at `/monitor/` on the projctl relay: Monitor, Cues, Rig,

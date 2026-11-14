@@ -90,6 +90,24 @@ const SIZES = [[1440, 900], [1024, 768], [680, 900], [375, 812]];
 
     assert.deepEqual(errors, [], 'browser errors while the relay was up');
     assert.equal(taskWrites, 0);
+
+    // Projctl links to the monitor: a header button where there is room, and always a Home choice.
+    await page.goto(relay.base + '/');
+    const link = page.locator('#monitor-link');
+    assert.equal(await link.getAttribute('href'), '/monitor/');
+    assert.equal(await link.getAttribute('target'), '_blank');
+    for (const [width, height] of [[1440, 900], [1024, 768], [680, 900], [375, 812]]) {
+      await page.setViewportSize({ width, height });
+      const box = await link.boundingBox();
+      assert.ok(box && box.width >= 44 && box.height >= 44, `monitor link target at ${width}x${height}`);
+      assert.ok(await page.evaluate(() => { const h = document.querySelector('.pj-header'); return h.scrollWidth <= h.clientWidth; }), `header overflows at ${width}x${height}`);
+    }
+    await page.setViewportSize({ width: 844, height: 390 });
+    assert.equal(await link.isVisible(), false, 'short landscape keeps the header to one row');
+    await page.evaluate(() => document.querySelector('#tab-btn-home').click());
+    assert.equal(await page.locator('#tab-home .pj-home-monitor').getAttribute('href'), '/monitor/');
+    assert.equal(await page.locator('#tab-home .pj-home-monitor').isVisible(), true);
+    console.log('projctl monitor links');
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(relay.base + '/monitor/');
     await until(async () => /4 of 4 replying/.test(await page.locator('#mv-count').textContent()));
