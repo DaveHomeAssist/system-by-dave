@@ -20,8 +20,10 @@ test('relay writes power-on, manual and power-off health reports without holding
 
   const manual = (await relay.api('health-reports/run', {})).body.report;
   assert.equal(manual.kind, 'manual');
-  assert.deepEqual(manual.counts, { units: 4, reached: 4, flagged: 0, watch: 0, unreachable: 0 });
-  assert.match(manual.findings, /^No overheating: 0 of 4 units flagged/);
+  assert.deepEqual(manual.counts, { units: 4, reached: 4, flagged: 0, watch: 0, unreachable: 0, incomplete: 2 });
+  assert.match(manual.findings, /^No temperature, fan or alarm flags reported by 4 of 4 units with alarm feedback/);
+  assert.match(manual.findings, /P2 \(rated limit unavailable\)/);
+  assert.match(manual.findings, /P3 \(rated limit unavailable\)/);
   assert.equal(manual.notion.state, 'local-only');
 
   const first = (await relay.api('command', off)).body;

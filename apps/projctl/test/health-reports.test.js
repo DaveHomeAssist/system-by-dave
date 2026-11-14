@@ -57,18 +57,19 @@ test('settings are private, validated and optional', (t) => {
   assert.match(bad.error, /unreadable/); assert.deepEqual(bad.notion, {}); assert.equal(bad.enabled, true);
 });
 
-test('the 2026-11-11 readings produce the same findings as the hand-written report', () => {
+test('complete readings report observed flags and headroom', () => {
   const units = rows();
   assert.deepEqual(units.map((u) => u.headroomC), [10.2, 22, 13, 3]);
   assert.deepEqual(units.map((u) => u.verdict), ['ok', 'ok', 'ok', 'watch']);
   assert.equal(units[0].password, undefined);
   const s = summarize(units);
-  assert.match(s.findings, /^No overheating: 0 of 4 units flagged for temperature, fan or alarm\./);
+  assert.match(s.findings, /^No temperature, fan or alarm flags reported by 4 of 4 units with alarm feedback\./);
+  assert.match(s.findings, /Coverage: temperature 4\/4, alarm feedback 4\/4, rated limit 4\/4\./);
   assert.match(s.findings, /Least headroom: P4 \(lane D, Panasonic PT-DW830U, 192\.168\.5\.23\) 3 °C \(37 °C intake, 40 °C limit\)\./);
   assert.match(s.findings, /PJLink warnings: P3 other warning; P4 other warning\./);
   assert.match(s.followUp, /P4 \(lane D, 192\.168\.5\.23\): inspect intake clearance and exhaust path, 3 °C headroom\./);
   assert.match(s.followUp, /P3, P4: read the Self Test screen for the "other" warning\./);
-  assert.deepEqual(s.counts, { units: 4, reached: 4, flagged: 0, watch: 1, unreachable: 0 });
+  assert.deepEqual(s.counts, { units: 4, reached: 4, flagged: 0, watch: 1, unreachable: 0, incomplete: 0 });
 });
 
 test('flags, alarms, unreachable units and missing readings are reported', () => {
@@ -91,6 +92,76 @@ test('flags, alarms, unreachable units and missing readings are reported', () =>
   assert.match(md, /readings: timeout \(port 1024\)/);
   const none = summarize(units.map((u) => ({ ...u, online: false, verdict: 'unreachable', headroomC: null })));
   assert.match(none.findings, /^No units reachable; 0 of 4 read\./);
+});
+
+test('incomplete readings never receive an ok verdict', () => {
+  const cases = [
+    { name: 'temperature missing', status: { errors: ok }, readings: null, gaps: ['temperature'] },
+    { name: 'alarms missing', status: { errors: null }, readings: panasonic(25), gaps: ['alarm feedback'] },
+    { name: 'both missing', status: { errors: null }, readings: null, gaps: ['temperature', 'alarm feedback'] },
+    { name: 'empty alarm object', status: { errors: {} }, readings: panasonic(25), gaps: ['alarm feedback'] },
+    { name: 'partial alarm object', status: { errors: { temp: 0 } }, readings: panasonic(25), gaps: ['alarm feedback'] },
+    { name: 'invalid alarm value', status: { errors: { ...ok, fan: null } }, readings: panasonic(25), gaps: ['alarm feedback'] },
+    { name: 'blank Pulse alarm', status: { errors: null }, readings: { ...panasonic(25), alarm: '  ' }, gaps: ['alarm feedback'] },
+    { name: 'unknown model limit', projector: { model: 'Unknown', slot: 'X' }, status: { errors: ok }, readings: panasonic(25), gaps: ['rated limit'] },
+  ];
+  for (const scenario of cases) {
+    const projector = { ...RIG[1], ...scenario.projector };
+    const row = unitRow(projector, { online: true, power: 'on', ...scenario.status }, {}, scenario.readings);
+    assert.equal(row.verdict, 'incomplete', scenario.name);
+    const summary = summarize([row]);
+    assert.equal(summary.counts.incomplete, 1, scenario.name);
+    assert.match(summary.findings, /Assessment incomplete for 1 of 1 units/);
+    assert.doesNotMatch(summary.findings, /No overheating/);
+    const report = buildReport({ kind: 'manual', startedAt: 0, finishedAt: 1, units: [row] });
+    const markdown = renderMarkdown(report);
+    const page = notionPage(report, 'd'.repeat(32));
+    for (const gap of scenario.gaps) {
+      assert.ok(markdown.includes(`${gap} unavailable`), scenario.name);
+      assert.ok(JSON.stringify(page).includes(`${gap} unavailable`), scenario.name);
+    }
+    assert.ok(summary.followUp.includes('unavailable'), scenario.name);
+    assert.equal(row.intakeC, scenario.readings ? 25 : null);
+  }
+});
+
+test('faults and low headroom remain prominent when assessment is incomplete', () => {
+  const fault = unitRow(RIG[1], { online: true, errors: { ...ok, temp: 2 } });
+  const watch = unitRow(RIG[3], { online: true, errors: null }, {}, panasonic(38), null, CONFIG);
+  const missing = unitRow(RIG[0], { online: true, errors: null });
+  const unreachable = unitRow(RIG[2], { online: false, errors: ok }, {}, panasonic(25));
+  assert.equal(fault.verdict, 'flag');
+  assert.equal(unitRow(RIG[1], { online: true, errors: { temp: 2 } }).verdict, 'flag', 'a known fault survives partial alarm feedback');
+  assert.equal(watch.verdict, 'watch');
+  assert.equal(unreachable.verdict, 'unreachable');
+  const summary = summarize([fault, watch, missing, unreachable]);
+  assert.match(summary.findings, /^1 of 4 units flagged:/);
+  assert.match(summary.findings, /Assessment incomplete for 4 of 4 units/);
+  assert.match(summary.findings, /Coverage: temperature 1\/4, alarm feedback 1\/4, rated limit 4\/4/);
+  assert.match(summary.findings, /Temperatures not read: P2, P1/);
+  assert.match(summary.followUp, /inspect intake clearance/);
+  assert.equal(summary.counts.incomplete, 4);
+});
+
+test('unreachable and empty reports retain explicit coverage', () => {
+  const row = unitRow(RIG[1], { online: false, errors: ok }, {}, panasonic(25));
+  const summary = summarize([row]);
+  assert.match(summary.findings, /^No units reachable; 0 of 1 read/);
+  assert.match(summary.findings, /Coverage: temperature 0\/1, alarm feedback 0\/1, rated limit 1\/1/);
+  assert.equal(summary.counts.incomplete, 1);
+  assert.equal(summarize([]).findings, 'No assigned projectors.');
+  assert.equal(summarize([]).counts.incomplete, 0);
+});
+
+test('saved reports without completeness fields still render in Markdown and Notion', () => {
+  const report = JSON.parse(JSON.stringify(buildReport({ kind: 'manual', startedAt: 0, finishedAt: 1, units: rows() })));
+  delete report.counts.incomplete;
+  report.units[1].intakeC = null;
+  report.units[1].headroomC = null;
+  report.units[1].verdict = 'ok';
+  assert.match(renderMarkdown(report), /Assessment incomplete \(temperature unavailable\)/);
+  assert.ok(JSON.stringify(notionPage(report, 'd'.repeat(32))).includes('Assessment incomplete (temperature unavailable)'));
+  assert.equal(report.units[1].verdict, 'ok', 'rendering preserves saved report data');
 });
 
 test('Notion page carries the four properties and a unit table', () => {
@@ -159,6 +230,22 @@ function rigEngine(t, { start = '2026-11-12T22:10:00Z', config = CONFIG, publish
   const kinds = () => engine.view().reports.map((r) => r.kind).reverse();
   return { engine, clock, live, set, kinds, dir };
 }
+
+test('incomplete report verdicts and coverage survive saving and reload', async (t) => {
+  const first = rigEngine(t, { readTelemetry: () => null });
+  const summary = await first.engine.run();
+  assert.equal(summary.counts.incomplete, 4);
+  assert.match(summary.findings, /Coverage: temperature 0\/4, alarm feedback 4\/4/);
+  const file = path.join(first.dir, `${summary.id}.json`);
+  const saved = JSON.parse(fs.readFileSync(file, 'utf8'));
+  assert.ok(saved.units.every((unit) => unit.verdict === 'incomplete' && unit.intakeC === null));
+  assert.match(fs.readFileSync(file.replace(/\.json$/, '.md'), 'utf8'), /Assessment incomplete/);
+  await first.engine.stop();
+  const restarted = rigEngine(t, { dir: first.dir });
+  assert.deepEqual(restarted.engine.view().reports[0].counts, summary.counts);
+  assert.equal(restarted.engine.view().reports[0].findings, summary.findings);
+  await restarted.engine.stop();
+});
 
 test('power-on, hourly and power-off reports follow the lit session', async (t) => {
   const { engine, clock, set, kinds, dir } = rigEngine(t);

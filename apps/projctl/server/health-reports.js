@@ -54,6 +54,15 @@ const level = (v) => (v === 2 ? 'error' : 'warning');
 const lanePart = (u) => (u.lane ? `lane ${u.lane}, ` : '');
 const who = (u) => `${u.slot} (${lanePart(u)}${u.model || 'unknown model'}, ${u.ip})`;
 
+function assessmentGaps(unit) {
+  if (!unit.online) return ['device reply'];
+  const gaps = [];
+  if (!Number.isFinite(unit.intakeC)) gaps.push('temperature');
+  if (!unit.flagSource) gaps.push('alarm feedback');
+  if (!Number.isFinite(unit.ratedC)) gaps.push('rated limit');
+  return gaps;
+}
+
 export function unitRow(p, st = {}, conn = {}, readings = null, readError = null, config = DEFAULTS) {
   const sensors = Array.isArray(readings?.sensors) ? readings.sensors : [];
   const intake = sensors.find((s) => s.role === 'intake' && Number.isFinite(s.c));
@@ -61,7 +70,8 @@ export function unitRow(p, st = {}, conn = {}, readings = null, readError = null
   const rated = ratedAmbientC(p, config.ratedAmbientC);
   const headroom = intake && rated != null ? round1(rated - intake.c) : null;
   const errors = st?.errors && typeof st.errors === 'object' ? st.errors : null; // PJLink ERST; null for Pulse
-  const alarm = readings?.alarm == null ? null : String(readings.alarm);
+  const alarm = readings?.alarm == null ? null : String(readings.alarm).trim() || null;
+  const completeErrors = errors && ['fan', 'lamp', 'temp', 'cover', 'filter', 'other'].every((key) => [0, 1, 2].includes(errors[key]));
   const online = !!st?.online;
   const flags = [], warnings = [];
   if (online && errors) {
@@ -71,14 +81,15 @@ export function unitRow(p, st = {}, conn = {}, readings = null, readError = null
   }
   if (online && alarm && !/^ok$/i.test(alarm)) flags.push(`alarm ${alarm}`);
   const watchAt = Number.isFinite(config.watchHeadroomC) ? config.watchHeadroomC : DEFAULTS.watchHeadroomC;
-  const verdict = !online ? 'unreachable' : flags.length ? 'flag' : headroom != null && headroom <= watchAt ? 'watch' : 'ok';
-  return {
+  const row = {
     slot: p.slot, lane: p.lane || null, model: [p.make, p.model].filter(Boolean).join(' ') || p.label || null, ip: p.ip || null, owner: p.owner || null,
     power: st?.power || 'unknown', online, lastContact: conn?.lastSuccessAt || null, lightHours: Number.isFinite(st?.lightHours) ? st.lightHours : null,
     intakeC: intake ? intake.c : null, intakeLabel: intake?.label || null, internalC: internal, ratedC: rated, headroomC: headroom,
-    flags, warnings, alarm, flagSource: errors ? 'PJLink' : alarm != null ? 'Pulse' : null,
-    readError: readError ? String(readError).slice(0, 200) : null, verdict,
+    flags, warnings, alarm, flagSource: completeErrors ? 'PJLink' : alarm != null ? 'Pulse' : null,
+    readError: readError ? String(readError).slice(0, 200) : null,
   };
+  row.verdict = !online ? 'unreachable' : flags.length ? 'flag' : headroom != null && headroom <= watchAt ? 'watch' : assessmentGaps(row).length ? 'incomplete' : 'ok';
+  return row;
 }
 
 export function summarize(units) {
@@ -88,13 +99,20 @@ export function summarize(units) {
   const watch = units.filter((u) => u.verdict === 'watch');
   const unreachable = units.filter((u) => u.verdict === 'unreachable');
   const warned = units.filter((u) => u.warnings.length);
-  const notRead = reached.filter((u) => u.intakeC == null);
-  const least = units.filter((u) => u.headroomC != null).sort((a, b) => a.headroomC - b.headroomC)[0];
+  const notRead = reached.filter((u) => !Number.isFinite(u.intakeC));
+  const alarmRead = reached.filter((u) => u.flagSource);
+  const temperatureRead = reached.filter((u) => Number.isFinite(u.intakeC));
+  const limits = units.filter((u) => Number.isFinite(u.ratedC));
+  const incomplete = units.filter((u) => assessmentGaps(u).length);
+  const least = reached.filter((u) => Number.isFinite(u.headroomC)).sort((a, b) => a.headroomC - b.headroomC)[0];
   const findings = [];
   if (!n) findings.push('No assigned projectors.');
   else if (!reached.length) findings.push(`No units reachable; 0 of ${n} read.`);
   else if (flagged.length) findings.push(`${flagged.length} of ${n} units flagged: ${flagged.map((u) => `${who(u)} ${u.flags.join(', ')}`).join('; ')}.`);
-  else findings.push(`No overheating: 0 of ${n} units flagged for temperature, fan or alarm.`);
+  else if (alarmRead.length) findings.push(`No temperature, fan or alarm flags reported by ${alarmRead.length} of ${n} units with alarm feedback.`);
+  else findings.push(`Alarm feedback unavailable for all ${n} units.`);
+  if (incomplete.length) findings.push(`Assessment incomplete for ${incomplete.length} of ${n} units: ${incomplete.map((u) => `${u.slot} (${assessmentGaps(u).map((gap) => `${gap} unavailable`).join(', ')})`).join('; ')}.`);
+  if (n) findings.push(`Coverage: temperature ${temperatureRead.length}/${n}, alarm feedback ${alarmRead.length}/${n}, rated limit ${limits.length}/${n}.`);
   if (least) findings.push(`Least headroom: ${who(least)} ${num(least.headroomC)} °C (${num(least.intakeC)} °C intake, ${least.ratedC} °C limit).`);
   if (warned.length) findings.push(`PJLink warnings: ${warned.map((u) => `${u.slot} ${u.warnings.join(', ')}`).join('; ')}.`);
   if (unreachable.length && reached.length) findings.push(`Not reached: ${unreachable.map(who).join(', ')}.`);
@@ -104,10 +122,11 @@ export function summarize(units) {
   for (const u of watch) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): inspect intake clearance and exhaust path, ${num(u.headroomC)} °C headroom.`);
   const other = warned.filter((u) => u.warnings.some((w) => w.startsWith('other')));
   if (other.length) follow.push(`${other.map((u) => u.slot).join(', ')}: read the Self Test screen for the "other" warning.`);
+  for (const u of incomplete.filter((u) => u.online)) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): check ${assessmentGaps(u).map((gap) => `${gap} unavailable`).join(', ')} before assessing health.`);
   for (const u of unreachable) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): not reachable at report time; check network and power.`);
   return {
     findings: findings.join(' '), followUp: follow.length ? follow.join(' ') : 'None.',
-    counts: { units: n, reached: reached.length, flagged: flagged.length, watch: watch.length, unreachable: unreachable.length },
+    counts: { units: n, reached: reached.length, flagged: flagged.length, watch: watch.length, unreachable: unreachable.length, incomplete: incomplete.length },
   };
 }
 
@@ -127,6 +146,8 @@ function flagCell(u) {
   const parts = [...u.flags, ...u.warnings];
   if (u.flagSource === 'Pulse' && !u.flags.length) parts.unshift(`Alarm ${u.alarm}`);
   if (!parts.length) parts.push(u.flagSource ? `None (${u.flagSource})` : 'Not reported');
+  const gaps = assessmentGaps(u);
+  if (gaps.length) parts.push(`Assessment incomplete (${gaps.map((gap) => `${gap} unavailable`).join(', ')})`);
   if (u.readError) parts.push(`readings: ${u.readError}`);
   return parts.join('; ');
 }

@@ -1,5 +1,15 @@
 # Changelog
 
+## November 13, 2026: Projctl health report completeness
+
+- Classify reachable units with missing temperature, alarm feedback or rated
+  limits as incomplete. Preserve observed Fault and Watch verdicts and show
+  missing evidence independently.
+- Replace the overheating conclusion with reported alarm findings and explicit
+  coverage counts. Include incomplete evidence in Markdown and Notion unit rows.
+- Cover missing, partial, unreachable and mixed-fault reports, plus rendering
+  saved reports and the isolated relay report path.
+
 ## November 13, 2026: Equipment Lab release 1.2.0, Panasonic PT-DW830 lamp access and PT-RZ970
 
 - Adopt shared Equipment Lab release 1.2.0: 46 entries, the confirmed 43 plus P01, P02 Panasonic PT-DW830 and P03 Panasonic PT-RZ970. Both projectors open in the inspector, sit under Video and projection, and join the offline set.
