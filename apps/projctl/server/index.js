@@ -15,12 +15,14 @@ import { hasLens, lensSummary, lensPositionMatch, lensMotorState, LENS_AXES } fr
 import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
 import { confirmations } from './confirmations.js';
+import { createCommandBinding } from './command-binding.js';
 import { readStagePlot } from './stage-plot.js';
 import { readVenue, readVenueAsset } from './venue-model.js';
 import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
 import { createPoller } from './polling.js';
+import { createTelemetryReader } from './telemetry-reader.js';
 import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader, ratedAmbientC, isLit } from './health-reports.js';
 import { createThermalMonitor, thermalThresholds, plausibleAirC, thermalCsv, RETENTION_MS } from './thermal.js';
 import { createManualDiscovery } from './discovery.js';
@@ -34,6 +36,7 @@ const POLL_MS = Number(process.env.POLL_MS || 5000);
 const SIM = process.env.SIM === '1';
 const readHostDisplays = createHostDisplayReader({ sim: SIM });
 const STARTED_AT = new Date().toISOString();
+const commandBinding = createCommandBinding();
 // ---- Login (optional). Set PJ_PASSCODE to require it: needed before exposing the relay beyond the LAN.
 const PASSCODE = (process.env.PROJCTL_PASSWORD || process.env.PJ_PASSCODE || '').trim();
 const SESSION_SECRET = randomBytes(32).toString('hex'); // sessions end when the relay restarts
@@ -86,7 +89,7 @@ function connectionError(p, error) {
 function driverFor(p) {
   const key = JSON.stringify([p.slot, p.driver, p.ip, p.user, p.password, p.model]);
   let d = drivers.get(p.slot);
-  if (!d || d._key !== key) { d = makeDriver(p); d._key = key; drivers.set(p.slot, d); }
+  if (!d || d._key !== key) { d?.close?.(); d = makeDriver(p); d._key = key; drivers.set(p.slot, d); }
   return d;
 }
 
@@ -102,10 +105,10 @@ setInterval(() => broadcast({ type: 'heartbeat', at: new Date().toISOString() })
 function snapshot() {
   return {
     type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM, preferredInput: rig.preferredInput || 'HDMI',
-    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS },
+    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS, commandTargetBinding: 1 },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
-      return { ...p, password: undefined, status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p),
+      return { ...p, password: undefined, controlRevision: commandBinding.revision(p), status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p),
         inputs: d.inputs ?? p.inputs, displayInfo: displayInfoFor(p), inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lensJog?.axes.length, lensJog: d.lensJog, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
@@ -115,6 +118,7 @@ function snapshot() {
 }
 
 // ---- Polling ----
+const telemetry = createTelemetryReader();
 function poll(p) {
   return poller.poll(p.slot);
 }
@@ -123,6 +127,7 @@ poller = createPoller({
   intervalMs: POLL_MS,
   timeoutMs: 10000,
   maxRetryMs: Math.max(POLL_MS, 15000),
+  coordinate: (p, read, options) => telemetry.poll(p.slot, read, options),
   read: (p, options) => p.ip ? driverFor(p).getStatus(options) : null,
   started(p, { identityChanged, at }) {
     // Temperature history follows the physical target. Correcting a model or lane label keeps it; a new driver or address starts fresh.
@@ -179,7 +184,7 @@ health = createHealthReports({
   status: (slot) => status.get(slot),
   connection: (slot) => connections.get(slot),
   events: () => rig.events,
-  readTelemetry, // shared with the Thermal watch below: one read at a time per projector
+  readTelemetry, // shared with the Thermal watch below, through the coordinated reader
   describeError: (p, e) => connectionError(store.projector(p.slot) || p, e),
   publish: healthConfig.notion.databaseId ? createNotionPublisher({ databaseId: healthConfig.notion.databaseId, token: notionTokenReader({ keychain: !SIM }) }) : null,
   powerOnDelayMs: Number(process.env.PROJCTL_HEALTH_POWER_ON_DELAY_MS || 120000),
@@ -197,7 +202,6 @@ const thermal = createThermalMonitor({ thresholds: thermalLevels }); // in memor
 const thermalTargets = new Map();  // slot -> driver and address behind the history
 const thermalReads = new Map();    // slot -> { at, ok } for the latest finished temperature read
 const thermalAttempts = new Map(); // slot -> when the latest read started
-const telemetryQueue = new Map();  // slot -> tail of that projector's read chain
 const limitFor = (p) => ratedAmbientC(p, healthConfig.ratedAmbientC);
 const airSource = (p) => { const d = driverFor(p); return d.healthReadings ? (d.kind === 'pulse' ? 'ambient' : 'intake') : null; };
 // `source` says what the driver can report (intake, ambient or nothing), so the page can tell
@@ -221,16 +225,15 @@ function recordThermal(p, readings) {
   }
   broadcastStatus(p);
 }
-// One temperature reader per projector for health reports and the Thermal watch. Reads for a
-// slot run one after another, and every finished read reaches the watch, whoever asked for it.
+// One temperature reader per projector for health reports and the Thermal watch. It goes through
+// the coordinated reader, so a read never overlaps that projector's status poll or another read,
+// and every finished read reaches the watch, whoever asked for it.
 function readTelemetry(p, options) {
   const current = store.projector(p.slot) || p, d = driverFor(current);
   if (!d.healthReadings) return null;
   thermalAttempts.set(current.slot, Date.now());
-  const run = () => d.healthReadings(options);
-  const read = (telemetryQueue.get(current.slot) || Promise.resolve()).then(run, run);
-  telemetryQueue.set(current.slot, read.catch(() => {}));
-  return read.then((readings) => { try { recordThermal(current, readings); } catch (e) { console.error('[thermal]', e.message); } return readings; },
+  return telemetry.read(current.slot, d, options).then(
+    (readings) => { try { recordThermal(current, readings); } catch (e) { console.error('[thermal]', e.message); } return readings; },
     (error) => { thermalReads.set(current.slot, { at: Date.now(), ok: false }); throw error; });
 }
 // Called after each successful status poll; takes a sample only when one is due.
@@ -269,40 +272,48 @@ const discover = createManualDiscovery({
 
 // ---- Commands ----
 const pendingConfirm = confirmations();
+let lockRevision = 0;
 const targetIdentity = (p) => JSON.stringify([p.slot, p.driver, p.ip, p.user, p.password, p.model]);
 
+function commandGuard(slot) {
+  return commandBinding.commandGuard(slot, () => ({
+    projector: store.projector(slot), status: status.get(slot),
+    lock: rig.lock, lockRevision, busy: busy.has(slot),
+  }));
+}
+function captureCommandGuards(slots) {
+  return new Map(slots.map(slot => [slot, commandGuard(slot)]));
+}
 function fmtArg(a) { return a && typeof a === 'object' ? Object.values(a).join(' ') : String(a); }
 async function command(slot, cmd, arg, source = 'ui', executionGuard) {
-  executionGuard?.();
   const p = store.projector(slot);
   if (!p) throw httpErr(404, `no projector ${slot}`);
-  const st = status.get(slot);
-  if (!st.online) throw httpErr(409, `${slot} is offline`);
+  const check = commandGuard(slot);
+  let ownsMovement = false;
+  const guard = () => { executionGuard?.(); check(cmd, arg, { allowBusy: ownsMovement }); };
   const resettingInput = cmd === 'resetInput';
   if (resettingInput) {
     const preference = inputPreferenceFor(p);
     if (!preference.available) throw httpErr(409, preference.reason);
     cmd = 'input'; arg = preference.value;
   }
-  if (rig.lock && (cmd === 'power' && !arg || cmd === 'input' || cmd === 'pattern' || cmd === 'lens' && arg?.op !== 'stop' || cmd === 'picture')) throw httpErr(423, 'show lock is on');
-  if (cmd === 'power' && arg && st.power === POWER.COOLING) throw httpErr(409, `${slot} is cooling, wait before power on`);
+  guard();
   const stop = cmd === 'lens' && arg?.op === 'stop';
-  if (busy.has(slot) && !stop && cmd !== 'shutter') throw httpErr(409, `${slot}: lens is moving. Wait or use Stop lens.`);
   const d = driverFor(p);
   const moving = cmd === 'lens' && !stop;
-  if (moving) { busy.set(slot, 'lens'); broadcast({ type: 'busy', slot, busy: 'lens' }); }
+  if (moving) { ownsMovement = true; busy.set(slot, 'lens'); broadcast({ type: 'busy', slot, busy: 'lens' }); }
   let result, detail;
   // Readings start alongside the off command; the command itself is never held.
   if (cmd === 'power' && !arg) health?.powerOff(slot, source);
   try {
-    if (cmd === 'power') result = await d.power(!!arg, { guard: executionGuard });
-    else if (cmd === 'shutter') result = await d.shutter(!!arg);
-    else if (cmd === 'input') result = await d.input(String(arg));
-    else if (cmd === 'pattern') { if (!d.pattern) throw httpErr(400, `${slot}: test pattern not supported by ${d.kind} driver`); let code = String(arg); if (d.kind === 'pulse') code = code === '08' ? 'internal:colorbars' : code === '00' ? 'off' : code; result = await d.pattern(code); }
-    else if (cmd === 'lens') { if (arg?.op === 'recall') { if (!d.recallLens) throw httpErr(400, `${slot}: absolute lens recall not stored by this driver`); result = await d.recallLens(arg.targets || {}); } else { if (!d.lens) throw httpErr(400, `${slot}: lens not supported by ${d.kind} driver`); result = await d.lens(arg); } }
-    else if (cmd === 'picture') { if (!d.picture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`); result = await d.picture(arg.key, arg.value); }
+    if (cmd === 'power') result = await d.power(!!arg, { guard });
+    else if (cmd === 'shutter') result = await d.shutter(!!arg, { guard });
+    else if (cmd === 'input') result = await d.input(String(arg), { guard });
+    else if (cmd === 'pattern') { if (!d.pattern) throw httpErr(400, `${slot}: test pattern not supported by ${d.kind} driver`); let code = String(arg); if (d.kind === 'pulse') code = code === '08' ? 'internal:colorbars' : code === '00' ? 'off' : code; result = await d.pattern(code, { guard }); }
+    else if (cmd === 'lens') { if (arg?.op === 'recall') { if (!d.recallLens) throw httpErr(400, `${slot}: absolute lens recall not stored by this driver`); result = await d.recallLens(arg.targets || {}, { guard }); } else { if (!d.lens) throw httpErr(400, `${slot}: lens not supported by ${d.kind} driver`); result = await d.lens(arg, { guard }); } }
+    else if (cmd === 'picture') { if (!d.picture) throw httpErr(400, `${slot}: picture settings not supported by ${d.kind} driver`); result = await d.picture(arg.key, arg.value, { guard }); }
     else throw httpErr(400, `unknown command ${cmd}`);
-  } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw Object.assign(httpErr(502, e.message), { scheduleSkip: !!e.scheduleSkip }); }
+  } catch (e) { result = 'ERR'; detail = e.message; store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail }); broadcast({ type: 'event', event: rig.events.at(-1) }); throw Object.assign(httpErr(e.status || 502, e.message), { scheduleSkip: !!e.scheduleSkip }); }
   finally { if (moving) { busy.delete(slot); broadcast({ type: 'busy', slot, busy: null }); } }
   store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail });
   broadcast({ type: 'event', event: rig.events.at(-1) });
@@ -334,7 +345,8 @@ try {
   console.error('[schedules] Saved power schedules unavailable; scheduling disabled, controller remains available.');
 }
 
-async function uiCommand(slot, cmd, arg, confirm) {
+async function uiCommand(slot, cmd, arg, confirm, expectedTargets) {
+  const checkReviewedTarget = commandBinding.guard(expectedTargets, () => rig.projectors, slot);
   if ((cmd === 'power' || cmd === 'shutter') && ![0, 1, false, true].includes(arg)) throw httpErr(400, `${cmd} needs 0 or 1`);
   const slots = slot === 'all' ? rig.projectors.map((p) => p.slot) : [slot];
   const out = {};
@@ -348,7 +360,7 @@ async function uiCommand(slot, cmd, arg, confirm) {
       for (const s of slots) {
         const p = store.projector(s);
         if (!p || !status.get(s)?.online) { out[s] = { error: p ? `${s} is offline` : `no projector ${s}` }; continue; }
-        targets.push({ slot: s, identity: targetIdentity(p) });
+        targets.push({ slot: s, identity: commandBinding.revision(p) });
       }
       if (targets.length) out[slot] = {
         confirm: pendingConfirm.issue(key, targets),
@@ -362,18 +374,24 @@ async function uiCommand(slot, cmd, arg, confirm) {
   }
   // Consume the batch confirmation before any network wait. A slow target must not
   // expire confirmations for later devices, and a failed target must not stop them.
+  const guards = captureCommandGuards(targets.map(target => target.slot));
   for (const target of targets) {
     try {
+      checkReviewedTarget(target.slot);
       const p = store.projector(target.slot);
-      if (target.identity && (!p || targetIdentity(p) !== target.identity)) throw httpErr(409, 'configuration changed; confirm again');
-      out[target.slot] = await command(target.slot, cmd, arg);
+      if (target.identity && (!p || commandBinding.revision(p) !== target.identity)) throw httpErr(409, 'configuration changed; confirm again');
+      out[target.slot] = await command(target.slot, cmd, arg, 'ui', () => {
+        checkReviewedTarget(target.slot);
+        guards.get(target.slot)(cmd, arg, { allowBusy: true });
+      });
     } catch (e) { out[target.slot] = { error: e.message }; }
   }
   return out;
 }
 
 async function recallPreset(name, source = 'ui', confirmedLens = false) {
-  const pr = rig.presets.find((x) => x.name === name);
+  const found = rig.presets.find((x) => x.name === name);
+  const pr = found && structuredClone(found);
   if (!pr) throw httpErr(404, `no preset ${name}`);
   if (!hasLens(pr)) return recallOldPreset(pr, source);
   const key = `preset:${name}:lens`;
@@ -381,19 +399,20 @@ async function recallPreset(name, source = 'ui', confirmedLens = false) {
   if (!confirmedLens) {
     const targets = Object.entries(summary).filter(([, v]) => v.supported.length).map(([slot]) => slot);
     if (rig.lock && targets.some((slot) => status.get(slot)?.online)) throw httpErr(423, 'show lock is on');
-    return { preset: name, confirm: targets.length ? pendingConfirm.issue(key, targets.map((slot) => ({ slot, identity: targetIdentity(store.projector(slot)) }))) : null,
+    return { preset: name, confirm: targets.length ? pendingConfirm.issue(key, targets.map((slot) => ({ slot, identity: commandBinding.revision(store.projector(slot)) }))) : null,
       message: targets.length ? `Recall lens positions for ${targets.join(', ')}? Re-hang still needs alignment and focus checked.` : 'No absolute lens recall is stored for this rig.',
       projectors: summary };
   }
   const targetsForRecall = (items) => Object.entries(items).filter(([, v]) => v.supported.length).map(([slot]) => slot);
-  const confirmed = confirmedLens === true ? targetsForRecall(summary).map((slot) => ({ slot, identity: targetIdentity(store.projector(slot)) })) : pendingConfirm.take(key, confirmedLens);
+  const confirmed = confirmedLens === true ? targetsForRecall(summary).map((slot) => ({ slot, identity: commandBinding.revision(store.projector(slot)) })) : pendingConfirm.take(key, confirmedLens);
   if (!confirmed) return { preset: name, confirm: null, message: 'Lens confirmation expired. Recall and confirm again.', projectors: summary };
   const out = {};
+  const guards = captureCommandGuards(Object.keys(summary));
   for (const [slot, info] of Object.entries(summary)) {
     if (!confirmed.some((t) => t.slot === slot)) { out[slot] = { ...info, result: 'not confirmed', lens: 'unknown' }; continue; }
-    if (targetIdentity(store.projector(slot)) !== confirmed.find((t) => t.slot === slot).identity) { out[slot] = { ...info, result: 'configuration changed; confirm again', lens: 'unknown' }; continue; }
+    if (commandBinding.revision(store.projector(slot)) !== confirmed.find((t) => t.slot === slot).identity) { out[slot] = { ...info, result: 'configuration changed; confirm again', lens: 'unknown' }; continue; }
     try {
-      const r = await command(slot, 'lens', { op: 'recall', targets: Object.fromEntries(info.supported.map((k) => [k, info.saved[k]])) }, `${source} preset ${name}`);
+      const r = await command(slot, 'lens', { op: 'recall', targets: Object.fromEntries(info.supported.map((k) => [k, info.saved[k]])) }, `${source} preset ${name}`, () => guards.get(slot)('lens', { op: 'recall' }, { allowBusy: true }));
       // Failed polls preserve last-known status for the UI. Those cached values
       // must not verify the movement that just finished.
       const freshLens = r.status?.online && r.status?.connection?.state === 'online' ? r.status.lens : null;
@@ -404,12 +423,14 @@ async function recallPreset(name, source = 'ui', confirmedLens = false) {
 }
 async function recallOldPreset(pr, source) {
   const out = {};
+  const guards = captureCommandGuards(Object.keys(pr.perSlot));
   for (const [slot, want] of Object.entries(pr.perSlot)) {
     const st = status.get(slot); if (!st?.online) { out[slot] = 'offline'; continue; }
     try {
-      if (want.power !== undefined) await command(slot, 'power', want.power, `${source} preset ${pr.name}`);
-      if (want.input) await command(slot, 'input', want.input, `${source} preset ${pr.name}`);
-      if (want.shutter !== undefined) await command(slot, 'shutter', want.shutter === 'closed', `${source} preset ${pr.name}`);
+      const send = (cmd, arg) => command(slot, cmd, arg, `${source} preset ${pr.name}`, () => guards.get(slot)(cmd, arg, { allowBusy: true }));
+      if (want.power !== undefined) await send('power', want.power);
+      if (want.input) await send('input', want.input);
+      if (want.shutter !== undefined) await send('shutter', want.shutter === 'closed');
       out[slot] = 'OK';
     } catch (e) { out[slot] = e.message; }
   }
@@ -447,8 +468,12 @@ async function onCue(addr, args, source) {
     const cmd = parts[2]; const arg = args[0];
     if (cmd !== 'input' && ![0, 1, '0', '1'].includes(arg)) throw new Error(`${cmd} needs 0 or 1`);
     const out = {};
+    const guards = captureCommandGuards(slots);
     for (const s of slots) {
-      try { out[s] = await command(s, cmd, cmd === 'input' ? arg : Number(arg) === 1, source); }
+      try {
+        const value = cmd === 'input' ? arg : Number(arg) === 1;
+        out[s] = await command(s, cmd, value, source, () => guards.get(s)(cmd, value, { allowBusy: true }));
+      }
       catch (e) {
         out[s] = { error: e.message };
         store.event({ source, slot: s, command: addr, result: 'ERR', detail: e.message });
@@ -468,6 +493,12 @@ const PUB = path.join(__dirname, '..', 'public');
 function body(req) { return readJsonBody(req); } // 64 KiB JSON object, 10 s to arrive
 function confirmTokenFor(_name, token) { return typeof token === 'string' && token.length <= 256 ? token : ''; }
 function json(res, code, obj) { res.writeHead(code, { 'content-type': 'application/json', 'access-control-allow-origin': '*' }); res.end(JSON.stringify(obj)); }
+// A read error ends this response instead of surfacing as an uncaught stream error.
+function sendFile(res, file, type) {
+  const stream = fs.createReadStream(file);
+  stream.once('open', () => { res.writeHead(200, { 'content-type': type }); stream.pipe(res); });
+  stream.once('error', () => { if (res.headersSent) res.destroy(); else { res.writeHead(500); res.end('read error'); } });
+}
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
@@ -541,13 +572,14 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, await d.getPicture());
     }
     if (url.pathname === '/api/command' && req.method === 'POST') {
-      const { slot, cmd, arg, confirm } = await body(req);
-      return json(res, 200, await uiCommand(slot, cmd, arg, confirm));
+      const { slot, cmd, arg, confirm, expectedTargets } = await body(req);
+      if (slot === 'all' && req.headers.origin && !expectedTargets) throw httpErr(409, 'Reload the controller before sending a group command.');
+      return json(res, 200, await uiCommand(slot, cmd, arg, confirm, expectedTargets));
     }
     if (url.pathname === '/api/preset/save' && req.method === 'POST') { const { name } = await body(req); if (!name) throw httpErr(400, 'name required'); savePreset(name); return json(res, 200, { ok: true }); }
     if (url.pathname === '/api/preset/recall' && req.method === 'POST') { const { name, confirmLens } = await body(req); return json(res, 200, await recallPreset(name, 'ui', confirmTokenFor(name, confirmLens) || false)); }
     if (url.pathname === '/api/preset/delete' && req.method === 'POST') { const { name } = await body(req); rig.presets = rig.presets.filter((x) => x.name !== name); store.save(); broadcast(snapshot()); return json(res, 200, { ok: true }); }
-    if (url.pathname === '/api/lock' && req.method === 'POST') { const { lock } = await body(req); rig.lock = !!lock; pendingConfirm.clear(); store.save(); store.event({ source: 'ui', slot: '*', command: `lock ${rig.lock ? 'on' : 'off'}`, result: 'OK' }); broadcast(snapshot()); return json(res, 200, { lock: rig.lock }); }
+    if (url.pathname === '/api/lock' && req.method === 'POST') { const { lock } = await body(req); rig.lock = !!lock; lockRevision++; pendingConfirm.clear(); store.save(); store.event({ source: 'ui', slot: '*', command: `lock ${rig.lock ? 'on' : 'off'}`, result: 'OK' }); broadcast(snapshot()); return json(res, 200, { lock: rig.lock }); }
     if (url.pathname === '/api/projector' && req.method === 'POST') {
       const upd = await body(req); const p = store.projector(upd.slot); if (!p) throw httpErr(404, 'no slot');
       for (const k of ['reverseH', 'reverseV']) {
@@ -568,19 +600,25 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname.startsWith('/ProjectorThrow/')) {
       const asset = throwlineAsset(url.pathname);
       if (!asset) { res.writeHead(404); return res.end('not found'); }
-      res.writeHead(200, { 'content-type': 'application/javascript' });
-      return fs.createReadStream(asset).pipe(res);
+      return sendFile(res, asset, 'application/javascript');
     }
     let filePath = url.pathname === '/' ? '/index.html' : url.pathname;
-    const fp = path.join(PUB, path.normalize(filePath));
+    let fp = path.join(PUB, path.normalize(filePath));
     if (!fp.startsWith(PUB) || !fs.existsSync(fp)) { res.writeHead(404); return res.end('not found'); }
+    // A folder serves its index.html (the Frozen Monitor lives at /monitor/). Reading a folder as a
+    // file used to throw outside this handler and stop the relay.
+    if (fs.statSync(fp).isDirectory()) {
+      const folder = '/' + path.relative(PUB, fp).split(path.sep).filter(Boolean).map(encodeURIComponent).join('/');
+      if (!url.pathname.endsWith('/')) { res.writeHead(301, { location: (folder === '/' ? '' : folder) + '/' }); return res.end(); }
+      fp = path.join(fp, 'index.html');
+      if (!fs.existsSync(fp) || !fs.statSync(fp).isFile()) { res.writeHead(404); return res.end('not found'); }
+    }
     if (fp === path.join(PUB, 'index.html')) {
       const html = withThrowlineImports(fs.readFileSync(fp, 'utf8'));
       res.writeHead(200, { 'content-type': MIME['.html'] });
       return res.end(html);
     }
-    res.writeHead(200, { 'content-type': MIME[path.extname(fp)] || 'application/octet-stream' });
-    fs.createReadStream(fp).pipe(res);
+    sendFile(res, fp, MIME[path.extname(fp)] || 'application/octet-stream');
   } catch (e) { if (e.closeConnection) res.setHeader('connection', 'close'); json(res, e.status || 500, { error: e.message }); }
 });
 applyServerLimits(server);

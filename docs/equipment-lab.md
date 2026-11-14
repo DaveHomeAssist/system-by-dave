@@ -145,8 +145,9 @@ opens in the same inspector.
   supports where each is drawn. Practice states that P01 has no practice mode
   and shows the operating note for the selected part. Reference shows scope,
   downloads, Barco's documents and what is not established.
-- **Splash.** P01 sits under Video & PTZ with the preview from its package.
-  Counts derive from the catalog.
+- **Splash.** P01 sits under Video and projection with the preview from its
+  package. That tab was Video & PTZ until 12 November 2026, when Dave asked for
+  the rename. Counts derive from the catalog.
 - **Offline.** P01's manifest, definition and GLB join the offline set under
   cache generation `v20261112-equipment-lab-projector`.
 
@@ -161,6 +162,129 @@ inspector and in Reference.
 
 Rollback: revert the host commit. That restores the 1.0.0 copy, which the
 import still recognizes as a previous release.
+
+## Release 1.2.0: two Panasonic projectors and service states
+
+On 13 November 2026 Dave agreed to add the other two projectors in his rig
+records, and then wrote: "FOCUS on the 830s lamp access and replacement
+mechanisms". The shared repository registered P02 Panasonic PT-DW830 and P03
+Panasonic PT-RZ970 in release 1.2.0. Their briefs,
+[P02](https://github.com/DaveHomeAssist/equipment-lab/blob/main/docs/PANASONIC_PT_DW830.md)
+and [P03](https://github.com/DaveHomeAssist/equipment-lab/blob/main/docs/PANASONIC_PT_RZ970.md),
+own each model's scope, sources and open decisions. This section covers the host.
+
+P02 is the first package whose parts move. Its definition carries four joints,
+five states and two procedures. Its GLB is exported closed, and a node moves
+with a joint when its extras name it. The host needed one new capability for
+that. P03 and the two older packages use none of it.
+
+- **Import.** `scripts/equipment_lab_release.mjs` names release 1.2.0 and the
+  three entries it adds. A release the script does not name is still refused.
+- **Package registry.** A package may carry joints, states, procedures and the
+  view a bare link opens on. P02 opens on the lamp unit cover, seen from the
+  rear. P03 opens on the control panel.
+- **Viewer.** For a package with joints the viewer keeps each tagged node's
+  exported transform. For a state it turns hinge nodes about the joint's axis
+  through its pivot and slides the others along theirs. A joint that moves no
+  node, or a node that names an unknown joint, refuses the package like any
+  other invalid one. The camera goes first, to the view the state names, framed
+  on the parts as they will stand; the parts then move over 450 ms. With
+  reduced motion, or in a hidden tab, the state applies at once. Nothing draws
+  after a move ends.
+- **State row.** A package with states gets a row of state buttons under the
+  view buttons, and the pressed one is the current state. On a narrow panel the
+  row stays on one scrolling line, as the view row does.
+- **Selection.** Choosing an item that is hidden while the projector is closed
+  opens the state that shows it. Any other item leaves the model as it stands.
+  A change of equipment starts at rest. A link may name a state with `state=`;
+  the resting state is left out of links.
+- **Practice.** For a package with procedures, Practice lists the maker's steps
+  in order under its warnings, with the pages they come from and a link to the
+  document. Each step has a button that selects its part in its state and
+  returns to the inspector. The panel says the steps are a summary, that the
+  operating instructions are the reference, and that showing a step sends no
+  hardware commands.
+- **Framing.** A package with states is framed on the box of its parts as they
+  stand, so an open cover costs the picture as little as it can. The other
+  packages keep their framing.
+- **Splash.** P02 and P03 sit under Video and projection with the previews from
+  their packages. Searching for Panasonic now finds three entries: the generic
+  camera body and the two projectors.
+- **Offline.** Six more files join the offline set under cache generation
+  `v20261113-equipment-lab-panasonic`.
+
+Unchanged: C02's ten IDs and P01's 26, their links, copy and framing, the other
+42 entries, routes and saved arrangements. A package without states shows no
+state row and never moves.
+
+P02 and P03 are approximate and not qualified. Lamp replacement involves heat,
+glass and mercury: the steps repeat Panasonic's warnings and its advice to use
+a qualified technician. Inside P02's lamp bay, which part is where and which
+way it moves are Panasonic's; sizes, depths, the 100 degree opening of the
+cover and each travel are approximate or assumed, and each part says so.
+
+Rollback: revert the host commit. That restores the 1.1.0 copy, which the
+import still recognizes as a previous release.
+
+## Small screens
+
+Recorded on 13 November 2026. Two layout defects predated release 1.1.0 and
+affected C02 and P01 alike. The page itself did not scroll, so every viewport
+check passed.
+
+- **Phone held sideways (844 x 390).** The page chooses the console's phone
+  presentation under 500 px tall. At 720 px and wider the shared console
+  stylesheet still applied its rule for a switcher inside the view strip
+  (`flex-basis:100%`), which in the shell's column claimed the full height. The
+  switcher was 272 px tall and the panel body had no height. The shared sheet
+  now keeps the phone switcher a bar at any width
+  ([console workspace](av-console.md)).
+- **320 px wide.** The page's one grid column grew to the width of the four
+  switcher labels, 53 px past the screen. It now stays the width of the screen,
+  and the header, view strip and switcher fit inside it.
+
+The model inspector lays out by the size of its own panel, through a container
+query on the panel. The same inspector is a phone screen on the page, half a
+tablet inside the AV console and any cell on a desktop, so the size of the
+screen says little about the room it has.
+
+| Panel | Layout |
+| --- | --- |
+| 420 px tall or more | Heading, picture, view buttons, hint, item list, as before. |
+| Under 420 px tall | The hint and the collection line go. The picture keeps a floor of 96 to 120 px. |
+| Under 340 px tall and 360 px wide or more | The picture sits beside the item list at the full height of the panel. |
+| Under 480 px wide, and the side column above | The view buttons stay on one scrolling row. |
+
+Whatever still cannot fit scrolls inside the inspector. In the side-by-side
+layout the picture stays in place while the list scrolls. The row of view
+buttons fades at its trailing edge while more buttons follow, and a focused
+button scrolls fully into view. View buttons keep 44 px targets on short
+screens, where they were 32 px. Entries without a native model keep their copy
+panel.
+
+Measured in emulated Chromium, the same in light and dark and for C02 and P01
+unless a row names one:
+
+| Screen | Where | Picture before | Picture now |
+| --- | --- | --- | --- |
+| 844 x 390 | Page | 760 x 20 | 448 x 194 |
+| 844 x 390 | AV console | 385 x 93 | 195 x 212 |
+| 320 x 568 | Page | 313 x 45, clipped at the right edge | 260 x 120 |
+| 320 x 568 | AV console | 308 x 45, hint over the item list | 308 x 98 |
+| 390 x 844 | Page, P01 | 330 x 187 | 330 x 236 |
+| 390 x 844 | Page, C02 | 330 x 307 | 330 x 307 |
+
+Unchanged: IDs, deep links, copy, the catalog, the release import and saved
+arrangements. Desktop and tablet renderings match the previous build, apart
+from P01's view buttons on panels narrower than 480 px. Cache generation is
+`v20261113-console-phone-panels`.
+
+Limits: these are emulated sizes, not devices. A phone's own toolbars leave less
+height than 390 px; at 844 x 340 the picture is 448 x 144. At 320 x 256 the
+header, view strip and switcher leave the panel no room, as before. No physical
+phone or WebKit browser was checked.
+
+Rollback: revert the host commit. No data, package or storage changes with it.
 
 ## Verification record
 
@@ -200,7 +324,8 @@ already has for C02 and that this release leaves alone: in phone landscape
 (844 x 390) the console's panel area collapses to about 20 px, and at 320 px
 wide the inspector is clipped at the right edge. On a phone held upright P01's
 six view buttons take two rows, which leaves its picture 187 px tall at
-390 x 844 where C02 has 307.
+390 x 844 where C02 has 307. All three were addressed on 13 November 2026;
+see Small screens.
 
 P01 opens on the local keypad rather than the body. Selecting the body
 highlights the whole projector, which would show a black unit in the highlight
@@ -210,3 +335,64 @@ colour on first sight.
 records host delivery. Publication and live acceptance are separate release
 gates, and the shared repository's record owns that evidence. No GPU, physical
 phone, WebKit browser or physical projector was checked.
+
+Release 1.2.0 was built and checked on 13 November 2026 in a cloud session with
+Node 22 and Chromium on SwiftShader, pinned to shared revision
+`7c81bb60335e68ff4d767093a34de32919a21601`, on host base
+`cafd077d8e23441c3e0a1f714cbb2001c5442358`. The probe checks 46 entries and four packages. For each it runs
+the deep link, every listed item, each view, model picking, an unknown-item
+link, the native AV route, the splash handoff, the WebGL fallback, a deliberate
+context loss and four invalid-package cases. P02 adds each state from its
+button, the state in the link, a hidden part opening its state, a visible part
+leaving the model as it stands, no drawing while idle, both procedures with
+their steps, a step shown on the model, and a return to rest after leaving the
+package. The state row is in every layout check for P02; P03 lays out as P01
+does and runs a shorter matrix. The probe covers 263 layout cases and 176 panel
+checks and logs no error or `THREE.*` message other than the one line three.js
+writes for each deliberate loss. C02 keeps ten controls and 22 textures and P01
+26 parts and 14 textures; P02 loads 60 parts, 43 textures, eight views and 140
+joint nodes, and P03 45 parts, 38 textures and seven views.
+
+A supplemental check of P02 in 26 points adds a state button from the keyboard,
+a model click in the open lamp bay, reduced motion, three phone sizes
+(390 x 844, 844 x 390 and 320 x 568) and the AV console route. With reduced
+motion a state applies in at most three frames. No GPU, physical phone, WebKit
+browser or physical projector was checked; phone sizes are emulated.
+
+[Pull request 479](https://github.com/DaveHomeAssist/system-by-dave/pull/479)
+records host delivery of release 1.2.0. Publication and live acceptance are
+separate release gates, and the shared repository's record owns that evidence.
+
+The small-screen change was built and checked on 13 November 2026 in a cloud
+session with Node 22 and Chromium on SwiftShader, on host base
+`90444e26ad28a2752c1191bd43650b43580a6fd2`. Rebuilding untouched `main` there
+again reproduced the committed bundles byte for byte. The measurements of the
+previous build and the screenshot comparisons used
+`efb7883f75d2216ce8cce5ab66bcd332b17c9909`; the base differs from it only in
+the splash tab label of pull request 464. The probe adds 320 x 568
+to its sizes and the AV console route at 844 x 390 and 320 x 568. At every size
+except 320 x 256 it asserts that the page frame and its controls are on screen,
+the switcher is a bar, each open panel has a body, the picture is at least
+120 px tall on a sideways phone, no part of the inspector covers another, and
+every control can be brought into the panel and is the thing under its own
+centre. It covers 163 layout cases and 104 panel checks and logs no error. Run
+unchanged against the previous build it fails in 40 of those 104 states, all at
+the two phone sizes, and passes the other 64. It also passes when the system
+font is DejaVu Sans, FreeSans or Carlito instead of Inter, which stands in for
+the fonts other machines and phones use; with the widest of them the page title
+shortens at 320 px.
+
+Every gate in `.github/workflows/av-video.yml` passes there, with the workspace
+probe in Chromium, the theme and viewport contracts, the LED wall probes, the
+public contracts and the domain cutover checks. Screenshots of the other nine
+packs inside the console, the eight retained family builds and the standalone
+Calculator match the previous build at five sizes, apart from Show Control's
+clock. A supplemental check covers keyboard travel through the scrolling view
+buttons, the picture staying in place while the list scrolls, a tap selection
+under touch emulation in landscape, the unknown-item notice, entries without a
+native model and print layout. No physical phone, WebKit browser or GPU was
+checked; the WebKit run of the workspace probe is left to CI.
+
+[Pull request 465](https://github.com/DaveHomeAssist/system-by-dave/pull/465)
+records delivery. Publication and live read-back are separate gates, and the
+shared repository's record owns that evidence.

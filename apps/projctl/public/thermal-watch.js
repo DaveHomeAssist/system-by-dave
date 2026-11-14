@@ -52,10 +52,10 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
     // The lane header is the one control: it opens that lane's controls in the Rig tab.
     li.innerHTML = `
       <div class="pj-thermal-top"><button class="pj-thermal-lane" type="button" data-open aria-label="Open projector ${lane} controls"><b class="pj-thermal-letter">${lane}</b><strong>${esc(LANES[lane].target)}</strong></button><span class="avd-state"><span class="avd-dot avd-dot--idle" aria-hidden="true" data-dot></span><span data-word>No reading</span></span></div>
-      <p class="pj-thermal-reading"><span class="pj-thermal-value" data-value>—</span><span class="pj-thermal-unit">°C</span><span class="pj-thermal-kind pj-mono" data-kind></span><span class="pj-thermal-f pj-mono" data-f></span></p>
+      <p class="pj-thermal-reading"><span class="pj-thermal-value" data-value>N/A</span><span class="pj-thermal-unit">°C</span><span class="pj-thermal-kind pj-mono" data-kind></span><span class="pj-thermal-f pj-mono" data-f></span></p>
       <div class="pj-thermal-meter" role="img" data-meter hidden><span class="pj-thermal-marker"></span></div>
       <dl class="pj-thermal-facts">
-        <div><dt>Headroom</dt><dd data-headroom>—</dd></div><div><dt>Limit</dt><dd data-limit>—</dd></div><div><dt>Peak</dt><dd data-peak>—</dd></div><div><dt>vs coolest</dt><dd data-delta>—</dd></div>
+        <div><dt>Headroom</dt><dd data-headroom>N/A</dd></div><div><dt>Limit</dt><dd data-limit>N/A</dd></div><div><dt>Peak</dt><dd data-peak>N/A</dd></div><div><dt>vs coolest</dt><dd data-delta>N/A</dd></div>
       </dl>
       <svg class="pj-thermal-spark" viewBox="0 0 120 40" preserveAspectRatio="none" role="img" data-spark><path class="pj-thermal-zone" data-zone/><line class="pj-thermal-limit" data-limitline x1="0" x2="120"/><line class="pj-thermal-watchline" data-watchline x1="0" x2="120"/><path class="pj-thermal-line" data-line/></svg>
       <p class="pj-mono pj-thermal-foot" data-foot></p>`;
@@ -77,7 +77,7 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
     li.classList.toggle('stale', has && !live); li.classList.toggle('empty', !has); li.dataset.level = level;
     setAttr(li.querySelector('[data-dot]'), 'class', `avd-dot avd-dot--${info.dot}`);
     setText(li.querySelector('[data-word]'), has && !live ? `Last known · ${info.word}` : info.word);
-    setText(li.querySelector('[data-value]'), has ? f1(v.c) : '—');
+    setText(li.querySelector('[data-value]'), has ? f1(v.c) : 'N/A');
     setText(li.querySelector('[data-kind]'), has ? (v.kind === 'ambient' ? 'ambient' : 'intake') : '');
     setText(li.querySelector('[data-f]'), has ? `${toF(v.c)} °F` : '');
 
@@ -89,11 +89,14 @@ export function createThermalWatch(host, { chip = null, live = null, onOpen = ()
       meter.style.setProperty('--hot', String(clamp(((limit - thresholds.hotHeadroomC) / limit) * 100, 0, 100)));
       setAttr(meter, 'aria-label', `${f1(v.c)} °C within a rated range of 0 to ${limit} °C`);
     }
-    setText(li.querySelector('[data-headroom]'), has && v.headroomC != null ? `${f1(v.headroomC)} °C` : has ? 'no limit' : '—');
-    setText(li.querySelector('[data-limit]'), has ? (Number.isFinite(limit) ? `${limit} °C` : 'Not rated') : '—');
+    setText(li.querySelector('[data-headroom]'), has && v.headroomC != null ? `${f1(v.headroomC)} °C` : has ? 'no limit' : 'N/A');
+    const limitEl = li.querySelector('[data-limit]');
+    const source = v?.limitSource === 'unit' ? 'unit override' : v?.limitSource === 'slot' ? 'slot override' : v?.limitSource === 'safe-default' ? 'safe default' : v?.limitSource === 'model' ? 'model default' : '';
+    setText(limitEl, has ? (Number.isFinite(limit) ? `${limit} °C` : 'Not rated') : 'N/A');
+    setAttr(limitEl, 'title', [source, v?.limitWarning, v?.configError].filter(Boolean).join(' · '));
     const peakEl = li.querySelector('[data-peak]');
-    setText(peakEl, has ? `${f1(v.peakC)} °C` : '—'); setAttr(peakEl, 'title', has && v.peakAt ? `Peak in retained history, at ${clock(v.peakAt)}` : '');
-    setText(li.querySelector('[data-delta]'), has && live && coolest != null ? (v.c - coolest < 0.05 ? 'coolest' : `+${f1(v.c - coolest)} °C`) : '—');
+    setText(peakEl, has ? `${f1(v.peakC)} °C` : 'N/A'); setAttr(peakEl, 'title', has && v.peakAt ? `Peak in retained history, at ${clock(v.peakAt)}` : '');
+    setText(li.querySelector('[data-delta]'), has && live && coolest != null ? (v.c - coolest < 0.05 ? 'coolest' : `+${f1(v.c - coolest)} °C`) : 'N/A');
 
     const pts = (series.get(p?.slot) || []).filter(([t]) => t >= now - WINDOW_MS), spark = li.querySelector('[data-spark]');
     const lo = rated ? limit - 25 : has ? Math.min(...pts.map(([, c]) => c), v.c) - 2 : 0, hi = rated ? limit + 2 : has ? Math.max(...pts.map(([, c]) => c), v.c) + 2 : 1;

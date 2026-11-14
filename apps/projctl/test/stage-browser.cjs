@@ -1,8 +1,9 @@
+const {selectView,selectLane}=require('./operator-ui.cjs');
 const assert = require('node:assert/strict');
 const { check3D, check3DLayout } = require('./stage-3d-browser.cjs');
 
 exports.checkStage = async (page, relay, offline, until) => {
-  await page.locator('[data-tab="stage"]').click();
+  await selectView(page,'stage');
   await page.locator('#stage-workspace').waitFor();
   await check3D(page, relay, offline, until);
   assert.equal(await page.locator('#stage-canvas script').count(), 0);
@@ -70,13 +71,13 @@ exports.checkStage = async (page, relay, offline, until) => {
         ws.send(JSON.stringify(message));
       });
     });
-    await limited.goto(relay.base); await limited.locator('[data-tab="stage"]').click();
+    await limited.goto(relay.base); await selectView(limited,'stage');
     const card = limited.locator('.pj-stage-card[data-lane="B"]');
     await until(async () => (await card.getAttribute('aria-disabled')) === 'true');
     await until(async () => (await card.innerText()).includes('Adjustments unavailable'));
     assert.match(await card.innerText(), /(?:Powered|Standby|Cooling|Warming) · Shutter open · Adjustments unavailable/);
   } finally { await limited.close(); }
-  await page.locator('[data-tab="rig"]').click();
+  await selectView(page,'rig');
 };
 
 exports.checkStageLayout = async (page, width, height, theme) => {

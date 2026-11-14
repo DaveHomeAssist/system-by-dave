@@ -1,23 +1,42 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "9230efa14436b24f95b060330b7e2291c767369d",
-  "deploymentId": "appgdep_6aef97cea46881919b1fb077511d9f68",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_98a84eab0a9c8191adc41a903a0c97cf",
+  "managedSourceCommit": "bfc60c6cf52f79c5b9d08916b30c7d1adf0a8f30",
+  "deploymentId": "appgdep_6af80aea4b78819183693171baffc0b2",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_b3f8c5205054819189e1c84e78956dc0",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 25,
-  "acceptedSourceCommit": "6e0753a6153868ba2b12aa32038b54bd329d3c65",
-  "publicVerifiedAt": "2026-11-07T21:29:15.499248+00:00",
-  "taskPublication": {
-    "versionNumber": 24,
-    "managedSourceCommit": "8cc745f4462669b4b46c68d26f54671a233d7e3c",
-    "deploymentId": "appgdep_6aef95e5d80081919c7198811c750e6b",
-    "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_71f61d1fe53081918c4127512a272d61",
-    "preservedManagedBaseline": "80e8f8122cab6b9fa30507609e0b0aed3dfc35c5"
-  },
-  "sourceReconciliation": "Versions 23 and 25 added Tech Schedule, More navigation and pixel reference in the managed source. Preserve those assets when synchronizing the canonical projector renderer; the checked-in Worker is not the complete current production snapshot."
+  "versionNumber": 28,
+  "acceptedSourceCommit": "a1ee7562f2a8a960258d0e9a58d0b93ec3ee7b03",
+  "publicVerifiedAt": "2026-11-14T07:18:00Z",
+  "priorPublications": [
+    {
+      "versionNumber": 26,
+      "managedSourceCommit": "a71c93323f0c05f800dad739e100d19eb29e942d",
+      "deploymentId": "appgdep_6aef9e70105c8191b7eea51e3f68e574",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_471db80b43a88191bf2314b335bb7eb3",
+      "acceptedSourceCommit": "b09a0b06970892371173de0fa78a32a608a22fa9",
+      "publicVerifiedAt": "2026-11-13T22:45:00Z"
+    },
+    {
+      "versionNumber": 25,
+      "managedSourceCommit": "9230efa14436b24f95b060330b7e2291c767369d",
+      "deploymentId": "appgdep_6aef97cea46881919b1fb077511d9f68",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_98a84eab0a9c8191adc41a903a0c97cf",
+      "acceptedSourceCommit": "6e0753a6153868ba2b12aa32038b54bd329d3c65",
+      "publicVerifiedAt": "2026-11-07T21:29:15.499248+00:00"
+    },
+    {
+      "versionNumber": 24,
+      "managedSourceCommit": "8cc745f4462669b4b46c68d26f54671a233d7e3c",
+      "deploymentId": "appgdep_6aef95e5d80081919c7198811c750e6b",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_71f61d1fe53081918c4127512a272d61",
+      "preservedManagedBaseline": "80e8f8122cab6b9fa30507609e0b0aed3dfc35c5",
+      "note": "Stage/reference polish from PR 448 (taskPublication)"
+    }
+  ],
+  "sourceReconciliation": "Version 28 adds current R5 signal-flow PDF and consolidated R4 handoff under Planning Documents. Public copies omit private network addresses. Hosted-only generation preserves the local controller. Version 27 was saved but never deployed."
 }

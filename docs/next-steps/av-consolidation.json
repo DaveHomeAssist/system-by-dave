@@ -1,6 +1,6 @@
 {
   "id": "av-consolidation",
-  "name": "AV Suite \u2014 Toolbox & consolidation",
+  "name": "AV Suite — Toolbox & consolidation",
   "repos": [
     "DaveHomeAssist/system-by-dave"
   ],
@@ -89,8 +89,8 @@
   },
   "lastActivity": "2026-10-30",
   "shipped": [
-    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
-    "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+    "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
+    "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
     "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit.",
     "AV Video owns its document and optional Patch, Checks, Backups and Displays/Projection modules; remaining Video capabilities follow the maintained plan.",
     "Console workspace and Show panels (#262), Stage Slate first-use theme (#263), and separate draft/layout persistence (#264) are published.",
@@ -296,7 +296,7 @@
   ],
   "phases": [
     {
-      "name": "Stage 1a \u2014 Returning-neutral Toolbox \u2014 Delivered",
+      "name": "Stage 1a — Returning-neutral Toolbox — Delivered",
       "goal": "Implement the settled default while preserving explicit entries and saved data.",
       "items": [
         "Merged in #256; relevant PR contracts and public deployment pass.",
@@ -305,7 +305,7 @@
       "gate": "Returning neutral entry opens Toolbox and explicit Show/context/history journeys pass."
     },
     {
-      "name": "Stage 1b \u2014 Public Workbook withdrawal \u2014 Delivered",
+      "name": "Stage 1b — Public Workbook withdrawal — Delivered",
       "goal": "Remove public promotion and editor publication under the maintained plan.",
       "items": [
         "Merged in #257 and metadata follow-up #258; public readback verified.",
@@ -314,17 +314,17 @@
       "gate": "Staged and live former entry URLs return to Toolbox; no promoted/public editor remains."
     },
     {
-      "name": "Viewport delivery \u2014 Complete",
+      "name": "Viewport delivery — Complete",
       "goal": "Record delivered layout work independently from application consolidation.",
       "items": [
-        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237\u2013#243).",
-        "Four checks succeeded on each of PRs #237\u2013#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
+        "All six viewport candidates delivered across 20 routes: Calculator, shared navigation, 12 Show Operations tools, Cue Sheet, five Logistics tools and StagePlotter (#237–#243).",
+        "Four checks succeeded on each of PRs #237–#243; source deployment 37175190577 and AV destination deployment 37176560749 succeeded.",
         "Published source.json and remote main agree on 1adc884 (checked 2026-10-04); live Calculator functional probes pass Chromium and WebKit."
       ],
       "gate": "Release proof is recorded; physical/operator acceptance remains separate."
     },
     {
-      "name": "Remaining application consolidation \u2014 Paused 2026-10-13 (superseded by the shell)",
+      "name": "Remaining application consolidation — Paused 2026-10-13 (superseded by the shell)",
       "goal": "Follow the maintained spec; do not reopen settled app ownership.",
       "items": [
         "Eight standalone primary applications are published, isolated-live tested and navigable from the Rail through #312. Canonical specialist compatibility, connected workflows and physical/operator acceptance remain separate.",
@@ -341,11 +341,11 @@
       "gate": "Per-slice data compatibility, release proof and operator acceptance."
     },
     {
-      "name": "Application Rail and console snapshots \u2014 Delivered",
+      "name": "Application Rail and console snapshots — Delivered",
       "goal": "Recall all nine primary AV identities within AV Video's shared console while preserving standalone applications and independent data.",
       "items": [
         "Toolbox and the exact nine RAIL-1B console slots are followed by All apps and Customize; all nine published primary applications open their canonical routes and mapped apps appear once in All apps.",
-        "RAIL-2A uses a phone Apps launcher below 720px, compact rail at 720\u20131439px and labeled rail at 1440px+. Device-local pin, unpin, reorder, reset and corrupt-preference recovery are live.",
+        "RAIL-2A uses a phone Apps launcher below 720px, compact rail at 720–1439px and labeled rail at 1440px+. Device-local pin, unpin, reorder, reset and corrupt-preference recovery are live.",
         "PR #279, source deployment 37572814064 and AV destination deployment 37574460288 passed. Walter live acceptance covered 11 viewport fixtures; seven published Rail/AV assets matched 55bec1a byte-for-byte.",
         "Walter's isolated returning-client fixture kept one browser context from published adf1f1e through reviewed 55bec1a: AV Video data, UI-written Rail customization and typed context survived the worker update, the old cache was removed, all seven Rail/AV assets were cached and the updated app reopened offline.",
         "PR #312, source deployment 37893934453 and AV destination deployment 37895712977 passed at c77b0cd. Production source.json, nine live Console links, zero Planned entries, Audio launch and ten AV Video page-asset matches were verified; physical/operator acceptance remains open.",
@@ -355,7 +355,7 @@
       "gate": "Exact-head CI, repaired generated-output parity, both publications, production provenance, live console journeys and asset parity passed. Physical devices and operator acceptance remain separate."
     },
     {
-      "name": "Show Ops shared console \u2014 Delivered",
+      "name": "Show Ops shared console — Delivered",
       "goal": "Use the existing Show Ops records and guarded imports through the same configurable panel engine as AV Video.",
       "items": [
         "Rooms, Crew and Tasks work side by side; Setup, Handoff and Backup remain available through the chooser and quick controls.",
@@ -365,7 +365,7 @@
       "gate": "Source, generated bundle parity, exact-head CI, both publications and isolated live browser behavior passed. Missing specialist capabilities and physical/operator acceptance remain separate."
     },
     {
-      "name": "Console workspace and recovery \u2014 Delivered",
+      "name": "Console workspace and recovery — Delivered",
       "goal": "Protect operator edits while making panel arrangements reusable.",
       "items": [
         "Shared console presentation with independent Video document ownership; explicit Save and unchanged recovery keys.",
@@ -376,7 +376,7 @@
       "gate": "PR #266 release verified separately from physical/operator acceptance."
     },
     {
-      "name": "Cameras and Playback \u2014 Delivered",
+      "name": "Cameras and Playback — Delivered",
       "goal": "Deliver ordered camera shots and playback cues in the independent Video console.",
       "items": [
         "Preserve every legacy field, status, duration string and original import; keep legacy pages unchanged.",
@@ -386,7 +386,7 @@
       "gate": "Source, required CI, publication and isolated live acceptance passed; physical/operator acceptance remains separate."
     },
     {
-      "name": "AV Suite shell \u2014 In progress",
+      "name": "AV Suite shell — In progress",
       "goal": "One /av/ console with every application as a panel pack and the legacy sheets retired (docs/av-suite-shell.md).",
       "items": [
         "Slice A: brief, supersede notes, hold on per-family conversions (PR #338, 2026-10-13)",
@@ -402,7 +402,8 @@
     "D7: fixes in other repos (fmp-suite, DeckForge, BPM Delay, Lansdowne, PlotForge) - do upstream now or defer?",
     "D8: record the audit outcome in the repo like docs/fmp-camera-simulator-audit-2026-09.md? (recommended)",
     "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?",
-    "DIAG-1 [unlocks AVC-16 and the AVC-15 recovery panel; held by Dave 2026-10-28]: how production errors reach Dave. Option A local-only recovery panel with Copy diagnostics (version, source commit, browser, recent errors, offline status) kept on the device, with no third party and no CSP change (recommended); Option B hosted error tracker such as Sentry, with a connect-src change and a third-party script; Option C self-hosted report endpoint, with a connect-src change and a service to maintain."
+    "DIAG-1 [unlocks AVC-16 and the AVC-15 recovery panel; held by Dave 2026-10-28]: how production errors reach Dave. Option A local-only recovery panel with Copy diagnostics (version, source commit, browser, recent errors, offline status) kept on the device, with no third party and no CSP change (recommended); Option B hosted error tracker such as Sentry, with a connect-src change and a third-party script; Option C self-hosted report endpoint, with a connect-src change and a service to maintain.",
+    "PHONE-LANDSCAPE-1 [unlocks readable three-panel views on a phone held sideways]: under 500 px tall the console keeps two panels across, so a view of three or more panels gives each about 79 px of body at 844 x 390 (measured 2026-11-13; Maximize is one tap away). Keep it (A), show one panel with the switcher as the standalone pages do (B), or keep two across for views of up to two panels and use the switcher for larger views (C, recommended)?"
   ],
   "files": [
     {
@@ -1315,9 +1316,108 @@
         "limits": [
           "P01 is approximate and not qualified; Barco's values were read through search excerpts, and no drawing, photograph or unit was used.",
           "The other 42 entries retain their existing viewers while native adapters migrate.",
-          "Two small-screen limits predate this release and remain: in phone landscape (844 x 390) the console panel area collapses, and at 320 px wide the inspector is clipped at the right edge."
+          "The two small-screen limits that predated this release were fixed on 2026-11-13 (smallScreens, pull request 465): in phone landscape (844 x 390) the console panel area no longer collapses, and at 320 px wide the inspector is no longer clipped at the right edge. Both sizes are emulated; a physical phone check remains."
         ],
         "nextAction": "Finish the host release and read back the live route; then check P01 against Barco's primary documents."
+      },
+      "smallScreens": {
+        "checkedOn": "2026-11-13",
+        "scope": "Console panels on small phone screens: the shared phone switcher stays a bar at any width, the Equipment Lab page column stays the width of the screen, and the model inspector lays out by the size of its own panel",
+        "hostBase": "90444e26ad28a2752c1191bd43650b43580a6fd2",
+        "comparedWith": "efb7883f75d2216ce8cce5ab66bcd332b17c9909, which differs from the host base only in the splash tab label of pull request 464",
+        "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/465",
+        "verifiedImplementation": "d9c037808d37d1ede97c228941be76172dfde7d4",
+        "status": "Scoped source and browser checks pass in a cloud session; CI, merge, publication and live read-back are separate gates",
+        "cacheGeneration": "v20261113-console-phone-panels",
+        "compatibility": "ECP-1.0 revision 1.0 unchanged; no catalog, package, ID, deep link, storage or release import change",
+        "picture": {
+          "page844x390": "448 x 194, was 760 x 20",
+          "console844x390": "195 x 212, was 385 x 93",
+          "page320x568": "260 x 120, was 313 x 45 and clipped at the right edge",
+          "console320x568": "308 x 98, was 308 x 45 with the hint over the item list",
+          "pageP01At390x844": "330 x 236, was 330 x 187; C02 is unchanged at 330 x 307"
+        },
+        "verification": {
+          "runner": "Cloud session, Linux Chromium with SwiftShader, Node 22",
+          "viewportChecks": 163,
+          "panelChecks": 104,
+          "previousBuildFailures": 40,
+          "result": "Passed every gate in the AV Video workflow, including the Equipment Lab, suite shell and retained family probes, and the workspace, viewport and theme contract, LED wall, public contract and domain cutover checks. Rebuilding untouched main reproduced the committed bundles byte for byte.",
+          "previousBuild": "The new panel checks fail in 40 of 104 states on the previous build, all at 844 x 390 and 320 x 568, and pass the other 64.",
+          "otherConsoles": "Screenshots of the other nine packs in the console, the eight retained family builds and the standalone Calculator match the previous build at five sizes, apart from Show Control's clock.",
+          "supplemental": "Keyboard travel through the scrolling view buttons, the picture staying in place while the list scrolls, an emulated tap selection in landscape, the unknown-item notice, entries without a native model, print layout, and the probe under three other system fonts (DejaVu Sans, FreeSans, Carlito)",
+          "notChecked": "A physical phone, WebKit and GPU. WebKit runs of the workspace probe are left to CI."
+        },
+        "limits": [
+          "Sizes are emulated in Chromium; a phone's own toolbars leave less height than 390 px (448 x 144 at 844 x 340).",
+          "At 320 x 256 the header, view strip and switcher leave the panel no room; that size remains a page-containment check.",
+          "Inside the console at 844 x 390, views of three or more panels still give each panel a body about 79 px tall. That is the console's two-across layout, not this defect."
+        ],
+        "nextAction": "Dave checks both layouts on a physical phone, held sideways and upright."
+      },
+      "release120": {
+        "checkedOn": "2026-11-13",
+        "scope": "Shared release 1.2.0: P02 Panasonic PT-DW830 with lamp and air filter access, P03 Panasonic PT-RZ970, and an inspector that reads service joints, states and procedures from a package",
+        "sharedRevision": "7c81bb60335e68ff4d767093a34de32919a21601",
+        "hostBase": "cafd077d8e23441c3e0a1f714cbb2001c5442358",
+        "pullRequest": "https://github.com/DaveHomeAssist/system-by-dave/pull/479",
+        "status": "Scoped source and browser checks pass in a cloud session; CI, merge, publication and live read-back are separate gates",
+        "entries": 46,
+        "nativeRepresentations": [
+          "C02",
+          "P01",
+          "P02",
+          "P03"
+        ],
+        "compatibility": "ECP-1.0 revision 1.0; ten head IDs and 26 P01 part IDs unchanged; 60 new P02 part IDs and 45 new P03 part IDs; definition schema and revision unchanged, with joints, states and procedures as additions; generic Panasonic camera body",
+        "verification": {
+          "runner": "Cloud session, Linux Chromium with SwiftShader, Node 22",
+          "entries": 46,
+          "packages": {
+            "C02": {
+              "controls": 10,
+              "textures": 22,
+              "views": 4
+            },
+            "P01": {
+              "controls": 26,
+              "textures": 14,
+              "views": 6
+            },
+            "P02": {
+              "controls": 60,
+              "textures": 43,
+              "views": 8,
+              "states": 5,
+              "jointNodes": 140,
+              "steps": [
+                10,
+                8
+              ]
+            },
+            "P03": {
+              "controls": 45,
+              "textures": 38,
+              "views": 7
+            }
+          },
+          "viewportChecks": 263,
+          "panelChecks": 176,
+          "invalidPackageCases": 16,
+          "contextLossCases": 4,
+          "packageFiles": 100,
+          "cacheGeneration": "v20261113-equipment-lab-panasonic",
+          "result": "Passed package integrity, typecheck, build parity, the Equipment Lab probe, the suite shell, canvas menu, audio flow, bounded workspace, Throwline and offline transition probes, and the AV, indexing, navigation, consistency, private exposure and domain staging checks",
+          "supplemental": "P02 in 26 points: each state from its button, the state in the link, a hidden part opening its state, a visible part leaving the model as it stands, no idle drawing, both procedures and their steps, a step shown on the model, a state button from the keyboard, a model click in the open bay, reduced motion, three phone sizes and the AV console route",
+          "notChecked": "GPU, a physical phone, WebKit, an unprepared first offline visit, and any physical projector"
+        },
+        "limits": [
+          "P02 and P03 are approximate and not qualified. No photograph or unit was used.",
+          "Inside the P02 lamp bay, which part is where and which way it moves are Panasonic's; sizes, depths, the 100 degree opening of the cover and each travel are approximate or assumed.",
+          "The lamp and air filter steps summarise Panasonic's operating instructions and do not replace them.",
+          "The other 42 entries retain their existing viewers while native adapters migrate."
+        ],
+        "nextAction": "Finish the host release and read back the live route; then compare the P02 lamp bay with a real PT-DW830."
       }
     }
   },
@@ -1380,22 +1480,22 @@
     {
       "id": "AVC-D1",
       "question": "D1 [unlocks fix PR]: no-scroll rule everywhere incl. ~35 worksheets, or only calculators, workspaces and the Suite?",
-      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
     },
     {
       "id": "AVC-D2",
       "question": "D2 [unlocks]: AV Workbook - withdrawal settled 10-02, dark lock gone; confirm it is simply excluded from mobile fixes?",
-      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
     },
     {
       "id": "AVC-D3",
       "question": "D3 [unlocks]: Throwline+LED already got the shell (#226); confirm, and pick next adopter: AV Video, Show Console or worksheets?",
-      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
     },
     {
       "id": "AVC-D5",
       "question": "D5: theme toggle for ~38 tools in shared nav, no new storage key - placement OK, and must every worksheet support both palettes?",
-      "resolution": "Settled by the October 3\u20134 six-candidate implementation request and workspace WEB rules; do not re-ask."
+      "resolution": "Settled by the October 3–4 six-candidate implementation request and workspace WEB rules; do not re-ask."
     }
   ],
   "historicalEvidence": [
@@ -1526,7 +1626,7 @@
     "reviewedBase": "4561f20a4ed854fdb807a5439d2867427885f670",
     "state": "Independent test-only design implemented; Stream/Record runtime remains unimplemented and gated.",
     "brief": "docs/av-video-stream-record-contract.md",
-    "authority": "Independent design work explicitly permitted by docs/av-video-stream-record-credential-decision.md; Stage 2.1\u20132.3 field and source-preservation contract.",
+    "authority": "Independent design work explicitly permitted by docs/av-video-stream-record-credential-decision.md; Stage 2.1–2.3 field and source-preservation contract.",
     "acceptanceDelta": "Typed working row shapes, complete invented field/metadata fixtures, blank/custom/duration cases, and documented preview/cancel/apply/repeat/restore requirements. Existing six-family model still rejects Stream and Record imports and document extensions.",
     "verification": "Dominic: Video typecheck, 82 tests (four new contract/boundary tests), Video build and unchanged JS/CSS hashes pass. Initial transfer sidecar failure retained; exact AppleDouble sidecars moved to private evidence before unchanged rerun.",
     "delivery": "Source, review, exact-head CI, merge and publication are separate gates; the owning PR retains their provider receipts. This record makes no Stream/Record runtime or human acceptance claim.",

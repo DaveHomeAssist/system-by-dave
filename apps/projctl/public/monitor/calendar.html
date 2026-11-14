@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws: wss: https://wst.housevideo.app; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Frozen Monitor | Calendar</title>
+<meta name="description" content="Frozen Monitor calendar: the November tech schedule by day, the selected day's calls and the milestones to opening night.">
+<link rel="canonical" href="http://localhost:8080/monitor/calendar.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Projctl relay">
+<meta property="og:title" content="Frozen Monitor | Calendar">
+<meta property="og:description" content="Frozen Monitor calendar: the November tech schedule by day, the selected day's calls and the milestones to opening night.">
+<meta property="og:url" content="http://localhost:8080/monitor/calendar.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Frozen Monitor | Calendar">
+<meta name="twitter:description" content="Frozen Monitor calendar: the November tech schedule by day, the selected day's calls and the milestones to opening night.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../avd/tokens.css">
+<link rel="stylesheet" href="../avd/bundle.css">
+<link rel="stylesheet" href="../app.css">
+<link rel="stylesheet" href="monitor.css">
+<script type="module" src="page-calendar.js"></script>
+</head>
+<body>
+<a class="pj-skip" href="#fm-main">Skip to content</a>
+<noscript><p class="fm-noscript">The Frozen Monitor needs JavaScript to read the relay. Projctl itself is at <a href="/">this relay's home page</a>.</p></noscript>
+<div class="fm-shell">
+<header class="pj-header fm-header">
+  <div class="pj-brand"><svg class="pj-snowmark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 2v28M4 9l24 14M4 23L28 9M12 5l4 4 4-4M12 27l4-4 4 4M5 13l6-1-2-6M27 19l-6 1 2 6M9 26l2-6-6-1M23 6l-2 6 6 1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><div><p class="pj-kicker">WALNUT STREET THEATRE · DISNEY'S FROZEN</p><h1>Frozen Monitor</h1></div></div>
+  <span class="avd-state" id="fm-relay" aria-live="polite"><span class="avd-dot avd-dot--queued" aria-hidden="true"></span><span data-relay-word>Connecting…</span></span>
+  <span class="fm-source" id="fm-source" data-source="recorded">Recorded only</span>
+  <span class="pj-vrule" aria-hidden="true"></span>
+  <time class="pj-clock" id="fm-clock"><span data-clock-date></span><strong data-clock-time></strong></time>
+  <div class="avd-seg" role="group" aria-label="Theme"><button class="avd-seg__btn" type="button" data-theme-choice="light" aria-pressed="true">Light</button><button class="avd-seg__btn" type="button" data-theme-choice="dark" aria-pressed="false">Dark</button><button class="avd-seg__btn" type="button" data-theme-choice="deep-freeze" aria-pressed="false">Deep Freeze</button></div>
+  <span class="avd-btn fm-lock" id="fm-lock" data-lock="unknown" role="status" title="Show Lock restricts Projctl's own commands. Millumin sends its commands independently."><svg class="avd-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3"/></svg><span data-lock-word>Show Lock unknown</span></span>
+</header>
+<nav class="fm-nav" aria-label="Sections"><div class="avd-tabs"><a class="avd-tab" href="index.html">Monitor</a><a class="avd-tab" href="cues.html">Cues</a><a class="avd-tab" href="rig.html">Rig</a><a class="avd-tab" href="network.html">Network</a><a class="avd-tab" href="notes.html">Notes</a><a class="avd-tab" href="calendar.html" aria-current="page">Calendar</a></div></nav>
+<main class="fm-body" id="fm-main" tabindex="-1">
+  <div class="fm-col fm-col--main">
+    <section class="avd-panel fm-panel fm-panel--grow" aria-labelledby="cal-title"><div class="avd-panel__head"><h2 id="cal-title" class="avd-panel__title">November 2026</h2><span class="fm-cal-legend" aria-label="Call types"><span class="fm-ev" data-kind="work">Work call</span><span class="fm-ev" data-kind="tech">Tech and dress</span><span class="fm-ev" data-kind="rehearsal">Rehearsal</span><span class="fm-ev" data-kind="preview">Preview</span><span class="fm-ev" data-kind="show">Performance</span><span class="fm-ev" data-kind="off">Off</span></span></div><div class="fm-cal"><div class="fm-weekdays" aria-hidden="true"><span class="avd-eyebrow">Sun</span><span class="avd-eyebrow">Mon</span><span class="avd-eyebrow">Tue</span><span class="avd-eyebrow">Wed</span><span class="avd-eyebrow">Thu</span><span class="avd-eyebrow">Fri</span><span class="avd-eyebrow">Sat</span></div><div class="fm-month" id="cal-month" aria-label="November 2026 days"></div></div></section>
+  </div>
+  <aside class="fm-col fm-col--aside" aria-label="Day and milestones">
+    <section class="avd-panel fm-panel fm-panel--grow" aria-labelledby="day-title"><div class="avd-panel__head"><h2 id="day-title" class="avd-panel__title">Loading the schedule</h2><span class="pj-mono fm-small" id="cal-count"></span></div><ol class="fm-scroll fm-agenda" id="cal-agenda" aria-live="polite"></ol></section>
+    <section class="avd-panel fm-panel fm-panel--fixed" aria-labelledby="ms-title"><div class="avd-panel__head"><h2 id="ms-title" class="avd-panel__title">Milestones</h2><span class="fm-tag">From the schedule</span></div><ul class="fm-miles" id="cal-miles"></ul></section>
+    <section class="avd-panel fm-panel fm-draft" aria-labelledby="draft-title"><div><h2 id="draft-title" class="avd-panel__title">Draft October 30, 2026</h2><p class="fm-muted">Times are local to Philadelphia. Daily stage management calls govern changes. OFF and No shows are kept as written; other listed calls may still apply. These are scheduled events, not hours worked.</p><a class="avd-btn avd-btn--block" id="cal-pdf" target="_blank" rel="noopener noreferrer">Original PDF ↗</a></div></section>
+  </aside>
+</main>
+</div>
+</body>
+</html>

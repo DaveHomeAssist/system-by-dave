@@ -348,6 +348,105 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
   {
+    "id": 37,
+    "date": "2026-11-13",
+    "track": "Fiber, video over IP, NDI, and SMPTE ST 2110",
+    "trackShort": "Video over IP",
+    "title": "RTP repair before playout",
+    "fact": "RTP retransmission can recover a lost media packet only if the replacement arrives in time for the receiver to use it. The available window must cover loss detection, feedback, and the replacement packet’s trip back.",
+    "why": "A clean link test can hide a repair window that is too short for the round-trip delay of a remote contribution feed.",
+    "takeaway": "During rehearsal, inspect receiver late-packet and recovery counters while testing the actual path. Compare the configured buffering with measured recovery time and the show’s latency budget.",
+    "sourceLabel": "RFC 4588, RTP Retransmission, §§ 3 and 6.4",
+    "sourceUrl": "https://www.rfc-editor.org/rfc/rfc4588",
+    "current": true,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/>\n<text x=\"12\" y=\"26\" class=\"diagram-index\">37</text>\n<text x=\"48\" y=\"26\" class=\"diagram-heading\">RTP REPAIR</text>\n<path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"79\" class=\"blue-label\">1 / Repair arrives early</text>\n<text x=\"24\" y=\"105\">Loss → Retry</text>\n<path d=\"M24 126H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<path d=\"M153 115v23\" class=\"reference\"/>\n<rect x=\"110\" y=\"119\" width=\"14\" height=\"14\" rx=\"4\" class=\"result\"/>\n<text x=\"24\" y=\"163\" class=\"good-label\">Repair before deadline</text>\n<rect x=\"12\" y=\"198\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"225\" class=\"blue-label\">2 / Repair arrives late</text>\n<text x=\"24\" y=\"251\">Loss → Retry</text>\n<path d=\"M24 272H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<path d=\"M153 261v23\" class=\"reference\"/>\n<rect x=\"191\" y=\"265\" width=\"14\" height=\"14\" rx=\"4\" class=\"result\"/>\n<text x=\"24\" y=\"309\" class=\"good-label\">Repair after deadline</text>\n<text x=\"24\" y=\"365\">Time runs left to right</text>\n<text x=\"24\" y=\"390\" class=\"note\">Schematic, not to scale</text>",
+      "caption": "The amber marker is the receiver’s playout deadline. A replacement is useful when it reaches the receiver before that deadline."
+    },
+    "basis": "See RFC 4588, RTP Retransmission, §§ 3 and 6.4. Diagram and operating guidance apply to the conditions stated in this edition."
+  },
+  {
+    "id": 36,
+    "date": "2026-11-12",
+    "track": "LED walls, projection, EDID, and HDCP",
+    "trackShort": "Projection",
+    "title": "Combined lens shift limits",
+    "fact": "Epson’s G6000-series lens shift specification shows a combined adjustment envelope. On supported lenses, the horizontal and vertical maximum shifts cannot be reached simultaneously.",
+    "why": "A projector location may pass separate width and height checks yet fall outside the combined range once both offsets are applied.",
+    "takeaway": "Plot the horizontal and vertical offsets together on the chart for the exact projector and lens before approving the mount point.",
+    "sourceLabel": "Epson G6000 series, Lens Shift Adjustment Range",
+    "sourceUrl": "https://www.epson.com.au/d/pub/epson/techtips/g6xxxstd_spec_en.pdf",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/>\n<text x=\"12\" y=\"26\" class=\"diagram-index\">36</text>\n<text x=\"48\" y=\"26\" class=\"diagram-heading\">LENS SHIFT</text>\n<path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"79\" class=\"blue-label\">1 / Separate checks</text>\n<text x=\"24\" y=\"105\">Horizontal limit</text>\n<path d=\"M45 140V114M28 129H91\" class=\"rule\"/>\n<path d=\"M28 129L39 115H66L80 129L66 141H39Z\" class=\"wire\"/>\n<rect x=\"43\" y=\"120\" width=\"8\" height=\"8\" rx=\"4\" class=\"limit\"/>\n<text x=\"24\" y=\"163\" class=\"good-label\">Vertical limit</text>\n<rect x=\"12\" y=\"198\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"225\" class=\"blue-label\">2 / Combined check</text>\n<text x=\"24\" y=\"251\">Offset pair</text>\n<path d=\"M45 286V260M28 275H91\" class=\"rule\"/>\n<path d=\"M28 275L39 261H66L80 275L66 287H39Z\" class=\"wire\"/>\n<rect x=\"70\" y=\"259\" width=\"8\" height=\"8\" rx=\"4\" class=\"limit\"/>\n<text x=\"24\" y=\"309\" class=\"good-label\">Check the lens chart</text>\n<text x=\"24\" y=\"365\">Schematic envelope</text>\n<text x=\"24\" y=\"390\" class=\"note\">Not to scale</text>",
+      "caption": "The amber point represents a combined offset outside the illustrative envelope. The actual allowed region comes from the projector and lens documentation."
+    },
+    "backfilledOn": "2026-11-13",
+    "basis": "See Epson G6000 series, Lens Shift Adjustment Range. Diagram and operating guidance apply to the conditions stated in this edition."
+  },
+  {
+    "id": 35,
+    "date": "2026-11-11",
+    "track": "Cameras, switchers, scalers, and capture systems",
+    "trackShort": "Cameras",
+    "title": "Shutter angle and exposure",
+    "fact": "A 180° shutter exposes for half the frame interval. At 25 fps the exposure is 20 ms (1/50 s). At 50 fps the same angle gives 10 ms (1/100 s).",
+    "why": "Switching a live camera to 50 fps while retaining 180° halves exposure time. With other settings and steady lighting held constant, that is one stop less exposure per frame.",
+    "takeaway": "Check exposure and motion rendering after a frame-rate change. Calculate exposure time as angle divided by 360 and then divided by fps.",
+    "sourceLabel": "RED KOMODO-X guide, Shutter",
+    "sourceUrl": "https://docs.red.com/955-0219/955-0219_V1.0%20Rev-A%20RED%20PS%2C%20KOMODO-X%20Operation%20Guide/Content/4_Menus/01_Image_LUT/Shutter.htm",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/>\n<text x=\"12\" y=\"26\" class=\"diagram-index\">35</text>\n<text x=\"48\" y=\"26\" class=\"diagram-heading\">SHUTTER ANGLE</text>\n<path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"79\" class=\"blue-label\">1 / 25 fps</text>\n<text x=\"24\" y=\"105\">40 ms frame</text>\n<rect x=\"24\" y=\"117\" width=\"180\" height=\"17\" rx=\"4\" class=\"packet\"/>\n<path d=\"M24 126h90\" class=\"wire\"/>\n<path d=\"M114 117v17\" class=\"reference\"/>\n<text x=\"24\" y=\"163\" class=\"good-label\">20 ms exposure</text>\n<rect x=\"12\" y=\"198\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"225\" class=\"blue-label\">2 / 50 fps</text>\n<text x=\"24\" y=\"251\">20 ms frame</text>\n<rect x=\"24\" y=\"263\" width=\"90\" height=\"17\" rx=\"4\" class=\"packet\"/>\n<path d=\"M24 272h45\" class=\"wire\"/>\n<path d=\"M69 263v17\" class=\"reference\"/>\n<text x=\"24\" y=\"309\" class=\"good-label\">10 ms exposure</text>\n<text x=\"24\" y=\"365\">180° in both cases</text>\n<text x=\"24\" y=\"390\" class=\"note\">Half the frame interval</text>",
+      "caption": "The blue segment is exposure and the remaining segment is the rest of the frame interval. Both rows use the same time scale."
+    },
+    "backfilledOn": "2026-11-13",
+    "basis": "See RED KOMODO-X guide, Shutter. Diagram and operating guidance apply to the conditions stated in this edition."
+  },
+  {
+    "id": 34,
+    "date": "2026-11-10",
+    "track": "Color spaces, chroma subsampling, bit depth, and HDR",
+    "trackShort": "Color",
+    "title": "HDR graphics white",
+    "fact": "ITU-R BT.2408 gives nominal HDR graphics white as 75% HLG or 58% PQ. Both correspond to roughly 203 cd/m² in the report’s reference conditions, including a 1,000 cd/m² HLG display.",
+    "why": "Mapping an SDR lower third to the top of the HDR signal can make it overpower the picture and consume highlight headroom.",
+    "takeaway": "Run a white patch through the graphics conversion. Check it on a waveform set for the correct transfer function and confirm your production’s reference-white target.",
+    "sourceLabel": "ITU-R BT.2408-7, Table 1 and §5.2",
+    "sourceUrl": "https://www.itu.int/dms_pub/itu-r/opb/rep/R-REP-BT.2408-7-2023-PDF-E.pdf",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/>\n<text x=\"12\" y=\"26\" class=\"diagram-index\">34</text>\n<text x=\"48\" y=\"26\" class=\"diagram-heading\">GRAPHICS WHITE</text>\n<path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"79\" class=\"blue-label\">1 / HLG signal</text>\n<text x=\"24\" y=\"105\">75% level</text>\n<rect x=\"24\" y=\"120\" width=\"180\" height=\"13\" rx=\"4\" class=\"packet\"/>\n<path d=\"M24 126H159\" class=\"wire\"/>\n<path d=\"M159 115v24\" class=\"reference\"/>\n<text x=\"24\" y=\"163\" class=\"good-label\">1,000 cd/m² peak</text>\n<rect x=\"12\" y=\"198\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"225\" class=\"blue-label\">2 / PQ signal</text>\n<text x=\"24\" y=\"251\">58% level</text>\n<rect x=\"24\" y=\"266\" width=\"180\" height=\"13\" rx=\"4\" class=\"packet\"/>\n<path d=\"M24 272H128\" class=\"wire\"/>\n<path d=\"M128 261v24\" class=\"reference\"/>\n<text x=\"24\" y=\"309\" class=\"good-label\">PQ reference curve</text>\n<text x=\"24\" y=\"365\">About 203 cd/m²</text>\n<text x=\"24\" y=\"390\" class=\"note\">Nominal graphics white</text>",
+      "caption": "Two transfer functions map different signal levels to approximately the same graphics-white luminance under the stated reference conditions."
+    },
+    "backfilledOn": "2026-11-13",
+    "basis": "See ITU-R BT.2408-7, Table 1 and §5.2. Diagram and operating guidance apply to the conditions stated in this edition."
+  },
+  {
+    "id": 33,
+    "date": "2026-11-09",
+    "track": "Resolution, frame rates, bandwidth, and compression",
+    "trackShort": "Compression",
+    "title": "JPEG XS line latency",
+    "fact": "JPEG XS is designed for encode-to-decode latency of a few picture lines. In a line-based implementation, decoded lines can emerge while the rest of the frame is still arriving.",
+    "why": "A compressed contribution link can fit a smaller bandwidth budget without requiring a frame-long codec delay. The complete path can still add buffering, transport and display delay.",
+    "takeaway": "Measure the whole path with a flash or time counter. Ask for codec delay and network buffer delay separately.",
+    "sourceLabel": "JPEG Committee, JPEG XS",
+    "sourceUrl": "https://jpeg.org/jpegxs/",
+    "current": false,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/>\n<text x=\"12\" y=\"26\" class=\"diagram-index\">33</text>\n<text x=\"48\" y=\"26\" class=\"diagram-heading\">LINE LATENCY</text>\n<path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"79\" class=\"blue-label\">1 / Input rows</text>\n<text x=\"24\" y=\"105\">Row group A</text>\n<rect x=\"24\" y=\"119\" width=\"38\" height=\"15\" rx=\"4\" class=\"result\"/>\n<rect x=\"68\" y=\"119\" width=\"38\" height=\"15\" rx=\"4\" class=\"result\"/>\n<rect x=\"112\" y=\"119\" width=\"38\" height=\"15\" rx=\"4\" class=\"result\"/>\n<rect x=\"156\" y=\"119\" width=\"38\" height=\"15\" rx=\"4\" class=\"result\"/>\n<text x=\"24\" y=\"163\" class=\"good-label\">Frame continues</text>\n<rect x=\"12\" y=\"198\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"225\" class=\"blue-label\">2 / Codec pipeline</text>\n<text x=\"24\" y=\"251\">Encode → Decode</text>\n<rect x=\"24\" y=\"265\" width=\"38\" height=\"15\" rx=\"4\" class=\"result\"/>\n<rect x=\"68\" y=\"265\" width=\"38\" height=\"15\" rx=\"4\" class=\"packet\"/>\n<rect x=\"112\" y=\"265\" width=\"38\" height=\"15\" rx=\"4\" class=\"packet\"/>\n<rect x=\"156\" y=\"265\" width=\"38\" height=\"15\" rx=\"4\" class=\"packet\"/>\n<text x=\"24\" y=\"309\" class=\"good-label\">Group A emerges</text>\n<text x=\"24\" y=\"365\">Line timing schematic</text>\n<text x=\"24\" y=\"390\" class=\"note\">Not to scale</text>",
+      "caption": "The first group can emerge before the final input rows arrive. The blocks represent processing order, not a measured latency."
+    },
+    "backfilledOn": "2026-11-13",
+    "basis": "See JPEG Committee, JPEG XS. Diagram and operating guidance apply to the conditions stated in this edition."
+  },
+  {
     "id": 32,
     "date": "2026-11-08",
     "track": "SDI, HDMI, DisplayPort, and signal transport",
@@ -359,7 +458,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "sourceLabel": "VESA, DisplayPort 1.2 overview, pp.14/17",
     "sourceUrl": "https://www.vesa.org/wp-content/uploads/2010/12/DisplayPort-DevCon-Presentation-DP-1.2-Dec-2010-rev-2b.pdf#page=14",
     "basis": "VESA DP1.2 overview describes multiple streams rather than one stream per lane (p14), and bandwidth-dependent virtual channel time-slot allocation (p17). Generic mechanism only; no universal display count or host support asserted.",
-    "current": true,
+    "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
       "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/><text x=\"12\" y=\"26\" class=\"diagram-index\">32</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">DISPLAYPORT MST</text><path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"116\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"78\" class=\"blue-label\">1 / Shared link</text>\n<rect x=\"24\" y=\"96\" width=\"44\" height=\"32\" class=\"packet\"/><text x=\"46\" y=\"118\" text-anchor=\"middle\" class=\"blue-label\">A</text><rect x=\"72\" y=\"96\" width=\"44\" height=\"32\" class=\"packet\"/><text x=\"94\" y=\"118\" text-anchor=\"middle\" class=\"good-label\">B</text><rect x=\"120\" y=\"96\" width=\"44\" height=\"32\" class=\"packet\"/><text x=\"142\" y=\"118\" text-anchor=\"middle\" class=\"blue-label\">A</text><rect x=\"168\" y=\"96\" width=\"44\" height=\"32\" class=\"packet\"/><text x=\"190\" y=\"118\" text-anchor=\"middle\" class=\"good-label\">B</text><text x=\"24\" y=\"152\" class=\"note\">Conceptual time slots</text>\n<rect x=\"12\" y=\"184\" width=\"216\" height=\"164\" rx=\"6\" class=\"panel\"/><text x=\"24\" y=\"210\" class=\"blue-label\">2 / MST branch</text><path d=\"M120 224V246m-5-6l5 6l5-6\" class=\"wire\"/><rect x=\"80\" y=\"246\" width=\"80\" height=\"28\" rx=\"3\" class=\"node\"/><text x=\"120\" y=\"266\" text-anchor=\"middle\">Branch</text><path d=\"M100 274V290H64V310m-5-6l5 6l5-6M140 274V290H176V310m-5-6l5 6l5-6\" class=\"wire\"/><rect x=\"24\" y=\"310\" width=\"80\" height=\"26\" class=\"node\"/><text x=\"64\" y=\"329\" text-anchor=\"middle\" class=\"blue-label\">View A</text><rect x=\"136\" y=\"310\" width=\"80\" height=\"26\" class=\"node\"/><text x=\"176\" y=\"329\" text-anchor=\"middle\" class=\"good-label\">View B</text>\n<text x=\"24\" y=\"372\">A + B share capacity</text><text x=\"24\" y=\"396\">Not one stream / lane</text>",

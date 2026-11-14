@@ -129,6 +129,12 @@
     './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.manifest.json',
     './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.definition.json',
     './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.inspection.glb',
+    './equipment-lab/data/models/panasonic.ptdw830.inspection/panasonic.ptdw830.manifest.json',
+    './equipment-lab/data/models/panasonic.ptdw830.inspection/panasonic.ptdw830.definition.json',
+    './equipment-lab/data/models/panasonic.ptdw830.inspection/panasonic.ptdw830.inspection.glb',
+    './equipment-lab/data/models/panasonic.ptrz970.inspection/panasonic.ptrz970.manifest.json',
+    './equipment-lab/data/models/panasonic.ptrz970.inspection/panasonic.ptrz970.definition.json',
+    './equipment-lab/data/models/panasonic.ptrz970.inspection/panasonic.ptrz970.inspection.glb',
     './av-suite-worker.js',
     './js/sbd-registry.js',
     './js/av-suite-context.js',
@@ -341,7 +347,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261112-equipment-lab-projector',
+    version:'v20261114-offline-cache-receipts',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

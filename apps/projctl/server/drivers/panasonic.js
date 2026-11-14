@@ -66,7 +66,7 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
   const pj = pjlinkDriver({ host, password, ...rest, port: 4352 });
   const patterns = patternsFor(model);
 
-  function native(cmd, { signal } = {}) {
+  function native(cmd, { signal, guard } = {}) {
     throwIfAborted(signal);
     return new Promise((resolve, reject) => {
       const sock = net.createConnection({ host, port });
@@ -76,10 +76,13 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
       const abort = () => fail(signal.reason || new Error('Projector poll cancelled'));
       const t = setTimeout(() => fail(new Error('timeout (port 1024)')), timeoutMs);
       signal?.addEventListener('abort', abort, { once: true });
+      let bytes = 0;
       sock.on('error', fail);
       sock.on('end', () => fail(new Error('connection closed before Panasonic reply')));
       sock.on('close', () => fail(new Error('connection closed before Panasonic reply')));
       sock.on('data', (d) => {
+        bytes += d.length;
+        if (bytes > 8192) return fail(new Error('Panasonic response exceeds size limit'));
         buf += d.toString('latin1');
         let idx;
         while ((idx = buf.indexOf('\r')) >= 0) {
@@ -87,15 +90,20 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
           if (prefix === null) {
             if (!line.startsWith('NTCONTROL ')) return fail(new Error('not Panasonic network control: ' + line));
             prefix = line[10] === '1' ? createHash('md5').update(`${user}:${password}:${line.slice(12, 20)}`).digest('hex') : '';
-            try { throwIfAborted(signal); sock.write(prefix + '00' + cmd + '\r'); } catch (e) { return fail(e); }
+            try { throwIfAborted(signal); guard?.(); sock.write(prefix + '00' + cmd + '\r'); } catch (e) { return fail(e); }
           } else {
             cleanup(); done = true; sock.end();
-            const body = line.replace(/^00/, '');
-            if (body === 'ERRA') return reject(new Error('auth failed: admin user/password wrong (Setup tab)'));
-            if (body.startsWith('ER401')) return reject(Object.assign(new Error('projector refuses this now (no signal, wrong state, or unsupported)'), { code: 'ER401' }));
-            if (body.startsWith('ER402')) return reject(new Error('invalid parameter'));
-            if (body.startsWith('ER')) return reject(new Error(body));
-            resolve(body);
+            const body = line.startsWith('00') ? line.slice(2) : line;
+            const commandName = cmd.split('=')[0];
+            const echoed = /^([A-Z]{2,}(?::[A-Z0-9]+)?)=(.*)$/.exec(body);
+            // The exchange is already marked done above, so fail() would do nothing here.
+            if (echoed && echoed[1] !== commandName) return reject(new Error('Panasonic reply does not match the command'));
+            const payload = echoed ? echoed[2] : body;
+            if (payload === 'ERRA') return reject(new Error('auth failed: admin user/password wrong (Setup tab)'));
+            if (payload.startsWith('ER401')) return reject(Object.assign(new Error('projector refuses this now (no signal, wrong state, or unsupported)'), { code: 'ER401' }));
+            if (payload.startsWith('ER402')) return reject(new Error('invalid parameter'));
+            if (payload.startsWith('ER')) return reject(new Error(payload));
+            resolve(payload);
           }
         }
       });
@@ -116,28 +124,35 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     },
     // Read-only temperatures for health reports; never part of the status poll.
     // A refused sensor reads as null; a dead connection stops the remaining queries.
-    async healthReadings({ signal } = {}) {
+    async healthReadings({ signal, onPartial } = {}) {
       const sensors = [];
       for (const [n, id, label, role] of QTM_SENSORS) {
         let c = null;
         try { c = parseQtm(await native(`QTM:${n}`, { signal })); }
-        catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; }
+        catch (e) {
+          if (transportFailure(e) || signal?.aborted) {
+            if (!sensors.some((s) => Number.isFinite(s.c))) throw e;
+            sensors.push({ id, label, role, c: null });
+            return { sensors, readError: String(e.message || e) };
+          }
+        }
         sensors.push({ id, label, role, c });
+        onPartial?.({ sensors: sensors.map((sensor) => ({ ...sensor })) });
       }
       return { sensors };
     },
-    async pattern(code) {
+    async pattern(code, options) {
       const c = String(code).padStart(2, '0');
       if (!patterns[c]) throw new Error(`pattern ${c} not on this model`);
-      await native(`OTS:${c}`);
+      await native(`OTS:${c}`, options);
       return 'OK';
     },
     // lens({ axis: 'h'|'v'|'focus'|'zoom', speed: 'slow'|'normal'|'fast', dir: '+'|'-' }) or lens({ op: 'home' })
-    async lens(op = {}) {
-      if (op.op === 'home') { await native('VXX:LNSI1=+00001'); return 'OK'; }
+    async lens(op = {}, options) {
+      if (op.op === 'home') { await native('VXX:LNSI1=+00001', options); return 'OK'; }
       const n = LENS_AXIS[op.axis], s = LENS_SPEED[op.speed || 'normal'];
       if (n == null || s == null || !['+', '-'].includes(op.dir)) throw new Error('lens needs axis h|v|focus|zoom, speed slow|normal|fast, dir + or -');
-      await native(`VXX:LNSI${n}=+00${s}0${op.dir === '+' ? 0 : 1}`);
+      await native(`VXX:LNSI${n}=+00${s}0${op.dir === '+' ? 0 : 1}`, options);
       return 'OK';
     },
     async getPicture() {
@@ -147,12 +162,12 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
       }
       return out;
     },
-    async picture(key, value) {
+    async picture(key, value, options) {
       const d = PICTURE[key];
       if (!d) throw new Error(`unknown picture setting ${key}`);
       if (d.type === 'range' && (Number(value) < d.min || Number(value) > d.max || Number.isNaN(Number(value)))) throw new Error(`${key} must be ${d.min}..${d.max}`);
       if (d.type === 'enum' && !(String(value) in d.options)) throw new Error(`${key}: unknown option ${value}`);
-      await native(`${d.set}:${d.codec.enc(value)}`);
+      await native(`${d.set}:${d.codec.enc(value)}`, options);
       return 'OK';
     },
   };

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws: wss: https://wst.housevideo.app; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Frozen Monitor | Cues</title>
+<meta name="description" content="Frozen Monitor cue path: how lighting cues reach Millumin, the projectors and the Projctl cue listener, with the recorded cue map and checks.">
+<link rel="canonical" href="http://localhost:8080/monitor/cues.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Projctl relay">
+<meta property="og:title" content="Frozen Monitor | Cues">
+<meta property="og:description" content="Frozen Monitor cue path: how lighting cues reach Millumin, the projectors and the Projctl cue listener, with the recorded cue map and checks.">
+<meta property="og:url" content="http://localhost:8080/monitor/cues.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Frozen Monitor | Cues">
+<meta name="twitter:description" content="Frozen Monitor cue path: how lighting cues reach Millumin, the projectors and the Projctl cue listener, with the recorded cue map and checks.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../avd/tokens.css">
+<link rel="stylesheet" href="../avd/bundle.css">
+<link rel="stylesheet" href="../app.css">
+<link rel="stylesheet" href="monitor.css">
+<script type="module" src="page-cues.js"></script>
+</head>
+<body>
+<a class="pj-skip" href="#fm-main">Skip to content</a>
+<noscript><p class="fm-noscript">The Frozen Monitor needs JavaScript to read the relay. Projctl itself is at <a href="/">this relay's home page</a>.</p></noscript>
+<div class="fm-shell">
+<header class="pj-header fm-header">
+  <div class="pj-brand"><svg class="pj-snowmark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 2v28M4 9l24 14M4 23L28 9M12 5l4 4 4-4M12 27l4-4 4 4M5 13l6-1-2-6M27 19l-6 1 2 6M9 26l2-6-6-1M23 6l-2 6 6 1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><div><p class="pj-kicker">WALNUT STREET THEATRE · DISNEY'S FROZEN</p><h1>Frozen Monitor</h1></div></div>
+  <span class="avd-state" id="fm-relay" aria-live="polite"><span class="avd-dot avd-dot--queued" aria-hidden="true"></span><span data-relay-word>Connecting…</span></span>
+  <span class="fm-source" id="fm-source" data-source="recorded">Recorded only</span>
+  <span class="pj-vrule" aria-hidden="true"></span>
+  <time class="pj-clock" id="fm-clock"><span data-clock-date></span><strong data-clock-time></strong></time>
+  <div class="avd-seg" role="group" aria-label="Theme"><button class="avd-seg__btn" type="button" data-theme-choice="light" aria-pressed="true">Light</button><button class="avd-seg__btn" type="button" data-theme-choice="dark" aria-pressed="false">Dark</button><button class="avd-seg__btn" type="button" data-theme-choice="deep-freeze" aria-pressed="false">Deep Freeze</button></div>
+  <span class="avd-btn fm-lock" id="fm-lock" data-lock="unknown" role="status" title="Show Lock restricts Projctl's own commands. Millumin sends its commands independently."><svg class="avd-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3"/></svg><span data-lock-word>Show Lock unknown</span></span>
+</header>
+<nav class="fm-nav" aria-label="Sections"><div class="avd-tabs"><a class="avd-tab" href="index.html">Monitor</a><a class="avd-tab" href="cues.html" aria-current="page">Cues</a><a class="avd-tab" href="rig.html">Rig</a><a class="avd-tab" href="network.html">Network</a><a class="avd-tab" href="notes.html">Notes</a><a class="avd-tab" href="calendar.html">Calendar</a></div></nav>
+<main class="fm-body fm-body--stack" id="fm-main" tabindex="-1">
+  <section class="avd-panel fm-panel fm-panel--fixed" aria-labelledby="path-title"><div class="avd-panel__head"><h2 id="path-title" class="avd-panel__title">Cue path</h2><span class="pj-mono fm-small">Lighting fires every cue. No video operator during the show.</span><span class="fm-legend" aria-label="Line key"><span data-link="reported">Reported</span><span data-link="documented">Documented</span><span data-link="planned">Planned</span><span data-link="unresolved">Unresolved</span></span></div><div class="fm-scroll"><div class="fm-diagram fm-diagram--cues" data-diagram="cues">
+<svg class="fm-wires" viewBox="0 0 1344 264" aria-hidden="true"><defs><marker id="fm-head-documented" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z"/></marker><marker id="fm-head-unresolved" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z"/></marker></defs>
+<path data-link="unresolved" marker-end="url(#fm-head-unresolved)" d="M192 60H243"/><path data-link="unresolved" marker-end="url(#fm-head-unresolved)" d="M416 60H467"/><path data-link="unresolved" marker-end="url(#fm-head-unresolved)" d="M656 60H707"/><path data-link="unresolved" marker-end="url(#fm-head-unresolved)" d="M880 60H931"/><path data-link="unresolved" d="M796 96V204"/><path data-link="unresolved" marker-end="url(#fm-head-unresolved)" d="M796 204H931"/><path data-link="documented" marker-end="url(#fm-head-documented)" d="M1112 60H1171"/><path data-link="unresolved" marker-end="url(#fm-head-unresolved)" d="M1112 204H1171"/><path data-link="unresolved" marker-end="url(#fm-head-unresolved)" d="M192 204H243"/><path data-link="documented" marker-end="url(#fm-head-documented)" d="M416 204H467"/><path data-link="documented" d="M564 168V132H1252"/><path data-link="documented" marker-end="url(#fm-head-documented)" d="M1252 132V101"/></svg>
+<div class="fm-node" data-node="gio"><span><b>ETC Gio</b><br>Lighting console<br>Reported</span></div>
+<div class="fm-node" data-node="midi" data-link="unresolved"><span><b>MIDI link</b><br>Port and cable<br>TBD</span></div>
+<div class="fm-node" data-node="mio"><span><b>mioXL</b><br>iConnectivity<br>Routing TBD</span></div>
+<div class="fm-node" data-node="nmidi" data-link="unresolved"><span><b>Network MIDI</b><br>Session names<br>TBD</span></div>
+<div class="fm-node" data-node="m5"><span><b>M5 Studio</b><br>Millumin<br>Projection</span></div>
+<div class="fm-node" data-node="proj"><span><b>Projectors A–D</b><br>PJLink :4352<br>C: Pulse or PJLink</span></div>
+<div class="fm-node" data-node="clients" data-link="unresolved"><span><b>Cue clients</b><br>Approved hosts<br>TBD</span></div>
+<div class="fm-node" data-node="listener"><span><b>Cue listener</b><br>OSC UDP 9000<br>Text TCP 9001</span></div>
+<div class="fm-node" data-node="relay"><span><b>Projctl relay</b><br>This page's relay<br><span data-lock-line>Show Lock unknown</span></span></div>
+<div class="fm-node" data-node="m1"><span><b>M1 Studio</b><br>Millumin<br>Pixels</span></div>
+<div class="fm-node" data-node="pixels" data-link="unresolved"><span><b>Pixel decoders</b><br>Deck and portals<br>Protocol unverified</span></div>
+<div class="fm-wirelabel" data-node="manual">Manual control and monitoring</div>
+</div></div>
+<ul class="fm-sr" aria-label="Cue path connections"><li>ETC Gio to MIDI link: physical connection to be traced.</li><li>MIDI link to mioXL: port to be confirmed.</li><li>mioXL to network MIDI: routing to be confirmed.</li><li>Network MIDI to the M5 Studio and the M1 Studio: sessions to be confirmed.</li><li>M5 Studio to projectors A to D: PJLink, and Pulse or PJLink for C. Documented.</li><li>M1 Studio to the pixel decoders: protocol unverified.</li><li>Cue clients to the cue listener: approved hosts to be confirmed.</li><li>Cue listener to the Projctl relay. Documented.</li><li>Projctl relay to projectors A to D: manual control and monitoring. Documented.</li></ul></section>
+  <div class="fm-cuegrid">
+    <section class="avd-panel fm-panel" aria-labelledby="map-title"><div class="avd-panel__head"><h2 id="map-title" class="avd-panel__title">Cue map</h2><span class="pj-mono fm-small">NT is not tested · no cue numbers are recorded yet</span></div><div class="fm-scroll fm-fill"><div role="table" aria-label="Cue map" class="fm-table fm-cuemap" id="cue-map"></div></div></section>
+    <section class="avd-panel fm-panel" aria-labelledby="osc-title"><div class="avd-panel__head"><h2 id="osc-title" class="avd-panel__title">Projctl cue listener</h2><span class="fm-tag">From code</span></div><div class="fm-scroll fm-fill fm-osc" id="cue-osc"></div></section>
+    <section class="avd-panel fm-panel" aria-labelledby="rec-title"><div class="avd-panel__head"><h2 id="rec-title" class="avd-panel__title">Recovery and checks</h2><span class="fm-tag">No results yet</span></div><div class="fm-scroll fm-fill fm-recovery"><ul class="fm-list"><li><span class="avd-dot avd-dot--waiting" aria-hidden="true"></span><span>Repeat projection or pixels without replaying sound. Lighting and the A1 to confirm.</span></li><li><span class="avd-dot avd-dot--waiting" aria-hidden="true"></span><span>Agree the opening reset and one safe test cue.</span></li><li><span class="avd-dot avd-dot--waiting" aria-hidden="true"></span><span>Name who steps in during a show. Stage management keeps the call to stop.</span></li></ul><div role="table" aria-label="Checks" class="fm-table fm-checks fm-checks--stacked" id="cue-checks"></div></div></section>
+  </div>
+</main>
+</div>
+</body>
+</html>

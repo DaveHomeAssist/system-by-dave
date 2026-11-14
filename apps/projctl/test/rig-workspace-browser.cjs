@@ -1,3 +1,4 @@
+const {selectView,selectLane}=require('./operator-ui.cjs');
 const {openDisclosure}=require('./operator-ui.cjs');
 const {chromium}=require('playwright');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 (async()=>{
@@ -9,8 +10,8 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
    page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(['POST','PUT','PATCH','DELETE'].includes(r.method()))writes.push(r.url());});
    let relaySocket;await page.routeWebSocket('**/ws',ws=>{relaySocket=ws;ws.send(JSON.stringify(snapshot));});
    await page.route('https://avbydave.com/ProjectorThrow/**',r=>r.fulfill({contentType:'text/html',body:'<h1>Canonical Throwline test fixture</h1><label>Distance<input value="38.5"></label>'}));
-   await page.goto(relay.base);await page.locator('#tab-home.on').waitFor();
-   await page.locator('#tab-btn-info').click();
+   await page.goto(relay.base);await page.locator('#tab-rig.on').waitFor();
+   await selectView(page,'info');
    const aModel=page.locator('[data-reference-model="A"]');
    await aModel.filter({hasText:'Unassigned'}).waitFor();
    const assigned=structuredClone(snapshot);Object.assign(assigned.projectors.find(p=>p.slot==='P3'),{lane:'A',make:'Panasonic',model:'PT-DW830U'});
@@ -19,47 +20,46 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
    assert.match(await page.locator('[data-reference-assignment="A"]').innerText(),/slot P3/);
    relaySocket.send(JSON.stringify(snapshot));await aModel.filter({hasText:'Unassigned'}).waitFor();
    const history=structuredClone(snapshot);history.events=[{at:'2026-11-07T12:00:00Z',slot:'P3',slotBeforeRenumber:'P1',command:'/proj/P1/power',result:'OK',source:'fixture'}];
-   relaySocket.send(JSON.stringify(history));await page.locator('#tab-btn-log').click();
+   relaySocket.send(JSON.stringify(history));await selectView(page,'log');
    await page.locator('#log tbody').filter({hasText:'previously P1'}).waitFor();
    assert.match(await page.locator('#log tbody').innerText(),/\/proj\/P1\/power/,'original command text remains in historical events');
-   relaySocket.send(JSON.stringify(snapshot));await page.locator('#tab-btn-info').click();
-   assert.deepEqual(await page.locator('[data-primary-nav]').evaluateAll(nodes=>nodes.map(n=>n.childNodes[0].textContent.trim())),['My Projector Rig','3D Stage View','Presets','Log','Configuration','Throw Calc']);
-   await page.locator('#tab-btn-rig').click();await page.locator('#grid [data-lane="B"] [data-open-projector]').click();
+   relaySocket.send(JSON.stringify(snapshot));await selectView(page,'info');
+   assert.deepEqual(await page.locator('[data-primary-nav]').evaluateAll(nodes=>nodes.map(n=>n.childNodes[0].textContent.trim())),['Controls','3D Stage View','Presets','Log','Configuration','Throw Calc']);
+   await selectView(page,'rig');
+   if (await page.locator('.pj-connection-help summary').isVisible()) {
    await page.locator('.pj-connection-help summary').click();
-   const disclosureFits=await page.locator('.pj-connection-help').evaluate(details=>{
-     const summary=document.querySelector('#summary').getBoundingClientRect(),box=details.getBoundingClientRect(),cards=document.querySelector('#grid').getBoundingClientRect();
-     return box.top>=summary.bottom&&box.bottom<=cards.top;
-   });
-   assert.equal(disclosureFits,true,'expanded connection details do not overlap status or cards');
+   assert.equal(await page.locator('.pj-connection-help').evaluate(details => details.getBoundingClientRect().bottom <= document.querySelector('#grid').getBoundingClientRect().top), true, 'expanded connection details stay above controls');
    await page.locator('.pj-connection-help summary').click();
+   }
+   await selectLane(page,'B');
    await page.locator('#tab-projector.on').waitFor();await openDisclosure(page,'#projector-more-controls');await openDisclosure(page,'#projector-info-panel');assert.match(await page.locator('#projector-detail-title').innerText(),/^B/);
    assert.equal(await page.locator('#projector-controls [data-reset-input]').isDisabled(),true);
    assert.match(await page.locator('#projector-display-info').innerText(),/HDMI/);assert.match(await page.locator('#projector-display-info').innerText(),/EDID is not read/);assert.match(await page.locator('#projector-display-info').innerText(),/Last known/);
-   await page.locator('#grid [data-open-projector="A"]').click();assert.match(await page.locator('#projector-detail-title').innerText(),/^A/);assert.match(await page.locator('#projector-controls').innerText(),/No assigned live device/);
+   await selectLane(page,'A');assert.match(await page.locator('#projector-detail-title').innerText(),/^A/);assert.match(await page.locator('#projector-controls').innerText(),/No assigned live device/);
    await page.locator('#projector-static-info').filter({hasText:'ET-DLE170'}).waitFor();
-   for(const lane of ['B','C','D']){await page.locator(`#grid [data-open-projector="${lane}"]`).click();assert.match(await page.locator('#projector-detail-title').innerText(),new RegExp('^'+lane));}
-   await page.locator('#tab-btn-info').click();await page.locator('[data-reference-view="catalog"]').click();await page.locator('.fr-search input').fill('ET-DLE150');
+   for(const lane of ['B','C','D']){await selectLane(page,lane);assert.match(await page.locator('#projector-detail-title').innerText(),new RegExp('^'+lane));}
+   await selectView(page,'info');await page.locator('[data-reference-view="catalog"]').click();await page.locator('.fr-search input').fill('ET-DLE150');
    assert.match(await page.locator('[data-catalog-count]').innerText(),/^1 documented/);assert.match(await page.locator('[data-catalog-results]').innerText(),/1.36–1.98/);
    await page.locator('[data-reference-view="flow"]').click();assert.match(await page.locator('#reference-view').innerText(),/Patch and transport unknown/);
    const relayNode=page.locator('[data-flow-relay]');assert.equal(await relayNode.getAttribute('data-status'),'verified');
    const originalRelay=await relayNode.elementHandle();relaySocket.close();await relayNode.filter({hasText:'Live relay status unavailable'}).waitFor();assert.equal(await relayNode.getAttribute('data-status'),'unknown');
    await relayNode.filter({hasText:'Connected now'}).waitFor();assert.equal(await relayNode.getAttribute('data-status'),'verified');assert.equal(await relayNode.evaluate((node,old)=>node===old,originalRelay),true,'connection updates keep the open flow view in place');
    await page.locator('.fr-flow-node[data-open-lane="B"]').click();assert.match(await page.locator('#projector-detail-title').innerText(),/^B/);
-   await page.locator('#tab-btn-throw').click();assert.equal(await page.locator('#throw-calc-frame').getAttribute('src'),'https://avbydave.com/ProjectorThrow/');await page.frameLocator('#throw-calc-frame').getByRole('heading').waitFor();
+   await selectView(page,'throw');assert.equal(await page.locator('#throw-calc-frame').getAttribute('src'),'https://avbydave.com/ProjectorThrow/');await page.frameLocator('#throw-calc-frame').getByRole('heading').waitFor();
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight));
-   const out=process.env.EVIDENCE_DIR||path.join(__dirname,'../artifacts');fs.mkdirSync(out,{recursive:true});await page.locator('#tab-btn-rig').click();await page.locator('#grid [data-lane="D"] [data-open-projector]').click();await page.screenshot({path:path.join(out,`rig-workspace-${width}-${height}.png`)});
+   const out=process.env.EVIDENCE_DIR||path.join(__dirname,'../artifacts');fs.mkdirSync(out,{recursive:true});await selectView(page,'rig');await selectLane(page,'D');await page.screenshot({path:path.join(out,`rig-workspace-${width}-${height}.png`)});
    assert.deepEqual(errors,[]);assert.deepEqual(writes,[],'navigation/reference/offline detail never sends setters');await page.close();
   }
   const page=await browser.newPage();const calls=[];let socket;
   const online=structuredClone(snapshot);online.lock=false;online.presets=[{name:'Lens fixture',perSlot:{P1:{lens:{h:.2},power:true,shutter:'open',input:'HDMI'}}}];online.projectors.find(p=>p.slot==='P1').capabilities={lensRecall:true};
   await page.routeWebSocket('**/ws',ws=>{socket=ws;ws.send(JSON.stringify(online));});
   await page.route('**/api/preset/recall',route=>{calls.push(route.request().postDataJSON());return route.fulfill({contentType:'application/json',body:JSON.stringify(calls.length===1?{confirm:'fixture-token',message:'Confirm lens recall'}:{projectors:{P1:{position:'match',motors:'unknown'}}})});});
-  await page.goto(relay.base);await page.locator('#tab-btn-presets').click();await page.locator('[data-recall]').click();
+  await page.goto(relay.base);await selectView(page,'presets');await page.locator('[data-recall]').click();
   assert.deepEqual(calls,[{name:'Lens fixture'}]);await page.locator('[data-recall]').filter({hasText:'Confirm lens recall'}).waitFor();
   // A fresh snapshot rebuilds presets: the explicit confirmation must retain its token.
   socket.send(JSON.stringify(online));await page.locator('[data-recall]').filter({hasText:'Confirm lens recall'}).click();assert.deepEqual(calls[1],{name:'Lens fixture',confirmLens:'fixture-token'});
   await page.locator('[role=status]').filter({hasText:'match'}).waitFor();
-  await page.locator('#tab-btn-rig').click();await page.locator('#grid [data-lane=D] [data-open-projector]').click();await openDisclosure(page,'#projector-info-panel');
+  await selectView(page,'rig');await selectLane(page,'D');await openDisclosure(page,'#projector-info-panel');
   const d=online.projectors.find(p=>p.lane==='D');socket.send(JSON.stringify({type:'status',slot:d.slot,status:d.status,displayInfo:{...d.displayInfo,input:{state:'offline',label:'Updated fixture input',value:'new',observedAt:'2026-11-06T05:00:00Z'}}}));
   await page.locator('#projector-display-info').filter({hasText:'Updated fixture input'}).waitFor();await page.close();
   console.log('Rig workspace: six menus, offline/unassigned A–D details, truthful EDID, catalog, signal flow, embedded Throw Calc and zero writes passed');

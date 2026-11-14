@@ -1,15 +1,15 @@
 {
   "id": "house-reference",
   "engineeringDailyPublication": {
-    "date": "2026-11-08",
-    "edition": 32,
-    "title": "DisplayPort MST shared capacity",
+    "date": "2026-11-13",
+    "edition": 37,
+    "title": "RTP repair before playout",
     "state": "Verified publication input; exact CI, merge and deployment evidence belongs to the provider records for this revision",
-    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=32&month=2026-11",
+    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=37&month=2026-11",
     "evidence": "demos/engineering-daily/release.json",
-    "verification": "Dominic: full 32 edition illustration/story verification; normal candidate, CI, deployment and live gates required.",
+    "verification": "Dominic verified all 37 editions and their story cards. Candidate, CI, deployment and live checks are required.",
     "next": "Require exact-head CI, Pages deployment and matching live manifest/assets/browser journeys before publication completion; continue the same gates for future daily releases.",
-    "boundaries": "Prior 31 records and 62 assets preserved; no gaps or renumbering; human acceptance separate."
+    "boundaries": "November 9–12 backfilled. The previous 32 records and 64 assets were preserved without renumbering."
   },
   "engineeringDailyUx": {
     "date": "2026-10-28",

@@ -1,13 +1,21 @@
 # projctl: Frozen at WST projector control
 
+For a lightweight Mac-only output-resolution check, see the independent
+[Frozen Screen Check application](../screen-check/README.md). It verifies the
+computer's display outputs at login and on demand, without requiring this relay
+or issuing projector commands.
+
 
 For managed macOS access, use `~/Applications/Open Projctl.command` or
 `http://localhost:8080/`. The service starts at login and recovers after exit.
 See [managed service access and recovery](deploy/RUNBOOK.md#managed-macos-access-and-recovery)
 for installation, the one live settings location, logs and backups.
 
-One workspace contains Notes + tasks, Projector info, Rig and Stage. The controller
-opens a Home landing with four choices; the other tabs stay in the same page. Notes save
+A fresh browser opens on Controls, with shutter, power, quick test patterns,
+Clear pattern and Reset to HDMI on each projector. Reset clears the pattern,
+selects the reported HDMI input and confirms fresh feedback. Tools opens notes,
+reference, stage, presets, thermal watch, log and configuration. The permanent All Projectors tab holds group actions; every group action requires a target review and confirmation. Per-projector Details opens
+the lens pad with Stop lens, picture tiles for every test pattern, the projector's heat reading, a browser session timer, and diagnostic controls. A heat chip and header pill appear only when a projector reports Watch or Hot. Preferences under Tools save the selected lane and view, theme, model-specific pattern favorites and a preset-name template in this browser. Optional next-action hints highlight existing buttons and can be dismissed. See [the operator console](docs/operator-console.md). Notes save
 in this browser at this controller address, with text export. Shared team tasks
 use the public Frozen workspace service at https://wst.housevideo.app/; keep
 sensitive content out of that shared list. Private cross-device notes sync is
@@ -24,6 +32,12 @@ is hosted by the workspace. Enable and verify PJ_PASSCODE on a crew destination
 before wider exposure; the optional app login is absent when it is unset.
 
 Spec: Frozen at WST | Projector Control App Spec.
+
+## Frozen Monitor
+
+`http://<relay-ip>:8080/monitor/` opens the six-page Frozen Monitor: live A–D state, the
+command log, cues, rig, network, notes and the calendar. It reads the relay and sends only
+Stop lens. See [the Frozen Monitor](docs/frozen-monitor.md).
 
 ## Run
 
@@ -46,8 +60,7 @@ With DHCP the relay re-finds projectors by MAC every 60 s using PJLink class 2 s
 
 ## Power off and Show Lock
 
-Tap All projectors → Power off twice within three seconds. The first tap lists the reachable
-targets; the second sends one command to each of those targets and reports each result.
+Open All Projectors and choose Power off all. Review the target list and choose Confirm and send. The relay then lists its reachable targets. Choose Confirm power off within three seconds to send the command and report each result.
 An offline slot does not block the others. A projector that comes online after the first tap
 is skipped until a new confirmation, as is a slot whose connection settings changed.
 Individual power-off uses the same two-tap confirmation. Expired or reused confirmations
@@ -57,27 +70,36 @@ require another first tap. Changing Show Lock clears pending confirmations.
 change through Cooling to Standby before removing power. Show Lock blocks power off, input,
 test patterns, lens movement and picture changes; shutter and read-only status remain available.
 
+## Command validation at the write
+
+The relay binds each requested command to the current projector configuration.
+It rechecks that binding, current availability and applicable Show Lock rules
+immediately before each driver write. A protected command waiting on a handshake
+or queue is cancelled if Show Lock changes, including an on/off transition.
+Group actions, cues and preset sequences keep the target bindings captured when
+execution begins. A changed later target receives an error while other results
+remain visible. Shutter, power on and Stop retain their existing Show Lock rules.
+
+Pulse patterns and compound lens moves recheck before each write. If an earlier
+lens move was already attempted, its protective stop can still run after a later
+step is cancelled. A command acknowledgement continues to require separate state
+feedback and physical acceptance.
+
 ## Thermal watch
 
-A status button in the Rig tab's overview row ("D Watch · 37.0 °C", or "Air OK · tightest ...") shows
-the worst state at a glance. It opens the Thermal watch panel: air temperature at each lane (A to D)
-against that projector's rated maximum ambient, with headroom, peak, a 30 minute trend, and the tightest
-unit (least headroom) outlined. Cards are keyed by lane, not slot number, because slot numbers have been
-renumbered between rig records.
-
-The panel is a non-modal overlay rather than a tab or a row, because the header, tab bar and Rig tab have no
-spare height: a tenth tab wraps the tab bar at 1440 px, a header button wraps the header at 845 px, and a
-panel above the A-D tiles squeezes the selected-projector dock to nothing at 1280 x 720. While open it
-covers the Rig tab below the overview row (never the header, tabs or its button); Escape, Close or the
-button dismiss it, and it stays open if you change tab. The button adds no height at 845 px and wider;
-below 680 px the overview row already stacks and the Rig tab scrolls, so it adds one row there.
+The Thermal watch tab shows air temperature at each lane (A to D) against that projector's rated maximum
+ambient, with headroom, peak, a 30 minute trend, and the tightest unit (least headroom) outlined. Cards are
+keyed by lane, not slot number, because slot numbers have been renumbered between rig records. Outside the
+tab, heat shows only for a current Watch or Hot reading: a chip on that projector's card and a header pill
+that opens Thermal watch ([details controls](docs/details-controls.md)).
 
 - **Readings.** The watch uses the [health reports](docs/health-reports.md)' read-only driver query:
   Panasonic intake air (`QTM:0`) and the Barco's outside-ambient sensor. PJLink-only projectors report
   no temperature, and the card says so. The relay takes one sample per projector about once a minute
   (`PROJCTL_THERMAL_SAMPLE_MS`, default 60000) and only while the unit is on, warming or cooling. It is
-  never part of the 5-second status poll. Health reports and the watch share one reader, so the two never
-  query a projector at the same time, and a report's own reading also reaches the watch.
+  never part of the 5-second status poll. Status polls, health reports and the watch share one queue per
+  projector (`server/telemetry-reader.js`), so they never query a projector at the same time, and a
+  report's own reading also reaches the watch.
 - **Limits.** The health reports' limits, so the panel and the reports cannot disagree: Barco UDM 4K22
   40 C, PT-RZ970 45 C, PT-DW830 series 45 C, with per-slot overrides in the private `health-reports.json`
   beside the rig (`"ratedAmbientC": { "P3": 40, "P4": 40 }` for units hung in portrait). A unit whose
@@ -120,8 +142,8 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
     server/store.js        data/rig.json read and write
     server/osc.js          OSC and TCP line parsing
     server/drivers/        base.js (interface), pjlink.js, panasonic.js, pulse.js, simulator.js
-    server/thermal.js      rated limits, levels, in-memory history, CSV
-    public/thermal-watch.js  thermal panel and Rig overview status button
+    server/thermal.js      levels, in-memory history, CSV
+    public/thermal-watch.js  Thermal watch tab
     public/                index.html, app.css, app.js
 
 ## Status of drivers
@@ -131,17 +153,38 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
 - pulse (Barco): core state, power, shutter, internal patterns, discovered inputs, bounded lens targets and supported picture ranges use the Pulse API. Optional alarm telemetry remains unknown, rather than implying a clear alarm panel.
 - panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls.
 
+PJLink keeps one status connection open per projector between polls. Every poll
+still reads the complete status, including lamp hours and the projector name.
+Control commands run after an in-flight poll, close its connection, and use a
+separate connection. Closed status sessions are recovered without replaying a
+control command. Replacing a configured driver releases its held connection.
+Panasonic native replies validate an echoed command name and reject a mismatch
+promptly so the next operation can proceed.
+
 Pulse status requires a successful `system.state` query. Failed core queries count toward the
 relay's offline policy; unsupported optional properties remain unknown rather than preventing
 an otherwise reachable projector from reporting status.
 
 ## Verify changes
 
-From this directory, `npm ci` then `npm test` runs isolated simulator, loopback protocol and
+Run the following development checks from `apps/projctl` in a full
+`DaveHomeAssist/system-by-dave` source checkout. Transfer packages omit `test/`
+and the repository's browser tooling, so their package-script names alone do
+not mean those checks are available in the package. Use the root repository's
+documented dependency setup for browser checks.
+
+From the source directory, `npm ci` then `npm test` runs isolated simulator, loopback protocol and
 confirmation regressions. `npm run test:browser` additionally uses the repository's Playwright
 installation and Chromium to exercise the real controls at desktop, 680px and phone widths
 in both themes. Set `CHROMIUM_PATH` only to use an existing browser binary. Tests use temporary
 rig files and ephemeral ports, and never connect to physical projectors. CI runs both suites.
+
+For an installed package, use the managed-service and venue acceptance checks
+in [the runbook](deploy/RUNBOOK.md#managed-macos-access-and-recovery). Record the
+package revision, configured mode, successful client connection and current
+lane-to-device identities. A health response establishes relay availability.
+Confirm device replies and expected physical results separately, in an agreed
+test window. Keep venue addresses and acceptance records in the private handoff.
 
 Compatibility: ECP-1.0 revision 1.0; Projctl remains the physical-command owner. Rig files,
 slot IDs and cue addresses retain their existing formats. The bulk HTTP first-tap response

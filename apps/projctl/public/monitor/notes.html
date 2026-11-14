@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws: wss: https://wst.housevideo.app; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Frozen Monitor | Notes</title>
+<meta name="description" content="Frozen Monitor notes: personal notes kept in this browser, the shared team to-do list, Frozen documents and records in Notion.">
+<link rel="canonical" href="http://localhost:8080/monitor/notes.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Projctl relay">
+<meta property="og:title" content="Frozen Monitor | Notes">
+<meta property="og:description" content="Frozen Monitor notes: personal notes kept in this browser, the shared team to-do list, Frozen documents and records in Notion.">
+<meta property="og:url" content="http://localhost:8080/monitor/notes.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Frozen Monitor | Notes">
+<meta name="twitter:description" content="Frozen Monitor notes: personal notes kept in this browser, the shared team to-do list, Frozen documents and records in Notion.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../avd/tokens.css">
+<link rel="stylesheet" href="../avd/bundle.css">
+<link rel="stylesheet" href="../app.css">
+<link rel="stylesheet" href="monitor.css">
+<script type="module" src="page-notes.js"></script>
+</head>
+<body>
+<a class="pj-skip" href="#fm-main">Skip to content</a>
+<noscript><p class="fm-noscript">The Frozen Monitor needs JavaScript to read the relay. Projctl itself is at <a href="/">this relay's home page</a>.</p></noscript>
+<div class="fm-shell">
+<header class="pj-header fm-header">
+  <div class="pj-brand"><svg class="pj-snowmark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 2v28M4 9l24 14M4 23L28 9M12 5l4 4 4-4M12 27l4-4 4 4M5 13l6-1-2-6M27 19l-6 1 2 6M9 26l2-6-6-1M23 6l-2 6 6 1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><div><p class="pj-kicker">WALNUT STREET THEATRE · DISNEY'S FROZEN</p><h1>Frozen Monitor</h1></div></div>
+  <span class="avd-state" id="fm-relay" aria-live="polite"><span class="avd-dot avd-dot--queued" aria-hidden="true"></span><span data-relay-word>Connecting…</span></span>
+  <span class="fm-source" id="fm-source" data-source="recorded">Recorded only</span>
+  <span class="pj-vrule" aria-hidden="true"></span>
+  <time class="pj-clock" id="fm-clock"><span data-clock-date></span><strong data-clock-time></strong></time>
+  <div class="avd-seg" role="group" aria-label="Theme"><button class="avd-seg__btn" type="button" data-theme-choice="light" aria-pressed="true">Light</button><button class="avd-seg__btn" type="button" data-theme-choice="dark" aria-pressed="false">Dark</button><button class="avd-seg__btn" type="button" data-theme-choice="deep-freeze" aria-pressed="false">Deep Freeze</button></div>
+  <span class="avd-btn fm-lock" id="fm-lock" data-lock="unknown" role="status" title="Show Lock restricts Projctl's own commands. Millumin sends its commands independently."><svg class="avd-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3"/></svg><span data-lock-word>Show Lock unknown</span></span>
+</header>
+<nav class="fm-nav" aria-label="Sections"><div class="avd-tabs"><a class="avd-tab" href="index.html">Monitor</a><a class="avd-tab" href="cues.html">Cues</a><a class="avd-tab" href="rig.html">Rig</a><a class="avd-tab" href="network.html">Network</a><a class="avd-tab" href="notes.html" aria-current="page">Notes</a><a class="avd-tab" href="calendar.html">Calendar</a></div></nav>
+<main class="fm-body" id="fm-main" tabindex="-1">
+  <div class="fm-col fm-col--third">
+    <section class="avd-panel fm-panel fm-panel--grow" aria-labelledby="notes-title"><div class="avd-panel__head"><h2 id="notes-title" class="avd-panel__title">Your notes</h2><span class="fm-tag">Private</span></div><div class="fm-notes"><span class="avd-eyebrow">01 / Personal · this browser only</span><label class="avd-field avd-field--grow" for="fm-notes-text"><span class="avd-field__label">Personal Frozen notes</span><textarea class="avd-input" id="fm-notes-text" placeholder="Notes for the next call" spellcheck="true" disabled aria-describedby="fm-notes-privacy"></textarea></label><p class="fm-muted" id="fm-notes-privacy">Saved on this device in this browser, at this relay's address. Projctl's own Notes panel on this relay shows the same notes. Not shared with the team or uploaded. Clearing site data removes these notes, so export a backup to keep them.</p><p class="pj-mono fm-small fm-status" id="fm-notes-status" role="status"></p><button class="avd-btn" type="button" id="fm-notes-export">Export notes</button></div></section>
+  </div>
+  <div class="fm-col fm-col--third">
+    <section class="avd-panel fm-panel fm-panel--grow" aria-labelledby="tasks-title"><div class="avd-panel__head"><h2 id="tasks-title" class="avd-panel__title">Team to-do list</h2><span class="fm-tag" id="fm-task-state">Connecting</span></div><div class="fm-notes"><span class="avd-eyebrow">02 / Together · public</span><p class="fm-muted">Anyone with the workspace page can view, add, edit and complete these tasks. Keep sensitive information out.</p><form class="fm-row" id="fm-task-add"><label class="avd-field" for="fm-task-text"><span class="avd-field__label">New team task</span><input class="avd-input" id="fm-task-text" type="text" maxlength="500" required placeholder="Up to 500 characters"></label><button class="avd-btn avd-btn--primary" type="submit">Add task</button></form><p class="pj-mono fm-small fm-status" id="fm-task-feedback" role="status">Loading shared tasks…</p><ul class="fm-scroll fm-tasks" id="fm-task-list" aria-label="Shared team tasks"></ul><div class="fm-task-foot"><button class="avd-btn avd-btn--quiet" type="button" id="fm-task-refresh">Refresh tasks</button><a class="pj-mono fm-small" id="fm-shared-board" target="_blank" rel="noopener noreferrer">Open the shared board ↗</a></div></div></section>
+  </div>
+  <div class="fm-col fm-col--docs">
+    <section class="avd-panel fm-panel fm-panel--grow" aria-labelledby="docs-title"><div class="avd-panel__head"><h2 id="docs-title" class="avd-panel__title">Documents</h2><span class="fm-tag">R5 current · R4 packet</span></div><div class="fm-scroll fm-docs" id="fm-docs"></div></section>
+    <section class="avd-panel fm-panel fm-panel--fixed" aria-labelledby="rec-title"><div class="avd-panel__head"><h2 id="rec-title" class="avd-panel__title">Records in Notion</h2><span class="pj-mono fm-small">System of record</span></div><ul class="fm-records" id="fm-records"></ul></section>
+  </div>
+</main>
+</div>
+</body>
+</html>

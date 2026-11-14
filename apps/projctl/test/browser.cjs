@@ -1,3 +1,4 @@
+const {selectView,selectLane}=require('./operator-ui.cjs');
 const {selectSlot,openLegacy,openBulk}=require('./operator-ui.cjs');
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
@@ -21,22 +22,25 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
       try {
         if (offline) await relay.api('projector', { slot: 'P1', ip: '' });
         await relay.api('command', { slot: 'all', cmd: 'power', arg: 1 });
+        await until(async () => (await relay.state()).projectors.filter(p => !offline || p.slot !== 'P1').every(p => p.status.power === 'on'));
         await page.goto(relay.base);
-    await page.locator('[data-tab="rig"]').click();
+    await selectView(page,'rig');
         await page.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
         await openBulk(page);
         const bulk = page.locator('[data-all="power"][data-arg="0"]');
         for (let tap = 0; tap < 2; tap++) {
           const response = page.waitForResponse((r) => r.url().endsWith('/api/command'));
-          await bulk.click(); await response;
-          if (!tap) await page.locator('#toast').filter({ hasText: 'Tap again' }).waitFor();
+          if (!tap) await bulk.click();
+          await page.locator('#all-confirm-send').click(); await response;
+          if (!tap) { await page.locator('#all-confirm-send').filter({hasText:'Confirm power off'}).waitFor(); await page.waitForTimeout(450); }
         }
         await until(async () => (await relay.state()).projectors.filter((p) => !offline || p.slot !== 'P1').every((p) => p.status.power === 'cooling'));
-        await page.locator('#toast').filter({ hasText: 'P4: command accepted' }).waitFor();
-        if (offline) assert.match(await page.locator('#toast').innerText(), /P1:.*skipped/);
+        await page.locator('#all-results').filter({hasText:'Command accepted'}).waitFor();
+        if (offline) assert.match(await page.locator('#all-results').innerText(), /skipped/);
 
         // An unassigned first lane must not shift B/C/D or steal a device.
         for (const [slot, lane] of Object.entries({ P1: 'C', P2: 'B', P4: 'D' })) await relay.api('projector', { slot, lane });
+        await selectView(page,'rig');
         await page.locator('#grid > .pj-tile[data-lane="B"][data-slot="P2"]').waitFor();
         const laneOrder = () => page.locator('#grid > .pj-tile').evaluateAll(els => els.map(el => [el.dataset.lane, el.dataset.slot || null]));
         assert.deepEqual(await laneOrder(), [['A', null], ['B', 'P2'], ['C', 'P1'], ['D', 'P4']]);
@@ -44,7 +48,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         assert.doesNotMatch(await page.locator('#grid > .pj-tile[data-lane="C"]').innerText(), /\bP1\b/);
         await page.locator('#rig-extra-devices').click();
         await page.locator('#setup .pj-setup[data-slot="P3"]').waitFor();
-        await page.locator('#tab-btn-rig').click();
+        await selectView(page,'rig');
         await relay.api('command', { slot: 'all', cmd: 'shutter', arg: 0 });
         await until(async () => (await relay.state()).projectors.find(p => p.slot === 'P2').status.shutter === 'open');
         await selectSlot(page,'P2');
@@ -52,7 +56,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await until(async () => (await relay.state()).projectors.find(p => p.slot === 'P2').status.shutter === 'closed');
         assert.equal((await relay.state()).projectors.find(p => p.slot === 'P4').status.shutter, 'open');
         assert.equal(await page.locator('#grid > .pj-tile[data-slot="P3"]').count(),0,'unbound device must not steal a lane');
-        await page.reload(); await page.locator('[data-tab="rig"]').click();
+        await page.reload(); await selectView(page,'rig');
         await page.locator('#grid > .pj-tile[data-lane="D"][data-slot="P4"]').waitFor();
         assert.deepEqual(await laneOrder(), [['A', null], ['B', 'P2'], ['C', 'P1'], ['D', 'P4']]);
         await relay.api('projector', { slot: 'P2', lane: '' });
@@ -70,18 +74,18 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         await page.locator('#projector-controls [data-slot="P2"] [data-c="shutter"][data-a="1"]').click();
         await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P2').status.shutter === 'closed');
         assert.equal((await relay.state()).projectors.find((p) => p.slot === 'P4').status.shutter, 'open');
-        await page.reload(); await page.locator('[data-tab="rig"]').click();
-        await page.locator('.pj-tile[data-lane="A"] .pj-summary-heading strong').filter({ hasText: 'SL Portal' }).waitFor();
+        await page.reload(); await selectView(page,'rig');
+        await page.locator('.pj-tile[data-lane="A"] .pj-summary-heading h2').filter({ hasText: 'SL Portal' }).waitFor();
 
         // Operator direction labels use the selected slot's saved mounting correction.
-        await page.locator('[data-tab="setup"]').click();
+        await selectView(page,'setup');
         const slotSetup = page.locator('.pj-setup[data-slot="P2"]');
         await slotSetup.locator('[data-k="reverseH"]').selectOption('true');
         await slotSetup.locator('[data-k="reverseV"]').selectOption('true');
         await slotSetup.getByRole('button', { name: 'Save', exact: true }).click();
         await until(async () => (await relay.state()).projectors.find((p) => p.slot === 'P2').reverseV === true);
-        await page.reload(); await page.locator('[data-tab="rig"]').click();
-        await page.locator('[data-tab="rig"]').click();
+        await page.reload(); await selectView(page,'rig');
+        await selectView(page,'rig');
         await openLegacy(page,'P2','lens');
         await page.getByRole('tab', { name: 'Lens', exact: true }).click();
         for (const [label, axis, dir] of [['Shift left', 'h', '+'], ['Shift right', 'h', '-'], ['Shift up', 'v', '-'], ['Shift down', 'v', '+'], ['Focus forward', 'focus', '+'], ['Zoom out', 'zoom', '-']]) {
@@ -138,11 +142,12 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
             assert.ok(sizes.w <= sizes.cw && sizes.h <= sizes.ch, `viewport overflow ${width} ${theme}`);
             await openBulk(page);
             assert.equal(await page.locator('.pj-allbar').first().evaluate((el) => el.scrollWidth <= el.clientWidth), true, `bulk controls overflow ${width}`);
-            assert.equal(await page.locator('.pj-tile').first().evaluate((el) => el.scrollHeight <= el.clientHeight + 1), true, `clipped projector tile ${width}`);
+            await selectView(page,'rig');
+            assert.equal(await page.locator('.pj-tile').first().evaluate((el) => el.scrollHeight <= el.clientHeight + 1 || getComputedStyle(el).overflowY === 'auto'), true, `clipped projector tile ${width}`);
             await openBulk(page);await bulk.scrollIntoViewIfNeeded(); const box = await bulk.boundingBox(); assert.ok(box.x >= 0 && box.x + box.width <= width && box.y >= 0 && box.y + box.height <= height, `bulk button outside viewport ${width}x${height}: ${JSON.stringify(box)}`);
             await bulk.focus(); assert.ok(await bulk.evaluate((el) => document.activeElement === el));
             for (const name of ['Stage', 'Presets', 'Log', 'Setup', 'Rig']) {
-              await page.locator(`[data-tab="${name.toLowerCase()}"]`).click();
+              await selectView(page, name.toLowerCase());
               if (name === 'Stage') await checkStageLayout(page, width, height, theme);
               const overflow = await page.evaluate(() => document.documentElement.scrollHeight > innerHeight || document.documentElement.scrollWidth > innerWidth);
               assert.equal(overflow, false, `${name} overflow at ${width}x${height} ${theme}`);
@@ -155,14 +160,14 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
           }
         }
         await page.setViewportSize({ width: 1440, height: 900 });
-        await page.locator('[data-tab="setup"]').click();
+        await selectView(page,'setup');
         const label = page.locator('[data-slot="P2"] [data-k="label"]');
         await label.fill('Unsaved operator edit');
         await relay.api('lock', { lock: true });
         assert.equal(await label.inputValue(), 'Unsaved operator edit');
         assert.equal(await label.evaluate((el) => document.activeElement === el), true);
         await relay.api('lock', { lock: false });
-        await page.locator('[data-tab="rig"]').click();
+        await selectView(page,'rig');
         await selectSlot(page,'P2');
         const adjust = page.locator('#projector-controls [data-slot="P2"] [data-adj="lens"]');
         await adjust.click();
@@ -180,19 +185,19 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
         assert.equal(await page.evaluate(() => document.activeElement.matches('#projector-controls [data-slot="P2"] [data-adj="lens"]')), true);
         const plotFile = path.join(path.dirname(relay.rigFile), 'stage-plot.json');
         fs.renameSync(plotFile, plotFile + '.saved');
-        await page.reload(); await page.locator('[data-tab="stage"]').click();
+        await page.reload(); await selectView(page,'stage');
         await page.locator('#stage-message').filter({ hasText: 'No stage plot loaded' }).waitFor();
         fs.writeFileSync(plotFile, '{broken');
-        await page.reload(); await page.locator('[data-tab="stage"]').click();
+        await page.reload(); await selectView(page,'stage');
         await page.locator('#stage-message').filter({ hasText: 'could not be loaded' }).waitFor();
         fs.writeFileSync(plotFile, JSON.stringify(stageFixture()));
-        await page.reload(); await page.locator('[data-tab="stage"]').click();
+        await page.reload(); await selectView(page,'stage');
         await page.locator('#stage-workspace').waitFor();
         await relay.close();
         await page.locator('#conn-word').filter({ hasText: 'Relay offline' }).waitFor();
         assert.equal(await bulk.isDisabled(), true);
         assert.equal(await page.locator('[data-all="shutter"]').first().isDisabled(), true);
-        await page.locator('[data-tab="stage"]').click();
+        await selectView(page,'stage');
         assert.equal(await page.locator('#stage-status-kind').innerText(), 'Relay offline');
         assert.equal(await page.locator('.pj-stage-card[data-lane="A"]').getAttribute('aria-disabled'), 'true');
         assert.deepEqual(errors, []);

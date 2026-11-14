@@ -1,3 +1,4 @@
+const {selectView,selectLane}=require('./operator-ui.cjs');
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -23,7 +24,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
       if (r.method() === 'POST') writes.push(r.url());
       if (/\/api\/venue-model\//.test(r.url())) layers.push(r.url().split('/').pop());
     });
-    await page.goto(relay.base); await page.locator('[data-tab="stage"]').click();
+    await page.goto(relay.base); await selectView(page,'stage');
     await page.locator('#stage-building[data-state="ready"]').waitFor();
     assert.deepEqual(layers, ['room'], 'large optional layers load only on request');
     assert.equal(await page.locator('[data-stage-view="3d"]').isVisible(), false, 'model-only bundle works');
@@ -56,11 +57,11 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
     await page.locator('.pj-stage-card[data-lane="A"]').click();
     await page.locator('#adjust').waitFor(); assert.match(await page.locator('#adj-sub').innerText(), /^P2/);
     await page.keyboard.press('Escape');
-    await page.locator('[data-tab="rig"]').click(); await page.waitForTimeout(200);
+    await selectView(page,'rig'); await page.waitForTimeout(200);
     const hidden = await page.evaluate(() => window.stageDraws); await page.waitForTimeout(600);
     assert.equal(await page.evaluate(() => window.stageDraws), hidden);
     assert.deepEqual(writes, [], 'model and lane inspection send no commands');
-    await page.locator('[data-tab="stage"]').click();
+    await selectView(page,'stage');
     await canvas.evaluate(el => { window.recoverVenue = el.getContext('webgl2').getExtension('WEBGL_lose_context'); window.recoverVenue.loseContext(); });
     await page.locator('#stage-building[data-state="lost"]').waitFor();
     await page.evaluate(() => window.recoverVenue.restoreContext());
@@ -69,7 +70,7 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
 
     // Both sources coexist, with the original diagram semantics preserved.
     await fs.writeFile(path.join(dir, 'stage-plot.json'), JSON.stringify(stageFixture()));
-    await page.reload(); await page.locator('[data-tab="stage"]').click();
+    await page.reload(); await selectView(page,'stage');
     await page.locator('#stage-3d[data-state="ready"]').waitFor();
     await page.locator('[data-stage-view="front"]').click();
     assert.equal(await page.locator('.pj-stage-marker[data-lane="A"]').isVisible(), true);
@@ -81,9 +82,9 @@ const { instrument3D } = require('./stage-3d-browser.cjs');
 
     const fallback = await browser.newPage();
     await fallback.addInitScript(() => { const original = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function(type, ...args) { return type.startsWith('webgl') ? null : original.call(this, type, ...args); }; });
-    await fallback.goto(relay.base); await fallback.locator('[data-tab="stage"]').click();
+    await fallback.goto(relay.base); await selectView(fallback,'stage');
     await fallback.locator('#stage-3d[data-state="unavailable"]').waitFor();
-    await fallback.locator('[data-tab="rig"]').click();
+    await selectView(fallback,'rig');
     assert.equal(await fallback.locator('.pj-tile').first().isVisible(), true);
     console.log('Venue browser passed: lazy metric GLBs, inert inspection, existing lane controls, mobile, idle/hidden, context recovery, drawing coexistence and no-WebGL fallback.');
   } finally { await browser.close(); await relay.close(); }

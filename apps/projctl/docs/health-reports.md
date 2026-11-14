@@ -59,15 +59,46 @@ because production paperwork numbers the projectors differently.
 | Barco Pulse | `environment.temperature.ambient_outside.value` and `environment.alarmstate`. |
 | PJLink only | `ERST` flags from the normal poll; no temperatures. |
 
-Readings are taken when a report runs, never on the 5-second status poll.
-Each unit's reading is limited to 12 seconds; a unit that does not answer is
-listed as not read. The Thermal watch (README, "Thermal watch") takes the same
-reading about once a minute while a unit is on or cooling. Both go through one
-reader in the relay, one read at a time per projector, so a report waits for a
-sample in progress instead of querying alongside it.
+Report readings are taken when a report runs, never on the 5-second status poll.
+The Thermal watch (README, "Thermal watch") takes the same reading about once a
+minute while a unit is on or cooling. Status polls, report readings and watch
+samples share a queue for each projector, preventing those reads from
+overlapping, and a report's own reading also reaches the watch. A status poll gets its full
+device timeout after acquiring the queue, so local queue waiting cannot mark a
+projector offline. Different projectors remain
+independent. Report readings retry transport failures at most twice, with a
+4-second wait between attempts. Status polls can run during that wait. Refusals,
+authentication errors and invalid replies do not trigger retries. Each unit's
+12-second report deadline includes queue time, attempts and retry waits. A
+relay-stop report makes one attempt per unit with a 4-second read budget inside
+the default 6-second shutdown cap.
+
+A transport failure after a valid Panasonic sensor reply preserves the readings
+already received and stops further sensor queries. Pulse preserves an ambient
+reading if the subsequent alarm query fails. The report also preserves partial
+readings when its deadline expires, records the failure in the unit's Flags
+cell, and leaves missing channels unknown. A usable partial result finishes the
+attempt without retrying it. Missing optional internal channels do not erase a
+valid intake reading. Missing alarm feedback still produces an incomplete
+assessment. Control writes remain independent of this read queue.
+
+This adapts the read coordination, partial readings and retry scope reviewed in
+PR #463 to the current relay. Fallback samples and peak columns in reports are
+outside this change; Thermal watch history lives in the relay's Thermal backend
+(`server/thermal.js`).
+ECP-1.0 revision 1.0 applies. Existing units, identities and saved report shapes
+are preserved, with optional read-error detail added to partial results.
 
 ### Flags and limits
 
+- **Incomplete** applies when a reachable unit lacks an intake or ambient temperature,
+  complete alarm feedback, or a rated ambient limit. Fault and Watch verdicts
+  take priority when their evidence is present, with missing data still listed.
+  Unreachable units retain their Unreachable verdict and count toward incomplete
+  assessment. Optional internal temperature channels do not determine completeness.
+- Reports show temperature, alarm and rated-limit coverage separately. A clear
+  alarm response means no faults were reported by that source. Missing readings
+  remain unknown. The unit table lists missing evidence alongside reported flags.
 - **Flag:** PJLink temperature or fan status above 0, or a Barco alarm state
   other than `Ok`.
 - **Watch:** headroom (rated maximum ambient minus the intake or ambient
@@ -133,7 +164,7 @@ retry, the two API routes and tests. No operator-page panel.
   themselves are unchanged.
 - No settings changes on any projector. No power command is sent or delayed.
 - No operator-page panel for reports; they are read in Notion or the saved
-  files. The Thermal watch panel shows live air temperature, not reports.
+  files. The Thermal watch tab shows live air temperature, not reports.
 
 ## Dependencies
 

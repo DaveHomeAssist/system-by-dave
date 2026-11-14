@@ -140,7 +140,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Request, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261112-equipment-lab-projector');
+      assert.equal(name, 'sbd-av-suite-v20261114-offline-cache-receipts');
       return cache;
     } },
     fetch: async () => new Response('ok'),
@@ -212,3 +212,36 @@ for (const scope of ['https://example.test/', 'https://example.test/project/']) 
     assert.equal(await (await navigate(scope)).text(), 'native console', 'uncached site root falls back to the prepared shell');
   });
 }
+
+test('version reply lists optional assets missing from the cache and retries them once (AVC-19)', async () => {
+  const listeners = {}, stored = new Set(['https://example.test/av/index.html']), added = [];
+  const context = {
+    URL, Response, Promise, importScripts() {},
+    caches: { open: async () => ({
+      match: async key => stored.has(key) ? new Response('ok') : undefined,
+      add: async asset => { added.push(asset); throw new Error('still offline'); }
+    }) },
+    fetch: async () => { throw new Error('offline'); },
+    self: {
+      location: { origin: 'https://example.test' }, registration: { scope: 'https://example.test/' },
+      SBD_REGISTRY: { version: 'test', offlineAssets: () => ['./av/index.html', './js/tool-a.js', './tool-b.html'] },
+      addEventListener: (type, listener) => { listeners[type] = listener; }
+    }
+  };
+  vm.runInNewContext(source, context);
+  const ask = async () => {
+    let reply, pending;
+    listeners.message({ data: { type: 'SBD_OFFLINE_VERSION' }, ports: [{ postMessage: data => { reply = data; } }], waitUntil: promise => { pending = promise; } });
+    await pending;
+    return reply;
+  };
+  const first = await ask();
+  assert.equal(first.version, 'test');
+  assert.equal(first.cache, 'sbd-av-suite-test');
+  assert.deepEqual([...first.missing], ['./js/tool-a.js', './tool-b.html']);
+  assert.deepEqual(added, ['./js/tool-a.js', './tool-b.html']);
+  stored.add('https://example.test/js/tool-a.js');
+  const second = await ask();
+  assert.deepEqual([...second.missing], ['./tool-b.html']);
+  assert.equal(added.length, 2, 'missing assets are retried once per worker start, not on every readiness poll');
+});
