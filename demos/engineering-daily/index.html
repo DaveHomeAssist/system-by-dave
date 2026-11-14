@@ -348,6 +348,25 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
   {
+    "id": 38,
+    "date": "2026-11-14",
+    "track": "Signal troubleshooting and system design",
+    "trackShort": "Troubleshooting",
+    "title": "SDI CRC error counts",
+    "fact": "A monitor with HD-SDI CRC checking recalculates a checksum from received line data and compares it with the carried CRC. A mismatch can increment the error counter even when the picture appears stable.",
+    "why": "A brief error can be hard to see during line check. A rising count gives you evidence to correlate with a suspect patch point or cable run.",
+    "takeaway": "At the show format, clear the receiver counter and record its change over a timed test. Swap one segment at a time and repeat with the same source and receiver.",
+    "basis": "Tektronix describes detecting and logging CRC errors on HD-SDI and 3G-SDI. Counter presentation depends on the monitor.",
+    "sourceLabel": "Tektronix, SDI Physical Layer Testing",
+    "sourceUrl": "https://download.tek.com/document/Physical-Layer-Testing-3G-SDI-HD-SDI-Serial-Digital-Signals_AppNote_25W-19525-3.pdf",
+    "current": true,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/>\n<text x=\"12\" y=\"26\" class=\"diagram-index\">38</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">SDI CRC CHECK</text><path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"136\" rx=\"6\" class=\"panel\"/>\n<text x=\"24\" y=\"78\" class=\"blue-label\">1 / Compare at receiver</text>\n<text x=\"24\" y=\"104\">Received line data</text>\n<path d=\"M24 117H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<text x=\"24\" y=\"144\">Recalculate CRC</text>\n<path d=\"M24 154H208\" class=\"reference\"/>\n<text x=\"24\" y=\"176\" class=\"note\">Compare carried CRC</text>\n<rect x=\"12\" y=\"202\" width=\"216\" height=\"141\" rx=\"6\" class=\"panel\"/>\n<text x=\"24\" y=\"228\" class=\"blue-label\">2 / Read counter</text>\n<text x=\"24\" y=\"258\">Match: count holds</text>\n<path d=\"M24 272H208\" class=\"rule\"/>\n<text x=\"24\" y=\"302\" class=\"note\">Mismatch detected</text>\n<text x=\"24\" y=\"328\" class=\"good-label\">Counter increments</text>\n<text x=\"24\" y=\"373\">Log over a test window</text>",
+      "caption": "The receiver compares its calculated CRC with the carried value. The mismatch increments a counter on a monitor that supports the check."
+    }
+  },
+  {
     "id": 37,
     "date": "2026-11-13",
     "track": "Fiber, video over IP, NDI, and SMPTE ST 2110",
@@ -358,7 +377,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "takeaway": "During rehearsal, inspect receiver late-packet and recovery counters while testing the actual path. Compare the configured buffering with measured recovery time and the show’s latency budget.",
     "sourceLabel": "RFC 4588, RTP Retransmission, §§ 3 and 6.4",
     "sourceUrl": "https://www.rfc-editor.org/rfc/rfc4588",
-    "current": true,
+    "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
       "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/>\n<text x=\"12\" y=\"26\" class=\"diagram-index\">37</text>\n<text x=\"48\" y=\"26\" class=\"diagram-heading\">RTP REPAIR</text>\n<path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"79\" class=\"blue-label\">1 / Repair arrives early</text>\n<text x=\"24\" y=\"105\">Loss → Retry</text>\n<path d=\"M24 126H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<path d=\"M153 115v23\" class=\"reference\"/>\n<rect x=\"110\" y=\"119\" width=\"14\" height=\"14\" rx=\"4\" class=\"result\"/>\n<text x=\"24\" y=\"163\" class=\"good-label\">Repair before deadline</text>\n<rect x=\"12\" y=\"198\" width=\"216\" height=\"132\" rx=\"4\" class=\"panel\"/>\n<text x=\"24\" y=\"225\" class=\"blue-label\">2 / Repair arrives late</text>\n<text x=\"24\" y=\"251\">Loss → Retry</text>\n<path d=\"M24 272H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<path d=\"M153 261v23\" class=\"reference\"/>\n<rect x=\"191\" y=\"265\" width=\"14\" height=\"14\" rx=\"4\" class=\"result\"/>\n<text x=\"24\" y=\"309\" class=\"good-label\">Repair after deadline</text>\n<text x=\"24\" y=\"365\">Time runs left to right</text>\n<text x=\"24\" y=\"390\" class=\"note\">Schematic, not to scale</text>",

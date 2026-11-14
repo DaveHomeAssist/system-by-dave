@@ -1,5 +1,9 @@
 # Changelog
 
+## November 14, 2026: Video Engineering Daily
+
+- Add Edition 038 on measuring SDI CRC errors during line checks, with an illustrated story card.
+
 ## November 14, 2026: Monitor link inside Projctl
 
 - Projctl's header gains a Monitor button and its Home view a Frozen Monitor
