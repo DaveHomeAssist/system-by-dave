@@ -142,7 +142,9 @@ Run one stage on its own:
 node scripts/probe_frozen_case.mjs --stage 2
 ```
 
-Film it at operator pace and caption the film (needs ffmpeg and Pillow):
+Film it at operator pace and caption the film. Captioning needs Pillow and any
+ffmpeg with libx264. Pillow draws the captions, so ffmpeg needs no text filter;
+Homebrew ffmpeg 9, which has no `drawtext` and no `-filter_complex_script`, works.
 
 ```bash
 node scripts/probe_frozen_case.mjs /tmp/frozen-run --film
