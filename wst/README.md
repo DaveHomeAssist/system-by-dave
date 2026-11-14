@@ -3,7 +3,7 @@
 Planning now includes Documents alongside Calendar and Notes. The final November 13
 R4 consolidated handoff is available as a 17-page PDF, with section links to the
 illustrated overview, five signal-flow sheets, selected crew workbook and source key.
-The public export omits six private network addresses; the original is unchanged.
+R5 is separately offered as the current five-page signal-flow issue, with larger AV1 labels. The later pixel routing reply is not yet incorporated. Each public export omits six private network addresses; the original is unchanged.
 Hashes and transformation are recorded in `documents/provenance.json`.
 
 The snow Home, light/dark themes, More navigation, notes key and task API are

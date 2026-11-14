@@ -2,7 +2,7 @@
 
 ## 2026-11-14
 
-- WST Planning adds the final R4 document packet and section links while preserving
+- WST Planning adds current R5 signal-flow diagrams, the consolidated R4 document packet and section links while preserving
   the existing snow Home, themes and navigation. Public PDF copies omit private
   network addresses; original documents remain unchanged.
 - WST public controller entries open localhost separately. Hosted pages no longer
