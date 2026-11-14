@@ -149,6 +149,7 @@ a { color: var(--tape); } a:hover { color: var(--action-hover); }
 .fm-feed__id { font-size: 11px; line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fm-feed__state { margin-left: auto; }
 .fm-feed__foot { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; flex-shrink: 0; }
+.fm-feed__foot .fm-lamp-now { color: var(--state-blocked); font-weight: 600; }
 .fm-art { position: relative; display: block; flex: 1 1 auto; min-height: 0; overflow: hidden; background-color: var(--snow-night); }
 .fm-snow::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background-image: radial-gradient(circle, rgba(247,252,255,.85) 1px, transparent 1.6px), radial-gradient(circle, rgba(247,252,255,.5) 1px, transparent 1.4px); background-size: 31px 31px, 19px 19px; background-position: 0 0, 11px 7px; }
 .fm-art-aurora { background: radial-gradient(ellipse 60% 140% at 22% 0%, var(--aurora-teal), transparent 70%), radial-gradient(ellipse 50% 130% at 80% 10%, var(--aurora-violet), transparent 70%), linear-gradient(180deg, var(--snow-night) 0%, #0a2a3d 100%); }

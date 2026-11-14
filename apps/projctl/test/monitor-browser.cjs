@@ -33,6 +33,9 @@ const SIZES = [[1440, 900], [1024, 768], [680, 900], [375, 812]];
     await until(async () => (await page.locator('[data-lock-word]').textContent()) === 'Show Lock on');
     assert.match(await page.locator('[data-relay-word]').textContent(), /Simulator relay · live/);
     await until(async () => (await page.locator('#mon-log [role=row]').count()) > 2);
+    // Recorded lamp notes keep their date and label; they never read as a current reading.
+    assert.match(await page.locator('#mon-insp').textContent(), /Recorded: Lamp 1 on · Lamp 2 FAILED · Nov 13 snapshot/);
+    assert.match(await page.locator('.fm-feed[data-lane=A] .fm-feed__foot').textContent(), /Recorded: Lamp 1 on · Lamp 2 FAILED · Nov 13 snapshot/);
     await page.locator('.fm-feed[data-lane=B]').click();
     assert.equal(await page.locator('#insp-title').textContent(), 'BProjector B');
     assert.equal(await page.locator('#mon-insp').getAttribute('data-lane'), 'B');

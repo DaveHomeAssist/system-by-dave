@@ -37,6 +37,11 @@ test('folders serve index.html, redirect without a slash, and leave the relay ru
       const html = await r.text();
       assert.match(html, /http-equiv="Content-Security-Policy"/, page);
       assert.doesNotMatch(html, /\sstyle="/, `${page} keeps styles in monitor.css`);
+      // AGENTS.md full head: canonical, Open Graph and Twitter Card, at the relay's local identity.
+      const url = 'http://localhost:8080/monitor/' + (page === 'index.html' ? '' : page);
+      assert.match(html, new RegExp(`<link rel="canonical" href="${url}">`), `${page} canonical`);
+      assert.match(html, new RegExp(`<meta property="og:url" content="${url}">`), `${page} og:url`);
+      for (const tag of ['property="og:title"', 'property="og:description"', 'property="og:type"', 'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"', 'name="theme-color"', 'name="robots" content="noindex, nofollow"']) assert.ok(html.includes(`<meta ${tag}`), `${page} lacks ${tag}`);
     }
   } finally { await relay.close(); }
 });

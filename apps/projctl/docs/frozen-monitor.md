@@ -18,7 +18,7 @@ Millumin still sends power and shutter; the monitor does not take over either jo
 
 | Page | Live from the relay | Recorded (dated, in `monitor-data.js`) |
 | --- | --- | --- |
-| Monitor (`index.html`) | Per-lane state, input, signal, shutter, reply age, intake air and heat; the command log; health-report timing; Show Lock | Alerts from the Nov 12–13 records, the theatre checklist, lane identity |
+| Monitor (`index.html`) | Per-lane state, input, signal, shutter, reply age, intake air and heat; a lamp error when the relay reports one; the command log; health-report timing; Show Lock | Alerts from the Nov 12–13 records, the theatre checklist, lane identity, lamp notes labeled `Recorded:` with their snapshot date |
 | Cues | Show Lock on the relay node; which slot each lane uses | Cue path, cue map, listener forms (from `server/osc.js`), checks |
 | Rig | Addresses, controller slots, model, Show Lock, power schedules, Stop lens | Lanes, lenses, plotted rasters, acceptance grid, power notes |
 | Network | Projector addresses and state, this relay's address, poll interval | Control and picture maps, device details, link health |
@@ -53,6 +53,9 @@ status, not a switch.
   `public/monitor/`.
 
 ## Layout
+
+Each page carries the repository's full head (canonical, Open Graph and Twitter Card) at the relay's
+local identity, `http://localhost:8080/monitor/`, with `noindex, nofollow`.
 
 Every page is viewport-locked: the page never scrolls (WEB-2) and long panels scroll inside
 themselves. Below 1100 px the columns stack inside the page body; at 680 px and below the six

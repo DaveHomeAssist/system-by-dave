@@ -7,7 +7,11 @@ let selected = 'A', schedule = null;
 const KIND = { 'power-on': 'Power on', hourly: 'Hourly', 'power-off': 'Power off', 'relay-stop': 'Relay stop', manual: 'Manual' };
 const word = v => `<span class="fm-word"><span class="avd-dot avd-dot--${v.st}" aria-hidden="true"></span>${esc(v.word)}</span>`;
 const model = v => v.liveModel || v.model;
-const light = v => v.lampNow || v.light.split(' · Nov')[0];
+// The lamp note is a dated record and keeps its date; a lamp error the relay reports now is shown
+// beside it, never instead of it. Drivers that do not read lamp state report no error, so the
+// absence of one is not presented as a current reading.
+const lampRecord = v => `Recorded: ${v.light}`;
+const light = v => [v.lampNow, lampRecord(v)].filter(Boolean).join(' · ');
 const address = v => v.ip || (live.connected ? 'No address saved' : 'Address from the relay');
 const slotLabel = slot => !slot || slot === '*' || slot === 'all' ? 'All' : laneOfSlot(slot) ? `${slot} · ${laneOfSlot(slot)}` : slot;
 
@@ -15,7 +19,7 @@ function feed(v) {
   const portal = v.lane === 'A' || v.lane === 'D';
   const head = portal ? '' : `<span class="pj-mono fm-feed__id">${esc(model(v))} · ${esc(address(v))}</span><span class="fm-feed__state">${word(v)}</span>`;
   const chips = `<span class="fm-chip fm-chip--tl">${esc(v.input)} · ${esc(v.signal)}</span>${portal ? '' : `<span class="fm-chip fm-chip--tr">Intake ${esc(v.intake)}</span>`}<span class="fm-chip fm-chip--bl">Shutter ${esc(v.shutter)}</span>${portal ? '' : `<span class="fm-chip fm-chip--br">Reply ${esc(v.reply)}</span>`}`;
-  const foot = portal ? `<span class="fm-feed__foot">${word(v)}<span class="pj-mono fm-small">${esc(light(v))}</span><span class="pj-mono fm-small">Intake ${esc(v.intake)}<br>Reply ${esc(v.reply)}</span></span>` : '';
+  const foot = portal ? `<span class="fm-feed__foot">${word(v)}${v.lampNow ? `<span class="pj-mono fm-small fm-lamp-now">${esc(v.lampNow)}</span>` : ''}<span class="pj-mono fm-small">${esc(lampRecord(v))}</span><span class="pj-mono fm-small">Intake ${esc(v.intake)}<br>Reply ${esc(v.reply)}</span></span>` : '';
   return `<button type="button" class="fm-feed fm-pick" data-lane="${v.lane}" data-pick="${v.lane}" data-key="feed-${v.lane}" aria-pressed="${v.lane === selected}" aria-label="Projector ${v.lane}, ${esc(v.surface)}, ${esc(v.word)}"><span class="fm-feed__head"><span class="fm-laneidx">${v.lane}</span><span class="fm-lanename">${esc(v.surface)}</span>${head}</span><span class="fm-art ${v.lane === 'C' ? 'fm-art-peaks' : 'fm-art-aurora'} fm-snow">${chips}</span>${foot}</button>`;
 }
 
