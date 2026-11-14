@@ -5,7 +5,7 @@
 - `scripts/frozen_case_film.py` draws its caption band with Pillow and runs it
   under the session film as a timed image sequence. It no longer needs ffmpeg's
   `drawtext` filter or `-filter_complex_script`, which Homebrew ffmpeg 9 lacks,
-  so it captions on any ffmpeg with libx264. The film looks the same.
+  so it captions on any ffmpeg with libx264. The caption layout is unchanged.
 
 ## November 14, 2026: PT-DW830 lamp replacement video in Equipment Lab
 
