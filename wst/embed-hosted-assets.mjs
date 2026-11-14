@@ -26,6 +26,6 @@ fs.writeFileSync(worker,'const ASSETS = '+JSON.stringify(assets)+';\nconst BINAR
 if(!process.argv.includes('--hosted-only')){
 const local=path.resolve(root,'../apps/projctl/public/workspace');
 fs.mkdirSync(local,{recursive:true});
-for(const file of ['index.html','workspace.css','workspace.js','calendar.js','tech-schedule.json','frozen-tech-schedule.pdf','pixel-strip-label.jpg','pixel-power-supply.jpg','snow-splash.css','snow-splash.js','vendor/gsap.min.js','workspace-config.json','projectors.json','reference-view.js','reference-view.css']){const dest=path.join(local,file);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,file),dest);}
+for(const file of ['documents/frozen-handoff-r4.pdf','documents/frozen-signal-flow-r5.pdf','index.html','workspace.css','workspace.js','calendar.js','tech-schedule.json','frozen-tech-schedule.pdf','pixel-strip-label.jpg','pixel-power-supply.jpg','snow-splash.css','snow-splash.js','vendor/gsap.min.js','workspace-config.json','projectors.json','reference-view.js','reference-view.css']){const dest=path.join(local,file);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,file),dest);}
 }
 console.log('Embedded canonical WST assets, configuration and projector reference.');
