@@ -1,0 +1,10 @@
+{
+  "title": "Frozen Projection Handoff R4",
+  "sourceDate": "2026-11-13",
+  "publishedCopy": "frozen-handoff-r4.pdf",
+  "pages": 17,
+  "sourceSha256": "90066f0b2f1e491bdc7423dd51dbdbc1f49b8a393eac79d3d15c53387bffad1a",
+  "publicSha256": "3fd0095ac6dadbd48db3e74d7b2eef8ad814cc1d521926d0567353599e4542fc",
+  "transformation": "Six private network addresses replaced with Private LAN. Metadata normalized. Original layout, internal links and bookmarks retained. Original source unchanged.",
+  "acceptance": "Recorded configuration; field acceptance pending."
+}
