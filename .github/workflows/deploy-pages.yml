@@ -237,8 +237,10 @@ jobs:
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |
+          # Repo/agent docs (CLAUDE.md, AGENTS.md, README.md at the root) stay in the
+          # repo but are not part of the published site.
           mkdir -p _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='dist' --exclude='package.json' --exclude='package-lock.json' --exclude='/flooring-contract-review.html' --exclude='/house' --exclude='/cross-project-*' --exclude='.agent-claim' --exclude='/apps/av-workbook' --exclude='/av-workbook/assets' ./ _site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='dist' --exclude='package.json' --exclude='package-lock.json' --exclude='/flooring-contract-review.html' --exclude='/house' --exclude='/cross-project-*' --exclude='.agent-claim' --exclude='/apps/av-workbook' --exclude='/av-workbook/assets' --exclude='/CLAUDE.md' --exclude='/AGENTS.md' --exclude='/README.md' ./ _site/
           # Check the actual publish artifact as well as the tracked source.
           # The committed sitemap lists routes only; stamp the published copy with
           # each page's last commit date from this commit's full history.

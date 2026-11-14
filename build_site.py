@@ -243,7 +243,7 @@ def page_shell(current_path: str, title: str, description: str, body: str) -> st
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>{esc(page_title)}</title>
           <meta name="description" content="{esc(description)}">
-          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self'; object-src 'none'; base-uri 'self'">
           <link rel="canonical" href="{canonical(current_path)}">
           <meta name="robots" content="index,follow">
           <meta name="theme-color" content="#f7f8f5">
