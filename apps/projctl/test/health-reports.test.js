@@ -397,3 +397,88 @@ test('Barco health readings read ambient and alarm state only', async (t) => {
   const missing = await driver.healthReadings();
   assert.equal(missing.sensors[0].c, null, 'an unsupported sensor is not read as 0 °C');
 });
+
+for (const failedSensor of [0, 1, 2]) {
+  test(`Panasonic transport loss at sensor ${failedSensor} preserves prior readings and stops queries`, async (t) => {
+    const sent = [], partials = [];
+    const port = await fakeServer(t, (socket) => {
+      socket.write('NTCONTROL 0\r');
+      socket.once('data', (bytes) => {
+        const cmd = bytes.toString().trim().slice(2);
+        sent.push(cmd);
+        if (cmd === `QTM:${failedSensor}`) socket.end();
+        else socket.end('000037/0098\r');
+      });
+    });
+    const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
+    const result = driver.healthReadings({ onPartial: (value) => partials.push(value) });
+    if (failedSensor === 0) await assert.rejects(result, /connection closed/);
+    else {
+      const value = await result;
+      assert.equal(value.sensors[0].c, 37);
+      assert.equal(value.sensors.filter((sensor) => Number.isFinite(sensor.c)).length, failedSensor);
+      assert.match(value.readError, /connection closed/);
+      const row = unitRow(RIG[2], { online: true, errors: ok }, {}, value, null, CONFIG);
+      assert.equal(row.intakeC, 37);
+      assert.equal(row.verdict, 'watch');
+      assert.match(row.readError, /connection closed/);
+      assert.equal(partials[0].sensors.length, 1, 'partial snapshots remain stable');
+    }
+    assert.deepEqual(sent, Array.from({ length: failedSensor + 1 }, (_, n) => `QTM:${n}`));
+  });
+}
+
+test('Pulse retains ambient temperature when the alarm connection drops', async (t) => {
+  const port = await fakeServer(t, (socket) => {
+    socket.once('data', (bytes) => {
+      const request = JSON.parse(bytes.toString());
+      if (request.params.property === 'environment.alarmstate') socket.end();
+      else socket.end(JSON.stringify({ jsonrpc: '2.0', id: request.id, result: 29.8 }));
+    });
+  });
+  const value = await pulseDriver({ host: '127.0.0.1', port, timeoutMs: 500 }).healthReadings();
+  assert.equal(value.sensors[0].c, 29.8);
+  assert.equal(value.alarm, null);
+  assert.match(value.readError, /connection closed/);
+  const row = unitRow(RIG[0], { online: true }, {}, value);
+  assert.equal(row.verdict, 'incomplete');
+  assert.match(renderMarkdown(buildReport({ kind: 'manual', startedAt: 0, finishedAt: 1, units: [row] })), /alarm feedback unavailable/);
+});
+
+test('report deadline preserves partial readings, bounds retries and saves the failure', async (t) => {
+  const { engine, clock, dir } = rigEngine(t, {
+    telemetryTimeoutMs: 100,
+    readTelemetry: async (p, { signal, attempts, onPartial }) => {
+      assert.equal(attempts, 3);
+      onPartial(panasonic(37));
+      await new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason), { once: true }));
+    },
+  });
+  const pending = engine.run();
+  await clock.flush();
+  await clock.advance(100);
+  const report = await pending;
+  const saved = JSON.parse(fs.readFileSync(path.join(dir, `${report.id}.json`), 'utf8'));
+  assert.ok(saved.units.every((unit) => unit.intakeC === 37 && /timed out/.test(unit.readError)));
+  assert.match(fs.readFileSync(path.join(dir, `${report.id}.md`), 'utf8'), /readings: health reading timed out/);
+  await engine.stop();
+});
+
+test('relay-stop partial readings are saved inside its shutdown cap without retries', async (t) => {
+  const { engine, clock, set, dir } = rigEngine(t, {
+    readTelemetry: async (p, { signal, attempts, onPartial }) => {
+      assert.equal(attempts, 1);
+      onPartial(panasonic(37));
+      await new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason), { once: true }));
+    },
+  });
+  set('on');
+  const stop = engine.stop();
+  await clock.flush();
+  await clock.advance(4000);
+  await stop;
+  const summary = engine.view().reports[0];
+  assert.equal(summary.kind, 'relay-stop');
+  const saved = JSON.parse(fs.readFileSync(path.join(dir, `${summary.id}.json`), 'utf8'));
+  assert.ok(saved.units.every((unit) => unit.intakeC === 37 && /timed out/.test(unit.readError)));
+});
