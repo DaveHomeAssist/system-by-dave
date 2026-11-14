@@ -1,5 +1,14 @@
 # Changelog
 
+## November 14, 2026: PT-DW830 lamp replacement video in Equipment Lab
+
+- The PT-DW830's Practice panel shows a silent 1 minute 23 second walkthrough
+  of replacing a lamp unit, at the top of the lamp procedure. Its ten steps
+  match the steps listed under it. It loads only when played, and Reference
+  lists a download link.
+- The video and its poster are host media in `equipment-lab/media/`, outside
+  the managed release and the offline set. The browser probe checks them.
+
 ## 2026-11-14
 
 - Refresh WST Planning Documents with the 18-page R5 handoff and five-page diagrams, including EDID evidence and pixel-routing corrections. Publish sanitized PDFs with source hashes while retaining the private exports outside the site.
