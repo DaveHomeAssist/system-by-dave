@@ -1,5 +1,18 @@
 # Changelog
 
+## November 14, 2026: Frozen Monitor on the projctl relay
+
+- Add the Frozen Monitor at `/monitor/` on the projctl relay: Monitor, Cues, Rig,
+  Network, Notes and Calendar pages built from the November 14 design canvas with
+  projctl's own tokens, header, tiles and lane colours, plus a new Deep Freeze theme.
+  Live projector state, the command log, Show Lock, addresses and health timing come
+  from the relay's snapshot; recorded facts are dated, and nothing is filled with
+  sample values. Stop lens is the only command it sends. See
+  `apps/projctl/docs/frozen-monitor.md`.
+- Fix a relay crash: requesting a folder such as `/avd/` threw inside the static
+  handler and stopped the relay. Folders now serve their `index.html`, a bare folder
+  path redirects to its slash form, and read errors end only that response.
+
 ## November 14, 2026: Offline receipts name missing files; AV data asks to persist
 
 - The offline status says when optional files failed to cache ("Offline ready ·
