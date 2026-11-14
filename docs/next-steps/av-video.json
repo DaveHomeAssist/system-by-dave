@@ -167,7 +167,12 @@
     "Retire the 8 legacy Video pages once AV Video imports all 8 keys, or keep them live indefinitely?",
     "Minimum iOS/iPadOS for field use: 17.4+ (checkVisibility) or add fallbacks for older iPads?",
     "Throwline: keep explicit-save only (edited width resets on reload) or add a draft autosave?",
-    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?"
+    "AVV-STREAM-KEY-1 [unlocks Stream/Record runtime]: Option 1 block raw stream keys at every AV Video import, original, storage, export and recovery boundary (recommended), or Option 2 retain warning-only behavior and classify all resulting documents as potentially credential-bearing?",
+    "FC-D1: Is the Frozen case the test case you meant? A) yes, as built in docs/frozen-case.md (recommended), or B) something else you describe?",
+    "FC-D2: Where is the Frozen case monitored? A) pull requests plus a live read-back after each release (recommended, current), B) also gate the Pages deployment, or C) also a nightly live run (a scheduled job, needs approval)?",
+    "FC-D3: Which Frozen case stage next? A) Throwline for each lane (recommended), B) the PT-DW830 lamp and filter procedures in Equipment Lab, or C) another order?",
+    "FC-D4: How should Equipment Lab find a model by the name on a rig record? A) search ignores case, spaces and hyphens and matches shared-catalog aliases (recommended), B) normalise in the host only, or C) leave it?",
+    "FC-D5: Should the Frozen case be visible in the product? A) no, test only (recommended), or B) a loadable demo plan in the console (a new public surface)?"
   ],
   "files": [
     {
@@ -945,5 +950,26 @@
       "scope": "Page-specific Open Graph and Twitter card, actual model render, labeled PDF and reference accuracy notice; other pages unchanged.",
       "releaseReceipt": "Current follow-up pull request; production metadata/image readback required, third-party cache refresh separate."
     }
+  },
+  "frozenCase": {
+    "recordedOn": "2026-11-14",
+    "request": "Dave, November 13, 2026: \"methodically build out the frozen situation in the avbydave app as a recorded and monitored test case\".",
+    "state": "Stage 1 (projection lanes A to D in AV Video) built; runs on pull requests that touch the console. Publication and live read-back are separate gates recorded in the owning pull request.",
+    "brief": "docs/frozen-case.md",
+    "probe": "scripts/probe_frozen_case.mjs",
+    "verification": "Cloud session, headless Chromium on SwiftShader: 22 of 22 steps pass against the checkout; planning checks equal the eight known unknowns in the public reference.",
+    "findings": [
+      {
+        "id": "FC-F1",
+        "state": "Fixed in the same change",
+        "title": "Signal Flow counted the newest connection and did not draw its cable until a reload"
+      },
+      {
+        "id": "FC-F2",
+        "state": "Open",
+        "title": "Equipment Lab search needs the catalogue spelling; rig-record spellings find nothing"
+      }
+    ],
+    "limits": "Plan records and operator reports, not show state. No hardware, physical device, touch or operator acceptance."
   }
 }
