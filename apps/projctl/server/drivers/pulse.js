@@ -161,16 +161,25 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       return s;
     },
     // Read-only ambient temperature and alarm state for health reports.
-    async healthReadings({ signal } = {}) {
+    async healthReadings({ signal, onPartial } = {}) {
       const read = (property) => rpc('property.get', { property }, timeoutMs, undefined, signal);
       const optional = async (property) => { try { return await read(property); } catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; return null; } };
       const raw = await optional('environment.temperature.ambient_outside.value');
       const ambient = raw == null || raw === '' ? NaN : Number(raw);
-      const alarm = await optional('environment.alarmstate');
-      throwIfAborted(signal);
+      const sensors = [{ id: 'ambient', label: 'Ambient, outside', role: 'intake', c: Number.isFinite(ambient) ? Math.round(ambient * 10) / 10 : null }];
+      onPartial?.({ sensors, alarm: null });
+      let alarm, readError;
+      try {
+        alarm = await optional('environment.alarmstate');
+        throwIfAborted(signal);
+      } catch (error) {
+        if (!Number.isFinite(ambient)) throw error;
+        readError = String(error.message || error);
+      }
       return {
-        sensors: [{ id: 'ambient', label: 'Ambient, outside', role: 'intake', c: Number.isFinite(ambient) ? Math.round(ambient * 10) / 10 : null }],
+        sensors,
         alarm: alarm == null ? null : String(alarm),
+        ...(readError ? { readError } : {}),
       };
     },
     power: (on, { guard } = {}) => rpc(on ? 'system.poweron' : 'system.poweroff', undefined, timeoutMs, guard).then(() => 'OK'),

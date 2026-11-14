@@ -9,6 +9,13 @@
   connect to or embed the relay, and public-only generation leaves the installed
   controller shell untouched.
 
+## November 14, 2026: Projctl telemetry coordination
+
+- Serialize status and health reads per projector while keeping different units independent and allowing status polls between bounded report retries.
+- Retry transport failures at most twice, 4 seconds apart, within the existing 12-second report deadline.
+- Preserve partial Panasonic and Pulse temperatures and report later sensor failures, including deadline expiry. Add queue, retry, cancellation, transport and saved-report regression tests.
+- Adapt the scoped telemetry improvements from PR #463 to current main.
+
 ## November 14, 2026: Frozen recorded test case and a Signal Flow cable fix
 
 - Add the Frozen case: the four projection lanes of the Frozen rig entered into

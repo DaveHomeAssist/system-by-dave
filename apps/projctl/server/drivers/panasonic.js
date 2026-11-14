@@ -124,13 +124,20 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     },
     // Read-only temperatures for health reports; never part of the status poll.
     // A refused sensor reads as null; a dead connection stops the remaining queries.
-    async healthReadings({ signal } = {}) {
+    async healthReadings({ signal, onPartial } = {}) {
       const sensors = [];
       for (const [n, id, label, role] of QTM_SENSORS) {
         let c = null;
         try { c = parseQtm(await native(`QTM:${n}`, { signal })); }
-        catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; }
+        catch (e) {
+          if (transportFailure(e) || signal?.aborted) {
+            if (!sensors.some((s) => Number.isFinite(s.c))) throw e;
+            sensors.push({ id, label, role, c: null });
+            return { sensors, readError: String(e.message || e) };
+          }
+        }
         sensors.push({ id, label, role, c });
+        onPartial?.({ sensors: sensors.map((sensor) => ({ ...sensor })) });
       }
       return { sensors };
     },
