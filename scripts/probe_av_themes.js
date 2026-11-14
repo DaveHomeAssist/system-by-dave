@@ -2,10 +2,9 @@
 'use strict';
 
 const fs = require('node:fs');
-const os = require('node:os');
 const path = require('node:path');
 const vm = require('node:vm');
-const { spawn } = require('node:child_process');
+const { launchChrome } = require('./chrome_launch');
 
 if (typeof WebSocket === 'undefined') {
   console.error('This probe requires a Node runtime with global WebSocket support.');
@@ -60,19 +59,6 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function waitForJson(port) {
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    try {
-      const response = await fetch(`http://127.0.0.1:${port}/json/version`);
-      if (response.ok) return response.json();
-    } catch (error) {
-      // Chrome is still starting.
-    }
-    await delay(250);
-  }
-  throw new Error('Chrome DevTools endpoint did not start.');
-}
-
 function rgb(value) {
   const hex = String(value || '').trim().match(/^#([0-9a-f]{6})$/i);
   if (hex) return [0, 2, 4].map((index) => Number.parseInt(hex[1].slice(index, index + 2), 16));
@@ -115,24 +101,26 @@ async function main() {
   if (!targets.length) throw new Error('No AV theme probe targets matched --target.');
   if (captureDir) fs.mkdirSync(captureDir, { recursive: true });
 
-  const port = 9500 + Math.floor(Math.random() * 300);
-  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'sbd-av-theme-probe-'));
-  const chrome = spawn(chromeBin, [
-    '--headless=new',
-    '--disable-gpu',
-    '--use-angle=swiftshader',
-    '--enable-unsafe-swiftshader',
-    '--disable-background-networking',
-    '--disable-component-update',
-    '--no-default-browser-check',
-    '--no-first-run',
-    `--remote-debugging-port=${port}`,
-    `--user-data-dir=${profile}`,
-    'about:blank'
-  ], { stdio: ['ignore', 'ignore', 'ignore'] });
+  // A start that does not answer is retried on a fresh port and profile (scripts/chrome_launch.js).
+  const { chrome, port, profile } = await launchChrome({
+    chromeBin,
+    profilePrefix: 'sbd-av-theme-probe-',
+    portBase: 9500,
+    portSpan: 300,
+    args: [
+      '--headless=new',
+      '--disable-gpu',
+      '--use-angle=swiftshader',
+      '--enable-unsafe-swiftshader',
+      '--disable-background-networking',
+      '--disable-component-update',
+      '--no-default-browser-check',
+      '--no-first-run'
+    ],
+    log: (line) => console.error(line)
+  });
 
   try {
-    await waitForJson(port);
     const page = await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: 'PUT' }).then((response) => response.json());
     const socket = new WebSocket(page.webSocketDebuggerUrl);
     await new Promise((resolve, reject) => {
