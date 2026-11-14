@@ -64,6 +64,21 @@ require another first tap. Changing Show Lock clears pending confirmations.
 change through Cooling to Standby before removing power. Show Lock blocks power off, input,
 test patterns, lens movement and picture changes; shutter and read-only status remain available.
 
+## Command validation at the write
+
+The relay binds each requested command to the current projector configuration.
+It rechecks that binding, current availability and applicable Show Lock rules
+immediately before each driver write. A protected command waiting on a handshake
+or queue is cancelled if Show Lock changes, including an on/off transition.
+Group actions, cues and preset sequences keep the target bindings captured when
+execution begins. A changed later target receives an error while other results
+remain visible. Shutter, power on and Stop retain their existing Show Lock rules.
+
+Pulse patterns and compound lens moves recheck before each write. If an earlier
+lens move was already attempted, its protective stop can still run after a later
+step is cancelled. A command acknowledgement continues to require separate state
+feedback and physical acceptance.
+
 ## Cues from Millumin or QLab
 
 Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:

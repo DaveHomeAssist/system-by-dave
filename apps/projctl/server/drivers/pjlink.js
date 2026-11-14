@@ -165,7 +165,7 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
   const query = (commands, options) => inTurn(() => runQuery(commands, options));
   // A command closes the held status session and uses its own connection, as it
   // always has. The next poll opens a new session.
-  const command = (cmd, options) => inTurn(() => { dropSession(live); return send(cmd, options); });
+  const command = (cmd, options) => inTurn(() => { options?.guard?.(); dropSession(live); return send(cmd, options); });
   const powerMap = { '0': POWER.OFF, '1': POWER.ON, '2': POWER.COOLING, '3': POWER.WARMING };
   return {
     kind: 'pjlink',
