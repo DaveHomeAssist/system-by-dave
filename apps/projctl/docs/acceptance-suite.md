@@ -117,3 +117,7 @@ Tests use a temporary local fixture server and fake Screen Check. They must
 exercise missing evidence, expired release, simulation, interrupted writes,
 resume, credential redaction and GET-only collection. Venue, macOS executable,
 actual cueing and physical recovery acceptance remain separate live checks.
+
+## Audit correction criteria
+
+Criteria version 2 requires a current power-off report and witnessed shutdown passes for all four lanes linked to the same submitted evidence. A relay-stop record cannot pass shutdown reporting or shutdown delivery. Thermal acceptance requires an explicit zero incomplete count. Historical thermal and shutdown passes remain in the journal and appear as legacy_unverified until rechecked. Record the lane observations first, then the report and delivery results.

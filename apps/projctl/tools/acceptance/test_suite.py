@@ -82,7 +82,7 @@ class AcceptanceTests(unittest.TestCase):
         for check, lane in (("temperature", "A"), ("shutdown-report", "rig"), ("delivery", "rig")):
             with self.assertRaises(ValueError):
                 suite.record(self.run, check, lane, "pass", "Witness", "Observed", [evidence])
-        report = {"startedAt": suite.now(), "kind": "manual", "counts": {"units": 4, "reached": 4, "flagged": 0}}
+        report = {"startedAt": suite.now(), "kind": "manual", "counts": {"units": 4, "reached": 4, "flagged": 0, "incomplete": 0}}
         def save_report(value):
             return suite.add_event(self.run, {"kind": "capture", "api": {"/api/state": {"simulation": False},
                      "/api/health-reports": {"reports": [value]}}})
@@ -92,11 +92,55 @@ class AcceptanceTests(unittest.TestCase):
             suite.record(self.run, "shutdown-report", "rig", "pass", "Witness", "Observed", [capture])
         report["kind"] = "power-off"
         capture = save_report(report)
+        suite.release(self.run, "Stage manager", ["shutdown"], 30)
+        for lane in suite.LANES:
+            suite.record(self.run, "shutdown", lane, "pass", "Witness", "Observed standby", [capture])
         suite.record(self.run, "shutdown-report", "rig", "pass", "Witness", "Observed", [capture])
         with self.assertRaises(ValueError):
             suite.record(self.run, "delivery", "rig", "pass", "Witness", "Observed", [capture])
         report["notion"] = {"state": "published", "url": "https://example.test/report"}
-        suite.record(self.run, "delivery", "rig", "pass", "Witness", "Opened report", [save_report(report)])
+        delivered = save_report(report)
+        for lane in suite.LANES:
+            suite.record(self.run, "shutdown", lane, "pass", "Witness", "Observed standby", [delivered])
+        suite.record(self.run, "delivery", "rig", "pass", "Witness", "Opened report", [delivered])
+
+    def test_relay_stop_and_unlinked_shutdown_cannot_pass(self):
+        report = {"startedAt": suite.now(), "kind": "relay-stop",
+                  "notion": {"state": "published", "url": "https://example.test/report"}}
+        def save_report():
+            return suite.add_event(self.run, {"kind": "capture", "api": {
+                "/api/state": {"simulation": False},
+                "/api/health-reports": {"reports": [report]}}})
+        capture = save_report()
+        suite.release(self.run, "Stage manager", ["shutdown"], 30)
+        for check in ("shutdown-report", "delivery"):
+            with self.assertRaises(ValueError):
+                suite.record(self.run, check, "rig", "pass", "Witness", "Observed", [capture])
+        for lane in suite.LANES:
+            suite.record(self.run, "shutdown", lane, "pass", "Witness", "Observed standby", [capture])
+        for check in ("shutdown-report", "delivery"):
+            with self.assertRaises(ValueError):
+                suite.record(self.run, check, "rig", "pass", "Witness", "Observed", [capture])
+        report["kind"] = "power-off"
+        unrelated = save_report()
+        with self.assertRaises(ValueError):
+            suite.record(self.run, "shutdown-report", "rig", "pass", "Witness", "Observed", [unrelated])
+
+    def test_missing_thermal_coverage_and_legacy_pass_require_reverification(self):
+        report = {"startedAt": suite.now(), "kind": "manual",
+                  "counts": {"units": 4, "reached": 4, "flagged": 0, "incomplete": 1}}
+        capture = suite.add_event(self.run, {"kind": "capture", "api": {
+            "/api/state": {"simulation": False}, "/api/health-reports": {"reports": [report]}}})
+        with self.assertRaises(ValueError):
+            suite.record(self.run, "temperature", "A", "pass", "Witness", "Observed", [capture])
+        with suite.transaction(self.run) as data:
+            data["events"].append({"kind": "result", "id": "legacy", "at": suite.now(),
+                "check": "shutdown-report", "lane": "rig", "result": "pass", "witness": "Old witness",
+                "notes": "Historical result", "evidence": [capture]})
+        original = (self.run / "run.json").read_bytes()
+        self.assertEqual(suite.report(self.run), 2)
+        self.assertIn("legacy_unverified", (self.run / "report.md").read_text())
+        self.assertEqual(original, (self.run / "run.json").read_bytes())
 
     def test_journal_lock_and_interrupted_transaction(self):
         before = (self.run / "run.json").read_bytes()
@@ -168,7 +212,7 @@ class AcceptanceTests(unittest.TestCase):
             for check, lanes in suite.CHECKS.items():
                 for lane in lanes:
                     data["events"].append({"kind": "result", "id": check + lane, "at": suite.now(),
-                        "check": check, "lane": lane, "result": "pass", "witness": "Fixture", "notes": "Fixture", "evidence": [evidence]})
+                        "check": check, "lane": lane, "result": "pass", "witness": "Fixture", "notes": "Fixture", "evidence": [evidence], "criteria_version": 2})
         self.assertEqual(suite.report(self.run), 0)
         suite.record(self.run, "delivery", "rig", "not_tested", "Fixture", "Retest required", [])
         self.assertEqual(suite.report(self.run), 2)
