@@ -1,5 +1,12 @@
 # Changelog
 
+## November 14, 2026: Frozen case films caption on current ffmpeg
+
+- `scripts/frozen_case_film.py` draws its caption band with Pillow and runs it
+  under the session film as a timed image sequence. It no longer needs ffmpeg's
+  `drawtext` filter or `-filter_complex_script`, which Homebrew ffmpeg 9 lacks,
+  so it captions on any ffmpeg with libx264. The caption layout is unchanged.
+
 ## November 14, 2026: PT-DW830 lamp replacement video in Equipment Lab
 
 - The PT-DW830's Practice panel shows a silent 1 minute 23 second walkthrough
