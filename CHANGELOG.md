@@ -6,6 +6,16 @@
 - Show heat outside Thermal watch only for a current Watch or Hot reading, as a card chip and a header pill that opens Thermal watch. Add thumbnails to the full pattern list.
 - No new commands, guards or backend changes; the default cards are unchanged. Brief: `apps/projctl/docs/details-controls.md`.
 
+## November 13, 2026: Projector connection recovery
+
+- Keep a PJLink status session open across polls, recover closed sessions and
+  support projectors that require authentication on every query.
+- Preserve complete status reads and cancellation while serializing controls
+  with polling. Release held sessions when a configured driver is replaced.
+- Validate Panasonic echoed replies and reject mismatches promptly.
+- Cover session reuse, close recovery, command isolation, cancellation and
+  complete status freshness with loopback regression tests.
+
 ## November 13, 2026: Resumable rig acceptance runner
 
 - Use an OS-held journal lock so a forced process exit or restart cannot leave
