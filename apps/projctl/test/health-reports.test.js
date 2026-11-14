@@ -247,6 +247,91 @@ test('Notion failures stay local, retry later and survive a restart', async (t) 
   assert.equal(b.engine.view().engine.notion.pending, 0);
 });
 
+test('a unit that left the network in standby and comes back lit is a power-on; a lit unit that only lost the network is not', async (t) => {
+  const a = rigEngine(t);
+  a.set('off');
+  for (const s of ['P1', 'P2', 'P3', 'P4']) { a.live.get(s).online = false; a.engine.observe(s, null); } // ECO standby drops the network
+  await a.clock.advance(3600000);
+  a.live.get('P1').online = true;
+  a.set('warming', ['P1']); // front panel power on: the first reply is already warming
+  await a.clock.advance(2 * 60000);
+  assert.deepEqual(a.kinds(), ['power-on']);
+
+  const b = rigEngine(t);
+  b.set('on'); // already lit when the relay starts
+  b.live.get('P3').online = false; b.engine.observe('P3', null);
+  b.live.get('P3').online = true; b.set('on', ['P3']); // a network blip mid-show
+  await b.clock.advance(5 * 60000);
+  assert.deepEqual(b.kinds(), [], 'no power-on report for a blip or for units lit at relay start');
+});
+
+test('relay stop saves its report within the cap when a unit does not answer', async (t) => {
+  const tries = [];
+  const { engine, clock, set, kinds, dir } = rigEngine(t, {
+    start: '2026-11-12T22:55:00Z', stopTimeoutMs: 6000,
+    readTelemetry: (p, options) => { tries.push(options.attempts); return p.slot === 'P4' ? new Promise(() => {}) : NOV11[p.slot].readings; },
+  });
+  set('off'); set('on', ['P1']);
+  await clock.advance(30 * 60000); // the power-on report, then no report for half an hour
+  tries.length = 0;
+  const stopping = engine.stop();
+  await clock.flush();
+  await clock.advance(4000); // one attempt per unit, read within 4 s
+  const final = engine.view().reports[0];
+  assert.equal(final.kind, 'relay-stop');
+  assert.ok(fs.existsSync(path.join(dir, `${final.id}.json`)), 'saved before the 6 s cap');
+  assert.match(final.findings, /Temperatures not read: P4\./);
+  assert.deepEqual(tries, [1, 1, 1, 1]);
+  await stopping;
+  assert.deepEqual(kinds(), ['power-on', 'relay-stop']);
+});
+
+test('a report whose Notion send is cut off stays pending and is sent after the next start', async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'projctl-health-cut-'));
+  const config = { ...CONFIG, notion: { databaseId: 'd'.repeat(32) } };
+  const a = rigEngine(t, { dir, config, publish: () => new Promise(() => {}) }); // the relay exits mid-send
+  a.set('off'); a.set('on');
+  a.engine.run();
+  await a.clock.flush();
+  const id = a.engine.view().reports[0].id;
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, `${id}.json`), 'utf8')).notion.state, 'pending', 'saved as pending before the first send');
+  const sent = [];
+  const b = rigEngine(t, { dir, config, publish: async (r) => { sent.push(r.id); return { id: 'p1', url: 'https://notion.example/p1' }; } });
+  assert.equal(b.engine.view().engine.notion.pending, 1);
+  await b.clock.advance(10 * 60000);
+  assert.deepEqual(sent, [id]);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, `${id}.json`), 'utf8')).notion.state, 'published');
+});
+
+test('Notion retries never hold up readings, a round stops while Notion is down, and old reports expire', async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'projctl-health-backlog-'));
+  const config = { ...CONFIG, notion: { databaseId: 'd'.repeat(32) } };
+  const start = Date.parse('2026-11-12T22:10:00Z');
+  const waiting = (ageMs) => {
+    const at = new Date(start - ageMs).toISOString(), id = `${at.replace(/[:.]/g, '-')}-hourly`;
+    fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify({ id, kind: 'hourly', title: id, startedAt: at, finishedAt: at, units: [], notion: { state: 'pending', attempts: 1 } }));
+    return id;
+  };
+  const old = waiting(8 * 24 * 3600000);
+  for (let i = 1; i <= 10; i++) waiting(i * 3600000);
+  let mode = 'down', attempts = 0;
+  const publish = () => { attempts++; return mode === 'down' ? Promise.reject(Object.assign(new Error('Notion unreachable: fetch failed'), { retry: true })) : new Promise(() => {}); };
+  const readAt = [];
+  const { engine, clock, set } = rigEngine(t, { dir, config, publish, readTelemetry: (p) => { readAt.push(clock.now()); return NOV11[p.slot].readings; } });
+  set('on'); // lit at relay start: no power-on report
+  await clock.advance(10 * 60000);
+  assert.equal(attempts, 2, 'the expired report, then one live try; the other nine wait');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, `${old}.json`), 'utf8')).notion.state, 'failed', 'pending for more than 7 days');
+  assert.equal(engine.view().engine.notion.pending, 10);
+  mode = 'hang'; // a dead uplink that never answers
+  await clock.advance(10 * 60000);
+  const off = clock.now();
+  engine.powerOff('P1', 'ui');
+  await clock.flush();
+  assert.equal(readAt.length, 4);
+  assert.ok(readAt.every((at) => at === off), 'power-off readings start at once, not behind the stuck send');
+});
+
 test('a reporting fault never interrupts polling or the power-off path', async (t) => {
   const { engine, clock, set } = rigEngine(t, { projectors: () => { throw new Error('rig unreadable'); } });
   set('off');

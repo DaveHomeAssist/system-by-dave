@@ -294,12 +294,17 @@ export function createHealthReports({
   recentAir = null, telemetryAttempts = 3, watchSampleMaxAgeMs = 3 * 60000,
   now = Date.now, timer = setTimeout, cancelTimer = clearTimeout, timeZone = TIME_ZONE,
   powerOnDelayMs = 120000, telemetryTimeoutMs = 12000, hourlyQuietMs = 15 * 60000, powerOffWindowMs = 30000,
-  // Retries cover a venue without internet for up to 7 days (1008 tries at 10 minutes).
-  stopQuietMs = 5 * 60000, stopTimeoutMs = 6000, retryMs = 10 * 60000, maxAttempts = 1008, keep = 500, log = console,
+  // Retries cover a venue without internet for up to 7 days after a report is written
+  // (at most 1008 tries at 10 minutes).
+  stopQuietMs = 5 * 60000, stopTimeoutMs = 6000, retryMs = 10 * 60000, maxAttempts = 1008, retryForMs = 7 * 24 * HOUR, keep = 500, log = console,
+  // The relay-stop report reads each unit once within this limit, so it is saved inside the stop cap.
+  stopReadingMs = Math.max(1000, stopTimeoutMs - 2000),
 }) {
   const lastPower = new Map(), pending = new Map(), recent = [];
   let session = null, powerOnTimer = null, hourlyTimer = null, retryTimer = null, nextHourlyAt = null;
-  let lastReportAt = null, lastPowerOffAt = -Infinity, chain = Promise.resolve(), closed = false, lastPublishError = null;
+  // `chain` runs readings and local saves one report at a time. `sending` runs Notion sends and
+  // retries on their own, so a slow or unreachable Notion never holds up a report's readings.
+  let lastReportAt = null, lastPowerOffAt = -Infinity, chain = Promise.resolve(), sending = Promise.resolve(), closed = false, lastPublishError = null;
   const enabled = () => config.enabled && !closed;
   const assigned = () => projectors().filter((p) => p.ip);
   const anyLitNow = () => assigned().some((p) => status(p.slot)?.online && isLit(status(p.slot)?.power));
@@ -340,8 +345,11 @@ export function createHealthReports({
     }
   }
 
+  const notionConfigured = () => !!(publish && config.notion?.databaseId);
+  // Returns the report's Notion state afterwards.
   async function publishReport(report) {
-    if (!publish || !config.notion?.databaseId) { report.notion = { state: 'local-only', reason: 'Notion is not configured' }; save(report); remember(report); return; }
+    if (report.notion?.state === 'published') return 'published';
+    if (!notionConfigured()) { report.notion = { state: 'local-only', reason: 'Notion is not configured' }; pending.delete(report.id); save(report); remember(report); return 'local-only'; }
     const attempts = (report.notion?.attempts || 0) + 1, at = new Date(now()).toISOString();
     try {
       const out = await publish(report);
@@ -349,20 +357,32 @@ export function createHealthReports({
       pending.delete(report.id); lastPublishError = null;
     } catch (e) {
       const message = String(e?.message || e).slice(0, 240);
-      const retry = e?.retry === true && attempts < maxAttempts;
+      const written = Date.parse(report.finishedAt);
+      const fresh = !Number.isFinite(written) || now() - written < retryForMs;
+      const retry = e?.retry === true && attempts < maxAttempts && fresh;
       report.notion = { state: retry ? 'pending' : 'failed', attempts, lastAttemptAt: at, error: message };
       lastPublishError = { at, message };
       if (retry) { pending.set(report.id, report); scheduleRetry(); } else pending.delete(report.id);
       log.error?.(`[health] Notion ${retry ? 'deferred' : 'failed'} for ${report.title}: ${message}`);
     }
     save(report); remember(report);
+    return report.notion.state;
+  }
+  function send(report) {
+    const job = sending.then(() => publishReport(report));
+    sending = job.catch(() => {});
+    return job;
   }
   function scheduleRetry() {
     if (retryTimer || closed || !pending.size) return;
     retryTimer = timer(() => {
       retryTimer = null;
-      chain = chain.then(async () => { for (const r of [...pending.values()].sort((a, b) => a.startedAt.localeCompare(b.startedAt))) await publishReport(r); })
-        .catch((e) => log.error?.(`[health] retry failed: ${e.message}`)).finally(scheduleRetry);
+      sending = sending.then(async () => {
+        for (const r of [...pending.values()].sort((a, b) => a.startedAt.localeCompare(b.startedAt))) {
+          // Still unreachable: leave the rest for the next round instead of waiting out each timeout.
+          if (await publishReport(r) === 'pending') break;
+        }
+      }).catch((e) => log.error?.(`[health] retry failed: ${e.message}`)).finally(scheduleRetry);
     }, retryMs);
     retryTimer?.unref?.();
   }
@@ -383,16 +403,17 @@ export function createHealthReports({
     const fresh = Number.isFinite(r.c) && Number.isFinite(r.at) && now() - r.at <= watchSampleMaxAgeMs;
     return { sample: fresh ? { c: r.c, at: r.at } : null, peakC: r.peakC, peakAt: r.peakAt };
   }
-  async function capture(kind, reason, snapshot) {
+  // Reads and saves one report locally; sending it to Notion is separate (see send()).
+  async function capture(kind, reason, snapshot, { attempts = telemetryAttempts, timeoutMs = telemetryTimeoutMs } = {}) {
     const startedAt = now();
     const since = lastReportAt ?? startedAt - HOUR;
     const units = await Promise.all(snapshot.map(async ({ p, st, conn }) => {
       let readings = null, readError = null;
       if (st.online && readTelemetry) {
         const controller = new AbortController();
-        const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), telemetryTimeoutMs);
+        const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), timeoutMs);
         deadline?.unref?.();
-        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal, attempts: telemetryAttempts })), controller.signal); }
+        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal, attempts })), controller.signal); }
         catch (e) { readError = describeError(p, e); if (e?.attempts > 1) readError += ` (${e.attempts} tries)`; }
         finally { cancelTimer(deadline); }
       }
@@ -400,19 +421,25 @@ export function createHealthReports({
     }));
     const finishedAt = now();
     const report = buildReport({ kind, reason, startedAt, finishedAt, units, events: recentEvents(since, finishedAt), config, timeZone });
+    // Saved as pending before the first send, so a relay that exits or loses power mid-send
+    // still sends it after the next start.
+    if (notionConfigured()) { report.notion = { state: 'pending', attempts: 0 }; pending.set(report.id, report); }
     save(report, { markdown: true }); remember(report); prune();
     lastReportAt = finishedAt;
-    await publishReport(report);
-    log.log?.(`[health] ${report.title}: ${report.findings} (Notion ${report.notion.state})`);
-    return summaryOf(report);
+    return report;
   }
-  function trigger(kind, reason) {
+  // Resolves with the report summary once the report is saved and its first Notion send is done.
+  function trigger(kind, reason, reading) {
     if (!enabled()) return Promise.resolve(null);
     let snapshot; // taken now, before any queued work or power transition
     try { snapshot = statusSnapshot(); } catch (e) { log.error?.(`[health] ${kind} report skipped: ${e.message}`); return Promise.resolve(null); }
-    const job = chain.then(() => capture(kind, reason, snapshot)).catch((e) => { log.error?.(`[health] ${kind} report failed: ${e.message}`); return null; });
-    chain = job;
-    return job;
+    const captured = chain.then(() => capture(kind, reason, snapshot, reading));
+    chain = captured.catch(() => null);
+    return captured.then(async (report) => {
+      await send(report);
+      log.log?.(`[health] ${report.title}: ${report.findings} (Notion ${report.notion.state})`);
+      return summaryOf(report);
+    }).catch((e) => { log.error?.(`[health] ${kind} report failed: ${e.message}`); return null; });
   }
 
   function scheduleHourly() {
@@ -436,9 +463,12 @@ export function createHealthReports({
     start() { load(); if (config.enabled) { scheduleHourly(); scheduleRetry(); } return this; },
     // Poll results. A unit seen going from not lit to lit starts the power-on report
     // once per lit session; units already lit when the relay starts are not a power-on.
+    // An unreachable unit keeps its last state unless it was lit: a unit that dropped off the
+    // network in standby (Panasonic ECO) and comes back lit is a power-on, while a lit unit
+    // that only lost the network comes back as unknown, as at relay start.
     observe: guarded('observe', (slot, power) => {
       if (!enabled()) return;
-      if (power == null) { lastPower.delete(slot); return; }
+      if (power == null) { if (isLit(lastPower.get(slot))) lastPower.delete(slot); return; }
       const had = lastPower.has(slot), prev = lastPower.get(slot);
       lastPower.set(slot, power);
       if (![...lastPower.values()].some(isLit)) { session = null; clearPowerOn(); return; }
@@ -466,10 +496,13 @@ export function createHealthReports({
       clearPowerOn(); for (const t of [hourlyTimer, retryTimer]) if (t) cancelTimer(t);
       hourlyTimer = retryTimer = null;
       const t = now();
-      if (config.enabled && anyLitNow() && !(lastReportAt != null && t - lastReportAt < stopQuietMs) && t - lastPowerOffAt >= powerOffWindowMs) trigger(KIND.RELAY_STOP, 'relay stopping');
+      // One attempt per unit within stopReadingMs, so the report is saved before the cap even
+      // when a unit does not answer. A send cut off by the cap stays pending for the next start.
+      const final = config.enabled && anyLitNow() && !(lastReportAt != null && t - lastReportAt < stopQuietMs) && t - lastPowerOffAt >= powerOffWindowMs
+        ? trigger(KIND.RELAY_STOP, 'relay stopping', { attempts: 1, timeoutMs: stopReadingMs }) : null;
       closed = true;
       let cap;
-      await Promise.race([chain, new Promise((resolve) => { cap = timer(resolve, stopTimeoutMs); cap?.unref?.(); })]);
+      await Promise.race([final || chain, new Promise((resolve) => { cap = timer(resolve, stopTimeoutMs); cap?.unref?.(); })]);
       cancelTimer(cap);
     },
     view() {

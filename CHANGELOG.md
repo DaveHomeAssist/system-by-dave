@@ -1,5 +1,13 @@
 # Changelog
 
+## November 13, 2026: Projctl health report reliability
+
+- Health reports keep P3/P4 temperatures when a PT-DW830U drops a connection. A reading keeps the intake when a later sensor read is lost, a failed reading is retried twice 4 s apart, and a Thermal watch sample up to 3 minutes old stands in when the reading still fails. The unit table adds each unit's peak since the previous report.
+- A unit that left the network in standby (Panasonic ECO) and comes back lit now starts a power-on report. A lit unit that only lost the network still does not.
+- The relay-stop report reads each unit once within 4 s, so it is saved before the 6-second stop cap even when a unit does not answer.
+- Reports are saved as pending before their first Notion send, so a report cut off by a relay exit or a power cut is sent after the next start.
+- Notion sends and retries run apart from readings, so an unreachable Notion never delays a report's readings. A retry round stops at the first report that still fails, and a pending report expires 7 days after it was written.
+
 ## November 12, 2026: Projctl review fixes
 
 - A folder URL, a path that leaves the public directory, or a static-file read error returns an HTTP error. It no longer crashes the relay.
