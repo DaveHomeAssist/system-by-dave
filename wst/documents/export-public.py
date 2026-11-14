@@ -6,7 +6,7 @@ import fitz
 
 ROOT = Path('/work')
 IP = re.compile(r'(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}(?![\d.])')
-LOCAL = re.compile(r'/Users/[^\s<>]+')
+LOCAL = re.compile(r'/(?:Users|home)/[^\s<>]+')
 records = []
 for source, output, title in [
     ('handoff-private.pdf', 'frozen-handoff-r5.pdf', 'Frozen Projection Handoff R5'),
@@ -40,7 +40,7 @@ for source, output, title in [
     public = fitz.open(ROOT / output)
     text = '\n'.join(page.get_text() for page in public)
     assert not IP.search(text), 'IP left in public text'
-    assert '/Users/' not in text, 'Local path left in public text'
+    assert not LOCAL.search(text), 'Local path left in public text'
     assert public.get_toc() == original_toc, 'Bookmarks changed'
     assert [[link.get('kind'), link.get('page'), link.get('to'), link.get('uri')] for page in public for link in page.get_links()] == [[link.get('kind'), link.get('page'), link.get('to'), link.get('uri')] for page in fitz.open(ROOT/source) for link in page.get_links()], 'Link targets changed'
     assert public.embfile_count() == 0, 'Unexpected embedded files'
