@@ -1,5 +1,15 @@
 # Changelog
 
+## November 13, 2026: Projctl command validation at the write
+
+- Carry target, availability and Show Lock checks through queued driver calls
+  and handshakes to each physical write. Protected commands remain cancelled
+  after a Show Lock on/off transition.
+- Bind group, cue and preset sequences to their original target configurations.
+  Preserve shutter, power-on, Stop and protective lens-stop behavior.
+- Add loopback transport and isolated relay regressions for delayed writes,
+  partial sequences, target changes, lock transitions and simulator parity.
+
 ## November 13, 2026: Projctl health report completeness
 
 - Classify reachable units with missing temperature, alarm feedback or rated

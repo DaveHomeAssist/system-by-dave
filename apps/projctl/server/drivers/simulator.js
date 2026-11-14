@@ -36,15 +36,22 @@ export function simulatorDriver({ name = 'SIM', inputs = ['31', '32'] } = {}) {
       }
       return 'OK';
     },
-    async shutter(closed) { st.shutter = closed ? SHUTTER.CLOSED : SHUTTER.OPEN; return 'OK'; },
-    async input(id) {
+    async shutter(closed, { guard } = {}) { guard?.(); st.shutter = closed ? SHUTTER.CLOSED : SHUTTER.OPEN; return 'OK'; },
+    async input(id, { guard } = {}) {
+      guard?.();
       if (!inputs.includes(String(id))) throw Object.assign(new Error('Invalid parameter'), { code: 'ERR2' });
       st.input = String(id); return 'OK';
     },
-    async pattern(code) { st.pattern = String(code).padStart(2, '0'); return 'OK'; },
-    async lens(op) { st.pollFocus = null; if (['h', 'v', 'focus', 'zoom'].includes(op.axis)) { st.lens[op.axis] = Math.max(0, Math.min(65535, st.lens[op.axis] + (op.dir === '+' ? 1 : -1) * ({ slow: 128, normal: 512, fast: 2048 }[op.speed || 'slow']))); st.lens[op.axis + 'State'] = 'Stopped'; } else if (op.op === 'home') { st.lens.h = st.lens.v = 0; } return 'OK'; },
-    async recallLens(targets) { for (const [axis, target] of Object.entries(targets)) { if (Number.isFinite(target)) st.lens[axis] = target; st.lens[axis + 'State'] = 'Stopped'; } return 'OK'; },
+    async pattern(code, { guard } = {}) { guard?.(); st.pattern = String(code).padStart(2, '0'); return 'OK'; },
+    async lens(op, { guard } = {}) { guard?.(); st.pollFocus = null; if (['h', 'v', 'focus', 'zoom'].includes(op.axis)) { st.lens[op.axis] = Math.max(0, Math.min(65535, st.lens[op.axis] + (op.dir === '+' ? 1 : -1) * ({ slow: 128, normal: 512, fast: 2048 }[op.speed || 'slow']))); st.lens[op.axis + 'State'] = 'Stopped'; } else if (op.op === 'home') { st.lens.h = st.lens.v = 0; } return 'OK'; },
+    async recallLens(targets, { guard } = {}) { guard?.(); for (const [axis, target] of Object.entries(targets)) { if (Number.isFinite(target)) st.lens[axis] = target; st.lens[axis + 'State'] = 'Stopped'; } return 'OK'; },
     async getPicture() { return st.picture || (st.picture = { mode: 'STD', contrast: 0, brightness: 0, color: 0, tint: 0, sharpness: 8, gamma: 'DEF', colorTemp: '10', noise: '0', iris: '0' }); },
-    async picture(key, value) { (st.picture || await this.getPicture()); st.picture[key] = value; return 'OK'; },
+    async picture(key, value, { guard } = {}) {
+      guard?.();
+      if (!st.picture) await this.getPicture();
+      guard?.();
+      st.picture[key] = value;
+      return 'OK';
+    },
   };
 }

@@ -4,9 +4,9 @@ export function createCommandBinding() {
   const secret = randomBytes(32);
   const revision = projector => createHmac('sha256', secret).update(JSON.stringify([
     projector.slot, projector.driver, projector.ip, projector.mac, projector.model,
-    projector.lane, projector.user, projector.password, projector.inputs,
+    projector.lane, projector.user, projector.password, projector.inputs, projector.reverseH, projector.reverseV,
   ])).digest('hex');
-  const reject = message => { throw Object.assign(new Error(message), { status: 409 }); };
+  const reject = (message, status = 409) => { throw Object.assign(new Error(message), { status, commandRejected: true }); };
 
   function guard(expected, getProjectors, slot) {
     if (expected === undefined) return () => {};
@@ -28,5 +28,22 @@ export function createCommandBinding() {
     check();
     return check;
   }
-  return { revision, guard };
+  function commandGuard(slot, readState) {
+    const initial = readState();
+    const expected = initial.projector ? revision(initial.projector) : null;
+    const lockAtCapture = initial.lockRevision;
+    return (cmd, arg, { allowBusy = false } = {}) => {
+      const current = readState();
+      if (!expected || !current.projector) reject(`no projector ${slot}`, 404);
+      if (revision(current.projector) !== expected) reject('Projector configuration changed. Review the target again.');
+      if (!current.status?.online) reject(`${slot} is offline`);
+      const stop = cmd === 'lens' && arg?.op === 'stop';
+      const protectedCommand = cmd === 'power' && !arg || ['input', 'resetInput', 'pattern', 'picture'].includes(cmd) || cmd === 'lens' && !stop;
+      if (protectedCommand && current.lock) reject('show lock is on', 423);
+      if (protectedCommand && current.lockRevision !== lockAtCapture) reject('Show lock changed. Review the command again.', 423);
+      if (cmd === 'power' && arg && current.status.power === 'cooling') reject(`${slot} is cooling, wait before power on`);
+      if (current.busy && !allowBusy && !stop && cmd !== 'shutter') reject(`${slot}: lens is moving. Wait or use Stop lens.`);
+    };
+  }
+  return { revision, guard, commandGuard };
 }
