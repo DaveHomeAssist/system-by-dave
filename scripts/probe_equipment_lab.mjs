@@ -4,7 +4,7 @@ import { readFile, stat, mkdir, writeFile } from 'node:fs/promises';
 import { extname, join, resolve } from 'node:path';
 import { chromium } from 'playwright';
 const root = resolve(import.meta.dirname,'..');
-const mime = {'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.glb':'model/gltf-binary','.svg':'image/svg+xml','.woff2':'font/woff2','.png':'image/png','.jpg':'image/jpeg'};
+const mime = {'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.glb':'model/gltf-binary','.svg':'image/svg+xml','.woff2':'font/woff2','.png':'image/png','.jpg':'image/jpeg','.mp4':'video/mp4'};
 const server = createServer(async(req,res) => { let path = resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://local').pathname)); if (!path.startsWith(root+'/')) return res.writeHead(403).end(); try { if ((await stat(path)).isDirectory()) path=join(path,'index.html'); res.writeHead(200,{'content-type':mime[extname(path)]||'application/octet-stream','cache-control':'no-store'});res.end(await readFile(path)); } catch {res.writeHead(404).end();} });
 await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
 const base = process.env.EQUIPMENT_LAB_BASE || `http://127.0.0.1:${server.address().port}`;
@@ -23,7 +23,8 @@ const PACKAGES=[
  {id:'C02',find:'Cartoni',link:'head.panLock',first:'head.tiltDrag',away:'head.bubble',controls:10,textures:22,views:4,manifest:'cartoni.maxima30.manifest.json',unknown:'Unknown control link.'},
  {id:'P01',find:'Barco',link:'io.hdmi',first:'io.keypad',away:'body.feet',controls:26,textures:14,views:6,manifest:'barco.udm4k22.manifest.json',unknown:'Unknown part link.'},
  {id:'P02',find:'PT-DW830',link:'io.hdmiIn',first:'lamp.cover',away:'body.feet',controls:60,textures:43,views:8,manifest:'panasonic.ptdw830.manifest.json',unknown:'Unknown part link.',
-  states:[['Closed','closed'],['Lamp cover open','coverOpen'],['Lamp unit 1 out','lampUnit1Out'],['Lamp unit 2 out','lampUnit2Out'],['Air filter case out','filterCaseOut']],joints:140,hidden:['lamp.unit1','lampUnit1Out'],steps:[10,8]},
+  states:[['Closed','closed'],['Lamp cover open','coverOpen'],['Lamp unit 1 out','lampUnit1Out'],['Lamp unit 2 out','lampUnit2Out'],['Air filter case out','filterCaseOut']],joints:140,hidden:['lamp.unit1','lampUnit1Out'],steps:[10,8],
+  walkthroughs:[{src:'/equipment-lab/media/pt-dw830-lamp-replacement.mp4',poster:'/equipment-lab/media/pt-dw830-lamp-replacement.jpg',preload:'none',controls:true,download:'/equipment-lab/media/pt-dw830-lamp-replacement.mp4'},null]},
  {id:'P03',find:'PT-RZ970',link:'io.sdiIn',first:'panel.plate',away:'body.feet',controls:45,textures:38,views:7,manifest:'panasonic.ptrz970.manifest.json',unknown:'Unknown part link.',matrix:false},
 ];
 const context=await browser.newContext({viewport:{width:1440,height:900}});context.setDefaultTimeout(20000); const page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));let losses=0;page.on('console',message=>{const text=message.text();if(text==='THREE.WebGLRenderer: Context Lost.'){losses++;return;}if(message.type()==='error' || text.startsWith('THREE.')) errors.push(text);});
@@ -119,6 +120,10 @@ try {
    await page.locator('.console-quick').getByRole('button',{name:'Practice',exact:true}).click();
    assert.deepEqual(await page.locator('.lab-procedure').evaluateAll(nodes=>nodes.map(node=>node.querySelectorAll('.lab-steps li').length)),pack.steps);
    assert.equal(await page.locator('.lab-caution').count(),1);
+   // A procedure with a walkthrough shows its silent video on demand, with a poster and a download link; both files are served.
+   const walkthroughs=await page.locator('.lab-procedure').evaluateAll(nodes=>nodes.map(node=>{const video=node.querySelector('.lab-walkthrough video');return video&&{src:video.querySelector('source')?.getAttribute('src'),poster:video.getAttribute('poster'),preload:video.getAttribute('preload'),controls:video.controls,download:node.querySelector('.lab-walkthrough figcaption a[download]')?.getAttribute('href')};}));
+   assert.deepEqual(walkthroughs,pack.walkthroughs);
+   for(const item of walkthroughs.filter(Boolean))for(const file of [item.src,item.poster]){const response=await page.request.get(base+file);assert.equal(response.status(),200,file);assert.ok((await response.body()).length>1000,file);}
    await page.locator('.lab-procedure').first().locator('.lab-steps li').nth(3).getByRole('button').click();await settle(pack.states[1][1]);
    assert.equal(await page.locator('.lab-control select').inputValue(),pack.first);
    // A link may name a state, and an unknown state falls back to the resting one.
