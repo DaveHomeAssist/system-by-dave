@@ -1,3 +1,22 @@
+## Documents publication, November 14, 2026
+
+Planning now includes Documents alongside Calendar and Notes. The final November 13
+R4 consolidated handoff is available as a 17-page PDF, with section links to the
+illustrated overview, five signal-flow sheets, selected crew workbook and source key.
+R5 is separately offered as the current five-page signal-flow issue, with larger AV1 labels. The later pixel routing reply is not yet incorporated. Each public export omits six private network addresses; the original is unchanged.
+Hashes and transformation are recorded in `documents/provenance.json`.
+
+The snow Home, light/dark themes, More navigation, notes key and task API are
+preserved. Public controller destinations now offer an explicit localhost link.
+The website does not fetch relay health, embed a controller, send navigation messages
+to a relay or expose a venue endpoint. Existing local controller files and services
+are unchanged. This supersedes the hosted iframe connection instructions below.
+
+Use `node wst/embed-hosted-assets.mjs --hosted-only` for public-only releases. It
+regenerates the hosted artifact without copying the public shell into the local
+controller. Run `node --test wst/workspace.test.mjs`, the workspace browser test,
+and the hosting build/validation before publication. Field acceptance remains open.
+
 # Frozen workspace
 
 Live managed deployment: https://wst-frozen.davein4k.chatgpt.site

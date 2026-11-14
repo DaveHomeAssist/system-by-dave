@@ -15,6 +15,21 @@
   records for lanes B and C do not agree with lane D's throw. Decisions FC-D6
   to FC-D9 are in `docs/frozen-case.md`.
 - The case now also runs on pull requests that touch `ProjectorThrow/`.
+## 2026-11-14
+
+- WST Planning adds current R5 signal-flow diagrams, the consolidated R4 document packet and section links while preserving
+  the existing snow Home, themes and navigation. Public PDF copies omit private
+  network addresses; original documents remain unchanged.
+- WST public controller entries open localhost separately. Hosted pages no longer
+  connect to or embed the relay, and public-only generation leaves the installed
+  controller shell untouched.
+
+## November 14, 2026: Projctl telemetry coordination
+
+- Serialize status and health reads per projector while keeping different units independent and allowing status polls between bounded report retries.
+- Retry transport failures at most twice, 4 seconds apart, within the existing 12-second report deadline.
+- Preserve partial Panasonic and Pulse temperatures and report later sensor failures, including deadline expiry. Add queue, retry, cancellation, transport and saved-report regression tests.
+- Adapt the scoped telemetry improvements from PR #463 to current main.
 
 ## November 14, 2026: Frozen recorded test case and a Signal Flow cable fix
 

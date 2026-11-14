@@ -1,18 +1,26 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "a71c93323f0c05f800dad739e100d19eb29e942d",
-  "deploymentId": "appgdep_6aef9e70105c8191b7eea51e3f68e574",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_471db80b43a88191bf2314b335bb7eb3",
+  "managedSourceCommit": "bfc60c6cf52f79c5b9d08916b30c7d1adf0a8f30",
+  "deploymentId": "appgdep_6af80aea4b78819183693171baffc0b2",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_b3f8c5205054819189e1c84e78956dc0",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 26,
-  "acceptedSourceCommit": "b09a0b06970892371173de0fa78a32a608a22fa9",
-  "publicVerifiedAt": "2026-11-13T22:45:00Z",
+  "versionNumber": 28,
+  "acceptedSourceCommit": "a1ee7562f2a8a960258d0e9a58d0b93ec3ee7b03",
+  "publicVerifiedAt": "2026-11-14T07:18:00Z",
   "priorPublications": [
+    {
+      "versionNumber": 26,
+      "managedSourceCommit": "a71c93323f0c05f800dad739e100d19eb29e942d",
+      "deploymentId": "appgdep_6aef9e70105c8191b7eea51e3f68e574",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_471db80b43a88191bf2314b335bb7eb3",
+      "acceptedSourceCommit": "b09a0b06970892371173de0fa78a32a608a22fa9",
+      "publicVerifiedAt": "2026-11-13T22:45:00Z"
+    },
     {
       "versionNumber": 25,
       "managedSourceCommit": "9230efa14436b24f95b060330b7e2291c767369d",
@@ -30,13 +38,5 @@
       "note": "Stage/reference polish from PR 448 (taskPublication)"
     }
   ],
-  "sourceReconciliation": "Reconciled 2026-11-13 at accepted source b09a0b0: Tech Schedule (v23), More navigation (v23), pixel reference (v25), photos and the Planning calendar (v26) now live in wst/ and are embedded by embed-hosted-assets.mjs, so the generated Worker equals production version 26 plus the #open-controller fallback.",
-  "pendingPublication": {
-    "preparedManagedSourceCommit": "e5f1db6fbdb703853d0d52171149dc60d6cebeea",
-    "basedOnManagedSourceCommit": "a71c93323f0c05f800dad739e100d19eb29e942d",
-    "expectedVersionNumber": 27,
-    "contents": "Site version 26 assets plus Open controller in a new tab fallback",
-    "blocker": "sites.* connector tools exist only in the Codex Desktop app; codex exec reports SITES_TOOL_UNAVAILABLE. Bundle, archive and EXECUTE steps are in the side-session notes folder (wst-sites-publish/).",
-    "preparedAt": "2026-11-13T22:45:00Z"
-  }
+  "sourceReconciliation": "Version 28 adds current R5 signal-flow PDF and consolidated R4 handoff under Planning Documents. Public copies omit private network addresses. Hosted-only generation preserves the local controller. Version 27 was saved but never deployed."
 }
