@@ -60,6 +60,7 @@ const path = require('node:path');
       assert.equal(await page.locator('#heat-pill').getAttribute('data-level'), 'hot');
       const pillBox = await page.locator('#heat-pill').boundingBox();
       assert.ok(pillBox.x >= 0 && pillBox.x + pillBox.width <= width, `heat pill inside the viewport at ${width}`);
+      assert.ok(pillBox.height >= 44, `heat pill keeps a 44 px touch target at ${width}`);
       const cardB = page.locator('#grid > [data-lane="B"]');
       if (await cardB.isVisible()) {
         const chip = cardB.locator('.operator-heat');

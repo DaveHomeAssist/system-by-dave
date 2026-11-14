@@ -94,7 +94,7 @@
   .operator-card[data-connection-state="online"] .operator-status.has-heat { display: flex; }
   .operator-status.has-heat .operator-connection.online { display: none; }
 }
-.pj-heat-pill.avd-state { height: auto; min-height: 32px; padding: 4px 10px; border: 2px solid var(--state-waiting); border-radius: 999px; cursor: pointer; }
+.pj-heat-pill.avd-state { height: auto; min-height: 44px; padding: 4px 12px; border: 2px solid var(--state-waiting); border-radius: 999px; cursor: pointer; }
 .pj-heat-pill.avd-state[data-level="hot"] { border-color: var(--state-blocked); }
 .pj-heat-pill[hidden] { display: none; }
 .pj-heat-pill:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
