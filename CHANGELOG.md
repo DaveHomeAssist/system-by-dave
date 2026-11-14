@@ -1,5 +1,11 @@
 # Changelog
 
+## November 13, 2026: Projctl details control surface
+
+- Projector Details opens the reviewed control layout: a larger lens pad with minus and plus focus and zoom and a full-width Stop lens, picture tiles for every reported test pattern with Clear pattern, the projector's heat reading, and a browser session timer kept under `projctl.sessionTimer.v1`.
+- Show heat outside Thermal watch only for a current Watch or Hot reading, as a card chip and a header pill that opens Thermal watch. Add thumbnails to the full pattern list.
+- No new commands, guards or backend changes; the default cards are unchanged. Brief: `apps/projctl/docs/details-controls.md`.
+
 ## November 13, 2026: Projector connection recovery
 
 - Keep a PJLink status session open across polls, recover closed sessions and

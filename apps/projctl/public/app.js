@@ -7,6 +7,10 @@ import { LANES, laneOf, projectorName, orderedProjectors, rigLanes } from './lan
 import { createStageView } from './stage-view.js';
 import { mountPowerSchedules } from './power-schedules.js';
 import { createLensWorkspace } from './lens-workspace.js';
+import { patternPanelContent, heatPanelContent } from './details-controls.js';
+import { createSessionTimer } from './session-timer.js';
+import { heatNotice, worstHeat } from './heat-notice.js';
+import { patternThumb } from './pattern-thumbs.js';
 import { lensDirection } from './lens-direction.js';
 import { loadReference, mountReference, referenceGearHTML } from './reference-view.js';
 import { createConnectionMonitor } from './projector-connection.js';
@@ -28,7 +32,22 @@ const thermalWatch = createThermalWatch($('#thermal-watch'), {
   onOpen: lane => { $('#tab-btn-rig').click(); openProjector(lane); },
   onClose: () => $('#tab-btn-rig').click(),
 });
-const renderThermal = () => thermalWatch.update({ projectors: state.projectors, connected, connectionOf });
+const renderThermal = () => { thermalWatch.update({ projectors: state.projectors, connected, connectionOf }); renderHeatPill(); };
+const sessionTimer = createSessionTimer($('#session-timer'));
+const heatCurrent = p => connected && !!p && !!connectionOf(p).current;
+// Heat shows outside Thermal watch only for a current Watch or Hot reading (heat-notice.js).
+function renderHeatPill() {
+  const pill = $('#heat-pill'), worst = worstHeat(rigLanes(state.projectors).map(({ lane, projector }) => ({ lane, projector, current: heatCurrent(projector) })));
+  pill.hidden = !worst;
+  if (!worst) { delete pill.dataset.level; return; }
+  pill.dataset.level = worst.notice.level;
+  pill.querySelector('.avd-dot').className = `avd-dot avd-dot--${worst.notice.level === 'hot' ? 'blocked' : 'waiting'}`;
+  const text = `${worst.lane} ${worst.notice.text}`, label = `Heat ${worst.notice.word}: projector ${worst.lane}, ${worst.notice.text.split(' · ')[1]}. Open Thermal watch`;
+  if (pill.querySelector('[data-heat-pill-text]').textContent !== text) pill.querySelector('[data-heat-pill-text]').textContent = text;
+  if (pill.getAttribute('aria-label') !== label) pill.setAttribute('aria-label', label);
+}
+function openThermal() { if (selectedDetailLane) closeProjector(); $('#tab-btn-health').click(); }
+$('#heat-pill').onclick = () => openThermal();
 async function loadThermal() {
   const available = state.projectors.some(p => p.thermal != null);
   $('#thermal-watch .pj-thermal-csv').hidden = !available;
@@ -338,7 +357,7 @@ function renderGrid() {
     output.append(operatorCard({
       projector, lane, info: LANES[lane], connection, lock: state.lock, patterns: PATTERNS,
       feedback: operatorFeedback.get(projector?.slot), pending: operatorPending.has(projector?.slot) || [...commandsInFlight].some(key => key.startsWith(projector?.slot + ':')),
-      act: operatorAction, details: openProjector, morePatterns: slot => openAdjust(slot, 'pattern'),
+      act: operatorAction, details: openProjector, morePatterns: slot => openAdjust(slot, 'pattern'), heat: conflict ? null : heatNotice(projector, heatCurrent(projector)),
       preferences: preferences.value, dismissSuggestion: id => { preferences.update({ dismissedSuggestions: [...preferences.value.dismissedSuggestions, id] }); renderGrid(); },
     }));
   }
@@ -357,7 +376,7 @@ function renderGrid() {
     } else {
       $('#projector-controls').innerHTML = '<div class="pj-device-note"><h3>No assigned live device</h3><p>This lane remains available for recorded gear and planning information. Controls become available after a unique device is assigned in Configuration.</p></div>';
     }
-    renderDisplayInfo(selected);renderPrimaryControls(selected);
+    renderDisplayInfo(selected);renderPrimaryControls(selected);renderDetailPanels(selected);
   }
   updateLensWorkspace();
   renderComparison();
@@ -387,6 +406,7 @@ function openProjector(lane){
   lastRigLane=lane;if($('#tab-btn-rig').getAttribute('aria-selected')!=='true')$('#tab-btn-rig').click();selectedDetailLane=lane;
   const detail=$('#tab-projector');detail.hidden=false;detail.classList.add('on');detail.dataset.lane=lane;
   if (!detail.open) detail.showModal();
+  sessionTimer.setActive(true);
   $('#projector-detail-title').textContent=`${lane} · ${LANES[lane].target}`;
   document.querySelectorAll('[data-detail-lane]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.detailLane===lane)));
   renderGrid();renderProjectorInfo();
@@ -398,6 +418,14 @@ function renderPrimaryControls(p){
  const options=fresh&&s.shutter==='open'?[['1','Close shutter']]:fresh&&s.shutter==='closed'?[['0','Open shutter']]:[['0','Open shutter'],['1','Close shutter']];
  for(const[arg,label]of options){const b=document.createElement('button');b.className='avd-btn';b.type='button';b._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);b.dataset.focusKey=`${p.slot}:dock:shutter:${arg}`;b.dataset.c='shutter';b.dataset.a=arg;b.textContent=label;b.disabled=off;b.onclick=e=>cmd(p.slot,'shutter',Number(arg),e.currentTarget);out.append(b);}
  const input=document.createElement('button');input.type='button';input.className='avd-btn';input._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);input.dataset.focusKey=`${p.slot}:dock:reset-input`;input.dataset.resetInput='';input.textContent=`Reset to ${p.inputPreference?.label||state.preferredInput||'HDMI'}`;input.disabled=off||state.lock||!!p.busy||!p.inputPreference?.available;input.onclick=e=>cmd(p.slot,'resetInput',undefined,e.currentTarget);out.append(input);patchControls(host,out);
+}
+function renderDetailPanels(p){
+ const connection=p?connectionOf(p):null,off=!p||!connection.current,moving=!!p&&(!!p.busy||commandsInFlight.has(`${p.slot}:lens:move`));
+ const supported=!!p&&supportsPatterns(p),blocked=state.lock||off||moving||(!!p&&operatorPending.has(p.slot));
+ patchControls($('#projector-patterns'),patternPanelContent({projector:p,lane:selectedDetailLane,table:p?.patterns||PATTERNS,supported,current:p?.status?.pattern,stale:!!p?.status?.stale?.includes('pattern'),
+  favorites:p?preferences.value.favoritePatterns[patternPreferenceKey(p)]||[]:[],disabled:blocked,clearDisabled:blocked,feedback:p?operatorFeedback.get(p.slot)?.text:'',
+  onPattern:(code,button)=>cmd(p.slot,'pattern',code,button),onClear:button=>operatorAction(p,'clear',undefined,button)}));
+ patchControls($('#projector-heat'),heatPanelContent({projector:p,current:heatCurrent(p),onOpenThermal:openThermal}));
 }
 function renderProjectorInfo() {
   const lane=selectedDetailLane;if(!lane)return;
@@ -417,7 +445,7 @@ $('#rig-extra-devices').onclick=()=>$('#tab-btn-setup').click();
 function closeProjector() {
   const detail = $('#tab-projector');
   detail.close(); detail.hidden = true; detail.classList.remove('on');
-  selectedDetailLane = null; updateLensWorkspace();
+  selectedDetailLane = null; updateLensWorkspace(); sessionTimer.setActive(false);
 }
 $('#projector-back').onclick = closeProjector;
 $('#tab-projector').addEventListener('cancel', () => closeProjector());
@@ -561,7 +589,7 @@ function renderAdjust() {
   const favoriteCodes = preferences.value.favoritePatterns[patternPreferenceKey(p)] || [];
   const choices = Object.entries(table).sort(([a], [b]) => Number(favoriteCodes.includes(b)) - Number(favoriteCodes.includes(a)));
   for (const [code, name] of choices) {
-    const b = document.createElement('button'); b.type = 'button'; b.dataset.pattern = code; b.className = 'avd-btn'; b.textContent = name; b.setAttribute('aria-pressed', String(cur === code));
+    const b = document.createElement('button'); b.type = 'button'; b.dataset.pattern = code; b.className = 'avd-btn pj-pattern-thumbed'; b.innerHTML = `${patternThumb(name)}<span>${esc(name)}</span>`; b.setAttribute('aria-pressed', String(cur === code));
     b._controlIdentity = JSON.stringify([p.slot,p.driver,p.ip,p.mac]); b.dataset.focusKey = `${p.slot}:adjust:pattern:${code}`;
     b.disabled = state.lock || off || !!moving || !canPattern(p); b.onclick = event => cmd(p.slot, 'pattern', code, event.currentTarget); const choice = document.createElement('span'); choice.className = 'pj-pattern-choice';
     const favorite = document.createElement('button');
