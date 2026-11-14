@@ -1,5 +1,29 @@
 # Changelog
 
+## November 14, 2026: Frozen recorded test case and a Signal Flow cable fix
+
+- Add the Frozen case: the four projection lanes of the Frozen rig entered into
+  the AV by Dave console through its own controls, read at run time from the
+  public reference in `wst/`. 22 steps, each journalled, photographed, filmed
+  and monitored for page errors, failed requests, unexpected saved data and page
+  scrolling. `npm run test:frozen-case`; set `FROZEN_CASE_BASE` to read a
+  deployment back. It runs on pull requests that touch the console and keeps its
+  record as a workflow artifact. Brief and findings: `docs/frozen-case.md`.
+- Fix the defect its first run found. Signal Flow now draws a route's cable as
+  soon as its source and destination are typed in Route details. Before, the
+  newest connection was counted and left undrawn until the page was reloaded.
+- `scripts/frozen_case_film.py` captions a run filmed with `--film`.
+
+## November 13, 2026: Projctl command validation at the write
+
+- Carry target, availability and Show Lock checks through queued driver calls
+  and handshakes to each physical write. Protected commands remain cancelled
+  after a Show Lock on/off transition.
+- Bind group, cue and preset sequences to their original target configurations.
+  Preserve shutter, power-on, Stop and protective lens-stop behavior.
+- Add loopback transport and isolated relay regressions for delayed writes,
+  partial sequences, target changes, lock transitions and simulator parity.
+
 ## November 13, 2026: AV theme probe retries a Chrome start that does not answer
 
 - `scripts/probe_av_themes.js` failed two Pages deploys (`f7300b2` on November 7, `efb7883` on November 12) with "Chrome DevTools endpoint did not start"; both passed when rerun. It made one silent attempt and waited 20 seconds. It now starts Chrome through `scripts/chrome_launch.js`: a start that does not answer within 30 seconds, or exits, is killed and tried again on a fresh port and profile, up to three times. If every attempt fails, the error says what happened on each and what Chrome printed.

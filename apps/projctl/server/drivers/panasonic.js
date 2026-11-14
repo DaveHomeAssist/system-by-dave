@@ -66,7 +66,7 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
   const pj = pjlinkDriver({ host, password, ...rest, port: 4352 });
   const patterns = patternsFor(model);
 
-  function native(cmd, { signal } = {}) {
+  function native(cmd, { signal, guard } = {}) {
     throwIfAborted(signal);
     return new Promise((resolve, reject) => {
       const sock = net.createConnection({ host, port });
@@ -90,7 +90,7 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
           if (prefix === null) {
             if (!line.startsWith('NTCONTROL ')) return fail(new Error('not Panasonic network control: ' + line));
             prefix = line[10] === '1' ? createHash('md5').update(`${user}:${password}:${line.slice(12, 20)}`).digest('hex') : '';
-            try { throwIfAborted(signal); sock.write(prefix + '00' + cmd + '\r'); } catch (e) { return fail(e); }
+            try { throwIfAborted(signal); guard?.(); sock.write(prefix + '00' + cmd + '\r'); } catch (e) { return fail(e); }
           } else {
             cleanup(); done = true; sock.end();
             const body = line.startsWith('00') ? line.slice(2) : line;
@@ -134,18 +134,18 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
       }
       return { sensors };
     },
-    async pattern(code) {
+    async pattern(code, options) {
       const c = String(code).padStart(2, '0');
       if (!patterns[c]) throw new Error(`pattern ${c} not on this model`);
-      await native(`OTS:${c}`);
+      await native(`OTS:${c}`, options);
       return 'OK';
     },
     // lens({ axis: 'h'|'v'|'focus'|'zoom', speed: 'slow'|'normal'|'fast', dir: '+'|'-' }) or lens({ op: 'home' })
-    async lens(op = {}) {
-      if (op.op === 'home') { await native('VXX:LNSI1=+00001'); return 'OK'; }
+    async lens(op = {}, options) {
+      if (op.op === 'home') { await native('VXX:LNSI1=+00001', options); return 'OK'; }
       const n = LENS_AXIS[op.axis], s = LENS_SPEED[op.speed || 'normal'];
       if (n == null || s == null || !['+', '-'].includes(op.dir)) throw new Error('lens needs axis h|v|focus|zoom, speed slow|normal|fast, dir + or -');
-      await native(`VXX:LNSI${n}=+00${s}0${op.dir === '+' ? 0 : 1}`);
+      await native(`VXX:LNSI${n}=+00${s}0${op.dir === '+' ? 0 : 1}`, options);
       return 'OK';
     },
     async getPicture() {
@@ -155,12 +155,12 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
       }
       return out;
     },
-    async picture(key, value) {
+    async picture(key, value, options) {
       const d = PICTURE[key];
       if (!d) throw new Error(`unknown picture setting ${key}`);
       if (d.type === 'range' && (Number(value) < d.min || Number(value) > d.max || Number.isNaN(Number(value)))) throw new Error(`${key} must be ${d.min}..${d.max}`);
       if (d.type === 'enum' && !(String(value) in d.options)) throw new Error(`${key}: unknown option ${value}`);
-      await native(`${d.set}:${d.codec.enc(value)}`);
+      await native(`${d.set}:${d.codec.enc(value)}`, options);
       return 'OK';
     },
   };
