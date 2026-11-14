@@ -1,5 +1,19 @@
 # Changelog
 
+## November 14, 2026: Frozen recorded test case and a Signal Flow cable fix
+
+- Add the Frozen case: the four projection lanes of the Frozen rig entered into
+  the AV by Dave console through its own controls, read at run time from the
+  public reference in `wst/`. 22 steps, each journalled, photographed, filmed
+  and monitored for page errors, failed requests, unexpected saved data and page
+  scrolling. `npm run test:frozen-case`; set `FROZEN_CASE_BASE` to read a
+  deployment back. It runs on pull requests that touch the console and keeps its
+  record as a workflow artifact. Brief and findings: `docs/frozen-case.md`.
+- Fix the defect its first run found. Signal Flow now draws a route's cable as
+  soon as its source and destination are typed in Route details. Before, the
+  newest connection was counted and left undrawn until the page was reloaded.
+- `scripts/frozen_case_film.py` captions a run filmed with `--film`.
+
 ## November 13, 2026: Projctl command validation at the write
 
 - Carry target, availability and Show Lock checks through queued driver calls
