@@ -7,7 +7,7 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const read = path => JSON.parse(readFileSync(path, 'utf8'));
 const safe = (base, path) => { const full = resolve(base,path); if (!full.startsWith(base + sep) || lstatSync(full).isSymbolicLink()) throw Error(`Unsafe release path: ${path}`); return full; };
 // The family Dave confirmed stays at 43. Each release names the entries it adds to it, one by one.
-const FAMILY = 43, RELEASES = { '1.0.0': [], '1.1.0': ['P01'] }, CURRENT = '1.1.0';
+const FAMILY = 43, RELEASES = { '1.0.0': [], '1.1.0': ['P01'], '1.2.0': ['P01', 'P02', 'P03'] }, CURRENT = '1.2.0';
 function verify(base, revisions = [CURRENT]) {
   const manifest = read(resolve(base,'manifest.json')); if (manifest.schema !== 'equipment.lab.release.v1' || !revisions.includes(manifest.revision)) throw Error('Unsupported Equipment Lab release');
   for (const [name, record] of Object.entries(manifest.files)) { const bytes = readFileSync(safe(base,name)); if (bytes.length !== record.bytes || hash(bytes) !== record.sha256) throw Error(`Equipment Lab integrity mismatch: ${name}`); }

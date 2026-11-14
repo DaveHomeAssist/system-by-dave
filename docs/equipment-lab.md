@@ -163,6 +163,69 @@ inspector and in Reference.
 Rollback: revert the host commit. That restores the 1.0.0 copy, which the
 import still recognizes as a previous release.
 
+## Release 1.2.0: two Panasonic projectors and service states
+
+On 13 November 2026 Dave agreed to add the other two projectors in his rig
+records, and then wrote: "FOCUS on the 830s lamp access and replacement
+mechanisms". The shared repository registered P02 Panasonic PT-DW830 and P03
+Panasonic PT-RZ970 in release 1.2.0. Their briefs,
+[P02](https://github.com/DaveHomeAssist/equipment-lab/blob/main/docs/PANASONIC_PT_DW830.md)
+and [P03](https://github.com/DaveHomeAssist/equipment-lab/blob/main/docs/PANASONIC_PT_RZ970.md),
+own each model's scope, sources and open decisions. This section covers the host.
+
+P02 is the first package whose parts move. Its definition carries four joints,
+five states and two procedures. Its GLB is exported closed, and a node moves
+with a joint when its extras name it. The host needed one new capability for
+that. P03 and the two older packages use none of it.
+
+- **Import.** `scripts/equipment_lab_release.mjs` names release 1.2.0 and the
+  three entries it adds. A release the script does not name is still refused.
+- **Package registry.** A package may carry joints, states, procedures and the
+  view a bare link opens on. P02 opens on the lamp unit cover, seen from the
+  rear. P03 opens on the control panel.
+- **Viewer.** For a package with joints the viewer keeps each tagged node's
+  exported transform. For a state it turns hinge nodes about the joint's axis
+  through its pivot and slides the others along theirs. A joint that moves no
+  node, or a node that names an unknown joint, refuses the package like any
+  other invalid one. The camera goes first, to the view the state names, framed
+  on the parts as they will stand; the parts then move over 450 ms. With
+  reduced motion, or in a hidden tab, the state applies at once. Nothing draws
+  after a move ends.
+- **State row.** A package with states gets a row of state buttons under the
+  view buttons, and the pressed one is the current state. On a narrow panel the
+  row stays on one scrolling line, as the view row does.
+- **Selection.** Choosing an item that is hidden while the projector is closed
+  opens the state that shows it. Any other item leaves the model as it stands.
+  A change of equipment starts at rest. A link may name a state with `state=`;
+  the resting state is left out of links.
+- **Practice.** For a package with procedures, Practice lists the maker's steps
+  in order under its warnings, with the pages they come from and a link to the
+  document. Each step has a button that selects its part in its state and
+  returns to the inspector. The panel says the steps are a summary, that the
+  operating instructions are the reference, and that showing a step sends no
+  hardware commands.
+- **Framing.** A package with states is framed on the box of its parts as they
+  stand, so an open cover costs the picture as little as it can. The other
+  packages keep their framing.
+- **Splash.** P02 and P03 sit under Video and projection with the previews from
+  their packages. Searching for Panasonic now finds three entries: the generic
+  camera body and the two projectors.
+- **Offline.** Six more files join the offline set under cache generation
+  `v20261113-equipment-lab-panasonic`.
+
+Unchanged: C02's ten IDs and P01's 26, their links, copy and framing, the other
+42 entries, routes and saved arrangements. A package without states shows no
+state row and never moves.
+
+P02 and P03 are approximate and not qualified. Lamp replacement involves heat,
+glass and mercury: the steps repeat Panasonic's warnings and its advice to use
+a qualified technician. Inside P02's lamp bay, which part is where and which
+way it moves are Panasonic's; sizes, depths, the 100 degree opening of the
+cover and each travel are approximate or assumed, and each part says so.
+
+Rollback: revert the host commit. That restores the 1.1.0 copy, which the
+import still recognizes as a previous release.
+
 ## Small screens
 
 Recorded on 13 November 2026. Two layout defects predated release 1.1.0 and
@@ -272,6 +335,33 @@ colour on first sight.
 records host delivery. Publication and live acceptance are separate release
 gates, and the shared repository's record owns that evidence. No GPU, physical
 phone, WebKit browser or physical projector was checked.
+
+Release 1.2.0 was built and checked on 13 November 2026 in a cloud session with
+Node 22 and Chromium on SwiftShader, pinned to shared revision
+`7c81bb60335e68ff4d767093a34de32919a21601`, on host base
+`cafd077d8e23441c3e0a1f714cbb2001c5442358`. The probe checks 46 entries and four packages. For each it runs
+the deep link, every listed item, each view, model picking, an unknown-item
+link, the native AV route, the splash handoff, the WebGL fallback, a deliberate
+context loss and four invalid-package cases. P02 adds each state from its
+button, the state in the link, a hidden part opening its state, a visible part
+leaving the model as it stands, no drawing while idle, both procedures with
+their steps, a step shown on the model, and a return to rest after leaving the
+package. The state row is in every layout check for P02; P03 lays out as P01
+does and runs a shorter matrix. The probe covers 263 layout cases and 176 panel
+checks and logs no error or `THREE.*` message other than the one line three.js
+writes for each deliberate loss. C02 keeps ten controls and 22 textures and P01
+26 parts and 14 textures; P02 loads 60 parts, 43 textures, eight views and 140
+joint nodes, and P03 45 parts, 38 textures and seven views.
+
+A supplemental check of P02 in 26 points adds a state button from the keyboard,
+a model click in the open lamp bay, reduced motion, three phone sizes
+(390 x 844, 844 x 390 and 320 x 568) and the AV console route. With reduced
+motion a state applies in at most three frames. No GPU, physical phone, WebKit
+browser or physical projector was checked; phone sizes are emulated.
+
+[Pull request 479](https://github.com/DaveHomeAssist/system-by-dave/pull/479)
+records host delivery of release 1.2.0. Publication and live acceptance are
+separate release gates, and the shared repository's record owns that evidence.
 
 The small-screen change was built and checked on 13 November 2026 in a cloud
 session with Node 22 and Chromium on SwiftShader, on host base

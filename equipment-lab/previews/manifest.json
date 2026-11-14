@@ -256,6 +256,26 @@
       "sha256": "470fd417fe358f5d9cb6fe68de4a91101787be3ee0366d26e40c1a0344019f39"
     },
     {
+      "file": "panasonic-pt-dw830.jpg",
+      "inventoryIds": [
+        "P02"
+      ],
+      "source": "DaveHomeAssist/equipment-lab@7c81bb60335e68ff4d767093a34de32919a21601 release/models/panasonic.ptdw830.inspection/preview.jpg, unchanged; rendered from the reloaded GLB by the package build, light stage #e9eae0",
+      "bytes": 20306,
+      "sha256": "dbcd16d15f639b9f387dec1fc0c1887e423857f975ce702cb429c63ac3b4960d",
+      "geometrySourceSha256": "b555022fc2ba289d341668605a6d99760dfe13552db31058c91b602d128caaba"
+    },
+    {
+      "file": "panasonic-pt-rz970.jpg",
+      "inventoryIds": [
+        "P03"
+      ],
+      "source": "DaveHomeAssist/equipment-lab@7c81bb60335e68ff4d767093a34de32919a21601 release/models/panasonic.ptrz970.inspection/preview.jpg, unchanged; rendered from the reloaded GLB by the package build, light stage #e9eae0",
+      "bytes": 20076,
+      "sha256": "d3f02e97b3cb05b4ec8fe6a8f7ed7e6daef69f5cae3ef4642ca53c8007291a9c",
+      "geometrySourceSha256": "0c139dd9d72c73f55f86631b188e2e9c513d73423df7d7d1a053cc030d4a8006"
+    },
+    {
       "file": "smartfade-1248.jpg",
       "inventoryIds": [
         "I03"

@@ -1,0 +1,59 @@
+{
+  "schema": "equipment.reference.manifest.v1",
+  "revision": "1.0.0",
+  "assetId": "P02",
+  "representation": "inspection",
+  "owner": "Equipment Lab",
+  "generator": "models/panasonic-dlp/model.mjs",
+  "catalog": "models/panasonic-dlp/catalog-dw830.mjs",
+  "adapter": "none; authored in the portable frame",
+  "consumer": "none qualified",
+  "runtime": "Three.js r184",
+  "validator": "Khronos glTF-Validator 2.0.0-dev.3.10",
+  "browser": "Chromium 153.0.8010.12 with SwiftShader",
+  "files": {
+    "model": {
+      "name": "panasonic.ptdw830.inspection.glb",
+      "bytes": 1757124,
+      "sha256": "b555022fc2ba289d341668605a6d99760dfe13552db31058c91b602d128caaba"
+    },
+    "definition": {
+      "name": "panasonic.ptdw830.definition.json",
+      "bytes": 283539,
+      "sha256": "d89f80a3ab7daaaa7994989f90ca2022fc518f934b7d2b609a5bd2586f5fb0ea"
+    }
+  },
+  "sourceHashes": {
+    "models/panasonic-dlp/catalog-dw830.mjs": "614e78265fb869086075d3339dd5728e475485010a891e3ccce6fbbe22261670",
+    "models/panasonic-dlp/common.mjs": "c952c216ede724f40781fe2179e0984f4325f5e7873d03306f872d56c938342c",
+    "models/panasonic-dlp/model.mjs": "8d488897502eb44dd14d32592bcc718a13d3702a616149c021e3ddc9d14c30eb",
+    "models/panasonic-dlp/harness.mjs": "88133ccae9328c095e04cf7f04d415636c152f035ddd77051c77582274a36768",
+    "models/panasonic-dlp/harness.html": "97d2f1ff42ab44248dcad17c8b49e26c8f29cb70490712f23a76e4e284b4b93d",
+    "models/panasonic-dlp/build.mjs": "c27128ea892a5a5393d105a60c60c517c236c06b2099535a43313ab7f0dd9f86",
+    "three@0.184.0/build/three.module.js": "61134198639a10885daf893fb29669ca26386e2a4cde76e8399f51e329f741f2",
+    "three@0.184.0/build/three.core.js": "368dc78835287709a48939e8eb9a7a61d0732098bdf916e56840d458aae9ccf3",
+    "three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "380af42ac1b503c43e0430dd56ade34e3e76317b1b1cc702f452b87d6fece404",
+    "three@0.184.0/examples/jsm/loaders/GLTFLoader.js": "97642d720f16cc9a0c9844934198e4d0c023bea8e89576d0f7545d03b2d103d2",
+    "three@0.184.0/examples/jsm/utils/BufferGeometryUtils.js": "d700b4c4584b9ff53a04692624d2363019f6d1df2978a207389168c6ae647a65"
+  },
+  "included": [
+    "P02"
+  ],
+  "excluded": [
+    "lights",
+    "floor",
+    "contact shadow",
+    "helpers"
+  ],
+  "export": {
+    "binary": true,
+    "trs": true,
+    "onlyVisible": false,
+    "maxTextureSize": "unbounded; retain generated texture dimensions",
+    "animations": [],
+    "includeCustomExtensions": false,
+    "compression": "none",
+    "pose": "every joint at rest"
+  },
+  "qualification": "Not qualified. Approximate inspection geometry; no reference checklist, consumer acceptance or physical comparison has been done."
+}

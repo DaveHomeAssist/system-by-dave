@@ -1,5 +1,13 @@
 # Changelog
 
+## November 13, 2026: Equipment Lab release 1.2.0, Panasonic PT-DW830 lamp access and PT-RZ970
+
+- Adopt shared Equipment Lab release 1.2.0: 46 entries, the confirmed 43 plus P01, P02 Panasonic PT-DW830 and P03 Panasonic PT-RZ970. Both projectors open in the inspector, sit under Video and projection, and join the offline set.
+- The PT-DW830 is built around lamp and air filter access. Its lamp unit cover opens, each lamp unit pulls out and the air filter case slides out, as five named states with a row of state buttons. Choosing a part that is hidden while the projector is closed opens the state that shows it, and a link can name a state.
+- Practice lists Panasonic's lamp replacement and air filter steps in order, under its warnings, with a button on each step that shows its part on the model. The steps are a summary; the operating instructions are the reference. Nothing here operates a projector.
+- The inspector reads service joints, states and procedures from a package definition. Packages without them are unchanged: no state row, no movement, the same framing.
+- Cache generation `v20261113-equipment-lab-panasonic`. Brief: `docs/equipment-lab.md`.
+
 ## November 13, 2026: Projctl details control surface
 
 - Projector Details opens the reviewed control layout: a larger lens pad with minus and plus focus and zoom and a full-width Stop lens, picture tiles for every reported test pattern with Clear pattern, the projector's heat reading, and a browser session timer kept under `projctl.sessionTimer.v1`.

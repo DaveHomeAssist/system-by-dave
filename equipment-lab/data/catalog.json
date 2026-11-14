@@ -1,6 +1,6 @@
 {
   "schema": "equipment.lab.catalog.v1",
-  "revision": "1.1.0",
+  "revision": "1.2.0",
   "compatibility": "ECP-1.0 revision 1.0",
   "inventoryConfirmed": "2026-10-23",
   "entries": [
@@ -1355,6 +1355,94 @@
         "geometry": "approximate"
       },
       "added": "2026-11-09"
+    },
+    {
+      "inventoryId": "P02",
+      "name": "Panasonic PT-DW830",
+      "collection": "Projection",
+      "role": "Large-venue lamp projector; inspection model with lamp and air filter access",
+      "notes": "body.*, lamp.*, filter.*, panel.*, io.* and lens.barrel. Four service joints and five states show the lamp unit cover, both lamp units and the air filter case. The entry is the model, not one variant. Added after the confirmed 43-entry family.",
+      "viewUrl": "https://avbydave.com/equipment-lab/?equipment=P02",
+      "nativeIdentity": [
+        {
+          "field": "equipment_id",
+          "value": "panasonic-pt-dw830"
+        },
+        {
+          "field": "schema",
+          "value": "equipment.inspection.v1"
+        },
+        {
+          "field": "revision",
+          "value": "1.0.0"
+        }
+      ],
+      "migration": "native",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/equipment-lab",
+        "revision": "8871f2dea8136e7e2973427bdd6fa83531a85d6c",
+        "paths": [
+          "models/panasonic-dlp/model.mjs",
+          "models/panasonic-dlp/catalog-dw830.mjs"
+        ],
+        "state": "native source"
+      },
+      "representation": {
+        "kind": "glb",
+        "base": "models/panasonic.ptdw830.inspection/",
+        "manifest": "panasonic.ptdw830.manifest.json"
+      },
+      "identity": {
+        "manufacturer": "Panasonic",
+        "model": "PT-DW830",
+        "geometry": "approximate"
+      },
+      "added": "2026-11-13"
+    },
+    {
+      "inventoryId": "P03",
+      "name": "Panasonic PT-RZ970",
+      "collection": "Projection",
+      "role": "Large-venue laser projector; inspection model",
+      "notes": "body.*, panel.*, io.* and lens.barrel, placed from Panasonic's CAD outline for the series. The entry is the model, not one variant. Added after the confirmed 43-entry family.",
+      "viewUrl": "https://avbydave.com/equipment-lab/?equipment=P03",
+      "nativeIdentity": [
+        {
+          "field": "equipment_id",
+          "value": "panasonic-pt-rz970"
+        },
+        {
+          "field": "schema",
+          "value": "equipment.inspection.v1"
+        },
+        {
+          "field": "revision",
+          "value": "1.0.0"
+        }
+      ],
+      "migration": "native",
+      "geometryConfidence": "approximate",
+      "source": {
+        "repository": "DaveHomeAssist/equipment-lab",
+        "revision": "8871f2dea8136e7e2973427bdd6fa83531a85d6c",
+        "paths": [
+          "models/panasonic-dlp/model.mjs",
+          "models/panasonic-dlp/catalog-rz970.mjs"
+        ],
+        "state": "native source"
+      },
+      "representation": {
+        "kind": "glb",
+        "base": "models/panasonic.ptrz970.inspection/",
+        "manifest": "panasonic.ptrz970.manifest.json"
+      },
+      "identity": {
+        "manufacturer": "Panasonic",
+        "model": "PT-RZ970",
+        "geometry": "approximate"
+      },
+      "added": "2026-11-13"
     }
   ]
 }
