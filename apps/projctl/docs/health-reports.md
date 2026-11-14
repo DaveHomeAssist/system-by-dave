@@ -65,7 +65,9 @@ those reads from overlapping in either direction. Different projectors remain
 independent. Report readings retry transport failures at most twice, with a
 4-second wait between attempts. Status polls can run during that wait. Refusals,
 authentication errors and invalid replies do not trigger retries. Each unit's
-12-second report deadline includes queue time, attempts and retry waits.
+12-second report deadline includes queue time, attempts and retry waits. A
+relay-stop report makes one attempt per unit with a 4-second read budget inside
+the default 6-second shutdown cap.
 
 A transport failure after a valid Panasonic sensor reply preserves the readings
 already received and stops further sensor queries. Pulse preserves an ambient

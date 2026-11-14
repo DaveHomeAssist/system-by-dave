@@ -319,16 +319,16 @@ export function createHealthReports({
     return events().filter((e) => { const t = Date.parse(e.at); return t > since && t <= until; }).slice(-30).reverse()
       .map((e) => ({ at: e.at, slot: e.slot || null, text: clip([e.command, e.result, e.detail].filter(Boolean).join(' · '), 160) }));
   }
-  async function capture(kind, reason, snapshot) {
+  async function capture(kind, reason, snapshot, { attempts = 3, timeoutMs = telemetryTimeoutMs } = {}) {
     const startedAt = now();
     const since = lastReportAt ?? startedAt - HOUR;
     const units = await Promise.all(snapshot.map(async ({ p, st, conn }) => {
       let readings = null, readError = null;
       if (st.online && readTelemetry) {
         const controller = new AbortController();
-        const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), telemetryTimeoutMs);
+        const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), timeoutMs);
         deadline?.unref?.();
-        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal, attempts: 3, onPartial: (partial) => { readings = partial; } })), controller.signal); }
+        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal, attempts, onPartial: (partial) => { readings = partial; } })), controller.signal); }
         catch (e) { readError = describeError(p, e); }
         finally { cancelTimer(deadline); }
       }
@@ -342,11 +342,11 @@ export function createHealthReports({
     log.log?.(`[health] ${report.title}: ${report.findings} (Notion ${report.notion.state})`);
     return summaryOf(report);
   }
-  function trigger(kind, reason) {
+  function trigger(kind, reason, reading) {
     if (!enabled()) return Promise.resolve(null);
     let snapshot; // taken now, before any queued work or power transition
     try { snapshot = statusSnapshot(); } catch (e) { log.error?.(`[health] ${kind} report skipped: ${e.message}`); return Promise.resolve(null); }
-    const job = chain.then(() => capture(kind, reason, snapshot)).catch((e) => { log.error?.(`[health] ${kind} report failed: ${e.message}`); return null; });
+    const job = chain.then(() => capture(kind, reason, snapshot, reading)).catch((e) => { log.error?.(`[health] ${kind} report failed: ${e.message}`); return null; });
     chain = job;
     return job;
   }
@@ -402,7 +402,7 @@ export function createHealthReports({
       clearPowerOn(); for (const t of [hourlyTimer, retryTimer]) if (t) cancelTimer(t);
       hourlyTimer = retryTimer = null;
       const t = now();
-      if (config.enabled && anyLitNow() && !(lastReportAt != null && t - lastReportAt < stopQuietMs) && t - lastPowerOffAt >= powerOffWindowMs) trigger(KIND.RELAY_STOP, 'relay stopping');
+      if (config.enabled && anyLitNow() && !(lastReportAt != null && t - lastReportAt < stopQuietMs) && t - lastPowerOffAt >= powerOffWindowMs) trigger(KIND.RELAY_STOP, 'relay stopping', { attempts: 1, timeoutMs: Math.min(telemetryTimeoutMs, Math.max(0, stopTimeoutMs - 2000)) });
       closed = true;
       let cap;
       await Promise.race([chain, new Promise((resolve) => { cap = timer(resolve, stopTimeoutMs); cap?.unref?.(); })]);

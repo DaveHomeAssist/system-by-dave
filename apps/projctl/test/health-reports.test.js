@@ -463,3 +463,22 @@ test('report deadline preserves partial readings, bounds retries and saves the f
   assert.match(fs.readFileSync(path.join(dir, `${report.id}.md`), 'utf8'), /readings: health reading timed out/);
   await engine.stop();
 });
+
+test('relay-stop partial readings are saved inside its shutdown cap without retries', async (t) => {
+  const { engine, clock, set, dir } = rigEngine(t, {
+    readTelemetry: async (p, { signal, attempts, onPartial }) => {
+      assert.equal(attempts, 1);
+      onPartial(panasonic(37));
+      await new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason), { once: true }));
+    },
+  });
+  set('on');
+  const stop = engine.stop();
+  await clock.flush();
+  await clock.advance(4000);
+  await stop;
+  const summary = engine.view().reports[0];
+  assert.equal(summary.kind, 'relay-stop');
+  const saved = JSON.parse(fs.readFileSync(path.join(dir, `${summary.id}.json`), 'utf8'));
+  assert.ok(saved.units.every((unit) => unit.intakeC === 37 && /timed out/.test(unit.readError)));
+});
