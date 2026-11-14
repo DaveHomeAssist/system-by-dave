@@ -1,3 +1,7 @@
+## Private controller: embed in place or open directly, November 14, 2026
+
+Dave asked for both controller paths to work robustly. The Controls, Presets, Log and Configuration views now offer two actions side by side: **Connect this Mac** (requests the browser's local-network permission for `http://localhost:8080`, checks relay health, then embeds the private controller frame as before) and **Open local controller ↗** (`#open-controller`, a plain top-level link to `http://localhost:8080/` that is always visible and never subject to iframe or mixed-content rules). Browsers can allow the health fetch yet refuse the localhost frame (Resource Timing responseStatus 0); when no `projctl:ready` arrives within 8 seconds the frame hides, the status names the link and the link is highlighted (`data-recommended`). A failed health check does the same. Connected still requires a source/origin-validated child report; parent messages select views only and cannot issue device commands. The CSP again lists `http://localhost:8080` in `connect-src` and `frame-src`. Both paths only work on the Mac running Projctl. This replaces the November 14 documents release's link-only controller panel, which had removed the embed without a recorded decision.
+
 ## Documents publication, November 14, 2026
 
 Planning Documents provides the current 18-page R5 handoff and five-page R5 diagrams,
@@ -12,7 +16,7 @@ ZIP and original EDID/settings exports stay outside the repository and publicati
 
 Use `node wst/embed-hosted-assets.mjs --hosted-only`, then the workspace tests,
 PDF route tests and hosting build validation before publication. The public shell
-keeps its localhost controller link and existing planning features.
+keeps its localhost controller link, the in-place Connect this Mac embed and existing planning features.
 
 # Frozen workspace
 
@@ -45,7 +49,7 @@ Navigation includes Notes + tasks, Projector info and Projector controls. `proje
 
 The controller now includes Notes + tasks and Projector info alongside Rig and Stage, loading this same frontend as generated same-origin panels from `public/workspace/`. `node wst/embed-hosted-assets.mjs` refreshes both the managed Worker assets and this local copy. Personal notes use the same key but remain browser-and-origin-specific; local controller notes and website notes do not silently sync. Dave confirmed no saved content needed migration.
 
-The public website shows Stage / room and Controls in place. Connect this Mac explicitly requests the browser's local-network permission for `http://localhost:8080`, checks relay health, and loads the private controller frame. Browsers can allow that health fetch yet refuse the localhost iframe (Resource Timing responseStatus 0), so once health passes the view also offers "Open controller in a new tab" (`#open-controller`, a top-level `window.open` with `noopener`); if no `projctl:ready` arrives within 8 seconds the frame hides and the status names the new-tab path. The button stays hidden while disconnected or when the health check fails. Connected requires a source/origin-validated child report with active relay connection, not iframe load. Parent messages can select only Rig or Stage; they cannot issue device commands. Denied/unavailable connection stays clearly disconnected. This does not expose a public relay and is not a verified Studio crew endpoint.
+The public website shows Stage / room and Controls in place. Connect this Mac explicitly requests the browser's local-network permission for `http://localhost:8080`, checks relay health, and loads the private controller frame; the always-visible Open local controller link is the direct path (see the November 14 section above). Connected requires a source/origin-validated child report with active relay connection, not iframe load. Parent messages can select only Rig or Stage; they cannot issue device commands. Denied/unavailable connection stays clearly disconnected. This does not expose a public relay and is not a verified Studio crew endpoint.
 
 The public tasks API permits anonymous cross-origin GET/POST/OPTIONS so the local workspace uses the same shared list. This CORS change is limited to the managed task API. Existing controller API policies were not broadened. Private authenticated Studio iframe behavior remains unverified: current controller cookies use SameSite=Lax, and the current MacBook has no passcode configured. Do not claim a future protected Studio iframe is commissioned from this local test.
 

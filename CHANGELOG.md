@@ -11,6 +11,11 @@
 
 ## 2026-11-14
 
+- WST private controller views offer both paths: Connect this Mac embeds the
+  controller in place after a health check, and the always-visible Open local
+  controller link opens it directly. A blocked frame or failed health check
+  highlights the link instead of stalling. The CSP again allows
+  `http://localhost:8080` for fetch and frames.
 - Refresh WST Planning Documents with the 18-page R5 handoff and five-page diagrams, including EDID evidence and pixel-routing corrections. Publish sanitized PDFs with source hashes while retaining the private exports outside the site.
 
 ## November 14, 2026: Video Engineering Daily

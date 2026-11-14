@@ -6,8 +6,8 @@ const request=(path,method='GET')=>worker.fetch(new Request('https://wst.housevi
 const html=await (await request('/')).text();
 const script=await (await request('/workspace.js')).text();
 assert.match(html,/data-route="documents"/);
-assert.doesNotMatch(html,/id="relay-frame"|connect-src[^;]*localhost/);
-assert.doesNotMatch(script,/connectRelay|api\/health|new WebSocket/);
+assert.match(html,/id="relay-frame"[^>]*hidden/);assert.match(html,/id="open-controller"[^>]*href="http:\/\/localhost:8080\/"/);assert.match(html,/connect-src[^;]*http:\/\/localhost:8080/);assert.doesNotMatch(html,/<iframe[^>]*src="http/);
+assert.doesNotMatch(script,/new WebSocket|api\/(?:devices|command|commands|presets|power)/);assert.match(script,/connectRelay/);
 assert.match(html,/18-page R5 handoff/);
 assert.match(html,/documents\/frozen-handoff-r5\.pdf#page=17/);
 for (const path of ['/documents/Frozen Documentation R5.zip','/documents/EDID baseline.zip','/documents/customEDID.txt']) assert.equal((await request(path)).status,404);
