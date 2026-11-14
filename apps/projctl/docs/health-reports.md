@@ -60,8 +60,27 @@ because production paperwork numbers the projectors differently.
 | PJLink only | `ERST` flags from the normal poll; no temperatures. |
 
 Readings are taken only when a report runs, never on the 5-second status poll.
-Each unit's reading is limited to 12 seconds; a unit that does not answer is
-listed as not read.
+Status polls and report readings share a queue for each projector, preventing
+those reads from overlapping in either direction. Different projectors remain
+independent. Report readings retry transport failures at most twice, with a
+4-second wait between attempts. Status polls can run during that wait. Refusals,
+authentication errors and invalid replies do not trigger retries. Each unit's
+12-second report deadline includes queue time, attempts and retry waits.
+
+A transport failure after a valid Panasonic sensor reply preserves the readings
+already received and stops further sensor queries. Pulse preserves an ambient
+reading if the subsequent alarm query fails. The report also preserves partial
+readings when its deadline expires, records the failure in the unit's Flags
+cell, and leaves missing channels unknown. A usable partial result finishes the
+attempt without retrying it. Missing optional internal channels do not erase a
+valid intake reading. Missing alarm feedback still produces an incomplete
+assessment. Control writes remain independent of this read queue.
+
+This adapts the read coordination, partial readings and retry scope reviewed in
+PR #463 to the current relay. Thermal watch history, fallback samples and peak
+columns require the separate Thermal backend and are outside this change.
+ECP-1.0 revision 1.0 applies. Existing units, identities and saved report shapes
+are preserved, with optional read-error detail added to partial results.
 
 ### Flags and limits
 

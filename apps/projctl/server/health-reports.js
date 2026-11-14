@@ -86,7 +86,7 @@ export function unitRow(p, st = {}, conn = {}, readings = null, readError = null
     power: st?.power || 'unknown', online, lastContact: conn?.lastSuccessAt || null, lightHours: Number.isFinite(st?.lightHours) ? st.lightHours : null,
     intakeC: intake ? intake.c : null, intakeLabel: intake?.label || null, internalC: internal, ratedC: rated, headroomC: headroom,
     flags, warnings, alarm, flagSource: completeErrors ? 'PJLink' : alarm != null ? 'Pulse' : null,
-    readError: readError ? String(readError).slice(0, 200) : null,
+    readError: readError || readings?.readError ? String(readError || readings.readError).slice(0, 200) : null,
   };
   row.verdict = !online ? 'unreachable' : flags.length ? 'flag' : headroom != null && headroom <= watchAt ? 'watch' : assessmentGaps(row).length ? 'incomplete' : 'ok';
   return row;
@@ -328,7 +328,7 @@ export function createHealthReports({
         const controller = new AbortController();
         const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), telemetryTimeoutMs);
         deadline?.unref?.();
-        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal })), controller.signal); }
+        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal, attempts: 3, onPartial: (partial) => { readings = partial; } })), controller.signal); }
         catch (e) { readError = describeError(p, e); }
         finally { cancelTimer(deadline); }
       }

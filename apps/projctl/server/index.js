@@ -22,6 +22,7 @@ import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
 import { createPoller } from './polling.js';
+import { createTelemetryReader } from './telemetry-reader.js';
 import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader } from './health-reports.js';
 import { createManualDiscovery } from './discovery.js';
 import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES } from './http-security.js';
@@ -116,6 +117,7 @@ function snapshot() {
 }
 
 // ---- Polling ----
+const telemetry = createTelemetryReader();
 function poll(p) {
   return poller.poll(p.slot);
 }
@@ -124,7 +126,7 @@ poller = createPoller({
   intervalMs: POLL_MS,
   timeoutMs: 10000,
   maxRetryMs: Math.max(POLL_MS, 15000),
-  read: (p, options) => p.ip ? driverFor(p).getStatus(options) : null,
+  read: (p, options) => p.ip ? telemetry.poll(p.slot, () => driverFor(p).getStatus(options), options) : null,
   started(p, { identityChanged, at }) {
     if (identityChanged) {
       status.set(p.slot, emptyStatus());
@@ -175,7 +177,7 @@ health = createHealthReports({
   status: (slot) => status.get(slot),
   connection: (slot) => connections.get(slot),
   events: () => rig.events,
-  readTelemetry: (p, options) => { const d = driverFor(store.projector(p.slot) || p); return d.healthReadings ? d.healthReadings(options) : null; },
+  readTelemetry: (p, options) => { const d = driverFor(store.projector(p.slot) || p); return d.healthReadings ? telemetry.read(p.slot, d, options) : null; },
   describeError: (p, e) => connectionError(store.projector(p.slot) || p, e),
   publish: healthConfig.notion.databaseId ? createNotionPublisher({ databaseId: healthConfig.notion.databaseId, token: notionTokenReader({ keychain: !SIM }) }) : null,
   powerOnDelayMs: Number(process.env.PROJCTL_HEALTH_POWER_ON_DELAY_MS || 120000),
