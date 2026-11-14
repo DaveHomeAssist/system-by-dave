@@ -69,6 +69,56 @@ for (const route of ['av/', 'av/?app=calculator', 'av/index.html?app=calculator'
   });
 }
 
+// A known page that the server answers with an error: what the worker returns
+// for each combination of saved copies.
+function serverErrorNavigation({ saved, status = 503, url = 'https://example.test/tool.html' }) {
+  const listeners = {};
+  const context = {
+    URL, Response, Promise, importScripts() {},
+    caches: { open: async () => ({
+      match: async key => typeof key === 'string' && saved[key] ? new Response(saved[key]) : undefined,
+      put: async () => assert.fail('An error response must not be stored')
+    }) },
+    fetch: async () => new Response('origin unavailable', { status }),
+    self: {
+      location: { origin: 'https://example.test' },
+      registration: { scope: 'https://example.test/' },
+      SBD_REGISTRY: { version: 'test', offlineAssets: () => ['./av/index.html', './tool.html'] },
+      addEventListener: (type, listener) => { listeners[type] = listener; }
+    }
+  };
+  vm.runInNewContext(source, context, { filename: 'av-suite-worker.js' });
+  let response;
+  listeners.fetch({ request: { url, method: 'GET', mode: 'navigate' }, respondWith: promise => { response = promise; } });
+  return response;
+}
+
+test('a server error on a saved page reopens the saved copy', async () => {
+  const response = await serverErrorNavigation({ saved: {
+    'https://example.test/tool.html': 'saved tool',
+    'https://example.test/av/index.html': 'native console'
+  } });
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), 'saved tool');
+});
+
+test('a server error on a known page with no saved copy reopens the saved console', async () => {
+  const response = await serverErrorNavigation({ saved: { 'https://example.test/av/index.html': 'native console' } });
+  assert.equal(await response.text(), 'native console');
+});
+
+test('a server error passes through when nothing is saved', async () => {
+  const response = await serverErrorNavigation({ saved: {} });
+  assert.equal(response.status, 503);
+  assert.equal(await response.text(), 'origin unavailable');
+});
+
+test('a 404 on a known page is passed through, not replaced or stored', async () => {
+  const response = await serverErrorNavigation({ status: 404, saved: { 'https://example.test/tool.html': 'saved tool' } });
+  assert.equal(response.status, 404);
+  assert.equal(await response.text(), 'origin unavailable');
+});
+
 test('install precaches every local Rail asset in the bumped cache generation', async () => {
   const registryContext = { self: {} };
   vm.createContext(registryContext);
@@ -77,15 +127,20 @@ test('install precaches every local Rail asset in the bumped cache generation', 
   const listeners = {};
   const critical = [];
   const optional = [];
+  // Install must read past the HTTP cache, or a copy fetched before a deploy is stored as new.
+  const asset = request => {
+    assert.equal(request.cache, 'reload', `${request.url} was read through the HTTP cache`);
+    return `./${request.url.slice('https://example.test/'.length)}`;
+  };
   const cache = {
-    addAll: async assets => { critical.push(...assets); },
-    add: async asset => { optional.push(asset); }
+    addAll: async requests => { critical.push(...requests.map(asset)); },
+    add: async request => { optional.push(asset(request)); }
   };
   const context = {
-    URL, Response, Promise,
+    URL, Request, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261029-two-step-panel-chooser-verified');
+      assert.equal(name, 'sbd-av-suite-v20261113-equipment-lab-panasonic');
       return cache;
     } },
     fetch: async () => new Response('ok'),

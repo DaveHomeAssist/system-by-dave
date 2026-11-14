@@ -1,0 +1,6293 @@
+{
+  "schema": "equipment.reference.v1",
+  "revision": "1.0.0",
+  "assetId": "P01",
+  "representation": "inspection",
+  "native": {
+    "definition": {
+      "schema": "equipment.inspection.v1",
+      "revision": "1.0.0",
+      "equipment_id": "barco-udm-4k22",
+      "compatibility": "ECP-1.0 revision 1.0",
+      "units": "m",
+      "up": "+Y",
+      "forward": "+Z",
+      "origin": "Foot contact plane under the centre of the published envelope",
+      "handedness": "Left and right follow Barco: stand behind the projector and face the screen. The right side is -X.",
+      "projector": {
+        "manufacturer": "Barco",
+        "model": "UDM-4K22",
+        "family": "UDM",
+        "kind": "Large-venue laser projector",
+        "imaging": "3-chip DLP",
+        "light_source": "laser phosphor",
+        "native_resolution": "2560 x 1600",
+        "output_resolution": "3840 x 2400 (4K UHD)",
+        "lens_system": "TLD+ interchangeable lenses; the body ships without a lens",
+        "published_brightness": "Published ratings differ by measurement convention and document. Read the current specification sheet."
+      },
+      "lens": {
+        "manufacturer": "Barco",
+        "family": "TLD+",
+        "exact_lens": "not asserted",
+        "geometry": "representative"
+      },
+      "geometry": "Published outer envelope with face-level layout from Barco documents. Sizes and positions of parts on each face are approximate or assumed. Not CAD.",
+      "geometry_revision": "2026-11-09 initial authoring",
+      "behavior": "Inspection only. No simulated operation, optical result or hardware control."
+    },
+    "components": [
+      {
+        "id": "body.chassis",
+        "label": "Projector body",
+        "assembly": "body",
+        "purpose": "Housing for the light source, sealed optical engine, cooling and electronics.",
+        "action": "Lift and place with enough people for a 48 kg unit. Keep every air inlet and the rear outlet clear.",
+        "source": "product",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "Envelope 540 x 725 x 339 mm and 48 kg are published. Panel lines and edge shapes are styling.",
+        "view": "overview"
+      },
+      {
+        "id": "body.lensMount",
+        "label": "Lens holder",
+        "assembly": "body",
+        "purpose": "Carries a TLD+ lens and moves it for lens shift.",
+        "action": "Fit or remove a lens only as the installation manual describes. Shift range depends on the lens.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "Front face is published. Horizontal centring is assumed. Height uses the 223 mm installation-manual figure.",
+        "view": "front"
+      },
+      {
+        "id": "body.airInletFront",
+        "label": "Front air inlet",
+        "assembly": "body",
+        "purpose": "One of three filtered cooling air inlets.",
+        "action": "Keep clear. Clean or replace the dust filter on the schedule in the user guide.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "An inlet on the front is published. Its size and its place on the face are assumed.",
+        "view": "front"
+      },
+      {
+        "id": "body.airInletTop",
+        "label": "Top air inlet",
+        "assembly": "body",
+        "purpose": "One of three filtered cooling air inlets.",
+        "action": "Keep clear; do not stack anything on it. Clean or replace the dust filter on schedule.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "An inlet on the top is published. Its size and its place on the face are assumed.",
+        "view": "top"
+      },
+      {
+        "id": "body.airInletRight",
+        "label": "Right-side air inlet",
+        "assembly": "body",
+        "purpose": "One of three filtered cooling air inlets.",
+        "action": "Keep clear when dressing cables from the input and communication module on the same side.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "An inlet on the right side is published. Its size and its place on the face are assumed.",
+        "view": "io"
+      },
+      {
+        "id": "body.airOutlet",
+        "label": "Rear air outlet",
+        "assembly": "body",
+        "purpose": "The single exhaust for warm air.",
+        "action": "Leave free space behind the projector. Do not let exhaust feed another unit's inlet.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "A single outlet at the rear is published. Its size and its place on the face are assumed.",
+        "view": "rear"
+      },
+      {
+        "id": "body.powerInput",
+        "label": "Mains power input",
+        "assembly": "body",
+        "purpose": "Mains supply and the disconnect point for the projector.",
+        "action": "Published ratings: 200 to 240 V at 13.5 A, or 120 to 160 V at 18.5 A with reduced light output. Confirm against the unit nameplate.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "The rear location is published through the rear IR receiver description. Connector type is not asserted.",
+        "view": "rear"
+      },
+      {
+        "id": "body.irFront",
+        "label": "Front IR receiver",
+        "assembly": "body",
+        "purpose": "Receives the remote control from in front of the projector.",
+        "action": "Point the remote toward this window, or reflect it off the screen.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "Published as on the front, below the lens holder.",
+        "view": "front"
+      },
+      {
+        "id": "body.irRear",
+        "label": "Rear IR receiver",
+        "assembly": "body",
+        "purpose": "Receives the remote control from behind the projector.",
+        "action": "Point the remote toward this window when working behind the unit.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "Published as at the rear, beside the power input.",
+        "view": "rear"
+      },
+      {
+        "id": "body.feet",
+        "label": "Adjustable feet",
+        "assembly": "body",
+        "purpose": "Level the projector on a surface. Rigging hardware attaches at the same points.",
+        "action": "Adjust until a test pattern is level and rectangular. Use only Barco-approved rigging at these points.",
+        "source": "installation",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "Adjustable feet that double as rigging points are published. Four feet at the corners is assumed.",
+        "view": "left"
+      },
+      {
+        "id": "io.display",
+        "label": "LCD panel",
+        "assembly": "io",
+        "purpose": "Shows menus and adjustments, and status such as projector state, network address, active source and firmware version.",
+        "action": "Read status here when the projected image is not visible. The drawn screen content is a placeholder.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "Part of the input and communication module on the right side. Its place in the module is assumed.",
+        "view": "io"
+      },
+      {
+        "id": "io.keypad",
+        "label": "Local keypad",
+        "assembly": "io",
+        "purpose": "Local control of power, menus and basic adjustments without the remote.",
+        "action": "Use with the LCD panel. Key count and legends are not modeled.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "Part of the input and communication module on the right side. Key layout is a stand-in.",
+        "view": "io"
+      },
+      {
+        "id": "io.statusLights",
+        "label": "Status lights",
+        "assembly": "io",
+        "purpose": "Show projector state at a glance. The user guide lists orange for ready and green for on.",
+        "action": "Check before sending commands. Read the user guide for every colour and blink pattern.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "Listed on the communication panel. Count and place are assumed.",
+        "view": "io"
+      },
+      {
+        "id": "io.irReceiver",
+        "label": "Side IR receiver",
+        "assembly": "io",
+        "purpose": "Receives the remote control from the input and communication side.",
+        "action": "Point the remote toward this window when working at the connector side.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "Published as on the right side, inside the input and communication module.",
+        "view": "io"
+      },
+      {
+        "id": "io.hdmi",
+        "label": "HDMI 2.0 input",
+        "assembly": "io",
+        "purpose": "Digital video input on the Quad Combo input board.",
+        "action": "Select the input from the source menu. Confirm the exact timing your source sends.",
+        "source": "specSheet",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "The input is published. Its place on the board is a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.displayPort",
+        "label": "DisplayPort 1.2 input",
+        "assembly": "io",
+        "purpose": "Digital video input on the Quad Combo input board.",
+        "action": "Select the input from the source menu. Confirm the exact timing your source sends.",
+        "source": "specSheet",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "The input is published. Its place on the board is a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.hdbaset",
+        "label": "HDBaseT input",
+        "assembly": "io",
+        "purpose": "Video over a category cable from an HDBaseT transmitter.",
+        "action": "Connect Ethernet to this input or to the LAN port, not both.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "The input is published. Its place on the board is a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.sdi",
+        "label": "Quad SDI connectors",
+        "assembly": "io",
+        "purpose": "Four BNC connectors for 3G to 12G SDI on the Quad Combo input board.",
+        "action": "Check the user guide for which connectors are inputs and which pass the signal through.",
+        "source": "specSheet",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "Four SDI connectors are published. Their order and place are a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.lan",
+        "label": "LAN port",
+        "assembly": "io",
+        "purpose": "10/100 Base-T network port for control over IP and Art-Net.",
+        "action": "Use for network control. A modeled port does not make a projector reachable.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "The port is published on the communication panel. Its place is a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.dmx",
+        "label": "DMX in and out",
+        "assembly": "io",
+        "purpose": "DMX 512 input, and an output to the next device in the chain.",
+        "action": "Wire in to out through the chain and terminate the last device.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "Input and output are published. Connector style and place are a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.remote",
+        "label": "Wired remote input",
+        "assembly": "io",
+        "purpose": "XLR input for controlling the projector with the remote on a cable.",
+        "action": "Use when infrared is unreliable. Check the user guide for the cable required.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "An XLR wired-control input is published. Its place is a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.rs232",
+        "label": "RS232 port",
+        "assembly": "io",
+        "purpose": "Serial control on a Sub-D connector.",
+        "action": "Use the protocol and settings in the Barco control documentation.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "The port is published. Its place is a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.usb",
+        "label": "USB port",
+        "assembly": "io",
+        "purpose": "Firmware updates and log download.",
+        "action": "Follow the user guide update procedure. Keep power stable during an update.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "The port is published. Its place is a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.sync3d",
+        "label": "3D sync in and out",
+        "assembly": "io",
+        "purpose": "BNC connectors that take and send a 3D synchronisation signal.",
+        "action": "Used only in stereoscopic systems.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "Sync in and sync out are published. Their place is a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "io.dc12v",
+        "label": "12 V output",
+        "assembly": "io",
+        "purpose": "Low-voltage output rated 12 V at 1 A.",
+        "action": "Stay inside the 1 A rating.",
+        "source": "userGuide",
+        "geometry": "approximate",
+        "position": "assumed",
+        "basis": "The output is published. Connector style and place are a schematic arrangement.",
+        "view": "io"
+      },
+      {
+        "id": "lens.barrel",
+        "label": "Representative TLD+ lens",
+        "assembly": "lens",
+        "purpose": "Shows where a lens sits. It stands in for the TLD+ family and is not a specific lens.",
+        "action": "Identify the fitted lens from its barrel marking before any throw calculation.",
+        "source": "specSheet",
+        "geometry": "approximate",
+        "position": "manufacturer referenced",
+        "basis": "TLD+ lenses mount at the front. Barrel size and shape are generic.",
+        "view": "front"
+      }
+    ],
+    "sources": {
+      "product": {
+        "label": "Barco UDM-4K22 product page",
+        "url": "https://www.barco.com/en/product/udm-4k22"
+      },
+      "specSheet": {
+        "label": "Barco UDM-4K22 specification sheet (English)",
+        "url": "https://assets.barco.com/m/5baeef26d9138bb3/original/UDM-4K22-en-Spec-sheet.pdf"
+      },
+      "userGuide": {
+        "label": "Barco UDM user guide R5911443",
+        "url": "https://www.barco.com/manuals/R5911443/d2ni0weh3859.html"
+      },
+      "installation": {
+        "label": "Barco UDM installation manual R5911438",
+        "url": "https://www.barco.com/en/support/docs/R5911438"
+      },
+      "documentation": {
+        "label": "Barco UDM-4K22 manuals and documentation",
+        "url": "https://www.barco.com/en/support/udm-4k22/documentation"
+      }
+    },
+    "views": {
+      "overview": {
+        "label": "Overview",
+        "direction": [
+          -0.9,
+          0.55,
+          1
+        ]
+      },
+      "front": {
+        "label": "Front",
+        "direction": [
+          0,
+          0.2,
+          1
+        ]
+      },
+      "io": {
+        "label": "Input and communication side",
+        "direction": [
+          -1,
+          0.18,
+          -0.12
+        ]
+      },
+      "rear": {
+        "label": "Rear",
+        "direction": [
+          0.25,
+          0.25,
+          -1
+        ]
+      },
+      "left": {
+        "label": "Left side",
+        "direction": [
+          1,
+          0.2,
+          0.1
+        ]
+      },
+      "top": {
+        "label": "Top",
+        "direction": [
+          0,
+          1,
+          0
+        ],
+        "up": [
+          1,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "componentMap": {
+    "body.airInletFront": "body.airInletFront",
+    "body.airInletRight": "body.airInletRight",
+    "body.airInletTop": "body.airInletTop",
+    "body.airOutlet": "body.airOutlet",
+    "body.chassis": "body.chassis",
+    "body.feet": "body.feet",
+    "body.irFront": "body.irFront",
+    "body.irRear": "body.irRear",
+    "body.lensMount": "body.lensMount",
+    "body.powerInput": "body.powerInput",
+    "io.dc12v": "io.dc12v",
+    "io.display": "io.display",
+    "io.displayPort": "io.displayPort",
+    "io.dmx": "io.dmx",
+    "io.hdbaset": "io.hdbaset",
+    "io.hdmi": "io.hdmi",
+    "io.irReceiver": "io.irReceiver",
+    "io.keypad": "io.keypad",
+    "io.lan": "io.lan",
+    "io.remote": "io.remote",
+    "io.rs232": "io.rs232",
+    "io.sdi": "io.sdi",
+    "io.statusLights": "io.statusLights",
+    "io.sync3d": "io.sync3d",
+    "io.usb": "io.usb",
+    "lens.barrel": "lens.barrel"
+  },
+  "frame": {
+    "units": "m",
+    "up": "+Y",
+    "front": "+Z",
+    "origin": "foot contact plane under the centre of the published envelope",
+    "nativeToPortable": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "portableToNative": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "nativeOrigin": "same as origin",
+    "nativeFront": "+Z"
+  },
+  "dimensions": {
+    "nominal": {
+      "size": [
+        0.54,
+        0.339,
+        0.725
+      ],
+      "order": "width, height, length",
+      "massKg": 48,
+      "source": "product",
+      "conflict": "The specification sheet prints the same figures as 725 x 540 x 339 mm under the W x L x H heading.",
+      "includes": "Not stated whether feet, handles or the lens holder are inside these figures. The body ships without a lens."
+    },
+    "reported": {
+      "lensCentreHeight": 0.223,
+      "source": "installation",
+      "note": "The excerpt gives 223 mm with all feet retracted and no vertical shift. Reading it as lens-centre height is an interpretation."
+    },
+    "measured": null,
+    "modeled": {
+      "all": {
+        "min": [
+          -0.27,
+          0,
+          -0.3625
+        ],
+        "max": [
+          0.27,
+          0.339,
+          0.5825
+        ],
+        "size": [
+          0.54,
+          0.339,
+          0.945
+        ]
+      },
+      "withoutLens": {
+        "min": [
+          -0.27,
+          0,
+          -0.3625
+        ],
+        "max": [
+          0.27,
+          0.339,
+          0.3629
+        ],
+        "size": [
+          0.54,
+          0.339,
+          0.7254
+        ]
+      }
+    },
+    "use": "approximate inspection only; not measured fit"
+  },
+  "rig": {
+    "kind": "rigid hierarchy",
+    "bones": 0,
+    "skins": 0,
+    "clips": 0,
+    "joints": {},
+    "context": "No stand, rigging frame, flight case, cables or screen are included."
+  },
+  "materials": [
+    {
+      "name": "udm4k22.material.udm4k22.core.001",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.001518,
+        0.001518,
+        0.001821
+      ],
+      "metalness": 0,
+      "roughness": 1,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.plate.front.002",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.015996,
+        0.0185,
+        0.022174
+      ],
+      "metalness": 0.2,
+      "roughness": 0.68,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.plate.rear.003",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.015996,
+        0.0185,
+        0.022174
+      ],
+      "metalness": 0.2,
+      "roughness": 0.68,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.plate.right.004",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.015996,
+        0.0185,
+        0.022174
+      ],
+      "metalness": 0.2,
+      "roughness": 0.68,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.plate.left.005",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.015996,
+        0.0185,
+        0.022174
+      ],
+      "metalness": 0.2,
+      "roughness": 0.68,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.cover.left.006",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.015996,
+        0.0185,
+        0.022174
+      ],
+      "metalness": 0.2,
+      "roughness": 0.68,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.plate.top.007",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.015996,
+        0.0185,
+        0.022174
+      ],
+      "metalness": 0.2,
+      "roughness": 0.68,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.wordmark.008",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.io.panel.117",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.025187,
+        0.029557,
+        0.035601
+      ],
+      "metalness": 0.55,
+      "roughness": 0.5,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.model.118",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.io.board.177",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.039546,
+        0.046665,
+        0.056128
+      ],
+      "metalness": 0.6,
+      "roughness": 0.45,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.collar.094",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.023153,
+        0.026241,
+        0.030713
+      ],
+      "metalness": 0.7,
+      "roughness": 0.4,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": true,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.collar.face.095",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.023153,
+        0.026241,
+        0.030713
+      ],
+      "metalness": 0.7,
+      "roughness": 0.4,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.009",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.010",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.011",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.012",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.013",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.014",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.015",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.016",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.017",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.018",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.019",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.020",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.021",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.022",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.023",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.024",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.025",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.026",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.027",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.028",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.029",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.030",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.031",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.032",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.033",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.034",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.035",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.036",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.037",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.038",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.039",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.040",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.041",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.042",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.043",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.044",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.045",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.046",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.047",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.048",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.049",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.050",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.051",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.052",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.053",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.054",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.055",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.056",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.057",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.058",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.059",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.060",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.061",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.062",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.063",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.064",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.065",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.066",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.067",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.068",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.069",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.070",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.071",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.072",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.073",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.074",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.075",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.076",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.077",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.078",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.079",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.080",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.081",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.082",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.083",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.084",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.085",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.086",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.087",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.088",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.089",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.090",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.091",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.092",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.louvre.093",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.0185,
+        0.021219,
+        0.025187
+      ],
+      "metalness": 0.25,
+      "roughness": 0.7,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.recess.105",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.004391,
+        0.004777,
+        0.005605
+      ],
+      "metalness": 0.2,
+      "roughness": 0.4,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.inlet.106",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.inlet.block.107",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.004391,
+        0.004777,
+        0.005605
+      ],
+      "metalness": 0.2,
+      "roughness": 0.4,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.window.096",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024158,
+        0.001821,
+        0.002732
+      ],
+      "metalness": 0.1,
+      "roughness": 0.12,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.window.108",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024158,
+        0.001821,
+        0.002732
+      ],
+      "metalness": 0.1,
+      "roughness": 0.12,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.pad.109",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003347,
+        0.003677
+      ],
+      "metalness": 0,
+      "roughness": 0.95,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.stem.110",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.pad.111",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003347,
+        0.003677
+      ],
+      "metalness": 0,
+      "roughness": 0.95,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.stem.112",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.pad.113",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003347,
+        0.003677
+      ],
+      "metalness": 0,
+      "roughness": 0.95,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.stem.114",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.pad.115",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003347,
+        0.003677
+      ],
+      "metalness": 0,
+      "roughness": 0.95,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.stem.116",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bezel.119",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.004391,
+        0.004777,
+        0.005605
+      ],
+      "metalness": 0.2,
+      "roughness": 0.4,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.lcd.120",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.121",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.122",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.123",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.124",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.125",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.126",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.127",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.128",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.129",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.130",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.131",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.132",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.cursor.133",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.cursor.134",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.cursor.135",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.cursor.136",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.key.cursor.137",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.042311,
+        0.049707,
+        0.059511
+      ],
+      "metalness": 0.1,
+      "roughness": 0.6,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.lamp.138",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.093059,
+        0.107023,
+        0.124772
+      ],
+      "metalness": 0.1,
+      "roughness": 0.25,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.lamp.139",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.093059,
+        0.107023,
+        0.124772
+      ],
+      "metalness": 0.1,
+      "roughness": 0.25,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.lamp.140",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.093059,
+        0.107023,
+        0.124772
+      ],
+      "metalness": 0.1,
+      "roughness": 0.25,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.window.141",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.024158,
+        0.001821,
+        0.002732
+      ],
+      "metalness": 0.1,
+      "roughness": 0.12,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.hdmi.shell.181",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.hdmi.cavity.182",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.hdmi.183",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.dp.shell.184",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.dp.cavity.185",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.dp.186",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.rj45.shell.178",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.rj45.cavity.179",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.hdbaset.180",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.nut.187",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.barrel.188",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.bore.189",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.nut.190",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.barrel.191",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.bore.192",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.nut.193",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.barrel.194",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.bore.195",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.nut.196",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.barrel.197",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.bore.198",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.sdi.199",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.rj45.shell.142",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.rj45.cavity.143",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.lan.144",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.flange.156",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.004391,
+        0.004777,
+        0.005605
+      ],
+      "metalness": 0.2,
+      "roughness": 0.4,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.ring.157",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.cavity.158",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.latch.159",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.flange.160",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.004391,
+        0.004777,
+        0.005605
+      ],
+      "metalness": 0.2,
+      "roughness": 0.4,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.ring.161",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.cavity.162",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.latch.163",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.dmx.164",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.flange.165",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.004391,
+        0.004777,
+        0.005605
+      ],
+      "metalness": 0.2,
+      "roughness": 0.4,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.ring.166",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.cavity.167",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.xlr.latch.168",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.remote.169",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.dsub.shell.151",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.dsub.cavity.152",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.dsub.post.153",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.dsub.post.154",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.rs232.155",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.usb.shell.145",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.usb.cavity.146",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.usb.147",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.nut.170",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.barrel.171",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.bore.172",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.nut.173",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.barrel.174",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.bnc.bore.175",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.sync3d.176",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.jack.148",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.366253,
+        0.396755,
+        0.42869
+      ],
+      "metalness": 0.9,
+      "roughness": 0.32,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.jack.bore.149",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003347,
+        0.003677,
+        0.004025
+      ],
+      "metalness": 0.1,
+      "roughness": 0.55,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.label.dc12v.150",
+      "type": "MeshBasicMaterial",
+      "role": "generated label",
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "metalness": null,
+      "roughness": null,
+      "opacity": 1,
+      "alphaMode": "BLEND",
+      "doubleSided": false,
+      "depthWrite": false
+    },
+    {
+      "name": "udm4k22.material.udm4k22.mount.097",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.008568,
+        0.009134,
+        0.01033
+      ],
+      "metalness": 0.5,
+      "roughness": 0.45,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.body.098",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.008568,
+        0.009134,
+        0.01033
+      ],
+      "metalness": 0.5,
+      "roughness": 0.45,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.zoomRing.099",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.017642,
+        0.020289,
+        0.023153
+      ],
+      "metalness": 0.1,
+      "roughness": 0.85,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.body.front.100",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.008568,
+        0.009134,
+        0.01033
+      ],
+      "metalness": 0.5,
+      "roughness": 0.45,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.focusRing.101",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.017642,
+        0.020289,
+        0.023153
+      ],
+      "metalness": 0.1,
+      "roughness": 0.85,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.hood.102",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.008568,
+        0.009134,
+        0.01033
+      ],
+      "metalness": 0.5,
+      "roughness": 0.45,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": true,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.hood.lip.103",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.004391,
+        0.004777,
+        0.005605
+      ],
+      "metalness": 0.2,
+      "roughness": 0.4,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    },
+    {
+      "name": "udm4k22.material.udm4k22.frontElement.104",
+      "type": "MeshStandardMaterial",
+      "role": "physical surface",
+      "color": [
+        0.003035,
+        0.008023,
+        0.019382
+      ],
+      "metalness": 0.35,
+      "roughness": 0.06,
+      "opacity": 1,
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "depthWrite": true
+    }
+  ],
+  "textures": [
+    {
+      "name": "udm4k22.texture.wordmark.color",
+      "width": 512,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.model.color",
+      "width": 1024,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.lcd.color",
+      "width": 512,
+      "height": 256,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.hdmi.color",
+      "width": 1024,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.dp.color",
+      "width": 512,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.hdbaset.color",
+      "width": 1024,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.sdi.color",
+      "width": 1024,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.lan.color",
+      "width": 512,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.dmx.color",
+      "width": 1024,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.remote.color",
+      "width": 512,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.rs232.color",
+      "width": 512,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.usb.color",
+      "width": 512,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.sync3d.color",
+      "width": 1024,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    },
+    {
+      "name": "udm4k22.texture.dc12v.color",
+      "width": 512,
+      "height": 128,
+      "colorSpace": "srgb",
+      "role": "color",
+      "embedded": true
+    }
+  ],
+  "surfaces": [
+    {
+      "name": "udm4k22.core.001",
+      "geometry": "udm4k22.core.001.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "core",
+      "finish": "core",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.plate.front.002",
+      "geometry": "udm4k22.plate.front.002.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "plate.front",
+      "finish": "shell",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.plate.rear.003",
+      "geometry": "udm4k22.plate.rear.003.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "plate.rear",
+      "finish": "shell",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.plate.right.004",
+      "geometry": "udm4k22.plate.right.004.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "plate.right",
+      "finish": "shell",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.plate.left.005",
+      "geometry": "udm4k22.plate.left.005.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "plate.left",
+      "finish": "shell",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.cover.left.006",
+      "geometry": "udm4k22.cover.left.006.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "cover.left",
+      "finish": "shell",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.plate.top.007",
+      "geometry": "udm4k22.plate.top.007.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "plate.top",
+      "finish": "shell",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.wordmark.008",
+      "geometry": "udm4k22.label.wordmark.008.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "label.wordmark",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "BARCO"
+    },
+    {
+      "name": "udm4k22.io.panel.117",
+      "geometry": "udm4k22.io.panel.117.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "io.panel",
+      "finish": "panel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.model.118",
+      "geometry": "udm4k22.label.model.118.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "label.model",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "UDM-4K22"
+    },
+    {
+      "name": "udm4k22.io.board.177",
+      "geometry": "udm4k22.io.board.177.geometry",
+      "owner": "P01",
+      "component": "body.chassis",
+      "role": "io.board",
+      "finish": "board",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.collar.094",
+      "geometry": "udm4k22.collar.094.geometry",
+      "owner": "P01",
+      "component": "body.lensMount",
+      "role": "collar",
+      "finish": "collar",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.collar.face.095",
+      "geometry": "udm4k22.collar.face.095.geometry",
+      "owner": "P01",
+      "component": "body.lensMount",
+      "role": "collar.face",
+      "finish": "collar",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.009",
+      "geometry": "udm4k22.louvre.009.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.010",
+      "geometry": "udm4k22.louvre.010.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.011",
+      "geometry": "udm4k22.louvre.011.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.012",
+      "geometry": "udm4k22.louvre.012.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.013",
+      "geometry": "udm4k22.louvre.013.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.014",
+      "geometry": "udm4k22.louvre.014.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.015",
+      "geometry": "udm4k22.louvre.015.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.016",
+      "geometry": "udm4k22.louvre.016.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.017",
+      "geometry": "udm4k22.louvre.017.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.018",
+      "geometry": "udm4k22.louvre.018.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.019",
+      "geometry": "udm4k22.louvre.019.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.020",
+      "geometry": "udm4k22.louvre.020.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.021",
+      "geometry": "udm4k22.louvre.021.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.022",
+      "geometry": "udm4k22.louvre.022.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.023",
+      "geometry": "udm4k22.louvre.023.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.024",
+      "geometry": "udm4k22.louvre.024.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.025",
+      "geometry": "udm4k22.louvre.025.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.026",
+      "geometry": "udm4k22.louvre.026.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.027",
+      "geometry": "udm4k22.louvre.027.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.028",
+      "geometry": "udm4k22.louvre.028.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.029",
+      "geometry": "udm4k22.louvre.029.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.030",
+      "geometry": "udm4k22.louvre.030.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.031",
+      "geometry": "udm4k22.louvre.031.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.032",
+      "geometry": "udm4k22.louvre.032.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.033",
+      "geometry": "udm4k22.louvre.033.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.034",
+      "geometry": "udm4k22.louvre.034.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.035",
+      "geometry": "udm4k22.louvre.035.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.036",
+      "geometry": "udm4k22.louvre.036.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.037",
+      "geometry": "udm4k22.louvre.037.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.038",
+      "geometry": "udm4k22.louvre.038.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.039",
+      "geometry": "udm4k22.louvre.039.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.040",
+      "geometry": "udm4k22.louvre.040.geometry",
+      "owner": "P01",
+      "component": "body.airInletFront",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.041",
+      "geometry": "udm4k22.louvre.041.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.042",
+      "geometry": "udm4k22.louvre.042.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.043",
+      "geometry": "udm4k22.louvre.043.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.044",
+      "geometry": "udm4k22.louvre.044.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.045",
+      "geometry": "udm4k22.louvre.045.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.046",
+      "geometry": "udm4k22.louvre.046.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.047",
+      "geometry": "udm4k22.louvre.047.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.048",
+      "geometry": "udm4k22.louvre.048.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.049",
+      "geometry": "udm4k22.louvre.049.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.050",
+      "geometry": "udm4k22.louvre.050.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.051",
+      "geometry": "udm4k22.louvre.051.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.052",
+      "geometry": "udm4k22.louvre.052.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.053",
+      "geometry": "udm4k22.louvre.053.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.054",
+      "geometry": "udm4k22.louvre.054.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.055",
+      "geometry": "udm4k22.louvre.055.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.056",
+      "geometry": "udm4k22.louvre.056.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.057",
+      "geometry": "udm4k22.louvre.057.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.058",
+      "geometry": "udm4k22.louvre.058.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.059",
+      "geometry": "udm4k22.louvre.059.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.060",
+      "geometry": "udm4k22.louvre.060.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.061",
+      "geometry": "udm4k22.louvre.061.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.062",
+      "geometry": "udm4k22.louvre.062.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.063",
+      "geometry": "udm4k22.louvre.063.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.064",
+      "geometry": "udm4k22.louvre.064.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.065",
+      "geometry": "udm4k22.louvre.065.geometry",
+      "owner": "P01",
+      "component": "body.airInletTop",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.066",
+      "geometry": "udm4k22.louvre.066.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.067",
+      "geometry": "udm4k22.louvre.067.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.068",
+      "geometry": "udm4k22.louvre.068.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.069",
+      "geometry": "udm4k22.louvre.069.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.070",
+      "geometry": "udm4k22.louvre.070.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.071",
+      "geometry": "udm4k22.louvre.071.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.072",
+      "geometry": "udm4k22.louvre.072.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.073",
+      "geometry": "udm4k22.louvre.073.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.074",
+      "geometry": "udm4k22.louvre.074.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.075",
+      "geometry": "udm4k22.louvre.075.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.076",
+      "geometry": "udm4k22.louvre.076.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.077",
+      "geometry": "udm4k22.louvre.077.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.078",
+      "geometry": "udm4k22.louvre.078.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.079",
+      "geometry": "udm4k22.louvre.079.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.080",
+      "geometry": "udm4k22.louvre.080.geometry",
+      "owner": "P01",
+      "component": "body.airInletRight",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.081",
+      "geometry": "udm4k22.louvre.081.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.082",
+      "geometry": "udm4k22.louvre.082.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.083",
+      "geometry": "udm4k22.louvre.083.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.084",
+      "geometry": "udm4k22.louvre.084.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.085",
+      "geometry": "udm4k22.louvre.085.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.086",
+      "geometry": "udm4k22.louvre.086.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.087",
+      "geometry": "udm4k22.louvre.087.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.088",
+      "geometry": "udm4k22.louvre.088.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.089",
+      "geometry": "udm4k22.louvre.089.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.090",
+      "geometry": "udm4k22.louvre.090.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.091",
+      "geometry": "udm4k22.louvre.091.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.092",
+      "geometry": "udm4k22.louvre.092.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.louvre.093",
+      "geometry": "udm4k22.louvre.093.geometry",
+      "owner": "P01",
+      "component": "body.airOutlet",
+      "role": "louvre",
+      "finish": "slat",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.recess.105",
+      "geometry": "udm4k22.recess.105.geometry",
+      "owner": "P01",
+      "component": "body.powerInput",
+      "role": "recess",
+      "finish": "bezel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.inlet.106",
+      "geometry": "udm4k22.inlet.106.geometry",
+      "owner": "P01",
+      "component": "body.powerInput",
+      "role": "inlet",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.inlet.block.107",
+      "geometry": "udm4k22.inlet.block.107.geometry",
+      "owner": "P01",
+      "component": "body.powerInput",
+      "role": "inlet.block",
+      "finish": "bezel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.window.096",
+      "geometry": "udm4k22.window.096.geometry",
+      "owner": "P01",
+      "component": "body.irFront",
+      "role": "window",
+      "finish": "ir",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.window.108",
+      "geometry": "udm4k22.window.108.geometry",
+      "owner": "P01",
+      "component": "body.irRear",
+      "role": "window",
+      "finish": "ir",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.pad.109",
+      "geometry": "udm4k22.pad.109.geometry",
+      "owner": "P01",
+      "component": "body.feet",
+      "role": "pad",
+      "finish": "rubber",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.stem.110",
+      "geometry": "udm4k22.stem.110.geometry",
+      "owner": "P01",
+      "component": "body.feet",
+      "role": "stem",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.pad.111",
+      "geometry": "udm4k22.pad.111.geometry",
+      "owner": "P01",
+      "component": "body.feet",
+      "role": "pad",
+      "finish": "rubber",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.stem.112",
+      "geometry": "udm4k22.stem.112.geometry",
+      "owner": "P01",
+      "component": "body.feet",
+      "role": "stem",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.pad.113",
+      "geometry": "udm4k22.pad.113.geometry",
+      "owner": "P01",
+      "component": "body.feet",
+      "role": "pad",
+      "finish": "rubber",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.stem.114",
+      "geometry": "udm4k22.stem.114.geometry",
+      "owner": "P01",
+      "component": "body.feet",
+      "role": "stem",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.pad.115",
+      "geometry": "udm4k22.pad.115.geometry",
+      "owner": "P01",
+      "component": "body.feet",
+      "role": "pad",
+      "finish": "rubber",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.stem.116",
+      "geometry": "udm4k22.stem.116.geometry",
+      "owner": "P01",
+      "component": "body.feet",
+      "role": "stem",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bezel.119",
+      "geometry": "udm4k22.bezel.119.geometry",
+      "owner": "P01",
+      "component": "io.display",
+      "role": "bezel",
+      "finish": "bezel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.lcd.120",
+      "geometry": "udm4k22.label.lcd.120.geometry",
+      "owner": "P01",
+      "component": "io.display",
+      "role": "label.lcd",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "STATUS\nADDRESS\nSOURCE\nFIRMWARE"
+    },
+    {
+      "name": "udm4k22.key.121",
+      "geometry": "udm4k22.key.121.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.122",
+      "geometry": "udm4k22.key.122.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.123",
+      "geometry": "udm4k22.key.123.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.124",
+      "geometry": "udm4k22.key.124.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.125",
+      "geometry": "udm4k22.key.125.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.126",
+      "geometry": "udm4k22.key.126.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.127",
+      "geometry": "udm4k22.key.127.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.128",
+      "geometry": "udm4k22.key.128.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.129",
+      "geometry": "udm4k22.key.129.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.130",
+      "geometry": "udm4k22.key.130.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.131",
+      "geometry": "udm4k22.key.131.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.132",
+      "geometry": "udm4k22.key.132.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.cursor.133",
+      "geometry": "udm4k22.key.cursor.133.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key.cursor",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.cursor.134",
+      "geometry": "udm4k22.key.cursor.134.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key.cursor",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.cursor.135",
+      "geometry": "udm4k22.key.cursor.135.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key.cursor",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.cursor.136",
+      "geometry": "udm4k22.key.cursor.136.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key.cursor",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.key.cursor.137",
+      "geometry": "udm4k22.key.cursor.137.geometry",
+      "owner": "P01",
+      "component": "io.keypad",
+      "role": "key.cursor",
+      "finish": "key",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.lamp.138",
+      "geometry": "udm4k22.lamp.138.geometry",
+      "owner": "P01",
+      "component": "io.statusLights",
+      "role": "lamp",
+      "finish": "lamp",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.lamp.139",
+      "geometry": "udm4k22.lamp.139.geometry",
+      "owner": "P01",
+      "component": "io.statusLights",
+      "role": "lamp",
+      "finish": "lamp",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.lamp.140",
+      "geometry": "udm4k22.lamp.140.geometry",
+      "owner": "P01",
+      "component": "io.statusLights",
+      "role": "lamp",
+      "finish": "lamp",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.window.141",
+      "geometry": "udm4k22.window.141.geometry",
+      "owner": "P01",
+      "component": "io.irReceiver",
+      "role": "window",
+      "finish": "ir",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.hdmi.shell.181",
+      "geometry": "udm4k22.hdmi.shell.181.geometry",
+      "owner": "P01",
+      "component": "io.hdmi",
+      "role": "hdmi.shell",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.hdmi.cavity.182",
+      "geometry": "udm4k22.hdmi.cavity.182.geometry",
+      "owner": "P01",
+      "component": "io.hdmi",
+      "role": "hdmi.cavity",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.hdmi.183",
+      "geometry": "udm4k22.label.hdmi.183.geometry",
+      "owner": "P01",
+      "component": "io.hdmi",
+      "role": "label.hdmi",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "HDMI 2.0"
+    },
+    {
+      "name": "udm4k22.dp.shell.184",
+      "geometry": "udm4k22.dp.shell.184.geometry",
+      "owner": "P01",
+      "component": "io.displayPort",
+      "role": "dp.shell",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.dp.cavity.185",
+      "geometry": "udm4k22.dp.cavity.185.geometry",
+      "owner": "P01",
+      "component": "io.displayPort",
+      "role": "dp.cavity",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.dp.186",
+      "geometry": "udm4k22.label.dp.186.geometry",
+      "owner": "P01",
+      "component": "io.displayPort",
+      "role": "label.dp",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "DP 1.2"
+    },
+    {
+      "name": "udm4k22.rj45.shell.178",
+      "geometry": "udm4k22.rj45.shell.178.geometry",
+      "owner": "P01",
+      "component": "io.hdbaset",
+      "role": "rj45.shell",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.rj45.cavity.179",
+      "geometry": "udm4k22.rj45.cavity.179.geometry",
+      "owner": "P01",
+      "component": "io.hdbaset",
+      "role": "rj45.cavity",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.hdbaset.180",
+      "geometry": "udm4k22.label.hdbaset.180.geometry",
+      "owner": "P01",
+      "component": "io.hdbaset",
+      "role": "label.hdbaset",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "HDBaseT"
+    },
+    {
+      "name": "udm4k22.bnc.nut.187",
+      "geometry": "udm4k22.bnc.nut.187.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.nut",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.barrel.188",
+      "geometry": "udm4k22.bnc.barrel.188.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.barrel",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.bore.189",
+      "geometry": "udm4k22.bnc.bore.189.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.bore",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.nut.190",
+      "geometry": "udm4k22.bnc.nut.190.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.nut",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.barrel.191",
+      "geometry": "udm4k22.bnc.barrel.191.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.barrel",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.bore.192",
+      "geometry": "udm4k22.bnc.bore.192.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.bore",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.nut.193",
+      "geometry": "udm4k22.bnc.nut.193.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.nut",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.barrel.194",
+      "geometry": "udm4k22.bnc.barrel.194.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.barrel",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.bore.195",
+      "geometry": "udm4k22.bnc.bore.195.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.bore",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.nut.196",
+      "geometry": "udm4k22.bnc.nut.196.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.nut",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.barrel.197",
+      "geometry": "udm4k22.bnc.barrel.197.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.barrel",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.bore.198",
+      "geometry": "udm4k22.bnc.bore.198.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "bnc.bore",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.sdi.199",
+      "geometry": "udm4k22.label.sdi.199.geometry",
+      "owner": "P01",
+      "component": "io.sdi",
+      "role": "label.sdi",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "QUAD SDI"
+    },
+    {
+      "name": "udm4k22.rj45.shell.142",
+      "geometry": "udm4k22.rj45.shell.142.geometry",
+      "owner": "P01",
+      "component": "io.lan",
+      "role": "rj45.shell",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.rj45.cavity.143",
+      "geometry": "udm4k22.rj45.cavity.143.geometry",
+      "owner": "P01",
+      "component": "io.lan",
+      "role": "rj45.cavity",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.lan.144",
+      "geometry": "udm4k22.label.lan.144.geometry",
+      "owner": "P01",
+      "component": "io.lan",
+      "role": "label.lan",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "LAN"
+    },
+    {
+      "name": "udm4k22.xlr.flange.156",
+      "geometry": "udm4k22.xlr.flange.156.geometry",
+      "owner": "P01",
+      "component": "io.dmx",
+      "role": "xlr.flange",
+      "finish": "bezel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.ring.157",
+      "geometry": "udm4k22.xlr.ring.157.geometry",
+      "owner": "P01",
+      "component": "io.dmx",
+      "role": "xlr.ring",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.cavity.158",
+      "geometry": "udm4k22.xlr.cavity.158.geometry",
+      "owner": "P01",
+      "component": "io.dmx",
+      "role": "xlr.cavity",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.latch.159",
+      "geometry": "udm4k22.xlr.latch.159.geometry",
+      "owner": "P01",
+      "component": "io.dmx",
+      "role": "xlr.latch",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.flange.160",
+      "geometry": "udm4k22.xlr.flange.160.geometry",
+      "owner": "P01",
+      "component": "io.dmx",
+      "role": "xlr.flange",
+      "finish": "bezel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.ring.161",
+      "geometry": "udm4k22.xlr.ring.161.geometry",
+      "owner": "P01",
+      "component": "io.dmx",
+      "role": "xlr.ring",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.cavity.162",
+      "geometry": "udm4k22.xlr.cavity.162.geometry",
+      "owner": "P01",
+      "component": "io.dmx",
+      "role": "xlr.cavity",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.latch.163",
+      "geometry": "udm4k22.xlr.latch.163.geometry",
+      "owner": "P01",
+      "component": "io.dmx",
+      "role": "xlr.latch",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.dmx.164",
+      "geometry": "udm4k22.label.dmx.164.geometry",
+      "owner": "P01",
+      "component": "io.dmx",
+      "role": "label.dmx",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "DMX IN / OUT"
+    },
+    {
+      "name": "udm4k22.xlr.flange.165",
+      "geometry": "udm4k22.xlr.flange.165.geometry",
+      "owner": "P01",
+      "component": "io.remote",
+      "role": "xlr.flange",
+      "finish": "bezel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.ring.166",
+      "geometry": "udm4k22.xlr.ring.166.geometry",
+      "owner": "P01",
+      "component": "io.remote",
+      "role": "xlr.ring",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.cavity.167",
+      "geometry": "udm4k22.xlr.cavity.167.geometry",
+      "owner": "P01",
+      "component": "io.remote",
+      "role": "xlr.cavity",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.xlr.latch.168",
+      "geometry": "udm4k22.xlr.latch.168.geometry",
+      "owner": "P01",
+      "component": "io.remote",
+      "role": "xlr.latch",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.remote.169",
+      "geometry": "udm4k22.label.remote.169.geometry",
+      "owner": "P01",
+      "component": "io.remote",
+      "role": "label.remote",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "REMOTE"
+    },
+    {
+      "name": "udm4k22.dsub.shell.151",
+      "geometry": "udm4k22.dsub.shell.151.geometry",
+      "owner": "P01",
+      "component": "io.rs232",
+      "role": "dsub.shell",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.dsub.cavity.152",
+      "geometry": "udm4k22.dsub.cavity.152.geometry",
+      "owner": "P01",
+      "component": "io.rs232",
+      "role": "dsub.cavity",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.dsub.post.153",
+      "geometry": "udm4k22.dsub.post.153.geometry",
+      "owner": "P01",
+      "component": "io.rs232",
+      "role": "dsub.post",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.dsub.post.154",
+      "geometry": "udm4k22.dsub.post.154.geometry",
+      "owner": "P01",
+      "component": "io.rs232",
+      "role": "dsub.post",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.rs232.155",
+      "geometry": "udm4k22.label.rs232.155.geometry",
+      "owner": "P01",
+      "component": "io.rs232",
+      "role": "label.rs232",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "RS232"
+    },
+    {
+      "name": "udm4k22.usb.shell.145",
+      "geometry": "udm4k22.usb.shell.145.geometry",
+      "owner": "P01",
+      "component": "io.usb",
+      "role": "usb.shell",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.usb.cavity.146",
+      "geometry": "udm4k22.usb.cavity.146.geometry",
+      "owner": "P01",
+      "component": "io.usb",
+      "role": "usb.cavity",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.usb.147",
+      "geometry": "udm4k22.label.usb.147.geometry",
+      "owner": "P01",
+      "component": "io.usb",
+      "role": "label.usb",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "USB"
+    },
+    {
+      "name": "udm4k22.bnc.nut.170",
+      "geometry": "udm4k22.bnc.nut.170.geometry",
+      "owner": "P01",
+      "component": "io.sync3d",
+      "role": "bnc.nut",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.barrel.171",
+      "geometry": "udm4k22.bnc.barrel.171.geometry",
+      "owner": "P01",
+      "component": "io.sync3d",
+      "role": "bnc.barrel",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.bore.172",
+      "geometry": "udm4k22.bnc.bore.172.geometry",
+      "owner": "P01",
+      "component": "io.sync3d",
+      "role": "bnc.bore",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.nut.173",
+      "geometry": "udm4k22.bnc.nut.173.geometry",
+      "owner": "P01",
+      "component": "io.sync3d",
+      "role": "bnc.nut",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.barrel.174",
+      "geometry": "udm4k22.bnc.barrel.174.geometry",
+      "owner": "P01",
+      "component": "io.sync3d",
+      "role": "bnc.barrel",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.bnc.bore.175",
+      "geometry": "udm4k22.bnc.bore.175.geometry",
+      "owner": "P01",
+      "component": "io.sync3d",
+      "role": "bnc.bore",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.sync3d.176",
+      "geometry": "udm4k22.label.sync3d.176.geometry",
+      "owner": "P01",
+      "component": "io.sync3d",
+      "role": "label.sync3d",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "3D SYNC IN / OUT"
+    },
+    {
+      "name": "udm4k22.jack.148",
+      "geometry": "udm4k22.jack.148.geometry",
+      "owner": "P01",
+      "component": "io.dc12v",
+      "role": "jack",
+      "finish": "metal",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.jack.bore.149",
+      "geometry": "udm4k22.jack.bore.149.geometry",
+      "owner": "P01",
+      "component": "io.dc12v",
+      "role": "jack.bore",
+      "finish": "socket",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.label.dc12v.150",
+      "geometry": "udm4k22.label.dc12v.150.geometry",
+      "owner": "P01",
+      "component": "io.dc12v",
+      "role": "label.dc12v",
+      "finish": "label",
+      "policy": "open decal plane",
+      "uvPolicy": "single 0 to 1 mapping",
+      "labelGenerator": "harness.mjs makeLabel",
+      "labelText": "12 V OUT"
+    },
+    {
+      "name": "udm4k22.mount.097",
+      "geometry": "udm4k22.mount.097.geometry",
+      "owner": "P01",
+      "component": "lens.barrel",
+      "role": "mount",
+      "finish": "barrel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.body.098",
+      "geometry": "udm4k22.body.098.geometry",
+      "owner": "P01",
+      "component": "lens.barrel",
+      "role": "body",
+      "finish": "barrel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.zoomRing.099",
+      "geometry": "udm4k22.zoomRing.099.geometry",
+      "owner": "P01",
+      "component": "lens.barrel",
+      "role": "zoomRing",
+      "finish": "grip",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.body.front.100",
+      "geometry": "udm4k22.body.front.100.geometry",
+      "owner": "P01",
+      "component": "lens.barrel",
+      "role": "body.front",
+      "finish": "barrel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.focusRing.101",
+      "geometry": "udm4k22.focusRing.101.geometry",
+      "owner": "P01",
+      "component": "lens.barrel",
+      "role": "focusRing",
+      "finish": "grip",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.hood.102",
+      "geometry": "udm4k22.hood.102.geometry",
+      "owner": "P01",
+      "component": "lens.barrel",
+      "role": "hood",
+      "finish": "barrel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.hood.lip.103",
+      "geometry": "udm4k22.hood.lip.103.geometry",
+      "owner": "P01",
+      "component": "lens.barrel",
+      "role": "hood.lip",
+      "finish": "bezel",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    },
+    {
+      "name": "udm4k22.frontElement.104",
+      "geometry": "udm4k22.frontElement.104.geometry",
+      "owner": "P01",
+      "component": "lens.barrel",
+      "role": "frontElement",
+      "finish": "glass",
+      "policy": "rigid solid",
+      "uvPolicy": "primitive UV; overlaps intentional; no bake",
+      "labelGenerator": null,
+      "labelText": null
+    }
+  ],
+  "evidence": {
+    "identity": {
+      "status": "manufacturer referenced",
+      "source": "https://www.barco.com/en/product/udm-4k22",
+      "readPath": "search excerpt of the named Barco document; primary file not opened during authoring"
+    },
+    "layout": {
+      "status": "approximate",
+      "basis": "Barco user guide and installation manual statements about which face carries each part. No drawing or photograph was used."
+    },
+    "dimensions": {
+      "status": "published envelope, unmeasured",
+      "basis": "Outer envelope follows the published 540 x 725 x 339 mm. Everything inside it is unmeasured."
+    },
+    "functions": {
+      "status": "manufacturer referenced; no simulated operation"
+    },
+    "unknowns": [
+      "Carrying handles: not drawn. Their number and place were not established.",
+      "Lens holder horizontal position: drawn centred. Not established.",
+      "Foot count and positions: four corner feet drawn. Not established.",
+      "Mains connector type: a generic recessed inlet is drawn.",
+      "Keypad keys and panel printing: a stand-in key block and generated legends are drawn.",
+      "Order and spacing of connectors on the input board and communication panel.",
+      "Optional Wi-Fi and GSM antennas, optional input boards and the optional distance meter: not drawn.",
+      "Product marking positions: the wordmark and model label are placed for recognition only.",
+      "Published width and length are swapped between two Barco documents; see the nominal dimensions note."
+    ],
+    "rights": {
+      "geometry": "Independently authored procedural geometry",
+      "labels": "Generated identifying text and legends; not a copy of product artwork. Manufacturer marks are not a claim of endorsement",
+      "referenceImages": "None used",
+      "runtime": "Three.js MIT license"
+    }
+  }
+}

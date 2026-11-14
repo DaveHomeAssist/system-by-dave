@@ -3,10 +3,12 @@
 The source for [systembydave.com](https://systembydave.com) — a personal site
 documenting the Notion skills, agents, widgets, and templates I build and use.
 
-[Equipment Lab](https://avbydave.com/equipment-lab/) centralizes the 43-entry
-model catalog and offers the same four native panels in the AV workspace.
-Its first native model is the Cartoni Maxima 30 GLB; other entries open their
-existing viewers during migration. Build with `npm run build:equipment-lab`
+[Equipment Lab](https://avbydave.com/equipment-lab/) centralizes the shared
+model catalog, the confirmed 43-entry family plus later additions, and offers
+the same four native panels in the AV workspace. Its native models are GLB
+packages: the Cartoni Maxima 30, the Barco UDM-4K22, the Panasonic PT-DW830
+with lamp and air filter access, and the Panasonic PT-RZ970. Other entries open
+their existing viewers during migration. Build with `npm run build:equipment-lab`
 and verify with `npm run verify:equipment-lab`, `npm run typecheck:equipment-lab`
 and `npm run test:equipment-lab-browser`. See [the module brief](docs/equipment-lab.md).
 
