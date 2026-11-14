@@ -1,5 +1,14 @@
 # Changelog
 
+## November 14, 2026: PT-DW830 lamp replacement video in Equipment Lab
+
+- The PT-DW830's Practice panel shows a silent 1 minute 23 second walkthrough
+  of replacing a lamp unit, at the top of the lamp procedure. Its ten steps
+  match the steps listed under it. It loads only when played, and Reference
+  lists a download link.
+- The video and its poster are host media in `equipment-lab/media/`, outside
+  the managed release and the offline set. The browser probe checks them.
+
 ## November 14, 2026: Video Engineering Daily
 
 - Add Edition 038 on measuring SDI CRC errors during line checks, with an illustrated story card.
