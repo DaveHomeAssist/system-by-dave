@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-14
+
+- Refresh WST Planning Documents with the 18-page R5 handoff and five-page diagrams, including EDID evidence and pixel-routing corrections. Publish sanitized PDFs with source hashes while retaining the private exports outside the site.
+
 ## November 14, 2026: Video Engineering Daily
 
 - Add Edition 038 on measuring SDI CRC errors during line checks, with an illustrated story card.
