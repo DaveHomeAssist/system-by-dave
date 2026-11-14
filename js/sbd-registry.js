@@ -347,7 +347,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261113-equipment-lab-panasonic',
+    version:'v20261114-offline-cache-receipts',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
