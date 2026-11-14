@@ -33,6 +33,12 @@ before wider exposure; the optional app login is absent when it is unset.
 
 Spec: Frozen at WST | Projector Control App Spec.
 
+## Frozen Monitor
+
+`http://<relay-ip>:8080/monitor/` opens the six-page Frozen Monitor: live A–D state, the
+command log, cues, rig, network, notes and the calendar. It reads the relay and sends only
+Stop lens. See [the Frozen Monitor](docs/frozen-monitor.md).
+
 ## Run
 
     npm install

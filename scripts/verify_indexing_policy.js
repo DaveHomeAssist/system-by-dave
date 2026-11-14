@@ -77,7 +77,8 @@ const robots = read('robots.txt');
 // and its buyers-only download page (field-kit/thanks/, noindex, reached from Stripe's
 // after-payment redirect) adds one more.
 // Projctl adds two nonpublic relay pages: the control UI and passcode sign-in.
-if (unlisted.length !== 206) fail(`Expected 206 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// The Frozen Monitor adds six noindex relay pages under apps/projctl/public/monitor/ (2026-11-14).
+if (unlisted.length !== 212) fail(`Expected 212 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);

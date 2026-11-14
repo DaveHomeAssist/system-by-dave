@@ -426,6 +426,12 @@ const PUB = path.join(__dirname, '..', 'public');
 function body(req) { return readJsonBody(req); } // 64 KiB JSON object, 10 s to arrive
 function confirmTokenFor(_name, token) { return typeof token === 'string' && token.length <= 256 ? token : ''; }
 function json(res, code, obj) { res.writeHead(code, { 'content-type': 'application/json', 'access-control-allow-origin': '*' }); res.end(JSON.stringify(obj)); }
+// A read error ends this response instead of surfacing as an uncaught stream error.
+function sendFile(res, file, type) {
+  const stream = fs.createReadStream(file);
+  stream.once('open', () => { res.writeHead(200, { 'content-type': type }); stream.pipe(res); });
+  stream.once('error', () => { if (res.headersSent) res.destroy(); else { res.writeHead(500); res.end('read error'); } });
+}
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
@@ -517,19 +523,25 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname.startsWith('/ProjectorThrow/')) {
       const asset = throwlineAsset(url.pathname);
       if (!asset) { res.writeHead(404); return res.end('not found'); }
-      res.writeHead(200, { 'content-type': 'application/javascript' });
-      return fs.createReadStream(asset).pipe(res);
+      return sendFile(res, asset, 'application/javascript');
     }
     let filePath = url.pathname === '/' ? '/index.html' : url.pathname;
-    const fp = path.join(PUB, path.normalize(filePath));
+    let fp = path.join(PUB, path.normalize(filePath));
     if (!fp.startsWith(PUB) || !fs.existsSync(fp)) { res.writeHead(404); return res.end('not found'); }
+    // A folder serves its index.html (the Frozen Monitor lives at /monitor/). Reading a folder as a
+    // file used to throw outside this handler and stop the relay.
+    if (fs.statSync(fp).isDirectory()) {
+      const folder = '/' + path.relative(PUB, fp).split(path.sep).filter(Boolean).map(encodeURIComponent).join('/');
+      if (!url.pathname.endsWith('/')) { res.writeHead(301, { location: (folder === '/' ? '' : folder) + '/' }); return res.end(); }
+      fp = path.join(fp, 'index.html');
+      if (!fs.existsSync(fp) || !fs.statSync(fp).isFile()) { res.writeHead(404); return res.end('not found'); }
+    }
     if (fp === path.join(PUB, 'index.html')) {
       const html = withThrowlineImports(fs.readFileSync(fp, 'utf8'));
       res.writeHead(200, { 'content-type': MIME['.html'] });
       return res.end(html);
     }
-    res.writeHead(200, { 'content-type': MIME[path.extname(fp)] || 'application/octet-stream' });
-    fs.createReadStream(fp).pipe(res);
+    sendFile(res, fp, MIME[path.extname(fp)] || 'application/octet-stream');
   } catch (e) { if (e.closeConnection) res.setHeader('connection', 'close'); json(res, e.status || 500, { error: e.message }); }
 });
 applyServerLimits(server);
