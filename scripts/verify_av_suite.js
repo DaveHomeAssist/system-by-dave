@@ -208,7 +208,7 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261113-console-phone-panels') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261113-equipment-lab-panasonic') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
@@ -223,7 +223,7 @@ function assertRailRegistryContracts(registry) {
     const stub = read(tool.href);
     if (!/<meta name="robots" content="noindex,follow">/.test(stub) || !stub.includes(`location.replace('/av/?app=${tool.retired}')`) || !/rel="canonical" href="https:\/\/avbydave\.com\/"/.test(stub)) fail(`Retired route ${tool.href} is not a noindex redirect stub into /av/?app=${tool.retired}.`);
   });
-  if (registry.tools.length !== 53 || registry.baseAssets.length !== 147 || registry.offlineAssets().length !== 166 || storageKeyCount !== 83) {
+  if (registry.tools.length !== 53 || registry.baseAssets.length !== 153 || registry.offlineAssets().length !== 172 || storageKeyCount !== 83) {
     fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {

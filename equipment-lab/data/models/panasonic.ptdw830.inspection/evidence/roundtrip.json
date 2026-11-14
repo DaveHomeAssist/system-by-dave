@@ -1,0 +1,47 @@
+{
+  "schema": "equipment.lab.roundtrip.v1",
+  "loader": "three.js r184 GLTFLoader",
+  "componentsNative": 60,
+  "componentsLoaded": 60,
+  "componentsMatch": true,
+  "meshesNative": 492,
+  "meshesLoaded": 492,
+  "trianglesNative": 22514,
+  "trianglesLoaded": 22514,
+  "texturesNative": 43,
+  "texturesLoaded": 43,
+  "texturesDecoded": true,
+  "jointNodesNative": {
+    "lampCover": 46,
+    "lampUnit1": 18,
+    "lampUnit2": 18,
+    "filterCase": 58
+  },
+  "jointNodesLoaded": {
+    "lampCover": 46,
+    "lampUnit1": 18,
+    "lampUnit2": 18,
+    "filterCase": 58
+  },
+  "jointsMatch": true,
+  "unlitLabels": 43,
+  "standardSurfaces": 449,
+  "boundsMatch": true,
+  "boundsLoaded": {
+    "min": [
+      -0.249,
+      0,
+      -0.25865
+    ],
+    "max": [
+      0.249,
+      0.2009,
+      0.29955
+    ],
+    "size": [
+      0.498,
+      0.2009,
+      0.5582
+    ]
+  }
+}
