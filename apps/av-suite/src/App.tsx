@@ -6,6 +6,7 @@ import { readLayout, writeLayout, type LayoutState } from "../../shared/av-conso
 import type { Panel, View } from "../../shared/av-console/layout";
 import { CONTEXT_KEYS, showContext, type Pack, type PackHost } from "../../shared/av-console/pack";
 import { PACKS, SPECIALISTS, specialistHref } from "./packs";
+import { storageState } from "./storage";
 import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, packLibrary, saveViews, shortOf, specialistLibrary, SUITE_PREFIX, TOOL_PREFIX, viewApp, viewTool } from "./views";
 
 /* AV Suite shell (docs/av-suite-shell.md): one console. Every application is a
@@ -33,6 +34,15 @@ const PALETTES = ["light", "dark", "white", "black"] as const;
 type Palette = typeof PALETTES[number];
 type ThemeMode = Palette | "system";
 type Status = { app: string; text: string; error: boolean };
+/* One line per state js/av-offline.js can report, so a cache that failed or
+   cannot exist never reads as "preparing" in the Status menu. */
+const OFFLINE_STATUS: Record<string, string> = {
+  ready: "Offline ready",
+  preparing: "Offline cache preparing",
+  partial: "Offline not ready. Stay online.",
+  error: "Offline unavailable. Keep your connection.",
+  unavailable: "Offline use is not available in this browser.",
+};
 
 function railRef(app: string, toolId?: string) {
   if (app === SUITE_PREFIX) return "toolbox";
@@ -180,6 +190,7 @@ export function App() {
   const viewTabs = views.filter(view => viewApp(view) === activeApp && (activeApp !== TOOL_PREFIX || viewTool(view) === activeTool));
   const quick = activePack ? activePack.quick.map(item => ({ ...item, type: `${activePack.id}:${item.type}` })) : [];
   const activeTitle = activePack ? activePack.label : SPECIALISTS.find(entry => entry.id === activeTool)?.label || "AV by Dave";
+  // Readiness as js/av-offline.js reports it on <html data-workspace-offline>.
   const [offline, setOffline] = useState(document.documentElement.dataset.workspaceOffline || "");
   useEffect(() => {
     const observer = new MutationObserver(() => setOffline(document.documentElement.dataset.workspaceOffline || ""));
@@ -217,7 +228,7 @@ export function App() {
         <label className="follow-system"><input type="checkbox" checked={theme === "system"} onChange={e => changeTheme(e.target.checked ? "system" : systemPalette)} /><span>Follow system</span></label>
         <button type="button" className="focus-toggle" aria-label={focusMode ? "Exit focus" : "Focus"} aria-pressed={focusMode} title={focusMode ? "Restore workspace chrome" : "Collapse workspace chrome"} onClick={toggleFocus}><svg aria-hidden="true" viewBox="0 0 24 24"><path d={focusMode ? "M9 4v5H4m16 0h-5V4m0 16v-5h5M4 15h5v5" : "M9 4H4v5m16 0V4h-5m0 16h5v-5M4 15v5h5"} /></svg><span>{focusMode ? "Exit focus" : "Focus"}</span></button>
           </> },
-          { name: "Status", description: "Plan summary, saved state and offline readiness", content: <><p>{activePack?.title || "Workspace"}</p><p>{activePack?.summary || "Add any panel to this workspace."}</p><p>{offline === "ready" ? "Offline ready" : "Offline cache preparing"}</p>{context && <p>{context}</p>}{dirtyApps.length > 0 && <p>Unsaved: {dirtyApps.join(", ")}</p>}</> },
+          { name: "Status", description: "Plan summary, saved state and offline readiness", content: <><p>{activePack?.title || "Workspace"}</p><p>{activePack?.summary || "Add any panel to this workspace."}</p><p>{OFFLINE_STATUS[offline] || OFFLINE_STATUS.preparing}</p>{context && <p>{context}</p>}{dirtyApps.length > 0 && <p>Unsaved: {dirtyApps.join(", ")}</p>}</> },
         ]} />
       </div>
     </header>
@@ -227,6 +238,7 @@ export function App() {
     </section>}
     {offer && activePack && <div className="draft-offer" role="alert"><p><strong>{activePack.label} unsaved edits</strong> from {new Date(offer.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}<span className="draft-more"> were kept on this device. Restore them to keep working, then Save.</span></p><div className="row-actions"><button type="button" className="primary" onClick={() => void activePack.recovery.restore()}>Restore draft</button><button type="button" onClick={() => void activePack.recovery.discard()}>Discard draft</button></div></div>}
     <main id="workspace" tabIndex={-1} className="workspace-host">
+      {storageState === "blocked" && <div className="console-notice" role="note">This browser is blocking site storage, so nothing can be saved here. Your work lasts for this visit only. Export anything you need before you leave.</div>}
       {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Add panels here; the saved view changes only when you store or update it.</div>}
       <ConsoleWorkspace compact ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : undefined)} />
     </main>

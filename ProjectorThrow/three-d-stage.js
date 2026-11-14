@@ -360,6 +360,16 @@
   }
 
   class ThreeDStage extends HTMLElement {
+    static get observedAttributes() { return ['paused']; }
+
+    attributeChangedCallback(name) {
+      if (name !== 'paused') return;
+      if (this.hasAttribute('paused')) {
+        if (this._frameId !== undefined) cancelAnimationFrame(this._frameId);
+        this._frameId = undefined;
+      } else this.requestRender();
+    }
+
     constructor() {
       super();
       const root = this.attachShadow({ mode: 'open' });
@@ -464,12 +474,13 @@
       message.textContent =
         'The WebGL 2 renderer could not start. ' +
         'Throwline will keep the live 2D plan, calculations, placement controls, scene JSON, and job sheet available.';
+      if (this.hasAttribute('inspection-only')) message.textContent = 'The WebGL 2 renderer could not start. Use Front or Plan; projector controls remain available.';
       const fallback = document.createElement('a');
       fallback.href = this.getAttribute('fallback') || 'index.html?workspace=planner';
-      fallback.textContent = 'Open the Throwline planner';
+      fallback.textContent = this.hasAttribute('inspection-only') ? 'Return to Stage controls' : 'Open the Throwline planner';
       this._err.replaceChildren(title, message, fallback);
       this._err.hidden = false;
-      this.announce('Stage 3D unavailable. Open the Throwline planner.');
+      this.announce(this.hasAttribute('inspection-only') ? 'Stage 3D unavailable. Use Front or Plan; projector controls remain available.' : 'Stage 3D unavailable. Open the Throwline planner.');
       this.dispatchEvent(new CustomEvent('stage-dependency-error', {
         detail: { message: String(err && err.message ? err.message : err) }
       }));
@@ -487,12 +498,13 @@
       const message = document.createElement('p');
       message.textContent =
         'The graphics context was interrupted. Throwline is keeping your numbers and will restore the 3D view automatically when the device recovers.';
+      if (this.hasAttribute('inspection-only')) message.textContent = 'The graphics context was interrupted. Use Front or Plan while the 3D reference recovers; projector controls remain available.';
       const fallback = document.createElement('a');
       fallback.href = this.getAttribute('fallback') || 'index.html?workspace=planner';
-      fallback.textContent = 'Open the Throwline planner';
+      fallback.textContent = this.hasAttribute('inspection-only') ? 'Return to Stage controls' : 'Open the Throwline planner';
       this._err.replaceChildren(title, message, fallback);
       this._err.hidden = false;
-      this.announce('The 3D view paused. Your calculation data is safe while graphics recover.');
+      this.announce(this.hasAttribute('inspection-only') ? 'The 3D reference paused. Use Front or Plan; projector controls remain available.' : 'The 3D view paused. Your calculation data is safe while graphics recover.');
       this.dispatchEvent(new CustomEvent('stage-context-lost', { bubbles: true }));
     }
 
@@ -580,6 +592,10 @@
       this._controls = controls;
       this._raycaster = new THREE.Raycaster();
       this._pointer = new THREE.Vector2();
+      if (this.hasAttribute('inspection-only')) {
+        this._note.textContent = 'Drag to orbit. Wheel or pinch to zoom. Right-drag to pan. Arrow keys orbit; plus and minus zoom; Home resets. Click a labeled object to open its controls, or use the adjacent projector buttons.';
+        renderer.domElement.setAttribute('aria-label', 'Interactive 3D reference. Arrow keys orbit, plus and minus zoom, Home resets. Use the adjacent projector buttons to open controls.');
+      }
       this._pointerDownHandler = event => this._handleManipulationStart(event);
       this._pointerMoveHandler = event => this._handleManipulationMove(event);
       this._pointerUpHandler = event => this._handleManipulationEnd(event);
@@ -587,6 +603,27 @@
       renderer.domElement.addEventListener('pointermove', this._pointerMoveHandler, true);
       renderer.domElement.addEventListener('pointerup', this._pointerUpHandler, true);
       renderer.domElement.addEventListener('pointercancel', this._pointerUpHandler, true);
+      // Inspection activation is separate from geometry manipulation and never emits a value.
+      this._activationDown = event => {
+        this._activationPress = event.button === 0 && event.isPrimary
+          ? { id: this._activationHit(event)?.id, x: event.clientX, y: event.clientY, pointer: event.pointerId }
+          : undefined;
+      };
+      this._activationMove = event => {
+        const press = this._activationPress;
+        if (press && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 6) this._activationPress = undefined;
+      };
+      this._activationUp = event => {
+        const press = this._activationPress; this._activationPress = undefined;
+        if (!press?.id || event.type !== 'pointerup' || press.pointer !== event.pointerId || this.hasAttribute('paused') || this._contextLost) return;
+        if (Math.hypot(event.clientX - press.x, event.clientY - press.y) > 6 || this._activationHit(event)?.id !== press.id) return;
+        this.dispatchEvent(new CustomEvent('stage-object-activate', { bubbles: true, composed: true,
+          detail: { version: 1, context: this._activationContext, id: press.id, source: 'pointer' } }));
+      };
+      renderer.domElement.addEventListener('pointerdown', this._activationDown);
+      renderer.domElement.addEventListener('pointermove', this._activationMove);
+      renderer.domElement.addEventListener('pointerup', this._activationUp);
+      renderer.domElement.addEventListener('pointercancel', this._activationUp);
 
       // Neutral studio: soft sky/ground wash, a shadow-casting key light,
       // and a dim fill from behind so silhouettes never go black.
@@ -642,7 +679,7 @@
       this._ro = new ResizeObserver(fit);
       this._frame = () => {
         this._frameId = undefined;
-        if (this._destroyed || this._contextLost || document.hidden || !this.isConnected) return;
+        if (this._destroyed || this._contextLost || document.hidden || !this.isConnected || this.hasAttribute('paused') || !this.getClientRects().length) return;
         const changed = controls.update();
         renderer.render(scene, camera);
         this._renderDimensionAnnotations();
@@ -673,6 +710,43 @@
       if (this._ro) this._ro.disconnect();
     }
 
+    /** Inert inspection targets. Hosts retain instance mapping and execution authority. */
+    setActivationTargets(targets, { context = '' } = {}) {
+      const seen = new Set();
+      this._activationTargets = (Array.isArray(targets) ? targets : []).filter(target => {
+        if (!target || typeof target.id !== 'string' || seen.has(target.id) || !Array.isArray(target.objects) || !target.objects.length || !target.objects.every(object => object?.isObject3D)) return false;
+        seen.add(target.id); return true;
+      }).map(target => ({ id: target.id, label: String(target.label || target.id), objects: [...target.objects] }));
+      this._activationContext = String(context);
+      this._activationPress = undefined;
+    }
+
+    _activationHit(event) {
+      if (!this._activationTargets?.length || this._contextLost || this.hasAttribute('paused')) return undefined;
+      const point = this._pointerPosition(event);
+      this._pointer.set(point.ndcX, point.ndcY); this._raycaster.setFromCamera(this._pointer, this._camera);
+      const targets = this._activationTargets;
+      const hit = this._raycaster.intersectObjects(targets.flatMap(t => t.objects).filter(o => this._objectVisible(o)), true)[0];
+      let object = hit?.object;
+      while (object) {
+        const target = targets.find(t => t.objects.includes(object));
+        if (target) return target;
+        object = object.parent;
+      }
+      return undefined;
+    }
+
+    /** Public browser-space inspection point, without exposing camera internals. */
+    getActivationTargetScreenPoint(id) {
+      const target = this._activationTargets?.find(t => t.id === id);
+      if (!target || !this._renderer) return undefined;
+      const object = target.objects[target.objects.length - 1];
+      if (!this._objectVisible(object)) return undefined;
+      const p = object.getWorldPosition(new this._THREE.Vector3()).project(this._camera);
+      const rect = this._renderer.domElement.getBoundingClientRect();
+      return { x: rect.left + (p.x + 1) * rect.width / 2, y: rect.top + (1 - p.y) * rect.height / 2, visible: p.z >= -1 && p.z <= 1 };
+    }
+
     /** Show (and own) the object. Replaces any previous object, enables
      *  shadows on every mesh, rests it on the ground plane, and frames
      *  the camera to its bounds. */
@@ -680,6 +754,7 @@
       const THREE = this._THREE;
       if (!THREE) throw new Error('three-d-stage: not ready — await stage.ready first');
       this._clearSelectionGizmo();
+      this._activationTargets = []; this._activationPress = undefined;
       if (this._object) {
         this._scene.remove(this._object);
         this._disposeObject(this._object);
@@ -761,11 +836,13 @@
 
     /** Frame the current scene from a requested direction. Unlike setView,
      * this derives distance and target from the live object bounds so visible
-     * manipulation handles stay inside the canvas as the room and rig change. */
+     * manipulation handles stay inside the canvas as the room and rig change.
+     * Optional bounds (THREE.Box3) or points (THREE.Vector3[]) frame a subset without moving scene objects. */
     frameObject(direction, label, options = {}) {
       if (!this._THREE || !this._object || !this._camera || !this._controls) return false;
       const THREE = this._THREE;
-      const box = new THREE.Box3().setFromObject(this._object);
+      const points = Array.isArray(options.points) ? options.points.filter(point => point?.isVector3) : [];
+      const box = points.length ? new THREE.Box3().setFromPoints(points) : options.bounds?.isBox3 ? options.bounds.clone() : new THREE.Box3().setFromObject(this._object);
       if (box.isEmpty()) return false;
       const sphere = box.getBoundingSphere(new THREE.Sphere());
       const view = new THREE.Vector3(
@@ -779,7 +856,33 @@
       const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(this._camera.aspect, 0.01));
       const limitingFov = Math.max(THREE.MathUtils.degToRad(5), Math.min(verticalFov, horizontalFov));
       const padding = Number.isFinite(Number(options.padding)) ? Math.max(1, Number(options.padding)) : 1.25;
-      const distance = Math.max(0.5, (sphere.radius / Math.sin(limitingFov / 2)) * padding);
+      let distance = Math.max(0.5, (sphere.radius / Math.sin(limitingFov / 2)) * padding);
+      if (options.fit === 'content' && (points.length || !options.bounds?.isBox3)) {
+        const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), view);
+        if (right.lengthSq() < .000001) right.set(1, 0, 0);
+        right.normalize();
+        const up = new THREE.Vector3().crossVectors(view, right).normalize();
+        let fit = 0;
+        const include = point => {
+          const offset = point.sub(sphere.center);
+          fit = Math.max(fit, offset.dot(view) + Math.abs(offset.dot(right)) / Math.tan(horizontalFov / 2), offset.dot(view) + Math.abs(offset.dot(up)) / Math.tan(verticalFov / 2));
+        };
+        this._object.updateMatrixWorld(true);
+        if (points.length) points.forEach(point => include(point.clone()));
+        else this._object.traverse(object => {
+          if (!this._objectVisible(object)) return;
+          if (object.isSprite) {
+            const center = object.getWorldPosition(new THREE.Vector3());
+            const scale = object.getWorldScale(new THREE.Vector3());
+            for (const x of [-.5, .5]) for (const y of [-.5, .5]) include(center.clone().addScaledVector(right, x * scale.x).addScaledVector(up, y * scale.y));
+            return;
+          }
+          const positions = object.geometry?.attributes?.position;
+          if (!positions) return;
+          for (let i = 0; i < positions.count; i++) include(new THREE.Vector3().fromBufferAttribute(positions, i).applyMatrix4(object.matrixWorld));
+        });
+        distance = Math.max(.5, fit * padding);
+      }
       const position = sphere.center.clone().add(view.multiplyScalar(distance));
       this._camera.near = Math.max(distance / 500, 0.01);
       this._camera.far = Math.max(distance * 20, 500);
@@ -1385,7 +1488,7 @@
     }
 
     requestRender() {
-      if (this._destroyed || this._contextLost || document.hidden || !this.isConnected || !this._renderer || this._frameId !== undefined) return;
+      if (this._destroyed || this._contextLost || document.hidden || !this.isConnected || this.hasAttribute('paused') || !this._renderer || this._frameId !== undefined) return;
       this._frameId = requestAnimationFrame(this._frame);
     }
 
@@ -1458,6 +1561,14 @@
         this._renderer.domElement.removeEventListener('pointerup', this._pointerUpHandler, true);
         this._renderer.domElement.removeEventListener('pointercancel', this._pointerUpHandler, true);
       }
+      if (this._renderer && this._activationDown) {
+        const canvas = this._renderer.domElement;
+        canvas.removeEventListener('pointerdown', this._activationDown);
+        canvas.removeEventListener('pointermove', this._activationMove);
+        canvas.removeEventListener('pointerup', this._activationUp);
+        canvas.removeEventListener('pointercancel', this._activationUp);
+      }
+      this._activationTargets = []; this._activationPress = undefined;
       if (this._controls) this._controls.dispose();
       this._clearSelectionGizmo();
       this._disposeObject(this._object);

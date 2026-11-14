@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Frozen | Projector control</title>
+<meta name="description" content="Frozen projector control: rig status, presets, lens and picture tools.">
+<meta name="theme-color" content="#10273d">
+<link rel="stylesheet" href="avd/tokens.css">
+<link rel="stylesheet" href="avd/bundle.css">
+<link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="thermal-watch.css">
+  <link rel="stylesheet" href="operator-console.css">
+  <link rel="stylesheet" href="details-controls.css">
+  <link rel="stylesheet" href="power-schedules.css">
+<link rel="stylesheet" href="reference-view.css" data-frozen-reference>
+<link rel="stylesheet" href="stage.css">
+<!-- Local Throwline import map: supplied by the relay. -->
+<link rel="stylesheet" href="workspace-bridge.css">
+</head>
+<body>
+<a class="pj-skip" href="#tab-rig">Skip to rig</a>
+<div id="app" class="avd-shell">
+  <header class="pj-header">
+    <div class="pj-brand"><svg class="pj-snowmark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 2v28M4 9l24 14M4 23L28 9M12 5l4 4 4-4M12 27l4-4 4 4M5 13l6-1-2-6M27 19l-6 1 2 6M9 26l2-6-6-1M23 6l-2 6 6 1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><div><a class="pj-kicker pj-workspace-link" href="https://wst.housevideo.app/" rel="noopener noreferrer">Frozen workspace ↗</a><h1 id="show">Frozen</h1></div></div>
+    <time class="pj-clock" id="operator-clock" title="America/New_York · Eastern time" aria-live="off"><span data-clock-date></span><strong data-clock-time></strong></time>
+    <span class="avd-state" id="conn" aria-live="polite"><span class="avd-dot avd-dot--blocked" aria-hidden="true"></span><span id="conn-word">Relay offline</span></span>
+    <span class="pj-heat-alert" id="heat-alert" aria-live="polite"><button type="button" class="avd-state pj-heat-pill" id="heat-pill" hidden><span class="avd-dot avd-dot--waiting" aria-hidden="true"></span><span data-heat-pill-text></span></button></span>
+    <span class="pj-mode" id="relay-mode">Connecting…</span>
+    <button class="avd-btn avd-btn--icon pj-lock" id="show-lock" type="button" aria-pressed="false" aria-label="Show lock off. Enable show lock" title="Show lock off · Enable show lock" data-lock-state="unlocked" disabled>
+      <svg class="avd-icon" data-lock-icon="locked" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3"/></svg>
+      <svg class="avd-icon" data-lock-icon="unlocked" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 7.5-2M12 14v3"/></svg>
+    </button>
+    <button class="avd-btn avd-btn--quiet avd-btn--icon" id="theme" type="button" aria-label="Switch light and dark theme">
+      <svg class="avd-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 4v16"></path><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"></path></svg>
+    </button>
+  </header>
+
+  <div class="avd-shell__tabs" id="workspace-nav"><button id="workspace-menu" type="button" class="avd-btn" aria-expanded="false" aria-controls="workspace-views">Tools</button>
+    <div class="avd-tabs" id="workspace-views" role="tablist" aria-label="Views"><button class="avd-tab" role="tab" id="tab-btn-home" aria-selected="false" aria-controls="tab-home" data-tab="home" type="button" tabindex="-1">Home</button>
+      <button class="avd-tab" role="tab" id="tab-btn-notes" aria-selected="false" aria-controls="tab-notes" data-tab="notes" type="button" tabindex="-1">Notes + tasks</button>
+      <button class="avd-tab" role="tab" id="tab-btn-info" aria-selected="false" aria-controls="tab-info" data-tab="info" type="button" tabindex="-1">Gear &amp; signal flow</button>
+      <button class="avd-tab" role="tab" id="tab-btn-rig" data-primary-nav aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">Controls <span class="avd-tab__count" id="count-rig"></span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-all" aria-label="All projectors" aria-selected="false" aria-controls="tab-all" data-tab="all" type="button" tabindex="-1"><span class="all-label-full">All projectors</span><span class="all-label-short" aria-hidden="true">All</span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-stage" data-primary-nav aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">3D Stage View</button>
+      <button class="avd-tab" role="tab" id="tab-btn-presets" data-primary-nav aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
+      <button class="avd-tab" role="tab" id="tab-btn-preferences" aria-selected="false" aria-controls="tab-preferences" data-tab="preferences" type="button" tabindex="-1">Preferences</button>
+      <button class="avd-tab" role="tab" id="tab-btn-health" aria-selected="false" aria-controls="tab-health" data-tab="health" type="button" tabindex="-1">Thermal watch</button>
+      <button class="avd-tab" role="tab" id="tab-btn-log" data-primary-nav aria-selected="false" aria-controls="tab-log" data-tab="log" type="button" tabindex="-1">Log</button>
+      <button class="avd-tab" role="tab" id="tab-btn-setup" data-primary-nav aria-selected="false" aria-controls="tab-setup" data-tab="setup" type="button" tabindex="-1">Configuration</button>
+      <button class="avd-tab" role="tab" id="tab-btn-throw" data-primary-nav aria-selected="false" aria-controls="tab-throw" data-tab="throw" type="button" tabindex="-1">Throw Calc</button>
+    </div>
+  </div>
+
+  <main class="pj-main">
+<section class="tab home-panel" role="tabpanel" aria-labelledby="tab-btn-home" id="tab-home" hidden><div><p class="eyebrow">FROZEN / WALNUT STREET THEATRE</p><h2 id="local-home-title">Where would you like to go?</h2><p class="hint">One workspace for show notes, the projector reference and private controls.</p></div><div class="home-choices"><button type="button" data-local-target="notes"><strong>Notes + tasks</strong><span>Your personal notes and the shared to-do list</span></button><button type="button" data-local-target="info"><strong>Projector info</strong><span>A–D models, lenses and planning notes</span></button><button type="button" data-local-target="stage"><strong>Stage / room</strong><span>Room view and projection planning</span></button><button type="button" data-local-target="rig"><strong>Controls</strong><span>Connect to the private projector controller</span></button></div><p class="hint">Notes stay in this browser. Shared tasks are public. Private controls require a connected controller.</p></section>
+    <section id="tab-notes" class="tab" role="tabpanel" aria-labelledby="tab-btn-notes" hidden><iframe class="pj-workspace-frame" data-workspace="notes" title="Frozen notes and shared team tasks"></iframe></section>
+    <section id="tab-info" class="tab" role="tabpanel" aria-labelledby="tab-btn-info" hidden><div id="reference-view" class="pj-fill"></div></section>
+    <section id="tab-rig" tabindex="-1" class="tab on" role="tabpanel" aria-labelledby="tab-btn-rig">
+      <div class="pj-overview" aria-label="Rig connection overview"><div><span class="avd-eyebrow">Projector connection</span><strong id="summary">Waiting for relay…</strong></div><details class="pj-connection-help"><summary>Connection details</summary><p class="pj-mono" id="connection-note" role="status">Connecting to the local relay. Device status will update here automatically.</p><p class="pj-mono" id="local-controller-help" hidden>This page needs the local controller. <a href="http://localhost:8080/">Open controller on this Mac</a><span>On a phone or another computer, use the controller Mac’s network address; localhost points to the device you are using.</span></p></details></div>
+      <button class="avd-btn" type="button" id="rig-extra-devices" hidden>Other devices · Configuration</button>
+      <div id="operator-lanes" role="group" aria-label="Projector"><button type="button" data-operator-lane="A" aria-pressed="true">A <span>SL Portal</span></button><button type="button" data-operator-lane="B" aria-pressed="false">B <span>Top Portal</span></button><button type="button" data-operator-lane="C" aria-pressed="false">C <span>Stage</span></button><button type="button" data-operator-lane="D" aria-pressed="false">D <span>SR Portal</span></button></div>
+      <div id="grid" class="pj-grid" role="region" aria-label="A to D projector multiview" tabindex="0" data-web2-scroll></div>
+    <dialog id="tab-projector" class="pj-projector-page pj-selected-dock" aria-modal="true" aria-labelledby="projector-detail-title" hidden>
+      <div class="pj-projector-heading"><button class="avd-btn" type="button" id="projector-back">Close details</button><div><span class="avd-eyebrow">Projector controls &amp; information</span><h2 id="projector-detail-title" tabindex="-1"></h2></div><div class="pj-detail-lanes" role="group" aria-label="Select projector"><button class="avd-btn" type="button" data-detail-lane="A">A</button><button class="avd-btn" type="button" data-detail-lane="B">B</button><button class="avd-btn" type="button" data-detail-lane="C">C</button><button class="avd-btn" type="button" data-detail-lane="D">D</button></div></div>
+      <div id="projector-primary-controls" class="pj-primary-controls"></div>
+      <div class="pj-projector-body" id="projector-detail-body"><div class="pj-details-canvas"><section id="projector-lens-workspace" aria-label="Selected projector lens workspace"></section><section id="projector-patterns" class="avd-panel pj-dc-panel pj-patterns-panel" aria-label="Selected projector test patterns"></section><div class="pj-details-rail"><section id="projector-heat" class="avd-panel pj-dc-panel pj-heat-panel" aria-label="Selected projector heat"></section><section id="session-timer" aria-label="Session timer"></section></div></div><section class="avd-panel pj-comparison"><label>Compare live status with <select id="operator-comparison" class="avd-input"><option value="">Choose projector</option><option value="A">A · SL Portal</option><option value="B">B · Top Portal</option><option value="C">C · Stage</option><option value="D">D · SR Portal</option></select></label><p id="operator-comparison-status" role="status"></p></section><div class="pj-secondary-controls"><details id="projector-more-controls"><summary>Power, inputs & picture</summary><div id="projector-controls"></div></details><details id="projector-info-panel"><summary>Signal, EDID & gear</summary><div class="pj-projector-information"><section class="avd-panel pj-detail-panel"><h3>Input, signal & EDID</h3><div id="projector-display-info"></div><details id="host-displays"><summary>Relay computer displays</summary><p class="pj-mono">Relay computer records, not projector EDID or assigned signal paths.</p><button class="avd-btn" type="button" id="host-displays-load">Read computer display info</button><div id="host-display-results"></div></details></section><section class="frozen-reference pj-projector-info" id="projector-static-info"></section></div></details></div></div>
+    </dialog>
+    </section>
+
+    <section id="tab-all" class="tab" role="tabpanel" aria-labelledby="tab-btn-all" hidden>
+      <div class="all-heading"><h2 id="all-label">All projectors</h2><p>Every action requires confirmation. Review the targets before sending.</p></div>
+      <div class="pj-allbar all-action-groups" aria-labelledby="all-label">
+        <section><h3>Shutter</h3><button class="avd-btn" data-all="shutter" data-arg="0" type="button">Open all shutters</button><button class="avd-btn" data-all="shutter" data-arg="1" type="button">Close all shutters</button></section>
+        <section><h3>Power</h3><button class="avd-btn" data-all="power" data-arg="1" type="button">Power on all</button><button class="avd-btn avd-btn--danger" data-all="power" data-arg="0" type="button">Power off all</button></section>
+        <section><h3>Test patterns</h3><button class="avd-btn" data-all="pattern" data-arg="08" type="button">Colour bars on all</button><button class="avd-btn" data-all="pattern" data-arg="00" type="button">Clear all patterns</button></section>
+        <section><h3>Input</h3><button class="avd-btn" data-all="resetInput" type="button">Reset all to HDMI</button></section>
+      </div>
+      <h3 class="all-section-title">Projectors</h3><ul id="all-targets" class="all-targets"></ul>
+      <p id="all-results" class="all-results" role="status" aria-live="polite">Choose an action above to review it.</p>
+    </section>
+    <dialog id="all-confirm" class="all-confirm" aria-labelledby="all-confirm-title">
+      <h2 id="all-confirm-title">Confirm group command</h2><p>This action applies to the projectors listed below.</p>
+      <ul id="all-confirm-targets" class="all-targets"></ul><p id="all-confirm-note" role="status" aria-live="polite"></p>
+      <div class="all-confirm-buttons"><button class="avd-btn" id="all-confirm-cancel" type="button">Cancel</button><button class="avd-btn avd-btn--primary" id="all-confirm-send" type="button">Confirm and send</button></div>
+    </dialog>
+    <section id="tab-health" class="tab" role="tabpanel" aria-labelledby="tab-btn-health" hidden><section id="thermal-watch"></section></section>
+    <section id="tab-throw" class="tab" role="tabpanel" aria-labelledby="tab-btn-throw" hidden><div class="pj-allbar"><strong>Throw Calc · Throwline</strong><span class="pj-mono">Planning calculations only · no projector commands</span><a class="pj-mono" href="https://avbydave.com/ProjectorThrow/" target="_blank" rel="noopener noreferrer">Open separately ↗</a></div><iframe id="throw-calc-frame" class="pj-workspace-frame" title="Throwline projector throw calculator"></iframe></section>
+    <section id="tab-stage" class="tab" role="tabpanel" aria-labelledby="tab-btn-stage" hidden>
+      <div class="pj-stage-head">
+        <div><span class="avd-eyebrow">Projection plot</span><h2 id="stage-title">Stage view</h2></div>
+        <div class="avd-seg pj-stage-mode" role="group" aria-label="Stage mode"><button class="avd-seg__btn" type="button" data-stage-mode="reference" aria-pressed="true">Rig reference</button><button class="avd-seg__btn" type="button" data-stage-mode="planning" aria-pressed="false">What-if planning</button></div>
+        <div class="avd-seg" role="group" aria-label="Stage viewpoint">
+          <button class="avd-seg__btn" type="button" data-stage-view="building" aria-pressed="false" hidden>Building</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="3d" aria-pressed="true">3D</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="front" aria-pressed="false">Front 2D</button>
+          <button class="avd-seg__btn" type="button" data-stage-view="plan" aria-pressed="false">Plan 2D</button>
+        </div>
+      </div>
+      <div id="stage-message" class="pj-stage-empty" role="status">Loading local plot…</div>
+      <div id="stage-workspace" class="pj-stage-workspace" hidden>
+        <div class="pj-stage-drawing">
+          <div class="pj-stage-toolbar">
+            <span id="stage-caption" class="pj-mono"></span>
+            <div class="pj-stage-layers" role="group" aria-label="Show coverage layers"><span class="pj-mono">Coverage</span></div>
+          </div>
+          <div class="pj-stage-viewport">
+            <div id="stage-canvas" class="pj-stage-canvas" hidden></div>
+            <div id="stage-3d" class="pj-stage-3d"><p id="stage-3d-message" role="status">Loading Throwline 3D…</p></div>
+            <div id="stage-building" class="pj-stage-3d" hidden><p id="stage-building-message" role="status">Loading building…</p></div>
+          </div>
+          <p id="stage-foot" class="pj-stage-foot pj-mono">Plot reference · coverage is not live beam position</p>
+        </div>
+        <aside class="pj-stage-sidebar" aria-label="Stage projectors" data-web2-scroll>
+          <button class="avd-btn avd-btn--primary" type="button" id="stage-add-room" hidden>Plan with room reference</button>
+          <div id="stage-alignment" hidden>
+            <strong class="pj-plan-badge">Approximate venue alignment</strong>
+            <details><summary>Adjust room alignment</summary><div class="pj-plan-fields">
+              <label class="avd-field"><span class="avd-field__label">Room X offset (m)</span><input class="avd-input" type="number" step="0.1" value="0" data-room-axis="x"></label>
+              <label class="avd-field"><span class="avd-field__label">Room Y offset (m)</span><input class="avd-input" type="number" step="0.1" value="0" data-room-axis="y"></label>
+              <label class="avd-field"><span class="avd-field__label">Room Z offset (m)</span><input class="avd-input" type="number" step="0.1" value="0.2" data-room-axis="z"></label>
+              <label class="avd-field"><span class="avd-field__label">Room yaw (degrees)</span><input class="avd-input" type="number" step="1" value="0" data-room-axis="yaw"></label>
+            </div><p class="pj-mono">Stage floor aligned at Y0; room proscenium used as a tentative target-plane anchor (Z+0.2 m). No scale correction. Local preview only; not surveyed or clearance-checked. Bright enclosure outlines remain visible through room geometry as position aids.</p></details>
+          </div>
+          <div id="stage-planner" hidden></div>
+          <div id="stage-live-reference">
+          <div class="pj-rowhead"><h3>Projectors</h3><span id="stage-status-kind" class="pj-mono"></span></div>
+          <p class="pj-mono pj-note">Select a projector to open lens, pattern and picture controls.</p>
+          <div id="stage-projectors" class="pj-stage-projectors"></div>
+          <p id="stage-source" class="pj-mono pj-note"></p>
+          <a class="pj-stage-planner" href="https://avbydave.com/ProjectorThrow/" target="_blank" rel="noopener noreferrer">Open Throwline ↗<span>Separate planning workspace · opens a new tab</span></a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="tab-preferences" class="tab pj-preferences" role="tabpanel" aria-labelledby="tab-btn-preferences" hidden>
+      <h2>Interface preferences</h2>
+      <label><input id="preference-suggestions" type="checkbox"> Suggest the next action</label>
+      <label>Preset name template<input id="preference-preset-name" type="text" class="avd-input" maxlength="64" autocomplete="off"></label>
+      <p>Theme, selected projector, view and favorite patterns are saved only in this browser. Use the star in More patterns to save up to four favorites per model.</p>
+      <button id="preference-reset" type="button" class="avd-btn">Reset interface preferences</button>
+      <p id="preference-message" role="status"></p>
+    </section>
+
+    <section id="tab-presets" class="tab" role="tabpanel" aria-labelledby="tab-btn-presets" hidden>
+      <div class="pj-allbar">
+        <label class="avd-field pj-grow"><span class="avd-field__label">Preset name</span><input id="preset-name" class="avd-input" placeholder="preshow, intermission, strike"></label>
+        <button id="preset-save" class="avd-btn avd-btn--primary" type="button">Save current rig</button>
+      </div>
+      <div id="presets" class="pj-list"></div>
+    </section>
+
+    <section id="tab-log" class="tab" role="tabpanel" aria-labelledby="tab-btn-log" hidden>
+      <div class="pj-allbar"><label class="avd-field pj-grow"><span class="avd-field__label">Search command log</span><input class="avd-input" id="log-search" type="search" placeholder="Slot, command or result"></label></div>
+      <div class="avd-table-wrap pj-fill" role="region" aria-label="Command history" tabindex="0" data-web2-scroll><table id="log" class="avd-table"><caption>Command log</caption><thead><tr><th>Time</th><th>Slot</th><th>Command</th><th>Result</th><th>Source</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section id="tab-setup" class="tab" role="tabpanel" aria-labelledby="tab-btn-setup" hidden>
+      <details id="power-schedule-panel"><summary>Power scheduling</summary><div id="power-schedules"></div></details>
+      <div class="pj-allbar"><button id="discover" class="avd-btn" type="button">Find projectors</button><span id="discover-out" class="pj-mono" aria-live="polite"></span></div>
+      <div id="setup" class="pj-list pj-fill" role="region" aria-label="Projector setup" tabindex="0" data-web2-scroll></div>
+      <p class="pj-mono pj-note">Cue input: OSC on UDP 9000 or a text line on TCP 9001. Forms: <code>/proj/P4/shutter 1</code>, <code>/proj/all/power 0</code>, <code>/proj/preset/preshow</code>.</p>
+    </section>
+  </main>
+
+  <dialog id="adjust" class="pj-modal" aria-labelledby="adj-title" hidden>
+    <div class="pj-sheet">
+      <div class="pj-sheet-head">
+        <div class="pj-sheet-title"><strong id="adj-title">Adjust</strong><span id="adj-sub" class="pj-mono"></span></div>
+        <button id="adj-close" class="avd-btn avd-btn--quiet" type="button">Close</button>
+      </div>
+      <div class="avd-tabs pj-sheet-tabs" role="tablist" aria-label="Adjust sections">
+        <button class="avd-tab" role="tab" aria-selected="true" id="adj-tab-pattern" aria-controls="adj-panel-pattern" data-adjtab="pattern" type="button">Pattern</button>
+        <button class="avd-tab" role="tab" aria-selected="false" id="adj-tab-lens" aria-controls="adj-panel-lens" data-adjtab="lens" type="button" tabindex="-1">Lens</button>
+        <button class="avd-tab" role="tab" aria-selected="false" id="adj-tab-picture" aria-controls="adj-panel-picture" data-adjtab="picture" type="button" tabindex="-1">Picture</button>
+      </div>
+      <p id="adj-feedback" class="pj-mono pj-feedback" role="status" aria-live="polite"></p>
+      <div class="pj-sheet-body" role="region" aria-label="Adjustment controls" tabindex="0" data-web2-scroll>
+        <div class="adjtab on" id="adj-panel-pattern" role="tabpanel" aria-labelledby="adj-tab-pattern" data-adjpanel="pattern">
+          <div class="pj-rowhead"><span class="avd-eyebrow">Test pattern</span><span class="pj-mono pj-ink" id="adj-pattern-now"></span></div>
+          <div id="adj-patterns" class="pj-chips"></div>
+        </div>
+        <div class="adjtab" id="adj-panel-lens" role="tabpanel" aria-labelledby="adj-tab-lens" data-adjpanel="lens" hidden>
+          <div class="pj-rowhead"><span class="avd-eyebrow">Step size</span>
+            <div class="avd-seg" id="adj-speed" role="group" aria-label="Lens step size"><button class="avd-seg__btn" data-s="slow" type="button">Slow</button><button class="avd-seg__btn" data-s="normal" aria-pressed="true" type="button">Normal</button><button class="avd-seg__btn" data-s="fast" type="button">Fast</button></div>
+          </div>
+          <div class="lens">
+            <div><span>Shift H</span><button class="avd-btn" data-l="h" data-d="-" type="button" aria-label="Shift left">Left</button><button class="avd-btn" data-l="h" data-d="+" type="button" aria-label="Shift right">Right</button></div>
+            <div><span>Shift V</span><button class="avd-btn" data-l="v" data-d="-" type="button" aria-label="Shift down">Down</button><button class="avd-btn" data-l="v" data-d="+" type="button" aria-label="Shift up">Up</button></div>
+            <div><span>Focus</span><button class="avd-btn" data-l="focus" data-d="-" type="button" aria-label="Focus back">Back</button><button class="avd-btn" data-l="focus" data-d="+" type="button" aria-label="Focus forward">Forward</button></div>
+            <div><span>Zoom</span><button class="avd-btn" data-l="zoom" data-d="-" type="button" aria-label="Zoom out">Out</button><button class="avd-btn" data-l="zoom" data-d="+" type="button" aria-label="Zoom in">In</button></div>
+          </div>
+          <p class="pj-mono" id="adj-motion" role="status" aria-live="polite"></p><p class="pj-mono" id="adj-position"></p>
+          <button id="adj-stop" class="avd-btn avd-btn--block" type="button">Stop lens</button>
+          <button id="adj-home" class="avd-btn avd-btn--danger avd-btn--block" type="button">Lens shift home, tap twice</button>
+          <p class="pj-mono pj-note">Shift directions follow the image from the audience's view. Reverse either axis per projector in Setup to match its mounting. One movement per tap. Controls unlock after the Barco reports stopped. Stop lens remains available during movement and Show Lock.</p>
+        </div>
+        <div class="adjtab" id="adj-panel-picture" role="tabpanel" aria-labelledby="adj-tab-picture" data-adjpanel="picture" hidden>
+          <div class="pj-rowhead"><span class="avd-eyebrow">Picture</span><button id="adj-pic-reload" class="avd-btn avd-btn--quiet avd-btn--sm" type="button">Reload values</button></div>
+          <p id="adj-pic-note" class="pj-mono pj-note" aria-live="polite"></p>
+          <div id="adj-picture" class="picture"></div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+<noscript>Projector controls require JavaScript. Use the projector remote if the relay is unavailable.</noscript>
+<script type="module" src="app.js"></script>
+<script type="module" src="workspace-bridge.js"></script>
+</body>
+</html>

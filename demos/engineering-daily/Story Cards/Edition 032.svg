@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">DisplayPort MST shared capacity</title><desc id="desc">A and B are independent streams sharing one upstream link. Blue lines are physical links; slot sizes are conceptual, not to scale.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 032</text>
+<text x="108" y="228" font-size="54" class="story-title">DisplayPort MST shared</text>
+<text x="108" y="304" font-size="54" class="story-title">capacity</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect width="240" height="400" class="canvas"/><text x="12" y="26" class="diagram-index">32</text><text x="48" y="26" class="diagram-heading">DISPLAYPORT MST</text><path d="M12 40H228" class="rule"/>
+<rect x="12" y="52" width="216" height="116" rx="6" class="panel"/><text x="24" y="78" class="blue-label">1 / Shared link</text>
+<rect x="24" y="96" width="44" height="32" class="packet"/><text x="46" y="118" text-anchor="middle" class="blue-label">A</text><rect x="72" y="96" width="44" height="32" class="packet"/><text x="94" y="118" text-anchor="middle" class="good-label">B</text><rect x="120" y="96" width="44" height="32" class="packet"/><text x="142" y="118" text-anchor="middle" class="blue-label">A</text><rect x="168" y="96" width="44" height="32" class="packet"/><text x="190" y="118" text-anchor="middle" class="good-label">B</text><text x="24" y="152" class="note">Conceptual time slots</text>
+<rect x="12" y="184" width="216" height="164" rx="6" class="panel"/><text x="24" y="210" class="blue-label">2 / MST branch</text><path d="M120 224V246m-5-6l5 6l5-6" class="wire"/><rect x="80" y="246" width="80" height="28" rx="3" class="node"/><text x="120" y="266" text-anchor="middle">Branch</text><path d="M100 274V290H64V310m-5-6l5 6l5-6M140 274V290H176V310m-5-6l5 6l5-6" class="wire"/><rect x="24" y="310" width="80" height="26" class="node"/><text x="64" y="329" text-anchor="middle" class="blue-label">View A</text><rect x="136" y="310" width="80" height="26" class="node"/><text x="176" y="329" text-anchor="middle" class="good-label">View B</text>
+<text x="24" y="372">A + B share capacity</text><text x="24" y="396">Not one stream / lane</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">A and B are independent streams</text>
+<text x="108" y="1558" font-size="40" class="story-caption">sharing one upstream link. Blue</text>
+<text x="108" y="1610" font-size="40" class="story-caption">lines are physical links; slot sizes</text>
+<text x="108" y="1662" font-size="40" class="story-caption">are conceptual, not to scale.</text>
+<a href="https://www.vesa.org/wp-content/uploads/2010/12/DisplayPort-DevCon-Presentation-DP-1.2-Dec-2010-rev-2b.pdf#page=14"><text x="108" y="1808" font-size="28" class="story-source">VESA, DisplayPort 1.2 overview, pp.14/17</text></a>
+</svg>

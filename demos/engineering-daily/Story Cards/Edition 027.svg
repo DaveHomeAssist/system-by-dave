@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">Quad link image mapping</title><desc id="desc">SQD assigns four spatial quadrants to four SDI links. This is a conceptual picture map, not physical wiring. A receiver set for 2SI expects a different sample arrangement.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 027</text>
+<text x="108" y="228" font-size="54" class="story-title">Quad link image mapping</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect width="240" height="400" class="canvas"/><text x="12" y="26" class="diagram-index">27</text><text x="48" y="26" class="diagram-heading">SQD LINK ORDER</text><path d="M12 40H228" class="rule"/><rect x="12" y="52" width="216" height="230" rx="6" class="panel"/><text x="24" y="78" class="blue-label">1 / Spatial quadrants</text><rect x="32" y="100" width="176" height="144" class="node"/><path d="M120 100V244M32 172H208" class="wire"/><text x="76" y="142" text-anchor="middle">SDI 1</text><text x="164" y="142" text-anchor="middle">SDI 2</text><text x="76" y="214" text-anchor="middle">SDI 3</text><text x="164" y="214" text-anchor="middle">SDI 4</text><text x="120" y="268" text-anchor="middle">One quadrant per link</text><rect x="12" y="298" width="216" height="75" rx="6" class="panel"/><text x="24" y="322" class="note">2 / Receiver check</text><text x="24" y="350">SQD mapping + order</text><text x="120" y="395" text-anchor="middle">2SI is a different map</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">SQD assigns four spatial quadrants</text>
+<text x="108" y="1558" font-size="40" class="story-caption">to four SDI links. This is a</text>
+<text x="108" y="1610" font-size="40" class="story-caption">conceptual picture map, not physical</text>
+<text x="108" y="1662" font-size="40" class="story-caption">wiring. A receiver set for 2SI</text>
+<text x="108" y="1714" font-size="40" class="story-caption">expects a different sample</text>
+<text x="108" y="1766" font-size="40" class="story-caption">arrangement.</text>
+<a href="https://www.aja.com/support/item-download/3738/AJA_manual_FS4_v1.1.pdf"><text x="108" y="1808" font-size="28" class="story-source">AJA FS4 manual v1.1, Output Image Mapping</text></a>
+</svg>
