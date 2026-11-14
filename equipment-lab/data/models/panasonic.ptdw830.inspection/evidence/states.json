@@ -1,0 +1,152 @@
+{
+  "schema": "equipment.lab.states.v1",
+  "note": "Each state applied to the reloaded GLB by the rule in rig.jointNodes.",
+  "states": {
+    "closed": {
+      "label": "Closed",
+      "joints": {},
+      "nodesByJoint": {
+        "lampCover": 46,
+        "lampUnit1": 18,
+        "lampUnit2": 18,
+        "filterCase": 58
+      },
+      "bounds": {
+        "min": [
+          -0.249,
+          0,
+          -0.25865
+        ],
+        "max": [
+          0.249,
+          0.2009,
+          0.29955
+        ],
+        "size": [
+          0.498,
+          0.2009,
+          0.5582
+        ]
+      }
+    },
+    "coverOpen": {
+      "label": "Lamp cover open",
+      "joints": {
+        "lampCover": 100
+      },
+      "nodesByJoint": {
+        "lampCover": 46,
+        "lampUnit1": 18,
+        "lampUnit2": 18,
+        "filterCase": 58
+      },
+      "bounds": {
+        "min": [
+          -0.249,
+          0,
+          -0.57549
+        ],
+        "max": [
+          0.287796,
+          0.2009,
+          0.29955
+        ],
+        "size": [
+          0.536796,
+          0.2009,
+          0.87504
+        ]
+      }
+    },
+    "lampUnit1Out": {
+      "label": "Lamp unit 1 out",
+      "joints": {
+        "lampCover": 100,
+        "lampUnit1": 210
+      },
+      "nodesByJoint": {
+        "lampCover": 46,
+        "lampUnit1": 18,
+        "lampUnit2": 18,
+        "filterCase": 58
+      },
+      "bounds": {
+        "min": [
+          -0.249,
+          0,
+          -0.57549
+        ],
+        "max": [
+          0.287796,
+          0.2009,
+          0.29955
+        ],
+        "size": [
+          0.536796,
+          0.2009,
+          0.87504
+        ]
+      }
+    },
+    "lampUnit2Out": {
+      "label": "Lamp unit 2 out",
+      "joints": {
+        "lampCover": 100,
+        "lampUnit2": 210
+      },
+      "nodesByJoint": {
+        "lampCover": 46,
+        "lampUnit1": 18,
+        "lampUnit2": 18,
+        "filterCase": 58
+      },
+      "bounds": {
+        "min": [
+          -0.249,
+          0,
+          -0.57549
+        ],
+        "max": [
+          0.287796,
+          0.2009,
+          0.29955
+        ],
+        "size": [
+          0.536796,
+          0.2009,
+          0.87504
+        ]
+      }
+    },
+    "filterCaseOut": {
+      "label": "Air filter case out",
+      "joints": {
+        "lampCover": 100,
+        "filterCase": 170
+      },
+      "nodesByJoint": {
+        "lampCover": 46,
+        "lampUnit1": 18,
+        "lampUnit2": 18,
+        "filterCase": 58
+      },
+      "bounds": {
+        "min": [
+          -0.249,
+          0,
+          -0.57549
+        ],
+        "max": [
+          0.287796,
+          0.2009,
+          0.29955
+        ],
+        "size": [
+          0.536796,
+          0.2009,
+          0.87504
+        ]
+      }
+    }
+  }
+}

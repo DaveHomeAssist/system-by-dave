@@ -1,5 +1,421 @@
 # Changelog
 
+## November 14, 2026: Frozen case stage 2, lens and throw in Throwline
+
+- Extend the Frozen case with eleven steps in Throwline: the console panel,
+  the planner, a catalog lookup, each lane's lens and throw against its plotted
+  coverage, a portrait lane entered as drawn, the show board and its export, a
+  reload, and the hand-off to Stage 3D. 33 steps in all; `--stage 2` runs the
+  new stage alone. The planner's throw must equal ratio times width, and lane
+  D's recorded throw must read as a good distance.
+- Record five findings without changing Throwline: none of the Frozen
+  projectors is in its audited catalog, the older lens list carries the WUXGA
+  figure for a lens used on a WXGA projector, there is no portrait mounting, the
+  solver's default zone marks an output "fix before you hang it", and the
+  records for lanes B and C do not agree with lane D's throw. Decisions FC-D6
+  to FC-D9 are in `docs/frozen-case.md`.
+- The case now also runs on pull requests that touch `ProjectorThrow/`.
+## 2026-11-14
+
+- WST Planning adds current R5 signal-flow diagrams, the consolidated R4 document packet and section links while preserving
+  the existing snow Home, themes and navigation. Public PDF copies omit private
+  network addresses; original documents remain unchanged.
+- WST public controller entries open localhost separately. Hosted pages no longer
+  connect to or embed the relay, and public-only generation leaves the installed
+  controller shell untouched.
+
+## November 14, 2026: Projctl telemetry coordination
+
+- Serialize status and health reads per projector while keeping different units independent and allowing status polls between bounded report retries.
+- Retry transport failures at most twice, 4 seconds apart, within the existing 12-second report deadline.
+- Preserve partial Panasonic and Pulse temperatures and report later sensor failures, including deadline expiry. Add queue, retry, cancellation, transport and saved-report regression tests.
+- Adapt the scoped telemetry improvements from PR #463 to current main.
+
+## November 14, 2026: Frozen recorded test case and a Signal Flow cable fix
+
+- Add the Frozen case: the four projection lanes of the Frozen rig entered into
+  the AV by Dave console through its own controls, read at run time from the
+  public reference in `wst/`. 22 steps, each journalled, photographed, filmed
+  and monitored for page errors, failed requests, unexpected saved data and page
+  scrolling. `npm run test:frozen-case`; set `FROZEN_CASE_BASE` to read a
+  deployment back. It runs on pull requests that touch the console and keeps its
+  record as a workflow artifact. Brief and findings: `docs/frozen-case.md`.
+- Fix the defect its first run found. Signal Flow now draws a route's cable as
+  soon as its source and destination are typed in Route details. Before, the
+  newest connection was counted and left undrawn until the page was reloaded.
+- `scripts/frozen_case_film.py` captions a run filmed with `--film`.
+
+## November 13, 2026: Projctl command validation at the write
+
+- Carry target, availability and Show Lock checks through queued driver calls
+  and handshakes to each physical write. Protected commands remain cancelled
+  after a Show Lock on/off transition.
+- Bind group, cue and preset sequences to their original target configurations.
+  Preserve shutter, power-on, Stop and protective lens-stop behavior.
+- Add loopback transport and isolated relay regressions for delayed writes,
+  partial sequences, target changes, lock transitions and simulator parity.
+
+## November 13, 2026: AV theme probe retries a Chrome start that does not answer
+
+- `scripts/probe_av_themes.js` failed two Pages deploys (`f7300b2` on November 7, `efb7883` on November 12) with "Chrome DevTools endpoint did not start"; both passed when rerun. It made one silent attempt and waited 20 seconds. It now starts Chrome through `scripts/chrome_launch.js`: a start that does not answer within 30 seconds, or exits, is killed and tried again on a fresh port and profile, up to three times. If every attempt fails, the error says what happened on each and what Chrome printed.
+- `scripts/chrome_launch.test.js` covers a clean start, a silent start, an early exit, a missing binary, total failure and a profile that cannot be removed. It runs with `npm run verify:av`.
+- `scripts/probe_cue_sheet.js` and `scripts/probe_led_wall_configurator.js` keep their own single-attempt launchers; neither has failed a deploy.
+
+## November 13, 2026: Projctl health report completeness
+
+- Classify reachable units with missing temperature, alarm feedback or rated
+  limits as incomplete. Preserve observed Fault and Watch verdicts and show
+  missing evidence independently.
+- Replace the overheating conclusion with reported alarm findings and explicit
+  coverage counts. Include incomplete evidence in Markdown and Notion unit rows.
+- Cover missing, partial, unreachable and mixed-fault reports, plus rendering
+  saved reports and the isolated relay report path.
+
+## November 13, 2026: Equipment Lab release 1.2.0, Panasonic PT-DW830 lamp access and PT-RZ970
+
+- Adopt shared Equipment Lab release 1.2.0: 46 entries, the confirmed 43 plus P01, P02 Panasonic PT-DW830 and P03 Panasonic PT-RZ970. Both projectors open in the inspector, sit under Video and projection, and join the offline set.
+- The PT-DW830 is built around lamp and air filter access. Its lamp unit cover opens, each lamp unit pulls out and the air filter case slides out, as five named states with a row of state buttons. Choosing a part that is hidden while the projector is closed opens the state that shows it, and a link can name a state.
+- Practice lists Panasonic's lamp replacement and air filter steps in order, under its warnings, with a button on each step that shows its part on the model. The steps are a summary; the operating instructions are the reference. Nothing here operates a projector.
+- The inspector reads service joints, states and procedures from a package definition. Packages without them are unchanged: no state row, no movement, the same framing.
+- Cache generation `v20261113-equipment-lab-panasonic`. Brief: `docs/equipment-lab.md`.
+
+## November 13, 2026: Projctl details control surface
+
+- Projector Details opens the reviewed control layout: a larger lens pad with minus and plus focus and zoom and a full-width Stop lens, picture tiles for every reported test pattern with Clear pattern, the projector's heat reading, and a browser session timer kept under `projctl.sessionTimer.v1`.
+- Show heat outside Thermal watch only for a current Watch or Hot reading, as a card chip and a header pill that opens Thermal watch. Add thumbnails to the full pattern list.
+- No new commands, guards or backend changes; the default cards are unchanged. Brief: `apps/projctl/docs/details-controls.md`.
+
+## November 13, 2026: Projector connection recovery
+
+- Keep a PJLink status session open across polls, recover closed sessions and
+  support projectors that require authentication on every query.
+- Preserve complete status reads and cancellation while serializing controls
+  with polling. Release held sessions when a configured driver is replaced.
+- Validate Panasonic echoed replies and reject mismatches promptly.
+- Cover session reuse, close recovery, command isolation, cancellation and
+  complete status freshness with loopback regression tests.
+
+## November 13, 2026: Resumable rig acceptance runner
+
+- Use an OS-held journal lock so a forced process exit or restart cannot leave
+  a stale lock blocking resumed acceptance. Test forced exit and journal reuse.
+- Add a Python operator runner that collects existing relay and Screen Check
+  evidence, retains failed attempts and produces a per-lane acceptance report.
+- Require recorded release windows for disruptive test observations and distinct
+  before/after evidence for display recovery. Preserve the separate EDID package.
+- Add isolated regression checks for resume, evidence integrity, release expiry,
+  missing evidence, simulation rejection and read-only network collection.
+
+## November 13, 2026: Screen checker 1.0.2 review improvements
+
+- Clear stale action feedback on checks and reconnects; distinguish unknown rows
+  and expose complete row summaries and shortcuts to keyboard/accessibility users.
+- Separate the injected UI model from views, bound event-burst postponement, and
+  use an OS-held instance lock with existing-window activation.
+- Save reports privately and atomically; validate opened profile files, including
+  rejection of non-regular inputs without waiting for a pipe writer.
+- Build clean bundles, verify extracted archives and preserve toolchain/checksum
+  evidence. Add model-transition, boundary, file and lifecycle regression checks.
+- Document operator recovery and all ten review areas, retaining explicit
+  minimum-OS, Studio hardware and notarization acceptance boundaries.
+
+## November 13, 2026: Screen checker 1.0.1 edge cases
+
+- Preserve successful screen readings when report storage fails, and re-read
+  displays after the Save dialog so exports cannot reuse a stale passing result.
+- Reject duplicate display IDs, truncated/unstable snapshots, interlaced and
+  stretched modes, malformed command-line options and oversized profiles.
+- Keep the profile protected during export and label uncommitted local builds.
+  Regression coverage increases from 21 to 57 cases; physical Studio acceptance
+  and Apple notarization remain separate.
+
+## November 13, 2026: Projector operator console
+
+- Bound reviewed browser targets to opaque relay revisions, corrected Panasonic factory input labels and preserved detailed recovery errors.
+- Added optional next-action highlights, browser-local preferences, model-scoped favorite patterns, preset-name templates and read-only projector comparisons.
+- Fixed narrow-card power text and exposed active patterns outside the quick choices.
+
+- Made projector warnings and faults prominent with a labeled banner and matching card border.
+- Enlarged each projector power state and restored a two by two grid on medium screens before the individual-card layout.
+- Added a permanent All Projectors tab with target review and explicit confirmation before every group command. Group Clear and HDMI recovery verify each device.
+- Put shutter, power, quick patterns, Clear pattern and Reset to HDMI on each projector card. Controls is the default view. Tools and Details hold secondary functions.
+- Reset to HDMI clears the test pattern, resolves the device source and verifies fresh feedback. Partial failure, stale feedback, ambiguous HDMI and changed assignments are reported on the affected card.
+- Desktop shows the full rig. Medium screens show a two by two grid. Phones and short windows provide direct A to D selection with the same primary actions.
+
+## November 13, 2026: Native show screen checker
+
+- Added a lightweight macOS menu-bar checker with on-demand and login checks,
+  display-change detection, model/count verification, actual pixel and refresh
+  readback, and local report export. It flags scaled, mirrored, missing and
+  unexpected outputs without changing hardware or display modes.
+- The initial five-output profile comes from the production readback; identical
+  portal models are checked as a pair. Studio installation and login/reboot
+  acceptance remain separate from source and packaged-app validation.
+
+## November 13, 2026: Video Engineering Daily
+
+- Backfill November 9–12 and add Edition 037 for November 13. The five lessons cover JPEG XS line latency, HDR graphics white, shutter angle, lens shift and RTP retransmission. Each includes an illustrated story card.
+
+## November 13, 2026 · Projctl documentation reconciliation
+
+- Distinguished source-checkout tests from installed-package acceptance checks.
+- Labeled the controller runbook as a deployment template and made verified private venue procedures the show-operation reference.
+- Clarified independent playback command paths, the single-relay operating arrangement, remote-access acceptance and model-specific shutdown readback.
+
+## November 13, 2026: Console panels on small phone screens
+
+- On a phone held sideways (844 x 390) the Equipment Lab page showed four tall switcher buttons and no panel; its 3D picture was 20 px tall. The page chooses the phone layout on short screens, and at 720 px and wider a rule meant for the switcher inside the view strip (`flex-basis:100%`) took the full height of the column instead of the full width of a row. The shared console stylesheet now keeps the phone switcher a bar at any width, and the picture is 448 x 194 px at that size. Other consoles are unchanged: seven already carried their own correction, and before-and-after screenshots of every pack in the console, the retained family builds and the standalone Calculator match, apart from Show Control's clock.
+- At 320 px wide the page ran up to 53 px past the screen, which cut off the theme button, the full-screen button, the Reference tab and the right edge of every panel. The page column grew to fit the four switcher labels. It now stays the width of the screen, and the header and the switcher each fit on one row.
+- The model inspector lays out by the size of its own panel, so it behaves the same on the page and inside the AV console. A short panel drops the hint and the collection line. A short, wide panel puts the picture beside the item list at the full height of the panel. Anything that still cannot fit scrolls inside the inspector; the hint no longer sits on top of the item list. At 320 x 568 the picture is 260 x 120 px, where it was 45 px tall. Inside the console at 844 x 390 it is 195 x 212 px, where it was 93 px tall.
+- On narrow panels the view buttons stay on one scrolling row, with a faded edge while more follow, and a focused button scrolls fully into view. On a phone held upright (390 x 844) the Barco's picture grows from 187 to 236 px. View buttons keep 44 px targets on short screens; they were 32 px.
+- `npm run test:equipment-lab-browser` now checks, at every size except 320 x 256, that the page frame and its controls are on screen, the switcher is a bar, each open panel has a body, the picture is at least 120 px tall on a sideways phone, no part of the inspector covers another, and every control can be reached. It adds 320 x 568 and the console route at both phone sizes: 163 layout cases and 104 panel checks for C02 and P01 in both themes. Run against the previous build it fails in 40 of those states, all at 844 x 390 and 320 x 568.
+- Cache generation is now `v20261113-console-phone-panels`.
+- Sizes are emulated in Chromium. No physical phone or WebKit browser was checked. At 320 x 256 the header, view strip and switcher still leave the panel no room. Details: `docs/equipment-lab.md`.
+## November 12, 2026: Equipment Lab tab is now Video and projection
+
+- The Equipment Lab splash tab that holds the switcher, shading panel, PTZ camera, joystick and the Barco UDM-4K22 is named Video and projection. It was Video & PTZ, which did not cover the projector. The same name appears as the group heading in the results and as the discipline of each entry in the selected-equipment sheet. On narrow screens the tab still reads Video.
+- Only the label changed: the discipline id, the entries in it, their counts and every link are the same. The AV console bundle is unchanged, and the offline cache generation stays `v20261112-equipment-lab-projector`.
+- In phone landscape (844 x 390) the longer name takes two lines in the discipline rail; all six tabs still fit.
+
+## November 12, 2026: Console opens without site storage, saved pages on server errors
+
+- The AV console opens when the browser refuses site storage (every cookie blocked, some private and embedded contexts). It rendered nothing, because reading `window.localStorage` threw while the packs mounted. The shell now checks first, gives the page a stand-in that holds nothing and refuses writes, and shows a notice that nothing can be saved and work lasts for the visit only. Saves, drafts and layout writes report their failure as they do for full storage. A browser where no stand-in can be installed gets a plain message. Details: `docs/av-suite-shell.md`.
+- The offline worker answers a page request that gets a server error (5xx) with the saved copy of that page, or the saved console, and passes the error through only when nothing is saved. Install now reads every asset past the browser's HTTP cache, so a copy fetched just before a deploy is not stored as the new generation.
+- The console page's link preview uses the AV by Dave card (`img/av-by-dave-og.png`) with its size and description, as the other AV pages do. It used the System by Dave banner.
+- `docs/launch/checkout.md` no longer says the draft Field Kit page is unlinked; the console links to it.
+
+## November 12, 2026: Equipment Lab adds the Barco UDM-4K22
+
+- Equipment Lab imports shared release 1.1.0 at `27561a2`: the confirmed 43-entry family plus P01, the Barco UDM-4K22, in a new Projection collection. The library, splash and counts now read from the catalog, so they show 44 entries.
+- The 3D inspector loads any catalog entry whose representation is a GLB package. It was fixed to the Cartoni Maxima 30. Each package gets the same manifest, hash, frame, ID and label checks, and brings its own item list, view presets and orbit limits. The Cartoni's ten control IDs, deep links and behavior are unchanged.
+- P01 has 26 selectable parts grouped as body, input and communication, and lens, six views including the connector side, and a line under each part saying what supports where it is drawn. It opens on the local keypad, because selecting the body highlights the whole projector. Practice says the model has no practice mode. Reference lists the package downloads, Barco's documents and what is not established.
+- The model is approximate and not qualified. Barco publishes the body size, the mass and the face that carries each part; sizes and positions within each face are approximate or assumed.
+- `scripts/equipment_lab_release.mjs` accepts the family plus the additions each known release names, checks every native package against its own manifest, and still refuses a release it does not name.
+- The projector's manifest, definition and GLB join the offline set. Cache generation is now `v20261112-equipment-lab-projector`.
+- `npm run test:equipment-lab-browser` exercises both packages the same way, covers 135 layout cases, and now loses each package's graphics context on purpose to check that the notice and the item list remain.
+
+## November 12, 2026: Cue Sheet cell editing keeps focus
+
+- Committing a cell edit in Cue Sheet no longer rebuilds the cue table. The rebuild destroyed the control that was taking focus (the next cell on Tab, a clicked cell, the status select between arrow keys), so focus fell to the page and the next keys ran as shortcuts: typed words marked cues done or took them live, and Backspace deleted the selected cue. Focus now stays where the operator put it, and the status and layer selects work from the keyboard.
+- A cue whose own edit takes it out of the current search or status filter stays in the table while focus is in its row and leaves once focus moves on. Only that row is removed, so the control the operator moved to keeps its caret and selection, and a press in progress finishes before the rows move.
+- Cue Sheet shortcuts ignore Ctrl, Cmd and Alt chords. Ctrl+D, Ctrl+G, Cmd+L and Alt+N used to mark a cue done, take the next cue, go live and add a cue, and a modified Delete or Backspace deleted the selected cue.
+- `npm run probe:cue-sheet-editing` (`scripts/probe_cue_sheet_editing.mjs`) covers these paths and runs on every pull request. `--cue-sheet-file=<path>` serves another copy of the page; the probe fails all seven checks against the previous one.
+
+## November 11, 2026: Field Kit download page link check, console offline status
+
+- The Field Kit download page (`field-kit/thanks/`) now shows its download button and "your payment went through" line only for the share link registered by SHA-256 in `fieldKit.download.sha256` (`js/sbd-launch-config.js`). Before, any address carrying a Google Drive, Dropbox, OneDrive or SharePoint link and any `cs_…` value produced a page that confirmed a payment and offered that file. No hash is registered yet, so the page shows "email me" for every link until Dave registers the real one with `npm run hash:field-kit-link`. Steps and reasoning: `docs/launch/checkout.md`.
+- `npm run probe:field-kit` covers the registered link, a crafted address against the shipped config, unregistered links and malformed hashes. `npm run smoke:field-kit-checkout` fails when checkout is live without a registered hash.
+- The console's Status menu reports the real offline state. It showed "Offline cache preparing" for every state except ready, including a cache that failed or a browser that cannot keep one; those now read "Offline not ready. Stay online.", "Offline unavailable. Keep your connection." and "Offline use is not available in this browser."
+
+## November 10, 2026: Projctl review hardening
+
+- Bound OSC and text TCP cue input (4 KiB packets and lines, connection, idle and in-flight limits) and log failed asynchronous cues. Add optional `PROJCTL_OSC_ENABLED`, `PROJCTL_TCP_ENABLED`, `PROJCTL_CUE_HOST` and `PROJCTL_CUE_ALLOWLIST` controls; existing cue exposure defaults are unchanged.
+- Validate PJLink handshakes, reply class and command, setter acknowledgements and outbound command grammar, which blocks CR/LF injection through input values. Bound reply and discovery sizes, and report unsupported optional telemetry as unknown instead of carrying earlier values forward.
+- Limit JSON request bodies to 64 KiB (login 4 KiB) with a 10 s arrival timeout and explicit 400, 408 and 413 errors. Add HTTP header and request receive timeouts and a 64 KiB WebSocket frame cap.
+- Honor forwarding headers only from `PROJCTL_TRUSTED_PROXIES` (default loopback, the `tailscale serve` hop). Bound the login throttle, forget expired records, never evict active lockouts, and recheck the lockout after the login body arrives. Details: `apps/projctl/docs/security-hardening.md`.
+
+## November 8, 2026: Video Engineering Daily
+
+- Add Edition 032, DisplayPort MST shared capacity, with a VESA sourced lesson,
+  time slot and branch diagram and matching SVG/PNG story card. Preserve prior editions.
+
+## November 7, 2026: Frozen control polish
+
+- Open Stage facing the set with the complete A-D projection beams in frame. Keep projector inspection, coverage, plan and side presets, original geometry and manual room-layer choices.
+- Resolve gear and signal-flow identities from the connected relay, correct the recorded A Panasonic PT-DW830U entry, and distinguish recorded, simulated, unassigned and conflicting lanes.
+- Align Frozen references and the simulator with A=P1, B=P2, C=P3 and D=P4. Add an explicit backed-up migration that preserves device settings, preset targets and previous event numbers. Existing installations require an external-cue review before migration.
+- Preserve the deployed compact workspace and public Stage inspector. Keep primary navigation directly accessible on phones, suppress duplicate embedded Notes headers, and accept theme updates from the actual controller parent.
+- Keep expanded connection details in the page flow, constrain Room layers to the drawing panel, and let phone Stage controls and planning fields scroll together without covering one another.
+
+## November 7, 2026: Video Engineering Daily
+
+- Add Edition 031, Return loss and reflections, with a sourced calculation,
+  power reflection comparison and matching SVG/PNG story card. Preserve prior editions.
+
+## November 6, 2026: Video Engineering Daily
+
+- Add Edition 030, ST 2110 essence routing, with a SMPTE sourced lesson,
+  independent flow diagram and matching SVG/PNG story card. Preserve prior editions.
+
+## 2026-11-06
+
+- Reconnect saved projector targets with bounded cancellable polls and independent retry delays. Keep stale telemetry visibly last known, restore controls only after fresh feedback, and stop background discovery from changing saved IPs. Manual discovery reports its limits/errors and refuses ambiguous identity updates; reconnect never replays hardware commands.
+
+- Compact the Frozen workspace into one desktop navigation row or two narrow rows, with a labelled phone menu and shared theme. Give public Stage a full canvas, one planning toolbar, a selected-projector overlay inspector, separated A–D markers and an unobstructed room/beam overview. Preserve the snow splash, browser notes, shared tasks and private hardware-control boundary.
+
+- Keep all four projector summaries visible above one selected control/lens dock, with live alarms, compact desktop framing and accessible phone flow. Add explicit Eastern power scheduling with disabled saves/edits, separate activation, fixed target identities, next-run/status/audit and durable no-replay occurrence handling. No show times or active schedules are supplied.
+
+- Redirect the portfolio Pages copies of Frozen home/Stage to the working managed WST origin while preserving its same-origin viewer bundle.
+- The Frozen workspace home is the snow splash: aurora, canvas snow, a staggered Frozen title and frosted destination cards. Routes, the theme toggle and the same-origin CSP stay as they were. Snow and the title reveal pause off Home and do not run when reduced motion is requested.
+
+- Add a guarded per-projector lens workspace with supported Fine/Normal/Coarse steps, explicit focused arrow-key opt-in, release/Stop behavior where supported, readbacks and confirmed rig-preset recall. Show command acknowledgement separately from actual state; fresh confirmed shutters expose only the opposite action, while unknown or stale readings retain explicit choices.
+
+- Report lens verification as unknown when the post-recall status read fails, rather than comparing retained cached positions and showing a false match. Keep rig cards responsive to their actual pane width and contain control labels in narrow views.
+
+- Projctl adds six primary views, dedicated A-D projector details, shared documented gear/catalog/signal-flow references and the canonical Throwline calculator. Forward-integrate guarded Pulse lens preset recall and password aliases, plus cached projector signal and bounded computer-display readouts with explicit unavailable EDID. Preserve managed settings and host assignment; no automatic hardware action.
+
+- Combine Notes/tasks, projector reference, Rig and Stage in one controller workspace. Notes remain browser/address-local; shared public tasks retain their separate service. Stage opens directly with the room and recorded projectors, and the public hub can connect an existing private controller in place.
+
+- Projctl combines an opt-in approximate room preview with optical scenarios, roof/wall/balcony/seat controls, visible A-D markers and purposeful Projectors/Coverage/Plan/Selected side cameras while preserving true enclosure sizes, original model/plot data and false calibrated-registration status.
+
+- Add the Frozen workspace with browser-local personal notes, text export, live Eastern date/time and publicly shared D1-backed tasks. Keep projector control private and retain the managed hosting source/deployment receipt.
+- Projctl Stage adds local what-if optical scenarios using canonical Throwline calculations, with independent lane settings, D lens comparisons, reset to the loaded plot and no hardware/settings writes. Private unregistered venue models remain separate appearance references without planning overlays.
+
+- Projctl adds a supervised macOS runtime and one launcher that waits for relay health, preserving the private rig and app settings during migration. The live controller reports relay availability separately from device reachability, including last success and sanitized failure reasons over WebSocket updates. HDMI is the preferred input with an explicit per-device or all-device reset resolved from supported metadata. Saved-rig read errors now stop safely; settings writes use atomic replacement.
+
+- Equipment Lab opens on a searchable 43-entry splash library with discipline and collection filters, model previews and an equipment sheet. Existing equipment links keep opening their workspace; the Cartoni reference retains all ten controls. NNC previews use approved source on a lighter stage. Route the Pages copy of the managed WST Stage to its owning service so its service-relative assets do not block domain publication.
+
+## November 5, 2026: Stable projector order
+
+- Keep Rig positions A, B, C and D visible when a lane is unassigned, with
+  unassigned devices in a separate expandable section.
+- Use drawing identities and models on Rig and Stage cards while preserving
+  existing relay IDs, device assignments and command destinations.
+
+## November 5, 2026: Projector image shift directions
+
+- Add independent per-projector horizontal and vertical shift reversal settings so
+  operator labels can follow the projected image on mounted or mirrored installations.
+- Preserve legacy mappings, device-native API directions, focus, zoom and drawing views.
+
+## November 5, 2026: Video Engineering Daily
+
+- Add Edition 029, Rolling shutter row timing, with a Basler sourced lesson,
+  timing comparison diagram and matching story card. Preserve previous editions.
+
+## November 4, 2026: Video Engineering Daily
+
+- Add Edition 028, Processing depth and input depth, with an EIZO sourced
+  lesson and matching diagram and story card. Preserve previous editions.
+
+## November 3, 2026: Dimensioned projector references
+
+- Add optional metric plot metadata for lens offsets, enclosure dimensions and
+  supplied mounting heights. Preserve unknown heights in a labeled plan view.
+- Remove the invented balcony rail and duplicate scenic elevation from the 3D
+  adapter. Keep colored coverage, correctly sized portrait bodies and clickable
+  lane controls, with explicit limits on physical clearance claims.
+- Preserve both plan rays regardless of the front polygon's starting vertex
+  or winding order.
+- Verify metric and legacy plots, renderer interaction, mobile layouts, existing
+  relay controls and the separate private Building view.
+
+## November 3, 2026: Video Engineering Daily
+
+- Add Edition 027, Quad link image mapping, with an AJA sourced lesson,
+  SQD quadrant diagram and matching story card. Preserve previous editions.
+
+## November 3, 2026: Private building models in Projctl
+
+- Add a metric Building view beside the existing drawing views, with optional
+  drawing and LiDAR layers, camera controls and a preview fallback. Preserve
+  saved rig assignments and keep geometry inspection free of device commands.
+- Serve local venue bundles behind the relay's existing authentication, with
+  bounded reads, embedded GLBs, checksums and fixed asset roles. Keep actual
+  venue geometry private and bundle the pinned Three.js loader for offline use.
+- Verify source-only and model-only installations, existing bulk power behavior,
+  mobile layout, lazy layers, idle/hidden rendering and context recovery.
+
+## November 3, 2026: Throwline in projector Stage
+
+- Embed the canonical Throwline 3D viewer in Projctl with colored coverage,
+  crossed throw references, orbit/zoom/camera presets and clickable projector
+  models routed to the current lane's guarded controls. Keep Front and Plan.
+- Label diagram scale and illustrative mounting heights. Preserve private plot
+  storage, rig identity, show lock and command ownership; no optical claims or
+  job imports. Package the existing local renderer for standalone installations.
+- Verify inert model activation, drag rejection, camera and layer changes,
+  current slot targeting, idle/hidden rendering, context recovery and WebGL
+  fallback alongside the existing simulator and responsive checks.
+
+## November 3, 2026: Projector stage view
+
+- Add front and plan views with colored coverage layers and clickable projector
+  keys that open the existing controls through current drawing lane assignments.
+  Show reported power and shutter separately from the drawing reference.
+- Load a validated private plot beside the active rig without publishing venue
+  geometry. Keep missing or ambiguous lanes unavailable and preserve Show Lock,
+  offline gates, keyboard focus and existing cue routes. Link to Throwline as a
+  separate planning workspace without transferring data or control authority.
+- Add plot validation, slot reassignment and browser coverage for both viewpoints,
+  themes, keyboard operation and six viewport sizes.
+
+## 2026-11-02
+
+- Projector control: add optional drawing lanes with letter badges, target names,
+  orientation and matching accents; retain slot IDs and cue routing when cards
+  sort by lane. Setup validates assignments and keeps older rigs compatible.
+
+## November 3, 2026: Frozen projector control desk
+
+- Add light ice and dark aurora themes, a snowflake mark, mobile bottom navigation, searchable command history and accessible adjustment dialogs. Preserve focus across status refreshes and unsaved setup fields across snapshots.
+- Discover Barco input names and picture ranges from the connected device. Use bounded lens targets, wait for stopped feedback, expose Stop lens and prevent overlapping movement. Report unavailable alarm telemetry explicitly.
+- Add protocol and browser regressions for discovered controls, movement completion, keyboard focus, disconnected controls and six viewport sizes in both themes. Physical rig acceptance remains separate.
+
+## November 3, 2026: Projctl bulk commands and relay reliability
+
+- Confirm All Power Off once for the displayed reachable targets, then dispatch to each with per-projector results. Keep individual confirmation, bind tokens to the action and connection settings, and skip newly online/reconfigured targets until reconfirmed.
+- Continue OSC/TCP bulk cues after a slot fails; reject malformed power/shutter arguments and safely drop malformed OSC datagrams.
+- Require a successful Barco core status query before reporting it online, and enforce Show Lock for picture controls as well as lens, pattern, input and power off.
+- Add isolated relay/protocol regressions and browser checks for bulk confirmation, live picture locking, both themes and desktop/phone containment to the pull-request contract job. Saved rigs and cue addresses are unchanged; physical projector testing is still required on the installed relay.
+- Mark the relay's control and login pages noindex and account for them in the indexing inventory.
+
+## November 2, 2026: Video Engineering Daily
+
+- Add Edition 026, Active HDMI cable direction, with an Extron sourced lesson,
+  matching diagram and SVG/PNG story card. Preserve previous editions and behavior.
+
+## November 1, 2026: Video Engineering Daily
+
+- Add Edition 025, LED refresh and shutter exposure, with a Brompton sourced
+  lesson and matching diagram and story card. Backfill October 31 as Edition
+  024, B frame reordering, with an AWS sourced lesson and matching assets.
+  Preserve all prior editions, chronological numbering and calendar behavior.
+
+## October 30, 2026: Vite development server patch
+
+- Upgrade Vite from 6.4.4 to 6.4.5 for GHSA-8g5g-mxqh-grgj and raise the minimum compatible version. Add a loopback regression proving raw/import queries cannot retrieve a denied synthetic file, enforced by the existing pull request contract job.
+
+## October 30, 2026: Video Engineering Daily
+
+- Add Edition 023, Frame rate conversion families, with an AJA sourced
+  conversion-family diagram and matching SVG and PNG story card. Preserve
+  prior lessons, numbering, calendar behavior and the reviewed release gates.
+
+## October 29, 2026: Add panel short screen verification
+
+- Keep the Add panel list usable on short screens when adding into empty space. Phones can use the available viewport height; short screens omit the decorative placement map.
+- Preserve the compact topic menus and native modal from PR #388, restore group and panel focus transitions, and wrap Tab in the modal. Add browser regression coverage for all five Front Office choices, Enter, Space, Tab, Back, Escape, focus return and final-choice placement at nine viewport sizes in light and dark themes. Saved views and application storage contracts are unchanged.
+
+## 2026-10-29: Two-step Add panel menu
+
+- Open the Add panel chooser on search and the group tiles only. Picking a tile replaces the tiles with that group's panels, a Back button and the placement preview; Back or Escape returns to the tiles with focus on the tile just left. The active application's tile is marked.
+- Let the chooser use the height below where it opened and scroll only its panel list, so every panel in a group stays reachable (Front Office now shows all five, not two).
+- The retained family hosts share the engine, so they get the same two steps over their Common, Planning and Utilities categories; category tiles that hold no panels are dropped.
+- Rebuild the AV Suite, AV Calculator and Equipment Lab bundles and bump the AV offline cache generation to `v20261029-two-step-panel-chooser`. Panel types, views, layouts and saved documents are unchanged.
+
+## 2026-10-29: AV workspace topic menus
+
+- Reclaim workspace space with compact console controls and topic submenus with Back, Close and Escape.
+- Put project, appearance, status, views, panel recall and layout controls in focused menu pages.
+- Make the shared panel chooser enter an application submenu and keep phone panel shortcuts available.
+- Move Video diagram controls into topic menus and hide React Flow attribution through its supported option.
+
+## October 29, 2026
+
+- Add Video Engineering Daily Edition 022, Fiber mode and wavelength, with
+  its sourced diagram and verified SVG and PNG story card. Daily releases use
+  the existing reviewed export and Pages verification path.
+
+- Redirect the eight original AV family routes into the shared console with
+  their native pack selected. Preserve the five shared show-context fields,
+  per-pack source, saved documents and import/export behavior.
+- Retarget public family probes to `/av/?app=<pack>`. Keep detailed previous
+  host regressions on ignored build fixtures and exclude those fixtures from
+  publication. Add root-console and 42-route browser checks.
+- Honor the configured Chrome browser in the retained Audio flow probe so
+  publication does not require a separate downloaded headless browser.
+
 ## 2026-10-28: Engineering daily archive
 
 - Keep the demos entry and return hub inside the viewport with the existing subject reader, shared neutral light and dark preferences, complete text pagination and direct archive entry. Preserve the existing demo content and links.
@@ -87,6 +503,26 @@
 - Add a focused native/masked API regression to the existing workspace probe. Chromium and WebKit cover both helpers, paging/value preservation and the current standalone/shared-console consumers. Preserve physical older-device and minimum-OS policy gaps; no global polyfill or saved-data change.
 - Regenerate embedded workspace runtimes and the native suite bundle, and advance the existing offline cache generation and Stage 3D readiness pin together. Preserve CSS, calculation engines, routes, schemas, keys and original imports.
 
+## 2026-10-20 — Reels-safe capture layout for the demos
+
+- `demos/demo-shell.js`: capture-only `?reels` layout (needs `?drive` or `?auto`, so visitors never see it) that fits the stage's content box into Instagram's Reels safe area (x 60–972, y 252–1500 of 1080×1920). `demos/frame-sync.html` declares its content box (`data-capture-box`). The reel renderer uses it; a glyph-level check of every cut finds no text under the top bar, the caption band or the right-hand buttons. On-screen copy, including "link in bio", is unchanged. `probe:demos-viewport` checks that `?reels` alone changes nothing. Posting checklist: drag the profile-grid crop to the top.
+
+## 2026-10-20 — Demos fit phone widths
+
+- The demo pages (`demos/frame-sync.html`, `demos/fault-finding.html`) laid out 446–539 px wide on 360–430 px phones: the page zoomed out and the stage, breadcrumb and completion panel ran past the screen edge. Cause: the 1080 px stage rendered unscaled until `demo-shell.js` ran, so mobile browsers zoomed the page out at load (1275 px with JavaScript off), and `layout()` then sized the stage from `innerWidth`/`innerHeight`, which report the zoomed-out visual viewport, so it stayed too wide. The stage now starts scaled down in `demos/demo-shell.css`, and `layout()` uses the layout viewport (`documentElement.clientWidth/Height`). New local probe `npm run probe:demos-viewport` (320, 360, 390, 430 px under mobile emulation: width equals the viewport, no horizontal scroll, nothing crossing an edge or clipped).
+
+## 2026-10-20 — beehiiv subscribe link and Stripe checkout prep (AV by Dave)
+
+- Demos: `demos/demo-shell.js` gains a hosted-subscribe-link mode. When `emailSubscribeUrl` in `demos/config.js` is an https `beehiiv.com` link, the post-completion ask becomes a "Send me the next demo" button to beehiiv's subscribe page (new tab, `rel="noopener"`, the visitor's UTM tags or demo defaults). It ships as a marked `[DAVE: …]` placeholder, so the ask is unchanged until Dave fills it in. No CSP change. New local probe `npm run probe:demo-subscribe`.
+- Field Kit: Stripe Payment Links chosen. `js/sbd-launch-config.js` ships `provider: 'stripe'` with `[DAVE: …]` Payment Link and price placeholders; checkout now also stays closed until the price is real. New noindex buyers-only download page `field-kit/thanks/` for Stripe's after-payment redirect (the file link lives only in that Stripe setting; known file hosts only, no referrer, query stripped). Delivery, statement-descriptor, refund and licence wording is DRAFT for Dave. The indexing policy now expects 189 unlisted routes.
+- Privacy policy: AV by Dave email list (beehiiv) and Field Kit purchases (Stripe) sections.
+
+## 2026-10-18 — Field Kit draft and launch drafts (AV by Dave)
+
+- The frame sync demo's single home is `demos/frame-sync.html` (2026-10-20 entry), published at `https://avbydave.com/demos/frame-sync.html`. This branch's earlier duplicate `frame-sync/` page, its `js/sbd-signup.js` signup, its sitemap and domain-site entries and its reel capture script were removed before merge. `frame-sync/` was never on `main` or live, so no redirect. The Field Kit page, the launch docs, the reel copy and UTM links point at the demos page.
+- Add `js/sbd-events.js`, a no-op launch event dispatcher. Analytics stays off by decision: no provider and no third-party script, so the privacy policy's no-analytics statement stays true (`docs/launch/analytics.md`).
+- Add `field-kit/`, a noindex, unlinked Sync & Signal Field Kit draft page: price TBD, blurred preview images of the kit pages (the paid files stay out of the repository), and delivery/refund/licence placeholders marked for Dave. One `fieldKit.checkout` value turns on Gumroad, Lemon Squeezy or Stripe Payment Links (link or overlay, `js/sbd-checkout.js`, provider hosts only). Checkout stays disabled until that value is valid and every placeholder is replaced (`docs/launch/checkout.md`). The indexing verifier now expects 188 routes outside the sitemaps.
+- Add local-only `scripts/launch/mix_reel_music.sh` (music under the reel cuts at −14 LUFS with fades; synthesized placeholder bed only) and `scripts/launch/probe_field_kit.mjs` (Field Kit page and checkout interlock against local mocks). Email capture setup for the demos is in `docs/launch/email.md`, with `docs/launch/privacy-email-section.md` as the policy section to apply first (not applied). Reel copy and a posting-day checklist in `docs/launch/`, ready for review; nothing posted.
 
 ## 2026-10-18 — Stream and Record independent preparation
 

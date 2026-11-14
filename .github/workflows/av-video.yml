@@ -9,6 +9,15 @@ on:
       - 'scripts/*equipment_lab*'
       - 'av/**'
       - 'scripts/probe_av_suite_shell.mjs'
+      - 'scripts/probe_av_canvas_menus.mjs'
+      - 'scripts/av-menu-journey.mjs'
+      - 'scripts/av-family-probe.mjs'
+      - 'scripts/probe_av_retained.mjs'
+      - 'scripts/probe_av_routes.mjs'
+      - 'scripts/probe_frozen_case.mjs'
+      - 'ProjectorThrow/**'
+      - 'wst/projectors.json'
+      - 'wst/stage/plot.json'
       - 'apps/av-video/**'
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
@@ -89,7 +98,21 @@ jobs:
           test -z "$(git status --porcelain -- av)"
           npx playwright install --with-deps chromium
           npm run test:av-suite-browser
+          npm run test:av-canvas-menus-browser
           npm run test:av-audio-flow-browser
+      - name: Frozen case, recorded
+        env:
+          CHROME_CHANNEL: chrome
+          FROZEN_CASE_OUT: ${{ runner.temp }}/frozen-case
+        run: npm run test:frozen-case
+      - name: Keep the Frozen case record
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: frozen-case-record
+          path: ${{ runner.temp }}/frozen-case
+          if-no-files-found: ignore
+          retention-days: 30
       - name: Audio shared-console consumer matches its source
         run: |
           npm run typecheck:av-audio
@@ -154,6 +177,8 @@ jobs:
           npm run typecheck:the-shop
           npm run test:the-shop
           npm run build:the-shop
+          npm run test:av-retained-browser
+          npm run test:av-routes-browser
           git diff --exit-code -- the-shop
           test -z "$(git status --porcelain -- the-shop)"
           npm run test:the-shop-browser

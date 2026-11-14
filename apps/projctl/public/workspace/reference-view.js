@@ -1,0 +1,50 @@
+const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// The saved catalog describes gear; a connected relay owns lane assignment.
+export function referenceIdentity(item, state = {projectors: []}, connected = false) {
+  if (!connected) return {model: item.model, assignment: item.internalSlot ? `Recorded slot ${item.internalSlot}` : 'No recorded control slot'};
+  const matches = (state.projectors || []).filter(projector => projector.lane === item.lane);
+  if (matches.length !== 1) return {model: matches.length ? 'Assignment conflict' : 'Unassigned', assignment: matches.length ? 'Multiple control slots use this lane' : 'No assigned live device'};
+  const projector = matches[0], model = projector.model || 'Projector';
+  return {
+    model: projector.make && !model.toLowerCase().includes(projector.make.toLowerCase()) ? `${projector.make} ${model}` : model,
+    assignment: `${state.simulation ? 'Simulator' : 'Relay'} slot ${projector.slot}`,
+  };
+}
+export async function loadReference(dataUrl = './workspace/projectors.json') {
+  const response = await fetch(dataUrl, {cache:'no-store'});
+  if (!response.ok) throw new Error('Projector reference could not load.');
+  const data = await response.json();
+  if (!Array.isArray(data.projectors) || !Array.isArray(data.catalog)) throw new Error('Projector reference is incomplete.');
+  return data;
+}
+export function referenceGearHTML(data, lane) {
+  const item = data.projectors.find(p => p.lane === lane);
+  return (item?.referenceIds || []).map(id => data.catalog.find(entry => entry.id === id)).filter(Boolean).map(entry => `<article class="fr-gear"><span class="fr-eyebrow">${escape(entry.category)}</span><h3>${escape(entry.name)}</h3><p>${escape(entry.description)}</p><dl>${entry.facts.map(fact => `<div><dt>${escape(fact.label)}</dt><dd>${escape(fact.value)}</dd></div>`).join('')}</dl><p class="fr-source">${escape(entry.provenance)}${entry.source ? ` · <a href="${escape(entry.source)}" target="_blank" rel="noopener noreferrer">Source ↗</a>` : ''}</p></article>`).join('');
+}
+export async function mountReference(root, {dataUrl = './workspace/projectors.json',view = 'rig',onProjectorSelect} = {}) {
+  if (!document.querySelector('link[data-frozen-reference]')) { const link=document.createElement('link');link.rel='stylesheet';link.href=new URL('./reference-view.css',import.meta.url);link.dataset.frozenReference='';document.head.append(link); }
+  root.classList.add('frozen-reference');root.innerHTML='<p role="status">Loading documented projector reference…</p>';
+  let data;try {data=await loadReference(dataUrl);} catch(error){root.textContent=error.message;throw error;}
+  let currentView=view,selected=null,live={projectors:[]},connected=false;
+  const itemFor=lane=>data.projectors.find(item=>item.lane===lane);
+  const open=lane=>{if(onProjectorSelect)onProjectorSelect(lane);else{selected=lane;draw();root.querySelector('h2')?.focus();}};
+  const identity=item=>referenceIdentity(item,live,connected);
+  const status=lane=>{const matches=live.projectors.filter(p=>p.lane===lane),p=matches.length===1?matches[0]:null;return !connected?'Live status unavailable':matches.length>1?'Resolve the lane assignment in Configuration':!p?'No assigned live device':p.status?.online?'Control reply received':'No current device reply';};
+  const modelHTML=item=>`<span data-reference-model="${item.lane}">${escape(identity(item).model)}</span>`;
+  const card=item=>`<article class="fr-projector" data-lane="${item.lane}"><div class="fr-projector-head"><span class="fr-letter">${item.lane}</span><div><h3>${escape(item.position)}</h3><span>${escape(item.orientation)}</span></div></div><strong>${modelHTML(item)}</strong><span class="fr-assignment" data-reference-assignment="${item.lane}">${escape(identity(item).assignment)}</span><p>${escape(item.lens)}</p><p class="fr-source">${escape(status(item.lane))}</p><button type="button" data-open-lane="${item.lane}">Open ${item.lane} · controls &amp; info</button></article>`;
+  const flow=()=>`<h2 tabindex="-1">Signal flow</h2><p>${escape(data.signalFlow.note)}</p><div class="fr-legend"><span data-status="verified">Verified / current reply</span><span data-status="planned">Planned / configured</span><span data-status="unknown">Unknown / not checked</span></div><h3>Video path</h3>${data.projectors.map(item=>`<div class="fr-flow-row" data-lane="${item.lane}"><div class="fr-flow-node" data-status="unknown">${escape(data.signalFlow.videoSource.label)}<small>Unknown output / application</small></div><span aria-hidden="true">→</span><div class="fr-flow-node" data-status="unknown">${escape(data.signalFlow.transport.label)}<small>Patch and transport unknown</small></div><span aria-hidden="true">→</span><button type="button" class="fr-flow-node" data-status="planned" data-open-lane="${item.lane}">${item.lane} · ${escape(item.position)}<small>${modelHTML(item)} · HDMI target planned</small></button></div>`).join('')}<h3>Control path</h3><div class="fr-flow-row"><div class="fr-flow-node" data-status="verified">Operator interface<small>Implemented route</small></div><span aria-hidden="true">→</span><div class="fr-flow-node" data-flow-relay data-status="${connected?'verified':'unknown'}">Local relay<small>${connected?'Connected now':'Live relay status unavailable'}</small></div><span aria-hidden="true">→</span><div class="fr-flow-node" data-status="unknown">A–D projectors<small>Per-device replies do not verify video wiring</small></div></div>`;
+  function draw(){
+    root.innerHTML=`<div class="fr-navigation" role="group" aria-label="Projector reference views">${[['rig','Rig & gear'],['catalog','Projector database'],['flow','Signal flow']].map(([id,label])=>`<button type="button" data-reference-view="${id}" aria-pressed="${id===currentView}">${label}</button>`).join('')}</div><div class="fr-content" tabindex="0"></div>`;
+    const content=root.querySelector('.fr-content');
+    if(selected){const item=itemFor(selected);content.innerHTML=`<button type="button" data-reference-back>Back to rig</button><h2 tabindex="-1">${item.lane} · ${escape(item.position)}</h2><p>${escape(item.note)}</p><div class="fr-gear-grid">${referenceGearHTML(data,selected)}</div>`;content.querySelector('[data-reference-back]').onclick=()=>{selected=null;draw();};}
+    else if(currentView==='rig') content.innerHTML=`<h2 tabindex="-1">My Projector Rig</h2><p class="fr-source">Recorded plan and saved assignments · updated ${escape(data.updated)}. Live state is shown only when supplied by a connected controller.</p><div class="fr-rig">${data.projectors.map(card).join('')}</div><h3>Gear used</h3><p>Select a projector for its model, recorded lens and source notes. Installed identity, plotted equipment and candidates are kept distinct.</p>`;
+    else if(currentView==='catalog'){
+      content.innerHTML='<h2 tabindex="-1">Projector database</h2><label class="fr-search">Search documented models, lenses and gear<input type="search" placeholder="DW830, ET-DLE150, laser…"></label><p class="fr-source">Reference catalog for this rig. Manufacturer specifications are reference data, not confirmation of installed equipment.</p><p data-catalog-count role="status"></p><div class="fr-gear-grid" data-catalog-results></div>';
+      const input=content.querySelector('input');const results=()=>{const query=input.value.toLowerCase();const items=data.catalog.filter(entry=>JSON.stringify(entry).toLowerCase().includes(query));content.querySelector('[data-catalog-count]').textContent=`${items.length} documented entries`;content.querySelector('[data-catalog-results]').innerHTML=items.map(entry=>`<article class="fr-gear"><span class="fr-eyebrow">${escape(entry.category)}</span><h3>${escape(entry.name)}</h3><p>${escape(entry.description)}</p><dl>${entry.facts.map(f=>`<div><dt>${escape(f.label)}</dt><dd>${escape(f.value)}</dd></div>`).join('')}</dl><p class="fr-source">${escape(entry.provenance)}${entry.source?` · <a href="${escape(entry.source)}" target="_blank" rel="noopener noreferrer">Source ↗</a>`:''}</p></article>`).join('')||'<p>No matching documented gear.</p>';};input.oninput=results;results();
+    }else content.innerHTML=flow();
+    root.querySelectorAll('[data-reference-view]').forEach(button=>button.onclick=()=>{selected=null;currentView=button.dataset.referenceView;draw();root.querySelector('h2')?.focus();});
+    root.querySelectorAll('[data-open-lane]').forEach(button=>button.onclick=()=>open(button.dataset.openLane));
+  }
+  draw();
+  return {data,setView(next){if(!['rig','catalog','flow'].includes(next))return;selected=null;currentView=next;draw();},selectProjector(lane){if(itemFor(lane)){selected=lane;currentView='rig';draw();}},updateLive(state,online){live=state;connected=online;root.querySelectorAll('[data-reference-model]').forEach(node=>{node.textContent=identity(itemFor(node.dataset.referenceModel)).model;});root.querySelectorAll('[data-reference-assignment]').forEach(node=>{node.textContent=identity(itemFor(node.dataset.referenceAssignment)).assignment;});root.querySelectorAll('.fr-projector').forEach(card=>{const lane=card.querySelector('[data-open-lane]')?.dataset.openLane;if(lane)card.querySelector('.fr-source').textContent=status(lane);});const relay=root.querySelector('[data-flow-relay]');if(relay){relay.dataset.status=connected?'verified':'unknown';relay.querySelector('small').textContent=connected?'Connected now':'Live relay status unavailable';}}};
+}

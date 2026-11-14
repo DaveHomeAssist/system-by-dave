@@ -1,0 +1,74 @@
+{
+  "show": "Frozen at WST",
+  "lock": false,
+  "projectors": [
+    {
+      "slot": "P1",
+      "label": "Barco UDM 4K22",
+      "make": "Barco",
+      "model": "UDM 4K22",
+      "owner": "Rental",
+      "driver": "pulse",
+      "mac": "",
+      "ip": "",
+      "inputs": {
+        "HDMI": "HDMI",
+        "SDI": "SDI"
+      },
+      "notes": "Rental. Snorkel, right angle out. TLD+ zoom 0.71 to 0.93:1 (4K) lens. L6-30 cord: full brightness on 208/240 V (13.5 A, 2200 W max); 120 V caps output at 70% (18.5 A). PJLink + Pulse JSON-RPC 9090. Not on the LAN yet (2026-11-02)."
+    },
+    {
+      "slot": "P2",
+      "label": "House Panasonic A",
+      "make": "Panasonic",
+      "model": "PT-DW830U",
+      "owner": "House",
+      "driver": "panasonic",
+      "mac": "70:58:12:ee:27:0a",
+      "ip": "192.168.1.11",
+      "inputs": {
+        "31": "HDMI",
+        "32": "DVI-D",
+        "33": "SDI"
+      },
+      "notes": "House. Portrait, cross shoots portal. PT-DW830U per QID. PJLink name NAME1982. Found on LAN 2026-11-02.",
+      "user": "WST"
+    },
+    {
+      "slot": "P3",
+      "label": "House Panasonic B",
+      "make": "Panasonic",
+      "model": "PT-DW830U",
+      "owner": "House",
+      "driver": "panasonic",
+      "mac": "70:58:12:ee:27:0d",
+      "ip": "192.168.1.12",
+      "inputs": {
+        "31": "HDMI",
+        "32": "DVI-D",
+        "33": "SDI"
+      },
+      "notes": "House. Portrait, cross shoots portal. PT-DW830U per QID. PJLink name PANO-1. Found on LAN 2026-11-02.",
+      "user": "WST"
+    },
+    {
+      "slot": "P4",
+      "label": "Panasonic PT-RZ970B",
+      "make": "Panasonic",
+      "model": "PT-RZ970B",
+      "owner": "Rental",
+      "driver": "panasonic",
+      "mac": "",
+      "ip": "192.168.1.8",
+      "inputs": {
+        "31": "HDMI",
+        "32": "DVI-D",
+        "33": "SDI",
+        "34": "DIGITAL LINK"
+      },
+      "notes": "Rental. Straight shot (to confirm). ET-DLE080 short throw zoom (about 0.8 to 1.0:1). 10,000 lm WUXGA laser, 1050 W max, runs on 120 V Edison. S/N DA7610162. Web UI reached at 192.168.1.8 earlier 2026-11-02, down since; DHCP may move it, so capture its MAC for rediscovery."
+    }
+  ],
+  "presets": [],
+  "events": []
+}

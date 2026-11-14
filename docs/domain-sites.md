@@ -9,7 +9,7 @@ GitHub Pages repository.
 | --- | --- | --- | --- | --- |
 | `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/ursa-broadcast-g2/`, `/backfocus/`, `/camera-sim/` | 2026-09-18 |
 | `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | 2026-09-20; authenticated walk acceptance pending |
-| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Show-first landing at `/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
+| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | AV by Dave console at `/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
 and the browser storage its tools own. AV by Dave pages come from
@@ -18,8 +18,8 @@ avbydave.com without editing the config. Paths are unchanged on the new domains:
 `systembydave.com/fmp/house/` is `housevideo.app/fmp/house/`. The bare domain
 redirects to the site's home (`/fmp/` or `/fmpwalk/`). AV by Dave serves the
 source-controlled `av/index.html` at `/`; the direct source path is
-noindex and canonical to `/`. It keeps direct Show Console and Toolbox routes
-and is cached with the AV shell for offline return visits. The previous
+noindex and canonical to `/`. Former Show Console, Toolbox, sheet and eight original family routes redirect
+into the console. The shell is cached for offline return visits. The previous
 `av-suite-landing.html` was retired (UX-005): it is now a noindex redirect to
 the current home, kept so old links still land, and is no longer cached offline.
 
@@ -298,3 +298,7 @@ suite remains online-only under `docs/fmp-public-release.md`; no protected API
 response or authentication state is cached. Its strict `connect-src 'none'`
 reference pages are tested by navigation; a deliberately blocked test fetch is
 recorded as expected CSP enforcement.
+
+## Managed service snapshots
+
+The WST Stage files under `wst/stage/` are inputs to the managed WST Worker. Its root-relative renderer imports belong to that service. When producing the System by Dave Pages artifact, `stage_domain_sites.mjs` replaces only `wst/stage/index.html` with a noindex redirect to `https://wst.housevideo.app/stage/index.html`. The canonical snapshot and Worker remain unchanged; the normal removed-asset check still applies to every staged page.

@@ -1,5 +1,6 @@
+import { TopicMenu } from "../../shared/av-console/TopicMenu";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BaseEdge, Edge, EdgeProps, Background, BackgroundVariant, Controls, ControlButton, Handle, MarkerType, MiniMap, Node, NodeProps, Position, ReactFlow, ReactFlowInstance, useNodesState } from "@xyflow/react";
+import { BaseEdge, Edge, EdgeProps, Background, BackgroundVariant, Controls, ControlButton, Handle, MarkerType, MiniMap, Node, NodeProps, Position, ReactFlow, ReactFlowInstance, useNodesState, useUpdateNodeInternals } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { DeviceKind, VideoDocument } from "./model";
 import { addDevice, buildGraph, connectDevices, Device, deviceHeight, diagramSvg, renameDevice, Wire } from "./graph";
@@ -9,8 +10,14 @@ import { orthogonalPath } from "./routing";
 type DeviceData = { device: Device; incoming: Wire[]; outgoing: Wire[]; active: boolean; dim: boolean };
 type DeviceNodeType = Node<DeviceData, "device">;
 const names: Record<DeviceKind, string> = { source: "Source", converter: "Converter", processor: "Routing / processing", destination: "Destination" };
-function DeviceNode({ data }: NodeProps<DeviceNodeType>) {
+function DeviceNode({ id, data }: NodeProps<DeviceNodeType>) {
   const { device, incoming, outgoing, active, dim } = data;
+  // The diagram reads a device's ports when it measures the device. Naming a route's source or destination
+  // renames that cable's ports without changing the device's size, so ask for the ports to be read again;
+  // otherwise the newest cable has nowhere to attach and is not drawn until the page is reloaded.
+  const readPorts = useUpdateNodeInternals();
+  const ports = [...incoming.map(w => `i:${w.id}`), ...outgoing.map(w => `o:${w.id}`)].join("\n");
+  useEffect(() => { readPorts(id); }, [id, ports, readPorts]);
   const rows = Math.max(incoming.length, outgoing.length, 1);
   return <div className={`diagram-device kind-${device.kind} ${active ? "is-traced" : ""} ${dim ? "is-dimmed" : ""}`} style={{ height: 76 + rows * 26 }}>
     <div className="device-title"><span className="device-icon" aria-hidden="true">{device.kind === "source" ? "↗" : device.kind === "destination" ? "▣" : device.kind === "converter" ? "⇄" : "⤨"}</span><div><small>{names[device.kind]}</small><strong title={device.label}>{device.label}</strong></div></div>
@@ -97,13 +104,19 @@ export function FlowCanvas({ doc, selected, onChange, onSelect, onChecks, onEdit
     const url = URL.createObjectURL(new Blob([diagramSvg(doc)], { type: "image/svg+xml" }));
     const a = document.createElement("a"); a.href = url; a.download = "signal-flow.svg"; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+  const routeControls = <div className="flow-route-bar"><label>Route<select aria-label="Select route to trace" value={selectedRoute?.id || ""} onChange={e => { onSelect(e.target.value); setTrace(true); setPicked(""); }}><option value="">All routes</option>{doc.routes.map(r => <option value={r.id} key={r.id}>{r.route || r.source || "Untitled route"}</option>)}</select></label><button type="button" aria-pressed={tracing} disabled={!selectedRoute} onClick={() => setTrace(!trace)}>Trace path</button><button type="button" onClick={onEdit} disabled={!selectedRoute}>Edit route</button></div>;
+  const routeContext = <div className="flow-context"><span className="flow-route-format">{selectedRoute ? [`Source: ${selectedRoute.format || "format unknown"}`, selectedRoute.connector, `Operator status: ${selectedRoute.status || "unspecified"}`].filter(Boolean).join(" · ") : doc.routes.length ? `${doc.routes.length} routes · select a route for format and status` : "Connect devices to build your signal paths"}</span></div>;
   return <section className="flow-workspace" aria-label="Interactive signal flow">
-    <div className="flow-toolbar"><div className="flow-heading"><h2>Signal flow</h2><span>{graph.devices.length} devices <i>·</i> {graph.wires.length} connections</span></div><div className="flow-actions"><button type="button" className="primary" onClick={() => openDevice()}>Add device</button><button type="button" onClick={onAddRoute}>Add route</button><button type="button" onClick={() => { arrangePending.current = true; onChange({ ...doc, graphPositions: {} }); }}>Arrange</button><button type="button" onClick={exportDiagram} disabled={!graph.devices.length}>Export diagram</button></div></div>
-    <div className="flow-route-bar"><label>Route<select aria-label="Select route to trace" value={selectedRoute?.id || ""} onChange={e => { onSelect(e.target.value); setTrace(true); setPicked(""); }}><option value="">All routes</option>{doc.routes.map(r => <option value={r.id} key={r.id}>{r.route || r.source || "Untitled route"}</option>)}</select></label><button type="button" aria-pressed={tracing} disabled={!selectedRoute} onClick={() => setTrace(!trace)}>Trace path</button><button type="button" onClick={onEdit} disabled={!selectedRoute}>Edit route</button></div>
-    <div className="flow-context"><span className="flow-route-format">{selectedRoute ? [`Source: ${selectedRoute.format || "format unknown"}`, selectedRoute.connector, `Operator status: ${selectedRoute.status || "unspecified"}`].filter(Boolean).join(" · ") : doc.routes.length ? `${doc.routes.length} routes · select a route for format and status` : "Connect devices to build your signal paths"}</span></div>
+    {document.documentElement.dataset.avTool === "av-suite" ? <div className="flow-compact-tools"><TopicMenu label="Diagram" topics={[
+      { name: "Devices", closeOnAction: true, description: "Add devices and connect the signal path", content: <><p>{graph.devices.length} devices · {graph.wires.length} connections</p><button type="button" className="primary" onClick={() => openDevice()}>Add device</button><button type="button" onClick={onAddRoute}>Add route</button><button type="button" onClick={onSample}>Try a sample plan</button><button type="button" onClick={onImport}>Import existing sheets</button></> },
+      { name: "Routes", closeOnAction: true, description: "Select, trace and edit a route", content: <>{routeControls}{routeContext}</> },
+      { name: "Arrange and export", closeOnAction: true, description: "Arrange devices or download the diagram", content: <><button type="button" onClick={() => { arrangePending.current = true; onChange({ ...doc, graphPositions: {} }); }}>Arrange</button><button type="button" onClick={exportDiagram} disabled={!graph.devices.length}>Export diagram</button></> },
+    ]} /></div> : <><div className="flow-toolbar"><div className="flow-heading"><h2>Signal flow</h2><span>{graph.devices.length} devices <i>·</i> {graph.wires.length} connections</span></div><div className="flow-actions"><button type="button" className="primary" onClick={() => openDevice()}>Add device</button><button type="button" onClick={onAddRoute}>Add route</button><button type="button" onClick={() => { arrangePending.current = true; onChange({ ...doc, graphPositions: {} }); }}>Arrange</button><button type="button" onClick={exportDiagram} disabled={!graph.devices.length}>Export diagram</button></div></div>
+    {routeControls}
+    {routeContext}</>}
     {selectedRoute?.status === "issue" && doc.modules.checks && <button type="button" className="flow-issue" onClick={onChecks}>Reported route issue · {active.size} devices on path · failed step unconfirmed. Open Checks →</button>}
     <div className="flow-canvas">
-      <ReactFlow<DeviceNodeType> nodes={nodes} edges={edges} edgeTypes={edgeTypes} nodeTypes={nodeTypes} onInit={instance => { flow.current = instance; }} fitView={window.innerWidth > 680} fitViewOptions={{ padding: .15, maxZoom: 1 }} minZoom={.15} maxZoom={2} deleteKeyCode={null} nodesConnectable edgesReconnectable={false} onNodesChange={changes => {
+      <ReactFlow<DeviceNodeType> proOptions={{ hideAttribution: true }} nodes={nodes} edges={edges} edgeTypes={edgeTypes} nodeTypes={nodeTypes} onInit={instance => { flow.current = instance; }} fitView={window.innerWidth > 680} fitViewOptions={{ padding: .15, maxZoom: 1 }} minZoom={.15} maxZoom={2} deleteKeyCode={null} nodesConnectable edgesReconnectable={false} onNodesChange={changes => {
         onNodesChange(changes);
         const moved = changes.filter(c => c.type === "position" && !c.dragging && c.position);
         if (moved.length) { const positions = Object.fromEntries(nodes.map(n => [n.id, n.position])); moved.forEach(c => { if (c.type === "position" && c.position) positions[c.id] = c.position; }); onChange({ ...doc, graphPositions: positions }); }

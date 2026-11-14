@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">Fiber mode and wavelength</title><desc id="desc">FOX3 alternatives: MM means multimode; SM means singlemode. Blue arrows show separate optical paths between matching TX and RX models. LC shape does not identify fiber mode.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 022</text>
+<text x="108" y="228" font-size="54" class="story-title">Fiber mode and wavelength</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect width="240" height="400" rx="6" class="canvas"/><text x="12" y="26" class="diagram-index">22</text><text x="48" y="26" class="diagram-heading">OPTICAL MATCH</text><path d="M12 40H228" class="rule"/><rect x="12" y="54" width="216" height="144" rx="6" class="panel"/><text x="24" y="79" class="blue-label">MM / 850 nm</text><rect x="24" y="100" width="68" height="44" rx="4" class="node"/><text x="58" y="127" text-anchor="middle">TX</text><rect x="148" y="100" width="68" height="44" rx="4" class="node"/><text x="182" y="127" text-anchor="middle">RX</text><path d="M92 122H148m-6-5l6 5l-6 5" class="wire"/><text x="120" y="179" text-anchor="middle" class="good-label">Multimode fiber</text><rect x="12" y="212" width="216" height="144" rx="6" class="panel"/><text x="24" y="237" class="blue-label">SM / 1310 nm</text><rect x="24" y="258" width="68" height="44" rx="4" class="node"/><text x="58" y="285" text-anchor="middle">TX</text><rect x="148" y="258" width="68" height="44" rx="4" class="node"/><text x="182" y="285" text-anchor="middle">RX</text><path d="M92 280H148m-6-5l6 5l-6 5" class="wire"/><text x="120" y="337" text-anchor="middle" class="good-label">Singlemode fiber</text><text x="120" y="383" text-anchor="middle" class="note">LC shape ≠ fiber mode</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">FOX3 alternatives: MM means</text>
+<text x="108" y="1558" font-size="40" class="story-caption">multimode; SM means singlemode. Blue</text>
+<text x="108" y="1610" font-size="40" class="story-caption">arrows show separate optical paths</text>
+<text x="108" y="1662" font-size="40" class="story-caption">between matching TX and RX models.</text>
+<text x="108" y="1714" font-size="40" class="story-caption">LC shape does not identify fiber</text>
+<text x="108" y="1766" font-size="40" class="story-caption">mode.</text>
+<a href="https://media.extron.com/public/download/files/specs/fox3_tr_101_5145-D1.pdf"><text x="108" y="1808" font-size="28" class="story-source">Extron FOX3 T/R 101 specifications, optical</text>
+<text x="108" y="1842" font-size="28" class="story-source">interconnection</text></a>
+</svg>

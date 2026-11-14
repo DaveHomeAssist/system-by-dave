@@ -1,0 +1,69 @@
+{
+  "schema": "equipment.lab.geometry.v1",
+  "meshes": 199,
+  "triangles": 15892,
+  "materials": 199,
+  "textures": 14,
+  "components": {
+    "body.chassis": 11,
+    "body.lensMount": 2,
+    "body.airInletFront": 32,
+    "body.airInletTop": 25,
+    "body.airInletRight": 15,
+    "body.airOutlet": 13,
+    "body.powerInput": 3,
+    "body.irFront": 1,
+    "body.irRear": 1,
+    "body.feet": 8,
+    "io.display": 2,
+    "io.keypad": 17,
+    "io.statusLights": 3,
+    "io.irReceiver": 1,
+    "io.hdmi": 3,
+    "io.displayPort": 3,
+    "io.hdbaset": 3,
+    "io.sdi": 13,
+    "io.lan": 3,
+    "io.dmx": 9,
+    "io.remote": 5,
+    "io.rs232": 5,
+    "io.usb": 3,
+    "io.sync3d": 7,
+    "io.dc12v": 3,
+    "lens.barrel": 8
+  },
+  "bounds": {
+    "min": [
+      -0.27,
+      0,
+      -0.3625
+    ],
+    "max": [
+      0.27,
+      0.339,
+      0.5825
+    ],
+    "size": [
+      0.54,
+      0.339,
+      0.945
+    ]
+  },
+  "boundsWithoutLens": {
+    "min": [
+      -0.27,
+      0,
+      -0.3625
+    ],
+    "max": [
+      0.27,
+      0.339,
+      0.3629
+    ],
+    "size": [
+      0.54,
+      0.339,
+      0.7254
+    ]
+  }
+}
