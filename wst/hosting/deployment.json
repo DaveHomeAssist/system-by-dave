@@ -1,18 +1,26 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "bfc60c6cf52f79c5b9d08916b30c7d1adf0a8f30",
-  "deploymentId": "appgdep_6af80aea4b78819183693171baffc0b2",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_b3f8c5205054819189e1c84e78956dc0",
+  "managedSourceCommit": "c2894ebce9ab3481b873a4ce8b66d34b27fbf2c6",
+  "deploymentId": "appgdep_6af8bb6b765c8191825560c90591e6a3",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_c5dcb4dab5bc8191b171addc594b4624",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 28,
-  "acceptedSourceCommit": "a1ee7562f2a8a960258d0e9a58d0b93ec3ee7b03",
-  "publicVerifiedAt": "2026-11-14T07:18:00Z",
+  "versionNumber": 29,
+  "acceptedSourceCommit": "b3b2fb41d8902b3f376d1c58186e6fe75145a026",
+  "publicVerifiedAt": "2026-11-14T19:50:43.132913+00:00",
   "priorPublications": [
+    {
+      "versionNumber": 28,
+      "managedSourceCommit": "bfc60c6cf52f79c5b9d08916b30c7d1adf0a8f30",
+      "deploymentId": "appgdep_6af80aea4b78819183693171baffc0b2",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_b3f8c5205054819189e1c84e78956dc0",
+      "acceptedSourceCommit": "a1ee7562f2a8a960258d0e9a58d0b93ec3ee7b03",
+      "publicVerifiedAt": "2026-11-14T07:18:00Z"
+    },
     {
       "versionNumber": 26,
       "managedSourceCommit": "a71c93323f0c05f800dad739e100d19eb29e942d",
@@ -38,5 +46,24 @@
       "note": "Stage/reference polish from PR 448 (taskPublication)"
     }
   ],
-  "sourceReconciliation": "Version 28 adds current R5 signal-flow PDF and consolidated R4 handoff under Planning Documents. Public copies omit private network addresses. Hosted-only generation preserves the local controller. Version 27 was saved but never deployed."
+  "sourceReconciliation": "Version 29 publishes the November 14 R5 evidence reconciliation: 18-page combined handoff and current five-page diagrams. Public exports omit private network addresses. Private ZIP and original EDID/settings exports are excluded.",
+  "verification": {
+    "pdfHashesMatch": true,
+    "combinedPDFPages": 18,
+    "signalFlowPDFPages": 5,
+    "combinedPDFSHA256": "8f2c6bfbefff1b8fb2262ad9f67969d21d358296d091cd9523963800b8560a97",
+    "signalFlowPDFSHA256": "cca5cf644477b2759679edbca82cec4e8a165bc2ca912d3a46f7010448de71a0",
+    "browserWidths": [
+      1440,
+      680,
+      375,
+      2560
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "privateExportRoutes": "404",
+    "host": "Dominic"
+  }
 }
