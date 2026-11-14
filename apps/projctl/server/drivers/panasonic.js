@@ -137,7 +137,18 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
       for (const [n, id, label, role] of QTM_SENSORS) {
         let c = null;
         try { c = parseQtm(await native(`QTM:${n}`, { signal })); }
-        catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; }
+        catch (e) {
+          throwIfAborted(signal);
+          if (!transportFailure(e)) { sensors.push({ id, label, role, c: null }); continue; }
+          // A lost connection after the intake was read keeps the intake (all that headroom
+          // needs) instead of failing the reading. The house PT-DW830Us refuse new sessions
+          // once about eight are held, so no further connection is opened.
+          if (sensors[0]?.role === 'intake' && Number.isFinite(sensors[0].c)) {
+            for (const [, restId, restLabel, restRole] of QTM_SENSORS.slice(sensors.length)) sensors.push({ id: restId, label: restLabel, role: restRole, c: null });
+            return { sensors, partial: String(e.message || e) };
+          }
+          throw e;
+        }
         sensors.push({ id, label, role, c });
       }
       return { sensors };

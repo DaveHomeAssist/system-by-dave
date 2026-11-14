@@ -87,3 +87,12 @@ test('CSV has a stable header, ISO times and neutralises spreadsheet formulas', 
   assert.equal(lines[1], '2026-11-12T03:00:00.000Z,P4,D,PT-DW830U,intake,37.5,40');
   assert.equal(lines[2], `2026-11-12T03:00:05.000Z,'=P5,,"'+cmd|""x""",intake,22,`);
 });
+
+test('recent gives the latest reading and the peak since a time, for health reports', () => {
+  const monitor = createThermalMonitor({ now: () => 10_000 });
+  assert.equal(monitor.recent('P4'), null);
+  for (const [t, c] of [[1_000, 38], [5_000, 36], [8_000, 37]]) monitor.observe('P4', { at: t, c, limitC: 40 });
+  assert.deepEqual(monitor.recent('P4', 2_000), { c: 37, at: 8_000, kind: 'intake', peakC: 37, peakAt: 8_000 }, 'the 38 before the previous report is not this window\'s peak');
+  assert.deepEqual(monitor.recent('P4'), { c: 37, at: 8_000, kind: 'intake', peakC: 38, peakAt: 1_000 });
+  assert.equal(monitor.recent('P4', 9_000).peakC, null, 'no readings since then');
+});

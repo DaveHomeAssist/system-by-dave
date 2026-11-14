@@ -15,14 +15,18 @@ The relay writes a health report on its own:
 
 - **Power on:** 2 minutes after the first projector is seen lit (on or warming),
   so units switched on together land in one report. Any source counts: the
-  controller, a preset, a schedule, OSC or the front panel.
+  controller, a preset, a schedule, OSC or the front panel. A unit that left the
+  network in standby (Panasonic ECO) and comes back already lit counts too. A
+  lit unit that only lost the network for a moment does not.
 - **Hourly:** on the hour while any projector is lit. An hourly report is skipped
   when another report finished in the previous 15 minutes.
 - **Power off:** when a power-off command is about to be sent, the relay reads
   every reachable unit at that moment. The off command is never delayed. A batch
   power-off (all units, a preset or a schedule) produces one report.
 - **Relay stop:** when the relay is stopping while a unit is lit, it writes a
-  final report, capped at 6 seconds.
+  final report, capped at 6 seconds. Each unit gets one reading attempt within
+  4 seconds, so the report is saved inside the cap even when a unit does not
+  answer. A Notion send cut off by the cap is sent after the next start.
 - **Manual:** `POST /api/health-reports/run` for acceptance checks.
 
 Each report is saved on the relay machine and, when configured, added as one row
@@ -45,8 +49,9 @@ in a Notion database.
   headroom; PJLink "other" or lamp, cover and filter warnings; units not reached.
 - Follow-up: one line per thing to check, or "None".
 - Page body: a unit table (slot, lane, model, address, power, intake or ambient
-  temperature, rated limit, headroom, internal temperatures, flags, light hours,
-  last contact) and the controller events since the previous report.
+  temperature, peak since the previous report, rated limit, headroom, internal
+  temperatures, flags, light hours, last contact) and the controller events since
+  the previous report.
 
 Slots are internal relay IDs. Every row also names lane, model and address,
 because production paperwork numbers the projectors differently.
@@ -65,6 +70,31 @@ listed as not read. The Thermal watch (README, "Thermal watch") takes the same
 reading about once a minute while a unit is on or cooling. Both go through one
 reader in the relay, one read at a time per projector, so a report waits for a
 sample in progress instead of querying alongside it.
+
+**Lost connections (fix 2026-11-12).** On 12 Nov 2026, 3 of 6 reports listed
+P3 and P4, the house PT-DW830Us, as not read with "connection closed before
+Panasonic reply". A passive capture the same day showed these units refuse a new
+session once about eight are held, for roughly 45 seconds. A report's reading
+landing in the middle of a status poll may also play a part. Neither cause is
+proven for the temperature port. Now:
+
+- Every temperature reading waits for that projector's status poll to finish
+  before opening connections.
+- If the connection is lost after the intake (QTM:0) was read, the reading keeps
+  the intake and opens no further connections. Only a failure before the intake
+  fails the reading.
+- A report retries a failed reading up to 2 more times, 4 s apart, within its
+  12-second limit, so a held session can expire. Refusals and bad replies are not
+  retried. The Thermal watch takes one attempt and tries again at its next sample.
+- If the report's reading still fails, the latest Thermal watch sample stands in
+  when it is at most 3 minutes old. The table marks it as a watch sample with its
+  time, and Findings name the unit. An older sample is not used; the unit is
+  listed as not read.
+- The unit table shows each unit's peak since the previous report, from the
+  Thermal watch history. Headroom and the verdict still use the report-time
+  reading (or the stand-in sample), not the peak.
+
+Status: simulator and unit tests only; not yet checked against the projectors.
 
 ### Flags and limits
 
@@ -114,9 +144,14 @@ The database needs the properties `Log` (title), `Check window` (date),
 
 - Reports are saved as JSON and Markdown in `health-reports/` beside the rig
   file. The newest 500 are kept.
+- A report is saved as pending before its first Notion write, so one cut off by
+  a relay exit or a power cut is sent after the next start.
 - A report whose Notion write fails with a network error, a rate limit or a
   server error, or with no token yet, stays pending and is retried every 10
-  minutes for up to 7 days.
+  minutes for up to 7 days after it was written. Each round sends the oldest
+  first and stops at the first that still fails, so a dead uplink costs one
+  try per round. Notion sends run apart from readings: a slow or unreachable
+  Notion never delays a report's readings.
   Other refusals, such as a wrong database or a missing share, are recorded as
   failed and need fixing in Notion.
 - `GET /api/health-reports`: engine state, Notion configuration state, next

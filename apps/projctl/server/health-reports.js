@@ -107,16 +107,25 @@ const level = (v) => (v === 2 ? 'error' : 'warning');
 const lanePart = (u) => (u.lane ? `lane ${u.lane}, ` : '');
 const who = (u) => `${u.slot} (${lanePart(u)}${u.model || 'unknown model'}, ${u.ip})`;
 
-export function unitRow(p, st = {}, conn = {}, readings = null, readError = null, config = DEFAULTS) {
+// `air` comes from the Thermal watch: { sample: { c, at } | null, peakC, peakAt } with epoch-ms
+// times. `sample` is the latest watch reading, passed only when it is recent enough to stand in
+// for a report-time reading that failed. The peak is the highest watch reading since the
+// previous report.
+const isoOrNull = (ms) => (Number.isFinite(ms) ? new Date(ms).toISOString() : null);
+export function unitRow(p, st = {}, conn = {}, readings = null, readError = null, config = DEFAULTS, air = null) {
   const sensors = Array.isArray(readings?.sensors) ? readings.sensors : [];
   const intake = sensors.find((s) => s.role === 'intake' && Number.isFinite(s.c));
   const internal = sensors.filter((s) => s.role === 'internal' && Number.isFinite(s.c)).map((s) => s.c);
   const limit = ratedAmbientDetail(p, config.ratedAmbientC, { reliable: config.reliable !== false });
   const rated = limit.c;
-  const headroom = intake && rated != null ? round1(rated - intake.c) : null;
+  const online = !!st?.online;
+  const fallback = !intake && online && Number.isFinite(air?.sample?.c) ? air.sample : null;
+  const intakeC = intake ? intake.c : fallback ? fallback.c : null;
+  const headroom = intakeC != null && rated != null ? round1(rated - intakeC) : null;
+  let peakC = Number.isFinite(air?.peakC) ? air.peakC : null, peakAt = peakC != null ? isoOrNull(air.peakAt) : null;
+  if (peakC == null && intakeC != null) { peakC = intakeC; peakAt = fallback ? isoOrNull(fallback.at) : null; }
   const errors = st?.errors && typeof st.errors === 'object' ? st.errors : null; // PJLink ERST; null for Pulse
   const alarm = readings?.alarm == null ? null : String(readings.alarm);
-  const online = !!st?.online;
   const flags = [], warnings = [];
   if (online && errors) {
     if (errors.temp) flags.push(`temperature ${level(errors.temp)}`);
@@ -129,7 +138,9 @@ export function unitRow(p, st = {}, conn = {}, readings = null, readError = null
   return {
     slot: p.slot, lane: p.lane || null, model: [p.make, p.model].filter(Boolean).join(' ') || p.label || null, ip: p.ip || null, owner: p.owner || null,
     power: st?.power || 'unknown', online, lastContact: conn?.lastSuccessAt || null, lightHours: Number.isFinite(st?.lightHours) ? st.lightHours : null,
-    intakeC: intake ? intake.c : null, intakeLabel: intake?.label || null, internalC: internal, ratedC: rated, limitSource: limit.source, limitWarning: limit.warning, headroomC: headroom,
+    intakeC, intakeLabel: intake?.label || (fallback ? 'Thermal watch sample' : null),
+    intakeSource: intake ? 'report' : fallback ? 'watch' : null, intakeAt: fallback ? isoOrNull(fallback.at) : null, peakC, peakAt,
+    internalC: internal, ratedC: rated, limitSource: limit.source, limitWarning: limit.warning, headroomC: headroom,
     flags, warnings, alarm, flagSource: errors ? 'PJLink' : alarm != null ? 'Pulse' : null,
     readError: readError ? String(readError).slice(0, 200) : null, verdict,
   };
@@ -143,6 +154,7 @@ export function summarize(units) {
   const unreachable = units.filter((u) => u.verdict === 'unreachable');
   const warned = units.filter((u) => u.warnings.length);
   const notRead = reached.filter((u) => u.intakeC == null);
+  const fromWatch = reached.filter((u) => u.intakeSource === 'watch');
   const least = units.filter((u) => u.headroomC != null).sort((a, b) => a.headroomC - b.headroomC)[0];
   const findings = [];
   if (!n) findings.push('No assigned projectors.');
@@ -152,6 +164,7 @@ export function summarize(units) {
   if (least) findings.push(`Least headroom: ${who(least)} ${num(least.headroomC)} °C (${num(least.intakeC)} °C intake, ${least.ratedC} °C limit).`);
   if (warned.length) findings.push(`PJLink warnings: ${warned.map((u) => `${u.slot} ${u.warnings.join(', ')}`).join('; ')}.`);
   if (unreachable.length && reached.length) findings.push(`Not reached: ${unreachable.map(who).join(', ')}.`);
+  if (fromWatch.length) findings.push(`Report-time reading failed; latest Thermal watch sample used: ${fromWatch.map((u) => u.slot).join(', ')}.`);
   if (notRead.length) findings.push(`Temperatures not read: ${notRead.map((u) => u.slot).join(', ')}.`);
   const follow = [];
   for (const u of flagged) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): check ${u.flags.join(', ')} on the projector.`);
@@ -175,7 +188,13 @@ export function buildReport({ kind, reason = '', startedAt, finishedAt, units, e
   };
 }
 
-const UNIT_HEADER = ['Unit', 'Lane', 'Model', 'Address', 'Power', 'Intake or ambient (°C)', 'Limit (°C)', 'Headroom (°C)', 'Internal (°C)', 'Flags', 'Light hours (h)', 'Last contact'];
+const UNIT_HEADER = ['Unit', 'Lane', 'Model', 'Address', 'Power', 'Intake or ambient (°C)', 'Peak since previous report (°C)', 'Limit (°C)', 'Headroom (°C)', 'Internal (°C)', 'Flags', 'Light hours (h)', 'Last contact'];
+const timeSuffix = (iso, timeZone) => (iso ? ` (${localTime(Date.parse(iso), timeZone)})` : '');
+function intakeCell(u, timeZone) {
+  if (u.intakeC == null) return '—';
+  return u.intakeSource === 'watch' ? `${num(u.intakeC)} watch sample${timeSuffix(u.intakeAt, timeZone)}` : num(u.intakeC);
+}
+const peakCell = (u, timeZone) => (u.peakC == null ? '—' : `${num(u.peakC)}${timeSuffix(u.peakAt, timeZone)}`);
 function flagCell(u) {
   if (!u.online) return 'Not reached';
   const parts = [...u.flags, ...u.warnings];
@@ -186,7 +205,8 @@ function flagCell(u) {
 }
 export function unitTable(report) {
   return [UNIT_HEADER, ...report.units.map((u) => [
-    u.slot, u.lane || '—', u.model || '—', u.ip || '—', u.power, num(u.intakeC), u.ratedC == null ? '—' : String(u.ratedC), num(u.headroomC),
+    u.slot, u.lane || '—', u.model || '—', u.ip || '—', u.power, intakeCell(u, report.timeZone), peakCell(u, report.timeZone),
+    u.ratedC == null ? '—' : String(u.ratedC), num(u.headroomC),
     u.internalC.length ? u.internalC.join(', ') : '—', flagCell(u), u.lightHours == null ? '—' : u.lightHours.toLocaleString('en-US'),
     u.lastContact ? localTime(Date.parse(u.lastContact), report.timeZone) : '—',
   ])];
@@ -270,14 +290,21 @@ const summaryOf = (r) => ({ id: r.id, kind: r.kind, title: r.title, startedAt: r
 export function createHealthReports({
   dir, config = { ...DEFAULTS, ratedAmbientC: {}, notion: {} }, projectors, status, connection, events = () => [],
   readTelemetry = null, describeError = (p, e) => String(e?.message || e), publish = null,
+  // recentAir(p, sinceMs) -> { c, at, peakC, peakAt } | null from the Thermal watch (epoch-ms times).
+  recentAir = null, telemetryAttempts = 3, watchSampleMaxAgeMs = 3 * 60000,
   now = Date.now, timer = setTimeout, cancelTimer = clearTimeout, timeZone = TIME_ZONE,
   powerOnDelayMs = 120000, telemetryTimeoutMs = 12000, hourlyQuietMs = 15 * 60000, powerOffWindowMs = 30000,
-  // Retries cover a venue without internet for up to 7 days (1008 tries at 10 minutes).
-  stopQuietMs = 5 * 60000, stopTimeoutMs = 6000, retryMs = 10 * 60000, maxAttempts = 1008, keep = 500, log = console,
+  // Retries cover a venue without internet for up to 7 days after a report is written
+  // (at most 1008 tries at 10 minutes).
+  stopQuietMs = 5 * 60000, stopTimeoutMs = 6000, retryMs = 10 * 60000, maxAttempts = 1008, retryForMs = 7 * 24 * HOUR, keep = 500, log = console,
+  // The relay-stop report reads each unit once within this limit, so it is saved inside the stop cap.
+  stopReadingMs = Math.max(1000, stopTimeoutMs - 2000),
 }) {
   const lastPower = new Map(), pending = new Map(), recent = [];
   let session = null, powerOnTimer = null, hourlyTimer = null, retryTimer = null, nextHourlyAt = null;
-  let lastReportAt = null, lastPowerOffAt = -Infinity, chain = Promise.resolve(), closed = false, lastPublishError = null;
+  // `chain` runs readings and local saves one report at a time. `sending` runs Notion sends and
+  // retries on their own, so a slow or unreachable Notion never holds up a report's readings.
+  let lastReportAt = null, lastPowerOffAt = -Infinity, chain = Promise.resolve(), sending = Promise.resolve(), closed = false, lastPublishError = null;
   const enabled = () => config.enabled && !closed;
   const assigned = () => projectors().filter((p) => p.ip);
   const anyLitNow = () => assigned().some((p) => status(p.slot)?.online && isLit(status(p.slot)?.power));
@@ -318,8 +345,11 @@ export function createHealthReports({
     }
   }
 
+  const notionConfigured = () => !!(publish && config.notion?.databaseId);
+  // Returns the report's Notion state afterwards.
   async function publishReport(report) {
-    if (!publish || !config.notion?.databaseId) { report.notion = { state: 'local-only', reason: 'Notion is not configured' }; save(report); remember(report); return; }
+    if (report.notion?.state === 'published') return 'published';
+    if (!notionConfigured()) { report.notion = { state: 'local-only', reason: 'Notion is not configured' }; pending.delete(report.id); save(report); remember(report); return 'local-only'; }
     const attempts = (report.notion?.attempts || 0) + 1, at = new Date(now()).toISOString();
     try {
       const out = await publish(report);
@@ -327,20 +357,32 @@ export function createHealthReports({
       pending.delete(report.id); lastPublishError = null;
     } catch (e) {
       const message = String(e?.message || e).slice(0, 240);
-      const retry = e?.retry === true && attempts < maxAttempts;
+      const written = Date.parse(report.finishedAt);
+      const fresh = !Number.isFinite(written) || now() - written < retryForMs;
+      const retry = e?.retry === true && attempts < maxAttempts && fresh;
       report.notion = { state: retry ? 'pending' : 'failed', attempts, lastAttemptAt: at, error: message };
       lastPublishError = { at, message };
       if (retry) { pending.set(report.id, report); scheduleRetry(); } else pending.delete(report.id);
       log.error?.(`[health] Notion ${retry ? 'deferred' : 'failed'} for ${report.title}: ${message}`);
     }
     save(report); remember(report);
+    return report.notion.state;
+  }
+  function send(report) {
+    const job = sending.then(() => publishReport(report));
+    sending = job.catch(() => {});
+    return job;
   }
   function scheduleRetry() {
     if (retryTimer || closed || !pending.size) return;
     retryTimer = timer(() => {
       retryTimer = null;
-      chain = chain.then(async () => { for (const r of [...pending.values()].sort((a, b) => a.startedAt.localeCompare(b.startedAt))) await publishReport(r); })
-        .catch((e) => log.error?.(`[health] retry failed: ${e.message}`)).finally(scheduleRetry);
+      sending = sending.then(async () => {
+        for (const r of [...pending.values()].sort((a, b) => a.startedAt.localeCompare(b.startedAt))) {
+          // Still unreachable: leave the rest for the next round instead of waiting out each timeout.
+          if (await publishReport(r) === 'pending') break;
+        }
+      }).catch((e) => log.error?.(`[health] retry failed: ${e.message}`)).finally(scheduleRetry);
     }, retryMs);
     retryTimer?.unref?.();
   }
@@ -352,36 +394,52 @@ export function createHealthReports({
     return events().filter((e) => { const t = Date.parse(e.at); return t > since && t <= until; }).slice(-30).reverse()
       .map((e) => ({ at: e.at, slot: e.slot || null, text: clip([e.command, e.result, e.detail].filter(Boolean).join(' · '), 160) }));
   }
-  async function capture(kind, reason, snapshot) {
+  // Read after the report's own attempt, which also feeds the watch. A watch sample older than
+  // watchSampleMaxAgeMs is not used in place of a failed reading.
+  function airFor(p, since) {
+    if (!recentAir) return null;
+    let r = null; try { r = recentAir(p, since); } catch { return null; }
+    if (!r) return null;
+    const fresh = Number.isFinite(r.c) && Number.isFinite(r.at) && now() - r.at <= watchSampleMaxAgeMs;
+    return { sample: fresh ? { c: r.c, at: r.at } : null, peakC: r.peakC, peakAt: r.peakAt };
+  }
+  // Reads and saves one report locally; sending it to Notion is separate (see send()).
+  async function capture(kind, reason, snapshot, { attempts = telemetryAttempts, timeoutMs = telemetryTimeoutMs } = {}) {
     const startedAt = now();
     const since = lastReportAt ?? startedAt - HOUR;
     const units = await Promise.all(snapshot.map(async ({ p, st, conn }) => {
       let readings = null, readError = null;
       if (st.online && readTelemetry) {
         const controller = new AbortController();
-        const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), telemetryTimeoutMs);
+        const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), timeoutMs);
         deadline?.unref?.();
-        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal })), controller.signal); }
-        catch (e) { readError = describeError(p, e); }
+        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal, attempts })), controller.signal); }
+        catch (e) { readError = describeError(p, e); if (e?.attempts > 1) readError += ` (${e.attempts} tries)`; }
         finally { cancelTimer(deadline); }
       }
-      return unitRow(p, st, conn, readings, readError, config);
+      return unitRow(p, st, conn, readings, readError, config, airFor(p, since));
     }));
     const finishedAt = now();
     const report = buildReport({ kind, reason, startedAt, finishedAt, units, events: recentEvents(since, finishedAt), config, timeZone });
+    // Saved as pending before the first send, so a relay that exits or loses power mid-send
+    // still sends it after the next start.
+    if (notionConfigured()) { report.notion = { state: 'pending', attempts: 0 }; pending.set(report.id, report); }
     save(report, { markdown: true }); remember(report); prune();
     lastReportAt = finishedAt;
-    await publishReport(report);
-    log.log?.(`[health] ${report.title}: ${report.findings} (Notion ${report.notion.state})`);
-    return summaryOf(report);
+    return report;
   }
-  function trigger(kind, reason) {
+  // Resolves with the report summary once the report is saved and its first Notion send is done.
+  function trigger(kind, reason, reading) {
     if (!enabled()) return Promise.resolve(null);
     let snapshot; // taken now, before any queued work or power transition
     try { snapshot = statusSnapshot(); } catch (e) { log.error?.(`[health] ${kind} report skipped: ${e.message}`); return Promise.resolve(null); }
-    const job = chain.then(() => capture(kind, reason, snapshot)).catch((e) => { log.error?.(`[health] ${kind} report failed: ${e.message}`); return null; });
-    chain = job;
-    return job;
+    const captured = chain.then(() => capture(kind, reason, snapshot, reading));
+    chain = captured.catch(() => null);
+    return captured.then(async (report) => {
+      await send(report);
+      log.log?.(`[health] ${report.title}: ${report.findings} (Notion ${report.notion.state})`);
+      return summaryOf(report);
+    }).catch((e) => { log.error?.(`[health] ${kind} report failed: ${e.message}`); return null; });
   }
 
   function scheduleHourly() {
@@ -405,9 +463,12 @@ export function createHealthReports({
     start() { load(); if (config.enabled) { scheduleHourly(); scheduleRetry(); } return this; },
     // Poll results. A unit seen going from not lit to lit starts the power-on report
     // once per lit session; units already lit when the relay starts are not a power-on.
+    // An unreachable unit keeps its last state unless it was lit: a unit that dropped off the
+    // network in standby (Panasonic ECO) and comes back lit is a power-on, while a lit unit
+    // that only lost the network comes back as unknown, as at relay start.
     observe: guarded('observe', (slot, power) => {
       if (!enabled()) return;
-      if (power == null) { lastPower.delete(slot); return; }
+      if (power == null) { if (isLit(lastPower.get(slot))) lastPower.delete(slot); return; }
       const had = lastPower.has(slot), prev = lastPower.get(slot);
       lastPower.set(slot, power);
       if (![...lastPower.values()].some(isLit)) { session = null; clearPowerOn(); return; }
@@ -435,10 +496,13 @@ export function createHealthReports({
       clearPowerOn(); for (const t of [hourlyTimer, retryTimer]) if (t) cancelTimer(t);
       hourlyTimer = retryTimer = null;
       const t = now();
-      if (config.enabled && anyLitNow() && !(lastReportAt != null && t - lastReportAt < stopQuietMs) && t - lastPowerOffAt >= powerOffWindowMs) trigger(KIND.RELAY_STOP, 'relay stopping');
+      // One attempt per unit within stopReadingMs, so the report is saved before the cap even
+      // when a unit does not answer. A send cut off by the cap stays pending for the next start.
+      const final = config.enabled && anyLitNow() && !(lastReportAt != null && t - lastReportAt < stopQuietMs) && t - lastPowerOffAt >= powerOffWindowMs
+        ? trigger(KIND.RELAY_STOP, 'relay stopping', { attempts: 1, timeoutMs: stopReadingMs }) : null;
       closed = true;
       let cap;
-      await Promise.race([chain, new Promise((resolve) => { cap = timer(resolve, stopTimeoutMs); cap?.unref?.(); })]);
+      await Promise.race([final || chain, new Promise((resolve) => { cap = timer(resolve, stopTimeoutMs); cap?.unref?.(); })]);
       cancelTimer(cap);
     },
     view() {

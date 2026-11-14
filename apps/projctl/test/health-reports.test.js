@@ -93,7 +93,7 @@ test('flags, alarms, unreachable units and missing readings are reported', () =>
   const report = buildReport({ kind: 'hourly', startedAt: Date.parse('2026-11-13T00:00:00Z'), finishedAt: Date.parse('2026-11-13T00:00:03Z'), units, config: CONFIG });
   assert.equal(report.title, 'Frozen | Projectors | Health Log | 2026-11-12 19:00 | Hourly');
   const md = renderMarkdown(report);
-  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| on \| 27 \| 40 \| 13 \| 37 \| Not reached \|/);
+  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| on \| 27 \| 27 \| 40 \| 13 \| 37 \| Not reached \|/);
   assert.match(md, /readings: timeout \(port 1024\)/);
   const none = summarize(units.map((u) => ({ ...u, online: false, verdict: 'unreachable', headroomC: null })));
   assert.match(none.findings, /^No units reachable; 0 of 4 read\./);
@@ -110,7 +110,7 @@ test('Notion page carries the four properties and a unit table', () => {
   assert.ok(page.properties.Findings.rich_text[0].text.content.length <= 2000);
   const tables = page.children.filter((b) => b.type === 'table');
   assert.equal(tables.length, 2);
-  assert.equal(tables[0].table.table_width, 12);
+  assert.equal(tables[0].table.table_width, 13);
   assert.equal(tables[0].table.children.length, 5);
   assert.ok(tables[0].table.children.every((r) => r.table_row.cells.every((c) => c[0].text.content.length > 0)));
   assert.doesNotMatch(JSON.stringify(page), /secret-1/);
@@ -247,6 +247,91 @@ test('Notion failures stay local, retry later and survive a restart', async (t) 
   assert.equal(b.engine.view().engine.notion.pending, 0);
 });
 
+test('a unit that left the network in standby and comes back lit is a power-on; a lit unit that only lost the network is not', async (t) => {
+  const a = rigEngine(t);
+  a.set('off');
+  for (const s of ['P1', 'P2', 'P3', 'P4']) { a.live.get(s).online = false; a.engine.observe(s, null); } // ECO standby drops the network
+  await a.clock.advance(3600000);
+  a.live.get('P1').online = true;
+  a.set('warming', ['P1']); // front panel power on: the first reply is already warming
+  await a.clock.advance(2 * 60000);
+  assert.deepEqual(a.kinds(), ['power-on']);
+
+  const b = rigEngine(t);
+  b.set('on'); // already lit when the relay starts
+  b.live.get('P3').online = false; b.engine.observe('P3', null);
+  b.live.get('P3').online = true; b.set('on', ['P3']); // a network blip mid-show
+  await b.clock.advance(5 * 60000);
+  assert.deepEqual(b.kinds(), [], 'no power-on report for a blip or for units lit at relay start');
+});
+
+test('relay stop saves its report within the cap when a unit does not answer', async (t) => {
+  const tries = [];
+  const { engine, clock, set, kinds, dir } = rigEngine(t, {
+    start: '2026-11-12T22:55:00Z', stopTimeoutMs: 6000,
+    readTelemetry: (p, options) => { tries.push(options.attempts); return p.slot === 'P4' ? new Promise(() => {}) : NOV11[p.slot].readings; },
+  });
+  set('off'); set('on', ['P1']);
+  await clock.advance(30 * 60000); // the power-on report, then no report for half an hour
+  tries.length = 0;
+  const stopping = engine.stop();
+  await clock.flush();
+  await clock.advance(4000); // one attempt per unit, read within 4 s
+  const final = engine.view().reports[0];
+  assert.equal(final.kind, 'relay-stop');
+  assert.ok(fs.existsSync(path.join(dir, `${final.id}.json`)), 'saved before the 6 s cap');
+  assert.match(final.findings, /Temperatures not read: P4\./);
+  assert.deepEqual(tries, [1, 1, 1, 1]);
+  await stopping;
+  assert.deepEqual(kinds(), ['power-on', 'relay-stop']);
+});
+
+test('a report whose Notion send is cut off stays pending and is sent after the next start', async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'projctl-health-cut-'));
+  const config = { ...CONFIG, notion: { databaseId: 'd'.repeat(32) } };
+  const a = rigEngine(t, { dir, config, publish: () => new Promise(() => {}) }); // the relay exits mid-send
+  a.set('off'); a.set('on');
+  a.engine.run();
+  await a.clock.flush();
+  const id = a.engine.view().reports[0].id;
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, `${id}.json`), 'utf8')).notion.state, 'pending', 'saved as pending before the first send');
+  const sent = [];
+  const b = rigEngine(t, { dir, config, publish: async (r) => { sent.push(r.id); return { id: 'p1', url: 'https://notion.example/p1' }; } });
+  assert.equal(b.engine.view().engine.notion.pending, 1);
+  await b.clock.advance(10 * 60000);
+  assert.deepEqual(sent, [id]);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, `${id}.json`), 'utf8')).notion.state, 'published');
+});
+
+test('Notion retries never hold up readings, a round stops while Notion is down, and old reports expire', async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'projctl-health-backlog-'));
+  const config = { ...CONFIG, notion: { databaseId: 'd'.repeat(32) } };
+  const start = Date.parse('2026-11-12T22:10:00Z');
+  const waiting = (ageMs) => {
+    const at = new Date(start - ageMs).toISOString(), id = `${at.replace(/[:.]/g, '-')}-hourly`;
+    fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify({ id, kind: 'hourly', title: id, startedAt: at, finishedAt: at, units: [], notion: { state: 'pending', attempts: 1 } }));
+    return id;
+  };
+  const old = waiting(8 * 24 * 3600000);
+  for (let i = 1; i <= 10; i++) waiting(i * 3600000);
+  let mode = 'down', attempts = 0;
+  const publish = () => { attempts++; return mode === 'down' ? Promise.reject(Object.assign(new Error('Notion unreachable: fetch failed'), { retry: true })) : new Promise(() => {}); };
+  const readAt = [];
+  const { engine, clock, set } = rigEngine(t, { dir, config, publish, readTelemetry: (p) => { readAt.push(clock.now()); return NOV11[p.slot].readings; } });
+  set('on'); // lit at relay start: no power-on report
+  await clock.advance(10 * 60000);
+  assert.equal(attempts, 2, 'the expired report, then one live try; the other nine wait');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, `${old}.json`), 'utf8')).notion.state, 'failed', 'pending for more than 7 days');
+  assert.equal(engine.view().engine.notion.pending, 10);
+  mode = 'hang'; // a dead uplink that never answers
+  await clock.advance(10 * 60000);
+  const off = clock.now();
+  engine.powerOff('P1', 'ui');
+  await clock.flush();
+  assert.equal(readAt.length, 4);
+  assert.ok(readAt.every((at) => at === off), 'power-off readings start at once, not behind the stuck send');
+});
+
 test('a reporting fault never interrupts polling or the power-off path', async (t) => {
   const { engine, clock, set } = rigEngine(t, { projectors: () => { throw new Error('rig unreadable'); } });
   set('off');
@@ -315,4 +400,53 @@ test('Barco health readings read ambient and alarm state only', async (t) => {
   delete values['environment.temperature.ambient_outside.value'];
   const missing = await driver.healthReadings();
   assert.equal(missing.sensors[0].c, null, 'an unsupported sensor is not read as 0 °C');
+});
+
+test('a failed report-time reading uses a recent Thermal watch sample, and the peak since the previous report is shown', async (t) => {
+  const lost = () => Promise.reject(new Error('connection closed before Panasonic reply'));
+  const asked = [];
+  const { engine, clock, set, dir } = rigEngine(t, {
+    readTelemetry: (p, options) => { asked.push(options.attempts); return ['P3', 'P4'].includes(p.slot) ? lost() : NOV11[p.slot].readings; },
+    recentAir: (p, since) => {
+      const n = clock.now();
+      if (p.slot === 'P4') return { c: 37, at: n - 40000, peakC: 38, peakAt: n - 20 * 60000 };
+      if (p.slot === 'P3') return { c: 27, at: n - 10 * 60000, peakC: 28, peakAt: n - 30 * 60000 }; // too old to stand in
+      return null;
+    },
+  });
+  set('off'); set('on');
+  const summary = await engine.run();
+  assert.deepEqual(asked, [3, 3, 3, 3], 'reports ask the reader for three attempts');
+  assert.match(summary.findings, /Least headroom: P4 \(lane D, Panasonic PT-DW830U, 192\.168\.5\.23\) 3 °C \(37 °C intake, 40 °C limit\)\./);
+  assert.match(summary.findings, /Report-time reading failed; latest Thermal watch sample used: P4\./);
+  assert.match(summary.findings, /Temperatures not read: P3\./);
+  assert.match(summary.followUp, /P4 \(lane D, 192\.168\.5\.23\): inspect intake clearance and exhaust path, 3 °C headroom\./);
+  const md = fs.readFileSync(path.join(dir, `${engine.view().reports[0].id}.md`), 'utf8');
+  assert.match(md, /\| P4 \| D \| Panasonic PT-DW830U \| 192\.168\.5\.23 \| on \| 37 watch sample \(\d\d:\d\d:\d\d EST\) \| 38 \(\d\d:\d\d:\d\d EST\) \| 40 \| 3 \|/);
+  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| on \| — \| 28 \(\d\d:\d\d:\d\d EST\) \| 40 \| — \|/);
+  assert.match(md, /readings: connection closed before Panasonic reply/);
+});
+
+test('a Panasonic connection lost after the intake reading keeps the intake and opens no more connections', async (t) => {
+  const sent = [];
+  const port = await fakeServer(t, (socket) => {
+    socket.write('NTCONTROL 0\r');
+    let text = '';
+    socket.on('data', (b) => {
+      text += b; if (!text.includes('\r')) return;
+      const cmd = text.trim().replace(/^00/, ''); sent.push(cmd);
+      if (cmd === 'QTM:0') socket.write('000036/0097\r'); else socket.destroy(); // projector drops the session
+    });
+  });
+  const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
+  const out = await driver.healthReadings();
+  assert.deepEqual(sent, ['QTM:0', 'QTM:1'], 'QTM:2 is not attempted after a lost connection');
+  assert.deepEqual(out.sensors.map((s) => [s.id, s.c]), [['intake', 36], ['qtm1', null], ['qtm2', null]]);
+  assert.match(out.partial, /connection closed/);
+});
+
+test('a Panasonic connection lost before the intake reading fails the reading so it can be retried', async (t) => {
+  const port = await fakeServer(t, (socket) => { socket.write('NTCONTROL 0\r'); socket.on('data', () => socket.destroy()); });
+  const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
+  await assert.rejects(driver.healthReadings(), /connection closed before Panasonic reply/);
 });

@@ -50,7 +50,11 @@ export function createPoller({ target, read, started, succeeded, failed, defer,
     });
     return entry.work;
   }
-  return { poll, async refresh(slot) {
+  return { poll,
+    // Resolves when the slot has no status read in flight. Temperature reads wait for this so
+    // they do not open connections to the projector in the middle of a poll.
+    settled(slot) { return active.get(slot)?.work.then(() => {}, () => {}) ?? Promise.resolve(); },
+    async refresh(slot) {
     // A command's verification must not reuse a read started before that command.
     const previous = active.get(slot)?.work;
     if (previous) await previous;
