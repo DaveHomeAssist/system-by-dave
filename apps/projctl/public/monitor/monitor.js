@@ -168,10 +168,10 @@ function renderShell() {
   if (chip) {
     const sim = live.connected && live.snapshot.simulation;
     $('.avd-dot', chip).className = `avd-dot avd-dot--${live.connected ? sim ? 'automated' : 'done' : live.attempted ? 'blocked' : 'queued'}`;
-    $('[data-relay-word]', chip).textContent = live.connected ? sim ? 'Simulator relay · live' : 'Projctl relay · live' : live.attempted ? 'Relay offline' : 'Connecting…';
+    $('[data-relay-word]', chip).textContent = live.connected ? sim ? 'Practice mode' : 'Projctl relay · live' : live.attempted ? 'Relay offline' : 'Connecting…';
     chip.title = live.connected ? `Connected to the relay at ${location.host}` : 'Recorded facts still show. Live readings need the relay that serves this page.';
   }
-  if (source) { source.dataset.source = live.connected ? 'live' : 'recorded'; source.textContent = live.connected ? 'Live relay data' : 'Recorded only'; }
+  if (source) { source.dataset.source = live.connected ? live.snapshot.simulation ? 'practice' : 'live' : 'recorded'; source.textContent = live.connected ? live.snapshot.simulation ? 'Practice data' : 'Live relay data' : 'Recorded only'; }
   if (lock) {
     const state = lockState();
     lock.dataset.lock = state;

@@ -2,6 +2,8 @@
 
 ## 2026-11-15: Frozen Quiet Watch 1
 
+- Label simulated Monitor readings as Practice data, consistent with the controller.
+
 - Keep failed shared-task saves visible, preserve drafts and prevent duplicate
   submissions. Refresh crew copy and R5 document links across Monitor.
 - Keep screenshot failures in the Frozen case record instead of crashing while
