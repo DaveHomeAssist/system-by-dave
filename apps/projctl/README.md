@@ -33,9 +33,23 @@ before wider exposure; the optional app login is absent when it is unset.
 
 Spec: Frozen at WST | Projector Control App Spec.
 
+## Power Freshness 1
+
+The prepared source release is `Power Freshness 1` (`2026.11.15.3`), reconciled
+with the current repository after Quiet Watch 2. A valid power reply survives
+later optional telemetry failures and the status-poll deadline. Each completed
+optional reply remains usable; missing replies are explicitly unknown/stale.
+A failed core power read still follows ordinary reconnect/backoff behavior.
+Standby, warming and cooling do not request telemetry that requires full power.
+
+Existing command follow-up, Show Lock, field-freshness UI, web diagnostics,
+private settings and cue routes are preserved. See
+[power freshness and deployment preparation](docs/power-freshness.md) for
+verification, limits and the separate deployment gate.
+
 ## Quiet Watch 2
 
-The source release is `Quiet Watch 2` (`2026.11.15.2`). Connection details shows the
+The previous source release is `Quiet Watch 2` (`2026.11.15.2`). Connection details shows the
 interface and relay versions separately, plus the configured polling interval.
 A successful command means accepted, not physically verified. Cached power reads
 as Unknown with its last reported value; missing pattern and alarm data stays Not

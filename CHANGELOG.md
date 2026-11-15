@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-15: Power Freshness 1 preparation
+
+- Preserve validated projector power and completed optional readings when later telemetry fails or reaches its poll deadline. Missing core replies still follow reconnect policy.
+- Retain current command follow-up, freshness UI and Panasonic web diagnostics; add isolated power regression coverage and identifiable release metadata. Deployment remains separately gated.
+
 ## Panasonic web diagnostics, 2026-11-15
 
 - Add read-only signal timing, individual lamp readings and Self Test details to selected projector views, with independent freshness and unavailable states.

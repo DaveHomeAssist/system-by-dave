@@ -14,7 +14,7 @@ test('health is available before login without exposing configuration', async t 
   assert.equal(health.status, 200);
   assert.deepEqual(Object.keys(health.body).sort(), ['ok', 'release', 'service', 'simulation', 'uptimeSeconds']);
   assert.equal(health.body.service, 'projctl');
-  assert.deepEqual(health.body.release, { name: 'Quiet Watch 2', version: '2026.11.15.2' });
+  assert.deepEqual(health.body.release, { name: 'Power Freshness 1', version: '2026.11.15.3' });
   assert.equal(health.body.simulation, true);
   assert.equal((await r.api('state')).status, 401);
 });

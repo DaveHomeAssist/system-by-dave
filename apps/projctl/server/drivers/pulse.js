@@ -47,6 +47,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
         buf += d.toString();
         // The UDM answers with one JSON object and no newline (seen on the WST unit 2026-11-02): parse when it is complete.
         let res; try { res = JSON.parse(buf); } catch { return; }
+        if (res?.jsonrpc !== '2.0' || res.id !== req.id || Object.hasOwn(res, 'result') === Object.hasOwn(res, 'error')) return fail(new Error('Malformed Pulse reply'));
         cleanup(); done = true; sock.end();
         if (res.error) reject(Object.assign(new Error(res.error.message || 'rpc error'), { code: res.error.code }));
         else resolve(res.result);
@@ -142,22 +143,33 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       if (!PULSE_PATTERNS[code]) throw new Error(`pattern ${code} not on this projector`);
       await set('image.testpattern.selected', code, options); await set('image.testpattern.show', true, options); return 'OK';
     },
-    async getStatus({ signal } = {}) {
-      // A successful core query proves liveness. Optional properties may be
-      // unsupported, but total transport failure must reach the relay's offline policy.
+    async getStatus({ signal, onPartial } = {}) {
       const read = (property) => rpc('property.get', { property }, timeoutMs, undefined, signal);
-      const optional = async (fn, fallback) => { try { return await fn(); } catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; return fallback; } };
-      const s = { online: true, power: mapPower(await read('system.state')) };
-      await discover(signal);
-      s.errors = null; // Pulse alarm telemetry is not implemented; unknown is not clear.
-      s.shutter = await optional(async () => { const sh = String(await read('optics.shutter.target')).toLowerCase(); return sh === 'closed' ? SHUTTER.CLOSED : sh === 'open' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; }, SHUTTER.UNKNOWN);
-      s.input = await optional(async () => String(await read(inputProperty)), null);
-      s.lightHours = await optional(async () => Math.round(Number(await read('statistics.laserruntime.value')) / 3600));
-      s.name = await optional(async () => String(await read('system.name')));
-      s.pattern = await optional(async () => (await read('image.testpattern.show')) ? String(await read('image.testpattern.selected')) : 'off', null);
-      s.lens = await optional(() => lensReadback(signal), null);
-      s.signal = await optional(() => read('image.window.main.activesignal'), null);
-      throwIfAborted(signal);
+      const power = mapPower(await read('system.state'));
+      if (power === POWER.UNKNOWN) throw new Error('Invalid Pulse power status');
+      const s = { online: true, power, errors: null, shutter: SHUTTER.UNKNOWN, input: null,
+        lightHours: null, name: null, pattern: null, lens: null, signal: null,
+        stale: ['errors', 'shutter', 'input', 'lightHours', 'name', 'pattern', 'lens', 'signal'] };
+      const publish = () => onPartial?.({ ...s, stale: [...s.stale] });
+      publish();
+      if (power !== POWER.ON) return s;
+      const optional = async (field, fn) => {
+        try {
+          const value = await fn();
+          if (value == null || value === 'unknown' || (typeof value === 'number' && !Number.isFinite(value))) return;
+          s[field] = value; s.stale = s.stale.filter(key => key !== field); publish();
+        } catch (error) { throwIfAborted(signal); if (transportFailure(error)) throw error; }
+      };
+      try {
+        await optional('shutter', async () => { const v = String(await read('optics.shutter.target')).toLowerCase(); return v === 'closed' ? SHUTTER.CLOSED : v === 'open' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; });
+        await optional('input', () => read(inputProperty));
+        await optional('lightHours', async () => { const v = await read('statistics.laserruntime.value'); return typeof v === 'number' && v >= 0 ? Math.round(v / 3600) : null; });
+        await optional('name', () => read('system.name'));
+        await optional('pattern', async () => { const show = await read('image.testpattern.show'); return show === false ? 'off' : show === true ? await read('image.testpattern.selected') : null; });
+        await optional('lens', async () => { const v = await lensReadback(signal); return Object.values(v).some(value => value == null) ? null : v; });
+        await optional('signal', () => read('image.window.main.activesignal'));
+        await discover(signal);
+      } catch (error) { throwIfAborted(signal); }
       return s;
     },
     // Read-only ambient temperature and alarm state for health reports.
