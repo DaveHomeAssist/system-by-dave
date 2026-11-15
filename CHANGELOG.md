@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-11-15: Frozen Quiet Watch 1
+
+- Keep failed shared-task saves visible, preserve drafts and prevent duplicate
+  submissions. Refresh crew copy and R5 document links across Monitor.
+- Keep screenshot failures in the Frozen case record instead of crashing while
+  hashing a nonexistent image.
+
+- Give Monitor four explicit single-screen views, paged activity and checklist rows,
+  and on-demand details. Keep primary controls concise on constrained screens.
+- Add portable test receipts for later monitoring dashboard integration, with
+  deployment and physical acceptance kept separate from software checks.
+
+- Share Light, Dark and System appearance across the Frozen workspace, Home scene,
+  controller, login and Monitor, preserving legacy preferences and browser notes.
+  Keep mobile primary navigation directly visible and local controller links on
+  the controller's own origin; include the standalone handoff in local packages.
+- Distinguish current, cached and missing fields, retain fresh WebSocket feedback
+  over late command replies, show polling cadence and interface/relay versions,
+  and prevent redundant Power on from the operator cards.
+- Bound bad WebSocket traffic and reject unrelated browser origins while retaining
+  authenticated local and approved embedded workflows. Recheck stale feedback at
+  command write time; keep close-shutter and Stop lens recovery paths available.
+- Verify source update inventories and make private backup snapshots include
+  scheduling state without automatic destination pruning.
+
 ## 2026-11-15
 
 - Keep conditional PJLink status reads in one serialized operation so queued controls cannot interrupt the poll. Add a regression for a shutdown queued during the power reply.

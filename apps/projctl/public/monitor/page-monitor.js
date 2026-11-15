@@ -3,7 +3,7 @@ import { startMonitor, onLive, laneModels, patch, esc, $, live, todayISO, easter
 import { ALERTS, CHECKLIST, HUB, isSide } from './monitor-data.js';
 import { eventKind } from '../workspace/calendar.js';
 
-let selected = 'A', schedule = null;
+let selected = 'A', schedule = null, logPage = 0, logRows = 5, checklistIndex = 0;
 const KIND = { 'power-on': 'Power on', hourly: 'Hourly', 'power-off': 'Power off', 'relay-stop': 'Relay stop', manual: 'Manual' };
 const word = v => `<span class="fm-word"><span class="avd-dot avd-dot--${v.st}" aria-hidden="true"></span>${esc(v.word)}</span>`;
 const model = v => v.liveModel || v.model;
@@ -16,11 +16,7 @@ const address = v => v.ip || (live.connected ? 'No address saved' : 'Address fro
 const slotLabel = slot => !slot || slot === '*' || slot === 'all' ? 'All' : laneOfSlot(slot) ? `${slot} · ${laneOfSlot(slot)}` : slot;
 
 function feed(v) {
-  const portal = v.lane === 'A' || v.lane === 'D';
-  const head = portal ? '' : `<span class="pj-mono fm-feed__id">${esc(model(v))} · ${esc(address(v))}</span><span class="fm-feed__state">${word(v)}</span>`;
-  const chips = `<span class="fm-chip fm-chip--tl">${esc(v.input)} · ${esc(v.signal)}</span>${portal ? '' : `<span class="fm-chip fm-chip--tr">Intake ${esc(v.intake)}</span>`}<span class="fm-chip fm-chip--bl">Shutter ${esc(v.shutter)}</span>${portal ? '' : `<span class="fm-chip fm-chip--br">Reply ${esc(v.reply)}</span>`}`;
-  const foot = portal ? `<span class="fm-feed__foot">${word(v)}${v.lampNow ? `<span class="pj-mono fm-small fm-lamp-now">${esc(v.lampNow)}</span>` : ''}<span class="pj-mono fm-small">${esc(lampRecord(v))}</span><span class="pj-mono fm-small">Intake ${esc(v.intake)}<br>Reply ${esc(v.reply)}</span></span>` : '';
-  return `<button type="button" class="fm-feed fm-pick" data-lane="${v.lane}" data-pick="${v.lane}" data-key="feed-${v.lane}" aria-pressed="${v.lane === selected}" aria-label="Projector ${v.lane}, ${esc(v.surface)}, ${esc(v.word)}"><span class="fm-feed__head"><span class="fm-laneidx">${v.lane}</span><span class="fm-lanename">${esc(v.surface)}</span>${head}</span><span class="fm-art ${v.lane === 'C' ? 'fm-art-peaks' : 'fm-art-aurora'} fm-snow">${chips}</span>${foot}</button>`;
+  return `<button type="button" class="fm-feed fm-pick" data-lane="${v.lane}" data-pick="${v.lane}" data-key="feed-${v.lane}" aria-pressed="${v.lane === selected}" aria-label="Projector ${v.lane}, ${esc(v.surface)}, ${esc(v.power)}, shutter ${esc(v.shutter)}"><span class="fm-feed__head"><span class="fm-laneidx">${v.lane}</span><span class="fm-lanename">${esc(v.surface)}</span></span><span class="fm-art ${v.lane === 'C' ? 'fm-art-peaks' : 'fm-art-aurora'}"><strong class="fm-feed-power">${esc(v.power)}</strong><span class="fm-feed-shutter">Shutter ${esc(v.shutter)}</span></span><span class="fm-feed__foot">${word(v)}<span class="fm-small">Reply ${esc(v.reply)}</span></span></button>`;
 }
 
 const row = cells => `<div role="row" class="fm-tr">${cells}</div>`;
@@ -36,8 +32,13 @@ function render() {
     : '<span class="avd-dot avd-dot--idle" aria-hidden="true"></span><span>Relay offline</span>');
   patch($('#mon-mv'), lanes.map(feed).join(''));
 
-  const events = live.connected ? live.events.slice(-80).reverse() : [];
-  patch($('#mon-log'), `<div role="row" class="fm-tr fm-tr--head"><span role="columnheader" class="avd-eyebrow">Time</span><span role="columnheader" class="avd-eyebrow">Slot</span><span role="columnheader" class="avd-eyebrow">Command</span><span role="columnheader" class="avd-eyebrow">Result</span><span role="columnheader" class="avd-eyebrow">Source</span></div>`
+  const allEvents = live.connected ? live.events.slice(-80).reverse() : [];
+  logPage = Math.min(logPage, Math.max(0, Math.ceil(allEvents.length / logRows) - 1));
+  const events = allEvents.slice(logPage * logRows, (logPage + 1) * logRows);
+  $('#mon-log-newer').disabled = logPage === 0;
+  $('#mon-log-older').disabled = (logPage + 1) * logRows >= allEvents.length;
+  $('#mon-log-page').textContent = allEvents.length ? `${logPage * logRows + 1} to ${logPage * logRows + events.length} of ${allEvents.length}` : 'No entries';
+  patch($('#mon-log'), `<div role="row" class="fm-tr fm-tr--head"><span role="columnheader" class="avd-eyebrow">Time</span><span role="columnheader" class="avd-eyebrow">Projector</span><span role="columnheader" class="avd-eyebrow">Command</span><span role="columnheader" class="avd-eyebrow">Result</span><span role="columnheader" class="avd-eyebrow">Source</span></div>`
     + (events.length ? events.map(e => row(`<span role="cell" class="fm-td fm-td--mono">${easternTime(e.at)}</span><span role="cell" class="fm-td fm-td--mono">${esc(slotLabel(e.slot))}</span><span role="cell" class="fm-td fm-td--clip">${esc(e.command)}</span><span role="cell" class="fm-td fm-td--clip fm-td--muted">${esc([e.result, e.detail].filter(Boolean).join(' · '))}</span><span role="cell" class="fm-td fm-td--clip fm-td--muted">${esc(e.source || '')}</span>`)).join('')
       : empty(live.connected ? 'No commands recorded on this relay yet.' : 'The command log fills from the relay that serves this page.')));
 
@@ -48,21 +49,61 @@ function render() {
       : '<span class="fm-ev" data-kind="other">No calls listed today</span>');
 
   const v = L[selected], insp = $('#mon-insp');
+  $('#mon-details').textContent = `${selected} details`;
+  $('#mon-details').setAttribute('aria-label', `Details for projector ${selected}`);
   insp.dataset.lane = selected;
   patch(insp, `<div class="avd-panel__head"><h2 id="insp-title" class="avd-panel__title"><span class="avd-panel__index">${v.lane}</span>Projector ${v.lane}</h2><span class="avd-state"><span class="avd-dot avd-dot--${v.st}" aria-hidden="true"></span>${esc(v.word)}</span></div><div class="avd-panel__body"><div class="pj-lane"><h3>${esc(v.surface)}</h3><span class="pj-mono">${esc(v.role)} · ${esc(v.orientation)}</span></div><div class="fm-kvs">${[
-    kv('Model', model(v)), kv('Address', address(v)), kv('Labels', `${v.prod} production · ${v.slot || '—'} controller`), kv('Native', v.native),
-    kv('Receiving', `${v.input} · ${v.signal}`), kv('Control', v.route), kv('Light', light(v))].join('')}</div><a class="avd-btn avd-btn--primary avd-btn--block" href="/" target="_blank" rel="noopener">Open in Projctl ↗</a><p class="pj-mono fm-small">Monitor only. Lighting fires the cues and Millumin sends power and shutter.</p></div>`);
+    kv('Model', model(v)), kv('Address', address(v)), kv('Labels', `${v.prod} production · ${v.slot || 'unassigned'} controller`), kv('Resolution', v.native),
+    kv('Input reported', `${v.input} · ${v.signal}`), kv('Control', v.route), kv('Light', light(v))].join('')}</div><a class="avd-btn avd-btn--primary avd-btn--block" href="/" target="_blank" rel="noopener noreferrer">Open in Projctl ↗</a><p class="pj-mono fm-small">Monitor only. Lighting fires the cues and Millumin sends power and shutter.</p></div>`);
 
   const h = live.health, last = h?.reports?.[0], engine = h?.engine;
   const next = !engine ? '' : engine.state === 'disabled' ? 'reports are off on this relay' : engine.nextHourlyAt ? `next ${shortTime(engine.nextHourlyAt)}` : 'next on the hour while lit';
-  $('#mon-health-line').textContent = !live.connected ? 'Health readings come from the relay that serves this page.'
-    : !h ? 'Reading the report summary…' : last ? `Last: ${KIND[last.kind] || last.title || 'Report'} · ${shortTime(last.startedAt)} · ${next}` : `No report written yet · ${next}`;
+  $('#mon-health-line').textContent = !live.connected ? 'Connect to the controller to see health readings.'
+    : !h ? 'Loading the latest report…' : last ? `Last: ${KIND[last.kind] || last.title || 'Report'} · ${shortTime(last.startedAt)} · ${next}` : `No report yet · ${next}`;
   patch($('#mon-health'), `<div role="row" class="fm-tr fm-tr--head"><span role="columnheader" class="avd-eyebrow">Lane</span><span role="columnheader" class="avd-eyebrow">Intake air</span><span role="columnheader" class="avd-eyebrow">Heat</span><span role="columnheader" class="avd-eyebrow">Reply</span></div>`
     + ['A', 'B', 'C', 'D'].map(k => L[k]).map(x => row(`<span role="cell" class="fm-td fm-td--clip">${x.lane} · ${esc(x.surface)}</span><span role="cell" class="fm-td fm-td--mono">${esc(x.intake)}</span><span role="cell" class="fm-td fm-td--clip"><span class="avd-dot avd-dot--${x.heatSt}" aria-hidden="true"></span>${esc(x.heat)}</span><span role="cell" class="fm-td fm-td--mono">${esc(x.reply)}</span>`)).join(''));
 }
 
 $('#mon-alerts').innerHTML = ALERTS.map(a => `<div class="fm-alertcard" data-state="${a.st}"><strong><span class="avd-dot avd-dot--${a.st}" aria-hidden="true"></span>${esc(a.title)}</strong><span>${esc(a.detail)}</span><span class="pj-mono fm-small">${esc(a.when)}</span></div>`).join('');
-$('#mon-checklist').innerHTML = CHECKLIST.map(c => `<li><span class="avd-dot avd-dot--idle" aria-hidden="true"></span><span><b>${esc(c.title)}.</b> <span class="fm-dim">${esc(c.text)}</span></span></li>`).join('');
+function renderChecklist() {
+  const c = CHECKLIST[checklistIndex];
+  $('#mon-checklist').innerHTML = `<li><span><b>${esc(c.title)}.</b> <span class="fm-dim">${esc(c.text)}</span></span></li>`;
+  $('#mon-check-page').textContent = `${checklistIndex + 1} of ${CHECKLIST.length}`;
+  $('#mon-check-prev').disabled = checklistIndex === 0;
+  $('#mon-check-next').disabled = checklistIndex === CHECKLIST.length - 1;
+}
+renderChecklist();
+$('#mon-check-prev').onclick = () => { checklistIndex--; renderChecklist(); };
+$('#mon-check-next').onclick = () => { checklistIndex++; renderChecklist(); };
+$('#mon-log-newer').onclick = () => { logPage--; render(); };
+$('#mon-log-older').onclick = () => { logPage++; render(); };
+$('#mon-details').onclick = () => $('#mon-detail-dialog').showModal();
+$('#mon-records').onclick = () => $('#mon-records-dialog').showModal();
+document.querySelectorAll('[data-close-dialog]').forEach(button => { button.onclick = () => button.closest('dialog').close(); });
+const tabs = [...document.querySelectorAll('[data-dashboard-view]')];
+function selectDashboard(tab) {
+  tabs.forEach(button => {
+    const active = button === tab;
+    button.setAttribute('aria-selected', String(active)); button.tabIndex = active ? 0 : -1;
+    document.getElementById(button.getAttribute('aria-controls')).hidden = !active;
+  });
+  sizeLog();
+}
+function sizeLog() {
+  const panel = $('#mon-panel-activity');
+  if (panel.hidden) return;
+  const rows = Math.max(1, Math.min(12, Math.floor((panel.clientHeight - 164) / 32)));
+  if (rows !== logRows) { logRows = rows; logPage = 0; render(); }
+}
+for (const [i, tab] of tabs.entries()) {
+  tab.onclick = () => selectDashboard(tab);
+  tab.onkeydown = event => {
+    const index = event.key === 'ArrowRight' ? (i + 1) % tabs.length : event.key === 'ArrowLeft' ? (i + tabs.length - 1) % tabs.length : event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : null;
+    if (index == null) return;
+    event.preventDefault(); selectDashboard(tabs[index]); tabs[index].focus();
+  };
+}
+new ResizeObserver(sizeLog).observe($('#fm-main'));
 $('#mon-hub').href = HUB;
 $('#mon-mv').addEventListener('click', event => { const lane = event.target.closest('[data-pick]')?.dataset.pick; if (lane) { selected = lane; render(); } });
 fetch('../workspace/tech-schedule.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : []).then(d => { schedule = Array.isArray(d) ? d : []; render(); }).catch(() => { schedule = []; render(); });

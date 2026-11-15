@@ -12,8 +12,9 @@ test('health is available before login without exposing configuration', async t 
   const r = await startRelay({ PJ_PASSCODE: 'test-only' }); t.after(r.close);
   const health = await r.api('health');
   assert.equal(health.status, 200);
-  assert.deepEqual(Object.keys(health.body).sort(), ['ok', 'service', 'simulation', 'uptimeSeconds']);
+  assert.deepEqual(Object.keys(health.body).sort(), ['ok', 'release', 'service', 'simulation', 'uptimeSeconds']);
   assert.equal(health.body.service, 'projctl');
+  assert.deepEqual(health.body.release, { name: 'Quiet Watch 1', version: '2026.11.15.1' });
   assert.equal(health.body.simulation, true);
   assert.equal((await r.api('state')).status, 401);
 });

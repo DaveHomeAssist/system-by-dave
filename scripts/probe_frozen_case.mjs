@@ -157,11 +157,18 @@ async function step(id, title, action, { writes = [], detail = '', blocking = tr
   await pause(900);
   const after = await storage(), changed = [...new Set([...Object.keys(before), ...Object.keys(after)])].filter(key => before[key] !== after[key]);
   const unexpected = changed.filter(key => !writes.includes(key) && !DEVICE_LOCAL.includes(key) && !/draft|recovery/i.test(key));
-  const shot = `steps/${String(index).padStart(2, '0')}-${id}.png`; await page.screenshot({ path: join(OUT, shot) }).catch(() => {});
+  const shot = `steps/${String(index).padStart(2, '0')}-${id}.png`, evidence = [];
+  try {
+    await page.screenshot({ path: join(OUT, shot), timeout: 60000 });
+    evidence.push({ file: shot, sha256: sha(join(OUT, shot)) });
+  } catch (failure) {
+    status = 'failed';
+    error = [error, `Screenshot failed: ${String(failure.message || failure).split('\n').slice(0, 8).join(' | ')}`].filter(Boolean).join(' | ');
+  }
   const monitors = { ...drain(), storageChanged: changed, unexpectedWrites: unexpected, overflow: await overflow() };
   const flags = [...monitors.pageErrors.map(text => `page error: ${text}`), ...monitors.consoleErrors.map(text => `console error: ${text}`), ...monitors.failedRequests.map(text => `request failed: ${text}`), ...monitors.badResponses.map(text => `bad response: ${text}`), ...unexpected.map(key => `unexpected saved key changed: ${key}`), ...(!scrolls && monitors.overflow && (monitors.overflow.x > 0 || monitors.overflow.y > 0) ? [`page scrolls by ${monitors.overflow.x} x ${monitors.overflow.y} px`] : [])];
   if (status === 'passed' && flags.length) status = 'flagged';
-  const entry = { stage, step: id, index, title, detail, status, duration_ms: Date.now() - began, film: [from, clock()], observed, flags, monitors, evidence: [{ file: shot, sha256: sha(join(OUT, shot)) }], ...(error ? { error } : {}) };
+  const entry = { stage, step: id, index, title, detail, status, duration_ms: Date.now() - began, film: [from, clock()], observed, flags, monitors, evidence, ...(error ? { error } : {}) };
   emit({ event: 'step_finished', ...entry }); steps.push(entry);
   console.log(`${status.toUpperCase().padEnd(7)} ${String(index).padStart(2, '0')} ${id}${error ? ` :: ${error}` : ''}${flags.length ? ` :: ${flags.join('; ')}` : ''}`);
   if (status === 'failed' && blocking) stopped = id;

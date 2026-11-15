@@ -36,7 +36,7 @@ export function patternPanelContent({ projector: p, lane, table, supported, curr
     out.append(head('Test patterns', ''), note('No assigned projector · pattern controls unavailable'));
     return out;
   }
-  const currentName = !supported ? 'Not supported' : patternIsOff(current) ? 'Off' : table?.[current] || current || 'Unknown';
+  const currentName = !supported ? 'Not supported' : current == null || current === '' || current === 'unknown' ? 'Not reported' : patternIsOff(current) ? 'Off' : table?.[current] || current;
   out.append(head('Test patterns', `<span class="pj-dc-state">${esc(currentName)}${stale ? ' (last known)' : ''}</span>`));
   if (!supported) {
     out.append(note('This driver has no internal test patterns. Reset to HDMI stays available.'));

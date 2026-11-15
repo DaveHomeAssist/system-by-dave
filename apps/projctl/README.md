@@ -33,6 +33,27 @@ before wider exposure; the optional app login is absent when it is unset.
 
 Spec: Frozen at WST | Projector Control App Spec.
 
+## Quiet Watch 1
+
+The source release is `Quiet Watch 1` (`2026.11.15.1`). Connection details shows the
+interface and relay versions separately, plus the configured polling interval.
+A successful command means accepted, not physically verified. Cached power reads
+as Unknown with its last reported value; missing pattern and alarm data stays Not
+reported. Read [the hardening brief](docs/quiet-watch.md) for scope and acceptance.
+
+Appearance offers Light, Dark and System across the controller, login, Monitor
+and Frozen workspace. A new browser starts light. Explicit choices win over the
+OS; System tracks OS changes. The shared `frozen.theme.v1` preference persists on
+the same origin and updates other open tabs. Existing preferences migrate without
+changing notes. Embedded views inherit the parent appearance for that view;
+separate website/controller origins do not silently sync their saved choices.
+Blocked browser storage permits a temporary choice and explains the limitation.
+
+Before transferring a source update, run `node scripts/verify-update.js` with the
+package directory. It checks every recorded digest and rejects missing, changed,
+unlisted and unsafe entries. The checksum inventory proves integrity, not a
+publisher signature. Live settings and dependencies are separate from that package.
+
 ## Frozen Monitor
 
 `http://<relay-ip>:8080/monitor/` opens the six-page Frozen Monitor: live A–D state, the
@@ -57,7 +78,7 @@ Env overrides: PORT, OSC_PORT, TCP_PORT, POLL_MS, RIG.
 2. Rig tab: the tile goes live within 10 s once the relay can reach the projector.
 3. Set the rig how you want it, Presets tab, name it, Save current rig.
 
-With DHCP the relay re-finds projectors by MAC every 60 s using PJLink class 2 search. The Find projectors button does it on demand.
+The relay retries saved addresses. Find projectors runs an explicit PJLink Class 2 search; background recovery does not rewrite addresses.
 
 ## Power off and Show Lock
 
@@ -250,6 +271,7 @@ lifecycle and drawing coexistence using synthetic geometry.
 
 To prepare a synchronized update from a clean source checkout, run
 `node scripts/package-update.js /path/to/new-output /path/to/private-venue`.
+Commit the reviewed source and generated assets first; packaging refuses uncommitted changes.
 Omit the last argument for a code-only update. The resulting directory has a
 source commit/model version manifest and file checksums, without a saved rig.
 For the managed Mac service, run `node deploy/install-service.js` followed by

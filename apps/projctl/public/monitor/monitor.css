@@ -1,7 +1,6 @@
 /* Frozen Monitor: six monitor pages served by the projctl relay.
    Loads after ../avd/tokens.css, ../avd/bundle.css and ../app.css, which own the Frozen light and
-   dark palettes, the header, tiles and lane colours. This layer adds the Deep Freeze theme, the
-   calendar and link tokens, and the monitor layouts. */
+   dark palettes, the header, tiles and lane colours. This layer adds calendar and link colors and the monitor layouts. */
 
 :root { --on-lane: #102131; --snow-night: #041018; --snow-ink: #edf5fb; --aurora-teal: rgba(62,184,212,.34); --aurora-violet: rgba(141,101,173,.28);
   --glacier-top: #f7fcff; --glacier-mid: #b8e8f5; --glacier-deep: #5fc0d8;
@@ -206,7 +205,7 @@ button.fm-node[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 
 .fm-zonelabel { position: absolute; white-space: nowrap; }
 .fm-cuegrid { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
 .fm-cuemap { font-size: 13px; }
-.fm-cuemap .fm-tr { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(0, 1.3fr) 44px; padding: 8px 14px; align-items: start; }
+.fm-cuemap .fm-tr { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(0, 1.3fr); padding: 8px 14px; align-items: start; }
 .fm-cuemap .fm-tr--head { align-items: end; }
 .fm-cuemap .fm-td:first-child { font-weight: 600; }
 .fm-osc { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }

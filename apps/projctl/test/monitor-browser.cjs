@@ -35,7 +35,7 @@ const SIZES = [[1440, 900], [1024, 768], [680, 900], [375, 812]];
     await until(async () => (await page.locator('#mon-log [role=row]').count()) > 2);
     // Recorded lamp notes keep their date and label; they never read as a current reading.
     assert.match(await page.locator('#mon-insp').textContent(), /Recorded: Lamp 1 on · Lamp 2 FAILED · Nov 13 snapshot/);
-    assert.match(await page.locator('.fm-feed[data-lane=A] .fm-feed__foot').textContent(), /Recorded: Lamp 1 on · Lamp 2 FAILED · Nov 13 snapshot/);
+    assert.doesNotMatch(await page.locator('.fm-feed[data-lane=A]').textContent(), /Nov 13 snapshot/, 'historical records stay in the deliberate detail view');
     await page.locator('.fm-feed[data-lane=B]').click();
     assert.equal(await page.locator('#insp-title').textContent(), 'BProjector B');
     assert.equal(await page.locator('#mon-insp').getAttribute('data-lane'), 'B');
@@ -44,9 +44,9 @@ const SIZES = [[1440, 900], [1024, 768], [680, 900], [375, 812]];
 
     // Theme: a fresh browser starts light; the choice is remembered across pages.
     assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'light');
-    await page.locator('[data-theme-choice="deep-freeze"]').click();
+    await page.locator('[data-theme-choice="dark"]').click();
     await page.goto(relay.base + '/monitor/rig.html');
-    assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'deep-freeze');
+    assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
     console.log('theme memory');
 
     // Rig: Stop lens is the only live control, and the relay accepts it under Show Lock.

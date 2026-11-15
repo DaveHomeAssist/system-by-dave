@@ -25,7 +25,8 @@ $('#fm-notes-export').addEventListener('click', () => {
 });
 window.addEventListener('beforeunload', event => { if (!storageAvailable && notes.value) { event.preventDefault(); event.returnValue = ''; } });
 
-let tasks = [];
+let tasks = [], taskError = '', addingTask = false;
+const pendingTasks = new Set();
 const feedback = $('#fm-task-feedback');
 async function taskAPI(path = '', data) {
   const r = await fetch(TASKS + path, { method: data ? 'POST' : 'GET', headers: data ? { 'Content-Type': 'application/json' } : {}, body: data ? JSON.stringify(data) : undefined, cache: 'no-store', signal: AbortSignal.timeout(10000) });
@@ -34,33 +35,40 @@ async function taskAPI(path = '', data) {
   return result;
 }
 function renderTasks() {
-  $('#fm-task-list').innerHTML = tasks.length ? tasks.map(t => `<li class="${t.done ? 'fm-done' : ''}"><label><input type="checkbox" data-task="${esc(t.id)}" data-key="task-${esc(t.id)}" ${t.done ? 'checked' : ''}><span>${esc(t.text)}</span></label><span class="pj-mono fm-small">${t.done ? 'Done' : 'Open'}</span></li>`).join('')
+  $('#fm-task-list').innerHTML = tasks.length ? tasks.map(t => `<li class="${t.done ? 'fm-done' : ''}"><label><input type="checkbox" data-task="${esc(t.id)}" data-key="task-${esc(t.id)}" ${t.done ? 'checked' : ''} ${pendingTasks.has(t.id) ? 'disabled' : ''}><span>${esc(t.text)}</span></label><span class="pj-mono fm-small">${t.done ? 'Done' : 'Open'}</span></li>`).join('')
     : '<li><span class="fm-muted">No tasks yet. Add the first one.</span></li>';
 }
 async function loadTasks() {
-  try { tasks = (await taskAPI()).tasks || []; renderTasks(); $('#fm-task-state').textContent = 'Shared · live'; feedback.textContent = 'Tasks up to date.'; }
-  catch (error) { $('#fm-task-state').textContent = 'Unavailable'; feedback.textContent = `${error.message} Your personal notes still work.`; }
+  try { tasks = (await taskAPI()).tasks || []; renderTasks(); $('#fm-task-state').textContent = 'Shared · live'; feedback.textContent = taskError || 'Tasks up to date.'; }
+  catch (error) { $('#fm-task-state').textContent = 'Unavailable'; feedback.textContent = taskError || `${error.message} Your personal notes still work.`; }
 }
 $('#fm-task-list').addEventListener('change', async event => {
   const box = event.target.closest('[data-task]'), task = tasks.find(t => String(t.id) === box?.dataset.task);
-  if (!task) return;
+  if (!task || pendingTasks.has(task.id)) return;
+  pendingTasks.add(task.id); box.disabled = true; taskError = '';
   try { await taskAPI('/' + encodeURIComponent(task.id), { revision: task.revision, done: box.checked, text: task.text }); }
-  catch (error) { feedback.textContent = error.message; }
+  catch (error) { taskError = error.message; }
+  pendingTasks.delete(task.id);
   await loadTasks();
+  if (box.isConnected) { box.checked = task.done; box.disabled = false; }
 });
 $('#fm-task-add').addEventListener('submit', async event => {
   event.preventDefault();
+  if (addingTask) return;
   const field = $('#fm-task-text'), text = field.value.trim();
   if (!text) return;
-  try { await taskAPI('', { text }); field.value = ''; await loadTasks(); } catch (error) { feedback.textContent = error.message; }
+  const submit = event.currentTarget.querySelector('[type=submit]');
+  addingTask = true; taskError = ''; submit.disabled = true;
+  try { await taskAPI('', { text }); if (field.value.trim() === text) field.value = ''; await loadTasks(); }
+  catch (error) { taskError = error.message; feedback.textContent = taskError; }
+  finally { addingTask = false; submit.disabled = false; }
 });
-$('#fm-task-refresh').addEventListener('click', loadTasks);
+$('#fm-task-refresh').addEventListener('click', () => { taskError = ''; loadTasks(); });
 $('#fm-shared-board').href = SHARED_BOARD;
 loadTasks();
 setInterval(() => { if (!document.hidden) loadTasks(); }, 10000);
 
-$('#fm-docs').innerHTML = DOCUMENTS.map(d => `<a href="${esc(d.href)}" target="_blank" rel="noopener noreferrer"><span class="avd-eyebrow">${esc(d.tag)}</span><strong>${esc(d.title)} ↗</strong><span>${esc(d.text)}</span></a>`).join('')
-  + '<p class="fm-muted">Nov 14 pixel routing reply is not in the drawings yet.</p>';
+$('#fm-docs').innerHTML = DOCUMENTS.map(d => `<a href="${esc(d.href)}" target="_blank" rel="noopener noreferrer"><span class="avd-eyebrow">${esc(d.tag)}</span><strong>${esc(d.title)} ↗</strong><span>${esc(d.text)}</span></a>`).join('');
 $('#fm-records').innerHTML = RECORDS.map(r => `<li><a href="${esc(r.href)}" target="_blank" rel="noopener noreferrer">${esc(r.title)} ↗</a></li>`).join('');
 
 startMonitor();

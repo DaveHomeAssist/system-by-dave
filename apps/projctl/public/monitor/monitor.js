@@ -2,6 +2,8 @@
 // the live lane model. The monitor reads relay state; the only command it can send is Stop lens.
 import { rigLanes } from '../lanes.js';
 import { createConnectionMonitor } from '../projector-connection.js';
+import { fieldFeedback } from '../status-feedback.js';
+import { patternIsOff } from '../output-recovery.js';
 import { heatDetail } from '../heat-notice.js';
 import { LANES, OPENING } from './monitor-data.js';
 
@@ -18,25 +20,6 @@ export const easternTime = value => { const t = Date.parse(value); return Number
 export const shortTime = value => { const t = Date.parse(value); return Number.isFinite(t) ? clockLine.format(new Date(t)).replace(/:\d\d (?=[AP]M)/, ' ') : '—'; };
 const dayNumber = iso => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / 86400000;
 export const daysBetween = (from, to) => Math.round(dayNumber(to) - dayNumber(from));
-
-// ---- Theme: Light, Dark or Deep Freeze. A fresh browser follows Projctl's saved theme, else light.
-const THEME_KEY = 'projctl.monitor.theme.v1';
-const THEMES = ['light', 'dark', 'deep-freeze'];
-const THEME_COLOR = { light: '#ffffff', dark: '#102438', 'deep-freeze': '#0a2232' };
-function savedTheme() {
-  try {
-    const own = localStorage.getItem(THEME_KEY);
-    if (THEMES.includes(own)) return own;
-    const projctl = JSON.parse(localStorage.getItem('projctl.ui.v1') || 'null');
-    if (projctl?.version === 1 && ['light', 'dark'].includes(projctl.theme)) return projctl.theme;
-  } catch { /* Storage can be unavailable; the light default still works. */ }
-  return 'light';
-}
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  document.querySelectorAll('[data-theme-choice]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themeChoice === theme)));
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[theme]);
-}
 
 // ---- Clock: Eastern time with the countdown to opening night.
 function startClock() {
@@ -147,22 +130,23 @@ export function laneModels(now = Date.now()) {
   for (const rec of LANES) {
     const entry = byLane[rec.lane], p = entry?.projector;
     const v = { ...rec, projector: p || null, slot: p?.slot || null, ip: p?.ip || null, current: false, st: 'idle', word: 'Relay offline',
-      power: '—', shutter: '—', input: '—', signal: '—', pattern: '—', reply: '—', intake: '—', heat: '—', heatSt: 'idle', lampNow: null,
+      power: 'UNKNOWN', shutter: 'Unknown', input: 'Not reported', signal: 'Not reported', pattern: 'Not reported', reply: 'No reply yet', intake: 'No reading', heat: 'Unknown', heatSt: 'idle', lampNow: null,
       liveModel: p ? [p.make, p.model].filter(Boolean).join(' ') : null };
     if (live.connected && !p) { v.st = entry?.conflict ? 'waiting' : 'idle'; v.word = entry?.conflict ? 'Lane conflict' : 'Unassigned'; }
     if (live.connected && p) {
       const c = monitor(p, true, pollMs, now), s = p.status || {};
       v.current = c.current;
-      v.reply = c.lastSuccessAt ? ago(now - Date.parse(c.lastSuccessAt)) : 'No reply yet';
+      v.reply = c.ageLabel;
       if (c.current) {
+        const reported = field => fieldFeedback(p, field, c).current;
         const words = { on: ['done', 'Powered'], warming: ['active', 'Warming'], cooling: ['waiting', 'Cooling'], off: ['idle', 'Standby'] };
-        [v.st, v.word] = words[s.power] || ['queued', 'Power unknown'];
-        v.power = String(s.power || 'unknown').toUpperCase();
-        v.shutter = s.shutter === 'open' ? 'Open' : s.shutter === 'closed' ? 'Closed' : 'Unknown';
-        v.input = p.displayInfo?.input?.label && p.displayInfo.input.label !== 'Reported input' ? p.displayInfo.input.label : s.input || 'Not reported';
+        [v.st, v.word] = reported('power') && words[s.power] || ['queued', 'Power unknown'];
+        v.power = reported('power') ? String(s.power).toUpperCase() : 'UNKNOWN';
+        v.shutter = !reported('shutter') ? 'Unknown' : s.shutter === 'open' ? 'Open' : s.shutter === 'closed' ? 'Closed' : 'Unknown';
+        v.input = !reported('input') ? 'Not reported' : p.displayInfo?.input?.label && p.displayInfo.input.label !== 'Reported input' ? p.displayInfo.input.label : s.input;
         v.signal = signalText(p.displayInfo);
-        v.pattern = s.pattern ? String(s.pattern) : 'Off';
-        if (s.errors?.lamp > 0) v.lampNow = 'Lamp error reported now';
+        v.pattern = !reported('pattern') ? 'Not reported' : patternIsOff(s.pattern) ? 'Off' : p.patterns?.[s.pattern] || String(s.pattern);
+        if (reported('errors') && s.errors?.lamp > 0) v.lampNow = 'Lamp error reported now';
       } else {
         const words = { checking: ['queued', 'Checking'], stale: ['waiting', 'Stale reply'], reconnecting: ['blocked', 'No reply'], unassigned: ['idle', 'No address'] };
         [v.st, v.word] = words[c.state] || ['blocked', 'No reply'];
@@ -205,11 +189,6 @@ export function patch(el, html) {
 
 export function startMonitor({ health = false } = {}) {
   wantHealth = health;
-  applyTheme(savedTheme());
-  document.querySelectorAll('[data-theme-choice]').forEach(button => button.addEventListener('click', () => {
-    applyTheme(button.dataset.themeChoice);
-    try { localStorage.setItem(THEME_KEY, button.dataset.themeChoice); } catch { /* This visit keeps the choice. */ }
-  }));
   startClock();
   renderShell();
   open();
