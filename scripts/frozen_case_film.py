@@ -7,7 +7,8 @@ Run the case with --film first, so the session is at operator pace:
     node scripts/probe_frozen_case.mjs <run-dir> --film
 
 The session film is set above a caption band that names each step as it happens and shows its result,
-between an opening card and a closing card built from the run's own summary. Needs ffmpeg and Pillow.
+between an opening card and a closing card built from the run's own summary. Needs Pillow and any ffmpeg
+with libx264: Pillow draws the captions, so ffmpeg needs no text filter.
 Inter is used when installed; otherwise the first of the usual system sans fonts found."""
 import json, subprocess, sys, textwrap
 from pathlib import Path
@@ -76,27 +77,36 @@ def closing():
 outro = closing()
 
 # Caption band: one line for the step, one for what to expect, and the result as the step ends.
-filters = [f"[0:v]scale={VW}:{VH}:flags=lanczos,pad={W}:{H}:{(W - VW) // 2}:0:color=0x0e1114,drawbox=x=0:y={VH}:w={W}:h={H - VH}:color=0x16181b:t=fill"]
-def text(name, body, **options):
-    (work / name).write_text(body)
-    pairs = ':'.join(f'{key}={value}' for key, value in options.items())
-    filters.append(f"drawtext=textfile='{work / name}':expansion=none:{pairs}")
+# Pillow draws each band and the bands run under the film as a timed image sequence, so ffmpeg needs no text
+# filter (many builds, Homebrew's among them, lack drawtext) and no filter script file (ffmpeg 8 dropped
+# -filter_complex_script). Text is placed by its top edge, as drawtext placed it.
 colour = {'passed': GREEN, 'failed': RED, 'flagged': AMBER}
+def band(name, step=None, line='', tint=GREY, status=None):
+    image = Image.new('RGB', (W, H - VH), '#16181b'); pen = ImageDraw.Draw(image)
+    if step:
+        pen.text((96, 68), f"STAGE {step.get('stage', 1)}", font=font(SEMI, 20), fill=GREY, anchor='la')
+        pen.text((96, 22), f"{step['index']:02d} / {len(steps):02d}", font=font(SEMI, 30), fill=RUST, anchor='la')
+        pen.text((250, 18), step['title'], font=font(SEMI, 36), fill='white', anchor='la')
+        if line: pen.text((250, 66), line[:150], font=font(REGULAR if tint == GREY else SEMI, 24), fill=tint, anchor='la')
+        if status: pen.text((W - 96, 22), status.upper(), font=font(BOLD, 30), fill=colour[status], anchor='ra')
+    image.save(work / name); return work / name
+quote = lambda path: "'" + str(path).replace("'", "'\\''") + "'"
+blank, segments, cursor = band('band-blank.png'), [], 0.0
 for position, step in enumerate(steps):
     start = step['film'][0]; end = steps[position + 1]['film'][0] if position + 1 < len(steps) else step['film'][1] + 1.2
-    done = max(start + 0.4, step['film'][1] - 1.0)
-    span = f"enable='between(t,{start:.2f},{end:.2f})'"
-    text(f"g{position}.txt", f"STAGE {step.get('stage', 1)}", fontfile=SEMI, fontsize=20, fontcolor=GREY.replace('#', '0x'), x=96, y=VH + 68, **{'enable': span[7:]})
-    text(f"n{position}.txt", f"{step['index']:02d} / {len(steps):02d}", fontfile=SEMI, fontsize=30, fontcolor=RUST.replace('#', '0x'), x=96, y=VH + 22, **{'enable': span[7:]})
-    text(f"t{position}.txt", step['title'], fontfile=SEMI, fontsize=36, fontcolor='white', x=250, y=VH + 18, **{'enable': span[7:]})
-    note = step.get('error') if step['status'] == 'failed' else ('; '.join(step['flags']) if step['status'] == 'flagged' else step.get('detail', ''))
-    before = f"'between(t,{start:.2f},{done:.2f})'"; after = f"'between(t,{done:.2f},{end:.2f})'"
-    if step.get('detail'): text(f"d{position}.txt", step['detail'][:150], fontfile=REGULAR, fontsize=24, fontcolor=GREY.replace('#', '0x'), x=250, y=VH + 66, **{'enable': before if step['status'] != 'passed' else span[7:]})
-    if step['status'] != 'passed' and note: text(f"e{position}.txt", note[:150], fontfile=SEMI, fontsize=24, fontcolor=colour[step['status']].replace('#', '0x'), x=250, y=VH + 66, **{'enable': after})
-    text(f"s{position}.txt", step['status'].upper(), fontfile=BOLD, fontsize=30, fontcolor=colour[step['status']].replace('#', '0x'), x=f'{W - 96}-tw', y=VH + 22, **{'enable': after})
-(work / 'filters.txt').write_text(',\n'.join(filters) + '[body]')
+    done = min(end, max(start + 0.4, step['film'][1] - 1.0))
+    if start > cursor: segments.append((blank, start - cursor))
+    detail = step.get('detail', '')
+    note = step.get('error') if step['status'] == 'failed' else ('; '.join(step['flags']) if step['status'] == 'flagged' else detail)
+    segments.append((band(f'band-{position:02d}-step.png', step, detail), done - start))
+    segments.append((band(f'band-{position:02d}-result.png', step, note, GREY if step['status'] == 'passed' else colour[step['status']], step['status']), end - done))
+    cursor = max(cursor, end)
+segments.append((blank, 3600))  # outlasts any film; shortest=1 ends the body with the film
+# The concat demuxer honours an image's duration only when another entry follows it.
+(work / 'bands.txt').write_text(''.join(f"file {quote(image)}\nduration {seconds:.3f}\n" for image, seconds in segments if seconds > 0) + f"file {quote(blank)}\n")
+graph = f"[0:v]scale={VW}:{VH}:flags=lanczos,pad={W}:{H}:{(W - VW) // 2}:0:color=0x0e1114[film];[film][1:v]overlay=0:{VH}:shortest=1[body]"
 body = work / 'body.mp4'
-subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(run / 'film' / 'session.webm'), '-filter_complex_script', str(work / 'filters.txt'), '-map', '[body]', '-r', '30', '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', str(body)], check=True)
+subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(run / 'film' / 'session.webm'), '-f', 'concat', '-safe', '0', '-i', str(work / 'bands.txt'), '-filter_complex', graph, '-map', '[body]', '-r', '30', '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', str(body)], check=True)
 def still(image, seconds, name):
     target = work / name
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-loop', '1', '-t', str(seconds), '-i', str(image), '-r', '30', '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', str(target)], check=True); return target

@@ -37,7 +37,8 @@ Spec: Frozen at WST | Projector Control App Spec.
 
 `http://<relay-ip>:8080/monitor/` opens the six-page Frozen Monitor: live A–D state, the
 command log, cues, rig, network, notes and the calendar. It reads the relay and sends only
-Stop lens. See [the Frozen Monitor](docs/frozen-monitor.md).
+Stop lens. The controller's header Monitor button and the Frozen Monitor choice on Home open it
+in a new tab. See [the Frozen Monitor](docs/frozen-monitor.md).
 
 ## Run
 

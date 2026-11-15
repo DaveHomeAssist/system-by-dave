@@ -14,6 +14,13 @@ projectors, today's calls, and the open acceptance checks, without opening the c
 without risking a command. The monitor gives them that place. Lighting still fires the cues and
 Millumin still sends power and shutter; the monitor does not take over either job.
 
+## Getting there
+
+Projctl's header has a **Monitor** button (labelled on desktop, icon-only below 1100 px) and its
+Home view has a **Frozen Monitor** choice; both open `/monitor/` in a new tab so the controller
+stays open. Short landscape phones and 320 px screens keep the header to its existing rows, so the
+button is hidden there and Home is the way in. Styles live in `public/monitor-link.css`.
+
 ## Pages
 
 | Page | Live from the relay | Recorded (dated, in `monitor-data.js`) |
@@ -80,7 +87,6 @@ relay process. Folders now serve their `index.html` (so `/monitor/` works), `/mo
 
 ## Not included
 
-- No entry link inside the controller UI yet; open `/monitor/` directly.
 - No new relay API. The monitor reads the existing snapshot, events and health-report summary.
 - Acceptance results are not recorded here; the grids show the crew workbook's empty state.
 - Physical acceptance on the theatre relay remains open until the monitor is installed with the

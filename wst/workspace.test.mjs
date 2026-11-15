@@ -39,8 +39,12 @@ test('snow splash stays same-origin and keeps the home routes', () => {
   assert.match(html, /id="home-title"/);
   assert.match(html, /id="snow"[^>]*aria-hidden="true"/);
   for (const route of ['notes', 'rig', 'stage', 'throw', 'schedule', 'pixels']) assert.match(html, new RegExp('data-route="' + route + '"'));
-  assert.match(html, /href="http:\/\/localhost:8080\/"/);
-  assert.doesNotMatch(html, /id="relay-frame"/);
+  assert.match(html, /id="open-controller"[^>]*href="http:\/\/localhost:8080\/"/);
+  assert.match(html, /id="connect-mac"/);
+  assert.match(html, /id="relay-frame"[^>]*hidden/);
+  assert.match(html, /connect-src [^;]*http:\/\/localhost:8080/);
+  assert.match(html, /frame-src [^;]*http:\/\/localhost:8080/);
+  assert.doesNotMatch(html, /<iframe[^>]*src="http/);
   assert.match(html, /id="documents-panel"/);
   assert.match(html, /id="nav-more"/);
   assert.match(html, /id="schedule-panel"/);

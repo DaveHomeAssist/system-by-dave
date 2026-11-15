@@ -9,6 +9,42 @@
 - New read-only `GET /api/thermal` (series) and `GET /api/thermal.csv`. Eight hours of samples are kept in memory and reset when the relay restarts or a slot's driver or address changes.
 - Tests: `test/thermal.test.js`, `test/thermal-relay.test.js` and `test/thermal-browser.cjs` (in `npm run test:browser`); `test/relay-helper.js` can write settings files beside the test rig. Verified against the simulator and loopback stand-ins only.
 
+## November 14, 2026: Frozen case films caption on current ffmpeg
+
+- `scripts/frozen_case_film.py` draws its caption band with Pillow and runs it
+  under the session film as a timed image sequence. It no longer needs ffmpeg's
+  `drawtext` filter or `-filter_complex_script`, which Homebrew ffmpeg 9 lacks,
+  so it captions on any ffmpeg with libx264. The caption layout is unchanged.
+
+## November 14, 2026: PT-DW830 lamp replacement video in Equipment Lab
+
+- The PT-DW830's Practice panel shows a silent 1 minute 23 second walkthrough
+  of replacing a lamp unit, at the top of the lamp procedure. Its ten steps
+  match the steps listed under it. It loads only when played, and Reference
+  lists a download link.
+- The video and its poster are host media in `equipment-lab/media/`, outside
+  the managed release and the offline set. The browser probe checks them.
+
+## 2026-11-14
+
+- WST private controller views offer both paths: Connect this Mac embeds the
+  controller in place after a health check, and the always-visible Open local
+  controller link opens it directly. A blocked frame or failed health check
+  highlights the link instead of stalling. The CSP again allows
+  `http://localhost:8080` for fetch and frames.
+- Refresh WST Planning Documents with the 18-page R5 handoff and five-page diagrams, including EDID evidence and pixel-routing corrections. Publish sanitized PDFs with source hashes while retaining the private exports outside the site.
+
+## November 14, 2026: Video Engineering Daily
+
+- Add Edition 038 on measuring SDI CRC errors during line checks, with an illustrated story card.
+
+## November 14, 2026: Monitor link inside Projctl
+
+- Projctl's header gains a Monitor button and its Home view a Frozen Monitor
+  choice; both open `/monitor/` in a new tab. The button is icon-only below
+  1100 px and hidden on short landscape phones and 320 px screens, where Home
+  keeps the way in, so the header keeps its existing rows.
+
 ## November 14, 2026: Frozen Monitor on the projctl relay
 
 - Add the Frozen Monitor at `/monitor/` on the projctl relay: Monitor, Cues, Rig,
