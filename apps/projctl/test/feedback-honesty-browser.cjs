@@ -55,7 +55,7 @@ const {selectLane,selectView}=require('./operator-ui.cjs');
   p.status={...p.status,stale:[],online:true,power:'off',pattern:null,shutter:'unknown',errors:null,connection:{state:'online',lastSuccessAt:new Date().toISOString()}};
   await monitor.routeWebSocket('**/ws',ws=>ws.send(JSON.stringify(state)));
   await monitor.goto(relay.base+'/monitor/');
-  await monitor.waitForFunction(()=>document.querySelector('[data-relay-word]')?.textContent.includes('live'));
+  await monitor.waitForFunction(()=>document.querySelector('[data-relay-word]')?.textContent === 'Practice mode');
   const lane=await monitor.evaluate(async()=>{const {laneModels}=await import('/monitor/monitor.js');const v=laneModels().A;return {power:v.power,pattern:v.pattern,shutter:v.shutter};});
   assert.equal(lane.power,'OFF');assert.equal(lane.pattern,'Not reported');assert.equal(lane.shutter,'Unknown');
   console.log('Feedback honesty passed: missing values, cached alarms/input/pattern, late HTTP response, repeated power-on disabled, Monitor unknown state');
