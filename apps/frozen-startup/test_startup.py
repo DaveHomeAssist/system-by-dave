@@ -177,10 +177,10 @@ class Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             package.build(root)
-            data = (root / 'Frozen-Startup-0.1.0.zip').read_bytes()
+            data = (root / 'Frozen-Startup-0.2.0.zip').read_bytes()
             package.build(root)
-            self.assertEqual(data, (root / 'Frozen-Startup-0.1.0.zip').read_bytes())
-            with zipfile.ZipFile(root / 'Frozen-Startup-0.1.0.zip') as archive:
+            self.assertEqual(data, (root / 'Frozen-Startup-0.2.0.zip').read_bytes())
+            with zipfile.ZipFile(root / 'Frozen-Startup-0.2.0.zip') as archive:
                 self.assertEqual(set(archive.namelist()), {'Frozen Startup/' + n for n in package.FILES})
 
     def test_malformed_observations_fail_cleanly(self):

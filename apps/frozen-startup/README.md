@@ -1,6 +1,6 @@
 # Frozen Startup
 
-Offline development package, version 0.1.0. Python 3.9 or newer, standard library only.
+Offline development package, version 0.2.0. Python 3.9 or newer, standard library only.
 
 Run the demonstration from the repository root:
 
@@ -112,3 +112,22 @@ shutters, MIDI, playback cues and shutdown remain with their existing operators.
 
 Manufacturer references: [BetterDisplay CLI](https://betterdisplay.pro/guide/integration/cli-examples/),
 [Millumin scripts](https://help.millumin.com/docs/connect/scripts/).
+
+## Mac adapter development status
+
+The package now includes a native CoreGraphics display reader and atomic layout
+transaction, BetterDisplay connector-based mode restoration, and a bounded
+read-only Millumin accessibility inspector. Build the native tool with
+`bash apps/frozen-startup/build-mac.sh /tmp/frozen-mac-build` on a Mac.
+Set `FROZEN_NATIVE_DISPLAY_TOOL=/tmp/frozen-mac-build/mac-displays` when testing
+the adapter from source. A source archive includes the build script, not a
+preinstalled binary or login item.
+
+The native reader was compiled and observed the development Mac. Restoration
+commands have fixture coverage only. Millumin's real accessibility structure,
+active-document identity and output-window ownership remain unqualified.
+The adapter can verify an already-open approved document. Automatic show
+opening, control-window repositioning and fullscreen verification remain
+unimplemented, so fullscreen requests fail in this adapter. The package is a development artifact and must not be installed as an
+automatic Studio startup task. The missing integration is recorded explicitly
+instead of treating a saved-file assignment as live routing proof.
