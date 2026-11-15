@@ -38,7 +38,7 @@ def copy_file(src, relative):
     if hashlib.sha256(target.read_bytes()).hexdigest() != digest:
         raise RuntimeError('Backup verification failed')
     files[str(relative)] = digest
-for name in ('rig.json', 'stage-plot.json', 'venue', 'power-schedules.json', 'power-schedules.json.claims', 'health-reports.json', 'health-reports'):
+for name in ('rig.json', 'stage-plot.json', 'venue', 'power-schedules.json', 'power-schedules.json.claims', 'health-reports.json', 'health-reports', 'software-checks.json'):
     item = source / name
     if item.is_symlink():
         raise SystemExit('Symlink in backup source. Private partial snapshot retained.')

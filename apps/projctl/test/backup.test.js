@@ -11,7 +11,7 @@ test('private backup handles spaces, preserves scheduling state and never prunes
   t.after(() => fs.rm(root, { recursive: true, force: true }));
   const data = path.join(root, 'live data'), output = path.join(root, 'backup copies');
   await fs.mkdir(data); await fs.mkdir(output);
-  const payloads = { 'rig.json': JSON.stringify({ projectors: [{ password: 'fixture secret' }], presets: [], events: [] }), 'power-schedules.json': '{"schedules":[]}', 'stage-plot.json': '{"plot":"saved"}', 'power-schedules.json.claims/used.json': '{"claimed":true}' };
+  const payloads = { 'rig.json': JSON.stringify({ projectors: [{ password: 'fixture secret' }], presets: [], events: [] }), 'software-checks.json': '{"checks":[]}', 'power-schedules.json': '{"schedules":[]}', 'stage-plot.json': '{"plot":"saved"}', 'power-schedules.json.claims/used.json': '{"claimed":true}' };
   for (const [name, bytes] of Object.entries(payloads)) { await fs.mkdir(path.dirname(path.join(data, name)), { recursive: true }); await fs.writeFile(path.join(data, name), bytes); }
   for (let i = 0; i < 32; i++) await fs.mkdir(path.join(output, `unrelated ${i}`));
   const run = () => execFileSync('bash', ['deploy/backup.sh', output], { env: { ...process.env, PROJCTL_DATA: data }, encoding: 'utf8' });

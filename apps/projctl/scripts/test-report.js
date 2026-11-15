@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { RELEASE } from '../public/release.js';
 
-// A transportable test receipt for a future monitoring dashboard. It never polls
+// A transportable test receipt for the monitoring dashboard. It never polls
 // the controller and never upgrades software checks into deployment acceptance.
 export function testReport({ results, sourceCommit, runner, finishedAt = new Date().toISOString() }) {
   if (!/^[a-f0-9]{40}$/.test(sourceCommit || '')) throw new Error('A full source commit is required');

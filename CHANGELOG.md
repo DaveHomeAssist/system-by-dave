@@ -9,8 +9,8 @@
 
 - Give Monitor four explicit single-screen views, paged activity and checklist rows,
   and on-demand details. Keep primary controls concise on constrained screens.
-- Add portable test receipts for later monitoring dashboard integration, with
-  deployment and physical acceptance kept separate from software checks.
+- Show dated software checks in Health, matching the installed package before
+  reporting a pass. Keep failed checks and physical acceptance separate.
 
 - Share Light, Dark and System appearance across the Frozen workspace, Home scene,
   controller, login and Monitor, preserving legacy preferences and browser notes.

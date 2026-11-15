@@ -99,6 +99,6 @@ relay process. Folders now serve their `index.html` (so `/monitor/` works), `/mo
 ## Not included
 
 - No new relay API. The monitor reads the existing snapshot, events and health-report summary.
-- Acceptance results are not recorded here; the grids show the crew workbook's empty state. The planned test-report integration is documented in [Quiet Watch](quiet-watch.md#monitoring-dashboard-integration).
+- Acceptance results are not recorded here; the grids show the crew workbook's empty state. Read-only package checks are available from Health; the report contract is documented in [Quiet Watch](quiet-watch.md#monitoring-dashboard-integration).
 - Physical acceptance on the theatre relay remains open until the monitor is installed with the
   next venue update and read back there.

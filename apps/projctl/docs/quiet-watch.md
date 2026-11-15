@@ -50,9 +50,9 @@ Measure before implementing: reduce duplicate DOM work on heartbeats, back off d
 
 ## Monitoring dashboard integration
 
-The next integration consumes `projctl.test-report.v1` receipts produced by `scripts/test-report.js`. Each receipt identifies the release, full source commit, execution environment, runner, finish time and every executed check. Failed and timed-out checks remain visible. Deployment, live readback, physical output and human acceptance start as separate unverified fields. A passing simulation receipt must never make the live system appear verified.
+Health opens a read-only Software checks dialog from `projctl.test-report.v1` receipts produced by `scripts/test-report.js`. Each receipt identifies the release, full source commit, execution environment, runner, finish time and every executed check. Failed and timed-out checks remain visible. Deployment, live readback, physical output and human acceptance stay separate. A passing simulation receipt must never make the live system appear verified.
 
-The dashboard should show receipt age and compare its source commit with the installed release. Missing, old or mismatched receipts mean testing evidence is unavailable for that installation. Keep private receipts with operational records; do not publish runner addresses, private rig data, credentials or raw logs. The first integration is a read-only report import, without a button that runs tests against physical projectors. Dashboard rendering and automated report delivery remain future work.
+The relay reads `software-checks.json` beside its saved rig and compares the receipt with the installed `DELIVERY.json` source commit. Only an exact match can show Checks passed. Other receipts remain dated package records. Missing receipts add no dashboard control; malformed receipts show a review message. The dialog paginates the recorded checks and cannot run tests or send equipment commands. Keep private receipts with operational records; the API omits runner identity, private rig data, credentials and raw logs. Receipt delivery is an explicit release step, not an automatic test schedule.
 
 After completing isolated checks and committing their exact source:
 

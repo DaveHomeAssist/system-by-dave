@@ -79,6 +79,35 @@ $('#mon-log-newer').onclick = () => { logPage--; render(); };
 $('#mon-log-older').onclick = () => { logPage++; render(); };
 $('#mon-details').onclick = () => $('#mon-detail-dialog').showModal();
 $('#mon-records').onclick = () => $('#mon-records-dialog').showModal();
+let software = null, softwarePage = 0;
+function renderSoftware() {
+  const checks = software?.checks || [], invalid = software?.state === 'invalid';
+  const passed = checks.filter(check => check.outcome === 'passed').length;
+  $('#mon-software-summary').textContent = invalid ? 'The saved report could not be read. Replace it with the release report.'
+    : `${software.release.name}: ${passed} of ${checks.length} checks passed. ${software.state === 'matched' ? 'Matches this installed package.' : software.state === 'different' ? 'Recorded for a different package.' : 'Recorded package results.'}`;
+  $('#mon-software-date').textContent = invalid ? '' : `${new Date(software.finishedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })} · ${software.sourceCommit.slice(0, 8)}`;
+  softwarePage = Math.min(softwarePage, Math.max(0, Math.ceil(checks.length / 5) - 1));
+  patch($('#mon-software-list'), checks.slice(softwarePage * 5, softwarePage * 5 + 5).map(check => `<li><span>${esc(check.name)}</span><strong>${check.outcome === 'passed' ? 'Passed' : check.outcome === 'timed-out' ? 'Timed out' : 'Needs review'}</strong></li>`).join(''));
+  $('#mon-software-prev').disabled = softwarePage === 0;
+  $('#mon-software-next').disabled = (softwarePage + 1) * 5 >= checks.length;
+  $('#mon-software-page').textContent = checks.length ? `${softwarePage + 1} of ${Math.ceil(checks.length / 5)}` : '';
+}
+$('#mon-software').onclick = () => { renderSoftware(); $('#mon-software-dialog').showModal(); };
+$('#mon-software-prev').onclick = () => { softwarePage--; renderSoftware(); };
+$('#mon-software-next').onclick = () => { softwarePage++; renderSoftware(); };
+async function loadSoftware() {
+  try {
+    const response = await fetch('/api/software-checks', { cache: 'no-store', signal: AbortSignal.timeout(5000) });
+    if (!response.ok) return;
+    software = await response.json();
+    const button = $('#mon-software');
+    button.hidden = software.state === 'absent';
+    button.textContent = software.state === 'matched' && software.passed ? 'Checks passed' : software.state === 'invalid' || software.passed === false ? 'Review checks' : 'Recorded checks';
+    if ($('#mon-software-dialog').open) renderSoftware();
+  } catch { /* The dated report remains separate from live equipment feedback. */ }
+}
+loadSoftware();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadSoftware(); });
 document.querySelectorAll('[data-close-dialog]').forEach(button => { button.onclick = () => button.closest('dialog').close(); });
 const tabs = [...document.querySelectorAll('[data-dashboard-view]')];
 function selectDashboard(tab) {

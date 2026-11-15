@@ -51,7 +51,7 @@ if (pids.length && !fs.existsSync(paths.plist) && !Object.hasOwn(process.env, 'P
 const next = path.join(paths.root, `app-next-${process.pid}`);
 fs.mkdirSync(paths.root, { recursive: true, mode: 0o700 });
 fs.mkdirSync(next);
-for (const name of ['server', 'public', 'runtime', 'scripts', 'docs', 'deploy', 'package.json', 'package-lock.json', 'README.md', 'node_modules']) {
+for (const name of ['server', 'public', 'runtime', 'scripts', 'docs', 'deploy', 'package.json', 'package-lock.json', 'README.md', 'DELIVERY.json', 'node_modules']) {
   const from = path.join(source, name);
   if (fs.existsSync(from)) fs.cpSync(from, path.join(next, name), { recursive: true });
 }

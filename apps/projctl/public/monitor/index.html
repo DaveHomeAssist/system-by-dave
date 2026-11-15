@@ -63,12 +63,13 @@
     <div class="fm-page-controls"><button type="button" class="avd-btn" id="mon-check-prev">Previous</button><span id="mon-check-page" role="status"></span><button type="button" class="avd-btn" id="mon-check-next">Next</button></div>
   </section>
   <section class="fm-dashboard-panel" id="mon-panel-health" role="tabpanel" aria-labelledby="mon-tab-health" hidden>
-    <div class="fm-dashboard-heading"><h2>Health readings</h2><span class="fm-tag" data-live-tag>Connecting</span></div>
+    <div class="fm-dashboard-heading"><h2>Health readings</h2><button type="button" class="avd-btn" id="mon-software" hidden>Software checks</button></div>
     <p class="fm-small" id="mon-health-line">Reading the relay…</p>
     <div role="table" aria-label="Health readings" class="fm-table fm-health" id="mon-health"></div>
     <p class="fm-small fm-health-note">Intake air. Display margins are not approved limits.</p>
   </section>
 </main>
+<dialog class="fm-detail-dialog" id="mon-software-dialog" aria-labelledby="mon-software-title"><button type="button" class="avd-btn fm-dialog-close" data-close-dialog>Close checks</button><h2 id="mon-software-title">Software checks</h2><p id="mon-software-summary"></p><p class="fm-small" id="mon-software-date"></p><ul class="fm-software-list" id="mon-software-list"></ul><div class="fm-page-controls"><button type="button" class="avd-btn" id="mon-software-prev">Previous</button><span id="mon-software-page" aria-live="polite"></span><button type="button" class="avd-btn" id="mon-software-next">Next</button></div><p class="fm-small">Recorded software checks. Projector readings are shown in House and Health.</p></dialog>
 <dialog class="fm-detail-dialog" id="mon-detail-dialog" aria-label="Selected projector details"><button type="button" class="avd-btn fm-dialog-close" data-close-dialog>Close details</button><section class="avd-panel pj-tile fm-insp" id="mon-insp" data-lane="A" aria-labelledby="insp-title"></section></dialog>
 <dialog class="fm-detail-dialog" id="mon-records-dialog" aria-labelledby="mon-records-title"><button type="button" class="avd-btn fm-dialog-close" data-close-dialog>Close records</button><h2 id="mon-records-title">Recorded issues</h2><p class="fm-small">Dated reference notes, not current device readings.</p><section class="fm-alerts" id="mon-alerts" aria-label="Recorded alerts"></section></dialog>
 </div>
