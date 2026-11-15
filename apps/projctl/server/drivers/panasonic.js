@@ -64,7 +64,7 @@ export function pictureSchema() {
 }
 
 export function panasonicDriver({ host, port = 1024, user = 'admin1', password = '', timeoutMs = 5000, model = '', ...rest }) {
-  const pj = pjlinkDriver({ host, password, ...rest, port: 4352 });
+  const pj = pjlinkDriver({ host, password, timeoutMs, ...rest, port: 4352 });
   const patterns = patternsFor(model);
   const readWeb = createPanasonicWebReader({ host, user, password });
 
@@ -118,10 +118,15 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'native-jog', stop: false, positionReadback: false },
     lensControls: { h: false, v: false, focus: false, zoom: false },
     patterns,
-    async getStatus({ signal } = {}) {
-      const s = await pj.getStatus({ signal });
+    async getStatus({ signal, onPartial } = {}) {
+      const s = await pj.getStatus({ signal, onPartial });
       if (s.power !== 'on') return s;
-      try { s.pattern = await native('QTS', { signal }); } catch { throwIfAborted(signal); s.pattern = null; }
+      try {
+        s.pattern = await native('QTS', { signal });
+        if (!Object.hasOwn(patterns, s.pattern)) throw new Error('Invalid Panasonic pattern status');
+        s.stale = s.stale.filter(field => field !== 'pattern');
+        onPartial?.({ ...s, stale: [...s.stale] });
+      } catch { throwIfAborted(signal); s.pattern = null; }
       throwIfAborted(signal);
       return s;
     },

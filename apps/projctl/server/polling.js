@@ -29,8 +29,10 @@ export function createPoller({ target, read, started, succeeded, failed,
     active.set(slot, entry);
     const isCurrent = () => !closed && active.get(slot) === entry && pollIdentity(target(slot) || {}) === key;
     started?.(p, { identityChanged: changed, at: now() });
-    let deadline;
-    const options = { signal: controller.signal };
+    let deadline, partial;
+    const options = { signal: controller.signal, onPartial(value) {
+      if (!controller.signal.aborted && ['on', 'off', 'warming', 'cooling'].includes(value?.power) && !value.stale?.includes('power')) partial = structuredClone(value);
+    } };
     const run = () => {
       throwIfAborted(controller.signal);
       // Queue waiting is local contention, so only actual device I/O gets the
@@ -46,6 +48,12 @@ export function createPoller({ target, read, started, succeeded, failed,
       schedule(slot, intervalMs);
     }, (error) => {
       if (!isCurrent()) return;
+      if (controller.signal.aborted && error === controller.signal.reason && error?.code === 'POLL_TIMEOUT' && partial) {
+        failures.set(slot, 0);
+        succeeded?.(p, partial, { at: now() });
+        schedule(slot, intervalMs);
+        return;
+      }
       const count = (failures.get(slot) || 0) + 1;
       failures.set(slot, count);
       const delay = Math.min(maxRetryMs, intervalMs * 2 ** Math.min(count - 1, 8));

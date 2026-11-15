@@ -104,7 +104,35 @@ test('Pulse cancellation after core reply drains no optional backlog and reconne
   a.abort(new Error('test poll deadline')); await assert.rejects(pending, /deadline/);
   await until(() => f.sockets.size === 0, 'aborted socket leaked'); assert.equal(f.requests.length, 2);
   mode = 'online'; assert.equal((await d.getStatus()).power, 'on');
-  mode = 'drop-optional'; await assert.rejects(d.getStatus(), /closed/);
+  // A valid core reply survives optional transport loss; explicit cancellation still rejects.
+  mode = 'drop-optional'; const partial = await d.getStatus();
+  assert.equal(partial.power, 'on'); assert.equal(partial.shutter, 'unknown');
+  assert.ok(partial.stale.includes('shutter'));
   mode = 'online'; assert.equal((await d.getStatus()).power, 'on');
   assert.ok(f.requests.every(r => r.method === 'property.get' || r.method === 'image.source.list' || r.method === 'introspect'));
+});
+
+
+test('only the poller deadline can publish a validated partial snapshot', async () => {
+  const c = clock(), seen = [], failures = [];
+  const p = createPoller({ ...c, target: () => ({ slot: 'P1', ip: 'fixture' }), timeoutMs: 10,
+    read: async (_, { onPartial }) => {
+      onPartial({ power: 'on', online: true, stale: ['shutter'], shutter: 'unknown' });
+      throw Object.assign(new Error('foreign deadline'), { code: 'POLL_TIMEOUT' });
+    }, succeeded: (_, value) => seen.push(value), failed: (_, error) => failures.push(error) });
+  await p.poll('P1');
+  assert.equal(seen.length, 0); assert.equal(failures[0].message, 'foreign deadline');
+  p.close(); assert.equal(c.count(), 0);
+});
+
+test('a stale partial power value cannot become current at the deadline', async () => {
+  const c = clock(), seen = [], failures = [];
+  const p = createPoller({ ...c, target: () => ({ slot: 'P1', ip: 'fixture' }), timeoutMs: 10,
+    read: (_, { onPartial }) => {
+      onPartial({ power: 'on', online: true, stale: ['power'] });
+      return new Promise(() => {});
+    }, succeeded: (_, value) => seen.push(value), failed: (_, error) => failures.push(error) });
+  const pending = p.poll('P1'); await Promise.resolve(); await c.advance(10); await pending;
+  assert.equal(seen.length, 0); assert.equal(failures[0].code, 'POLL_TIMEOUT');
+  p.close(); assert.equal(c.count(), 0);
 });
