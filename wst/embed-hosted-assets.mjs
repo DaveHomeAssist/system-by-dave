@@ -12,7 +12,7 @@ const indexHtml=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const handoffStart=indexHtml.indexOf('<section class="panel handoff-panel"');
 const handoffEnd=indexHtml.indexOf('<section class="panel planning-shell"',handoffStart);
 if(handoffStart<0||handoffEnd<0)throw Error('Handoff document boundaries missing');
-const handoffBody=indexHtml.slice(handoffStart,handoffEnd).replace(' hidden>','>');
+const handoffBody=indexHtml.slice(handoffStart,handoffEnd).replace(' hidden>','>').replaceAll('href="#updates"','href="./#updates"').replaceAll('href="#notes"','href="./#notes"');
 const handoffHead=indexHtml.slice(0,indexHtml.indexOf('<body>')).replace('<title>Frozen workspace | WST</title>','<title>Frozen house handoff | WST</title>').replace(/<script[^>]*>[\s\S]*?<\/script>/g,'').replace('href="https://wst.housevideo.app/"','href="https://wst.housevideo.app/handoff.html"');
 fs.writeFileSync(path.join(root,'handoff.html'),handoffHead+'<body><div class="shell"><header><a class="document-link" href="./#home">Frozen workspace</a></header>'+handoffBody+'</div></body></html>');
 const files={'/':'index.html','/handoff.html':'handoff.html','/workspace.css':'workspace.css','/workspace.js':'workspace.js','/calendar.js':'calendar.js','/tech-schedule.json':'tech-schedule.json','/snow-splash.css':'snow-splash.css','/snow-splash.js':'snow-splash.js','/vendor/gsap.min.js':'vendor/gsap.min.js','/workspace-config.json':'workspace-config.json','/projectors.json':'projectors.json','/reference-view.js':'reference-view.js','/reference-view.css':'reference-view.css'};

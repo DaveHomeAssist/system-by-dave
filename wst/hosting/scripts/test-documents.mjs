@@ -22,3 +22,9 @@ assert.equal((await request('/documents/frozen-handoff-r5.pdf','POST')).status,4
 assert.equal((await request('/documents/missing.pdf')).status,404);
 const r5=await request('/documents/frozen-signal-flow-r5.pdf');assert.equal(r5.headers.get('content-type'),'application/pdf');assert.equal(createHash('sha256').update(Buffer.from(await r5.arrayBuffer())).digest('hex'),'cca5cf644477b2759679edbca82cec4e8a165bc2ca912d3a46f7010448de71a0');
 console.log('PASS packaged PDF exact bytes, MIME, methods, missing route and localhost separation');
+
+const handoff = await (await request("/handoff.html")).text();
+assert.match(handoff, /Projection handoff/);
+assert.doesNotMatch(handoff, /<script/);
+assert.match(handoff, /href="documents\/frozen-handoff-r5.pdf"/);
+assert.match(handoff, /href=".\/#notes"/);
