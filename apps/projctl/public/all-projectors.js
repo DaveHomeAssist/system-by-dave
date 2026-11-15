@@ -1,6 +1,7 @@
 import { supportsPatterns } from './output-recovery.js';
 import { projectorName, orderedProjectors } from './lanes.js';
 import { fieldFeedback } from './status-feedback.js';
+import { commandProgress, samePendingCommand } from './command-progress.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
@@ -14,9 +15,10 @@ export function createAllProjectors({ state, connected, connectionOf, send }) {
   const devices = () => orderedProjectors(state().projectors);
   const fingerprint = () => JSON.stringify({ connected: connected(), lock: state().lock, targets: devices().map(p => [p.slot,p.lane,p.model,p.driver,p.ip,p.mac,p.inputs,p.inputPreference,p.controlRevision,!!p.busy,connectionOf(p).current,p.status?.power]) });
   const allowed = command => connected() && state().relay?.commandTargetBinding === 1 && (!state().lock || command === 'shutter' || request?.cmd === 'power' && request?.arg === 1);
-  const targetHTML = projectors => projectors.map(p => {
+  const targetHTML = (projectors, includeProgress = false) => projectors.map(p => {
     const connection = connectionOf(p), power = fieldFeedback(p, 'power', connection);
-    return `<li><strong>${escape(projectorName(p))}</strong><span>${escape(power.current ? power.value : connection.current ? 'Power not reported' : connection.detail)} · ${escape(p.model)}</span></li>`;
+    const progress = includeProgress ? commandProgress(p, connection) : null;
+    return `<li><strong>${escape(projectorName(p))}</strong><span>${escape(power.current ? power.value : connection.current ? 'Power not reported' : connection.detail)} · ${escape(progress?.text || p.model)}</span></li>`;
   }).join('');
   function close() {
     if (busy) return;
@@ -67,10 +69,12 @@ export function createAllProjectors({ state, connected, connectionOf, send }) {
   for (const button of document.querySelectorAll('[data-all]')) button.onclick = () => open(button);
   return {
     update() {
-      document.querySelector('#all-targets').innerHTML = targetHTML(devices());
+      document.querySelector('#all-targets').innerHTML = targetHTML(devices(), true);
       for (const button of document.querySelectorAll('[data-all]')) {
         const safe = !state().lock || button.dataset.all === 'shutter' || button.dataset.all === 'power' && button.dataset.arg === '1';
-        button.disabled = !connected() || !state().relay?.commandTargetBinding || !safe || !devices().some(p => connectionOf(p).current && (button.dataset.all !== 'pattern' || supportsPatterns(p)));
+        const expected = button.dataset.all === 'power' ? (button.dataset.arg === '1' ? 'on' : 'off') : button.dataset.all === 'shutter' ? (button.dataset.arg === '1' ? 'closed' : 'open') : null;
+        const waiting = expected && devices().some(p => samePendingCommand(p, button.dataset.all, expected));
+        button.disabled = !connected() || !state().relay?.commandTargetBinding || !safe || waiting || !devices().some(p => connectionOf(p).current && (button.dataset.all !== 'pattern' || supportsPatterns(p)));
       }
     },
   };

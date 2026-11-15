@@ -109,6 +109,7 @@ export function summarize(units) {
   if (!n) findings.push('No assigned projectors.');
   else if (!reached.length) findings.push(`No units reachable; 0 of ${n} read.`);
   else if (flagged.length) findings.push(`${flagged.length} of ${n} units flagged: ${flagged.map((u) => `${who(u)} ${u.flags.join(', ')}`).join('; ')}.`);
+  else if (warned.length) findings.push(`${warned.length} of ${n} units report other projector alerts.`);
   else if (alarmRead.length) findings.push(`No temperature, fan or alarm flags reported by ${alarmRead.length} of ${n} units with alarm feedback.`);
   else findings.push(`Alarm feedback unavailable for all ${n} units.`);
   if (incomplete.length) findings.push(`Assessment incomplete for ${incomplete.length} of ${n} units: ${incomplete.map((u) => `${u.slot} (${assessmentGaps(u).map((gap) => `${gap} unavailable`).join(', ')})`).join('; ')}.`);
@@ -122,6 +123,10 @@ export function summarize(units) {
   for (const u of watch) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): inspect intake clearance and exhaust path, ${num(u.headroomC)} °C headroom.`);
   const other = warned.filter((u) => u.warnings.some((w) => w.startsWith('other')));
   if (other.length) follow.push(`${other.map((u) => u.slot).join(', ')}: read the Self Test screen for the "other" warning.`);
+  for (const u of warned) {
+    const specific = u.warnings.filter(w => !w.startsWith('other'));
+    if (specific.length) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): check ${specific.join(', ')} on the projector.`);
+  }
   for (const u of incomplete.filter((u) => u.online)) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): check ${assessmentGaps(u).map((gap) => `${gap} unavailable`).join(', ')} before assessing health.`);
   for (const u of unreachable) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): not reachable at report time; check network and power.`);
   return {

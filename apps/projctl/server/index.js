@@ -22,7 +22,8 @@ import { readVenue, readVenueAsset } from './venue-model.js';
 import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
-import { createPoller } from './polling.js';
+import { createPoller, pollIdentity } from './polling.js';
+import { createCommandFeedback } from './command-feedback.js';
 import { createTelemetryReader } from './telemetry-reader.js';
 import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader, ratedAmbientC, isLit } from './health-reports.js';
 import { createThermalMonitor, thermalThresholds, plausibleAirC, thermalCsv, RETENTION_MS } from './thermal.js';
@@ -83,10 +84,11 @@ const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 've
 const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
 if (SIM) simRig(store.rig);
 const rig = store.rig;
-let powerSchedules, poller, health, stopping = false;
+let powerSchedules, poller, feedback, health, stopping = false;
 // A lit rig gets a final health report before exit; health.stop() is capped at a few seconds.
 for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, async () => {
   if (stopping) return; stopping = true;
+  feedback?.close();
   try { await health?.stop(); } catch { /* exit regardless */ }
   poller?.close(); powerSchedules?.close(); store.close(); process.exit(0);
 });
@@ -134,7 +136,7 @@ function snapshot() {
     relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS, commandTargetBinding: 1, release: RELEASE },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
-      return { ...p, password: undefined, controlRevision: commandBinding.revision(p), status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p),
+      return { ...p, password: undefined, controlRevision: commandBinding.revision(p), status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p), commandFeedback: feedback?.get(p.slot) || null,
         inputs: d.inputs ?? p.inputs, displayInfo: displayInfoFor(p), inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lensJog?.axes.length, lensJog: d.lensJog, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
@@ -190,7 +192,7 @@ poller = createPoller({
 });
 function broadcastStatus(p) {
   const next = status.get(p.slot), d = driverFor(p);
-  broadcast({ type: 'status', slot: p.slot, status: { ...next, connection: connections.get(p.slot) }, thermal: thermalView(p), displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
+  broadcast({ type: 'status', slot: p.slot, status: { ...next, connection: connections.get(p.slot) }, commandFeedback: feedback?.get(p.slot) || null, thermal: thermalView(p), displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
 }
 function setOffline(slot, why) {
   const prev = status.get(slot);
@@ -278,6 +280,9 @@ function thermalReport(minutes, points) {
   };
 }
 
+feedback = createCommandFeedback({ target: slot => store.projector(slot),
+  status: slot => status.get(slot), refresh: slot => poller.refresh(slot),
+  changed: slot => { const p = store.projector(slot); if (p) broadcastStatus(p); } });
 rig.projectors.forEach(poll);
 
 // ---- Discovery (PJLink class 2 search by MAC) ----
@@ -315,6 +320,8 @@ function fmtArg(a) { return a && typeof a === 'object' ? Object.values(a).join('
 async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   const p = store.projector(slot);
   if (!p) throw httpErr(404, `no projector ${slot}`);
+  const feedbackIdentity = pollIdentity(p);
+  const commandStartedAt = Date.now();
   const check = commandGuard(slot);
   let ownsMovement = false;
   const guard = () => { executionGuard?.(); check(cmd, arg, { allowBusy: ownsMovement }); };
@@ -344,7 +351,10 @@ async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   finally { if (moving) { busy.delete(slot); broadcast({ type: 'busy', slot, busy: null }); } }
   store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail });
   broadcast({ type: 'event', event: rig.events.at(-1) });
+  if (cmd !== 'power' && cmd !== 'shutter') feedback.clear(slot);
   if (cmd === 'lens' || cmd === 'input' || cmd === 'picture') await poller.refresh(slot);
+  else if (cmd === 'power' || cmd === 'shutter') feedback.follow(slot, cmd,
+    cmd === 'power' ? (arg ? 'on' : 'off') : (arg ? 'closed' : 'open'), feedbackIdentity, commandStartedAt);
   else setTimeout(() => poll(p), 400);
   return { result, status: { ...status.get(slot), connection: connections.get(slot) } };
 }

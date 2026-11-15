@@ -1,6 +1,7 @@
 import { hdmiSource, patternIsOff, supportsPatterns } from './output-recovery.js';
 import { nextOperatorAction } from './operator-intent.js';
 import { fieldFeedback } from './status-feedback.js';
+import { commandProgress, samePendingCommand } from './command-progress.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
@@ -22,6 +23,7 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
   const s = p?.status || {};
   const stale = new Set(s.stale || []);
   const available = !!p && connection.current;
+  if (!feedback || ['idle', 'sent'].includes(feedback.phase)) feedback = commandProgress(p, connection) || feedback;
   const reported = field => fieldFeedback(p, field, connection);
   card.dataset.connectionState = connection.recovered ? 'recovered' : connection.state;
   const blocked = !available || lock || pending || !!p?.busy;
@@ -56,18 +58,19 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
     <section class="operator-shutter" aria-label="Shutter for ${lane}">
       <div class="operator-label"><span>Shutter</span><strong>${available?escape(shutter):'Unknown'}</strong></div>
       <div class="operator-pair">
-        <button class="operator-button shutter-open" type="button" data-action="shutter" data-value="0" aria-pressed="${available&&shutter==='open'}" ${disabled(!available)}><span class="operator-shutter-prefix">Shutter</span> Open</button>
-        <button class="operator-button shutter-close" type="button" data-action="shutter" data-value="1" aria-pressed="${available&&shutter==='closed'}" ${disabled(!available)}><span class="operator-shutter-prefix">Shutter</span> Close</button>
+        <button class="operator-button shutter-open" type="button" data-action="shutter" data-value="0" aria-pressed="${available&&shutter==='open'}" ${disabled(!available||samePendingCommand(p,'shutter','open'))}><span class="operator-shutter-prefix">Shutter</span> Open</button>
+        <button class="operator-button shutter-close" type="button" data-action="shutter" data-value="1" aria-pressed="${available&&shutter==='closed'}" ${disabled(!available||samePendingCommand(p,'shutter','closed'))}><span class="operator-shutter-prefix">Shutter</span> Close</button>
       </div>
     </section>
     <section class="operator-power" aria-label="Power for ${lane}">
       <div class="operator-label"><span>Power</span><strong class="operator-power-state" data-power-state="${escape(power)}">${escape(power)}</strong></div>
       <div class="operator-pair">
-        <button class="operator-button" type="button" data-action="power" data-value="1" ${disabled(!available||pending||p?.busy||['on','warming','cooling'].includes(s.power))}>Power on</button>
-        <button class="operator-button power-off" type="button" aria-describedby="power-off-reason-${escape(lane)}" data-action="power" data-value="0" ${disabled(blocked||s.power==='off')}>${feedback?.phase==='confirmation'?'Confirm power off':'Power off'}</button>
+        <button class="operator-button" type="button" data-action="power" data-value="1" ${disabled(!available||pending||p?.busy||samePendingCommand(p,'power','on')||['on','warming','cooling'].includes(s.power))}>Power on</button>
+        <button class="operator-button power-off" type="button" aria-describedby="power-off-reason-${escape(lane)}" data-action="power" data-value="0" ${disabled(blocked||s.power==='off'||samePendingCommand(p,'power','off'))}>${feedback?.phase==='confirmation'?'Confirm power off':'Power off'}</button>
       </div>
       <p id="power-off-reason-${escape(lane)}" class="pj-mono pj-note" style="margin:0" role="status">${escape(powerOffReason)}</p>
     </section>
+    <p class="operator-feedback" role="status" aria-live="polite" data-phase="${escape(feedback?.phase||(!available&&connection.retry?'connection':'idle'))}">${escape(feedback?.text||(!available&&connection.retry?connection.retry:lock?'Show lock is on.':'Ready'))}</p>
     <section class="operator-patterns" aria-label="Test patterns for ${lane}">
       <div class="operator-label"><span>Test pattern</span><strong>${escape(pattern)}</strong></div>
       <div class="operator-pattern-buttons">${quick.map(item=>`<button class="operator-button pattern-${item.label.toLowerCase()}" type="button" data-action="pattern" data-value="${escape(item.code)}" aria-pressed="${reported('pattern').current&&String(s.pattern)===item.code}" ${disabled(blocked)}><i aria-hidden="true"></i>${item.label}</button>`).join('')}<button type="button" class="operator-button pattern-more" data-more-patterns ${disabled(blocked||!hasPatterns)}>${moreLabel}</button></div>
@@ -79,7 +82,7 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
     <div class="operator-readback"><span>Input <strong>${escape(input)}</strong></span><span class="pj-summary-freshness" title="${escape(connection.lastReply||'No reply')}">Last reply ${escape(connection.ageLabel || connection.lastReply||'No reply')}</span></div>
     ${!reported('power').current && reported('power').present ? `<p class="operator-last-known">Last reported power: ${escape(s.power)}. Current state unknown.</p>` : ''}
     ${hint?`<div class="operator-hint"><p>${escape(hint.text)}</p><button type="button" data-dismiss-hint aria-label="Dismiss suggestion">×</button></div>`:''}
-    <p class="operator-feedback" role="status" aria-live="polite" data-phase="${escape(feedback?.phase||(!available&&connection.retry?'connection':'idle'))}">${escape(feedback?.text||(!available&&connection.retry?connection.retry:lock?'Show lock is on.':'Ready'))}</p>`;
+`;
   if (hint) {
     const suggested = hint.action === 'details' ? card.querySelector('[data-open-projector]') : card.querySelector(`[data-action="${hint.action}"]`);
     suggested?.classList.add('is-suggested');

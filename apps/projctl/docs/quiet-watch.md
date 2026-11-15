@@ -48,6 +48,34 @@ No redesign of protocol drivers, new dependency, new schedule or automatic power
 
 Measure before implementing: reduce duplicate DOM work on heartbeats, back off disconnected browser reconnections, and report response freshness separately from relay liveness. Preserve the existing one-reader-per-projector telemetry queue and avoid extra device polling for UI animation.
 
+## Quiet Watch 2 feedback follow-up
+
+The live Quiet Watch 1 exercise exposed an ambiguous shutter result: the command
+was acknowledged, the early status read still reported closed, and the next idle
+poll was outside the test's 30-second deadline. That is failed verification, not
+proof of physical movement or of a broken shutter.
+
+Follow power and shutter acknowledgements with fresh reads using the existing
+serialized poller. Start after 400 ms, then read shutters every second for at most
+30 seconds and power every five seconds for at most seven minutes. Finish when a
+fresh online response matches the request. A changed target, newer command or
+shutdown cancels the watch. Preserve normal idle polling afterwards. Never resend
+the actuator command or manufacture a matching status.
+
+Acceptance includes delayed movement, stale matching data, read failures, target
+changes, overlapping commands, bounded deadlines and service shutdown. Simulated
+verification does not close the original physical shutter test.
+
+The operator sees Sending, Waiting, Confirmed or Not confirmed beside the lane's
+controls. Waiting includes elapsed time and distinguishes warming from cooling.
+Confirmation records the first matching fresh reply; connection loss removes any
+claim of current confirmation. A timeout asks the operator to check the projector
+before retrying. The same pending command is unavailable, while the opposite
+protective action retains its existing safety rules. Reloading reads the relay's
+current command record without sending another command. A new target or command
+replaces the old record. Existing login, Show Lock, focus styles and unknown-state
+handling remain authoritative. No optimistic power or shutter update is allowed.
+
 ## Monitoring dashboard integration
 
 Health opens a read-only Software checks dialog from `projctl.test-report.v1` receipts produced by `scripts/test-report.js`. Each receipt identifies the release, full source commit, execution environment, runner, finish time and every executed check. Failed and timed-out checks remain visible. Deployment, live readback, physical output and human acceptance stay separate. A passing simulation receipt must never make the live system appear verified.
