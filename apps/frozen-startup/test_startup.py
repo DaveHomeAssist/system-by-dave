@@ -41,7 +41,7 @@ class Tests(unittest.TestCase):
         r = self.execute(b)
         self.assertTrue(r['computerReady'])
         self.assertFalse(r['showNightReady'])
-        self.assertEqual([c for c in b.calls if c != 'observe'], ['restore', 'openShow', 'fullscreen'])
+        self.assertEqual([c for c in b.calls if c != 'observe'], ['capabilities', 'restore', 'openShow', 'fullscreen'])
 
     def test_changed_ids_use_current_handles(self):
         for d in self.snapshot['displays']:
@@ -60,7 +60,7 @@ class Tests(unittest.TestCase):
                 s['displays'].pop(i)
                 b = FixtureBridge(s)
                 self.assertFalse(self.execute(b)['computerReady'])
-                self.assertEqual(set(b.calls), {'observe'})
+                self.assertEqual(set(b.calls), {'capabilities', 'observe'})
 
     def test_duplicate_connector_and_extra_display(self):
         for change in ('duplicate', 'extra', 'inactive', 'wrongIdentity', 'duplicateID'):
@@ -78,10 +78,10 @@ class Tests(unittest.TestCase):
     def test_warm_never_mutates(self):
         b = FixtureBridge(self.snapshot)
         self.assertTrue(self.execute(b, warm=True)['computerReady'])
-        self.assertEqual(set(b.calls), {'observe'})
+        self.assertEqual(set(b.calls), {'capabilities', 'observe'})
         b.snapshot['displays'][1]['mode']['height'] = 1080
         self.assertFalse(self.execute(b, warm=True)['computerReady'])
-        self.assertEqual(set(b.calls), {'observe'})
+        self.assertEqual(set(b.calls), {'capabilities', 'observe'})
 
     def test_mode_acknowledgement_is_not_readback(self):
         class FailedRestore(FixtureBridge):
@@ -202,6 +202,16 @@ class Tests(unittest.TestCase):
         b = Race(self.snapshot)
         self.assertFalse(self.execute(b)['computerReady'])
         self.assertNotIn('fullscreen', b.calls)
+
+    def test_incomplete_native_adapter_cannot_restore(self):
+        class Incomplete(FixtureBridge):
+            def call(self, action, payload):
+                if action == 'capabilities': return {'startup': False}
+                return super().call(action, payload)
+        b = Incomplete(self.snapshot)
+        result = self.execute(b)
+        self.assertFalse(result['computerReady'])
+        self.assertNotIn('restore', b.calls)
 
     def test_bad_profile_and_private_atomic_receipt(self):
         self.profile['displays'][1]['connector'] = self.profile['displays'][0]['connector']

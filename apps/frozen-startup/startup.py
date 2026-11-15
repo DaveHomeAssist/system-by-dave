@@ -151,6 +151,8 @@ class FixtureBridge:
 
     def call(self, action, payload):
         self.calls.append(action)
+        if action == 'capabilities':
+            return {'startup': True, 'routingReadback': True}
         if action == 'observe':
             return copy.deepcopy(self.snapshot)
         if action == 'restore':
@@ -198,6 +200,9 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
         raise StartupError(issue)
 
     try:
+        capabilities = bridge.call('capabilities', {})
+        if not isinstance(capabilities, dict) or (not warm and capabilities.get('startup') is not True):
+            raise StartupError('Mac startup integration is incomplete. No display changes were made.')
         record('Waiting for five stable display identities')
         snapshot = wait_for(lambda s: [])
         if not warm:

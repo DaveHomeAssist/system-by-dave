@@ -160,7 +160,9 @@ def main():
     if request.get('schemaVersion') != 1:
         raise ValueError('Unsupported request')
     action, payload = request.get('action'), request.get('payload', {})
-    if action == 'observe':
+    if action == 'capabilities':
+        result = {'startup': False, 'routingReadback': False, 'reason': 'Live Millumin output ownership is unqualified'}
+    elif action == 'observe':
         displays = observe_displays()
         result = {'schemaVersion': 1, 'displays': displays, 'millumin': observe_millumin(displays)}
     elif action == 'restore':

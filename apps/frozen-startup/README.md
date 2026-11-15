@@ -31,11 +31,13 @@ The executable receives one JSON request on stdin and emits one JSON response
 on stdout. Every request has `schemaVersion: 1`, `action` and `payload`.
 Responses have `ok: true` and `result`, or `ok: false`. Calls time out after
 15 seconds. There is no shell evaluation. The bridge is trusted local code.
-This release supplies the offline bridge. A production bridge still requires
-implementation and native qualification before use on the Studio.
+This release supplies the offline bridge and a partial native Mac adapter.
+The native adapter reports startup capability as unavailable, so the coordinator
+stops before changing any display. Millumin integration needs completion.
 
 | Action | Request | Required behavior |
 | --- | --- | --- |
+| capabilities | Empty payload | Report whether complete startup integration is available |
 | observe | Empty payload | Read current displays and Millumin state in the example snapshot shape |
 | restore | Explicit display IDs, connectors, identities and modes | Revalidate identities, restore modes, atomically arrange all displays and verify success |
 | openShow | Approved path/hash and current control display ID | Verify the file hash, open once, place controls on the operator display, preserve show geometry and cues |
