@@ -163,3 +163,23 @@ test('a cancelled partial poll releases a queued control without reporting a com
   assert.equal(state.lines.filter(line => line.endsWith('%1AVMT 30')).length, 1);
   assert.equal(state.connections, 2);
 });
+
+for (const [rawPower, expectedPower] of [['0', 'off'], ['2', 'cooling'], ['3', 'warming']]) {
+  test(`PJLink preserves ${expectedPower} without unavailable detail queries`, async (t) => {
+    const { driver, state } = await pjlinkProjector(t);
+    state.values.POWR = rawPower;
+    state.stallQuery = 'AVMT';
+    const status = await driver.getStatus();
+    assert.equal(status.power, expectedPower);
+    assert.equal(status.online, true);
+    assert.equal(status.shutter, 'unknown');
+    assert.equal(status.input, null);
+    assert.equal(state.lines.length, 1);
+    assert.match(state.lines[0], /%1POWR \?$/);
+    state.values.POWR = '1';
+    state.stallQuery = null;
+    const recovered = await driver.getStatus();
+    assert.equal(recovered.power, 'on');
+    assert.equal(recovered.shutter, 'open');
+  });
+}

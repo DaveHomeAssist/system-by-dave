@@ -171,7 +171,9 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
     kind: 'pjlink',
     lensJog: { axes: [], speeds: [], mode: 'unsupported', stop: false, positionReadback: false },
     async getStatus({ signal } = {}) {
-      const got = await query(['POWR ?', 'AVMT ?', 'INPT ?', 'ERST ?', 'LAMP ?', 'NAME ?'], { signal });
+      // Read power independently: standby projectors may stop answering the
+      // other queries while still providing a valid power state.
+      const got = await query(['POWR ?'], { signal });
       const read = cmd => {
         const entry = got.get(cmd);
         if (!entry) throw new Error(CLOSED);
@@ -182,6 +184,11 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
       const power = await read('POWR ?');
       if (!Object.hasOwn(powerMap, power)) throw new Error('Invalid PJLink power status');
       const s = { power: powerMap[power], online: true, errors: null, lightHours: null, name: null };
+      if (power !== '1') {
+        return { ...s, shutter: SHUTTER.UNKNOWN, input: null, pattern: null };
+      }
+      const details = await query(['AVMT ?', 'INPT ?', 'ERST ?', 'LAMP ?', 'NAME ?'], { signal });
+      for (const [command, result] of details) got.set(command, result);
       s.shutter = await optional(async () => { const value = await read('AVMT ?'); if (!['10', '11', '20', '21', '30', '31'].includes(value)) throw new Error('Invalid PJLink shutter status'); return value === '11' || value === '31' ? SHUTTER.CLOSED : SHUTTER.OPEN; }, SHUTTER.UNKNOWN);
       s.input = await optional(async () => { const value = await read('INPT ?'); if (!/^[1-6][1-9]$/.test(value)) throw new Error('Invalid PJLink input status'); return value; }, null);
       await optional(async () => { const value = await read('ERST ?'); if (!/^[012]{6}$/.test(value)) throw new Error('Invalid PJLink alarm status'); const [fan, lamp, temp, cover, filter, other] = [...value].map(Number); s.errors = { fan, lamp, temp, cover, filter, other }; });

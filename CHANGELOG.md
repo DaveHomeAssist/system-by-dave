@@ -2,6 +2,10 @@
 
 ## 2026-11-14
 
+- Preserve fresh PJLink off, cooling and warming replies when standby projectors stop answering optional status queries. Panasonic polling skips its native pattern query in these states. Add protocol regression coverage for all three states and return to on.
+
+## 2026-11-14
+
 - Add a concise WST house Handoff page with current R5 documents, crew checks, fault/shutdown guidance and explicit open confirmations.
 
 ## 2026-11-14
