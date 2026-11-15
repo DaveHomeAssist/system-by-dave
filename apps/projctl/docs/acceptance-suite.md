@@ -64,8 +64,9 @@ query strings and fragments are rejected.
    other fault as a failure or unresolved finding.
 7. Exercise shutdown, wait for the device's actual cooling/standby indication,
    then the approved startup. Record exact order, elapsed time and states.
-   Verify the real `power-off` or `relay-stop` report trigger and its timestamps.
-   A manually generated report alone cannot pass `shutdown-report`.
+   Verify the real `power-off` report trigger and its timestamps.
+   A manual or `relay-stop` report cannot pass `shutdown-report`; restarting
+   the controller does not prove projector shutdown.
 8. Separately test Studio reboot/login, standby/wake, USB reconnect and HDMI
    reconnect. Capture before and after each. Require automatic recovery to
    four unscaled progressive 1920x1200 outputs and the 1920x1080 control screen,
@@ -81,7 +82,10 @@ query strings and fragments are rejected.
 
 Temperature passes require a report from this run with all four units reached
 and zero flagged units. Shutdown-report passes require a current `power-off`
-or `relay-stop` report. Delivery passes require a current shutdown report with
+report and a later capture with all four lanes online and OFF. Each reply must
+follow the report trigger and be no older than three minutes at capture time.
+A `relay-stop` report cannot satisfy shutdown or delivery acceptance.
+Delivery passes require a current power-off report with
 the relay's Notion publication state and URL, plus the operator's readback.
 Attach full report files as well as snapshots to retain individual temperatures.
 

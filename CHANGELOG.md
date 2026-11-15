@@ -2,6 +2,9 @@
 
 ## 2026-11-15: Frozen Quiet Watch 1
 
+- Require an actual power-off report for projector shutdown and delivery acceptance;
+  fresh OFF replies from all four lanes must follow the trigger. A controller
+  restart report cannot satisfy either check.
 - Label simulated Monitor readings as Practice data, consistent with the controller.
 - Include every current projector alarm in Monitor, with compact alert counts and
   complete detail text. Retain unknown status for missing or stale alarm readings.
