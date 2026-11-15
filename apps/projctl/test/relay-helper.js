@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,8 +12,10 @@ export async function until(fn, timeout = 10000) {
   throw new Error('Timed out waiting for relay state');
 }
 
-export async function startRelay(overrides = {}) {
+// files: { name: text } written beside the rig before the relay starts, e.g. health-reports.json.
+export async function startRelay(overrides = {}, { files = {} } = {}) {
   const dir = await mkdtemp(path.join(tmpdir(), 'projctl-test-'));
+  for (const [name, text] of Object.entries(files)) await writeFile(path.join(dir, path.basename(name)), text);
   const child = spawn(process.execPath, ['server/index.js'], {
     cwd: fileURLToPath(new URL('../', import.meta.url)),
     env: { ...process.env, SIM: '1', PJ_PASSCODE: '', PROJCTL_PASSWORD: '', RIG: path.join(dir, 'rig.json'), STAGE_PLOT: path.join(dir, 'stage-plot.json'), VENUE_MODEL: path.join(dir, 'venue'), PORT: '0', OSC_PORT: '0', TCP_PORT: '0', POLL_MS: '50', ...overrides },

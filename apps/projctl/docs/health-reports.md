@@ -59,9 +59,11 @@ because production paperwork numbers the projectors differently.
 | Barco Pulse | `environment.temperature.ambient_outside.value` and `environment.alarmstate`. |
 | PJLink only | `ERST` flags from the normal poll; no temperatures. |
 
-Readings are taken only when a report runs, never on the 5-second status poll.
-Status polls and report readings share a queue for each projector, preventing
-those reads from overlapping in either direction. A status poll gets its full
+Report readings are taken when a report runs, never on the 5-second status poll.
+The Thermal watch (README, "Thermal watch") takes the same reading about once a
+minute while a unit is on or cooling. Status polls, report readings and watch
+samples share a queue for each projector, preventing those reads from
+overlapping, and a report's own reading also reaches the watch. A status poll gets its full
 device timeout after acquiring the queue, so local queue waiting cannot mark a
 projector offline. Different projectors remain
 independent. Report readings retry transport failures at most twice, with a
@@ -81,8 +83,9 @@ valid intake reading. Missing alarm feedback still produces an incomplete
 assessment. Control writes remain independent of this read queue.
 
 This adapts the read coordination, partial readings and retry scope reviewed in
-PR #463 to the current relay. Thermal watch history, fallback samples and peak
-columns require the separate Thermal backend and are outside this change.
+PR #463 to the current relay. Fallback samples and peak columns in reports are
+outside this change; Thermal watch history lives in the relay's Thermal backend
+(`server/thermal.js`).
 ECP-1.0 revision 1.0 applies. Existing units, identities and saved report shapes
 are preserved, with optional read-error detail added to partial results.
 
@@ -156,9 +159,12 @@ retry, the two API routes and tests. No operator-page panel.
 
 - No full Barco sensor sweep (laser banks, DMD, FPGAs, fans); only ambient and
   alarm state.
-- No temperature trend logging between reports, and no alerting.
+- No temperature trend logging between reports, and no alerting. The Thermal
+  watch adds an in-memory trend and Log entries on a change of level; reports
+  themselves are unchanged.
 - No settings changes on any projector. No power command is sent or delayed.
-- No operator-page panel; reports are read in Notion or the saved files.
+- No operator-page panel for reports; they are read in Notion or the saved
+  files. The Thermal watch tab shows live air temperature, not reports.
 
 ## Dependencies
 
