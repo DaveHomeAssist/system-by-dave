@@ -1,5 +1,9 @@
 # Changelog
 
+## November 15, 2026: Video Engineering Daily
+
+- Add Edition 039 on how the AJA FS4 links audio delay to video timing, with an illustrated story card.
+
 ## 2026-11-15: Frozen Quiet Watch 2
 
 - Follow power and shutter commands with bounded fresh status reads, so an early
