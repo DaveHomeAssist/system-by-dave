@@ -1,3 +1,28 @@
+# Frozen workspace
+
+## Quiet Watch appearance and navigation
+
+The shared appearance source is `apps/projctl/public/frozen-theme.js` and
+`frozen-theme.css`. The embed generator copies these into WST and its local
+controller workspace. Do not edit the copies independently. Light, Dark and
+System persist as `frozen.theme.v1`; a fresh browser starts light. The Home snow
+scene, documents, references, controller, login and Monitor share the choice and
+surface palette. System follows the OS; an explicit mode overrides it. Old saved
+preferences are read, and Monitor Deep Freeze migrates to Dark. Browser origins
+keep separate saved settings; embedded views receive a bounded appearance message.
+
+Home names operator, crew, reference and planning destinations. Live controls is
+also in More. At 680px and below, Rig, Stage and More stay directly available in
+the bottom navigation. The local controller copy opens its own origin, not a
+visitor device's localhost. Local embedded references request an existing
+controller view instead of nesting another controller frame. The standalone
+handoff is included in local packages. Navigation and appearance send no hardware
+commands and do not alter personal notes or shared tasks.
+
+The dated sections below record earlier delivery context. Current slot mappings,
+service configuration and commissioning status come from the installed private
+rig and current operations record, not a historical example here.
+
 ## House handoff page
 
 The Handoff route gives house crew one concise entry point for current R5 documents,
@@ -57,7 +82,7 @@ Team tasks are public by Dave's explicit choice: anyone opening the page can vie
 
 This GitHub directory owns the shared projector frontend and retains a generated managed source snapshot in `hosting/`. The Sites hosting repository is a deployment mirror, not a separate feature authority. `hosting/deployment.json` records the managed commit and successful deployment. Update source here first, synchronize the managed repository via the Sites helper and record the resulting receipt. Do not create another Site: reuse `.openai/hosting.json` project ID. Generated single-file Worker contains embedded frontend assets; run `node wst/embed-hosted-assets.mjs` to synchronize the generated worker from the canonical frontend, configuration and projector JSON before release. `hosting/drizzle` owns schema migrations, never apply schema changes in request handling.
 
-Current production is version 26, managed source `a71c93323f0c05f800dad739e100d19eb29e942d` (published November 7, 2026). Version 23 added Tech Schedule, its PDF and the More navigation; version 24 published the Stage/reference polish from PR 448; version 25 added the pixel strip reference; version 26 added the pixel photos and the Planning calendar (`calendar.js`, `tech-schedule.json`). On November 13, 2026 those managed additions were reconciled into this directory (accepted source `b09a0b06970892371173de0fa78a32a608a22fa9`): `index.html`, `workspace.js`, `workspace.css`, `calendar.js`, `tech-schedule.json`, `frozen-tech-schedule.pdf`, `pixel-strip-label.jpg` and `pixel-power-supply.jpg` are canonical here, and `embed-hosted-assets.mjs` embeds the text assets plus the PDF and photos as gzip/base64 binaries, so the regenerated Worker equals production version 26 byte for byte apart from the new-tab controller fallback below. Version 27 (that fallback) is prepared as managed commit `e5f1db6fbdb703853d0d52171149dc60d6cebeea` but not yet published: the Sites connector is reachable only from the Codex Desktop app, and `hosting/deployment.json` carries the `pendingPublication` receipt until it ships.
+Use the current Sites deployment and `hosting/deployment.json` for the published version, managed source commit and readback evidence. Versions 23 through 26 introduced the schedule, Stage reference, pixel specification and Planning calendar. Later releases added the R5 documents, team updates and standalone house handoff. These assets are retained in the canonical source and regenerated together.
 
 The managed Worker/D1 service is separate from GitHub Pages and existing FMP services. DNS adds only the requested WST hostname; housevideo.app and walk.housevideo.app stay unchanged.
 
@@ -77,7 +102,7 @@ The controller now includes Notes + tasks and Projector info alongside Rig and S
 
 The public website shows Stage / room and Controls in place. Connect this Mac explicitly requests the browser's local-network permission for `http://localhost:8080`, checks relay health, and loads the private controller frame; the always-visible Open local controller link is the direct path (see the November 14 section above). Connected requires a source/origin-validated child report with active relay connection, not iframe load. Parent messages can select only Rig or Stage; they cannot issue device commands. Denied/unavailable connection stays clearly disconnected. This does not expose a public relay and is not a verified Studio crew endpoint.
 
-The public tasks API permits anonymous cross-origin GET/POST/OPTIONS so the local workspace uses the same shared list. This CORS change is limited to the managed task API. Existing controller API policies were not broadened. Private authenticated Studio iframe behavior remains unverified: current controller cookies use SameSite=Lax, and the current MacBook has no passcode configured. Do not claim a future protected Studio iframe is commissioned from this local test.
+The public tasks API permits anonymous cross-origin GET/POST/OPTIONS so the local workspace uses the same shared list. This CORS change is limited to the managed task API. Existing controller API policies were not broadened. Private authenticated Studio iframe commissioning remains a separate check. Current source uses a Strict controller cookie plus a Secure partitioned embed cookie, with own-origin API and WebSocket checks. Do not claim a future protected Studio iframe is commissioned from this local test.
 
 Verification: actual local controller panels passed desktop/mobile notes persistence across tabs, shared-list read, and projector info/Stage navigation. The public website loaded actual private Stage and Rig in place in an isolated browser with normal local-network permission explicitly granted; the denied state remains disconnected. No physical commands were sent. A temporary SSH forward bound only Walter loopback for these tests; it is not a deployed service.
 
@@ -91,7 +116,7 @@ The owner's actual desktop browser reached the new bounded failure message inste
 
 Dave requested a choice-first landing screen. Home is now the initial view on both the public website and non-embedded local controller, with four in-page choices: Notes + tasks, Projector info, Stage / room, and Controls. Notes remain one click away. Embedded controller frames continue opening Rig/Stage directly rather than showing a nested Home screen. This changes navigation only; no storage migration, backend restart or projector commands are involved. The user's actual local Home routes were verified; public Home routes are awaiting the final owner-browser readback. Existing local-network permission limitations remain unchanged.
 
-Home renders that choice screen as a dark snow splash (`snow-splash.css`, `snow-splash.js`, and vendored `vendor/gsap.min.js`). The aurora, falling snow and Frozen letter reveal stay inside the home panel. Destination buttons keep `data-route` and the existing `navigate()` path. The theme toggle still changes Notes, Rig and the other panels. Snow and the reveal pause while Home is hidden, and they do not run for `prefers-reduced-motion`. Styles and scripts are same-origin files embedded with the Worker; the CSP is unchanged.
+Home renders that choice screen as a theme-aware snow splash (`snow-splash.css`, `snow-splash.js`, and vendored `vendor/gsap.min.js`). The aurora, falling snow and Frozen letter reveal stay inside the home panel. Destination buttons keep `data-route` and the existing `navigate()` path. The appearance choice changes Home, Notes, Rig and the other panels. Snow and the reveal pause while Home is hidden, and they do not run for `prefers-reduced-motion`. Styles and scripts are same-origin files embedded with the Worker; the CSP is unchanged.
 
 ## Six-menu shell
 
@@ -137,10 +162,10 @@ Embedded Stage suppresses its duplicate heading/backlink and uses a single plann
 
 Checked in installed Chrome with disposable contexts: 1900×950, 845×954 and 375×812, both themes, full room WebGL, Front/Plan, candidate lens/raster edits, and inspector containment. Outer content retains the compact wide layout; phones reserve two rows for directly accessible destinations. `scripts/test_wst_workspace.cjs` checks notes reload and responsive navigation; `apps/projctl/test/wst-public-stage-browser.cjs` checks actual packaged model/planning and theme propagation. Set `PLAYWRIGHT_EXECUTABLE_PATH` to use an existing installed browser.
 
-## November 7 delivery and remaining installation
+## November 7 delivery record
 
 PR 448 merged as `6e0753a6153868ba2b12aa32038b54bd329d3c65` after both exact-head CI checks passed. Dominic passed 95 Projctl unit tests, the operator/browser suites, and the exact version 24 managed Stage artifact at 1440, 680 and 375 pixels. The live custom domain visibly opens on the set-facing Stage camera and shows the four requested reference slots. Projector/reference/Stage asset bytes remain exact in version 25; its CSS retains the task change plus the concurrent pixel-reference addition. Tech Schedule, its PDF and backend were preserved.
 
 The Mac Studio is the active backend. Dave subsequently clarified that a Stream Deck profile exists, superseding the initial assumption that only this page uses P1 through P4. Inspection found an installed Frozen XL profile whose letter controls resolve the current slot from relay lane assignments; isolated binding checks passed before and after the proposed renumbering. The running plugin was connected to the laptop relay, so Studio connection and physical button acceptance remain unverified. See the [readiness record](../apps/projctl/docs/show-readiness.md#drawing-order-numbering-and-stage-polish-november-7) for the connection constraint.
 
-The offline migration and UI installation still require working access to the Studio. Neither live rig has been renumbered, no projector command was sent, and the laptop installation was not changed. Next: verify the intended Stream Deck relay target, back up and migrate the Studio using the runbook, install the reviewed UI assets, restart the same managed relay, and verify A/P1, B/P2, C/P3 and D/P4 against the saved device identities and profile display.
+The November 7 renumbering proposal was not applied. Quiet Watch preserves the installed control mapping: A=P3, B=P2, C=P1 and D=P4. Keep the saved private rig and Stream Deck bindings intact. The public drawing-order labels are reference records, not authority to change controller slots.

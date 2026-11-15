@@ -4,7 +4,7 @@ export function nextOperatorAction(projector, connection, lock) {
   if (!projector) return null;
   const status = projector.status || {};
   if (!connection.current) return { id: 'connection', action: 'details', text: 'Open Details to check the connection.' };
-  if (Object.values(status.errors || {}).some(value => value > 0)) return { id: 'fault', action: 'details', text: 'Open Details to review the reported fault or warning.' };
+  if (!status.stale?.includes('errors') && Object.values(status.errors || {}).some(value => value > 0)) return { id: 'fault', action: 'details', text: 'Open Details to review the reported fault or warning.' };
   if (lock || projector.busy || status.power !== 'on') return null;
   const stale = new Set(status.stale || []);
   if (stale.has('power')) return null;

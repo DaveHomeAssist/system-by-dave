@@ -3,10 +3,13 @@
 The relay retries each saved projector independently after a cable, switch or
 interface interruption. Reconnecting does not scan for a different projector,
 change saved addresses or replay a power, input, shutter, pattern or lens action.
-Each protocol request opens a fresh socket. A failed or cancelled read closes
-its socket, including a connection that closes before sending a response.
+PJLink can reuse a healthy serialized status connection. A failed or cancelled
+read closes its socket, including one that closes before sending a response.
+Retries reopen the connection without replaying control commands.
 
-Healthy devices are polled five seconds after the previous poll completes.
+Healthy devices are polled after the configured interval following each completed
+poll (five seconds by default). Connection details shows this interval; a longer
+setting also delays visibility of actions from Millumin or a physical remote.
 Failure retries wait 5, then 10, then at most 15 seconds (using the configured
 poll interval if it is longer). A complete poll has a ten-second deadline;
 optional telemetry cannot keep a failed poll alive indefinitely. Successful

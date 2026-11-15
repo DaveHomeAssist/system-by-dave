@@ -3,6 +3,8 @@ import { normalizePlot, projectorForLane } from './stage-plot.js';
 import { createStage3D } from './stage-3d.js';
 import { createVenueView } from './venue-view.js';
 import { createStagePlanner } from './stage-planner.js';
+import { createConnectionMonitor } from './projector-connection.js';
+import { fieldFeedback } from './status-feedback.js';
 
 const svgNode = (name, attrs = {}) => {
   const el = document.createElementNS('http://www.w3.org/2000/svg', name);
@@ -19,6 +21,8 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
   let venue, buildingViewer, loadingBuilding, planner, plannerLoading, planning = false, proposal, approximateRoom = false;
   const roomAlignment = { x: 0, y: 0, z: .2, yaw: 0 };
   const hidden = new Set(), cards = new Map(), markers = new Map();
+  const readConnection = createConnectionMonitor();
+  const connectionOf = p => readConnection(p, connected, current.relay?.pollIntervalMs);
   const highlight = (lane) => { canvas.dataset.highlight = lane || ''; viewer?.highlight(lane); };
 
   function selectMetadata(lane){root.dataset.selectedLane=lane;for(const [key,card]of cards)card.setAttribute('aria-pressed',String(key===lane));root.dispatchEvent(new CustomEvent('stage-lane-select',{detail:{lane}}));}
@@ -26,7 +30,7 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
     selectMetadata(lane);viewer?.select(lane);
     if (planning) { planner?.select(lane); return; }
     const p = projectorForLane(current.projectors, lane);
-    if (p && connected && p.status?.online && canAdjust(p)) openControls(p.slot);
+    if (p && connectionOf(p).current && canAdjust(p)) openControls(p.slot);
   }
   function buttonFor(lane, className) {
     const b = document.createElement('button'); b.type = 'button'; b.className = className; b.dataset.lane = lane;
@@ -199,12 +203,13 @@ export function createStageView(root, openControls, canAdjust, {plotUrl = "/api/
     if(referenceOnly){$('#stage-status-kind').textContent='Recorded reference';for(const [lane,card] of cards){card.querySelector('.pj-stage-device').textContent=LANES[lane].orientation;card.querySelector('.pj-stage-state').textContent='Plot reference · not live telemetry';card.setAttribute('aria-disabled','false');card.setAttribute('aria-label',`${lane} ${LANES[lane].target}. Select recorded projector.`);}return;}
     $('#stage-status-kind').textContent = !online ? 'Relay offline' : state.simulation ? 'Simulated status' : 'Reported status';
     for (const [lane, info] of Object.entries(LANES)) {
-      const p = projectorForLane(state.projectors, lane), s = p?.status;
+      const p = projectorForLane(state.projectors, lane), connection = connectionOf(p);
       const matches = state.projectors.filter((p) => p.lane === lane).length;
-      const reason = !p ? matches ? 'Duplicate lane. Check Setup.' : 'Assign this lane in Setup.' : !online ? 'Relay offline' : !s?.online ? 'Projector offline' : !canAdjust(p) ? 'Adjustment controls unavailable' : null;
-      const power = { on: 'Powered', off: 'Standby', cooling: 'Cooling', warming: 'Warming' }[s?.power] || 'Power unknown';
-      const shutter = ['open', 'closed'].includes(s?.shutter) ? `Shutter ${s.shutter}` : 'Shutter unknown';
-      const status = !p || !online || !s?.online ? reason : [power, shutter, !canAdjust(p) && 'Adjustments unavailable'].filter(Boolean).join(' · ');
+      const reason = !p ? matches ? 'Duplicate lane. Check Setup.' : 'Assign this lane in Setup.' : !online ? 'Relay offline' : !connection.current ? connection.label : !canAdjust(p) ? 'Adjustment controls unavailable' : null;
+      const powerReport = fieldFeedback(p, 'power', connection), shutterReport = fieldFeedback(p, 'shutter', connection);
+      const power = powerReport.current ? { on: 'Powered', off: 'Standby', cooling: 'Cooling', warming: 'Warming' }[powerReport.value] || 'Power unknown' : 'Power unknown';
+      const shutter = shutterReport.current && ['open', 'closed'].includes(shutterReport.value) ? `Shutter ${shutterReport.value}` : 'Shutter unknown';
+      const status = !p || !connection.current ? reason : [power, shutter, !canAdjust(p) && 'Adjustments unavailable'].filter(Boolean).join(' · ');
       const card = cards.get(lane), marker = markers.get(lane);
       card.querySelector('.pj-stage-device').textContent = p ? `${p.model || p.make || 'Projector'} · ${info.orientation}` : 'No unique control slot';
       card.querySelector('.pj-stage-state').textContent = status;

@@ -6,8 +6,8 @@
   if (!panel || !canvas || !gsap) return;
 
   const brand = document.querySelector('header .brand');
-  const themeMeta = document.querySelector('meta[name="theme-color"]');
-  const themeDefault = themeMeta ? themeMeta.getAttribute('content') || '#edf5fb' : '#edf5fb';
+  let snowColor = document.documentElement.dataset.theme === 'dark' ? '237,245,251' : '70,115,145';
+  window.addEventListener('frozen:themechange', event => { snowColor = event.detail.theme === 'dark' ? '237,245,251' : '70,115,145'; });
   const aurora = panel.querySelector('.snow-aurora');
   const chars = panel.querySelectorAll('.snow-char');
   const mark = panel.querySelector('.snow-mark');
@@ -64,7 +64,7 @@
       if (flake.x < -4) flake.x = width + 4;
       if (flake.x > width + 4) flake.x = -4;
       ctx.beginPath();
-      ctx.fillStyle = 'rgba(237,245,251,' + flake.alpha.toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(' + snowColor + ',' + flake.alpha.toFixed(3) + ')';
       ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
       ctx.fill();
     }
@@ -121,7 +121,6 @@
       if (home) brand.setAttribute('aria-hidden', 'true');
       else brand.removeAttribute('aria-hidden');
     }
-    if (themeMeta) themeMeta.setAttribute('content', home ? '#071520' : themeDefault);
   }
 
   function sync() {
@@ -193,6 +192,8 @@
   }).observe(panel);
   new MutationObserver(sync).observe(panel, { attributes: true, attributeFilter: ['hidden'] });
   document.addEventListener('visibilitychange', sync);
+  window.addEventListener('pagehide', () => { stopSnow(); pauseMotion(); });
+  window.addEventListener('pageshow', sync);
   // workspace.js navigates during its module script, which runs before this event.
   document.addEventListener('DOMContentLoaded', () => {
     resize();

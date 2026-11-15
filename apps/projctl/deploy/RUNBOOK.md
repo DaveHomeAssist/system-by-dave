@@ -45,9 +45,9 @@ Manufacturer reference: [Barco UDM PJLink command list](https://www.barco.com/ma
 
 | Symptom | Do this |
 | --- | --- |
-| Tile says Offline, projector is on | Setup tab, press Find projectors. The relay rediscovers by MAC every minute on its own. |
+| Tile says Offline, projector is on | Check the saved address and venue network. Recovery retries that address; Find projectors is an explicit MAC-based discovery action. |
 | "auth failed" in the Log | The projector's PJLink or admin password changed. Setup tab, enter it, Save. |
-| Shutter button does nothing | Wait 5 s; the projector answers slowly while the shutter moves. Then check the Log tab. |
+| Shutter button does nothing | Check the command result and wait for a fresh projector reply. Connection details shows the check interval. Read the Log before repeating the action. |
 | Picture sliders greyed | Check Show Lock and the input signal. Unlocking restores available settings; missing-signal values remain disabled. |
 | Page asks for a passcode again | The relay restarted. Sign in again. |
 | Nothing loads at all | On the relay box: macOS: open `~/Applications/Open Projctl.command`; Linux `sudo systemctl restart projctl`. |
@@ -63,15 +63,23 @@ The optional Funnel mode publishes a public endpoint. Enabling it requires an
 explicitly authorized public-access plan and its authentication review. A
 private Serve deployment does not require Funnel.
 
-Then Setup tab: enter each projector's IP, MAC, admin user and PJLink password, Save. Tiles go live within 10 s.
+Then Setup tab: enter each projector's IP, MAC, admin user and PJLink password, Save. Tiles update after the next successful check. Connection details shows the configured interval.
 
 Keep the box awake. macOS: System Settings, Energy, Prevent automatic sleeping. Pi: nothing to do.
 
 ## Backups
 
-    deploy/backup.sh [DEST]      # rig file, presets, log; keeps 30 snapshots
+    deploy/backup.sh [DEST]      # private settings, schedules, model and log; verifies digests
 
-Cron it nightly on the box. Backups contain private operational data. Keep them private, including redacted copies.
+The script creates a unique private directory and `BACKUP.json` inventory. It
+includes the rig, presets, stage plot, venue, schedule state and claims, health
+settings/reports and log when present. A managed macOS snapshot also includes the
+service configuration. It never prunes destination folders. Review retention only
+after verifying an off-host copy. Do not treat a partially redacted rig as public.
+
+This is a live file snapshot, not a transaction across all running writers or a
+whole-computer backup. Use the service updater's stopped-writer snapshot for an
+atomic settings migration. No recurring backup task is created automatically.
 
 ## Strike (early January)
 
@@ -146,8 +154,10 @@ starting it. Do not run old and new copies simultaneously.
 
 ## Align slot numbers with drawing lanes
 
-Frozen uses A / SL Portal = P1, B / Top Portal = P2, C / Stage = P3 and
-D / SR Portal = P4. A lane edit alone does not change a device's control address.
+The optional drawing-order migration targets A / SL Portal = P1, B / Top Portal = P2,
+C / Stage = P3 and D / SR Portal = P4. This is not proof of an installed rig mapping.
+Read the current private rig before any cue work; existing controller slots remain
+authoritative until this separately coordinated migration is completed. A lane edit alone does not change a device's control address.
 For an older rig with different numbers, use `scripts/renumber-rig.js` during a
 maintenance window. First review Stream Deck, OSC/TCP and other external cues
 that address P1 through P4. A saved cue using the old number must be changed

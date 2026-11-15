@@ -90,6 +90,19 @@ export function proxyPolicy(raw = process.env.PROJCTL_TRUSTED_PROXIES ?? DEFAULT
   };
 }
 
+// Browser credentials belong to the controller origin, including when its page
+// is embedded in an approved workspace. Native API/cue clients have no Origin.
+export function browserRequestAllowed(req, proxy) {
+  const origin = req.headers.origin;
+  if (origin === undefined) return !['cross-site', 'same-site'].includes(req.headers['sec-fetch-site']);
+  if (typeof origin !== 'string' || origin === 'null') return false;
+  try {
+    const expected = new URL(`${proxy.isHttps(req) ? 'https' : 'http'}://${req.headers.host}`);
+    const supplied = new URL(origin);
+    return supplied.origin === origin && supplied.origin === expected.origin;
+  } catch { return false; }
+}
+
 // Failed logins back off exponentially per client. The table is bounded: expired records are
 // forgotten, idle ones are evicted first, and active lockouts are never evicted. When every slot
 // holds an active lockout, unknown clients share one overflow record instead of escaping the limit.

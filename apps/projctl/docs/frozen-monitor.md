@@ -2,7 +2,7 @@
 
 The Frozen Monitor is a six-page, read-mostly view of the Frozen projection system, served by the
 projctl relay at `/monitor/` (for example `http://localhost:8080/monitor/` on the relay computer).
-It implements the [Frozen Monitor design canvas](https://claude.ai/code/artifact/0281f22f-caf3-4cc2-bc4a-294697c12eb6)
+It evolves the [Frozen Monitor design canvas](https://claude.ai/code/artifact/0281f22f-caf3-4cc2-bc4a-294697c12eb6)
 (November 14, 2026) with projctl's own components: `avd/tokens.css`, `avd/bundle.css`, the
 `app.css` header, tile and lane styles, and the relay's WebSocket snapshot.
 
@@ -32,6 +32,13 @@ button is hidden there and Home is the way in. Styles live in `public/monitor-li
 | Notes | Shared team tasks (public Frozen workspace service) | Documents and Notion records |
 | Calendar | — | `workspace/tech-schedule.json` (the Planning calendar's file), milestones |
 
+Faults come from the projector's PJLink alarm status (fan, lamp, temperature, cover, filter,
+other; 1 is a warning, 2 an error). Current alerts appear as a compact amber or red count on the lane's tile.
+The tile's accessible name and the inspector's Faults row list every alert, errors first, for example
+`Lamp error · other warning reported now`. Missing or stale alarm readings say `Not reported`;
+an explicit reading with no alarms says `None reported`, never "OK".
+Pulse reports signal presence only, shown as `Signal present` or `No signal`.
+
 Where the relay has not reported a value the page says so (`Not reported`, `No reading`,
 `Relay offline`); it never fills a gap with a sample. When the relay is unreachable every lane
 reads `Relay offline`, Show Lock reads `unknown`, and only recorded facts remain.
@@ -47,13 +54,16 @@ status, not a switch.
 
 ## Data, storage and privacy
 
-- Theme: `projctl.monitor.theme.v1` (`light`, `dark`, `deep-freeze`). A fresh browser follows
-  Projctl's saved light or dark choice (`projctl.ui.v1`), otherwise light. Deep Freeze is a new,
-  monitor-only palette in `monitor.css`.
+- Theme: shared `frozen.theme.v1` (`light`, `dark`, `system`). Fresh browsers start light;
+  System follows the OS. Existing controller/workspace preferences are read during migration,
+  and the old Monitor Deep Freeze choice becomes Dark. The same choice follows login,
+  controller, Monitor and workspace pages on this origin. Denied storage keeps it for the visit.
 - Personal notes use `wst.frozen.personal-notes.v1`, the key Projctl's Notes panel already uses on
   the same relay origin, so both show the same notes. They stay in that browser.
 - Shared tasks use `https://wst.housevideo.app/api/tasks`, the same public list as the workspace.
   The monitor can add and complete tasks; editing and deleting stay on the shared board.
+  Failed saves retain the draft and error through automatic refresh. Repeated submits
+  produce one request; rejected edits restore the latest shared value.
 - No private network address is written into the source: this repository is public. Projector
   addresses come from the relay at run time; the Studio relay and lighting-network addresses link
   to the project hub. `test/static-serving.test.js` fails if a private address appears in
@@ -64,10 +74,16 @@ status, not a switch.
 Each page carries the repository's full head (canonical, Open Graph and Twitter Card) at the relay's
 local identity, `http://localhost:8080/monitor/`, with `noindex, nofollow`.
 
-Every page is viewport-locked: the page never scrolls (WEB-2) and long panels scroll inside
-themselves. Below 1100 px the columns stack inside the page body; at 680 px and below the six
-sections move to a bottom rail with 44 px targets and the header compacts. Styles live in
-`monitor.css` as classes so the pages run under `style-src 'self'`; there are no inline styles.
+The primary dashboard uses one viewport with four explicit views: House, Activity,
+Today and Health. House prioritizes all four reported power and shutter states.
+Activity uses paged rows, Today shows one checklist item at a time, and the
+selected projector or dated issues open in accessible dialogs. No dashboard panel
+requires vertical scrolling. House uses status cards in the physical stage arrangement.
+
+The six section links move to a persistent bottom rail on phones. Reference pages
+keep longer records in their own panels. Shared layouts live in `monitor.css`;
+`dashboard.css` owns the primary dashboard's allocation of space. Both use the
+shared appearance tokens, without inline styles.
 
 ## Relay change
 
@@ -79,6 +95,8 @@ relay process. Folders now serve their `index.html` (so `/monitor/` works), `/mo
 
 - `npm test --prefix apps/projctl` includes `test/static-serving.test.js` (folder serving,
   redirects, relay survival, no inline styles, no private addresses).
+- `test/monitor-notes-browser.cjs` verifies rejected edits, retained failure feedback,
+  successful retry, duplicate submission protection and draft/notes preservation.
 - `npm run test:browser --prefix apps/projctl` includes `test/monitor-browser.cjs`: live state on
   the simulator relay, Show Lock, inspector selection, theme memory, Stop lens accepted under Show
   Lock, the picture map, notes storage, shared tasks from a fixture (no request reaches the public
@@ -88,6 +106,6 @@ relay process. Folders now serve their `index.html` (so `/monitor/` works), `/mo
 ## Not included
 
 - No new relay API. The monitor reads the existing snapshot, events and health-report summary.
-- Acceptance results are not recorded here; the grids show the crew workbook's empty state.
+- Acceptance results are not recorded here; the grids show the crew workbook's empty state. Read-only package checks are available from Health; the report contract is documented in [Quiet Watch](quiet-watch.md#monitoring-dashboard-integration).
 - Physical acceptance on the theatre relay remains open until the monitor is installed with the
   next venue update and read back there.

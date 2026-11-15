@@ -1,4 +1,5 @@
 // Display freshness and recovery only; never changes targets or starts a retry.
+import { feedbackAge } from './status-feedback.js';
 const eastern = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' });
 const timestamp = value => typeof value === 'number' ? (Number.isFinite(value) && Math.abs(value) <= 8.64e15 ? value : NaN) : typeof value === 'string' ? Date.parse(value) : NaN;
 const time = value => Number.isFinite(timestamp(value)) ? eastern.format(new Date(timestamp(value))) : null;
@@ -21,7 +22,7 @@ export function createConnectionMonitor() {
     const state = unassigned ? 'unassigned' : !relayConnected ? 'disconnected' : current ? 'online' : c.state === 'checking' ? 'checking' : s.online ? 'stale' : 'reconnecting';
     const label = state === 'unassigned' ? 'Unassigned' : state === 'disconnected' ? 'Relay disconnected' : state === 'online' ? recovered ? 'Reply recovered' : 'Reply received' : state === 'checking' ? 'Checking saved IP' : state === 'stale' ? 'Stale reply' : 'Reconnecting';
     const retry = state === 'reconnecting' ? c.nextRetryAt && time(c.nextRetryAt) ? `Next retry ${time(c.nextRetryAt)}` : 'Retry in progress' : '';
-    return { current, state, recovered, label, lastSuccessAt, lastReply: time(lastSuccessAt) || 'No successful reply yet', retry,
+    return { current, state, recovered, label, lastSuccessAt, ageMs: age, ageLabel: lastSuccessAt == null ? 'No reply yet' : feedbackAge(age), lastReply: time(lastSuccessAt) || 'No successful reply yet', retry,
       detail: `${label}${['checking','reconnecting'].includes(state) ? ` to saved IP ${projector.ip}` : ''}` };
   };
 }

@@ -1,5 +1,6 @@
 import { supportsPatterns } from './output-recovery.js';
 import { projectorName, orderedProjectors } from './lanes.js';
+import { fieldFeedback } from './status-feedback.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
@@ -13,7 +14,10 @@ export function createAllProjectors({ state, connected, connectionOf, send }) {
   const devices = () => orderedProjectors(state().projectors);
   const fingerprint = () => JSON.stringify({ connected: connected(), lock: state().lock, targets: devices().map(p => [p.slot,p.lane,p.model,p.driver,p.ip,p.mac,p.inputs,p.inputPreference,p.controlRevision,!!p.busy,connectionOf(p).current,p.status?.power]) });
   const allowed = command => connected() && state().relay?.commandTargetBinding === 1 && (!state().lock || command === 'shutter' || request?.cmd === 'power' && request?.arg === 1);
-  const targetHTML = projectors => projectors.map(p => `<li><strong>${escape(projectorName(p))}</strong><span>${escape(connectionOf(p).current ? p.status?.power || 'Connected' : connectionOf(p).detail)} · ${escape(p.model)}</span></li>`).join('');
+  const targetHTML = projectors => projectors.map(p => {
+    const connection = connectionOf(p), power = fieldFeedback(p, 'power', connection);
+    return `<li><strong>${escape(projectorName(p))}</strong><span>${escape(power.current ? power.value : connection.current ? 'Power not reported' : connection.detail)} · ${escape(p.model)}</span></li>`;
+  }).join('');
   function close() {
     if (busy) return;
     clearTimeout(expiry); request = null; dialog.close(); returnFocus?.focus();

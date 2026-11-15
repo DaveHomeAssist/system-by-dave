@@ -14,6 +14,7 @@ import { projectorDisplayInfo, createHostDisplayReader } from './display-info.js
 import { hasLens, lensSummary, lensPositionMatch, lensMotorState, LENS_AXES } from './preset-lens.js';
 import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
+import { RELEASE } from '../public/release.js';
 import { confirmations } from './confirmations.js';
 import { createCommandBinding } from './command-binding.js';
 import { readStagePlot } from './stage-plot.js';
@@ -26,7 +27,8 @@ import { createTelemetryReader } from './telemetry-reader.js';
 import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader, ratedAmbientC, isLit } from './health-reports.js';
 import { createThermalMonitor, thermalThresholds, plausibleAirC, thermalCsv, RETENTION_MS } from './thermal.js';
 import { createManualDiscovery } from './discovery.js';
-import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES } from './http-security.js';
+import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, browserRequestAllowed, LOGIN_BODY_BYTES } from './http-security.js';
+import { readSoftwareChecks } from './software-checks.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -44,10 +46,27 @@ const SESSION = createHash('sha256').update(`pj:${SESSION_SECRET}:${PASSCODE}`).
 const loginThrottle = createLoginThrottle(); // bounded per-client backoff; active lockouts survive eviction
 const proxy = proxyPolicy(); // PROJCTL_TRUSTED_PROXIES (default loopback); invalid values stop startup
 function cookies(req) { return Object.fromEntries((req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((kv) => kv[0]).map(([k, ...v]) => [k, v.join('=')])); }
-function authed(req) {
+// The public workspace embeds this controller in a cross-site frame, where browsers never send
+// the SameSite=Strict login cookie. Login therefore also sets a partitioned copy (CHIPS): the
+// browser keeps it separate per top-level site and only returns it inside that site's frames.
+// It is accepted only for the controller's own same-origin requests and for page loads into a
+// frame, never for cross-site API calls or WebSockets, so other sites cannot drive the relay.
+const EMBED_COOKIE = 'pj_embed';
+const SESSION_MAX_AGE = 60 * 60 * 24 * 90;
+const TRUSTED_PARENTS = ['https://wst.housevideo.app', 'https://wst-frozen.davein4k.chatgpt.site'];
+const FRAME_ANCESTORS = `frame-ancestors 'self' ${TRUSTED_PARENTS.join(' ')}`;
+function sessionMatches(c) { const want = Buffer.from(SESSION), got = Buffer.from(String(c || '')); return got.length === want.length && timingSafeEqual(got, want); }
+function ownOrigin(req) { return `${proxy.isHttps(req) ? 'https' : 'http'}://${req.headers.host}`; }
+function embedRequestOk(req, pathname) {
+  if (req.headers.origin) return req.headers.origin === ownOrigin(req); // fetch POST/CORS and WebSocket handshakes
+  if (req.headers['sec-fetch-site'] === 'same-origin') return true; // the controller's own pages, assets and GETs
+  return req.method === 'GET' && req.headers['sec-fetch-mode'] === 'navigate' && req.headers['sec-fetch-dest'] === 'iframe' && !pathname.startsWith('/api/');
+}
+function authed(req, pathname = new URL(req.url, 'http://x').pathname) {
   if (!PASSCODE) return true;
-  const c = cookies(req).pj || ''; const want = Buffer.from(SESSION), got = Buffer.from(c);
-  return got.length === want.length && timingSafeEqual(got, want);
+  const jar = cookies(req);
+  if (sessionMatches(jar.pj)) return true;
+  return sessionMatches(jar[EMBED_COOKIE]) && embedRequestOk(req, pathname);
 }
 function clientIp(req) { return proxy.clientAddress(req); }
 function enforceLoginThrottle(ip, res) {
@@ -99,13 +118,20 @@ function inputPreferenceFor(p) { return resolveInputPreference(driverFor(p).inpu
 
 // ---- WebSocket broadcast ----
 const clients = new Set();
-function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients) if (c.readyState === 1) c.send(s); }
+function sendSnapshotMessage(client, data) {
+  if (client.readyState !== 1) return;
+  // Slow or broken clients reconnect for a fresh snapshot instead of retaining
+  // an unbounded backlog of obsolete state in the relay process.
+  if (client.bufferedAmount > 1024 * 1024) { client.terminate(); return; }
+  client.send(data, error => { if (error) client.terminate(); });
+}
+function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients) sendSnapshotMessage(c, s); }
 // Relay liveness is independent of potentially slow device polling.
 setInterval(() => broadcast({ type: 'heartbeat', at: new Date().toISOString() }), 5000).unref();
 function snapshot() {
   return {
     type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM, preferredInput: rig.preferredInput || 'HDMI',
-    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS, commandTargetBinding: 1 },
+    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS, commandTargetBinding: 1, release: RELEASE },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
       return { ...p, password: undefined, controlRevision: commandBinding.revision(p), status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p),
@@ -278,6 +304,7 @@ const targetIdentity = (p) => JSON.stringify([p.slot, p.driver, p.ip, p.user, p.
 function commandGuard(slot) {
   return commandBinding.commandGuard(slot, () => ({
     projector: store.projector(slot), status: status.get(slot),
+    connection: connections.get(slot), maxStatusAgeMs: Math.max(15000, POLL_MS * 3),
     lock: rig.lock, lockRevision, busy: busy.has(slot),
   }));
 }
@@ -501,10 +528,12 @@ function sendFile(res, file, type) {
 }
 
 const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, 'http://x');
   try {
+    let url;
+    try { url = new URL(req.url, 'http://x'); } catch { throw httpErr(400, 'invalid request URL'); }
     res.setHeader('cache-control', 'no-store');
-    if (url.pathname === '/api/health' && req.method === 'GET') return json(res, 200, { ok: true, service: 'projctl', simulation: SIM, uptimeSeconds: Math.floor(process.uptime()) });
+    if (url.pathname === '/api/health' && req.method === 'GET') return json(res, 200, { ok: true, service: 'projctl', simulation: SIM, uptimeSeconds: Math.floor(process.uptime()), release: RELEASE });
+    if (url.pathname.startsWith('/api/') && !browserRequestAllowed(req, proxy)) throw httpErr(403, 'use the controller origin for this request');
     if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'content-type', 'access-control-allow-methods': 'GET,POST' }); return res.end(); }
     if (url.pathname === '/api/login' && req.method === 'POST') {
       if (!PASSCODE) return json(res, 200, { ok: true, open: true });
@@ -517,13 +546,17 @@ const server = http.createServer(async (req, res) => {
       if (a.length !== b.length || !timingSafeEqual(a, b)) { loginThrottle.fail(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'ERR', detail: `wrong passcode from ${ip}` }); throw httpErr(401, 'wrong passcode'); }
       loginThrottle.succeed(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'OK', detail: ip });
       const secure = proxy.isHttps(req) ? '; Secure' : '';
-      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': `pj=${SESSION}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${60 * 60 * 24 * 90}${secure}` }); return res.end(JSON.stringify({ ok: true }));
+      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': [
+        `pj=${SESSION}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${SESSION_MAX_AGE}${secure}`,
+        `${EMBED_COOKIE}=${SESSION}; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=${SESSION_MAX_AGE}`,
+      ] }); return res.end(JSON.stringify({ ok: true }));
     }
-    if (url.pathname === '/api/logout' && req.method === 'POST') { res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': 'pj=; Path=/; HttpOnly; Max-Age=0' }); return res.end('{"ok":true}'); }
-    if (url.pathname === '/login.html' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css') { /* public assets */ }
+    if (url.pathname === '/api/logout' && req.method === 'POST') { res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': ['pj=; Path=/; HttpOnly; Max-Age=0', `${EMBED_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=0`] }); return res.end('{"ok":true}'); }
+    if (url.pathname === '/login.html' || url.pathname === '/login.js' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css' || url.pathname === '/frozen-theme.js' || url.pathname === '/frozen-theme.css') { /* public assets */ }
     else if (!authed(req)) {
       if (url.pathname.startsWith('/api/')) throw httpErr(401, 'login required');
-      res.writeHead(302, { location: '/login.html' }); return res.end();
+      const next = url.pathname + url.search;
+      res.writeHead(302, { location: next === '/' ? '/login.html' : `/login.html?next=${encodeURIComponent(next)}` }); return res.end();
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
     if (url.pathname === '/api/power-schedules' && req.method === 'GET') return json(res, 200, powerSchedules.view());
@@ -531,6 +564,7 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
     if (url.pathname === '/api/power-schedules/delete' && req.method === 'POST') { const { id } = await body(req); return json(res, 200, powerSchedules.remove(id)); }
     if (url.pathname === '/api/health-reports' && req.method === 'GET') return json(res, 200, health.view());
+    if (url.pathname === '/api/software-checks' && req.method === 'GET') return json(res, 200, await readSoftwareChecks(path.join(path.dirname(DATA), 'software-checks.json'), path.join(__dirname, '../DELIVERY.json'), RELEASE));
     if (url.pathname === '/api/health-reports/run' && req.method === 'POST') return json(res, 200, { report: await health.run(), ...health.view() });
     if (url.pathname === '/api/thermal' && req.method === 'GET') {
       const minutes = Math.min(RETENTION_MS / 60000, Math.max(1, Number(url.searchParams.get('minutes')) || 30));
@@ -613,6 +647,7 @@ const server = http.createServer(async (req, res) => {
       fp = path.join(fp, 'index.html');
       if (!fs.existsSync(fp) || !fs.statSync(fp).isFile()) { res.writeHead(404); return res.end('not found'); }
     }
+    if (path.extname(fp) === '.html') res.setHeader('content-security-policy', FRAME_ANCESTORS);
     if (fp === path.join(PUB, 'index.html')) {
       const html = withThrowlineImports(fs.readFileSync(fp, 'utf8'));
       res.writeHead(200, { 'content-type': MIME['.html'] });
@@ -625,7 +660,20 @@ applyServerLimits(server);
 
 // Browsers never send messages on this socket; keep any inbound frame small.
 const wss = new WebSocketServer({ noServer: true, maxPayload: 64 * 1024 });
-server.on('upgrade', (req, sock, head) => { if (new URL(req.url, 'http://x').pathname !== '/ws' || !authed(req)) { sock.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); return sock.destroy(); } wss.handleUpgrade(req, sock, head, (ws) => wss.emit('connection', ws, req)); });
-wss.on('connection', (ws) => { clients.add(ws); ws.send(JSON.stringify(snapshot())); ws.on('close', () => clients.delete(ws)); });
+server.on('upgrade', (req, sock, head) => {
+  const reject = (code, reason) => sock.end(`HTTP/1.1 ${code} ${reason}\r\nConnection: close\r\nContent-Length: 0\r\n\r\n`);
+  sock.on('error', () => sock.destroy());
+  let url;
+  try { url = new URL(req.url, 'http://x'); } catch { return reject(400, 'Bad Request'); }
+  if (url.pathname !== '/ws' || !authed(req)) return reject(401, 'Unauthorized');
+  if (!browserRequestAllowed(req, proxy)) return reject(403, 'Forbidden');
+  wss.handleUpgrade(req, sock, head, (ws) => wss.emit('connection', ws, req));
+});
+wss.on('connection', (ws) => {
+  ws.on('error', () => ws.terminate());
+  ws.on('close', () => clients.delete(ws));
+  clients.add(ws);
+  sendSnapshotMessage(ws, JSON.stringify(snapshot()));
+});
 
 server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${server.address().port}  rig=${DATA}  login=${PASSCODE ? 'passcode' : 'open (LAN only)'}`));

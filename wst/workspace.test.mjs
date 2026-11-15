@@ -55,8 +55,8 @@ test('snow splash stays same-origin and keeps the home routes', () => {
   assert.doesNotMatch(splash, /https?:\/\//);
   assert.match(readFileSync(new URL('./vendor/gsap.min.js', import.meta.url), 'utf8'), /3\.15\.0/);
 });
-test('theme preference toggles without touching personal notes', () => {
-  const app = boot({ initial: 'Keep me' }); app.elements['#theme'].listeners.click();
+test('shared theme events update the workspace without touching personal notes', () => {
+  const app = boot({ initial: 'Keep me' }); app.listeners['frozen:themechange']({detail:{theme:'dark'}});
   assert.equal(app.context.document.documentElement.dataset.theme, 'dark');
   assert.equal(app.saved.get('wst.frozen.personal-notes.v1'), 'Keep me');
 });

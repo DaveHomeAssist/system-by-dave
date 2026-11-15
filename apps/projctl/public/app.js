@@ -1,3 +1,5 @@
+import { RELEASE } from './release.js';
+import { fieldFeedback } from './status-feedback.js';
 import { createAllProjectors } from './all-projectors.js';
 import { createThermalWatch } from './thermal-watch.js';
 import { operatorCard } from './operator-console.js';
@@ -72,8 +74,7 @@ const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 
 // Respect saved operator choice; a fresh browser starts in the light theme.
 const root = document.documentElement;
-root.dataset.theme = preferences.value.theme;
-$('#theme').onclick = () => { root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light'; preferences.update({ theme: root.dataset.theme }); };
+// FrozenTheme owns the shared preference; existing operator preferences remain compatible.
 
 // tabs (WAI-ARIA tabs: arrow keys move, Home/End jump)
 function wireTabs(list, attr, panelFor, onSelect = () => {}) {
@@ -129,8 +130,9 @@ async function cmd(slot, c, arg, source, { expectedRevision, throwOnError = fals
     if (slot === 'all') toast(Object.entries(out).map(([k, v]) => `${k}: ${v.error || (v.result === 'OK' ? 'command accepted' : v.result)}`).join(' · '), 6000);
     else if (errs.length) toast(errs.join(' · '), 6000);
     else toast(c === 'lens' ? `${slot}: lens command completed; check the reported position and image` : `${slot}: command accepted`);
-    if (r?.status) { const p = state.projectors.find((x) => x.slot === slot); if (p) p.status = r.status; }
-    setOperatorFeedback(slot, errs.length ? 'error' : 'sent', errs.length ? errs.join(' · ') : 'Command accepted. Live state shown above.');
+    // HTTP responses may arrive after newer socket readings. Only the live
+    // state stream updates displayed telemetry; an acknowledgement is not a poll.
+    setOperatorFeedback(slot, errs.length ? 'error' : 'sent', errs.length ? errs.join(' · ') : 'Request accepted. Check the projector status above.');
     if (c === 'lens') $('#adj-motion').textContent = errs.length ? errs.join(' · ') : 'Lens command completed. Check the reported position and image; absolute readback may be unavailable.';
     if (throwOnError && errs.length) throw new Error(errs.join(' · '));
     if (throwOnError && r?.result !== 'OK') throw new Error('Command acknowledgement was not OK. Check the live state.');
@@ -227,6 +229,7 @@ function stateOf(p) {
   const s = p.status || {};
   if (!connected) return { st: 'blocked', word: 'Relay disconnected' };
   if (!connectionOf(p).current) return { st: 'blocked', word: connectionOf(p).label };
+  if (!fieldFeedback(p, 'power', connectionOf(p)).current) return { st: 'idle', word: 'Power unknown' };
   if (s.power === 'on') return { st: 'done', word: 'Powered' };
   if (s.power === 'cooling') return { st: 'waiting', word: 'Cooling' };
   if (s.power === 'warming') return { st: 'waiting', word: 'Warming' };
@@ -242,12 +245,16 @@ function renderOverview() {
   $('[data-all="resetInput"]').disabled = !connected || state.lock || !state.projectors.some((p) => p.inputPreference?.available && connectionOf(p).current && !p.busy);
   const online = state.projectors.filter((p) => connectionOf(p).current).length;
   const assigned = rigLanes(state.projectors).filter((x) => x.projector).length;
-  $('#relay-mode').textContent = state.simulation === true ? 'DEMO · simulated devices' : state.simulation === false ? 'REAL RELAY' : 'Connecting…';
+  $('#relay-mode').textContent = state.simulation === true ? 'PRACTICE MODE' : state.simulation === false ? 'LIVE SYSTEM' : 'Connecting…';
   $('#relay-mode').classList.toggle('pj-mode--demo', state.simulation === true);
   const staticPreview = location.pathname.includes('/apps/projctl/public') || ['systembydave.com', 'www.systembydave.com', 'davehomeassist.github.io'].includes(location.hostname);
   $('#local-controller-help').hidden = connected || !staticPreview;
   $('#summary').textContent = connected ? `${online} / ${state.projectors.length} devices replying · ${assigned} / 4 lanes assigned` : 'Relay disconnected · device data unavailable';
   allProjectors?.update();
+  const interval = Number(state.relay?.pollIntervalMs);
+  $('#polling-note').textContent = connected && Number.isFinite(interval) && interval > 0 ? `Automatic checks about every ${interval / 1000} seconds, plus device response time. Changes made in Millumin or on a remote appear after the next successful check.` : 'Polling interval unavailable while disconnected.';
+  const installed = state.relay?.release;
+  $('#release-id').textContent = `Interface: ${RELEASE.name} (${RELEASE.version}) · Relay: ${installed ? `${installed.name} (${installed.version})` : 'version not reported'}`;
   $('#connection-note').textContent = !connected ? 'Reconnecting automatically. Displayed values are last known; current projector power is unknown.' : online < state.projectors.length ? 'Relay connected. Devices without a reply: check the venue network and projector connection. No reply does not confirm power off.' : state.simulation ? 'Simulator data · no physical projector feedback. Status updates automatically.' : 'Device feedback updates automatically. Each card shows its latest successful reply.';
 }
 // Keep interactive nodes stable through status polls; only changed content is patched.
@@ -295,11 +302,11 @@ function renderGrid() {
     const preference = p.inputPreference;
     const preferredLabel = preference?.label || state.preferredInput || 'HDMI';
     const resetAvailable = preference?.available === true;
-    const shutterAt = new Date(s.connection?.lastSuccessAt || s.updatedAt || NaN).getTime();
-    const freshShutter = Number.isFinite(shutterAt) && Date.now()-shutterAt <= Math.max(15000,(state.relay?.pollIntervalMs||5000)*3) && connected && s.online && (!s.connection || s.connection.state === 'online') && ['open','closed'].includes(s.shutter);
+    const freshShutter = fieldFeedback(p, 'shutter', connection).current && ['open','closed'].includes(s.shutter);
     const shutterActions = freshShutter ? (s.shutter === 'open' ? [['closed','Close shutter']] : [['open','Open shutter']]) : [['open','Open shutter'],['closed','Close shutter']];
 
-    const pat = s.pattern ? ((p.patterns || PATTERNS)[s.pattern] || s.pattern) : '—';
+    const patternReport = fieldFeedback(p, 'pattern', connection);
+    const pat = !patternReport.present ? 'Not reported' : ((p.patterns || PATTERNS)[s.pattern] || s.pattern) + (patternReport.lastKnown ? ' (last known)' : '');
     const card = document.createElement('section'); card.className = 'avd-panel pj-tile' + (off ? ' offline' : ''); card._controlIdentity = JSON.stringify([p.slot,p.driver,p.ip,p.mac]); card.dataset.slot = p.slot; card.dataset.lane = lane ? p.lane : ''; card.setAttribute('aria-label', lane ? projectorName(p) : `Unassigned ${p.label}`);
     card.innerHTML = `
       <div class="avd-panel__head"><h2 class="avd-panel__title"><span class="avd-panel__index">${lane ? esc(p.lane) : '—'}</span>${esc(lane ? 'Projector ' + p.lane : p.label)}<span class="avd-dot avd-dot--${st}" aria-hidden="true"></span></h2></div>
@@ -308,7 +315,7 @@ function renderGrid() {
         <div class="pj-tile-top">${pill(st, word)}<span class="pj-mono">${esc(p.owner)} · ${esc(p.ip || 'no address')}</span></div>
         <div class="pj-telemetry-note pj-mono">${esc(connection.detail)}${off ? ' · values last known' : state.simulation ? ' · simulated feedback' : ''}<span>Last reply: ${esc(connection.lastReply)}${connection.retry ? ' · '+esc(connection.retry) : ''}</span>${off && s.connection?.error ? `<span>${esc(s.connection.error)}</span>` : ''}</div>
         <p class="pj-mono" role="status" ${busy ? '' : 'style="display:none"'}>Lens moving</p>
-        <div class="pj-tile-top" ${errs.length ? '' : 'style="display:none"'}>${errs.map((e) => pill('blocked', e)).join('')}</div>
+        <div class="pj-tile-top" ${errs.length ? '' : 'style="display:none"'}>${errs.map((e) => pill('blocked', (fieldFeedback(p, 'errors', connection).lastKnown ? 'Last known: ' : '') + e)).join('')}</div>
         <div class="pj-two">
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Input</span><span class="avd-readout__value">${esc(s.input ? (p.inputs?.[s.input] || s.input) : '—')}</span></div>
           <div class="avd-readout avd-readout--sm"><span class="avd-readout__label avd-eyebrow">Light source</span><span class="avd-readout__value">${s.lightHours != null ? esc(s.lightHours) + '<span class="avd-readout__unit">h</span>' : '—'}</span></div>
@@ -414,7 +421,7 @@ function openProjector(lane){
 function renderPrimaryControls(p){
  const host=$('#projector-primary-controls'),out=document.createElement('div');
  if(!p){out.innerHTML='<span class="pj-mono">Unassigned · lens controls unavailable</span>';patchControls(host,out);return;}
- const s=p.status||{},off=!connectionOf(p).current,at=new Date(s.connection?.lastSuccessAt||s.updatedAt||NaN).getTime(),fresh=Number.isFinite(at)&&Date.now()-at<=Math.max(15000,(state.relay?.pollIntervalMs||5000)*3)&&!off&&(!s.connection||s.connection.state==='online');
+ const s=p.status||{},connection=connectionOf(p),off=!connection.current,fresh=fieldFeedback(p,'shutter',connection).current;
  const options=fresh&&s.shutter==='open'?[['1','Close shutter']]:fresh&&s.shutter==='closed'?[['0','Open shutter']]:[['0','Open shutter'],['1','Close shutter']];
  for(const[arg,label]of options){const b=document.createElement('button');b.className='avd-btn';b.type='button';b._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);b.dataset.focusKey=`${p.slot}:dock:shutter:${arg}`;b.dataset.c='shutter';b.dataset.a=arg;b.textContent=label;b.disabled=off;b.onclick=e=>cmd(p.slot,'shutter',Number(arg),e.currentTarget);out.append(b);}
  const input=document.createElement('button');input.type='button';input.className='avd-btn';input._controlIdentity=JSON.stringify([p.slot,p.driver,p.ip,p.mac]);input.dataset.focusKey=`${p.slot}:dock:reset-input`;input.dataset.resetInput='';input.textContent=`Reset to ${p.inputPreference?.label||state.preferredInput||'HDMI'}`;input.disabled=off||state.lock||!!p.busy||!p.inputPreference?.available;input.onclick=e=>cmd(p.slot,'resetInput',undefined,e.currentTarget);out.append(input);patchControls(host,out);
@@ -422,7 +429,7 @@ function renderPrimaryControls(p){
 function renderDetailPanels(p){
  const connection=p?connectionOf(p):null,off=!p||!connection.current,moving=!!p&&(!!p.busy||commandsInFlight.has(`${p.slot}:lens:move`));
  const supported=!!p&&supportsPatterns(p),blocked=state.lock||off||moving||(!!p&&operatorPending.has(p.slot));
- patchControls($('#projector-patterns'),patternPanelContent({projector:p,lane:selectedDetailLane,table:p?.patterns||PATTERNS,supported,current:p?.status?.pattern,stale:!!p?.status?.stale?.includes('pattern'),
+ patchControls($('#projector-patterns'),patternPanelContent({projector:p,lane:selectedDetailLane,table:p?.patterns||PATTERNS,supported,current:p?.status?.pattern,stale:fieldFeedback(p,'pattern',connection).lastKnown,
   favorites:p?preferences.value.favoritePatterns[patternPreferenceKey(p)]||[]:[],disabled:blocked,clearDisabled:blocked,feedback:p?operatorFeedback.get(p.slot)?.text:'',
   onPattern:(code,button)=>cmd(p.slot,'pattern',code,button),onClear:button=>operatorAction(p,'clear',undefined,button)}));
  patchControls($('#projector-heat'),heatPanelContent({projector:p,current:heatCurrent(p),onOpenThermal:openThermal}));
@@ -437,7 +444,7 @@ function renderDisplayInfo(p) {
   const info=p?.displayInfo?.scope==='projector'?p.displayInfo:null;
   const status=p?.status||{};
   const input=info?.input || (status.input!=null ? {state:connected&&status.online?'reported':'offline',value:status.input,label:p.inputs?.[status.input]||status.input,observedAt:status.connection?.lastSuccessAt||status.updatedAt} : null),signal=info?.signal,edid=info?.edid;
-  const field=(label,data,fallback)=>{const stale=!connectionOf(p).current||data?.state==='offline';return `<div><dt>${label}</dt><dd>${esc(data?.value!=null ? (data.label || reportedValue(data.value)) : fallback)}<br><span class="pj-mono">${esc(stale&&data?.value!=null?'Last known · ': '')}${esc(data?.state || (p?'unsupported':'unassigned'))}${data?.observedAt?' · '+esc(new Date(data.observedAt).toLocaleString()):''}</span></dd></div>`;};
+  const field=(label,data,fallback)=>{const stale=!connectionOf(p).current||data?.state==='offline'||(label==='Reported input'&&!fieldFeedback(p,'input',connectionOf(p)).current);return `<div><dt>${label}</dt><dd>${esc(data?.value!=null ? (data.label || reportedValue(data.value)) : fallback)}<br><span class="pj-mono">${esc(stale&&data?.value!=null?'Last known · ': '')}${esc(data?.state || (p?'unsupported':'unassigned'))}${data?.observedAt?' · '+esc(new Date(data.observedAt).toLocaleString()):''}</span></dd></div>`;};
   $('#projector-display-info').innerHTML=`<dl>${field('Reported input',input,'No input reported')}${field('Driver signal readout',signal,'Signal information unavailable')}<div><dt>Projector EDID</dt><dd>${esc(edid?.state==='reported'&&edid.value!=null?reportedValue(edid.value):edid?.reason||(p?'EDID is not read by this driver.':'No device is assigned to this lane; projector EDID is unavailable.'))}<br><span class="pj-mono">${esc(edid?.state||(p?'unsupported':'unassigned'))} · projector scope</span></dd></div></dl><p class="pj-detail-unavailable">Input names and signal readings are separate from EDID. No resolution or EDID is inferred from the selected input.</p>`;
 }
 let powerSchedulesView=null;$('#power-schedule-panel').addEventListener('toggle',()=>{if($('#power-schedule-panel').open&&!powerSchedulesView)powerSchedulesView=mountPowerSchedules($('#power-schedules'),{projectors:()=>state.projectors,connected:()=>connected});});
@@ -579,17 +586,19 @@ function renderAdjust() {
   const p = state.projectors.find((x) => x.slot === adjSlot); if (!p) return;
   const off = !connectionOf(p).current;
   const moving = p.busy || commandsInFlight.has(`${adjSlot}:lens:move`);
-  const lens = p.status?.lens;
+  const lensFeedback = fieldFeedback(p, 'lens', connectionOf(p));
+  const lens = lensFeedback.value;
   const readback = lens && p.driver === 'pulse' ? Object.entries({ h: 'H', v: 'V', focus: 'Focus', zoom: 'Zoom' }).map(([key, label]) => `${label} ${lens[key] ?? '?'}`).join(' · ') : '';
-  $('#adj-position').textContent = readback;
-  const cur = p.status?.pattern; const table = p.patterns || PATTERNS;
-  $('#adj-pattern-now').textContent = (off ? 'Last reported: ' : 'Showing: ') + (table[cur] || (cur ? cur : 'unknown'));
+  $('#adj-position').textContent = readback ? (lensFeedback.lastKnown ? 'Last known: ' : '') + readback : '';
+  const patternFeedback = fieldFeedback(p, 'pattern', connectionOf(p));
+  const cur = patternFeedback.value; const table = p.patterns || PATTERNS;
+  $('#adj-pattern-now').textContent = patternFeedback.present ? (patternFeedback.current ? 'Reported: ' : 'Last known: ') + (table[cur] || cur) : 'Pattern not reported';
   const el = $('#adj-patterns'), patterns = document.createElement('div');
   const patternFocus = el.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null;
   const favoriteCodes = preferences.value.favoritePatterns[patternPreferenceKey(p)] || [];
   const choices = Object.entries(table).sort(([a], [b]) => Number(favoriteCodes.includes(b)) - Number(favoriteCodes.includes(a)));
   for (const [code, name] of choices) {
-    const b = document.createElement('button'); b.type = 'button'; b.dataset.pattern = code; b.className = 'avd-btn pj-pattern-thumbed'; b.innerHTML = `${patternThumb(name)}<span>${esc(name)}</span>`; b.setAttribute('aria-pressed', String(cur === code));
+    const b = document.createElement('button'); b.type = 'button'; b.dataset.pattern = code; b.className = 'avd-btn pj-pattern-thumbed'; b.innerHTML = `${patternThumb(name)}<span>${esc(name)}</span>`; b.setAttribute('aria-pressed', String(patternFeedback.current && String(cur) === code));
     b._controlIdentity = JSON.stringify([p.slot,p.driver,p.ip,p.mac]); b.dataset.focusKey = `${p.slot}:adjust:pattern:${code}`;
     b.disabled = state.lock || off || !!moving || !canPattern(p); b.onclick = event => cmd(p.slot, 'pattern', code, event.currentTarget); const choice = document.createElement('span'); choice.className = 'pj-pattern-choice';
     const favorite = document.createElement('button');
@@ -713,7 +722,7 @@ function connect() {
       markAlive(); state = msg;if(msg.powerSchedules&&typeof msg.powerSchedules==='object'&&Array.isArray(msg.powerSchedules.schedules)&&Array.isArray(msg.powerSchedules.audit))powerSchedulesView?.update(msg.powerSchedules); setConn(true); renderAll(); loadThermal();
     }
     else if (!connected) return;
-    else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') { markAlive(); renderGrid(); renderThermal(); renderOverview(); if (adjSlot) renderAdjust(); } }
+    else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') { markAlive(); renderGrid(); renderThermal(); renderOverview(); stageView.update(state, connected); if (adjSlot) renderAdjust(); } }
     else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.displayInfo !== undefined) p.displayInfo = msg.displayInfo; if (msg.inputPreference !== undefined) p.inputPreference = msg.inputPreference; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; if (msg.thermal) { p.thermal = msg.thermal; thermalWatch.append(msg.slot, msg.thermal); } renderGrid(); renderThermal(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
     else if (msg.type === 'busy' && typeof msg.slot === 'string') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); }
     else if (msg.type === 'powerSchedules' && msg.schedules && typeof msg.schedules === 'object' && Array.isArray(msg.schedules.schedules) && Array.isArray(msg.schedules.audit)) { markAlive(); powerSchedulesView?.update(msg.schedules); }
@@ -756,7 +765,7 @@ function initializePreferences() {
   };
   $('#preference-reset').onclick = () => {
     const saved = preferences.reset();
-    root.dataset.theme = preferences.value.theme;
+    window.FrozenTheme.set('light');
     activeOperatorLane = preferences.value.lastLane;
     $('#preset-name').value = preferences.value.presetNameTemplate;
     $('#operator-comparison').value = '';
@@ -773,6 +782,7 @@ function renderComparison() {
   const projector = rigLanes(state.projectors).find(item => item.lane === lane)?.projector;
   if (!projector) { output.textContent = `${lane} has no assigned projector.`; return; }
   const connection = connectionOf(projector);
-  const alarms = Object.entries(projector.status?.errors || {}).filter(([, value]) => value > 0).map(([name, value]) => `${name} ${value === 2 ? 'fault' : 'warning'}`);
-  output.textContent = `${lane} · ${LANES[lane].target} · ${connection.current ? projector.status?.power || 'Unknown power' : connection.detail} · ${projector.status?.errors == null ? 'Alarm status unavailable' : alarms.join(', ') || 'No reported alarms'}`;
+  const errors = fieldFeedback(projector, 'errors', connection), power = fieldFeedback(projector, 'power', connection);
+  const alarms = Object.entries(errors.value || {}).filter(([, value]) => value > 0).map(([name, value]) => `${name} ${value === 2 ? 'fault' : 'warning'}`);
+  output.textContent = `${lane} · ${LANES[lane].target} · ${power.current ? power.value : connection.current ? 'Unknown power' : connection.detail} · ${!errors.present ? 'Alarms not reported' : (errors.lastKnown ? 'Last known: ' : '') + (alarms.join(', ') || 'No reported alarms')}`;
 }

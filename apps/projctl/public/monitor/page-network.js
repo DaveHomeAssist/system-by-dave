@@ -12,24 +12,24 @@ const subnet = L => { const ip = Object.values(L).map(v => v.ip).find(x => /^\d+
 function nodes(L) {
   const lock = lockState(), lockWord = lock === 'on' ? 'On · limits Projctl commands only' : lock === 'off' ? 'Off' : 'Unknown · relay offline';
   const out = {
-    gio: { kind: 'Lighting console', name: 'ETC Gio', word: 'Reported', rows: [['Network', 'Lighting network'], ['Address', 'TBD'], ['Sends', 'MIDI to the mioXL · link and port TBD'], ['Fires', 'Projection and pixel cues'], ['Sheet', 'CU1']] },
-    mio: { kind: 'MIDI interface', name: 'iConnectivity mioXL', word: 'Routing TBD', rows: [['Location', 'Third floor rack'], ['In', 'Gio MIDI · link and port TBD'], ['Out', 'Network MIDI to both Studios'], ['Sessions', 'M5 and M1 session names TBD'], ['Check', 'midi']] },
-    m5: { kind: 'Playback · projection', name: 'M5 Studio', word: 'Recorded', rows: [['Runs', 'Millumin · four projector feeds'], ['Receives', 'Network MIDI through the mioXL · TBD'], ['Sends', 'PJLink to A, B, D · Pulse or PJLink to C'], ['Picture', '4 × USB to HDMI, then HDBaseT'], ['Show Lock', 'Does not cover these commands']] },
-    m1: { kind: 'Playback · pixels', name: 'M1 Studio', word: 'Recorded', rows: [['Runs', 'Millumin · pixel playback'], ['Network', 'Lighting network'], ['Show file', 'Unverified'], ['Sends', 'Pixel data to the deck decoder · protocol unverified']] },
-    lum: { kind: 'Lighting switch', name: 'Jump Top Luminex', word: 'Reported', rows: [['Source', 'Katy · Nov 14'], ['Carries', 'Cat5 for the deck pixels'], ['Traced', 'No · reported routing only']] },
-    dec: { kind: 'Deck pixel decoder', name: 'LeDMX2 or Max2', word: 'Unresolved', rows: PIXELS.slice(0, 5).map(p => [p.k, p.v]) },
-    macbook: { kind: 'Control relay', name: RELAYS.macbook.name, word: live.connected ? 'Live' : 'Working controller',
-      rows: [['Serving', live.connected ? `This page · ${location.host}` : 'Not connected to this page'], ['Build', RELAYS.macbook.build], ['Poll', live.connected ? `${Math.round((live.snapshot.relay?.pollIntervalMs || 5000) / 1000)} s · live` : RELAYS.macbook.poll], ['Show Lock', lockWord], ['Since', 'Nov 13']] },
-    studio: { kind: 'Reporting relay', name: RELAYS.studio.name, word: 'RELAY-1', rows: [['Role', 'Posts Health Logs rows'], ['Address', 'In the project hub'], ['Poll', RELAYS.studio.poll], ['Decision', 'Keep both relays, Studio slowed · Nov 13'], ['Host', 'Which Studio is not stated in the records read']] },
-    sw: { kind: 'Network switch', name: 'LAN switch', word: 'Ports TBD', rows: [['Network', `Projector LAN${subnet(L) ? ' · ' + subnet(L) : ''}`], ['Ports', 'TBD'], ['To do', 'Label and mount in the cove and at the rack']] },
-    usb: { kind: 'Adapters', name: 'USB to HDMI', word: 'Models TBD', rows: [['Count', '4'], ['Models', 'TBD'], ['Note', 'Reseating USB-C recovered 1920 × 1200 (Dave)'], ['Check', 'usb']] },
+    gio: { kind: 'Lighting console', name: 'ETC Gio', word: 'Reported', rows: [['Network', 'Lighting network'], ['Sends', 'MIDI to the mioXL'], ['Fires', 'Projection and pixel cues'], ['Sheet', 'CU1']] },
+    mio: { kind: 'MIDI interface', name: 'iConnectivity mioXL', word: 'Recorded route', rows: [['Location', 'Third floor rack'], ['In', 'Gio MIDI'], ['Out', 'Network MIDI to both Studios'], ['Check', 'midi']] },
+    m5: { kind: 'Playback · projection', name: 'M5 Studio', word: 'Recorded', rows: [['Runs', 'Millumin · four projector feeds'], ['Receives', 'Network MIDI through the mioXL'], ['Sends', 'PJLink to A, B, D · Pulse or PJLink to C'], ['Picture', '4 × USB to HDMI, then HDBaseT'], ['Show Lock', 'Does not cover these commands']] },
+    m1: { kind: 'Playback · pixels', name: 'M1 Studio', word: 'Recorded', rows: [['Runs', 'Millumin · pixel playback'], ['Network', 'Lighting network'], ['Sends', 'Pixel data to the deck decoder']] },
+    lum: { kind: 'Lighting switch', name: 'Jump Top Luminex', word: 'Reported', rows: [['Record', 'November 14'], ['Carries', 'Cat5 for the deck pixels'], ['Path', 'Recorded routing']] },
+    dec: { kind: 'Deck pixel decoder', name: 'DMXking deck decoder', word: 'Recorded route', rows: PIXELS.slice(0, 5).map(p => [p.k, p.v]) },
+    macbook: { kind: 'Control relay', name: live.connected ? 'This controller' : RELAYS.macbook.name, word: live.connected ? 'Connected' : 'Recorded',
+      rows: [['Serving', live.connected ? `This page · ${location.host}` : 'Not connected to this page'], ['Version', live.connected ? live.snapshot.relay?.release?.name || 'Not reported by this version' : RELAYS.macbook.build], ['Poll', live.connected ? `${Math.round((live.snapshot.relay?.pollIntervalMs || 5000) / 1000)} s · live` : RELAYS.macbook.poll], ['Show Lock', lockWord], ['Record', live.connected ? 'Reading the connected controller' : 'Nov 13 snapshot']] },
+    studio: { kind: 'Reporting relay', name: RELAYS.studio.name, word: 'RELAY-1', rows: [['Role', 'Posts Health Logs rows'], ['Address', 'In the project hub'], ['Poll', RELAYS.studio.poll], ['Decision', 'Keep both relays, Studio slowed · Nov 13'], ['Record', 'November 15']] },
+    sw: { kind: 'Network switch', name: 'LAN switch', word: 'Recorded route', rows: [['Network', `Projector LAN${subnet(L) ? ' · ' + subnet(L) : ''}`], ['To do', 'Label and mount in the cove and at the rack']] },
+    usb: { kind: 'Adapters', name: 'USB to HDMI', word: 'Recorded route', rows: [['Count', '4'], ['Note', 'USB-C reseat restored 1920 × 1200 in the recorded check'], ['Check', 'usb']] },
     aten: { kind: 'EDID emulator', name: 'ATEN VC081A', word: 'Planned', rows: [['State', 'Selected · units out for now'], ['Purpose', 'Hold EDID for the computer'], ['Next', 'Test one ATEN path in the agreed window'], ['Check', 'aten']] },
-    tx: { kind: 'Extenders', name: 'AV Access HDBaseT', word: 'Recorded', rows: [['Type', '4K HDMI over HDBaseT'], ['Lanes', 'All four'], ['Open', 'Model suffix and EDID switches'], ['Run', 'Dedicated category cable to each projector'], ['Check', 'hdmi']] },
-    kvm: { kind: 'Operator display', name: 'KVM or field monitor', word: 'Position TBD', rows: [['Feed', 'Studio built-in HDMI'], ['Position', 'Permanent position to confirm'], ['Plan', 'Mini PC on venue Wi-Fi · accepted direction']] },
+    tx: { kind: 'Extenders', name: 'AV Access HDBaseT', word: 'Recorded', rows: [['Type', '4K HDMI over HDBaseT'], ['Lanes', 'All four'], ['Before changes', 'Photograph the model label and EDID switches'], ['Run', 'Dedicated category cable to each projector'], ['Check', 'hdmi']] },
+    kvm: { kind: 'Operator display', name: 'KVM or field monitor', word: 'Operator station', rows: [['Feed', 'Studio built-in HDMI'], ['Plan', 'Mini PC on venue Wi-Fi · accepted direction']] },
   };
   for (const v of Object.values(L)) out[v.lane.toLowerCase()] = { kind: `Projector ${v.lane}`, name: v.surface, word: live.connected ? v.word : 'Recorded', rows: [
     ['Model', `${v.liveModel || v.model} · ${v.orientation}`], ['Address', v.ip || (live.connected ? 'No address saved' : 'From the relay')],
-    ['Labels', `Production ${v.prod} · controller slot ${v.slot || '—'}`], ['Control', v.route], ['Picture', 'HDBaseT receiver · 1920 × 1200 recorded']] };
+    ['Labels', `Production ${v.prod} · controller slot ${v.slot || 'unassigned'}`], ['Control', v.route], ['Picture', 'HDBaseT receiver · 1920 × 1200 recorded']] };
   return out;
 }
 
@@ -51,8 +51,7 @@ function render() {
 
   const rows = [...lanes.map(v => [`${v.lane} · ${v.surface}`, v.ip || (live.connected ? 'None saved' : 'Relay offline'), live.connected ? 'Relay · live' : 'Needs relay']),
     ['This relay', live.connected ? location.host : 'Relay offline', live.connected ? 'This page' : 'Needs relay'],
-    ['Studio relay', 'Project hub', 'Recorded'], ['Lighting network', 'Project hub', 'Dave'],
-    ['ETC Gio', 'TBD', 'Not recorded'], ['mioXL', 'TBD', 'Not recorded'], ['M5 and M1 Studios', 'TBD', 'Not recorded'], ['Deck decoder', 'TBD', 'Read back']];
+    ['Studio relay', 'Project hub', 'Recorded'], ['Lighting network', 'Project hub', 'Team record']];
   patch($('#net-addr'), `<div role="row" class="fm-tr fm-tr--head"><span role="columnheader" class="avd-eyebrow">Device</span><span role="columnheader" class="avd-eyebrow">Address</span><span role="columnheader" class="avd-eyebrow">Record</span></div>`
     + rows.map(([n, a, r]) => `<div role="row" class="fm-tr"><span role="cell" class="fm-td fm-td--clip">${esc(n)}</span><span role="cell" class="fm-td fm-td--mono">${a === 'Project hub' ? `<a href="${HUB}" target="_blank" rel="noopener noreferrer">Project hub ↗</a>` : esc(a)}</span><span role="cell" class="fm-td">${esc(r)}</span></div>`).join(''));
 }

@@ -2,6 +2,8 @@
 // the live lane model. The monitor reads relay state; the only command it can send is Stop lens.
 import { rigLanes } from '../lanes.js';
 import { createConnectionMonitor } from '../projector-connection.js';
+import { fieldFeedback } from '../status-feedback.js';
+import { patternIsOff } from '../output-recovery.js';
 import { heatDetail } from '../heat-notice.js';
 import { LANES, OPENING } from './monitor-data.js';
 
@@ -18,25 +20,6 @@ export const easternTime = value => { const t = Date.parse(value); return Number
 export const shortTime = value => { const t = Date.parse(value); return Number.isFinite(t) ? clockLine.format(new Date(t)).replace(/:\d\d (?=[AP]M)/, ' ') : '—'; };
 const dayNumber = iso => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / 86400000;
 export const daysBetween = (from, to) => Math.round(dayNumber(to) - dayNumber(from));
-
-// ---- Theme: Light, Dark or Deep Freeze. A fresh browser follows Projctl's saved theme, else light.
-const THEME_KEY = 'projctl.monitor.theme.v1';
-const THEMES = ['light', 'dark', 'deep-freeze'];
-const THEME_COLOR = { light: '#ffffff', dark: '#102438', 'deep-freeze': '#0a2232' };
-function savedTheme() {
-  try {
-    const own = localStorage.getItem(THEME_KEY);
-    if (THEMES.includes(own)) return own;
-    const projctl = JSON.parse(localStorage.getItem('projctl.ui.v1') || 'null');
-    if (projctl?.version === 1 && ['light', 'dark'].includes(projctl.theme)) return projctl.theme;
-  } catch { /* Storage can be unavailable; the light default still works. */ }
-  return 'light';
-}
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  document.querySelectorAll('[data-theme-choice]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themeChoice === theme)));
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[theme]);
-}
 
 // ---- Clock: Eastern time with the countdown to opening night.
 function startClock() {
@@ -130,14 +113,31 @@ export async function stopLens(slot) {
 const monitor = createConnectionMonitor();
 const ago = ms => ms < 0 ? 'just now' : ms < 60000 ? `${Math.max(1, Math.round(ms / 1000))} s ago` : ms < 3600000 ? `${Math.round(ms / 60000)} min ago` : 'over an hour ago';
 const HEAT_STATE = { ok: 'done', watch: 'waiting', hot: 'blocked', unknown: 'idle' };
-function signalText(info) {
+// Pulse reports signal presence as a boolean; other shapes are shown as reported.
+export function signalText(info) {
   const s = info?.signal;
   if (!s || s.state === 'unsupported') return 'Not reported';
-  if (s.state !== 'reported') return '—';
+  if (s.state !== 'reported') return 'Not reported';
   const v = s.value;
+  if (v == null) return 'Not reported';
+  if (v === true) return 'Signal present';
+  if (v === false) return 'No signal';
   if (typeof v === 'string' || typeof v === 'number') return String(v);
   const w = v?.width ?? v?.horizontal ?? v?.h, h = v?.height ?? v?.vertical ?? v?.v;
-  return Number.isFinite(+w) && Number.isFinite(+h) ? `${w} × ${h}` : 'Reported';
+  return Number.isFinite(+w) && Number.isFinite(+h) ? `${w} × ${h}` : 'Signal reported';
+}
+
+// PJLink alarm status (ERST): each field is 0 (none), 1 (warning) or 2 (error). Errors are listed
+// first. A driver that does not read alarms reports none, so no fault is never shown as "OK".
+const FAULT_NAMES = [['fan', 'fan'], ['lamp', 'lamp'], ['temp', 'temperature'], ['cover', 'cover'], ['filter', 'filter'], ['other', 'other']];
+export function faultSummary(errors) {
+  if (!errors || typeof errors !== 'object') return null;
+  const items = FAULT_NAMES.filter(([key]) => Number(errors[key]) > 0)
+    .map(([key, name]) => ({ key, name, level: Number(errors[key]) >= 2 ? 'error' : 'warning' }))
+    .sort((a, b) => (b.level === 'error') - (a.level === 'error'));
+  if (!items.length) return null;
+  const text = items.map(i => `${i.name} ${i.level}`).join(' · ');
+  return { level: items.some(i => i.level === 'error') ? 'error' : 'warning', items, text: `${text[0].toUpperCase()}${text.slice(1)} reported now` };
 }
 export function laneModels(now = Date.now()) {
   const projectors = live.connected ? live.snapshot.projectors : [];
@@ -147,22 +147,24 @@ export function laneModels(now = Date.now()) {
   for (const rec of LANES) {
     const entry = byLane[rec.lane], p = entry?.projector;
     const v = { ...rec, projector: p || null, slot: p?.slot || null, ip: p?.ip || null, current: false, st: 'idle', word: 'Relay offline',
-      power: '—', shutter: '—', input: '—', signal: '—', pattern: '—', reply: '—', intake: '—', heat: '—', heatSt: 'idle', lampNow: null,
+      power: 'UNKNOWN', shutter: 'Unknown', input: 'Not reported', signal: 'Not reported', pattern: 'Not reported', reply: 'No reply yet', intake: 'No reading', heat: 'Unknown', heatSt: 'idle', fault: null, alarmsReported: false,
       liveModel: p ? [p.make, p.model].filter(Boolean).join(' ') : null };
     if (live.connected && !p) { v.st = entry?.conflict ? 'waiting' : 'idle'; v.word = entry?.conflict ? 'Lane conflict' : 'Unassigned'; }
     if (live.connected && p) {
       const c = monitor(p, true, pollMs, now), s = p.status || {};
       v.current = c.current;
-      v.reply = c.lastSuccessAt ? ago(now - Date.parse(c.lastSuccessAt)) : 'No reply yet';
+      v.reply = c.ageLabel;
       if (c.current) {
+        const reported = field => fieldFeedback(p, field, c).current;
         const words = { on: ['done', 'Powered'], warming: ['active', 'Warming'], cooling: ['waiting', 'Cooling'], off: ['idle', 'Standby'] };
-        [v.st, v.word] = words[s.power] || ['queued', 'Power unknown'];
-        v.power = String(s.power || 'unknown').toUpperCase();
-        v.shutter = s.shutter === 'open' ? 'Open' : s.shutter === 'closed' ? 'Closed' : 'Unknown';
-        v.input = p.displayInfo?.input?.label && p.displayInfo.input.label !== 'Reported input' ? p.displayInfo.input.label : s.input || 'Not reported';
+        [v.st, v.word] = reported('power') && words[s.power] || ['queued', 'Power unknown'];
+        v.power = reported('power') ? String(s.power).toUpperCase() : 'UNKNOWN';
+        v.shutter = !reported('shutter') ? 'Unknown' : s.shutter === 'open' ? 'Open' : s.shutter === 'closed' ? 'Closed' : 'Unknown';
+        v.input = !reported('input') ? 'Not reported' : p.displayInfo?.input?.label && p.displayInfo.input.label !== 'Reported input' ? p.displayInfo.input.label : s.input;
         v.signal = signalText(p.displayInfo);
-        v.pattern = s.pattern ? String(s.pattern) : 'Off';
-        if (s.errors?.lamp > 0) v.lampNow = 'Lamp error reported now';
+        v.pattern = !reported('pattern') ? 'Not reported' : patternIsOff(s.pattern) ? 'Off' : p.patterns?.[s.pattern] || String(s.pattern);
+        v.alarmsReported = reported('errors') && FAULT_NAMES.some(([key]) => [0, 1, 2].includes(s.errors?.[key]));
+        v.fault = v.alarmsReported ? faultSummary(s.errors) : null;
       } else {
         const words = { checking: ['queued', 'Checking'], stale: ['waiting', 'Stale reply'], reconnecting: ['blocked', 'No reply'], unassigned: ['idle', 'No address'] };
         [v.st, v.word] = words[c.state] || ['blocked', 'No reply'];
@@ -184,10 +186,10 @@ function renderShell() {
   if (chip) {
     const sim = live.connected && live.snapshot.simulation;
     $('.avd-dot', chip).className = `avd-dot avd-dot--${live.connected ? sim ? 'automated' : 'done' : live.attempted ? 'blocked' : 'queued'}`;
-    $('[data-relay-word]', chip).textContent = live.connected ? sim ? 'Simulator relay · live' : 'Projctl relay · live' : live.attempted ? 'Relay offline' : 'Connecting…';
+    $('[data-relay-word]', chip).textContent = live.connected ? sim ? 'Practice mode' : 'Projctl relay · live' : live.attempted ? 'Relay offline' : 'Connecting…';
     chip.title = live.connected ? `Connected to the relay at ${location.host}` : 'Recorded facts still show. Live readings need the relay that serves this page.';
   }
-  if (source) { source.dataset.source = live.connected ? 'live' : 'recorded'; source.textContent = live.connected ? 'Live relay data' : 'Recorded only'; }
+  if (source) { source.dataset.source = live.connected ? live.snapshot.simulation ? 'practice' : 'live' : 'recorded'; source.textContent = live.connected ? live.snapshot.simulation ? 'Practice data' : 'Live relay data' : 'Recorded only'; }
   if (lock) {
     const state = lockState();
     lock.dataset.lock = state;
@@ -205,11 +207,6 @@ export function patch(el, html) {
 
 export function startMonitor({ health = false } = {}) {
   wantHealth = health;
-  applyTheme(savedTheme());
-  document.querySelectorAll('[data-theme-choice]').forEach(button => button.addEventListener('click', () => {
-    applyTheme(button.dataset.themeChoice);
-    try { localStorage.setItem(THEME_KEY, button.dataset.themeChoice); } catch { /* This visit keeps the choice. */ }
-  }));
   startClock();
   renderShell();
   open();

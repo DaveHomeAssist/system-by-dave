@@ -36,3 +36,20 @@ test('new Panasonic defaults resolve HDMI to code 32', async () => {
     assert.ok(projectors.every(p => p.inputs['31'] === 'DVI-D' && p.inputs['32'] === 'HDMI'));
   } finally { await relay.close(); }
 });
+
+test('write-time guard rejects stale feedback even if the last online flag remains true', () => {
+  let now = 100000;
+  const binding = createCommandBinding({ now: () => now });
+  const state = { projector: { slot: 'P1', ip: 'sim' }, status: { online: true, power: 'on' }, connection: { state: 'online', lastSuccessAt: new Date(now).toISOString() }, maxStatusAgeMs: 15000, lock: false, lockRevision: 0 };
+  const guard = binding.commandGuard('P1', () => state);
+  guard('shutter', 1);
+  now += 15001;
+  assert.throws(() => guard('shutter', 0), /no fresh projector reply/);
+  assert.throws(() => guard('power', 1), /no fresh projector reply/);
+  guard('lens', { op: 'stop' });
+  guard('shutter', 1); // A blackout request remains available while the last online sample ages.
+  state.connection.lastSuccessAt = new Date(now).toISOString();
+  guard('shutter', 1);
+  state.connection.state = 'reconnecting';
+  assert.throws(() => guard('shutter', 0), /no fresh projector reply/);
+});

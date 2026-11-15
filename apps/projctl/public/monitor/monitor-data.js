@@ -4,22 +4,22 @@
 // 2026-11-14. Private relay and lighting-network addresses stay in the project hub, not in this file.
 
 export const HUB = 'https://app.notion.com/p/410255fc8f44811c8d80c85bedbcede7';
-export const RECORDS_READ = 'Nov 14, 2026';
+export const RECORDS_READ = 'Nov 15, 2026';
 export const OPENING = '2026-11-25';
 const DOCS = 'https://wst.housevideo.app/documents/';
 
 export const LANES = [
   { lane: 'A', surface: 'SL Portal', role: 'Stage left portal', prod: 'P1', native: '1280 × 800', raster: '12′5″ × 19′11″',
-    route: 'PJLink :4352', lensFlag: 'Plot record · barrel not confirmed', model: 'Panasonic PT-DW830U', orientation: 'Portrait',
+    route: 'PJLink :4352', lensFlag: 'Match the lens label to the plot', model: 'Panasonic PT-DW830U', orientation: 'Portrait',
     lens: 'ET-DLE170 · 1.80–2.54:1 (projection plot record)', light: 'Lamp 1 on · Lamp 2 FAILED · Nov 13 snapshot' },
   { lane: 'B', surface: 'Top Portal', role: 'Portal header', prod: 'P2', native: '1920 × 1200', raster: '29′5″ × 18′4″',
-    route: 'PJLink :4352', lensFlag: 'Plot lists 085 · verify the label', model: 'Panasonic PT-RZ970', orientation: 'Landscape',
+    route: 'PJLink :4352', lensFlag: 'Match the lens label to the plot', model: 'Panasonic PT-RZ970', orientation: 'Landscape',
     lens: 'ET-DLE080 (recorded)', light: 'Laser light source' },
   { lane: 'C', surface: 'Stage', role: 'Main stage', prod: 'P3', native: '2560 × 1600 · 4K output 3840 × 2400', raster: '32′5″ × 20′3″',
-    route: 'Pulse :9090 or PJLink :4352', lensFlag: 'Fitted lens unknown · case label only', model: 'Barco UDM 4K22', orientation: 'Landscape',
-    lens: 'TLD+ zoom 0.71–0.93:1 (4K), recorded', light: 'Not in the records read' },
+    route: 'Pulse :9090 or PJLink :4352', lensFlag: 'Match the fitted lens to the case label', model: 'Barco UDM 4K22', orientation: 'Landscape',
+    lens: 'TLD+ zoom 0.71–0.93:1 (4K), recorded', light: 'Laser light source' },
   { lane: 'D', surface: 'SR Portal', role: 'Stage right portal', prod: 'P4', native: '1280 × 800', raster: '12′5″ × 19′11″',
-    route: 'PJLink :4352', lensFlag: 'Plot record · barrel not confirmed', model: 'Panasonic PT-DW830U', orientation: 'Portrait',
+    route: 'PJLink :4352', lensFlag: 'Match the lens label to the plot', model: 'Panasonic PT-DW830U', orientation: 'Portrait',
     lens: 'ET-DLE170 · 1.80–2.54:1 (projection plot record)', light: 'Both lamps on · Nov 13 snapshot' },
 ];
 
@@ -31,7 +31,7 @@ export const ALERTS = [
 
 export const RELAYS = {
   macbook: { name: 'MacBook relay', role: 'Control surface', build: '87e844b + PR 478 driver overlay', poll: '5 s', note: 'Working controller as of Nov 13.' },
-  studio: { name: 'Studio relay', role: 'Health Logs reporting', build: 'Older build', poll: '60 s selected · change pending', note: 'Kept on by decision RELAY-1, Nov 13.' },
+  studio: { name: 'Studio relay', role: 'Health Logs reporting', build: 'Installed relay', poll: '60 s · checked Nov 15', note: 'Kept on by decision RELAY-1, Nov 13.' },
 };
 
 export const MILESTONES = [
@@ -72,14 +72,14 @@ export const CHECKS = [
 ];
 
 export const CUES = [
-  { cue: 'Projection playback', msg: 'Gio MIDI message · TBD', dest: 'Millumin on the M5 Studio', route: 'Gio → mioXL → network MIDI' },
-  { cue: 'Pixel playback', msg: 'Gio MIDI message · TBD', dest: 'Millumin on the M1 Studio', route: 'Gio → mioXL → network MIDI' },
-  { cue: 'Power and shutter · A, B, D', msg: 'Millumin mapping · TBD', dest: 'Projectors A, B and D', route: 'PJLink :4352' },
-  { cue: 'Power and shutter · C', msg: 'Millumin mapping · TBD', dest: 'Projector C', route: 'Pulse :9090 or PJLink :4352 · record which' },
-  { cue: 'One safe test cue', msg: 'TBD · lighting and A1 to confirm', dest: 'Both playback systems', route: 'TBD' },
-  { cue: 'Opening reset', msg: 'TBD', dest: 'Both playback systems', route: 'TBD' },
-  { cue: 'Repeat without replaying sound', msg: 'TBD', dest: 'Projection or pixels alone', route: 'TBD' },
-  { cue: 'Walk-in and opening looks', msg: 'TBD · approved show files', dest: 'Projection and pixels', route: 'TBD' },
+  { cue: 'Projection playback', msg: 'Use the approved lighting cue sheet', dest: 'Millumin on the M5 Studio', route: 'Gio → mioXL → network MIDI' },
+  { cue: 'Pixel playback', msg: 'Use the approved lighting cue sheet', dest: 'Millumin on the M1 Studio', route: 'Gio → mioXL → network MIDI' },
+  { cue: 'Power and shutter · A, B, D', msg: 'Use the saved Millumin mapping', dest: 'Projectors A, B and D', route: 'PJLink :4352' },
+  { cue: 'Power and shutter · C', msg: 'Use the saved Millumin mapping', dest: 'Projector C', route: 'Pulse :9090 or PJLink :4352 · record which' },
+  { cue: 'One safe test cue', msg: 'Agree with lighting and A1', dest: 'Both playback systems', route: 'Follow the approved cue sheet' },
+  { cue: 'Opening reset', msg: 'Agree with lighting and A1', dest: 'Both playback systems', route: 'Follow the approved cue sheet' },
+  { cue: 'Repeat without replaying sound', msg: 'Agree with lighting and A1', dest: 'Projection or pixels alone', route: 'Follow the approved cue sheet' },
+  { cue: 'Walk-in and opening looks', msg: 'Use the approved show files', dest: 'Projection and pixels', route: 'Follow the approved cue sheet' },
 ];
 
 // From apps/projctl/server/osc.js and the README: OSC on UDP 9000, a text line on TCP 9001.
@@ -88,29 +88,29 @@ export const OSC = { ports: 'OSC on UDP 9000 · text line on TCP 9001', forms: [
 export const PIXELS = [
   { k: 'Deck strips', v: '6 physical · 3 downstage, 3 upstage · 12 mapping slices' },
   { k: 'Deck patch', v: 'Port 1 downstage · universe 221, ch 1 · Port 2 upstage · universe 227, ch 1 (Nov 12 record)' },
-  { k: 'Deck decoder', v: 'DMXking LeDMX2 per Dave, Nov 13 · Katy calls it Max2 · compare the unit label' },
-  { k: 'Deck protocol', v: 'Unverified · Art-Net or sACN (Katy, Nov 14)' },
-  { k: 'Deck routing', v: 'Cat5 to the Jump Top Luminex · injection at SR, CSR and CSL (reported, not traced)' },
-  { k: 'Portal pixels', v: 'Elation Pixel Driver V2 · Art-Net (reported by Katy, Nov 14)' },
+  { k: 'Deck decoder', v: 'Match the fitted DMXking unit to its label' },
+  { k: 'Deck protocol', v: 'Check the saved Art-Net or sACN setting before changes' },
+  { k: 'Deck routing', v: 'Recorded Nov 14: Jump Top Luminex; injection at SR, CSR and CSL' },
+  { k: 'Portal pixels', v: 'Recorded Nov 14: Elation Pixel Driver V2 · Art-Net' },
 ];
 
 export const POWER = [
-  { k: 'A, B, D', v: 'NORMAL standby accepted · checks pending' },
-  { k: 'C', v: 'Barco shutdown sequence to agree · read back' },
+  { k: 'A, B, D', v: 'Use the agreed NORMAL standby setting' },
+  { k: 'C', v: 'Coordinate the Barco shutdown sequence before use' },
   { k: 'Reports', v: 'Power-off report before a shutdown pass' },
 ];
 
 export const LINK_HEALTH = [
   { st: 'active', title: '37 portal control disconnects in one hour', detail: 'Nov 12 · no lost pings · 36 back at the next 5 s check, one took 15 s · cause open' },
-  { st: 'waiting', title: 'Slow the Studio relay to one poll a minute', detail: 'RELAY-1 · Nov 13 · both relays were polling on Nov 12 · do it at a break' },
+  { st: 'done', title: 'Studio checks once a minute', detail: 'Read back Nov 15. Watch the reply time when checking a change made in Millumin.' },
 ];
 
 export const DOCUMENTS = [
-  { tag: 'Current issue · 5 pages', title: 'Signal flow R5', text: 'Larger AV1 labels and clearer connections. CU1, CT1, PX1 and PW1 keep the R4 content.', href: DOCS + 'frozen-signal-flow-r5.pdf' },
-  { tag: '17 pages', title: 'Projection handoff R4', text: 'One packet with clickable contents and bookmarks. Private network addresses are left out of this public copy.', href: DOCS + 'frozen-handoff-r4.pdf' },
-  { tag: 'Pages 2 to 6', title: 'Illustrated overview', text: 'Projection lanes, display recovery, cueing, pixels and house handoff.', href: DOCS + 'frozen-handoff-r4.pdf#page=2' },
-  { tag: 'Pages 12 to 16', title: 'Crew acceptance', text: 'Blank field workbook with 16 check IDs. Results need a witness.', href: DOCS + 'frozen-handoff-r4.pdf#page=12' },
-  { tag: 'Page 17', title: 'Source reference key', text: 'Source records and manufacturer references. Notion links may need sign-in.', href: DOCS + 'frozen-handoff-r4.pdf#page=17' },
+  { tag: 'Current issue · 5 pages', title: 'Signal flow R5', text: 'Projection, cueing, control, pixels and power diagrams.', href: DOCS + 'frozen-signal-flow-r5.pdf' },
+  { tag: '18 pages', title: 'Projection handoff R5', text: 'Show operation, diagrams and crew checks with clickable contents.', href: DOCS + 'frozen-handoff-r5.pdf' },
+  { tag: 'Pages 2 to 6', title: 'Illustrated overview', text: 'Projection lanes, display recovery, cueing, pixels and house handoff.', href: DOCS + 'frozen-handoff-r5.pdf#page=2' },
+  { tag: 'Pages 12 to 16', title: 'Crew acceptance', text: 'Crew checks and space for witnessed results.', href: DOCS + 'frozen-handoff-r5.pdf#page=12' },
+  { tag: 'Reference', title: 'Source reference key', text: 'Source records and manufacturer references. Notion links may need sign-in.', href: DOCS + 'frozen-handoff-r5.pdf' },
 ];
 
 export const RECORDS = [
@@ -123,7 +123,7 @@ export const RECORDS = [
 ];
 
 export const SCHEDULE_PDF = 'https://wst.housevideo.app/frozen-tech-schedule.pdf';
-export const WORKBOOK = DOCS + 'frozen-handoff-r4.pdf#page=12';
+export const WORKBOOK = DOCS + 'frozen-handoff-r5.pdf#page=12';
 export const SHARED_BOARD = 'https://wst.housevideo.app/';
 
 // Rows for a coverage grid: one square per lane plus the rig, one state circle at the end.
