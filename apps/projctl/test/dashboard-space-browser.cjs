@@ -9,6 +9,11 @@ const fs = require('node:fs');
     const state = await relay.state();
     state.lock = true;
     state.projectors.forEach((p, i) => { p.lane = 'ABCD'[i]; p.status.power = 'off'; p.status.shutter = 'closed'; });
+    state.projectors[0].driver = 'panasonic';
+    state.projectors[0].webDiagnostics = {
+      status: { state: 'reported', observedAt: new Date().toISOString(), signalTiming: 'WUXGA (74.05 kHz / 59.96 Hz)', lamps: [{ id: 1, state: 'ON', hours: 100 }, { id: 2, state: 'OFF', hours: 90 }], lampSelection: 'DUAL', lampPower: 'ECO' },
+      selfTest: { state: 'reported', observedAt: new Date().toISOString(), result: 'FAILED', checks: [{ name: 'LAMP2 STATUS', result: 'FAILED' }, { name: 'HORIZONTAL TILT', result: 'WARNING' }] },
+    };
     const context = await browser.newContext({ reducedMotion: 'reduce' });
     await context.route('https://wst.housevideo.app/**', route => route.fulfill({ json: { tasks: [] } }));
     const page = await context.newPage(), errors = [], commands = [];
@@ -47,6 +52,8 @@ const fs = require('node:fs');
       await page.locator('[data-dashboard-view=house]').click();
       await page.locator('#mon-details').click();
       assert.equal(await page.locator('#mon-detail-dialog').evaluate(el => el.open), true);
+      assert.match(await page.locator('#mon-insp').textContent(), /Lamp 2 · OFF · 90 h/);
+      assert.match(await page.locator('#mon-insp').textContent(), /HORIZONTAL TILT · WARNING/);
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#mon-details').evaluate(el => el === document.activeElement), true);
       await page.locator('[data-dashboard-view=house]').focus();

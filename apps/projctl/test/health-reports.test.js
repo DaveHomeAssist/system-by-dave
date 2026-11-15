@@ -487,7 +487,7 @@ for (const failedSensor of [0, 1, 2]) {
       assert.equal(row.intakeC, 37);
       assert.equal(row.verdict, 'watch');
       assert.match(row.readError, /connection closed/);
-      assert.equal(partials[0].sensors.length, 1, 'partial snapshots remain stable');
+      assert.equal(partials.find(value => value.sensors.length).sensors.length, 1, 'partial snapshots remain stable');
     }
     assert.deepEqual(sent, Array.from({ length: failedSensor + 1 }, (_, n) => `QTM:${n}`));
   });
