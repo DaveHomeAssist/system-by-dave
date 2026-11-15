@@ -22,7 +22,10 @@ class StartupError(Exception):
 
 def boot_id():
     if sys.platform == 'darwin':
-        return subprocess.check_output(['/usr/sbin/sysctl', '-n', 'kern.boottime'], text=True, timeout=3).strip()
+        try:
+            return subprocess.check_output(['/usr/sbin/sysctl', '-n', 'kern.boottime'], text=True, timeout=3).strip()
+        except (OSError, subprocess.SubprocessError) as error:
+            raise StartupError('Boot identity is unavailable.') from error
     path = Path('/proc/sys/kernel/random/boot_id')
     if path.exists():
         return path.read_text().strip()

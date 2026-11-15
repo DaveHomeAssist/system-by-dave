@@ -223,6 +223,11 @@ class Tests(unittest.TestCase):
         with patch('startup.boot_id', return_value='different-boot'):
             self.assertFalse(readiness(r, e, self.snapshot, self.profile)['showNightReady'])
 
+    def test_boot_query_failure_becomes_unavailable(self):
+        import startup
+        with patch('startup.sys.platform', 'darwin'), patch('startup.subprocess.check_output', side_effect=subprocess.TimeoutExpired('sysctl', 3)):
+            with self.assertRaises(StartupError): startup.boot_id()
+
     def test_missing_evidence_clears_saved_ready(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
