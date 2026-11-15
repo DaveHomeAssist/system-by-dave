@@ -1,5 +1,5 @@
 // Monitor page: the house multiview, command log, today's calls, the selected projector and heat.
-import { startMonitor, onLive, laneModels, patch, esc, $, live, todayISO, easternTime, laneOfSlot, shortTime } from './monitor.js';
+import { startMonitor, onLive, laneModels, patch, esc, $, live, todayISO, easternTime, laneOfSlot, shortTime, relayUnavailableText } from './monitor.js';
 import { ALERTS, CHECKLIST, HUB, isSide } from './monitor-data.js';
 import { eventKind } from '../workspace/calendar.js';
 
@@ -29,7 +29,7 @@ function render() {
   document.querySelectorAll('[data-live-tag]').forEach(tag => { tag.textContent = live.connected ? 'Live' : live.attempted ? 'Relay offline' : 'Connecting'; tag.classList.toggle('fm-tag--live', live.connected); tag.classList.toggle('fm-tag--muted', !live.connected); });
   patch($('#mv-count'), live.connected
     ? `<span class="avd-dot avd-dot--${replying === 4 ? 'done' : replying ? 'waiting' : 'blocked'}" aria-hidden="true"></span><span>${replying} of 4 replying</span>`
-    : '<span class="avd-dot avd-dot--idle" aria-hidden="true"></span><span>Relay offline</span>');
+    : `<span class="avd-dot avd-dot--idle" aria-hidden="true"></span><span>${relayUnavailableText()}</span>`);
   patch($('#mon-mv'), lanes.map(feed).join(''));
 
   const allEvents = live.connected ? live.events.slice(-80).reverse() : [];

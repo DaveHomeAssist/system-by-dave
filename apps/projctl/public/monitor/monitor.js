@@ -41,6 +41,7 @@ function startClock() {
 
 // ---- Relay connection: the same snapshot, status and event messages Projctl itself uses.
 export const live = { connected: false, attempted: false, snapshot: null, events: [], health: null };
+export const relayUnavailableText = () => live.attempted ? 'Relay offline' : 'Connecting';
 const listeners = new Set();
 let frame = 0;
 function emit() {
@@ -146,7 +147,7 @@ export function laneModels(now = Date.now()) {
   const out = {};
   for (const rec of LANES) {
     const entry = byLane[rec.lane], p = entry?.projector;
-    const v = { ...rec, projector: p || null, slot: p?.slot || null, ip: p?.ip || null, current: false, st: 'idle', word: 'Relay offline',
+    const v = { ...rec, projector: p || null, slot: p?.slot || null, ip: p?.ip || null, current: false, st: 'idle', word: relayUnavailableText(),
       power: 'UNKNOWN', shutter: 'Unknown', input: 'Not reported', signal: 'Not reported', pattern: 'Not reported', reply: 'No reply yet', intake: 'No reading', heat: 'Unknown', heatSt: 'idle', fault: null, alarmsReported: false,
       liveModel: p ? [p.make, p.model].filter(Boolean).join(' ') : null };
     if (live.connected && !p) { v.st = entry?.conflict ? 'waiting' : 'idle'; v.word = entry?.conflict ? 'Lane conflict' : 'Unassigned'; }

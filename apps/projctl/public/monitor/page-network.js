@@ -1,6 +1,6 @@
 // Network page: control and picture maps, device details and addresses.
 // Addresses come only from this relay at runtime; the public repository keeps none of them.
-import { startMonitor, onLive, laneModels, patch, esc, $, live, lockState, checksHTML } from './monitor.js';
+import { relayUnavailableText, startMonitor, onLive, laneModels, patch, esc, $, live, lockState, checksHTML } from './monitor.js';
 import { LANES, RELAYS, PIXELS, LINK_HEALTH, HUB, checkRows } from './monitor-data.js';
 
 let view = 'control', selected = 'macbook';
@@ -10,7 +10,7 @@ const octet = ip => /^\d+\.\d+\.\d+\.\d+$/.test(ip || '') ? '.' + ip.split('.')[
 const subnet = L => { const ip = Object.values(L).map(v => v.ip).find(x => /^\d+\.\d+\.\d+\.\d+$/.test(x || '')); return ip ? ip.split('.').slice(0, 3).join('.') + '.x' : null; };
 
 function nodes(L) {
-  const lock = lockState(), lockWord = lock === 'on' ? 'On · limits Projctl commands only' : lock === 'off' ? 'Off' : 'Unknown · relay offline';
+  const lock = lockState(), lockWord = lock === 'on' ? 'On · limits Projctl commands only' : lock === 'off' ? 'Off' : `Unknown · ${relayUnavailableText().toLowerCase()}`;
   const out = {
     gio: { kind: 'Lighting console', name: 'ETC Gio', word: 'Reported', rows: [['Network', 'Lighting network'], ['Sends', 'MIDI to the mioXL'], ['Fires', 'Projection and pixel cues'], ['Sheet', 'CU1']] },
     mio: { kind: 'MIDI interface', name: 'iConnectivity mioXL', word: 'Recorded route', rows: [['Location', 'Third floor rack'], ['In', 'Gio MIDI'], ['Out', 'Network MIDI to both Studios'], ['Check', 'midi']] },
@@ -49,8 +49,8 @@ function render() {
   const s = N[selected] || N.macbook;
   patch($('#net-dev'), `<div class="avd-panel__head"><h2 id="dev-title" class="avd-panel__title">${esc(s.kind)}</h2><span class="fm-tag">${esc(s.word)}</span></div><div class="avd-panel__body"><h3>${esc(s.name)}</h3><div class="fm-kvs">${s.rows.map(([k, v]) => kv(k, v)).join('')}</div></div>`);
 
-  const rows = [...lanes.map(v => [`${v.lane} · ${v.surface}`, v.ip || (live.connected ? 'None saved' : 'Relay offline'), live.connected ? 'Relay · live' : 'Needs relay']),
-    ['This relay', live.connected ? location.host : 'Relay offline', live.connected ? 'This page' : 'Needs relay'],
+  const rows = [...lanes.map(v => [`${v.lane} · ${v.surface}`, v.ip || (live.connected ? 'None saved' : relayUnavailableText()), live.connected ? 'Relay · live' : 'Needs relay']),
+    ['This relay', live.connected ? location.host : relayUnavailableText(), live.connected ? 'This page' : 'Needs relay'],
     ['Studio relay', 'Project hub', 'Recorded'], ['Lighting network', 'Project hub', 'Team record']];
   patch($('#net-addr'), `<div role="row" class="fm-tr fm-tr--head"><span role="columnheader" class="avd-eyebrow">Device</span><span role="columnheader" class="avd-eyebrow">Address</span><span role="columnheader" class="avd-eyebrow">Record</span></div>`
     + rows.map(([n, a, r]) => `<div role="row" class="fm-tr"><span role="cell" class="fm-td fm-td--clip">${esc(n)}</span><span role="cell" class="fm-td fm-td--mono">${a === 'Project hub' ? `<a href="${HUB}" target="_blank" rel="noopener noreferrer">Project hub ↗</a>` : esc(a)}</span><span role="cell" class="fm-td">${esc(r)}</span></div>`).join(''));

@@ -1,6 +1,6 @@
 // Rig page: recorded lanes and rasters, the selected projector's control mirror and acceptance.
 // Every control here stays disabled except Stop lens, which the relay allows under Show Lock.
-import { startMonitor, onLive, laneModels, patch, esc, $, live, lockState, stopLens, checksHTML } from './monitor.js';
+import { startMonitor, onLive, laneModels, patch, esc, $, live, lockState, stopLens, checksHTML, relayUnavailableText } from './monitor.js';
 import { LANES, POWER, WORKBOOK, checkRows } from './monitor-data.js';
 
 let selected = 'C', stopping = false;
@@ -16,17 +16,17 @@ function render() {
   $('[data-sel-name]', ctl).textContent = `Projector ${selected}`;
   $('[data-sel-surface]', ctl).textContent = v.surface;
   $('[data-sel-model]', ctl).textContent = `${v.liveModel || v.model} · ${v.route}`;
-  $('#rig-lock-tag').textContent = lock === 'on' ? 'Locked' : lock === 'off' ? 'Monitor view' : 'Relay offline';
+  $('#rig-lock-tag').textContent = lock === 'on' ? 'Locked' : lock === 'off' ? 'Monitor view' : relayUnavailableText();
   $('#rig-note').firstChild.textContent = lock === 'on' ? 'Show Lock is on. Lens, pattern and input controls are locked.'
     : lock === 'off' ? 'Show Lock is off. This monitor still sends no lens, pattern or input changes; use Projctl.'
-      : 'Relay offline. Controls are shown for reference only.';
+      : `${relayUnavailableText()}. Controls are shown for reference only.`;
   const canStop = live.connected && !!v.projector && v.current && v.projector.capabilities?.lens !== false;
   const stop = $('#rig-stop');
   stop.disabled = stopping || !canStop;
   stop.title = canStop ? `Stop any lens movement on ${v.slot}` : 'Stop lens needs a connected relay and a replying projector.';
 
   const schedules = live.snapshot?.powerSchedules?.schedules;
-  const saved = !live.connected ? 'Relay offline' : !Array.isArray(schedules) || !schedules.length ? 'None saved · off until enabled'
+  const saved = !live.connected ? relayUnavailableText() : !Array.isArray(schedules) || !schedules.length ? 'None saved · off until enabled'
     : `${schedules.length} saved · ${schedules.filter(s => s.enabled).length} enabled`;
   patch($('#rig-power'), [kv('Schedules', saved), ...POWER.map(r => kv(r.k, r.v))].join(''));
 }
