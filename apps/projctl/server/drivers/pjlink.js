@@ -51,7 +51,7 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
   // the first command of a session only, as PJLink specifies; a projector that
   // answers a later command with an authentication error gets it on every
   // command from then on. Gear that closes after each reply continues on a new
-  // session instead of failing the poll. Every poll returns a complete status.
+  // session instead of failing the poll. Each poll returns power plus the details available in that state.
   const CLOSED = 'connection closed before PJLink reply';
   let live = null, digestEveryCommand = false, chain = Promise.resolve();
   const cancelled = signal => signal?.reason || new Error('Projector poll cancelled');
@@ -162,7 +162,6 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
     chain = run.catch(() => {});
     return run;
   }
-  const query = (commands, options) => inTurn(() => runQuery(commands, options));
   // A command closes the held status session and uses its own connection, as it
   // always has. The next poll opens a new session.
   const command = (cmd, options) => inTurn(() => { options?.guard?.(); dropSession(live); return send(cmd, options); });
@@ -170,24 +169,33 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
   return {
     kind: 'pjlink',
     lensJog: { axes: [], speeds: [], mode: 'unsupported', stop: false, positionReadback: false },
-    async getStatus({ signal } = {}) {
-      const got = await query(['POWR ?', 'AVMT ?', 'INPT ?', 'ERST ?', 'LAMP ?', 'NAME ?'], { signal });
-      const read = cmd => {
-        const entry = got.get(cmd);
-        if (!entry) throw new Error(CLOSED);
-        if (entry.error) throw entry.error;
-        return entry.value;
-      };
-      const optional = async (fn, fallback) => { try { return await fn(); } catch (error) { throwIfAborted(signal); if (transportFailure(error)) throw error; return fallback; } };
-      const power = await read('POWR ?');
-      if (!Object.hasOwn(powerMap, power)) throw new Error('Invalid PJLink power status');
-      const s = { power: powerMap[power], online: true, errors: null, lightHours: null, name: null };
-      s.shutter = await optional(async () => { const value = await read('AVMT ?'); if (!['10', '11', '20', '21', '30', '31'].includes(value)) throw new Error('Invalid PJLink shutter status'); return value === '11' || value === '31' ? SHUTTER.CLOSED : SHUTTER.OPEN; }, SHUTTER.UNKNOWN);
-      s.input = await optional(async () => { const value = await read('INPT ?'); if (!/^[1-6][1-9]$/.test(value)) throw new Error('Invalid PJLink input status'); return value; }, null);
-      await optional(async () => { const value = await read('ERST ?'); if (!/^[012]{6}$/.test(value)) throw new Error('Invalid PJLink alarm status'); const [fan, lamp, temp, cover, filter, other] = [...value].map(Number); s.errors = { fan, lamp, temp, cover, filter, other }; });
-      await optional(async () => { const value = await read('LAMP ?'); if (!/^\d+ [01](?: \d+ [01])*$/.test(value)) throw new Error('Invalid PJLink lamp status'); const hours = Number(value.split(' ')[0]); if (!Number.isSafeInteger(hours)) throw new Error('Invalid PJLink lamp hours'); s.lightHours = hours; });
-      await optional(async () => { s.name = await read('NAME ?'); });
-      throwIfAborted(signal); return s;
+    getStatus({ signal } = {}) {
+      return inTurn(async () => {
+        // Read power independently: standby projectors may stop answering the
+        // other queries while still providing a valid power state.
+        const got = await runQuery(['POWR ?'], { signal });
+        const read = cmd => {
+          const entry = got.get(cmd);
+          if (!entry) throw new Error(CLOSED);
+          if (entry.error) throw entry.error;
+          return entry.value;
+        };
+        const optional = async (fn, fallback) => { try { return await fn(); } catch (error) { throwIfAborted(signal); if (transportFailure(error)) throw error; return fallback; } };
+        const power = await read('POWR ?');
+        if (!Object.hasOwn(powerMap, power)) throw new Error('Invalid PJLink power status');
+        const s = { power: powerMap[power], online: true, errors: null, lightHours: null, name: null };
+        if (power !== '1') {
+          return { ...s, shutter: SHUTTER.UNKNOWN, input: null, pattern: null };
+        }
+        const details = await runQuery(['AVMT ?', 'INPT ?', 'ERST ?', 'LAMP ?', 'NAME ?'], { signal });
+        for (const [command, result] of details) got.set(command, result);
+        s.shutter = await optional(async () => { const value = await read('AVMT ?'); if (!['10', '11', '20', '21', '30', '31'].includes(value)) throw new Error('Invalid PJLink shutter status'); return value === '11' || value === '31' ? SHUTTER.CLOSED : SHUTTER.OPEN; }, SHUTTER.UNKNOWN);
+        s.input = await optional(async () => { const value = await read('INPT ?'); if (!/^[1-6][1-9]$/.test(value)) throw new Error('Invalid PJLink input status'); return value; }, null);
+        await optional(async () => { const value = await read('ERST ?'); if (!/^[012]{6}$/.test(value)) throw new Error('Invalid PJLink alarm status'); const [fan, lamp, temp, cover, filter, other] = [...value].map(Number); s.errors = { fan, lamp, temp, cover, filter, other }; });
+        await optional(async () => { const value = await read('LAMP ?'); if (!/^\d+ [01](?: \d+ [01])*$/.test(value)) throw new Error('Invalid PJLink lamp status'); const hours = Number(value.split(' ')[0]); if (!Number.isSafeInteger(hours)) throw new Error('Invalid PJLink lamp hours'); s.lightHours = hours; });
+        await optional(async () => { s.name = await read('NAME ?'); });
+        throwIfAborted(signal); return s;
+      });
     },
     power: (on, options) => command(`POWR ${on ? 1 : 0}`, options),
     shutter: (closed, options) => command(`AVMT ${closed ? 31 : 30}`, options),

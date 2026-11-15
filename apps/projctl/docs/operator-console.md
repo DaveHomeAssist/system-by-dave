@@ -12,7 +12,7 @@ Details on a card opens the fuller controls for that lane, so the default view s
 
 ## Command behavior
 
-Shutter actions state the requested position. Power off retains the relay's existing two-step confirmation and ignores a rapid repeat during its first 400 ms. Cooling, offline, stale and show-lock states keep their existing command guards.
+Shutter actions state the requested position. Power off retains the relay's existing two-step confirmation and ignores a rapid repeat during its first 400 ms. Cooling, offline, stale and show-lock states keep their existing command guards. The Power off button has an adjacent explanation when Show Lock, stale feedback, another operation or an already-off reading prevents shutdown. The sign-in field accepts text passwords without requesting a numeric-only mobile keyboard.
 
 Clear pattern sends the model's pattern-off command and checks fresh reported state. Reset to HDMI clears the test pattern, selects the configured HDMI input or the unique HDMI input reported by the device, and checks fresh feedback for both. PJLink-only devices without internal pattern control keep HDMI reset available; only the input is sent and verified, and unsupported pattern controls are disabled. Missing or ambiguous HDMI metadata produces an explicit error. Each projector has independent operation feedback, and concurrent output recovery actions on the same projector are blocked until the current action finishes. Partial failure preserves the successful step and reports the remaining problem.
 

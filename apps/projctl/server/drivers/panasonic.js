@@ -118,6 +118,7 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     patterns,
     async getStatus({ signal } = {}) {
       const s = await pj.getStatus({ signal });
+      if (s.power !== 'on') return s;
       try { s.pattern = await native('QTS', { signal }); } catch { throwIfAborted(signal); s.pattern = null; }
       throwIfAborted(signal);
       return s;
