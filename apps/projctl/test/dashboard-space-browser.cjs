@@ -54,6 +54,7 @@ const fs = require('node:fs');
       assert.equal(await page.locator('#mon-detail-dialog').evaluate(el => el.open), true);
       assert.match(await page.locator('#mon-insp').textContent(), /Lamp 2 · OFF · 90 h/);
       assert.match(await page.locator('#mon-insp').textContent(), /HORIZONTAL TILT · WARNING/);
+      if (evidence) await page.screenshot({ path: `${evidence}/panasonic-details-${width}-${height}.png` });
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#mon-details').evaluate(el => el === document.activeElement), true);
       await page.locator('[data-dashboard-view=house]').focus();
