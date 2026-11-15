@@ -7,16 +7,16 @@ let selected = 'A', schedule = null, logPage = 0, logRows = 5, checklistIndex = 
 const KIND = { 'power-on': 'Power on', hourly: 'Hourly', 'power-off': 'Power off', 'relay-stop': 'Relay stop', manual: 'Manual' };
 const word = v => `<span class="fm-word"><span class="avd-dot avd-dot--${v.st}" aria-hidden="true"></span>${esc(v.word)}</span>`;
 const model = v => v.liveModel || v.model;
-// The lamp note is a dated record and keeps its date; a lamp error the relay reports now is shown
-// beside it, never instead of it. Drivers that do not read lamp state report no error, so the
-// absence of one is not presented as a current reading.
+// The lamp note is a dated record and keeps its date. Faults the relay reports now (PJLink alarm
+// status) are shown beside it, never instead of it, and their absence is not shown as "OK".
 const lampRecord = v => `Recorded: ${v.light}`;
-const light = v => [v.lampNow, lampRecord(v)].filter(Boolean).join(' · ');
+const fault = v => v.fault ? `<span class="fm-fault fm-fault-count" data-level="${v.fault.level}" title="${esc(v.fault.text)}">${v.fault.items.length} ${v.fault.items.length === 1 ? 'alert' : 'alerts'}</span>` : '';
+const faultRow = v => v.fault ? v.fault.text : v.alarmsReported ? 'None reported' : 'Not reported';
 const address = v => v.ip || (live.connected ? 'No address saved' : 'Address from the relay');
 const slotLabel = slot => !slot || slot === '*' || slot === 'all' ? 'All' : laneOfSlot(slot) ? `${slot} · ${laneOfSlot(slot)}` : slot;
 
 function feed(v) {
-  return `<button type="button" class="fm-feed fm-pick" data-lane="${v.lane}" data-pick="${v.lane}" data-key="feed-${v.lane}" aria-pressed="${v.lane === selected}" aria-label="Projector ${v.lane}, ${esc(v.surface)}, ${esc(v.power)}, shutter ${esc(v.shutter)}"><span class="fm-feed__head"><span class="fm-laneidx">${v.lane}</span><span class="fm-lanename">${esc(v.surface)}</span></span><span class="fm-art ${v.lane === 'C' ? 'fm-art-peaks' : 'fm-art-aurora'}"><strong class="fm-feed-power">${esc(v.power)}</strong><span class="fm-feed-shutter">Shutter ${esc(v.shutter)}</span></span><span class="fm-feed__foot">${word(v)}<span class="fm-small">Reply ${esc(v.reply)}</span></span></button>`;
+  return `<button type="button" class="fm-feed fm-pick" data-lane="${v.lane}" data-pick="${v.lane}" data-key="feed-${v.lane}" aria-pressed="${v.lane === selected}" aria-label="Projector ${v.lane}, ${esc(v.surface)}, ${esc(v.power)}, shutter ${esc(v.shutter)}${v.fault ? ', ' + esc(v.fault.text) : ''}"><span class="fm-feed__head"><span class="fm-laneidx">${v.lane}</span><span class="fm-lanename">${esc(v.surface)}</span></span><span class="fm-art ${v.lane === 'C' ? 'fm-art-peaks' : 'fm-art-aurora'}"><strong class="fm-feed-power">${esc(v.power)}</strong><span class="fm-feed-shutter">Shutter ${esc(v.shutter)}</span></span><span class="fm-feed__foot">${v.fault ? fault(v) : word(v)}<span class="fm-small">Reply ${esc(v.reply)}</span></span></button>`;
 }
 
 const row = cells => `<div role="row" class="fm-tr">${cells}</div>`;
@@ -54,7 +54,7 @@ function render() {
   insp.dataset.lane = selected;
   patch(insp, `<div class="avd-panel__head"><h2 id="insp-title" class="avd-panel__title"><span class="avd-panel__index">${v.lane}</span>Projector ${v.lane}</h2><span class="avd-state"><span class="avd-dot avd-dot--${v.st}" aria-hidden="true"></span>${esc(v.word)}</span></div><div class="avd-panel__body"><div class="pj-lane"><h3>${esc(v.surface)}</h3><span class="pj-mono">${esc(v.role)} · ${esc(v.orientation)}</span></div><div class="fm-kvs">${[
     kv('Model', model(v)), kv('Address', address(v)), kv('Labels', `${v.prod} production · ${v.slot || 'unassigned'} controller`), kv('Resolution', v.native),
-    kv('Input reported', `${v.input} · ${v.signal}`), kv('Control', v.route), kv('Light', light(v))].join('')}</div><a class="avd-btn avd-btn--primary avd-btn--block" href="/" target="_blank" rel="noopener noreferrer">Open in Projctl ↗</a><p class="pj-mono fm-small">Monitor only. Lighting fires the cues and Millumin sends power and shutter.</p></div>`);
+    kv('Input reported', `${v.input} · ${v.signal}`), kv('Control', v.route), kv('Faults', faultRow(v)), kv('Light', lampRecord(v))].join('')}</div><a class="avd-btn avd-btn--primary avd-btn--block" href="/" target="_blank" rel="noopener noreferrer">Open in Projctl ↗</a><p class="pj-mono fm-small">Monitor only. Lighting fires the cues and Millumin sends power and shutter.</p></div>`);
 
   const h = live.health, last = h?.reports?.[0], engine = h?.engine;
   const next = !engine ? '' : engine.state === 'disabled' ? 'reports are off on this relay' : engine.nextHourlyAt ? `next ${shortTime(engine.nextHourlyAt)}` : 'next on the hour while lit';

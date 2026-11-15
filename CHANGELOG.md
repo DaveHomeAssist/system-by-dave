@@ -3,6 +3,10 @@
 ## 2026-11-15: Frozen Quiet Watch 1
 
 - Label simulated Monitor readings as Practice data, consistent with the controller.
+- Include every current projector alarm in Monitor, with compact alert counts and
+  complete detail text. Retain unknown status for missing or stale alarm readings.
+- Fill supported temperature and headroom chart fields in new Notion health rows,
+  preserving empty readings and report delivery when schema lookup is unavailable.
 
 - Keep failed shared-task saves visible, preserve drafts and prevent duplicate
   submissions. Refresh crew copy and R5 document links across Monitor.
@@ -81,6 +85,14 @@
 ## November 14, 2026: Video Engineering Daily
 
 - Add Edition 038 on measuring SDI CRC errors during line checks, with an illustrated story card.
+
+## November 14, 2026: Frozen Monitor shows projector warnings and signal presence
+
+- The monitor lists every fault in the projector's PJLink alarm status, not only
+  lamp errors: warnings in amber, errors in red, on the lane tile and in a new
+  Faults row in the inspector. Lane A's lamp error and the A and D "other"
+  warnings now show.
+- A Pulse signal reading of `true` reads "Signal present" instead of "Reported".
 
 ## November 14, 2026: Monitor link inside Projctl
 
