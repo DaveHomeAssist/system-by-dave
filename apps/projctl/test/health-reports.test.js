@@ -188,13 +188,66 @@ test('Notion publisher sends the page, classifies failures and redacts the token
   const token = async () => 'ntn_test_token';
   const published = await createNotionPublisher({ databaseId: 'd'.repeat(32), token, fetch: reply(200, { id: 'page-1', url: 'https://notion.example/page-1' }) })(report);
   assert.deepEqual(published, { id: 'page-1', url: 'https://notion.example/page-1' });
-  assert.equal(calls[0].url, 'https://api.notion.com/v1/pages');
-  assert.equal(calls[0].init.headers.authorization, 'Bearer ntn_test_token');
-  assert.equal(calls[0].init.headers['notion-version'], '2022-06-28');
+  const post = calls.find((c) => c.init.method === 'POST');
+  assert.equal(post.url, 'https://api.notion.com/v1/pages');
+  assert.equal(post.init.headers.authorization, 'Bearer ntn_test_token');
+  assert.equal(post.init.headers['notion-version'], '2022-06-28');
   await assert.rejects(createNotionPublisher({ databaseId: 'd'.repeat(32), token, fetch: reply(429, { message: 'slow down' }) })(report), (e) => e.retry === true && /Notion 429: slow down/.test(e.message));
   await assert.rejects(createNotionPublisher({ databaseId: 'd'.repeat(32), token, fetch: reply(404, { message: 'Could not find database with ID ntn_test_token' }) })(report), (e) => e.retry === false && !e.message.includes('ntn_test_token'));
   await assert.rejects(createNotionPublisher({ databaseId: 'd'.repeat(32), token, fetch: async () => { throw new TypeError('fetch failed'); } })(report), (e) => e.retry === true && /unreachable/.test(e.message));
   await assert.rejects(createNotionPublisher({ databaseId: 'd'.repeat(32), token: async () => null, fetch: reply(200, {}) })(report), (e) => e.code === 'NO_TOKEN' && e.retry === true);
+});
+
+test('Notion page fills per-unit number properties only where the database has them', () => {
+  const data = { ...NOV11, P3: { st: { online: false, power: 'unknown', errors: null }, readings: null } };
+  const report = buildReport({ kind: 'hourly', startedAt: 0, finishedAt: 1, units: rows(data), config: CONFIG });
+  assert.deepEqual(Object.keys(notionPage(report, 'd'.repeat(32)).properties), ['Log', 'Check window', 'Findings', 'Follow-up']);
+  const names = new Set(['P1 Temp (°C)', 'P1 Headroom (°C)', 'P2 Temp (°C)', 'P3 Temp (°C)', 'P3 Headroom (°C)', 'P4 Temp (°C)', 'P4 Headroom (°C)', 'Other number']);
+  const props = notionPage(report, 'd'.repeat(32), { numberProperties: names }).properties;
+  assert.deepEqual(props['P1 Temp (°C)'], { number: 29.8 });
+  assert.deepEqual(props['P1 Headroom (°C)'], { number: 10.2 });
+  assert.deepEqual(props['P2 Temp (°C)'], { number: 23 });
+  assert.equal('P2 Headroom (°C)' in props, false);
+  assert.deepEqual(props['P3 Temp (°C)'], { number: null });
+  assert.deepEqual(props['P3 Headroom (°C)'], { number: null });
+  assert.deepEqual(props['P4 Temp (°C)'], { number: 37 });
+  assert.deepEqual(props['P4 Headroom (°C)'], { number: 3 });
+  assert.equal('Other number' in props, false);
+});
+
+test('Notion publisher reads the database once and sends only the numbers it has', async () => {
+  const report = buildReport({ kind: 'hourly', startedAt: 0, finishedAt: 1, units: rows(), config: CONFIG });
+  const schema = { properties: { Log: { type: 'title' }, 'P4 Temp (°C)': { type: 'number' }, 'P4 Headroom (°C)': { type: 'number' }, 'P1 Temp (°C)': { type: 'rich_text' } } };
+  const fake = (failFirstRead = false) => {
+    const calls = [];
+    let fail = failFirstRead;
+    const send = async (url, init) => {
+      calls.push({ url, method: init.method, body: init.body ? JSON.parse(init.body) : null });
+      if (init.method === 'GET' && fail) { fail = false; throw new TypeError('fetch failed'); }
+      return { ok: true, status: 200, json: async () => (init.method === 'GET' ? schema : { id: 'page', url: 'https://notion.example/page' }) };
+    };
+    return { calls, send };
+  };
+  const steady = fake();
+  const publish = createNotionPublisher({ databaseId: 'd'.repeat(32), token: async () => 'ntn_test_token', fetch: steady.send });
+  await publish(report);
+  await publish(report);
+  const reads = steady.calls.filter((c) => c.method === 'GET');
+  assert.equal(reads.length, 1);
+  assert.equal(reads[0].url, `https://api.notion.com/v1/databases/${'d'.repeat(32)}`);
+  const sent = steady.calls.find((c) => c.method === 'POST').body.properties;
+  assert.deepEqual(sent['P4 Temp (°C)'], { number: 37 });
+  assert.deepEqual(sent['P4 Headroom (°C)'], { number: 3 });
+  assert.equal('P1 Temp (°C)' in sent, false);
+
+  const flaky = fake(true);
+  const publishFlaky = createNotionPublisher({ databaseId: 'd'.repeat(32), token: async () => 'ntn_test_token', fetch: flaky.send });
+  assert.deepEqual(await publishFlaky(report), { id: 'page', url: 'https://notion.example/page' });
+  await publishFlaky(report);
+  const posts = flaky.calls.filter((c) => c.method === 'POST');
+  assert.equal('P4 Temp (°C)' in posts[0].body.properties, false);
+  assert.deepEqual(posts[1].body.properties['P4 Temp (°C)'], { number: 37 });
+  assert.equal(flaky.calls.filter((c) => c.method === 'GET').length, 2);
 });
 
 function fakeClock(start) {

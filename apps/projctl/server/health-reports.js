@@ -179,7 +179,24 @@ const notionTable = (rows) => block('table', {
   table_width: rows[0].length, has_column_header: true, has_row_header: false,
   children: rows.map((r) => block('table_row', { cells: r.map((c) => rich(c)) })),
 });
-export function notionPage(report, databaseId) {
+// Per-unit number properties, named by controller slot: "P1 Temp (°C)" (intake or
+// ambient) and "P1 Headroom (°C)". Written only when the database has them as number
+// properties, so a database without them still accepts the page. A unit with no
+// reading gets an empty value, never a guess.
+export const unitPropertyNames = (slot) => ({ temp: `${slot} Temp (°C)`, headroom: `${slot} Headroom (°C)` });
+function unitProperties(report, numberProperties) {
+  const out = {};
+  if (!numberProperties?.size) return out;
+  for (const u of report.units || []) {
+    if (!/^P\d+$/.test(String(u?.slot || ''))) continue;
+    const { temp, headroom } = unitPropertyNames(u.slot);
+    if (numberProperties.has(temp)) out[temp] = { number: Number.isFinite(u.intakeC) ? u.intakeC : null };
+    if (numberProperties.has(headroom)) out[headroom] = { number: Number.isFinite(u.headroomC) ? u.headroomC : null };
+  }
+  return out;
+}
+
+export function notionPage(report, databaseId, { numberProperties } = {}) {
   return {
     parent: { database_id: databaseId },
     properties: {
@@ -187,6 +204,7 @@ export function notionPage(report, databaseId) {
       'Check window': { date: { start: report.startedAt, end: report.finishedAt } },
       Findings: { rich_text: rich(report.findings) },
       'Follow-up': { rich_text: rich(report.followUp) },
+      ...unitProperties(report, numberProperties),
     },
     children: [
       block('paragraph', { rich_text: rich(`${report.findings} Trigger: ${report.reason || report.kind}.`) }),
@@ -212,15 +230,33 @@ export function notionTokenReader({ env = process.env, platform = process.platfo
 }
 
 export function createNotionPublisher({ databaseId, token, fetch: send = globalThis.fetch, timeoutMs = 15000 }) {
+  // The database's number property names, read once. A failed read publishes the page
+  // without the per-unit numbers and tries the read again with the next report.
+  let numberProperties = null;
+  async function readNumberProperties(secret) {
+    if (numberProperties) return numberProperties;
+    try {
+      const response = await send(`https://api.notion.com/v1/databases/${databaseId}`, {
+        method: 'GET', signal: AbortSignal.timeout(timeoutMs),
+        headers: { authorization: `Bearer ${secret}`, 'notion-version': '2022-06-28' },
+      });
+      if (!response?.ok) return new Set();
+      const body = await response.json().catch(() => null);
+      if (!body || typeof body.properties !== 'object') return new Set();
+      numberProperties = new Set(Object.entries(body.properties).filter(([, p]) => p?.type === 'number').map(([name]) => name));
+      return numberProperties;
+    } catch { return new Set(); }
+  }
   return async function publish(report) {
     const secret = await token();
     if (!secret) throw Object.assign(new Error('Notion token not found on this machine'), { code: 'NO_TOKEN', retry: true });
+    const available = await readNumberProperties(secret);
     let response;
     try {
       response = await send('https://api.notion.com/v1/pages', {
         method: 'POST', signal: AbortSignal.timeout(timeoutMs),
         headers: { authorization: `Bearer ${secret}`, 'notion-version': '2022-06-28', 'content-type': 'application/json' },
-        body: JSON.stringify(notionPage(report, databaseId)),
+        body: JSON.stringify(notionPage(report, databaseId, { numberProperties: available })),
       });
     } catch (e) { throw Object.assign(new Error(`Notion unreachable: ${e.name === 'TimeoutError' ? 'timed out' : e.message}`), { retry: true }); }
     const body = await response.json().catch(() => ({}));
