@@ -123,7 +123,8 @@ projector credentials. Responses are bounded, redirects are refused, and raw HTM
 and credentials never reach the browser. No control request is part of collection.
 
 These reads share the existing per-projector telemetry queue and sampling cadence.
-Each page has its own timestamp and availability. Failed requests show Unavailable;
+Native temperatures are collected first so optional web timeouts cannot consume
+the shutdown temperature budget. Each page has its own timestamp and availability. Failed requests show Unavailable;
 readings older than two minutes or with a disconnected projector show Last known.
 Web diagnostics do not replace PJLink control feedback or establish EDID, physical
 shutter operation, alignment or lamp-service diagnosis. Unsupported page layouts

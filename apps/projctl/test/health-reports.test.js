@@ -435,7 +435,10 @@ test('Panasonic health readings query QTM:0-2 read-only and tolerate a refused s
     socket.on('data', (b) => { text += b; if (!text.includes('\r')) return; const cmd = text.trim().replace(/^00/, ''); sent.push(cmd); socket.write(`00${replies[cmd] ?? 'ER402'}\r`); });
   });
   const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
-  const out = await driver.healthReadings();
+  const partials = [];
+  const out = await driver.healthReadings({ onPartial: value => partials.push(value) });
+  assert.equal(partials[0].sensors[0].c, 37);
+  assert.equal(partials[0].webDiagnostics, undefined, 'native temperatures arrive before optional web reads');
   assert.deepEqual(sent, ['QTM:0', 'QTM:1', 'QTM:2']);
   assert.deepEqual(out.sensors.map((s) => [s.id, s.role, s.c]), [['intake', 'intake', 37], ['qtm1', 'internal', 37], ['qtm2', 'internal', null]]);
 });

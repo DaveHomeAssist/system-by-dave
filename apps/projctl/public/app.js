@@ -1,4 +1,4 @@
-import { diagnosticsHTML } from './panasonic-diagnostics.js';
+import { diagnosticsHTML, preserveDiagnostics } from './panasonic-diagnostics.js';
 import { RELEASE } from './release.js';
 import { fieldFeedback } from './status-feedback.js';
 import { createAllProjectors } from './all-projectors.js';
@@ -442,11 +442,13 @@ function renderProjectorInfo() {
 }
 function reportedValue(value) { return value == null || value === '' ? 'Unavailable' : typeof value === 'object' ? JSON.stringify(value) : String(value); }
 function renderDisplayInfo(p) {
+  const restoreDiagnostics = preserveDiagnostics($('#projector-display-info'));
   const info=p?.displayInfo?.scope==='projector'?p.displayInfo:null;
   const status=p?.status||{};
   const input=info?.input || (status.input!=null ? {state:connected&&status.online?'reported':'offline',value:status.input,label:p.inputs?.[status.input]||status.input,observedAt:status.connection?.lastSuccessAt||status.updatedAt} : null),signal=info?.signal,edid=info?.edid;
   const field=(label,data,fallback)=>{const stale=!connectionOf(p).current||data?.state==='offline'||(label==='Reported input'&&!fieldFeedback(p,'input',connectionOf(p)).current);return `<div><dt>${label}</dt><dd>${esc(data?.value!=null ? (data.label || reportedValue(data.value)) : fallback)}<br><span class="pj-mono">${esc(stale&&data?.value!=null?'Last known · ': '')}${esc(data?.state || (p?'unsupported':'unassigned'))}${data?.observedAt?' · '+esc(new Date(data.observedAt).toLocaleString()):''}</span></dd></div>`;};
   $('#projector-display-info').innerHTML=`<dl>${field('Reported input',input,'No input reported')}${field('Driver signal readout',signal,'Signal information unavailable')}<div><dt>Projector EDID</dt><dd>${esc(edid?.state==='reported'&&edid.value!=null?reportedValue(edid.value):edid?.reason||(p?'EDID is not read by this driver.':'No device is assigned to this lane; projector EDID is unavailable.'))}<br><span class="pj-mono">${esc(edid?.state||(p?'unsupported':'unassigned'))} · projector scope</span></dd></div></dl><p class="pj-detail-unavailable">Input names and signal readings are separate from EDID. No resolution or EDID is inferred from the selected input.</p>${diagnosticsHTML(p, !!p && connectionOf(p).current)}`;
+  restoreDiagnostics();
 }
 let powerSchedulesView=null;$('#power-schedule-panel').addEventListener('toggle',()=>{if($('#power-schedule-panel').open&&!powerSchedulesView)powerSchedulesView=mountPowerSchedules($('#power-schedules'),{projectors:()=>state.projectors,connected:()=>connected});});
 $('#rig-extra-devices').onclick=()=>$('#tab-btn-setup').click();

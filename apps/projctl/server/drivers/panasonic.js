@@ -128,8 +128,7 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     // Read-only temperatures for health reports; never part of the status poll.
     // A refused sensor reads as null; a dead connection stops the remaining queries.
     async healthReadings({ signal, onPartial } = {}) {
-      const webDiagnostics = await readWeb({ signal });
-      onPartial?.({ sensors: [], webDiagnostics });
+      let webDiagnostics;
       const sensors = [];
       for (const [n, id, label, role] of QTM_SENSORS) {
         let c = null;
@@ -144,6 +143,8 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
         sensors.push({ id, label, role, c });
         onPartial?.({ sensors: sensors.map((sensor) => ({ ...sensor })), webDiagnostics });
       }
+      webDiagnostics = await readWeb({ signal });
+      onPartial?.({ sensors: sensors.map(sensor => ({ ...sensor })), webDiagnostics });
       return { sensors, webDiagnostics };
     },
     async pattern(code, options) {

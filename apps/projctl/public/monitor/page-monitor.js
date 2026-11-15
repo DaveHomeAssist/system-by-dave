@@ -1,4 +1,4 @@
-import { diagnosticsHTML } from '../panasonic-diagnostics.js';
+import { diagnosticsHTML, preserveDiagnostics } from '../panasonic-diagnostics.js';
 // Monitor page: the house multiview, command log, today's calls, the selected projector and heat.
 import { startMonitor, onLive, laneModels, patch, esc, $, live, todayISO, easternTime, laneOfSlot, shortTime, relayUnavailableText } from './monitor.js';
 import { ALERTS, CHECKLIST, HUB, isSide } from './monitor-data.js';
@@ -53,9 +53,11 @@ function render() {
   $('#mon-details').textContent = `${selected} details`;
   $('#mon-details').setAttribute('aria-label', `Details for projector ${selected}`);
   insp.dataset.lane = selected;
+  const restoreDiagnostics = preserveDiagnostics(insp);
   patch(insp, `<div class="avd-panel__head"><h2 id="insp-title" class="avd-panel__title"><span class="avd-panel__index">${v.lane}</span>Projector ${v.lane}</h2><span class="avd-state"><span class="avd-dot avd-dot--${v.st}" aria-hidden="true"></span>${esc(v.word)}</span></div><div class="avd-panel__body"><div class="pj-lane"><h3>${esc(v.surface)}</h3><span class="pj-mono">${esc(v.role)} · ${esc(v.orientation)}</span></div><div class="fm-kvs">${[
     kv('Model', model(v)), kv('Address', address(v)), kv('Labels', `${v.prod} production · ${v.slot || 'unassigned'} controller`), kv('Resolution', v.native),
     kv('Input reported', `${v.input} · ${v.signal}`), kv('Control', v.route), kv('Faults', faultRow(v)), kv('Light', lampRecord(v))].join('')}</div>${diagnosticsHTML(v.projector, v.current)}<a class="avd-btn avd-btn--primary avd-btn--block" href="/" target="_blank" rel="noopener noreferrer">Open in Projctl ↗</a><p class="pj-mono fm-small">Monitor only. Lighting fires the cues and Millumin sends power and shutter.</p></div>`);
+  restoreDiagnostics();
 
   const h = live.health, last = h?.reports?.[0], engine = h?.engine;
   const next = !engine ? '' : engine.state === 'disabled' ? 'reports are off on this relay' : engine.nextHourlyAt ? `next ${shortTime(engine.nextHourlyAt)}` : 'next on the hour while lit';
