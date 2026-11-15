@@ -1,5 +1,12 @@
 # Changelog
 
+## Frozen Startup offline package, 2026-11-15
+
+- Add a development Mac adapter with native display enumeration, atomic layout restoration, BetterDisplay mode requests and read-only Millumin accessibility parsing. Verify the real Millumin 5.14.l Output sheet, active document, control-window position and layer-1000 fullscreen output windows on the development Mac. Studio installation acceptance remains separate.
+
+- Add a five-display startup coordinator with stable-identity matching, bounded restoration/readback stages, explicit Millumin routing verification and warm read-only checks.
+- Add same-run crew readiness evidence, deterministic portable packaging and missing-display/changed-ID regression fixtures. Native Studio integration and installation remain pending.
+
 ## November 15, 2026: Video Engineering Daily
 
 - Add Edition 039 on how the AJA FS4 links audio delay to video timing, with an illustrated story card.
