@@ -1,0 +1,16 @@
+name: Frozen Startup offline checks
+on:
+  pull_request:
+    paths: ['apps/frozen-startup/**', '.github/workflows/frozen-startup.yml']
+  push:
+    branches: [main]
+    paths: ['apps/frozen-startup/**', '.github/workflows/frozen-startup.yml']
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: python3 -B -m unittest discover -s apps/frozen-startup -p 'test_*.py' -v
+      - run: python3 apps/frozen-startup/package.py /tmp/frozen-startup-package
