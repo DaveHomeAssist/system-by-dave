@@ -20,6 +20,15 @@ class StartupError(Exception):
     pass
 
 
+def boot_id():
+    if sys.platform == 'darwin':
+        return subprocess.check_output(['/usr/sbin/sysctl', '-n', 'kern.boottime'], text=True, timeout=3).strip()
+    path = Path('/proc/sys/kernel/random/boot_id')
+    if path.exists():
+        return path.read_text().strip()
+    raise StartupError('Boot identity is unavailable.')
+
+
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
@@ -173,7 +182,7 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
     if timeout <= 0 or interval <= 0 or stable_samples < 2:
         raise StartupError('Invalid wait settings.')
     receipt = {'schemaVersion': 1, 'runID': str(uuid.uuid4()), 'createdAt': datetime.now(timezone.utc).isoformat(),
-               'profileSHA256': digest(profile), 'mode': 'warm' if warm else 'startup', 'events': [], 'computerReady': False,
+               'bootID': boot_id(), 'profileSHA256': digest(profile), 'mode': 'warm' if warm else 'startup', 'events': [], 'computerReady': False,
                'showNightReady': False}
 
     def record(action):
@@ -245,7 +254,7 @@ def readiness(receipt, evidence, snapshot, profile, now=None):
     now = now or datetime.now(timezone.utc)
     try:
         age = (now - datetime.fromisoformat(receipt['completedAt'])).total_seconds()
-        valid = (receipt.get('computerReady') is True and 0 <= age <= 900
+        valid = (receipt.get('computerReady') is True and receipt.get('bootID') == boot_id() and 0 <= age <= 900
                  and receipt['profileSHA256'] == digest(profile)
                  and receipt.get('snapshotSHA256') == digest(snapshot)
                  and evidence.get('runID') == receipt['runID']
@@ -285,14 +294,19 @@ def main():
     parser.add_argument('--crew-evidence')
     parser.add_argument('--verify-ready', action='store_true', help='Verify crew evidence against an existing receipt and current snapshot')
     args = parser.parse_args()
+    result = None
+    lock_owned = False
     try:
         receipt_path = Path(args.receipt)
         receipt_path.parent.mkdir(parents=True, exist_ok=True)
         lock = open(receipt_path.parent / '.frozen-startup.lock', 'a')
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            lock_owned = True
         except BlockingIOError as error:
             raise StartupError('Another startup check is running in this receipt directory.') from error
+        if args.verify_ready:
+            result = json.loads(Path(args.receipt).read_text())
         profile = validate_profile(json.loads(Path(args.profile).read_text()))
         bridge = FixtureBridge(json.loads(Path(args.fixture).read_text())) if args.fixture else Bridge(args.bridge)
         if args.crew_evidence and not args.verify_ready:
@@ -316,6 +330,12 @@ def main():
         print(result['message'])
         return 0 if result.get('showNightReady' if args.verify_ready else 'computerReady') else 2
     except (StartupError, OSError, ValueError) as error:
+        if args.verify_ready and lock_owned and isinstance(result, dict):
+            result.update(showNightReady=False, message='Readiness verification unavailable.', readinessCheckedAt=datetime.now(timezone.utc).isoformat())
+            try:
+                save(args.receipt, result)
+            except OSError:
+                pass
         print('Startup check unavailable: %s' % error, file=sys.stderr)
         return 3
 
