@@ -348,6 +348,25 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
 <script id="archive-data" type="application/json">
 [
   {
+    "id": 39,
+    "date": "2026-11-15",
+    "track": "Genlock, timecode, synchronization, and latency",
+    "trackShort": "Synchronization",
+    "title": "When audio delay follows video",
+    "fact": "On the AJA FS4, Maintain A/V Sync can make audio input delay follow changes to video timing for supported routes. Turning it on keeps the existing audio delay until you change video timing.",
+    "why": "If you add video delay to align cameras on a live show, the re-embedded audio can move out of sync when its delay is set independently.",
+    "takeaway": "First align sound and picture at the output with a flash and click. Then enable the link for later video timing changes and verify sync again after any adjustment.",
+    "basis": "AJA FS4 v3.1 describes the one-way link, eligible routes and the master processor condition in four-channel mode. This is specific to the FS4.",
+    "sourceLabel": "AJA FS4 manual v3.1, Timing Menu",
+    "sourceUrl": "https://www.aja.com/support/item-download/10522/AJA_FS4_Manual_v3.1r1.pdf",
+    "current": true,
+    "illustration": {
+      "viewBox": "0 0 240 400",
+      "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/>\n<text x=\"12\" y=\"26\" class=\"diagram-index\">39</text><text x=\"46\" y=\"26\" class=\"diagram-heading\">AUDIO DELAY LINK</text><path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"144\" rx=\"6\" class=\"panel\"/>\n<text x=\"24\" y=\"78\" class=\"blue-label\">1 / Link off</text>\n<text x=\"24\" y=\"105\">Video timing + Δ</text>\n<path d=\"M24 118H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<text x=\"24\" y=\"151\">Audio delay unchanged</text>\n<path d=\"M24 162H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<text x=\"24\" y=\"184\" class=\"note\">Relative offset shifts</text>\n<rect x=\"12\" y=\"210\" width=\"216\" height=\"145\" rx=\"6\" class=\"panel\"/>\n<text x=\"24\" y=\"236\" class=\"blue-label\">2 / Link on</text>\n<text x=\"24\" y=\"263\">Video timing + Δ</text>\n<path d=\"M24 276H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<path d=\"M215 279V316m-5-6l5 6l5-6\" class=\"reference\"/>\n<text x=\"24\" y=\"309\">Audio delay + Δ</text>\n<path d=\"M24 320H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<text x=\"24\" y=\"342\" class=\"good-label\">Relative offset holds</text>\n<text x=\"24\" y=\"380\">Δ = change in delay</text>",
+      "caption": "With the FS4 link enabled for a supported route, a video timing change applies the same change to audio delay, preserving the existing offset."
+    }
+  },
+  {
     "id": 38,
     "date": "2026-11-14",
     "track": "Signal troubleshooting and system design",
@@ -359,7 +378,7 @@ noscript {position:fixed;inset:0;z-index:200;background:var(--surface);color:var
     "basis": "Tektronix describes detecting and logging CRC errors on HD-SDI and 3G-SDI. Counter presentation depends on the monitor.",
     "sourceLabel": "Tektronix, SDI Physical Layer Testing",
     "sourceUrl": "https://download.tek.com/document/Physical-Layer-Testing-3G-SDI-HD-SDI-Serial-Digital-Signals_AppNote_25W-19525-3.pdf",
-    "current": true,
+    "current": false,
     "illustration": {
       "viewBox": "0 0 240 400",
       "body": "<rect width=\"240\" height=\"400\" class=\"canvas\"/>\n<text x=\"12\" y=\"26\" class=\"diagram-index\">38</text><text x=\"48\" y=\"26\" class=\"diagram-heading\">SDI CRC CHECK</text><path d=\"M12 40H228\" class=\"rule\"/>\n<rect x=\"12\" y=\"52\" width=\"216\" height=\"136\" rx=\"6\" class=\"panel\"/>\n<text x=\"24\" y=\"78\" class=\"blue-label\">1 / Compare at receiver</text>\n<text x=\"24\" y=\"104\">Received line data</text>\n<path d=\"M24 117H208m-6-5l6 5l-6 5\" class=\"wire\"/>\n<text x=\"24\" y=\"144\">Recalculate CRC</text>\n<path d=\"M24 154H208\" class=\"reference\"/>\n<text x=\"24\" y=\"176\" class=\"note\">Compare carried CRC</text>\n<rect x=\"12\" y=\"202\" width=\"216\" height=\"141\" rx=\"6\" class=\"panel\"/>\n<text x=\"24\" y=\"228\" class=\"blue-label\">2 / Read counter</text>\n<text x=\"24\" y=\"258\">Match: count holds</text>\n<path d=\"M24 272H208\" class=\"rule\"/>\n<text x=\"24\" y=\"302\" class=\"note\">Mismatch detected</text>\n<text x=\"24\" y=\"328\" class=\"good-label\">Counter increments</text>\n<text x=\"24\" y=\"373\">Log over a test window</text>",

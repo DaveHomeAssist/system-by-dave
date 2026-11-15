@@ -1,9 +1,23 @@
 {
   "schema": 1,
-  "sourceSha256": "74b0edc9b36ec5fdda7e10cc2be972637dc3ba58338e345113f2a6d8739f6061",
-  "publicSha256": "5daf792bfa0e400f18e99d170a8a10143db7ec056609b5d6b653051129af9405",
-  "editions": 38,
+  "sourceSha256": "4d69895d933acc7f9d44642f690b03c089581b360a75322040b17c8bdc66637d",
+  "publicSha256": "e16b9973c9fe9cd20ccc0e730cc0a637e96a32a3fe4b9277513a0e02d5367752",
+  "editions": 39,
   "files": [
+    {
+      "name": "Edition 039.svg",
+      "id": 39,
+      "date": "2026-11-15",
+      "title": "When audio delay follows video",
+      "sha256": "daaa2625a92c0cb15fa52999e623312ba9b0c405d6950ff776e6f03972f8e9e1"
+    },
+    {
+      "name": "Edition 039.png",
+      "id": 39,
+      "date": "2026-11-15",
+      "title": "When audio delay follows video",
+      "sha256": "922ee0c64179bc979a8c280f04d0c8e13c7600450fce83e6db549796d4215f77"
+    },
     {
       "name": "Edition 038.svg",
       "id": 38,
