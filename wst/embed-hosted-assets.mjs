@@ -13,8 +13,14 @@ const handoffStart=indexHtml.indexOf('<section class="panel handoff-panel"');
 const handoffEnd=indexHtml.indexOf('<section class="panel planning-shell"',handoffStart);
 if(handoffStart<0||handoffEnd<0)throw Error('Handoff document boundaries missing');
 const handoffBody=indexHtml.slice(handoffStart,handoffEnd).replace(' hidden>','>').replaceAll('href="#updates"','href="./#updates"').replaceAll('href="#notes"','href="./#notes"');
-const handoffHead=indexHtml.slice(0,indexHtml.indexOf('<body>')).replace('<title>Frozen workspace | WST</title>','<title>Frozen house handoff | WST</title>').replace(/<script[^>]*>[\s\S]*?<\/script>/g,'').replace('href="https://wst.housevideo.app/"','href="https://wst.housevideo.app/handoff.html"');
-fs.writeFileSync(path.join(root,'handoff.html'),handoffHead+'<body><div class="shell"><header><a class="document-link" href="index.html#home">Frozen workspace</a></header>'+handoffBody+'</div></body></html>');
+const handoffHead = indexHtml.slice(0, indexHtml.indexOf('<body>'))
+  .replaceAll('Frozen workspace | WST', 'Frozen house handoff | WST')
+  .replace('Personal notes and team tasks for Frozen at Walnut Street Theatre.', 'House crew checks, current documents and open confirmations for Frozen at Walnut Street Theatre.')
+  .replaceAll('Personal notes and team tasks for Frozen.', 'House crew checks and open confirmations for Frozen.')
+  .replace(/<script[^>]*>[\s\S]*?<\/script>/g, '')
+  .replaceAll('https://wst.housevideo.app/', 'https://wst.housevideo.app/handoff.html');
+const handoffHeader = '<body><a class="skip" href="#handoff-title">Skip to handoff</a><div class="shell"><header><a class="document-link" href="index.html#home">Frozen workspace</a><label class="handoff-theme"><input id="handoff-dark" type="checkbox"> Dark theme</label></header>';
+fs.writeFileSync(path.join(root, 'handoff.html'), handoffHead + handoffHeader + handoffBody + '</div></body></html>');
 const files={'/':'index.html','/index.html':'index.html','/handoff.html':'handoff.html','/workspace.css':'workspace.css','/workspace.js':'workspace.js','/calendar.js':'calendar.js','/tech-schedule.json':'tech-schedule.json','/snow-splash.css':'snow-splash.css','/snow-splash.js':'snow-splash.js','/vendor/gsap.min.js':'vendor/gsap.min.js','/workspace-config.json':'workspace-config.json','/projectors.json':'projectors.json','/reference-view.js':'reference-view.js','/reference-view.css':'reference-view.css'};
 const stageRoot=path.join(root,'stage');
 const publicRoot=path.resolve(root,'../apps/projctl/public');

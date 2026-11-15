@@ -28,3 +28,6 @@ assert.match(handoff, /Projection handoff/);
 assert.doesNotMatch(handoff, /<script/);
 assert.match(handoff, /href="documents\/frozen-handoff-r5.pdf"/);
 assert.match(handoff, /href=".\/#notes"/);
+
+assert.match(handoff, /id="handoff-dark" type="checkbox"/);
+assert.match(handoff, /href="index.html#home"/);
