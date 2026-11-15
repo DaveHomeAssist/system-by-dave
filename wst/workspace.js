@@ -137,7 +137,10 @@ async function loadTasks() {
  catch(error) { showEntryFeedback(error.message); }
 }
 async function mutate(path,data) {
- try { await taskAPI(path,data); await loadTasks(); return true; }
+ try {
+  const payload = path ? {...data, done:!!data.done} : data;
+  await taskAPI(path,payload); await loadTasks(); return true;
+ }
  catch(error) { await loadTasks(); showEntryFeedback(error.message); return false; }
 }
 for(const [formId,fieldId,kind] of [['#task-add','#task-text','task'],['#update-add','#update-text','update']]) {
