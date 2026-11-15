@@ -5,6 +5,7 @@ pre-show checks, show-time faults, shutdown, responsibilities and remaining conf
 Source basis is the House Show Operations Guide, Handoff Walkthrough and November 14
 project/field reports. The page labels untested procedures and unknown assignments.
 It publishes no private endpoints, credentials or assumed equipment-control sequence.
+The static handoff.html is generated from the same content and works without JavaScript.
 Acceptance covers direct-link and navigation access, PDF links, both themes and viewport-contained desktop/mobile layout. The source
 records remain responsible for final operating acceptance and sign-off.
 
