@@ -79,6 +79,8 @@ const path = require('node:path');
     assert.equal(await page.locator('#tab-projector').isVisible(), false);
     const evidence = process.env.EVIDENCE_DIR || '/tmp/projctl-operator-evidence';
     fs.mkdirSync(evidence, { recursive: true });
+    await relay.api('lock', { lock: true });
+    await until(() => page.locator('#grid [data-lane=B] [data-action=power][data-value="0"]').isDisabled());
     for (const [width,height] of [[1440,900],[1280,900],[1024,768],[681,900],[930,1574],[680,900],[375,812],[844,390],[3840,1080]]) {
       await page.setViewportSize({ width, height });
       const singleProjector = width <= 680 || (width < 1280 && height < 700);
@@ -108,6 +110,8 @@ const path = require('node:path');
         await page.screenshot({ animations: 'disabled', path: path.join(evidence, `operator-${width}-${height}-${theme}.png`) });
       }
     }
+    await relay.api('lock', { lock: false });
+    await until(async () => !await page.locator('#grid [data-lane=B] [data-action=power][data-value="0"]').isDisabled());
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.locator('#workspace-menu').click();
     await page.locator('[data-tab=health]').focus();
