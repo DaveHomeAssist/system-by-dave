@@ -1,3 +1,18 @@
+## Team updates and tasks
+
+Scope requested November 14: show shared news separately from work that needs doing,
+while preserving existing entries, personal notes and completion states. Acceptance
+is independent creation/editing, persistent category moves, conflict handling, and
+legible desktop/mobile views. Existing six news entries will move to updates; their
+remaining actions become concise tasks after the new version is published.
+
+
+Planning has a dedicated Team updates tab for shared news, with no completion checkbox.
+Notes + tasks keeps private browser notes beside open tasks, with completed work in a
+collapsed section. Existing task records default to task; the kind column is added by
+migration 0001. Older clients can update records without losing their kind. Updates and
+tasks can be moved between sections, and inline editing preserves drafts during refresh.
+
 ## Private controller: embed in place or open directly, November 14, 2026
 
 Dave asked for both controller paths to work robustly. The Controls, Presets, Log and Configuration views now offer two actions side by side: **Connect this Mac** (requests the browser's local-network permission for `http://localhost:8080`, checks relay health, then embeds the private controller frame as before) and **Open local controller ↗** (`#open-controller`, a plain top-level link to `http://localhost:8080/` that is always visible and never subject to iframe or mixed-content rules). Browsers can allow the health fetch yet refuse the localhost frame (Resource Timing responseStatus 0); when no `projctl:ready` arrives within 8 seconds the frame hides, the status names the link and the link is highlighted (`data-recommended`). A failed health check does the same. Connected still requires a source/origin-validated child report; parent messages select views only and cannot issue device commands. The CSP again lists `http://localhost:8080` in `connect-src` and `frame-src`. Both paths only work on the Mac running Projctl. This replaces the November 14 documents release's link-only controller panel, which had removed the embed without a recorded decision.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-14
+
+- Separate WST team updates from actionable tasks, keep completed tasks collapsed, and add inline editing and category moves with backward-compatible storage.
+
 ## November 14, 2026: Frozen case films caption on current ffmpeg
 
 - `scripts/frozen_case_film.py` draws its caption band with Pillow and runs it
