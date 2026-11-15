@@ -3,6 +3,7 @@ import fcntl
 import subprocess
 import sys
 import zipfile
+from unittest.mock import patch
 import json
 from pathlib import Path
 import tempfile
@@ -34,7 +35,10 @@ class Tests(unittest.TestCase):
         self.profile, self.snapshot = fixture()
 
     def execute(self, bridge=None, **kwargs):
-        return run(self.profile, bridge or FixtureBridge(self.snapshot), timeout=.015, interval=.001, **kwargs)
+        ticks = [0.0]
+        def clock(): return ticks[0]
+        def sleep(seconds): ticks[0] += seconds
+        return run(self.profile, bridge or FixtureBridge(self.snapshot), timeout=.015, interval=.001, clock=clock, sleep=sleep, **kwargs)
 
     def test_complete_startup(self):
         b = FixtureBridge(self.snapshot)
@@ -212,6 +216,29 @@ class Tests(unittest.TestCase):
         result = self.execute(b)
         self.assertFalse(result['computerReady'])
         self.assertNotIn('restore', b.calls)
+
+    def test_boot_change_invalidates_readiness(self):
+        r = self.execute(warm=True)
+        e = {'runID': r['runID'], 'operator': 'Crew', **dict.fromkeys(('surfacesAtoD', 'approvedShow', 'testCardsRemoved', 'openingLookRestored', 'warningsReviewed'), True)}
+        with patch('startup.boot_id', return_value='different-boot'):
+            self.assertFalse(readiness(r, e, self.snapshot, self.profile)['showNightReady'])
+
+    def test_boot_query_failure_becomes_unavailable(self):
+        import startup
+        with patch('startup.sys.platform', 'darwin'), patch('startup.subprocess.check_output', side_effect=subprocess.TimeoutExpired('sysctl', 3)):
+            with self.assertRaises(StartupError): startup.boot_id()
+
+    def test_missing_evidence_clears_saved_ready(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for name, value in [('profile', self.profile), ('snapshot', self.snapshot)]:
+                (root / (name + '.json')).write_text(json.dumps(value))
+            receipt = self.execute(warm=True)
+            receipt.update(showNightReady=True, execution='offline fixture')
+            (root / 'receipt.json').write_text(json.dumps(receipt))
+            cmd = [sys.executable, str(Path(__file__).with_name('startup.py')), '--profile', str(root / 'profile.json'), '--fixture', str(root / 'snapshot.json'), '--receipt', str(root / 'receipt.json'), '--verify-ready', '--crew-evidence', str(root / 'missing.json')]
+            self.assertEqual(subprocess.run(cmd, capture_output=True).returncode, 3)
+            self.assertFalse(json.loads((root / 'receipt.json').read_text())['showNightReady'])
 
     def test_bad_profile_and_private_atomic_receipt(self):
         self.profile['displays'][1]['connector'] = self.profile['displays'][0]['connector']

@@ -178,6 +178,7 @@ def restore(rows):
     for row in rows:
         mode = row['mode']
         selector = '-registryLocation='+row['connector']
+        command([BETTERDISPLAY, 'set', selector, '-rotation='+str(mode['rotation'])])
         command([BETTERDISPLAY, 'set', selector, '-connectionMode='+mode['colorMode']])
         command([BETTERDISPLAY, 'set', selector, '-resolution=%dx%d' % (mode['width'], mode['height']),
                  '-refreshRate=%sHz' % mode['refreshRate'], '-hiDPI=off'])

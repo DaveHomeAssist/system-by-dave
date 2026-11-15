@@ -84,9 +84,10 @@ class MacTests(unittest.TestCase):
         with patch.object(mac, 'observe_displays', return_value=snapshot['displays']), patch.object(mac, 'command', return_value='') as command:
             mac.restore(rows)
             calls = command.call_args_list
-            self.assertEqual(len(calls), 11)
+            self.assertEqual(len(calls), 16)
             self.assertIn('-registryLocation=fixture-port-0', calls[0].args[0])
-            self.assertIn('-hiDPI=off', calls[1].args[0])
+            self.assertIn('-rotation=0', calls[0].args[0])
+            self.assertIn('-hiDPI=off', calls[2].args[0])
             self.assertEqual(calls[-1].args[0], [mac.NATIVE, 'layout'])
 
 
