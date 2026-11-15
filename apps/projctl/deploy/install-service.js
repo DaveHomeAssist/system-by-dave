@@ -66,14 +66,15 @@ if (fs.existsSync(paths.plist)) fs.copyFileSync(paths.plist, path.join(backup, '
 const original = await snapshotSettingsAfterStop({ sourceData: path.dirname(sourceRig), data, backup, stop: async () => {
   try { run('launchctl', ['bootout', label]); } catch {}
   for (const pid of pids) { try { process.kill(Number(pid), 'SIGTERM'); } catch (e) { if (e.code !== 'ESRCH') throw e; } }
-  for (let n = 0; n < 40; n++) {
+  // The health reporter may take six seconds to flush before the writer exits.
+  for (let n = 0; n < 100; n++) {
     let occupied = false;
     try { occupied = !!run('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN']).trim(); } catch {}
     const writersAlive = pids.some(pid => {
       try { return !run('ps', ['-p', pid, '-o', 'stat=']).trim().startsWith('Z'); } catch { return false; }
     });
     if (!occupied && !writersAlive) break;
-    if (n === 39) throw new Error('Old relay did not stop. Staged runtime and backup preserved.');
+    if (n === 99) throw new Error('Old relay did not stop. Staged runtime and backup preserved.');
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 } });

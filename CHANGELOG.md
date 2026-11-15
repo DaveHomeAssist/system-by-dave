@@ -7,6 +7,8 @@
   complete detail text. Retain unknown status for missing or stale alarm readings.
 - Fill supported temperature and headroom chart fields in new Notion health rows,
   preserving empty readings and report delivery when schema lookup is unavailable.
+- Let the managed updater wait for the health reporter's graceful shutdown before
+  deciding that the previous writer failed to stop.
 
 - Keep failed shared-task saves visible, preserve drafts and prevent duplicate
   submissions. Refresh crew copy and R5 document links across Monitor.
