@@ -58,6 +58,7 @@ async function pjlinkProjector(t, { refuseEvery = 0, digestOnEveryCommand = fals
         authenticated = true;
         const body = digest ? line.slice(32) : line, name = body.slice(2, 6);
         if (body.endsWith('?') && state.stallQuery === name) continue;
+        state.onQuery?.(name, body);
         socket.write(body.endsWith('?') ? `%1${name}=${values[name]}\r` : `%1${name}=OK\r`);
       }
     });
@@ -183,3 +184,16 @@ for (const [rawPower, expectedPower] of [['0', 'off'], ['2', 'cooling'], ['3', '
     assert.equal(recovered.shutter, 'open');
   });
 }
+
+test('a queued power command waits for the entire status poll', async (t) => {
+  const { driver, state } = await pjlinkProjector(t);
+  let control;
+  state.onQuery = (name, body) => {
+    if (body === '%1POWR ?' && !control) control = driver.power(false);
+  };
+  assert.equal((await driver.getStatus()).power, 'on');
+  assert.equal(await control, 'OK');
+  assert.deepEqual(state.lines.map(line => line.slice(line.indexOf('%1'))), [
+    '%1POWR ?', '%1AVMT ?', '%1INPT ?', '%1ERST ?', '%1LAMP ?', '%1NAME ?', '%1POWR 0',
+  ]);
+});

@@ -23,6 +23,7 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
   const available = !!p && connection.current;
   card.dataset.connectionState = connection.recovered ? 'recovered' : connection.state;
   const blocked = !available || lock || pending || !!p?.busy;
+  const powerOffReason = lock ? 'Power off unavailable: Show Lock is on.' : !available ? 'Power off unavailable: waiting for a fresh projector reply.' : pending || p?.busy ? 'Power off unavailable: another operation is in progress.' : s.power === 'off' ? 'Projector reports power off.' : '';
   const disabled = condition => condition ? 'disabled' : '';
   const hasPatterns = supportsPatterns(p);
   const table = hasPatterns ? p?.patterns || patterns : {};
@@ -61,8 +62,9 @@ export function operatorCard({ projector: p, lane, info, connection, lock, patte
       <div class="operator-label"><span>Power</span><strong class="operator-power-state" data-power-state="${escape(power)}">${escape(power)}</strong></div>
       <div class="operator-pair">
         <button class="operator-button" type="button" data-action="power" data-value="1" ${disabled(!available||pending||p?.busy||s.power==='cooling')}>Power on</button>
-        <button class="operator-button power-off" type="button" data-action="power" data-value="0" ${disabled(blocked||s.power==='off')}>${feedback?.phase==='confirmation'?'Confirm power off':'Power off'}</button>
+        <button class="operator-button power-off" type="button" aria-describedby="power-off-reason-${escape(lane)}" data-action="power" data-value="0" ${disabled(blocked||s.power==='off')}>${feedback?.phase==='confirmation'?'Confirm power off':'Power off'}</button>
       </div>
+      <p id="power-off-reason-${escape(lane)}" class="pj-mono pj-note" style="margin:0" role="status">${escape(powerOffReason)}</p>
     </section>
     <section class="operator-patterns" aria-label="Test patterns for ${lane}">
       <div class="operator-label"><span>Test pattern</span><strong>${escape(pattern)}</strong></div>

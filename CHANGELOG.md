@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-15
+
+- Keep conditional PJLink status reads in one serialized operation so queued controls cannot interrupt the poll. Add a regression for a shutdown queued during the power reply.
+- Allow text password entry on mobile and explain disabled Power off controls beside the button without changing Show Lock or command guards.
+
 ## 2026-11-14
 
 - Preserve fresh PJLink off, cooling and warming replies when standby projectors stop answering optional status queries. Panasonic polling skips its native pattern query in these states. Add protocol regression coverage for all three states and return to on.
