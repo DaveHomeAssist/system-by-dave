@@ -17,6 +17,8 @@ func snapshot() throws -> [[String: Any]] {
         let mode = CGDisplayCopyDisplayMode(id)
         var result: [String: Any] = [:]
         result["id"] = Int(id)
+        let screen = NSScreen.screens.first { ($0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value == id }
+        result["name"] = screen?.localizedName ?? ""
         result["active"] = CGDisplayIsActive(id) != 0
         result["width"] = mode?.width ?? 0
         result["height"] = mode?.height ?? 0
@@ -33,6 +35,13 @@ func snapshot() throws -> [[String: Any]] {
 }
 
 do {
+    if CommandLine.arguments.dropFirst().first == "windows" {
+        let windows = CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+        let owned = windows.filter { ($0[kCGWindowOwnerName as String] as? String) == "Millumin5" }
+        let data = try JSONSerialization.data(withJSONObject: owned, options: [.sortedKeys])
+        FileHandle.standardOutput.write(data)
+        exit(0)
+    }
     if CommandLine.arguments.dropFirst().first == "layout" {
         let data = FileHandle.standardInput.readDataToEndOfFile()
         let rows = try JSONDecoder().decode([Layout].self, from: data)

@@ -131,7 +131,7 @@ class Bridge:
     def call(self, action, payload):
         try:
             result = subprocess.run([self.executable], input=json.dumps({'schemaVersion': 1, 'action': action, 'payload': payload}),
-                                    capture_output=True, text=True, timeout=15, check=True)
+                                    capture_output=True, text=True, timeout=45, check=True)
             reply = json.loads(result.stdout)
         except (OSError, subprocess.SubprocessError, ValueError) as error:
             raise StartupError('The local application bridge failed.') from error

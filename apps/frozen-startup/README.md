@@ -1,6 +1,6 @@
 # Frozen Startup
 
-Offline development package, version 0.2.0. Python 3.9 or newer, standard library only.
+Offline development package, version 0.3.0. Python 3.9 or newer, standard library only.
 
 Run the demonstration from the repository root:
 
@@ -18,22 +18,23 @@ Run regression checks:
 python3 -B -m unittest discover -s apps/frozen-startup -p 'test_*.py' -v
 ```
 
-Build a portable source package:
+Build a portable source package (add the compiled mac-displays path as a second argument to include the native executable):
 
 ```sh
 python3 apps/frozen-startup/package.py /tmp/frozen-startup-package
 ```
 
-## Deployment bridge
+## Mac application adapter
 
-A commissioned bridge is selected explicitly with `--bridge /absolute/path`.
+The Mac adapter is selected explicitly with `--bridge /absolute/path`.
 The executable receives one JSON request on stdin and emits one JSON response
 on stdout. Every request has `schemaVersion: 1`, `action` and `payload`.
 Responses have `ok: true` and `result`, or `ok: false`. Calls time out after
-15 seconds. There is no shell evaluation. The bridge is trusted local code.
-This release supplies the offline bridge and a partial native Mac adapter.
-The native adapter reports startup capability as unavailable, so the coordinator
-stops before changing any display. Millumin integration needs completion.
+45 seconds. There is no shell evaluation. The bridge is trusted local code.
+This release supplies an offline bridge and a native Mac adapter tested with
+Millumin 5.14.l on the development Mac. The native adapter reads the Output
+setup sheet and CoreGraphics output windows. The Studio remains a separate
+installation and physical acceptance target.
 
 | Action | Request | Required behavior |
 | --- | --- | --- |
@@ -115,21 +116,35 @@ shutters, MIDI, playback cues and shutdown remain with their existing operators.
 Manufacturer references: [BetterDisplay CLI](https://betterdisplay.pro/guide/integration/cli-examples/),
 [Millumin scripts](https://help.millumin.com/docs/connect/scripts/).
 
-## Mac adapter development status
+## Native Mac integration
 
-The package now includes a native CoreGraphics display reader and atomic layout
-transaction, BetterDisplay connector-based mode restoration, and a bounded
-read-only Millumin accessibility inspector. Build the native tool with
-`bash apps/frozen-startup/build-mac.sh /tmp/frozen-mac-build` on a Mac.
-Set `FROZEN_NATIVE_DISPLAY_TOOL=/tmp/frozen-mac-build/mac-displays` when testing
-the adapter from source. A source archive includes the build script, not a
-preinstalled binary or login item.
+Build with `bash apps/frozen-startup/build-mac.sh /tmp/frozen-mac-build`.
+Use `FROZEN_NATIVE_DISPLAY_TOOL=/tmp/frozen-mac-build/mac-displays` when running
+the source adapter. The packaged native executable belongs beside mac_bridge.py.
+The local runtime needs Python 3, BetterDisplay CLI enabled, Millumin 5.14.l and
+macOS Accessibility permission for the invoking process. Fullscreen window
+verification may require Screen Recording permission. Missing permission or
+unknown UI shape prevents readiness.
 
-The native reader was compiled and observed the development Mac. Restoration
-commands have fixture coverage only. Millumin's real accessibility structure,
-active-document identity and output-window ownership remain unqualified.
-The adapter can verify an already-open approved document. Automatic show
-opening, control-window repositioning and fullscreen verification remain
-unimplemented, so fullscreen requests fail in this adapter. The package is a development artifact and must not be installed as an
-automatic Studio startup task. The missing integration is recorded explicitly
-instead of treating a saved-file assignment as live routing proof.
+The adapter opens the Output setup sheet, reads each canvas by selecting its
+row, and restores the previously selected row. It closes a sheet it opened.
+This briefly changes editor focus. All assigned canvases must have exactly one
+output. Multiple-output canvases stop verification rather than guessing.
+Display names match native and BetterDisplay aliases only when unambiguous.
+Extra assigned canvases appear in the route comparison and prevent a match.
+
+Fullscreen is confirmed using visible Millumin-owned layer-1000 windows whose
+bounds cover the assigned display. The checkbox alone does not pass. Local
+acceptance exercised fullscreen off/on/off and no-assignment false-positive
+rejection on the built-in screen. Four physical projector destinations and
+Studio permissions still require installation acceptance.
+
+The adapter opens the specified show only when no other document is open,
+checks its hash, moves the control window and checks actual assignments. A
+wrong route blocks startup for operator correction. It never rewrites a show
+archive or automatically changes canvas assignments. Automatic recovery relies
+on Millumin restoring the saved routes after the desktop has settled.
+
+Show hash describes the saved file. It cannot establish unsaved in-memory
+content. Start from the approved saved project for startup acceptance. The
+operator's approved-show confirmation remains part of show-night readiness.
