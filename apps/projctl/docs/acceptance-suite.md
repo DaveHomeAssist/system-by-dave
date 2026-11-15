@@ -116,7 +116,9 @@ supersedes the result in the summary while retaining earlier failures.
 
 ## Verification
 
-Run `python3 -m unittest discover -s apps/projctl/tools/acceptance -p 'test_*.py'`.
+From the repository root, run
+`python3 -B -m unittest discover -s apps/projctl/tools/acceptance -p 'test_*.py'`.
+Inside a delivered `Acceptance` folder, run `python3 -B -m unittest -v test_suite.py`.
 Tests use a temporary local fixture server and fake Screen Check. They must
 exercise missing evidence, expired release, simulation, interrupted writes,
 resume, credential redaction and GET-only collection. Venue, macOS executable,
