@@ -57,27 +57,104 @@ window.addEventListener('beforeunload', event => {
 });
 
 let currentTasks = [];
+let editingEntry = null;
 const feedback = document.querySelector('#task-feedback');
+const updateFeedback = document.querySelector('#update-feedback');
 async function taskAPI(path = '', data) {
  const response = await fetch(TASK_BASE + '/api/tasks' + path, {method:data ? 'POST':'GET', headers:data ? {'Content-Type':'application/json'}:{}, body:data ? JSON.stringify(data):undefined, cache:'no-store'});
- const result = await response.json(); if(!response.ok) throw Error(result.error || 'Task request failed.'); return result;
+ const result = await response.json();
+ if(!response.ok) throw Error(result.error || 'Could not save. Try again.');
+ return result;
+}
+function showEntryFeedback(message) {
+ feedback.textContent = message;
+ updateFeedback.textContent = message;
+}
+function entryButton(text, action, entry) {
+ const button = document.createElement('button');
+ button.type = 'button'; button.textContent = text;
+ button.setAttribute('aria-label', text + ' ' + entry.text);
+ button.onclick = action;
+ return button;
+}
+function editEntry(entry, item) {
+ editingEntry = entry.id;
+ const form = document.createElement('form'); form.className = 'entry-editor';
+ const field = document.createElement('textarea');
+ field.value = entry.text; field.maxLength = 500; field.required = true;
+ field.setAttribute('aria-label', 'Edit ' + (entry.kind === 'update' ? 'update' : 'task'));
+ const save = document.createElement('button'); save.type = 'submit'; save.textContent = 'Save';
+ const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Cancel';
+ cancel.onclick = () => { editingEntry = null; renderTasks(); };
+ form.append(field, save, cancel); item.replaceChildren(form); field.focus();
+ form.onsubmit = async event => {
+  event.preventDefault();
+  if(!field.value.trim()) return;
+  save.disabled = true;
+  const latest = currentTasks.find(row => row.id === entry.id);
+  if(!latest) { showEntryFeedback('This entry was removed. Copy your text before cancelling.'); save.disabled = false; return; }
+  const saved = await mutate('/' + entry.id, {...latest, text:field.value.trim()});
+  save.disabled = false;
+  if(saved) { editingEntry = null; renderTasks(); }
+ };
+}
+function renderEntry(entry) {
+ const item = document.createElement('li');
+ const isUpdate = entry.kind === 'update';
+ item.classList.toggle('completed', !isUpdate && !!entry.done);
+ const body = document.createElement(isUpdate ? 'div' : 'label'); body.className = 'entry-body';
+ if(!isUpdate) {
+  const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!entry.done;
+  check.onchange = () => mutate('/' + entry.id, {...entry, done:check.checked});
+  body.append(check);
+ }
+ const text = document.createElement('span'); text.textContent = entry.text; body.append(text);
+ if(isUpdate && entry.created_at) {
+  const date = document.createElement('time'); date.dateTime = entry.created_at;
+  date.textContent = new Intl.DateTimeFormat('en-US', {month:'short',day:'numeric',timeZone:'America/New_York'}).format(new Date(entry.created_at));
+  body.prepend(date);
+ }
+ const actions = document.createElement('div'); actions.className = 'entry-actions';
+ actions.append(entryButton('Edit', () => editEntry(entry,item), entry));
+ actions.append(entryButton(isUpdate ? 'Make a task' : 'Move to updates', () => mutate('/'+entry.id, {...entry,kind:isUpdate ? 'task' : 'update',done:false}), entry));
+ actions.append(entryButton('Delete', () => { if(confirm('Delete this '+(isUpdate?'update':'task')+'?')) mutate('/'+entry.id,{...entry,delete:true}); }, entry));
+ item.append(body, actions); return item;
 }
 function renderTasks() {
- const list=document.querySelector('#task-list');list.replaceChildren();
- if(!currentTasks.length) { const li=document.createElement('li');li.textContent='No tasks yet. Add the first one.';list.append(li); }
- for(const task of currentTasks){
- const li=document.createElement('li');li.classList.toggle('completed',!!task.done);
- const label=document.createElement('label'),check=document.createElement('input'),text=document.createElement('span');check.type='checkbox';check.checked=!!task.done;text.textContent=task.text;label.append(check,text);li.append(label);
- const edit=document.createElement('button');edit.textContent='Edit';edit.type='button';edit.setAttribute('aria-label','Edit '+task.text);li.append(edit);
- check.onchange=()=>mutate('/'+task.id,{revision:task.revision,done:check.checked,text:task.text});
- const remove=document.createElement('button');remove.type='button';remove.textContent='Delete';remove.setAttribute('aria-label','Delete '+task.text);remove.onclick=()=>{if(confirm('Delete this shared task?'))mutate('/'+task.id,{revision:task.revision,delete:true,text:task.text,done:!!task.done});};li.append(remove);
- edit.onclick=()=>{const value=prompt('Edit team task',task.text);if(value!==null&&value.trim())mutate('/'+task.id,{revision:task.revision,text:value.trim(),done:!!task.done});};list.append(li);
+ const updates = currentTasks.filter(entry => entry.kind === 'update');
+ const tasks = currentTasks.filter(entry => entry.kind !== 'update');
+ const open = tasks.filter(entry => !entry.done), completed = tasks.filter(entry => entry.done);
+ for(const [id,entries,empty] of [['#task-list',open,'Nothing left on the list.'],['#completed-task-list',completed,''],['#update-list',updates,'No team updates yet.']]) {
+  const list = document.querySelector(id); list.replaceChildren(...entries.map(renderEntry));
+  if(!entries.length && empty) { const item = document.createElement('li'); item.className = 'empty-list'; item.textContent = empty; list.append(item); }
  }
+ document.querySelector('#task-state').textContent = open.length + ' open';
+ document.querySelector('#completed-count').textContent = completed.length;
+ document.querySelector('#completed-tasks').hidden = !completed.length;
 }
-async function loadTasks(){try{currentTasks=(await taskAPI()).tasks;renderTasks();document.querySelector('#task-state').textContent='Shared';feedback.textContent='Tasks up to date.';}catch(error){document.querySelector('#task-state').textContent='Unavailable';feedback.textContent=error.message+' Your personal notes still work.';}}
-async function mutate(path,data){try{await taskAPI(path,data);await loadTasks();}catch(error){feedback.textContent=error.message;await loadTasks();feedback.textContent=error.message;}}
-document.querySelector('#task-add').onsubmit=async(event)=>{event.preventDefault();const field=document.querySelector('#task-text'),text=field.value.trim();if(!text)return;try{await taskAPI('',{text});field.value='';await loadTasks();}catch(error){feedback.textContent=error.message;}};
-document.querySelector('#refresh').onclick=loadTasks;loadTasks();setInterval(()=>{if(!document.hidden)loadTasks();},10000);
+async function loadTasks() {
+ try { currentTasks = (await taskAPI()).tasks; if(!editingEntry) renderTasks(); showEntryFeedback('Up to date.'); }
+ catch(error) { showEntryFeedback(error.message); }
+}
+async function mutate(path,data) {
+ try {
+  const payload = path ? {...data, done:!!data.done} : data;
+  await taskAPI(path,payload); await loadTasks(); return true;
+ }
+ catch(error) { await loadTasks(); showEntryFeedback(error.message); return false; }
+}
+for(const [formId,fieldId,kind] of [['#task-add','#task-text','task'],['#update-add','#update-text','update']]) {
+ document.querySelector(formId).onsubmit = async event => {
+  event.preventDefault(); const field = document.querySelector(fieldId), text = field.value.trim();
+  if(!text) return;
+  const submit = event.currentTarget.querySelector('button[type=submit]');
+  submit.disabled = true;
+  if(await mutate('',{text,kind})) field.value = '';
+  submit.disabled = false;
+ };
+}
+document.querySelector('#refresh').onclick = loadTasks;
+loadTasks(); setInterval(() => { if(!document.hidden && !editingEntry) loadTasks(); },10000);
 
 const clock = document.querySelector('#clock');
 function tick(){clock.textContent = new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date());clock.dateTime=new Date().toISOString();}tick();setInterval(tick,1000);
@@ -89,8 +166,9 @@ const relayPanel=document.querySelector('#relay-panel'),relayFrame=document.quer
 const publicStagePanel=document.querySelector('#public-stage-panel');
 const pixelReference=document.querySelector('#pixel-reference');
 const documentsPanel=document.querySelector('#documents-panel');
-const ROUTES={documents:{panel:documentsPanel,heading:'Documents'},pixels:{panel:pixelReference,heading:'Pixel Strip Reference'},schedule:{panel:schedulePanel,heading:'Tech Schedule'},home:{panel:homePanel},notes:{panel:workspacePanels},rig:{panel:projectorInfo,heading:'My Projector Rig'},stage:{panel:publicStagePanel,heading:'3D Stage View'},presets:{panel:relayPanel,child:'presets',heading:'Presets',note:'Saved show presets are available only from the connected private controller.'},log:{panel:relayPanel,child:'log',heading:'Log',note:'The real command log is available from the connected private controller.'},configuration:{panel:relayPanel,child:'setup',heading:'Configuration',note:'Projector connection settings and actual EDID availability come from the private controller.'},throw:{panel:throwPanel,heading:'Throw Calc'}};
-const PANELS=[documentsPanel,pixelReference,schedulePanel,homePanel,workspacePanels,projectorInfo,relayPanel,throwPanel,publicStagePanel];
+const updatesPanel=document.querySelector('#updates-panel');
+const ROUTES={updates:{panel:updatesPanel,heading:'Team updates'},documents:{panel:documentsPanel,heading:'Documents'},pixels:{panel:pixelReference,heading:'Pixel Strip Reference'},schedule:{panel:schedulePanel,heading:'Tech Schedule'},home:{panel:homePanel},notes:{panel:workspacePanels},rig:{panel:projectorInfo,heading:'My Projector Rig'},stage:{panel:publicStagePanel,heading:'3D Stage View'},presets:{panel:relayPanel,child:'presets',heading:'Presets',note:'Saved show presets are available only from the connected private controller.'},log:{panel:relayPanel,child:'log',heading:'Log',note:'The real command log is available from the connected private controller.'},configuration:{panel:relayPanel,child:'setup',heading:'Configuration',note:'Projector connection settings and actual EDID availability come from the private controller.'},throw:{panel:throwPanel,heading:'Throw Calc'}};
+const PANELS=[updatesPanel,documentsPanel,pixelReference,schedulePanel,homePanel,workspacePanels,projectorInfo,relayPanel,throwPanel,publicStagePanel];
 const CHILD_VIEWS=new Set(['rig','stage','presets','log','setup','throw']);
 let relayViews=new Set(['rig','stage']),relayProjectorSelection=false;
 let relayOrigin=null,relayReady=false,relayView='rig',relayProjector=null,relayTimer,currentRoute='home',selectedProjector=null,reference=null,referenceLoading=null;
@@ -98,8 +176,8 @@ function childMessage(){const message={type:'wst:show-panel',panel:relayView};if
 function sendChildView(){if(!relayReady||!relayOrigin)return;if(!relayViews.has(relayView)){relayFrame.hidden=true;relayStatus.textContent='The private controller is connected, but needs a workspace update to open this view. Use Open local controller for it; the public rig reference and notes remain available.';return;}relayFrame.hidden=false;const message=childMessage();if(message.projector&&!relayProjectorSelection){delete message.projector;relayStatus.textContent='Controller connected. Choose projector '+relayProjector+' inside the rig view; this controller does not support direct projector selection yet.';}relayFrame.contentWindow.postMessage(message,relayOrigin);}
 function recommendLink(on){if(on)relayLink.dataset.recommended='true';else delete relayLink.dataset.recommended;}
 async function ensureReference(){if(reference)return reference;if(!referenceLoading)referenceLoading=import('./reference-view.js').then(async module=>{reference=await module.mountReference(document.querySelector('#rig-reference'),{dataUrl:new URL('projectors.json',import.meta.url).href,view:'rig',onProjectorSelect:lane=>{if(!/^[A-D]$/.test(lane))return;selectedProjector=lane;reference?.selectProjector(lane);document.querySelector('#rig-reference h2')?.focus();document.querySelector('#rig-controls').textContent='Open projector '+lane+' controls';document.querySelector('#rig-selection-note').textContent='Projector '+lane+' selected. Gear information is reference; controls open separately on localhost.';if(location.hash!== '#rig/'+lane)history.replaceState(null,'','#rig/'+lane);}});return reference;}).catch(error=>{document.querySelector('#rig-reference').textContent='The projector reference could not load. Reload to retry.';referenceLoading=null;throw error;});return referenceLoading;}
-function parseHash(){const match=location.hash.match(/^#(home|notes|rig|stage|presets|log|configuration|throw|schedule|pixels|documents)(?:\/([A-D]))?(?:\/(controls))?$/);if(match&&(match[2]||match[3])&&match[1]!=='rig')return {route:'home'};return match?{route:match[1],projector:match[2]||null,controls:match[3]==='controls'}:{route:'home'};}
-function navigate(route,{projector=null,controls=false,updateHash=true}={}){if(!ROUTES[route])return;currentRoute=route;const planningActive=route==='notes'||route==='schedule'||route==='documents';document.querySelector('#planning-shell').hidden=!planningActive;const moreWasOpen=document.querySelector('#nav-more').open;document.querySelector('#nav-more').open=false;const menuWasOpen=document.body.classList.contains('workspace-menu-open');document.body.classList.remove('workspace-menu-open');const menu=document.querySelector('#workspace-menu');menu?.setAttribute('aria-expanded','false');if(menuWasOpen)menu?.focus();if(menu)menu.textContent='Menu · '+({documents:'Planning documents',pixels:'Pixel Strips',schedule:'Planning calendar',home:'Home',notes:'Planning notes',rig:'My Projector Rig',stage:'3D Stage View',presets:'Presets',log:'Log',configuration:'Configuration',throw:'Throw Calc'}[route]);document.body.classList.toggle('stage-focus',route==='stage');if(route==='rig'&&!projector&&!controls)selectedProjector=null;if(/^[A-D]$/.test(projector||''))selectedProjector=projector;const spec=ROUTES[route],privateRig=route==='rig'&&controls;for(const panel of PANELS)panel.hidden=panel!==(privateRig?relayPanel:spec.panel);for(const button of document.querySelectorAll('[data-route]')){if(button.closest('nav')){if(button.dataset.planningEntry!==undefined?planningActive:button.dataset.route===route)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}}if(updateHash){const hash='#'+route+(route==='rig'&&selectedProjector?'/'+selectedProjector:'')+(privateRig?'/controls':'');if(location.hash!==hash)history.pushState(null,'',hash);}document.querySelector('.skip').href=route==='documents'?'#documents-title':route==='home'?'#home-title':route==='notes'?'#notes':route==='rig'&&!privateRig?'#projector-info-title':route==='throw'?'#throw-title':route==='schedule'?'#schedule-title':route==='pixels'?'#pixel-reference-title':'#relay-view-title';
+function parseHash(){const match=location.hash.match(/^#(home|notes|updates|rig|stage|presets|log|configuration|throw|schedule|pixels|documents)(?:\/([A-D]))?(?:\/(controls))?$/);if(match&&(match[2]||match[3])&&match[1]!=='rig')return {route:'home'};return match?{route:match[1],projector:match[2]||null,controls:match[3]==='controls'}:{route:'home'};}
+function navigate(route,{projector=null,controls=false,updateHash=true}={}){if(!ROUTES[route])return;currentRoute=route;const planningActive=route==='updates'||route==='notes'||route==='schedule'||route==='documents';document.querySelector('#planning-shell').hidden=!planningActive;const moreWasOpen=document.querySelector('#nav-more').open;document.querySelector('#nav-more').open=false;const menuWasOpen=document.body.classList.contains('workspace-menu-open');document.body.classList.remove('workspace-menu-open');const menu=document.querySelector('#workspace-menu');menu?.setAttribute('aria-expanded','false');if(menuWasOpen)menu?.focus();if(menu)menu.textContent='Menu · '+({updates:'Team updates',documents:'Planning documents',pixels:'Pixel Strips',schedule:'Planning calendar',home:'Home',notes:'Planning notes',rig:'My Projector Rig',stage:'3D Stage View',presets:'Presets',log:'Log',configuration:'Configuration',throw:'Throw Calc'}[route]);document.body.classList.toggle('stage-focus',route==='stage');if(route==='rig'&&!projector&&!controls)selectedProjector=null;if(/^[A-D]$/.test(projector||''))selectedProjector=projector;const spec=ROUTES[route],privateRig=route==='rig'&&controls;for(const panel of PANELS)panel.hidden=panel!==(privateRig?relayPanel:spec.panel);for(const button of document.querySelectorAll('[data-route]')){if(button.closest('nav')){if(button.dataset.planningEntry!==undefined?planningActive:button.dataset.route===route)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}}if(updateHash){const hash='#'+route+(route==='rig'&&selectedProjector?'/'+selectedProjector:'')+(privateRig?'/controls':'');if(location.hash!==hash)history.pushState(null,'',hash);}document.querySelector('.skip').href=route==='updates'?'#updates-title':route==='documents'?'#documents-title':route==='home'?'#home-title':route==='notes'?'#notes':route==='rig'&&!privateRig?'#projector-info-title':route==='throw'?'#throw-title':route==='schedule'?'#schedule-title':route==='pixels'?'#pixel-reference-title':'#relay-view-title';
  if(moreWasOpen&&!menuWasOpen)spec.panel.querySelector('h2')?.focus();
  if(route==='rig'&&!privateRig){document.querySelector('#rig-controls').textContent=selectedProjector?'Open projector '+selectedProjector+' controls':'Open rig controls';ensureReference().then(view=>{view.setView('rig');if(selectedProjector)view.selectProjector(selectedProjector);}).catch(()=>{});}
  if(spec.child||privateRig){relayView=privateRig?'rig':spec.child;relayProjector=privateRig?selectedProjector:null;document.querySelector('#relay-view-title').textContent=privateRig?(selectedProjector?'Projector '+selectedProjector+' controls':'My Projector Rig controls'):spec.heading;document.querySelector('#relay-view-note').textContent=privateRig?'Live status and controls stay in the local controller. This website sends no projector commands. Both options work only on the Mac running Projctl.':spec.note;document.querySelector('#back-reference').hidden=!privateRig;sendChildView();}

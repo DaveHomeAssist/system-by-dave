@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-14
+
+- Separate WST team updates from actionable tasks, keep completed tasks collapsed, and add inline editing and category moves with backward-compatible storage.
+
 ## November 14, 2026: Projctl Thermal watch backend
 
 - Add the relay side of Thermal watch. The Thermal watch tab, the heat pill, the card chip and the Details heat reading (November 13) had no data on a relay built from main. The relay now samples air temperature per projector, compares it with the rated limit and sends it in the snapshot and in every status message.
