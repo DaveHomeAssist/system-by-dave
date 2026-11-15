@@ -2,6 +2,10 @@
 
 ## 2026-11-14
 
+- Add a concise WST house Handoff page with current R5 documents, crew checks, fault/shutdown guidance and explicit open confirmations.
+
+## 2026-11-14
+
 - Separate WST team updates from actionable tasks, keep completed tasks collapsed, and add inline editing and category moves with backward-compatible storage.
 
 ## November 14, 2026: Projctl Thermal watch backend

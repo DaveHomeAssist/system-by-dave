@@ -1,3 +1,14 @@
+## House handoff page
+
+The Handoff route gives house crew one concise entry point for current R5 documents,
+pre-show checks, show-time faults, shutdown, responsibilities and remaining confirmations.
+Source basis is the House Show Operations Guide, Handoff Walkthrough and November 14
+project/field reports. The page labels untested procedures and unknown assignments.
+It publishes no private endpoints, credentials or assumed equipment-control sequence.
+The static handoff.html is generated from the same content and works without JavaScript.
+Acceptance covers direct-link and navigation access, PDF links, both themes and viewport-contained desktop/mobile layout. The source
+records remain responsible for final operating acceptance and sign-off.
+
 ## Team updates and tasks
 
 Scope requested November 14: show shared news separately from work that needs doing,
