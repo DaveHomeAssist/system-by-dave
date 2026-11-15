@@ -39,6 +39,10 @@ The tile's accessible name and the inspector's Faults row list every alert, erro
 an explicit reading with no alarms says `None reported`, never "OK".
 Pulse reports signal presence only, shown as `Signal present` or `No signal`.
 
+Before the first relay snapshot or a failed connection attempt, status labels say
+`Connecting`. A failed attempt or a lost established connection changes them to
+`Relay offline`; unavailable power and shutter readings remain unknown.
+
 Where the relay has not reported a value the page says so (`Not reported`, `No reading`,
 `Relay offline`); it never fills a gap with a sample. When the relay is unreachable every lane
 reads `Relay offline`, Show Lock reads `unknown`, and only recorded facts remain.

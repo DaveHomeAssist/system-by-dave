@@ -28,7 +28,18 @@ const SIZES = [[1440, 900], [1024, 768], [680, 900], [375, 812]];
     page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
     const noPageScroll = () => page.evaluate(() => { const d = document.documentElement; return d.scrollHeight <= d.clientHeight && d.scrollWidth <= d.clientWidth; });
 
+    // Hold the first snapshot so initial rendering cannot be mistaken for an outage.
+    let releaseConnection;
+    const connectionGate = new Promise(resolve => { releaseConnection = resolve; });
+    await page.routeWebSocket('**/ws', async socket => {
+      await connectionGate;
+      socket.connectToServer();
+    });
     await page.goto(relay.base + '/monitor/');
+    assert.equal((await page.locator('#mv-count').textContent()).trim(), 'Connecting');
+    assert.ok((await page.locator('.fm-feed .fm-word').allTextContents()).every(text => text.trim() === 'Connecting'));
+    assert.equal(await page.locator('[data-lock-word]').textContent(), 'Show Lock unknown');
+    releaseConnection();
     await until(async () => /4 of 4 replying/.test(await page.locator('#mv-count').textContent()));
     await until(async () => (await page.locator('[data-lock-word]').textContent()) === 'Show Lock on');
     assert.match(await page.locator('[data-relay-word]').textContent(), /Practice mode/);

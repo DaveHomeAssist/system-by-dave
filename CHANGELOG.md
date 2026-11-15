@@ -1,5 +1,9 @@
 # Changelog
 
+## Frozen Monitor connection startup, 2026-11-15
+
+- Show Connecting while the first relay snapshot is pending across Monitor, Rig and Network views. Keep Relay offline for a failed attempt or lost connection, with unknown equipment readings until fresh feedback arrives.
+
 ## Frozen Startup offline package, 2026-11-15
 
 - Add a development Mac adapter with native display enumeration, atomic layout restoration, BetterDisplay mode requests and read-only Millumin accessibility parsing. Verify the real Millumin 5.14.l Output sheet, active document, control-window position and layer-1000 fullscreen output windows on the development Mac. Studio installation acceptance remains separate.
