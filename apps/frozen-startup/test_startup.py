@@ -35,7 +35,10 @@ class Tests(unittest.TestCase):
         self.profile, self.snapshot = fixture()
 
     def execute(self, bridge=None, **kwargs):
-        return run(self.profile, bridge or FixtureBridge(self.snapshot), timeout=.015, interval=.001, **kwargs)
+        ticks = [0.0]
+        def clock(): return ticks[0]
+        def sleep(seconds): ticks[0] += seconds
+        return run(self.profile, bridge or FixtureBridge(self.snapshot), timeout=.015, interval=.001, clock=clock, sleep=sleep, **kwargs)
 
     def test_complete_startup(self):
         b = FixtureBridge(self.snapshot)
