@@ -86,7 +86,7 @@ function open() {
     const p = typeof msg.slot === 'string' ? live.snapshot.projectors.find(x => x.slot === msg.slot) : null;
     if (msg.type === 'status' && p && msg.status && typeof msg.status === 'object') {
       p.status = msg.status;
-      for (const key of ['displayInfo', 'inputPreference', 'inputs', 'thermal']) if (msg[key] !== undefined) p[key] = msg[key];
+      for (const key of ['displayInfo', 'inputPreference', 'inputs', 'thermal', 'webDiagnostics']) if (msg[key] !== undefined) p[key] = msg[key];
     } else if (msg.type === 'busy' && p) p.busy = msg.busy;
     else if (msg.type === 'event' && msg.event && typeof msg.event === 'object') { live.events.push(msg.event); if (live.events.length > 200) live.events.shift(); }
     else if (msg.type === 'powerSchedules' && msg.schedules && typeof msg.schedules === 'object') live.snapshot.powerSchedules = msg.schedules;

@@ -136,7 +136,7 @@ function snapshot() {
     relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS, commandTargetBinding: 1, release: RELEASE },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
-      return { ...p, password: undefined, controlRevision: commandBinding.revision(p), status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p), commandFeedback: feedback?.get(p.slot) || null,
+      return { ...p, password: undefined, controlRevision: commandBinding.revision(p), status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p), webDiagnostics: webDiagnostics.get(p.slot) || null, commandFeedback: feedback?.get(p.slot) || null,
         inputs: d.inputs ?? p.inputs, displayInfo: displayInfoFor(p), inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lensJog?.axes.length, lensJog: d.lensJog, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
@@ -160,9 +160,10 @@ poller = createPoller({
   started(p, { identityChanged, at }) {
     // Temperature history follows the physical target. Correcting a model or lane label keeps it; a new driver or address starts fresh.
     const target = JSON.stringify([p.driver, p.ip]);
-    if (thermalTargets.has(p.slot) && thermalTargets.get(p.slot) !== target) { thermal.reset(p.slot); thermalReads.delete(p.slot); }
+    if (thermalTargets.has(p.slot) && thermalTargets.get(p.slot) !== target) { thermal.reset(p.slot); thermalReads.delete(p.slot); webDiagnostics.delete(p.slot); }
     thermalTargets.set(p.slot, target);
     if (identityChanged) {
+      webDiagnostics.delete(p.slot);
       status.set(p.slot, emptyStatus());
       connections.set(p.slot, { state: 'checking', lastSuccessAt: null, lastFailureAt: null, error: null, consecutiveFailures: 0, retryDelayMs: 0 });
     }
@@ -192,7 +193,7 @@ poller = createPoller({
 });
 function broadcastStatus(p) {
   const next = status.get(p.slot), d = driverFor(p);
-  broadcast({ type: 'status', slot: p.slot, status: { ...next, connection: connections.get(p.slot) }, commandFeedback: feedback?.get(p.slot) || null, thermal: thermalView(p), displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
+  broadcast({ type: 'status', slot: p.slot, status: { ...next, connection: connections.get(p.slot) }, commandFeedback: feedback?.get(p.slot) || null, thermal: thermalView(p), webDiagnostics: webDiagnostics.get(p.slot) || null, displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
 }
 function setOffline(slot, why) {
   const prev = status.get(slot);
@@ -227,6 +228,7 @@ const THERMAL_SAMPLE_MS = Math.min(600000, Math.max(50, Number(process.env.PROJC
 const THERMAL_READ_TIMEOUT_MS = 8000;
 const thermalLevels = thermalThresholds(healthConfig.watchHeadroomC);
 const thermal = createThermalMonitor({ thresholds: thermalLevels }); // in memory; a restart begins empty
+const webDiagnostics = new Map();
 const thermalTargets = new Map();  // slot -> driver and address behind the history
 const thermalReads = new Map();    // slot -> { at, ok } for the latest finished temperature read
 const thermalAttempts = new Map(); // slot -> when the latest read started
@@ -240,6 +242,7 @@ function thermalView(p) {
     lastReadAt: read ? new Date(read.at).toISOString() : null, lastReadOk: read ? read.ok : null };
 }
 function recordThermal(p, readings) {
+  if (readings?.webDiagnostics) webDiagnostics.set(p.slot, readings.webDiagnostics);
   const sensor = readings?.sensors?.find((s) => s.role === 'intake'), c = sensor?.c, at = Date.now(), ok = plausibleAirC(c);
   thermalReads.set(p.slot, { at, ok });
   if (ok) {
@@ -259,9 +262,13 @@ function recordThermal(p, readings) {
 function readTelemetry(p, options) {
   const current = store.projector(p.slot) || p, d = driverFor(current);
   if (!d.healthReadings) return null;
+  const identity = targetIdentity(current);
   thermalAttempts.set(current.slot, Date.now());
-  return telemetry.read(current.slot, d, options).then(
-    (readings) => { try { recordThermal(current, readings); } catch (e) { console.error('[thermal]', e.message); } return readings; },
+  return telemetry.read(current.slot, d, { ...options, onPartial: readings => {
+    if (readings.webDiagnostics && targetIdentity(store.projector(current.slot) || {}) === identity) { webDiagnostics.set(current.slot, readings.webDiagnostics); broadcastStatus(current); }
+    options?.onPartial?.(readings);
+  } }).then(
+    (readings) => { if (targetIdentity(store.projector(current.slot) || {}) !== identity) return readings; try { recordThermal(current, readings); } catch (e) { console.error('[thermal]', e.message); } return readings; },
     (error) => { thermalReads.set(current.slot, { at: Date.now(), ok: false }); throw error; });
 }
 // Called after each successful status poll; takes a sample only when one is due.

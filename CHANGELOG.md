@@ -1,5 +1,9 @@
 # Changelog
 
+## Panasonic web diagnostics, 2026-11-15
+
+- Add read-only signal timing, individual lamp readings and Self Test details to selected projector views, with independent freshness and unavailable states.
+
 ## Frozen Monitor connection startup, 2026-11-15
 
 - Show Connecting while the first relay snapshot is pending across Monitor, Rig and Network views. Keep Relay offline for a failed attempt or lost connection, with unknown equipment readings until fresh feedback arrives.

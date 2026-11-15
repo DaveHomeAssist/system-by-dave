@@ -5,6 +5,7 @@
 // PT-DZ870/DW830 and PT-RZ970 control command specs (2015/2018) and the
 // WST house PT-DW830U units on 2026-11-02.
 import net from 'node:net';
+import { createPanasonicWebReader } from './panasonic-web.js';
 import { createHash } from 'node:crypto';
 import { pjlinkDriver } from './pjlink.js';
 import { throwIfAborted, transportFailure } from './transport.js';
@@ -65,6 +66,7 @@ export function pictureSchema() {
 export function panasonicDriver({ host, port = 1024, user = 'admin1', password = '', timeoutMs = 5000, model = '', ...rest }) {
   const pj = pjlinkDriver({ host, password, ...rest, port: 4352 });
   const patterns = patternsFor(model);
+  const readWeb = createPanasonicWebReader({ host, user, password });
 
   function native(cmd, { signal, guard } = {}) {
     throwIfAborted(signal);
@@ -126,6 +128,7 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     // Read-only temperatures for health reports; never part of the status poll.
     // A refused sensor reads as null; a dead connection stops the remaining queries.
     async healthReadings({ signal, onPartial } = {}) {
+      let webDiagnostics;
       const sensors = [];
       for (const [n, id, label, role] of QTM_SENSORS) {
         let c = null;
@@ -134,13 +137,15 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
           if (transportFailure(e) || signal?.aborted) {
             if (!sensors.some((s) => Number.isFinite(s.c))) throw e;
             sensors.push({ id, label, role, c: null });
-            return { sensors, readError: String(e.message || e) };
+            return { sensors, webDiagnostics, readError: String(e.message || e) };
           }
         }
         sensors.push({ id, label, role, c });
-        onPartial?.({ sensors: sensors.map((sensor) => ({ ...sensor })) });
+        onPartial?.({ sensors: sensors.map((sensor) => ({ ...sensor })), webDiagnostics });
       }
-      return { sensors };
+      webDiagnostics = await readWeb({ signal });
+      onPartial?.({ sensors: sensors.map(sensor => ({ ...sensor })), webDiagnostics });
+      return { sensors, webDiagnostics };
     },
     async pattern(code, options) {
       const c = String(code).padStart(2, '0');

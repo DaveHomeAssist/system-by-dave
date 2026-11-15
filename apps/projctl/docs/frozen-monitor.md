@@ -113,3 +113,28 @@ relay process. Folders now serve their `index.html` (so `/monitor/` works), `/mo
 - Acceptance results are not recorded here; the grids show the crew workbook's empty state. Read-only package checks are available from Health; the report contract is documented in [Quiet Watch](quiet-watch.md#monitoring-dashboard-integration).
 - Physical acceptance on the theatre relay remains open until the monitor is installed with the
   next venue update and read back there.
+
+## Panasonic web diagnostics
+
+The selected projector details in Monitor and Projctl show signal timing, separate
+lamp state and runtime, lamp mode, projector runtime and every Self Test result.
+The relay reads only the fixed status and Self Test HTTP pages using the existing
+projector credentials. Responses are bounded, redirects are refused, and raw HTML
+and credentials never reach the browser. No control request is part of collection.
+
+These reads share the existing per-projector telemetry queue and sampling cadence.
+Native temperatures are collected first so optional web timeouts cannot consume
+the shutdown temperature budget. Each page has its own timestamp and availability. Failed requests show Unavailable;
+readings older than two minutes or with a disconnected projector show Last known.
+Web diagnostics do not replace PJLink control feedback or establish EDID, physical
+shutter operation, alignment or lamp-service diagnosis. Unsupported page layouts
+remain unavailable.
+
+The feature addresses the gap between a generic PJLink alarm and the diagnostic
+information already exposed by a Panasonic web page. It adds no setup fields,
+persistence schema or equipment controls. Missing or differently structured web
+pages leave the established PJLink status and temperature pipeline available.
+Acceptance requires separate lamp counters, explicit failed/warning checks,
+unknown values for absent fields, bounded GET-only requests, fresh/stale labels,
+and contained desktop/phone detail views. Physical picture acceptance remains a
+separate operator task.
