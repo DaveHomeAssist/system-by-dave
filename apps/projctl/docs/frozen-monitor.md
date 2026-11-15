@@ -32,6 +32,12 @@ button is hidden there and Home is the way in. Styles live in `public/monitor-li
 | Notes | Shared team tasks (public Frozen workspace service) | Documents and Notion records |
 | Calendar | — | `workspace/tech-schedule.json` (the Planning calendar's file), milestones |
 
+Faults come from the projector's PJLink alarm status (fan, lamp, temperature, cover, filter,
+other; 1 is a warning, 2 an error). A reported fault appears in amber or red on the lane's tile and in
+the inspector's Faults row, errors first, for example `Lamp error · other warning reported now`. A
+driver that does not read alarms reports none, so the inspector says `None reported`, never "OK".
+Pulse reports signal presence only, shown as `Signal present` or `No signal`.
+
 Where the relay has not reported a value the page says so (`Not reported`, `No reading`,
 `Relay offline`); it never fills a gap with a sample. When the relay is unreachable every lane
 reads `Relay offline`, Show Lock reads `unknown`, and only recorded facts remain.

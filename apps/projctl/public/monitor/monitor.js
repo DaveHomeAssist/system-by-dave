@@ -130,14 +130,30 @@ export async function stopLens(slot) {
 const monitor = createConnectionMonitor();
 const ago = ms => ms < 0 ? 'just now' : ms < 60000 ? `${Math.max(1, Math.round(ms / 1000))} s ago` : ms < 3600000 ? `${Math.round(ms / 60000)} min ago` : 'over an hour ago';
 const HEAT_STATE = { ok: 'done', watch: 'waiting', hot: 'blocked', unknown: 'idle' };
-function signalText(info) {
+// Pulse reports signal presence as a boolean; other shapes are shown as reported.
+export function signalText(info) {
   const s = info?.signal;
   if (!s || s.state === 'unsupported') return 'Not reported';
   if (s.state !== 'reported') return '—';
   const v = s.value;
+  if (v === true) return 'Signal present';
+  if (v === false) return 'No signal';
   if (typeof v === 'string' || typeof v === 'number') return String(v);
   const w = v?.width ?? v?.horizontal ?? v?.h, h = v?.height ?? v?.vertical ?? v?.v;
-  return Number.isFinite(+w) && Number.isFinite(+h) ? `${w} × ${h}` : 'Reported';
+  return Number.isFinite(+w) && Number.isFinite(+h) ? `${w} × ${h}` : 'Signal reported';
+}
+
+// PJLink alarm status (ERST): each field is 0 (none), 1 (warning) or 2 (error). Errors are listed
+// first. A driver that does not read alarms reports none, so no fault is never shown as "OK".
+const FAULT_NAMES = [['fan', 'fan'], ['lamp', 'lamp'], ['temp', 'temperature'], ['cover', 'cover'], ['filter', 'filter'], ['other', 'other']];
+export function faultSummary(errors) {
+  if (!errors || typeof errors !== 'object') return null;
+  const items = FAULT_NAMES.filter(([key]) => Number(errors[key]) > 0)
+    .map(([key, name]) => ({ key, name, level: Number(errors[key]) >= 2 ? 'error' : 'warning' }))
+    .sort((a, b) => (b.level === 'error') - (a.level === 'error'));
+  if (!items.length) return null;
+  const text = items.map(i => `${i.name} ${i.level}`).join(' · ');
+  return { level: items.some(i => i.level === 'error') ? 'error' : 'warning', items, text: `${text[0].toUpperCase()}${text.slice(1)} reported now` };
 }
 export function laneModels(now = Date.now()) {
   const projectors = live.connected ? live.snapshot.projectors : [];
@@ -147,7 +163,7 @@ export function laneModels(now = Date.now()) {
   for (const rec of LANES) {
     const entry = byLane[rec.lane], p = entry?.projector;
     const v = { ...rec, projector: p || null, slot: p?.slot || null, ip: p?.ip || null, current: false, st: 'idle', word: 'Relay offline',
-      power: '—', shutter: '—', input: '—', signal: '—', pattern: '—', reply: '—', intake: '—', heat: '—', heatSt: 'idle', lampNow: null,
+      power: '—', shutter: '—', input: '—', signal: '—', pattern: '—', reply: '—', intake: '—', heat: '—', heatSt: 'idle', fault: null,
       liveModel: p ? [p.make, p.model].filter(Boolean).join(' ') : null };
     if (live.connected && !p) { v.st = entry?.conflict ? 'waiting' : 'idle'; v.word = entry?.conflict ? 'Lane conflict' : 'Unassigned'; }
     if (live.connected && p) {
@@ -162,7 +178,7 @@ export function laneModels(now = Date.now()) {
         v.input = p.displayInfo?.input?.label && p.displayInfo.input.label !== 'Reported input' ? p.displayInfo.input.label : s.input || 'Not reported';
         v.signal = signalText(p.displayInfo);
         v.pattern = s.pattern ? String(s.pattern) : 'Off';
-        if (s.errors?.lamp > 0) v.lampNow = 'Lamp error reported now';
+        v.fault = faultSummary(s.errors);
       } else {
         const words = { checking: ['queued', 'Checking'], stale: ['waiting', 'Stale reply'], reconnecting: ['blocked', 'No reply'], unassigned: ['idle', 'No address'] };
         [v.st, v.word] = words[c.state] || ['blocked', 'No reply'];

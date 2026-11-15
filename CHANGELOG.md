@@ -29,6 +29,14 @@
 
 - Add Edition 038 on measuring SDI CRC errors during line checks, with an illustrated story card.
 
+## November 14, 2026: Frozen Monitor shows projector warnings and signal presence
+
+- The monitor lists every fault in the projector's PJLink alarm status, not only
+  lamp errors: warnings in amber, errors in red, on the lane tile and in a new
+  Faults row in the inspector. Lane A's lamp error and the A and D "other"
+  warnings now show.
+- A Pulse signal reading of `true` reads "Signal present" instead of "Reported".
+
 ## November 14, 2026: Monitor link inside Projctl
 
 - Projctl's header gains a Monitor button and its Home view a Frozen Monitor
