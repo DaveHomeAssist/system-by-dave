@@ -1,7 +1,23 @@
 # Changelog
 
+## 2026-11-15: Frozen Quiet Watch 2
+
+- Follow power and shutter commands with bounded fresh status reads, so an early
+  acknowledgement cannot leave delayed movement hidden until a long idle poll.
+  Stop on confirmed feedback, target changes, newer commands or shutdown without
+  repeating the control command or changing the reported state optimistically.
+- Keep elapsed waiting, device confirmation and unconfirmed results beside each
+  projector. Retain the record across browser reloads, suppress matching repeated
+  clicks and keep the opposite protective action available under existing guards.
+- Lead health summaries with reported lamp, cover, filter and other projector
+  alerts when present. Include specific follow-up for those alerts instead of
+  opening with an all-clear sentence for the separate thermal assessment.
+
 ## 2026-11-15: Frozen Quiet Watch 1
 
+- Require an actual power-off report for projector shutdown and delivery acceptance;
+  fresh OFF replies from all four lanes must follow the trigger. A controller
+  restart report cannot satisfy either check.
 - Label simulated Monitor readings as Practice data, consistent with the controller.
 - Include every current projector alarm in Monitor, with compact alert counts and
   complete detail text. Retain unknown status for missing or stale alarm readings.

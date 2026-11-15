@@ -63,13 +63,25 @@ test('complete readings report observed flags and headroom', () => {
   assert.deepEqual(units.map((u) => u.verdict), ['ok', 'ok', 'ok', 'watch']);
   assert.equal(units[0].password, undefined);
   const s = summarize(units);
-  assert.match(s.findings, /^No temperature, fan or alarm flags reported by 4 of 4 units with alarm feedback\./);
+  assert.match(s.findings, /^2 of 4 units report other projector alerts\./);
   assert.match(s.findings, /Coverage: temperature 4\/4, alarm feedback 4\/4, rated limit 4\/4\./);
   assert.match(s.findings, /Least headroom: P4 \(lane D, Panasonic PT-DW830U, 192\.168\.5\.23\) 3 °C \(37 °C intake, 40 °C limit\)\./);
   assert.match(s.findings, /PJLink warnings: P3 other warning; P4 other warning\./);
   assert.match(s.followUp, /P4 \(lane D, 192\.168\.5\.23\): inspect intake clearance and exhaust path, 3 °C headroom\./);
   assert.match(s.followUp, /P3, P4: read the Self Test screen for the "other" warning\./);
   assert.deepEqual(s.counts, { units: 4, reached: 4, flagged: 0, watch: 1, unreachable: 0, incomplete: 0 });
+});
+
+test('a lamp fault cannot produce an all-clear opening or lose its follow-up', () => {
+  const data = structuredClone(NOV11);
+  data.P3.st.errors = { ...ok, lamp: 2 };
+  data.P4.st.errors = { ...ok };
+  const summary = summarize(rows(data));
+  assert.match(summary.findings, /^1 of 4 units report other projector alerts\./);
+  assert.doesNotMatch(summary.findings, /No .*flags reported/);
+  assert.match(summary.findings, /P3 lamp error/);
+  assert.match(summary.followUp, /P3 .*check lamp error on the projector/);
+  assert.equal(summary.counts.flagged, 0, 'the thermal flag count retains its scope');
 });
 
 test('flags, alarms, unreachable units and missing readings are reported', () => {

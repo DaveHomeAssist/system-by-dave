@@ -33,13 +33,21 @@ before wider exposure; the optional app login is absent when it is unset.
 
 Spec: Frozen at WST | Projector Control App Spec.
 
-## Quiet Watch 1
+## Quiet Watch 2
 
-The source release is `Quiet Watch 1` (`2026.11.15.1`). Connection details shows the
+The source release is `Quiet Watch 2` (`2026.11.15.2`). Connection details shows the
 interface and relay versions separately, plus the configured polling interval.
 A successful command means accepted, not physically verified. Cached power reads
 as Unknown with its last reported value; missing pattern and alarm data stays Not
 reported. Read [the hardening brief](docs/quiet-watch.md) for scope and acceptance.
+
+After power or shutter commands, the relay makes bounded follow-up reads until
+the requested state is reported. Shutters are checked every second for up to
+30 seconds; power every five seconds for up to seven minutes. The first check
+starts after 0.4 seconds. These checks never repeat the control command. They
+stop on confirmation, target changes, a newer control command, or
+controller shutdown, then normal background polling continues. A timeout leaves
+the actual reported state intact; it does not turn an acknowledgement into success.
 
 Appearance offers Light, Dark and System across the controller, login, Monitor
 and Frozen workspace. A new browser starts light. Explicit choices win over the

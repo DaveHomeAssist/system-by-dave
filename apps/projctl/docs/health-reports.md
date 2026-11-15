@@ -43,6 +43,9 @@ in a Notion database.
 - Check window: when the readings started and finished.
 - Findings: units flagged for temperature, fan or alarm; the unit with the least
   headroom; PJLink "other" or lamp, cover and filter warnings; units not reached.
+  Existing lamp, cover, filter or other alerts lead the summary when there are
+  no thermal flags. Specific alerts receive a follow-up even when temperatures
+  are within limits. The thermal flag count remains a separate measurement.
 - Follow-up: one line per thing to check, or "None".
 - Per-unit numbers: when the database has number properties named
   `P1 Temp (°C)` and `P1 Headroom (°C)` (and so on for each slot), the relay

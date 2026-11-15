@@ -1,18 +1,53 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "c2894ebce9ab3481b873a4ce8b66d34b27fbf2c6",
-  "deploymentId": "appgdep_6af8bb6b765c8191825560c90591e6a3",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_c5dcb4dab5bc8191b171addc594b4624",
+  "managedSourceCommit": "32862549994fe01c184bbd43e3dc79adb37f459c",
+  "deploymentId": "appgdep_6af965e17da081919aac212d39147073",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_183a99f1c3748191982eb88e91645a0a",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 29,
-  "acceptedSourceCommit": "b3b2fb41d8902b3f376d1c58186e6fe75145a026",
-  "publicVerifiedAt": "2026-11-14T19:50:43.132913+00:00",
+  "versionNumber": 36,
+  "acceptedSourceCommit": "6477335e552bf79a15f351aec797ec7979598e57",
+  "publicVerifiedAt": "2026-11-15T08:03:25.309Z",
   "priorPublications": [
+    {
+      "versionNumber": 35,
+      "managedSourceCommit": "e0b82324f65fe26827503b16d1991cf730d5914a",
+      "deploymentId": "appgdep_6af90f28f8f081918f6b6897cd97e78d",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_e56ea81182f48191a4d3de5e19ea7ca8",
+      "acceptedSourceCommit": "53c3301d45f335743175dea51dd429f9a3c46f3d",
+      "note": "House handoff publication retained from the prior release record."
+    },
+    {
+      "versionNumber": 29,
+      "managedSourceCommit": "c2894ebce9ab3481b873a4ce8b66d34b27fbf2c6",
+      "deploymentId": "appgdep_6af8bb6b765c8191825560c90591e6a3",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_c5dcb4dab5bc8191b171addc594b4624",
+      "acceptedSourceCommit": "b3b2fb41d8902b3f376d1c58186e6fe75145a026",
+      "publicVerifiedAt": "2026-11-14T19:50:43.132913+00:00",
+      "verification": {
+        "pdfHashesMatch": true,
+        "combinedPDFPages": 18,
+        "signalFlowPDFPages": 5,
+        "combinedPDFSHA256": "8f2c6bfbefff1b8fb2262ad9f67969d21d358296d091cd9523963800b8560a97",
+        "signalFlowPDFSHA256": "cca5cf644477b2759679edbca82cec4e8a165bc2ca912d3a46f7010448de71a0",
+        "browserWidths": [
+          1440,
+          680,
+          375,
+          2560
+        ],
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "privateExportRoutes": "404",
+        "host": "Dominic"
+      }
+    },
     {
       "versionNumber": 28,
       "managedSourceCommit": "bfc60c6cf52f79c5b9d08916b30c7d1adf0a8f30",
@@ -46,24 +81,25 @@
       "note": "Stage/reference polish from PR 448 (taskPublication)"
     }
   ],
-  "sourceReconciliation": "Version 29 publishes the November 14 R5 evidence reconciliation: 18-page combined handoff and current five-page diagrams. Public exports omit private network addresses. Private ZIP and original EDID/settings exports are excluded.",
+  "sourceReconciliation": "Quiet Watch 1 publishes shared Light, Dark and System appearance, concise crew navigation and the current handoff. Existing shared tasks and updates are preserved. Private controller settings and evidence are excluded.",
   "verification": {
-    "pdfHashesMatch": true,
-    "combinedPDFPages": 18,
-    "signalFlowPDFPages": 5,
-    "combinedPDFSHA256": "8f2c6bfbefff1b8fb2262ad9f67969d21d358296d091cd9523963800b8560a97",
-    "signalFlowPDFSHA256": "cca5cf644477b2759679edbca82cec4e8a165bc2ca912d3a46f7010448de71a0",
     "browserWidths": [
       1440,
       680,
-      375,
-      2560
+      375
     ],
     "themes": [
       "light",
-      "dark"
+      "dark",
+      "system"
     ],
-    "privateExportRoutes": "404",
-    "host": "Dominic"
+    "host": "Dominic",
+    "themeReload": true,
+    "sharedTaskRecordsPreserved": 17,
+    "sharedTaskSnapshotSHA256": "8a57fd59bc03d9676ceb49860a97af2857eff3b4979982dc08f4d8be23672158",
+    "controllerRequests": 0,
+    "unexpectedBrowserErrors": 0,
+    "providerCspWarnings": "Four Cloudflare injected inline scripts per viewport were blocked by the existing CSP; exact script hashes identify these separately.",
+    "browserRendering": "Chromium with GPU disabled; SwiftShader screenshot capture stalled after navigation."
   }
 }
