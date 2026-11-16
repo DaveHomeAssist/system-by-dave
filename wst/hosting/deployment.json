@@ -1,18 +1,59 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "32862549994fe01c184bbd43e3dc79adb37f459c",
-  "deploymentId": "appgdep_6af965e17da081919aac212d39147073",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_183a99f1c3748191982eb88e91645a0a",
+  "managedSourceCommit": "ca8fb28943d0b231874cc0f3a83e422b2c60f146",
+  "deploymentId": "appgdep_6afb51f555508191843ebd3092205240",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_79cd8d5a4c4881919aa833fd96bb6b6e",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 36,
-  "acceptedSourceCommit": "6477335e552bf79a15f351aec797ec7979598e57",
-  "publicVerifiedAt": "2026-11-15T08:03:25.309Z",
+  "versionNumber": 40,
+  "acceptedSourceCommit": "49dc885d7e456e356b290f32bcde4e1983299cc6",
+  "publicVerifiedAt": "2026-11-16T18:58:20.751261+00:00",
   "priorPublications": [
+    {
+      "versionNumber": 39,
+      "managedSourceCommit": "2e752d113aa5d6e288231fd0bd9ad8397e49281c",
+      "deploymentId": "appgdep_6afb4f7d72d08191ab439027e5878d20",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_075c3d53a85481919bb1aa70870c120b",
+      "note": "Intermediate media publication; uploader secret removed before version 40."
+    },
+    {
+      "versionNumber": 38,
+      "managedSourceCommit": "ee20d6068b1ebcdeb99aa6df3e1fa7261baa49e3",
+      "note": "Inspected production baseline before the two-session integration; evening-only review and existing media routes preserved."
+    },
+    {
+      "managedSourceCommit": "32862549994fe01c184bbd43e3dc79adb37f459c",
+      "deploymentId": "appgdep_6af965e17da081919aac212d39147073",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_183a99f1c3748191982eb88e91645a0a",
+      "versionNumber": 36,
+      "acceptedSourceCommit": "6477335e552bf79a15f351aec797ec7979598e57",
+      "publicVerifiedAt": "2026-11-15T08:03:25.309Z",
+      "sourceReconciliation": "Quiet Watch 1 publishes shared Light, Dark and System appearance, concise crew navigation and the current handoff. Existing shared tasks and updates are preserved. Private controller settings and evidence are excluded.",
+      "verification": {
+        "browserWidths": [
+          1440,
+          680,
+          375
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "system"
+        ],
+        "host": "Dominic",
+        "themeReload": true,
+        "sharedTaskRecordsPreserved": 17,
+        "sharedTaskSnapshotSHA256": "8a57fd59bc03d9676ceb49860a97af2857eff3b4979982dc08f4d8be23672158",
+        "controllerRequests": 0,
+        "unexpectedBrowserErrors": 0,
+        "providerCspWarnings": "Four Cloudflare injected inline scripts per viewport were blocked by the existing CSP; exact script hashes identify these separately.",
+        "browserRendering": "Chromium with GPU disabled; SwiftShader screenshot capture stalled after navigation."
+      }
+    },
     {
       "versionNumber": 35,
       "managedSourceCommit": "e0b82324f65fe26827503b16d1991cf730d5914a",
@@ -81,25 +122,94 @@
       "note": "Stage/reference polish from PR 448 (taskPublication)"
     }
   ],
-  "sourceReconciliation": "Quiet Watch 1 publishes shared Light, Dark and System appearance, concise crew navigation and the current handoff. Existing shared tasks and updates are preserved. Private controller settings and evidence are excluded.",
+  "sourceReconciliation": "Both November 15 sessions use the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation is retained with the new review entries. Original image routes, shared task API, documents and unrelated assets are preserved. Public audience unchanged; video remains deferred.",
   "verification": {
+    "host": "Dominic",
+    "macCheck": "Visible live evening and afternoon session switching, cue 373 original preview at 1280 x 720, and Close verified through the in-app browser.",
+    "viewerCommit": "dc3fffa84da2d09e0c6915eaa3e5917fa63d4d20",
+    "viewerTests": {
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "realAfternoonArchive": true
+    },
     "browserWidths": [
-      1440,
+      375,
       680,
-      375
+      1440,
+      3840
     ],
     "themes": [
       "light",
-      "dark",
-      "system"
+      "dark"
     ],
-    "host": "Dominic",
-    "themeReload": true,
-    "sharedTaskRecordsPreserved": 17,
-    "sharedTaskSnapshotSHA256": "8a57fd59bc03d9676ceb49860a97af2857eff3b4979982dc08f4d8be23672158",
-    "controllerRequests": 0,
-    "unexpectedBrowserErrors": 0,
-    "providerCspWarnings": "Four Cloudflare injected inline scripts per viewport were blocked by the existing CSP; exact script hashes identify these separately.",
-    "browserRendering": "Chromium with GPU disabled; SwiftShader screenshot capture stalled after navigation."
+    "layouts": [
+      "2x2",
+      "1x4"
+    ],
+    "packagedBrowserStates": 32,
+    "liveBrowserStates": 32,
+    "liveBehavior": [
+      "original photo dimensions",
+      "preview arrows and Escape",
+      "note isolation and reload",
+      "exact session and firing links",
+      "repeated cue jump",
+      "invalid context retains capture"
+    ],
+    "originalPhotoHashes": {
+      "matched": 1644,
+      "failed": 0
+    },
+    "releaseId": "nov15-4995c2c54268",
+    "sessions": [
+      {
+        "sessionId": "20261115-130124",
+        "events": 254,
+        "go": 250,
+        "stop": 2,
+        "resume": 2,
+        "repeatGo": 91,
+        "originalPhotos": 119,
+        "missingPhotoSlots": 9,
+        "prePhotoEvents": 190,
+        "stalePhotoWarnings": 10,
+        "observations": 47
+      },
+      {
+        "sessionId": "20261115-190014",
+        "events": 417,
+        "originalPhotos": 1525,
+        "missingPhotoSlots": 33,
+        "observations": 54,
+        "observationLinkedFirings": 342,
+        "unassignedFirings": 75
+      }
+    ],
+    "referenceCues": 159,
+    "referenceScenes": 29,
+    "wstUnitTests": 5,
+    "wstBrowserWidths": [
+      1440,
+      680,
+      375,
+      2560
+    ],
+    "mediaHandlerTests": 2,
+    "frozenCase": {
+      "passed": 33,
+      "failed": 0,
+      "existingFindings": 6
+    },
+    "preservation": "Managed Worker checks confirm unchanged unrelated assets and original document bytes, with only approved Home/Planning navigation transformations. Shared task synthetic fixture passed.",
+    "limitations": [
+      "Managed test-documents.mjs fails the same outdated 18-page R5 handoff text assertion on the unchanged baseline; no document content modified.",
+      "Live task API snapshot returned HTTP 403 to the read-only runner request; persisted task record hash was not independently verified.",
+      "Notes remain browser-local; no live Notion/Sheets synchronization.",
+      "Production look approval, hardware behavior, physical mobile devices and print acceptance were not tested."
+    ],
+    "environmentRevision": 4,
+    "temporaryUploaderSecretRemoved": true,
+    "captureOrEquipmentCommands": 0
   }
 }
