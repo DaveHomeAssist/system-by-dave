@@ -59,3 +59,21 @@ integration is the deployed managed commit `ee20d6068b1ebcdeb99aa6df3e1fa7261baa
 Never label an unavailable archive fixture or unrun browser check as passed.
 
 The installer hashes every inline viewer script and puts the policy before the first script. This includes the early shared Frozen appearance script and the application script, without permitting arbitrary inline scripts.
+
+## Selected photo replacements
+
+Frozen release inputs may supply `reviewPhotos[].replaceSlot` for an explicitly
+approved replacement. The exporter keeps source files and object-store originals
+intact, substitutes the viewer slot with true timestamp/provenance, maps the
+old published image entry to the clean image, and adds both old full-size and
+thumbnail paths to the media allowlist using the existing replacement object key.
+The hosted handler runs before legacy image handlers, so old links also return
+the clean bytes. No upload, object overwrite or credential change is needed.
+Existing downloaded/cached copies cannot be recalled. Current viewer URLs point
+directly to the replacement, avoiding stale original image caches.
+
+For a presentation-only update using already published media, use the normal
+`active` integration, build/test/package and Sites release steps. Verify hashes
+from both old public image routes and all viewer modes, and compare raw files
+and archived image hashes unchanged. Do not repeat media ingestion or enable
+the upload secret for such a release.

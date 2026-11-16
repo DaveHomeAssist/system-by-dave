@@ -1,18 +1,26 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "b1012cd676c1d6afea68cc3ab93c0d872dd57595",
-  "deploymentId": "appgdep_6afb6d3946e08191843c54c6132c6370",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5dd8e032d180819184b7b5820c7a1f0c",
+  "managedSourceCommit": "58e8a311935b847bc829f6fc8d7f7c2551e05949",
+  "deploymentId": "appgdep_6afb70f9396881919f33f64ad192f33e",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_30ad388287088191ac4a5d6d6abb4c3d",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 42,
-  "acceptedSourceCommit": "c67bc2201a2348f04ba3389a72a11cddcbd71ba1",
-  "publicVerifiedAt": "2026-11-16T20:54:16.910697+00:00",
+  "versionNumber": 43,
+  "acceptedSourceCommit": "4f4dbd764803134b4b52306baec458c21a124f9f",
+  "publicVerifiedAt": "2026-11-16T21:10:07.631233+00:00",
   "priorPublications": [
+    {
+      "versionNumber": 42,
+      "managedSourceCommit": "b1012cd676c1d6afea68cc3ab93c0d872dd57595",
+      "deploymentId": "appgdep_6afb6d3946e08191843c54c6132c6370",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5dd8e032d180819184b7b5820c7a1f0c",
+      "acceptedSourceCommit": "c67bc2201a2348f04ba3389a72a11cddcbd71ba1",
+      "publicVerifiedAt": "2026-11-16T20:54:16.910697+00:00"
+    },
     {
       "versionNumber": 41,
       "managedSourceCommit": "59dd4a459b9e3e0d7c8287ca6e64f4dd523156f7",
@@ -139,13 +147,13 @@
       "note": "Stage/reference polish from PR 448 (taskPublication)"
     }
   ],
-  "sourceReconciliation": "Both November 15 sessions use the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation is retained with the new review entries. Original image routes, shared task API, documents and unrelated assets are preserved. Public audience unchanged; video remains deferred. Version 41 corrects timeline text overlap and filter clipping without increasing timeline height or changing published evidence. Version 42 uses the canonical Frozen light/dark skin and shared appearance preference, consistent Home navigation, and the approved later review image for cue 13. Original frames and capture context are preserved. The hosting policy authorizes both exact inline scripts before execution.",
+  "sourceReconciliation": "Both November 15 sessions use the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation is retained with the new review entries. Original image routes, shared task API, documents and unrelated assets are preserved. Public audience unchanged; video remains deferred. Version 41 corrects timeline text overlap and filter clipping without increasing timeline height or changing published evidence. Version 42 uses the canonical Frozen light/dark skin and shared appearance preference, consistent Home navigation, and the approved later review image for cue 13. Original frames and capture context are preserved. The hosting policy authorizes both exact inline scripts before execution. Version 43 supersedes original-pair recovery for the selected cue 13 photo: every review mode and the old public original/thumbnail URLs use the approved replacement. Raw archives and stored original bytes remain intact.",
   "verification": {
     "host": "Dominic",
-    "macCheck": "Live reload: shared dark preference inherited; switching to light updates the existing Home tab; Home navigation and back return correctly; All photos restores the original cue 13 Before/After pair; cleaner Review image restored in dark mode.",
-    "viewerCommit": "3d8b4f61f7e25f78afd67b457053b50c6f6e1696",
+    "macCheck": "Live reload verified Single and All photos use the clean cue 15 frame, with Replacement label, 19:08:27 EST time and +38.30 second offset. Existing note remains present.",
+    "viewerCommit": "ef5f0457b10a4870e2a922cc2babe23ef7f10a7b",
     "viewerTests": {
-      "passed": 43,
+      "passed": 45,
       "failed": 0,
       "skipped": 0,
       "realAfternoonArchive": true
@@ -180,14 +188,15 @@
       "shared Frozen appearance, system preference and cross-tab changes",
       "keyboard review tabs",
       "curated cue 13 review image with actual time/provenance",
-      "original pair recovery and reload"
+      "replacement in Single, All photos, Compare, Repeats, preview, contact sheet and print content",
+      "old full-resolution and thumbnail URL bodies match replacement SHA256"
     ],
     "originalPhotoHashes": {
       "matched": 1644,
       "failed": 0,
-      "note": "All 1644 public hashes verified during the initial integration. This release retains every original image mapping/hash and capture file exactly; no media upload or replacement."
+      "note": "All 1644 archived image hashes and raw capture files remain unchanged. The cue 13 Before public mapping and old original/thumbnail URLs now serve the approved replacement."
     },
-    "releaseId": "nov15-321d7104641e",
+    "releaseId": "nov15-26b7ab6b7f67",
     "sessions": [
       {
         "sessionId": "20261115-130124",
@@ -233,7 +242,8 @@
       "Live task API snapshot returned HTTP 403 to the read-only runner request; persisted task record hash was not independently verified.",
       "Notes remain browser-local; no live Notion/Sheets synchronization.",
       "Production look approval, hardware behavior, physical mobile devices and print acceptance were not tested.",
-      "A direct Python URL read returned HTTP 403 during the v42 check; actual live browser acceptance passed. No claim of a second full public-media hash scan."
+      "A direct Python URL read returned HTTP 403 during the v42 check; actual live browser acceptance passed. No claim of a second full public-media hash scan.",
+      "Previously cached or downloaded original images cannot be recalled. Current viewer requests use the replacement URL; private archival copies are deliberately retained."
     ],
     "environmentRevision": 4,
     "temporaryUploaderSecretRemoved": true,
@@ -253,7 +263,12 @@
       "sourceSlot": "before",
       "capturedAtEST": "2026-11-15 19:08:27",
       "offsetSeconds": 38.29545617103577,
-      "sourcePreserved": true
-    }
+      "sourcePreserved": true,
+      "replaceSlot": "before",
+      "originalPublicSha256": "ee3dd0ec775cb5032d887b266f2bc0b9b351db696d7ba72ecc094ff88e698028",
+      "replacementSha256": "ae15df7bb3a62243add297d171dd834e100b76b964c8005a93b748f69998f761",
+      "publicAliasHashChecks": 2
+    },
+    "liveBrowserStatus": "Passed on public WST hostname"
   }
 }
