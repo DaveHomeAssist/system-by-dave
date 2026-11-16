@@ -1,18 +1,27 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "ca8fb28943d0b231874cc0f3a83e422b2c60f146",
-  "deploymentId": "appgdep_6afb51f555508191843ebd3092205240",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_79cd8d5a4c4881919aa833fd96bb6b6e",
+  "managedSourceCommit": "59dd4a459b9e3e0d7c8287ca6e64f4dd523156f7",
+  "deploymentId": "appgdep_6afb5c362aec8191a45c941822fac2b2",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_e09f4a0bcecc819192d55a632a3cc183",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 40,
+  "versionNumber": 41,
   "acceptedSourceCommit": "49dc885d7e456e356b290f32bcde4e1983299cc6",
-  "publicVerifiedAt": "2026-11-16T18:58:20.751261+00:00",
+  "publicVerifiedAt": "2026-11-16T19:41:17.147026+00:00",
   "priorPublications": [
+    {
+      "versionNumber": 40,
+      "managedSourceCommit": "ca8fb28943d0b231874cc0f3a83e422b2c60f146",
+      "deploymentId": "appgdep_6afb51f555508191843ebd3092205240",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_79cd8d5a4c4881919aa833fd96bb6b6e",
+      "acceptedSourceCommit": "49dc885d7e456e356b290f32bcde4e1983299cc6",
+      "publicVerifiedAt": "2026-11-16T18:58:20.751261+00:00",
+      "packagedBrowserStates": 32
+    },
     {
       "versionNumber": 39,
       "managedSourceCommit": "2e752d113aa5d6e288231fd0bd9ad8397e49281c",
@@ -122,11 +131,11 @@
       "note": "Stage/reference polish from PR 448 (taskPublication)"
     }
   ],
-  "sourceReconciliation": "Both November 15 sessions use the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation is retained with the new review entries. Original image routes, shared task API, documents and unrelated assets are preserved. Public audience unchanged; video remains deferred.",
+  "sourceReconciliation": "Both November 15 sessions use the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation is retained with the new review entries. Original image routes, shared task API, documents and unrelated assets are preserved. Public audience unchanged; video remains deferred. Version 41 corrects timeline text overlap and filter clipping without increasing timeline height or changing published evidence.",
   "verification": {
     "host": "Dominic",
-    "macCheck": "Visible live evening and afternoon session switching, cue 373 original preview at 1280 x 720, and Close verified through the in-app browser.",
-    "viewerCommit": "dc3fffa84da2d09e0c6915eaa3e5917fa63d4d20",
+    "macCheck": "Live 616x805 viewport reload confirms a 2px gap between each cue number and timestamp, with both inside their row. Original photos remain visible.",
+    "viewerCommit": "772880db55660b1cd46255662336fa3330759755",
     "viewerTests": {
       "passed": 41,
       "failed": 0,
@@ -136,7 +145,9 @@
     "browserWidths": [
       375,
       680,
+      1280,
       1440,
+      2240,
       3840
     ],
     "themes": [
@@ -147,15 +158,17 @@
       "2x2",
       "1x4"
     ],
-    "packagedBrowserStates": 32,
-    "liveBrowserStates": 32,
+    "liveBrowserStates": 48,
     "liveBehavior": [
       "original photo dimensions",
       "preview arrows and Escape",
       "note isolation and reload",
       "exact session and firing links",
       "repeated cue jump",
-      "invalid context retains capture"
+      "invalid context retains capture",
+      "cue and timestamp non-overlap with 16px classic scrollbars",
+      "all visible filters fit on one line",
+      "112px desktop and 104px mobile timeline height retained"
     ],
     "originalPhotoHashes": {
       "matched": 1644,
@@ -210,6 +223,12 @@
     ],
     "environmentRevision": 4,
     "temporaryUploaderSecretRemoved": true,
-    "captureOrEquipmentCommands": 0
+    "captureOrEquipmentCommands": 0,
+    "timelineCorrection": {
+      "publishedAt": "2026-11-16T19:40:50.143624+00:00",
+      "baselineRegression": "Fails the all-filters-fit assertion before the fix",
+      "captureOrPhotoChanges": false
+    },
+    "candidateBrowserStates": 48
   }
 }
