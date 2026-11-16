@@ -1,18 +1,26 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "59dd4a459b9e3e0d7c8287ca6e64f4dd523156f7",
-  "deploymentId": "appgdep_6afb5c362aec8191a45c941822fac2b2",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_e09f4a0bcecc819192d55a632a3cc183",
+  "managedSourceCommit": "b1012cd676c1d6afea68cc3ab93c0d872dd57595",
+  "deploymentId": "appgdep_6afb6d3946e08191843c54c6132c6370",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5dd8e032d180819184b7b5820c7a1f0c",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 41,
-  "acceptedSourceCommit": "49dc885d7e456e356b290f32bcde4e1983299cc6",
-  "publicVerifiedAt": "2026-11-16T19:41:17.147026+00:00",
+  "versionNumber": 42,
+  "acceptedSourceCommit": "c67bc2201a2348f04ba3389a72a11cddcbd71ba1",
+  "publicVerifiedAt": "2026-11-16T20:54:16.910697+00:00",
   "priorPublications": [
+    {
+      "versionNumber": 41,
+      "managedSourceCommit": "59dd4a459b9e3e0d7c8287ca6e64f4dd523156f7",
+      "deploymentId": "appgdep_6afb5c362aec8191a45c941822fac2b2",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_e09f4a0bcecc819192d55a632a3cc183",
+      "acceptedSourceCommit": "49dc885d7e456e356b290f32bcde4e1983299cc6",
+      "publicVerifiedAt": "2026-11-16T19:41:17.147026+00:00"
+    },
     {
       "versionNumber": 40,
       "managedSourceCommit": "ca8fb28943d0b231874cc0f3a83e422b2c60f146",
@@ -131,13 +139,13 @@
       "note": "Stage/reference polish from PR 448 (taskPublication)"
     }
   ],
-  "sourceReconciliation": "Both November 15 sessions use the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation is retained with the new review entries. Original image routes, shared task API, documents and unrelated assets are preserved. Public audience unchanged; video remains deferred. Version 41 corrects timeline text overlap and filter clipping without increasing timeline height or changing published evidence.",
+  "sourceReconciliation": "Both November 15 sessions use the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation is retained with the new review entries. Original image routes, shared task API, documents and unrelated assets are preserved. Public audience unchanged; video remains deferred. Version 41 corrects timeline text overlap and filter clipping without increasing timeline height or changing published evidence. Version 42 uses the canonical Frozen light/dark skin and shared appearance preference, consistent Home navigation, and the approved later review image for cue 13. Original frames and capture context are preserved. The hosting policy authorizes both exact inline scripts before execution.",
   "verification": {
     "host": "Dominic",
-    "macCheck": "Live 616x805 viewport reload confirms a 2px gap between each cue number and timestamp, with both inside their row. Original photos remain visible.",
-    "viewerCommit": "772880db55660b1cd46255662336fa3330759755",
+    "macCheck": "Live reload: shared dark preference inherited; switching to light updates the existing Home tab; Home navigation and back return correctly; All photos restores the original cue 13 Before/After pair; cleaner Review image restored in dark mode.",
+    "viewerCommit": "3d8b4f61f7e25f78afd67b457053b50c6f6e1696",
     "viewerTests": {
-      "passed": 41,
+      "passed": 43,
       "failed": 0,
       "skipped": 0,
       "realAfternoonArchive": true
@@ -168,13 +176,18 @@
       "invalid context retains capture",
       "cue and timestamp non-overlap with 16px classic scrollbars",
       "all visible filters fit on one line",
-      "112px desktop and 104px mobile timeline height retained"
+      "112px desktop and 104px mobile timeline height retained",
+      "shared Frozen appearance, system preference and cross-tab changes",
+      "keyboard review tabs",
+      "curated cue 13 review image with actual time/provenance",
+      "original pair recovery and reload"
     ],
     "originalPhotoHashes": {
       "matched": 1644,
-      "failed": 0
+      "failed": 0,
+      "note": "All 1644 public hashes verified during the initial integration. This release retains every original image mapping/hash and capture file exactly; no media upload or replacement."
     },
-    "releaseId": "nov15-4995c2c54268",
+    "releaseId": "nov15-321d7104641e",
     "sessions": [
       {
         "sessionId": "20261115-130124",
@@ -219,7 +232,8 @@
       "Managed test-documents.mjs fails the same outdated 18-page R5 handoff text assertion on the unchanged baseline; no document content modified.",
       "Live task API snapshot returned HTTP 403 to the read-only runner request; persisted task record hash was not independently verified.",
       "Notes remain browser-local; no live Notion/Sheets synchronization.",
-      "Production look approval, hardware behavior, physical mobile devices and print acceptance were not tested."
+      "Production look approval, hardware behavior, physical mobile devices and print acceptance were not tested.",
+      "A direct Python URL read returned HTTP 403 during the v42 check; actual live browser acceptance passed. No claim of a second full public-media hash scan."
     ],
     "environmentRevision": 4,
     "temporaryUploaderSecretRemoved": true,
@@ -229,6 +243,17 @@
       "baselineRegression": "Fails the all-filters-fit assertion before the fix",
       "captureOrPhotoChanges": false
     },
-    "candidateBrowserStates": 48
+    "candidateBrowserStates": 48,
+    "packagedBrowserStates": 48,
+    "scriptPolicyTests": 2,
+    "reviewPhoto": {
+      "sessionId": "20261115-190014",
+      "eventId": "de33248acb6c0408b35fe75d",
+      "sourceEventId": "3c69e229935e71229803b999",
+      "sourceSlot": "before",
+      "capturedAtEST": "2026-11-15 19:08:27",
+      "offsetSeconds": 38.29545617103577,
+      "sourcePreserved": true
+    }
   }
 }
