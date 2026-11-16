@@ -1,5 +1,9 @@
 # Changelog
 
+## Frozen review appearance and selected photo, 2026-11-16
+
+- Publish the shared Frozen light/dark palette and Home navigation treatment in the existing review layout, with a shared appearance preference. Add the approved cue 13 review image while retaining the original pair and actual capture timing. The hosting installer now hashes all viewer scripts and places its policy before execution.
+
 ## WST two-session review integration, 2026-11-16
 
 - Integrate the maintained Frozen viewer at the existing review address with

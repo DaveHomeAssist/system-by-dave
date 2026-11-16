@@ -42,7 +42,7 @@ Unassigned cues and missing or stale images remain explicit.
 
 ## Verification
 
-- `node --test wst/hosting/review/handler.test.mjs`
+- `node --test wst/hosting/review/handler.test.mjs wst/hosting/scripts/review-csp.test.mjs`
 - `node --test wst/workspace.test.mjs`
 - `node scripts/test_wst_workspace.cjs` with the qualified cached browser runtime
 - `npm run test:frozen-case` and the required public-navigation/consistency gates
@@ -57,3 +57,5 @@ Unassigned cues and missing or stale images remain explicit.
 retained baseline when the runner has no Git history. The baseline for this
 integration is the deployed managed commit `ee20d6068b1ebcdeb99aa6df3e1fa7261baa49e3`.
 Never label an unavailable archive fixture or unrun browser check as passed.
+
+The installer hashes every inline viewer script and puts the policy before the first script. This includes the early shared Frozen appearance script and the application script, without permitting arbitrary inline scripts.

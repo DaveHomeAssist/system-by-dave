@@ -1,3 +1,4 @@
+import {withReviewCsp} from './review-csp.mjs';
 // Install a pinned viewer and verified release into the current managed WST source.
 // Preserve every unrelated live asset and all D1/R2 bindings. No production writes.
 import fs from 'node:fs';
@@ -25,9 +26,7 @@ fs.writeFileSync(path.join(managed, 'worker/review-release.js'), 'export default
 fs.writeFileSync(path.join(managed, 'worker/review-hosted.js'), "import {reviewHandler} from './review-handler.mjs';\nimport release from './review-release.js';\nexport const handleHostedReview=reviewHandler(release);\n");
 if (phase === 'active') {
   let html = fs.readFileSync(viewer, 'utf8');
-  const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-  const sha = createHash('sha256').update(script).digest('base64');
-  html = html.replace('</head>', `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-${sha}'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'">\n</head>`);
+  html = withReviewCsp(html);
   fs.writeFileSync(path.join(managed, 'review.html'), html);
   // Existing Home/Planning assets remain the release baseline, not an older checkout.
   const start = source.indexOf('const ASSETS'); const jsonStart = source.indexOf('{', start);
