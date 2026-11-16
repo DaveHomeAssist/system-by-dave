@@ -14,7 +14,7 @@
   const eyebrow = panel.querySelector('.snow-eyebrow');
   const lede = panel.querySelector('.snow-lede');
   const foot = panel.querySelector('.snow-foot');
-  const cards = panel.querySelectorAll('.home-choices button');
+  const cards = panel.querySelectorAll('.home-choices :is(button,a)');
   const ctx = canvas.getContext('2d');
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 

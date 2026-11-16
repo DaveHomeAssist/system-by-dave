@@ -55,6 +55,24 @@ test('snow splash stays same-origin and keeps the home routes', () => {
   assert.doesNotMatch(splash, /https?:\/\//);
   assert.match(readFileSync(new URL('./vendor/gsap.min.js', import.meta.url), 'utf8'), /3\.15\.0/);
 });
+test('run review is reachable from Home and Planning, not squeezed into the header', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('./snow-splash.css', import.meta.url), 'utf8');
+  const splash = readFileSync(new URL('./snow-splash.js', import.meta.url), 'utf8');
+  const review = 'https://wst.housevideo.app/run-review/';
+  const home = html.slice(html.indexOf('<div class="home-choices">'), html.indexOf('</div>', html.indexOf('<div class="home-choices">')));
+  assert.equal((home.match(/<(?:button|a)\b/g) || []).length, 6, 'six home choices fill the grid evenly');
+  assert.match(home, new RegExp('<a class="home-choice" href="' + review + '">[\\s\\S]*<strong>Run review</strong>'));
+  const planning = html.slice(html.indexOf('aria-label="Planning views"'), html.indexOf('</nav>', html.indexOf('aria-label="Planning views"')));
+  assert.match(planning, new RegExp('<a class="planning-link" href="' + review + '">Run review'));
+  const header = html.slice(html.indexOf('aria-label="Workspace"'), html.indexOf('</nav>', html.indexOf('aria-label="Workspace"')));
+  assert.doesNotMatch(header, /run-review/, 'the phone header keeps Home, Handoff and Planning on screen');
+  assert.doesNotMatch(html, /\sstyle="/, 'inline styles are blocked by the page CSP');
+  assert.match(css, /\.home-choices :is\(button,a\)/);
+  assert.doesNotMatch(css, /\[data-open-controls\]\{grid-column:1\/-1/, 'six choices make even rows without a spanning card');
+  assert.match(splash, /\.home-choices :is\(button,a\)/, 'the link card joins the intro animation');
+});
+
 test('shared theme events update the workspace without touching personal notes', () => {
   const app = boot({ initial: 'Keep me' }); app.listeners['frozen:themechange']({detail:{theme:'dark'}});
   assert.equal(app.context.document.documentElement.dataset.theme, 'dark');

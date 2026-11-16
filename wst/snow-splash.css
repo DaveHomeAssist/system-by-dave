@@ -49,11 +49,11 @@ body:has(#home-panel:not([hidden])) :focus-visible{outline-color:var(--snow-acce
 .snow-lede{margin:0;max-width:34em;font-size:clamp(16px,2.2vw,20px);line-height:1.45;color:var(--snow-muted);font-weight:450}
 .snow-lede strong{color:var(--snow-ink);font-weight:600}
 .home-panel .home-choices{width:100%}
-.home-panel .home-choices button{position:relative;overflow:hidden;text-align:left;color:var(--snow-ink);background:var(--snow-card);border:1px solid var(--snow-border);border-radius:20px;box-shadow:0 24px 80px var(--snow-card-shadow);padding:20px 22px 18px;min-height:112px;gap:6px;-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);transition:border-color .2s ease,background-color .2s ease}
-.home-panel .home-choices button::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,var(--snow-accent),transparent 85%);opacity:.75}
-.home-panel .home-choices button:hover,
-.home-panel .home-choices button:focus-visible{border-color:rgba(162,229,244,.55);background:var(--snow-card-hover)}
-.home-panel .home-choices button:focus-visible{outline:3px solid var(--snow-accent);outline-offset:3px}
+.home-panel .home-choices :is(button,a){position:relative;overflow:hidden;text-align:left;color:var(--snow-ink);background:var(--snow-card);border:1px solid var(--snow-border);border-radius:20px;box-shadow:0 24px 80px var(--snow-card-shadow);padding:20px 22px 18px;min-height:112px;gap:6px;-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);transition:border-color .2s ease,background-color .2s ease}
+.home-panel .home-choices :is(button,a)::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,var(--snow-accent),transparent 85%);opacity:.75}
+.home-panel .home-choices :is(button,a):hover,
+.home-panel .home-choices :is(button,a):focus-visible{border-color:rgba(162,229,244,.55);background:var(--snow-card-hover)}
+.home-panel .home-choices :is(button,a):focus-visible{outline:3px solid var(--snow-accent);outline-offset:3px}
 .snow-icon{width:28px;height:28px;color:var(--snow-accent);margin-bottom:2px;fill:none;stroke:currentColor;stroke-width:1.6}
 .home-panel .home-choices strong{font-size:clamp(17px,2vw,21px);font-weight:650;letter-spacing:-.02em;color:var(--snow-ink)}
 .home-panel .home-choices span{font-size:13px;line-height:1.45;font-weight:400;color:var(--snow-muted)}
@@ -61,7 +61,7 @@ body:has(#home-panel:not([hidden])) :focus-visible{outline-color:var(--snow-acce
 
 @media(max-width:680px){
   .home-panel .home-choices{grid-template-columns:1fr;gap:8px}
-  .home-panel .home-choices button{min-height:64px;padding:10px 12px 10px 14px;display:grid;grid-template-columns:28px 1fr;column-gap:12px;row-gap:0;align-items:center}
+  .home-panel .home-choices :is(button,a){min-height:64px;padding:10px 12px 10px 14px;display:grid;grid-template-columns:28px 1fr;column-gap:12px;row-gap:0;align-items:center}
   .home-panel .home-choices strong,.home-panel .home-choices span{grid-column:2}
   .home-panel .snow-icon{grid-column:1;grid-row:1 / span 2;width:22px;height:22px;margin:0}
   .home-panel h2.snow-title{font-size:clamp(42px,14vw,64px)}
@@ -72,7 +72,7 @@ body:has(#home-panel:not([hidden])) :focus-visible{outline-color:var(--snow-acce
 }
 @media(max-height:700px){
   .home-panel h2.snow-title{font-size:clamp(40px,8vw,68px)}
-  .home-panel .home-choices button{min-height:64px;padding:12px 14px}
+  .home-panel .home-choices :is(button,a){min-height:64px;padding:12px 14px}
   .snow-masthead{gap:8px}
   .snow-content{gap:12px}
 }
@@ -84,9 +84,9 @@ body:has(#home-panel:not([hidden])) :focus-visible{outline-color:var(--snow-acce
     var(--snow-ground);
     background-size:140px 180px,auto,auto;
     background-position:24px 36px,0 0,0 0}
-  .snow-aurora,.snow-char,.snow-mark,.snow-lede,.snow-eyebrow,.home-panel .home-choices button,.snow-foot{opacity:1!important;transform:none!important;filter:none!important;animation:none!important;transition:none!important}
+  .snow-aurora,.snow-char,.snow-mark,.snow-lede,.snow-eyebrow,.home-panel .home-choices :is(button,a),.snow-foot{opacity:1!important;transform:none!important;filter:none!important;animation:none!important;transition:none!important}
   .snow-mark{filter:none}
 }
 
-@media(min-width:681px){.home-panel .home-choices [data-open-controls]{grid-column:1/-1;min-height:86px}}
-@media(min-width:2200px){.snow-content{width:min(1440px,100%)}.home-panel .home-choices{grid-template-columns:repeat(4,minmax(0,1fr))}.home-panel .home-choices [data-open-controls]{min-height:96px}}
+@media(min-width:681px){.home-panel .home-choices [data-open-controls]{min-height:86px}}
+@media(min-width:2200px){.snow-content{width:min(1440px,100%)}.home-panel .home-choices{grid-template-columns:repeat(3,minmax(0,1fr))}.home-panel .home-choices [data-open-controls]{min-height:96px}}
