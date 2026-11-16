@@ -1,5 +1,19 @@
 # Frozen workspace
 
+## Two-session rehearsal review
+
+The existing `/run-review/` route uses the maintained viewer from
+`DaveHomeAssist/frozen-rehearsal-capture`, with both November 15 sessions,
+original 1280 × 720 photos and versioned observations and scene/song candidates.
+The Home card and Planning link open the same address. Video is deferred.
+
+`hosting/scripts/integrate-review.mjs` installs a verified release and pinned
+viewer into the current managed Site source without replacing its existing
+D1 task API, R2 photo store or unrelated assets. The viewer source remains in
+its own repository; this repository owns hosting integration and navigation.
+See [the release procedure](hosting/review/README.md). Do not deploy the older
+embedded Worker snapshot alone: it does not contain the current review media.
+
 ## Quiet Watch appearance and navigation
 
 The shared appearance source is `apps/projctl/public/frozen-theme.js` and
