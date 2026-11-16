@@ -1,5 +1,19 @@
 # Frozen workspace
 
+## Two-session rehearsal review
+
+The existing `/run-review/` route uses the maintained viewer from
+`DaveHomeAssist/frozen-rehearsal-capture`, with both November 15 sessions,
+original 1280 × 720 photos and versioned observations and scene/song candidates.
+The Home card and Planning link open the same address. Video is deferred.
+
+`hosting/scripts/integrate-review.mjs` installs a verified release and pinned
+viewer into the current managed Site source without replacing its existing
+D1 task API, R2 photo store or unrelated assets. The viewer source remains in
+its own repository; this repository owns hosting integration and navigation.
+See [the release procedure](hosting/review/README.md). Do not deploy the older
+embedded Worker snapshot alone: it does not contain the current review media.
+
 ## Quiet Watch appearance and navigation
 
 The shared appearance source is `apps/projctl/public/frozen-theme.js` and
@@ -169,3 +183,7 @@ PR 448 merged as `6e0753a6153868ba2b12aa32038b54bd329d3c65` after both exact-hea
 The Mac Studio is the active backend. Dave subsequently clarified that a Stream Deck profile exists, superseding the initial assumption that only this page uses P1 through P4. Inspection found an installed Frozen XL profile whose letter controls resolve the current slot from relay lane assignments; isolated binding checks passed before and after the proposed renumbering. The running plugin was connected to the laptop relay, so Studio connection and physical button acceptance remain unverified. See the [readiness record](../apps/projctl/docs/show-readiness.md#drawing-order-numbering-and-stage-polish-november-7) for the connection constraint.
 
 The November 7 renumbering proposal was not applied. Quiet Watch preserves the installed control mapping: A=P3, B=P2, C=P1 and D=P4. Keep the saved private rig and Stream Deck bindings intact. The public drawing-order labels are reference records, not authority to change controller slots.
+
+## Run review navigation (2026-11-16)
+
+The November 15 run review lives at `/run-review/` on the published Site only: its page, `data.json`, `context.json` and the R2-backed `originals/` route were added in Site version 38 from a managed checkout and are not in this directory or in `hosting/worker/index.js`. Home and Planning link to it by absolute URL, so the local Projctl copy also reaches the public review. Before the next Sites publication from this source, carry the version 38 run-review routes and R2 binding into the managed worker (the version 38 checkout is preserved on the 4TB T9 drive), or publishing will remove `/run-review/`. Rehearsal data and photos stay out of this public repository.

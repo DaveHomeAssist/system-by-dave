@@ -1,5 +1,17 @@
 # Changelog
 
+## WST two-session review integration, 2026-11-16
+
+- Integrate the maintained Frozen viewer at the existing review address with
+  separate afternoon/evening sessions, original-resolution photo routes and
+  versioned observation/scene/song snapshots. Retain firing identities, note
+  keys, photo gaps, public access and the existing D1 task service. Video stays
+  deferred. Add immutable media validation and a staged upload/readback procedure.
+
+## WST run review in navigation, 2026-11-16
+
+- Link the November 15 run review from a sixth Home card and from Planning, as real links to `https://wst.housevideo.app/run-review/`. Six cards now fill even rows (3×2 on ultrawide), so Operator controls no longer spans a row, and the link card shares the glass styling and intro animation. Nothing is added to the header, which keeps Home, Handoff and Planning on a 375 px screen. Replaces the live inline-styled header link, whose styles the page CSP blocked.
+
 ## Panasonic web diagnostics, 2026-11-15
 
 - Add read-only signal timing, individual lamp readings and Self Test details to selected projector views, with independent freshness and unavailable states.
