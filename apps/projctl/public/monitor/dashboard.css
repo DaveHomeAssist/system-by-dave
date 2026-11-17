@@ -78,3 +78,21 @@
   .fm-dashboard .fm-checklist-page { padding: 8px; }
   .fm-checklist-page > li { font-size: 12px; line-height: 17px; }
 }
+
+/* Feed art: the Coronation and Winter looks drawn on each lane's house surface (monitor-art.js). */
+.fm-dashboard .fm-art.fm-art-house { background: #12132a; }
+.fm-dashboard .fm-art.fm-art-house[data-look="winter"] { background: #05081c; }
+.fm-dashboard .fm-art.fm-art-house[data-look="icepalace"] { background: #0a1438; }
+.fm-art-house::before, .fm-art-house::after { content: none; }
+.fm-art-svg { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; display: block; }
+.fm-dashboard .fm-art.fm-art-house { place-content: end center; padding: 8px; }
+.fm-feed-readout { justify-self: center; max-width: 100%; padding: 4px 10px; border-radius: 8px; background: rgba(4,12,26,.8); box-shadow: 0 0 0 1px rgba(255,255,255,.14); }
+.fm-dashboard .fm-art-house .fm-feed-power { color: #f4f8ff; font-size: clamp(15px,1.6vw,26px); line-height: 1.15; overflow-wrap: anywhere; }
+.fm-dashboard .fm-art-house .fm-feed-shutter { color: #dce6f4; font-size: 12px; line-height: 16px; margin-top: 2px; }
+.fm-dashboard .fm-feed[data-lane="B"] .fm-art-house { place-content: end end; }
+.fm-look .avd-seg__btn { min-height: 36px; }
+@media (max-width: 680px) {
+  .fm-house-panel .fm-dashboard-heading { flex-wrap: wrap; row-gap: 6px; }
+  .fm-house-panel .fm-look { order: 3; flex: 1 1 100%; display: grid; grid-template-columns: repeat(3, 1fr); }
+  .fm-look .avd-seg__btn { min-height: 32px; padding: 4px 8px; font-size: 11px; }
+}
