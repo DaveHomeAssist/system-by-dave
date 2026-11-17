@@ -30,7 +30,7 @@ export const ALERTS = [
 ];
 
 export const RELAYS = {
-  macbook: { name: 'Mac Studio relay', role: 'Control relay', build: 'Read back from this relay', poll: '5 s', note: 'Control relay as of Nov 17. The MacBook relay (87e844b + PR 478) was the controller on Nov 13.' },
+  macbook: { name: 'Mac Studio relay', role: 'Control relay', build: 'Read back from this relay', poll: '5 s', note: 'Control relay since Nov 15, when Projctl on the Studio took A\'s shutter (A-CONTROL-1). The MacBook relay (87e844b + PR 478) was the controller on Nov 13.' },
   studio: { name: 'Studio relay', role: 'Health Logs reporting', build: 'Installed relay', poll: '60 s · checked Nov 15', note: 'Kept on by decision RELAY-1, Nov 13.' },
 };
 
