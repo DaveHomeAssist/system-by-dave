@@ -40,7 +40,7 @@ function snowflake(cx, cy, r, color, glow) {
 }
 
 // A Norwegian rosemaling flower medallion: a central bud, two curling heart petals, a tulip base,
-// leaf sprigs and dots, inside a double ring. Drawn in a unit circle and scaled.
+// leaf sprigs and dots, inside a double ring (the header medallion). Drawn in a unit circle and scaled.
 function medallion(cx, cy, r, P, id) {
   // Five rounded petals around a heart-shaped centre, C-scroll leaves between them.
   const petal = '<path d="M0-.2C.34-.3.42-.74.12-.88.06-.8 0-.78 0-.78S-.06-.8-.12-.88C-.42-.74-.34-.3 0-.2Z"/>';
@@ -53,6 +53,28 @@ function medallion(cx, cy, r, P, id) {
     + `<circle r="${n(r)}" fill="${P.medallionField}" stroke="${P.ring}" stroke-width="${n(r * .09)}"/>`
     + `<circle r="${n(r * .86)}" fill="none" stroke="${P.ring}" stroke-width="${n(r * .025)}" opacity=".8"/>`
     + `<g transform="scale(${n(r * .82)})" fill="url(#${id}-petal)" stroke="${P.petalLine}" stroke-width=".035" stroke-linejoin="round">${leaves}${petals}<circle r=".3" fill="${P.petal[2]}"/><g fill="${P.petal[0]}">${heart}</g><g fill="${P.petalLine}" stroke="none">${dots}</g></g></g>`;
+}
+
+// The portal rosemaling flower as painted on the house portals: frameless, wider than tall, a
+// five-petal rosette with a heart centre, big scrolling leaves to each side, curling tendrils and
+// small leaf sprigs above and below. Unit width is about +-1, height about +-.8; w is half-width.
+function rosemaling(cx, cy, w, P, id) {
+  const petal = '<path d="M0-.12C.24-.18.3-.5.08-.6.04-.54 0-.53 0-.53S-.04-.54-.08-.6C-.3-.5-.24-.18 0-.12Z"/>';
+  const rosette = [0, 72, 144, 216, 288].map(a => `<g transform="rotate(${a})">${petal}</g>`).join('');
+  const heart = '<path d="M0 .15C-.22-.01-.2-.22-.06-.21-.02-.2 0-.17 0-.15 0-.17.02-.2.06-.21.2-.22.22-.01 0 .15Z"/>';
+  const side = '<path d="M.42 .02C.56-.26.86-.36 1.02-.14.88-.15.76-.08.72.04.67.18.52.2.42.02Z"/>'
+    + '<path d="M.4 .2C.54.44.84.5 .98.3.84.31.72.25.64.17.56.11.47.13.4.2Z"/>'
+    + '<path d="M.46-.3C.48-.5.66-.6.8-.5.68-.47.6-.4.58-.3.55-.24.5-.24.46-.3Z"/>';
+  const curls = '<path d="M.7-.16C.84-.34.74-.56.56-.56.44-.56.4-.44.48-.38.54-.34.6-.4.56-.45M.62.36C.72.6.58.74.44.7.34.66.36.54.44.54.5.54.52.6.48.63M.2-.56C.3-.7.24-.8.14-.78"/>';
+  const sprig = '<path d="M0-.58C.08-.66.08-.76 0-.82-.08-.76-.08-.66 0-.58Z"/><path d="M.03-.6C.14-.62.2-.7.18-.78.1-.76.04-.7.03-.6Z"/><path d="M-.03-.6C-.14-.62-.2-.7-.18-.78-.1-.76-.04-.7-.03-.6Z"/>';
+  const dots = [[.3, -.42], [.92, .08], [.86, -.36], [.3, .5], [.8, .5]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".035"/><circle cx="${-x}" cy="${y}" r=".035"/>`).join('');
+  const half = side + `<g fill="none" stroke="${P.petal[1]}" stroke-width=".045" stroke-linecap="round">${curls}</g>`;
+  return `<g transform="translate(${n(cx)} ${n(cy)}) scale(${n(w)})">`
+    + `<ellipse rx="1.05" ry=".78" fill="${P.glow}" opacity=".16"/>`
+    + `<g fill="url(#${id}-petal)" stroke="${P.petalLine}" stroke-width=".022" stroke-linejoin="round">`
+    + `${half}<g transform="scale(-1 1)">${half}</g>${sprig}<g transform="scale(1 -1) translate(0 -.04)">${sprig}</g>`
+    + `${rosette}<circle r=".2" fill="${P.petal[2]}"/><g fill="${P.petal[0]}">${heart}</g></g>`
+    + `<g fill="${P.petal[0]}">${dots}</g></g>`;
 }
 
 // A pointed crystal spike: base at (x,y), pointing along angle (degrees, 0 = up).
@@ -74,12 +96,12 @@ function defs(id, P) {
     + `<radialGradient id="${id}-up" cx=".5" cy=".85" r=".75"><stop offset="0" stop-color="${P.upstage[0]}"/><stop offset="1" stop-color="${P.upstage[1]}"/></radialGradient></defs>`;
 }
 
-// Portal, drawn for the SL portal (A, house right) with its peak on the outer (right) side.
+// Portal, drawn for the SL portal (A, house right). The apex sits just outboard of centre so both\n// shoulders slope down, with the spike pillar on the outer (right) side.
 // D, the SR portal, is the exact mirror image, as built in the house.
 function portal(lane, look) {
   const P = PALETTE[look], id = `fm-art-${lane}-${look}`;
-  const outer = '150,8 194,96 188,350 128,414 14,358 6,118';
-  const inner = '148,30 180,102 175,343 126,396 27,348 20,126';
+  const outer = '112,6 194,92 188,350 128,414 14,358 6,104';
+  const inner = '111,28 180,98 175,343 126,396 27,348 20,112';
   const lattice = [110, 210, 308].map(y => `<path d="M100 ${y - 58}L172 ${y}L100 ${y + 58}L28 ${y}Z"/>`).join('');
   // The tall crystal spike pillar that stands on each portal's outer side in the house.
   const pillar = `<polygon points="207,404 207,64 215,2 223,64 223,404" fill="url(#${id}-frame)" stroke="${P.seam}" stroke-width="1.2" stroke-linejoin="round"/>`
@@ -91,8 +113,8 @@ function portal(lane, look) {
     + `<clipPath id="${id}-clip"><polygon points="${inner}"/></clipPath>`
     + `<g clip-path="url(#${id}-clip)"><g fill="none" stroke="${P.lattice}" stroke-width="1.4" opacity=".55">${lattice}</g>`
     + `<circle cx="100" cy="210" r="96" fill="${P.glow}" opacity=".08"/>${P.snow ? snow(200, 420, 46, lane === 'A' ? 7 : 11) : ''}</g>`
-    + snowflake(100, 110, 44, P.flake, P.glow) + medallion(100, 210, 40, P, id) + snowflake(100, 308, 44, P.flake, P.glow)
-    + spike(150, 10, 26, 7, 18, P) + spike(193, 97, 20, 6, 70, P) + spike(7, 120, 18, 6, -66, P)
+    + snowflake(100, 110, 44, P.flake, P.glow) + rosemaling(100, 210, 58, P, id) + snowflake(100, 308, 44, P.flake, P.glow)
+    + spike(112, 8, 26, 7, 6, P) + spike(193, 93, 20, 6, 70, P) + spike(7, 106, 18, 6, -66, P)
     + spike(128, 412, 18, 6, 180, P) + spike(187, 348, 14, 5, 120, P) + spike(15, 356, 14, 5, -120, P);
   const flip = lane === 'D' ? ' transform="translate(230 0) scale(-1 1)"' : '';
   return svg('0 0 230 420', 'xMidYMid meet', defs(id, P) + `<g${flip}>${art}</g>`);
