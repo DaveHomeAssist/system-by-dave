@@ -1,39 +1,52 @@
-// Feed art for the Monitor multiview: the Coronation and Winter looks drawn onto each lane's real
-// projection surface at Walnut Street Theatre. Shapes follow the house photos (Nov 2026), not the
-// earlier concept renders: the portals are tall, pointed, asymmetric ice crystals with a rosemaling
-// medallion between two snowflakes; A (SL) and D (SR) are mirror images in one palette; the header
-// is an X-truss with diamond snowflake panels and a round rosemaling medallion. Art is illustrative
-// only and never reflects what a projector is showing.
+// Feed art for the Monitor multiview: the Coronation, Winter and Ice Palace looks drawn onto each
+// lane's real projection surface at Walnut Street Theatre. Shapes follow the house work-light photos
+// (Nov 2026): tall, pointed crystal portals with an outer spike pillar and a frameless rosemaling
+// flower between two folk snowflakes, A (SL) and D (SR) as exact mirrors, and an X-truss header with
+// diamond snowflake panels around a round rosemaling medallion. Colours follow the Nov 15 runthrough
+// (palettes from the frozen-monitor-refine covers): Coronation is coral stencil light on slate indigo,
+// Winter is pale blue over a diamond ice lattice, Ice Palace is luminous ice on cobalt. Art is
+// illustrative only and never reflects what a projector is showing.
 
-export const LOOKS = ['coronation', 'winter'];
-export const LOOK_NAMES = { coronation: 'Coronation', winter: 'Winter' };
+export const LOOKS = ['coronation', 'winter', 'icepalace'];
+export const LOOK_NAMES = { coronation: 'Coronation', winter: 'Winter', icepalace: 'Ice Palace' };
 
 const PALETTE = {
   coronation: {
-    sky: ['#1a1440', '#2a2168'], fieldTop: '#3f2d8c', fieldBottom: '#2a4c9c', lattice: '#8f86e0',
-    frame: ['#f0c870', '#b07a30'], seam: '#6e4515', spike: '#fbe6ad', spikeEdge: '#c08a3a',
-    flake: '#fff1cf', glow: '#f6b54a', petal: ['#ffcf6b', '#e8862a', '#b9561a'], petalLine: '#7a3410',
-    ring: '#d39a44', medallionField: '#2c2470', snow: 0,
-    upstage: ['#5b2a4a', '#1c1238'], warmth: '#f09a4c', trunk: '#efdcb8', leg: '#121b3c', legFlower: '#5d8fe0',
+    sky: ['#100c14', '#12132a'], fieldTop: '#2a2d5c', fieldBottom: '#1c1e42', lattice: '#4a4e88', latticeOn: 0,
+    frame: ['#f09a7a', '#c45040'], seam: '#5e2420', spike: '#f6c4b0', spikeEdge: '#c45040',
+    flake: '#f09a7a', flakeOpacity: 1, glow: '#e87860', petal: ['#f6c4b0', '#e07058', '#c45040'], petalLine: '#6e2820',
+    ring: '#e07058', medallionField: '#1c1e42', snow: 0,
+    upstage: ['#2a1820', '#140c12'], wave: '#c47870', pilaster: ['#3a2a38', '#c47870'],
+    floral: ['#e8a0a8', '#c06070', '#f0c8c0'], leaf: '#5a7a4a', floor: ['#5a3220', '#8a5a38', '#c4a070'],
   },
   winter: {
-    sky: ['#050b16', '#0b1a2c'], fieldTop: '#16294a', fieldBottom: '#0c1a30', lattice: '#5d7fa8',
-    frame: ['#eef4fb', '#8ea2b8'], seam: '#55687e', spike: '#e4f7ff', spikeEdge: '#6fc4dc',
-    flake: '#f4faff', glow: '#9fdcf2', petal: ['#f2f8ff', '#b9cde3', '#7f9cbc'], petalLine: '#4c6688',
-    ring: '#b9c8d8', medallionField: '#10213a', snow: 1,
-    upstage: ['#173052', '#060d1a'], warmth: '#7fb6e6', trunk: '#dbe9f7', leg: '#0b1428', legFlower: '#4d7bc4',
+    sky: ['#040616', '#05081c'], fieldTop: '#102060', fieldBottom: '#071030', lattice: '#5a82d0', latticeOn: 1,
+    frame: ['#b8cce0', '#4a6ab8'], seam: '#1a2a60', spike: '#e0e8f8', spikeEdge: '#6a8ad0',
+    flake: '#b8ccf0', flakeOpacity: .7, glow: '#5a7ad0', petal: ['#e0e8f8', '#8aa8e0', '#4a6ab8'], petalLine: '#1a2a60',
+    ring: '#8aa8e0', medallionField: '#071030', snow: 1,
+    upstage: ['#122050', '#060a22'], wave: '#5a82d0', pilaster: ['#1a2a60', '#6a8ad0'], ice: '#8aa8e0', iceGlow: '#5a7ad0',
+    floor: ['#0a1028', '#1a2a50', '#3a58a0'], stairs: 0, aurora: 0,
+  },
+  icepalace: {
+    sky: ['#081028', '#0a1438'], fieldTop: '#2a58a8', fieldBottom: '#12245a', lattice: '#7eb4e8', latticeOn: 0,
+    frame: ['#e8f2fc', '#7aacd8'], seam: '#2a4a80', spike: '#f7fbff', spikeEdge: '#7eb4e8',
+    flake: '#f7fbff', flakeOpacity: 1, glow: '#7eb4e8', petal: ['#f7fbff', '#d0e4f8', '#7aacd8'], petalLine: '#2a4a80',
+    ring: '#d0e4f8', medallionField: '#12245a', snow: 0,
+    upstage: ['#1e3a70', '#0c1838'], wave: '#8ab4dc', pilaster: ['#2a4a80', '#a8d0ec'], ice: '#d0e4f8', iceGlow: '#7eb4e8',
+    floor: ['#1a3058', '#3a68a0', '#a8c8e8'], stairs: 1, aurora: 1,
   },
 };
 
 const n = v => Math.round(v * 10) / 10;
 
-// A six-armed snowflake with two pairs of branches and a diamond tip on each arm.
-function snowflake(cx, cy, r, color, glow) {
+// An eight-armed folk snowflake, as stencilled on the house portals: two pairs of branches and a
+// diamond tip on each arm.
+function snowflake(cx, cy, r, color, glow, opacity = 1) {
   const arm = `M0 0V${n(-r)}M0 ${n(-r * .38)}l${n(r * .26)} ${n(-r * .2)}M0 ${n(-r * .38)}l${n(-r * .26)} ${n(-r * .2)}M0 ${n(-r * .66)}l${n(r * .2)} ${n(-r * .16)}M0 ${n(-r * .66)}l${n(-r * .2)} ${n(-r * .16)}`;
   const tip = `M0 ${n(-r * 1.08)}l${n(r * .07)} ${n(r * .1)}l${n(-r * .07)} ${n(r * .1)}l${n(-r * .07)} ${n(-r * .1)}Z`;
-  const arms = [0, 60, 120, 180, 240, 300].map(a => `<g transform="rotate(${a})"><path d="${arm}"/><path d="${tip}" fill="${color}" stroke="none"/></g>`).join('');
+  const arms = [0, 45, 90, 135, 180, 225, 270, 315].map(a => `<g transform="rotate(${a})"><path d="${arm}"/><path d="${tip}" fill="${color}" stroke="none"/></g>`).join('');
   const sw = Math.max(1.2, r * .07);
-  return `<g transform="translate(${n(cx)} ${n(cy)})" fill="none" stroke-linecap="round">`
+  return `<g transform="translate(${n(cx)} ${n(cy)})" fill="none" stroke-linecap="round" opacity="${opacity}">`
     + `<g stroke="${glow}" stroke-width="${n(sw * 3)}" opacity=".28">${arms}</g>`
     + `<g stroke="${color}" stroke-width="${n(sw)}">${arms}</g>`
     + `<circle r="${n(r * .12)}" fill="${color}"/></g>`;
@@ -93,10 +106,12 @@ function defs(id, P) {
     + `<linearGradient id="${id}-frame" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${P.frame[0]}"/><stop offset="1" stop-color="${P.frame[1]}"/></linearGradient>`
     + `<linearGradient id="${id}-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.sky[0]}"/><stop offset="1" stop-color="${P.sky[1]}"/></linearGradient>`
     + `<radialGradient id="${id}-petal" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="${P.petal[0]}"/><stop offset=".6" stop-color="${P.petal[1]}"/><stop offset="1" stop-color="${P.petal[2]}"/></radialGradient>`
+    + `<pattern id="${id}-lat" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H14M0 0V14" stroke="${P.lattice}" stroke-width="2.4" fill="none"/></pattern>`
     + `<radialGradient id="${id}-up" cx=".5" cy=".85" r=".75"><stop offset="0" stop-color="${P.upstage[0]}"/><stop offset="1" stop-color="${P.upstage[1]}"/></radialGradient></defs>`;
 }
 
-// Portal, drawn for the SL portal (A, house right). The apex sits just outboard of centre so both\n// shoulders slope down, with the spike pillar on the outer (right) side.
+// Portal, drawn for the SL portal (A, house right). The apex sits just outboard of centre so both
+// shoulders slope down, with the spike pillar on the outer (right) side.
 // D, the SR portal, is the exact mirror image, as built in the house.
 function portal(lane, look) {
   const P = PALETTE[look], id = `fm-art-${lane}-${look}`;
@@ -112,8 +127,9 @@ function portal(lane, look) {
     + `<polygon points="${inner}" fill="url(#${id}-field)" stroke="${P.seam}" stroke-width="2" stroke-linejoin="round"/>`
     + `<clipPath id="${id}-clip"><polygon points="${inner}"/></clipPath>`
     + `<g clip-path="url(#${id}-clip)"><g fill="none" stroke="${P.lattice}" stroke-width="1.4" opacity=".55">${lattice}</g>`
-    + `<circle cx="100" cy="210" r="96" fill="${P.glow}" opacity=".08"/>${P.snow ? snow(200, 420, 46, lane === 'A' ? 7 : 11) : ''}</g>`
-    + snowflake(100, 110, 44, P.flake, P.glow) + rosemaling(100, 210, 58, P, id) + snowflake(100, 308, 44, P.flake, P.glow)
+    + (P.latticeOn ? `<rect width="230" height="420" fill="url(#${id}-lat)" opacity=".55"/>` : '')
+    + `<circle cx="100" cy="210" r="96" fill="${P.glow}" opacity=".1"/>${P.snow ? snow(200, 420, 46, lane === 'A' ? 7 : 11) : ''}</g>`
+    + snowflake(100, 110, 44, P.flake, P.glow, P.flakeOpacity) + rosemaling(100, 210, 58, P, id) + snowflake(100, 308, 44, P.flake, P.glow, P.flakeOpacity)
     + spike(112, 8, 26, 7, 6, P) + spike(193, 93, 20, 6, 70, P) + spike(7, 106, 18, 6, -66, P)
     + spike(128, 412, 18, 6, 180, P) + spike(187, 348, 14, 5, 120, P) + spike(15, 356, 14, 5, -120, P);
   const flip = lane === 'D' ? ' transform="translate(230 0) scale(-1 1)"' : '';
@@ -124,13 +140,14 @@ function portal(lane, look) {
 function header(look) {
   const P = PALETTE[look], id = `fm-art-B-${look}`;
   const beam = d => `<path d="${d}" stroke="${P.frame[0]}" stroke-width="8" opacity=".92" stroke-linecap="round"/><path d="${d}" stroke="${P.seam}" stroke-width="1.2" stroke-dasharray="7 5" opacity=".8"/>`;
-  const diamond = x => `<path d="M${x} 24L${x + 52} 62 ${x} 100 ${x - 52} 62Z" fill="url(#${id}-field)" stroke="url(#${id}-frame)" stroke-width="5" stroke-linejoin="round"/>`;
+  const diamond = x => `<path d="M${x} 24L${x + 52} 62 ${x} 100 ${x - 52} 62Z" fill="url(#${id}-field)" stroke="url(#${id}-frame)" stroke-width="5" stroke-linejoin="round"/>`
+    + (P.latticeOn ? `<path d="M${x} 27L${x + 47} 62 ${x} 97 ${x - 47} 62Z" fill="url(#${id}-lat)" opacity=".5"/>` : '');
   const art = `<rect width="400" height="124" fill="url(#${id}-sky)"/>${P.snow ? snow(400, 124, 40, 5) : ''}`
     + `<g fill="none">${beam('M12 28Q200 10 388 28')}${beam('M24 100H376')}`
     + `${beam('M18 30L192 102')}${beam('M18 100L192 22')}${beam('M382 30L208 102')}${beam('M382 100L208 22')}`
     + `${beam('M4 46L70 8')}${beam('M396 46L330 8')}</g>`
     + diamond(102) + diamond(298)
-    + snowflake(102, 62, 27, P.flake, P.glow) + snowflake(298, 62, 27, P.flake, P.glow)
+    + snowflake(102, 62, 27, P.flake, P.glow, P.flakeOpacity) + snowflake(298, 62, 27, P.flake, P.glow, P.flakeOpacity)
     + medallion(200, 62, 33, P, id)
     + spike(8, 64, 18, 6, -90, P) + spike(392, 64, 18, 6, 90, P) + spike(200, 14, 14, 5, 0, P) + spike(200, 112, 12, 5, 180, P)
     + spike(40, 18, 14, 5, -35, P) + spike(360, 18, 14, 5, 35, P)
@@ -138,24 +155,52 @@ function header(look) {
   return svg('0 0 400 124', 'xMidYMid meet', defs(id, P) + art);
 }
 
-// Stage (C): the inner opening as seen from the house, with the zigzag header trim, ice-tree trunks,
-// folk-pattern legs and the upstage chapel gables.
+// Stage (C): the inner opening seen from the house, under the wavy soffit and between wavy pilasters.
+// Coronation shows the floral arches on the wood floor; Winter and Ice Palace show the gothic ice
+// arches with the upstage bridge (Ice Palace adds the stairs and the aurora, as in the runthrough).
+const wave = (y, amp, P) => `<path d="M0 ${y}${Array.from({ length: 16 }, (_, i) => `q12.5 ${i % 2 ? amp : -amp} 25 0`).join('')}" fill="none" stroke="${P.wave}" stroke-width="2.4"/>`;
+function pilaster(x, P, phase) {
+  const pts = Array.from({ length: 23 }, (_, i) => `${n(x + Math.sin(i * .9 + phase) * 4)} ${26 + i * 8}`).join(' ');
+  return `<rect x="${x - 8}" y="24" width="16" height="176" fill="${P.pilaster[0]}" opacity=".85"/><polyline points="${pts}" fill="none" stroke="${P.pilaster[1]}" stroke-width="1.6"/>`;
+}
+function floralArch(cx, P) {
+  let out = '';
+  for (let i = 0; i <= 18; i++) {
+    const t = Math.PI * (1 - i / 18), x = cx + Math.cos(t) * 52, y = 196 - Math.sin(t) * 92;
+    const c = P.floral[i % 3];
+    out += `<circle cx="${n(x)}" cy="${n(y)}" r="6.2" fill="${c}"/><circle cx="${n(x)}" cy="${n(y)}" r="2" fill="${P.floral[1]}"/>`;
+    if (i % 3 === 1) out += `<ellipse cx="${n(x + 7)}" cy="${n(y + 4)}" rx="2.4" ry="5" fill="${P.leaf}" transform="rotate(35 ${n(x + 7)} ${n(y + 4)})"/>`;
+  }
+  return out;
+}
+function gothicArch(x0, x1, yTop, P, w) {
+  // A pointed lancet: each side rises straight, then curves in to meet at a sharp apex.
+  const cx = (x0 + x1) / 2, half = (x1 - x0) / 2, spring = yTop + half * 1.5, h = spring - yTop;
+  const d = `M${x0} 200V${n(spring)}C${x0} ${n(yTop + h * .45)} ${n(cx - half * .3)} ${n(yTop + h * .12)} ${cx} ${yTop}`
+    + `C${n(cx + half * .3)} ${n(yTop + h * .12)} ${x1} ${n(yTop + h * .45)} ${x1} ${n(spring)}V200`;
+  return `<path d="${d}" fill="none" stroke="${P.iceGlow}" stroke-width="${w * 2.6}" opacity=".35"/>`
+    + `<path d="${d}" fill="none" stroke="${P.ice}" stroke-width="${w}" stroke-linejoin="miter"/>`
+    + `<path d="M${cx - 3} ${yTop + 4}L${cx} ${yTop + 22} ${cx + 3} ${yTop + 4}Z" fill="${P.ice}"/>`;
+}
 function stage(look) {
   const P = PALETTE[look], id = `fm-art-C-${look}`;
-  const zig = Array.from({ length: 41 }, (_, i) => `${i * 10} ${i % 2 ? 30 : 24}`).join(' ');
-  const leg = x => `<rect x="${x}" y="28" width="30" height="170" fill="${P.leg}"/>`
-    + Array.from({ length: 7 }, (_, i) => { const y = 44 + i * 23; return `<g fill="${P.legFlower}"><circle cx="${x + 15}" cy="${y - 5}" r="3.4"/><circle cx="${x + 15}" cy="${y + 5}" r="3.4"/><circle cx="${x + 10}" cy="${y}" r="3.4"/><circle cx="${x + 20}" cy="${y}" r="3.4"/></g><circle cx="${x + 15}" cy="${y}" r="2" fill="${P.leg}"/>`; }).join('');
-  const tree = (x, w, s) => `<g stroke="${P.trunk}" stroke-linecap="round" fill="none"><path d="M${x} 200V40" stroke-width="${w}"/>`
-    + `<path d="M${x} 118l${-22 * s} -44M${x - 22 * s} 74l${-6 * s} -22M${x} 96l${20 * s} -40M${x} 72l${-16 * s} -30M${x} 140l${18 * s} -34M${x + 20 * s} 56l${8 * s} -18" stroke-width="${n(w * .45)}"/></g>`;
-  const gables = `<path d="M168 168V132l12-20 12 20V168M188 168V122l12-24 12 24V168M208 168V132l12-20 12 20V168" fill="${P.upstage[1]}" stroke="${P.warmth}" stroke-width="1.6" opacity=".9"/>`;
-  const art = `<rect width="400" height="220" fill="url(#${id}-up)"/>`
-    + `<ellipse cx="200" cy="170" rx="150" ry="60" fill="${P.warmth}" opacity=".16"/>`
-    + gables + (P.snow ? snow(400, 200, 70, 3) : '')
-    + tree(118, 7, 1) + tree(282, 7, -1) + tree(84, 4, -.7) + tree(316, 4, .7)
-    + leg(30) + leg(340)
-    + `<rect width="400" height="28" fill="url(#${id}-frame)"/><polyline points="${zig}" fill="none" stroke="${P.seam}" stroke-width="2"/>`
-    + `<path d="M0 198H400V220H0Z" fill="${P.sky[0]}"/><path d="M40 220L120 198M140 220L170 198M260 220L230 198M360 220L280 198" stroke="${P.lattice}" stroke-width="1" opacity=".5"/>`;
-  return svg('0 0 400 220', 'xMidYMin slice', defs(id, P) + art);
+  const sides = pilaster(18, P, 0) + pilaster(40, P, 1.2) + pilaster(360, P, 2.1) + pilaster(382, P, .6);
+  const planks = (top, P) => `<rect y="${top}" width="400" height="${220 - top}" fill="${P.floor[0]}"/>` + [0, 1, 2, 3].map(i => `<path d="M0 ${top + 4 + i * 5}H400" stroke="${P.floor[i % 2 ? 1 : 2]}" stroke-width="1.2" opacity=".6"/>`).join('');
+  let body;
+  if (look === 'coronation') {
+    body = floralArch(128, P) + floralArch(272, P)
+      + `<path d="M336 196V150l12-16 12 16V196" fill="none" stroke="${P.wave}" stroke-width="1.6" opacity=".8"/>` + planks(198, P);
+  } else {
+    const bridge = `<rect x="150" y="150" width="100" height="5" fill="${P.ice}"/><rect x="150" y="128" width="100" height="22" fill="none" stroke="${P.ice}" stroke-width="2"/>`
+      + Array.from({ length: 5 }, (_, i) => `<path d="M${150 + i * 20} 128l20 22M${170 + i * 20} 128l-20 22" stroke="${P.ice}" stroke-width="1" opacity=".75"/>`).join('');
+    const stairs = P.stairs ? Array.from({ length: 6 }, (_, i) => `<rect x="${246 + i * 8}" y="${155 + i * 7.4}" width="${46 - i * 3}" height="3.2" fill="${P.floor[2]}"/>`).join('') : '';
+    const aurora = P.aurora ? `<path d="M40 70C110 20 170 90 230 50S340 40 380 80" fill="none" stroke="#3fd2b4" stroke-width="22" opacity=".18" stroke-linecap="round"/><path d="M60 92C130 50 190 110 250 70S350 66 380 98" fill="none" stroke="#2fa8c8" stroke-width="12" opacity=".16" stroke-linecap="round"/>` : '';
+    body = aurora + gothicArch(70, 150, 70, P, 3.4) + gothicArch(250, 330, 70, P, 3.4) + gothicArch(132, 268, 32, P, 4.4)
+      + bridge + stairs + (P.snow ? snow(400, 200, 70, 3) : '') + planks(198, P);
+  }
+  const art = `<rect width="400" height="220" fill="url(#${id}-up)"/>` + body + sides
+    + `<rect width="400" height="24" fill="${P.sky[0]}"/>` + wave(12, 5, P) + wave(19, 4, P);
+  return svg('0 0 400 220', 'xMidYMid meet', defs(id, P) + art);
 }
 
 // The letterbox colour around the art comes from CSS (.fm-art-house[data-look]); the page CSP

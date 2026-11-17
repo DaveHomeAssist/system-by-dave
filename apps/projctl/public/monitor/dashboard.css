@@ -80,8 +80,9 @@
 }
 
 /* Feed art: the Coronation and Winter looks drawn on each lane's house surface (monitor-art.js). */
-.fm-dashboard .fm-art.fm-art-house { background: #2a2168; }
-.fm-dashboard .fm-art.fm-art-house[data-look="winter"] { background: #0b1a2c; }
+.fm-dashboard .fm-art.fm-art-house { background: #12132a; }
+.fm-dashboard .fm-art.fm-art-house[data-look="winter"] { background: #05081c; }
+.fm-dashboard .fm-art.fm-art-house[data-look="icepalace"] { background: #0a1438; }
 .fm-art-house::before, .fm-art-house::after { content: none; }
 .fm-art-svg { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; display: block; }
 .fm-dashboard .fm-art.fm-art-house { place-content: end center; padding: 8px; }
@@ -92,6 +93,6 @@
 .fm-look .avd-seg__btn { min-height: 36px; }
 @media (max-width: 680px) {
   .fm-house-panel .fm-dashboard-heading { flex-wrap: wrap; row-gap: 6px; }
-  .fm-house-panel .fm-look { order: 3; flex: 1 1 100%; display: grid; grid-template-columns: 1fr 1fr; }
+  .fm-house-panel .fm-look { order: 3; flex: 1 1 100%; display: grid; grid-template-columns: repeat(3, 1fr); }
   .fm-look .avd-seg__btn { min-height: 32px; padding: 4px 8px; font-size: 11px; }
 }
