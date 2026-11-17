@@ -5,6 +5,7 @@
 
 import { patternsFor } from './drivers/panasonic.js';
 import { PULSE_PATTERNS } from './drivers/pulse.js';
+import { slotsForSelector } from './rig-lanes.js';
 
 export const SHOW_INPUT_KEYS = ['show', 'backup'];
 
@@ -38,18 +39,10 @@ export function resolvePattern(driverKind, model, want) {
   return null; // pjlink and unknown kinds have no pattern API
 }
 
-// Frozen WST slot roles when drawing lanes are not yet assigned.
-const WST_FALLBACK = { portals: ['P2', 'P4', 'P3'], stage: ['P1'] };
+// Portals = lanes A, B, D; stage = lane C. Slot IDs come from the current
+// rig.json at plan time. Unassigned lanes stay unverified; never invent slots.
 function slotList(projectors, selector) {
-  if (selector === 'all') return projectors.map((p) => p.slot);
-  if (selector === 'portals' || selector === 'stage') {
-    const byLane = projectors.filter((p) => selector === 'portals' ? (p.lane === 'A' || p.lane === 'B' || p.lane === 'D') : p.lane === 'C').map((p) => p.slot);
-    if (byLane.length) return byLane;
-    const want = new Set(WST_FALLBACK[selector]);
-    return projectors.filter((p) => want.has(p.slot)).map((p) => p.slot);
-  }
-  if (Array.isArray(selector)) return selector;
-  return [selector];
+  return slotsForSelector(projectors, selector);
 }
 
 /**
@@ -178,12 +171,18 @@ export function listShowPresets() {
  * @param {object} preset
  * @param {object[]} projectors
  * @param {(slot: string) => object} driverFor  returns driver with .kind and optional .pattern
- * @param {object} showInputs  rig.showInputs = { show: {P1:id}, backup: {P1:id} }
+ * @param {object} showInputs  rig.showInputs = { show: {<slot>:id}, backup: {<slot>:id} } keyed by recorded slot IDs from the current rig
  */
 export function planShowPreset(preset, projectors, driverFor, showInputs = {}) {
   const plan = [];
   for (const step of preset.steps || []) {
-    const slots = slotList(projectors, step.slots);
+    const { slots, missing } = slotList(projectors, step.slots);
+    for (const lane of missing) {
+      plan.push({
+        slot: `lane:${lane}`, cmd: step.cmd, status: 'unsupported/unverified',
+        detail: `Lane ${lane} is unassigned in the current rig`,
+      });
+    }
     for (const slot of slots) {
       const p = projectors.find((x) => x.slot === slot);
       if (!p) {

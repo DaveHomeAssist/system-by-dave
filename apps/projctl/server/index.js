@@ -12,6 +12,8 @@ import { pjlinkSearch } from './drivers/pjlink.js';
 import { emptyStatus, POWER } from './drivers/base.js';
 import { hasLens, lensSummary, lensPositionMatch, lensMotorState, LENS_AXES } from './preset-lens.js';
 import { showPreset, listShowPresets, planShowPreset, summarizePlan } from './show-presets.js';
+import { resolveOscTarget } from './rig-lanes.js';
+import { isBlockedByShowLock, showLockRefusal } from './show-lock.js';
 import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
 import { confirmations } from './confirmations.js';
@@ -142,7 +144,12 @@ async function command(slot, cmd, arg, source = 'ui') {
   if (!p) throw httpErr(404, `no projector ${slot}`);
   const st = status.get(slot);
   if (!st.online) throw httpErr(409, `${slot} is offline`);
-  if (rig.lock && (cmd === 'power' && !arg || cmd === 'input' || cmd === 'pattern' || cmd === 'lens' && arg?.op !== 'stop' || cmd === 'picture')) throw httpErr(423, 'show lock is on');
+  if (rig.lock && isBlockedByShowLock(cmd, arg)) {
+    const message = showLockRefusal(cmd, arg);
+    store.event({ source, slot, command: `${cmd} ${fmtArg(arg)}`, result: 'ERR', detail: message });
+    broadcast({ type: 'event', event: rig.events.at(-1) });
+    throw httpErr(423, message);
+  }
   if (cmd === 'power' && arg && st.power === POWER.COOLING) throw httpErr(409, `${slot} is cooling, wait before power on`);
   const stop = cmd === 'lens' && arg?.op === 'stop';
   if (busy.has(slot) && !stop && cmd !== 'shutter') throw httpErr(409, `${slot}: lens is moving. Wait or use Stop lens.`);
@@ -169,11 +176,18 @@ async function command(slot, cmd, arg, source = 'ui') {
 
 async function uiCommand(slot, cmd, arg, confirm) {
   if ((cmd === 'power' || cmd === 'shutter') && ![0, 1, false, true].includes(arg)) throw httpErr(400, `${cmd} needs 0 or 1`);
-  const slots = slot === 'all' ? rig.projectors.map((p) => p.slot) : [slot];
+  let slots;
+  try { slots = resolveOscTarget(rig.projectors, slot).slots; }
+  catch (e) { throw httpErr(e.code === 'UNASSIGNED_LANE' ? 404 : 400, e.message); }
   const out = {};
   let targets = slots.map((s) => ({ slot: s }));
   if (cmd === 'power' && !arg) {
-    if (rig.lock) throw httpErr(423, 'show lock is on');
+    if (rig.lock) {
+      const message = showLockRefusal('power', false);
+      store.event({ source: 'ui', slot, command: 'power 0', result: 'ERR', detail: message });
+      broadcast({ type: 'event', event: rig.events.at(-1) });
+      throw httpErr(423, message);
+    }
     const key = `${slot}:power:off`;
     const confirmed = pendingConfirm.take(key, confirm);
     if (!confirmed) {
@@ -213,7 +227,12 @@ async function recallPreset(name, source = 'ui', confirmedLens = false) {
   const summary = lensSummary(pr, (slot) => { const p = store.projector(slot); return p ? driverFor(p).lensControls || {} : {}; });
   if (!confirmedLens) {
     const targets = Object.entries(summary).filter(([, v]) => v.supported.length).map(([slot]) => slot);
-    if (rig.lock && targets.some((slot) => status.get(slot)?.online)) throw httpErr(423, 'show lock is on');
+    if (rig.lock && targets.some((slot) => status.get(slot)?.online)) {
+      const message = showLockRefusal('lens', { op: 'recall' });
+      store.event({ source, slot: '*', command: `preset ${name} lens`, result: 'ERR', detail: message });
+      broadcast({ type: 'event', event: rig.events.at(-1) });
+      throw httpErr(423, message);
+    }
     return { preset: name, confirm: targets.length ? pendingConfirm.issue(key, targets.map((slot) => ({ slot, identity: targetIdentity(store.projector(slot)) }))) : null,
       message: targets.length ? `Recall lens positions for ${targets.join(', ')}? Re-hang still needs alignment and focus checked.` : 'No absolute lens recall is stored for this rig.',
       projectors: summary };
@@ -274,10 +293,15 @@ async function recallShowPreset(id, source = 'ui', confirm = false) {
   const powerOffs = actionable.filter((a) => a.cmd === 'power' && !a.arg);
   const others = actionable.filter((a) => !(a.cmd === 'power' && !a.arg));
 
-  // Show lock: shutter-only blackout stays allowed; power-off / input / pattern blocked.
+  // Show Lock: shutter close stays allowed; shutter open, power, lens, input, pattern refused.
   if (rig.lock) {
-    const wantsRestricted = (pr.steps || []).some((s) => s.cmd === 'input' || s.cmd === 'pattern' || (s.cmd === 'power' && s.arg === false));
-    if (wantsRestricted) throw httpErr(423, 'show lock is on');
+    const blocked = (pr.steps || []).find((s) => isBlockedByShowLock(s.cmd, s.arg));
+    if (blocked) {
+      const message = showLockRefusal(blocked.cmd, blocked.arg);
+      store.event({ source, slot: '*', command: `show ${pr.id}`, result: 'ERR', detail: message });
+      broadcast({ type: 'event', event: rig.events.at(-1) });
+      throw httpErr(423, message);
+    }
   }
 
   // Strike: close shutters (and pattern off) first, then require the two-tap power-off confirm.
@@ -338,7 +362,7 @@ async function recallShowPreset(id, source = 'ui', confirm = false) {
   };
 }
 
-// ---- OSC / TCP cue input: /proj/<slot>/<power|shutter|input> <arg>, /proj/preset/<name>, /proj/all/<power|shutter> <arg>
+// ---- OSC / TCP cue input: /proj/<lane|all|slot>/<power|shutter|input> <arg>; lanes A–D resolve from the current rig.json
 async function onCue(addr, args, source) {
   const parts = addr.split('/').filter(Boolean);
   if (parts[0] !== 'proj') return;
@@ -352,8 +376,8 @@ async function onCue(addr, args, source) {
       return await recallPreset(parts.slice(3).join('/'), source, true);
     }
     if (parts[1] === 'preset') return await recallPreset(parts.slice(2).join('/'), source);
-    if (!parts[1] || !['power', 'shutter', 'input'].includes(parts[2]) || args.length !== 1) throw new Error('cue needs slot, power/shutter/input and one argument');
-    const slots = parts[1] === 'all' ? rig.projectors.map((p) => p.slot) : [parts[1].toUpperCase()];
+    if (!parts[1] || !['power', 'shutter', 'input'].includes(parts[2]) || args.length !== 1) throw new Error('cue needs a lane letter, all, or a recorded slot, plus power/shutter/input and one argument');
+    const slots = resolveOscTarget(rig.projectors, parts[1]).slots;
     const cmd = parts[2]; const arg = args[0];
     if (cmd !== 'input' && ![0, 1, '0', '1'].includes(arg)) throw new Error(`${cmd} needs 0 or 1`);
     const out = {};

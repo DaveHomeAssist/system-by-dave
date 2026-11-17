@@ -42,7 +42,7 @@ test('single-slot confirmations, lock invalidation and power argument validation
   assert.ok((await r.api('command', { ...one, confirm: 'preset' })).body.P2.confirm);
   await r.api('lock', { lock: true });
   assert.equal((await r.api('command', { ...one, confirm: first.confirm })).status, 423);
-  assert.match((await r.api('command', { slot: 'P2', cmd: 'picture', arg: { key: 'brightness', value: 10 } })).body.P2.error, /lock/);
+  assert.match((await r.api('command', { slot: 'P2', cmd: 'picture', arg: { key: 'brightness', value: 10 } })).body.P2.error, /lock/i);
   assert.equal((await r.api('command', { slot: 'P2', cmd: 'shutter', arg: 1 })).body.P2.result, 'OK');
   await r.api('lock', { lock: false });
   const fresh = (await r.api('command', { ...one, confirm: first.confirm })).body.P2;

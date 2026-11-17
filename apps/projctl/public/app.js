@@ -138,7 +138,7 @@ function renderGrid() {
   g.scrollTop = scroll;
   if (focusKey) [...g.querySelectorAll('[data-focus-key]')].find((el) => el.dataset.focusKey === focusKey)?.focus({ preventScroll: true });
 }
-function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); return p && laneOf(p) ? `${slot} · ${p.lane} / ${laneOf(p).target}` : slot; }
+function slotName(slot) { const p = state.projectors.find((p) => p.slot === slot); if (p && laneOf(p)) return `Lane ${p.lane} · ${laneOf(p).target} · ${slot} (recorded, not verified)`; if (p) return `${slot} (recorded, not verified)`; return slot; }
 
 const showPresetResults = new Map();
 let showConfirm = null; // { id, token, message, targets }

@@ -31,21 +31,33 @@ Individual power-off uses the same two-tap confirmation. Expired or reused confi
 require another first tap. Changing Show Lock clears pending confirmations.
 
 “Command accepted” means the driver acknowledged the request. Watch the reported tile state
-change through Cooling to Standby before removing power. Show Lock blocks power off, input,
-test patterns, lens movement and picture changes; shutter and read-only status remain available.
+change through Cooling to Standby before removing power. Show Lock always allows shutter close
+(`1` = shutter closed). It refuses shutter open, power, input, lens movement (Stop lens stays
+available), test patterns and picture changes, with a clear refusal message and a log entry.
+Read-only status remains available.
 
 ## Cues from Millumin or QLab
 
 Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
 
-    /proj/P4/shutter 1          close P4 shutter (0 opens)
-    /proj/P1/power 1            power on (0 off)
-    /proj/P2/input 31           select input
-    /proj/all/shutter 0         every projector
-    /proj/all/shutter 1         blackout (CueForge Panic target)
+    /proj/A/shutter 1           close the shutter on lane A (1 = shutter closed, 0 opens)
+    /proj/all/shutter 1         blackout, every projector (CueForge Panic target)
+    /proj/C/power 1             power on the projector currently assigned to lane C
+    /proj/all/shutter 0         open every shutter (refused while Show Lock is on)
     /proj/show/preshow          built-in show preset
     /proj/show/strike 1         strike power-off confirm (after first cue)
     /proj/preset/preshow        recall a saved operator preset
+
+Lane letters A–D are the cue identity. `/proj/A/…` through `/proj/D/…` resolve at runtime
+from `rig.projectors[].lane` in the current rig.json; they do not hard-code a slot letter
+or IP. A recorded slot ID still works when you already know it, and any displayed slot
+letter is recorded, not verified. Unassigned lanes are refused rather than invented.
+
+projctl does not yet expose per-lane shutter readback over OSC, so a Panic sender such as
+CueForge must treat each targeted lane as unconfirmed after `/proj/A/shutter 1`. HTTP
+`/api/state` includes `status.shutter` after a poll, but that is an authenticated web API,
+not an OSC Panic path. The needed endpoint is an OSC query/reply such as
+`/proj/A/shutter/state` that returns `0` (open) or `1` (closed) for the lane letter.
 
 Bulk cues try every slot and log failures per projector; an offline first slot does not
 prevent later slots receiving the cue. Power and shutter require an explicit 0 or 1.
@@ -58,6 +70,8 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
     server/index.js        relay: HTTP, WS, polling, presets, lock, cue input
     server/store.js        data/rig.json read and write
     server/osc.js          OSC and TCP line parsing
+    server/rig-lanes.js    resolve A–D lane letters from the current rig.json
+    server/show-lock.js    Show Lock allow/refuse rules and refusal messages
     server/drivers/        base.js (interface), pjlink.js, panasonic.js, pulse.js, simulator.js
     public/                index.html, app.css, app.js
 
@@ -114,7 +128,7 @@ and mirror arrangements differ even between projectors of the same model.
 Built-in Frozen WST show presets live on the Presets tab alongside operator-saved captures.
 They only send commands the active driver supports (PJLink, Panasonic native, Barco Pulse, simulator).
 Steps a driver cannot do — test patterns on PJLink, or show/backup inputs until `rig.showInputs` is set — are marked **unsupported/unverified** and are not faked.
-Blackout is shutter-only and stays available under Show Lock; its OSC address is `/proj/all/shutter 1`.
+Blackout is shutter-only (`1` = shutter closed) and stays available under Show Lock; its OSC address is `/proj/all/shutter 1`. Per-lane close uses `/proj/A/shutter 1` through `/proj/D/shutter 1`, resolved from the current rig. Portals-only and stage-only also follow those lane letters, not a hard-coded slot map.
 Strike closes shutters first, then keeps the existing two-tap power-off confirm.
 
 ## Lens in presets
