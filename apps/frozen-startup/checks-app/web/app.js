@@ -118,7 +118,7 @@
     } else {
       const failed = state.checks.find(ch => (state.results[ch.id] || {}).status === 'FAIL');
       const r = failed ? state.results[failed.id] : {};
-      setStatus('fail', '!', 'FAIL · ' + (failed ? failed.label : 'Computer setup'), summary + ' No automatic repair runs.');
+      setStatus('fail', '!', 'FAIL · ' + (failed ? failed.label : 'Computer setup'), summary + ' Automatic startup recovery has stopped.');
       setAction('Next: ' + (r.next || state.result.message), 'Correct the fault, then retry. The other checks did not run.', 'Retry check', !state.busy, 'retry');
     }
     const r = state.readiness;

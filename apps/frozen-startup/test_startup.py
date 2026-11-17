@@ -45,7 +45,7 @@ class Tests(unittest.TestCase):
         r = self.execute(b)
         self.assertTrue(r['computerReady'])
         self.assertFalse(r['showNightReady'])
-        self.assertEqual([c for c in b.calls if c != 'observe'], ['capabilities', 'restore', 'openShow', 'fullscreen'])
+        self.assertEqual([c for c in b.calls if c != 'observe'], ['capabilities', 'openShow', 'fullscreen'])
 
     def test_changed_ids_use_current_handles(self):
         for d in self.snapshot['displays']:
@@ -99,6 +99,21 @@ class Tests(unittest.TestCase):
         self.assertFalse(self.execute(b)['computerReady'])
         self.assertNotIn('openShow', b.calls)
 
+    def test_desktop_restore_retries_once_after_stable_readback(self):
+        class DelayedRestore(FixtureBridge):
+            def call(self, action, payload):
+                if action == 'restore' and 'restore' not in self.calls:
+                    self.calls.append(action)
+                    return {}
+                return super().call(action, payload)
+
+        self.snapshot['displays'][1]['mode']['pixelHeight'] = 1080
+        bridge = DelayedRestore(self.snapshot)
+        result = self.execute(bridge)
+        self.assertTrue(result['computerReady'])
+        self.assertEqual(bridge.calls.count('restore'), 2)
+        self.assertTrue(any('Retrying approved display' in event for event in result['events']))
+
     def test_wrong_or_unavailable_routing_blocks_fullscreen(self):
         for routes in ({}, {'CH1': 10}, None):
             s = copy.deepcopy(self.snapshot)
@@ -128,6 +143,7 @@ class Tests(unittest.TestCase):
                     self.snapshot['displays'].pop()
                     return {}
                 return super().call(action, payload)
+        self.snapshot['displays'][1]['mode']['pixelHeight'] = 1080
         b = Partial(self.snapshot)
         self.assertFalse(self.execute(b)['computerReady'])
         self.assertNotIn('openShow', b.calls)
@@ -197,11 +213,11 @@ class Tests(unittest.TestCase):
         class Race(FixtureBridge):
             def call(self, action, payload):
                 result = super().call(action, payload)
-                # After the third stable routing observation, change the next read.
+                # After three show reads and three routing reads, change the next read.
                 if action == 'openShow': self.routing_reads = 0
                 if action == 'observe' and hasattr(self, 'routing_reads'):
                     self.routing_reads += 1
-                    if self.routing_reads == 4: result['displays'][1]['id'] += 100
+                    if self.routing_reads == 7: result['displays'][1]['id'] += 100
                 return result
         b = Race(self.snapshot)
         self.assertFalse(self.execute(b)['computerReady'])

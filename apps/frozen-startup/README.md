@@ -64,12 +64,13 @@ The examples contain no production host, address, serial number or show path.
 
 ## Startup and warm checks
 
-Startup waits for three identical observations, restores the approved desktop,
-waits for verified configuration, opens the show, checks its routing and enables
-fullscreen. Each settling stage has a 60-second deadline. A failed command or
-check stops the sequence and writes a receipt. Partial changes are recorded by
-the failed stage; restoration is not silently claimed or retried indefinitely.
-An operator can explicitly retry after correcting the fault.
+Startup waits for three identical observations. It preserves a desktop that
+already matches the approved profile. If the layout needs restoration and
+readback still differs after settling, it may apply the approved layout once
+more after all five physical display identities settle again. The receipt
+records the retry. An explicit bridge error stops the run. Startup verifies
+the approved show and its routing before enabling fullscreen. An operator can
+retry after correcting a persistent fault.
 
 `--warm` reads and checks an already-running system. It issues only `observe`.
 The helper exits after its check. It does not rearrange displays during a show.
