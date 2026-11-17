@@ -120,20 +120,23 @@ def display_problems(profile, snapshot):
     return problems
 
 
+def show_problems(profile, snapshot):
+    mapped = resolve(profile, snapshot)
+    millumin = snapshot.get('millumin', {})
+    if not isinstance(millumin, dict) or millumin.get('showSHA256') != profile['showSHA256']:
+        return ['Open the approved show version.']
+    if millumin.get('controlDisplayID') != mapped['control']['id']:
+        return ['Move the Millumin control window to BenQ.']
+    return []
+
+
 def routing_problems(profile, snapshot):
     mapped = resolve(profile, snapshot)
     millumin = snapshot.get('millumin', {})
-    if not isinstance(millumin, dict):
-        return ['Millumin routing feedback is unavailable.']
     wanted = {canvas: mapped[lane]['id'] for canvas, lane in profile['routes'].items()}
-    errors = []
-    if millumin.get('showSHA256') != profile['showSHA256']:
-        errors.append('Open the approved show version.')
-    if millumin.get('routes') != wanted:
-        errors.append('Check Millumin canvas destinations.')
-    if millumin.get('controlDisplayID') != mapped['control']['id']:
-        errors.append('Move the Millumin control window to BenQ.')
-    return errors
+    if not isinstance(millumin, dict) or millumin.get('routes') != wanted:
+        return ['Check Millumin canvas destinations.']
+    return []
 
 
 CHECKS = (
@@ -293,14 +296,29 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
         snapshot = wait_for(lambda s: [])
         passed('displays', '5 displays detected; identities match the profile')
         begin('desktop')
-        if not warm:
-            mapped = resolve(profile, snapshot)
+        def restore_desktop(observation):
+            mapped = resolve(profile, observation)
+            bridge.call('restore', {'displays': [
+                {'id': mapped[d['lane']]['id'], 'connector': d['connector'],
+                 'identity': d['identity'], 'mode': d['mode']} for d in profile['displays']
+            ]})
+
+        needs_restore = not warm and bool(display_problems(profile, snapshot))
+        if needs_restore:
             receipt['beforeRestore'] = snapshot
             record('Restoring approved display modes and arrangement')
-            bridge.call('restore', {'displays': [{'id': mapped[d['lane']]['id'], 'connector': d['connector'],
-                                                'identity': d['identity'], 'mode': d['mode']} for d in profile['displays']]})
+            restore_desktop(snapshot)
         record('Verifying display modes and arrangement')
-        snapshot = wait_for(lambda s: display_problems(profile, s))
+        try:
+            snapshot = wait_for(lambda s: display_problems(profile, s))
+        except StartupError:
+            if not needs_restore:
+                raise
+            snapshot = wait_for(lambda s: [])
+            if display_problems(profile, snapshot):
+                record('Retrying approved display restoration once using current display identities')
+                restore_desktop(snapshot)
+            snapshot = wait_for(lambda s: display_problems(profile, s))
         passed('desktop', '5 displays match approved modes and layout')
         begin('show')
         if not warm:
@@ -309,9 +327,12 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
             record('Opening approved show')
             bridge.call('openShow', {'showSHA256': profile['showSHA256'], 'showPath': profile['showPath'],
                                     'controlDisplayID': mapped['control']['id']})
-        record('Verifying Millumin routing')
-        snapshot = wait_for(lambda s: display_problems(profile, s) + routing_problems(profile, s))
+        snapshot = wait_for(lambda s: display_problems(profile, s) + show_problems(profile, s))
         passed('show', 'Saved file hash matches; control window on BenQ')
+        begin('routes')
+        record('Verifying Millumin routing')
+        snapshot = wait_for(lambda s: display_problems(profile, s) + show_problems(profile, s)
+                            + routing_problems(profile, s))
         passed('routes', 'All %d assigned canvases match' % len(profile['routes']))
         begin('fullscreen')
         if not warm:
@@ -321,6 +342,7 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
                 raise StartupError('Displays changed before fullscreen. Retry the startup check.')
             bridge.call('fullscreen', {})
             snapshot = wait_for(lambda s: display_problems(profile, s) + routing_problems(profile, s)
+                                + show_problems(profile, s)
                                 + ([] if s.get('millumin', {}).get('fullscreen') is True else ['Check fullscreen output.']))
         elif snapshot.get('millumin', {}).get('fullscreen') is not True:
             raise StartupError('Check fullscreen output.')
@@ -329,9 +351,6 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
     except StartupError as error:
         receipt['message'] = str(error)
         failed = state['current']
-        if failed == 'show' and 'approved show' not in str(error).lower() and 'control window' not in str(error).lower():
-            passed('show', 'Saved file hash matches; control window on BenQ')
-            failed = 'routes'
         if failed is None:
             failed = 'displays'
         send({'type': 'check', 'id': failed, 'label': dict(CHECKS)[failed], 'status': 'FAIL',
@@ -365,7 +384,8 @@ def readiness(receipt, evidence, snapshot, profile, now=None):
                  and evidence.get('runID') == receipt['runID']
                  and bool(evidence.get('operator', '').strip())
                  and all(evidence.get(k) is True for k in CREW_CHECKS)
-                 and not display_problems(profile, snapshot) and not routing_problems(profile, snapshot)
+                 and not display_problems(profile, snapshot) and not show_problems(profile, snapshot)
+                 and not routing_problems(profile, snapshot)
                  and snapshot.get('millumin', {}).get('fullscreen') is True)
     except (KeyError, ValueError, TypeError, AttributeError, StartupError):
         valid = False
