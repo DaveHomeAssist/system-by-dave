@@ -55,6 +55,9 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
   const CLOSED = 'connection closed before PJLink reply';
   let live = null, digestEveryCommand = false, chain = Promise.resolve();
   const cancelled = signal => signal?.reason || new Error('Projector poll cancelled');
+  // A projector that drops a session may close it or reset it. A reset reaches the
+  // driver as ECONNRESET, or as EPIPE when the write meets the closed socket first.
+  const sessionGone = error => error?.message === CLOSED || error?.code === 'ECONNRESET' || error?.code === 'EPIPE';
   function dropSession(session) {
     if (!session) return;
     if (!session.dead) session.dead = new Error(CLOSED);
@@ -128,10 +131,11 @@ export function pjlinkDriver({ host, port = 4352, password = '', timeoutMs = 500
           let line;
           try { line = await nextLine(session, signal); }
           catch (error) {
-            // The command went into a socket the projector had already closed: after an
-            // earlier reply (one-reply gear), or an idle session it dropped between polls.
+            // The command went into a socket the projector had already closed or reset: after
+            // an earlier reply (one-reply gear), or an idle session it dropped between polls.
+            // Only status queries run here, so asking again never repeats a control command.
             const staleSession = reused && !consumed && !retriedFresh;
-            if (error.message === CLOSED && !signal?.aborted && (consumed || staleSession)) { if (!consumed) retriedFresh = true; reopen = true; break; }
+            if (sessionGone(error) && !signal?.aborted && (consumed || staleSession)) { if (!consumed) retriedFresh = true; reopen = true; break; }
             throw error;
           }
           if (line === 'PJLINK ERRA') {
