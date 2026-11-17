@@ -214,6 +214,7 @@ health = createHealthReports({
   connection: (slot) => connections.get(slot),
   events: () => rig.events,
   readTelemetry, // shared with the Thermal watch below, through the coordinated reader
+  recentAir: (p) => thermal.latest(p.slot),
   describeError: (p, e) => connectionError(store.projector(p.slot) || p, e),
   publish: healthConfig.notion.databaseId ? createNotionPublisher({ databaseId: healthConfig.notion.databaseId, token: notionTokenReader({ keychain: !SIM }) }) : null,
   powerOnDelayMs: Number(process.env.PROJCTL_HEALTH_POWER_ON_DELAY_MS || 120000),

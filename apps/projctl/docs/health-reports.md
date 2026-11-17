@@ -91,9 +91,20 @@ valid intake reading. Missing alarm feedback still produces an incomplete
 assessment. Control writes remain independent of this read queue.
 
 This adapts the read coordination, partial readings and retry scope reviewed in
-PR #463 to the current relay. Fallback samples and peak columns in reports are
-outside this change; Thermal watch history lives in the relay's Thermal backend
-(`server/thermal.js`).
+PR #463 to the current relay. Thermal watch history lives in the relay's Thermal
+backend (`server/thermal.js`). Peak columns in reports are not implemented.
+
+When a reached unit's report-time read returns no intake or ambient value, the
+report uses that unit's newest Thermal watch reading if it is at most three
+minutes old. The cell reads, for example, `36.5 (Thermal watch sample 17:09:00
+EST)`, the findings name the unit, and the read error stays in the Flags cell.
+The saved row carries `intakeSource` (`report` or `watch`) and `intakeAt`. An
+older sample is not used and the unit stays "Temperatures not read". A
+report-time value always takes precedence, and an unreached unit never receives
+a sample. Headroom and the watch verdict are calculated from the sample, so a
+warm unit is not hidden by a dropped connection. The watch is in memory and
+resets when a slot's address or driver changes, so a sample cannot come from a
+different projector or from before a relay restart.
 ECP-1.0 revision 1.0 applies. Existing units, identities and saved report shapes
 are preserved, with optional read-error detail added to partial results.
 
