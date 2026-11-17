@@ -567,6 +567,14 @@ window.AVWorkspaceVersion="v20261114-offline-cache-receipts";
     const count=document.createElement('output');count.setAttribute('aria-live','polite');
     nav.append(back,count,next);panel.append(win,nav);panel.classList.add('av-paged');
     let page=0,total=1,width=0,gap=16;
+    function measure(){
+      if(!isVisible(panel)||win.clientWidth===0||win.clientHeight===0)return false;
+      width=win.getBoundingClientRect().width;
+      gap=parseFloat(getComputedStyle(root).getPropertyValue('--av-page-gap'))||16;
+      content.style.setProperty('--av-page-width',`${width}px`);
+      total=Math.max(1,Math.ceil((content.scrollWidth+gap)/(width+gap)));
+      return true;
+    }
     function show(value){
       page=Math.max(0,Math.min(total-1,value));
       content.style.setProperty('--av-page-offset',`${-page*(width+gap)}px`);
@@ -576,14 +584,15 @@ window.AVWorkspaceVersion="v20261114-offline-cache-receipts";
     }
     const api={
       refresh(){
-        if(!isVisible(panel)||win.clientWidth===0||win.clientHeight===0)return;
-        width=win.getBoundingClientRect().width;gap=parseFloat(getComputedStyle(root).getPropertyValue('--av-page-gap'))||16;
-        content.style.setProperty('--av-page-width',`${width}px`);
-        total=Math.max(1,Math.ceil((content.scrollWidth+gap)/(width+gap)));
+        if(!measure())return;
         const active=document.activeElement;
         if(content.contains(active))api.reveal(active);else show(page);
       },
+      // Resize refreshes on the next frame. A focus in that gap used to page with the
+      // previous width and page count, which clamped the control off screen (the LED
+      // calculator's 360×800 dark case on the Pages runner).
       reveal(element){
+        if(!measure())return;
         const x=element.getBoundingClientRect().left-content.getBoundingClientRect().left;
         show(Math.floor((x+1)/(width+gap)));
       }

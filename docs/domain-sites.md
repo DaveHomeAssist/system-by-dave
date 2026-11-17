@@ -67,10 +67,15 @@ move again.
    verifying the new origin in the existing Google client and backend
    `FMP_ALLOWED_ORIGINS`. It records external configuration evidence; it does not
    prove Gmail delivery or a Notion save.
-4. Publish the walk first with `scripts/publish_domain_site.sh`. Wait up to ten
-   minutes for HTTPS to serve the exact staged `source.json`, walk, alias and
-   transfer page. Missing DNS, TLS, target repository, deploy key, or stale output
-   stops the release before systembydave.com or housevideo.app redirects change.
+4. Publish the walk first with `scripts/publish_domain_site.sh`. That script
+   waits until the destination repository's Pages run for the pushed commit
+   succeeds. The live check then compares HTTPS with the staged `source.json`,
+   walk, alias and transfer page. GitHub Pages caches those files for ten
+   minutes and ignores the `?release=` query, so a response that is still the
+   previous release is waited out until its `Age` reaches `max-age`, once.
+   Missing DNS, TLS, target repository, deploy key, or a destination run that
+   fails stops the release before systembydave.com or housevideo.app redirects
+   change.
 5. Deploy systembydave.com, then publish housevideo.app and avbydave.com with
    their respective `HOUSEVIDEO_DEPLOY_KEY` and `AVBYDAVE_DEPLOY_KEY`. Each target
    repository's own Pages workflow deploys its push; each key can write only its
