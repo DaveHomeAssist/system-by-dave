@@ -1,5 +1,10 @@
 # Changelog
 
+## Projctl health report Thermal watch fallback, 2026-11-17
+
+- When a reached projector's report-time temperature read fails, the health report uses that unit's newest Thermal watch reading if it is at most three minutes old, and labels it with its time. The findings name the unit and the read error stays visible. An older sample is not used.
+- Tests now pin three behaviours first written for PR 463: report retries spaced four seconds apart, a Panasonic intake reading kept when the connection drops on a later sensor, and the Thermal watch fallback.
+
 ## Frozen workspace: one label per view, 2026-11-17
 
 - The Home card "Operator controls" is now "Live controls", the name the More menu already uses for the same view. Both Run review links carry the same separate-page cue: an arrow, and "(separate page)" for screen readers.
