@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import {gunzipSync, gzipSync} from 'node:zlib';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {installReviewPage, publishReviewFavicons} from './hosting/scripts/review-favicons.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url));
 for(const name of ['reference-view.js','reference-view.css','projector-connection.js','status-feedback.js','frozen-theme.js','frozen-theme.css'])fs.copyFileSync(path.resolve(root,'../apps/projctl/public',name),path.join(root,name));
 const worker=path.join(root,'hosting/worker/index.js');
@@ -36,6 +37,9 @@ try{priorBinary=JSON.parse(source.slice(source.lastIndexOf('const BINARY = ')+'c
 const binary={};
 for(const [url,file] of Object.entries(binaryFiles)){const bytes=fs.readFileSync(path.join(root,file));let encoded=gzipSync(bytes).toString('base64');try{const prior=priorBinary[url];if(prior&&gunzipSync(Buffer.from(prior,'base64')).equals(bytes))encoded=prior;}catch{/* Recompress when the saved payload no longer matches. */}binary[url]=encoded;}
 const assets=Object.fromEntries(Object.entries(files).map(([url,file])=>[url,fs.readFileSync(path.join(root,file),'utf8')]));
+const reviewRoot=path.join(root,'hosting/review');
+publishReviewFavicons(assets, binary, {reviewRoot, shellRoot: root});
+installReviewPage(assets, fs.readFileSync(path.join(reviewRoot,'rehearsal-review.html'),'utf8'));
 fs.writeFileSync(worker,'const ASSETS = '+JSON.stringify(assets)+';\nconst BINARY = '+JSON.stringify(binary)+source.slice(seam));
 if(!process.argv.includes('--hosted-only')){
 const local=path.resolve(root,'../apps/projctl/public/workspace');

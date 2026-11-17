@@ -1,0 +1,71 @@
+{
+  "page": "/run-review/",
+  "files": [
+    {
+      "relativePath": "favicons/favicon-01-classic.png",
+      "publicPath": "/run-review/favicons/favicon-01-classic.png",
+      "contentType": "image/png",
+      "workerMap": "BINARY"
+    },
+    {
+      "relativePath": "favicons/favicon-01-classic.svg",
+      "publicPath": "/run-review/favicons/favicon-01-classic.svg",
+      "contentType": "image/svg+xml",
+      "workerMap": "ASSETS"
+    },
+    {
+      "relativePath": "favicons/favicon-02-inverted.svg",
+      "publicPath": "/run-review/favicons/favicon-02-inverted.svg",
+      "contentType": "image/svg+xml",
+      "workerMap": "ASSETS"
+    },
+    {
+      "relativePath": "favicons/favicon-03-rose.svg",
+      "publicPath": "/run-review/favicons/favicon-03-rose.svg",
+      "contentType": "image/svg+xml",
+      "workerMap": "ASSETS"
+    },
+    {
+      "relativePath": "favicons/favicon-04-round.svg",
+      "publicPath": "/run-review/favicons/favicon-04-round.svg",
+      "contentType": "image/svg+xml",
+      "workerMap": "ASSETS"
+    },
+    {
+      "relativePath": "favicons/favicon-05-bold.svg",
+      "publicPath": "/run-review/favicons/favicon-05-bold.svg",
+      "contentType": "image/svg+xml",
+      "workerMap": "ASSETS"
+    },
+    {
+      "relativePath": "favicons/favicon-06-beads.svg",
+      "publicPath": "/run-review/favicons/favicon-06-beads.svg",
+      "contentType": "image/svg+xml",
+      "workerMap": "ASSETS"
+    },
+    {
+      "relativePath": "favicons/favicon-07-crystal.svg",
+      "publicPath": "/run-review/favicons/favicon-07-crystal.svg",
+      "contentType": "image/svg+xml",
+      "workerMap": "ASSETS"
+    },
+    {
+      "relativePath": "favicons/favicon-08-bloom.svg",
+      "publicPath": "/run-review/favicons/favicon-08-bloom.svg",
+      "contentType": "image/svg+xml",
+      "workerMap": "ASSETS"
+    },
+    {
+      "relativePath": "favicons/favicon-09-ice.svg",
+      "publicPath": "/run-review/favicons/favicon-09-ice.svg",
+      "contentType": "image/svg+xml",
+      "workerMap": "ASSETS"
+    },
+    {
+      "relativePath": "frozen-favicon.js",
+      "publicPath": "/run-review/frozen-favicon.js",
+      "contentType": "text/javascript",
+      "workerMap": "ASSETS"
+    }
+  ]
+}
