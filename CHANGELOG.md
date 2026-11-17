@@ -1,5 +1,14 @@
 # Changelog
 
+## Pages deploy flakes, 2026-11-17
+
+- The walk live check was reading `source.json` in the second after the git push, before `housevideo-walk`'s Pages run replaced the origin. GitHub Pages caches that response for `max-age=600` and ignores the `?release=` query, and the checker polled that same cached body until a deadline of exactly ten minutes. The publisher now waits until the destination Pages run for the pushed commit succeeds. A response that is still the previous release is waited out until its `Age` reaches `max-age`, once. The source workflow's concurrency group already queues the next main push; it is not the overlap.
+- LED calculator paging remeasures the window when focus moves a control. A resize still refreshes on the next frame, and focusing during that gap used the previous page count, which left Mode outside the 360×800 page (both workspace deploy failures).
+- The signal-flow rename probe waits until the reloaded diagram has stopped moving before it double-clicks. React Flow's drag threshold is 1px, so a double-click during the post-reload fit never opened the dialog.
+- The Stage 3D offline reload waits, while still offline, for the page to leave its synchronous "installing" state. The calculated facts were already correct; the single sample ran after the network was restored.
+- Console recovery reads the status until the debounced draft conflict is reported. A single read 750ms later still showed "Plan loaded from this browser." when the runner was busy.
+- The November 7 Chrome startup failure in the theme probe was already retried by `scripts/chrome_launch.js`. The deploy job still runs the browser probes: the path-filtered pull-request workflows do not run on the merge commit being published, and these probes run one after another, not in parallel.
+
 ## Frozen cue 13 photo replacement, 2026-11-16
 
 - Replace the selected cue 13 Before photo in every shared review mode, thumbnail, preview and printed packet. Old public image links now serve the clean replacement too. Keep the actual replacement timestamp and provenance visible, while preserving raw capture archives, note identities and coverage.
