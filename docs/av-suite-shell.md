@@ -293,7 +293,11 @@ The detailed previous host regressions are retained behind
 runner serves their ignored `apps/<family>/dist/` output as disposable fixtures
 and invokes the original import, recovery, data and layout checks with
 `AV_RETAINED_HOST=1`. These fixtures establish source compatibility, not public
-standalone availability. The Pages pipeline excludes all `dist` directories,
+standalone availability. Each probe has a four-minute limit
+(`AV_RETAINED_PROBE_LIMIT_MS`); a probe that runs past it is stopped and named
+in the error. In the Verify AV Video workflow the suite runs as its own
+`retained` job, because inside the `video` job it pushed runs to the
+15-minute limit (17 November 2026). The Pages pipeline excludes all `dist` directories,
 and the release verifier rejects a standalone bundle replacing any route stub.
 
 ## Two-step chooser, 29 October 2026
