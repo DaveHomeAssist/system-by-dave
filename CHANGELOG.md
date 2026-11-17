@@ -4,6 +4,7 @@
 
 - When a reached projector's report-time temperature read fails, the health report uses that unit's newest Thermal watch reading if it is at most three minutes old, and labels it with its time. The findings name the unit and the read error stays visible. An older sample is not used.
 - Tests now pin three behaviours first written for PR 463: report retries spaced four seconds apart, a Panasonic intake reading kept when the connection drops on a later sensor, and the Thermal watch fallback.
+
 ## Frozen Monitor feed art matched to the house, 2026-11-17
 
 - Redraw the Monitor multiview art for all four lanes (`apps/projctl/public/monitor/monitor-art.js`, hand-written SVG). Shapes follow the Walnut Street Theatre work-light photos: tall, pointed crystal portals with the apex just outboard of centre and the outer spike pillar; eight-armed folk snowflakes around a large frameless rosemaling flower (about 75% of the panel width); A and D as exact mirror images; the X-truss header with diamond snowflake panels around a round rosemaling medallion.
