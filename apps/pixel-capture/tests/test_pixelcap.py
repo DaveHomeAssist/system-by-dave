@@ -336,6 +336,16 @@ class InspectorTests(unittest.TestCase):
         self.assertEqual(stale["invalidLines"], 1)
         self.assertTrue(any("unicast" in a for a in stale["alerts"]))
 
+    def test_expected_universes(self):
+        rows = [{"type": "start", "unixSeconds": 1.0}]
+        for u in (221, 222, 223, 224):
+            rows.append({"type": "window", "protocol": "artnet", "universe": u, "packets": 1, "unixSeconds": 2.0})
+        report = inspect_capture.inspect(self.write(rows), now=3,
+                                         expect=inspect_capture.parse_expect("artnet:221-223, artnet:227-229"))
+        self.assertEqual(report["expected"]["missing"], ["artnet:227", "artnet:228", "artnet:229"])
+        self.assertEqual(report["expected"]["unexpected"], ["artnet:224"])
+        self.assertEqual(len(report["expected"]["matched"]), 3)
+
     def test_inspector_opens_no_sockets(self):
         path = self.write([{"type": "start", "unixSeconds": 1.0}])
         with mock.patch.object(socket, "socket", side_effect=AssertionError("socket opened")):

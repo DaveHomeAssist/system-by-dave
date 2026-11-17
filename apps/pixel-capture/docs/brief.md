@@ -104,8 +104,10 @@ multicast groups, because that sends IGMP reports.
 
 Also needed before any install, and not a choice: the universe numbers, the
 decoder identity and the destination addresses from the patch reconciliation.
-The recorder discovers universes from traffic and does not need them to run,
-but the review cannot say "the right universe" without them.
+The recorder discovers universes from traffic and does not need them to run.
+`inspect_capture --expect` compares what was seen against the patch, so one
+rehearsal capture settles which start universes and which protocol the show
+actually sends.
 
 ## Smallest useful slice (built in this change)
 
@@ -121,7 +123,7 @@ but the review cannot say "the right universe" without them.
   cue-by-universe table, and a JSON association export.
 - `pixelcap.fixture`: a synthetic generator that refuses non-loopback targets
   by default, with an instant pcap mode.
-- Tests: 29 unittest cases, including proof that nothing transmits.
+- Tests: 30 unittest cases, including proof that nothing transmits.
 
 ## Exclusions
 

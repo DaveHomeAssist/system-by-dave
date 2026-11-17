@@ -34,8 +34,8 @@ python3 -m pixelcap.recorder --input pcap --pcap capture.pcap --out pixels.jsonl
 # UDP input (only sees traffic addressed to this host; default bind is loopback):
 python3 -m pixelcap.recorder --out pixels.jsonl --bind 127.0.0.1
 
-# Health (read-only):
-python3 -m pixelcap.inspect_capture pixels.jsonl
+# Health (read-only); --expect lists the patched universes, so missing or unexpected ones are flagged:
+python3 -m pixelcap.inspect_capture pixels.jsonl --expect artnet:0-3,sacn:1
 
 # Viewer against a MIDI capture session (reads midi.jsonl and session.json clockOffset):
 python3 -m pixelcap.viewer --pixels pixels.jsonl --midi-session SESSION_DIR --out pixels-viewer.html --json cues.json

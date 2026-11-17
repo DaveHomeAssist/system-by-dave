@@ -11,7 +11,18 @@ import sys
 import time
 
 
-def inspect(path, now=None, heartbeat_slack=2.5):
+def parse_expect(spec):
+    """'artnet:221-223,artnet:227,sacn:1' -> {'artnet:221', ...}"""
+    keys = set()
+    for part in filter(None, (p.strip() for p in (spec or "").split(","))):
+        proto, _, numbers = part.partition(":")
+        lo, _, hi = numbers.partition("-")
+        for n in range(int(lo), int(hi or lo) + 1):
+            keys.add("%s:%d" % (proto.strip().lower(), n))
+    return keys
+
+
+def inspect(path, now=None, heartbeat_slack=2.5, expect=None):
     now = time.time() if now is None else now
     result = {"file": str(path), "checkedAt": round(now, 3)}
     types = collections.Counter()
@@ -87,18 +98,32 @@ def inspect(path, now=None, heartbeat_slack=2.5):
     if start and start.get("input") == "udp" and not universes:
         alerts.append("No universes seen. A UDP listener only sees traffic addressed to it; unicast to the decoders "
                       "needs a mirror port or a packet capture on the sender.")
+    if expect:
+        seen = set(universes)
+        result["expected"] = {"missing": sorted(expect - seen, key=_order), "unexpected": sorted(seen - expect, key=_order),
+                              "matched": sorted(expect & seen, key=_order)}
+        if result["expected"]["missing"]:
+            alerts.append("Expected but not seen: %s" % ", ".join(result["expected"]["missing"]))
+        if result["expected"]["unexpected"]:
+            alerts.append("Seen but not expected: %s" % ", ".join(result["expected"]["unexpected"]))
     result["status"] = status
     result["alerts"] = alerts
     result["lastRow"] = last_row
     return result
 
 
+def _order(key):
+    proto, _, number = key.partition(":")
+    return proto, int(number) if number.isdigit() else -1
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("jsonl")
     p.add_argument("--at", type=float, help="evaluate heartbeat age at this unix time (default now)")
+    p.add_argument("--expect", help="expected universes, e.g. artnet:221-223,artnet:227-229,artnet:200-211")
     args = p.parse_args(argv)
-    print(json.dumps(inspect(args.jsonl, args.at), indent=2))
+    print(json.dumps(inspect(args.jsonl, args.at, expect=parse_expect(args.expect)), indent=2))
     return 0
 
 
