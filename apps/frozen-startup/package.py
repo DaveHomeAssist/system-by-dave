@@ -7,7 +7,7 @@ import zipfile
 
 FILES = ('startup.py', 'README.md', 'BRIEF.md', 'test_startup.py',
          'example-profile.json', 'example-snapshot.json', 'package.py',
-         'mac_bridge.py', 'mac-displays.swift', 'millumin-readback.js', 'test_mac_bridge.py', 'build-mac.sh', 'LOCAL-ACCEPTANCE.md')
+         'mac_bridge.py', 'mac-displays.swift', 'millumin-readback.js', 'test_mac_bridge.py', 'build-mac.sh', 'LOCAL-ACCEPTANCE.md', 'test_check_stream.py')
 
 
 def build(destination, native=None):

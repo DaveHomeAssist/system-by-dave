@@ -57,6 +57,8 @@ body:has(#home-panel:not([hidden])) :focus-visible{outline-color:var(--snow-acce
 .snow-icon{width:28px;height:28px;color:var(--snow-accent);margin-bottom:2px;fill:none;stroke:currentColor;stroke-width:1.6}
 .home-panel .home-choices strong{font-size:clamp(17px,2vw,21px);font-weight:650;letter-spacing:-.02em;color:var(--snow-ink)}
 .home-panel .home-choices span{font-size:13px;line-height:1.45;font-weight:400;color:var(--snow-muted)}
+/* A cue inside a card title (the separate-page arrow) keeps the title's type, not the caption's. */
+.home-panel .home-choices strong span{font:inherit;letter-spacing:inherit;color:inherit}
 .snow-foot{margin:0;color:var(--snow-muted)}
 
 @media(max-width:680px){

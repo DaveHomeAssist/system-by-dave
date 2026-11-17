@@ -5,6 +5,12 @@
 - When a reached projector's report-time temperature read fails, the health report uses that unit's newest Thermal watch reading if it is at most three minutes old, and labels it with its time. The findings name the unit and the read error stays visible. An older sample is not used.
 - Tests now pin three behaviours first written for PR 463: report retries spaced four seconds apart, a Panasonic intake reading kept when the connection drops on a later sensor, and the Thermal watch fallback.
 
+## Frozen workspace: one label per view, 2026-11-17
+
+- The Home card "Operator controls" is now "Live controls", the name the More menu already uses for the same view. Both Run review links carry the same separate-page cue: an arrow, and "(separate page)" for screen readers.
+- Add `wst/navigation-contract.test.mjs`. It reads the four workspace menus and fails on a second name for a view, a reused label, a link to another page without the cue, an entry the router does not serve, or a local Projctl copy that differs from the published source. `npm run verify:public-navigation` now runs it with the existing workspace unit tests, so CI covers both.
+- The three Handoff collisions remain and are listed in the test as waiting on a decision. The brief, the later slices and the open decisions NAV-1 to NAV-5 are in `apps/projctl/docs/navigation-cohesion.md`. Nothing is published by this change, and the hosted worker snapshot is left for the next publication.
+
 ## Projctl PJLink session reset, 2026-11-17
 
 - A status poll whose held PJLink session was reset by the projector (ECONNRESET or EPIPE) now opens one new session and completes, as it already did for a plain close. Before, the poll failed and the unit read offline for that cycle. A reset on the replacement session still fails the poll. Control commands are unaffected: they use their own connection and are never repeated.

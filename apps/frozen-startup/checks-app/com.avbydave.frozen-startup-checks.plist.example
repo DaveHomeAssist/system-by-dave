@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Login trigger for restart 2 only. Install to ~/Library/LaunchAgents after restart 1 passes.
+     Replace INSTALL_DIR with the commissioned install folder. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.avbydave.frozen-startup-checks</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/open</string>
+    <string>-a</string>
+    <string>INSTALL_DIR/Frozen Startup Checks.app</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><false/>
+  <key>LimitLoadToSessionType</key><string>Aqua</string>
+  <key>ProcessType</key><string>Interactive</string>
+</dict>
+</plist>

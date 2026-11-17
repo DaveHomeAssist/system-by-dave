@@ -14,9 +14,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - run: python3 -B -m unittest discover -s apps/frozen-startup -p 'test_*.py' -v
       - run: python3 apps/frozen-startup/package.py /tmp/frozen-startup-package
+      - run: node --check apps/frozen-startup/checks-app/web/app.js
   native:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - run: bash apps/frozen-startup/build-mac.sh /tmp/frozen-native
+      - run: bash apps/frozen-startup/checks-app/build-app.sh /tmp/frozen-checks-app
       - run: python3 -B -m unittest discover -s apps/frozen-startup -p 'test_*.py' -v
