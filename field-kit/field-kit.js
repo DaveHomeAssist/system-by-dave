@@ -1,9 +1,9 @@
-/* Field Kit draft page (docs/launch/checkout.md).
+/* Field Kit page (docs/launch/checkout.md).
    Checkout stays disabled until window.SBD_LAUNCH.fieldKit.checkout names a
    provider and a valid link on that provider's site (js/sbd-checkout.js), AND
-   every Dave-approval block (data-dave-placeholder: delivery, statement
-   descriptor, refunds, licence) has been approved and its marker
-   removed, AND fieldKit.priceLabel is a real price. That interlock keeps the page from selling before the terms exist.
+   no Dave-approval block is still marked data-dave-placeholder (the delivery,
+   statement descriptor, refund and licence text was approved on 2026-11-01),
+   AND fieldKit.priceLabel is a real price. That interlock keeps the page from selling before the terms exist.
    Events go to the no-op dispatcher (js/sbd-events.js). */
 (function () {
   'use strict';
@@ -42,6 +42,8 @@
   buy.href = checkout.url;
   buy.hidden = false;
   if (off) off.hidden = true;
+  var status = document.getElementById('kit-status');
+  if (status) status.hidden = true;
   if (note) note.textContent = 'Secure checkout by ' + checkout.label + '. Your download link appears right after payment.';
   buy.addEventListener('click', function () { events.track('kit_click', { placement: 'field-kit', provider: checkout.provider }); });
 

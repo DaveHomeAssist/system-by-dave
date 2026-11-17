@@ -1,11 +1,11 @@
 # Field Kit checkout
 
-Status: **closed**. `field-kit/` is a noindex draft that isn't in the sitemap.
-The console's navigation and first-visit box on avbydave.com link to it (whether
-they should before checkout opens is open choice HR-D9 in
-`docs/next-steps/av-by-dave.json`). It shows the $12 price and a disabled
-"Checkout not open yet" button. Paid kit files are **not** in this repository. Only the
+Status: **Payment Link live; download hash empty**. The page shows the $12 price and a Buy button for `https://buy.stripe.com/cNifZg4N98oy776fKgdEs00`. `field-kit/index.html` stays `noindex,nofollow` in this repo; while checkout is live the publish step marks the avbydave.com copy `index,follow` and lists `/field-kit/` (Search indexing, below). `fieldKit.download.sha256` is `[]`, so `field-kit/thanks/` shows the email-me card until Dave registers the kit share link. Paid kit files are **not** in this repository. Only the
 blurred preview images in `field-kit/img/` are.
+
+The console's navigation and first-visit box on avbydave.com link to it (whether
+they should before the download link is registered is open choice HR-D9 in
+`docs/next-steps/av-by-dave.json`).
 
 Code: `js/sbd-checkout.js` (validation), `field-kit/field-kit.js` (button),
 config in `js/sbd-launch-config.js` (`fieldKit`).
@@ -17,11 +17,10 @@ Checkout opens only when **all three** of these are true:
 1. `fieldKit.checkout` names a provider and an HTTPS link on that provider's own
    hosts. Anything else stays closed: another host, `http:`, a typo or an
    unknown provider.
-2. Every Dave-approval block on `field-kit/index.html` (delivery, statement
-   descriptor, refunds, licence; marked `data-dave-placeholder`) has been
-   approved or replaced. Delete the `data-dave-placeholder` attribute with each
-   one. While any remain, the button stays disabled and the console says how
-   many are left.
+2. No block on `field-kit/index.html` is marked `data-dave-placeholder`. The
+   delivery, statement descriptor, refund and licence text was approved on
+   2026-11-01 and the markers removed. Re-adding the attribute to any block
+   closes checkout again, and the console says how many are left.
 3. `fieldKit.priceLabel` is a real price. `'Price TBD'`, an empty string or a
    `[DAVE: …]` placeholder keeps checkout closed and the page shows "Price TBD".
 
@@ -42,14 +41,25 @@ placeholder, 1 = a check failed.
 
 ## Chosen: Stripe Payment Links (2026-10-19)
 
-The config ships `provider: 'stripe'` with the marked placeholder
-`url: '[DAVE: Stripe Payment Link]'` and `priceLabel: '$12'` (Dave, 2026-10-30),
-so checkout stays closed until a real `buy.stripe.com` link replaces the placeholder.
+The config ships `provider: 'stripe'`, `priceLabel: '$12'` (Dave, 2026-10-30) and
+the Payment Link `url: 'https://buy.stripe.com/cNifZg4N98oy776fKgdEs00'` (2026-11-01).
+Putting the `[DAVE: Stripe Payment Link]` placeholder back closes checkout.
 **Account:** a separate AV by Dave Stripe account (Dave, 2026-10-23), not the System
-by Dave one. Its statement descriptor isn't known yet, so `[STATEMENT DESCRIPTOR]`
-stays a placeholder. The four blocks on the page carry **DRAFT** wording for
-Dave to approve, including `[STATEMENT DESCRIPTOR]`. Dave's click-steps live
-outside the repo (`/workspace/launch/setup-stripe.md`).
+by Dave one. Statement descriptor: **AVBYDAVE FIELD KIT** (18 characters; set it
+in that account's Stripe settings so the card statement matches the page). The
+Payment Link went in on 2026-11-01. Dave's click-steps live outside the repo
+(`/workspace/launch/setup-stripe.md`).
+
+## Search indexing
+
+`field-kit/index.html` is committed `noindex,nofollow`. When
+`js/sbd-launch-config.js` has a `buy.stripe.com` Payment Link and a real price,
+and no `data-dave-placeholder` block remains, the publish step
+(`scripts/stage_domain_sites.mjs` via `scripts/field_kit_launch.mjs`) stages the
+page as `index,follow` and `scripts/gen_sitemap.py --site avbydave` lists
+`/field-kit/` in the avbydave.com sitemap. Put the placeholder back and both
+revert. `scripts/field_kit_launch.test.mjs` (in `npm run verify:domain-sites`)
+keeps the JavaScript and Python rules in step.
 
 Delivery: Stripe doesn't host files. The Payment Link's "After payment" →
 "Don't show confirmation page" → redirect setting sends buyers to the noindex page
@@ -94,13 +104,10 @@ change and a push.
 
 1. Create the product with the provider, upload the kit files there (not to the
    repo), and set the price, tax and refund settings.
-2. Approve or edit the four DRAFT blocks (delivery, statement descriptor,
-   refunds, licence), fill in `[STATEMENT DESCRIPTOR]`, and remove the
-   `DRAFT, Dave …:` labels, the `kit-dave` class and the `data-dave-placeholder`
-   attribute.
-3. Replace the `url` placeholder in `js/sbd-launch-config.js` with the Payment
-   Link (or paste another provider's block below), and set `priceLabel` to the
-   Stripe price (for example `'$12'`):
+2. Done 2026-11-01: the delivery, statement descriptor, refund and licence
+   text is final and the DRAFT markers are gone.
+3. Done 2026-11-01: `url` is `https://buy.stripe.com/cNifZg4N98oy776fKgdEs00` and
+   `priceLabel` is `'$12'`. Another provider would paste its block below instead:
 
 | Provider | Paste | Link to copy | Modes |
 |---|---|---|---|
@@ -127,10 +134,9 @@ occasionally change the hosts their overlay needs.
    printed hash into `download: { sha256: ['…'] }` in `js/sbd-launch-config.js`.
    Use the same link in the Stripe redirect (Delivery, above). Without the hash
    buyers get "email me" instead of a download button.
-5. Decide whether the page stays `noindex`. At launch, remove `noindex,nofollow`,
-   add `field-kit/` to `STATIC_PAGES` in `scripts/gen_sitemap.py`, regenerate the
-   sitemaps, and lower the `unlisted` count in `scripts/verify_indexing_policy.js`
-   by one.
+5. Done by the indexing gate (Search indexing, above). The source stays
+   `noindex,nofollow`; the publish step swaps the avbydave.com copy and lists
+   `/field-kit/` only while checkout is live. Do not remove the source tag by hand.
 6. Test: `npm run probe:field-kit` (mock checks), then one real test purchase
    (Stripe test mode) from a phone. Confirm the redirect lands on
    `field-kit/thanks/` with a working download button, the receipt email

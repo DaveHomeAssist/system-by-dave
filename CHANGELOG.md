@@ -546,6 +546,12 @@
 - Add Edition 026, Active HDMI cable direction, with an Extron sourced lesson,
   matching diagram and SVG/PNG story card. Preserve previous editions and behavior.
 
+## November 1, 2026: Field Kit checkout
+
+- Wire the AV by Dave Stripe Payment Link ($12) into `js/sbd-launch-config.js`, finalise the Field Kit delivery, statement descriptor (AVBYDAVE FIELD KIT), refund and licence text, and remove the DRAFT markers, so the Buy button opens. `fieldKit.download.sha256` stays empty until Dave registers the kit share link, so the thanks page keeps the email-me card.
+- Index `/field-kit/` on avbydave.com only while checkout is live: the source stays noindex and the publish step swaps it, with a matching avbydave.com sitemap entry (`scripts/field_kit_launch.mjs`, `scripts/gen_sitemap.py`, tested in `verify:domain-sites`).
+- Add the avbydave.com/frame-sync/ Reel short link, a noindex redirect to systembydave.com/demos/frame-sync.html that keeps the query string.
+
 ## November 1, 2026: Video Engineering Daily
 
 - Add Edition 025, LED refresh and shutter exposure, with a Brompton sourced
