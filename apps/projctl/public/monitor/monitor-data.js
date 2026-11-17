@@ -30,7 +30,7 @@ export const ALERTS = [
 ];
 
 export const RELAYS = {
-  macbook: { name: 'MacBook relay', role: 'Control surface', build: '87e844b + PR 478 driver overlay', poll: '5 s', note: 'Working controller as of Nov 13.' },
+  macbook: { name: 'Mac Studio relay', role: 'Control relay', build: 'Read back from this relay', poll: '5 s', note: 'Control relay as of Nov 17. The MacBook relay (87e844b + PR 478) was the controller on Nov 13.' },
   studio: { name: 'Studio relay', role: 'Health Logs reporting', build: 'Installed relay', poll: '60 s · checked Nov 15', note: 'Kept on by decision RELAY-1, Nov 13.' },
 };
 
@@ -74,7 +74,8 @@ export const CHECKS = [
 export const CUES = [
   { cue: 'Projection playback', msg: 'Use the approved lighting cue sheet', dest: 'Millumin on the M5 Studio', route: 'Gio → mioXL → network MIDI' },
   { cue: 'Pixel playback', msg: 'Use the approved lighting cue sheet', dest: 'Millumin on the M1 Studio', route: 'Gio → mioXL → network MIDI' },
-  { cue: 'Power and shutter · A, B, D', msg: 'Use the saved Millumin mapping', dest: 'Projectors A, B and D', route: 'PJLink :4352' },
+  { cue: 'Shutter · A', msg: 'Held by Projctl, not Millumin', dest: 'Projector A', route: 'PJLink :4352 · Projctl' },
+  { cue: 'Power · A · power and shutter · B, D', msg: 'Use the saved Millumin mapping', dest: 'Projectors A, B and D', route: 'PJLink :4352' },
   { cue: 'Power and shutter · C', msg: 'Use the saved Millumin mapping', dest: 'Projector C', route: 'Pulse :9090 or PJLink :4352 · record which' },
   { cue: 'One safe test cue', msg: 'Agree with lighting and A1', dest: 'Both playback systems', route: 'Follow the approved cue sheet' },
   { cue: 'Opening reset', msg: 'Agree with lighting and A1', dest: 'Both playback systems', route: 'Follow the approved cue sheet' },

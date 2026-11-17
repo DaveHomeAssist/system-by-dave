@@ -1,5 +1,11 @@
 # Changelog
 
+## Frozen Monitor feed art matched to the house, 2026-11-17
+
+- Redraw the Monitor multiview art for all four lanes in the Coronation and Winter looks (`apps/projctl/public/monitor/monitor-art.js`, hand-written SVG). The shapes follow the Walnut Street Theatre house photos instead of the Grok concept renders: tall, pointed, asymmetric crystal portals with the outer spike pillar; a large orange-gold rosemaling medallion between two snowflakes on both A and D; A and D as exact mirror images in one purple-and-blue palette with warm gold; the X-truss header with diamond snowflake panels and a round rosemaling medallion. Stage C shows the inner opening (zigzag header trim, ice trees, folk-pattern legs, chapel gables) until the exact C surface is confirmed against the plot.
+- Add a Coronation/Winter switch above the multiview, remembered per browser. The art stays illustrative and never reflects what a projector shows. Power and shutter now sit in a compact readout at the foot of each tile so the art stays visible; the heading wraps at phone width so the 375px dashboard still fits.
+- Correct the Monitor wording: the control relay is the Mac Studio (the MacBook build is kept as Nov 13 history), and Projctl holds A's shutter while Millumin sends power and shutter for B, C and D. The cue map gains a "Shutter · A" row.
+
 ## Pages deploy flakes, 2026-11-17
 
 - The walk live check was reading `source.json` in the second after the git push, before `housevideo-walk`'s Pages run replaced the origin. GitHub Pages caches that response for `max-age=600` and ignores the `?release=` query, and the checker polled that same cached body until a deadline of exactly ten minutes. The publisher now waits until the destination Pages run for the pushed commit succeeds. A response that is still the previous release is waited out until its `Age` reaches `max-age`, once. The source workflow's concurrency group already queues the next main push; it is not the overlap.
