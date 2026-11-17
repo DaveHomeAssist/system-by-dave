@@ -184,6 +184,10 @@ The Mac Studio is the active backend. Dave subsequently clarified that a Stream 
 
 The November 7 renumbering proposal was not applied. Quiet Watch preserves the installed control mapping: A=P3, B=P2, C=P1 and D=P4. Keep the saved private rig and Stream Deck bindings intact. The public drawing-order labels are reference records, not authority to change controller slots.
 
+## Navigation contract (2026-11-17)
+
+One label per view and one view per label across the Workspace row, the Main menu, the Home cards and the Planning views. `node --test wst/navigation-contract.test.mjs` enforces it and also checks that every menu entry opens a route the router serves, that a link to another page carries the separate-page cue (`.leaves-shell` arrow plus "(separate page)" for screen readers), and that the local Projctl copy matches this directory. `npm run verify:public-navigation` runs it in CI with `workspace.test.mjs`. Collisions that wait on a decision are listed in the test's `OPEN` array with the decision's ID; the brief and decisions NAV-1 to NAV-5 are in `apps/projctl/docs/navigation-cohesion.md`. When you add or rename a menu entry, run `node wst/embed-hosted-assets.mjs` so the local copy follows.
+
 ## Run review navigation (2026-11-16)
 
 The November 15 run review lives at `/run-review/` on the published Site only: its page, `data.json`, `context.json` and the R2-backed `originals/` route were added in Site version 38 from a managed checkout and are not in this directory or in `hosting/worker/index.js`. Home and Planning link to it by absolute URL, so the local Projctl copy also reaches the public review. Before the next Sites publication from this source, carry the version 38 run-review routes and R2 binding into the managed worker (the version 38 checkout is preserved on the 4TB T9 drive), or publishing will remove `/run-review/`. Rehearsal data and photos stay out of this public repository.
