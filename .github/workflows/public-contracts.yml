@@ -22,7 +22,7 @@ jobs:
       - run: npm run verify:public-consistency
       - run: npm ci --no-audit --no-fund
       - run: npm run test:vite-fs-deny
-      - run: npm audit --audit-level=high
+      - run: node --test scripts/audit_gate.test.mjs && node scripts/audit_gate.mjs
       # ubuntu-latest already supplies Chromium's runtime libraries. Match the
       # domain gate: headless tests need the shell, not a stalled apt mirror.
       - run: npx playwright install --only-shell chromium

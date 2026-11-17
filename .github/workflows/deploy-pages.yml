@@ -234,7 +234,7 @@ jobs:
 
       - name: Verify dependency security and generated files
         run: |
-          npm audit --audit-level=high
+          node --test scripts/audit_gate.test.mjs && node scripts/audit_gate.mjs
           python3 scripts/gen_sitemap.py
           git diff --exit-code -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim equipment-lab sitemap.xml
           test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim equipment-lab sitemap.xml)"
