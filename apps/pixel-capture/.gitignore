@@ -1,0 +1,9 @@
+# Real captures and their metadata never go in this public repository (or Pages).
+*.pcap
+*.pcapng
+*.cap
+sessions/
+captures/
+*.jsonl
+!demo/receipt/*.jsonl
+tcpdump*.log
