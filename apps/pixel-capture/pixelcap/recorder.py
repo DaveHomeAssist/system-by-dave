@@ -36,14 +36,16 @@ class ListenOnlySocket:
 
     def __init__(self, bind, port, buffer_bytes=4 << 20):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, buffer_bytes)
         except OSError:
             pass
-        # Deliberately no SO_REUSEPORT: sharing a port with a show application
-        # could divert datagrams meant for it.
-        sock.bind((bind, port))
+        # Require exclusive use of the address and port.
+        try:
+            sock.bind((bind, port))
+        except OSError:
+            sock.close()
+            raise
         sock.setblocking(False)
         self._sock = sock
         self.port = sock.getsockname()[1]

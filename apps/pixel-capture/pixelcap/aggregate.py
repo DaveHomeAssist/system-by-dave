@@ -177,6 +177,7 @@ class Aggregator:
 
         step = protocol.artnet_sequence_step if proto == "artnet" else protocol.sacn_sequence_step
         last = uni.last_sequence.get(identity)
+        status = None
         if last is not None:
             status, missing = step(last, packet["sequence"])
             if status == "gap":
@@ -189,7 +190,8 @@ class Aggregator:
                 uni.duplicates += 1
             elif status == "reset":
                 uni.resets += 1
-        uni.last_sequence[identity] = packet["sequence"]
+        if status != "out_of_order":
+            uni.last_sequence[identity] = packet["sequence"]
 
         uni.packets += 1
         uni.total_packets += 1

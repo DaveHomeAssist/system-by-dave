@@ -148,3 +148,35 @@ on Millumin restoring the saved routes after the desktop has settled.
 Show hash describes the saved file. It cannot establish unsaved in-memory
 content. Start from the approved saved project for startup acceptance. The
 operator's approved-show confirmation remains part of show-night readiness.
+
+## Startup System Checks window (0.4.0 development)
+
+`checks-app/` adds a native macOS window that runs these checks visibly at login.
+The window has no equipment control of its own. All machine work still goes
+through `startup.py` and its configured bridge.
+
+- **Check stream:** `--events -` writes one JSON line per event to stdout, using
+  schema `frozen-startup.check-stream.v1`. Event types are `run`, `check`
+  (RUNNING, PASS, FAIL or NOT RUN, with expected, observed and next action),
+  `displays`, `result`, `readiness` and `unavailable`. `--events PATH` appends
+  to a file instead. The receipt is unchanged and is still written for every run.
+- **Window:** `Frozen Startup Checks.app` is a Swift AppKit and WKWebView
+  shell. It hosts the live UI in `checks-app/web/`, adapted from the offline
+  preview with its simulated scenarios removed.
+  - It reads `~/Library/Application Support/FrozenStartup/checks-app.json` (see
+    `checks-app.example.json`), runs a check at launch and offers an explicit Retry.
+  - It records the crew check (operator name plus the five confirmations) and
+    then runs `--verify-ready`.
+  - It opens only on the primary (BenQ) display and moves back there if dragged
+    away. After READY it collapses to a banner showing the expiry time, and it
+    expands again when readiness expires.
+- **Build:** `bash apps/frozen-startup/checks-app/build-app.sh /tmp/frozen-checks-app`
+  produces an ad-hoc signed app.
+- **Login trigger:** `com.avbydave.frozen-startup-checks.plist.example` opens
+  the app at login. Per the install plan, it is installed only for restart 2.
+- **Screenshots for review:** `checks-app/screenshots/record-streams.py`
+  records real fixture streams. `capture.mjs` replays them in Playwright to
+  capture each window state. Neither is shipped.
+
+Studio installation, permissions and the five-display restart acceptance are
+still separate, approved work.

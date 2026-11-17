@@ -1,0 +1,15 @@
+/* Live-app additions on top of the preview's base.css. */
+.status.running{border-left-color:var(--accent)}.status.running .icon{color:var(--accent);background:var(--raised)}
+.steps li.running .test-result{color:var(--accent);background:var(--raised);border-color:var(--line)}
+.steps li.running .observed{color:var(--muted)}
+.operator{flex-direction:column;align-items:stretch;gap:6px;font-weight:650;margin-bottom:6px}
+.operator input{width:100%;height:auto;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);font:inherit;font-weight:400}
+.ready-banner{display:flex;align-items:center;gap:20px;margin:16px 28px 0;padding:18px 22px;border:1px solid var(--line);border-left:6px solid var(--good);border-radius:12px;background:var(--surface)}
+.ready-banner[hidden]{display:none}
+.ready-mark{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:30px;color:var(--good);background:var(--goodbg);flex-shrink:0}
+.ready-text{flex:1;min-width:0}.ready-text h2{font-size:30px;letter-spacing:.02em}.ready-text p:last-child{margin-top:6px;color:var(--muted)}
+.ready-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ready-banner.expired{border-left-color:var(--bad)}.ready-banner.expired .ready-mark{color:var(--bad);background:var(--badbg)}
+body.collapsed .layout,body.collapsed footer,body.collapsed .header{display:none}
+body.collapsed .ready-banner{margin:12px;min-height:calc(100dvh - 24px)}
+@media(max-width:680px){.ready-banner{flex-wrap:wrap;margin:12px}.ready-actions{width:100%}.ready-actions button{flex:1}}

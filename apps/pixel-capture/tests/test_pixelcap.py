@@ -123,6 +123,14 @@ class AggregatorTests(unittest.TestCase):
         self.assertEqual(win["sources"], ["10.0.0.10"])
         self.assertEqual((win["nonZero"], win["maxLevel"], win["length"]), (8, 9, 8))
 
+    def test_reordered_packet_does_not_move_sequence_baseline(self):
+        for i, seq in enumerate((10, 9, 11)):
+            self.feed(1000 + i * 0.1, seq=seq)
+        self.agg.tick(1001.01)
+        window = next(row for row in self.out.rows if row["type"] == "window")
+        self.assertEqual(window["outOfOrder"], 1)
+        self.assertEqual(window["seqMissing"], 0)
+
     def test_no_full_frames_are_logged(self):
         for i in range(50):
             self.agg.ingest(protocol.decode(protocol.encode_artdmx(0, i % 255 + 1, bytes(range(256)) * 2)), "1.2.3.4",
@@ -337,6 +345,7 @@ class LiveLoopbackTests(unittest.TestCase):
 
     def test_port_in_use_fails_cleanly(self):
         hold = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        hold.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         hold.bind(("127.0.0.1", 0))
         port = hold.getsockname()[1]
         try:
@@ -344,10 +353,9 @@ class LiveLoopbackTests(unittest.TestCase):
                 out = os.path.join(tmp, "p.jsonl")
                 code = recorder.main(["--out", out, "--artnet-port", str(port), "--no-sacn", "--duration", "1"])
                 rows = read_rows(out)
-            # SO_REUSEADDR on macOS may allow the bind; either way the run must end with a complete row
+            self.assertNotEqual(code, 0)
             self.assertEqual(rows[-1]["type"], "complete")
-            if code:
-                self.assertTrue(rows[-1]["reason"].startswith("error"))
+            self.assertTrue(rows[-1]["reason"].startswith("error"))
         finally:
             hold.close()
 
@@ -369,6 +377,19 @@ class InspectorTests(unittest.TestCase):
         self.assertEqual(stale["status"], "heartbeat-stale")
         self.assertEqual(stale["invalidLines"], 1)
         self.assertTrue(any("unicast" in a for a in stale["alerts"]))
+
+    def test_appended_start_resets_prior_run(self):
+        path = self.write([
+            {"type": "start", "unixSeconds": 160},
+            {"type": "heartbeat", "unixSeconds": 190},
+            {"type": "window", "protocol": "artnet", "universe": 221, "seqMissing": 10},
+            {"type": "start", "unixSeconds": 200},
+        ])
+        result = inspect_capture.inspect(path, now=225)
+        self.assertEqual(result["status"], "recording")
+        self.assertEqual(result["heartbeatAgeSeconds"], 25)
+        self.assertEqual(result["universes"], {})
+        self.assertEqual(result["alerts"], [])
 
     def test_expected_universes(self):
         rows = [{"type": "start", "unixSeconds": 1.0}]
@@ -450,6 +471,16 @@ class MscAndViewerTests(unittest.TestCase):
                "unixSeconds": 1794791459.888229, "hex": raw.hex()}
         (f,) = msc.firings([row])
         self.assertEqual(f["id"], "0464ba2c5061995505c03159")  # cue 441 in the Nov 15 session markers
+
+    def test_change_after_cue_interval_is_excluded(self):
+        firing = {"id": "one", "key": "one", "unixSeconds": 1000.1}
+        window = {"protocol": "artnet", "universe": 0, "windowStart": 1003.0,
+                  "windowSeconds": 1.0, "hashChanges": 1,
+                  "firstChangeUnix": 1003.9, "lastChangeUnix": 1003.9}
+        cue, = viewer.associate([firing], [window], after=3)
+        result = cue["universes"]["artnet:0"]
+        self.assertFalse(result["changed"])
+        self.assertIsNone(result["firstChangeOffset"])
 
     def test_viewer_offset_and_escaping(self):
         with tempfile.TemporaryDirectory() as tmp:

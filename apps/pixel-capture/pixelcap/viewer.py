@@ -64,18 +64,34 @@ def associate(firings, windows, offset=0.0, after=3.0, stale_after=2.5):
             live = any(w["windowStart"] + span > t - stale_after and w["windowStart"] <= t for w in near)
             before = [w for w in near if w["windowStart"] + span > t - after and w["windowStart"] < t]
             later = [w for w in near if w["windowStart"] + span > t and w["windowStart"] < t + after]
-            changed = [w for w in later if w.get("hashChanges") and (w.get("lastChangeUnix") or 0) >= t]
-            first, approx = None, False
-            exact = [w["firstChangeUnix"] for w in changed if (w.get("firstChangeUnix") or 0) >= t]
-            if exact:
-                first = min(exact)
-            elif changed:
-                first, approx = t, True
+            end = t + after
+            exact = []
+            ambiguous = False
+            for window in later:
+                if not window.get("hashChanges"):
+                    continue
+                first_change = window.get("firstChangeUnix")
+                last_change = window.get("lastChangeUnix")
+                if first_change is None or last_change is None:
+                    ambiguous = True
+                elif t <= first_change <= end:
+                    exact.append(first_change)
+                elif first_change < t <= last_change:
+                    if last_change <= end:
+                        exact.append(last_change)
+                    elif window["hashChanges"] > 2:
+                        ambiguous = True
+            first = min(exact, default=None)
             cells[key] = {
                 "live": live,
-                "changed": bool(changed),
+                "changed": first is not None,
+                "changeUncertain": ambiguous,
                 "firstChangeOffset": round(first - t, 3) if first is not None else None,
-                "offsetApprox": approx,
+                "offsetApprox": ambiguous or any(
+                    w.get("firstChangeUnix") is not None
+                    and w["firstChangeUnix"] < t <= (w.get("lastChangeUnix") or 0) <= end
+                    and w.get("hashChanges", 0) > 2 for w in later
+                ),
                 "changesBefore": sum(w.get("hashChanges", 0) for w in before),
                 "changesAfter": sum(w.get("hashChanges", 0) for w in later),
                 "packetsAfter": sum(w.get("packets", 0) for w in later),
@@ -173,7 +189,7 @@ function draw(){
   const x=t=>lw+(t-t0)/(t1-t0||1)*(width-lw-10);
   const parts=[`<rect x="0" y="0" width="${width}" height="${h}" fill="transparent"/>`];
   lanes.forEach((k,i)=>{const y=top+i*laneH;parts.push(`<text x="4" y="${y+16}">${k}</text><line x1="${lw}" x2="${width}" y1="${y+laneH-2}" y2="${y+laneH-2}" stroke="var(--line)"/>`)});
-  const maxR=Math.max(1,...W.map(w=>w.r));
+  const maxR=W.reduce((max,w)=>Math.max(max,w.r),1);
   for(const w of W){const i=lanes.indexOf(w.k),y=top+i*laneH,x0=x(w.s),x1=Math.max(x0+1,x(w.s+w.d));
     parts.push(`<rect x="${x0}" y="${y+3}" width="${x1-x0}" height="${laneH-8}" fill="var(${w.m?"--multi":"--live"})" opacity="${(0.25+0.75*w.r/maxR).toFixed(2)}"><title>${w.k} ${fmt(w.s)} · ${w.r} Hz · ${w.h} changes · ${w.g} missing · nonzero ${w.z} · max ${w.x} · ${esc((w.src||[]).join(", "))}</title></rect>`);
     if(w.h)parts.push(`<rect x="${x0}" y="${y+laneH-7}" width="${x1-x0}" height="3" fill="var(--change)"/>`);
@@ -188,7 +204,7 @@ function draw(){
 }
 function cell(u){if(!u)return'<td class="muted">no data</td>';
   if(!u.live&&!u.packetsAfter)return'<td class="bad">quiet</td>';
-  const s=u.changed?`<span class="chg">changed${u.firstChangeOffset!=null?" +"+u.firstChangeOffset.toFixed(2)+"s"+(u.offsetApprox?"≈":""):""}</span>`:'<span class="ok">live, no change</span>';
+  const s=u.changed?`<span class="chg">changed${u.firstChangeOffset!=null?" +"+u.firstChangeOffset.toFixed(2)+"s"+(u.offsetApprox?"≈":""):""}</span>`:u.changeUncertain?'<span class="chg">change timing uncertain</span>':'<span class="ok">live, no change</span>';
   return`<td title="changes before ${u.changesBefore} / after ${u.changesAfter}; packets after ${u.packetsAfter}">${s} <span class="muted">${u.changesBefore}→${u.changesAfter}</span></td>`}
 function table(){const head=`<tr><th>Cue</th><th>List</th><th>UTC (MIDI)</th>${lanes.map(k=>`<th>${k}</th>`).join("")}</tr>`;
   $("#cues").innerHTML=head+D.cues.map((c,n)=>`<tr data-n="${n}"><td class="cue">${esc(c.cue??"?")}</td><td>${esc(c.cueList)}</td><td>${(c.utc||"").slice(11)}</td>${lanes.map(k=>cell(c.universes[k])).join("")}</tr>`).join("");

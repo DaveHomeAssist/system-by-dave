@@ -39,6 +39,12 @@ def inspect(path, now=None, heartbeat_slack=2.5, expect=None, candidates=None, c
                 invalid += 1
                 continue
             kind = row.get("type", "unknown")
+            if kind == "start":
+                types.clear()
+                invalid = 0
+                universes.clear()
+                events.clear()
+                last_heartbeat = None
             types[kind] += 1
             last_row = row
             if kind == "start":
