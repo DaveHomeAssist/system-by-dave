@@ -62,7 +62,7 @@ test('run review is reachable from Home and Planning, not squeezed into the head
   const review = 'https://wst.housevideo.app/run-review/';
   const home = html.slice(html.indexOf('<div class="home-choices">'), html.indexOf('</div>', html.indexOf('<div class="home-choices">')));
   assert.equal((home.match(/<(?:button|a)\b/g) || []).length, 6, 'six home choices fill the grid evenly');
-  assert.match(home, new RegExp('<a class="home-choice" href="' + review + '">[\\s\\S]*<strong>Run review</strong>'));
+  assert.match(home, new RegExp('<a class="home-choice" href="' + review + '">[\\s\\S]*<strong>Run review<span class="leaves-shell" aria-hidden="true"> ↗</span>'));
   const planning = html.slice(html.indexOf('aria-label="Planning views"'), html.indexOf('</nav>', html.indexOf('aria-label="Planning views"')));
   assert.match(planning, new RegExp('<a class="planning-link" href="' + review + '">Run review'));
   const header = html.slice(html.indexOf('aria-label="Workspace"'), html.indexOf('</nav>', html.indexOf('aria-label="Workspace"')));
