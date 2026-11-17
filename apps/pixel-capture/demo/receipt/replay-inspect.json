@@ -1,0 +1,224 @@
+{
+  "file": "/tmp/pxdemo/replay-pixels.jsonl",
+  "checkedAt": 1794914112.812,
+  "types": {
+    "start": 1,
+    "universe_seen": 3,
+    "window": 49,
+    "heartbeat": 4,
+    "universe_stale": 1,
+    "source_added": 1,
+    "universe_resumed": 1,
+    "stream_terminated": 1,
+    "complete": 1
+  },
+  "invalidLines": 0,
+  "start": {
+    "type": "start",
+    "unixSeconds": 1794787200.0,
+    "utc": "2026-11-16T00:00:00.000Z",
+    "schema": "frozen-pixel-capture/1",
+    "noTransmit": true,
+    "window": 1.0,
+    "staleAfter": 2.5,
+    "heartbeatEvery": 5.0,
+    "input": "pcap",
+    "pcap": "/tmp/pxdemo/replay.pcap",
+    "replay": true,
+    "recorderVersion": "0.1.0",
+    "host": "lab-runner",
+    "pid": 2404302,
+    "python": "3.12.3",
+    "session": "demo-replay",
+    "plannedEndUnix": null,
+    "plannedEnd": null,
+    "evidenceNote": "Receipt at the capture point only; not proof that pixels lit."
+  },
+  "complete": {
+    "type": "complete",
+    "unixSeconds": 1794787217.979,
+    "utc": "2026-11-16T00:00:17.979Z",
+    "interrupted": 0,
+    "reason": "end-of-capture",
+    "counters": {
+      "dmx": 1821,
+      "otherOpcode": 1
+    },
+    "universes": {
+      "artnet:0": {
+        "packets": 720,
+        "seqMissing": 5,
+        "sources": [
+          "10.0.0.10"
+        ]
+      },
+      "artnet:1": {
+        "packets": 560,
+        "seqMissing": 0,
+        "sources": [
+          "10.0.0.10"
+        ]
+      },
+      "sacn:1": {
+        "packets": 541,
+        "seqMissing": 0,
+        "sources": [
+          "10.0.0.10#a15f1c2e",
+          "10.0.0.11#b25f1c2e"
+        ]
+      }
+    }
+  },
+  "universes": {
+    "artnet:0": {
+      "windows": 18,
+      "packets": 720,
+      "seqMissing": 5,
+      "seqGapEvents": 1,
+      "outOfOrder": 0,
+      "hashChanges": 4,
+      "sources": [
+        "10.0.0.10"
+      ],
+      "destinations": [
+        "10.0.0.50"
+      ],
+      "staleEvents": 0,
+      "maxRateHz": 40.0,
+      "multipleSourceWindows": 0,
+      "lastWindow": {
+        "utc": "2026-11-16T00:00:18.000Z",
+        "rateHz": 40.0,
+        "levelHash": "c529d007e8fcc735",
+        "lastFrameUnix": 1794787217.975,
+        "nonZero": 170,
+        "maxLevel": 180,
+        "length": 510
+      }
+    },
+    "artnet:1": {
+      "windows": 14,
+      "packets": 560,
+      "seqMissing": 0,
+      "seqGapEvents": 0,
+      "outOfOrder": 0,
+      "hashChanges": 200,
+      "sources": [
+        "10.0.0.10"
+      ],
+      "destinations": [
+        "10.0.0.50"
+      ],
+      "staleEvents": 1,
+      "maxRateHz": 40.0,
+      "multipleSourceWindows": 0,
+      "lastWindow": {
+        "utc": "2026-11-16T00:00:18.000Z",
+        "rateHz": 40.0,
+        "levelHash": "7413d1840bea548d",
+        "lastFrameUnix": 1794787217.979,
+        "nonZero": 170,
+        "maxLevel": 220,
+        "length": 510
+      }
+    },
+    "sacn:1": {
+      "windows": 17,
+      "packets": 541,
+      "seqMissing": 0,
+      "seqGapEvents": 0,
+      "outOfOrder": 0,
+      "hashChanges": 125,
+      "sources": [
+        "10.0.0.10#a15f1c2e",
+        "10.0.0.11#b25f1c2e"
+      ],
+      "destinations": [
+        "239.255.0.1"
+      ],
+      "staleEvents": 0,
+      "maxRateHz": 60.0,
+      "multipleSourceWindows": 3,
+      "lastWindow": {
+        "utc": "2026-11-16T00:00:17.000Z",
+        "rateHz": 1.0,
+        "levelHash": "aae1392a13fe0a1e",
+        "lastFrameUnix": 1794787216.05,
+        "nonZero": 0,
+        "maxLevel": 0,
+        "length": 300
+      }
+    }
+  },
+  "recentEvents": [
+    {
+      "type": "universe_stale",
+      "utc": "2026-11-16T00:00:12.500Z",
+      "protocol": "artnet",
+      "universe": 1,
+      "quietSeconds": 2.521
+    },
+    {
+      "type": "source_added",
+      "utc": "2026-11-16T00:00:13.050Z",
+      "protocol": "sacn",
+      "universe": 1,
+      "quietSeconds": null
+    },
+    {
+      "type": "universe_resumed",
+      "utc": "2026-11-16T00:00:14.004Z",
+      "protocol": "artnet",
+      "universe": 1,
+      "quietSeconds": 4.025
+    },
+    {
+      "type": "stream_terminated",
+      "utc": "2026-11-16T00:00:16.050Z",
+      "protocol": "sacn",
+      "universe": 1,
+      "quietSeconds": null
+    }
+  ],
+  "status": "complete",
+  "alerts": [
+    "artnet:0 missed 5 sequence numbers in 1 gap events",
+    "artnet:1 went quiet 1 times",
+    "sacn:1 has 2 senders: 10.0.0.10#a15f1c2e, 10.0.0.11#b25f1c2e"
+  ],
+  "lastRow": {
+    "type": "complete",
+    "unixSeconds": 1794787217.979,
+    "utc": "2026-11-16T00:00:17.979Z",
+    "interrupted": 0,
+    "reason": "end-of-capture",
+    "counters": {
+      "dmx": 1821,
+      "otherOpcode": 1
+    },
+    "universes": {
+      "artnet:0": {
+        "packets": 720,
+        "seqMissing": 5,
+        "sources": [
+          "10.0.0.10"
+        ]
+      },
+      "artnet:1": {
+        "packets": 560,
+        "seqMissing": 0,
+        "sources": [
+          "10.0.0.10"
+        ]
+      },
+      "sacn:1": {
+        "packets": 541,
+        "seqMissing": 0,
+        "sources": [
+          "10.0.0.10#a15f1c2e",
+          "10.0.0.11#b25f1c2e"
+        ]
+      }
+    }
+  }
+}
