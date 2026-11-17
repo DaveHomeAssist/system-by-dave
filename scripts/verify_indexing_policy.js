@@ -79,7 +79,8 @@ const robots = read('robots.txt');
 // Projctl adds two nonpublic relay pages: the control UI and passcode sign-in.
 // The Frozen Monitor adds six noindex relay pages under apps/projctl/public/monitor/ (2026-11-14).
 // The Frozen standalone house handoff and its local relay copy add two noindex crew reference pages.
-if (unlisted.length !== 214) fail(`Expected 214 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// The Frozen Startup Checks window adds one noindex native app page under apps/frozen-startup/checks-app/web/ (2026-11-17).
+if (unlisted.length !== 215) fail(`Expected 215 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);
