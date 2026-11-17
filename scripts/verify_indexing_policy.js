@@ -79,7 +79,9 @@ const robots = read('robots.txt');
 // Projctl adds two nonpublic relay pages: the control UI and passcode sign-in.
 // The Frozen Monitor adds six noindex relay pages under apps/projctl/public/monitor/ (2026-11-14).
 // The Frozen standalone house handoff and its local relay copy add two noindex crew reference pages.
-if (unlisted.length !== 214) fail(`Expected 214 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// Rehearsal Review's tracked source (wst/hosting/review/rehearsal-review.html) is /run-review/.
+// It uses the same noindex and https://wst.housevideo.app canonical as the other Frozen crew pages.
+if (unlisted.length !== 215) fail(`Expected 215 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);
