@@ -1,5 +1,10 @@
 # Changelog
 
+## Frozen zone navigation and snowflake icons, 2026-11-17
+
+- Show the existing Frozen zone menu on the standalone handoff and public stage pages. The workspace shell keeps its in-page menu. Embedded frames do not repeat it.
+- Add nine snowflake icons, with Classic as the default and a browser setting to switch them. `?favicon=` selects one without a reload.
+
 ## Frozen cue 13 photo replacement, 2026-11-16
 
 - Replace the selected cue 13 Before photo in every shared review mode, thumbnail, preview and printed packet. Old public image links now serve the clean replacement too. Keep the actual replacement timestamp and provenance visible, while preserving raw capture archives, note identities and coverage.

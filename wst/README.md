@@ -33,6 +33,19 @@ controller view instead of nesting another controller frame. The standalone
 handoff is included in local packages. Navigation and appearance send no hardware
 commands and do not alter personal notes or shared tasks.
 
+The zone menu is Home, Handoff, Planning, My Projector Rig, 3D Stage View, and
+More (Live controls, Pixel Strips, Presets, Log, Configuration, Throw Calc).
+The workspace shell keeps that menu in the page. `frozen-zone-nav.js` mounts
+the same menu on the other top-level Frozen pages. An embedded frame does not
+repeat it, because the parent already shows it. The current zone is
+`aria-current="page"`. Escape closes More when focus is inside the menu.
+
+`frozen-favicon.js` selects one of the nine snowflake icons. The address
+`?favicon=` (an id `01`–`09` or a name such as `ice`) and the `frozenFavicon`
+setting in this browser choose it. A corner control switches icons without
+reloading or clearing what you typed. Projctl Preferences uses the same control
+when that panel is on the page.
+
 The dated sections below record earlier delivery context. Current slot mappings,
 service configuration and commissioning status come from the installed private
 rig and current operations record, not a historical example here.
