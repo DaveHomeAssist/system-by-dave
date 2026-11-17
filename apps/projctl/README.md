@@ -188,7 +188,7 @@ reads power first. Off, cooling and warming states return immediately with
 shutter, input and other unavailable details cleared. Powered-on polls also
 read shutter, input, alarms, lamp hours and the projector name.
 Control commands run after an in-flight poll, close its connection, and use a
-separate connection. Closed status sessions are recovered without replaying a
+separate connection. Closed or reset status sessions are recovered without replaying a
 control command. Replacing a configured driver releases its held connection.
 Panasonic native replies validate an echoed command name and reject a mismatch
 promptly so the next operation can proceed.

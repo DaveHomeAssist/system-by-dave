@@ -1,5 +1,10 @@
 # Changelog
 
+## Projctl PJLink session reset, 2026-11-17
+
+- A status poll whose held PJLink session was reset by the projector (ECONNRESET or EPIPE) now opens one new session and completes, as it already did for a plain close. Before, the poll failed and the unit read offline for that cycle. A reset on the replacement session still fails the poll. Control commands are unaffected: they use their own connection and are never repeated.
+- This also ends an intermittent failure of the "closed while idle" driver test under full-suite load.
+
 ## Pages deploy flakes, 2026-11-17
 
 - The walk live check was reading `source.json` in the second after the git push, before `housevideo-walk`'s Pages run replaced the origin. GitHub Pages caches that response for `max-age=600` and ignores the `?release=` query, and the checker polled that same cached body until a deadline of exactly ten minutes. The publisher now waits until the destination Pages run for the pushed commit succeeds. A response that is still the previous release is waited out until its `Age` reaches `max-age`, once. The source workflow's concurrency group already queues the next main push; it is not the overlap.
