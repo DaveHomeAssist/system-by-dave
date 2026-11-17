@@ -550,3 +550,76 @@ test('relay-stop partial readings are saved inside its shutdown cap without retr
   const saved = JSON.parse(fs.readFileSync(path.join(dir, `${summary.id}.json`), 'utf8'));
   assert.ok(saved.units.every((unit) => unit.intakeC === 37 && /timed out/.test(unit.readError)));
 });
+
+test('a Panasonic connection lost after the intake reading keeps the intake and sends no further query', async (t) => {
+  const sent = [];
+  const port = await fakeServer(t, (socket) => {
+    socket.write('NTCONTROL 0\r');
+    let text = '';
+    socket.on('data', (b) => {
+      text += b; if (!text.includes('\r')) return;
+      const cmd = text.trim().replace(/^00/, ''); sent.push(cmd);
+      if (cmd === 'QTM:0') socket.write('000037/0098\r'); else socket.destroy();
+    });
+  });
+  const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
+  const out = await driver.healthReadings();
+  assert.deepEqual(sent, ['QTM:0', 'QTM:1'], 'the third sensor is not queried on a dead connection');
+  assert.deepEqual(out.sensors.map((s) => [s.id, s.c]), [['intake', 37], ['qtm1', null]]);
+  assert.match(out.readError, /closed|reset|ECONN/i);
+  const row = unitRow(RIG[2], { online: true, power: 'on', errors: ok }, {}, out, null, CONFIG);
+  assert.equal(row.intakeC, 37); assert.equal(row.intakeSource, 'report'); assert.equal(row.headroomC, 3); assert.equal(row.verdict, 'watch');
+  assert.ok(row.readError, 'the dropped read stays visible beside the kept intake');
+});
+
+test('a Panasonic connection lost before any reading still fails, so the report can retry it', async (t) => {
+  const port = await fakeServer(t, (socket) => { socket.write('NTCONTROL 0\r'); socket.on('data', () => socket.destroy()); });
+  const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
+  await assert.rejects(driver.healthReadings());
+});
+
+test('a Thermal watch sample stands in only for a missing report-time intake on a reached unit', () => {
+  const at = Date.parse('2026-11-12T22:09:00Z'), st = { online: true, power: 'on', errors: ok };
+  const used = unitRow(RIG[3], st, {}, null, 'connection closed before Panasonic reply', CONFIG, { c: 36.5, at });
+  assert.deepEqual([used.intakeC, used.intakeSource, used.intakeLabel, used.intakeAt, used.headroomC, used.verdict],
+    [36.5, 'watch', 'Thermal watch sample', '2026-11-12T22:09:00.000Z', 3.5, 'watch']);
+  assert.match(used.readError, /connection closed/);
+  const fresh = unitRow(RIG[3], st, {}, panasonic(30), null, CONFIG, { c: 36.5, at });
+  assert.deepEqual([fresh.intakeC, fresh.intakeSource, fresh.intakeAt], [30, 'report', null], 'a report-time reading always wins');
+  const offline = unitRow(RIG[3], { online: false }, {}, null, 'timeout', CONFIG, { c: 36.5, at });
+  assert.deepEqual([offline.intakeC, offline.intakeSource, offline.verdict], [null, null, 'unreachable']);
+  for (const bad of [null, {}, { c: 36.5 }, { c: NaN, at }, { c: '36', at }]) assert.equal(unitRow(RIG[3], st, {}, null, 'x', CONFIG, bad).intakeC, null);
+  assert.match(summarize([used, fresh]).findings, /Report-time reading failed; latest Thermal watch sample used: P4\./);
+  assert.doesNotMatch(summarize([fresh]).findings, /Thermal watch sample/);
+});
+
+test('a failed report-time reading uses a recent Thermal watch sample; an old or future one is not used', async (t) => {
+  const start = Date.parse('2026-11-12T22:10:00Z');
+  const samples = { P2: { c: 24, at: start - 60000 }, P3: { c: 28, at: start - 181000 }, P4: { c: 36.5, at: start + 5000 } };
+  const asked = [];
+  const { engine, dir } = rigEngine(t, {
+    readTelemetry: async (p) => { if (p.slot === 'P1') return NOV11.P1.readings; throw new Error('connection closed before Panasonic reply'); },
+    recentAir: (p) => { asked.push(p.slot); if (p.slot === 'P2') return samples.P2; if (p.slot === 'P3') return samples.P3; return samples.P4; },
+  });
+  const report = await engine.run();
+  const saved = JSON.parse(fs.readFileSync(path.join(dir, `${report.id}.json`), 'utf8'));
+  const unit = Object.fromEntries(saved.units.map((u) => [u.slot, u]));
+  assert.deepEqual(asked.sort(), ['P2', 'P3', 'P4'], 'the watch is not consulted when the report read an intake');
+  assert.deepEqual([unit.P1.intakeC, unit.P1.intakeSource], [29.8, 'report']);
+  assert.deepEqual([unit.P2.intakeC, unit.P2.intakeSource, unit.P2.intakeAt], [24, 'watch', '2026-11-12T22:09:00.000Z']);
+  assert.deepEqual([unit.P3.intakeC, unit.P3.intakeSource], [null, null], 'a sample older than three minutes is not used');
+  assert.deepEqual([unit.P4.intakeC, unit.P4.intakeSource], [null, null], 'a sample stamped after the report is not used');
+  assert.ok(saved.units.filter((u) => u.slot !== 'P1').every((u) => /connection closed/.test(u.readError)));
+  const markdown = fs.readFileSync(path.join(dir, `${report.id}.md`), 'utf8');
+  assert.match(markdown, /24 \(Thermal watch sample 17:09:00 EST\)/);
+  assert.match(markdown, /Report-time reading failed; latest Thermal watch sample used: P2\./);
+  assert.match(markdown, /Temperatures not read: P3, P4\./);
+  await engine.stop();
+});
+
+test('a failing Thermal watch lookup never fails the report', async (t) => {
+  const { engine } = rigEngine(t, { readTelemetry: async () => { throw new Error('connection closed before Panasonic reply'); }, recentAir: () => { throw new Error('watch unavailable'); } });
+  const report = await engine.run();
+  assert.equal(report.counts.incomplete, 4);
+  await engine.stop();
+});
