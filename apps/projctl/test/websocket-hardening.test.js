@@ -55,7 +55,7 @@ test('protected and embedded sessions retain their own-origin access', { timeout
   const frame = await fetch(relay.base + '/', { headers: { cookie: embedded, 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'navigate', 'sec-fetch-dest': 'iframe' } });
   assert.equal(frame.status, 200);
   assert.match(frame.headers.get('content-security-policy'), /frame-ancestors 'self' https:\/\/wst.housevideo.app/);
-  for (const name of ['frozen-theme.js', 'frozen-theme.css']) {
+  for (const name of ['frozen-theme.js', 'frozen-theme.css', 'frozen-favicon.js', 'frozen-favicon.css', 'frozen-zone-nav.js', 'frozen-zone-nav.css', 'favicons/favicon-01-classic.svg']) {
     const asset = await fetch(relay.base + '/' + name, { redirect: 'manual' });
     assert.equal(asset.status, 200, 'login can load ' + name + ' before authentication');
   }

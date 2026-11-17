@@ -1,5 +1,10 @@
 # Changelog
 
+## Projctl Frozen zone menu and snowflake icons, 2026-11-17
+
+- Show the Frozen zone menu on the projector controller, Monitor, and sign-in. A controller view stays on this page. Handoff, Planning, and Pixel Strips open the workspace. Embedded controller frames do not repeat the menu.
+- Add the nine snowflake icons. Preferences holds the switcher. Sign-in and Monitor use the corner control. Projctl is a Node relay, so there is no desktop window icon.
+
 ## Frozen cue 13 photo replacement, 2026-11-16
 
 - Replace the selected cue 13 Before photo in every shared review mode, thumbnail, preview and printed packet. Old public image links now serve the clean replacement too. Keep the actual replacement timestamp and provenance visible, while preserving raw capture archives, note identities and coverage.
