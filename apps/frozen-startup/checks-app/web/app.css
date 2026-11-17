@@ -13,3 +13,12 @@
 body.collapsed .layout,body.collapsed footer,body.collapsed .header{display:none}
 body.collapsed .ready-banner{margin:12px;min-height:calc(100dvh - 24px)}
 @media(max-width:680px){.ready-banner{flex-wrap:wrap;margin:12px}.ready-actions{width:100%}.ready-actions button{flex:1}}
+/* Fit the native 1280 x 860 window (832 px of page) without scrolling. */
+@media(max-height:900px) and (min-width:681px){
+.header{padding-block:10px}.snow{font-size:30px}
+.layout{padding-block:12px;gap:10px}.main{gap:10px}
+.status{padding:10px 18px}.status .icon{width:40px;height:40px;font-size:22px}.status h3{font-size:19px;margin-bottom:2px}
+.main>.panel>h3{padding:11px 20px}.test-head{padding-block:6px}.steps li{padding-block:8px}
+.section-head{margin-bottom:6px}.display{padding:8px 12px}.monitor{height:24px;margin-bottom:6px;font-size:18px}.monitor:after{display:none}.pill{margin-top:6px}
+.action{padding:10px 18px}.crew{padding:10px 20px}footer{padding-block:8px}
+}

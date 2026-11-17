@@ -174,9 +174,51 @@ through `startup.py` and its configured bridge.
   produces an ad-hoc signed app.
 - **Login trigger:** `com.avbydave.frozen-startup-checks.plist.example` opens
   the app at login. Per the install plan, it is installed only for restart 2.
-- **Screenshots for review:** `checks-app/screenshots/record-streams.py`
+- **Screenshots and fit checks for review:** `checks-app/screenshots/record-streams.py`
   records real fixture streams. `capture.mjs` replays them in Playwright to
-  capture each window state. Neither is shipped.
+  capture each window state. `measure.mjs` fails if any state scrolls at the
+  window's page size (1280 × 832). None of these is shipped.
+
+### Run the window
+
+1. Build it: `bash apps/frozen-startup/checks-app/build-app.sh /tmp/frozen-checks-app`.
+2. Write a configuration from `checks-app.example.json`, with absolute paths and
+   exactly one of `bridge` or `fixture`:
+   - `fixture` with `example-snapshot.json` runs an offline demonstration that
+     performs no machine operations.
+   - `bridge` with the commissioned `mac_bridge.py` and the reviewed production
+     profile is for the Studio only.
+   - `mode` is `startup` (restore, open the show, then enable fullscreen) or
+     `warm` (observe only).
+3. Open it: `open "/tmp/frozen-checks-app/Frozen Startup Checks.app"`. It reads
+   `~/Library/Application Support/FrozenStartup/checks-app.json` by default.
+   `--config PATH` or `FROZEN_CHECKS_CONFIG` selects another file.
+4. In the window:
+   - **Retry check** reruns after a fault is corrected.
+   - **Open crew check** records the operator name and the five confirmations,
+     then verifies readiness against a fresh observation.
+   - **Show checks** and **Hide checks** switch between the READY banner and the
+     full view.
+   - **Run check again** appears when readiness expires or is refused.
+   - Closing the window quits the app.
+
+Each run writes `run-<time>.json` (the receipt) and, after a crew check,
+`run-<time>.crew.json` in `receiptDirectory`.
+
+### Login agent (restart 2 only)
+
+Restart 1 of the install plan opens the app by hand. Only after it passes:
+
+1. Copy `com.avbydave.frozen-startup-checks.plist.example` to
+   `~/Library/LaunchAgents/com.avbydave.frozen-startup-checks.plist`, and
+   replace `INSTALL_DIR` with the commissioned install folder.
+2. Check that no other startup path opens Millumin. The earlier
+   `com.avbydave.frozen-millumin-autostart` agent stays disabled.
+3. Restart and log in. The window should open on the BenQ within two minutes.
+
+To remove the login agent, run
+`launchctl bootout gui/$(id -u)/com.avbydave.frozen-startup-checks`, then move
+the plist out of `~/Library/LaunchAgents`.
 
 Studio installation, permissions and the five-display restart acceptance are
 still separate, approved work.
