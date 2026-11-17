@@ -1,6 +1,6 @@
 {
   "file": "/tmp/pxdemo/replay-pixels.jsonl",
-  "checkedAt": 1794914112.812,
+  "checkedAt": 1794914925.859,
   "types": {
     "start": 1,
     "universe_seen": 3,
@@ -27,7 +27,7 @@
     "replay": true,
     "recorderVersion": "0.1.0",
     "host": "lab-runner",
-    "pid": 2404302,
+    "pid": 2416059,
     "python": "3.12.3",
     "session": "demo-replay",
     "plannedEndUnix": null,
@@ -180,11 +180,25 @@
       "quietSeconds": null
     }
   ],
+  "capture": {
+    "input": "pcap"
+  },
+  "protocols": {
+    "artnet": {
+      "state": "present",
+      "packets": 1280
+    },
+    "sacn": {
+      "state": "present",
+      "packets": 541
+    }
+  },
   "status": "complete",
   "alerts": [
     "artnet:0 missed 5 sequence numbers in 1 gap events",
     "artnet:1 went quiet 1 times",
-    "sacn:1 has 2 senders: 10.0.0.10#a15f1c2e, 10.0.0.11#b25f1c2e"
+    "sacn:1 has 2 senders: 10.0.0.10#a15f1c2e, 10.0.0.11#b25f1c2e",
+    "Sequence gaps seen but capture drop counters are unknown; pass --capture-log to separate capture loss from show loss."
   ],
   "lastRow": {
     "type": "complete",

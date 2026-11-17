@@ -34,8 +34,11 @@ def _read_exact(stream, size):
     return b"".join(chunks)
 
 
-def read_packets(stream):
-    """Yield (timestamp, linktype, frame bytes) from a pcap stream."""
+def read_packets(stream, with_original=False):
+    """Yield (timestamp, linktype, frame bytes) from a pcap stream.
+
+    With with_original=True, also yield the original wire length, so callers can
+    count frames that the capture's snaplen cut short."""
     header = _read_exact(stream, 24)
     if len(header) < 24:
         raise PcapError("missing pcap global header")
@@ -56,11 +59,14 @@ def read_packets(stream):
         head = _read_exact(stream, 16)
         if len(head) < 16:
             return
-        seconds, fraction, included, _original = record.unpack(head)
+        seconds, fraction, included, original = record.unpack(head)
         frame = _read_exact(stream, included)
         if len(frame) < included:
             return
-        yield seconds + fraction * scale, linktype, frame
+        if with_original:
+            yield seconds + fraction * scale, linktype, frame, original
+        else:
+            yield seconds + fraction * scale, linktype, frame
 
 
 def _ip_payload(linktype, frame):

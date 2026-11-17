@@ -8,14 +8,14 @@
  ],
  "cues": [
   {
-   "id": "577d87c41c0618b3dcc20115",
-   "key": "2026-11-17T11:14:54Z|incoming|990001|f0 7f 03 02 01 01 31 30 31 00 31 f7|1",
+   "id": "83b274249064ef2f4431aed7",
+   "key": "2026-11-17T11:28:27Z|incoming|990001|f0 7f 03 02 01 01 31 30 31 00 31 f7|1",
    "cue": "101",
    "cueList": "1",
    "command": "GO",
-   "midiUnix": 1794914094.0735269,
-   "pixelTime": 1794914094.073527,
-   "utc": "2026-11-17T11:14:54Z",
+   "midiUnix": 1794914907.1163795,
+   "pixelTime": 1794914907.116379,
+   "utc": "2026-11-17T11:28:27Z",
    "universes": {
     "artnet:0": {
      "live": true,
@@ -29,10 +29,10 @@
     "artnet:1": {
      "live": true,
      "changed": true,
-     "firstChangeOffset": 0.929,
+     "firstChangeOffset": 0.904,
      "offsetApprox": false,
-     "changesBefore": 153,
-     "changesAfter": 85,
+     "changesBefore": 152,
+     "changesAfter": 86,
      "packetsAfter": 160
     },
     "sacn:1": {
@@ -47,14 +47,53 @@
    }
   },
   {
-   "id": "824559a502dd41fd65db7483",
-   "key": "2026-11-17T11:14:57Z|incoming|990001|f0 7f 03 02 01 01 31 30 32 2e 35 00 31 f7|1",
+   "id": "9b96b05fe0491e11c6db1c25",
+   "key": "2026-11-17T11:28:30Z|incoming|990001|f0 7f 03 02 01 01 31 30 32 2e 35 00 31 f7|1",
    "cue": "102.5",
    "cueList": "1",
    "command": "GO",
-   "midiUnix": 1794914097.0735269,
-   "pixelTime": 1794914097.073527,
-   "utc": "2026-11-17T11:14:57Z",
+   "midiUnix": 1794914910.1163795,
+   "pixelTime": 1794914910.116379,
+   "utc": "2026-11-17T11:28:30Z",
+   "universes": {
+    "artnet:0": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.0,
+     "offsetApprox": false,
+     "changesBefore": 2,
+     "changesAfter": 2,
+     "packetsAfter": 160
+    },
+    "artnet:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.005,
+     "offsetApprox": false,
+     "changesBefore": 86,
+     "changesAfter": 2,
+     "packetsAfter": 160
+    },
+    "sacn:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.045,
+     "offsetApprox": false,
+     "changesBefore": 2,
+     "changesAfter": 2,
+     "packetsAfter": 120
+    }
+   }
+  },
+  {
+   "id": "e3d95f9715a7d0990579bb3e",
+   "key": "2026-11-17T11:28:33Z|incoming|990001|f0 7f 03 02 01 01 31 30 33 00 31 f7|1",
+   "cue": "103",
+   "cueList": "1",
+   "command": "GO",
+   "midiUnix": 1794914913.1163795,
+   "pixelTime": 1794914913.116379,
+   "utc": "2026-11-17T11:28:33Z",
    "universes": {
     "artnet:0": {
      "live": true,
@@ -70,48 +109,9 @@
      "changed": true,
      "firstChangeOffset": 0.004,
      "offsetApprox": false,
-     "changesBefore": 85,
-     "changesAfter": 2,
-     "packetsAfter": 160
-    },
-    "sacn:1": {
-     "live": true,
-     "changed": true,
-     "firstChangeOffset": 0.045,
-     "offsetApprox": false,
-     "changesBefore": 2,
-     "changesAfter": 2,
-     "packetsAfter": 120
-    }
-   }
-  },
-  {
-   "id": "8efad7c62b3ce942c0f8985f",
-   "key": "2026-11-17T11:15:00Z|incoming|990001|f0 7f 03 02 01 01 31 30 33 00 31 f7|1",
-   "cue": "103",
-   "cueList": "1",
-   "command": "GO",
-   "midiUnix": 1794914100.0735269,
-   "pixelTime": 1794914100.073527,
-   "utc": "2026-11-17T11:15:00Z",
-   "universes": {
-    "artnet:0": {
-     "live": true,
-     "changed": true,
-     "firstChangeOffset": 0.0,
-     "offsetApprox": false,
-     "changesBefore": 2,
-     "changesAfter": 2,
-     "packetsAfter": 160
-    },
-    "artnet:1": {
-     "live": true,
-     "changed": true,
-     "firstChangeOffset": 0.004,
-     "offsetApprox": false,
      "changesBefore": 2,
      "changesAfter": 1,
-     "packetsAfter": 43
+     "packetsAfter": 44
     },
     "sacn:1": {
      "live": true,
@@ -125,14 +125,14 @@
    }
   },
   {
-   "id": "f0ee8f680d49baf71ade6dfe",
-   "key": "2026-11-17T11:15:03Z|incoming|990001|f0 7f 03 02 01 01 31 30 34 00 31 f7|1",
+   "id": "d4e8b667fed44d8d77860346",
+   "key": "2026-11-17T11:28:36Z|incoming|990001|f0 7f 03 02 01 01 31 30 34 00 31 f7|1",
    "cue": "104",
    "cueList": "1",
    "command": "GO",
-   "midiUnix": 1794914103.0735269,
-   "pixelTime": 1794914103.073527,
-   "utc": "2026-11-17T11:15:03Z",
+   "midiUnix": 1794914916.1163795,
+   "pixelTime": 1794914916.116379,
+   "utc": "2026-11-17T11:28:36Z",
    "universes": {
     "artnet:0": {
      "live": true,
@@ -150,7 +150,7 @@
      "offsetApprox": false,
      "changesBefore": 1,
      "changesAfter": 1,
-     "packetsAfter": 77
+     "packetsAfter": 76
     },
     "sacn:1": {
      "live": true,

@@ -6,8 +6,10 @@ would send an IGMP report), no connect(). Inputs:
   udp   bind UDP 6454 (Art-Net) and 5568 (sACN) and read what this host is sent
   pcap  read a classic pcap stream, a file or `tcpdump -U -w -` on stdin
 
-A UDP socket on the sending Mac does not see that Mac's own outbound unicast;
-only a packet capture does. See docs/brief.md.
+Mirrored unicast (another device's traffic copied to this port) reaches the
+host only through interface-level capture, so use the pcap input for it. A UDP
+socket, even on a promiscuous interface, receives only traffic addressed to
+this host. Not transmitting proves nothing about the host; see docs/runbook.md.
 """
 from __future__ import annotations
 
@@ -91,7 +93,21 @@ def build_parser():
     p.add_argument("--duration", type=float, default=4 * 3600.0, help="seconds to run (default 4 h)")
     p.add_argument("--until", help="absolute ISO end time; overrides --duration")
     p.add_argument("--session", default=None, help="session label stored in the start row")
+    p.add_argument("--allow-repo-output", action="store_true",
+                   help="allow --out inside a git working tree (captures must not go in the public repo)")
     return p
+
+
+def repo_root(path):
+    """Return the git working tree containing path, or None."""
+    here = os.path.dirname(os.path.abspath(path))
+    while True:
+        if os.path.exists(os.path.join(here, ".git")):
+            return here
+        parent = os.path.dirname(here)
+        if parent == here:
+            return None
+        here = parent
 
 
 def run_udp(args, agg, end_at, stop):
@@ -125,7 +141,10 @@ def run_udp(args, agg, end_at, stop):
 
 
 def _pcap_events(stream):
-    for stamp, linktype, frame in pcap.read_packets(stream):
+    for stamp, linktype, frame, original in pcap.read_packets(stream, with_original=True):
+        if len(frame) < original:
+            yield stamp, "snaplen-truncated"  # capture loss, not show loss
+            continue
         yield stamp, pcap.udp_datagram(linktype, frame)
 
 
@@ -202,6 +221,14 @@ def common_start(args, end_at):
 
 def main(argv=None):
     args = build_parser().parse_args(argv)
+    if args.out != "-" and not args.allow_repo_output and repo_root(args.out):
+        print("pixel-capture: refusing to write %s inside the git working tree %s; captures stay out of the "
+              "repository (use --allow-repo-output only for synthetic fixtures)" % (args.out, repo_root(args.out)),
+              file=sys.stderr)
+        return 2
+    if args.input == "udp" and args.bind not in ("127.0.0.1", "localhost"):
+        print("pixel-capture: the UDP listener only receives traffic addressed to this host. It will not see "
+              "mirrored unicast; use interface-level capture into --input pcap.", file=sys.stderr)
     end_at = parse_until(args.until) if args.until else time.time() + args.duration
     writer = aggregate.JsonlWriter(args.out)
     agg = aggregate.Aggregator(writer, window=args.window, stale_after=args.stale_after, heartbeat=args.heartbeat)

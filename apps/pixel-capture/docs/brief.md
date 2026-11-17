@@ -1,8 +1,9 @@
 # Brief: passive pixel capture for Frozen (Art-Net / sACN)
 
 Status: **proposed**. Built and tested on synthetic data only. Not installed
-anywhere, and nothing has listened on a show network. Decisions PX-D1 to PX-D6
-below are **Open** until Dave answers them.
+anywhere, and nothing has listened on a show network. PX-D2 was decided on
+2026-11-17. PX-D1 and PX-D3 to PX-D6 stay **Open** until Dave answers them.
+The operating steps for the decided path are in [runbook.md](runbook.md).
 
 This public brief leaves out venue addresses, people and private paths. The
 private board card `frozen-rehearsal-capture` holds those.
@@ -88,19 +89,52 @@ So there are only three ways to see the data:
    (or needs IGMP snooping). It is listed for completeness and not recommended.
 
 The recorder's `udp` input only fits traffic that is actually addressed to the
-listening host, such as broadcast or a future dedicated copy. It does not join
-multicast groups, because that sends IGMP reports.
+listening host, such as broadcast or a future dedicated copy. **Do not use it
+for mirrored unicast.** A mirrored frame is still addressed to the decoder, so
+the laptop's stack drops it before any socket sees it, even in promiscuous
+mode. Only interface-level capture (tcpdump/BPF) into `--input pcap` sees it.
+The `udp` input does not join multicast groups, because that sends IGMP
+reports.
 
 ## Decisions for Dave (Open)
 
 | ID | Question | Options | Recommendation | Unlocks |
 | --- | --- | --- | --- | --- |
 | PX-D1 | Which host listens? | **A.** A laptop on a mirrored lighting-switch port (the MacBook that runs the MIDI viewer) · **B.** The playback Mac itself, via packet capture · **C.** Dominic | **A**: it keeps the show machine untouched. Dominic is on the tailnet, not the lighting network, and runs on a degraded battery. | Install plan and acceptance run |
-| PX-D2 | How does the listener see unicast? | **A.** Ask the lighting team for a mirror port on the Luminex · **B.** BPF capture on the sending Mac · **C.** Switch Millumin to broadcast or sACN multicast | **A** if the lighting team agrees; otherwise **B** at a scheduled rehearsal, never first at a show. **C** no. | Which input mode is used |
+| PX-D2 | How does the listener see unicast? | **A.** Ask the lighting team for a mirror port on the Luminex · **B.** BPF capture on the sending Mac · **C.** Switch Millumin to broadcast or sACN multicast | **Decided 2026-11-17: A** (see below) | Which input mode is used |
 | PX-D3 | What is logged per universe? | **A.** 1 s summaries: rate, sources, destinations, sequence gaps and reorders, last-frame time, level hash, nonzero/max level, plus stale/resume/second-sender events · **B.** A, plus full frames whenever the hash changes · **C.** Rate and last frame only | **A** (built). B grows to gigabytes during chases; ask for it only for a specific fault hunt. | Storage and review depth |
 | PX-D4 | Thresholds | Summary window 1 s; stale after 2.5 s (the E1.31 data-loss timeout); heartbeat every 30 s | Keep these defaults; tune after one rehearsal | Alert tuning |
 | PX-D5 | Where do recordings live? | **A.** Beside the MIDI session in its session folder, then in the existing external archive · **B.** A separate pixel folder | **A**: one session folder per run, so the viewer can find both | Closeout and archive |
 | PX-D6 | Where does the code live? | **A.** Keep it here (`apps/pixel-capture` in system-by-dave). Captures never go in this public repo · **B.** Move it into the private `frozen-rehearsal-capture` repo with the MIDI capture | **A** for now. It is generic, public-safe and synthetic-tested. Revisit when the rehearsal-capture archive schema (Phase 2b) imports pixel JSONL. | Ownership and schema work |
+
+### PX-D2 decision (Dave, 2026-11-17)
+
+> Prefer A: an approved Luminex mirror port feeding interface-level packet
+> capture on the MacBook, piped into the recorder's pcap input. Do not use the
+> ordinary UDP listener for mirrored unicast. Before a venue run, confirm the
+> switch model, source and mirror ports, authorization, capture visibility,
+> drop counters, and host-level no-transmit arrangements. If mirroring is
+> unavailable or not approved, return for approval of B, a bounded M1-local
+> packet capture during rehearsal. This decision does not authorize switch
+> changes, installation, a venue capture, or pixel output. Capture may
+> establish transmitted universes and protocol. C1 still requires comparing
+> current show mapping with the decoder's current Out 2 setting.
+
+The checklist, the host-level no-transmit arrangement and the drop handling
+are in [runbook.md](runbook.md).
+
+### What a capture can and cannot settle
+
+- **C1 (upstage start universe 224 vs 227).** A capture shows only which
+  universes are *transmitted* (`inspect_capture --candidate`). It cannot show
+  the decoder's Out 2 setting. C1 still needs the current show mapping compared
+  with the decoder's current Out 2.
+- **C4 (Art-Net vs sACN).** A capture shows which protocol is present, once
+  capture visibility is shown. Until then, an absent protocol is inconclusive.
+- **C2 (slice overlaps).** A capture can't settle this; it needs the show's DMX
+  inspector.
+- **Physical pixel correctness.** A capture shows timing correlation with cues
+  only, not that the right pixels lit.
 
 Also needed before any install, and not a choice: the universe numbers, the
 decoder identity and the destination addresses from the patch reconciliation.
@@ -123,7 +157,7 @@ actually sends.
   cue-by-universe table, and a JSON association export.
 - `pixelcap.fixture`: a synthetic generator that refuses non-loopback targets
   by default, with an instant pcap mode.
-- Tests: 30 unittest cases, including proof that nothing transmits.
+- Tests: 36 unittest cases, including proof that nothing transmits.
 
 ## Exclusions
 
@@ -136,8 +170,17 @@ into the Projctl Monitor yet.
 
 - A BPF capture on the show Mac (PX-D2 B) needs root and must be stopped
   cleanly. Rehearse it first.
-- A mirror port can drop frames under load. Sequence gaps seen on a mirror are
-  evidence about the mirror first, and about the show only after that.
+- A mirror port can drop frames under load, and the capture host can drop
+  them in the kernel. Sequence gaps are then ambiguous. The inspector reads
+  tcpdump's drop counters (`--capture-log`) and the recorder counts
+  snaplen-truncated frames. Treat a gap as show loss only when those counters
+  are zero.
+- The recorder never transmitting does not make the host silent. The capture
+  adapter must have IPv4 and IPv6 off, and its silence must be proven before a
+  run (runbook).
+- Real captures and private metadata stay out of this public repository and
+  Pages. The recorder refuses `--out` inside a git working tree, and
+  `.gitignore` excludes capture files.
 - Destination addresses are visible only in pcap mode.
 - Hash churn during effects is expected. Read "changed" together with the
   before/after counts.

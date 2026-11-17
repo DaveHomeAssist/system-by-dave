@@ -211,6 +211,40 @@ class PcapTests(unittest.TestCase):
             self.assertEqual(beat["skipped"], {"other-port": 1})
 
 
+class CaptureLossAndPrivacyTests(unittest.TestCase):
+    def test_snaplen_truncation_counted_as_capture_loss(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cap, out = os.path.join(tmp, "s.pcap"), os.path.join(tmp, "p.jsonl")
+            buf = io.BytesIO()
+            pcap.write_header(buf)
+            pcap.write_udp(buf, 10.0, "10.0.0.10", "10.0.0.50", 6454, 6454, protocol.encode_artdmx(0, 1, bytes(512)))
+            raw = bytearray(buf.getvalue())
+            # rewrite the record as cut to 60 bytes by a small snaplen
+            import struct
+            sec, usec, incl, orig = struct.unpack_from("<IIII", raw, 24)
+            truncated = raw[:24] + struct.pack("<IIII", sec, usec, 60, orig) + raw[40:40 + 60]
+            with open(cap, "wb") as f:
+                f.write(truncated)
+            recorder.main(["--input", "pcap", "--pcap", cap, "--out", out])
+            beat = [r for r in read_rows(out) if r["type"] == "heartbeat"][-1]
+            self.assertEqual(beat["skipped"], {"snaplen-truncated": 1})
+            report = inspect_capture.inspect(out, now=20)
+            self.assertEqual(report["capture"]["snaplenTruncated"], 1)
+
+    def test_refuses_to_write_captures_inside_a_repository(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            os.mkdir(os.path.join(tmp, ".git"))
+            out = os.path.join(tmp, "sessions", "pixels.jsonl")
+            os.makedirs(os.path.dirname(out))
+            self.assertEqual(recorder.main(["--out", out, "--duration", "0.1"]), 2)
+            self.assertFalse(os.path.exists(out))
+
+    def test_public_repo_ignores_capture_files(self):
+        ignore = (ROOT / ".gitignore").read_text()
+        for pattern in ("*.pcap", "*.pcapng", "sessions/", "captures/"):
+            self.assertIn(pattern, ignore)
+
+
 class NoTransmitTests(unittest.TestCase):
     SEND_NAMES = {"send", "sendto", "sendall", "sendmsg", "sendfile", "connect", "connect_ex",
                   "IP_ADD_MEMBERSHIP", "IP_MULTICAST_IF", "SO_REUSEPORT", "SO_BROADCAST"}
@@ -345,6 +379,47 @@ class InspectorTests(unittest.TestCase):
         self.assertEqual(report["expected"]["missing"], ["artnet:227", "artnet:228", "artnet:229"])
         self.assertEqual(report["expected"]["unexpected"], ["artnet:224"])
         self.assertEqual(len(report["expected"]["matched"]), 3)
+
+    def deck_rows(self, universes, gaps=0):
+        rows = [{"type": "start", "unixSeconds": 1.0, "input": "pcap"}]
+        for u in universes:
+            rows.append({"type": "window", "protocol": "artnet", "universe": u, "packets": 40, "seqMissing": gaps,
+                         "unixSeconds": 2.0})
+        return rows
+
+    def test_candidate_ranges_report_activity_not_verdicts(self):
+        cands = inspect_capture.parse_candidates(["downstage=artnet:221-223", "upstage-A=artnet:224-226",
+                                                  "upstage-B=artnet:227-229"])
+        report = inspect_capture.inspect(self.write(self.deck_rows([221, 222, 223, 227, 228])), now=3,
+                                         candidates=cands)
+        c = report["candidates"]
+        self.assertEqual(c["downstage"]["state"], "observed")
+        self.assertEqual(c["upstage-A"]["state"], "not observed")
+        self.assertEqual((c["upstage-B"]["state"], c["upstage-B"]["observed"]), ("partly observed", 2))
+        self.assertIn("does not show which universes a decoder", report["candidatesNote"])
+        self.assertEqual(report["protocols"]["artnet"]["state"], "present")
+        self.assertEqual(report["protocols"]["sacn"]["state"], "absent-inconclusive")
+        self.assertIn("Inconclusive until capture visibility is shown", report["protocols"]["sacn"]["note"])
+
+    def test_empty_capture_is_inconclusive(self):
+        cands = inspect_capture.parse_candidates(["upstage-A=artnet:224-226"])
+        report = inspect_capture.inspect(self.write(self.deck_rows([])), now=3, candidates=cands)
+        self.assertIn("inconclusive", report["candidates"]["upstage-A"]["state"])
+        self.assertEqual(report["protocols"]["artnet"]["state"], "absent-inconclusive")
+
+    def test_capture_drops_make_gaps_ambiguous(self):
+        path = self.write(self.deck_rows([221], gaps=4))
+        unknown = inspect_capture.inspect(path, now=3)
+        self.assertTrue(any("drop counters are unknown" in a for a in unknown["alerts"]))
+        log = self.write(["tcpdump: listening on en7", "12000 packets captured", "12010 packets received by filter",
+                          "10 packets dropped by kernel"])
+        known = inspect_capture.inspect(path, now=3, capture_log=log)
+        self.assertEqual(known["capture"]["drops"], {"dropped by kernel": 10})
+        self.assertTrue(any("ambiguous" in a for a in known["alerts"]))
+        clean = self.write(["5 packets captured", "5 packets received by filter", "0 packets dropped by kernel"])
+        quiet = inspect_capture.inspect(path, now=3, capture_log=clean)
+        self.assertTrue(quiet["capture"]["dropCountersKnown"])
+        self.assertFalse(any("ambiguous" in a or "unknown" in a for a in quiet["alerts"]))
 
     def test_inspector_opens_no_sockets(self):
         path = self.write([{"type": "start", "unixSeconds": 1.0}])

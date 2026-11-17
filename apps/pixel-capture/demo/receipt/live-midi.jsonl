@@ -1,7 +1,7 @@
-{"type": "start", "unixSeconds": 1794914091.0735269, "utc": "2026-11-17T11:14:51Z", "noOutputPort": true, "synthetic": true, "durationSeconds": 18.0}
-{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914094.0735269, "utc": "2026-11-17T11:14:54Z", "length": 12, "hex": "f0 7f 03 02 01 01 31 30 31 00 31 f7"}
-{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914097.0735269, "utc": "2026-11-17T11:14:57Z", "length": 7, "hex": "f07f0302010131"}
-{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914097.0745268, "utc": "2026-11-17T11:14:57Z", "length": 8, "hex": "f830322e350031f7"}
-{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914100.0735269, "utc": "2026-11-17T11:15:00Z", "length": 12, "hex": "f0 7f 03 02 01 01 31 30 33 00 31 f7"}
-{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914103.0735269, "utc": "2026-11-17T11:15:03Z", "length": 12, "hex": "f0 7f 03 02 01 01 31 30 34 00 31 f7"}
-{"type": "complete", "unixSeconds": 1794914109.0735269, "utc": "2026-11-17T11:15:09Z", "interrupted": 0, "synthetic": true}
+{"type": "start", "unixSeconds": 1794914904.1163795, "utc": "2026-11-17T11:28:24Z", "noOutputPort": true, "synthetic": true, "durationSeconds": 18.0}
+{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914907.1163795, "utc": "2026-11-17T11:28:27Z", "length": 12, "hex": "f0 7f 03 02 01 01 31 30 31 00 31 f7"}
+{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914910.1163795, "utc": "2026-11-17T11:28:30Z", "length": 7, "hex": "f07f0302010131"}
+{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914910.1173794, "utc": "2026-11-17T11:28:30Z", "length": 8, "hex": "f830322e350031f7"}
+{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914913.1163795, "utc": "2026-11-17T11:28:33Z", "length": 12, "hex": "f0 7f 03 02 01 01 31 30 33 00 31 f7"}
+{"type": "midi", "direction": "incoming", "endpoint": 990001, "name": "fixture", "unixSeconds": 1794914916.1163795, "utc": "2026-11-17T11:28:36Z", "length": 12, "hex": "f0 7f 03 02 01 01 31 30 34 00 31 f7"}
+{"type": "complete", "unixSeconds": 1794914922.1163795, "utc": "2026-11-17T11:28:42Z", "interrupted": 0, "synthetic": true}
