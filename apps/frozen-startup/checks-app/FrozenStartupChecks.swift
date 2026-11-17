@@ -27,7 +27,7 @@ final class Controller: NSObject, NSApplicationDelegate, WKScriptMessageHandler,
     var pageReady = false
     var pendingRun = false
     let expandedSize = NSSize(width: 1280, height: 860)
-    let bannerSize = NSSize(width: 760, height: 150)
+    let bannerSize = NSSize(width: 780, height: 200)  // includes the title bar
 
     // MARK: Startup
 

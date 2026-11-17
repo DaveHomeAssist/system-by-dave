@@ -10,6 +10,6 @@
 .ready-text{flex:1;min-width:0}.ready-text h2{font-size:30px;letter-spacing:.02em}.ready-text p:last-child{margin-top:6px;color:var(--muted)}
 .ready-actions{display:flex;gap:10px;flex-wrap:wrap}
 .ready-banner.expired{border-left-color:var(--bad)}.ready-banner.expired .ready-mark{color:var(--bad);background:var(--badbg)}
-body.collapsed .layout,body.collapsed footer{display:none}
-body.collapsed .ready-banner{margin:12px}
+body.collapsed .layout,body.collapsed footer,body.collapsed .header{display:none}
+body.collapsed .ready-banner{margin:12px;min-height:calc(100dvh - 24px)}
 @media(max-width:680px){.ready-banner{flex-wrap:wrap;margin:12px}.ready-actions{width:100%}.ready-actions button{flex:1}}

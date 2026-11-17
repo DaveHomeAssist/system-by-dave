@@ -32,7 +32,7 @@ page = await open(); await feed(page, fail); await shot(page, '03-fail-with-retr
 page = await open(); await feed(page, pass); await page.click('#next'); await page.fill('#operator', 'Crew operator');
 for (const box of await page.$$('[data-crew]')) await box.check();
 await shot(page, '04-crew-check');
-page = await open(); await feed(page, [...warm, ...ready]); await shot(page, '05-ready-banner', { width: 760, height: 150 });
+page = await open(); await feed(page, [...warm, ...ready]); await shot(page, '05-ready-banner', { width: 780, height: 172 });
 await page.setViewportSize({ width: 1280, height: 860 }); await page.click('#ready-details'); await shot(page, '06-ready-expanded');
 page = await open(); await feed(page, [...warm, ...ready]); await page.clock.fastForward('16:00'); await shot(page, '07-expired');
 page = await open('dark'); await feed(page, fail); await shot(page, '08-fail-dark');
