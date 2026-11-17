@@ -33,6 +33,19 @@ controller view instead of nesting another controller frame. The standalone
 handoff is included in local packages. Navigation and appearance send no hardware
 commands and do not alter personal notes or shared tasks.
 
+The zone menu is Home, Handoff, Planning, My Projector Rig, 3D Stage View, and
+More (Live controls, Pixel Strips, Presets, Log, Configuration, Throw Calc).
+The workspace shell keeps that menu in the page. `frozen-zone-nav.js` mounts
+the same menu on the other top-level Frozen pages. An embedded frame does not
+repeat it, because the parent already shows it. The current zone is
+`aria-current="page"`. Escape closes More when focus is inside the menu.
+
+`frozen-favicon.js` selects one of the nine snowflake icons. The address
+`?favicon=` (an id `01`–`09` or a name such as `ice`) and the `frozenFavicon`
+setting in this browser choose it. A corner control switches icons without
+reloading or clearing what you typed. Projctl Preferences uses the same control
+when that panel is on the page.
+
 The dated sections below record earlier delivery context. Current slot mappings,
 service configuration and commissioning status come from the installed private
 rig and current operations record, not a historical example here.
@@ -186,4 +199,4 @@ The November 7 renumbering proposal was not applied. Quiet Watch preserves the i
 
 ## Run review navigation (2026-11-16)
 
-The November 15 run review lives at `/run-review/` on the published Site only: its page, `data.json`, `context.json` and the R2-backed `originals/` route were added in Site version 38 from a managed checkout and are not in this directory or in `hosting/worker/index.js`. Home and Planning link to it by absolute URL, so the local Projctl copy also reaches the public review. Before the next Sites publication from this source, carry the version 38 run-review routes and R2 binding into the managed worker (the version 38 checkout is preserved on the 4TB T9 drive), or publishing will remove `/run-review/`. Rehearsal data and photos stay out of this public repository.
+The November 15 run review is served at `/run-review/` with the trailing slash. `/run-review` redirects there so relative favicon URLs stay under that directory. The page's nine SVG icons reuse the shell favicon bytes; its PNG fallback and `frozen-favicon.js` are the review copies. Release manifests, `data.json`, and the R2-backed originals still come from the managed review handler. Rehearsal photos stay out of this public repository. Home and Planning link to the review by absolute URL.

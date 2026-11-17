@@ -1,5 +1,12 @@
 # Changelog
 
+## Frozen zone menu and snowflake icons, 2026-11-17
+
+- Show the Frozen zone menu on the WST handoff and public stage, and on Projctl's controller, Monitor, and sign-in. The workspace shell keeps its in-page menu. Embedded frames do not repeat it. On Projctl, a controller view stays on the page; Handoff, Planning, and Pixel Strips open the workspace.
+- Add nine snowflake icons, with Classic as the default. `?favicon=` and the browser setting switch them without a reload. Projctl Preferences holds the switcher; other pages use a corner control. Projctl is a Node relay, so there is no desktop window icon.
+- Home, Handoff, Planning, My Projector Rig, 3D Stage View, and More share the longest label's width and stay on one row.
+- Serve Rehearsal Review at `/run-review/` (trailing slash). Its nine snowflake SVGs reuse the shell icon bytes. The review PNG and `frozen-favicon.js` are the review copies.
+
 ## Frozen cue 13 photo replacement, 2026-11-16
 
 - Replace the selected cue 13 Before photo in every shared review mode, thumbnail, preview and printed packet. Old public image links now serve the clean replacement too. Keep the actual replacement timestamp and provenance visible, while preserving raw capture archives, note identities and coverage.

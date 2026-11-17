@@ -1,4 +1,5 @@
 import {withReviewCsp} from './review-csp.mjs';
+import {installReviewPage, publishReviewFavicons} from './review-favicons.mjs';
 // Install a pinned viewer and verified release into the current managed WST source.
 // Preserve every unrelated live asset and all D1/R2 bindings. No production writes.
 import fs from 'node:fs';
@@ -33,6 +34,14 @@ if (phase === 'active') {
   const end = source.indexOf(';\nconst BINARY', jsonStart);
   assert(start >= 0 && end > start, 'Unrecognized assets boundary');
   const assets = JSON.parse(source.slice(jsonStart, end));
+  const binaryMarker = 'const BINARY = ';
+  const binaryStart = source.indexOf(binaryMarker, end);
+  const binaryJson = binaryStart + binaryMarker.length;
+  const binaryEnd = source.indexOf(';\nconst rates', binaryJson);
+  assert(binaryStart > end && binaryEnd > binaryJson, 'Unrecognized binary boundary');
+  const binary = JSON.parse(source.slice(binaryJson, binaryEnd));
+  publishReviewFavicons(assets, binary, { reviewRoot: path.dirname(path.resolve(viewer)), shellRoot });
+  installReviewPage(assets, html);
   // Older managed releases override Home after the generated map. Preserve that
   // current page as the input, then fold it back into the map exactly once.
   const homeOverride = source.match(/^ASSETS\['\/'\]=(.*);$/m);
@@ -55,7 +64,7 @@ if (phase === 'active') {
     assets[url] = home;
   }
   for (const name of ['workspace.css', 'snow-splash.css', 'snow-splash.js']) assets['/' + name] = fs.readFileSync(path.join(shellRoot, name), 'utf8');
-  source = source.slice(0, jsonStart) + JSON.stringify(assets) + source.slice(end);
+  source = source.slice(0, jsonStart) + JSON.stringify(assets) + ';\nconst BINARY = ' + JSON.stringify(binary) + source.slice(binaryEnd);
   source = source.replace(/^ASSETS\['\/'\]=.*;\n/m, '');
 }
 fs.writeFileSync(workerPath, source);
