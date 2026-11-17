@@ -4,6 +4,12 @@
 
 - When a reached projector's report-time temperature read fails, the health report uses that unit's newest Thermal watch reading if it is at most three minutes old, and labels it with its time. The findings name the unit and the read error stays visible. An older sample is not used.
 - Tests now pin three behaviours first written for PR 463: report retries spaced four seconds apart, a Panasonic intake reading kept when the connection drops on a later sensor, and the Thermal watch fallback.
+## Frozen Monitor feed art matched to the house, 2026-11-17
+
+- Redraw the Monitor multiview art for all four lanes (`apps/projctl/public/monitor/monitor-art.js`, hand-written SVG). Shapes follow the Walnut Street Theatre work-light photos: tall, pointed crystal portals with the apex just outboard of centre and the outer spike pillar; eight-armed folk snowflakes around a large frameless rosemaling flower (about 75% of the panel width); A and D as exact mirror images; the X-truss header with diamond snowflake panels around a round rosemaling medallion.
+- Colours follow the Nov 15 runthrough (palettes from the frozen-monitor-refine covers): Coronation is coral stencil light on slate indigo, Winter is pale blue over a diamond ice lattice with ghosted flakes, and the new Ice Palace look is luminous ice on cobalt. Stage C shows the floral arches on the wood floor for Coronation and the gothic ice arches with the upstage bridge for Winter and Ice Palace (Ice Palace adds the stairs and aurora).
+- Add a Coronation / Winter / Ice Palace switch above the multiview, remembered per browser. The art stays illustrative and never reflects what a projector shows. Power and shutter sit in a compact readout at the foot of each tile; the heading wraps at phone width so the 375px dashboard still fits.
+- Correct the Monitor wording: the control relay is the Mac Studio, since Nov 15 (A-CONTROL-1; the MacBook build is kept as Nov 13 history), and Projctl holds A's shutter while Millumin sends power and shutter for B, C and D. The cue map gains a "Shutter · A" row.
 
 ## Pages deploy flakes, 2026-11-17
 
