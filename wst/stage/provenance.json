@@ -1,0 +1,8 @@
+{
+  "authorization": "Dave explicitly authorized public venue/model/plots/planning on 2026-11-06; hardware control remains private.",
+  "source": "Walnut Street Theatre appearance revision 3, existing user-provided project asset",
+  "originalRoomSha256": "fa85995025ca1c1925aab9523581dc4941d2256059b8e1e3725967a8c31fc7da",
+  "publishedRoomSha256": "2fd4845996422ae7e8138fb771f57c6cd38c70639d2ffcce78bb6028e4fcf27f",
+  "sanitization": "Removed glTF extras and generator metadata; retained geometry, embedded resources, transforms, node names for cutaway. No rig connection settings or private paths.",
+  "registration": "Approximate appearance reference; no surveyed scale/clearance claim."
+}

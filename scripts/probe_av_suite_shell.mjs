@@ -529,6 +529,43 @@ try {
     assert.equal(await blockedPage.locator('.suite-app > .message.error').count(), 1, 'failed autosave is visible in the shared status line');
     assert.equal(await blockedPage.evaluate(() => localStorage.getItem('avCalculator.v1')), null, 'failed autosave is not reported as persisted');
   } finally { await blockedContext.close(); }
+  /* Site storage refused outright (every cookie blocked): reading window.localStorage throws.
+     The console still opens, says nothing can be saved, and reports each failed write. */
+  const refuseStorage = configurable => {
+    const deny = () => { throw new DOMException('The operation is insecure.', 'SecurityError'); };
+    for (const name of ['localStorage', 'sessionStorage']) Object.defineProperty(window, name, { get: deny, configurable });
+  };
+  const refusedContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  try {
+    await refusedContext.addInitScript(refuseStorage, true);
+    const refusedPage = await refusedContext.newPage();
+    refusedPage.on('pageerror', error => errors.push(error.message));
+    await refusedPage.goto(`${BASE}/av/?app=calculator`);
+    await refusedPage.locator('.suite-header h1').waitFor();
+    assert.equal(await refusedPage.locator('.suite-header h1').textContent(), 'AV Calculator', 'the console opens with site storage refused');
+    assert.match(await refusedPage.locator('.workspace-host > .console-notice').first().textContent(), /blocking site storage.*nothing can be saved/, 'the operator is told nothing can be saved');
+    await refusedPage.locator('.console-panel #delayDistance').fill('88');
+    await refusedPage.waitForFunction(() => /storage.*unavailable|values were not saved/i.test(document.querySelector('.suite-app > .message')?.textContent || ''));
+    assert.equal(await refusedPage.locator('.suite-app > .message.error').count(), 1, 'a failed write is visible with site storage refused');
+    for (const [app, title] of [['video', 'AV Video'], ['shop', 'The Shop'], ['show-control', 'Show Control'], ['audio', 'Audio']]) {
+      await refusedPage.goto(`${BASE}/av/?app=${app}`);
+      await refusedPage.locator('.console-panel').first().waitFor();
+      assert.equal(await refusedPage.locator('.suite-header h1').textContent(), title, `${title} opens with site storage refused`);
+    }
+  } finally { await refusedContext.close(); }
+  // A browser where the stand-in cannot be installed gets a plain message, never a blank page.
+  const unusableContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  try {
+    await unusableContext.addInitScript(refuseStorage, false);
+    const unusablePage = await unusableContext.newPage();
+    unusablePage.on('pageerror', error => errors.push(error.message));
+    await unusablePage.goto(`${BASE}/av/`);
+    const blockedNotice = unusablePage.locator('#root > .suite-blocked[role="alert"]');
+    await blockedNotice.waitFor();
+    assert.match(await blockedNotice.textContent(), /blocking site storage/, 'an unusable browser is told why the console cannot open');
+    assert.equal(await unusablePage.locator('.suite-app').count(), 0, 'the console does not mount without any storage object');
+  } finally { await unusableContext.close(); }
+  console.log('Site storage refused: the console opens five applications with a notice and visible write failures; an unusable browser gets a plain message.');
   assert.deepEqual(errors, []);
   console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across ten native departments, seven specialist panels and two Gear 3D viewers, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
 } catch (error) {

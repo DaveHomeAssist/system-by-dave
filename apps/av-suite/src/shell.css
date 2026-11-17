@@ -190,3 +190,7 @@ html[data-av-focus="true"] .suite-intro{display:none}
 /* Server-rendered page heading for search and screen readers before the console mounts;
    React replaces #root's children on first render, so it never duplicates the app's <h1> (SEO-06). */
 .shell-static-title{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+/* Shown by main.tsx when the browser refuses site storage and no stand-in can be installed. */
+.suite-blocked{display:grid;align-content:center;justify-items:start;gap:8px;height:100%;max-width:34rem;margin:0 auto;padding:24px;box-sizing:border-box;color:var(--av-text)}
+.suite-blocked h1{margin:0;font-size:22px;line-height:1.25}
+.suite-blocked p{margin:0;font-size:15px;line-height:1.5;color:var(--av-text-2,var(--av-text))}

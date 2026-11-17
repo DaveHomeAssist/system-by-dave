@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "Frozen — show outputs",
+  "source": "Production Mac display readback, 2026-11-08; verify again after approved show changes.",
+  "ignoreBuiltIn": true,
+  "refreshTolerance": 0.15,
+  "groups": [
+    { "id": "side-portals", "name": "A + D · Side portals", "model": "Panasonic PT-DW830U", "color": "purple", "vendor": 13481, "product": 53461, "count": 2, "width": 1920, "height": 1200, "refreshRate": 60, "note": "Identical model IDs: both checked; A/D position is not inferred." },
+    { "id": "top-portal", "name": "B · Top portal", "model": "Panasonic PT-RZ970", "color": "cyan", "vendor": 13481, "product": 53541, "count": 1, "width": 1920, "height": 1200, "refreshRate": 60, "note": "" },
+    { "id": "stage", "name": "C · Stage", "model": "Barco UDM-4K", "color": "yellow", "vendor": 2579, "product": 3584, "count": 1, "width": 1920, "height": 1200, "refreshRate": 60, "note": "Checks the Mac signal, not the projector's native panel resolution." },
+    { "id": "operator", "name": "Operator monitor", "model": "Field Monitor", "color": "blue", "vendor": 19636, "product": 19540, "count": 1, "width": 1920, "height": 1080, "refreshRate": 60, "note": "Replace this profile entry if the approved operator monitor changes." }
+  ]
+}

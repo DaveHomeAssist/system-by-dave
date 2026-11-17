@@ -1,9 +1,11 @@
 # Field Kit checkout
 
-Status: **closed**. `field-kit/` is a noindex draft that isn't linked from
-navigation or the sitemap. It shows the $12 price and a disabled "Checkout not
-open yet" button. Paid kit files are **not** in this repository. Only the
+Status: **Payment Link live; download hash empty**. The page shows the $12 price and a Buy button for `https://buy.stripe.com/cNifZg4N98oy776fKgdEs00`. `field-kit/index.html` stays `noindex,nofollow` in this repo; while checkout is live the publish step marks the avbydave.com copy `index,follow` and lists `/field-kit/` (Search indexing, below). `fieldKit.download.sha256` is `[]`, so `field-kit/thanks/` shows the email-me card until Dave registers the kit share link. Paid kit files are **not** in this repository. Only the
 blurred preview images in `field-kit/img/` are.
+
+The console's navigation and first-visit box on avbydave.com link to it (whether
+they should before the download link is registered is open choice HR-D9 in
+`docs/next-steps/av-by-dave.json`).
 
 Code: `js/sbd-checkout.js` (validation), `field-kit/field-kit.js` (button),
 config in `js/sbd-launch-config.js` (`fieldKit`).
@@ -31,15 +33,17 @@ kit from its `checklistUrl` in `demos/config.js` (set: the absolute avbydave.com
 `https://avbydave.com`; `npm run smoke:field-kit-checkout`). GET requests only, no
 dependencies, never submits a payment. It checks that `/field-kit/` returns 200
 and shows $12, that `fieldKit.checkout.url` matches `^https://buy\.stripe\.com/`
-and that Payment Link answers 200, and that `/field-kit/thanks/` loads. Exit 0 =
-checkout live, 2 = pages fine but the Payment Link is still a placeholder,
-1 = a check failed.
+and that Payment Link answers 200, and that `/field-kit/thanks/` loads with the
+launch config. Once the Payment Link is real it also fails while
+`fieldKit.download.sha256` is empty, because buyers would get no download
+button. Exit 0 = checkout live, 2 = pages fine but the Payment Link is still a
+placeholder, 1 = a check failed.
 
 ## Chosen: Stripe Payment Links (2026-10-19)
 
-The config ships `provider: 'stripe'` with the marked placeholder
-`url: '[DAVE: Stripe Payment Link]'` and `priceLabel: '$12'` (Dave, 2026-10-30),
-so checkout stays closed until a real `buy.stripe.com` link replaces the placeholder.
+The config ships `provider: 'stripe'`, `priceLabel: '$12'` (Dave, 2026-10-30) and
+the Payment Link `url: 'https://buy.stripe.com/cNifZg4N98oy776fKgdEs00'` (2026-11-01).
+Putting the `[DAVE: Stripe Payment Link]` placeholder back closes checkout.
 **Account:** a separate AV by Dave Stripe account (Dave, 2026-10-23), not the System
 by Dave one. Statement descriptor: **AVBYDAVE FIELD KIT** (18 characters; set it
 in that account's Stripe settings so the card statement matches the page). The
@@ -66,17 +70,35 @@ committed):
 https://avbydave.com/field-kit/thanks/?dl=<URL-encoded share link to the kit folder>&session_id={CHECKOUT_SESSION_ID}
 ```
 
-`field-kit/thanks/thanks.js` shows a download button only for an HTTPS link
-on a known file host (Google Drive/Docs, Dropbox, OneDrive/SharePoint).
-Anything else shows "email me your receipt". The page sends no referrer,
+`field-kit/thanks/thanks.js` shows the download button, and the "your payment
+went through" line, only for the one link Dave registered: an HTTPS link on a
+known file host (Google Drive/Docs, Dropbox, OneDrive/SharePoint) whose SHA-256
+is listed in `fieldKit.download.sha256` in `js/sbd-launch-config.js`. Any other
+link, and every link while that list is empty (the shipped state), shows
+"email me your receipt" under the neutral heading. The page sends no referrer,
 removes the query from the address bar, and keeps the link in that tab's
 sessionStorage so a reload still works. `session_id` only shows as a short
-order reference for support emails.
+order reference for support emails; on its own it never produces the payment
+line.
+
+Why the hash (2026-11-11): the address is public and anyone can write one. With
+only the host list, a made-up address carrying someone else's Drive, Dropbox or
+SharePoint link and any `cs_…` value produced an AV by Dave page that confirmed
+a payment and offered that file. The hash lets the page recognise the real link
+without the link being in this repository.
+
+Register the link: `npm run hash:field-kit-link -- '<share link>'` prints the
+hash (`pbpaste | npm run --silent hash:field-kit-link` keeps the link out of
+shell history). Hash exactly the share link that goes into the Stripe redirect,
+before URL-encoding it. Paste the hash into `download: { sha256: ['…'] }`.
 
 What this does and doesn't protect: the file link isn't in this public repo,
-and a non-buyer can't find it. A buyer *can* forward it. That's acceptable for
-a low-priced kit, and the licence asks them not to. If it leaks, make a new share
-link and update the redirect in Stripe. No code change or push is needed.
+a non-buyer can't find it, and the page can't be pointed at another file. A
+buyer *can* forward the link. That's acceptable for a low-priced kit, and the
+licence asks them not to. If it leaks, make a new share link, update the
+redirect in Stripe, and register the new hash (list both hashes until the old
+link is switched off, then remove the old one). That last step is a one-line
+change and a push.
 
 ## Turn it on (Dave)
 
@@ -84,9 +106,8 @@ link and update the redirect in Stripe. No code change or push is needed.
    repo), and set the price, tax and refund settings.
 2. Done 2026-11-01: the delivery, statement descriptor, refund and licence
    text is final and the DRAFT markers are gone.
-3. Replace the `url` placeholder in `js/sbd-launch-config.js` with the Payment
-   Link (or paste another provider's block below), and set `priceLabel` to the
-   Stripe price (for example `'$12'`):
+3. Done 2026-11-01: `url` is `https://buy.stripe.com/cNifZg4N98oy776fKgdEs00` and
+   `priceLabel` is `'$12'`. Another provider would paste its block below instead:
 
 | Provider | Paste | Link to copy | Modes |
 |---|---|---|---|
@@ -108,15 +129,20 @@ Replace the CSP `content` with the matching line:
 Verify the overlay in a real browser after changing the CSP. Providers
 occasionally change the hosts their overlay needs.
 
-4. Decide whether the page stays `noindex`. At launch, remove `noindex,nofollow`,
-   add `field-kit/` to `STATIC_PAGES` in `scripts/gen_sitemap.py`, regenerate the
-   sitemaps, and lower the `unlisted` count in `scripts/verify_indexing_policy.js`
-   by one.
-5. Test: `npm run probe:field-kit` (mock checks), then one real test purchase
+4. Register the download link. Run
+   `npm run hash:field-kit-link -- '<share link to the kit files>'` and paste the
+   printed hash into `download: { sha256: ['…'] }` in `js/sbd-launch-config.js`.
+   Use the same link in the Stripe redirect (Delivery, above). Without the hash
+   buyers get "email me" instead of a download button.
+5. Done by the indexing gate (Search indexing, above). The source stays
+   `noindex,nofollow`; the publish step swaps the avbydave.com copy and lists
+   `/field-kit/` only while checkout is live. Do not remove the source tag by hand.
+6. Test: `npm run probe:field-kit` (mock checks), then one real test purchase
    (Stripe test mode) from a phone. Confirm the redirect lands on
    `field-kit/thanks/` with a working download button, the receipt email
-   arrives, the statement descriptor is right, and the refund path works.
-6. CHANGELOG entry.
+   arrives, the statement descriptor is right, and the refund path works. Then
+   `npm run smoke:field-kit-checkout`.
+7. CHANGELOG entry.
 
 ## Events
 

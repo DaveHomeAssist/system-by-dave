@@ -23,8 +23,18 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run test:vite-fs-deny
       - run: npm audit --audit-level=high
-      - run: npx playwright install --with-deps chromium
+      # ubuntu-latest already supplies Chromium's runtime libraries. Match the
+      # domain gate: headless tests need the shell, not a stalled apt mirror.
+      - run: npx playwright install --only-shell chromium
+      - name: Verify Projctl relay and operator controls
+        run: |
+          python3 -m unittest discover -s apps/projctl/tools/acceptance -p 'test_*.py'
+          npm ci --prefix apps/projctl --ignore-scripts --no-audit --no-fund
+          npm test --prefix apps/projctl
+          npm run test:browser --prefix apps/projctl
+          npm run test:venue-browser --prefix apps/projctl
       - run: npm run test:public-viewport
+      - run: npm run probe:cue-sheet-editing
       - name: Verify engineering daily journeys
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/daily-server.log 2>&1 &

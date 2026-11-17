@@ -1,6 +1,6 @@
 import { TopicMenu } from "../../shared/av-console/TopicMenu";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BaseEdge, Edge, EdgeProps, Background, BackgroundVariant, Controls, ControlButton, Handle, MarkerType, MiniMap, Node, NodeProps, Position, ReactFlow, ReactFlowInstance, useNodesState } from "@xyflow/react";
+import { BaseEdge, Edge, EdgeProps, Background, BackgroundVariant, Controls, ControlButton, Handle, MarkerType, MiniMap, Node, NodeProps, Position, ReactFlow, ReactFlowInstance, useNodesState, useUpdateNodeInternals } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { DeviceKind, VideoDocument } from "./model";
 import { addDevice, buildGraph, connectDevices, Device, deviceHeight, diagramSvg, renameDevice, Wire } from "./graph";
@@ -10,8 +10,14 @@ import { orthogonalPath } from "./routing";
 type DeviceData = { device: Device; incoming: Wire[]; outgoing: Wire[]; active: boolean; dim: boolean };
 type DeviceNodeType = Node<DeviceData, "device">;
 const names: Record<DeviceKind, string> = { source: "Source", converter: "Converter", processor: "Routing / processing", destination: "Destination" };
-function DeviceNode({ data }: NodeProps<DeviceNodeType>) {
+function DeviceNode({ id, data }: NodeProps<DeviceNodeType>) {
   const { device, incoming, outgoing, active, dim } = data;
+  // The diagram reads a device's ports when it measures the device. Naming a route's source or destination
+  // renames that cable's ports without changing the device's size, so ask for the ports to be read again;
+  // otherwise the newest cable has nowhere to attach and is not drawn until the page is reloaded.
+  const readPorts = useUpdateNodeInternals();
+  const ports = [...incoming.map(w => `i:${w.id}`), ...outgoing.map(w => `o:${w.id}`)].join("\n");
+  useEffect(() => { readPorts(id); }, [id, ports, readPorts]);
   const rows = Math.max(incoming.length, outgoing.length, 1);
   return <div className={`diagram-device kind-${device.kind} ${active ? "is-traced" : ""} ${dim ? "is-dimmed" : ""}`} style={{ height: 76 + rows * 26 }}>
     <div className="device-title"><span className="device-icon" aria-hidden="true">{device.kind === "source" ? "↗" : device.kind === "destination" ? "▣" : device.kind === "converter" ? "⇄" : "⤨"}</span><div><small>{names[device.kind]}</small><strong title={device.label}>{device.label}</strong></div></div>

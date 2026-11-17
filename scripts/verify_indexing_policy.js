@@ -73,14 +73,18 @@ const robots = read('robots.txt');
 // retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md).
 // Equipment Lab adds its source template, original checklist and package return route.
 // Eight original family entries now redirect into the shared console.
-// The noindex Sync & Signal Field Kit draft (field-kit/, docs/launch/README.md) adds one,
+// The noindex Sync & Signal Field Kit page (field-kit/, docs/launch/README.md) adds one,
 // and its buyers-only download page (field-kit/thanks/, noindex, reached from Stripe's
 // after-payment redirect) adds one more. The noindex frame-sync/ short link (avbydave.com/frame-sync/,
 // canonical to systembydave.com/demos/frame-sync.html, used in the frame sync reel) adds one more.
 // Once checkout is live the Field Kit page joins the avbydave.com sitemap (scripts/field_kit_launch.mjs)
-// and leaves this count.
+// and leaves this count. Main's 214 includes field-kit/ unlisted and has no frame-sync/, so the
+// live count stays 214 (field-kit listed, frame-sync unlisted) and the closed count is 215.
+// Projctl adds two nonpublic relay pages: the control UI and passcode sign-in.
+// The Frozen Monitor adds six noindex relay pages under apps/projctl/public/monitor/ (2026-11-14).
+// The Frozen standalone house handoff and its local relay copy add two noindex crew reference pages.
 const fieldKitListed = sitemapRoutes.has('/field-kit/');
-const expectedUnlisted = fieldKitListed ? 201 : 202;
+const expectedUnlisted = fieldKitListed ? 214 : 215;
 if (unlisted.length !== expectedUnlisted) fail(`Expected ${expectedUnlisted} tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;

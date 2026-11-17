@@ -315,3 +315,21 @@ Clients of its five).
   Planning and Utilities categories.
 
 Panel types, views, layouts and saved documents are unchanged.
+
+## Refused site storage, November 12, 2026
+
+Some browsers refuse site storage outright (every cookie blocked, some private
+and embedded contexts): reading `window.localStorage` throws. Every pack reads
+it while it mounts, so the console rendered nothing.
+
+`apps/av-suite/src/storage.ts` checks once before anything mounts. When storage
+is refused it gives the page a stand-in that holds nothing and refuses every
+write. Reads see an empty browser. Each save, draft and layout write fails
+through the handling the packs already have for full storage, so nothing is
+reported as kept. The workspace shows a notice that nothing can be saved and
+that work lasts for the visit only; Export still works. If the stand-in cannot
+be installed either, `main.tsx` shows a plain message instead of a blank page.
+`npm run test:av-suite-browser` covers both cases.
+
+The stand-in is deliberately not an in-memory store: a save that appeared to
+work and vanished on reload would be worse than a save that says it failed.

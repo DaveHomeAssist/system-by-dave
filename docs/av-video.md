@@ -24,6 +24,8 @@ A reported issue belongs to a route, not every device on it. Its path stays red 
 
 The desktop header includes plan identity and the canvas toolbar includes route controls. New-port handles appear on hover, keyboard focus, selection and touch devices; keyboard connection remains available in device details.
 
+A route typed in Route details draws its cable at once. Until November 14, 2026 the newest connection was counted and left undrawn until the page was reloaded; the [Frozen case](frozen-case.md) found it and guards it.
+
 ## Displays & Projection
 
 The **Displays** tab adds editable display and projection records to the same saved Video document. Add a display for its type, input, processor, resolution, aspect and refresh, or a projection record for screen, surface, size, projector, lens, throw distance, position and blend. Both retain route references, backups, original status and notes. Enter dimensions with units; no optical calculation or physical verification is inferred.

@@ -106,7 +106,8 @@
         "field-kit/",
         "field-kit/thanks/",
         "frame-sync/",
-        "boxlens/"
+        "boxlens/",
+        "console-guide/"
       ],
       "assets": [
         "img/av-by-dave-og.png",
