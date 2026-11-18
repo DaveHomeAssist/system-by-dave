@@ -68,6 +68,10 @@ or the reading changing while armed all withdraw it. After the relay accepts the
 waits for the projector's own report and says "Reported CLOSED" only when that arrives; if it has
 not arrived in 30 seconds the card says so and asks for a look.
 
+A refusal shows the relay's own reason. No answer at all is worded differently: the card says the
+relay did not answer and asks for a look, because the command may have left before the reply was
+lost.
+
 The control is offered only when the lane has a current reply saying power is ON. Otherwise it is
 shown blocked with the reason beside it, for example "Relay can't reach it. Use the remote." The
 blocked button stays reachable by keyboard so the reason can be read out.
@@ -122,8 +126,10 @@ writes `POST /api/command` for the shutter only.
 New files: `public/show.html`, `public/show.js`, `public/show-model.js`, `public/show.css`,
 `test/show-backup.test.js`, `test/show-backup-browser.cjs`, this brief.
 
-Shared files touched: `package.json` (the browser test is appended to `test:browser`) and the
-repository `CHANGELOG.md` (one entry). Nothing else.
+Shared files touched, three: `package.json` (the browser test is appended to `test:browser`), the
+repository `CHANGELOG.md` (one entry), and `scripts/verify_indexing_policy.js` (the count of
+tracked routes outside the sitemap goes from 217 to 218 for this noindex page). Nothing else. Any
+other branch that adds a page moves the same count, so the second to merge must add one more.
 
 The page reuses three existing modules without changing them: `lanes.js`,
 `projector-connection.js` and `status-feedback.js`.
