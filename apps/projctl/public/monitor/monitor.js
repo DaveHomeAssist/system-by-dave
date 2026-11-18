@@ -182,7 +182,7 @@ export const laneOfSlot = slot => live.snapshot?.projectors.find(p => p.slot ===
 export const lockState = () => !live.connected ? 'unknown' : live.snapshot.lock ? 'on' : 'off';
 
 // Compact theme control: shows the saved choice and opens the shared menu under the button.
-const themeButton = $('#theme');
+const themeButton = typeof document === 'undefined' ? null : $('#theme');
 if (themeButton) {
   const word = $('[data-theme-word]', themeButton);
   const showTheme = () => { const mode = window.FrozenTheme?.mode || 'light'; word.textContent = mode[0].toUpperCase() + mode.slice(1); };
