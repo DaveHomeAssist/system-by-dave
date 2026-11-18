@@ -10,6 +10,12 @@ import threading
 
 root = pathlib.Path(sys.argv[1])
 manifest = json.loads((root / 'media.json').read_text())
+catalog = json.loads((root / 'catalog.json').read_text())
+new_route_prefixes = tuple(
+    f"/run-review/sessions/{session['id']}/originals/"
+    for session in catalog['sessions']
+    if session.get('release', catalog['release']) == catalog['release']
+)
 token = getpass.getpass('Temporary upload token (hidden): ')
 local = threading.local()
 
@@ -18,14 +24,15 @@ def transfer(item):
     route, meta = item
     source = root / 'originals' / meta['key']
     body = source.read_bytes() if source.exists() else None
+    is_new = route.startswith(new_route_prefixes)
     if body is not None and hashlib.sha256(body).hexdigest() != meta['sha256']:
         raise ValueError('Local checksum mismatch: ' + route)
-    if '/sessions/' in route and body is None:
+    if is_new and body is None:
         raise FileNotFoundError('New session original is missing: ' + str(source))
     for attempt in range(3):
         try:
             conn = http.client.HTTPSConnection('wst.housevideo.app', timeout=45)
-            if '/sessions/' in route:
+            if is_new:
                 conn.request('PUT', route, body, {'Authorization': 'Bearer ' + token, 'Content-Type': 'image/jpeg', 'Content-Length': str(len(body))})
                 response = conn.getresponse()
                 response.read()
@@ -39,7 +46,7 @@ def transfer(item):
             conn.close()
             if response.status != 200 or hashlib.sha256(returned).hexdigest() != meta['sha256']:
                 raise RuntimeError('Public checksum mismatch or HTTP ' + str(response.status))
-            return route, meta['sha256'], body is not None and '/sessions/' in route
+            return route, meta['sha256'], is_new
         except Exception:
             if attempt == 2:
                 raise
