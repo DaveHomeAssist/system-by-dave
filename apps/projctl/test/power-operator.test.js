@@ -49,9 +49,16 @@ test('saved ticks and timers are validated, and anything else is dropped', () =>
     A: { tick: { state: 'off', at: NOW }, coolUntil: NOW + 1000 },
     D: { tick: { state: 'standby', at: NOW }, coolUntil: -5 },
     B: { tick: { state: 'off', at: NOW } }, // not a manual lane
+  }, relay: {
+    C: { tick: { state: 'off', at: NOW }, coolUntil: NOW }, // a relay lane keeps only an "off by eye" tick
+    B: { tick: { state: 'lit', at: NOW } },
+    A: { tick: { state: 'off', at: NOW } }, // not a relay lane
   }, extra: '<script>' };
   const record = parseRecord(JSON.stringify(saved));
-  assert.deepEqual(record, { v: 1, playback: { on: NOW, off: null }, lanes: { A: { tick: { state: 'off', at: NOW }, coolUntil: NOW + 1000 }, D: { tick: null, coolUntil: null } } });
+  assert.deepEqual(record, { v: 1, playback: { on: NOW, off: null },
+    lanes: { A: { tick: { state: 'off', at: NOW }, coolUntil: NOW + 1000 }, D: { tick: null, coolUntil: null } },
+    relay: { B: { tick: null }, C: { tick: { state: 'off', at: NOW } } } });
+  assert.deepEqual(emptyRecord().relay, { B: { tick: null }, C: { tick: null } });
 });
 
 test('a tick is current for 30 minutes and never from the future', () => {
@@ -123,24 +130,20 @@ test('a relay lane offers its command only when every guard passes', () => {
   assert.match(relayStep('off', readingOf(projector('C', 'off', { ageMs: 60000 })), ready).reason, /does not confirm power off/);
 });
 
-test('a relay lane whose fresh reply has no power state can still be powered, and is never counted as done', () => {
+test('a relay lane whose fresh reply has no power state can still be powered, and is never read as On or Standby', () => {
   // Seen on a relay whose driver does not name one of a unit's standby states: the unit replies, power reads unknown.
-  const unread = readingOf(projector('C', 'unknown')), ready = { playbackTicked: true };
+  const unread = readingOf(projector('C', 'unknown')), ready = { playbackTicked: true, now: NOW };
   assert.deepEqual([unread.kind, unread.word], ['unknown', 'UNKNOWN']);
   for (const mode of ['on', 'off']) {
     const step = relayStep(mode, unread, ready);
-    assert.deepEqual([step.enabled, step.done, step.tone, step.word], [true, false, 'waiting', 'UNKNOWN'], mode);
-    assert.match(step.reason, mode === 'on' ? /cannot read this unit's power state\. Look at it first: power on only from standby\./ : /Look at it first: power off only if it is lit\./, `${mode} says to look first`);
-    assert.equal(relayStep(mode, unread, {}).enabled, false, `${mode} still waits for the playback tick`);
+    assert.deepEqual([step.enabled, step.done, step.tone, step.word, step.basis], [true, false, 'waiting', 'UNKNOWN', null], mode);
+    assert.equal(relayStep(mode, unread, { now: NOW }).enabled, false, `${mode} still waits for the playback tick`);
     assert.equal(relayStep(mode, unread, { ...ready, busy: true }).enabled, false, `${mode} still waits for a running operation`);
   }
+  assert.match(relayStep('on', unread, ready).reason, /cannot read this unit's power state\. Look at it first: power on only from standby\./);
+  assert.match(relayStep('off', unread, ready).reason, /Look at it: tick if it is off, power off if it is lit\./);
   assert.equal(relayStep('off', unread, { ...ready, lock: true }).enabled, false, 'Show Lock still blocks power off');
   assert.equal(relayStep('on', unread, { ...ready, lock: true }).enabled, true);
-
-  // The banner never takes an unread lane for Standby or On.
-  const ticked = { item: tick('off'), reading: notReached };
-  const night = banner('off', lanesFor('off', { B: readingOf(projector('B', 'off')), C: unread, A: ticked, D: ticked }));
-  assert.deepEqual([night.state, night.detail], ['wait', 'Waiting on: C unknown']);
 
   // The relay's own guard agrees: it refuses power on only while cooling, and power off only under Show Lock.
   const state = power => ({ projector: { slot: 'P3', driver: 'simulator', ip: 'sim' }, status: { online: true, power }, connection: { state: 'online', lastSuccessAt: new Date().toISOString() }, lock: false, lockRevision: 0, busy: false });
@@ -149,6 +152,48 @@ test('a relay lane whose fresh reply has no power state can still be powered, an
   assert.doesNotThrow(() => binding.commandGuard('P3', () => state('unknown'))('power', false));
   assert.throws(() => binding.commandGuard('P3', () => state('cooling'))('power', true), /cooling/);
   assert.throws(() => binding.commandGuard('P3', () => ({ ...state('unknown'), lock: true }))('power', false), /show lock/);
+});
+
+test('at night a relay lane the relay cannot read is confirmed off by eye, and the banner says so', () => {
+  const unread = readingOf(projector('C', 'unknown')), ready = { playbackTicked: true, now: NOW };
+  const eyeTick = (ageMs = 60000) => ({ state: 'off', at: NOW - ageMs });
+
+  // The tick is offered at night only, and only while the reply has no power state.
+  assert.equal(relayStep('off', unread, ready).eye.offered, true);
+  assert.equal(relayStep('on', unread, ready).eye.offered, false);
+  assert.equal(relayStep('on', unread, { ...ready, tick: eyeTick() }).done, false, 'a night tick never makes a lane On');
+  for (const power of ['on', 'warming', 'cooling', 'off']) {
+    const seen = relayStep('off', readingOf(projector('C', power)), { ...ready, tick: eyeTick() });
+    assert.deepEqual([seen.eye.offered, seen.eye.ticked, seen.done, seen.word], [false, false, power === 'off', { on: 'ON', warming: 'WARMING', cooling: 'COOLING', off: 'STANDBY' }[power]], `${power}: a real reading always wins over a tick`);
+  }
+  for (const reading of [readingOf(projector('C', 'off', { ageMs: 60000 })), readingOf(projector('C', 'off'), { relayConnected: false }), readingOf(null)]) {
+    const dark = relayStep('off', reading, { ...ready, tick: eyeTick() });
+    assert.deepEqual([dark.eye.offered, dark.done], [false, false], `${reading.kind}: no reply is not a case for the tick`);
+  }
+
+  const ticked = relayStep('off', unread, { ...ready, tick: eyeTick() });
+  assert.deepEqual([ticked.done, ticked.basis, ticked.word, ticked.tone, ticked.eye.tickedAt], [true, 'eye', 'OFF BY EYE', 'done', NOW - 60000]);
+  assert.notEqual(ticked.word, 'STANDBY', 'unknown is never shown as Standby');
+  assert.equal(ticked.enabled, true, 'power off stays available beside the tick');
+  assert.equal(relayStep('off', unread, { now: NOW, tick: eyeTick() }).done, true, 'the tick does not wait for the playback step, like a manual lane');
+  const lapsed = relayStep('off', unread, { ...ready, tick: eyeTick(TICK_VALID_MS + 1000) });
+  assert.deepEqual([lapsed.done, lapsed.eye.lapsed, lapsed.word], [false, true, 'UNKNOWN']);
+  assert.equal(relayStep('off', unread, { ...ready, tick: { state: 'lit', at: NOW } }).done, false);
+
+  // Banner: every lane is either read as Standby or looked at, and the detail says which.
+  const manual = { item: tick('off'), reading: notReached };
+  const lanes = (c, b = readingOf(projector('B', 'off'))) => [
+    { lane: 'B', kind: 'relay', ...relayStep('off', b, ready) },
+    { lane: 'C', kind: 'relay', ...c },
+    { lane: 'A', kind: 'manual', relayWord: manual.reading.word, ...manualStep('off', manual.item, manual.reading, NOW) },
+    { lane: 'D', kind: 'manual', relayWord: manual.reading.word, ...manualStep('off', manual.item, manual.reading, NOW) },
+  ];
+  assert.deepEqual([banner('off', lanes(ticked)).state, banner('off', lanes(ticked)).detail], ['safe', 'B reads Standby. C, A and D confirmed off by eye.']);
+  assert.deepEqual([banner('off', lanes(relayStep('off', unread, ready))).state, banner('off', lanes(relayStep('off', unread, ready))).detail], ['wait', 'Waiting on: C unknown']);
+  assert.equal(banner('off', lanes(lapsed)).detail, 'Waiting on: C tick lapsed');
+  assert.equal(banner('off', lanes(relayStep('off', readingOf(projector('C', 'on')), { ...ready, tick: eyeTick() }))).detail, 'Waiting on: C on', 'a lane that reads On is not safe, whatever was ticked');
+  const both = { ...ready, tick: eyeTick() };
+  assert.equal(banner('off', [{ lane: 'B', kind: 'relay', ...relayStep('off', readingOf(projector('B', 'unknown')), both) }, ...lanes(ticked).slice(1)]).detail, 'B, C, A and D confirmed off by eye.');
 });
 
 test('a manual lane goes by the operator tick, and a fresh relay reading can only veto it', () => {

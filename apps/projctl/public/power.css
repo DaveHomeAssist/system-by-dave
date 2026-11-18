@@ -65,7 +65,8 @@
 .pw-text{margin:0;max-width:64ch;font-size:15px;line-height:22px}
 .pw-detail__foot{display:flex;gap:8px;min-width:0}
 .pw-tools{flex:1 1 auto;min-width:0;display:flex;gap:8px}
-.pw-tools[hidden]{display:none}
+.pw-tools[hidden],.pw-tools [hidden]{display:none}
+.pw-tools [data-confirming]{background:var(--state-blocked);border-color:var(--state-blocked);color:var(--surface)}
 .pw-tools .avd-btn{flex:1 1 0;min-width:0;padding:0 8px;font-size:11px;letter-spacing:.04em;white-space:normal}
 .pw-why{margin:0;font-size:14px;line-height:20px;color:var(--ink-muted)}
 .pw-why:empty{display:none}

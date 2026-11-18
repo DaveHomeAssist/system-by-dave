@@ -19,7 +19,10 @@ export const POWER_WORDS = Object.freeze({ on: 'ON', off: 'STANDBY', warming: 'W
 const time = value => typeof value === 'number' && Number.isFinite(value) && value > 0 && value < 8.64e15 ? value : null;
 
 export function emptyRecord() {
-  return { v: 1, playback: { on: null, off: null }, lanes: Object.fromEntries(MANUAL_LANES.map(lane => [lane, { tick: null, coolUntil: null }])) };
+  return { v: 1, playback: { on: null, off: null },
+    lanes: Object.fromEntries(MANUAL_LANES.map(lane => [lane, { tick: null, coolUntil: null }])),
+    // Night only: a relay lane the relay cannot read may be confirmed off by eye (decision POWER-4).
+    relay: Object.fromEntries(RELAY_LANES.map(lane => [lane, { tick: null }])) };
 }
 
 // Saved browser data is untrusted: anything that is not the expected shape is dropped.
@@ -34,6 +37,10 @@ export function parseRecord(text) {
     if (!item || typeof item !== 'object') continue;
     if (item.tick && typeof item.tick === 'object' && ['lit', 'off'].includes(item.tick.state) && time(item.tick.at)) record.lanes[lane].tick = { state: item.tick.state, at: item.tick.at };
     record.lanes[lane].coolUntil = time(item.coolUntil);
+  }
+  for (const lane of RELAY_LANES) {
+    const tick = raw.relay?.[lane]?.tick;
+    if (tick && typeof tick === 'object' && tick.state === 'off' && time(tick.at)) record.relay[lane].tick = { state: 'off', at: tick.at };
   }
   return record;
 }
@@ -83,19 +90,26 @@ export function laneReading(entry, connection) {
 }
 
 // A relay lane: the one command this mode may send, whether it may be sent now, and why not.
-export function relayStep(mode, reading, { lock = false, busy = false, playbackTicked = false } = {}) {
+// `tick` is the operator's own "off by eye" tick for this lane, used only at night and only while the
+// relay's fresh reply carries no power state.
+export function relayStep(mode, reading, { lock = false, busy = false, playbackTicked = false, tick = null, now = Date.now() } = {}) {
   const want = mode === 'on' ? 'on' : 'off';
-  const done = reading.kind === 'reading' && reading.power === want;
+  const read = reading.kind === 'reading' && reading.power === want;
   // A fresh reply with no power state in it (for example a unit in a standby the relay's driver does
   // not name). The relay still accepts power for it, as the operator console does, so the step
-  // stays usable. It is never counted as On or Standby.
+  // stays usable. It is never shown or counted as On or Standby.
   const unread = reading.kind === 'unknown';
+  // At night such a lane can be confirmed off by eye, exactly as a lane powered by handheld remote is.
+  const eyeOffered = unread && mode === 'off';
+  const eyeMatches = eyeOffered && !!tick && tick.state === 'off';
+  const eyeTicked = eyeMatches && tickCurrent(tick.at, now);
+  const done = read || eyeTicked;
   let reason = '', enabled = false;
   if (reading.kind === 'conflict') reason = 'This lane is assigned to more than one projector. Call the video lead.';
   else if (reading.kind === 'unassigned') reason = 'This lane is not set up on the relay. Call the video lead.';
   else if (reading.kind === 'disconnected') reason = 'The control page lost the relay. Wait for it to reconnect.';
   else if (reading.kind === 'noreply') reason = 'No fresh reply from this projector. No reply does not confirm power off.';
-  else if (done) reason = mode === 'on' ? 'The relay reads On. Nothing to send.' : 'The relay reads Standby. Nothing to send.';
+  else if (read) reason = mode === 'on' ? 'The relay reads On. Nothing to send.' : 'The relay reads Standby. Nothing to send.';
   else if (!playbackTicked) reason = 'Tick step 1 first.';
   else if (busy) reason = 'Another operation is running on this projector. Wait for it to finish.';
   else if (reading.power === 'cooling') reason = mode === 'on' ? 'Cooling. Wait for Standby before power on.' : 'Cooling down. Watch for Standby.';
@@ -103,10 +117,15 @@ export function relayStep(mode, reading, { lock = false, busy = false, playbackT
   else if (mode === 'off' && lock) reason = 'Show Lock is on, so power off is blocked. Ask the video lead to release it.';
   else {
     enabled = true;
-    if (unread) reason = `The relay cannot read this unit's power state. Look at it first: ${mode === 'on' ? 'power on only from standby' : 'power off only if it is lit'}.`;
+    if (unread) reason = mode === 'on'
+      ? "The relay cannot read this unit's power state. Look at it first: power on only from standby."
+      : "The relay cannot read this unit's power state. Look at it: tick if it is off, power off if it is lit.";
   }
   const tone = done ? 'done' : unread ? 'waiting' : reading.kind !== 'reading' ? 'blocked' : ['warming', 'cooling'].includes(reading.power) ? 'waiting' : 'todo';
-  return { done, enabled, reason, word: reading.word, tone, action: want };
+  return { done, enabled, reason, word: eyeTicked ? 'OFF BY EYE' : reading.word, tone, action: want,
+    // How this lane came to count: read by the relay, or looked at by the operator. Never both.
+    basis: read ? 'read' : eyeTicked ? 'eye' : null,
+    eye: { offered: eyeOffered, ticked: eyeTicked, lapsed: eyeMatches && !eyeTicked, tickedAt: eyeTicked ? tick.at : null } };
 }
 
 // A manual lane: the operator's own tick and timer. The relay reading, when there is one, can only veto.
@@ -126,18 +145,22 @@ export function manualStep(mode, item, reading, now) {
     tickReason: tickEnabled ? '' : 'Wait for the cooling countdown, then check by eye.' };
 }
 
-// The strip above the checklist. Night: safe to leave only when every relay lane reads Standby
-// from a fresh reply and every manual lane carries a current tick that no fresh reading disputes.
+// The strip above the checklist. Night: safe to leave only when every lane is either read as Standby
+// from a fresh relay reply or carries a current "off by eye" tick that no fresh reading disputes.
+// The detail says which lanes were read and which were looked at.
 export function banner(mode, lanes) {
   const missing = lanes.filter(lane => !lane.done).map(lane => ({ lane: lane.lane,
-    why: lane.kind === 'relay' ? lane.word.toLowerCase() : lane.conflict ? `ticked, but the relay reads ${lane.relayWord}` : lane.lapsed ? 'tick lapsed' : lane.timer?.running ? 'cooling timer' : 'not ticked' }));
+    why: lane.kind === 'relay' ? (lane.eye?.lapsed ? 'tick lapsed' : lane.word.toLowerCase()) : lane.conflict ? `ticked, but the relay reads ${lane.relayWord}` : lane.lapsed ? 'tick lapsed' : lane.timer?.running ? 'cooling timer' : 'not ticked' }));
   const complete = lanes.length > 0 && missing.length === 0;
-  const relay = lanes.filter(lane => lane.kind === 'relay').map(lane => lane.lane), manual = lanes.filter(lane => lane.kind === 'manual').map(lane => lane.lane);
+  const read = lanes.filter(lane => lane.kind === 'relay' && lane.basis !== 'eye').map(lane => lane.lane);
+  const eye = lanes.filter(lane => lane.kind === 'manual' || lane.basis === 'eye').map(lane => lane.lane);
   const list = items => items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items[0] || '';
+  const told = (state, sight) => [read.length ? `${list(read)} ${read.length === 1 ? 'reads' : 'read'} ${state}.` : '', eye.length ? `${list(eye)} confirmed ${sight} by eye.` : ''].filter(Boolean).join(' ');
+  const waiting = `Waiting on: ${missing.map(item => `${item.lane} ${item.why}`).join(' · ')}`;
   if (mode === 'off') return complete
-    ? { state: 'safe', title: 'Safe to leave the building', detail: `${list(relay)} read Standby. ${list(manual)} confirmed off by eye.`, missing }
-    : { state: 'wait', title: 'Not safe to leave yet', detail: `Waiting on: ${missing.map(item => `${item.lane} ${item.why}`).join(' · ')}`, missing };
+    ? { state: 'safe', title: 'Safe to leave the building', detail: told('Standby', 'off'), missing }
+    : { state: 'wait', title: 'Not safe to leave yet', detail: waiting, missing };
   return complete
-    ? { state: 'ready', title: 'All four on', detail: `${list(relay)} read On. ${list(manual)} confirmed lit by eye.`, missing }
-    : { state: 'wait', title: 'Not all on yet', detail: `Waiting on: ${missing.map(item => `${item.lane} ${item.why}`).join(' · ')}`, missing };
+    ? { state: 'ready', title: 'All four on', detail: told('On', 'lit'), missing }
+    : { state: 'wait', title: 'Not all on yet', detail: waiting, missing };
 }

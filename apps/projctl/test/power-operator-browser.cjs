@@ -404,14 +404,57 @@ const audit = () => {
     const body = (await sent).postDataJSON();
     assert.deepEqual([body.slot, body.cmd, body.arg], ['P3', 'power', 1]);
     await odd.locator('#on [data-why]').filter({ hasText: 'Command accepted by the relay' }).waitFor();
+    // Night: the relay cannot read lane C, so the operator's eyes decide, as they do for lanes A and D.
+    await reach('P2', true);  // lane B reads Standby
+    await reach('P4', false); // lane D is not reached, as at the venue
     await odd.locator('#t-off').click();
     await odd.locator('#off').waitFor();
     assert.match(await odd.locator('#off [data-banner-detail]').textContent(), /C unknown/, 'unknown is never counted as Standby');
     await odd.locator('#off [data-action]').click();
     await odd.locator('#off [data-step="2"]').click();
-    await odd.locator('#off [data-why]').filter({ hasText: 'Look at it first: power off only if it is lit.' }).waitFor();
-    assert.equal(await odd.locator('#off [data-action]').textContent(), 'Power off C');
-    assert.equal(await odd.locator('#off [data-action]').getAttribute('aria-disabled'), null);
+    const oddText = selector => odd.locator(selector).textContent();
+    assert.deepEqual([await oddText('#off [data-title]'), await oddText('#off [data-word]'), await oddText('#off [data-action]')], ['C · Stage', 'UNKNOWN', 'Tick by eye: C is off']);
+    assert.match(await oddText('#off [data-text]'), /cannot read lane C's power state, so go by eye/);
+    assert.match(await oddText('#off [data-pending]'), /Pending POWER-4/);
+    await odd.locator('#off [data-why]').filter({ hasText: 'Look at it: tick if it is off, power off if it is lit.' }).waitFor();
+    assert.deepEqual([await odd.locator('#off [data-timer]').isVisible(), await odd.locator('#off [data-lamp]').isVisible()], [false, false], 'no remote tools on a relay lane');
+    // Power off is still there beside the tick, with the same two steps.
+    const alt = odd.locator('#off [data-alt]');
+    assert.deepEqual([await alt.textContent(), await alt.getAttribute('aria-disabled')], ['Power off C', null]);
+    await alt.click();
+    await odd.locator('#off [data-alt][data-confirming]').waitFor();
+    assert.equal(await alt.textContent(), 'Confirm power off C');
+    await odd.waitForTimeout(450);
+    const off = odd.waitForRequest(request => request.url().endsWith('/api/command') && request.method() === 'POST');
+    await alt.click();
+    const offBody = (await off).postDataJSON();
+    assert.deepEqual([offBody.slot, offBody.cmd, offBody.arg, typeof offBody.confirm], ['P3', 'power', 0, 'string']);
+    await odd.locator('#off [data-why]').filter({ hasText: 'Command accepted by the relay' }).waitFor();
+    // The tick: shown as looked at, never as Standby.
+    await odd.locator('#off [data-action]').click();
+    await odd.locator('#off [data-word]').filter({ hasText: 'OFF BY EYE' }).waitFor();
+    assert.deepEqual([await odd.locator('#off [data-action]').getAttribute('aria-pressed'), await oddText('#off [data-action]'), await oddText('#off [data-step="2"] .pw-pill__word'), await odd.locator('#off [data-step="2"]').getAttribute('data-tone')], ['true', '\u2713 C off by eye', 'TICKED', 'done']);
+    assert.equal(await odd.locator('#off').getByText('STANDBY', { exact: true }).count(), 1, 'only lane B, which the relay did read, says Standby');
+    for (const [width, height] of [[375, 635], [320, 256]]) {
+      await odd.setViewportSize({ width, height });
+      assert.deepEqual(await odd.evaluate(audit), { scrolls: false, outside: [], cut: [], sheets: [] }, `${width}x${height} night, lane read by eye`);
+      if (await odd.locator('#off [data-detail-open]').isVisible()) {
+        await odd.locator('#off [data-detail-open]').click();
+        await alt.waitFor();
+        assert.deepEqual(await odd.evaluate(audit), { scrolls: false, outside: [], cut: [], sheets: [] }, `${width}x${height} night, lane read by eye, details`);
+        await odd.keyboard.press('Escape');
+      }
+    }
+    await odd.setViewportSize({ width: 375, height: 812 });
+    for (const index of [3, 4]) { await odd.locator(`#off [data-step="${index}"]`).click(); await odd.locator('#off [data-action]').click(); await odd.locator('#off [data-word]').filter({ hasText: 'OFF BY EYE' }).waitFor(); }
+    await odd.locator('#off [data-banner][data-state=safe]').waitFor();
+    assert.equal(await oddText('#off [data-banner-detail]'), 'B reads Standby. C, A and D confirmed off by eye.', 'the banner says which lanes were read and which were looked at');
+    if (SHOTS) { await odd.waitForTimeout(250); await odd.screenshot({ path: path.join(SHOTS, 'phone-night-safe-lane-c-by-eye.png') }); await odd.locator('#off [data-step="2"]').click(); await odd.waitForTimeout(250); await odd.screenshot({ path: path.join(SHOTS, 'phone-night-lane-c-unknown-ticked.png') }); }
+    // Taking the tick back takes the banner back.
+    await odd.locator('#off [data-step="2"]').click();
+    await odd.locator('#off [data-action]').click();
+    await odd.locator('#off [data-banner][data-state=wait]').waitFor();
+    assert.equal(await oddText('#off [data-banner-detail]'), 'Waiting on: C unknown');
     await odd.close();
 
     // ---- Signed out: sign in, then straight back to this page ----
@@ -461,6 +504,6 @@ const audit = () => {
       await visitor.close();
     } finally { await guarded.close(); }
 
-    console.log('Power operator page passed: morning on, nightly off, two-step power off and its expiry, Show Lock, no-reply and conflict guards, countdown, tick lapse, safe-to-leave banner, keyboard, themes, crew notes link configured and not configured, a lane with an unread power state, sign-in return, and containment at six sizes');
+    console.log('Power operator page passed: morning on, nightly off, two-step power off and its expiry, Show Lock, no-reply and conflict guards, countdown, tick lapse, safe-to-leave banner, keyboard, themes, crew notes link configured and not configured, a lane with an unread power state (powered, and confirmed off by eye at night), sign-in return, and containment at six sizes');
   } finally { await browser.close(); await relay.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });
