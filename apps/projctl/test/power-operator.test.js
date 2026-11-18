@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { startRelay, until } from './relay-helper.js';
 import { createConnectionMonitor } from '../public/projector-connection.js';
+import { createCommandBinding } from '../server/command-binding.js';
 import { rigLanes } from '../public/lanes.js';
 import { COOL_SECONDS, TICK_VALID_MS, STEPS, RELAY_LANES, MANUAL_LANES, emptyRecord, parseRecord, tickCurrent, coolTimer, clock, crewNotesUrl, laneReading, relayStep, manualStep, banner } from '../public/power-model.js';
 
@@ -112,7 +113,7 @@ test('a relay lane offers its command only when every guard passes', () => {
   assert.equal(relayStep('off', cooling, ready).done, false, 'cooling is not Standby');
   assert.deepEqual([relayStep('off', standby, ready).done, relayStep('off', standby, ready).enabled], [true, false]);
 
-  for (const reading of [readingOf(projector('C', 'off', { ageMs: 60000 })), readingOf(projector('C', 'off'), { relayConnected: false }), readingOf(projector('C', 'unknown')), readingOf(null), { kind: 'conflict', word: 'CONFLICT' }]) {
+  for (const reading of [readingOf(projector('C', 'off', { ageMs: 60000 })), readingOf(projector('C', 'off'), { relayConnected: false }), readingOf(null), { kind: 'conflict', word: 'CONFLICT' }]) {
     for (const mode of ['on', 'off']) {
       const step = relayStep(mode, reading, ready);
       assert.deepEqual([step.done, step.enabled, step.tone], [false, false, 'blocked'], `${mode} ${reading.kind}`);
@@ -120,6 +121,34 @@ test('a relay lane offers its command only when every guard passes', () => {
     }
   }
   assert.match(relayStep('off', readingOf(projector('C', 'off', { ageMs: 60000 })), ready).reason, /does not confirm power off/);
+});
+
+test('a relay lane whose fresh reply has no power state can still be powered, and is never counted as done', () => {
+  // Seen on a relay whose driver does not name one of a unit's standby states: the unit replies, power reads unknown.
+  const unread = readingOf(projector('C', 'unknown')), ready = { playbackTicked: true };
+  assert.deepEqual([unread.kind, unread.word], ['unknown', 'UNKNOWN']);
+  for (const mode of ['on', 'off']) {
+    const step = relayStep(mode, unread, ready);
+    assert.deepEqual([step.enabled, step.done, step.tone, step.word], [true, false, 'waiting', 'UNKNOWN'], mode);
+    assert.match(step.reason, mode === 'on' ? /cannot read this unit's power state\. Look at it first: power on only from standby\./ : /Look at it first: power off only if it is lit\./, `${mode} says to look first`);
+    assert.equal(relayStep(mode, unread, {}).enabled, false, `${mode} still waits for the playback tick`);
+    assert.equal(relayStep(mode, unread, { ...ready, busy: true }).enabled, false, `${mode} still waits for a running operation`);
+  }
+  assert.equal(relayStep('off', unread, { ...ready, lock: true }).enabled, false, 'Show Lock still blocks power off');
+  assert.equal(relayStep('on', unread, { ...ready, lock: true }).enabled, true);
+
+  // The banner never takes an unread lane for Standby or On.
+  const ticked = { item: tick('off'), reading: notReached };
+  const night = banner('off', lanesFor('off', { B: readingOf(projector('B', 'off')), C: unread, A: ticked, D: ticked }));
+  assert.deepEqual([night.state, night.detail], ['wait', 'Waiting on: C unknown']);
+
+  // The relay's own guard agrees: it refuses power on only while cooling, and power off only under Show Lock.
+  const state = power => ({ projector: { slot: 'P3', driver: 'simulator', ip: 'sim' }, status: { online: true, power }, connection: { state: 'online', lastSuccessAt: new Date().toISOString() }, lock: false, lockRevision: 0, busy: false });
+  const binding = createCommandBinding();
+  assert.doesNotThrow(() => binding.commandGuard('P3', () => state('unknown'))('power', true));
+  assert.doesNotThrow(() => binding.commandGuard('P3', () => state('unknown'))('power', false));
+  assert.throws(() => binding.commandGuard('P3', () => state('cooling'))('power', true), /cooling/);
+  assert.throws(() => binding.commandGuard('P3', () => ({ ...state('unknown'), lock: true }))('power', false), /show lock/);
 });
 
 test('a manual lane goes by the operator tick, and a fresh relay reading can only veto it', () => {

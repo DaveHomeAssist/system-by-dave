@@ -86,20 +86,26 @@ export function laneReading(entry, connection) {
 export function relayStep(mode, reading, { lock = false, busy = false, playbackTicked = false } = {}) {
   const want = mode === 'on' ? 'on' : 'off';
   const done = reading.kind === 'reading' && reading.power === want;
+  // A fresh reply with no power state in it (for example a unit in a standby the relay's driver does
+  // not name). The relay still accepts power for it, as the operator console does, so the step
+  // stays usable. It is never counted as On or Standby.
+  const unread = reading.kind === 'unknown';
   let reason = '', enabled = false;
   if (reading.kind === 'conflict') reason = 'This lane is assigned to more than one projector. Call the video lead.';
   else if (reading.kind === 'unassigned') reason = 'This lane is not set up on the relay. Call the video lead.';
   else if (reading.kind === 'disconnected') reason = 'The control page lost the relay. Wait for it to reconnect.';
   else if (reading.kind === 'noreply') reason = 'No fresh reply from this projector. No reply does not confirm power off.';
-  else if (reading.kind === 'unknown') reason = 'The projector replied without a power state. Wait for the next reading.';
   else if (done) reason = mode === 'on' ? 'The relay reads On. Nothing to send.' : 'The relay reads Standby. Nothing to send.';
   else if (!playbackTicked) reason = 'Tick step 1 first.';
   else if (busy) reason = 'Another operation is running on this projector. Wait for it to finish.';
   else if (reading.power === 'cooling') reason = mode === 'on' ? 'Cooling. Wait for Standby before power on.' : 'Cooling down. Watch for Standby.';
   else if (mode === 'on' && reading.power === 'warming') reason = 'Warming up. Watch for On.';
   else if (mode === 'off' && lock) reason = 'Show Lock is on, so power off is blocked. Ask the video lead to release it.';
-  else enabled = true;
-  const tone = done ? 'done' : reading.kind !== 'reading' ? 'blocked' : ['warming', 'cooling'].includes(reading.power) ? 'waiting' : 'todo';
+  else {
+    enabled = true;
+    if (unread) reason = `The relay cannot read this unit's power state. Look at it first: ${mode === 'on' ? 'power on only from standby' : 'power off only if it is lit'}.`;
+  }
+  const tone = done ? 'done' : unread ? 'waiting' : reading.kind !== 'reading' ? 'blocked' : ['warming', 'cooling'].includes(reading.power) ? 'waiting' : 'todo';
   return { done, enabled, reason, word: reading.word, tone, action: want };
 }
 

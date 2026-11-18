@@ -367,6 +367,53 @@ const audit = () => {
     assert.deepEqual(problems, [], 'no page error or console error');
     await context.close();
 
+    // ---- A relay lane that replies without a power state (a standby the relay's driver does not name) ----
+    // The live stream is rewritten on its way to this one page so lane C reads "unknown" while still replying.
+    await relay.api('lock', { lock: false });
+    const odd = await browser.newPage({ viewport: { width: 375, height: 812 }, reducedMotion: 'reduce' });
+    await odd.routeWebSocket(/\/ws$/, socket => {
+      const upstream = socket.connectToServer();
+      upstream.onMessage(message => {
+        let data;
+        try { data = JSON.parse(message); } catch { socket.send(message); return; }
+        if (data.type === 'snapshot') for (const item of data.projectors) { if (item.lane === 'C') item.status.power = 'unknown'; }
+        if (data.type === 'status' && data.slot === 'P3') data.status.power = 'unknown';
+        socket.send(JSON.stringify(data));
+      });
+    });
+    await odd.goto(relay.base + '/power.html');
+    await odd.locator('#conn[data-state=online]').waitFor();
+    await odd.locator('#on [data-step="1"]').click();
+    await odd.locator('#on [data-word]').filter({ hasText: 'UNKNOWN' }).waitFor();
+    assert.match(await odd.locator('#on [data-source]').textContent(), /no power state in it$/);
+    assert.equal(await odd.locator('#on [data-action]').getAttribute('aria-disabled'), 'true', 'the playback tick still comes first');
+    await odd.locator('#on [data-step="0"]').click();
+    await odd.locator('#on [data-action]').click();
+    await odd.locator('#on [data-step="1"]').click();
+    await odd.locator('#on [data-why]').filter({ hasText: "The relay cannot read this unit's power state. Look at it first: power on only from standby." }).waitFor();
+    assert.equal(await odd.locator('#on [data-action]').getAttribute('aria-disabled'), null, 'power on stays available, as on the operator console');
+    assert.deepEqual([await odd.locator('#on [data-step="1"]').getAttribute('data-tone'), await odd.locator('#on [data-step="1"] .pw-pill__word').textContent()], ['waiting', 'UNKNOWN']);
+    assert.match(await odd.locator('#on [data-banner-detail]').textContent(), /C unknown/, 'unknown is never counted as On');
+    for (const [width, height] of [[375, 635], [320, 256]]) {
+      await odd.setViewportSize({ width, height });
+      assert.deepEqual(await odd.evaluate(audit), { scrolls: false, outside: [], cut: [], sheets: [] }, `${width}x${height} unknown power state`);
+    }
+    await odd.setViewportSize({ width: 375, height: 812 });
+    const sent = odd.waitForRequest(request => request.url().endsWith('/api/command') && request.method() === 'POST');
+    await odd.locator('#on [data-action]').click();
+    const body = (await sent).postDataJSON();
+    assert.deepEqual([body.slot, body.cmd, body.arg], ['P3', 'power', 1]);
+    await odd.locator('#on [data-why]').filter({ hasText: 'Command accepted by the relay' }).waitFor();
+    await odd.locator('#t-off').click();
+    await odd.locator('#off').waitFor();
+    assert.match(await odd.locator('#off [data-banner-detail]').textContent(), /C unknown/, 'unknown is never counted as Standby');
+    await odd.locator('#off [data-action]').click();
+    await odd.locator('#off [data-step="2"]').click();
+    await odd.locator('#off [data-why]').filter({ hasText: 'Look at it first: power off only if it is lit.' }).waitFor();
+    assert.equal(await odd.locator('#off [data-action]').textContent(), 'Power off C');
+    assert.equal(await odd.locator('#off [data-action]').getAttribute('aria-disabled'), null);
+    await odd.close();
+
     // ---- Signed out: sign in, then straight back to this page ----
     const guarded = await startRelay({ PJ_PASSCODE: 'fixture-only-passcode' });
     try {
@@ -414,6 +461,6 @@ const audit = () => {
       await visitor.close();
     } finally { await guarded.close(); }
 
-    console.log('Power operator page passed: morning on, nightly off, two-step power off and its expiry, Show Lock, no-reply and conflict guards, countdown, tick lapse, safe-to-leave banner, keyboard, themes, crew notes link configured and not configured, sign-in return, and containment at six sizes');
+    console.log('Power operator page passed: morning on, nightly off, two-step power off and its expiry, Show Lock, no-reply and conflict guards, countdown, tick lapse, safe-to-leave banner, keyboard, themes, crew notes link configured and not configured, a lane with an unread power state, sign-in return, and containment at six sizes');
   } finally { await browser.close(); await relay.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

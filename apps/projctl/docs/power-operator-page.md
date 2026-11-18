@@ -1,8 +1,9 @@
 # Power operator page brief
 
-Status: first version built and tested in the simulator on November 18, 2026. Not
-installed on any show computer. Not exercised against a real projector, a real phone or a
-venue network. Decisions POWER-1 to POWER-3, ACCESS-1, ACCESS-2 and NET-1 to NET-3 are
+Status: first version built and tested in the simulator on November 18, 2026. The same
+day, on the owner's instruction, the four page files of commit `ca8ba48` were copied to
+the show computer's relay with no restart; nothing later than that commit is there. No
+signed-in load, real projector, real phone or venue network has been exercised. Decisions POWER-1 to POWER-4, ACCESS-1, ACCESS-2 and NET-1 to NET-3 are
 open. The page is built on the recommended option for each and marks what depends on one.
 
 ## Problem
@@ -65,6 +66,11 @@ button.
   step completes only when a fresh relay reading shows ON (morning) or STANDBY (night).
 - A stale or missing reply is shown as "No fresh reply" with the last known value
   labeled as last known. It never counts as Standby.
+- A fresh reply that carries no power state reads UNKNOWN. The step stays usable, as it
+  is on the operator console and as the relay's own guard allows: the button is offered
+  with the note "The relay cannot read this unit's power state. Look at it first". UNKNOWN
+  never counts as On or Standby, so the step does not complete and the banner stays off
+  for that lane (POWER-4).
 
 ### Manual lanes (A and D)
 
@@ -193,6 +199,11 @@ The page never scrolls (workspace rule WEB-2), in both themes, light by default.
   `public/power-model.js` (`RELAY_LANES`, `MANUAL_LANES`, `STEPS`).
 - **POWER-2** decides whether step 1 exists and who closes the playback app.
 - **POWER-3** blocks the lamp message helper.
+- **Relay version.** A relay whose Barco driver predates the standby mapping of
+  November 17, 2026 (`CHANGELOG.md`, "Projctl Barco standby power state") reports that
+  unit as UNKNOWN once it settles into network standby. On such a relay this page can
+  still power the lane, but it cannot show STANDBY for it, so "Safe to leave the building"
+  stays off until the relay is updated. The page does not guess.
 - The 170 second figure is the cooling time recorded for the lamp units. It is a
   guide for the operator's eyes, not a measurement.
 - The page trusts the operator's ticks for A and D. A wrong tick gives a wrong banner.
@@ -210,8 +221,8 @@ The page never scrolls (workspace rule WEB-2), in both themes, light by default.
   the exact request it sends (two-step power off, Show Lock, a stale target revision,
   the cooling guard, a lane with no reply); the crew notes read (not configured,
   configured and signed in, refused when signed out, an unusable address); and the state
-  rules in `power-model.js` (lane readings, both step kinds, tick lapse, the countdown,
-  the banner, which crew notes addresses are accepted).
+  rules in `power-model.js` (lane readings, both step kinds, an unread power state, tick
+  lapse, the countdown, the banner, which crew notes addresses are accepted).
 - `test/power-operator-browser.cjs` (Chromium, simulator relay, lanes A and D made
   unreachable as at the venue): both checklists end to end on a phone; every request the
   page sent; the playback tick gate; the two-step confirmation, its lapse and the
@@ -221,7 +232,9 @@ The page never scrolls (workspace rule WEB-2), in both themes, light by default.
   focus and history; both themes; sign-in and return; the crew notes link when
   configured (label, new tab, no opener, and no request to the address by the page) and
   when not configured (nothing shown, also for an address the page must refuse and for a
-  relay without the route); and no page scroll, nothing outside its panel and no cut text
+  relay without the route); a relay lane rewritten to reply with no power state (UNKNOWN,
+  power still offered after the playback tick, the command sent, never counted as On or
+  Standby); and no page scroll, nothing outside its panel and no cut text
   at 375 by 812, 375 by 635, 1440 by 900, 844 by 390, 320 by 256 and 3840 by 1080, with
   the longest strings and the crew notes rule set on screen.
 - Not covered by any test: real projectors, the real PJLink conflict with the playback
@@ -240,9 +253,11 @@ The first option is the recommendation. The page is built on it.
 | POWER-1 | How are lamp lanes A and D powered? | Handheld remote, confirmed by eye on this page. B and C through the relay. No build needed. | Quit the playback app first, then the relay for all four. Makes all four lanes relay steps. | Teach the relay to reach A and D on the maker's own control port. One flow for all four, but needs a build and an install. | Whether A and D stay manual steps |
 | POWER-2 | Who closes and reopens the playback app around the power cycle? | The show backup. The power operator only ticks that it is closed, and the relay power buttons wait for that tick. | The power operator does it. The step becomes an instruction, not a check. | The playback app stays open overnight. Step 1 is removed. Needs a dark-day test that outputs survive a power cycle. | Step 1 wording, or its removal |
 | POWER-3 | What does the lamp message helper say? | Record the message, the right answer and the reason on a supervised power-on, then fill the slot. | Leave the slot as "photograph it and call" for the whole run. | | The helper content |
+| POWER-4 | A relay lane replies but with no power state (UNKNOWN). What may the operator do? | Power stays available with a "look at it first" note, as on the operator console. The lane never counts as On or Standby. Built this way. | Block power and send the operator to the video lead. Safest on paper, but on a relay that cannot name a unit's standby the lane could never be powered on from this page. | Add a "confirmed by eye" tick for that lane so the banner can still turn on. Changes the banner rule. | Morning power on for a lane the relay cannot read; whether the banner needs a relay update |
 
 Needed now: POWER-1 and POWER-2, before the operator's walk-through. POWER-3 needs the
-supervised power-on first.
+supervised power-on first. POWER-4 matters only on a relay that reports UNKNOWN for a
+replying unit; updating that relay removes the case.
 
 ## Role access proposal
 
