@@ -1,18 +1,34 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "58e8a311935b847bc829f6fc8d7f7c2551e05949",
-  "deploymentId": "appgdep_6afb70f9396881919f33f64ad192f33e",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_30ad388287088191ac4a5d6d6abb4c3d",
+  "managedSourceCommit": "9acb4e77a03e308a4b076f7d46d6e4b6cf71a19b",
+  "deploymentId": "appgdep_6afdefaa3bac8191b62258d360bfefb3",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_86dc15797f8481918985ece439b44a4d",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 43,
-  "acceptedSourceCommit": "4f4dbd764803134b4b52306baec458c21a124f9f",
-  "publicVerifiedAt": "2026-11-16T21:10:07.631233+00:00",
+  "versionNumber": 47,
+  "acceptedSourceCommit": "9ebb8dab79197e1612e8c757e8e80b4a31674cb9",
+  "publicVerifiedAt": "2026-11-18T18:42:36Z",
   "priorPublications": [
+    {
+      "versionNumber": 46,
+      "managedSourceCommit": "461b60efd1c09f04fd60d516c9c477b2f35dc89e",
+      "deploymentId": "appgdep_6afdedc04a448191846b3ca20a8bbbb1",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_ebfdbbc385288191862d65be1e13a784",
+      "acceptedSourceCommit": "9ebb8dab79197e1612e8c757e8e80b4a31674cb9",
+      "note": "Intermediate active-source publication superseded before acceptance after the tracked viewer distribution was found stale."
+    },
+    {
+      "versionNumber": 45,
+      "managedSourceCommit": "c211220fccfc05eff7626abab33ded78af0e016d",
+      "deploymentId": "appgdep_6afde7174f18819199398796665da79b",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_165fdcf82714819199398796665da79b",
+      "acceptedSourceCommit": "a9dea1a8073e121d7df500eabb6cbfe9d6831b77",
+      "note": "Media upload phase. The temporary uploader secret was removed before the active-source publications."
+    },
     {
       "versionNumber": 42,
       "managedSourceCommit": "b1012cd676c1d6afea68cc3ab93c0d872dd57595",
@@ -147,7 +163,92 @@
       "note": "Stage/reference polish from PR 448 (taskPublication)"
     }
   ],
-  "sourceReconciliation": "Both November 15 sessions use the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation is retained with the new review entries. Original image routes, shared task API, documents and unrelated assets are preserved. Public audience unchanged; video remains deferred. Version 41 corrects timeline text overlap and filter clipping without increasing timeline height or changing published evidence. Version 42 uses the canonical Frozen light/dark skin and shared appearance preference, consistent Home navigation, and the approved later review image for cue 13. Original frames and capture context are preserved. The hosting policy authorizes both exact inline scripts before execution. Version 43 supersedes original-pair recovery for the selected cue 13 photo: every review mode and the old public original/thumbnail URLs use the approved replacement. Raw archives and stored original bytes remain intact.",
+  "november17Release": {
+    "releaseId": "nov17-57d1c28570e7",
+    "publishedAt": "2026-11-18T18:34:30.466541+00:00",
+    "frozenSourceCommits": [
+      "7bc1afbae10dcdf90d559684801e869f2b3808e6",
+      "31e5139dffabe51578c0e2baa9fe10dc2b842661",
+      "1fad761ae1b77cd787efc0943c035f59abc0dcd6"
+    ],
+    "systemSourceCommits": [
+      "79690d24feb6c2a01a22db93e6932e4a6635c40e",
+      "a9dea1a8073e121d7df500eabb6cbfe9d6831b77",
+      "9ebb8dab79197e1612e8c757e8e80b4a31674cb9"
+    ],
+    "sessions": [
+      {
+        "sessionId": "20261117-123916",
+        "label": "Afternoon run · Nov 17",
+        "events": 145,
+        "go": 141,
+        "originalPhotos": 562,
+        "repeatGo": 18
+      },
+      {
+        "sessionId": "20261117-195209-act-1",
+        "label": "Show Act 1 · Nov 17",
+        "events": 171,
+        "go": 154,
+        "originalPhotos": 476,
+        "repeatGo": 172
+      },
+      {
+        "sessionId": "20261117-195209-act-2",
+        "label": "Show Act 2 · Nov 17",
+        "events": 177,
+        "go": 163,
+        "originalPhotos": 473,
+        "repeatGo": 235
+      }
+    ],
+    "referenceCues": 428,
+    "browserAcceptance": {
+      "host": "Dominic",
+      "statesPassed": 120,
+      "widths": [1440, 1280, 680, 375, 2240, 3840],
+      "themes": ["light", "dark"],
+      "layouts": ["grid", "across"],
+      "behaviors": [
+        "original image dimensions",
+        "preview navigation and Escape",
+        "note isolation and reload",
+        "exact session and firing links",
+        "repeated cue jump",
+        "invalid context retains capture"
+      ]
+    },
+    "publicHashReadback": {
+      "expected": 3162,
+      "verified": 3162,
+      "manifestRoutes": 5,
+      "mediaRoutes": 3156,
+      "failures": 0
+    },
+    "november15Preservation": {
+      "routesMatched": 1647,
+      "changed": 0,
+      "missing": 0,
+      "afternoonManifestSha256": "5b649d362b7ec836b450f383314bcebfd1f43782cf7f0cef0faaa69560265ba8",
+      "eveningManifestSha256": "3aae115aaa16e8d910756317343032d323d959aabba4fe109ad007234a34d433"
+    },
+    "existingRuntime": {
+      "homeAndPlanningReviewLinks": true,
+      "taskApiStatus": 200,
+      "taskRecords": 17,
+      "taskSchemaValid": true,
+      "handoffStatus": 200,
+      "documentHashesMatch": true
+    },
+    "environmentRevision": 6,
+    "temporaryUploaderSecretRemoved": true,
+    "audience": "public",
+    "limitations": [
+      "FRC_AFTERNOON_ZIP was unavailable, so the real-afternoon archive fixture remained skipped.",
+      "The hosting provider injects an inline script that the existing content security policy blocks; application scripts and cue rendering passed."
+    ]
+  },
+  "sourceReconciliation": "November 17 afternoon, show Act 1 and show Act 2 are published alongside both November 15 sessions in the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation, shared task API, handoff and document bytes are preserved. All 1511 new original photos passed public SHA-256 readback, all 1647 prior November 15 manifest and media routes match the before snapshot, and the Site remains public. Video remains deferred.",
   "verification": {
     "host": "Dominic",
     "macCheck": "Live reload verified Single and All photos use the clean cue 15 frame, with Replacement label, 19:08:27 EST time and +38.30 second offset. Existing note remains present.",
