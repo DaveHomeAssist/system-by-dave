@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Projctl | Show backup</title>
+<meta name="description" content="Show backup page: a go or no-go strip, the four projection lanes as the relay reports them, and a guarded shutter control for each lane.">
+<link rel="canonical" href="http://localhost:8080/show.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Projctl relay">
+<meta property="og:title" content="Projctl | Show backup">
+<meta property="og:description" content="Show backup page: a go or no-go strip, the four projection lanes as the relay reports them, and a guarded shutter control for each lane.">
+<meta property="og:url" content="http://localhost:8080/show.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Projctl | Show backup">
+<meta name="twitter:description" content="Show backup page: a go or no-go strip, the four projection lanes as the relay reports them, and a guarded shutter control for each lane.">
+<meta name="theme-color" content="#edf5fa">
+<link rel="icon" href="data:,">
+<script src="frozen-theme.js"></script><link rel="stylesheet" href="frozen-theme.css">
+<link rel="stylesheet" href="avd/tokens.css">
+<link rel="stylesheet" href="show.css">
+<script type="module" src="show.js"></script>
+</head>
+<body>
+<a class="sb-skip" href="#sb-main">Skip to status</a>
+<noscript><p class="sb-noscript">This page needs JavaScript to read the relay. Until it is on, check every lane by eye.</p></noscript>
+<div class="sb-shell">
+  <header class="sb-top">
+    <div class="sb-brand">
+      <p class="sb-kicker"><span>Projctl</span><span id="sb-sim" class="sb-sim" hidden>Simulation</span></p>
+      <h1>Show backup</h1>
+    </div>
+    <span id="sb-lock" class="sb-pill" data-lock="unknown" role="status">Show Lock unknown</span>
+    <time id="sb-clock" class="sb-clock"></time>
+    <button id="theme" type="button" class="sb-btn sb-btn--quiet">Theme</button>
+  </header>
+
+  <p id="sb-verdict" class="sb-verdict" data-state="off" role="status"><strong data-f="title">Connecting</strong><span data-f="text">Waiting for the relay. Nothing below is a reading yet.</span></p>
+
+  <main id="sb-main" class="sb-main" data-view="lanes" tabindex="-1">
+    <section id="sb-checks" class="sb-section sb-section--checks" aria-labelledby="sb-checks-h">
+      <h2 id="sb-checks-h" class="sb-sr">Go or no-go</h2>
+      <ul class="sb-checks" id="sb-check-list"></ul>
+    </section>
+    <section id="sb-lanes" class="sb-section sb-section--lanes" aria-labelledby="sb-lanes-h">
+      <h2 id="sb-lanes-h" class="sb-sr">Lanes and shutters</h2>
+      <div class="sb-pick" id="sb-pick" role="group" aria-label="Lane shown"></div>
+      <div class="sb-lanes" id="sb-lane-list"></div>
+    </section>
+  </main>
+
+  <footer class="sb-foot">
+    <nav class="sb-rail" aria-label="View">
+      <button type="button" class="sb-rail__btn" data-view-btn="lanes" aria-pressed="true">Lanes</button>
+      <button type="button" class="sb-rail__btn" data-view-btn="checks" aria-pressed="false">Checks</button>
+    </nav>
+    <button id="sb-help" type="button" class="sb-btn sb-btn--help" aria-label="Call for help with a snapshot"><span class="sb-help__long">Call for help with a snapshot</span><span class="sb-help__short">Help</span></button>
+    <p class="sb-foot__note">Shutters only. Power, patterns, lens and the show file stay with the video lead.</p>
+  </footer>
+</div>
+<p id="sb-live" class="sb-sr" aria-live="polite"></p>
+
+<dialog id="sb-detail" class="sb-dialog" aria-labelledby="sb-detail-title">
+  <p class="sb-dialog__state" data-f="state"></p>
+  <h2 id="sb-detail-title" data-f="title"></h2>
+  <p class="sb-dialog__value" data-f="value"></p>
+  <div data-f="detail"></div>
+  <h3>This page cannot tell</h3>
+  <ul data-f="cannot"></ul>
+  <button type="button" class="sb-btn sb-btn--primary" data-close>Close</button>
+</dialog>
+
+<dialog id="sb-snapshot" class="sb-dialog" aria-labelledby="sb-snapshot-title">
+  <h2 id="sb-snapshot-title">Snapshot for a text message</h2>
+  <p id="sb-snapshot-status" class="sb-dialog__value" role="status"></p>
+  <textarea id="sb-snapshot-text" class="sb-snapshot" readonly rows="9" aria-label="Snapshot text"></textarea>
+  <p class="sb-dialog__hint">No phone number is stored on this page. Use the number on your card.</p>
+  <div class="sb-dialog__actions">
+    <button type="button" id="sb-snapshot-copy" class="sb-btn sb-btn--primary">Copy again</button>
+    <a id="sb-snapshot-sms" class="sb-btn" href="sms:">Open a text message</a>
+    <button type="button" class="sb-btn sb-btn--quiet" data-close>Close</button>
+  </div>
+</dialog>
+</body>
+</html>

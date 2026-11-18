@@ -1,5 +1,11 @@
 # Changelog
 
+## Projctl show backup page, 2026-11-18
+
+- Add `apps/projctl/public/show.html`, a role page for the person who backs up projection from the lighting position. A go or no-go strip (lanes lit, outputs, cue link, show computer) sits above the four lanes. A lane the relay is not reading says "check by eye" and never shows its last known state. The cue link says "Not connected", because console cues do not pass through the relay.
+- The page sends one command: a shutter move for one lane, after a two-step confirm, with the reviewed target revision. It is offered only on a current reply that says power is ON. "Call for help with a snapshot" copies a plain-text summary; no number is stored.
+- No relay, console or sign-in change. `npm run test:browser` gains `test/show-backup-browser.cjs`, and `test/show-backup.test.js` joins `npm test`. Simulator only: not installed on a relay computer and not accepted on a rig. Brief, limits and open decisions SBP-1 to SBP-7: `apps/projctl/docs/show-backup-page.md`.
+
 ## Projctl health reports: no current reading, 2026-11-18
 
 - A projector not reached at report time no longer shows its last power state as current. The unit table says "No current reading (last known on)", and saved reports render the same way. On Nov 17, lanes A and D kept showing "on" for about 10 hours with no contact.
