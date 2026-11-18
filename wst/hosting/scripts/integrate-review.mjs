@@ -60,13 +60,18 @@ if (phase === 'active') {
   for (const url of ['/', '/index.html']) {
     let home = assets[url]; assert(home, 'Missing WST home');
     home = home.replace(/<a href="\/run-review\/" style="[^"]*">Review November 15 run · 417 cues<\/a>/, '');
-    if (!home.includes('class="home-choice"')) {
+    const existingReviewCard = /<a class="home-choice"[^>]*>[\s\S]*?<\/a>/;
+    if (existingReviewCard.test(home)) {
+      home = home.replace(existingReviewCard, card);
+    } else {
       const start = home.indexOf('<div class="home-choices">');
       const end = home.indexOf('</div>', start);
       assert(start >= 0 && end > start, 'Missing Home choices boundary');
       home = home.slice(0, end) + card + '\n' + home.slice(end);
     }
-    if (!home.includes('class="planning-link"')) home = home.replace('<button type="button" data-route="documents">Documents</button></nav>', '<button type="button" data-route="documents">Documents</button>' + planning + '</nav>');
+    const existingPlanningLink = /<a class="planning-link"[^>]*>[\s\S]*?<\/a>/;
+    if (existingPlanningLink.test(home)) home = home.replace(existingPlanningLink, planning);
+    else home = home.replace('<button type="button" data-route="documents">Documents</button></nav>', '<button type="button" data-route="documents">Documents</button>' + planning + '</nav>');
     assert(home.includes(card) && home.includes(planning), 'Review navigation did not attach');
     assets[url] = home;
   }
