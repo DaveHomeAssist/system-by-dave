@@ -16,15 +16,16 @@ The selected WST Site is `appgprj_6aed67f5df688191acf3e2641138818a`, with the ex
 3. Test the viewer, build `viewer/dist/rehearsal-review.html`, and record its
    committed SHA. Pin the current context/source snapshot in the release.
 4. Run `node wst/hosting/scripts/integrate-review.mjs MANAGED VIEWER RELEASE media`
-   to add only checksum-allowlisted media routes. The prior viewer stays live.
+   to add only checksum-allowlisted media routes. The prior catalog, manifests
+   and viewer stay live while the new media routes become uploadable.
    Add a temporary secret `REVIEW_UPLOAD_TOKEN` through Sites, then publish
    the helper's pushed and packaged source with the same Site ID.
 5. On the runner, run `python3 wst/hosting/scripts/transfer-review.py RELEASE`.
    Supply the temporary token only through its hidden prompt. This uploads
-   missing afternoon originals and reads back all 1,644 public originals.
+   only new session originals and reads back every old and new public original.
    It rejects a conflicting stored hash and never deletes or rewrites evidence.
 6. Remove `REVIEW_UPLOAD_TOKEN` through Sites. Run the installer with `active`
-   to replace only the review viewer, activate both manifests and apply the
+   to replace only the review viewer, activate the complete catalog and apply the
    canonical Home/Planning navigation. An optional fifth argument selects the
    canonical `wst` directory when the runner has a different layout.
 7. Test the packaged Worker, existing task service with synthetic fixtures,

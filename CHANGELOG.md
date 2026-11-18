@@ -1,5 +1,15 @@
 # Changelog
 
+## Projctl health reports: no current reading, 2026-11-18
+
+- A projector not reached at report time no longer shows its last power state as current. The unit table says "No current reading (last known on)", and saved reports render the same way. On Nov 17, lanes A and D kept showing "on" for about 10 hours with no contact.
+
+## Verify AV Video: retained suite in its own job, 2026-11-17
+
+- The `video` job was not hanging. It ran 12 to 15 minutes against its 15-minute limit; three of eight recent green runs finished above 14m40s. The retained standalone-build suite (`npm run test:av-retained-browser`, about six minutes) ran inside the last long step, "Infrastructure and Shop panels and saved-plan compatibility", so on a slower runner the job was cancelled while that suite was still passing checks (run 44161812645 and the first attempt of run 44167101248).
+- The suite now runs in a parallel `retained` job, which builds the eight family fixtures it serves. Every step in both jobs has its own `timeout-minutes`, so a real stall fails at the step that stalled.
+- The retained runner stops any probe that runs past four minutes (`AV_RETAINED_PROBE_LIMIT_MS`) and names it in the error.
+
 ## Frozen Monitor: compact app bar, 2026-11-17
 
 - The six Monitor pages move the Light, Dark and System buttons into one theme menu, following the refined header design. The bar stays on one row down to about 1000 px, so it no longer takes three rows when the Monitor shares a screen with Rehearsal Review, MIDI Live and PTZ. In Dark, the current section and an active Show Lock get the glow from the design. The saved theme and all relay behaviour are unchanged.
