@@ -54,7 +54,9 @@ in a Notion database.
   database without these properties still receives the page without them.
 - Page body: a unit table (slot, lane, model, address, power, intake or ambient
   temperature, rated limit, headroom, internal temperatures, flags, light hours,
-  last contact) and the controller events since the previous report.
+  last contact) and the controller events since the previous report. A unit not
+  reached at report time shows `No current reading`, with its last known power
+  when there is one, so an old state is not read as current.
 
 Slots are internal relay IDs. Every row also names lane, model and address,
 because production paperwork numbers the projectors differently.

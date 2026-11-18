@@ -1,5 +1,9 @@
 # Changelog
 
+## Projctl health reports: no current reading, 2026-11-18
+
+- A projector not reached at report time no longer shows its last power state as current. The unit table says "No current reading (last known on)", and saved reports render the same way. On Nov 17, lanes A and D kept showing "on" for about 10 hours with no contact.
+
 ## Projctl Barco standby power state, 2026-11-17
 
 - The Barco Pulse driver now reads `system.state` `standby` as power OFF. Before, a Barco that had cooled down into standby showed UNKNOWN with "power unknown" on the monitor while still replying (seen on lane C at WST, Nov 17 after the 10:01 PM power-off). Power commands and lens guards are unchanged. A new test pins every mapped state.
