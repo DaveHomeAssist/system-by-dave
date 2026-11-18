@@ -4,6 +4,12 @@
 
 - A projector not reached at report time no longer shows its last power state as current. The unit table says "No current reading (last known on)", and saved reports render the same way. On Nov 17, lanes A and D kept showing "on" for about 10 hours with no contact.
 
+## Verify AV Video: retained suite in its own job, 2026-11-17
+
+- The `video` job was not hanging. It ran 12 to 15 minutes against its 15-minute limit; three of eight recent green runs finished above 14m40s. The retained standalone-build suite (`npm run test:av-retained-browser`, about six minutes) ran inside the last long step, "Infrastructure and Shop panels and saved-plan compatibility", so on a slower runner the job was cancelled while that suite was still passing checks (run 44161812645 and the first attempt of run 44167101248).
+- The suite now runs in a parallel `retained` job, which builds the eight family fixtures it serves. Every step in both jobs has its own `timeout-minutes`, so a real stall fails at the step that stalled.
+- The retained runner stops any probe that runs past four minutes (`AV_RETAINED_PROBE_LIMIT_MS`) and names it in the error.
+
 ## Projctl Barco standby power state, 2026-11-17
 
 - The Barco Pulse driver now reads `system.state` `standby` as power OFF. Before, a Barco that had cooled down into standby showed UNKNOWN with "power unknown" on the monitor while still replying (seen on lane C at WST, Nov 17 after the 10:01 PM power-off). Power commands and lens guards are unchanged. A new test pins every mapped state.
