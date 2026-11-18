@@ -1,9 +1,10 @@
 # Power operator page brief
 
 Status: first version built and tested in the simulator on November 18, 2026. The same
-day, on the owner's instruction, the four page files of commit `ca8ba48` were copied to
-the show computer's relay with no restart; nothing later than that commit is there. No
-signed-in load, real projector, real phone or venue network has been exercised. Decisions POWER-1 to POWER-4, ACCESS-1, ACCESS-2 and NET-1 to NET-3 are
+day, on the owner's instruction, the four page files were copied to the show computer's
+relay; at the last check they matched commit `46ea2dc`. The relay changes in this pull
+request (the crew notes read) are not there. No signed-in load, real projector, real
+phone or venue network has been exercised. Decisions POWER-1 to POWER-4, ACCESS-1, ACCESS-2 and NET-1 to NET-3 are
 open. The page is built on the recommended option for each and marks what depends on one.
 
 ## Problem
