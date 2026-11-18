@@ -1,18 +1,27 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "9acb4e77a03e308a4b076f7d46d6e4b6cf71a19b",
-  "deploymentId": "appgdep_6afdefaa3bac8191b62258d360bfefb3",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_86dc15797f8481918985ece439b44a4d",
+  "managedSourceCommit": "80fa000e6755a405df7ce4fa78413ebdad14433b",
+  "deploymentId": "appgdep_6afe05747fe081919428b21d44e71752",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_b8e3299d86e08191805f27bae73708aa",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 47,
-  "acceptedSourceCommit": "9ebb8dab79197e1612e8c757e8e80b4a31674cb9",
-  "publicVerifiedAt": "2026-11-18T18:42:36Z",
+  "versionNumber": 48,
+  "acceptedSourceCommit": "eb3a8eab7b911e9fec6a9a6ee3fa589d247f87a4",
+  "publicVerifiedAt": "2026-11-18T20:11:12Z",
   "priorPublications": [
+    {
+      "versionNumber": 47,
+      "managedSourceCommit": "9acb4e77a03e308a4b076f7d46d6e4b6cf71a19b",
+      "deploymentId": "appgdep_6afdefaa3bac8191b62258d360bfefb3",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_86dc15797f8481918985ece439b44a4d",
+      "acceptedSourceCommit": "9ebb8dab79197e1612e8c757e8e80b4a31674cb9",
+      "publicVerifiedAt": "2026-11-18T18:42:36Z",
+      "note": "Initial five-session November 17 Run Review release, superseded only by the approved timing metadata correction."
+    },
     {
       "versionNumber": 46,
       "managedSourceCommit": "461b60efd1c09f04fd60d516c9c477b2f35dc89e",
@@ -264,7 +273,43 @@
       "The hosting provider injects an inline script that the existing content security policy blocks; application scripts and cue rendering passed."
     ]
   },
-  "sourceReconciliation": "November 17 afternoon, show Act 1 and show Act 2 are published alongside both November 15 sessions in the maintained Frozen Rehearsal Review viewer at /run-review/. Existing Home and Planning navigation, shared task API, handoff and document bytes are preserved. All 1511 new original photos passed public SHA-256 readback, all 1647 prior November 15 manifest and media routes match the before snapshot, and the Site remains public. Video remains deferred.",
+  "november17TimingCorrection": {
+    "releaseId": "nov17-81958bb73e8c",
+    "publishedAt": "2026-11-18T20:07:29.572404+00:00",
+    "frozenSourceCommit": "eb3a8eab7b911e9fec6a9a6ee3fa589d247f87a4",
+    "managedSourceCommit": "80fa000e6755a405df7ce4fa78413ebdad14433b",
+    "siteVersion": 48,
+    "deploymentId": "appgdep_6afe05747fe081919428b21d44e71752",
+    "sourcePullRequest": "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/6",
+    "photoHashesUnchanged": true,
+    "photoRoutesVerified": 3156,
+    "november15ManifestsUnchanged": true,
+    "clockOffsets": [
+      {"sessionId": "20261117-123916", "beforeSeconds": 0.169, "afterSeconds": 0.006},
+      {"sessionId": "20261117-195209-act-1", "beforeSeconds": 0.357, "afterSeconds": 0.006},
+      {"sessionId": "20261117-195209-act-2", "beforeSeconds": 0.357, "afterSeconds": 0.006}
+    ],
+    "photoOffsetAdjustments": [
+      {"sessionId": "20261117-123916", "seconds": -0.163},
+      {"sessionId": "20261117-195209-act-1", "seconds": -0.351},
+      {"sessionId": "20261117-195209-act-2", "seconds": -0.351}
+    ],
+    "warningCountsBefore": 0,
+    "warningCountsAfter": 0,
+    "negativeTriggerOffsetsPreserved": true,
+    "browserStatesPassed": 120,
+    "publicRoutesVerified": 3162,
+    "publicFailures": 0,
+    "uploadSecretPresent": false,
+    "environmentRevision": 6,
+    "audience": "public",
+    "limitations": [
+      "FRC_AFTERNOON_ZIP was unavailable, so the real-afternoon archive fixture remained skipped.",
+      "The first Sites archive upload attempt failed at the transport layer before a version was created; retrying the same validated archive created version 48.",
+      "Dominic's generic Node container lacked Git and Python for two checks; the checks passed with the documented baseline or locally, and all browser checks ran on Dominic."
+    ]
+  },
+  "sourceReconciliation": "The five-session Frozen Rehearsal Review remains live at /run-review/. The November 17 published clock and derived photo offsets now carry the approved correction note. All 3156 photo routes and both November 15 manifests are unchanged; cue and capture times, event IDs, slot selection, missing slots, counts, existing Home and Planning navigation, task API, handoff, documents and public audience are preserved. No upload secret or media ingestion was used. Video remains deferred.",
   "verification": {
     "host": "Dominic",
     "macCheck": "Live reload verified Single and All photos use the clean cue 15 frame, with Replacement label, 19:08:27 EST time and +38.30 second offset. Existing note remains present.",
