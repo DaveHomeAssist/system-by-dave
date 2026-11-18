@@ -1,5 +1,10 @@
 # Changelog
 
+## Projctl Panasonic control-port fallback, 2026-11-18
+
+- When another controller holds a Panasonic projector's PJLink link, the relay now reads power and shutter on the projector's control port and sends power and shutter there, instead of showing the projector as unreachable. PJLink stays the link whenever it answers, and is retried every five minutes. Input, the alarm summary and light hours read "not reported" while the control port is in use.
+- Built against stand-in servers (`test/panasonic-control-port.test.js`). Not installed, and no power or shutter command has been sent to a real projector on this path. Brief, rig acceptance steps and decisions PCP-1 and PCP-2: `apps/projctl/docs/panasonic-control-port.md`.
+
 ## Projctl health reports: no current reading, 2026-11-18
 
 - A projector not reached at report time no longer shows its last power state as current. The unit table says "No current reading (last known on)", and saved reports render the same way. On Nov 17, lanes A and D kept showing "on" for about 10 hours with no contact.
