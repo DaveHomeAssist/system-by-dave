@@ -1,7 +1,9 @@
 # Show backup page
 
-Brief and first version, November 18, 2026. Simulator only. Not installed on any relay computer
-and not accepted on a rig. Options marked "recommended" below are proposals; none has been
+Brief and first version, November 18, 2026. Tested in the simulator only. The four page files were
+copied to the show computer's relay late on November 18 at the owner's direct instruction, as
+static files with no relay restart; the page has not been accepted on the rig, and the relay there
+does not yet have the crew notes route. Options marked "recommended" below are proposals; none has been
 answered yet.
 
 ## Problem
@@ -290,6 +292,9 @@ These are tracked in the private control handoff brief, not in this repository. 
 
 ## Installing
 
-Not part of this change. The four page files are static and need no relay restart to serve, but
-any copy to a relay computer is a separate, explicitly released step with its own read back, and
-the role and network questions above come first.
+The four page files are static and need no relay restart to serve. They were copied to the show
+computer on November 18 at the owner's instruction and read back by digest; the relay answered
+`show.html` with the sign-in redirect. Nobody has yet signed in and watched it against the real
+rig. To remove the page, delete `show.html`, `show.js`, `show-model.js` and `show.css` from the
+relay's public folder. The crew notes link needs the updated relay code and one restart, which has
+not been done. The role and network questions above are still open.

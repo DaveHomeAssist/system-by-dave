@@ -5,7 +5,7 @@
 - Add `apps/projctl/public/show.html`, a role page for the person who backs up projection from the lighting position. A go or no-go strip (lanes lit, outputs, cue link, show computer) sits above the four lanes. A lane the relay is not reading says "check by eye" and never shows its last known state. The cue link says "Not connected", because console cues do not pass through the relay.
 - The page sends one command: a shutter move for one lane, after a two-step confirm, with the reviewed target revision. It is offered only on a current reply that says power is ON. "Call for help with a snapshot" copies a plain-text summary; no number is stored.
 - An optional crew notes link, for notes that can wait, appears only when the relay's private settings name an address. The relay gains one read-only route for it, `GET /api/crew-links` (`server/crew-links.js`), behind the existing login; the page never requests the address itself.
-- No console or sign-in change. `npm run test:browser` gains `test/show-backup-browser.cjs`, and `test/show-backup.test.js` joins `npm test`. Simulator only: not installed on a relay computer and not accepted on a rig. Brief, limits and open decisions SBP-1 to SBP-8: `apps/projctl/docs/show-backup-page.md`.
+- No console or sign-in change. `npm run test:browser` gains `test/show-backup-browser.cjs`, and `test/show-backup.test.js` joins `npm test`. Tested in the simulator only. The page files were copied to the show computer on November 18 with no relay restart; it is not yet accepted on the rig. Brief, limits and open decisions SBP-1 to SBP-8: `apps/projctl/docs/show-backup-page.md`.
 
 ## Projctl health reports: no current reading, 2026-11-18
 
