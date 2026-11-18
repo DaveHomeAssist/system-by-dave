@@ -88,7 +88,7 @@ export function unitRow(p, st = {}, conn = {}, readings = null, readError = null
   const watchAt = Number.isFinite(config.watchHeadroomC) ? config.watchHeadroomC : DEFAULTS.watchHeadroomC;
   const row = {
     slot: p.slot, lane: p.lane || null, model: [p.make, p.model].filter(Boolean).join(' ') || p.label || null, ip: p.ip || null, owner: p.owner || null,
-    power: st?.power || 'unknown', online, lastContact: conn?.lastSuccessAt || null, lightHours: Number.isFinite(st?.lightHours) ? st.lightHours : null,
+    power: online ? st?.power || 'unknown' : 'unknown', lastKnownPower: online ? null : st?.power || null, online, lastContact: conn?.lastSuccessAt || null, lightHours: Number.isFinite(st?.lightHours) ? st.lightHours : null,
     intakeC, intakeLabel: intake?.label || (fallback ? 'Thermal watch sample' : null),
     intakeSource: intake ? 'report' : fallback ? 'watch' : null, intakeAt: fallback ? new Date(fallback.at).toISOString() : null,
     internalC: internal, ratedC: rated, headroomC: headroom,
@@ -165,6 +165,12 @@ function flagCell(u) {
   if (u.readError) parts.push(`readings: ${u.readError}`);
   return parts.join('; ');
 }
+// An unreached unit's power is history, not a reading. Saved reports kept it in power.
+function powerCell(u) {
+  if (u.online) return u.power;
+  const last = u.lastKnownPower ?? u.power;
+  return last && last !== 'unknown' ? `No current reading (last known ${last})` : 'No current reading';
+}
 // Saved reports from before this field have no intakeSource and render as a plain number.
 function intakeCell(u, timeZone) {
   if (u.intakeSource !== 'watch') return num(u.intakeC);
@@ -173,7 +179,7 @@ function intakeCell(u, timeZone) {
 }
 export function unitTable(report) {
   return [UNIT_HEADER, ...report.units.map((u) => [
-    u.slot, u.lane || '—', u.model || '—', u.ip || '—', u.power, intakeCell(u, report.timeZone), u.ratedC == null ? '—' : String(u.ratedC), num(u.headroomC),
+    u.slot, u.lane || '—', u.model || '—', u.ip || '—', powerCell(u), intakeCell(u, report.timeZone), u.ratedC == null ? '—' : String(u.ratedC), num(u.headroomC),
     u.internalC.length ? u.internalC.join(', ') : '—', flagCell(u), u.lightHours == null ? '—' : u.lightHours.toLocaleString('en-US'),
     u.lastContact ? localTime(Date.parse(u.lastContact), report.timeZone) : '—',
   ])];

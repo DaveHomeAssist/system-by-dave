@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { once } from 'node:events';
 import {
-  createHealthReports, createNotionPublisher, notionPage, readHealthConfig, ratedAmbientC, unitRow, summarize, buildReport, renderMarkdown, localStamp,
+  createHealthReports, createNotionPublisher, notionPage, readHealthConfig, ratedAmbientC, unitRow, summarize, buildReport, renderMarkdown, unitTable, localStamp,
 } from '../server/health-reports.js';
 import { parseQtm, panasonicDriver } from '../server/drivers/panasonic.js';
 import { pulseDriver } from '../server/drivers/pulse.js';
@@ -100,7 +100,7 @@ test('flags, alarms, unreachable units and missing readings are reported', () =>
   const report = buildReport({ kind: 'hourly', startedAt: Date.parse('2026-11-13T00:00:00Z'), finishedAt: Date.parse('2026-11-13T00:00:03Z'), units, config: CONFIG });
   assert.equal(report.title, 'Frozen | Projectors | Health Log | 2026-11-12 19:00 | Hourly');
   const md = renderMarkdown(report);
-  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| on \| 27 \| 40 \| 13 \| 37 \| Not reached \|/);
+  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| No current reading \(last known on\) \| 27 \| 40 \| 13 \| 37 \| Not reached \|/);
   assert.match(md, /readings: timeout \(port 1024\)/);
   const none = summarize(units.map((u) => ({ ...u, online: false, verdict: 'unreachable', headroomC: null })));
   assert.match(none.findings, /^No units reachable; 0 of 4 read\./);
@@ -163,6 +163,19 @@ test('unreachable and empty reports retain explicit coverage', () => {
   assert.equal(summary.counts.incomplete, 1);
   assert.equal(summarize([]).findings, 'No assigned projectors.');
   assert.equal(summarize([]).counts.incomplete, 0);
+});
+
+test('an unreached unit reports no current power reading', () => {
+  const row = unitRow(RIG[2], { online: false, power: 'on', errors: ok }, { lastSuccessAt: '2026-11-17T16:20:10.388Z' });
+  assert.equal(row.power, 'unknown');
+  assert.equal(row.lastKnownPower, 'on');
+  assert.equal(row.verdict, 'unreachable');
+  assert.equal(row.lastContact, '2026-11-17T16:20:10.388Z');
+  const cellFor = (unit) => unitTable(buildReport({ kind: 'manual', startedAt: 0, finishedAt: 1, units: [unit] }))[1][4];
+  assert.equal(cellFor(row), 'No current reading (last known on)');
+  assert.equal(cellFor(unitRow(RIG[2], { online: false, errors: ok })), 'No current reading');
+  assert.equal(cellFor({ ...row, power: 'on', lastKnownPower: undefined }), 'No current reading (last known on)', 'saved reports stay honest');
+  assert.equal(cellFor(unitRow(RIG[2], { online: true, power: 'on', errors: ok })), 'on');
 });
 
 test('saved reports without completeness fields still render in Markdown and Notion', () => {
