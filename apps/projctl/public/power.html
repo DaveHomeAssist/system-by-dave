@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Projctl | Power checklist</title>
+<meta name="description" content="Guided morning on and nightly off checklist for the projector power operator.">
+<meta name="theme-color" content="#edf5fa">
+<link rel="canonical" href="http://localhost:8080/power.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Projctl | Power checklist">
+<meta property="og:description" content="Guided morning on and nightly off checklist for the projector power operator.">
+<meta property="og:url" content="http://localhost:8080/power.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Projctl | Power checklist">
+<meta name="twitter:description" content="Guided morning on and nightly off checklist for the projector power operator.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<script src="frozen-theme.js"></script><link rel="stylesheet" href="frozen-theme.css">
+<link rel="stylesheet" href="avd/tokens.css">
+<link rel="stylesheet" href="avd/bundle.css">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="power.css">
+</head>
+<body>
+<a class="pw-skip" href="#panels">Skip to the checklist</a>
+<div class="pw-shell" id="shell">
+  <header class="pw-top">
+    <h1 class="pw-title">Power<span class="pw-wide"> checklist</span></h1>
+    <p class="pw-flag pw-flag--sim" id="sim-flag" title="Simulator data. No real projector is connected." hidden>Sim<span class="pw-wide">ulator</span></p>
+    <p class="pw-flag pw-flag--lock" id="lock-flag" title="Show Lock is on. Power off is blocked." hidden><span class="pw-wide">Show </span>Lock<span class="pw-wide"> on</span></p>
+    <p class="pw-conn" id="conn" role="status" data-state="connecting"><span class="avd-dot avd-dot--waiting" id="conn-dot"></span><span class="pw-wide">Relay </span><span id="conn-word">connecting</span></p>
+    <button id="theme" type="button" class="avd-btn avd-btn--quiet pw-theme">Theme</button>
+  </header>
+  <nav class="pw-tabs" aria-label="Checklist views">
+    <div role="tablist" aria-label="Checklist views">
+      <button role="tab" type="button" id="t-on" aria-controls="on" aria-selected="true" aria-label="Morning on"><span class="pw-tab__long">Morning </span>on</button>
+      <button role="tab" type="button" id="t-off" aria-controls="off" aria-selected="false" tabindex="-1" aria-label="Nightly off"><span class="pw-tab__long">Nightly </span>off</button>
+      <button role="tab" type="button" id="t-rules" aria-controls="rules" aria-selected="false" tabindex="-1">Rules</button>
+    </div>
+  </nav>
+  <main class="pw-panels" id="panels" tabindex="-1">
+    <section class="pw-panel pw-mode" role="tabpanel" id="on" aria-labelledby="t-on" data-mode="on"></section>
+    <section class="pw-panel pw-mode" role="tabpanel" id="off" aria-labelledby="t-off" data-mode="off" hidden></section>
+    <section class="pw-panel pw-rules" role="tabpanel" id="rules" aria-labelledby="t-rules" hidden>
+      <div class="pw-rules__pick" role="group" aria-label="Rule sets">
+        <button type="button" class="avd-btn" data-rule-pick="never" aria-pressed="true">Never</button>
+        <button type="button" class="avd-btn" data-rule-pick="wrong" aria-pressed="false">If wrong</button>
+        <button type="button" class="avd-btn" data-rule-pick="page" aria-pressed="false">This page</button>
+      </div>
+      <div class="pw-rules__grid" id="rules-body">
+        <section class="pw-rule" data-rule-set="never" aria-labelledby="rules-never">
+          <h2 id="rules-never">Never</h2>
+          <ul>
+            <li>Never cut power at a breaker, a power strip or a mains switch. A lamp projector must cool with its fans running, about 3 minutes.</li>
+            <li>Never shut down, log out of or unplug the show computer or its control monitor. <span class="pw-pending">Pending decision</span></li>
+            <li>Never open or save the show file.</li>
+            <li>Never touch lens, focus or zoom.</li>
+          </ul>
+        </section>
+        <section class="pw-rule" data-rule-set="wrong" aria-labelledby="rules-wrong">
+          <h2 id="rules-wrong">If something is wrong</h2>
+          <ul>
+            <li><strong>A unit will not turn on:</strong> wait 3 minutes, try once more, then call the show backup.</li>
+            <li><strong>A warning light, a cover error or a lamp message:</strong> photograph the screen and the indicator lights, then call the show backup or the video lead.</li>
+            <li><strong>A or D say "Not reached by the relay":</strong> normal while the playback app is open. Go by the light on the surface.</li>
+            <li><strong>The relay is offline:</strong> this page can send nothing. Call the video lead.</li>
+          </ul>
+        </section>
+        <section class="pw-rule" data-rule-set="page" aria-labelledby="rules-page">
+          <h2 id="rules-page">What this page does</h2>
+          <ul>
+            <li>Lanes B and C are powered from this page. Their words come from the relay's own reading.</li>
+            <li>Lanes A and D are powered with the handheld remote. Their ticks and timers are yours, not readings.</li>
+            <li>A tick lapses after 30 minutes. Look again and tick again.</li>
+            <li>After a projector lights, leave it alone for 60 seconds.</li>
+          </ul>
+        </section>
+      </div>
+    </section>
+  </main>
+</div>
+
+<template id="mode-template">
+  <div class="pw-banner" data-banner data-state="wait" role="status" aria-live="polite">
+    <strong class="pw-banner__title" data-banner-title>Waiting for the relay</strong>
+    <span class="pw-banner__detail" data-banner-detail></span>
+  </div>
+  <div class="pw-work">
+    <ol class="pw-rail" data-rail aria-label="Steps"></ol>
+    <article class="pw-card" data-card data-tone="todo">
+      <div class="pw-card__nav">
+        <button type="button" class="avd-btn avd-btn--quiet pw-nav" data-prev aria-label="Back"><span aria-hidden="true">&lsaquo;</span><span class="pw-nav__label">Back</span></button>
+        <p class="pw-card__count" data-count>Step 1 of 5</p>
+        <button type="button" class="avd-btn pw-nav" data-next aria-label="Next"><span class="pw-nav__label">Next</span><span aria-hidden="true">&rsaquo;</span></button>
+      </div>
+      <h2 class="pw-card__title" data-title tabindex="-1">Step</h2>
+      <p class="pw-card__state"><strong class="pw-word" data-word>TO DO</strong> <span class="pw-source" data-source></span></p>
+      <div class="pw-detail" data-detail popover="auto">
+        <p class="pw-text"><span data-text></span> <span class="pw-pending" data-pending hidden>Pending decision</span></p>
+        <div class="pw-detail__foot">
+          <div class="pw-tools" data-tools hidden>
+            <button type="button" class="avd-btn" data-timer>Start timer</button>
+            <button type="button" class="avd-btn" data-lamp popovertarget="lamp-help">Lamp message</button>
+          </div>
+          <button type="button" class="avd-btn pw-detail__close" data-detail-close popovertargetaction="hide">Close</button>
+        </div>
+      </div>
+      <p class="pw-why" data-why role="status" aria-live="polite"></p>
+      <div class="pw-actions">
+        <button type="button" class="avd-btn pw-detail__open" data-detail-open>Details</button>
+        <button type="button" class="avd-btn avd-btn--primary avd-btn--lg pw-action" data-action>Action</button>
+      </div>
+    </article>
+    <aside class="pw-aside" data-aside aria-label="Rules"></aside>
+  </div>
+</template>
+
+<div class="pw-sheet" id="lamp-help" popover="auto" role="dialog" aria-labelledby="lamp-help-title">
+  <h2 id="lamp-help-title">Lamp message <span class="pw-pending">Not written yet</span></h2>
+  <p>This helper is empty on purpose. What the lamp message says, the right answer and why the unit shuts itself off have not been recorded yet.</p>
+  <p>Until they are: photograph the screen and the indicator lights, then call the video lead. Do not guess an answer.</p>
+  <button type="button" class="avd-btn avd-btn--primary" popovertarget="lamp-help" popovertargetaction="hide">Close</button>
+</div>
+<noscript><p class="pw-noscript">Turn on JavaScript in this browser to use the power checklist.</p></noscript>
+<script type="module" src="power.js"></script>
+</body>
+</html>

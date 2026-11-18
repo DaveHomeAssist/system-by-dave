@@ -1,5 +1,11 @@
 # Changelog
 
+## Projctl power operator page, 2026-11-18
+
+- Add `power.html` to the Projctl relay: a guided checklist for the crew member who turns the four projectors on each morning and off each night. Two modes, five steps each, one step open at a time. Lanes B and C use the relay's existing power command, with its two-step power off, Show Lock, stale-reply and cooling guards unchanged. Lanes A and D are done by handheld remote and are recorded with a "confirmed by eye" tick and an operator-started 170 second cooling countdown. The page never commands A or D and never draws a lane the relay has not reached as a reading.
+- A "Safe to leave the building" banner turns on only when B and C read Standby from fresh replies and A and D carry a current tick that no fresh reading disputes. Ticks lapse after 30 minutes.
+- No relay endpoint, login or network binding changes. The lamp message helper is an empty, labelled slot until its content is recorded. Brief, open decisions and the role access and network exposure proposal for the role pages: `apps/projctl/docs/power-operator-page.md`. Simulator tests only; nothing is installed and no real projector, phone or venue network was used.
+
 ## Projctl health reports: no current reading, 2026-11-18
 
 - A projector not reached at report time no longer shows its last power state as current. The unit table says "No current reading (last known on)", and saved reports render the same way. On Nov 17, lanes A and D kept showing "on" for about 10 hours with no contact.
