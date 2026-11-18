@@ -129,7 +129,8 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       await waitStopped(selected, checkMove);
       return 'OK';
   }
-  const mapPower = (v) => ({ on: POWER.ON, ready: POWER.OFF, eco: POWER.OFF, boot: POWER.WARMING, conditioning: POWER.WARMING, deconditioning: POWER.COOLING }[String(v).toLowerCase()] ?? POWER.UNKNOWN);
+  // Pulse system.state: standby is the network-standby state after deconditioning (seen as power unknown at WST 2026-11-17).
+  const mapPower = (v) => ({ on: POWER.ON, ready: POWER.OFF, standby: POWER.OFF, eco: POWER.OFF, boot: POWER.WARMING, conditioning: POWER.WARMING, deconditioning: POWER.COOLING }[String(v).toLowerCase()] ?? POWER.UNKNOWN);
   return {
     kind: 'pulse',
     lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'bounded-step', stop: true, positionReadback: true },
