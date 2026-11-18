@@ -2,9 +2,12 @@
 
 Status: first version built and tested in the simulator on November 18, 2026. The same
 day, on the owner's instruction, the four page files were copied to the show computer's
-relay; at the last check they matched commit `46ea2dc`. The relay changes in this pull
-request (the crew notes read) are not there. No signed-in load, real projector, real
-phone or venue network has been exercised. Decisions POWER-1 to POWER-4, ACCESS-1, ACCESS-2 and NET-1 to NET-3 are
+relay, where they match commit `46ea2dc`. That relay was then updated once, from
+separate pull requests, with the Barco standby mapping and a Panasonic control-port
+fallback, so it should read lane C in standby and may now reach lanes A and D while the
+playback application is open. The relay change in this pull request (the crew notes
+read) is not there. No signed-in load, real projector, real phone or venue network has
+been exercised with this page. Decisions POWER-1 to POWER-4, ACCESS-1, ACCESS-2 and NET-1 to NET-3 are
 open. The page is built on the recommended option for each and marks what depends on one.
 
 ## Problem
@@ -92,7 +95,9 @@ button.
   tick is unavailable while a countdown runs, and starting a countdown clears that
   lane's tick, because a lane that was just switched is in transition.
 - If the relay does have a fresh reply from one of these lanes (for example with the
-  playback app closed), the page shows it, labeled "Relay reading". If it does not, the
+  playback app closed, or on a relay with the Panasonic control-port fallback), the page
+  shows it, labeled "Relay reading". The lane stays a remote-and-tick step: the page
+  sends it nothing until POWER-1 says otherwise. If it does not, the
   page says "Not reached by the control page" and tells the operator to go by the light
   on the surface. A lane the relay has not reached is never drawn as a reading.
 - A **lamp message** slot sits on each manual lane. Its content is not known yet
@@ -268,12 +273,13 @@ The first option is the recommendation. The page is built on it.
 
 | ID | Question | A (recommended) | B | C | Answer unlocks |
 | --- | --- | --- | --- | --- | --- |
-| POWER-1 | How are lamp lanes A and D powered? | Handheld remote, confirmed by eye on this page. B and C through the relay. No build needed. | Quit the playback app first, then the relay for all four. Makes all four lanes relay steps. | Teach the relay to reach A and D on the maker's own control port. One flow for all four, but needs a build and an install. | Whether A and D stay manual steps |
+| POWER-1 | How are lamp lanes A and D powered? | Handheld remote, confirmed by eye on this page. B and C through the relay. This is what the page does. | Quit the playback app first, then the relay for all four. Makes all four lanes relay steps. | Through the relay on the maker's own control port. That fallback now exists in a separate pull request and is on the show computer's relay, untested on the rig. Choosing it here means moving A and D into `RELAY_LANES`, a small change to this page and its tests, after one supervised power cycle proves the path. | Whether A and D stay manual steps |
 | POWER-2 | Who closes and reopens the playback app around the power cycle? | The show backup. The power operator only ticks that it is closed, and the relay power buttons wait for that tick. | The power operator does it. The step becomes an instruction, not a check. | The playback app stays open overnight. Step 1 is removed. Needs a dark-day test that outputs survive a power cycle. | Step 1 wording, or its removal |
 | POWER-3 | What does the lamp message helper say? | Record the message, the right answer and the reason on a supervised power-on, then fill the slot. | Leave the slot as "photograph it and call" for the whole run. | | The helper content |
 | POWER-4 | A relay lane replies but with no power state (UNKNOWN). What may the operator do? | Power stays available with a "look at it first" note, and at night the lane is confirmed off by eye like a manual lane, with the banner naming it as looked at. Never shown as On or Standby. Built this way on November 18 after the owner asked for the standby case to work without a relay update. | Power only, no tick: the banner stays off for that lane until the relay is updated. | Block power and send the operator to the video lead. Safest on paper, but on a relay that cannot name a unit's standby the lane could never be powered on from this page. | Whether the by-eye tick for a relay lane stays once the relay can read that unit |
 
-Needed now: POWER-1 and POWER-2, before the operator's walk-through. POWER-3 needs the
+Needed now: POWER-1 and POWER-2, before the operator's walk-through. POWER-1 has moved:
+option C no longer needs a build of the relay, only proof on the rig and a change here. POWER-3 needs the
 supervised power-on first. POWER-4 matters only on a relay that reports UNKNOWN for a
 replying unit; updating that relay removes the case. Its shape was this session's to
 choose and waits for the owner's confirmation.
