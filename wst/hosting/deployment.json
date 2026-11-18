@@ -24,10 +24,26 @@
     {
       "versionNumber": 45,
       "managedSourceCommit": "c211220fccfc05eff7626abab33ded78af0e016d",
-      "deploymentId": "appgdep_6afde7174f18819199398796665da79b",
+      "deploymentId": "appgdep_6afde7174f188191a1a7dce4ab11fa45",
       "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_165fdcf82714819199398796665da79b",
       "acceptedSourceCommit": "a9dea1a8073e121d7df500eabb6cbfe9d6831b77",
       "note": "Media upload phase. The temporary uploader secret was removed before the active-source publications."
+    },
+    {
+      "versionNumber": 44,
+      "managedSourceCommit": "a5bec7890a2bd54f7c6849a6f75d685275435f91",
+      "deploymentId": "appgdep_6afc5c2fc4188191baf07d2c60433a9d",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_007ae80f3ab4819192d2644af04e0288",
+      "publicVerifiedAt": "2026-11-17T13:52:58.672184+00:00",
+      "note": "Published baseline immediately before the November 17 Run Review release."
+    },
+    {
+      "versionNumber": 43,
+      "managedSourceCommit": "58e8a311935b847bc829f6fc8d7f7c2551e05949",
+      "deploymentId": "appgdep_6afb70f9396881919f33f64ad192f33e",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_30ad388287088191ac4a5d6d6abb4c3d",
+      "acceptedSourceCommit": "4f4dbd764803134b4b52306baec458c21a124f9f",
+      "publicVerifiedAt": "2026-11-16T21:10:07.631233+00:00"
     },
     {
       "versionNumber": 42,
