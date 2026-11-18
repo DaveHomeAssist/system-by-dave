@@ -86,6 +86,13 @@ page), copies it, and shows it so it can also be selected by hand. A second cont
 device's message composer with the text filled in. No phone number is stored in the page or the
 repository; the number lives on the operator's printed card.
 
+**Crew notes link (optional).** When the relay's private settings name an address, the page shows a
+quiet "Notes" link with the caption "For notes that can wait. Not for emergencies or cue calls."
+It opens in a new tab. It sits with the checks, away from the help button, and on a phone it is on
+the Checks view only, so the Lanes view stays clear. With no address set, nothing of it is shown.
+The page never requests the address; it is only the target of the link. Trouble during a show
+stays a call for help with a snapshot.
+
 ## What it must not do
 
 - No power, test patterns, input, lens, picture, presets, schedules, Setup, discovery or Show Lock
@@ -95,7 +102,8 @@ repository; the number lives on the operator's printed card.
 - No group commands. One lane at a time.
 - No value shown as a reading unless the relay's reply behind it is current.
 - No address, name, phone number or passcode in the source.
-- No request to any host other than the relay. Fonts and styles are local.
+- No request to any host other than the relay. Fonts and styles are local. The crew notes link is
+  a link the operator may follow, not something the page loads or depends on.
 
 ## How Show Lock, stale and offline are respected
 
@@ -119,17 +127,34 @@ time with an A to D picker. An ultrawide screen moves the strip into a side colu
 
 ## Interfaces and shared files
 
-No new relay route, no server change, no change to the main console, sign-in page or styles. The
-page reads `GET /ws`, `GET /api/host-displays` and (after a lost connection) `GET /api/state`, and
+No change to the main console, sign-in page or styles. The page reads `GET /ws`,
+`GET /api/host-displays`, `GET /api/crew-links` and (after a lost connection) `GET /api/state`, and
 writes `POST /api/command` for the shutter only.
 
-New files: `public/show.html`, `public/show.js`, `public/show-model.js`, `public/show.css`,
-`test/show-backup.test.js`, `test/show-backup-browser.cjs`, this brief.
+One new relay route, read only, for the crew notes link: `GET /api/crew-links`, behind the existing
+login. It reads the private file `crew-links.json` beside the rig, in the settings folder that
+survives an update (a file under `public/` would be replaced with the app):
 
-Shared files touched, three: `package.json` (the browser test is appended to `test:browser`), the
-repository `CHANGELOG.md` (one entry), and `scripts/verify_indexing_policy.js` (the count of
-tracked routes outside the sitemap goes from 217 to 218 for this noindex page). Nothing else. Any
-other branch that adds a page moves the same count, so the second to merge must add one more.
+```json
+{ "notes": { "url": "https://…" } }
+```
+
+It answers `{ "notes": { "url": "…" }, "state": "configured" }`, or `notes: null` with a state of
+`not-configured`, `invalid` or `unreadable`. Only `http` and `https` addresses are accepted, at most
+300 characters, with no embedded credentials. The relay never opens or checks the address. The page
+treats anything but a usable answer as "not configured", so it also runs on a relay without the
+route. No address, host name or product name belongs in this repository; the tests use a reserved
+example name.
+
+New files: `public/show.html`, `public/show.js`, `public/show-model.js`, `public/show.css`,
+`server/crew-links.js`, `test/show-backup.test.js`, `test/show-backup-browser.cjs`, this brief.
+
+Shared files touched, four: `package.json` (the browser test is appended to `test:browser`), the
+repository `CHANGELOG.md` (one entry), `scripts/verify_indexing_policy.js` (the count of tracked
+routes outside the sitemap goes from 217 to 218 for this noindex page), and `server/index.js` (two
+added lines: the import and the `GET /api/crew-links` route). Nothing else. Any other branch that
+adds a page moves the indexing count too, so the second to merge must add one more. Another role
+page that wants the same link can use the same route.
 
 The page reuses three existing modules without changing them: `lanes.js`,
 `projector-connection.js` and `status-feedback.js`.
@@ -165,7 +190,7 @@ and built, every holder of the passcode is a full operator, whichever page they 
 
 | Role | Pages | API routes | Commands |
 | --- | --- | --- | --- |
-| Show backup | `show.html` and its assets, sign-in | `ws`; `GET api/state`; `GET api/host-displays`; `POST api/command` | `shutter` only, one slot at a time, with a reviewed target. No group target |
+| Show backup | `show.html` and its assets, sign-in | `ws`; `GET api/state`; `GET api/host-displays`; `GET api/crew-links`; `POST api/command` | `shutter` only, one slot at a time, with a reviewed target. No group target |
 
 The page uses these snapshot fields and no others: per projector `slot`, `lane`, `model`, `label`,
 `driver`, `ip` and `mac` (only to tell one device from another; never shown), `controlRevision`
@@ -196,8 +221,9 @@ Run from `apps/projctl`, against isolated simulator relays only:
 - `node --test test/show-backup.test.js`: reading rules (unreached, stale, unassigned, lost relay),
   when a shutter move is offered, each strip item and the headline, alarms, the snapshot text, the
   source limits (no address, number or host name; one write; relative routes only), serving with a
-  full head, the sign-in redirect when a passcode is set, and the relay rules the page relies on
-  (reviewed target, shutter under Show Lock, refusal for an unreached projector).
+  full head, the sign-in redirect when a passcode is set, the relay rules the page relies on
+  (reviewed target, shutter under Show Lock, refusal for an unreached projector), and the crew links
+  settings (accepted and refused addresses; configured, not configured, invalid; behind the login).
 - `node test/show-backup-browser.cjs` (part of `npm run test:browser`): a simulator relay with B
   and C lit and A and D unreachable. Covers the lane and strip readings, the two-step shutter with
   Cancel, Escape, timeout and the double-tap guard, the command body, the projector's report, a
@@ -205,7 +231,10 @@ Run from `apps/projctl`, against isolated simulator relays only:
   sent),
   Show Lock, the details dialog, the snapshot through both copy paths, keyboard focus, a display
   report fixture (enough outputs, too few), an alarm, a reply going stale while armed, a lost
-  relay, a device clock ten minutes out in each direction, the return to sign-in, and fit (no page
+  relay, a device clock ten minutes out in each direction, the return to sign-in, the crew notes
+  link (hidden when not configured; shown with its caption, new-tab target and no request to its
+  address when configured; hidden again on an unusable answer or a relay without the route), and
+  fit (no page
   scroll, nothing outside the viewport, no card cutting its own text) at 1440×900, 1024×768,
   768×1024, 375×812, 375×667, 844×390, 320×256 and 2560×720 in both themes.
   Set `SHOW_BACKUP_SHOTS` to a folder to keep screenshots.
@@ -225,6 +254,8 @@ Run from `apps/projctl`, against isolated simulator relays only:
 - A screen reader. Roles, names and focus order were checked in code and by keyboard in the test,
   not with assistive technology.
 - A long session: hours of connection, a sleeping tablet waking, a network change.
+- The crew notes link against a real notes service. Only the link itself was checked, with a
+  reserved example address; nothing was opened.
 - Readability in an actual dark booth.
 
 ## Open decisions
@@ -240,6 +271,7 @@ The first option in each row is the recommendation. None is answered.
 | SBP-5 | Shutter on a stale reply | Blocked both ways, as on the main console | Allow Close on a stale reply, which the relay accepts | |
 | SBP-6 | How is the page found? | No link from the main console. A bookmark on the operator's device, opened once with the video lead present | A choice on the sign-in page, once roles exist | |
 | SBP-7 | Lanes the relay cannot reach during a show | "Check by eye" and the handheld remote, as built | Change how the relay reaches them, so the page reads them with no change here | |
+| SBP-8 | Crew notes link | Leave it unset until the notes service can be reached from the operator's device, then set the address in the relay's private settings | Set it now, so the link is in place when the service becomes reachable; until then it leads nowhere for this operator | Leave the link out of this page |
 
 Later slices, not part of this version: a lock-screen and display-sleep reading from the relay
 computer, a reading of the playback app's output windows, and the cue link.

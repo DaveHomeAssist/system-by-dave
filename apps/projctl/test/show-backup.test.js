@@ -2,10 +2,13 @@
 // and what its source is allowed to contain. Simulator only; nothing here reaches a projector.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { startRelay, until } from './relay-helper.js';
 import { createConnectionMonitor } from '../public/projector-connection.js';
 import { laneViews, buildChecks, verdictOf, snapshotText, smsHref, alarmSummary, STATE_WORDS } from '../public/show-model.js';
+import { cleanLink, readCrewLinks } from '../server/crew-links.js';
 
 const NOW = Date.parse('2026-11-18T19:00:00Z');
 const ago = ms => new Date(NOW - ms).toISOString();
@@ -145,7 +148,7 @@ test('the page source holds no address, number or name, and can send only a shut
     assert.doesNotMatch(text, /\.ts\.net|\.local\b/, `${name} names a host`);
   }
   const script = source['show.js'];
-  assert.deepEqual([...script.matchAll(/fetch\('([^']+)'/g)].map(match => match[1]).sort(), ['api/command', 'api/host-displays', 'api/state'], 'relative relay routes only');
+  assert.deepEqual([...script.matchAll(/fetch\('([^']+)'/g)].map(match => match[1]).sort(), ['api/command', 'api/crew-links', 'api/host-displays', 'api/state'], 'relative relay routes only');
   assert.deepEqual([...script.matchAll(/method: '(\w+)'/g)].map(match => match[1]), ['POST'], 'one write, the command route');
   assert.deepEqual([...script.matchAll(/cmd: '(\w+)'/g)].map(match => match[1]), ['shutter']);
   assert.doesNotMatch(script, /api\/(?:lock|preset|projector|power-schedules|discover|preferred-input|health-reports|logout)/);
@@ -215,4 +218,42 @@ test('the relay rules this page leans on: reviewed target, Show Lock and an unre
     reply = await relay.api('command', { slot: 'P2', cmd: 'shutter', arg: 0, expectedTargets: await target() });
     assert.match(reply.body.P2?.error || reply.body.error, /offline/);
   } finally { await relay.close(); }
+});
+
+// The crew notes link is optional. Its address lives in a private file beside the rig, never in the source.
+const NOTES = 'https://notes.example.test/crew';
+test('the crew notes address is accepted only as a plain http or https link', () => {
+  assert.equal(cleanLink(NOTES), NOTES);
+  assert.equal(cleanLink('http://notes.example.test:8443'), 'http://notes.example.test:8443/');
+  for (const bad of ['', null, 42, 'notes.example.test', 'javascript:alert(1)', 'data:text/html,x', 'file:///etc/hosts', 'sms:5', 'https://user:secret@notes.example.test/',
+    'https://notes.example.test/a b', 'https://notes.example.test/\n', `https://notes.example.test/${'a'.repeat(300)}`]) assert.equal(cleanLink(bad), null, String(bad).slice(0, 40));
+});
+
+test('crew links read as configured, not configured or invalid, and never throw', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'projctl-crew-links-'));
+  const file = path.join(dir, 'crew-links.json');
+  try {
+    assert.deepEqual(await readCrewLinks(file), { notes: null, state: 'not-configured' });
+    await writeFile(file, JSON.stringify({ notes: { url: NOTES } }));
+    assert.deepEqual(await readCrewLinks(file), { notes: { url: NOTES }, state: 'configured' });
+    for (const [text, state] of [['{}', 'not-configured'], ['{"notes":null}', 'not-configured'], ['[]', 'not-configured'], ['not json', 'invalid'],
+      ['{"notes":{"url":"javascript:alert(1)"}}', 'invalid'], ['{"notes":{}}', 'invalid'], ['{"notes":"https://notes.example.test/"}', 'invalid'], [JSON.stringify({ notes: { url: NOTES }, pad: 'x'.repeat(5000) }), 'invalid']]) {
+      await writeFile(file, text);
+      assert.deepEqual(await readCrewLinks(file), { notes: null, state }, text.slice(0, 40));
+    }
+    assert.deepEqual(await readCrewLinks(dir), { notes: null, state: 'invalid' }, 'a folder is not a settings file');
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+test('the relay serves crew links behind the login, from the private file beside the rig', async () => {
+  const plain = await startRelay();
+  try { assert.deepEqual((await plain.api('crew-links')).body, { notes: null, state: 'not-configured' }); } finally { await plain.close(); }
+  const configured = await startRelay({}, { files: { 'crew-links.json': JSON.stringify({ notes: { url: NOTES } }) } });
+  try {
+    const reply = await configured.api('crew-links');
+    assert.deepEqual([reply.status, reply.body], [200, { notes: { url: NOTES }, state: 'configured' }]);
+    assert.equal((await fetch(`${configured.base}/api/crew-links`, { method: 'POST' })).status, 404, 'read only');
+  } finally { await configured.close(); }
+  const locked = await startRelay({ PJ_PASSCODE: 'simulator-only-code' }, { files: { 'crew-links.json': JSON.stringify({ notes: { url: NOTES } }) } });
+  try { assert.equal((await fetch(`${locked.base}/api/crew-links`)).status, 401); } finally { await locked.close(); }
 });

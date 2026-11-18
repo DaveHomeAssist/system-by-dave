@@ -83,6 +83,9 @@ const audit = () => {
     assert.equal(await page.locator('#sb-sim').isVisible(), true, 'simulated readings are labelled');
     assert.equal(await page.locator('#sb-lock').innerText(), 'Show Lock off');
     assert.equal(posts.length, 0, 'loading and watching sends nothing');
+    // No crew notes link is configured on this relay: nothing of it shows, and nothing is reachable by keyboard.
+    assert.equal(await page.locator('#sb-notes').isVisible(), false);
+    assert.equal(await page.locator('#sb-notes-link').getAttribute('href'), null);
     await shot(page, '01-tablet-1024x768-light');
 
     // Two steps. The first sends nothing; Cancel, Escape and a timeout send nothing.
@@ -314,6 +317,55 @@ const audit = () => {
     await shot(phone, '15-phone-375x812-snapshot');
     await lan.close();
 
-    console.log('Show backup page: unreached lanes by eye, strip honesty, two-step shutter, Show Lock, stale and lost-relay guards, clock skew, sign-in return, snapshot copy and fit at eight sizes in both themes passed');
+    // ---- Crew notes link, configured in the relay's private settings.
+    const NOTES = 'https://notes.example.test/crew';
+    const noted = await startRelay({}, { files: { 'crew-links.json': JSON.stringify({ notes: { url: NOTES } }) } });
+    try {
+      for (const [slot, laneId] of [['P1', 'A'], ['P2', 'B'], ['P3', 'C'], ['P4', 'D']]) await noted.api('projector', { slot, lane: laneId });
+      const ctx = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+      const tab = await ctx.newPage();
+      const requests = [];
+      tab.on('request', request => requests.push(request.url()));
+      await tab.goto(`${noted.base}/show.html`);
+      const link = tab.locator('#sb-notes-link');
+      await link.waitFor();
+      assert.deepEqual([await link.getAttribute('href'), await link.getAttribute('target'), await link.getAttribute('rel')], [NOTES, '_blank', 'noopener noreferrer']);
+      assert.match(await link.innerText(), /^Notes/);
+      assert.equal(await tab.locator('#sb-notes-hint').innerText(), 'For notes that can wait. Not for emergencies or cue calls.');
+      assert.equal(await link.evaluate(node => node.closest('.sb-foot')), null, 'kept away from the help button in the footer');
+      assert.equal(await tab.locator('.sb-foot #sb-help').count(), 1);
+      await shot(tab, '16-tablet-notes-link');
+      for (const theme of ['light', 'dark']) for (const [width, height] of SIZES) {
+        await tab.setViewportSize({ width, height });
+        await tab.evaluate(mode => window.FrozenTheme.set(mode, { save: false }), theme);
+        if (await tab.locator('[data-view-btn="checks"]').isVisible()) await tab.locator('[data-view-btn="checks"]').click();
+        assert.equal(await link.isVisible(), true, `notes link shown ${width}x${height}`);
+        assert.deepEqual(await tab.evaluate(audit), { pageScrolls: false, outside: [], cut: [] }, `notes link ${theme} ${width}x${height}`);
+        if (width === 375 && height === 812) {
+          assert.equal(await tab.locator('#sb-notes-hint').innerText(), 'Can wait. Not for emergencies.');
+          if (theme === 'dark') await shot(tab, '17-phone-notes-link-checks-dark');
+          await tab.locator('[data-view-btn="lanes"]').click();
+          assert.equal(await link.isVisible(), false, 'the phone lanes view stays clear of it');
+        }
+      }
+      assert.ok(requests.length > 0 && requests.every(url => url.startsWith(noted.base) || url.startsWith('data:')), 'the page never requests the notes address');
+      await ctx.close();
+    } finally { await noted.close(); }
+    // An unusable answer, an older relay without the route, or a failed read all leave the link hidden.
+    for (const answer of [{ json: { notes: { url: 'javascript:alert(1)' }, state: 'configured' } }, { json: { notes: { url: 'https://user:secret@notes.example.test/' } } }, { json: { notes: null, state: 'invalid' } }, { status: 404, body: 'not found' }, { status: 500, json: { error: 'x' } }, { body: 'not json' }]) {
+      const ctx = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+      const tab = await ctx.newPage();
+      let asked = 0;
+      await tab.route('**/api/crew-links', route => { asked++; return route.fulfill(answer); });
+      await tab.goto(`${relay.base}/show.html`);
+      await tab.locator('.sb-lane[data-lane="B"][data-reach="live"]').waitFor();
+      await until(() => asked > 0);
+      await tab.waitForTimeout(150);
+      assert.equal(await tab.locator('#sb-notes').isVisible(), false, JSON.stringify(answer).slice(0, 60));
+      assert.equal(await tab.locator('#sb-notes-link').getAttribute('href'), null);
+      await ctx.close();
+    }
+
+    console.log('Show backup page: unreached lanes by eye, strip honesty, two-step shutter, Show Lock, stale and lost-relay guards, clock skew, sign-in return, snapshot copy, the optional crew notes link and fit at eight sizes in both themes passed');
   } finally { await browser.close(); await relay.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

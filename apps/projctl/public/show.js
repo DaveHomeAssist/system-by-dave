@@ -262,7 +262,7 @@ function connect() {
   let ws;
   try { ws = new WebSocket(url); } catch { again(); return; }
   socket = ws;
-  ws.addEventListener('open', () => { if (mine === generation) { socketOpen = true; heard = false; openedAt = Date.now(); retry = 0; } });
+  ws.addEventListener('open', () => { if (mine === generation) { socketOpen = true; heard = false; openedAt = Date.now(); retry = 0; readCrewLinks(); } });
   ws.addEventListener('message', event => {
     if (mine !== generation) return;
     try { receive(JSON.parse(event.data)); } catch { /* an unreadable frame is not a reading */ }
@@ -292,6 +292,23 @@ async function readDisplays() {
     displays = { status: 'ok', data };
   } catch { displays = { status: 'error', error: 'Display report failed' }; }
   render();
+}
+
+// ---- Crew notes link: optional, from the relay's private settings. The page never requests the
+// address itself; it only becomes the target of a link, and only if it is plain http or https.
+function notesAddress(value) {
+  if (typeof value !== 'string' || value.length > 300) return null;
+  try { const url = new URL(value); return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? url.href : null; } catch { return null; }
+}
+async function readCrewLinks() {
+  let address = null;
+  try {
+    const response = await fetch('api/crew-links', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+    if (response.ok) address = notesAddress((await response.json())?.notes?.url); // 404 on an older relay, 401 when signed out: both mean no link
+  } catch { address = null; }
+  const link = $('#sb-notes-link');
+  if (address) mark(link, 'href', address); else link.removeAttribute('href');
+  reveal($('#sb-notes'), !!address);
 }
 
 // ---- Go or no-go details
