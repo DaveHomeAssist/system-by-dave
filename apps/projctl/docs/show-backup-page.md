@@ -194,13 +194,18 @@ Run from `apps/projctl`, against isolated simulator relays only:
   (reviewed target, shutter under Show Lock, refusal for an unreached projector).
 - `node test/show-backup-browser.cjs` (part of `npm run test:browser`): a simulator relay with B
   and C lit and A and D unreachable. Covers the lane and strip readings, the two-step shutter with
-  Cancel, Escape, timeout and the double-tap guard, the command body, the projector's report,
+  Cancel, Escape, timeout and the double-tap guard, the command body, the projector's report, a
+  refusal from the relay, a command the relay never answers (the page does not claim it was not
+  sent),
   Show Lock, the details dialog, the snapshot through both copy paths, keyboard focus, a display
   report fixture (enough outputs, too few), an alarm, a reply going stale while armed, a lost
   relay, a device clock ten minutes out in each direction, the return to sign-in, and fit (no page
   scroll, nothing outside the viewport, no card cutting its own text) at 1440×900, 1024×768,
   768×1024, 375×812, 375×667, 844×390, 320×256 and 2560×720 in both themes.
   Set `SHOW_BACKUP_SHOTS` to a folder to keep screenshots.
+- A one-off axe-core pass (WCAG 2 A and AA, 2.1 AA and best practice) on the simulator found no
+  violations in 26 views: four sizes, both themes, both small-screen views, an armed lane and both
+  dialogs. It is not part of the committed suite, because the app has no axe-core dependency.
 
 ## Not tested
 
@@ -235,15 +240,15 @@ computer, a reading of the playback app's output windows, and the cue link.
 
 ### Handoff decisions this page depends on
 
-These are tracked in the private control handoff brief, not in this repository.
+These are tracked in the private control handoff brief, not in this repository. All are open. HANDOFF-4 and HANDOFF-7 do not affect this page.
 
 | Handoff decision | Effect here |
 | --- | --- |
-| How far the backup operator's reach goes | The shutter control exists because the recommended answer includes it. If the answer is "watch only", the control is removed and the rest stands |
-| How the two lamp projectors are powered and controlled | Decides SBP-7. Today they read "check by eye" |
-| Whether the show computer stays awake between shows | Decides how often "Show computer: not answering" will be seen and what it means |
-| Who quits and reopens the playback app around the power cycle | The page has no pre-show or post-show checklist. If the backup operator owns those steps, that is a separate slice |
-| Which role page is built first | Both first versions were started together; installing either is a separate decision |
+| HANDOFF-3: how far the backup operator's reach goes | The shutter control exists because the recommended answer includes it. If the answer is "watch only", the control is removed and the rest stands |
+| HANDOFF-1: how the two lamp projectors are powered and controlled | Decides SBP-7. Today they read "check by eye" |
+| HANDOFF-2: whether the show computer stays awake between shows | Decides how often "Show computer: not answering" will be seen and what it means |
+| HANDOFF-5: who quits and reopens the playback app around the power cycle | The page has no pre-show or post-show checklist. If the backup operator owns those steps, that is a separate slice |
+| HANDOFF-6: which role page is built first | Both first versions were started together; installing either is a separate decision |
 
 ## Installing
 
