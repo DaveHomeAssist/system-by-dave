@@ -1,7 +1,10 @@
 # Panasonic control-port fallback
 
-Brief, November 18, 2026. Built and tested against stand-in servers. Not installed on a relay
-computer. No power or shutter command has been sent to a real projector over this path.
+Brief, November 18, 2026. Built and tested against stand-in servers. The driver file was installed
+on the show computer's relay late on November 18 at the owner's instruction, with one relay restart;
+after it, the two projectors whose PJLink link is held elsewhere came online in the relay's log. No
+power or shutter command has been sent to a real projector over this path, and the acceptance steps
+below have not been run.
 
 ## Problem
 
@@ -71,8 +74,9 @@ retry and the return to PJLink; and a failed poll when neither link answers.
 
 ## Not tested
 
-- Any real projector beyond the one temperature query above. `QPW`, `QSH`, `Q$S`, `PON`, `POF` and
-  `OSH` have not been sent to the rig's projectors by this driver.
+- The read queries (`QPW`, `QSH`, `Q$S`) are now being sent by the installed relay, and both
+  projectors show as online in its log, but nobody has compared the readings with what is seen.
+  `PON`, `POF` and `OSH` have not been sent to a real projector by this driver.
 - How a real projector refuses a second PJLink client (closing at once, or staying silent). Both
   were simulated.
 - A laser Panasonic on this path. It normally answers PJLink, so it normally never takes it.
