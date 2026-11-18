@@ -47,6 +47,7 @@
         <button type="button" class="avd-btn" data-rule-pick="never" aria-pressed="true">Never</button>
         <button type="button" class="avd-btn" data-rule-pick="wrong" aria-pressed="false">If wrong</button>
         <button type="button" class="avd-btn" data-rule-pick="page" aria-pressed="false">This page</button>
+        <button type="button" class="avd-btn" data-rule-pick="notes" aria-pressed="false" hidden>Notes</button>
       </div>
       <div class="pw-rules__grid" id="rules-body">
         <section class="pw-rule" data-rule-set="never" aria-labelledby="rules-never">
@@ -75,6 +76,12 @@
             <li>A tick lapses after 30 minutes. Look again and tick again.</li>
             <li>After a projector lights, leave it alone for 60 seconds.</li>
           </ul>
+        </section>
+        <!-- Shown only when the relay's private settings hold a crew notes address. The page never calls it. -->
+        <section class="pw-rule pw-rule--notes" data-rule-set="notes" aria-labelledby="rules-notes" hidden>
+          <h2 id="rules-notes">Crew notes</h2>
+          <p>For notes that can wait. Not for emergencies or cue calls: phone for those.</p>
+          <a class="avd-btn avd-btn--primary" data-crew-notes target="_blank" rel="noopener noreferrer">Open crew notes<span class="avd-sr"> (opens in a new tab)</span> <span aria-hidden="true">&#8599;</span></a>
         </section>
       </div>
     </section>

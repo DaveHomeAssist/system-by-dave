@@ -6,7 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { startRelay, until } from './relay-helper.js';
 import { createConnectionMonitor } from '../public/projector-connection.js';
 import { rigLanes } from '../public/lanes.js';
-import { COOL_SECONDS, TICK_VALID_MS, STEPS, RELAY_LANES, MANUAL_LANES, emptyRecord, parseRecord, tickCurrent, coolTimer, clock, laneReading, relayStep, manualStep, banner } from '../public/power-model.js';
+import { COOL_SECONDS, TICK_VALID_MS, STEPS, RELAY_LANES, MANUAL_LANES, emptyRecord, parseRecord, tickCurrent, coolTimer, clock, crewNotesUrl, laneReading, relayStep, manualStep, banner } from '../public/power-model.js';
 
 const NOW = Date.parse('2026-11-18T22:30:00Z');
 const PAGE_FILES = ['power.html', 'power.js', 'power-model.js', 'power.css'];
@@ -183,6 +183,40 @@ test('safe to leave needs B and C in Standby from fresh replies and A and D tick
   assert.equal(banner('on', lanesFor('on', { ...morning, B: readingOf(projector('B', 'warming')) })).detail, 'Waiting on: B warming');
 });
 
+test('the crew notes link accepts only a plain web address from the relay', () => {
+  assert.equal(crewNotesUrl({ notes: { url: 'https://notes.example.test/crew' }, state: 'configured' }), 'https://notes.example.test/crew');
+  assert.equal(crewNotesUrl({ notes: { url: 'http://notes.example.test:8443/' } }), 'http://notes.example.test:8443/');
+  for (const payload of [null, undefined, {}, [], 'https://notes.example.test/', { notes: null, state: 'not-configured' }, { notes: null, state: 'invalid' }, { notes: {} }, { notes: { url: 7 } }, { notes: { url: '' } },
+    { notes: { url: 'javascript:alert(1)' } }, { notes: { url: 'data:text/html,x' } }, { notes: { url: 'file:///etc/hosts' } }, { notes: { url: '/local/path' } }, { notes: { url: 'notes.example.test' } },
+    { notes: { url: 'https://user:secret@notes.example.test/' } }, { notes: { url: 'https://notes.example.test/a b' } }, { notes: { url: 'https://notes.example.test/\nx' } }, { notes: { url: `https://notes.example.test/${'a'.repeat(300)}` } }]) {
+    assert.equal(crewNotesUrl(payload), null, JSON.stringify(payload)?.slice(0, 60));
+  }
+});
+
+test('the relay hands the crew notes address to a signed-in page only, from private settings', async () => {
+  const get = async (relay, headers = {}) => { const r = await fetch(relay.base + '/api/crew-links', { headers }); return { status: r.status, body: await r.json() }; };
+  const none = await startRelay();
+  try {
+    assert.deepEqual(await get(none), { status: 200, body: { notes: null, state: 'not-configured' } });
+    assert.equal(crewNotesUrl((await get(none)).body), null);
+  } finally { await none.close(); }
+
+  const set = await startRelay({ PJ_PASSCODE: 'fixture-only-passcode' }, { files: { 'crew-links.json': JSON.stringify({ notes: { url: 'https://notes.example.test/crew' } }) } });
+  try {
+    assert.equal((await get(set)).status, 401, 'the address is not public');
+    const login = await fetch(set.base + '/api/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ code: 'fixture-only-passcode' }) });
+    const cookie = login.headers.getSetCookie().find(value => value.startsWith('pj=')).split(';')[0];
+    const answer = await get(set, { cookie });
+    assert.deepEqual(answer, { status: 200, body: { notes: { url: 'https://notes.example.test/crew' }, state: 'configured' } });
+    assert.equal(crewNotesUrl(answer.body), 'https://notes.example.test/crew');
+  } finally { await set.close(); }
+
+  const bad = await startRelay({}, { files: { 'crew-links.json': JSON.stringify({ notes: { url: 'javascript:alert(1)' } }) } });
+  try {
+    assert.deepEqual(await get(bad), { status: 200, body: { notes: null, state: 'invalid' } });
+  } finally { await bad.close(); }
+});
+
 test('the relay serves the page with a full head, a strict policy and no outside dependency', async () => {
   const relay = await startRelay();
   try {
@@ -219,7 +253,12 @@ test('the page source keeps every URL relative and holds no private address', as
     assert.doesNotMatch(text, /@import|\bimport\s*\(/, `${name} loads nothing dynamically`);
   }
   const script = await source('power.js');
-  assert.deepEqual([...new Set(script.match(/['"`]api\/[a-z-]+/g).map(route => route.slice(1)))].sort(), ['api/command', 'api/state'], 'the page reads state and sends commands, nothing else');
+  assert.deepEqual([...new Set(script.match(/['"`]api\/[a-z-]+/g).map(route => route.slice(1)))].sort(), ['api/command', 'api/crew-links', 'api/state'], 'the page reads state and the crew notes address, and sends commands, nothing else');
+  const html = await source('power.html');
+  assert.match(html, /<a class="[^"]*" data-crew-notes target="_blank" rel="noopener noreferrer">/, 'the crew notes link opens a new tab without an opener');
+  assert.doesNotMatch(html, /\shref="(?!#panels"|avd\/|app\.css|power\.css|frozen-theme\.css|http:\/\/localhost:8080\/power\.html")/, 'no address is written into the page');
+  assert.match(html, /data-rule-set="notes"[^>]* hidden>/, 'the crew notes rule set starts hidden');
+  assert.match(html, /data-rule-pick="notes"[^>]* hidden>/, 'the crew notes button starts hidden');
   assert.deepEqual([...new Set(script.match(/cmd:\s*'[a-z]+'/gi))], ["cmd: 'power'"], 'power is the only command');
   assert.doesNotMatch(script, /slot:\s*'all'|innerHTML|\beval\(/);
   for (const name of ['power.js', 'power-model.js']) {

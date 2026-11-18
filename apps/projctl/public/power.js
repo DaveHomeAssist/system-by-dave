@@ -3,7 +3,7 @@
 // nothing else, and it never sends anything to a lane the operator powers by handheld remote.
 import { LANES, rigLanes } from './lanes.js';
 import { createConnectionMonitor } from './projector-connection.js';
-import { STORAGE_KEY, COOL_SECONDS, TICK_VALID_MS, STEPS, MANUAL_LANES, emptyRecord, parseRecord, tickCurrent, coolTimer, clock, laneReading, relayStep, manualStep, banner } from './power-model.js';
+import { STORAGE_KEY, COOL_SECONDS, TICK_VALID_MS, STEPS, MANUAL_LANES, emptyRecord, parseRecord, tickCurrent, coolTimer, clock, crewNotesUrl, laneReading, relayStep, manualStep, banner } from './power-model.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const MODES = ['on', 'off'];
@@ -90,6 +90,22 @@ function pickRules(id) {
 }
 for (const button of rulePicks) button.addEventListener('click', () => pickRules(button.dataset.rulePick));
 pickRules('never');
+
+// ---- Optional crew notes link ----
+// The address lives in the relay's private settings and reaches the page through one read. The page
+// only draws a link to it: it never requests, checks or frames that address. With no usable address,
+// or on a relay without the route, the link and its rule set are not shown at all.
+function showCrewNotes(address) {
+  for (const link of document.querySelectorAll('[data-crew-notes]')) { if (address) link.href = address; else link.removeAttribute('href'); }
+  for (const node of document.querySelectorAll('[data-rule-set=notes], [data-rule-pick=notes]')) node.hidden = !address;
+  if (!address && $('#rules [data-rule-pick=notes]').getAttribute('aria-pressed') === 'true') pickRules('never');
+}
+async function loadCrewNotes() {
+  try {
+    const response = await fetch('api/crew-links', { cache: 'no-store', signal: AbortSignal.timeout(5000) });
+    showCrewNotes(response.ok ? crewNotesUrl(await response.json()) : null);
+  } catch { showCrewNotes(null); }
+}
 
 // A sheet left open while the screen grows back to the tall layout returns to the card.
 const shortScreen = window.matchMedia('(max-height:620px)');
@@ -334,10 +350,12 @@ function signIn() { location.href = 'login.html?next=' + encodeURIComponent(loca
 
 // ---- Relay connection: same snapshot, status, busy and heartbeat messages as the console ----
 function setConnected(value) {
+  const first = value && !connected;
   connected = value;
   $('#conn').dataset.state = value ? 'online' : 'offline';
   if (!value) { confirms.clear(); }
   render();
+  if (first) loadCrewNotes(); // once per connection, after the relay has accepted this session
 }
 let reconnectTimer = null, generationCounter = 0;
 function scheduleReconnect() { if (reconnectTimer === null) reconnectTimer = setTimeout(() => { reconnectTimer = null; connect(); }, 1500); }

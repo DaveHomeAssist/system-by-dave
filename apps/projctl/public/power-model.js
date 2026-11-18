@@ -57,6 +57,18 @@ export function clock(seconds) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
+// The optional crew notes link. The address comes from the relay's private settings (api/crew-links).
+// The relay validates it; the page checks again and accepts only a plain http or https address.
+// Anything else, including a relay without that route, means "not configured".
+export function crewNotesUrl(payload) {
+  const value = payload?.notes?.url;
+  if (typeof value !== 'string' || !value || value.length > 300 || /[\s\u0000-\u001f\u007f]/.test(value)) return null;
+  let url;
+  try { url = new URL(value); } catch { return null; }
+  if (!['http:', 'https:'].includes(url.protocol) || !url.hostname || url.username || url.password) return null;
+  return url.href.length <= 300 ? url.href : null;
+}
+
 // What the relay can honestly say about one lane right now. Only kind 'reading' is a reading.
 export function laneReading(entry, connection) {
   if (!entry || entry.conflict) return { kind: 'conflict', word: 'CONFLICT' };

@@ -30,7 +30,10 @@ const audit = () => {
 
 (async () => {
   const { startRelay, until } = await import('./relay-helper.js');
-  const relay = await startRelay();
+  // The main relay has a crew notes address in its private settings, so every size is checked with
+  // the optional link on screen. The address uses a reserved test name and is never requested.
+  const NOTES = 'https://notes.example.test/crew';
+  const relay = await startRelay({}, { files: { 'crew-links.json': JSON.stringify({ notes: { url: NOTES } }) } });
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
   try {
     for (const [index, slot] of ['P1', 'P2', 'P3', 'P4'].entries()) await relay.api('projector', { slot, lane: 'ABCD'[index] });
@@ -40,6 +43,8 @@ const audit = () => {
     await reach('P1', false); await reach('P4', false);
 
     const context = await browser.newContext({ viewport: { width: 375, height: 812 }, reducedMotion: 'reduce' });
+    const notesRequests = [];
+    await context.route('https://notes.example.test/**', route => { notesRequests.push(route.request().url()); return route.fulfill({ status: 200, contentType: 'text/html', body: '<title>notes fixture</title>' }); });
     const page = await context.newPage();
     const problems = [], posts = [], elsewhere = [];
     page.on('pageerror', error => problems.push(String(error)));
@@ -283,6 +288,23 @@ const audit = () => {
     await $('#t-rules').click();
     await $('#rules').waitFor();
     assert.equal(new URL(page.url()).hash, '#rules');
+
+    // ---- Crew notes link, configured: a labelled link in a new tab that the page itself never calls ----
+    await $('[data-rule-pick=notes]').click();
+    const notes = $('#rules [data-rule-set=notes]');
+    await notes.waitFor();
+    assert.match(await notes.innerText(), /For notes that can wait\. Not for emergencies or cue calls/);
+    const link = $('#rules [data-crew-notes]');
+    assert.deepEqual([await link.getAttribute('href'), await link.getAttribute('target'), await link.getAttribute('rel')], [NOTES, '_blank', 'noopener noreferrer']);
+    assert.deepEqual(notesRequests, [], 'the page never requests the notes address on its own');
+    await shot('phone-rules-crew-notes');
+    const [opened] = await Promise.all([context.waitForEvent('page'), link.click()]);
+    await opened.waitForLoadState();
+    assert.equal(opened.url(), NOTES);
+    assert.equal(await opened.evaluate(() => window.opener), null, 'the new tab cannot reach back into the checklist');
+    await opened.close();
+    assert.equal(new URL(page.url()).pathname, '/power.html', 'the checklist stays where it was');
+    await $('[data-rule-pick=never]').click();
     await page.goBack();
     await $('#off').waitFor();
     assert.equal(await $('#t-off').getAttribute('aria-selected'), 'true', 'Back returns to the earlier view');
@@ -328,15 +350,16 @@ const audit = () => {
         await $('#t-rules').click();
         await $('#rules').waitFor();
         await check('rules');
-        if (await $('[data-rule-pick=wrong]').isVisible()) for (const set of ['wrong', 'page', 'never']) {
+        if (await $('[data-rule-pick=wrong]').isVisible()) for (const set of ['wrong', 'page', 'notes', 'never']) {
           await $(`[data-rule-pick=${set}]`).click();
           assert.equal(await $(`#rules [data-rule-set=${set}]`).isVisible(), true);
           await check(`rules ${set}`);
-        } else for (const set of ['never', 'wrong', 'page']) assert.equal(await $(`#rules [data-rule-set=${set}]`).isVisible(), true, `${width}x${height}: every rule set shows`);
+        } else for (const set of ['never', 'wrong', 'page', 'notes']) assert.equal(await $(`#rules [data-rule-set=${set}]`).isVisible(), true, `${width}x${height}: every rule set shows`);
         if (theme === 'dark' || width === 3840) await shot(`${width}x${height}-${theme}-rules`);
         // Very wide screens show the rules beside the open step. Others keep them behind the tab.
         await $('#t-off').click();
         assert.equal(await $('#off [data-aside]').isVisible(), width === 3840, `${width}x${height} rules aside`);
+        if (width === 3840) assert.equal(await $('#off [data-aside] [data-crew-notes]').getAttribute('href'), NOTES, 'the rules beside the step carry the crew notes link too');
         await go('off', 1);
         await shot(`${width}x${height}-${theme}-night-no-reply-locked`);
       }
@@ -354,9 +377,43 @@ const audit = () => {
       await visitor.locator('button[type=submit]').click();
       await visitor.waitForURL(guarded.base + '/power.html');
       await visitor.locator('#conn[data-state=online]').waitFor();
+
+      // ---- Crew notes link, not configured: nothing of it is shown, here or beside the step ----
+      const asked = visitor.waitForResponse(response => response.url().endsWith('/api/crew-links'));
+      await visitor.reload();
+      assert.deepEqual(await (await asked).json(), { notes: null, state: 'not-configured' });
+      await visitor.locator('#conn[data-state=online]').waitFor();
+      await visitor.locator('#t-rules').click();
+      await visitor.locator('#rules').waitFor();
+      const shown = () => visitor.evaluate(() => ({
+        visible: [...document.querySelectorAll('[data-rule-set=notes], [data-rule-pick=notes], [data-crew-notes]')].filter(node => node.getClientRects().length).length,
+        addresses: [...document.querySelectorAll('a[href]')].map(node => node.getAttribute('href')).filter(href => href !== '#panels'),
+      }));
+      assert.deepEqual(await shown(), { visible: 0, addresses: [] });
+      assert.equal(await visitor.locator('#rules [data-rule-set]:visible').count(), 1, 'the three ordinary rule sets still work, one at a time on a phone');
+
+      // An address the relay should never send is refused by the page as well.
+      for (const body of [{ notes: { url: 'javascript:alert(1)' }, state: 'configured' }, { notes: { url: 'https://user:secret@notes.example.test/' }, state: 'configured' }, 'not json']) {
+        await visitor.route('**/api/crew-links', route => route.fulfill({ status: 200, contentType: 'application/json', body: typeof body === 'string' ? body : JSON.stringify(body) }));
+        const again = visitor.waitForResponse(response => response.url().endsWith('/api/crew-links'));
+        await visitor.reload();
+        await again;
+        await visitor.locator('#conn[data-state=online]').waitFor();
+        await visitor.waitForTimeout(150); // let the page act on the answer before judging it
+        assert.deepEqual(await shown(), { visible: 0, addresses: [] }, JSON.stringify(body));
+        await visitor.unroute('**/api/crew-links');
+      }
+      // A relay without the route at all (an older install) also means "not configured".
+      await visitor.route('**/api/crew-links', route => route.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' }));
+      const missing = visitor.waitForResponse(response => response.url().endsWith('/api/crew-links'));
+      await visitor.reload();
+      await missing;
+      await visitor.locator('#conn[data-state=online]').waitFor();
+      await visitor.waitForTimeout(150);
+      assert.deepEqual(await shown(), { visible: 0, addresses: [] });
       await visitor.close();
     } finally { await guarded.close(); }
 
-    console.log('Power operator page passed: morning on, nightly off, two-step power off and its expiry, Show Lock, no-reply and conflict guards, countdown, tick lapse, safe-to-leave banner, keyboard, themes, sign-in return, and containment at six sizes');
+    console.log('Power operator page passed: morning on, nightly off, two-step power off and its expiry, Show Lock, no-reply and conflict guards, countdown, tick lapse, safe-to-leave banner, keyboard, themes, crew notes link configured and not configured, sign-in return, and containment at six sizes');
   } finally { await browser.close(); await relay.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

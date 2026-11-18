@@ -26,8 +26,9 @@ Two facts make "press All off" the wrong tool for this job:
 
 One small page, `power.html`, served by the same relay, that walks the power operator
 through morning on or nightly off one step at a time and says plainly when it is safe to
-leave. It shows only what this job needs. It adds no relay endpoint and changes no saved
-rig data.
+leave. It shows only what this job needs. The checklist uses only the relay's existing
+routes and changes no saved rig data. One small read-only route is added for the optional
+crew notes link described below.
 
 ## Flow
 
@@ -93,6 +94,32 @@ button.
 - Morning on: the same strip reads "All four on" when B and C read ON and A and D carry
   a current "lit" tick.
 
+### Crew notes link (optional)
+
+The crew has a separate place for notes and questions that can wait. When the relay knows
+its address, the Rules view gains a fourth rule set, **Crew notes**, with one link.
+
+- The address comes from private local settings only: a `crew-links.json` file beside the
+  rig, shape `{ "notes": { "url": "https://…" } }`. The relay hands it to a signed-in page
+  through `GET api/crew-links`. No address, host name or product name is in this
+  repository, and the tests use a reserved test name.
+- With no usable address the link, its rule set and its button are not shown at all, on
+  the Rules tab or beside the open step on a very wide screen. The same is true on a relay
+  that does not have the route. Nothing else on the page depends on it.
+- The page only draws the link. It never requests, checks or frames that address.
+- The link opens in a new tab with no opener, under the label "For notes that can wait.
+  Not for emergencies or cue calls: phone for those."
+- The relay accepts only an `http` or `https` address without credentials, 300 characters
+  at most. The page applies the same rule again to whatever it is handed.
+- The reader (`server/crew-links.js`) and its two lines in `server/index.js` are the same,
+  byte for byte, as the ones the show backup page adds, so both role pages share one
+  private setting and either pull request works on its own.
+
+When to set the address is one question for both role pages: decision SBP-8 in the show
+backup page brief. Its recommendation is to leave it unset until the operator's device can
+reach the notes service. Today this page's operator cannot reach it, so the link stays
+hidden.
+
 ### Ticks and timers
 
 Ticks and countdowns live in the browser (`localStorage` key `projctl.powerPage.v1`,
@@ -130,21 +157,27 @@ The page never scrolls (workspace rule WEB-2), in both themes, light by default.
   control, and no group "all" command.
 - No power off in Morning on, and no power on in Nightly off.
 - No command of any kind to lanes A and D.
-- No new relay endpoint, no change to authentication and no change to which network
-  interfaces the relay listens on.
+- No new relay endpoint for power or state, no change to authentication and no change to
+  which network interfaces the relay listens on. The one added route only reads the
+  optional crew notes address.
+- No request to the crew notes address, and no link to it unless the relay's private
+  settings hold one.
 - No optimistic state: nothing is shown as on, cooling or Standby unless a fresh relay
   reading says so, and nothing the operator ticked is shown as a relay reading.
 - No external font, script, style or network request. Every URL is relative.
 
 ## Rules, data and API effects
 
-- Reads: `GET api/state` (session check) and the existing `ws` snapshot, status, busy
-  and heartbeat messages.
+- Reads: `GET api/state` (session check), the existing `ws` snapshot, status, busy and
+  heartbeat messages, and `GET api/crew-links` once per connection for the optional link.
 - Writes: `POST api/command` with `{slot, cmd:'power', arg, confirm, expectedTargets}`
   for one slot at a time. No other route.
 - Files: `public/power.html`, `power.js` (page), `power-model.js` (state rules, no
   DOM) and `power.css`. They reuse the shared theme, tokens, lane names and
   reply-freshness modules and change none of them.
+- Relay: `server/crew-links.js` (new, shared with the show backup page) and two added
+  lines in `server/index.js`: its import and the `api/crew-links` route. The route sits
+  behind the existing login and never opens the address it returns.
 - The page is served by the relay's existing static handler, behind the existing
   login. A signed-out visit redirects to the sign-in page and returns to `power.html`.
 - `power.html` is one more tracked page outside the sitemap, so the count in
@@ -175,17 +208,22 @@ The page never scrolls (workspace rule WEB-2), in both themes, light by default.
   holds no absolute URL, outside host or private network address, calls only `api/state`
   and `api/command`, and sends only `power`; the relay behaviour the page relies on, for
   the exact request it sends (two-step power off, Show Lock, a stale target revision,
-  the cooling guard, a lane with no reply); and the state rules in `power-model.js`
-  (lane readings, both step kinds, tick lapse, the countdown, the banner).
+  the cooling guard, a lane with no reply); the crew notes read (not configured,
+  configured and signed in, refused when signed out, an unusable address); and the state
+  rules in `power-model.js` (lane readings, both step kinds, tick lapse, the countdown,
+  the banner, which crew notes addresses are accepted).
 - `test/power-operator-browser.cjs` (Chromium, simulator relay, lanes A and D made
   unreachable as at the venue): both checklists end to end on a phone; every request the
   page sent; the playback tick gate; the two-step confirmation, its lapse and the
   ignored rapid repeat; Show Lock; a lane that stops replying; a manual lane the relay
   reaches and disputes; the countdown across a reload; tick lapse; the banner turning on
   and going off again; a device clock ten minutes fast; keyboard tab navigation, visible
-  focus and history; both themes; sign-in and return; and no page scroll, nothing
-  outside its panel and no cut text at 375 by 812, 375 by 635, 1440 by 900, 844 by 390,
-  320 by 256 and 3840 by 1080, with the longest strings on screen.
+  focus and history; both themes; sign-in and return; the crew notes link when
+  configured (label, new tab, no opener, and no request to the address by the page) and
+  when not configured (nothing shown, also for an address the page must refuse and for a
+  relay without the route); and no page scroll, nothing outside its panel and no cut text
+  at 375 by 812, 375 by 635, 1440 by 900, 844 by 390, 320 by 256 and 3840 by 1080, with
+  the longest strings and the crew notes rule set on screen.
 - Not covered by any test: real projectors, the real PJLink conflict with the playback
   app, a real handheld remote, real cooling time, a real phone browser, the venue
   networks, and the installed show computer.
@@ -279,4 +317,5 @@ network each person will really use, which is not recorded yet.
 
 Role passcodes, interface binding, cue port changes, a lamp message helper with real
 content, any change to the playback application, power schedules, installing or
-restarting the relay, and anything on the show backup page.
+restarting the relay, anything on the show backup page, and the crew notes service
+itself: this page links to it when told where it is and does nothing else with it.

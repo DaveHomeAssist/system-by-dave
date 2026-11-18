@@ -98,7 +98,10 @@
 .pw-rules__pick{grid-row:1;display:none;gap:6px;margin-bottom:8px}
 .pw-rules__pick .avd-btn{flex:1 1 0;min-width:0;padding:0 4px;font-size:11px;line-height:14px;letter-spacing:.02em;white-space:normal}
 .pw-rules__pick .avd-btn[aria-pressed=true]{background:var(--tape);border-color:var(--tape);color:var(--on-tape)}
-.pw-rules__grid{grid-row:2;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-content:start}
+.pw-rules__grid{grid-row:2;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(13rem,100%),1fr));gap:12px;align-content:start}
+.pw-rules [hidden],.pw-aside [hidden]{display:none}
+.pw-rule p{margin:0 0 10px;font-size:14px;line-height:20px}
+.pw-rule--notes .avd-btn{white-space:normal;padding-block:6px;text-align:center}
 .pw-rule{min-width:0;padding:12px 16px;border:1px solid var(--hairline);border-radius:12px;background:var(--surface)}
 .pw-rule h2{margin:0 0 6px;font:700 15px/20px var(--font-display);letter-spacing:.04em;text-transform:uppercase}
 .pw-rule ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px;line-height:20px}
@@ -201,7 +204,8 @@
   .pw-rules__pick{display:flex}
   .pw-rules__grid{grid-template-columns:minmax(0,1fr)}
   .pw-rules .pw-rule[data-off]{display:none}
-  .pw-rule ul{font-size:13px;line-height:18px;gap:2px}
+  .pw-rule ul,.pw-rule p{font-size:13px;line-height:18px}
+  .pw-rule ul{gap:2px}
   .pw-rule{padding:8px 12px}
 }
 
@@ -220,9 +224,11 @@
   .pw-text{font-size:12px;line-height:16px}
   .pw-detail__close{flex:1 1 auto;padding:0 10px;font-size:11px}
   .pw-tools:not([hidden]) + .pw-detail__close{flex:0 0 auto}
-  .pw-rules__pick{margin-bottom:4px}
+  .pw-rules__pick{gap:4px;margin-bottom:4px}
+  .pw-rules__pick .avd-btn{padding:0 1px;font-size:10px;line-height:12px;letter-spacing:0;overflow-wrap:anywhere}
   .pw-rule h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
   .pw-rule ul{padding-left:14px;font-size:11px;line-height:14px;gap:1px}
+  .pw-rule p{margin-bottom:6px;font-size:11px;line-height:14px}
   .pw-rule{padding:4px 8px}
 }
 
