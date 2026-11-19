@@ -175,7 +175,7 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
 .sb-night__total{margin:0;font:800 18px/1.25 var(--font-sans,system-ui,sans-serif)}
 .sb-night__mains{margin:0;padding:2px 8px;border:1px solid var(--hairline);border-radius:8px;font:700 13px/1.35 var(--font-sans,system-ui,sans-serif)}
 .sb-night__mains[data-hot]{border-color:var(--pc-bad);background:var(--pc-bad-wash);color:var(--pc-bad)}
-.sb-night__rows{flex:1 1 auto;min-height:0;margin:0;padding:0;list-style:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--hairline);border-radius:10px;background:var(--surface)}
+.sb-night__rows{flex:0 1 auto;min-height:0;margin:0;padding:0;list-style:none;overflow:auto;overscroll-behavior:contain;border:1px solid var(--hairline);border-radius:10px;background:var(--surface)}
 .sb-night__row{display:grid;grid-template-columns:28px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.3fr);grid-template-areas:"l who expect now" "l who detail detail";gap:2px 12px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--hairline);box-shadow:inset 6px 0 0 var(--sb-state,var(--hairline))}
 .sb-night__row:last-child{border-bottom:0}
 .sb-night__letter{grid-area:l;font:800 20px/1 var(--font-sans,system-ui,sans-serif);text-align:center}
