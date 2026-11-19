@@ -1,5 +1,19 @@
 # Changelog
 
+## Projctl role pages: the rig's daily order of operations, 2026-11-19
+
+Applies the November 19 order of operations research to the role pages on the owner's word ("apply to crew dashboards", relayed). Simulator and fixtures only; not installed. Waits and behaviours from the research are labelled "researched, not yet tested" on the pages.
+
+- **The all-four run** (`apps/projctl/server/power-run.js`): fresh reads of every unit it waits on every 10 s through the relay's own poller; morning lamp units staggered about 10 s apart and watched for 3 minutes; a lamp that turns itself off is retried once after OFF plus 75 s, then stopped with an alert; never an on to a Panasonic that reads COOLING; nothing, not even a read, to a lamp unit in the minute after its on command; the night waits up to 240 s and names any unit not OFF; "sent, not confirmed" instead of success when a unit does not report. The night order is unchanged pending SD-1.
+- **The Barco's raw state**: the Pulse driver keeps `rawState` beside the mapped power, and the simulator reports it for a Barco model. Deep standby (STANDBY or ECO) is shown as a caution on the lane card and in the run's end message; a Barco reading OFF or cooling is never sent a second off.
+- **Night timeline** (`public/night-timeline.js`, a Night tab on `power.html`): one row per lane in the off order with its expected wait (lamp units about 170 s, top laser about 5 s, Barco about 30 s to READY) and its live reading, "All off, about 3 min", "Never cut mains while a lamp unit is cooling", and "Safe to leave the building" only when all four read OFF. The page that starts the nightly off moves to it.
+- **Recovery ladder** on `show.html`, least disruptive first: shutter, input, power cycle one projector, relaunch the playback app, restart the show computer, each with when it is allowed.
+- **Holds**: a Know manifest entry of kind `notice` shows a short hold above the list until its `until` time, with a mark on the Know tab. Date-specific holds live in the private folder, not in the page.
+- **Know samples**: the power-up and recovery samples carry the morning check of the show computer, photographing a lamp message, the once-only Panasonic STANDBY MODE check, and two-show days.
+- **Show page look** from Dave's design reference (November 19): the power banner in the reading's colour (a wakeable Barco cyan with "READY · this page can wake it", deep standby grey with "this page can't wake it"), the shutter as a coloured pill with "sent, not confirmed", readings as rows on very tall cards, "Control link" for the driver in use, summary items with coloured top edges, and an amber outline while Show Lock is on. Show Lock stays read only; the Frozen palette, locked shell and theme switch stay.
+- **Hints** on the shared control: a suggested run, highlighted and explained from B and C, Show Lock and the last run (never pressed), and a copyable summary of the finished run under the banner.
+- Shared files: `server/index.js` (the run gets the poller's refresh), `server/drivers/pulse.js`, `server/drivers/simulator.js`, `server/drivers/index.js`.
+
 ## Projctl: Barco Stop lens on every axis, 2026-11-19
 
 - Stop lens on the Barco (Pulse) used to queue behind status reads and stop at the first axis that failed, leaving the rest moving. It now sends stop to all four axes at once, each on its own connection, and reports any axis that did not acknowledge. Re-landed from draft PR 460 onto main's driver. Simulator-tested only; not installed or tried on the UDM.
@@ -8,10 +22,34 @@
 
 Workspace search opens show pages and R5 references. Notes retains the last shared task snapshot and queues offline checkoffs. Readiness reports identify operator confirmations and the connected relay can supply timestamped booth status.
 
+## Projctl role pages: one shared on and off control and one all-four run, 2026-11-18
+
+- **One run in the relay.** `server/power-run.js` runs "all four on" and "all four off" once, in the relay, with one state every page reads. A second press from any page meets the run in progress. Fixed order (on: C, B, A, D; off: A, D, B, C), each unit read before it is commanded, at most one command per unit, the waits from the manuals inside it, and a banner ("All four on" or "Safe to leave the building") only when every lane's own reply supports it. Routes: `GET /api/power-run`, `POST /api/power-run/plan`, `/start` and `/stop`, behind the sign-in.
+- **One shared control on each person's page.** `projector-control.js`, `projector-control-model.js` and `projector-control.css` draw a card per lane and an all-lanes card. `show.html` (show backup operator and designer) mounts it with power and shutter; `power.html` (power operator) with power only. Both addresses are unchanged. Every action takes two steps; power off uses the relay's own one-use confirmation.
+- **The power page is replaced by the shared shell.** Its checklist, ticks, timers, "app closed" step and handheld remote steps are gone. `power.js`, `power-model.js`, `power.css` and their two test files are removed; `test/show-backup-browser.cjs` and `test/show-backup.test.js` cover both pages.
+- **The show backup page** gains a setup check (pass, fail or cannot check per line), a MIDI test that waits for Show Control cue 999 and then 999.5 from the lighting console and sends nothing, and a Know tab that serves diagrams and documents from a private folder. Each lane shows its input, test pattern and which link carries it. A lit lane with a closed shutter gets a highlighted Open button, the way back from a dark surface. "Call for help with a snapshot" is removed on the owner's word.
+- Show Lock blocks power off, for one lane and for the off run, as the relay does. Power on and shutters stay available.
+- More read-only relay routes: `GET /api/cue-feed` (a listen-only observer file, tailed by `server/cue-feed.js`), `GET /api/host-checks` (`server/host-checks.js`, "cannot check" until a provider is configured), `GET /api/know` and `GET /api/know/file` (`server/know-folder.js`). Paths come from a private `host-paths.json` beside the rig. `server/index.js` gains three lines.
+- Simulator, stand-in projectors and fixtures only. Not installed. No command from these pages has reached a projector, the run's order and waits have not been timed on a rig, and the MIDI test has not read a real observer file. Brief and open decisions: `apps/projctl/docs/show-backup-page.md`.
+
+## Projctl show backup page, 2026-11-18
+
+- Add `apps/projctl/public/show.html`, a role page for the person who backs up projection from the lighting position. A go or no-go strip (lanes lit, outputs, cue link, show computer) sits above the four lanes. A lane the relay is not reading says "check by eye" and never shows its last known state. The cue link says "Not connected", because console cues do not pass through the relay.
+- The page sends one command: a shutter move for one lane, after a two-step confirm, with the reviewed target revision. It is offered only on a current reply that says power is ON. "Call for help with a snapshot" copies a plain-text summary; no number is stored.
+- An optional crew notes link, for notes that can wait, appears only when the relay's private settings name an address. The relay gains one read-only route for it, `GET /api/crew-links` (`server/crew-links.js`), behind the existing login; the page never requests the address itself.
+- No console or sign-in change. `npm run test:browser` gains `test/show-backup-browser.cjs`, and `test/show-backup.test.js` joins `npm test`. Tested in the simulator only. The page files were copied to the show computer on November 18 with no relay restart; it is not yet accepted on the rig. Brief, limits and open decisions SBP-1 to SBP-8: `apps/projctl/docs/show-backup-page.md`.
+
 ## Projctl Panasonic control-port fallback, 2026-11-18
 
 - When another controller holds a Panasonic projector's PJLink link, the relay now reads power and shutter on the projector's control port and sends power and shutter there, instead of showing the projector as unreachable. PJLink stays the link whenever it answers, and is retried every five minutes. Input, the alarm summary and light hours read "not reported" while the control port is in use.
 - Built against stand-in servers (`test/panasonic-control-port.test.js`). The driver file was installed on the show computer on November 18 with one relay restart, after which both affected projectors came online in the relay's log; no power or shutter command has been sent to a real projector on this path and the rig acceptance steps are not yet run. Brief, rig acceptance steps and decisions PCP-1 and PCP-2: `apps/projctl/docs/panasonic-control-port.md`.
+## Projctl power operator page, 2026-11-18
+
+- Add `power.html` to the Projctl relay: a guided checklist for the crew member who turns the four projectors on each morning and off each night. Two modes, five steps each, one step open at a time. Lanes B and C use the relay's existing power command, with its two-step power off, Show Lock, stale-reply and cooling guards unchanged. Lanes A and D are done by handheld remote and are recorded with a "confirmed by eye" tick and an operator-started 170 second cooling countdown. The page never commands A or D and never draws a lane the relay has not reached as a reading.
+- A "Safe to leave the building" banner turns on only when B and C read Standby from fresh replies and A and D carry a current tick that no fresh reading disputes. Ticks lapse after 30 minutes.
+- The Rules view shows an optional crew notes link when the relay's private settings hold an address (`crew-links.json` beside the rig, read through `GET /api/crew-links`). It is hidden entirely otherwise, opens in a new tab, and is labelled as for notes that can wait, not emergencies or cue calls. The page never calls that address. The reader is the same file the show backup page adds.
+- A relay lane that replies with no power state reads UNKNOWN and is never shown as On or Standby. It can still be powered, with a "look at it first" note, as on the operator console. At night it is confirmed off by eye like a lane powered by remote, and the banner says which lanes were read and which were looked at. A relay without the November 17 Barco standby mapping reports that unit this way.
+- No login or network binding changes, and no relay change for power. The lamp message helper is an empty, labelled slot until its content is recorded. Brief, open decisions and the role access and network exposure proposal for the role pages: `apps/projctl/docs/power-operator-page.md`. Simulator tests only; nothing is installed and no real projector, phone or venue network was used.
 
 ## Projctl health reports: no current reading, 2026-11-18
 
