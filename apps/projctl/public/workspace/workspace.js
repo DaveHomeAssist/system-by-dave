@@ -55,7 +55,76 @@ window.addEventListener('beforeunload', event => {
   if (!storageAvailable && notes.value) { event.preventDefault(); event.returnValue = ''; }
 });
 
-let currentTasks = [];
+const taskCacheKey = 'wst_frozen_shared_todos_v1';
+function validEntries(rows) {
+ return Array.isArray(rows) && rows.every(row => row && typeof row.id === 'string' &&
+  typeof row.text === 'string' && ['task','update'].includes(row.kind ?? 'task') &&
+  [true,false,0,1].includes(row.done) && (row.kind !== 'update' || Number.isFinite(Date.parse(row.created_at))));
+}
+let lastSnapshot;
+try {
+ const saved = JSON.parse(localStorage.getItem(taskCacheKey));
+ if (saved && Array.isArray(saved.open) && Array.isArray(saved.completed)) {
+  const tasks = [...saved.open, ...saved.completed, ...(saved.updates ?? [])];
+  if (validEntries(tasks) && Number.isFinite(Date.parse(saved.updatedAt))) lastSnapshot = {tasks, savedAt:saved.updatedAt};
+ }
+} catch { /* Storage can be unavailable or contain an older format. */ }
+let currentTasks = lastSnapshot?.tasks ?? [];
+let tasksWritable = false;
+let readSequence = 0;
+function setTaskAccess(writable) {
+ tasksWritable = writable;
+ for (const button of document.querySelectorAll('#task-add button, #update-add button')) button.disabled = !writable;
+}
+const outboxKey = 'wst_frozen_todo_outbox_v1';
+function getOutbox() {
+ const entries = JSON.parse(localStorage.getItem(outboxKey) || '[]');
+ if (!Array.isArray(entries)) throw Error('Unreadable offline queue.');
+ return entries;
+}
+function queueToggle(entry, done) {
+ try {
+  if (!Number.isInteger(entry.revision) || entry.revision < 1) throw Error('Missing server revision');
+  const queue = getOutbox().filter(item => item.id !== entry.id);
+  if (Boolean(entry.done) !== done) queue.push({id:entry.id,revision:entry.revision,done});
+  localStorage.setItem(outboxKey, JSON.stringify(queue));
+  showSnapshot('Offline change saved on this device.');
+ } catch { renderTasks(); showEntryFeedback('Could not save this offline change.'); }
+}
+let flushing = false;
+let replayNotice = '';
+async function replayOutbox(event) {
+ if (flushing || !event.detail?.length) return;
+ flushing = true;
+ try {
+  for (const item of event.detail) {
+   const server = currentTasks.find(row => row.id === item.id);
+   let resolved = false;
+   if (!server || server.kind === 'update' || (server.revision !== item.revision && Boolean(server.done) !== item.done)) {
+    replayNotice = 'A queued checkoff conflicted with a crew change. Review the current shared list.';
+    resolved = true;
+   } else if (Boolean(server.done) === item.done) resolved = true;
+   else { await taskAPI('/'+item.id, {...server, revision:item.revision, done:item.done}); resolved = true; }
+   if (resolved) localStorage.setItem(outboxKey, JSON.stringify(getOutbox().filter(next =>
+    next.id !== item.id || next.revision !== item.revision || next.done !== item.done)));
+  }
+ } catch { replayNotice = 'Offline checkoffs are pending. Refresh to retry.'; }
+ finally { flushing = false; }
+ if (tasksWritable) await loadTasks(false);
+}
+window.addEventListener('wst:todo-flush-outbox', replayOutbox);
+function showSnapshot(reason) {
+ setTaskAccess(false);
+ if (!editingEntry) renderTasks();
+ const badge = document.querySelector('#task-state');
+ badge.classList.add('cached');
+ if (lastSnapshot) badge.textContent = 'OFFLINE · CACHED ' + Math.max(0, Math.floor((Date.now()-Date.parse(lastSnapshot.savedAt))/60000)) + 'm ago';
+ if (!lastSnapshot) {
+  document.querySelector('#task-state').textContent = 'Unknown';
+  for (const id of ['#task-list','#update-list']) document.querySelector(id).textContent = 'No saved copy on this device.';
+ }
+ showEntryFeedback(reason + (lastSnapshot ? ' Last synced ' + new Date(lastSnapshot.savedAt).toLocaleString() + '.' : ''));
+}
 let editingEntry = null;
 const feedback = document.querySelector('#task-feedback');
 const updateFeedback = document.querySelector('#update-feedback');
@@ -99,12 +168,17 @@ function editEntry(entry, item) {
 }
 function renderEntry(entry) {
  const item = document.createElement('li');
+ item.dataset.entryId = entry.id;
  const isUpdate = entry.kind === 'update';
  item.classList.toggle('completed', !isUpdate && !!entry.done);
  const body = document.createElement(isUpdate ? 'div' : 'label'); body.className = 'entry-body';
  if(!isUpdate) {
   const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!entry.done;
-  check.onchange = () => mutate('/' + entry.id, {...entry, done:check.checked});
+  if (!tasksWritable) {
+   try { check.checked = getOutbox().find(item => item.id === entry.id)?.done ?? check.checked; }
+   catch { check.disabled = true; }
+  }
+  check.onchange = () => !tasksWritable ? queueToggle(entry,check.checked) : mutate('/' + entry.id, {...entry, done:check.checked});
   body.append(check);
  }
  const text = document.createElement('span'); text.textContent = entry.text; body.append(text);
@@ -117,7 +191,25 @@ function renderEntry(entry) {
  actions.append(entryButton('Edit', () => editEntry(entry,item), entry));
  actions.append(entryButton(isUpdate ? 'Make a task' : 'Move to updates', () => mutate('/'+entry.id, {...entry,kind:isUpdate ? 'task' : 'update',done:false}), entry));
  actions.append(entryButton('Delete', () => { if(confirm('Delete this '+(isUpdate?'update':'task')+'?')) mutate('/'+entry.id,{...entry,delete:true}); }, entry));
- item.append(body, actions); return item;
+ item.append(body); if(tasksWritable) item.append(actions); return item;
+}
+function cacheRenderedTasks() {
+ if (!tasksWritable || !lastSnapshot) return;
+ const snapshot = {updatedAt:lastSnapshot.savedAt, open:[], completed:[],
+  updates:currentTasks.filter(row => row.kind === 'update')};
+ const byId = new Map(currentTasks.map(entry => [entry.id, entry]));
+ for (const [key,selector] of [['open','#task-list'],['completed','#completed-task-list']]) {
+  for (const item of document.querySelector(selector).children) {
+   const row = byId.get(item.dataset.entryId);
+   if (row) snapshot[key].push(row);
+  }
+ }
+ try { localStorage.setItem(taskCacheKey,JSON.stringify(snapshot)); }
+ catch { showEntryFeedback('Up to date. Browser storage unavailable for offline use.'); }
+}
+const taskObserver = new MutationObserver(cacheRenderedTasks);
+for (const selector of ['ul[aria-label="Open team tasks"]','ul[aria-label="Completed team tasks"]']) {
+ taskObserver.observe(document.querySelector(selector),{childList:true});
 }
 function renderTasks() {
  const updates = currentTasks.filter(entry => entry.kind === 'update');
@@ -131,11 +223,26 @@ function renderTasks() {
  document.querySelector('#completed-count').textContent = completed.length;
  document.querySelector('#completed-tasks').hidden = !completed.length;
 }
-async function loadTasks() {
- try { currentTasks = (await taskAPI()).tasks; if(!editingEntry) renderTasks(); showEntryFeedback('Up to date.'); }
- catch(error) { showEntryFeedback(error.message); }
+async function loadTasks(replay = true) {
+ const sequence = ++readSequence;
+ try {
+  const {tasks} = await taskAPI();
+  if (sequence !== readSequence) return;
+  if (!validEntries(tasks)) throw Error('Invalid task response.');
+  lastSnapshot = {savedAt:new Date().toISOString(), tasks};
+  currentTasks = tasks;
+  setTaskAccess(true);
+  if (!editingEntry) renderTasks();
+  document.querySelector('#task-state').classList.remove('cached');
+  showEntryFeedback(replayNotice || 'Up to date.');
+  if (replay !== false) {
+   try { const queue = getOutbox(); if (queue.length) window.dispatchEvent(new CustomEvent('wst:todo-flush-outbox',{detail:queue})); }
+   catch { /* The live list still works when local storage is blocked. */ }
+  }
+ } catch { if (sequence === readSequence) showSnapshot('Shared list unavailable.'); }
 }
 async function mutate(path,data) {
+ if (!tasksWritable) { showSnapshot('Reconnect to make changes.'); return false; }
  try {
   const payload = path ? {...data, done:!!data.done} : data;
   await taskAPI(path,payload); await loadTasks(); return true;
@@ -149,10 +256,13 @@ for(const [formId,fieldId,kind] of [['#task-add','#task-text','task'],['#update-
   const submit = event.currentTarget.querySelector('button[type=submit]');
   submit.disabled = true;
   if(await mutate('',{text,kind})) field.value = '';
-  submit.disabled = false;
+  submit.disabled = !tasksWritable;
  };
 }
 document.querySelector('#refresh').onclick = loadTasks;
+showSnapshot('Connecting.');
+window.addEventListener('online', loadTasks);
+window.addEventListener('offline', () => { ++readSequence; showSnapshot('Offline.'); });
 loadTasks(); setInterval(() => { if(!document.hidden && !editingEntry) loadTasks(); },10000);
 
 const clock = document.querySelector('#clock');
@@ -196,7 +306,7 @@ currentRoute=route;const planningActive=route==='updates'||route==='notes'||rout
 for(const button of document.querySelectorAll('[data-route]'))button.onclick=()=>navigate(button.dataset.route,{controls:button.hasAttribute('data-open-controls')});
 for(const button of document.querySelectorAll('[data-reference-view]'))button.onclick=()=>{ensureReference().then(view=>view.setView(button.dataset.referenceView)).catch(()=>{});for(const peer of document.querySelectorAll('[data-reference-view]'))peer.setAttribute('aria-pressed',String(peer===button));};
 document.querySelector('#rig-controls').onclick=()=>navigate('rig',{projector:selectedProjector,controls:true});document.querySelector('#back-reference').onclick=()=>navigate('rig',{projector:selectedProjector});
-async function connectRelay(url,label){const target=new URL(url);if(!['http:','https:'].includes(target.protocol)||target.username||target.password)throw Error('Invalid controller address');relayOrigin=target.origin;relayReady=false;relayFrame.hidden=true;clearTimeout(relayTimer);recommendLink(false);relayStatus.textContent='Requesting access to '+label+'…';document.querySelector('#workspace-connection').textContent='Private controller connecting';
+async function connectRelay(url,label){const target=new URL(url);if(!['http:','https:'].includes(target.protocol)||target.username||target.password)throw Error('Invalid controller address');boothReading=null;renderBoothStatus();relayOrigin=target.origin;relayReady=false;relayFrame.hidden=true;clearTimeout(relayTimer);recommendLink(false);relayStatus.textContent='Requesting access to '+label+'…';document.querySelector('#workspace-connection').textContent='Private controller connecting';
  try{const response=await fetch(new URL('/api/health',target),{cache:'no-store',targetAddressSpace:target.hostname==='localhost'?'loopback':'local',signal:AbortSignal.timeout(12000)});const health=await response.json();if(!response.ok||health.service!=='projctl'||health.ok!==true)throw Error('Relay health unavailable');}
  catch{recommendLink(true);relayStatus.textContent='Cannot reach the controller. Open it in a new tab, or allow local-network access in your browser.';document.querySelector('#workspace-connection').textContent='Private controller not connected';return;}
  relayStatus.textContent='Opening the controller… You can also open it in a new tab.';relayFrame.hidden=false;target.searchParams.set('workspaceEmbed','1');relayFrame.src=target.href;relayTimer=setTimeout(()=>{if(!relayReady){relayFrame.hidden=true;recommendLink(true);relayStatus.textContent='The controller could not open inside this page. Use Open local controller to try a new tab.';document.querySelector('#workspace-connection').textContent='Private controller: open in a new tab';}},8000);}
@@ -244,3 +354,99 @@ async function ensureSchedule(){
 }
 
 for(const button of document.querySelectorAll('[data-schedule-view]'))button.onclick=()=>{const month=button.dataset.scheduleView==='month';document.querySelector('.schedule-body').classList.toggle('calendar-mode',month);document.querySelector('#schedule-month').hidden=!month;for(const peer of document.querySelectorAll('[data-schedule-view]'))peer.setAttribute('aria-pressed',String(peer===button));};
+
+const pageSearch = document.querySelector('#wst-cmd-palette');
+const pageQuery = document.querySelector('#page-query');
+const pageResults = document.querySelector('#page-results');
+function renderPageResults() {
+ const entries = new Map();
+ const keywords = new Map();
+ for (const button of document.querySelectorAll('[data-route]')) {
+  const route = button.dataset.route;
+  if (!ROUTES[route] || button.hasAttribute('data-planning-entry')) continue;
+  const controls = button.hasAttribute('data-open-controls');
+  const label = controls ? 'Private controller' : ROUTES[route].heading || (route === 'notes' ? 'Notes and tasks' : 'Home');
+  keywords.set(label, (keywords.get(label) || '') + ' ' + route + ' ' + button.textContent.trim());
+  entries.set(label, () => {
+   navigate(route, {controls});
+   const panel = controls ? relayPanel : ROUTES[route].panel;
+   panel.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+  });
+ }
+ for (const link of document.querySelectorAll('a[href*="/run-review/"], .document-card, .handoff-links a[href*=".pdf"]')) {
+  const title = link.querySelector('h3,strong')?.textContent || link.textContent.trim();
+  const label = /run-review/.test(link.href) ? 'Run Review' : title + (link.hash.startsWith('#page=') ? ' · page ' + link.hash.slice(6) : '');
+  entries.set(label, () => link.click());
+ }
+ entries.set('Open Projctl on this computer', () => window.open('http://localhost:8080/', '_blank', 'noopener,noreferrer'));
+ entries.set('Copy Pre-Show Ready Report', copyReady);
+ pageResults.replaceChildren();
+ for (const [label, action] of entries) {
+  if (!(label + ' ' + (keywords.get(label) || '')).toLowerCase().includes(pageQuery.value.trim().toLowerCase())) continue;
+  const button = document.createElement('button');
+  button.type = 'button'; button.textContent = label;
+  button.onclick = () => { pageSearch.close(); action(); };
+  pageResults.append(button);
+ }
+ if (!pageResults.childElementCount) pageResults.textContent = 'No matching pages.';
+}
+function openPageSearch() {
+ if (!pageSearch.open) pageSearch.showModal();
+ pageQuery.value = ''; renderPageResults(); pageQuery.focus();
+}
+document.querySelector('#find-page').onclick = openPageSearch;
+pageQuery.oninput = renderPageResults;
+pageSearch.addEventListener('keydown', event => {
+ const buttons = Array.from(pageResults.children);
+ if (!buttons.length) return;
+ const index = buttons.indexOf(document.activeElement);
+ if (event.key === 'Enter' && document.activeElement === pageQuery) {
+  event.preventDefault(); buttons[0].click();
+ } else if (['ArrowDown','ArrowUp'].includes(event.key)) {
+  event.preventDefault();
+  const next = index < 0 ? (event.key === 'ArrowDown' ? 0 : buttons.length - 1) : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+  buttons[next].focus();
+ }
+});
+document.addEventListener('keydown', event => {
+ if ((event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'k') {
+  event.preventDefault(); openPageSearch();
+ }
+});
+
+pageSearch.addEventListener('click', event => {
+ if (event.target !== pageSearch) return;
+ const box = pageSearch.getBoundingClientRect();
+ if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) pageSearch.close();
+});
+document.querySelector('#find-page').textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl+K';
+let boothReading = null;
+function renderBoothStatus() {
+ const age = boothReading ? Date.now() - boothReading.observedAt : Infinity;
+ const live = age >= 0 && age <= 30000;
+ const lockAge = boothReading ? Date.now() - boothReading.lockAt : Infinity;
+ const lockKnown = lockAge >= 0 && lockAge <= 30000 && typeof boothReading?.lock === 'boolean';
+ document.querySelector('#poll-age').textContent = 'TELEMETRY: ' + (live ? 'LIVE' : boothReading ? 'STALE' : 'UNKNOWN');
+ document.querySelector('#show-lock').textContent = 'PROJCTL: ' + (lockKnown ? (boothReading.lock ? 'LOCKED' : 'UNLOCKED') : 'UNKNOWN');
+ document.body.classList.toggle('show-locked', lockKnown && boothReading.lock === true);
+}
+window.addEventListener('message', event => {
+ if (!relayOrigin || event.origin !== relayOrigin || event.source !== relayFrame.contentWindow) return;
+ if (event.data?.type === 'projctl:ready' && !event.data.relayConnected) boothReading = null;
+ else if (event.data?.type === 'projctl:telemetry' && relayReady && Number.isFinite(event.data.lockAt)) boothReading = {observedAt:event.data.observedAt ?? -Infinity, lockAt:event.data.lockAt, lock:event.data.lock};
+ else return;
+ renderBoothStatus();
+});
+setInterval(renderBoothStatus,1000);
+async function copyReady() {
+ renderBoothStatus();
+ const checks = Array.from(document.querySelectorAll('#readiness input'));
+ const time = new Intl.DateTimeFormat('en-US',{hour:'2-digit', minute:'2-digit', hourCycle:'h23', timeZone:'America/New_York',timeZoneName:'short'}).format(new Date());
+ const report = time + ' · VIDEO ' + (checks.every(check => check.checked) ? 'READY' : 'CHECKS INCOMPLETE') + ': ' +
+  checks.map(check => check.parentElement.textContent.trim() + (check.checked ? ' verified' : ' unchecked')).join(', ') + '. ' + document.querySelector('#show-lock').textContent;
+ try { await navigator.clipboard.writeText(report); document.querySelector('#ready-feedback').textContent = 'Copied.'; }
+ catch { window.prompt('Copy the readiness line', report); }
+}
+document.querySelector('#copy-ready').onclick = copyReady;
+
+if ('serviceWorker' in navigator && !LOCAL_CONTROLLER) navigator.serviceWorker.register('./workspace-offline.js').catch(() => {});
