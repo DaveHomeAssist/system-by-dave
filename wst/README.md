@@ -191,3 +191,23 @@ One label per view and one view per label across the Workspace row, the Main men
 ## Run review navigation (2026-11-16)
 
 The November 15 run review lives at `/run-review/` on the published Site only: its page, `data.json`, `context.json` and the R2-backed `originals/` route were added in Site version 38 from a managed checkout and are not in this directory or in `hosting/worker/index.js`. Home and Planning link to it by absolute URL, so the local Projctl copy also reaches the public review. Before the next Sites publication from this source, carry the version 38 run-review routes and R2 binding into the managed worker (the version 38 checkout is preserved on the 4TB T9 drive), or publishing will remove `/run-review/`. Rehearsal data and photos stay out of this public repository.
+
+
+## Booth navigation and offline notes
+
+Open Find a workspace page with the header shortcut or Cmd/Ctrl+K. Search for
+a page, an R5 reference, a controller link, or the readiness report. Check
+the four readiness items for the current call before copying a report.
+The browser keeps personal notes separately from the cached team list.
+
+After an online visit prepares the shell and syncs the list, Notes can open
+offline on the public site. Cached rows show the last successful sync.
+Offline checkoffs replay with the original server revision. A crew edit or
+deletion takes precedence and the page reports the conflict. Other team
+operations require a working connection. Clearing site data removes local
+notes, the snapshot and any pending checkoffs.
+
+The Show Lock badge uses a fresh response from an explicitly connected
+controller that supports the telemetry message. Live telemetry requires
+successful readings from all four lanes within 30 seconds. A disconnected
+workspace or an older relay cannot supply those readings.

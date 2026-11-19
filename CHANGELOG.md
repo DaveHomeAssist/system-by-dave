@@ -1,5 +1,13 @@
 # Changelog
 
+## Projctl: Barco Stop lens on every axis, 2026-11-19
+
+- Stop lens on the Barco (Pulse) used to queue behind status reads and stop at the first axis that failed, leaving the rest moving. It now sends stop to all four axes at once, each on its own connection, and reports any axis that did not acknowledge. Re-landed from draft PR 460 onto main's driver. Simulator-tested only; not installed or tried on the UDM.
+
+## Frozen booth workspace, November 19, 2026
+
+Workspace search opens show pages and R5 references. Notes retains the last shared task snapshot and queues offline checkoffs. Readiness reports identify operator confirmations and the connected relay can supply timestamped booth status.
+
 ## Projctl Panasonic control-port fallback, 2026-11-18
 
 - When another controller holds a Panasonic projector's PJLink link, the relay now reads power and shutter on the projector's control port and sends power and shutter there, instead of showing the projector as unreachable. PJLink stays the link whenever it answers, and is retried every five minutes. Input, the alarm summary and light hours read "not reported" while the control port is in use.
