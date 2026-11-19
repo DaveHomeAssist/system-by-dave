@@ -160,7 +160,7 @@ export function setupCheck({ lanes, relay, displays, feed, hostChecks, lock, rel
     else if (v.pattern == null) add(group, id('pattern'), 'Test pattern off', 'cannot', 'Not reported');
     else add(group, id('pattern'), 'Test pattern off', v.patternFlag ? 'fail' : 'pass', v.patternFlag ? v.patternText : 'Off');
 
-    add(group, id('link'), 'Link', 'reading', v.link ? `${v.link.label}${v.link.unproven ? ' (commands unproven on a rig)' : ''}` : 'Not reported');
+    add(group, id('link'), 'Link', 'reading', v.link ? `${v.link.label}${v.link.caution ? ' (shutter proven on the rig; power not yet tested there)' : ''}` : 'Not reported');
   }
 
   const d = readDisplays(displays, lanes, now);

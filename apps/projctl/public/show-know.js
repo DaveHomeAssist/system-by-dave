@@ -1,7 +1,6 @@
 // Know tab: diagrams and documents the relay serves from a private folder on the relay computer.
 // Diagrams open in a zoomable viewer. Documents are shown as plain text: nothing in a file is run
 // or inserted as markup. A PDF opens in the browser's own viewer in a new tab.
-const AUDIENCE = 'show-backup,designer';
 const MAX_TEXT_BYTES = 512 * 1024;
 const ZOOM_STEPS = [1, 1.5, 2, 3, 4, 6, 8];
 const TYPES = { svg: 'Diagram', png: 'Diagram', pdf: 'PDF', md: 'Document', txt: 'Text', json: 'Data' };
@@ -31,7 +30,7 @@ export function textBlocks(text, type) {
   return blocks;
 }
 
-export function createKnow({ panel, list, status, title, tools, stage, back, onSignedOut = () => {} }) {
+export function createKnow({ panel, list, status, title, tools, stage, back, audience = 'show-backup,designer', onSignedOut = () => {} }) {
   let items = [], current = null, zoom = { mode: 'fit', scale: 1 }, loadedAt = 0, token = 0;
 
   async function get(url, as) {
@@ -159,7 +158,7 @@ export function createKnow({ panel, list, status, title, tools, stage, back, onS
   async function load({ force = false } = {}) {
     if (!force && Date.now() - loadedAt < 30000) return;
     loadedAt = Date.now();
-    try { draw(await get(`api/know?audience=${AUDIENCE}`, 'json')); }
+    try { draw(await get(`api/know?audience=${audience}`, 'json')); }
     catch (error) { if (error.message !== 'signed out') draw({ state: error.status === 404 ? 'not-configured' : 'unreadable', items: [] }); loadedAt = 0; }
   }
   addEventListener('resize', () => { if (stage.dataset.mode === 'diagram') applyZoom(); });

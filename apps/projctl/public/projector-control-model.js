@@ -40,15 +40,18 @@ export function alarmSummary(errors) {
   return { level: items[0].level, text: text.charAt(0).toUpperCase() + text.slice(1) };
 }
 
-// Which link the relay is using for this projector. Commands over the control port have been
-// tested against stand-in servers only, so that link is tagged until it is proven on a rig.
-export const UNPROVEN_LINKS = Object.freeze(['control-port']);
+// Which link the relay is using for this projector. As reported from the rig on November 18, the
+// shutter over the control port works there and power over it has not been sent. The tag stays
+// until a watched power test passes; this build did not verify either statement itself.
+export const LINK_CAUTIONS = Object.freeze({
+  'control-port': Object.freeze({ caution: 'power untested', text: 'Shutter over this link is proven on the rig. Power over it has not been tested on the rig yet.' }),
+});
 export function linkOf(projector) {
   const reported = projector?.status?.controlLink, driver = projector?.driver;
   const id = reported === 'control-port' || reported === 'pjlink' ? reported
     : driver === 'panasonic' || driver === 'pjlink' ? 'pjlink' : driver === 'pulse' ? 'pulse' : driver === 'simulator' ? 'simulator' : null;
   const label = { 'control-port': 'Control port', pjlink: 'PJLink', pulse: 'Barco API', simulator: 'Simulator' }[id] || 'Not reported';
-  return { id, label, unproven: UNPROVEN_LINKS.includes(id) };
+  return { id, label, caution: LINK_CAUTIONS[id]?.caution ?? null, cautionText: LINK_CAUTIONS[id]?.text ?? null };
 }
 
 const patternIsOff = value => ['00', 'off', '0'].includes(String(value).toLowerCase());

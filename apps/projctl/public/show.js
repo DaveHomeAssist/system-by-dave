@@ -1,6 +1,7 @@
-// Show backup page. Reads the relay's snapshot and sends two kinds of command through the shared
-// projector control component: power and shutter, each after a two-step confirm. Input, pattern,
-// lens, schedules and Show Lock are not reachable from this file. Nothing here sends MIDI.
+// Role pages: show.html (show backup and designer) and power.html (power operator). Both read the
+// relay's snapshot and carry the same shared projector control: power and shutter, each after a
+// two-step confirm, and the relay's one all-four power run. Input, pattern, lens, schedules and
+// Show Lock are not reachable from this file. Nothing here sends MIDI.
 import { createConnectionMonitor } from './projector-connection.js';
 import { createProjectorControl } from './projector-control.js';
 import { createKnow } from './show-know.js';
@@ -12,7 +13,10 @@ const DISPLAY_POLL_MS = 30000; // the relay caches its display report for 30 s
 const FEED_POLL_MS = 5000;     // the cue feed, while nothing is being tested
 const FEED_TEST_MS = 1000;     // the cue feed, while a MIDI test is waiting
 const FEED_ABSENT_MS = 60000;  // a relay without the route is asked again once a minute
-const TABS = ['control', 'setup', 'midi', 'know'];
+// Each page lists its own tabs in its markup. The power page has no setup check and no MIDI test.
+const ROLE = document.documentElement.dataset.role === 'power' ? 'power' : 'show';
+const TABS = ['control', 'setup', 'midi', 'know'].filter(id => document.getElementById(`t-${id}`));
+const has = { setup: TABS.includes('setup'), midi: TABS.includes('midi') };
 
 const $ = (selector, root = document) => root.querySelector(selector);
 function el(tag, attrs = {}, text) {
@@ -36,6 +40,7 @@ let clockOffset = 0, clockPrecise = false;
 let displays = { status: 'loading' }, feed = { status: 'loading' }, hostChecks = { status: 'loading' };
 let lanes = [], checks = [], verdict = null, openCheck = null, detailKey = '';
 let setupResult = null, setupRunning = false, midiTest = null, feedTimer = 0, feedBusy = false, tab = 'control';
+let powerRun; // the relay's all-four run: undefined until read, null when this relay has none
 const relayNow = () => Date.now() + clockOffset;
 const lockState = () => !relay.connected || !snapshot ? null : !!snapshot.lock;
 
@@ -45,12 +50,14 @@ function signIn() {
   leaving = true;
   location.href = `login.html?next=${encodeURIComponent(location.pathname + location.hash)}`;
 }
-// The one write this page makes. The control component decides what goes in it: power or shutter, one lane.
-async function postCommand(body) {
-  const response = await fetch('api/command', { method: 'POST', headers: { 'content-type': 'application/json' }, cache: 'no-store', signal: AbortSignal.timeout(20000), body: JSON.stringify(body) });
+// Every write this page makes goes through here: a power or shutter command for one lane, and the
+// plan, start and stop of the relay's all-four run. A 401 means the session ended: back to the sign-in.
+async function postJson(route, body) {
+  const response = await fetch(route, { method: 'POST', headers: { 'content-type': 'application/json' }, cache: 'no-store', signal: AbortSignal.timeout(20000), body: JSON.stringify(body) });
   if (response.status === 401) signIn();
   return { status: response.status, body: await response.json().catch(() => ({})) };
 }
+const runHooks = { plan: direction => postJson('api/power-run/plan', { direction }), start: (direction, confirm) => postJson('api/power-run/start', { direction, confirm }), stop: () => postJson('api/power-run/stop', {}) };
 // A read that never throws: { status: 'ok', data } or 'absent' (an older relay) or 'error'.
 async function readJson(route, timeout = 12000) {
   try {
@@ -63,9 +70,12 @@ async function readJson(route, timeout = 12000) {
   } catch { return { status: 'error' }; }
 }
 
-const control = createProjectorControl({ root: $('#pc-root'), pick: $('#pc-pick'), post: postCommand, announce: say, relayNow,
+// The power page carries power only and opens on the all-lanes card, where the one on and off button is.
+const control = createProjectorControl({ root: $('#pc-root'), pick: $('#pc-pick'), runRoot: $('#pc-run'), post: body => postJson('api/command', body), run: runHooks, announce: say, relayNow,
+  rows: ROLE === 'power' ? ['power'] : ['power', 'shutter'], selected: ROLE === 'power' ? 'ALL' : 'A',
   sharedNote: 'Shared sign-in: the relay logs the command, not who sent it.' });
-const know = createKnow({ panel: $('#know'), list: $('#sb-know-list'), status: $('#sb-know-status'), title: $('#sb-know-title'), tools: $('#sb-know-tools'), stage: $('#sb-know-stage'), back: $('#sb-know-back'), onSignedOut: signIn });
+const know = createKnow({ panel: $('#know'), list: $('#sb-know-list'), status: $('#sb-know-status'), title: $('#sb-know-title'), tools: $('#sb-know-tools'), stage: $('#sb-know-stage'), back: $('#sb-know-back'),
+  audience: ROLE === 'power' ? 'power' : 'show-backup,designer', onSignedOut: signIn });
 
 // ---- Go or no-go strip: built once, then only text and attributes change, so focus survives.
 const checkNodes = new Map();
@@ -114,9 +124,9 @@ function render() {
   }
   if (openCheck) fillDetail();
 
-  control.render({ views: lanes, lock, local });
-  renderSetup(relayView, lock);
-  renderMidi(relayView, lock, now);
+  control.render({ views: lanes, lock, local, run: powerRun });
+  if (has.setup) renderSetup(relayView, lock);
+  if (has.midi) renderMidi(relayView, lock, now);
 }
 
 // ---- Setup check: one press, a list of pass, fail or cannot check. It reads; it sends nothing to a projector.
@@ -164,10 +174,10 @@ async function runSetup() {
   render();
   say(`Setup check done. ${setupResult.summary}.`);
 }
-$('#sb-setup-run').addEventListener('click', runSetup);
+$('#sb-setup-run')?.addEventListener('click', runSetup);
 
 // ---- MIDI test and the cue feed. The page only reads what the listener saw.
-const stepNodes = [0, 1].map(() => {
+const stepNodes = !has.midi ? [] : [0, 1].map(() => {
   const item = el('li', { class: 'sb-step', 'data-state': 'idle' }), sign = el('span', { class: 'sb-step__mark', 'aria-hidden': 'true' }), label = el('span', { class: 'sb-step__label' }), word = el('span', { class: 'sb-step__word' });
   const long = el('span', { class: 'sb-step__long' }), short = el('span', { class: 'sb-step__short', 'aria-hidden': 'true' });
   label.append(long, short);
@@ -216,7 +226,7 @@ function renderMidi(relayView, lock, now) {
   reveal($('#sb-recent-empty'), !seen.recent.length);
   put($('#sb-recent-empty'), seen.kind === 'listening' || seen.kind === 'stopped' ? 'No Show Control message heard yet.' : 'There is no cue feed to list.');
 }
-$('#sb-midi-start').addEventListener('click', async () => {
+$('#sb-midi-start')?.addEventListener('click', async () => {
   render();
   const blocked = midiTestBlocked({ relay, lock: lockState(), feed, now: relayNow() });
   if (blocked) { put($('#sb-midi-text'), blocked); say(blocked); return; }
@@ -230,7 +240,7 @@ $('#sb-midi-start').addEventListener('click', async () => {
   $('#sb-midi-stop').focus();
   say('MIDI test started. Fire cue 999 on the console now. This page sends nothing.');
 });
-$('#sb-midi-stop').addEventListener('click', () => {
+$('#sb-midi-stop')?.addEventListener('click', () => {
   if (!midiTestRunning(midiTest)) return;
   midiTest = { ...midiTest, phase: 'cancelled', endedAt: relayNow() };
   render();
@@ -262,7 +272,9 @@ function syncClock(value, precise) {
 }
 function receive(message) {
   if (!message || typeof message !== 'object') return;
-  if (message.type === 'snapshot' && Array.isArray(message.projectors)) {
+  // The run is one state in the relay. Whichever page started it, every page is told as it moves.
+  if (message.type === 'powerRun') powerRun = { active: !!message.active, run: message.run ?? null };
+  else if (message.type === 'snapshot' && Array.isArray(message.projectors)) {
     snapshot = message; relay.everConnected = true; relay.startedAt = message.relay?.startedAt ?? null;
   } else if (!snapshot) return;
   else if (message.type === 'heartbeat') syncClock(message.at, true);
@@ -281,7 +293,7 @@ function connect() {
   let ws;
   try { ws = new WebSocket(url); } catch { again(); return; }
   socket = ws;
-  ws.addEventListener('open', () => { if (mine === generation) { socketOpen = true; heard = false; openedAt = Date.now(); retry = 0; readCrewLinks(); scheduleFeed(0); } });
+  ws.addEventListener('open', () => { if (mine === generation) { socketOpen = true; heard = false; openedAt = Date.now(); retry = 0; readCrewLinks(); readRun(); scheduleFeed(0); } });
   ws.addEventListener('message', event => {
     if (mine !== generation) return;
     try { receive(JSON.parse(event.data)); } catch { /* an unreadable frame is not a reading */ }
@@ -300,6 +312,13 @@ function dropSilentSocket() {
   socketOpen = false; heard = false;
   try { socket?.close(); } catch { /* already closed */ }
   connect();
+}
+// The run as the relay holds it now. An older relay has no such route, and the control says so.
+async function readRun() {
+  const answer = await readJson('api/power-run', 8000);
+  if (answer.status === 'ok') powerRun = { active: !!answer.data?.active, run: answer.data?.run ?? null };
+  else if (answer.status === 'absent') powerRun = null;
+  render();
 }
 async function readDisplayReport() {
   const answer = await readJson('api/host-displays');
@@ -346,7 +365,7 @@ $('#sb-check-list').addEventListener('click', event => {
 });
 $('#sb-detail').addEventListener('close', () => { openCheck = null; });
 $('#sb-shared').addEventListener('click', () => $('#sb-shared-note').showModal());
-$('#sb-midi-more').addEventListener('click', () => $('#sb-midi-detail').showModal());
+$('#sb-midi-more')?.addEventListener('click', () => $('#sb-midi-detail').showModal());
 // A tiny screen shows the test or what was heard, one at a time.
 for (const button of document.querySelectorAll('[data-midi-view]')) button.addEventListener('click', () => {
   mark($('#midi'), 'data-midi', button.dataset.midiView);
