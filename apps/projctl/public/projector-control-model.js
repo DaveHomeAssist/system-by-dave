@@ -187,4 +187,48 @@ export function groupSummary(views) {
   return { total: views.length, reading: live.length, lit: live.filter(view => view.lit).length, closed: live.filter(view => view.lit && view.shutter === 'closed').length };
 }
 
+// Which all-four run to suggest now, or null. A suggestion only highlights a button and says why; it
+// never presses one, arms one or starts a timer. B and C, the two laser units, are read all day, so both
+// must have current replies and agree:
+//   B and C read OFF -> "Turn all on", but not within 6 hours of an off run ending (that is the night).
+//   B and C read ON and Show Lock is off -> "Turn all off", but not within an hour of an on run ending
+//   (that is the morning check). Show Lock is on through the shows, so the off run is not suggested then.
+// No clock is read: the rig's own state and the last run decide it. `run` is the shared run state.
+export const SUGGEST_QUIET_MS = Object.freeze({ afterOff: 6 * 3600000, afterOn: 3600000 });
+export function suggestRun(views, { lock = null, run = undefined, now = Date.now() } = {}) {
+  if (!run || run.active) return null; // not read yet, no run on this relay, or one in progress
+  const b = views.find(view => view.lane === 'B'), c = views.find(view => view.lane === 'C');
+  if (b?.reach !== 'live' || c?.reach !== 'live' || b.power !== c.power) return null;
+  const last = run.run, ended = Date.parse(last?.endedAt || ''), since = Number.isFinite(ended) ? now - ended : Infinity;
+  if (b.power === 'off') {
+    if (last?.direction === 'off' && since < SUGGEST_QUIET_MS.afterOff) return null;
+    return { direction: 'on', text: 'B and C read OFF. Morning: Turn all on?' };
+  }
+  if (b.power === 'on') {
+    if (lock !== false || (last?.direction === 'on' && since < SUGGEST_QUIET_MS.afterOn)) return null;
+    return { direction: 'off', text: 'B and C read ON and Show Lock is off. Night: Turn all off?' };
+  }
+  return null;
+}
+
+// A plain summary of a finished run, to send to whoever needs it ("units off at 10:04 PM ...").
+// It is a starting point: the operator adds anything odd wherever they report it.
+export function runSummary(run, views = []) {
+  if (!run || run.state === 'running') return '';
+  const when = clockShort(run.endedAt) || 'an unknown time';
+  const head = run.state === 'done' ? `Units ${run.direction === 'on' ? 'on' : 'off'} at ${when}.`
+    : run.state === 'attention' ? `${run.direction === 'on' ? 'Not all four on' : 'Not safe to leave yet'} at ${when}.`
+    : `Run ${run.state === 'interrupted' ? 'interrupted' : 'stopped'} at ${when}.`;
+  const parts = [head, String(run.message || '').trim()];
+  const c = views.find(view => view.lane === 'C');
+  if (run.direction === 'off' && c?.reach === 'live' && c.power === 'off' && c.raw && !/deep standby/i.test(run.message || '')) {
+    parts.push(c.deepStandby ? `C reads ${c.raw.toUpperCase()}: ${lower(DEEP_STANDBY_TEXT)}` : `C reads ${c.raw.toUpperCase()}.`);
+  }
+  if (run.direction === 'on') for (const step of run.steps || []) {
+    const lamp = /Lamp hours [^.]*\./.exec(String(step.note || ''));
+    if (lamp) parts.push(`${step.lane}: ${lower(lamp[0])}`);
+  }
+  return parts.filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+}
+
 export { LANES, feedbackAge };

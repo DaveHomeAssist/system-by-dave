@@ -219,6 +219,9 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.equal(await other.locator('.sb-strip').isVisible(), false, 'the power page has no go or no-go strip to read');
     assert.deepEqual(await card('ALL').locator('.pc-actions [data-act]').allInnerTexts(), ['Turn all on', 'Turn all off', 'Open', 'Close']);
     assert.equal(await page.locator('#pc-run').isVisible(), false);
+    // B and C read ON and Show Lock is off: the off run is suggested. A suggestion only highlights and explains.
+    assert.deepEqual(await card('ALL').locator('[data-suggest]').evaluateAll(buttons => buttons.map(button => button.dataset.act)), ['power-off']);
+    assert.match(await card('ALL').locator('[data-act="power-off"]').getAttribute('aria-label'), /, suggested: B and C read ON and Show Lock is off\. Night: Turn all off\?$/);
     posts.length = 0;
     await act('ALL', 'power-on').click();
     await settled('ALL', 'relay-armed');
@@ -244,6 +247,11 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.match(await page.locator('#pc-run .pc-run__text').innerText(), /^Every lane reports ON\. Finished \d+:\d\d [AP]M\.$/);
     assert.deepEqual(await page.locator('#pc-run .pc-run__step').allInnerTexts(), ['C ✓', 'B ✓', 'A ✓', 'D ✓']);
     assert.equal(await page.locator('#pc-run .pc-run__stop').isVisible(), false);
+    // The finished run's summary, to pass on, and no off suggestion straight after the morning on run.
+    assert.match(await page.locator('#pc-run .pc-run__summary').innerText(), /^Units on at \d+:\d\d [AP]M\. Every lane reports ON\.$/);
+    await page.locator('#pc-run .pc-run__copy').click();
+    assert.match(await page.locator('#pc-run .pc-run__copy').textContent(), /^(Copied|Selected)$/);
+    assert.equal(await card('ALL').locator('[data-suggest]').count(), 0);
     await other.locator('#pc-run[data-state="done"]').waitFor();
     assert.equal(await other.locator('#pc-run .pc-run__title').innerText(), 'ALL FOUR ON');
     assert.deepEqual(posts.map(post => post.path), ['/api/power-run/plan', '/api/power-run/start'], 'the page started one run and sent no command of its own');
@@ -275,6 +283,8 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await other.locator('#pc-run[data-state="done"]').waitFor({ timeout: 40000 });
     assert.equal(await other.locator('#pc-run .pc-run__title').innerText(), 'SAFE TO LEAVE THE BUILDING');
     assert.equal(await other.locator('.sb-night__stop').isVisible(), false);
+    assert.match(await other.locator('#pc-run .pc-run__summary').innerText(), /^Units off at \d+:\d\d [AP]M\. Every lane reports OFF\. C reads READY\.$/);
+    assert.equal(await otherCard('ALL').locator('[data-suggest]').count(), 0, 'no morning suggestion the same night');
     await page.locator('#pc-run[data-state="done"][data-direction="off"]').waitFor();
     assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'SAFE TO LEAVE THE BUILDING');
     assert.equal((await relay.state()).projectors.every(p => p.status.power === 'off'), true);

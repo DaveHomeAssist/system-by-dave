@@ -10,6 +10,7 @@ Applies the November 19 order of operations research to the role pages on the ow
 - **Recovery ladder** on `show.html`, least disruptive first: shutter, input, power cycle one projector, relaunch the playback app, restart the show computer, each with when it is allowed.
 - **Holds**: a Know manifest entry of kind `notice` shows a short hold above the list until its `until` time, with a mark on the Know tab. Date-specific holds live in the private folder, not in the page.
 - **Know samples**: the power-up and recovery samples carry the morning check of the show computer, photographing a lamp message, the once-only Panasonic STANDBY MODE check, and two-show days.
+- **Hints** on the shared control: a suggested run, highlighted and explained from B and C, Show Lock and the last run (never pressed), and a copyable summary of the finished run under the banner.
 - Shared files: `server/index.js` (the run gets the poller's refresh), `server/drivers/pulse.js`, `server/drivers/simulator.js`, `server/drivers/index.js`.
 
 ## Projctl role pages: one shared on and off control and one all-four run, 2026-11-18

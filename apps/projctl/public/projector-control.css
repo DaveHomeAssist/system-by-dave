@@ -29,6 +29,13 @@
 .pc-run__step[data-state="part"],.pc-run__step[data-state="busy"]{border-color:var(--pc-eye);color:var(--pc-eye)}
 .pc-run__step[data-state="bad"]{border-color:var(--pc-bad);color:var(--pc-bad)}
 .pc-run__stop{flex:none;min-height:40px;background:var(--pc-surface)}
+/* A finished run's summary and its Copy button, on their own row under the banner's words. */
+.pc-run:not([data-state="running"]){flex-wrap:wrap}
+.pc-run__summary{flex:1 1 60%;order:4;min-width:0;margin:0;padding:3px 8px;border:1px dashed var(--pc-line);border-radius:6px;background:var(--pc-surface);font-size:12px;line-height:1.35;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;user-select:all;-webkit-user-select:all}
+.pc-run__summary[hidden],.pc-run__copy[hidden]{display:none}
+.pc-run__copy{order:5;flex:none;min-height:32px}
+/* A suggested run: highlighted and explained on the card, never pressed. */
+.pc-btn[data-suggest]{box-shadow:0 0 0 3px var(--pc-accent)}
 /* Four lanes in a row under the all-lanes bar. */
 .pc-grid{min-height:0;min-width:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr);gap:10px}
 .pc-card{container:pc-card / size;min-width:0;min-height:0;overflow:hidden;border:1px solid var(--pc-line);border-top:5px solid var(--lane-accent,var(--pc-control));border-radius:12px;background:var(--pc-surface);color:var(--pc-ink)}
@@ -195,13 +202,15 @@
 }
 /* A phone held sideways: the run banner is one row, so the card under it keeps its height. */
 @media (min-width:600px) and (max-height:519px){
-  .pc-run{flex-wrap:nowrap;padding:3px 10px}
+  .pc-run,.pc-run:not([data-state="running"]){flex-wrap:nowrap;padding:3px 10px}
+  .pc-run__summary,.pc-run__copy{display:none}
   .pc-run__title{flex:none;font-size:14px}
   .pc-run__text{flex:1 1 0;order:0;-webkit-line-clamp:1}
   .pc-run__stop{min-height:32px}
 }
 @media (max-width:599px) and (max-height:419px){
-  .pc-run{flex-wrap:nowrap;gap:4px;padding:1px 6px;border-left-width:5px}
+  .pc-run,.pc-run:not([data-state="running"]){flex-wrap:nowrap;gap:4px;padding:1px 6px;border-left-width:5px}
+  .pc-run__summary,.pc-run__copy{display:none}
   .pc-run__title{flex:1 1 auto;min-width:0;overflow:hidden;font-size:10px;letter-spacing:0;white-space:nowrap;text-overflow:ellipsis}
   .pc-run__text{display:none}
   .pc-run__step{padding:0 3px;font-size:10px}

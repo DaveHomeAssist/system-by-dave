@@ -4,6 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createConnectionMonitor } from '../public/projector-connection.js';
+import { suggestRun, runSummary, SUGGEST_QUIET_MS } from '../public/projector-control-model.js';
 import { ACTIONS, ACTION_IDS, DEFAULT_POLICY, CONFIRM_MS, RELAY_CONFIRM_MS, laneViews, actionState, sharedReason, groupState, groupSummary, linkOf, alarmSummary, targetsText, skippedText } from '../public/projector-control-model.js';
 
 const NOW = Date.parse('2026-11-18T19:00:00Z');
@@ -157,4 +158,38 @@ test('the component sends only what the model names, one lane at a time, with th
   assert.doesNotMatch(source, /cmd: '/, 'the component takes its commands from the model');
   assert.match(source, /expectedTargets: \[\{ slot: target\.slot, revision: target\.revision \}\]/);
   assert.doesNotMatch(source + model, /slot: 'all'|fetch\(|XMLHttpRequest|WebSocket|localStorage/, 'no group target and no network of its own');
+});
+
+test('a run is suggested from B and C only, never during Show Lock, never straight after the run it would repeat', () => {
+  const lanes = (b, c, extra = {}) => [{ lane: 'A', reach: 'unreached' }, { lane: 'B', reach: 'live', power: b }, { lane: 'C', reach: 'live', power: c }, { lane: 'D', reach: 'live', power: 'on' }].map(v => ({ ...v, ...(extra[v.lane] || {}) }));
+  const none = { active: false, run: null }, ended = (direction, ms) => ({ active: false, run: { direction, state: 'done', endedAt: new Date(NOW - ms).toISOString() } });
+  assert.deepEqual(suggestRun(lanes('off', 'off'), { lock: false, run: none, now: NOW }), { direction: 'on', text: 'B and C read OFF. Morning: Turn all on?' });
+  assert.deepEqual(suggestRun(lanes('off', 'off'), { lock: true, run: none, now: NOW })?.direction, 'on', 'the morning on run is allowed under Show Lock');
+  assert.deepEqual(suggestRun(lanes('on', 'on'), { lock: false, run: none, now: NOW }), { direction: 'off', text: 'B and C read ON and Show Lock is off. Night: Turn all off?' });
+  assert.equal(suggestRun(lanes('on', 'on'), { lock: true, run: none, now: NOW }), null, 'during a show Show Lock is on: no off suggestion');
+  assert.equal(suggestRun(lanes('on', 'on'), { lock: null, run: none, now: NOW }), null, 'Show Lock not read');
+  assert.equal(suggestRun(lanes('on', 'off'), { lock: false, run: none, now: NOW }), null, 'B and C disagree');
+  assert.equal(suggestRun(lanes('on', 'on', { C: { reach: 'stale' } }), { lock: false, run: none, now: NOW }), null, 'C has no current reply');
+  assert.equal(suggestRun(lanes('cooling', 'cooling'), { lock: false, run: none, now: NOW }), null);
+  assert.equal(suggestRun(lanes('off', 'off'), { lock: false, run: ended('off', SUGGEST_QUIET_MS.afterOff - 1000), now: NOW }), null, 'the same night: no morning suggestion');
+  assert.equal(suggestRun(lanes('off', 'off'), { lock: false, run: ended('off', SUGGEST_QUIET_MS.afterOff + 1000), now: NOW })?.direction, 'on', 'next morning');
+  assert.equal(suggestRun(lanes('on', 'on'), { lock: false, run: ended('on', 20 * 60000), now: NOW }), null, 'the morning check: no off suggestion');
+  assert.equal(suggestRun(lanes('on', 'on'), { lock: false, run: ended('on', SUGGEST_QUIET_MS.afterOn + 1000), now: NOW })?.direction, 'off');
+  assert.equal(suggestRun(lanes('off', 'off'), { lock: false, run: { active: true, run: { direction: 'on', state: 'running' } }, now: NOW }), null, 'a run in progress');
+  assert.equal(suggestRun(lanes('off', 'off'), { lock: false, run: null, now: NOW }), null, 'a relay with no run');
+  assert.equal(suggestRun(lanes('off', 'off'), { lock: false, run: undefined, now: NOW }), null, 'not read yet');
+});
+
+test('a finished run gives a plain summary with the time, the Barco state at night and lamp hours in the morning', () => {
+  const at = '2026-11-19T03:04:00Z', C = (raw, deep = false) => [{ lane: 'C', reach: 'live', power: 'off', raw, deepStandby: deep }];
+  assert.equal(runSummary({ direction: 'off', state: 'done', endedAt: at, message: 'Every lane reports OFF.' }, C('ready')), 'Units off at 10:04 PM. Every lane reports OFF. C reads READY.');
+  assert.equal(runSummary({ direction: 'off', state: 'done', endedAt: at, message: 'Every lane reports OFF.' }, C('eco', true)), 'Units off at 10:04 PM. Every lane reports OFF. C reads ECO: deep standby: the morning power on cannot reach it.');
+  assert.equal(runSummary({ direction: 'off', state: 'done', endedAt: at, message: 'Every lane reports OFF. C is in deep standby: the morning power on from this page cannot reach it. Wake it at the unit.' }, C('eco', true)),
+    'Units off at 10:04 PM. Every lane reports OFF. C is in deep standby: the morning power on from this page cannot reach it. Wake it at the unit.', 'said once');
+  assert.equal(runSummary({ direction: 'on', state: 'done', endedAt: at, message: 'Every lane reports ON.', steps: [{ lane: 'C', note: 'Reported ON' }, { lane: 'A', note: 'Reported ON and stayed on for 3 minutes. Lamp hours 1234; no lamp error.' }, { lane: 'D', note: 'Reported ON and stayed on for 3 minutes. Lamp hours not reported; lamp state not reported.' }] }),
+    'Units on at 10:04 PM. Every lane reports ON. A: lamp hours 1234; no lamp error. D: lamp hours not reported; lamp state not reported.');
+  assert.equal(runSummary({ direction: 'off', state: 'attention', endedAt: at, message: 'Not confirmed OFF: D (reports COOLING). Check by eye.' }, []), 'Not safe to leave yet at 10:04 PM. Not confirmed OFF: D (reports COOLING). Check by eye.');
+  assert.equal(runSummary({ direction: 'on', state: 'interrupted', endedAt: at, message: 'The relay restarted during this run. Nothing more was sent. Check each lane.' }), 'Run interrupted at 10:04 PM. The relay restarted during this run. Nothing more was sent. Check each lane.');
+  assert.equal(runSummary({ direction: 'on', state: 'running' }), '', 'nothing while it runs');
+  assert.equal(runSummary(null), '');
 });

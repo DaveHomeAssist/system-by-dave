@@ -178,6 +178,13 @@ There is no "app closed" step, no tick and no remote step anywhere in the run or
 
 The run's finished banner stays on screen for 15 minutes.
 
+**Hints** (from the power page session's anticipatory plan, the two parts that still fit; built on the owner's word, November 19). A hint only highlights and explains; it never presses, arms or starts anything.
+
+- **A suggested run.** The all-lanes card highlights one run button and says why, from B and C (the two laser units, read all day) when both have current replies and agree. B and C read OFF: "Turn all on", but not within 6 hours of an off run ending. B and C read ON and Show Lock is off: "Turn all off", but not within an hour of an on run ending (the morning check). Show Lock is on through the shows, so the off run is not suggested then. No clock is read. An address that picks the run (`#on`, `#off`) was in the plan and is not built: the address already carries the tab.
+- **A summary of the finished run** under the banner, read only, with a Copy button: for example "Units off at 10:04 PM. Every lane reports OFF. C reads READY." In the morning it adds each lamp unit's hours and lamp state. Copy uses the clipboard where the page may, and otherwise selects the text for the device's own copy (plain HTTP has no clipboard). Hidden on short screens.
+
+The rest of that plan was written for the earlier checklist page: resuming ticks and timers, the cooling timer and the one retry are already done by the relay run and the night timeline, and the tick lapse warning has no ticks to attach to.
+
 **The Barco's raw state.** Its driver now keeps the raw Pulse state (`ready`, `standby`, `eco`,
 `conditioning`, `deconditioning`, `on`) beside the mapped power, as `rawState`. The lane card shows
 deep standby as a caution ("ECO. Deep standby: the morning power on cannot reach it."), and the

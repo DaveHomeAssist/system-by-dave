@@ -12,7 +12,7 @@
 // run is { plan(direction), start(direction, confirm), stop() }, each resolving to { status, body }.
 import { LANES } from './lanes.js';
 import { ACTIONS, ACTION_IDS, ALL, CONFIRM_MS, RELAY_CONFIRM_MS, GUARD_MS, REPORT_MS, DEFAULT_POLICY,
-  actionState, sharedReason, groupState, groupSummary, targetsText, skippedText, clockShort, list, lower } from './projector-control-model.js';
+  actionState, sharedReason, groupState, groupSummary, targetsText, skippedText, clockShort, list, lower, suggestRun, runSummary } from './projector-control-model.js';
 
 const WITHDRAWN_MS = 20000; // a withdrawn confirm clears itself; a refusal stays until the next action
 const DONE_MS = 60000;
@@ -106,10 +106,13 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
   const banner = runRoot && runHooks ? (() => {
     const title = el('strong', { class: 'pc-run__title' }), text = el('span', { class: 'pc-run__text' }), steps = el('ol', { class: 'pc-run__steps', 'aria-label': 'Units in order' });
     const stop = el('button', { type: 'button', class: 'pc-btn pc-run__stop', 'data-run': 'stop' }, RUN_LABELS.stop);
+    // A finished run's summary, to pass on with the time. Read only; Copy only copies it.
+    const summary = el('p', { class: 'pc-run__summary', hidden: '' });
+    const copy = el('button', { type: 'button', class: 'pc-btn pc-btn--quiet pc-run__copy', 'data-run': 'copy', hidden: '' }, 'Copy');
     mark(runRoot, 'role', 'status');
     runRoot.hidden = true;
-    runRoot.append(title, text, steps, stop);
-    return { title, text, steps, stop, chips: new Map() };
+    runRoot.append(title, text, steps, stop, summary, copy);
+    return { title, text, steps, stop, summary, copy, chips: new Map() };
   })() : null;
 
   // ---- Messages
@@ -318,6 +321,20 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     if (button) { selected = button.dataset.pick; render(); }
   });
   banner?.stop.addEventListener('click', stopRun);
+  // Copy the summary: the clipboard where the page may use it, otherwise select it for the device's own copy.
+  banner?.copy.addEventListener('click', async () => {
+    const text = banner.summary.textContent;
+    let copied = false;
+    try { if (window.isSecureContext && navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); copied = true; } } catch { copied = false; }
+    if (!copied) {
+      const range = document.createRange(); range.selectNodeContents(banner.summary);
+      const selection = getSelection(); selection.removeAllRanges(); selection.addRange(range);
+      try { copied = document.execCommand('copy'); } catch { copied = false; }
+    }
+    put(banner.copy, copied ? 'Copied' : 'Selected');
+    announce(copied ? 'Summary copied.' : 'Summary selected. Copy it from the menu.');
+    setTimeout(() => put(banner.copy, 'Copy'), 4000);
+  });
 
   // ---- Render
   function renderOp(key, nodes, local, fallback) {
@@ -376,6 +393,10 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     put(banner.text, text);
     mark(banner.text, 'title', text);
     reveal(banner.stop, kind === 'running');
+    const summary = kind === 'running' ? '' : runSummary(run, views);
+    put(banner.summary, summary);
+    reveal(banner.summary, !!summary);
+    reveal(banner.copy, !!summary);
     for (const step of steps) {
       let chip = banner.chips.get(step.lane);
       if (!chip) { chip = el('li', { class: 'pc-run__step', 'data-lane': step.lane }); banner.chips.set(step.lane, chip); }
@@ -435,8 +456,17 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     put(nodes.fresh, lock === true ? 'Show Lock is on' : lock === false ? 'Show Lock is off' : 'Show Lock not read');
     put(nodes.fact.lit.value, `${summary.lit} of ${summary.total}`);
     put(nodes.fact.closed.value, summary.reading ? String(summary.closed) : 'Not reported');
-    const { busy, op } = renderOp(ALL, nodes, local, runState?.active ? `${RUN_LABELS.running[run.direction]}. Started ${clockShort(run.startedAt)}.` : reasons.size === 1 ? [...reasons][0] : '');
+    // A suggested run is highlighted and explained, never pressed. Only an offered button is suggested.
+    const hint = runHooks ? suggestRun(views, { lock, run: runState, now: relayNow() }) : null;
+    const hinted = hint && ids.find(id => isRun(ALL, id) && (ACTIONS[id].arg ? 'on' : 'off') === hint.direction && states[id].enabled);
+    const reason = reasons.size === 1 ? [...reasons][0] : '';
+    const { busy, op } = renderOp(ALL, nodes, local, runState?.active ? `${RUN_LABELS.running[run.direction]}. Started ${clockShort(run.startedAt)}.` : reason || (hinted ? hint.text : ''));
     renderButtons(ALL, nodes, id => states[id], busy, op);
+    for (const id of ids.filter(item => isRun(ALL, item))) {
+      const button = nodes.buttons[id], on = id === hinted && !busy;
+      mark(button, 'data-suggest', on ? '' : null);
+      if (on) mark(button, 'aria-label', `${button.getAttribute('aria-label')}, suggested: ${hint.text}`);
+    }
     // Picker: one card at a time on a small screen. It carries each lane's state as a word.
     for (const key of KEYS) {
       const item = cards.get(key), view = viewOf(key);
