@@ -1,18 +1,34 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "80fa000e6755a405df7ce4fa78413ebdad14433b",
-  "deploymentId": "appgdep_6afe05747fe081919428b21d44e71752",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_b8e3299d86e08191805f27bae73708aa",
+  "managedSourceCommit": "ce13d80de2943dfc6ee127eee5373eeefe96796e",
+  "deploymentId": "appgdep_6afe83e3d3e08191825fc8deb12f981d",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_ff9dcf8a4840819185f77b72809bab18",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 48,
-  "acceptedSourceCommit": "eb3a8eab7b911e9fec6a9a6ee3fa589d247f87a4",
-  "publicVerifiedAt": "2026-11-18T20:11:12Z",
+  "versionNumber": 50,
+  "acceptedSourceCommit": "0aedee2f3290c3534c6c0cd9c00543b132e74eda",
+  "publicVerifiedAt": "2026-11-19T05:14:59Z",
   "priorPublications": [
+    {
+      "versionNumber": 49,
+      "managedSourceCommit": "8c2fc84ed1a41de71b933ac5828bfc8026c8c4ae",
+      "deploymentId": "appgdep_6afe81bd0288819191ae02a6154d1b2c",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_01c554cadde48191bd58679058a879ef",
+      "note": "November 18 media phase. The prior five-session catalog remained active while 1389 checksum-allowlisted objects were uploaded. The temporary uploader secret was removed before version 50."
+    },
+    {
+      "versionNumber": 48,
+      "managedSourceCommit": "80fa000e6755a405df7ce4fa78413ebdad14433b",
+      "deploymentId": "appgdep_6afe05747fe081919428b21d44e71752",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_b8e3299d86e08191805f27bae73708aa",
+      "acceptedSourceCommit": "eb3a8eab7b911e9fec6a9a6ee3fa589d247f87a4",
+      "publicVerifiedAt": "2026-11-18T20:11:12Z",
+      "note": "Five-session November 17 release with the approved timing correction, retained unchanged as the November 18 append baseline."
+    },
     {
       "versionNumber": 47,
       "managedSourceCommit": "9acb4e77a03e308a4b076f7d46d6e4b6cf71a19b",
@@ -309,7 +325,91 @@
       "Dominic's generic Node container lacked Git and Python for two checks; the checks passed with the documented baseline or locally, and all browser checks ran on Dominic."
     ]
   },
-  "sourceReconciliation": "The five-session Frozen Rehearsal Review remains live at /run-review/. The November 17 published clock and derived photo offsets now carry the approved correction note. All 3156 photo routes and both November 15 manifests are unchanged; cue and capture times, event IDs, slot selection, missing slots, counts, existing Home and Planning navigation, task API, handoff, documents and public audience are preserved. No upload secret or media ingestion was used. Video remains deferred.",
+  "november18Release": {
+    "releaseId": "nov18-74c142c636ee",
+    "publishedAt": "2026-11-19T05:06:55.256711+00:00",
+    "frozenSourceCommits": [
+      "ee20d95fc464365c6907bbbef935eea32ce59a87",
+      "0aedee2f3290c3534c6c0cd9c00543b132e74eda"
+    ],
+    "managedSourceCommits": [
+      "8c2fc84ed1a41de71b933ac5828bfc8026c8c4ae",
+      "32eaf720e52ec8b1b59104b4f0d4d4a639e1e61d",
+      "ce13d80de2943dfc6ee127eee5373eeefe96796e"
+    ],
+    "sourcePullRequests": [
+      "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/7",
+      "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/8"
+    ],
+    "sessions": [
+      {
+        "sessionId": "20261118-185801-act-1",
+        "label": "Show Act 1 · Nov 18",
+        "events": 252,
+        "withPhotos": 229,
+        "livePhotos": 606,
+        "rescuedPhotos": 153,
+        "publishedPhotos": 759,
+        "missingPhotoSlots": 249
+      },
+      {
+        "sessionId": "20261118-185801-act-2",
+        "label": "Show Act 2 · Nov 18",
+        "events": 181,
+        "withPhotos": 178,
+        "livePhotos": 507,
+        "rescuedPhotos": 123,
+        "publishedPhotos": 630,
+        "missingPhotoSlots": 94
+      }
+    ],
+    "photoReadback": {
+      "expected": 4545,
+      "verified": 4545,
+      "uploaded": 1389,
+      "readOnly": 3156,
+      "failures": 0
+    },
+    "publicHashReadback": {
+      "expected": 4553,
+      "verified": 4553,
+      "manifestRoutes": 7,
+      "mediaRoutes": 4545,
+      "failures": 0
+    },
+    "existingFiveSessionPreservation": {
+      "manifestsByteEquivalent": 5,
+      "manifestsChanged": 0,
+      "photoRoutesReadOnly": 3156,
+      "photoHashConflicts": 0
+    },
+    "browserAcceptance": {
+      "host": "Dominic",
+      "statesPassed": 168,
+      "widths": [1440, 1280, 680, 375, 2240, 3840],
+      "themes": ["light", "dark"],
+      "layouts": ["grid", "across"],
+      "behaviors": [
+        "all seven sessions",
+        "original image dimensions",
+        "rescued badge and exact desktop delay",
+        "preview navigation and Escape",
+        "note isolation and reload",
+        "exact session and firing links",
+        "repeated cue jump",
+        "invalid context retains capture"
+      ]
+    },
+    "environmentRevision": 8,
+    "temporaryUploaderSecretRemoved": true,
+    "audience": "public",
+    "limitations": [
+      "FRC_AFTERNOON_ZIP was unavailable, so the real-afternoon archive fixture remained skipped.",
+      "The first version 49 archive save was rejected before version creation because the archive root omitted the required dist directory. The corrected archive was saved and deployed.",
+      "The external Viewer Spec was not edited because this release explicitly prohibited Notion writes."
+    ]
+  },
+  "sourceReconciliation": "The seven-session Frozen Rehearsal Review is live at /run-review/. November 18 Show Act 1 and Show Act 2 append 1389 checksum-allowlisted photo routes, including 276 visibly identified rescued photos. The five prior manifests are byte-equivalent to version 48 and all 3156 prior photo routes passed read-only SHA verification. Existing Home and Planning navigation, task service, documents, public audience, session identities and browser note keys remain preserved. The temporary upload secret was removed before the active release. Video remains deferred.",
   "verification": {
     "host": "Dominic",
     "macCheck": "Live reload verified Single and All photos use the clean cue 15 frame, with Replacement label, 19:08:27 EST time and +38.30 second offset. Existing note remains present.",
