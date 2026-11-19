@@ -357,7 +357,7 @@ ones is answered.
 | ID | Question | A (recommended, built) | B | C |
 | --- | --- | --- | --- | --- |
 | SBP-9 | One page or two? | One shared page for the show backup operator and the designer | A page each, sharing the components | One page with a role switch that hides tabs |
-| SBP-10 | Sign-in | The existing shared passcode, with the on-page note that actions are not attributed | Wait for role passcodes (ACCESS-1) before installing | |
+| SBP-10 | Sign-in | The existing shared passcode, with the on-page note that actions are not attributed. The owner's latest word on sign-in, as relayed on November 18, was to keep the passcode | Wait for role passcodes (ACCESS-1) before installing | |
 | SBP-11 | What Show Lock locks here | Power, every all-lanes action, the MIDI test and the setup check. Per-lane shutters stay available | Also allow "close all shutters" under Show Lock, as the fastest safe move | Also allow the setup check, since it sends nothing |
 | SBP-12 | Setup check contents and expected states | The list above: power ON, shutter OPEN, preferred input, pattern off, the displays rule | Expected states saved per show in the private rig settings | Readings only, no pass or fail |
 | SBP-13 | Test cue numbers and waits | Cue 999 inside 30 seconds, clear cue 999.5 inside 60 | Numbers and waits read from the private settings | |

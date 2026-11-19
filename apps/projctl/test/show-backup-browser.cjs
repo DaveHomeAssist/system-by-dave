@@ -62,12 +62,13 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
     const page = await context.newPage();
     const posts = [], foreign = [], errors = [];
+    let refusalsExpected = false; // the test asks for files it must not get; the browser logs each 404
     page.on('request', request => {
       if (new URL(request.url()).origin !== relay.base && !request.url().startsWith('data:')) foreign.push(request.url());
       if (request.method() === 'POST') posts.push({ path: new URL(request.url()).pathname, body: request.postDataJSON() });
     });
     page.on('pageerror', error => errors.push(error.message));
-    page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+    page.on('console', message => { if (message.type() === 'error' && !refusalsExpected) errors.push(message.text()); });
     await page.goto(`${relay.base}/show.html`);
     const card = id => page.locator(`.pc-card[data-lane="${id}"]`);
     const act = (id, name) => card(id).locator(`[data-act="${name}"]`);
@@ -348,7 +349,10 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.match(await page.locator('.sb-know__text pre').innerText(), /"surface": "SR Portal"/);
     assert.equal(await page.locator('.sb-know__text script, .sb-know__text a, .sb-know__text img').count(), 0, 'a document is text, never markup');
     // Only files the manifest names are served.
+    refusalsExpected = true;
     assert.deepEqual(await page.evaluate(async () => Promise.all(['manifest.json', '../know/manifest.json', '..%2F..%2Fpackage.json', 'power-up.md'].map(async name => (await fetch(`api/know/file?f=${name}`)).status))), [404, 404, 404, 200]);
+    await page.waitForTimeout(100);
+    refusalsExpected = false;
     const link = page.locator('#sb-notes-link');
     assert.deepEqual([await link.isVisible(), await link.getAttribute('href'), await link.getAttribute('target'), await link.getAttribute('rel')], [true, NOTES, '_blank', 'noopener noreferrer']);
     assert.equal(await page.locator('#sb-notes-hint').innerText(), 'For notes that can wait. Not for emergencies or cue calls.');

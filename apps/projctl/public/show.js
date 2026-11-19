@@ -352,6 +352,7 @@ for (const button of document.querySelectorAll('[data-midi-view]')) button.addEv
   mark($('#midi'), 'data-midi', button.dataset.midiView);
   $(button.dataset.midiView === 'feed' ? '#sb-midi-back' : '#sb-midi-heard').focus();
 });
+for (const button of document.querySelectorAll('dialog [data-close]')) button.addEventListener('click', () => button.closest('dialog').close());
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !document.querySelector('dialog[open]')) control.cancelArmed(); });
 
 // ---- Tabs. The open tab is kept in the address, so a reload or a sign-in returns to it.
