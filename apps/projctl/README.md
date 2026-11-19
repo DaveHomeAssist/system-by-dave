@@ -181,7 +181,7 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
 - pjlink: complete for power, shutter, input, status, light hours (where the projector answers LAMP).
 - simulator: complete.
 - pulse (Barco): core state, power, shutter, internal patterns, discovered inputs, bounded lens targets and supported picture ranges use the Pulse API. Optional alarm telemetry remains unknown, rather than implying a clear alarm panel.
-- panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls.
+- panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls. When another controller holds a projector's PJLink link, power and shutter fall back to the control port ([brief](docs/panasonic-control-port.md)).
 
 PJLink keeps one status connection open per projector between polls. Each poll
 reads power first. Off, cooling and warming states return immediately with

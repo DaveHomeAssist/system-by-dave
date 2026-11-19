@@ -7,6 +7,11 @@
 - An optional crew notes link, for notes that can wait, appears only when the relay's private settings name an address. The relay gains one read-only route for it, `GET /api/crew-links` (`server/crew-links.js`), behind the existing login; the page never requests the address itself.
 - No console or sign-in change. `npm run test:browser` gains `test/show-backup-browser.cjs`, and `test/show-backup.test.js` joins `npm test`. Tested in the simulator only. The page files were copied to the show computer on November 18 with no relay restart; it is not yet accepted on the rig. Brief, limits and open decisions SBP-1 to SBP-8: `apps/projctl/docs/show-backup-page.md`.
 
+## Projctl Panasonic control-port fallback, 2026-11-18
+
+- When another controller holds a Panasonic projector's PJLink link, the relay now reads power and shutter on the projector's control port and sends power and shutter there, instead of showing the projector as unreachable. PJLink stays the link whenever it answers, and is retried every five minutes. Input, the alarm summary and light hours read "not reported" while the control port is in use.
+- Built against stand-in servers (`test/panasonic-control-port.test.js`). The driver file was installed on the show computer on November 18 with one relay restart, after which both affected projectors came online in the relay's log; no power or shutter command has been sent to a real projector on this path and the rig acceptance steps are not yet run. Brief, rig acceptance steps and decisions PCP-1 and PCP-2: `apps/projctl/docs/panasonic-control-port.md`.
+
 ## Projctl health reports: no current reading, 2026-11-18
 
 - A projector not reached at report time no longer shows its last power state as current. The unit table says "No current reading (last known on)", and saved reports render the same way. On Nov 17, lanes A and D kept showing "on" for about 10 hours with no contact.
