@@ -466,6 +466,31 @@
       "The external Viewer Spec was not edited because this release explicitly prohibited Notion writes."
     ]
   },
+  "november19Release": {
+    "releaseId": "nov19-e41acdbf7d65",
+    "frozenSourceCommit": "2008fc943ec79cde8f4aead5e58d268f97aa8b0f",
+    "managedSourceCommits": [
+      "e755e56231e0167ad7d763ffce3920556ab1e07a"
+    ],
+    "mediaVersion": 55,
+    "sessions": [
+      {
+        "sessionId": "20261119-144854",
+        "label": "Rehearsal · Nov 19",
+        "events": 228,
+        "withPhotos": 208,
+        "publishedPhotos": 728,
+        "missingPhotoSlots": 184
+      }
+    ],
+    "existingSevenSessionPreservation": {
+      "manifestsByteEquivalent": 7,
+      "manifestsChanged": 0,
+      "photoRoutesExpectedReadOnly": 4545
+    },
+    "audience": "public",
+    "state": "media version saved; production deployment and public acceptance pending"
+  },
   "sourceReconciliation": "The seven-session Frozen Rehearsal Review is live at /run-review/. November 18 Show Act 1 and Show Act 2 append 1389 checksum-allowlisted photo routes, including 276 visibly identified rescued photos. The five prior manifests are byte-equivalent to version 48 and all 3156 prior photo routes passed read-only SHA verification. Existing Home and Planning navigation, task service, documents, public audience, session identities and browser note keys remain preserved. The temporary upload secret was removed before the active release. Video remains deferred.",
   "verification": {
     "host": "Dominic",
