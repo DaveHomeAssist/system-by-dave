@@ -1,5 +1,19 @@
 # Power operator page brief
 
+> **The page described below has been replaced on this branch.** `power.html` keeps its address
+> and is now the same shell as the show backup page, with the shared projector control (power
+> only), the relay's one all-four run and the documents tab. The step-by-step checklist, its
+> ticks and timers, the "app closed" step and the handheld remote steps for the two lamp
+> projectors are gone: the unit order and the waits are inside the run. The current design, the
+> words on screen and what is still unproven are in
+> [the show backup page brief](show-backup-page.md), under "The all-four run" and "The power
+> page". The first version described here is what was copied to the show computer on November 18
+> and is still there until the new version is installed.
+>
+> **Still current in this document:** the role, passcode and network proposal (ACCESS-1, ACCESS-2,
+> NET-1 to NET-3) and its role table, which both role pages rely on. POWER-1 to POWER-4 were about
+> the checklist and no longer describe the page.
+
 Status: first version built and tested in the simulator on November 18, 2026. The same
 day, on the owner's instruction, the four page files were copied to the show computer's
 relay, where they match commit `46ea2dc`. That relay was then updated once, from
