@@ -1,18 +1,24 @@
-# Show backup page
+# Show backup page, the power page and the shared control
 
 Brief for the second version, November 18, 2026. The first version (a go or no-go strip, four
 lanes and a guarded shutter) is on its own pull request and its four page files were copied to the
 show computer's relay on November 18. This version is built and tested in the simulator only.
 Nothing in it has been installed or run against a rig.
 
-The page is now for two people who share it: the **show backup operator** at the lighting
-position and the **designer**. Scope set by the owner on November 18: both can run a setup check,
-run a MIDI test from the console independently of that, and power the projectors on and off and
-move their shutters; both get diagrams and the most useful documents close by. The same on and off
-control is to appear on every role page.
+Scope set by the owner on November 18, relayed to this build: the show backup operator and the
+designer can run a setup check, run a MIDI test from the console independently of that, and power
+the projectors on and off and move their shutters; everyone gets diagrams and the most useful
+documents close by. On where the on and off button lives, the owner's answer was that each
+person's own page carries the same button. So there is one shared control and one run in the
+relay, and two pages that carry them at the addresses already handed out:
 
-Options marked "recommended" below are proposals. The defaults this build uses where the owner has
-not answered are listed under [Open decisions](#open-decisions).
+| Address | For | Carries |
+| --- | --- | --- |
+| `show.html` | The show backup operator and the designer | The shared control (power and shutter), the setup check, the MIDI test, the documents |
+| `power.html` | The power operator | The shared control (power only) and the documents |
+
+Options marked "recommended" below are proposals. What is still open is under
+[Open decisions](#open-decisions).
 
 ## Problem
 
@@ -39,15 +45,16 @@ Two facts about the rig still shape what the page may claim:
 
 ## Outcome
 
-One page, served by the relay at `show.html` behind the existing sign-in, with the go or no-go
-strip always on top and four tabs under it:
+Two pages, served by the relay behind the existing sign-in, built from the same script, styles
+and control. `show.html` keeps the go or no-go strip on top with four tabs under it. `power.html`
+is the same shell with two tabs.
 
-| Tab | For | Sends |
-| --- | --- | --- |
-| **Control** | Power on, power off, shutter open and shutter close, per lane and for all lanes | `POST /api/command`, `power` and `shutter` only |
-| **Setup check** | One press: a list of pass, fail or cannot check, each with its reading | Nothing |
-| **MIDI test** | Wait for the console's test cue and say whether it arrived | Nothing. This build never sends MIDI |
-| **Know** | Diagrams and documents from a private folder on the relay computer | Nothing |
+| Tab | On | For | Sends |
+| --- | --- | --- | --- |
+| **Control** ("Power" on the power page) | Both | Power on, power off, shutter open and shutter close for one lane; "Turn all on" and "Turn all off" for all four; open and close for all shutters. The power page has the power rows only | `POST /api/command` (`power`, `shutter`, one lane) and the plan, start and stop of the relay's run |
+| **Setup check** | `show.html` | One press: a list of pass, fail or cannot check, each with its reading | Nothing |
+| **MIDI test** | `show.html` | Wait for the console's test cue and say whether it arrived | Nothing. This build never sends MIDI |
+| **Know** | Both | A short built-in list of first things to try, then diagrams and documents from a private folder on the relay computer | Nothing |
 
 ## Go or no-go strip
 
@@ -68,18 +75,20 @@ the cue item reads "Not connected", as before, and the headline cannot read "All
 ## Control
 
 One shared component (`projector-control.js`, `projector-control-model.js`,
-`projector-control.css`) draws a card per lane and one "All lanes" card. Another role page can
-mount the same component: it takes the relay snapshot and a function that posts a command, and it
-contains no page-specific code.
+`projector-control.css`) draws a card per lane and one "All lanes" card. Each page mounts it with
+the rows it wants: `show.html` asks for power and shutter, `power.html` for power only. It takes
+the relay snapshot, a function that posts a command, and three functions for the run. It contains
+no page-specific code.
 
 **Each lane card shows** power, shutter, input, test pattern and reply age, any alarm the projector
 reports, and which link carries the lane: PJLink, the control port, the Barco API or the simulator.
-A lane on the control port is tagged "unproven" until the rig acceptance steps in the control-port
-brief pass. Input and pattern are read only. They are there so a blue "no signal" picture can be
-explained: a wrong input and a test pattern left on both show up as a flagged line.
+A lane on the control port is tagged "power untested": as reported from the rig on November 18,
+the shutter over that link works there and power over it has not been sent. This build did not
+verify either statement. Input and pattern are read only. They are there so a blue "no signal"
+picture can be explained: a wrong input and a test pattern left on both show up as a flagged line.
 
 A lane the relay is not reading shows **CHECK BY EYE** and the time of its last reply. Last known
-values are never shown as readings.
+values are never shown as readings. No message on either page sends anyone to a handheld remote.
 
 **Four actions per lane**, each in two steps:
 
@@ -96,16 +105,73 @@ revision, so a projector that was swapped or re-addressed after the page drew it
 anything is sent. After the relay accepts a command the card waits for the projector's own report
 and says "Reported …" only when that arrives.
 
-**Refusals stay on the card.** A blocked action says why when it is tapped, and carries the reason
-in its accessible name. A refusal
-from the relay or the projector is shown in the relay's own words with the time, and stays until
-the next action on that lane. No answer at all is worded differently from a refusal, because the
-command may have left before the reply was lost.
+**The way back from a dark surface.** A lit lane whose shutter reads CLOSED gets a highlighted Open
+button and the line "Dark on stage: the shutter is closed. Open it here." This is the recovery when
+a shutter closed from the playback app does not reopen from there.
 
-**All lanes.** The same four actions for every lane at once. The first step lists exactly which
+**Refusals stay on the card.** A blocked action says why when it is tapped, and carries the reason
+in its accessible name. A refusal from the relay or the projector is shown in the relay's own
+words with the time, and stays until the next action on that lane. No answer at all is worded
+differently from a refusal, because the command may have left before the reply was lost.
+
+**All lanes: shutters.** Open and Close for every lane at once. The first step lists exactly which
 lanes will get the command and which are skipped, with the reason for each skip. The second step
-sends one command per listed lane, each with the same guards as a single-lane action. The result
-is reported per lane. There is no group target in what the page sends.
+sends one command per listed lane, each with the same guards as a single-lane action.
+
+**All lanes: power.** "Turn all on" and "Turn all off" do not send commands from the page. They
+start the relay's one run, described next.
+
+## The all-four run
+
+One run lives in the relay (`server/power-run.js`). Every page reads the same state, so if one
+person starts it, every other page shows the same progress and the same banner, and their button
+waits until it ends. A second press from any page meets the run in progress and cannot start
+another. The relay had no such run before; the earlier power page worked its banner out on the
+page from readings.
+
+**The words on screen**, the same on both pages:
+
+| Where | Words |
+| --- | --- |
+| Buttons | **Turn all on** · **Turn all off** |
+| Second step | **Confirm: turn all on (9)** · **Confirm: turn all off (9)** · **Cancel** |
+| While it runs | **Turning all four on** · **Turning all four off**, with **Stop the run** |
+| Banner at the end | **All four on** · **Safe to leave the building** |
+| It ended without that | **Not all four on** · **Not safe to leave yet**, naming the lanes |
+| It was stopped | **Run stopped** · **Run interrupted** (the relay restarted) |
+
+**Two steps.** The first press asks the relay what a run would do now and gets back the plan and a
+one-use confirm that lasts 10 seconds. The plan is shown lane by lane: power on, already ON,
+waiting, or no current reply. Nothing reaches a projector. The second press starts the run in the
+relay with that confirm. The confirm is bound to the direction and to the projectors it was shown
+for.
+
+**What the run does**
+
+| Rule | Detail |
+| --- | --- |
+| Order | On: C, B, A, D. Off: A, D, B, C, so the two lamp units start cooling first |
+| Read before commanding | Each unit needs a current reply. A unit already in the target state is skipped and nothing is sent to it |
+| One command per unit | Never repeated, whatever happens. A second "off" to a resting laser unit pushes it toward a deeper standby |
+| A quiet minute | Nothing is sent to a Panasonic unit for 60 seconds after it lights |
+| No relight too soon | A lamp unit is not powered on while cooling, nor inside 75 seconds of going off |
+| One strike at a time | After a lamp unit is told to power on, the next unit waits until it reports ON, up to 2 minutes |
+| No reply | A unit with no current reply inside 20 seconds gets nothing. The run goes on to the next unit |
+| A refusal | Shown in the relay's own words for that lane. Not retried |
+| The banner | Only when every lane's own reply reads ON (or OFF). A unit read in its end state stays confirmed if it then stops answering, which a resting laser unit can |
+| Waiting for the end | Up to 5 minutes for all ON, 6 minutes for all OFF. After that the run ends with the lanes it could not confirm, by name |
+| Stop | Any page can stop the run. Nothing more is sent |
+| A relay restart | The run is recorded beside the rig. A relay that starts and finds a run in progress marks it interrupted and sends nothing more |
+
+The order and the waits come from the manuals as gathered for this rig, relayed to this build.
+They were checked against the drivers (what each driver reads as OFF, WARMING and COOLING, and that
+each power command is sent once) and exercised with stand-in projectors and a fake clock. None of
+it has been timed on a rig. After a relay restart the run counts each unit's state from the moment
+it is first read, so it may wait up to 75 seconds it did not need to.
+
+There is no "app closed" step, no tick and no remote step anywhere in the run or on either page.
+
+The run's finished banner stays on screen for 15 minutes.
 
 ## Setup check
 
@@ -202,6 +268,12 @@ The folder holds a `manifest.json`:
 The optional crew notes link from the first version now lives on this tab, with the same caption:
 for notes that can wait, not for emergencies or cue calls.
 
+Above the folder's list, each page has a short built-in list that does not depend on the folder.
+On `show.html`: the way back from a dark stage (open the shutter from Control, lane C, when a
+shutter closed from the playback app has not reopened), what CHECK BY EYE means, and where to look
+when a cue did nothing. On `power.html`: how the page works, the things never to do, and what to
+do when something is wrong.
+
 ## Private settings
 
 One new private file beside the rig, `host-paths.json`, in the settings folder that survives an
@@ -214,11 +286,29 @@ update. Every key is optional and each value is an absolute path on the relay co
 No path, host name or file from a real venue belongs in this repository. The samples and the test
 fixtures are invented.
 
-## Shared sign-in
+## Sign-in
 
-Both people use the one existing passcode. The relay records each command and its time, not who
-sent it, and the page says so beside its title. Until role passcodes exist (ACCESS-1 in the
-[power operator page brief](power-operator-page.md)) the same passcode also opens the main console.
+The existing passcode stays. The owner's latest word on sign-in, as relayed on November 18, was to
+keep the passcode, so the signed-in path is the one the crew uses and the one tested hardest: sign
+in, then the control, the setup check, the MIDI test and the documents, on a phone. A relay
+restart ends every session; the page then goes to the sign-in and returns to the same page and tab
+afterwards. If that happens during a run, the page shows "Run interrupted" after signing in.
+
+A relay with no passcode set still serves both pages; that path is not the target.
+
+Everyone uses the one passcode. The relay records each command and its time, not who sent it, and
+each page says so beside its title and in every confirm prompt. Until role passcodes exist
+(ACCESS-1 in the [power operator page brief](power-operator-page.md)) the same passcode also
+opens the main console.
+
+## The power page
+
+`power.html` keeps its address. It is now the same shell as `show.html` with two tabs: **Power**
+(the shared control with the power rows only) and **Know**. On a phone it opens on the all-lanes
+card, where the one on and off button is. The earlier version of this page was a step-by-step
+checklist with ticks, timers, an "app closed" step and handheld remote steps for the two lamp
+projectors. All of that is gone: the order and the waits are inside the run. Its Know tab starts
+with how the page works, the things never to do, and what to do when something is wrong.
 
 ## Dropped from this build
 
@@ -229,30 +319,35 @@ sent it, and the page says so beside its title. Until role passcodes exist (ACCE
 ## What it must not do
 
 - No input, test pattern, lens, picture, preset, schedule, Setup, discovery or Show Lock control.
-  The page source contains one write route, `api/command`, used for `power` and `shutter` only, and
-  a test fails if that changes.
+  The page sources write four routes and no others: `api/command` (for `power` and `shutter`
+  only) and the plan, start and stop of the run. A test fails if that changes.
 - No MIDI output of any kind. No show file, playback app or display control.
 - No value shown as a reading unless the relay's reply behind it is current.
 - No address, name, phone number or passcode in the source.
 - No request to any host other than the relay.
+- No "app closed" step, no ticks, and no steps that send anyone to a handheld remote.
 
 ## How Show Lock, stale and offline are respected
 
-| Condition | Page | Relay |
+| Condition | Pages | Relay |
 | --- | --- | --- |
-| Show Lock on | Per-lane shutters stay available. Power, every "All lanes" action, the MIDI test and the setup check are locked, each with the reason shown | Blocks power off, input, pattern, picture and lens. Allows shutter both ways and power on |
+| Show Lock on | Power off is locked, for one lane and for "Turn all off", with the reason shown. Power on, "Turn all on" and every shutter stay available. On `show.html` the MIDI test and the setup check are locked too | Blocks power off, input, pattern, picture and lens. Allows shutter both ways and power on. Refuses an off run and stops one under way |
 | Reply older than 15 s | Lane reads CHECK BY EYE; all four actions blocked | Refuses everything except shutter close |
-| Projector not reached | Lane reads CHECK BY EYE; actions blocked | Refuses any command to it |
+| Projector not reached | Lane reads CHECK BY EYE; actions blocked | Refuses any command to it. The run sends it nothing |
 | Relay not answering | Every lane reads CHECK BY EYE; Show Lock reads unknown; everything blocked | Not reachable |
-| Projector reports COOLING | Power on blocked with that reason | Refuses power on |
+| Projector reports COOLING | Power on blocked with that reason | Refuses power on. The run waits for it to finish |
+| A run is in progress | Power for one lane and both run buttons are blocked on every page. Shutters stay available | Refuses a second run |
 
-Where the page and the relay differ, the page is the stricter of the two.
+**A gap this leaves.** Show Lock blocks "Turn all off", and neither page can turn Show Lock off.
+Someone has to turn it off after the show, from the main console, before the nightly off will
+run. See SBP-17.
 
 ## Layout
 
 One viewport, no page scroll (WEB-2), light by default with Dark and System from the shared
 appearance menu (WEB-1). Tabs sit along the top on a tablet or laptop and in a bottom rail on a
-phone. The strip stays above every tab. On a phone or a short screen the Control tab shows one
+phone. While a run is in progress, and for 15 minutes after it ends, its banner sits above the
+cards on the Control tab of every page. The strip stays above every tab. On a phone or a short screen the Control tab shows one
 card at a time, chosen with an A, B, C, D, All picker that also carries each lane's state, and the
 MIDI test keeps its result, steps and button on the card and moves the longer explanation behind
 "What this means". Four panels scroll inside themselves, because their content is inherently long:
@@ -262,55 +357,79 @@ the test, and a wider documents list (WEB-3).
 
 ## Interfaces and shared files
 
-The page reads `GET /ws`, `GET /api/host-displays`, `GET /api/crew-links`, `GET /api/cue-feed`,
-`GET /api/host-checks`, `GET /api/know`, `GET /api/know/file` and (after a lost connection)
-`GET /api/state`, and writes `POST /api/command`.
+The pages read `GET /ws`, `GET /api/host-displays`, `GET /api/crew-links`, `GET /api/cue-feed`,
+`GET /api/host-checks`, `GET /api/know`, `GET /api/know/file`, `GET /api/power-run` and (after a
+lost connection) `GET /api/state`. They write `POST /api/command` and the three run routes.
 
-New relay routes, all read only and behind the existing sign-in:
+New relay routes, all behind the existing sign-in:
 
-| Route | Answers |
+| Route | Does |
 | --- | --- |
 | `GET /api/cue-feed` | Listener state, heartbeat age, sources, the last cue and the most recent messages with a running sequence number |
 | `GET /api/host-checks` | The three host checks with `pass`, `fail` or `cannot-check`, a reading and a time |
 | `GET /api/know?audience=…` | The validated manifest entries for those audiences |
 | `GET /api/know/file?f=…` | One file named in the manifest |
+| `GET /api/power-run` | The run every page shares: in progress, or how the last one ended |
+| `POST /api/power-run/plan` | What a run would do now, lane by lane, with a one-use confirm. Sends nothing to a projector |
+| `POST /api/power-run/start` | Starts the reviewed run. Refused while one is in progress |
+| `POST /api/power-run/stop` | Ends the run. Nothing more is sent |
+
+The relay also sends a `powerRun` message on its existing socket whenever the run changes. The run
+sends power through the relay's own guarded power command, so the relay's freshness, cooling and
+Show Lock rules apply to every unit, and each command is in the relay's event log with the source
+`run`.
 
 New files: `public/projector-control.js`, `projector-control-model.js`, `projector-control.css`,
 `public/show-know.js`; `server/host-paths.js`, `cue-feed.js`, `host-checks.js`, `know-folder.js`,
-`show-routes.js`; `samples/know/`; `test/cue-feed.test.js`, `know-folder.test.js`,
-`host-checks.test.js`, `projector-control.test.js`. Changed: `public/show.html`, `show.js`,
-`show-model.js`, `show.css`, `test/show-backup.test.js`, `test/show-backup-browser.cjs`, this brief.
+`power-run.js`, `show-routes.js`; `samples/know/`; `test/power-run.test.js`, `cue-feed.test.js`,
+`know-folder.test.js`, `host-checks.test.js`, `projector-control.test.js`. Changed:
+`public/show.html`, `show.js`, `show-model.js`, `show.css`, `test/show-backup.test.js`,
+`test/show-backup-browser.cjs`, this brief.
+
+Replaced from the power operator page's branch: `public/power.html` is rewritten as the shared
+shell. `public/power.js`, `power-model.js`, `power.css`, `test/power-operator.test.js` and
+`test/power-operator-browser.cjs` are removed, because the page they drove and tested no longer
+exists; `test/show-backup-browser.cjs` and `test/show-backup.test.js` cover `power.html` now.
 
 Shared files touched: `server/index.js` (three added lines: one import, one line that builds the
-route handler, one line that calls it after the sign-in check) and the repository `CHANGELOG.md`
-(one entry). `package.json` and the indexing count are unchanged from the first version, because
-no page was added.
+route handler and hands the run the relay's own functions, one line that calls the handler after
+the sign-in check), the repository `CHANGELOG.md`, and `scripts/verify_indexing_policy.js` (the
+count of tracked routes outside the sitemap is 219: the two role pages).
 
-**Stacking.** This branch sits on the first version's branch and also contains the control-port
-driver branch, merged in, because the Control tab shows which link carries a lane.
+**Stacking.** This branch sits on the first version's branch and contains two more branches by
+merge: the control-port driver (the Control tab shows which link carries a lane) and the power
+operator page (its page is replaced here).
 
-## What this page needs from the access proposal
+## What these pages need from the access proposal
 
 Roles, passcodes and network binding are proposed once, for every role page, in the
 [power operator page brief](power-operator-page.md) (ACCESS-1, ACCESS-2, NET-1, NET-2, NET-3). The
-row for this page in that role table is now:
+rows for these pages in that role table are now:
 
 | Role | Pages | API routes | Commands |
 | --- | --- | --- | --- |
-| Show backup and designer | `show.html` and its assets, sign-in | `ws`; `GET api/state`, `api/host-displays`, `api/crew-links`, `api/cue-feed`, `api/host-checks`, `api/know`, `api/know/file`; `POST api/command` | `power` and `shutter` only, one slot at a time, with a reviewed target. No group target |
+| Show backup and designer | `show.html` and its assets, sign-in | `ws`; `GET api/state`, `api/host-displays`, `api/crew-links`, `api/cue-feed`, `api/host-checks`, `api/know`, `api/know/file`, `api/power-run`; `POST api/command`, `api/power-run/plan`, `api/power-run/start`, `api/power-run/stop` | `power` and `shutter`, one slot at a time, with a reviewed target; the run |
+| Power operator | `power.html` and its assets, sign-in | `ws`; `GET api/state`, `api/host-displays`, `api/crew-links`, `api/cue-feed`, `api/know`, `api/know/file`, `api/power-run`; `POST api/command`, the three run routes | `power` only, one slot at a time, with a reviewed target; the run |
 
-Still needed from that proposal: a landing page per role, reach on the lighting position's network
-and the house wireless network (NET-2), an answer on the unauthenticated cue ports before new
-devices join those networks (NET-1), and sessions that survive a relay restart or a passcode to
-hand.
+Still needed from that proposal: a landing page per role, reach on each person's network (NET-2),
+an answer on the unauthenticated cue ports before new devices join those networks (NET-1), and
+sessions that survive a relay restart or a passcode to hand.
 
 ## Verification
 
-Run from `apps/projctl`, against isolated simulator relays only.
+Run from `apps/projctl`, against isolated simulator relays, stand-in projectors and fixture files
+only.
 
+- `node --test test/power-run.test.js`: the order in each direction, one unit at a time, the banner
+  only when all four report the end state, units already in state skipped, the 60 second quiet
+  after a Panasonic lights, no relight while cooling or inside 75 seconds, a unit with no reply, a
+  refused command never retried, a second press meeting the run in progress, stop, Show Lock, the
+  one-use confirm bound to direction and projectors, a unit that stops answering after its end
+  state, the record beside the rig and a restart mid-run, and one full on and off run through a
+  simulator relay over HTTP, behind the sign-in.
 - `node --test test/projector-control.test.js`: when each of the four actions is offered, every
-  block reason, the Show Lock policy, the all-lanes target and skip lists, link names and the
-  "unproven" tag.
+  block reason, the Show Lock rule, the all-lanes target and skip lists, link names and the "power
+  untested" tag.
 - `node --test test/cue-feed.test.js`: Show Control parsing, fragments joined per endpoint,
   interleaved endpoints, an abandoned fragment, a truncated last line finished on the next read, a
   malformed line, a stale file, rotation to a new file in a folder, a replaced file, outgoing rows
@@ -321,53 +440,60 @@ Run from `apps/projctl`, against isolated simulator relays only.
 - `node --test test/host-checks.test.js`: "cannot check" with no provider, a report-file provider
   passing and failing, a stale report, a malformed report and a provider that throws.
 - `node --test test/show-backup.test.js`: the strip and headline, the cue item in each listener
-  state, the setup check lines in each state, the MIDI test steps (pass, timeout, clear, clear not
-  seen, a cue older than the start ignored, a listener that stops mid-test), source limits (one
-  write route, `power` and `shutter` only, no address or contact, relative routes), serving, the
-  sign-in redirect, and the relay rules the page relies on.
+  state, the setup check lines in each state, the MIDI test steps, the limits on both pages'
+  sources (four write routes, `power` and `shutter` only, no address or contact, no "app closed"
+  or remote wording), serving of both pages, the sign-in redirect, and the relay rules the pages
+  rely on.
 - `node test/show-backup-browser.cjs` (part of `npm run test:browser`): the four tabs by pointer
-  and keyboard with the tab kept in the address, every per-lane action including the relay's
-  power-off confirmation, the all-lanes review and per-lane results, Show Lock, refusals that stay
-  on the card, a reply going stale while armed, a lost relay, the MIDI test against an observer
-  file the test appends to, the setup check, the Know tab with the sample set (diagram zoom, a
-  document as text, a refused path), the crew notes link, an older relay without the new routes,
-  and fit at 1440×900, 1024×768, 768×1024, 375×812, 375×667, 844×390, 320×256 and 2560×720 on every
-  tab in both themes, with an armed lane, an armed all-lanes action, setup results, a waiting,
-  passed and cleared MIDI test, and an open diagram and document.
+  and keyboard with the tab kept in the address; every per-lane action including the relay's
+  power-off confirmation; the run started from `show.html` and watched from `power.html`, the
+  second page's button waiting, both banners, then the off run started from `power.html`; the run
+  banner in every state from a scripted relay, and Stop; Show Lock; refusals that stay on the
+  card; a reply going stale while armed; a lost relay; the MIDI test against an observer file the
+  test appends to; the setup check; the Know tab with the sample set; the crew notes link; an
+  older relay without the new routes; **the signed-in path on a phone** (sign in, run, setup
+  check, documents, then `power.html` in the same session); **a relay restart in the middle of a
+  run** (the page goes to the sign-in and shows "Run interrupted" afterwards); and fit at
+  1440×900, 1024×768, 768×1024, 375×812, 375×667, 844×390, 320×256 and 2560×720 on every tab of
+  both pages in both themes, with an armed lane, a reviewed run, a finished run's banner, setup
+  results, a waiting, passed and cleared MIDI test, and an open diagram and document.
   Set `SHOW_BACKUP_SHOTS` to a folder to keep screenshots.
 
 Results for this version are in the pull request.
 
 ## Not proven on a rig
 
-- **Any command from this page on real hardware.** Power on, power off and both shutter moves have
-  run only against the simulator.
-- **The control-port link under command.** The relay has read the two lamp projectors over it; no
-  power or shutter command has been sent to them that way with someone watching the surface.
+- **The run.** Its order and waits have run only against stand-in projectors with a fake clock and
+  against the simulator. No run has commanded a real projector.
+- **Power over the control port** (the two lamp projectors while the playback app is open). As
+  reported from the rig on November 18, the shutter over that link works and power has not been
+  sent. This build verified neither.
+- **Any other command from these pages on real hardware.** Power and shutter have run only against
+  the simulator from these pages.
 - **The MIDI test end to end.** The reader was tested with fixture files built to the row format
   above. It has not read a file written by the real observer, and no console has fired cue 999
   into it.
-- **The Know tab with the real bundle.** Only the invented samples were shown.
+- **The Know tab with the real bundle in a browser.** Only the invented samples were shown.
 - **The display report on the real show computer**, real phones and tablets, Safari and Firefox,
   a screen reader, a long session, and readability in a dark booth.
 
 ## Open decisions
 
-The first option in each row is the recommendation and is what this build does. None of the new
-ones is answered.
+The first option in each row is the recommendation and is what this build does.
 
 | ID | Question | A (recommended, built) | B | C |
 | --- | --- | --- | --- | --- |
-| SBP-9 | One page or two? | One shared page for the show backup operator and the designer | A page each, sharing the components | One page with a role switch that hides tabs |
-| SBP-10 | Sign-in | The existing shared passcode, with the on-page note that actions are not attributed. The owner's latest word on sign-in, as relayed on November 18, was to keep the passcode | Wait for role passcodes (ACCESS-1) before installing | |
-| SBP-11 | What Show Lock locks here | Power, every all-lanes action, the MIDI test and the setup check. Per-lane shutters stay available | Also allow "close all shutters" under Show Lock, as the fastest safe move | Also allow the setup check, since it sends nothing |
+| SBP-11 | Should the setup check and the MIDI test lock under Show Lock? | Yes, both, on `show.html` | Leave the setup check available, since it sends nothing | Leave both available |
 | SBP-12 | Setup check contents and expected states | The list above: power ON, shutter OPEN, preferred input, pattern off, the displays rule | Expected states saved per show in the private rig settings | Readings only, no pass or fail |
 | SBP-13 | Test cue numbers and waits | Cue 999 inside 30 seconds, clear cue 999.5 inside 60 | Numbers and waits read from the private settings | |
-| SBP-14 | The "unproven" tag on control-port lanes | Keep it until the control-port rig acceptance steps pass, then remove it in code | Drop it now | |
+| SBP-14 | The "power untested" tag on control-port lanes | Keep it until a watched power test over that link passes, then remove it in code | Drop it now | |
 | SBP-15 | Host checks (playback app, MIDI interface, awake and unlocked) | Leave them "cannot check" until a helper is written and accepted | Build the helper next | Remove the three lines until then |
-| SBP-16 | Who sees which Know items | Both people see everything marked for either audience | Filter by a role chosen on the page | |
+| SBP-16 | Who sees which Know items | `show.html` lists everything marked for the show backup operator or the designer; `power.html` lists what is marked for the power operator | Filter `show.html` by a role chosen on the page | |
+| SBP-17 | Show Lock and the nightly off. Show Lock blocks "Turn all off", and neither page can turn Show Lock off | Someone turns Show Lock off from the main console after the show; the pages say why off is locked | Give `show.html` a guarded Show Lock control | Let "Turn all off" run under Show Lock after a stronger confirm |
+| SBP-18 | Does the designer need a page at an address of their own? | No. `show.html` serves both, as the handoff sheets print it | A second address with the same content | |
+| SBP-19 | The run's waits (60 s quiet, 75 s relight, one strike at a time, the 5 and 6 minute limits) | As built, from the manuals as relayed | Tune them after a watched run on the rig | |
 
-Earlier decisions:
+Answered or changed:
 
 | ID | Question | State |
 | --- | --- | --- |
@@ -376,15 +502,20 @@ Earlier decisions:
 | SBP-3 | Cue link | Built as a listen-only feed, awaiting a rig test. Shows "Not connected" until the observer path is set |
 | SBP-4 | Should Show Lock block Open from this page? | Open. Still the relay's rule: shutters work both ways under Show Lock |
 | SBP-5 | Actions on a stale reply | Open. Blocked, as on the main console |
-| SBP-6 | How is the page found? | Open. A bookmark on each person's device |
-| SBP-7 | Lanes the relay cannot reach during a show | Changed by the control-port driver. Unproven under command |
+| SBP-6 | How is the page found? | The two addresses are on the handoff sheets |
+| SBP-7 | Lanes the relay cannot reach during a show | Changed by the control-port driver. Shutter reported working on the rig; power untested |
 | SBP-8 | Crew notes link | Open. Unset by default |
+| SBP-9 | One page or two? | Answered by the owner (November 18, relayed): each person's page carries the same button. Built as one shared control on `show.html` and `power.html` |
+| SBP-10 | Sign-in | Answered by the owner (November 18, relayed): keep the passcode |
 
-Later slices, not part of this version: a MIDI test the relay injects over the network, a helper
-for the three host checks, and adoption of the control component by the power operator page.
+Later slices, not part of this version: a MIDI test the relay injects over the network, and a
+helper for the three host checks.
 
 ## Installing
 
-Not installed. This version needs the updated relay code (the four new routes) and one relay
-restart, so it cannot go in as static files the way the first version did. Installing waits for a
-window outside a show and the owner's word. Until then the show computer keeps the first version.
+Not installed. This version needs the updated relay code (the new routes and the run) and one
+relay restart, so it cannot go in as static files the way the first version did. Installing waits
+for a window outside a show and the owner's word. Until then the show computer keeps the first
+versions of both pages. When this version goes in, the two addresses stay the same and the
+handoff sheets need new step text only: the button and banner words are in the table under
+"The all-four run".

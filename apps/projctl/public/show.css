@@ -23,7 +23,9 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
 :focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
 .sb-short{display:none}
 
-.sb-shell{height:100dvh;min-width:0;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+/* Named rows, so a page that leaves the strip out (the power page) keeps every other part in its place. */
+.sb-shell{height:100dvh;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr);grid-template-areas:"top" "strip" "tabs" "main";padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+.sb-top{grid-area:top}.sb-strip{grid-area:strip}.sb-tabs{grid-area:tabs}.sb-panels{grid-area:main}
 
 /* Header */
 .sb-top{display:flex;align-items:center;gap:8px 12px;min-width:0;padding:8px 16px;background:var(--surface);border-top:3px solid var(--tape);border-bottom:1px solid var(--hairline)}
@@ -177,9 +179,8 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
 
 /* A phone or a short screen: tabs in a bottom rail, one card at a time on Control. */
 @media (max-width:699px),(max-height:519px){
-  .sb-shell{grid-template-rows:auto auto minmax(0,1fr) auto}
-  .sb-panels{order:1}
-  .sb-tabs{order:2;border-bottom:0;border-top:1px solid var(--hairline)}
+  .sb-shell{grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"top" "strip" "main" "tabs"}
+  .sb-tabs{border-bottom:0;border-top:1px solid var(--hairline)}
   [role="tablist"]{gap:6px;padding:6px 12px max(6px,env(safe-area-inset-bottom))}
   [role="tab"]{flex:1;min-height:44px;padding:4px 6px;border:1px solid var(--line-control);border-radius:10px;background:var(--surface)}
   [role="tab"][aria-selected="true"]{background:var(--surface-raised);border-color:var(--line-control);box-shadow:inset 0 -4px 0 var(--tape)}

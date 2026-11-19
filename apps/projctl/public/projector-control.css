@@ -96,31 +96,42 @@
   .pc-msg{grid-column:2;grid-row:5;min-height:0}
   .pc-card[data-phase="armed"] .pc-msg,.pc-card[data-phase="relay-armed"] .pc-msg{display:none}
 }
-/* A very short, narrow card: one lane at a time on a tiny or heavily zoomed screen. */
+/* A short card that is also narrow (a phone with the run banner showing): each row's name sits above its buttons. */
+@container pc-card (max-height:330px) and (max-width:459px){
+  .pc-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch}
+  .pc-row__label{grid-column:1 / -1}
+  .pc-btn{min-height:40px}
+}
+/* A very short, narrow card: one lane at a time on a tiny or heavily zoomed screen. One fact line
+   (the first flagged one, else the shutter), small buttons and a one-line message, so the card
+   still fits when the run banner is showing above it. */
 @container pc-card (max-height:150px) and (max-width:699px){
-  .pc-card__in{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);grid-template-rows:auto auto minmax(0,1fr);gap:2px 8px;padding:5px 8px}
+  .pc-card__in{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);grid-template-rows:auto auto minmax(0,1fr);gap:2px 8px;padding:4px 8px}
   .pc-letter{min-width:22px;height:22px;font-size:14px}
   .pc-name{font-size:13px}
   .pc-state{padding:1px 6px;font-size:13px}
   .pc-fresh{display:none}
   .pc-facts{grid-row:3;grid-template-columns:minmax(0,1fr);gap:0}
-  .pc-fact{display:flex;align-items:baseline;gap:5px}
-  .pc-fact:not([data-fact="shutter"],[data-flag],[data-fact="lit"]){display:none}
-  .pc-fact dt{font-size:9px}
+  .pc-fact{display:none;align-items:baseline;gap:5px}
+  .pc-facts:not(:has([data-flag])) .pc-fact:first-child,.pc-fact[data-flag]{display:flex}
+  .pc-fact[data-flag] ~ .pc-fact[data-flag]{display:none}
+  .pc-fact dt{flex:none;font-size:9px}
   .pc-fact dd{min-width:0;overflow:hidden;font-size:11px;line-height:1.2;white-space:nowrap;text-overflow:ellipsis}
-  .pc-fact dt{flex:none}
   .pc-card__in:has(.pc-alarm:not([hidden])) .pc-facts{display:none}
   .pc-alarm{grid-row:3;padding:0 6px;font-size:11px}
-  .pc-actions{grid-row:1 / span 2;gap:4px}
-  .pc-row{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);align-items:center;gap:4px}
+  .pc-actions{grid-row:1 / span 2;gap:3px}
+  .pc-row{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);align-items:center;gap:3px}
   .pc-row__label{grid-column:auto;font-size:9px;letter-spacing:.04em}
-  .pc-btn{min-height:30px;padding:2px 4px;font-size:13px}
+  .pc-btn{min-height:26px;padding:1px 4px;font-size:13px}
   .pc-row[data-run]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .pc-row[data-run] .pc-row__label{display:none}
   .pc-row[data-run] .pc-btn{font-size:12px}
-  .pc-confirm{grid-row:1 / span 2;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:3px 4px}
+  /* Armed: the confirm takes the card's full width under the name, so its words stay on one line. */
+  .pc-card[data-phase="armed"] :is(.pc-state,.pc-facts,.pc-alarm),.pc-card[data-phase="relay-armed"] :is(.pc-state,.pc-facts,.pc-alarm){display:none}
+  .pc-confirm{grid-column:1 / -1;grid-row:2 / span 2;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 4px}
   .pc-confirm__text{grid-column:1 / -1;overflow:hidden;font-size:11px;line-height:1.2;white-space:nowrap;text-overflow:ellipsis}
-  .pc-msg{grid-row:3;font-size:11px;line-height:1.2}
+  .pc-confirm .pc-btn{white-space:nowrap}
+  .pc-msg{grid-row:3;display:block;min-height:0;overflow:hidden;font-size:11px;line-height:1.2;white-space:nowrap;text-overflow:ellipsis}
 }
 /* The all-lanes card as a bar above the lanes: name, the two rows of buttons, then the message. */
 @container pc-card (max-height:150px) and (min-width:700px){

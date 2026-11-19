@@ -29,6 +29,7 @@ const audit = () => {
   return { pageScrolls: root.scrollHeight > root.clientHeight || root.scrollWidth > root.clientWidth, outside, cut };
 };
 const CLEAN = { pageScrolls: false, outside: [], cut: [] };
+const innerHeightMin = height => Math.round(height * 0.45); // header, tabs and the rest leave the panel at least this much
 
 // The observer's row format: one Show Control message spread over several midi rows.
 const ascii = text => [...text].map(char => char.charCodeAt(0));
@@ -480,6 +481,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
         await page.locator(`#t-${tab}`).click();
         await page.waitForTimeout(60);
         assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} ${tab}`);
+        assert.ok(await page.locator('#sb-main').evaluate(node => node.getBoundingClientRect().height) >= innerHeightMin(height) - 40, `${label} ${tab} the panel fills the page`);
         if (tab === 'control') {
           assert.equal(await page.locator('#pc-pick').isVisible(), small, `${label} one card at a time only on a small screen`);
           if (await page.locator('#pc-pick').isVisible()) {
@@ -571,6 +573,9 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       const label = `power page ${theme} ${width}x${height}`, small = width < 700 || height < 520, key = `${width}x${height}`;
       await power.locator('#t-control').click();
       assert.deepEqual(await power.evaluate(audit), CLEAN, `${label} power`);
+      // The cards have real room: a collapsed panel would pass a fit audit while showing nothing.
+      assert.ok(await power.locator('.pc-card:visible').first().evaluate(node => node.getBoundingClientRect().height) >= 70, `${label} cards have height`);
+      assert.ok(await power.locator('#sb-main').evaluate(node => node.getBoundingClientRect().height) >= innerHeightMin(height), `${label} the panel fills the page`);
       if (small) for (const pick of ['B', 'D', 'ALL']) { await power.locator(`#pc-pick [data-pick="${pick}"]`).click(); assert.deepEqual(await power.evaluate(audit), CLEAN, `${label} card ${pick}`); }
       // The reviewed run fits too: the plan, Confirm and Cancel.
       await power.locator('.pc-card[data-lane="ALL"] [data-act="power-off"]').click();
