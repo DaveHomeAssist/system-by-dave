@@ -325,7 +325,8 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
   banner?.copy.addEventListener('click', async () => {
     const text = banner.summary.textContent;
     let copied = false;
-    try { if (window.isSecureContext && navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); copied = true; } } catch { copied = false; }
+    // A clipboard that waits on a permission prompt or a focus rule is given 1.5 s, then the text is selected instead.
+    try { if (window.isSecureContext && navigator.clipboard?.writeText) { await Promise.race([navigator.clipboard.writeText(text), new Promise((_, no) => setTimeout(() => no(new Error('slow')), 1500))]); copied = true; } } catch { copied = false; }
     if (!copied) {
       const range = document.createRange(); range.selectNodeContents(banner.summary);
       const selection = getSelection(); selection.removeAllRanges(); selection.addRange(range);

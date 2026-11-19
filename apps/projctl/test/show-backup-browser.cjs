@@ -250,7 +250,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     // The finished run's summary, to pass on, and no off suggestion straight after the morning on run.
     assert.match(await page.locator('#pc-run .pc-run__summary').innerText(), /^Units on at \d+:\d\d [AP]M\. Every lane reports ON\.$/);
     await page.locator('#pc-run .pc-run__copy').click();
-    assert.match(await page.locator('#pc-run .pc-run__copy').textContent(), /^(Copied|Selected)$/);
+    await page.waitForFunction(() => /^(Copied|Selected)$/.test(document.querySelector('#pc-run .pc-run__copy').textContent), null, { timeout: 5000 });
     assert.equal(await card('ALL').locator('[data-suggest]').count(), 0);
     await other.locator('#pc-run[data-state="done"]').waitFor();
     assert.equal(await other.locator('#pc-run .pc-run__title').innerText(), 'ALL FOUR ON');
