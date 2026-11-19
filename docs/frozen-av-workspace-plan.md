@@ -92,6 +92,28 @@ Measure the produced package and compare it with the current
 before choosing a staging configuration. Avoid changing framework, database
 schema, viewer URL structure and hosting provider in the same cutover.
 
+### Version 54 portability inventory
+
+The published source for version 54 is `48491de7fe0253e19039a7754ec801bf2087e73c`.
+Its release archive measures 27,186,205 bytes. The Worker entry module alone
+measures 24,532,629 bytes before compression. The active catalog indexes seven
+sessions, seven manifests and 4,545 media routes. Route aliases can share an
+object. Determine unique keys and verified hashes before estimating a transfer.
+The managed source includes two SQL migrations for shared tasks and entry kinds.
+The workspace stores personal notes, cached team rows and pending offline
+checkoffs on the visitor's browser origin.
+
+For M0, build the complete target upload with Wrangler's local dry run and
+measure every included module. Cloudflare currently documents a 64 MiB
+uncompressed bundle limit and a one second startup limit. Neither the Sites
+archive size nor the entry module size establishes target acceptance.
+Verify the D1 export and restore path and the recoverable R2 object manifest.
+For the cutover rehearsal, include a browser with a previously installed
+service worker and one offline checkoff. Verify it reconnects to the single
+active task writer and preserves another crew member's newer revision.
+[Cloudflare Workers limits](https://developers.cloudflare.com/workers/platform/limits/#worker-size)
+and [version 54 workspace release](https://github.com/DaveHomeAssist/system-by-dave/pull/544).
+
 ### Migration sequence
 
 | Gate | Work | Required proof |
