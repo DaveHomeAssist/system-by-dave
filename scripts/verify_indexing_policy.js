@@ -82,7 +82,8 @@ const robots = read('robots.txt');
 // Pixel capture adds two noindex synthetic demo viewers.
 // Frozen Startup Checks adds one noindex native app page.
 // The Projctl show backup page adds one noindex relay role page, apps/projctl/public/show.html (2026-11-18).
-if (unlisted.length !== 218) fail(`Expected 218 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// The Projctl power operator page adds one noindex relay page (apps/projctl/public/power.html).
+if (unlisted.length !== 219) fail(`Expected 219 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);
