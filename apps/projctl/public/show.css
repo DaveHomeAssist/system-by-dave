@@ -337,6 +337,8 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
   .sb-feed__line strong{font-size:12px}
   .sb-feed__line span:last-child,.sb-feed__k{font-size:11px}
   .sb-know__status{font-size:11px}
+  .sb-notice{padding:3px 6px;border-left-width:4px;font-size:11px;line-height:1.25}
+  .sb-notices{gap:3px}
   .sb-know__item{min-height:30px;padding:2px 8px;font-size:13px}
   .sb-know__title{font-size:13px}
   .sb-know__tools .sb-btn{min-width:30px;padding:2px 6px}
