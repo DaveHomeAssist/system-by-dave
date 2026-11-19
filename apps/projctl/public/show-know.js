@@ -140,12 +140,14 @@ export function createKnow({ panel, list, status, title, tools, stage, back, onS
     for (const [kind, heading] of [['diagram', 'Diagrams'], ['doc', 'Documents']]) {
       const group = items.filter(item => item.kind === kind);
       if (!group.length) continue;
-      nodes.push(el('li', { class: 'sb-know__group', role: 'presentation' }, heading));
+      // A heading, then a list that holds nothing but its items.
+      const rows = el('ul', { class: 'sb-know__items', 'aria-label': heading });
       for (const item of group) {
         const button = el('button', { type: 'button', class: 'sb-know__item', 'data-file': item.file, 'aria-current': String(current?.file === item.file) });
         button.append(el('span', { class: 'sb-know__name' }, item.title), el('span', { class: 'sb-know__type' }, item.available ? TYPES[item.type] : 'Missing'));
-        const row = el('li'); row.append(button); nodes.push(row);
+        const row = el('li'); row.append(button); rows.append(row);
       }
+      nodes.push(el('h3', { class: 'sb-know__group' }, heading), rows);
     }
     list.replaceChildren(...nodes);
     if (current && !items.some(item => item.file === current.file)) { current = null; title.textContent = 'Choose a diagram or document'; setStage('empty'); panel.dataset.know = 'list'; }

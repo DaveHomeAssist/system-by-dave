@@ -317,7 +317,9 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await page.locator('#t-know').click();
     await page.locator('.sb-know__item').first().waitFor();
     assert.equal(await page.locator('#sb-know-status').innerText(), '4 items · sample set for the simulator, not a real rig');
-    assert.deepEqual(await page.locator('#sb-know-list li').allInnerTexts().then(rows => rows.map(row => row.replace(/\s+/g, ' ').trim())), ['DIAGRAMS', 'Sample signal flow DIAGRAM', 'DOCUMENTS', 'Sample recovery steps DOCUMENT', 'Sample cue notes TEXT', 'Sample output map DATA']);
+    assert.deepEqual(await page.locator('#sb-know-list .sb-know__group').allInnerTexts(), ['DIAGRAMS', 'DOCUMENTS']);
+    assert.deepEqual(await page.locator('#sb-know-list li').evaluateAll(rows => rows.map(row => [row.parentElement.getAttribute('aria-label'), row.querySelector('.sb-know__name').textContent, row.querySelector('.sb-know__type').textContent])),
+      [['Diagrams', 'Sample signal flow', 'Diagram'], ['Documents', 'Sample recovery steps', 'Document'], ['Documents', 'Sample cue notes', 'Text'], ['Documents', 'Sample output map', 'Data']]);
     assert.equal(await page.locator('#sb-know-tools').isVisible(), false);
     await page.locator('.sb-know__item', { hasText: 'Sample signal flow' }).click();
     const image = page.locator('#sb-know-stage img');
