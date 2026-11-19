@@ -3,6 +3,9 @@
 **Date:** November 14, 2026
 **Status:** Stages 1 (projection lanes in AV Video) and 2 (lens and throw in Throwline) are built and run on pull requests. Later stages wait on the decisions below.
 
+[Frozen workspace and hosting plan](frozen-av-workspace-plan.md) proposes how to
+use the case alongside operator views and assess hosting portability.
+
 ## Brief
 
 Dave asked on November 13, 2026: "methodically build out the frozen situation
