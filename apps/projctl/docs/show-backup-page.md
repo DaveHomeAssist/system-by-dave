@@ -150,21 +150,26 @@ for.
 
 | Rule | Detail |
 | --- | --- |
-| Order | On: C, B, A, D. Off: A, D, B, C, so the two lamp units start cooling first |
+| Order | On: C, B, A, D. Off: A, D, B, C, so the two lamp units start cooling first. The off order is unchanged pending SD-1 (send all four together, or this order) |
 | Read before commanding | Each unit needs a current reply. A unit already in the target state is skipped and nothing is sent to it |
-| One command per unit | Never repeated, whatever happens. A second "off" to a resting laser unit pushes it toward a deeper standby |
-| A quiet minute | Nothing is sent to a Panasonic unit for 60 seconds after it lights |
-| No relight too soon | A lamp unit is not powered on while cooling, nor inside 75 seconds of going off |
-| One strike at a time | After a lamp unit is told to power on, the next unit waits until it reports ON, up to 2 minutes |
-| No reply | A unit with no current reply inside 20 seconds gets nothing. The run goes on to the next unit |
+| One command per unit | Never repeated, with one exception below. A second "off" to the Barco pushes it into deep standby (STANDBY or ECO), where its network is down and the morning power on cannot reach it. It reads OFF in READY and in deep standby alike, so a Barco reading OFF or cooling gets nothing |
+| Fresh reads | The run asks the relay's poller for a fresh read of every unit it is waiting on every 10 seconds. A read is never a command |
+| A quiet minute | Nothing is sent to a Panasonic unit for 60 seconds after it lights, and nothing at all, not even a read from the run, to a lamp unit for 60 seconds after its on command. The relay's own background poll is not paused |
+| No relight too soon | A lamp unit is not powered on while cooling, nor inside 75 seconds of reading OFF. Nothing is ever sent on to a Panasonic that reads COOLING |
+| Morning stagger | The second lamp unit (D) goes about 10 seconds after the first (A)'s on command is accepted. They are then watched side by side |
+| Lamp watch and one retry | After its on command, a lamp unit is watched for 3 minutes. Reading COOLING inside that window means it turned itself off: the run marks a lamp fault, waits for OFF plus 75 seconds, and sends on once more. A second fault stops that unit with an alert: a service call. This is the only case where a unit gets a second command. After the watch the run reports lamp hours and the lamp error state, or says they are not reported on that link |
+| No reply | A unit with no current reply inside 20 seconds gets nothing. The run goes on to the next unit. In the morning a Barco with no reply may be in deep standby, which needs a wake at the unit; the run says so |
+| Sent, not confirmed | A unit that accepted its command but has not reported is shown as "sent, not confirmed", never as done |
 | A refusal | Shown in the relay's own words for that lane. Not retried |
-| The banner | Only when every lane's own reply reads ON (or OFF). A unit read in its end state stays confirmed if it then stops answering, which a resting laser unit can |
-| Waiting for the end | Up to 5 minutes for all ON, 6 minutes for all OFF. After that the run ends with the lanes it could not confirm, by name |
+| The banner | Only when every lane's own reply reads ON (or OFF). A lamp unit counts as ON only once it has stayed on through its 3-minute watch. A unit read in its end state stays confirmed if it then stops answering, which a resting laser unit can. A Barco that ends in deep standby still reads OFF, so the night banner shows, with a line that the morning power on cannot reach it |
+| Waiting for the end | Up to 5 minutes for all ON (longer while a lamp is being watched or retried), 240 seconds for all OFF. After that the run ends with the lanes it could not confirm, by name |
 | Stop | Any page can stop the run. Nothing more is sent |
 | A relay restart | The run is recorded beside the rig. A relay that starts and finds a run in progress marks it interrupted and sends nothing more |
 
-The order and the waits come from the manuals as gathered for this rig, relayed to this build.
-They were checked against the drivers (what each driver reads as OFF, WARMING and COOLING, and that
+The order and the waits come from the manufacturers' documents as researched for this rig (the
+rig's daily order of operations, November 19, relayed to this build), and are researched, not yet
+tested on a rig: the rig tests for them are planned for the first day with no shows. They were
+checked against the drivers (what each driver reads as OFF, WARMING and COOLING, and that
 each power command is sent once) and exercised with stand-in projectors and a fake clock. None of
 it has been timed on a rig. After a relay restart the run counts each unit's state from the moment
 it is first read, so it may wait up to 75 seconds it did not need to.
@@ -172,6 +177,28 @@ it is first read, so it may wait up to 75 seconds it did not need to.
 There is no "app closed" step, no tick and no remote step anywhere in the run or on either page.
 
 The run's finished banner stays on screen for 15 minutes.
+
+**The Barco's raw state.** Its driver now keeps the raw Pulse state (`ready`, `standby`, `eco`,
+`conditioning`, `deconditioning`, `on`) beside the mapped power, as `rawState`. The lane card shows
+deep standby as a caution ("ECO. Deep standby: the morning power on cannot reach it."), and the
+night timeline shows the raw word with READY as the target.
+
+## The night timeline (power page)
+
+A **Night** tab on `power.html`. One row per lane, in the order the off run sends (A, D, B, C):
+
+| Unit | Expected wait | Read from the relay |
+| --- | --- | --- |
+| Lamp unit (A, D) | about 170 s of cooling | COOLING with a count from its off command, then OFF |
+| Laser unit (B) | about 5 s | OFF |
+| Barco laser (C) | about 30 s to READY | its raw state: DECONDITIONING, then OFF · READY, or OFF · ECO / STANDBY marked deep standby |
+
+Above the rows: "All off, about 3 min" and "Never cut mains while a lamp unit is cooling", which
+stands out while a lamp unit cools. Below them: "Safe to leave the building" only when all four
+read OFF, otherwise "Not safe to leave yet" naming each lane and its reading. A lane with no reply
+after its off command reads "Sent, not confirmed", never success. The waits are labelled
+"researched, not yet tested on this rig". The page that starts the nightly off moves to this tab;
+other pages stay where they are. The run can be stopped from here too.
 
 ## Setup check
 
@@ -269,10 +296,28 @@ The optional crew notes link from the first version now lives on this tab, with 
 for notes that can wait, not for emergencies or cue calls.
 
 Above the folder's list, each page has a short built-in list that does not depend on the folder.
-On `show.html`: the way back from a dark stage (open the shutter from Control, lane C, when a
-shutter closed from the playback app has not reopened), what CHECK BY EYE means, and where to look
-when a cue did nothing. On `power.html`: how the page works, the things never to do, and what to
-do when something is wrong.
+On `show.html`: the recovery ladder for a surface that is wrong, least disruptive first, each rung
+with when it is allowed:
+
+1. Shutter (any time, mid-show too). The way back from a dark stage is here: on lane C, a shutter
+   closed from the playback app may not reopen from there, so open it from Control.
+2. Input (before a show). Read it on Control; tell the video lead if it is flagged.
+3. Power cycle that one projector (before a show), respecting cooling and the relight wait.
+4. Relaunch the playback app (before a show, all four on, only after any approved change is saved).
+5. Restart the show computer (only on the video lead's word).
+
+Then what CHECK BY EYE means, and where to look when a cue did nothing. On `power.html`: how the
+page works, the night timeline, the things never to do, and what to do when something is wrong
+(including a lamp fault and deep standby).
+
+**Holds.** A manifest entry of kind `notice` carries a short hold instead of a file, for example
+"no playback app quit or relaunch until the approved show file change is saved". It shows above
+the list for its audience until its optional `until` time, and the Know tab carries a mark while
+one is shown. Date-specific holds go in the private folder's manifest, never in the page:
+
+```json
+{ "kind": "notice", "label": "Hold", "text": "No playback app quit or relaunch until the approved change is saved.", "audience": ["show-backup"], "until": "2026-11-19T17:00:00-05:00" }
+```
 
 ## Private settings
 
@@ -303,8 +348,8 @@ opens the main console.
 
 ## The power page
 
-`power.html` keeps its address. It is now the same shell as `show.html` with two tabs: **Power**
-(the shared control with the power rows only) and **Know**. On a phone it opens on the all-lanes
+`power.html` keeps its address. It is now the same shell as `show.html` with three tabs: **Power**
+(the shared control with the power rows only), **Night** (the night timeline) and **Know**. On a phone it opens on the all-lanes
 card, where the one on and off button is. The earlier version of this page was a step-by-step
 checklist with ticks, timers, an "app closed" step and handheld remote steps for the two lamp
 projectors. All of that is gone: the order and the waits are inside the run. Its Know tab starts
@@ -464,10 +509,16 @@ Results for this version are in the pull request.
 ## Not proven on a rig
 
 - **The run.** Its order and waits have run only against stand-in projectors with a fake clock and
-  against the simulator. No run has commanded a real projector.
+  against the simulator. No run has commanded a real projector. The waits, the 10 second stagger,
+  the 3 minute lamp watch with one retry, and the Barco's deep standby behaviour are researched, not
+  yet tested on the rig (the rig tests are planned for the first day with no shows).
+- **The Barco's raw state** on the real driver. Read from the Pulse API as before; the new field has
+  only run against fixtures and the simulator.
 - **Power over the control port** (the two lamp projectors while the playback app is open). As
-  reported from the rig on November 18, the shutter over that link works and power has not been
-  sent. This build verified neither.
+  reported from the rig on November 18, the shutter over that link works. Power off to all four was
+  sent from a page at the end of that night and accepted, with A and D then on the control port
+  link by the relay's own report (relayed from the orchestrator's reading of the relay's event list;
+  the link used is not recorded). This build verified none of it.
 - **Any other command from these pages on real hardware.** Power and shutter have run only against
   the simulator from these pages.
 - **The MIDI test end to end.** The reader was tested with fixture files built to the row format
@@ -491,7 +542,9 @@ The first option in each row is the recommendation and is what this build does.
 | SBP-16 | Who sees which Know items | `show.html` lists everything marked for the show backup operator or the designer; `power.html` lists what is marked for the power operator | Filter `show.html` by a role chosen on the page | |
 | SBP-17 | Show Lock and the nightly off. Show Lock blocks "Turn all off", and neither page can turn Show Lock off | Someone turns Show Lock off from the main console after the show; the pages say why off is locked | Give `show.html` a guarded Show Lock control | Let "Turn all off" run under Show Lock after a stronger confirm |
 | SBP-18 | Does the designer need a page at an address of their own? | No. `show.html` serves both, as the handoff sheets print it | A second address with the same content | |
-| SBP-19 | The run's waits (60 s quiet, 75 s relight, one strike at a time, the 5 and 6 minute limits) | As built, from the manuals as relayed | Tune them after a watched run on the rig | |
+| SBP-20 | The off order inside the run | Unchanged (A, D, B, C) until SD-1 is answered | All four together (the shutdown procedure's recommendation, as relayed), or keep this order |
+| SBP-21 | A shutter close step before the nightly off | Not built: the research lists closing all four shutters first, but the off order was not to change | Add "close all four and read them back" as the run's first step |
+| SBP-19 | The run's waits (60 s quiet, 75 s relight, 10 s stagger, 3-minute lamp watch with one retry, the 5 minute and 240 s limits) | As built, from the manuals as relayed | Tune them after a watched run on the rig | |
 
 Answered or changed:
 

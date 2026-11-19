@@ -23,7 +23,7 @@ const audit = () => {
     const r = el.getBoundingClientRect();
     return r.height > 0 && (r.bottom > innerHeight + 1 || r.right > innerWidth + 1 || r.left < -1 || r.top < -1);
   }).map(el => `${el.className || el.tagName}`);
-  const cut = [...document.querySelectorAll('.pc-card__in, .pc-picker, .pc-pick, .pc-btn, .sb-check, .sb-top, .sb-strip, .sb-tabs, [role=tab], .sb-card, .sb-bar, .sb-know__bar, .sb-know__side, .sb-step, .sb-btn')]
+  const cut = [...document.querySelectorAll('.pc-card__in, .pc-picker, .pc-pick, .pc-btn, .sb-check, .sb-top, .sb-strip, .sb-tabs, [role=tab], .sb-card, .sb-bar, .sb-know__bar, .sb-know__side, .sb-step, .sb-btn, .sb-night__head, .sb-night__verdict, .sb-notice')]
     .filter(el => visible(el) && !el.closest('dialog:not([open])') && (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1))
     .map(el => `${el.className} ${el.closest('[data-lane]')?.dataset.lane || el.dataset.check || el.id || ''} ${el.scrollWidth}x${el.scrollHeight} in ${el.clientWidth}x${el.clientHeight}`);
   return { pageScrolls: root.scrollHeight > root.clientHeight || root.scrollWidth > root.clientWidth, outside, cut };
@@ -212,7 +212,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await other.goto(`${relay.base}/power.html`);
     await other.locator('.pc-card[data-lane="B"][data-reach="live"]').waitFor({ state: 'attached' });
     const otherCard = id => other.locator(`.pc-card[data-lane="${id}"]`);
-    assert.deepEqual(await other.locator('[role=tab]').allInnerTexts(), ['Power', 'Know']);
+    assert.deepEqual(await other.locator('[role=tab]').evaluateAll(tabs => tabs.map(tab => tab.firstChild.textContent)), ['Power', 'Night', 'Know']);
     assert.equal(await other.locator('h1').innerText(), 'Power');
     assert.deepEqual(await otherCard('ALL').locator('.pc-actions [data-act]').allInnerTexts(), ['Turn all on', 'Turn all off'], 'the power page carries power only');
     assert.equal(await other.locator('[data-act="shutter-open"], [data-act="shutter-close"]').count(), 0);
@@ -258,9 +258,23 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await otherCard('ALL').locator('[data-act="confirm"]').click();
     await page.locator('#pc-run[data-state="running"][data-direction="off"]').waitFor();
     assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'TURNING ALL FOUR OFF');
+    // The page that started the nightly off follows it on the night timeline: each lane's expected wait and its reading now.
+    await other.locator('#t-night[aria-selected="true"]').waitFor();
+    assert.equal(await page.locator('#t-control').getAttribute('aria-selected'), 'true', 'only the page that pressed moves to its timeline');
+    assert.deepEqual(await other.locator('.sb-night__row').evaluateAll(rows => rows.map(row => row.dataset.lane)), ['A', 'D', 'B', 'C'], 'the off order');
+    assert.deepEqual(await other.locator('.sb-night__unit').allInnerTexts(), ['Lamp unit', 'Lamp unit', 'Laser unit', 'Barco laser']);
+    assert.deepEqual(await other.locator('.sb-night__expect').allInnerTexts(), ['about 170 s of cooling', 'about 170 s of cooling', 'about 5 s', 'about 30 s to READY']);
+    assert.deepEqual([await other.locator('.sb-night__total').innerText(), await other.locator('.sb-night__mains').innerText()], ['All off, about 3 min', 'Never cut mains while a lamp unit is cooling.']);
+    assert.match(await other.locator('.sb-night__source').innerText(), /researched from the manufacturers. documents, not yet tested on this rig\.$/);
+    assert.equal(await other.locator('.sb-night__stop').isVisible(), true, 'the run can be stopped from the timeline');
     await shot(other, '08-tablet-power-page-run-off');
+    await other.locator('.sb-night__verdict[data-state="ok"]').waitFor({ timeout: 40000 });
+    assert.equal(await other.locator('.sb-night__verdict').innerText(), 'Safe to leave the building', 'only when all four read OFF');
+    assert.deepEqual(await other.locator('.sb-night__now').allInnerTexts(), ['OFF', 'OFF', 'OFF', 'OFF · READY'], 'the Barco shows its raw state, READY being the target');
+    await other.locator('#t-control').click();
     await other.locator('#pc-run[data-state="done"]').waitFor({ timeout: 40000 });
     assert.equal(await other.locator('#pc-run .pc-run__title').innerText(), 'SAFE TO LEAVE THE BUILDING');
+    assert.equal(await other.locator('.sb-night__stop').isVisible(), false);
     await page.locator('#pc-run[data-state="done"][data-direction="off"]').waitFor();
     assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'SAFE TO LEAVE THE BUILDING');
     assert.equal((await relay.state()).projectors.every(p => p.status.power === 'off'), true);
@@ -271,7 +285,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.match(await other.locator('.sb-tips').innerText(), /Never cut power at a breaker/);
     assert.doesNotMatch(await other.locator('body').innerText(), /app closed|remote/i);
     await other.locator('.sb-know__item').first().waitFor();
-    assert.deepEqual(await other.locator('.sb-know__name').allInnerTexts(), ['Sample signal flow', 'Sample power-up order'], 'the power page asks for the power audience');
+    assert.deepEqual(await other.locator('.sb-know__name').allInnerTexts(), ['Sample signal flow', 'Sample power-up and power-down order'], 'the power page asks for the power audience');
     await other.close();
     // Back to the state the rest of this test expects: B and C lit, A off, D unreachable.
     for (const slot of ['P2', 'P3']) await relay.api('command', { slot, cmd: 'power', arg: 1 });
@@ -403,7 +417,14 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await page.locator('#t-know').click();
     await page.locator('.sb-know__item').first().waitFor();
     assert.equal(await page.locator('#sb-know-status').innerText(), '4 items · sample set for the simulator, not a real rig');
-    assert.match(await page.locator('.sb-tips').innerText(), /The stage is dark and lane C reads shutter CLOSED: open it from Control, lane C\./, 'the way back from a dark stage is on the Know tab');
+    // The recovery ladder, least disruptive first, each step with when it is allowed; the lane C shutter is the first rung.
+    assert.deepEqual(await page.locator('.sb-ladder > li > strong').allInnerTexts(), ['Shutter.', 'Input.', 'Power cycle that one projector.', 'Relaunch the playback app.', 'Restart the show computer.']);
+    assert.deepEqual(await page.locator('.sb-ladder .sb-when').allInnerTexts(), ['Any time, mid-show too', 'Before a show', 'Before a show', 'Before a show, all four on', "Only on the video lead's word"]);
+    assert.match(await page.locator('.sb-ladder').innerText(), /On lane C, a shutter closed from the playback app may not reopen from there; the Open button on that card is the way back\./, 'the way back from a dark stage is on the Know tab');
+    assert.match(await page.locator('.sb-ladder__note').innerText(), /^Researched, not yet tested on this rig:/);
+    // A hold set in the documents folder shows above the list, and the tab says so.
+    assert.equal(await page.locator('#sb-notices .sb-notice').innerText(), 'Hold: Sample hold: no playback app quit or relaunch until the approved show file change is saved.');
+    assert.deepEqual([await page.locator('#t-know').getAttribute('aria-label'), await page.locator('#sb-know-count').isVisible()], ['Know, 1 hold', true]);
     assert.deepEqual(await page.locator('#sb-know-list .sb-know__group').allInnerTexts(), ['DIAGRAMS', 'DOCUMENTS']);
     assert.deepEqual(await page.locator('#sb-know-list li').evaluateAll(rows => rows.map(row => [row.parentElement.getAttribute('aria-label'), row.querySelector('.sb-know__name').textContent, row.querySelector('.sb-know__type').textContent])),
       [['Diagrams', 'Sample signal flow', 'Diagram'], ['Documents', 'Sample recovery steps', 'Document'], ['Documents', 'Sample cue notes', 'Text'], ['Documents', 'Sample output map', 'Data']]);
@@ -587,6 +608,14 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       if (theme === 'light' && key === '768x1024') await shot(power, '24-tablet-portrait-power-page');
       if (theme === 'dark' && key === '1024x768') await shot(power, '34-tablet-landscape-power-page-dark');
       if (theme === 'light' && key === '320x256') await shot(power, '64-tiny-power-page');
+      await power.locator('#t-night').click();
+      await power.waitForTimeout(60);
+      assert.deepEqual(await power.evaluate(audit), CLEAN, `${label} night`);
+      assert.ok(await power.locator('.sb-night__rows').evaluate(node => node.getBoundingClientRect().height) >= Math.min(140, Math.round(height / 6)), `${label} night rows have room`);
+      assert.equal(await power.locator('.sb-night__verdict').isVisible(), true, `${label} night verdict shows`);
+      if (theme === 'light' && key === '375x812') await shot(power, '19-phone-power-page-night');
+      if (theme === 'dark' && key === '1440x900') await shot(power, '44-desktop-power-page-night-dark');
+      if (theme === 'light' && key === '1440x900') await shot(power, '43-desktop-power-page-night');
       await power.locator('#t-know').click();
       await power.waitForTimeout(60);
       if (small && await power.locator('#sb-know-back').isVisible()) await power.locator('#sb-know-back').click();
@@ -602,8 +631,8 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
 
     // ---- A scripted relay: the control-port link, flags, stale replies, refusals, clock skew, a lost relay and an older relay.
     const base = await relay.state();
-    const scripted = async ({ skewMs = 0, lostStatus = 0, command, feed, older = false, hash = '', fakeClock = false, edit, runRoute } = {}) => {
-      const ctx = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+    const scripted = async ({ skewMs = 0, lostStatus = 0, command, feed, older = false, hash = '', fakeClock = false, edit, runRoute, file = 'show.html', viewport = { width: 1024, height: 768 } } = {}) => {
+      const ctx = await browser.newContext({ viewport });
       const tab = await ctx.newPage();
       let advanced = 0;
       if (fakeClock) await tab.clock.install({ time: Date.now() });
@@ -628,7 +657,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       await tab.route('**/api/know**', route => older ? missing(route) : route.fulfill({ json: { state: 'not-configured', sample: false, items: [] } }));
       await tab.route('**/api/crew-links', route => older ? missing(route) : route.fulfill({ json: { notes: null, state: 'not-configured' } }));
       await tab.route('**/api/power-run**', route => older ? missing(route) : runRoute ? runRoute(route) : route.fulfill({ json: { active: false, run: null } }));
-      await tab.goto(`${relay.base}/show.html${hash}`);
+      await tab.goto(`${relay.base}/${file}${hash}`);
       await tab.locator('.pc-card[data-lane="C"][data-reach="live"]').waitFor({ state: 'attached' });
       const push = (slot, change, ageMs) => { const p = state.projectors.find(x => x.slot === slot); Object.assign(p.status, change); stamp(p, ageMs); socket.send(JSON.stringify({ type: 'status', slot, status: p.status })); };
       const pulse = () => { for (const p of state.projectors) if (p.status.online) { stamp(p); socket.send(JSON.stringify({ type: 'status', slot: p.slot, status: p.status })); } socket.send(JSON.stringify({ type: 'heartbeat', at: new Date(relayNow()).toISOString() })); };
@@ -793,6 +822,39 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await run.ctx.close();
 
     // An older relay without the new routes: the page still runs and says what it does not have.
+    // The night timeline against scripted relay states: a lamp unit cooling, one sent but not confirmed, the Barco in deep standby.
+    run = await scripted({ file: 'power.html', hash: '#night', viewport: { width: 375, height: 812 }, edit: (state, stamp) => {
+      const lane = id => state.projectors.find(p => p.lane === id);
+      Object.assign(lane('C').status, { power: 'off', rawState: 'eco', shutter: 'unknown' });
+      Object.assign(lane('B').status, { power: 'off' });
+      Object.assign(lane('A').status, { power: 'cooling' });
+      lane('D').status = { ...lane('D').status, online: false, connection: { ...lane('D').status.connection, state: 'reconnecting', lastSuccessAt: new Date(Date.now() - 900000).toISOString() } };
+    } });
+    const nightRun = runOf('running', { steps: [['A', 'reported', 'Reported COOLING', 72000], ['D', 'sent', 'Sent. Waiting for it to report COOLING or OFF', 60000], ['B', 'reported', 'Reported OFF', 50000], ['C', 'reported', 'Reported COOLING', 40000]]
+      .map(([lane, step, note, ago]) => ({ lane, surface: SURFACES[lane], slot: lane, state: step, note, confirmed: lane === 'B', sentAt: run.relayNow() - ago })) });
+    run.tell({ type: 'powerRun', active: true, run: nightRun });
+    await run.tab.locator('.sb-night__row[data-lane="D"][data-state="eye"]').waitFor();
+    const nowOf = lane => run.tab.locator(`.sb-night__row[data-lane="${lane}"] .sb-night__now`).innerText();
+    assert.match(await nowOf('A'), /^COOLING · 1:[12]\d so far$/, 'the lamp unit counts from its off command');
+    assert.equal(await run.tab.locator('.sb-night__row[data-lane="A"] .sb-night__detail').innerText(), 'Never cut mains while a lamp unit is cooling.');
+    assert.equal(await run.tab.locator('.sb-night__mains').getAttribute('data-hot'), '', 'the mains line stands out while a lamp unit cools');
+    assert.deepEqual([await nowOf('D'), await run.tab.locator('.sb-night__row[data-lane="D"] .sb-night__detail').innerText()], ['Sent, not confirmed', 'Check it by eye.'], 'no reply after an off is not success');
+    assert.deepEqual([await nowOf('C'), await run.tab.locator('.sb-night__row[data-lane="C"]').getAttribute('data-state'), await run.tab.locator('.sb-night__row[data-lane="C"] .sb-night__detail').innerText()],
+      ['OFF · ECO', 'warn', 'Deep standby: the morning power on cannot reach it.']);
+    assert.match(await run.tab.locator('.sb-night__verdict').innerText(), /^Not safe to leave yet: A \(COOLING · \d:\d\d so far\), D \(Sent, not confirmed\)$/);
+    assert.deepEqual(await run.tab.evaluate(audit), CLEAN, 'the night timeline fits a phone');
+    await shot(run.tab, '20-phone-power-page-night-scripted');
+    await run.tab.locator('#t-control').click();
+    await run.tab.locator('#pc-pick [data-pick="C"]').click();
+    assert.deepEqual([await run.at('C').locator('.pc-alarm').innerText(), await run.at('C').locator('.pc-alarm').getAttribute('data-kind')], ['ECO. Deep standby: the morning power on cannot reach it.', 'caution'], 'the lane card says it too');
+    await run.tab.locator('#t-night').click();
+    // All four read off, the Barco in READY: now it is safe to leave.
+    run.push('P3', { power: 'off', rawState: 'ready' }); run.push('P1', { power: 'off' }); run.push('P4', { power: 'off', online: true, connection: { state: 'online' } });
+    run.tell({ type: 'powerRun', active: false, run: { ...nightRun, state: 'done', banner: 'Safe to leave the building', endedAt: new Date().toISOString() } });
+    await run.tab.locator('.sb-night__verdict[data-state="ok"]').waitFor();
+    assert.deepEqual([await run.tab.locator('.sb-night__verdict').innerText(), await nowOf('C'), await run.tab.locator('.sb-night__mains').getAttribute('data-hot')], ['Safe to leave the building', 'OFF · READY', null]);
+    await run.ctx.close();
+
     run = await scripted({ older: true });
     await run.tab.locator('.sb-check[data-check="cues"][data-state="off"]').waitFor();
     assert.match(await run.tab.locator('.sb-check[data-check="cues"]').getAttribute('aria-label'), /^Cue link: No reading\. Not connected\. Console cues do not reach this page\.$/);

@@ -50,7 +50,7 @@ test('the manifest is validated, filtered by audience and put in order', async t
 });
 
 test('no folder, a missing folder and a bad manifest each say what is wrong', async t => {
-  assert.deepEqual(await readKnow(null), { state: 'not-configured', sample: false, items: [] });
+  assert.deepEqual(await readKnow(null), { state: 'not-configured', sample: false, items: [], notices: [] });
   const { dir, outer } = await folder(t);
   assert.equal((await readKnow(dir)).state, 'missing', 'no manifest yet');
   assert.equal((await readKnow(path.join(outer, 'nowhere'))).state, 'missing');
@@ -94,9 +94,30 @@ test('served files carry headers that keep them inert', () => {
   assert.equal(knowHeaders({ mime: 'application/pdf', bytes: 1, type: 'pdf', name: 'a.pdf' })['content-security-policy'], undefined, 'the browser PDF viewer does not run in a sandbox');
 });
 
+test('a notice entry carries a short hold instead of a file: by audience, until its time, at most three', async t => {
+  const { dir } = await folder(t, [
+    { kind: 'notice', text: 'No playback app quit or relaunch until the approved change is saved.', audience: ['show-backup', 'power'], until: '2026-11-19T22:00:00Z' },
+    { kind: 'notice', label: 'Note', text: '  Lane C\nshutter   first.  ', audience: ['show-backup'] },
+    { kind: 'notice', text: 'Long gone.', audience: ['show-backup'], until: '2026-11-18T12:00:00Z' },
+    { kind: 'notice', text: 'For nobody.', audience: ['nobody'] }, { kind: 'notice', text: '', audience: ['power'] }, { kind: 'notice', text: 'x'.repeat(400), audience: ['designer'] },
+    { kind: 'notice', text: 'Fourth.', audience: ['show-backup'] }, { kind: 'notice', text: 'Fifth.', audience: ['show-backup'] },
+    entry('late.md', { title: 'Late' }),
+  ], { 'late.md': '# Late' });
+  const at = Date.parse('2026-11-19T15:00:00Z');
+  const show = await readKnow(dir, { audience: ['show-backup'], now: at });
+  assert.deepEqual(show.items.map(item => item.file), ['late.md'], 'a notice is not a document');
+  assert.deepEqual(show.notices.map(item => [item.label, item.text, item.until]), [
+    ['Hold', 'No playback app quit or relaunch until the approved change is saved.', '2026-11-19T22:00:00.000Z'], ['Note', 'Lane C shutter first.', null], ['Hold', 'Fourth.', null]], 'cleaned, expired one dropped, three at most');
+  assert.deepEqual((await readKnow(dir, { audience: ['power'], now: at })).notices.map(item => item.text), ['No playback app quit or relaunch until the approved change is saved.']);
+  assert.equal((await readKnow(dir, { audience: ['designer'], now: at })).notices[0].text.length, 240);
+  assert.deepEqual((await readKnow(dir, { audience: ['power'], now: Date.parse('2026-11-19T22:00:01Z') })).notices, [], 'past its time it is gone');
+});
+
 test('the sample set is complete, invented and inside the allowed types', async () => {
   const sample = await readKnow(SAMPLES, { sample: true });
   assert.deepEqual([sample.state, sample.sample, sample.items.length], ['configured', true, 5]);
+  assert.deepEqual(sample.notices.map(item => item.label), ['Hold'], 'one sample hold, labelled as a sample');
+  assert.match(sample.notices[0].text, /^Sample hold: /);
   assert.ok(sample.items.every(item => item.available && /^Sample /.test(item.title)), 'every sample is present and labelled as a sample');
   assert.deepEqual(sample.items.map(item => item.type), ['svg', 'md', 'txt', 'json', 'md']);
   const svg = await readFile(path.join(SAMPLES, 'signal-flow.svg'), 'utf8');

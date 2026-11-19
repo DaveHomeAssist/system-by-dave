@@ -48,7 +48,8 @@
   <nav class="sb-tabs" aria-label="Sections">
     <div role="tablist" aria-label="Sections">
       <button type="button" role="tab" id="t-control" aria-controls="control" aria-selected="true">Power</button>
-      <button type="button" role="tab" id="t-know" aria-controls="know" aria-selected="false" tabindex="-1">Know</button>
+      <button type="button" role="tab" id="t-night" aria-controls="night" aria-selected="false" tabindex="-1">Night</button>
+      <button type="button" role="tab" id="t-know" aria-controls="know" aria-selected="false" tabindex="-1">Know<span id="sb-know-count" class="sb-tab__count" hidden></span></button>
     </div>
   </nav>
 
@@ -60,16 +61,23 @@
       <div class="pc-grid" id="pc-root"></div>
     </section>
 
+    <section role="tabpanel" id="night" class="sb-panel sb-panel--night" aria-labelledby="t-night" tabindex="0" hidden>
+      <h2 class="sb-sr">Night power down</h2>
+      <div class="sb-night" id="sb-night"></div>
+    </section>
+
     <section role="tabpanel" id="know" class="sb-panel sb-panel--know" aria-labelledby="t-know" tabindex="0" data-know="list" hidden>
       <div class="sb-know__side">
         <h2 class="sb-sr">Rules and documents</h2>
+        <div id="sb-notices" class="sb-notices" hidden></div>
         <p id="sb-know-status" class="sb-know__status" role="status">Asking the relay for documents.</p>
         <div class="sb-scroll" tabindex="0" aria-label="Rules, diagrams and documents">
           <section class="sb-tips" aria-labelledby="sb-tips-h">
             <h3 id="sb-tips-h" class="sb-know__group">How this page works</h3>
             <ul class="sb-tips__list">
               <li><strong>Morning:</strong> Turn all on. <strong>Night:</strong> Turn all off. One press starts one run for all four, in the right order with the waits built in.</li>
-              <li><strong>Wait for the banner.</strong> "All four on" in the morning. "Safe to leave the building" at night. Until it shows, the run is not finished.</li>
+              <li><strong>Night:</strong> the Night tab shows each lane's expected wait and what it reads now. All off takes about 3 minutes.</li>
+              <li><strong>Wait for the banner.</strong> "All four on" in the morning, about 4 minutes, because the two lamp units are watched for 3 minutes after they light. "Safe to leave the building" at night, only when all four read OFF. Until it shows, the run is not finished.</li>
               <li><strong>If the banner says "Not all four on" or "Not safe to leave yet":</strong> it names the lane. Look at that surface, then call the show backup.</li>
             </ul>
             <h3 class="sb-know__group">Never</h3>
@@ -82,6 +90,8 @@
             <h3 class="sb-know__group">If something is wrong</h3>
             <ul class="sb-tips__list">
               <li><strong>A warning light, a cover error or a lamp message:</strong> photograph the screen and the indicator lights, then call the show backup or the video lead.</li>
+              <li><strong>"Lamp fault" on a lamp unit:</strong> it turned itself off after lighting. The run waits for it to cool and tries once more. If it fails again, it is a service call: photograph any message and call the video lead.</li>
+              <li><strong>Lane C reads deep standby:</strong> the morning power on cannot reach it from this page. Tell the video lead before you leave.</li>
               <li><strong>The relay is not answering:</strong> this page can send nothing. Call the video lead.</li>
             </ul>
           </section>

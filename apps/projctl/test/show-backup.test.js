@@ -226,7 +226,7 @@ test('a document is shown as text: markdown headings become headings and nothing
   assert.deepEqual(textBlocks('line', 'txt'), [{ kind: 'pre', text: 'line' }]);
 });
 
-const PAGE_FILES = ['show.html', 'power.html', 'show.js', 'show-model.js', 'show-know.js', 'show.css', 'projector-control.js', 'projector-control-model.js', 'projector-control.css'];
+const PAGE_FILES = ['show.html', 'power.html', 'show.js', 'show-model.js', 'show-know.js', 'night-timeline.js', 'show.css', 'projector-control.js', 'projector-control-model.js', 'projector-control.css'];
 test('the page sources hold no address, number, name or contact, write only the command and the run, and send no MIDI', async () => {
   const source = {};
   for (const name of PAGE_FILES) source[name] = await readFile(new URL(`../public/${name}`, import.meta.url), 'utf8');
@@ -237,7 +237,7 @@ test('the page sources hold no address, number, name or contact, write only the 
     assert.doesNotMatch(text, /sms:|tel:|mailto:|call for help|snapshot for a text/i, `${name} still carries the help or contact control`);
     assert.doesNotMatch(text, /requestMIDIAccess|MIDIOutput|\.send\(\s*\[/, `${name} can send MIDI`);
   }
-  const scripts = ['show.js', 'show-know.js', 'projector-control.js', 'projector-control-model.js', 'show-model.js'].map(name => source[name]).join('\n');
+  const scripts = ['show.js', 'show-know.js', 'night-timeline.js', 'projector-control.js', 'projector-control-model.js', 'show-model.js'].map(name => source[name]).join('\n');
   const routes = [...scripts.matchAll(/(?:fetch|readJson|postJson|get)\((?:`|')(api\/[a-z-]+(?:\/[a-z-]+)?)/g)].map(match => match[1]);
   assert.deepEqual([...new Set(routes)].sort(), ['api/command', 'api/crew-links', 'api/cue-feed', 'api/host-checks', 'api/host-displays', 'api/know', 'api/power-run', 'api/power-run/plan', 'api/power-run/start', 'api/power-run/stop', 'api/state'], 'relative relay routes only');
   assert.deepEqual([...scripts.matchAll(/postJson\('(api\/[a-z-]+(?:\/[a-z-]+)?)'/g)].map(match => match[1]).sort(), ['api/command', 'api/power-run/plan', 'api/power-run/start', 'api/power-run/stop'], 'the only writes: one lane command, and the plan, start and stop of the relay run');
@@ -247,7 +247,7 @@ test('the page sources hold no address, number, name or contact, write only the 
   assert.deepEqual([...new Set([...scripts.matchAll(/cmd: '(\w+)'/g)].map(match => match[1]))], ['power', 'shutter']);
   assert.doesNotMatch(scripts, /api\/(?:lock|preset|projector|power-schedules|discover|preferred-input|health-reports|logout|sim|picture)/);
   assert.doesNotMatch(scripts, /innerHTML|insertAdjacentHTML|outerHTML|document\.write|eval\(|new Function/, 'nothing is inserted as markup');
-  for (const [name, tabs] of [['show.html', ['control', 'setup', 'midi', 'know']], ['power.html', ['control', 'know']]]) {
+  for (const [name, tabs] of [['show.html', ['control', 'setup', 'midi', 'know']], ['power.html', ['control', 'night', 'know']]]) {
     const html = source[name];
     assert.doesNotMatch(html, /\s(?:src|href)="\/(?!\/)/, `${name}: relative URLs, so the page works behind a path prefix`);
     assert.deepEqual([...html.matchAll(/https?:\/\/[^"'\s<]+/g)].map(match => match[0]).filter(url => !url.startsWith(`http://localhost:8080/${name}`)), [], `${name}: no external host`);
@@ -261,11 +261,13 @@ test('the page sources hold no address, number, name or contact, write only the 
   // Both pages are the same shell: the power page differs only in its role, its words and the tabs it leaves out.
   assert.match(source['power.html'], /<html lang="en" data-theme="light" data-role="power">/);
   assert.match(source['show.html'], /<html lang="en" data-theme="light" data-role="show">/);
-  assert.match(source['show.html'], /open it from Control, lane C/, 'the way back from a dark stage is written on the page');
+  assert.match(source['show.html'], /On lane C, a shutter closed from the playback app may not reopen from there; the Open button on that card is the way back\./, 'the way back from a dark stage is written on the page');
+  assert.match(source['show.html'], /Restart the show computer\.<\/strong> <span class="sb-when">Only on the video lead's word<\/span>/, 'the last rung of the recovery ladder');
+  assert.match(source['power.html'], /<section role="tabpanel" id="night"/, 'the power page carries the night timeline');
 });
 
 test('the relay serves the page with a full head, and hides it behind the login when a passcode is set', async () => {
-  const assets = [['show.js', /javascript/], ['show-model.js', /javascript/], ['show-know.js', /javascript/], ['projector-control.js', /javascript/], ['projector-control-model.js', /javascript/], ['show.css', /text\/css/], ['projector-control.css', /text\/css/]];
+  const assets = [['show.js', /javascript/], ['show-model.js', /javascript/], ['show-know.js', /javascript/], ['night-timeline.js', /javascript/], ['projector-control.js', /javascript/], ['projector-control-model.js', /javascript/], ['show.css', /text\/css/], ['projector-control.css', /text\/css/]];
   const pages = [['show.html', 'Projctl | Show backup'], ['power.html', 'Projctl | Power']];
   const relay = await startRelay();
   try {

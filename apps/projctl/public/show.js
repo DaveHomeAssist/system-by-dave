@@ -5,6 +5,7 @@
 import { createConnectionMonitor } from './projector-connection.js';
 import { createProjectorControl } from './projector-control.js';
 import { createKnow } from './show-know.js';
+import { createNightTimeline } from './night-timeline.js';
 import { STATE_WORDS, STATE_MARKS, SETUP_WORDS, SETUP_MARKS, laneViews, buildChecks, verdictOf, setupCheck, setupBlocked,
   midiTestBlocked, midiTestStart, midiTestStep, midiTestView, midiTestRunning, feedView, clockSeconds } from './show-model.js';
 
@@ -13,9 +14,10 @@ const DISPLAY_POLL_MS = 30000; // the relay caches its display report for 30 s
 const FEED_POLL_MS = 5000;     // the cue feed, while nothing is being tested
 const FEED_TEST_MS = 1000;     // the cue feed, while a MIDI test is waiting
 const FEED_ABSENT_MS = 60000;  // a relay without the route is asked again once a minute
-// Each page lists its own tabs in its markup. The power page has no setup check and no MIDI test.
+const KNOW_POLL_MS = 120000;   // documents and holds are read again every two minutes
+// Each page lists its own tabs in its markup. The power page has a night timeline, no setup check and no MIDI test.
 const ROLE = document.documentElement.dataset.role === 'power' ? 'power' : 'show';
-const TABS = ['control', 'setup', 'midi', 'know'].filter(id => document.getElementById(`t-${id}`));
+const TABS = ['control', 'night', 'setup', 'midi', 'know'].filter(id => document.getElementById(`t-${id}`));
 const has = { setup: TABS.includes('setup'), midi: TABS.includes('midi') };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -73,9 +75,12 @@ async function readJson(route, timeout = 12000) {
 // The power page carries power only and opens on the all-lanes card, where the one on and off button is.
 const control = createProjectorControl({ root: $('#pc-root'), pick: $('#pc-pick'), runRoot: $('#pc-run'), post: body => postJson('api/command', body), run: runHooks, announce: say, relayNow,
   rows: ROLE === 'power' ? ['power'] : ['power', 'shutter'], selected: ROLE === 'power' ? 'ALL' : 'A',
-  sharedNote: 'Shared sign-in: the relay logs the command, not who sent it.' });
+  sharedNote: 'Shared sign-in: the relay logs the command, not who sent it.',
+  // Whoever starts the nightly off from the power page watches it on the night timeline.
+  onRunStarted: direction => { if (direction === 'off' && TABS.includes('night')) showTab('night'); } });
+const night = TABS.includes('night') ? createNightTimeline({ root: $('#sb-night'), onStop: () => control.stop() }) : null;
 const know = createKnow({ panel: $('#know'), list: $('#sb-know-list'), status: $('#sb-know-status'), title: $('#sb-know-title'), tools: $('#sb-know-tools'), stage: $('#sb-know-stage'), back: $('#sb-know-back'),
-  audience: ROLE === 'power' ? 'power' : 'show-backup,designer', onSignedOut: signIn });
+  notices: $('#sb-notices'), count: $('#sb-know-count'), audience: ROLE === 'power' ? 'power' : 'show-backup,designer', onSignedOut: signIn });
 
 // ---- Go or no-go strip: built once, then only text and attributes change, so focus survives.
 const checkNodes = new Map();
@@ -125,6 +130,7 @@ function render() {
   if (openCheck) fillDetail();
 
   control.render({ views: lanes, lock, local, run: powerRun });
+  night?.render({ views: lanes, run: powerRun, now: relayNow() });
   if (has.setup) renderSetup(relayView, lock);
   if (has.midi) renderMidi(relayView, lock, now);
 }
@@ -405,6 +411,8 @@ addEventListener('popstate', () => showTab(location.hash.slice(1), { push: false
 showTab(location.hash.slice(1), { push: false });
 render();
 connect();
+know.load(); // holds from the documents folder show on the Know tab from the start
+setInterval(() => know.load({ force: true }), KNOW_POLL_MS);
 readDisplays();
 setInterval(readDisplays, DISPLAY_POLL_MS);
 setInterval(() => { dropSilentSocket(); render(); }, 1000);

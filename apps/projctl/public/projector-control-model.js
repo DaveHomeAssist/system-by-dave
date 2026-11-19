@@ -56,6 +56,10 @@ export function linkOf(projector) {
 }
 
 const patternIsOff = value => ['00', 'off', '0'].includes(String(value).toLowerCase());
+// Barco Pulse states after an off. READY is the target: the morning power on can reach it. STANDBY and
+// ECO are deep standby, where the projector's network is down. Researched, not yet tested on a rig.
+export const DEEP_STANDBY = Object.freeze(['standby', 'eco']);
+export const DEEP_STANDBY_TEXT = 'Deep standby: the morning power on cannot reach it.';
 const BLOCKED = {
   connecting: 'Waiting for the relay.',
   'relay-offline': 'Relay not answering. Check by eye.',
@@ -69,7 +73,7 @@ function blockedLane(base, reach, fresh) {
   const connecting = reach === 'connecting';
   return { ...base, reach, tone: connecting ? 'off' : 'eye', headline: connecting ? 'CONNECTING' : 'CHECK BY EYE', word: connecting ? 'WAIT' : 'EYE', power: null, shutter: null, lit: false,
     shutterText: 'Not reported', inputText: 'Not reported', inputFlag: null, input: null, expectedInput: null, patternText: 'Not reported', patternFlag: null, pattern: null,
-    link: null, freshText: fresh, alarm: null, alarmsReported: false, flags: [], blocked: BLOCKED[reach] };
+    link: null, freshText: fresh, alarm: null, alarmsReported: false, raw: null, deepStandby: false, caution: null, flags: [], blocked: BLOCKED[reach] };
 }
 
 // One view per drawing lane A to D. `monitor` is createConnectionMonitor() from projector-connection.js.
@@ -97,6 +101,8 @@ export function laneViews(snapshot, { relayConnected = false, everConnected = fa
     const alarmsReported = reported('errors') && ALARMS.some(([key]) => [0, 1, 2].includes(s.errors?.[key]));
     const alarm = alarmsReported ? alarmSummary(s.errors) : null;
     const lit = power === 'on';
+    const raw = reported('power') && typeof s.rawState === 'string' && /^[a-z]{1,20}$/.test(s.rawState) ? s.rawState : null;
+    const deepStandby = power === 'off' && DEEP_STANDBY.includes(raw);
 
     // Input and pattern are read only. They explain a wrong or blue picture; this page never changes them.
     const names = p.inputs && typeof p.inputs === 'object' && !Array.isArray(p.inputs) ? p.inputs : {};
@@ -108,14 +114,14 @@ export function laneViews(snapshot, { relayConnected = false, everConnected = fa
     const patternOn = pattern != null && !patternIsOff(pattern);
     const patternName = patternOn ? String(p.patterns?.[pattern] || pattern).slice(0, 24) : null;
 
-    const flags = [...(alarm ? [lower(alarm.text)] : []), ...(lit && patternOn ? ['test pattern on'] : []), ...(lit && inputFlag ? [`input ${inputName}`] : [])];
+    const flags = [...(alarm ? [lower(alarm.text)] : []), ...(deepStandby ? ['deep standby'] : []), ...(lit && patternOn ? ['test pattern on'] : []), ...(lit && inputFlag ? [`input ${inputName}`] : [])];
     return { ...base, reach: 'live', tone: !lit || flags.length ? 'attention' : 'ok',
       headline: power === 'unknown' ? 'POWER UNKNOWN' : power.toUpperCase(), word: power === 'unknown' ? '?' : power === 'warming' ? 'WARM' : power === 'cooling' ? 'COOL' : power.toUpperCase(),
       power, shutter, lit,
       shutterText: shutter === 'unknown' ? 'Not reported' : lit && shutter === 'closed' ? 'CLOSED · dark on stage' : shutter.toUpperCase(),
       input, expectedInput: want, inputText: inputName ?? 'Not reported', inputFlag,
       pattern, patternText: pattern == null ? 'Not reported' : patternOn ? `ON · ${patternName}` : 'Off', patternFlag: patternOn ? 'Test pattern is on' : null,
-      link: linkOf(p), freshText: `Reply ${lower(c.ageLabel)}`, alarm, alarmsReported, flags, blocked: null };
+      link: linkOf(p), freshText: `Reply ${lower(c.ageLabel)}`, alarm, alarmsReported, raw, deepStandby, caution: deepStandby ? `${raw.toUpperCase()}. ${DEEP_STANDBY_TEXT}` : null, flags, blocked: null };
   });
 }
 

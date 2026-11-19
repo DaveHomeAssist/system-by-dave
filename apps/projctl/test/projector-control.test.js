@@ -42,6 +42,16 @@ test('a current reply shows power, shutter, input, pattern and link; a lost one 
   assert.deepEqual([lanes.C.inputText, lanes.C.input, lanes.C.shutterText], ['Not reported', null, 'CLOSED · dark on stage']);
 });
 
+test('the Barco shows its raw state; deep standby is flagged on the card, READY is not', () => {
+  const list = byLane(views(rig(projector('P3', 'C', { power: 'off', rawState: 'eco', shutter: 'unknown' }), projector('P2', 'B', { power: 'off', rawState: 'ready' }), projector('P1', 'A', { power: 'off', rawState: 'Weird state!' }))));
+  assert.deepEqual([list.C.raw, list.C.deepStandby, list.C.caution, list.C.tone], ['eco', true, 'ECO. Deep standby: the morning power on cannot reach it.', 'attention']);
+  assert.ok(list.C.flags.includes('deep standby'));
+  assert.deepEqual([list.B.raw, list.B.deepStandby, list.B.caution], ['ready', false, null]);
+  assert.equal(list.A.raw, null, 'only a plain word is shown');
+  const lost = byLane(views(rig({ ...held('P3', 'C'), status: { ...held('P3', 'C').status, power: 'off', rawState: 'eco' } })));
+  assert.deepEqual([lost.C.raw, lost.C.caution], [null, null], 'no current reply, no raw state');
+});
+
 test('the link is named from what the driver reports, and only the control port carries the "power untested" tag', () => {
   const link = (driver, controlLink) => linkOf({ driver, status: { controlLink } });
   const plain = (id, label) => ({ id, label, caution: null, cautionText: null });

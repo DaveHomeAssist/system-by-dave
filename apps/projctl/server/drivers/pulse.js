@@ -148,7 +148,9 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       // unsupported, but total transport failure must reach the relay's offline policy.
       const read = (property) => rpc('property.get', { property }, timeoutMs, undefined, signal);
       const optional = async (fn, fallback) => { try { return await fn(); } catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; return fallback; } };
-      const s = { online: true, power: mapPower(await read('system.state')) };
+      const state = String(await read('system.state')).toLowerCase();
+      // The raw state stays beside the mapped power: READY can be woken from the network, STANDBY and ECO cannot.
+      const s = { online: true, power: mapPower(state), rawState: /^[a-z]{1,20}$/.test(state) ? state : null };
       await discover(signal);
       s.errors = null; // Pulse alarm telemetry is not implemented; unknown is not clear.
       s.shutter = await optional(async () => { const sh = String(await read('optics.shutter.target')).toLowerCase(); return sh === 'closed' ? SHUTTER.CLOSED : sh === 'open' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; }, SHUTTER.UNKNOWN);

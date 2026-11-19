@@ -1,5 +1,17 @@
 # Changelog
 
+## Projctl role pages: the rig's daily order of operations, 2026-11-19
+
+Applies the November 19 order of operations research to the role pages on the owner's word ("apply to crew dashboards", relayed). Simulator and fixtures only; not installed. Waits and behaviours from the research are labelled "researched, not yet tested" on the pages.
+
+- **The all-four run** (`apps/projctl/server/power-run.js`): fresh reads of every unit it waits on every 10 s through the relay's own poller; morning lamp units staggered about 10 s apart and watched for 3 minutes; a lamp that turns itself off is retried once after OFF plus 75 s, then stopped with an alert; never an on to a Panasonic that reads COOLING; nothing, not even a read, to a lamp unit in the minute after its on command; the night waits up to 240 s and names any unit not OFF; "sent, not confirmed" instead of success when a unit does not report. The night order is unchanged pending SD-1.
+- **The Barco's raw state**: the Pulse driver keeps `rawState` beside the mapped power, and the simulator reports it for a Barco model. Deep standby (STANDBY or ECO) is shown as a caution on the lane card and in the run's end message; a Barco reading OFF or cooling is never sent a second off.
+- **Night timeline** (`public/night-timeline.js`, a Night tab on `power.html`): one row per lane in the off order with its expected wait (lamp units about 170 s, top laser about 5 s, Barco about 30 s to READY) and its live reading, "All off, about 3 min", "Never cut mains while a lamp unit is cooling", and "Safe to leave the building" only when all four read OFF. The page that starts the nightly off moves to it.
+- **Recovery ladder** on `show.html`, least disruptive first: shutter, input, power cycle one projector, relaunch the playback app, restart the show computer, each with when it is allowed.
+- **Holds**: a Know manifest entry of kind `notice` shows a short hold above the list until its `until` time, with a mark on the Know tab. Date-specific holds live in the private folder, not in the page.
+- **Know samples**: the power-up and recovery samples carry the morning check of the show computer, photographing a lamp message, the once-only Panasonic STANDBY MODE check, and two-show days.
+- Shared files: `server/index.js` (the run gets the poller's refresh), `server/drivers/pulse.js`, `server/drivers/simulator.js`, `server/drivers/index.js`.
+
 ## Projctl role pages: one shared on and off control and one all-four run, 2026-11-18
 
 - **One run in the relay.** `server/power-run.js` runs "all four on" and "all four off" once, in the relay, with one state every page reads. A second press from any page meets the run in progress. Fixed order (on: C, B, A, D; off: A, D, B, C), each unit read before it is commanded, at most one command per unit, the waits from the manuals inside it, and a banner ("All four on" or "Safe to leave the building") only when every lane's own reply supports it. Routes: `GET /api/power-run`, `POST /api/power-run/plan`, `/start` and `/stop`, behind the sign-in.

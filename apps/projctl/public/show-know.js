@@ -30,7 +30,8 @@ export function textBlocks(text, type) {
   return blocks;
 }
 
-export function createKnow({ panel, list, status, title, tools, stage, back, audience = 'show-backup,designer', onSignedOut = () => {} }) {
+// notices and count are optional: where a hold from the documents folder is shown, and the tab's mark for it.
+export function createKnow({ panel, list, status, title, tools, stage, back, notices = null, count = null, audience = 'show-backup,designer', onSignedOut = () => {} }) {
   let items = [], current = null, zoom = { mode: 'fit', scale: 1 }, loadedAt = 0, token = 0;
 
   async function get(url, as) {
@@ -130,7 +131,22 @@ export function createKnow({ panel, list, status, title, tools, stage, back, aud
     (list.querySelector('button[aria-current="true"]') || list.querySelector('button'))?.focus();
   });
 
+  function drawNotices(answer) {
+    const shown = (Array.isArray(answer?.notices) ? answer.notices : []).filter(item => item && typeof item.text === 'string' && item.text.trim()).slice(0, 3);
+    if (notices) {
+      notices.replaceChildren(...shown.map(item => { const line = el('p', { class: 'sb-notice', role: 'note' }); line.append(el('strong', {}, `${String(item.label || 'Hold').slice(0, 24)}: `), item.text.slice(0, 240)); return line; }));
+      notices.hidden = !shown.length;
+    }
+    if (count) {
+      count.textContent = shown.length ? '!' : '';
+      count.hidden = !shown.length;
+      count.setAttribute('aria-hidden', 'true');
+      const tab = count.closest('[role="tab"]');
+      if (tab) { if (shown.length) tab.setAttribute('aria-label', `Know, ${shown.length} ${shown.length === 1 ? 'hold' : 'holds'}`); else tab.removeAttribute('aria-label'); }
+    }
+  }
   function draw(answer) {
+    drawNotices(answer);
     items = (Array.isArray(answer?.items) ? answer.items : []).filter(item => item && typeof item.title === 'string' && safeFile(item.file) && Object.hasOwn(TYPES, item.type));
     const words = { 'not-configured': 'No documents folder is set up on the relay.', missing: 'The documents folder or its list is not there.', invalid: 'The documents list could not be read.', unreadable: 'The documents folder could not be read.' };
     if (answer?.state !== 'configured') status.textContent = words[answer?.state] || 'The relay did not send a documents list.';

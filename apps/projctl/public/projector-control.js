@@ -27,7 +27,7 @@ export const RUN_LABELS = Object.freeze({
   attention: Object.freeze({ on: 'Not all four on', off: 'Not safe to leave yet' }),
   stopped: 'Run stopped', interrupted: 'Run interrupted',
 });
-const STEP_MARK = { pending: '·', checking: '…', sending: '…', sent: '…', striking: '…', reported: '✓', already: '✓', failed: '!', unreported: '!', none: '!' };
+const STEP_MARK = { pending: '·', checking: '…', sending: '…', sent: '…', striking: '…', watching: '…', fault: '!', reported: '✓', already: '✓', failed: '!', unreported: '!', none: '!' };
 
 function el(tag, attrs = {}, text) {
   const node = document.createElement(tag);
@@ -40,8 +40,9 @@ const mark = (node, name, value) => { if (value == null) node.removeAttribute(na
 const reveal = (node, visible) => { if (node.hidden === visible) node.hidden = !visible; };
 const no = reason => ({ enabled: false, reason, note: '', ready: [], skipped: [] });
 
+// onRunStarted(direction) is told when this page started a run (another page's run does not call it).
 export function createProjectorControl({ root, pick = null, runRoot = null, post, run: runHooks = null, rows = ['power', 'shutter'], selected: firstShown = 'A',
-  announce = () => {}, relayNow = () => Date.now(), policy = DEFAULT_POLICY, sharedNote = '' }) {
+  announce = () => {}, relayNow = () => Date.now(), policy = DEFAULT_POLICY, sharedNote = '', onRunStarted = () => {} }) {
   const cards = new Map(), ops = new Map(), notes = new Map();
   const ids = ACTION_IDS.filter(id => rows.includes(ACTIONS[id].row));
   let views = [], lock = null, selected = KEYS.includes(firstShown) ? firstShown : 'A';
@@ -265,7 +266,7 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     cards.get(ALL).buttons[op.action].focus();
     let reply;
     try { reply = await runHooks.start(op.direction, op.token); } catch { reply = null; }
-    if (reply && reply.status >= 200 && reply.status < 300) { ops.delete(ALL); adopt(reply.body); announce(`${RUN_LABELS.running[op.direction]}. Every page shows this run.`); }
+    if (reply && reply.status >= 200 && reply.status < 300) { ops.delete(ALL); adopt(reply.body); announce(`${RUN_LABELS.running[op.direction]}. Every page shows this run.`); onRunStarted(op.direction); }
     else if (reply?.status === 409 && reply.body?.run) { ops.delete(ALL); adopt(reply.body); note(ALL, 'A run is already in progress.'); }
     else finish(op, 'error', reply ? `Not started: ${reply.status === 401 ? 'signed out. Sign in again.' : reply.body?.error || `the relay refused it (${reply.status})`}` : 'No answer from the relay. Check whether a run started.', { sticky: true });
     render();
@@ -365,7 +366,7 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     const kind = run.state === 'running' ? 'running' : run.state === 'done' ? 'done' : run.state === 'attention' ? 'attention' : run.state === 'interrupted' ? 'interrupted' : 'stopped';
     const title = kind === 'running' ? RUN_LABELS.running[run.direction] : kind === 'done' ? run.banner || RUN_LABELS.done[run.direction] : kind === 'attention' ? RUN_LABELS.attention[run.direction] : RUN_LABELS[kind];
     const steps = Array.isArray(run.steps) ? run.steps : [];
-    const live = steps.find(step => ['checking', 'sending', 'sent', 'striking'].includes(step.state));
+    const live = steps.find(step => ['checking', 'sending', 'sent', 'striking', 'fault'].includes(step.state)) || steps.find(step => step.state === 'watching');
     const ended = clockShort(run.endedAt);
     const text = kind === 'running' ? (live ? `${live.lane} · ${live.surface}: ${live.note}` : run.message || 'Starting')
       : `${run.message || ''}${ended ? ` ${kind === 'done' ? 'Finished' : 'Ended'} ${ended}.` : ''}`.trim();
@@ -378,7 +379,7 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     for (const step of steps) {
       let chip = banner.chips.get(step.lane);
       if (!chip) { chip = el('li', { class: 'pc-run__step', 'data-lane': step.lane }); banner.chips.set(step.lane, chip); }
-      const state = step.confirmed ? 'ok' : ['failed', 'unreported', 'none'].includes(step.state) ? 'bad' : ['pending'].includes(step.state) ? 'idle' : ['reported', 'already'].includes(step.state) ? 'part' : 'busy';
+      const state = step.confirmed ? 'ok' : ['failed', 'unreported', 'none', 'fault'].includes(step.state) ? 'bad' : ['pending'].includes(step.state) ? 'idle' : ['reported', 'already'].includes(step.state) ? 'part' : 'busy';
       mark(chip, 'data-state', state);
       put(chip, `${step.lane} ${step.confirmed ? '✓' : STEP_MARK[step.state] || '·'}`);
       mark(chip, 'title', `${step.lane} · ${step.surface}: ${step.note}${step.confirmed ? ' · confirmed' : ''}`);
@@ -412,8 +413,9 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
       put(nodes.fact.link.value, view.link ? `${view.link.label}${view.link.caution ? ` · ${view.link.caution}` : ''}` : 'Not reported');
       mark(nodes.fact.link.wrap, 'data-flag', view.link?.caution ? '' : null);
       mark(nodes.fact.link.wrap, 'title', view.link?.cautionText || null);
-      reveal(nodes.alarm, !!view.alarm);
-      put(nodes.alarm, view.alarm ? `${view.alarm.text} reported` : '');
+      reveal(nodes.alarm, !!(view.alarm || view.caution));
+      put(nodes.alarm, view.alarm ? `${view.alarm.text} reported` : view.caution || '');
+      mark(nodes.alarm, 'data-kind', view.alarm ? 'alarm' : view.caution ? 'caution' : null);
       // A lit lane with a closed shutter is dark on stage: its Open button is the way back, so it stands out.
       const dark = rows.includes('shutter') && view.reach === 'live' && view.lit && view.shutter === 'closed';
       if (nodes.buttons['shutter-open']) mark(nodes.buttons['shutter-open'], 'data-recover', dark ? '' : null);
@@ -450,6 +452,8 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
 
   return {
     render,
+    stop: () => stopRun(),
+    get run() { return runState; },
     select(key) { if (KEYS.includes(key)) { selected = key; render(); } },
     get selected() { return selected; },
     // Escape withdraws whatever is armed. Returns true when something was.

@@ -14,8 +14,9 @@ const T0 = Date.parse('2026-11-18T23:00:00Z');
 const settle = () => delay(0); // let a sent command's promise resolve
 // The rig as the run sees it: C is the laser unit on its own driver, B a laser Panasonic, A and D lamp Panasonics.
 // aged: the relay has been watching these units for ten minutes, so no state counts as just entered.
-function bench({ power = {}, refuse = {}, lock = false, file = null, react = true, aged = true } = {}) {
-  const b = { t: T0, T: T0, sent: [], lock, changes: [], refuse,
+// extra: more status fields per slot (rawState, lightHours, errors). asked: the fresh reads the run asked for.
+function bench({ power = {}, refuse = {}, lock = false, file = null, react = true, aged = true, extra = {} } = {}) {
+  const b = { t: T0, T: T0, sent: [], asked: [], lock, changes: [], refuse, extra,
     projectors: [
       { slot: 'P1', lane: 'C', driver: 'pulse', ip: 'c', model: 'UDM 4K22' }, { slot: 'P2', lane: 'B', driver: 'panasonic', ip: 'b', model: 'PT-RZ970' },
       { slot: 'P3', lane: 'A', driver: 'panasonic', ip: 'a', model: 'PT-DW830U' }, { slot: 'P4', lane: 'D', driver: 'panasonic', ip: 'd', model: 'PT-DW830U' }],
@@ -23,7 +24,8 @@ function bench({ power = {}, refuse = {}, lock = false, file = null, react = tru
   b.slot = lane => b.projectors.find(p => p.lane === lane).slot;
   b.run = createPowerRun({
     projectors: () => b.projectors, locked: () => b.lock, revision: p => `${p.slot}:${p.ip}:${p.model}`, now: () => b.t, file, interval: () => null, clearTimer: () => {},
-    status: slot => ({ power: b.state[slot], online: !b.silent.has(slot), connection: { state: b.silent.has(slot) ? 'reconnecting' : 'online', lastSuccessAt: new Date(b.silent.has(slot) ? b.t - 600000 : b.t - 1000).toISOString() } }),
+    status: slot => ({ power: b.state[slot], ...b.extra[slot], online: !b.silent.has(slot), connection: { state: b.silent.has(slot) ? 'reconnecting' : 'online', lastSuccessAt: new Date(b.silent.has(slot) ? b.t - 600000 : b.t - 1000).toISOString() } }),
+    refresh: async slot => { b.asked.push([slot, b.t - b.T]); },
     power: async (slot, on) => { b.sent.push([slot, on ? 'on' : 'off', b.t - b.T]); if (b.refuse[slot]) throw new Error(b.refuse[slot]); if (react) b.state[slot] = on ? 'warming' : 'cooling'; },
     changed: view => b.changes.push(view) });
   if (aged) { b.run.observe(); b.t += 600000; b.T = b.t; }
@@ -38,10 +40,12 @@ test('the order, the banners and the waits are fixed in one place', () => {
   assert.deepEqual(RUN_ORDER, { on: ['C', 'B', 'A', 'D'], off: ['A', 'D', 'B', 'C'] });
   assert.deepEqual(RUN_BANNER, { on: 'All four on', off: 'Safe to leave the building' });
   assert.deepEqual([RUN_RULES.quietAfterLitMs, RUN_RULES.relightMs, RUN_RULES.planMs], [60000, 75000, 10000]);
+  // From the rig's daily order of operations (researched, not yet tested on a rig).
+  assert.deepEqual([RUN_RULES.readEveryMs, RUN_RULES.staggerMs, RUN_RULES.lampWatchMs, RUN_RULES.lampRetries, RUN_RULES.settleMs.off], [10000, 10000, 180000, 1, 240000]);
 });
 
-test('an on run goes C, B, A, D, one unit at a time, and says "All four on" only when all four report ON', async () => {
-  const b = bench();
+test('an on run goes C, B, A, then D about 10 s after A, and says "All four on" only once the lamps have stayed lit 3 minutes', async () => {
+  const b = bench({ extra: { P3: { lightHours: 1234, errors: { lamp: 0 } } } });
   const plan = b.run.plan('on');
   assert.deepEqual(plan.steps.map(step => [step.lane, step.intent, step.slot]), [['C', 'send', 'P1'], ['B', 'send', 'P2'], ['A', 'send', 'P3'], ['D', 'send', 'P4']]);
   assert.deepEqual([plan.banner, plan.expiresInMs, typeof plan.confirm], ['All four on', 10000, 'string']);
@@ -54,24 +58,32 @@ test('an on run goes C, B, A, D, one unit at a time, and says "All four on" only
   assert.deepEqual(b.sent.map(item => item[0]), ['P1', 'P2']);
   await b.step();
   assert.deepEqual(b.sent.map(item => item[0]), ['P1', 'P2', 'P3']);
-  // A is a lamp unit: D waits until A reports ON, not just WARMING.
-  for (let i = 0; i < 20; i++) await b.step(1000);
-  assert.deepEqual(b.sent.map(item => item[0]), ['P1', 'P2', 'P3'], 'D is held while A strikes');
-  assert.deepEqual([b.steps().A.state, b.steps().A.note, b.steps().D.state], ['striking', 'Reported WARMING. Waiting for ON before the next unit', 'pending']);
-  b.state.P3 = 'on';
-  await b.step(); await b.step();
+  const aSent = b.sent[2][2];
+  // A is a lamp unit: D goes about 10 s after A's on command, without waiting for A to light.
+  for (let i = 0; i < 8; i++) await b.step(1000);
+  assert.deepEqual(b.sent.map(item => item[0]), ['P1', 'P2', 'P3'], 'D waits out the 10 s');
+  assert.deepEqual(b.steps().A.state, 'watching');
+  assert.match(b.steps().A.note, /^Sent\. Nothing more to it for \d+ s$/);
+  for (let i = 0; i < 3; i++) await b.step(1000);
   assert.deepEqual(b.sent.map(item => [item[0], item[1]]), [['P1', 'on'], ['P2', 'on'], ['P3', 'on'], ['P4', 'on']]);
-  // Every unit has had its command. No banner until each one reports ON.
-  b.state.P1 = 'on'; b.state.P2 = 'on';
-  for (let i = 0; i < 5; i++) await b.step(1000);
+  assert.ok(b.sent[3][2] - aSent >= 10000 && b.sent[3][2] - aSent <= 11000, 'D about 10 s after A');
+  // Every unit has had its command. C and B light; the lamps light but are watched for 3 minutes.
+  b.state.P1 = 'on'; b.state.P2 = 'on'; b.state.P3 = 'on'; b.state.P4 = 'on';
+  for (let i = 0; i < 175; i++) await b.step(1000);
   let view = b.run.view();
-  assert.deepEqual([view.active, view.run.banner, b.steps().D.state], [true, null, 'striking'], 'three lit and one striking is not "all four on"');
-  b.state.P4 = 'on';
-  await b.step();
+  assert.deepEqual([view.active, view.run.banner, b.steps().A.state, b.steps().D.state], [true, null, 'reported', 'watching'], 'A has stayed lit 3 minutes; D has not yet');
+  assert.equal(b.steps().A.note, 'Reported ON and stayed on for 3 minutes. Lamp hours 1234; no lamp error.');
+  assert.match(b.steps().D.note, /^Reports ON\. Watching the lamp for \d+ s more; lamp state not reported$/);
+  for (let i = 0; i < 12; i++) await b.step(1000);
   view = b.run.view();
   assert.deepEqual([view.active, view.run.state, view.run.banner, view.run.message], [false, 'done', 'All four on', 'Every lane reports ON.']);
   assert.equal(b.sent.length, 4, 'one command per unit');
   assert.equal(b.states(), 'C:reported B:reported A:reported D:reported');
+  // Nothing at all, not even a read from the run, reached a lamp unit in the minute after its on command.
+  for (const [slot, sentAt] of [['P3', aSent], ['P4', b.sent[3][2]]]) {
+    assert.equal(b.asked.some(([asked, at]) => asked === slot && at > sentAt && at < sentAt + 60000), false, `${slot} left alone for 60 s`);
+    assert.ok(b.asked.some(([asked, at]) => asked === slot && at >= sentAt + 60000), `${slot} read after its quiet minute`);
+  }
   assert.equal(JSON.stringify(view).includes('identity'), false, 'pages do not get the relay\'s bookkeeping');
   assert.ok(b.changes.length > 4 && b.changes.at(-1).run.banner === 'All four on', 'every page is told as the run moves');
 });
@@ -89,6 +101,8 @@ test('an off run starts the lamp units first, sends one command each, and waits 
   for (let i = 0; i < 180; i++) await b.step(1000);
   let view = b.run.view();
   assert.deepEqual([view.active, view.run.banner, view.run.message, b.sent.length], [true, null, 'Waiting for A, D to report OFF', 4]);
+  const reads = b.asked.filter(([slot]) => slot === 'P3').map(([, at]) => at);
+  assert.ok(reads.length >= 17 && reads.every((at, i) => i === 0 || at - reads[i - 1] >= 10000), 'A is read every 10 s while the run waits for OFF');
   b.state.P3 = 'off'; b.state.P4 = 'off';
   await b.step();
   view = b.run.view();
@@ -142,9 +156,8 @@ test('a lamp unit is not relit while cooling, nor inside 75 seconds of going off
   assert.match(b.steps().A.note, /^Went off \d+ s ago\. Waiting \d+ s before relight$/);
   for (let i = 0; i < 8; i++) await b.step(1000);
   assert.deepEqual(b.sent.map(item => item[0]), ['P3']);
-  b.state.P3 = 'on';
-  for (let i = 0; i < 3; i++) await b.step(1000);
-  assert.deepEqual(b.sent.map(item => item[0]), ['P3', 'P4'], 'D had been off long enough by then');
+  for (let i = 0; i < 11; i++) await b.step(1000);
+  assert.deepEqual(b.sent.map(item => item[0]), ['P3', 'P4'], 'D had been off long enough by then, and goes about 10 s after A');
   // A laser Panasonic has no relight wait.
   const laser = bench({ power: { P1: 'on', P2: 'off', P3: 'on', P4: 'on' }, aged: false });
   laser.run.observe(); laser.t += 5000;
@@ -173,10 +186,11 @@ test('a refused command is shown in the relay\'s words and never sent twice; a s
   b.state.P1 = 'warming';
   for (let i = 0; i < 4; i++) await b.step();
   assert.deepEqual([b.steps().B.state, b.steps().B.note], ['failed', 'Not done: P2: no fresh projector reply. Wait for reconnection.']);
-  // A accepted the command but never reports: after 45 s the run moves on and says so.
-  for (let i = 0; i < 100; i++) await b.step();
-  assert.deepEqual([b.steps().A.state, b.steps().A.note], ['unreported', 'Sent, but it has not reported. Check by eye.']);
+  for (let i = 0; i < 11; i++) await b.step(1000);
   b.state.P1 = 'on'; b.state.P4 = 'on';
+  // A accepted the command but never reports: it is watched for 3 minutes, then the run says so.
+  for (let i = 0; i < 200; i++) await b.step(1000);
+  assert.deepEqual([b.steps().A.state, b.steps().A.note], ['unreported', 'Sent, not confirmed: reports OFF after 3 minutes. Check by eye.']);
   for (let i = 0; i < 700; i++) await b.step(1000);
   assert.deepEqual(b.sent.map(item => item[0]), ['P1', 'P2', 'P3', 'P4'], 'each unit was asked once, the refused one included');
   assert.deepEqual([b.run.view().run.state, b.run.view().run.banner], ['attention', null]);
@@ -238,7 +252,7 @@ test('the confirm is one use, short lived, and bound to the direction and the pr
   three.projectors[3].lane = '';
   assert.deepEqual(three.run.plan('on').steps[3], { lane: 'D', surface: 'SR Portal', slot: null, model: '', intent: 'none', note: 'No projector on this lane' });
   await three.go('on');
-  for (let i = 0; i < 12; i++) { await three.step(); for (const slot of ['P1', 'P2', 'P3']) if (three.state[slot] === 'warming') three.state[slot] = 'on'; }
+  for (let i = 0; i < 400; i++) { await three.step(1000); for (const slot of ['P1', 'P2', 'P3']) if (three.state[slot] === 'warming') three.state[slot] = 'on'; }
   assert.deepEqual([three.run.view().run.state, three.run.view().run.banner, three.run.view().run.message], ['attention', null, 'Not confirmed ON: D (no projector). Check by eye.']);
   assert.deepEqual(three.sent.map(item => item[0]), ['P1', 'P2', 'P3']);
 });
@@ -254,6 +268,87 @@ test('a unit read in its end state stays confirmed if it then stops answering', 
   b.state.P2 = 'off'; b.state.P3 = 'off'; b.state.P4 = 'off';
   for (let i = 0; i < 3; i++) await b.step();
   assert.deepEqual([b.run.view().run.state, b.run.view().run.banner], ['done', 'Safe to leave the building']);
+});
+
+test('morning: a lamp that shuts itself off is retried once after OFF plus 75 s, then the run stops and alerts', async () => {
+  const b = bench();
+  await b.go('on');
+  for (let i = 0; i < 2; i++) await b.step();
+  const aSent = b.sent.find(item => item[0] === 'P3')[2];
+  b.state.P1 = 'on'; b.state.P2 = 'on'; b.state.P3 = 'on';
+  for (let i = 0; i < 12; i++) await b.step(1000);
+  b.state.P4 = 'on';
+  for (let i = 0; i < 80; i++) await b.step(1000);
+  b.state.P3 = 'cooling';                             // 93 s after its on command, A turns itself off
+  await b.step(1000);
+  assert.equal(b.steps().A.state, 'fault');
+  assert.match(b.steps().A.note, /^Lamp fault: it turned itself off \d+ s after the on command\. Waiting for OFF, then 75 s, then one retry\. Photograph any lamp message\.$/);
+  // Never an on while it reads COOLING, however long that takes.
+  for (let i = 0; i < 150; i++) await b.step(1000);
+  assert.equal(b.sent.filter(item => item[0] === 'P3').length, 1, 'nothing sent while cooling');
+  b.state.P3 = 'off';
+  for (let i = 0; i < 70; i++) await b.step(1000);
+  assert.equal(b.sent.filter(item => item[0] === 'P3').length, 1, 'and not inside 75 s of OFF');
+  assert.match(b.steps().A.note, /^Lamp fault\. Reads OFF; one retry in \d+ s\. Photograph any lamp message\.$/);
+  for (let i = 0; i < 8; i++) await b.step(1000);
+  const retries = b.sent.filter(item => item[0] === 'P3');
+  assert.equal(retries.length, 2, 'one retry');
+  assert.ok(retries[1][2] - aSent >= 93000 + 150000 + 75000, 'the retry waited for OFF plus 75 s');
+  assert.equal(b.steps().A.state, 'watching');
+  b.state.P3 = 'on';
+  for (let i = 0; i < 70; i++) await b.step(1000);
+  b.state.P3 = 'cooling';                             // and again
+  for (let i = 0; i < 3; i++) await b.step(1000);
+  assert.deepEqual([b.steps().A.state, b.steps().A.alert, b.steps().A.note], ['failed', true, 'Lamp fault again: it turned itself off after the retry. Stopped. Photograph any lamp message. This is a service call.']);
+  for (let i = 0; i < 400; i++) await b.step(1000);
+  const view = b.run.view();
+  assert.deepEqual([view.run.state, view.run.banner, view.run.message], ['attention', null, 'Not confirmed ON: A (lamp fault, a service call). Check by eye.']);
+  assert.equal(b.sent.filter(item => item[0] === 'P3').length, 2, 'no third try');
+  assert.equal(b.steps().D.state, 'reported', 'D was handled on its own');
+});
+
+test('night: the Barco gets one off; deep standby is named; a lane that does not reach OFF in 240 s is named', async () => {
+  const b = bench({ power: { P1: 'on', P2: 'on', P3: 'on', P4: 'on' }, extra: { P1: { rawState: 'on' } } });
+  await b.go('off');
+  for (let i = 0; i < 4; i++) await b.step();
+  assert.deepEqual(b.sent.map(item => item[0]), ['P3', 'P4', 'P2', 'P1']);
+  b.extra.P1.rawState = 'deconditioning';
+  for (let i = 0; i < 20; i++) await b.step(1000);
+  b.state.P1 = 'off'; b.extra.P1.rawState = 'eco'; b.state.P2 = 'off'; b.state.P3 = 'off'; b.state.P4 = 'off';
+  for (let i = 0; i < 3; i++) await b.step(1000);
+  let view = b.run.view();
+  assert.deepEqual([view.run.state, view.run.banner], ['done', 'Safe to leave the building'], 'deep standby is still off');
+  assert.equal(view.run.message, 'Every lane reports OFF. C is in deep standby: the morning power on from this page cannot reach it. Wake it at the unit.');
+  assert.equal(b.sent.filter(item => item[0] === 'P1').length, 1, 'one off to the Barco, never a second');
+  // Next night the Barco already reads off in deep standby: the plan says so and sends it nothing.
+  const next = bench({ power: { P1: 'off', P2: 'on', P3: 'on', P4: 'on' }, extra: { P1: { rawState: 'standby' } } });
+  assert.deepEqual(next.run.plan('off').steps[3].note, 'Already OFF (deep standby). Nothing will be sent');
+  // A lamp unit still cooling at 240 s is named; nothing is sent to it again.
+  const slow = bench({ power: { P1: 'on', P2: 'on', P3: 'on', P4: 'on' } });
+  await slow.go('off');
+  for (let i = 0; i < 4; i++) await slow.step();
+  slow.state.P1 = 'off'; slow.state.P2 = 'off'; slow.state.P3 = 'off';
+  for (let i = 0; i < 245; i++) await slow.step(1000);
+  view = slow.run.view();
+  assert.deepEqual([view.run.state, view.run.banner, view.run.message], ['attention', null, 'Not confirmed OFF: D (reports COOLING). Check by eye.']);
+  assert.equal(slow.sent.length, 4);
+  // After an off, a Barco that drops off the network before reading off may be in deep standby.
+  const quiet = bench({ power: { P1: 'on', P2: 'on', P3: 'on', P4: 'on' } });
+  await quiet.go('off');
+  for (let i = 0; i < 4; i++) await quiet.step();
+  quiet.silent.add('P1'); quiet.state.P2 = 'off'; quiet.state.P3 = 'off'; quiet.state.P4 = 'off';
+  for (let i = 0; i < 245; i++) await quiet.step(1000);
+  assert.equal(quiet.run.view().run.message, 'Not confirmed OFF: C (no current reply; it may be in deep standby). Check by eye.');
+});
+
+test('morning: a Barco with no reply may be in deep standby, and gets nothing', async () => {
+  const b = bench();
+  b.silent.add('P1');
+  assert.equal(b.run.plan('on').steps[0].note, 'No current reply. It may be in deep standby, which needs a wake at the unit. Nothing will be sent unless it answers');
+  await b.go('on');
+  for (let i = 0; i < 25; i++) await b.step(1000);
+  assert.deepEqual([b.steps().C.state, b.steps().C.note], ['failed', 'No current reply. It may be in deep standby, which needs a wake at the unit. Nothing sent.']);
+  assert.equal(b.sent.some(item => item[0] === 'P1'), false);
 });
 
 test('the run is recorded beside the rig, and a relay restart mid-run says nothing more was sent', async t => {

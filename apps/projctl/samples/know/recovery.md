@@ -1,14 +1,24 @@
 # Sample recovery steps
 
-This is an invented sample for the simulator. It is not a real procedure.
+A sample for the simulator, not a real procedure. The real steps live in the private documents
+folder on the relay computer.
 
-## A lane goes dark
+## A surface is wrong: least disruptive first
 
-1. Look at the surface first. The page reads the projector, not the picture.
-2. Open the Control tab and read the lane card: power, shutter, input and test pattern.
-3. Shutter CLOSED: open it from the card.
-4. Power OFF: power it on from the card and wait for ON.
-5. Input or pattern flagged: tell the video lead. This page does not change either.
+1. **Shutter.** Any time, mid-show too. A lit lane with its shutter CLOSED is dark on stage:
+   open it from Control.
+2. **Input.** Before a show. Read the lane's input on Control. If it is flagged, tell the
+   video lead. Do not touch the playback app.
+3. **Power cycle that one projector.** Before a show. Respect cooling: a lamp unit needs
+   about 170 s to cool, then 75 s more before it can light again. Never cut mains while it
+   cools.
+4. **Relaunch the playback app.** Before a show, all four on, and only after any approved
+   change is saved. Quit without saving, reopen the approved show file, wait for four
+   fullscreen outputs.
+5. **Restart the show computer.** Only on the video lead's word.
+
+The cooling and relight waits, and that a power cycle leaves the show computer's outputs
+alone, are researched, not yet tested on the rig.
 
 ## A cue does nothing
 

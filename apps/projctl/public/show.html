@@ -49,7 +49,7 @@
       <button type="button" role="tab" id="t-control" aria-controls="control" aria-selected="true">Control</button>
       <button type="button" role="tab" id="t-setup" aria-controls="setup" aria-selected="false" tabindex="-1"><span class="sb-long">Setup check</span><span class="sb-short">Setup</span></button>
       <button type="button" role="tab" id="t-midi" aria-controls="midi" aria-selected="false" tabindex="-1"><span class="sb-long">MIDI test</span><span class="sb-short">MIDI</span></button>
-      <button type="button" role="tab" id="t-know" aria-controls="know" aria-selected="false" tabindex="-1">Know</button>
+      <button type="button" role="tab" id="t-know" aria-controls="know" aria-selected="false" tabindex="-1">Know<span id="sb-know-count" class="sb-tab__count" hidden></span></button>
     </div>
   </nav>
 
@@ -101,12 +101,21 @@
 
     <section role="tabpanel" id="know" class="sb-panel sb-panel--know" aria-labelledby="t-know" tabindex="0" data-know="list" hidden>
       <div class="sb-know__side">
+        <div id="sb-notices" class="sb-notices" hidden></div>
         <p id="sb-know-status" class="sb-know__status" role="status">Asking the relay for documents.</p>
-        <div class="sb-scroll" tabindex="0" aria-label="First things to try, diagrams and documents">
+        <div class="sb-scroll" tabindex="0" aria-label="Recovery steps, diagrams and documents">
           <section class="sb-tips" aria-labelledby="sb-tips-h">
-            <h3 id="sb-tips-h" class="sb-know__group">First things to try</h3>
+            <h3 id="sb-tips-h" class="sb-know__group">A surface is wrong: least disruptive first</h3>
+            <ol class="sb-ladder">
+              <li><strong>Shutter.</strong> <span class="sb-when">Any time, mid-show too</span> Read the lane's shutter on Control. A lit lane with its shutter CLOSED is dark on stage: open it there. On lane C, a shutter closed from the playback app may not reopen from there; the Open button on that card is the way back.</li>
+              <li><strong>Input.</strong> <span class="sb-when">Before a show</span> Read the lane's input on Control. If it is flagged, tell the video lead. Do not touch the playback app.</li>
+              <li><strong>Power cycle that one projector.</strong> <span class="sb-when">Before a show</span> Respect cooling: a lamp unit needs about 170 s to cool, then 75 s more before it can light again. Never cut mains while it cools.</li>
+              <li><strong>Relaunch the playback app.</strong> <span class="sb-when">Before a show, all four on</span> Only after any approved change is saved. Quit without saving, reopen the approved show file, and wait for four fullscreen outputs.</li>
+              <li><strong>Restart the show computer.</strong> <span class="sb-when">Only on the video lead's word</span></li>
+            </ol>
+            <p class="sb-ladder__note">Researched, not yet tested on this rig: the cooling and relight waits, and that a power cycle leaves the show computer's outputs alone.</p>
+            <h3 class="sb-know__group">Also</h3>
             <ul class="sb-tips__list">
-              <li><strong>The stage is dark and lane C reads shutter CLOSED:</strong> open it from Control, lane C. A shutter closed from the playback app may not reopen from there. The Open button on that card is the way back.</li>
               <li><strong>A lane says CHECK BY EYE:</strong> the relay has no current reply from it, so nothing on its card is a reading. Look at the surface.</li>
               <li><strong>A cue did nothing:</strong> open MIDI test and read "Last cue received". Listed with the right time means it arrived, so look at the playback app. Not listed means it never arrived.</li>
             </ul>

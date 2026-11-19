@@ -24,8 +24,8 @@ export function createShowRoutes({ dataDir, appDir, sim = false, relay = null })
   const settings = path.join(dataDir, 'host-paths.json');
   const samples = path.join(appDir, 'samples', 'know'); // invented files, shown in simulation only
   const cueFeed = createCueFeed();
-  // relay: the hooks the run needs from the relay (projectors, status, power, revision, locked, broadcast, body).
-  const powerRun = relay ? createPowerRun({ projectors: relay.projectors, status: relay.status, power: relay.power, revision: relay.revision, locked: relay.locked,
+  // relay: the hooks the run needs from the relay (projectors, status, power, refresh, revision, locked, broadcast, body).
+  const powerRun = relay ? createPowerRun({ projectors: relay.projectors, status: relay.status, power: relay.power, refresh: relay.refresh, revision: relay.revision, locked: relay.locked,
     maxStatusAgeMs: relay.maxStatusAgeMs, file: path.join(dataDir, 'power-run.json'), changed: state => relay.broadcast({ type: 'powerRun', ...state }) }) : null;
 
   return async function showRoutes(req, res, url, json) {

@@ -81,7 +81,7 @@ function enforceLoginThrottle(ip, res) {
 }
 const DATA = process.env.RIG || path.join(__dirname, '..', 'data', SIM ? 'rig.sim.json' : 'rig.json');
 const STAGE_PLOT = process.env.STAGE_PLOT || path.join(path.dirname(DATA), 'stage-plot.json');
-const showRoutes = createShowRoutes({ dataDir: path.dirname(DATA), appDir: path.join(__dirname, '..'), sim: SIM, relay: { projectors: () => rig.projectors, status: slot => ({ ...status.get(slot), connection: connections.get(slot) }), power: (slot, on) => command(slot, 'power', on ? 1 : 0, 'run'), revision: p => commandBinding.revision(p), locked: () => rig.lock, broadcast: message => broadcast(message), body: req => body(req), maxStatusAgeMs: Math.max(15000, POLL_MS * 3) } });
+const showRoutes = createShowRoutes({ dataDir: path.dirname(DATA), appDir: path.join(__dirname, '..'), sim: SIM, relay: { projectors: () => rig.projectors, status: slot => ({ ...status.get(slot), connection: connections.get(slot) }), power: (slot, on) => command(slot, 'power', on ? 1 : 0, 'run'), refresh: slot => poller.refresh(slot), revision: p => commandBinding.revision(p), locked: () => rig.lock, broadcast: message => broadcast(message), body: req => body(req), maxStatusAgeMs: Math.max(15000, POLL_MS * 3) } });
 const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 'venue');
 
 const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
