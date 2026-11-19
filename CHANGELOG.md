@@ -1,5 +1,13 @@
 # Changelog
 
+## Projctl: Barco Stop lens on every axis, 2026-11-19
+
+- Stop lens on the Barco (Pulse) used to queue behind status reads and stop at the first axis that failed, leaving the rest moving. It now sends stop to all four axes at once, each on its own connection, and reports any axis that did not acknowledge. Re-landed from draft PR 460 onto main's driver. Simulator-tested only; not installed or tried on the UDM.
+
+## Frozen booth workspace, November 19, 2026
+
+Workspace search opens show pages and R5 references. Notes retains the last shared task snapshot and queues offline checkoffs. Readiness reports identify operator confirmations and the connected relay can supply timestamped booth status.
+
 ## Projctl show backup page, 2026-11-18
 
 - Add `apps/projctl/public/show.html`, a role page for the person who backs up projection from the lighting position. A go or no-go strip (lanes lit, outputs, cue link, show computer) sits above the four lanes. A lane the relay is not reading says "check by eye" and never shows its last known state. The cue link says "Not connected", because console cues do not pass through the relay.
