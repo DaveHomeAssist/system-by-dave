@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="avd/tokens.css">
 <link rel="stylesheet" href="projector-control.css">
 <link rel="stylesheet" href="show.css">
+<link rel="stylesheet" href="power-view.css">
 <script type="module" src="show.js"></script>
 </head>
 <body>
@@ -33,7 +34,7 @@
       <p class="sb-kicker"><span>Projctl</span><span id="sb-sim" class="sb-sim" hidden>Simulation</span><button id="sb-shared" type="button" class="sb-shared" aria-haspopup="dialog">Shared sign-in</button></p>
       <h1>Power</h1>
     </div>
-    <span id="sb-lock" class="sb-pill" data-lock="unknown" role="status"><span class="sb-long">Show </span><span data-f="word">Lock unknown</span></span>
+    <span id="sb-lock" class="sb-pill" data-lock="unknown" role="status"><span data-f="word">Lock unknown</span></span>
     <time id="sb-clock" class="sb-clock"></time>
     <button id="theme" type="button" class="sb-btn sb-btn--quiet">Theme</button>
   </header>
@@ -75,7 +76,7 @@
           <section class="sb-tips" aria-labelledby="sb-tips-h">
             <h3 id="sb-tips-h" class="sb-know__group">How this page works</h3>
             <ul class="sb-tips__list">
-              <li><strong>Morning:</strong> Turn all on. <strong>Night:</strong> Turn all off. One press starts one run for all four, in the right order with the waits built in.</li>
+              <li><strong>Morning:</strong> Turn all on. <strong>Night:</strong> Turn all off. Confirm to start one run for all four. In Blind, both buttons preview the sequence.</li>
               <li><strong>Night:</strong> the Night tab shows each lane's expected wait and what it reads now. All off takes about 3 minutes.</li>
               <li><strong>Wait for the banner.</strong> "All four on" in the morning, about 4 minutes, because the two lamp units are watched for 3 minutes after they light. "Safe to leave the building" at night, only when all four read OFF. Until it shows, the run is not finished.</li>
               <li><strong>If the banner says "Not all four on" or "Not safe to leave yet":</strong> it names the lane. Look at that surface, then call the show backup.</li>
@@ -136,6 +137,13 @@
   <p>The on and off run is shared too: if someone else has started it, this page shows the same run and waits for it to finish.</p>
   <p class="sb-dialog__hint">The same passcode also opens the main console.</p>
   <button type="button" class="sb-btn sb-btn--primary" data-close>Close</button>
+</dialog>
+<dialog id="sb-power-preview" class="sb-dialog" aria-labelledby="sb-power-preview-title">
+  <h2 id="sb-power-preview-title"></h2>
+  <p>Preview only. Live power is locked.</p>
+  <p><strong data-preview-order></strong></p>
+  <p data-preview-wait></p>
+  <button type="button" class="sb-btn" autofocus>Close</button>
 </dialog>
 </body>
 </html>

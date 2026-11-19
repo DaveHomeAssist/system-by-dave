@@ -1,5 +1,22 @@
 # Power operator page brief
 
+## Live and Blind
+
+The power operator needs one pair of all-four actions and a clear reading for each
+lane. The Power tab puts the summary and actions first. It keeps run progress in
+view and presents A to D as status rows. The Night and Know tabs remain available.
+
+Show Lock changes the whole page to an amber Blind palette in both themes. Both
+actions preview the sequence locally. The preview closes when the lock state
+changes. The relay rejects a Power-page run plan or start under Show Lock and
+stops a run started by this page if the lock engages. Stop remains available for
+an active run. The existing show page, cue policy and direct commands keep their
+current rules. The Power run uses existing target and timing checks.
+
+Acceptance: in simulation, the Power tab has exactly two start actions, both
+Blind previews issue no POST, a pending confirmation cannot start when locked,
+and cooling, missing readings and run progress remain legible on a phone.
+
 > **The page described below has been replaced on this branch.** `power.html` keeps its address
 > and is now the same shell as the show backup page, with the shared projector control (power
 > only), the relay's one all-four run and the documents tab. The step-by-step checklist, its

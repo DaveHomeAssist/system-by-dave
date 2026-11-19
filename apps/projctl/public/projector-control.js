@@ -42,7 +42,7 @@ const no = reason => ({ enabled: false, reason, note: '', ready: [], skipped: []
 
 // onRunStarted(direction) is told when this page started a run (another page's run does not call it).
 export function createProjectorControl({ root, pick = null, runRoot = null, post, run: runHooks = null, rows = ['power', 'shutter'], selected: firstShown = 'A',
-  announce = () => {}, relayNow = () => Date.now(), policy = DEFAULT_POLICY, sharedNote = '', onRunStarted = () => {} }) {
+  announce = () => {}, relayNow = () => Date.now(), policy = DEFAULT_POLICY, sharedNote = '', onRunStarted = () => {}, compactPower = false, onPreview = () => {} }) {
   const cards = new Map(), ops = new Map(), notes = new Map();
   const ids = ACTION_IDS.filter(id => rows.includes(ACTIONS[id].row));
   let views = [], lock = null, selected = KEYS.includes(firstShown) ? firstShown : 'A';
@@ -55,15 +55,15 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
   const verbOf = (key, id) => isRun(key, id) ? RUN_LABELS.buttons[ACTIONS[id].arg ? 'on' : 'off'] : ACTIONS[id].verb;
 
   // ---- Build once; later renders only change text and attributes, so focus survives.
-  for (const key of KEYS) {
+  for (const key of compactPower ? [ALL, ...KEYS.filter(key => key !== ALL)] : KEYS) {
     const isLane = key !== ALL;
     const card = el('article', { class: 'pc-card', 'data-lane': key, 'data-tone': 'off', 'data-reach': 'connecting', 'data-phase': 'idle', 'aria-labelledby': `pc-${key}-name` });
     const name = el('h3', { class: 'pc-name', id: `pc-${key}-name` });
-    if (isLane) name.append(el('span', { class: 'pc-sr' }, `Lane ${key}, `), LANES[key].target); else name.textContent = 'All lanes';
+    if (isLane) name.append(el('span', { class: 'pc-sr' }, `Lane ${key}, `), LANES[key].target); else name.textContent = compactPower ? 'All four projectors' : 'All lanes';
     const model = el('p', { class: 'pc-model' });
     const head = el('header', { class: 'pc-head' });
     head.append(el('span', { class: 'pc-letter', 'aria-hidden': 'true' }, isLane ? key : 'All'), name, model);
-    const state = el('p', { class: 'pc-state' }), fresh = el('p', { class: 'pc-fresh' });
+    const state = el('p', { class: 'pc-state', ...(compactPower && !isLane ? { role: 'status' } : {}) }), fresh = el('p', { class: 'pc-fresh' });
     const facts = el('dl', { class: 'pc-facts' }), fact = {};
     for (const [id, label] of isLane ? [['shutter', 'Shutter'], ['input', 'Input'], ['pattern', 'Pattern'], ['link', 'Control link']] : [['lit', 'Lit'], ['closed', 'Shutters closed']]) {
       const wrap = el('div', { class: 'pc-fact', 'data-fact': id }), value = el('dd');
@@ -73,7 +73,7 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     }
     const alarm = el('p', { class: 'pc-alarm', hidden: '' });
     const actions = el('div', { class: 'pc-actions' }), buttons = {};
-    for (const row of rows) {
+    for (const row of compactPower && isLane ? [] : rows) {
       const title = row === 'power' ? 'Power' : 'Shutter';
       const group = el('div', { class: 'pc-row', role: 'group', 'data-row': row, 'aria-label': `${title}, ${where(key)}` });
       group.append(el('span', { class: 'pc-row__label', 'aria-hidden': 'true' }, title));
@@ -152,6 +152,7 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     if (runState === null) return no('This relay has no all-four run.');
     if (runActive()) return no('A run is already in progress.');
     if (lock === null) return no('Show Lock not read.');
+    if (compactPower && lock) return no('Blind mode. Live power is locked.');
     if (lock && !ACTIONS[id].arg) return no('Show Lock is on. Power off is locked.');
     if (lock && policy.lockBlocksPowerOn) return no('Show Lock is on. Power is locked.');
     return { enabled: true, reason: '', note: '', ready: [], skipped: [] };
@@ -211,6 +212,8 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
   }
 
   function press(key, id) {
+    if (!cards.get(key)?.buttons[id]) return;
+    if (compactPower && lock === true) { onPreview(ACTIONS[id].arg ? 'on' : 'off'); return; }
     const action = ACTIONS[id], current = ops.get(key);
     if (current && LIVE_PHASES.includes(current.phase)) { if (current.phase === 'waiting') note(key, 'Wait for the last command to report.'); return; }
     const state = key === ALL ? allState(id) : laneState(viewOf(key), id);
@@ -345,9 +348,9 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     if (armed) {
       const action = ACTIONS[op.action], left = Math.max(0, Math.ceil((op.armedAt + op.window - local) / 1000));
       if (op.run) {
-        put(nodes.go, `Confirm: ${lower(RUN_LABELS.buttons[op.direction])} (${left})`);
+        put(nodes.go, compactPower ? `Confirm ${op.direction}` : `Confirm: ${lower(RUN_LABELS.buttons[op.direction])} (${left})`);
         const order = op.plan.map(step => step.lane).join(', '), detail = op.plan.map(step => `${step.lane} ${lower(String(step.note || ''))}`).join(' · ');
-        put(nodes.confirmText, ['The relay is ready. Nothing sent yet.', order ? `One run, in order ${order}.` : '', detail ? `${detail}.` : '', sharedNote].filter(Boolean).join(' '));
+        put(nodes.confirmText, [compactPower ? `Turn ${op.direction} all four projectors? Confirm within ${left} s.` : 'The relay is ready. Nothing sent yet.', order ? `One run, in order ${order}.` : '', detail ? `${detail}.` : '', sharedNote].filter(Boolean).join(' '));
       } else {
         const going = op.targets.filter(target => phase === 'armed' || target.status === 'ready');
         put(nodes.go, `Confirm ${action.verb.toLowerCase()} ${key === ALL ? targetsText(going) : key} (${left})`);
@@ -368,7 +371,16 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
   }
   function renderButtons(key, nodes, stateOf, busy, op) {
     for (const id of ids) {
-      const state = stateOf(id), button = nodes.buttons[id];
+      const button = nodes.buttons[id];
+      if (!button) continue;
+      if (compactPower && lock === true) {
+        mark(button, 'aria-disabled', 'false');
+        mark(button, 'aria-busy', null);
+        mark(button, 'aria-label', `${verbOf(key, id)} (preview only)`);
+        mark(button, 'title', 'Preview only. Live power is locked.');
+        continue;
+      }
+      const state = stateOf(id);
       mark(button, 'aria-disabled', String(!state.enabled || busy));
       mark(button, 'aria-busy', busy && op?.action === id ? 'true' : null);
       mark(button, 'aria-label', `${verbOf(key, id)}${isRun(key, id) ? ', one run in the relay' : `, ${where(key)}`}${state.enabled ? '' : `. Blocked: ${state.reason}`}`);
@@ -412,7 +424,10 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     return run;
   }
   function render({ views: nextViews, lock: nextLock, local = Date.now(), run: nextRun } = {}) {
-    if (nextViews) { views = nextViews; lock = nextLock ?? null; }
+    if (nextViews) {
+      views = nextViews; lock = nextLock ?? null;
+      if (compactPower && lock !== false && ops.get(ALL)?.phase === 'asking') ops.delete(ALL);
+    }
     if (nextRun !== undefined) runState = nextRun;
     settle(local);
     const run = renderRun(), stepOf = lane => runState?.active ? run?.steps?.find(step => step.lane === lane) : null;
@@ -421,10 +436,10 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
       mark(nodes.card, 'data-tone', view.tone);
       mark(nodes.card, 'data-reach', view.reach);
       put(nodes.model, view.model);
-      put(nodes.state, view.headline);
+      put(nodes.state, compactPower && view.reach !== 'live' ? (view.reach === 'connecting' ? 'Connecting' : 'No reply') : view.headline);
       const power = powerLook(view);
       mark(nodes.card, 'data-power', power.look);
-      mark(nodes.state, 'data-note', power.note || null);
+      mark(nodes.state, 'data-note', (compactPower && power.look === 'ready' ? 'Ready' : power.note) || null);
       put(nodes.fresh, view.freshText);
       mark(nodes.fresh, 'title', view.freshText);
       const shutter = shutterLook(view, pendingShutter([ops.get(view.lane), ops.get(ALL)], view.lane));
@@ -458,14 +473,28 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     mark(nodes.card, 'data-tone', connecting ? 'off' : !summary.reading ? 'eye' : summary.lit === summary.total ? 'ok' : 'attention');
     mark(nodes.card, 'data-reach', connecting ? 'connecting' : down ? 'relay-offline' : 'live');
     put(nodes.model, runHooks ? 'One run, shared by every page' : 'One command per lane');
-    put(nodes.state, connecting ? 'CONNECTING' : `${summary.reading} OF ${summary.total} READING`);
+    const missing = views.filter(view => view.reach !== 'live' || !['on', 'off', 'warming', 'cooling'].includes(view.power));
+    const allOff = views.length === 4 && views.every(view => view.reach === 'live' && view.power === 'off');
+    const allOn = views.length === 4 && views.every(view => view.reach === 'live' && view.power === 'on');
+    const cooling = views.some(view => view.reach === 'live' && view.power === 'cooling');
+    const warming = views.some(view => view.reach === 'live' && view.power === 'warming');
+    const plain = connecting || !views.length ? 'Connecting to the relay'
+      : down ? 'Relay not responding'
+      : runState?.active ? RUN_LABELS.running[run.direction]
+      : missing.length ? `Check lane ${missing.map(view => view.lane).join(', ')}`
+      : cooling ? 'Cooling · Keep mains power on'
+      : warming ? 'Warming up'
+      : allOff ? 'All four projectors are off'
+      : allOn ? 'All four projectors are on' : `${summary.lit} of 4 projectors on`;
+    put(nodes.state, compactPower ? plain : connecting ? 'CONNECTING' : `${summary.reading} OF ${summary.total} READING`);
+    if (compactPower) reveal(runRoot, !!run && (runState.active || run.state !== 'done' || (run.direction === 'off' ? allOff : allOn)) && !runRoot.hidden);
     put(nodes.fresh, lock === true ? 'Show Lock is on' : lock === false ? 'Show Lock is off' : 'Show Lock not read');
     put(nodes.fact.lit.value, `${summary.lit} of ${summary.total}`);
     put(nodes.fact.closed.value, summary.reading ? String(summary.closed) : 'Not reported');
     // A suggested run is highlighted and explained, never pressed. Only an offered button is suggested.
-    const hint = runHooks ? suggestRun(views, { lock, run: runState, now: relayNow() }) : null;
+    const hint = runHooks && !compactPower ? suggestRun(views, { lock, run: runState, now: relayNow() }) : null;
     const hinted = hint && ids.find(id => isRun(ALL, id) && (ACTIONS[id].arg ? 'on' : 'off') === hint.direction && states[id].enabled);
-    const reason = reasons.size === 1 ? [...reasons][0] : '';
+    const reason = compactPower && lock === true ? 'Both buttons preview the sequence.' : compactPower && missing.length && !connecting && !down ? 'Check the missing readings with the show lead.' : reasons.size === 1 ? [...reasons][0] : '';
     const { busy, op } = renderOp(ALL, nodes, local, runState?.active ? `${RUN_LABELS.running[run.direction]}. Started ${clockShort(run.startedAt)}.` : reason || (hinted ? hint.text : ''));
     renderButtons(ALL, nodes, id => states[id], busy, op);
     for (const id of ids.filter(item => isRun(ALL, item))) {

@@ -33,8 +33,8 @@ export function createShowRoutes({ dataDir, appDir, sim = false, relay = null })
     if (powerRun && RUN_POSTS.has(url.pathname)) {
       if (req.method !== 'POST') { json(res, 405, { error: 'post only' }); return true; }
       try {
-        const { direction, confirm } = await relay.body(req);
-        if (url.pathname.endsWith('/plan')) json(res, 200, powerRun.plan(direction));
+        const { direction, confirm, requireUnlocked } = await relay.body(req);
+        if (url.pathname.endsWith('/plan')) json(res, 200, powerRun.plan(direction, { requireUnlocked: requireUnlocked === true }));
         else if (url.pathname.endsWith('/start')) json(res, 200, powerRun.start(direction, typeof confirm === 'string' ? confirm.slice(0, 64) : ''));
         else json(res, 200, powerRun.stop());
       } catch (error) { if (!error.status || error.status >= 500) throw error; json(res, error.status, { error: error.message, ...(error.run ? error.run : {}) }); }

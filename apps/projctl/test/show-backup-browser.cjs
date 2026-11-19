@@ -224,6 +224,26 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.deepEqual(await otherCard('ALL').locator('.pc-actions [data-act]').allInnerTexts(), ['Turn all on', 'Turn all off'], 'the power page carries power only');
     assert.equal(await other.locator('[data-act="shutter-open"], [data-act="shutter-close"]').count(), 0);
     assert.equal(await other.locator('.sb-strip').isVisible(), false, 'the power page has no go or no-go strip to read');
+    const powerPosts = [];
+    other.on('request', request => { if (request.method() === 'POST') powerPosts.push(request.url()); });
+    const ground = () => other.locator('body').evaluate(node => getComputedStyle(node).backgroundColor);
+    const liveGround = await ground();
+    await relay.api('lock', { lock: true });
+    await other.locator('html[data-power-mode="blind"]').waitFor({ state: 'attached' });
+    assert.notEqual(await ground(), liveGround, 'Blind changes the page background');
+    for (const [direction, order] of [['on', 'C → B → A → D'], ['off', 'A → D → B → C']]) {
+      await otherCard('ALL').locator(`[data-act="power-${direction}"]`).click();
+      await other.locator('#sb-power-preview[open]').waitFor();
+      assert.equal(await other.locator('[data-preview-order]').innerText(), order);
+      assert.deepEqual(await other.locator('#sb-power-preview button').allInnerTexts(), ['Close']);
+      if (direction === 'on') await other.getByRole('button', { name: 'Close', exact: true }).click();
+    }
+    assert.deepEqual(powerPosts, [], 'Blind previews are local, without any POST');
+    await relay.api('lock', { lock: false });
+    await other.locator('html[data-power-mode="live"]').waitFor({ state: 'attached' });
+    assert.equal(await other.locator('#sb-power-preview').isVisible(), false, 'unlock discards the preview');
+    assert.equal(await ground(), liveGround);
+
     assert.deepEqual(await card('ALL').locator('.pc-actions [data-act]').allInnerTexts(), ['Turn all on', 'Turn all off', 'Open', 'Close']);
     assert.equal(await page.locator('#pc-run').isVisible(), false);
     // B and C read ON and Show Lock is off: the off run is suggested. A suggestion only highlights and explains.
@@ -268,14 +288,15 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     // Night, from the other page: one press, one banner, on both pages.
     await otherCard('ALL').locator('[data-act="power-off"]').click();
     await other.locator('.pc-card[data-lane="ALL"][data-phase="relay-armed"]').waitFor();
-    assert.match(await otherCard('ALL').locator('[data-act="confirm"]').innerText(), /^Confirm: turn all off \(\d+\)$/);
+    assert.equal(await otherCard('ALL').locator('[data-act="confirm"]').innerText(), 'Confirm off');
     assert.match(await otherCard('ALL').locator('.pc-confirm__text').innerText(), /One run, in order A, D, B, C\. A power off · D power off · B power off · C power off\./);
     await other.waitForTimeout(700);
     await otherCard('ALL').locator('[data-act="confirm"]').click();
     await page.locator('#pc-run[data-state="running"][data-direction="off"]').waitFor();
     assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'TURNING ALL FOUR OFF');
-    // The page that started the nightly off follows it on the night timeline: each lane's expected wait and its reading now.
-    await other.locator('#t-night[aria-selected="true"]').waitFor();
+    // The Power tab keeps progress in view. The detailed timeline stays available.
+    await other.locator('#pc-run[data-state="running"]').waitFor();
+    await other.locator('#t-night').click();
     assert.equal(await page.locator('#t-control').getAttribute('aria-selected'), 'true', 'only the page that pressed moves to its timeline');
     assert.deepEqual(await other.locator('.sb-night__row').evaluateAll(rows => rows.map(row => row.dataset.lane)), ['A', 'D', 'B', 'C'], 'the off order');
     assert.deepEqual(await other.locator('.sb-night__unit').allInnerTexts(), ['Lamp unit', 'Lamp unit', 'Laser unit', 'Barco laser']);
@@ -611,7 +632,8 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await power.setViewportSize({ width: 375, height: 812 });
     await power.goto(`${relay.base}/power.html`);
     await power.locator('.pc-card[data-lane="ALL"][data-reach="live"]').waitFor();
-    assert.deepEqual([await power.locator('#pc-pick [data-pick="ALL"]').getAttribute('aria-pressed'), await power.locator('.pc-card:visible').getAttribute('data-lane')], ['true', 'ALL'], 'on a phone the power page opens on the one on and off button');
+    assert.deepEqual(await power.locator('#pc-root .pc-actions button').allInnerTexts(), ['Turn all on', 'Turn all off']);
+    assert.equal(await power.locator('#pc-root .pc-card:visible').count(), 5);
     for (const theme of ['light', 'dark']) for (const [width, height] of SIZES) {
       await power.setViewportSize({ width, height });
       await power.evaluate(mode => window.FrozenTheme.set(mode, { save: false }), theme);
@@ -621,7 +643,6 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       // The cards have real room: a collapsed panel would pass a fit audit while showing nothing.
       assert.ok(await power.locator('.pc-card:visible').first().evaluate(node => node.getBoundingClientRect().height) >= 70, `${label} cards have height`);
       assert.ok(await power.locator('#sb-main').evaluate(node => node.getBoundingClientRect().height) >= innerHeightMin(height), `${label} the panel fills the page`);
-      if (small) for (const pick of ['B', 'D', 'ALL']) { await power.locator(`#pc-pick [data-pick="${pick}"]`).click(); assert.deepEqual(await power.evaluate(audit), CLEAN, `${label} card ${pick}`); }
       // The reviewed run fits too: the plan, Confirm and Cancel.
       await power.locator('.pc-card[data-lane="ALL"] [data-act="power-off"]').click();
       await power.locator('.pc-card[data-lane="ALL"][data-phase="relay-armed"]').waitFor();
@@ -869,8 +890,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.deepEqual(await run.tab.evaluate(audit), CLEAN, 'the night timeline fits a phone');
     await shot(run.tab, '20-phone-power-page-night-scripted');
     await run.tab.locator('#t-control').click();
-    await run.tab.locator('#pc-pick [data-pick="C"]').click();
-    assert.deepEqual([await run.at('C').locator('.pc-alarm').innerText(), await run.at('C').locator('.pc-alarm').getAttribute('data-kind')], ['ECO. Deep standby: the morning power on cannot reach it.', 'caution'], 'the lane card says it too');
+    assert.match(await run.at('C').locator('.pc-state').getAttribute('data-note'), /ECO/);
     await run.tab.locator('#t-night').click();
     // All four read off, the Barco in READY: now it is safe to leave.
     run.push('P3', { power: 'off', rawState: 'ready' }); run.push('P1', { power: 'off' }); run.push('P4', { power: 'off', online: true, connection: { state: 'online' } });
@@ -946,8 +966,8 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       await phone.locator('.pc-card[data-lane="ALL"][data-phase="relay-armed"]').waitFor();
       await phone.waitForTimeout(700);
       await phone.locator('.pc-card[data-lane="ALL"] [data-act="confirm"]').click();
-      // The page that started the nightly off follows it on its night timeline.
-      await phone.locator('#t-night[aria-selected="true"]').waitFor();
+      await phone.locator('#pc-run[data-state="running"]').waitFor();
+      await phone.locator('#t-night').click();
       await phone.locator('.sb-night__stop').waitFor();
       assert.deepEqual(await phone.evaluate(audit), CLEAN, 'signed in on a phone, the night timeline fits during a run');
       await shot(phone, '89-phone-signed-in-night-run');
