@@ -93,7 +93,7 @@ function render() {
 
   const lockNode = $('#sb-lock'), lockWord = lock === true ? 'on' : lock === false ? 'off' : 'unknown';
   mark(lockNode, 'data-lock', lockWord);
-  put(lockNode, lock === true ? 'Show Lock ON' : lock === false ? 'Show Lock off' : 'Show Lock unknown');
+  put($('[data-f=word]', lockNode), lock === true ? 'Lock ON' : lock === false ? 'Lock off' : 'Lock unknown'); // "Show " sits in the markup and drops out on a phone
   mark(lockNode, 'title', 'While Show Lock is on, this page locks power, every all-lanes action, the MIDI test and the setup check. Shutters for one lane stay available.');
   reveal($('#sb-sim'), !!snapshot?.simulation);
   put($('#sb-clock'), tickClock.format(new Date(now)));
@@ -101,6 +101,7 @@ function render() {
   const verdictNode = $('#sb-verdict');
   mark(verdictNode, 'data-state', verdict.state);
   put($('[data-f=title]', verdictNode), verdict.title);
+  put($('[data-f=short]', verdictNode), verdict.short);
   put($('[data-f=text]', verdictNode), verdict.text);
   mark(verdictNode, 'title', `${verdict.title}. ${verdict.text}`);
   for (const check of checks) {
@@ -168,10 +169,14 @@ $('#sb-setup-run').addEventListener('click', runSetup);
 // ---- MIDI test and the cue feed. The page only reads what the listener saw.
 const stepNodes = [0, 1].map(() => {
   const item = el('li', { class: 'sb-step', 'data-state': 'idle' }), sign = el('span', { class: 'sb-step__mark', 'aria-hidden': 'true' }), label = el('span', { class: 'sb-step__label' }), word = el('span', { class: 'sb-step__word' });
+  const long = el('span', { class: 'sb-step__long' }), short = el('span', { class: 'sb-step__short', 'aria-hidden': 'true' });
+  label.append(long, short);
   item.append(sign, label, word);
   $('#sb-midi-steps').append(item);
-  return { item, sign, label, word };
+  return { item, sign, long, short, word };
 });
+// A button with a long label and a short one for a tiny screen; the style sheet shows one of them.
+const twoLabels = (node, long, short) => { put($('.sb-tl', node), long); put($('.sb-ts', node), short); };
 const STEP = { idle: ['·', 'Not yet'], wait: ['…', 'Waiting'], pass: ['✓', 'Pass'], fail: ['!', 'Did not arrive'], cannot: ['?', 'Cannot tell'] };
 let recentKey = '';
 function renderMidi(relayView, lock, now) {
@@ -184,18 +189,19 @@ function renderMidi(relayView, lock, now) {
   put($('#sb-midi-title'), view.title);
   put($('#sb-midi-text'), view.running || midiTest ? view.text : blocked || view.text);
   put($('#sb-midi-hint'), view.hint);
-  put($('#sb-midi-stop'), view.running ? `Stop test (${view.count})` : 'Stop test');
+  put($('#sb-midi-tip'), view.tip);
+  twoLabels($('#sb-midi-stop'), view.running ? `Stop test (${view.count})` : 'Stop test', view.running ? `Stop (${view.count})` : 'Stop');
   // On a small screen the longer explanation sits behind "What this means"; the dialog follows the test live.
   put($('#sb-midi-more-title'), view.title); put($('#sb-midi-more-text'), $('#sb-midi-text').textContent); put($('#sb-midi-more-hint'), view.hint);
   view.steps.forEach((step, index) => {
     const nodes = stepNodes[index];
     mark(nodes.item, 'data-state', step.state);
-    put(nodes.sign, STEP[step.state][0]); put(nodes.label, step.label); put(nodes.word, [STEP[step.state][1], step.detail].filter(Boolean).join(' · '));
+    put(nodes.sign, STEP[step.state][0]); put(nodes.long, step.label); put(nodes.short, step.short); put(nodes.word, [STEP[step.state][1], step.detail].filter(Boolean).join(' · '));
   });
   const start = $('#sb-midi-start');
   reveal(start, !view.running); reveal($('#sb-midi-stop'), view.running);
   mark(start, 'aria-disabled', String(!!blocked));
-  put(start, midiTest ? 'Start MIDI test again' : 'Start MIDI test');
+  twoLabels(start, midiTest ? 'Start MIDI test again' : 'Start MIDI test', midiTest ? 'Again' : 'Start');
   mark(start, 'title', blocked || null);
 
   const seen = feedView(feed, now);
@@ -341,7 +347,11 @@ $('#sb-check-list').addEventListener('click', event => {
 $('#sb-detail').addEventListener('close', () => { openCheck = null; });
 $('#sb-shared').addEventListener('click', () => $('#sb-shared-note').showModal());
 $('#sb-midi-more').addEventListener('click', () => $('#sb-midi-detail').showModal());
-for (const button of document.querySelectorAll('dialog [data-close]')) button.addEventListener('click', () => button.closest('dialog').close());
+// A tiny screen shows the test or what was heard, one at a time.
+for (const button of document.querySelectorAll('[data-midi-view]')) button.addEventListener('click', () => {
+  mark($('#midi'), 'data-midi', button.dataset.midiView);
+  $(button.dataset.midiView === 'feed' ? '#sb-midi-back' : '#sb-midi-heard').focus();
+});
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !document.querySelector('dialog[open]')) control.cancelArmed(); });
 
 // ---- Tabs. The open tab is kept in the address, so a reload or a sign-in returns to it.

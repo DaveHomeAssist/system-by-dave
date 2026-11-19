@@ -122,6 +122,7 @@ test('an all-lanes action lists exactly the lanes that will get it and why the o
   assert.deepEqual(groupState(lanes, 'power-on', { lock: false }).ready.map(target => target.lane), ['D']);
   assert.deepEqual(groupState(lanes, 'power-off', { lock: false }).ready.map(target => target.lane), ['B', 'C']);
   assert.equal(targetsText(groupState(lanes, 'power-off', { lock: false }).ready), 'B and C');
+  assert.equal(skippedText(groupState(views(four()), 'power-on', { lock: false }).skipped), 'A, B, C and D: already reports ON', 'lanes skipped for one reason are named together');
   assert.deepEqual(groupSummary(lanes), { total: 4, reading: 3, lit: 2, closed: 1 });
 
   // Under Show Lock every all-lanes action is locked, shutters included.

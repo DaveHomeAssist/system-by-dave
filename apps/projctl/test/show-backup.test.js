@@ -41,7 +41,7 @@ const noFeed = { status: 'ok', fetchedAt: NOW - 1000, data: { feedId: 'feed-1', 
 test('the strip states only what the relay can vouch for', () => {
   const lanes = views(showRig());
   let checks = buildChecks({ lanes, relay: up, displays: displayReport(5), feed: noFeed, now: NOW });
-  assert.deepEqual(checks.map(item => [item.id, item.short]), [['lanes', 'Lanes'], ['outputs', 'Outputs'], ['cues', 'Cues'], ['computer', 'Relay']]);
+  assert.deepEqual(checks.map(item => [item.id, item.short]), [['lanes', 'Lanes'], ['outputs', 'Outs'], ['cues', 'Cues'], ['computer', 'Relay']]);
   assert.deepEqual([check(checks, 'lanes').state, check(checks, 'lanes').value, check(checks, 'lanes').brief, check(checks, 'lanes').note], ['eye', '2 of 4 lit', '2/4 lit', 'A and D: check by eye']);
   assert.deepEqual([check(checks, 'outputs').state, check(checks, 'outputs').value, check(checks, 'outputs').brief], ['ok', '4 outputs + main', '4 + main']);
   assert.match(check(checks, 'outputs').note, /^Windows not reported · read 20s ago$/);
@@ -49,7 +49,7 @@ test('the strip states only what the relay can vouch for', () => {
   assert.deepEqual([check(checks, 'computer').state, check(checks, 'computer').value], ['ok', 'Answering']);
   for (const item of checks) { assert.ok(item.detail.length && item.cannot.length, `${item.id} says what it cannot tell`); assert.ok(STATE_WORDS[item.state] && STATE_MARKS[item.state] && item.brief); }
   // With no cue feed the page can never call the whole rig good.
-  assert.deepEqual([verdictOf(checks, up).state, verdictOf(checks, up).title], ['eye', 'Nothing wrong reported']);
+  assert.deepEqual([verdictOf(checks, up).state, verdictOf(checks, up).title, verdictOf(checks, up).short], ['eye', 'Nothing wrong reported', 'By eye']);
 
   const outputs = displays => check(buildChecks({ lanes, relay: up, displays, feed: noFeed, now: NOW }), 'outputs');
   assert.deepEqual([outputs(displayReport(4)).state, outputs(displayReport(4)).value], ['attention', '3 of 4 outputs']);
@@ -70,7 +70,7 @@ test('with every lane lit, outputs present and the listener running, and only th
   const lanes = views(allUp());
   const good = buildChecks({ lanes, relay: up, displays: displayReport(5), feed: feedOf({ seq: 4, lastCue: cue(4, '12'), recent: [cue(4, '12')] }), now: NOW });
   assert.deepEqual(good.map(item => item.state), ['ok', 'ok', 'ok', 'ok']);
-  assert.deepEqual(verdictOf(good, up), { state: 'ok', title: 'All reported good', text: 'Every item has a current reading.' });
+  assert.deepEqual(verdictOf(good, up), { state: 'ok', title: 'All reported good', short: 'Good', text: 'Every item has a current reading.' });
   assert.deepEqual([check(good, 'cues').value, check(good, 'cues').brief], ['Cue 12, list 1', 'Cue 12']);
   assert.match(check(good, 'cues').note, /^Heard 1:59 PM from Console A · not proof that video followed$/);
 

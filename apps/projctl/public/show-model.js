@@ -48,7 +48,7 @@ function readDisplays(displays, lanes, now) {
 }
 
 function outputsCheck(displays, lanes, relay, now) {
-  const check = { id: 'outputs', label: 'Outputs', short: 'Outputs',
+  const check = { id: 'outputs', label: 'Outputs', short: 'Outs',
     detail: ['The relay asks the show computer which displays its operating system has connected, at most once every 30 seconds.',
       'The rule used here: one display flagged as main (the control monitor) plus at least one more display for every lane that has a projector assigned.'],
     cannot: ['Whether the playback app has a fullscreen window on each output.', 'Which display feeds which lane.', 'Whether the picture reaches the projector past the adapter and cable.', 'Whether the show computer is locked.'] };
@@ -108,12 +108,12 @@ export function buildChecks({ lanes, relay, displays, feed, now = Date.now() }) 
 }
 
 export function verdictOf(checks, relay) {
-  if (!relay.everConnected) return { state: 'off', title: 'Connecting', text: 'Waiting for the relay. Nothing below is a reading yet.' };
+  if (!relay.everConnected) return { state: 'off', title: 'Connecting', short: 'Wait', text: 'Waiting for the relay. Nothing below is a reading yet.' };
   const bad = checks.filter(c => c.state === 'attention');
-  if (bad.length) return { state: 'attention', title: 'Attention', text: bad.map(c => `${c.label}: ${c.value}. ${c.note}`).join(' · ') };
+  if (bad.length) return { state: 'attention', title: 'Attention', short: 'Attention', text: bad.map(c => `${c.label}: ${c.value}. ${c.note}`).join(' · ') };
   const open = checks.filter(c => c.state !== 'ok');
-  if (open.length) return { state: 'eye', title: 'Nothing wrong reported', text: `${open.length} of ${checks.length} need your eyes: ${list(open.map(c => lower(c.label)))}.` };
-  return { state: 'ok', title: 'All reported good', text: 'Every item has a current reading.' };
+  if (open.length) return { state: 'eye', title: 'Nothing wrong reported', short: 'By eye', text: `${open.length} of ${checks.length} need your eyes: ${list(open.map(c => lower(c.label)))}.` };
+  return { state: 'ok', title: 'All reported good', short: 'Good', text: 'Every item has a current reading.' };
 }
 
 // ---- Setup check: pass, fail or cannot check, each with its reading. A line with no rule to judge
@@ -233,21 +233,22 @@ export function midiTestView(test, { feed, relay, lock, now = Date.now() }) {
   const blocked = midiTestBlocked({ relay, lock, feed, now }), left = ms => Math.max(0, Math.ceil(ms / 1000));
   const arrived = test?.go ? `Cue ${MIDI_TEST.cue} arrived at ${clockSeconds(test.go.at)}${test.go.source ? ` from ${test.go.source}` : ''}.` : '';
   const picture = 'An arrival is not a picture. If the test picture did not appear, the cue reached the show computer and the playback app did not act on it: check the playback app.';
+  const noPicture = 'Arrived but no picture? Check the playback app.';
   const when = hit => hit ? `${clockSeconds(hit.at)}${hit.source ? ` · from ${hit.source}` : ''}` : '';
   const steps = (go, clear, goDetail = when(test?.go), clearDetail = when(test?.clear)) => [
-    { label: `Cue ${MIDI_TEST.cue} arrives`, state: go, detail: goDetail }, { label: `Clear cue ${MIDI_TEST.clear} arrives`, state: clear, detail: clearDetail }];
+    { label: `Cue ${MIDI_TEST.cue} arrives`, short: MIDI_TEST.cue, state: go, detail: goDetail }, { label: `Clear cue ${MIDI_TEST.clear} arrives`, short: MIDI_TEST.clear, state: clear, detail: clearDetail }];
   switch (test?.phase) {
     case 'waiting-go': { const count = left(test.startedAt + MIDI_TEST.goMs - now);
-      return { state: 'eye', running: true, count, title: `Fire cue ${MIDI_TEST.cue} on the console now`, text: `Waiting ${count} s for it to arrive.`, hint: 'This page sends nothing. It only watches for the cue.', steps: steps('wait', 'idle', `${count} s left`) }; }
+      return { state: 'eye', running: true, count, title: `Fire cue ${MIDI_TEST.cue} on the console now`, text: `Waiting ${count} s for it to arrive.`, hint: 'This page sends nothing. It only watches for the cue.', tip: `Sends nothing. Fire cue ${MIDI_TEST.cue} on the console.`, steps: steps('wait', 'idle', `${count} s left`) }; }
     case 'waiting-clear': { const count = left(test.goSeenAt + MIDI_TEST.clearMs - now);
-      return { state: 'ok', running: true, count, title: 'Pass: the cue arrived', text: `${arrived} Now fire the clear cue ${MIDI_TEST.clear}. Waiting ${count} s.`, hint: picture, steps: steps('pass', 'wait', undefined, `${count} s left`) }; }
-    case 'cleared': return { state: 'ok', running: false, title: 'Pass: cue and clear both arrived', text: `${arrived} Clear cue ${MIDI_TEST.clear} arrived at ${clockSeconds(test.clear.at)}.`, hint: picture, steps: steps('pass', 'pass') };
-    case 'clear-missing': return { state: 'attention', running: false, title: 'The cue arrived. The clear cue did not', text: `${arrived} Clear cue ${MIDI_TEST.clear} was not seen in ${MIDI_TEST.clearMs / 1000} s. The test picture may still be up: fire ${MIDI_TEST.clear} and look.`, hint: picture, steps: steps('pass', 'fail') };
-    case 'timeout': return { state: 'attention', running: false, title: `Timed out: cue ${MIDI_TEST.cue} did not arrive`, text: `Nothing arrived in ${MIDI_TEST.goMs / 1000} s while the listener was running. Check the console side: the cue on the console, the cable, and the MIDI interface.`, hint: 'The playback app is not the cause when nothing arrives.', steps: steps('fail', 'idle') };
-    case 'stopped': return { state: 'eye', running: false, title: 'No result: the listener stopped', text: 'The listener stopped during the test, so the page could not see whether the cue arrived. This is not a failed cue.', hint: 'Start the listener on the show computer, then test again.', steps: steps('cannot', 'idle') };
-    case 'interrupted': return { state: 'eye', running: false, title: 'No result: the relay restarted', text: 'The relay restarted during the test. Start the test again.', hint: '', steps: steps('cannot', 'idle') };
-    case 'cancelled': return { state: 'off', running: false, title: 'Test stopped', text: test.go ? `${arrived} Stopped before the clear cue.` : 'Stopped before a cue arrived. No result.', hint: test.go ? picture : '', steps: steps(test.go ? 'pass' : 'idle', 'idle') };
-    default: return { state: 'off', running: false, title: 'Not run yet', text: blocked || `Tap Start, then fire cue ${MIDI_TEST.cue} on the console inside ${MIDI_TEST.goMs / 1000} seconds.`, hint: 'This page sends nothing. It only watches for the cue.', steps: steps('idle', 'idle') };
+      return { state: 'ok', running: true, count, title: 'Pass: the cue arrived', text: `${arrived} Now fire the clear cue ${MIDI_TEST.clear}. Waiting ${count} s.`, hint: picture, tip: noPicture, steps: steps('pass', 'wait', undefined, `${count} s left`) }; }
+    case 'cleared': return { state: 'ok', running: false, title: 'Pass: cue and clear both arrived', text: `${arrived} Clear cue ${MIDI_TEST.clear} arrived at ${clockSeconds(test.clear.at)}.`, hint: picture, tip: noPicture, steps: steps('pass', 'pass') };
+    case 'clear-missing': return { state: 'attention', running: false, title: 'The cue arrived. The clear cue did not', text: `${arrived} Clear cue ${MIDI_TEST.clear} was not seen in ${MIDI_TEST.clearMs / 1000} s. The test picture may still be up: fire ${MIDI_TEST.clear} and look.`, hint: picture, tip: `The test picture may still be up. Fire ${MIDI_TEST.clear} and look.`, steps: steps('pass', 'fail') };
+    case 'timeout': return { state: 'attention', running: false, title: `Timed out: cue ${MIDI_TEST.cue} did not arrive`, text: `Nothing arrived in ${MIDI_TEST.goMs / 1000} s while the listener was running. Check the console side: the cue on the console, the cable, and the MIDI interface.`, hint: 'The playback app is not the cause when nothing arrives.', tip: 'Nothing arrived: check the console, the cable and the MIDI interface.', steps: steps('fail', 'idle') };
+    case 'stopped': return { state: 'eye', running: false, title: 'No result: the listener stopped', text: 'The listener stopped during the test, so the page could not see whether the cue arrived. This is not a failed cue.', hint: 'Start the listener on the show computer, then test again.', tip: 'Not a failed cue. Start the listener, then test again.', steps: steps('cannot', 'idle') };
+    case 'interrupted': return { state: 'eye', running: false, title: 'No result: the relay restarted', text: 'The relay restarted during the test. Start the test again.', hint: '', tip: 'No result. Start the test again.', steps: steps('cannot', 'idle') };
+    case 'cancelled': return { state: 'off', running: false, title: 'Test stopped', text: test.go ? `${arrived} Stopped before the clear cue.` : 'Stopped before a cue arrived. No result.', hint: test.go ? picture : '', tip: test.go ? noPicture : 'No result.', steps: steps(test.go ? 'pass' : 'idle', 'idle') };
+    default: return { state: 'off', running: false, title: 'Not run yet', text: blocked || `Tap Start, then fire cue ${MIDI_TEST.cue} on the console inside ${MIDI_TEST.goMs / 1000} seconds.`, hint: 'This page sends nothing. It only watches for the cue.', tip: blocked || `Sends nothing. It only watches for cue ${MIDI_TEST.cue}.`, steps: steps('idle', 'idle') };
   }
 }
 

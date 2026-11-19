@@ -96,7 +96,8 @@ revision, so a projector that was swapped or re-addressed after the page drew it
 anything is sent. After the relay accepts a command the card waits for the projector's own report
 and says "Reported …" only when that arrives.
 
-**Refusals stay on the card.** A blocked action says why when it is tapped or focused. A refusal
+**Refusals stay on the card.** A blocked action says why when it is tapped, and carries the reason
+in its accessible name. A refusal
 from the relay or the projector is shown in the relay's own words with the time, and stays until
 the next action on that lane. No answer at all is worded differently from a refusal, because the
 command may have left before the reply was lost.
@@ -252,10 +253,12 @@ Where the page and the relay differ, the page is the stricter of the two.
 One viewport, no page scroll (WEB-2), light by default with Dark and System from the shared
 appearance menu (WEB-1). Tabs sit along the top on a tablet or laptop and in a bottom rail on a
 phone. The strip stays above every tab. On a phone or a short screen the Control tab shows one
-card at a time, chosen with an A, B, C, D, All picker that also carries each lane's state. Only
-three panels scroll inside themselves, because their content is inherently long: the setup check
-results, the Know list and the Know viewer. An ultrawide screen puts Control beside the active tab
-(WEB-3).
+card at a time, chosen with an A, B, C, D, All picker that also carries each lane's state, and the
+MIDI test keeps its result, steps and button on the card and moves the longer explanation behind
+"What this means". Four panels scroll inside themselves, because their content is inherently long:
+the setup check results, the recent MIDI messages, the Know list and the Know viewer. An ultrawide
+screen gives each tab real columns: the all-lanes card beside the four lanes, the cue feed beside
+the test, and a wider documents list (WEB-3).
 
 ## Interfaces and shared files
 

@@ -53,6 +53,9 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     const reading = async () => Object.fromEntries((await relay.state()).projectors.map(p => [p.slot, p.status]));
     await until(async () => { const s = await reading(); return s.P2.power === 'on' && s.P3.power === 'on' && !s.P4.online; }, 20000);
     for (const slot of ['P2', 'P3']) { await relay.api('command', { slot, cmd: 'shutter', arg: 0 }); await relay.api('command', { slot, cmd: 'pattern', arg: '00' }); }
+    // The simulator starts on another input; put the lanes on the rig's preferred one so nothing is flagged yet.
+    for (const slot of ['P1', 'P2', 'P3']) assert.equal((await relay.api('command', { slot, cmd: 'resetInput' })).status, 200);
+    await until(async () => (await relay.state()).projectors.filter(p => p.slot !== 'P4').every(p => p.inputPreference.available && String(p.status.input) === String(p.inputPreference.value)));
     await until(async () => { const s = await reading(); return s.P2.shutter === 'open' && s.P3.shutter === 'open' && s.P2.pattern === '00' && s.P3.pattern === '00'; });
 
     // ---- Live simulator relay
@@ -103,9 +106,10 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await shot(page, '01-tablet-control');
 
     // A blocked action says why when it is tapped, and sends nothing.
-    await act('A', 'shutter-close').click();
+    // (A blocked button is aria-disabled, which a person can still tap; the test taps it the same way.)
+    await act('A', 'shutter-close').click({ force: true });
     assert.equal(await msg('A'), 'Close shutter is blocked. Reports OFF, so no shutter move.');
-    await act('D', 'power-on').click();
+    await act('D', 'power-on').click({ force: true });
     assert.equal(await msg('D'), "Power on is blocked. Relay can't reach it. Use the remote.");
     assert.deepEqual(sent(), []);
 
@@ -200,10 +204,10 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.deepEqual(await card('B').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => b.getAttribute('aria-disabled'))), ['true', 'true', 'true', 'false']);
     assert.match(await act('B', 'power-off').getAttribute('aria-label'), /Blocked: Show Lock is on\. Power is locked\.$/);
     assert.deepEqual(await card('ALL').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => b.getAttribute('aria-disabled'))), ['true', 'true', 'true', 'true']);
-    assert.equal(await msg('ALL'), 'Show Lock is on. All-lanes actions are locked.');
     posts.length = 0;
-    await act('ALL', 'shutter-close').click();
-    await act('B', 'power-off').click();
+    await act('ALL', 'shutter-close').click({ force: true });
+    assert.equal(await msg('ALL'), 'Close shutter is blocked. Show Lock is on. All-lanes actions are locked.');
+    await act('B', 'power-off').click({ force: true });
     assert.equal(await msg('B'), 'Power off is blocked. Show Lock is on. Power is locked.');
     assert.deepEqual(sent(), []);
     await act('B', 'shutter-close').click();
@@ -217,11 +221,11 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await page.locator('.pc-card[data-lane="B"] [data-fact="shutter"] dd', { hasText: /^OPEN$/ }).waitFor();
     await page.locator('#t-setup').click();
     assert.deepEqual([await page.locator('#sb-setup-run').getAttribute('aria-disabled'), await page.locator('#sb-setup-why').innerText()], ['true', 'Show Lock is on. The setup check is locked.']);
-    await page.locator('#sb-setup-run').click();
+    await page.locator('#sb-setup-run').click({ force: true });
     assert.equal(await page.locator('#sb-setup-summary').innerText(), 'Not run yet.');
     await page.locator('#t-midi').click();
     assert.deepEqual([await page.locator('#sb-midi-start').getAttribute('aria-disabled'), await page.locator('#sb-midi-text').innerText()], ['true', 'Show Lock is on. The MIDI test is locked.']);
-    await page.locator('#sb-midi-start').click();
+    await page.locator('#sb-midi-start').click({ force: true });
     assert.equal(await page.locator('#sb-midi-title').innerText(), 'Not run yet');
     await relay.api('lock', { lock: false });
     await page.locator('#sb-lock[data-lock="off"]').waitFor();
@@ -318,12 +322,12 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     const image = page.locator('#sb-know-stage img');
     await page.waitForFunction(() => document.querySelector('#sb-know-stage img')?.naturalWidth === 960);
     assert.deepEqual([await page.locator('#sb-know-title').innerText(), await page.locator('#sb-know-stage').getAttribute('data-mode'), await page.locator('#sb-know-stage').getAttribute('data-zoom'), await image.getAttribute('alt')], ['Sample signal flow', 'diagram', 'fit', 'Sample signal flow']);
-    assert.equal(await page.locator('.sb-know__item[aria-current="true"]').innerText().then(text => text.split('\n')[0]), 'Sample signal flow');
+    assert.equal(await page.locator('.sb-know__item[aria-current="true"] .sb-know__name').innerText(), 'Sample signal flow');
     const fitted = await image.evaluate(node => node.getBoundingClientRect().width), stageWidth = await page.locator('#sb-know-stage').evaluate(node => node.clientWidth);
     assert.ok(fitted <= stageWidth + 1, 'fit keeps the whole diagram in the viewer');
     await shot(page, '06-tablet-know-diagram');
-    await page.locator('[data-zoom="in"]').click();
-    await page.locator('[data-zoom="in"]').click();
+    await page.locator('#sb-know-tools [data-zoom="in"]').click();
+    await page.locator('#sb-know-tools [data-zoom="in"]').click();
     assert.equal(await page.locator('#sb-know-stage').getAttribute('data-zoom'), 'scale');
     const zoomed = await image.evaluate(node => node.getBoundingClientRect().width);
     assert.ok(zoomed > stageWidth * 1.5, `zoomed diagram is larger than the viewer (${zoomed} in ${stageWidth})`);
@@ -331,9 +335,9 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down(); await page.mouse.move(box.x + box.width / 2 - 120, box.y + box.height / 2 - 40, { steps: 4 }); await page.mouse.up();
     assert.ok(await page.locator('#sb-know-stage').evaluate(node => node.scrollLeft) >= 100, 'dragging pans the zoomed diagram');
     assert.deepEqual(await page.evaluate(audit), CLEAN, 'a zoomed diagram scrolls inside its viewer, not the page');
-    await page.locator('[data-zoom="actual"]').click();
-    assert.deepEqual([Math.round(await image.evaluate(node => node.getBoundingClientRect().width)), await page.locator('[data-zoom="actual"]').getAttribute('aria-pressed')], [960, 'true']);
-    await page.locator('[data-zoom="fit"]').click();
+    await page.locator('#sb-know-tools [data-zoom="actual"]').click();
+    assert.deepEqual([Math.round(await image.evaluate(node => node.getBoundingClientRect().width)), await page.locator('#sb-know-tools [data-zoom="actual"]').getAttribute('aria-pressed')], [960, 'true']);
+    await page.locator('#sb-know-tools [data-zoom="fit"]').click();
     assert.ok(Math.abs(await image.evaluate(node => node.getBoundingClientRect().width) - fitted) < 2);
     await page.locator('.sb-know__item', { hasText: 'Sample recovery steps' }).click();
     await page.locator('.sb-know__text h4').waitFor();
@@ -373,17 +377,16 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await page.locator('#t-know').click();
     await page.locator('.sb-know__item', { hasText: 'Sample signal flow' }).click();
     await page.waitForFunction(() => document.querySelector('#sb-know-stage img')?.naturalWidth === 960);
-    await page.locator('#sb-know-back').click({ force: true }).catch(() => {});
     for (const theme of ['light', 'dark']) for (const [width, height] of SIZES) {
       await page.setViewportSize({ width, height });
       await page.evaluate(mode => window.FrozenTheme.set(mode, { save: false }), theme);
-      const label = `${theme} ${width}x${height}`, solo = await page.locator('#pc-pick').isVisible().catch(() => false), key = `${width}x${height}`;
+      const label = `${theme} ${width}x${height}`, small = width < 700 || height < 520, key = `${width}x${height}`;
       for (const tab of TABS) {
         await page.locator(`#t-${tab}`).click();
         await page.waitForTimeout(60);
         assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} ${tab}`);
         if (tab === 'control') {
-          assert.equal(await page.locator('#pc-pick').isVisible(), width < 700 || height < 520, `${label} one card at a time only on a small screen`);
+          assert.equal(await page.locator('#pc-pick').isVisible(), small, `${label} one card at a time only on a small screen`);
           if (await page.locator('#pc-pick').isVisible()) {
             for (const pick of ['B', 'D', 'ALL', 'A']) {
               await page.locator(`#pc-pick [data-pick="${pick}"]`).click();
@@ -400,13 +403,31 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
           await act('B', 'cancel').click();
           await act('ALL', 'shutter-close').isVisible() && await act('ALL', 'shutter-close').click().then(async () => { await settled('ALL', 'armed'); assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} all lanes armed`); await act('ALL', 'cancel').click(); });
         }
-        if (tab === 'know' && await page.locator('#sb-know-back').isVisible().catch(() => false) === false && (width < 700 || height < 520)) {
+        if (tab === 'midi' && await page.locator('#sb-midi-heard').isVisible()) {
+          // A tiny screen shows the test or what was heard, one at a time.
+          assert.equal(await page.locator('#sb-feed').isVisible(), false);
+          await page.locator('#sb-midi-heard').click();
+          assert.deepEqual([await page.locator('#sb-feed').isVisible(), await page.locator('#sb-midi-test').isVisible(), await page.evaluate(() => document.activeElement?.id)], [true, false, 'sb-midi-back']);
+          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} midi heard`);
+          await page.locator('#sb-midi-back').click();
+          assert.equal(await page.locator('#sb-midi-test').isVisible(), true);
+        } else if (tab === 'midi') assert.deepEqual([await page.locator('#sb-feed').isVisible(), await page.locator('#sb-midi-test').isVisible()], [true, true]);
+        if (tab === 'know' && small) {
+          // A small screen shows the list or the viewer, one at a time.
+          if (await page.locator('#sb-know-back').isVisible()) await page.locator('#sb-know-back').click();
+          assert.deepEqual([await page.locator('#sb-know-list').isVisible(), await page.locator('#sb-know-stage').isVisible()], [true, false]);
+          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} know list`);
           await page.locator('.sb-know__item', { hasText: 'Sample signal flow' }).click();
           await page.locator('#sb-know-back').waitFor();
-          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} know viewer`);
+          assert.equal(await page.locator('#sb-know-list').isVisible(), false);
+          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} know diagram`);
           if (theme === 'light' && key === '375x812') await shot(page, '14-phone-know-diagram');
           await page.locator('#sb-know-back').click();
-          assert.equal(await page.locator('#sb-know-list').isVisible(), true);
+          await page.locator('.sb-know__item', { hasText: 'Sample recovery steps' }).click();
+          await page.locator('.sb-know__text h4').waitFor();
+          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} know document`);
+          if (theme === 'light' && key === '375x812') await shot(page, '15-phone-know-document');
+          await page.locator('#sb-know-back').click();
         }
         if (theme === 'light' && key === '768x1024') await shot(page, `2${TABS.indexOf(tab)}-tablet-portrait-${tab}`);
         if (theme === 'dark' && key === '1024x768') await shot(page, `3${TABS.indexOf(tab)}-tablet-landscape-${tab}-dark`);
@@ -419,7 +440,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       }
       // Tabs are a bottom rail on a phone and along the top otherwise.
       const tabsTop = await page.locator('.sb-tabs').evaluate(node => node.getBoundingClientRect().top), panelTop = await page.locator('#sb-main').evaluate(node => node.getBoundingClientRect().top);
-      assert.equal(tabsTop > panelTop, solo, `${label} tab rail position`);
+      assert.equal(tabsTop > panelTop, small, `${label} tab rail position`);
       // On a small screen the MIDI explanation moves behind a button, and its dialog fits.
       await page.locator('#t-midi').click();
       if (await page.locator('#sb-midi-more').isVisible()) {

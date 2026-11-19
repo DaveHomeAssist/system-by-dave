@@ -33,14 +33,14 @@
       <p class="sb-kicker"><span>Projctl</span><span id="sb-sim" class="sb-sim" hidden>Simulation</span><button id="sb-shared" type="button" class="sb-shared" aria-haspopup="dialog">Shared sign-in</button></p>
       <h1>Show backup</h1>
     </div>
-    <span id="sb-lock" class="sb-pill" data-lock="unknown" role="status">Show Lock unknown</span>
+    <span id="sb-lock" class="sb-pill" data-lock="unknown" role="status"><span class="sb-long">Show </span><span data-f="word">Lock unknown</span></span>
     <time id="sb-clock" class="sb-clock"></time>
     <button id="theme" type="button" class="sb-btn sb-btn--quiet">Theme</button>
   </header>
 
   <section class="sb-strip" aria-labelledby="sb-strip-h">
     <h2 id="sb-strip-h" class="sb-sr">Go or no-go</h2>
-    <p id="sb-verdict" class="sb-verdict" data-state="off" role="status"><strong data-f="title">Connecting</strong><span data-f="text">Waiting for the relay. Nothing below is a reading yet.</span></p>
+    <p id="sb-verdict" class="sb-verdict" data-state="off" role="status"><strong><span class="sb-verdict__long" data-f="title">Connecting</span><span class="sb-verdict__short" data-f="short" aria-hidden="true">Wait</span></strong><span data-f="text">Waiting for the relay. Nothing below is a reading yet.</span></p>
     <ul class="sb-checks" id="sb-check-list"></ul>
   </section>
 
@@ -71,26 +71,27 @@
       </div>
     </section>
 
-    <section role="tabpanel" id="midi" class="sb-panel sb-panel--midi" aria-labelledby="t-midi" tabindex="0" hidden>
+    <section role="tabpanel" id="midi" class="sb-panel sb-panel--midi" aria-labelledby="t-midi" tabindex="0" data-midi="test" hidden>
       <div class="sb-card sb-midi" id="sb-midi-test" data-state="off">
         <h3 class="sb-card__h">MIDI test from the console</h3>
         <p class="sb-midi__title" id="sb-midi-title" role="status">Not run yet</p>
         <p class="sb-midi__text" id="sb-midi-text"></p>
         <ol class="sb-steps" id="sb-midi-steps"></ol>
         <div class="sb-midi__actions">
-          <button id="sb-midi-start" type="button" class="sb-btn sb-btn--primary" aria-describedby="sb-midi-text">Start MIDI test</button>
-          <button id="sb-midi-stop" type="button" class="sb-btn" hidden>Stop test</button>
-          <button id="sb-midi-more" type="button" class="sb-btn sb-btn--quiet sb-midi__more" aria-haspopup="dialog">What this means</button>
+          <button id="sb-midi-start" type="button" class="sb-btn sb-btn--primary" aria-describedby="sb-midi-tip"><span class="sb-tl">Start MIDI test</span><span class="sb-ts">Start</span></button>
+          <button id="sb-midi-stop" type="button" class="sb-btn" hidden><span class="sb-tl">Stop test</span><span class="sb-ts">Stop</span></button>
+          <button id="sb-midi-more" type="button" class="sb-btn sb-btn--quiet sb-midi__more" aria-haspopup="dialog"><span class="sb-tl">What this means</span><span class="sb-ts">Explain</span></button>
+          <button id="sb-midi-heard" type="button" class="sb-btn sb-btn--quiet sb-tiny" data-midi-view="feed">Heard</button>
         </div>
+        <p class="sb-midi__tip" id="sb-midi-tip"></p>
         <p class="sb-midi__hint" id="sb-midi-hint"></p>
       </div>
       <div class="sb-card sb-feed" id="sb-feed" data-tone="off">
-        <h3 class="sb-card__h">Cue link</h3>
-        <p class="sb-feed__line"><strong id="sb-feed-title">Reading</strong><span id="sb-feed-text"></span></p>
-        <h3 class="sb-card__h">Last cue received</h3>
-        <p class="sb-feed__line"><strong id="sb-last-title">Not available</strong><span id="sb-last-text"></span></p>
+        <button id="sb-midi-back" type="button" class="sb-btn sb-btn--quiet sb-tiny" data-midi-view="test">Back to the test</button>
+        <p class="sb-feed__line"><span class="sb-feed__k">Cue link</span><strong id="sb-feed-title">Reading</strong><span id="sb-feed-text"></span></p>
+        <p class="sb-feed__line"><span class="sb-feed__k">Last cue received</span><strong id="sb-last-title">Not available</strong><span id="sb-last-text"></span></p>
         <h3 class="sb-card__h" id="sb-recent-h">Recent messages</h3>
-        <div class="sb-scroll" tabindex="0" aria-labelledby="sb-recent-h">
+        <div class="sb-scroll" tabindex="0" aria-label="Recent messages">
           <p id="sb-recent-empty" class="sb-empty">Nothing to list.</p>
           <ol id="sb-recent" class="sb-recent"></ol>
         </div>

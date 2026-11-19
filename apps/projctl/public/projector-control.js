@@ -238,10 +238,13 @@ export function createProjectorControl({ root, pick = null, post, announce = () 
       const skipped = [...op.skipped, ...refused];
       const lead = phase === 'armed' ? 'Nothing sent yet.' : 'The relay is ready. Nothing sent to the projector yet.';
       put(nodes.confirmText, [key === ALL ? `${lead} Goes to ${targetsText(going)}.` : lead, skipped.length ? `Skipping ${skippedText(skipped)}.` : '', sharedNote].filter(Boolean).join(' '));
+      mark(nodes.confirmText, 'title', nodes.confirmText.textContent);
     }
-    const text = op?.message || notes.get(key)?.text || fallback || '';
+    // A reason the operator just asked for by tapping a blocked action comes first, then the last outcome.
+    const asked = armed ? null : notes.get(key)?.text;
+    const text = asked || op?.message || fallback || '';
     put(nodes.msg, text);
-    mark(nodes.msg, 'data-kind', op?.message ? (phase === 'done' ? 'done' : phase === 'error' || phase === 'note' ? 'warn' : 'info') : notes.has(key) ? 'warn' : 'info');
+    mark(nodes.msg, 'data-kind', asked ? 'warn' : op?.message ? (phase === 'done' ? 'done' : phase === 'error' || phase === 'note' ? 'warn' : 'info') : 'info');
     mark(nodes.msg, 'title', text || null);
     return { phase, busy: LIVE_PHASES.includes(phase) && !armed, op };
   }
@@ -266,7 +269,10 @@ export function createProjectorControl({ root, pick = null, post, announce = () 
       put(nodes.fresh, view.freshText);
       mark(nodes.fresh, 'title', view.freshText);
       put(nodes.fact.shutter.value, view.shutterText);
-      put(nodes.fact.input.value, view.inputFlag ? `${view.inputText} · ${view.inputFlag.toLowerCase()}` : view.inputText);
+      const inputText = view.inputFlag ? `${view.inputText} · ${view.inputFlag.toLowerCase()}` : view.inputText;
+      put(nodes.fact.input.value, inputText);
+      mark(nodes.fact.input.value, 'title', inputText);
+      mark(nodes.fact.pattern.value, 'title', view.patternText);
       mark(nodes.fact.input.wrap, 'data-flag', view.inputFlag ? '' : null);
       put(nodes.fact.pattern.value, view.patternText);
       mark(nodes.fact.pattern.wrap, 'data-flag', view.patternFlag ? '' : null);

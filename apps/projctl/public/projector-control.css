@@ -90,7 +90,8 @@
   .pc-fact{display:flex;align-items:baseline;gap:5px}
   .pc-fact:not([data-fact="shutter"],[data-flag],[data-fact="lit"]){display:none}
   .pc-fact dt{font-size:9px}
-  .pc-fact dd{font-size:11px;line-height:1.2}
+  .pc-fact dd{min-width:0;overflow:hidden;font-size:11px;line-height:1.2;white-space:nowrap;text-overflow:ellipsis}
+  .pc-fact dt{flex:none}
   .pc-card__in:has(.pc-alarm:not([hidden])) .pc-facts{display:none}
   .pc-alarm{grid-row:3;padding:0 6px;font-size:11px}
   .pc-actions{grid-row:1 / span 2;gap:4px}

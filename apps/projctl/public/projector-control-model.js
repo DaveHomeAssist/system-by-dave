@@ -163,7 +163,12 @@ export function groupState(views, actionId, { lock = null, policy = DEFAULT_POLI
 }
 
 export const targetsText = ready => list(ready.map(target => target.lane));
-export const skippedText = skipped => skipped.map(item => `${item.lane}: ${lower(item.reason).replace(/\.$/, '')}`).join(' · ');
+// Lanes skipped for the same reason are named together, so the list stays short enough to read.
+export function skippedText(skipped) {
+  const byReason = new Map();
+  for (const item of skipped) byReason.set(item.reason, [...(byReason.get(item.reason) || []), item.lane]);
+  return [...byReason].map(([reason, lanes]) => `${list(lanes)}: ${lower(String(reason)).replace(/\.$/, '')}`).join(' · ');
+}
 
 // Counts for the all-lanes card.
 export function groupSummary(views) {
