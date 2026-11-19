@@ -1,5 +1,9 @@
 # Changelog
 
+## Projctl: Camera tab in source, 2026-11-19
+
+- The Camera tab that was installed by hand on the show Mac on November 17 is now in source: `public/camera-view.js`, `public/camera-view.css`, the tab and panel in `public/index.html`, and `http://127.0.0.1:8766` in the page CSP's `connect-src` and `frame-src`. The files match what the show Mac runs, except for two header comments. Carried in at Dave's choice (option A) so that the next install does not remove it.
+
 ## Projctl role pages: the rig's daily order of operations, 2026-11-19
 
 Applies the November 19 order of operations research to the role pages on the owner's word ("apply to crew dashboards", relayed). Simulator and fixtures only; not installed. Waits and behaviours from the research are labelled "researched, not yet tested" on the pages.

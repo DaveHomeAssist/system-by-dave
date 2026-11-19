@@ -1,0 +1,41 @@
+/* Camera tab: embeds the local Stage PTZ console. Installed by hand 2026-11-17; in source since 2026-11-19. */
+#tab-camera {
+  gap: 0;
+}
+
+.pj-camera-frame {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 360px;
+  border: 0;
+  border-radius: 10px;
+  background: #101416;
+}
+
+.pj-camera-message {
+  margin: auto;
+  max-width: 560px;
+  padding: 24px;
+  text-align: center;
+  line-height: 1.5;
+  border: 1px solid var(--line-control);
+  border-radius: 10px;
+  background: var(--surface-sunken);
+}
+
+.pj-camera-message p {
+  margin: 0 0 12px;
+}
+
+/* Keep Camera beside Controls in the tab bar; the Tools menu and narrow layouts keep Projctl's rules. */
+#workspace-views > [data-tab="camera"] {
+  display: inline-flex;
+  order: -1;
+}
+
+/* Projctl's .avd-btn sets display, which would override the hidden attribute. */
+#camera-retry[hidden],
+#camera-message[hidden],
+#camera-frame[hidden] {
+  display: none;
+}

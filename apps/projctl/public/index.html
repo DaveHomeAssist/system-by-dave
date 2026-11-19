@@ -15,7 +15,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Frozen | Projector control">
 <meta name="twitter:description" content="Frozen projector control: live readings, deliberate controls and show tools.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' ws: wss: https://wst.housevideo.app; frame-src 'self' https://wst.housevideo.app https://avbydave.com; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' ws: wss: https://wst.housevideo.app http://127.0.0.1:8766; frame-src 'self' https://wst.housevideo.app https://avbydave.com http://127.0.0.1:8766; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <script src="frozen-theme.js"></script><link rel="stylesheet" href="frozen-theme.css">
 <link rel="stylesheet" href="avd/tokens.css">
 <link rel="stylesheet" href="avd/bundle.css">
@@ -29,6 +29,7 @@
 <!-- Local Throwline import map: supplied by the relay. -->
 <link rel="stylesheet" href="workspace-bridge.css">
 <link rel="stylesheet" href="monitor-link.css">
+<link rel="stylesheet" href="camera-view.css">
 </head>
 <body>
 <a class="pj-skip" href="#tab-rig">Skip to rig</a>
@@ -56,6 +57,7 @@
       <button class="avd-tab" role="tab" id="tab-btn-rig" data-primary-nav aria-selected="true" aria-controls="tab-rig" data-tab="rig" type="button">Controls <span class="avd-tab__count" id="count-rig"></span></button>
       <button class="avd-tab" role="tab" id="tab-btn-all" aria-label="All projectors" aria-selected="false" aria-controls="tab-all" data-tab="all" type="button" tabindex="-1"><span class="all-label-full">All projectors</span><span class="all-label-short" aria-hidden="true">All</span></button>
       <button class="avd-tab" role="tab" id="tab-btn-stage" data-primary-nav aria-selected="false" aria-controls="tab-stage" data-tab="stage" type="button" tabindex="-1">3D Stage View</button>
+      <button class="avd-tab" role="tab" id="tab-btn-camera" data-primary-nav aria-selected="false" aria-controls="tab-camera" data-tab="camera" type="button" tabindex="-1">Camera</button>
       <button class="avd-tab" role="tab" id="tab-btn-presets" data-primary-nav aria-selected="false" aria-controls="tab-presets" data-tab="presets" type="button" tabindex="-1">Presets <span class="avd-tab__count" id="count-presets"></span></button>
       <button class="avd-tab" role="tab" id="tab-btn-preferences" aria-selected="false" aria-controls="tab-preferences" data-tab="preferences" type="button" tabindex="-1">Preferences</button>
       <button class="avd-tab" role="tab" id="tab-btn-health" aria-selected="false" aria-controls="tab-health" data-tab="health" type="button" tabindex="-1">Thermal watch</button>
@@ -98,6 +100,7 @@
       <div class="all-confirm-buttons"><button class="avd-btn" id="all-confirm-cancel" type="button">Cancel</button><button class="avd-btn avd-btn--primary" id="all-confirm-send" type="button">Confirm and send</button></div>
     </dialog>
     <section id="tab-health" class="tab" role="tabpanel" aria-labelledby="tab-btn-health" hidden><section id="thermal-watch"></section></section>
+    <section id="tab-camera" class="tab" role="tabpanel" aria-labelledby="tab-btn-camera" hidden><iframe id="camera-frame" class="pj-camera-frame" title="Stage PTZ camera: live picture and controls" allow="fullscreen" referrerpolicy="no-referrer" hidden></iframe><div id="camera-message" class="pj-camera-message" role="status"><p>Open this tab to connect to the Stage PTZ camera.</p><button id="camera-retry" class="avd-btn" type="button" hidden>Retry</button></div></section>
     <section id="tab-throw" class="tab" role="tabpanel" aria-labelledby="tab-btn-throw" hidden><div class="pj-allbar"><strong>Throw Calc · Throwline</strong><span class="pj-mono">Planning calculations only · no projector commands</span><a class="pj-mono" href="https://avbydave.com/ProjectorThrow/" target="_blank" rel="noopener noreferrer">Open separately ↗</a></div><iframe id="throw-calc-frame" class="pj-workspace-frame" title="Throwline projector throw calculator"></iframe></section>
     <section id="tab-stage" class="tab" role="tabpanel" aria-labelledby="tab-btn-stage" hidden>
       <div class="pj-stage-head">
@@ -222,5 +225,6 @@
 <noscript>Projector controls require JavaScript. Use the projector remote if the relay is unavailable.</noscript>
 <script type="module" src="app.js"></script>
 <script type="module" src="workspace-bridge.js"></script>
+<script type="module" src="camera-view.js"></script>
 </body>
 </html>

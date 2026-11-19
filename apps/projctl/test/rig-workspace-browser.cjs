@@ -24,7 +24,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
    await page.locator('#log tbody').filter({hasText:'previously P1'}).waitFor();
    assert.match(await page.locator('#log tbody').innerText(),/\/proj\/P1\/power/,'original command text remains in historical events');
    relaySocket.send(JSON.stringify(snapshot));await selectView(page,'info');
-   assert.deepEqual(await page.locator('[data-primary-nav]').evaluateAll(nodes=>nodes.map(n=>n.childNodes[0].textContent.trim())),['Controls','3D Stage View','Presets','Log','Configuration','Throw Calc']);
+   assert.deepEqual(await page.locator('[data-primary-nav]').evaluateAll(nodes=>nodes.map(n=>n.childNodes[0].textContent.trim())),['Controls','3D Stage View','Camera','Presets','Log','Configuration','Throw Calc']);
    await selectView(page,'rig');
    if (await page.locator('.pj-connection-help summary').isVisible()) {
    await page.locator('.pj-connection-help summary').click();
