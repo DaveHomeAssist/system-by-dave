@@ -220,7 +220,13 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     async lens(op = {}, { guard } = {}) {
       if (op.op === 'stop') {
         motionGeneration++;
-        for (const axis of Object.values(axes)) await rpc(axis + '.stop', undefined, timeoutMs, guard);
+        guard?.();
+        // Stop does not wait behind a queued status read, and one axis that fails
+        // does not keep the others moving: each axis gets its own connection.
+        const results = await Promise.allSettled(Object.values(axes).map((axis) => rpcOnce(axis + '.stop', undefined, timeoutMs, guard)));
+        const failed = results.filter((result) => result.status === 'rejected');
+        if (failed.length === results.length) throw failed[0].reason;
+        if (failed.length) throw new Error(`Stop lens was sent to every axis; ${failed.length} of ${results.length} did not acknowledge (${failed[0].reason?.message || failed[0].reason}).`);
         return 'OK';
       }
       const generation = motionGeneration;

@@ -237,6 +237,9 @@ Picture controls come from writable `image` metadata and use its actual ranges a
 Lens taps use bounded encoder targets: Slow 128, Normal 512 and Fast 2048, limited to device
 travel. Slow is the default. The relay waits for stopped feedback, blocks overlapping
 movement, and refreshes position before replying. Stop lens remains available under Show Lock.
+Stop lens opens its own connection to each of the four axes at once, so it does not wait behind
+a status read, and one axis that fails does not leave the others moving. If any axis does not
+acknowledge, the command reports how many.
 An acknowledged request still needs the expected physical result checked on the actual rig.
 
 Shift button labels describe image movement from the audience's view. Setup can reverse

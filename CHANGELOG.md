@@ -14,6 +14,14 @@ Applies the November 19 order of operations research to the role pages on the ow
 - **Hints** on the shared control: a suggested run, highlighted and explained from B and C, Show Lock and the last run (never pressed), and a copyable summary of the finished run under the banner.
 - Shared files: `server/index.js` (the run gets the poller's refresh), `server/drivers/pulse.js`, `server/drivers/simulator.js`, `server/drivers/index.js`.
 
+## Projctl: Barco Stop lens on every axis, 2026-11-19
+
+- Stop lens on the Barco (Pulse) used to queue behind status reads and stop at the first axis that failed, leaving the rest moving. It now sends stop to all four axes at once, each on its own connection, and reports any axis that did not acknowledge. Re-landed from draft PR 460 onto main's driver. Simulator-tested only; not installed or tried on the UDM.
+
+## Frozen booth workspace, November 19, 2026
+
+Workspace search opens show pages and R5 references. Notes retains the last shared task snapshot and queues offline checkoffs. Readiness reports identify operator confirmations and the connected relay can supply timestamped booth status.
+
 ## Projctl role pages: one shared on and off control and one all-four run, 2026-11-18
 
 - **One run in the relay.** `server/power-run.js` runs "all four on" and "all four off" once, in the relay, with one state every page reads. A second press from any page meets the run in progress. Fixed order (on: C, B, A, D; off: A, D, B, C), each unit read before it is commanded, at most one command per unit, the waits from the manuals inside it, and a banner ("All four on" or "Safe to leave the building") only when every lane's own reply supports it. Routes: `GET /api/power-run`, `POST /api/power-run/plan`, `/start` and `/stop`, behind the sign-in.
