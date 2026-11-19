@@ -1,5 +1,9 @@
 # Changelog
 
+## Projctl four-lane power checklist, November 19, 2026
+
+The power operator page sends individual relay commands for A, B, C and D. A and D require fresh power readings and start a 170-second browser timer after accepted power off. The departure banner waits for that timer and fresh Standby on the lamp lanes. The playback check, Show Lock and two-step shutdown still apply.
+
 ## Frozen booth workspace, November 19, 2026
 
 Workspace search opens show pages and R5 references. Notes retains the last shared task snapshot and queues offline checkoffs. Readiness reports identify operator confirmations and the connected relay can supply timestamped booth status.

@@ -7,7 +7,7 @@ import { startRelay, until } from './relay-helper.js';
 import { createConnectionMonitor } from '../public/projector-connection.js';
 import { createCommandBinding } from '../server/command-binding.js';
 import { rigLanes } from '../public/lanes.js';
-import { COOL_SECONDS, TICK_VALID_MS, STEPS, RELAY_LANES, MANUAL_LANES, emptyRecord, parseRecord, tickCurrent, coolTimer, clock, crewNotesUrl, laneReading, relayStep, manualStep, banner } from '../public/power-model.js';
+import { COOL_SECONDS, TICK_VALID_MS, STEPS, RELAY_LANES, LAMP_LANES, emptyRecord, parseRecord, tickCurrent, coolTimer, clock, crewNotesUrl, laneReading, relayStep, banner } from '../public/power-model.js';
 
 const NOW = Date.parse('2026-11-18T22:30:00Z');
 const PAGE_FILES = ['power.html', 'power.js', 'power-model.js', 'power.css'];
@@ -22,18 +22,9 @@ function readingOf(p, { relayConnected = true } = {}) {
   const entry = p ? rigLanes([p]).find(item => item.lane === p.lane) : { lane: 'B', projector: null, conflict: false };
   return laneReading(entry, createConnectionMonitor()(p, relayConnected, 5000, NOW));
 }
-const lanesFor = (mode, { B, C, A, D }) => [
-  { lane: 'B', kind: 'relay', ...relayStep(mode, B, { playbackTicked: true }) },
-  { lane: 'C', kind: 'relay', ...relayStep(mode, C, { playbackTicked: true }) },
-  { lane: 'A', kind: 'manual', relayWord: A.reading.word, ...manualStep(mode, A.item, A.reading, NOW) },
-  { lane: 'D', kind: 'manual', relayWord: D.reading.word, ...manualStep(mode, D.item, D.reading, NOW) },
-];
-const notReached = readingOf(projector('A', 'on', { online: false, state: 'reconnecting', ageMs: 6 * 3600 * 1000 }));
-const tick = (state, ageMs = 60000) => ({ tick: { state, at: NOW - ageMs }, coolUntil: null });
-
 test('the lane split and step order follow the brief', () => {
-  assert.deepEqual([...RELAY_LANES], ['B', 'C']);
-  assert.deepEqual([...MANUAL_LANES], ['A', 'D']);
+  assert.deepEqual([...RELAY_LANES], ['A', 'B', 'C', 'D']);
+  assert.deepEqual([...LAMP_LANES], ['A', 'D']);
   assert.deepEqual([...STEPS.on], ['playback', 'C', 'B', 'A', 'D']);
   assert.deepEqual([...STEPS.off], ['playback', 'B', 'C', 'A', 'D']);
   assert.equal(COOL_SECONDS, 170);
@@ -52,13 +43,13 @@ test('saved ticks and timers are validated, and anything else is dropped', () =>
   }, relay: {
     C: { tick: { state: 'off', at: NOW }, coolUntil: NOW }, // a relay lane keeps only an "off by eye" tick
     B: { tick: { state: 'lit', at: NOW } },
-    A: { tick: { state: 'off', at: NOW } }, // not a relay lane
+    A: { tick: { state: 'lit', at: NOW } },
   }, extra: '<script>' };
   const record = parseRecord(JSON.stringify(saved));
   assert.deepEqual(record, { v: 1, playback: { on: NOW, off: null },
-    lanes: { A: { tick: { state: 'off', at: NOW }, coolUntil: NOW + 1000 }, D: { tick: null, coolUntil: null } },
-    relay: { B: { tick: null }, C: { tick: { state: 'off', at: NOW } } } });
-  assert.deepEqual(emptyRecord().relay, { B: { tick: null }, C: { tick: null } });
+    lanes: { A: { coolUntil: NOW + 1000 }, D: { coolUntil: null } },
+    relay: { A: { tick: null }, B: { tick: null }, C: { tick: { state: 'off', at: NOW } }, D: { tick: null } } });
+  assert.deepEqual(emptyRecord().relay, { A: { tick: null }, B: { tick: null }, C: { tick: null }, D: { tick: null } });
 });
 
 test('a tick is current for 30 minutes and never from the future', () => {
@@ -181,80 +172,35 @@ test('at night a relay lane the relay cannot read is confirmed off by eye, and t
   assert.equal(relayStep('off', unread, { ...ready, tick: { state: 'lit', at: NOW } }).done, false);
 
   // Banner: every lane is either read as Standby or looked at, and the detail says which.
-  const manual = { item: tick('off'), reading: notReached };
   const lanes = (c, b = readingOf(projector('B', 'off'))) => [
     { lane: 'B', kind: 'relay', ...relayStep('off', b, ready) },
     { lane: 'C', kind: 'relay', ...c },
-    { lane: 'A', kind: 'manual', relayWord: manual.reading.word, ...manualStep('off', manual.item, manual.reading, NOW) },
-    { lane: 'D', kind: 'manual', relayWord: manual.reading.word, ...manualStep('off', manual.item, manual.reading, NOW) },
+    { lane: 'A', kind: 'relay', ...relayStep('off', readingOf(projector('A', 'off')), ready) },
+    { lane: 'D', kind: 'relay', ...relayStep('off', readingOf(projector('D', 'off')), ready) },
   ];
-  assert.deepEqual([banner('off', lanes(ticked)).state, banner('off', lanes(ticked)).detail], ['safe', 'B reads Standby. C, A and D confirmed off by eye.']);
+  assert.deepEqual([banner('off', lanes(ticked)).state, banner('off', lanes(ticked)).detail], ['safe', 'B, A and D read Standby. C confirmed off by eye.']);
   assert.deepEqual([banner('off', lanes(relayStep('off', unread, ready))).state, banner('off', lanes(relayStep('off', unread, ready))).detail], ['wait', 'Waiting on: C unknown']);
   assert.equal(banner('off', lanes(lapsed)).detail, 'Waiting on: C tick lapsed');
   assert.equal(banner('off', lanes(relayStep('off', readingOf(projector('C', 'on')), { ...ready, tick: eyeTick() }))).detail, 'Waiting on: C on', 'a lane that reads On is not safe, whatever was ticked');
   const both = { ...ready, tick: eyeTick() };
-  assert.equal(banner('off', [{ lane: 'B', kind: 'relay', ...relayStep('off', readingOf(projector('B', 'unknown')), both) }, ...lanes(ticked).slice(1)]).detail, 'B, C, A and D confirmed off by eye.');
+  assert.equal(banner('off', [{ lane: 'B', kind: 'relay', ...relayStep('off', readingOf(projector('B', 'unknown')), both) }, ...lanes(ticked).slice(1)]).detail, 'A and D read Standby. B and C confirmed off by eye.');
 });
 
-test('a manual lane goes by the operator tick, and a fresh relay reading can only veto it', () => {
-  const none = manualStep('off', { tick: null, coolUntil: null }, notReached, NOW);
-  assert.deepEqual([none.done, none.word, none.tickEnabled], [false, 'TO DO', true]);
-  assert.equal(none.word in { ON: 1, STANDBY: 1, COOLING: 1, WARMING: 1 }, false, 'a lane the relay has not reached never shows a power word');
-
-  const off = manualStep('off', tick('off'), notReached, NOW);
-  assert.deepEqual([off.done, off.word, off.tickedAt], [true, 'OFF BY EYE', NOW - 60000]);
-  assert.equal(manualStep('on', tick('off'), notReached, NOW).done, false, 'a night tick does not count in the morning');
-  assert.deepEqual([manualStep('on', tick('lit'), notReached, NOW).done, manualStep('on', tick('lit'), notReached, NOW).word], [true, 'LIT BY EYE']);
-
-  const lapsed = manualStep('off', tick('off', TICK_VALID_MS + 1000), notReached, NOW);
-  assert.deepEqual([lapsed.done, lapsed.lapsed, lapsed.word], [false, true, 'TICK LAPSED']);
-
-  const timing = manualStep('off', { tick: null, coolUntil: NOW + 90000 }, notReached, NOW);
-  assert.deepEqual([timing.word, timing.tickEnabled, timing.timer.remaining], ['COOLING TIMER', false, 90]);
-  assert.match(timing.tickReason, /cooling countdown/);
-
-  // With the playback app closed the relay may reach a manual lane. A fresh reading that disagrees wins.
-  for (const power of ['on', 'warming', 'cooling']) {
-    const disputed = manualStep('off', tick('off'), readingOf(projector('A', power)), NOW);
-    assert.deepEqual([disputed.done, disputed.conflict, disputed.word], [false, true, 'CHECK AGAIN'], power);
-  }
-  assert.equal(manualStep('off', tick('off'), readingOf(projector('A', 'off')), NOW).done, true);
-  assert.equal(manualStep('on', tick('lit'), readingOf(projector('A', 'off')), NOW).conflict, true);
-  assert.equal(manualStep('on', tick('lit'), readingOf(projector('A', 'warming')), NOW).done, true);
-});
-
-test('safe to leave needs B and C in Standby from fresh replies and A and D ticked off', () => {
-  const standby = lane => readingOf(projector(lane, 'off'));
-  const ticked = { item: tick('off'), reading: notReached };
-  const all = { B: standby('B'), C: standby('C'), A: ticked, D: ticked };
-
-  const safe = banner('off', lanesFor('off', all));
-  assert.deepEqual([safe.state, safe.title], ['safe', 'Safe to leave the building']);
-  assert.equal(safe.detail, 'B and C read Standby. A and D confirmed off by eye.');
-
-  const cases = {
-    'B cooling': { ...all, B: readingOf(projector('B', 'cooling')) },
-    'B on': { ...all, B: readingOf(projector('B', 'on')) },
-    'C no reply': { ...all, C: readingOf(projector('C', 'off', { ageMs: 60000 })) },
-    'C page offline': { ...all, C: readingOf(projector('C', 'off'), { relayConnected: false }) },
-    'C unknown': { ...all, C: readingOf(projector('C', 'unknown')) },
-    'A not ticked': { ...all, A: { item: { tick: null, coolUntil: null }, reading: notReached } },
-    'A cooling timer': { ...all, A: { item: { tick: null, coolUntil: NOW + 60000 }, reading: notReached } },
-    'D tick lapsed': { ...all, D: { item: tick('off', TICK_VALID_MS + 1), reading: notReached } },
-    'D not ticked': { ...all, D: { item: tick('lit'), reading: notReached } },
-    'A ticked, but the relay reads ON': { ...all, A: { item: tick('off'), reading: readingOf(projector('A', 'on')) } },
-  };
-  for (const [why, lanes] of Object.entries(cases)) {
-    const result = banner('off', lanesFor('off', lanes));
-    assert.deepEqual([result.state, result.title], ['wait', 'Not safe to leave yet'], why);
-    assert.equal(result.detail, `Waiting on: ${why}`);
-  }
-  assert.equal(banner('off', []).state, 'wait', 'no lanes is never safe');
-
-  const lit = { item: tick('lit'), reading: notReached };
-  const morning = { B: readingOf(projector('B', 'on')), C: readingOf(projector('C', 'on')), A: lit, D: lit };
-  assert.deepEqual([banner('on', lanesFor('on', morning)).state, banner('on', lanesFor('on', morning)).title], ['ready', 'All four on']);
-  assert.equal(banner('on', lanesFor('on', { ...morning, B: readingOf(projector('B', 'warming')) })).detail, 'Waiting on: B warming');
+test('lamp lanes require a known reply and completed cooling interval', () => {
+  const standby = readingOf(projector('A', 'off'));
+  const options = { playbackTicked: true, lamp: true, now: NOW };
+  assert.equal(relayStep('on', standby, options).enabled, true);
+  const cooling = { ...options, coolUntil: NOW + 60000 };
+  assert.equal(relayStep('on', standby, cooling).enabled, false);
+  assert.equal(relayStep('off', standby, cooling).done, false);
+  const unknown = readingOf(projector('A', 'unknown'));
+  assert.equal(relayStep('on', unknown, options).enabled, false);
+  assert.equal(relayStep('off', unknown, { ...options, tick: { state: 'off', at: NOW } }).done, false);
+  const lanes = RELAY_LANES.map(lane => ({ lane, ...relayStep('off', standby, options) }));
+  assert.equal(banner('off', lanes).state, 'safe');
+  lanes[0] = { lane: 'A', ...relayStep('off', standby, cooling) };
+  assert.equal(banner('off', lanes).detail, 'Waiting on: A cooling timer');
+  assert.equal(banner('off', []).state, 'wait');
 });
 
 test('the crew notes link accepts only a plain web address from the relay', () => {

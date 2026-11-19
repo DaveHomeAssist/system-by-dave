@@ -7,9 +7,8 @@ export const STORAGE_KEY = 'projctl.powerPage.v1';
 export const COOL_SECONDS = 170;
 // A "confirmed by eye" tick describes one moment. It lapses so an old tick cannot satisfy a later check.
 export const TICK_VALID_MS = 30 * 60 * 1000;
-// Pending decision POWER-1: the relay powers these lanes; the operator powers the others by handheld remote.
-export const RELAY_LANES = Object.freeze(['B', 'C']);
-export const MANUAL_LANES = Object.freeze(['A', 'D']);
+export const RELAY_LANES = Object.freeze(['A', 'B', 'C', 'D']);
+export const LAMP_LANES = Object.freeze(['A', 'D']);
 export const STEPS = Object.freeze({
   on: Object.freeze(['playback', 'C', 'B', 'A', 'D']),
   off: Object.freeze(['playback', 'B', 'C', 'A', 'D']),
@@ -20,7 +19,7 @@ const time = value => typeof value === 'number' && Number.isFinite(value) && val
 
 export function emptyRecord() {
   return { v: 1, playback: { on: null, off: null },
-    lanes: Object.fromEntries(MANUAL_LANES.map(lane => [lane, { tick: null, coolUntil: null }])),
+    lanes: Object.fromEntries(LAMP_LANES.map(lane => [lane, { coolUntil: null }])),
     // Night only: a relay lane the relay cannot read may be confirmed off by eye (decision POWER-4).
     relay: Object.fromEntries(RELAY_LANES.map(lane => [lane, { tick: null }])) };
 }
@@ -32,10 +31,9 @@ export function parseRecord(text) {
   try { raw = JSON.parse(text); } catch { return record; }
   if (!raw || typeof raw !== 'object' || raw.v !== 1) return record;
   for (const mode of ['on', 'off']) record.playback[mode] = time(raw.playback?.[mode]);
-  for (const lane of MANUAL_LANES) {
+  for (const lane of LAMP_LANES) {
     const item = raw.lanes?.[lane];
     if (!item || typeof item !== 'object') continue;
-    if (item.tick && typeof item.tick === 'object' && ['lit', 'off'].includes(item.tick.state) && time(item.tick.at)) record.lanes[lane].tick = { state: item.tick.state, at: item.tick.at };
     record.lanes[lane].coolUntil = time(item.coolUntil);
   }
   for (const lane of RELAY_LANES) {
@@ -92,15 +90,16 @@ export function laneReading(entry, connection) {
 // A relay lane: the one command this mode may send, whether it may be sent now, and why not.
 // `tick` is the operator's own "off by eye" tick for this lane, used only at night and only while the
 // relay's fresh reply carries no power state.
-export function relayStep(mode, reading, { lock = false, busy = false, playbackTicked = false, tick = null, now = Date.now() } = {}) {
+export function relayStep(mode, reading, { lock = false, busy = false, playbackTicked = false, tick = null, lamp = false, coolUntil = null, now = Date.now() } = {}) {
   const want = mode === 'on' ? 'on' : 'off';
-  const read = reading.kind === 'reading' && reading.power === want;
+  const timer = coolTimer(coolUntil, now);
+  const read = !timer.running && reading.kind === 'reading' && reading.power === want;
   // A fresh reply with no power state in it (for example a unit in a standby the relay's driver does
   // not name). The relay still accepts power for it, as the operator console does, so the step
   // stays usable. It is never shown or counted as On or Standby.
   const unread = reading.kind === 'unknown';
   // At night such a lane can be confirmed off by eye, exactly as a lane powered by handheld remote is.
-  const eyeOffered = unread && mode === 'off';
+  const eyeOffered = unread && !lamp && mode === 'off';
   const eyeMatches = eyeOffered && !!tick && tick.state === 'off';
   const eyeTicked = eyeMatches && tickCurrent(tick.at, now);
   const done = read || eyeTicked;
@@ -109,6 +108,8 @@ export function relayStep(mode, reading, { lock = false, busy = false, playbackT
   else if (reading.kind === 'unassigned') reason = 'This lane is not set up on the relay. Call the video lead.';
   else if (reading.kind === 'disconnected') reason = 'The control page lost the relay. Wait for it to reconnect.';
   else if (reading.kind === 'noreply') reason = 'No fresh reply from this projector. No reply does not confirm power off.';
+  else if (timer.running) reason = 'Wait for the lamp cooling timer.';
+  else if (unread && lamp) reason = 'Wait for a fresh lamp power reading.';
   else if (read) reason = mode === 'on' ? 'The relay reads On. Nothing to send.' : 'The relay reads Standby. Nothing to send.';
   else if (!playbackTicked) reason = 'Tick step 1 first.';
   else if (busy) reason = 'Another operation is running on this projector. Wait for it to finish.';
@@ -121,28 +122,11 @@ export function relayStep(mode, reading, { lock = false, busy = false, playbackT
       ? "The relay cannot read this unit's power state. Look at it first: power on only from standby."
       : "The relay cannot read this unit's power state. Look at it: tick if it is off, power off if it is lit.";
   }
-  const tone = done ? 'done' : unread ? 'waiting' : reading.kind !== 'reading' ? 'blocked' : ['warming', 'cooling'].includes(reading.power) ? 'waiting' : 'todo';
-  return { done, enabled, reason, word: eyeTicked ? 'OFF BY EYE' : reading.word, tone, action: want,
+  const tone = done ? 'done' : timer.running ? 'waiting' : unread ? 'waiting' : reading.kind !== 'reading' ? 'blocked' : ['warming', 'cooling'].includes(reading.power) ? 'waiting' : 'todo';
+  return { done, enabled, reason, timer, word: eyeTicked ? 'OFF BY EYE' : reading.word, tone, action: want,
     // How this lane came to count: read by the relay, or looked at by the operator. Never both.
     basis: read ? 'read' : eyeTicked ? 'eye' : null,
     eye: { offered: eyeOffered, ticked: eyeTicked, lapsed: eyeMatches && !eyeTicked, tickedAt: eyeTicked ? tick.at : null } };
-}
-
-// A manual lane: the operator's own tick and timer. The relay reading, when there is one, can only veto.
-export function manualStep(mode, item, reading, now) {
-  const want = mode === 'on' ? 'lit' : 'off';
-  const matches = !!item?.tick && item.tick.state === want;
-  const ticked = matches && tickCurrent(item.tick.at, now);
-  const lapsed = matches && !ticked;
-  const timer = coolTimer(item?.coolUntil, now);
-  const relayPower = reading.kind === 'reading' ? reading.power : null;
-  const conflict = ticked && relayPower !== null && (mode === 'on' ? ['off', 'cooling'].includes(relayPower) : relayPower !== 'off');
-  const done = ticked && !conflict;
-  const tickEnabled = ticked || !timer.running;
-  const word = conflict ? 'CHECK AGAIN' : ticked ? (mode === 'on' ? 'LIT BY EYE' : 'OFF BY EYE') : timer.running ? 'COOLING TIMER' : lapsed ? 'TICK LAPSED' : 'TO DO';
-  const tone = conflict ? 'blocked' : done ? 'done' : timer.running ? 'waiting' : 'todo';
-  return { done, ticked, lapsed, conflict, timer, tickEnabled, word, tone, tickedAt: ticked ? item.tick.at : null,
-    tickReason: tickEnabled ? '' : 'Wait for the cooling countdown, then check by eye.' };
 }
 
 // The strip above the checklist. Night: safe to leave only when every lane is either read as Standby
@@ -150,10 +134,10 @@ export function manualStep(mode, item, reading, now) {
 // The detail says which lanes were read and which were looked at.
 export function banner(mode, lanes) {
   const missing = lanes.filter(lane => !lane.done).map(lane => ({ lane: lane.lane,
-    why: lane.kind === 'relay' ? (lane.eye?.lapsed ? 'tick lapsed' : lane.word.toLowerCase()) : lane.conflict ? `ticked, but the relay reads ${lane.relayWord}` : lane.lapsed ? 'tick lapsed' : lane.timer?.running ? 'cooling timer' : 'not ticked' }));
+    why: lane.timer?.running ? 'cooling timer' : lane.eye?.lapsed ? 'tick lapsed' : lane.word.toLowerCase() }));
   const complete = lanes.length > 0 && missing.length === 0;
-  const read = lanes.filter(lane => lane.kind === 'relay' && lane.basis !== 'eye').map(lane => lane.lane);
-  const eye = lanes.filter(lane => lane.kind === 'manual' || lane.basis === 'eye').map(lane => lane.lane);
+  const read = lanes.filter(lane => lane.basis !== 'eye').map(lane => lane.lane);
+  const eye = lanes.filter(lane => lane.basis === 'eye').map(lane => lane.lane);
   const list = items => items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items[0] || '';
   const told = (state, sight) => [read.length ? `${list(read)} ${read.length === 1 ? 'reads' : 'read'} ${state}.` : '', eye.length ? `${list(eye)} confirmed ${sight} by eye.` : ''].filter(Boolean).join(' ');
   const waiting = `Waiting on: ${missing.map(item => `${item.lane} ${item.why}`).join(' · ')}`;

@@ -3,7 +3,7 @@
 // nothing else, and it never sends anything to a lane the operator powers by handheld remote.
 import { LANES, rigLanes } from './lanes.js';
 import { createConnectionMonitor } from './projector-connection.js';
-import { STORAGE_KEY, COOL_SECONDS, TICK_VALID_MS, STEPS, MANUAL_LANES, emptyRecord, parseRecord, tickCurrent, coolTimer, clock, crewNotesUrl, laneReading, relayStep, manualStep, banner } from './power-model.js';
+import { STORAGE_KEY, COOL_SECONDS, TICK_VALID_MS, STEPS, LAMP_LANES, emptyRecord, parseRecord, tickCurrent, clock, crewNotesUrl, laneReading, relayStep, banner } from './power-model.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const MODES = ['on', 'off'];
@@ -78,7 +78,6 @@ for (const mode of MODES) {
   $('[data-prev]', panel).addEventListener('click', () => goToStep(mode, stepIndex[mode] - 1, true));
   $('[data-next]', panel).addEventListener('click', () => goToStep(mode, stepIndex[mode] + 1, true));
   $('[data-action]', panel).addEventListener('click', () => act(mode));
-  $('[data-timer]', panel).addEventListener('click', () => toggleTimer(mode));
   $('[data-alt]', panel).addEventListener('click', () => altPower(mode));
   panels[mode] = { panel, detail, pills: [...rail.querySelectorAll('.pw-pill')] };
 }
@@ -126,8 +125,7 @@ function buildMode(mode, now) {
     }
     const entry = entries.get(key), projector = entry?.projector || null;
     const reading = laneReading(entry, monitor(projector, connected, state.relay?.pollIntervalMs, now + relayClockOffset));
-    if (MANUAL_LANES.includes(key)) return { key, lane: key, kind: 'manual', reading, relayWord: reading.word, ...manualStep(mode, record.lanes[key], reading, now) };
-    return { key, lane: key, kind: 'relay', reading, projector, ...relayStep(mode, reading, { lock: !!state.lock, busy: !!projector?.busy, playbackTicked, tick: record.relay[key]?.tick, now }) };
+    return { key, lane: key, kind: 'relay', reading, projector, ...relayStep(mode, reading, { lock: !!state.lock, busy: !!projector?.busy, playbackTicked, tick: record.relay[key]?.tick, lamp: LAMP_LANES.includes(key), coolUntil: record.lanes[key]?.coolUntil, now }) };
   });
   return { steps, banner: banner(mode, steps.filter(step => step.kind !== 'playback')) };
 }
@@ -143,10 +141,7 @@ const TEXT = {
   },
   // A relay lane whose reply has no power state, at night: the operator's eyes decide, as for a manual lane.
   unread: lane => `The relay cannot read lane ${lane}'s power state, so go by eye. If the unit is dark and its indicator shows standby, tick below. If it is still lit, press Power off, then Confirm.`,
-  manual: {
-    on: lane => `Power on lane ${lane} with the handheld remote. Tick below when you see light on the surface. If it shuts itself off, start the cooling timer and wait for the red light before one more try.`,
-    off: lane => `Power off lane ${lane} with the handheld remote and confirm on its screen. Start the cooling timer. When it ends, check that the fans have stopped and the indicator is red, then tick.`,
-  },
+
 };
 
 // The rail has room for one short word per step. The open step shows the full one.
@@ -158,16 +153,12 @@ function setHidden(node, hidden) { if (node.hidden !== hidden) node.hidden = hid
 
 function sourceText(step) {
   const reading = step.reading;
-  if (step.kind === 'relay') {
-    if (reading.kind === 'reading') return `Relay reading · reply ${reading.ageLabel.toLowerCase()}`;
-    if (reading.kind === 'noreply') return `No fresh reply · last known ${reading.lastKnown || 'nothing'} · last reply ${reading.lastReply}`;
-    if (reading.kind === 'disconnected') return `Relay offline · last known ${reading.lastKnown || 'nothing'}`;
-    if (reading.kind === 'unknown') return `Reply ${reading.ageLabel.toLowerCase()} · no power state in it`;
-    return '';
-  }
-  if (step.timer.running) return `${clock(step.timer.remaining)} left · your timer · do not cut mains power`;
-  if (reading.kind === 'reading') return `Relay reading: ${reading.word} · reply ${reading.ageLabel.toLowerCase()}`;
-  return 'Not reached by the relay. Go by eye.';
+  if (step.timer.running) return `${clock(step.timer.remaining)} left · lamp timer · keep mains on`;
+  if (reading.kind === 'reading') return `Relay reading · reply ${reading.ageLabel.toLowerCase()}`;
+  if (reading.kind === 'noreply') return `No fresh reply · last known ${reading.lastKnown || 'nothing'} · last reply ${reading.lastReply}`;
+  if (reading.kind === 'disconnected') return `Relay offline · last known ${reading.lastKnown || 'nothing'}`;
+  if (reading.kind === 'unknown') return `Reply ${reading.ageLabel.toLowerCase()} · no power state in it`;
+  return '';
 }
 
 function whyText(mode, step, now) {
@@ -178,26 +169,13 @@ function whyText(mode, step, now) {
     if (step.done) return { text: `Ticked ${at(step.tickedAt)}. Lapses ${at(step.tickedAt + TICK_VALID_MS)}.${store.persisted ? '' : ' Browser storage is unavailable, so ticks last only while this page stays open.'}`, tone: '' };
     return { text: step.word === 'TICK LAPSED' ? 'The earlier tick lapsed. Look again, then tick.' : 'The relay power buttons wait for this tick.', tone: '' };
   }
-  if (step.kind === 'relay') {
-    if (step.eye.ticked) return { text: `Ticked ${at(step.eye.tickedAt)}. Lapses ${at(step.eye.tickedAt + TICK_VALID_MS)}. The relay still cannot read this unit.`, tone: '' };
-    if (step.eye.lapsed) return { text: 'The earlier tick lapsed. Look again, then tick.', tone: '' };
-    return { text: step.reason, tone: '' };
-  }
-  if (step.conflict) return { text: `You ticked this lane, but the relay reads ${step.relayWord}. Look at the surface again.`, tone: 'error' };
-  if (step.ticked) return { text: `Ticked ${at(step.tickedAt)}. Lapses ${at(step.tickedAt + TICK_VALID_MS)}.`, tone: '' };
-  if (step.timer.running) return { text: step.tickReason, tone: '' };
-  if (step.timer.finishedAt) return { text: `Your cooling timer ended at ${at(step.timer.finishedAt)}. Check by eye, then tick.`, tone: 'ok' };
-  if (step.lapsed) return { text: 'The earlier tick lapsed. Look again, then tick.', tone: '' };
-  return { text: '', tone: '' };
+  if (step.eye.ticked) return { text: `Ticked ${at(step.eye.tickedAt)}. Lapses ${at(step.eye.tickedAt + TICK_VALID_MS)}. The relay still cannot read this unit.`, tone: '' };
+  if (step.eye.lapsed) return { text: 'The earlier tick lapsed. Look again, then tick.', tone: '' };
+  return { text: step.reason, tone: '' };
 }
 
 function actionView(mode, step) {
   if (step.kind === 'playback') return { label: step.done ? '\u2713 App closed by eye' : 'Tick by eye: app closed', pressed: step.done, enabled: true };
-  if (step.kind === 'manual') {
-    const ticked = mode === 'on' ? `\u2713 ${step.lane} lit by eye` : `\u2713 ${step.lane} off by eye`;
-    const todo = mode === 'on' ? `Tick by eye: ${step.lane} is lit` : `Tick by eye: ${step.lane} off, red light`;
-    return { label: step.ticked ? ticked : todo, pressed: step.ticked, enabled: step.tickEnabled };
-  }
   // A relay lane the relay cannot read, at night: the tick is the main action and power moves beside it.
   if (step.eye.offered) return { label: step.eye.ticked ? `\u2713 ${step.lane} off by eye` : `Tick by eye: ${step.lane} is off`, pressed: step.eye.ticked, enabled: true };
   return powerView(mode, step);
@@ -243,15 +221,15 @@ function renderMode(mode, now) {
   setText($('[data-word]', panel), step.word);
   setText($('[data-source]', panel), step.kind === 'playback' ? '' : sourceText(step));
   // Each of these depends on a decision that is still open (see the brief).
-  const pending = step.kind === 'playback' ? 'Pending POWER-2' : step.kind === 'manual' ? 'Pending POWER-1' : step.eye.offered ? 'Pending POWER-4' : '';
+  const pending = step.kind === 'playback' ? 'Pending POWER-2' : step.eye.offered ? 'Pending POWER-4' : '';
   setHidden($('[data-pending]', panel), !pending);
   setText($('[data-pending]', panel), pending || 'Pending decision');
   const byEye = step.kind === 'relay' && step.eye.offered;
-  setText($('[data-text]', panel), step.kind === 'manual' ? TEXT.manual[mode](step.lane) : byEye ? TEXT.unread(step.lane) : TEXT[step.kind][mode]);
+  setText($('[data-text]', panel), byEye ? TEXT.unread(step.lane) : TEXT[step.kind][mode]);
 
-  setHidden($('[data-tools]', panel), step.kind !== 'manual' && !byEye);
-  setHidden($('[data-timer]', panel), step.kind !== 'manual');
-  setHidden($('[data-lamp]', panel), step.kind !== 'manual');
+  const lamp = LAMP_LANES.includes(step.lane);
+  setHidden($('[data-tools]', panel), !lamp && !byEye);
+  setHidden($('[data-lamp]', panel), !lamp);
   const alt = $('[data-alt]', panel);
   setHidden(alt, !byEye);
   if (byEye) {
@@ -261,12 +239,6 @@ function renderMode(mode, now) {
     setAttr(alt, 'aria-busy', power.busy ? 'true' : null);
     setAttr(alt, 'data-confirming', power.confirming ? '' : null);
   }
-  if (step.kind === 'manual') {
-    const timer = $('[data-timer]', panel);
-    setText(timer, step.timer.running ? `Cancel timer ${clock(step.timer.remaining)}` : `Start ${COOL_SECONDS} s timer`);
-    setAttr(timer, 'aria-pressed', step.timer.running ? 'true' : 'false');
-  }
-
   const why = whyText(mode, step, now), whyNode = $('[data-why]', panel);
   setText(whyNode, why.text);
   setAttr(whyNode, 'data-tone', why.tone || null);
@@ -314,11 +286,6 @@ function act(mode) {
     record.playback[mode] = step.done ? null : Date.now();
     store.write(record); render(); return;
   }
-  if (step.kind === 'manual') {
-    if (!step.ticked && !step.tickEnabled) return;
-    record.lanes[step.lane].tick = step.ticked ? null : { state: mode === 'on' ? 'lit' : 'off', at: Date.now() };
-    store.write(record); render(); return;
-  }
   if (step.eye.offered) {
     record.relay[step.lane].tick = step.eye.ticked ? null : { state: 'off', at: Date.now() };
     store.write(record); render(); return;
@@ -333,16 +300,6 @@ function altPower(mode) {
   const step = buildMode(mode, Date.now()).steps[stepIndex[mode]];
   if (step.kind !== 'relay' || !step.eye.offered || !step.enabled || sending.has(step.lane)) return;
   sendPower(mode, step);
-}
-
-function toggleTimer(mode) {
-  const step = buildMode(mode, Date.now()).steps[stepIndex[mode]];
-  if (step.kind !== 'manual') return;
-  const item = record.lanes[step.lane];
-  if (coolTimer(item.coolUntil, Date.now()).running) item.coolUntil = null;
-  // A lane that has just been switched is in transition, so an earlier tick no longer describes it.
-  else { item.coolUntil = Date.now() + COOL_SECONDS * 1000; item.tick = null; }
-  store.write(record); render();
 }
 
 // ---- The one command this page sends ----
@@ -376,7 +333,9 @@ async function sendPower(mode, step) {
     }
     confirms.delete(lane);
     // The lane was just switched, so an earlier by-eye tick no longer describes it.
-    if (record.relay[lane]?.tick) { record.relay[lane].tick = null; store.write(record); }
+    record.relay[lane].tick = null;
+    if (!on && LAMP_LANES.includes(lane)) record.lanes[lane].coolUntil = Date.now() + COOL_SECONDS * 1000;
+    store.write(record);
     note(mode, lane, `Command accepted by the relay. Watch for ${on ? 'WARMING, then ON' : 'COOLING, then STANDBY'}.`, 'ok', 12000);
   } catch (error) {
     confirms.delete(lane);

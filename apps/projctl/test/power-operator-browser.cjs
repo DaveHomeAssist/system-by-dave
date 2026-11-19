@@ -39,8 +39,6 @@ const audit = () => {
     for (const [index, slot] of ['P1', 'P2', 'P3', 'P4'].entries()) await relay.api('projector', { slot, lane: 'ABCD'[index] });
     const projector = async slot => (await relay.state()).projectors.find(p => p.slot === slot);
     const reach = async (slot, on) => { await relay.api('sim', { slot, offline: !on }); await until(async () => (await projector(slot)).status.online === on); };
-    // As at the venue: the relay gets no reply from the two lanes powered by handheld remote.
-    await reach('P1', false); await reach('P4', false);
 
     const context = await browser.newContext({ viewport: { width: 375, height: 812 }, reducedMotion: 'reduce' });
     const notesRequests = [];
@@ -122,29 +120,23 @@ const audit = () => {
     await until(() => posts.length === 2);
     assert.equal(posts[1].body.slot, 'P2');
 
-    // Manual lanes: the operator's eyes and remote. The page sends nothing and shows no relay word.
     await go('on', 3);
-    assert.equal(await text('#on [data-title]'), 'A · SL Portal');
-    assert.equal(await text('#on [data-word]'), 'TO DO');
-    assert.equal(await text('#on [data-source]'), 'Not reached by the relay. Go by eye.');
-    assert.match(await text('#on [data-pending]'), /Pending POWER-1/);
     await $('#on [data-lamp]').click();
     await has('#lamp-help', 'Not written yet');
-    assert.match(await text('#lamp-help'), /have not been recorded yet[\s\S]+Do not guess an answer/);
     await shot('phone-lamp-message-pending');
     await page.keyboard.press('Escape');
-    await $('#lamp-help').waitFor({ state: 'hidden' });
-    await $('#on [data-action]').click();
-    await has('#on [data-word]', 'LIT BY EYE');
-    await go('on', 4);
-    await $('#on [data-action]').click();
-    await has('#on [data-word]', 'LIT BY EYE');
+    for (const [index, slot] of [[3, 'P1'], [4, 'P4']]) {
+      await go('on', index);
+      await $('#on [data-action]').click();
+      await has('#on [data-word]', 'WARMING');
+      assert.deepEqual([posts.at(-1).body.slot, posts.at(-1).body.arg], [slot, 1]);
+    }
     for (let index = 0; index < 5; index++) { await go('on', index); assert.doesNotMatch(await text('#on [data-action]'), /off/i, 'Morning on offers no power off'); }
 
     await $('#on [data-banner][data-state=ready]').waitFor({ timeout: 12000 });
     assert.equal(await text('#on [data-banner-title]'), 'All four on');
-    assert.equal(await text('#on [data-banner-detail]'), 'C and B read On. A and D confirmed lit by eye.');
-    assert.equal(posts.length, 2, 'ticks, timers and steps send nothing');
+    assert.equal(await text('#on [data-banner-detail]'), 'C, B, A and D read On.');
+    assert.equal(posts.length, 4, 'one power on request per lane');
     await shot('phone-morning-all-on');
 
     // ---- Nightly off, reached by keyboard ----
@@ -157,7 +149,7 @@ const audit = () => {
     assert.ok(ring[0] !== 'none' && ring[1] >= 2, 'keyboard focus is visible');
     assert.equal(await $('#on').isHidden(), true);
     await has('#off [data-banner-title]', 'Not safe to leave yet');
-    assert.equal(await text('#off [data-banner-detail]'), 'Waiting on: B on · C on · A not ticked · D not ticked', 'a morning tick does not count at night');
+    assert.equal(await text('#off [data-banner-detail]'), 'Waiting on: B on · C on · A on · D on', 'a morning tick does not count at night');
     assert.equal(await text('#off [data-title]'), 'Playback app');
     await $('#off [data-action]').click();
 
@@ -170,7 +162,7 @@ const audit = () => {
     assert.equal(await disabled('#off [data-action]'), true);
     await $('#off [data-action]').click({ force: true });
     await page.waitForTimeout(150);
-    assert.equal(posts.length, 2);
+    assert.equal(posts.length, 4);
     await relay.api('lock', { lock: false });
     await $('#lock-flag').waitFor({ state: 'hidden' });
     await until(async () => !await disabled('#off [data-action]'));
@@ -181,12 +173,12 @@ const audit = () => {
     await $('#off [data-action][data-confirming]').waitFor();
     assert.equal(await text('#off [data-action]'), 'Confirm power off B');
     await has('#off [data-why]', 'Nothing sent yet');
-    assert.deepEqual([posts.length, posts[2].body.slot, posts[2].body.arg, posts[2].body.confirm], [3, 'P2', 0, undefined]);
+    assert.deepEqual([posts.length, posts[4].body.slot, posts[4].body.arg, posts[4].body.confirm], [5, 'P2', 0, undefined]);
     assert.equal(await power('P2'), 'on');
     await shot('phone-night-confirm');
     await has('#off [data-why]', 'Confirmation expired. Nothing was sent.', 6000);
     assert.equal(await text('#off [data-action]'), 'Power off B');
-    assert.deepEqual([posts.length, await power('P2')], [3, 'on']);
+    assert.deepEqual([posts.length, await power('P2')], [5, 'on']);
 
     const powerOff = async (lane, slot) => {
       const before = posts.length;
@@ -208,31 +200,20 @@ const audit = () => {
     assert.match(await text('#off [data-banner-detail]'), /C cooling/, 'cooling is not Standby');
     assert.equal(await text('#off [data-banner-title]'), 'Not safe to leave yet');
 
-    // Lane A: the operator's own countdown. While it runs the tick is unavailable.
     await go('off', 3);
-    assert.equal(await text('#off [data-source]'), 'Not reached by the relay. Go by eye.');
-    assert.equal(await text('#off [data-timer]'), 'Start 170 s timer');
-    await $('#off [data-timer]').click();
-    await has('#off [data-word]', 'COOLING TIMER');
-    assert.match(await text('#off [data-source]'), /^2:(50|49) left · your timer · do not cut mains power$/);
-    assert.equal(await disabled('#off [data-action]'), true);
-    await has('#off [data-why]', 'Wait for the cooling countdown, then check by eye.');
-    await $('#off [data-action]').click({ force: true });
-    assert.equal(await text('#off [data-word]'), 'COOLING TIMER');
-    assert.equal(await text('#off [data-step="3"] .pw-pill__word'), 'TIMER');
+    await powerOff('A', 'P1');
+    await has('#off [data-source]', 'lamp timer');
     await shot('phone-night-cooling-timer');
-    // The countdown is kept by its end time, so it survives a reload and ends when it should.
-    await page.evaluate(key => { const saved = JSON.parse(localStorage.getItem(key)); saved.lanes.A.coolUntil = Date.now() + 1200; localStorage.setItem(key, JSON.stringify(saved)); }, STORAGE_KEY);
-    await reload();
-    assert.equal(await $('#t-off').getAttribute('aria-selected'), 'true', 'the view is kept in the address');
-    await go('off', 3);
-    await has('#off [data-why]', 'Your cooling timer ended at');
-    assert.equal(await disabled('#off [data-action]'), false);
-    await $('#off [data-action]').click();
-    await has('#off [data-word]', 'OFF BY EYE');
     await go('off', 4);
-    await $('#off [data-action]').click();
-    await has('#off [data-word]', 'OFF BY EYE');
+    await powerOff('D', 'P4');
+    await reload();
+    await has('#off [data-banner-detail]', 'A cooling timer');
+    await page.evaluate(key => {
+      const saved = JSON.parse(localStorage.getItem(key));
+      for (const lane of ['A', 'D']) saved.lanes[lane].coolUntil = Date.now() - 1;
+      localStorage.setItem(key, JSON.stringify(saved));
+    }, STORAGE_KEY);
+    await reload();
 
     // Reply age follows the relay's clock, so the fast-clock visitor still gets real readings.
     await skewed.locator('#off [data-step="1"] .pw-pill__word').filter({ hasText: /^(ON|STANDBY|WARMING|COOLING)$/ }).waitFor({ state: 'attached', timeout: 8000 });
@@ -241,7 +222,7 @@ const audit = () => {
     // ---- Safe to leave: B and C in Standby from fresh replies, A and D ticked ----
     await $('#off [data-banner][data-state=safe]').waitFor({ timeout: 15000 });
     assert.equal(await text('#off [data-banner-title]'), 'Safe to leave the building');
-    assert.equal(await text('#off [data-banner-detail]'), 'B and C read Standby. A and D confirmed off by eye.');
+    assert.equal(await text('#off [data-banner-detail]'), 'B, C, A and D read Standby.');
     assert.deepEqual([await power('P2'), await power('P3')], ['off', 'off']);
     await shot('phone-night-safe-to-leave');
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -261,27 +242,9 @@ const audit = () => {
     await reach('P2', true);
     await $('#off [data-banner][data-state=safe]').waitFor();
 
-    // If the relay does reach a manual lane and it is not in Standby, the tick loses.
-    await reach('P4', true);
-    assert.equal((await relay.api('command', { slot: 'P4', cmd: 'power', arg: 1 })).status, 200); // stands in for the handheld remote
-    await $('#off [data-banner][data-state=wait]').waitFor();
-    assert.match(await text('#off [data-banner-detail]'), /D ticked, but the relay reads (WARMING|ON)/);
-    await go('off', 4);
-    assert.equal(await text('#off [data-word]'), 'CHECK AGAIN');
-    assert.match(await text('#off [data-source]'), /^Relay reading: (WARMING|ON)/);
-    await has('#off [data-why]', 'Look at the surface again');
-
-    // A tick lapses after 30 minutes.
-    await page.evaluate(key => { const saved = JSON.parse(localStorage.getItem(key)); saved.lanes.A.tick.at = Date.now() - 31 * 60000; localStorage.setItem(key, JSON.stringify(saved)); }, STORAGE_KEY);
-    await reload();
-    assert.match(await text('#off [data-banner-detail]'), /A tick lapsed/);
-    await go('off', 3);
-    assert.equal(await text('#off [data-word]'), 'TICK LAPSED');
-
-    // Everything the page sent: one power command per tap, to the two relay lanes only.
     assert.deepEqual([...new Set(posts.map(post => post.path))], ['/api/command']);
     assert.deepEqual([...new Set(posts.map(post => post.body.cmd))], ['power']);
-    assert.deepEqual([...new Set(posts.map(post => post.body.slot))].sort(), ['P2', 'P3'], 'lanes A and D are never commanded');
+    assert.deepEqual([...new Set(posts.map(post => post.body.slot))].sort(), ['P1', 'P2', 'P3', 'P4']);
     assert.deepEqual(elsewhere, [], 'no request leaves the relay');
 
     // ---- History and themes ----
@@ -331,11 +294,6 @@ const audit = () => {
           await $(`#${mode}`).waitFor();
           for (let index = 0; index < 5; index++) {
             await go(mode, index);
-            if (mode === 'off' && index === 4 && !/Cancel/.test(await text('#off [data-timer]'))) {
-              if (await $('#off [data-detail-open]').isVisible()) { await $('#off [data-detail-open]').click(); await $('#off [data-timer]').click(); await page.keyboard.press('Escape'); }
-              else await $('#off [data-timer]').click();
-              await has('#off [data-word]', 'COOLING TIMER');
-            }
             await check(`${mode} step ${index + 1}`);
             if (await $(`#${mode} [data-detail-open]`).isVisible()) {
               // Short screens: the instructions open as a sheet that fits without scrolling.
@@ -404,9 +362,8 @@ const audit = () => {
     const body = (await sent).postDataJSON();
     assert.deepEqual([body.slot, body.cmd, body.arg], ['P3', 'power', 1]);
     await odd.locator('#on [data-why]').filter({ hasText: 'Command accepted by the relay' }).waitFor();
-    // Night: the relay cannot read lane C, so the operator's eyes decide, as they do for lanes A and D.
+    // Night: the relay cannot read lane C, so the operator can confirm it off by eye.
     await reach('P2', true);  // lane B reads Standby
-    await reach('P4', false); // lane D is not reached, as at the venue
     await odd.locator('#t-off').click();
     await odd.locator('#off').waitFor();
     assert.match(await odd.locator('#off [data-banner-detail]').textContent(), /C unknown/, 'unknown is never counted as Standby');
@@ -417,7 +374,7 @@ const audit = () => {
     assert.match(await oddText('#off [data-text]'), /cannot read lane C's power state, so go by eye/);
     assert.match(await oddText('#off [data-pending]'), /Pending POWER-4/);
     await odd.locator('#off [data-why]').filter({ hasText: 'Look at it: tick if it is off, power off if it is lit.' }).waitFor();
-    assert.deepEqual([await odd.locator('#off [data-timer]').isVisible(), await odd.locator('#off [data-lamp]').isVisible()], [false, false], 'no remote tools on a relay lane');
+    assert.deepEqual(await odd.locator('#off [data-lamp]').isVisible(), false, 'no lamp helper on a non-lamp lane');
     // Power off is still there beside the tick, with the same two steps.
     const alt = odd.locator('#off [data-alt]');
     assert.deepEqual([await alt.textContent(), await alt.getAttribute('aria-disabled')], ['Power off C', null]);
@@ -434,7 +391,7 @@ const audit = () => {
     await odd.locator('#off [data-action]').click();
     await odd.locator('#off [data-word]').filter({ hasText: 'OFF BY EYE' }).waitFor();
     assert.deepEqual([await odd.locator('#off [data-action]').getAttribute('aria-pressed'), await oddText('#off [data-action]'), await oddText('#off [data-step="2"] .pw-pill__word'), await odd.locator('#off [data-step="2"]').getAttribute('data-tone')], ['true', '\u2713 C off by eye', 'TICKED', 'done']);
-    assert.equal(await odd.locator('#off').getByText('STANDBY', { exact: true }).count(), 1, 'only lane B, which the relay did read, says Standby');
+    assert.equal(await odd.locator('#off').getByText('STANDBY', { exact: true }).count(), 3, 'only B, A and D have a Standby reading');
     for (const [width, height] of [[375, 635], [320, 256]]) {
       await odd.setViewportSize({ width, height });
       assert.deepEqual(await odd.evaluate(audit), { scrolls: false, outside: [], cut: [], sheets: [] }, `${width}x${height} night, lane read by eye`);
@@ -446,9 +403,8 @@ const audit = () => {
       }
     }
     await odd.setViewportSize({ width: 375, height: 812 });
-    for (const index of [3, 4]) { await odd.locator(`#off [data-step="${index}"]`).click(); await odd.locator('#off [data-action]').click(); await odd.locator('#off [data-word]').filter({ hasText: 'OFF BY EYE' }).waitFor(); }
     await odd.locator('#off [data-banner][data-state=safe]').waitFor();
-    assert.equal(await oddText('#off [data-banner-detail]'), 'B reads Standby. C, A and D confirmed off by eye.', 'the banner says which lanes were read and which were looked at');
+    assert.equal(await oddText('#off [data-banner-detail]'), 'B, A and D read Standby. C confirmed off by eye.', 'the banner says which lanes were read and which were looked at');
     if (SHOTS) { await odd.waitForTimeout(250); await odd.screenshot({ path: path.join(SHOTS, 'phone-night-safe-lane-c-by-eye.png') }); await odd.locator('#off [data-step="2"]').click(); await odd.waitForTimeout(250); await odd.screenshot({ path: path.join(SHOTS, 'phone-night-lane-c-unknown-ticked.png') }); }
     // Taking the tick back takes the banner back.
     await odd.locator('#off [data-step="2"]').click();

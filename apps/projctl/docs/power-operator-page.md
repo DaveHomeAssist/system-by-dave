@@ -1,5 +1,20 @@
 # Power operator page brief
 
+## Four relay lanes
+
+POWER-1 option C was approved on November 19. The checklist sends individual power
+commands for all four lanes through the existing relay. The installed Panasonic
+control-port fallback is the prerequisite for A and D when PJLink is unavailable.
+The playback check, Show Lock, target binding and two-step power off still apply.
+A and D require a fresh, known power state. After the relay accepts power off,
+this browser keeps a 170-second countdown across reloads and waits for a fresh
+Standby reading as well. The countdown is local to this browser. Check the lamp
+indicator and fans before a restart or departure. B and C retain the existing
+UNKNOWN-state procedure. No changes to device definitions, drivers or cue routes
+are needed (ECP-1.0 revision 1.0). Verify all eight commands on the simulator and
+check the installed page separately from physical projector acceptance.
+
+
 Status: first version built and tested in the simulator on November 18, 2026. The same
 day, on the owner's instruction, the four page files were copied to the show computer's
 relay, where they match commit `46ea2dc`. That relay was then updated once, from
@@ -7,7 +22,7 @@ separate pull requests, with the Barco standby mapping and a Panasonic control-p
 fallback, so it should read lane C in standby and may now reach lanes A and D while the
 playback application is open. The relay change in this pull request (the crew notes
 read) is not there. No signed-in load, real projector, real phone or venue network has
-been exercised with this page. Decisions POWER-1 to POWER-4, ACCESS-1, ACCESS-2 and NET-1 to NET-3 are
+been exercised with this page. Decisions POWER-2 to POWER-4, ACCESS-1, ACCESS-2 and NET-1 to NET-3 are
 open. The page is built on the recommended option for each and marks what depends on one.
 
 ## Problem
@@ -20,9 +35,9 @@ schedules and setup.
 
 Two facts make "press All off" the wrong tool for this job:
 
-- While the playback application is open it holds the PJLink link to the two lamp
-  projectors (lanes A and D), so the relay cannot read or command them. A group power
-  command and a power schedule both skip a target without fresh feedback.
+- The playback application can hold the PJLink connection to A and D. The installed
+  relay uses the Panasonic control-port fallback when PJLink is unavailable. A lane
+  still needs its own fresh reading before the operator can send a command.
 - The lamp projectors need about 170 seconds of fan cooling after power off before they
   can relight, and must never lose mains power while cooling. Leaving the building
   before every unit is confirmed in Standby has already happened once on this rig.
@@ -49,10 +64,10 @@ button.
 | 1 | Tick: the playback app is closed | Tick: the show is over and the playback app is quit |
 | 2 | Lane C: Power on through the relay | Lane B: Power off through the relay |
 | 3 | Lane B: Power on through the relay | Lane C: Power off through the relay |
-| 4 | Lane A: handheld remote, then tick "lit" | Lane A: handheld remote, cooling countdown, then tick "off" |
-| 5 | Lane D: handheld remote, then tick "lit" | Lane D: handheld remote, cooling countdown, then tick "off" |
+| 4 | Lane A: Power on through the relay | Lane A: Power off through the relay, then wait for cooling and Standby |
+| 5 | Lane D: Power on through the relay | Lane D: Power off through the relay, then wait for cooling and Standby |
 
-### Relay lanes (B and C)
+### Relay lanes (A to D)
 
 - The step shows the lane's power word from the relay's live state: ON, WARMING,
   COOLING or STANDBY, with the age of the projector's last reply.
@@ -70,12 +85,12 @@ button.
   step completes only when a fresh relay reading shows ON (morning) or STANDBY (night).
 - A stale or missing reply is shown as "No fresh reply" with the last known value
   labeled as last known. It never counts as Standby.
-- A fresh reply that carries no power state reads UNKNOWN, and is never shown or counted
+- For B and C, a fresh reply that carries no power state reads UNKNOWN, and is never shown or counted
   as On or Standby (POWER-4).
   - Morning: Power on stays available, as it is on the operator console and as the
     relay's own guard allows, with the note "The relay cannot read this unit's power
     state. Look at it first: power on only from standby."
-  - Night: the lane is confirmed by eye, exactly as a manual lane is. The main action
+  - Night: the lane can be confirmed off by eye. The main action
     becomes "Tick by eye: off", the word becomes OFF BY EYE once ticked, and Power off
     (still two steps, still under Show Lock) sits beside it for a unit that is in fact
     lit. The tick is offered whenever the lane reads UNKNOWN, not only after a power off
@@ -84,39 +99,23 @@ button.
   - A real reading always wins. If the lane later reads ON, WARMING, COOLING or STANDBY,
     the tick is ignored. A lane with no reply at all is not a case for the tick.
 
-### Manual lanes (A and D)
+### Lamp lanes (A and D)
 
-- The operator uses the handheld remote. The page never sends a command to these lanes.
-- Each has a "confirmed by eye" tick: "light on the surface" in the morning, "fans
-  stopped and the indicator is red" at night. A tick records the time it was made.
-- A cooling countdown of 170 seconds is started by the operator when they press Off on
-  the remote (or, in the morning, when a unit shuts itself off). It is labeled as the
-  operator's own timer and shows a "do not cut mains power" warning while it runs. The
-  tick is unavailable while a countdown runs, and starting a countdown clears that
-  lane's tick, because a lane that was just switched is in transition.
-- If the relay does have a fresh reply from one of these lanes (for example with the
-  playback app closed, or on a relay with the Panasonic control-port fallback), the page
-  shows it, labeled "Relay reading". The lane stays a remote-and-tick step: the page
-  sends it nothing until POWER-1 says otherwise. If it does not, the
-  page says "Not reached by the control page" and tells the operator to go by the light
-  on the surface. A lane the relay has not reached is never drawn as a reading.
-- A **lamp message** slot sits on each manual lane. Its content is not known yet
-  (POWER-3). It says so, and tells the operator to photograph the screen and call the
-  video lead. Nothing in it is invented.
+- Both lanes require a fresh, known power state for commands. A relay acknowledgement
+  starts the 170-second timer after power off. The timer blocks another command and
+  keeps the departure banner off while it runs.
+- Keep mains on. Before leaving or powering on again, check that the fans have stopped
+  and the indicator shows standby. The timer only covers shutdowns seen by this browser.
+- The **Lamp message** helper remains pending (POWER-3). Photograph the message and
+  contact the video lead.
 
 ### Banner
 
-- Nightly off: **Safe to leave the building** turns on only when every lane is either
-  read as STANDBY from a fresh relay reply or carries a current "off by eye" tick. On a
-  relay that reads both of its lanes, that is the original rule: B and C read STANDBY,
-  A and D ticked. In every other case it reads "Not safe to leave yet" and lists what is
-  missing.
-- The banner says which lanes were read and which were looked at, for example "B reads
-  Standby. C, A and D confirmed off by eye."
-- If the relay has a fresh reading from A or D that says the unit is not in Standby,
-  the banner stays off even when the lane is ticked, and names the conflict.
-- Morning on: the same strip reads "All four on" when B and C read ON and A and D carry
-  a current "lit" tick.
+- Morning on reads **All four on** after all four lanes report ON.
+- Nightly off reads **Safe to leave the building** after both lamps report fresh
+  Standby with no active countdown, and B and C each report fresh Standby or carry a
+  current off-by-eye tick while a fresh reply reports UNKNOWN. The banner names the
+  lanes confirmed by eye. A fresh known reading takes precedence.
 
 ### Crew notes link (optional)
 
@@ -214,8 +213,6 @@ The page never scrolls (workspace rule WEB-2), in both themes, light by default.
 
 ## Dependencies and risks
 
-- **POWER-1** decides which lanes are manual. The split is three constants at the top of
-  `public/power-model.js` (`RELAY_LANES`, `MANUAL_LANES`, `STEPS`).
 - **POWER-2** decides whether step 1 exists and who closes the playback app.
 - **POWER-3** blocks the lamp message helper.
 - **Relay version.** A relay whose Barco driver predates the standby mapping of
@@ -226,7 +223,7 @@ The page never scrolls (workspace rule WEB-2), in both themes, light by default.
   reading. The page does not guess.
 - The 170 second figure is the cooling time recorded for the lamp units. It is a
   guide for the operator's eyes, not a measurement.
-- The page trusts the operator's ticks for A and D. A wrong tick gives a wrong banner.
+- The page trusts the operator's ticks for B or C only while that lane replies with UNKNOWN.
 - A phone that sleeps pauses the page. On wake it reconnects and redraws from a new
   snapshot, and countdowns resume from their stored end time.
 - The relay serves plain HTTP on the local network (NET-3).
@@ -247,8 +244,7 @@ The page never scrolls (workspace rule WEB-2), in both themes, light by default.
 - `test/power-operator-browser.cjs` (Chromium, simulator relay, lanes A and D made
   unreachable as at the venue): both checklists end to end on a phone; every request the
   page sent; the playback tick gate; the two-step confirmation, its lapse and the
-  ignored rapid repeat; Show Lock; a lane that stops replying; a manual lane the relay
-  reaches and disputes; the countdown across a reload; tick lapse; the banner turning on
+  ignored rapid repeat; Show Lock; a lane that stops replying; all four command targets; the lamp countdown across a reload; the banner turning on
   and going off again; a device clock ten minutes fast; keyboard tab navigation, visible
   focus and history; both themes; sign-in and return; the crew notes link when
   configured (label, new tab, no opener, and no request to the address by the page) and
@@ -256,7 +252,7 @@ The page never scrolls (workspace rule WEB-2), in both themes, light by default.
   relay without the route); a relay lane rewritten to reply with no power state (UNKNOWN,
   power still offered after the playback tick, the command sent, never shown as On or
   Standby; at night the two-step power off beside the tick, the by-eye tick, the banner
-  turning on with "B reads Standby. C, A and D confirmed off by eye." and off again when
+  turning on with "B, A and D read Standby. C confirmed off by eye." and off again when
   the tick is taken back); and no page scroll, nothing outside its panel and no cut text
   at 375 by 812, 375 by 635, 1440 by 900, 844 by 390, 320 by 256 and 3840 by 1080, with
   the longest strings and the crew notes rule set on screen.
@@ -273,13 +269,11 @@ The first option is the recommendation. The page is built on it.
 
 | ID | Question | A (recommended) | B | C | Answer unlocks |
 | --- | --- | --- | --- | --- | --- |
-| POWER-1 | How are lamp lanes A and D powered? | Handheld remote, confirmed by eye on this page. B and C through the relay. This is what the page does. | Quit the playback app first, then the relay for all four. Makes all four lanes relay steps. | Through the relay on the maker's own control port. That fallback now exists in a separate pull request and is on the show computer's relay, untested on the rig. Choosing it here means moving A and D into `RELAY_LANES`, a small change to this page and its tests, after one supervised power cycle proves the path. | Whether A and D stay manual steps |
 | POWER-2 | Who closes and reopens the playback app around the power cycle? | The show backup. The power operator only ticks that it is closed, and the relay power buttons wait for that tick. | The power operator does it. The step becomes an instruction, not a check. | The playback app stays open overnight. Step 1 is removed. Needs a dark-day test that outputs survive a power cycle. | Step 1 wording, or its removal |
 | POWER-3 | What does the lamp message helper say? | Record the message, the right answer and the reason on a supervised power-on, then fill the slot. | Leave the slot as "photograph it and call" for the whole run. | | The helper content |
-| POWER-4 | A relay lane replies but with no power state (UNKNOWN). What may the operator do? | Power stays available with a "look at it first" note, and at night the lane is confirmed off by eye like a manual lane, with the banner naming it as looked at. Never shown as On or Standby. Built this way on November 18 after the owner asked for the standby case to work without a relay update. | Power only, no tick: the banner stays off for that lane until the relay is updated. | Block power and send the operator to the video lead. Safest on paper, but on a relay that cannot name a unit's standby the lane could never be powered on from this page. | Whether the by-eye tick for a relay lane stays once the relay can read that unit |
+| POWER-4 | A relay lane replies but with no power state (UNKNOWN). What may the operator do? | Power stays available with a "look at it first" note, and at night the lane is confirmed off by eye for B or C, with the banner naming it as looked at. Never shown as On or Standby. Built this way on November 18 after the owner asked for the standby case to work without a relay update. | Power only, no tick: the banner stays off for that lane until the relay is updated. | Block power and send the operator to the video lead. Safest on paper, but on a relay that cannot name a unit's standby the lane could never be powered on from this page. | Whether the by-eye tick for a relay lane stays once the relay can read that unit |
 
-Needed now: POWER-1 and POWER-2, before the operator's walk-through. POWER-1 has moved:
-option C no longer needs a build of the relay, only proof on the rig and a change here. POWER-3 needs the
+POWER-2 remains open before the operator's walk-through. POWER-3 needs the
 supervised power-on first. POWER-4 matters only on a relay that reports UNKNOWN for a
 replying unit; updating that relay removes the case. Its shape was this session's to
 choose and waits for the owner's confirmation.
