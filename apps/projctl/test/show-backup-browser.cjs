@@ -881,7 +881,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     try {
       const pocket = await browser.newContext({ viewport: { width: 375, height: 812 } });
       const phone = await pocket.newPage();
-      const signIn = async next => { await phone.waitForURL(new RegExp(`/login\\.html\\?next=%2F${next}\\.html$`)); await phone.locator('#code').fill(CODE); await phone.locator('button[type=submit]').click(); await phone.waitForURL(new RegExp(`/${next}\\.html$`)); };
+      const signIn = async next => { await phone.waitForURL(new RegExp(`/login\\.html\\?next=%2F${next}\\.html(?:%23[a-z]+)?$`)); await phone.locator('#code').fill(CODE); await phone.locator('button[type=submit]').click(); await phone.waitForURL(new RegExp(`/${next}\\.html(?:#[a-z]+)?$`)); };
       await phone.goto(`${secured.base}/show.html`);
       await signIn('show');
       assert.equal(await phone.evaluate(async () => { for (const [slot, lane] of [['P1', 'A'], ['P2', 'B'], ['P3', 'C'], ['P4', 'D']]) { const reply = await fetch('api/projector', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ slot, lane }) }); if (!reply.ok) return reply.status; } return 200; }), 200);
@@ -922,11 +922,18 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       await phone.locator('.pc-card[data-lane="ALL"][data-phase="relay-armed"]').waitFor();
       await phone.waitForTimeout(700);
       await phone.locator('.pc-card[data-lane="ALL"] [data-act="confirm"]').click();
-      await phone.locator('#pc-run[data-state="running"]').waitFor();
-      // The relay restarts mid-run. Sessions end with it: the page goes to the sign-in, not to a silent failure.
+      // The page that started the nightly off follows it on its night timeline.
+      await phone.locator('#t-night[aria-selected="true"]').waitFor();
+      await phone.locator('.sb-night__stop').waitFor();
+      assert.deepEqual(await phone.evaluate(audit), CLEAN, 'signed in on a phone, the night timeline fits during a run');
+      await shot(phone, '89-phone-signed-in-night-run');
+      // The relay restarts mid-run. Sessions end with it: the page goes to the sign-in, not to a silent failure,
+      // and comes back to the same tab.
       await secured.close();
       secured = await startRelay(secure);
       await signIn('power');
+      await phone.locator('#t-night[aria-selected="true"]').waitFor();
+      await phone.locator('#t-control').click();
       await phone.locator('#pc-run[data-state="interrupted"]').waitFor();
       assert.equal(await phone.locator('#pc-run .pc-run__title').innerText(), 'RUN INTERRUPTED');
       assert.match(await phone.locator('#pc-run .pc-run__text').innerText(), /^The relay restarted during this run\. Nothing more was sent\. Check each lane\. Ended \d+:\d\d [AP]M\.$/);
