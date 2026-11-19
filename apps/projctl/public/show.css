@@ -66,7 +66,9 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
 /* Panels */
 .sb-panels{min-height:0;min-width:0;display:grid;outline:none}
 .sb-panel{min-height:0;min-width:0;display:grid;gap:10px;padding:10px 16px}
-.sb-panel--control{grid-template-rows:minmax(0,1fr)}
+/* Run banner, picker, then the cards. The banner and the picker take no room while hidden. */
+.sb-panel--control{display:flex;flex-direction:column}
+.sb-panel--control .pc-grid{flex:1 1 0}
 .sb-scroll{min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;border:1px solid var(--hairline);border-radius:10px;background:var(--surface)}
 .sb-empty{margin:0;padding:12px;font-size:14px;line-height:1.4;color:var(--ink-muted)}
 .sb-card{min-height:0;min-width:0;overflow:hidden;padding:12px 14px;border:1px solid var(--hairline);border-left:6px solid var(--sb-state,var(--hairline));border-radius:12px;background:var(--surface)}
@@ -144,6 +146,10 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
 .sb-know__text p{margin:0 0 10px;white-space:pre-wrap;overflow-wrap:anywhere}
 .sb-know__text pre{margin:0;font:13px/1.5 var(--font-mono,ui-monospace,monospace);white-space:pre-wrap;overflow-wrap:anywhere}
 
+/* Built-in first aid on the Know tab: the same on every relay, above whatever the folder holds. */
+.sb-tips{padding:6px 6px 0}
+.sb-tips__list{margin:0 0 4px;padding:0 6px 0 22px;font-size:13px;line-height:1.4}
+.sb-tips__list li{margin:0 0 6px}
 /* Crew notes link: optional and quiet. It lives with the documents, away from every control. */
 .sb-notes{display:flex;align-items:center;gap:10px;min-width:0;margin:0;font-size:13px;line-height:1.3;color:var(--ink-muted)}
 .sb-notes__link{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:4px 14px;border:1px solid var(--line-control);border-radius:999px;background:transparent;color:var(--ink);font:600 14px/1.2 var(--font-sans,system-ui,sans-serif);text-decoration:none}
@@ -184,7 +190,6 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
   .sb-check__mark{grid-row:auto;width:16px;height:16px;font-size:12px}
   .sb-check__value{grid-column:1 / -1;font-size:12px}
   .sb-panel{gap:8px;padding:8px 12px}
-  .sb-panel--control{grid-template-rows:auto minmax(0,1fr)}
   /* Know: the list or the viewer, not both */
   .sb-panel--know{grid-template-columns:minmax(0,1fr)}
   .sb-panel--know[data-know="list"] .sb-know__view,.sb-panel--know[data-know="viewer"] .sb-know__side{display:none}

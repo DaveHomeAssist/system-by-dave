@@ -26,29 +26,30 @@ test('the four actions map to the two relay commands and nothing else', () => {
   assert.deepEqual(ACTION_IDS.map(id => [ACTIONS[id].cmd, ACTIONS[id].arg]), [['power', 1], ['power', 0], ['shutter', 0], ['shutter', 1]]);
   assert.deepEqual(ACTION_IDS.filter(id => ACTIONS[id].relayConfirm), ['power-off'], 'only power off uses the relay\'s own confirmation');
   assert.deepEqual([CONFIRM_MS, RELAY_CONFIRM_MS], [6000, 3000]);
-  assert.deepEqual(DEFAULT_POLICY, { lockBlocksPower: true, lockBlocksGroup: true });
+  assert.deepEqual(DEFAULT_POLICY, { lockBlocksPowerOn: false, lockBlocksGroup: false });
 });
 
 test('a current reply shows power, shutter, input, pattern and link; a lost one shows none of them', () => {
   const lanes = byLane(views(rig(held('P1', 'A'), projector('P2', 'B'), projector('P3', 'C', { controlLink: 'control-port', input: null, shutter: 'closed' }, { driver: 'panasonic' }), projector('P4', 'D'))));
   assert.deepEqual([lanes.B.reach, lanes.B.headline, lanes.B.shutterText, lanes.B.inputText, lanes.B.patternText, lanes.B.tone, lanes.B.word], ['live', 'ON', 'OPEN', 'HDMI 1', 'Off', 'ok', 'ON']);
-  assert.deepEqual(lanes.B.link, { id: 'simulator', label: 'Simulator', unproven: false });
+  assert.deepEqual(lanes.B.link, { id: 'simulator', label: 'Simulator', caution: null, cautionText: null });
   assert.equal(lanes.B.freshText, 'Reply 2s ago');
   assert.deepEqual([lanes.A.reach, lanes.A.headline, lanes.A.power, lanes.A.shutter, lanes.A.input, lanes.A.pattern, lanes.A.link, lanes.A.word], ['unreached', 'CHECK BY EYE', null, null, null, null, null, 'EYE']);
-  assert.equal(lanes.A.blocked, "Relay can't reach it. Use the remote.");
+  assert.equal(lanes.A.blocked, "Relay can't reach it. Check by eye.");
   assert.match(lanes.A.freshText, /^Last reply \d+:\d\d [AP]M$/);
   // The control port reports power and shutter but not the input.
-  assert.deepEqual(lanes.C.link, { id: 'control-port', label: 'Control port', unproven: true });
+  assert.deepEqual(lanes.C.link, { id: 'control-port', label: 'Control port', caution: 'power untested', cautionText: 'Shutter over this link is proven on the rig. Power over it has not been tested on the rig yet.' });
   assert.deepEqual([lanes.C.inputText, lanes.C.input, lanes.C.shutterText], ['Not reported', null, 'CLOSED · dark on stage']);
 });
 
-test('the link is named from what the driver reports, and only the control port is tagged unproven', () => {
+test('the link is named from what the driver reports, and only the control port carries the "power untested" tag', () => {
   const link = (driver, controlLink) => linkOf({ driver, status: { controlLink } });
-  assert.deepEqual(link('panasonic', 'pjlink'), { id: 'pjlink', label: 'PJLink', unproven: false });
-  assert.deepEqual(link('panasonic', undefined), { id: 'pjlink', label: 'PJLink', unproven: false });
-  assert.deepEqual(link('panasonic', 'control-port'), { id: 'control-port', label: 'Control port', unproven: true });
-  assert.deepEqual(link('pulse', undefined), { id: 'pulse', label: 'Barco API', unproven: false });
-  assert.deepEqual(link('other', undefined), { id: null, label: 'Not reported', unproven: false });
+  const plain = (id, label) => ({ id, label, caution: null, cautionText: null });
+  assert.deepEqual(link('panasonic', 'pjlink'), plain('pjlink', 'PJLink'));
+  assert.deepEqual(link('panasonic', undefined), plain('pjlink', 'PJLink'));
+  assert.deepEqual([link('panasonic', 'control-port').caution, link('panasonic', 'control-port').cautionText], ['power untested', 'Shutter over this link is proven on the rig. Power over it has not been tested on the rig yet.']);
+  assert.deepEqual(link('pulse', undefined), plain('pulse', 'Barco API'));
+  assert.deepEqual(link('other', undefined), plain(null, 'Not reported'));
 });
 
 test('a wrong input and a test pattern left on are flagged, so a blue picture can be explained', () => {
@@ -89,26 +90,26 @@ test('nothing is offered without a current reply, and every block carries its re
   const snapshot = rig(held('P1', 'A'), projector('P2', 'B', { connection: { state: 'online', lastSuccessAt: ago(40000) } }), projector('P3', 'C'), projector('P4', 'D'));
   snapshot.projectors[2].lane = '';
   const lanes = byLane(views(snapshot));
-  for (const [lane, reach, why] of [['A', 'unreached', "Relay can't reach it. Use the remote."], ['B', 'stale', 'Reply too old. Waiting for a fresh one.'], ['C', 'unassigned', 'No projector on this lane.']]) {
+  for (const [lane, reach, why] of [['A', 'unreached', "Relay can't reach it. Check by eye."], ['B', 'stale', 'Reply too old. Waiting for a fresh one.'], ['C', 'unassigned', 'No projector on this lane.']]) {
     assert.equal(lanes[lane].reach, reach);
     for (const id of ACTION_IDS) assert.deepEqual(actionState(lanes[lane], id, { lock: false }), { enabled: false, reason: why, note: '' }, `${lane} ${id}`);
     assert.equal(sharedReason(lanes[lane], { lock: false }), why);
   }
   assert.equal(sharedReason(lanes.D, { lock: false }), '', 'a lane with something on offer has no single reason');
-  for (const view of views(four(), { connected: false, everConnected: true })) assert.equal(sharedReason(view, { lock: null }), 'Relay not answering. Use the remote.');
+  for (const view of views(four(), { connected: false, everConnected: true })) assert.equal(sharedReason(view, { lock: null }), 'Relay not answering. Check by eye.');
   for (const view of views(null, { connected: false, everConnected: false })) assert.deepEqual([view.headline, sharedReason(view, { lock: null })], ['CONNECTING', 'Waiting for the relay.']);
   const noTarget = { ...lanes.D, revision: null };
   assert.equal(actionState(noTarget, 'shutter-close', { lock: false }).reason, 'No reviewed target for this lane.');
 });
 
-test('Show Lock locks power and leaves one-lane shutters available', () => {
+test('Show Lock blocks power off and nothing else: power on and shutters stay available', () => {
   const on = byLane(views(four())).A, off = byLane(views(rig(projector('P1', 'A', { power: 'off' })))).A;
   assert.deepEqual(offered(on, { lock: true }), { 'power-on': false, 'power-off': false, 'shutter-open': false, 'shutter-close': true });
-  assert.equal(actionState(on, 'power-off', { lock: true }).reason, 'Show Lock is on. Power is locked.');
-  assert.equal(actionState(off, 'power-on', { lock: true }).reason, 'Show Lock is on. Power is locked.', 'the page is stricter than the relay, which allows power on');
+  assert.equal(actionState(on, 'power-off', { lock: true }).reason, 'Show Lock is on. Power off is locked.');
+  assert.equal(actionState(off, 'power-on', { lock: true }).enabled, true, 'power on is allowed under Show Lock, as at the relay');
   assert.equal(actionState(on, 'power-off', { lock: null }).reason, 'Show Lock not read.');
-  // A page may choose the relay's own rule instead.
-  assert.equal(actionState(off, 'power-on', { lock: true, policy: { lockBlocksPower: false, lockBlocksGroup: true } }).enabled, true);
+  // A page may choose to be stricter.
+  assert.equal(actionState(off, 'power-on', { lock: true, policy: { lockBlocksPowerOn: true, lockBlocksGroup: false } }).reason, 'Show Lock is on. Power is locked.');
 });
 
 test('an all-lanes action lists exactly the lanes that will get it and why the others are skipped', () => {
@@ -117,18 +118,20 @@ test('an all-lanes action lists exactly the lanes that will get it and why the o
   const close = groupState(lanes, 'shutter-close', { lock: false });
   assert.equal(close.enabled, true);
   assert.deepEqual(close.ready, [{ lane: 'B', slot: 'P2', revision: 'b'.repeat(64) }]);
-  assert.deepEqual(close.skipped, [{ lane: 'A', reason: "Relay can't reach it. Use the remote." }, { lane: 'C', reason: 'Already reports CLOSED.' }, { lane: 'D', reason: 'Reports OFF, so no shutter move.' }]);
-  assert.equal(skippedText(close.skipped), "A: relay can't reach it. Use the remote · C: already reports CLOSED · D: reports OFF, so no shutter move");
+  assert.deepEqual(close.skipped, [{ lane: 'A', reason: "Relay can't reach it. Check by eye." }, { lane: 'C', reason: 'Already reports CLOSED.' }, { lane: 'D', reason: 'Reports OFF, so no shutter move.' }]);
+  assert.equal(skippedText(close.skipped), "A: relay can't reach it. Check by eye · C: already reports CLOSED · D: reports OFF, so no shutter move");
   assert.deepEqual(groupState(lanes, 'power-on', { lock: false }).ready.map(target => target.lane), ['D']);
   assert.deepEqual(groupState(lanes, 'power-off', { lock: false }).ready.map(target => target.lane), ['B', 'C']);
   assert.equal(targetsText(groupState(lanes, 'power-off', { lock: false }).ready), 'B and C');
   assert.equal(skippedText(groupState(views(four()), 'power-on', { lock: false }).skipped), 'A, B, C and D: already reports ON', 'lanes skipped for one reason are named together');
   assert.deepEqual(groupSummary(lanes), { total: 4, reading: 3, lit: 2, closed: 1 });
 
-  // Under Show Lock every all-lanes action is locked, shutters included.
-  for (const id of ACTION_IDS) assert.deepEqual([groupState(lanes, id, { lock: true }).enabled, groupState(lanes, id, { lock: true }).reason, groupState(lanes, id, { lock: true }).ready], [false, 'Show Lock is on. All-lanes actions are locked.', []]);
-  assert.equal(groupState(lanes, 'shutter-close', { lock: true, policy: { lockBlocksPower: true, lockBlocksGroup: false } }).enabled, true, 'a page may leave the group shutter open under Show Lock');
-  assert.equal(groupState(views(four()), 'power-on', { lock: true, policy: { lockBlocksPower: true, lockBlocksGroup: false } }).reason, 'Show Lock is on. Power is locked.');
+  // Under Show Lock the all-lanes shutters stay available and power off is locked lane by lane.
+  assert.deepEqual(groupState(lanes, 'shutter-close', { lock: true }).ready.map(target => target.lane), ['B']);
+  assert.deepEqual([groupState(lanes, 'power-off', { lock: true }).enabled, groupState(views(four()), 'power-off', { lock: true }).reason], [false, 'Show Lock is on. Power off is locked.']);
+  assert.deepEqual(groupState(lanes, 'power-on', { lock: true }).ready.map(target => target.lane), ['D']);
+  // A page may lock every all-lanes action instead.
+  for (const id of ACTION_IDS) assert.deepEqual([groupState(lanes, id, { lock: true, policy: { lockBlocksPowerOn: false, lockBlocksGroup: true } }).enabled, groupState(lanes, id, { lock: true, policy: { lockBlocksPowerOn: false, lockBlocksGroup: true } }).reason], [false, 'Show Lock is on. All-lanes actions are locked.']);
 
   // Nothing to do, and no relay.
   assert.deepEqual([groupState(views(four()), 'power-on', { lock: false }).enabled, groupState(views(four()), 'power-on', { lock: false }).reason], [false, 'Already reports ON.']);

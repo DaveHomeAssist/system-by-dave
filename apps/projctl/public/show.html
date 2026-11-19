@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" data-role="show">
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
@@ -55,6 +55,7 @@
 
   <main id="sb-main" class="sb-panels" tabindex="-1">
     <section role="tabpanel" id="control" class="sb-panel sb-panel--control" aria-labelledby="t-control" tabindex="0">
+      <div class="pc-run" id="pc-run" hidden></div>
       <div class="pc-picker" id="pc-pick" role="group" aria-label="Card shown"></div>
       <div class="pc-grid" id="pc-root"></div>
     </section>
@@ -101,7 +102,17 @@
     <section role="tabpanel" id="know" class="sb-panel sb-panel--know" aria-labelledby="t-know" tabindex="0" data-know="list" hidden>
       <div class="sb-know__side">
         <p id="sb-know-status" class="sb-know__status" role="status">Asking the relay for documents.</p>
-        <div class="sb-scroll" tabindex="0" aria-label="Diagrams and documents"><div id="sb-know-list" class="sb-know__list"></div></div>
+        <div class="sb-scroll" tabindex="0" aria-label="First things to try, diagrams and documents">
+          <section class="sb-tips" aria-labelledby="sb-tips-h">
+            <h3 id="sb-tips-h" class="sb-know__group">First things to try</h3>
+            <ul class="sb-tips__list">
+              <li><strong>The stage is dark and lane C reads shutter CLOSED:</strong> open it from Control, lane C. A shutter closed from the playback app may not reopen from there. The Open button on that card is the way back.</li>
+              <li><strong>A lane says CHECK BY EYE:</strong> the relay has no current reply from it, so nothing on its card is a reading. Look at the surface.</li>
+              <li><strong>A cue did nothing:</strong> open MIDI test and read "Last cue received". Listed with the right time means it arrived, so look at the playback app. Not listed means it never arrived.</li>
+            </ul>
+          </section>
+          <div id="sb-know-list" class="sb-know__list"></div>
+        </div>
         <p id="sb-notes" class="sb-notes" hidden>
           <a id="sb-notes-link" class="sb-notes__link" target="_blank" rel="noopener noreferrer" aria-describedby="sb-notes-hint">Notes<span class="sb-sr"> (opens in a new tab)</span><span class="sb-notes__mark" aria-hidden="true">↗</span></a>
           <span id="sb-notes-hint" class="sb-notes__hint">For notes that can wait. Not for emergencies or cue calls.</span>

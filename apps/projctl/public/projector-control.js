@@ -144,11 +144,12 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
   function allState(id) {
     if (!isRun(ALL, id)) return groupState(views, id, options());
     if (views.some(view => view.reach === 'connecting') || runState === undefined) return no('Waiting for the relay.');
-    if (!views.some(view => view.reach === 'live')) return no(views[0]?.reach === 'relay-offline' ? 'Relay not answering. Use the remote.' : 'No lane is answering the relay.');
+    if (!views.some(view => view.reach === 'live')) return no(views[0]?.reach === 'relay-offline' ? 'Relay not answering. Check by eye.' : 'No lane is answering the relay.');
     if (runState === null) return no('This relay has no all-four run.');
     if (runActive()) return no('A run is already in progress.');
     if (lock === null) return no('Show Lock not read.');
-    if (lock) return no('Show Lock is on. Power is locked.');
+    if (lock && !ACTIONS[id].arg) return no('Show Lock is on. Power off is locked.');
+    if (lock && policy.lockBlocksPowerOn) return no('Show Lock is on. Power is locked.');
     return { enabled: true, reason: '', note: '', ready: [], skipped: [] };
   }
 

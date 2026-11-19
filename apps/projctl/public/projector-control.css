@@ -15,6 +15,20 @@
 
 .pc-sr{position:absolute;top:0;left:0;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 .pc-picker{display:none}
+/* The all-four run, as every page sees it: in progress, or how the last one ended. */
+.pc-run{display:flex;align-items:center;gap:6px 12px;min-width:0;padding:8px 12px;border:1px solid var(--pc-line);border-left:8px solid var(--pc-tone);border-radius:10px;background:var(--pc-wash);color:var(--pc-ink);--pc-tone:var(--pc-off);--pc-wash:var(--pc-off-wash)}
+.pc-run[hidden]{display:none}
+.pc-run[data-state="running"]{--pc-tone:var(--pc-eye);--pc-wash:var(--pc-eye-wash)}
+.pc-run[data-state="done"]{--pc-tone:var(--pc-ok);--pc-wash:var(--pc-ok-wash)}
+.pc-run[data-state="attention"],.pc-run[data-state="stopped"],.pc-run[data-state="interrupted"]{--pc-tone:var(--pc-bad);--pc-wash:var(--pc-bad-wash)}
+.pc-run__title{flex:none;font:800 clamp(15px,1.8vw,22px)/1.2 var(--font-sans,system-ui,sans-serif);letter-spacing:.02em;text-transform:uppercase;color:var(--pc-tone)}
+.pc-run__text{flex:1 1 0;min-width:0;font-size:13px;line-height:1.3;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.pc-run__steps{flex:none;display:flex;gap:4px;margin:0;padding:0;list-style:none}
+.pc-run__step{padding:2px 7px;border:1px solid var(--pc-control);border-radius:6px;background:var(--pc-surface);color:var(--pc-muted);font:700 12px/1.5 var(--font-mono,ui-monospace,monospace);white-space:nowrap}
+.pc-run__step[data-state="ok"]{border-color:var(--pc-ok);color:var(--pc-ok)}
+.pc-run__step[data-state="part"],.pc-run__step[data-state="busy"]{border-color:var(--pc-eye);color:var(--pc-eye)}
+.pc-run__step[data-state="bad"]{border-color:var(--pc-bad);color:var(--pc-bad)}
+.pc-run__stop{flex:none;min-height:40px;background:var(--pc-surface)}
 /* Four lanes in a row under the all-lanes bar. */
 .pc-grid{min-height:0;min-width:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr);gap:10px}
 .pc-card{container:pc-card / size;min-width:0;min-height:0;overflow:hidden;border:1px solid var(--pc-line);border-top:5px solid var(--lane-accent,var(--pc-control));border-radius:12px;background:var(--pc-surface);color:var(--pc-ink)}
@@ -44,6 +58,9 @@
 .pc-btn[aria-busy="true"]{border-style:solid;border-color:var(--pc-accent);color:var(--pc-ink)}
 .pc-btn--confirm{background:var(--pc-bad);border-color:var(--pc-bad);color:var(--pc-on-bad)}
 .pc-btn--quiet{background:transparent}
+/* The way back from a dark surface: a lit lane whose shutter is closed. */
+.pc-btn[data-recover]{background:var(--pc-accent);border-color:var(--pc-accent);color:var(--pc-on-accent)}
+.pc-row[data-run] .pc-btn{white-space:nowrap}
 .pc-confirm{display:flex;flex-direction:column;gap:6px;margin-top:auto}
 .pc-confirm__text{margin:0;font-size:13px;line-height:1.3}
 .pc-msg{min-height:2.6em;margin:0;font-size:13px;line-height:1.3;color:var(--pc-muted);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
@@ -98,40 +115,61 @@
   .pc-row{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);align-items:center;gap:4px}
   .pc-row__label{grid-column:auto;font-size:9px;letter-spacing:.04em}
   .pc-btn{min-height:30px;padding:2px 4px;font-size:13px}
+  .pc-row[data-run]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .pc-row[data-run] .pc-row__label{display:none}
+  .pc-row[data-run] .pc-btn{font-size:12px}
   .pc-confirm{grid-row:1 / span 2;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:3px 4px}
   .pc-confirm__text{grid-column:1 / -1;overflow:hidden;font-size:11px;line-height:1.2;white-space:nowrap;text-overflow:ellipsis}
   .pc-msg{grid-row:3;font-size:11px;line-height:1.2}
 }
-/* The all-lanes card as a bar above the lanes. */
+/* The all-lanes card as a bar above the lanes: name, the two rows of buttons, then the message. */
 @container pc-card (max-height:150px) and (min-width:700px){
-  .pc-card__in{grid-template-columns:auto auto minmax(0,1fr) minmax(0,1fr) minmax(0,1.1fr);grid-template-rows:minmax(0,1fr);align-items:center;gap:0 14px;padding:6px 12px}
+  .pc-card__in{grid-template-columns:auto minmax(0,2.6fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:center;gap:0 14px;padding:6px 12px}
   .pc-model{display:block}
   .pc-letter{grid-row:1 / span 2}
   .pc-head{grid-column:1;grid-row:1}
-  .pc-state{grid-column:2;grid-row:1;padding:4px 8px;font-size:15px;white-space:nowrap}
-  .pc-fresh,.pc-facts,.pc-alarm{display:none}
-  .pc-actions{grid-column:3 / span 2;grid-row:1;flex-direction:row;align-self:center;gap:14px}
+  .pc-state,.pc-fresh,.pc-facts,.pc-alarm{display:none}
+  .pc-actions{grid-column:2;grid-row:1;flex-direction:row;align-self:center;gap:14px}
   .pc-row{flex:1;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);align-items:center}
+  .pc-row[data-run]{flex:1.5}
   .pc-row__label{grid-column:auto}
-  .pc-confirm{grid-column:3 / span 2;grid-row:1;flex-direction:row;align-items:center;align-self:center}
+  .pc-btn{padding-inline:6px}
+  .pc-confirm{grid-column:2;grid-row:1;flex-direction:row;align-items:center;align-self:center}
   .pc-confirm__text{flex:1;min-width:0;font-size:12px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
-  .pc-confirm .pc-btn{flex:none}
-  .pc-msg{grid-column:5;grid-row:1;align-self:center;font-size:12px;-webkit-line-clamp:4}
+  .pc-confirm .pc-btn{flex:none;padding-inline:12px}
+  .pc-msg{grid-column:3;grid-row:1;align-self:center;font-size:12px;-webkit-line-clamp:4}
   .pc-card[data-phase="armed"] .pc-msg,.pc-card[data-phase="relay-armed"] .pc-msg{display:none}
 }
-@container pc-card (max-height:150px) and (min-width:700px) and (max-width:899px){
-  .pc-card__in{grid-template-columns:auto minmax(0,1fr) minmax(0,1fr) minmax(0,.9fr)}
-  .pc-state{display:none}
-  .pc-actions,.pc-confirm{grid-column:2 / span 2}
+/* A very wide bar has room for the count as well. */
+@container pc-card (max-height:150px) and (min-width:1200px){
+  .pc-card__in{grid-template-columns:auto auto minmax(0,2.6fr) minmax(0,1fr)}
+  .pc-state{display:block;grid-column:2;grid-row:1;padding:4px 8px;font-size:15px;white-space:nowrap}
+  .pc-actions,.pc-confirm{grid-column:3}
   .pc-msg{grid-column:4}
 }
+/* A narrow bar (a tablet held upright) stacks the two rows of buttons beside the name. */
+@container pc-card (max-height:150px) and (min-width:700px) and (max-width:899px){
+  .pc-card__in{grid-template-columns:minmax(0,190px) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);align-items:start;gap:4px 14px}
+  .pc-head{grid-column:1;grid-row:1}
+  .pc-msg{grid-column:1;grid-row:2;align-self:start;-webkit-line-clamp:3}
+  .pc-actions{grid-column:2;grid-row:1 / span 2;flex-direction:column;align-self:center;gap:6px}
+  .pc-row,.pc-row[data-run]{flex:none;grid-template-columns:64px minmax(0,1fr) minmax(0,1fr)}
+  .pc-confirm{grid-column:2;grid-row:1 / span 2;flex-flow:row wrap;gap:4px 6px}
+  .pc-confirm__text{flex:1 1 100%;-webkit-line-clamp:3}
+  .pc-confirm .pc-btn{flex:1}
+}
 
-/* Two by two when four in a row would be too narrow. */
+/* Two by two when four in a row would be too narrow. The bar grows to hold two rows of buttons. */
 @media (max-width:999px){
   .pc-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto repeat(2,minmax(0,1fr))}
+  .pc-card[data-lane="ALL"]{height:124px}
 }
 /* A phone or a short screen shows one card at a time, chosen with A, B, C, D, All. */
 @media (max-width:699px),(max-height:519px){
+  .pc-run{flex-wrap:wrap;padding:6px 10px}
+  .pc-run__title{flex:1 1 auto;font-size:15px}
+  .pc-run__text{flex:1 1 100%;order:3}
+  .pc-run__stop{min-height:36px}
   .pc-picker{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
   .pc-pick{appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;min-width:0;padding:2px;border:1px solid var(--pc-control);border-bottom:4px solid var(--pc-tone);border-radius:8px;background:var(--pc-surface);color:var(--pc-ink);font:800 15px/1.15 var(--font-sans,system-ui,sans-serif);cursor:pointer}
   .pc-pick__word{font:700 10px/1.2 var(--font-mono,ui-monospace,monospace);color:var(--pc-tone)}
@@ -142,6 +180,11 @@
   .pc-card[data-lane="ALL"]{grid-column:auto;grid-row:auto;height:auto}
 }
 @media (max-width:599px) and (max-height:419px){
+  .pc-run{flex-wrap:nowrap;gap:4px;padding:1px 6px;border-left-width:5px}
+  .pc-run__title{flex:1 1 auto;min-width:0;overflow:hidden;font-size:10px;letter-spacing:0;white-space:nowrap;text-overflow:ellipsis}
+  .pc-run__text{display:none}
+  .pc-run__step{padding:0 3px;font-size:10px}
+  .pc-run__stop{min-height:22px;padding:0 6px;font-size:11px}
   .pc-picker{gap:4px}
   .pc-pick{flex-direction:row;gap:4px;min-height:28px;border-bottom-width:3px;font-size:13px}
   .pc-pick__word{font-size:9px}

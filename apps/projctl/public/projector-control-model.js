@@ -19,8 +19,9 @@ export const ACTIONS = Object.freeze({
 });
 export const ACTION_IDS = Object.freeze(Object.keys(ACTIONS));
 
-// What Show Lock locks on a role page. The relay itself blocks only power off; a page may be stricter.
-export const DEFAULT_POLICY = Object.freeze({ lockBlocksPower: true, lockBlocksGroup: true });
+// Show Lock blocks power off, as the relay does. Power on and shutters stay available under it.
+// A page that wants to be stricter can also lock power on, or every all-lanes action.
+export const DEFAULT_POLICY = Object.freeze({ lockBlocksPowerOn: false, lockBlocksGroup: false });
 
 const shortClock = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
 const stamp = value => typeof value === 'number' ? value : typeof value === 'string' ? Date.parse(value) : NaN;
@@ -57,11 +58,11 @@ export function linkOf(projector) {
 const patternIsOff = value => ['00', 'off', '0'].includes(String(value).toLowerCase());
 const BLOCKED = {
   connecting: 'Waiting for the relay.',
-  'relay-offline': 'Relay not answering. Use the remote.',
-  conflict: 'Lane claimed twice. Use the remote.',
+  'relay-offline': 'Relay not answering. Check by eye.',
+  conflict: 'Lane claimed twice. Check by eye.',
   unassigned: 'No projector on this lane.',
   stale: 'Reply too old. Waiting for a fresh one.',
-  unreached: "Relay can't reach it. Use the remote.",
+  unreached: "Relay can't reach it. Check by eye.",
 };
 
 function blockedLane(base, reach, fresh) {
@@ -128,7 +129,8 @@ export function actionState(view, actionId, { lock = null, policy = DEFAULT_POLI
   const power = view.power, POWER = power.toUpperCase();
   if (action.cmd === 'power') {
     if (lock === null) return no('Show Lock not read.');
-    if (lock && policy.lockBlocksPower) return no('Show Lock is on. Power is locked.');
+    if (lock && !action.arg) return no('Show Lock is on. Power off is locked.');
+    if (lock && policy.lockBlocksPowerOn) return no('Show Lock is on. Power is locked.');
     if (power === 'unknown') return no('Power not reported.');
     if (action.arg) {
       if (power === 'off') return { enabled: true, reason: '', note: '' };

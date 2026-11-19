@@ -121,11 +121,11 @@ test('the setup check gives each line a pass, a fail or "cannot check", always w
   bad.projectors.push(projector('P5', '')); // a projector with no lane is not a lane line
   const result = setupCheck({ lanes: views(bad), relay: up, displays: displayReport(4), feed: feedOf({ state: 'stopped', lastRowAt: ago(200000) }), hostChecks: { status: 'error' }, lock: false, now: NOW });
   const got = id => [line(result, id).state, line(result, id).reading];
-  assert.deepEqual(got('A-reach'), ['fail', "Relay can't reach it. Use the remote. Last reply 5:00 AM."]);
+  assert.deepEqual(got('A-reach'), ['fail', "Relay can't reach it. Check by eye. Last reply 5:00 AM."]);
   for (const id of ['A-power', 'A-input', 'A-shutter', 'A-pattern']) assert.deepEqual(got(id), ['cannot', 'Lane not reachable']);
   assert.deepEqual(got('A-link'), ['reading', 'Not reported']);
   assert.deepEqual([got('B-power'), got('B-shutter')], [['fail', 'OFF'], ['cannot', 'Projector is not ON']]);
-  assert.deepEqual([got('C-input'), got('C-shutter'), got('C-pattern'), got('C-link')], [['cannot', 'Not reported: the control port does not report the input'], ['fail', 'CLOSED: dark on stage'], ['fail', 'ON · Crosshatch'], ['reading', 'Control port (commands unproven on a rig)']]);
+  assert.deepEqual([got('C-input'), got('C-shutter'), got('C-pattern'), got('C-link')], [['cannot', 'Not reported: the control port does not report the input'], ['fail', 'CLOSED: dark on stage'], ['fail', 'ON · Crosshatch'], ['reading', 'Control port (shutter proven on the rig; power not yet tested there)']]);
   assert.deepEqual([got('D-input'), got('D-shutter'), got('D-pattern')], [['fail', 'SDI 1, expected HDMI 1'], ['cannot', 'Not reported'], ['cannot', 'Not reported']]);
   assert.deepEqual(got('displays'), ['fail', '3 outputs for 4 lanes · 4 displays · 1 main: 2560 x 1440 @ 60.00Hz · 2: 1920 x 1200 @ 60.00Hz · 3: 1920 x 1200 @ 60.00Hz · 4: 1920 x 1200 @ 60.00Hz']);
   assert.deepEqual(got('listener'), ['fail', 'Listener stopped. Last heard 3m ago']);
@@ -226,8 +226,8 @@ test('a document is shown as text: markdown headings become headings and nothing
   assert.deepEqual(textBlocks('line', 'txt'), [{ kind: 'pre', text: 'line' }]);
 });
 
-const PAGE_FILES = ['show.html', 'show.js', 'show-model.js', 'show-know.js', 'show.css', 'projector-control.js', 'projector-control-model.js', 'projector-control.css'];
-test('the page source holds no address, number, name or contact, writes one route and sends no MIDI', async () => {
+const PAGE_FILES = ['show.html', 'power.html', 'show.js', 'show-model.js', 'show-know.js', 'show.css', 'projector-control.js', 'projector-control-model.js', 'projector-control.css'];
+test('the page sources hold no address, number, name or contact, write only the command and the run, and send no MIDI', async () => {
   const source = {};
   for (const name of PAGE_FILES) source[name] = await readFile(new URL(`../public/${name}`, import.meta.url), 'utf8');
   for (const [name, text] of Object.entries(source)) {
@@ -238,36 +238,49 @@ test('the page source holds no address, number, name or contact, writes one rout
     assert.doesNotMatch(text, /requestMIDIAccess|MIDIOutput|\.send\(\s*\[/, `${name} can send MIDI`);
   }
   const scripts = ['show.js', 'show-know.js', 'projector-control.js', 'projector-control-model.js', 'show-model.js'].map(name => source[name]).join('\n');
-  const routes = [...scripts.matchAll(/(?:fetch|readJson|get)\((?:`|')(api\/[a-z-]+(?:\/[a-z-]+)?)/g)].map(match => match[1]);
-  assert.deepEqual([...new Set(routes)].sort(), ['api/command', 'api/crew-links', 'api/cue-feed', 'api/host-checks', 'api/host-displays', 'api/know', 'api/state'], 'relative relay routes only');
+  const routes = [...scripts.matchAll(/(?:fetch|readJson|postJson|get)\((?:`|')(api\/[a-z-]+(?:\/[a-z-]+)?)/g)].map(match => match[1]);
+  assert.deepEqual([...new Set(routes)].sort(), ['api/command', 'api/crew-links', 'api/cue-feed', 'api/host-checks', 'api/host-displays', 'api/know', 'api/power-run', 'api/power-run/plan', 'api/power-run/start', 'api/power-run/stop', 'api/state'], 'relative relay routes only');
+  assert.deepEqual([...scripts.matchAll(/postJson\('(api\/[a-z-]+(?:\/[a-z-]+)?)'/g)].map(match => match[1]).sort(), ['api/command', 'api/power-run/plan', 'api/power-run/start', 'api/power-run/stop'], 'the only writes: one lane command, and the plan, start and stop of the relay run');
   assert.match(source['show-know.js'], /const fileUrl = file => `api\/know\/file\?f=\$\{encodeURIComponent\(file\)\}`/);
   assert.deepEqual([...scripts.matchAll(/method: '(\w+)'/g)].map(match => match[1]), ['POST'], 'one write, the command route');
-  assert.match(source['show.js'], /fetch\('api\/command', \{ method: 'POST'/);
+  assert.match(source['show.js'], /async function postJson\(route, body\) \{\n  const response = await fetch\(route, \{ method: 'POST'/);
   assert.deepEqual([...new Set([...scripts.matchAll(/cmd: '(\w+)'/g)].map(match => match[1]))], ['power', 'shutter']);
   assert.doesNotMatch(scripts, /api\/(?:lock|preset|projector|power-schedules|discover|preferred-input|health-reports|logout|sim|picture)/);
   assert.doesNotMatch(scripts, /innerHTML|insertAdjacentHTML|outerHTML|document\.write|eval\(|new Function/, 'nothing is inserted as markup');
-  const html = source['show.html'];
-  assert.doesNotMatch(html, /\s(?:src|href)="\/(?!\/)/, 'relative URLs, so the page works behind a path prefix');
-  assert.deepEqual([...html.matchAll(/https?:\/\/[^"'\s<]+/g)].map(match => match[0]).filter(url => !url.startsWith('http://localhost:8080/show.html')), [], 'no external host');
-  assert.match(html, /Shared sign-in/);
-  assert.match(html, /It does not record who sent it\./);
-  assert.deepEqual([...html.matchAll(/role="tab" id="t-(\w+)"/g)].map(match => match[1]), ['control', 'setup', 'midi', 'know']);
+  for (const [name, tabs] of [['show.html', ['control', 'setup', 'midi', 'know']], ['power.html', ['control', 'know']]]) {
+    const html = source[name];
+    assert.doesNotMatch(html, /\s(?:src|href)="\/(?!\/)/, `${name}: relative URLs, so the page works behind a path prefix`);
+    assert.deepEqual([...html.matchAll(/https?:\/\/[^"'\s<]+/g)].map(match => match[0]).filter(url => !url.startsWith(`http://localhost:8080/${name}`)), [], `${name}: no external host`);
+    assert.match(html, /Shared sign-in/);
+    assert.match(html, /It does not record who sent it\./);
+    assert.deepEqual([...html.matchAll(/role="tab" id="t-(\w+)"/g)].map(match => match[1]), tabs, `${name} tabs`);
+    assert.match(html, /<script type="module" src="show\.js"><\/script>/, `${name} runs the shared page script`);
+    assert.match(html, /<div class="pc-run" id="pc-run" hidden><\/div>/, `${name} carries the shared run banner`);
+    assert.doesNotMatch(html, /app closed|remote/i, `${name} has no "app closed" step and no remote run-around`);
+  }
+  // Both pages are the same shell: the power page differs only in its role, its words and the tabs it leaves out.
+  assert.match(source['power.html'], /<html lang="en" data-theme="light" data-role="power">/);
+  assert.match(source['show.html'], /<html lang="en" data-theme="light" data-role="show">/);
+  assert.match(source['show.html'], /open it from Control, lane C/, 'the way back from a dark stage is written on the page');
 });
 
 test('the relay serves the page with a full head, and hides it behind the login when a passcode is set', async () => {
   const assets = [['show.js', /javascript/], ['show-model.js', /javascript/], ['show-know.js', /javascript/], ['projector-control.js', /javascript/], ['projector-control-model.js', /javascript/], ['show.css', /text\/css/], ['projector-control.css', /text\/css/]];
+  const pages = [['show.html', 'Projctl | Show backup'], ['power.html', 'Projctl | Power']];
   const relay = await startRelay();
   try {
-    const page = await fetch(`${relay.base}/show.html`, { redirect: 'manual' });
-    assert.equal(page.status, 200);
-    assert.match(page.headers.get('content-type'), /text\/html/);
-    assert.match(page.headers.get('content-security-policy'), /frame-ancestors/);
-    const html = await page.text();
-    assert.match(html, /<title>Projctl \| Show backup<\/title>/);
-    assert.match(html, /http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self';/);
-    assert.doesNotMatch(html, /unsafe-inline|\sstyle="|<style/);
-    assert.match(html, /<link rel="canonical" href="http:\/\/localhost:8080\/show\.html">/);
-    for (const tag of ['property="og:title"', 'property="og:description"', 'property="og:type"', 'property="og:url"', 'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"', 'name="theme-color"', 'name="description"', 'name="robots" content="noindex, nofollow"']) assert.ok(html.includes(`<meta ${tag}`), `show.html lacks ${tag}`);
+    for (const [name, title] of pages) {
+      const page = await fetch(`${relay.base}/${name}`, { redirect: 'manual' });
+      assert.equal(page.status, 200, name);
+      assert.match(page.headers.get('content-type'), /text\/html/);
+      assert.match(page.headers.get('content-security-policy'), /frame-ancestors/);
+      const html = await page.text();
+      assert.ok(html.includes(`<title>${title}</title>`), `${name} title`);
+      assert.match(html, /http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self';/);
+      assert.doesNotMatch(html, /unsafe-inline|\sstyle="|<style/);
+      assert.ok(html.includes(`<link rel="canonical" href="http://localhost:8080/${name}">`), `${name} canonical`);
+      for (const tag of ['property="og:title"', 'property="og:description"', 'property="og:type"', 'property="og:url"', 'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"', 'name="theme-color"', 'name="description"', 'name="robots" content="noindex, nofollow"']) assert.ok(html.includes(`<meta ${tag}`), `${name} lacks ${tag}`);
+    }
     for (const [asset, type] of assets) {
       const response = await fetch(`${relay.base}/${asset}`);
       assert.equal(response.status, 200, asset);
@@ -277,12 +290,12 @@ test('the relay serves the page with a full head, and hides it behind the login 
 
   const locked = await startRelay({ PJ_PASSCODE: 'simulator-only-code' });
   try {
-    for (const asset of ['show.html', ...assets.map(([name]) => name)]) {
+    for (const asset of ['show.html', 'power.html', ...assets.map(([name]) => name)]) {
       const response = await fetch(`${locked.base}/${asset}`, { redirect: 'manual' });
       assert.equal(response.status, 302, asset);
       assert.equal(response.headers.get('location'), `/login.html?next=${encodeURIComponent('/' + asset)}`);
     }
-    for (const route of ['host-displays', 'cue-feed', 'host-checks', 'know', 'know/file?f=signal-flow.svg', 'crew-links']) assert.equal((await fetch(`${locked.base}/api/${route}`)).status, 401, route);
+    for (const route of ['host-displays', 'cue-feed', 'host-checks', 'know', 'know/file?f=signal-flow.svg', 'crew-links', 'power-run']) assert.equal((await fetch(`${locked.base}/api/${route}`)).status, 401, route);
     assert.equal((await fetch(`${locked.base}/api/command`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ slot: 'P2', cmd: 'shutter', arg: 1 }) })).status, 401);
   } finally { await locked.close(); }
 });

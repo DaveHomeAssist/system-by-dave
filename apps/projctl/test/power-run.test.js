@@ -199,18 +199,24 @@ test('a second press from any page meets the run in progress and never starts an
   assert.equal(typeof b.run.plan('off').confirm, 'string');
 });
 
-test('Show Lock refuses a run in either direction and stops one that is under way', async () => {
-  const b = bench({ lock: true });
-  for (const direction of ['on', 'off']) assert.throws(() => b.run.plan(direction), error => error.status === 423 && error.message === 'show lock is on');
+test('Show Lock refuses an off run and stops one under way; an on run is allowed, as power on always is', async () => {
+  const b = bench({ lock: true, power: { P1: 'on', P2: 'on', P3: 'on', P4: 'on' } });
+  assert.throws(() => b.run.plan('off'), error => error.status === 423 && error.message === 'show lock is on');
   b.lock = false;
-  const plan = b.run.plan('on');
+  const plan = b.run.plan('off');
   b.lock = true;
-  assert.throws(() => b.run.start('on', plan.confirm), error => error.status === 423);
+  assert.throws(() => b.run.start('off', plan.confirm), error => error.status === 423);
   b.lock = false;
-  await b.go('on');
+  await b.go('off');
   b.lock = true;
   await b.step();
   assert.deepEqual([b.run.view().run.state, b.run.view().run.message, b.sent.length], ['stopped', 'Stopped: Show Lock was turned on. Nothing more was sent. Check each lane.', 1]);
+  // Morning with Show Lock still on from the night before: the on run goes ahead.
+  const morning = bench({ lock: true });
+  assert.equal(typeof morning.run.plan('on').confirm, 'string');
+  await morning.go('on');
+  await morning.step();
+  assert.deepEqual([morning.run.view().run.state, morning.sent.length], ['running', 2]);
 });
 
 test('the confirm is one use, short lived, and bound to the direction and the projectors it was shown for', async () => {
@@ -291,9 +297,9 @@ test('the relay runs it against the simulator: plan, confirm, shared state, one 
     const events = (await relay.state()).events.filter(event => event.source === 'run').map(event => `${event.slot} ${event.command}`);
     assert.deepEqual(events, ['P3 power 1', 'P2 power 1', 'P1 power 1', 'P4 power 1'], 'the relay logged one command per unit, in order: C, B, A, D');
 
-    // Show Lock: no run in either direction.
+    // Show Lock: no off run. An on run is still allowed, as power on always is.
     await relay.api('lock', { lock: true });
-    assert.deepEqual([(await relay.api('power-run/plan', { direction: 'off' })).status, (await relay.api('power-run/plan', { direction: 'on' })).status], [423, 423]);
+    assert.deepEqual([(await relay.api('power-run/plan', { direction: 'off' })).status, (await relay.api('power-run/plan', { direction: 'on' })).status], [423, 200]);
     await relay.api('lock', { lock: false });
     // Off, then the banner only once every lane reports OFF.
     const off = (await relay.api('power-run/plan', { direction: 'off' })).body;

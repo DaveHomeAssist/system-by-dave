@@ -1,12 +1,15 @@
-// Show backup page in a browser against the simulator relay: the four tabs, every projector
-// action with its two steps, Show Lock, the MIDI test against an observer file this test appends
-// to, the setup check, the Know tab with the invented sample set, and fit at eight sizes.
+// The role pages in a browser against the simulator relay: show.html (four tabs) and power.html
+// (the same shared control, power only). Every projector action with its two steps, the relay's
+// one all-four run seen from two pages, Show Lock, the MIDI test against an observer file this test
+// appends to, the setup check, the Know tab, the signed-in path with a relay restart mid-run, and
+// fit at eight sizes.
 // Nothing here reaches a projector or sends MIDI. Set SHOW_BACKUP_SHOTS to keep screenshots.
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const net = require('node:net');
 
 const SIZES = [[1440, 900], [1024, 768], [768, 1024], [375, 812], [375, 667], [844, 390], [320, 256], [2560, 720]];
 const TABS = ['control', 'setup', 'midi', 'know'];
@@ -96,10 +99,10 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.deepEqual([await card('B').locator('.pc-state').innerText(), await fact('B', 'shutter'), await fact('B', 'pattern'), await fact('B', 'link')], ['ON', 'OPEN', 'Off', 'Simulator']);
     assert.match(await card('B').locator('.pc-fresh').innerText(), /^Reply (just now|\ds ago)$/);
     assert.deepEqual([await card('A').locator('.pc-state').innerText(), await card('A').getAttribute('data-tone')], ['OFF', 'attention']);
-    assert.deepEqual([await card('D').locator('.pc-state').innerText(), await fact('D', 'shutter'), await fact('D', 'link'), await msg('D')], ['CHECK BY EYE', 'Not reported', 'Not reported', "Relay can't reach it. Use the remote."]);
+    assert.deepEqual([await card('D').locator('.pc-state').innerText(), await fact('D', 'shutter'), await fact('D', 'link'), await msg('D')], ['CHECK BY EYE', 'Not reported', 'Not reported', "Relay can't reach it. Check by eye."]);
     for (const name of ['power-on', 'power-off', 'shutter-open', 'shutter-close']) {
       assert.equal(await act('D', name).getAttribute('aria-disabled'), 'true');
-      assert.match(await act('D', name).getAttribute('aria-label'), /lane D\. Blocked: Relay can't reach it\. Use the remote\.$/);
+      assert.match(await act('D', name).getAttribute('aria-label'), /lane D\. Blocked: Relay can't reach it\. Check by eye\.$/);
     }
     assert.deepEqual(await card('A').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => [b.dataset.act, b.getAttribute('aria-disabled')])), [['power-on', 'false'], ['power-off', 'true'], ['shutter-open', 'true'], ['shutter-close', 'true']]);
     assert.deepEqual(await card('B').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => [b.dataset.act, b.getAttribute('aria-disabled')])), [['power-on', 'true'], ['power-off', 'false'], ['shutter-open', 'true'], ['shutter-close', 'false']]);
@@ -111,7 +114,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await act('A', 'shutter-close').click({ force: true });
     assert.equal(await msg('A'), 'Close shutter is blocked. Reports OFF, so no shutter move.');
     await act('D', 'power-on').click({ force: true });
-    assert.equal(await msg('D'), "Power on is blocked. Relay can't reach it. Use the remote.");
+    assert.equal(await msg('D'), "Power on is blocked. Relay can't reach it. Check by eye.");
     assert.deepEqual(sent(), []);
 
     // Shutter, two steps. A double tap, Cancel and Escape never send.
@@ -138,6 +141,8 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.deepEqual(sent(), [{ slot: 'P2', cmd: 'shutter', arg: 1, expectedTargets: [{ slot: 'P2', revision: await revision('P2') }] }]);
     assert.match(await msg('B'), /^Reported CLOSED at \d+:\d\d [AP]M\.$/);
     assert.equal(await fact('B', 'shutter'), 'CLOSED · dark on stage');
+    assert.equal(await act('B', 'shutter-open').getAttribute('data-recover'), '', 'a lit lane with a closed shutter: Open is marked as the way back');
+    assert.equal(await act('C', 'shutter-open').getAttribute('data-recover'), null);
     assert.equal((await reading()).P2.shutter, 'closed');
     await act('B', 'shutter-open').click();
     await page.waitForTimeout(700);
@@ -184,7 +189,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await act('ALL', 'shutter-close').click();
     await settled('ALL', 'armed');
     assert.match(await act('ALL', 'confirm').innerText(), /^Confirm close shutter B and C \(\d\)$/);
-    assert.match(await card('ALL').locator('.pc-confirm__text').innerText(), /^Nothing sent yet\. Goes to B and C\. Skipping A: reports (COOLING|OFF), so no shutter move · D: relay can't reach it\. Use the remote\. Shared sign-in/);
+    assert.match(await card('ALL').locator('.pc-confirm__text').innerText(), /^Nothing sent yet\. Goes to B and C\. Skipping A: reports (COOLING|OFF), so no shutter move · D: relay can't reach it\. Check by eye\. Shared sign-in/);
     await shot(page, '02-tablet-control-all-lanes-armed');
     await page.waitForTimeout(700);
     await act('ALL', 'confirm').click();
@@ -198,18 +203,98 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await page.locator('.pc-card[data-lane="C"] [data-fact="shutter"] dd', { hasText: /^OPEN$/ }).waitFor();
     await page.locator('.pc-card[data-lane="B"] [data-fact="shutter"] dd', { hasText: /^OPEN$/ }).waitFor();
 
-    // Show Lock: one-lane shutters stay; power, every all-lanes action, the MIDI test and the setup check lock.
+    // ---- The all-four run: one run in the relay, started from one page and shown on every page.
+    await relay.api('sim', { slot: 'P4', offline: false });
+    await page.locator('.pc-card[data-lane="D"][data-reach="live"]').waitFor();
+    await page.locator('.pc-card[data-lane="A"] .pc-state', { hasText: /^OFF$/ }).waitFor({ timeout: 15000 });
+    const other = await context.newPage(); // a second person, on the power page
+    await other.goto(`${relay.base}/power.html`);
+    await other.locator('.pc-card[data-lane="B"][data-reach="live"]').waitFor({ state: 'attached' });
+    const otherCard = id => other.locator(`.pc-card[data-lane="${id}"]`);
+    assert.deepEqual(await other.locator('[role=tab]').allInnerTexts(), ['Power', 'Know']);
+    assert.equal(await other.locator('h1').innerText(), 'Power');
+    assert.deepEqual(await otherCard('ALL').locator('.pc-actions [data-act]').allInnerTexts(), ['Turn all on', 'Turn all off'], 'the power page carries power only');
+    assert.equal(await other.locator('[data-act="shutter-open"], [data-act="shutter-close"]').count(), 0);
+    assert.equal(await other.locator('.sb-strip').isVisible(), false, 'the power page has no go or no-go strip to read');
+    assert.deepEqual(await card('ALL').locator('.pc-actions [data-act]').allInnerTexts(), ['Turn all on', 'Turn all off', 'Open', 'Close']);
+    assert.equal(await page.locator('#pc-run').isVisible(), false);
+    posts.length = 0;
+    await act('ALL', 'power-on').click();
+    await settled('ALL', 'relay-armed');
+    assert.match(await act('ALL', 'confirm').innerText(), /^Confirm: turn all on \(\d+\)$/);
+    assert.match(await card('ALL').locator('.pc-confirm__text').innerText(), /^The relay is ready\. Nothing sent yet\. One run, in order C, B, A, D\. C already ON · B already ON · A power on · D power on\. Shared sign-in/);
+    assert.deepEqual(posts.map(post => [post.path, post.body]), [['/api/power-run/plan', { direction: 'on' }]], 'the first tap asks the relay and sends nothing to a projector');
+    assert.equal((await reading()).P1.power, 'off');
+    await page.waitForTimeout(700);
+    await act('ALL', 'confirm').click();
+    await page.locator('#pc-run[data-state="running"]').waitFor();
+    assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'TURNING ALL FOUR ON');
+    assert.equal(await page.locator('#pc-run .pc-run__stop').innerText(), 'Stop the run');
+    // The other page shows the same run, and its button waits for it.
+    await other.locator('#pc-run[data-state="running"]').waitFor();
+    assert.equal(await other.locator('#pc-run .pc-run__title').innerText(), 'TURNING ALL FOUR ON');
+    assert.equal(await otherCard('ALL').locator('[data-act="power-off"]').getAttribute('aria-disabled'), 'true');
+    await otherCard('ALL').locator('[data-act="power-on"]').click({ force: true });
+    assert.equal(await otherCard('ALL').locator('.pc-msg').innerText(), 'Turn all on is blocked. A run is already in progress.');
+    assert.match(await act('B', 'power-off').getAttribute('aria-label'), /Blocked: An all-four run is in progress\.$/);
+    assert.equal(await act('B', 'shutter-close').getAttribute('aria-disabled'), 'false', 'shutters stay available during a run');
+    await page.locator('#pc-run[data-state="done"]').waitFor({ timeout: 30000 });
+    assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'ALL FOUR ON');
+    assert.match(await page.locator('#pc-run .pc-run__text').innerText(), /^Every lane reports ON\. Finished \d+:\d\d [AP]M\.$/);
+    assert.deepEqual(await page.locator('#pc-run .pc-run__step').allInnerTexts(), ['C ✓', 'B ✓', 'A ✓', 'D ✓']);
+    assert.equal(await page.locator('#pc-run .pc-run__stop').isVisible(), false);
+    await other.locator('#pc-run[data-state="done"]').waitFor();
+    assert.equal(await other.locator('#pc-run .pc-run__title').innerText(), 'ALL FOUR ON');
+    assert.deepEqual(posts.map(post => post.path), ['/api/power-run/plan', '/api/power-run/start'], 'the page started one run and sent no command of its own');
+    assert.deepEqual((await relay.state()).events.filter(event => event.source === 'run').map(event => `${event.slot} ${event.command}`), ['P1 power 1', 'P4 power 1'], 'the relay commanded only the two that were off, A then D');
+    await shot(page, '07-tablet-run-all-four-on');
+    // Night, from the other page: one press, one banner, on both pages.
+    await otherCard('ALL').locator('[data-act="power-off"]').click();
+    await other.locator('.pc-card[data-lane="ALL"][data-phase="relay-armed"]').waitFor();
+    assert.match(await otherCard('ALL').locator('[data-act="confirm"]').innerText(), /^Confirm: turn all off \(\d+\)$/);
+    assert.match(await otherCard('ALL').locator('.pc-confirm__text').innerText(), /One run, in order A, D, B, C\. A power off · D power off · B power off · C power off\./);
+    await other.waitForTimeout(700);
+    await otherCard('ALL').locator('[data-act="confirm"]').click();
+    await page.locator('#pc-run[data-state="running"][data-direction="off"]').waitFor();
+    assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'TURNING ALL FOUR OFF');
+    await shot(other, '08-tablet-power-page-run-off');
+    await other.locator('#pc-run[data-state="done"]').waitFor({ timeout: 40000 });
+    assert.equal(await other.locator('#pc-run .pc-run__title').innerText(), 'SAFE TO LEAVE THE BUILDING');
+    await page.locator('#pc-run[data-state="done"][data-direction="off"]').waitFor();
+    assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'SAFE TO LEAVE THE BUILDING');
+    assert.equal((await relay.state()).projectors.every(p => p.status.power === 'off'), true);
+    assert.deepEqual((await relay.state()).events.filter(event => event.source === 'run').slice(-4).map(event => `${event.slot} ${event.command}`), ['P1 power 0', 'P4 power 0', 'P2 power 0', 'P3 power 0'], 'A, D, B, C');
+    // The power page's own words: how it works, the nevers, and no "app closed" step or remote steps anywhere.
+    await other.locator('#t-know').click();
+    assert.match(await other.locator('.sb-tips').innerText(), /Turn all on\. Night: Turn all off\./);
+    assert.match(await other.locator('.sb-tips').innerText(), /Never cut power at a breaker/);
+    assert.doesNotMatch(await other.locator('body').innerText(), /app closed|remote/i);
+    await other.locator('.sb-know__item').first().waitFor();
+    assert.deepEqual(await other.locator('.sb-know__name').allInnerTexts(), ['Sample signal flow', 'Sample power-up order'], 'the power page asks for the power audience');
+    await other.close();
+    // Back to the state the rest of this test expects: B and C lit, A off, D unreachable.
+    for (const slot of ['P2', 'P3']) await relay.api('command', { slot, cmd: 'power', arg: 1 });
+    await relay.api('sim', { slot: 'P4', offline: true });
+    await until(async () => { const s = await reading(); return s.P2.power === 'on' && s.P3.power === 'on' && !s.P4.online; }, 20000);
+    await page.locator('.pc-card[data-lane="D"][data-reach="unreached"]').waitFor();
+    for (const id of ['B', 'C']) await page.locator(`.pc-card[data-lane="${id}"] .pc-state`, { hasText: /^ON$/ }).waitFor();
+
+    // Show Lock blocks power off, on one lane and in the run, as the relay does. Power on and shutters stay
+    // available. On this page the MIDI test and the setup check lock too.
     await relay.api('lock', { lock: true });
     await page.locator('#sb-lock[data-lock="on"]').waitFor();
     assert.equal(await page.locator('#sb-lock').innerText(), 'Show Lock ON');
     assert.deepEqual(await card('B').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => b.getAttribute('aria-disabled'))), ['true', 'true', 'true', 'false']);
-    assert.match(await act('B', 'power-off').getAttribute('aria-label'), /Blocked: Show Lock is on\. Power is locked\.$/);
-    assert.deepEqual(await card('ALL').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => b.getAttribute('aria-disabled'))), ['true', 'true', 'true', 'true']);
+    assert.match(await act('B', 'power-off').getAttribute('aria-label'), /Blocked: Show Lock is on\. Power off is locked\.$/);
+    assert.deepEqual(await card('ALL').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => [b.textContent, b.getAttribute('aria-disabled')])),
+      [['Turn all on', 'false'], ['Turn all off', 'true'], ['Open', 'true'], ['Close', 'false']], 'only the off run is locked; the morning on run and the shutters are not');
+    assert.equal(await act('A', 'power-on').getAttribute('aria-disabled'), 'false', 'power on for one lane stays available under Show Lock');
     posts.length = 0;
-    await act('ALL', 'shutter-close').click({ force: true });
-    assert.equal(await msg('ALL'), 'Close shutter is blocked. Show Lock is on. All-lanes actions are locked.');
+    await act('ALL', 'power-off').click({ force: true });
+    assert.equal(await msg('ALL'), 'Turn all off is blocked. Show Lock is on. Power off is locked.');
     await act('B', 'power-off').click({ force: true });
-    assert.equal(await msg('B'), 'Power off is blocked. Show Lock is on. Power is locked.');
+    assert.equal(await msg('B'), 'Power off is blocked. Show Lock is on. Power off is locked.');
+    assert.deepEqual(posts, [], 'a blocked press asks the relay nothing');
     assert.deepEqual(sent(), []);
     await act('B', 'shutter-close').click();
     await page.waitForTimeout(700);
@@ -262,7 +347,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.deepEqual([await line('B-power'), await line('B-shutter'), await line('B-pattern'), await line('B-link')], [['pass', 'PASS', 'ON'], ['pass', 'PASS', 'OPEN'], ['pass', 'PASS', 'Off'], ['reading', 'READING', 'Simulator']]);
     assert.ok(['pass', 'cannot'].includes((await line('B-input'))[0]), 'the input is judged only against a preferred input');
     assert.deepEqual((await line('D-reach'))[0], 'fail');
-    assert.match((await line('D-reach'))[2], /^Relay can't reach it\. Use the remote\. /);
+    assert.match((await line('D-reach'))[2], /^Relay can't reach it\. Check by eye\. /);
     assert.deepEqual([await line('D-power'), await line('D-shutter')], [['cannot', 'CANNOT CHECK', 'Lane not reachable'], ['cannot', 'CANNOT CHECK', 'Lane not reachable']]);
     assert.deepEqual((await line('A-power')).slice(0, 2), ['fail', 'FAIL']);
     assert.deepEqual(await line('displays'), ['cannot', 'CANNOT CHECK', 'Reader is off in simulation']);
@@ -317,6 +402,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await page.locator('#t-know').click();
     await page.locator('.sb-know__item').first().waitFor();
     assert.equal(await page.locator('#sb-know-status').innerText(), '4 items · sample set for the simulator, not a real rig');
+    assert.match(await page.locator('.sb-tips').innerText(), /The stage is dark and lane C reads shutter CLOSED: open it from Control, lane C\./, 'the way back from a dark stage is on the Know tab');
     assert.deepEqual(await page.locator('#sb-know-list .sb-know__group').allInnerTexts(), ['DIAGRAMS', 'DOCUMENTS']);
     assert.deepEqual(await page.locator('#sb-know-list li').evaluateAll(rows => rows.map(row => [row.parentElement.getAttribute('aria-label'), row.querySelector('.sb-know__name').textContent, row.querySelector('.sb-know__type').textContent])),
       [['Diagrams', 'Sample signal flow', 'Diagram'], ['Documents', 'Sample recovery steps', 'Document'], ['Documents', 'Sample cue notes', 'Text'], ['Documents', 'Sample output map', 'Data']]);
@@ -473,6 +559,37 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
         await page.locator('#sb-midi-detail [data-close]').click();
       } else assert.equal(await page.locator('#sb-midi-text').isVisible(), true);
     }
+    // ---- The power page: the same control, power only, at the same eight sizes in both themes.
+    const power = await context.newPage();
+    await power.setViewportSize({ width: 375, height: 812 });
+    await power.goto(`${relay.base}/power.html`);
+    await power.locator('.pc-card[data-lane="ALL"][data-reach="live"]').waitFor();
+    assert.deepEqual([await power.locator('#pc-pick [data-pick="ALL"]').getAttribute('aria-pressed'), await power.locator('.pc-card:visible').getAttribute('data-lane')], ['true', 'ALL'], 'on a phone the power page opens on the one on and off button');
+    for (const theme of ['light', 'dark']) for (const [width, height] of SIZES) {
+      await power.setViewportSize({ width, height });
+      await power.evaluate(mode => window.FrozenTheme.set(mode, { save: false }), theme);
+      const label = `power page ${theme} ${width}x${height}`, small = width < 700 || height < 520, key = `${width}x${height}`;
+      await power.locator('#t-control').click();
+      assert.deepEqual(await power.evaluate(audit), CLEAN, `${label} power`);
+      if (small) for (const pick of ['B', 'D', 'ALL']) { await power.locator(`#pc-pick [data-pick="${pick}"]`).click(); assert.deepEqual(await power.evaluate(audit), CLEAN, `${label} card ${pick}`); }
+      // The reviewed run fits too: the plan, Confirm and Cancel.
+      await power.locator('.pc-card[data-lane="ALL"] [data-act="power-off"]').click();
+      await power.locator('.pc-card[data-lane="ALL"][data-phase="relay-armed"]').waitFor();
+      assert.deepEqual(await power.evaluate(audit), CLEAN, `${label} run reviewed`);
+      if (theme === 'light' && key === '375x812') await shot(power, '17-phone-power-page-run-reviewed');
+      await power.locator('.pc-card[data-lane="ALL"] [data-act="cancel"]').click();
+      if (theme === 'light' && key === '375x812') await shot(power, '18-phone-power-page');
+      if (theme === 'light' && key === '768x1024') await shot(power, '24-tablet-portrait-power-page');
+      if (theme === 'dark' && key === '1024x768') await shot(power, '34-tablet-landscape-power-page-dark');
+      if (theme === 'light' && key === '320x256') await shot(power, '64-tiny-power-page');
+      await power.locator('#t-know').click();
+      await power.waitForTimeout(60);
+      if (small && await power.locator('#sb-know-back').isVisible()) await power.locator('#sb-know-back').click();
+      assert.deepEqual(await power.evaluate(audit), CLEAN, `${label} know`);
+      const tabsTop = await power.locator('.sb-tabs').evaluate(node => node.getBoundingClientRect().top), panelTop = await power.locator('#sb-main').evaluate(node => node.getBoundingClientRect().top);
+      assert.equal(tabsTop > panelTop, small, `${label} tab rail position`);
+    }
+    await power.close();
     await page.setViewportSize({ width: 1024, height: 768 });
     assert.deepEqual(foreign, [], 'the page asks nothing of any other host, the notes address included');
     assert.deepEqual(errors, [], 'no page or console errors');
@@ -480,7 +597,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
 
     // ---- A scripted relay: the control-port link, flags, stale replies, refusals, clock skew, a lost relay and an older relay.
     const base = await relay.state();
-    const scripted = async ({ skewMs = 0, lostStatus = 0, command, feed, older = false, hash = '', fakeClock = false, edit } = {}) => {
+    const scripted = async ({ skewMs = 0, lostStatus = 0, command, feed, older = false, hash = '', fakeClock = false, edit, runRoute } = {}) => {
       const ctx = await browser.newContext({ viewport: { width: 1024, height: 768 } });
       const tab = await ctx.newPage();
       let advanced = 0;
@@ -505,6 +622,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       await tab.route('**/api/host-checks', route => older ? missing(route) : route.fulfill({ json: { checks: [] } }));
       await tab.route('**/api/know**', route => older ? missing(route) : route.fulfill({ json: { state: 'not-configured', sample: false, items: [] } }));
       await tab.route('**/api/crew-links', route => older ? missing(route) : route.fulfill({ json: { notes: null, state: 'not-configured' } }));
+      await tab.route('**/api/power-run**', route => older ? missing(route) : runRoute ? runRoute(route) : route.fulfill({ json: { active: false, run: null } }));
       await tab.goto(`${relay.base}/show.html${hash}`);
       await tab.locator('.pc-card[data-lane="C"][data-reach="live"]').waitFor({ state: 'attached' });
       const push = (slot, change, ageMs) => { const p = state.projectors.find(x => x.slot === slot); Object.assign(p.status, change); stamp(p, ageMs); socket.send(JSON.stringify({ type: 'status', slot, status: p.status })); };
@@ -512,18 +630,19 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       const forward = async ms => { advanced += ms; await tab.clock.fastForward(ms); };
       const drop = () => { live = false; socket.close(); };
       const at = id => tab.locator(`.pc-card[data-lane="${id}"]`);
-      return { ctx, tab, push, pulse, forward, drop, sent: sentHere, relayNow, at };
+      const tell = message => socket.send(JSON.stringify(message));
+      return { ctx, tab, push, pulse, forward, drop, tell, sent: sentHere, relayNow, at };
     };
 
-    // The control port is named and tagged unproven; a wrong input and a pattern left on are flagged.
+    // The control port is named and tagged "power untested"; a wrong input and a pattern left on are flagged.
     let run = await scripted({ edit: state => {
       const [a, b, c] = ['P1', 'P2', 'P3'].map(slot => state.projectors.find(p => p.slot === slot));
       Object.assign(a, { driver: 'panasonic' }); Object.assign(a.status, { power: 'on', shutter: 'open', input: null, errors: null, pattern: '00', controlLink: 'control-port' });
       Object.assign(b, { inputs: { 31: 'HDMI 1', 32: 'SDI 1' }, inputPreference: { available: true, value: '31', label: 'HDMI 1' } }); Object.assign(b.status, { input: '32' });
       Object.assign(c, { patterns: { '00': 'Off', '08': 'Crosshatch' } }); Object.assign(c.status, { pattern: '08' });
     } });
-    assert.deepEqual([await run.at('A').locator('[data-fact="link"] dd').innerText(), await run.at('A').locator('[data-fact="link"]').getAttribute('data-flag'), await run.at('A').locator('[data-fact="input"] dd').innerText()], ['Control port · unproven', '', 'Not reported']);
-    assert.match(await run.at('A').locator('[data-fact="link"]').getAttribute('title'), /have not been proven on a rig yet/);
+    assert.deepEqual([await run.at('A').locator('[data-fact="link"] dd').innerText(), await run.at('A').locator('[data-fact="link"]').getAttribute('data-flag'), await run.at('A').locator('[data-fact="input"] dd').innerText()], ['Control port · power untested', '', 'Not reported']);
+    assert.match(await run.at('A').locator('[data-fact="link"]').getAttribute('title'), /^Shutter over this link is proven on the rig\. Power over it has not been tested on the rig yet\.$/);
     assert.deepEqual([await run.at('B').locator('[data-fact="input"] dd').innerText(), await run.at('B').locator('[data-fact="input"]').getAttribute('data-flag'), await run.at('B').getAttribute('data-tone')], ['SDI 1 · expected hdmi 1', '', 'attention']);
     assert.deepEqual([await run.at('C').locator('[data-fact="pattern"] dd').innerText(), await run.at('C').getAttribute('data-tone')], ['ON · Crosshatch', 'attention']);
     assert.match(await run.tab.locator('.sb-check[data-check="lanes"]').getAttribute('aria-label'), /B input SDI 1 · C test pattern on/);
@@ -590,7 +709,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     run = await scripted({});
     run.drop();
     await run.tab.locator('.pc-card[data-lane="B"][data-reach="relay-offline"]').waitFor();
-    assert.deepEqual([await run.at('B').locator('.pc-state').innerText(), await run.at('B').locator('.pc-msg').innerText(), await run.tab.locator('#sb-lock').innerText()], ['CHECK BY EYE', 'Relay not answering. Use the remote.', 'Show Lock unknown']);
+    assert.deepEqual([await run.at('B').locator('.pc-state').innerText(), await run.at('B').locator('.pc-msg').innerText(), await run.tab.locator('#sb-lock').innerText()], ['CHECK BY EYE', 'Relay not answering. Check by eye.', 'Show Lock unknown']);
     assert.equal(await run.tab.locator('.pc-btn[aria-disabled="false"]').count(), 0);
     await run.tab.locator('#t-setup').click();
     assert.equal(await run.tab.locator('#sb-setup-why').innerText(), 'Relay not answering.');
@@ -629,10 +748,52 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.equal(await run.tab.locator('#sb-midi-start').getAttribute('aria-disabled'), 'true');
     await run.ctx.close();
 
+    // The run as another page started it: this page shows it, blocks its own power, and can stop it.
+    const SURFACES = { A: 'SL Portal', B: 'Top Portal', C: 'Stage', D: 'SR Portal' };
+    const runOf = (state, extra = {}) => ({ id: 'run-1', direction: 'off', state, phase: 'units', startedAt: new Date(Date.now() - 20000).toISOString(), endedAt: state === 'running' ? null : new Date().toISOString(), banner: null, message: '',
+      steps: [['A', 'reported', 'Reported COOLING'], ['D', 'checking', 'Lit 20 s ago. Waiting 40 s before any command'], ['B', 'pending', 'Waiting for its turn'], ['C', 'pending', 'Waiting for its turn']]
+        .map(([lane, step, note]) => ({ lane, surface: SURFACES[lane], slot: lane, state: step, note, confirmed: false, sentAt: null })), ...extra });
+    const stops = [];
+    run = await scripted({ runRoute: route => { if (route.request().method() !== 'POST') return route.fulfill({ json: { active: false, run: null } }); stops.push(new URL(route.request().url()).pathname); return route.fulfill({ json: { active: false, run: runOf('stopped', { message: 'Stopped from a page. Nothing more was sent. Check each lane.' }) } }); } });
+    run.tell({ type: 'powerRun', active: true, run: runOf('running') });
+    await run.tab.locator('#pc-run[data-state="running"]').waitFor();
+    assert.deepEqual([await run.tab.locator('#pc-run .pc-run__title').innerText(), await run.tab.locator('#pc-run .pc-run__text').innerText()], ['TURNING ALL FOUR OFF', 'D · SR Portal: Lit 20 s ago. Waiting 40 s before any command']);
+    assert.deepEqual(await run.tab.locator('#pc-run .pc-run__step').allInnerTexts(), ['A ✓', 'D …', 'B ·', 'C ·']);
+    assert.match(await run.at('ALL').locator('[data-act="power-on"]').getAttribute('aria-label'), /Blocked: A run is already in progress\.$/);
+    assert.match(await run.at('B').locator('[data-act="power-off"]').getAttribute('aria-label'), /Blocked: An all-four run is in progress\.$/);
+    assert.equal(await run.at('D').locator('.pc-msg').innerText(), 'Run: Lit 20 s ago. Waiting 40 s before any command', 'each lane card carries its own step');
+    for (const [width, height] of [[1024, 768], [375, 667], [844, 390], [320, 256]]) {
+      await run.tab.setViewportSize({ width, height });
+      assert.deepEqual(await run.tab.evaluate(audit), CLEAN, `running banner ${width}x${height}`);
+      if (width === 375) await shot(run.tab, '19-phone-run-in-progress');
+    }
+    await run.tab.setViewportSize({ width: 1024, height: 768 });
+    await run.tab.locator('#pc-run .pc-run__stop').click();
+    await run.tab.locator('#pc-run[data-state="stopped"]').waitFor();
+    assert.deepEqual(stops, ['/api/power-run/stop']);
+    assert.equal(await run.tab.locator('#pc-run .pc-run__title').innerText(), 'RUN STOPPED');
+    assert.match(await run.tab.locator('#pc-run .pc-run__text').innerText(), /^Stopped from a page\. Nothing more was sent\. Check each lane\. Ended \d+:\d\d [AP]M\.$/);
+    run.tell({ type: 'powerRun', active: false, run: runOf('attention', { message: 'Not confirmed OFF: D (no current reply). Check by eye.' }) });
+    await run.tab.locator('#pc-run[data-state="attention"]').waitFor();
+    assert.equal(await run.tab.locator('#pc-run .pc-run__title').innerText(), 'NOT SAFE TO LEAVE YET');
+    run.tell({ type: 'powerRun', active: false, run: runOf('attention', { direction: 'on', message: 'Not confirmed ON: A (reports WARMING). Check by eye.' }) });
+    await run.tab.locator('#pc-run[data-direction="on"]').waitFor();
+    assert.equal(await run.tab.locator('#pc-run .pc-run__title').innerText(), 'NOT ALL FOUR ON');
+    run.tell({ type: 'powerRun', active: false, run: runOf('interrupted', { message: 'The relay restarted during this run. Nothing more was sent. Check each lane.' }) });
+    await run.tab.locator('#pc-run[data-state="interrupted"]').waitFor();
+    assert.equal(await run.tab.locator('#pc-run .pc-run__title').innerText(), 'RUN INTERRUPTED');
+    // A finished run's banner does not linger into the next day.
+    run.tell({ type: 'powerRun', active: false, run: runOf('done', { banner: 'Safe to leave the building', endedAt: new Date(Date.now() - 16 * 60000).toISOString() }) });
+    await run.tab.locator('#pc-run').waitFor({ state: 'hidden' });
+    await run.ctx.close();
+
     // An older relay without the new routes: the page still runs and says what it does not have.
     run = await scripted({ older: true });
     await run.tab.locator('.sb-check[data-check="cues"][data-state="off"]').waitFor();
     assert.match(await run.tab.locator('.sb-check[data-check="cues"]').getAttribute('aria-label'), /^Cue link: No reading\. Not connected\. Console cues do not reach this page\.$/);
+    await run.at('ALL').locator('[data-act="power-on"]').click({ force: true });
+    assert.equal(await run.at('ALL').locator('.pc-msg').innerText(), 'Turn all on is blocked. This relay has no all-four run.');
+    assert.equal(run.sent.length, 0);
     await run.tab.locator('#t-midi').click();
     assert.deepEqual([await run.tab.locator('#sb-feed-title').innerText(), await run.tab.locator('#sb-midi-start').getAttribute('aria-disabled'), await run.tab.locator('#sb-midi-text').innerText()], ['Not connected', 'true', 'No cue feed is connected, so a cue cannot be seen arriving.']);
     await run.tab.locator('#t-know').click();
@@ -644,6 +805,64 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.deepEqual([await run.tab.locator('.sb-line[data-line="playback-app"]').getAttribute('data-state'), await run.tab.locator('.sb-line[data-line="listener"]').getAttribute('data-state'), await run.tab.locator('.sb-line[data-line="displays"]').getAttribute('data-state')], ['cannot', 'cannot', 'pass']);
     await run.ctx.close();
 
-    console.log('Show backup page: four tabs, guarded power and shutter for one lane and all lanes, the relay power-off confirmation, Show Lock, refusals that stay, stale and lost-relay guards, clock skew, sign-in return, the MIDI test (pass, clear, timeout, stopped listener), the setup check, the Know tab with samples, the crew notes link, an older relay, and fit on every tab at eight sizes in both themes passed');
+    // ---- Signed in, on a phone: the path the crew uses. Then the relay restarts in the middle of a run.
+    const freePort = () => new Promise((resolve, reject) => { const probe = net.createServer(); probe.once('error', reject); probe.listen(0, '127.0.0.1', () => { const { port } = probe.address(); probe.close(() => resolve(port)); }); });
+    const CODE = 'simulator-only-code', home = fs.mkdtempSync(path.join(os.tmpdir(), 'projctl-signed-in-'));
+    const secure = { PJ_PASSCODE: CODE, RIG: path.join(home, 'rig.json'), STAGE_PLOT: path.join(home, 'stage-plot.json'), VENUE_MODEL: path.join(home, 'venue'), PORT: String(await freePort()) };
+    let secured = await startRelay(secure);
+    try {
+      const pocket = await browser.newContext({ viewport: { width: 375, height: 812 } });
+      const phone = await pocket.newPage();
+      const signIn = async next => { await phone.waitForURL(new RegExp(`/login\\.html\\?next=%2F${next}\\.html$`)); await phone.locator('#code').fill(CODE); await phone.locator('button[type=submit]').click(); await phone.waitForURL(new RegExp(`/${next}\\.html$`)); };
+      await phone.goto(`${secured.base}/show.html`);
+      await signIn('show');
+      assert.equal(await phone.evaluate(async () => { for (const [slot, lane] of [['P1', 'A'], ['P2', 'B'], ['P3', 'C'], ['P4', 'D']]) { const reply = await fetch('api/projector', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ slot, lane }) }); if (!reply.ok) return reply.status; } return 200; }), 200);
+      await phone.locator('.pc-card[data-lane="B"][data-reach="live"]').waitFor({ state: 'attached' });
+      // Morning, from the phone, signed in.
+      await phone.locator('#pc-pick [data-pick="ALL"]').click();
+      await phone.locator('.pc-card[data-lane="ALL"] [data-act="power-on"]').click();
+      await phone.locator('.pc-card[data-lane="ALL"][data-phase="relay-armed"]').waitFor();
+      await phone.waitForTimeout(700);
+      await phone.locator('.pc-card[data-lane="ALL"] [data-act="confirm"]').click();
+      await phone.locator('#pc-run[data-state="done"]').waitFor({ timeout: 30000 });
+      assert.equal(await phone.locator('#pc-run .pc-run__title').innerText(), 'ALL FOUR ON');
+      assert.deepEqual(await phone.evaluate(audit), CLEAN, 'signed in on a phone, the finished run fits');
+      // The other tabs work signed in too.
+      await phone.locator('#t-setup').click();
+      await phone.locator('#sb-setup-run').click();
+      await phone.locator('.sb-line[data-line="A-power"][data-state="pass"]').waitFor();
+      await phone.locator('#t-midi').click();
+      assert.equal(await phone.locator('#sb-midi-title').innerText(), 'Not run yet');
+      await phone.locator('#t-know').click();
+      await phone.locator('.sb-know__item').first().waitFor();
+      await phone.locator('.sb-know__item', { hasText: 'Sample recovery steps' }).click();
+      await phone.locator('.sb-know__text h4').waitFor();
+      // The power page at its own address, same session: it opens on the button and shows the same last run.
+      await phone.goto(`${secured.base}/power.html`);
+      await phone.locator('.pc-card[data-lane="ALL"][data-reach="live"]').waitFor();
+      await phone.locator('#pc-run[data-state="done"]').waitFor();
+      assert.equal(await phone.locator('#pc-run .pc-run__title').innerText(), 'ALL FOUR ON');
+      await phone.locator('.pc-card[data-lane="ALL"] [data-act="power-off"]').click();
+      await phone.locator('.pc-card[data-lane="ALL"][data-phase="relay-armed"]').waitFor();
+      await phone.waitForTimeout(700);
+      await phone.locator('.pc-card[data-lane="ALL"] [data-act="confirm"]').click();
+      await phone.locator('#pc-run[data-state="running"]').waitFor();
+      // The relay restarts mid-run. Sessions end with it: the page goes to the sign-in, not to a silent failure.
+      await secured.close();
+      secured = await startRelay(secure);
+      await signIn('power');
+      await phone.locator('#pc-run[data-state="interrupted"]').waitFor();
+      assert.equal(await phone.locator('#pc-run .pc-run__title').innerText(), 'RUN INTERRUPTED');
+      assert.match(await phone.locator('#pc-run .pc-run__text').innerText(), /^The relay restarted during this run\. Nothing more was sent\. Check each lane\. Ended \d+:\d\d [AP]M\.$/);
+      assert.deepEqual(await phone.evaluate(audit), CLEAN, 'the interrupted notice fits on a phone');
+      await shot(phone, '90-phone-signed-in-run-interrupted');
+      // A new run can be reviewed straight away.
+      await phone.locator('.pc-card[data-lane="ALL"] [data-act="power-off"]').click();
+      await phone.locator('.pc-card[data-lane="ALL"][data-phase="relay-armed"]').waitFor();
+      await phone.locator('.pc-card[data-lane="ALL"] [data-act="cancel"]').click();
+      await pocket.close();
+    } finally { await secured.close(); fs.rmSync(home, { recursive: true, force: true }); }
+
+    console.log('Role pages: show.html and power.html with one shared control; guarded power and shutter; the relay all-four run from two pages with one state, its banners, stop and a restart mid-run; Show Lock; refusals that stay; stale and lost-relay guards; clock skew; the signed-in path on a phone; the MIDI test; the setup check; the Know tab; the crew notes link; an older relay; and fit on every tab at eight sizes in both themes passed');
   } finally { clearInterval(beat); await browser.close(); await relay.close(); fs.rmSync(scratch, { recursive: true, force: true }); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

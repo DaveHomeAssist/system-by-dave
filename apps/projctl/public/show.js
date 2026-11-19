@@ -104,7 +104,7 @@ function render() {
   const lockNode = $('#sb-lock'), lockWord = lock === true ? 'on' : lock === false ? 'off' : 'unknown';
   mark(lockNode, 'data-lock', lockWord);
   put($('[data-f=word]', lockNode), lock === true ? 'Lock ON' : lock === false ? 'Lock off' : 'Lock unknown'); // "Show " sits in the markup and drops out on a phone
-  mark(lockNode, 'title', 'While Show Lock is on, this page locks power, every all-lanes action, the MIDI test and the setup check. Shutters for one lane stay available.');
+  mark(lockNode, 'title', 'While Show Lock is on, power off is locked, for one lane and for the all-four run. Power on and shutters stay available.');
   reveal($('#sb-sim'), !!snapshot?.simulation);
   put($('#sb-clock'), tickClock.format(new Date(now)));
 

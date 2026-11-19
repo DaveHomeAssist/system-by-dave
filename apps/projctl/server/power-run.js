@@ -14,6 +14,7 @@ import { LANES } from '../public/lanes.js';
 //   - nothing is sent to a Panasonic for 60 s after it lights
 //   - a lamp unit is not powered on while cooling, nor inside 75 s of going off
 //   - lamp units strike one at a time: the next waits until the last one reports ON
+// Show Lock blocks an off run, as it blocks every power off. An on run is allowed under it.
 export const RUN_ORDER = Object.freeze({ on: Object.freeze(['C', 'B', 'A', 'D']), off: Object.freeze(['A', 'D', 'B', 'C']) });
 export const RUN_BANNER = Object.freeze({ on: 'All four on', off: 'Safe to leave the building' });
 export const RUN_RULES = Object.freeze({
@@ -115,7 +116,7 @@ export function createPowerRun({ projectors, status, power, revision, locked, ch
   function plan(direction) {
     if (!RUN_ORDER[direction]) throw fail(400, 'direction must be on or off');
     if (run?.state === 'running') throw fail(409, 'A run is already in progress.', { run: view() });
-    if (locked()) throw fail(423, 'show lock is on');
+    if (direction === 'off' && locked()) throw fail(423, 'show lock is on');
     observe();
     for (const [token, entry] of plans) if (entry.expires <= now()) plans.delete(token);
     if (plans.size >= 64) plans.delete(plans.keys().next().value);
@@ -128,7 +129,7 @@ export function createPowerRun({ projectors, status, power, revision, locked, ch
   function start(direction, token) {
     if (!RUN_ORDER[direction]) throw fail(400, 'direction must be on or off');
     if (run?.state === 'running') throw fail(409, 'A run is already in progress.', { run: view() });
-    if (locked()) throw fail(423, 'show lock is on');
+    if (direction === 'off' && locked()) throw fail(423, 'show lock is on');
     const entry = plans.get(token);
     plans.delete(token); // one use, whatever happens next
     if (!entry || entry.direction !== direction || entry.expires <= now()) throw fail(409, 'Confirm expired. Review the run again.');
@@ -196,7 +197,7 @@ export function createPowerRun({ projectors, status, power, revision, locked, ch
     if (run?.state !== 'running') return;
     observe();
     const all = lanes(), on = run.direction === 'on', want = on ? ['on', 'warming'] : ['off', 'cooling'], final = on ? 'on' : 'off', at = now();
-    if (locked()) return end('stopped', 'Stopped: Show Lock was turned on. Nothing more was sent. Check each lane.');
+    if (!on && locked()) return end('stopped', 'Stopped: Show Lock was turned on. Nothing more was sent. Check each lane.');
     // A unit seen in its end state stays confirmed, even if it stops answering afterwards (a resting laser unit can).
     for (const step of run.steps) { const p = all[step.lane]; if (p && p.slot === step.slot && !step.confirmed) { const r = read(p); if (r.current && r.power === final) step.confirmed = true; } }
     while (run.steps[run.cursor] && turn(run.steps[run.cursor], all[run.steps[run.cursor].lane], at, on, want)) { /* the next unit goes in the same pass */ }

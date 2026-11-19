@@ -1,136 +1,129 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" data-role="power">
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<title>Projctl | Power checklist</title>
-<meta name="description" content="Guided morning on and nightly off checklist for the projector power operator.">
-<meta name="theme-color" content="#edf5fa">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Projctl | Power</title>
+<meta name="description" content="Power page: one guarded control that turns the four projection lanes on in the morning and off at night, and says when it is safe to leave.">
 <link rel="canonical" href="http://localhost:8080/power.html">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Projctl | Power checklist">
-<meta property="og:description" content="Guided morning on and nightly off checklist for the projector power operator.">
+<meta property="og:site_name" content="Projctl relay">
+<meta property="og:title" content="Projctl | Power">
+<meta property="og:description" content="Power page: one guarded control that turns the four projection lanes on in the morning and off at night, and says when it is safe to leave.">
 <meta property="og:url" content="http://localhost:8080/power.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Projctl | Power checklist">
-<meta name="twitter:description" content="Guided morning on and nightly off checklist for the projector power operator.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta name="twitter:title" content="Projctl | Power">
+<meta name="twitter:description" content="Power page: one guarded control that turns the four projection lanes on in the morning and off at night, and says when it is safe to leave.">
+<meta name="theme-color" content="#edf5fa">
+<link rel="icon" href="data:,">
 <script src="frozen-theme.js"></script><link rel="stylesheet" href="frozen-theme.css">
 <link rel="stylesheet" href="avd/tokens.css">
-<link rel="stylesheet" href="avd/bundle.css">
-<link rel="stylesheet" href="app.css">
-<link rel="stylesheet" href="power.css">
+<link rel="stylesheet" href="projector-control.css">
+<link rel="stylesheet" href="show.css">
+<script type="module" src="show.js"></script>
 </head>
 <body>
-<a class="pw-skip" href="#panels">Skip to the checklist</a>
-<div class="pw-shell" id="shell">
-  <header class="pw-top">
-    <h1 class="pw-title">Power<span class="pw-wide"> checklist</span></h1>
-    <p class="pw-flag pw-flag--sim" id="sim-flag" title="Simulator data. No real projector is connected." hidden>Sim<span class="pw-wide">ulator</span></p>
-    <p class="pw-flag pw-flag--lock" id="lock-flag" title="Show Lock is on. Power off is blocked." hidden><span class="pw-wide">Show </span>Lock<span class="pw-wide"> on</span></p>
-    <p class="pw-conn" id="conn" role="status" data-state="connecting"><span class="avd-dot avd-dot--waiting" id="conn-dot"></span><span class="pw-wide">Relay </span><span id="conn-word">connecting</span></p>
-    <button id="theme" type="button" class="avd-btn avd-btn--quiet pw-theme">Theme</button>
+<a class="sb-skip" href="#sb-main">Skip to the power control</a>
+<noscript><p class="sb-noscript">This page needs JavaScript to read the relay and to send power commands.</p></noscript>
+<div class="sb-shell">
+  <header class="sb-top">
+    <div class="sb-brand">
+      <p class="sb-kicker"><span>Projctl</span><span id="sb-sim" class="sb-sim" hidden>Simulation</span><button id="sb-shared" type="button" class="sb-shared" aria-haspopup="dialog">Shared sign-in</button></p>
+      <h1>Power</h1>
+    </div>
+    <span id="sb-lock" class="sb-pill" data-lock="unknown" role="status"><span class="sb-long">Show </span><span data-f="word">Lock unknown</span></span>
+    <time id="sb-clock" class="sb-clock"></time>
+    <button id="theme" type="button" class="sb-btn sb-btn--quiet">Theme</button>
   </header>
-  <nav class="pw-tabs" aria-label="Checklist views">
-    <div role="tablist" aria-label="Checklist views">
-      <button role="tab" type="button" id="t-on" aria-controls="on" aria-selected="true" aria-label="Morning on"><span class="pw-tab__long">Morning </span>on</button>
-      <button role="tab" type="button" id="t-off" aria-controls="off" aria-selected="false" tabindex="-1" aria-label="Nightly off"><span class="pw-tab__long">Nightly </span>off</button>
-      <button role="tab" type="button" id="t-rules" aria-controls="rules" aria-selected="false" tabindex="-1">Rules</button>
+
+  <!-- The go or no-go strip is the show backup page's. It is kept here, out of sight, because the two pages share one script. -->
+  <section class="sb-strip" aria-labelledby="sb-strip-h" hidden>
+    <h2 id="sb-strip-h" class="sb-sr">Go or no-go</h2>
+    <p id="sb-verdict" class="sb-verdict" data-state="off"><strong><span class="sb-verdict__long" data-f="title">Connecting</span><span class="sb-verdict__short" data-f="short" aria-hidden="true">Wait</span></strong><span data-f="text">Waiting for the relay.</span></p>
+    <ul class="sb-checks" id="sb-check-list"></ul>
+  </section>
+
+  <nav class="sb-tabs" aria-label="Sections">
+    <div role="tablist" aria-label="Sections">
+      <button type="button" role="tab" id="t-control" aria-controls="control" aria-selected="true">Power</button>
+      <button type="button" role="tab" id="t-know" aria-controls="know" aria-selected="false" tabindex="-1">Know</button>
     </div>
   </nav>
-  <main class="pw-panels" id="panels" tabindex="-1">
-    <section class="pw-panel pw-mode" role="tabpanel" id="on" aria-labelledby="t-on" data-mode="on"></section>
-    <section class="pw-panel pw-mode" role="tabpanel" id="off" aria-labelledby="t-off" data-mode="off" hidden></section>
-    <section class="pw-panel pw-rules" role="tabpanel" id="rules" aria-labelledby="t-rules" hidden>
-      <div class="pw-rules__pick" role="group" aria-label="Rule sets">
-        <button type="button" class="avd-btn" data-rule-pick="never" aria-pressed="true">Never</button>
-        <button type="button" class="avd-btn" data-rule-pick="wrong" aria-pressed="false">If wrong</button>
-        <button type="button" class="avd-btn" data-rule-pick="page" aria-pressed="false">This page</button>
-        <button type="button" class="avd-btn" data-rule-pick="notes" aria-pressed="false" hidden>Notes</button>
+
+  <main id="sb-main" class="sb-panels" tabindex="-1">
+    <section role="tabpanel" id="control" class="sb-panel sb-panel--control" aria-labelledby="t-control" tabindex="0">
+      <div class="pc-run" id="pc-run" hidden></div>
+      <div class="pc-picker" id="pc-pick" role="group" aria-label="Card shown"></div>
+      <div class="pc-grid" id="pc-root"></div>
+    </section>
+
+    <section role="tabpanel" id="know" class="sb-panel sb-panel--know" aria-labelledby="t-know" tabindex="0" data-know="list" hidden>
+      <div class="sb-know__side">
+        <p id="sb-know-status" class="sb-know__status" role="status">Asking the relay for documents.</p>
+        <div class="sb-scroll" tabindex="0" aria-label="Rules, diagrams and documents">
+          <section class="sb-tips" aria-labelledby="sb-tips-h">
+            <h3 id="sb-tips-h" class="sb-know__group">How this page works</h3>
+            <ul class="sb-tips__list">
+              <li><strong>Morning:</strong> Turn all on. <strong>Night:</strong> Turn all off. One press starts one run for all four, in the right order with the waits built in.</li>
+              <li><strong>Wait for the banner.</strong> "All four on" in the morning. "Safe to leave the building" at night. Until it shows, the run is not finished.</li>
+              <li><strong>If the banner says "Not all four on" or "Not safe to leave yet":</strong> it names the lane. Look at that surface, then call the show backup.</li>
+            </ul>
+            <h3 class="sb-know__group">Never</h3>
+            <ul class="sb-tips__list">
+              <li>Never cut power at a breaker, a power strip or a mains switch. A lamp projector must cool with its fans running, about 3 minutes.</li>
+              <li>Never shut down, log out of or unplug the show computer or its control monitor.</li>
+              <li>Never open or save the show file.</li>
+              <li>Never touch lens, focus or zoom.</li>
+            </ul>
+            <h3 class="sb-know__group">If something is wrong</h3>
+            <ul class="sb-tips__list">
+              <li><strong>A warning light, a cover error or a lamp message:</strong> photograph the screen and the indicator lights, then call the show backup or the video lead.</li>
+              <li><strong>The relay is not answering:</strong> this page can send nothing. Call the video lead.</li>
+            </ul>
+          </section>
+          <div id="sb-know-list" class="sb-know__list"></div>
+        </div>
+        <p id="sb-notes" class="sb-notes" hidden>
+          <a id="sb-notes-link" class="sb-notes__link" target="_blank" rel="noopener noreferrer" aria-describedby="sb-notes-hint">Notes<span class="sb-sr"> (opens in a new tab)</span><span class="sb-notes__mark" aria-hidden="true">↗</span></a>
+          <span id="sb-notes-hint" class="sb-notes__hint">For notes that can wait. Not for emergencies or cue calls.</span>
+        </p>
       </div>
-      <div class="pw-rules__grid" id="rules-body">
-        <section class="pw-rule" data-rule-set="never" aria-labelledby="rules-never">
-          <h2 id="rules-never">Never</h2>
-          <ul>
-            <li>Never cut power at a breaker, a power strip or a mains switch. A lamp projector must cool with its fans running, about 3 minutes.</li>
-            <li>Never shut down, log out of or unplug the show computer or its control monitor. <span class="pw-pending">Pending decision</span></li>
-            <li>Never open or save the show file.</li>
-            <li>Never touch lens, focus or zoom.</li>
-          </ul>
-        </section>
-        <section class="pw-rule" data-rule-set="wrong" aria-labelledby="rules-wrong">
-          <h2 id="rules-wrong">If something is wrong</h2>
-          <ul>
-            <li><strong>A unit will not turn on:</strong> wait 3 minutes, try once more, then call the show backup.</li>
-            <li><strong>A warning light, a cover error or a lamp message:</strong> photograph the screen and the indicator lights, then call the show backup or the video lead.</li>
-            <li><strong>A or D say "Not reached by the relay":</strong> normal while the playback app is open. Go by the light on the surface.</li>
-            <li><strong>The relay is offline:</strong> this page can send nothing. Call the video lead.</li>
-          </ul>
-        </section>
-        <section class="pw-rule" data-rule-set="page" aria-labelledby="rules-page">
-          <h2 id="rules-page">What this page does</h2>
-          <ul>
-            <li>Lanes B and C are powered from this page. Their words come from the relay's own reading.</li>
-            <li>Lanes A and D are powered with the handheld remote. Their ticks and timers are yours, not readings.</li>
-            <li>A tick lapses after 30 minutes. Look again and tick again.</li>
-            <li>After a projector lights, leave it alone for 60 seconds.</li>
-          </ul>
-        </section>
-        <!-- Shown only when the relay's private settings hold a crew notes address. The page never calls it. -->
-        <section class="pw-rule pw-rule--notes" data-rule-set="notes" aria-labelledby="rules-notes" hidden>
-          <h2 id="rules-notes">Crew notes</h2>
-          <p>For notes that can wait. Not for emergencies or cue calls: phone for those.</p>
-          <a class="avd-btn avd-btn--primary" data-crew-notes target="_blank" rel="noopener noreferrer">Open crew notes<span class="avd-sr"> (opens in a new tab)</span> <span aria-hidden="true">&#8599;</span></a>
-        </section>
+      <div class="sb-know__view">
+        <div class="sb-know__bar">
+          <button id="sb-know-back" type="button" class="sb-btn sb-btn--quiet sb-know__back">List</button>
+          <h3 id="sb-know-title" class="sb-know__title">Choose a diagram or document</h3>
+          <div class="sb-know__tools" id="sb-know-tools" role="group" aria-label="Zoom" hidden>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="out" aria-label="Zoom out">−</button>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="fit">Fit</button>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="actual" aria-label="Actual size">100%</button>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="in" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+        <div class="sb-scroll sb-know__stage" id="sb-know-stage" tabindex="0" aria-label="Viewer" data-mode="empty"></div>
       </div>
     </section>
   </main>
 </div>
+<p id="sb-live" class="sb-sr" aria-live="polite"></p>
 
-<template id="mode-template">
-  <div class="pw-banner" data-banner data-state="wait" role="status" aria-live="polite">
-    <strong class="pw-banner__title" data-banner-title>Waiting for the relay</strong>
-    <span class="pw-banner__detail" data-banner-detail></span>
-  </div>
-  <div class="pw-work">
-    <ol class="pw-rail" data-rail aria-label="Steps"></ol>
-    <article class="pw-card" data-card data-tone="todo">
-      <div class="pw-card__nav">
-        <button type="button" class="avd-btn avd-btn--quiet pw-nav" data-prev aria-label="Back"><span aria-hidden="true">&lsaquo;</span><span class="pw-nav__label">Back</span></button>
-        <p class="pw-card__count" data-count>Step 1 of 5</p>
-        <button type="button" class="avd-btn pw-nav" data-next aria-label="Next"><span class="pw-nav__label">Next</span><span aria-hidden="true">&rsaquo;</span></button>
-      </div>
-      <h2 class="pw-card__title" data-title tabindex="-1">Step</h2>
-      <p class="pw-card__state"><strong class="pw-word" data-word>TO DO</strong> <span class="pw-source" data-source></span></p>
-      <div class="pw-detail" data-detail popover="auto">
-        <p class="pw-text"><span data-text></span> <span class="pw-pending" data-pending hidden>Pending decision</span></p>
-        <div class="pw-detail__foot">
-          <div class="pw-tools" data-tools hidden>
-            <button type="button" class="avd-btn" data-timer>Start timer</button>
-            <button type="button" class="avd-btn" data-lamp popovertarget="lamp-help">Lamp message</button>
-            <button type="button" class="avd-btn" data-alt hidden>Power off</button>
-          </div>
-          <button type="button" class="avd-btn pw-detail__close" data-detail-close popovertargetaction="hide">Close</button>
-        </div>
-      </div>
-      <p class="pw-why" data-why role="status" aria-live="polite"></p>
-      <div class="pw-actions">
-        <button type="button" class="avd-btn pw-detail__open" data-detail-open>Details</button>
-        <button type="button" class="avd-btn avd-btn--primary avd-btn--lg pw-action" data-action>Action</button>
-      </div>
-    </article>
-    <aside class="pw-aside" data-aside aria-label="Rules"></aside>
-  </div>
-</template>
+<dialog id="sb-detail" class="sb-dialog" aria-labelledby="sb-detail-title">
+  <p class="sb-dialog__state" data-f="state"></p>
+  <h2 id="sb-detail-title" data-f="title"></h2>
+  <p class="sb-dialog__value" data-f="value"></p>
+  <div data-f="detail"></div>
+  <h3>This page cannot tell</h3>
+  <ul data-f="cannot"></ul>
+  <button type="button" class="sb-btn sb-btn--primary" data-close>Close</button>
+</dialog>
 
-<div class="pw-sheet" id="lamp-help" popover="auto" role="dialog" aria-labelledby="lamp-help-title">
-  <h2 id="lamp-help-title">Lamp message <span class="pw-pending">Not written yet</span></h2>
-  <p>This helper is empty on purpose. What the lamp message says, the right answer and why the unit shuts itself off have not been recorded yet.</p>
-  <p>Until they are: photograph the screen and the indicator lights, then call the video lead. Do not guess an answer.</p>
-  <button type="button" class="avd-btn avd-btn--primary" popovertarget="lamp-help" popovertargetaction="hide">Close</button>
-</div>
-<noscript><p class="pw-noscript">Turn on JavaScript in this browser to use the power checklist.</p></noscript>
-<script type="module" src="power.js"></script>
+<dialog id="sb-shared-note" class="sb-dialog" aria-labelledby="sb-shared-title">
+  <h2 id="sb-shared-title">Shared sign-in</h2>
+  <p>Everyone who uses this page signs in with the same passcode. The relay records each command and its time. It does not record who sent it.</p>
+  <p>The on and off run is shared too: if someone else has started it, this page shows the same run and waits for it to finish.</p>
+  <p class="sb-dialog__hint">The same passcode also opens the main console.</p>
+  <button type="button" class="sb-btn sb-btn--primary" data-close>Close</button>
+</dialog>
 </body>
 </html>

@@ -19,4 +19,4 @@ This is an invented sample for the simulator. It is not a real procedure.
 ## The page says CHECK BY EYE
 
 The relay has no current reply from that projector. Nothing on the card is a reading until it
-comes back. Use your eyes and the handheld remote.
+comes back. Look at the surface.
