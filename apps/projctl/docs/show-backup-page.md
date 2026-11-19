@@ -330,8 +330,10 @@ Run from `apps/projctl`, against isolated simulator relays only.
   power-off confirmation, the all-lanes review and per-lane results, Show Lock, refusals that stay
   on the card, a reply going stale while armed, a lost relay, the MIDI test against an observer
   file the test appends to, the setup check, the Know tab with the sample set (diagram zoom, a
-  document as text, a refused path), the crew notes link, and fit at 1440×900, 1024×768, 768×1024,
-  375×812, 375×667, 844×390, 320×256 and 2560×720 on every tab in both themes.
+  document as text, a refused path), the crew notes link, an older relay without the new routes,
+  and fit at 1440×900, 1024×768, 768×1024, 375×812, 375×667, 844×390, 320×256 and 2560×720 on every
+  tab in both themes, with an armed lane, an armed all-lanes action, setup results, a waiting,
+  passed and cleared MIDI test, and an open diagram and document.
   Set `SHOW_BACKUP_SHOTS` to a folder to keep screenshots.
 
 Results for this version are in the pull request.

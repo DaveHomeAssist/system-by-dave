@@ -412,6 +412,19 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
           await act('B', 'cancel').click();
           await act('ALL', 'shutter-close').isVisible() && await act('ALL', 'shutter-close').click().then(async () => { await settled('ALL', 'armed'); assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} all lanes armed`); await act('ALL', 'cancel').click(); });
         }
+        if (tab === 'midi') {
+          // A waiting test, a pass and a cleared test all fit: these are the longest wordings on the card.
+          await page.locator('#sb-midi-start').click();
+          await page.locator('#sb-midi-test[data-state="eye"]').waitFor();
+          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} midi waiting`);
+          fs.appendFileSync(observer, midiRows(msc('999')));
+          await page.locator('#sb-midi-test[data-state="ok"]').waitFor({ timeout: 10000 });
+          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} midi pass`);
+          if (theme === 'light' && key === '375x812') await shot(page, '16-phone-midi-pass');
+          fs.appendFileSync(observer, midiRows(msc('999.5')));
+          await page.locator('#sb-midi-title', { hasText: 'both arrived' }).waitFor({ timeout: 10000 });
+          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} midi cleared`);
+        }
         if (tab === 'midi' && await page.locator('#sb-midi-heard').isVisible()) {
           // A tiny screen shows the test or what was heard, one at a time.
           assert.equal(await page.locator('#sb-feed').isVisible(), false);
