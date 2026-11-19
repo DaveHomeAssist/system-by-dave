@@ -455,8 +455,8 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.ok(Math.abs(await image.evaluate(node => node.getBoundingClientRect().width) - fitted) < 2);
     await page.locator('.sb-know__item', { hasText: 'Sample recovery steps' }).click();
     await page.locator('.sb-know__text h4').waitFor();
-    assert.deepEqual([await page.locator('.sb-know__text h4').innerText(), await page.locator('.sb-know__text h5').first().innerText(), await page.locator('#sb-know-tools').isVisible(), await page.locator('#sb-know-stage').getAttribute('data-mode')], ['Sample recovery steps', 'A lane goes dark', false, 'text']);
-    assert.match(await page.locator('.sb-know__text').innerText(), /3\. Shutter CLOSED: open it from the card\./);
+    assert.deepEqual([await page.locator('.sb-know__text h4').innerText(), await page.locator('.sb-know__text h5').first().innerText(), await page.locator('#sb-know-tools').isVisible(), await page.locator('#sb-know-stage').getAttribute('data-mode')], ['Sample recovery steps', 'A surface is wrong: least disruptive first', false, 'text']);
+    assert.match(await page.locator('.sb-know__text').innerText(), /1\. Shutter\. Any time, mid-show too\. A lit lane with its shutter CLOSED is dark on stage: open it from Control\./);
     await page.locator('.sb-know__item', { hasText: 'Sample output map' }).click();
     await page.locator('.sb-know__text pre').waitFor();
     assert.match(await page.locator('.sb-know__text pre').innerText(), /"surface": "SR Portal"/);
