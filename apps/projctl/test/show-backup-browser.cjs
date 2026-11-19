@@ -94,6 +94,12 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.match(await chip('outputs').getAttribute('aria-label'), /^Outputs: No reading\. Not read\. Reader is off in simulation\.$/);
     assert.equal(await page.locator('#sb-verdict [data-f=title]').innerText(), 'ATTENTION');
     assert.equal(await page.locator('#sb-sim').isVisible(), true, 'simulation is labelled');
+    // The design reference's looks (November 19): the power banner takes the reading's look, a lane with no
+    // current reply keeps its own tone (D: CHECK BY EYE), and Show Lock here is a status, never a control.
+    const looks = () => page.locator('.pc-card').evaluateAll(cards => cards.filter(c => c.dataset.lane !== 'ALL').map(c => [c.dataset.lane, c.dataset.power ?? null]));
+    assert.deepEqual(await looks(), [['A', 'off'], ['B', 'lit'], ['C', 'lit'], ['D', null]]);
+    assert.equal(await page.locator('#sb-lock').evaluate(node => node.tagName + ':' + node.getAttribute('role')), 'SPAN:status');
+    assert.equal(await page.getByRole('button', { name: /lock/i }).count(), 0, 'no Show Lock control on this page');
     assert.equal(await page.locator('#sb-help, a[href^="sms:"], a[href^="tel:"]').count(), 0, 'the help and contact control is gone');
 
     // Readings: a lane the relay reads shows its state and link; one it cannot reach shows no state at all.
@@ -142,6 +148,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.deepEqual(sent(), [{ slot: 'P2', cmd: 'shutter', arg: 1, expectedTargets: [{ slot: 'P2', revision: await revision('P2') }] }]);
     assert.match(await msg('B'), /^Reported CLOSED at \d+:\d\d [AP]M\.$/);
     assert.equal(await fact('B', 'shutter'), 'CLOSED · dark on stage');
+    assert.equal(await card('B').locator('[data-fact="shutter"]').getAttribute('data-shutter'), 'closed', 'the shutter pill');
     assert.equal(await act('B', 'shutter-open').getAttribute('data-recover'), '', 'a lit lane with a closed shutter: Open is marked as the way back');
     assert.equal(await act('C', 'shutter-open').getAttribute('data-recover'), null);
     assert.equal((await reading()).P2.shutter, 'closed');
@@ -244,6 +251,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.equal(await act('B', 'shutter-close').getAttribute('aria-disabled'), 'false', 'shutters stay available during a run');
     await page.locator('#pc-run[data-state="done"]').waitFor({ timeout: 30000 });
     assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'ALL FOUR ON');
+    assert.deepEqual(await looks(), [['A', 'lit'], ['B', 'lit'], ['C', 'lit'], ['D', 'lit']]);
     assert.match(await page.locator('#pc-run .pc-run__text').innerText(), /^Every lane reports ON\. Finished \d+:\d\d [AP]M\.$/);
     assert.deepEqual(await page.locator('#pc-run .pc-run__step').allInnerTexts(), ['C ✓', 'B ✓', 'A ✓', 'D ✓']);
     assert.equal(await page.locator('#pc-run .pc-run__stop').isVisible(), false);
@@ -287,6 +295,9 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.equal(await otherCard('ALL').locator('[data-suggest]').count(), 0, 'no morning suggestion the same night');
     await page.locator('#pc-run[data-state="done"][data-direction="off"]').waitFor();
     assert.equal(await page.locator('#pc-run .pc-run__title').innerText(), 'SAFE TO LEAVE THE BUILDING');
+    // Off for the night: the Barco at READY is the one this page can wake, and says so.
+    assert.deepEqual(await looks(), [['A', 'off'], ['B', 'off'], ['C', 'ready'], ['D', 'off']]);
+    assert.equal(await card('C').locator('.pc-state').getAttribute('data-note'), 'READY · this page can wake it');
     assert.equal((await relay.state()).projectors.every(p => p.status.power === 'off'), true);
     assert.deepEqual((await relay.state()).events.filter(event => event.source === 'run').slice(-4).map(event => `${event.slot} ${event.command}`), ['P1 power 0', 'P4 power 0', 'P2 power 0', 'P3 power 0'], 'A, D, B, C');
     // The power page's own words: how it works, the nevers, and no "app closed" step or remote steps anywhere.
@@ -309,6 +320,8 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     await relay.api('lock', { lock: true });
     await page.locator('#sb-lock[data-lock="on"]').waitFor();
     assert.equal(await page.locator('#sb-lock').innerText(), 'Show Lock ON');
+    const outline = () => page.evaluate(() => getComputedStyle(document.querySelector('.sb-shell'), '::after').borderTopStyle);
+    assert.equal(await outline(), 'solid', 'Show Lock on: the page is outlined');
     assert.deepEqual(await card('B').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => b.getAttribute('aria-disabled'))), ['true', 'true', 'true', 'false']);
     assert.match(await act('B', 'power-off').getAttribute('aria-label'), /Blocked: Show Lock is on\. Power off is locked\.$/);
     assert.deepEqual(await card('ALL').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => [b.textContent, b.getAttribute('aria-disabled')])),
@@ -340,6 +353,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.equal(await page.locator('#sb-midi-title').innerText(), 'Not run yet');
     await relay.api('lock', { lock: false });
     await page.locator('#sb-lock[data-lock="off"]').waitFor();
+    assert.equal(await outline(), 'none', 'Show Lock off: no outline');
 
     // ---- Tabs: pointer, keyboard, and the address keeps the open tab.
     assert.equal(new URL(page.url()).hash, '#midi');

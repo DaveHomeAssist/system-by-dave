@@ -125,6 +125,39 @@ export function laneViews(snapshot, { relayConnected = false, everConnected = fa
   });
 }
 
+// The power banner's look, from the lane's reading only (the show page design reference, November 19):
+// lit, warming, cooling, ready (a Barco this page can wake), deep-standby (one it cannot), off or
+// unknown. The banner's words stay ON, OFF and so on; note is a short second line, or ''. A lane
+// with no current reply has no look: it keeps CONNECTING, or the amber CHECK BY EYE.
+export function powerLook(view) {
+  if (view?.reach !== 'live') return { look: null, note: '' };
+  if (view.power === 'on') return { look: 'lit', note: '' };
+  if (view.power === 'warming' || view.power === 'cooling') return { look: view.power, note: '' };
+  if (view.power === 'off' && view.deepStandby) return { look: 'deep-standby', note: `${view.raw.toUpperCase()} · this page can't wake it` };
+  if (view.power === 'off' && view.raw === 'ready') return { look: 'ready', note: 'READY · this page can wake it' };
+  return { look: view.power === 'off' ? 'off' : 'unknown', note: '' };
+}
+
+// A shutter command in one of the page's operations (the lane's own, or an all-lanes one) that was
+// sent to this lane and is waiting for, or has missed, its report: OPEN or CLOSE. Otherwise null.
+export function pendingShutter(ops, lane) {
+  for (const op of ops) {
+    const action = op && ACTIONS[op.action];
+    if (action?.row !== 'shutter') continue;
+    const target = op.targets?.find(item => item.lane === lane);
+    if (target && (target.status === 'accepted' || target.status === 'timeout')) return action.label.toUpperCase();
+  }
+  return null;
+}
+
+// The shutter pill: what the lane reports, or a shutter command sent and not yet confirmed.
+// pending is the command's word (OPEN or CLOSE) while it waits for, or has missed, its report.
+export function shutterLook(view, pending = null) {
+  if (pending) return { look: 'sent-unconfirmed', text: `${pending} sent, not confirmed` };
+  const text = view?.shutterText || 'Not reported';
+  return view?.reach === 'live' && (view.shutter === 'open' || view.shutter === 'closed') ? { look: view.shutter, text } : { look: 'not-reported', text };
+}
+
 // Whether one action is offered for one lane right now, and the reason when it is not.
 // lock is true, false or null (unknown, for example while the relay is not answering).
 export function actionState(view, actionId, { lock = null, policy = DEFAULT_POLICY } = {}) {

@@ -5,8 +5,9 @@
   --pc-surface:var(--frozen-surface,#ffffff);--pc-raised:var(--frozen-raised,#f1f6fa);--pc-ink:var(--frozen-ink,#102131);--pc-muted:var(--frozen-muted,#465f73);
   --pc-line:var(--frozen-hairline,#c9d9e4);--pc-control:var(--frozen-control,#7f97a9);--pc-accent:var(--frozen-accent,#0b5cad);--pc-on-accent:var(--frozen-on-accent,#ffffff);
   --pc-ok:#17703a;--pc-ok-wash:#dff3e6;--pc-eye:#855000;--pc-eye-wash:#fdeed3;--pc-bad:#b3231a;--pc-bad-wash:#fde3e0;--pc-off:#465f73;--pc-off-wash:#e2eff7;--pc-on-bad:#ffffff;
+  --pc-ready:#0b6276;--pc-ready-wash:#d9f1f6;
 }
-[data-theme="dark"]{--pc-ok:#79dfa2;--pc-ok-wash:#123a2a;--pc-eye:#ffc978;--pc-eye-wash:#3d2e10;--pc-bad:#ff9b91;--pc-bad-wash:#451d1b;--pc-off:#b1cbdc;--pc-off-wash:#18334a;--pc-on-bad:#1c0907}
+[data-theme="dark"]{--pc-ok:#79dfa2;--pc-ok-wash:#123a2a;--pc-eye:#ffc978;--pc-eye-wash:#3d2e10;--pc-bad:#ff9b91;--pc-bad-wash:#451d1b;--pc-off:#b1cbdc;--pc-off-wash:#18334a;--pc-on-bad:#1c0907;--pc-ready:#7fe3f3;--pc-ready-wash:#0f3540}
 .pc-card[data-tone="ok"],.pc-pick[data-tone="ok"]{--pc-tone:var(--pc-ok);--pc-wash:var(--pc-ok-wash)}
 .pc-card[data-tone="eye"],.pc-pick[data-tone="eye"]{--pc-tone:var(--pc-eye);--pc-wash:var(--pc-eye-wash)}
 .pc-card[data-tone="attention"],.pc-pick[data-tone="attention"]{--pc-tone:var(--pc-bad);--pc-wash:var(--pc-bad-wash)}
@@ -56,6 +57,23 @@
 .pc-fact[data-flag] dd{color:var(--pc-bad);font-weight:700}
 .pc-fact[data-fact="link"][data-flag] dd{color:var(--pc-eye)}
 .pc-alarm{margin:0;padding:3px 8px;border-radius:6px;background:var(--pc-bad-wash);color:var(--pc-bad);font:700 13px/1.3 var(--font-sans,system-ui,sans-serif)}
+/* The show page design reference (Dave, November 19). The power banner takes the power state's
+   colour: ON green, a wakeable Barco cyan, warming and cooling amber, deep standby and power not
+   reported grey, OFF red. A lane with no current reply has no data-power and keeps its tone. */
+.pc-state{box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 35%,transparent)}
+.pc-card[data-power="lit"] .pc-state{background:var(--pc-ok-wash);color:var(--pc-ok)}
+.pc-card[data-power="ready"] .pc-state{background:var(--pc-ready-wash);color:var(--pc-ready)}
+.pc-card[data-power="warming"] .pc-state,.pc-card[data-power="cooling"] .pc-state{background:var(--pc-eye-wash);color:var(--pc-eye)}
+.pc-card[data-power="deep-standby"] .pc-state,.pc-card[data-power="unknown"] .pc-state{background:var(--pc-off-wash);color:var(--pc-off)}
+.pc-card[data-power="off"] .pc-state{background:var(--pc-bad-wash);color:var(--pc-bad)}
+.pc-state[data-note]::after{content:attr(data-note);display:block;margin-top:1px;font:700 12px/1.25 var(--font-mono,ui-monospace,monospace);letter-spacing:.03em}
+/* The shutter as a pill: OPEN green, CLOSED amber, a command sent and not confirmed amber with a
+   dashed edge, not reported red on a lit lane (grey otherwise: an off unit does not report it). */
+.pc-fact[data-fact="shutter"]{margin:-2px -6px;padding:2px 6px;border:1px solid transparent;border-radius:6px;background:var(--pc-off-wash)}
+.pc-fact[data-shutter="open"]{background:var(--pc-ok-wash)}.pc-fact[data-shutter="open"] dd{color:var(--pc-ok)}
+.pc-fact[data-shutter="closed"]{background:var(--pc-eye-wash)}.pc-fact[data-shutter="closed"] dd{color:var(--pc-eye)}
+.pc-fact[data-shutter="sent-unconfirmed"]{background:var(--pc-eye-wash);border:1px dashed var(--pc-eye)}.pc-fact[data-shutter="sent-unconfirmed"] dd{color:var(--pc-eye)}
+.pc-card[data-power="lit"] .pc-fact[data-shutter="not-reported"]{background:var(--pc-bad-wash)}.pc-card[data-power="lit"] .pc-fact[data-shutter="not-reported"] dd{color:var(--pc-bad)}
 
 .pc-actions{display:flex;flex-direction:column;gap:6px;margin-top:auto}
 .pc-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:3px 6px}
@@ -88,6 +106,16 @@
   .pc-fresh,.pc-msg,.pc-confirm__text{font-size:14px}
   .pc-msg{-webkit-line-clamp:3;min-height:3.9em}
   .pc-btn{min-height:52px;font-size:17px}
+}
+/* Very tall cards list the readings as rows, a label over each value, with the shutter pill first. */
+@container pc-card (min-height:560px){
+  .pc-facts{grid-template-columns:minmax(0,1fr);gap:0}
+  .pc-fact{padding:5px 0;border-bottom:1px solid var(--pc-line)}
+  .pc-fact:last-child{border-bottom:0}
+  .pc-fact:nth-child(2){border-top:1px solid var(--pc-line)}
+  .pc-fact dt{font:500 12px/1.3 var(--font-sans,system-ui,sans-serif);letter-spacing:0;text-transform:none}
+  .pc-fact[data-fact="shutter"]{justify-self:start;display:flex;align-items:baseline;gap:8px;margin:0 0 8px;padding:5px 10px;border-bottom:1px solid transparent}
+  .pc-fact[data-fact="shutter"][data-shutter="sent-unconfirmed"]{border-bottom-color:var(--pc-eye)}
 }
 /* Short cards lay out in two columns: the reading on the left, the buttons on the right. */
 @container pc-card (max-height:330px){
@@ -181,6 +209,17 @@
 }
 
 /* Two by two when four in a row would be too narrow. The bar grows to hold two rows of buttons. */
+/* Short cards keep the Barco note small; the shortest drop it and show the shutter as a plain line. */
+@container pc-card (max-height:330px){
+  .pc-state[data-note]::after{display:inline;margin-left:8px;font-size:10px;white-space:nowrap}
+}
+@container pc-card (max-height:330px) and (max-width:459px){
+  .pc-state[data-note]::after{display:none}
+}
+@container pc-card (max-height:150px){
+  .pc-state[data-note]::after{display:none}
+  .pc-fact[data-fact="shutter"]{margin:0;padding:0 4px;border-radius:4px}
+}
 @media (max-width:999px){
   .pc-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto repeat(2,minmax(0,1fr))}
   .pc-card[data-lane="ALL"]{height:124px}

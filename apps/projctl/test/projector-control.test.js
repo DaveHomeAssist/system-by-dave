@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createConnectionMonitor } from '../public/projector-connection.js';
-import { suggestRun, runSummary, SUGGEST_QUIET_MS } from '../public/projector-control-model.js';
+import { suggestRun, runSummary, SUGGEST_QUIET_MS, powerLook, shutterLook, pendingShutter } from '../public/projector-control-model.js';
 import { ACTIONS, ACTION_IDS, DEFAULT_POLICY, CONFIRM_MS, RELAY_CONFIRM_MS, laneViews, actionState, sharedReason, groupState, groupSummary, linkOf, alarmSummary, targetsText, skippedText } from '../public/projector-control-model.js';
 
 const NOW = Date.parse('2026-11-18T19:00:00Z');
@@ -192,4 +192,40 @@ test('a finished run gives a plain summary with the time, the Barco state at nig
   assert.equal(runSummary({ direction: 'on', state: 'interrupted', endedAt: at, message: 'The relay restarted during this run. Nothing more was sent. Check each lane.' }), 'Run interrupted at 10:04 PM. The relay restarted during this run. Nothing more was sent. Check each lane.');
   assert.equal(runSummary({ direction: 'on', state: 'running' }), '', 'nothing while it runs');
   assert.equal(runSummary(null), '');
+});
+
+test('the power banner look comes from the reading only, and a lane with no current reply keeps its own tone', () => {
+  const live = extra => ({ reach: 'live', power: 'off', raw: null, deepStandby: false, ...extra });
+  assert.deepEqual(powerLook(live({ power: 'on' })), { look: 'lit', note: '' });
+  assert.deepEqual(powerLook(live({ power: 'warming' })), { look: 'warming', note: '' });
+  assert.deepEqual(powerLook(live({ power: 'cooling' })), { look: 'cooling', note: '' });
+  assert.deepEqual(powerLook(live({})), { look: 'off', note: '' });
+  assert.deepEqual(powerLook(live({ raw: 'ready' })), { look: 'ready', note: 'READY · this page can wake it' });
+  assert.deepEqual(powerLook(live({ raw: 'eco', deepStandby: true })), { look: 'deep-standby', note: "ECO · this page can't wake it" });
+  assert.deepEqual(powerLook(live({ raw: 'standby', deepStandby: true })), { look: 'deep-standby', note: "STANDBY · this page can't wake it" });
+  assert.deepEqual(powerLook(live({ power: 'unknown' })), { look: 'unknown', note: '' });
+  for (const reach of ['connecting', 'stale', 'unreached', 'relay-offline', 'unassigned', 'conflict']) assert.deepEqual(powerLook({ reach, power: null }), { look: null, note: '' }, reach);
+  assert.deepEqual(powerLook(null), { look: null, note: '' });
+});
+
+test('the shutter pill shows the report, or a command sent and not confirmed', () => {
+  const live = (shutter, shutterText) => ({ reach: 'live', shutter, shutterText });
+  assert.deepEqual(shutterLook(live('open', 'OPEN')), { look: 'open', text: 'OPEN' });
+  assert.deepEqual(shutterLook(live('closed', 'CLOSED · dark on stage')), { look: 'closed', text: 'CLOSED · dark on stage' });
+  assert.deepEqual(shutterLook(live('unknown', 'Not reported')), { look: 'not-reported', text: 'Not reported' });
+  assert.deepEqual(shutterLook(live('open', 'OPEN'), 'CLOSE'), { look: 'sent-unconfirmed', text: 'CLOSE sent, not confirmed' });
+  assert.deepEqual(shutterLook({ reach: 'stale', shutter: null, shutterText: 'Not reported' }), { look: 'not-reported', text: 'Not reported' });
+  assert.deepEqual(shutterLook(undefined), { look: 'not-reported', text: 'Not reported' });
+});
+
+test('a shutter command is pending for a lane while it waits for, or has missed, its report', () => {
+  const op = (action, targets) => ({ action, targets });
+  assert.equal(pendingShutter([op('shutter-close', [{ lane: 'B', status: 'accepted' }]), undefined], 'B'), 'CLOSE');
+  assert.equal(pendingShutter([undefined, op('shutter-open', [{ lane: 'A', status: 'reported' }, { lane: 'B', status: 'timeout' }])], 'B'), 'OPEN', 'an all-lanes command');
+  assert.equal(pendingShutter([op('shutter-close', [{ lane: 'B', status: 'reported' }])], 'B'), null, 'reported');
+  assert.equal(pendingShutter([op('shutter-close', [{ lane: 'B', status: 'refused' }])], 'B'), null, 'never sent');
+  assert.equal(pendingShutter([op('shutter-close', [{ lane: 'B', status: 'ready' }])], 'B'), null, 'armed, not sent');
+  assert.equal(pendingShutter([op('power-on', [{ lane: 'B', status: 'accepted' }])], 'B'), null, 'a power command');
+  assert.equal(pendingShutter([op('shutter-close', [{ lane: 'A', status: 'accepted' }])], 'B'), null, 'another lane');
+  assert.equal(pendingShutter([undefined, undefined], 'B'), null);
 });

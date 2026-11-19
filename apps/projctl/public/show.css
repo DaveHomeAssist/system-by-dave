@@ -35,7 +35,9 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
 .sb-shared{appearance:none;min-height:24px;padding:0 8px;border:1px solid var(--line-control);border-radius:999px;background:transparent;color:var(--ink);font:inherit;letter-spacing:inherit;text-transform:inherit;white-space:nowrap;cursor:pointer}
 .sb-brand h1{margin:0;font:700 clamp(17px,2.2vw,24px)/1.15 var(--font-display,system-ui,sans-serif);letter-spacing:-.02em;white-space:nowrap}
 .sb-pill{padding:5px 10px;border:1px solid var(--line-control);border-radius:999px;font:600 13px/1.2 var(--font-sans,system-ui,sans-serif);white-space:nowrap}
-.sb-pill[data-lock="on"]{background:var(--tape);border-color:var(--tape);color:var(--on-tape)}
+/* Show Lock is read only here. On, it is amber and the whole page is outlined in amber (the design reference, November 19). */
+.sb-pill[data-lock="on"]{background:var(--pc-eye-wash);border-color:var(--pc-eye);color:var(--pc-eye);font-weight:800}
+.sb-shell:has(#sb-lock[data-lock="on"])::after{content:"";position:fixed;inset:0;z-index:5;border:3px solid var(--pc-eye);pointer-events:none}
 .sb-pill[data-lock="unknown"]{border-style:dashed;color:var(--ink-muted)}
 .sb-clock{font:500 13px/1 var(--font-mono,ui-monospace,monospace);color:var(--ink-muted);white-space:nowrap}
 
@@ -54,10 +56,10 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
 .sb-verdict__short{display:none}
 .sb-checks{flex:none;display:grid;grid-template-columns:repeat(4,minmax(0,160px));gap:6px;margin:0;padding:6px 16px 6px 10px;list-style:none}
 .sb-checks li{min-width:0;display:grid}
-.sb-check{appearance:none;display:grid;grid-template-columns:auto minmax(0,1fr);align-content:center;align-items:center;gap:0 6px;min-width:0;min-height:44px;padding:3px 8px;border:1px solid var(--hairline);border-left:5px solid var(--sb-state);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
-.sb-check__mark{grid-row:1 / span 2;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--sb-wash);color:var(--sb-state);font:800 14px/1 var(--font-sans,system-ui,sans-serif)}
-.sb-check__label{overflow:hidden;font:600 10px/1.4 var(--font-mono,ui-monospace,monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);white-space:nowrap;text-overflow:ellipsis}
-.sb-check__value{overflow:hidden;font:700 13px/1.25 var(--font-sans,system-ui,sans-serif);white-space:nowrap;text-overflow:ellipsis}
+.sb-check{appearance:none;display:grid;grid-template-columns:minmax(0,1fr) auto;align-content:center;align-items:center;gap:1px 6px;min-width:0;min-height:44px;padding:3px 8px;border:1px solid var(--hairline);border-top:3px solid var(--sb-state);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.sb-check__mark{grid-column:2;grid-row:1;display:grid;place-items:center;min-width:18px;height:18px;padding:0 3px;border-radius:4px;background:var(--sb-wash);color:var(--sb-state);font:800 14px/1 var(--font-sans,system-ui,sans-serif)}
+.sb-check__label{grid-column:1;grid-row:1;overflow:hidden;font:600 10px/1.4 var(--font-mono,ui-monospace,monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);white-space:nowrap;text-overflow:ellipsis}
+.sb-check__value{grid-column:1 / -1;grid-row:2;overflow:hidden;font:700 13px/1.25 var(--font-sans,system-ui,sans-serif);white-space:nowrap;text-overflow:ellipsis}
 
 /* Tabs: along the top here, a bottom rail on a phone */
 .sb-tabs{min-width:0;background:var(--surface);border-bottom:1px solid var(--hairline)}
@@ -240,8 +242,8 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
   .sb-top{gap:6px 8px;padding:6px 12px}
   .sb-verdict{padding:4px 12px}
   .sb-checks{gap:5px;padding:5px 12px}
-  .sb-check{grid-template-columns:auto minmax(0,1fr);min-height:40px;padding:2px 6px;border-left-width:4px}
-  .sb-check__mark{grid-row:auto;width:16px;height:16px;font-size:12px}
+  .sb-check{min-height:40px;padding:2px 6px}
+  .sb-check__mark{min-width:16px;height:16px;font-size:12px}
   .sb-check__value{grid-column:1 / -1;font-size:12px}
   .sb-panel{gap:8px;padding:8px 12px}
   /* Know: the list or the viewer, not both */
@@ -305,8 +307,8 @@ body{background:var(--ground);color:var(--ink);font:16px/1.4 var(--font-sans,sys
   .sb-verdict > span,.sb-verdict__long{display:none}
   .sb-verdict__short{display:inline}
   .sb-checks{flex:1;gap:3px;padding:2px 8px 2px 4px}
-  .sb-check{display:flex;gap:3px;min-height:24px;padding:0 4px;border-left-width:3px}
-  .sb-check__mark{width:auto;height:auto;background:none;font-size:11px}
+  .sb-check{display:flex;gap:3px;min-height:24px;padding:0 4px;border-top-width:2px}
+  .sb-check__mark{min-width:0;width:auto;height:auto;padding:0;background:none;font-size:11px}
   .sb-check__label{font:600 9.5px/1.2 var(--font-sans,system-ui,sans-serif);letter-spacing:0;text-transform:none}
   .sb-check__value{display:none}
   .sb-panel{gap:4px;padding:4px 8px}

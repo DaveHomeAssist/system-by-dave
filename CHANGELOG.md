@@ -10,6 +10,7 @@ Applies the November 19 order of operations research to the role pages on the ow
 - **Recovery ladder** on `show.html`, least disruptive first: shutter, input, power cycle one projector, relaunch the playback app, restart the show computer, each with when it is allowed.
 - **Holds**: a Know manifest entry of kind `notice` shows a short hold above the list until its `until` time, with a mark on the Know tab. Date-specific holds live in the private folder, not in the page.
 - **Know samples**: the power-up and recovery samples carry the morning check of the show computer, photographing a lamp message, the once-only Panasonic STANDBY MODE check, and two-show days.
+- **Show page look** from Dave's design reference (November 19): the power banner in the reading's colour (a wakeable Barco cyan with "READY · this page can wake it", deep standby grey with "this page can't wake it"), the shutter as a coloured pill with "sent, not confirmed", readings as rows on very tall cards, "Control link" for the driver in use, summary items with coloured top edges, and an amber outline while Show Lock is on. Show Lock stays read only; the Frozen palette, locked shell and theme switch stay.
 - **Hints** on the shared control: a suggested run, highlighted and explained from B and C, Show Lock and the last run (never pressed), and a copyable summary of the finished run under the banner.
 - Shared files: `server/index.js` (the run gets the poller's refresh), `server/drivers/pulse.js`, `server/drivers/simulator.js`, `server/drivers/index.js`.
 

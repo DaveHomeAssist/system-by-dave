@@ -47,14 +47,27 @@ Two facts about the rig still shape what the page may claim:
 
 Two pages, served by the relay behind the existing sign-in, built from the same script, styles
 and control. `show.html` keeps the go or no-go strip on top with four tabs under it. `power.html`
-is the same shell with two tabs.
+is the same shell with three tabs: Power, Night and Know.
 
 | Tab | On | For | Sends |
 | --- | --- | --- | --- |
 | **Control** ("Power" on the power page) | Both | Power on, power off, shutter open and shutter close for one lane; "Turn all on" and "Turn all off" for all four; open and close for all shutters. The power page has the power rows only | `POST /api/command` (`power`, `shutter`, one lane) and the plan, start and stop of the relay's run |
 | **Setup check** | `show.html` | One press: a list of pass, fail or cannot check, each with its reading | Nothing |
 | **MIDI test** | `show.html` | Wait for the console's test cue and say whether it arrived | Nothing. This build never sends MIDI |
+| **Night** | `power.html` | The night timeline: each lane's expected wait, its live reading, and "Safe to leave the building" only when all four read OFF | Only Stop the run, while a run is in progress |
 | **Know** | Both | A short built-in list of first things to try, then diagrams and documents from a private folder on the relay computer | Nothing |
+
+### Look (design reference, November 19)
+
+Dave sent a static design reference for the show page through Olaf ("PR 541 DESIGN & CSS REFERENCE"). The page already had its structure (header with a Show Lock status and clock, go or no-go banner, four summary items, four lane cards), so the look was applied in place, on the existing locked shell and theme switch:
+
+- **Power banner** in the reading's colour: ON green, warming and cooling amber, OFF red, power not reported grey. The Barco at READY is cyan with "READY · this page can wake it"; in deep standby it is grey with "ECO (or STANDBY) · this page can't wake it". A lane with no current reply keeps CONNECTING or the amber CHECK BY EYE. The words stay ON, OFF and so on.
+- **Shutter pill**: OPEN green, CLOSED amber, a command sent and not yet confirmed amber with a dashed edge ("CLOSE sent, not confirmed"), not reported red on a lit lane and grey otherwise (an off unit does not report its shutter).
+- **Readings as rows** (a label over each value, with dividers) on very tall cards; shorter cards keep the two-column readings. "Link" is now "Control link": the driver actually in use (PJLink, control port, Barco API, simulator).
+- **Summary items** with a coloured top edge and their mark as a badge.
+- **Show Lock** is a read-only status on both pages (it already was). On, it turns amber and an amber outline is drawn around the page.
+
+Not taken from the reference: its host, lamp hours, thermal and ping rows and its fixed "NTCONTROL · TCP 1024" protocol line (the relay does not poll lamp hours, temperature or ping, the host is not needed by the show backup, and power, shutter and status go over PJLink); its dark-only charcoal palette (both themes keep the Frozen palette every Projctl page shares); its scrolling layout below 1024 px; and its lane colours (the rig's own lane colours stay). The reference allows shutter moves while a unit warms up or when power is not reported; the page still offers them only while a lane reports ON. Power buttons stay on each card: the reference shows none, but this page's power control was already agreed.
 
 ## Go or no-go strip
 

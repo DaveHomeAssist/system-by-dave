@@ -12,7 +12,7 @@
 // run is { plan(direction), start(direction, confirm), stop() }, each resolving to { status, body }.
 import { LANES } from './lanes.js';
 import { ACTIONS, ACTION_IDS, ALL, CONFIRM_MS, RELAY_CONFIRM_MS, GUARD_MS, REPORT_MS, DEFAULT_POLICY,
-  actionState, sharedReason, groupState, groupSummary, targetsText, skippedText, clockShort, list, lower, suggestRun, runSummary } from './projector-control-model.js';
+  actionState, sharedReason, groupState, groupSummary, targetsText, skippedText, clockShort, list, lower, suggestRun, runSummary, powerLook, shutterLook, pendingShutter } from './projector-control-model.js';
 
 const WITHDRAWN_MS = 20000; // a withdrawn confirm clears itself; a refusal stays until the next action
 const DONE_MS = 60000;
@@ -65,7 +65,7 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
     head.append(el('span', { class: 'pc-letter', 'aria-hidden': 'true' }, isLane ? key : 'All'), name, model);
     const state = el('p', { class: 'pc-state' }), fresh = el('p', { class: 'pc-fresh' });
     const facts = el('dl', { class: 'pc-facts' }), fact = {};
-    for (const [id, label] of isLane ? [['shutter', 'Shutter'], ['input', 'Input'], ['pattern', 'Pattern'], ['link', 'Link']] : [['lit', 'Lit'], ['closed', 'Shutters closed']]) {
+    for (const [id, label] of isLane ? [['shutter', 'Shutter'], ['input', 'Input'], ['pattern', 'Pattern'], ['link', 'Control link']] : [['lit', 'Lit'], ['closed', 'Shutters closed']]) {
       const wrap = el('div', { class: 'pc-fact', 'data-fact': id }), value = el('dd');
       wrap.append(el('dt', {}, label), value);
       facts.append(wrap);
@@ -422,9 +422,14 @@ export function createProjectorControl({ root, pick = null, runRoot = null, post
       mark(nodes.card, 'data-reach', view.reach);
       put(nodes.model, view.model);
       put(nodes.state, view.headline);
+      const power = powerLook(view);
+      mark(nodes.card, 'data-power', power.look);
+      mark(nodes.state, 'data-note', power.note || null);
       put(nodes.fresh, view.freshText);
       mark(nodes.fresh, 'title', view.freshText);
-      put(nodes.fact.shutter.value, view.shutterText);
+      const shutter = shutterLook(view, pendingShutter([ops.get(view.lane), ops.get(ALL)], view.lane));
+      put(nodes.fact.shutter.value, shutter.text);
+      mark(nodes.fact.shutter.wrap, 'data-shutter', shutter.look);
       const inputText = view.inputFlag ? `${view.inputText} · ${view.inputFlag.toLowerCase()}` : view.inputText;
       put(nodes.fact.input.value, inputText);
       mark(nodes.fact.input.value, 'title', inputText);
