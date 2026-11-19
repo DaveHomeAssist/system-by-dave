@@ -1,18 +1,25 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "48491de7fe0253e19039a7754ec801bf2087e73c",
-  "deploymentId": "appgdep_6afecac0979881919d2e229f356604e2",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_da70f1f7b7c881918176b5321ada0133",
+  "managedSourceCommit": "db5eecb6d99fb28cebe20b605a79ec68bb695b4c",
+  "deploymentId": "appgdep_6aff897a1e3c8191b9895b19d42dfe72",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5f5e483b3d708191950e4e46f6edc5be",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 54,
-  "acceptedSourceCommit": "bc6fb846f2b2a503390d7eac50e4d5a6cf20843e",
-  "publicVerifiedAt": "2026-11-19T10:10:32Z",
+  "versionNumber": 56,
+  "acceptedSourceCommit": "2008fc943ec79cde8f4aead5e58d268f97aa8b0f",
+  "publicVerifiedAt": "2026-11-19T23:52:56Z",
   "priorPublications": [
+    {
+      "versionNumber": 55,
+      "managedSourceCommit": "e755e56231e0167ad7d763ffce3920556ab1e07a",
+      "deploymentId": "appgdep_6aff874177b081918a8df766dbc5bc6b",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5aa4de64d30c819185e662f06afa4778",
+      "note": "November 19 media phase. The prior seven-session catalog remained active while 728 checksum-allowlisted originals were uploaded. The temporary uploader secret was removed before version 56."
+    },
     {
       "versionNumber": 50,
       "managedSourceCommit": "ce13d80de2943dfc6ee127eee5373eeefe96796e",
@@ -468,11 +475,16 @@
   },
   "november19Release": {
     "releaseId": "nov19-e41acdbf7d65",
+    "publishedAt": "2026-11-19T23:43:01.512979+00:00",
     "frozenSourceCommit": "2008fc943ec79cde8f4aead5e58d268f97aa8b0f",
     "managedSourceCommits": [
-      "e755e56231e0167ad7d763ffce3920556ab1e07a"
+      "e755e56231e0167ad7d763ffce3920556ab1e07a",
+      "db5eecb6d99fb28cebe20b605a79ec68bb695b4c"
     ],
     "mediaVersion": 55,
+    "activeVersion": 56,
+    "deploymentId": "appgdep_6aff897a1e3c8191b9895b19d42dfe72",
+    "sourcePullRequest": "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/10",
     "sessions": [
       {
         "sessionId": "20261119-144854",
@@ -486,12 +498,49 @@
     "existingSevenSessionPreservation": {
       "manifestsByteEquivalent": 7,
       "manifestsChanged": 0,
-      "photoRoutesExpectedReadOnly": 4545
+      "photoRoutesReadOnly": 4545,
+      "photoHashConflicts": 0
     },
+    "photoReadback": {
+      "expected": 5273,
+      "verified": 5273,
+      "uploaded": 728,
+      "readOnly": 4545,
+      "failures": 0
+    },
+    "publicHashReadback": {
+      "expected": 5282,
+      "verified": 5282,
+      "catalogRoutes": 1,
+      "manifestRoutes": 8,
+      "mediaRoutes": 5273,
+      "failures": 0
+    },
+    "browserAcceptance": {
+      "host": "Dominic",
+      "statesPassed": 192,
+      "widths": [1440, 1280, 680, 375, 2240, 3840],
+      "themes": ["light", "dark"],
+      "layouts": ["grid", "across"],
+      "behaviors": [
+        "all eight sessions",
+        "original image dimensions",
+        "preview navigation and Escape",
+        "note isolation and reload",
+        "exact session and firing links",
+        "repeated cue jump",
+        "invalid context retains capture"
+      ]
+    },
+    "environmentRevision": 10,
+    "temporaryUploaderSecretRemoved": true,
     "audience": "public",
-    "state": "media version saved; production deployment and public acceptance pending"
+    "limitations": [
+      "FRC_AFTERNOON_ZIP was unavailable, so the real-afternoon archive fixture remained skipped.",
+      "The first version 55 archive save was rejected before version creation because the archive root omitted the required dist directory. The corrected archive was saved and deployed."
+    ]
   },
-  "sourceReconciliation": "The seven-session Frozen Rehearsal Review is live at /run-review/. November 18 Show Act 1 and Show Act 2 append 1389 checksum-allowlisted photo routes, including 276 visibly identified rescued photos. The five prior manifests are byte-equivalent to version 48 and all 3156 prior photo routes passed read-only SHA verification. Existing Home and Planning navigation, task service, documents, public audience, session identities and browser note keys remain preserved. The temporary upload secret was removed before the active release. Video remains deferred.",
+  "sourceReconciliation": "The eight-session Frozen Rehearsal Review is live at /run-review/. The November 19 rehearsal appends 728 checksum-allowlisted original photos. The seven prior manifests are byte-equivalent to the 17:44 baseline and all 4545 prior photo routes passed read-only SHA verification. Existing Home and Planning navigation, task service, documents, public audience, session identities and browser note keys remain preserved. The temporary upload secret was removed before the active release. Video remains deferred.",
   "verification": {
     "host": "Dominic",
     "macCheck": "Live reload verified Single and All photos use the clean cue 15 frame, with Replacement label, 19:08:27 EST time and +38.30 second offset. Existing note remains present.",
