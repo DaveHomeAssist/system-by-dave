@@ -1,18 +1,27 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "ce13d80de2943dfc6ee127eee5373eeefe96796e",
-  "deploymentId": "appgdep_6afe83e3d3e08191825fc8deb12f981d",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_ff9dcf8a4840819185f77b72809bab18",
+  "managedSourceCommit": "48491de7fe0253e19039a7754ec801bf2087e73c",
+  "deploymentId": "appgdep_6afecac0979881919d2e229f356604e2",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_da70f1f7b7c881918176b5321ada0133",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 50,
-  "acceptedSourceCommit": "0aedee2f3290c3534c6c0cd9c00543b132e74eda",
-  "publicVerifiedAt": "2026-11-19T05:14:59Z",
+  "versionNumber": 54,
+  "acceptedSourceCommit": "bc6fb846f2b2a503390d7eac50e4d5a6cf20843e",
+  "publicVerifiedAt": "2026-11-19T10:10:32Z",
   "priorPublications": [
+    {
+      "versionNumber": 50,
+      "managedSourceCommit": "ce13d80de2943dfc6ee127eee5373eeefe96796e",
+      "deploymentId": "appgdep_6afe83e3d3e08191825fc8deb12f981d",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_ff9dcf8a4840819185f77b72809bab18",
+      "acceptedSourceCommit": "0aedee2f3290c3534c6c0cd9c00543b132e74eda",
+      "publicVerifiedAt": "2026-11-19T05:14:59Z",
+      "note": "November 18 review catalog release."
+    },
     {
       "versionNumber": 49,
       "managedSourceCommit": "8c2fc84ed1a41de71b933ac5828bfc8026c8c4ae",
@@ -247,9 +256,22 @@
     "browserAcceptance": {
       "host": "Dominic",
       "statesPassed": 120,
-      "widths": [1440, 1280, 680, 375, 2240, 3840],
-      "themes": ["light", "dark"],
-      "layouts": ["grid", "across"],
+      "widths": [
+        1440,
+        1280,
+        680,
+        375,
+        2240,
+        3840
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "layouts": [
+        "grid",
+        "across"
+      ],
       "behaviors": [
         "original image dimensions",
         "preview navigation and Escape",
@@ -301,14 +323,35 @@
     "photoRoutesVerified": 3156,
     "november15ManifestsUnchanged": true,
     "clockOffsets": [
-      {"sessionId": "20261117-123916", "beforeSeconds": 0.169, "afterSeconds": 0.006},
-      {"sessionId": "20261117-195209-act-1", "beforeSeconds": 0.357, "afterSeconds": 0.006},
-      {"sessionId": "20261117-195209-act-2", "beforeSeconds": 0.357, "afterSeconds": 0.006}
+      {
+        "sessionId": "20261117-123916",
+        "beforeSeconds": 0.169,
+        "afterSeconds": 0.006
+      },
+      {
+        "sessionId": "20261117-195209-act-1",
+        "beforeSeconds": 0.357,
+        "afterSeconds": 0.006
+      },
+      {
+        "sessionId": "20261117-195209-act-2",
+        "beforeSeconds": 0.357,
+        "afterSeconds": 0.006
+      }
     ],
     "photoOffsetAdjustments": [
-      {"sessionId": "20261117-123916", "seconds": -0.163},
-      {"sessionId": "20261117-195209-act-1", "seconds": -0.351},
-      {"sessionId": "20261117-195209-act-2", "seconds": -0.351}
+      {
+        "sessionId": "20261117-123916",
+        "seconds": -0.163
+      },
+      {
+        "sessionId": "20261117-195209-act-1",
+        "seconds": -0.351
+      },
+      {
+        "sessionId": "20261117-195209-act-2",
+        "seconds": -0.351
+      }
     ],
     "warningCountsBefore": 0,
     "warningCountsAfter": 0,
@@ -387,9 +430,22 @@
     "browserAcceptance": {
       "host": "Dominic",
       "statesPassed": 168,
-      "widths": [1440, 1280, 680, 375, 2240, 3840],
-      "themes": ["light", "dark"],
-      "layouts": ["grid", "across"],
+      "widths": [
+        1440,
+        1280,
+        680,
+        375,
+        2240,
+        3840
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "layouts": [
+        "grid",
+        "across"
+      ],
       "behaviors": [
         "all seven sessions",
         "original image dimensions",
@@ -533,5 +589,15 @@
       "publicAliasHashChecks": 2
     },
     "liveBrowserStatus": "Passed on public WST hostname"
+  },
+  "workspaceRelease": {
+    "workspaceSourceCommit": "64053ade89ecd117885d72fc79298a75e35655f3",
+    "previousManagedSource": "cd1bef60d23cc1fa86ba959bef4144a1210f88a7",
+    "previousVersionNumber": 53,
+    "checks": [
+      "Byte-identical workspace and service worker scripts on both published domains",
+      "Public custom-domain Chromium palette, offline shell reload with a synthetic task, handoff backlink, hosted review load and synthetic ZIP scrub"
+    ],
+    "venueAcceptance": "Pending"
   }
 }
