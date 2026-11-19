@@ -94,6 +94,10 @@
   .pc-alarm{grid-column:1;grid-row:5;justify-self:start}
   .pc-actions,.pc-confirm{grid-column:2;grid-row:1 / span 4;align-self:start;margin-top:0}
   .pc-msg{grid-column:2;grid-row:5;min-height:0}
+  /* The review text is held to three lines and the two buttons sit side by side, so a long plan cannot push the card past its height. */
+  .pc-confirm{flex-flow:row wrap;gap:4px 6px}
+  .pc-confirm__text{flex:1 1 100%;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+  .pc-confirm .pc-btn{flex:1}
   .pc-card[data-phase="armed"] .pc-msg,.pc-card[data-phase="relay-armed"] .pc-msg{display:none}
 }
 /* A short card that is also narrow (a phone with the run banner showing): each row's name sits above its buttons. */

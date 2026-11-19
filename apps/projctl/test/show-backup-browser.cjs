@@ -814,6 +814,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     const freePort = () => new Promise((resolve, reject) => { const probe = net.createServer(); probe.once('error', reject); probe.listen(0, '127.0.0.1', () => { const { port } = probe.address(); probe.close(() => resolve(port)); }); });
     const CODE = 'simulator-only-code', home = fs.mkdtempSync(path.join(os.tmpdir(), 'projctl-signed-in-'));
     const secure = { PJ_PASSCODE: CODE, RIG: path.join(home, 'rig.json'), STAGE_PLOT: path.join(home, 'stage-plot.json'), VENUE_MODEL: path.join(home, 'venue'), PORT: String(await freePort()) };
+    fs.writeFileSync(path.join(home, 'host-paths.json'), JSON.stringify({ cueObserver: observer })); // the same observer file, so the MIDI test runs signed in too
     let secured = await startRelay(secure);
     try {
       const pocket = await browser.newContext({ viewport: { width: 375, height: 812 } });
@@ -838,6 +839,14 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
       await phone.locator('.sb-line[data-line="A-power"][data-state="pass"]').waitFor();
       await phone.locator('#t-midi').click();
       assert.equal(await phone.locator('#sb-midi-title').innerText(), 'Not run yet');
+      await phone.locator('#sb-midi-start[aria-disabled="false"]').waitFor({ timeout: 10000 });
+      await phone.locator('#sb-midi-start').click();
+      await phone.locator('#sb-midi-test[data-state="eye"]').waitFor();
+      fs.appendFileSync(observer, midiRows(msc('999')));
+      await phone.locator('#sb-midi-test[data-state="ok"]').waitFor({ timeout: 10000 });
+      assert.equal(await phone.locator('#sb-midi-title').innerText(), 'Pass: the cue arrived');
+      assert.deepEqual(await phone.evaluate(audit), CLEAN, 'signed in on a phone, a passed MIDI test fits');
+      await phone.locator('#sb-midi-stop').click();
       await phone.locator('#t-know').click();
       await phone.locator('.sb-know__item').first().waitFor();
       await phone.locator('.sb-know__item', { hasText: 'Sample recovery steps' }).click();
