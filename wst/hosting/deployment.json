@@ -337,6 +337,7 @@
       "32eaf720e52ec8b1b59104b4f0d4d4a639e1e61d",
       "ce13d80de2943dfc6ee127eee5373eeefe96796e"
     ],
+    "systemRecordCommit": "b05858c3b4296972a158d2b4261741a2aa046c74",
     "sourcePullRequests": [
       "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/7",
       "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/8"
