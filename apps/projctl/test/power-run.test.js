@@ -213,6 +213,23 @@ test('a second press from any page meets the run in progress and never starts an
   assert.equal(typeof b.run.plan('off').confirm, 'string');
 });
 
+test('a Power page plan cannot start or continue in Blind', async () => {
+  const b = bench({ lock: true });
+  assert.throws(() => b.run.plan('on', { requireUnlocked: true }), { status: 423 });
+  b.lock = false;
+  const held = b.run.plan('on', { requireUnlocked: true });
+  b.lock = true;
+  assert.throws(() => b.run.start('on', held.confirm), { status: 423 });
+  assert.equal(b.sent.length, 0);
+  b.lock = false;
+  const ready = b.run.plan('on', { requireUnlocked: true });
+  b.run.start('on', ready.confirm);
+  b.lock = true;
+  await b.step();
+  assert.equal(b.run.view().run.state, 'stopped');
+  assert.equal(b.sent.length, 0);
+});
+
 test('Show Lock refuses an off run and stops one under way; an on run is allowed, as power on always is', async () => {
   const b = bench({ lock: true, power: { P1: 'on', P2: 'on', P3: 'on', P4: 'on' } });
   assert.throws(() => b.run.plan('off'), error => error.status === 423 && error.message === 'show lock is on');

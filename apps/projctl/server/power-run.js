@@ -140,32 +140,32 @@ export function createPowerRun({ projectors, status, power, refresh = null, revi
     return null;
   }
 
-  function plan(direction) {
+  function plan(direction, { requireUnlocked = false } = {}) {
     if (!RUN_ORDER[direction]) throw fail(400, 'direction must be on or off');
     if (run?.state === 'running') throw fail(409, 'A run is already in progress.', { run: view() });
-    if (direction === 'off' && locked()) throw fail(423, 'show lock is on');
+    if ((direction === 'off' || requireUnlocked) && locked()) throw fail(423, 'show lock is on');
     observe();
     for (const [token, entry] of plans) if (entry.expires <= now()) plans.delete(token);
     if (plans.size >= 64) plans.delete(plans.keys().next().value);
     const steps = RUN_ORDER[direction].map(lane => intent(lane, direction)), all = lanes();
     const token = randomUUID();
-    plans.set(token, { direction, expires: now() + rules.planMs, targets: Object.values(all).filter(Boolean).map(p => ({ slot: p.slot, identity: revision(p) })) });
+    plans.set(token, { direction, requireUnlocked, expires: now() + rules.planMs, targets: Object.values(all).filter(Boolean).map(p => ({ slot: p.slot, identity: revision(p) })) });
     return { direction, confirm: token, expiresInMs: rules.planMs, steps, banner: RUN_BANNER[direction] };
   }
 
   function start(direction, token) {
     if (!RUN_ORDER[direction]) throw fail(400, 'direction must be on or off');
     if (run?.state === 'running') throw fail(409, 'A run is already in progress.', { run: view() });
-    if (direction === 'off' && locked()) throw fail(423, 'show lock is on');
     const entry = plans.get(token);
     plans.delete(token); // one use, whatever happens next
     if (!entry || entry.direction !== direction || entry.expires <= now()) throw fail(409, 'Confirm expired. Review the run again.');
+    if ((direction === 'off' || entry.requireUnlocked) && locked()) throw fail(423, 'show lock is on');
     const all = lanes();
     const same = entry.targets.every(target => { const p = Object.values(all).find(item => item?.slot === target.slot); return p && revision(p) === target.identity; })
       && Object.values(all).filter(Boolean).length === entry.targets.length;
     if (!same) throw fail(409, 'Projector configuration changed. Review the run again.');
     const at = now();
-    run = { id: randomUUID(), direction, state: 'running', phase: 'units', startedAt: new Date(at).toISOString(), endedAt: null, banner: null, message: '', cursor: 0,
+    run = { id: randomUUID(), direction, requireUnlocked: entry.requireUnlocked, state: 'running', phase: 'units', startedAt: new Date(at).toISOString(), endedAt: null, banner: null, message: '', cursor: 0,
       steps: RUN_ORDER[direction].map(lane => { const p = all[lane]; return { lane, surface: LANES[lane].target, slot: p?.slot ?? null, identity: p ? revision(p) : null, state: 'pending', note: 'Waiting for its turn', confirmed: false, startedAt: null, sentAt: null }; }) };
     publish({ save: true });
     if (!ticker) { ticker = interval(tick, rules.tickMs); ticker?.unref?.(); }
@@ -188,7 +188,11 @@ export function createPowerRun({ projectors, status, power, refresh = null, revi
   function send(step, on, { retry = false } = {}) {
     Object.assign(step, { state: 'sending', note: retry ? 'Sending the one retry' : on ? 'Sending power on' : 'Sending power off' });
     const mine = run.id, lamp = on && isLamp(lanes()[step.lane]);
-    Promise.resolve().then(() => power(step.slot, on)).then(
+    const requireUnlocked = run.requireUnlocked;
+    const guard = requireUnlocked ? () => {
+      if (locked() || run?.id !== mine || run.state !== 'running') throw fail(423, 'Live power is locked or the run ended.');
+    } : undefined;
+    Promise.resolve().then(() => { guard?.(); return power(step.slot, on, guard); }).then(
       () => {
         if (run?.id !== mine || step.state !== 'sending') return;
         const at = now();
@@ -278,7 +282,7 @@ export function createPowerRun({ projectors, status, power, refresh = null, revi
     if (run?.state !== 'running') return;
     observe();
     const all = lanes(), on = run.direction === 'on', want = on ? ['on', 'warming'] : ['off', 'cooling'], final = on ? 'on' : 'off', at = now();
-    if (!on && locked()) return end('stopped', 'Stopped: Show Lock was turned on. Nothing more was sent. Check each lane.');
+    if ((!on || run.requireUnlocked) && locked()) return end('stopped', 'Stopped: Show Lock was turned on. Nothing more was sent. Check each lane.');
     // A unit seen in its end state stays confirmed, even if it stops answering afterwards (a resting laser unit can).
     // A lamp unit in the morning is confirmed only once it has stayed on through its 3-minute watch.
     for (const step of run.steps) {

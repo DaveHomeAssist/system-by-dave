@@ -1,5 +1,9 @@
 # Changelog
 
+## Projctl Power Live and Blind, November 19, 2026
+
+The Power page leads with two all-four buttons, plain status and four lane readings. Show Lock switches the whole page to amber and makes both actions local previews. Power-page run plans and starts require an unlocked relay. Run progress stays on the Power tab.
+
 ## Projctl role pages: the rig's daily order of operations, 2026-11-19
 
 Applies the November 19 order of operations research to the role pages on the owner's word ("apply to crew dashboards", relayed). Simulator and fixtures only; not installed. Waits and behaviours from the research are labelled "researched, not yet tested" on the pages.

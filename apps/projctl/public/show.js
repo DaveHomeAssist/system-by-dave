@@ -59,7 +59,7 @@ async function postJson(route, body) {
   if (response.status === 401) signIn();
   return { status: response.status, body: await response.json().catch(() => ({})) };
 }
-const runHooks = { plan: direction => postJson('api/power-run/plan', { direction }), start: (direction, confirm) => postJson('api/power-run/start', { direction, confirm }), stop: () => postJson('api/power-run/stop', {}) };
+const runHooks = { plan: direction => postJson('api/power-run/plan', ROLE === 'power' ? { direction, requireUnlocked: true } : { direction }), start: (direction, confirm) => postJson('api/power-run/start', { direction, confirm }), stop: () => postJson('api/power-run/stop', {}) };
 // A read that never throws: { status: 'ok', data } or 'absent' (an older relay) or 'error'.
 async function readJson(route, timeout = 12000) {
   try {
@@ -72,12 +72,24 @@ async function readJson(route, timeout = 12000) {
   } catch { return { status: 'error' }; }
 }
 
-// The power page carries power only and opens on the all-lanes card, where the one on and off button is.
-const control = createProjectorControl({ root: $('#pc-root'), pick: $('#pc-pick'), runRoot: $('#pc-run'), post: body => postJson('api/command', body), run: runHooks, announce: say, relayNow,
+const preview = $('#sb-power-preview');
+function previewPower(direction) {
+  if (lockState() !== true || !preview) return;
+  put($('h2', preview), direction === 'on' ? 'Preview: turn all on' : 'Preview: turn all off');
+  put($('[data-preview-order]', preview), direction === 'on' ? 'C → B → A → D' : 'A → D → B → C');
+  put($('[data-preview-wait]', preview), direction === 'on'
+    ? 'The relay checks readiness, staggers the lamp projectors and watches for lamp faults.'
+    : 'The relay starts with the lamp projectors and waits for off readings. Keep mains power on while they cool.');
+  preview.showModal();
+}
+preview?.querySelector('button').addEventListener('click', () => preview.close());
+
+// Both pages use the same run controller. Only the Power page presents lanes as status rows.
+const control = createProjectorControl({ root: $('#pc-root'), pick: ROLE === 'power' ? null : $('#pc-pick'), runRoot: $('#pc-run'),
+  post: body => postJson('api/command', body), run: runHooks, announce: say, relayNow,
   rows: ROLE === 'power' ? ['power'] : ['power', 'shutter'], selected: ROLE === 'power' ? 'ALL' : 'A',
-  sharedNote: 'Shared sign-in: the relay logs the command, not who sent it.',
-  // Whoever starts the nightly off from the power page watches it on the night timeline.
-  onRunStarted: direction => { if (direction === 'off' && TABS.includes('night')) showTab('night'); } });
+  compactPower: ROLE === 'power', onPreview: previewPower,
+  sharedNote: ROLE === 'power' ? '' : 'Shared sign-in: the relay logs the command, not who sent it.' });
 const night = TABS.includes('night') ? createNightTimeline({ root: $('#sb-night'), onStop: () => control.stop() }) : null;
 const know = createKnow({ panel: $('#know'), list: $('#sb-know-list'), status: $('#sb-know-status'), title: $('#sb-know-title'), tools: $('#sb-know-tools'), stage: $('#sb-know-stage'), back: $('#sb-know-back'),
   notices: $('#sb-notices'), count: $('#sb-know-count'), audience: ROLE === 'power' ? 'power' : 'show-backup,designer', onSignedOut: signIn });
@@ -109,7 +121,14 @@ function render() {
   const lockNode = $('#sb-lock'), lockWord = lock === true ? 'on' : lock === false ? 'off' : 'unknown';
   mark(lockNode, 'data-lock', lockWord);
   put($('[data-f=word]', lockNode), lock === true ? 'Lock ON' : lock === false ? 'Lock off' : 'Lock unknown'); // "Show " sits in the markup and drops out on a phone
-  mark(lockNode, 'title', 'While Show Lock is on, power off is locked, for one lane and for the all-four run. Power on and shutters stay available.');
+  if (ROLE === 'power') {
+    mark(document.documentElement, 'data-power-mode', lock === true ? 'blind' : lock === false ? 'live' : null);
+    put($('[data-f=word]', lockNode), lock === true ? 'BLIND · Live power locked' : lock === false ? 'LIVE' : 'Checking lock');
+    mark(lockNode, 'title', lock === true ? 'The power buttons preview the sequence.' : null);
+    if (lock !== true && preview.open) preview.close();
+  } else {
+    mark(lockNode, 'title', 'While Show Lock is on, power off is locked, for one lane and for the all-four run. Power on and shutters stay available.');
+  }
   reveal($('#sb-sim'), !!snapshot?.simulation);
   put($('#sb-clock'), tickClock.format(new Date(now)));
 
