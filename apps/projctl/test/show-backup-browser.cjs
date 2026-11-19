@@ -99,7 +99,7 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     const looks = () => page.locator('.pc-card').evaluateAll(cards => cards.filter(c => c.dataset.lane !== 'ALL').map(c => [c.dataset.lane, c.dataset.power ?? null]));
     assert.deepEqual(await looks(), [['A', 'off'], ['B', 'lit'], ['C', 'lit'], ['D', null]]);
     assert.equal(await page.locator('#sb-lock').evaluate(node => node.tagName + ':' + node.getAttribute('role')), 'SPAN:status');
-    assert.equal(await page.getByRole('button', { name: /lock/i }).count(), 0, 'no Show Lock control on this page');
+    assert.equal(await page.locator('button', { hasText: /lock/i }).count(), 0, 'no Show Lock control on this page (blocked buttons may name it in their reason)');
     assert.equal(await page.locator('#sb-help, a[href^="sms:"], a[href^="tel:"]').count(), 0, 'the help and contact control is gone');
 
     // Readings: a lane the relay reads shows its state and link; one it cannot reach shows no state at all.
