@@ -97,8 +97,11 @@ schema, viewer URL structure and hosting provider in the same cutover.
 The published source for version 54 is `48491de7fe0253e19039a7754ec801bf2087e73c`.
 Its release archive measures 27,186,205 bytes. The Worker entry module alone
 measures 24,532,629 bytes before compression. The active catalog indexes seven
-sessions, seven manifests and 4,545 media routes. Route aliases can share an
-object. Determine unique keys and verified hashes before estimating a transfer.
+sessions, seven manifests and 4,545 media routes. The manifest identifies 4,543 distinct
+object keys totaling 649,806,176 bytes. Every distinct key has a SHA-256
+digest and the two alias routes agree with their target digests. These figures
+describe the published manifest. Verify object bytes independently during
+export and restore.
 The managed source includes two SQL migrations for shared tasks and entry kinds.
 The workspace stores personal notes, cached team rows and pending offline
 checkoffs on the visitor's browser origin.
