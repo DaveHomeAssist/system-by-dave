@@ -334,6 +334,9 @@ const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', un
     assert.equal(await page.locator('#sb-know-stage').getAttribute('data-zoom'), 'scale');
     const zoomed = await image.evaluate(node => node.getBoundingClientRect().width);
     assert.ok(zoomed > stageWidth * 1.5, `zoomed diagram is larger than the viewer (${zoomed} in ${stageWidth})`);
+    // The image box grows as a scaled copy of the viewer and the picture stays contained in it, so a
+    // diagram that declares no size of its own (a viewBox only) can never be stretched out of shape.
+    assert.deepEqual(await page.evaluate(() => { const stage = document.querySelector('#sb-know-stage'), image = stage.querySelector('img'), box = image.getBoundingClientRect(); return [getComputedStyle(image).objectFit, Math.round(box.width / stage.clientWidth), Math.round(box.height / stage.clientHeight)]; }), ['contain', 2, 2]);
     const box = await page.locator('#sb-know-stage').boundingBox();
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down(); await page.mouse.move(box.x + box.width / 2 - 120, box.y + box.height / 2 - 40, { steps: 4 }); await page.mouse.up();
     assert.ok(await page.locator('#sb-know-stage').evaluate(node => node.scrollLeft) >= 100, 'dragging pans the zoomed diagram');

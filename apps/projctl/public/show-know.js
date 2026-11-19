@@ -55,11 +55,12 @@ export function createKnow({ panel, list, status, title, tools, stage, back, onS
     stage.dataset.zoom = zoom.mode;
     if (zoom.mode === 'fit') { image.style.width = ''; image.style.height = ''; }
     else {
-      // Zoom is measured from the fitted size, so 2x is always twice what "Fit" showed.
-      const natural = image.naturalWidth || 960, ratio = (image.naturalHeight || 540) / natural;
-      const fitted = Math.min(stage.clientWidth, stage.clientHeight / ratio);
-      const width = zoom.mode === 'actual' ? natural : Math.round(fitted * zoom.scale);
-      image.style.width = `${width}px`; image.style.height = `${Math.round(width * ratio)}px`;
+      // The image box is a scaled copy of the viewer and the picture is contained inside it, so the
+      // shape is always right, including for a diagram that declares no size of its own.
+      const sized = image.naturalWidth > 0 && image.naturalHeight > 0;
+      const scale = zoom.mode === 'actual' ? 1 : zoom.scale;
+      const [width, height] = zoom.mode === 'actual' && sized ? [image.naturalWidth, image.naturalHeight] : [stage.clientWidth * scale, stage.clientHeight * scale];
+      image.style.width = `${Math.round(width)}px`; image.style.height = `${Math.round(height)}px`;
     }
     for (const button of tools.querySelectorAll('[data-zoom]')) {
       const pressed = button.dataset.zoom === zoom.mode;
