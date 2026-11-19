@@ -1,0 +1,7 @@
+[
+  { "title": "Sample signal flow", "file": "signal-flow.svg", "kind": "diagram", "audience": ["show-backup", "designer", "power"], "order": 1 },
+  { "title": "Sample recovery steps", "file": "recovery.md", "kind": "doc", "audience": ["show-backup", "designer"], "order": 2 },
+  { "title": "Sample cue notes", "file": "cue-notes.txt", "kind": "doc", "audience": ["designer"], "order": 3 },
+  { "title": "Sample output map", "file": "output-map.json", "kind": "doc", "audience": ["show-backup", "designer"], "order": 4 },
+  { "title": "Sample power-up order", "file": "power-up.md", "kind": "doc", "audience": ["power"], "order": 5 }
+]

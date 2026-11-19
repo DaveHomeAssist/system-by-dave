@@ -1,28 +1,45 @@
-// Show backup page in a browser against the simulator relay. Lanes B and C are lit; A and D are
-// made unreachable, which is how they read during a show while the playback app holds their link.
-// Set SHOW_BACKUP_SHOTS to a folder to keep screenshots.
+// Show backup page in a browser against the simulator relay: the four tabs, every projector
+// action with its two steps, Show Lock, the MIDI test against an observer file this test appends
+// to, the setup check, the Know tab with the invented sample set, and fit at eight sizes.
+// Nothing here reaches a projector or sends MIDI. Set SHOW_BACKUP_SHOTS to keep screenshots.
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 
 const SIZES = [[1440, 900], [1024, 768], [768, 1024], [375, 812], [375, 667], [844, 390], [320, 256], [2560, 720]];
-// WEB-2: the page never scrolls, nothing is pushed past the viewport, and each card holds its own text.
+const TABS = ['control', 'setup', 'midi', 'know'];
+// WEB-2: the page never scrolls, nothing sits past the viewport unless it is inside one of the
+// bounded scroll panels, and no card or bar cuts its own content.
 const audit = () => {
   const root = document.documentElement, visible = el => el.getClientRects().length > 0;
   const outside = [...document.querySelectorAll('body *')].filter(el => {
-    if (!visible(el) || el.closest('.sb-sr, .sb-skip, dialog:not([open])')) return false;
+    if (!visible(el) || el.closest('.sb-sr, .pc-sr, .sb-skip, dialog:not([open]), [popover]:not(:popover-open)')) return false;
+    if (el.parentElement?.closest('.sb-scroll')) return false; // long content inside a scroll panel
     const r = el.getBoundingClientRect();
-    return r.height > 0 && (r.bottom > innerHeight + 1 || r.right > innerWidth + 1);
-  }).map(el => el.className || el.tagName);
-  const cut = [...document.querySelectorAll('.sb-lane__in, .sb-check, .sb-top, .sb-foot')].filter(el => visible(el) && (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1))
-    .map(el => `${el.className} ${el.closest('[data-lane]')?.dataset.lane || el.dataset.check || ''} ${el.scrollWidth}x${el.scrollHeight} in ${el.clientWidth}x${el.clientHeight}`);
+    return r.height > 0 && (r.bottom > innerHeight + 1 || r.right > innerWidth + 1 || r.left < -1 || r.top < -1);
+  }).map(el => `${el.className || el.tagName}`);
+  const cut = [...document.querySelectorAll('.pc-card__in, .pc-picker, .pc-pick, .pc-btn, .sb-check, .sb-top, .sb-strip, .sb-tabs, [role=tab], .sb-card, .sb-bar, .sb-know__bar, .sb-know__side, .sb-step, .sb-btn')]
+    .filter(el => visible(el) && !el.closest('dialog:not([open])') && (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1))
+    .map(el => `${el.className} ${el.closest('[data-lane]')?.dataset.lane || el.dataset.check || el.id || ''} ${el.scrollWidth}x${el.scrollHeight} in ${el.clientWidth}x${el.clientHeight}`);
   return { pageScrolls: root.scrollHeight > root.clientHeight || root.scrollWidth > root.clientWidth, outside, cut };
 };
+const CLEAN = { pageScrolls: false, outside: [], cut: [] };
+
+// The observer's row format: one Show Control message spread over several midi rows.
+const ascii = text => [...text].map(char => char.charCodeAt(0));
+const msc = (cue, command = 1) => [0xf0, 0x7f, 3, 0x02, 0x01, command, ...ascii(cue), 0x00, 0x31, 0xf7];
+const midiRows = (bytes, at = Date.now()) => { const rows = []; for (let i = 0; i < bytes.length; i += 4) rows.push(JSON.stringify({ type: 'midi', hex: bytes.slice(i, i + 4).map(b => b.toString(16).padStart(2, '0')).join(''), length: Math.min(4, bytes.length - i), direction: 'incoming', name: 'Console A', endpoint: 2666519, unixSeconds: at / 1000, utc: new Date(at).toISOString() })); return rows.map(row => `${row}\n`).join(''); };
+const heartbeat = (at = Date.now()) => `${JSON.stringify({ type: 'heartbeat', unixSeconds: at / 1000, sources: 2, destinations: 2 })}\n`;
 
 (async () => {
   const { startRelay, until } = await import('./relay-helper.js');
-  const relay = await startRelay();
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'projctl-show-browser-')), observer = path.join(scratch, 'observer.jsonl');
+  fs.writeFileSync(observer, heartbeat());
+  const beat = setInterval(() => fs.appendFileSync(observer, heartbeat()), 2000); // the listener stays alive for the whole test
+  const NOTES = 'https://notes.example.test/crew';
+  const relay = await startRelay({}, { files: { 'host-paths.json': JSON.stringify({ cueObserver: observer }), 'crew-links.json': JSON.stringify({ notes: { url: NOTES } }) } });
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
   const shots = process.env.SHOW_BACKUP_SHOTS;
   if (shots) fs.mkdirSync(shots, { recursive: true });
@@ -30,16 +47,16 @@ const audit = () => {
   try {
     // A fresh test rig has no drawing lanes; assign them the way Setup does.
     for (const [slot, lane, model] of [['P1', 'A', 'PT-DW830U'], ['P2', 'B', 'PT-RZ970'], ['P3', 'C', 'UDM 4K22'], ['P4', 'D', 'PT-DW830U']]) assert.equal((await relay.api('projector', { slot, lane, model })).status, 200);
+    // B and C lit with open shutters and no test pattern; A reachable and off; D unreachable.
     for (const slot of ['P2', 'P3']) await relay.api('command', { slot, cmd: 'power', arg: 1 });
-    for (const slot of ['P1', 'P4']) await relay.api('sim', { slot, offline: true });
+    await relay.api('sim', { slot: 'P4', offline: true });
     const reading = async () => Object.fromEntries((await relay.state()).projectors.map(p => [p.slot, p.status]));
-    await until(async () => { const s = await reading(); return s.P2.power === 'on' && s.P3.power === 'on' && !s.P1.online && !s.P4.online; }, 20000);
-    for (const slot of ['P2', 'P3']) await relay.api('command', { slot, cmd: 'shutter', arg: 0 });
-    await until(async () => { const s = await reading(); return s.P2.shutter === 'open' && s.P3.shutter === 'open'; });
+    await until(async () => { const s = await reading(); return s.P2.power === 'on' && s.P3.power === 'on' && !s.P4.online; }, 20000);
+    for (const slot of ['P2', 'P3']) { await relay.api('command', { slot, cmd: 'shutter', arg: 0 }); await relay.api('command', { slot, cmd: 'pattern', arg: '00' }); }
+    await until(async () => { const s = await reading(); return s.P2.shutter === 'open' && s.P3.shutter === 'open' && s.P2.pattern === '00' && s.P3.pattern === '00'; });
 
     // ---- Live simulator relay
     const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
-    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const page = await context.newPage();
     const posts = [], foreign = [], errors = [];
     page.on('request', request => {
@@ -49,165 +66,387 @@ const audit = () => {
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     await page.goto(`${relay.base}/show.html`);
-    const lane = id => page.locator(`.sb-lane[data-lane="${id}"]`);
-    const text = (id, part) => lane(id).locator(`.sb-lane__${part}`).innerText();
-    const armButton = id => lane(id).locator('[data-act=arm]'), confirmButton = id => lane(id).locator('[data-act=confirm]'), cancelButton = id => lane(id).locator('[data-act=cancel]');
-    const tile = id => page.locator(`.sb-check[data-check="${id}"]`);
-    const tileText = async id => [await tile(id).getAttribute('data-state'), await tile(id).locator('.sb-check__value').innerText(), await tile(id).locator('.sb-check__note').innerText()];
-    await page.locator('.sb-lane[data-lane="B"][data-reach="live"]').waitFor();
-    await page.locator('.sb-lane[data-lane="A"][data-reach="unreached"]').waitFor();
+    const card = id => page.locator(`.pc-card[data-lane="${id}"]`);
+    const act = (id, name) => card(id).locator(`[data-act="${name}"]`);
+    const msg = id => card(id).locator('.pc-msg').innerText();
+    const fact = (id, name) => card(id).locator(`[data-fact="${name}"] dd`).innerText();
+    const chip = id => page.locator(`.sb-check[data-check="${id}"]`);
+    const settled = (id, phase) => page.locator(`.pc-card[data-lane="${id}"][data-phase="${phase}"]`).waitFor();
+    const revision = async slot => (await relay.state()).projectors.find(p => p.slot === slot).controlRevision;
+    const sent = () => posts.filter(post => post.path === '/api/command').map(post => post.body);
+    await page.locator('.pc-card[data-lane="B"][data-reach="live"]').waitFor();
+    await page.locator('.pc-card[data-lane="D"][data-reach="unreached"]').waitFor();
+    await page.locator('.sb-check[data-check="cues"][data-state="ok"]').waitFor();
 
-    for (const id of ['B', 'C']) {
-      assert.equal(await text(id, 'state'), 'ON');
-      assert.equal(await text(id, 'shutter'), 'Shutter OPEN');
-      assert.match(await text(id, 'fresh'), /^Reply (just now|\ds ago)$/);
-      assert.equal(await armButton(id).innerText(), 'Close shutter');
-      assert.equal(await armButton(id).getAttribute('aria-disabled'), 'false');
+    // The strip sits above every tab, and Control is the tab that opens.
+    assert.deepEqual(await page.locator('[role=tab]').evaluateAll(tabs => tabs.map(tab => [tab.id, tab.getAttribute('aria-selected')])), [['t-control', 'true'], ['t-setup', 'false'], ['t-midi', 'false'], ['t-know', 'false']]);
+    assert.deepEqual(await page.locator('.sb-check').evaluateAll(chips => chips.map(node => node.dataset.check)), ['lanes', 'outputs', 'cues', 'computer']);
+    assert.match(await chip('lanes').getAttribute('aria-label'), /^Lanes lit: Attention\. 2 of 4 lit\. A reports OFF · D by eye\.$/);
+    assert.match(await chip('cues').getAttribute('aria-label'), /^Cue link: OK\. Listening\. Listening · no cue heard yet\.$/);
+    assert.match(await chip('outputs').getAttribute('aria-label'), /^Outputs: No reading\. Not read\. Reader is off in simulation\.$/);
+    assert.equal(await page.locator('#sb-verdict [data-f=title]').innerText(), 'ATTENTION');
+    assert.equal(await page.locator('#sb-sim').isVisible(), true, 'simulation is labelled');
+    assert.equal(await page.locator('#sb-help, a[href^="sms:"], a[href^="tel:"]').count(), 0, 'the help and contact control is gone');
+
+    // Readings: a lane the relay reads shows its state and link; one it cannot reach shows no state at all.
+    assert.deepEqual([await card('B').locator('.pc-state').innerText(), await fact('B', 'shutter'), await fact('B', 'pattern'), await fact('B', 'link')], ['ON', 'OPEN', 'Off', 'Simulator']);
+    assert.match(await card('B').locator('.pc-fresh').innerText(), /^Reply (just now|\ds ago)$/);
+    assert.deepEqual([await card('A').locator('.pc-state').innerText(), await card('A').getAttribute('data-tone')], ['OFF', 'attention']);
+    assert.deepEqual([await card('D').locator('.pc-state').innerText(), await fact('D', 'shutter'), await fact('D', 'link'), await msg('D')], ['CHECK BY EYE', 'Not reported', 'Not reported', "Relay can't reach it. Use the remote."]);
+    for (const name of ['power-on', 'power-off', 'shutter-open', 'shutter-close']) {
+      assert.equal(await act('D', name).getAttribute('aria-disabled'), 'true');
+      assert.match(await act('D', name).getAttribute('aria-label'), /lane D\. Blocked: Relay can't reach it\. Use the remote\.$/);
     }
-    for (const id of ['A', 'D']) {
-      assert.equal(await text(id, 'state'), 'CHECK BY EYE', `${id} never shows a state the relay could not read`);
-      assert.equal(await text(id, 'shutter'), 'Shutter not reported');
-      assert.match(await text(id, 'fresh'), /^Last reply \d+:\d\d [AP]M$/);
-      assert.equal(await armButton(id).getAttribute('aria-disabled'), 'true');
-      assert.equal(await text(id, 'why'), "Relay can't reach it. Use the remote.");
-      await armButton(id).click({ force: true });
-      assert.equal(await confirmButton(id).isVisible(), false, 'a blocked lane cannot be armed');
-    }
-    assert.deepEqual(await tileText('lanes'), ['eye', '2 of 4 lit', 'A and D: check by eye']);
-    assert.deepEqual(await tileText('outputs'), ['off', 'Not read', 'Reader is off in simulation']);
-    assert.equal(await tile('outputs').locator('.sb-check__state').innerText(), 'NO READING');
-    assert.deepEqual(await tileText('cues'), ['off', 'Not connected', 'Console cues do not reach this page']);
-    assert.deepEqual((await tileText('computer')).slice(0, 2), ['ok', 'Answering']);
-    assert.equal(await page.locator('#sb-verdict').getAttribute('data-state'), 'eye');
-    assert.match(await page.locator('#sb-verdict').innerText(), /NOTHING WRONG REPORTED/i);
-    assert.equal(await page.locator('#sb-sim').isVisible(), true, 'simulated readings are labelled');
-    assert.equal(await page.locator('#sb-lock').innerText(), 'Show Lock off');
-    assert.equal(posts.length, 0, 'loading and watching sends nothing');
-    // No crew notes link is configured on this relay: nothing of it shows, and nothing is reachable by keyboard.
-    assert.equal(await page.locator('#sb-notes').isVisible(), false);
-    assert.equal(await page.locator('#sb-notes-link').getAttribute('href'), null);
-    await shot(page, '01-tablet-1024x768-light');
+    assert.deepEqual(await card('A').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => [b.dataset.act, b.getAttribute('aria-disabled')])), [['power-on', 'false'], ['power-off', 'true'], ['shutter-open', 'true'], ['shutter-close', 'true']]);
+    assert.deepEqual(await card('B').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => [b.dataset.act, b.getAttribute('aria-disabled')])), [['power-on', 'true'], ['power-off', 'false'], ['shutter-open', 'true'], ['shutter-close', 'false']]);
+    assert.equal(await card('ALL').locator('.pc-state').innerText(), '3 OF 4 READING');
+    await shot(page, '01-tablet-control');
 
-    // Two steps. The first sends nothing; Cancel, Escape and a timeout send nothing.
-    await armButton('B').click();
-    assert.match(await confirmButton('B').innerText(), /^Confirm close B \(\d\)$/);
-    assert.equal(await armButton('B').isVisible(), false);
-    assert.equal(await page.evaluate(() => document.activeElement?.dataset.act), 'confirm', 'focus follows to the second step');
-    await shot(page, '02-tablet-armed');
-    await cancelButton('B').click();
-    assert.equal(await armButton('B').isVisible(), true);
-    assert.equal(await page.evaluate(() => document.activeElement?.dataset.act), 'arm');
-    await armButton('C').click();
-    await page.keyboard.press('Escape');
-    assert.equal(await armButton('C').isVisible(), true);
-    assert.equal(posts.length, 0, 'cancel and Escape send nothing');
+    // A blocked action says why when it is tapped, and sends nothing.
+    await act('A', 'shutter-close').click();
+    assert.equal(await msg('A'), 'Close shutter is blocked. Reports OFF, so no shutter move.');
+    await act('D', 'power-on').click();
+    assert.equal(await msg('D'), "Power on is blocked. Relay can't reach it. Use the remote.");
+    assert.deepEqual(sent(), []);
 
-    // A double tap is not two steps: the confirm ignores its first 600 ms.
-    await armButton('B').dblclick();
+    // Shutter, two steps. A double tap, Cancel and Escape never send.
+    await act('B', 'shutter-close').click();
+    await settled('B', 'armed');
+    assert.match(await act('B', 'confirm').innerText(), /^Confirm close shutter B \(\d\)$/);
+    assert.equal(await card('B').locator('.pc-confirm__text').innerText(), 'Nothing sent yet. Shared sign-in: the relay logs the command, not who sent it.');
+    assert.equal(await page.evaluate(() => document.activeElement?.dataset.act), 'confirm', 'focus moves to the confirm step');
+    await act('B', 'confirm').click(); // inside the 600 ms guard: not a second step
     await page.waitForTimeout(100);
-    assert.equal(posts.length, 0);
-    assert.equal(await confirmButton('B').isVisible(), true);
-    await page.waitForTimeout(650);
-    await confirmButton('B').click();
-    await lane('B').locator('.sb-lane__why', { hasText: /^Reported CLOSED at / }).waitFor({ timeout: 10000 });
-    assert.equal(posts.length, 1);
-    assert.equal(posts[0].path, '/api/command');
-    assert.deepEqual({ ...posts[0].body, expectedTargets: undefined }, { slot: 'P2', cmd: 'shutter', arg: 1, expectedTargets: undefined });
-    assert.match(posts[0].body.expectedTargets[0].revision, /^[a-f0-9]{64}$/);
-    assert.equal(posts[0].body.expectedTargets[0].slot, 'P2');
+    assert.deepEqual(sent(), []);
+    await act('B', 'cancel').click();
+    await settled('B', 'idle');
+    assert.equal(await page.evaluate(() => document.activeElement?.dataset.act), 'shutter-close', 'focus returns to the action');
+    await act('B', 'shutter-close').click();
+    await settled('B', 'armed');
+    await page.keyboard.press('Escape');
+    await settled('B', 'idle');
+    assert.deepEqual(sent(), []);
+    await act('B', 'shutter-close').click();
+    await page.waitForTimeout(700);
+    await act('B', 'confirm').click();
+    await settled('B', 'done');
+    assert.deepEqual(sent(), [{ slot: 'P2', cmd: 'shutter', arg: 1, expectedTargets: [{ slot: 'P2', revision: await revision('P2') }] }]);
+    assert.match(await msg('B'), /^Reported CLOSED at \d+:\d\d [AP]M\.$/);
+    assert.equal(await fact('B', 'shutter'), 'CLOSED · dark on stage');
     assert.equal((await reading()).P2.shutter, 'closed');
-    assert.equal(await text('B', 'shutter'), 'Shutter CLOSED · dark on stage');
-    assert.equal(await armButton('B').innerText(), 'Open shutter');
-    assert.deepEqual(await tileText('lanes'), ['eye', '2 of 4 lit', 'A and D: check by eye'], 'a closed shutter does not unlight a lane');
+    await act('B', 'shutter-open').click();
+    await page.waitForTimeout(700);
+    await act('B', 'confirm').click();
+    await page.locator('.pc-card[data-lane="B"] [data-fact="shutter"] dd', { hasText: /^OPEN$/ }).waitFor();
+    assert.deepEqual(sent().at(-1), { slot: 'P2', cmd: 'shutter', arg: 0, expectedTargets: [{ slot: 'P2', revision: await revision('P2') }] });
 
-    // Show Lock is shown, and the shutter stays available under it, as on the main console.
+    // Power on: armed on the page, then the projector's own report.
+    posts.length = 0;
+    await act('A', 'power-on').click();
+    await settled('A', 'armed');
+    assert.match(await act('A', 'confirm').innerText(), /^Confirm power on A \(\d\)$/);
+    await page.waitForTimeout(700);
+    await act('A', 'confirm').click();
+    await settled('A', 'done');
+    assert.deepEqual(sent(), [{ slot: 'P1', cmd: 'power', arg: 1, expectedTargets: [{ slot: 'P1', revision: await revision('P1') }] }]);
+    assert.match(await msg('A'), /^Reported (WARMING|ON) at \d+:\d\d [AP]M\.$/);
+    await page.locator('.pc-card[data-lane="A"] .pc-state', { hasText: /^ON$/ }).waitFor({ timeout: 15000 });
+
+    // Power off uses the relay's own confirmation: the first tap asks, the second sends, inside three seconds.
+    posts.length = 0;
+    await act('A', 'power-off').click();
+    await settled('A', 'relay-armed');
+    assert.match(await act('A', 'confirm').innerText(), /^Confirm power off A \(\d\)$/);
+    assert.match(await card('A').locator('.pc-confirm__text').innerText(), /^The relay is ready\. Nothing sent to the projector yet\./);
+    assert.equal(sent().length, 1);
+    assert.equal(sent()[0].confirm, undefined, 'the first request carries no confirmation');
+    assert.equal((await reading()).P1.power, 'on', 'nothing has reached the projector');
+    await page.waitForTimeout(700);
+    await act('A', 'confirm').click();
+    await settled('A', 'done');
+    assert.deepEqual([sent().length, typeof sent()[1].confirm, sent()[1].cmd, sent()[1].arg], [2, 'string', 'power', 0]);
+    assert.match(await msg('A'), /^Reported (COOLING|OFF) at \d+:\d\d [AP]M\.$/);
+    // Left alone, the relay's confirmation runs out and nothing is sent.
+    posts.length = 0;
+    await act('C', 'power-off').click();
+    await settled('C', 'relay-armed');
+    await settled('C', 'note');
+    assert.equal(await msg('C'), 'Not sent: confirm timed out.');
+    assert.deepEqual([sent().length, (await reading()).P3.power], [1, 'on']);
+
+    // All lanes: the first step lists exactly who gets it and who is skipped; the second sends one command per lane.
+    posts.length = 0;
+    await act('ALL', 'shutter-close').click();
+    await settled('ALL', 'armed');
+    assert.match(await act('ALL', 'confirm').innerText(), /^Confirm close shutter B and C \(\d\)$/);
+    assert.match(await card('ALL').locator('.pc-confirm__text').innerText(), /^Nothing sent yet\. Goes to B and C\. Skipping A: reports (COOLING|OFF), so no shutter move · D: relay can't reach it\. Use the remote\. Shared sign-in/);
+    await shot(page, '02-tablet-control-all-lanes-armed');
+    await page.waitForTimeout(700);
+    await act('ALL', 'confirm').click();
+    await settled('ALL', 'done');
+    assert.deepEqual(sent().map(body => [body.slot, body.cmd, body.arg, body.expectedTargets.length]).sort(), [['P2', 'shutter', 1, 1], ['P3', 'shutter', 1, 1]], 'one command per lane, never a group target');
+    assert.match(await msg('ALL'), /^\d+:\d\d [AP]M · Close shutter: B and C reported CLOSED$/);
+    assert.equal(await card('ALL').locator('[data-fact="closed"] dd').innerText(), '2');
+    await act('ALL', 'shutter-open').click();
+    await page.waitForTimeout(700);
+    await act('ALL', 'confirm').click();
+    await page.locator('.pc-card[data-lane="C"] [data-fact="shutter"] dd', { hasText: /^OPEN$/ }).waitFor();
+    await page.locator('.pc-card[data-lane="B"] [data-fact="shutter"] dd', { hasText: /^OPEN$/ }).waitFor();
+
+    // Show Lock: one-lane shutters stay; power, every all-lanes action, the MIDI test and the setup check lock.
     await relay.api('lock', { lock: true });
     await page.locator('#sb-lock[data-lock="on"]').waitFor();
     assert.equal(await page.locator('#sb-lock').innerText(), 'Show Lock ON');
-    await armButton('B').click();
-    await page.waitForTimeout(650);
-    await confirmButton('B').click();
-    await lane('B').locator('.sb-lane__why', { hasText: /^Reported OPEN at / }).waitFor({ timeout: 10000 });
-    assert.deepEqual([posts.length, posts[1].body.cmd, posts[1].body.arg], [2, 'shutter', 0]);
-
-    // Go or no-go detail and the snapshot.
-    await tile('cues').click();
-    const detail = page.locator('#sb-detail');
-    assert.equal(await detail.evaluate(node => node.open), true);
-    assert.match(await detail.innerText(), /Cue link[\s\S]*Not connected[\s\S]*This page cannot tell[\s\S]*Whether the console sent a cue/);
-    await detail.locator('[data-close]').click();
-    assert.equal(await page.evaluate(() => document.activeElement?.dataset.check), 'cues', 'focus returns to the tile');
-    await page.locator('#sb-help').click();
-    const snapshot = await page.locator('#sb-snapshot-text').inputValue();
-    assert.match(snapshot, /^Projection snapshot, .*\(SIMULATION, not the real rig\)\n/);
-    assert.match(snapshot, /\nA SL Portal: no reading \(last reply [^)]*\)\. Check by eye\.\n/);
-    assert.match(snapshot, /\nB Top Portal: ON, shutter OPEN, reply [^.]+\. No alarms reported\.\n/);
-    assert.match(snapshot, /\nCue link: not connected\./);
-    assert.match(snapshot, /\nShow Lock: on\.\n/);
-    assert.match(snapshot, /\nLast move from this page: Open shutter B, .*projector reported open\.$/);
-    assert.doesNotMatch(snapshot, /undefined|null|NaN|\[object/);
-    await page.locator('#sb-snapshot-status[data-state="ok"]').waitFor();
-    assert.equal(await page.evaluate(() => navigator.clipboard.readText()), snapshot);
-    assert.match(await page.locator('#sb-snapshot-sms').getAttribute('href'), /^sms:\?&body=Projection%20snapshot/);
-    await shot(page, '03-tablet-snapshot');
-    await page.locator('#sb-snapshot [data-close]').click();
+    assert.deepEqual(await card('B').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => b.getAttribute('aria-disabled'))), ['true', 'true', 'true', 'false']);
+    assert.match(await act('B', 'power-off').getAttribute('aria-label'), /Blocked: Show Lock is on\. Power is locked\.$/);
+    assert.deepEqual(await card('ALL').locator('.pc-actions [data-act]').evaluateAll(buttons => buttons.map(b => b.getAttribute('aria-disabled'))), ['true', 'true', 'true', 'true']);
+    assert.equal(await msg('ALL'), 'Show Lock is on. All-lanes actions are locked.');
+    posts.length = 0;
+    await act('ALL', 'shutter-close').click();
+    await act('B', 'power-off').click();
+    assert.equal(await msg('B'), 'Power off is blocked. Show Lock is on. Power is locked.');
+    assert.deepEqual(sent(), []);
+    await act('B', 'shutter-close').click();
+    await page.waitForTimeout(700);
+    await act('B', 'confirm').click();
+    await settled('B', 'done');
+    assert.deepEqual(sent().map(body => [body.slot, body.cmd, body.arg]), [['P2', 'shutter', 1]], 'a one-lane shutter still works under Show Lock');
+    await act('B', 'shutter-open').click();
+    await page.waitForTimeout(700);
+    await act('B', 'confirm').click();
+    await page.locator('.pc-card[data-lane="B"] [data-fact="shutter"] dd', { hasText: /^OPEN$/ }).waitFor();
+    await page.locator('#t-setup').click();
+    assert.deepEqual([await page.locator('#sb-setup-run').getAttribute('aria-disabled'), await page.locator('#sb-setup-why').innerText()], ['true', 'Show Lock is on. The setup check is locked.']);
+    await page.locator('#sb-setup-run').click();
+    assert.equal(await page.locator('#sb-setup-summary').innerText(), 'Not run yet.');
+    await page.locator('#t-midi').click();
+    assert.deepEqual([await page.locator('#sb-midi-start').getAttribute('aria-disabled'), await page.locator('#sb-midi-text').innerText()], ['true', 'Show Lock is on. The MIDI test is locked.']);
+    await page.locator('#sb-midi-start').click();
+    assert.equal(await page.locator('#sb-midi-title').innerText(), 'Not run yet');
     await relay.api('lock', { lock: false });
     await page.locator('#sb-lock[data-lock="off"]').waitFor();
 
-    // Keyboard: the skip link is first, every control shows a focus ring, a blocked button still explains itself.
-    assert.equal(await page.evaluate(() => document.body.querySelector('a[href], button, [tabindex]')?.className), 'sb-skip');
-    await armButton('A').focus();
-    assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('aria-describedby')), 'sb-lane-A-why');
-    await page.keyboard.press('Tab'); await page.keyboard.press('Shift+Tab');
-    assert.notEqual(await armButton('A').evaluate(node => getComputedStyle(node).outlineStyle), 'none');
+    // ---- Tabs: pointer, keyboard, and the address keeps the open tab.
+    assert.equal(new URL(page.url()).hash, '#midi');
+    await page.locator('#t-control').click();
+    assert.equal(await page.evaluate(() => document.activeElement?.id), 'control', 'a tab click moves focus to its panel');
+    await page.locator('#t-control').focus();
+    await page.keyboard.press('ArrowRight');
+    assert.deepEqual([await page.locator('#t-setup').getAttribute('aria-selected'), await page.locator('#setup').isVisible(), await page.locator('#control').isVisible(), new URL(page.url()).hash], ['true', true, false, '#setup']);
+    await page.keyboard.press('End');
+    assert.deepEqual([await page.evaluate(() => document.activeElement?.id), new URL(page.url()).hash], ['t-know', '#know']);
+    await page.keyboard.press('ArrowRight');
+    assert.equal(new URL(page.url()).hash, '#control', 'the arrow keys wrap');
+    await page.keyboard.press('Home');
+    await page.goBack();
+    assert.deepEqual([new URL(page.url()).hash, await page.locator('#t-know').getAttribute('aria-selected')], ['#know', 'true'], 'Back returns to the tab before');
+    assert.deepEqual(await page.locator('[role=tab]').evaluateAll(tabs => tabs.map(tab => tab.tabIndex)), [-1, -1, -1, 0]);
 
-    // Fit: every size, both themes, both small-screen views, and the taller armed state.
+    // ---- Setup check: one press, a reading on every line, and nothing sent to a projector.
+    posts.length = 0;
+    await page.locator('#t-setup').click();
+    assert.equal(await page.locator('#sb-setup-run').getAttribute('aria-disabled'), 'false');
+    await page.locator('#sb-setup-run').click();
+    await page.locator('.sb-line[data-line="relay"]').waitFor();
+    const line = async id => [await page.locator(`.sb-line[data-line="${id}"]`).getAttribute('data-state'), await page.locator(`.sb-line[data-line="${id}"] .sb-line__state`).innerText(), await page.locator(`.sb-line[data-line="${id}"] .sb-line__reading`).innerText()];
+    assert.match(await page.locator('#sb-setup-summary').innerText(), /^\d+ pass · \d+ fail · \d+ cannot check · checked \d+:\d\d:\d\d [AP]M$/);
+    assert.match((await line('relay'))[2], /^Answering, release [\d.]+, up since \d+:\d\d [AP]M$/);
+    assert.deepEqual((await line('relay')).slice(0, 2), ['pass', 'PASS']);
+    assert.deepEqual(await line('lock'), ['reading', 'READING', 'Off']);
+    assert.deepEqual((await line('B-reach')).slice(0, 2), ['pass', 'PASS']);
+    assert.deepEqual([await line('B-power'), await line('B-shutter'), await line('B-pattern'), await line('B-link')], [['pass', 'PASS', 'ON'], ['pass', 'PASS', 'OPEN'], ['pass', 'PASS', 'Off'], ['reading', 'READING', 'Simulator']]);
+    assert.ok(['pass', 'cannot'].includes((await line('B-input'))[0]), 'the input is judged only against a preferred input');
+    assert.deepEqual((await line('D-reach'))[0], 'fail');
+    assert.match((await line('D-reach'))[2], /^Relay can't reach it\. Use the remote\. /);
+    assert.deepEqual([await line('D-power'), await line('D-shutter')], [['cannot', 'CANNOT CHECK', 'Lane not reachable'], ['cannot', 'CANNOT CHECK', 'Lane not reachable']]);
+    assert.deepEqual((await line('A-power')).slice(0, 2), ['fail', 'FAIL']);
+    assert.deepEqual(await line('displays'), ['cannot', 'CANNOT CHECK', 'Reader is off in simulation']);
+    assert.deepEqual((await line('listener')).slice(0, 2), ['pass', 'PASS']);
+    assert.match((await line('listener'))[2], /^Running, last row (just now|\ds ago), 2 MIDI sources$/);
+    for (const id of ['playback-app', 'midi-interface', 'computer-awake']) assert.deepEqual(await line(id), ['cannot', 'CANNOT CHECK', 'No provider is configured for this check.']);
+    assert.deepEqual(await page.locator('.sb-group__h').allInnerTexts(), ['Relay and show computer', 'Lane A · SL Portal', 'Lane B · Top Portal', 'Lane C · Stage', 'Lane D · SR Portal', 'Displays', 'Cues']);
+    assert.equal(await page.locator('.sb-line').count(), 2 + 4 * 6 + 1 + 1 + 3);
+    assert.deepEqual(sent(), [], 'the setup check sends no command');
+    assert.equal(await page.locator('#sb-setup-run').innerText(), 'Run setup check again');
+    await shot(page, '03-tablet-setup-check');
+
+    // ---- MIDI test: the page waits for cue 999 from the console. It sends nothing.
+    await page.locator('#t-midi').click();
+    assert.deepEqual([await page.locator('#sb-feed-title').innerText(), await page.locator('#sb-last-title').innerText()], ['Listening', 'No cue heard yet']);
+    assert.match(await page.locator('#sb-midi-text').innerText(), /^Tap Start, then fire cue 999 on the console inside 30 seconds\.$/);
+    fs.appendFileSync(observer, midiRows(msc('999'))); // a cue 999 from before the tap must never count
+    await page.locator('#sb-last-title', { hasText: 'Cue 999, list 1' }).waitFor({ timeout: 10000 });
+    await page.locator('#sb-midi-start').click();
+    await page.locator('#sb-midi-test[data-state="eye"]').waitFor();
+    assert.equal(await page.locator('#sb-midi-title').innerText(), 'Fire cue 999 on the console now');
+    assert.match(await page.locator('#sb-midi-stop').innerText(), /^Stop test \(\d+\)$/);
+    assert.equal(await page.evaluate(() => document.activeElement?.id), 'sb-midi-stop');
+    assert.deepEqual(await page.locator('.sb-step').evaluateAll(steps => steps.map(step => step.dataset.state)), ['wait', 'idle']);
+    await shot(page, '04-tablet-midi-waiting');
+    fs.appendFileSync(observer, midiRows(msc('12')) + midiRows(msc('999', 2))); // another cue, and a STOP for 999: neither passes it
+    await page.waitForTimeout(2500);
+    assert.equal(await page.locator('#sb-midi-title').innerText(), 'Fire cue 999 on the console now');
+    fs.appendFileSync(observer, midiRows(msc('999')));
+    await page.locator('#sb-midi-test[data-state="ok"]').waitFor({ timeout: 10000 });
+    assert.equal(await page.locator('#sb-midi-title').innerText(), 'Pass: the cue arrived');
+    assert.match(await page.locator('#sb-midi-text').innerText(), /^Cue 999 arrived at \d+:\d\d:\d\d [AP]M from Console A\. Now fire the clear cue 999\.5\. Waiting \d+ s\.$/);
+    assert.match(await page.locator('#sb-midi-hint').innerText(), /^An arrival is not a picture\..*check the playback app\.$/);
+    assert.match(await page.locator('.sb-step').first().innerText(), /Cue 999 arrives\s+Pass · \d+:\d\d:\d\d [AP]M · from Console A/);
+    await shot(page, '05-tablet-midi-pass');
+    fs.appendFileSync(observer, midiRows(msc('999.5')));
+    await page.locator('#sb-midi-title', { hasText: 'Pass: cue and clear both arrived' }).waitFor({ timeout: 10000 });
+    assert.deepEqual(await page.locator('.sb-step').evaluateAll(steps => steps.map(step => step.dataset.state)), ['pass', 'pass']);
+    assert.equal(await page.locator('#sb-midi-start').innerText(), 'Start MIDI test again');
+    assert.equal(await page.locator('#sb-last-title').innerText(), 'Cue 999.5, list 1');
+    assert.match(await page.locator('#sb-last-text').innerText(), /^\d+:\d\d:\d\d [AP]M · from Console A · /);
+    assert.deepEqual((await page.locator('.sb-recent__row strong').allInnerTexts()).slice(0, 5), ['Cue 999.5, list 1', 'Cue 999, list 1', 'STOP cue 999, list 1', 'Cue 12, list 1', 'Cue 999, list 1'], 'newest first');
+    assert.match(await chip('cues').getAttribute('aria-label'), /^Cue link: OK\. Cue 999\.5, list 1\. Heard \d+:\d\d [AP]M from Console A · not proof that video followed\.$/);
+    assert.equal(await chip('cues').locator('.sb-check__value').innerText(), 'Cue 999.5');
+    assert.deepEqual(posts.filter(post => post.path !== '/api/command'), [], 'the MIDI test posts nothing');
+    // Stop ends a test with no result.
+    await page.locator('#sb-midi-start').click();
+    await page.locator('#sb-midi-stop').click();
+    assert.deepEqual([await page.locator('#sb-midi-title').innerText(), await page.locator('#sb-midi-text').innerText()], ['Test stopped', 'Stopped before a cue arrived. No result.']);
+
+    // ---- Know: the invented sample set, a zoomable diagram, documents as text, and the notes link.
+    await page.locator('#t-know').click();
+    await page.locator('.sb-know__item').first().waitFor();
+    assert.equal(await page.locator('#sb-know-status').innerText(), '4 items · sample set for the simulator, not a real rig');
+    assert.deepEqual(await page.locator('#sb-know-list li').allInnerTexts().then(rows => rows.map(row => row.replace(/\s+/g, ' ').trim())), ['DIAGRAMS', 'Sample signal flow DIAGRAM', 'DOCUMENTS', 'Sample recovery steps DOCUMENT', 'Sample cue notes TEXT', 'Sample output map DATA']);
+    assert.equal(await page.locator('#sb-know-tools').isVisible(), false);
+    await page.locator('.sb-know__item', { hasText: 'Sample signal flow' }).click();
+    const image = page.locator('#sb-know-stage img');
+    await page.waitForFunction(() => document.querySelector('#sb-know-stage img')?.naturalWidth === 960);
+    assert.deepEqual([await page.locator('#sb-know-title').innerText(), await page.locator('#sb-know-stage').getAttribute('data-mode'), await page.locator('#sb-know-stage').getAttribute('data-zoom'), await image.getAttribute('alt')], ['Sample signal flow', 'diagram', 'fit', 'Sample signal flow']);
+    assert.equal(await page.locator('.sb-know__item[aria-current="true"]').innerText().then(text => text.split('\n')[0]), 'Sample signal flow');
+    const fitted = await image.evaluate(node => node.getBoundingClientRect().width), stageWidth = await page.locator('#sb-know-stage').evaluate(node => node.clientWidth);
+    assert.ok(fitted <= stageWidth + 1, 'fit keeps the whole diagram in the viewer');
+    await shot(page, '06-tablet-know-diagram');
+    await page.locator('[data-zoom="in"]').click();
+    await page.locator('[data-zoom="in"]').click();
+    assert.equal(await page.locator('#sb-know-stage').getAttribute('data-zoom'), 'scale');
+    const zoomed = await image.evaluate(node => node.getBoundingClientRect().width);
+    assert.ok(zoomed > stageWidth * 1.5, `zoomed diagram is larger than the viewer (${zoomed} in ${stageWidth})`);
+    const box = await page.locator('#sb-know-stage').boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down(); await page.mouse.move(box.x + box.width / 2 - 120, box.y + box.height / 2 - 40, { steps: 4 }); await page.mouse.up();
+    assert.ok(await page.locator('#sb-know-stage').evaluate(node => node.scrollLeft) >= 100, 'dragging pans the zoomed diagram');
+    assert.deepEqual(await page.evaluate(audit), CLEAN, 'a zoomed diagram scrolls inside its viewer, not the page');
+    await page.locator('[data-zoom="actual"]').click();
+    assert.deepEqual([Math.round(await image.evaluate(node => node.getBoundingClientRect().width)), await page.locator('[data-zoom="actual"]').getAttribute('aria-pressed')], [960, 'true']);
+    await page.locator('[data-zoom="fit"]').click();
+    assert.ok(Math.abs(await image.evaluate(node => node.getBoundingClientRect().width) - fitted) < 2);
+    await page.locator('.sb-know__item', { hasText: 'Sample recovery steps' }).click();
+    await page.locator('.sb-know__text h4').waitFor();
+    assert.deepEqual([await page.locator('.sb-know__text h4').innerText(), await page.locator('.sb-know__text h5').first().innerText(), await page.locator('#sb-know-tools').isVisible(), await page.locator('#sb-know-stage').getAttribute('data-mode')], ['Sample recovery steps', 'A lane goes dark', false, 'text']);
+    assert.match(await page.locator('.sb-know__text').innerText(), /3\. Shutter CLOSED: open it from the card\./);
+    await page.locator('.sb-know__item', { hasText: 'Sample output map' }).click();
+    await page.locator('.sb-know__text pre').waitFor();
+    assert.match(await page.locator('.sb-know__text pre').innerText(), /"surface": "SR Portal"/);
+    assert.equal(await page.locator('.sb-know__text script, .sb-know__text a, .sb-know__text img').count(), 0, 'a document is text, never markup');
+    // Only files the manifest names are served.
+    assert.deepEqual(await page.evaluate(async () => Promise.all(['manifest.json', '../know/manifest.json', '..%2F..%2Fpackage.json', 'power-up.md'].map(async name => (await fetch(`api/know/file?f=${name}`)).status))), [404, 404, 404, 200]);
+    const link = page.locator('#sb-notes-link');
+    assert.deepEqual([await link.isVisible(), await link.getAttribute('href'), await link.getAttribute('target'), await link.getAttribute('rel')], [true, NOTES, '_blank', 'noopener noreferrer']);
+    assert.equal(await page.locator('#sb-notes-hint').innerText(), 'For notes that can wait. Not for emergencies or cue calls.');
+    assert.equal(await link.evaluate(node => !!node.closest('#know')), true, 'the notes link lives with the documents, away from every control');
+    await page.locator('#t-control').click();
+    assert.equal(await link.isVisible(), false);
+
+    // The shared sign-in note, and a strip item's explanation.
+    await page.locator('#sb-shared').click();
+    assert.match(await page.locator('#sb-shared-note').innerText(), /The relay records each command and its time\. It does not record who sent it\./);
+    await page.locator('#sb-shared-note [data-close]').click();
+    await chip('cues').click();
+    assert.match(await page.locator('#sb-detail').innerText(), /CUE LINK|Cue link/);
+    assert.match(await page.locator('#sb-detail').innerText(), /Whether the playback app followed the cue/);
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('#sb-detail').evaluate(node => node.open), false);
+
+    // A reload on a tab comes back to that tab.
+    await page.goto(`${relay.base}/show.html#setup`);
+    await page.locator('.pc-card[data-lane="B"][data-reach="live"]').waitFor({ state: 'attached' });
+    assert.deepEqual([await page.locator('#t-setup').getAttribute('aria-selected'), await page.locator('#setup').isVisible()], ['true', true]);
+
+    // ---- Fit: every tab at eight sizes in both themes, with real content on each.
+    await page.locator('#sb-setup-run').click();
+    await page.locator('.sb-line[data-line="relay"]').waitFor();
+    await page.locator('#t-know').click();
+    await page.locator('.sb-know__item', { hasText: 'Sample signal flow' }).click();
+    await page.waitForFunction(() => document.querySelector('#sb-know-stage img')?.naturalWidth === 960);
+    await page.locator('#sb-know-back').click({ force: true }).catch(() => {});
     for (const theme of ['light', 'dark']) for (const [width, height] of SIZES) {
       await page.setViewportSize({ width, height });
       await page.evaluate(mode => window.FrozenTheme.set(mode, { save: false }), theme);
-      for (const view of ['lanes', 'checks']) {
-        if (await page.locator(`[data-view-btn="${view}"]`).isVisible()) await page.locator(`[data-view-btn="${view}"]`).click();
-        else if (view === 'checks') continue; // a large screen shows both at once
-        const result = await page.evaluate(audit);
-        assert.deepEqual(result, { pageScrolls: false, outside: [], cut: [] }, `${theme} ${width}x${height} ${view}`);
+      const label = `${theme} ${width}x${height}`, solo = await page.locator('#pc-pick').isVisible().catch(() => false), key = `${width}x${height}`;
+      for (const tab of TABS) {
+        await page.locator(`#t-${tab}`).click();
+        await page.waitForTimeout(60);
+        assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} ${tab}`);
+        if (tab === 'control') {
+          assert.equal(await page.locator('#pc-pick').isVisible(), width < 700 || height < 520, `${label} one card at a time only on a small screen`);
+          if (await page.locator('#pc-pick').isVisible()) {
+            for (const pick of ['B', 'D', 'ALL', 'A']) {
+              await page.locator(`#pc-pick [data-pick="${pick}"]`).click();
+              assert.equal(await page.locator('.pc-card:visible').count(), 1);
+              assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} control card ${pick}`);
+            }
+            await page.locator('#pc-pick [data-pick="B"]').click();
+          } else assert.equal(await page.locator('.pc-card:visible').count(), 5);
+          // The armed state fits too: confirm, cancel and the note.
+          await act('B', 'shutter-close').click();
+          await settled('B', 'armed');
+          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} control armed`);
+          if (theme === 'light' && key === '375x812') await shot(page, '11-phone-control-armed');
+          await act('B', 'cancel').click();
+          await act('ALL', 'shutter-close').isVisible() && await act('ALL', 'shutter-close').click().then(async () => { await settled('ALL', 'armed'); assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} all lanes armed`); await act('ALL', 'cancel').click(); });
+        }
+        if (tab === 'know' && await page.locator('#sb-know-back').isVisible().catch(() => false) === false && (width < 700 || height < 520)) {
+          await page.locator('.sb-know__item', { hasText: 'Sample signal flow' }).click();
+          await page.locator('#sb-know-back').waitFor();
+          assert.deepEqual(await page.evaluate(audit), CLEAN, `${label} know viewer`);
+          if (theme === 'light' && key === '375x812') await shot(page, '14-phone-know-diagram');
+          await page.locator('#sb-know-back').click();
+          assert.equal(await page.locator('#sb-know-list').isVisible(), true);
+        }
+        if (theme === 'light' && key === '768x1024') await shot(page, `2${TABS.indexOf(tab)}-tablet-portrait-${tab}`);
+        if (theme === 'dark' && key === '1024x768') await shot(page, `3${TABS.indexOf(tab)}-tablet-landscape-${tab}-dark`);
+        if (theme === 'light' && key === '375x812') await shot(page, `1${TABS.indexOf(tab)}-phone-${tab}`);
+        if (theme === 'dark' && key === '375x812') await shot(page, `4${TABS.indexOf(tab)}-phone-${tab}-dark`);
+        if (theme === 'light' && key === '844x390') await shot(page, `5${TABS.indexOf(tab)}-phone-landscape-${tab}`);
+        if (theme === 'light' && key === '320x256') await shot(page, `6${TABS.indexOf(tab)}-tiny-${tab}`);
+        if (theme === 'light' && key === '1440x900') await shot(page, `7${TABS.indexOf(tab)}-laptop-${tab}`);
+        if (theme === 'light' && key === '2560x720') await shot(page, `8${TABS.indexOf(tab)}-ultrawide-${tab}`);
       }
-      if (await page.locator('[data-view-btn="lanes"]').isVisible()) await page.locator('[data-view-btn="lanes"]').click();
-      if (await page.locator('[data-pick="B"]').isVisible()) await page.locator('[data-pick="B"]').click();
-      await armButton('B').click();
-      assert.deepEqual(await page.evaluate(audit), { pageScrolls: false, outside: [], cut: [] }, `${theme} ${width}x${height} armed`);
-      if (theme === 'dark' && width === 375 && height === 812) await shot(page, '06-phone-375x812-dark-armed');
-      await cancelButton('B').click();
-      if (width === 1024) await shot(page, `04-tablet-1024x768-${theme}`);
-      if (width === 768) await shot(page, `05-tablet-768x1024-${theme}`);
-      if (width === 375 && height === 812) {
-        await shot(page, `07-phone-375x812-${theme}-lanes`);
-        await page.locator('[data-view-btn="checks"]').click();
-        await shot(page, `08-phone-375x812-${theme}-checks`);
-        await page.locator('[data-view-btn="lanes"]').click();
-      }
-      if (width === 844) await shot(page, `09-phone-landscape-844x390-${theme}`);
-      if (width === 320) await shot(page, `10-zoomed-320x256-${theme}`);
-      if (width === 2560) await shot(page, `11-ultrawide-2560x720-${theme}`);
-      if (width === 1440) await shot(page, `12-desktop-1440x900-${theme}`);
+      // Tabs are a bottom rail on a phone and along the top otherwise.
+      const tabsTop = await page.locator('.sb-tabs').evaluate(node => node.getBoundingClientRect().top), panelTop = await page.locator('#sb-main').evaluate(node => node.getBoundingClientRect().top);
+      assert.equal(tabsTop > panelTop, solo, `${label} tab rail position`);
+      // On a small screen the MIDI explanation moves behind a button, and its dialog fits.
+      await page.locator('#t-midi').click();
+      if (await page.locator('#sb-midi-more').isVisible()) {
+        assert.equal(await page.locator('#sb-midi-text').isVisible(), false);
+        await page.locator('#sb-midi-more').click();
+        assert.match(await page.locator('#sb-midi-detail').innerText(), /This page sends no MIDI\./);
+        assert.equal((await page.evaluate(audit)).pageScrolls, false);
+        await page.locator('#sb-midi-detail [data-close]').click();
+      } else assert.equal(await page.locator('#sb-midi-text').isVisible(), true);
     }
     await page.setViewportSize({ width: 1024, height: 768 });
-    await armButton('C').click();
-    await lane('C').locator('.sb-lane__why', { hasText: 'Not sent: confirm timed out.' }).waitFor({ timeout: 9000 });
-    assert.equal(await armButton('C').isVisible(), true);
-    assert.equal(posts.length, 2, 'layout checks and a timed-out confirm sent nothing');
-    assert.ok(posts.every(post => post.path === '/api/command' && post.body.cmd === 'shutter'), 'the page only ever sends a shutter command');
-    assert.deepEqual(foreign, [], 'no request leaves the relay');
-    assert.deepEqual(errors, []);
+    assert.deepEqual(foreign, [], 'the page asks nothing of any other host, the notes address included');
+    assert.deepEqual(errors, [], 'no page or console errors');
     await context.close();
 
-    // ---- A scripted relay: display reports, alarms, stale replies, a wrong device clock and a lost relay.
+    // ---- A scripted relay: the control-port link, flags, stale replies, refusals, clock skew, a lost relay and an older relay.
     const base = await relay.state();
-    const scripted = async ({ displays, skewMs = 0, lostStatus = 0 }) => {
+    const scripted = async ({ skewMs = 0, lostStatus = 0, command, feed, older = false, hash = '', fakeClock = false, edit } = {}) => {
       const ctx = await browser.newContext({ viewport: { width: 1024, height: 768 } });
       const tab = await ctx.newPage();
-      const state = structuredClone(base), sent = [], relayNow = () => Date.now() + skewMs;
+      let advanced = 0;
+      if (fakeClock) await tab.clock.install({ time: Date.now() });
+      const state = structuredClone(base), sentHere = [], relayNow = () => Date.now() + skewMs + advanced;
       const stamp = (p, ageMs = 500) => { p.status = { ...p.status, updatedAt: new Date(relayNow() - ageMs).toISOString(), connection: { ...p.status.connection, lastSuccessAt: new Date(relayNow() - ageMs).toISOString() } }; };
+      state.lock = false;
       for (const p of state.projectors) if (p.status.online) stamp(p);
+      edit?.(state, stamp);
       let socket, live = true;
       await tab.routeWebSocket('**/ws', ws => {
         if (!live) { ws.close(); return; }
@@ -215,157 +454,153 @@ const audit = () => {
         ws.send(JSON.stringify(state));
         ws.send(JSON.stringify({ type: 'heartbeat', at: new Date(relayNow()).toISOString() }));
       });
-      await tab.route('**/api/host-displays', route => route.fulfill({ json: displays }));
+      const missing = route => route.fulfill({ status: 404, body: 'not found' });
+      await tab.route('**/api/host-displays', route => route.fulfill({ json: { scope: 'relay-computer', state: 'reported', collectedAt: new Date(relayNow()).toISOString(), reason: null, displays: Array.from({ length: 5 }, (_, i) => ({ id: `d${i}`, online: true, main: i === 0, mirror: false, resolution: '1920 x 1080 @ 60.00Hz' })) } }));
       await tab.route('**/api/state', route => lostStatus ? route.fulfill({ status: lostStatus, json: { error: 'login required' } }) : route.fulfill({ json: state }));
-      await tab.route('**/api/command', route => { sent.push(route.request().postDataJSON()); return route.fulfill({ json: { error: 'not expected in this test' }, status: 500 }); });
-      await tab.goto(`${relay.base}/show.html`);
-      await tab.locator('.sb-lane[data-lane="C"][data-reach="live"]').waitFor();
+      await tab.route('**/api/command', route => { const body = route.request().postDataJSON(); sentHere.push(body); return command ? command(route, body) : route.fulfill({ status: 500, json: { error: 'not expected in this test' } }); });
+      await tab.route('**/api/cue-feed', route => older ? missing(route) : route.fulfill({ json: feed ? feed(relayNow()) : { feedId: 'scripted', state: 'not-configured', seq: 0, lastCue: null, recent: [] } }));
+      await tab.route('**/api/host-checks', route => older ? missing(route) : route.fulfill({ json: { checks: [] } }));
+      await tab.route('**/api/know**', route => older ? missing(route) : route.fulfill({ json: { state: 'not-configured', sample: false, items: [] } }));
+      await tab.route('**/api/crew-links', route => older ? missing(route) : route.fulfill({ json: { notes: null, state: 'not-configured' } }));
+      await tab.goto(`${relay.base}/show.html${hash}`);
+      await tab.locator('.pc-card[data-lane="C"][data-reach="live"]').waitFor({ state: 'attached' });
       const push = (slot, change, ageMs) => { const p = state.projectors.find(x => x.slot === slot); Object.assign(p.status, change); stamp(p, ageMs); socket.send(JSON.stringify({ type: 'status', slot, status: p.status })); };
+      const pulse = () => { for (const p of state.projectors) if (p.status.online) { stamp(p); socket.send(JSON.stringify({ type: 'status', slot: p.slot, status: p.status })); } socket.send(JSON.stringify({ type: 'heartbeat', at: new Date(relayNow()).toISOString() })); };
+      const forward = async ms => { advanced += ms; await tab.clock.fastForward(ms); };
       const drop = () => { live = false; socket.close(); };
-      return { ctx, tab, push, drop, sent, relayNow };
+      const at = id => tab.locator(`.pc-card[data-lane="${id}"]`);
+      return { ctx, tab, push, pulse, forward, drop, sent: sentHere, relayNow, at };
     };
-    const reported = count => ({ scope: 'relay-computer', state: 'reported', collectedAt: new Date().toISOString(), reason: null,
-      displays: Array.from({ length: count }, (_, i) => ({ id: `display-${i + 1}`, name: `Display ${i + 1}`, online: true, main: i === 0, mirror: false })) });
-    const tileOf = async (tab, id) => [await tab.locator(`.sb-check[data-check="${id}"]`).getAttribute('data-state'), await tab.locator(`.sb-check[data-check="${id}"] .sb-check__value`).innerText()];
 
-    let run = await scripted({ displays: reported(5) });
-    await run.tab.locator('.sb-check[data-check="outputs"][data-state="ok"]').waitFor();
-    assert.deepEqual(await tileOf(run.tab, 'outputs'), ['ok', '4 outputs + main']);
-    assert.match(await run.tab.locator('.sb-check[data-check="outputs"] .sb-check__note').innerText(), /^Windows not reported/);
-    run.push('P3', { errors: { fan: 0, lamp: 2, temp: 0, cover: 0, filter: 0, other: 0 } });
-    await run.tab.locator('.sb-lane[data-lane="C"][data-tone="attention"]').waitFor();
-    assert.equal(await run.tab.locator('.sb-lane[data-lane="C"] .sb-lane__alarm').innerText(), 'Lamp error reported');
-    assert.equal(await run.tab.locator('#sb-verdict').getAttribute('data-state'), 'attention');
-    await shot(run.tab, '13-tablet-attention-lamp-error');
-    for (const [width, height] of [[375, 667], [844, 390], [320, 256]]) {
-      await run.tab.setViewportSize({ width, height });
-      if (await run.tab.locator('[data-pick="C"]').isVisible()) await run.tab.locator('[data-pick="C"]').click();
-      assert.deepEqual(await run.tab.evaluate(audit), { pageScrolls: false, outside: [], cut: [] }, `alarm ${width}x${height}`);
-    }
-    await run.tab.setViewportSize({ width: 1024, height: 768 });
-    // Arm, then let the reading go stale: the armed move is withdrawn and nothing is sent.
-    run.push('P3', { errors: { fan: 0, lamp: 0, temp: 0, cover: 0, filter: 0, other: 0 } });
-    await run.tab.locator('.sb-lane[data-lane="C"][data-tone="ok"]').waitFor();
-    await run.tab.locator('.sb-lane[data-lane="C"] [data-act=arm]').click();
+    // The control port is named and tagged unproven; a wrong input and a pattern left on are flagged.
+    let run = await scripted({ edit: state => {
+      const [a, b, c] = ['P1', 'P2', 'P3'].map(slot => state.projectors.find(p => p.slot === slot));
+      Object.assign(a, { driver: 'panasonic' }); Object.assign(a.status, { power: 'on', shutter: 'open', input: null, errors: null, pattern: '00', controlLink: 'control-port' });
+      Object.assign(b, { inputs: { 31: 'HDMI 1', 32: 'SDI 1' }, inputPreference: { available: true, value: '31', label: 'HDMI 1' } }); Object.assign(b.status, { input: '32' });
+      Object.assign(c, { patterns: { '00': 'Off', '08': 'Crosshatch' } }); Object.assign(c.status, { pattern: '08' });
+    } });
+    assert.deepEqual([await run.at('A').locator('[data-fact="link"] dd').innerText(), await run.at('A').locator('[data-fact="link"]').getAttribute('data-flag'), await run.at('A').locator('[data-fact="input"] dd').innerText()], ['Control port · unproven', '', 'Not reported']);
+    assert.match(await run.at('A').locator('[data-fact="link"]').getAttribute('title'), /have not been proven on a rig yet/);
+    assert.deepEqual([await run.at('B').locator('[data-fact="input"] dd').innerText(), await run.at('B').locator('[data-fact="input"]').getAttribute('data-flag'), await run.at('B').getAttribute('data-tone')], ['SDI 1 · expected hdmi 1', '', 'attention']);
+    assert.deepEqual([await run.at('C').locator('[data-fact="pattern"] dd').innerText(), await run.at('C').getAttribute('data-tone')], ['ON · Crosshatch', 'attention']);
+    assert.match(await run.tab.locator('.sb-check[data-check="lanes"]').getAttribute('aria-label'), /B input SDI 1 · C test pattern on/);
+    assert.match(await run.tab.locator('.sb-check[data-check="outputs"]').getAttribute('aria-label'), /^Outputs: OK\. 4 outputs \+ main\./);
+    assert.match(await run.tab.locator('.sb-check[data-check="cues"]').getAttribute('aria-label'), /^Cue link: No reading\. Not connected\./);
+    await shot(run.tab, '09-tablet-control-port-and-flags');
+    // A reply that goes stale while an action is armed withdraws it, and nothing is sent.
+    await run.at('C').locator('[data-act="shutter-close"]').click();
+    await run.tab.locator('.pc-card[data-lane="C"][data-phase="armed"]').waitFor();
     run.push('P3', {}, 60000);
-    await run.tab.locator('.sb-lane[data-lane="C"][data-reach="stale"]').waitFor();
-    assert.equal(await run.tab.locator('.sb-lane[data-lane="C"] .sb-lane__state').innerText(), 'CHECK BY EYE');
-    assert.equal(await run.tab.locator('.sb-lane[data-lane="C"] .sb-lane__why').innerText(), 'Not sent: the reading changed.');
-    assert.equal(await run.tab.locator('.sb-lane[data-lane="C"] [data-act=arm]').getAttribute('aria-disabled'), 'true');
-    // The relay goes away: nothing keeps reading as current, and the lock is unknown.
-    run.drop();
-    await run.tab.locator('.sb-lane[data-lane="B"][data-reach="relay-offline"]').waitFor();
-    assert.deepEqual(await tileOf(run.tab, 'computer'), ['attention', 'Not answering']);
-    assert.deepEqual(await tileOf(run.tab, 'outputs'), ['off', 'Unknown']);
-    assert.equal(await run.tab.locator('#sb-lock').innerText(), 'Show Lock unknown');
-    for (const id of ['A', 'B', 'C', 'D']) assert.equal(await run.tab.locator(`.sb-lane[data-lane="${id}"] .sb-lane__state`).innerText(), 'CHECK BY EYE');
-    await shot(run.tab, '14-tablet-relay-offline');
-    for (const [width, height] of [[375, 667], [844, 390], [320, 256]]) {
-      await run.tab.setViewportSize({ width, height });
-      assert.deepEqual(await run.tab.evaluate(audit), { pageScrolls: false, outside: [], cut: [] }, `relay offline ${width}x${height}`);
-    }
-    assert.deepEqual(run.sent, []);
+    await run.tab.locator('.pc-card[data-lane="C"][data-phase="note"]').waitFor();
+    assert.deepEqual([await run.at('C').locator('.pc-msg').innerText(), await run.at('C').locator('.pc-state').innerText(), run.sent.length], ['Not sent: the reading changed.', 'CHECK BY EYE', 0]);
     await run.ctx.close();
 
-    run = await scripted({ displays: reported(4) });
-    await run.tab.locator('.sb-check[data-check="outputs"][data-state="attention"]').waitFor();
-    assert.deepEqual(await tileOf(run.tab, 'outputs'), ['attention', '3 of 4 outputs']);
-    // A refusal from the relay is shown as a refusal, with the relay's own reason.
-    await run.tab.locator('.sb-lane[data-lane="B"] [data-act=arm]').click();
-    await run.tab.waitForTimeout(650);
-    await run.tab.locator('.sb-lane[data-lane="B"] [data-act=confirm]').click();
-    await run.tab.locator('.sb-lane[data-lane="B"][data-phase="error"]').waitFor();
-    assert.equal(await run.tab.locator('.sb-lane[data-lane="B"] .sb-lane__why').innerText(), 'Not done: not expected in this test');
-    assert.deepEqual(run.sent.map(body => [body.slot, body.cmd, body.arg]), [['P2', 'shutter', 1]]);
-    // No answer at all is different: the page does not claim the command was not sent.
-    await run.tab.unroute('**/api/command');
-    await run.tab.route('**/api/command', route => route.abort('connectionreset'));
-    await run.tab.locator('.sb-lane[data-lane="C"] [data-act=arm]').click();
-    await run.tab.waitForTimeout(650);
-    await run.tab.locator('.sb-lane[data-lane="C"] [data-act=confirm]').click();
-    await run.tab.locator('.sb-lane[data-lane="C"][data-phase="note"]').waitFor();
-    assert.equal(await run.tab.locator('.sb-lane[data-lane="C"] .sb-lane__why').innerText(), 'No answer from the relay. Check the lane by eye.');
+    // A refusal stays on the card in the relay's own words; a withdrawn confirm clears itself.
+    run = await scripted({ fakeClock: true, command: (route, body) => route.fulfill({ json: { [body.slot]: { error: 'ERR3 Unavailable at this time' } } }) });
+    await run.at('B').locator('[data-act="shutter-close"]').click();
+    await run.forward(700); run.pulse();
+    await run.at('B').locator('[data-act="confirm"]').click();
+    await run.tab.locator('.pc-card[data-lane="B"][data-phase="error"]').waitFor();
+    assert.match(await run.at('B').locator('.pc-msg').innerText(), /^\d+:\d\d [AP]M · Close shutter: Not done: ERR3 Unavailable at this time$/);
+    await run.at('C').locator('[data-act="shutter-close"]').click();
+    await run.tab.locator('.pc-card[data-lane="C"][data-phase="armed"]').waitFor();
+    await run.forward(6500); run.pulse();
+    await run.tab.locator('.pc-card[data-lane="C"][data-phase="note"]').waitFor();
+    assert.equal(await run.at('C').locator('.pc-msg').innerText(), 'Not sent: confirm timed out.');
+    for (let i = 0; i < 5; i++) { await run.forward(5000); run.pulse(); }
+    await run.tab.locator('.pc-card[data-lane="C"][data-phase="idle"]').waitFor();
+    assert.equal(await run.at('C').locator('.pc-msg').innerText(), '');
+    assert.match(await run.at('B').locator('.pc-msg').innerText(), /Not done: ERR3 Unavailable at this time$/, 'the refusal is still there');
+    assert.equal(await run.at('B').getAttribute('data-phase'), 'error');
+    await run.ctx.close();
+
+    // No answer is not a refusal: the page does not claim the command was not sent.
+    run = await scripted({ command: route => route.abort() });
+    await run.at('C').locator('[data-act="shutter-close"]').click();
+    await run.tab.waitForTimeout(700);
+    await run.at('C').locator('[data-act="confirm"]').click();
+    await run.tab.locator('.pc-card[data-lane="C"][data-phase="error"]').waitFor();
+    assert.match(await run.at('C').locator('.pc-msg').innerText(), /No answer from the relay\. Check the lane by eye\.$/);
+    await run.ctx.close();
+    // The relay's confirmation expiring between the two taps sends nothing and says so.
+    let asked = 0;
+    run = await scripted({ command: (route, body) => route.fulfill({ json: { [body.slot]: { confirm: `token-${++asked}`, targets: [body.slot], message: 'Tap again' } } }) });
+    await run.at('B').locator('[data-act="power-off"]').click();
+    await run.tab.locator('.pc-card[data-lane="B"][data-phase="relay-armed"]').waitFor();
+    await run.tab.waitForTimeout(700);
+    await run.at('B').locator('[data-act="confirm"]').click();
+    await run.tab.locator('.pc-card[data-lane="B"][data-phase="error"]').waitFor();
+    assert.match(await run.at('B').locator('.pc-msg').innerText(), /Confirm expired at the relay\. Nothing sent\.$/);
+    assert.deepEqual(run.sent.map(body => body.confirm), [undefined, 'token-1']);
     await run.ctx.close();
 
     // A device clock ten minutes off: ages are measured on the relay's clock, so fresh stays fresh.
     for (const skewMs of [600000, -600000]) {
-      run = await scripted({ displays: reported(5), skewMs });
+      run = await scripted({ skewMs });
       await run.tab.waitForTimeout(1500);
-      assert.equal(await run.tab.locator('.sb-lane[data-lane="B"]').getAttribute('data-reach'), 'live', `relay clock ${skewMs} ms from the device clock`);
-      assert.match(await run.tab.locator('.sb-lane[data-lane="B"] .sb-lane__fresh').innerText(), /^Reply (just now|\ds ago)$/);
+      assert.equal(await run.at('B').getAttribute('data-reach'), 'live', `relay clock ${skewMs} ms from the device clock`);
+      assert.match(await run.at('B').locator('.pc-fresh').innerText(), /^Reply (just now|\ds ago)$/);
       await run.ctx.close();
     }
 
-    // A relay restart ends the session: the page goes to the sign-in and comes back here afterwards.
-    run = await scripted({ displays: reported(5), lostStatus: 401 });
+    // A lost relay: every lane goes to "check by eye" and everything locks.
+    run = await scripted({});
     run.drop();
-    await run.tab.waitForURL(/\/login\.html\?next=%2Fshow\.html$/);
+    await run.tab.locator('.pc-card[data-lane="B"][data-reach="relay-offline"]').waitFor();
+    assert.deepEqual([await run.at('B').locator('.pc-state').innerText(), await run.at('B').locator('.pc-msg').innerText(), await run.tab.locator('#sb-lock').innerText()], ['CHECK BY EYE', 'Relay not answering. Use the remote.', 'Show Lock unknown']);
+    assert.equal(await run.tab.locator('.pc-btn[aria-disabled="false"]').count(), 0);
+    await run.tab.locator('#t-setup').click();
+    assert.equal(await run.tab.locator('#sb-setup-why').innerText(), 'Relay not answering.');
+    await run.ctx.close();
+    // A relay restart ends the session: the page goes to the sign-in and comes back to the same tab.
+    run = await scripted({ lostStatus: 401, hash: '#midi' });
+    run.drop();
+    await run.tab.waitForURL(/\/login\.html\?next=%2Fshow\.html%23midi$/);
     await run.ctx.close();
 
-    // Plain-http pages on a LAN address have no Clipboard API: the selection fallback still copies.
-    const lan = await browser.newContext({ viewport: { width: 375, height: 812 } });
-    await lan.grantPermissions(['clipboard-read', 'clipboard-write']);
-    const phone = await lan.newPage();
-    await phone.addInitScript(() => Object.defineProperty(window, 'isSecureContext', { get: () => false }));
-    await phone.goto(`${relay.base}/show.html`);
-    await phone.locator('.sb-lane[data-lane="B"][data-reach="live"]').waitFor();
-    assert.equal(await phone.evaluate(() => window.isSecureContext), false);
-    await phone.locator('#sb-help').click();
-    await phone.locator('#sb-snapshot-status[data-state="ok"]').waitFor();
-    assert.equal(await phone.evaluate(() => navigator.clipboard.readText()), await phone.locator('#sb-snapshot-text').inputValue());
-    assert.deepEqual(await phone.evaluate(audit), { pageScrolls: false, outside: [], cut: [] }, 'snapshot dialog on a phone');
-    await shot(phone, '15-phone-375x812-snapshot');
-    await lan.close();
+    // The MIDI test with nothing arriving: a timeout that points at the console side.
+    const listening = now => ({ feedId: 'scripted', state: 'listening', reason: null, seq: 0, staleAfterMs: 90000, now: new Date(now).toISOString(), lastRowAt: new Date(now - 1000).toISOString(), heartbeatAt: new Date(now - 1000).toISOString(), sources: 2, destinations: 2, sourceNames: ['Console A'], lastCue: null, recent: [], skippedLines: 0 });
+    run = await scripted({ fakeClock: true, hash: '#midi', feed: listening });
+    await run.tab.locator('#sb-feed-title', { hasText: 'Listening' }).waitFor();
+    await run.tab.locator('#sb-midi-start').click();
+    await run.tab.locator('#sb-midi-test[data-state="eye"]').waitFor();
+    for (let i = 0; i < 7; i++) { await run.forward(5000); run.pulse(); await run.tab.waitForTimeout(40); }
+    await run.tab.locator('#sb-midi-test[data-state="attention"]').waitFor();
+    assert.equal(await run.tab.locator('#sb-midi-title').innerText(), 'Timed out: cue 999 did not arrive');
+    assert.match(await run.tab.locator('#sb-midi-text').innerText(), /Check the console side: the cue on the console, the cable, and the MIDI interface\.$/);
+    assert.equal(await run.tab.locator('#sb-midi-hint').innerText(), 'The playback app is not the cause when nothing arrives.');
+    assert.deepEqual(await run.tab.locator('.sb-step').evaluateAll(steps => steps.map(step => step.dataset.state)), ['fail', 'idle']);
+    await shot(run.tab, '10-tablet-midi-timeout');
+    await run.ctx.close();
+    // The listener stopping during the wait is "no result", never a failed cue.
+    let stop = false;
+    run = await scripted({ fakeClock: true, hash: '#midi', feed: now => stop ? { ...listening(now), state: 'stopped', reason: 'No row from the listener inside the limit.', lastRowAt: new Date(now - 200000).toISOString() } : listening(now) });
+    await run.tab.locator('#sb-feed-title', { hasText: 'Listening' }).waitFor();
+    await run.tab.locator('#sb-midi-start').click();
+    await run.tab.locator('#sb-midi-test[data-state="eye"]').waitFor();
+    stop = true;
+    for (let i = 0; i < 7; i++) { await run.forward(5000); run.pulse(); await run.tab.waitForTimeout(40); }
+    await run.tab.locator('#sb-midi-title', { hasText: 'No result: the listener stopped' }).waitFor();
+    assert.match(await run.tab.locator('#sb-midi-text').innerText(), /This is not a failed cue\.$/);
+    assert.equal(await run.tab.locator('#sb-feed-title').innerText(), 'Listener stopped');
+    assert.equal(await run.tab.locator('#sb-midi-start').getAttribute('aria-disabled'), 'true');
+    await run.ctx.close();
 
-    // ---- Crew notes link, configured in the relay's private settings.
-    const NOTES = 'https://notes.example.test/crew';
-    const noted = await startRelay({}, { files: { 'crew-links.json': JSON.stringify({ notes: { url: NOTES } }) } });
-    try {
-      for (const [slot, laneId] of [['P1', 'A'], ['P2', 'B'], ['P3', 'C'], ['P4', 'D']]) await noted.api('projector', { slot, lane: laneId });
-      const ctx = await browser.newContext({ viewport: { width: 1024, height: 768 } });
-      const tab = await ctx.newPage();
-      const requests = [];
-      tab.on('request', request => requests.push(request.url()));
-      await tab.goto(`${noted.base}/show.html`);
-      const link = tab.locator('#sb-notes-link');
-      await link.waitFor();
-      assert.deepEqual([await link.getAttribute('href'), await link.getAttribute('target'), await link.getAttribute('rel')], [NOTES, '_blank', 'noopener noreferrer']);
-      assert.match(await link.innerText(), /^Notes/);
-      assert.equal(await tab.locator('#sb-notes-hint').innerText(), 'For notes that can wait. Not for emergencies or cue calls.');
-      assert.equal(await link.evaluate(node => node.closest('.sb-foot')), null, 'kept away from the help button in the footer');
-      assert.equal(await tab.locator('.sb-foot #sb-help').count(), 1);
-      await shot(tab, '16-tablet-notes-link');
-      for (const theme of ['light', 'dark']) for (const [width, height] of SIZES) {
-        await tab.setViewportSize({ width, height });
-        await tab.evaluate(mode => window.FrozenTheme.set(mode, { save: false }), theme);
-        if (await tab.locator('[data-view-btn="checks"]').isVisible()) await tab.locator('[data-view-btn="checks"]').click();
-        assert.equal(await link.isVisible(), true, `notes link shown ${width}x${height}`);
-        assert.deepEqual(await tab.evaluate(audit), { pageScrolls: false, outside: [], cut: [] }, `notes link ${theme} ${width}x${height}`);
-        if (width === 375 && height === 812) {
-          assert.equal(await tab.locator('#sb-notes-hint').innerText(), 'Can wait. Not for emergencies.');
-          if (theme === 'dark') await shot(tab, '17-phone-notes-link-checks-dark');
-          await tab.locator('[data-view-btn="lanes"]').click();
-          assert.equal(await link.isVisible(), false, 'the phone lanes view stays clear of it');
-        }
-      }
-      assert.ok(requests.length > 0 && requests.every(url => url.startsWith(noted.base) || url.startsWith('data:')), 'the page never requests the notes address');
-      await ctx.close();
-    } finally { await noted.close(); }
-    // An unusable answer, an older relay without the route, or a failed read all leave the link hidden.
-    for (const answer of [{ json: { notes: { url: 'javascript:alert(1)' }, state: 'configured' } }, { json: { notes: { url: 'https://user:secret@notes.example.test/' } } }, { json: { notes: null, state: 'invalid' } }, { status: 404, body: 'not found' }, { status: 500, json: { error: 'x' } }, { body: 'not json' }]) {
-      const ctx = await browser.newContext({ viewport: { width: 1024, height: 768 } });
-      const tab = await ctx.newPage();
-      let asked = 0;
-      await tab.route('**/api/crew-links', route => { asked++; return route.fulfill(answer); });
-      await tab.goto(`${relay.base}/show.html`);
-      await tab.locator('.sb-lane[data-lane="B"][data-reach="live"]').waitFor();
-      await until(() => asked > 0);
-      await tab.waitForTimeout(150);
-      assert.equal(await tab.locator('#sb-notes').isVisible(), false, JSON.stringify(answer).slice(0, 60));
-      assert.equal(await tab.locator('#sb-notes-link').getAttribute('href'), null);
-      await ctx.close();
-    }
+    // An older relay without the new routes: the page still runs and says what it does not have.
+    run = await scripted({ older: true });
+    await run.tab.locator('.sb-check[data-check="cues"][data-state="off"]').waitFor();
+    assert.match(await run.tab.locator('.sb-check[data-check="cues"]').getAttribute('aria-label'), /^Cue link: No reading\. Not connected\. Console cues do not reach this page\.$/);
+    await run.tab.locator('#t-midi').click();
+    assert.deepEqual([await run.tab.locator('#sb-feed-title').innerText(), await run.tab.locator('#sb-midi-start').getAttribute('aria-disabled'), await run.tab.locator('#sb-midi-text').innerText()], ['Not connected', 'true', 'No cue feed is connected, so a cue cannot be seen arriving.']);
+    await run.tab.locator('#t-know').click();
+    await run.tab.locator('#sb-know-status', { hasText: 'No documents folder is set up on the relay.' }).waitFor();
+    assert.deepEqual([await run.tab.locator('.sb-know__item').count(), await run.tab.locator('#sb-notes').isVisible()], [0, false]);
+    await run.tab.locator('#t-setup').click();
+    await run.tab.locator('#sb-setup-run').click();
+    await run.tab.locator('.sb-line[data-line="playback-app"]').waitFor();
+    assert.deepEqual([await run.tab.locator('.sb-line[data-line="playback-app"]').getAttribute('data-state'), await run.tab.locator('.sb-line[data-line="listener"]').getAttribute('data-state'), await run.tab.locator('.sb-line[data-line="displays"]').getAttribute('data-state')], ['cannot', 'cannot', 'pass']);
+    await run.ctx.close();
 
-    console.log('Show backup page: unreached lanes by eye, strip honesty, two-step shutter, Show Lock, stale and lost-relay guards, clock skew, sign-in return, snapshot copy, the optional crew notes link and fit at eight sizes in both themes passed');
-  } finally { await browser.close(); await relay.close(); }
+    console.log('Show backup page: four tabs, guarded power and shutter for one lane and all lanes, the relay power-off confirmation, Show Lock, refusals that stay, stale and lost-relay guards, clock skew, sign-in return, the MIDI test (pass, clear, timeout, stopped listener), the setup check, the Know tab with samples, the crew notes link, an older relay, and fit on every tab at eight sizes in both themes passed');
+  } finally { clearInterval(beat); await browser.close(); await relay.close(); fs.rmSync(scratch, { recursive: true, force: true }); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

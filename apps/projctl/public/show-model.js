@@ -1,144 +1,110 @@
-// Show backup page model. Pure functions over the relay snapshot: no DOM, no network.
-// A value is a reading only while the relay's reply behind it is current. Everything else
-// is worded as "check by eye", "not reported" or "not connected", never as a state.
-import { LANES, rigLanes } from './lanes.js';
-import { fieldFeedback, feedbackAge } from './status-feedback.js';
+// Show backup page model. Pure functions: no DOM, no network. Lane readings and the control
+// rules live in projector-control-model.js, which other role pages share; this file holds what
+// is specific to this page: the go or no-go strip, the setup check and the MIDI test.
+import { laneViews, alarmSummary, clockShort, lower, list, feedbackAge } from './projector-control-model.js';
 
+export { laneViews, alarmSummary, clockShort };
 export const STATE_WORDS = Object.freeze({ ok: 'OK', eye: 'Check by eye', attention: 'Attention', off: 'No reading' });
+export const STATE_MARKS = Object.freeze({ ok: '✓', eye: '?', attention: '!', off: '–' });
 export const DISPLAY_STALE_MS = 120000;
-export const MOVE_CONFIRM_MS = 6000;
-export const MOVE_GUARD_MS = 600;
-export const MOVE_REPORT_MS = 30000; // the relay follows a shutter command for the same 30 s
+export const FEED_STALE_MS = 20000; // how old this page's own copy of the cue feed may be
 
-const shortClock = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
-const fullClock = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', timeZoneName: 'short' });
 const stamp = value => typeof value === 'number' ? value : typeof value === 'string' ? Date.parse(value) : NaN;
-export const clockShort = value => Number.isFinite(stamp(value)) ? shortClock.format(new Date(stamp(value))) : null;
-export const clockFull = value => Number.isFinite(stamp(value)) ? fullClock.format(new Date(stamp(value))) : null;
-const lower = text => text.charAt(0).toLowerCase() + text.slice(1);
-const list = items => items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
+const secondsClock = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', second: '2-digit' });
+export const clockSeconds = value => Number.isFinite(stamp(value)) ? secondsClock.format(new Date(stamp(value))) : null;
+const ago = (value, now) => lower(feedbackAge(now - stamp(value)));
+const cueWords = message => `${message.command === 'go' ? 'Cue' : `${message.command.toUpperCase()} cue`} ${message.cue ?? '(none)'}${message.list ? `, list ${message.list}` : ''}`;
 
-// PJLink alarm status: 0 none, 1 warning, 2 error. A driver that never read alarms reports nothing.
-const ALARMS = [['fan', 'fan'], ['lamp', 'lamp'], ['temp', 'temperature'], ['cover', 'cover'], ['filter', 'filter'], ['other', 'other']];
-export function alarmSummary(errors) {
-  if (!errors || typeof errors !== 'object') return null;
-  const items = ALARMS.filter(([key]) => Number(errors[key]) > 0)
-    .map(([key, name]) => ({ key, name, level: Number(errors[key]) >= 2 ? 'error' : 'warning' }))
-    .sort((a, b) => (b.level === 'error') - (a.level === 'error'));
-  if (!items.length) return null;
-  const text = items.map(item => `${item.name} ${item.level}`).join(', ');
-  return { level: items[0].level, text: text.charAt(0).toUpperCase() + text.slice(1) };
-}
-
-const BLOCKED = {
-  connecting: 'Waiting for the relay.',
-  'relay-offline': 'Relay not answering. Use the remote.',
-  conflict: 'Lane claimed twice. Use the remote.',
-  unassigned: 'No projector on this lane.',
-  stale: 'Reply too old. Waiting for a fresh one.',
-  unreached: "Relay can't reach it. Use the remote.",
-};
-
-function blockedLane(base, reach, fresh) {
-  const connecting = reach === 'connecting';
-  return { ...base, reach, tone: connecting ? 'off' : 'eye', headline: connecting ? 'CONNECTING' : 'CHECK BY EYE', power: null, shutter: null, lit: false,
-    shutterText: 'Shutter not reported', freshText: fresh, alarm: null, alarmsReported: false,
-    move: { arg: 1, verb: 'Close', label: 'Close shutter', enabled: false, reason: BLOCKED[reach] } };
-}
-
-// One view per drawing lane A to D. `monitor` is createConnectionMonitor() from projector-connection.js.
-export function laneViews(snapshot, { relayConnected = false, everConnected = false, monitor, now = Date.now() } = {}) {
-  const projectors = Array.isArray(snapshot?.projectors) ? snapshot.projectors : [];
-  const pollMs = snapshot?.relay?.pollIntervalMs || 5000;
-  return rigLanes(projectors).map(({ lane, projector: p, conflict }) => {
-    const base = { lane, surface: LANES[lane].target, slot: p?.slot ?? null, revision: p?.controlRevision ?? null,
-      model: p ? String(p.model || p.label || '').slice(0, 40) : '' };
-    if (!snapshot || !everConnected) return blockedLane(base, 'connecting', 'Waiting for relay');
-    if (!relayConnected) return blockedLane(base, 'relay-offline', 'Relay not answering');
-    if (conflict) return blockedLane(base, 'conflict', 'Lane claimed twice');
-    if (!p) return blockedLane(base, 'unassigned', 'Nothing assigned');
-    const c = monitor(p, true, pollMs, now), s = p.status || {};
-    if (c.state === 'unassigned') return blockedLane(base, 'unassigned', 'No address saved');
-    if (!c.current) {
-      if (c.state === 'stale') return blockedLane(base, 'stale', `Last reply ${lower(c.ageLabel)}`);
-      if (c.state === 'checking') return blockedLane(base, 'unreached', 'Relay is checking');
-      const last = clockShort(c.lastSuccessAt);
-      return blockedLane(base, 'unreached', last ? `Last reply ${last}` : 'No reply yet');
-    }
-    const reported = field => fieldFeedback(p, field, c).current;
-    const power = reported('power') && ['on', 'off', 'warming', 'cooling'].includes(s.power) ? s.power : 'unknown';
-    const shutter = reported('shutter') && ['open', 'closed'].includes(s.shutter) ? s.shutter : 'unknown';
-    const alarmsReported = reported('errors') && ALARMS.some(([key]) => [0, 1, 2].includes(s.errors?.[key]));
-    const alarm = alarmsReported ? alarmSummary(s.errors) : null;
-    const lit = power === 'on';
-    const move = !lit ? { arg: 1, verb: 'Close', label: 'Close shutter', enabled: false, reason: power === 'unknown' ? 'Power not reported, so no shutter move.' : `Reports ${power.toUpperCase()}, so no shutter move.` }
-      : shutter === 'closed' ? { arg: 0, verb: 'Open', label: 'Open shutter', enabled: true, reason: '' }
-      : { arg: 1, verb: 'Close', label: 'Close shutter', enabled: true, reason: shutter === 'unknown' ? 'Position not reported. Close is available.' : '' };
-    return { ...base, reach: 'live', tone: alarm || !lit ? 'attention' : 'ok', headline: power === 'unknown' ? 'POWER UNKNOWN' : power.toUpperCase(), power, shutter, lit,
-      shutterText: shutter === 'unknown' ? 'Shutter not reported' : lit && shutter === 'closed' ? 'Shutter CLOSED · dark on stage' : `Shutter ${shutter.toUpperCase()}`,
-      freshText: `Reply ${lower(c.ageLabel)}`, alarm, alarmsReported, move };
-  });
-}
-
+// ---- Go or no-go strip
 function lanesCheck(lanes, relay) {
-  const check = { id: 'lanes', label: 'Lanes lit',
+  const check = { id: 'lanes', label: 'Lanes lit', short: 'Lanes',
     detail: ['Each lane counts as lit only while the relay holds a current reply from that projector saying its power is ON.',
-      'A projector whose control link is held by the playback app does not answer the relay. That lane reads "check by eye", which is normal while the playback app is open.'],
+      'A lane the relay is not reading says "check by eye". Its last known state is never shown as a reading.'],
     cannot: ['Whether light reaches the surface. A lit projector with a closed shutter, a wrong input or no picture still counts as lit.', 'Anything about a lane the relay has not reached.'] };
-  if (!relay.everConnected) return { ...check, state: 'off', value: 'Waiting', note: 'No relay data yet' };
-  if (!relay.connected) return { ...check, state: 'eye', value: 'By eye', note: 'Relay not answering' };
+  if (!relay.everConnected) return { ...check, state: 'off', value: 'Waiting', brief: 'Waiting', note: 'No relay data yet' };
+  if (!relay.connected) return { ...check, state: 'eye', value: 'By eye', brief: 'By eye', note: 'Relay not answering' };
   const live = lanes.filter(l => l.reach === 'live'), lit = live.filter(l => l.lit), blind = lanes.filter(l => l.reach !== 'live');
-  const trouble = live.filter(l => !l.lit || l.alarm);
-  const value = `${lit.length} of ${lanes.length} lit`;
-  if (trouble.length) return { ...check, state: 'attention', value, note: [...trouble.map(l => `${l.lane} ${l.lit ? lower(l.alarm.text) : `reports ${l.headline}`}`), ...(blind.length ? [`${list(blind.map(l => l.lane))} by eye`] : [])].join(' · ') };
-  if (blind.length) return { ...check, state: 'eye', value, note: `${list(blind.map(l => l.lane))}: check by eye` };
+  const trouble = live.filter(l => !l.lit || l.flags.length);
+  const value = `${lit.length} of ${lanes.length} lit`, brief = `${lit.length}/${lanes.length} lit`;
+  if (trouble.length) return { ...check, state: 'attention', value, brief, note: [...trouble.map(l => `${l.lane} ${l.lit ? l.flags.join(', ') : `reports ${l.headline}`}`), ...(blind.length ? [`${list(blind.map(l => l.lane))} by eye`] : [])].join(' · ') };
+  if (blind.length) return { ...check, state: 'eye', value, brief, note: `${list(blind.map(l => l.lane))}: check by eye` };
   const closed = live.filter(l => l.shutter === 'closed');
-  return { ...check, state: 'ok', value, note: closed.length ? `${list(closed.map(l => l.lane))} shutter closed` : 'All four answering' };
+  return { ...check, state: 'ok', value, brief, note: closed.length ? `${list(closed.map(l => l.lane))} shutter closed` : 'All four answering' };
+}
+
+// The displays the show computer reports, and the rule this page applies to them.
+function readDisplays(displays, lanes, now) {
+  if (!displays || displays.status === 'loading') return { known: false, reason: 'Asking the show computer', value: 'Reading' };
+  if (displays.status === 'error') return { known: false, reason: displays.error || 'Display report failed', value: 'Not read' };
+  const report = displays.data || {};
+  if (report.state === 'simulation') return { known: false, reason: 'Reader is off in simulation', value: 'Not read' };
+  if (report.state !== 'reported') return { known: false, reason: report.reason || 'No display report', value: 'Not available' };
+  const age = now - stamp(report.collectedAt);
+  if (!Number.isFinite(age) || age > DISPLAY_STALE_MS) return { known: false, stale: true, reason: `Last read ${lower(feedbackAge(age))}`, value: 'Stale' };
+  const present = (Array.isArray(report.displays) ? report.displays : []).filter(d => d && d.online !== false && d.mirror !== true);
+  const mains = present.filter(d => d.main === true), outputs = present.filter(d => d.main !== true);
+  return { known: true, age, present, mains, outputs, expected: lanes.filter(l => l.slot).length,
+    modes: present.map((d, index) => `${index + 1}${d.main === true ? ' main' : ''}: ${d.resolution || d.pixelResolution || 'mode not reported'}`) };
 }
 
 function outputsCheck(displays, lanes, relay, now) {
-  const check = { id: 'outputs', label: 'Outputs',
+  const check = { id: 'outputs', label: 'Outputs', short: 'Outputs',
     detail: ['The relay asks the show computer which displays its operating system has connected, at most once every 30 seconds.',
       'The rule used here: one display flagged as main (the control monitor) plus at least one more display for every lane that has a projector assigned.'],
     cannot: ['Whether the playback app has a fullscreen window on each output.', 'Which display feeds which lane.', 'Whether the picture reaches the projector past the adapter and cable.', 'Whether the show computer is locked.'] };
-  if (!relay.everConnected) return { ...check, state: 'off', value: 'Waiting', note: 'No relay data yet' };
-  if (!relay.connected) return { ...check, state: 'off', value: 'Unknown', note: 'Relay not answering' };
-  if (!displays || displays.status === 'loading') return { ...check, state: 'off', value: 'Reading', note: 'Asking the show computer' };
-  if (displays.status === 'error') return { ...check, state: 'off', value: 'Not read', note: displays.error || 'Display report failed' };
-  const report = displays.data || {};
-  if (report.state === 'simulation') return { ...check, state: 'off', value: 'Not read', note: 'Reader is off in simulation' };
-  if (report.state !== 'reported') return { ...check, state: 'off', value: 'Not available', note: report.reason || 'No display report' };
-  const age = now - stamp(report.collectedAt);
-  if (!Number.isFinite(age) || age > DISPLAY_STALE_MS) return { ...check, state: 'eye', value: 'Stale', note: `Last read ${lower(feedbackAge(age))}` };
-  const present = (Array.isArray(report.displays) ? report.displays : []).filter(d => d && d.online !== false && d.mirror !== true);
-  const mains = present.filter(d => d.main === true), outputs = present.filter(d => d.main !== true);
-  const expected = lanes.filter(l => l.slot).length;
-  if (!expected) return { ...check, state: 'eye', value: `${present.length} displays`, note: 'No lanes assigned to compare' };
-  if (outputs.length < expected) return { ...check, state: 'attention', value: `${outputs.length} of ${expected} outputs`, note: `Fewer outputs than lanes · read ${lower(feedbackAge(age))}` };
-  if (mains.length !== 1) return { ...check, state: 'eye', value: `${present.length} displays`, note: 'Main display not identified' };
-  return { ...check, state: 'ok', value: `${outputs.length} outputs + main`, note: `Windows not reported · read ${lower(feedbackAge(age))}` };
+  if (!relay.everConnected) return { ...check, state: 'off', value: 'Waiting', brief: 'Waiting', note: 'No relay data yet' };
+  if (!relay.connected) return { ...check, state: 'off', value: 'Unknown', brief: 'Unknown', note: 'Relay not answering' };
+  const d = readDisplays(displays, lanes, now);
+  if (!d.known) return { ...check, state: d.stale ? 'eye' : 'off', value: d.value, brief: d.value, note: d.reason };
+  const read = `read ${lower(feedbackAge(d.age))}`;
+  if (!d.expected) return { ...check, state: 'eye', value: `${d.present.length} displays`, brief: `${d.present.length} seen`, note: 'No lanes assigned to compare' };
+  if (d.outputs.length < d.expected) return { ...check, state: 'attention', value: `${d.outputs.length} of ${d.expected} outputs`, brief: `${d.outputs.length}/${d.expected}`, note: `Fewer outputs than lanes · ${read}` };
+  if (d.mains.length !== 1) return { ...check, state: 'eye', value: `${d.present.length} displays`, brief: `${d.present.length} seen`, note: 'Main display not identified' };
+  return { ...check, state: 'ok', value: `${d.outputs.length} outputs + main`, brief: `${d.outputs.length} + main`, note: `Windows not reported · ${read}` };
 }
 
-function cueCheck() {
-  return { id: 'cues', label: 'Cue link', state: 'off', value: 'Not connected', note: 'Console cues do not reach this page',
-    detail: ['The lighting console triggers the playback app directly. That cue traffic does not pass through the relay, so this page has nothing to read.',
-      'This item stays "not connected" until a cue feed into the relay is built and accepted.'],
-    cannot: ['Whether the console sent a cue.', 'Whether the playback app received or followed it.'] };
+// feed is { status: 'loading' | 'ok' | 'absent' | 'error', data, fetchedAt } where data is GET api/cue-feed.
+export function feedState(feed, now = Date.now()) {
+  if (!feed || feed.status === 'loading') return { kind: 'loading', text: 'Asking the relay' };
+  if (feed.status === 'absent') return { kind: 'not-connected', text: 'This relay has no cue feed' };
+  if (feed.status === 'error') return { kind: 'unread', text: 'The cue feed could not be read' };
+  if (!Number.isFinite(feed.fetchedAt) || now - feed.fetchedAt > FEED_STALE_MS) return { kind: 'unread', text: 'The cue feed has not been read lately' };
+  const data = feed.data || {};
+  if (data.state === 'not-configured') return { kind: 'not-connected', text: 'No cue feed is set up on the relay' };
+  if (data.state === 'listening') return { kind: 'listening', text: 'Listening' };
+  if (data.state === 'stopped') return { kind: 'stopped', text: data.lastRowAt ? `Listener stopped. Last heard ${ago(data.lastRowAt, now)}` : 'Listener stopped. Nothing heard yet' };
+  return { kind: 'unread', text: data.reason || 'The observer file could not be read' };
+}
+
+function cueCheck(feed, relay, now) {
+  const check = { id: 'cues', label: 'Cue link', short: 'Cues',
+    detail: ['A listen-only observer on the show computer writes down each MIDI message it hears. The relay reads that record. Nothing on this page sends MIDI.',
+      'OK means the listener is running. It also shows the last cue it heard and when.'],
+    cannot: ['Whether the playback app followed the cue. A cue that arrived is not a picture that changed.', 'Anything while the listener is stopped.'] };
+  if (!relay.everConnected) return { ...check, state: 'off', value: 'Waiting', brief: 'Waiting', note: 'No relay data yet' };
+  if (!relay.connected) return { ...check, state: 'off', value: 'Unknown', brief: 'Unknown', note: 'Relay not answering' };
+  const state = feedState(feed, now), last = feed?.data?.lastCue;
+  if (state.kind === 'loading') return { ...check, state: 'off', value: 'Reading', brief: 'Reading', note: state.text };
+  if (state.kind === 'not-connected') return { ...check, state: 'off', value: 'Not connected', brief: 'No feed', note: 'Console cues do not reach this page' };
+  if (state.kind === 'unread') return { ...check, state: 'eye', value: 'Not read', brief: 'Not read', note: state.text };
+  const heard = last ? `Last: ${lower(cueWords(last))} at ${clockShort(last.at)}` : 'No cue heard yet';
+  if (state.kind === 'stopped') return { ...check, state: 'eye', value: 'Listener stopped', brief: 'Stopped', note: `${state.text} · ${lower(heard)}` };
+  return { ...check, state: 'ok', value: last ? cueWords(last) : 'Listening', brief: last ? `Cue ${last.cue}` : 'Listening', note: last ? `Heard ${clockShort(last.at)}${last.source ? ` from ${last.source}` : ''} · not proof that video followed` : 'Listening · no cue heard yet' };
 }
 
 function computerCheck(relay, now) {
-  const check = { id: 'computer', label: 'Show computer',
+  const check = { id: 'computer', label: 'Show computer', short: 'Relay',
     detail: ['The relay runs on the show computer and sends this page a heartbeat every 5 seconds. A recent heartbeat means that computer is powered, awake and running the relay.'],
     cannot: ['Whether the screen is locked or its displays are asleep.', 'Whether the playback app is open or which show file is loaded.'] };
-  if (!relay.everConnected) return { ...check, state: 'off', value: 'Connecting', note: 'No relay data yet' };
-  if (!relay.connected) return { ...check, state: 'attention', value: 'Not answering', note: relay.lastMessageAt ? `Last heard ${lower(feedbackAge(now - relay.lastMessageAt))}` : 'Relay not answering' };
+  if (!relay.everConnected) return { ...check, state: 'off', value: 'Connecting', brief: 'Waiting', note: 'No relay data yet' };
+  if (!relay.connected) return { ...check, state: 'attention', value: 'Not answering', brief: 'Lost', note: relay.lastMessageAt ? `Last heard ${lower(feedbackAge(now - relay.lastMessageAt))}` : 'Relay not answering' };
   const since = clockShort(relay.startedAt);
-  return { ...check, state: 'ok', value: 'Answering', note: since ? `Relay up since ${since} · lock screen not reported` : 'Lock screen not reported' };
+  return { ...check, state: 'ok', value: 'Answering', brief: 'Answering', note: since ? `Relay up since ${since} · lock screen not reported` : 'Lock screen not reported' };
 }
 
 // The four go or no-go items, in display order.
-export function buildChecks({ lanes, relay, displays, now = Date.now() }) {
-  return [lanesCheck(lanes, relay), outputsCheck(displays, lanes, relay, now), cueCheck(), computerCheck(relay, now)];
+export function buildChecks({ lanes, relay, displays, feed, now = Date.now() }) {
+  return [lanesCheck(lanes, relay), outputsCheck(displays, lanes, relay, now), cueCheck(feed, relay, now), computerCheck(relay, now)];
 }
 
 export function verdictOf(checks, relay) {
@@ -150,20 +116,152 @@ export function verdictOf(checks, relay) {
   return { state: 'ok', title: 'All reported good', text: 'Every item has a current reading.' };
 }
 
-// Plain text for a text message. Readings carry their age; gaps are stated as gaps.
-export function snapshotText({ lanes, checks, verdict, lock, simulation, relay, lastMove, now = Date.now() }) {
-  const lines = [`Projection snapshot, ${clockFull(now)}${simulation ? ' (SIMULATION, not the real rig)' : ''}`,
-    `${verdict.title}: ${verdict.text}`];
-  for (const l of lanes) {
-    lines.push(l.reach === 'live'
-      ? `${l.lane} ${l.surface}: ${l.headline}, ${lower(l.shutterText)}, ${lower(l.freshText)}. ${l.alarm ? `${l.alarm.text}.` : l.alarmsReported ? 'No alarms reported.' : 'Alarms not reported.'}`
-      : `${l.lane} ${l.surface}: no reading (${lower(l.freshText)}). Check by eye.`);
-  }
-  for (const c of checks.filter(c => c.id !== 'lanes')) lines.push(`${c.label}: ${lower(c.value)}. ${c.note}.`);
-  lines.push(`Show Lock: ${!relay.connected ? 'unknown' : lock ? 'on' : 'off'}.`);
-  if (lastMove) lines.push(`Last move from this page: ${lastMove.verb} shutter ${lastMove.lane}, ${clockShort(lastMove.at)}, ${lastMove.outcome}.`);
-  return lines.join('\n');
+// ---- Setup check: pass, fail or cannot check, each with its reading. A line with no rule to judge
+// it against is a plain reading. A guess is never a pass.
+export const SETUP_WORDS = Object.freeze({ pass: 'Pass', fail: 'Fail', cannot: 'Cannot check', reading: 'Reading' });
+export const SETUP_MARKS = Object.freeze({ pass: '✓', fail: '!', cannot: '?', reading: '·' });
+
+export function setupBlocked({ relay, lock }) {
+  if (!relay.connected) return 'Relay not answering.';
+  if (lock !== false) return lock ? 'Show Lock is on. The setup check is locked.' : 'Show Lock not read.';
+  return '';
 }
 
-// No number is stored in this source. The link opens the device's message composer with the text.
-export const smsHref = text => `sms:?&body=${encodeURIComponent(text)}`;
+export function setupCheck({ lanes, relay, displays, feed, hostChecks, lock, release, now = Date.now() }) {
+  const lines = [], add = (group, id, label, state, reading) => lines.push({ group, id, label, state, reading });
+  const system = 'Relay and show computer';
+  if (relay.connected) add(system, 'relay', 'Relay', 'pass', `Answering${release ? `, release ${release}` : ''}${clockShort(relay.startedAt) ? `, up since ${clockShort(relay.startedAt)}` : ''}`);
+  else add(system, 'relay', 'Relay', 'fail', 'Not answering');
+  add(system, 'lock', 'Show Lock', 'reading', lock === true ? 'On' : lock === false ? 'Off' : 'Not read');
+
+  for (const v of lanes) {
+    const group = `Lane ${v.lane} · ${v.surface}`, id = name => `${v.lane}-${name}`, live = v.reach === 'live';
+    const away = v.reach === 'unassigned' ? 'No projector on this lane' : 'Lane not reachable';
+    if (live) add(group, id('reach'), 'Reachable', 'pass', `${v.freshText}${v.model ? `, ${v.model}` : ''}`);
+    else if (v.reach === 'unassigned') add(group, id('reach'), 'Reachable', 'cannot', 'No projector on this lane');
+    else add(group, id('reach'), 'Reachable', 'fail', `${v.blocked} ${v.freshText}.`);
+
+    if (!live) add(group, id('power'), 'Power', 'cannot', away);
+    else if (v.power === 'unknown') add(group, id('power'), 'Power', 'cannot', 'Not reported');
+    else add(group, id('power'), 'Power', v.power === 'on' ? 'pass' : 'fail', v.power.toUpperCase());
+
+    if (!live) add(group, id('input'), 'Input', 'cannot', away);
+    else if (v.input == null) add(group, id('input'), 'Input', 'cannot', v.link?.id === 'control-port' ? 'Not reported: the control port does not report the input' : 'Not reported');
+    else if (!v.expectedInput) add(group, id('input'), 'Input', 'cannot', `Reads ${v.inputText}; the rig has no preferred input to compare`);
+    else if (v.input === v.expectedInput.value) add(group, id('input'), 'Input', 'pass', v.inputText);
+    else add(group, id('input'), 'Input', 'fail', `${v.inputText}, expected ${v.expectedInput.label}`);
+
+    if (!live) add(group, id('shutter'), 'Shutter', 'cannot', away);
+    else if (v.power !== 'on') add(group, id('shutter'), 'Shutter', 'cannot', 'Projector is not ON');
+    else if (v.shutter === 'unknown') add(group, id('shutter'), 'Shutter', 'cannot', 'Not reported');
+    else add(group, id('shutter'), 'Shutter', v.shutter === 'open' ? 'pass' : 'fail', v.shutter === 'open' ? 'OPEN' : 'CLOSED: dark on stage');
+
+    if (!live) add(group, id('pattern'), 'Test pattern off', 'cannot', away);
+    else if (v.pattern == null) add(group, id('pattern'), 'Test pattern off', 'cannot', 'Not reported');
+    else add(group, id('pattern'), 'Test pattern off', v.patternFlag ? 'fail' : 'pass', v.patternFlag ? v.patternText : 'Off');
+
+    add(group, id('link'), 'Link', 'reading', v.link ? `${v.link.label}${v.link.unproven ? ' (commands unproven on a rig)' : ''}` : 'Not reported');
+  }
+
+  const d = readDisplays(displays, lanes, now);
+  if (!d.known) add('Displays', 'displays', 'Outputs present', 'cannot', d.reason);
+  else {
+    const reading = `${d.present.length} displays · ${d.modes.join(' · ') || 'none listed'}`;
+    if (!d.expected) add('Displays', 'displays', 'Outputs present', 'cannot', `${reading} · no lanes assigned to compare`);
+    else if (d.outputs.length < d.expected) add('Displays', 'displays', 'Outputs present', 'fail', `${d.outputs.length} outputs for ${d.expected} lanes · ${reading}`);
+    else if (d.mains.length !== 1) add('Displays', 'displays', 'Outputs present', 'cannot', `Main display not identified · ${reading}`);
+    else add('Displays', 'displays', 'Outputs present', 'pass', reading);
+  }
+
+  const state = feedState(feed, now), data = feed?.data || {};
+  if (state.kind === 'listening') add('Cues', 'listener', 'Cue listener', 'pass', `Running, last row ${ago(data.lastRowAt, now)}${Number.isInteger(data.sources) ? `, ${data.sources} MIDI ${data.sources === 1 ? 'source' : 'sources'}` : ''}`);
+  else if (state.kind === 'stopped') add('Cues', 'listener', 'Cue listener', 'fail', state.text);
+  else add('Cues', 'listener', 'Cue listener', 'cannot', state.text);
+
+  const host = hostChecks?.status === 'ok' && Array.isArray(hostChecks.data?.checks) ? hostChecks.data.checks : null;
+  for (const [id, label] of [['playback-app', 'Playback app running with its fullscreen outputs'], ['midi-interface', 'MIDI interface present'], ['computer-awake', 'Computer awake and unlocked']]) {
+    const found = host?.find(item => item?.id === id);
+    if (found && ['pass', 'fail'].includes(found.state)) add(system, id, label, found.state, String(found.reading || '').slice(0, 200) || (found.state === 'pass' ? 'Reported good' : 'Reported not good'));
+    else add(system, id, label, 'cannot', found?.reading ? String(found.reading).slice(0, 200) : 'The relay did not answer this check');
+  }
+
+  const count = name => lines.filter(line => line.state === name).length;
+  const counts = { pass: count('pass'), fail: count('fail'), cannot: count('cannot') };
+  return { at: now, lines, counts, summary: `${counts.pass} pass · ${counts.fail} fail · ${counts.cannot} cannot check` };
+}
+
+// ---- MIDI test. Nothing is sent: the page waits for a cue the operator fires from the console.
+export const MIDI_TEST = Object.freeze({ cue: '999', clear: '999.5', goMs: 30000, clearMs: 60000 });
+const RUNNING = ['waiting-go', 'waiting-clear'];
+export const midiTestRunning = test => RUNNING.includes(test?.phase);
+
+export function midiTestBlocked({ relay, lock, feed, now = Date.now() }) {
+  if (!relay.connected) return 'Relay not answering.';
+  if (lock !== false) return lock ? 'Show Lock is on. The MIDI test is locked.' : 'Show Lock not read.';
+  const state = feedState(feed, now);
+  if (state.kind === 'listening') return '';
+  if (state.kind === 'not-connected') return 'No cue feed is connected, so a cue cannot be seen arriving.';
+  if (state.kind === 'stopped') return 'The listener has stopped, so a cue cannot be seen arriving.';
+  return `${state.text}.`;
+}
+
+export function midiTestStart(feed, now = Date.now()) {
+  return { phase: 'waiting-go', startedAt: now, feedId: feed.data.feedId, afterSeq: feed.data.seq, go: null, clear: null, endedAt: null };
+}
+
+const heard = (data, afterSeq, cue) => (Array.isArray(data?.recent) ? data.recent : []).find(m => m.seq > afterSeq && m.command === 'go' && m.cue === cue);
+
+// Advance a running test against the latest copy of the feed. An arrival is looked for before any timeout.
+export function midiTestStep(test, feed, now = Date.now()) {
+  if (!midiTestRunning(test)) return test;
+  const data = feed?.status === 'ok' ? feed.data : null, end = (phase, extra = {}) => ({ ...test, ...extra, phase, endedAt: now });
+  if (data && data.feedId !== test.feedId) return end('interrupted');
+  if (test.phase === 'waiting-go') {
+    const go = heard(data, test.afterSeq, MIDI_TEST.cue);
+    if (go) return { ...test, phase: 'waiting-clear', go: { seq: go.seq, at: go.at, source: go.source || '' }, goSeenAt: now };
+    if (now - test.startedAt >= MIDI_TEST.goMs) return end(feedState(feed, now).kind === 'listening' ? 'timeout' : 'stopped');
+    return test;
+  }
+  const clear = heard(data, test.go.seq, MIDI_TEST.clear);
+  if (clear) return end('cleared', { clear: { seq: clear.seq, at: clear.at, source: clear.source || '' } });
+  if (now - test.goSeenAt >= MIDI_TEST.clearMs) return end('clear-missing');
+  return test;
+}
+
+// What the MIDI test panel says. state is one of the strip's four state words.
+export function midiTestView(test, { feed, relay, lock, now = Date.now() }) {
+  const blocked = midiTestBlocked({ relay, lock, feed, now }), left = ms => Math.max(0, Math.ceil(ms / 1000));
+  const arrived = test?.go ? `Cue ${MIDI_TEST.cue} arrived at ${clockSeconds(test.go.at)}${test.go.source ? ` from ${test.go.source}` : ''}.` : '';
+  const picture = 'An arrival is not a picture. If the test picture did not appear, the cue reached the show computer and the playback app did not act on it: check the playback app.';
+  const when = hit => hit ? `${clockSeconds(hit.at)}${hit.source ? ` · from ${hit.source}` : ''}` : '';
+  const steps = (go, clear, goDetail = when(test?.go), clearDetail = when(test?.clear)) => [
+    { label: `Cue ${MIDI_TEST.cue} arrives`, state: go, detail: goDetail }, { label: `Clear cue ${MIDI_TEST.clear} arrives`, state: clear, detail: clearDetail }];
+  switch (test?.phase) {
+    case 'waiting-go': { const count = left(test.startedAt + MIDI_TEST.goMs - now);
+      return { state: 'eye', running: true, count, title: `Fire cue ${MIDI_TEST.cue} on the console now`, text: `Waiting ${count} s for it to arrive.`, hint: 'This page sends nothing. It only watches for the cue.', steps: steps('wait', 'idle', `${count} s left`) }; }
+    case 'waiting-clear': { const count = left(test.goSeenAt + MIDI_TEST.clearMs - now);
+      return { state: 'ok', running: true, count, title: 'Pass: the cue arrived', text: `${arrived} Now fire the clear cue ${MIDI_TEST.clear}. Waiting ${count} s.`, hint: picture, steps: steps('pass', 'wait', undefined, `${count} s left`) }; }
+    case 'cleared': return { state: 'ok', running: false, title: 'Pass: cue and clear both arrived', text: `${arrived} Clear cue ${MIDI_TEST.clear} arrived at ${clockSeconds(test.clear.at)}.`, hint: picture, steps: steps('pass', 'pass') };
+    case 'clear-missing': return { state: 'attention', running: false, title: 'The cue arrived. The clear cue did not', text: `${arrived} Clear cue ${MIDI_TEST.clear} was not seen in ${MIDI_TEST.clearMs / 1000} s. The test picture may still be up: fire ${MIDI_TEST.clear} and look.`, hint: picture, steps: steps('pass', 'fail') };
+    case 'timeout': return { state: 'attention', running: false, title: `Timed out: cue ${MIDI_TEST.cue} did not arrive`, text: `Nothing arrived in ${MIDI_TEST.goMs / 1000} s while the listener was running. Check the console side: the cue on the console, the cable, and the MIDI interface.`, hint: 'The playback app is not the cause when nothing arrives.', steps: steps('fail', 'idle') };
+    case 'stopped': return { state: 'eye', running: false, title: 'No result: the listener stopped', text: 'The listener stopped during the test, so the page could not see whether the cue arrived. This is not a failed cue.', hint: 'Start the listener on the show computer, then test again.', steps: steps('cannot', 'idle') };
+    case 'interrupted': return { state: 'eye', running: false, title: 'No result: the relay restarted', text: 'The relay restarted during the test. Start the test again.', hint: '', steps: steps('cannot', 'idle') };
+    case 'cancelled': return { state: 'off', running: false, title: 'Test stopped', text: test.go ? `${arrived} Stopped before the clear cue.` : 'Stopped before a cue arrived. No result.', hint: test.go ? picture : '', steps: steps(test.go ? 'pass' : 'idle', 'idle') };
+    default: return { state: 'off', running: false, title: 'Not run yet', text: blocked || `Tap Start, then fire cue ${MIDI_TEST.cue} on the console inside ${MIDI_TEST.goMs / 1000} seconds.`, hint: 'This page sends nothing. It only watches for the cue.', steps: steps('idle', 'idle') };
+  }
+}
+
+// "Last cue received" and the recent messages, for the MIDI test tab.
+export function feedView(feed, now = Date.now()) {
+  const state = feedState(feed, now), data = feed?.status === 'ok' ? feed.data || {} : {};
+  const connected = state.kind === 'listening' || state.kind === 'stopped';
+  const last = connected ? data.lastCue : null;
+  return {
+    kind: state.kind, tone: state.kind === 'listening' ? 'ok' : state.kind === 'stopped' || state.kind === 'unread' ? 'eye' : 'off',
+    title: state.kind === 'listening' ? 'Listening' : state.kind === 'stopped' ? 'Listener stopped' : state.kind === 'not-connected' ? 'Not connected' : state.kind === 'loading' ? 'Reading' : 'Not read',
+    text: state.kind === 'listening' ? `Last row ${ago(data.lastRowAt, now)}${Number.isInteger(data.sources) ? ` · ${data.sources} MIDI ${data.sources === 1 ? 'source' : 'sources'}` : ''}${data.sourceNames?.length ? ` · ${data.sourceNames.join(', ')}` : ''}` : state.text,
+    lastCue: last ? { title: cueWords(last), text: `${clockSeconds(last.at)}${last.source ? ` · from ${last.source}` : ''} · ${ago(last.at, now)}` }
+      : { title: connected ? 'No cue heard yet' : 'Not available', text: connected ? 'Nothing has arrived since the listener started.' : 'There is no cue feed to read.' },
+    recent: connected && Array.isArray(data.recent) ? data.recent.slice(-12).reverse().map(m => ({ seq: m.seq, text: cueWords(m), meta: `${clockSeconds(m.at)}${m.source ? ` · ${m.source}` : ''}` })) : [],
+  };
+}

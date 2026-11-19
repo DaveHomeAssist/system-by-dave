@@ -1,13 +1,18 @@
-// Show backup page. Reads the relay's snapshot and sends one kind of command: a shutter move
-// for one lane, after a two-step confirm. Power, input, pattern, lens, schedules and Show Lock
-// are not reachable from this file.
-import { LANES } from './lanes.js';
+// Show backup page. Reads the relay's snapshot and sends two kinds of command through the shared
+// projector control component: power and shutter, each after a two-step confirm. Input, pattern,
+// lens, schedules and Show Lock are not reachable from this file. Nothing here sends MIDI.
 import { createConnectionMonitor } from './projector-connection.js';
-import { STATE_WORDS, MOVE_CONFIRM_MS, MOVE_GUARD_MS, MOVE_REPORT_MS, laneViews, buildChecks, verdictOf, snapshotText, smsHref, clockShort } from './show-model.js';
+import { createProjectorControl } from './projector-control.js';
+import { createKnow } from './show-know.js';
+import { STATE_WORDS, STATE_MARKS, SETUP_WORDS, SETUP_MARKS, laneViews, buildChecks, verdictOf, setupCheck, setupBlocked,
+  midiTestBlocked, midiTestStart, midiTestStep, midiTestView, midiTestRunning, feedView, clockSeconds } from './show-model.js';
 
 const SILENT_MS = 15000;       // the relay sends a heartbeat every 5 s
 const DISPLAY_POLL_MS = 30000; // the relay caches its display report for 30 s
-const RESULT_MS = 20000;       // how long a finished move's result stays on the card
+const FEED_POLL_MS = 5000;     // the cue feed, while nothing is being tested
+const FEED_TEST_MS = 1000;     // the cue feed, while a MIDI test is waiting
+const FEED_ABSENT_MS = 60000;  // a relay without the route is asked again once a minute
+const TABS = ['control', 'setup', 'midi', 'know'];
 
 const $ = (selector, root = document) => root.querySelector(selector);
 function el(tag, attrs = {}, text) {
@@ -17,58 +22,61 @@ function el(tag, attrs = {}, text) {
   return node;
 }
 const put = (node, text) => { if (node.textContent !== text) node.textContent = text; };
-const mark = (node, name, value) => { if (node.getAttribute(name) !== value) node.setAttribute(name, value); };
+const mark = (node, name, value) => { if (value == null) node.removeAttribute(name); else if (node.getAttribute(name) !== value) node.setAttribute(name, value); };
 const reveal = (node, visible) => { if (node.hidden === visible) node.hidden = !visible; };
 const say = text => { const live = $('#sb-live'); live.textContent = ''; live.textContent = text; };
 const tickClock = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', second: '2-digit' });
 
 const monitor = createConnectionMonitor();
 const relay = { connected: false, everConnected: false, lastMessageAt: 0, startedAt: null };
-const moves = new Map(); // lane -> { phase, arg, verb, slot, revision, armedAt, sentAt, until, message }
 let snapshot = null, socket = null, socketOpen = false, heard = false, openedAt = 0, generation = 0, retry = 0, leaving = false;
 // Relay clock minus this device's clock. Reply ages are measured on the relay's clock, so a tablet
 // with a wrong clock cannot make a fresh reply look stale or a stale one look fresh.
 let clockOffset = 0, clockPrecise = false;
-let displays = { status: 'loading' };
-let lanes = [], checks = [], verdict = null, lastMove = null, openCheck = null, detailKey = '', solo = 'A';
+let displays = { status: 'loading' }, feed = { status: 'loading' }, hostChecks = { status: 'loading' };
+let lanes = [], checks = [], verdict = null, openCheck = null, detailKey = '';
+let setupResult = null, setupRunning = false, midiTest = null, feedTimer = 0, feedBusy = false, tab = 'control';
+const relayNow = () => Date.now() + clockOffset;
+const lockState = () => !relay.connected || !snapshot ? null : !!snapshot.lock;
 
-// ---- Build the fixed parts once; later renders only change text and attributes, so focus survives.
-const laneNodes = new Map();
-for (const lane of Object.keys(LANES)) {
-  const card = el('article', { class: 'sb-lane', 'data-lane': lane, 'data-tone': 'off', 'data-reach': 'connecting', 'aria-labelledby': `sb-lane-${lane}-name` });
-  const head = el('header', { class: 'sb-lane__head' });
-  const name = el('h3', { class: 'sb-lane__name', id: `sb-lane-${lane}-name` });
-  name.append(el('span', { class: 'sb-sr' }, `Lane ${lane}, `), LANES[lane].target);
-  const model = el('p', { class: 'sb-lane__model' });
-  head.append(el('span', { class: 'sb-lane__letter', 'aria-hidden': 'true' }, lane), name, model);
-  const headline = el('p', { class: 'sb-lane__state' });
-  const shutter = el('p', { class: 'sb-lane__shutter' });
-  const fresh = el('p', { class: 'sb-lane__fresh' });
-  const alarm = el('p', { class: 'sb-lane__alarm', hidden: '' });
-  const why = el('p', { class: 'sb-lane__why', id: `sb-lane-${lane}-why` });
-  // aria-disabled, not disabled: the button stays reachable by keyboard so its reason can be read.
-  const arm = el('button', { type: 'button', class: 'sb-btn sb-btn--move', 'data-act': 'arm', 'aria-describedby': why.id, 'aria-disabled': 'true' }, 'Close shutter');
-  const confirm = el('button', { type: 'button', class: 'sb-btn sb-btn--confirm', 'data-act': 'confirm', hidden: '' });
-  const cancel = el('button', { type: 'button', class: 'sb-btn sb-btn--quiet', 'data-act': 'cancel', hidden: '' }, 'Cancel');
-  const move = el('div', { class: 'sb-lane__move' });
-  move.append(arm, confirm, cancel);
-  const inner = el('div', { class: 'sb-lane__in' }); // the card is a size container, so its layout lives one level in
-  inner.append(head, headline, shutter, fresh, alarm, move, why);
-  card.append(inner);
-  $('#sb-lane-list').append(card);
-  const pick = el('button', { type: 'button', class: 'sb-pick__btn', 'data-pick': lane, 'data-tone': 'off', 'aria-pressed': 'false' }, lane);
-  $('#sb-pick').append(pick);
-  laneNodes.set(lane, { card, model, headline, shutter, fresh, alarm, why, arm, confirm, cancel, pick });
+// ---- Relay requests
+function signIn() {
+  if (leaving) return;
+  leaving = true;
+  location.href = `login.html?next=${encodeURIComponent(location.pathname + location.hash)}`;
 }
+// The one write this page makes. The control component decides what goes in it: power or shutter, one lane.
+async function postCommand(body) {
+  const response = await fetch('api/command', { method: 'POST', headers: { 'content-type': 'application/json' }, cache: 'no-store', signal: AbortSignal.timeout(20000), body: JSON.stringify(body) });
+  if (response.status === 401) signIn();
+  return { status: response.status, body: await response.json().catch(() => ({})) };
+}
+// A read that never throws: { status: 'ok', data } or 'absent' (an older relay) or 'error'.
+async function readJson(route, timeout = 12000) {
+  try {
+    const response = await fetch(route, { cache: 'no-store', signal: AbortSignal.timeout(timeout) });
+    if (response.status === 401) { signIn(); return { status: 'error' }; }
+    if (response.status === 404) return { status: 'absent' };
+    if (!response.ok) return { status: 'error' };
+    syncClock(response.headers.get('date'), false);
+    return { status: 'ok', data: await response.json(), fetchedAt: relayNow() };
+  } catch { return { status: 'error' }; }
+}
+
+const control = createProjectorControl({ root: $('#pc-root'), pick: $('#pc-pick'), post: postCommand, announce: say, relayNow,
+  sharedNote: 'Shared sign-in: the relay logs the command, not who sent it.' });
+const know = createKnow({ panel: $('#know'), list: $('#sb-know-list'), status: $('#sb-know-status'), title: $('#sb-know-title'), tools: $('#sb-know-tools'), stage: $('#sb-know-stage'), back: $('#sb-know-back'), onSignedOut: signIn });
+
+// ---- Go or no-go strip: built once, then only text and attributes change, so focus survives.
 const checkNodes = new Map();
 function checkNode(check) {
   if (checkNodes.has(check.id)) return checkNodes.get(check.id);
   const button = el('button', { type: 'button', class: 'sb-check', 'data-check': check.id, 'data-state': 'off', 'aria-haspopup': 'dialog' });
-  const label = el('span', { class: 'sb-check__label' }, check.label), state = el('span', { class: 'sb-check__state' });
-  const value = el('strong', { class: 'sb-check__value' }), note = el('span', { class: 'sb-check__note' });
-  button.append(label, state, value, note);
+  const sign = el('span', { class: 'sb-check__mark', 'aria-hidden': 'true' }), label = el('span', { class: 'sb-check__label' }), value = el('strong', { class: 'sb-check__value' });
+  label.append(el('span', { class: 'sb-long' }, check.label), el('span', { class: 'sb-short' }, check.short));
+  button.append(sign, label, value);
   const item = el('li'); item.append(button); $('#sb-check-list').append(item);
-  const nodes = { button, state, value, note };
+  const nodes = { button, sign, value };
   checkNodes.set(check.id, nodes);
   return nodes;
 }
@@ -79,15 +87,14 @@ function render() {
   // Connected means this socket has delivered something recently. A reopened socket that has said nothing yet does not count.
   relay.connected = socketOpen && heard && local - relay.lastMessageAt <= SILENT_MS;
   lanes = laneViews(snapshot, { relayConnected: relay.connected, everConnected: relay.everConnected, monitor, now });
-  settleMoves(local);
-  checks = buildChecks({ lanes, relay: { ...relay, lastMessageAt: relay.lastMessageAt + clockOffset }, displays, now });
+  const relayView = { ...relay, lastMessageAt: relay.lastMessageAt + clockOffset }, lock = lockState();
+  checks = buildChecks({ lanes, relay: relayView, displays, feed, now });
   verdict = verdictOf(checks, relay);
 
-  const lock = !relay.connected || !snapshot ? 'unknown' : snapshot.lock ? 'on' : 'off';
-  const lockNode = $('#sb-lock');
-  mark(lockNode, 'data-lock', lock);
-  put(lockNode, lock === 'on' ? 'Show Lock ON' : lock === 'off' ? 'Show Lock off' : 'Show Lock unknown');
-  mark(lockNode, 'title', 'Show Lock blocks power off, input, pattern and lens commands at the relay. Shutter moves stay available.');
+  const lockNode = $('#sb-lock'), lockWord = lock === true ? 'on' : lock === false ? 'off' : 'unknown';
+  mark(lockNode, 'data-lock', lockWord);
+  put(lockNode, lock === true ? 'Show Lock ON' : lock === false ? 'Show Lock off' : 'Show Lock unknown');
+  mark(lockNode, 'title', 'While Show Lock is on, this page locks power, every all-lanes action, the MIDI test and the setup check. Shutters for one lane stay available.');
   reveal($('#sb-sim'), !!snapshot?.simulation);
   put($('#sb-clock'), tickClock.format(new Date(now)));
 
@@ -96,143 +103,149 @@ function render() {
   put($('[data-f=title]', verdictNode), verdict.title);
   put($('[data-f=text]', verdictNode), verdict.text);
   mark(verdictNode, 'title', `${verdict.title}. ${verdict.text}`);
-
   for (const check of checks) {
     const nodes = checkNode(check);
     mark(nodes.button, 'data-state', check.state);
-    put(nodes.state, STATE_WORDS[check.state]);
-    put(nodes.value, check.value);
-    put(nodes.note, check.note);
+    put(nodes.sign, STATE_MARKS[check.state]);
+    put(nodes.value, check.brief);
+    mark(nodes.button, 'aria-label', `${check.label}: ${STATE_WORDS[check.state]}. ${check.value}. ${check.note}.`);
+    mark(nodes.button, 'title', `${check.value}. ${check.note}.`);
   }
-  for (const view of lanes) renderLane(view, local);
   if (openCheck) fillDetail();
+
+  control.render({ views: lanes, lock, local });
+  renderSetup(relayView, lock);
+  renderMidi(relayView, lock, now);
 }
 
-function renderLane(view, local) {
-  const nodes = laneNodes.get(view.lane), move = moves.get(view.lane), phase = move?.phase || 'idle';
-  mark(nodes.card, 'data-tone', view.tone);
-  mark(nodes.card, 'data-reach', view.reach);
-  mark(nodes.card, 'data-phase', phase);
-  if (view.lane === solo) mark(nodes.card, 'data-selected', ''); else nodes.card.removeAttribute('data-selected');
-  mark(nodes.pick, 'data-tone', view.tone);
-  mark(nodes.pick, 'aria-pressed', String(view.lane === solo));
-  mark(nodes.pick, 'aria-label', `Lane ${view.lane}, ${view.surface}: ${view.headline}`);
-  put(nodes.model, view.model);
-  put(nodes.headline, view.headline);
-  put(nodes.shutter, view.shutterText);
-  put(nodes.fresh, view.freshText);
-  reveal(nodes.alarm, !!view.alarm);
-  put(nodes.alarm, view.alarm ? `${view.alarm.text} reported` : '');
-
-  const armed = phase === 'armed', busy = phase === 'sending' || phase === 'waiting';
-  reveal(nodes.arm, !armed); reveal(nodes.confirm, armed); reveal(nodes.cancel, armed);
-  put(nodes.arm, phase === 'sending' ? 'Sending…' : view.move.label);
-  mark(nodes.arm, 'aria-disabled', String(!view.move.enabled || busy));
-  mark(nodes.arm, 'aria-busy', String(phase === 'sending'));
-  if (armed) {
-    const left = Math.max(0, Math.ceil((move.armedAt + MOVE_CONFIRM_MS - local) / 1000));
-    put(nodes.confirm, `Confirm ${move.verb.toLowerCase()} ${view.lane} (${left})`);
-    put(nodes.why, 'Nothing sent yet.');
-  } else put(nodes.why, move?.message || (phase === 'sending' ? 'Sending to the relay.' : view.move.reason));
-  mark(nodes.why, 'title', nodes.why.textContent);
-  mark(nodes.fresh, 'title', view.freshText);
+// ---- Setup check: one press, a list of pass, fail or cannot check. It reads; it sends nothing to a projector.
+function renderSetup(relayView, lock) {
+  const blocked = setupRunning ? 'Checking.' : setupBlocked({ relay: relayView, lock }), button = $('#sb-setup-run');
+  mark(button, 'aria-disabled', String(!!blocked));
+  mark(button, 'aria-busy', setupRunning ? 'true' : null);
+  put(button, setupResult ? 'Run setup check again' : 'Run setup check');
+  put($('#sb-setup-why'), setupRunning ? 'Asking the relay.' : blocked);
+  put($('#sb-setup-summary'), setupResult ? `${setupResult.summary} · checked ${clockSeconds(setupResult.at)}` : 'Not run yet.');
+  mark($('#sb-setup-summary'), 'data-state', !setupResult ? 'off' : setupResult.counts.fail ? 'attention' : setupResult.counts.cannot ? 'eye' : 'ok');
 }
-
-// ---- Shutter moves: arm, confirm inside six seconds, then wait for the projector's own report.
-function finish(lane, move, phase, message, outcome) {
-  Object.assign(move, { phase, message, until: Date.now() + RESULT_MS });
-  if (outcome) lastMove = { lane, verb: move.verb, at: Date.now() + clockOffset, outcome };
-  say(message);
-}
-function settleMoves(local) {
-  for (const [lane, move] of moves) {
-    const view = lanes.find(l => l.lane === lane);
-    if (move.phase === 'armed') {
-      const same = view?.move.enabled && view.slot === move.slot && view.revision === move.revision && view.move.arg === move.arg;
-      if (!same) { finish(lane, move, 'note', 'Not sent: the reading changed.'); refocus(lane); }
-      else if (local >= move.armedAt + MOVE_CONFIRM_MS) { finish(lane, move, 'note', 'Not sent: confirm timed out.'); refocus(lane); }
-    } else if (move.phase === 'waiting') {
-      const want = move.arg ? 'closed' : 'open';
-      if (view?.reach === 'live' && view.shutter === want) finish(lane, move, 'done', `Reported ${want.toUpperCase()} at ${clockShort(local + clockOffset)}.`, `projector reported ${want}`);
-      else if (local >= move.sentAt + MOVE_REPORT_MS) finish(lane, move, 'note', `Sent, but not reported ${want}. Check by eye.`, `sent, projector has not reported ${want}`);
-    } else if (move.phase !== 'sending' && local >= move.until) moves.delete(lane);
+function drawSetup(result) {
+  const groups = new Map();
+  for (const line of result.lines) { if (!groups.has(line.group)) groups.set(line.group, []); groups.get(line.group).push(line); }
+  const nodes = [];
+  for (const [name, lines] of groups) {
+    const section = el('section', { class: 'sb-group' }), items = el('ul', { class: 'sb-lines' });
+    const worst = lines.some(line => line.state === 'fail') ? 'fail' : lines.some(line => line.state === 'cannot') ? 'cannot' : 'pass';
+    section.dataset.state = worst;
+    section.append(el('h3', { class: 'sb-group__h' }, name));
+    for (const line of lines) {
+      const item = el('li', { class: 'sb-line', 'data-state': line.state, 'data-line': line.id });
+      item.append(el('span', { class: 'sb-line__mark', 'aria-hidden': 'true' }, SETUP_MARKS[line.state]), el('span', { class: 'sb-line__label' }, line.label),
+        el('span', { class: 'sb-line__state' }, SETUP_WORDS[line.state]), el('span', { class: 'sb-line__reading' }, line.reading));
+      items.append(item);
+    }
+    section.append(items);
+    nodes.push(section);
   }
+  $('#sb-setup-list').replaceChildren(...nodes);
+  reveal($('#sb-setup-empty'), false);
 }
-// Hiding a focused button drops focus to the page; put it back on the lane's visible control.
-function refocus(lane) {
-  const nodes = laneNodes.get(lane);
-  if (!nodes.card.contains(document.activeElement)) return;
-  queueMicrotask(() => (nodes.confirm.hidden ? nodes.arm : nodes.confirm).focus());
-}
-function arm(lane) {
-  const view = lanes.find(l => l.lane === lane), current = moves.get(lane);
-  if (!view?.move.enabled || ['armed', 'sending', 'waiting'].includes(current?.phase)) return;
-  for (const [other, move] of moves) if (move.phase === 'armed') moves.delete(other);
-  moves.set(lane, { phase: 'armed', arg: view.move.arg, verb: view.move.verb, slot: view.slot, revision: view.revision, armedAt: Date.now() });
+async function runSetup() {
   render();
-  laneNodes.get(lane).confirm.focus();
-  say(`Confirm ${view.move.verb.toLowerCase()} shutter on lane ${lane} within ${MOVE_CONFIRM_MS / 1000} seconds. Nothing sent yet.`);
-}
-function cancel(lane) {
-  const move = moves.get(lane);
-  if (move?.phase !== 'armed') return;
-  moves.delete(lane);
+  if (setupRunning || setupBlocked({ relay, lock: lockState() })) { say($('#sb-setup-why').textContent); return; }
+  setupRunning = true;
   render();
-  laneNodes.get(lane).arm.focus();
-  say('Cancelled. Nothing sent.');
-}
-async function confirmMove(lane) {
-  const move = moves.get(lane);
-  if (move?.phase !== 'armed' || Date.now() - move.armedAt < MOVE_GUARD_MS) return; // a double tap never counts as the second step
-  render(); // recheck the reading at the moment of the second step
-  if (moves.get(lane) !== move || move.phase !== 'armed') return;
-  move.phase = 'sending';
+  // Fresh copies of everything the relay answers by request; lane readings come from the live snapshot.
+  [displays, feed, hostChecks] = await Promise.all([readDisplayReport(), readJson('api/cue-feed'), readJson('api/host-checks')]);
+  setupRunning = false;
   render();
-  laneNodes.get(lane).arm.focus();
-  const want = move.arg ? 'closed' : 'open';
-  try {
-    await sendShutter(move);
-    Object.assign(move, { phase: 'waiting', sentAt: Date.now(), message: `Sent. Waiting for ${lane} to report ${want}.` });
-    lastMove = { lane, verb: move.verb, at: move.sentAt + clockOffset, outcome: 'relay accepted it, waiting for the projector report' };
-    say(move.message);
-  } catch (error) {
-    // No answer is not a refusal: the command may have left before the reply was lost.
-    if (error.unsure) finish(lane, move, 'note', 'No answer from the relay. Check the lane by eye.', 'no answer from the relay, so it is not known whether it was sent');
-    else finish(lane, move, 'error', `Not done: ${error.message}`, `not done (${error.message})`);
+  setupResult = setupCheck({ lanes, relay: { ...relay, lastMessageAt: relay.lastMessageAt + clockOffset }, displays, feed, hostChecks, lock: lockState(), release: snapshot?.relay?.release?.version || snapshot?.relay?.release?.id || '', now: relayNow() });
+  drawSetup(setupResult);
+  render();
+  say(`Setup check done. ${setupResult.summary}.`);
+}
+$('#sb-setup-run').addEventListener('click', runSetup);
+
+// ---- MIDI test and the cue feed. The page only reads what the listener saw.
+const stepNodes = [0, 1].map(() => {
+  const item = el('li', { class: 'sb-step', 'data-state': 'idle' }), sign = el('span', { class: 'sb-step__mark', 'aria-hidden': 'true' }), label = el('span', { class: 'sb-step__label' }), word = el('span', { class: 'sb-step__word' });
+  item.append(sign, label, word);
+  $('#sb-midi-steps').append(item);
+  return { item, sign, label, word };
+});
+const STEP = { idle: ['·', 'Not yet'], wait: ['…', 'Waiting'], pass: ['✓', 'Pass'], fail: ['!', 'Did not arrive'], cannot: ['?', 'Cannot tell'] };
+let recentKey = '';
+function renderMidi(relayView, lock, now) {
+  if (midiTestRunning(midiTest)) {
+    const next = midiTestStep(midiTest, feed, now);
+    if (next !== midiTest) { midiTest = next; const view = midiTestView(midiTest, { feed, relay: relayView, lock, now }); say(`${view.title}. ${view.text}`); scheduleFeed(0); }
   }
+  const view = midiTestView(midiTest, { feed, relay: relayView, lock, now }), blocked = midiTestBlocked({ relay: relayView, lock, feed, now });
+  mark($('#sb-midi-test'), 'data-state', view.state);
+  put($('#sb-midi-title'), view.title);
+  put($('#sb-midi-text'), view.running || midiTest ? view.text : blocked || view.text);
+  put($('#sb-midi-hint'), view.hint);
+  put($('#sb-midi-stop'), view.running ? `Stop test (${view.count})` : 'Stop test');
+  // On a small screen the longer explanation sits behind "What this means"; the dialog follows the test live.
+  put($('#sb-midi-more-title'), view.title); put($('#sb-midi-more-text'), $('#sb-midi-text').textContent); put($('#sb-midi-more-hint'), view.hint);
+  view.steps.forEach((step, index) => {
+    const nodes = stepNodes[index];
+    mark(nodes.item, 'data-state', step.state);
+    put(nodes.sign, STEP[step.state][0]); put(nodes.label, step.label); put(nodes.word, [STEP[step.state][1], step.detail].filter(Boolean).join(' · '));
+  });
+  const start = $('#sb-midi-start');
+  reveal(start, !view.running); reveal($('#sb-midi-stop'), view.running);
+  mark(start, 'aria-disabled', String(!!blocked));
+  put(start, midiTest ? 'Start MIDI test again' : 'Start MIDI test');
+  mark(start, 'title', blocked || null);
+
+  const seen = feedView(feed, now);
+  mark($('#sb-feed'), 'data-tone', seen.tone);
+  put($('#sb-feed-title'), seen.title); put($('#sb-feed-text'), seen.text);
+  put($('#sb-last-title'), seen.lastCue.title); put($('#sb-last-text'), seen.lastCue.text);
+  const key = seen.recent.map(item => item.seq).join(',');
+  if (key !== recentKey) {
+    recentKey = key;
+    $('#sb-recent').replaceChildren(...seen.recent.map(item => { const row = el('li', { class: 'sb-recent__row' }); row.append(el('strong', {}, item.text), el('span', {}, item.meta)); return row; }));
+  }
+  reveal($('#sb-recent-empty'), !seen.recent.length);
+  put($('#sb-recent-empty'), seen.kind === 'listening' || seen.kind === 'stopped' ? 'No Show Control message heard yet.' : 'There is no cue feed to list.');
+}
+$('#sb-midi-start').addEventListener('click', async () => {
   render();
-}
-async function sendShutter({ slot, arg, revision }) {
-  let response;
-  try {
-    response = await fetch('api/command', { method: 'POST', headers: { 'content-type': 'application/json' }, cache: 'no-store', signal: AbortSignal.timeout(20000),
-      body: JSON.stringify({ slot, cmd: 'shutter', arg, ...(revision ? { expectedTargets: [{ slot, revision }] } : {}) }) });
-  } catch { throw Object.assign(new Error('the relay did not answer'), { unsure: true }); }
-  if (response.status === 401) { signIn(); throw new Error('signed out'); }
-  const out = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(out.error || `the relay refused it (${response.status})`);
-  if (out[slot]?.error) throw new Error(out[slot].error);
-  if (out[slot]?.result !== 'OK') throw new Error('the projector did not acknowledge');
-}
-$('#sb-lane-list').addEventListener('click', event => {
-  const button = event.target.closest('button[data-act]');
-  if (!button) return;
-  const lane = button.closest('[data-lane]').dataset.lane;
-  if (button.dataset.act === 'arm') arm(lane);
-  else if (button.dataset.act === 'confirm') confirmMove(lane);
-  else cancel(lane);
+  const blocked = midiTestBlocked({ relay, lock: lockState(), feed, now: relayNow() });
+  if (blocked) { put($('#sb-midi-text'), blocked); say(blocked); return; }
+  // Start from a fresh copy of the feed, so a cue that arrived before the tap can never count.
+  const fresh = await readJson('api/cue-feed');
+  if (fresh.status !== 'ok' || fresh.data?.state !== 'listening') { feed = fresh; render(); say('The cue feed could not be read. The test did not start.'); return; }
+  feed = fresh;
+  midiTest = midiTestStart(feed, relayNow());
+  render();
+  scheduleFeed(0);
+  $('#sb-midi-stop').focus();
+  say('MIDI test started. Fire cue 999 on the console now. This page sends nothing.');
 });
-document.addEventListener('keydown', event => {
-  if (event.repeat && event.target.closest?.('button[data-act]')) event.preventDefault(); // a held key is one press
-  if (event.key === 'Escape' && !document.querySelector('dialog[open]')) for (const [lane, move] of moves) if (move.phase === 'armed') cancel(lane);
+$('#sb-midi-stop').addEventListener('click', () => {
+  if (!midiTestRunning(midiTest)) return;
+  midiTest = { ...midiTest, phase: 'cancelled', endedAt: relayNow() };
+  render();
+  $('#sb-midi-start').focus();
+  say('Test stopped.');
 });
+async function pollFeed() {
+  if (feedBusy) return;
+  feedBusy = true;
+  const next = await readJson('api/cue-feed', 8000);
+  feedBusy = false;
+  feed = next;
+  render();
+  scheduleFeed();
+}
+function scheduleFeed(delay) {
+  clearTimeout(feedTimer);
+  feedTimer = setTimeout(pollFeed, delay ?? (midiTestRunning(midiTest) ? FEED_TEST_MS : feed.status === 'absent' ? FEED_ABSENT_MS : FEED_POLL_MS));
+}
 
 // ---- Relay connection
-function signIn() {
-  if (leaving) return;
-  leaving = true;
-  location.href = `login.html?next=${encodeURIComponent(location.pathname + location.hash)}`;
-}
 // A heartbeat carries the relay's time to the millisecond. Until one arrives, an HTTP Date header
 // (whole seconds) is close enough against a 15 second freshness limit.
 function syncClock(value, precise) {
@@ -262,7 +275,7 @@ function connect() {
   let ws;
   try { ws = new WebSocket(url); } catch { again(); return; }
   socket = ws;
-  ws.addEventListener('open', () => { if (mine === generation) { socketOpen = true; heard = false; openedAt = Date.now(); retry = 0; readCrewLinks(); } });
+  ws.addEventListener('open', () => { if (mine === generation) { socketOpen = true; heard = false; openedAt = Date.now(); retry = 0; readCrewLinks(); scheduleFeed(0); } });
   ws.addEventListener('message', event => {
     if (mine !== generation) return;
     try { receive(JSON.parse(event.data)); } catch { /* an unreadable frame is not a reading */ }
@@ -282,17 +295,11 @@ function dropSilentSocket() {
   try { socket?.close(); } catch { /* already closed */ }
   connect();
 }
-async function readDisplays() {
-  try {
-    const response = await fetch('api/host-displays', { cache: 'no-store', signal: AbortSignal.timeout(12000) });
-    if (response.status === 401) { signIn(); return; }
-    const data = await response.json();
-    if (!response.ok || data?.scope !== 'relay-computer') throw new Error('unexpected reply');
-    syncClock(response.headers.get('date'), false);
-    displays = { status: 'ok', data };
-  } catch { displays = { status: 'error', error: 'Display report failed' }; }
-  render();
+async function readDisplayReport() {
+  const answer = await readJson('api/host-displays');
+  return answer.status === 'ok' && answer.data?.scope === 'relay-computer' ? answer : { status: 'error', error: 'Display report failed' };
 }
+async function readDisplays() { displays = await readDisplayReport(); render(); }
 
 // ---- Crew notes link: optional, from the relay's private settings. The page never requests the
 // address itself; it only becomes the target of a link, and only if it is plain http or https.
@@ -307,7 +314,7 @@ async function readCrewLinks() {
     if (response.ok) address = notesAddress((await response.json())?.notes?.url); // 404 on an older relay, 401 when signed out: both mean no link
   } catch { address = null; }
   const link = $('#sb-notes-link');
-  if (address) mark(link, 'href', address); else link.removeAttribute('href');
+  mark(link, 'href', address);
   reveal($('#sb-notes'), !!address);
 }
 
@@ -319,9 +326,8 @@ function fillDetail() {
   mark($('[data-f=state]', dialog), 'data-state', check.state);
   put($('[data-f=title]', dialog), check.label);
   put($('[data-f=value]', dialog), `${check.value}. ${check.note}.`);
-  const key = check.id;
-  if (key === detailKey) return;
-  detailKey = key;
+  if (check.id === detailKey) return;
+  detailKey = check.id;
   $('[data-f=detail]', dialog).replaceChildren(...check.detail.map(text => el('p', {}, text)));
   $('[data-f=cannot]', dialog).replaceChildren(...check.cannot.map(text => el('li', {}, text)));
 }
@@ -333,47 +339,40 @@ $('#sb-check-list').addEventListener('click', event => {
   $('#sb-detail').showModal();
 });
 $('#sb-detail').addEventListener('close', () => { openCheck = null; });
+$('#sb-shared').addEventListener('click', () => $('#sb-shared-note').showModal());
+$('#sb-midi-more').addEventListener('click', () => $('#sb-midi-detail').showModal());
 for (const button of document.querySelectorAll('dialog [data-close]')) button.addEventListener('click', () => button.closest('dialog').close());
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && !document.querySelector('dialog[open]')) control.cancelArmed(); });
 
-// ---- Call for help with a snapshot
-async function copySnapshot() {
-  const area = $('#sb-snapshot-text'), status = $('#sb-snapshot-status');
-  let copied = false;
-  try { if (window.isSecureContext && navigator.clipboard?.writeText) { await navigator.clipboard.writeText(area.value); copied = true; } } catch { copied = false; }
-  if (!copied) { // plain-http LAN pages have no Clipboard API; the selection command still works on a tap
-    area.focus(); area.select(); area.setSelectionRange(0, area.value.length);
-    try { copied = document.execCommand('copy'); } catch { copied = false; }
+// ---- Tabs. The open tab is kept in the address, so a reload or a sign-in returns to it.
+const tabButtons = TABS.map(id => $(`#t-${id}`));
+function showTab(id, { focusPanel = false, push = true } = {}) {
+  tab = TABS.includes(id) ? id : 'control';
+  for (const button of tabButtons) {
+    const on = button.getAttribute('aria-controls') === tab;
+    mark(button, 'aria-selected', String(on));
+    button.tabIndex = on ? 0 : -1;
+    $(`#${button.getAttribute('aria-controls')}`).hidden = !on;
   }
-  put(status, copied ? 'Copied. Paste it into a text message.' : 'This browser blocked the copy. Select the text below and copy it by hand.');
-  mark(status, 'data-state', copied ? 'ok' : 'eye');
+  mark($('.sb-shell'), 'data-tab', tab);
+  if (push && location.hash !== `#${tab}`) history.pushState(null, '', `#${tab}`);
+  if (tab === 'know') know.load();
+  if (focusPanel) $(`#${tab}`).focus();
 }
-$('#sb-help').addEventListener('click', () => {
-  render();
-  const text = snapshotText({ lanes, checks, verdict, lock: !!snapshot?.lock, simulation: !!snapshot?.simulation, relay, lastMove, now: Date.now() + clockOffset });
-  $('#sb-snapshot-text').value = text;
-  $('#sb-snapshot-sms').href = smsHref(text);
-  $('#sb-snapshot').showModal();
-  copySnapshot();
+tabButtons.forEach((button, index) => {
+  button.addEventListener('click', () => showTab(button.getAttribute('aria-controls'), { focusPanel: true }));
+  button.addEventListener('keydown', event => {
+    const to = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: TABS.length - 1 }[event.key];
+    if (to == null) return;
+    event.preventDefault();
+    const next = tabButtons[(to + TABS.length) % TABS.length];
+    next.focus();
+    showTab(next.getAttribute('aria-controls'));
+  });
 });
-$('#sb-snapshot-copy').addEventListener('click', copySnapshot);
+addEventListener('popstate', () => showTab(location.hash.slice(1), { push: false }));
 
-// ---- Views: both sections show on a large screen; a small screen shows one, chosen from the bottom rail.
-function setView(view, { write = false } = {}) {
-  const next = view === 'checks' ? 'checks' : 'lanes';
-  mark($('#sb-main'), 'data-view', next);
-  for (const button of document.querySelectorAll('[data-view-btn]')) mark(button, 'aria-pressed', String(button.dataset.viewBtn === next));
-  if (write && location.hash.slice(1) !== next) history.replaceState(null, '', `#${next}`); // a reload or a sign-in returns to the same view
-}
-for (const button of document.querySelectorAll('[data-view-btn]')) button.addEventListener('click', () => setView(button.dataset.viewBtn, { write: true }));
-addEventListener('hashchange', () => setView(location.hash.slice(1)));
-$('#sb-pick').addEventListener('click', event => {
-  const button = event.target.closest('button[data-pick]');
-  if (!button) return;
-  solo = button.dataset.pick;
-  render();
-});
-
-setView(location.hash.slice(1));
+showTab(location.hash.slice(1), { push: false });
 render();
 connect();
 readDisplays();

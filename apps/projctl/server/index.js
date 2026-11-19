@@ -31,6 +31,7 @@ import { createManualDiscovery } from './discovery.js';
 import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, browserRequestAllowed, LOGIN_BODY_BYTES } from './http-security.js';
 import { readSoftwareChecks } from './software-checks.js';
 import { readCrewLinks } from './crew-links.js';
+import { createShowRoutes } from './show-routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -80,6 +81,7 @@ function enforceLoginThrottle(ip, res) {
 }
 const DATA = process.env.RIG || path.join(__dirname, '..', 'data', SIM ? 'rig.sim.json' : 'rig.json');
 const STAGE_PLOT = process.env.STAGE_PLOT || path.join(path.dirname(DATA), 'stage-plot.json');
+const showRoutes = createShowRoutes({ dataDir: path.dirname(DATA), appDir: path.join(__dirname, '..'), sim: SIM });
 const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 'venue');
 
 const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
@@ -585,6 +587,7 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/health-reports' && req.method === 'GET') return json(res, 200, health.view());
     if (url.pathname === '/api/software-checks' && req.method === 'GET') return json(res, 200, await readSoftwareChecks(path.join(path.dirname(DATA), 'software-checks.json'), path.join(__dirname, '../DELIVERY.json'), RELEASE));
     if (url.pathname === '/api/crew-links' && req.method === 'GET') return json(res, 200, await readCrewLinks(path.join(path.dirname(DATA), 'crew-links.json')));
+    if (await showRoutes(req, res, url, json)) return; // cue feed, host checks and documents for the role pages (read only)
     if (url.pathname === '/api/health-reports/run' && req.method === 'POST') return json(res, 200, { report: await health.run(), ...health.view() });
     if (url.pathname === '/api/thermal' && req.method === 'GET') {
       const minutes = Math.min(RETENTION_MS / 60000, Math.max(1, Number(url.searchParams.get('minutes')) || 30));

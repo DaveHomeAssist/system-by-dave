@@ -1,5 +1,13 @@
 # Changelog
 
+## Projctl show backup page: control, setup check, MIDI test and documents, 2026-11-18
+
+- The show backup page (`apps/projctl/public/show.html`) is now shared by the show backup operator and the designer, with four tabs under the go or no-go strip. **Control** offers power on, power off, shutter open and shutter close for one lane or all lanes, each in two steps; power off uses the relay's own one-use confirmation. Each lane shows which link carries it, and its input and test pattern (read only). **Setup check** lists pass, fail or cannot check with the reading on every line. **MIDI test** waits for Show Control cue 999 from the lighting console and then the clear cue 999.5; it sends no MIDI. **Know** shows diagrams and documents from a private folder on the relay computer.
+- The control is one shared component (`projector-control.js`, `projector-control-model.js`, `projector-control.css`) that another role page can mount. It sends one command per lane with the reviewed target, never a group target.
+- Four read-only relay routes behind the existing sign-in: `GET /api/cue-feed` (a listen-only observer file, tailed by `server/cue-feed.js`), `GET /api/host-checks` (`server/host-checks.js`, "cannot check" until a provider is configured), `GET /api/know` and `GET /api/know/file` (`server/know-folder.js`: manifest-named files only, no traversal, six file types). Paths come from a private `host-paths.json` beside the rig. `server/index.js` gains three lines.
+- "Call for help with a snapshot" is removed from this build on the owner's word. The crew notes link stays, on the Know tab.
+- Simulator and fixtures only. Not installed. No command from this page has reached a projector, the control-port link is unproven under command, and the MIDI test has not read a real observer file. Brief and open decisions: `apps/projctl/docs/show-backup-page.md`.
+
 ## Projctl show backup page, 2026-11-18
 
 - Add `apps/projctl/public/show.html`, a role page for the person who backs up projection from the lighting position. A go or no-go strip (lanes lit, outputs, cue link, show computer) sits above the four lanes. A lane the relay is not reading says "check by eye" and never shows its last known state. The cue link says "Not connected", because console cues do not pass through the relay.

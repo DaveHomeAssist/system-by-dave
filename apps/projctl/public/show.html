@@ -6,30 +6,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Projctl | Show backup</title>
-<meta name="description" content="Show backup page: a go or no-go strip, the four projection lanes as the relay reports them, and a guarded shutter control for each lane.">
+<meta name="description" content="Show backup page: a go or no-go strip, guarded power and shutter control for the four projection lanes, a setup check, a MIDI test and the rig's documents.">
 <link rel="canonical" href="http://localhost:8080/show.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Projctl relay">
 <meta property="og:title" content="Projctl | Show backup">
-<meta property="og:description" content="Show backup page: a go or no-go strip, the four projection lanes as the relay reports them, and a guarded shutter control for each lane.">
+<meta property="og:description" content="Show backup page: a go or no-go strip, guarded power and shutter control for the four projection lanes, a setup check, a MIDI test and the rig's documents.">
 <meta property="og:url" content="http://localhost:8080/show.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Projctl | Show backup">
-<meta name="twitter:description" content="Show backup page: a go or no-go strip, the four projection lanes as the relay reports them, and a guarded shutter control for each lane.">
+<meta name="twitter:description" content="Show backup page: a go or no-go strip, guarded power and shutter control for the four projection lanes, a setup check, a MIDI test and the rig's documents.">
 <meta name="theme-color" content="#edf5fa">
 <link rel="icon" href="data:,">
 <script src="frozen-theme.js"></script><link rel="stylesheet" href="frozen-theme.css">
 <link rel="stylesheet" href="avd/tokens.css">
+<link rel="stylesheet" href="projector-control.css">
 <link rel="stylesheet" href="show.css">
 <script type="module" src="show.js"></script>
 </head>
 <body>
-<a class="sb-skip" href="#sb-main">Skip to status</a>
+<a class="sb-skip" href="#sb-main">Skip to the tabs</a>
 <noscript><p class="sb-noscript">This page needs JavaScript to read the relay. Until it is on, check every lane by eye.</p></noscript>
 <div class="sb-shell">
   <header class="sb-top">
     <div class="sb-brand">
-      <p class="sb-kicker"><span>Projctl</span><span id="sb-sim" class="sb-sim" hidden>Simulation</span></p>
+      <p class="sb-kicker"><span>Projctl</span><span id="sb-sim" class="sb-sim" hidden>Simulation</span><button id="sb-shared" type="button" class="sb-shared" aria-haspopup="dialog">Shared sign-in</button></p>
       <h1>Show backup</h1>
     </div>
     <span id="sb-lock" class="sb-pill" data-lock="unknown" role="status">Show Lock unknown</span>
@@ -37,32 +38,89 @@
     <button id="theme" type="button" class="sb-btn sb-btn--quiet">Theme</button>
   </header>
 
-  <p id="sb-verdict" class="sb-verdict" data-state="off" role="status"><strong data-f="title">Connecting</strong><span data-f="text">Waiting for the relay. Nothing below is a reading yet.</span></p>
+  <section class="sb-strip" aria-labelledby="sb-strip-h">
+    <h2 id="sb-strip-h" class="sb-sr">Go or no-go</h2>
+    <p id="sb-verdict" class="sb-verdict" data-state="off" role="status"><strong data-f="title">Connecting</strong><span data-f="text">Waiting for the relay. Nothing below is a reading yet.</span></p>
+    <ul class="sb-checks" id="sb-check-list"></ul>
+  </section>
 
-  <main id="sb-main" class="sb-main" data-view="lanes" tabindex="-1">
-    <section id="sb-checks" class="sb-section sb-section--checks" aria-labelledby="sb-checks-h">
-      <h2 id="sb-checks-h" class="sb-sr">Go or no-go</h2>
-      <ul class="sb-checks" id="sb-check-list"></ul>
-      <p id="sb-notes" class="sb-notes" hidden>
-        <a id="sb-notes-link" class="sb-notes__link" target="_blank" rel="noopener noreferrer" aria-describedby="sb-notes-hint">Notes<span class="sb-sr"> (opens in a new tab)</span><span class="sb-notes__mark" aria-hidden="true">↗</span></a>
-        <span id="sb-notes-hint" class="sb-notes__hint"><span class="sb-notes__long">For notes that can wait. Not for emergencies or cue calls.</span><span class="sb-notes__short">Can wait. Not for emergencies.</span></span>
-      </p>
+  <nav class="sb-tabs" aria-label="Sections">
+    <div role="tablist" aria-label="Sections">
+      <button type="button" role="tab" id="t-control" aria-controls="control" aria-selected="true">Control</button>
+      <button type="button" role="tab" id="t-setup" aria-controls="setup" aria-selected="false" tabindex="-1"><span class="sb-long">Setup check</span><span class="sb-short">Setup</span></button>
+      <button type="button" role="tab" id="t-midi" aria-controls="midi" aria-selected="false" tabindex="-1"><span class="sb-long">MIDI test</span><span class="sb-short">MIDI</span></button>
+      <button type="button" role="tab" id="t-know" aria-controls="know" aria-selected="false" tabindex="-1">Know</button>
+    </div>
+  </nav>
+
+  <main id="sb-main" class="sb-panels" tabindex="-1">
+    <section role="tabpanel" id="control" class="sb-panel sb-panel--control" aria-labelledby="t-control" tabindex="0">
+      <div class="pc-picker" id="pc-pick" role="group" aria-label="Card shown"></div>
+      <div class="pc-grid" id="pc-root"></div>
     </section>
-    <section id="sb-lanes" class="sb-section sb-section--lanes" aria-labelledby="sb-lanes-h">
-      <h2 id="sb-lanes-h" class="sb-sr">Lanes and shutters</h2>
-      <div class="sb-pick" id="sb-pick" role="group" aria-label="Lane shown"></div>
-      <div class="sb-lanes" id="sb-lane-list"></div>
+
+    <section role="tabpanel" id="setup" class="sb-panel sb-panel--setup" aria-labelledby="t-setup" tabindex="0" hidden>
+      <div class="sb-bar">
+        <button id="sb-setup-run" type="button" class="sb-btn sb-btn--primary" aria-describedby="sb-setup-why">Run setup check</button>
+        <p id="sb-setup-summary" class="sb-bar__text" role="status">Not run yet.</p>
+        <p id="sb-setup-why" class="sb-bar__why"></p>
+      </div>
+      <div class="sb-scroll" tabindex="0" aria-label="Setup check results">
+        <p id="sb-setup-empty" class="sb-empty">One press checks the relay, each lane, the displays and the cue listener, and lists what it found as pass, fail or cannot check. It sends nothing to a projector.</p>
+        <div id="sb-setup-list" class="sb-setup"></div>
+      </div>
+    </section>
+
+    <section role="tabpanel" id="midi" class="sb-panel sb-panel--midi" aria-labelledby="t-midi" tabindex="0" hidden>
+      <div class="sb-card sb-midi" id="sb-midi-test" data-state="off">
+        <h3 class="sb-card__h">MIDI test from the console</h3>
+        <p class="sb-midi__title" id="sb-midi-title" role="status">Not run yet</p>
+        <p class="sb-midi__text" id="sb-midi-text"></p>
+        <ol class="sb-steps" id="sb-midi-steps"></ol>
+        <div class="sb-midi__actions">
+          <button id="sb-midi-start" type="button" class="sb-btn sb-btn--primary" aria-describedby="sb-midi-text">Start MIDI test</button>
+          <button id="sb-midi-stop" type="button" class="sb-btn" hidden>Stop test</button>
+          <button id="sb-midi-more" type="button" class="sb-btn sb-btn--quiet sb-midi__more" aria-haspopup="dialog">What this means</button>
+        </div>
+        <p class="sb-midi__hint" id="sb-midi-hint"></p>
+      </div>
+      <div class="sb-card sb-feed" id="sb-feed" data-tone="off">
+        <h3 class="sb-card__h">Cue link</h3>
+        <p class="sb-feed__line"><strong id="sb-feed-title">Reading</strong><span id="sb-feed-text"></span></p>
+        <h3 class="sb-card__h">Last cue received</h3>
+        <p class="sb-feed__line"><strong id="sb-last-title">Not available</strong><span id="sb-last-text"></span></p>
+        <h3 class="sb-card__h" id="sb-recent-h">Recent messages</h3>
+        <div class="sb-scroll" tabindex="0" aria-labelledby="sb-recent-h">
+          <p id="sb-recent-empty" class="sb-empty">Nothing to list.</p>
+          <ol id="sb-recent" class="sb-recent"></ol>
+        </div>
+      </div>
+    </section>
+
+    <section role="tabpanel" id="know" class="sb-panel sb-panel--know" aria-labelledby="t-know" tabindex="0" data-know="list" hidden>
+      <div class="sb-know__side">
+        <p id="sb-know-status" class="sb-know__status" role="status">Asking the relay for documents.</p>
+        <div class="sb-scroll" tabindex="0" aria-label="Diagrams and documents"><ul id="sb-know-list" class="sb-know__list"></ul></div>
+        <p id="sb-notes" class="sb-notes" hidden>
+          <a id="sb-notes-link" class="sb-notes__link" target="_blank" rel="noopener noreferrer" aria-describedby="sb-notes-hint">Notes<span class="sb-sr"> (opens in a new tab)</span><span class="sb-notes__mark" aria-hidden="true">↗</span></a>
+          <span id="sb-notes-hint" class="sb-notes__hint">For notes that can wait. Not for emergencies or cue calls.</span>
+        </p>
+      </div>
+      <div class="sb-know__view">
+        <div class="sb-know__bar">
+          <button id="sb-know-back" type="button" class="sb-btn sb-btn--quiet sb-know__back">List</button>
+          <h3 id="sb-know-title" class="sb-know__title">Choose a diagram or document</h3>
+          <div class="sb-know__tools" id="sb-know-tools" role="group" aria-label="Zoom" hidden>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="out" aria-label="Zoom out">−</button>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="fit">Fit</button>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="actual" aria-label="Actual size">100%</button>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="in" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+        <div class="sb-scroll sb-know__stage" id="sb-know-stage" tabindex="0" aria-label="Viewer" data-mode="empty"></div>
+      </div>
     </section>
   </main>
-
-  <footer class="sb-foot">
-    <nav class="sb-rail" aria-label="View">
-      <button type="button" class="sb-rail__btn" data-view-btn="lanes" aria-pressed="true">Lanes</button>
-      <button type="button" class="sb-rail__btn" data-view-btn="checks" aria-pressed="false">Checks</button>
-    </nav>
-    <button id="sb-help" type="button" class="sb-btn sb-btn--help" aria-label="Call for help with a snapshot"><span class="sb-help__long">Call for help with a snapshot</span><span class="sb-help__short">Help</span></button>
-    <p class="sb-foot__note">Shutters only. Power, patterns, lens and the show file stay with the video lead.</p>
-  </footer>
 </div>
 <p id="sb-live" class="sb-sr" aria-live="polite"></p>
 
@@ -76,16 +134,20 @@
   <button type="button" class="sb-btn sb-btn--primary" data-close>Close</button>
 </dialog>
 
-<dialog id="sb-snapshot" class="sb-dialog" aria-labelledby="sb-snapshot-title">
-  <h2 id="sb-snapshot-title">Snapshot for a text message</h2>
-  <p id="sb-snapshot-status" class="sb-dialog__value" role="status"></p>
-  <textarea id="sb-snapshot-text" class="sb-snapshot" readonly rows="9" aria-label="Snapshot text"></textarea>
-  <p class="sb-dialog__hint">No phone number is stored on this page. Use the number on your card.</p>
-  <div class="sb-dialog__actions">
-    <button type="button" id="sb-snapshot-copy" class="sb-btn sb-btn--primary">Copy again</button>
-    <a id="sb-snapshot-sms" class="sb-btn" href="sms:">Open a text message</a>
-    <button type="button" class="sb-btn sb-btn--quiet" data-close>Close</button>
-  </div>
+<dialog id="sb-midi-detail" class="sb-dialog" aria-labelledby="sb-midi-more-title">
+  <h2 id="sb-midi-more-title">MIDI test</h2>
+  <p id="sb-midi-more-text" class="sb-dialog__value"></p>
+  <p id="sb-midi-more-hint"></p>
+  <p class="sb-dialog__hint">This page sends no MIDI. It reads what a listen-only observer on the show computer heard.</p>
+  <button type="button" class="sb-btn sb-btn--primary" data-close>Close</button>
+</dialog>
+
+<dialog id="sb-shared-note" class="sb-dialog" aria-labelledby="sb-shared-title">
+  <h2 id="sb-shared-title">Shared sign-in</h2>
+  <p>Everyone who uses this page signs in with the same passcode. The relay records each command and its time. It does not record who sent it.</p>
+  <p>Say out loud what you are about to do before you confirm it, so two people do not act on the same lane at once.</p>
+  <p class="sb-dialog__hint">The same passcode also opens the main console.</p>
+  <button type="button" class="sb-btn sb-btn--primary" data-close>Close</button>
 </dialog>
 </body>
 </html>

@@ -1,0 +1,146 @@
+// Shared projector control model: what counts as a reading, when each of the four actions is
+// offered, every block reason, the Show Lock policy and the all-lanes target list.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { createConnectionMonitor } from '../public/projector-connection.js';
+import { ACTIONS, ACTION_IDS, DEFAULT_POLICY, CONFIRM_MS, RELAY_CONFIRM_MS, laneViews, actionState, sharedReason, groupState, groupSummary, linkOf, alarmSummary, targetsText, skippedText } from '../public/projector-control-model.js';
+
+const NOW = Date.parse('2026-11-18T19:00:00Z');
+const ago = ms => new Date(NOW - ms).toISOString();
+const QUIET = { fan: 0, lamp: 0, temp: 0, cover: 0, filter: 0, other: 0 };
+function projector(slot, lane, status = {}, extra = {}) {
+  return { slot, lane, driver: 'simulator', ip: 'sim', model: `Model ${lane}`, controlRevision: lane.toLowerCase().repeat(64),
+    inputs: { 31: 'HDMI 1', 32: 'SDI 1' }, inputPreference: { available: true, value: '31', label: 'HDMI 1' }, patterns: { '00': 'Off', '08': 'Crosshatch' },
+    status: { power: 'on', shutter: 'open', input: '31', pattern: '00', errors: QUIET, online: true, updatedAt: ago(2000), connection: { state: 'online', lastSuccessAt: ago(2000) }, ...status }, ...extra };
+}
+const held = (slot, lane) => projector(slot, lane, { online: false, connection: { state: 'reconnecting', lastSuccessAt: ago(9 * 3600000) } });
+const rig = (...projectors) => ({ type: 'snapshot', lock: false, relay: { pollIntervalMs: 5000 }, projectors });
+const views = (snapshot, relay = { connected: true, everConnected: true }) => laneViews(snapshot, { relayConnected: relay.connected, everConnected: relay.everConnected, monitor: createConnectionMonitor(), now: NOW });
+const byLane = list => Object.fromEntries(list.map(view => [view.lane, view]));
+const four = () => rig(projector('P1', 'A'), projector('P2', 'B'), projector('P3', 'C'), projector('P4', 'D'));
+const offered = (view, options) => Object.fromEntries(ACTION_IDS.map(id => [id, actionState(view, id, options).enabled]));
+
+test('the four actions map to the two relay commands and nothing else', () => {
+  assert.deepEqual(ACTION_IDS, ['power-on', 'power-off', 'shutter-open', 'shutter-close']);
+  assert.deepEqual(ACTION_IDS.map(id => [ACTIONS[id].cmd, ACTIONS[id].arg]), [['power', 1], ['power', 0], ['shutter', 0], ['shutter', 1]]);
+  assert.deepEqual(ACTION_IDS.filter(id => ACTIONS[id].relayConfirm), ['power-off'], 'only power off uses the relay\'s own confirmation');
+  assert.deepEqual([CONFIRM_MS, RELAY_CONFIRM_MS], [6000, 3000]);
+  assert.deepEqual(DEFAULT_POLICY, { lockBlocksPower: true, lockBlocksGroup: true });
+});
+
+test('a current reply shows power, shutter, input, pattern and link; a lost one shows none of them', () => {
+  const lanes = byLane(views(rig(held('P1', 'A'), projector('P2', 'B'), projector('P3', 'C', { controlLink: 'control-port', input: null, shutter: 'closed' }, { driver: 'panasonic' }), projector('P4', 'D'))));
+  assert.deepEqual([lanes.B.reach, lanes.B.headline, lanes.B.shutterText, lanes.B.inputText, lanes.B.patternText, lanes.B.tone, lanes.B.word], ['live', 'ON', 'OPEN', 'HDMI 1', 'Off', 'ok', 'ON']);
+  assert.deepEqual(lanes.B.link, { id: 'simulator', label: 'Simulator', unproven: false });
+  assert.equal(lanes.B.freshText, 'Reply 2s ago');
+  assert.deepEqual([lanes.A.reach, lanes.A.headline, lanes.A.power, lanes.A.shutter, lanes.A.input, lanes.A.pattern, lanes.A.link, lanes.A.word], ['unreached', 'CHECK BY EYE', null, null, null, null, null, 'EYE']);
+  assert.equal(lanes.A.blocked, "Relay can't reach it. Use the remote.");
+  assert.match(lanes.A.freshText, /^Last reply \d+:\d\d [AP]M$/);
+  // The control port reports power and shutter but not the input.
+  assert.deepEqual(lanes.C.link, { id: 'control-port', label: 'Control port', unproven: true });
+  assert.deepEqual([lanes.C.inputText, lanes.C.input, lanes.C.shutterText], ['Not reported', null, 'CLOSED · dark on stage']);
+});
+
+test('the link is named from what the driver reports, and only the control port is tagged unproven', () => {
+  const link = (driver, controlLink) => linkOf({ driver, status: { controlLink } });
+  assert.deepEqual(link('panasonic', 'pjlink'), { id: 'pjlink', label: 'PJLink', unproven: false });
+  assert.deepEqual(link('panasonic', undefined), { id: 'pjlink', label: 'PJLink', unproven: false });
+  assert.deepEqual(link('panasonic', 'control-port'), { id: 'control-port', label: 'Control port', unproven: true });
+  assert.deepEqual(link('pulse', undefined), { id: 'pulse', label: 'Barco API', unproven: false });
+  assert.deepEqual(link('other', undefined), { id: null, label: 'Not reported', unproven: false });
+});
+
+test('a wrong input and a test pattern left on are flagged, so a blue picture can be explained', () => {
+  const lanes = byLane(views(rig(projector('P1', 'A', { input: '32' }), projector('P2', 'B', { pattern: '08' }), projector('P3', 'C', { pattern: null, input: null }), projector('P4', 'D', {}, { inputPreference: { available: false, value: null, label: 'HDMI' } }))));
+  assert.deepEqual([lanes.A.inputText, lanes.A.inputFlag, lanes.A.tone, lanes.A.flags], ['SDI 1', 'Expected HDMI 1', 'attention', ['input SDI 1']]);
+  assert.deepEqual([lanes.B.patternText, lanes.B.patternFlag, lanes.B.tone, lanes.B.flags], ['ON · Crosshatch', 'Test pattern is on', 'attention', ['test pattern on']]);
+  assert.deepEqual([lanes.C.patternText, lanes.C.inputText, lanes.C.tone], ['Not reported', 'Not reported', 'ok'], 'not reported is not a fault');
+  assert.deepEqual([lanes.D.inputFlag, lanes.D.expectedInput], [null, null], 'no preferred input, so nothing to compare');
+  assert.deepEqual(alarmSummary({ ...QUIET, lamp: 1, temp: 2 }), { level: 'error', text: 'Temperature error, lamp warning' });
+});
+
+test('each action is offered only on a current reading that allows it', () => {
+  const state = power => byLane(views(rig(projector('P1', 'A', { power, shutter: 'open' }))))['A'];
+  assert.deepEqual(offered(state('on'), { lock: false }), { 'power-on': false, 'power-off': true, 'shutter-open': false, 'shutter-close': true });
+  assert.deepEqual(offered(state('off'), { lock: false }), { 'power-on': true, 'power-off': false, 'shutter-open': false, 'shutter-close': false });
+  assert.deepEqual(offered(state('warming'), { lock: false }), { 'power-on': false, 'power-off': true, 'shutter-open': false, 'shutter-close': false });
+  assert.deepEqual(offered(state('cooling'), { lock: false }), { 'power-on': false, 'power-off': false, 'shutter-open': false, 'shutter-close': false });
+  assert.deepEqual(offered(state('unknown'), { lock: false }), { 'power-on': false, 'power-off': false, 'shutter-open': false, 'shutter-close': false });
+
+  const reason = (view, id, lock = false) => actionState(view, id, { lock }).reason;
+  assert.equal(reason(state('on'), 'power-on'), 'Already reports ON.');
+  assert.equal(reason(state('warming'), 'power-on'), 'Already warming up.');
+  assert.equal(reason(state('cooling'), 'power-on'), 'Cooling. Wait before power on.');
+  assert.equal(reason(state('off'), 'power-off'), 'Already reports OFF.');
+  assert.equal(reason(state('cooling'), 'power-off'), 'Already cooling.');
+  assert.equal(reason(state('unknown'), 'power-on'), 'Power not reported.');
+  assert.equal(reason(state('off'), 'shutter-close'), 'Reports OFF, so no shutter move.');
+  assert.equal(reason(state('unknown'), 'shutter-open'), 'Power not reported, so no shutter move.');
+  assert.equal(reason(state('on'), 'shutter-open'), 'Already reports OPEN.');
+
+  const closed = byLane(views(rig(projector('P1', 'A', { shutter: 'closed' })))).A;
+  assert.deepEqual([actionState(closed, 'shutter-open', { lock: false }).enabled, reason(closed, 'shutter-close')], [true, 'Already reports CLOSED.']);
+  const blind = byLane(views(rig(projector('P1', 'A', { shutter: 'unknown' })))).A;
+  assert.deepEqual([actionState(blind, 'shutter-open', { lock: false }), actionState(blind, 'shutter-close', { lock: false })].map(s => [s.enabled, s.note]), [[true, 'Shutter position not reported.'], [true, 'Shutter position not reported.']]);
+});
+
+test('nothing is offered without a current reply, and every block carries its reason', () => {
+  const snapshot = rig(held('P1', 'A'), projector('P2', 'B', { connection: { state: 'online', lastSuccessAt: ago(40000) } }), projector('P3', 'C'), projector('P4', 'D'));
+  snapshot.projectors[2].lane = '';
+  const lanes = byLane(views(snapshot));
+  for (const [lane, reach, why] of [['A', 'unreached', "Relay can't reach it. Use the remote."], ['B', 'stale', 'Reply too old. Waiting for a fresh one.'], ['C', 'unassigned', 'No projector on this lane.']]) {
+    assert.equal(lanes[lane].reach, reach);
+    for (const id of ACTION_IDS) assert.deepEqual(actionState(lanes[lane], id, { lock: false }), { enabled: false, reason: why, note: '' }, `${lane} ${id}`);
+    assert.equal(sharedReason(lanes[lane], { lock: false }), why);
+  }
+  assert.equal(sharedReason(lanes.D, { lock: false }), '', 'a lane with something on offer has no single reason');
+  for (const view of views(four(), { connected: false, everConnected: true })) assert.equal(sharedReason(view, { lock: null }), 'Relay not answering. Use the remote.');
+  for (const view of views(null, { connected: false, everConnected: false })) assert.deepEqual([view.headline, sharedReason(view, { lock: null })], ['CONNECTING', 'Waiting for the relay.']);
+  const noTarget = { ...lanes.D, revision: null };
+  assert.equal(actionState(noTarget, 'shutter-close', { lock: false }).reason, 'No reviewed target for this lane.');
+});
+
+test('Show Lock locks power and leaves one-lane shutters available', () => {
+  const on = byLane(views(four())).A, off = byLane(views(rig(projector('P1', 'A', { power: 'off' })))).A;
+  assert.deepEqual(offered(on, { lock: true }), { 'power-on': false, 'power-off': false, 'shutter-open': false, 'shutter-close': true });
+  assert.equal(actionState(on, 'power-off', { lock: true }).reason, 'Show Lock is on. Power is locked.');
+  assert.equal(actionState(off, 'power-on', { lock: true }).reason, 'Show Lock is on. Power is locked.', 'the page is stricter than the relay, which allows power on');
+  assert.equal(actionState(on, 'power-off', { lock: null }).reason, 'Show Lock not read.');
+  // A page may choose the relay's own rule instead.
+  assert.equal(actionState(off, 'power-on', { lock: true, policy: { lockBlocksPower: false, lockBlocksGroup: true } }).enabled, true);
+});
+
+test('an all-lanes action lists exactly the lanes that will get it and why the others are skipped', () => {
+  const snapshot = rig(held('P1', 'A'), projector('P2', 'B'), projector('P3', 'C', { shutter: 'closed' }), projector('P4', 'D', { power: 'off' }));
+  const lanes = views(snapshot);
+  const close = groupState(lanes, 'shutter-close', { lock: false });
+  assert.equal(close.enabled, true);
+  assert.deepEqual(close.ready, [{ lane: 'B', slot: 'P2', revision: 'b'.repeat(64) }]);
+  assert.deepEqual(close.skipped, [{ lane: 'A', reason: "Relay can't reach it. Use the remote." }, { lane: 'C', reason: 'Already reports CLOSED.' }, { lane: 'D', reason: 'Reports OFF, so no shutter move.' }]);
+  assert.equal(skippedText(close.skipped), "A: relay can't reach it. Use the remote · C: already reports CLOSED · D: reports OFF, so no shutter move");
+  assert.deepEqual(groupState(lanes, 'power-on', { lock: false }).ready.map(target => target.lane), ['D']);
+  assert.deepEqual(groupState(lanes, 'power-off', { lock: false }).ready.map(target => target.lane), ['B', 'C']);
+  assert.equal(targetsText(groupState(lanes, 'power-off', { lock: false }).ready), 'B and C');
+  assert.deepEqual(groupSummary(lanes), { total: 4, reading: 3, lit: 2, closed: 1 });
+
+  // Under Show Lock every all-lanes action is locked, shutters included.
+  for (const id of ACTION_IDS) assert.deepEqual([groupState(lanes, id, { lock: true }).enabled, groupState(lanes, id, { lock: true }).reason, groupState(lanes, id, { lock: true }).ready], [false, 'Show Lock is on. All-lanes actions are locked.', []]);
+  assert.equal(groupState(lanes, 'shutter-close', { lock: true, policy: { lockBlocksPower: true, lockBlocksGroup: false } }).enabled, true, 'a page may leave the group shutter open under Show Lock');
+  assert.equal(groupState(views(four()), 'power-on', { lock: true, policy: { lockBlocksPower: true, lockBlocksGroup: false } }).reason, 'Show Lock is on. Power is locked.');
+
+  // Nothing to do, and no relay.
+  assert.deepEqual([groupState(views(four()), 'power-on', { lock: false }).enabled, groupState(views(four()), 'power-on', { lock: false }).reason], [false, 'Already reports ON.']);
+  assert.equal(groupState(lanes, 'shutter-open', { lock: false }).ready.length, 1);
+  assert.equal(groupState(views(four(), { connected: false, everConnected: true }), 'shutter-close', { lock: null }).reason, 'Show Lock not read.');
+  assert.equal(groupState(views(null, { connected: false, everConnected: false }), 'shutter-close', { lock: null }).reason, 'Waiting for the relay.');
+});
+
+test('the component sends only what the model names, one lane at a time, with the reviewed target', async () => {
+  const source = await readFile(new URL('../public/projector-control.js', import.meta.url), 'utf8');
+  const model = await readFile(new URL('../public/projector-control-model.js', import.meta.url), 'utf8');
+  assert.deepEqual([...model.matchAll(/cmd: '(\w+)'/g)].map(match => match[1]), ['power', 'power', 'shutter', 'shutter']);
+  assert.doesNotMatch(source, /cmd: '/, 'the component takes its commands from the model');
+  assert.match(source, /expectedTargets: \[\{ slot: target\.slot, revision: target\.revision \}\]/);
+  assert.doesNotMatch(source + model, /slot: 'all'|fetch\(|XMLHttpRequest|WebSocket|localStorage/, 'no group target and no network of its own');
+});
