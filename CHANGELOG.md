@@ -1,5 +1,9 @@
 # Changelog
 
+## Frozen booth workspace, November 19, 2026
+
+Workspace search opens show pages and R5 references. Notes retains the last shared task snapshot and queues offline checkoffs. Readiness reports identify operator confirmations and the connected relay can supply timestamped booth status.
+
 ## Projctl power operator page, 2026-11-18
 
 - Add `power.html` to the Projctl relay: a guided checklist for the crew member who turns the four projectors on each morning and off each night. Two modes, five steps each, one step open at a time. Lanes B and C use the relay's existing power command, with its two-step power off, Show Lock, stale-reply and cooling guards unchanged. Lanes A and D are done by handheld remote and are recorded with a "confirmed by eye" tick and an operator-started 170 second cooling countdown. The page never commands A or D and never draws a lane the relay has not reached as a reading.
@@ -11,6 +15,12 @@
 ## Projctl health reports: no current reading, 2026-11-18
 
 - A projector not reached at report time no longer shows its last power state as current. The unit table says "No current reading (last known on)", and saved reports render the same way. On Nov 17, lanes A and D kept showing "on" for about 10 hours with no contact.
+
+## Verify AV Video: retained suite in its own job, 2026-11-17
+
+- The `video` job was not hanging. It ran 12 to 15 minutes against its 15-minute limit; three of eight recent green runs finished above 14m40s. The retained standalone-build suite (`npm run test:av-retained-browser`, about six minutes) ran inside the last long step, "Infrastructure and Shop panels and saved-plan compatibility", so on a slower runner the job was cancelled while that suite was still passing checks (run 44161812645 and the first attempt of run 44167101248).
+- The suite now runs in a parallel `retained` job, which builds the eight family fixtures it serves. Every step in both jobs has its own `timeout-minutes`, so a real stall fails at the step that stalled.
+- The retained runner stops any probe that runs past four minutes (`AV_RETAINED_PROBE_LIMIT_MS`) and names it in the error.
 
 ## Projctl Barco standby power state, 2026-11-17
 
