@@ -2,6 +2,11 @@
 
 ## November 20, 2026. Frozen workspace navigation
 
+- Published Sites version 60 from managed source `1c50b07`, preserving the newer
+  version 59 Review release and its media. PR 554 merged after both CI gates and
+  all 33 Frozen reference regression steps passed. Live desktop navigation,
+  the eight session manifests and a real Review photo were read back on Dominic.
+
 - Consolidated the Frozen workspace navigation into one ordered model and shared
   header across the workspace, Handoff, Run review, Stage and Scenic pages.
 - Added an opening night countdown to the sixth Home card, targeting November 25
