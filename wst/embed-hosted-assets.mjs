@@ -6,6 +6,9 @@ const root=path.dirname(fileURLToPath(import.meta.url));
 for(const name of ['reference-view.js','reference-view.css','projector-connection.js','status-feedback.js','frozen-theme.js','frozen-theme.css'])fs.copyFileSync(path.resolve(root,'../apps/projctl/public',name),path.join(root,name));
 const worker=path.join(root,'hosting/worker/index.js');
 const source=fs.readFileSync(worker,'utf8');
+const assetsStart=source.indexOf('const ASSETS = ');
+const assetLineEnd=source.indexOf(';\n',assetsStart);
+const existingAssets=JSON.parse(source.slice(assetsStart+'const ASSETS = '.length,assetLineEnd));
 const seam=source.indexOf(';\nconst rates');
 if(seam<0)throw Error('Worker asset boundary changed; refusing to overwrite.');
 const indexHtml=fs.readFileSync(path.join(root,'index.html'),'utf8');
@@ -32,13 +35,13 @@ function walk(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
 const binaryFiles={'/documents/frozen-signal-flow-r5.pdf':'documents/frozen-signal-flow-r5.pdf','/documents/frozen-handoff-r5.pdf':'documents/frozen-handoff-r5.pdf','/documents/frozen-handoff-r4.pdf':'documents/frozen-handoff-r4.pdf','/stage/room.glb':'stage/room.glb','/frozen-tech-schedule.pdf':'frozen-tech-schedule.pdf','/pixel-strip-label.jpg':'pixel-strip-label.jpg','/pixel-power-supply.jpg':'pixel-power-supply.jpg'};
 let priorBinary={};
 try{priorBinary=JSON.parse(source.slice(source.lastIndexOf('const BINARY = ')+'const BINARY = '.length, seam));}catch{/* Recompress when the saved payloads are missing or unreadable. */}
-const binary={};
+const binary={...priorBinary};
 for(const [url,file] of Object.entries(binaryFiles)){const bytes=fs.readFileSync(path.join(root,file));let encoded=gzipSync(bytes).toString('base64');try{const prior=priorBinary[url];if(prior&&gunzipSync(Buffer.from(prior,'base64')).equals(bytes))encoded=prior;}catch{/* Recompress when the saved payload no longer matches. */}binary[url]=encoded;}
-const assets=Object.fromEntries(Object.entries(files).map(([url,file])=>[url,fs.readFileSync(path.join(root,file),'utf8')]));
-fs.writeFileSync(worker,'const ASSETS = '+JSON.stringify(assets)+';\nconst BINARY = '+JSON.stringify(binary)+source.slice(seam));
+const assets={...existingAssets,...Object.fromEntries(Object.entries(files).map(([url,file])=>[url,fs.readFileSync(path.join(root,file),'utf8')]))};
+fs.writeFileSync(worker,source.slice(0,assetsStart)+'const ASSETS = '+JSON.stringify(assets)+';\nconst BINARY = '+JSON.stringify(binary)+source.slice(seam));
 if(!process.argv.includes('--hosted-only')){
 const local=path.resolve(root,'../apps/projctl/public/workspace');
 fs.mkdirSync(local,{recursive:true});
-for(const file of ['documents/frozen-handoff-r5.pdf','documents/frozen-handoff-r4.pdf','documents/frozen-signal-flow-r5.pdf','index.html','handoff.html','frozen-theme.js','frozen-theme.css','workspace.css','workspace.js','workspace-offline.js','calendar.js','tech-schedule.json','frozen-tech-schedule.pdf','pixel-strip-label.jpg','pixel-power-supply.jpg','snow-splash.css','snow-splash.js','vendor/gsap.min.js','workspace-config.json','projectors.json','reference-view.js','reference-view.css','projector-connection.js','status-feedback.js']){const dest=path.join(local,file);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,file),dest);}
+for(const file of ['documents/frozen-handoff-r5.pdf','documents/frozen-handoff-r4.pdf','documents/frozen-signal-flow-r5.pdf','index.html','handoff.html','frozen-theme.js','frozen-theme.css','workspace.css','workspace.js','workspace-offline.js','calendar.js','tech-schedule.json','frozen-tech-schedule.pdf','pixel-strip-label.jpg','pixel-power-supply.jpg','snow-splash.css','snow-splash.js','vendor/gsap.min.js','workspace-config.json','projectors.json','reference-view.js','reference-view.css','projector-connection.js','status-feedback.js']){const dest=path.join(local,file);fs.mkdirSync(path.dirname(dest),{recursive:true});if(file==='index.html')fs.writeFileSync(dest,fs.readFileSync(path.join(root,file),'utf8').replaceAll('href="/run-review/"','href="https://wst.housevideo.app/run-review/"').replace('class="frozen-home-link" href="/"','class="frozen-home-link" href="index.html#home"'));else fs.copyFileSync(path.join(root,file),dest);}
 }
 console.log('Embedded canonical WST assets, configuration and projector reference.');

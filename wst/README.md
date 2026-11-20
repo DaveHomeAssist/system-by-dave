@@ -1,3 +1,25 @@
+## Canonical navigation and opening night, November 20, 2026
+
+`hosting/navigation/model.mjs` owns the workspace destination order, labels and
+URLs. `hosting/scripts/apply-navigation.mjs` applies that shell to every HTML
+entry point after the hosted build, including the independently supplied Review,
+Stage and Scenic pages. Keep it as the last hosting build step. The deployment
+mirror retains its existing capture, storage and media modules.
+
+Home has six public cards. The sixth counts down to November 25 at 7 p.m. Eastern,
+with the absolute date visible and a completed state at zero. The existing GSAP
+choreography now reveals the ice title, crystal and six cards; reduced motion,
+visibility pause and immediate navigation are retained. Controller tools remain a
+separate, initially hidden operator group. Personal notes and task guards retain
+their storage and authentication behavior.
+
+Validation: `node --test wst/navigation-contract.test.mjs wst/workspace.test.mjs wst/hosting/navigation/navigation.test.mjs`.
+In the complete Sites mirror, `node scripts/check-navigation.mjs` builds and checks
+all six HTML entry points; `node scripts/browser-navigation.mjs` runs the viewport,
+keyboard, theme, motion and countdown acceptance suite with the existing Playwright
+installation. Run substantial checks on an approved runner. The isolated preview
+server `scripts/preview-navigation.mjs` uses empty read-only test storage.
+
 # Frozen workspace
 
 The crew Calendar covers November 1 through January 3. It opens on the current

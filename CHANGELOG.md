@@ -1,5 +1,16 @@
 # Changelog
 
+## November 20, 2026. Frozen workspace navigation
+
+- Consolidated the Frozen workspace navigation into one ordered model and shared
+  header across the workspace, Handoff, Run review, Stage and Scenic pages.
+- Added an opening night countdown to the sixth Home card, targeting November 25
+  at 7 p.m. Eastern, with a visible absolute date and completed state.
+- Refreshed the GSAP ice title, crystal and card entrance, plus short workspace
+  transitions with reduced motion and visibility cleanup.
+- Preserved the current production shell inputs and made asset embedding retain
+  unrelated existing assets, binaries and Worker imports.
+
 ## Run Review usability and keyboard polish, 2026-11-20
 
 - Publish WST version 59 with Contact sheet search, clear filters, truthful note-save feedback, image retry, preview position and a notes Close control. Preserve the eight sessions and all evidence.
