@@ -45,5 +45,5 @@ test('controller tools remain present and initially hidden on the public workspa
 });
 
 test('the local Projctl source copy stays in sync with the canonical workspace inputs',()=>{
-  for(const file of ['index.html','snow-splash.css','snow-splash.js','workspace.css','workspace.js','workspace-offline.js'])assert.equal(read('../apps/projctl/public/workspace/'+file),file==='index.html'?read('./'+file).replaceAll('href="/run-review/"','href="https://wst.housevideo.app/run-review/"'):read('./'+file),file+' source parity; run node wst/embed-hosted-assets.mjs');
+  for(const file of ['index.html','snow-splash.css','snow-splash.js','workspace.css','workspace.js','workspace-offline.js'])assert.equal(read('../apps/projctl/public/workspace/'+file),file==='index.html'?read('./'+file).replaceAll('href="/run-review/"','href="https://wst.housevideo.app/run-review/"').replace('class="frozen-home-link" href="/"','class="frozen-home-link" href="index.html#home"'):read('./'+file),file+' source parity; run node wst/embed-hosted-assets.mjs');
 });
