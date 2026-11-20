@@ -1,18 +1,26 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "db5eecb6d99fb28cebe20b605a79ec68bb695b4c",
-  "deploymentId": "appgdep_6aff897a1e3c8191b9895b19d42dfe72",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5f5e483b3d708191950e4e46f6edc5be",
+  "managedSourceCommit": "a9773cf0bf6d5351394883d072c8f2b09d21b254",
+  "deploymentId": "appgdep_6b0002c09ae081918dacebfa87bbc74b",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_144e7bbfd32481918333d05e2abb9b4e",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 56,
-  "acceptedSourceCommit": "2008fc943ec79cde8f4aead5e58d268f97aa8b0f",
-  "publicVerifiedAt": "2026-11-19T23:52:56Z",
+  "versionNumber": 59,
+  "acceptedSourceCommit": "7487083949940f37caf53e008dad0e8635d6edd8",
+  "publicVerifiedAt": "2026-11-20T08:21:20.968257+00:00",
   "priorPublications": [
+    {
+      "versionNumber": 56,
+      "managedSourceCommit": "db5eecb6d99fb28cebe20b605a79ec68bb695b4c",
+      "deploymentId": "appgdep_6aff897a1e3c8191b9895b19d42dfe72",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5f5e483b3d708191950e4e46f6edc5be",
+      "acceptedSourceCommit": "2008fc943ec79cde8f4aead5e58d268f97aa8b0f",
+      "publicVerifiedAt": "2026-11-19T23:52:56Z"
+    },
     {
       "versionNumber": 55,
       "managedSourceCommit": "e755e56231e0167ad7d763ffce3920556ab1e07a",
@@ -236,7 +244,7 @@
     "sessions": [
       {
         "sessionId": "20261117-123916",
-        "label": "Afternoon run · Nov 17",
+        "label": "Afternoon run \u00b7 Nov 17",
         "events": 145,
         "go": 141,
         "originalPhotos": 562,
@@ -244,7 +252,7 @@
       },
       {
         "sessionId": "20261117-195209-act-1",
-        "label": "Show Act 1 · Nov 17",
+        "label": "Show Act 1 \u00b7 Nov 17",
         "events": 171,
         "go": 154,
         "originalPhotos": 476,
@@ -252,7 +260,7 @@
       },
       {
         "sessionId": "20261117-195209-act-2",
-        "label": "Show Act 2 · Nov 17",
+        "label": "Show Act 2 \u00b7 Nov 17",
         "events": 177,
         "go": 163,
         "originalPhotos": 473,
@@ -395,7 +403,7 @@
     "sessions": [
       {
         "sessionId": "20261118-185801-act-1",
-        "label": "Show Act 1 · Nov 18",
+        "label": "Show Act 1 \u00b7 Nov 18",
         "events": 252,
         "withPhotos": 229,
         "livePhotos": 606,
@@ -405,7 +413,7 @@
       },
       {
         "sessionId": "20261118-185801-act-2",
-        "label": "Show Act 2 · Nov 18",
+        "label": "Show Act 2 \u00b7 Nov 18",
         "events": 181,
         "withPhotos": 178,
         "livePhotos": 507,
@@ -488,7 +496,7 @@
     "sessions": [
       {
         "sessionId": "20261119-144854",
-        "label": "Rehearsal · Nov 19",
+        "label": "Rehearsal \u00b7 Nov 19",
         "events": 228,
         "withPhotos": 208,
         "publishedPhotos": 728,
@@ -519,9 +527,22 @@
     "browserAcceptance": {
       "host": "Dominic",
       "statesPassed": 192,
-      "widths": [1440, 1280, 680, 375, 2240, 3840],
-      "themes": ["light", "dark"],
-      "layouts": ["grid", "across"],
+      "widths": [
+        1440,
+        1280,
+        680,
+        375,
+        2240,
+        3840
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "layouts": [
+        "grid",
+        "across"
+      ],
       "behaviors": [
         "all eight sessions",
         "original image dimensions",
@@ -673,5 +694,32 @@
       "Public custom-domain Chromium palette, offline shell reload with a synthetic task, handoff backlink, hosted review load and synthetic ZIP scrub"
     ],
     "venueAcceptance": "Pending"
+  },
+  "reviewUsabilityRelease": {
+    "date": "2026-11-20",
+    "baselineVersion": 58,
+    "baselineManagedSource": "8d574f06732c1bf7b8dfbdb0f10d4fc513de9132",
+    "viewerPR": "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/11",
+    "viewerMerge": "16461608e67c78076c43c98f4b6cd07cf034b68d",
+    "scope": "Contact sheet search, filter recovery, notes close/save feedback, image retry, keyboard guards, small screen photo sizing",
+    "runner": "Dominic, cached Playwright 1.63 container",
+    "tests": {
+      "passed": 45,
+      "failed": 0,
+      "skipped": [
+        "F12: FRC_AFTERNOON_ZIP not supplied"
+      ]
+    },
+    "browserEngines": {
+      "chromium": "153.0.8010.12",
+      "firefox": "155.0",
+      "webkit": "26.6"
+    },
+    "viewportThemeCombinations": 84,
+    "tabLayoutChecks": 336,
+    "photoLayoutChecks": 168,
+    "liveCheck": "Mac in-app browser: Contact sheet search and return to cue, clear filters, notes Close, original preview next and Escape. Existing note count retained.",
+    "preserved": "Eight sessions; catalog, manifests, image routes, originals, observation context, IDs, note keys, DB/R2 bindings and current public audience",
+    "limits": "Native Windows/macOS browser and physical touch/assistive-technology acceptance not performed. Video remains deferred."
   }
 }
