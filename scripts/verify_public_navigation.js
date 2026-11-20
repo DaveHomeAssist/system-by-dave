@@ -25,8 +25,9 @@ const CORE_HEADERS = new Map([
   ['remote-desktop.html', 'Tools'],
   ['project-registry.html', 'Tools'],
   ['tailscale-manual.html', 'Tools'],
-  ['resume/index.html', 'Dave'],
-  ['profile/index.html', 'Dave']
+  // The profile and resume are reached from the shared footer's About / Hire link (nav audit fix 4).
+  ['resume/index.html', null],
+  ['profile/index.html', null]
 ]);
 const STANDALONE_RETURNS = [
   'switcher/index.html',
@@ -266,9 +267,13 @@ function verifyNavigationContract() {
     if (!/class="sbd-site-header"/.test(source)) fail(`${file} is missing the shared global header.`);
     // Pages also published on another domain (scripts/domain-sites.json) name
     // their systembydave.com destinations absolutely.
-    ['/tools.html', '/av/', '/notion.html', '/prompt-lab.html', '/profile/'].forEach((href) => {
+    // Header: Notion, AV by Dave (direct to avbydave.com), Demos, Prompt Lab, Tools; the shared footer adds About / Hire.
+    ['/tools.html', 'https://avbydave.com/', '/demos/', '/notion.html', '/prompt-lab.html', '/profile/'].forEach((href) => {
       if (!source.includes(`href="${href}"`) && !source.includes(`href="${SITE_ORIGIN}${href}"`)) fail(`${file} is missing global destination ${href}.`);
     });
+    if (!/class="sbd-site-menu"[^>]*aria-controls="sbd-site-links"/.test(source) || !/class="sbd-site-links" id="sbd-site-links"/.test(source)) fail(`${file} is missing the global header's phone Menu button.`);
+    if (!/<nav class="sbd-site-footer" aria-label="Site">/.test(source)) fail(`${file} is missing the shared site footer.`);
+    if (/<a href="\/profile\/"[^>]*>Dave<\/a>/.test(source)) fail(`${file} still gives the hiring profile a header slot.`);
     if (active === 'Home') {
       if (!source.includes('<a class="sbd-site-brand" href="/" aria-current="page">')) fail(`${file} does not mark Home current.`);
     } else if (active) {
