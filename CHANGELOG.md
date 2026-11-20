@@ -1,5 +1,17 @@
 # Changelog
 
+## November 20, 2026. Frozen workspace navigation
+
+- Consolidated the Frozen workspace navigation into one ordered model and shared
+  header across the workspace, Handoff, Run review, Stage and Scenic pages.
+- Added an opening night countdown to the sixth Home card, targeting November 25
+  at 7 p.m. Eastern, with a visible absolute date and completed state.
+- Refreshed the GSAP ice title, crystal and card entrance, plus short workspace
+  transitions with reduced motion and visibility cleanup.
+- Preserved the current production shell inputs and made asset embedding retain
+  unrelated existing assets, binaries and Worker imports.
+
+
 ## Frozen crew calendar through closing, 2026-11-20
 
 - Extend the Calendar through the January 3 closing matinee with all public

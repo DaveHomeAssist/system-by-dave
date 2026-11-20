@@ -1,13 +1,13 @@
 // Keep a previously opened Notes screen available if the venue connection drops.
-const cacheName = 'wst-frozen-notes-shell-v1';
+const cacheName = 'wst-frozen-notes-shell-nav-20261120';
 const root = new URL('./', self.location.href);
 const resources = ['index.html','workspace.js','workspace.css','calendar.js','frozen-theme.js',
- 'frozen-theme.css','snow-splash.css','snow-splash.js','vendor/gsap.min.js'];
+ 'workspace-navigation.js','workspace-navigation.css','opening-night.js','frozen-theme.css','snow-splash.css','snow-splash.js','vendor/gsap.min.js'];
 const allowed = new Set(resources.map(path => new URL(path, root).href));
 self.addEventListener('install', event => {
  event.waitUntil(caches.open(cacheName).then(cache => cache.addAll(resources)).then(() => self.skipWaiting()));
 });
-self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
+self.addEventListener('activate', event => event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith('wst-frozen-notes-shell-')&&key!==cacheName)await caches.delete(key);await self.clients.claim();})()));
 self.addEventListener('fetch', event => {
  const request = event.request;
  if (request.method !== 'GET') return;
