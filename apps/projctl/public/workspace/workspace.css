@@ -172,3 +172,7 @@ body.show-locked .shell { box-shadow:inset 0 0 0 2px var(--booth-warning); }
  body:not(.embedded-workspace) .shell:has(#booth-status) > :is(.panel,main){grid-row:3}
  body:not(.embedded-workspace) .primary-navigation{grid-row:4}
 }
+.task-access{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.task-access button{min-height:36px;padding:7px 10px}
+[data-controller-only][hidden]{display:none!important}
+@media(max-width:680px){.task-access{gap:4px}.task-access button{min-height:44px;font-size:10px;padding:6px 8px}}
