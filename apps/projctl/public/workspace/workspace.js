@@ -56,6 +56,23 @@ window.addEventListener('beforeunload', event => {
 });
 
 const taskCacheKey = 'wst_frozen_shared_todos_v1';
+const TASK_PASSCODE_KEY = 'wst.frozen.tasks-passcode.v1';
+function savedTaskPasscode() {
+ try { return sessionStorage.getItem(TASK_PASSCODE_KEY) || ''; }
+ catch { return ''; }
+}
+function requestTaskPasscode() {
+ const value = window.prompt('Crew passcode');
+ if (!value) { showEntryFeedback('Editing is locked.'); return ''; }
+ try { sessionStorage.setItem(TASK_PASSCODE_KEY, value); }
+ catch { showEntryFeedback('Editing is locked. This browser cannot save the passcode for this tab.'); return ''; }
+ showEntryFeedback('Passcode saved for this tab. The first change will confirm it.');
+ return value;
+}
+function lockTaskEditing() {
+ try { sessionStorage.removeItem(TASK_PASSCODE_KEY); } catch {}
+ showEntryFeedback('Editing is locked.');
+}
 function validEntries(rows) {
  return Array.isArray(rows) && rows.every(row => row && typeof row.id === 'string' &&
   typeof row.text === 'string' && ['task','update'].includes(row.kind ?? 'task') &&
@@ -95,6 +112,7 @@ let flushing = false;
 let replayNotice = '';
 async function replayOutbox(event) {
  if (flushing || !event.detail?.length) return;
+ if (!savedTaskPasscode()) { replayNotice = 'Offline checkoffs are pending. Unlock editing to retry.'; return; }
  flushing = true;
  try {
   for (const item of event.detail) {
@@ -104,7 +122,7 @@ async function replayOutbox(event) {
     replayNotice = 'A queued checkoff conflicted with a crew change. Review the current shared list.';
     resolved = true;
    } else if (Boolean(server.done) === item.done) resolved = true;
-   else { await taskAPI('/'+item.id, {...server, revision:item.revision, done:item.done}); resolved = true; }
+   else { await taskAPI('/'+item.id, {...server, revision:item.revision, done:item.done}, false); resolved = true; }
    if (resolved) localStorage.setItem(outboxKey, JSON.stringify(getOutbox().filter(next =>
     next.id !== item.id || next.revision !== item.revision || next.done !== item.done)));
   }
@@ -128,9 +146,19 @@ function showSnapshot(reason) {
 let editingEntry = null;
 const feedback = document.querySelector('#task-feedback');
 const updateFeedback = document.querySelector('#update-feedback');
-async function taskAPI(path = '', data) {
- const response = await fetch(TASK_BASE + '/api/tasks' + path, {method:data ? 'POST':'GET', headers:data ? {'Content-Type':'application/json'}:{}, body:data ? JSON.stringify(data):undefined, cache:'no-store'});
+async function taskAPI(path = '', data, allowPrompt = true) {
+ let passcode = '';
+ if (data) {
+  passcode = savedTaskPasscode();
+  if (!passcode && allowPrompt) passcode = requestTaskPasscode();
+  if (!passcode) throw Error('Editing is locked.');
+ }
+ const response = await fetch(TASK_BASE + '/api/tasks' + path, {method:data ? 'POST':'GET', headers:data ? {'Content-Type':'application/json','X-Frozen-Task-Passcode':passcode}:{}, body:data ? JSON.stringify(data):undefined, cache:'no-store'});
  const result = await response.json();
+ if (data && (response.status === 401 || response.status === 403)) {
+  lockTaskEditing();
+  throw Error('Editing is locked.');
+ }
  if(!response.ok) throw Error(result.error || 'Could not save. Try again.');
  return result;
 }
@@ -260,6 +288,10 @@ for(const [formId,fieldId,kind] of [['#task-add','#task-text','task'],['#update-
  };
 }
 document.querySelector('#refresh').onclick = loadTasks;
+document.querySelector('#unlock-task-editing').onclick = () => {
+ if (savedTaskPasscode()) showEntryFeedback('Editing is unlocked for this tab.');
+ else requestTaskPasscode();
+};
 showSnapshot('Connecting.');
 window.addEventListener('online', loadTasks);
 window.addEventListener('offline', () => { ++readSequence; showSnapshot('Offline.'); });
@@ -315,7 +347,11 @@ window.addEventListener('frozen:themechange',themeController);
 relayFrame.addEventListener('load',()=>{if(relayOrigin){relayFrame.contentWindow.postMessage({type:'wst:hello'},relayOrigin);themeController();}});
 window.addEventListener('message',event=>{if(event.source!==relayFrame.contentWindow||event.origin!==relayOrigin||event.data?.type!=='projctl:ready')return;if(event.data.relayConnected!==true){relayReady=false;relayStatus.textContent='Controller page loaded; relay is reconnecting.';document.querySelector('#workspace-connection').textContent='Private relay reconnecting';return;}relayReady=true;relayViews=new Set(Array.isArray(event.data.views)?event.data.views.filter(view=>CHILD_VIEWS.has(view)):['rig','stage']);relayProjectorSelection=event.data.projectorSelection===true;clearTimeout(relayTimer);recommendLink(false);const word='Private controller connected · '+(new URL(relayOrigin).hostname==='localhost'?'this Mac':new URL(relayOrigin).hostname);relayStatus.textContent=word;document.querySelector('#workspace-connection').textContent=word;sendChildView();});
 document.querySelector('#connect-mac').onclick=()=>connectRelay(controllerUrl,LOCAL_RELAY_WORKSPACE?'this controller':'this Mac');
-(async()=>{try{const response=await fetch(new URL('workspace-config.json',import.meta.url),{cache:'no-store'});const cfg=await response.json();if(cfg.control?.verified&&cfg.control.url){const button=document.querySelector('#connect-venue');button.hidden=false;button.onclick=()=>connectRelay(cfg.control.url,cfg.control.label||'theatre controller');}}catch{/* Keep explicit connection options. */}})();
+function showControllerNavigation(show) {
+ for (const item of document.querySelectorAll('[data-controller-only]')) item.hidden = !show;
+}
+if (LOCAL_CONTROLLER) showControllerNavigation(true);
+(async()=>{try{const response=await fetch(new URL('workspace-config.json',import.meta.url),{cache:'no-store'});const cfg=await response.json();if(cfg.control?.verified&&cfg.control.url){showControllerNavigation(true);const button=document.querySelector('#connect-venue');button.hidden=false;button.onclick=()=>connectRelay(cfg.control.url,cfg.control.label||'theatre controller');}}catch{/* Keep explicit connection options. */}})();
 window.addEventListener('hashchange',()=>navigate(parseHash().route,{...parseHash(),updateHash:false}));
 const embed=new URL(location.href).searchParams.get('embed');if(embed==='notes'||embed==='info'){document.body.classList.add('embedded-workspace');navigate(embed==='info'?'rig':'notes',{updateHash:false});}else navigate(parseHash().route,{...parseHash(),updateHash:false});
 window.addEventListener('message',event=>{if(event.source===parent&&event.origin===location.origin&&event.data?.type==='workspace:theme'&&['light','dark','system'].includes(event.data.mode||event.data.theme))window.FrozenTheme.set(event.data.mode||event.data.theme,{save:false});});

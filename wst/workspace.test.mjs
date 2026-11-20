@@ -78,3 +78,22 @@ test('shared theme events update the workspace without touching personal notes',
   assert.equal(app.context.document.documentElement.dataset.theme, 'dark');
   assert.equal(app.saved.get('wst.frozen.personal-notes.v1'), 'Keep me');
 });
+
+test('task editing keeps the crew passcode in session storage and reading stays public', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8');
+  assert.match(html, /id="unlock-task-editing"/);
+  assert.match(app, /sessionStorage\.setItem\(TASK_PASSCODE_KEY/);
+  assert.match(app, /'X-Frozen-Task-Passcode':passcode/);
+  assert.doesNotMatch(app, /localStorage\.(?:getItem|setItem)\(TASK_PASSCODE_KEY/);
+  assert.match(app, /if \(data && \(response\.status === 401 \|\| response\.status === 403\)\)/);
+  assert.match(app, /Editing is locked\./);
+});
+
+test('public controller entries start hidden and robots disallows crawling', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8');
+  assert.equal((html.match(/data-controller-only hidden/g) || []).length, 5);
+  assert.match(app, /cfg\.control\?\.verified&&cfg\.control\.url/);
+  assert.equal(readFileSync(new URL('./robots.txt', import.meta.url), 'utf8'), 'User-agent: *\nDisallow: /\n');
+});
