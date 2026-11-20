@@ -13,7 +13,7 @@ visibility pause and immediate navigation are retained. Controller tools remain 
 separate, initially hidden operator group. Personal notes and task guards retain
 their storage and authentication behavior.
 
-Validation: `node --test wst/workspace.test.mjs wst/hosting/navigation/navigation.test.mjs`.
+Validation: `node --test wst/navigation-contract.test.mjs wst/workspace.test.mjs wst/hosting/navigation/navigation.test.mjs`.
 In the complete Sites mirror, `node scripts/check-navigation.mjs` builds and checks
 all six HTML entry points; `node scripts/browser-navigation.mjs` runs the viewport,
 keyboard, theme, motion and countdown acceptance suite with the existing Playwright

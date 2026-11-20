@@ -2,10 +2,15 @@
 const cacheName = 'wst-frozen-notes-shell-nav-20261120';
 const root = new URL('./', self.location.href);
 const resources = ['index.html','workspace.js','workspace.css','calendar.js','frozen-theme.js',
- 'workspace-navigation.js','workspace-navigation.css','opening-night.js','frozen-theme.css','snow-splash.css','snow-splash.js','vendor/gsap.min.js'];
-const allowed = new Set(resources.map(path => new URL(path, root).href));
+ 'frozen-theme.css','snow-splash.css','snow-splash.js','vendor/gsap.min.js'];
+const navigation = ['workspace-navigation.js','workspace-navigation.css','opening-night.js'];
+const allowed = new Set([...resources,...navigation].map(path => new URL(path, root).href));
 self.addEventListener('install', event => {
- event.waitUntil(caches.open(cacheName).then(cache => cache.addAll(resources)).then(() => self.skipWaiting()));
+ event.waitUntil(caches.open(cacheName).then(async cache => {
+  await cache.addAll(resources);
+  const shell = await cache.match(new URL('index.html',root).href);
+  if ((await shell.text()).includes('data-wst-header')) await cache.addAll(navigation);
+ }).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', event => event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith('wst-frozen-notes-shell-')&&key!==cacheName)await caches.delete(key);await self.clients.claim();})()));
 self.addEventListener('fetch', event => {

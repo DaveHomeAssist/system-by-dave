@@ -95,3 +95,16 @@ test('public controller entries start hidden and robots disallows crawling', () 
   assert.match(app, /cfg\.control\?\.verified&&cfg\.control\.url/);
   assert.equal(readFileSync(new URL('./robots.txt', import.meta.url), 'utf8'), 'User-agent: *\nDisallow: /\n');
 });
+
+// The local controller serves the raw shell; the hosted build adds shared assets.
+test('offline install caches the assets served by each shell without requiring missing local files',async()=>{
+ const script=readFileSync(new URL('./workspace-offline.js',import.meta.url),'utf8');
+ for(const hosted of [false,true]){
+  const cached=[],listeners={};let installed=false;
+  vm.runInNewContext(script,{URL,caches:{open:async()=>({addAll:async names=>cached.push(...names),match:async()=>({text:async()=>hosted?'<header data-wst-header>':'<header>'})})},self:{location:{href:'https://example.test/workspace/workspace-offline.js'},addEventListener:(name,fn)=>listeners[name]=fn,skipWaiting:()=>{installed=true;}}});
+  let pending;listeners.install({waitUntil:promise=>{pending=promise;}});await pending;
+  assert(installed);assert(cached.includes('index.html'));
+  assert.equal(cached.includes('workspace-navigation.js'),hosted);
+  assert.equal(cached.includes('opening-night.js'),hosted);
+ }
+});
