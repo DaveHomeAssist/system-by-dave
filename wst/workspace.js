@@ -364,28 +364,47 @@ const workspaceMenu=document.querySelector('#workspace-menu');workspaceMenu.addE
 const moreMenu=document.querySelector('#nav-more');
 document.addEventListener('click',event=>{if(!moreMenu.contains(event.target))moreMenu.open=false;});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'){if(moreMenu.open){moreMenu.open=false;moreMenu.querySelector('summary').focus();}else if(document.body.classList.contains('workspace-menu-open')){document.body.classList.remove('workspace-menu-open');workspaceMenu.setAttribute('aria-expanded','false');workspaceMenu.focus();}}});
-let scheduleData=null,scheduleLoading=null,scheduleIndex=0,calendar=null;
+let scheduleData=null,scheduleLoading=null,scheduleIndex=0,calendar=null,scheduleMonth=null;
 function easternDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
 function scheduleLabel(date,short=false){return new Intl.DateTimeFormat('en-US',{timeZone:'UTC',weekday:short?'short':'long',month:short?'short':'long',day:'numeric'}).format(new Date(date+'T12:00:00Z'));}
 function renderSchedule(){
- calendar?.select(scheduleIndex);
+ const month=calendar.select(scheduleIndex),days=document.querySelector('#schedule-days');
+ if(month!==scheduleMonth){
+  scheduleMonth=month;
+  days.setAttribute('aria-label','Days in '+month.name);
+  days.replaceChildren();
+  const today=easternDate();
+  for(const {index,item} of month.entries){
+   const button=document.createElement('button');
+   button.type='button';
+   button.dataset.index=String(index);
+   button.textContent=scheduleLabel(item.date,true);
+   if(item.date===today){
+    button.textContent+=' · Today';
+    button.setAttribute('aria-current','date');
+   }
+   button.onclick=()=>{scheduleIndex=index;renderSchedule();};
+   days.append(button);
+  }
+ }
  const day=scheduleData[scheduleIndex],detail=document.querySelector('#schedule-detail');detail.replaceChildren();
  const heading=document.createElement('h3');heading.textContent=scheduleLabel(day.date);detail.append(heading);
  const list=document.createElement('ul');list.className='schedule-events';
- for(const event of day.events){const row=document.createElement('li'),name=document.createElement('strong'),time=document.createElement('span');name.textContent=event.label;time.textContent=event.time||'Time not specified';row.dataset.kind=eventKind(event.label);row.classList.toggle('schedule-highlight',/Preview|Performance|Final Dress|Opening Night/.test(event.label));row.append(name,time);list.append(row);}detail.append(list);detail.scrollTop=0;
+ for(const event of day.events){const row=document.createElement('li'),name=document.createElement('strong'),time=document.createElement('span');name.textContent=event.label;time.textContent=event.time||(event.label==='No shows'?'':'Time not specified');row.dataset.kind=eventKind(event.label);row.classList.toggle('schedule-highlight',/Preview|Performance|Final Dress|Opening Night/.test(event.label));row.append(name,time);list.append(row);}detail.append(list);detail.scrollTop=0;
  document.querySelector('#schedule-date').value=String(scheduleIndex);document.querySelector('#schedule-prev').disabled=scheduleIndex===0;document.querySelector('#schedule-next').disabled=scheduleIndex===scheduleData.length-1;
- for(const button of document.querySelectorAll('#schedule-days button')){if(Number(button.dataset.index)===scheduleIndex)button.setAttribute('aria-current','date');else button.removeAttribute('aria-current');}
+ for(const button of days.children)button.setAttribute('aria-pressed',String(Number(button.dataset.index)===scheduleIndex));
 }
 async function ensureSchedule(){
  if(scheduleData)return;if(scheduleLoading)return scheduleLoading;
  scheduleLoading=(async()=>{try{
  const response=await fetch(new URL('tech-schedule.json',import.meta.url));if(!response.ok)throw Error('Schedule unavailable');scheduleData=await response.json();
- calendar=mountCalendar(document.querySelector('#schedule-month'),scheduleData,index=>{scheduleIndex=index;renderSchedule();},easternDate());
- const today=easternDate(),found=scheduleData.findIndex(day=>day.date===today);scheduleIndex=found>=0?found:today<scheduleData[0].date?0:scheduleData.length-1;
- const select=document.querySelector('#schedule-date'),days=document.querySelector('#schedule-days');select.replaceChildren();days.replaceChildren();
- scheduleData.forEach((day,index)=>{const option=document.createElement('option');option.value=String(index);option.textContent=scheduleLabel(day.date);select.append(option);const button=document.createElement('button');button.type='button';button.dataset.index=String(index);button.textContent=scheduleLabel(day.date,true);if(day.date===today)button.textContent+=' · Today';button.onclick=()=>{scheduleIndex=index;renderSchedule();};days.append(button);});
+ const today=easternDate();
+ calendar=mountCalendar(document.querySelector('#schedule-month'),scheduleData,index=>{scheduleIndex=index;renderSchedule();},today);
+ const found=scheduleData.findIndex(day=>day.date===today);scheduleIndex=found>=0?found:today<scheduleData[0].date?0:scheduleData.length-1;
+ const select=document.querySelector('#schedule-date');select.replaceChildren();
+ scheduleData.forEach((day,index)=>{const option=document.createElement('option');option.value=String(index);option.textContent=scheduleLabel(day.date);select.append(option);});
  select.onchange=()=>{scheduleIndex=Number(select.value);renderSchedule();};document.querySelector('#schedule-prev').onclick=()=>{if(scheduleIndex>0){scheduleIndex--;renderSchedule();}};document.querySelector('#schedule-next').onclick=()=>{if(scheduleIndex<scheduleData.length-1){scheduleIndex++;renderSchedule();}};
- const todayButton=document.querySelector('#schedule-today');todayButton.disabled=found<0;todayButton.title=found<0?'Today is outside this November 2026 schedule':'Show today in Philadelphia';todayButton.onclick=()=>{const index=scheduleData.findIndex(day=>day.date===easternDate());if(index>=0){scheduleIndex=index;renderSchedule();}};renderSchedule();
+ const todayButton=document.querySelector('#schedule-today');todayButton.disabled=found<0;todayButton.title=found<0?'Today is outside the Frozen schedule':'Show today in Philadelphia';todayButton.onclick=()=>{const index=scheduleData.findIndex(day=>day.date===easternDate());if(index>=0){scheduleIndex=index;renderSchedule();}};renderSchedule();
  }catch{document.querySelector('#schedule-month').textContent='Calendar unavailable. Open the original PDF or retry below.';const detail=document.querySelector('#schedule-detail');detail.replaceChildren();const text=document.createElement('p');text.textContent='The daily schedule could not load. Open the original PDF above, or retry.';const retry=document.createElement('button');retry.type='button';retry.textContent='Retry schedule';retry.onclick=()=>ensureSchedule();detail.append(text,retry);scheduleData=null;}finally{scheduleLoading=null;}})();return scheduleLoading;
 }
 

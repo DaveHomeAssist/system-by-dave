@@ -1,5 +1,13 @@
 # Changelog
 
+## Frozen crew calendar through closing, 2026-11-20
+
+- Extend the Calendar through the January 3 closing matinee with all public
+  performances, accessibility performances and days without shows. Preserve
+  the November tech calls and original PDF.
+- Browse November, December and January with month controls and keyboard day
+  navigation. Open on the current Eastern month within the run.
+
 ## Frozen workspace: crew task lock and public navigation tidy, 2026-11-20
 
 - Keep shared task reads public while requiring a crew passcode for every add, edit, completion and delete. The Worker fails closed until Dave sets the Site secret, compares fixed-length digests, rejects cross-origin writes and no longer emits wildcard CORS.
