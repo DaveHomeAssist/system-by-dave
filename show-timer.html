@@ -1282,8 +1282,9 @@
   });
   document.addEventListener('keydown', event => {
     const target = event.target;
-    const typing = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
+    const typing = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || target.isContentEditable;
     if (typing) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return; // leave browser/OS shortcuts (Cmd+R, Ctrl+F, ...) alone
     if (event.key === ' ') {
       event.preventDefault();
       toggleRun();
@@ -1320,5 +1321,6 @@
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
+<script src="js/sbd-shortcuts.js" defer></script>
 </body>
 </html>

@@ -6437,7 +6437,11 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       ae.tagName === 'INPUT' || ae.tagName === 'SELECT' || ae.tagName === 'TEXTAREA');
     var k = e.key;
 
+    // Ctrl/Cmd/Alt combos belong to the browser and OS (Cmd+R, Cmd+C, Cmd+F, ...).
+    // The rich editor's Cmd/Ctrl+B bold is handled in the typing branch below.
+    var modified = e.ctrlKey || e.metaKey || e.altKey;
     if(isRemoteMode){
+      if(modified) return;
       switch(k){
         case ' ': case 'Spacebar':
           e.preventDefault(); sendRemoteCommand('togglePlay'); break;
@@ -6488,6 +6492,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       if(k==='Escape'){ e.preventDefault(); setReading(true); }
       return;
     }
+    if(modified) return;
 
     switch(k){
       case ' ': case 'Spacebar':
@@ -6577,5 +6582,6 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
+<script src="js/sbd-shortcuts.js" defer></script>
 </body>
 </html>

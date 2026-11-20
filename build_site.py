@@ -301,6 +301,7 @@ def page_shell(current_path: str, title: str, description: str, body: str) -> st
             </div>
           </footer>
         <script src="{root}js/sbd-public-nav.js" defer></script>
+        <script src="{root}js/sbd-shortcuts.js" defer></script>
 </body>
         </html>
         """

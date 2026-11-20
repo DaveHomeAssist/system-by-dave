@@ -2902,8 +2902,9 @@
     // Browser and system chords (Ctrl+D, Cmd+L, Alt+N) are never cue shortcuts.
     if (event.ctrlKey || event.metaKey || event.altKey) return;
     const target = event.target;
-    const typing = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
+    const typing = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || target.isContentEditable;
     if (typing) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return; // leave browser/OS shortcuts (Cmd+R, Ctrl+F, ...) alone
     if (event.key.toLowerCase() === 'n') {
       addCue();
     } else if (event.key.toLowerCase() === 'j') {
@@ -2939,6 +2940,7 @@
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
+<script src="js/sbd-shortcuts.js" defer></script>
 <script src="js/av-viewport.js"></script>
 <script src="js/av-cue-viewport.js"></script>
 </body>
