@@ -1,5 +1,10 @@
 # Frozen workspace
 
+The crew Calendar covers November 1 through January 3. It opens on the current
+Eastern month within the run. Use Previous month and Next month to browse the
+run, or Today to return to the current date. The original November tech PDF is
+still available. Performance times are Eastern and subject to change.
+
 ## Two-session rehearsal review
 
 The existing `/run-review/` route uses the maintained viewer from
