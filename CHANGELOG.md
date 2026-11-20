@@ -11,6 +11,11 @@
 - Preserved the current production shell inputs and made asset embedding retain
   unrelated existing assets, binaries and Worker imports.
 
+## Run Review usability and keyboard polish, 2026-11-20
+
+- Publish WST version 59 with Contact sheet search, clear filters, truthful note-save feedback, image retry, preview position and a notes Close control. Preserve the eight sessions and all evidence.
+- Keep existing controls and photo layouts; fix zero-height photos on small and short screens. Preserve browser modifier shortcuts and typing fields.
+- Dominic passed 45 source tests (F12 archive fixture skipped), 336 tab layouts and 168 photo-layout checks across Chromium, Firefox and WebKit. The Mac in-app browser verified the live controls. Native OS/browser combinations remain a separate acceptance boundary.
 
 ## Frozen crew calendar through closing, 2026-11-20
 
