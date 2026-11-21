@@ -1,5 +1,13 @@
 # Changelog
 
+## November 21, 2026. Destination sites deploy only when their content changes
+
+- A push to `main` used to redeploy housevideo.app, walk.housevideo.app and avbydave.com even when it touched none of their pages (for example a new page under systembydave.com). Each destination's `source.json` carries the source commit, so it differs on every push and the "nothing changed" check in `scripts/publish_domain_site.sh` never held. Content digests were unchanged across the previous push; only that marker moved.
+- `scripts/domain_publish_plan.mjs` now decides per destination. It publishes when any file other than `source.json` differs, skips when only `source.json` differs and the live site already serves the staged content digest, and republishes (an empty commit if needed) when the live site does not serve the staged content or cannot be read, so a destination Pages deploy that failed earlier is retried instead of being reported as done. Covered by `scripts/domain_publish_plan.test.mjs` in `npm run verify:domain-sites`.
+- The walk cutover gate (`scripts/check_domain_cutover_ready.mjs --live`) compares the live walk site with the staged one by `artifactSha256` instead of `sourceCommit`, so a push that does not change the walk site no longer makes the systembydave.com deploy wait for a walk deploy that has nothing to deploy.
+- systembydave.com publishes `deploy.json` on every deploy: the source commit and the content digest staged for each destination (`scripts/stage_domain_sites.mjs`, `scripts/domain_deploy_marker.test.mjs`). The live-behind-main check (`scripts/launch/smoke_live_domain.mjs --behind-main`) compares `deploy.json` with main, then checks that each destination serves the digest staged for it, because a destination's own `source.json` commit is no longer expected to equal main HEAD. `--expect-release <sha>` replaces `--expect-commit` for post-deploy waits. Until the first deploy publishes `deploy.json` the check falls back to the old comparison.
+- `docs/domain-sites.md`, `docs/launch/uptime-monitoring.md`, the self-hosted smoke workflow example and the README describe the new behaviour. The publish step itself runs only on `main`, so it is covered by unit tests and a staged dry run rather than a pull request run.
+
 ## November 21, 2026. The Philly prototype at /thephilly/
 
 - Added `/thephilly/`, the clickable prototype of The Philly, a free quarterly print magazine about Philadelphia (private source: `DaveHomeAssist/the-philly`). The page is `noindex`, outside the sitemap and carries real artist and listing content from the prototype, so it is for sharing by link only.

@@ -100,7 +100,9 @@ directly.
 The FMP suite and AV by Dave are also published on their own domains. The
 Pages workflow stages them with `scripts/stage_domain_sites.mjs` and pushes each
 to its repository (`DaveHomeAssist/housevideo`, `DaveHomeAssist/housevideo-walk`,
-`DaveHomeAssist/avbydave`) with that repository's deploy key. The walk destination
+`DaveHomeAssist/avbydave`) with that repository's deploy key, but only when that
+site's content changed (`scripts/domain_publish_plan.mjs`); the other destinations are
+not redeployed. The walk destination
 must pass the infrastructure and auth gates in `docs/domain-sites.md` before any
 old-origin redirects deploy. Check the staged sites locally with:
 
