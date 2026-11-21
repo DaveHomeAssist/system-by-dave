@@ -81,7 +81,6 @@
   function watchView() {
     const w = state.watch;
     if (!w) return null;
-    if (w.paused) return { kind: 'paused', mark: '…', title: 'WATCH PAUSED', copy: 'The startup check is running. Watching resumes when the computer checks pass.' };
     if (w.notConfigured) return { kind: 'off', mark: '–', title: 'WATCH OFF', copy: w.notConfigured };
     if (w.stopped) return { kind: 'fault', mark: '!', title: 'WATCH STOPPED', copy: w.stopped + ' This Mac is not being watched.' };
     const last = w.last;
@@ -112,6 +111,10 @@
     if (!v) { banner.hidden = true; return; }
     banner.hidden = false;
     banner.dataset.state = v.kind;
+    const toggle = $('#watch-toggle');
+    toggle.hidden = !(v.checks && v.checks.length);
+    text(toggle, banner.classList.contains('open') ? 'Hide checks' : 'Show checks');
+    banner.title = '';
     text($('#watch-mark'), v.mark);
     text($('#watch-eyebrow'), 'Mid-show watch' + (state.watch && state.watch.last ? ' · every ' + (state.watch.last.intervalSeconds || 60) + ' s · read only' : ' · read only'));
     text($('#watch-title'), v.title);
@@ -192,7 +195,7 @@
   function receive(event) {
     if (!event || typeof event !== 'object') return;
     if (event.type === 'run') {
-      Object.assign(state, { run: event, checks: event.checks || [], results: {}, displays: [], result: null, readiness: null, unavailable: null, busy: true, expiredNotified: false, watch: { paused: true } });
+      Object.assign(state, { run: event, checks: event.checks || [], results: {}, displays: [], result: null, readiness: null, unavailable: null, busy: true, expiredNotified: false, watch: null });
       text($('#mode-badge'), event.mode === 'warm' ? 'WARM CHECK' : 'STARTUP CHECK');
       document.body.classList.remove('collapsed'); post({ action: 'expand' });
     } else if (event.type === 'check') {
@@ -209,12 +212,12 @@
     } else if (event.type === 'busy') {
       state.busy = !!event.busy;
     } else if (event.type === 'watch') {
-      const keep = state.watch && !state.watch.paused ? state.watch : {};
+      const keep = state.watch || {};
       state.watch = { report: keep.report || null, last: event, lastAt: Date.now() };
     } else if (event.type === 'report') {
-      state.watch = Object.assign(state.watch && !state.watch.paused ? state.watch : {}, { report: event });
+      state.watch = Object.assign(state.watch || {}, { report: event });
     } else if (event.type === 'watch-state') {
-      const keep = state.watch && !state.watch.paused ? state.watch : {};
+      const keep = state.watch || {};
       if (event.state === 'running' || event.state === 'starting') state.watch = Object.assign(keep, { stopped: null, notConfigured: null });
       else if (event.state === 'not-configured') state.watch = { notConfigured: event.message || 'Watch mode is not configured in this profile.' };
       else state.watch = Object.assign(keep, { stopped: event.message || 'The watch process stopped.' });
@@ -230,6 +233,7 @@
     else if (action === 'retry') retry();
   });
   $('#ready-rerun').addEventListener('click', retry);
+  $('#watch-toggle').addEventListener('click', () => { $('#watch-banner').classList.toggle('open'); renderWatch(); });
   $('#ready-details').addEventListener('click', () => {
     const collapse = !document.body.classList.contains('collapsed');
     document.body.classList.toggle('collapsed', collapse); post({ action: collapse ? 'collapse' : 'expand', watching: !!state.watch }); renderBanner();

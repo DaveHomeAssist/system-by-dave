@@ -5,7 +5,8 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 const [web, streams, width = '1280', height = '832'] = process.argv.slice(2);
 const load = name => readFileSync(`${streams}/${name}.jsonl`, 'utf8').trim().split('\n').map(line => JSON.parse(line));
-const states = { running: load('pass').slice(0, 8), pass: load('pass'), fail: load('fail') };
+const pass = load('pass'), watchOk = load('watch-ok'), watchNote = load('watch-note'), watchFault = load('watch-fault');
+const states = { running: pass.slice(0, 8), pass, fail: load('fail'), 'watch ok': [...pass, ...watchOk], 'watch note': [...pass, ...watchNote], 'watch fault': [...pass, ...watchFault] };
 const browser = await chromium.launch();
 let worst = 0;
 for (const [name, events] of Object.entries(states)) {

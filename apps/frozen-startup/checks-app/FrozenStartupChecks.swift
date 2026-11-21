@@ -41,7 +41,7 @@ final class Controller: NSObject, NSApplicationDelegate, WKScriptMessageHandler,
     var watchRestarts = 0
     let expandedSize = NSSize(width: 1280, height: 860)
     let bannerSize = NSSize(width: 780, height: 200)  // includes the title bar
-    let watchBannerSize = NSSize(width: 780, height: 340)  // READY banner plus the watch banner and its check chips
+    let watchBannerSize = NSSize(width: 780, height: 460)  // READY banner plus the watch banner and its check chips (title bar included)
 
     // MARK: Startup
 

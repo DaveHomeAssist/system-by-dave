@@ -347,6 +347,52 @@ class RelayChecks(Base):
         self.assertEqual([c['id'] for c in last['checks'] if c['status'] == 'FAIL'], ['displays'])
 
 
+class RelayContract(Base):
+    """What the Mac sends must be exactly what the Projctl relay accepts. Skipped only when this app is packaged alone."""
+    RELAY = HERE.parent / 'projctl'
+
+    def setUp(self):
+        super().setUp()
+        if not (self.RELAY / 'server' / 'mac-status.js').exists():
+            self.skipTest('the Projctl relay source is not beside this app')
+
+    def js_list(self, name):
+        import re
+        source = (self.RELAY / 'server' / 'mac-status.js').read_text()
+        found = re.search(r'const %s = \[([^\]]*)\]' % name, source)
+        return set(re.findall(r"'([^']*)'", found.group(1)))
+
+    def test_report_keys_and_statuses_match_the_relay_schema(self):
+        cfg = self.cfg()
+        checks, _ = self.cycle()
+        report = watch.report_body(cfg, 'watch', 'ok', list(checks.values()), 'mac', run_id='run-1', cycle=1, interval=60, message='m')
+        self.assertEqual(set(report), self.js_list('KEYS') - set(), 'every field the Mac can send is a field the relay knows')
+        self.assertEqual(set(report['checks'][0]), self.js_list('CHECK_KEYS'))
+        self.assertEqual(report['schema'], watch.REPORT_SCHEMA)
+        every_status = {'PASS', 'FAIL', 'CHANGED', 'WARN', 'NOT CONFIGURED', 'NOT RUN', 'RUNNING'}
+        self.assertEqual(every_status, self.js_list('STATUSES'))
+        self.assertTrue({c['status'] for c in checks.values()} <= every_status)
+        self.assertEqual({'startup', 'watch'}, self.js_list('PHASES'))
+        self.assertEqual({'running', 'ok', 'fault'}, self.js_list('STATES'))
+        self.assertEqual({'mac', 'offline fixture'}, self.js_list('EXECUTIONS'))
+
+    def test_the_relays_documented_example_has_the_shape_the_mac_builds(self):
+        example = json.loads((self.RELAY / 'test' / 'fixtures' / 'status-report.example.json').read_text())
+        built = watch.report_body(self.cfg(), 'watch', 'ok', [{'id': 'disk', 'label': 'Disk space', 'status': 'PASS', 'observed': 'x'}], 'mac',
+                                  run_id='r', cycle=1, interval=60)
+        self.assertEqual(set(built), set(example))
+        self.assertEqual({k: type(v) for k, v in built.items()}, {k: type(v) for k, v in example.items()})
+        self.assertEqual(set(built['checks'][0]), set(example['checks'][0]))
+
+    def test_every_check_id_and_label_fits_the_relay_limits(self):
+        import re
+        for check_id, label in watch.WATCH_CHECKS:
+            self.assertTrue(re.match(r'^[a-z][a-z0-9-]*$', check_id) and len(check_id) <= 32)
+            self.assertTrue(1 <= len(label) <= 60)
+        report = watch.report_body(self.cfg(hostName='x' * 80), 'watch', 'ok', [{'id': 'a', 'label': 'A', 'status': 'PASS', 'observed': 'o' * 500}], 'mac')
+        self.assertEqual(len(report['hostName']), 80)
+
+
 class PixelStub(Base):
     PIXEL = {'enabled': True, 'interface': 'en1', 'controllers': [{'name': 'Strip A', 'address': '192.168.10.21'}, {'name': 'Strip B', 'address': '192.168.10.22'}]}
 
