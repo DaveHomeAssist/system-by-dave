@@ -9,7 +9,7 @@ GitHub Pages repository.
 | --- | --- | --- | --- | --- |
 | `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/ursa-broadcast-g2/`, `/backfocus/`, `/camera-sim/` | 2026-09-18 |
 | `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | 2026-09-20; authenticated walk acceptance pending |
-| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | AV by Dave console at `/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
+| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Home page at `/` (from `av-home/`), AV by Dave console at `/av/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
 and the browser storage its tools own. AV by Dave pages come from
@@ -17,9 +17,15 @@ and the browser storage its tools own. AV by Dave pages come from
 avbydave.com without editing the config. Paths are unchanged on the new domains:
 `systembydave.com/fmp/house/` is `housevideo.app/fmp/house/`. The bare domain
 redirects to the site's home (`/fmp/` or `/fmpwalk/`). AV by Dave serves the
-source-controlled `av/index.html` at `/`; the direct source path is
-noindex and canonical to `/`. Former Show Console, Toolbox, sheet and eight original family routes redirect
-into the console. The shell is cached for offline return visits. The previous
+source-controlled `av-home/index.html` at `/` (since 2026-11-21); the direct
+source path is noindex and canonical to `/`. The console is one part of that
+site at `/av/`, indexable under its own canonical address, and its breadcrumb
+returns to `/`. Former Show Console, Toolbox, sheet and eight original family
+routes redirect into the console. The home page's files are in the registry's
+offline list, so a saved copy of `/` opens styled offline; a browser that never
+saved `/` gets the saved console instead. Bookmarks to the bare domain now open
+the home page, one link from the console; `/av/`, the installed app and every
+saved workspace are unchanged. The previous
 `av-suite-landing.html` was retired (UX-005): it is now a noindex redirect to
 the current home, kept so old links still land, and is no longer cached offline.
 
@@ -51,6 +57,9 @@ AV's: browsers that moved or skipped before those keys were listed are offered t
 move again.
 
 ## Pipeline
+
+The release gates run as parallel jobs in `.github/workflows/deploy-pages.yml`
+(since 2026-11-21); the `deploy` job needs every one of them and does steps 2 to 5.
 
 1. `npm run verify:domain-sites` runs with the other release gates. It stages
    all sites into a temporary directory and fails when:

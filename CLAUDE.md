@@ -26,6 +26,9 @@ handoffs.
   `css/sbd-public-nav.css` owns shared public-shell navigation, and
   `css/av-theme.css` owns the Warm Paper and Stage Slate AV palettes. Product
   layouts may remain local while consuming those shared contracts.
+  `css/avd/` holds the AV by Dave design system's tokens, component styles and
+  fonts (Gaffer and Call Sheet), copied unchanged; the avbydave.com home page
+  uses them.
 - `js/sbd-registry.js` is the single source of truth for AV tool names, routes,
   departments, phases, storage keys, recommendations, aliases, and offline
   assets. AV navigation, context, handoff, console, and service-worker code
@@ -67,6 +70,7 @@ handoffs.
 - `av-workbook/`: noindex redirect to Toolbox; no editor artifact
 - `apps/fmp-camera-sim/`: React/TypeScript/Three.js source for the FMP Camera
   Simulator; `camera-sim/` is its generated artifact (published on housevideo.app)
+- `av-home/`: the avbydave.com home page (static; staged at `/`)
 - `ProjectorThrow/`: Throwline planner and Stage 3D companion
 - `depotops/`, `pixelforge/`, `noteforge/`: product-specific public surfaces;
   NoteForge is a managed release artifact synchronized from its own repository
@@ -93,8 +97,9 @@ AV by Dave is one console. The shell at `/av/` (`apps/av-suite/`, built into
 `av/`) opens on an empty Workspace view; the Rail recalls each application's
 views in place, the chooser lists every department's individual native panels,
 and specialist tools retain standalone links rather than whole-app tiles. On
-avbydave.com the shell is also the home page (`scripts/domain-sites.json`
-`landingPage`). `av-suite.html` (the former Toolbox and Show Console doorway),
+avbydave.com the console is one part of the site: the home page is `av-home/`
+(`scripts/domain-sites.json` `landingPage`, since 2026-11-21), which links the
+console at `/av/`, and the console's breadcrumb returns to it. `av-suite.html` (the former Toolbox and Show Console doorway),
 the two landing pages and the 34 legacy sheet pages are noindex redirect stubs
 into the console; their registry entries carry `retired:'<pack>'`, keep their
 storage keys for data transfer and one-time import, and leave the offline

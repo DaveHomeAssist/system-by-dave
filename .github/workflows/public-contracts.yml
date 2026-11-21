@@ -9,7 +9,9 @@ permissions:
 jobs:
   contracts:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # The job runs 8 to 10 minutes (the Projctl step alone takes about 8). Run 671 was cancelled at
+    # the old 10 minute limit, so leave headroom.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
@@ -35,6 +37,7 @@ jobs:
           npm run test:venue-browser --prefix apps/projctl
       - run: npm run test:public-viewport
       - run: npm run probe:cue-sheet-editing
+      - run: npm run probe:thephilly
       - name: Verify engineering daily journeys
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/daily-server.log 2>&1 &

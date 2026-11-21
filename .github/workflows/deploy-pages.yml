@@ -27,17 +27,19 @@ concurrency:
   group: systembydave-pages
   cancel-in-progress: false
 
+
+# The release gates run as parallel jobs (2026-11-21); they used to be one list of
+# steps, about 26 minutes end to end. Each job builds what its own checks read,
+# so no job depends on another's workspace. The publish job needs all of them.
 jobs:
   domain-cutover:
     uses: ./.github/workflows/domain-cutover.yml
 
-  deploy:
-    needs: domain-cutover
+  contracts:
+    name: Site contracts
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 20
     steps:
       # Actions pinned by SHA per GitHub's security-hardening guide.
       - name: Checkout
@@ -54,12 +56,6 @@ jobs:
       - name: Install verification dependencies
         run: npm ci
 
-      - name: Verify walk cutover prerequisites
-        env:
-          DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_WALK_DEPLOY_KEY }}
-          CUTOVER_AUTH_VERIFIED: ${{ vars.HOUSEVIDEO_WALK_AUTH_VERIFIED }}
-        run: node scripts/check_domain_cutover_ready.mjs housevideo-walk --preflight
-
       - name: Verify public site contracts
         run: |
           npm run verify:private-exposure
@@ -74,6 +70,43 @@ jobs:
           npm run test:fmp-hygiene
           npm run verify:domain-sites
           npm run test:camera-training-links
+
+      - name: Verify Throwline release contract
+        run: npm run verify:throwline
+
+      - name: Verify Shader practice release
+        run: npm run verify:shader-practice
+
+      - name: Verify NoteForge release contract
+        run: npm run verify:noteforge
+
+      - name: Verify dependency security and the generated sitemap
+        run: |
+          node --test scripts/audit_gate.test.mjs && node scripts/audit_gate.mjs
+          python3 scripts/gen_sitemap.py
+          git diff --exit-code -- sitemap.xml
+          test -z "$(git status --porcelain -- sitemap.xml)"
+
+  site-browser:
+    name: Site pages in a browser
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
 
       - name: Verify AV themes and LED configurator
         run: |
@@ -100,17 +133,37 @@ jobs:
       - name: Verify AV bounded workspaces
         run: npm run test:av-workspace
 
-      - name: Verify Throwline release contract
-        run: npm run verify:throwline
-
       - name: Verify Throwline browser runtime
         run: npm run test:throwline-browser
 
-      - name: Verify Shader practice release
-        run: npm run verify:shader-practice
-
       - name: Verify Shader practice browser runtime
         run: npm run test:shader-practice-browser
+
+      - name: Verify NoteForge host shell
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:noteforge-shell-browser
+
+  console:
+    name: AV Video, Equipment Lab and the console shell
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
 
       - name: Verify AV Video
         env:
@@ -139,6 +192,32 @@ jobs:
           git diff --exit-code -- av
           npm run test:av-suite-browser
           npm run test:av-canvas-menus-browser
+
+      - name: Committed builds match their source
+        run: |
+          git diff --exit-code -- av av-video equipment-lab
+          test -z "$(git status --porcelain -- av av-video equipment-lab)"
+
+  panels:
+    name: Department panels
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
 
       - name: Verify AV Audio
         run: |
@@ -191,6 +270,41 @@ jobs:
           npm run build:av-calculator
           npm run test:av-calculator-browser
 
+      - name: Committed builds match their source
+        run: |
+          git diff --exit-code -- av-audio show-ops show-control front-office av-lighting av-calculator
+          test -z "$(git status --porcelain -- av-audio show-ops show-control front-office av-lighting av-calculator)"
+
+  retained:
+    name: Infrastructure, Shop and retained fixtures
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
+
+      - name: Build the family fixtures the retained suite serves
+        run: |
+          npm run build:av-video
+          npm run build:av-audio
+          npm run build:show-ops
+          npm run build:show-control
+          npm run build:front-office
+          npm run build:av-lighting
+
       - name: Verify Infrastructure and Shop panels
         env:
           CHROME_CHANNEL: chrome
@@ -206,13 +320,31 @@ jobs:
           npm run test:av-routes-browser
           npm run test:the-shop-browser
 
-      - name: Verify NoteForge release contract
-        run: npm run verify:noteforge
+      - name: Committed builds match their source
+        run: |
+          git diff --exit-code -- the-shop infrastructure av-video av-audio show-ops show-control front-office av-lighting
+          test -z "$(git status --porcelain -- the-shop infrastructure av-video av-audio show-ops show-control front-office av-lighting)"
 
-      - name: Verify NoteForge host shell
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:noteforge-shell-browser
+  simulator:
+    name: Workbook and Camera Simulator
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
 
       - name: Verify AV Workbook
         run: |
@@ -232,12 +364,42 @@ jobs:
           CHROME_CHANNEL: chrome
         run: npm run test:camera-sim-browser -- --no-sandbox
 
-      - name: Verify dependency security and generated files
+      - name: Committed builds match their source
         run: |
-          node --test scripts/audit_gate.test.mjs && node scripts/audit_gate.mjs
-          python3 scripts/gen_sitemap.py
-          git diff --exit-code -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim equipment-lab sitemap.xml
-          test -z "$(git status --porcelain -- av-workbook av-video av-audio show-ops show-control front-office av-lighting av-calculator the-shop infrastructure camera-sim equipment-lab sitemap.xml)"
+          git diff --exit-code -- av-workbook camera-sim
+          test -z "$(git status --porcelain -- av-workbook camera-sim)"
+
+  deploy:
+    needs: [domain-cutover, contracts, site-browser, console, panels, retained, simulator]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Publishing only. Every check runs in the jobs this one needs, side by side,
+    # so "Re-run failed jobs" after a publishing error repeats this job alone.
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
+
+      - name: Verify walk cutover prerequisites
+        env:
+          DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_WALK_DEPLOY_KEY }}
+          CUTOVER_AUTH_VERIFIED: ${{ vars.HOUSEVIDEO_WALK_AUTH_VERIFIED }}
+        run: node scripts/check_domain_cutover_ready.mjs housevideo-walk --preflight
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |
