@@ -6,6 +6,15 @@
 done and pauses further per-family console conversions under the
 [October 9 rollout](av-console-rollout.md).
 
+## November 21 site home
+
+Dave decided on November 21 that avbydave.com opens on a home page and the
+console is one part of the site. `av-home/` is staged at `/`; the console stays
+at `/av/` with its own canonical address and a breadcrumb back to the home
+page. Nothing else in this brief changes: one console, native department
+packs, redirect stubs into `/av/`, and the same saved workspace keys. See
+`docs/domain-sites.md`.
+
 ## October 29 menu redesign
 
 Dave requested a canvas-first layout and topic selection that enters a submenu.
