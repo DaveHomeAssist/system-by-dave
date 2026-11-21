@@ -11,7 +11,8 @@ whoever sets it up owns that account.
 | `https://avbydave.com/` | 200, `<title>AV by Dave</title>` | live today |
 | `https://systembydave.com/demos/frame-sync.html` | 200, demo title, `demo-shell.js` | #361 (unblocks the #360 deploy; the demos stay on systembydave.com, Dave's c4b517e) |
 | `https://avbydave.com/field-kit/` | 200, `Field Kit`, `sbd-launch-config.js` | #352 (the Field Kit page) |
-| `https://avbydave.com/source.json` | `sourceCommit` = main HEAD | every deploy (`scripts/stage_domain_sites.mjs`) |
+| `https://systembydave.com/deploy.json` | `sourceCommit` = main HEAD, and the content digest staged for each destination | every deploy (`scripts/stage_domain_sites.mjs`) |
+| `https://avbydave.com/source.json` | `artifactSha256` = the digest `deploy.json` lists for `avbydave` | whenever avbydave.com's content changes (`scripts/publish_domain_site.sh` skips an unchanged destination) |
 
 The targets live in `scripts/launch/smoke-live.json`. A check can carry its own `base`
 (the demo is on systembydave.com, everything else on avbydave.com). With `--dir`
@@ -44,8 +45,9 @@ read-only GETs. Exit codes: 0 = all good, 1 = a check failed, 2 = bad usage.
 # Once, against the live site
 node scripts/launch/smoke_live_domain.mjs
 
-# Right after a deploy: wait up to 15 min for source.json to report the commit, then check pages
-node scripts/launch/smoke_live_domain.mjs --expect-commit "$(git rev-parse origin/main)" --wait 900 --delay 20
+# Right after a deploy: wait up to 15 min for deploy.json to name the commit and this site to serve
+# the content that deploy staged for it, then check pages
+node scripts/launch/smoke_live_domain.mjs --expect-release "$(git rev-parse origin/main)" --wait 900 --delay 20
 
 # The same checks against a staged folder before publishing (after stage_domain_sites.mjs)
 node scripts/launch/smoke_live_domain.mjs --dir _sites/avbydave
@@ -85,11 +87,19 @@ create.
 
 ## 4. Live-behind-main check (design)
 
-**Signal.** Every deploy writes `source.json` with `sourceCommit`: the system-by-dave commit
-the site was staged from. Every push to main triggers "Deploy site to Pages" (`on: push:
-branches: [main]`), so after a healthy deploy `sourceCommit` equals main HEAD.
+**Signal.** Every push to main triggers "Deploy site to Pages" (`on: push: branches: [main]`),
+and that deploy writes `https://systembydave.com/deploy.json`: the system-by-dave commit it
+deployed and, for each destination, the content digest (`artifactSha256`) it staged. After a
+healthy deploy `deploy.json` names main HEAD.
 
-**Comparison.** `GET https://api.github.com/repos/DaveHomeAssist/system-by-dave/compare/<sourceCommit>...main`
+A destination is published only when its content changed (`scripts/publish_domain_site.sh`),
+so avbydave.com's own `source.json` keeps the commit of the last push that changed it and is
+not expected to equal main HEAD. It is expected to carry the digest `deploy.json` lists for it.
+The check therefore reads two things: whether the deploy is behind main, and whether this
+destination serves the content that deploy staged for it. A destination that is stale
+(its Pages deploy did not land) fails the second check even while main is current.
+
+**Comparison.** `GET https://api.github.com/repos/DaveHomeAssist/system-by-dave/compare/<deploy.json sourceCommit>...main`
 uses the public API with no token (60 requests/hour per IP, enough for one check every 5-15
 min). Alternatively pass `--main-sha` from a local `git fetch`.
 
@@ -107,8 +117,10 @@ main has that the site lacks means a steady stream of merges can't keep resettin
 Lower the limit to 30 if deploys stay fast.
 
 **Covers both hops.** system-by-dave deploy → push to DaveHomeAssist/avbydave → avbydave
-Pages build. `source.json` is read from the live domain, so a failure at either hop shows up
-as "behind".
+Pages build. `deploy.json` and `source.json` are read from the live domains, so a failure at
+either hop shows up: the first as "behind", the second as "serves content X, deploy staged Y".
+Until the first deploy that publishes `deploy.json`, the check falls back to the destination's
+own `source.json` commit, as it did before.
 
 **Not covered.** CDN staleness of individual files (the page checks' cache-busting query
 covers HTML) and correctness of interactive behaviour (the local probes cover that before

@@ -69,7 +69,7 @@ move again.
    prove Gmail delivery or a Notion save.
 4. Publish the walk first with `scripts/publish_domain_site.sh`. That script
    waits until the destination repository's Pages run for the pushed commit
-   succeeds. The live check then compares HTTPS with the staged `source.json`,
+   succeeds. The live check then compares HTTPS with the staged `source.json` content digest,
    walk, alias and transfer page. GitHub Pages caches those files for ten
    minutes and ignores the `?release=` query, so a response that is still the
    previous release is waited out until its `Age` reaches `max-age`, once.
@@ -79,7 +79,25 @@ move again.
 5. Deploy systembydave.com, then publish housevideo.app and avbydave.com with
    their respective `HOUSEVIDEO_DEPLOY_KEY` and `AVBYDAVE_DEPLOY_KEY`. Each target
    repository's own Pages workflow deploys its push; each key can write only its
-   own repository. Unchanged content produces no commit.
+   own repository.
+
+A push to this repository that changes none of a site's pages leaves that site alone.
+`scripts/domain_publish_plan.mjs` decides, after staging the destination worktree:
+
+| Plan | When | What happens |
+| --- | --- | --- |
+| `publish` | any file other than `source.json` differs | commit, push, wait for that repository's Pages deploy |
+| `skip` | only `source.json` differs (it names the source commit, so it differs on every push) and the live site already serves this content digest | nothing is pushed; no destination deploy runs |
+| `republish` | only `source.json` differs but the live site does not serve this digest, or cannot be read | push anyway (an empty commit when nothing differs) so a Pages deploy that failed earlier is retried |
+
+`republish` is what keeps a failed destination deploy from being forgotten: a re-run of the
+workflow would otherwise find nothing to push and report success while the site stayed stale.
+
+systembydave.com is the one site that deploys on every push. It publishes `deploy.json`
+(commit, plus the content digest staged for each destination), which the live-behind-main
+check reads (`docs/launch/uptime-monitoring.md`). The walk cutover gate compares the live
+walk site with the staged one by content digest, not by commit, so a push that does not change
+the walk site does not hold up the systembydave.com deploy.
 
 Each staged site gets its own `index.html` (home page or redirect), `404.html`,
 `robots.txt`, `CNAME`, `source.json` (source commit and artifact digest) and
