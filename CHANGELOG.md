@@ -1,5 +1,10 @@
 # Changelog
 
+## November 21, 2026. Saved optical evidence
+
+- Added a pure saved-frame shutter evaluator for isolated target/control regions
+  and open/close response candidates. No relay or equipment output integration.
+
 ## November 21, 2026. Offline diagnostic planning
 
 - Added a source-only projector check planner with synthetic fixtures, explicit

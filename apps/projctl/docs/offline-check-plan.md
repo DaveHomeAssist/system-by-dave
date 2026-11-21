@@ -50,3 +50,21 @@ source routing, geometry and human acceptance need separate evidence.
 ECP-1.0 revision 1.0 applies: lane identity is stable, equipment state remains
 reported evidence, and execution ownership remains with the existing runtime.
 This additive report schema does not change rig definitions or driver APIs.
+
+## Saved optical evidence
+
+`server/shutter-evidence.js` adds a pure saved-frame evaluator consumed by the
+private local Check Desk workbench. `projctl.shutter-input.v1` includes stable
+lane identity, a profile, baseline, three `openFrames` and three `closedFrames`.
+Decoded RGB frames carry ordered distinct IDs/timestamps, view/exposure
+revisions and explicit visibility qualification. Target and control masks are
+disjoint pixel-index arrays. The target must brighten on open and return near
+baseline on close while the control region stays stable. Thresholds and maximum
+evidence span are supplied by the qualified profile. Outputs are candidates,
+with device response, routing, restoration and show readiness unverified.
+
+No driver, relay route, packaging change or browser page is added to Projctl.
+The workbench builder embeds this source by explicit path and records its hash;
+there is no second maintained evaluator implementation. Camera files are decoded
+locally by the consumer, not acquired from a network. Test with
+`node --test test/shutter-evidence.test.js`. Physical profiles remain unqualified.
