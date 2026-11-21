@@ -1,0 +1,43 @@
+{
+  "schema": "projctl.check-snapshot.v1",
+  "nowMs": 2000000,
+  "mode": "startup",
+  "windowReleased": true,
+  "manualTestCard": true,
+  "finishProfile": {
+    "A": "closed",
+    "B": "closed",
+    "C": "open",
+    "D": "closed"
+  },
+  "lanes": [
+    {
+      "id": "C",
+      "observedAtMs": 2000000,
+      "stateSinceMs": 1980000,
+      "power": "off",
+      "lampError": 0
+    },
+    {
+      "id": "B",
+      "observedAtMs": 2000000,
+      "stateSinceMs": 1980000,
+      "power": "off",
+      "lampError": 0
+    },
+    {
+      "id": "A",
+      "observedAtMs": 2000000,
+      "stateSinceMs": 1980000,
+      "power": "off",
+      "lampError": 0
+    },
+    {
+      "id": "D",
+      "observedAtMs": 2000000,
+      "stateSinceMs": 1980000,
+      "power": "off",
+      "lampError": 0
+    }
+  ]
+}
