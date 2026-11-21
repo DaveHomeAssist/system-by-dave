@@ -83,7 +83,8 @@ const robots = read('robots.txt');
 // Frozen Startup Checks adds one noindex native app page.
 // The Projctl show backup page adds one noindex relay role page, apps/projctl/public/show.html (2026-11-18).
 // The Projctl power operator page adds one noindex relay page (apps/projctl/public/power.html).
-if (unlisted.length !== 219) fail(`Expected 219 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// The Philly prototype (thephilly/, noindex, private working prototype) adds one.
+if (unlisted.length !== 220) fail(`Expected 220 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);

@@ -1,5 +1,13 @@
 # Changelog
 
+## November 21, 2026. The Philly prototype at /thephilly/
+
+- Added `/thephilly/`, the clickable prototype of The Philly, a free quarterly print magazine about Philadelphia (private source: `DaveHomeAssist/the-philly`). The page is `noindex`, outside the sitemap and carries real artist and listing content from the prototype, so it is for sharing by link only.
+- Fonts (Alfa Slab One, Anton, IBM Plex Mono, Source Serif 4, all SIL OFL) and the QR generator (qrcode-generator 1.4.4, MIT) are served from `thephilly/fonts/` and `thephilly/vendor/`. The prototype loaded them from Google Fonts and cdnjs; this page contacts no third-party host on load. Licences: `thephilly/vendor/NOTICE.txt`.
+- Added a System by Dave breadcrumb and a first-in-body skip link to satisfy the public shell contract, and registered the page in `scripts/verify_public_navigation.js`. The indexing gate now expects 220 routes outside the sitemap.
+- The Food Finders story (`#story-food-finders`) has a Cheesesteak Radar: a button opens the Philly Cheesesteak Heatmap from `/cheesesteaks/` in a frame, with links to the full map and rankings. The frame is created on click and removed on close, so no map tiles load until a reader opens it. The note beside it repeats the heatmap's own description (real shops from OpenStreetMap and Google Maps, weekly snapshot, not a complete list).
+- `npm run probe:thephilly` (`scripts/probe_thephilly.mjs`, run on every pull request) checks that the page never scrolls at 1440, 680 and 375 px on eight routes, that nothing leaves the origin before the radar opens, the skip link and breadcrumb, the Sounds QR codes, the radar open and close, and the theme toggle.
+
 ## November 20, 2026. Frozen workspace navigation
 
 - Published Sites version 60 from managed source `1c50b07`, preserving the newer
