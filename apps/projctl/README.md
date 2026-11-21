@@ -452,3 +452,8 @@ Reports are saved beside the rig file and, with a private `health-reports.json`
 and a Notion token on the relay machine, added as one row each to a Notion
 database. `GET /api/health-reports` lists recent reports and
 `POST /api/health-reports/run` takes one now.
+
+## Offline check planning
+
+The [source-only check planner](docs/offline-check-plan.md) reads a saved snapshot
+and emits proposed steps. It is not wired to the relay or installed on a rig.
