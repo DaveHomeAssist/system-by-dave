@@ -19,6 +19,17 @@
     <button id="theme" type="button">Dark mode</button>
   </header>
 
+  <section class="watch-banner" id="watch-banner" data-state="off" aria-live="assertive" hidden>
+    <div class="watch-mark" id="watch-mark" aria-hidden="true">✓</div>
+    <div class="watch-text">
+      <p class="eyebrow" id="watch-eyebrow">Mid-show watch</p>
+      <h2 id="watch-title">WATCHING</h2>
+      <p id="watch-copy"></p>
+      <ul class="watch-chips" id="watch-chips" aria-label="Watched checks"></ul>
+      <p class="watch-report" id="watch-report"></p>
+    </div>
+  </section>
+
   <section class="ready-banner" id="ready-banner" aria-live="polite" hidden>
     <div class="ready-mark" aria-hidden="true">✓</div>
     <div class="ready-text">

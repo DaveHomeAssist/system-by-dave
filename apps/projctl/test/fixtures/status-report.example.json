@@ -1,0 +1,20 @@
+{
+  "schema": "frozen-startup.status-report.v1",
+  "host": "m5",
+  "role": "projectors",
+  "phase": "watch",
+  "state": "ok",
+  "reportedAt": "2026-11-20T20:14:03.482913+00:00",
+  "execution": "mac",
+  "checks": [
+    { "id": "displays", "label": "Displays", "status": "PASS", "observed": "5 displays present · identities, resolution and refresh match" },
+    { "id": "millumin", "label": "Millumin process", "status": "PASS", "observed": "Running · pid 4242 · same process as at startup" },
+    { "id": "show", "label": "Show file", "status": "CHANGED", "observed": "Changed since startup (saved about 20:12) · a save is reported, not treated as a fault" },
+    { "id": "relay", "label": "Projctl relay", "status": "PASS", "observed": "Answering (12 ms)" },
+    { "id": "pixel", "label": "Pixel output", "status": "NOT CONFIGURED", "observed": "Starts when the pixel controllers are listed in the profile (MF-3)" }
+  ],
+  "hostName": "Example projector Mac (synthetic)",
+  "runID": "7f4b6a0e-1c52-4a52-9e43-2d9d2f0d9b11",
+  "cycle": 12,
+  "intervalSeconds": 60
+}

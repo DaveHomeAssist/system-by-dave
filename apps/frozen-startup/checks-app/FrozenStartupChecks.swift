@@ -12,6 +12,16 @@ struct Config: Decodable {
     var fixture: String?
     var receiptDirectory: String
     var mode: String?          // "startup" (default) or "warm"
+    var watch: Bool?           // mid-show watch after the computer checks pass; on unless set to false
+}
+
+// The read-only mid-show watch: one long-running `startup.py --watch` process. It only reads. The window starts
+// it after the computer checks pass, stops it before any new startup check, and shows what it reports.
+final class WatchHandle {
+    let process = Process()
+    var stopped = false
+    var buffer = Data()
+    var stderrTail = ""
 }
 
 final class Controller: NSObject, NSApplicationDelegate, WKScriptMessageHandler, NSWindowDelegate {
@@ -26,8 +36,12 @@ final class Controller: NSObject, NSApplicationDelegate, WKScriptMessageHandler,
     var stderrTail = ""
     var pageReady = false
     var pendingRun = false
+    var watcher: WatchHandle?
+    var startWatchAfterFinish = false
+    var watchRestarts = 0
     let expandedSize = NSSize(width: 1280, height: 860)
     let bannerSize = NSSize(width: 780, height: 200)  // includes the title bar
+    let watchBannerSize = NSSize(width: 780, height: 340)  // READY banner plus the watch banner and its check chips
 
     // MARK: Startup
 
@@ -91,6 +105,7 @@ final class Controller: NSObject, NSApplicationDelegate, WKScriptMessageHandler,
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+    func applicationWillTerminate(_ notification: Notification) { stopWatch() }
 
     // MARK: Page messages
 
@@ -102,7 +117,7 @@ final class Controller: NSObject, NSApplicationDelegate, WKScriptMessageHandler,
             if pendingRun { pendingRun = false; startCheck() }
         case "retry": startCheck()
         case "crew": recordCrew(body)
-        case "collapse": place(size: bannerSize)
+        case "collapse": place(size: (body["watching"] as? Bool) == true ? watchBannerSize : bannerSize)
         case "expand": place(size: expandedSize)
         default: break
         }
@@ -129,6 +144,8 @@ final class Controller: NSObject, NSApplicationDelegate, WKScriptMessageHandler,
     func startCheck() {
         guard let c = config else { send(["type": "unavailable", "message": configError ?? "Configuration unavailable."]); return }
         guard process == nil else { send(["type": "busy", "busy": true]); return }
+        stopWatch()  // a new startup check may restore displays; the baseline is rebuilt when it passes
+        startWatchAfterFinish = false
         let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "")
         let receipt = URL(fileURLWithPath: c.receiptDirectory).appendingPathComponent("run-\(stamp).json")
         lastReceipt = receipt
@@ -193,6 +210,7 @@ final class Controller: NSObject, NSApplicationDelegate, WKScriptMessageHandler,
             guard let text = String(data: line, encoding: .utf8), !text.isEmpty,
                   let object = try? JSONSerialization.jsonObject(with: line) as? [String: Any] else { continue }
             if let type = object["type"] as? String, ["result", "readiness", "unavailable"].contains(type) { sawTerminalEvent = true }
+            if (object["type"] as? String) == "result", (object["computerReady"] as? Bool) == true { startWatchAfterFinish = true }
             sendLine(text)
         }
     }
@@ -204,6 +222,84 @@ final class Controller: NSObject, NSApplicationDelegate, WKScriptMessageHandler,
             send(["type": "unavailable", "message": detail.isEmpty ? "The startup check stopped (exit \(status))." : detail])
         }
         send(["type": "busy", "busy": false])
+        if startWatchAfterFinish { startWatchAfterFinish = false; startWatch() }
+    }
+
+    // MARK: Mid-show watch (read only)
+
+    func startWatch() {
+        guard let c = config, c.watch != false, watcher == nil else { return }
+        let handle = WatchHandle()
+        let task = handle.process
+        task.executableURL = URL(fileURLWithPath: c.python ?? "/usr/bin/python3")
+        // --watch changes nothing on the Mac. It holds its own lock, writes no receipt and reads through the read-only bridge action.
+        var args = ["-B", c.startup, "--profile", c.profile, "--watch", "--events", "-",
+                    "--receipt", URL(fileURLWithPath: c.receiptDirectory).appendingPathComponent("watch.json").path]
+        if let bridge = c.bridge { args += ["--bridge", bridge] } else if let fixture = c.fixture { args += ["--fixture", fixture] }
+        task.arguments = args
+        let out = Pipe(), err = Pipe()
+        task.standardOutput = out
+        task.standardError = err
+        out.fileHandleForReading.readabilityHandler = { [weak self, weak handle] file in
+            let chunk = file.availableData
+            DispatchQueue.main.async { if let handle = handle { self?.consumeWatch(chunk, handle) } }
+        }
+        err.fileHandleForReading.readabilityHandler = { [weak handle] file in
+            let chunk = file.availableData
+            DispatchQueue.main.async { if let handle = handle { handle.stderrTail = String((handle.stderrTail + (String(data: chunk, encoding: .utf8) ?? "")).suffix(400)) } }
+        }
+        task.terminationHandler = { [weak self] finished in
+            DispatchQueue.main.async {
+                out.fileHandleForReading.readabilityHandler = nil
+                err.fileHandleForReading.readabilityHandler = nil
+                if let handle = self?.watcher, handle.process === finished {
+                    self?.consumeWatch(out.fileHandleForReading.readDataToEndOfFile(), handle)
+                    self?.watchEnded(handle, status: finished.terminationStatus)
+                }
+            }
+        }
+        do {
+            try task.run()
+            watcher = handle
+            send(["type": "watch-state", "state": "starting"])
+        } catch {
+            send(["type": "watch-state", "state": "unavailable", "message": "Watch mode could not start: Python is not available at \(task.executableURL?.path ?? "?")."])
+        }
+    }
+
+    func stopWatch() {
+        guard let handle = watcher else { return }
+        handle.stopped = true
+        watcher = nil
+        if handle.process.isRunning { handle.process.terminate() }
+    }
+
+    func consumeWatch(_ chunk: Data, _ handle: WatchHandle) {
+        handle.buffer.append(chunk)
+        while let newline = handle.buffer.firstIndex(of: 0x0A) {
+            let line = handle.buffer.subdata(in: handle.buffer.startIndex..<newline)
+            handle.buffer.removeSubrange(handle.buffer.startIndex...newline)
+            guard let text = String(data: line, encoding: .utf8), !text.isEmpty,
+                  let object = try? JSONSerialization.jsonObject(with: line) as? [String: Any] else { continue }
+            if (object["type"] as? String) == "watch" { watchRestarts = 0 }
+            sendLine(text)
+        }
+    }
+
+    func watchEnded(_ handle: WatchHandle, status: Int32) {
+        watcher = nil
+        if handle.stopped { return }
+        // Exit 4: not configured in this profile. Exit 3: the profile or bridge is unusable. Neither is fixed by trying again.
+        if status == 4 { return }
+        let detail = handle.stderrTail.trimmingCharacters(in: .whitespacesAndNewlines)
+        send(["type": "watch-state", "state": "stopped", "message": detail.isEmpty ? "The watch process ended (exit \(status))." : detail])
+        if status != 3 && watchRestarts < 5 {
+            watchRestarts += 1
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10) { [weak self] in
+                guard let self = self, self.watcher == nil, self.process == nil else { return }
+                self.startWatch()
+            }
+        }
     }
 }
 
