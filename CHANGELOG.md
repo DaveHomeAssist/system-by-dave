@@ -1,5 +1,13 @@
 # Changelog
 
+## November 21, 2026. Release gates run side by side
+
+- The Pages workflow's checks were one list of steps in one job, about 26 minutes before anything published, and a publishing error at the end meant repeating all of it. They now run as six parallel jobs (site contracts; site pages in a browser; AV Video, Equipment Lab and the console shell; department panels; Infrastructure, Shop and the retained fixtures; Workbook and Camera Simulator) beside the existing domain move job. The `deploy` job needs all of them and only stages and publishes.
+- No check was dropped or weakened: every command, secret, condition and pinned action from the old job is in the new file, in the same order within its job. The one combined "generated files" check became a per-job check of the folders that job builds, covering the same thirteen paths.
+- Only the retained suite reads another family's build, so its job builds the six family fixtures it serves before running. Nothing else depends on another job's workspace.
+- After a publishing failure, "Re-run failed jobs" now repeats the `deploy` job alone instead of every check.
+- Checked before merge: the file parses, a command by command comparison against the old workflow shows nothing missing, and the three scripts that read this file pass (`check_domain_cutover_ready.test.mjs`, `verify:throwline`, `verify:domain-sites`). The first real run is the proof; it is the push that carries this change.
+
 ## November 21, 2026. avbydave.com gets a home page; the console is one part of the site
 
 - avbydave.com now opens on a home page (`av-home/`, staged at `/` through `landingPage` in `scripts/domain-sites.json`) instead of on the console. Dave decided this on November 21; it replaces the October 13 arrangement in which the console shell was also the home page. The console itself is unchanged at `/av/`, and so are the installed app (`start_url` `./av/`), every redirect stub (they already target `/av/`) and all saved work. A bookmark to the bare domain now lands one link from the console.
