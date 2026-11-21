@@ -1,0 +1,49 @@
+{
+  "_placeholders": "THE M1 HAS NOT BEEN INSPECTED. Every value that starts with REPLACE- is a placeholder, not a measurement. Watch mode refuses to start while any remain. Fill them from a read-only inspection of the m1 (Phase 2), then delete this note.",
+  "schemaVersion": 1,
+  "role": "pixel-strips",
+  "showPath": "REPLACE-WITH-ABSOLUTE-PATH-OF-THE-APPROVED-M1-SHOW",
+  "showSHA256": "REPLACE-WITH-APPROVED-SHOW-SHA256-AFTER-M1-2-IS-ANSWERED",
+  "displays": [
+    {
+      "lane": "control",
+      "identity": {
+        "vendor": "REPLACE-VENDOR-NUMBER",
+        "model": "REPLACE-MODEL-NUMBER",
+        "serial": "REPLACE-SERIAL-NUMBER"
+      },
+      "mode": {
+        "width": "REPLACE-WIDTH",
+        "height": "REPLACE-HEIGHT",
+        "pixelWidth": "REPLACE-PIXEL-WIDTH",
+        "pixelHeight": "REPLACE-PIXEL-HEIGHT",
+        "refreshRate": "REPLACE-REFRESH-RATE"
+      }
+    }
+  ],
+  "watch": {
+    "host": "m1",
+    "hostName": "m1 (Millumin pixel strips)",
+    "intervalSeconds": 60,
+    "mediaFolder": "REPLACE-WITH-ABSOLUTE-MEDIA-FOLDER-PATH",
+    "keepAwake": {
+      "process": "REPLACE-WITH-KEEP-AWAKE-PROCESS-NAME-OR-DELETE-THIS-BLOCK"
+    },
+    "relay": {
+      "url": "REPLACE-WITH-M5-RELAY-ADDRESS-ON-THE-TAILNET"
+    },
+    "report": {
+      "tokenFile": "REPLACE-WITH-ABSOLUTE-PATH-OF-THE-STATUS-TOKEN-FILE"
+    },
+    "pixelOutput": {
+      "enabled": false,
+      "interface": "REPLACE-WITH-PIXEL-NETWORK-INTERFACE-NAME",
+      "controllers": [
+        {
+          "name": "REPLACE-WITH-CONTROLLER-NAME",
+          "address": "REPLACE-WITH-CONTROLLER-ADDRESS"
+        }
+      ]
+    }
+  }
+}

@@ -42,6 +42,20 @@ do {
         FileHandle.standardOutput.write(data)
         exit(0)
     }
+    if CommandLine.arguments.dropFirst().first == "watch" {
+        // Read-only identity reading for mid-show watch: the same snapshot plus the display's own
+        // vendor, model and serial numbers. Changes nothing.
+        let rows = try snapshot().map { row -> [String: Any] in
+            var out = row
+            let id = UInt32(row["id"] as? Int ?? 0)
+            out["vendor"] = Int(CGDisplayVendorNumber(id))
+            out["model"] = Int(CGDisplayModelNumber(id))
+            out["serial"] = Int(CGDisplaySerialNumber(id))
+            return out
+        }
+        FileHandle.standardOutput.write(try JSONSerialization.data(withJSONObject: rows, options: [.sortedKeys]))
+        exit(0)
+    }
     if CommandLine.arguments.dropFirst().first == "layout" {
         let data = FileHandle.standardInput.readDataToEndOfFile()
         let rows = try JSONDecoder().decode([Layout].self, from: data)
