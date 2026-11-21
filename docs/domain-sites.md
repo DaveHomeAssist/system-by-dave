@@ -58,6 +58,9 @@ move again.
 
 ## Pipeline
 
+The release gates run as parallel jobs in `.github/workflows/deploy-pages.yml`
+(since 2026-11-21); the `deploy` job needs every one of them and does steps 2 to 5.
+
 1. `npm run verify:domain-sites` runs with the other release gates. It stages
    all sites into a temporary directory and fails when:
    - a staged page loads or links a local file that the site does not carry
