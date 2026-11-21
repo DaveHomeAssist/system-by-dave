@@ -209,6 +209,10 @@ const notionTable = (rows) => block('table', {
 // ambient) and "P1 Headroom (°C)". Written only when the database has them as number
 // properties, so a database without them still accepts the page. A unit with no
 // reading gets an empty value, never a guess.
+// The numbers are filled only while the unit is reached and lit (on or warming), so
+// charts built on them show running temperatures. A unit that is off, cooling or
+// unreachable gets empty values; a reading taken then (a Panasonic intake can read
+// 29 to 32 °C just after power-off) stays in the page's unit table.
 export const unitPropertyNames = (slot) => ({ temp: `${slot} Temp (°C)`, headroom: `${slot} Headroom (°C)` });
 function unitProperties(report, numberProperties) {
   const out = {};
@@ -216,8 +220,9 @@ function unitProperties(report, numberProperties) {
   for (const u of report.units || []) {
     if (!/^P\d+$/.test(String(u?.slot || ''))) continue;
     const { temp, headroom } = unitPropertyNames(u.slot);
-    if (numberProperties.has(temp)) out[temp] = { number: Number.isFinite(u.intakeC) ? u.intakeC : null };
-    if (numberProperties.has(headroom)) out[headroom] = { number: Number.isFinite(u.headroomC) ? u.headroomC : null };
+    const running = !!u.online && isLit(u.power);
+    if (numberProperties.has(temp)) out[temp] = { number: running && Number.isFinite(u.intakeC) ? u.intakeC : null };
+    if (numberProperties.has(headroom)) out[headroom] = { number: running && Number.isFinite(u.headroomC) ? u.headroomC : null };
   }
   return out;
 }
