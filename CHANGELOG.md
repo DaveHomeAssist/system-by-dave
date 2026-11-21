@@ -44,7 +44,8 @@
   tile per Mac, green, red or stale (no report in about three minutes), with the last report time and the
   failing check. Red only: no sound, nothing on the projectors.
 - Not installed anywhere. The relay release and the Studio and m1 acceptance are separate, approved work.
-  Built to the recommended options for MF-1, MF-2 and MF-3, which are still open.
+  Built to the recommended options for MF-1, MF-2 and MF-3, and Dave confirmed MF-1 to MF-5 on 2026-11-21 (MF-4 is
+  the write-only status token, MF-5 the projector power rule).
 
 ## November 20, 2026. Frozen workspace navigation
 

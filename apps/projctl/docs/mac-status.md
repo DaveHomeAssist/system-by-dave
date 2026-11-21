@@ -98,8 +98,8 @@ interact with it; this change does not answer them:
   trigger nothing, but a device that can reach the relay can reach the cue ports as well, so the status token
   is not the weakest control on the relay.
 
-Decisions this change was built to the recommended option for: **MF-1 A** (each Mac reports to this relay;
-the Rig page only displays), **MF-2 A** (red tile only), **MF-3 A** (pixel output: interface up and a ping to
-each controller, never data). Two smaller choices made along the way are listed in the pull request: a
-write-only status token instead of the passcode (MF-4), and whether projector power is a fault or only
-reported (MF-5).
+Decisions this change was built to, all confirmed by Dave on 2026-11-21: **MF-1 A** (each Mac reports to this
+relay; the Rig page only displays), **MF-2 A** (red tile only), **MF-3 A** (pixel output: interface up and a
+ping to each controller, never data), **MF-4** (a write-only status token for the Macs instead of the
+passcode) and **MF-5** (projector power is a fault only when the profile sets `expectPower`; otherwise it is
+reported).
