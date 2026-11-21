@@ -1,5 +1,6 @@
 import copy
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -115,6 +116,54 @@ class ShippedWindowTests(unittest.TestCase):
         script = (self.WEB / 'app.js').read_text()
         for status in ('PASS', 'FAIL', 'NOT RUN', 'RUNNING'):
             self.assertIn(status, script)
+
+
+class WatchWindowTests(unittest.TestCase):
+    """The window only shows the watch; it never asks for a check, a repair or a command."""
+    WEB = HERE / 'checks-app' / 'web'
+    SWIFT = (HERE / 'checks-app' / 'FrozenStartupChecks.swift').read_text()
+
+    def test_the_stream_carries_what_the_window_draws(self):
+        with tempfile.TemporaryDirectory() as folder:
+            args = [sys.executable, '-B', str(HERE / 'startup.py'), '--profile', str(HERE / 'example-profile.json'),
+                    '--fixture', str(HERE / 'example-snapshot.json'), '--events', '-']
+            subprocess.run(args + ['--receipt', str(Path(folder) / 'r.json')], capture_output=True, text=True, timeout=30)
+            done = subprocess.run(args + ['--receipt', str(Path(folder) / 'watch.json'), '--watch', '--max-cycles', '1'],
+                                  capture_output=True, text=True, timeout=30)
+        event = json.loads(done.stdout.splitlines()[-1])
+        self.assertEqual((event['schema'], event['type'], event['state']), (STREAM_SCHEMA, 'watch', 'ok'))
+        script = (self.WEB / 'app.js').read_text()
+        for check in event['checks']:
+            self.assertEqual(set(check) - {'expected'}, {'id', 'label', 'status', 'observed'})
+            self.assertIn("'%s'" % check['status'], script, 'the window has a symbol for %s' % check['status'])
+        for kind in ('watch', 'report', 'watch-state'):
+            self.assertIn("event.type === '%s'" % kind, script)
+
+    def test_the_window_has_no_way_to_send_anything(self):
+        script = (self.WEB / 'app.js').read_text()
+        posted = set(re.findall(r"post\(\{ action: '([a-z]+)'", script))
+        self.assertEqual(posted, {'ready', 'retry', 'crew', 'collapse', 'expand'}, 'watch adds no message to the app')
+        for marker in ('fetch(', 'XMLHttpRequest', 'WebSocket', 'innerHTML', 'eval(', 'sendBeacon'):
+            self.assertNotIn(marker, script)
+
+    def test_the_app_starts_only_the_read_only_watch_and_has_no_network_or_automation_code(self):
+        self.assertIn('"--watch"', self.SWIFT)
+        for imported in re.findall(r'^import (\w+)', self.SWIFT, re.M):
+            self.assertIn(imported, ('AppKit', 'WebKit'))
+        start = self.SWIFT.index('func startWatch()')
+        body = self.SWIFT[start:self.SWIFT.index('func stopWatch()')]
+        for forbidden in ('--warm', '--verify-ready', '--crew-evidence', 'osascript', 'BetterDisplay', '/usr/bin/open', 'restore', 'URLSession', 'NWConnection', 'socket'):
+            self.assertNotIn(forbidden, body)
+        for forbidden in ('URLSession', 'NWConnection', 'CFSocket', 'osascript', 'BetterDisplay', 'NSAppleScript'):
+            self.assertNotIn(forbidden, self.SWIFT)
+
+    def test_watch_stops_before_a_new_startup_check_and_starts_only_after_the_computer_checks_pass(self):
+        start_check = self.SWIFT[self.SWIFT.index('func startCheck()'):self.SWIFT.index('func recordCrew')]
+        self.assertIn('stopWatch()', start_check)
+        self.assertIn('startWatchAfterFinish = true', self.SWIFT)
+        self.assertIn('(object["computerReady"] as? Bool) == true', self.SWIFT)
+        self.assertIn('func applicationWillTerminate', self.SWIFT)
+        self.assertIn('stopWatch()', self.SWIFT[self.SWIFT.index('func applicationWillTerminate'):][:120])
 
 
 if __name__ == '__main__':

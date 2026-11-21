@@ -435,3 +435,35 @@ button.fm-node[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 
   .fm-notes .fm-row { flex-wrap: wrap; }
   .fm-cal-legend { display: none; }
 }
+
+/* Show Macs (Rig): a slim row above the three columns, one tile per Mac. Green, red and stale each carry their own
+   word and mark, never colour alone. A fault is a red tile only: no sound and nothing on the projectors. */
+.fm-macsrow { flex: 0 0 auto; display: flex; flex-direction: column; gap: 8px; }
+.fm-macsrow__head { display: flex; align-items: center; gap: 12px; }
+.fm-macsrow__head h2 { margin: 0; }
+.fm-macsrow__head .fm-tag { margin-left: auto; }
+.fm-rigcols { flex: 1 1 0; min-height: 0; display: flex; flex-wrap: wrap; gap: 16px; overflow: hidden; }
+.fm-macs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.fm-mac { --mac: var(--line-control); display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 8px 12px; border: 1px dashed var(--line-control); border-left: 6px solid var(--mac); border-radius: var(--radius-md); background: var(--surface); }
+.fm-mac__head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.fm-mac__title { flex: 0 1 auto; min-width: 0; margin: 0; font: 700 13px/18px var(--font-display); letter-spacing: .02em; white-space: nowrap; }
+.fm-mac__machine { flex: 1 1 0; min-width: 0; margin: 0; color: var(--ink-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fm-mac__word, .fm-mac__practice { flex: none; }
+.fm-mac__dot { flex: none; display: grid; place-items: center; width: 16px; height: 16px; border-radius: var(--radius-round); border: 2px solid var(--mac); font: 700 11px/1 var(--font-mono); color: var(--on-mac, var(--ink)); }
+.fm-mac__line { margin: 0; color: var(--ink-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fm-mac__third { margin: 0; min-height: 32px; font: 400 12px/16px var(--font-sans, inherit); color: var(--ink-muted); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+.fm-mac__fail { color: var(--ink); }
+.fm-mac__third strong { font-weight: 700; }
+.fm-mac__more { color: var(--ink-muted); }
+.fm-mac[data-state="ok"] { --mac: var(--state-done); --on-mac: var(--surface); border-style: solid; }
+.fm-mac[data-state="ok"] .fm-mac__dot { background: var(--mac); }
+.fm-mac[data-state="ok"] .fm-mac__dot::after { content: "\2713"; }
+.fm-mac[data-state="fault"] { --mac: var(--state-blocked); --on-mac: var(--surface); border-style: solid; border-color: var(--state-blocked); background: color-mix(in srgb, var(--state-blocked) 12%, var(--surface)); }
+.fm-mac[data-state="fault"] .fm-mac__dot { background: var(--mac); border-radius: var(--radius-sm); }
+.fm-mac[data-state="fault"] .fm-mac__dot::after { content: "!"; }
+.fm-mac[data-state="starting"] { --mac: var(--state-queued); border-style: solid; }
+.fm-mac[data-state="starting"] .fm-mac__dot::after { content: "\2026"; }
+.fm-mac[data-state="stale"] .fm-mac__dot, .fm-mac[data-state="none"] .fm-mac__dot, .fm-mac[data-state="unknown"] .fm-mac__dot { border-style: dashed; }
+.fm-mac[data-state="stale"] .fm-mac__dot::after, .fm-mac[data-state="none"] .fm-mac__dot::after, .fm-mac[data-state="unknown"] .fm-mac__dot::after { content: "?"; }
+@media (max-width: 1100px) { .fm-rigcols { flex: 0 0 auto; overflow: visible; } .fm-macs { gap: 10px; } }
+@media (max-width: 680px) { .fm-macs { grid-template-columns: minmax(0, 1fr); } .fm-mac__machine { display: none; } .fm-mac__third { min-height: 16px; -webkit-line-clamp: 2; } }

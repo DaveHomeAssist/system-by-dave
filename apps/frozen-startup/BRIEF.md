@@ -13,7 +13,9 @@ A fixture bridge exercises the entire sequence without contacting equipment.
 A deployment bridge is an explicit local executable implementing the documented
 protocol. Studio integration, BetterDisplay version qualification and supported
 Millumin routing readback remain commissioning work. The package installs no
-login item. It contains no projector power, shutter, cue or network client.
+login item. It contains no projector power, shutter or cue client. Its only
+network use is the read-only mid-show watch, which asks the Projctl relay three
+fixed questions (see README, "Mid-show watch").
 
 Readiness requires current computer checks and this run's operator observations
 of all four surfaces, the intended show, opening look, removed test cards and

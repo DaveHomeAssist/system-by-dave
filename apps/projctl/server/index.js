@@ -32,6 +32,7 @@ import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, brow
 import { readSoftwareChecks } from './software-checks.js';
 import { readCrewLinks } from './crew-links.js';
 import { createShowRoutes } from './show-routes.js';
+import { createMacStatus, projectorSummary, statusToken, bearerToken, tokenMatches, STATUS_ROUTES, REPORT_MAX_BYTES, STALE_AFTER_MS } from './mac-status.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -48,6 +49,12 @@ const SESSION_SECRET = randomBytes(32).toString('hex'); // sessions end when the
 const SESSION = createHash('sha256').update(`pj:${SESSION_SECRET}:${PASSCODE}`).digest('hex');
 const loginThrottle = createLoginThrottle(); // bounded per-client backoff; active lockouts survive eviction
 const proxy = proxyPolicy(); // PROJCTL_TRUSTED_PROXIES (default loopback); invalid values stop startup
+// Show Mac status reports (docs/mac-status.md). PROJCTL_STATUS_TOKEN is a write-only credential for the show Macs: it
+// opens POST /api/mac-status and the read-only projector summary, and nothing else. A bad token never stops the relay.
+let STATUS_TOKEN = '';
+try { STATUS_TOKEN = statusToken(); } catch (error) { console.error(`[projctl] ${error.message}; status reports then need the normal sign-in`); }
+const statusThrottle = createLoginThrottle(); // wrong status tokens back off per client, apart from passcode logins
+const macStatus = createMacStatus({ staleAfterMs: Math.max(1000, Number(process.env.PROJCTL_MAC_STALE_MS) || STALE_AFTER_MS), simulation: SIM });
 function cookies(req) { return Object.fromEntries((req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((kv) => kv[0]).map(([k, ...v]) => [k, v.join('=')])); }
 // The public workspace embeds this controller in a cross-site frame, where browsers never send
 // the SameSite=Strict login cookie. Login therefore also sets a partitioned copy (CHIPS): the
@@ -573,8 +580,14 @@ const server = http.createServer(async (req, res) => {
       ] }); return res.end(JSON.stringify({ ok: true }));
     }
     if (url.pathname === '/api/logout' && req.method === 'POST') { res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': ['pj=; Path=/; HttpOnly; Max-Age=0', `${EMBED_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=0`] }); return res.end('{"ok":true}'); }
+    let viaStatusToken = false;
+    if (STATUS_TOKEN && STATUS_ROUTES.has(`${req.method} ${url.pathname}`) && bearerToken(req)) {
+      const ip = clientIp(req), wait = statusThrottle.retryAfterMs(ip);
+      if (wait) { res.setHeader('retry-after', Math.ceil(wait / 1000)); throw httpErr(429, `too many tries, wait ${Math.ceil(wait / 1000)} s`); }
+      if (tokenMatches(bearerToken(req), STATUS_TOKEN)) { statusThrottle.succeed(ip); viaStatusToken = true; } else statusThrottle.fail(ip);
+    }
     if (url.pathname === '/login.html' || url.pathname === '/login.js' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css' || url.pathname === '/frozen-theme.js' || url.pathname === '/frozen-theme.css') { /* public assets */ }
-    else if (!authed(req)) {
+    else if (!viaStatusToken && !authed(req)) {
       if (url.pathname.startsWith('/api/')) throw httpErr(401, 'login required');
       const next = url.pathname + url.search;
       res.writeHead(302, { location: next === '/' ? '/login.html' : `/login.html?next=${encodeURIComponent(next)}` }); return res.end();
@@ -584,6 +597,10 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/power-schedules/save' && req.method === 'POST') return json(res, 200, powerSchedules.save(await body(req)));
     if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
     if (url.pathname === '/api/power-schedules/delete' && req.method === 'POST') { const { id } = await body(req); return json(res, 200, powerSchedules.remove(id)); }
+    // Show Mac status: a report is only stored, never acted on. The page reads the latest ones; a Mac reads the projector summary.
+    if (url.pathname === '/api/mac-status' && req.method === 'POST') return json(res, 200, macStatus.accept(await readJsonBody(req, { maxBytes: REPORT_MAX_BYTES })));
+    if (url.pathname === '/api/mac-status' && req.method === 'GET') return json(res, 200, macStatus.view());
+    if (url.pathname === '/api/mac-status/projectors' && req.method === 'GET') return json(res, 200, projectorSummary({ projectors: () => rig.projectors, status: slot => ({ ...status.get(slot), connection: connections.get(slot) }), maxStatusAgeMs: Math.max(15000, POLL_MS * 3) }));
     if (url.pathname === '/api/health-reports' && req.method === 'GET') return json(res, 200, health.view());
     if (url.pathname === '/api/software-checks' && req.method === 'GET') return json(res, 200, await readSoftwareChecks(path.join(path.dirname(DATA), 'software-checks.json'), path.join(__dirname, '../DELIVERY.json'), RELEASE));
     if (url.pathname === '/api/crew-links' && req.method === 'GET') return json(res, 200, await readCrewLinks(path.join(path.dirname(DATA), 'crew-links.json')));
@@ -699,4 +716,4 @@ wss.on('connection', (ws) => {
   sendSnapshotMessage(ws, JSON.stringify(snapshot()));
 });
 
-server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${server.address().port}  rig=${DATA}  login=${PASSCODE ? 'passcode' : 'open (LAN only)'}`));
+server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${server.address().port}  rig=${DATA}  login=${PASSCODE ? 'passcode' : 'open (LAN only)'}  mac-status=${STATUS_TOKEN ? 'token' : 'sign-in only'}`));

@@ -94,7 +94,8 @@ python3 apps/frozen-startup/startup.py --profile apps/frozen-startup/example-pro
 
 Readiness expires after 15 minutes and is invalidated by a configuration change,
 a different run, missing crew evidence or an incorrect show/routing. This is a
-readiness checkpoint, not continuous show monitoring. The timeout is provisional
+readiness checkpoint. Continuous watching during the show is the separate
+[mid-show watch](#mid-show-watch-read-only). The timeout is provisional
 until the crew commissioning walkthrough establishes the operational value.
 
 For show-night integration, run the warm check on a running system or startup
@@ -223,3 +224,112 @@ the plist out of `~/Library/LaunchAgents`.
 
 Studio installation, permissions and the five-display restart acceptance are
 still separate, approved work.
+
+## Mid-show watch (read only)
+
+Development, offline. Studio installation and acceptance are separate, approved work (Phases 3 to 5 of the
+mid-show checks brief; see [what only the rig can prove](#what-only-the-rig-can-prove)).
+
+After the computer checks pass, the checks app starts `startup.py --watch`. About every 60 seconds it reads the
+Mac, judges the reading, shows the result and sends a small status report to the Projctl relay, where the Frozen
+Monitor's Rig page shows one tile per Mac. It watches and alerts. It never changes anything.
+
+```sh
+python3 apps/frozen-startup/startup.py --profile apps/frozen-startup/example-profile.json --fixture apps/frozen-startup/example-snapshot.json --receipt /tmp/frozen-watch-demo/watch.json --watch --max-cycles 1 --events -
+```
+
+Run a startup check into the same folder first so the watch has its baseline; the fixture never reports to a relay.
+
+### What it checks
+
+| Check | Reads | Fault when |
+| --- | --- | --- |
+| Displays | The native display helper (`mac-displays watch`): identity, resolution, refresh, position | A display is missing, inactive or changed identity, or its mode differs from the approved profile |
+| Millumin process | Process list: pid and start time | Not running, more than one, or not the same process as at startup |
+| Show file | Size and modified time, and a SHA-256 only when either changed | Missing. **A save is reported as `CHANGED`, not a fault**, so a planned save does not turn the Mac red |
+| Sleep and keep-awake | `pmset -g assertions` | The named keep-awake process is not holding sleep off |
+| Disk, thermal, memory | Free space, `pmset -g therm`, `kern.memorystatus_vm_pressure_level` | Below `minFreeDiskGB`, thermal throttling, critical pressure (elevated pressure is a `WARN` note) |
+| Media folder | Path exists and is readable | Missing or unreadable |
+| Projctl relay | `GET /api/health` | Not answering, or not the Projctl relay |
+| Projector power and shutter | `GET /api/mac-status/projectors` (M5 profile only) | A listed lane has no projector, or is not replying; power is a fault only if `expectPower` is set; shutter is reported, never a fault |
+| Pixel output | Interface state and one ping to each listed controller (m1 profile; a stub until the profile enables it) | Interface down, or a controller does not answer. It never sends pixel data |
+
+Statuses are `PASS`, `FAIL`, `CHANGED`, `WARN` and `NOT CONFIGURED`. Only `FAIL` is a fault and makes the overall
+state `fault`. A check the profile does not switch on says `NOT CONFIGURED`; it is never shown as a pass, and an
+unreadable reading is a `FAIL`, never a pass.
+
+### What it never does
+
+Enforced in code and covered by tests, not just by convention:
+
+- No Millumin readback. `millumin-readback.js` brings Millumin to the front and opens its Output setup sheet; watch
+  mode cannot reach it (`mac_bridge.watch_observe` never calls `millumin_ui`).
+- No BetterDisplay at all, so no mode change either. Identity and mode come from the native display helper.
+- No OSC or any message to Millumin, and no projector or pixel command. The watch process has no `subprocess` or
+  `socket` import, and its only requests to the relay are `GET /api/health`, `GET /api/mac-status/projectors` and
+  `POST /api/mac-status` (`watch.HTTP_REQUESTS`).
+- No relaunch, no repair, no restore, no window or focus change.
+
+How: `watch.ReadOnlyBridge` hands the loop only the bridge actions `capabilities` and `watch`; the bridge's `watch`
+action runs programs only through `read_command`, which refuses anything outside `WATCH_PROGRAMS` with arguments
+outside the listed shapes. `test_watch.py` and `test_mac_bridge.py` check this at runtime and in the source.
+
+### Baseline
+
+When startup reaches computer-ready it captures a baseline: which display is which lane, each display's identity,
+the Millumin pid and start time, and the show file's hash, in `watch-baseline.json` beside the receipts. It
+belongs to one boot; a restart ends it. Without one (a Mac whose startup is not commissioned yet), the first watch
+reading becomes the baseline and the window says so ("same process as at the first watch reading"). Displays that
+share one identity, such as four identical projector outputs, cannot be told apart without a startup baseline, so
+that check fails with "Run the startup check first."
+
+### Profile: every check is profile driven
+
+A profile may carry a `watch` block. A check runs only when the profile switches it on; defaults are in
+`watch.watch_config`. The `watch` block is not part of the profile digest, so editing the interval or the relay
+address does not invalidate a receipt or a crew confirmation.
+
+```json
+"watch": {
+  "host": "m5",
+  "hostName": "Production's Mac Studio (2)",
+  "intervalSeconds": 60,
+  "mediaFolder": "/absolute/path/to/media",
+  "keepAwake": { "process": "caffeinate" },
+  "relay": { "url": "http://127.0.0.1:8080" },
+  "report": { "tokenFile": "/absolute/path/to/status-token" },
+  "projectors": { "lanes": ["A", "B", "C", "D"], "expectPower": null }
+}
+```
+
+[`example-m1-profile.json`](example-m1-profile.json) is the m1 (Millumin pixel strips) with every value a clearly marked
+`REPLACE-` placeholder, because the m1 has not been inspected. Watch mode refuses to start while any placeholder
+remains and lists them. Its `pixelOutput` stub ships `"enabled": false`. Startup checks for a non-projector role are
+refused with a clear message until the m1's own startup checks are commissioned (Phase 2 and 4).
+
+### Status reports and the window
+
+Reports go to the Projctl relay's `POST /api/mac-status` with a write-only status token read from `watch.report.tokenFile`
+(owner-only permissions required). The contract, limits and what the relay will not do are in
+[the relay's Mac status doc](../projctl/docs/mac-status.md). A startup run reports `running` and then `ok` or `fault`; the
+watch reports each cycle. An offline fixture never reports.
+
+The checks window shows a banner above everything else: **green** `WATCHING · ALL CLEAR`, or **red**
+`FAULT · <check names>` with what was observed, `WATCH STOPPED` if the process dies (the app restarts it up to five
+times), or `WATCH NOT UPDATING` if a cycle is overdue. It also says whether the last report reached the relay.
+The banner is read only: it has no button that checks, repairs or sends. The window's `config` takes `"watch": false`
+to switch watching off; exit code 4 means the profile has no `watch` block and 3 means the profile or bridge is unusable.
+
+### What only the rig can prove
+
+Everything above is proven offline (fixtures, a local stand-in relay and the simulator relay). These need the Studio
+and the m1 in a downtime window and are **not** proven by this change:
+
+- The native display helper's vendor, model and serial match the identities the approved profile was captured with
+  (BetterDisplay reports its own). The watch compares against the baseline the helper itself captured at startup, so
+  this does not block it, but it needs one real run to confirm.
+- A real `pmset`/`sysctl`/`ps` reading on the Studio's macOS 27.0, including the keep-awake process name.
+- A watch run through a full rehearsal with no focus change, no sheet opening and no command sent.
+- A test fault (one output unplugged) turning the Mac's tile red within two minutes and back to green after.
+- The relay release (Phase 5): the status token, the Rig page and the relay restart.
+- The m1: its profile, its startup checks, its pixel controllers and Remote Login.
