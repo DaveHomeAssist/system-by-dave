@@ -117,6 +117,18 @@
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
+    /* The avbydave.com home page (av-home/), so a saved copy of / opens styled offline. */
+    './av-home/index.html',
+    './av-home/home.css',
+    './av-home/home.js',
+    './av-home/favicon.svg',
+    './css/avd/tokens.css',
+    './css/avd/bundle.css',
+    './css/avd/fonts/ArchivoExpanded-Variable.woff2',
+    './css/avd/fonts/Archivo-Variable.woff2',
+    './css/avd/fonts/IBMPlexMono-Regular.woff2',
+    './css/avd/fonts/IBMPlexMono-Medium.woff2',
+    './css/avd/fonts/IBMPlexMono-SemiBold.woff2',
     './equipment-lab/index.html',
     './equipment-lab/assets/equipment-lab.js',
     './equipment-lab/assets/equipment-lab-Viewer.js',
@@ -347,7 +359,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261114-offline-cache-receipts',
+    version:'v20261121-site-home',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

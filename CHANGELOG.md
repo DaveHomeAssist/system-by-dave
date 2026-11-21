@@ -1,5 +1,15 @@
 # Changelog
 
+## November 21, 2026. avbydave.com gets a home page; the console is one part of the site
+
+- avbydave.com now opens on a home page (`av-home/`, staged at `/` through `landingPage` in `scripts/domain-sites.json`) instead of on the console. Dave decided this on November 21; it replaces the October 13 arrangement in which the console shell was also the home page. The console itself is unchanged at `/av/`, and so are the installed app (`start_url` `./av/`), every redirect stub (they already target `/av/`) and all saved work. A bookmark to the bare domain now lands one link from the console.
+- The home page is static HTML in the AV by Dave design system (Gaffer dark, Call Sheet light): four sections with real addresses (`#overview`, `#tools`, `#console`, `#brief`), locked to the screen with JavaScript and an ordinary top to bottom document without it. Its one action is Send the show brief, a prefilled email to the AV by Dave show address. It sets no cookies, loads nothing from another host and runs under `script-src 'self'; style-src 'self'`.
+- The design system's tokens, component styles and fonts (Archivo, Archivo Expanded, IBM Plex Mono, all SIL OFL, licences beside them) are now in `css/avd/`, byte for byte the copies already under `apps/projctl/public/avd/`.
+- One theme owner per origin: the home page reads and writes the AV tools' own `av-theme-mode.v1`, so the choice carries between the home page and the console. The console's White and Black read as light and dark here.
+- The console page is now indexable at its own canonical address, `https://avbydave.com/av/` (it was noindex with the root as canonical), and is listed in the AV sitemap. Its breadcrumb reads AV by Dave, linking the site home, then Console; the System by Dave link moved to the home page footer.
+- The home page's files joined the registry's offline list and the cache generation is `v20261121-site-home`, so a saved copy of `/` opens styled offline. `verify:av` now requires `av-home/` as the staged home, the console's own canonical and return link, and the shared theme key; its pinned counts are 164 base and 183 offline assets.
+- Checked locally: all four sections at ten sizes from 320 by 568 to 3840 by 1080 in both themes with no page scroll, clipping or sub 44 px control; keyboard skip link, section history, theme persistence into the console and back, print and no JavaScript on the staged avbydave.com site; `verify:av`, `verify:indexing`, `verify:public-navigation`, `verify:public-consistency`, `verify:domain-sites`, `verify:private-exposure`, `verify:throwline`, the console shell, nav funnel and first visit probes, the 57 domain move scenarios and the 33 step Frozen reference.
+
 ## November 21, 2026. The Philly prototype at /thephilly/
 
 - Added `/thephilly/`, the clickable prototype of The Philly, a free quarterly print magazine about Philadelphia (private source: `DaveHomeAssist/the-philly`). The page is `noindex`, outside the sitemap and carries real artist and listing content from the prototype, so it is for sharing by link only.
