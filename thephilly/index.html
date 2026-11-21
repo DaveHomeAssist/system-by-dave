@@ -1,0 +1,1415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Philly (prototype) — System by Dave</title>
+<meta name="description" content="Prototype site for The Philly, a free quarterly print magazine about Philadelphia. Private working prototype; not indexed.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://systembydave.com/thephilly/">
+<meta name="theme-color" content="#ebe3d1">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="The Philly (prototype) — System by Dave">
+<meta property="og:description" content="Prototype site for The Philly, a free quarterly print magazine about Philadelphia.">
+<meta property="og:url" content="https://systembydave.com/thephilly/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Philly (prototype) — System by Dave">
+<meta name="twitter:description" content="Prototype site for The Philly, a free quarterly print magazine about Philadelphia.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<style>
+/* Self-hosted OFL fonts (see vendor/NOTICE.txt); no third-party font host is contacted. */
+@font-face{font-family:"Alfa Slab One";font-style:normal;font-weight:400;font-display:swap;src:url("fonts/alfa-slab-one-400.woff2") format("woff2")}
+@font-face{font-family:"Anton";font-style:normal;font-weight:400;font-display:swap;src:url("fonts/anton-400.woff2") format("woff2")}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:swap;src:url("fonts/ibm-plex-mono-400.woff2") format("woff2")}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:600;font-display:swap;src:url("fonts/ibm-plex-mono-600.woff2") format("woff2")}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:400;font-display:swap;src:url("fonts/source-serif-4-400.woff2") format("woff2")}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:600;font-display:swap;src:url("fonts/source-serif-4-600.woff2") format("woff2")}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/source-serif-4-700.woff2") format("woff2")}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:900;font-display:swap;src:url("fonts/source-serif-4-900.woff2") format("woff2")}
+@font-face{font-family:"Source Serif 4";font-style:italic;font-weight:400;font-display:swap;src:url("fonts/source-serif-4-400-italic.woff2") format("woff2")}
+/* Layout: one viewport-locked board. Torn newsprint scraps hold each tab; long lists scroll inside their own scrap, never the page. */
+:root{
+  --paper:#ebe3d1; --paper-deep:#dfd5bf; --scrap:#f6f1e5; --tile:#d3cbb9;
+  --ink:#17140f; --ink-soft:#5b5347; --red:#c42b2f; --blue:#1d3fd6; --on-accent:#fffaf0;
+  --tape:rgba(212,193,140,.8); --dot:rgba(23,20,15,.24); --rule:rgba(23,20,15,.85); --line:rgba(23,20,15,.16);
+  --shadow:rgba(23,20,15,.22); --qr-bg:#fbf8f1; --qr-fg:#17140f; --cheese:#e0b13f;
+  --grain-op:.09; --grain-blend:multiply;
+  --f-mast:"Alfa Slab One","Rockwell","Roboto Slab",Georgia,serif;
+  --f-head:"Anton","Impact","Arial Narrow Bold",sans-serif;
+  --f-body:"Source Serif 4","Source Serif Pro",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --paper:#1b1a17; --paper-deep:#131210; --scrap:#26241f; --tile:#3a362f;
+  --ink:#eee6d4; --ink-soft:#aea593; --red:#ef5b55; --blue:#8aa2ff; --on-accent:#17140f;
+  --tape:rgba(170,150,100,.42); --dot:rgba(238,230,212,.16); --rule:rgba(238,230,212,.8); --line:rgba(238,230,212,.16);
+  --shadow:rgba(0,0,0,.55); --grain-op:.06; --grain-blend:screen;
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{height:100%;margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.fx{position:absolute;width:0;height:0}
+
+/* Shell */
+/* Public shell: skip link and static site return */
+.sbd-skip-link{position:fixed;top:8px;left:8px;z-index:200;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;background:var(--ink);color:var(--paper);border:2px solid var(--paper);font:600 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transform:translateY(-200%)}
+.sbd-skip-link:focus{transform:translateY(0);outline:3px solid var(--red);outline-offset:2px}
+.sbd-site-return{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-height:44px;font:600 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.sbd-site-return a{display:inline-flex;align-items:center;min-height:44px;padding:0 6px;text-decoration:none}
+.sbd-site-return a:hover{color:var(--red)}
+.sbd-site-return a:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.sbd-site-return__current{padding:0 6px;color:var(--ink)}
+
+.app{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative}
+.app::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;opacity:var(--grain-op);mix-blend-mode:var(--grain-blend);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.top{display:flex;align-items:center;gap:18px;padding-block:10px;border-bottom:3px solid var(--ink)}
+.logo{display:inline-flex;flex-direction:column;line-height:.8;text-decoration:none;flex:none}
+.logo-the{font:400 11px/1 var(--f-mast);letter-spacing:.2em;text-transform:uppercase;margin:0 0 3px 2px}
+.logo-name{font:400 30px/.85 var(--f-mast);text-transform:uppercase;letter-spacing:-.01em;filter:url(#rough)}
+.issue-tag{font:600 11px/1.35 var(--f-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);border-left:2px solid var(--ink);padding-left:12px;flex:none}
+.tabs{display:flex;gap:2px;margin-inline:auto}
+.tab{font:400 17px/1 var(--f-head);text-transform:uppercase;letter-spacing:.05em;text-decoration:none;padding:9px 13px 8px}
+.tab:hover{color:var(--red)}
+.tab[aria-current="page"]{background:var(--ink);color:var(--paper);transform:rotate(-1.5deg)}
+.proto{font:600 10.5px/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--red);border:2px dashed var(--red);padding:5px 8px;flex:none}
+.theme{display:inline-flex;align-items:center;gap:7px;border:2px solid var(--ink);background:var(--scrap);padding:7px 10px;font:600 11px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;cursor:pointer;flex:none}
+.theme:hover{background:var(--ink);color:var(--paper)}
+.theme svg{width:16px;height:16px}
+.rail{display:none}
+
+.stage{min-height:0;container-type:size;padding-block:16px 18px;position:relative}
+.panel{height:100%;min-height:0;position:relative}
+.panel.entering{animation:panelIn .28s ease-out both}
+@keyframes panelIn{from{transform:translateY(8px);opacity:.35}to{transform:none;opacity:1}}
+.col{min-width:0;min-height:0;display:flex;flex-direction:column}
+.scroll{position:relative;min-height:0;flex:1 1 auto;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--ink-soft) transparent}
+
+/* Type */
+.kicker{font:600 11.5px/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.14em;color:var(--red);margin:0}
+.h-xl{font:400 clamp(36px,4.2vw,60px)/.92 var(--f-head);text-transform:uppercase;margin:6px 0 10px;text-wrap:balance;letter-spacing:.005em}
+.h-l{font:400 clamp(28px,2.6vw,40px)/.95 var(--f-head);text-transform:uppercase;margin:6px 0 8px;text-wrap:balance}
+.h-m{font:400 22px/1 var(--f-head);text-transform:uppercase;margin:0 0 10px;letter-spacing:.02em}
+.lede{font-size:17px;line-height:1.5;color:var(--ink-soft);max-width:58ch;margin:0}
+.small{font:400 12px/1.5 var(--f-mono);color:var(--ink-soft)}
+.panel-head{flex:none;margin-bottom:14px}
+
+/* Paper bits */
+.scrap{background:var(--scrap);position:relative}
+.wrap{position:relative}
+.tape{position:absolute;width:76px;height:22px;background:var(--tape);z-index:3;pointer-events:none;
+  clip-path:polygon(2% 0,98% 6%,100% 30%,97% 55%,100% 82%,96% 100%,3% 94%,0 70%,3% 45%,0 18%)}
+.halftone{background-color:var(--tile);background-image:radial-gradient(var(--dot) 1.05px,transparent 1.55px);background-size:5px 5px}
+
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 12px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;border:2px solid var(--ink);background:var(--scrap);padding:10px 14px;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn-red{background:var(--red);border-color:var(--red);color:var(--on-accent)}
+.btn-red:hover{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 11px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;border:2px solid var(--ink);background:transparent;padding:6px 9px;cursor:pointer}
+.chip:hover{border-color:var(--red);color:var(--red)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.back{display:none}
+.seg{display:none}
+
+/* ---------- Cover (a printed object: keeps print colors in both themes) ---------- */
+/* Follows the founders' launch cover: rowhome border, cut-letter masthead, eight torn headline scraps around a centerpiece. */
+.cover-wrap{flex:none;position:relative;width:min(46cqw,calc(100cqh * .6667));align-self:flex-start;filter:drop-shadow(0 12px 18px var(--shadow))}
+.cover{margin:0;position:relative;width:100%;aspect-ratio:2/3;container-type:inline-size;overflow:hidden;background:#2b2925;
+  --scrap:#f4ecdc; --ink:#17140f; --red:#c4161c; --blue:#1d3fd6; --tile:#8f8a82; color:var(--ink)}
+.cover > *{position:absolute}
+.cv-rows{inset:0;width:100%;height:100%}
+.cv-field{left:7%;right:7%;top:8.6%;bottom:7.6%;background-color:#9d988f;
+  background-image:radial-gradient(rgba(23,20,15,.42) 1px,transparent 1.5px),linear-gradient(180deg,#c3bdb1 0%,#8a857c 60%,#6f6a62 100%);
+  background-size:4px 4px,100% 100%;box-shadow:inset 0 0 0 .7cqw #17140f}
+.cv-sky{left:7%;right:7%;top:11.5%;height:15%;color:#45413a;opacity:.75}
+.cv-sky svg{width:100%;height:100%}
+.cv-bell{left:27%;width:46%;top:23%;height:auto}
+.cv-mast{left:4%;right:4%;top:1.6%;display:flex;justify-content:center;align-items:flex-end;gap:.6cqw;z-index:4}
+.cv-mast .gap{width:1.6cqw}
+.rl{display:inline-block;padding:.4cqw .9cqw .2cqw;line-height:1;box-shadow:.4cqw .5cqw 0 rgba(0,0,0,.4)}
+.rl.s0{background:var(--blue);color:#fff;font:400 11.5cqw/1 var(--f-mast);transform:rotate(-4deg)}
+.rl.s1{background:#fff;color:var(--ink);font:900 11.5cqw/1 var(--f-body);transform:rotate(3deg)}
+.rl.s2{background:var(--ink);color:#fff;font:400 12.5cqw/1 var(--f-head);transform:rotate(-2deg)}
+.rl.s3{background:var(--scrap);color:var(--blue);font:400 11cqw/1 var(--f-mast);transform:rotate(2deg)}
+.rl.s4{background:#fff;color:var(--ink);font:400 12.5cqw/1 var(--f-head);transform:rotate(-3deg)}
+.rl.small{font-size:7.5cqw}
+.cv-tease{background:var(--scrap);color:var(--red);padding:2cqw 2.3cqw 2.3cqw;transform:rotate(var(--r,0deg));animation:slap .6s cubic-bezier(.2,.8,.25,1.3) both;animation-delay:var(--d,0s);z-index:3}
+.cv-tease b{display:block;font:900 4.4cqw/.98 var(--f-body);text-transform:uppercase;letter-spacing:-.01em}
+.cv-tease span{display:block;font:700 3.1cqw/1.12 var(--f-body);margin-top:.7cqw}
+@keyframes slap{from{transform:rotate(var(--r,0deg)) scale(1.08)}to{transform:rotate(var(--r,0deg)) scale(1)}}
+.cv-streak{height:1.3cqw;background:var(--red);transform:rotate(var(--r,0deg));z-index:2;opacity:.9}
+
+/* ---------- Issue ---------- */
+.issue{display:flex;gap:clamp(18px,2.4vw,44px)}
+.issue-text{flex:1;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.85fr);gap:clamp(18px,2vw,36px)}
+.toc{list-style:none;margin:0;padding:0}
+.toc a{display:grid;grid-template-columns:52px minmax(0,1fr);gap:2px 14px;padding:11px 4px;border-top:2px solid var(--rule);text-decoration:none}
+.toc li:last-child a{border-bottom:2px solid var(--rule)}
+.toc .pg{font:400 28px/1 var(--f-head);grid-row:span 2;font-variant-numeric:tabular-nums}
+.toc .pg small{display:block;font:600 9.5px/1.4 var(--f-mono);letter-spacing:.12em;color:var(--ink-soft)}
+.toc .t{font:600 18px/1.25 var(--f-body)}
+.toc .t span{font:600 10.5px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.12em;color:var(--red);margin-right:8px;vertical-align:2px}
+.toc .d{font-size:14.5px;line-height:1.4;color:var(--ink-soft)}
+.toc a:hover .t{text-decoration:underline;text-decoration-color:var(--red);text-decoration-thickness:3px;text-underline-offset:3px}
+.side-inner{display:flex;flex-direction:column;gap:22px;padding:14px 6px 6px}
+.pickup{padding:22px 20px 18px}
+.pickup ul{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 18px}
+.pickup li{display:flex;justify-content:space-between;gap:8px;font:400 13px/1.7 var(--f-mono);border-bottom:1px dotted var(--line)}
+.pickup li b{font-weight:600;font-variant-numeric:tabular-nums}
+.adbox{border:2px dashed var(--ink-soft);padding:18px;display:grid;gap:10px;justify-items:start}
+.adbox .h-m{margin:0}
+.next-strip{background:var(--ink);color:var(--paper);padding:14px 16px;transform:rotate(-1deg)}
+.next-strip .kicker{color:var(--paper);opacity:.75}
+.next-strip p{margin:4px 0 0;font:400 22px/1.05 var(--f-head);text-transform:uppercase}
+
+/* ---------- Read ---------- */
+.read{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:clamp(18px,2.4vw,40px)}
+.read-side{display:none}
+.story-list{list-style:none;margin:12px 0 0;padding:0}
+.story-item{display:grid;gap:5px;width:100%;text-align:left;border:0;border-top:2px solid var(--rule);background:transparent;padding:12px 10px;cursor:pointer}
+.story-list li:last-child .story-item{border-bottom:2px solid var(--rule)}
+.story-item:hover .si-title{color:var(--red)}
+.story-item[aria-current="true"]{background:var(--ink);color:var(--paper)}
+.story-item[aria-current="true"] .si-title{color:var(--paper)}
+.story-item[aria-current="true"] .si-sec,.story-item[aria-current="true"] .si-meta{color:var(--paper);opacity:.8}
+.si-sec{font:600 10.5px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.12em;color:var(--red)}
+.si-title{font:400 22px/1.02 var(--f-head);text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
+.si-meta{font:400 11.5px/1.3 var(--f-mono);color:var(--ink-soft)}
+.reader-wrap{padding-top:10px}
+.reader-wrap > .tape{top:0;left:calc(50% - 38px);transform:rotate(-2deg)}
+.reader{padding:clamp(24px,3.4vw,56px) clamp(20px,3.4vw,56px)}
+.reader-inner{max-width:66ch;margin-inline:auto}
+/* Cheesesteak Radar: the Philly Cheesesteak Heatmap (/cheesesteaks/) opened inside the Food Finders story */
+.radar{margin:28px 0 8px;padding:18px 18px 16px;border:2px solid var(--ink);background:var(--scrap);position:relative}
+.radar::before{content:"";position:absolute;inset:6px;border:1px dashed var(--line);pointer-events:none}
+.radar h3{font:400 clamp(26px,3vw,36px)/.95 var(--f-head);text-transform:uppercase;margin:6px 0 10px}
+.radar p{margin:0 0 10px}
+.radar .radar-note{font:600 11px/1.45 var(--f-mono);letter-spacing:.04em;color:var(--ink-soft)}
+.radar-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.radar-frame{margin-top:14px;border:2px solid var(--ink);background:var(--paper-deep)}
+.radar-frame iframe{display:block;width:100%;height:clamp(420px,62vh,640px);border:0;background:var(--paper)}
+.reader h2{font:400 clamp(38px,4.4vw,66px)/.92 var(--f-head);text-transform:uppercase;margin:10px 0 14px;text-wrap:balance}
+.reader .dek{font:italic 400 21px/1.4 var(--f-body);color:var(--ink-soft);margin:0 0 16px;text-wrap:pretty}
+.byline{display:flex;flex-wrap:wrap;gap:6px 18px;font:600 11.5px/1.3 var(--f-mono);text-transform:uppercase;letter-spacing:.1em;padding-block:10px;border-block:2px solid var(--rule);margin-bottom:24px}
+.reader p.body{font-size:18.5px;line-height:1.66;margin:0 0 1em;text-wrap:pretty}
+.reader p.lead::first-letter{font:400 4.3em/.8 var(--f-mast);float:left;margin:.08em .1em 0 0;color:var(--red)}
+.print-note{font:400 12.5px/1.5 var(--f-mono);border:2px dashed var(--ink-soft);padding:12px 14px;margin-top:26px}
+.read-side .adbox{margin-top:10px}
+
+/* ---------- Sounds ---------- */
+.sounds{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,440px);grid-template-rows:minmax(0,1fr);gap:clamp(18px,2.4vw,40px)}
+.artist-grid{list-style:none;margin:0;padding:4px 10px 10px 2px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px;align-content:start}
+.artist-card{display:flex;flex-direction:column;width:100%;text-align:left;background:var(--scrap);border:2px solid var(--ink);padding:0;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+.artist-card:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.artist-card[aria-current="true"]{box-shadow:6px 6px 0 var(--red);transform:translate(-2px,-2px)}
+.a-tile{position:relative;overflow:hidden;aspect-ratio:16/10}
+.a-tile::before{content:"";position:absolute;inset:0;background:var(--tint,var(--red));opacity:.32}
+.a-tile .ini{position:absolute;left:8%;bottom:4%;font:400 clamp(54px,6vw,84px)/.85 var(--f-head);letter-spacing:.01em}
+.a-tile svg{position:absolute;right:-8%;top:-12%;width:52%;height:auto;opacity:.9}
+.a-body{padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end}
+.a-name{display:block;font:400 23px/1 var(--f-head);text-transform:uppercase;letter-spacing:.01em;margin:0 0 6px;text-wrap:balance}
+.a-meta{display:block;font:400 11.5px/1.45 var(--f-mono);color:var(--ink-soft)}
+.qr{display:block}
+.qr rect{fill:var(--qr-bg)}
+.qr path{fill:var(--qr-fg)}
+.qr-sm{width:62px;height:62px;border:1px solid var(--line)}
+.qr-lg{width:150px;height:150px}
+.qr-fallback{display:grid;place-items:center;width:62px;height:62px;border:2px dashed var(--ink-soft);font:600 10px var(--f-mono)}
+.artist-wrap{padding-top:10px}
+.artist-wrap > .tape{top:0;right:18%;transform:rotate(3deg)}
+.artist-page{padding:26px clamp(18px,2.2vw,30px) 26px}
+.artist-page .a-tile{aspect-ratio:16/9;margin-bottom:16px}
+.ap-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font:600 11.5px/1.3 var(--f-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);margin-bottom:12px}
+.artist-page p{margin:0 0 14px;font-size:17px;line-height:1.6}
+.played{list-style:none;margin:6px 0 14px;padding:0}
+.played li{padding:9px 0;border-bottom:1px solid var(--line)}
+.played a{font:600 15.5px/1.3 var(--f-body);color:inherit}
+.played span{display:block;margin-top:3px;font:400 12px/1.5 var(--f-mono);color:var(--ink-soft)}
+.src{margin:0 0 18px}
+.scene-src{margin:2px 0 10px}
+.facts{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0 0 16px;padding:0}
+.facts li{border:2px solid var(--ink);padding:5px 8px;font:600 11px/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.08em}
+.shows{list-style:none;margin:6px 0 18px;padding:0}
+.shows li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.shows li span{font:400 12px/1.6 var(--f-mono);color:var(--ink-soft);white-space:nowrap}
+.ap-qr{--ink:#17140f;--ink-soft:#5b5347;background:var(--qr-bg);color:var(--ink);border:2px solid var(--ink);padding:14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;margin-top:8px}
+.ap-qr .kicker{color:#a8262a}
+.ap-qr .url{font:600 15px/1.3 var(--f-mono);word-break:break-all;margin:6px 0}
+.ap-qr .small{color:#5b5347}
+
+/* ---------- Scene ---------- */
+.scene{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);grid-template-rows:minmax(0,1fr);gap:clamp(18px,2.4vw,40px)}
+.filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.venue-pill{display:inline-flex;align-items:center;gap:8px;font:600 11px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;background:var(--red);color:var(--on-accent);border:0;padding:7px 10px;cursor:pointer}
+.events{list-style:none;margin:0;padding:0 6px 0 0}
+.week-label{font:600 11px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.14em;color:var(--ink-soft);padding:18px 0 8px;border-bottom:2px solid var(--rule)}
+.events > li:first-child.week-label{padding-top:4px}
+.event{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.ev-date{text-align:center;border:2px solid var(--ink);background:var(--scrap);padding:5px 0 4px}
+.ev-mon{display:block;font:600 10px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.12em;color:var(--red)}
+.ev-day{display:block;font:400 30px/1 var(--f-head);font-variant-numeric:tabular-nums}
+.ev-dow{display:block;font:400 10px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.1em}
+.ev-title{font:600 18px/1.25 var(--f-body);margin:0 0 4px}
+.ev-where{font:400 12.5px/1.4 var(--f-mono);color:var(--ink-soft)}
+.ev-where button{border:0;background:none;padding:0;font:inherit;color:var(--ink);text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:2px;cursor:pointer}
+.ev-where a{color:var(--ink);text-decoration-color:var(--blue)}
+.ev-right{text-align:right;font:400 12.5px/1.6 var(--f-mono);white-space:nowrap}
+.ev-cat{display:inline-block;font:600 10px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.1em;border:1.5px solid var(--ink);padding:3px 6px;margin-top:4px}
+.empty{font:400 13px/1.6 var(--f-mono);color:var(--ink-soft);padding:24px 0}
+.venues{list-style:none;margin:0;padding:0}
+.venue{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;width:100%;text-align:left;background:transparent;border:0;border-top:2px solid var(--rule);padding:12px 6px;cursor:pointer}
+.venues li:last-child .venue{border-bottom:2px solid var(--rule)}
+.venue:hover .v-name{color:var(--red)}
+.venue[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.venue[aria-pressed="true"] .v-meta{color:var(--paper);opacity:.8}
+.v-name{font:400 21px/1.05 var(--f-head);text-transform:uppercase;letter-spacing:.01em}
+.v-meta{font:400 11.5px/1.5 var(--f-mono);color:var(--ink-soft);grid-column:1}
+.v-count{grid-row:1/span 2;grid-column:2;align-self:center;font:400 26px/1 var(--f-head);text-align:center;font-variant-numeric:tabular-nums}
+.v-count small{display:block;font:600 9px/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+
+/* ---------- Threads ---------- */
+.threads{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,320px);grid-template-rows:minmax(0,1fr);gap:clamp(18px,2.4vw,40px)}
+.brand-grid{list-style:none;margin:0;padding:4px 10px 10px 2px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;align-content:start}
+.brand{background:var(--scrap);border:2px solid var(--ink);display:flex;flex-direction:column;height:100%}
+.swatch{aspect-ratio:16/8;position:relative;border-bottom:2px solid var(--ink)}
+.swatch .tape{top:-9px;left:14px;transform:rotate(-4deg)}
+.sw-stripe{background:repeating-linear-gradient(90deg,var(--ink) 0 14px,var(--scrap) 14px 26px,var(--red) 26px 32px,var(--scrap) 32px 44px)}
+.sw-dots{background:radial-gradient(var(--red) 32%,transparent 34%) 0 0/22px 22px,radial-gradient(var(--blue) 18%,transparent 20%) 11px 11px/22px 22px,var(--scrap)}
+.sw-check{background:linear-gradient(90deg,color-mix(in srgb,var(--ink) 55%,transparent) 50%,transparent 0) 0 0/36px 36px,linear-gradient(color-mix(in srgb,var(--red) 70%,transparent) 50%,transparent 0) 0 0/36px 36px,var(--scrap)}
+.sw-knit{background:linear-gradient(135deg,var(--blue) 25%,transparent 25%) -12px 0/24px 24px,linear-gradient(225deg,var(--blue) 25%,transparent 25%) -12px 0/24px 24px,linear-gradient(315deg,var(--blue) 25%,transparent 25%) 0 0/24px 24px,linear-gradient(45deg,var(--blue) 25%,transparent 25%) 0 0/24px 24px,var(--scrap)}
+.sw-grid{background:linear-gradient(var(--line) 2px,transparent 2px) 0 0/22px 22px,linear-gradient(90deg,var(--line) 2px,transparent 2px) 0 0/22px 22px,var(--tile)}
+.sw-grid::after{content:"";position:absolute;left:12%;right:20%;top:48%;height:5px;background:var(--red);transform:rotate(-8deg)}
+.b-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.b-name{font:400 24px/1 var(--f-head);text-transform:uppercase;letter-spacing:.01em;margin:0}
+.b-meta{font:400 11.5px/1.4 var(--f-mono);color:var(--ink-soft)}
+.b-body p{margin:0;font-size:16px;line-height:1.5}
+.b-drop{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--line);font:600 12px/1.3 var(--f-mono);text-transform:uppercase;letter-spacing:.06em}
+.drops{list-style:none;margin:0;padding:0}
+.drops li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.drops b{display:block;font:600 16px/1.2 var(--f-body)}
+.drops span{font:400 11.5px var(--f-mono);color:var(--ink-soft)}
+
+/* ---------- Advertise ---------- */
+.advertise{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-rows:minmax(0,1fr);gap:clamp(18px,2.4vw,40px)}
+.ad-inner{padding-right:8px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 22px}
+.fact{border:2px solid var(--ink);background:var(--scrap);padding:12px 14px}
+.fact b{display:block;font:400 34px/1 var(--f-head);font-variant-numeric:tabular-nums}
+.fact span{font:600 10.5px/1.3 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft)}
+.tbl-wrap{overflow-x:auto}
+.rate,.scans{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.rate th,.rate td,.scans th,.scans td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.rate thead th,.scans thead th{font:600 10.5px/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.1em;border-bottom:2px solid var(--rule)}
+.rate td:first-child{font-weight:600}
+.rate td small{display:block;font:400 12px/1.4 var(--f-mono);color:var(--ink-soft);font-weight:400}
+.rate .price,.scans .num{text-align:right;white-space:nowrap}
+.rate td.price{font:400 22px/1 var(--f-head)}
+.scans td.num{font:600 14px/1.4 var(--f-mono)}
+.scans tfoot td{border-top:2px solid var(--rule);border-bottom:0;font-weight:600}
+.steps{margin:8px 0 16px;padding-left:22px;display:grid;gap:6px;font-size:16px;line-height:1.45}
+.callout{border-left:6px solid var(--red);padding:4px 0 4px 14px;margin:20px 0;font-size:17px;line-height:1.5}
+.report{border:2px solid var(--ink);background:var(--scrap);padding:18px;margin-bottom:22px}
+form.inquiry{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:grid;gap:5px}
+.field.full{grid-column:1/-1}
+.field label{font:600 10.5px/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.1em}
+.field input,.field select,.field textarea{border:2px solid var(--ink);background:var(--scrap);padding:10px;border-radius:0;font-size:16px;min-width:0}
+.field textarea{min-height:84px;resize:vertical}
+.form-ok{border:2px solid var(--ink);background:var(--scrap);padding:16px;display:grid;gap:10px;justify-items:start}
+.form-ok p{margin:0}
+
+/* ---------- Anticipatory bits: saves, arrival, up next, coming up ---------- */
+.save{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--ink);background:var(--scrap);padding:8px 11px;font:600 11px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;cursor:pointer;white-space:nowrap}
+.save svg{width:14px;height:14px;flex:none}
+.save:hover{border-color:var(--red);color:var(--red)}
+.save[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.save[aria-pressed="true"] svg path{fill:currentColor}
+.ev-tags{display:flex;gap:6px;justify-content:flex-end;align-items:center;margin-top:5px}
+.ev-tags .ev-cat{margin-top:0}
+.ev-tags .save{padding:5px 8px}
+.b-actions{display:flex;gap:6px}
+.saved-tag{font:600 10px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--red)}
+.arrival{background:var(--ink);color:var(--paper);padding:14px 16px;margin-bottom:18px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 12px;align-items:start}
+.arrival .kicker{color:var(--paper);opacity:.8}
+.arrival p.say{margin:5px 0 0;font:600 16px/1.35 var(--f-body)}
+.arrival .btns{grid-column:1/-1}
+.arrival .btn{background:var(--paper);border-color:var(--paper);color:var(--ink)}
+.arrival .btn:hover{background:var(--red);border-color:var(--red);color:var(--on-accent)}
+.arrival .x{border:2px solid transparent;background:transparent;color:var(--paper);font:600 16px/1 var(--f-mono);cursor:pointer;padding:6px 9px}
+.arrival .x:hover{border-color:var(--paper)}
+.upnext{margin-top:28px;border-top:3px solid var(--rule);padding-top:14px}
+.upnext > button{display:grid;gap:5px;width:100%;text-align:left;background:transparent;border:2px solid var(--ink);padding:14px 16px;cursor:pointer;margin-top:8px}
+.upnext > button:hover{background:var(--ink);color:var(--paper)}
+.un-title{font:400 26px/1 var(--f-head);text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
+.un-dek{font:italic 400 16px/1.4 var(--f-body);opacity:.85}
+.un-meta{font:400 11.5px/1.4 var(--f-mono);opacity:.8}
+.ask{display:inline-flex;align-items:center;margin-top:6px;border:0;background:none;padding:0;font:600 11px/1.6 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--red);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.ask:hover{color:var(--ink)}
+.slot-hint{margin:0;font:400 11.5px/1.4 var(--f-mono);color:var(--red)}
+.foryou{border:2px solid var(--ink);background:var(--scrap);padding:16px 18px}
+.foryou ul{list-style:none;margin:8px 0 6px;padding:0}
+.foryou li button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:10px 0;cursor:pointer}
+.foryou li button:hover .fy-t{color:var(--red)}
+.fy-t{font:600 15px/1.3 var(--f-body)}
+.fy-m{font:400 11.5px/1.4 var(--f-mono);color:var(--ink-soft);grid-column:1}
+.fy-when{grid-row:1/span 2;grid-column:2;align-self:center;font:600 11px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--red);white-space:nowrap}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font:600 12px/1.4 var(--f-mono);padding:11px 15px;z-index:70;max-width:calc(100% - 32px);box-shadow:4px 4px 0 var(--red)}
+
+/* ---------- Wide and ultrawide ---------- */
+@media (max-width:1199px){
+  .issue-tag{display:none}
+  .issue-text{display:block;overflow:auto;overscroll-behavior:contain}
+  .issue-text .scroll{overflow:visible;flex:none}
+  .issue-text .side{margin-top:22px}
+}
+@media (max-width:1060px){ .proto .long{display:none} .theme .lbl{display:none} }
+@media (min-width:2200px){
+  .read{grid-template-columns:380px minmax(0,1fr) 340px}
+  .read-side{display:flex}
+  .sounds{grid-template-columns:minmax(0,1fr) 520px}
+  .threads{grid-template-columns:minmax(0,1fr) 380px}
+  .issue-text{grid-template-columns:minmax(0,1.3fr) minmax(0,.9fr)}
+}
+
+/* ---------- Phone and small tablet ---------- */
+@media (max-width:899px){
+  .app{grid-template-rows:auto auto minmax(0,1fr) auto}
+  .top{gap:10px;padding-block:8px}
+  .tabs,.issue-tag{display:none}
+  .proto{margin-left:auto}
+  .logo-name{font-size:24px}
+  .stage{padding-block:12px 10px}
+  .rail{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-top:3px solid var(--ink);background:var(--paper);
+    margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+    padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}
+  .rail a{display:grid;justify-items:center;gap:3px;padding:8px 2px 7px;text-decoration:none;font:600 9.5px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.06em}
+  .rail svg{width:22px;height:22px}
+  .rail a[aria-current="page"]{background:var(--ink);color:var(--paper)}
+  .panel{overflow:auto;overscroll-behavior:contain}
+  .panel .scroll{overflow:visible;flex:none}
+  .panel .col{display:block}
+  .issue,.read,.sounds,.scene,.threads,.advertise{display:block}
+  .cover-wrap{width:min(100%,440px);margin:0 auto 24px}
+  .issue-text{display:block;overflow:visible}
+  .read.has-open .list-col{display:none}
+  .read:not(.has-open) .reader-wrap{display:none}
+  .sounds.has-open .artist-list-col{display:none}
+  .sounds:not(.has-open) .artist-wrap{display:none}
+  .back{display:inline-flex;margin-bottom:12px}
+  .seg{display:flex;gap:0;margin-top:10px}
+  .seg .chip{flex:1;text-align:center;padding:9px}
+  .scene[data-view="events"] .venues-col{display:none}
+  .scene[data-view="venues"] .events-col{display:none}
+  .threads .drops-col,.advertise .ad-right{margin-top:28px}
+  .reader{padding:26px 18px}
+  .reader p.body{font-size:17.5px}
+  .event{grid-template-columns:56px minmax(0,1fr);gap:12px}
+  .ev-right{grid-column:2;text-align:left;display:flex;gap:10px;align-items:center;flex-wrap:wrap;white-space:normal}
+  .ev-cat{margin-top:0}
+  .facts{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .fact b{font-size:26px}
+  form.inquiry{grid-template-columns:1fr}
+  .toast{bottom:84px}
+}
+@media (max-width:899px){
+  .save,.ask,.arrival .x{min-height:44px;min-width:44px}
+  .ev-tags{justify-content:flex-start;margin-top:0}
+  .ev-tags .save{padding:8px 11px}
+}
+@media (max-width:480px){
+  .ap-qr{grid-template-columns:1fr;justify-items:start}
+}
+@media (max-width:420px){
+  .artist-grid,.brand-grid{grid-template-columns:1fr}
+  .pickup ul{grid-template-columns:1fr}
+  .facts{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<a class="sbd-skip-link" href="#stage">Skip to the magazine</a>
+<svg class="fx" aria-hidden="true" focusable="false">
+  <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter>
+  <filter id="crayon"><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4"/></filter>
+</svg>
+
+<div class="app" id="app">
+  <nav class="sbd-site-return" aria-label="Breadcrumb">
+    <a href="/">System by Dave</a>
+    <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+    <span class="sbd-site-return__current" aria-current="page">The Philly (prototype)</span>
+  </nav>
+  <header class="top">
+    <a class="logo" href="#issue" aria-label="Current issue home">
+      <span class="logo-the" data-brand-the>The</span><span class="logo-name" data-brand-name>Philly</span>
+    </a>
+    <span class="issue-tag" data-issue-tag>Vol. 1 · No. 01<br>Launch Edition</span>
+    <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+    <span class="proto" title="Sample content, except the Sounds artists, the AfterJinx story and the Scene listings, which are real.">Prototype<span class="long"> · sample content</span></span>
+    <button class="theme" id="theme-toggle" type="button" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+      <span class="lbl">Dark</span>
+    </button>
+  </header>
+
+  <main class="stage" id="stage" tabindex="-1">
+
+    <!-- ISSUE -->
+    <section class="panel issue" data-panel="issue" aria-label="Current issue">
+      <div class="cover-wrap">
+        <figure class="cover" id="cover" aria-label="Cover of Issue 01, The Philly: Philly Nightlife, 76ers Mania, Food Finders, Pothole Pandemic, Breakin Bullies, 25 Life Hacks, Music IYKYK and Fashion, around the Liberty Bell.">
+          <svg class="cv-rows" id="cv-rows" viewBox="0 0 400 600" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <div class="cv-field"></div>
+          <div class="cv-sky" aria-hidden="true">
+            <svg viewBox="0 0 200 62" preserveAspectRatio="xMidYMax meet" fill="currentColor">
+              <rect x="4" y="36" width="14" height="26"/><rect x="20" y="26" width="12" height="36"/>
+              <rect x="36" y="16" width="14" height="46"/><path d="M36 16 43 2 50 16z"/>
+              <rect x="53" y="22" width="10" height="40"/>
+              <rect x="64" y="44" width="40" height="18"/><rect x="78" y="20" width="12" height="24"/><rect x="80" y="11" width="8" height="10"/><path d="M80 11 84 3 88 11z"/>
+              <rect x="108" y="12" width="12" height="50"/><path d="M108 12 114 2 120 12z"/>
+              <rect x="124" y="28" width="16" height="34"/><rect x="142" y="20" width="12" height="42"/>
+              <rect x="157" y="34" width="18" height="28"/><rect x="177" y="25" width="12" height="37"/><rect x="190" y="38" width="10" height="24"/>
+            </svg>
+          </div>
+          <svg class="cv-bell" viewBox="0 0 200 220" aria-hidden="true">
+            <defs>
+              <linearGradient id="cv-bell-g" x1="0" x2="1"><stop offset="0" stop-color="#4a443c"/><stop offset=".45" stop-color="#a69b89"/><stop offset=".72" stop-color="#776d5d"/><stop offset="1" stop-color="#3a342d"/></linearGradient>
+              <pattern id="cv-bell-dots" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="rgba(23,20,15,.35)"/></pattern>
+            </defs>
+            <rect x="34" y="4" width="132" height="22" rx="5" fill="#3b342c" stroke="#17140f" stroke-width="3"/>
+            <path d="M70 26v12M130 26v12" stroke="#17140f" stroke-width="5"/>
+            <path d="M86 38q14-14 28 0" fill="none" stroke="#17140f" stroke-width="6"/>
+            <path d="M62 40C56 74 52 122 26 170h148C148 122 144 74 138 40Q100 28 62 40Z" fill="url(#cv-bell-g)" stroke="#17140f" stroke-width="3"/>
+            <path d="M62 40C56 74 52 122 26 170h148C148 122 144 74 138 40Q100 28 62 40Z" fill="url(#cv-bell-dots)"/>
+            <path d="M58 62Q100 54 142 62M56 72Q100 64 144 72" fill="none" stroke="#2b2620" stroke-width="1.4"/>
+            <path d="M18 168Q100 186 182 168v12Q100 200 18 180Z" fill="url(#cv-bell-g)" stroke="#17140f" stroke-width="3"/>
+            <path d="M97 78l6 18-6 14 8 18-6 20 6 22" fill="none" stroke="#17140f" stroke-width="3.2" stroke-linejoin="round"/>
+            <circle cx="100" cy="200" r="9" fill="#3b342c" stroke="#17140f" stroke-width="3"/>
+          </svg>
+          <div class="cv-mast" id="cv-mast" aria-hidden="true"></div>
+          <i class="cv-streak" style="left:4%;top:13%;width:16%;--r:-18deg"></i>
+          <i class="cv-streak" style="right:3%;top:37%;width:14%;--r:24deg"></i>
+          <i class="cv-streak" style="left:38%;top:61%;width:12%;--r:-30deg"></i>
+          <div class="cv-tease torn" data-seed="17" style="left:8%;top:16.5%;width:33%;--r:-3deg;--d:.05s"><b>Philly Nightlife:</b><span>Ratings and rankings of where to go out</span></div>
+          <div class="cv-tease torn" data-seed="19" style="right:7%;top:15%;width:30%;--r:3deg;--d:.1s"><b>76ers Mania:</b><span>City that was founded on democracy makes room for a king</span></div>
+          <div class="cv-tease torn" data-seed="23" style="left:6%;top:40%;width:32%;--r:-2deg;--d:.15s"><b>Food Finders:</b><span>Top 5: mac and cheese, roast beef, pizza, tacos, random gems</span></div>
+          <div class="cv-tease torn" data-seed="29" style="right:6.5%;top:45%;width:31%;--r:-4deg;--d:.2s"><b>Pothole Pandemic:</b><span>How to get your street fixed</span></div>
+          <div class="cv-tease torn" data-seed="31" style="left:8.5%;top:63.5%;width:34%;--r:-3deg;--d:.25s"><b>Breakin Bullies:</b><span>How to prevent your vehicle from getting broken into</span></div>
+          <div class="cv-tease torn" data-seed="37" style="left:45%;top:66.5%;width:22%;--r:5deg;--d:.3s"><b>25 Life Hacks:</b><span>Become clutch overnight</span></div>
+          <div class="cv-tease torn" data-seed="41" style="left:9%;top:83%;width:47%;--r:-4deg;--d:.35s"><b>Music: IYKYK…</b><span>so why not just know</span></div>
+          <div class="cv-tease torn" data-seed="43" style="right:8%;top:78.5%;width:30%;--r:-3deg;--d:.4s"><b>Fashion:</b><span>What’s coming back and what’s new</span></div>
+        </figure>
+      </div>
+
+      <div class="issue-text">
+        <div class="col toc-col">
+          <div class="panel-head">
+            <p class="kicker">In this issue</p>
+            <h1 class="h-xl">Issue 01. Launch Edition</h1>
+            <p class="lede"><b data-tagline>Doesn’t fit in your feed.</b> Music, nightlife, art, food, fashion and sports. The city, on paper, with codes on the page that bring you here.</p>
+          </div>
+          <ol class="toc scroll" id="toc"></ol>
+        </div>
+        <aside class="col side" aria-label="Find a copy and advertise">
+          <div class="scroll side-inner">
+            <section class="foryou" id="foryou" aria-label="Coming up for you" hidden>
+              <p class="kicker">Coming up for you</p>
+              <ul id="foryou-list"></ul>
+              <p class="small" style="margin:0">From what you saved. Kept on this device only.</p>
+            </section>
+            <div class="wrap">
+              <div class="pickup scrap torn" data-seed="53">
+                <p class="kicker">Where to get it</p>
+                <h2 class="h-m" style="margin-top:6px">10,000 copies in the first run</h2>
+                <p style="margin:0 0 8px">Handed out at sponsored events and sold at festivals and events around the city.</p>
+                <p class="small" style="margin:0">Dates and locations are announced as the launch schedule is set.</p>
+              </div>
+              <i class="tape" style="top:-10px;left:22px;transform:rotate(-5deg)"></i>
+            </div>
+            <div class="adbox">
+              <p class="kicker">Advertise in the launch edition</p>
+              <p class="h-m">Ads from $20</p>
+              <p class="small" style="margin:0">Quarter page $75, half page $150, full page $200. Premium positions from $250.</p>
+              <div class="btns"><button class="btn btn-red" type="button" data-ask="Quarter page">Ask about a quarter page</button><a class="btn" href="#advertise">Rate card</a></div>
+            </div>
+            <div class="next-strip">
+              <p class="kicker">Launch edition</p>
+              <p>Quarterly. Launch dates to be announced</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- READ -->
+    <section class="panel read" data-panel="read" aria-label="Stories" hidden>
+      <div class="col list-col">
+        <div class="panel-head">
+          <p class="kicker">Read</p>
+          <h2 class="h-l">From the issue</h2>
+          <div class="chips" id="section-chips" role="group" aria-label="Filter by section"></div>
+        </div>
+        <ul class="story-list scroll" id="story-list"></ul>
+      </div>
+      <div class="col reader-wrap wrap">
+        <article class="reader scrap torn scroll" data-seed="61" id="reader" tabindex="-1" aria-live="polite"></article>
+        <i class="tape"></i>
+      </div>
+      <aside class="col read-side" aria-label="More from this issue">
+        <p class="kicker">Also in print</p>
+        <ol class="toc scroll" id="read-side-list"></ol>
+        <div class="adbox">
+          <p class="kicker">Ad slot · web</p>
+          <p class="h-m">Site banner</p>
+          <button class="btn" type="button" data-ask="Site banner">Ask about a banner</button>
+        </div>
+      </aside>
+    </section>
+
+    <!-- SOUNDS -->
+    <section class="panel sounds" data-panel="sounds" aria-label="Featured artists" hidden>
+      <div class="col artist-list-col">
+        <div class="panel-head">
+          <p class="kicker">Sounds · print pages 30–35</p>
+          <h2 class="h-l">Six artists. Six codes.</h2>
+          <p class="lede">Six artists from No Nonsense Collective lineups, each with a code on their print page. Scan it and you land on their page here, with their links and the shows they were billed on.</p>
+        </div>
+        <ul class="artist-grid scroll" id="artist-grid"></ul>
+      </div>
+      <div class="col artist-wrap wrap">
+        <article class="artist-page scrap torn scroll" data-seed="67" id="artist-page" tabindex="-1" aria-live="polite"></article>
+        <i class="tape"></i>
+      </div>
+    </section>
+
+    <!-- SCENE -->
+    <section class="panel scene" data-panel="scene" data-view="events" aria-label="Events and venues" hidden>
+      <div class="col events-col">
+        <div class="panel-head">
+          <p class="kicker">Scene</p>
+          <h2 class="h-l">What’s on this winter</h2>
+          <p class="small scene-src">Real listings, checked against organizer, venue and ticketing pages on Nov 21, 2026, club nights included. Each one links its source; check it before you go.</p>
+          <div class="filter-row">
+            <div class="chips" id="cat-chips" role="group" aria-label="Filter by type"></div>
+            <span id="venue-filter"></span>
+          </div>
+          <div class="seg" role="group" aria-label="Show events or venues">
+            <button class="chip" type="button" data-view="events" aria-pressed="true">Events</button>
+            <button class="chip" type="button" data-view="venues" aria-pressed="false">Venues</button>
+          </div>
+        </div>
+        <ol class="events scroll" id="events"></ol>
+      </div>
+      <aside class="col venues-col" aria-label="Venues">
+        <div class="panel-head">
+          <p class="kicker">Venues</p>
+          <h3 class="h-m" style="margin-top:6px">Rooms we cover</h3>
+          <p class="small" style="margin:0">Pick a venue to see only its shows.</p>
+        </div>
+        <ul class="venues scroll" id="venues"></ul>
+      </aside>
+    </section>
+
+    <!-- THREADS -->
+    <section class="panel threads" data-panel="threads" aria-label="Local clothing lines" hidden>
+      <div class="col">
+        <div class="panel-head">
+          <p class="kicker">Threads · print pages 38–40</p>
+          <h2 class="h-l">Made here, worn here</h2>
+          <p class="lede">Five local labels from the issue. None of them have a warehouse. All of them have a waiting list.</p>
+        </div>
+        <ul class="brand-grid scroll" id="brand-grid"></ul>
+      </div>
+      <aside class="col drops-col" aria-label="Drop calendar">
+        <div class="panel-head">
+          <p class="kicker">Drop calendar</p>
+          <h3 class="h-m" style="margin-top:6px">Next releases</h3>
+        </div>
+        <ul class="drops scroll" id="drops"></ul>
+      </aside>
+    </section>
+
+    <!-- ADVERTISE -->
+    <section class="panel advertise" data-panel="advertise" aria-label="Advertise" hidden>
+      <div class="col">
+        <div class="scroll ad-inner">
+          <p class="kicker">Advertise · Launch Edition 1</p>
+          <h2 class="h-l">Print. Presence. Philadelphia.</h2>
+          <p class="lede">10,000 copies in the planned first run, handed out at sponsored events and sold at festivals and events. Put your business next to stories about where Philly goes, what it listens to and what comes next.</p>
+          <div class="facts">
+            <div class="fact"><b>10,000</b><span>Copies, first run</span></div>
+            <div class="fact"><b>$20</b><span>Ads start at</span></div>
+            <div class="fact"><b>7</b><span>Ad formats</span></div>
+          </div>
+          <h3 class="h-m">Launch ad rates · per issue</h3>
+          <div class="tbl-wrap"><table class="rate" id="rates">
+            <thead><tr><th scope="col">Placement</th><th scope="col">Position</th><th scope="col" class="price">Per issue</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+          <p class="small" style="margin:10px 0 0">Opening-page advertisers are grandfathered in at $750. Rate retention and placement availability are recorded in the booking agreement.</p>
+          <h3 class="h-m" style="margin-top:22px">Book your placement</h3>
+          <ol class="steps">
+            <li><b>Choose</b> an ad size, preferred section and issue.</li>
+            <li><b>Send</b> your business name, contact details, logo, ad copy and destination link or QR code.</li>
+            <li><b>Approve</b> placement, final artwork and booking details before production.</li>
+          </ol>
+          <p class="callout">Artwork: a print-ready PDF with embedded fonts and images at 300 dpi at final size. Dimensions, bleed, deadlines, payment terms and any design charges are confirmed with each booking.</p>
+        </div>
+      </div>
+      <div class="col ad-right">
+        <div class="scroll ad-inner">
+          <div class="report">
+            <p class="kicker">Proposed add-on · not in the packet</p>
+            <h3 class="h-m" style="margin-top:6px">A scan report after each issue</h3>
+            <p class="small" style="margin:0 0 6px">If every ad’s QR code points at a short link The Philly controls, each advertiser can get a count like this.</p>
+            <div class="tbl-wrap"><table class="scans" id="scans">
+              <thead><tr><th scope="col">Code</th><th scope="col">Where it ran</th><th scope="col" class="num">Scans</th></tr></thead>
+              <tbody></tbody><tfoot></tfoot>
+            </table></div>
+            <p class="small" style="margin:10px 0 0">Made-up numbers to show the format.</p>
+          </div>
+          <h3 class="h-m">Ask about a spot</h3>
+          <form class="inquiry" id="inquiry" novalidate>
+            <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" required autocomplete="name"></div>
+            <div class="field"><label for="f-biz">Business</label><input id="f-biz" name="business" required autocomplete="organization"></div>
+            <div class="field"><label for="f-slot">Interested in</label>
+              <select id="f-slot" name="slot"><option>Quarter page</option><option>Half page</option><option>Interior full page</option><option>Inside back cover</option><option>Back cover</option><option>Opening page</option><option>Small ad</option><option>Not sure yet</option></select>
+              <p class="slot-hint" id="slot-hint" hidden></p></div>
+            <div class="field"><label for="f-contact">Email or phone</label><input id="f-contact" name="contact" required></div>
+            <div class="field full"><label for="f-msg">Anything else</label><textarea id="f-msg" name="message" placeholder="What you sell and which section you want to be in"></textarea></div>
+            <div class="field full"><button class="btn btn-red" type="submit">Send inquiry</button></div>
+          </form>
+          <div class="form-ok" id="form-ok" hidden role="status">
+            <p class="h-m" style="margin:0">Inquiry not sent</p>
+            <p>This is a prototype, so nothing left the page. On the real site this goes to the ad desk and you get a reply with booking details and the artwork deadline.</p>
+            <button class="btn" type="button" id="form-reset">Start over</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="rail" id="rail" aria-label="Sections"></nav>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="vendor/qrcode.js"></script>
+<script>
+(() => {
+"use strict";
+
+/* One place to rename the magazine or change the domain printed in every code. */
+const CONFIG = { name: "The Philly", domain: "thephilly.com", issue: "01", season: "Launch Edition", tagline: "Doesn’t fit in your feed." };
+
+const TABS = [
+  { id: "issue", label: "Issue", icon: '<rect x="5" y="3" width="14" height="18"/><path d="M8 7h8M8 11h8M8 15h5"/>' },
+  { id: "read", label: "Read", icon: '<path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3zM21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z"/>' },
+  { id: "sounds", label: "Sounds", icon: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M12 5.5a6.5 6.5 0 0 1 6.5 6.5"/>' },
+  { id: "scene", label: "Scene", icon: '<rect x="3" y="5" width="18" height="16"/><path d="M3 10h18M8 3v4M16 3v4"/>' },
+  { id: "threads", label: "Threads", icon: '<path d="M8 3 3 6l2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z"/>' },
+  { id: "advertise", label: "Advertise", icon: '<path d="M3 10v4h4l8 5V5l-8 5zM18 9a4 4 0 0 1 0 6"/>' }
+];
+
+const STORIES = [
+  { slug: "nightlife", sec: "Nightlife", pg: "04", min: 8, by: "The Philly staff",
+    title: "Philly Nightlife: Ratings and Rankings",
+    dek: "Where to go out, scored on what matters once you’re there.",
+    body: [
+      "Every best-bars list ranks the same twenty places on vibes. This one scores them. Each spot is rated on five things: sound, drinks, crowd, price and the walk to late-night food.",
+      "Scores are out of five, and every place gets two visits, a Friday and a weeknight. A room that is great at 11 p.m. Saturday and empty on Tuesday tells you something, and the rating should too.",
+      "The full rankings, by neighborhood, start on page 5. Online, each place gets its own page with its scores and the date of the last visit, so a ranking never looks fresher than it is." ] },
+  { slug: "afterjinx", sec: "Nightlife", pg: "08", min: 3, by: "The Philly staff (draft)",
+    title: "AfterJinx: Where HiJinx Goes After Midnight",
+    dek: "No Nonsense Collective’s unofficial afters are back Dec 30, one night only, at The Arts Loft.",
+    facts: ["Wed, Dec 30, 2026", "The Arts Loft, Callowhill", "Doors 11:55 PM, music until 6 AM", "21+", "Lineup TBA"],
+    source: "https://nononsensephilly.com/events/afterjinx-2026/",
+    note: "Draft started Nov 21, 2026. Facts come from the No Nonsense Collective event pages as of Nov 20. Quotes, photos and the lineup are still to come.",
+    body: [
+      "When HiJinx lets out, not everyone is ready to go home. For the second year, No Nonsense Collective is throwing the unofficial afterparty: AfterJinx, Wednesday, Dec 30, at The Arts Loft in Callowhill, after the festival’s first night. Unofficial means exactly that: the festival doesn’t run it.",
+      "Doors open at 11:55 PM and the music runs until 6 AM. It’s 21 and up.",
+      "The lineup isn’t out yet. No Nonsense sends lineups to its drop list first, then posts them with the on-sale link, so the event page at nononsensephilly.com is the one to watch.",
+      "Last year AfterJinx ran two nights, Dec 28 and 29, at 905 N Broad St, from midnight to 8 AM. Nineteen acts were on the bill, and both nights opened with open decks at 12:15. Acidic Dreams b2b Tethra64 had the last set of night one. Spin Doctaz closed night two, right after Neuromancy, the GRiZ neurofunk tribute from ILLIXIR and Acidic Dreams.",
+      "If you want a taste, SAP’s set from the second night is up on SoundCloud.",
+      "Three acts from last year’s bill have pages in this issue’s Sounds section: Acidic Dreams, Dragon Drop and illGmusic." ] },
+  { slug: "sixers", sec: "Sports", pg: "10", min: 6, by: "The Philly staff",
+    title: "76ers Mania",
+    dek: "A city founded on democracy makes room for a king.",
+    body: [
+      "Philadelphia is where the country decided nobody gets a crown. Then every spring it treats one basketball team like a royal court.",
+      "The mania is easy to spot: jerseys on the El, watch parties in bars that never turn the TV on, strangers explaining the rotation to you in line at the hoagie counter.",
+      "This piece is about the fans more than the box score: who shows up, where they watch, and what the city feels like on a game night when the whole place leans one way." ] },
+  { slug: "food-finders", sec: "Food", pg: "14", min: 9, by: "The Philly staff",
+    title: "Food Finders: Top 5",
+    dek: "Mac and cheese, roast beef, pizza, tacos, and the random gems that don’t fit a category.",
+    radar: true,
+    body: [
+      "Five categories, five picks each. Mac and cheese, roast beef, pizza and tacos each get a top five, plus a list of random gems for the places that refuse to fit a box.",
+      "Every pick was ordered at least twice and judged on the food itself, not the room or the line. When a place is cash only or closes early, the listing says so.",
+      "The ranked lists start on page 15. Online, each pick gets a page with hours, price range and the date it was last checked." ] },
+  { slug: "potholes", sec: "City", pg: "20", min: 5, by: "The Philly staff",
+    title: "Pothole Pandemic",
+    dek: "How to get your street fixed, step by step.",
+    body: [
+      "Every block has one: the pothole everybody swerves around and nobody reports, because everybody assumes somebody else already did.",
+      "Reporting it takes a couple of minutes. Use Philly311 by phone, app or website, give the nearest address or intersection, and add a photo if you can. Keep the request number it gives you; that number is how you follow up.",
+      "Still there weeks later? Follow up with that number, and get your neighbors to file too. The full guide, including what to do when a repair goes wrong, is on page 21." ] },
+  { slug: "break-ins", sec: "City", pg: "22", min: 5, by: "The Philly staff",
+    title: "Breakin Bullies",
+    dek: "How to keep your car from getting broken into.",
+    body: [
+      "Most car break-ins start with what someone can see through the window: a bag on the seat, a charger cable, a jacket that might have a wallet in it.",
+      "The basics work. Leave nothing visible, not even an empty bag. Lock it every time. Park where there is light and foot traffic when you can, and don’t leave the garage remote inside.",
+      "If it happens, report it, even if nothing was taken; reports are how the city sees where break-ins cluster. The full checklist starts on page 23." ] },
+  { slug: "life-hacks", sec: "Life", pg: "24", min: 4, by: "The Philly staff",
+    title: "25 Life Hacks: Become Clutch Overnight",
+    dek: "Small moves that make living here easier. Five here, twenty more in print.",
+    body: [
+      "Clutch isn’t luck. It’s having the thing before you need it.",
+      "Five to start: keep a photo of the parking sign where you left the car; carry cash for the places that still take only cash; save the request number whenever you report something to the city; know your trash day; and keep a spare charger in your bag, not your car.",
+      "The other twenty, from parking to rent to getting a table on a Friday, start on page 25." ] },
+  { slug: "iykyk", sec: "Music", pg: "28", min: 7, by: "The Philly staff",
+    title: "Music: IYKYK",
+    dek: "So why not just know. The artists and rooms worth knowing about now.",
+    body: [
+      "If you know, you know. That’s the problem: a lot of the best music in the city lives in rooms and group chats you only hear about after the fact.",
+      "This section fixes that. Six artists from No Nonsense Collective lineups get a page each in this issue, with a code you can scan to hear them and see where they have played.",
+      "Start on the Sounds tab, or scan any code on pages 30 to 35." ] },
+  { slug: "fashion", sec: "Fashion", pg: "36", min: 6, by: "The Philly staff",
+    title: "Fashion: What’s Coming Back",
+    dek: "What’s coming back, what’s new, and who in the city is making it.",
+    body: [
+      "Every few years something your older cousin wore comes back, a size bigger. This season it’s workwear: heavy canvas, real pockets, jackets meant to last.",
+      "What’s new is where it comes from. More of it is made here, in small runs, by labels that sell out at pop-ups before most people hear about them.",
+      "Five of those labels are on pages 38 to 40 and on the Threads tab, with their next drop dates." ] }
+];
+
+/* Real artists from No Nonsense Collective lineups (nononsensephilly.com data, main 38ee215, 2026-11-20).
+   Bios and links only where the NNC site has them; shows are lineups as published. */
+const ARTISTS = [
+  {"slug": "face-my-flow", "name": "Face My Flow", "ini": "FM", "role": "guest", "pg": "30", "tint": "var(--red)", "bio": "On 2 No Nonsense lineups between June 2025 and September 2026.", "ownBio": false, "links": [], "shows": [{"date": "2026-09-12", "label": "Sep 11 + 12, 2026", "title": "AfterBreak 2026", "billed": "Face My Flow feat. Stehreo", "set": "Night 1 · Fri Sep 11, 3:30 set", "place": "Secret Philly location", "url": "https://nononsensephilly.com/events/afterbreak-2026/", "cancelled": false}, {"date": "2025-06-07", "label": "Sat, Jun 7, 2025", "title": "Rooftop Nonsense", "billed": "Face My Flow b2b ILLIXIR", "set": "", "place": "Secret Fishtown rooftop", "url": "https://nononsensephilly.com/events/rooftop-nonsense-2025/", "cancelled": false}]},
+  {"slug": "illixir", "name": "ILLIXIR", "ini": "IX", "role": "member", "pg": "31", "tint": "var(--blue)", "bio": "Plays solo and as Neuromancy, a GRiZ neurofunk tribute with Acidic Dreams.", "ownBio": true, "links": [{"label": "SoundCloud", "url": "https://soundcloud.com/illixirbass"}, {"label": "Welcome Home (ILLIXIR x Acidic Dreams)", "url": "https://open.spotify.com/track/2EO3bNmyE6GKPqWOd8AseL"}], "shows": [{"date": "2026-11-13", "label": "Fri, Nov 13, 2026", "title": "The Legend of Delta: A Link to the Rave", "billed": "ILLIXIR", "set": "Fri Nov 13, 11:20 set", "place": "South Philly", "url": "https://nononsensephilly.com/events/legend-of-delta-2026/", "cancelled": false}, {"date": "2026-05-15", "label": "Fri, May 15, 2026", "title": "Endpoint Connections 2.0", "billed": "ILLIXIR", "set": "", "place": "The Arts Loft", "url": "https://nononsensephilly.com/events/endpoint-connections-2/", "cancelled": false}, {"date": "2026-03-06", "label": "Mar 6 + 7, 2026", "title": "Aftertronics", "billed": "ILLIXIR", "set": "", "place": "Near The Met", "url": "https://nononsensephilly.com/events/aftertronics-2026/", "cancelled": false}, {"date": "2025-09-13", "label": "Sep 12 + 13, 2025", "title": "AfterBreak 2025", "billed": "ILLIXIR", "set": "", "place": "Secret Philly location", "url": "https://nononsensephilly.com/events/afterbreak-2025/", "cancelled": false}, {"date": "2025-06-07", "label": "Sat, Jun 7, 2025", "title": "Rooftop Nonsense", "billed": "Face My Flow b2b ILLIXIR", "set": "", "place": "Secret Fishtown rooftop", "url": "https://nononsensephilly.com/events/rooftop-nonsense-2025/", "cancelled": false}]},
+  {"slug": "acidic-dreams", "name": "Acidic Dreams", "ini": "AD", "role": "member", "pg": "32", "tint": "var(--red)", "bio": "Plays solo, in b2b sets, and as Neuromancy with ILLIXIR.", "ownBio": true, "links": [{"label": "SoundCloud", "url": "https://soundcloud.com/acidicdreams"}, {"label": "Welcome Home (ILLIXIR x Acidic Dreams)", "url": "https://open.spotify.com/track/2EO3bNmyE6GKPqWOd8AseL"}], "shows": [{"date": "2026-11-13", "label": "Fri, Nov 13, 2026", "title": "The Legend of Delta: A Link to the Rave", "billed": "Acidic Dreams", "set": "Fri Nov 13, 12:00 set", "place": "South Philly", "url": "https://nononsensephilly.com/events/legend-of-delta-2026/", "cancelled": false}, {"date": "2026-09-12", "label": "Sep 11 + 12, 2026", "title": "AfterBreak 2026", "billed": "Acidic Dreams b2b Tethra64", "set": "Night 1 · Fri Sep 11, 5:30 set", "place": "Secret Philly location", "url": "https://nononsensephilly.com/events/afterbreak-2026/", "cancelled": false}, {"date": "2026-03-06", "label": "Mar 6 + 7, 2026", "title": "Aftertronics", "billed": "Acidic Dreams b2b Dragon Drop", "set": "", "place": "Near The Met", "url": "https://nononsensephilly.com/events/aftertronics-2026/", "cancelled": false}, {"date": "2025-12-28", "label": "Dec 28 + 29, 2025", "title": "AfterJinx", "billed": "Acidic Dreams", "set": "Night 1 · Dec 28, 7:15 set", "place": "North Broad", "url": "https://nononsensephilly.com/events/afterjinx-2025/", "cancelled": false}, {"date": "2025-08-02", "label": "Sat, Aug 2, 2025", "title": "Kandi Island", "billed": "Acidic Dreams", "set": "", "place": "Secret outdoor location", "url": "https://nononsensephilly.com/events/kandi-island-2025/", "cancelled": false}]},
+  {"slug": "double-vision", "name": "Double Vision", "ini": "DV", "role": "member", "pg": "33", "tint": "var(--blue)", "bio": "Runs projection mapping and live VJ for No Nonsense rooms, and opened AfterBreak 2026 Night 1 on the decks.", "ownBio": true, "links": [], "shows": [{"date": "2026-11-13", "label": "Fri, Nov 13, 2026", "title": "The Legend of Delta: A Link to the Rave", "billed": "Double Vision", "set": "Fri Nov 13, 10:00 set", "place": "South Philly", "url": "https://nononsensephilly.com/events/legend-of-delta-2026/", "cancelled": false}, {"date": "2026-09-12", "label": "Sep 11 + 12, 2026", "title": "AfterBreak 2026", "billed": "Double Vision", "set": "Night 1 · Fri Sep 11, 12:00 set", "place": "Secret Philly location", "url": "https://nononsensephilly.com/events/afterbreak-2026/", "cancelled": false}]},
+  {"slug": "dragon-drop", "name": "Dragon Drop", "ini": "DD", "role": "guest", "pg": "34", "tint": "var(--red)", "bio": "On 5 No Nonsense lineups between August 2025 and May 2026.", "ownBio": false, "links": [], "shows": [{"date": "2026-05-15", "label": "Fri, May 15, 2026", "title": "Endpoint Connections 2.0", "billed": "Dragon Drop", "set": "", "place": "The Arts Loft", "url": "https://nononsensephilly.com/events/endpoint-connections-2/", "cancelled": false}, {"date": "2026-03-06", "label": "Mar 6 + 7, 2026", "title": "Aftertronics", "billed": "Acidic Dreams b2b Dragon Drop", "set": "", "place": "Near The Met", "url": "https://nononsensephilly.com/events/aftertronics-2026/", "cancelled": false}, {"date": "2025-12-28", "label": "Dec 28 + 29, 2025", "title": "AfterJinx", "billed": "Dragon Drop", "set": "Night 1 · Dec 28, 1:45 set", "place": "North Broad", "url": "https://nononsensephilly.com/events/afterjinx-2025/", "cancelled": false}, {"date": "2025-11-15", "label": "Sat, Nov 15, 2025", "title": "City Rave: Round 2", "billed": "Dragon Drop", "set": "", "place": "North Broad", "url": "https://nononsensephilly.com/events/city-rave-round-2-2025/", "cancelled": false}, {"date": "2025-08-02", "label": "Sat, Aug 2, 2025", "title": "Kandi Island", "billed": "Dragon Drop", "set": "", "place": "Secret outdoor location", "url": "https://nononsensephilly.com/events/kandi-island-2025/", "cancelled": false}]},
+  {"slug": "illgmusic", "name": "illGmusic", "ini": "IG", "role": "guest", "pg": "35", "tint": "var(--blue)", "bio": "On 5 No Nonsense lineups between September 2025 and April 2026.", "ownBio": false, "links": [], "shows": [{"date": "2026-04-18", "label": "Apr 18, 2026", "title": "Endpoint Connections 1.0", "billed": "illGmusic", "set": "", "place": "The Arts Loft", "url": "https://nononsensephilly.com/events/endpoint-connections-1/", "cancelled": false}, {"date": "2026-03-06", "label": "Mar 6 + 7, 2026", "title": "Aftertronics", "billed": "illGmusic", "set": "", "place": "Near The Met", "url": "https://nononsensephilly.com/events/aftertronics-2026/", "cancelled": false}, {"date": "2025-12-28", "label": "Dec 28 + 29, 2025", "title": "AfterJinx", "billed": "illGmusic", "set": "Night 1 · Dec 28, 5:30 set", "place": "North Broad", "url": "https://nononsensephilly.com/events/afterjinx-2025/", "cancelled": false}, {"date": "2025-09-26", "label": "Fri, Sep 26, 2025", "title": "Sub Kulture Festival Takeover", "billed": "illGmusic", "set": "", "place": "The Feral Dungeon stage", "url": "https://nononsensephilly.com/events/sub-kulture-2025/", "cancelled": false}, {"date": "2025-09-13", "label": "Sep 12 + 13, 2025", "title": "AfterBreak 2025", "billed": "illGmusic", "set": "", "place": "Secret Philly location", "url": "https://nononsensephilly.com/events/afterbreak-2025/", "cancelled": false}]}
+];
+
+/* Real venues and listings, checked on Nov 21, 2026 against organizer, venue and ticketing pages (src).
+   Kinds and neighborhoods only; no capacities, since none were checked. */
+const VENUES = [
+  { id: "arts-loft", name: "The Arts Loft", hood: "Callowhill", kind: "Venue" },
+  { id: "union-transfer", name: "Union Transfer", hood: "Spring Garden", kind: "Music venue" },
+  { id: "the-met", name: "The Met Philadelphia", hood: "North Broad", kind: "Theater" },
+  { id: "arena", name: "Xfinity Mobile Arena", hood: "South Philly", kind: "Arena" },
+  { id: "academy", name: "Academy of Music", hood: "Avenue of the Arts", kind: "Opera house" },
+  { id: "love-park", name: "LOVE Park and City Hall", hood: "Center City", kind: "Park" },
+  { id: "dilworth", name: "Dilworth Park", hood: "Center City", kind: "Park" },
+  { id: "franklin-square", name: "Franklin Square", hood: "Old City", kind: "Park" },
+  { id: "riverrink", name: "RiverRink Winterfest", hood: "Penn’s Landing", kind: "Outdoor rink" },
+  { id: "wow", name: "Warehouse on Watts", hood: "North Philly", kind: "Club" },
+  { id: "dolphin", name: "The Dolphin", hood: "South Philly", kind: "Bar and club" },
+  { id: "barbary", name: "The Barbary", hood: "Fishtown", kind: "Club" },
+  { id: "ave-live", name: "The Ave Live", hood: "Delaware waterfront", kind: "Venue" }
+];
+
+const EVENTS = [
+  { date: "2026-11-13", until: "2027-01-01", time: "Noon–8 PM, Fri–Sat to 9", title: "Made in Philadelphia Holiday Market", venue: "dilworth", cat: "Market",
+    src: "https://centercityphila.org/explore/dilworth-park-winter/made-in-philadelphia-holiday-market/" },
+  { date: "2026-11-19", until: "2027-01-03", time: "5–9 PM nightly", title: "Holidays in Franklin Square", venue: "franklin-square", cat: "Lights",
+    src: "https://historicphiladelphia.org/calendar-of-events/" },
+  { date: "2026-11-21", until: "2026-12-27", time: "Noon–8 PM, Fri–Sat to 9", title: "Christmas Village", venue: "love-park", cat: "Market", price: "Free",
+    src: "https://www.philachristmas.com/" },
+  { date: "2026-11-21", time: "9 PM–2 AM", title: "Diva Worship, with Ariel Zetina, ONEELEVEN and doll.redacted", venue: "dolphin", cat: "Club", price: "21+",
+    src: "https://ma.to/event/diva-worship-ariel-zetina-2026-11-21" },
+  { date: "2026-11-21", time: "9 PM–2 AM", title: "Legacy: hip-hop and house, with Terry Hunter, Barbara Tucker and 9th Wonder", venue: "wow", cat: "Club", price: "21+",
+    src: "https://www.tixr.com/groups/wowphilly/events/legacy-with-9th-wonder-terry-hunter-barbara-tucker-buckshot-joshua-lang-cosmo-baker-cvgebird-foxy-nora-211391" },
+  { date: "2026-11-21", time: "10 PM–2 AM", title: "Two-room club night, with Apollo, Silvertone, KTB and Rainbow Savage", venue: "barbary", cat: "Club", price: "$10 · 21+",
+    src: "https://ma.to/event/two-room-club-night-at-the-barbary-21-nov-2026" },
+  { date: "2026-11-27", until: "2027-02-28", time: "Daily", title: "RiverRink Winterfest", venue: "riverrink", cat: "Outdoors", price: "Free to enter",
+    src: "https://www.delawareriverwaterfront.com/where-to-go/blue-cross-riverrink-winterfest" },
+  { date: "2026-11-27", time: "9 PM", title: "JEWELSSEA b2b QRTR: Black Friday", venue: "dolphin", cat: "Club", price: "$10 advance, $15 door · 21+",
+    src: "https://ma.to/event/jewelssea-b2b-qrtr-black-friday-27-nov-2026" },
+  { date: "2026-11-28", time: "9 PM", title: "Club Congress: DJ Minx, with WTCHCRFT downstairs", venue: "wow", cat: "Club",
+    src: "https://www.tixr.com/groups/wowphilly/events/dj-minx-tommy-hart-wtchcrft-clubby-boy-redevil-kraftwitch-b3b-cubby-b3b-nine-of-wands-212034" },
+  { date: "2026-11-28", time: "9 PM–2 AM", title: "Philly crews birthday night, with Bridget B, John Raffaele and Shawn Ryan", venue: "dolphin", cat: "Club", price: "$10 advance, $15 door · 21+",
+    src: "https://ma.to/event/philly-crews-birthday-dj-night-28-nov-2026" },
+  { date: "2026-11-28", time: "10 PM–2 AM", title: "Marco Lys and ALLNIGHTKEV", venue: "barbary", cat: "Club", price: "21+",
+    src: "https://ma.to/event/marco-lys-allnightkev-28-nov-2026" },
+  { date: "2026-11-29", time: "6 PM", title: "Winterfest tree lighting and Zinadelphia concert", venue: "riverrink", cat: "Outdoors", price: "Free",
+    src: "https://www.delawareriverwaterfront.com/who-we-are/waterfront-news/2026/11/06/independence-blue-cross-riverrink-winterfest-opens-november-27-kicking-off-a-weekend-of-holiday-fun-with-free-zinadelphia-concert-and-tree-lighting-on-november-29" },
+  { date: "2026-12-04", time: "8 PM", title: "Bonobo, with Anish Kumar", venue: "union-transfer", cat: "Music", price: "All ages",
+    src: "https://www.axs.com/events/1474820/bonobo-tickets" },
+  { date: "2026-12-04", until: "2026-12-31", time: "Opens 7 PM", title: "Philadelphia Ballet: George Balanchine’s The Nutcracker", venue: "academy", cat: "Stage",
+    src: "https://philadelphiaballet.org/26-27-season/george-balanchines-the-nutcracker/" },
+  { date: "2026-12-04", time: "Doors 9 PM", title: "Medicine Place: Stuck in a Dream, with FREQ, CHEFWAMP, LAI and LAWNCARE", venue: "wow", cat: "Club", price: "21+",
+    src: "https://www.tixr.com/groups/wowphilly/events/medicine-place-210164" },
+  { date: "2026-12-04", time: "9 PM–2 AM", title: "RHUTHM of the Night: 90s Dancemania", venue: "dolphin", cat: "Club", price: "21+",
+    src: "https://ma.to/event/rhuthm-of-the-night-90s-dancemania-04-dec-2026" },
+  { date: "2026-12-04", time: "10 PM–2 AM", title: "Ammo Avenue, with Zuna and the Soulution crew", venue: "barbary", cat: "Club", price: "21+",
+    src: "https://ma.to/event/ammo-avenue-philly-debut-04-dec-2026" },
+  { date: "2026-12-05", time: "8 PM", title: "Venna, with Kaelin Ellis", venue: "union-transfer", cat: "Music", price: "21+",
+    src: "https://www.axs.com/events/1558295/venna-21-event-tickets" },
+  { date: "2026-12-05", time: "10 PM–2 AM", title: "DSTONE and Solar Sounds", venue: "barbary", cat: "Club", price: "21+",
+    src: "https://ma.to/event/dstone-solar-sounds-05-dec-2026" },
+  { date: "2026-12-10", time: "9 PM–1 AM", title: "Chef Boyarbeatz: four-hour set", venue: "barbary", cat: "Club", price: "21+",
+    src: "https://ma.to/event/chef-boyarbeatz-4-hour-set-10-dec-2026" },
+  { date: "2026-12-11", time: "9 PM", title: "Tear You Apart: dark techno, darkwave and EBM", venue: "wow", cat: "Club",
+    src: "https://www.tixr.com/groups/wowphilly/events/tear-you-apart-207778" },
+  { date: "2026-12-12", time: "7 PM", title: "Into It. Over It., “Proper” at 15", venue: "union-transfer", cat: "Music", price: "All ages",
+    src: "https://www.axs.com/events/1557941/into-it-over-it-tickets" },
+  { date: "2026-12-12", time: "8 PM", title: "An Evening with Lord Huron", venue: "the-met", cat: "Music",
+    src: "https://www.livenation.com/event/vvG1FZ_2mgbLqL/an-evening-with-lord-huron" },
+  { date: "2026-12-15", time: "7:30 PM", title: "Q102 Jingle Ball", venue: "arena", cat: "Music",
+    src: "https://www.xfinitymobilearena.com/news/detail/iheartradio-q102s-jingle-ball-2026-presented-by-capital-one-rings-in-the-season-with-annual-star-studded-holiday-concert" },
+  { date: "2026-12-19", time: "9 PM", title: "DEPARTED Season 5 finale, with Victor Calderone", venue: "ave-live", cat: "Club",
+    src: "https://ma.to/event/departed-season-5-finale-20-dec-2026" },
+  { date: "2026-12-30", time: "11:55 PM", title: "AfterJinx 2026 (No Nonsense)", venue: "arts-loft", cat: "Club", price: "21+ · Lineup TBA", story: "afterjinx",
+    src: "https://nononsensephilly.com/events/afterjinx-2026/" },
+  { date: "2026-12-31", time: "7 PM", title: "Submersion NYE 2026, with Mickman, Thought Process, Schmoop", venue: "union-transfer", cat: "Music",
+    src: "https://www.axs.com/events/1693128/submersion-nye-2026-w-mickman-thought-process-schmoop-more-tickets" },
+  { date: "2027-01-23", time: "8 PM", title: "Puzzle, with 3l3d3p", venue: "union-transfer", cat: "Music", price: "All ages",
+    src: "https://www.axs.com/events/1664421/puzzle-tickets" },
+  { date: "2027-01-29", time: "9 PM–2 AM", title: "MADWRRLD 02: hard techno, with Luke Noize and MADGRRL", venue: "wow", cat: "Club", price: "21+",
+    src: "https://www.tixr.com/groups/wowphilly/events/madwrrld-215109" },
+  { date: "2027-01-31", time: "11 AM–11 PM", title: "Free skate day at RiverRink", venue: "riverrink", cat: "Outdoors", price: "Free",
+    src: "https://www.delawareriverwaterfront.com/" },
+  { date: "2027-02-05", time: "10 PM", title: "Spencer Brown: nubreed tour", venue: "barbary", cat: "Club", price: "21+",
+    src: "https://ma.to/event/spencer-brown-nubreed-tour-05-feb-2027" }
+];
+
+const BRANDS = [
+  { slug: "lehigh-thread", name: "Lehigh Thread Co.", hood: "Kensington", sw: "sw-stripe", price: "$45–90", drop: "2026-12-05", pg: "38",
+    makes: "Heavyweight hoodies and crewnecks, screen printed in-house one color at a time." },
+  { slug: "wooder-ice-club", name: "Wooder Ice Club", hood: "South Philly", sw: "sw-dots", price: "$28–40", drop: "2026-12-12", pg: "38",
+    makes: "Tees in winter colors, each one named for a water ice flavor." },
+  { slug: "brick-and-bell", name: "Brick & Bell", hood: "Old City", sw: "sw-check", price: "$120–220", drop: "2027-01-10", pg: "39",
+    makes: "Work jackets cut from deadstock canvas, with a lifetime repair promise." },
+  { slug: "second-shift", name: "Second Shift Garments", hood: "Port Richmond", sw: "sw-knit", price: "$25–60", drop: "2026-12-19", pg: "39",
+    makes: "Knit hats and scarves made on a 1970s machine in a garage." },
+  { slug: "trolley-kids", name: "Trolley Kids", hood: "West Philly", sw: "sw-grid", price: "$18–35", drop: "2026-12-19", pg: "40",
+    makes: "Kids’ clothes printed with old trolley-route maps of the neighborhood." }
+];
+
+const TOC = [
+  { pg: "04", sec: "Nightlife", title: "Philly Nightlife", dek: "Ratings and rankings of where to go out.", href: "#story-nightlife" },
+  { pg: "08", sec: "Nightlife", title: "AfterJinx", dek: "Where HiJinx goes after midnight. Dec 30.", href: "#story-afterjinx" },
+  { pg: "10", sec: "Sports", title: "76ers Mania", dek: "A city founded on democracy makes room for a king.", href: "#story-sixers" },
+  { pg: "14", sec: "Food", title: "Food Finders", dek: "Top 5: mac and cheese, roast beef, pizza, tacos, random gems.", href: "#story-food-finders" },
+  { pg: "20", sec: "City", title: "Pothole Pandemic", dek: "How to get your street fixed.", href: "#story-potholes" },
+  { pg: "22", sec: "City", title: "Breakin Bullies", dek: "How to keep your car from getting broken into.", href: "#story-break-ins" },
+  { pg: "24", sec: "Life", title: "25 Life Hacks", dek: "Become clutch overnight.", href: "#story-life-hacks" },
+  { pg: "28", sec: "Music", title: "Music: IYKYK", dek: "So why not just know.", href: "#story-iykyk" },
+  { pg: "30", sec: "Sounds", title: "Six Artists, Six Codes", dek: "Scan the page, hear the song.", href: "#sounds" },
+  { pg: "36", sec: "Fashion", title: "Fashion", dek: "What’s coming back and what’s new.", href: "#story-fashion" },
+  { pg: "42", sec: "Scene", title: "The Season’s Calendar", dek: "Shows, markets and fairs.", href: "#scene" }
+];
+
+const RATES = [
+  ["Opening page", "Full page, first interior right-hand page", "$750"],
+  ["Back cover", "Full page, outside rear cover", "$425"],
+  ["Inside back cover", "Full page, inside rear cover", "$250"],
+  ["Interior full page", "Full page, editorial section", "$200"],
+  ["Half page", "Horizontal, interior page", "$150"],
+  ["Quarter page", "Block, interior page", "$75"],
+  ["Small ad", "1/16 page, interior small-ad section", "$20"]
+];
+
+const SCANS = [
+  ["Opening page advertiser", "Opening page", 540],
+  ["Featured artist code", "Sounds, p. 31", 412],
+  ["Lehigh Thread Co.", "Quarter page, p. 38", 288],
+  ["Featured artist code", "Sounds, p. 30", 251],
+  ["Season calendar", "Scene, p. 42", 197]
+];
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const day = iso => new Date(iso + "T12:00:00");
+const fmtDay = iso => { const d = day(iso); return `${DOW[d.getDay()]} ${MON[d.getMonth()]} ${d.getDate()}`; };
+const dateBlock = (iso, cls = "ev-date") => { const d = day(iso);
+  return `<div class="${cls}" aria-hidden="true"><span class="ev-mon">${MON[d.getMonth()]}</span><span class="ev-day">${d.getDate()}</span><span class="ev-dow">${DOW[d.getDay()]}</span></div>`; };
+const venueOf = id => VENUES.find(v => v.id === id);
+const shortUrl = slug => `${CONFIG.domain}/a/${slug}`;
+const codeUrl = slug => `https://${CONFIG.domain}/a/${slug}?i=${CONFIG.issue}`;
+const phone = window.matchMedia("(max-width: 899px)");
+const state = { tab: "issue", section: "All", story: STORIES[0].slug, artist: ARTISTS[0].slug, cat: "All", venue: null, savedOnly: false };
+
+/* ---------- device memory: saves only (docs/ANTICIPATORY_UX.md, releases 1-2) ---------- */
+const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+EVENTS.forEach(e => { e.id = [e.date, e.venue, e.artist || e.brand || slugify(e.title)].join("-"); });
+const eventById = id => EVENTS.find(e => e.id === id);
+const endOf = e => e.until || e.date;
+const pad = n => String(n).padStart(2, "0");
+const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+function localStamp(d = new Date()) {
+  const o = -d.getTimezoneOffset(), a = Math.abs(o);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}${o >= 0 ? "+" : "-"}${pad(Math.floor(a / 60))}:${pad(a % 60)}`;
+}
+const PREFS_KEY = "thephilly:prefs:v1";
+const KNOWN = { artists: new Set(ARTISTS.map(a => a.slug)), events: new Set(EVENTS.map(e => e.id)), brands: new Set(BRANDS.map(b => b.slug)) };
+const store = (() => { try { localStorage.setItem("thephilly:probe", "1"); localStorage.removeItem("thephilly:probe"); return true; } catch (e) { return false; } })();
+const emptyPrefs = () => ({ v: 1, issue: CONFIG.issue, updatedAt: localStamp(), remember: { reading: false, contact: false }, saved: { artists: [], events: [], brands: [] } });
+function loadPrefs() {
+  if (!store) return null;
+  let d;
+  try { const raw = localStorage.getItem(PREFS_KEY); if (!raw) return null; d = JSON.parse(raw); } catch (e) { return null; }
+  if (!d || typeof d !== "object" || d.v !== 1 || !d.saved || typeof d.saved !== "object") return null;
+  const t = Date.parse(d.updatedAt);
+  if (!Number.isFinite(t) || t > Date.now() + 60000) return null;
+  const p = emptyPrefs(), today = todayISO();
+  p.updatedAt = d.updatedAt;
+  for (const k of ["artists", "events", "brands"]) {
+    const list = Array.isArray(d.saved[k]) ? d.saved[k] : [];
+    p.saved[k] = [...new Set(list.filter(x => typeof x === "string" && KNOWN[k].has(x)))]
+      .filter(x => k !== "events" || endOf(eventById(x)) >= today).slice(-50);
+  }
+  return p;
+}
+let prefs = loadPrefs(), writeTimer = null;
+function writePrefs() {
+  clearTimeout(writeTimer); writeTimer = null;
+  if (!store || !prefs) return;
+  prefs.updatedAt = localStamp();
+  try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) {}
+}
+const queueWrite = () => { clearTimeout(writeTimer); writeTimer = setTimeout(writePrefs, 400); };
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && writeTimer) writePrefs(); });
+window.addEventListener("pagehide", () => { if (writeTimer) writePrefs(); });
+const isSaved = (k, id) => !!prefs && prefs.saved[k].includes(id);
+function toggleSave(k, id) {
+  if (!prefs) prefs = emptyPrefs();
+  const l = prefs.saved[k], i = l.indexOf(id);
+  if (i >= 0) l.splice(i, 1); else { l.push(id); if (l.length > 50) l.shift(); }
+  queueWrite();
+  return i < 0;
+}
+const BOOKMARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+function saveBtn(kind, id, name) {
+  if (!store) return "";
+  const on = isSaved(kind, id);
+  return `<button class="save" type="button" data-save="${kind}" data-id="${esc(id)}" data-name="${esc(name)}" aria-pressed="${on}">${BOOKMARK}<span>${on ? "Saved" : "Save"}</span><span class="sr-only"> ${esc(name)}</span></button>`;
+}
+function syncSaveButtons(kind, id) {
+  const on = isSaved(kind, id);
+  $$(`.save[data-save="${kind}"]`).filter(b => b.dataset.id === id).forEach(b => {
+    b.setAttribute("aria-pressed", String(on)); b.querySelector("span").textContent = on ? "Saved" : "Save";
+  });
+}
+
+/* ---------- context-only predictions ---------- */
+const arrival = { slug: null, dismissed: false };   // the artist whose printed code opened this visit
+const visited = new Set();                          // stories opened this visit, never stored
+let pendingFocus = null;
+const daysUntil = iso => Math.round((day(iso) - day(todayISO())) / 864e5);
+const whenText = n => n < 0 ? "Past" : n === 0 ? "Today" : n === 1 ? "Tomorrow" : `In ${n} days`;
+function upNext(s) {
+  const byPage = [...STORIES].sort((a, b) => a.pg.localeCompare(b.pg)), i = byPage.indexOf(s);
+  const after = byPage.slice(i + 1).concat(byPage.slice(0, i));
+  const fresh = x => !visited.has(x.slug);
+  return after.find(x => x.sec === s.sec && fresh(x)) || after.find(fresh) || after[0];
+}
+function askAbout(slot) {
+  const f = $("#inquiry"), sel = $("#f-slot");
+  if (f.hidden) { f.reset(); f.hidden = false; $("#form-ok").hidden = true; }
+  if ([...sel.options].some(o => o.value === slot)) {
+    sel.value = slot;
+    const hint = $("#slot-hint"); hint.textContent = `Set to ${slot}. Change it any time.`; hint.hidden = false;
+  }
+  pendingFocus = "#f-name";
+  go("advertise");
+}
+function renderForYou() {
+  const box = $("#foryou"), today = todayISO(), items = [];
+  if (prefs) {
+    prefs.saved.events.forEach(id => { const e = eventById(id); if (e && endOf(e) >= today)
+      items.push({ date: e.date < today ? today : e.date, t: e.title, m: `${e.date < today ? `Through ${fmtDay(e.until)}` : fmtDay(e.date)} · ${e.time} · ${venueOf(e.venue).name}`, attr: `data-goto-event="${esc(e.id)}"` }); });
+    prefs.saved.artists.forEach(slug => { const a = ARTISTS.find(x => x.slug === slug);
+      const e = EVENTS.find(x => x.artist === slug && x.date >= today && !isSaved("events", x.id));
+      if (a && e) items.push({ date: e.date, t: `${a.name} at ${venueOf(e.venue).name}`, m: `${fmtDay(e.date)} · ${e.time} · Saved artist`, attr: `data-artist="${slug}"` }); });
+    prefs.saved.brands.forEach(slug => { const b = BRANDS.find(x => x.slug === slug);
+      if (b && b.drop >= today) items.push({ date: b.drop, t: `${b.name} drop`, m: `${fmtDay(b.drop)} · ${b.hood}`, attr: `data-go="threads"` }); });
+  }
+  items.sort((x, y) => x.date.localeCompare(y.date));
+  box.hidden = !items.length;
+  $("#foryou-list").innerHTML = items.slice(0, 4).map(i => `<li><button type="button" ${i.attr}><span class="fy-t">${esc(i.t)}</span><span class="fy-m">${esc(i.m)}</span><span class="fy-when">${whenText(daysUntil(i.date))}</span></button></li>`).join("");
+}
+
+function qrSvg(text, cls) {
+  if (typeof window.qrcode !== "function") return `<span class="qr-fallback ${cls}">QR</span>`;
+  const q = window.qrcode(0, "M"); q.addData(text); q.make();
+  const n = q.getModuleCount(); let d = "";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`;
+  return `<svg class="qr ${cls}" viewBox="-4 -4 ${n + 8} ${n + 8}" shape-rendering="crispEdges" role="img" aria-label="QR code for ${esc(text)}"><rect x="-4" y="-4" width="${n + 8}" height="${n + 8}"/><path d="${d}"/></svg>`;
+}
+
+function seeded(seed) { let s = (seed * 9301 + 49297) % 233280; return () => (s = (s * 9301 + 49297) % 233280) / 233280; }
+function tornClip(seed, amp) {
+  const rnd = seeded(seed), h = 18, v = 14, p = [], j = () => (rnd() * amp).toFixed(1);
+  for (let i = 0; i <= h; i++) p.push(`${(i / h * 100).toFixed(2)}% ${j()}px`);
+  for (let i = 1; i <= v; i++) p.push(`calc(100% - ${j()}px) ${(i / v * 100).toFixed(2)}%`);
+  for (let i = h - 1; i >= 0; i--) p.push(`${(i / h * 100).toFixed(2)}% calc(100% - ${j()}px)`);
+  for (let i = v - 1; i > 0; i--) p.push(`${j()}px ${(i / v * 100).toFixed(2)}%`);
+  return `polygon(${p.join(",")})`;
+}
+function applyTorn(root = document) {
+  $$(".torn", root).forEach((el, i) => {
+    if (el.dataset.tornDone) return;
+    const amp = el.closest(".cover") ? 4 : 6;
+    el.style.clipPath = tornClip(Number(el.dataset.seed || i + 3), amp);
+    el.dataset.tornDone = "1";
+  });
+}
+
+let toastTimer;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3200);
+}
+
+/* ---------- brand ---------- */
+function applyBrand() {
+  const words = CONFIG.name.split(" ");
+  const the = words.length > 1 ? words[0] : "";
+  const rest = words.length > 1 ? words.slice(1).join(" ") : words[0];
+  $$("[data-brand-the]").forEach(el => { el.textContent = the; el.hidden = !the; });
+  $$("[data-brand-name]").forEach(el => { el.textContent = rest; });
+  $$("[data-tagline]").forEach(el => { el.textContent = CONFIG.tagline; });
+  $$("[data-cover-no]").forEach(el => { el.textContent = `No. ${CONFIG.issue}`; });
+  const looks = ["s0", "s1", "s2", "s3", "s4"]; let n = 0;
+  const letter = (ch, small) => ch === " " ? '<span class="gap"></span>' : `<span class="rl ${looks[n++ % looks.length]}${small ? " small" : ""}">${esc(ch)}</span>`;
+  $("#cv-mast").innerHTML = [...the].map(c => letter(c, true)).join("") + (the ? '<span class="gap"></span>' : "") + [...rest.toUpperCase()].map(c => letter(c, false)).join("");
+  $("#cv-rows").innerHTML = rowhomes();
+}
+function rowhomes() {
+  const rnd = seeded(101), colors = ["#b5452f", "#3b8c8a", "#d9a441", "#3d5fa8", "#e9dcc0", "#c9706b", "#6e9a5a", "#8a3b2e", "#e0b9a0", "#4f6d8f"];
+  const pick = () => colors[Math.floor(rnd() * colors.length)];
+  let out = "";
+  const house = (x, y, w, h, door) => {
+    let g = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${pick()}" stroke="#17140f" stroke-width=".8"/><rect x="${x}" y="${y}" width="${w}" height="3" fill="#2b2925"/>`;
+    const cols = w > 26 ? 3 : 2, ww = 4.2, gapx = (w - cols * ww) / (cols + 1);
+    for (let r = 0, wy = y + 7; wy + 6 < y + h - (door ? 11 : 4); r++, wy += 10)
+      for (let c = 0; c < cols; c++) g += `<rect x="${(x + gapx + c * (ww + gapx)).toFixed(1)}" y="${wy}" width="${ww}" height="6" fill="${rnd() > .3 ? "#f4ecdc" : "#2b2925"}" stroke="#17140f" stroke-width=".4"/>`;
+    if (door) g += `<rect x="${(x + w / 2 - 3).toFixed(1)}" y="${y + h - 10}" width="6" height="10" fill="#2b2925"/>`;
+    return g;
+  };
+  for (let x = -6; x < 400;) { const w = 22 + Math.floor(rnd() * 14), h = 34 + Math.floor(rnd() * 16); out += house(x, 55 - h, w, h, true); x += w; }
+  for (let x = -4; x < 400;) { const w = 22 + Math.floor(rnd() * 14), h = 40 + Math.floor(rnd() * 12); out += house(x, 600 - h, w, h, true); x += w; }
+  for (const x0 of [0, 372]) for (let y = 50; y < 560;) { const h = 34 + Math.floor(rnd() * 14); out += house(x0, y, 28, h, false); y += h; }
+  return out;
+}
+
+/* ---------- nav ---------- */
+function renderNav() {
+  $("#tabs").innerHTML = TABS.map(t => `<a class="tab" href="#${t.id}" data-tab="${t.id}">${t.label}</a>`).join("");
+  $("#rail").innerHTML = TABS.map(t => `<a href="#${t.id}" data-tab="${t.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">${t.icon}</svg>${t.label}</a>`).join("");
+}
+function show(tab) {
+  const changed = tab !== state.tab;
+  state.tab = tab;
+  $$("[data-panel]").forEach(p => {
+    const on = p.dataset.panel === tab; p.hidden = !on;
+    if (on && changed) { p.classList.remove("entering"); void p.offsetWidth; p.classList.add("entering"); }
+  });
+  $$("[data-tab]").forEach(a => a.dataset.tab === tab ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  if (pendingFocus) { const el = $(pendingFocus); pendingFocus = null; if (el) el.focus(); }
+  const label = TABS.find(t => t.id === tab).label;
+  document.title = tab === "issue" ? CONFIG.name : `${label} · ${CONFIG.name}`;
+}
+
+/* ---------- issue ---------- */
+function renderIssue() {
+  $("#toc").innerHTML = TOC.map(t => `<li><a href="${t.href}"><span class="pg"><small>PAGE</small>${t.pg}</span><span class="t"><span>${esc(t.sec)}</span>${esc(t.title)}</span><span class="d">${esc(t.dek)}</span></a></li>`).join("");
+  $("#read-side-list").innerHTML = TOC.filter(t => !t.href.startsWith("#story")).map(t => `<li><a href="${t.href}"><span class="pg"><small>PAGE</small>${t.pg}</span><span class="t"><span>${esc(t.sec)}</span>${esc(t.title)}</span><span class="d">${esc(t.dek)}</span></a></li>`).join("");
+  $("[data-issue-tag]").innerHTML = `Vol. 1 · No. ${esc(CONFIG.issue)}<br>${esc(CONFIG.season)}`;
+}
+
+/* ---------- read ---------- */
+function renderSectionChips() {
+  const secs = ["All", ...new Set(STORIES.map(s => s.sec))];
+  $("#section-chips").innerHTML = secs.map(s => `<button class="chip" type="button" data-sec="${esc(s)}" aria-pressed="${s === state.section}">${esc(s)}</button>`).join("");
+}
+function renderStoryList() {
+  const list = STORIES.filter(s => state.section === "All" || s.sec === state.section);
+  $("#story-list").innerHTML = list.map(s => `<li><button class="story-item" type="button" data-story="${s.slug}" aria-current="${s.slug === state.story}">
+    <span class="si-sec">${esc(s.sec)} · p. ${s.pg}</span><span class="si-title">${esc(s.title)}</span><span class="si-meta">${esc(s.by)} · ${s.min} min read</span></button></li>`).join("");
+}
+function renderReader(slug, opened = false) {
+  const s = STORIES.find(x => x.slug === slug) || STORIES[0];
+  state.story = s.slug;
+  if (opened) visited.add(s.slug);
+  const nx = upNext(s);
+  $("#reader").innerHTML = `<div class="reader-inner">
+    <button class="btn back" type="button" data-go="read">← All stories</button>
+    <p class="kicker">${esc(s.sec)}</p>
+    <h2>${esc(s.title)}</h2>
+    <p class="dek">${esc(s.dek)}</p>
+    <div class="byline"><span>By ${esc(s.by)}</span><span>${s.min} min read</span><span>Issue ${CONFIG.issue} · p. ${s.pg}</span></div>
+    ${s.facts ? `<ul class="facts">${s.facts.map(f => `<li>${esc(f)}</li>`).join("")}</ul>` : ""}
+    ${s.body.map((p, i) => `<p class="body${i ? "" : " lead"}">${esc(p)}</p>`).join("")}
+    ${s.radar ? `<section class="radar" aria-labelledby="radar-h">
+      <p class="kicker">Cheesesteak Radar</p>
+      <h3 id="radar-h">Where the cheesesteak heat is</h3>
+      <p>Every Philadelphia neighborhood on one map, with shops scored on a published formula. Open the radar here, or take it full screen.</p>
+      <p class="radar-note">Real shops from OpenStreetMap and Google Maps, from a weekly snapshot. Not a complete list. The map loads OpenStreetMap tiles only after you open it.</p>
+      <div class="radar-actions">
+        <button class="btn btn-red" type="button" id="radar-toggle" data-radar aria-expanded="false" aria-controls="radar-frame">Open the radar</button>
+        <a class="btn" href="/cheesesteaks/">Full map</a>
+        <a class="btn" href="/cheesesteaks/rankings/">Rankings</a>
+      </div>
+      <div class="radar-frame" id="radar-frame" hidden></div>
+    </section>` : ""}
+    <p class="print-note">In print: Issue ${CONFIG.issue}, ${esc(CONFIG.season)}, page ${s.pg}. ${s.note ? `${esc(s.note)}${s.source ? ` <a href="${esc(s.source)}" target="_blank" rel="noopener">Event page</a>` : ""}` : "Sample story written for this prototype."}</p>
+    <div class="upnext"><p class="kicker">Up next ${nx.sec === s.sec ? "in " + esc(s.sec) : "in the issue"}</p>
+      <button type="button" data-story="${nx.slug}"><span class="un-title">${esc(nx.title)}</span><span class="un-dek">${esc(nx.dek)}</span><span class="un-meta">${esc(nx.sec)} · p. ${nx.pg} · ${nx.min} min read</span></button></div>
+  </div>`;
+  $$(".story-item").forEach(b => b.setAttribute("aria-current", String(b.dataset.story === s.slug)));
+  $("#reader").scrollTop = 0; $(".panel.read").scrollTop = 0;
+}
+
+/* ---------- sounds ---------- */
+const ROLE = { member: "No Nonsense Collective", project: "No Nonsense project", guest: "Guest on No Nonsense lineups" };
+const roleOf = a => ROLE[a.role] || ROLE.guest;
+const lineupCount = a => `${a.shows.length} No Nonsense ${a.shows.length === 1 ? "lineup" : "lineups"}`;
+const extLink = (l, cls = "btn") => `<a class="${cls}" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`;
+function artistTile(a) {
+  return `<div class="a-tile halftone" style="--tint:${a.tint}" aria-hidden="true"><span class="ini">${esc(a.ini)}</span>
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="currentColor"/><circle cx="50" cy="50" r="34" fill="none" style="stroke:var(--tile)" stroke-width="1" opacity=".5"/><circle cx="50" cy="50" r="14" style="fill:${a.tint}"/><circle cx="50" cy="50" r="2.5" style="fill:var(--scrap)"/></svg></div>`;
+}
+function renderArtists() {
+  $("#artist-grid").innerHTML = ARTISTS.map(a => `<li><button class="artist-card" type="button" data-artist="${a.slug}" aria-current="${a.slug === state.artist}" aria-label="${esc(a.name)}, ${esc(roleOf(a))}">
+    ${artistTile(a)}
+    <span class="a-body"><span><span class="a-name">${esc(a.name)}</span><span class="a-meta">${esc(roleOf(a))}<br>${lineupCount(a)} · Print p. ${a.pg}${isSaved("artists", a.slug) ? ' · <b class="saved-tag">Saved</b>' : ""}</span></span>${qrSvg(codeUrl(a.slug), "qr-sm")}</span>
+  </button></li>`).join("");
+}
+function renderArtist(slug) {
+  const a = ARTISTS.find(x => x.slug === slug) || ARTISTS[0];
+  state.artist = a.slug;
+  const shows = EVENTS.filter(e => e.artist === a.slug && e.date >= todayISO());
+  const soon = shows[0], last = a.shows[0];
+  const order = [...ARTISTS].sort((x, y) => x.pg.localeCompare(y.pg));
+  const nextA = order[(order.indexOf(a) + 1) % order.length];
+  const banner = arrival.slug === a.slug && !arrival.dismissed ? `<div class="arrival" role="note">
+      <div><p class="kicker">Scanned from page ${a.pg} · Issue ${CONFIG.issue}</p>
+      <p class="say">${soon ? `${esc(a.name)} plays ${fmtDay(soon.date)} at ${esc(venueOf(soon.venue).name)}.` : last ? `${esc(a.name)} was last billed at ${esc(last.title)}, ${esc(last.label)}.` : `${esc(a.name)} is on page ${a.pg}.`}</p></div>
+      <button class="x" type="button" data-dismiss-arrival aria-label="Hide this note">✕</button>
+      ${soon || a.links.length ? `<div class="btns">${soon ? `<a class="btn" href="#scene" data-venue-link="${soon.venue}">See the show</a>` : ""}${a.links.length ? extLink({ label: `Listen on ${a.links[0].label}`, url: a.links[0].url }) : ""}</div>` : ""}
+    </div>` : "";
+  $("#artist-page").innerHTML = `
+    <button class="btn back" type="button" data-go="sounds">← All artists</button>
+    ${banner}
+    ${artistTile(a)}
+    <p class="kicker">Featured artist · Issue ${CONFIG.issue}</p>
+    <h2 class="h-l">${esc(a.name)}</h2>
+    <div class="ap-meta"><span>${esc(roleOf(a))}</span><span>${lineupCount(a)}</span><span>Print p. ${a.pg}</span></div>
+    <p>${esc(a.bio)}${a.ownBio ? "" : " Bio to come from the artist."}</p>
+    <div class="btns" style="margin-bottom:18px">
+      ${saveBtn("artists", a.slug, a.name)}
+      ${a.links.map(l => extLink(l)).join("")}
+    </div>
+    ${a.links.length ? "" : `<p class="small">No public links on file yet.</p>`}
+    <h3 class="h-m">Next shows</h3>
+    <ul class="shows">${shows.length ? shows.map(e => `<li><a href="#scene" data-venue-link="${e.venue}">${esc(venueOf(e.venue).name)}</a><span>${fmtDay(e.date)} · ${e.time} · ${e.price}</span></li>`).join("") : `<li>None announced<span>Check back</span></li>`}</ul>
+    <h3 class="h-m">On No Nonsense lineups</h3>
+    <ul class="played">${a.shows.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a><span>${esc(x.label)} · ${esc(x.place)}<br>Billed as ${esc(x.billed)}${x.set ? ` · ${esc(x.set)}` : ""}</span></li>`).join("")}</ul>
+    <p class="small src">Bio, links and lineups from the No Nonsense Collective site. Print page and code are prototype.</p>
+    <div class="ap-qr">${qrSvg(codeUrl(a.slug), "qr-lg")}
+      <div><p class="kicker">The code on page ${a.pg}</p><p class="url">${esc(shortUrl(a.slug))}</p>
+      <p class="small" style="margin:0">Scanning it lands here and counts one scan for Issue ${CONFIG.issue}. Prototype: ${esc(CONFIG.domain)} is not live yet.</p></div></div>
+    <div class="upnext"><p class="kicker">Next in the issue</p>
+      <button type="button" data-artist="${nextA.slug}"><span class="un-title">${esc(nextA.name)}</span><span class="un-meta">${esc(roleOf(nextA))} · Print p. ${nextA.pg}</span></button></div>`;
+  $$(".artist-card").forEach(b => b.setAttribute("aria-current", String(b.dataset.artist === a.slug)));
+  $("#artist-page").scrollTop = 0; $(".panel.sounds").scrollTop = 0;
+}
+
+/* ---------- scene ---------- */
+function weekOf(iso) { const d = day(iso); const m = new Date(d); m.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return m; }
+function renderCatChips() {
+  const cats = ["All", ...new Set(EVENTS.map(e => e.cat))];
+  const n = prefs ? prefs.saved.events.length : 0;
+  if (!n) state.savedOnly = false;
+  $("#cat-chips").innerHTML = cats.map(c => `<button class="chip" type="button" data-cat="${esc(c)}" aria-pressed="${c === state.cat}">${esc(c)}</button>`).join("")
+    + (n ? `<button class="chip" type="button" data-saved-only aria-pressed="${state.savedOnly}">Saved (${n})</button>` : "");
+}
+function weekLabel(w) {
+  const diff = Math.round((w - weekOf(todayISO())) / (7 * 864e5)), base = `Week of ${MON[w.getMonth()]} ${w.getDate()}`;
+  return diff === 0 ? `This week · ${base}` : diff === 1 ? `Next week · ${base}` : diff < 0 ? `Past · ${base}` : base;
+}
+function renderEvents() {
+  const today = todayISO(), running = e => !!e.until && e.date <= today && e.until >= today;
+  const wk = e => running(e) ? 0 : weekOf(e.date).getTime();
+  const list = EVENTS.filter(e => endOf(e) >= today && (state.cat === "All" || e.cat === state.cat) && (!state.venue || e.venue === state.venue) && (!state.savedOnly || isSaved("events", e.id)))
+    .sort((a, b) => wk(a) - wk(b) || isSaved("events", b.id) - isSaved("events", a.id) || (running(a) ? endOf(a).localeCompare(endOf(b)) : a.date.localeCompare(b.date)) || EVENTS.indexOf(a) - EVENTS.indexOf(b));
+  const vf = $("#venue-filter");
+  vf.innerHTML = state.venue ? `<button class="venue-pill" type="button" data-clear-venue>At ${esc(venueOf(state.venue).name)} <span aria-hidden="true">✕</span><span class="sr-only">Clear venue filter</span></button>` : "";
+  if (!list.length) { $("#events").innerHTML = `<li class="empty">Nothing matches. Clear the venue, turn off Saved or pick All.</li>`; return; }
+  let html = "", lastWeek = "";
+  list.forEach(e => {
+    const now = running(e), key = now ? "now" : weekOf(e.date).toDateString();
+    if (key !== lastWeek) { html += `<li class="week-label">${now ? "Running now" : weekLabel(weekOf(e.date))}</li>`; lastWeek = key; }
+    const v = venueOf(e.venue), u = e.until ? day(e.until) : null;
+    const block = now ? `<div class="ev-date" aria-hidden="true"><span class="ev-mon">Thru</span><span class="ev-day">${u.getDate()}</span><span class="ev-dow">${MON[u.getMonth()]}</span></div>` : dateBlock(e.date);
+    const when = now ? `Through ${fmtDay(e.until)}` : e.until ? `${fmtDay(e.date)} to ${fmtDay(e.until)}` : fmtDay(e.date);
+    const link = (e.story ? ` · <a href="#story-${e.story}">Story</a>` : "") + (e.src ? ` · <a href="${esc(e.src)}" target="_blank" rel="noopener">Source</a>` : "");
+    html += `<li class="event">${block}<div><p class="ev-title"><span class="sr-only">${when}: </span>${esc(e.title)}</p>
+      <div class="ev-where"><button type="button" data-venue="${v.id}">${esc(v.name)}</button> · ${esc(v.hood)}${e.until && !now ? ` · to ${fmtDay(e.until)}` : ""}${link}</div></div>
+      <div class="ev-right">${esc(e.time)}${e.price ? ` · ${esc(e.price)}` : ""}<div class="ev-tags"><span class="ev-cat">${esc(e.cat)}</span>${saveBtn("events", e.id, e.title)}</div></div></li>`;
+  });
+  $("#events").innerHTML = html;
+}
+function renderVenues() {
+  $("#venues").innerHTML = VENUES.map(v => {
+    const n = EVENTS.filter(e => e.venue === v.id && endOf(e) >= todayISO()).length;
+    return `<li><button class="venue" type="button" data-venue="${v.id}" aria-pressed="${state.venue === v.id}">
+      <span class="v-name">${esc(v.name)}</span><span class="v-meta">${esc(v.hood)} · ${esc(v.kind)}</span>
+      <span class="v-count">${n}<small>${n === 1 ? "listing" : "listings"}</small></span></button></li>`;
+  }).join("");
+}
+function setVenue(id) {
+  state.venue = state.venue === id ? null : id;
+  renderEvents(); renderVenues();
+  if (phone.matches) setSceneView("events");
+}
+function setSceneView(v) {
+  $(".scene").dataset.view = v;
+  $$(".seg .chip").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+}
+
+/* ---------- threads ---------- */
+function renderThreads() {
+  $("#brand-grid").innerHTML = BRANDS.map(b => `<li><article class="brand">
+    <div class="swatch ${b.sw}" aria-hidden="true"><i class="tape"></i></div>
+    <div class="b-body"><h3 class="b-name">${esc(b.name)}</h3><span class="b-meta">${esc(b.hood)} · ${esc(b.price)} · Print p. ${b.pg}</span>
+      <p>${esc(b.makes)}</p>
+      <div class="b-drop"><span>Next drop ${fmtDay(b.drop)}</span><span class="b-actions">${saveBtn("brands", b.slug, b.name)}<button class="btn" type="button" data-proto="opens the ${esc(b.name)} shop">Shop</button></span></div></div>
+  </article></li>`).join("");
+  renderDrops();
+}
+function renderDrops() {
+  $("#drops").innerHTML = [...BRANDS].sort((a, b) => a.drop.localeCompare(b.drop)).map(b => `<li>${dateBlock(b.drop)}<div><b>${esc(b.name)}</b><span>${esc(b.hood)} · ${esc(b.price)}${isSaved("brands", b.slug) ? ' · <b class="saved-tag" style="display:inline">Saved</b>' : ""}</span></div></li>`).join("");
+}
+
+/* ---------- advertise ---------- */
+function renderAdvertise() {
+  $("#rates tbody").innerHTML = RATES.map(([p, inc, r]) => `<tr><td>${esc(p)}</td><td><small>${esc(inc)}</small><button class="ask" type="button" data-ask="${esc(p)}">Ask about this</button></td><td class="price">${esc(r)}</td></tr>`).join("");
+  $("#scans tbody").innerHTML = SCANS.map(([c, w, n]) => `<tr><td>${esc(c)}</td><td>${esc(w)}</td><td class="num">${n.toLocaleString("en-US")}</td></tr>`).join("");
+  const total = SCANS.reduce((t, r) => t + r[2], 0);
+  $("#scans tfoot").innerHTML = `<tr><td colspan="2">Total scans, five codes</td><td class="num">${total.toLocaleString("en-US")}</td></tr>`;
+}
+
+/* ---------- routing ---------- */
+function route() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith("story-") && STORIES.some(s => s.slug === h.slice(6))) {
+    state.section = "All"; renderSectionChips(); renderStoryList();
+    renderReader(h.slice(6), true); $(".read").classList.add("has-open"); show("read");
+    return;
+  }
+  if (h.startsWith("artist-") && ARTISTS.some(a => a.slug === h.slice(7))) {
+    renderArtist(h.slice(7)); $(".sounds").classList.add("has-open"); show("sounds");
+    return;
+  }
+  const tab = TABS.some(t => t.id === h) ? h : "issue";
+  if (tab === "read") $(".read").classList.remove("has-open");
+  if (tab === "sounds") $(".sounds").classList.remove("has-open");
+  show(tab);
+}
+function go(hash) { if (location.hash === "#" + hash) route(); else location.hash = hash; }
+
+/* ---------- theme ---------- */
+function setTheme(t, save) {
+  document.documentElement.setAttribute("data-theme", t);
+  const btn = $("#theme-toggle");
+  btn.setAttribute("aria-pressed", String(t === "dark"));
+  $(".lbl", btn).textContent = t === "dark" ? "Light" : "Dark";
+  btn.setAttribute("aria-label", t === "dark" ? "Switch to light mode" : "Switch to dark mode");
+  if (save) { try { localStorage.setItem("thephilly-theme", t); } catch (e) {} }
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, a");
+  if (!t) return;
+  if (t.dataset.save) {
+    const k = t.dataset.save, id = t.dataset.id, on = toggleSave(k, id);
+    syncSaveButtons(k, id); renderForYou();
+    if (k === "artists") renderArtists();
+    if (k === "brands") renderDrops();
+    if (k === "events") { renderCatChips(); renderEvents(); const b = $$('.save[data-save="events"]').find(x => x.dataset.id === id); if (b) b.focus(); }
+    toast(on ? `Saved ${t.dataset.name}. It shows under Coming up on the Issue tab.` : `Removed ${t.dataset.name} from your saves.`);
+    return;
+  }
+  if (t.dataset.radar !== undefined) {
+    const box = $("#radar-frame"), open = t.getAttribute("aria-expanded") !== "true";
+    t.setAttribute("aria-expanded", String(open));
+    t.textContent = open ? "Close the radar" : "Open the radar";
+    box.hidden = !open;
+    // The map is created on demand and removed on close, so nothing loads until the reader asks.
+    box.innerHTML = open ? '<iframe src="/cheesesteaks/" title="Philly Cheesesteak Heatmap" allow="geolocation" referrerpolicy="same-origin"></iframe>' : "";
+    return;
+  }
+  if (t.dataset.ask) { askAbout(t.dataset.ask); return; }
+  if ("dismissArrival" in t.dataset) { arrival.dismissed = true; renderArtist(state.artist); $("#artist-page").focus(); return; }
+  if ("savedOnly" in t.dataset) { state.savedOnly = !state.savedOnly; renderCatChips(); renderEvents(); return; }
+  if (t.dataset.gotoEvent) { state.venue = null; state.cat = "All"; state.savedOnly = true; renderCatChips(); renderEvents(); renderVenues(); setSceneView("events"); go("scene"); return; }
+  if (t.dataset.story) { go("story-" + t.dataset.story); return; }
+  if (t.dataset.artist) { go("artist-" + t.dataset.artist); return; }
+  if (t.dataset.go) { go(t.dataset.go); return; }
+  if (t.dataset.sec) { state.section = t.dataset.sec; renderSectionChips(); renderStoryList(); return; }
+  if (t.dataset.cat) { state.cat = t.dataset.cat; renderCatChips(); renderEvents(); return; }
+  if (t.dataset.venue) { setVenue(t.dataset.venue); return; }
+  if (t.dataset.venueLink) { state.venue = t.dataset.venueLink; state.cat = "All"; renderCatChips(); renderEvents(); renderVenues(); setSceneView("events"); return; }
+  if ("clearVenue" in t.dataset) { state.venue = null; renderEvents(); renderVenues(); return; }
+  if (t.dataset.view) { setSceneView(t.dataset.view); return; }
+  if (t.dataset.proto) { toast(`Prototype: on the real site this ${t.dataset.proto}.`); return; }
+  if (t.id === "theme-toggle") { setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark", true); return; }
+  if (t.id === "form-reset") { $("#inquiry").reset(); $("#inquiry").hidden = false; $("#form-ok").hidden = true; $("#f-name").focus(); }
+});
+
+$("#inquiry").addEventListener("submit", e => {
+  e.preventDefault();
+  const f = e.currentTarget, missing = $$("[required]", f).filter(i => !i.value.trim());
+  $$("[required]", f).forEach(i => i.setAttribute("aria-invalid", String(!i.value.trim())));
+  if (missing.length) { missing[0].focus(); toast("Add your name, business and a way to reach you."); return; }
+  f.hidden = true; $("#form-ok").hidden = false; $("#form-reset").focus();
+});
+
+$("#f-slot").addEventListener("change", () => { $("#slot-hint").hidden = true; });
+window.addEventListener("hashchange", route);
+
+/* ---------- boot ---------- */
+let saved = null; try { saved = localStorage.getItem("thephilly-theme"); } catch (e) {}
+setTheme(saved === "dark" || saved === "light" ? saved : (document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light"), false);
+applyBrand(); renderNav(); renderIssue();
+renderSectionChips(); renderStoryList(); renderReader(state.story);
+renderArtists(); renderArtist(state.artist);
+renderCatChips(); renderEvents(); renderVenues();
+renderThreads(); renderAdvertise(); renderForYou();
+applyTorn();
+{ const h0 = decodeURIComponent(location.hash.slice(1)); if (h0.startsWith("artist-")) arrival.slug = h0.slice(7); }
+route();
+})();
+</script>
+
+</body>
+</html>
