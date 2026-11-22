@@ -38,13 +38,14 @@ not shared-workspace adoption or legacy tool parity.
 
 - **Workspace.** A 12 × 8 snapping grid. Panels never overlap and respect their minimum size. Long content scrolls inside its panel; the page never scrolls.
 - **Add panel.**
-  - Tapping empty space, or pressing **Add panel**, opens the chooser near that spot. It works in two steps. First it shows search and one tile per group: the Common / Planning / Utilities categories, or one tile per application in the AV Suite shell, with the active application marked. Picking a tile replaces the tiles with that group's large labelled choices and a preview of the space the panel will take. **Back**, or Escape, returns to the tiles. Search lists matches from every group at once. A group with no panels gets no tile, and a console with a single group skips the first step.
+  - Tapping empty space, or pressing **Add panel**, opens the chooser near that spot. It works in two steps. First it shows search and one tile per group: the Common / Planning / Utilities categories, or one tile per application in the AV Suite shell, with the active application marked. Picking a tile replaces the tiles with that group's large labelled choices and a preview of the space the panel will take. **Back**, or Escape, returns to the tiles. Search lists matches from every group at once. A group with no panels gets no tile, and a console with a single group skips the first step. A console that supplies group icons (`groupIcons`) gets the tiles as a two-column grid of icon tiles; the AV Suite shell passes each department's Rail icon from the registry.
   - The chooser uses the height below where it opened. On phones it can use the full available height; on short screens the decorative placement preview is omitted to keep choices reachable. A long group scrolls inside its list.
   - With the layout unlocked, dragging across empty space draws the rectangle first.
   - When nothing fits, the chooser offers **Replace**, **Split** or **New view**. It never covers a panel silently.
 - **Panel menu.** Change panel, Move and size (explicit grid commands), Split side by side / top and bottom, Maximize / Restore, and Close panel.
   - Dragging uses the title bar; resizing uses the corner handle. Both work only while unlocked on a desktop layout.
   - Close removes the view of the data. It never deletes records or turns off a module.
+  - Options menus (panel and view) have one dismiss control, the ✕ in the title row. A press outside the menu, Escape, or pressing its trigger again also closes it. There is no separate Close row, so **Close panel** is the only item that says close.
 - **Layout lock.** Lock stops dragging and resizing. Menu commands still work, and the lock state is always visible.
 - **Panel buttons.** These bring a panel forward. They focus it in the current view, open the stored view that holds it, or place it in free space. AV Video keeps its earlier labels (Signal flow, Patch, Displays, Checks, Project) and adds Cameras and Playback so existing links and habits still land on the same work.
 - **Views.**

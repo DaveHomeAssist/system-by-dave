@@ -346,3 +346,24 @@ be installed either, `main.tsx` shows a plain message instead of a blank page.
 
 The stand-in is deliberately not an in-memory store: a save that appeared to
 work and vanished on reload would be worse than a save that says it failed.
+
+## Chooser tiles and one Close, November 22, 2026
+
+Dave asked for three things after using the console on a show plan.
+
+- **The chooser's first step is a grid of icon tiles.** He preferred the home
+  page's department grid to the chooser's plain list of names. The twelve
+  groups now show as two columns of tiles with an icon and the name in caps.
+  A department's icon is the one the Rail shows for it, read from
+  `js/sbd-registry.js` by Rail identity (`groupIcons` in `packs.ts`); Tools and
+  Gear 3D carry their own. Names stay on one line down to a 320 px screen, and
+  on a short screen the tiles scroll inside the chooser. Search, Back, Escape
+  and the marked current group are unchanged.
+- **Options menus have one Close.** The panel menu ended with **Close panel**
+  directly above a full-width **Close** that only dismissed the menu. That row
+  is gone from the panel and view menus. The title row carries a ✕, and a press
+  outside the menu, Escape or the trigger again also closes it. The Add panel
+  chooser keeps its Close button; it has no other item with that word.
+- **Signal Flow's Add device offers gear.** See `docs/av-video.md`.
+
+Panel types, views, layouts and saved documents are unchanged.

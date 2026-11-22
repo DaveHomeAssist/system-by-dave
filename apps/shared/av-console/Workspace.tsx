@@ -78,10 +78,13 @@ type Props = {
   /* Chooser group marked as the current one on its first step: an
      application name when the library carries `app`, otherwise a category. */
   defaultGroup?: string;
+  /* Icons for the chooser's group tiles, keyed by group name: path data on a
+     24 by 24 grid, drawn as strokes. Groups show as icon tiles when supplied. */
+  groupIcons?: Record<string, string[]>;
   compact?: boolean;
 };
 
-export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, viewTabs, extraViews, defaultGroup: currentGroup, compact = false }: Props) {
+export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, notify, viewTabs, extraViews, defaultGroup: currentGroup, groupIcons, compact = false }: Props) {
   const grid = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLElement | null>(null);
@@ -114,6 +117,21 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     const t = trigger.current; trigger.current = null;
     if (t && document.contains(t)) setTimeout(() => t.focus(), 0);
   }, []);
+  /* A pointer press outside an options menu dismisses it and leaves focus where
+     the press landed. The menu's own trigger is left to its click, which toggles. */
+  const menuOpen = Boolean(menu);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const outside = (e: PointerEvent) => {
+      const target = e.target as Node;
+      if (menuRef.current?.contains(target) || trigger.current?.contains(target)) return;
+      setMenu(null);
+      // Empty workspace space closes through gridDown, which hands focus back to the trigger.
+      if (target !== grid.current) trigger.current = null;
+    };
+    document.addEventListener("pointerdown", outside, true);
+    return () => document.removeEventListener("pointerdown", outside, true);
+  }, [menuOpen]);
   /* Two-step chooser: a group tile opens its panels in place of the tiles, and
      Back (or Escape) returns to the tiles with focus on the group just left. */
   const focusIn = (selector: string) => setTimeout(() => chooserDialog.current?.querySelector<HTMLElement>(selector)?.focus(), 0);
@@ -238,6 +256,9 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
 
   /* Panel menu commands. */
   const menuPanel = menu?.kind === "panel" ? panels.find(p => p.id === menu.id) : undefined;
+  const menuPanelName = menuPanel ? def(menuPanel.type)?.name || "Panel" : "Panel";
+  const menuTitle = !menu ? "" : menu.kind === "panel" ? (menu.sub === "move" ? `Move and size · ${menuPanelName}` : menuPanelName)
+    : menu.sub === "rename" ? "Rename view" : `${view?.name || "View"}${changed ? " · changed" : ""}`;
   function doNudge(d: Partial<Rect>) {
     if (!menuPanel) return; const x = def(menuPanel.type) || { minW: 1, minH: 1 };
     const r = nudge(menuPanel, panels, d, { w: x.minW, h: x.minH });
@@ -310,7 +331,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
         { name: "Panels", closeOnAction: true, description: "Recall panels in this topic", content: quickBar },
         { name: "Layout", closeOnAction: true, description: "Lock the arrangement or focus a panel", content: <><button type="button" aria-pressed={locked} onClick={() => { ws.setLocked(!locked); notify(locked ? "Layout unlocked." : "Layout locked."); }}>{locked ? "Locked" : "Unlocked"}</button><button type="button" onClick={fullScreen}>Full screen focused panel</button></> },
       ]} /> : viewBar}
-      <button type="button" className="console-icon" aria-label="View options" aria-haspopup="menu" aria-expanded={menu?.kind === "view"} onClick={e => { trigger.current = e.currentTarget; const p = at(e.currentTarget); setChooser(null); setMenu({ kind: "view", id: ws.viewId, ...clampPos(p.left, p.top, 260, 340) }); }}>▾</button>
+      <button type="button" className="console-icon" aria-label="View options" aria-haspopup="menu" aria-expanded={menu?.kind === "view"} onClick={e => { if (menu?.kind === "view") { close(); return; } trigger.current = e.currentTarget; const p = at(e.currentTarget); setChooser(null); setMenu({ kind: "view", id: ws.viewId, ...clampPos(p.left, p.top, 280, 340) }); }}>▾</button>
       {mode !== "phone" && !compact && quickBar}
       <div className="console-tools">
         <button type="button" onClick={addPanelButton}>＋ Add panel</button>
@@ -332,7 +353,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
           <header className={`console-bar ${canDrag ? "can-drag" : ""}`} onPointerDown={dragStart(p, "move")} onPointerMove={dragMove} onPointerUp={dragEnd}>
             <strong className="console-title">{out.title || d.name}</strong>{out.context && <span className="console-context">{out.context}</span>}
             <span className="console-bar-actions">{out.actions}
-              <button type="button" className="console-icon" aria-label={`${d.name} options`} aria-haspopup="menu" aria-expanded={menu?.kind === "panel" && menu.id === p.id} onClick={e => { trigger.current = e.currentTarget; const r = e.currentTarget.getBoundingClientRect(); setChooser(null); setMenu({ kind: "panel", id: p.id, ...clampPos(r.right - 260, r.bottom + 6, 260, 380) }); }}>⋯</button>
+              <button type="button" className="console-icon" aria-label={`${d.name} options`} aria-haspopup="menu" aria-expanded={menu?.kind === "panel" && menu.id === p.id} onClick={e => { if (menu?.kind === "panel" && menu.id === p.id) { close(); return; } trigger.current = e.currentTarget; const r = e.currentTarget.getBoundingClientRect(); setChooser(null); setMenu({ kind: "panel", id: p.id, ...clampPos(r.right - 280, r.bottom + 6, 280, 380) }); }}>⋯</button>
               {!compact && mode !== "phone" && <button type="button" className="console-icon" aria-label={isMax ? `Restore ${d.name}` : `Maximize ${d.name}`} onClick={() => toggleMax(p.id)}>{isMax ? "▭" : "▢"}</button>}
             </span>
           </header>
@@ -355,7 +376,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
       </> : <>
         <h3>{compact && group && !query ? group : chooser.mode === "replace" ? "Change panel" : "Add panel"}</h3>
         <input type="search" aria-label="Search panels" placeholder="Search panels…" value={query} autoFocus onChange={e => setQuery(e.target.value)} />
-        {!query && !activeGroup ? <div className="console-groups" role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" data-group={g} aria-current={g === currentGroup || undefined} onClick={() => openGroup(g)}>{g}</button>)}</div> : <>
+        {!query && !activeGroup ? <div className={`console-groups ${groupIcons ? "is-tiles" : ""}`} role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" data-group={g} aria-current={g === currentGroup || undefined} onClick={() => openGroup(g)}>{groupIcons?.[g] && <svg className="console-group-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">{groupIcons[g].map((d, i) => <path key={i} d={d} />)}</svg>}<span>{g}</span></button>)}</div> : <>
           {drilled && <div className="console-sub"><button type="button" className="console-back" onClick={backToGroups}><span aria-hidden="true">‹ </span>Back</button><strong>{activeGroup}</strong></div>}
           <div className="console-choices">
             {choices.length ? choices.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}{panels.some(p => p.type === d.type) && <small> · open</small>}</strong><span>{d.description}</span></button>) : <p>No panels match.</p>}
@@ -367,15 +388,14 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     </dialog>}
 
     {menu && <div ref={menuRef} className="console-pop console-menu" role="menu" aria-orientation="vertical" onKeyDown={menuKeyDown} aria-label={menu.kind === "panel" ? "Panel options" : "View options"} style={{ left: menu.left, top: menu.top }}>
+      <div className="console-menu-head"><p className="console-menu-title">{menuTitle}</p><button type="button" className="console-menu-x" aria-label="Close menu" onClick={close}><span aria-hidden="true">✕</span></button></div>
       {menu.kind === "panel" && menuPanel && (menu.sub === "move" ? <>
-        <p className="console-menu-title">Move and size · {def(menuPanel.type)?.name}</p>
         <div className="console-pad">
           <button type="button" role="menuitem" aria-label="Move left" onClick={() => doNudge({ x: -1 })}>←</button><button type="button" role="menuitem" aria-label="Move up" onClick={() => doNudge({ y: -1 })}>↑</button><button type="button" role="menuitem" aria-label="Move down" onClick={() => doNudge({ y: 1 })}>↓</button><button type="button" role="menuitem" aria-label="Move right" onClick={() => doNudge({ x: 1 })}>→</button>
           <button type="button" role="menuitem" onClick={() => doNudge({ w: 1 })}>Wider</button><button type="button" role="menuitem" onClick={() => doNudge({ w: -1 })}>Narrower</button><button type="button" role="menuitem" onClick={() => doNudge({ h: 1 })}>Taller</button><button type="button" role="menuitem" onClick={() => doNudge({ h: -1 })}>Shorter</button>
         </div>
         <button type="button" role="menuitem" onClick={() => setMenu({ ...menu, sub: undefined })}>Done</button>
       </> : <>
-        <p className="console-menu-title">{def(menuPanel.type)?.name}</p>
         <button type="button" role="menuitem" onClick={() => { const pos = { left: menu.left - 200, top: menu.top }; setMenu(null); openChooser({ mode: "replace", panelId: menuPanel.id }, pos.left, pos.top); }}>Change panel…</button>
         {mode === "desktop" && <button type="button" role="menuitem" onClick={() => setMenu({ ...menu, sub: "move" })}>Move and size…</button>}
         {mode === "desktop" && <button type="button" role="menuitem" onClick={() => doSplit("h")}>Split side by side</button>}
@@ -387,7 +407,6 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
         <label className="console-rename">View name<input value={rename} autoFocus onChange={e => setRename(e.target.value)} onKeyDown={e => { if (e.key === "Enter") commitRename(); }} /></label>
         <button type="button" role="menuitem" onClick={commitRename}>Rename</button>
       </> : <>
-        <p className="console-menu-title">{view.name}{changed ? " · changed" : ""}</p>
         <button type="button" role="menuitem" onClick={storeUpdate} disabled={!changed}>Update “{view.name}”</button>
         <button type="button" role="menuitem" onClick={storeNew}>Store as new view</button>
         <button type="button" role="menuitem" onClick={revert} disabled={!changed}>Revert to stored</button>
@@ -396,7 +415,6 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
         <button type="button" role="menuitem" className="danger" onClick={remove} disabled={ws.views.length < 2}>Delete view</button>
         <p className="console-menu-note">Views store arrangements only. Deleting one never deletes records.</p>
       </>)}
-      <button type="button" className="console-close" onClick={close}>Close</button>
     </div>}
   </div>;
 }

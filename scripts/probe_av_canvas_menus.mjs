@@ -25,7 +25,18 @@ try {
  await page.getByRole('button',{name:/^Diagram/}).click();
  await page.locator('dialog[open]').getByRole('button',{name:/^Devices/}).click();
  await page.locator('dialog[open]').getByRole('button',{name:'Add device',exact:true}).click();
- await page.getByLabel('Device name',{exact:true}).fill('Synthetic camera');
+ // Gear choices: device types, then the Gear Reference library. One fills the name and role; a typed name is kept.
+ const addDevice=page.getByRole('dialog',{name:'Add device',exact:true});
+ const gear=addDevice.getByLabel('Gear'), deviceName=addDevice.getByLabel('Device name',{exact:true}), deviceRole=addDevice.getByLabel('Device role');
+ await gear.locator('optgroup[label^="Gear Reference"] option').first().waitFor({state:'attached'});
+ assert.deepEqual(await gear.locator('optgroup').evaluateAll(groups=>groups.slice(0,4).map(group=>group.label)),['Sources','Converters','Routing and processing','Destinations']);
+ await gear.selectOption({label:'BirdDog P240'});
+ assert.equal(await deviceName.inputValue(),'BirdDog P240'); assert.equal(await deviceRole.inputValue(),'source');
+ await gear.selectOption({label:'Projector'});
+ assert.equal(await deviceName.inputValue(),'Projector 1'); assert.equal(await deviceRole.inputValue(),'destination');
+ await deviceName.fill('Synthetic camera');
+ await gear.selectOption({label:'Camera'});
+ assert.equal(await deviceName.inputValue(),'Synthetic camera','a typed name is kept'); assert.equal(await deviceRole.inputValue(),'source');
  await page.getByRole('button',{name:'Add to diagram',exact:true}).click();
  await page.locator('.react-flow__node').waitFor();
  assert.equal(await page.locator('.react-flow__attribution').count(),0);
@@ -48,9 +59,25 @@ try {
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight));
  }
  await page.setViewportSize({width:1051,height:881});
- await page.getByRole('button',{name:'Signal Flow options',exact:true}).click();
+ // An options menu has one dismiss control, in its title row; Close panel is the only item that says close.
+ const options=page.getByRole('button',{name:'Signal Flow options',exact:true}), menu=page.getByRole('menu',{name:'Panel options',exact:true});
+ await options.click();
+ assert.deepEqual(await menu.getByRole('button').evaluateAll(buttons=>buttons.map(button=>button.getAttribute('aria-label')||button.textContent)),['Close menu']);
+ assert.deepEqual(await menu.getByRole('menuitem').evaluateAll(items=>items.map(item=>item.textContent).filter(name=>/close/i.test(name))),['Close panel']);
+ assert.ok(await menu.evaluate(element=>{const box=element.getBoundingClientRect();return box.left>=0&&box.top>=0&&box.right<=innerWidth&&box.bottom<=innerHeight;}),'menu stays inside the screen');
+ await options.click(); assert.equal(await menu.count(),0,'the trigger closes its own menu');
+ await options.click(); await menu.waitFor();
+ await page.locator('.suite-header h1').click(); assert.equal(await menu.count(),0,'a press outside closes the menu');
+ await options.click(); await menu.getByRole('button',{name:'Close menu',exact:true}).click(); assert.equal(await menu.count(),0);
+ await page.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Signal Flow options');
+ await options.click();
  await page.getByRole('menuitem',{name:'Change panel…',exact:true}).click();
  const chooser=page.getByRole('dialog',{name:'Add panel',exact:true});
+ // The first step is a two-column grid of icon tiles, one per group.
+ const tiles=chooser.getByRole('group',{name:'Panel categories'}).getByRole('button');
+ assert.equal(await tiles.count(),12);
+ assert.ok(await tiles.evaluateAll(buttons=>buttons.every(button=>button.querySelector('svg path')&&button.getBoundingClientRect().height>=44&&button.scrollWidth<=button.clientWidth+1)),'every group tile has its icon and fits its name');
+ assert.equal(await chooser.getByRole('group',{name:'Panel categories'}).evaluate(group=>getComputedStyle(group).gridTemplateColumns.split(' ').length),2);
  await chooser.getByRole('button',{name:'Lighting',exact:true}).click();
  assert.equal(await chooser.getByRole('group',{name:'Panel categories'}).count(),0);
  assert.ok(await chooser.locator('.console-choices button').count()>0);

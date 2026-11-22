@@ -90,6 +90,31 @@ The release gates run as parallel jobs in `.github/workflows/deploy-pages.yml`
    repository's own Pages workflow deploys its push; each key can write only its
    own repository. Unchanged content produces no commit.
 
+### When GitHub loses sight of the Pages artifact
+
+GitHub's Pages action sometimes stops with "No artifacts named github-pages were
+found" a second after the upload step reported success. It reads GitHub's own
+artifact service, which does not always list a new artifact straight away; the
+REST artifact list shows it the whole time, which is why the REST wait in the
+destination workflows does not prevent it. On 2026-11-21 it failed five of six
+runs here and runs in `housevideo` and `avbydave`. Nothing in the site causes it
+and a fresh attempt works, so the pipeline makes that attempt itself (since
+2026-11-22):
+
+- **systembydave.com** (`deploy` job): the Pages step is tried up to three
+  times. The second try asks again after 20 seconds. The third uploads the same
+  staged `_site` under a new artifact name and deploys that. The job is green
+  when any try publishes, and the two domain publishes run only then
+  (`steps.pages.outputs.deployed`).
+- **Destination repositories** (`scripts/publish_domain_site.sh`): when a
+  destination's Pages run for the pushed commit does not succeed, the script
+  pushes an empty commit, which starts a new run, and waits for that one. Up to
+  three runs in all (`PUBLISH_ATTEMPTS`). The site's files do not change, and
+  `source.json` still names the same source commit.
+
+A real failure still fails: three tries that all fail leave the job red, and
+the walk still stops the release before any redirect changes.
+
 Each staged site gets its own `index.html` (home page or redirect), `404.html`,
 `robots.txt`, `CNAME`, `source.json` (source commit and artifact digest) and
 `transfer.html`.

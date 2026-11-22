@@ -5,7 +5,7 @@ import { ConsoleWorkspace, useConsoleWorkspace } from "../../shared/av-console/W
 import { readLayout, writeLayout, type LayoutState } from "../../shared/av-console/drafts";
 import type { Panel, View } from "../../shared/av-console/layout";
 import { CONTEXT_KEYS, showContext, type Pack, type PackHost } from "../../shared/av-console/pack";
-import { PACKS, SPECIALISTS, specialistHref } from "./packs";
+import { groupIcons, PACKS, SPECIALISTS, specialistHref } from "./packs";
 import { storageState } from "./storage";
 import { appOf, BLANK_VIEW, defaultViews, LAYOUT_KEY, loadViews, nativePanels, packLibrary, saveViews, shortOf, specialistLibrary, SUITE_PREFIX, TOOL_PREFIX, viewApp, viewTool } from "./views";
 
@@ -73,6 +73,7 @@ export function App() {
   // PACKS is a module constant, so this hook order never changes between renders.
   const packs: Pack[] = PACKS.map(def => def.use(hosts[def.id]));
   const library = useMemo(() => [...PACKS.flatMap(packLibrary), ...specialistLibrary(), ...GEAR_PANELS], []);
+  const chooserIcons = useMemo(() => groupIcons(), []);
   const [initialViews] = useState(() => loadViews(localStorage, defaultViews(PACKS)));
   const [views, setViews] = useState<View[]>(initialViews.views);
   const [layoutPersist] = useState(() => {
@@ -240,7 +241,7 @@ export function App() {
     <main id="workspace" tabIndex={-1} className="workspace-host">
       {storageState === "blocked" && <div className="console-notice" role="note">This browser is blocking site storage, so nothing can be saved here. Your work lasts for this visit only. Export anything you need before you leave.</div>}
       {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Add panels here; the saved view changes only when you store or update it.</div>}
-      <ConsoleWorkspace compact ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : undefined)} />
+      <ConsoleWorkspace compact ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : undefined)} groupIcons={chooserIcons} />
     </main>
     <footer role="status" className={`message ${status.error || activePack?.problem ? "error" : ""}`}>{[...(activePack?.recovery.errors || []), status.app ? `${status.app}: ${status.text}` : status.text].join(" ")}</footer>
     {packs.map(pack => <div key={pack.id} data-pack-dialogs={pack.id}>{pack.dialogs}</div>)}

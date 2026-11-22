@@ -26,8 +26,24 @@ export const SPECIALISTS: Specialist[] = [
   { id: "stageplotter", label: "StagePlotter", description: "Room layouts with screens, cameras, speakers, mics, power and cable paths.", fallbackHref: "stage-plot.html", minW: 5, minH: 4 },
 ];
 
-type Registry = { tools?: { id: string; href: string }[] };
+type Registry = { tools?: { id: string; href: string }[]; consoles?: { id: string; icon?: string[] }[] };
 declare global { interface Window { SBD_REGISTRY?: Registry } }
+
+/* Chooser tile icons, keyed by group name. A department uses the icon the Rail
+   already shows for it (js/sbd-registry.js); the two groups without a Rail
+   identity carry their own. */
+const EXTRA_GROUP_ICONS: Record<string, string[]> = {
+  "Tools": ["M4 4h16v16H4z", "M8 9h8", "M8 13h5"],
+  "Gear 3D": ["M6 4v16", "M12 4v16", "M18 4v16", "M4 9h4", "M10 15h4", "M16 8h4"],
+};
+export function groupIcons(registry: Registry | undefined = typeof window === "undefined" ? undefined : window.SBD_REGISTRY, packs: Pick<PackDef, "label" | "consoleId">[] = PACKS): Record<string, string[]> {
+  const icons: Record<string, string[]> = { ...EXTRA_GROUP_ICONS };
+  for (const pack of packs) {
+    const icon = registry?.consoles?.find(entry => entry.id === pack.consoleId)?.icon;
+    if (icon?.length) icons[pack.label] = icon;
+  }
+  return icons;
+}
 
 export function specialistHref(tool: Specialist) {
   const registered = window.SBD_REGISTRY?.tools?.find(entry => entry.id === tool.id)?.href;
