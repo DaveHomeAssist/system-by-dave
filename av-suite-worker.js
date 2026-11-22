@@ -9,6 +9,7 @@
 importScripts('./js/sbd-registry.js');
 
 // Offline recovery: return directly to the cached native console.
+// November 22: the /console/ entry reopens from the same cached shell as /av/.
 // November 3: refresh the Throwline inspection viewer with this cache generation.
 // November 12: add the Equipment Lab projector package to this cache generation.
 // November 14: report optional assets that failed to cache, and request persistent storage.
@@ -21,6 +22,8 @@ function canonicalUrl(requestUrl){
   var url=new URL(requestUrl);
   url.search='';
   url.hash='';
+  // The AV destination stages the same shell at both addresses, without a second cache entry.
+  if(url.pathname==='/console/'||url.pathname==='/console/index.html') return new URL('av/index.html',self.registration.scope).href;
   // Directory routes use the manifest's index entry; /av/ must reopen the
   // same cached shell that the readiness check verified as /av/index.html.
   if(url.pathname.endsWith('/')&&url.pathname!==new URL('./',self.registration.scope).pathname){

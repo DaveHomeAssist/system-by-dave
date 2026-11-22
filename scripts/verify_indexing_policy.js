@@ -86,7 +86,9 @@ const robots = read('robots.txt');
 // The Projctl show backup page adds one noindex relay role page, apps/projctl/public/show.html (2026-11-18).
 // The Projctl power operator page adds one noindex relay page (apps/projctl/public/power.html).
 // The Philly prototype (thephilly/, noindex, private working prototype) adds one.
-if (unlisted.length !== 220) fail(`Expected 220 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// November 22 moves the AV destination sitemap entry to the generated /console/ route.
+// The existing /av/ source shell now has cross-domain canonical coverage, not sitemap membership.
+if (unlisted.length !== 221) fail(`Expected 221 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);

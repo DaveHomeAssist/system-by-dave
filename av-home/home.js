@@ -49,6 +49,8 @@
     var toggle = document.getElementById('themeToggle');
     var barAction = document.getElementById('barAction');
     var briefSend = document.getElementById('briefSend');
+    var barActionLabel = document.getElementById('barActionLabel');
+    var consoleHref = barAction && barAction.getAttribute('href');
 
     function showTab(id, moveFocus) {
       root.setAttribute('data-hp-tab', id);
@@ -56,8 +58,11 @@
         if (link.getAttribute('href') === '#' + id) link.setAttribute('aria-current', 'true');
         else link.removeAttribute('aria-current');
       });
-      /* On the Brief screen the phone action bar sends the brief; elsewhere it opens that screen. */
-      if (barAction && briefSend) barAction.setAttribute('href', id === 'brief' ? briefSend.getAttribute('href') : '#brief');
+      /* Keep the primary phone action on the console until someone chooses the Brief tab. */
+      if (barAction && barActionLabel && briefSend) {
+        barAction.setAttribute('href', id === 'brief' ? briefSend.getAttribute('href') : consoleHref);
+        barActionLabel.textContent = id === 'brief' ? 'Send the show brief' : 'Get behind the console';
+      }
       if (main) main.scrollTop = 0;
       window.scrollTo(0, 0);
       if (moveFocus) {

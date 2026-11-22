@@ -23,7 +23,8 @@
           controller.postMessage({type:'SBD_OFFLINE_VERSION'},[channel.port2]);
         });
         if(!info||info.version!==(global.AVWorkspaceVersion||(global.SBD_REGISTRY&&global.SBD_REGISTRY.version)))return false;
-        const assets=[new URL(location.pathname+(location.pathname.endsWith('/')?'index.html':''),location.origin).href,...[...document.querySelectorAll('script[src],link[rel=stylesheet]')].map(el=>el.src||el.href)];
+        const entry=/^\/console\/(?:index\.html)?$/.test(location.pathname)?'/av/index.html':location.pathname+(location.pathname.endsWith('/')?'index.html':'');
+        const assets=[new URL(entry,location.origin).href,...[...document.querySelectorAll('script[src],link[rel=stylesheet]')].map(el=>el.src||el.href)];
         if(isThrowline)assets.push(new URL('ProjectorThrow/throwline-scene-state.js',base).href);
         else if(isLed)assets.push(...['data/led-cabinet-catalog.v1.json','ProjectorThrow/vendor/three/three.module.min.js','ProjectorThrow/vendor/three/three.core.min.js','ProjectorThrow/vendor/three/addons/controls/OrbitControls.js'].map(path=>new URL(path,base).href));
         const cache=await caches.open(info.cache);

@@ -43,7 +43,7 @@ for (const destination of ['script', 'style']) {
   });
 }
 
-for (const route of ['av/', 'av/?app=calculator', 'av/index.html?app=calculator']) {
+for (const route of ['av/', 'av/?app=calculator', 'av/index.html?app=calculator', 'console/', 'console/?app=calculator#workspace', 'console/index.html?app=calculator']) {
   test(`prepared console ${route} reopens from its index cache offline`, async () => {
     const listeners = {}, index = 'https://example.test/av/index.html';
     const context = {
@@ -140,7 +140,7 @@ test('install precaches every local Rail asset in the bumped cache generation', 
     URL, Request, Response, Promise,
     importScripts: () => {},
     caches: { open: async name => {
-      assert.equal(name, 'sbd-av-suite-v20261121-site-home');
+      assert.equal(name, 'sbd-av-suite-v20261122-console-entry');
       return cache;
     } },
     fetch: async () => new Response('ok'),

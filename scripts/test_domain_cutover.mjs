@@ -72,7 +72,9 @@ try {
     execFileSync(process.execPath, [path.join(root, 'scripts/stage_domain_sites.mjs'), '--out', temporary, '--site-root', sourceRoot, '--simulate', '--source-origin', source,
       ...sites.flatMap(site => ['--site-origin', `${site.id}=${site.origin}`])], { cwd: root, stdio: 'pipe' });
   }
-  browser = await chromium.launch({ headless: true, ...(process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANNEL } : {}) });
+  browser = await chromium.launch({ headless: true, ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH
+    ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH }
+    : process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANNEL } : {}) });
 
   async function test(name, fn) {
     if (process.env.CUTOVER_FILTER && !name.includes(process.env.CUTOVER_FILTER)) return;
@@ -458,6 +460,45 @@ try {
     assert.ok(avStorageKeys.includes('sbd.avVideo.v1'), 'AV Video must participate in cross-domain backup and restore');
     assert.ok(['sbd.avVideo.draft.v1', 'sbd.avVideo.layout.v1'].every(key => avStorageKeys.includes(key)), 'AV Video drafts and layout travel with its plan');
     assert.ok(['sbd.showOps.draft.v1', 'sbd.showOps.layout.v1'].every(key => avStorageKeys.includes(key)), 'Show Ops drafts and layout travel with its document');
+  });
+
+  await test('AV console entry is primary and preserves both console URLs and browser storage', async (page, context) => {
+    const site = sites.find(entry => entry.id === 'avbydave');
+    const origin = site.origin;
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(origin + '/');
+    const cta = page.locator('#overview').getByRole('link', { name: 'Get behind the console', exact: true });
+    assert.equal(await cta.getAttribute('href'), '/console/');
+    assert.equal(await page.locator('#overview').getByRole('link', { name: 'Send the show brief', exact: true }).getAttribute('href'), '#brief');
+    await cta.click();
+    await page.waitForURL(origin + '/console/');
+    await page.locator('.suite-header h1').waitFor();
+    await page.goto(origin + '/av/?app=show-control#workspace');
+    await page.locator('.suite-app[data-active-app="show-control"]').waitFor();
+    await page.evaluate(() => localStorage.setItem('sbd.showboard.console-entry-fixture', JSON.stringify({ label: 'Disposable record' })));
+    await page.goto(origin + '/console/?app=show-control#workspace');
+    await page.locator('.suite-app[data-active-app="show-control"]').waitFor();
+    assert.equal(page.url(), origin + '/console/?app=show-control#workspace');
+    assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'), 'https://avbydave.com/console/');
+    await page.reload();
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('sbd.showboard.console-entry-fixture'))), { label: 'Disposable record' });
+    await page.goto(origin + '/av/?app=show-control#workspace');
+    await page.locator('.suite-app[data-active-app="show-control"]').waitFor();
+    assert.equal(page.url(), origin + '/av/?app=show-control#workspace');
+    assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'), 'https://avbydave.com/console/');
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(origin + '/');
+    const phoneCta = page.locator('#barAction');
+    assert.equal(await phoneCta.textContent(), 'Get behind the console');
+    assert.equal(await phoneCta.getAttribute('href'), '/console/');
+    assert.equal(await phoneCta.isVisible(), true);
+    await page.getByRole('link', { name: 'Brief', exact: true }).click();
+    await page.waitForURL(origin + '/#brief');
+    assert.equal(await phoneCta.textContent(), 'Send the show brief');
+    assert.match(await phoneCta.getAttribute('href'), /^mailto:avbydave@gmail\.com\?/);
+    const manifest = await (await context.request.get(origin + '/manifest.json')).json();
+    assert.equal(manifest.start_url, './av/');
+    assert.ok(manifest.shortcuts.some(({ url }) => url === './av/?app=show-control'));
   });
 
   await test('AV not-found page keeps theme and recovery links usable at short heights', async page => {

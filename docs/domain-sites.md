@@ -9,7 +9,7 @@ GitHub Pages repository.
 | --- | --- | --- | --- | --- |
 | `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/ursa-broadcast-g2/`, `/backfocus/`, `/camera-sim/` | 2026-09-18 |
 | `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | 2026-09-20; authenticated walk acceptance pending |
-| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Home page at `/` (from `av-home/`), AV by Dave console at `/av/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
+| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Home page at `/` (from `av-home/`), AV by Dave console at `/console/` (also available at legacy `/av/`), `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
 and the browser storage its tools own. AV by Dave pages come from
@@ -19,13 +19,15 @@ avbydave.com without editing the config. Paths are unchanged on the new domains:
 redirects to the site's home (`/fmp/` or `/fmpwalk/`). AV by Dave serves the
 source-controlled `av-home/index.html` at `/` (since 2026-11-21); the direct
 source path is noindex and canonical to `/`. The console is one part of that
-site at `/av/`, indexable under its own canonical address, and its breadcrumb
-returns to `/`. Former Show Console, Toolbox, sheet and eight original family
+site; `consoleEntry` stages the same shell at `/console/` and `/av/`. Both
+name `/console/` as canonical and only that path is in this domain’s sitemap.
+The breadcrumb returns to `/`. Former Show Console, Toolbox, sheet and eight original family
 routes redirect into the console. The home page's files are in the registry's
 offline list, so a saved copy of `/` opens styled offline; a browser that never
 saved `/` gets the saved console instead. Bookmarks to the bare domain now open
-the home page, one link from the console; `/av/`, the installed app and every
-saved workspace are unchanged. The previous
+the home page, one link from the console. Legacy URLs retain their query and
+fragment, the installed launch/shortcut URLs are unchanged, and both entries
+share the same origin, browser storage and offline shell cache. The previous
 `av-suite-landing.html` was retired (UX-005): it is now a noindex redirect to
 the current home, kept so old links still land, and is no longer cached offline.
 

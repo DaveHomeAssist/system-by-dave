@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const { spawnSync } = require('node:child_process');
-const { siteSitemap, cutoverSites } = require('./domain_sites_lib');
+const { siteSitemap, cutoverSites, publishedConsole } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
@@ -39,10 +39,9 @@ function link(source, rel) {
 function routeFile(url) {
   const parsed = new URL(url);
   const route = parsed.pathname;
-  if (route === '/') {
-    const site = cutoverSites().find((entry) => entry.domain === parsed.hostname && entry.landingPage);
-    return site ? site.landingPage : 'index.html';
-  }
+  const site = cutoverSites().find((entry) => entry.domain === parsed.hostname);
+  if (route === '/') return site?.landingPage || 'index.html';
+  if (site?.consoleEntry && route === '/' + site.consoleEntry.path) return site.consoleEntry.shell;
   if (route.endsWith('/')) return `${route.slice(1)}index.html`;
   return route.slice(1);
 }
@@ -88,7 +87,8 @@ function verifyMetadata(entries) {
       fail(`${file} is missing for sitemap URL ${url}.`);
       return;
     }
-    const source = read(file);
+    const site = cutoverSites().find((entry) => entry.consoleEntry?.shell === file && url === `https://${entry.domain}/${entry.consoleEntry.path}`);
+    const source = site ? publishedConsole(site, read(file)) : read(file);
     if (!/<title>[^<]+<\/title>/i.test(source)) fail(`${file} is missing a nonempty title.`);
     requiredMeta.forEach(([key, value]) => {
       if (!meta(source, key, value)) fail(`${file} is missing ${key}="${value}" metadata.`);

@@ -96,6 +96,7 @@
       "cutover": true,
       "home": "/",
       "landingPage": "av-home/index.html",
+      "consoleEntry": { "path": "console/", "shell": "av/index.html" },
       "registry": true,
       "pages": [
         "av-home/",
