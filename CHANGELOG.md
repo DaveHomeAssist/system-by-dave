@@ -1,5 +1,14 @@
 # Changelog
 
+## November 22, 2026. Add panel: one top bar, nothing covering the options
+
+- Dave: "All of those things could share a single top bar with icons" and "stop covering all the menu options." Opening a group in the Add panel chooser put four rows of furniture around the choices: the title, a full-width search field, a Back row that repeated the group name, and under the list an orange placement map and a full-width Close. On a 580 px high screen about two options were left in view.
+- The chooser is now one bar and the options. The bar holds a back arrow (inside a group), the title or group name, the search field and a close button in one row, 44 px tall. Nothing sits under the options.
+- The placement map is removed. It was a picture of where the panel would land, drawn in the accent colour at the size of a button, and it did nothing when pressed. The dashed outline on the workspace shows the same thing.
+- Choices are in two columns (one on a phone), and the chooser rises from where it opened until its options fit. Measured at twelve sizes from 320 by 568 to 1920 by 1080: every group shows all its options without scrolling, including all ten AV Video panels at 1024 by 580, with one group on two screens as the exception: AV Video's list runs about 10 px past the chooser on a 320 by 568 phone and on a phone held sideways (844 by 390), so its last row is trimmed until scrolled.
+- Tab order follows the bar: search, close, then the options. `scripts/probe_av_canvas_menus.mjs` checks the bar is one row, that nothing but the bar and the options is in the chooser, and that every option is in view.
+- Offline cache generation is `v20261122-chooser-bar`.
+
 ## November 22, 2026. Console menus: one Close, department tiles and gear choices; the publish step retries
 
 - **One Close in the options menus.** The panel menu ended with **Close panel** directly above a full-width **Close** that only dismissed the menu. That second row is gone from the panel and view menus. The title row has a ✕, and a press outside the menu, Escape or the trigger again closes it. The menu's edge clamp now uses its real width (280 px), so it no longer sits 8 px off the right edge at 1024 px.
