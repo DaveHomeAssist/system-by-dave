@@ -359,7 +359,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261122-console-menus',
+    version:'v20261122-chooser-bar',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

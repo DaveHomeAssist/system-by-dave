@@ -366,4 +366,14 @@ Dave asked for three things after using the console on a show plan.
   chooser keeps its Close button; it has no other item with that word.
 - **Signal Flow's Add device offers gear.** See `docs/av-video.md`.
 
+- **The chooser is one top bar and options.** A group used to open under four
+  rows of its own furniture: the title, the search field, a Back row that
+  repeated the group name, then at the bottom an orange placement map and a
+  Close row. On a 580 px high screen that left room for about two options, and
+  the map read as a button that did nothing. Back (an arrow), the name, search
+  and Close now share one bar. The map is gone; the dashed outline on the
+  workspace already shows where the panel lands. Choices sit in two columns,
+  and the chooser rises from where it opened until they fit: all ten AV Video
+  panels show at 1024 by 580.
+
 Panel types, views, layouts and saved documents are unchanged.

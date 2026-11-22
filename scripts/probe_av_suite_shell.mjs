@@ -216,7 +216,7 @@ try {
   assert.equal(await chooser.locator('.console-groups button[aria-current="true"]').textContent(), 'AV Video', 'the active application is marked');
   await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
   assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).count(), 0, 'the other groups leave once one is picked');
-  assert.equal(await chooser.locator('.console-sub strong').textContent(), 'Front Office');
+  assert.equal(await chooser.locator('.console-chooser-bar h3').textContent(), 'Front Office');
   assert.equal(await chooser.locator('.console-choices button').count(), 5, 'every Front Office panel is listed');
   await page.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null); // focus moves to the first panel choice
   await page.keyboard.press('Escape');
@@ -478,8 +478,9 @@ try {
         await addTrigger.click();
         const addChooser = addPage.getByRole('dialog', { name: 'Add panel' });
         await addPage.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Search panels');
+        // Search is the first control in the top bar, so reverse Tab wraps to the last group tile.
         await addPage.keyboard.press('Shift+Tab');
-        assert.equal(await addChooser.getByRole('button', { name: 'Close', exact: true }).evaluate(el => el === document.activeElement), true, 'modal retains reverse Tab focus');
+        assert.equal(await addChooser.locator('.console-groups button').last().evaluate(el => el === document.activeElement), true, 'modal retains reverse Tab focus');
         await addPage.keyboard.press('Tab');
         assert.equal(await addChooser.getByRole('searchbox').evaluate(el => el === document.activeElement), true, 'modal retains forward Tab focus');
         assert.equal(await addChooser.locator('[aria-current]').count(), 0, 'empty Workspace marks no application as current');

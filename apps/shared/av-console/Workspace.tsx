@@ -1,5 +1,5 @@
 import { TopicMenu } from "./TopicMenu";
-import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { LayoutState } from "./drafts";
 import { clone, COLS, deleteView, firstFree, fits, nudge, Panel, PanelDef, Rect, renameView, ROWS, sameLayout, sanitizeView, split, storeAsNew, suggest, trim, updateView, View } from "./layout";
 
@@ -155,7 +155,7 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     };
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
   }, [chooser, menu, drag, draw, close, drilled, backToGroups]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (compact && chooser && !chooserDialog.current?.open) chooserDialog.current?.showModal();
   }, [compact, chooser]);
   /* Options menus take focus on open (or on a sub-page change) unless a field already has it. */
@@ -316,6 +316,18 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
   const choices = query ? ws.library.filter(d => `${d.name} ${d.app || ""} ${d.description}`.toLowerCase().includes(query.toLowerCase()))
     : activeGroup ? ws.library.filter(d => groupOf(d) === activeGroup) : [];
   const ghost = drag?.rect || draw?.rect || (chooser?.rect && chooser.mode !== "replace" ? chooser.rect : undefined);
+  /* The chooser opens where it was asked for and rises when its options need the room, so a
+     group is never cut short while the screen has space above. Phones and short screens place
+     it by stylesheet instead. */
+  const [chooserTop, setChooserTop] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const el = chooserDialog.current;
+    if (!chooser || !el) { setChooserTop(null); return; }
+    const limit = el.style.maxHeight; el.style.maxHeight = "none";
+    const natural = el.offsetHeight; el.style.maxHeight = limit;
+    setChooserTop(Math.max(8, Math.min(chooser.top, window.innerHeight - natural - 8)));
+  }, [chooser, group, query, choices.length, mode, compact]);
+  const popTop = chooser ? chooserTop ?? chooser.top : 0;
 
   const viewBar = <div role="tablist" aria-label={`${label} views`} className="console-views">
         {visibleViewTabs.map(v => <button key={v.id} type="button" role="tab" aria-selected={v.id === ws.viewId} onClick={() => { ws.setViewId(v.id); close(); }}>{v.name}{v.id === ws.viewId && changed && <span className="console-dot" title="Arrangement changed. Store or update the view to keep it." aria-label="arrangement changed" />}</button>)}
@@ -365,26 +377,25 @@ export function ConsoleWorkspace({ ws, label, quick, render, onViewsChange, noti
     </div>
     {mode === "phone" && quickBar}
 
-    {chooser && <dialog ref={chooserDialog} open={compact ? undefined : true} className="console-pop console-chooser" aria-label="Add panel" onKeyDown={chooserKeyDown} onCancel={event => { event.preventDefault(); if (drilled) backToGroups(); else close(); }} style={{ left: chooser.left, top: chooser.top, margin: 0, "--pop-top": `${chooser.top}px` } as React.CSSProperties}>
+    {chooser && <dialog ref={chooserDialog} open={compact ? undefined : true} className="console-pop console-chooser" aria-label="Add panel" onKeyDown={chooserKeyDown} onCancel={event => { event.preventDefault(); if (drilled) backToGroups(); else close(); }} style={{ left: chooser.left, top: popTop, margin: 0, "--pop-top": `${popTop}px` } as React.CSSProperties}>
+      {/* One bar: back, where you are, search and close. Everything below it is options. */}
+      <header className="console-chooser-bar">
+        {drilled && <button type="button" className="console-bar-icon console-back" aria-label="Back" onClick={backToGroups}><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" /></svg></button>}
+        <h3>{chooser.mode === "nospace" ? "No room for another panel" : drilled ? activeGroup : chooser.mode === "replace" ? "Change panel" : "Add panel"}</h3>
+        {chooser.mode !== "nospace" && <label className="console-search"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z" /><path d="M15.5 15.5l4.5 4.5" /></svg><input type="search" aria-label="Search panels" placeholder="Search" value={query} autoFocus onChange={e => setQuery(e.target.value)} /></label>}
+        <button type="button" className="console-bar-icon console-close" aria-label="Close" onClick={close}><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" /></svg></button>
+      </header>
       {chooser.mode === "nospace" ? <>
-        <h3>No room for another panel</h3><p>Nothing is covered silently. Choose how to make space.</p>
+        <p>Nothing is covered silently. Choose how to make space.</p>
         <div className="console-choice-actions">
           <button type="button" onClick={() => { const p = panels.find(x => x.id === ws.focus) || panels[0]; if (!p) return; setChooser(c => c && { ...c, mode: "replace", panelId: p.id }); }}>Replace the focused panel</button>
           <button type="button" onClick={() => { const p = panels.find(x => x.id === ws.focus) || panels[0]; if (!p) return; const s = split(p, p.w >= p.h ? "h" : "v"); if (!s) { notify("The focused panel is too small to split."); return; } ws.setPanels(ps => ps.map(x => x.id === p.id ? { ...x, ...s.keep } : x)); setChooser(c => c && { ...c, mode: "add", rect: s.rest }); }}>Split the focused panel</button>
           <button type="button" onClick={() => { if (!view) return; const id = `v-${uid()}`; onViewsChange(storeAsNew(ws.views, [], "New view", id), "New empty view created. Save to keep it."); ws.setViewId(id); setChooser(c => c && { ...c, mode: "add", rect: { x: 0, y: 0, w: COLS, h: ROWS } }); }}>Create a new view</button>
         </div>
-      </> : <>
-        <h3>{compact && group && !query ? group : chooser.mode === "replace" ? "Change panel" : "Add panel"}</h3>
-        <input type="search" aria-label="Search panels" placeholder="Search panels…" value={query} autoFocus onChange={e => setQuery(e.target.value)} />
-        {!query && !activeGroup ? <div className={`console-groups ${groupIcons ? "is-tiles" : ""}`} role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" data-group={g} aria-current={g === currentGroup || undefined} onClick={() => openGroup(g)}>{groupIcons?.[g] && <svg className="console-group-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">{groupIcons[g].map((d, i) => <path key={i} d={d} />)}</svg>}<span>{g}</span></button>)}</div> : <>
-          {drilled && <div className="console-sub"><button type="button" className="console-back" onClick={backToGroups}><span aria-hidden="true">‹ </span>Back</button><strong>{activeGroup}</strong></div>}
-          <div className="console-choices">
-            {choices.length ? choices.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}{panels.some(p => p.type === d.type) && <small> · open</small>}</strong><span>{d.description}</span></button>) : <p>No panels match.</p>}
-          </div>
-          {chooser.rect && <div className="console-preview" aria-hidden="true">{panels.map(p => <i key={p.id} style={{ gridColumn: `${p.x + 1} / ${p.x + p.w + 1}`, gridRow: `${p.y + 1} / ${p.y + p.h + 1}` }} />)}<b style={{ gridColumn: `${chooser.rect.x + 1} / ${chooser.rect.x + chooser.rect.w + 1}`, gridRow: `${chooser.rect.y + 1} / ${chooser.rect.y + chooser.rect.h + 1}` }} /></div>}
-        </>}
-      </>}
-      <button type="button" className="console-close" onClick={close}>Close</button>
+      </> : !query && !activeGroup ? <div className={`console-groups ${groupIcons ? "is-tiles" : ""}`} role="group" aria-label="Panel categories">{groups.map(g => <button key={g} type="button" data-group={g} aria-current={g === currentGroup || undefined} onClick={() => openGroup(g)}>{groupIcons?.[g] && <svg className="console-group-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">{groupIcons[g].map((d, i) => <path key={i} d={d} />)}</svg>}<span>{g}</span></button>)}</div>
+        : <div className="console-choices">
+          {choices.length ? choices.map(d => <button key={d.type} type="button" onClick={() => place(d.type)}><strong>{d.name}{panels.some(p => p.type === d.type) && <small> · open</small>}</strong><span>{d.description}</span></button>) : <p>No panels match.</p>}
+        </div>}
     </dialog>}
 
     {menu && <div ref={menuRef} className="console-pop console-menu" role="menu" aria-orientation="vertical" onKeyDown={menuKeyDown} aria-label={menu.kind === "panel" ? "Panel options" : "View options"} style={{ left: menu.left, top: menu.top }}>
