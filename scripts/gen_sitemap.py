@@ -46,7 +46,6 @@ STATIC_PAGES = [
     ("shader/", "monthly", "0.7"),
     ("ursa-broadcast-g2/", "monthly", "0.7"),
     ("pixelforge/", "weekly", "0.8"),
-    ("ProjectorThrow/", "weekly", "0.8"),
     ("ProjectorThrow/Stage3D.html", "weekly", "0.6"),
     ("shader/practice.html", "weekly", "0.6"),
     ("notion.html", "weekly", "0.8"),
@@ -95,6 +94,12 @@ TOOL_PRIORITY = "0.7"
 
 def load_domain_sites():
     return json.load(io.open(os.path.join(ROOT, "scripts", "domain-sites.json"), encoding="utf-8"))["sites"]
+
+
+# Pages that only forward to another address with JavaScript. A sitemap must
+# list final, canonical URLs, so these stay out even when the registry links
+# them (ProjectorThrow/ forwards to ProjectorThrow/Stage3D.html).
+REDIRECT_ONLY = {"ProjectorThrow/"}
 
 
 def registry_hrefs():
@@ -189,7 +194,7 @@ def main():
             entries.append((path, when(path), freq, prio))
     listed = {path for path, _, _, _ in entries}
     for href in registry_tool_pages():
-        if href in listed or not belongs(href):
+        if href in listed or href in REDIRECT_ONLY or not belongs(href):
             continue
         if not os.path.exists(os.path.join(ROOT, href)):
             print("skip (missing file):", href, file=sys.stderr)
