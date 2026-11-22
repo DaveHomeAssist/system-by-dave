@@ -1,5 +1,11 @@
 # Changelog
 
+## November 21, 2026. The Philly opens on the Hijinx Handbook cover
+
+- `/thephilly/` now matches the private prototype at `DaveHomeAssist/the-philly` commit `c7376c3`. Issue 01 is the founders' Special Edition, "Hijinx Handbook": the Issue tab shows their cover art (an embedded WebP image, so nothing new is fetched) and the masthead reads Special Edition. The drawn Liberty Bell collage, its styles and the rowhomes and masthead builder are gone.
+- Refreshed the way the README describes: the prototype's `index.html` replaced this page and the site's changes were reapplied (public `noindex` head and Content Security Policy, self-hosted fonts and QR generator, breadcrumb and skip link, Cheesesteak Radar). The page differs from the prototype only by those changes.
+- Checked: `npm run probe:thephilly` (all 7 checks, Playwright 1.63 on Dominic), the Issue tab at 1440 and 375 px with the cover loaded and no page errors, `verify:public-navigation` and `verify:indexing`.
+
 ## November 21, 2026. Release gates run side by side
 
 - The Pages workflow's checks were one list of steps in one job, about 26 minutes before anything published, and a publishing error at the end meant repeating all of it. They now run as six parallel jobs (site contracts; site pages in a browser; AV Video, Equipment Lab and the console shell; department panels; Infrastructure, Shop and the retained fixtures; Workbook and Camera Simulator) beside the existing domain move job. The `deploy` job needs all of them and only stages and publishes.
