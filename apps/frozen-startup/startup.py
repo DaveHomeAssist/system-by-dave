@@ -13,7 +13,7 @@ import sys
 import tempfile
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 
 class StartupError(Exception):
@@ -120,20 +120,61 @@ def display_problems(profile, snapshot):
     return problems
 
 
+def show_problems(profile, snapshot):
+    mapped = resolve(profile, snapshot)
+    millumin = snapshot.get('millumin', {})
+    if not isinstance(millumin, dict) or millumin.get('showSHA256') != profile['showSHA256']:
+        return ['Open the approved show version.']
+    if millumin.get('controlDisplayID') != mapped['control']['id']:
+        return ['Move the Millumin control window to BenQ.']
+    return []
+
+
 def routing_problems(profile, snapshot):
     mapped = resolve(profile, snapshot)
     millumin = snapshot.get('millumin', {})
-    if not isinstance(millumin, dict):
-        return ['Millumin routing feedback is unavailable.']
     wanted = {canvas: mapped[lane]['id'] for canvas, lane in profile['routes'].items()}
-    errors = []
-    if millumin.get('showSHA256') != profile['showSHA256']:
-        errors.append('Open the approved show version.')
-    if millumin.get('routes') != wanted:
-        errors.append('Check Millumin canvas destinations.')
-    if millumin.get('controlDisplayID') != mapped['control']['id']:
-        errors.append('Move the Millumin control window to BenQ.')
-    return errors
+    if not isinstance(millumin, dict) or millumin.get('routes') != wanted:
+        return ['Check Millumin canvas destinations.']
+    return []
+
+
+CHECKS = (
+    ('displays', 'Display detection'),
+    ('desktop', 'Desktop settings'),
+    ('show', 'Show file'),
+    ('routes', 'Canvas destinations'),
+    ('fullscreen', 'Fullscreen output'),
+)
+STREAM_SCHEMA = 'frozen-startup.check-stream.v1'
+
+
+def mode_text(mode):
+    if not isinstance(mode, dict):
+        return 'Mode unavailable'
+    try:
+        return '%d × %d · %s Hz' % (mode['width'], mode['height'], ('%.2f' % mode['refreshRate']).rstrip('0').rstrip('.'))
+    except (KeyError, TypeError, ValueError):
+        return 'Mode unavailable'
+
+
+def display_summary(profile, snapshot):
+    """Per-lane observation for the window's display cards. Never raises."""
+    observed = snapshot.get('displays', []) if isinstance(snapshot, dict) and isinstance(snapshot.get('displays'), list) else []
+    cards = []
+    for expected in profile['displays']:
+        matches = [d for d in observed if isinstance(d, dict) and d.get('connector') == expected['connector']]
+        actual = matches[0] if len(matches) == 1 else None
+        detected = bool(actual) and actual.get('active') is True
+        cards.append({'lane': expected['lane'], 'detected': detected,
+                      'expected': mode_text(expected['mode']),
+                      'observed': mode_text(actual.get('mode')) if detected else 'Not detected'})
+    return cards
+
+
+def route_text(profile):
+    order = sorted(profile['routes'].items(), key=lambda item: (item[0].lower().startswith('boost'), item[0]))
+    return ' · '.join('%s → %s' % (canvas, lane) for canvas, lane in order)
 
 
 class Bridge:
@@ -180,7 +221,7 @@ class FixtureBridge:
         return {}
 
 
-def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, clock=time.monotonic, sleep=time.sleep):
+def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, clock=time.monotonic, sleep=time.sleep, emit=None):
     validate_profile(profile)
     if timeout <= 0 or interval <= 0 or stable_samples < 2:
         raise StartupError('Invalid wait settings.')
@@ -191,11 +232,44 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
     def record(action):
         receipt['events'].append(action)
 
+    expected = {
+        'displays': '5 displays: BenQ control, A, B, C, D',
+        'desktop': 'Approved modes and layout',
+        'show': 'Approved saved project, SHA-256 %s…' % profile['showSHA256'][:8],
+        'routes': route_text(profile),
+        'fullscreen': 'Output windows on A, B, C and D' if not warm else 'Output windows already on A, B, C and D',
+    }
+    state = {'current': None, 'done': [], 'snapshot': None}
+
+    def send(event):
+        if emit is not None:
+            emit(dict(event, schema=STREAM_SCHEMA, runID=receipt['runID'], at=datetime.now(timezone.utc).isoformat()))
+
+    def begin(check_id):
+        state['current'] = check_id
+        send({'type': 'check', 'id': check_id, 'label': dict(CHECKS)[check_id], 'status': 'RUNNING',
+              'expected': expected[check_id], 'observed': 'Checking…'})
+
+    def passed(check_id, observed):
+        state['done'].append(check_id)
+        send({'type': 'check', 'id': check_id, 'label': dict(CHECKS)[check_id], 'status': 'PASS',
+              'expected': expected[check_id], 'observed': observed})
+
+    def show_displays(snapshot):
+        cards = display_summary(profile, snapshot)
+        if cards != state['snapshot']:
+            state['snapshot'] = cards
+            send({'type': 'displays', 'displays': cards})
+
+    def observing(snapshot):
+        show_displays(snapshot)
+        return snapshot
+
     def wait_for(check):
         deadline = clock() + timeout
         previous, count, issue = None, 0, 'Waiting for displays.'
         while clock() < deadline:
-            snapshot = bridge.call('observe', {})
+            snapshot = observing(bridge.call('observe', {}))
             try:
                 resolve(profile, snapshot)
                 errors = check(snapshot)
@@ -211,28 +285,56 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
             sleep(interval)
         raise StartupError(issue)
 
+    send({'type': 'run', 'status': 'RUNNING', 'mode': receipt['mode'],
+          'checks': [{'id': i, 'label': l, 'expected': expected[i]} for i, l in CHECKS]})
     try:
         capabilities = bridge.call('capabilities', {})
         if not isinstance(capabilities, dict) or (not warm and capabilities.get('startup') is not True):
             raise StartupError('Mac startup integration is incomplete. No display changes were made.')
         record('Waiting for five stable display identities')
+        begin('displays')
         snapshot = wait_for(lambda s: [])
-        if not warm:
-            mapped = resolve(profile, snapshot)
+        passed('displays', '5 displays detected; identities match the profile')
+        begin('desktop')
+        def restore_desktop(observation):
+            mapped = resolve(profile, observation)
+            bridge.call('restore', {'displays': [
+                {'id': mapped[d['lane']]['id'], 'connector': d['connector'],
+                 'identity': d['identity'], 'mode': d['mode']} for d in profile['displays']
+            ]})
+
+        needs_restore = not warm and bool(display_problems(profile, snapshot))
+        if needs_restore:
             receipt['beforeRestore'] = snapshot
             record('Restoring approved display modes and arrangement')
-            bridge.call('restore', {'displays': [{'id': mapped[d['lane']]['id'], 'connector': d['connector'],
-                                                'identity': d['identity'], 'mode': d['mode']} for d in profile['displays']]})
+            restore_desktop(snapshot)
         record('Verifying display modes and arrangement')
-        snapshot = wait_for(lambda s: display_problems(profile, s))
+        try:
+            snapshot = wait_for(lambda s: display_problems(profile, s))
+        except StartupError:
+            if not needs_restore:
+                raise
+            snapshot = wait_for(lambda s: [])
+            if display_problems(profile, snapshot):
+                record('Retrying approved display restoration once using current display identities')
+                restore_desktop(snapshot)
+            snapshot = wait_for(lambda s: display_problems(profile, s))
+        passed('desktop', '5 displays match approved modes and layout')
+        begin('show')
         if not warm:
             mapped = resolve(profile, snapshot)
             receipt['afterRestore'] = snapshot
             record('Opening approved show')
             bridge.call('openShow', {'showSHA256': profile['showSHA256'], 'showPath': profile['showPath'],
                                     'controlDisplayID': mapped['control']['id']})
+        snapshot = wait_for(lambda s: display_problems(profile, s) + show_problems(profile, s))
+        passed('show', 'Saved file hash matches; control window on BenQ')
+        begin('routes')
         record('Verifying Millumin routing')
-        snapshot = wait_for(lambda s: display_problems(profile, s) + routing_problems(profile, s))
+        snapshot = wait_for(lambda s: display_problems(profile, s) + show_problems(profile, s)
+                            + routing_problems(profile, s))
+        passed('routes', 'All %d assigned canvases match' % len(profile['routes']))
+        begin('fullscreen')
         if not warm:
             # Re-read immediately before enabling output; never reuse stale display handles.
             current = bridge.call('observe', {})
@@ -240,16 +342,35 @@ def run(profile, bridge, warm=False, timeout=60, interval=1, stable_samples=3, c
                 raise StartupError('Displays changed before fullscreen. Retry the startup check.')
             bridge.call('fullscreen', {})
             snapshot = wait_for(lambda s: display_problems(profile, s) + routing_problems(profile, s)
+                                + show_problems(profile, s)
                                 + ([] if s.get('millumin', {}).get('fullscreen') is True else ['Check fullscreen output.']))
         elif snapshot.get('millumin', {}).get('fullscreen') is not True:
             raise StartupError('Check fullscreen output.')
         receipt.update(computerReady=True, snapshotSHA256=digest(snapshot), message='Computer checks passed. Complete the crew visual check.')
+        passed('fullscreen', '4 output windows confirmed')
     except StartupError as error:
         receipt['message'] = str(error)
+        failed = state['current']
+        if failed is None:
+            failed = 'displays'
+        send({'type': 'check', 'id': failed, 'label': dict(CHECKS)[failed], 'status': 'FAIL',
+              'expected': expected[failed], 'observed': str(error), 'next': str(error)})
+        stop = dict(CHECKS)[failed].lower()
+        for check_id, label in CHECKS:
+            if check_id != failed and check_id not in state['done']:
+                send({'type': 'check', 'id': check_id, 'label': label, 'status': 'NOT RUN',
+                      'expected': expected[check_id], 'observed': 'Stopped after %s' % stop})
     receipt['completedAt'] = datetime.now(timezone.utc).isoformat()
+    send({'type': 'result', 'computerReady': receipt['computerReady'], 'showNightReady': False,
+          'message': receipt['message'], 'completedAt': receipt['completedAt'],
+          'passed': len(state['done']), 'failed': 0 if receipt['computerReady'] else 1,
+          'notRun': len(CHECKS) - len(state['done']) - (0 if receipt['computerReady'] else 1),
+          'readyExpiresAt': (datetime.fromisoformat(receipt['completedAt']) + timedelta(seconds=READY_SECONDS)).isoformat()
+          if receipt['computerReady'] else None})
     return receipt
 
 
+READY_SECONDS = 900
 CREW_CHECKS = ('surfacesAtoD', 'approvedShow', 'testCardsRemoved', 'openingLookRestored', 'warningsReviewed')
 
 
@@ -257,17 +378,40 @@ def readiness(receipt, evidence, snapshot, profile, now=None):
     now = now or datetime.now(timezone.utc)
     try:
         age = (now - datetime.fromisoformat(receipt['completedAt'])).total_seconds()
-        valid = (receipt.get('computerReady') is True and receipt.get('bootID') == boot_id() and 0 <= age <= 900
+        valid = (receipt.get('computerReady') is True and receipt.get('bootID') == boot_id() and 0 <= age <= READY_SECONDS
                  and receipt['profileSHA256'] == digest(profile)
                  and receipt.get('snapshotSHA256') == digest(snapshot)
                  and evidence.get('runID') == receipt['runID']
                  and bool(evidence.get('operator', '').strip())
                  and all(evidence.get(k) is True for k in CREW_CHECKS)
-                 and not display_problems(profile, snapshot) and not routing_problems(profile, snapshot)
+                 and not display_problems(profile, snapshot) and not show_problems(profile, snapshot)
+                 and not routing_problems(profile, snapshot)
                  and snapshot.get('millumin', {}).get('fullscreen') is True)
     except (KeyError, ValueError, TypeError, AttributeError, StartupError):
         valid = False
     return {'showNightReady': valid, 'message': 'Ready for the agreed opening look.' if valid else 'Complete a current computer and crew check.'}
+
+
+def readiness_event(result):
+    expires = None
+    if result.get('showNightReady') is True and result.get('completedAt'):
+        expires = (datetime.fromisoformat(result['completedAt']) + timedelta(seconds=READY_SECONDS)).isoformat()
+    evidence = result.get('crewEvidence') if isinstance(result.get('crewEvidence'), dict) else {}
+    return {'schema': STREAM_SCHEMA, 'type': 'readiness', 'runID': result.get('runID'), 'at': datetime.now(timezone.utc).isoformat(),
+            'showNightReady': result.get('showNightReady') is True, 'message': result.get('message'),
+            'operator': evidence.get('operator'), 'expiresAt': expires}
+
+
+def event_writer(target):
+    """Return a callable that appends one flushed JSON line per event, or None."""
+    if not target:
+        return None
+    stream = sys.stdout if target == '-' else open(target, 'a', buffering=1)
+
+    def write(event):
+        stream.write(json.dumps(event, allow_nan=False, sort_keys=True) + '\n')
+        stream.flush()
+    return write
 
 
 def save(path, value):
@@ -296,7 +440,9 @@ def main():
     parser.add_argument('--warm', action='store_true')
     parser.add_argument('--crew-evidence')
     parser.add_argument('--verify-ready', action='store_true', help='Verify crew evidence against an existing receipt and current snapshot')
+    parser.add_argument('--events', help='Write the live check stream as JSON lines to this path; use - for stdout')
     args = parser.parse_args()
+    emit = event_writer(args.events)
     result = None
     lock_owned = False
     try:
@@ -319,7 +465,7 @@ def main():
                 raise StartupError('Crew evidence is required.')
             result = json.loads(Path(args.receipt).read_text())
         else:
-            result = run(profile, bridge, warm=args.warm, timeout=0.1 if args.fixture else 60, interval=0.001 if args.fixture else 1)
+            result = run(profile, bridge, warm=args.warm, timeout=0.1 if args.fixture else 60, interval=0.001 if args.fixture else 1, emit=emit)
         execution = 'offline fixture' if args.fixture else 'local bridge'
         if args.verify_ready and result.get('execution') != execution:
             raise StartupError('Receipt and current observation use different execution modes.')
@@ -329,8 +475,10 @@ def main():
             result.update(readiness(result, evidence, bridge.call('observe', {}), profile))
             result['crewEvidence'] = evidence
             result['readinessCheckedAt'] = datetime.now(timezone.utc).isoformat()
+            if emit:
+                emit(readiness_event(result))
         save(args.receipt, result)
-        print(result['message'])
+        print(result['message'], file=sys.stderr if args.events == '-' else sys.stdout)
         return 0 if result.get('showNightReady' if args.verify_ready else 'computerReady') else 2
     except (StartupError, OSError, ValueError) as error:
         if args.verify_ready and lock_owned and isinstance(result, dict):
@@ -339,6 +487,11 @@ def main():
                 save(args.receipt, result)
             except OSError:
                 pass
+        if emit:
+            emit({'schema': STREAM_SCHEMA, 'type': 'unavailable', 'message': 'Startup check unavailable: %s' % error,
+                  'runID': result.get('runID') if isinstance(result, dict) else None, 'at': datetime.now(timezone.utc).isoformat()})
+            if args.verify_ready and isinstance(result, dict):
+                emit(readiness_event(result))
         print('Startup check unavailable: %s' % error, file=sys.stderr)
         return 3
 

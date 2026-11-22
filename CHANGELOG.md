@@ -1,5 +1,195 @@
 # Changelog
 
+## November 22, 2026. Add panel: one top bar, nothing covering the options
+
+- Dave: "All of those things could share a single top bar with icons" and "stop covering all the menu options." Opening a group in the Add panel chooser put four rows of furniture around the choices: the title, a full-width search field, a Back row that repeated the group name, and under the list an orange placement map and a full-width Close. On a 580 px high screen about two options were left in view.
+- The chooser is now one bar and the options. The bar holds a back arrow (inside a group), the title or group name, the search field and a close button in one row, 44 px tall. Nothing sits under the options.
+- The placement map is removed. It was a picture of where the panel would land, drawn in the accent colour at the size of a button, and it did nothing when pressed. The dashed outline on the workspace shows the same thing.
+- Choices are in two columns (one on a phone), and the chooser rises from where it opened until its options fit. Measured at twelve sizes from 320 by 568 to 1920 by 1080: every group shows all its options without scrolling, including all ten AV Video panels at 1024 by 580, with one group on two screens as the exception: AV Video's list runs about 10 px past the chooser on a 320 by 568 phone and on a phone held sideways (844 by 390), so its last row is trimmed until scrolled.
+- Tab order follows the bar: search, close, then the options. `scripts/probe_av_canvas_menus.mjs` checks the bar is one row, that nothing but the bar and the options is in the chooser, and that every option is in view.
+- Offline cache generation is `v20261122-chooser-bar`.
+
+## November 22, 2026. Console menus: one Close, department tiles and gear choices; the publish step retries
+
+- **One Close in the options menus.** The panel menu ended with **Close panel** directly above a full-width **Close** that only dismissed the menu. That second row is gone from the panel and view menus. The title row has a ✕, and a press outside the menu, Escape or the trigger again closes it. The menu's edge clamp now uses its real width (280 px), so it no longer sits 8 px off the right edge at 1024 px.
+- **The Add panel chooser opens on department tiles.** Its first step was a plain list of twelve names, one of them cut off at 900 px high. It is now two columns of tiles with an icon and the name in caps, after the department grid on the avbydave.com home page. Each department uses the icon the Rail already shows for it, read from `js/sbd-registry.js`. All twelve fit without scrolling from 320 by 568 up; on a short screen the tiles scroll inside the chooser.
+- **Signal Flow's Add device offers gear.** A **Gear** list sits above the name: 22 everyday device types in four groups, then the Gear Reference library entries that carry video (six today). Picking one fills in the name and the role. Both stay editable, a typed name is never replaced, and names stay unique (Camera 1, Camera 2; a second BirdDog P240 becomes BirdDog P240 2). The plan still stores only the name and role, so saved plans and exports are unchanged. The library is read from `data/gear/index.json` at runtime, so new Gear Reference sheets appear here without a rebuild.
+- **The publish step retries GitHub's artifact fault.** Five of six deploy runs on November 21 failed at "Deploy to GitHub Pages" with "No artifacts named github-pages were found", after every check had passed. The Pages action reads GitHub's own artifact service, which did not list the artifact it had accepted a second earlier; the REST list showed it each time (the `avbydave` workflow already waits on REST and failed the same way). The `deploy` job now tries the Pages step up to three times, the third with a fresh upload under a new name, and `scripts/publish_domain_site.sh` starts a new destination Pages run with an empty commit when one fails, up to three runs. Details: `docs/domain-sites.md`.
+- **Two probe checks no longer depend on timing.** The AV Video graph probe compared the diagram's viewport before and after **Zoom in**, reading it straight after each click; it passed only when Fit View happened to land between the two reads, and on unchanged `main` the first read came back from either side of Fit View. The console probe read focus in the same instant as the Escape that returns it; on unchanged `main` focus had not arrived yet in four of eight trials here. Each now waits for the state it asserts (`scripts/probe_av_video_graph.mjs`, `scripts/probe_av_console.mjs`). `scripts/probe_av_canvas_menus.mjs` now covers the tiles, the single Close and the gear list.
+- Offline cache generation is `v20261122-console-menus`.
+- Checked locally: the tile grid at eleven sizes from 320 by 568 to 1920 by 1080 in two palettes (names on one line, chooser inside the screen, Close reachable, no page scroll, 44 px targets); the menu closing by ✕, outside press, Escape and trigger with focus returning on the keyboard paths; the gear list filling name and role and adding the device; type checks and unit tests for AV Video and the shell; the browser probes for the shell and every department; `verify:av`, `verify:domain-sites`, `verify:throwline` and the cutover order test. The retry steps cannot be exercised before a real run; the push that carries this change is their first.
+
+## November 21, 2026. The Philly opens on the Hijinx Handbook cover
+
+- `/thephilly/` now matches the private prototype at `DaveHomeAssist/the-philly` commit `c7376c3`. Issue 01 is the founders' Special Edition, "Hijinx Handbook": the Issue tab shows their cover art (an embedded WebP image, so nothing new is fetched) and the masthead reads Special Edition. The drawn Liberty Bell collage, its styles and the rowhomes and masthead builder are gone.
+- Refreshed the way the README describes: the prototype's `index.html` replaced this page and the site's changes were reapplied (public `noindex` head and Content Security Policy, self-hosted fonts and QR generator, breadcrumb and skip link, Cheesesteak Radar). The page differs from the prototype only by those changes.
+- Checked: `npm run probe:thephilly` (all 7 checks, Playwright 1.63 on Dominic), the Issue tab at 1440 and 375 px with the cover loaded and no page errors, `verify:public-navigation` and `verify:indexing`.
+
+## November 21, 2026. Release gates run side by side
+
+- The Pages workflow's checks were one list of steps in one job, about 26 minutes before anything published, and a publishing error at the end meant repeating all of it. They now run as six parallel jobs (site contracts; site pages in a browser; AV Video, Equipment Lab and the console shell; department panels; Infrastructure, Shop and the retained fixtures; Workbook and Camera Simulator) beside the existing domain move job. The `deploy` job needs all of them and only stages and publishes.
+- No check was dropped or weakened: every command, secret, condition and pinned action from the old job is in the new file, in the same order within its job. The one combined "generated files" check became a per-job check of the folders that job builds, covering the same thirteen paths.
+- Only the retained suite reads another family's build, so its job builds the six family fixtures it serves before running. Nothing else depends on another job's workspace.
+- After a publishing failure, "Re-run failed jobs" now repeats the `deploy` job alone instead of every check.
+- Checked before merge: the file parses, a command by command comparison against the old workflow shows nothing missing, and the three scripts that read this file pass (`check_domain_cutover_ready.test.mjs`, `verify:throwline`, `verify:domain-sites`). The first real run is the proof; it is the push that carries this change.
+
+## November 21, 2026. avbydave.com gets a home page; the console is one part of the site
+
+- avbydave.com now opens on a home page (`av-home/`, staged at `/` through `landingPage` in `scripts/domain-sites.json`) instead of on the console. Dave decided this on November 21; it replaces the October 13 arrangement in which the console shell was also the home page. The console itself is unchanged at `/av/`, and so are the installed app (`start_url` `./av/`), every redirect stub (they already target `/av/`) and all saved work. A bookmark to the bare domain now lands one link from the console.
+- The home page is static HTML in the AV by Dave design system (Gaffer dark, Call Sheet light): four sections with real addresses (`#overview`, `#tools`, `#console`, `#brief`), locked to the screen with JavaScript and an ordinary top to bottom document without it. Its one action is Send the show brief, a prefilled email to the AV by Dave show address. It sets no cookies, loads nothing from another host and runs under `script-src 'self'; style-src 'self'`.
+- The design system's tokens, component styles and fonts (Archivo, Archivo Expanded, IBM Plex Mono, all SIL OFL, licences beside them) are now in `css/avd/`, byte for byte the copies already under `apps/projctl/public/avd/`.
+- One theme owner per origin: the home page reads and writes the AV tools' own `av-theme-mode.v1`, so the choice carries between the home page and the console. The console's White and Black read as light and dark here.
+- The console page is now indexable at its own canonical address, `https://avbydave.com/av/` (it was noindex with the root as canonical), and is listed in the AV sitemap. Its breadcrumb reads AV by Dave, linking the site home, then Console; the System by Dave link moved to the home page footer.
+- The home page's files joined the registry's offline list and the cache generation is `v20261121-site-home`, so a saved copy of `/` opens styled offline. `verify:av` now requires `av-home/` as the staged home, the console's own canonical and return link, and the shared theme key; its pinned counts are 164 base and 183 offline assets.
+- Checked locally: all four sections at ten sizes from 320 by 568 to 3840 by 1080 in both themes with no page scroll, clipping or sub 44 px control; keyboard skip link, section history, theme persistence into the console and back, print and no JavaScript on the staged avbydave.com site; `verify:av`, `verify:indexing`, `verify:public-navigation`, `verify:public-consistency`, `verify:domain-sites`, `verify:private-exposure`, `verify:throwline`, the console shell, nav funnel and first visit probes, the 57 domain move scenarios and the 33 step Frozen reference.
+
+## November 21, 2026. The Philly prototype at /thephilly/
+
+- Added `/thephilly/`, the clickable prototype of The Philly, a free quarterly print magazine about Philadelphia (private source: `DaveHomeAssist/the-philly`). The page is `noindex`, outside the sitemap and carries real artist and listing content from the prototype, so it is for sharing by link only.
+- Fonts (Alfa Slab One, Anton, IBM Plex Mono, Source Serif 4, all SIL OFL) and the QR generator (qrcode-generator 1.4.4, MIT) are served from `thephilly/fonts/` and `thephilly/vendor/`. The prototype loaded them from Google Fonts and cdnjs; this page contacts no third-party host on load. Licences: `thephilly/vendor/NOTICE.txt`.
+- Added a System by Dave breadcrumb and a first-in-body skip link to satisfy the public shell contract, and registered the page in `scripts/verify_public_navigation.js`. The indexing gate now expects 220 routes outside the sitemap.
+- The Food Finders story (`#story-food-finders`) has a Cheesesteak Radar: a button opens the Philly Cheesesteak Heatmap from `/cheesesteaks/` in a frame, with links to the full map and rankings. The frame is created on click and removed on close, so no map tiles load until a reader opens it. The note beside it repeats the heatmap's own description (real shops from OpenStreetMap and Google Maps, weekly snapshot, not a complete list).
+- The Public site contracts job timeout goes from 10 to 20 minutes. The job now runs 8 to 10 minutes, mostly in the Projctl relay step, and was cancelled at the old limit on the previous pull request (run 671) and again on this one, once in the middle of the first probe.
+- `npm run probe:thephilly` (`scripts/probe_thephilly.mjs`, run on every pull request) checks that the page never scrolls at 1440, 680 and 375 px on eight routes, that nothing leaves the origin before the radar opens, the skip link and breadcrumb, the Sounds QR codes, the radar open and close, and the theme toggle.
+
+## November 20, 2026. Frozen workspace navigation
+
+- Published Sites version 60 from managed source `1c50b07`, preserving the newer
+  version 59 Review release and its media. PR 554 merged after both CI gates and
+  all 33 Frozen reference regression steps passed. Live desktop navigation,
+  the eight session manifests and a real Review photo were read back on Dominic.
+
+- Consolidated the Frozen workspace navigation into one ordered model and shared
+  header across the workspace, Handoff, Run review, Stage and Scenic pages.
+- Added an opening night countdown to the sixth Home card, targeting November 25
+  at 7 p.m. Eastern, with a visible absolute date and completed state.
+- Refreshed the GSAP ice title, crystal and card entrance, plus short workspace
+  transitions with reduced motion and visibility cleanup.
+- Preserved the current production shell inputs and made asset embedding retain
+  unrelated existing assets, binaries and Worker imports.
+
+## Run Review usability and keyboard polish, 2026-11-20
+
+- Publish WST version 59 with Contact sheet search, clear filters, truthful note-save feedback, image retry, preview position and a notes Close control. Preserve the eight sessions and all evidence.
+- Keep existing controls and photo layouts; fix zero-height photos on small and short screens. Preserve browser modifier shortcuts and typing fields.
+- Dominic passed 45 source tests (F12 archive fixture skipped), 336 tab layouts and 168 photo-layout checks across Chromium, Firefox and WebKit. The Mac in-app browser verified the live controls. Native OS/browser combinations remain a separate acceptance boundary.
+
+## Frozen crew calendar through closing, 2026-11-20
+
+- Extend the Calendar through the January 3 closing matinee with all public
+  performances, accessibility performances and days without shows. Preserve
+  the November tech calls and original PDF.
+- Browse November, December and January with month controls and keyboard day
+  navigation. Open on the current Eastern month within the run.
+
+## Frozen workspace: crew task lock and public navigation tidy, 2026-11-20
+
+- Keep shared task reads public while requiring a crew passcode for every add, edit, completion and delete. The Worker fails closed until Dave sets the Site secret, compares fixed-length digests, rejects cross-origin writes and no longer emits wildcard CORS.
+- Add an explicit Unlock editing control. The browser asks only on unlock or the first write, keeps the passcode in session storage for the tab, and reports Editing is locked after a refused write. Personal notes and existing D1 rows are unchanged.
+- Hide Live controls, Presets, Log and Configuration from the public Home and menus until workspace-config.json names a verified controller. Existing hash routes and unavailable states remain available directly.
+- Publish the current Run review Home copy, add a site-wide crawl block at /robots.txt, and retain the single Live controls label.
+
+## Frozen workspace: Run review card no longer goes stale, 2026-11-19
+
+The Home card for Run review said "November 15 and 17 · Five sessions with original photos" while the review had grown to eight sessions (November 15 to 19). It now reads "Every captured run since November 15, with original photos", which stays true as runs are added. `wst/index.html`, with the local workspace copy and the hosted Worker bundle regenerated by `node wst/embed-hosted-assets.mjs`. The live site picks it up at the next Sites publication that applies the canonical Home navigation (the Run Review `active` integration does).
+
+## Projctl role pages: the rig's daily order of operations, 2026-11-19
+
+Applies the November 19 order of operations research to the role pages on the owner's word ("apply to crew dashboards", relayed). Simulator and fixtures only; not installed. Waits and behaviours from the research are labelled "researched, not yet tested" on the pages.
+
+- **The all-four run** (`apps/projctl/server/power-run.js`): fresh reads of every unit it waits on every 10 s through the relay's own poller; morning lamp units staggered about 10 s apart and watched for 3 minutes; a lamp that turns itself off is retried once after OFF plus 75 s, then stopped with an alert; never an on to a Panasonic that reads COOLING; nothing, not even a read, to a lamp unit in the minute after its on command; the night waits up to 240 s and names any unit not OFF; "sent, not confirmed" instead of success when a unit does not report. The night order is unchanged pending SD-1.
+- **The Barco's raw state**: the Pulse driver keeps `rawState` beside the mapped power, and the simulator reports it for a Barco model. Deep standby (STANDBY or ECO) is shown as a caution on the lane card and in the run's end message; a Barco reading OFF or cooling is never sent a second off.
+- **Night timeline** (`public/night-timeline.js`, a Night tab on `power.html`): one row per lane in the off order with its expected wait (lamp units about 170 s, top laser about 5 s, Barco about 30 s to READY) and its live reading, "All off, about 3 min", "Never cut mains while a lamp unit is cooling", and "Safe to leave the building" only when all four read OFF. The page that starts the nightly off moves to it.
+- **Recovery ladder** on `show.html`, least disruptive first: shutter, input, power cycle one projector, relaunch the playback app, restart the show computer, each with when it is allowed.
+- **Holds**: a Know manifest entry of kind `notice` shows a short hold above the list until its `until` time, with a mark on the Know tab. Date-specific holds live in the private folder, not in the page.
+- **Know samples**: the power-up and recovery samples carry the morning check of the show computer, photographing a lamp message, the once-only Panasonic STANDBY MODE check, and two-show days.
+- **Show page look** from Dave's design reference (November 19): the power banner in the reading's colour (a wakeable Barco cyan with "READY · this page can wake it", deep standby grey with "this page can't wake it"), the shutter as a coloured pill with "sent, not confirmed", readings as rows on very tall cards, "Control link" for the driver in use, summary items with coloured top edges, and an amber outline while Show Lock is on. Show Lock stays read only; the Frozen palette, locked shell and theme switch stay.
+- **Hints** on the shared control: a suggested run, highlighted and explained from B and C, Show Lock and the last run (never pressed), and a copyable summary of the finished run under the banner.
+- Shared files: `server/index.js` (the run gets the poller's refresh), `server/drivers/pulse.js`, `server/drivers/simulator.js`, `server/drivers/index.js`.
+
+## Projctl: Barco Stop lens on every axis, 2026-11-19
+
+- Stop lens on the Barco (Pulse) used to queue behind status reads and stop at the first axis that failed, leaving the rest moving. It now sends stop to all four axes at once, each on its own connection, and reports any axis that did not acknowledge. Re-landed from draft PR 460 onto main's driver. Simulator-tested only; not installed or tried on the UDM.
+
+## Frozen booth workspace, November 19, 2026
+
+Workspace search opens show pages and R5 references. Notes retains the last shared task snapshot and queues offline checkoffs. Readiness reports identify operator confirmations and the connected relay can supply timestamped booth status.
+
+## Projctl role pages: one shared on and off control and one all-four run, 2026-11-18
+
+- **One run in the relay.** `server/power-run.js` runs "all four on" and "all four off" once, in the relay, with one state every page reads. A second press from any page meets the run in progress. Fixed order (on: C, B, A, D; off: A, D, B, C), each unit read before it is commanded, at most one command per unit, the waits from the manuals inside it, and a banner ("All four on" or "Safe to leave the building") only when every lane's own reply supports it. Routes: `GET /api/power-run`, `POST /api/power-run/plan`, `/start` and `/stop`, behind the sign-in.
+- **One shared control on each person's page.** `projector-control.js`, `projector-control-model.js` and `projector-control.css` draw a card per lane and an all-lanes card. `show.html` (show backup operator and designer) mounts it with power and shutter; `power.html` (power operator) with power only. Both addresses are unchanged. Every action takes two steps; power off uses the relay's own one-use confirmation.
+- **The power page is replaced by the shared shell.** Its checklist, ticks, timers, "app closed" step and handheld remote steps are gone. `power.js`, `power-model.js`, `power.css` and their two test files are removed; `test/show-backup-browser.cjs` and `test/show-backup.test.js` cover both pages.
+- **The show backup page** gains a setup check (pass, fail or cannot check per line), a MIDI test that waits for Show Control cue 999 and then 999.5 from the lighting console and sends nothing, and a Know tab that serves diagrams and documents from a private folder. Each lane shows its input, test pattern and which link carries it. A lit lane with a closed shutter gets a highlighted Open button, the way back from a dark surface. "Call for help with a snapshot" is removed on the owner's word.
+- Show Lock blocks power off, for one lane and for the off run, as the relay does. Power on and shutters stay available.
+- More read-only relay routes: `GET /api/cue-feed` (a listen-only observer file, tailed by `server/cue-feed.js`), `GET /api/host-checks` (`server/host-checks.js`, "cannot check" until a provider is configured), `GET /api/know` and `GET /api/know/file` (`server/know-folder.js`). Paths come from a private `host-paths.json` beside the rig. `server/index.js` gains three lines.
+- Simulator, stand-in projectors and fixtures only. Not installed. No command from these pages has reached a projector, the run's order and waits have not been timed on a rig, and the MIDI test has not read a real observer file. Brief and open decisions: `apps/projctl/docs/show-backup-page.md`.
+
+## Projctl show backup page, 2026-11-18
+
+- Add `apps/projctl/public/show.html`, a role page for the person who backs up projection from the lighting position. A go or no-go strip (lanes lit, outputs, cue link, show computer) sits above the four lanes. A lane the relay is not reading says "check by eye" and never shows its last known state. The cue link says "Not connected", because console cues do not pass through the relay.
+- The page sends one command: a shutter move for one lane, after a two-step confirm, with the reviewed target revision. It is offered only on a current reply that says power is ON. "Call for help with a snapshot" copies a plain-text summary; no number is stored.
+- An optional crew notes link, for notes that can wait, appears only when the relay's private settings name an address. The relay gains one read-only route for it, `GET /api/crew-links` (`server/crew-links.js`), behind the existing login; the page never requests the address itself.
+- No console or sign-in change. `npm run test:browser` gains `test/show-backup-browser.cjs`, and `test/show-backup.test.js` joins `npm test`. Tested in the simulator only. The page files were copied to the show computer on November 18 with no relay restart; it is not yet accepted on the rig. Brief, limits and open decisions SBP-1 to SBP-8: `apps/projctl/docs/show-backup-page.md`.
+
+## Projctl Panasonic control-port fallback, 2026-11-18
+
+- When another controller holds a Panasonic projector's PJLink link, the relay now reads power and shutter on the projector's control port and sends power and shutter there, instead of showing the projector as unreachable. PJLink stays the link whenever it answers, and is retried every five minutes. Input, the alarm summary and light hours read "not reported" while the control port is in use.
+- Built against stand-in servers (`test/panasonic-control-port.test.js`). The driver file was installed on the show computer on November 18 with one relay restart, after which both affected projectors came online in the relay's log; no power or shutter command has been sent to a real projector on this path and the rig acceptance steps are not yet run. Brief, rig acceptance steps and decisions PCP-1 and PCP-2: `apps/projctl/docs/panasonic-control-port.md`.
+## Projctl power operator page, 2026-11-18
+
+- Add `power.html` to the Projctl relay: a guided checklist for the crew member who turns the four projectors on each morning and off each night. Two modes, five steps each, one step open at a time. Lanes B and C use the relay's existing power command, with its two-step power off, Show Lock, stale-reply and cooling guards unchanged. Lanes A and D are done by handheld remote and are recorded with a "confirmed by eye" tick and an operator-started 170 second cooling countdown. The page never commands A or D and never draws a lane the relay has not reached as a reading.
+- A "Safe to leave the building" banner turns on only when B and C read Standby from fresh replies and A and D carry a current tick that no fresh reading disputes. Ticks lapse after 30 minutes.
+- The Rules view shows an optional crew notes link when the relay's private settings hold an address (`crew-links.json` beside the rig, read through `GET /api/crew-links`). It is hidden entirely otherwise, opens in a new tab, and is labelled as for notes that can wait, not emergencies or cue calls. The page never calls that address. The reader is the same file the show backup page adds.
+- A relay lane that replies with no power state reads UNKNOWN and is never shown as On or Standby. It can still be powered, with a "look at it first" note, as on the operator console. At night it is confirmed off by eye like a lane powered by remote, and the banner says which lanes were read and which were looked at. A relay without the November 17 Barco standby mapping reports that unit this way.
+- No login or network binding changes, and no relay change for power. The lamp message helper is an empty, labelled slot until its content is recorded. Brief, open decisions and the role access and network exposure proposal for the role pages: `apps/projctl/docs/power-operator-page.md`. Simulator tests only; nothing is installed and no real projector, phone or venue network was used.
+
+## Projctl health reports: no current reading, 2026-11-18
+
+- A projector not reached at report time no longer shows its last power state as current. The unit table says "No current reading (last known on)", and saved reports render the same way. On Nov 17, lanes A and D kept showing "on" for about 10 hours with no contact.
+
+## Verify AV Video: retained suite in its own job, 2026-11-17
+
+- The `video` job was not hanging. It ran 12 to 15 minutes against its 15-minute limit; three of eight recent green runs finished above 14m40s. The retained standalone-build suite (`npm run test:av-retained-browser`, about six minutes) ran inside the last long step, "Infrastructure and Shop panels and saved-plan compatibility", so on a slower runner the job was cancelled while that suite was still passing checks (run 44161812645 and the first attempt of run 44167101248).
+- The suite now runs in a parallel `retained` job, which builds the eight family fixtures it serves. Every step in both jobs has its own `timeout-minutes`, so a real stall fails at the step that stalled.
+- The retained runner stops any probe that runs past four minutes (`AV_RETAINED_PROBE_LIMIT_MS`) and names it in the error.
+
+## Projctl Barco standby power state, 2026-11-17
+
+- The Barco Pulse driver now reads `system.state` `standby` as power OFF. Before, a Barco that had cooled down into standby showed UNKNOWN with "power unknown" on the monitor while still replying (seen on lane C at WST, Nov 17 after the 10:01 PM power-off). Power commands and lens guards are unchanged. A new test pins every mapped state.
+
+## Projctl health report Thermal watch fallback, 2026-11-17
+
+- When a reached projector's report-time temperature read fails, the health report uses that unit's newest Thermal watch reading if it is at most three minutes old, and labels it with its time. The findings name the unit and the read error stays visible. An older sample is not used.
+- Tests now pin three behaviours first written for PR 463: report retries spaced four seconds apart, a Panasonic intake reading kept when the connection drops on a later sensor, and the Thermal watch fallback.
+
+## Frozen workspace: one label per view, 2026-11-17
+
+- The Home card "Operator controls" is now "Live controls", the name the More menu already uses for the same view. Both Run review links carry the same separate-page cue: an arrow, and "(separate page)" for screen readers.
+- Add `wst/navigation-contract.test.mjs`. It reads the four workspace menus and fails on a second name for a view, a reused label, a link to another page without the cue, an entry the router does not serve, or a local Projctl copy that differs from the published source. `npm run verify:public-navigation` now runs it with the existing workspace unit tests, so CI covers both.
+- The three Handoff collisions remain and are listed in the test as waiting on a decision. The brief, the later slices and the open decisions NAV-1 to NAV-5 are in `apps/projctl/docs/navigation-cohesion.md`. Nothing is published by this change, and the hosted worker snapshot is left for the next publication.
+
+## Projctl PJLink session reset, 2026-11-17
+
+- A status poll whose held PJLink session was reset by the projector (ECONNRESET or EPIPE) now opens one new session and completes, as it already did for a plain close. Before, the poll failed and the unit read offline for that cycle. A reset on the replacement session still fails the poll. Control commands are unaffected: they use their own connection and are never repeated.
+- This also ends an intermittent failure of the "closed while idle" driver test under full-suite load.
+
+## Frozen Monitor feed art matched to the house, 2026-11-17
+
+- Redraw the Monitor multiview art for all four lanes (`apps/projctl/public/monitor/monitor-art.js`, hand-written SVG). Shapes follow the Walnut Street Theatre work-light photos: tall, pointed crystal portals with the apex just outboard of centre and the outer spike pillar; eight-armed folk snowflakes around a large frameless rosemaling flower (about 75% of the panel width); A and D as exact mirror images; the X-truss header with diamond snowflake panels around a round rosemaling medallion.
+- Colours follow the Nov 15 runthrough (palettes from the frozen-monitor-refine covers): Coronation is coral stencil light on slate indigo, Winter is pale blue over a diamond ice lattice with ghosted flakes, and the new Ice Palace look is luminous ice on cobalt. Stage C shows the floral arches on the wood floor for Coronation and the gothic ice arches with the upstage bridge for Winter and Ice Palace (Ice Palace adds the stairs and aurora).
+- Add a Coronation / Winter / Ice Palace switch above the multiview, remembered per browser. The art stays illustrative and never reflects what a projector shows. Power and shutter sit in a compact readout at the foot of each tile; the heading wraps at phone width so the 375px dashboard still fits.
+- Correct the Monitor wording: the control relay is the Mac Studio, since Nov 15 (A-CONTROL-1; the MacBook build is kept as Nov 13 history), and Projctl holds A's shutter while Millumin sends power and shutter for B, C and D. The cue map gains a "Shutter · A" row.
+
+## Pages deploy flakes, 2026-11-17
+
+- The walk live check was reading `source.json` in the second after the git push, before `housevideo-walk`'s Pages run replaced the origin. GitHub Pages caches that response for `max-age=600` and ignores the `?release=` query, and the checker polled that same cached body until a deadline of exactly ten minutes. The publisher now waits until the destination Pages run for the pushed commit succeeds. A response that is still the previous release is waited out until its `Age` reaches `max-age`, once. The source workflow's concurrency group already queues the next main push; it is not the overlap.
+- LED calculator paging remeasures the window when focus moves a control. A resize still refreshes on the next frame, and focusing during that gap used the previous page count, which left Mode outside the 360×800 page (both workspace deploy failures).
+- The signal-flow rename probe waits until the reloaded diagram has stopped moving before it double-clicks. React Flow's drag threshold is 1px, so a double-click during the post-reload fit never opened the dialog.
+- The Stage 3D offline reload waits, while still offline, for the page to leave its synchronous "installing" state. The calculated facts were already correct; the single sample ran after the network was restored.
+- Console recovery reads the status until the debounced draft conflict is reported. A single read 750ms later still showed "Plan loaded from this browser." when the runner was busy.
+- The November 7 Chrome startup failure in the theme probe was already retried by `scripts/chrome_launch.js`. The deploy job still runs the browser probes: the path-filtered pull-request workflows do not run on the merge commit being published, and these probes run one after another, not in parallel.
+
 ## Frozen cue 13 photo replacement, 2026-11-16
 
 - Replace the selected cue 13 Before photo in every shared review mode, thumbnail, preview and printed packet. Old public image links now serve the clean replacement too. Keep the actual replacement timestamp and provenance visible, while preserving raw capture archives, note identities and coverage.

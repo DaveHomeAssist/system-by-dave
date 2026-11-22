@@ -12,22 +12,19 @@ const env = { DB: { prepare(sql) {
   async all() { return { results: stmt.all(...values) }; },
   async run() { return { meta: stmt.run(...values) }; } };
 } } };
-const request = (path = '', data) => worker.fetch(new Request('https://wst.housevideo.app/api/tasks' + path,
- data ? { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) } : {}), env);
+const request = (path = '', data, headers = {}) => worker.fetch(new Request('https://wst.housevideo.app/api/tasks' + path,
+ data ? { method:'POST', headers:{'Content-Type':'application/json',...headers}, body:JSON.stringify(data) } : {headers}), env);
 let rows = (await (await request()).json()).tasks;
 assert.equal(rows[0].kind, 'task'); assert.equal(rows[0].done, 1);
-const added = await request('', {text:'Latest update',kind:'update'});
-assert.equal(added.status, 201); const {id} = await added.json();
-assert.equal((await request('', {text:'Bad kind',kind:'other'})).status, 400);
-assert.equal((await request('', {text:'x'.repeat(501)})).status, 400);
-// Legacy clients omit kind and keep the existing category.
-assert.equal((await request('/'+id,{text:'Edited update',done:false,revision:1})).status,200);
-rows = (await (await request()).json()).tasks;
-assert.equal(rows.find(row=>row.id===id).kind,'update');
-assert.equal((await request('/'+id,{text:'Stale',done:false,revision:1,kind:'task'})).status,409);
-assert.equal((await request('/'+id,{text:'Action now',done:false,revision:2,kind:'task'})).status,200);
-assert.equal((await request('/'+id,{text:'Action now',done:true,revision:3,kind:'task'})).status,200);
-assert.equal((await request('/'+id,{text:'Action now',done:true,revision:4,delete:true})).status,200);
+const locked = await request('', {text:'No write without the Site secret',kind:'task'});
+assert.equal(locked.status, 403);
+assert.deepEqual(await locked.json(), {error:'Task editing is locked'});
+const wrongHeader = await request('', {text:'Still locked',kind:'task'}, {'X-Frozen-Task-Passcode':'not-a-credential'});
+assert.equal(wrongHeader.status, 403);
+assert.deepEqual(await wrongHeader.json(), {error:'Task editing is locked'});
+const options = await worker.fetch(new Request('https://wst.housevideo.app/api/tasks', {method:'OPTIONS'}), env);
+assert.equal(options.status, 204);
+assert.equal(options.headers.get('access-control-allow-origin'), null);
 assert.equal((await request()).status,200);
 assert.equal((await (await request()).json()).tasks.length,1);
-console.log('PASS entry migration, default kind, creation, legacy updates, conflict, move, completion and deletion');
+console.log('PASS public task reads, fail-closed writes, unchanged D1 rows and no wildcard CORS');

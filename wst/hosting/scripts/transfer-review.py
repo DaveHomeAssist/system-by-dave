@@ -10,22 +10,34 @@ import threading
 
 root = pathlib.Path(sys.argv[1])
 manifest = json.loads((root / 'media.json').read_text())
+catalog = json.loads((root / 'catalog.json').read_text())
+new_route_prefixes = tuple(
+    f"/run-review/sessions/{session['id']}/originals/"
+    for session in catalog['sessions']
+    if session.get('release', catalog['release']) == catalog['release']
+)
 token = getpass.getpass('Temporary upload token (hidden): ')
 local = threading.local()
 
 
 def transfer(item):
     route, meta = item
-    body = (root / 'originals' / meta['key']).read_bytes()
-    if hashlib.sha256(body).hexdigest() != meta['sha256']:
+    source = root / 'originals' / meta['key']
+    body = source.read_bytes() if source.exists() else None
+    is_new = route.startswith(new_route_prefixes)
+    if body is not None and hashlib.sha256(body).hexdigest() != meta['sha256']:
         raise ValueError('Local checksum mismatch: ' + route)
+    if is_new and body is None:
+        raise FileNotFoundError('New session original is missing: ' + str(source))
     for attempt in range(3):
         try:
             conn = http.client.HTTPSConnection('wst.housevideo.app', timeout=45)
-            if '/sessions/' in route:
+            if is_new:
                 conn.request('PUT', route, body, {'Authorization': 'Bearer ' + token, 'Content-Type': 'image/jpeg', 'Content-Length': str(len(body))})
                 response = conn.getresponse()
                 response.read()
+                if response.status == 409:
+                    raise RuntimeError('Conflicting stored hash, upload refused: ' + route)
                 if response.status not in (201, 204):
                     raise RuntimeError('Upload HTTP ' + str(response.status))
             conn.request('GET', route)
@@ -34,24 +46,25 @@ def transfer(item):
             conn.close()
             if response.status != 200 or hashlib.sha256(returned).hexdigest() != meta['sha256']:
                 raise RuntimeError('Public checksum mismatch or HTTP ' + str(response.status))
-            return route, meta['sha256']
+            return route, meta['sha256'], is_new
         except Exception:
             if attempt == 2:
                 raise
 
 
-verified, failed = {}, []
+verified, failed, uploaded = {}, [], 0
 with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
     futures = {pool.submit(transfer, item): item[0] for item in manifest.items()}
     for result in concurrent.futures.as_completed(futures):
         try:
-            route, digest = result.result()
+            route, digest, did_upload = result.result()
             verified[route] = digest
+            uploaded += int(did_upload)
         except Exception as error:
             failed.append({'path': futures[result], 'error': str(error)})
         if (len(verified) + len(failed)) % 100 == 0:
             print('Verified', len(verified), 'of', len(manifest), 'failures', len(failed), flush=True)
-(root / 'public-verification.json').write_text(json.dumps({'expected': len(manifest), 'verified': verified, 'failed': failed}, indent=2))
-print(json.dumps({'expected': len(manifest), 'verified': len(verified), 'failed': failed}), flush=True)
+(root / 'public-verification.json').write_text(json.dumps({'expected': len(manifest), 'verified': verified, 'uploaded': uploaded, 'readOnly': len(verified) - uploaded, 'failed': failed}, indent=2))
+print(json.dumps({'expected': len(manifest), 'verified': len(verified), 'uploaded': uploaded, 'readOnly': len(verified) - uploaded, 'failed': failed}), flush=True)
 if failed:
     raise SystemExit(1)

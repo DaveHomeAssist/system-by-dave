@@ -69,8 +69,10 @@ const robots = read('robots.txt');
 // Infrastructure adds its non-published native source template.
 // Front Office adds one non-published native source template; its public route is unchanged.
 // The AV Suite shell adds its non-published source template under apps/av-suite/. From
-// 2026-10-13 its av/ route is the noindex source of the avbydave.com home page, and the 34
-// retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md).
+// 2026-10-13 its av/ route was the noindex source of the avbydave.com home page, and the 34
+// retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md). From
+// 2026-11-21 the home page source is av-home/ (noindex at its source path, one more route
+// outside the sitemap) and av/ is indexable in the AV sitemap (one fewer), so the count holds.
 // Equipment Lab adds its source template, original checklist and package return route.
 // Eight original family entries now redirect into the shared console.
 // The noindex Sync & Signal Field Kit draft (field-kit/, docs/launch/README.md) adds one,
@@ -79,7 +81,12 @@ const robots = read('robots.txt');
 // Projctl adds two nonpublic relay pages: the control UI and passcode sign-in.
 // The Frozen Monitor adds six noindex relay pages under apps/projctl/public/monitor/ (2026-11-14).
 // The Frozen standalone house handoff and its local relay copy add two noindex crew reference pages.
-if (unlisted.length !== 214) fail(`Expected 214 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// Pixel capture adds two noindex synthetic demo viewers.
+// Frozen Startup Checks adds one noindex native app page.
+// The Projctl show backup page adds one noindex relay role page, apps/projctl/public/show.html (2026-11-18).
+// The Projctl power operator page adds one noindex relay page (apps/projctl/public/power.html).
+// The Philly prototype (thephilly/, noindex, private working prototype) adds one.
+if (unlisted.length !== 220) fail(`Expected 220 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);

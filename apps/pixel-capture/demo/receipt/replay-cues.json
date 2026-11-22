@@ -1,0 +1,167 @@
+{
+ "offset": 0.0,
+ "after": 3.0,
+ "lanes": [
+  "artnet:0",
+  "artnet:1",
+  "sacn:1"
+ ],
+ "cues": [
+  {
+   "id": "a2e5641fd0f20d53fc8c937d",
+   "key": "2026-11-16T00:00:03Z|incoming|990001|f0 7f 03 02 01 01 31 30 31 00 31 f7|1",
+   "cue": "101",
+   "cueList": "1",
+   "command": "GO",
+   "midiUnix": 1794787203.0,
+   "pixelTime": 1794787203.0,
+   "utc": "2026-11-16T00:00:03Z",
+   "universes": {
+    "artnet:0": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.025,
+     "offsetApprox": false,
+     "changesBefore": 0,
+     "changesAfter": 1,
+     "packetsAfter": 120
+    },
+    "artnet:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.004,
+     "offsetApprox": false,
+     "changesBefore": 116,
+     "changesAfter": 81,
+     "packetsAfter": 120
+    },
+    "sacn:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.044,
+     "offsetApprox": false,
+     "changesBefore": 0,
+     "changesAfter": 1,
+     "packetsAfter": 90
+    }
+   }
+  },
+  {
+   "id": "b057ae3a88851ea4a8bcaa35",
+   "key": "2026-11-16T00:00:06Z|incoming|990001|f0 7f 03 02 01 01 31 30 32 2e 35 00 31 f7|1",
+   "cue": "102.5",
+   "cueList": "1",
+   "command": "GO",
+   "midiUnix": 1794787206.0,
+   "pixelTime": 1794787206.0,
+   "utc": "2026-11-16T00:00:06Z",
+   "universes": {
+    "artnet:0": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.0,
+     "offsetApprox": false,
+     "changesBefore": 1,
+     "changesAfter": 1,
+     "packetsAfter": 120
+    },
+    "artnet:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.004,
+     "offsetApprox": false,
+     "changesBefore": 81,
+     "changesAfter": 1,
+     "packetsAfter": 120
+    },
+    "sacn:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.044,
+     "offsetApprox": false,
+     "changesBefore": 1,
+     "changesAfter": 1,
+     "packetsAfter": 90
+    }
+   }
+  },
+  {
+   "id": "fd02f1aece754d0c44e0bb65",
+   "key": "2026-11-16T00:00:09Z|incoming|990001|f0 7f 03 02 01 01 31 30 33 00 31 f7|1",
+   "cue": "103",
+   "cueList": "1",
+   "command": "GO",
+   "midiUnix": 1794787209.0,
+   "pixelTime": 1794787209.0,
+   "utc": "2026-11-16T00:00:09Z",
+   "universes": {
+    "artnet:0": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.0,
+     "offsetApprox": false,
+     "changesBefore": 1,
+     "changesAfter": 1,
+     "packetsAfter": 120
+    },
+    "artnet:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.004,
+     "offsetApprox": false,
+     "changesBefore": 1,
+     "changesAfter": 1,
+     "packetsAfter": 40
+    },
+    "sacn:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.044,
+     "offsetApprox": false,
+     "changesBefore": 1,
+     "changesAfter": 1,
+     "packetsAfter": 90
+    }
+   }
+  },
+  {
+   "id": "d86b43973feca3d7862a3f06",
+   "key": "2026-11-16T00:00:12Z|incoming|990001|f0 7f 03 02 01 01 31 30 34 00 31 f7|1",
+   "cue": "104",
+   "cueList": "1",
+   "command": "GO",
+   "midiUnix": 1794787212.0,
+   "pixelTime": 1794787212.0,
+   "utc": "2026-11-16T00:00:12Z",
+   "universes": {
+    "artnet:0": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.0,
+     "offsetApprox": false,
+     "changesBefore": 1,
+     "changesAfter": 1,
+     "packetsAfter": 120
+    },
+    "artnet:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 2.004,
+     "offsetApprox": false,
+     "changesBefore": 1,
+     "changesAfter": 1,
+     "packetsAfter": 40
+    },
+    "sacn:1": {
+     "live": true,
+     "changed": true,
+     "firstChangeOffset": 0.044,
+     "offsetApprox": false,
+     "changesBefore": 1,
+     "changesAfter": 118,
+     "packetsAfter": 149
+    }
+   }
+  }
+ ]
+}

@@ -1,7 +1,10 @@
 // In-process fake projector. Warms up 4 s, cools 6 s. Same interface as the real drivers.
 import { POWER, SHUTTER, NotSupported } from './base.js';
 
-export function simulatorDriver({ name = 'SIM', inputs = ['31', '32'] } = {}) {
+// A Barco model reports the raw Pulse state as well (ready while off), as the real driver does.
+const PULSE_STATES = { on: 'on', off: 'ready', warming: 'conditioning', cooling: 'deconditioning' };
+export function simulatorDriver({ name = 'SIM', inputs = ['31', '32'], model = '' } = {}) {
+  const pulseLike = /UD[MX]|barco/i.test(String(model));
   const st = { power: POWER.OFF, shutter: SHUTTER.CLOSED, input: inputs[0], lightHours: 1234, name, flaky: false, lens: { h: 0, v: 0, focus: 1000, zoom: 1000, hState: 'Stopped', vState: 'Stopped', focusState: 'Stopped', zoomState: 'Stopped' } };
   let timer = null;
   const later = (ms, fn) => { clearTimeout(timer); timer = setTimeout(fn, ms); };
@@ -15,6 +18,7 @@ export function simulatorDriver({ name = 'SIM', inputs = ['31', '32'] } = {}) {
       const { power, shutter, input, lightHours, name, lens, pattern } = st;
       if (st.pollFocus != null) st.lens.focus = st.pollFocus;
       const result = { power, shutter, input, lightHours, name, lens: { ...lens }, pattern, errors: { fan: 0, lamp: 0, temp: 0, cover: 0, filter: 0, other: 0 }, online: true };
+      if (pulseLike) result.rawState = st.rawState || PULSE_STATES[power] || null;
       return result;
     },
     async healthReadings() {

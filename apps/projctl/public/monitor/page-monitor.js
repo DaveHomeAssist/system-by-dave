@@ -3,8 +3,9 @@ import { diagnosticsHTML, preserveDiagnostics } from '../panasonic-diagnostics.j
 import { startMonitor, onLive, laneModels, patch, esc, $, live, todayISO, easternTime, laneOfSlot, shortTime, relayUnavailableText } from './monitor.js';
 import { ALERTS, CHECKLIST, HUB, isSide } from './monitor-data.js';
 import { eventKind } from '../workspace/calendar.js';
+import { artSVG, LOOKS } from './monitor-art.js';
 
-let selected = 'A', schedule = null, logPage = 0, logRows = 5, checklistIndex = 0;
+let selected = 'A', look = savedLook(), schedule = null, logPage = 0, logRows = 5, checklistIndex = 0;
 const KIND = { 'power-on': 'Power on', hourly: 'Hourly', 'power-off': 'Power off', 'relay-stop': 'Relay stop', manual: 'Manual' };
 const word = v => `<span class="fm-word"><span class="avd-dot avd-dot--${v.st}" aria-hidden="true"></span>${esc(v.word)}</span>`;
 const model = v => v.liveModel || v.model;
@@ -16,8 +17,17 @@ const faultRow = v => v.fault ? v.fault.text : v.alarmsReported ? 'None reported
 const address = v => v.ip || (live.connected ? 'No address saved' : 'Address from the relay');
 const slotLabel = slot => !slot || slot === '*' || slot === 'all' ? 'All' : laneOfSlot(slot) ? `${slot} · ${laneOfSlot(slot)}` : slot;
 
+// Feed art look, remembered per browser. Storage can be unavailable; the page still works without it.
+function savedLook() { try { const v = localStorage.getItem('fm-look'); return LOOKS.includes(v) ? v : 'coronation'; } catch { return 'coronation'; } }
+function setLook(next) {
+  look = LOOKS.includes(next) ? next : 'coronation';
+  try { localStorage.setItem('fm-look', look); } catch { /* per-browser convenience only */ }
+  document.querySelectorAll('[data-look-choice]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lookChoice === look)));
+  render();
+}
+
 function feed(v) {
-  return `<button type="button" class="fm-feed fm-pick" data-lane="${v.lane}" data-pick="${v.lane}" data-key="feed-${v.lane}" aria-pressed="${v.lane === selected}" aria-label="Projector ${v.lane}, ${esc(v.surface)}, ${esc(v.power)}, shutter ${esc(v.shutter)}${v.fault ? ', ' + esc(v.fault.text) : ''}"><span class="fm-feed__head"><span class="fm-laneidx">${v.lane}</span><span class="fm-lanename">${esc(v.surface)}</span></span><span class="fm-art ${v.lane === 'C' ? 'fm-art-peaks' : 'fm-art-aurora'}"><strong class="fm-feed-power">${esc(v.power)}</strong><span class="fm-feed-shutter">Shutter ${esc(v.shutter)}</span></span><span class="fm-feed__foot">${v.fault ? fault(v) : word(v)}<span class="fm-small">Reply ${esc(v.reply)}</span></span></button>`;
+  return `<button type="button" class="fm-feed fm-pick" data-lane="${v.lane}" data-pick="${v.lane}" data-key="feed-${v.lane}" aria-pressed="${v.lane === selected}" aria-label="Projector ${v.lane}, ${esc(v.surface)}, ${esc(v.power)}, shutter ${esc(v.shutter)}${v.fault ? ', ' + esc(v.fault.text) : ''}"><span class="fm-feed__head"><span class="fm-laneidx">${v.lane}</span><span class="fm-lanename">${esc(v.surface)}</span></span><span class="fm-art fm-art-house" data-look="${look}">${artSVG(v.lane, look)}<span class="fm-feed-readout"><strong class="fm-feed-power">${esc(v.power)}</strong><span class="fm-feed-shutter">Shutter ${esc(v.shutter)}</span></span></span><span class="fm-feed__foot">${v.fault ? fault(v) : word(v)}<span class="fm-small">Reply ${esc(v.reply)}</span></span></button>`;
 }
 
 const row = cells => `<div role="row" class="fm-tr">${cells}</div>`;
@@ -56,7 +66,7 @@ function render() {
   const restoreDiagnostics = preserveDiagnostics(insp);
   patch(insp, `<div class="avd-panel__head"><h2 id="insp-title" class="avd-panel__title"><span class="avd-panel__index">${v.lane}</span>Projector ${v.lane}</h2><span class="avd-state"><span class="avd-dot avd-dot--${v.st}" aria-hidden="true"></span>${esc(v.word)}</span></div><div class="avd-panel__body"><div class="pj-lane"><h3>${esc(v.surface)}</h3><span class="pj-mono">${esc(v.role)} · ${esc(v.orientation)}</span></div><div class="fm-kvs">${[
     kv('Model', model(v)), kv('Address', address(v)), kv('Labels', `${v.prod} production · ${v.slot || 'unassigned'} controller`), kv('Resolution', v.native),
-    kv('Input reported', `${v.input} · ${v.signal}`), kv('Control', v.route), kv('Faults', faultRow(v)), kv('Light', lampRecord(v))].join('')}</div>${diagnosticsHTML(v.projector, v.current)}<a class="avd-btn avd-btn--primary avd-btn--block" href="/" target="_blank" rel="noopener noreferrer">Open in Projctl ↗</a><p class="pj-mono fm-small">Monitor only. Lighting fires the cues and Millumin sends power and shutter.</p></div>`);
+    kv('Input reported', `${v.input} · ${v.signal}`), kv('Control', v.route), kv('Faults', faultRow(v)), kv('Light', lampRecord(v))].join('')}</div>${diagnosticsHTML(v.projector, v.current)}<a class="avd-btn avd-btn--primary avd-btn--block" href="/" target="_blank" rel="noopener noreferrer">Open in Projctl ↗</a><p class="pj-mono fm-small">Monitor only. Lighting fires the cues. Projctl holds A's shutter; Millumin sends power and shutter for B, C and D.</p></div>`);
   restoreDiagnostics();
 
   const h = live.health, last = h?.reports?.[0], engine = h?.engine;
@@ -80,6 +90,7 @@ $('#mon-check-prev').onclick = () => { checklistIndex--; renderChecklist(); };
 $('#mon-check-next').onclick = () => { checklistIndex++; renderChecklist(); };
 $('#mon-log-newer').onclick = () => { logPage--; render(); };
 $('#mon-log-older').onclick = () => { logPage++; render(); };
+document.querySelectorAll('[data-look-choice]').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.lookChoice === look)); b.onclick = () => setLook(b.dataset.lookChoice); });
 $('#mon-details').onclick = () => $('#mon-detail-dialog').showModal();
 $('#mon-records').onclick = () => $('#mon-records-dialog').showModal();
 let software = null, softwarePage = 0;

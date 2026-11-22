@@ -10,8 +10,14 @@ const [managed, viewer, data, phase = 'active', shellRoot = fileURLToPath(new UR
 assert(managed && viewer && data && ['media', 'active'].includes(phase), 'Usage: integrate-review.mjs managed-source viewer.html verified-release-dir [media|active]');
 const read = file => JSON.parse(fs.readFileSync(path.join(data, file), 'utf8'));
 const catalog = read('catalog.json'), media = read('media.json'), manifests = {};
-assert.equal(catalog.sessions.length, 2);
-for (const s of catalog.sessions) { const m = read(s.id + '.json'); assert.equal(m.sessionId, s.id); assert.equal(m.release, catalog.release); manifests[s.manifest] = m; }
+assert(catalog.sessions.length >= 2);
+assert.equal(new Set(catalog.sessions.map(session => session.id)).size, catalog.sessions.length, 'Review session IDs must be unique');
+for (const s of catalog.sessions) {
+  const m = read(s.id + '.json');
+  assert.equal(m.sessionId, s.id);
+  assert.equal(m.release, s.release || catalog.release);
+  manifests[s.manifest] = m;
+}
 const hosting = JSON.parse(fs.readFileSync(path.join(managed, '.openai/hosting.json')));
 assert.equal(hosting.project_id, 'appgprj_6aed67f5df688191acf3e2641138818a');
 assert.equal(hosting.r2, 'REVIEW_PHOTOS'); assert.equal(hosting.d1, 'DB');
@@ -22,7 +28,17 @@ assert(source.includes(marker), 'Unrecognized Worker boundary; preserve and insp
 if (!source.includes("import {handleHostedReview}")) source = "import {handleHostedReview} from './review-hosted.js';\n" + source;
 if (!source.includes('const hostedReview=')) source = source.replace(marker, marker + '\n const hostedReview=await handleHostedReview(request,env);if(hostedReview)return hostedReview;');
 fs.copyFileSync(new URL('../review/handler.mjs', import.meta.url), path.join(managed, 'worker/review-handler.mjs'));
-fs.writeFileSync(path.join(managed, 'worker/review-release.js'), 'export default ' + JSON.stringify({ active: phase === 'active', catalog, media, manifests }) + ';\n');
+const releasePath = path.join(managed, 'worker/review-release.js');
+let installed = { active: true, catalog, media, manifests };
+if (phase === 'media') {
+  const previousSource = fs.readFileSync(releasePath, 'utf8').trim();
+  assert(previousSource.startsWith('export default ') && previousSource.endsWith(';'), 'Existing review release is not a recognized managed export');
+  const previous = JSON.parse(previousSource.slice('export default '.length, -1));
+  assert(previous.active && previous.catalog && previous.manifests && previous.media, 'Existing live review release is incomplete');
+  for (const session of previous.catalog.sessions) assert(previous.manifests[session.manifest], `Existing live manifest is missing for ${session.id}`);
+  installed = { active: true, catalog: previous.catalog, media, manifests: previous.manifests };
+}
+fs.writeFileSync(releasePath, 'export default ' + JSON.stringify(installed) + ';\n');
 fs.writeFileSync(path.join(managed, 'worker/review-hosted.js'), "import {reviewHandler} from './review-handler.mjs';\nimport release from './review-release.js';\nexport const handleHostedReview=reviewHandler(release);\n");
 if (phase === 'active') {
   let html = fs.readFileSync(viewer, 'utf8');
@@ -44,13 +60,18 @@ if (phase === 'active') {
   for (const url of ['/', '/index.html']) {
     let home = assets[url]; assert(home, 'Missing WST home');
     home = home.replace(/<a href="\/run-review\/" style="[^"]*">Review November 15 run · 417 cues<\/a>/, '');
-    if (!home.includes('class="home-choice"')) {
+    const existingReviewCard = /<a class="home-choice"[^>]*>[\s\S]*?<\/a>/;
+    if (existingReviewCard.test(home)) {
+      home = home.replace(existingReviewCard, card);
+    } else {
       const start = home.indexOf('<div class="home-choices">');
       const end = home.indexOf('</div>', start);
       assert(start >= 0 && end > start, 'Missing Home choices boundary');
       home = home.slice(0, end) + card + '\n' + home.slice(end);
     }
-    if (!home.includes('class="planning-link"')) home = home.replace('<button type="button" data-route="documents">Documents</button></nav>', '<button type="button" data-route="documents">Documents</button>' + planning + '</nav>');
+    const existingPlanningLink = /<a class="planning-link"[^>]*>[\s\S]*?<\/a>/;
+    if (existingPlanningLink.test(home)) home = home.replace(existingPlanningLink, planning);
+    else home = home.replace('<button type="button" data-route="documents">Documents</button></nav>', '<button type="button" data-route="documents">Documents</button>' + planning + '</nav>');
     assert(home.includes(card) && home.includes(planning), 'Review navigation did not attach');
     assets[url] = home;
   }
@@ -62,5 +83,5 @@ fs.writeFileSync(workerPath, source);
 const buildPath = path.join(managed, 'scripts/build.sh'); let build = fs.readFileSync(buildPath, 'utf8');
 if (!build.includes('review-handler.mjs')) build += '\ncp "$project_root/worker/review-hosted.js" "$project_root/worker/review-handler.mjs" "$project_root/worker/review-release.js" "$dist_root/server/"\n';
 fs.writeFileSync(buildPath, build);
-fs.writeFileSync(path.join(managed, 'REVIEW_RELEASE.json'), JSON.stringify({ release: catalog.release, phase, viewerSha256: createHash('sha256').update(fs.readFileSync(viewer)).digest('hex'), sessions: catalog.sessions.map(s => s.id) }, null, 2));
+fs.writeFileSync(path.join(managed, 'REVIEW_RELEASE.json'), JSON.stringify({ release: catalog.release, phase, viewerSha256: createHash('sha256').update(fs.readFileSync(viewer)).digest('hex'), sessions: catalog.sessions.map(s => s.id), activeSessions: installed.catalog.sessions.map(s => s.id), mediaRoutes: Object.keys(media).length }, null, 2));
 console.log(`Integrated ${catalog.release}: ${phase}; unrelated live assets and storage bindings retained`);

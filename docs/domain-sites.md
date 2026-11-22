@@ -9,7 +9,7 @@ GitHub Pages repository.
 | --- | --- | --- | --- | --- |
 | `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/ursa-broadcast-g2/`, `/backfocus/`, `/camera-sim/` | 2026-09-18 |
 | `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | 2026-09-20; authenticated walk acceptance pending |
-| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | AV by Dave console at `/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
+| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Home page at `/` (from `av-home/`), AV by Dave console at `/av/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
 and the browser storage its tools own. AV by Dave pages come from
@@ -17,9 +17,15 @@ and the browser storage its tools own. AV by Dave pages come from
 avbydave.com without editing the config. Paths are unchanged on the new domains:
 `systembydave.com/fmp/house/` is `housevideo.app/fmp/house/`. The bare domain
 redirects to the site's home (`/fmp/` or `/fmpwalk/`). AV by Dave serves the
-source-controlled `av/index.html` at `/`; the direct source path is
-noindex and canonical to `/`. Former Show Console, Toolbox, sheet and eight original family routes redirect
-into the console. The shell is cached for offline return visits. The previous
+source-controlled `av-home/index.html` at `/` (since 2026-11-21); the direct
+source path is noindex and canonical to `/`. The console is one part of that
+site at `/av/`, indexable under its own canonical address, and its breadcrumb
+returns to `/`. Former Show Console, Toolbox, sheet and eight original family
+routes redirect into the console. The home page's files are in the registry's
+offline list, so a saved copy of `/` opens styled offline; a browser that never
+saved `/` gets the saved console instead. Bookmarks to the bare domain now open
+the home page, one link from the console; `/av/`, the installed app and every
+saved workspace are unchanged. The previous
 `av-suite-landing.html` was retired (UX-005): it is now a noindex redirect to
 the current home, kept so old links still land, and is no longer cached offline.
 
@@ -52,6 +58,9 @@ move again.
 
 ## Pipeline
 
+The release gates run as parallel jobs in `.github/workflows/deploy-pages.yml`
+(since 2026-11-21); the `deploy` job needs every one of them and does steps 2 to 5.
+
 1. `npm run verify:domain-sites` runs with the other release gates. It stages
    all sites into a temporary directory and fails when:
    - a staged page loads or links a local file that the site does not carry
@@ -67,14 +76,44 @@ move again.
    verifying the new origin in the existing Google client and backend
    `FMP_ALLOWED_ORIGINS`. It records external configuration evidence; it does not
    prove Gmail delivery or a Notion save.
-4. Publish the walk first with `scripts/publish_domain_site.sh`. Wait up to ten
-   minutes for HTTPS to serve the exact staged `source.json`, walk, alias and
-   transfer page. Missing DNS, TLS, target repository, deploy key, or stale output
-   stops the release before systembydave.com or housevideo.app redirects change.
+4. Publish the walk first with `scripts/publish_domain_site.sh`. That script
+   waits until the destination repository's Pages run for the pushed commit
+   succeeds. The live check then compares HTTPS with the staged `source.json`,
+   walk, alias and transfer page. GitHub Pages caches those files for ten
+   minutes and ignores the `?release=` query, so a response that is still the
+   previous release is waited out until its `Age` reaches `max-age`, once.
+   Missing DNS, TLS, target repository, deploy key, or a destination run that
+   fails stops the release before systembydave.com or housevideo.app redirects
+   change.
 5. Deploy systembydave.com, then publish housevideo.app and avbydave.com with
    their respective `HOUSEVIDEO_DEPLOY_KEY` and `AVBYDAVE_DEPLOY_KEY`. Each target
    repository's own Pages workflow deploys its push; each key can write only its
    own repository. Unchanged content produces no commit.
+
+### When GitHub loses sight of the Pages artifact
+
+GitHub's Pages action sometimes stops with "No artifacts named github-pages were
+found" a second after the upload step reported success. It reads GitHub's own
+artifact service, which does not always list a new artifact straight away; the
+REST artifact list shows it the whole time, which is why the REST wait in the
+destination workflows does not prevent it. On 2026-11-21 it failed five of six
+runs here and runs in `housevideo` and `avbydave`. Nothing in the site causes it
+and a fresh attempt works, so the pipeline makes that attempt itself (since
+2026-11-22):
+
+- **systembydave.com** (`deploy` job): the Pages step is tried up to three
+  times. The second try asks again after 20 seconds. The third uploads the same
+  staged `_site` under a new artifact name and deploys that. The job is green
+  when any try publishes, and the two domain publishes run only then
+  (`steps.pages.outputs.deployed`).
+- **Destination repositories** (`scripts/publish_domain_site.sh`): when a
+  destination's Pages run for the pushed commit does not succeed, the script
+  pushes an empty commit, which starts a new run, and waits for that one. Up to
+  three runs in all (`PUBLISH_ATTEMPTS`). The site's files do not change, and
+  `source.json` still names the same source commit.
+
+A real failure still fails: three tries that all fail leave the job red, and
+the walk still stops the release before any redirect changes.
 
 Each staged site gets its own `index.html` (home page or redirect), `404.html`,
 `robots.txt`, `CNAME`, `source.json` (source commit and artifact digest) and

@@ -181,14 +181,14 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
 - pjlink: complete for power, shutter, input, status, light hours (where the projector answers LAMP).
 - simulator: complete.
 - pulse (Barco): core state, power, shutter, internal patterns, discovered inputs, bounded lens targets and supported picture ranges use the Pulse API. Optional alarm telemetry remains unknown, rather than implying a clear alarm panel.
-- panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls.
+- panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls. When another controller holds a projector's PJLink link, power and shutter fall back to the control port ([brief](docs/panasonic-control-port.md)).
 
 PJLink keeps one status connection open per projector between polls. Each poll
 reads power first. Off, cooling and warming states return immediately with
 shutter, input and other unavailable details cleared. Powered-on polls also
 read shutter, input, alarms, lamp hours and the projector name.
 Control commands run after an in-flight poll, close its connection, and use a
-separate connection. Closed status sessions are recovered without replaying a
+separate connection. Closed or reset status sessions are recovered without replaying a
 control command. Replacing a configured driver releases its held connection.
 Panasonic native replies validate an echoed command name and reject a mismatch
 promptly so the next operation can proceed.
@@ -237,6 +237,9 @@ Picture controls come from writable `image` metadata and use its actual ranges a
 Lens taps use bounded encoder targets: Slow 128, Normal 512 and Fast 2048, limited to device
 travel. Slow is the default. The relay waits for stopped feedback, blocks overlapping
 movement, and refreshes position before replying. Stop lens remains available under Show Lock.
+Stop lens opens its own connection to each of the four axes at once, so it does not wait behind
+a status read, and one axis that fails does not leave the others moving. If any axis does not
+acknowledge, the command reports how many.
 An acknowledged request still needs the expected physical result checked on the actual rig.
 
 Shift button labels describe image movement from the audience's view. Setup can reverse
