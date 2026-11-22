@@ -22,7 +22,8 @@
       var dark = document.documentElement.getAttribute('data-av-theme') === 'dark';
       toggle.textContent = dark ? 'Light mode' : 'Dark mode';
       toggle.setAttribute('aria-label', dark ? 'Use light mode' : 'Use dark mode');
-      toggle.setAttribute('aria-pressed', String(dark));
+      // The button turns light mode on, so it reads as pressed only in light mode.
+      toggle.setAttribute('aria-pressed', String(!dark));
       toggle.hidden = false;
     }
     toggle.addEventListener('click', function () {
