@@ -1,5 +1,10 @@
 # Changelog
 
+## November 22, 2026. Get behind the AV by Dave console
+
+- The home page now puts the visitor at the controls. The primary action opens the live-show workspace at `/console/`; the show brief remains available as a secondary action.
+- The AV destination stages both `/console/` and `/av/` from the same shell, with `/console/` as canonical and in the AV sitemap. Old links, deep links, installed shortcuts, saved browser records and cached offline console use continue on the same origin. No storage or manifest migration.
+
 ## November 21, 2026. The Philly opens on the Hijinx Handbook cover
 
 - `/thephilly/` now matches the private prototype at `DaveHomeAssist/the-philly` commit `c7376c3`. Issue 01 is the founders' Special Edition, "Hijinx Handbook": the Issue tab shows their cover art (an embedded WebP image, so nothing new is fetched) and the masthead reads Special Edition. The drawn Liberty Bell collage, its styles and the rowhomes and masthead builder are gone.

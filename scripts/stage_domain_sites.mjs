@@ -24,6 +24,7 @@ import vm from 'node:vm';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import domainSites from './domain_sites_lib.js';
 import { applyManagedSiteMirrors } from './managed_site_mirrors.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -732,6 +733,13 @@ function stageSite(site, closed, policy, options) {
   } else {
     writeFile(dir, 'index.html', homePage(site, origin));
   }
+  if (site.consoleEntry) {
+    const { path: route, shell } = site.consoleEntry;
+    const consolePage = domainSites.publishedConsole(site, read(shell));
+    writeFile(dir, `${route}index.html`, consolePage);
+    // Old links still open this exact app at the same origin, query and fragment.
+    writeFile(dir, shell, consolePage);
+  }
   for (const [route, targetId] of Object.entries(site.movedTo || {})) {
     const moved = options.config.sites.find((entry) => entry.id === targetId);
     if (!moved) throw new Error(`${site.id} movedTo names unknown site ${targetId}.`);
@@ -760,6 +768,14 @@ function stageSite(site, closed, policy, options) {
   if (options.cutover) {
     execFileSync('python3', [path.join(ROOT, 'scripts/gen_sitemap.py'), '--site', site.id, '--lastmod', '--out', path.join(dir, 'sitemap.xml')], { cwd: ROOT, stdio: ['ignore', 'ignore', 'inherit'] });
     hasSitemap = fs.existsSync(path.join(dir, 'sitemap.xml'));
+  }
+  if (site.consoleEntry && options.cutover) {
+    const sitemap = fs.readFileSync(path.join(dir, 'sitemap.xml'), 'utf8');
+    const { path: route, shell } = site.consoleEntry;
+    if (!sitemap.includes(`<loc>https://${site.domain}/${route}</loc>`) ||
+        sitemap.includes(`<loc>https://${site.domain}/${routeFor(shell)}</loc>`)) {
+      throw new Error(`${site.id} sitemap must list only the canonical console path.`);
+    }
   }
   const baseRules = robotsRules(robots(site, origin, options.cutover, hasSitemap));
   const blockedImages = options.cutover
@@ -917,6 +933,16 @@ function main() {
     }
     const cutover = Boolean(site.cutover) || Boolean(args.simulate);
     const entries = siteEntries(site, registry);
+    const generatedForSite = new Set(generated);
+    if (site.consoleEntry) {
+      const { path: route, shell } = site.consoleEntry;
+      // Both addresses are one directory deep, so relative shell assets resolve identically.
+      if (!/^[a-z0-9-]+\/$/.test(route) || !/^[a-z0-9-]+\/index\.html$/.test(shell) ||
+          !entries.pages.has(shell) || fs.existsSync(abs(`${route}index.html`))) {
+        throw new Error(`${site.id} consoleEntry needs a new top-level path and an owned top-level shell.`);
+      }
+      generatedForSite.add(`${route}index.html`);
+    }
     for (const file of entries.pages) {
       if (movedIndex.has(file)) throw new Error(`${file} is claimed by both ${movedIndex.get(file).site.id} and ${site.id}.`);
       movedIndex.set(file, { site, cutover });
@@ -927,11 +953,11 @@ function main() {
       throw new Error(`${site.id} home ${site.home} is not one of its pages.`);
     }
     policies[site.id] = storagePolicy(site, registry);
-    plans.push({ site, entries, cutover });
+    plans.push({ site, entries, cutover, generatedForSite });
   }
 
-  for (const { site, entries, cutover } of plans) {
-    const closed = closeSite(site, entries, generated, movedIndex, args.simulate);
+  for (const { site, entries, cutover, generatedForSite } of plans) {
+    const closed = closeSite(site, entries, generatedForSite, movedIndex, args.simulate);
     closed.problems.push(...checkOffline(site, registry, closed.files));
     closed.warnings.forEach((warning) => console.warn(`warn ${site.id}: ${warning}`));
     if (closed.problems.length) {

@@ -208,7 +208,7 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261121-site-home') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261122-console-entry') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
@@ -291,8 +291,8 @@ function assertPageContracts(registry) {
   if (!siteHome.includes('<meta name="robots" content="noindex,follow">') || !siteHome.includes('<link rel="canonical" href="https://avbydave.com/">')) {
     fail('av-home/ must be noindex at its source path with the avbydave.com root as canonical (it is staged as that home page).');
   }
-  if (!siteHome.includes('href="../av/"') || !/<a class="hp-skip" href="#main">/.test(siteHome) || !/id="main" tabindex="-1"/.test(siteHome)) {
-    fail('The avbydave.com home page must link the console at /av/ and open with a skip link to its content.');
+  if (!avSite || avSite.consoleEntry?.path !== 'console/' || avSite.consoleEntry?.shell !== 'av/index.html' || !siteHome.includes('href="/console/">Get behind the console') || !/<a class="hp-skip" href="#main">/.test(siteHome) || !/id="main" tabindex="-1"/.test(siteHome)) {
+    fail('The avbydave.com home page must link the console at /console/ and open with a skip link to its content.');
   }
   // One theme owner per origin: the home page reads and writes the AV tools' own saved choice.
   if (!read('av-home/home.js').includes("'av-theme-mode.v1'")) fail('The avbydave.com home page must use the shared av-theme-mode.v1 theme choice.');

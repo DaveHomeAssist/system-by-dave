@@ -173,7 +173,12 @@ def main():
             parser.error("unknown site id: %s" % args.site)
     base = "https://%s/" % site["domain"] if site else BASE
 
+    console = site.get('consoleEntry') if site else None
+    console_shell = console['shell'].removesuffix('index.html') if console else None
+
     def belongs(path):
+        if path == console_shell:
+            return False
         owner = site_for(path, sites, hrefs)
         if site:
             return owner is not None and owner["id"] == site["id"]
@@ -187,6 +192,8 @@ def main():
             continue
         if not path or is_indexable(path):
             entries.append((path, when(path), freq, prio))
+    if console:
+        entries.append((console['path'], when(console['shell']), TOOL_CHANGEFREQ, TOOL_PRIORITY))
     listed = {path for path, _, _, _ in entries}
     for href in registry_tool_pages():
         if href in listed or not belongs(href):

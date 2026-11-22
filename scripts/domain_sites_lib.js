@@ -77,4 +77,20 @@ function cutoverSites() {
   return config.sites.filter((site) => site.cutover);
 }
 
-module.exports = { SOURCE_ORIGIN, siteFor, originFor, sitemapFor, siteSitemap, cutoverSites };
+// Both AV entry addresses share one runnable shell. Only the destination
+// metadata changes, not the source-host template or installed manifest.
+function publishedConsole(site, source) {
+  const { path: route, shell } = site.consoleEntry;
+  const oldCanonical = `https://${site.domain}/${shell.replace(/index\.html$/, '')}`;
+  const canonical = `https://${site.domain}/${route}`;
+  if (!source.includes(`rel="canonical" href="${oldCanonical}"`) ||
+      !source.includes(`property="og:url" content="${oldCanonical}"`) ||
+      /<meta[^>]+name="robots"/i.test(source)) {
+    throw new Error(`${site.id} console entry requires an indexable shell with its original canonical and Open Graph URL.`);
+  }
+  return source
+    .replace(`rel="canonical" href="${oldCanonical}"`, `rel="canonical" href="${canonical}"`)
+    .replace(`property="og:url" content="${oldCanonical}"`, `property="og:url" content="${canonical}"`);
+}
+
+module.exports = { SOURCE_ORIGIN, siteFor, originFor, sitemapFor, siteSitemap, cutoverSites, publishedConsole };
