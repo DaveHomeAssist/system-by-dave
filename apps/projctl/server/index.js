@@ -586,7 +586,7 @@ const server = http.createServer(async (req, res) => {
       if (wait) { res.setHeader('retry-after', Math.ceil(wait / 1000)); throw httpErr(429, `too many tries, wait ${Math.ceil(wait / 1000)} s`); }
       if (tokenMatches(bearerToken(req), STATUS_TOKEN)) { statusThrottle.succeed(ip); viaStatusToken = true; } else statusThrottle.fail(ip);
     }
-    if (url.pathname === '/login.html' || url.pathname === '/login.js' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css' || url.pathname === '/frozen-theme.js' || url.pathname === '/frozen-theme.css') { /* public assets */ }
+    if (url.pathname === '/login.html' || url.pathname === '/login.js' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css' || url.pathname === '/frozen-theme.js' || url.pathname === '/frozen-theme.css' || url.pathname === '/frozen-favicon.js' || url.pathname === '/frozen-favicon.css' || url.pathname === '/frozen-zone-nav.js' || url.pathname === '/frozen-zone-nav.css' || url.pathname.startsWith('/favicons/')) { /* public assets */ }
     else if (!viaStatusToken && !authed(req)) {
       if (url.pathname.startsWith('/api/')) throw httpErr(401, 'login required');
       const next = url.pathname + url.search;

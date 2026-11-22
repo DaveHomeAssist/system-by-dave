@@ -373,10 +373,10 @@ jobs:
     needs: [domain-cutover, contracts, site-browser, console, panels, retained, simulator]
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_second.outputs.page_url || steps.deployment_third.outputs.page_url }}
     # Publishing only. Every check runs in the jobs this one needs, side by side,
     # so "Re-run failed jobs" after a publishing error repeats this job alone.
     steps:
@@ -437,19 +437,65 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+
+      # Second and third attempts. GitHub's artifact service sometimes does not
+      # list an artifact it accepted a moment earlier, and the Pages action then
+      # stops with "No artifacts named github-pages were found" (five of six runs
+      # on 2026-11-21; the REST artifact list showed the artifact each time, so a
+      # REST wait does not help). The second attempt asks again after a pause.
+      # The third uploads the same staged site under a new name, which is what
+      # "Re-run failed jobs" did when it worked.
+      - name: Pause before the second Pages attempt
+        if: ${{ steps.deployment.outcome == 'failure' }}
+        run: sleep 20
+
+      - name: Deploy to GitHub Pages, second attempt
+        id: deployment_second
+        if: ${{ steps.deployment.outcome == 'failure' }}
+        continue-on-error: true
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+
+      - name: Upload artifact again for the third Pages attempt
+        if: ${{ steps.deployment.outcome == 'failure' && steps.deployment_second.outcome == 'failure' }}
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+          name: github-pages-third-attempt
+
+      - name: Pause before the third Pages attempt
+        if: ${{ steps.deployment.outcome == 'failure' && steps.deployment_second.outcome == 'failure' }}
+        run: sleep 20
+
+      - name: Deploy to GitHub Pages, third attempt
+        id: deployment_third
+        if: ${{ steps.deployment.outcome == 'failure' && steps.deployment_second.outcome == 'failure' }}
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        with:
+          artifact_name: github-pages-third-attempt
+
+      # One answer for the steps below: did any attempt publish the site?
+      - name: Record the Pages result
+        id: pages
+        if: ${{ !cancelled() }}
+        env:
+          DEPLOYED: ${{ steps.deployment.outcome == 'success' || steps.deployment_second.outcome == 'success' || steps.deployment_third.outcome == 'success' }}
+        run: |
+          echo "deployed=$DEPLOYED" >> "$GITHUB_OUTPUT"
+          echo "Pages deployed: $DEPLOYED (first: ${{ steps.deployment.outcome }}, second: ${{ steps.deployment_second.outcome }}, third: ${{ steps.deployment_third.outcome }})"
 
       # Each target repository deploys its own Pages site when this push lands.
       # These remaining publishes are independent; the walk is already verified.
       - name: Publish housevideo.app
-        if: ${{ !cancelled() && steps.deployment.outcome == 'success' && github.ref == 'refs/heads/main' }}
+        if: ${{ !cancelled() && steps.pages.outputs.deployed == 'true' && github.ref == 'refs/heads/main' }}
         env:
           DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_DEPLOY_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
         run: scripts/publish_domain_site.sh housevideo _sites/housevideo DaveHomeAssist/housevideo "$GITHUB_SHA"
 
       - name: Publish avbydave.com
-        if: ${{ !cancelled() && steps.deployment.outcome == 'success' && github.ref == 'refs/heads/main' }}
+        if: ${{ !cancelled() && steps.pages.outputs.deployed == 'true' && github.ref == 'refs/heads/main' }}
         env:
           DEPLOY_KEY: ${{ secrets.AVBYDAVE_DEPLOY_KEY }}
           GITHUB_TOKEN: ${{ github.token }}

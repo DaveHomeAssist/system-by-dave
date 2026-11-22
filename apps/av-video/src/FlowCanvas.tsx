@@ -4,6 +4,7 @@ import { BaseEdge, Edge, EdgeProps, Background, BackgroundVariant, Controls, Con
 import "@xyflow/react/dist/style.css";
 import { DeviceKind, VideoDocument } from "./model";
 import { addDevice, buildGraph, connectDevices, Device, deviceHeight, diagramSvg, renameDevice, Wire } from "./graph";
+import { DEVICE_TYPES, GearChoice, groupChoices, loadGearLibrary, suggestName } from "./gear";
 
 import { orthogonalPath } from "./routing";
 
@@ -54,6 +55,12 @@ export function FlowCanvas({ doc, selected, onChange, onSelect, onChecks, onEdit
   const [label, setLabel] = useState("");
   const [kind, setKind] = useState<DeviceKind>("source");
   const [deviceError, setDeviceError] = useState("");
+  /* Gear choices fill in the name and role. The Gear Reference list is read the first time the dialog
+     opens; null means not asked yet. A name the operator typed is never replaced by a later choice. */
+  const [gear, setGear] = useState("");
+  const [library, setLibrary] = useState<GearChoice[] | null>(null);
+  const suggested = useRef("");
+  const gearGroups = useMemo(() => groupChoices([...DEVICE_TYPES, ...(library || [])]), [library]);
   const device = graph.devices.find(d => d.id === picked);
   const selectedRoute = doc.routes.find(r => r.id === selected);
   useEffect(() => { setTrace(true); }, [selected]);
@@ -85,7 +92,17 @@ export function FlowCanvas({ doc, selected, onChange, onSelect, onChecks, onEdit
     };
   });
   function fit() { if (window.innerWidth <= 680) { const first = flow.current?.getNodes()[0]; if (first) { void flow.current?.setCenter(first.position.x + 120, first.position.y + 60, { zoom: .85, duration: 0 }); return; } } void flow.current?.fitView({ padding: .15, duration: 0, maxZoom: 1, minZoom: .2 }); }
-  function openDevice(old: Device | null = null) { if (old?.id.startsWith("empty:")) { onSelect(old.routes[0]); onEdit(); setPicked(""); return; } setEditing(old); setLabel(old?.label || ""); setKind(old?.kind || "source"); setDeviceError(""); dialog.current?.showModal(); }
+  function openDevice(old: Device | null = null) { if (old?.id.startsWith("empty:")) { onSelect(old.routes[0]); onEdit(); setPicked(""); return; } setEditing(old); setLabel(old?.label || ""); setKind(old?.kind || "source"); setDeviceError(""); setGear(""); suggested.current = "";
+    if (!old && library === null) { setLibrary([]); loadGearLibrary().then(setLibrary, () => setLibrary(null)); }
+    dialog.current?.showModal(); }
+  function pickGear(id: string) {
+    setGear(id);
+    const choice = gearGroups.flatMap(([, choices]) => choices).find(entry => entry.id === id);
+    if (!choice) return;
+    setKind(choice.kind);
+    if (label.trim() && label !== suggested.current) return;
+    suggested.current = suggestName(choice, graph.devices.map(d => d.label)); setLabel(suggested.current);
+  }
   function commitDevice() {
     try {
       const next = editing ? renameDevice(doc, editing.label, label) : addDevice(doc, label, kind);
@@ -133,6 +150,6 @@ export function FlowCanvas({ doc, selected, onChange, onSelect, onChecks, onEdit
       {device && <div className="device-selection"><div><small>Selected device</small><strong>{device.label}</strong><span>{device.routes.length} connected routes</span></div><button type="button" onClick={() => openDevice(device)}>Rename device</button>{device.kind !== "destination" && <form onSubmit={e => { e.preventDefault(); if (connectTarget) connect(device.id, connectTarget); }}><label>Connect to<select aria-label="Connect to device" value={connectTarget} onChange={e => setConnectTarget(e.target.value)}><option value="">Choose destination</option>{graph.devices.filter(d => d.id !== device.id && d.kind !== "source").map(d => <option key={d.id} value={d.id}>{d.label}</option>)}</select></label><button type="submit" disabled={!connectTarget}>Connect</button></form>}{device.routes.length === 0 && <button type="button" className="danger" onClick={() => { const positions = { ...doc.graphPositions }; delete positions[device.id]; onChange({ ...doc, graphDevices: doc.graphDevices.filter(d => d.label !== device.label), graphPositions: positions }); setPicked(""); notify("Unused device removed."); }}>Remove unused device</button>}<button type="button" className="device-close" aria-label="Close device details" onClick={() => setPicked("")}>×</button></div>}
       {graph.devices.length > 0 && <div className="diagram-hint">Drag to arrange · connect ports · HDMI dashed / SDI solid · ? unspecified output</div>}
     </div>
-    <dialog ref={dialog} aria-labelledby="device-dialog-title"><form onSubmit={e => { e.preventDefault(); commitDevice(); }}><h2 id="device-dialog-title">{editing ? "Rename shared device" : "Add device"}</h2><p>{editing ? `Updates the device name in ${editing.routes.length} connected routes. Original imports stay intact.` : "Give each physical device a unique name. Matching names share one device on the diagram."}</p><label>Device name<input autoFocus value={label} onChange={e => setLabel(e.target.value)} placeholder="e.g. Camera 2 or Production switcher" /></label>{!editing && <label>Device role<select value={kind} onChange={e => setKind(e.target.value as DeviceKind)}>{Object.entries(names).map(([value, name]) => <option key={value} value={value}>{name}</option>)}</select></label>}{deviceError && <p role="alert">{deviceError}</p>}<div className="row-actions"><button type="button" onClick={() => dialog.current?.close()}>Cancel</button><button type="submit" className="primary">{editing ? "Rename device" : "Add to diagram"}</button></div></form></dialog>
+    <dialog ref={dialog} aria-labelledby="device-dialog-title"><form onSubmit={e => { e.preventDefault(); commitDevice(); }}><h2 id="device-dialog-title">{editing ? "Rename shared device" : "Add device"}</h2><p>{editing ? `Updates the device name in ${editing.routes.length} connected routes. Original imports stay intact.` : "Pick gear to fill in the name and role, or type your own. Give each physical device a unique name; matching names share one device on the diagram."}</p>{!editing && <label>Gear<select value={gear} onChange={e => pickGear(e.target.value)}><option value="">Choose gear…</option>{gearGroups.map(([group, choices]) => <optgroup key={group} label={group}>{choices.map(choice => <option key={choice.id} value={choice.id}>{choice.label}</option>)}</optgroup>)}</select></label>}<label>Device name<input autoFocus value={label} onChange={e => setLabel(e.target.value)} placeholder="e.g. Camera 2 or Production switcher" /></label>{!editing && <label>Device role<select value={kind} onChange={e => setKind(e.target.value as DeviceKind)}>{Object.entries(names).map(([value, name]) => <option key={value} value={value}>{name}</option>)}</select></label>}{deviceError && <p role="alert">{deviceError}</p>}<div className="row-actions"><button type="button" onClick={() => dialog.current?.close()}>Cancel</button><button type="submit" className="primary">{editing ? "Rename device" : "Add to diagram"}</button></div></form></dialog>
   </section>;
 }
