@@ -811,6 +811,24 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 - Declare Node.js 24 for local package tooling, matching CI, with `.nvmrc`.
 - Include the venue walk publishing domain in repository orientation and the domain source map. Replace stale pre-cutover wording while preserving the separate authenticated acceptance gate.
 
+## 2026-10-30
+
+- AOM Copy text now reports confirmed clipboard results and offers selected
+  manual-copy text when permission or the fallback fails. Preserve an editor
+  opened during a pending permission request.
+
+- AOM now preserves existing saved bytes after failed reads or invalid saved
+  JSON. Block autosave of fallback sample data, retain visible failure feedback,
+  and offer an exact original-text download plus explicit reload retry.
+  Disposable local and artifact storage fixtures cover the failure boundary.
+
+- AOM show board now has an explicit resource policy and bounded Timeline, Live,
+  Turns and Tools views. Preserve the route, saved board key and data, import
+  confirmation and photo transcription request. Add keyboard room/session
+  controls and dialog focus handling. Mocked scan regression makes no inference
+  calls. Source validation and deployment remain separate.
+
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced
