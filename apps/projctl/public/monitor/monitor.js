@@ -181,6 +181,20 @@ export function laneModels(now = Date.now()) {
 export const laneOfSlot = slot => live.snapshot?.projectors.find(p => p.slot === slot)?.lane || null;
 export const lockState = () => !live.connected ? 'unknown' : live.snapshot.lock ? 'on' : 'off';
 
+// Compact theme control: shows the saved choice and opens the shared menu under the button.
+const themeButton = typeof document === 'undefined' ? null : $('#theme');
+if (themeButton) {
+  const word = $('[data-theme-word]', themeButton);
+  const showTheme = () => { const mode = window.FrozenTheme?.mode || 'light'; word.textContent = mode[0].toUpperCase() + mode.slice(1); };
+  window.addEventListener('frozen:themechange', showTheme); showTheme();
+  document.addEventListener('toggle', (event) => {
+    if (event.target.id !== 'frozen-theme-menu' || event.newState !== 'open') return;
+    const box = themeButton.getBoundingClientRect();
+    event.target.style.top = `${Math.round(box.bottom + 6)}px`;
+    event.target.style.right = `${Math.max(12, Math.round(document.documentElement.clientWidth - box.right))}px`;
+  }, true);
+}
+
 // ---- Shell: relay chip, data source and Show Lock state in the app bar.
 function renderShell() {
   const chip = $('#fm-relay'), source = $('#fm-source'), lock = $('#fm-lock');

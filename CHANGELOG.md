@@ -1,5 +1,15 @@
 # Changelog
 
+## November 23, 2026. Publish the public site, not the repository
+
+- GitHub Pages was copying the repository root. `scripts/stage_public_site.mjs` now publishes site content. Docs, scripts, reports, plans, tests, application source, and `career-market.html` stay in the repository and are not served. The Equipment Lab reference markdown and the Davai storyboard script stay, because pages link to them. `apps/projctl/public/` stays, because those noindex pages are part of the site. `scripts/stage_public_site.test.mjs` diffs the new publish against the previous one.
+- `robots.txt` no longer lists paths this publish does not ship. `/command53/` is a noindex page that says the address is not available.
+- The Field Kit page no longer shows draft labels or a statement-descriptor placeholder. The card line says AVBYDAVE FIELD KIT. The price stays $12, and checkout stays closed.
+- The home page, Tools directory, and avbydave.com home page all say 19 browser tools, the live registry count. The avbydave.com tools tab no longer shows 6.
+- The privacy policy names David Robertson, an individual, New Jersey law, and avbydave@gmail.com.
+- The project registry labels its June 11, 2026 snapshot and shows Phillies Wire as paused until Feb 2027.
+- The demos tab bar scrolls at narrow widths instead of overlapping. The page heading stays outside the tab panels, where the hub probe does not treat it as clipped panel text.
+
 ## November 23, 2026. Theme Organizer on the tools directory
 
 - The Tools directory lists Theme Organizer under Labs. The card links to the live page at `https://davehomeassist.github.io/theme-organizer-resource/` and opens in a new tab. It browses, filters, compares, and shortlists 58 UI themes, and can inspect color tokens, copy CSS custom properties, preview a theme across the page, and export or import JSON. Choices stay in the browser.
@@ -65,6 +75,16 @@
 - The Food Finders story (`#story-food-finders`) has a Cheesesteak Radar: a button opens the Philly Cheesesteak Heatmap from `/cheesesteaks/` in a frame, with links to the full map and rankings. The frame is created on click and removed on close, so no map tiles load until a reader opens it. The note beside it repeats the heatmap's own description (real shops from OpenStreetMap and Google Maps, weekly snapshot, not a complete list).
 - The Public site contracts job timeout goes from 10 to 20 minutes. The job now runs 8 to 10 minutes, mostly in the Projctl relay step, and was cancelled at the old limit on the previous pull request (run 671) and again on this one, once in the middle of the first probe.
 - `npm run probe:thephilly` (`scripts/probe_thephilly.mjs`, run on every pull request) checks that the page never scrolls at 1440, 680 and 375 px on eight routes, that nothing leaves the origin before the radar opens, the skip link and breadcrumb, the Sounds QR codes, the radar open and close, and the theme toggle.
+
+## November 21, 2026. Saved optical evidence
+
+- Added a pure saved-frame shutter evaluator for isolated target/control regions
+  and open/close response candidates. No relay or equipment output integration.
+
+## November 21, 2026. Offline diagnostic planning
+
+- Added a source-only projector check planner with synthetic fixtures, explicit
+  timing constraints and no relay integration or diagnostic lamp retry.
 
 ## November 20, 2026. Frozen workspace navigation
 
@@ -167,6 +187,10 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 - The `video` job was not hanging. It ran 12 to 15 minutes against its 15-minute limit; three of eight recent green runs finished above 14m40s. The retained standalone-build suite (`npm run test:av-retained-browser`, about six minutes) ran inside the last long step, "Infrastructure and Shop panels and saved-plan compatibility", so on a slower runner the job was cancelled while that suite was still passing checks (run 44161812645 and the first attempt of run 44167101248).
 - The suite now runs in a parallel `retained` job, which builds the eight family fixtures it serves. Every step in both jobs has its own `timeout-minutes`, so a real stall fails at the step that stalled.
 - The retained runner stops any probe that runs past four minutes (`AV_RETAINED_PROBE_LIMIT_MS`) and names it in the error.
+
+## Frozen Monitor: compact app bar, 2026-11-17
+
+- The six Monitor pages move the Light, Dark and System buttons into one theme menu, following the refined header design. The bar stays on one row down to about 1000 px, so it no longer takes three rows when the Monitor shares a screen with Rehearsal Review, MIDI Live and PTZ. In Dark, the current section and an active Show Lock get the glow from the design. The saved theme and all relay behaviour are unchanged.
 
 ## Projctl Barco standby power state, 2026-11-17
 
@@ -760,6 +784,11 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 ## October 30, 2026: Vite development server patch
 
 - Upgrade Vite from 6.4.4 to 6.4.5 for GHSA-8g5g-mxqh-grgj and raise the minimum compatible version. Add a loopback regression proving raw/import queries cannot retrieve a denied synthetic file, enforced by the existing pull request contract job.
+
+## October 30, 2026: Brand reference policy and reading controls
+
+- Add a restrictive content policy to the noindex brand reference, allowing its existing Google font sources and local navigation script while blocking connections, inline scripts, objects and forms.
+- Preserve all seven reference sections and artwork with light/default and dark reading themes, keyboard section tabs, bounded reading, URL history, print expansion and no-JavaScript access.
 
 ## October 30, 2026: Davai reference navigation
 

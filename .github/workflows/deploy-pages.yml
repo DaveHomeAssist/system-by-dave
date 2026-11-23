@@ -1,9 +1,9 @@
 name: Deploy site to Pages
 
-# Publishes the repo's static content to GitHub Pages via Actions, replacing the
-# legacy branch build (which was erratically slow — 10-15 min hangs). Serves the
-# SAME files the legacy build did: the whole repo root, minus VCS + CI tooling
-# (.git / .github), so the git history is never exposed. .nojekyll + CNAME are
+# Publishes the public site to GitHub Pages via Actions, replacing the legacy
+# branch build (which was erratically slow — 10-15 min hangs).
+# scripts/stage_public_site.mjs copies site content and leaves docs, scripts,
+# plans, tests, and private pages in the repository. .nojekyll and CNAME are
 # carried through, so no Jekyll processing and the custom domain is preserved.
 # The pages listed in scripts/domain-sites.json are also staged as their own
 # sites and pushed to the Pages repositories for housevideo.app and
@@ -401,10 +401,9 @@ jobs:
           CUTOVER_AUTH_VERIFIED: ${{ vars.HOUSEVIDEO_WALK_AUTH_VERIFIED }}
         run: node scripts/check_domain_cutover_ready.mjs housevideo-walk --preflight
 
-      - name: Stage site (everything except VCS + CI tooling)
+      - name: Stage public site
         run: |
-          mkdir -p _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='dist' --exclude='package.json' --exclude='package-lock.json' --exclude='/flooring-contract-review.html' --exclude='/house' --exclude='/cross-project-*' --exclude='.agent-claim' --exclude='/apps/av-workbook' --exclude='/av-workbook/assets' ./ _site/
+          node scripts/stage_public_site.mjs --out _site
           # Check the actual publish artifact as well as the tracked source.
           # The committed sitemap lists routes only; stamp the published copy with
           # each page's last commit date from this commit's full history.
