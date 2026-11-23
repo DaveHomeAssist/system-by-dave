@@ -63,11 +63,23 @@ export function nudge(panel: Panel, panels: Panel[], d: Partial<Rect>, min: { w:
   const r = { x: panel.x + (d.x || 0), y: panel.y + (d.y || 0), w: Math.max(min.w, panel.w + (d.w || 0)), h: Math.max(min.h, panel.h + (d.h || 0)) };
   return fits(r, panels, panel.id) ? r : null;
 }
-/* Split keeps the original panel in the first half and returns the free half. */
-export function split(panel: Panel, direction: "h" | "v"): { keep: Rect; rest: Rect } | null {
-  if (direction === "h") { if (panel.w < 2) return null; const half = Math.ceil(panel.w / 2 / STEP) * STEP; return { keep: { ...rect(panel), w: half }, rest: { x: panel.x + half, y: panel.y, w: panel.w - half, h: panel.h } }; }
-  if (panel.h < 2) return null; const half = Math.ceil(panel.h / 2 / STEP) * STEP;
+/* Split keeps the original panel in the first half and returns the free half.
+   The kept half never drops below the panel's minimum; when the panel cannot keep
+   its minimum and still free at least one cell, there is nothing to split. */
+export function split(panel: Panel, direction: "h" | "v", min: { w: number; h: number } = { w: STEP, h: STEP }): { keep: Rect; rest: Rect } | null {
+  if (direction === "h") {
+    if (panel.w < 2) return null; const half = Math.max(min.w, Math.ceil(panel.w / 2 / STEP) * STEP);
+    if (panel.w - half < 1) return null;
+    return { keep: { ...rect(panel), w: half }, rest: { x: panel.x + half, y: panel.y, w: panel.w - half, h: panel.h } };
+  }
+  if (panel.h < 2) return null; const half = Math.max(min.h, Math.ceil(panel.h / 2 / STEP) * STEP);
+  if (panel.h - half < 1) return null;
   return { keep: { ...rect(panel), h: half }, rest: { x: panel.x, y: panel.y + half, w: panel.w, h: panel.h - half } };
+}
+/* First free spot, reading order, for a panel of exactly this size. */
+export function findSpace(panels: Panel[], size: { w: number; h: number }): Rect | null {
+  for (let y = 0; y + size.h <= ROWS; y += STEP) for (let x = 0; x + size.w <= COLS; x += STEP) { const r = { x, y, w: size.w, h: size.h }; if (fits(r, panels)) return r; }
+  return null;
 }
 const rect = (p: Rect): Rect => ({ x: p.x, y: p.y, w: p.w, h: p.h });
 

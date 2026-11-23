@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COLS, deleteView, firstFree, fits, nudge, Panel, ROWS, sameLayout, sanitizeView, split, storeAsNew, suggest, trim, updateView, workspaceSchema } from "./layout";
+import { COLS, deleteView, findSpace, firstFree, fits, nudge, Panel, ROWS, sameLayout, sanitizeView, split, storeAsNew, suggest, trim, updateView, workspaceSchema } from "./layout";
 
 const P = (id: string, x: number, y: number, w: number, h: number, type = id): Panel => ({ id, type, x, y, w, h });
 const routing = [P("flow", 0, 0, 8, 5), P("patch", 0, 5, 8, 3), P("inspector", 8, 0, 4, 8)];
@@ -67,5 +67,18 @@ describe("stored views", () => {
     expect(fits({ x: 4, y: 0, w: 1, h: 1 }, [P("a", 0, 0, 4.5, 8)])).toBe(false);
     expect(split(P("a", 0, 0, 5, 4), "h")).toEqual({ keep: { x: 0, y: 0, w: 2.5, h: 4 }, rest: { x: 2.5, y: 0, w: 2.5, h: 4 } });
     expect(firstFree([P("a", 0, 0, 8.5, 8)])).toEqual({ x: 8.5, y: 0, w: 3.5, h: 8 });
+  });
+  it("keeps a split panel at its minimum and refuses when nothing is left to free", () => {
+    expect(split(P("a", 0, 0, 6, 8), "h", { w: 4, h: 3 })).toEqual({ keep: { x: 0, y: 0, w: 4, h: 8 }, rest: { x: 4, y: 0, w: 2, h: 8 } });
+    expect(split(P("a", 0, 0, 4.5, 8), "h", { w: 4, h: 3 })).toBeNull();
+    expect(split(P("a", 0, 0, 6, 3.5), "v", { w: 4, h: 3 })).toBeNull();
+    expect(split(P("a", 0, 0, 6, 8), "v", { w: 4, h: 3 })).toEqual({ keep: { x: 0, y: 0, w: 6, h: 4 }, rest: { x: 0, y: 4, w: 6, h: 4 } });
+  });
+  it("finds the first free spot for a fixed size, so six 4x4 panels share the grid", () => {
+    const placed: ReturnType<typeof P>[] = [];
+    for (let i = 0; i < 6; i++) { const r = findSpace(placed, { w: 4, h: 4 }); expect(r).not.toBeNull(); placed.push(P(`p${i}`, r!.x, r!.y, r!.w, r!.h)); }
+    expect(placed.map(p => [p.x, p.y])).toEqual([[0, 0], [4, 0], [8, 0], [0, 4], [4, 4], [8, 4]]);
+    expect(findSpace(placed, { w: 4, h: 4 })).toBeNull();
+    expect(findSpace([P("a", 0, 0, 4.5, 8)], { w: 4, h: 4 })).toEqual({ x: 4.5, y: 0, w: 4, h: 4 });
   });
 });
