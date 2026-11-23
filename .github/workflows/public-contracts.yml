@@ -21,6 +21,7 @@ jobs:
       - run: npm run verify:private-exposure
       - run: npm run verify:indexing
       - run: python3 scripts/gen_sitemap.py --check
+      - run: npm run verify:davai
       - run: npm run verify:public-navigation
       - run: npm run verify:public-consistency
       - run: npm ci --no-audit --no-fund
@@ -45,6 +46,7 @@ jobs:
       - run: npm run test:public-viewport
       - run: npm run probe:cue-sheet-editing
       - run: npm run probe:thephilly
+      - run: npm run test:davai-browser
       - name: Verify engineering daily journeys
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/daily-server.log 2>&1 &

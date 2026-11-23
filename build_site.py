@@ -237,7 +237,7 @@ def page_shell(current_path: str, title: str, description: str, body: str) -> st
     return clean(
         f"""
         <!doctype html>
-        <html lang="en">
+        <html lang="en" data-davai-theme="light">
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -259,12 +259,12 @@ def page_shell(current_path: str, title: str, description: str, body: str) -> st
           <meta name="twitter:description" content="{esc(description)}">
           <meta name="twitter:image" content="{OG_IMAGE}">
           <link rel="icon" type="image/svg+xml" href="{rel_url(current_path, 'favicon.svg')}">
+          <link rel="stylesheet" href="{root}css/sbd-public-nav.css">
           <link rel="stylesheet" href="{stylesheet}">
-        <link rel="stylesheet" href="{root}css/sbd-public-nav.css">
 </head>
         <body>
+          <a class="sbd-skip-link" href="#main">Skip to content</a>
 {site_return}
-          <a class="skip-link" href="#main">Skip to content</a>
           <header class="site-header">
             <div class="shell header-inner">
               <a class="brand" href="{index_href}" aria-label="Davai overview">
@@ -274,19 +274,22 @@ def page_shell(current_path: str, title: str, description: str, body: str) -> st
                   <small>Davai memory architecture</small>
                 </span>
               </a>
-              <nav class="primary-nav" aria-label="Primary navigation">
-                {top_nav}
-              </nav>
-            </div>
-            <div class="layer-rail">
-              <nav class="shell layer-strip" aria-label="Memory layers">
-                {layer_strip(current_path)}
-              </nav>
+              <div class="reference-controls">
+                <button id="davai-theme" type="button" hidden>Dark mode</button>
+                <details class="layer-menu">
+                  <summary>Memory layers</summary>
+                  <nav class="layer-strip" aria-label="Memory layers" data-web2-scroll>
+                    {layer_strip(current_path)}
+                  </nav>
+                </details>
+              </div>
             </div>
           </header>
-          <main id="main">
+          <nav class="primary-nav" aria-label="Primary navigation">
+            {top_nav}
+          </nav>
+          <main id="main" tabindex="-1" aria-label="Davai reference" data-web2-scroll>
             {body}
-          </main>
           <footer class="site-footer">
             <div class="shell footer-grid">
               <div>
@@ -300,6 +303,8 @@ def page_shell(current_path: str, title: str, description: str, body: str) -> st
               </div>
             </div>
           </footer>
+          </main>
+        <script src="{rel_url(current_path, 'assets/reference.js')}" defer></script>
         <script src="{root}js/sbd-public-nav.js" defer></script>
 </body>
         </html>
@@ -1179,6 +1184,9 @@ def styles_css() -> str:
           color-scheme: light;
           --paper: #f7f8f5;
           --white: #ffffff;
+          --on-ink: #ffffff;
+          --panel-soft: #eef1ed;
+          --header: rgba(247, 248, 245, 0.97);
           --ink: #171a1f;
           --muted: #5f6670;
           --line: #d9ded8;
@@ -1240,19 +1248,19 @@ def styles_css() -> str:
           line-height: 1.55;
         }
 
-        .skip-link {
+        .sbd-skip-link {
           position: absolute;
           left: 1rem;
           top: 1rem;
           transform: translateY(-160%);
           padding: 0.7rem 0.9rem;
           background: var(--ink);
-          color: var(--white);
+          color: var(--on-ink);
           border-radius: var(--radius);
           z-index: 20;
         }
 
-        .skip-link:focus { transform: translateY(0); }
+        .sbd-skip-link:focus { transform: translateY(0); }
 
         :focus-visible {
           outline: 3px solid var(--gold);
@@ -1268,7 +1276,7 @@ def styles_css() -> str:
           position: sticky;
           top: 0;
           z-index: 10;
-          background: rgba(247, 248, 245, 0.94);
+          background: var(--header);
           backdrop-filter: blur(18px);
           border-bottom: 1px solid var(--line);
         }
@@ -1294,7 +1302,7 @@ def styles_css() -> str:
           height: 40px;
           display: grid;
           place-items: center;
-          color: var(--white);
+          color: var(--on-ink);
           background: var(--ink);
           border-radius: 6px;
           font-weight: 850;
@@ -1335,14 +1343,14 @@ def styles_css() -> str:
 
         .nav-link {
           padding: 0.45rem 0.7rem;
-          color: #303640;
+          color: var(--ink);
           font-size: 0.9rem;
         }
 
         .nav-link:hover,
         .nav-link.is-active {
           background: var(--ink);
-          color: var(--white);
+          color: var(--on-ink);
         }
 
         .layer-rail {
@@ -1363,7 +1371,7 @@ def styles_css() -> str:
           border: 1px solid var(--line);
           background: var(--white);
           font-size: 0.85rem;
-          color: #303640;
+          color: var(--ink);
         }
 
         .layer-chip span {
@@ -1372,7 +1380,7 @@ def styles_css() -> str:
           display: grid;
           place-items: center;
           border-radius: 4px;
-          color: var(--white);
+          color: var(--on-ink);
           background: var(--ink);
           font-size: 0.78rem;
           font-weight: 800;
@@ -1389,16 +1397,16 @@ def styles_css() -> str:
         }
 
         .band-white {
-          background: rgba(255, 255, 255, 0.76);
+          background: var(--white);
           border-block: 1px solid var(--line);
         }
 
         .band-ink {
-          color: var(--white);
+          color: #ffffff;
           background:
             linear-gradient(120deg, rgba(8, 118, 109, 0.18), transparent 34%),
             linear-gradient(240deg, rgba(180, 122, 22, 0.18), transparent 35%),
-            var(--ink);
+            #171a1f;
         }
 
         .hero {
@@ -1489,7 +1497,7 @@ def styles_css() -> str:
 
         .lede {
           max-width: 68ch;
-          color: #303640;
+          color: var(--ink);
           font-size: clamp(1.1rem, 2vw, 1.35rem);
         }
 
@@ -1513,7 +1521,7 @@ def styles_css() -> str:
         .button:hover { transform: translateY(-1px); }
 
         .button-primary {
-          color: var(--white);
+          color: var(--on-ink);
           background: var(--ink);
         }
 
@@ -1555,7 +1563,7 @@ def styles_css() -> str:
         .route-stack span {
           display: block;
           padding: 0.85rem;
-          color: var(--white);
+          color: var(--on-ink);
           background: var(--ink);
           border-left: 8px solid var(--teal);
           border-radius: 6px;
@@ -1636,10 +1644,10 @@ def styles_css() -> str:
         .layer-card code,
         .spec-table code {
           padding: 0.12rem 0.28rem;
-          background: #eef1ed;
+          background: var(--panel-soft);
           border: 1px solid var(--line);
           border-radius: 4px;
-          color: #293037;
+          color: var(--ink);
           white-space: nowrap;
         }
 
@@ -1693,8 +1701,8 @@ def styles_css() -> str:
 
         .spec-table th {
           width: 10rem;
-          color: #303640;
-          background: #f0f2ef;
+          color: var(--ink);
+          background: var(--panel-soft);
         }
 
         .spec-table tr:last-child th,
@@ -1744,7 +1752,7 @@ def styles_css() -> str:
 
         .gap-grid article {
           color: var(--ink);
-          background: rgba(255, 255, 255, 0.94);
+          background: var(--white);
           border-color: rgba(255, 255, 255, 0.18);
         }
 
@@ -1844,7 +1852,7 @@ def styles_css() -> str:
           display: grid;
           place-items: center;
           margin-bottom: 0.8rem;
-          color: var(--white);
+          color: var(--on-ink);
           background: var(--ink);
           border-radius: 5px;
           font-weight: 850;
@@ -1875,7 +1883,7 @@ def styles_css() -> str:
         }
 
         .footer-grid a {
-          color: var(--white);
+          color: var(--on-ink);
         }
 
         @media (max-width: 980px) {
@@ -2011,6 +2019,112 @@ def styles_css() -> str:
           }
         }
 
+
+        :root[data-davai-theme="dark"] {
+          color-scheme: dark;
+          --paper: #171c21; --white: #222930; --ink: #edf2ef;
+          --on-ink: #171c21; --muted: #b2beb8; --line: #49564e;
+          --line-strong: #899b8f; --panel-soft: #303a33;
+          --header: rgba(23, 28, 33, 0.97);
+          --teal: #72d5c8; --red: #ff9c8f; --blue: #9bc7f7;
+          --gold: #edbd65; --violet: #c1a3f0; --green: #a8d396; --orange: #ffb17f;
+        }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+          height: 100vh; height: 100dvh;
+          display: grid;
+          grid-template: "breadcrumb breadcrumb" auto "header header" auto "navigation reference" minmax(0, 1fr) / 220px minmax(0, 1fr);
+        }
+        .sbd-site-return { grid-area: breadcrumb; background: var(--white); color: var(--ink); padding-block: 0; }
+        .sbd-site-return a { min-height: 44px; min-width: 44px; }
+        .sbd-site-return a:hover { color: var(--ink); }
+        .sbd-site-return__current, .sbd-site-return__separator { color: var(--muted); }
+        .site-header { grid-area: header; position: relative; z-index: 100; }
+        .header-inner { width: calc(100% - 2rem); min-height: 60px; flex-direction: row; align-items: center; padding-block: 0; }
+        .reference-controls { display: flex; gap: .5rem; align-items: center; }
+        #davai-theme, .layer-menu summary {
+          min-height: 44px; padding: .5rem .75rem; border: 1px solid var(--line);
+          border-radius: 6px; color: var(--ink); background: var(--white); font: inherit; cursor: pointer;
+        }
+        #davai-theme[hidden] { display: none; }
+        .layer-menu summary { display: flex; align-items: center; }
+        .layer-menu summary::after { content: "▾"; padding-left: .5rem; }
+        .layer-menu[open] summary::after { content: "▴"; }
+        .layer-strip {
+          position: fixed; z-index: 200; right: 1rem; top: 108px;
+          width: min(360px, calc(100vw - 2rem)); max-height: calc(100dvh - 120px);
+          display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+          padding: .5rem; overflow: auto; overscroll-behavior: contain;
+          background: var(--white); border: 1px solid var(--line); box-shadow: var(--shadow);
+        }
+        .layer-chip { min-width: 0; min-height: 44px; }
+        .primary-nav {
+          grid-area: navigation; display: grid; align-content: start; align-items: stretch;
+          grid-template-columns: 1fr; padding: .75rem; gap: .35rem; width: auto;
+          border-right: 1px solid var(--line); background: var(--white);
+        }
+        .nav-link { min-height: 44px; justify-content: flex-start; }
+        main { grid-area: reference; min-height: 0; min-width: 0; overflow: auto; overscroll-behavior: contain; scroll-padding: 1rem; }
+        main:focus-visible { outline-offset: -4px; }
+        .sbd-skip-link { position: fixed; z-index: 1000; }
+        .hero-small .shell { margin-inline: auto; }
+        .hero, .hero-small { min-height: 0; padding-block: 3rem; }
+        h1, .hero-small h1, .layer-hero h1 { font-size: clamp(2rem, 5vw, 5.8rem); overflow-wrap: anywhere; }
+        .band { padding-block: 3rem; }
+        .button { min-height: 44px; }
+        .site-footer, .site-footer a { color: #eef4ed; }
+        .layer-chip span, .step-grid article span, .brand-mark { color: var(--on-ink); }
+        .band-ink .gap-grid span { color: var(--muted); }
+        .band-ink .gap-grid article { color: var(--ink); }
+        .band-ink .gap-grid p { color: var(--muted); }
+        @media (min-width: 2400px) {
+          :root { --max: 2000px; }
+          body { grid-template-columns: 280px minmax(0, 1fr); }
+          .layer-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+          .hero-grid, .split, .two-col, .chart-grid { gap: 4rem; }
+        }
+        @media (max-width: 1100px), (max-height: 550px) {
+          body { grid-template: "breadcrumb" auto "header" auto "navigation" auto "reference" minmax(0, 1fr) / minmax(0, 1fr); }
+          .primary-nav { grid-template-columns: repeat(7, minmax(0, 1fr)); padding: .25rem .5rem; gap: .15rem; border-right: 0; border-bottom: 1px solid var(--line); }
+          .nav-link { justify-content: center; padding: .25rem; }
+          .header-inner { min-height: 48px; }
+          .layer-strip { top: 96px; max-height: calc(100dvh - 104px); }
+        }
+        @media (max-width: 680px) {
+          body { grid-template: "breadcrumb" auto "header" auto "reference" minmax(0, 1fr) "navigation" auto / minmax(0, 1fr); }
+          .sbd-site-return { flex-wrap: nowrap; padding-inline: .5rem; }
+          .sbd-site-return__current, .sbd-site-return__separator:last-of-type { display: none; }
+          .header-inner { width: calc(100% - 1rem); gap: .25rem; }
+          .brand { min-width: 44px; }
+          .brand > span:last-child { display: none; }
+          .brand-mark { width: 44px; height: 44px; }
+          .reference-controls { gap: .25rem; }
+          #davai-theme, .layer-menu summary { font-size: .85rem; padding-inline: .5rem; }
+          .primary-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); padding-bottom: max(.25rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
+          .nav-link { font-size: .8rem; }
+          .hero, .hero-small, .band { padding-block: 1.5rem; }
+          .layer-grid { grid-template-columns: 1fr; }
+          .shell { width: calc(100% - 1.5rem); }
+          .hero-grid, .split, .two-col, .chart-grid { grid-template-columns: minmax(0, 1fr); }
+          h2 { font-size: 1.75rem; overflow-wrap: anywhere; }
+          .layer-strip { right: .5rem; width: calc(100vw - 1rem); }
+        }
+        @media (max-width: 680px) and (max-height: 350px) {
+          .primary-nav { grid-template-columns: repeat(7, minmax(0, 1fr)); padding-inline: 0; gap: 0; }
+          .nav-link { font-size: .72rem; line-height: 1.2; overflow-wrap: anywhere; text-align: center; }
+        }
+        @media print {
+          html, body, main { display: block; height: auto; overflow: visible; background: white; color: black; }
+          .site-header, .primary-nav, .sbd-site-return, .sbd-skip-link { display: none; }
+          .shell { width: 100%; max-width: none; }
+          .band, .hero { break-inside: auto; padding-block: 1rem; }
+          .band-ink, .site-footer { background: white; color: black; }
+          .band-ink .lede, .band-ink p, .band-ink .eyebrow, .site-footer a { color: black; }
+          pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+          details > * { display: block; }
+          :root, :root[data-davai-theme="dark"] { --paper: white; --white: white; --ink: black; --on-ink: white; --muted: #333333; --line: #aaaaaa; --panel-soft: #eeeeee; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           html { scroll-behavior: auto; }
           *,
@@ -2021,6 +2135,42 @@ def styles_css() -> str:
             animation-iteration-count: 1 !important;
           }
         }
+        """
+    )
+
+
+
+def reference_js() -> str:
+    return clean(
+        """
+        (() => {
+          'use strict';
+          const themeKey = 'davai.theme.v1';
+          const scrollKey = 'davai.reading.v1:' + location.pathname;
+          const main = document.querySelector('main');
+          const toggle = document.querySelector('#davai-theme');
+          const menu = document.querySelector('.layer-menu');
+          const read = key => { try { return localStorage.getItem(key); } catch { return null; } };
+          const write = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
+          function theme(value) {
+            document.documentElement.dataset.davaiTheme = value;
+            toggle.textContent = value === 'dark' ? 'Light mode' : 'Dark mode';
+            toggle.setAttribute('aria-label', 'Switch to ' + (value === 'dark' ? 'light' : 'dark') + ' mode');
+          }
+          theme(read(themeKey) === 'dark' ? 'dark' : 'light');
+          toggle.hidden = false;
+          toggle.addEventListener('click', () => {
+            const value = document.documentElement.dataset.davaiTheme === 'dark' ? 'light' : 'dark';
+            theme(value); write(themeKey, value);
+          });
+          if (!location.hash) main.scrollTop = Math.max(0, Number(read(scrollKey)) || 0);
+          addEventListener('pagehide', () => write(scrollKey, String(main.scrollTop)));
+          document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && menu.open) {
+              menu.open = false; menu.querySelector('summary').focus();
+            }
+          });
+        })();
         """
     )
 
@@ -2427,6 +2577,7 @@ def render_bundle() -> dict[str, str]:
     """Every generated file in the bundle, keyed by path relative to OUT_DIR."""
     files: dict[str, str] = dict(render_pages())
     files["assets/styles.css"] = styles_css()
+    files["assets/reference.js"] = reference_js()
     for filename, content in diagrams().items():
         files[f"assets/img/{filename}"] = content
     files["favicon.svg"] = favicon_svg()

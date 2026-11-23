@@ -842,6 +842,12 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 - Validate source revisions and stage and compare heatmap exports before replacement. Restore the previous export when promotion fails, and retain its backup if restoration fails.
 - Add read-only build parity verification and regression coverage for invalid inputs, copy failures, promotion failures and recovery. Public heatmap files are unchanged.
 
+## October 30, 2026: Davai reference navigation
+
+- Put the skip link first on all fourteen generated reference pages and make its target focusable.
+- Add a light default with a saved theme toggle, bounded reading panel, persistent page navigation and a memory layer disclosure. Preserve content, routes, fragments and printable reference.
+- Verify generated parity and keyboard, theme, viewport and no-JavaScript journeys in the public contracts workflow.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced
