@@ -240,6 +240,26 @@ test('Notion page fills per-unit number properties only where the database has t
   assert.equal('Other number' in props, false);
 });
 
+test('Notion page leaves per-unit numbers empty unless the unit is reached and lit', () => {
+  const data = {
+    P1: { ...NOV11.P1, st: { ...NOV11.P1.st, power: 'warming' } },
+    P2: { st: { online: true, power: 'off', errors: null, lightHours: null }, readings: panasonic(32) },
+    P3: { st: { online: true, power: 'cooling', errors: null, lightHours: 1059 }, readings: panasonic(30) },
+    P4: NOV11.P4,
+  };
+  const report = buildReport({ kind: 'power-off', startedAt: 0, finishedAt: 1, units: rows(data), config: CONFIG });
+  const names = new Set(['P1 Temp (°C)', 'P1 Headroom (°C)', 'P2 Temp (°C)', 'P2 Headroom (°C)', 'P3 Temp (°C)', 'P3 Headroom (°C)', 'P4 Temp (°C)', 'P4 Headroom (°C)']);
+  const props = notionPage(report, 'd'.repeat(32), { numberProperties: names }).properties;
+  assert.deepEqual(props['P1 Temp (°C)'], { number: 29.8 });
+  assert.deepEqual(props['P2 Temp (°C)'], { number: null });
+  assert.deepEqual(props['P2 Headroom (°C)'], { number: null });
+  assert.deepEqual(props['P3 Temp (°C)'], { number: null });
+  assert.deepEqual(props['P3 Headroom (°C)'], { number: null });
+  assert.deepEqual(props['P4 Temp (°C)'], { number: 37 });
+  const lane = report.units.find((u) => u.slot === 'P2');
+  assert.equal(lane.intakeC, 32, 'the off-state reading is kept in the report');
+});
+
 test('Notion publisher reads the database once and sends only the numbers it has', async () => {
   const report = buildReport({ kind: 'hourly', startedAt: 0, finishedAt: 1, units: rows(), config: CONFIG });
   const schema = { properties: { Log: { type: 'title' }, 'P4 Temp (°C)': { type: 'number' }, 'P4 Headroom (°C)': { type: 'number' }, 'P1 Temp (°C)': { type: 'rich_text' } } };

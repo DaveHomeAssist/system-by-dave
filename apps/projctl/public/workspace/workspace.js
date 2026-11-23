@@ -55,13 +55,110 @@ window.addEventListener('beforeunload', event => {
   if (!storageAvailable && notes.value) { event.preventDefault(); event.returnValue = ''; }
 });
 
-let currentTasks = [];
+const taskCacheKey = 'wst_frozen_shared_todos_v1';
+const TASK_PASSCODE_KEY = 'wst.frozen.tasks-passcode.v1';
+function savedTaskPasscode() {
+ try { return sessionStorage.getItem(TASK_PASSCODE_KEY) || ''; }
+ catch { return ''; }
+}
+function requestTaskPasscode() {
+ const value = window.prompt('Crew passcode');
+ if (!value) { showEntryFeedback('Editing is locked.'); return ''; }
+ try { sessionStorage.setItem(TASK_PASSCODE_KEY, value); }
+ catch { showEntryFeedback('Editing is locked. This browser cannot save the passcode for this tab.'); return ''; }
+ showEntryFeedback('Passcode saved for this tab. The first change will confirm it.');
+ return value;
+}
+function lockTaskEditing() {
+ try { sessionStorage.removeItem(TASK_PASSCODE_KEY); } catch {}
+ showEntryFeedback('Editing is locked.');
+}
+function validEntries(rows) {
+ return Array.isArray(rows) && rows.every(row => row && typeof row.id === 'string' &&
+  typeof row.text === 'string' && ['task','update'].includes(row.kind ?? 'task') &&
+  [true,false,0,1].includes(row.done) && (row.kind !== 'update' || Number.isFinite(Date.parse(row.created_at))));
+}
+let lastSnapshot;
+try {
+ const saved = JSON.parse(localStorage.getItem(taskCacheKey));
+ if (saved && Array.isArray(saved.open) && Array.isArray(saved.completed)) {
+  const tasks = [...saved.open, ...saved.completed, ...(saved.updates ?? [])];
+  if (validEntries(tasks) && Number.isFinite(Date.parse(saved.updatedAt))) lastSnapshot = {tasks, savedAt:saved.updatedAt};
+ }
+} catch { /* Storage can be unavailable or contain an older format. */ }
+let currentTasks = lastSnapshot?.tasks ?? [];
+let tasksWritable = false;
+let readSequence = 0;
+function setTaskAccess(writable) {
+ tasksWritable = writable;
+ for (const button of document.querySelectorAll('#task-add button, #update-add button')) button.disabled = !writable;
+}
+const outboxKey = 'wst_frozen_todo_outbox_v1';
+function getOutbox() {
+ const entries = JSON.parse(localStorage.getItem(outboxKey) || '[]');
+ if (!Array.isArray(entries)) throw Error('Unreadable offline queue.');
+ return entries;
+}
+function queueToggle(entry, done) {
+ try {
+  if (!Number.isInteger(entry.revision) || entry.revision < 1) throw Error('Missing server revision');
+  const queue = getOutbox().filter(item => item.id !== entry.id);
+  if (Boolean(entry.done) !== done) queue.push({id:entry.id,revision:entry.revision,done});
+  localStorage.setItem(outboxKey, JSON.stringify(queue));
+  showSnapshot('Offline change saved on this device.');
+ } catch { renderTasks(); showEntryFeedback('Could not save this offline change.'); }
+}
+let flushing = false;
+let replayNotice = '';
+async function replayOutbox(event) {
+ if (flushing || !event.detail?.length) return;
+ if (!savedTaskPasscode()) { replayNotice = 'Offline checkoffs are pending. Unlock editing to retry.'; return; }
+ flushing = true;
+ try {
+  for (const item of event.detail) {
+   const server = currentTasks.find(row => row.id === item.id);
+   let resolved = false;
+   if (!server || server.kind === 'update' || (server.revision !== item.revision && Boolean(server.done) !== item.done)) {
+    replayNotice = 'A queued checkoff conflicted with a crew change. Review the current shared list.';
+    resolved = true;
+   } else if (Boolean(server.done) === item.done) resolved = true;
+   else { await taskAPI('/'+item.id, {...server, revision:item.revision, done:item.done}, false); resolved = true; }
+   if (resolved) localStorage.setItem(outboxKey, JSON.stringify(getOutbox().filter(next =>
+    next.id !== item.id || next.revision !== item.revision || next.done !== item.done)));
+  }
+ } catch { replayNotice = 'Offline checkoffs are pending. Refresh to retry.'; }
+ finally { flushing = false; }
+ if (tasksWritable) await loadTasks(false);
+}
+window.addEventListener('wst:todo-flush-outbox', replayOutbox);
+function showSnapshot(reason) {
+ setTaskAccess(false);
+ if (!editingEntry) renderTasks();
+ const badge = document.querySelector('#task-state');
+ badge.classList.add('cached');
+ if (lastSnapshot) badge.textContent = 'OFFLINE · CACHED ' + Math.max(0, Math.floor((Date.now()-Date.parse(lastSnapshot.savedAt))/60000)) + 'm ago';
+ if (!lastSnapshot) {
+  document.querySelector('#task-state').textContent = 'Unknown';
+  for (const id of ['#task-list','#update-list']) document.querySelector(id).textContent = 'No saved copy on this device.';
+ }
+ showEntryFeedback(reason + (lastSnapshot ? ' Last synced ' + new Date(lastSnapshot.savedAt).toLocaleString() + '.' : ''));
+}
 let editingEntry = null;
 const feedback = document.querySelector('#task-feedback');
 const updateFeedback = document.querySelector('#update-feedback');
-async function taskAPI(path = '', data) {
- const response = await fetch(TASK_BASE + '/api/tasks' + path, {method:data ? 'POST':'GET', headers:data ? {'Content-Type':'application/json'}:{}, body:data ? JSON.stringify(data):undefined, cache:'no-store'});
+async function taskAPI(path = '', data, allowPrompt = true) {
+ let passcode = '';
+ if (data) {
+  passcode = savedTaskPasscode();
+  if (!passcode && allowPrompt) passcode = requestTaskPasscode();
+  if (!passcode) throw Error('Editing is locked.');
+ }
+ const response = await fetch(TASK_BASE + '/api/tasks' + path, {method:data ? 'POST':'GET', headers:data ? {'Content-Type':'application/json','X-Frozen-Task-Passcode':passcode}:{}, body:data ? JSON.stringify(data):undefined, cache:'no-store'});
  const result = await response.json();
+ if (data && (response.status === 401 || response.status === 403)) {
+  lockTaskEditing();
+  throw Error('Editing is locked.');
+ }
  if(!response.ok) throw Error(result.error || 'Could not save. Try again.');
  return result;
 }
@@ -99,12 +196,17 @@ function editEntry(entry, item) {
 }
 function renderEntry(entry) {
  const item = document.createElement('li');
+ item.dataset.entryId = entry.id;
  const isUpdate = entry.kind === 'update';
  item.classList.toggle('completed', !isUpdate && !!entry.done);
  const body = document.createElement(isUpdate ? 'div' : 'label'); body.className = 'entry-body';
  if(!isUpdate) {
   const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!entry.done;
-  check.onchange = () => mutate('/' + entry.id, {...entry, done:check.checked});
+  if (!tasksWritable) {
+   try { check.checked = getOutbox().find(item => item.id === entry.id)?.done ?? check.checked; }
+   catch { check.disabled = true; }
+  }
+  check.onchange = () => !tasksWritable ? queueToggle(entry,check.checked) : mutate('/' + entry.id, {...entry, done:check.checked});
   body.append(check);
  }
  const text = document.createElement('span'); text.textContent = entry.text; body.append(text);
@@ -117,7 +219,25 @@ function renderEntry(entry) {
  actions.append(entryButton('Edit', () => editEntry(entry,item), entry));
  actions.append(entryButton(isUpdate ? 'Make a task' : 'Move to updates', () => mutate('/'+entry.id, {...entry,kind:isUpdate ? 'task' : 'update',done:false}), entry));
  actions.append(entryButton('Delete', () => { if(confirm('Delete this '+(isUpdate?'update':'task')+'?')) mutate('/'+entry.id,{...entry,delete:true}); }, entry));
- item.append(body, actions); return item;
+ item.append(body); if(tasksWritable) item.append(actions); return item;
+}
+function cacheRenderedTasks() {
+ if (!tasksWritable || !lastSnapshot) return;
+ const snapshot = {updatedAt:lastSnapshot.savedAt, open:[], completed:[],
+  updates:currentTasks.filter(row => row.kind === 'update')};
+ const byId = new Map(currentTasks.map(entry => [entry.id, entry]));
+ for (const [key,selector] of [['open','#task-list'],['completed','#completed-task-list']]) {
+  for (const item of document.querySelector(selector).children) {
+   const row = byId.get(item.dataset.entryId);
+   if (row) snapshot[key].push(row);
+  }
+ }
+ try { localStorage.setItem(taskCacheKey,JSON.stringify(snapshot)); }
+ catch { showEntryFeedback('Up to date. Browser storage unavailable for offline use.'); }
+}
+const taskObserver = new MutationObserver(cacheRenderedTasks);
+for (const selector of ['ul[aria-label="Open team tasks"]','ul[aria-label="Completed team tasks"]']) {
+ taskObserver.observe(document.querySelector(selector),{childList:true});
 }
 function renderTasks() {
  const updates = currentTasks.filter(entry => entry.kind === 'update');
@@ -131,11 +251,26 @@ function renderTasks() {
  document.querySelector('#completed-count').textContent = completed.length;
  document.querySelector('#completed-tasks').hidden = !completed.length;
 }
-async function loadTasks() {
- try { currentTasks = (await taskAPI()).tasks; if(!editingEntry) renderTasks(); showEntryFeedback('Up to date.'); }
- catch(error) { showEntryFeedback(error.message); }
+async function loadTasks(replay = true) {
+ const sequence = ++readSequence;
+ try {
+  const {tasks} = await taskAPI();
+  if (sequence !== readSequence) return;
+  if (!validEntries(tasks)) throw Error('Invalid task response.');
+  lastSnapshot = {savedAt:new Date().toISOString(), tasks};
+  currentTasks = tasks;
+  setTaskAccess(true);
+  if (!editingEntry) renderTasks();
+  document.querySelector('#task-state').classList.remove('cached');
+  showEntryFeedback(replayNotice || 'Up to date.');
+  if (replay !== false) {
+   try { const queue = getOutbox(); if (queue.length) window.dispatchEvent(new CustomEvent('wst:todo-flush-outbox',{detail:queue})); }
+   catch { /* The live list still works when local storage is blocked. */ }
+  }
+ } catch { if (sequence === readSequence) showSnapshot('Shared list unavailable.'); }
 }
 async function mutate(path,data) {
+ if (!tasksWritable) { showSnapshot('Reconnect to make changes.'); return false; }
  try {
   const payload = path ? {...data, done:!!data.done} : data;
   await taskAPI(path,payload); await loadTasks(); return true;
@@ -149,10 +284,17 @@ for(const [formId,fieldId,kind] of [['#task-add','#task-text','task'],['#update-
   const submit = event.currentTarget.querySelector('button[type=submit]');
   submit.disabled = true;
   if(await mutate('',{text,kind})) field.value = '';
-  submit.disabled = false;
+  submit.disabled = !tasksWritable;
  };
 }
 document.querySelector('#refresh').onclick = loadTasks;
+document.querySelector('#unlock-task-editing').onclick = () => {
+ if (savedTaskPasscode()) showEntryFeedback('Editing is unlocked for this tab.');
+ else requestTaskPasscode();
+};
+showSnapshot('Connecting.');
+window.addEventListener('online', loadTasks);
+window.addEventListener('offline', () => { ++readSequence; showSnapshot('Offline.'); });
 loadTasks(); setInterval(() => { if(!document.hidden && !editingEntry) loadTasks(); },10000);
 
 const clock = document.querySelector('#clock');
@@ -196,7 +338,7 @@ currentRoute=route;const planningActive=route==='updates'||route==='notes'||rout
 for(const button of document.querySelectorAll('[data-route]'))button.onclick=()=>navigate(button.dataset.route,{controls:button.hasAttribute('data-open-controls')});
 for(const button of document.querySelectorAll('[data-reference-view]'))button.onclick=()=>{ensureReference().then(view=>view.setView(button.dataset.referenceView)).catch(()=>{});for(const peer of document.querySelectorAll('[data-reference-view]'))peer.setAttribute('aria-pressed',String(peer===button));};
 document.querySelector('#rig-controls').onclick=()=>navigate('rig',{projector:selectedProjector,controls:true});document.querySelector('#back-reference').onclick=()=>navigate('rig',{projector:selectedProjector});
-async function connectRelay(url,label){const target=new URL(url);if(!['http:','https:'].includes(target.protocol)||target.username||target.password)throw Error('Invalid controller address');relayOrigin=target.origin;relayReady=false;relayFrame.hidden=true;clearTimeout(relayTimer);recommendLink(false);relayStatus.textContent='Requesting access to '+label+'…';document.querySelector('#workspace-connection').textContent='Private controller connecting';
+async function connectRelay(url,label){const target=new URL(url);if(!['http:','https:'].includes(target.protocol)||target.username||target.password)throw Error('Invalid controller address');boothReading=null;renderBoothStatus();relayOrigin=target.origin;relayReady=false;relayFrame.hidden=true;clearTimeout(relayTimer);recommendLink(false);relayStatus.textContent='Requesting access to '+label+'…';document.querySelector('#workspace-connection').textContent='Private controller connecting';
  try{const response=await fetch(new URL('/api/health',target),{cache:'no-store',targetAddressSpace:target.hostname==='localhost'?'loopback':'local',signal:AbortSignal.timeout(12000)});const health=await response.json();if(!response.ok||health.service!=='projctl'||health.ok!==true)throw Error('Relay health unavailable');}
  catch{recommendLink(true);relayStatus.textContent='Cannot reach the controller. Open it in a new tab, or allow local-network access in your browser.';document.querySelector('#workspace-connection').textContent='Private controller not connected';return;}
  relayStatus.textContent='Opening the controller… You can also open it in a new tab.';relayFrame.hidden=false;target.searchParams.set('workspaceEmbed','1');relayFrame.src=target.href;relayTimer=setTimeout(()=>{if(!relayReady){relayFrame.hidden=true;recommendLink(true);relayStatus.textContent='The controller could not open inside this page. Use Open local controller to try a new tab.';document.querySelector('#workspace-connection').textContent='Private controller: open in a new tab';}},8000);}
@@ -205,7 +347,11 @@ window.addEventListener('frozen:themechange',themeController);
 relayFrame.addEventListener('load',()=>{if(relayOrigin){relayFrame.contentWindow.postMessage({type:'wst:hello'},relayOrigin);themeController();}});
 window.addEventListener('message',event=>{if(event.source!==relayFrame.contentWindow||event.origin!==relayOrigin||event.data?.type!=='projctl:ready')return;if(event.data.relayConnected!==true){relayReady=false;relayStatus.textContent='Controller page loaded; relay is reconnecting.';document.querySelector('#workspace-connection').textContent='Private relay reconnecting';return;}relayReady=true;relayViews=new Set(Array.isArray(event.data.views)?event.data.views.filter(view=>CHILD_VIEWS.has(view)):['rig','stage']);relayProjectorSelection=event.data.projectorSelection===true;clearTimeout(relayTimer);recommendLink(false);const word='Private controller connected · '+(new URL(relayOrigin).hostname==='localhost'?'this Mac':new URL(relayOrigin).hostname);relayStatus.textContent=word;document.querySelector('#workspace-connection').textContent=word;sendChildView();});
 document.querySelector('#connect-mac').onclick=()=>connectRelay(controllerUrl,LOCAL_RELAY_WORKSPACE?'this controller':'this Mac');
-(async()=>{try{const response=await fetch(new URL('workspace-config.json',import.meta.url),{cache:'no-store'});const cfg=await response.json();if(cfg.control?.verified&&cfg.control.url){const button=document.querySelector('#connect-venue');button.hidden=false;button.onclick=()=>connectRelay(cfg.control.url,cfg.control.label||'theatre controller');}}catch{/* Keep explicit connection options. */}})();
+function showControllerNavigation(show) {
+ for (const item of document.querySelectorAll('[data-controller-only]')) item.hidden = !show;
+}
+if (LOCAL_CONTROLLER) showControllerNavigation(true);
+(async()=>{try{const response=await fetch(new URL('workspace-config.json',import.meta.url),{cache:'no-store'});const cfg=await response.json();if(cfg.control?.verified&&cfg.control.url){showControllerNavigation(true);const button=document.querySelector('#connect-venue');button.hidden=false;button.onclick=()=>connectRelay(cfg.control.url,cfg.control.label||'theatre controller');}}catch{/* Keep explicit connection options. */}})();
 window.addEventListener('hashchange',()=>navigate(parseHash().route,{...parseHash(),updateHash:false}));
 const embed=new URL(location.href).searchParams.get('embed');if(embed==='notes'||embed==='info'){document.body.classList.add('embedded-workspace');navigate(embed==='info'?'rig':'notes',{updateHash:false});}else navigate(parseHash().route,{...parseHash(),updateHash:false});
 window.addEventListener('message',event=>{if(event.source===parent&&event.origin===location.origin&&event.data?.type==='workspace:theme'&&['light','dark','system'].includes(event.data.mode||event.data.theme))window.FrozenTheme.set(event.data.mode||event.data.theme,{save:false});});
@@ -218,29 +364,144 @@ const workspaceMenu=document.querySelector('#workspace-menu');workspaceMenu.addE
 const moreMenu=document.querySelector('#nav-more');
 document.addEventListener('click',event=>{if(!moreMenu.contains(event.target))moreMenu.open=false;});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'){if(moreMenu.open){moreMenu.open=false;moreMenu.querySelector('summary').focus();}else if(document.body.classList.contains('workspace-menu-open')){document.body.classList.remove('workspace-menu-open');workspaceMenu.setAttribute('aria-expanded','false');workspaceMenu.focus();}}});
-let scheduleData=null,scheduleLoading=null,scheduleIndex=0,calendar=null;
+let scheduleData=null,scheduleLoading=null,scheduleIndex=0,calendar=null,scheduleMonth=null;
 function easternDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
 function scheduleLabel(date,short=false){return new Intl.DateTimeFormat('en-US',{timeZone:'UTC',weekday:short?'short':'long',month:short?'short':'long',day:'numeric'}).format(new Date(date+'T12:00:00Z'));}
 function renderSchedule(){
- calendar?.select(scheduleIndex);
+ const month=calendar.select(scheduleIndex),days=document.querySelector('#schedule-days');
+ if(month!==scheduleMonth){
+  scheduleMonth=month;
+  days.setAttribute('aria-label','Days in '+month.name);
+  days.replaceChildren();
+  const today=easternDate();
+  for(const {index,item} of month.entries){
+   const button=document.createElement('button');
+   button.type='button';
+   button.dataset.index=String(index);
+   button.textContent=scheduleLabel(item.date,true);
+   if(item.date===today){
+    button.textContent+=' · Today';
+    button.setAttribute('aria-current','date');
+   }
+   button.onclick=()=>{scheduleIndex=index;renderSchedule();};
+   days.append(button);
+  }
+ }
  const day=scheduleData[scheduleIndex],detail=document.querySelector('#schedule-detail');detail.replaceChildren();
  const heading=document.createElement('h3');heading.textContent=scheduleLabel(day.date);detail.append(heading);
  const list=document.createElement('ul');list.className='schedule-events';
- for(const event of day.events){const row=document.createElement('li'),name=document.createElement('strong'),time=document.createElement('span');name.textContent=event.label;time.textContent=event.time||'Time not specified';row.dataset.kind=eventKind(event.label);row.classList.toggle('schedule-highlight',/Preview|Performance|Final Dress|Opening Night/.test(event.label));row.append(name,time);list.append(row);}detail.append(list);detail.scrollTop=0;
+ for(const event of day.events){const row=document.createElement('li'),name=document.createElement('strong'),time=document.createElement('span');name.textContent=event.label;time.textContent=event.time||(event.label==='No shows'?'':'Time not specified');row.dataset.kind=eventKind(event.label);row.classList.toggle('schedule-highlight',/Preview|Performance|Final Dress|Opening Night/.test(event.label));row.append(name,time);list.append(row);}detail.append(list);detail.scrollTop=0;
  document.querySelector('#schedule-date').value=String(scheduleIndex);document.querySelector('#schedule-prev').disabled=scheduleIndex===0;document.querySelector('#schedule-next').disabled=scheduleIndex===scheduleData.length-1;
- for(const button of document.querySelectorAll('#schedule-days button')){if(Number(button.dataset.index)===scheduleIndex)button.setAttribute('aria-current','date');else button.removeAttribute('aria-current');}
+ for(const button of days.children)button.setAttribute('aria-pressed',String(Number(button.dataset.index)===scheduleIndex));
 }
 async function ensureSchedule(){
  if(scheduleData)return;if(scheduleLoading)return scheduleLoading;
  scheduleLoading=(async()=>{try{
  const response=await fetch(new URL('tech-schedule.json',import.meta.url));if(!response.ok)throw Error('Schedule unavailable');scheduleData=await response.json();
- calendar=mountCalendar(document.querySelector('#schedule-month'),scheduleData,index=>{scheduleIndex=index;renderSchedule();},easternDate());
- const today=easternDate(),found=scheduleData.findIndex(day=>day.date===today);scheduleIndex=found>=0?found:today<scheduleData[0].date?0:scheduleData.length-1;
- const select=document.querySelector('#schedule-date'),days=document.querySelector('#schedule-days');select.replaceChildren();days.replaceChildren();
- scheduleData.forEach((day,index)=>{const option=document.createElement('option');option.value=String(index);option.textContent=scheduleLabel(day.date);select.append(option);const button=document.createElement('button');button.type='button';button.dataset.index=String(index);button.textContent=scheduleLabel(day.date,true);if(day.date===today)button.textContent+=' · Today';button.onclick=()=>{scheduleIndex=index;renderSchedule();};days.append(button);});
+ const today=easternDate();
+ calendar=mountCalendar(document.querySelector('#schedule-month'),scheduleData,index=>{scheduleIndex=index;renderSchedule();},today);
+ const found=scheduleData.findIndex(day=>day.date===today);scheduleIndex=found>=0?found:today<scheduleData[0].date?0:scheduleData.length-1;
+ const select=document.querySelector('#schedule-date');select.replaceChildren();
+ scheduleData.forEach((day,index)=>{const option=document.createElement('option');option.value=String(index);option.textContent=scheduleLabel(day.date);select.append(option);});
  select.onchange=()=>{scheduleIndex=Number(select.value);renderSchedule();};document.querySelector('#schedule-prev').onclick=()=>{if(scheduleIndex>0){scheduleIndex--;renderSchedule();}};document.querySelector('#schedule-next').onclick=()=>{if(scheduleIndex<scheduleData.length-1){scheduleIndex++;renderSchedule();}};
- const todayButton=document.querySelector('#schedule-today');todayButton.disabled=found<0;todayButton.title=found<0?'Today is outside this November 2026 schedule':'Show today in Philadelphia';todayButton.onclick=()=>{const index=scheduleData.findIndex(day=>day.date===easternDate());if(index>=0){scheduleIndex=index;renderSchedule();}};renderSchedule();
+ const todayButton=document.querySelector('#schedule-today');todayButton.disabled=found<0;todayButton.title=found<0?'Today is outside the Frozen schedule':'Show today in Philadelphia';todayButton.onclick=()=>{const index=scheduleData.findIndex(day=>day.date===easternDate());if(index>=0){scheduleIndex=index;renderSchedule();}};renderSchedule();
  }catch{document.querySelector('#schedule-month').textContent='Calendar unavailable. Open the original PDF or retry below.';const detail=document.querySelector('#schedule-detail');detail.replaceChildren();const text=document.createElement('p');text.textContent='The daily schedule could not load. Open the original PDF above, or retry.';const retry=document.createElement('button');retry.type='button';retry.textContent='Retry schedule';retry.onclick=()=>ensureSchedule();detail.append(text,retry);scheduleData=null;}finally{scheduleLoading=null;}})();return scheduleLoading;
 }
 
 for(const button of document.querySelectorAll('[data-schedule-view]'))button.onclick=()=>{const month=button.dataset.scheduleView==='month';document.querySelector('.schedule-body').classList.toggle('calendar-mode',month);document.querySelector('#schedule-month').hidden=!month;for(const peer of document.querySelectorAll('[data-schedule-view]'))peer.setAttribute('aria-pressed',String(peer===button));};
+
+const pageSearch = document.querySelector('#wst-cmd-palette');
+const pageQuery = document.querySelector('#page-query');
+const pageResults = document.querySelector('#page-results');
+function renderPageResults() {
+ const entries = new Map();
+ const keywords = new Map();
+ for (const button of document.querySelectorAll('[data-route]')) {
+  const route = button.dataset.route;
+  if (!ROUTES[route] || button.hasAttribute('data-planning-entry')) continue;
+  const controls = button.hasAttribute('data-open-controls');
+  const label = controls ? 'Private controller' : ROUTES[route].heading || (route === 'notes' ? 'Notes and tasks' : 'Home');
+  keywords.set(label, (keywords.get(label) || '') + ' ' + route + ' ' + button.textContent.trim());
+  entries.set(label, () => {
+   navigate(route, {controls});
+   const panel = controls ? relayPanel : ROUTES[route].panel;
+   panel.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+  });
+ }
+ for (const link of document.querySelectorAll('a[href*="/run-review/"], .document-card, .handoff-links a[href*=".pdf"]')) {
+  const title = link.querySelector('h3,strong')?.textContent || link.textContent.trim();
+  const label = /run-review/.test(link.href) ? 'Run Review' : title + (link.hash.startsWith('#page=') ? ' · page ' + link.hash.slice(6) : '');
+  entries.set(label, () => link.click());
+ }
+ entries.set('Open Projctl on this computer', () => window.open('http://localhost:8080/', '_blank', 'noopener,noreferrer'));
+ entries.set('Copy Pre-Show Ready Report', copyReady);
+ pageResults.replaceChildren();
+ for (const [label, action] of entries) {
+  if (!(label + ' ' + (keywords.get(label) || '')).toLowerCase().includes(pageQuery.value.trim().toLowerCase())) continue;
+  const button = document.createElement('button');
+  button.type = 'button'; button.textContent = label;
+  button.onclick = () => { pageSearch.close(); action(); };
+  pageResults.append(button);
+ }
+ if (!pageResults.childElementCount) pageResults.textContent = 'No matching pages.';
+}
+function openPageSearch() {
+ if (!pageSearch.open) pageSearch.showModal();
+ pageQuery.value = ''; renderPageResults(); pageQuery.focus();
+}
+document.querySelector('#find-page').onclick = openPageSearch;
+pageQuery.oninput = renderPageResults;
+pageSearch.addEventListener('keydown', event => {
+ const buttons = Array.from(pageResults.children);
+ if (!buttons.length) return;
+ const index = buttons.indexOf(document.activeElement);
+ if (event.key === 'Enter' && document.activeElement === pageQuery) {
+  event.preventDefault(); buttons[0].click();
+ } else if (['ArrowDown','ArrowUp'].includes(event.key)) {
+  event.preventDefault();
+  const next = index < 0 ? (event.key === 'ArrowDown' ? 0 : buttons.length - 1) : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+  buttons[next].focus();
+ }
+});
+document.addEventListener('keydown', event => {
+ if ((event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'k') {
+  event.preventDefault(); openPageSearch();
+ }
+});
+
+pageSearch.addEventListener('click', event => {
+ if (event.target !== pageSearch) return;
+ const box = pageSearch.getBoundingClientRect();
+ if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) pageSearch.close();
+});
+document.querySelector('#find-page').textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl+K';
+let boothReading = null;
+function renderBoothStatus() {
+ const age = boothReading ? Date.now() - boothReading.observedAt : Infinity;
+ const live = age >= 0 && age <= 30000;
+ const lockAge = boothReading ? Date.now() - boothReading.lockAt : Infinity;
+ const lockKnown = lockAge >= 0 && lockAge <= 30000 && typeof boothReading?.lock === 'boolean';
+ document.querySelector('#poll-age').textContent = 'TELEMETRY: ' + (live ? 'LIVE' : boothReading ? 'STALE' : 'UNKNOWN');
+ document.querySelector('#show-lock').textContent = 'PROJCTL: ' + (lockKnown ? (boothReading.lock ? 'LOCKED' : 'UNLOCKED') : 'UNKNOWN');
+ document.body.classList.toggle('show-locked', lockKnown && boothReading.lock === true);
+}
+window.addEventListener('message', event => {
+ if (!relayOrigin || event.origin !== relayOrigin || event.source !== relayFrame.contentWindow) return;
+ if (event.data?.type === 'projctl:ready' && !event.data.relayConnected) boothReading = null;
+ else if (event.data?.type === 'projctl:telemetry' && relayReady && Number.isFinite(event.data.lockAt)) boothReading = {observedAt:event.data.observedAt ?? -Infinity, lockAt:event.data.lockAt, lock:event.data.lock};
+ else return;
+ renderBoothStatus();
+});
+setInterval(renderBoothStatus,1000);
+async function copyReady() {
+ renderBoothStatus();
+ const checks = Array.from(document.querySelectorAll('#readiness input'));
+ const time = new Intl.DateTimeFormat('en-US',{hour:'2-digit', minute:'2-digit', hourCycle:'h23', timeZone:'America/New_York',timeZoneName:'short'}).format(new Date());
+ const report = time + ' · VIDEO ' + (checks.every(check => check.checked) ? 'READY' : 'CHECKS INCOMPLETE') + ': ' +
+  checks.map(check => check.parentElement.textContent.trim() + (check.checked ? ' verified' : ' unchecked')).join(', ') + '. ' + document.querySelector('#show-lock').textContent;
+ try { await navigator.clipboard.writeText(report); document.querySelector('#ready-feedback').textContent = 'Copied.'; }
+ catch { window.prompt('Copy the readiness line', report); }
+}
+document.querySelector('#copy-ready').onclick = copyReady;
+
+if ('serviceWorker' in navigator && !LOCAL_CONTROLLER) navigator.serviceWorker.register('./workspace-offline.js').catch(() => {});

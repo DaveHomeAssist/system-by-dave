@@ -123,6 +123,36 @@ test('Stop cancels a pending target, and monitoring failure requests a stop', as
   assert.equal(moved, true); assert.equal(running, false); assert.equal(stops, 5);
 });
 
+test('Stop lens reaches every axis without waiting behind a slow status read', async (t) => {
+  const stopped = [], sockets = new Set(); let releaseRead;
+  const readHeld = new Promise((resolve) => { releaseRead = resolve; });
+  const server = net.createServer((socket) => {
+    sockets.add(socket); socket.on('close', () => sockets.delete(socket)); let text = '';
+    socket.on('data', (b) => {
+      text += b; if (!text.includes('\n')) return;
+      const r = JSON.parse(text);
+      const reply = (body) => socket.end(JSON.stringify({ jsonrpc: '2.0', id: r.id, ...body }));
+      if (r.method === 'property.get') { readHeld.then(() => reply({ result: 'on' })); return; }
+      if (r.method.endsWith('.stop')) {
+        stopped.push(r.method);
+        if (r.method === 'optics.lensshift.vertical.stop') return reply({ error: { code: -1, message: 'axis busy' } });
+        return reply({ result: null });
+      }
+      reply({ result: true });
+    });
+  });
+  server.listen(0, '127.0.0.1'); await once(server, 'listening');
+  t.after(() => { releaseRead(); for (const socket of sockets) socket.destroy(); server.close(); });
+  const d = pulseDriver({ host: '127.0.0.1', port: server.address().port, timeoutMs: 2000 });
+  const slowRead = d.getStatus().catch(() => {});
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  const started = Date.now();
+  await assert.rejects(d.lens({ op: 'stop' }), /sent to every axis; 1 of 4 did not acknowledge \(axis busy\)/);
+  assert.ok(Date.now() - started < 1000, 'Stop must not queue behind the held status read');
+  assert.deepEqual(stopped.sort(), ['optics.focus.stop', 'optics.lensshift.horizontal.stop', 'optics.lensshift.vertical.stop', 'optics.zoom.stop']);
+  releaseRead(); await slowRead;
+});
+
 test('compound recall validates all axes before targets and stops all axes on a partial send failure', async (t) => {
   const requests = [], sockets = new Set(); let failZoom = false;
   const server = net.createServer(socket => {

@@ -1,5 +1,18 @@
 # Frozen navigation and cohesion
 
+November 20 workspace release: Dave requested one canonical navigation system
+across the hosted pages, an opening night countdown in Home slot six, and a
+refreshed GSAP treatment. The implemented hosted shell is defined by
+`wst/hosting/navigation/model.mjs` and the scoped acceptance brief in
+`wst/NAVIGATION_BRIEF.md`. It uses one ordered menu, with Handoff opening the
+in-workspace view and the standalone handoff retaining its direct URL. The
+controller tools remain initially hidden on the public workspace.
+`wst/navigation-contract.test.mjs` now checks that compiled shell, route coverage
+and parity of the local controller source inputs. The older four-menu contract
+and its Handoff collision exceptions are replaced for this hosted release. The
+controller and Monitor proposals below remain historical context and separate
+scope; this change does not resolve or alter their task records.
+
 Brief for the menus of the Frozen crew surfaces: the published workspace
 (`wst/`, also served by Projctl at `/workspace/`), the standalone handoff page,
 the Rehearsal Review page, the Projctl controller and Frozen Monitor.
