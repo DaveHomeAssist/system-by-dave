@@ -6,6 +6,16 @@ The [shared bounded workspace foundation](../docs/av-workspace.md) provides safe
 
 ## Stage 3D architecture
 
+Projctl reuses `three-d-stage.js` as an embedded inspection viewer. Its private
+plot adapter owns the reference model and maps stable drawing lane IDs to the
+current relay slots. `setActivationTargets` registers inert mesh/sprite targets;
+`stage-object-activate` carries version, context and instance ID after a click,
+never after an orbit drag. It conveys no command or geometry edit. The optional
+`inspection-only` attribute adapts camera help, `paused` suppresses hidden-panel
+draws, and `frameObject(..., {fit:'content'})` fits sparse drawings to visible
+geometry. Existing Throwline jobs, optical gates, manipulation and exports are
+unchanged. The local relay packages the same canonical viewer and pinned engine.
+
 - `throwline-scene-state.js` is the shared scene contract and pure geometry boundary. It normalizes imported data, applies named user intents, calculates projector and multi-projector geometry, detects beam obstructions, owns commissioning evidence, and provides named scenario history with undo and redo.
 - `Stage3D.html` owns the no-scroll workspace, controls, readouts, room model, placement and shift guides, persistence, and the mapping from UI events to scene intents.
 - `three-d-stage.js` owns WebGL rendering, runtime context-loss recovery, camera and export plumbing, pointer and keyboard hit-testing, dimension callouts, and PNG capture. Direct manipulation emits `stage-manipulation` intents; it does not calculate throw geometry.

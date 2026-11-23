@@ -704,15 +704,15 @@ window.SBD_PROJECT_REGISTRY = {
       "name": "theme-organizer-resource",
       "fullName": "DaveHomeAssist/theme-organizer-resource",
       "category": "Web/static",
-      "purpose": "A browsable, filterable theme gallery and comparison tool for selecting and evaluating color themes across DaveHomeAssist proje...",
+      "purpose": "Theme Organizer browses, filters, compares, and shortlists 58 UI themes, with color tokens, CSS custom properties, page preview, and JSON export in the browser.",
       "stack": [
         "HTML"
       ],
       "defaultBranch": "main",
-      "lastRemoteUpdate": "2026-03-30",
-      "recentCommits90d": 6,
-      "sizeKB": 139,
-      "files": 9,
+      "lastRemoteUpdate": "2026-11-23",
+      "recentCommits90d": 20,
+      "sizeKB": 822,
+      "files": 45,
       "archived": false,
       "status": "active",
       "github": "https://github.com/DaveHomeAssist/theme-organizer-resource"

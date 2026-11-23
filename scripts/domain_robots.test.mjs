@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { robots, robotsRules, robotsAllows, declaresNoindex, previewImagePaths, crawlPolicyProblems } from './stage_domain_sites.mjs';
+import { robots, robotsRules, robotsAllows, declaresNoindex, previewImagePaths, crawlPolicyProblems, stageManagedSnapshotRoutes } from './stage_domain_sites.mjs';
 
 const site = {
   domain: 'example.test',
@@ -86,4 +86,25 @@ test('a blocked preview image and an open data file both fail', () => {
   const dir2 = stage({ 'fmp/index.html': NOINDEX, 'fmp/data.csv': 'a' });
   fs.writeFileSync(path.join(dir2, 'robots.txt'), robots(open, 'https://example.test', true, false));
   assert.match(crawlPolicyProblems(open, dir2).join('\n'), /\/fmp\/data\.csv is neither a page nor a link-preview image/);
+});
+
+
+test('Pages sends the managed WST Stage snapshot to its owning service', () => {
+  const source = '<script type="importmap">{"imports":{"three":"/ProjectorThrow/vendor/three/three.module.min.js"}}</script>';
+  const dir = stage({ 'wst/stage/index.html': source, 'unrelated.html': 'preserve me' });
+  try {
+    stageManagedSnapshotRoutes(dir);
+    const page = fs.readFileSync(path.join(dir, 'wst/stage/index.html'), 'utf8');
+    assert.match(page, /http-equiv="refresh" content="0;url=https:\/\/wst\.housevideo\.app\/stage\/index\.html"/);
+    assert.match(page, /rel="canonical" href="https:\/\/wst\.housevideo\.app\/stage\/index\.html"/);
+    assert.equal(declaresNoindex(page), true);
+    assert.doesNotMatch(page, /ProjectorThrow/);
+    assert.equal(fs.readFileSync(path.join(dir, 'unrelated.html'), 'utf8'), 'preserve me');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('managed snapshot routing creates nothing when Stage is absent', () => {
+  const dir = stage({});
+  try { stageManagedSnapshotRoutes(dir); assert.equal(fs.existsSync(path.join(dir, 'wst')), false); }
+  finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });

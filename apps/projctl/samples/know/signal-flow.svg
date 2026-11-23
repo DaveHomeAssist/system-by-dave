@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540" role="img" aria-labelledby="t d">
+  <title id="t">Sample signal flow</title>
+  <desc id="d">An invented sample: a lighting console sends cues through a MIDI interface to the show computer, which feeds four projectors. The relay reads and commands the projectors on a control network.</desc>
+  <rect width="960" height="540" fill="#f6fafc"/>
+  <g font-family="system-ui, sans-serif" fill="#102131">
+    <text x="24" y="38" font-size="22" font-weight="700">Sample signal flow</text>
+    <text x="24" y="60" font-size="13" fill="#465f73">Invented for the simulator. Not a real rig.</text>
+  </g>
+  <g fill="#ffffff" stroke="#102131" stroke-width="2">
+    <rect x="24" y="110" width="170" height="70" rx="8"/>
+    <rect x="254" y="110" width="150" height="70" rx="8"/>
+    <rect x="464" y="90" width="200" height="110" rx="8"/>
+    <rect x="464" y="300" width="200" height="80" rx="8"/>
+    <rect x="766" y="84" width="170" height="52" rx="8"/>
+    <rect x="766" y="150" width="170" height="52" rx="8"/>
+    <rect x="766" y="216" width="170" height="52" rx="8"/>
+    <rect x="766" y="282" width="170" height="52" rx="8"/>
+    <rect x="24" y="300" width="170" height="80" rx="8"/>
+  </g>
+  <g fill="none" stroke-width="3">
+    <path d="M194 145 H254" stroke="#855000"/>
+    <path d="M404 145 H464" stroke="#855000"/>
+    <path d="M664 120 H720 V110 H766" stroke="#17703a"/>
+    <path d="M664 140 H735 V176 H766" stroke="#17703a"/>
+    <path d="M664 160 H720 V242 H766" stroke="#17703a"/>
+    <path d="M664 180 H705 V308 H766" stroke="#17703a"/>
+    <path d="M664 340 H750 V320 H766" stroke="#1d5fa8" stroke-dasharray="7 5"/>
+    <path d="M750 320 V124 H766" stroke="#1d5fa8" stroke-dasharray="7 5"/>
+    <path d="M750 190 H766" stroke="#1d5fa8" stroke-dasharray="7 5"/>
+    <path d="M750 256 H766" stroke="#1d5fa8" stroke-dasharray="7 5"/>
+    <path d="M194 340 H464" stroke="#1d5fa8" stroke-dasharray="7 5"/>
+  </g>
+  <g font-family="system-ui, sans-serif" fill="#102131" font-size="15" font-weight="700">
+    <text x="40" y="140">Lighting console</text>
+    <text x="270" y="140">MIDI interface</text>
+    <text x="480" y="122">Show computer</text>
+    <text x="480" y="332">Relay</text>
+    <text x="782" y="116">A · SL Portal</text>
+    <text x="782" y="182">B · Top Portal</text>
+    <text x="782" y="248">C · Stage</text>
+    <text x="782" y="314">D · SR Portal</text>
+    <text x="40" y="332">This page</text>
+  </g>
+  <g font-family="system-ui, sans-serif" fill="#465f73" font-size="12">
+    <text x="40" y="160">fires cue 999</text>
+    <text x="270" y="160">cable in, USB out</text>
+    <text x="480" y="142">playback app</text>
+    <text x="480" y="160">four fullscreen outputs</text>
+    <text x="480" y="178">listen-only cue observer</text>
+    <text x="480" y="352">reads and commands</text>
+    <text x="480" y="368">the projectors</text>
+    <text x="40" y="352">signed-in browser</text>
+  </g>
+  <g font-family="system-ui, sans-serif" font-size="12" font-weight="700">
+    <rect x="24" y="440" width="26" height="6" fill="#855000"/><text x="58" y="448" fill="#102131">Cue (MIDI Show Control)</text>
+    <rect x="24" y="464" width="26" height="6" fill="#17703a"/><text x="58" y="472" fill="#102131">Picture</text>
+    <rect x="24" y="488" width="26" height="6" fill="#1d5fa8"/><text x="58" y="496" fill="#102131">Control and readings (dashed)</text>
+  </g>
+</svg>

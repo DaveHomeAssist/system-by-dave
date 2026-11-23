@@ -18,6 +18,8 @@ on:
       - 'transfer.html'
       - 'js/domain-*.js'
       - 'scripts/*domain*'
+      - 'scripts/managed_site_mirrors*'
+      - 'wst/**'
       - 'js/sbd-registry.js'
       - 'av-suite-worker.js'
       - 'av-suite.html'
