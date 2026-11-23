@@ -148,7 +148,9 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       // unsupported, but total transport failure must reach the relay's offline policy.
       const read = (property) => rpc('property.get', { property }, timeoutMs, undefined, signal);
       const optional = async (fn, fallback) => { try { return await fn(); } catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; return fallback; } };
-      const s = { online: true, power: mapPower(await read('system.state')) };
+      const state = String(await read('system.state')).toLowerCase();
+      // The raw state stays beside the mapped power: READY can be woken from the network, STANDBY and ECO cannot.
+      const s = { online: true, power: mapPower(state), rawState: /^[a-z]{1,20}$/.test(state) ? state : null };
       await discover(signal);
       s.errors = null; // Pulse alarm telemetry is not implemented; unknown is not clear.
       s.shutter = await optional(async () => { const sh = String(await read('optics.shutter.target')).toLowerCase(); return sh === 'closed' ? SHUTTER.CLOSED : sh === 'open' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; }, SHUTTER.UNKNOWN);
@@ -218,7 +220,13 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     async lens(op = {}, { guard } = {}) {
       if (op.op === 'stop') {
         motionGeneration++;
-        for (const axis of Object.values(axes)) await rpc(axis + '.stop', undefined, timeoutMs, guard);
+        guard?.();
+        // Stop does not wait behind a queued status read, and one axis that fails
+        // does not keep the others moving: each axis gets its own connection.
+        const results = await Promise.allSettled(Object.values(axes).map((axis) => rpcOnce(axis + '.stop', undefined, timeoutMs, guard)));
+        const failed = results.filter((result) => result.status === 'rejected');
+        if (failed.length === results.length) throw failed[0].reason;
+        if (failed.length) throw new Error(`Stop lens was sent to every axis; ${failed.length} of ${results.length} did not acknowledge (${failed[0].reason?.message || failed[0].reason}).`);
         return 'OK';
       }
       const generation = motionGeneration;

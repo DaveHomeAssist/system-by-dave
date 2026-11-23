@@ -12,3 +12,4 @@ cp "$project_root/.openai/hosting.json" "$dist_root/.openai/hosting.json"
 echo "Built $dist_root"
 
 cp -R "$project_root/drizzle" "$dist_root/drizzle"
+node "$project_root/scripts/apply-navigation.mjs"

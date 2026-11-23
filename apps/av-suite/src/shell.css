@@ -33,8 +33,6 @@
    panel list shrinks, so the last choice stays reachable inside that list. */
 .suite-app .console-chooser>*{flex-shrink:0}
 .suite-app .console-chooser .console-choices{flex-shrink:1}
-.suite-app .console-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
-.suite-app .console-groups button{min-width:0;padding:8px 4px}
 .suite-app .message{flex-shrink:0}
 [data-pack-dialogs]{display:contents}
 /* Pack panels fill their console body the way their own pages did. */
@@ -99,8 +97,6 @@ html[data-av-focus="true"] .focus-toggle span{display:none}
 .suite-app .console-bar{min-height:44px;padding:0 4px 0 10px}
 .suite-app .console-grid{padding:6px;gap:6px}
 .suite-app .console-context{font-size:11px}
-.suite-app .console-groups{display:flex;flex-direction:column}
-.suite-app .console-groups button{text-align:left;padding:10px 12px;min-height:48px}
 .suite-app .flow-workspace{position:relative}
 .flow-compact-tools{position:absolute;top:8px;left:8px;z-index:5}
 .flow-compact-tools>button{background:var(--av-surface);box-shadow:0 2px 8px #0002}
@@ -138,7 +134,7 @@ html[data-av-focus="true"] .suite-actions>button[aria-haspopup="dialog"]{display
   .suite-app .console-strip{padding-left:180px}
 }
 
-/* Keep the long group list within the chooser, with Close always available. */
+/* Keep the group tiles within the chooser on a short screen, with Close always available. */
 .suite-app .console-chooser .console-groups{min-height:0;overflow:auto;flex-shrink:1}
 
 /* Public breadcrumb row: breadcrumb on the left, demos and Field Kit links on the right (AUD-003). */

@@ -1,4 +1,31 @@
+## Canonical navigation and opening night, November 20, 2026
+
+`hosting/navigation/model.mjs` owns the workspace destination order, labels and
+URLs. `hosting/scripts/apply-navigation.mjs` applies that shell to every HTML
+entry point after the hosted build, including the independently supplied Review,
+Stage and Scenic pages. Keep it as the last hosting build step. The deployment
+mirror retains its existing capture, storage and media modules.
+
+Home has six public cards. The sixth counts down to November 25 at 7 p.m. Eastern,
+with the absolute date visible and a completed state at zero. The existing GSAP
+choreography now reveals the ice title, crystal and six cards; reduced motion,
+visibility pause and immediate navigation are retained. Controller tools remain a
+separate, initially hidden operator group. Personal notes and task guards retain
+their storage and authentication behavior.
+
+Validation: `node --test wst/navigation-contract.test.mjs wst/workspace.test.mjs wst/hosting/navigation/navigation.test.mjs`.
+In the complete Sites mirror, `node scripts/check-navigation.mjs` builds and checks
+all six HTML entry points; `node scripts/browser-navigation.mjs` runs the viewport,
+keyboard, theme, motion and countdown acceptance suite with the existing Playwright
+installation. Run substantial checks on an approved runner. The isolated preview
+server `scripts/preview-navigation.mjs` uses empty read-only test storage.
+
 # Frozen workspace
+
+The crew Calendar covers November 1 through January 3. It opens on the current
+Eastern month within the run. Use Previous month and Next month to browse the
+run, or Today to return to the current date. The original November tech PDF is
+still available. Performance times are Eastern and subject to change.
 
 ## Two-session rehearsal review
 
@@ -90,7 +117,7 @@ Primary hostname: https://wst.housevideo.app (Stage, reference and preserved sch
 
 Personal notes autosave only in this browser/origin under `wst.frozen.personal-notes.v1`, with text export and storage-failure recovery. They never enter the task API. Clearing browser site data loses local notes; notes at the temporary hostname do not automatically transfer to the custom hostname. Private cross-device notes are deferred, not a project-wide storage policy.
 
-Team tasks are public by Dave's explicit choice: anyone opening the page can view, add, edit, complete and delete. D1 stores tasks separately. The API caps text at 500 characters, request JSON at 2KB, total tasks at 200, and writes per IP per Worker isolate at 30/minute. The isolate limiter is a modest abuse safeguard, not a global quota. Revision checks reject lost updates. No projector endpoints, existing private data or account credentials are included.
+Team tasks are public to read. Every add, edit, completion and delete requires the crew passcode in the X-Frozen-Task-Passcode header, matched in fixed-length digest form against the Site secret TASKS_WRITE_PASSCODE. Missing configuration fails closed, and writes with another Origin are rejected. The browser asks only when someone unlocks editing or first tries to write, keeps the passcode in sessionStorage for that tab, and clears it after a 401 or 403. Personal notes remain unaffected. D1 stores tasks separately; this change has no migration and does not alter existing rows. The API still caps text at 500 characters, request JSON at 2KB, total tasks at 200, and writes per IP per Worker isolate at 30/minute. Revision checks reject lost updates. No projector endpoints, existing private data or account credentials are included.
 
 ## Source and release
 
@@ -116,7 +143,7 @@ The controller now includes Notes + tasks and Projector info alongside Rig and S
 
 The public website shows Stage / room and Controls in place. Connect this Mac explicitly requests the browser's local-network permission for `http://localhost:8080`, checks relay health, and loads the private controller frame; the always-visible Open local controller link is the direct path (see the November 14 section above). Connected requires a source/origin-validated child report with active relay connection, not iframe load. Parent messages can select only Rig or Stage; they cannot issue device commands. Denied/unavailable connection stays clearly disconnected. This does not expose a public relay and is not a verified Studio crew endpoint.
 
-The public tasks API permits anonymous cross-origin GET/POST/OPTIONS so the local workspace uses the same shared list. This CORS change is limited to the managed task API. Existing controller API policies were not broadened. Private authenticated Studio iframe commissioning remains a separate check. Current source uses a Strict controller cookie plus a Secure partitioned embed cookie, with own-origin API and WebSocket checks. Do not claim a future protected Studio iframe is commissioned from this local test.
+The public tasks API has no wildcard CORS policy. Reads remain public on the WST origin; writes require the Site secret-backed crew passcode and, when an Origin header is present, the exact WST origin. Existing controller API policies were not broadened. Private authenticated Studio iframe commissioning remains a separate check. Current source uses a Strict controller cookie plus a Secure partitioned embed cookie, with own-origin API and WebSocket checks. Do not claim a future protected Studio iframe is commissioned from this local test.
 
 Verification: actual local controller panels passed desktop/mobile notes persistence across tabs, shared-list read, and projector info/Stage navigation. The public website loaded actual private Stage and Rig in place in an isolated browser with normal local-network permission explicitly granted; the denied state remains disconnected. No physical commands were sent. A temporary SSH forward bound only Walter loopback for these tests; it is not a deployed service.
 
@@ -191,3 +218,23 @@ One label per view and one view per label across the Workspace row, the Main men
 ## Run review navigation (2026-11-16)
 
 The November 15 run review lives at `/run-review/` on the published Site only: its page, `data.json`, `context.json` and the R2-backed `originals/` route were added in Site version 38 from a managed checkout and are not in this directory or in `hosting/worker/index.js`. Home and Planning link to it by absolute URL, so the local Projctl copy also reaches the public review. Before the next Sites publication from this source, carry the version 38 run-review routes and R2 binding into the managed worker (the version 38 checkout is preserved on the 4TB T9 drive), or publishing will remove `/run-review/`. Rehearsal data and photos stay out of this public repository.
+
+
+## Booth navigation and offline notes
+
+Open Find a workspace page with the header shortcut or Cmd/Ctrl+K. Search for
+a page, an R5 reference, a controller link, or the readiness report. Check
+the four readiness items for the current call before copying a report.
+The browser keeps personal notes separately from the cached team list.
+
+After an online visit prepares the shell and syncs the list, Notes can open
+offline on the public site. Cached rows show the last successful sync.
+Offline checkoffs replay with the original server revision. A crew edit or
+deletion takes precedence and the page reports the conflict. Other team
+operations require a working connection. Clearing site data removes local
+notes, the snapshot and any pending checkoffs.
+
+The Show Lock badge uses a fresh response from an explicitly connected
+controller that supports the telemetry message. Live telemetry requires
+successful readings from all four lanes within 30 seconds. A disconnected
+workspace or an older relay cannot supply those readings.

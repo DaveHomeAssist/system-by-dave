@@ -49,9 +49,13 @@ in a Notion database.
 - Follow-up: one line per thing to check, or "None".
 - Per-unit numbers: when the database has number properties named
   `P1 Temp (°C)` and `P1 Headroom (°C)` (and so on for each slot), the relay
-  fills them with each unit's intake or ambient reading and headroom, empty when
-  a unit was not read. The relay reads the database's property list once; a
-  database without these properties still receives the page without them.
+  fills them with each unit's intake or ambient reading and headroom while the
+  unit is reached and lit (on or warming). They stay empty when a unit is off,
+  cooling or not read, so charts built on them show running temperatures. A
+  reading taken while off (a Panasonic intake can read 29 to 32 °C just after
+  power-off) still appears in the page's unit table. The relay reads the
+  database's property list once; a database without these properties still
+  receives the page without them.
 - Page body: a unit table (slot, lane, model, address, power, intake or ambient
   temperature, rated limit, headroom, internal temperatures, flags, light hours,
   last contact) and the controller events since the previous report. A unit not
