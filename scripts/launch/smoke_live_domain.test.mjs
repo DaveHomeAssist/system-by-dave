@@ -6,7 +6,7 @@ import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { behindMain, parseArgs, run } from './smoke_live_domain.mjs';
+import { behindMain, destinationState, parseArgs, readDeployMarker, run } from './smoke_live_domain.mjs';
 
 const SHA = 'a'.repeat(40);
 const NEW = 'b'.repeat(40);
@@ -116,4 +116,171 @@ test('bad options are rejected', () => {
   assert.throws(() => parseArgs(['--retries', '-1']));
   assert.throws(() => parseArgs(['--expect-commit', 'main']));
   assert.throws(() => parseArgs(['--nope']));
+});
+
+// --- deploy.json: the main site's marker of what each destination should be serving ---------------------
+
+const DIGEST = 'd'.repeat(64);
+const STALE = '9'.repeat(64);
+const marker = (commit = SHA, digest = DIGEST) => ({ schema: 'system-by-dave.deploy.v1', sourceRepository: 'o/r', sourceCommit: commit, sites: { avbydave: { domain: 'avbydave.com', artifactSha256: digest, files: 3 } } });
+
+// A throwaway origin: routes maps a pathname to a function (or a value) returning { status, body }.
+async function origin(routes) {
+  const hits = [];
+  const server = http.createServer((req, res) => {
+    const pathname = new URL(req.url, 'http://x').pathname;
+    hits.push(pathname);
+    const route = routes[pathname];
+    const { status = 200, body = '' } = (typeof route === 'function' ? route(hits.filter((h) => h === pathname).length) : route) || { status: 404, body: 'not found' };
+    res.writeHead(status, { 'content-type': pathname.endsWith('.json') ? 'application/json' : 'text/html' });
+    res.end(typeof body === 'string' ? body : JSON.stringify(body));
+  });
+  await new Promise((ready) => server.listen(0, '127.0.0.1', ready));
+  return { url: `http://127.0.0.1:${server.address().port}`, hits, close: () => server.close() };
+}
+// The destination: a home page plus the source.json its last Pages deploy produced (an older commit is normal).
+const destination = (artifact, commit = SHA) => origin({
+  '/': { body: '<title>AV by Dave</title>' },
+  '/source.json': { body: { site: 'avbydave', sourceRepository: 'o/r', sourceCommit: commit, artifactSha256: artifact, files: 3 } }
+});
+const mainSite = (body, status = 200) => origin({ '/deploy.json': { status, body } });
+
+test('readDeployMarker reads the commit and per-site digests, and tells a missing marker from a broken one', async () => {
+  let m = await mainSite(marker());
+  let r = await readDeployMarker(m.url); m.close();
+  assert.deepEqual([r.ok, r.commit, r.sites.avbydave.artifactSha256], [true, SHA, DIGEST]);
+  assert.ok(m.hits.includes('/deploy.json'));
+
+  m = await mainSite('not found', 404);
+  r = await readDeployMarker(m.url); m.close();
+  assert.deepEqual([r.ok, r.missing], [false, true], 'a 404 means no deploy has published the marker yet');
+
+  m = await mainSite({ sourceCommit: 'nope', sites: {} });
+  r = await readDeployMarker(m.url); m.close();
+  assert.deepEqual([r.ok, !!r.missing], [false, false]);
+  assert.match(r.problem, /malformed/);
+
+  m = await mainSite('<html>', 200);
+  r = await readDeployMarker(m.url); m.close();
+  assert.match(r.problem, /not JSON/);
+
+  m = await mainSite('boom', 503);
+  r = await readDeployMarker(m.url); m.close();
+  assert.deepEqual([r.ok, !!r.missing, r.problem], [false, false, 'deploy.json HTTP 503'], 'an outage is not "not published yet"');
+});
+
+test('destinationState compares the served content digest, not the commit that produced it', () => {
+  const m = { commit: NEW, sites: marker(NEW).sites };
+  assert.deepEqual(destinationState(m, 'avbydave', { ok: true, commit: SHA, artifact: DIGEST }), { ok: true, expected: DIGEST, live: DIGEST, problem: undefined }, 'an older sourceCommit with the same content is current');
+  const stale = destinationState(m, 'avbydave', { ok: true, commit: SHA, artifact: STALE });
+  assert.equal(stale.ok, false);
+  assert.match(stale.problem, /serves content 999999999999, deploy bbbbbbbbbbbb staged dddddddddddd/);
+  assert.match(destinationState(m, 'avbydave', { ok: false, problem: 'source.json HTTP 503' }).problem, /serves content source\.json HTTP 503/);
+  assert.match(destinationState(m, 'avbydave', { ok: true, commit: SHA, artifact: null }).problem, /serves content unknown/, 'a destination that publishes no digest cannot be confirmed');
+  assert.match(destinationState(m, 'housevideo', { ok: true, artifact: DIGEST }).problem, /no entry for housevideo/);
+});
+
+test('--expect-release passes once deploy.json names the release and the destination serves its staged content', async () => {
+  const main = await mainSite(marker(SHA));
+  const dest = await destination(DIGEST, 'f'.repeat(40));
+  const r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], expectRelease: SHA.slice(0, 12) }), quiet);
+  main.close(); dest.close();
+  assert.equal(r.ok, true, JSON.stringify(r.deploy));
+  assert.deepEqual([r.deploy.ok, r.deploy.liveRelease, r.deploy.artifact], [true, SHA, DIGEST]);
+  assert.equal(r.source.commit, 'f'.repeat(40), 'the destination still reports an older commit, and that is fine');
+});
+
+test('--expect-release fails when the release has not been deployed, or the destination still serves older content', async () => {
+  let main = await mainSite(marker(NEW));
+  let dest = await destination(DIGEST);
+  let r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], expectRelease: SHA, wait: 0 }), quiet);
+  main.close(); dest.close();
+  assert.equal(r.ok, false);
+  assert.match(r.deploy.problem, /deploy\.json names bbbbbbbbbbbb, expected aaaaaaaaaaaa/);
+
+  main = await mainSite(marker(SHA));
+  dest = await destination(STALE);
+  r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], expectRelease: SHA, wait: 0 }), quiet);
+  main.close(); dest.close();
+  assert.equal(r.ok, false);
+  assert.match(r.deploy.problem, /serves content 999999999999.*staged dddddddddddd/);
+
+  main = await mainSite('not found', 404);
+  dest = await destination(DIGEST);
+  r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], expectRelease: SHA, wait: 0 }), quiet);
+  main.close(); dest.close();
+  assert.match(r.deploy.problem, /deploy\.json is not published yet/);
+
+  r = await run(base({ dir: site(), expectRelease: SHA }), quiet);
+  assert.match(r.deploy.problem, /checks a live site, not --dir/);
+});
+
+test('--expect-release waits for the marker to catch up and then passes', async () => {
+  let reads = 0;
+  const main = await origin({ '/deploy.json': () => { reads += 1; return reads < 2 ? { status: 200, body: marker(NEW) } : { status: 200, body: marker(SHA) }; } });
+  const dest = await destination(DIGEST);
+  const r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], expectRelease: SHA, wait: 5, delay: 0 }), quiet);
+  main.close(); dest.close();
+  assert.equal(r.ok, true, JSON.stringify(r.deploy));
+  assert.equal(reads, 2, "the marker is re-read once, after the first read named another release");
+});
+
+test('--behind-main follows deploy.json: current main with current content is healthy even when source.json is older', async () => {
+  const main = await mainSite(marker(SHA));
+  const dest = await destination(DIGEST, 'f'.repeat(40));
+  const compared = [];
+  const api = http.createServer((req, res) => { compared.push(req.url); res.end(JSON.stringify({ status: 'identical', ahead_by: 0, commits: [] })); });
+  await new Promise((ready) => api.listen(0, '127.0.0.1', ready));
+  const r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], behindMain: true, mainSha: SHA, api: `http://127.0.0.1:${api.address().port}` }), quiet);
+  main.close(); dest.close(); api.close();
+  assert.equal(r.ok, true, JSON.stringify(r.main));
+  assert.equal(r.main.state, 'current');
+  assert.equal(r.main.destination.ok, true);
+  assert.deepEqual(compared, [`/repos/o/r/compare/${SHA}...${SHA}`], 'main is compared with the deploy marker commit, not the destination source.json commit');
+});
+
+test('--behind-main fails when the destination does not serve the content the current deploy staged', async () => {
+  const main = await mainSite(marker(SHA));
+  const dest = await destination(STALE);
+  const api = await fakeApi({ status: 'identical', ahead_by: 0, behind_by: 0, commits: [] });
+  const r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], behindMain: true, mainSha: SHA, api: api.api }), quiet);
+  main.close(); dest.close(); api.close();
+  assert.equal(r.ok, false);
+  assert.equal(r.main.state, 'current', 'main itself is not behind');
+  assert.equal(r.main.destination.ok, false);
+  assert.match(r.main.problem, /serves content 999999999999.*staged dddddddddddd/);
+});
+
+test('--behind-main reports an old deploy marker as behind main, and an unreadable marker as unknown', async () => {
+  let main = await mainSite(marker(SHA));
+  let dest = await destination(DIGEST);
+  const api = await fakeApi({ status: 'ahead', ahead_by: 5, behind_by: 0, commits: [{ sha: NEW, commit: { committer: { date: at(1662) } } }] });
+  let r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], behindMain: true, api: api.api, maxBehindMinutes: 60 }), quiet);
+  main.close(); dest.close(); api.close();
+  assert.equal(r.ok, false);
+  assert.match(r.main.problem, /5 commit\(s\) behind main/);
+
+  main = await mainSite('boom', 503);
+  dest = await destination(DIGEST);
+  r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], behindMain: true }), quiet);
+  main.close(); dest.close();
+  assert.deepEqual([r.main.ok, r.main.state, r.main.problem], [false, 'unknown', 'deploy.json HTTP 503']);
+});
+
+test('--behind-main falls back to source.json only until the first deploy publishes deploy.json', async () => {
+  const main = await mainSite('not found', 404);
+  const dest = await destination(undefined, SHA);
+  let seen = '';
+  const api = http.createServer((req, res) => { seen = req.url; res.end(JSON.stringify({ status: 'identical', ahead_by: 0, commits: [] })); });
+  await new Promise((ready) => api.listen(0, '127.0.0.1', ready));
+  const r = await run(base({ base: dest.url, sourceOrigin: main.url, only: ['/'], behindMain: true, mainSha: SHA, api: `http://127.0.0.1:${api.address().port}` }), quiet);
+  main.close(); dest.close(); api.close();
+  assert.equal(r.ok, true);
+  assert.equal(seen, `/repos/o/r/compare/${SHA}...${SHA}`);
+  assert.equal(r.main.destination, undefined);
+});
+
+test('--expect-release must be a commit SHA', () => {
+  assert.throws(() => parseArgs(['--expect-release', 'main']));
+  assert.equal(parseArgs(['--expect-release', SHA]).expectRelease, SHA);
 });

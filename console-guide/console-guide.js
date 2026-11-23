@@ -121,6 +121,9 @@
     var p = new URLSearchParams(location.search);
     q.value = p.get('q') || '';
     if (p.get('brand')) brand.value = p.get('brand');
+    // A brand that isn't in the list (old or hand-edited link) leaves the select
+    // with nothing chosen; fall back to All brands.
+    if (brand.selectedIndex < 0) brand.value = '';
     if (/^[smlx]$/.test(p.get('size') || '')) size.value = p.get('size');
     if (/^(w|kg)$/.test(p.get('sort') || '')) sort.value = p.get('sort');
     legacy.checked = p.get('legacy') !== '0';

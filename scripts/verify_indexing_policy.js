@@ -86,7 +86,9 @@ const robots = read('robots.txt');
 // The Projctl show backup page adds one noindex relay role page, apps/projctl/public/show.html (2026-11-18).
 // The Projctl power operator page adds one noindex relay page (apps/projctl/public/power.html).
 // The Philly prototype (thephilly/, noindex, private working prototype) adds one.
-if (unlisted.length !== 220) fail(`Expected 220 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// ProjectorThrow/ only forwards to ProjectorThrow/Stage3D.html, so the AV sitemap
+// lists the final address instead (scripts/gen_sitemap.py REDIRECT_ONLY) and adds one.
+if (unlisted.length !== 221) fail(`Expected 221 tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
   const source = read(tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href);
@@ -107,12 +109,6 @@ unlisted.forEach((file) => {
 });
 
 [
-  '/apps/av-workbook/',
-  '/apps/av-audio/',
-  '/apps/av-video/',
-  '/apps/show-ops/',
-  '/apps/show-control/',
-  '/apps/fmp-camera-sim/',
   '/camera-sim/',
   '/fmp-index/',
   '/fmp/',
@@ -160,7 +156,7 @@ hatFiles.forEach((file) => {
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],
-  ['command53/index.html', 'https://davehomeassist.github.io/command-center-061eed/private.html']
+  ['command53/index.html', 'https://systembydave.com/command53/']
 ].forEach(([file, expectedCanonical]) => {
   const source = read(file);
   if (!hasNoIndex(source)) fail(`${file} is missing noindex.`);
