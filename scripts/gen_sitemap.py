@@ -46,7 +46,6 @@ STATIC_PAGES = [
     ("shader/", "monthly", "0.7"),
     ("ursa-broadcast-g2/", "monthly", "0.7"),
     ("pixelforge/", "weekly", "0.8"),
-    ("ProjectorThrow/", "weekly", "0.8"),
     ("ProjectorThrow/Stage3D.html", "weekly", "0.6"),
     ("shader/practice.html", "weekly", "0.6"),
     ("notion.html", "weekly", "0.8"),
@@ -99,6 +98,12 @@ def load_domain_sites():
     return json.load(io.open(os.path.join(ROOT, "scripts", "domain-sites.json"), encoding="utf-8"))["sites"]
 
 
+# Pages that only forward to another address with JavaScript. A sitemap must
+# list final, canonical URLs, so these stay out even when the registry links
+# them (ProjectorThrow/ forwards to ProjectorThrow/Stage3D.html).
+REDIRECT_ONLY = {"ProjectorThrow/"}
+
+
 def registry_hrefs():
     src = io.open(os.path.join(ROOT, "js", "sbd-registry.js"), encoding="utf-8").read()
     return re.findall(r"href:'([^']+)'", src)
@@ -130,10 +135,15 @@ FIELD_KIT = "field-kit/"
 STRIPE_LINK = re.compile(r"^https://buy\.stripe\.com/[A-Za-z0-9_]+$")
 
 
+def field_kit_checkout_open(config_text):
+    """True only for the checkoutOpen assignment. Same rule as field_kit_launch.mjs."""
+    return re.search(r"\bcheckoutOpen\s*:\s*true\b", config_text) is not None
+
+
 def field_kit_checkout_live(config_text=None, page_html=None):
     """Same rule as scripts/field_kit_launch.mjs: the committed field-kit page is
-    noindex, and it is indexed only once js/sbd-launch-config.js has a
-    buy.stripe.com Payment Link and a real price and no DRAFT block remains."""
+    noindex, and it is indexed only once js/sbd-launch-config.js has checkoutOpen
+    true, a buy.stripe.com Payment Link, a real price and no DRAFT block left."""
     if config_text is None:
         config_text = io.open(os.path.join(ROOT, "js", "sbd-launch-config.js"), encoding="utf-8").read()
     if page_html is None:
@@ -142,7 +152,7 @@ def field_kit_checkout_live(config_text=None, page_html=None):
     url = block and re.search(r"url\s*:\s*(['\"])(.*?)\1", block.group(0))
     price = re.search(r"priceLabel\s*:\s*(['\"])(.*?)\1", config_text)
     price_set = bool(price) and price.group(2).strip() not in ("", "Price TBD") and not price.group(2).lstrip().startswith("[")
-    return bool(url and STRIPE_LINK.match(url.group(2).strip())) and price_set and "data-dave-placeholder" not in page_html
+    return field_kit_checkout_open(config_text) and bool(url and STRIPE_LINK.match(url.group(2).strip())) and price_set and "data-dave-placeholder" not in page_html
 
 
 def is_indexable(path):
@@ -212,7 +222,7 @@ def main():
             entries.append((path, when(path), freq, prio))
     listed = {path for path, _, _, _ in entries}
     for href in registry_tool_pages():
-        if href in listed or not belongs(href):
+        if href in listed or href in REDIRECT_ONLY or not belongs(href):
             continue
         if not os.path.exists(os.path.join(ROOT, href)):
             print("skip (missing file):", href, file=sys.stderr)

@@ -4,10 +4,14 @@
 // self-hosted runner; exit 0 = all good, 1 = a check failed, 2 = bad usage.
 //
 //   node scripts/launch/smoke_live_domain.mjs                       # live site, once
+//   node scripts/launch/smoke_live_domain.mjs --expect-release <sha> --wait 900
+//        # after a deploy of <sha>: retry until systembydave.com/deploy.json names <sha> and this site
+//        # serves the content that deploy staged for it (or timeout), then check pages
 //   node scripts/launch/smoke_live_domain.mjs --expect-commit <sha> --wait 900
-//        # after a deploy: retry until source.json reports <sha> (or timeout), then check pages
+//        # only for a site whose content changed in <sha>: retry until source.json reports <sha>
 //   node scripts/launch/smoke_live_domain.mjs --behind-main --max-behind-minutes 60
-//        # live-behind-main: compare source.json with the source repo's main (GitHub public API)
+//        # live-behind-main: compare deploy.json with the source repo's main (GitHub public API), and
+//        # check this site serves the content that deploy staged for it
 //   node scripts/launch/smoke_live_domain.mjs --dir _sites/avbydave # same checks on a staged folder
 //   node scripts/launch/smoke_live_domain.mjs --json                # machine-readable summary
 //
@@ -33,6 +37,7 @@ export function parseArgs(argv) {
     else if (a === '--delay') opts.delay = Number(v());
     else if (a === '--wait') opts.wait = Number(v());
     else if (a === '--expect-commit') opts.expectCommit = v();
+    else if (a === '--expect-release') opts.expectRelease = v();
     else if (a === '--behind-main') opts.behindMain = true;
     else if (a === '--max-behind-minutes') opts.maxBehindMinutes = Number(v());
     else if (a === '--main-sha') { opts.mainSha = v(); opts.behindMain = true; }
@@ -42,6 +47,7 @@ export function parseArgs(argv) {
   }
   for (const k of ['retries', 'delay', 'wait', 'maxBehindMinutes']) if (!Number.isFinite(opts[k]) || opts[k] < 0) throw new Error(`--${k} must be a non-negative number`);
   if (opts.expectCommit && !/^[0-9a-f]{7,40}$/i.test(opts.expectCommit)) throw new Error('--expect-commit must be a commit SHA');
+  if (opts.expectRelease && !/^[0-9a-f]{7,40}$/i.test(opts.expectRelease)) throw new Error('--expect-release must be a commit SHA');
   if (opts.mainSha && !/^[0-9a-f]{7,40}$/i.test(opts.mainSha)) throw new Error('--main-sha must be a commit SHA');
   return opts;
 }
@@ -85,8 +91,31 @@ export async function readSource(base) {
   try {
     const j = JSON.parse(r.body);
     if (!/^[0-9a-f]{40}$/.test(j.sourceCommit || '')) return { ok: false, problem: 'source.json has no sourceCommit' };
-    return { ok: true, commit: j.sourceCommit, repository: j.sourceRepository, site: j.site, files: j.files };
+    return { ok: true, commit: j.sourceCommit, artifact: j.artifactSha256 || null, repository: j.sourceRepository, site: j.site, files: j.files };
   } catch { return { ok: false, problem: 'source.json is not JSON' }; }
+}
+
+// systembydave.com deploys on every push and publishes deploy.json: the commit it deployed and the content
+// digest staged for each destination. A destination whose content did not change is not republished, so its own
+// source.json can name an older commit; this is what it should be serving.
+export async function readDeployMarker(origin) {
+  const r = await get(new URL('/deploy.json', origin).toString() + `?smoke=${Date.now()}`);
+  if (r.status === 404) return { ok: false, missing: true, problem: 'deploy.json is not published yet' };
+  if (r.status !== 200) return { ok: false, problem: r.error ? `deploy.json request failed (${r.error})` : `deploy.json HTTP ${r.status}` };
+  try {
+    const j = JSON.parse(r.body);
+    if (!/^[0-9a-f]{40}$/.test(j.sourceCommit || '') || !j.sites || typeof j.sites !== 'object') return { ok: false, problem: 'deploy.json is malformed' };
+    return { ok: true, commit: j.sourceCommit, repository: j.sourceRepository, sites: j.sites };
+  } catch { return { ok: false, problem: 'deploy.json is not JSON' }; }
+}
+
+// Does this destination serve the content the deploy staged for it?
+export function destinationState(marker, siteId, source) {
+  const expected = marker.sites?.[siteId]?.artifactSha256 || null;
+  if (!expected) return { ok: false, expected, live: source?.artifact || null, problem: `deploy.json has no entry for ${siteId}` };
+  const live = source?.ok ? source.artifact : null;
+  const ok = live === expected;
+  return { ok, expected, live, problem: ok ? undefined : `serves content ${short(live) || source?.problem || 'unknown'}, deploy ${short(marker.commit)} staged ${short(expected)}` };
 }
 
 // Live-behind-main: is the published commit main's HEAD, and if not, how long has main waited?
@@ -137,6 +166,30 @@ export async function run(opts, log = console.log) {
   const result = { site: cfg.site, base: opts.dir ? `dir:${opts.dir}` : base, startedAt: new Date().toISOString(), pages: [], source: null, deploy: null, main: null, ok: true };
   try {
     let source = await readSource(base);
+    const sourceOrigin = opts.sourceOrigin || cfg.sourceOrigin || 'https://systembydave.com';
+    let marker = null;
+    if (opts.expectRelease) {
+      if (opts.dir) result.deploy = { ok: false, problem: '--expect-release checks a live site, not --dir' };
+      else {
+        // The main site deploys first; wait for its marker to name the release, then for this site to serve its content.
+        const want = opts.expectRelease.toLowerCase();
+        const state = () => {
+          if (!marker?.ok) return { ok: false, problem: marker?.problem || 'deploy.json unread' };
+          if (!marker.commit.startsWith(want)) return { ok: false, problem: `deploy.json names ${short(marker.commit)}, expected ${short(want)}` };
+          const dest = destinationState(marker, cfg.site, source);
+          return dest.ok ? { ok: true, artifact: dest.live } : { ok: false, problem: dest.problem };
+        };
+        const deadline = Date.now() + opts.wait * 1000;
+        marker = await readDeployMarker(sourceOrigin);
+        while (!state().ok && Date.now() < deadline) {
+          await sleep(Math.max(1, opts.delay) * 1000);
+          marker = await readDeployMarker(sourceOrigin);
+          source = await readSource(base);
+        }
+        const final = state();
+        result.deploy = { expectedRelease: opts.expectRelease, liveRelease: marker?.commit || null, artifact: final.artifact || null, ok: final.ok, problem: final.ok ? undefined : `${final.problem} after ${opts.wait}s` };
+      }
+    }
     if (opts.expectCommit) {
       // Post-publish: GitHub Pages takes a minute or two; wait for the new source.json first.
       const deadline = Date.now() + opts.wait * 1000;
@@ -165,7 +218,17 @@ export async function run(opts, log = console.log) {
     }
     if (opts.behindMain) {
       if (!source.ok) result.main = { ok: false, state: 'unknown', problem: source.problem };
-      else result.main = await behindMain({ deployed: source.commit, repository: source.repository || cfg.sourceRepository, branch: cfg.mainBranch || 'main', mainSha: opts.mainSha, maxBehindMinutes: opts.maxBehindMinutes, api: opts.api });
+      else {
+        const compare = (deployed, repository) => behindMain({ deployed, repository: repository || cfg.sourceRepository, branch: cfg.mainBranch || 'main', mainSha: opts.mainSha, maxBehindMinutes: opts.maxBehindMinutes, api: opts.api });
+        // A staged --dir folder has no deploy marker; a live site compares deploy.json, and falls back to the
+        // site's own source.json only until the first deploy that publishes deploy.json.
+        marker = opts.dir ? { ok: false, missing: true } : (marker?.ok ? marker : await readDeployMarker(sourceOrigin));
+        if (marker.ok) {
+          const [main, dest] = [await compare(marker.commit, marker.repository), destinationState(marker, cfg.site, source)];
+          result.main = { ...main, destination: dest, ok: main.ok && dest.ok, problem: main.ok ? dest.problem : main.problem };
+        } else if (marker.missing) result.main = await compare(source.commit, source.repository);
+        else result.main = { ok: false, state: 'unknown', problem: marker.problem };
+      }
     }
   } finally { server?.close(); }
   result.ok = result.pages.every((p) => p.ok) && (!result.deploy || result.deploy.ok) && (!result.main || result.main.ok) && (!result.analytics || result.analytics.ok);

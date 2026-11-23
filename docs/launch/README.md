@@ -1,8 +1,8 @@
 # AV by Dave launch: frame-sync demo
 
 The reversible, on-site parts of the frame-sync Reel launch (launch brief §2–§6).
-Nothing here posts, signs up or spends anything; every external service is off
-until Dave picks it.
+Analytics and the email form stay off. Field Kit checkout is open; the switch
+is `fieldKit.checkoutOpen` in `js/sbd-launch-config.js` (`checkout.md`).
 
 ## Pages
 
@@ -32,11 +32,12 @@ home. Since 2026-11-01 `frame-sync/` is only a short-link redirect to that demo
 | Where | Key | Today |
 |---|---|---|
 | `demos/config.js` | `emailSubscribeUrl` | `[DAVE: beehiiv subscribe URL]` placeholder: no signup link yet. Set → UTM-tagged button to beehiiv's hosted page (`email.md`) |
-| `demos/config.js` | `umamiWebsiteId`, `emailFormAction`, `checklistUrl` | No analytics (demo CSP has no `cloud.umami.is` since 2026-10-30; re-adding needs a CSP + privacy-policy change), no email form; `checklistUrl` is the absolute, UTM-tagged Field Kit link on avbydave.com (see `demos/README.md`) |
+| `demos/config.js` | `umamiWebsiteId`, `emailFormAction`, `checklistUrl` | No analytics (demo CSP currently has no `cloud.umami.is`), no email form; `checklistUrl` is the absolute, UTM-tagged Field Kit link on avbydave.com (see `demos/README.md`) |
 | `js/sbd-launch-config.js` | `analytics.provider` | `null`: **OFF by decision (2026-10-18)**, no-op dispatcher (`analytics.md`) |
-| `js/sbd-launch-config.js` | `fieldKit.checkout` | `provider: 'stripe'`, `url: 'https://buy.stripe.com/cNifZg4N98oy776fKgdEs00'`: the Buy button opens that Payment Link. After payment, Stripe redirects to the noindex `field-kit/thanks/` page. See `checkout.md`. A `data-dave-placeholder` block would close it again |
+| `js/sbd-launch-config.js` | `fieldKit.checkoutOpen` | `true`: the one line that opens checkout. `false` keeps "Checkout opens soon", does not point the Buy button at the Payment Link, and leaves the published page noindex |
+| `js/sbd-launch-config.js` | `fieldKit.checkout` | `provider: 'stripe'`, `url: 'https://buy.stripe.com/cNifZg4N98oy776fKgdEs00'`: while `checkoutOpen` is true, the Buy button opens that Payment Link. After payment, Stripe redirects to the noindex `field-kit/thanks/` page. See `checkout.md`. A `data-dave-placeholder` block would close it again |
 | `js/sbd-launch-config.js` | `fieldKit.priceLabel` | `$12` (Dave, 2026-10-30); the Stripe price must match it |
-| `js/sbd-launch-config.js` | `fieldKit.download.sha256` | `[]`: the download page shows "email me" for every link. Set to the SHA-256 of the kit share link (`npm run hash:field-kit-link`) → download button and payment line for that link only (`checkout.md`) |
+| `js/sbd-launch-config.js` | `fieldKit.download.sha256` | the kit folder's hash. The thanks page shows the download button and payment line only for that link (`checkout.md`). The share link stays out of this repo |
 
 Affiliate links: none, and none planned for now (decision 2026-10-18).
 

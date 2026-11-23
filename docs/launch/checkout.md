@@ -1,27 +1,27 @@
 # Field Kit checkout
 
-Status: **Payment Link live; download hash empty**. The page shows the $12 price and a Buy button for `https://buy.stripe.com/cNifZg4N98oy776fKgdEs00`. `field-kit/index.html` stays `noindex,nofollow` in this repo; while checkout is live the publish step marks the avbydave.com copy `index,follow` and lists `/field-kit/` (Search indexing, below). `fieldKit.download.sha256` is `[]`, so `field-kit/thanks/` shows the email-me card until Dave registers the kit share link. Paid kit files are **not** in this repository. Only the
-blurred preview images in `field-kit/img/` are.
+Status: **checkout open**. `fieldKit.checkoutOpen` is `true` in `js/sbd-launch-config.js`. That one line is the switch: `false` keeps "Checkout opens soon", does not point the Buy button at the Payment Link, and leaves the published page noindex. `true` shows the $12 price and a Buy button for `https://buy.stripe.com/cNifZg4N98oy776fKgdEs00`. `field-kit/index.html` stays `noindex,nofollow` in this repo; while checkout is open the publish step marks the avbydave.com copy `index,follow` and lists `/field-kit/` (Search indexing, below). `fieldKit.download.sha256` lists the kit folder's hash, so `field-kit/thanks/` shows the download button for that link. Paid kit files are **not** in this repository. The card previews in `field-kit/img/` are the final page-1 renders.
 
-The console's navigation and first-visit box on avbydave.com link to it (whether
-they should before the download link is registered is open choice HR-D9 in
-`docs/next-steps/av-by-dave.json`).
+The console's navigation and first-visit box on avbydave.com link to it (open
+choice HR-D9 in `docs/next-steps/av-by-dave.json`).
 
 Code: `js/sbd-checkout.js` (validation), `field-kit/field-kit.js` (button),
 config in `js/sbd-launch-config.js` (`fieldKit`).
 
 ## Safety interlock
 
-Checkout opens only when **all three** of these are true:
+Checkout opens only when **all four** of these are true:
 
-1. `fieldKit.checkout` names a provider and an HTTPS link on that provider's own
+1. `fieldKit.checkoutOpen` is `true`. This is the switch. `false` keeps checkout
+   closed even when the Payment Link below is already filled in.
+2. `fieldKit.checkout` names a provider and an HTTPS link on that provider's own
    hosts. Anything else stays closed: another host, `http:`, a typo or an
    unknown provider.
-2. No block on `field-kit/index.html` is marked `data-dave-placeholder`. The
+3. No block on `field-kit/index.html` is marked `data-dave-placeholder`. The
    delivery, statement descriptor, refund and licence text was approved on
    2026-11-01 and the markers removed. Re-adding the attribute to any block
    closes checkout again, and the console says how many are left.
-3. `fieldKit.priceLabel` is a real price. `'Price TBD'`, an empty string or a
+4. `fieldKit.priceLabel` is a real price. `'Price TBD'`, an empty string or a
    `[DAVE: …]` placeholder keeps checkout closed and the page shows "Price TBD".
 
 The demo itself (`demos/frame-sync.html`) doesn't carry a Field Kit block; link the
@@ -32,18 +32,21 @@ kit from its `checklistUrl` in `demos/config.js` (set: the absolute avbydave.com
 `node scripts/smoke_field_kit_checkout.mjs [base-url]` (default
 `https://avbydave.com`; `npm run smoke:field-kit-checkout`). GET requests only, no
 dependencies, never submits a payment. It checks that `/field-kit/` returns 200
-and shows $12, that `fieldKit.checkout.url` matches `^https://buy\.stripe\.com/`
-and that Payment Link answers 200, and that `/field-kit/thanks/` loads with the
-launch config. Once the Payment Link is real it also fails while
-`fieldKit.download.sha256` is empty, because buyers would get no download
-button. Exit 0 = checkout live, 2 = pages fine but the Payment Link is still a
-placeholder, 1 = a check failed.
+and shows $12, that checkout is open only when `checkoutOpen` is `true` and
+`fieldKit.checkout.url` matches `^https://buy\.stripe\.com/`, that the Payment
+Link answers 200, and that `/field-kit/thanks/` loads with the launch config.
+Once checkout is open it also fails while `fieldKit.download.sha256` is empty,
+because buyers would get no download button. Exit 0 = checkout live, 2 = pages
+fine but the switch is off or the Payment Link is still a placeholder, 1 = a
+check failed.
 
 ## Chosen: Stripe Payment Links (2026-10-19)
 
-The config ships `provider: 'stripe'`, `priceLabel: '$12'` (Dave, 2026-10-30) and
-the Payment Link `url: 'https://buy.stripe.com/cNifZg4N98oy776fKgdEs00'` (2026-11-01).
-Putting the `[DAVE: Stripe Payment Link]` placeholder back closes checkout.
+The config ships `checkoutOpen: true`, `provider: 'stripe'`, `priceLabel: '$12'`
+(Dave, 2026-10-30) and the Payment Link
+`url: 'https://buy.stripe.com/cNifZg4N98oy776fKgdEs00'` (2026-11-01).
+Set `checkoutOpen` to `false`, or put the `[DAVE: Stripe Payment Link]`
+placeholder back, to close checkout.
 **Account:** a separate AV by Dave Stripe account (Dave, 2026-10-23), not the System
 by Dave one. Statement descriptor: **AVBYDAVE FIELD KIT** (18 characters; set it
 in that account's Stripe settings so the card statement matches the page). The
@@ -53,11 +56,12 @@ Payment Link went in on 2026-11-01. Dave's click-steps live outside the repo
 ## Search indexing
 
 `field-kit/index.html` is committed `noindex,nofollow`. When
-`js/sbd-launch-config.js` has a `buy.stripe.com` Payment Link and a real price,
-and no `data-dave-placeholder` block remains, the publish step
-(`scripts/stage_domain_sites.mjs` via `scripts/field_kit_launch.mjs`) stages the
-page as `index,follow` and `scripts/gen_sitemap.py --site avbydave` lists
-`/field-kit/` in the avbydave.com sitemap. Put the placeholder back and both
+`fieldKit.checkoutOpen` is `true`, `js/sbd-launch-config.js` has a
+`buy.stripe.com` Payment Link and a real price, and no `data-dave-placeholder`
+block remains, the publish step (`scripts/stage_domain_sites.mjs` via
+`scripts/field_kit_launch.mjs`) stages the page as `index,follow` and
+`scripts/gen_sitemap.py --site avbydave` lists `/field-kit/` in the avbydave.com
+sitemap. Set `checkoutOpen` to `false`, or put the placeholder back, and both
 revert. `scripts/field_kit_launch.test.mjs` (in `npm run verify:domain-sites`)
 keeps the JavaScript and Python rules in step.
 
@@ -74,7 +78,7 @@ https://avbydave.com/field-kit/thanks/?dl=<URL-encoded share link to the kit fol
 went through" line, only for the one link Dave registered: an HTTPS link on a
 known file host (Google Drive/Docs, Dropbox, OneDrive/SharePoint) whose SHA-256
 is listed in `fieldKit.download.sha256` in `js/sbd-launch-config.js`. Any other
-link, and every link while that list is empty (the shipped state), shows
+link, and every link while that list is empty, shows
 "email me your receipt" under the neutral heading. The page sends no referrer,
 removes the query from the address bar, and keeps the link in that tab's
 sessionStorage so a reload still works. `session_id` only shows as a short
@@ -129,11 +133,10 @@ Replace the CSP `content` with the matching line:
 Verify the overlay in a real browser after changing the CSP. Providers
 occasionally change the hosts their overlay needs.
 
-4. Register the download link. Run
-   `npm run hash:field-kit-link -- '<share link to the kit files>'` and paste the
-   printed hash into `download: { sha256: ['…'] }` in `js/sbd-launch-config.js`.
-   Use the same link in the Stripe redirect (Delivery, above). Without the hash
-   buyers get "email me" instead of a download button.
+4. Done: the kit folder's hash is in `download.sha256`. The share link itself
+   stays in the Stripe redirect (Delivery, above), not in this repo. Replacing
+   the link is `npm run hash:field-kit-link` and a one-line hash change. Without
+   a matching hash, buyers get "email me" instead of a download button.
 5. Done by the indexing gate (Search indexing, above). The source stays
    `noindex,nofollow`; the publish step swaps the avbydave.com copy and lists
    `/field-kit/` only while checkout is live. Do not remove the source tag by hand.

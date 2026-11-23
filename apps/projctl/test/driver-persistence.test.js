@@ -39,7 +39,7 @@ async function pjlinkProjector(t, { refuseEvery = 0, digestOnEveryCommand = fals
   const nonce = '1a2b3c4d', password = 'fixture-pass';
   const expected = createHash('md5').update(nonce + password).digest('hex');
   const values = { POWR: '1', AVMT: '30', INPT: '31', ERST: '000000', LAMP: '10 1', NAME: 'fixture' };
-  const state = { connections: 0, refused: 0, lines: [], sockets: new Set(), values, stallQuery: null, open: () => state.sockets.size };
+  const state = { connections: 0, refused: 0, lines: [], sockets: new Set(), values, stallQuery: null, resetNext: 0, resets: 0, open: () => state.sockets.size };
   const server = net.createServer((socket) => {
     state.connections += 1;
     socket.on('error', () => {});
@@ -52,6 +52,7 @@ async function pjlinkProjector(t, { refuseEvery = 0, digestOnEveryCommand = fals
       let index;
       while ((index = text.indexOf('\r')) >= 0) {
         const line = text.slice(0, index); text = text.slice(index + 1);
+        if (state.resetNext > 0) { state.resetNext -= 1; state.resets += 1; socket.resetAndDestroy(); return; }
         state.lines.push(line);
         const digest = /^[0-9a-f]{32}%1/.test(line) ? line.slice(0, 32) : '';
         if (digest ? digest !== expected : (!authenticated || digestOnEveryCommand)) { socket.write('PJLINK ERRA\r'); continue; }
@@ -102,6 +103,27 @@ test('a PJLink session the projector closed while idle is replaced on the next p
   const again = await driver.getStatus();
   assert.equal(again.power, 'on');
   assert.equal(state.connections, 3);
+});
+
+test('a held PJLink session the projector resets is replaced once, and a reset on a new session still fails', async (t) => {
+  const { driver, state } = await pjlinkProjector(t);
+  assert.equal((await driver.getStatus()).power, 'on');
+  await settle();
+  assert.equal(state.open(), 1);
+  // The projector answers the next poll's first command with a TCP reset instead of a reply,
+  // which reaches the driver as ECONNRESET, not as a plain close.
+  state.resetNext = 1;
+  const status = await driver.getStatus();
+  assert.equal(status.power, 'on'); assert.equal(status.shutter, 'open');
+  assert.equal(state.resets, 1);
+  assert.equal(state.connections, 2, 'one new session, no further retry');
+  // Two resets in a row: the idle session, then the new one. The poll reports the failure
+  // instead of opening connections without limit.
+  await settle();
+  state.resetNext = 2;
+  await assert.rejects(driver.getStatus(), (error) => error.code === 'ECONNRESET' || /connection closed/.test(error.message));
+  assert.equal(state.connections, 3, 'exactly one replacement session was tried');
+  assert.equal((await driver.getStatus()).power, 'on', 'the following poll recovers');
 });
 
 test('a projector that wants the digest on every command still gives a full status', async (t) => {

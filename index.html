@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>System by Dave — Tools that do the unglamorous work</title>
 <meta name="robots" content="index,follow">
 <meta name="twitter:title" content="System by Dave — Tools that do the unglamorous work">
@@ -21,12 +21,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/fonts.css">
-<script>
-  if (window.location.pathname.endsWith('/index.html')) {
-    const p = window.location.pathname.replace(/index\.html$/, '');
-    window.location.replace(`${window.location.origin}${p}${window.location.search}${window.location.hash}`);
-  }
-</script>
+<script src="js/sbd-clean-index-url.js"></script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"System by Dave","url":"https://systembydave.com/","description":"Offline-capable browser tools for live-show crews, the Prompt Lab prompt workbench, and agents and widgets for Notion. Built by Dave Robertson.","publisher":{"@type":"Person","name":"Dave Robertson"},"sameAs":["https://github.com/DaveHomeAssist/system-by-dave","https://promptlab.tools"]}
 </script>
@@ -129,6 +124,11 @@
   .line > *{color:var(--ink);}
   .line .tag{color:inherit;}
   .line .line-mark{position:absolute;top:22px;right:24px;font-family:var(--ff-mono);font-size:44px;font-weight:400;line-height:1;opacity:0.18;color:inherit;}
+  .card-shot{margin:-24px -24px 16px;aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line);border-radius:var(--radius) var(--radius) 0 0;background:#0B0E16;}
+  .line .card-shot{margin:-26px -24px 16px;}
+  .line:has(.card-shot) .line-mark{display:none;}
+  .card-shot img{width:100%;height:100%;object-fit:cover;object-position:center top;}
+  .card-shot img.card-shot--portrait{object-position:center;}
   .line h3{font-size:26px;margin-bottom:10px;}
   .line h3 a{text-decoration:none;}
   .line .meta{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-3);margin:auto 0 0;padding-top:20px;}
@@ -188,6 +188,8 @@
     .stat-num{font-size:32px;}
     .card{padding:20px;}
     .line{padding:24px 20px;}
+    .card-shot,.line .card-shot{margin:-20px -20px 14px;}
+    .line .card-shot{margin:-24px -20px 14px;}
     .feat-shot{aspect-ratio:16/10;}
     .footer-inner{flex-direction:column;align-items:flex-start;}
     .footer-links{margin-left:-8px;}
@@ -286,6 +288,9 @@
       </div>
       <div class="grid-3">
         <article class="card line accent-green">
+          <div class="card-shot">
+            <img src="img/av-by-dave-console.webp" alt="AV by Dave console open to Equipment Lab, with a searchable equipment library on the left and a 3D model of a Cartoni Maxima 30 fluid head in the inspector." width="1600" height="1000" loading="lazy" decoding="async">
+          </div>
           <span class="line-mark" aria-hidden="true">AV</span>
           <p class="tag">Live shows</p>
           <h3><a class="card-link" href="av/" data-track-cta="lines:av-suite">AV by Dave</a></h3>
@@ -310,6 +315,9 @@
           </ul>
         </article>
         <article class="card line accent-red">
+          <div class="card-shot">
+            <img src="img/notion.webp" alt="System by Dave Notion page headed &quot;Tools for Notion people&quot;, with agent and widget counts and the start of the agents gallery." width="1600" height="1000" loading="lazy" decoding="async">
+          </div>
           <span class="line-mark" aria-hidden="true">N</span>
           <p class="tag">Workspace</p>
           <h3><a class="card-link" href="notion.html" data-track-cta="lines:notion">Notion</a></h3>
@@ -346,6 +354,9 @@
         </article>
         <div class="feat-side">
           <article class="card accent-green">
+            <div class="card-shot">
+              <img src="img/cue-sheet.webp" alt="Cue Sheet edit view with the sample corporate session: numbered cues with times, departments, actions, sources, owners and Ready/Standby/Hold status." width="1600" height="730" loading="lazy" decoding="async">
+            </div>
             <p class="tag">AV by Dave</p>
             <h3>Cue Sheet and Show Advance</h3>
             <p>Cue Sheet runs the rundown with preview, playback, and print or CSV export. Show Advance collects contacts, access, schedule, power, network, and open questions before you arrive.</p>
@@ -355,6 +366,9 @@
             </div>
           </article>
           <article class="card accent-red">
+            <div class="card-shot">
+              <img class="card-shot--portrait" src="img/sort-inbox.webp" alt="Sort Inbox agent card: an illustrated man carrying a tray of sorted envelopes, with a short description of weekly Notion inbox triage." width="534" height="948" loading="lazy" decoding="async">
+            </div>
             <p class="tag">Notion agent</p>
             <h3>Sort Inbox</h3>
             <p>Scheduled inbox triage for Notion. It classifies new entries, applies your routing rules, and leaves a short review queue.</p>

@@ -43,9 +43,24 @@ const STANDALONE_RETURNS = [
   'fifa-pitch-crew/index.html',
   'scorecard/index.html',
   'prompts/index.html',
-  'noteforge/index.html'
+  'noteforge/index.html',
+  'thephilly/index.html'
 ];
 const REQUIRED_SKIP_LINKS = new Map([
+  ['systembydave/index.html', 'main'],
+  ['systembydave/index-md.html', 'main'],
+  ['systembydave/routing.html', 'main'],
+  ['systembydave/lifecycle.html', 'main'],
+  ['systembydave/sync.html', 'main'],
+  ['systembydave/voice.html', 'main'],
+  ['systembydave/implementation.html', 'main'],
+  ['systembydave/layers/identity.html', 'main'],
+  ['systembydave/layers/semantic.html', 'main'],
+  ['systembydave/layers/episodic.html', 'main'],
+  ['systembydave/layers/procedural.html', 'main'],
+  ['systembydave/layers/decisions.html', 'main'],
+  ['systembydave/layers/working.html', 'main'],
+  ['systembydave/layers/reference.html', 'main'],
   ['switcher/index.html', 'reference-main'],
   ['switcher/guide/index.html', 'atem-explorer'],
   ['switcher/guide/atem-hd8-iso-guide-offline.html', 'atem-explorer'],
@@ -63,7 +78,8 @@ const REQUIRED_SKIP_LINKS = new Map([
   ['scorecard/index.html', 'scorecard-workspace'],
   ['noteforge/index.html', 'app'],
   ['prompts/index.html', 'prompt-library'],
-  ['teleprompter.html', 'teleprompter-workspace']
+  ['teleprompter.html', 'teleprompter-workspace'],
+  ['thephilly/index.html', 'stage']
 ]);
 const CUSTOM_SHELLS = new Map([
   ['depotops/index.html', ['href="/"', 'href="/tools.html"', 'aria-current="page">DepotOps']],

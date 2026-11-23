@@ -69,22 +69,32 @@ const robots = read('robots.txt');
 // Infrastructure adds its non-published native source template.
 // Front Office adds one non-published native source template; its public route is unchanged.
 // The AV Suite shell adds its non-published source template under apps/av-suite/. From
-// 2026-10-13 its av/ route is the noindex source of the avbydave.com home page, and the 34
-// retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md).
+// 2026-10-13 its av/ route was the noindex source of the avbydave.com home page, and the 34
+// retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md). From
+// 2026-11-21 the home page source is av-home/ (noindex at its source path, one more route
+// outside the sitemap) and av/ is indexable in the AV sitemap (one fewer), so the count holds.
 // Equipment Lab adds its source template, original checklist and package return route.
 // Eight original family entries now redirect into the shared console.
 // The noindex Sync & Signal Field Kit page (field-kit/, docs/launch/README.md) adds one,
 // and its buyers-only download page (field-kit/thanks/, noindex, reached from Stripe's
 // after-payment redirect) adds one more. The noindex frame-sync/ short link (avbydave.com/frame-sync/,
 // canonical to systembydave.com/demos/frame-sync.html, used in the frame sync reel) adds one more.
-// Once checkout is live the Field Kit page joins the avbydave.com sitemap (scripts/field_kit_launch.mjs)
-// and leaves this count. Main's 214 includes field-kit/ unlisted and has no frame-sync/, so the
-// live count stays 214 (field-kit listed, frame-sync unlisted) and the closed count is 215.
+// Once checkout is open the Field Kit page joins the avbydave.com sitemap
+// (scripts/field_kit_launch.mjs) and leaves this count. Main's 221 includes field-kit/
+// unlisted and has no frame-sync/, so the open count stays 221 (field-kit listed,
+// frame-sync unlisted) and the closed count is 222.
 // Projctl adds two nonpublic relay pages: the control UI and passcode sign-in.
 // The Frozen Monitor adds six noindex relay pages under apps/projctl/public/monitor/ (2026-11-14).
 // The Frozen standalone house handoff and its local relay copy add two noindex crew reference pages.
+// Pixel capture adds two noindex synthetic demo viewers.
+// Frozen Startup Checks adds one noindex native app page.
+// The Projctl show backup page adds one noindex relay role page, apps/projctl/public/show.html (2026-11-18).
+// The Projctl power operator page adds one noindex relay page (apps/projctl/public/power.html).
+// The Philly prototype (thephilly/, noindex, private working prototype) adds one.
+// ProjectorThrow/ only forwards to ProjectorThrow/Stage3D.html, so the AV sitemap
+// lists the final address instead (scripts/gen_sitemap.py REDIRECT_ONLY) and adds one.
 const fieldKitListed = sitemapRoutes.has('/field-kit/');
-const expectedUnlisted = fieldKitListed ? 214 : 215;
+const expectedUnlisted = fieldKitListed ? 221 : 222;
 if (unlisted.length !== expectedUnlisted) fail(`Expected ${expectedUnlisted} tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
@@ -106,12 +116,6 @@ unlisted.forEach((file) => {
 });
 
 [
-  '/apps/av-workbook/',
-  '/apps/av-audio/',
-  '/apps/av-video/',
-  '/apps/show-ops/',
-  '/apps/show-control/',
-  '/apps/fmp-camera-sim/',
   '/camera-sim/',
   '/fmp-index/',
   '/fmp/',
@@ -159,7 +163,7 @@ hatFiles.forEach((file) => {
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],
-  ['command53/index.html', 'https://davehomeassist.github.io/command-center-061eed/private.html']
+  ['command53/index.html', 'https://systembydave.com/command53/']
 ].forEach(([file, expectedCanonical]) => {
   const source = read(file);
   if (!hasNoIndex(source)) fail(`${file} is missing noindex.`);

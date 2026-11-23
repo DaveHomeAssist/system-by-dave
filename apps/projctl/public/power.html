@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-role="power">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Projctl | Power</title>
+<meta name="description" content="Power page: one guarded control that turns the four projection lanes on in the morning and off at night, and says when it is safe to leave.">
+<link rel="canonical" href="http://localhost:8080/power.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Projctl relay">
+<meta property="og:title" content="Projctl | Power">
+<meta property="og:description" content="Power page: one guarded control that turns the four projection lanes on in the morning and off at night, and says when it is safe to leave.">
+<meta property="og:url" content="http://localhost:8080/power.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Projctl | Power">
+<meta name="twitter:description" content="Power page: one guarded control that turns the four projection lanes on in the morning and off at night, and says when it is safe to leave.">
+<meta name="theme-color" content="#edf5fa">
+<link rel="icon" href="data:,">
+<script src="frozen-theme.js"></script><link rel="stylesheet" href="frozen-theme.css">
+<link rel="stylesheet" href="avd/tokens.css">
+<link rel="stylesheet" href="projector-control.css">
+<link rel="stylesheet" href="show.css">
+<script type="module" src="show.js"></script>
+</head>
+<body>
+<a class="sb-skip" href="#sb-main">Skip to the power control</a>
+<noscript><p class="sb-noscript">This page needs JavaScript to read the relay and to send power commands.</p></noscript>
+<div class="sb-shell">
+  <header class="sb-top">
+    <div class="sb-brand">
+      <p class="sb-kicker"><span>Projctl</span><span id="sb-sim" class="sb-sim" hidden>Simulation</span><button id="sb-shared" type="button" class="sb-shared" aria-haspopup="dialog">Shared sign-in</button></p>
+      <h1>Power</h1>
+    </div>
+    <span id="sb-lock" class="sb-pill" data-lock="unknown" role="status"><span class="sb-long">Show </span><span data-f="word">Lock unknown</span></span>
+    <time id="sb-clock" class="sb-clock"></time>
+    <button id="theme" type="button" class="sb-btn sb-btn--quiet">Theme</button>
+  </header>
+
+  <!-- The go or no-go strip is the show backup page's. It is kept here, out of sight, because the two pages share one script. -->
+  <section class="sb-strip" aria-labelledby="sb-strip-h" hidden>
+    <h2 id="sb-strip-h" class="sb-sr">Go or no-go</h2>
+    <p id="sb-verdict" class="sb-verdict" data-state="off"><strong><span class="sb-verdict__long" data-f="title">Connecting</span><span class="sb-verdict__short" data-f="short" aria-hidden="true">Wait</span></strong><span data-f="text">Waiting for the relay.</span></p>
+    <ul class="sb-checks" id="sb-check-list"></ul>
+  </section>
+
+  <nav class="sb-tabs" aria-label="Sections">
+    <div role="tablist" aria-label="Sections">
+      <button type="button" role="tab" id="t-control" aria-controls="control" aria-selected="true">Power</button>
+      <button type="button" role="tab" id="t-night" aria-controls="night" aria-selected="false" tabindex="-1">Night</button>
+      <button type="button" role="tab" id="t-know" aria-controls="know" aria-selected="false" tabindex="-1">Know<span id="sb-know-count" class="sb-tab__count" hidden></span></button>
+    </div>
+  </nav>
+
+  <main id="sb-main" class="sb-panels" tabindex="-1">
+    <section role="tabpanel" id="control" class="sb-panel sb-panel--control" aria-labelledby="t-control" tabindex="0">
+      <h2 class="sb-sr">Power control</h2>
+      <div class="pc-run" id="pc-run" hidden></div>
+      <div class="pc-picker" id="pc-pick" role="group" aria-label="Card shown"></div>
+      <div class="pc-grid" id="pc-root"></div>
+    </section>
+
+    <section role="tabpanel" id="night" class="sb-panel sb-panel--night" aria-labelledby="t-night" tabindex="0" hidden>
+      <h2 class="sb-sr">Night power down</h2>
+      <div class="sb-night" id="sb-night"></div>
+    </section>
+
+    <section role="tabpanel" id="know" class="sb-panel sb-panel--know" aria-labelledby="t-know" tabindex="0" data-know="list" hidden>
+      <div class="sb-know__side">
+        <h2 class="sb-sr">Rules and documents</h2>
+        <div id="sb-notices" class="sb-notices" hidden></div>
+        <p id="sb-know-status" class="sb-know__status" role="status">Asking the relay for documents.</p>
+        <div class="sb-scroll" tabindex="0" aria-label="Rules, diagrams and documents">
+          <section class="sb-tips" aria-labelledby="sb-tips-h">
+            <h3 id="sb-tips-h" class="sb-know__group">How this page works</h3>
+            <ul class="sb-tips__list">
+              <li><strong>Morning:</strong> Turn all on. <strong>Night:</strong> Turn all off. One press starts one run for all four, in the right order with the waits built in.</li>
+              <li><strong>Night:</strong> the Night tab shows each lane's expected wait and what it reads now. All off takes about 3 minutes.</li>
+              <li><strong>Wait for the banner.</strong> "All four on" in the morning, about 4 minutes, because the two lamp units are watched for 3 minutes after they light. "Safe to leave the building" at night, only when all four read OFF. Until it shows, the run is not finished.</li>
+              <li><strong>If the banner says "Not all four on" or "Not safe to leave yet":</strong> it names the lane. Look at that surface, then call the show backup.</li>
+            </ul>
+            <h3 class="sb-know__group">Never</h3>
+            <ul class="sb-tips__list">
+              <li>Never cut power at a breaker, a power strip or a mains switch. A lamp projector must cool with its fans running, about 3 minutes.</li>
+              <li>Never shut down, log out of or unplug the show computer or its control monitor.</li>
+              <li>Never open or save the show file.</li>
+              <li>Never touch lens, focus or zoom.</li>
+            </ul>
+            <h3 class="sb-know__group">If something is wrong</h3>
+            <ul class="sb-tips__list">
+              <li><strong>A warning light, a cover error or a lamp message:</strong> photograph the screen and the indicator lights, then call the show backup or the video lead.</li>
+              <li><strong>"Lamp fault" on a lamp unit:</strong> it turned itself off after lighting. The run waits for it to cool and tries once more. If it fails again, it is a service call: photograph any message and call the video lead.</li>
+              <li><strong>Lane C reads deep standby:</strong> the morning power on cannot reach it from this page. Tell the video lead before you leave.</li>
+              <li><strong>The relay is not answering:</strong> this page can send nothing. Call the video lead.</li>
+            </ul>
+          </section>
+          <div id="sb-know-list" class="sb-know__list"></div>
+        </div>
+        <p id="sb-notes" class="sb-notes" hidden>
+          <a id="sb-notes-link" class="sb-notes__link" target="_blank" rel="noopener noreferrer" aria-describedby="sb-notes-hint">Notes<span class="sb-sr"> (opens in a new tab)</span><span class="sb-notes__mark" aria-hidden="true">↗</span></a>
+          <span id="sb-notes-hint" class="sb-notes__hint">For notes that can wait. Not for emergencies or cue calls.</span>
+        </p>
+      </div>
+      <div class="sb-know__view">
+        <div class="sb-know__bar">
+          <button id="sb-know-back" type="button" class="sb-btn sb-btn--quiet sb-know__back">List</button>
+          <h3 id="sb-know-title" class="sb-know__title">Choose a diagram or document</h3>
+          <div class="sb-know__tools" id="sb-know-tools" role="group" aria-label="Zoom" hidden>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="out" aria-label="Zoom out">−</button>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="fit">Fit</button>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="actual" aria-label="Actual size">100%</button>
+            <button type="button" class="sb-btn sb-btn--quiet" data-zoom="in" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+        <div class="sb-scroll sb-know__stage" id="sb-know-stage" tabindex="0" aria-label="Viewer" data-mode="empty"></div>
+      </div>
+    </section>
+  </main>
+</div>
+<p id="sb-live" class="sb-sr" aria-live="polite"></p>
+
+<dialog id="sb-detail" class="sb-dialog" aria-labelledby="sb-detail-title">
+  <p class="sb-dialog__state" data-f="state"></p>
+  <h2 id="sb-detail-title" data-f="title"></h2>
+  <p class="sb-dialog__value" data-f="value"></p>
+  <div data-f="detail"></div>
+  <h3>This page cannot tell</h3>
+  <ul data-f="cannot"></ul>
+  <button type="button" class="sb-btn sb-btn--primary" data-close>Close</button>
+</dialog>
+
+<dialog id="sb-shared-note" class="sb-dialog" aria-labelledby="sb-shared-title">
+  <h2 id="sb-shared-title">Shared sign-in</h2>
+  <p>Everyone who uses this page signs in with the same passcode. The relay records each command and its time. It does not record who sent it.</p>
+  <p>The on and off run is shared too: if someone else has started it, this page shows the same run and waits for it to finish.</p>
+  <p class="sb-dialog__hint">The same passcode also opens the main console.</p>
+  <button type="button" class="sb-btn sb-btn--primary" data-close>Close</button>
+</dialog>
+</body>
+</html>

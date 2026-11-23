@@ -1,0 +1,10 @@
+{
+  "note": "Invented sample for the simulator. Not a real rig.",
+  "outputs": [
+    { "display": 1, "role": "control monitor (main)" },
+    { "display": 2, "lane": "A", "surface": "SL Portal" },
+    { "display": 3, "lane": "B", "surface": "Top Portal" },
+    { "display": 4, "lane": "C", "surface": "Stage" },
+    { "display": 5, "lane": "D", "surface": "SR Portal" }
+  ]
+}

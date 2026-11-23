@@ -61,6 +61,11 @@ export function createThermalMonitor({ thresholds = THRESHOLDS, retentionMs = RE
     },
     // A new physical target behind a slot must not inherit the old unit's history.
     reset(slot) { slots.delete(slot); },
+    // The newest reading with its epoch-ms time, for a health report whose own read failed.
+    latest(slot) {
+      const e = slots.get(slot), last = e?.samples.at(-1);
+      return last ? { c: last.c, at: last.t, kind: e.kind } : null;
+    },
     view(slot, limitC = null) {
       const e = slots.get(slot), last = e?.samples.at(-1);
       if (!last) return { level: 'unknown', c: null, kind: null, at: null, limitC, headroomC: null, peakC: null, peakAt: null };

@@ -1,0 +1,8 @@
+{
+  "python": "/usr/bin/python3",
+  "startup": "INSTALL_DIR/startup.py",
+  "profile": "INSTALL_DIR/production-profile.json",
+  "bridge": "INSTALL_DIR/mac_bridge.py",
+  "receiptDirectory": "INSTALL_DIR/receipts",
+  "mode": "startup"
+}

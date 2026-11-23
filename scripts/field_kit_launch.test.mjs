@@ -16,11 +16,18 @@ test('committed page is noindex and a placeholder link keeps it that way', () =>
   assert.equal(stagedFieldKitPage(placeholder, page), page);
 });
 
-test('a buy.stripe.com link makes the staged page indexable', () => {
+test('a buy.stripe.com link with checkoutOpen true makes the staged page indexable', () => {
   assert.equal(fieldKitCheckoutLive(live, page), true);
   const staged = stagedFieldKitPage(live, page);
   assert.match(staged, /<meta name="robots" content="index,follow" \/>/);
   assert.doesNotMatch(staged, /noindex/);
+});
+
+test('checkoutOpen false keeps a real Payment Link noindex', () => {
+  const closed = live.replace(/\bcheckoutOpen\s*:\s*true\b/, 'checkoutOpen: false');
+  assert.notEqual(closed, live);
+  assert.equal(fieldKitCheckoutLive(closed, page), false);
+  assert.equal(stagedFieldKitPage(closed, page), page);
 });
 
 test('other hosts, a placeholder price or a leftover DRAFT block keep it noindex', () => {
@@ -35,4 +42,5 @@ test('gen_sitemap.py applies the same rule', () => {
   { input: cfg, encoding: 'utf8', env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' }, cwd: new URL('..', import.meta.url).pathname }).trim();
   assert.equal(py(placeholder), 'False');
   assert.equal(py(live), 'True');
+  assert.equal(py(live.replace(/\bcheckoutOpen\s*:\s*true\b/, 'checkoutOpen: false')), 'False');
 });

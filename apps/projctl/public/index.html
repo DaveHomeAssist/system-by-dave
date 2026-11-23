@@ -29,6 +29,10 @@
 <!-- Local Throwline import map: supplied by the relay. -->
 <link rel="stylesheet" href="workspace-bridge.css">
 <link rel="stylesheet" href="monitor-link.css">
+<link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-01-classic.png" data-frozen-favicon-png>
+<link rel="icon" type="image/svg+xml" href="favicons/favicon-01-classic.svg" data-frozen-favicon>
+<link rel="stylesheet" href="frozen-favicon.css"><link rel="stylesheet" href="frozen-zone-nav.css">
+<script src="frozen-favicon.js"></script><script defer src="frozen-zone-nav.js"></script>
 </head>
 <body>
 <a class="pj-skip" href="#tab-rig">Skip to rig</a>
@@ -152,6 +156,9 @@
       <label><input id="preference-suggestions" type="checkbox"> Suggest the next action</label>
       <label>Preset name template<input id="preference-preset-name" type="text" class="avd-input" maxlength="64" autocomplete="off"></label>
       <p>Theme, selected projector, view and favorite patterns are saved only in this browser. Use the star in More patterns to save up to four favorites per model.</p>
+      <h2>Frozen icon</h2>
+      <p>Choose the icon for this browser. It stays on this device.</p>
+      <div data-frozen-favicon-mount></div>
       <button id="preference-reset" type="button" class="avd-btn">Reset interface preferences</button>
       <p id="preference-message" role="status"></p>
     </section>

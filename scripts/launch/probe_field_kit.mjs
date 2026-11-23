@@ -61,17 +61,20 @@ async function noHorizontalScroll(page, label) {
 }
 async function shotFull(page, name) { if (SCREENS) await page.screenshot({ path: path.join(SCREENS, name), fullPage: true }); }
 
-// The committed Payment Link, if any (js/sbd-launch-config.js); the page must open checkout on it.
-const SHIPPED_LINK = ((fs.readFileSync(path.join(ROOT, 'js/sbd-launch-config.js'), 'utf8').match(/checkout\s*:\s*\{[^}]*url:\s*'(https:\/\/buy\.stripe\.com\/[A-Za-z0-9_]+)'/) || [])[1]) || '';
+// The committed Payment Link, if any (js/sbd-launch-config.js). The page opens it
+// only while checkoutOpen is true; that one line is the switch.
+const LAUNCH_CONFIG = fs.readFileSync(path.join(ROOT, 'js/sbd-launch-config.js'), 'utf8');
+const SHIPPED_LINK = ((LAUNCH_CONFIG.match(/checkout\s*:\s*\{[^}]*url:\s*'(https:\/\/buy\.stripe\.com\/[A-Za-z0-9_]+)'/) || [])[1]) || '';
+const CHECKOUT_OPEN = /\bcheckoutOpen\s*:\s*true\b/.test(LAUNCH_CONFIG);
 const VIEWPORTS = { phone: { width: 390, height: 844 }, desktop: { width: 1280, height: 800 } };
 
 try {
   // Every provider request is answered by a local route; nothing reaches a real service.
-  const cfgScript = (checkout, priceLabel, hashes = []) => `window.SBD_LAUNCH={analytics:{provider:null},fieldKit:{checkout:${JSON.stringify(checkout || { provider: null, url: '', mode: 'link' })},priceLabel:${JSON.stringify(priceLabel)},download:{sha256:${JSON.stringify(hashes)}}}};`;
-  async function openWith(url, checkout, extraRoutes = [], viewport = VIEWPORTS.phone, priceLabel = '$12') {
+  const cfgScript = (checkout, priceLabel, hashes = [], checkoutOpen = true) => `window.SBD_LAUNCH={analytics:{provider:null},fieldKit:{checkoutOpen:${checkoutOpen},checkout:${JSON.stringify(checkout || { provider: null, url: '', mode: 'link' })},priceLabel:${JSON.stringify(priceLabel)},download:{sha256:${JSON.stringify(hashes)}}}};`;
+  async function openWith(url, checkout, extraRoutes = [], viewport = VIEWPORTS.phone, priceLabel = '$12', checkoutOpen = true) {
     const hits = [];
     const routes = [
-      ['**/js/sbd-launch-config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: cfgScript(checkout, priceLabel) })],
+      ['**/js/sbd-launch-config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: cfgScript(checkout, priceLabel, [], checkoutOpen) })],
       // Playwright tries the most recently added route first, so the catch-all goes first.
       [/^https:\/\//, (route) => { const r = route.request(); hits.push({ url: r.url(), method: r.method(), body: r.postData() || '' }); return route.fulfill({ status: 200, contentType: 'text/html', body: '<p>ok</p>' }); }],
       ...extraRoutes
@@ -129,6 +132,12 @@ try {
     await context.close();
   }
   {
+    const { page, context } = await openWith('/field-kit/', { provider: 'stripe', url: 'https://buy.stripe.com/test_123', mode: 'link' }, [noPlaceholders], VIEWPORTS.phone, '$12', false);
+    const href = await page.getAttribute('#kit-buy', 'href');
+    if (!(await page.locator('#kit-buy').isHidden()) || href === 'https://buy.stripe.com/test_123' || await page.locator('#kit-status').isHidden()) fail('checkoutOpen false still opened the Payment Link');
+    await context.close();
+  }
+  {
     const { page, context } = await openWith('/field-kit/', { provider: 'stripe', url: 'https://buy.stripe.com/test_123', mode: 'link' }, [noPlaceholders]);
     if (await page.locator('#kit-buy').isHidden() || (await page.getAttribute('#kit-buy', 'href')) !== 'https://buy.stripe.com/test_123') fail('stripe link checkout did not open with a real price');
     if (!/\$12/.test(await page.textContent('#kit-price'))) fail('real price not shown');
@@ -136,7 +145,7 @@ try {
     if (!(await page.locator('#kit-status').isHidden())) fail('"Checkout opens soon" badge still shows after checkout opened');
     await context.close();
   }
-  notes.push('checkout: closed while [DAVE] placeholders remain or the price is a placeholder (Price TBD, [DAVE: …], empty); gumroad link, lemonsqueezy overlay (embed=1 + class) and stripe new-tab work; non-provider hosts, http and unknown providers stay closed');
+  notes.push('checkout: closed while checkoutOpen is false, [DAVE] placeholders remain, or the price is a placeholder (Price TBD, [DAVE: …], empty); gumroad link, lemonsqueezy overlay (embed=1 + class) and stripe new-tab work once the switch is on; non-provider hosts, http and unknown providers stay closed');
 
   // 2. Field Kit draft page.
   for (const [label, viewport] of Object.entries(VIEWPORTS)) {
@@ -146,16 +155,17 @@ try {
     if (!/noindex/.test(robots || '')) fail('Field Kit draft is not noindex');
     const shownPrice = await page.textContent('#kit-price');
     if (!/^\$12/.test(shownPrice.trim()) || /not set yet|TBD/.test(shownPrice)) fail(`Field Kit should show the $12 price (got ${JSON.stringify(shownPrice)})`);
-    if (SHIPPED_LINK) {
-      if (await page.locator('#kit-buy').isHidden() || (await page.getAttribute('#kit-buy', 'href')) !== SHIPPED_LINK || (await page.getAttribute('#kit-buy', 'target')) !== '_blank') fail('shipped config has a Payment Link but checkout did not open on it');
-    } else if (!(await page.locator('#kit-buy').isHidden()) || await page.locator('#kit-buy-disabled').isHidden()) fail('shipped config opened checkout (Payment Link is still a placeholder)');
+    if (CHECKOUT_OPEN && SHIPPED_LINK) {
+      if (await page.locator('#kit-buy').isHidden() || (await page.getAttribute('#kit-buy', 'href')) !== SHIPPED_LINK || (await page.getAttribute('#kit-buy', 'target')) !== '_blank') fail('shipped config has checkout open but the Buy button did not open the Payment Link');
+      if (!(await page.locator('#kit-status').isHidden())) fail('"Checkout opens soon" still shows while checkout is open');
+    } else if (!(await page.locator('#kit-buy').isHidden()) || await page.locator('#kit-buy-disabled').isHidden() || (await page.getAttribute('#kit-buy', 'href') || '').includes('buy.stripe.com')) fail('shipped config opened checkout while the switch is off');
     if (await page.locator('[data-dave-placeholder]').count()) fail('Field Kit page still has [DAVE] placeholder blocks');
     if (/DRAFT/.test(await page.textContent('body'))) fail('Field Kit page shows a DRAFT marker');
     if (errors.length) fail(`field kit ${label} console errors: ${errors.join(' | ')}`);
     await shotFull(page, `field-kit-${label}.png`);
     await context.close();
   }
-  notes.push(SHIPPED_LINK ? 'shipped config (Stripe Payment Link, price $12): $12 shown, Buy button opens buy.stripe.com in a new tab (never clicked)' : 'shipped config (Stripe, [DAVE] Payment Link placeholder, price $12): $12 shown, checkout closed');
+  notes.push(CHECKOUT_OPEN && SHIPPED_LINK ? 'shipped config (checkoutOpen true, Stripe Payment Link, price $12): $12 shown, Buy button opens buy.stripe.com in a new tab (never clicked)' : 'shipped config: $12 shown, checkout closed (checkoutOpen is false or the Payment Link is still a placeholder)');
 
   // 3. After-payment download page (Stripe redirect target). The button and the
   //    payment line need the link registered by hash (fieldKit.download.sha256).
@@ -200,8 +210,8 @@ try {
     await context.close();
   }
   {
-    // Shipped config: no hash is registered, so a crafted address with an allowed
-    // file host and a plausible session id gets neither the button nor a payment claim.
+    // Shipped config registers one kit-folder hash. A crafted address on an
+    // allowed host, even with a plausible session id, is not that link.
     const { page, context, errors } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(DL)}&session_id=cs_live_a1B2c3D4e5F6g7H8`, VIEWPORTS.phone);
     await refuses(page, 'shipped config, crafted address');
     if (!/e5F6g7H8/.test(await page.textContent('#ty-ref'))) fail('thanks shipped config: order reference not shown for the support email');
@@ -219,7 +229,7 @@ try {
     await refuses(page, `config sha256 ${JSON.stringify(badHash)}`);
     await context.close();
   }
-  notes.push('thanks page: noindex; button and payment line only for the link registered by SHA-256 (none in the shipped config); query stripped; survives reload; a crafted or unregistered link falls back to "email me"');
+  notes.push('thanks page: noindex; button and payment line only for the link registered by SHA-256; query stripped; survives reload; a crafted or unregistered link falls back to "email me"');
 } finally {
   await browser.close();
   server.close();

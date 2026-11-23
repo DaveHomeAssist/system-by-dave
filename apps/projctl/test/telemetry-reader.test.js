@@ -124,3 +124,16 @@ test('status timeout starts after telemetry releases the queue and still bounds 
   assert.equal(failures[0].code, 'POLL_TIMEOUT');
   poller.close();
 });
+
+test('report retries are spaced four seconds apart by default', async () => {
+  const waits = [];
+  const real = globalThis.setTimeout;
+  globalThis.setTimeout = (fn, ms, ...rest) => { waits.push(ms); return real(fn, 0, ...rest); };
+  try {
+    let calls = 0;
+    const reader = createTelemetryReader();
+    const out = await reader.read('P3', { healthReadings: async () => { if (++calls < 3) throw lost(); return reading; } }, { attempts: 3 });
+    assert.equal(out, reading); assert.equal(calls, 3);
+    assert.deepEqual(waits.filter((ms) => ms === 4000), [4000, 4000]);
+  } finally { globalThis.setTimeout = real; }
+});

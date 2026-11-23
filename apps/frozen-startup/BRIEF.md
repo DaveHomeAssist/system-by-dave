@@ -28,3 +28,8 @@ public repository. Example data is synthetic. Verification covers missing,
 duplicate, extra and changed display identities, partial failures, timeout,
 stale evidence, warm operation and readiness. Native and physical acceptance
 require separately authorized Studio testing.
+
+Startup recovery may retry the approved display layout once when readback
+shows drift and all five physical identities settle again. Warm checks remain
+read-only. The receipt records retry attempts and the UI attributes failures to
+the check that actually failed. Millumin routing changes remain manual.

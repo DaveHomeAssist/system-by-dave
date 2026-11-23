@@ -6,9 +6,9 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'" />
     <title>Sync &amp; Signal Field Kit | AV by Dave</title>
     <meta name="description" content="The Sync &amp; Signal Field Kit: a tearing troubleshooting card, an EDID/HDCP decision tree, a genlock checklist and a browser tear-test page. A $12 digital download from a working AV tech." />
-    <!-- Kept out of search until checkout opens. The publish step (scripts/field_kit_launch.mjs, scripts/gen_sitemap.py)
-         swaps this for index,follow and lists the page in the avbydave.com sitemap once
-         js/sbd-launch-config.js has a buy.stripe.com Payment Link (docs/launch/checkout.md). -->
+    <!-- Kept out of search in this file. The publish step (scripts/field_kit_launch.mjs, scripts/gen_sitemap.py)
+         swaps this for index,follow and lists the page in the avbydave.com sitemap only while
+         fieldKit.checkoutOpen is true and the Payment Link is real (docs/launch/checkout.md). -->
     <meta name="robots" content="noindex,nofollow" />
     <link rel="canonical" href="https://avbydave.com/field-kit/" />
     <meta name="theme-color" content="#0C1016" />
@@ -87,9 +87,9 @@
       </div>
 
       <ul class="kit-grid" aria-label="What's in the kit">
-        <li><img src="img/troubleshooting-card-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the tearing troubleshooting card: a symptom table, with the rest of the page blurred" /><h2>Tearing troubleshooting card</h2><p>The checks in order, from "is it the source or the display?" to frame rate, vsync/frame lock and reference. One printable page, one phone-sized version.</p></li>
-        <li><img src="img/edid-hdcp-tree-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the EDID/HDCP decision tree: the first two yes/no questions, with the rest blurred" /><h2>EDID/HDCP decision tree</h2><p>No picture, wrong resolution, or a black screen that flickers back: a yes/no path through the handshake, with what to swap or reset at each branch.</p></li>
-        <li><img src="img/genlock-checklist-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the genlock and reference checklist: the planning tick boxes, with the rest blurred" /><h2>Genlock and reference checklist</h2><p>Reference type and format, termination, which devices should lock, and how to confirm each one actually did, before doors.</p></li>
+        <li><img src="img/troubleshooting-card-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Page 1 of the tearing troubleshooting card: the symptom table and the first checks" /><h2>Tearing troubleshooting card</h2><p>The checks in order, from "is it the source or the display?" to frame rate, vsync/frame lock and reference. One printable page, one phone-sized version.</p></li>
+        <li><img src="img/edid-hdcp-tree-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Page 1 of the EDID/HDCP decision tree: the opening yes/no questions" /><h2>EDID/HDCP decision tree</h2><p>No picture, wrong resolution, or a black screen that flickers back: a yes/no path through the handshake, with what to swap or reset at each branch.</p></li>
+        <li><img src="img/genlock-checklist-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Page 1 of the genlock and reference checklist: the planning tick boxes" /><h2>Genlock and reference checklist</h2><p>Reference type and format, termination, which devices should lock, and how to confirm each one actually did, before doors.</p></li>
         <li><img src="img/tear-test-preview.jpg" width="600" height="450" loading="lazy" decoding="async" alt="Preview of the browser tear-test page: moving white bars with frame and late-frame counters" /><h2>Browser tear-test page</h2><p>Open it on any screen to see whether the path tears or stutters: moving bars, a frame counter and a refresh-rate readout.</p></li>
       </ul>
 
