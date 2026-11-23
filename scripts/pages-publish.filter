@@ -1,0 +1,72 @@
+# What GitHub Pages receives. scripts/stage_public_site.mjs passes this file
+# to rsync. The first matching rule wins. scripts/stage_public_site.test.mjs
+# diffs this result against the previous whole-repo publish and fails if a
+# public page disappears or an internal path remains.
+#
+# Kept on purpose:
+# - apps/projctl/public/ is the noindex Projctl relay the site actually serves
+# - equipment-lab/data/ markdown is part of the hashed reference package
+# - systembydave/assets/img/08_storyboard_scripts.md is linked from the Davai page
+
+# VCS, CI, dependencies, and this staging directory
+- /.git
+- /.github
+- /_site
+- /_sites
+- /node_modules
+- /dist
+- /.claude
+
+# Internal trees
+- /docs
+- /scripts
+- /reports
+- /schemas
+- /design
+- /house
+
+# Private pages that stay in the git repo and must not be served
+- /career-market.html
+- /flooring-contract-review.html
+- /cross-project-*
+- /.agent-claim
+- /av-workbook/assets
+- /implementation_plan.txt
+- /systembydave-site.zip
+- /youtube-pipeline-regression-2026-06-11.js
+- /build_site.py
+
+# Application source, except the Projctl pages published as site content
++ /apps/
++ /apps/projctl/
++ /apps/projctl/public/
++ /apps/projctl/public/**
+- /apps/**
+
+# Markdown that is site content, then every other markdown file
++ /equipment-lab/data/**
++ /systembydave/assets/img/08_storyboard_scripts.md
+- *.md
+
+# Tooling that sits beside published pages
+- /wst/hosting/scripts
+- /wst/hosting/scripts/**
+- *.py
+- *.d.ts
+- *.d.mts
+- *.test.js
+- *.test.mjs
+- *.test.cjs
+- *.test.ts
+- *.test.tsx
+- *.spec.js
+- *.spec.mjs
+- *probe.js
+- *probe.mjs
+- *probe.cjs
+- package.json
+- package-lock.json
+
+# Dotfiles, except the Pages marker
++ /.nojekyll
+- .*
