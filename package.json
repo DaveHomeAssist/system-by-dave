@@ -109,7 +109,7 @@
     "test:av-offline-transition": "node scripts/probe_av_offline_transition.mjs --no-sandbox",
     "sync:av-workspace": "node scripts/sync_av_workspace.js",
     "test:av-workspace": "node scripts/probe_av_workspace.mjs",
-    "verify:private-exposure": "node --test scripts/verify_private_exposure.test.js && node scripts/verify_private_exposure.js",
+    "verify:private-exposure": "node --test scripts/verify_private_exposure.test.js scripts/stage_public_site.test.mjs && node scripts/verify_private_exposure.js",
     "verify:workbook-withdrawal": "node scripts/verify_workbook_withdrawal.cjs",
     "test:av-audio-flow-browser": "node scripts/probe_av_audio_flow.mjs",
     "build:equipment-lab": "vite build --config apps/equipment-lab/vite.config.ts",

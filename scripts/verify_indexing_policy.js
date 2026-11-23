@@ -69,8 +69,10 @@ const robots = read('robots.txt');
 // Infrastructure adds its non-published native source template.
 // Front Office adds one non-published native source template; its public route is unchanged.
 // The AV Suite shell adds its non-published source template under apps/av-suite/. From
-// 2026-10-13 its av/ route is the noindex source of the avbydave.com home page, and the 34
-// retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md).
+// 2026-10-13 its av/ route was the noindex source of the avbydave.com home page, and the 34
+// retired sheet pages are noindex redirect stubs into it (docs/av-suite-shell.md). From
+// 2026-11-21 the home page source is av-home/ (noindex at its source path, one more route
+// outside the sitemap) and av/ is indexable in the AV sitemap (one fewer), so the count holds.
 // Equipment Lab adds its source template, original checklist and package return route.
 // Eight original family entries now redirect into the shared console.
 // The noindex Sync & Signal Field Kit draft (field-kit/, docs/launch/README.md) adds one,
@@ -105,12 +107,6 @@ unlisted.forEach((file) => {
 });
 
 [
-  '/apps/av-workbook/',
-  '/apps/av-audio/',
-  '/apps/av-video/',
-  '/apps/show-ops/',
-  '/apps/show-control/',
-  '/apps/fmp-camera-sim/',
   '/camera-sim/',
   '/fmp-index/',
   '/fmp/',
@@ -158,7 +154,7 @@ hatFiles.forEach((file) => {
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],
-  ['command53/index.html', 'https://davehomeassist.github.io/command-center-061eed/private.html']
+  ['command53/index.html', 'https://systembydave.com/command53/']
 ].forEach(([file, expectedCanonical]) => {
   const source = read(file);
   if (!hasNoIndex(source)) fail(`${file} is missing noindex.`);

@@ -258,9 +258,15 @@ try {
     }
   }
   await page.setViewportSize({ width: 1440, height: 900 }); await button('Fit View').click();
-  const zoomBefore = await page.locator('.react-flow__viewport').getAttribute('style');
+  // Fit View lands a frame or two after its click and Zoom in animates. Reading the viewport straight
+  // after either click compares whichever frame arrived first, so the check passed or failed by timing.
+  // Read it once Fit View has settled, then wait for Zoom in to move it.
+  const viewportStyle = () => page.locator('.react-flow__viewport').getAttribute('style');
+  let zoomBefore = await viewportStyle();
+  for (let settled = 0; settled < 3;) { await page.waitForTimeout(100); const now = await viewportStyle(); settled = now === zoomBefore ? settled + 1 : 0; zoomBefore = now; }
   await button('Zoom in').click();
-  assert.notEqual(await page.locator('.react-flow__viewport').getAttribute('style'), zoomBefore);
+  await page.waitForFunction(before => document.querySelector('.react-flow__viewport')?.getAttribute('style') !== before, zoomBefore, { timeout: 5000 });
+  assert.notEqual(await viewportStyle(), zoomBefore);
   await button('Toggle overview').click(); assert.ok(await page.locator('.react-flow__minimap').isVisible());
   assert.deepEqual(errors, []);
   console.log(`AV Video graph browser passed: shared devices, trace, drag/save/reload, shared rename, keyboard connection, port dragging, patch parity, SVG export, format/connector presets, custom LED raster, undo/redo, zoom, overview and responsive themes (${BASE}).`);
