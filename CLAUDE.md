@@ -15,8 +15,8 @@ handoffs.
 - Hosting: GitHub Pages from `main`, with `CNAME` preserving the custom domain.
  The Pages workflow publishes site content (`scripts/stage_public_site.mjs`),
  not the docs, scripts, plans, or private pages that stay in this repository.
-  The FMP suite and AV by Dave are also published from here to housevideo.app
-  and avbydave.com (`docs/domain-sites.md`).
+  The FMP suite, venue walk and AV by Dave are also published from here to
+  housevideo.app, walk.housevideo.app and avbydave.com (`docs/domain-sites.md`).
 
 ## Architecture
 

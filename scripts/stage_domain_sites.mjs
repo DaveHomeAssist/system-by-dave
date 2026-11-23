@@ -876,6 +876,24 @@ function moveSitesScript(config, policies, options) {
   return `window.SBD_DOMAIN_MOVES=${JSON.stringify(sites)};\n`;
 }
 
+// Published on systembydave.com, which deploys on every push. A destination whose content did not change
+// is not republished (scripts/domain_publish_plan.mjs), so its source.json can name an older commit. This
+// records what the deploy staged for each destination, so a monitor can tell a current site from a stale one
+// (scripts/launch/smoke_live_domain.mjs).
+function deployMarker(staged, options) {
+  const sites = {};
+  for (const { site, result } of staged) {
+    const provenance = JSON.parse(fs.readFileSync(path.join(result.dir, 'source.json'), 'utf8'));
+    sites[site.id] = { domain: site.domain, artifactSha256: provenance.artifactSha256, files: provenance.files };
+  }
+  return `${JSON.stringify({
+    schema: 'system-by-dave.deploy.v1',
+    sourceRepository: options.config.sourceRepository,
+    sourceCommit: options.commit,
+    sites
+  }, null, 2)}\n`;
+}
+
 // Every configured site needs a publish step that passes its own deploy key.
 function checkWorkflow(config) {
   const workflow = read('.github/workflows/deploy-pages.yml');
@@ -965,6 +983,7 @@ function main() {
       console.log(`${site.id}: systembydave.com now redirects ${[...entries.pages].filter((file) => /\.html?$/i.test(file)).length} pages to ${site.domain}`);
     }
     applyManagedSiteMirrors(siteRoot);
+    writeFile(siteRoot, 'deploy.json', deployMarker(staged, options));
     if (staged.some((item) => item.cutover)) {
       writeFile(siteRoot, 'js/domain-move-sites.js', moveSitesScript(config, policies, options));
       const problems = checkRemovedAssets(siteRoot, removed);
@@ -982,7 +1001,7 @@ function main() {
 }
 
 export {
-  CONFIG_FILE, read, loadRegistry, siteEntries, routeFor,
+  CONFIG_FILE, read, loadRegistry, siteEntries, routeFor, deployMarker,
   robots, robotsRules, robotsAllows, declaresNoindex, previewImagePaths, crawlPolicyProblems, stageManagedSnapshotRoutes
 };
 
