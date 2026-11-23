@@ -1,0 +1,10 @@
+/* Compact Frozen icon control. Tokens come from the page that loads this file. */
+.frozen-favicon-picker{position:fixed;right:12px;bottom:12px;z-index:80;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:6px}
+.frozen-favicon-picker--inline{position:static;display:block}
+.frozen-favicon-picker__toggle,.frozen-favicon-picker__choices button{width:44px;height:44px;padding:4px;border-radius:10px;border:1px solid var(--line,var(--hairline,#c9dbe7));background:var(--surface,#fff);color:inherit;cursor:pointer}
+.frozen-favicon-picker__toggle img,.frozen-favicon-picker__choices img{display:block;width:100%;height:100%;object-fit:contain}
+.frozen-favicon-picker__choices{display:grid;grid-template-columns:repeat(3,44px);gap:4px;padding:6px;border-radius:12px;border:1px solid var(--line,var(--hairline,#c9dbe7));background:var(--surface,#fff);box-shadow:0 8px 24px #0003}
+.frozen-favicon-picker--inline .frozen-favicon-picker__choices{box-shadow:none}
+.frozen-favicon-picker__choices button[aria-pressed="true"]{border-color:var(--accent,var(--tape,#126f8c));background:var(--tag,rgba(18,111,140,.12))}
+.frozen-favicon-picker button:focus-visible{outline:3px solid var(--accent,var(--focus-ring,#126f8c));outline-offset:3px}
+.frozen-favicon-picker [hidden]{display:none}

@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { reviewHandler } from './handler.mjs';
+const bytes = new Uint8Array([1, 2, 3]);
+const sha256 = createHash('sha256').update(bytes).digest('hex');
+const url = '/run-review/sessions/one/originals/a.jpg';
+const release = { active: true, catalog: { release: 'one' }, manifests: { '/run-review/releases/one/one.json': { sessionId: 'one' } }, media: { [url]: { key: 'one/a.jpg', bytes: 3, sha256 } } };
+const req = (path, method = 'GET', body, headers) => new Request('https://wst.housevideo.app' + path, { method, body, headers });
+test('release routes only expose allowlisted snapshots and preserve unrelated handlers', async () => {
+  const handle = reviewHandler(release);
+  assert.equal(await handle(req('/api/tasks'), {}), null);
+  assert.equal(await handle(req('/run-review/releases/one/other.json'), {}), null);
+  assert.equal((await handle(req('/run-review/catalog.json'), {})).headers.get('cache-control'), 'no-store');
+  assert.equal((await handle(req('/run-review/catalog.json', 'POST'), {})).status, 405);
+  assert.equal(await reviewHandler({ ...release, active: false })(req('/run-review/catalog.json'), {}), null);
+});
+test('original upload is authenticated, hash checked, immutable and retrievable', async () => {
+  let saved;
+  const env = { REVIEW_UPLOAD_TOKEN: 'synthetic', REVIEW_PHOTOS: { head: async () => saved, get: async () => saved, put: async (key, data, meta) => { assert.equal(key, 'one/a.jpg'); saved = { body: data, ...meta }; } } };
+  const handle = reviewHandler(release);
+  const headers = { authorization: 'Bearer synthetic', 'content-type': 'image/jpeg', 'content-length': '3' };
+  assert.equal((await handle(req(url), env)).status, 503);
+  assert.equal((await handle(req(url, 'PUT', bytes), env)).status, 401);
+  assert.equal((await handle(req(url, 'PUT', new Uint8Array([3, 2, 1]), headers), env)).status, 422);
+  assert.equal((await handle(req(url, 'PUT', bytes, headers), env)).status, 201);
+  assert.equal((await handle(req(url, 'PUT', bytes, headers), env)).status, 204);
+  assert.deepEqual(new Uint8Array(await (await handle(req(url), env)).arrayBuffer()), bytes);
+  saved.customMetadata.sha256 = 'conflict';
+  assert.equal((await handle(req(url, 'PUT', bytes, headers), env)).status, 409);
+  assert.equal((await handle(req(url, 'DELETE'), env)).status, 405);
+});

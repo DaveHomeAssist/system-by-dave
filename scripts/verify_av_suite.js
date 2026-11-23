@@ -208,7 +208,7 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261029-two-step-panel-chooser-verified') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261122-chooser-bar') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;
@@ -223,7 +223,7 @@ function assertRailRegistryContracts(registry) {
     const stub = read(tool.href);
     if (!/<meta name="robots" content="noindex,follow">/.test(stub) || !stub.includes(`location.replace('/av/?app=${tool.retired}')`) || !/rel="canonical" href="https:\/\/avbydave\.com\/"/.test(stub)) fail(`Retired route ${tool.href} is not a noindex redirect stub into /av/?app=${tool.retired}.`);
   });
-  if (registry.tools.length !== 53 || registry.baseAssets.length !== 144 || registry.offlineAssets().length !== 163 || storageKeyCount !== 83) {
+  if (registry.tools.length !== 53 || registry.baseAssets.length !== 164 || registry.offlineAssets().length !== 183 || storageKeyCount !== 83) {
     fail(`AV application integration changed an inventory count unexpectedly (tools=${registry.tools.length}, baseAssets=${registry.baseAssets.length}, offlineAssets=${registry.offlineAssets().length}, storageKeys=${storageKeyCount}).`);
   }
   (registry.externals || []).forEach((external) => {
@@ -258,12 +258,15 @@ function assertPageContracts(registry) {
     fail('Public AV Suite copy still contains stale 40+ or ~40 count.');
   }
 
-  // AV by Dave is one console (docs/av-suite-shell.md): the shell source at av/ is
-  // staged as the avbydave.com home, and the retired Toolbox, landing and index pages
-  // are noindex redirect stubs into it.
+  // AV by Dave is one console (docs/av-suite-shell.md), published at /av/ as one part of
+  // avbydave.com. The site home page is av-home/ (2026-11-21); the retired Toolbox, landing
+  // and index pages are noindex redirect stubs into the console.
   const shell = read('av/index.html');
-  if (!/<meta name="robots" content="noindex,follow"/.test(shell) || !shell.includes('<link rel="canonical" href="https://avbydave.com/"')) {
-    fail('AV Suite shell source must be noindex with the avbydave.com root as canonical (it is staged as that home page).');
+  if (/<meta name="robots" content="noindex/.test(shell) || !shell.includes('<link rel="canonical" href="https://avbydave.com/av/"')) {
+    fail('AV Suite shell must be indexable at its own canonical address, https://avbydave.com/av/.');
+  }
+  if (!shell.includes('<a class="brand-link sbd-site-return" href="/">AV by Dave</a>')) {
+    fail('AV Suite shell breadcrumb must return to the avbydave.com home page.');
   }
   if (!/data-sbd-rail-host[^>]*data-current-ref="toolbox"/.test(shell) || !/data-sbd-rail-dialogs/.test(shell) || !/js\/av-offline\.js/.test(shell) || !/id="workspaceOffline"/.test(shell)) {
     fail('AV Suite shell does not mount the Rail on the Workspace entry with offline registration.');
@@ -281,7 +284,18 @@ function assertPageContracts(registry) {
   });
   const domainSites = JSON.parse(read('scripts/domain-sites.json'));
   const avSite = domainSites.sites.find((site) => site.id === 'avbydave');
-  if (!avSite || avSite.landingPage !== 'av/index.html' || !avSite.pages.includes('av/')) fail('avbydave.com must stage the AV Suite shell as its home page.');
+  if (!avSite || avSite.landingPage !== 'av-home/index.html' || !avSite.pages.includes('av-home/') || !avSite.pages.includes('av/')) {
+    fail('avbydave.com must stage av-home/ as its home page and publish the console at /av/.');
+  }
+  const siteHome = read('av-home/index.html');
+  if (!siteHome.includes('<meta name="robots" content="noindex,follow">') || !siteHome.includes('<link rel="canonical" href="https://avbydave.com/">')) {
+    fail('av-home/ must be noindex at its source path with the avbydave.com root as canonical (it is staged as that home page).');
+  }
+  if (!siteHome.includes('href="../av/"') || !/<a class="hp-skip" href="#main">/.test(siteHome) || !/id="main" tabindex="-1"/.test(siteHome)) {
+    fail('The avbydave.com home page must link the console at /av/ and open with a skip link to its content.');
+  }
+  // One theme owner per origin: the home page reads and writes the AV tools' own saved choice.
+  if (!read('av-home/home.js').includes("'av-theme-mode.v1'")) fail('The avbydave.com home page must use the shared av-theme-mode.v1 theme choice.');
 
   const manifest = JSON.parse(read('manifest.json'));
   const shortcutUrls = (manifest.shortcuts || []).map((shortcut) => shortcut.url);

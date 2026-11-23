@@ -1,0 +1,57 @@
+{
+  "schema": "equipment.reference.manifest.v1",
+  "revision": "1.0.0",
+  "assetId": "P01",
+  "representation": "inspection",
+  "owner": "Equipment Lab",
+  "generator": "models/barco-udm-4k22/model.mjs",
+  "catalog": "models/barco-udm-4k22/catalog.mjs",
+  "adapter": "none; authored in the portable frame",
+  "consumer": "none qualified",
+  "runtime": "Three.js r184",
+  "validator": "Khronos glTF-Validator 2.0.0-dev.3.10",
+  "browser": "Chromium 153.0.8010.12 with SwiftShader",
+  "files": {
+    "model": {
+      "name": "barco.udm4k22.inspection.glb",
+      "bytes": 1239440,
+      "sha256": "9583dc58786b7dd54442822b1b34b269aa5b2224dcb23ce1fa5b558b712744ba"
+    },
+    "definition": {
+      "name": "barco.udm4k22.definition.json",
+      "bytes": 168138,
+      "sha256": "f1548421076bb5412a6d75157ef8bd367540e511eddcffe21a152e3ad90077b7"
+    }
+  },
+  "sourceHashes": {
+    "models/barco-udm-4k22/catalog.mjs": "9669ede7b03c537e9724f4710fbb66a20aa2026f173cfdb74826163ae4ad268a",
+    "models/barco-udm-4k22/model.mjs": "a85017652855dfde70aca48816e5979330f638a6beae2da131e8fe24840f18c5",
+    "models/barco-udm-4k22/harness.mjs": "525e00548225bbb70aa54977849fa5046ecd5c19e5ed06aece130d43d350837a",
+    "models/barco-udm-4k22/harness.html": "ab075a395fcbbb6d88340d3f039182e016f14bfb5a40ece2c2bf11a7d3e9c199",
+    "models/barco-udm-4k22/build.mjs": "151f180421ed253446aa616492b041895a136bc494812e8c7b0a142dafdf39fa",
+    "three@0.184.0/build/three.module.js": "61134198639a10885daf893fb29669ca26386e2a4cde76e8399f51e329f741f2",
+    "three@0.184.0/build/three.core.js": "368dc78835287709a48939e8eb9a7a61d0732098bdf916e56840d458aae9ccf3",
+    "three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "380af42ac1b503c43e0430dd56ade34e3e76317b1b1cc702f452b87d6fece404",
+    "three@0.184.0/examples/jsm/loaders/GLTFLoader.js": "97642d720f16cc9a0c9844934198e4d0c023bea8e89576d0f7545d03b2d103d2",
+    "three@0.184.0/examples/jsm/utils/BufferGeometryUtils.js": "d700b4c4584b9ff53a04692624d2363019f6d1df2978a207389168c6ae647a65"
+  },
+  "included": [
+    "P01"
+  ],
+  "excluded": [
+    "lights",
+    "floor",
+    "contact shadow",
+    "helpers"
+  ],
+  "export": {
+    "binary": true,
+    "trs": true,
+    "onlyVisible": false,
+    "maxTextureSize": "unbounded; retain generated texture dimensions",
+    "animations": [],
+    "includeCustomExtensions": false,
+    "compression": "none"
+  },
+  "qualification": "Not qualified. Approximate inspection geometry; no reference checklist, consumer acceptance or physical comparison has been done."
+}

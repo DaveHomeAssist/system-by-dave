@@ -14,6 +14,10 @@ on:
       - 'scripts/av-family-probe.mjs'
       - 'scripts/probe_av_retained.mjs'
       - 'scripts/probe_av_routes.mjs'
+      - 'scripts/probe_frozen_case.mjs'
+      - 'ProjectorThrow/**'
+      - 'wst/projectors.json'
+      - 'wst/stage/plot.json'
       - 'apps/av-video/**'
       - 'apps/av-audio/**'
       - 'apps/show-ops/**'
@@ -57,6 +61,7 @@ permissions:
 jobs:
   video:
     runs-on: ubuntu-latest
+    # Steps carry their own limits, so a stall fails at the step that stalled.
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -65,16 +70,20 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+        timeout-minutes: 3
       - name: Typecheck, unit tests and build
+        timeout-minutes: 3
         run: |
           npm run typecheck:av-video
           npm run test:av-video
           npm run build:av-video
       - name: Committed build matches the source
+        timeout-minutes: 1
         run: |
           git diff --exit-code -- av-video
           test -z "$(git status --porcelain -- av-video)"
       - name: Equipment Lab package and native consumer
+        timeout-minutes: 6
         env:
           CHROME_CHANNEL: chrome
         run: |
@@ -85,6 +94,7 @@ jobs:
           test -z "$(git status --porcelain -- equipment-lab)"
           npm run test:equipment-lab-browser
       - name: AV Suite shell typecheck, build parity and browser
+        timeout-minutes: 5
         env:
           CHROME_CHANNEL: chrome
         run: |
@@ -96,7 +106,22 @@ jobs:
           npm run test:av-suite-browser
           npm run test:av-canvas-menus-browser
           npm run test:av-audio-flow-browser
+      - name: Frozen case, recorded
+        timeout-minutes: 5
+        env:
+          CHROME_CHANNEL: chrome
+          FROZEN_CASE_OUT: ${{ runner.temp }}/frozen-case
+        run: npm run test:frozen-case
+      - name: Keep the Frozen case record
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: frozen-case-record
+          path: ${{ runner.temp }}/frozen-case
+          if-no-files-found: ignore
+          retention-days: 30
       - name: Audio shared-console consumer matches its source
+        timeout-minutes: 3
         run: |
           npm run typecheck:av-audio
           npm run test:av-audio
@@ -104,11 +129,14 @@ jobs:
           git diff --exit-code -- av-audio
           test -z "$(git status --porcelain -- av-audio)"
       - run: npx playwright install --with-deps chromium
+        timeout-minutes: 3
       - name: Video and embedded layout probes with deployment Chrome
+        timeout-minutes: 3
         env:
           CHROME_CHANNEL: chrome
         run: npm run test:av-video-browser
       - name: Show Ops console typecheck, tests, build and browser
+        timeout-minutes: 3
         run: |
           npm run typecheck:show-ops
           npm run test:show-ops
@@ -117,6 +145,7 @@ jobs:
           test -z "$(git status --porcelain -- show-ops)"
           npm run test:show-ops-browser
       - name: Show Control panels and saved-run compatibility
+        timeout-minutes: 3
         run: |
           npm run typecheck:show-control
           npm run test:show-control
@@ -125,6 +154,7 @@ jobs:
           test -z "$(git status --porcelain -- show-control)"
           npm run test:show-control-browser
       - name: Front Office panels and saved-document compatibility
+        timeout-minutes: 3
         run: |
           npm run typecheck:front-office
           npm run test:front-office
@@ -133,6 +163,7 @@ jobs:
           test -z "$(git status --porcelain -- front-office)"
           npm run test:front-office-browser
       - name: Lighting panels and saved-plan compatibility
+        timeout-minutes: 3
         run: |
           npm run typecheck:av-lighting
           npm run test:av-lighting
@@ -141,6 +172,7 @@ jobs:
           test -z "$(git status --porcelain -- av-lighting)"
           npm run test:av-lighting-browser
       - name: Calculator panels and unchanged field calculations
+        timeout-minutes: 5
         # The serial gate now verifies Calculator plus eight other consumers.
         run: |
           npm run typecheck:av-calculator
@@ -150,6 +182,7 @@ jobs:
           test -z "$(git status --porcelain -- av-calculator)"
           npm run test:av-calculator-browser
       - name: Infrastructure and Shop panels and saved-plan compatibility
+        timeout-minutes: 4
         run: |
           npm run typecheck:infrastructure
           npm run test:infrastructure
@@ -160,10 +193,40 @@ jobs:
           npm run typecheck:the-shop
           npm run test:the-shop
           npm run build:the-shop
-          npm run test:av-retained-browser
           npm run test:av-routes-browser
           git diff --exit-code -- the-shop
           test -z "$(git status --porcelain -- the-shop)"
           npm run test:the-shop-browser
       - name: AV source checks
+        timeout-minutes: 3
         run: npm run verify:av
+  retained:
+    # The retained standalone-build regressions take about six minutes on
+    # their own. Run in the video job they pushed it to 14m50s of its
+    # 15-minute budget, and slower runners were cancelled mid-suite.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+        timeout-minutes: 3
+      - name: Build the retained family fixtures
+        timeout-minutes: 4
+        run: |
+          npm run build:av-video
+          npm run build:av-audio
+          npm run build:show-control
+          npm run build:show-ops
+          npm run build:front-office
+          npm run build:the-shop
+          npm run build:infrastructure
+          npm run build:av-lighting
+      - run: npx playwright install --with-deps chromium
+        timeout-minutes: 3
+      - name: Retained standalone builds and saved-data recovery
+        timeout-minutes: 10
+        run: npm run test:av-retained-browser
