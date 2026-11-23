@@ -76,6 +76,16 @@
 - The Public site contracts job timeout goes from 10 to 20 minutes. The job now runs 8 to 10 minutes, mostly in the Projctl relay step, and was cancelled at the old limit on the previous pull request (run 671) and again on this one, once in the middle of the first probe.
 - `npm run probe:thephilly` (`scripts/probe_thephilly.mjs`, run on every pull request) checks that the page never scrolls at 1440, 680 and 375 px on eight routes, that nothing leaves the origin before the radar opens, the skip link and breadcrumb, the Sounds QR codes, the radar open and close, and the theme toggle.
 
+## November 21, 2026. Saved optical evidence
+
+- Added a pure saved-frame shutter evaluator for isolated target/control regions
+  and open/close response candidates. No relay or equipment output integration.
+
+## November 21, 2026. Offline diagnostic planning
+
+- Added a source-only projector check planner with synthetic fixtures, explicit
+  timing constraints and no relay integration or diagnostic lamp retry.
+
 ## November 20, 2026. Frozen workspace navigation
 
 - Published Sites version 60 from managed source `1c50b07`, preserving the newer
