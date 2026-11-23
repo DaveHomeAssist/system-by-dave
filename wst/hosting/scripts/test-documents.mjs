@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {readFile} from 'node:fs/promises';
+import worker from '../worker/index.js';
+const request=(path,method='GET')=>worker.fetch(new Request('https://wst.housevideo.app'+path,{method}),{});
+const html=await (await request('/')).text();
+const script=await (await request('/workspace.js')).text();
+assert.match(html,/data-route="documents"/);
+assert.match(html,/id="relay-frame"[^>]*hidden/);assert.match(html,/id="open-controller"[^>]*href="http:\/\/localhost:8080\/"/);assert.match(html,/connect-src[^;]*http:\/\/localhost:8080/);assert.doesNotMatch(html,/<iframe[^>]*src="http/);
+assert.doesNotMatch(script,/new WebSocket|api\/(?:devices|command|commands|presets|power)/);assert.match(script,/connectRelay/);
+assert.match(html,/18-page R5 handoff/);
+assert.match(html,/documents\/frozen-handoff-r5\.pdf#page=17/);
+for (const path of ['/documents/Frozen Documentation R5.zip','/documents/EDID baseline.zip','/documents/customEDID.txt']) assert.equal((await request(path)).status,404);
+const pdf=await request('/documents/frozen-handoff-r5.pdf');
+assert.equal(pdf.headers.get('content-type'),'application/pdf');
+const bytes=Buffer.from(await pdf.arrayBuffer());
+const expected=await readFile(new URL('../../documents/frozen-handoff-r5.pdf',import.meta.url));
+assert.deepEqual(bytes,expected);
+assert.equal(createHash('sha256').update(bytes).digest('hex'),'8f2c6bfbefff1b8fb2262ad9f67969d21d358296d091cd9523963800b8560a97');
+assert.equal((await request('/documents/frozen-handoff-r5.pdf','HEAD')).status,200);
+assert.equal((await request('/documents/frozen-handoff-r5.pdf','POST')).status,405);
+assert.equal((await request('/documents/missing.pdf')).status,404);
+const r5=await request('/documents/frozen-signal-flow-r5.pdf');assert.equal(r5.headers.get('content-type'),'application/pdf');assert.equal(createHash('sha256').update(Buffer.from(await r5.arrayBuffer())).digest('hex'),'cca5cf644477b2759679edbca82cec4e8a165bc2ca912d3a46f7010448de71a0');
+console.log('PASS packaged PDF exact bytes, MIME, methods, missing route and localhost separation');
+
+const handoff = await (await request("/handoff.html")).text();
+assert.match(handoff, /Projection handoff/);
+assert.doesNotMatch(handoff, /<script/);
+assert.match(handoff, /href="documents\/frozen-handoff-r5.pdf"/);
+assert.match(handoff, /href=".\/#notes"/);
+
+assert.match(handoff, /id="handoff-dark" type="checkbox"/);
+assert.match(handoff, /href="index.html#home"/);

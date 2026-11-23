@@ -17,7 +17,9 @@ SITE="${1:?site id}"
 STAGED="${2:?staged site directory}"
 REPO="${3:?target repository}"
 SHA="${4:?source commit}"
-KEEP_HELPER="$(cd "$(dirname "$0")" && pwd)/domain_keep_previous_assets.mjs"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+KEEP_HELPER="$SCRIPT_DIR/domain_keep_previous_assets.mjs"
+WAIT_HELPER="$SCRIPT_DIR/wait_for_repository_run.mjs"
 KEEP_PREVIOUS_ASSETS="${KEEP_PREVIOUS_ASSETS-$(node "$KEEP_HELPER" --apps "$SITE")}"
 : "${DEPLOY_KEY:?DEPLOY_KEY is not set; add the repository secret named in scripts/domain-sites.json}"
 
@@ -62,4 +64,28 @@ git -c user.name="system-by-dave publisher" \
     -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
     commit --quiet -m "Publish ${SITE} from DaveHomeAssist/system-by-dave@${SHA:0:12}"
 git push --quiet origin HEAD:main
-echo "OK: published ${SITE} to ${REPO} ($(git rev-parse --short HEAD))."
+TARGET_SHA="$(git rev-parse HEAD)"
+echo "OK: published ${SITE} to ${REPO} (${TARGET_SHA:0:12})."
+# The destination Pages workflow (concurrency group "pages") deploys this push.
+# Reading HTTPS before that run finishes caches the previous release for max-age=600.
+#
+# That workflow's deploy step fails now and then on GitHub's side: the artifact it
+# uploaded a second earlier is not listed yet (housevideo and avbydave on 2026-11-21).
+# A fresh run fixes it, and this script can start one: an empty commit is a new push.
+# The site's files are already in place, so nothing about the release changes.
+# PUBLISH_ATTEMPTS (default 3) bounds the tries.
+ATTEMPTS="${PUBLISH_ATTEMPTS:-3}"
+attempt=1
+until node "$WAIT_HELPER" "$REPO" "$TARGET_SHA"; do
+  if [ "$attempt" -ge "$ATTEMPTS" ]; then
+    echo "FATAL: ${REPO} did not deploy ${SITE} after ${attempt} Pages runs."
+    exit 1
+  fi
+  attempt=$((attempt + 1))
+  echo "Pages run for ${REPO} @ ${TARGET_SHA:0:12} did not succeed; starting run ${attempt} of ${ATTEMPTS} with an empty commit."
+  git -c user.name="system-by-dave publisher" \
+      -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+      commit --quiet --allow-empty -m "Run Pages again for ${SITE} from DaveHomeAssist/system-by-dave@${SHA:0:12}"
+  git push --quiet origin HEAD:main
+  TARGET_SHA="$(git rev-parse HEAD)"
+done

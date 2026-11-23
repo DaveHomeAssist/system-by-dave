@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Frozen | Controller sign in</title>
+<link rel="canonical" href="http://localhost:8080/login.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Frozen | Controller sign in">
+<meta property="og:description" content="Sign in to the private Frozen projector controller.">
+<meta property="og:url" content="http://localhost:8080/login.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Frozen | Controller sign in">
+<meta name="twitter:description" content="Sign in to the private Frozen projector controller.">
+<meta name="description" content="Sign in to the private Frozen projector controller.">
+<meta name="theme-color" content="#edf5fa">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' ws: wss: https://wst.housevideo.app; frame-src 'self' https://wst.housevideo.app https://avbydave.com; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<script src="frozen-theme.js"></script><link rel="stylesheet" href="frozen-theme.css">
+<link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-01-classic.png" data-frozen-favicon-png>
+<link rel="icon" type="image/svg+xml" href="favicons/favicon-01-classic.svg" data-frozen-favicon>
+<link rel="stylesheet" href="frozen-favicon.css"><link rel="stylesheet" href="frozen-zone-nav.css">
+<script src="frozen-favicon.js"></script><script defer src="frozen-zone-nav.js"></script>
+<link rel="stylesheet" href="avd/tokens.css">
+<link rel="stylesheet" href="avd/bundle.css">
+<link rel="stylesheet" href="app.css">
+<style>
+.pj-login{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:var(--space-4)}
+.pj-login form{width:min(380px,100%);display:flex;flex-direction:column;gap:var(--space-4);padding:var(--space-5);background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius-md)}
+</style>
+</head>
+<body>
+<noscript><p>Turn on JavaScript in this browser to sign in.</p></noscript>
+<main class="pj-login">
+  <form id="f" autocomplete="off">
+    <span class="avd-tape">Frozen at WST</span><button id="theme" type="button" class="avd-btn avd-btn--quiet">Appearance</button>
+    <h1 style="margin:0;font-size:20px;line-height:26px;font-weight:600">Projector control</h1>
+    <label class="avd-field"><span class="avd-field__label">Passcode</span><input id="code" class="avd-input" type="password" inputmode="text" autocapitalize="none" spellcheck="false" autocomplete="current-password" required autofocus></label>
+    <p id="err" class="pj-mono" role="alert" style="margin:0;color:var(--state-blocked)"></p>
+    <button class="avd-btn avd-btn--primary avd-btn--block" type="submit">Sign in</button>
+    <p class="pj-mono pj-note">Ask the video lead for the passcode. Use the controller password, not your Mac or Tailscale password. Sessions last until the relay restarts.</p>
+  </form>
+</main>
+<script src="login.js"></script>
+</body>
+</html>

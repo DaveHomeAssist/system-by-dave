@@ -1,0 +1,198 @@
+{
+  "file": "/tmp/pxdemo/live-pixels.jsonl",
+  "checkedAt": 1794914925.184,
+  "types": {
+    "start": 1,
+    "universe_seen": 3,
+    "window": 52,
+    "heartbeat": 4,
+    "universe_stale": 4,
+    "source_added": 1,
+    "universe_resumed": 1,
+    "stream_terminated": 1
+  },
+  "invalidLines": 0,
+  "start": {
+    "type": "start",
+    "unixSeconds": 1794914903.370854,
+    "utc": "2026-11-17T11:28:23.370Z",
+    "schema": "frozen-pixel-capture/1",
+    "noTransmit": true,
+    "window": 1.0,
+    "staleAfter": 2.5,
+    "heartbeatEvery": 5.0,
+    "input": "udp",
+    "bind": "127.0.0.1",
+    "ports": [
+      6454,
+      5568
+    ],
+    "recorderVersion": "0.1.0",
+    "host": "lab-runner",
+    "pid": 2415810,
+    "python": "3.12.3",
+    "session": "demo-live",
+    "plannedEndUnix": 1794914963.371,
+    "plannedEnd": "2026-11-17T11:29:23.370Z",
+    "evidenceNote": "Receipt at the capture point only; not proof that pixels lit."
+  },
+  "complete": null,
+  "universes": {
+    "artnet:0": {
+      "windows": 19,
+      "packets": 720,
+      "seqMissing": 5,
+      "seqGapEvents": 1,
+      "outOfOrder": 0,
+      "hashChanges": 4,
+      "sources": [
+        "127.0.0.1"
+      ],
+      "destinations": [],
+      "staleEvents": 1,
+      "maxRateHz": 40.0,
+      "multipleSourceWindows": 0,
+      "lastWindow": {
+        "utc": "2026-11-17T11:28:43.000Z",
+        "rateHz": 4.0,
+        "levelHash": "c529d007e8fcc735",
+        "lastFrameUnix": 1794914922.092137,
+        "nonZero": 170,
+        "maxLevel": 180,
+        "length": 510
+      }
+    },
+    "artnet:1": {
+      "windows": 16,
+      "packets": 560,
+      "seqMissing": 0,
+      "seqGapEvents": 0,
+      "outOfOrder": 0,
+      "hashChanges": 200,
+      "sources": [
+        "127.0.0.1"
+      ],
+      "destinations": [],
+      "staleEvents": 2,
+      "maxRateHz": 40.0,
+      "multipleSourceWindows": 0,
+      "lastWindow": {
+        "utc": "2026-11-17T11:28:43.000Z",
+        "rateHz": 4.0,
+        "levelHash": "7413d1840bea548d",
+        "lastFrameUnix": 1794914922.099032,
+        "nonZero": 170,
+        "maxLevel": 220,
+        "length": 510
+      }
+    },
+    "sacn:1": {
+      "windows": 17,
+      "packets": 541,
+      "seqMissing": 0,
+      "seqGapEvents": 0,
+      "outOfOrder": 0,
+      "hashChanges": 125,
+      "sources": [
+        "127.0.0.1#a15f1c2e",
+        "127.0.0.1#b25f1c2e"
+      ],
+      "destinations": [],
+      "staleEvents": 1,
+      "maxRateHz": 60.0,
+      "multipleSourceWindows": 3,
+      "lastWindow": {
+        "utc": "2026-11-17T11:28:41.000Z",
+        "rateHz": 4.0,
+        "levelHash": "aae1392a13fe0a1e",
+        "lastFrameUnix": 1794914920.1667,
+        "nonZero": 0,
+        "maxLevel": 0,
+        "length": 300
+      }
+    }
+  },
+  "recentEvents": [
+    {
+      "type": "universe_stale",
+      "utc": "2026-11-17T11:28:36.616Z",
+      "protocol": "artnet",
+      "universe": 1,
+      "quietSeconds": 2.521
+    },
+    {
+      "type": "source_added",
+      "utc": "2026-11-17T11:28:37.166Z",
+      "protocol": "sacn",
+      "universe": 1,
+      "quietSeconds": null
+    },
+    {
+      "type": "universe_resumed",
+      "utc": "2026-11-17T11:28:38.120Z",
+      "protocol": "artnet",
+      "universe": 1,
+      "quietSeconds": 4.025
+    },
+    {
+      "type": "stream_terminated",
+      "utc": "2026-11-17T11:28:40.166Z",
+      "protocol": "sacn",
+      "universe": 1,
+      "quietSeconds": null
+    },
+    {
+      "type": "universe_stale",
+      "utc": "2026-11-17T11:28:42.850Z",
+      "protocol": "sacn",
+      "universe": 1,
+      "quietSeconds": 2.683
+    },
+    {
+      "type": "universe_stale",
+      "utc": "2026-11-17T11:28:44.613Z",
+      "protocol": "artnet",
+      "universe": 0,
+      "quietSeconds": 2.522
+    },
+    {
+      "type": "universe_stale",
+      "utc": "2026-11-17T11:28:44.613Z",
+      "protocol": "artnet",
+      "universe": 1,
+      "quietSeconds": 2.515
+    }
+  ],
+  "heartbeatAgeSeconds": 1.6,
+  "capture": {
+    "input": "udp"
+  },
+  "protocols": {
+    "artnet": {
+      "state": "present",
+      "packets": 1280
+    },
+    "sacn": {
+      "state": "present",
+      "packets": 541
+    }
+  },
+  "status": "recording",
+  "alerts": [
+    "artnet:0 missed 5 sequence numbers in 1 gap events",
+    "artnet:0 went quiet 1 times",
+    "artnet:1 went quiet 2 times",
+    "sacn:1 has 2 senders: 127.0.0.1#a15f1c2e, 127.0.0.1#b25f1c2e",
+    "sacn:1 went quiet 1 times"
+  ],
+  "lastRow": {
+    "type": "universe_stale",
+    "unixSeconds": 1794914924.613995,
+    "utc": "2026-11-17T11:28:44.613Z",
+    "protocol": "artnet",
+    "universe": 1,
+    "lastFrameUnix": 1794914922.099032,
+    "quietSeconds": 2.515,
+    "lastLevelHash": "7413d1840bea548d"
+  }
+}

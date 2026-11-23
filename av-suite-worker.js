@@ -9,6 +9,9 @@
 importScripts('./js/sbd-registry.js');
 
 // Offline recovery: return directly to the cached native console.
+// November 3: refresh the Throwline inspection viewer with this cache generation.
+// November 12: add the Equipment Lab projector package to this cache generation.
+// November 14: report optional assets that failed to cache, and request persistent storage.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();
@@ -67,15 +70,33 @@ var CRITICAL_ASSETS=[
 ];
 var OPTIONAL_ASSETS=OFFLINE_ASSETS.filter(function(asset){return CRITICAL_ASSETS.indexOf(asset)<0;});
 
+/* Install reads every asset from the network, past the browser's HTTP cache.
+   A copy fetched minutes before a deploy would otherwise be stored as the new
+   generation, and images, fonts and data are then served from this cache first. */
+function fresh(asset){
+  return new Request(new URL(asset,self.registration.scope).href,{cache:'reload'});
+}
+
 function cacheOptionalAssets(cache){
   return Promise.all(OPTIONAL_ASSETS.map(function(asset){
-    return cache.add(asset).then(function(){return {asset:asset,ok:true};}).catch(function(){return {asset:asset,ok:false};});
+    return cache.add(fresh(asset)).then(function(){return {asset:asset,ok:true};}).catch(function(){return {asset:asset,ok:false};});
   }));
+}
+
+/* Optional assets absent from the current cache generation. Computed from the
+   cache itself so the answer survives worker restarts. */
+var retriedMissing=false;
+function missingOptionalAssets(){
+  return caches.open(CACHE_NAME).then(function(cache){
+    return Promise.all(OPTIONAL_ASSETS.map(function(asset){
+      return cache.match(new URL(asset,self.registration.scope).href,{ignoreSearch:true}).then(function(found){return found?null:asset;});
+    }));
+  }).then(function(list){return list.filter(Boolean);});
 }
 
 self.addEventListener('install',function(event){
   event.waitUntil(caches.open(CACHE_NAME).then(function(cache){
-    return cache.addAll(CRITICAL_ASSETS).then(function(){
+    return cache.addAll(CRITICAL_ASSETS.map(fresh)).then(function(){
       return cacheOptionalAssets(cache);
     });
   }).then(function(){
@@ -103,7 +124,20 @@ self.addEventListener('message',function(event){
     event.waitUntil(self.clients.claim());
   }
   if(event.data&&event.data.type==='SBD_OFFLINE_VERSION'&&event.ports&&event.ports[0]){
-    event.ports[0].postMessage({version:self.SBD_REGISTRY.version,cache:CACHE_NAME});
+    var port=event.ports[0];
+    // Report optional assets that did not make it into the cache (AVC-19), so the
+    // page can say so instead of a silent gap. Retry them once per worker start.
+    event.waitUntil(missingOptionalAssets().then(function(missing){
+      port.postMessage({version:self.SBD_REGISTRY.version,cache:CACHE_NAME,missing:missing});
+      if(missing.length&&!retriedMissing){
+        retriedMissing=true;
+        return caches.open(CACHE_NAME).then(function(cache){
+          return Promise.all(missing.map(function(asset){return cache.add(asset).catch(function(){});}));
+        });
+      }
+    }).catch(function(){
+      port.postMessage({version:self.SBD_REGISTRY.version,cache:CACHE_NAME});
+    }));
   }
 });
 
@@ -126,6 +160,13 @@ function offlinePage(){
   return new Response(html,{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
 }
 
+/* The saved copy of a known page or, failing that, the saved console. */
+function savedPage(cache,request){
+  return cachedResponse(cache,request).then(function(found){
+    return found||cache.match(new URL('./av/index.html',self.registration.scope).href);
+  });
+}
+
 self.addEventListener('fetch',function(event){
   var request=event.request;
   if(!isKnownRequest(request)){
@@ -139,13 +180,19 @@ self.addEventListener('fetch',function(event){
       var networkRequest=request.mode==='navigate'?fetch(request):fetch(request,{cache:'no-cache'});
       return networkRequest.then(function(response){
         if(request.mode!=='navigate'&&!response.ok) throw new Error('Asset request failed');
+        // A server error is not worth showing while this device holds the page:
+        // reopen what is saved, and pass the error through only when nothing is.
+        if(request.mode==='navigate'&&response.status>=500){
+          return savedPage(cache,request).then(function(page){return page||response;});
+        }
         return putClean(cache,request,response);
       }).catch(function(){
+        if(request.mode==='navigate'){
+          return savedPage(cache,request).then(function(page){return page||offlinePage();});
+        }
         return cachedResponse(cache,request).then(function(found){
           if(found) return found;
-          if(request.mode!=='navigate') throw new Error('Offline asset is unavailable');
-          var fallback='./av/index.html';
-          return cache.match(new URL(fallback,self.registration.scope).href).then(function(page){return page||offlinePage();});
+          throw new Error('Offline asset is unavailable');
         });
       });
     }
