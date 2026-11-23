@@ -785,6 +785,11 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 
 - Upgrade Vite from 6.4.4 to 6.4.5 for GHSA-8g5g-mxqh-grgj and raise the minimum compatible version. Add a loopback regression proving raw/import queries cannot retrieve a denied synthetic file, enforced by the existing pull request contract job.
 
+## October 30, 2026: Brand reference policy and reading controls
+
+- Add a restrictive content policy to the noindex brand reference, allowing its existing Google font sources and local navigation script while blocking connections, inline scripts, objects and forms.
+- Preserve all seven reference sections and artwork with light/default and dark reading themes, keyboard section tabs, bounded reading, URL history, print expansion and no-JavaScript access.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced
