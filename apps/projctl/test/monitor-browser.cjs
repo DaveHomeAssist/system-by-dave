@@ -56,10 +56,33 @@ const SIZES = [[1440, 900], [1024, 768], [680, 900], [375, 812]];
 
     // Theme: a fresh browser starts light; the choice is remembered across pages.
     assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'light');
+    await page.locator('#theme').click();
     await page.locator('[data-theme-choice="dark"]').click();
+    assert.equal(await page.locator('[data-theme-word]').textContent(), 'Dark');
     await page.goto(relay.base + '/monitor/rig.html');
     assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
+    assert.equal(await page.locator('[data-theme-word]').textContent(), 'Dark');
     console.log('theme memory');
+
+    // App bar: one row when the Monitor shares a screen, and nothing overflows on a phone.
+    const original = page.viewportSize();
+    const bar = () => page.evaluate(() => {
+      const items = [...document.querySelector('.fm-header').children].filter((el) => getComputedStyle(el).display !== 'none').map((el) => el.getBoundingClientRect());
+      return { rows: new Set(items.map((box) => Math.round((box.top + box.bottom) / 2 / 12))).size, right: Math.max(...items.map((box) => box.right)), width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth };
+    });
+    await page.setViewportSize({ width: 1000, height: 560 });
+    let measured = await bar();
+    assert.equal(measured.rows, 1, 'app bar stays on one row at 1000 px');
+    assert.ok(measured.right <= measured.width, 'app bar stays inside a shared pane');
+    await page.locator('#theme').click();
+    const menu = await page.locator('#frozen-theme-menu').boundingBox(), trigger = await page.locator('#theme').boundingBox();
+    assert.ok(menu.y >= trigger.y + trigger.height && menu.x + menu.width <= 1000, 'theme menu opens under its button');
+    await page.keyboard.press('Escape');
+    await page.setViewportSize({ width: 375, height: 812 });
+    measured = await bar();
+    assert.ok(measured.scroll <= measured.width && measured.right <= measured.width, 'app bar fits a phone');
+    await page.setViewportSize(original);
+    console.log('app bar');
 
     // Rig: Stop lens is the only live control, and the relay accepts it under Show Lock.
     await until(async () => !(await page.locator('#rig-stop').isDisabled()));
