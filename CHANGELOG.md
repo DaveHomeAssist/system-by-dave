@@ -1,5 +1,9 @@
 # Changelog
 
+## November 23, 2026. Domain publish staging path
+
+- Resolve the staged site directory before entering the destination checkout, so the publish planner can read its provenance file.
+
 ## November 23, 2026. The Philly 215 preview
 
 - Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.
