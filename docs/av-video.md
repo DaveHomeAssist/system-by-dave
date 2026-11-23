@@ -24,6 +24,8 @@ A reported issue belongs to a route, not every device on it. Its path stays red 
 
 The desktop header includes plan identity and the canvas toolbar includes route controls. New-port handles appear on hover, keyboard focus, selection and touch devices; keyboard connection remains available in device details.
 
+A route typed in Route details draws its cable at once. Until November 14, 2026 the newest connection was counted and left undrawn until the page was reloaded; the [Frozen case](frozen-case.md) found it and guards it.
+
 ## Displays & Projection
 
 The **Displays** tab adds editable display and projection records to the same saved Video document. Add a display for its type, input, processor, resolution, aspect and refresh, or a projection record for screen, surface, size, projector, lens, throw distance, position and blend. Both retain route references, backups, original status and notes. Enter dimensions with units; no optical calculation or physical verification is inferred.
@@ -69,7 +71,7 @@ independent and usable, including their printing and summary workflows.
 
 ## Working with a plan
 
-- Add devices or try the sample. Drag equipment to arrange it and connect an output port to an input. A keyboard alternative is available in the selected device panel. Both actions create real editable routes in Patch. New equipment avoids overlap with an existing saved layout.
+- Add devices or try the sample. **Add device** opens with a **Gear** list: everyday device types (camera, switcher, projector and so on) followed by the Gear Reference library entries that sit in the picture path. Picking one fills in the device name and role; both stay editable, and a name already typed is never replaced. Kinds that come in several count from 1 (Camera 1, Camera 2), and a second unit of one model gets a 2. The plan stores the name and role only, as before, so the document schema is unchanged. The library is read from `data/gear/index.json` when the dialog first opens (it is part of the offline suite); a subcategory with no video role, such as lenses or control panels, is not offered, and `apps/av-video/src/gear.test.ts` fails when a new library subcategory has neither a role nor a recorded omission. Drag equipment to arrange it and connect an output port to an input. A keyboard alternative is available in the selected device panel. Both actions create real editable routes in Patch. New equipment avoids overlap with an existing saved layout.
 - The selected route highlights immediately; **All routes** clears the highlight. Select a cable or a route to trace its path. Shared devices appear once, with incoming feeds and branching outputs. Zoom, pan, Fit View and the optional overview let you navigate larger systems. Double-click a device to rename it across all connected routes; use **Edit route** for a single route.
 - **Export diagram** downloads a standalone SVG for handoff. Save and JSON export retain both routing data and equipment positions. On a phone, **Back to diagram** returns from the editor to the canvas.
 - The workspace is a panel console ([contract](av-console.md)). The **Routing**, **Projection**, **Troubleshooting** and **Project** views arrange Signal Flow, Patch, Inspector, Displays & Projection, Checks and Project side by side, all on the same data. The **Signal flow**, **Patch**, **Displays**, **Checks** and **Project** buttons bring a panel forward. **Edit route** or a route card opens the Inspector, and a check opens the affected record.

@@ -5,13 +5,15 @@
 // (390x844) and desktop (1280x800): noindex, TBD price, no console errors or
 // horizontal scroll, and that checkout stays closed until both a valid provider
 // link, a real price and the [DAVE] terms are in place, plus the noindex
-// after-payment download page (field-kit/thanks/).
+// after-payment download page (field-kit/thanks/), which shows its button and
+// payment line only for the link registered by hash.
 //   node scripts/launch/probe_field_kit.mjs [--screens /path/to/dir]
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { fieldKitLinkHash } from './field_kit_link_hash.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const args = process.argv.slice(2);
@@ -63,7 +65,7 @@ const VIEWPORTS = { phone: { width: 390, height: 844 }, desktop: { width: 1280, 
 
 try {
   // Every provider request is answered by a local route; nothing reaches a real service.
-  const cfgScript = (checkout, priceLabel) => `window.SBD_LAUNCH={analytics:{provider:null},fieldKit:{checkout:${JSON.stringify(checkout || { provider: null, url: '', mode: 'link' })},priceLabel:${JSON.stringify(priceLabel)}}};`;
+  const cfgScript = (checkout, priceLabel, hashes = []) => `window.SBD_LAUNCH={analytics:{provider:null},fieldKit:{checkout:${JSON.stringify(checkout || { provider: null, url: '', mode: 'link' })},priceLabel:${JSON.stringify(priceLabel)},download:{sha256:${JSON.stringify(hashes)}}}};`;
   async function openWith(url, checkout, extraRoutes = [], viewport = VIEWPORTS.phone, priceLabel = '$12') {
     const hits = [];
     const routes = [
@@ -141,30 +143,69 @@ try {
   }
   notes.push('shipped config (Stripe, [DAVE] Payment Link placeholder, price $12): $12 shown, checkout closed');
 
-  // 3. After-payment download page (Stripe redirect target).
+  // 3. After-payment download page (Stripe redirect target). The button and the
+  //    payment line need the link registered by hash (fieldKit.download.sha256).
   const DL = 'https://drive.google.com/drive/folders/abc123';
+  const SESSION = 'cs_test_a1B2c3D4e5F6g7H8';
+  const DECOY_HASH = 'f'.repeat(64);
+  const withHashes = (...hashes) => ({ routes: [['**/js/sbd-launch-config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: cfgScript(null, '$12', hashes) })]] });
+  // thanks.js marks <html data-kit-link> once it has checked the link.
+  const linkChecked = async (page) => { await page.waitForSelector('html[data-kit-link]', { state: 'attached', timeout: 5000 }); return page.getAttribute('html', 'data-kit-link'); };
+  const refuses = async (page, label) => {
+    if ((await linkChecked(page)) !== 'unregistered') fail(`thanks ${label}: link reported as registered`);
+    if (!(await page.locator('#ty-ready').isHidden()) || await page.locator('#ty-missing').isHidden()) fail(`thanks ${label}: download button shown`);
+    if (!(await page.locator('#ty-paid').isHidden()) || /Thanks/.test(await page.textContent('#ty-title'))) fail(`thanks ${label}: page claims a payment`);
+    if ((await page.getAttribute('#ty-download', 'href')) !== '#') fail(`thanks ${label}: hidden button points at the link`);
+    if (await page.evaluate(() => location.search)) fail(`thanks ${label}: query not removed from the address bar`);
+  };
   for (const [label, viewport] of Object.entries(VIEWPORTS)) {
-    const { page, context, errors } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(DL)}&session_id=cs_test_a1B2c3D4e5F6g7H8`, viewport);
+    const { page, context, errors } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(DL)}&session_id=${SESSION}`, viewport, withHashes(DECOY_HASH, label === 'desktop' ? fieldKitLinkHash(DL).toUpperCase() : fieldKitLinkHash(DL)));
     const robots = await page.getAttribute('meta[name="robots"]', 'content');
     if (!/noindex/.test(robots || '')) fail('thanks page is not noindex');
-    if (await page.locator('#ty-ready').isHidden() || (await page.getAttribute('#ty-download', 'href')) !== DL) fail(`thanks ${label}: download button missing for an allowed host`);
+    if ((await linkChecked(page)) !== 'registered') fail(`thanks ${label}: the registered link was refused (thanks.js and field_kit_link_hash.mjs disagree?)`);
+    if (await page.locator('#ty-ready').isHidden() || (await page.getAttribute('#ty-download', 'href')) !== DL) fail(`thanks ${label}: download button missing for the registered link`);
     if (await page.evaluate(() => location.search)) fail(`thanks ${label}: query not removed from the address bar`);
     if (!/e5F6g7H8/.test(await page.textContent('#ty-ref'))) fail(`thanks ${label}: order reference not shown`);
-    if (await page.locator('#ty-paid').isHidden()) fail(`thanks ${label}: payment line hidden despite a Stripe session id`);
+    if (await page.locator('#ty-paid').isHidden()) fail(`thanks ${label}: payment line hidden despite the registered link and a Stripe session id`);
     await page.reload(); await page.waitForLoadState('load');
-    if (await page.locator('#ty-ready').isHidden()) fail(`thanks ${label}: button lost after reload in the same tab`);
+    if ((await linkChecked(page)) !== 'registered' || await page.locator('#ty-ready').isHidden()) fail(`thanks ${label}: button lost after reload in the same tab`);
+    if (await page.locator('#ty-paid').isHidden()) fail(`thanks ${label}: payment line lost after reload in the same tab`);
+    // An unregistered link arriving in the same tab must not replace the kept one.
+    await page.goto(`${BASE}/field-kit/thanks/?dl=${encodeURIComponent('https://drive.google.com/drive/folders/other999')}`); await page.waitForLoadState('load');
+    if ((await linkChecked(page)) !== 'registered' || (await page.getAttribute('#ty-download', 'href')) !== DL) fail(`thanks ${label}: an unregistered link replaced the registered one kept in this tab`);
     await noHorizontalScroll(page, `thanks ${label}`);
     if (errors.length) fail(`thanks ${label} console errors: ${errors.join(' | ')}`);
     await shotFull(page, `field-kit-thanks-${label}.png`);
     await context.close();
   }
-  for (const bad of ['https://evil.example/kit.zip', 'http://drive.google.com/x', 'javascript:alert(1)', 'https://drive.google.com.evil.example/x', '']) {
-    const { page, context } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(bad)}`, VIEWPORTS.phone);
-    if (!(await page.locator('#ty-ready').isHidden()) || await page.locator('#ty-missing').isHidden()) fail(`thanks accepted a bad link ${JSON.stringify(bad)}`);
+  {
+    // The registered link without a session id: the button, but no payment claim.
+    const { page, context } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(DL)}`, VIEWPORTS.phone, withHashes(fieldKitLinkHash(DL)));
+    if ((await linkChecked(page)) !== 'registered' || await page.locator('#ty-ready').isHidden()) fail('thanks: registered link without a session id lost its button');
     if (!(await page.locator('#ty-paid').isHidden()) || /Thanks/.test(await page.textContent('#ty-title'))) fail('thanks page claims a payment without a Stripe session id');
     await context.close();
   }
-  notes.push('thanks page: noindex, button only for https links on known file hosts, query stripped, survives reload, bad links fall back to "email me"');
+  {
+    // Shipped config: no hash is registered, so a crafted address with an allowed
+    // file host and a plausible session id gets neither the button nor a payment claim.
+    const { page, context, errors } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(DL)}&session_id=cs_live_a1B2c3D4e5F6g7H8`, VIEWPORTS.phone);
+    await refuses(page, 'shipped config, crafted address');
+    if (!/e5F6g7H8/.test(await page.textContent('#ty-ref'))) fail('thanks shipped config: order reference not shown for the support email');
+    if (errors.length) fail(`thanks shipped config console errors: ${errors.join(' | ')}`);
+    await shotFull(page, 'field-kit-thanks-unregistered-phone.png');
+    await context.close();
+  }
+  for (const bad of ['https://drive.google.com/drive/folders/other999', 'https://evil.example/kit.zip', 'http://drive.google.com/drive/folders/abc123', 'javascript:alert(1)', 'https://drive.google.com.evil.example/x', '']) {
+    const { page, context } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(bad)}&session_id=${SESSION}`, VIEWPORTS.phone, withHashes(fieldKitLinkHash(DL)));
+    await refuses(page, `link ${JSON.stringify(bad)} with another link registered`);
+    await context.close();
+  }
+  for (const badHash of [[], [''], ['not-a-hash'], [fieldKitLinkHash(DL).slice(1)], [DECOY_HASH]]) {
+    const { page, context } = await open(`/field-kit/thanks/?dl=${encodeURIComponent(DL)}&session_id=${SESSION}`, VIEWPORTS.phone, withHashes(...badHash));
+    await refuses(page, `config sha256 ${JSON.stringify(badHash)}`);
+    await context.close();
+  }
+  notes.push('thanks page: noindex; button and payment line only for the link registered by SHA-256 (none in the shipped config); query stripped; survives reload; a crafted or unregistered link falls back to "email me"');
 } finally {
   await browser.close();
   server.close();

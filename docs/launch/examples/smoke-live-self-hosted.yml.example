@@ -1,0 +1,33 @@
+# EXAMPLE ONLY: not active. Copy to .github/workflows/smoke-live.yml only if Dave approves.
+# Needs a registered self-hosted runner (none is created by this change). A self-hosted job
+# does not use GitHub-hosted Actions minutes. See docs/launch/uptime-monitoring.md.
+name: Smoke check live avbydave.com
+
+on:
+  workflow_run:
+    workflows: ["Deploy site to Pages"]
+    types: [completed]
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: smoke-live
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: [self-hosted]
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/launch
+      - name: Post-publish check (waits for source.json after a deploy)
+        if: github.event_name == 'workflow_run'
+        run: node scripts/launch/smoke_live_domain.mjs --expect-commit "${{ github.event.workflow_run.head_sha }}" --wait 900 --delay 20
+      - name: Uptime and live-behind-main
+        run: node scripts/launch/smoke_live_domain.mjs --behind-main --max-behind-minutes 60
