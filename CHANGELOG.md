@@ -14,6 +14,10 @@
 
 - The house handoff, on the Frozen workspace and the public WST pages, now says the house team has run video since November 19, names show file 3.1, and records lamps, deck pixels and opening night as they stood on November 21.
 
+## November 23, 2026. Frozen workspace and hosting plan
+
+- Record the proposed Frozen operator views inside the AV console and the separate assessment for moving the public workspace off GPT Sites. The plan does not change the running show pages and does not authorize a migration.
+
 ## November 23, 2026. Theme Organizer on the tools directory
 
 - The Tools directory lists Theme Organizer under Labs. The card links to the live page at `https://davehomeassist.github.io/theme-organizer-resource/` and opens in a new tab. It browses, filters, compares, and shortlists 58 UI themes, and can inspect color tokens, copy CSS custom properties, preview a theme across the page, and export or import JSON. Choices stay in the browser.
