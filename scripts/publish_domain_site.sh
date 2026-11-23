@@ -28,6 +28,9 @@ KEEP_PREVIOUS_ASSETS="${KEEP_PREVIOUS_ASSETS-$(node "$KEEP_HELPER" --apps "$SITE
 : "${DEPLOY_KEY:?DEPLOY_KEY is not set; add the repository secret named in scripts/domain-sites.json}"
 
 [ -f "$STAGED/source.json" ] || { echo "FATAL: $STAGED is not a staged domain site (no source.json)"; exit 1; }
+# The publish plan runs after this script cd's into the destination clone.
+# A relative staged path would then miss source.json (the walk deploy's ENOENT).
+STAGED="$(cd "$STAGED" && pwd)"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT

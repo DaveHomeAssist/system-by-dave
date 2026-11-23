@@ -1,5 +1,9 @@
 # Changelog
 
+## November 23, 2026. Walk publish can read its staged source.json
+
+- `scripts/publish_domain_site.sh` decides whether to push after it changes into the destination clone. The staged directory was still a relative path, so the plan looked for `_sites/housevideo-walk/source.json` inside that clone and every Pages deploy stopped there. The staged directory is now an absolute path. Site content is unchanged.
+
 ## November 23, 2026. The Philly 215 preview
 
 - Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.
