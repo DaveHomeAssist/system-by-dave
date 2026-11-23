@@ -1,5 +1,11 @@
 # Changelog
 
+## November 23, 2026. Publish script fix: staged path resolved before the script changes directory
+
+- The first deploy that ran `scripts/publish_domain_site.sh` after #561 failed 2 seconds into "Publish walk.housevideo.app" with `ENOENT: no such file or directory, open '_sites/housevideo-walk/source.json'` (run 708, every gate before it green). The workflow passes a relative staged path and the script changes into the destination checkout before calling `scripts/domain_publish_plan.mjs`, so the helper looked for `source.json` in the wrong place. The script now resolves the staged path to an absolute path first. No destination was pushed to, so no site content changed.
+- #561's tests called the helper with absolute paths and never ran the script the way the workflow does. `scripts/publish_domain_site.test.mjs` (in `npm run verify:domain-sites`) now runs the real script from a working directory with a relative staged path against a local bare repository, and covers publish, skip, republish for a stale live site, and republish for an unreadable live site.
+- The mirror step compares file content (`rsync --checksum`) instead of size and modification time. With the default shortcut a changed file of the same size whose mtime falls in the same second as the clone is skipped, and `source.json` is always the same size.
+
 ## November 23, 2026. The Philly 215 preview
 
 - Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.
