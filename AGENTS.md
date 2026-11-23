@@ -95,6 +95,10 @@ to make stale documentation true.
 - **Davai bundle:** `build_site.py` generates `systembydave/`; edit the
   generator, run `python3 build_site.py`, and gate with `npm run verify:davai`.
   Do not hand-edit the generated pages.
+- **Published Pages site:** `scripts/stage_public_site.mjs` and
+ `scripts/pages-publish.filter` choose the files GitHub Pages receives.
+ Docs, scripts, reports, plans, tests, and private pages stay in the
+ repository and are not copied to the site.
 - **Domain sites:** `scripts/domain-sites.json` owns which pages are also
   published on housevideo.app and avbydave.com, and each site's cutover state.
   Those pages link systembydave.com-only destinations absolutely

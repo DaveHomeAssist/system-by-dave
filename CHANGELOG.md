@@ -1,5 +1,29 @@
 # Changelog
 
+## November 23, 2026. Publish the public site, not the repository
+
+- GitHub Pages was copying the repository root. `scripts/stage_public_site.mjs` now publishes site content. Docs, scripts, reports, plans, tests, application source, and `career-market.html` stay in the repository and are not served. The Equipment Lab reference markdown and the Davai storyboard script stay, because pages link to them. `apps/projctl/public/` stays, because those noindex pages are part of the site. `scripts/stage_public_site.test.mjs` diffs the new publish against the previous one.
+- `robots.txt` no longer lists paths this publish does not ship. `/command53/` is a noindex page that says the address is not available.
+- The Field Kit page no longer shows draft labels or a statement-descriptor placeholder. The card line says AVBYDAVE FIELD KIT. The price stays $12, and checkout stays closed.
+- The home page, Tools directory, and avbydave.com home page all say 19 browser tools, the live registry count. The avbydave.com tools tab no longer shows 6.
+- The privacy policy names David Robertson, an individual, New Jersey law, and avbydave@gmail.com.
+- The project registry labels its June 11, 2026 snapshot and shows Phillies Wire as paused until Feb 2027.
+- The demos tab bar scrolls at narrow widths instead of overlapping. The page heading stays outside the tab panels, where the hub probe does not treat it as clipped panel text.
+
+## November 23, 2026. Theme Organizer on the tools directory
+
+- The Tools directory lists Theme Organizer under Labs. The card links to the live page at `https://davehomeassist.github.io/theme-organizer-resource/` and opens in a new tab. It browses, filters, compares, and shortlists 58 UI themes, and can inspect color tokens, copy CSS custom properties, preview a theme across the page, and export or import JSON. Choices stay in the browser.
+- The public project registry already named `DaveHomeAssist/theme-organizer-resource`. That row now uses the current description, repository size (822 KB), default-branch file count (45), commits in the last 90 days (20), and last update (2026-11-23). It stays out of the sitemap, the same way other tools that live on their own sites do.
+
+## November 23, 2026. Projctl: the page can no longer fall behind the relay's status stream
+
+- **The flake.** The Public site contracts job intermittently failed at `apps/projctl/test/browser.cjs` line 104 (`locator.waitFor: Timeout 30000ms exceeded` waiting for `#adj-picture input`). It failed on unchanged `main` and on older commits, and a rerun passed. On Dominic it failed 7 of 7 runs on `main`.
+- **The cause was the page, not the test or the relay.** The relay sends a status reply for every projector on every poll, and the browser tests poll every 50 ms (about 55 replies a second; production polls every 5 s). The page drew the whole screen (grid, thermal, stage, overview and the open projector sheet) for each reply, which a slow host cannot keep up with. The unprocessed replies queued behind each other, so every reply the page handled was older than the last: 0.4 s behind at 20 s, 9 s at 51 s, 15.6 s at 69 s, while the relay's own copy of the projector was 3 to 50 ms old. At 15 s the connection monitor calls a projector stale. Opening Picture then wrote "Current picture values unavailable. Waiting for projector connection." and returned without asking the relay, and nothing asked again when the lag cleared; a lens click was refused the same way ("No fresh projector reply") before it sent a request. Passing runs were only passing by a margin: the lag peaked at 15.8 s and 15.3 s in two of them.
+- **The fix.** `renderLive()` in `public/app.js`: each status reply is still applied to the page's state immediately, but the screen is drawn at most once per 100 ms of idle time after the previous draw. The page cannot build a backlog, so a healthy projector keeps looking healthy. Replies that arrive slower than that (the normal 5 s poll) are drawn on arrival, exactly as before.
+- **Test.** `test/status-burst-browser.cjs` feeds the page's own message handler 1 500 status replies in a row with the projector sheet open and fails if handling them takes a second or more. On Dominic it took 12 ms with the fix and 22.5 s (15 ms a reply) on the page as it was before. It is in `npm run test:browser`.
+- The 30 s wait in `browser.cjs` is unchanged; it was waiting for something the page had already decided not to do.
+- Checked on Dominic (Linux, Docker `mcr.microsoft.com/playwright:v1.61.1-noble`, serial): the unmodified `node test/browser.cjs` passed 20 of 20 runs, 68 to 71 s each. Before the fix the same run took 250 to 370 s and failed at line 104 on 7 of 7 runs on `main`. With the fix the page's lag behind the relay stayed under 50 ms.
+
 ## November 22, 2026. Add panel: one top bar, nothing covering the options
 
 - Dave: "All of those things could share a single top bar with icons" and "stop covering all the menu options." Opening a group in the Add panel chooser put four rows of furniture around the choices: the title, a full-width search field, a Back row that repeated the group name, and under the list an orange placement map and a full-width Close. On a 580 px high screen about two options were left in view.
