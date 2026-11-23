@@ -10,6 +10,10 @@
 - The project registry labels its June 11, 2026 snapshot and shows Phillies Wire as paused until Feb 2027.
 - The demos tab bar scrolls at narrow widths instead of overlapping. The page heading stays outside the tab panels, where the hub probe does not treat it as clipped panel text.
 
+## November 23, 2026. Frozen handoff brought current through November 21
+
+- The house handoff, on the Frozen workspace and the public WST pages, now says the house team has run video since November 19, names show file 3.1, and records lamps, deck pixels and opening night as they stood on November 21.
+
 ## November 23, 2026. Theme Organizer on the tools directory
 
 - The Tools directory lists Theme Organizer under Labs. The card links to the live page at `https://davehomeassist.github.io/theme-organizer-resource/` and opens in a new tab. It browses, filters, compares, and shortlists 58 UI themes, and can inspect color tokens, copy CSS custom properties, preview a theme across the page, and export or import JSON. Choices stay in the browser.
