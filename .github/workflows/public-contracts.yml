@@ -36,6 +36,7 @@ jobs:
           npm test --prefix apps/projctl
           npm run test:browser --prefix apps/projctl
           npm run test:venue-browser --prefix apps/projctl
+      - run: node scripts/probe_brand_reference.mjs
       - run: npm run test:public-viewport
       - run: npm run probe:cue-sheet-editing
       - run: npm run probe:thephilly
