@@ -685,6 +685,23 @@ async function loadPicture() {
 
 // websocket
 function setConn(on) { connected = on; powerSchedulesView?.connectionChanged(); const d = $('#conn .avd-dot'); d.className = 'avd-dot ' + (on ? 'avd-dot--done' : 'avd-dot--blocked'); $('#conn-word').textContent = on ? 'Relay connected' : 'Relay offline'; $('#show-lock').disabled = !on; document.querySelectorAll('[data-all]').forEach((b) => b.disabled = !on || (state.lock && b.dataset.all !== 'shutter' && !(b.dataset.all === 'power' && b.dataset.arg === '1'))); renderOverview(); renderGrid(); renderThermal(); stageView.update(state, connected); if (adjSlot) renderAdjust(); }
+// The relay sends a status for every projector on every poll. A fast relay (the browser tests poll every
+// 50 ms) can out-run a slow page: if each message were drawn as it arrived, the page would work through a
+// growing backlog of old replies, and the freshness check would read that delay as a stale projector and
+// refuse commands and Picture reads while the relay itself is healthy. Messages are applied to `state` at
+// once; drawing is limited to one pass per LIVE_RENDER_MS of idle time after the previous pass.
+const LIVE_RENDER_MS = 100;
+let liveRenderTimer = null, liveRenderEndedAt = -Infinity;
+function renderLive() {
+  if (liveRenderTimer !== null) return;
+  const draw = () => {
+    liveRenderTimer = null;
+    try { renderGrid(); renderThermal(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); }
+    finally { liveRenderEndedAt = performance.now(); }
+  };
+  const wait = liveRenderEndedAt + LIVE_RENDER_MS - performance.now();
+  if (wait > 0) liveRenderTimer = setTimeout(draw, Math.min(wait, LIVE_RENDER_MS)); else draw();
+}
 let reconnectTimer = null, socketGeneration = 0;
 function scheduleReconnect() {
   if (reconnectTimer !== null) return;
@@ -726,7 +743,7 @@ function connect() {
     }
     else if (!connected) return;
     else if (msg.type === 'heartbeat') { if (typeof msg.at === 'number' || typeof msg.at === 'string') { markAlive(); renderGrid(); renderThermal(); renderOverview(); stageView.update(state, connected); if (adjSlot) renderAdjust(); } }
-    else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.commandFeedback !== undefined) { if (msg.commandFeedback && msg.commandFeedback.startedAt !== p.commandFeedback?.startedAt && operatorFeedback.get(p.slot)?.phase !== 'sending') operatorFeedback.delete(p.slot); p.commandFeedback = msg.commandFeedback; } if (msg.webDiagnostics !== undefined) p.webDiagnostics = msg.webDiagnostics; if (msg.displayInfo !== undefined) p.displayInfo = msg.displayInfo; if (msg.inputPreference !== undefined) p.inputPreference = msg.inputPreference; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; if (msg.thermal) { p.thermal = msg.thermal; thermalWatch.append(msg.slot, msg.thermal); } renderGrid(); renderThermal(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); } }
+    else if (msg.type === 'status' && typeof msg.slot === 'string' && msg.status && typeof msg.status === 'object') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) { p.status = msg.status; if (msg.commandFeedback !== undefined) { if (msg.commandFeedback && msg.commandFeedback.startedAt !== p.commandFeedback?.startedAt && operatorFeedback.get(p.slot)?.phase !== 'sending') operatorFeedback.delete(p.slot); p.commandFeedback = msg.commandFeedback; } if (msg.webDiagnostics !== undefined) p.webDiagnostics = msg.webDiagnostics; if (msg.displayInfo !== undefined) p.displayInfo = msg.displayInfo; if (msg.inputPreference !== undefined) p.inputPreference = msg.inputPreference; if (msg.inputs) p.inputs = msg.inputs; if (msg.pictureSchema) p.pictureSchema = msg.pictureSchema; if (msg.thermal) { p.thermal = msg.thermal; thermalWatch.append(msg.slot, msg.thermal); } renderLive(); } }
     else if (msg.type === 'busy' && typeof msg.slot === 'string') { markAlive(); const p = state.projectors.find((x) => x.slot === msg.slot); if (p) p.busy = msg.busy; renderGrid(); stageView.update(state, connected); if (adjSlot) renderAdjust(); renderOverview(); }
     else if (msg.type === 'powerSchedules' && msg.schedules && typeof msg.schedules === 'object' && Array.isArray(msg.schedules.schedules) && Array.isArray(msg.schedules.audit)) { markAlive(); powerSchedulesView?.update(msg.schedules); }
     else if (msg.type === 'event' && msg.event && typeof msg.event === 'object') { markAlive(); state.events.push(msg.event); if (state.events.length > 200) state.events.shift(); renderLog(); }
