@@ -1,6 +1,6 @@
 # Security hardening
 
-These changes are source changes only. They do not configure, restart, or deploy the Studio. The focused regressions listed at the end pass in isolated simulator relays. The full Node suite (`npm test`, 119 tests in 32 files) passed on 2026-11-10 at `58f3e1b`. Pull-request CI runs the Node and browser suites on Linux. Physical projectors are a separate acceptance step.
+This document describes the source safeguards. Use the release receipt to establish which version is installed. Run the Node and browser suites in isolated simulator relays; physical projector acceptance is a separate step. [Quiet Watch](quiet-watch.md) defines the current feedback, appearance and software-report acceptance checks.
 
 ## Cue access
 
@@ -31,8 +31,14 @@ Outbound commands are restricted to the implemented Class 1 grammar, blocking CR
 - Failed logins back off exponentially (2 s, 4 s … 60 s) per client, as before. Records are forgotten 15 minutes after their lockout ends. The table holds at most 1,024 clients: idle records are evicted oldest first and active lockouts are never evicted. If every slot holds an active lockout, new clients share one overflow lockout instead of escaping the limit.
 - The lockout is checked before the body is read and again after it arrives, so a parallel attempt that fails while a slow body is in flight still blocks it.
 
-## Still open
+## Quiet Watch browser and feedback safeguards
 
-Pulse response validation, execution-time Show Lock guards, Stop-lens reliability, preset semantics, persistence failure handling and Panasonic numeric validation remain open. Merging publishes source only. Installing on the Studio is a separate step for a safe show window: confirm the cue environment and `PROJCTL_TRUSTED_PROXIES` there first.
+Browser requests must use the controller's own origin. WebSocket upgrades also require the existing session and a valid origin; malformed frames and slow-client backlogs are bounded. Native clients without an Origin header retain access under the existing authentication policy. These checks do not authenticate OSC or text TCP cues.
+
+Command binding rejects stale feedback at write time while retaining close-shutter and Stop lens recovery paths. The UI distinguishes current readings, last-known values and unreported fields. HTTP acknowledgements cannot replace newer WebSocket feedback.
+
+The read-only software-check endpoint validates a bounded local report, omits runner details, and compares the full source commit with the installed delivery manifest. It cannot run tests or command equipment. A matching report describes software checks, not physical acceptance.
+
+Before a Studio update, confirm the saved cue environment and `PROJCTL_TRUSTED_PROXIES`. Retain a verified recovery copy and use an explicitly released service window. Broad protocol, preset and hardware commissioning claims require their own evidence.
 
 Run the focused regressions from apps/projctl with `node --test test/cue-ingress.test.js test/security-protocol.test.js test/http-security.test.js test/venue-model.test.js`, then run `npm test` and the browser suites. Use isolated simulator settings, never the active Studio rig, for development.

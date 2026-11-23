@@ -25,7 +25,9 @@ test('schedule flags and occurrence claims survive migration and managed backup 
  fs.writeFileSync(path.join(source,'rig.json'),JSON.stringify({projectors:[],presets:[],events:[]}));
  const settings=Buffer.from('{"schedules":[{"id":"fixture","enabled":true}]}\n'),claim=Buffer.from('{"fixture":"already claimed"}\n');
  fs.writeFileSync(path.join(source,'power-schedules.json'),settings);fs.mkdirSync(path.join(source,'power-schedules.json.claims'));fs.writeFileSync(path.join(source,'power-schedules.json.claims/fixture.json'),claim);
+ fs.writeFileSync(path.join(source,'software-checks.json'),'software report');
  await snapshotSettingsAfterStop({sourceData:source,data,backup,stop:async()=>{}});
+ for(const dir of [data,backup]) assert.equal(fs.readFileSync(path.join(dir,'software-checks.json'),'utf8'),'software report');
  for(const dir of [data,backup]){assert.deepEqual(fs.readFileSync(path.join(dir,'power-schedules.json')),settings);assert.deepEqual(fs.readFileSync(path.join(dir,'power-schedules.json.claims/fixture.json')),claim);}
  const second=path.join(root,'second');fs.mkdirSync(second);await snapshotSettingsAfterStop({sourceData:data,data,backup:second,stop:async()=>{}});assert.deepEqual(fs.readFileSync(path.join(second,'power-schedules.json')),settings);
 });

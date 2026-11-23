@@ -121,7 +121,10 @@ test('relay ignores forwarding headers from untrusted peers', { timeout: 20000 }
   const relay = await startRelay({ PJ_PASSCODE: 'fixture-code', PROJCTL_TRUSTED_PROXIES: '' }); t.after(relay.close);
   const login = loginWith(relay);
   const ok = await login('fixture-code', { 'x-forwarded-proto': 'https' });
-  assert.equal(ok.status, 200); assert.doesNotMatch(ok.headers.get('set-cookie'), /Secure/);
+  assert.equal(ok.status, 200);
+  const cookies = ok.headers.getSetCookie();
+  assert.doesNotMatch(cookies.find(cookie => cookie.startsWith('pj=')), /Secure/);
+  assert.match(cookies.find(cookie => cookie.startsWith('pj_embed=')), /Secure; SameSite=None; Partitioned/);
   assert.equal((await login('wrong', { 'x-forwarded-for': '198.51.100.1' })).status, 401);
   const blocked = await login('fixture-code', { 'x-forwarded-for': '198.51.100.2' });
   assert.equal(blocked.status, 429, 'a spoofed address must not escape the lockout');

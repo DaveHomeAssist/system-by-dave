@@ -4,10 +4,20 @@
 // test patterns, lens, picture settings. Commands verified against the
 // PT-DZ870/DW830 and PT-RZ970 control command specs (2015/2018) and the
 // WST house PT-DW830U units on 2026-11-02.
+//
+// Control-port fallback (2026-11-18): some projectors answer one PJLink client at a
+// time, so another controller holding that link leaves this relay blind. When PJLink
+// does not answer but the control port does, power and shutter are read (QPW, QSH) and
+// commanded (PON, POF, OSH) on the control port instead. See docs/panasonic-control-port.md.
 import net from 'node:net';
+import { createPanasonicWebReader } from './panasonic-web.js';
 import { createHash } from 'node:crypto';
 import { pjlinkDriver } from './pjlink.js';
 import { throwIfAborted, transportFailure } from './transport.js';
+import { POWER, SHUTTER } from './base.js';
+
+// How long the control port stays the status link before PJLink is tried again.
+export const PJLINK_RETRY_MS = 300000;
 
 // Temperature query QTM:n. Replies are "°C/°F" pairs, e.g. "0023/0073".
 // QTM:0 is intake air per Panasonic's command list; QTM:1/2 names are unconfirmed.
@@ -62,9 +72,10 @@ export function pictureSchema() {
   return Object.fromEntries(Object.entries(PICTURE).map(([k, v]) => [k, { label: v.label, type: v.type, min: v.min, max: v.max, options: v.options }]));
 }
 
-export function panasonicDriver({ host, port = 1024, user = 'admin1', password = '', timeoutMs = 5000, model = '', ...rest }) {
-  const pj = pjlinkDriver({ host, password, ...rest, port: 4352 });
+export function panasonicDriver({ host, port = 1024, pjlinkPort = 4352, pjlinkRetryMs = PJLINK_RETRY_MS, now = Date.now, user = 'admin1', password = '', timeoutMs = 5000, model = '', ...rest }) {
+  const pj = pjlinkDriver({ host, password, timeoutMs, ...rest, port: pjlinkPort });
   const patterns = patternsFor(model);
+  const readWeb = createPanasonicWebReader({ host, user, password });
 
   function native(cmd, { signal, guard } = {}) {
     throwIfAborted(signal);
@@ -110,21 +121,80 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
     });
   }
 
+  // Which link carries power and shutter: PJLink while it answers, the control port while it does not.
+  let link = 'pjlink', pjlinkRetryAt = 0, lampStatus = true;
+
+  // Power and shutter from the control port. Input, alarms, light hours and name are PJLink-only
+  // readings: they come back null (not reported), never as a guess or a remembered value.
+  async function controlPortStatus(signal) {
+    const powered = await native('QPW', { signal });
+    let power = powered === '001' ? POWER.ON : powered === '000' ? POWER.OFF : POWER.UNKNOWN;
+    // Lamp control status tells warming and cooling apart from on and off. A model that refuses the
+    // query is not asked again; on and off from QPW still stand.
+    if (lampStatus && power !== POWER.UNKNOWN) {
+      try {
+        const lamp = await native('Q$S', { signal });
+        if (lamp === '1') power = POWER.WARMING; else if (lamp === '3') power = POWER.COOLING;
+        else if (lamp !== '0' && lamp !== '2') lampStatus = false;
+      } catch (error) { throwIfAborted(signal); if (transportFailure(error)) throw error; lampStatus = false; }
+    }
+    const status = { power, online: true, shutter: SHUTTER.UNKNOWN, input: null, errors: null, lightHours: null, name: null, pattern: null, controlLink: 'control-port' };
+    if (power !== POWER.ON) return status;
+    try { const shutter = await native('QSH', { signal }); status.shutter = shutter === '1' ? SHUTTER.CLOSED : shutter === '0' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; }
+    catch (error) { throwIfAborted(signal); if (transportFailure(error)) throw error; }
+    try { status.pattern = await native('QTS', { signal }); } catch { throwIfAborted(signal); status.pattern = null; }
+    throwIfAborted(signal);
+    return status;
+  }
+  async function pjlinkStatus(signal) {
+    const s = await pj.getStatus({ signal });
+    s.controlLink = 'pjlink';
+    if (s.power !== 'on') return s;
+    try { s.pattern = await native('QTS', { signal }); } catch { throwIfAborted(signal); s.pattern = null; }
+    throwIfAborted(signal);
+    return s;
+  }
+
   return {
     ...pj,
     kind: 'panasonic',
     lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'native-jog', stop: false, positionReadback: false },
     lensControls: { h: false, v: false, focus: false, zoom: false },
     patterns,
+    get controlLink() { return link === 'pjlink' ? 'pjlink' : 'control-port'; },
     async getStatus({ signal } = {}) {
-      const s = await pj.getStatus({ signal });
-      try { s.pattern = await native('QTS', { signal }); } catch { throwIfAborted(signal); s.pattern = null; }
-      throwIfAborted(signal);
-      return s;
+      if (link === 'control-port') {
+        // Read the control port first so feedback stays fresh, then see whether PJLink is back.
+        const status = await controlPortStatus(signal);
+        if (now() < pjlinkRetryAt) return status;
+        try { const full = await pjlinkStatus(signal); link = 'pjlink'; return full; }
+        catch { if (!signal?.aborted) pjlinkRetryAt = now() + pjlinkRetryMs; return status; }
+      }
+      try { return await pjlinkStatus(signal); }
+      catch (pjlinkError) {
+        throwIfAborted(signal);
+        // PJLink did not answer. If the control port does, the projector is reachable there.
+        let status;
+        try { status = await controlPortStatus(signal); } catch { throwIfAborted(signal); throw pjlinkError; }
+        link = 'control-port'; pjlinkRetryAt = now() + pjlinkRetryMs;
+        return status;
+      }
+    },
+    // Power and shutter follow the link that is currently answering. A command is sent once, on one link.
+    async power(on, options) {
+      if (link !== 'control-port') return pj.power(on, options);
+      await native(on ? 'PON' : 'POF', options);
+      return 'OK';
+    },
+    async shutter(closed, options) {
+      if (link !== 'control-port') return pj.shutter(closed, options);
+      await native(`OSH:${closed ? 1 : 0}`, options);
+      return 'OK';
     },
     // Read-only temperatures for health reports; never part of the status poll.
     // A refused sensor reads as null; a dead connection stops the remaining queries.
     async healthReadings({ signal, onPartial } = {}) {
+      let webDiagnostics;
       const sensors = [];
       for (const [n, id, label, role] of QTM_SENSORS) {
         let c = null;
@@ -133,13 +203,15 @@ export function panasonicDriver({ host, port = 1024, user = 'admin1', password =
           if (transportFailure(e) || signal?.aborted) {
             if (!sensors.some((s) => Number.isFinite(s.c))) throw e;
             sensors.push({ id, label, role, c: null });
-            return { sensors, readError: String(e.message || e) };
+            return { sensors, webDiagnostics, readError: String(e.message || e) };
           }
         }
         sensors.push({ id, label, role, c });
-        onPartial?.({ sensors: sensors.map((sensor) => ({ ...sensor })) });
+        onPartial?.({ sensors: sensors.map((sensor) => ({ ...sensor })), webDiagnostics });
       }
-      return { sensors };
+      webDiagnostics = await readWeb({ signal });
+      onPartial?.({ sensors: sensors.map(sensor => ({ ...sensor })), webDiagnostics });
+      return { sensors, webDiagnostics };
     },
     async pattern(code, options) {
       const c = String(code).padStart(2, '0');

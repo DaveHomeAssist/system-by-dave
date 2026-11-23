@@ -31,4 +31,6 @@ test('suggestions require fresh actionable state and prioritize reported faults'
   projector.status.errors = { lamp: 2 };
   assert.equal(nextOperatorAction(projector, { current: true }, false).action, 'details');
   assert.equal(nextOperatorAction(projector, { current: false }, false).id, 'connection');
+  projector.status.stale = ['errors', 'power'];
+  assert.equal(nextOperatorAction(projector, { current: true }, false), null);
 });

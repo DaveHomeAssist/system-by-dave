@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { once } from 'node:events';
 import {
-  createHealthReports, createNotionPublisher, notionPage, readHealthConfig, ratedAmbientC, unitRow, summarize, buildReport, renderMarkdown, localStamp,
+  createHealthReports, createNotionPublisher, notionPage, readHealthConfig, ratedAmbientC, unitRow, summarize, buildReport, renderMarkdown, unitTable, localStamp,
 } from '../server/health-reports.js';
 import { parseQtm, panasonicDriver } from '../server/drivers/panasonic.js';
 import { pulseDriver } from '../server/drivers/pulse.js';
@@ -63,13 +63,25 @@ test('complete readings report observed flags and headroom', () => {
   assert.deepEqual(units.map((u) => u.verdict), ['ok', 'ok', 'ok', 'watch']);
   assert.equal(units[0].password, undefined);
   const s = summarize(units);
-  assert.match(s.findings, /^No temperature, fan or alarm flags reported by 4 of 4 units with alarm feedback\./);
+  assert.match(s.findings, /^2 of 4 units report other projector alerts\./);
   assert.match(s.findings, /Coverage: temperature 4\/4, alarm feedback 4\/4, rated limit 4\/4\./);
   assert.match(s.findings, /Least headroom: P4 \(lane D, Panasonic PT-DW830U, 192\.168\.5\.23\) 3 °C \(37 °C intake, 40 °C limit\)\./);
   assert.match(s.findings, /PJLink warnings: P3 other warning; P4 other warning\./);
   assert.match(s.followUp, /P4 \(lane D, 192\.168\.5\.23\): inspect intake clearance and exhaust path, 3 °C headroom\./);
   assert.match(s.followUp, /P3, P4: read the Self Test screen for the "other" warning\./);
   assert.deepEqual(s.counts, { units: 4, reached: 4, flagged: 0, watch: 1, unreachable: 0, incomplete: 0 });
+});
+
+test('a lamp fault cannot produce an all-clear opening or lose its follow-up', () => {
+  const data = structuredClone(NOV11);
+  data.P3.st.errors = { ...ok, lamp: 2 };
+  data.P4.st.errors = { ...ok };
+  const summary = summarize(rows(data));
+  assert.match(summary.findings, /^1 of 4 units report other projector alerts\./);
+  assert.doesNotMatch(summary.findings, /No .*flags reported/);
+  assert.match(summary.findings, /P3 lamp error/);
+  assert.match(summary.followUp, /P3 .*check lamp error on the projector/);
+  assert.equal(summary.counts.flagged, 0, 'the thermal flag count retains its scope');
 });
 
 test('flags, alarms, unreachable units and missing readings are reported', () => {
@@ -88,7 +100,7 @@ test('flags, alarms, unreachable units and missing readings are reported', () =>
   const report = buildReport({ kind: 'hourly', startedAt: Date.parse('2026-11-13T00:00:00Z'), finishedAt: Date.parse('2026-11-13T00:00:03Z'), units, config: CONFIG });
   assert.equal(report.title, 'Frozen | Projectors | Health Log | 2026-11-12 19:00 | Hourly');
   const md = renderMarkdown(report);
-  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| on \| 27 \| 40 \| 13 \| 37 \| Not reached \|/);
+  assert.match(md, /\| P3 \| A \| Panasonic PT-DW830U \| 192\.168\.5\.20 \| No current reading \(last known on\) \| 27 \| 40 \| 13 \| 37 \| Not reached \|/);
   assert.match(md, /readings: timeout \(port 1024\)/);
   const none = summarize(units.map((u) => ({ ...u, online: false, verdict: 'unreachable', headroomC: null })));
   assert.match(none.findings, /^No units reachable; 0 of 4 read\./);
@@ -153,6 +165,19 @@ test('unreachable and empty reports retain explicit coverage', () => {
   assert.equal(summarize([]).counts.incomplete, 0);
 });
 
+test('an unreached unit reports no current power reading', () => {
+  const row = unitRow(RIG[2], { online: false, power: 'on', errors: ok }, { lastSuccessAt: '2026-11-17T16:20:10.388Z' });
+  assert.equal(row.power, 'unknown');
+  assert.equal(row.lastKnownPower, 'on');
+  assert.equal(row.verdict, 'unreachable');
+  assert.equal(row.lastContact, '2026-11-17T16:20:10.388Z');
+  const cellFor = (unit) => unitTable(buildReport({ kind: 'manual', startedAt: 0, finishedAt: 1, units: [unit] }))[1][4];
+  assert.equal(cellFor(row), 'No current reading (last known on)');
+  assert.equal(cellFor(unitRow(RIG[2], { online: false, errors: ok })), 'No current reading');
+  assert.equal(cellFor({ ...row, power: 'on', lastKnownPower: undefined }), 'No current reading (last known on)', 'saved reports stay honest');
+  assert.equal(cellFor(unitRow(RIG[2], { online: true, power: 'on', errors: ok })), 'on');
+});
+
 test('saved reports without completeness fields still render in Markdown and Notion', () => {
   const report = JSON.parse(JSON.stringify(buildReport({ kind: 'manual', startedAt: 0, finishedAt: 1, units: rows() })));
   delete report.counts.incomplete;
@@ -188,13 +213,86 @@ test('Notion publisher sends the page, classifies failures and redacts the token
   const token = async () => 'ntn_test_token';
   const published = await createNotionPublisher({ databaseId: 'd'.repeat(32), token, fetch: reply(200, { id: 'page-1', url: 'https://notion.example/page-1' }) })(report);
   assert.deepEqual(published, { id: 'page-1', url: 'https://notion.example/page-1' });
-  assert.equal(calls[0].url, 'https://api.notion.com/v1/pages');
-  assert.equal(calls[0].init.headers.authorization, 'Bearer ntn_test_token');
-  assert.equal(calls[0].init.headers['notion-version'], '2022-06-28');
+  const post = calls.find((c) => c.init.method === 'POST');
+  assert.equal(post.url, 'https://api.notion.com/v1/pages');
+  assert.equal(post.init.headers.authorization, 'Bearer ntn_test_token');
+  assert.equal(post.init.headers['notion-version'], '2022-06-28');
   await assert.rejects(createNotionPublisher({ databaseId: 'd'.repeat(32), token, fetch: reply(429, { message: 'slow down' }) })(report), (e) => e.retry === true && /Notion 429: slow down/.test(e.message));
   await assert.rejects(createNotionPublisher({ databaseId: 'd'.repeat(32), token, fetch: reply(404, { message: 'Could not find database with ID ntn_test_token' }) })(report), (e) => e.retry === false && !e.message.includes('ntn_test_token'));
   await assert.rejects(createNotionPublisher({ databaseId: 'd'.repeat(32), token, fetch: async () => { throw new TypeError('fetch failed'); } })(report), (e) => e.retry === true && /unreachable/.test(e.message));
   await assert.rejects(createNotionPublisher({ databaseId: 'd'.repeat(32), token: async () => null, fetch: reply(200, {}) })(report), (e) => e.code === 'NO_TOKEN' && e.retry === true);
+});
+
+test('Notion page fills per-unit number properties only where the database has them', () => {
+  const data = { ...NOV11, P3: { st: { online: false, power: 'unknown', errors: null }, readings: null } };
+  const report = buildReport({ kind: 'hourly', startedAt: 0, finishedAt: 1, units: rows(data), config: CONFIG });
+  assert.deepEqual(Object.keys(notionPage(report, 'd'.repeat(32)).properties), ['Log', 'Check window', 'Findings', 'Follow-up']);
+  const names = new Set(['P1 Temp (°C)', 'P1 Headroom (°C)', 'P2 Temp (°C)', 'P3 Temp (°C)', 'P3 Headroom (°C)', 'P4 Temp (°C)', 'P4 Headroom (°C)', 'Other number']);
+  const props = notionPage(report, 'd'.repeat(32), { numberProperties: names }).properties;
+  assert.deepEqual(props['P1 Temp (°C)'], { number: 29.8 });
+  assert.deepEqual(props['P1 Headroom (°C)'], { number: 10.2 });
+  assert.deepEqual(props['P2 Temp (°C)'], { number: 23 });
+  assert.equal('P2 Headroom (°C)' in props, false);
+  assert.deepEqual(props['P3 Temp (°C)'], { number: null });
+  assert.deepEqual(props['P3 Headroom (°C)'], { number: null });
+  assert.deepEqual(props['P4 Temp (°C)'], { number: 37 });
+  assert.deepEqual(props['P4 Headroom (°C)'], { number: 3 });
+  assert.equal('Other number' in props, false);
+});
+
+test('Notion page leaves per-unit numbers empty unless the unit is reached and lit', () => {
+  const data = {
+    P1: { ...NOV11.P1, st: { ...NOV11.P1.st, power: 'warming' } },
+    P2: { st: { online: true, power: 'off', errors: null, lightHours: null }, readings: panasonic(32) },
+    P3: { st: { online: true, power: 'cooling', errors: null, lightHours: 1059 }, readings: panasonic(30) },
+    P4: NOV11.P4,
+  };
+  const report = buildReport({ kind: 'power-off', startedAt: 0, finishedAt: 1, units: rows(data), config: CONFIG });
+  const names = new Set(['P1 Temp (°C)', 'P1 Headroom (°C)', 'P2 Temp (°C)', 'P2 Headroom (°C)', 'P3 Temp (°C)', 'P3 Headroom (°C)', 'P4 Temp (°C)', 'P4 Headroom (°C)']);
+  const props = notionPage(report, 'd'.repeat(32), { numberProperties: names }).properties;
+  assert.deepEqual(props['P1 Temp (°C)'], { number: 29.8 });
+  assert.deepEqual(props['P2 Temp (°C)'], { number: null });
+  assert.deepEqual(props['P2 Headroom (°C)'], { number: null });
+  assert.deepEqual(props['P3 Temp (°C)'], { number: null });
+  assert.deepEqual(props['P3 Headroom (°C)'], { number: null });
+  assert.deepEqual(props['P4 Temp (°C)'], { number: 37 });
+  const lane = report.units.find((u) => u.slot === 'P2');
+  assert.equal(lane.intakeC, 32, 'the off-state reading is kept in the report');
+});
+
+test('Notion publisher reads the database once and sends only the numbers it has', async () => {
+  const report = buildReport({ kind: 'hourly', startedAt: 0, finishedAt: 1, units: rows(), config: CONFIG });
+  const schema = { properties: { Log: { type: 'title' }, 'P4 Temp (°C)': { type: 'number' }, 'P4 Headroom (°C)': { type: 'number' }, 'P1 Temp (°C)': { type: 'rich_text' } } };
+  const fake = (failFirstRead = false) => {
+    const calls = [];
+    let fail = failFirstRead;
+    const send = async (url, init) => {
+      calls.push({ url, method: init.method, body: init.body ? JSON.parse(init.body) : null });
+      if (init.method === 'GET' && fail) { fail = false; throw new TypeError('fetch failed'); }
+      return { ok: true, status: 200, json: async () => (init.method === 'GET' ? schema : { id: 'page', url: 'https://notion.example/page' }) };
+    };
+    return { calls, send };
+  };
+  const steady = fake();
+  const publish = createNotionPublisher({ databaseId: 'd'.repeat(32), token: async () => 'ntn_test_token', fetch: steady.send });
+  await publish(report);
+  await publish(report);
+  const reads = steady.calls.filter((c) => c.method === 'GET');
+  assert.equal(reads.length, 1);
+  assert.equal(reads[0].url, `https://api.notion.com/v1/databases/${'d'.repeat(32)}`);
+  const sent = steady.calls.find((c) => c.method === 'POST').body.properties;
+  assert.deepEqual(sent['P4 Temp (°C)'], { number: 37 });
+  assert.deepEqual(sent['P4 Headroom (°C)'], { number: 3 });
+  assert.equal('P1 Temp (°C)' in sent, false);
+
+  const flaky = fake(true);
+  const publishFlaky = createNotionPublisher({ databaseId: 'd'.repeat(32), token: async () => 'ntn_test_token', fetch: flaky.send });
+  assert.deepEqual(await publishFlaky(report), { id: 'page', url: 'https://notion.example/page' });
+  await publishFlaky(report);
+  const posts = flaky.calls.filter((c) => c.method === 'POST');
+  assert.equal('P4 Temp (°C)' in posts[0].body.properties, false);
+  assert.deepEqual(posts[1].body.properties['P4 Temp (°C)'], { number: 37 });
+  assert.equal(flaky.calls.filter((c) => c.method === 'GET').length, 2);
 });
 
 function fakeClock(start) {
@@ -370,7 +468,10 @@ test('Panasonic health readings query QTM:0-2 read-only and tolerate a refused s
     socket.on('data', (b) => { text += b; if (!text.includes('\r')) return; const cmd = text.trim().replace(/^00/, ''); sent.push(cmd); socket.write(`00${replies[cmd] ?? 'ER402'}\r`); });
   });
   const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
-  const out = await driver.healthReadings();
+  const partials = [];
+  const out = await driver.healthReadings({ onPartial: value => partials.push(value) });
+  assert.equal(partials[0].sensors[0].c, 37);
+  assert.equal(partials[0].webDiagnostics, undefined, 'native temperatures arrive before optional web reads');
   assert.deepEqual(sent, ['QTM:0', 'QTM:1', 'QTM:2']);
   assert.deepEqual(out.sensors.map((s) => [s.id, s.role, s.c]), [['intake', 'intake', 37], ['qtm1', 'internal', 37], ['qtm2', 'internal', null]]);
 });
@@ -422,7 +523,7 @@ for (const failedSensor of [0, 1, 2]) {
       assert.equal(row.intakeC, 37);
       assert.equal(row.verdict, 'watch');
       assert.match(row.readError, /connection closed/);
-      assert.equal(partials[0].sensors.length, 1, 'partial snapshots remain stable');
+      assert.equal(partials.find(value => value.sensors.length).sensors.length, 1, 'partial snapshots remain stable');
     }
     assert.deepEqual(sent, Array.from({ length: failedSensor + 1 }, (_, n) => `QTM:${n}`));
   });
@@ -481,4 +582,77 @@ test('relay-stop partial readings are saved inside its shutdown cap without retr
   assert.equal(summary.kind, 'relay-stop');
   const saved = JSON.parse(fs.readFileSync(path.join(dir, `${summary.id}.json`), 'utf8'));
   assert.ok(saved.units.every((unit) => unit.intakeC === 37 && /timed out/.test(unit.readError)));
+});
+
+test('a Panasonic connection lost after the intake reading keeps the intake and sends no further query', async (t) => {
+  const sent = [];
+  const port = await fakeServer(t, (socket) => {
+    socket.write('NTCONTROL 0\r');
+    let text = '';
+    socket.on('data', (b) => {
+      text += b; if (!text.includes('\r')) return;
+      const cmd = text.trim().replace(/^00/, ''); sent.push(cmd);
+      if (cmd === 'QTM:0') socket.write('000037/0098\r'); else socket.destroy();
+    });
+  });
+  const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
+  const out = await driver.healthReadings();
+  assert.deepEqual(sent, ['QTM:0', 'QTM:1'], 'the third sensor is not queried on a dead connection');
+  assert.deepEqual(out.sensors.map((s) => [s.id, s.c]), [['intake', 37], ['qtm1', null]]);
+  assert.match(out.readError, /closed|reset|ECONN/i);
+  const row = unitRow(RIG[2], { online: true, power: 'on', errors: ok }, {}, out, null, CONFIG);
+  assert.equal(row.intakeC, 37); assert.equal(row.intakeSource, 'report'); assert.equal(row.headroomC, 3); assert.equal(row.verdict, 'watch');
+  assert.ok(row.readError, 'the dropped read stays visible beside the kept intake');
+});
+
+test('a Panasonic connection lost before any reading still fails, so the report can retry it', async (t) => {
+  const port = await fakeServer(t, (socket) => { socket.write('NTCONTROL 0\r'); socket.on('data', () => socket.destroy()); });
+  const driver = panasonicDriver({ host: '127.0.0.1', port, timeoutMs: 500 });
+  await assert.rejects(driver.healthReadings());
+});
+
+test('a Thermal watch sample stands in only for a missing report-time intake on a reached unit', () => {
+  const at = Date.parse('2026-11-12T22:09:00Z'), st = { online: true, power: 'on', errors: ok };
+  const used = unitRow(RIG[3], st, {}, null, 'connection closed before Panasonic reply', CONFIG, { c: 36.5, at });
+  assert.deepEqual([used.intakeC, used.intakeSource, used.intakeLabel, used.intakeAt, used.headroomC, used.verdict],
+    [36.5, 'watch', 'Thermal watch sample', '2026-11-12T22:09:00.000Z', 3.5, 'watch']);
+  assert.match(used.readError, /connection closed/);
+  const fresh = unitRow(RIG[3], st, {}, panasonic(30), null, CONFIG, { c: 36.5, at });
+  assert.deepEqual([fresh.intakeC, fresh.intakeSource, fresh.intakeAt], [30, 'report', null], 'a report-time reading always wins');
+  const offline = unitRow(RIG[3], { online: false }, {}, null, 'timeout', CONFIG, { c: 36.5, at });
+  assert.deepEqual([offline.intakeC, offline.intakeSource, offline.verdict], [null, null, 'unreachable']);
+  for (const bad of [null, {}, { c: 36.5 }, { c: NaN, at }, { c: '36', at }]) assert.equal(unitRow(RIG[3], st, {}, null, 'x', CONFIG, bad).intakeC, null);
+  assert.match(summarize([used, fresh]).findings, /Report-time reading failed; latest Thermal watch sample used: P4\./);
+  assert.doesNotMatch(summarize([fresh]).findings, /Thermal watch sample/);
+});
+
+test('a failed report-time reading uses a recent Thermal watch sample; an old or future one is not used', async (t) => {
+  const start = Date.parse('2026-11-12T22:10:00Z');
+  const samples = { P2: { c: 24, at: start - 60000 }, P3: { c: 28, at: start - 181000 }, P4: { c: 36.5, at: start + 5000 } };
+  const asked = [];
+  const { engine, dir } = rigEngine(t, {
+    readTelemetry: async (p) => { if (p.slot === 'P1') return NOV11.P1.readings; throw new Error('connection closed before Panasonic reply'); },
+    recentAir: (p) => { asked.push(p.slot); if (p.slot === 'P2') return samples.P2; if (p.slot === 'P3') return samples.P3; return samples.P4; },
+  });
+  const report = await engine.run();
+  const saved = JSON.parse(fs.readFileSync(path.join(dir, `${report.id}.json`), 'utf8'));
+  const unit = Object.fromEntries(saved.units.map((u) => [u.slot, u]));
+  assert.deepEqual(asked.sort(), ['P2', 'P3', 'P4'], 'the watch is not consulted when the report read an intake');
+  assert.deepEqual([unit.P1.intakeC, unit.P1.intakeSource], [29.8, 'report']);
+  assert.deepEqual([unit.P2.intakeC, unit.P2.intakeSource, unit.P2.intakeAt], [24, 'watch', '2026-11-12T22:09:00.000Z']);
+  assert.deepEqual([unit.P3.intakeC, unit.P3.intakeSource], [null, null], 'a sample older than three minutes is not used');
+  assert.deepEqual([unit.P4.intakeC, unit.P4.intakeSource], [null, null], 'a sample stamped after the report is not used');
+  assert.ok(saved.units.filter((u) => u.slot !== 'P1').every((u) => /connection closed/.test(u.readError)));
+  const markdown = fs.readFileSync(path.join(dir, `${report.id}.md`), 'utf8');
+  assert.match(markdown, /24 \(Thermal watch sample 17:09:00 EST\)/);
+  assert.match(markdown, /Report-time reading failed; latest Thermal watch sample used: P2\./);
+  assert.match(markdown, /Temperatures not read: P3, P4\./);
+  await engine.stop();
+});
+
+test('a failing Thermal watch lookup never fails the report', async (t) => {
+  const { engine } = rigEngine(t, { readTelemetry: async () => { throw new Error('connection closed before Panasonic reply'); }, recentAir: () => { throw new Error('watch unavailable'); } });
+  const report = await engine.run();
+  assert.equal(report.counts.incomplete, 4);
+  await engine.stop();
 });

@@ -23,6 +23,8 @@ export interface Joint { kind: string; label: string; axis: number[]; pivot?: nu
 export interface ModelState { id: string; label: string; note: string; view: string; joints: Record<string, number> }
 export interface Step { text: string; part: string; state: string }
 export interface Procedure { id: string; label: string; source: string; pages: string; summary: string; before: string[]; steps: Step[]; after: string[] }
+/* A silent video of one procedure's steps on this model, with its poster frame and its length as the caption reads it. */
+export interface Walkthrough { src: string; poster: string; length: string }
 /* A native model package: what the inspector needs beside the catalog row. The control list is
    bundled so it stays available when WebGL or the package itself cannot load. */
 export interface ModelPackage {
@@ -45,6 +47,8 @@ export interface ModelPackage {
   states?: ModelState[];
   procedures?: Procedure[];
   procedureSources?: Record<string, { label: string; url: string }>;
+  /* Walkthrough videos by procedure ID. They are host media in /equipment-lab/media/, not part of the shared package. */
+  walkthroughs?: Record<string, Walkthrough>;
   /* Assembly labels, when the list is long enough to group. */
   groups?: Record<string, string>;
   /* Reference panel content for packages without their own copy. */
@@ -81,6 +85,7 @@ const PACKAGES: Record<string, ModelPackage> = {
     states: Object.entries(lampProjector.states as Record<string, Omit<ModelState, 'id'>>).map(([id, state]) => ({ id, ...state })),
     procedures: lampProjector.procedures,
     procedureSources: lampProjector.sources,
+    walkthroughs: { lampUnit: { src: '/equipment-lab/media/pt-dw830-lamp-replacement.mp4', poster: '/equipment-lab/media/pt-dw830-lamp-replacement.jpg', length: '1 minute 23 second' } },
     reference: {
       scope: 'This package is not qualified. Panasonic prints the cabinet size, the mass, the foot spacing and the lens centre height, and names every part drawn here. The front and the terminal side are placed from its CAD outline for the sibling PT-RZ970 series; the rear, the left side and the bottom are scaled from illustrations. Inside the lamp bay, which part is where and which way it moves are Panasonic\'s; sizes, depths, the 100 degree opening of the cover and each travel are approximate or assumed.',
       files: downloads('PT-DW830', lampProjectorFiles),

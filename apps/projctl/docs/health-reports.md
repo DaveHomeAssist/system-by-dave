@@ -43,10 +43,24 @@ in a Notion database.
 - Check window: when the readings started and finished.
 - Findings: units flagged for temperature, fan or alarm; the unit with the least
   headroom; PJLink "other" or lamp, cover and filter warnings; units not reached.
+  Existing lamp, cover, filter or other alerts lead the summary when there are
+  no thermal flags. Specific alerts receive a follow-up even when temperatures
+  are within limits. The thermal flag count remains a separate measurement.
 - Follow-up: one line per thing to check, or "None".
+- Per-unit numbers: when the database has number properties named
+  `P1 Temp (°C)` and `P1 Headroom (°C)` (and so on for each slot), the relay
+  fills them with each unit's intake or ambient reading and headroom while the
+  unit is reached and lit (on or warming). They stay empty when a unit is off,
+  cooling or not read, so charts built on them show running temperatures. A
+  reading taken while off (a Panasonic intake can read 29 to 32 °C just after
+  power-off) still appears in the page's unit table. The relay reads the
+  database's property list once; a database without these properties still
+  receives the page without them.
 - Page body: a unit table (slot, lane, model, address, power, intake or ambient
   temperature, rated limit, headroom, internal temperatures, flags, light hours,
-  last contact) and the controller events since the previous report.
+  last contact) and the controller events since the previous report. A unit not
+  reached at report time shows `No current reading`, with its last known power
+  when there is one, so an old state is not read as current.
 
 Slots are internal relay IDs. Every row also names lane, model and address,
 because production paperwork numbers the projectors differently.
@@ -59,9 +73,11 @@ because production paperwork numbers the projectors differently.
 | Barco Pulse | `environment.temperature.ambient_outside.value` and `environment.alarmstate`. |
 | PJLink only | `ERST` flags from the normal poll; no temperatures. |
 
-Readings are taken only when a report runs, never on the 5-second status poll.
-Status polls and report readings share a queue for each projector, preventing
-those reads from overlapping in either direction. A status poll gets its full
+Report readings are taken when a report runs, never on the 5-second status poll.
+The Thermal watch (README, "Thermal watch") takes the same reading about once a
+minute while a unit is on or cooling. Status polls, report readings and watch
+samples share a queue for each projector, preventing those reads from
+overlapping, and a report's own reading also reaches the watch. A status poll gets its full
 device timeout after acquiring the queue, so local queue waiting cannot mark a
 projector offline. Different projectors remain
 independent. Report readings retry transport failures at most twice, with a
@@ -81,8 +97,20 @@ valid intake reading. Missing alarm feedback still produces an incomplete
 assessment. Control writes remain independent of this read queue.
 
 This adapts the read coordination, partial readings and retry scope reviewed in
-PR #463 to the current relay. Thermal watch history, fallback samples and peak
-columns require the separate Thermal backend and are outside this change.
+PR #463 to the current relay. Thermal watch history lives in the relay's Thermal
+backend (`server/thermal.js`). Peak columns in reports are not implemented.
+
+When a reached unit's report-time read returns no intake or ambient value, the
+report uses that unit's newest Thermal watch reading if it is at most three
+minutes old. The cell reads, for example, `36.5 (Thermal watch sample 17:09:00
+EST)`, the findings name the unit, and the read error stays in the Flags cell.
+The saved row carries `intakeSource` (`report` or `watch`) and `intakeAt`. An
+older sample is not used and the unit stays "Temperatures not read". A
+report-time value always takes precedence, and an unreached unit never receives
+a sample. Headroom and the watch verdict are calculated from the sample, so a
+warm unit is not hidden by a dropped connection. The watch is in memory and
+resets when a slot's address or driver changes, so a sample cannot come from a
+different projector or from before a relay restart.
 ECP-1.0 revision 1.0 applies. Existing units, identities and saved report shapes
 are preserved, with optional read-error detail added to partial results.
 
@@ -156,9 +184,12 @@ retry, the two API routes and tests. No operator-page panel.
 
 - No full Barco sensor sweep (laser banks, DMD, FPGAs, fans); only ambient and
   alarm state.
-- No temperature trend logging between reports, and no alerting.
+- No temperature trend logging between reports, and no alerting. The Thermal
+  watch adds an in-memory trend and Log entries on a change of level; reports
+  themselves are unchanged.
 - No settings changes on any projector. No power command is sent or delayed.
-- No operator-page panel; reports are read in Notion or the saved files.
+- No operator-page panel for reports; they are read in Notion or the saved
+  files. The Thermal watch tab shows live air temperature, not reports.
 
 ## Dependencies
 

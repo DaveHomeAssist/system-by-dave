@@ -14,7 +14,9 @@ const { selectView } = require('./operator-ui.cjs');
     }
     await relay.api('command', { slot: 'all', cmd: 'power', arg: 1 });
     await until(async () => (await relay.state()).projectors.every(p => p.status.power === 'on'));
-    const page = await browser.newPage({ viewport: { width: 1024, height: 900 } });
+    // Suggestions and quick pattern actions are expanded in the roomy layout.
+    // Compact controls have separate containment and Details journeys.
+    const page = await browser.newPage({ viewport: { width: 1440, height: 1050 } });
     const calls = [], errors = [];
     page.on('request', request => { if (request.method() === 'POST' && request.url().endsWith('/api/command')) calls.push(request.postDataJSON()); });
     page.on('pageerror', error => errors.push(error.message));

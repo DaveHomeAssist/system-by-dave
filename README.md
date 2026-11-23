@@ -86,6 +86,7 @@ use the tooling selected for that surface.
 | `privacy-policy.html` | Privacy policy |
 | `404.html` / `500.html` | Error pages |
 | `html/sbd-brand.html` | Internal brand reference |
+| `thephilly/index.html` | Noindex prototype of The Philly magazine site, with the Cheesesteak Radar in its Food Finders story (see [The Philly prototype](#the-philly-prototype)) |
 
 ## Deploy
 
@@ -159,6 +160,20 @@ npm run verify:public-navigation
 The sync replaces `cheesesteaks/`, drops the export's own 404 pages (Pages serves
 only the root `404.html`), and records the source commit in
 `cheesesteaks/SOURCE.txt`. Do not hand-edit `cheesesteaks/`.
+
+### The Philly prototype
+
+`/thephilly/` is a copy of the single-file prototype in the private
+`DaveHomeAssist/the-philly` repository, adapted for this site: full public head
+(`noindex`, so it stays out of search and the sitemap), a Content Security Policy,
+fonts and the QR generator self-hosted under `thephilly/fonts/` and
+`thephilly/vendor/` (licences in `vendor/NOTICE.txt`) instead of Google Fonts and
+cdnjs, a System by Dave breadcrumb and skip link, and the Cheesesteak Radar in the
+Food Finders story. The radar opens the heatmap at `/cheesesteaks/` in a frame only
+when the reader asks, so the map's OpenStreetMap tile requests start then. To
+refresh the page, copy the prototype's `index.html` over `thephilly/index.html` and
+reapply those changes. Verify with `npm run probe:thephilly`,
+`npm run verify:public-navigation` and `npm run verify:indexing`.
 
 ### NoteForge canonical release
 

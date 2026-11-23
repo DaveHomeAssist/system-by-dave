@@ -14,6 +14,7 @@ import { projectorDisplayInfo, createHostDisplayReader } from './display-info.js
 import { hasLens, lensSummary, lensPositionMatch, lensMotorState, LENS_AXES } from './preset-lens.js';
 import { startOsc, startTcpLines } from './osc.js';
 import { LANES } from '../public/lanes.js';
+import { RELEASE } from '../public/release.js';
 import { confirmations } from './confirmations.js';
 import { createCommandBinding } from './command-binding.js';
 import { readStagePlot } from './stage-plot.js';
@@ -21,11 +22,16 @@ import { readVenue, readVenueAsset } from './venue-model.js';
 import { throwlineAsset, withThrowlineImports } from './throwline-assets.js';
 import { resolveInputPreference } from './input-preference.js';
 import { createPowerSchedules, scheduledPowerGuard } from './power-schedules.js';
-import { createPoller } from './polling.js';
+import { createPoller, pollIdentity } from './polling.js';
+import { createCommandFeedback } from './command-feedback.js';
 import { createTelemetryReader } from './telemetry-reader.js';
-import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader } from './health-reports.js';
+import { createHealthReports, readHealthConfig, createNotionPublisher, notionTokenReader, ratedAmbientC, isLit } from './health-reports.js';
+import { createThermalMonitor, thermalThresholds, plausibleAirC, thermalCsv, RETENTION_MS } from './thermal.js';
 import { createManualDiscovery } from './discovery.js';
-import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, LOGIN_BODY_BYTES } from './http-security.js';
+import { readJsonBody, proxyPolicy, createLoginThrottle, applyServerLimits, browserRequestAllowed, LOGIN_BODY_BYTES } from './http-security.js';
+import { readSoftwareChecks } from './software-checks.js';
+import { readCrewLinks } from './crew-links.js';
+import { createShowRoutes } from './show-routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8080);
@@ -43,10 +49,27 @@ const SESSION = createHash('sha256').update(`pj:${SESSION_SECRET}:${PASSCODE}`).
 const loginThrottle = createLoginThrottle(); // bounded per-client backoff; active lockouts survive eviction
 const proxy = proxyPolicy(); // PROJCTL_TRUSTED_PROXIES (default loopback); invalid values stop startup
 function cookies(req) { return Object.fromEntries((req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((kv) => kv[0]).map(([k, ...v]) => [k, v.join('=')])); }
-function authed(req) {
+// The public workspace embeds this controller in a cross-site frame, where browsers never send
+// the SameSite=Strict login cookie. Login therefore also sets a partitioned copy (CHIPS): the
+// browser keeps it separate per top-level site and only returns it inside that site's frames.
+// It is accepted only for the controller's own same-origin requests and for page loads into a
+// frame, never for cross-site API calls or WebSockets, so other sites cannot drive the relay.
+const EMBED_COOKIE = 'pj_embed';
+const SESSION_MAX_AGE = 60 * 60 * 24 * 90;
+const TRUSTED_PARENTS = ['https://wst.housevideo.app', 'https://wst-frozen.davein4k.chatgpt.site'];
+const FRAME_ANCESTORS = `frame-ancestors 'self' ${TRUSTED_PARENTS.join(' ')}`;
+function sessionMatches(c) { const want = Buffer.from(SESSION), got = Buffer.from(String(c || '')); return got.length === want.length && timingSafeEqual(got, want); }
+function ownOrigin(req) { return `${proxy.isHttps(req) ? 'https' : 'http'}://${req.headers.host}`; }
+function embedRequestOk(req, pathname) {
+  if (req.headers.origin) return req.headers.origin === ownOrigin(req); // fetch POST/CORS and WebSocket handshakes
+  if (req.headers['sec-fetch-site'] === 'same-origin') return true; // the controller's own pages, assets and GETs
+  return req.method === 'GET' && req.headers['sec-fetch-mode'] === 'navigate' && req.headers['sec-fetch-dest'] === 'iframe' && !pathname.startsWith('/api/');
+}
+function authed(req, pathname = new URL(req.url, 'http://x').pathname) {
   if (!PASSCODE) return true;
-  const c = cookies(req).pj || ''; const want = Buffer.from(SESSION), got = Buffer.from(c);
-  return got.length === want.length && timingSafeEqual(got, want);
+  const jar = cookies(req);
+  if (sessionMatches(jar.pj)) return true;
+  return sessionMatches(jar[EMBED_COOKIE]) && embedRequestOk(req, pathname);
 }
 function clientIp(req) { return proxy.clientAddress(req); }
 function enforceLoginThrottle(ip, res) {
@@ -58,15 +81,17 @@ function enforceLoginThrottle(ip, res) {
 }
 const DATA = process.env.RIG || path.join(__dirname, '..', 'data', SIM ? 'rig.sim.json' : 'rig.json');
 const STAGE_PLOT = process.env.STAGE_PLOT || path.join(path.dirname(DATA), 'stage-plot.json');
+const showRoutes = createShowRoutes({ dataDir: path.dirname(DATA), appDir: path.join(__dirname, '..'), sim: SIM, relay: { projectors: () => rig.projectors, status: slot => ({ ...status.get(slot), connection: connections.get(slot) }), power: (slot, on) => command(slot, 'power', on ? 1 : 0, 'run'), refresh: slot => poller.refresh(slot), revision: p => commandBinding.revision(p), locked: () => rig.lock, broadcast: message => broadcast(message), body: req => body(req), maxStatusAgeMs: Math.max(15000, POLL_MS * 3) } });
 const VENUE_MODEL = process.env.VENUE_MODEL || path.join(path.dirname(DATA), 'venue');
 
 const store = openStore(DATA, { allowCreate: SIM || !process.env.RIG });
 if (SIM) simRig(store.rig);
 const rig = store.rig;
-let powerSchedules, poller, health, stopping = false;
+let powerSchedules, poller, feedback, health, stopping = false;
 // A lit rig gets a final health report before exit; health.stop() is capped at a few seconds.
 for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, async () => {
   if (stopping) return; stopping = true;
+  feedback?.close();
   try { await health?.stop(); } catch { /* exit regardless */ }
   poller?.close(); powerSchedules?.close(); store.close(); process.exit(0);
 });
@@ -98,16 +123,23 @@ function inputPreferenceFor(p) { return resolveInputPreference(driverFor(p).inpu
 
 // ---- WebSocket broadcast ----
 const clients = new Set();
-function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients) if (c.readyState === 1) c.send(s); }
+function sendSnapshotMessage(client, data) {
+  if (client.readyState !== 1) return;
+  // Slow or broken clients reconnect for a fresh snapshot instead of retaining
+  // an unbounded backlog of obsolete state in the relay process.
+  if (client.bufferedAmount > 1024 * 1024) { client.terminate(); return; }
+  client.send(data, error => { if (error) client.terminate(); });
+}
+function broadcast(msg) { const s = JSON.stringify(msg); for (const c of clients) sendSnapshotMessage(c, s); }
 // Relay liveness is independent of potentially slow device polling.
 setInterval(() => broadcast({ type: 'heartbeat', at: new Date().toISOString() }), 5000).unref();
 function snapshot() {
   return {
     type: 'snapshot', show: rig.show, lock: rig.lock, simulation: SIM, preferredInput: rig.preferredInput || 'HDMI',
-    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS, commandTargetBinding: 1 },
+    relay: { startedAt: STARTED_AT, pollIntervalMs: POLL_MS, commandTargetBinding: 1, release: RELEASE },
     projectors: rig.projectors.map((p) => {
       const d = driverFor(p);
-      return { ...p, password: undefined, controlRevision: commandBinding.revision(p), status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null,
+      return { ...p, password: undefined, controlRevision: commandBinding.revision(p), status: { ...status.get(p.slot), connection: connections.get(p.slot) }, busy: busy.get(p.slot) || null, thermal: thermalView(p), webDiagnostics: webDiagnostics.get(p.slot) || null, commandFeedback: feedback?.get(p.slot) || null,
         inputs: d.inputs ?? p.inputs, displayInfo: displayInfoFor(p), inputPreference: inputPreferenceFor(p), patterns: p.ip ? (d.patterns || null) : null,
         pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}),
         capabilities: { lens: !!d.lensJog?.axes.length, lensJog: d.lensJog, picture: !!d.getPicture, lensRecall: !!d.recallLens } };
@@ -129,7 +161,12 @@ poller = createPoller({
   coordinate: (p, read, options) => telemetry.poll(p.slot, read, options),
   read: (p, options) => p.ip ? driverFor(p).getStatus(options) : null,
   started(p, { identityChanged, at }) {
+    // Temperature history follows the physical target. Correcting a model or lane label keeps it; a new driver or address starts fresh.
+    const target = JSON.stringify([p.driver, p.ip]);
+    if (thermalTargets.has(p.slot) && thermalTargets.get(p.slot) !== target) { thermal.reset(p.slot); thermalReads.delete(p.slot); webDiagnostics.delete(p.slot); }
+    thermalTargets.set(p.slot, target);
     if (identityChanged) {
+      webDiagnostics.delete(p.slot);
       status.set(p.slot, emptyStatus());
       connections.set(p.slot, { state: 'checking', lastSuccessAt: null, lastFailureAt: null, error: null, consecutiveFailures: 0, retryDelayMs: 0 });
     }
@@ -148,6 +185,7 @@ poller = createPoller({
     status.set(p.slot, next);
     if (!prev.online) store.event({ source: 'poll', slot: p.slot, command: 'online', result: 'OK' });
     health?.observe(p.slot, next.power);
+    sampleThermal(p, next);
     broadcastStatus(p);
   },
   failed(p, e, { at, consecutiveFailures, nextRetryAt, retryDelayMs }) {
@@ -158,7 +196,7 @@ poller = createPoller({
 });
 function broadcastStatus(p) {
   const next = status.get(p.slot), d = driverFor(p);
-  broadcast({ type: 'status', slot: p.slot, status: { ...next, connection: connections.get(p.slot) }, displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
+  broadcast({ type: 'status', slot: p.slot, status: { ...next, connection: connections.get(p.slot) }, commandFeedback: feedback?.get(p.slot) || null, thermal: thermalView(p), webDiagnostics: webDiagnostics.get(p.slot) || null, displayInfo: displayInfoFor(p, next), inputPreference: inputPreferenceFor(p), inputs: d.inputs ?? p.inputs, pictureSchema: d.pictureSchema ?? (d.getPicture ? pictureSchema() : {}) });
 }
 function setOffline(slot, why) {
   const prev = status.get(slot);
@@ -167,7 +205,7 @@ function setOffline(slot, why) {
   status.set(slot, next);
   health?.observe(slot, null);
   if (prev.online) store.event({ source: 'poll', slot, command: 'offline', result: why });
-  broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, displayInfo: displayInfoFor(store.projector(slot), next), inputPreference: inputPreferenceFor(store.projector(slot)) });
+  broadcast({ type: 'status', slot, status: { ...next, connection: connections.get(slot) }, thermal: thermalView(store.projector(slot)), displayInfo: displayInfoFor(store.projector(slot), next), inputPreference: inputPreferenceFor(store.projector(slot)) });
 }
 // ---- Health reports (read-only readings; see docs/health-reports.md) ----
 const healthConfig = readHealthConfig(path.join(path.dirname(DATA), 'health-reports.json'));
@@ -178,13 +216,84 @@ health = createHealthReports({
   status: (slot) => status.get(slot),
   connection: (slot) => connections.get(slot),
   events: () => rig.events,
-  readTelemetry: (p, options) => { const d = driverFor(store.projector(p.slot) || p); return d.healthReadings ? telemetry.read(p.slot, d, options) : null; },
+  readTelemetry, // shared with the Thermal watch below, through the coordinated reader
+  recentAir: (p) => thermal.latest(p.slot),
   describeError: (p, e) => connectionError(store.projector(p.slot) || p, e),
   publish: healthConfig.notion.databaseId ? createNotionPublisher({ databaseId: healthConfig.notion.databaseId, token: notionTokenReader({ keychain: !SIM }) }) : null,
   powerOnDelayMs: Number(process.env.PROJCTL_HEALTH_POWER_ON_DELAY_MS || 120000),
 }).start();
 console.log(`[health] reports ${healthConfig.enabled ? 'on' : 'off'}; Notion ${healthConfig.notion.databaseId ? 'database configured' : 'not configured'}${healthConfig.error ? `; ${healthConfig.error}` : ''}`);
 
+// ---- Thermal watch (operator panel; README "Thermal watch") ----
+// Air temperature between health reports: the same read-only driver query, at most once per
+// THERMAL_SAMPLE_MS per projector and only while it is on, warming or cooling. It is never part
+// of the 5-second status poll. Limits and the watch threshold are the health reports' own.
+const THERMAL_SAMPLE_MS = Math.min(600000, Math.max(50, Number(process.env.PROJCTL_THERMAL_SAMPLE_MS) || 60000));
+const THERMAL_READ_TIMEOUT_MS = 8000;
+const thermalLevels = thermalThresholds(healthConfig.watchHeadroomC);
+const thermal = createThermalMonitor({ thresholds: thermalLevels }); // in memory; a restart begins empty
+const webDiagnostics = new Map();
+const thermalTargets = new Map();  // slot -> driver and address behind the history
+const thermalReads = new Map();    // slot -> { at, ok } for the latest finished temperature read
+const thermalAttempts = new Map(); // slot -> when the latest read started
+const limitFor = (p) => ratedAmbientC(p, healthConfig.ratedAmbientC);
+const airSource = (p) => { const d = driverFor(p); return d.healthReadings ? (d.kind === 'pulse' ? 'ambient' : 'intake') : null; };
+// `source` says what the driver can report (intake, ambient or nothing), so the page can tell
+// "no reading yet" from "this driver does not report temperature".
+function thermalView(p) {
+  const read = thermalReads.get(p.slot);
+  return { ...thermal.view(p.slot, limitFor(p)), source: p.ip ? airSource(p) : null, sampleMs: THERMAL_SAMPLE_MS,
+    lastReadAt: read ? new Date(read.at).toISOString() : null, lastReadOk: read ? read.ok : null };
+}
+function recordThermal(p, readings) {
+  if (readings?.webDiagnostics) webDiagnostics.set(p.slot, readings.webDiagnostics);
+  const sensor = readings?.sensors?.find((s) => s.role === 'intake'), c = sensor?.c, at = Date.now(), ok = plausibleAirC(c);
+  thermalReads.set(p.slot, { at, ok });
+  if (ok) {
+    const limitC = limitFor(p), kind = sensor.id === 'ambient' ? 'ambient' : 'intake';
+    const r = thermal.observe(p.slot, { at, c, kind, limitC });
+    if (r?.changed) {
+      const where = typeof p.lane === 'string' && Object.hasOwn(LANES, p.lane) ? `${p.lane} · ${LANES[p.lane].target}` : p.slot;
+      store.event({ source: 'thermal', slot: p.slot, command: `air ${r.level}`, result: r.level === 'ok' ? 'OK' : 'WARN', detail: `${where}: ${kind} air ${c} °C, ${r.headroomC} °C below the ${limitC} °C rated limit` });
+      broadcast({ type: 'event', event: rig.events.at(-1) });
+    }
+  }
+  broadcastStatus(p);
+}
+// One temperature reader per projector for health reports and the Thermal watch. It goes through
+// the coordinated reader, so a read never overlaps that projector's status poll or another read,
+// and every finished read reaches the watch, whoever asked for it.
+function readTelemetry(p, options) {
+  const current = store.projector(p.slot) || p, d = driverFor(current);
+  if (!d.healthReadings) return null;
+  const identity = targetIdentity(current);
+  thermalAttempts.set(current.slot, Date.now());
+  return telemetry.read(current.slot, d, { ...options, onPartial: readings => {
+    if (readings.webDiagnostics && targetIdentity(store.projector(current.slot) || {}) === identity) { webDiagnostics.set(current.slot, readings.webDiagnostics); broadcastStatus(current); }
+    options?.onPartial?.(readings);
+  } }).then(
+    (readings) => { if (targetIdentity(store.projector(current.slot) || {}) !== identity) return readings; try { recordThermal(current, readings); } catch (e) { console.error('[thermal]', e.message); } return readings; },
+    (error) => { thermalReads.set(current.slot, { at: Date.now(), ok: false }); throw error; });
+}
+// Called after each successful status poll; takes a sample only when one is due.
+function sampleThermal(p, st) {
+  if (!p.ip || !(isLit(st.power) || st.power === POWER.COOLING) || busy.has(p.slot) || !airSource(p)) return;
+  if (Date.now() - (thermalAttempts.get(p.slot) ?? -Infinity) < THERMAL_SAMPLE_MS) return;
+  const controller = new AbortController();
+  const deadline = setTimeout(() => controller.abort(Object.assign(new Error('temperature read timed out'), { code: 'POLL_TIMEOUT' })), THERMAL_READ_TIMEOUT_MS);
+  deadline.unref?.();
+  Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal })).catch(() => {}).finally(() => clearTimeout(deadline));
+}
+function thermalReport(minutes, points) {
+  return {
+    at: new Date().toISOString(), windowMinutes: minutes, retentionMinutes: RETENTION_MS / 60000, thresholds: thermalLevels, sampleMs: THERMAL_SAMPLE_MS,
+    projectors: rig.projectors.map((p) => ({ slot: p.slot, lane: p.lane || null, ...thermalView(p), series: thermal.series(p.slot, { windowMs: minutes * 60000, maxPoints: points }) })),
+  };
+}
+
+feedback = createCommandFeedback({ target: slot => store.projector(slot),
+  status: slot => status.get(slot), refresh: slot => poller.refresh(slot),
+  changed: slot => { const p = store.projector(slot); if (p) broadcastStatus(p); } });
 rig.projectors.forEach(poll);
 
 // ---- Discovery (PJLink class 2 search by MAC) ----
@@ -211,6 +320,7 @@ const targetIdentity = (p) => JSON.stringify([p.slot, p.driver, p.ip, p.user, p.
 function commandGuard(slot) {
   return commandBinding.commandGuard(slot, () => ({
     projector: store.projector(slot), status: status.get(slot),
+    connection: connections.get(slot), maxStatusAgeMs: Math.max(15000, POLL_MS * 3),
     lock: rig.lock, lockRevision, busy: busy.has(slot),
   }));
 }
@@ -221,6 +331,8 @@ function fmtArg(a) { return a && typeof a === 'object' ? Object.values(a).join('
 async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   const p = store.projector(slot);
   if (!p) throw httpErr(404, `no projector ${slot}`);
+  const feedbackIdentity = pollIdentity(p);
+  const commandStartedAt = Date.now();
   const check = commandGuard(slot);
   let ownsMovement = false;
   const guard = () => { executionGuard?.(); check(cmd, arg, { allowBusy: ownsMovement }); };
@@ -250,7 +362,10 @@ async function command(slot, cmd, arg, source = 'ui', executionGuard) {
   finally { if (moving) { busy.delete(slot); broadcast({ type: 'busy', slot, busy: null }); } }
   store.event({ source, slot, command: `${cmd} ${resettingInput ? inputPreferenceFor(p).label : fmtArg(arg)}`, result, detail });
   broadcast({ type: 'event', event: rig.events.at(-1) });
+  if (cmd !== 'power' && cmd !== 'shutter') feedback.clear(slot);
   if (cmd === 'lens' || cmd === 'input' || cmd === 'picture') await poller.refresh(slot);
+  else if (cmd === 'power' || cmd === 'shutter') feedback.follow(slot, cmd,
+    cmd === 'power' ? (arg ? 'on' : 'off') : (arg ? 'closed' : 'open'), feedbackIdentity, commandStartedAt);
   else setTimeout(() => poll(p), 400);
   return { result, status: { ...status.get(slot), connection: connections.get(slot) } };
 }
@@ -426,12 +541,20 @@ const PUB = path.join(__dirname, '..', 'public');
 function body(req) { return readJsonBody(req); } // 64 KiB JSON object, 10 s to arrive
 function confirmTokenFor(_name, token) { return typeof token === 'string' && token.length <= 256 ? token : ''; }
 function json(res, code, obj) { res.writeHead(code, { 'content-type': 'application/json', 'access-control-allow-origin': '*' }); res.end(JSON.stringify(obj)); }
+// A read error ends this response instead of surfacing as an uncaught stream error.
+function sendFile(res, file, type) {
+  const stream = fs.createReadStream(file);
+  stream.once('open', () => { res.writeHead(200, { 'content-type': type }); stream.pipe(res); });
+  stream.once('error', () => { if (res.headersSent) res.destroy(); else { res.writeHead(500); res.end('read error'); } });
+}
 
 const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, 'http://x');
   try {
+    let url;
+    try { url = new URL(req.url, 'http://x'); } catch { throw httpErr(400, 'invalid request URL'); }
     res.setHeader('cache-control', 'no-store');
-    if (url.pathname === '/api/health' && req.method === 'GET') return json(res, 200, { ok: true, service: 'projctl', simulation: SIM, uptimeSeconds: Math.floor(process.uptime()) });
+    if (url.pathname === '/api/health' && req.method === 'GET') return json(res, 200, { ok: true, service: 'projctl', simulation: SIM, uptimeSeconds: Math.floor(process.uptime()), release: RELEASE });
+    if (url.pathname.startsWith('/api/') && !browserRequestAllowed(req, proxy)) throw httpErr(403, 'use the controller origin for this request');
     if (req.method === 'OPTIONS') { res.writeHead(204, { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'content-type', 'access-control-allow-methods': 'GET,POST' }); return res.end(); }
     if (url.pathname === '/api/login' && req.method === 'POST') {
       if (!PASSCODE) return json(res, 200, { ok: true, open: true });
@@ -444,13 +567,17 @@ const server = http.createServer(async (req, res) => {
       if (a.length !== b.length || !timingSafeEqual(a, b)) { loginThrottle.fail(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'ERR', detail: `wrong passcode from ${ip}` }); throw httpErr(401, 'wrong passcode'); }
       loginThrottle.succeed(ip); store.event({ source: 'ui', slot: '*', command: 'login', result: 'OK', detail: ip });
       const secure = proxy.isHttps(req) ? '; Secure' : '';
-      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': `pj=${SESSION}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${60 * 60 * 24 * 90}${secure}` }); return res.end(JSON.stringify({ ok: true }));
+      res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': [
+        `pj=${SESSION}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${SESSION_MAX_AGE}${secure}`,
+        `${EMBED_COOKIE}=${SESSION}; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=${SESSION_MAX_AGE}`,
+      ] }); return res.end(JSON.stringify({ ok: true }));
     }
-    if (url.pathname === '/api/logout' && req.method === 'POST') { res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': 'pj=; Path=/; HttpOnly; Max-Age=0' }); return res.end('{"ok":true}'); }
-    if (url.pathname === '/login.html' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css') { /* public assets */ }
+    if (url.pathname === '/api/logout' && req.method === 'POST') { res.writeHead(200, { 'content-type': 'application/json', 'set-cookie': ['pj=; Path=/; HttpOnly; Max-Age=0', `${EMBED_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=0`] }); return res.end('{"ok":true}'); }
+    if (url.pathname === '/login.html' || url.pathname === '/login.js' || url.pathname.startsWith('/avd/') || url.pathname === '/app.css' || url.pathname === '/frozen-theme.js' || url.pathname === '/frozen-theme.css' || url.pathname === '/frozen-favicon.js' || url.pathname === '/frozen-favicon.css' || url.pathname === '/frozen-zone-nav.js' || url.pathname === '/frozen-zone-nav.css' || url.pathname.startsWith('/favicons/')) { /* public assets */ }
     else if (!authed(req)) {
       if (url.pathname.startsWith('/api/')) throw httpErr(401, 'login required');
-      res.writeHead(302, { location: '/login.html' }); return res.end();
+      const next = url.pathname + url.search;
+      res.writeHead(302, { location: next === '/' ? '/login.html' : `/login.html?next=${encodeURIComponent(next)}` }); return res.end();
     }
     if (url.pathname === '/api/state') return json(res, 200, snapshot());
     if (url.pathname === '/api/power-schedules' && req.method === 'GET') return json(res, 200, powerSchedules.view());
@@ -458,7 +585,20 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/power-schedules/enable' && req.method === 'POST') { const { id, enabled } = await body(req); return json(res, 200, powerSchedules.enable(id, enabled)); }
     if (url.pathname === '/api/power-schedules/delete' && req.method === 'POST') { const { id } = await body(req); return json(res, 200, powerSchedules.remove(id)); }
     if (url.pathname === '/api/health-reports' && req.method === 'GET') return json(res, 200, health.view());
+    if (url.pathname === '/api/software-checks' && req.method === 'GET') return json(res, 200, await readSoftwareChecks(path.join(path.dirname(DATA), 'software-checks.json'), path.join(__dirname, '../DELIVERY.json'), RELEASE));
+    if (url.pathname === '/api/crew-links' && req.method === 'GET') return json(res, 200, await readCrewLinks(path.join(path.dirname(DATA), 'crew-links.json')));
+    if (await showRoutes(req, res, url, json)) return; // cue feed, host checks and documents for the role pages (read only)
     if (url.pathname === '/api/health-reports/run' && req.method === 'POST') return json(res, 200, { report: await health.run(), ...health.view() });
+    if (url.pathname === '/api/thermal' && req.method === 'GET') {
+      const minutes = Math.min(RETENTION_MS / 60000, Math.max(1, Number(url.searchParams.get('minutes')) || 30));
+      const points = Math.min(600, Math.max(20, Number(url.searchParams.get('points')) || 180));
+      return json(res, 200, thermalReport(minutes, points));
+    }
+    if (url.pathname === '/api/thermal.csv' && req.method === 'GET') {
+      const meta = (slot) => { const p = store.projector(slot); return p ? { lane: p.lane || '', model: p.model || p.label || '', limitC: limitFor(p) } : {}; };
+      res.writeHead(200, { 'content-type': 'text/csv; charset=utf-8', 'content-disposition': 'attachment; filename="projctl-air-temperature.csv"' });
+      return res.end(thermalCsv(thermal.rows(), meta));
+    }
 
     if (url.pathname === '/api/display-info' && req.method === 'GET') {
       const p = store.projector(url.searchParams.get('slot'));
@@ -511,32 +651,52 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/discover' && req.method === 'POST') return json(res, 200, await discover('ui'));
     if (url.pathname === '/api/sim' && req.method === 'POST' && SIM) { // test hook: toggle offline or set an out-of-position reported lens readback
-      const { slot, offline, lens } = await body(req); const d = driverFor(store.projector(slot)); if (offline !== undefined) d._state.flaky = !!offline; if (lens) Object.assign(d._state.lens, lens); if (lens?._pollFocus != null) d._state.pollFocus = lens._pollFocus; return json(res, 200, { ok: true });
+      const { slot, offline, lens, temps } = await body(req); const d = driverFor(store.projector(slot)); if (offline !== undefined) d._state.flaky = !!offline; if (temps && typeof temps === 'object') d._state.temps = { intake: 24, qtm1: 36, qtm2: 31, ...d._state.temps, ...temps }; if (lens) Object.assign(d._state.lens, lens); if (lens?._pollFocus != null) d._state.pollFocus = lens._pollFocus; return json(res, 200, { ok: true });
     }
     // static
     if (url.pathname.startsWith('/ProjectorThrow/')) {
       const asset = throwlineAsset(url.pathname);
       if (!asset) { res.writeHead(404); return res.end('not found'); }
-      res.writeHead(200, { 'content-type': 'application/javascript' });
-      return fs.createReadStream(asset).pipe(res);
+      return sendFile(res, asset, 'application/javascript');
     }
     let filePath = url.pathname === '/' ? '/index.html' : url.pathname;
-    const fp = path.join(PUB, path.normalize(filePath));
+    let fp = path.join(PUB, path.normalize(filePath));
     if (!fp.startsWith(PUB) || !fs.existsSync(fp)) { res.writeHead(404); return res.end('not found'); }
+    // A folder serves its index.html (the Frozen Monitor lives at /monitor/). Reading a folder as a
+    // file used to throw outside this handler and stop the relay.
+    if (fs.statSync(fp).isDirectory()) {
+      const folder = '/' + path.relative(PUB, fp).split(path.sep).filter(Boolean).map(encodeURIComponent).join('/');
+      if (!url.pathname.endsWith('/')) { res.writeHead(301, { location: (folder === '/' ? '' : folder) + '/' }); return res.end(); }
+      fp = path.join(fp, 'index.html');
+      if (!fs.existsSync(fp) || !fs.statSync(fp).isFile()) { res.writeHead(404); return res.end('not found'); }
+    }
+    if (path.extname(fp) === '.html') res.setHeader('content-security-policy', FRAME_ANCESTORS);
     if (fp === path.join(PUB, 'index.html')) {
       const html = withThrowlineImports(fs.readFileSync(fp, 'utf8'));
       res.writeHead(200, { 'content-type': MIME['.html'] });
       return res.end(html);
     }
-    res.writeHead(200, { 'content-type': MIME[path.extname(fp)] || 'application/octet-stream' });
-    fs.createReadStream(fp).pipe(res);
+    sendFile(res, fp, MIME[path.extname(fp)] || 'application/octet-stream');
   } catch (e) { if (e.closeConnection) res.setHeader('connection', 'close'); json(res, e.status || 500, { error: e.message }); }
 });
 applyServerLimits(server);
 
 // Browsers never send messages on this socket; keep any inbound frame small.
 const wss = new WebSocketServer({ noServer: true, maxPayload: 64 * 1024 });
-server.on('upgrade', (req, sock, head) => { if (new URL(req.url, 'http://x').pathname !== '/ws' || !authed(req)) { sock.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); return sock.destroy(); } wss.handleUpgrade(req, sock, head, (ws) => wss.emit('connection', ws, req)); });
-wss.on('connection', (ws) => { clients.add(ws); ws.send(JSON.stringify(snapshot())); ws.on('close', () => clients.delete(ws)); });
+server.on('upgrade', (req, sock, head) => {
+  const reject = (code, reason) => sock.end(`HTTP/1.1 ${code} ${reason}\r\nConnection: close\r\nContent-Length: 0\r\n\r\n`);
+  sock.on('error', () => sock.destroy());
+  let url;
+  try { url = new URL(req.url, 'http://x'); } catch { return reject(400, 'Bad Request'); }
+  if (url.pathname !== '/ws' || !authed(req)) return reject(401, 'Unauthorized');
+  if (!browserRequestAllowed(req, proxy)) return reject(403, 'Forbidden');
+  wss.handleUpgrade(req, sock, head, (ws) => wss.emit('connection', ws, req));
+});
+wss.on('connection', (ws) => {
+  ws.on('error', () => ws.terminate());
+  ws.on('close', () => clients.delete(ws));
+  clients.add(ws);
+  sendSnapshotMessage(ws, JSON.stringify(snapshot()));
+});
 
 server.listen(PORT, () => console.log(`[projctl] ${SIM ? 'SIMULATOR ' : ''}http://0.0.0.0:${server.address().port}  rig=${DATA}  login=${PASSCODE ? 'passcode' : 'open (LAN only)'}`));

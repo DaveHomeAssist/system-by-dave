@@ -2,7 +2,9 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-const source = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8').split('let currentTasks = []')[0].replace(/^import [^\n]*\n/, '');
+import {adaptPage} from './hosting/scripts/apply-navigation.mjs';
+const workspaceHtml=()=>adaptPage('/',readFileSync(new URL('./index.html',import.meta.url),'utf8'));
+const source = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8').split('const taskCacheKey =')[0].replace(/^import [^\n]*\n/, '');
 function boot({ failStorage = false, initial = '' } = {}) {
   const elements = Object.fromEntries(['#notes', '#save-status', '#theme', '#export'].map(id => [id, { value: '', listeners: {}, addEventListener(event, fn) { this.listeners[event] = fn; }, setAttribute(name, value) { this[name] = value; } }]));
   const saved = new Map([['wst.frozen.personal-notes.v1', initial]]), links = [], listeners = {};
@@ -29,7 +31,7 @@ test('storage failure retains editor contents, explains recovery, and allows exp
   assert.equal(app.elements['#notes'].value, 'Unsaved note');
 });
 test('snow splash stays same-origin and keeps the home routes', () => {
-  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const html = workspaceHtml();
   const splash = readFileSync(new URL('./snow-splash.js', import.meta.url), 'utf8');
   assert.match(html, /script-src 'self'/);
   assert.match(html, /style-src 'self'/);
@@ -39,8 +41,12 @@ test('snow splash stays same-origin and keeps the home routes', () => {
   assert.match(html, /id="home-title"/);
   assert.match(html, /id="snow"[^>]*aria-hidden="true"/);
   for (const route of ['notes', 'rig', 'stage', 'throw', 'schedule', 'pixels']) assert.match(html, new RegExp('data-route="' + route + '"'));
-  assert.match(html, /href="http:\/\/localhost:8080\/"/);
-  assert.doesNotMatch(html, /id="relay-frame"/);
+  assert.match(html, /id="open-controller"[^>]*href="http:\/\/localhost:8080\/"/);
+  assert.match(html, /id="connect-mac"/);
+  assert.match(html, /id="relay-frame"[^>]*hidden/);
+  assert.match(html, /connect-src [^;]*http:\/\/localhost:8080/);
+  assert.match(html, /frame-src [^;]*http:\/\/localhost:8080/);
+  assert.doesNotMatch(html, /<iframe[^>]*src="http/);
   assert.match(html, /id="documents-panel"/);
   assert.match(html, /id="nav-more"/);
   assert.match(html, /id="schedule-panel"/);
@@ -51,8 +57,54 @@ test('snow splash stays same-origin and keeps the home routes', () => {
   assert.doesNotMatch(splash, /https?:\/\//);
   assert.match(readFileSync(new URL('./vendor/gsap.min.js', import.meta.url), 'utf8'), /3\.15\.0/);
 });
-test('theme preference toggles without touching personal notes', () => {
-  const app = boot({ initial: 'Keep me' }); app.elements['#theme'].listeners.click();
+test('Home has six public choices and every page uses the canonical navigation', () => {
+  const html=workspaceHtml();
+  const home=html.slice(html.indexOf('<div class="home-choices">'),html.indexOf('</div>',html.indexOf('<div class="home-choices">')));
+  const choices=[...home.matchAll(/<(?:button|a)\b[^>]*>/g)].map(match=>match[0]).filter(tag=>!tag.includes('hidden'));
+  assert.equal(choices.length,6);
+  assert.match(home, /href="\/run-review\/"/);
+  assert.match(home, /data-opening-at="2026-11-25T19:00:00-05:00"/);
+  assert.match(html, /class="wst-nav" aria-label="Workspace"/);
+  assert.doesNotMatch(html, /class="show-pages"|class="planning-views"|class="workspace-navigation"/);
+  for(const route of ['home','handoff','schedule','review','rig','stage','pixels','notes','updates','documents','scenic','throw'])assert.match(html,new RegExp('data-nav-key="'+route+'"'));
+  assert.doesNotMatch(html, /\sstyle="/);
+});
+
+test('shared theme events update the workspace without touching personal notes', () => {
+  const app = boot({ initial: 'Keep me' }); app.listeners['frozen:themechange']({detail:{theme:'dark'}});
   assert.equal(app.context.document.documentElement.dataset.theme, 'dark');
   assert.equal(app.saved.get('wst.frozen.personal-notes.v1'), 'Keep me');
+});
+
+test('task editing keeps the crew passcode in session storage and reading stays public', () => {
+  const html = workspaceHtml();
+  const app = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8');
+  assert.match(html, /id="unlock-task-editing"/);
+  assert.match(app, /sessionStorage\.setItem\(TASK_PASSCODE_KEY/);
+  assert.match(app, /'X-Frozen-Task-Passcode':passcode/);
+  assert.doesNotMatch(app, /localStorage\.(?:getItem|setItem)\(TASK_PASSCODE_KEY/);
+  assert.match(app, /if \(data && \(response\.status === 401 \|\| response\.status === 403\)\)/);
+  assert.match(app, /Editing is locked\./);
+});
+
+test('public controller entries start hidden and robots disallows crawling', () => {
+  const html = workspaceHtml();
+  const app = readFileSync(new URL('./workspace.js', import.meta.url), 'utf8');
+  assert.match(html, /<details id="nav-more" class="wst-operator-nav" data-controller-only hidden>/);
+  for(const route of ['presets','log','configuration'])assert.match(html,new RegExp('data-route="'+route+'"'));
+  assert.match(app, /cfg\.control\?\.verified&&cfg\.control\.url/);
+  assert.equal(readFileSync(new URL('./robots.txt', import.meta.url), 'utf8'), 'User-agent: *\nDisallow: /\n');
+});
+
+// The local controller serves the raw shell; the hosted build adds shared assets.
+test('offline install caches the assets served by each shell without requiring missing local files',async()=>{
+ const script=readFileSync(new URL('./workspace-offline.js',import.meta.url),'utf8');
+ for(const hosted of [false,true]){
+  const cached=[],listeners={};let installed=false;
+  vm.runInNewContext(script,{URL,caches:{open:async()=>({addAll:async names=>cached.push(...names),match:async()=>({text:async()=>hosted?'<header data-wst-header>':'<header>'})})},self:{location:{href:'https://example.test/workspace/workspace-offline.js'},addEventListener:(name,fn)=>listeners[name]=fn,skipWaiting:()=>{installed=true;}}});
+  let pending;listeners.install({waitUntil:promise=>{pending=promise;}});await pending;
+  assert(installed);assert(cached.includes('index.html'));
+  assert.equal(cached.includes('workspace-navigation.js'),hosted);
+  assert.equal(cached.includes('opening-night.js'),hosted);
+ }
 });

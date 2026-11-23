@@ -1,6 +1,6 @@
 import { createHmac, randomBytes } from 'node:crypto';
 
-export function createCommandBinding() {
+export function createCommandBinding({ now = Date.now } = {}) {
   const secret = randomBytes(32);
   const revision = projector => createHmac('sha256', secret).update(JSON.stringify([
     projector.slot, projector.driver, projector.ip, projector.mac, projector.model,
@@ -38,6 +38,12 @@ export function createCommandBinding() {
       if (revision(current.projector) !== expected) reject('Projector configuration changed. Review the target again.');
       if (!current.status?.online) reject(`${slot} is offline`);
       const stop = cmd === 'lens' && arg?.op === 'stop';
+      if (!stop && !(cmd === 'shutter' && arg) && current.connection) {
+        const age = now() - new Date(current.connection.lastSuccessAt || NaN).getTime();
+        if (current.connection.state !== 'online' || !Number.isFinite(age) || age < -1000 || age > (current.maxStatusAgeMs || 15000)) {
+          reject(`${slot}: no fresh projector reply. Wait for reconnection.`);
+        }
+      }
       const protectedCommand = cmd === 'power' && !arg || ['input', 'resetInput', 'pattern', 'picture'].includes(cmd) || cmd === 'lens' && !stop;
       if (protectedCommand && current.lock) reject('show lock is on', 423);
       if (protectedCommand && current.lockRevision !== lockAtCapture) reject('Show lock changed. Review the command again.', 423);

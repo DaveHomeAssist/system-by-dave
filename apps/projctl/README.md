@@ -33,6 +33,42 @@ before wider exposure; the optional app login is absent when it is unset.
 
 Spec: Frozen at WST | Projector Control App Spec.
 
+## Quiet Watch 2
+
+The source release is `Quiet Watch 2` (`2026.11.15.2`). Connection details shows the
+interface and relay versions separately, plus the configured polling interval.
+A successful command means accepted, not physically verified. Cached power reads
+as Unknown with its last reported value; missing pattern and alarm data stays Not
+reported. Read [the hardening brief](docs/quiet-watch.md) for scope and acceptance.
+
+After power or shutter commands, the relay makes bounded follow-up reads until
+the requested state is reported. Shutters are checked every second for up to
+30 seconds; power every five seconds for up to seven minutes. The first check
+starts after 0.4 seconds. These checks never repeat the control command. They
+stop on confirmation, target changes, a newer control command, or
+controller shutdown, then normal background polling continues. A timeout leaves
+the actual reported state intact; it does not turn an acknowledgement into success.
+
+Appearance offers Light, Dark and System across the controller, login, Monitor
+and Frozen workspace. A new browser starts light. Explicit choices win over the
+OS; System tracks OS changes. The shared `frozen.theme.v1` preference persists on
+the same origin and updates other open tabs. Existing preferences migrate without
+changing notes. Embedded views inherit the parent appearance for that view;
+separate website/controller origins do not silently sync their saved choices.
+Blocked browser storage permits a temporary choice and explains the limitation.
+
+Before transferring a source update, run `node scripts/verify-update.js` with the
+package directory. It checks every recorded digest and rejects missing, changed,
+unlisted and unsafe entries. The checksum inventory proves integrity, not a
+publisher signature. Live settings and dependencies are separate from that package.
+
+## Frozen Monitor
+
+`http://<relay-ip>:8080/monitor/` opens the six-page Frozen Monitor: live A–D state, the
+command log, cues, rig, network, notes and the calendar. It reads the relay and sends only
+Stop lens. The controller's header Monitor button and the Frozen Monitor choice on Home open it
+in a new tab. See [the Frozen Monitor](docs/frozen-monitor.md).
+
 ## Run
 
     npm install
@@ -50,7 +86,7 @@ Env overrides: PORT, OSC_PORT, TCP_PORT, POLL_MS, RIG.
 2. Rig tab: the tile goes live within 10 s once the relay can reach the projector.
 3. Set the rig how you want it, Presets tab, name it, Save current rig.
 
-With DHCP the relay re-finds projectors by MAC every 60 s using PJLink class 2 search. The Find projectors button does it on demand.
+The relay retries saved addresses. Find projectors runs an explicit PJLink Class 2 search; background recovery does not rewrite addresses.
 
 ## Power off and Show Lock
 
@@ -79,6 +115,41 @@ lens move was already attempted, its protective stop can still run after a later
 step is cancelled. A command acknowledgement continues to require separate state
 feedback and physical acceptance.
 
+## Thermal watch
+
+The Thermal watch tab shows air temperature at each lane (A to D) against that projector's rated maximum
+ambient, with headroom, peak, a 30 minute trend, and the tightest unit (least headroom) outlined. Cards are
+keyed by lane, not slot number, because slot numbers have been renumbered between rig records. Outside the
+tab, heat shows only for a current Watch or Hot reading: a chip on that projector's card and a header pill
+that opens Thermal watch ([details controls](docs/details-controls.md)).
+
+- **Readings.** The watch uses the [health reports](docs/health-reports.md)' read-only driver query:
+  Panasonic intake air (`QTM:0`) and the Barco's outside-ambient sensor. PJLink-only projectors report
+  no temperature, and the card says so. The relay takes one sample per projector about once a minute
+  (`PROJCTL_THERMAL_SAMPLE_MS`, default 60000) and only while the unit is on, warming or cooling. It is
+  never part of the 5-second status poll. Status polls, health reports and the watch share one queue per
+  projector (`server/telemetry-reader.js`), so they never query a projector at the same time, and a
+  report's own reading also reaches the watch.
+- **Limits.** The health reports' limits, so the panel and the reports cannot disagree: Barco UDM 4K22
+  40 C, PT-RZ970 45 C, PT-DW830 series 45 C, with per-slot overrides in the private `health-reports.json`
+  beside the rig (`"ratedAmbientC": { "P3": 40, "P4": 40 }` for units hung in portrait). A unit whose
+  model is not recognised shows its temperature with no level.
+- **Levels.** Watch is the health reports' `watchHeadroomC` (default: within 5 C of the limit). Hot is
+  within 2 C, or half the watch margin if that is smaller, with 1 C of hysteresis before a level clears.
+  Hot and the hysteresis exist only in the watch (`server/thermal.js`) and are a proposal, not a Barco or
+  Panasonic specification. A reading outside -20 to 120 C is treated as no reading.
+- **Freshness.** A value is current while the projector is replying and its latest sample is no older
+  than three sampling intervals. Otherwise the card keeps the last sample, marked Last known, with its age.
+- **Log and history.** A change of level is written to the Log tab once (source `thermal`, result `WARN`;
+  recovery is `OK`), so it also appears in the next health report's event list. Eight hours of samples are
+  kept in memory and are lost when the relay restarts; they also reset when a slot's driver or address
+  changes. `GET /api/thermal?minutes=30&points=180` returns the series and `GET /api/thermal.csv` downloads
+  the retained samples. Export the CSV after each show: two shows in a day can span more than eight hours.
+
+This is advisory display only. It sends no command and does not replace the projector's own alarms.
+Checked against the simulator and loopback protocol stand-ins; the readings on the installed projectors
+are part of the health reports' open venue acceptance.
+
 ## Cues from Millumin or QLab
 
 Send OSC to UDP 9000, or a text line to TCP 9001. Same addresses either way:
@@ -101,6 +172,8 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
     server/store.js        data/rig.json read and write
     server/osc.js          OSC and TCP line parsing
     server/drivers/        base.js (interface), pjlink.js, panasonic.js, pulse.js, simulator.js
+    server/thermal.js      levels, in-memory history, CSV
+    public/thermal-watch.js  Thermal watch tab
     public/                index.html, app.css, app.js
 
 ## Status of drivers
@@ -108,12 +181,14 @@ tile states to check execution. Malformed OSC datagrams are ignored; OSC bundles
 - pjlink: complete for power, shutter, input, status, light hours (where the projector answers LAMP).
 - simulator: complete.
 - pulse (Barco): core state, power, shutter, internal patterns, discovered inputs, bounded lens targets and supported picture ranges use the Pulse API. Optional alarm telemetry remains unknown, rather than implying a clear alarm panel.
-- panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls.
+- panasonic: PJLink handles power/shutter/input; native port 1024 handles supported patterns, lens and picture controls. When another controller holds a projector's PJLink link, power and shutter fall back to the control port ([brief](docs/panasonic-control-port.md)).
 
-PJLink keeps one status connection open per projector between polls. Every poll
-still reads the complete status, including lamp hours and the projector name.
+PJLink keeps one status connection open per projector between polls. Each poll
+reads power first. Off, cooling and warming states return immediately with
+shutter, input and other unavailable details cleared. Powered-on polls also
+read shutter, input, alarms, lamp hours and the projector name.
 Control commands run after an in-flight poll, close its connection, and use a
-separate connection. Closed status sessions are recovered without replaying a
+separate connection. Closed or reset status sessions are recovered without replaying a
 control command. Replacing a configured driver releases its held connection.
 Panasonic native replies validate an echoed command name and reject a mismatch
 promptly so the next operation can proceed.
@@ -162,6 +237,9 @@ Picture controls come from writable `image` metadata and use its actual ranges a
 Lens taps use bounded encoder targets: Slow 128, Normal 512 and Fast 2048, limited to device
 travel. Slow is the default. The relay waits for stopped feedback, blocks overlapping
 movement, and refreshes position before replying. Stop lens remains available under Show Lock.
+Stop lens opens its own connection to each of the four axes at once, so it does not wait behind
+a status read, and one axis that fails does not leave the others moving. If any axis does not
+acknowledge, the command reports how many.
 An acknowledged request still needs the expected physical result checked on the actual rig.
 
 Shift button labels describe image movement from the audience's view. Setup can reverse
@@ -204,6 +282,7 @@ lifecycle and drawing coexistence using synthetic geometry.
 
 To prepare a synchronized update from a clean source checkout, run
 `node scripts/package-update.js /path/to/new-output /path/to/private-venue`.
+Commit the reviewed source and generated assets first; packaging refuses uncommitted changes.
 Omit the last argument for a code-only update. The resulting directory has a
 source commit/model version manifest and file checksums, without a saved rig.
 For the managed Mac service, run `node deploy/install-service.js` followed by

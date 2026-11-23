@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readVenue, readVenueAsset } from '../server/venue-model.js';
+import { RELEASE } from '../public/release.js';
+import { verifyUpdate } from './verify-update.js';
 
 const app = fileURLToPath(new URL('../', import.meta.url));
 const output = process.argv[2] && path.resolve(process.argv[2]);
@@ -17,8 +19,14 @@ if (venueRoot) {
   for (const role of Object.keys(venue.assets)) await readVenueAsset(venueRoot, role);
 }
 const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: app, encoding: 'utf8' }).trim();
-await fs.mkdir(output); // Deliberately refuse an existing output directory.
+function requireCommittedSource() {
+  const changes = execFileSync('git', ['status', '--porcelain', '--untracked-files=normal'], { cwd: app, encoding: 'utf8' });
+  if (changes.trim()) throw new Error('Commit the reviewed source and generated assets before packaging an update.');
+}
+requireCommittedSource();
 execFileSync(process.execPath, [path.join(app, 'scripts/bundle-throwline.js')], { cwd: app, stdio: 'inherit' });
+requireCommittedSource();
+await fs.mkdir(output); // Deliberately refuse an existing output directory.
 for (const name of ['server', 'public', 'runtime', 'scripts', 'docs', 'deploy', 'package.json', 'package-lock.json', 'README.md']) {
   await fs.cp(path.join(app, name), path.join(output, name), { recursive: true });
 }
@@ -34,6 +42,7 @@ async function checksum(dir, prefix = '') {
   }
 }
 await checksum(output);
-await fs.writeFile(path.join(output, 'DELIVERY.json'), JSON.stringify({ version: 1, sourceCommit,
+await fs.writeFile(path.join(output, 'DELIVERY.json'), JSON.stringify({ version: 1, sourceCommit, release: RELEASE,
   builtAt: new Date().toISOString(), modelVersion: venue?.modelVersion || null, files }, null, 2) + '\n');
+await verifyUpdate(output);
 console.log(`Update package: ${output}. Saved rig and stage plot intentionally excluded.`);

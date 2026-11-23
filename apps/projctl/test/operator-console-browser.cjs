@@ -9,6 +9,18 @@ const path = require('node:path');
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
   const errors = [];
   try {
+    const protectedRelay = await startRelay({ PROJCTL_PASSWORD: 'letters-and-123' });
+    try {
+      const login = await browser.newPage({ viewport: { width: 375, height: 812 }, isMobile: true });
+      await login.goto(protectedRelay.base);
+      assert.equal(await login.locator('#code').getAttribute('inputmode'), 'text');
+      assert.equal(await login.locator('#code').getAttribute('autocapitalize'), 'none');
+      await login.locator('#code').fill('letters-and-123');
+      await login.getByRole('button', { name: 'Sign in' }).click();
+      await login.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
+      assert.equal(await login.evaluate(async () => (await fetch('/api/state')).status), 200);
+      await login.close();
+    } finally { await protectedRelay.close(); }
     for (const [i,slot] of ['P1','P2','P3','P4'].entries()) {
       await relay.api('projector', { slot, model: ['PT-DW830U','PT-RZ970','Barco UDM 4K22','PT-DW830U'][i], lane: 'ABCD'[i], inputs: { '31': 'DVI-D', '32': 'HDMI' } });
     }
@@ -58,6 +70,7 @@ const path = require('node:path');
     await relay.api('lock', { lock: true });
     await until(() => page.locator('#grid [data-lane=B] [data-action=pattern]').first().isDisabled());
     assert.equal(await page.locator('#grid [data-lane=B] [data-action=shutter]').first().isDisabled(), false);
+    assert.match(await page.locator('#grid [data-lane=B] .operator-power').innerText(), /Power off unavailable: Show Lock is on/);
     await relay.api('lock', { lock: false });
     await until(async () => !await page.locator('#grid [data-lane=B] [data-action=pattern]').first().isDisabled());
     await card.locator('[data-open-projector]').click();
@@ -66,6 +79,8 @@ const path = require('node:path');
     assert.equal(await page.locator('#tab-projector').isVisible(), false);
     const evidence = process.env.EVIDENCE_DIR || '/tmp/projctl-operator-evidence';
     fs.mkdirSync(evidence, { recursive: true });
+    await relay.api('lock', { lock: true });
+    await until(() => page.locator('#grid [data-lane=B] [data-action=power][data-value="0"]').isDisabled());
     for (const [width,height] of [[1440,900],[1280,900],[1024,768],[681,900],[930,1574],[680,900],[375,812],[844,390],[3840,1080]]) {
       await page.setViewportSize({ width, height });
       const singleProjector = width <= 680 || (width < 1280 && height < 700);
@@ -95,6 +110,8 @@ const path = require('node:path');
         await page.screenshot({ animations: 'disabled', path: path.join(evidence, `operator-${width}-${height}-${theme}.png`) });
       }
     }
+    await relay.api('lock', { lock: false });
+    await until(async () => !await page.locator('#grid [data-lane=B] [data-action=power][data-value="0"]').isDisabled());
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.locator('#workspace-menu').click();
     await page.locator('[data-tab=health]').focus();

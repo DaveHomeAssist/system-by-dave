@@ -1,15 +1,15 @@
 {
   "id": "house-reference",
   "engineeringDailyPublication": {
-    "date": "2026-11-13",
-    "edition": 37,
-    "title": "RTP repair before playout",
+    "date": "2026-11-15",
+    "edition": 39,
+    "title": "When audio delay follows video",
     "state": "Verified publication input; exact CI, merge and deployment evidence belongs to the provider records for this revision",
-    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=37&month=2026-11",
+    "route": "https://systembydave.com/demos/engineering-daily/#view=calendar&edition=39&month=2026-11",
     "evidence": "demos/engineering-daily/release.json",
-    "verification": "Dominic verified all 37 editions and their story cards. Candidate, CI, deployment and live checks are required.",
+    "verification": "Dominic verified all 39 editions and matching story cards.",
     "next": "Require exact-head CI, Pages deployment and matching live manifest/assets/browser journeys before publication completion; continue the same gates for future daily releases.",
-    "boundaries": "November 9–12 backfilled. The previous 32 records and 64 assets were preserved without renumbering."
+    "boundaries": "All 38 prior editions and 76 assets preserved. No backfills or renumbering."
   },
   "engineeringDailyUx": {
     "date": "2026-10-28",

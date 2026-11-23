@@ -18,7 +18,7 @@ const fs = require('node:fs');
     await page.routeWebSocket('**/ws', ws => { sockets.push(ws); ws.send(JSON.stringify(snapshot)); });
     await page.goto(relay.base);
     await page.locator('#conn-word').filter({ hasText: 'Relay connected' }).waitFor();
-    assert.match(await page.locator('#relay-mode').innerText(), /DEMO/);
+    assert.equal(await page.locator('#relay-mode').innerText(), 'PRACTICE MODE');
     await selectView(page,'setup');
     const label = page.locator('.pj-setup[data-slot="P2"] [data-k="label"]');
     await label.fill('Keep unsaved edit');

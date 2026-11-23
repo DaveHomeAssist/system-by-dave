@@ -1,0 +1,8 @@
+SAMPLE CUE NOTES (invented, for the simulator)
+
+Cue 999    Test picture on every lane. Used by the MIDI test.
+Cue 999.5  Clear the test picture.
+
+Cue 1      House open look
+Cue 12     Storm
+Cue 40     Interval
