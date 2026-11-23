@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>AV by Dave | Live event video, projection and show tools</title>
+<meta name="description" content="Bring in an operator who can step into the room and move the show forward. Live event AV support, projection planning, show systems and the browser tools Dave runs a show with.">
+<!-- Published as the avbydave.com home page; this source path is its noindex alias (scripts/domain-sites.json). -->
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="https://avbydave.com/">
+<meta name="theme-color" content="#0f0f0e" id="themeColor">
+<meta name="color-scheme" content="dark light">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AV by Dave">
+<meta property="og:title" content="AV by Dave | Live event video, projection and show tools">
+<meta property="og:description" content="Live event AV support, projection planning, show systems and practical handoff for production teams, plus the browser tools Dave runs a show with.">
+<meta property="og:url" content="https://avbydave.com/">
+<meta property="og:image" content="https://avbydave.com/img/av-by-dave-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AV by Dave: free AV tools for live-show crews">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AV by Dave | Live event video, projection and show tools">
+<meta name="twitter:description" content="Live event AV support, projection planning, show systems and practical handoff for production teams, plus the browser tools Dave runs a show with.">
+<meta name="twitter:image" content="https://avbydave.com/img/av-by-dave-og.png">
+<link rel="icon" href="../av-home/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../css/avd/tokens.css">
+<link rel="stylesheet" href="../css/avd/bundle.css">
+<link rel="stylesheet" href="../av-home/home.css">
+<script src="../av-home/home.js"></script>
+</head>
+<body>
+<a class="hp-skip" href="#main">Skip to the homepage content</a>
+<svg class="hp-sprite" aria-hidden="true" focusable="false" width="0" height="0">
+<symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A7.75 7.75 0 1 1 9.5 4.5a6.25 6.25 0 0 0 10 10z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.75v2M12 19.25v2M2.75 12h2M19.25 12h2M5.45 5.45l1.4 1.4M17.15 17.15l1.4 1.4M5.45 18.55l1.4-1.4M17.15 6.85l1.4-1.4"/></symbol>
+<symbol id="i-monitor-auto" viewBox="0 0 24 24"><rect x="2.75" y="4.75" width="18.5" height="12.5" rx="1.5"/><path d="M8 20.25h8M12 17.25v3M12 4.75v12.5"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><rect x="2.75" y="6.75" width="12.5" height="10.5" rx="1.5"/><path d="M15.25 10.5l6-3.5v10l-6-3.5"/></symbol>
+<symbol id="i-audio" viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></symbol>
+<symbol id="i-signal" viewBox="0 0 24 24"><circle cx="4.5" cy="6" r="1.75"/><circle cx="4.5" cy="18" r="1.75"/><circle cx="19.5" cy="12" r="1.75"/><rect x="9.75" y="9.25" width="4.5" height="5.5" rx="1"/><path d="M6.25 6c2 0 1.5 5 3.5 5M6.25 18c2 0 1.5-5 3.5-5M14.25 12h3.5"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.25"/><path d="M12 7.5V12l3 2"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M6.75 2.75h7l4.5 4.5v14H6.75z"/><path d="M13.75 2.75v4.5h4.5M9.5 12.5h5M9.5 16h5"/></symbol>
+<symbol id="i-case" viewBox="0 0 24 24"><rect x="2.75" y="6.75" width="18.5" height="13.5" rx="1"/><path d="M9 6.75v-2h6v2M2.75 11.25h18.5M7 11.25v2M17 11.25v2"/></symbol>
+<symbol id="i-network" viewBox="0 0 24 24"><rect x="9.25" y="2.75" width="5.5" height="4.5" rx="1"/><rect x="2.75" y="16.75" width="5.5" height="4.5" rx="1"/><rect x="15.75" y="16.75" width="5.5" height="4.5" rx="1"/><path d="M12 7.25V12M5.5 16.75V12h13v4.75"/></symbol>
+<symbol id="i-light" viewBox="0 0 24 24"><path d="M3.75 7.75h9.5v7.5h-9.5zM13.25 9l5.5-2.5v11l-5.5-2.5"/><path d="M8.5 15.25v5M5 20.25h7M6.5 4.75v3M10.5 4.75v3"/></symbol>
+<symbol id="i-projector" viewBox="0 0 24 24"><rect x="2.75" y="8.25" width="18.5" height="9" rx="1.5"/><circle cx="15.5" cy="12.75" r="2.5"/><path d="M6 12.75h4M5.5 17.25v2M18.5 17.25v2"/></symbol>
+</svg>
+<div class="avd-shell hp-shell">
+<header class="avd-site-header">
+<a class="avd-site-header__brand" href="./" aria-label="AV by Dave home" aria-current="page"><svg class="avd-wordmark" viewBox="-2 -2 326.19 52" width="176" height="28" role="img" aria-label="AV by Dave"><title>AV by Dave</title><path class="avd-wm-tape" d="M0.0 0.0 4.19 5.76 0.80 12.96 5.0 19.68 1.60 26.39 4.59 33.59 0.40 40.31 3.59 48.0H102.42L98.02 41.27L101.82 34.56L97.42 27.36L101.22 20.63L98.42 13.92L102.02 7.19L99.02 0.0Z"/><path class="avd-wm-av" d="M19.20 36.0 31.02 11.93H38.96L50.79 36.0H43.06L41.24 32.15H28.36L26.54 36.0ZM64.05 36.0 52.47 11.93H60.37L65.62 23.65Q65.97 24.31 66.36 25.31Q66.74 26.30 67.16 27.32Q67.58 28.33 67.86 29.14H68.10Q68.38 28.40 68.75 27.42Q69.12 26.44 69.54 25.45Q69.96 24.45 70.31 23.65L75.63 11.93H83.22L71.60 36.0ZM30.74 26.93H38.86L36.69 22.04Q36.55 21.72 36.30 21.11Q36.06 20.50 35.78 19.81Q35.50 19.13 35.29 18.55Q35.08 17.98 34.94 17.70H34.69Q34.45 18.33 34.10 19.17Q33.75 20.01 33.45 20.78Q33.15 21.55 32.91 22.04Z"/><path class="avd-wm-by" d="M116.82 36.0V11.93H136.59Q138.54 11.93 140.12 12.68Q141.69 13.43 142.62 14.76Q143.55 16.09 143.55 17.87Q143.55 19.45 142.99 20.57Q142.43 21.69 141.47 22.39Q140.50 23.09 139.35 23.44V23.58Q140.71 23.86 141.80 24.57Q142.88 25.29 143.51 26.51Q144.14 27.74 144.14 29.49Q144.14 31.55 143.14 33.00Q142.15 34.46 140.47 35.23Q138.79 36.0 136.69 36.0ZM195.75 36.0V11.93H209.18Q213.62 11.93 216.84 13.32Q220.06 14.72 221.77 17.42Q223.49 20.11 223.49 23.96Q223.49 27.84 221.77 30.52Q220.06 33.20 216.84 34.60Q213.62 36.0 209.18 36.0ZM296.85 36.0V11.93H321.90V17.21H303.99V21.27H319.66V26.37H303.99V30.71H322.18V36.0ZM227.34 36.0 239.16 11.93H247.10L258.93 36.0H251.20L249.38 32.15H236.50L234.68 36.0ZM272.89 36.0 261.31 11.93H269.21L274.46 23.65Q274.81 24.31 275.20 25.31Q275.58 26.30 276.00 27.32Q276.42 28.33 276.70 29.14H276.95Q277.23 28.40 277.59 27.42Q277.96 26.44 278.38 25.45Q278.80 24.45 279.15 23.65L284.47 11.93H292.06L280.45 36.0ZM159.71 36.0V26.41L147.82 11.93H156.25L163.28 20.95H163.59L170.70 11.93H178.74L166.85 26.41V36.0ZM202.85 30.71H208.76Q210.44 30.71 211.79 30.27Q213.13 29.84 214.11 29.03Q215.09 28.23 215.63 27.04Q216.18 25.85 216.18 24.34V23.54Q216.18 22.04 215.63 20.86Q215.09 19.69 214.11 18.89Q213.13 18.08 211.79 17.65Q210.44 17.21 208.76 17.21H202.85ZM123.92 30.92H134.31Q135.43 30.92 136.13 30.31Q136.83 29.70 136.83 28.44Q136.83 27.77 136.53 27.25Q136.24 26.72 135.64 26.43Q135.05 26.13 134.21 26.13H123.92ZM123.92 21.44H133.72Q134.52 21.44 135.08 21.14Q135.64 20.85 135.96 20.32Q136.27 19.80 136.27 19.06Q136.27 18.05 135.57 17.44Q134.87 16.82 133.82 16.82H123.92ZM238.88 26.93H247.00L244.83 22.04Q244.69 21.72 244.45 21.11Q244.20 20.50 243.92 19.81Q243.64 19.13 243.43 18.55Q243.22 17.98 243.08 17.70H242.84Q242.59 18.33 242.24 19.17Q241.89 20.01 241.59 20.78Q241.30 21.55 241.05 22.04Z"/></svg></a>
+<nav class="avd-site-header__nav" aria-label="Primary">
+<a class="avd-site-header__link" href="../av/">Console</a>
+<a class="avd-site-header__link" href="../ProjectorThrow/">Throwline</a>
+<a class="avd-site-header__link" href="../pixelforge/">PixelForge</a>
+</nav>
+<div class="avd-site-header__end">
+<div class="avd-seg" role="group" aria-label="Theme" id="themeToggle" hidden>
+<button type="button" class="avd-seg__btn" data-theme-mode="dark" aria-pressed="false" aria-label="Dark" title="Dark"><svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-moon"/></svg></button>
+<button type="button" class="avd-seg__btn" data-theme-mode="light" aria-pressed="false" aria-label="Light" title="Light"><svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-sun"/></svg></button>
+<button type="button" class="avd-seg__btn" data-theme-mode="system" aria-pressed="false" aria-label="System" title="System"><svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-monitor-auto"/></svg></button>
+</div>
+<span class="avd-site-header__action"><a class="avd-btn avd-btn--primary" href="#brief">Send the show brief<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a></span>
+</div>
+</header>
+<div class="avd-shell__tabs">
+<nav class="avd-tabs hp-tabs" aria-label="Homepage sections">
+<a class="avd-tab" href="#overview">Overview</a>
+<a class="avd-tab" href="#tools">Tools<span class="avd-tab__count">6</span></a>
+<a class="avd-tab" href="#console">Console</a>
+<a class="avd-tab" href="#brief">Brief</a>
+</nav>
+</div>
+<main class="avd-shell__main hp-main" id="main" tabindex="-1">
+
+<section class="hp-panel hp-split" id="overview" aria-labelledby="overview-title">
+<div class="hp-col">
+<span class="avd-tape avd-tape--xl hp-tape">Live event video</span>
+<h1 class="hp-h1" id="overview-title" tabindex="-1">Bring in an operator who can step into the room and move the show forward.</h1>
+<p class="hp-lead">Live event AV support, projection planning, show systems, and practical handoff for production teams.</p>
+<div class="hp-actions">
+<a class="avd-btn" href="../av/">Open the console<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a>
+<a class="avd-btn avd-btn--quiet" href="#tools">See the tools</a>
+</div>
+</div>
+<section class="avd-panel hp-fit" aria-labelledby="fit-title">
+<div class="avd-panel__head"><h2 class="avd-panel__title" id="fit-title">Where Dave fits</h2></div>
+<div class="avd-panel__body hp-fit__body">
+<ul class="hp-fit__list">
+<li><span class="hp-fit__name">Video engineering</span><span class="hp-fit__note">Shading, signal integrity, broadcast imaging.</span></li>
+<li><span class="hp-fit__name">Camera operation</span><span class="hp-fit__note">Capture across formats and venues.</span></li>
+<li><span class="hp-fit__name">Directing</span><span class="hp-fit__note">Calling shots, coordinating live coverage.</span></li>
+<li><span class="hp-fit__name">LED systems</span><span class="hp-fit__note">Wall builds, processing, calibration.</span></li>
+<li><span class="hp-fit__name">Media servers</span><span class="hp-fit__note">Playback and show ready content.</span></li>
+<li><span class="hp-fit__name">Signal distribution</span><span class="hp-fit__note">Routing and conversion across the chain.</span></li>
+<li><span class="hp-fit__name">Fiber</span><span class="hp-fit__note">Long runs and venue backbones.</span></li>
+<li><span class="hp-fit__name">Show control</span><span class="hp-fit__note">Cueing and integration of live systems.</span></li>
+</ul>
+</div>
+<div class="hp-panel-foot"><span class="avd-eyebrow">Oaklyn, NJ · Philadelphia region · IATSE Local 8</span></div>
+</section>
+</section>
+
+<section class="hp-panel hp-tools" id="tools" aria-labelledby="tools-title">
+<div class="hp-tools__head">
+<h2 class="hp-h2" id="tools-title" tabindex="-1">The tools Dave runs a show with.</h2>
+<p class="hp-tools__note">Browser tools. Each one says where it stands.</p>
+</div>
+<div class="avd-table-wrap" role="region" aria-label="Tools" tabindex="0">
+<table class="avd-table hp-table">
+<thead><tr><th scope="col">Tool</th><th scope="col" class="hp-wide-cell">What it does</th><th scope="col">State</th><th scope="col"><span class="avd-sr">Open</span></th></tr></thead>
+<tbody>
+<tr><th scope="row">AV by Dave console</th><td class="hp-wide-cell">One console for live show crews. Video, audio, show control, show ops, front office, the shop, infrastructure and lighting as panels you resize.</td><td class="avd-td--state"><span class="avd-state avd-state--bare"><span class="avd-dot avd-dot--done" aria-hidden="true"></span>Live</span></td><td class="hp-open"><a class="avd-btn" href="../av/" aria-label="Open the AV by Dave console">Open<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a></td></tr>
+<tr><th scope="row">Throwline</th><td class="hp-wide-cell">Projector throw, fit and placement planning in a 3D room, with field checks and show handoff. Confirm estimates on site.</td><td class="avd-td--state"><span class="avd-state avd-state--bare"><span class="avd-dot avd-dot--active" aria-hidden="true"></span>Field testing</span></td><td class="hp-open"><a class="avd-btn" href="../ProjectorThrow/" aria-label="Open Throwline">Open<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a></td></tr>
+<tr><th scope="row">PixelForge</th><td class="hp-wide-cell">Browser graphics editor for show graphics, signage fixes, simple overlays and PNG export.</td><td class="avd-td--state"><span class="avd-state avd-state--bare"><span class="avd-dot avd-dot--done" aria-hidden="true"></span>Live</span></td><td class="hp-open"><a class="avd-btn" href="../pixelforge/" aria-label="Open PixelForge">Open<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a></td></tr>
+<tr><th scope="row">PlotForge</th><td class="hp-wide-cell">Lighting plot application. Early build, opens as its own app.</td><td class="avd-td--state"><span class="avd-state avd-state--bare"><span class="avd-dot avd-dot--active" aria-hidden="true"></span>Early build</span></td><td class="hp-open"><a class="avd-btn" href="../plotforge.html" aria-label="Open PlotForge">Open<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a></td></tr>
+<tr><th scope="row">Run Review</th><td class="hp-wide-cell">Rehearsal capture and review. Step through cues, photos and MIDI firings, and mark each cue.</td><td class="avd-td--state"><span class="avd-state avd-state--bare"><span class="avd-dot avd-dot--idle" aria-hidden="true"></span>Not public yet</span></td><td class="hp-open hp-open--note">Set up per show</td></tr>
+<tr><th scope="row">Field Kit</th><td class="hp-wide-cell">Sync and signal references: tearing card, EDID and HDCP decision tree, genlock checklist and a tear test page.</td><td class="avd-td--state"><span class="avd-state avd-state--bare"><span class="avd-dot avd-dot--active" aria-hidden="true"></span>Draft</span></td><td class="hp-open"><a class="avd-btn" href="../field-kit/" aria-label="Open the Field Kit">Open<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a></td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="hp-panel hp-split hp-split--even" id="console" aria-labelledby="console-title">
+<div class="hp-col hp-col--tight">
+<span class="avd-eyebrow hp-wide-only">The console</span>
+<h2 class="hp-h2" id="console-title" tabindex="-1">One console for live show crews.</h2>
+<p class="hp-body">It opens on an empty workspace. Call up any panel, resize it and set the screen up the way the room needs. Saved work stays in this browser, and the console is cached for return visits offline.</p>
+<a class="avd-btn" href="../av/">Open the console<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a>
+</div>
+<ul class="hp-depts" aria-label="Console departments">
+<li><svg class="avd-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-camera"/></svg><span class="avd-caps">Video</span></li>
+<li><svg class="avd-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-audio"/></svg><span class="avd-caps">Audio</span></li>
+<li><svg class="avd-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-signal"/></svg><span class="avd-caps">Show control</span></li>
+<li><svg class="avd-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg><span class="avd-caps">Show ops</span></li>
+<li><svg class="avd-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg><span class="avd-caps">Front office</span></li>
+<li><svg class="avd-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-case"/></svg><span class="avd-caps">The shop</span></li>
+<li><svg class="avd-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-network"/></svg><span class="avd-caps">Infrastructure</span></li>
+<li><svg class="avd-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-light"/></svg><span class="avd-caps">Lighting</span></li>
+<li><svg class="avd-icon" width="24" height="24" aria-hidden="true" focusable="false"><use href="#i-projector"/></svg><span class="avd-caps">Specialist tools</span></li>
+</ul>
+</section>
+
+<section class="hp-panel hp-split" id="brief" aria-labelledby="brief-title">
+<div class="hp-col hp-col--tight">
+<h2 class="hp-h2" id="brief-title" tabindex="-1">Send the show brief.</h2>
+<p class="hp-body hp-wide-only">Share the date, venue, role and working files.</p>
+<dl class="hp-brief">
+<div><dt class="avd-eyebrow">Show date</dt><dd>The day, plus load in and strike if they differ.</dd></div>
+<div><dt class="avd-eyebrow">Venue or city</dt><dd>The room, or the city if the venue is still open.</dd></div>
+<div><dt class="avd-eyebrow">Role needed</dt><dd>Video engineer, camera, LED and display, projection, playback or show support.</dd></div>
+<div><dt class="avd-eyebrow">Working files</dt><dd>Production brief, run of show, drawings or signal flow. A share link works too.</dd></div>
+</dl>
+<a class="avd-btn avd-btn--primary avd-btn--lg hp-brief__send" id="briefSend" href="mailto:avbydave@gmail.com?subject=Show%20brief&amp;body=Show%20date%3A%0AVenue%20or%20city%3A%0ARole%20needed%3A%0A%0AShort%20brief%20%28call%20times%2C%20the%20room%2C%20what%20the%20show%20needs%20from%20video%29%3A%0A%0AFiles%20or%20share%20link%3A%0A">Send the show brief<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a>
+<p class="hp-caption">Opens your email with the brief laid out. Dave replies from the AV by Dave show email.</p>
+</div>
+<section class="avd-panel hp-lines" aria-labelledby="lines-title">
+<div class="avd-panel__head"><h2 class="avd-panel__title" id="lines-title">Direct lines</h2></div>
+<div class="avd-panel__body hp-lines__body">
+<div class="hp-line"><span class="avd-eyebrow">Email</span><a class="hp-link hp-line__value" href="mailto:avbydave@gmail.com">avbydave@gmail.com</a></div>
+<div class="hp-line"><span class="avd-eyebrow">Phone</span><a class="hp-link hp-line__value" href="tel:+12676653324">(267) 665 3324</a></div>
+</div>
+<div class="hp-panel-foot"><span class="avd-eyebrow">Oaklyn, NJ · Philadelphia region · IATSE Local 8</span></div>
+</section>
+</section>
+
+<footer class="hp-footer">
+<span>© 2026 David Robertson · Digital Footprints LLC</span>
+<span class="hp-footer__links"><a class="hp-link" href="https://systembydave.com/" rel="noopener noreferrer">System by Dave</a><a class="hp-link" href="https://systembydave.com/privacy-policy.html" rel="noopener noreferrer">Privacy</a></span>
+</footer>
+</main>
+<div class="avd-shell__actionbar">
+<a class="avd-btn avd-btn--primary avd-btn--lg avd-btn--block" id="barAction" href="#brief">Send the show brief<svg class="avd-icon" width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg></a>
+</div>
+</div>
+</body>
+</html>

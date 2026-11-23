@@ -1,0 +1,38 @@
+/* AV by Dave tokens, written from tokens.json v1 for this canvas. Gaffer (dark) is the default; Call Sheet (light) under [data-theme="light"]. */
+@font-face { font-family: "Archivo Expanded"; src: url("fonts/ArchivoExpanded-Variable.woff2") format("woff2"); font-weight: 600 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Archivo"; src: url("fonts/Archivo-Variable.woff2") format("woff2"); font-weight: 400 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("fonts/IBMPlexMono-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("fonts/IBMPlexMono-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("fonts/IBMPlexMono-SemiBold.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
+
+:root {
+  --ground: #0f0f0e; --surface: #181816; --surface-raised: #22221f; --surface-sunken: #0a0a09;
+  --hairline: #2f2f2b; --line-control: #6e6c64;
+  --ink: #f2f0e9; --ink-muted: #aba89e; --ink-faint: #8f8c82;
+  --tape: #f2f0e9; --on-tape: #11110f; --aluminum: #9ea1a5; --on-aluminum: #11110f;
+  --action: var(--tape); --on-action: var(--on-tape); --action-hover: #ffffff; --focus-ring: #f2f0e9;
+  --state-idle: #ecebe4; --state-queued: #5ba4ff; --state-active: #f4c21b; --state-waiting: #ff8b3d; --state-blocked: #ff5b4e;
+  --state-automated: #b58cff; --state-done: #45cc7a; --state-archived: #b4875f; --state-killed: #000000;
+  --cell-empty: #2a2a26; --cell-na: #000000; --cell-baseline: var(--state-queued); --cell-legacy: var(--state-archived);
+  --cell-machine: var(--state-automated); --cell-failing: var(--state-blocked); --cell-risk: var(--state-waiting);
+  --cell-partial: var(--state-active); --cell-healthy: var(--state-done);
+  --shadow-lift: 0 16px 40px -16px rgba(0,0,0,0.80);
+  --font-display: "Archivo Expanded", "Archivo", system-ui, sans-serif;
+  --font-sans: "Archivo", system-ui, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px;
+  --radius-0: 0px; --radius-sm: 2px; --radius-md: 4px; --radius-lg: 8px; --radius-round: 999px;
+  --control-sm: 32px; --control-md: 44px; --control-lg: 52px; --dot: 10px; --cell: 14px;
+}
+[data-theme="light"] {
+  --ground: #f3f2ec; --surface: #ffffff; --surface-raised: #ebeae3; --surface-sunken: #e6e5dd;
+  --hairline: #d8d6cc; --line-control: #85837a;
+  --ink: #141412; --ink-muted: #57554d; --ink-faint: #64625a;
+  --tape: #141412; --on-tape: #f2f0e9; --aluminum: #b4b7ba; --on-aluminum: #11110f;
+  --action-hover: #34342f; --focus-ring: #141412;
+  --state-idle: #ffffff; --state-queued: #1e5cc0; --state-active: #a07400; --state-waiting: #c24a0a; --state-blocked: #c2261b;
+  --state-automated: #6e40cc; --state-done: #1d7d3d; --state-archived: #7a5333; --state-killed: #141412;
+  --cell-empty: #e3e2da; --cell-na: #141412;
+  --shadow-lift: 0 16px 40px -20px rgba(20,20,18,0.28);
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
