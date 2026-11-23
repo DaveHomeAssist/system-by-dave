@@ -4,6 +4,12 @@
 
 - Resolve the staged site directory before entering the destination checkout, so the publish planner can read its provenance file.
 
+## November 23, 2026. Publish script: end-to-end test and content-based mirroring
+
+- #571 fixed the failure behind runs 708 and 710 (`ENOENT: no such file or directory, open '_sites/housevideo-walk/source.json'`, 2 seconds into "Publish walk.housevideo.app"): the workflow passes a relative staged path and the script changes into the destination checkout before calling `scripts/domain_publish_plan.mjs`. #561's tests called the helper with absolute paths and never ran the script the way the workflow does, so nothing caught it.
+- `scripts/publish_domain_site.test.mjs` (in `npm run verify:domain-sites`) now runs the real script from a working directory with a relative staged path against a local bare repository, with git, curl, fetch and the Pages wait stubbed. It covers publish, skip, republish for a stale live site, and republish for an unreadable live site. Without the #571 line, all four fail with the production error.
+- The mirror step compares file content (`rsync --checksum`) instead of size and modification time. With the default shortcut a changed file of the same size whose mtime falls in the same second as the clone is skipped, and `source.json` is always the same size.
+
 ## November 23, 2026. The Philly 215 preview
 
 - Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.

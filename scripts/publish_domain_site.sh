@@ -54,7 +54,10 @@ for app in ${KEEP_PREVIOUS_ASSETS:-}; do
     cp -R "$WORK/site/$app/index.html" "$WORK/site/$app/assets" "$WORK/previous/$app/" 2>/dev/null || true
   fi
 done
-rsync -a --delete --exclude='/.git/' --exclude='/.github/' --exclude='/README.md' "$STAGED"/ "$WORK/site"/
+# --checksum: rsync's default size-and-mtime shortcut skips a changed file whose size is unchanged and whose
+# mtime lands in the same second as the clone (source.json is always the same size). The publish plan below
+# depends on seeing every real change.
+rsync -a --checksum --delete --exclude='/.git/' --exclude='/.github/' --exclude='/README.md' "$STAGED"/ "$WORK/site"/
 if [ -n "${KEEP_PREVIOUS_ASSETS:-}" ] && [ -d "$WORK/previous" ]; then
   # shellcheck disable=SC2086 # KEEP_PREVIOUS_ASSETS is a space-separated list
   node "$KEEP_HELPER" "$WORK/previous" "$WORK/site" $KEEP_PREVIOUS_ASSETS
