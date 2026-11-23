@@ -1,5 +1,10 @@
 # Changelog
 
+## November 23, 2026. Pages deploys unblocked: the Throwline release gate follows the sitemap
+
+- Every deploy from `main` since #564 failed in "Site contracts" and "domain-cutover / browser" with `Throwline release verification failed: Sitemap is missing https://avbydave.com/ProjectorThrow/.` and never reached the publish steps. #564 removed `ProjectorThrow/` from the sitemap because it only forwards to `ProjectorThrow/Stage3D.html` (`scripts/gen_sitemap.py` `REDIRECT_ONLY`) and lists `Stage3D.html` instead, but `scripts/verify_throwline_release.js` still required the forwarding address.
+- The Throwline release gate now requires `ProjectorThrow/Stage3D.html` in the sitemap and fails if the forwarding `ProjectorThrow/` is listed again, so the gate and the generator state the same rule.
+
 ## November 23, 2026. The Philly 215 preview
 
 - Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.

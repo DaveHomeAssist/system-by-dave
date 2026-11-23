@@ -806,10 +806,15 @@ if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stag
 if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-units:v1')) {
   fail('Registry must include the versioned Throwline Stage measurement-units key.');
 }
-['ProjectorThrow/', 'ProjectorThrow/Stage3D.html'].forEach((route) => {
-  const url = `${originFor(route)}/${route}`;
-  if (!sitemapFor(route).includes(`<loc>${url}</loc>`)) fail(`Sitemap is missing ${url}.`);
-});
+// ProjectorThrow/ only forwards to ProjectorThrow/Stage3D.html, and a sitemap lists final addresses
+// (scripts/gen_sitemap.py REDIRECT_ONLY), so the planner is listed at Stage3D.html and the forwarding
+// address stays out.
+const stageRoute = 'ProjectorThrow/Stage3D.html';
+const stageUrl = `${originFor(stageRoute)}/${stageRoute}`;
+if (!sitemapFor(stageRoute).includes(`<loc>${stageUrl}</loc>`)) fail(`Sitemap is missing ${stageUrl}.`);
+const forwardingRoute = 'ProjectorThrow/';
+const forwardingUrl = `${originFor(forwardingRoute)}/${forwardingRoute}`;
+if (sitemapFor(forwardingRoute).includes(`<loc>${forwardingUrl}</loc>`)) fail(`Sitemap lists ${forwardingUrl}, which only forwards to ${stageRoute}.`);
 
 if (failures.length) {
   console.error('Throwline release verification failed:');
