@@ -4,7 +4,8 @@ window.SBD_PROJECT_REGISTRY = {
     "source": "Public-safe subset generated from DaveHomeAssist local registry",
     "counts": {
       "total": 52,
-      "active": 50,
+      "active": 49,
+      "paused": 1,
       "maintenance": 0,
       "archived": 2
     }
@@ -25,7 +26,8 @@ window.SBD_PROJECT_REGISTRY = {
       "sizeKB": 3559,
       "files": 200,
       "archived": false,
-      "status": "active",
+      "status": "paused",
+      "pausedUntil": "Feb 2027",
       "github": "https://github.com/DaveHomeAssist/phillies-wire"
     },
     {

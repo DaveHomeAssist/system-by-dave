@@ -57,8 +57,8 @@ html[data-theme="light"] { --bg: #f4f6f8; --bg-2: #eaf0f5; --surface: #fff; --su
 @media(min-width:2400px) { .public-pages { column-count: 2; } .public-stage { padding-inline: 40px; } }
 @media(max-width:680px) {
   .public-shell { grid-template-rows: auto minmax(0,1fr) auto auto; }
-  .public-tabs { grid-row: 4; padding: 4px; gap: 2px; border-top: 1px solid var(--reader-line); border-bottom: 0; }
-  .public-tabs button { flex: 1; min-width: 0; padding: 4px 2px; font-size: 12px; }
+  .public-tabs { grid-row: 4; min-width: 0; max-width: 100%; padding: 4px; gap: 2px; border-top: 1px solid var(--reader-line); border-bottom: 0; justify-content: flex-start; overflow-x: auto; overscroll-behavior-x: contain; }
+  .public-tabs button { flex: 0 0 auto; padding: 4px 10px; font-size: 12px; white-space: nowrap; }
   .public-stage { grid-row: 2; padding: 12px; }
   .public-pager { grid-row: 3; gap: 6px; padding: 2px 6px; }
   .public-pager button { padding: 4px 8px; font-size: 12px; }

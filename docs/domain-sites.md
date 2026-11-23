@@ -306,8 +306,7 @@ node scripts/stage_domain_sites.mjs --out /tmp/sites --site-root /tmp/sbd-site -
   --site-origin housevideo-walk=http://localhost:8804
 ```
 
-`/tmp/sbd-site` must first hold a copy of the repository webroot (the same
-rsync the workflow runs). Serve it on 8801 and each staged site on its port.
+`/tmp/sbd-site` must first hold the published site (`node scripts/stage_public_site.mjs --out /tmp/sbd-site`). Serve it on 8801 and each staged site on its port.
 `--simulate` refuses to run without local origins, and it reports stale
 canonical URLs as warnings rather than failures.
 
