@@ -4,6 +4,10 @@
 
 - Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.
 
+## November 23, 2026. Throwline sitemap check follows the Stage 3D page
+
+- `ProjectorThrow/` only redirects to `ProjectorThrow/Stage3D.html`, so the sitemap lists the final page. Throwline release verification checks that address and still requires the registry entry at `ProjectorThrow/`.
+
 ## November 23, 2026. Publish the public site, not the repository
 
 - GitHub Pages was copying the repository root. `scripts/stage_public_site.mjs` now publishes site content. Docs, scripts, reports, plans, tests, application source, and `career-market.html` stay in the repository and are not served. The Equipment Lab reference markdown and the Davai storyboard script stay, because pages link to them. `apps/projctl/public/` stays, because those noindex pages are part of the site. `scripts/stage_public_site.test.mjs` diffs the new publish against the previous one.
@@ -832,6 +836,11 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
   controls and dialog focus handling. Mocked scan regression makes no inference
   calls. Source validation and deployment remain separate.
 
+
+## October 30, 2026: Preserve heatmap exports during sync
+
+- Validate source revisions and stage and compare heatmap exports before replacement. Restore the previous export when promotion fails, and retain its backup if restoration fails.
+- Add read-only build parity verification and regression coverage for invalid inputs, copy failures, promotion failures and recovery. Public heatmap files are unchanged.
 
 ## October 30, 2026: Video Engineering Daily
 
