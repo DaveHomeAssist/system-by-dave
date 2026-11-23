@@ -1124,7 +1124,7 @@ function renderReader(slug, opened = false) {
 const ROLE = { member: "No Nonsense Collective", project: "No Nonsense project", guest: "Guest on No Nonsense lineups" };
 const roleOf = a => ROLE[a.role] || ROLE.guest;
 const lineupCount = a => `${a.shows.length} No Nonsense ${a.shows.length === 1 ? "lineup" : "lineups"}`;
-const extLink = (l, cls = "btn") => `<a class="${cls}" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`;
+const extLink = (l, cls = "btn") => `<a class="${cls}" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label)}</a>`;
 function artistTile(a) {
   return `<div class="a-tile halftone" style="--tint:${a.tint}" aria-hidden="true"><span class="ini">${esc(a.ini)}</span>
     <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="currentColor"/><circle cx="50" cy="50" r="34" fill="none" style="stroke:var(--tile)" stroke-width="1" opacity=".5"/><circle cx="50" cy="50" r="14" style="fill:${a.tint}"/><circle cx="50" cy="50" r="2.5" style="fill:var(--scrap)"/></svg></div>`;
