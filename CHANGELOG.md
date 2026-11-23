@@ -1,5 +1,14 @@
 # Changelog
 
+## November 23, 2026. Screenshots on the tool cards
+
+- Tools directory cards that only had the sprite now show a live screenshot in the same art box (`img.tc-art.tc-art--shot`, lazy, with the capture's alt text). Theme Organizer keeps `img/theme-organizer-card.webp`; the new full-page capture is lighter and harder to read at that size. Garden OS, Back Focus, OnTrack and AV Video are unchanged. Prompts, Trailkeeper and Hat-in-Ring had no file in the capture set.
+- The home page shows the console on the AV by Dave card, the Notion page on the Notion card, Cue Sheet on the Cue Sheet spotlight, and `img/sort-inbox.webp` on the Sort Inbox spotlight. The agents pages keep `img/agent-sort-inbox.webp`.
+- The avbydave.com tools list shows the console, Throwline, PixelForge and PlotForge. Throwline uses the dark stage shot. The light Throwline capture stays in `img/` unused, because the page does not swap images with the theme. Field Kit and Run Review stay without an image. The mislabeled calculator capture is `img/av-by-dave-calculator.webp` and is not shown: there is no AV Calculator card.
+- Phone captures and the Lighting Console Spec Guide capture are in `img/` and unused. No card uses a `<picture>` set, and the console guide has no card.
+- Davai's headline now sizes from its column, so "architecture" stays beside the route panel from 1280 px through 1680 px.
+- Cue Sheet's column header sticks to the top of the table. The old 68 px offset was inside the table scroller, so the header covered cue 001.
+
 ## November 23, 2026. Domain publish staging path
 
 - Resolve the staged site directory before entering the destination checkout, so the publish planner can read its provenance file.

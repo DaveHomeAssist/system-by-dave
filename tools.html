@@ -66,6 +66,7 @@
   .tc-art--unique{background-image:url('img/tools-card-unique-atlas.webp');background-size:auto 300%;}
   .tc-art--text{display:grid;place-items:center;background:none;mix-blend-mode:normal;container-type:inline-size;}
   .tc-art--shot{background-image:url('img/theme-organizer-card.webp');background-size:cover;background-position:center;mix-blend-mode:normal;border-radius:10px;}
+  img.tc-art--shot{background-image:none;object-fit:cover;object-position:center top;}
   .tc-mark{display:grid;place-items:center;width:68%;height:72%;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-radius:18px;background:radial-gradient(120% 95% at 50% 22%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 72%),#131a21;box-shadow:inset 0 1px rgba(255,255,255,.06),0 8px 18px rgba(0,0,0,.3);color:var(--accent);font:700 clamp(26px,24cqi,44px)/1 var(--ff-display);letter-spacing:-.04em;text-shadow:0 0 22px color-mix(in srgb,var(--accent) 35%,transparent);}
   .tool-card h2{display:grid;place-items:center;min-height:2.5em;font-family:var(--ff-display);font-weight:700;font-size:clamp(14px,1.3vw,18px);line-height:1.2;letter-spacing:-.025em;text-wrap:balance;}
   .tc-badge{display:inline-flex;align-items:center;justify-content:center;gap:8px;max-width:100%;min-height:26px;padding:3px 12px;border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);border-radius:999px;background:var(--badge);color:color-mix(in srgb,var(--accent) 75%,white);font:700 11px/1.15 var(--ff-mono);letter-spacing:.035em;text-transform:uppercase;white-space:nowrap;}
@@ -140,12 +141,13 @@
            directory category. Artwork comes from the two WebP atlases via --art-x/--art-y:
            the 5x7 atlas has 7:5 cells, and the 2x3 atlas has 3:2 cells that are scaled to
            the box height and cropped horizontally, so no icon is stretched. A tool without
-           artwork uses the tc-art--text monogram card. A product screenshot uses
-           tc-art--shot, its own image with no lighten blend.
+           artwork uses the tc-art--text monogram card. A product screenshot is an img.tc-art.tc-art--shot in that same box
+           (its own image, no lighten blend). Theme Organizer keeps the
+           tc-art--shot background crop, which reads more clearly at this size.
            Cards deep-link to the live page; cross-domain links open in a new tab. -->
       <div class="tools-grid" id="toolsGrid">
         <a class="tool-card" data-chips="AV" data-tone="violet" data-track-cta="tools:av-by-dave" href="av/">
-          <span class="tc-art" style="--art-x:0%;--art-y:2.2%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/av-by-dave-console.webp" alt="AV by Dave console open to Equipment Lab, with a searchable equipment library on the left and a 3D model of a Cartoni Maxima 30 fluid head in the inspector." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>AV by Dave</h2>
           <span class="tc-badge">Console</span>
           <span class="sr-only">One console: video, audio, show control, show ops, front office, the shop, infrastructure, lighting and the specialist tools as resizable panels with saved views.</span>
@@ -163,13 +165,13 @@
           <span class="sr-only">Preshow camera field guide — diagnose flange back focus, step through the electronic or mechanical Fujinon procedure, verify it, and hand the camera back.</span>
         </a>
         <a class="tool-card" data-registry-id="teleprompter" data-chips="AV" data-tone="blue" data-track-cta="tools:teleprompter" href="teleprompter.html">
-          <span class="tc-art" style="--art-x:100%;--art-y:2.2%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/teleprompter.webp" alt="Teleprompter with play, pace and font controls above a large-type sample script." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Teleprompter</h2>
           <span class="tc-badge">Run of show</span>
           <span class="sr-only">On-device teleprompter with instrument-grade controls, mirror/fullscreen, rundown timing and show packages.</span>
         </a>
         <a class="tool-card" data-registry-id="gear-reference" data-chips="AV" data-tone="blue" data-track-cta="tools:gear-reference" href="gear-reference.html">
-          <span class="tc-art" style="--art-x:50%;--art-y:2.2%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/gear-reference.webp" alt="Gear Reference field sheet for the Epson PowerLite X39 projector, with identification specs and a section list down the left." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Gear Reference</h2>
           <span class="tc-badge">Logistics</span>
           <span class="sr-only">Offline per-device field sheets with schematics, procedures, consumables, intake checks, and source confidence.</span>
@@ -181,31 +183,31 @@
           <span class="sr-only">Signal Flow, Video Patch, Displays and Projection in one plan: connected routes, destination plans, checks, and optional modules.</span>
         </a>
         <a class="tool-card" data-chips="AV" data-tone="violet" data-track-cta="tools:deckforge" href="https://davehomeassist.github.io/deckforge/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art" style="--art-x:0%;--art-y:17.7%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/deckforge.webp" alt="DeckForge layout generator showing a 32-key Stream Deck XL grid of colour-coded keys grouped by zone, with profile and zone lists on the left." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>DeckForge</h2>
           <span class="tc-badge">AV references</span>
           <span class="sr-only">Design Elgato Stream Deck &amp; Logitech MX Creative Console layouts for your OBS / vMix show workflow. Opens davehomeassist.github.io/deckforge in a new tab.</span>
         </a>
         <a class="tool-card" data-registry-id="pixelforge" data-chips="AV Apps" data-tone="blue" data-track-cta="tools:pixelforge" href="pixelforge/">
-          <span class="tc-art" style="--art-x:75%;--art-y:17.7%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/pixelforge.webp" alt="PixelForge home screen with the headline &quot;Pixels, vectors, type, and AI on one layered canvas&quot; and a layered canvas preview." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>PixelForge</h2>
           <span class="tc-badge">Graphics</span>
           <span class="sr-only">Browser raster, vector, text, and image editing for show graphics, signage fixes, simple overlays, and PNG export.</span>
         </a>
         <a class="tool-card" data-chips="Notion" data-tone="violet" data-track-cta="tools:notion-skills" href="skills.html">
-          <span class="tc-art" style="--art-x:100%;--art-y:17.7%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/notion-skills.webp" alt="Notion AI Skills catalog page listing 24 skills by category, starting with Improve Writing and Proofread." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Notion Skills</h2>
           <span class="tc-badge">Notion</span>
           <span class="sr-only">AI skills that run natively inside Notion AI — no external apps or plugins to break.</span>
         </a>
         <a class="tool-card" data-chips="Notion" data-tone="teal" data-track-cta="tools:notion-agents" href="agents.html">
-          <span class="tc-art" style="--art-x:0%;--art-y:33.9%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/notion-agents.webp" alt="All Agents page explaining how the Notion agents work, above illustrated cards for each agent." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Notion Agents</h2>
           <span class="tc-badge">Notion</span>
           <span class="sr-only">Agents that triage your inbox, assemble briefings and keep your prompts organized — inside Notion.</span>
         </a>
         <a class="tool-card" data-chips="Notion" data-tone="violet" data-track-cta="tools:notion-widgets" href="widgets.html">
-          <span class="tc-art" style="--art-x:25%;--art-y:33.9%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/notion-widgets.webp" alt="All Widgets page showing four embeddable Notion widgets: Project Status Dashboard, Quest Log, Client Approval Hub and Workspace Map." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Notion Widgets</h2>
           <span class="tc-badge">Notion</span>
           <span class="sr-only">Self-contained widgets that embed in Notion pages via iframe. Free and open source.</span>
@@ -217,55 +219,55 @@
           <span class="sr-only">A library of reusable prompts for building systems inside Notion.</span>
         </a>
         <a class="tool-card" data-chips="Notion Labs" data-tone="violet" data-track-cta="tools:notionwidgets-gallery" href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art" style="--art-x:75%;--art-y:33.9%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/notionwidgets-gallery.webp" alt="NotionWidgets gallery page headed &quot;Small widgets, better Notion pages&quot;, with cards explaining URL-only configuration." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>NotionWidgets (gallery)</h2>
           <span class="tc-badge">Notion</span>
           <span class="sr-only">The open-source catalog of embeddable Notion widgets — project status, quest log, and more. Opens davehomeassist.github.io/NotionWidgets in a new tab.</span>
         </a>
         <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:graph-explorer" href="https://davehomeassist.github.io/graph-explorer/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art" style="--art-x:0%;--art-y:79.1%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/graph-explorer.webp" alt="Graph Explorer showing the sample Client Operations map: hubs, databases and pages linked in a top-down topology." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Graph Explorer</h2>
           <span class="tc-badge">Labs</span>
           <span class="sr-only">Dataset-agnostic node-graph topology visualizer — one D3 / Dagre engine, many pluggable map packs. Opens davehomeassist.github.io/graph-explorer in a new tab.</span>
         </a>
         <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:sdlc-tool-stack-map" href="https://davehomeassist.github.io/sdlc-tool-stack-map/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art" style="--art-x:25%;--art-y:79.1%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/sdlc-tool-stack-map.webp" alt="SDLC Tool Map comparing Atlassian, modern startup and hybrid stacks phase by phase, with a quick-read summary." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>SDLC Tool Stack Map</h2>
           <span class="tc-badge">Labs</span>
           <span class="sr-only">An interactive visual map of an SDLC tool stack, grouped by lifecycle stage. Opens davehomeassist.github.io/sdlc-tool-stack-map in a new tab.</span>
         </a>
         <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:prompt-lab" href="https://promptlab.tools/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art" style="--art-x:50%;--art-y:79.1%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/prompt-lab.webp" alt="Prompt Lab home page headed &quot;Turn rough prompts into reusable, tested workflows&quot;, with a prompt editor preview showing a draft and its expanded version." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Prompt Lab</h2>
           <span class="tc-badge">Labs</span>
           <span class="sr-only">A prompt-engineering workstation with a sign-in web app, extension setup, and documented desktop source build; the free editor has optional Pro tools. Opens promptlab.tools in a new tab.</span>
         </a>
         <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:project-registry" href="project-registry.html">
-          <span class="tc-art" style="--art-x:75%;--art-y:79.1%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/project-registry.webp" alt="Public Project Registry with totals from a June 11, 2026 snapshot and a filterable table of public repositories." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Project Registry</h2>
           <span class="tc-badge">Labs</span>
           <span class="sr-only">Public-safe repository inventory with stack, purpose, status, and recent activity.</span>
         </a>
         <a class="tool-card" data-chips="Notion Labs" data-tone="violet" data-track-cta="tools:davai-system-by-dave-memory-architecture" href="systembydave/">
-          <span class="tc-art tc-art--unique" style="--art-x:6.25%;--art-y:100%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/davai-system-by-dave-memory-architecture.webp" alt="Davai memory architecture page with the full headline and a stacked panel routing questions to seven memory layers." width="1600" height="1047" loading="lazy" decoding="async">
           <h2>Davai — System by Dave Memory Architecture</h2>
           <span class="tc-badge">Labs</span>
           <span class="sr-only">The layered memory, routing, lifecycle, and synchronization architecture behind Dave’s working system.</span>
         </a>
         <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:tailscale-manual" href="tailscale-manual.html">
-          <span class="tc-art tc-art--unique" style="--art-x:93.75%;--art-y:100%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/tailscale-manual.webp" alt="Tailscale Express Working Manual title page with a device-to-device path diagram and the start of the 12-section index." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Tailscale Manual</h2>
           <span class="tc-badge">Labs</span>
           <span class="sr-only">A responsive, printable field manual for secure Tailscale access, identity, routing, and recovery.</span>
         </a>
         <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:dave-robertson-profile" href="profile/">
-          <span class="tc-art" style="--art-x:25%;--art-y:95.8%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/dave-robertson-profile.webp" alt="Dave Robertson profile page: video engineer, operator and systems builder, with a portrait photo and summary counts." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Dave Robertson Profile</h2>
           <span class="tc-badge">Labs</span>
           <span class="sr-only">Live event, broadcast, systems, and business operating context for clients and collaborators.</span>
         </a>
         <a class="tool-card" data-chips="Labs" data-tone="blue" data-track-cta="tools:remote-desktop" href="remote-desktop.html">
-          <span class="tc-art" style="--art-x:50%;--art-y:95.8%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/remote-desktop.webp" alt="Remote Desktop page explaining the serverless WebRTC screen share, with Share my screen and View a screen options." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Remote Desktop</h2>
           <span class="tc-badge">Labs</span>
           <span class="sr-only">Serverless WebRTC screen share, file transfer, and remote view — locator-not-password session codes, verbal peer authentication, and capability-scoped consent.</span>
@@ -283,25 +285,25 @@
           <span class="sr-only">Plan a raised-bed garden with an explainable, deterministic crop-scoring engine. Spec-first showcase. Opens davehomeassist.github.io/garden-os in a new tab.</span>
         </a>
         <a class="tool-card" data-chips="Apps Games Sports" data-tone="violet" data-track-cta="tools:mlb-ballparks-quest" href="https://davehomeassist.github.io/mlb-ballparks-quest/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art" style="--art-x:0%;--art-y:48.8%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/mlb-ballparks-quest.webp" alt="MLB Ballparks Quest home headed &quot;Track the run&quot;, with a photo of a hand scoring a game and counters for parks visited and still open." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>MLB Ballparks Quest</h2>
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">Track ballpark visits, plan stadium road trips, and scorekeep live games. Phillies-themed PWA. Opens davehomeassist.github.io/mlb-ballparks-quest in a new tab.</span>
         </a>
         <a class="tool-card" data-chips="Apps Sports" data-tone="teal" data-track-cta="tools:ballpark-scorecard" href="scorecard/">
-          <span class="tc-art tc-art--unique" style="--art-x:94.93%;--art-y:0%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/ballpark-scorecard.webp" alt="Ballpark Scorecard new-game screen with a line score grid, quick note box and guided play buttons." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Ballpark Scorecard</h2>
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">A focused, installable baseball scorecard for tracking an entire game from the stands.</span>
         </a>
         <a class="tool-card" data-chips="Games Sports" data-tone="green" data-track-cta="tools:fifa-pitch-crew" href="/fifa-pitch-crew/">
-          <span class="tc-art" style="--art-x:50%;--art-y:48.8%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/fifa-pitch-crew.webp" alt="FIFA Pitch Crew title screen with neon &quot;Halftime Cover Ops&quot; lettering over a soccer pitch and Clock In and Call Sheet buttons." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>FIFA Pitch Crew</h2>
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">Arcade halftime-cover game — deploy the stage cloth across six lanes, dodge the sprinklers, run the show, then strike it before kickoff.</span>
         </a>
         <a class="tool-card" data-chips="Apps" data-tone="orange" data-track-cta="tools:noteforge" href="noteforge/">
-          <span class="tc-art tc-art--unique" style="--art-x:6.25%;--art-y:0%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/noteforge.webp" alt="NoteForge writing workspace with a notes list on the left and the Welcome note showing markdown, tags and backlinks." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>NoteForge</h2>
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">A local-first writing workspace for structured notes, reusable documents, and focused drafting.</span>
@@ -313,7 +315,7 @@
           <span class="sr-only">Plan, shortlist and log hiking trails with live weather and nearby-trail discovery. Opens davehomeassist.github.io/trailkeeper in a new tab.</span>
         </a>
         <a class="tool-card" data-chips="Apps Trackers" data-tone="green" data-track-cta="tools:festival-atlas" href="https://davehomeassist.github.io/festival-atlas/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art tc-art--unique" style="--art-x:6.12%;--art-y:50%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/festival-atlas.webp" alt="Festival Atlas home headed &quot;Build the run. Catch the sets.&quot;, with a live planning snapshot card and circuit progress bar." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Festival Atlas</h2>
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">Browse, route and journal music festivals — 43 USA festivals seeded with 2026 dates. (Prototype.) Opens davehomeassist.github.io/festival-atlas in a new tab.</span>
@@ -325,19 +327,19 @@
           <span class="sr-only">A 2028 presidential signal tracker — who is stepping into the ring, scored by how serious the move is. Opens hatinring.com in a new tab.</span>
         </a>
         <a class="tool-card" data-chips="Trackers Sports" data-tone="green" data-track-cta="tools:world-cup-predictor" href="/world-cup/">
-          <span class="tc-art" style="--art-x:50%;--art-y:63.3%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/world-cup-predictor.webp" alt="World Cup 2026 Bracket Predictor with the example loaded: group stage complete and the Round of 32 bracket waiting for picks." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>World Cup Predictor</h2>
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">Predict and track the World Cup as results come in.</span>
         </a>
         <a class="tool-card" data-chips="Trackers Sports" data-tone="red" data-track-cta="tools:phillies-wire" href="https://davehomeassist.github.io/phillies-wire/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art tc-art--unique" style="--art-x:93.75%;--art-y:50%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/phillies-wire.webp" alt="Phillies Wire newsletter page announcing the 2026 season is complete with an 88-74 record, plus last game and next season cards." width="1600" height="1188" loading="lazy" decoding="async">
           <h2>Phillies Wire</h2>
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">A daily auto-generated Philadelphia Phillies newsletter, dashboard and live-innings view. Opens davehomeassist.github.io/phillies-wire in a new tab.</span>
         </a>
         <a class="tool-card" data-chips="Trackers" data-tone="green" data-track-cta="tools:frontier-signals" href="https://davehomeassist.github.io/frontier-signals-pipeline/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art" style="--art-x:100%;--art-y:63.3%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/frontier-signals.webp" alt="Frontier Signals dark magazine page headed &quot;The new compute story is being written below the headline&quot;, with a column of the latest research, silicon and power items." width="1600" height="1000" loading="lazy" decoding="async">
           <h2>Frontier Signals</h2>
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">A dark editorial &quot;magazine&quot; tracking frontier-compute signals, refreshed from a scraper pipeline. Opens davehomeassist.github.io/frontier-signals-pipeline in a new tab.</span>

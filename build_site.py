@@ -2070,6 +2070,11 @@ def styles_css() -> str:
         .hero-small .shell { margin-inline: auto; }
         .hero, .hero-small { min-height: 0; padding-block: 3rem; }
         h1, .hero-small h1, .layer-hero h1 { font-size: clamp(2rem, 5vw, 5.8rem); overflow-wrap: anywhere; }
+        /* The headline shares a row with the route panel from 1101px up.
+           Size it from that column so "architecture" stays inside it. */
+        .hero-copy { container-type: inline-size; }
+        .hero-title { font-size: clamp(2rem, 10.5cqi, 5.8rem); max-width: 100%; }
+        .hero-title span { width: auto; max-width: 100%; overflow-wrap: anywhere; }
         .band { padding-block: 3rem; }
         .button { min-height: 44px; }
         .site-footer, .site-footer a { color: #eef4ed; }

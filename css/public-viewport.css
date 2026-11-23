@@ -34,6 +34,8 @@ html[data-theme="light"] { --bg: #f4f6f8; --bg-2: #eaf0f5; --surface: #fff; --su
 .public-pages .stats { margin-top: 20px; padding: 20px 0; }
 .public-pages .hero-portrait img { max-height: 360px; width: 100%; object-fit: contain; }
 .public-pages .feat-shot img { max-height: 200px; object-fit: cover; }
+.public-pages .card-shot { margin: 0 0 12px; aspect-ratio: auto; max-height: none; overflow: visible; background: transparent; }
+.public-pages .card-shot img { position: static; width: 100%; height: auto; max-width: 100%; max-height: 200px; object-fit: cover; }
 .public-pages .product-card { max-width: 800px; margin: 20px auto; }
 .public-pages .feature, .public-pages .quick-tool { margin-bottom: 16px; }
 .public-pages .hero { text-align: left; }
