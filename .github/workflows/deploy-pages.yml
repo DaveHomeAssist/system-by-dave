@@ -20,9 +20,11 @@ permissions:
 
 # Queue the next main push behind an in-flight publish. Cancelling would leave
 # GitHub Pages mid-deploy. This group already keeps two source publishes from
-# overlapping; the destination repo has its own "pages" group. The walk check
-# still has to wait for that destination run, because a read before it finishes
-# is cached for ten minutes (see scripts/check_domain_cutover_ready.mjs).
+# overlapping; the destination repo has its own "pages" group. A destination
+# is pushed only when its content changed (scripts/domain_publish_plan.mjs).
+# When the walk site did change, its check still has to wait for that
+# destination run, because a read before it finishes is cached for ten minutes
+# (see scripts/check_domain_cutover_ready.mjs).
 concurrency:
   group: systembydave-pages
   cancel-in-progress: false
