@@ -667,6 +667,15 @@ const TABS = [
 ];
 
 const STORIES = [
+  { slug: "the-philly-215", sec: "Awards", min: 2, by: "The Philly staff",
+    title: "The Philly 215",
+    dek: "A proposed set of 215 awards celebrating the people, places and work that make Philadelphia.",
+    facts: ["Awards concept", "215 proposed categories"],
+    body: [
+      "The Philly 215 would recognize the Philly originals, neighborhood heroes and collaborators who keep the city moving.",
+      "Music and nightlife categories could cover underground party series, Philadelphia DJs, independent promoters and live sound engineers. Genre awards could spotlight house, drum & bass, punk and jazz.",
+      "Other proposed categories include cheesesteaks, neighborhood bars, murals, independent films, local clothing brands, record stores, youth programs and nightlife safety initiatives.",
+      "The categories are in development. Nomination and voting details are to be announced." ] },
   { slug: "nightlife", sec: "Nightlife", pg: "04", min: 8, by: "The Philly staff",
     title: "Philly Nightlife: Ratings and Rankings",
     dek: "Where to go out, scored on what matters once you’re there.",
@@ -704,11 +713,15 @@ const STORIES = [
       "The ranked lists start on page 15. Online, each pick gets a page with hours, price range and the date it was last checked." ] },
   { slug: "potholes", sec: "City", pg: "20", min: 5, by: "The Philly staff",
     title: "Pothole Pandemic",
-    dek: "How to get your street fixed, step by step.",
+    dek: "How to report a pothole and follow up with Philly311.",
+    resources: [
+      { label: "Report a pothole", url: "https://www.phila.gov/services/streets-sidewalks-alleys/report-a-problem-on-a-city-street-sidewalk-or-alley/report-a-pothole-or-other-street-damage/" },
+      { label: "Track your request", url: "https://www.phila.gov/services/streets-sidewalks-alleys/report-a-problem-on-a-city-street-sidewalk-or-alley/track-a-service-request-with-311/" }
+    ],
     body: [
       "Every block has one: the pothole everybody swerves around and nobody reports, because everybody assumes somebody else already did.",
       "Reporting it takes a couple of minutes. Use Philly311 by phone, app or website, give the nearest address or intersection, and add a photo if you can. Keep the request number it gives you; that number is how you follow up.",
-      "Still there weeks later? Follow up with that number, and get your neighbors to file too. The full guide, including what to do when a repair goes wrong, is on page 21." ] },
+      "Save the service request number and use the City’s tracker or call 311 for an update. If the road is maintained by the state, the City can forward your request to PennDOT." ] },
   { slug: "break-ins", sec: "City", pg: "22", min: 5, by: "The Philly staff",
     title: "Breakin Bullies",
     dek: "How to keep your car from getting broken into.",
@@ -847,6 +860,7 @@ const BRANDS = [
 ];
 
 const TOC = [
+  { pg: "Web", sec: "Awards", title: "The Philly 215", dek: "A first look at the proposed citywide awards.", href: "#story-the-philly-215" },
   { pg: "04", sec: "Nightlife", title: "Philly Nightlife", dek: "Ratings and rankings of where to go out.", href: "#story-nightlife" },
   { pg: "08", sec: "Nightlife", title: "AfterJinx", dek: "Where HiJinx goes after midnight. Dec 30.", href: "#story-afterjinx" },
   { pg: "10", sec: "Sports", title: "76ers Mania", dek: "A city founded on democracy makes room for a king.", href: "#story-sixers" },
@@ -963,7 +977,7 @@ let pendingFocus = null;
 const daysUntil = iso => Math.round((day(iso) - day(todayISO())) / 864e5);
 const whenText = n => n < 0 ? "Past" : n === 0 ? "Today" : n === 1 ? "Tomorrow" : `In ${n} days`;
 function upNext(s) {
-  const byPage = [...STORIES].sort((a, b) => a.pg.localeCompare(b.pg)), i = byPage.indexOf(s);
+  const byPage = [...STORIES].sort((a, b) => (a.pg || "99").localeCompare(b.pg || "99")), i = byPage.indexOf(s);
   const after = byPage.slice(i + 1).concat(byPage.slice(0, i));
   const fresh = x => !visited.has(x.slug);
   return after.find(x => x.sec === s.sec && fresh(x)) || after.find(fresh) || after[0];
@@ -1057,8 +1071,8 @@ function show(tab) {
 
 /* ---------- issue ---------- */
 function renderIssue() {
-  $("#toc").innerHTML = TOC.map(t => `<li><a href="${t.href}"><span class="pg"><small>PAGE</small>${t.pg}</span><span class="t"><span>${esc(t.sec)}</span>${esc(t.title)}</span><span class="d">${esc(t.dek)}</span></a></li>`).join("");
-  $("#read-side-list").innerHTML = TOC.filter(t => !t.href.startsWith("#story")).map(t => `<li><a href="${t.href}"><span class="pg"><small>PAGE</small>${t.pg}</span><span class="t"><span>${esc(t.sec)}</span>${esc(t.title)}</span><span class="d">${esc(t.dek)}</span></a></li>`).join("");
+  $("#toc").innerHTML = TOC.map(t => `<li><a href="${t.href}"><span class="pg">${t.pg === "Web" ? "Web" : `<small>PAGE</small>${t.pg}`}</span><span class="t"><span>${esc(t.sec)}</span>${esc(t.title)}</span><span class="d">${esc(t.dek)}</span></a></li>`).join("");
+  $("#read-side-list").innerHTML = TOC.filter(t => !t.href.startsWith("#story")).map(t => `<li><a href="${t.href}"><span class="pg">${t.pg === "Web" ? "Web" : `<small>PAGE</small>${t.pg}`}</span><span class="t"><span>${esc(t.sec)}</span>${esc(t.title)}</span><span class="d">${esc(t.dek)}</span></a></li>`).join("");
   $("[data-issue-tag]").innerHTML = `Vol. 1 · No. ${esc(CONFIG.issue)}<br>${esc(CONFIG.season)}`;
 }
 
@@ -1070,7 +1084,7 @@ function renderSectionChips() {
 function renderStoryList() {
   const list = STORIES.filter(s => state.section === "All" || s.sec === state.section);
   $("#story-list").innerHTML = list.map(s => `<li><button class="story-item" type="button" data-story="${s.slug}" aria-current="${s.slug === state.story}">
-    <span class="si-sec">${esc(s.sec)} · p. ${s.pg}</span><span class="si-title">${esc(s.title)}</span><span class="si-meta">${esc(s.by)} · ${s.min} min read</span></button></li>`).join("");
+    <span class="si-sec">${esc(s.sec)} · ${s.pg ? "p. " + s.pg : "Web preview"}</span><span class="si-title">${esc(s.title)}</span><span class="si-meta">${esc(s.by)} · ${s.min} min read</span></button></li>`).join("");
 }
 function renderReader(slug, opened = false) {
   const s = STORIES.find(x => x.slug === slug) || STORIES[0];
@@ -1082,7 +1096,7 @@ function renderReader(slug, opened = false) {
     <p class="kicker">${esc(s.sec)}</p>
     <h2>${esc(s.title)}</h2>
     <p class="dek">${esc(s.dek)}</p>
-    <div class="byline"><span>By ${esc(s.by)}</span><span>${s.min} min read</span><span>Issue ${CONFIG.issue} · p. ${s.pg}</span></div>
+    <div class="byline"><span>By ${esc(s.by)}</span><span>${s.min} min read</span><span>${s.pg ? `Issue ${CONFIG.issue} · p. ${s.pg}` : "Web preview"}</span></div>
     ${s.facts ? `<ul class="facts">${s.facts.map(f => `<li>${esc(f)}</li>`).join("")}</ul>` : ""}
     ${s.body.map((p, i) => `<p class="body${i ? "" : " lead"}">${esc(p)}</p>`).join("")}
     ${s.radar ? `<section class="radar" aria-labelledby="radar-h">
@@ -1097,9 +1111,10 @@ function renderReader(slug, opened = false) {
       </div>
       <div class="radar-frame" id="radar-frame" hidden></div>
     </section>` : ""}
-    <p class="print-note">In print: Issue ${CONFIG.issue}, ${esc(CONFIG.season)}, page ${s.pg}. ${s.note ? `${esc(s.note)}${s.source ? ` <a href="${esc(s.source)}" target="_blank" rel="noopener">Event page</a>` : ""}` : "Sample story written for this prototype."}</p>
+    ${s.resources ? `<div class="btns">${s.resources.map(link => extLink(link)).join("")}</div>` : ""}
+    ${s.pg ? `<p class="print-note">In print: Issue ${CONFIG.issue}, ${esc(CONFIG.season)}, page ${s.pg}. ${s.note ? `${esc(s.note)}${s.source ? ` <a href="${esc(s.source)}" target="_blank" rel="noopener">Event page</a>` : ""}` : "Sample story written for this prototype."}</p>` : ""}
     <div class="upnext"><p class="kicker">Up next ${nx.sec === s.sec ? "in " + esc(s.sec) : "in the issue"}</p>
-      <button type="button" data-story="${nx.slug}"><span class="un-title">${esc(nx.title)}</span><span class="un-dek">${esc(nx.dek)}</span><span class="un-meta">${esc(nx.sec)} · p. ${nx.pg} · ${nx.min} min read</span></button></div>
+      <button type="button" data-story="${nx.slug}"><span class="un-title">${esc(nx.title)}</span><span class="un-dek">${esc(nx.dek)}</span><span class="un-meta">${esc(nx.sec)} · ${nx.pg ? "p. " + nx.pg : "Web preview"} · ${nx.min} min read</span></button></div>
   </div>`;
   $$(".story-item").forEach(b => b.setAttribute("aria-current", String(b.dataset.story === s.slug)));
   $("#reader").scrollTop = 0; $(".panel.read").scrollTop = 0;
