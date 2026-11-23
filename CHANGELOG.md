@@ -802,6 +802,11 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 - Add a restrictive content policy to the noindex brand reference, allowing its existing Google font sources and local navigation script while blocking connections, inline scripts, objects and forms.
 - Preserve all seven reference sections and artwork with light/default and dark reading themes, keyboard section tabs, bounded reading, URL history, print expansion and no-JavaScript access.
 
+## October 30, 2026: Platform setup documentation
+
+- Declare Node.js 24 for local package tooling, matching CI, with `.nvmrc`.
+- Include the venue walk publishing domain in repository orientation and the domain source map. Replace stale pre-cutover wording while preserving the separate authenticated acceptance gate.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced
