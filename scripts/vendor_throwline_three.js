@@ -6,6 +6,9 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const files = [
+  ['node_modules/three/examples/jsm/utils/SkeletonUtils.js', 'ProjectorThrow/vendor/three/addons/utils/SkeletonUtils.js'],
+  ['node_modules/three/examples/jsm/loaders/GLTFLoader.js', 'ProjectorThrow/vendor/three/addons/loaders/GLTFLoader.js'],
+  ['node_modules/three/examples/jsm/utils/BufferGeometryUtils.js', 'ProjectorThrow/vendor/three/addons/utils/BufferGeometryUtils.js'],
   ['node_modules/three/build/three.module.min.js', 'ProjectorThrow/vendor/three/three.module.min.js'],
   ['node_modules/three/build/three.core.min.js', 'ProjectorThrow/vendor/three/three.core.min.js'],
   ['node_modules/three/examples/jsm/controls/OrbitControls.js', 'ProjectorThrow/vendor/three/addons/controls/OrbitControls.js'],

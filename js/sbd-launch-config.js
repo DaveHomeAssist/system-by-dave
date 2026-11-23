@@ -22,17 +22,26 @@ window.SBD_LAUNCH = {
   // Until provider and url are both valid, checkout stays disabled.
   fieldKit: {
     // Chosen: Stripe Payment Links (2026-10-19), on a SEPARATE AV by Dave Stripe
-    // account (Dave, 2026-10-23), not the System by Dave one. The statement
-    // descriptor on field-kit/index.html stays a [STATEMENT DESCRIPTOR] placeholder
-    // until that account exists and its descriptor is known. Replace the
-    // placeholder below with that account's Payment Link, e.g.
-    // 'https://buy.stripe.com/xxxxxxxx'. Until it's a valid buy.stripe.com link,
-    // checkout stays closed.
+    // account (Dave, 2026-10-23), not the System by Dave one. The page says the
+    // card statement will show AVBYDAVE FIELD KIT. The delivery, refund, and
+    // licence paragraphs still carry data-dave-placeholder, so the buy button
+    // stays disabled even after the Payment Link below is real. Replace the
+    // placeholder with that account's Payment Link, e.g.
+    // 'https://buy.stripe.com/xxxxxxxx'. Until it's a valid buy.stripe.com link
+    // and those markers are removed, checkout stays closed.
     checkout: { provider: 'stripe', url: '[DAVE: Stripe Payment Link]', mode: 'link' },
     // Price buyers see (Dave, 2026-10-30); the Stripe price must match it.
     // A [DAVE: …] placeholder, 'Price TBD' or '' shows "Price TBD" and keeps
     // checkout closed. A real price alone does not open checkout: the
     // Payment Link and the page's DRAFT blocks still gate it.
-    priceLabel: '$12'
+    priceLabel: '$12',
+    // After-payment download page (field-kit/thanks/, docs/launch/checkout.md).
+    // The share link to the kit files stays in Stripe's Payment Link settings;
+    // only its SHA-256 goes here, printed by
+    //   npm run hash:field-kit-link -- '<share link>'
+    // The page shows the download button and the "payment went through" line
+    // only for a link whose hash is listed. Empty keeps both off, so buyers
+    // see "email me". List the old and new hash while replacing a link.
+    download: { sha256: [] }
   }
 };

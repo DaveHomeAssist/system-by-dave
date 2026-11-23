@@ -1,0 +1,23 @@
+{
+  "venue": {
+    "version": 1,
+    "title": "Walnut Street Theatre appearance reference",
+    "modelVersion": "appearance-v3-partial",
+    "notes": "Reuses appearance revision 3. Approximate building, not surveyed. Axis and stage-floor datum normalized only; C target-plane depth and measured 50 ft first-level endpoints remain unidentified. Do not align planning beams to this building yet. Source dimensions and seating are illustrative.",
+    "units": "metres",
+    "up": "Y",
+    "upstage": "-Z",
+    "cutaway": [],
+    "assets": {
+      "room": {
+        "bytes": 4377700,
+        "sha256": "2fd4845996422ae7e8138fb771f57c6cd38c70639d2ffcce78bb6028e4fcf27f",
+        "url": "/stage/room.glb"
+      }
+    },
+    "registration": {
+      "status": "partial-unregistered",
+      "planningOverlayAllowed": false
+    }
+  }
+}

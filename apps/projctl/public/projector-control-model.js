@@ -1,0 +1,267 @@
+// Projector control model, shared by the role pages. Pure functions over the relay snapshot:
+// no DOM, no network. A value is a reading only while the relay's reply behind it is current.
+// Everything else is worded as "check by eye" or "not reported", never as a state.
+import { LANES, rigLanes } from './lanes.js';
+import { fieldFeedback, feedbackAge } from './status-feedback.js';
+
+export const CONFIRM_MS = 6000;        // an action armed on the page
+export const RELAY_CONFIRM_MS = 3000;  // the relay's own power-off confirmation
+export const GUARD_MS = 600;           // a double tap is not two steps
+export const REPORT_MS = 30000;        // how long a sent command waits for the projector's own report
+export const ALL = 'ALL';
+
+// The four actions. `want` is what the projector reports once the command has taken.
+export const ACTIONS = Object.freeze({
+  'power-on': Object.freeze({ id: 'power-on', row: 'power', cmd: 'power', arg: 1, label: 'On', verb: 'Power on', field: 'power', want: ['on', 'warming'], relayConfirm: false }),
+  'power-off': Object.freeze({ id: 'power-off', row: 'power', cmd: 'power', arg: 0, label: 'Off', verb: 'Power off', field: 'power', want: ['off', 'cooling'], relayConfirm: true }),
+  'shutter-open': Object.freeze({ id: 'shutter-open', row: 'shutter', cmd: 'shutter', arg: 0, label: 'Open', verb: 'Open shutter', field: 'shutter', want: ['open'], relayConfirm: false }),
+  'shutter-close': Object.freeze({ id: 'shutter-close', row: 'shutter', cmd: 'shutter', arg: 1, label: 'Close', verb: 'Close shutter', field: 'shutter', want: ['closed'], relayConfirm: false }),
+});
+export const ACTION_IDS = Object.freeze(Object.keys(ACTIONS));
+
+// Show Lock blocks power off, as the relay does. Power on and shutters stay available under it.
+// A page that wants to be stricter can also lock power on, or every all-lanes action.
+export const DEFAULT_POLICY = Object.freeze({ lockBlocksPowerOn: false, lockBlocksGroup: false });
+
+const shortClock = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+const stamp = value => typeof value === 'number' ? value : typeof value === 'string' ? Date.parse(value) : NaN;
+export const clockShort = value => Number.isFinite(stamp(value)) ? shortClock.format(new Date(stamp(value))) : null;
+export const lower = text => text.charAt(0).toLowerCase() + text.slice(1);
+export const list = items => items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
+
+// PJLink alarm status: 0 none, 1 warning, 2 error. A driver that never read alarms reports nothing.
+const ALARMS = [['fan', 'fan'], ['lamp', 'lamp'], ['temp', 'temperature'], ['cover', 'cover'], ['filter', 'filter'], ['other', 'other']];
+export function alarmSummary(errors) {
+  if (!errors || typeof errors !== 'object') return null;
+  const items = ALARMS.filter(([key]) => Number(errors[key]) > 0)
+    .map(([key, name]) => ({ key, name, level: Number(errors[key]) >= 2 ? 'error' : 'warning' }))
+    .sort((a, b) => (b.level === 'error') - (a.level === 'error'));
+  if (!items.length) return null;
+  const text = items.map(item => `${item.name} ${item.level}`).join(', ');
+  return { level: items[0].level, text: text.charAt(0).toUpperCase() + text.slice(1) };
+}
+
+// Which link the relay is using for this projector. As reported from the rig on November 18, the
+// shutter over the control port works there and power over it has not been sent. The tag stays
+// until a watched power test passes; this build did not verify either statement itself.
+export const LINK_CAUTIONS = Object.freeze({
+  'control-port': Object.freeze({ caution: 'power untested', text: 'Shutter over this link is proven on the rig. Power over it has not been tested on the rig yet.' }),
+});
+export function linkOf(projector) {
+  const reported = projector?.status?.controlLink, driver = projector?.driver;
+  const id = reported === 'control-port' || reported === 'pjlink' ? reported
+    : driver === 'panasonic' || driver === 'pjlink' ? 'pjlink' : driver === 'pulse' ? 'pulse' : driver === 'simulator' ? 'simulator' : null;
+  const label = { 'control-port': 'Control port', pjlink: 'PJLink', pulse: 'Barco API', simulator: 'Simulator' }[id] || 'Not reported';
+  return { id, label, caution: LINK_CAUTIONS[id]?.caution ?? null, cautionText: LINK_CAUTIONS[id]?.text ?? null };
+}
+
+const patternIsOff = value => ['00', 'off', '0'].includes(String(value).toLowerCase());
+// Barco Pulse states after an off. READY is the target: the morning power on can reach it. STANDBY and
+// ECO are deep standby, where the projector's network is down. Researched, not yet tested on a rig.
+export const DEEP_STANDBY = Object.freeze(['standby', 'eco']);
+export const DEEP_STANDBY_TEXT = 'Deep standby: the morning power on cannot reach it.';
+const BLOCKED = {
+  connecting: 'Waiting for the relay.',
+  'relay-offline': 'Relay not answering. Check by eye.',
+  conflict: 'Lane claimed twice. Check by eye.',
+  unassigned: 'No projector on this lane.',
+  stale: 'Reply too old. Waiting for a fresh one.',
+  unreached: "Relay can't reach it. Check by eye.",
+};
+
+function blockedLane(base, reach, fresh) {
+  const connecting = reach === 'connecting';
+  return { ...base, reach, tone: connecting ? 'off' : 'eye', headline: connecting ? 'CONNECTING' : 'CHECK BY EYE', word: connecting ? 'WAIT' : 'EYE', power: null, shutter: null, lit: false,
+    shutterText: 'Not reported', inputText: 'Not reported', inputFlag: null, input: null, expectedInput: null, patternText: 'Not reported', patternFlag: null, pattern: null,
+    link: null, freshText: fresh, alarm: null, alarmsReported: false, raw: null, deepStandby: false, caution: null, flags: [], blocked: BLOCKED[reach] };
+}
+
+// One view per drawing lane A to D. `monitor` is createConnectionMonitor() from projector-connection.js.
+export function laneViews(snapshot, { relayConnected = false, everConnected = false, monitor, now = Date.now() } = {}) {
+  const projectors = Array.isArray(snapshot?.projectors) ? snapshot.projectors : [];
+  const pollMs = snapshot?.relay?.pollIntervalMs || 5000;
+  return rigLanes(projectors).map(({ lane, projector: p, conflict }) => {
+    const base = { lane, surface: LANES[lane].target, slot: p?.slot ?? null, revision: p?.controlRevision ?? null,
+      model: p ? String(p.model || p.label || '').slice(0, 40) : '' };
+    if (!snapshot || !everConnected) return blockedLane(base, 'connecting', 'Waiting for relay');
+    if (!relayConnected) return blockedLane(base, 'relay-offline', 'Relay not answering');
+    if (conflict) return blockedLane(base, 'conflict', 'Lane claimed twice');
+    if (!p) return blockedLane(base, 'unassigned', 'Nothing assigned');
+    const c = monitor(p, true, pollMs, now), s = p.status || {};
+    if (c.state === 'unassigned') return blockedLane(base, 'unassigned', 'No address saved');
+    if (!c.current) {
+      if (c.state === 'stale') return blockedLane(base, 'stale', `Last reply ${lower(c.ageLabel)}`);
+      if (c.state === 'checking') return blockedLane(base, 'unreached', 'Relay is checking');
+      const last = clockShort(c.lastSuccessAt);
+      return blockedLane(base, 'unreached', last ? `Last reply ${last}` : 'No reply yet');
+    }
+    const reported = field => fieldFeedback(p, field, c).current;
+    const power = reported('power') && ['on', 'off', 'warming', 'cooling'].includes(s.power) ? s.power : 'unknown';
+    const shutter = reported('shutter') && ['open', 'closed'].includes(s.shutter) ? s.shutter : 'unknown';
+    const alarmsReported = reported('errors') && ALARMS.some(([key]) => [0, 1, 2].includes(s.errors?.[key]));
+    const alarm = alarmsReported ? alarmSummary(s.errors) : null;
+    const lit = power === 'on';
+    const raw = reported('power') && typeof s.rawState === 'string' && /^[a-z]{1,20}$/.test(s.rawState) ? s.rawState : null;
+    const deepStandby = power === 'off' && DEEP_STANDBY.includes(raw);
+
+    // Input and pattern are read only. They explain a wrong or blue picture; this page never changes them.
+    const names = p.inputs && typeof p.inputs === 'object' && !Array.isArray(p.inputs) ? p.inputs : {};
+    const input = reported('input') ? String(s.input) : null;
+    const want = p.inputPreference?.available ? { value: String(p.inputPreference.value), label: String(p.inputPreference.label) } : null;
+    const inputName = input == null ? null : String(names[input] || `Input ${input}`).slice(0, 24);
+    const inputFlag = input != null && want && input !== want.value ? `Expected ${want.label}` : null;
+    const pattern = reported('pattern') ? String(s.pattern) : null;
+    const patternOn = pattern != null && !patternIsOff(pattern);
+    const patternName = patternOn ? String(p.patterns?.[pattern] || pattern).slice(0, 24) : null;
+
+    const flags = [...(alarm ? [lower(alarm.text)] : []), ...(deepStandby ? ['deep standby'] : []), ...(lit && patternOn ? ['test pattern on'] : []), ...(lit && inputFlag ? [`input ${inputName}`] : [])];
+    return { ...base, reach: 'live', tone: !lit || flags.length ? 'attention' : 'ok',
+      headline: power === 'unknown' ? 'POWER UNKNOWN' : power.toUpperCase(), word: power === 'unknown' ? '?' : power === 'warming' ? 'WARM' : power === 'cooling' ? 'COOL' : power.toUpperCase(),
+      power, shutter, lit,
+      shutterText: shutter === 'unknown' ? 'Not reported' : lit && shutter === 'closed' ? 'CLOSED · dark on stage' : shutter.toUpperCase(),
+      input, expectedInput: want, inputText: inputName ?? 'Not reported', inputFlag,
+      pattern, patternText: pattern == null ? 'Not reported' : patternOn ? `ON · ${patternName}` : 'Off', patternFlag: patternOn ? 'Test pattern is on' : null,
+      link: linkOf(p), freshText: `Reply ${lower(c.ageLabel)}`, alarm, alarmsReported, raw, deepStandby, caution: deepStandby ? `${raw.toUpperCase()}. ${DEEP_STANDBY_TEXT}` : null, flags, blocked: null };
+  });
+}
+
+// The power banner's look, from the lane's reading only (the show page design reference, November 19):
+// lit, warming, cooling, ready (a Barco this page can wake), deep-standby (one it cannot), off or
+// unknown. The banner's words stay ON, OFF and so on; note is a short second line, or ''. A lane
+// with no current reply has no look: it keeps CONNECTING, or the amber CHECK BY EYE.
+export function powerLook(view) {
+  if (view?.reach !== 'live') return { look: null, note: '' };
+  if (view.power === 'on') return { look: 'lit', note: '' };
+  if (view.power === 'warming' || view.power === 'cooling') return { look: view.power, note: '' };
+  if (view.power === 'off' && view.deepStandby) return { look: 'deep-standby', note: `${view.raw.toUpperCase()} · this page can't wake it` };
+  if (view.power === 'off' && view.raw === 'ready') return { look: 'ready', note: 'READY · this page can wake it' };
+  return { look: view.power === 'off' ? 'off' : 'unknown', note: '' };
+}
+
+// A shutter command in one of the page's operations (the lane's own, or an all-lanes one) that was
+// sent to this lane and is waiting for, or has missed, its report: OPEN or CLOSE. Otherwise null.
+export function pendingShutter(ops, lane) {
+  for (const op of ops) {
+    const action = op && ACTIONS[op.action];
+    if (action?.row !== 'shutter') continue;
+    const target = op.targets?.find(item => item.lane === lane);
+    if (target && (target.status === 'accepted' || target.status === 'timeout')) return action.label.toUpperCase();
+  }
+  return null;
+}
+
+// The shutter pill: what the lane reports, or a shutter command sent and not yet confirmed.
+// pending is the command's word (OPEN or CLOSE) while it waits for, or has missed, its report.
+export function shutterLook(view, pending = null) {
+  if (pending) return { look: 'sent-unconfirmed', text: `${pending} sent, not confirmed` };
+  const text = view?.shutterText || 'Not reported';
+  return view?.reach === 'live' && (view.shutter === 'open' || view.shutter === 'closed') ? { look: view.shutter, text } : { look: 'not-reported', text };
+}
+
+// Whether one action is offered for one lane right now, and the reason when it is not.
+// lock is true, false or null (unknown, for example while the relay is not answering).
+export function actionState(view, actionId, { lock = null, policy = DEFAULT_POLICY } = {}) {
+  const action = ACTIONS[actionId], no = reason => ({ enabled: false, reason, note: '' });
+  if (!action || !view) return no('Not available.');
+  if (view.reach !== 'live') return no(view.blocked || 'No current reply.');
+  if (!view.slot || !view.revision) return no('No reviewed target for this lane.');
+  const power = view.power, POWER = power.toUpperCase();
+  if (action.cmd === 'power') {
+    if (lock === null) return no('Show Lock not read.');
+    if (lock && !action.arg) return no('Show Lock is on. Power off is locked.');
+    if (lock && policy.lockBlocksPowerOn) return no('Show Lock is on. Power is locked.');
+    if (power === 'unknown') return no('Power not reported.');
+    if (action.arg) {
+      if (power === 'off') return { enabled: true, reason: '', note: '' };
+      return no(power === 'on' ? 'Already reports ON.' : power === 'warming' ? 'Already warming up.' : 'Cooling. Wait before power on.');
+    }
+    if (power === 'on' || power === 'warming') return { enabled: true, reason: '', note: '' };
+    return no(power === 'off' ? 'Already reports OFF.' : 'Already cooling.');
+  }
+  if (power !== 'on') return no(power === 'unknown' ? 'Power not reported, so no shutter move.' : `Reports ${POWER}, so no shutter move.`);
+  const there = action.arg ? 'closed' : 'open';
+  if (view.shutter === there) return no(`Already reports ${there.toUpperCase()}.`);
+  return { enabled: true, reason: '', note: view.shutter === 'unknown' ? 'Shutter position not reported.' : '' };
+}
+
+// The one reason shared by every action on a lane, or '' when they differ or any is offered.
+export function sharedReason(view, options) {
+  const reasons = new Set(ACTION_IDS.map(id => { const state = actionState(view, id, options); return state.enabled ? '' : state.reason; }));
+  return reasons.size === 1 ? [...reasons][0] : '';
+}
+
+// An all-lanes action sends one command per ready lane; the skipped lanes are listed with their reasons.
+export function groupState(views, actionId, { lock = null, policy = DEFAULT_POLICY } = {}) {
+  const action = ACTIONS[actionId], ready = [], skipped = [];
+  for (const view of views) {
+    const state = actionState(view, actionId, { lock, policy });
+    if (state.enabled) ready.push({ lane: view.lane, slot: view.slot, revision: view.revision });
+    else skipped.push({ lane: view.lane, reason: state.reason });
+  }
+  const no = reason => ({ enabled: false, reason, ready: [], skipped });
+  if (!action) return no('Not available.');
+  if (lock === null) return no(views.some(view => view.reach === 'connecting') ? 'Waiting for the relay.' : 'Show Lock not read.');
+  if (lock && policy.lockBlocksGroup) return no('Show Lock is on. All-lanes actions are locked.');
+  if (!ready.length) { const reasons = new Set(skipped.map(item => item.reason)); return no(reasons.size === 1 ? [...reasons][0] : 'No lane can take this now.'); }
+  return { enabled: true, reason: '', ready, skipped };
+}
+
+export const targetsText = ready => list(ready.map(target => target.lane));
+// Lanes skipped for the same reason are named together, so the list stays short enough to read.
+export function skippedText(skipped) {
+  const byReason = new Map();
+  for (const item of skipped) byReason.set(item.reason, [...(byReason.get(item.reason) || []), item.lane]);
+  return [...byReason].map(([reason, lanes]) => `${list(lanes)}: ${lower(String(reason)).replace(/\.$/, '')}`).join(' · ');
+}
+
+// Counts for the all-lanes card.
+export function groupSummary(views) {
+  const live = views.filter(view => view.reach === 'live');
+  return { total: views.length, reading: live.length, lit: live.filter(view => view.lit).length, closed: live.filter(view => view.lit && view.shutter === 'closed').length };
+}
+
+// Which all-four run to suggest now, or null. A suggestion only highlights a button and says why; it
+// never presses one, arms one or starts a timer. B and C, the two laser units, are read all day, so both
+// must have current replies and agree:
+//   B and C read OFF -> "Turn all on", but not within 6 hours of an off run ending (that is the night).
+//   B and C read ON and Show Lock is off -> "Turn all off", but not within an hour of an on run ending
+//   (that is the morning check). Show Lock is on through the shows, so the off run is not suggested then.
+// No clock is read: the rig's own state and the last run decide it. `run` is the shared run state.
+export const SUGGEST_QUIET_MS = Object.freeze({ afterOff: 6 * 3600000, afterOn: 3600000 });
+export function suggestRun(views, { lock = null, run = undefined, now = Date.now() } = {}) {
+  if (!run || run.active) return null; // not read yet, no run on this relay, or one in progress
+  const b = views.find(view => view.lane === 'B'), c = views.find(view => view.lane === 'C');
+  if (b?.reach !== 'live' || c?.reach !== 'live' || b.power !== c.power) return null;
+  const last = run.run, ended = Date.parse(last?.endedAt || ''), since = Number.isFinite(ended) ? now - ended : Infinity;
+  if (b.power === 'off') {
+    if (last?.direction === 'off' && since < SUGGEST_QUIET_MS.afterOff) return null;
+    return { direction: 'on', text: 'B and C read OFF. Morning: Turn all on?' };
+  }
+  if (b.power === 'on') {
+    if (lock !== false || (last?.direction === 'on' && since < SUGGEST_QUIET_MS.afterOn)) return null;
+    return { direction: 'off', text: 'B and C read ON and Show Lock is off. Night: Turn all off?' };
+  }
+  return null;
+}
+
+// A plain summary of a finished run, to send to whoever needs it ("units off at 10:04 PM ...").
+// It is a starting point: the operator adds anything odd wherever they report it.
+export function runSummary(run, views = []) {
+  if (!run || run.state === 'running') return '';
+  const when = clockShort(run.endedAt) || 'an unknown time';
+  const head = run.state === 'done' ? `Units ${run.direction === 'on' ? 'on' : 'off'} at ${when}.`
+    : run.state === 'attention' ? `${run.direction === 'on' ? 'Not all four on' : 'Not safe to leave yet'} at ${when}.`
+    : `Run ${run.state === 'interrupted' ? 'interrupted' : 'stopped'} at ${when}.`;
+  const parts = [head, String(run.message || '').trim()];
+  const c = views.find(view => view.lane === 'C');
+  if (run.direction === 'off' && c?.reach === 'live' && c.power === 'off' && c.raw && !/deep standby/i.test(run.message || '')) {
+    parts.push(c.deepStandby ? `C reads ${c.raw.toUpperCase()}: ${lower(DEEP_STANDBY_TEXT)}` : `C reads ${c.raw.toUpperCase()}.`);
+  }
+  if (run.direction === 'on') for (const step of run.steps || []) {
+    const lamp = /Lamp hours [^.]*\./.exec(String(step.note || ''));
+    if (lamp) parts.push(`${step.lane}: ${lower(lamp[0])}`);
+  }
+  return parts.filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+}
+
+export { LANES, feedbackAge };

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Frozen Startup Checks</title>
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to startup checks</a>
+<div class="shell">
+  <header class="header">
+    <span class="snow" aria-hidden="true">❄</span>
+    <div class="brand"><p class="eyebrow">Frozen at WST</p><h1>Projections · Startup System Check</h1></div>
+    <span class="badge" id="mode-badge">STARTUP CHECK</span>
+    <button id="theme" type="button">Dark mode</button>
+  </header>
+
+  <section class="ready-banner" id="ready-banner" aria-live="polite" hidden>
+    <div class="ready-mark" aria-hidden="true">✓</div>
+    <div class="ready-text">
+      <p class="eyebrow" id="ready-eyebrow">Show-night readiness</p>
+      <h2 id="ready-title">READY</h2>
+      <p id="ready-copy"></p>
+    </div>
+    <div class="ready-actions">
+      <button type="button" id="ready-details">Show checks</button>
+      <button type="button" class="primary" id="ready-rerun" hidden>Run check again</button>
+    </div>
+  </section>
+
+  <div class="layout" id="layout">
+    <main class="main" id="main">
+      <section class="status running" id="status" aria-live="polite">
+        <div class="icon" id="status-icon" aria-hidden="true">…</div>
+        <div><h3 id="status-title">Starting checks</h3><p id="status-copy">Waiting for the first result.</p></div>
+      </section>
+      <section class="panel">
+        <h3>Computer tests</h3>
+        <div class="test-head" aria-hidden="true"><span>Check</span><span>Result</span><span>Expected</span><span>Observed</span></div>
+        <ol class="steps" id="steps" aria-label="Computer test results"></ol>
+      </section>
+      <section>
+        <div class="section-head"><h3>Observed displays</h3><small id="count">Not observed yet</small></div>
+        <div class="displays" id="displays"></div>
+      </section>
+      <section class="action">
+        <div><strong id="next-title">Checks are running</strong><p id="next-copy">No action needed yet.</p></div>
+        <button class="primary" id="next" type="button" disabled>Checking…</button>
+      </section>
+    </main>
+    <aside class="side" id="details">
+      <section class="panel crew">
+        <h3>Crew check</h3>
+        <p>Requires visual confirmation by the operator in the room.</p>
+        <strong id="crew-state">NOT CHECKED · Crew confirmation required</strong>
+      </section>
+    </aside>
+  </div>
+  <footer><span id="footer-run">No run yet</span><span id="footer-receipt">Receipts are written for every run</span></footer>
+</div>
+
+<dialog id="crew-dialog">
+  <form method="dialog" id="crew-form">
+    <p class="eyebrow">Crew check</p>
+    <h2>Check the opening look</h2>
+    <p>Confirm what you can see in the room. This records your name against this run and is checked against a fresh computer observation.</p>
+    <label class="operator">Operator name<input type="text" id="operator" autocomplete="name" required></label>
+    <label><input type="checkbox" data-crew="surfacesAtoD">All four surfaces (A, B, C, D) look correct</label>
+    <label><input type="checkbox" data-crew="approvedShow">The approved show is loaded</label>
+    <label><input type="checkbox" data-crew="testCardsRemoved">Test cards are off</label>
+    <label><input type="checkbox" data-crew="openingLookRestored">The opening look is restored</label>
+    <label><input type="checkbox" data-crew="warningsReviewed">Warnings have been reviewed</label>
+    <div class="dialog-actions"><button value="cancel" type="submit" formnovalidate>Cancel</button><button class="primary" id="confirm" value="confirm" type="submit" disabled>Record crew check</button></div>
+  </form>
+</dialog>
+<script src="app.js"></script>
+</body>
+</html>

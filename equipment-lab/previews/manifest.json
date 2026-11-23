@@ -1,0 +1,297 @@
+{
+  "schema": "equipment-lab.previews.v1",
+  "description": "Renders of approximate 3D models for the Equipment Lab splash. They are not product photographs and prove nothing about physical accuracy.",
+  "pending": [
+    "I01",
+    "I02"
+  ],
+  "images": [
+    {
+      "file": "atem-hd8-iso.jpg",
+      "inventoryIds": [
+        "F01"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 39713,
+      "sha256": "7373fc85f1592a9b36d82283404a1cfbfd552d2b26f74fcf472feac4c5cec516"
+    },
+    {
+      "file": "barco-udm-4k22.jpg",
+      "inventoryIds": [
+        "P01"
+      ],
+      "source": "DaveHomeAssist/equipment-lab@27561a2bb5a27be756df38315a6389aa2235aa17 release/models/barco.udm4k22.inspection/preview.jpg, unchanged; rendered from the reloaded GLB by the package build, light stage #e9eae0",
+      "bytes": 21772,
+      "sha256": "77ddd7ac81079214b9dd0bf957bc8ad0ece5815062dc8b7b446247d72f8677d1",
+      "geometrySourceSha256": "9583dc58786b7dd54442822b1b34b269aa5b2224dcb23ce1fa5b558b712744ba"
+    },
+    {
+      "file": "camera-rig.jpg",
+      "inventoryIds": [
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07"
+      ],
+      "source": "Ion Workbench camera viewer capture from the Cartoni pilot at source revision 26108848220775fe258d1aa6b66c716877ed855c, cropped to the stage",
+      "bytes": 25700,
+      "sha256": "b9cf2583605d6de39583d276abdd92472602e4e7c3e3787a2f0e2178504cc944"
+    },
+    {
+      "file": "cartoni-maxima30.jpg",
+      "inventoryIds": [
+        "C02"
+      ],
+      "source": "Ion Workbench camera viewer capture from the Cartoni pilot at source revision 26108848220775fe258d1aa6b66c716877ed855c, cropped to the stage",
+      "bytes": 28753,
+      "sha256": "b935235dbc91561273d587450b73c6c6a6c4c1ba9c8438ea421a6aefd66b68c8"
+    },
+    {
+      "file": "ccu4.jpg",
+      "inventoryIds": [
+        "F02"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 40767,
+      "sha256": "425dc1e4be86ec42f5be6ea899ff263e01ed6a184fde97fb5e8ad43c00659f5a"
+    },
+    {
+      "file": "fmp-rig.jpg",
+      "inventoryIds": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "R07",
+        "R08",
+        "R09",
+        "R10",
+        "R11",
+        "R12",
+        "R13"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 38155,
+      "sha256": "3676fd83638a984bf003115b7552f0a7c6e325b296d10922ece8a13797e01455"
+    },
+    {
+      "file": "fujinon-digipower66.jpg",
+      "inventoryIds": [
+        "C01"
+      ],
+      "source": "Ion Workbench camera viewer capture from the Cartoni pilot at source revision 26108848220775fe258d1aa6b66c716877ed855c, cropped to the stage",
+      "bytes": 22168,
+      "sha256": "13aaa2825a47e8dae6ef0119d90880770be097364545fdc34ed10160c652ab08"
+    },
+    {
+      "file": "nnc-cdj-3000.jpg",
+      "inventoryIds": [
+        "N05"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 23723,
+      "sha256": "db91e5be3c4e82442479b77e76ff37b3dc1a8a762f5bd5514a5e658110cc7450",
+      "geometrySourceSha256": "75c5bd076ee12a0e079360219a1d510237cbf4cbf89ebf3d008fa225b12cbf2b"
+    },
+    {
+      "file": "nnc-cva-118.jpg",
+      "inventoryIds": [
+        "N09"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 12994,
+      "sha256": "abb55e42af9534011034939f0642d0127a5b739ec3c5aff161c0d003338f2a79",
+      "geometrySourceSha256": "bec60eb07d08834fb03177018eca5896b2df50e4c9d34a604e7d0327bab52dbf"
+    },
+    {
+      "file": "nnc-djm-a9.jpg",
+      "inventoryIds": [
+        "N06"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 21248,
+      "sha256": "a30ef02edf2c0c06ea9544c4b69f6161a75f1ec2696635943971b0fabd1c7799",
+      "geometrySourceSha256": "941bddc212b750761882107a647aa9beb2c2c3503989d31eaa6d3fb20a272117"
+    },
+    {
+      "file": "nnc-ekx-15sp.jpg",
+      "inventoryIds": [
+        "N10"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 13988,
+      "sha256": "cfad7f91c0f66fe45882f138ad2c68a4a02d49fac0b9b8e8cb662f42df2c73a9",
+      "geometrySourceSha256": "d85bc8308f9114cfe0c31ab5d18bbac5c763ef94970c23b60b19f9f3ae9576ea"
+    },
+    {
+      "file": "nnc-gx5.jpg",
+      "inventoryIds": [
+        "N04"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 23944,
+      "sha256": "44155fd183ff5282c01aff2d6e0cb6bec10e59c2d0b14db5106d487d76c7ecdd",
+      "geometrySourceSha256": "d06df1e568f7e517f6d467d832a5ef44464c4204a466ed898d13f98982b4590e"
+    },
+    {
+      "file": "nnc-gx7.jpg",
+      "inventoryIds": [
+        "N03"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 23944,
+      "sha256": "e52a0bdd2db7e45711040a3d6c38c9e92c728907274937d50e9d0fcb2b864a15",
+      "geometrySourceSha256": "2c3499062e105f4c619cbc06d3d2a943433948f82b02eaa683ed09d19801151b"
+    },
+    {
+      "file": "nnc-haze-1dx.jpg",
+      "inventoryIds": [
+        "N13"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 14446,
+      "sha256": "527a6ce530595d5e03855cc9a848e985e708c5be3d4256c81f18c7408abaa8ef",
+      "geometrySourceSha256": "527938570ecc88366a6c560525c20e89fc71474eddd4fd5c73ba6520790b6748"
+    },
+    {
+      "file": "nnc-j-six.jpg",
+      "inventoryIds": [
+        "N11"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 22769,
+      "sha256": "c7018935b71c0aa8bf1ae0e8b38d9f55feb8c3830802beebcbddcb7768a8cfb6",
+      "geometrySourceSha256": "6ffa37800cd774910c80ffd83c9703d5577a60eeaf4092af3d8360619f18e197"
+    },
+    {
+      "file": "nnc-lasercube-2w.jpg",
+      "inventoryIds": [
+        "N14"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 17313,
+      "sha256": "e85650c1345a91a2f9b822477443cc6dec478ecb5bca55e4c989a8d16d9cb1da",
+      "geometrySourceSha256": "ff6e48ed55ea770a3e45a0d28df5dc58d4db991057cfc2cab4f1a8c3f6a6a65f"
+    },
+    {
+      "file": "nnc-prime-4.jpg",
+      "inventoryIds": [
+        "N08"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 27520,
+      "sha256": "a22fbf913a947c312f79654897d39278a2b890b32746dbf420cc61aac0c1b208",
+      "geometrySourceSha256": "ca8fef5817a66bb6df41a5dcb184d3b524d7c1d89c73be13c62e79fc2d701828"
+    },
+    {
+      "file": "nnc-s181.jpg",
+      "inventoryIds": [
+        "N01"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 14230,
+      "sha256": "c2adda7ad563db99f3e82a40a877bd66dc3709cfd4c26acd0bbbd65828757e9c",
+      "geometrySourceSha256": "0bce09d2fb82be179a889cf8b5367a692575ac591e1b1243e0a5d44f039db2ae"
+    },
+    {
+      "file": "nnc-sm58.jpg",
+      "inventoryIds": [
+        "N16"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 14333,
+      "sha256": "252620f330750bd4fd6d2125454f5a2cc709597d678631f35819644a95c65006",
+      "geometrySourceSha256": "2ab088bd41c95f1417dbe2056e5328731a7c35a882b894b159f01726d188b00d"
+    },
+    {
+      "file": "nnc-tl60.jpg",
+      "inventoryIds": [
+        "N15"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 8045,
+      "sha256": "5571bfa66577c42a8ceb408e253be0ef87ea4824eebb5d507eeddc769dd773ab",
+      "geometrySourceSha256": "5ebe5349ccfb62acd9a7e39f395381386c221222f5cec9e52c6f0b58cc11aa4e"
+    },
+    {
+      "file": "nnc-vertigo-tri-led.jpg",
+      "inventoryIds": [
+        "N12"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 21916,
+      "sha256": "9bab68d745ed8fa93ad4a18d0b50e23cdacfdceae0cacdcf4ead97d809efbf64",
+      "geometrySourceSha256": "4fc8a008e9d6b3fb996ca55e6f2ae56e5dda2c0fb04e4e09bcdaabc8e1a3c659"
+    },
+    {
+      "file": "nnc-xdj-xz.jpg",
+      "inventoryIds": [
+        "N07"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 24750,
+      "sha256": "baf81d073452213dd378b27cf1c8aa02b824b291b52af8946bc0e931948b1e43",
+      "geometrySourceSha256": "8d344d3a383b9b791d08df1a82a33fe378fc90b523e3504ce333570c4644f050"
+    },
+    {
+      "file": "nnc-zlx-15bt.jpg",
+      "inventoryIds": [
+        "N02"
+      ],
+      "source": "DaveHomeAssist/nononsensephilly@3cfdc6e1c76872336cc217237e29834af834e342, approved main; rendered on Dominic on 2026-11-06, light stage #e9eae0, grid hidden",
+      "bytes": 11802,
+      "sha256": "433e673635e622a9f86b1751ebfc930533d2783886f48dac468f8989d8283c08",
+      "geometrySourceSha256": "8fe05db9a3b649e7c690af9493d868d988fdfb71529bcbb74a73bf05bb5384b9"
+    },
+    {
+      "file": "p240.jpg",
+      "inventoryIds": [
+        "F03"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 26233,
+      "sha256": "470fd417fe358f5d9cb6fe68de4a91101787be3ee0366d26e40c1a0344019f39"
+    },
+    {
+      "file": "panasonic-pt-dw830.jpg",
+      "inventoryIds": [
+        "P02"
+      ],
+      "source": "DaveHomeAssist/equipment-lab@7c81bb60335e68ff4d767093a34de32919a21601 release/models/panasonic.ptdw830.inspection/preview.jpg, unchanged; rendered from the reloaded GLB by the package build, light stage #e9eae0",
+      "bytes": 20306,
+      "sha256": "dbcd16d15f639b9f387dec1fc0c1887e423857f975ce702cb429c63ac3b4960d",
+      "geometrySourceSha256": "b555022fc2ba289d341668605a6d99760dfe13552db31058c91b602d128caaba"
+    },
+    {
+      "file": "panasonic-pt-rz970.jpg",
+      "inventoryIds": [
+        "P03"
+      ],
+      "source": "DaveHomeAssist/equipment-lab@7c81bb60335e68ff4d767093a34de32919a21601 release/models/panasonic.ptrz970.inspection/preview.jpg, unchanged; rendered from the reloaded GLB by the package build, light stage #e9eae0",
+      "bytes": 20076,
+      "sha256": "d3f02e97b3cb05b4ec8fe6a8f7ed7e6daef69f5cae3ef4642ca53c8007291a9c",
+      "geometrySourceSha256": "0c139dd9d72c73f55f86631b188e2e9c513d73423df7d7d1a053cc030d4a8006"
+    },
+    {
+      "file": "smartfade-1248.jpg",
+      "inventoryIds": [
+        "I03"
+      ],
+      "source": "Ion Workbench SmartFade 1248 viewer capture, cropped to the stage",
+      "bytes": 62733,
+      "sha256": "c046d18bafacbbdec2d53cc58031978f0a4f9042a003a3abd046cea935294d1c"
+    },
+    {
+      "file": "superjoy-g1.jpg",
+      "inventoryIds": [
+        "F04"
+      ],
+      "source": "DaveHomeAssist/fmp-suite@ab1fc0f88ade2fa2a4f6e480a7605de0bbd61212 models/previews capture, resized",
+      "bytes": 32895,
+      "sha256": "bb37702a1319b06eb8c52199f4d6ef1381e396d4934cc42af628366279d2a8b2"
+    }
+  ]
+}

@@ -455,13 +455,22 @@ async function main() {
     check('Offline ready appears only after the service worker controls the page', offlineStatus?.state === 'ready' && offlineStatus.controlled === true && /^Offline ready/.test(offlineStatus.badge), offlineStatus);
     await cdp('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
     let offlineReload;
+    let offlineReloadStatus = null;
     try {
       offlineReload = await open(AUDIT_QUERY);
+      // The page sets dataset.offline to "installing" synchronously, then "ready" only after
+      // the controlling worker answers. The calculated facts are already on screen. Wait for
+      // that hand-off while the network is still offline; reading once after it is restored
+      // races the hand-off.
+      for (let attempt = 0; attempt < 160; attempt += 1) {
+        offlineReloadStatus = await evaluate(`({ state:document.documentElement.dataset.offline, controlled:Boolean(navigator.serviceWorker?.controller) })`);
+        if (offlineReloadStatus.state === 'ready' && offlineReloadStatus.controlled === true) break;
+        await delay(125);
+      }
     } finally {
       await cdp('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
     }
-    const offlineReloadStatus = await evaluate(`({ state:document.documentElement.dataset.offline, controlled:Boolean(navigator.serviceWorker?.controller) })`);
-    check('Stage 3D reloads with calculated facts while the network is offline', offlineReload.ratio === '0.366:1' && offlineReloadStatus.state === 'ready' && offlineReloadStatus.controlled === true, { readout: offlineReload, offline: offlineReloadStatus });
+    check('Stage 3D reloads with calculated facts while the network is offline', offlineReload.ratio === '0.366:1' && offlineReloadStatus?.state === 'ready' && offlineReloadStatus?.controlled === true, { readout: offlineReload, offline: offlineReloadStatus });
 
     // 15b. Crew job sheet: plain-language placement, the verdict, and a QR link that reopens the same scene.
     await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=1.8962963&basisW=20&rasterAr=1.8962963&lh=6&dist=50&clr=1');
