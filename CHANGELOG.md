@@ -761,6 +761,19 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 
 - Upgrade Vite from 6.4.4 to 6.4.5 for GHSA-8g5g-mxqh-grgj and raise the minimum compatible version. Add a loopback regression proving raw/import queries cannot retrieve a denied synthetic file, enforced by the existing pull request contract job.
 
+## 2026-10-30: OnTrack keyboard and responsive workspace
+
+- Added first-focus workspace access, keyboard track opening, sortable column
+  buttons, debrief selection buttons and focus restoration after note edits.
+- Kept navigation within the viewport, moved mobile views to a bottom rail,
+  grouped filters and data actions into disclosures, and expanded set/debrief
+  panels on ultrawide screens.
+- Added a visible light/dark control with light as OnTrack's fresh default,
+  respecting the shared AV preference. Existing saved data and import/export
+  shapes remain unchanged.
+- Added a disposable browser regression for keyboard workflows, imports,
+  notes, backup/reload, theme persistence and responsive containment.
+
 ## October 30, 2026: Video Engineering Daily
 
 - Add Edition 023, Frame rate conversion families, with an AJA sourced

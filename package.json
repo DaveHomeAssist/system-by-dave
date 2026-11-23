@@ -32,6 +32,7 @@
     "check:throwline-catalog": "node scripts/sync_throwline_catalog.js --check",
     "verify:throwline": "node scripts/sync_throwline_catalog.js --check && node --test ProjectorThrow/throwline-scene-state.test.js && node scripts/verify_throwline_release.js",
     "probe:av-themes": "node scripts/probe_av_themes.js",
+    "test:ontrack-browser": "node scripts/probe_ontrack.mjs --no-sandbox",
     "probe:import-xss": "node scripts/probe_import_xss.mjs",
     "probe:cue-sheet-editing": "node scripts/probe_cue_sheet_editing.mjs",
     "probe:thephilly": "node scripts/probe_thephilly.mjs",

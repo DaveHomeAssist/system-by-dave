@@ -71,8 +71,8 @@ routes.forEach((route) => {
   if (/<meta http-equiv="refresh" content="0;url=\/av\/\?app=/.test(html)
       && html.includes('noindex,follow') && html.includes('location.replace(target.pathname + target.search)')) return;
   const escapedId = route.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  // Equipment Lab follows the current light-first contract; older shells retain their existing opt-in.
-  const expectedTheme = route.id === 'equipment-lab' ? 'light' : 'system';
+  // Converted specialists follow the light-first contract; older shells retain their existing opt-in.
+  const expectedTheme = ['equipment-lab', 'ontrack'].includes(route.id) ? 'light' : 'system';
   if (!new RegExp(`<html[^>]+data-av-theme="${expectedTheme}"[^>]+data-av-tool="${escapedId}"`, 'i').test(html)) {
     fail(`${route.file} does not opt into the ${expectedTheme} AV theme as ${route.id}.`);
   }
