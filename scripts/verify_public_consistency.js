@@ -121,8 +121,12 @@ function verifyCounts() {
   const contracts = new Map([
     ['index.html', [`>${count}</div>`, `${count} tools · one console · offline`]],
     ['tools.html', [`hosts ${count} applications and tools`]],
-    ['README.md', [`contains **${count} browser tools**`]]
+    ['README.md', [`contains **${count} browser tools**`]],
+    ['av-home/index.html', [`${count} browser tools`]]
   ]);
+  if (read('av-home/index.html').includes('avd-tab__count')) {
+    fail('av-home/index.html shows a tools-tab count that is not the registry count.');
+  }
   contracts.forEach((snippets, file) => {
     const source = read(file);
     snippets.forEach((snippet) => {

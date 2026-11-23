@@ -107,12 +107,6 @@ unlisted.forEach((file) => {
 });
 
 [
-  '/apps/av-workbook/',
-  '/apps/av-audio/',
-  '/apps/av-video/',
-  '/apps/show-ops/',
-  '/apps/show-control/',
-  '/apps/fmp-camera-sim/',
   '/camera-sim/',
   '/fmp-index/',
   '/fmp/',
@@ -160,7 +154,7 @@ hatFiles.forEach((file) => {
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],
-  ['command53/index.html', 'https://davehomeassist.github.io/command-center-061eed/private.html']
+  ['command53/index.html', 'https://systembydave.com/command53/']
 ].forEach(([file, expectedCanonical]) => {
   const source = read(file);
   if (!hasNoIndex(source)) fail(`${file} is missing noindex.`);

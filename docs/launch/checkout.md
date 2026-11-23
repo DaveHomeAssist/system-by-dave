@@ -46,9 +46,10 @@ The config ships `provider: 'stripe'` with the marked placeholder
 `url: '[DAVE: Stripe Payment Link]'` and `priceLabel: '$12'` (Dave, 2026-10-30),
 so checkout stays closed until a real `buy.stripe.com` link replaces the placeholder.
 **Account:** a separate AV by Dave Stripe account (Dave, 2026-10-23), not the System
-by Dave one. Its statement descriptor isn't known yet, so `[STATEMENT DESCRIPTOR]`
-stays a placeholder. The four blocks on the page carry **DRAFT** wording for
-Dave to approve, including `[STATEMENT DESCRIPTOR]`. Dave's click-steps live
+by Dave one. The page tells buyers the card statement will show
+`AVBYDAVE FIELD KIT`. The delivery, refund, and licence paragraphs no longer
+show draft labels. They still carry `data-dave-placeholder`, so the buy button
+stays disabled until those markers are removed. Dave's click-steps live
 outside the repo (`/workspace/launch/setup-stripe.md`).
 
 Delivery: Stripe doesn't host files. The Payment Link's "After payment" →
@@ -94,10 +95,9 @@ change and a push.
 
 1. Create the product with the provider, upload the kit files there (not to the
    repo), and set the price, tax and refund settings.
-2. Approve or edit the four DRAFT blocks (delivery, statement descriptor,
-   refunds, licence), fill in `[STATEMENT DESCRIPTOR]`, and remove the
-   `DRAFT, Dave …:` labels, the `kit-dave` class and the `data-dave-placeholder`
-   attribute.
+2. Approve or edit the delivery, refund, and licence paragraphs, then remove
+   each `data-dave-placeholder` attribute. The statement line already says
+   `AVBYDAVE FIELD KIT`. The buy button stays disabled while any marker remains.
 3. Replace the `url` placeholder in `js/sbd-launch-config.js` with the Payment
    Link (or paste another provider's block below), and set `priceLabel` to the
    Stripe price (for example `'$12'`):
