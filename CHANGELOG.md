@@ -1,5 +1,10 @@
 # Changelog
 
+## November 23, 2026. Theme Organizer on the tools directory
+
+- The Tools directory lists Theme Organizer under Labs. The card links to the live page at `https://davehomeassist.github.io/theme-organizer-resource/` and opens in a new tab. It browses, filters, compares, and shortlists 58 UI themes, and can inspect color tokens, copy CSS custom properties, preview a theme across the page, and export or import JSON. Choices stay in the browser.
+- The public project registry already named `DaveHomeAssist/theme-organizer-resource`. That row now uses the current description, repository size (822 KB), default-branch file count (45), commits in the last 90 days (20), and last update (2026-11-23). It stays out of the sitemap, the same way other tools that live on their own sites do.
+
 ## November 23, 2026. Projctl: the page can no longer fall behind the relay's status stream
 
 - **The flake.** The Public site contracts job intermittently failed at `apps/projctl/test/browser.cjs` line 104 (`locator.waitFor: Timeout 30000ms exceeded` waiting for `#adj-picture input`). It failed on unchanged `main` and on older commits, and a rerun passed. On Dominic it failed 7 of 7 runs on `main`.
