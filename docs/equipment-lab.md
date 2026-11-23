@@ -226,6 +226,36 @@ cover and each travel are approximate or assumed, and each part says so.
 Rollback: revert the host commit. That restores the 1.1.0 copy, which the
 import still recognizes as a previous release.
 
+### Lamp replacement walkthrough video
+
+On 14 November 2026 Dave asked for his PT-DW830 lamp replacement video on the
+830 entry. `equipment-lab/media/pt-dw830-lamp-replacement.mp4` is a silent
+1 minute 23 second walkthrough, 1920 × 1080 H.264 with the index at the front,
+rendered from P02 on this site. Its ten steps match the package's `lampUnit`
+procedure, step for step and part for part, and it opens and closes on
+Panasonic's warnings and advice. It is the byte-for-byte copy of Dave's file
+(SHA-256 `74fb95c1…c42b5`); `pt-dw830-lamp-replacement.jpg` is its title frame.
+
+- **Where.** Practice shows the video at the top of "Replacing a lamp unit",
+  under the source line and above "Before you start". The steps below it are
+  its text. Reference lists a download link. The AV console's Equipment Lab
+  panels show the same, since `av/` bundles the pack.
+- **Loading.** The video loads only when played (`preload="none"`). It shows its
+  poster until then.
+- **Host media.** The files sit in `equipment-lab/media/`, outside the managed
+  `data/` release, so a later shared release neither carries nor removes them.
+  `walkthroughs` in the P02 registry entry names them by procedure ID; the
+  air filter procedure has none. They move to avbydave.com with the rest of
+  `equipment-lab/`, as the previews do.
+- **Offline.** The video is not in the offline set: 10.7 MB is too much to
+  cache on every device that opens the suite. Offline, Practice keeps its steps
+  and the video does not play.
+- **Probe.** `test:equipment-lab-browser` checks the video's source, poster,
+  loading and download link, and that both files are served.
+
+The headless Chromium the probe uses has no H.264 decoder, so the probe does
+not play the video. Chrome, Safari, Edge and Firefox play it.
+
 ## Small screens
 
 Recorded on 13 November 2026. Two layout defects predated release 1.1.0 and

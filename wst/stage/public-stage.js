@@ -1,8 +1,8 @@
 import {createStageView} from './stage-view.js';
 const params=new URLSearchParams(location.search),html=document.documentElement,embedded=params.get('embed')==='workspace';
-if(embedded)html.classList.add('workspace-embedded');if(['light','dark'].includes(params.get('theme')))html.dataset.theme=params.get('theme');
+if(embedded)html.classList.add('workspace-embedded');if(['light','dark'].includes(params.get('theme')))window.FrozenTheme.set(params.get('theme'),{save:false});
 const parentOrigin = (() => { try { return new URL(document.referrer).origin; } catch { return null; } })();
-window.addEventListener('message',event=>{if(event.source!==parent||!embedded||event.origin!==parentOrigin||event.data?.type!=='wst:stage-theme'||!['light','dark'].includes(event.data.theme))return;html.dataset.theme=event.data.theme;});
+window.addEventListener('message',event=>{if(event.source!==parent||!embedded||event.origin!==parentOrigin||event.data?.type!=='wst:stage-theme'||!['light','dark'].includes(event.data.theme))return;window.FrozenTheme.set(event.data.theme,{save:false});});
 const root=document.querySelector('#tab-stage');root.setAttribute('role','region');root.removeAttribute('aria-labelledby');root.setAttribute('aria-label','Frozen Stage planning');
 const toolbar=document.createElement('div');toolbar.className='public-stage-toolbar';toolbar.setAttribute('role','toolbar');toolbar.setAttribute('aria-label','Stage planning controls');
 const modes=root.querySelector('.pj-stage-mode');modes.querySelector('[data-stage-mode=reference]').textContent='Recorded';modes.querySelector('[data-stage-mode=planning]').textContent='What-if';toolbar.append(modes);

@@ -11,6 +11,7 @@ importScripts('./js/sbd-registry.js');
 // Offline recovery: return directly to the cached native console.
 // November 3: refresh the Throwline inspection viewer with this cache generation.
 // November 12: add the Equipment Lab projector package to this cache generation.
+// November 14: report optional assets that failed to cache, and request persistent storage.
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();
@@ -82,6 +83,17 @@ function cacheOptionalAssets(cache){
   }));
 }
 
+/* Optional assets absent from the current cache generation. Computed from the
+   cache itself so the answer survives worker restarts. */
+var retriedMissing=false;
+function missingOptionalAssets(){
+  return caches.open(CACHE_NAME).then(function(cache){
+    return Promise.all(OPTIONAL_ASSETS.map(function(asset){
+      return cache.match(new URL(asset,self.registration.scope).href,{ignoreSearch:true}).then(function(found){return found?null:asset;});
+    }));
+  }).then(function(list){return list.filter(Boolean);});
+}
+
 self.addEventListener('install',function(event){
   event.waitUntil(caches.open(CACHE_NAME).then(function(cache){
     return cache.addAll(CRITICAL_ASSETS.map(fresh)).then(function(){
@@ -112,7 +124,20 @@ self.addEventListener('message',function(event){
     event.waitUntil(self.clients.claim());
   }
   if(event.data&&event.data.type==='SBD_OFFLINE_VERSION'&&event.ports&&event.ports[0]){
-    event.ports[0].postMessage({version:self.SBD_REGISTRY.version,cache:CACHE_NAME});
+    var port=event.ports[0];
+    // Report optional assets that did not make it into the cache (AVC-19), so the
+    // page can say so instead of a silent gap. Retry them once per worker start.
+    event.waitUntil(missingOptionalAssets().then(function(missing){
+      port.postMessage({version:self.SBD_REGISTRY.version,cache:CACHE_NAME,missing:missing});
+      if(missing.length&&!retriedMissing){
+        retriedMissing=true;
+        return caches.open(CACHE_NAME).then(function(cache){
+          return Promise.all(missing.map(function(asset){return cache.add(asset).catch(function(){});}));
+        });
+      }
+    }).catch(function(){
+      port.postMessage({version:self.SBD_REGISTRY.version,cache:CACHE_NAME});
+    }));
   }
 });
 

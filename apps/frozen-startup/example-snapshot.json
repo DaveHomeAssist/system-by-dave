@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "displays": [
+    {
+      "id": 10,
+      "connector": "fixture-port-0",
+      "identity": {
+        "vendor": 100,
+        "product": 200,
+        "serial": 300
+      },
+      "active": true,
+      "mode": {
+        "width": 1920,
+        "height": 1080,
+        "pixelWidth": 1920,
+        "pixelHeight": 1080,
+        "refreshRate": 60,
+        "x": 0,
+        "y": 0,
+        "main": true,
+        "mirrored": false,
+        "rotation": 0,
+        "colorMode": "fixture-rgb8"
+      }
+    },
+    {
+      "id": 11,
+      "connector": "fixture-port-1",
+      "identity": {
+        "vendor": 100,
+        "product": 200,
+        "serial": 0
+      },
+      "active": true,
+      "mode": {
+        "width": 1920,
+        "height": 1200,
+        "pixelWidth": 1920,
+        "pixelHeight": 1200,
+        "refreshRate": 59.95,
+        "x": 1920,
+        "y": 0,
+        "main": false,
+        "mirrored": false,
+        "rotation": 0,
+        "colorMode": "fixture-rgb8"
+      }
+    },
+    {
+      "id": 12,
+      "connector": "fixture-port-2",
+      "identity": {
+        "vendor": 100,
+        "product": 200,
+        "serial": 0
+      },
+      "active": true,
+      "mode": {
+        "width": 1920,
+        "height": 1200,
+        "pixelWidth": 1920,
+        "pixelHeight": 1200,
+        "refreshRate": 59.95,
+        "x": 3840,
+        "y": 0,
+        "main": false,
+        "mirrored": false,
+        "rotation": 0,
+        "colorMode": "fixture-rgb8"
+      }
+    },
+    {
+      "id": 13,
+      "connector": "fixture-port-3",
+      "identity": {
+        "vendor": 100,
+        "product": 200,
+        "serial": 0
+      },
+      "active": true,
+      "mode": {
+        "width": 1920,
+        "height": 1200,
+        "pixelWidth": 1920,
+        "pixelHeight": 1200,
+        "refreshRate": 59.95,
+        "x": 5760,
+        "y": 0,
+        "main": false,
+        "mirrored": false,
+        "rotation": 0,
+        "colorMode": "fixture-rgb8"
+      }
+    },
+    {
+      "id": 14,
+      "connector": "fixture-port-4",
+      "identity": {
+        "vendor": 100,
+        "product": 200,
+        "serial": 0
+      },
+      "active": true,
+      "mode": {
+        "width": 1920,
+        "height": 1200,
+        "pixelWidth": 1920,
+        "pixelHeight": 1200,
+        "refreshRate": 59.95,
+        "x": 7680,
+        "y": 0,
+        "main": false,
+        "mirrored": false,
+        "rotation": 0,
+        "colorMode": "fixture-rgb8"
+      }
+    }
+  ],
+  "millumin": {
+    "showSHA256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "controlDisplayID": 10,
+    "fullscreen": true,
+    "routes": {
+      "CH1": 13,
+      "CH2": 14,
+      "CH3": 11,
+      "CH4": 12,
+      "boost": 12
+    }
+  }
+}

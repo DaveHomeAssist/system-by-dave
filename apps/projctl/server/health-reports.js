@@ -63,12 +63,17 @@ function assessmentGaps(unit) {
   return gaps;
 }
 
-export function unitRow(p, st = {}, conn = {}, readings = null, readError = null, config = DEFAULTS) {
+// `watchSample` is the newest Thermal watch reading ({ c, at } with an epoch-ms time), passed only
+// when it is recent enough to stand in for a report-time reading that returned no intake value.
+// The row says where the number came from, and keeps the read error.
+export function unitRow(p, st = {}, conn = {}, readings = null, readError = null, config = DEFAULTS, watchSample = null) {
   const sensors = Array.isArray(readings?.sensors) ? readings.sensors : [];
   const intake = sensors.find((s) => s.role === 'intake' && Number.isFinite(s.c));
   const internal = sensors.filter((s) => s.role === 'internal' && Number.isFinite(s.c)).map((s) => s.c);
   const rated = ratedAmbientC(p, config.ratedAmbientC);
-  const headroom = intake && rated != null ? round1(rated - intake.c) : null;
+  const fallback = !intake && st?.online && Number.isFinite(watchSample?.c) && Number.isFinite(watchSample?.at) ? watchSample : null;
+  const intakeC = intake ? intake.c : fallback ? fallback.c : null;
+  const headroom = intakeC != null && rated != null ? round1(rated - intakeC) : null;
   const errors = st?.errors && typeof st.errors === 'object' ? st.errors : null; // PJLink ERST; null for Pulse
   const alarm = readings?.alarm == null ? null : String(readings.alarm).trim() || null;
   const completeErrors = errors && ['fan', 'lamp', 'temp', 'cover', 'filter', 'other'].every((key) => [0, 1, 2].includes(errors[key]));
@@ -83,10 +88,12 @@ export function unitRow(p, st = {}, conn = {}, readings = null, readError = null
   const watchAt = Number.isFinite(config.watchHeadroomC) ? config.watchHeadroomC : DEFAULTS.watchHeadroomC;
   const row = {
     slot: p.slot, lane: p.lane || null, model: [p.make, p.model].filter(Boolean).join(' ') || p.label || null, ip: p.ip || null, owner: p.owner || null,
-    power: st?.power || 'unknown', online, lastContact: conn?.lastSuccessAt || null, lightHours: Number.isFinite(st?.lightHours) ? st.lightHours : null,
-    intakeC: intake ? intake.c : null, intakeLabel: intake?.label || null, internalC: internal, ratedC: rated, headroomC: headroom,
+    power: online ? st?.power || 'unknown' : 'unknown', lastKnownPower: online ? null : st?.power || null, online, lastContact: conn?.lastSuccessAt || null, lightHours: Number.isFinite(st?.lightHours) ? st.lightHours : null,
+    intakeC, intakeLabel: intake?.label || (fallback ? 'Thermal watch sample' : null),
+    intakeSource: intake ? 'report' : fallback ? 'watch' : null, intakeAt: fallback ? new Date(fallback.at).toISOString() : null,
+    internalC: internal, ratedC: rated, headroomC: headroom,
     flags, warnings, alarm, flagSource: completeErrors ? 'PJLink' : alarm != null ? 'Pulse' : null,
-    readError: readError ? String(readError).slice(0, 200) : null,
+    readError: readError || readings?.readError ? String(readError || readings.readError).slice(0, 200) : null,
   };
   row.verdict = !online ? 'unreachable' : flags.length ? 'flag' : headroom != null && headroom <= watchAt ? 'watch' : assessmentGaps(row).length ? 'incomplete' : 'ok';
   return row;
@@ -109,6 +116,7 @@ export function summarize(units) {
   if (!n) findings.push('No assigned projectors.');
   else if (!reached.length) findings.push(`No units reachable; 0 of ${n} read.`);
   else if (flagged.length) findings.push(`${flagged.length} of ${n} units flagged: ${flagged.map((u) => `${who(u)} ${u.flags.join(', ')}`).join('; ')}.`);
+  else if (warned.length) findings.push(`${warned.length} of ${n} units report other projector alerts.`);
   else if (alarmRead.length) findings.push(`No temperature, fan or alarm flags reported by ${alarmRead.length} of ${n} units with alarm feedback.`);
   else findings.push(`Alarm feedback unavailable for all ${n} units.`);
   if (incomplete.length) findings.push(`Assessment incomplete for ${incomplete.length} of ${n} units: ${incomplete.map((u) => `${u.slot} (${assessmentGaps(u).map((gap) => `${gap} unavailable`).join(', ')})`).join('; ')}.`);
@@ -117,11 +125,17 @@ export function summarize(units) {
   if (warned.length) findings.push(`PJLink warnings: ${warned.map((u) => `${u.slot} ${u.warnings.join(', ')}`).join('; ')}.`);
   if (unreachable.length && reached.length) findings.push(`Not reached: ${unreachable.map(who).join(', ')}.`);
   if (notRead.length) findings.push(`Temperatures not read: ${notRead.map((u) => u.slot).join(', ')}.`);
+  const fromWatch = reached.filter((u) => u.intakeSource === 'watch');
+  if (fromWatch.length) findings.push(`Report-time reading failed; latest Thermal watch sample used: ${fromWatch.map((u) => u.slot).join(', ')}.`);
   const follow = [];
   for (const u of flagged) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): check ${u.flags.join(', ')} on the projector.`);
   for (const u of watch) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): inspect intake clearance and exhaust path, ${num(u.headroomC)} °C headroom.`);
   const other = warned.filter((u) => u.warnings.some((w) => w.startsWith('other')));
   if (other.length) follow.push(`${other.map((u) => u.slot).join(', ')}: read the Self Test screen for the "other" warning.`);
+  for (const u of warned) {
+    const specific = u.warnings.filter(w => !w.startsWith('other'));
+    if (specific.length) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): check ${specific.join(', ')} on the projector.`);
+  }
   for (const u of incomplete.filter((u) => u.online)) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): check ${assessmentGaps(u).map((gap) => `${gap} unavailable`).join(', ')} before assessing health.`);
   for (const u of unreachable) follow.push(`${u.slot} (${lanePart(u)}${u.ip}): not reachable at report time; check network and power.`);
   return {
@@ -151,9 +165,21 @@ function flagCell(u) {
   if (u.readError) parts.push(`readings: ${u.readError}`);
   return parts.join('; ');
 }
+// An unreached unit's power is history, not a reading. Saved reports kept it in power.
+function powerCell(u) {
+  if (u.online) return u.power;
+  const last = u.lastKnownPower ?? u.power;
+  return last && last !== 'unknown' ? `No current reading (last known ${last})` : 'No current reading';
+}
+// Saved reports from before this field have no intakeSource and render as a plain number.
+function intakeCell(u, timeZone) {
+  if (u.intakeSource !== 'watch') return num(u.intakeC);
+  const at = Date.parse(u.intakeAt);
+  return `${num(u.intakeC)} (Thermal watch sample${Number.isFinite(at) ? ` ${localTime(at, timeZone)}` : ''})`;
+}
 export function unitTable(report) {
   return [UNIT_HEADER, ...report.units.map((u) => [
-    u.slot, u.lane || '—', u.model || '—', u.ip || '—', u.power, num(u.intakeC), u.ratedC == null ? '—' : String(u.ratedC), num(u.headroomC),
+    u.slot, u.lane || '—', u.model || '—', u.ip || '—', powerCell(u), intakeCell(u, report.timeZone), u.ratedC == null ? '—' : String(u.ratedC), num(u.headroomC),
     u.internalC.length ? u.internalC.join(', ') : '—', flagCell(u), u.lightHours == null ? '—' : u.lightHours.toLocaleString('en-US'),
     u.lastContact ? localTime(Date.parse(u.lastContact), report.timeZone) : '—',
   ])];
@@ -179,7 +205,29 @@ const notionTable = (rows) => block('table', {
   table_width: rows[0].length, has_column_header: true, has_row_header: false,
   children: rows.map((r) => block('table_row', { cells: r.map((c) => rich(c)) })),
 });
-export function notionPage(report, databaseId) {
+// Per-unit number properties, named by controller slot: "P1 Temp (°C)" (intake or
+// ambient) and "P1 Headroom (°C)". Written only when the database has them as number
+// properties, so a database without them still accepts the page. A unit with no
+// reading gets an empty value, never a guess.
+// The numbers are filled only while the unit is reached and lit (on or warming), so
+// charts built on them show running temperatures. A unit that is off, cooling or
+// unreachable gets empty values; a reading taken then (a Panasonic intake can read
+// 29 to 32 °C just after power-off) stays in the page's unit table.
+export const unitPropertyNames = (slot) => ({ temp: `${slot} Temp (°C)`, headroom: `${slot} Headroom (°C)` });
+function unitProperties(report, numberProperties) {
+  const out = {};
+  if (!numberProperties?.size) return out;
+  for (const u of report.units || []) {
+    if (!/^P\d+$/.test(String(u?.slot || ''))) continue;
+    const { temp, headroom } = unitPropertyNames(u.slot);
+    const running = !!u.online && isLit(u.power);
+    if (numberProperties.has(temp)) out[temp] = { number: running && Number.isFinite(u.intakeC) ? u.intakeC : null };
+    if (numberProperties.has(headroom)) out[headroom] = { number: running && Number.isFinite(u.headroomC) ? u.headroomC : null };
+  }
+  return out;
+}
+
+export function notionPage(report, databaseId, { numberProperties } = {}) {
   return {
     parent: { database_id: databaseId },
     properties: {
@@ -187,6 +235,7 @@ export function notionPage(report, databaseId) {
       'Check window': { date: { start: report.startedAt, end: report.finishedAt } },
       Findings: { rich_text: rich(report.findings) },
       'Follow-up': { rich_text: rich(report.followUp) },
+      ...unitProperties(report, numberProperties),
     },
     children: [
       block('paragraph', { rich_text: rich(`${report.findings} Trigger: ${report.reason || report.kind}.`) }),
@@ -212,15 +261,33 @@ export function notionTokenReader({ env = process.env, platform = process.platfo
 }
 
 export function createNotionPublisher({ databaseId, token, fetch: send = globalThis.fetch, timeoutMs = 15000 }) {
+  // The database's number property names, read once. A failed read publishes the page
+  // without the per-unit numbers and tries the read again with the next report.
+  let numberProperties = null;
+  async function readNumberProperties(secret) {
+    if (numberProperties) return numberProperties;
+    try {
+      const response = await send(`https://api.notion.com/v1/databases/${databaseId}`, {
+        method: 'GET', signal: AbortSignal.timeout(timeoutMs),
+        headers: { authorization: `Bearer ${secret}`, 'notion-version': '2022-06-28' },
+      });
+      if (!response?.ok) return new Set();
+      const body = await response.json().catch(() => null);
+      if (!body || typeof body.properties !== 'object') return new Set();
+      numberProperties = new Set(Object.entries(body.properties).filter(([, p]) => p?.type === 'number').map(([name]) => name));
+      return numberProperties;
+    } catch { return new Set(); }
+  }
   return async function publish(report) {
     const secret = await token();
     if (!secret) throw Object.assign(new Error('Notion token not found on this machine'), { code: 'NO_TOKEN', retry: true });
+    const available = await readNumberProperties(secret);
     let response;
     try {
       response = await send('https://api.notion.com/v1/pages', {
         method: 'POST', signal: AbortSignal.timeout(timeoutMs),
         headers: { authorization: `Bearer ${secret}`, 'notion-version': '2022-06-28', 'content-type': 'application/json' },
-        body: JSON.stringify(notionPage(report, databaseId)),
+        body: JSON.stringify(notionPage(report, databaseId, { numberProperties: available })),
       });
     } catch (e) { throw Object.assign(new Error(`Notion unreachable: ${e.name === 'TimeoutError' ? 'timed out' : e.message}`), { retry: true }); }
     const body = await response.json().catch(() => ({}));
@@ -237,6 +304,9 @@ const summaryOf = (r) => ({ id: r.id, kind: r.kind, title: r.title, startedAt: r
 export function createHealthReports({
   dir, config = { ...DEFAULTS, ratedAmbientC: {}, notion: {} }, projectors, status, connection, events = () => [],
   readTelemetry = null, describeError = (p, e) => String(e?.message || e), publish = null,
+  // recentAir(p) -> { c, at } | null: the newest Thermal watch reading, with an epoch-ms time.
+  // It stands in for a report-time reading that failed only while it is younger than watchSampleMaxAgeMs.
+  recentAir = null, watchSampleMaxAgeMs = 3 * 60000,
   now = Date.now, timer = setTimeout, cancelTimer = clearTimeout, timeZone = TIME_ZONE,
   powerOnDelayMs = 120000, telemetryTimeoutMs = 12000, hourlyQuietMs = 15 * 60000, powerOffWindowMs = 30000,
   // Retries cover a venue without internet for up to 7 days (1008 tries at 10 minutes).
@@ -319,20 +389,30 @@ export function createHealthReports({
     return events().filter((e) => { const t = Date.parse(e.at); return t > since && t <= until; }).slice(-30).reverse()
       .map((e) => ({ at: e.at, slot: e.slot || null, text: clip([e.command, e.result, e.detail].filter(Boolean).join(' · '), 160) }));
   }
-  async function capture(kind, reason, snapshot) {
+  async function capture(kind, reason, snapshot, { attempts = 3, timeoutMs = telemetryTimeoutMs } = {}) {
     const startedAt = now();
     const since = lastReportAt ?? startedAt - HOUR;
     const units = await Promise.all(snapshot.map(async ({ p, st, conn }) => {
       let readings = null, readError = null;
       if (st.online && readTelemetry) {
         const controller = new AbortController();
-        const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), telemetryTimeoutMs);
+        const deadline = timer(() => controller.abort(Object.assign(new Error('health reading timed out'), { code: 'POLL_TIMEOUT' })), timeoutMs);
         deadline?.unref?.();
-        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal })), controller.signal); }
+        try { readings = await abortable(Promise.resolve().then(() => readTelemetry(p, { signal: controller.signal, attempts, onPartial: (partial) => { readings = partial; } })), controller.signal); }
         catch (e) { readError = describeError(p, e); }
         finally { cancelTimer(deadline); }
       }
-      return unitRow(p, st, conn, readings, readError, config);
+      // Read after the report's own attempt, which also feeds the watch. An older sample, or one
+      // stamped in the future, is not used in place of a failed reading.
+      let watchSample = null;
+      const hasIntake = readings?.sensors?.some?.((s) => s.role === 'intake' && Number.isFinite(s.c));
+      if (st.online && recentAir && !hasIntake) {
+        try {
+          const sample = recentAir(p), age = now() - sample?.at;
+          if (Number.isFinite(sample?.c) && age >= 0 && age <= watchSampleMaxAgeMs) watchSample = sample;
+        } catch { /* the watch is optional; the report records the failed reading */ }
+      }
+      return unitRow(p, st, conn, readings, readError, config, watchSample);
     }));
     const finishedAt = now();
     const report = buildReport({ kind, reason, startedAt, finishedAt, units, events: recentEvents(since, finishedAt), config, timeZone });
@@ -342,11 +422,11 @@ export function createHealthReports({
     log.log?.(`[health] ${report.title}: ${report.findings} (Notion ${report.notion.state})`);
     return summaryOf(report);
   }
-  function trigger(kind, reason) {
+  function trigger(kind, reason, reading) {
     if (!enabled()) return Promise.resolve(null);
     let snapshot; // taken now, before any queued work or power transition
     try { snapshot = statusSnapshot(); } catch (e) { log.error?.(`[health] ${kind} report skipped: ${e.message}`); return Promise.resolve(null); }
-    const job = chain.then(() => capture(kind, reason, snapshot)).catch((e) => { log.error?.(`[health] ${kind} report failed: ${e.message}`); return null; });
+    const job = chain.then(() => capture(kind, reason, snapshot, reading)).catch((e) => { log.error?.(`[health] ${kind} report failed: ${e.message}`); return null; });
     chain = job;
     return job;
   }
@@ -402,7 +482,7 @@ export function createHealthReports({
       clearPowerOn(); for (const t of [hourlyTimer, retryTimer]) if (t) cancelTimer(t);
       hourlyTimer = retryTimer = null;
       const t = now();
-      if (config.enabled && anyLitNow() && !(lastReportAt != null && t - lastReportAt < stopQuietMs) && t - lastPowerOffAt >= powerOffWindowMs) trigger(KIND.RELAY_STOP, 'relay stopping');
+      if (config.enabled && anyLitNow() && !(lastReportAt != null && t - lastReportAt < stopQuietMs) && t - lastPowerOffAt >= powerOffWindowMs) trigger(KIND.RELAY_STOP, 'relay stopping', { attempts: 1, timeoutMs: Math.min(telemetryTimeoutMs, Math.max(0, stopTimeoutMs - 2000)) });
       closed = true;
       let cap;
       await Promise.race([chain, new Promise((resolve) => { cap = timer(resolve, stopTimeoutMs); cap?.unref?.(); })]);

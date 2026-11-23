@@ -4,7 +4,7 @@
 
 The default view exposes shutter, power, test patterns, Clear pattern and Reset to HDMI for each A to D projector. Diagnostics, lens controls, configuration, schedules, references and planning remain available through secondary controls.
 
-Each card keeps the lane, surface, model, current power/shutter/input/pattern and connection freshness visible. Power state uses prominent uppercase text. Warnings and faults use labeled high-contrast banners and matching card borders. Wide desktops show four columns. Medium screens from 681 to 1279 pixels wide and at least 700 pixels tall show a two by two grid. Phones and short medium screens select one lane at a time with persistent A to D navigation. Both themes use the existing design tokens. All Projectors is a permanent tab beside Controls. Its group actions open a target review with Cancel and Confirm; opening or cancelling that review sends no command. Changed targets or safety state require a fresh confirmation. Group power off retains the relay's additional confirmation. Group Clear and HDMI recovery report verified results for each device.
+Each card keeps the lane, surface, model, current power/shutter/input/pattern and connection freshness visible. Power state uses prominent uppercase text. Warnings and faults use labeled high-contrast banners and matching card borders. Wide desktops show four columns. Medium screens from 681 to 1279 pixels wide and at least 700 pixels tall show a two by two grid. Phones and short medium screens select one lane at a time with persistent A to D navigation. Both themes use shared appearance tokens. Where screen space is limited, secondary pattern shortcuts remain in Details so the primary dashboard does not require vertical scrolling. All Projectors is a permanent tab beside Controls. Its group actions open a target review with Cancel and Confirm; opening or cancelling that review sends no command. Changed targets or safety state require a fresh confirmation. Group power off retains the relay's additional confirmation. Group Clear and HDMI recovery report verified results for each device.
 
 ## Details control surface
 
@@ -12,7 +12,7 @@ Details on a card opens the fuller controls for that lane, so the default view s
 
 ## Command behavior
 
-Shutter actions state the requested position. Power off retains the relay's existing two-step confirmation and ignores a rapid repeat during its first 400 ms. Cooling, offline, stale and show-lock states keep their existing command guards.
+Shutter actions state the requested position. Power off retains the relay's existing two-step confirmation and ignores a rapid repeat during its first 400 ms. Cooling, offline, stale and show-lock states keep their existing command guards. The Power off button has an accessible explanation when Show Lock, stale feedback, another operation or an already-off reading prevents shutdown. The sign-in field accepts text passwords without requesting a numeric-only mobile keyboard.
 
 Clear pattern sends the model's pattern-off command and checks fresh reported state. Reset to HDMI clears the test pattern, selects the configured HDMI input or the unique HDMI input reported by the device, and checks fresh feedback for both. PJLink-only devices without internal pattern control keep HDMI reset available; only the input is sent and verified, and unsupported pattern controls are disabled. Missing or ambiguous HDMI metadata produces an explicit error. Each projector has independent operation feedback, and concurrent output recovery actions on the same projector are blocked until the current action finishes. Partial failure preserves the successful step and reports the remaining problem.
 
@@ -20,9 +20,24 @@ Clear pattern sends the model's pattern-off command and checks fresh reported st
 
 Verify every main action in the simulator, including model-specific pattern codes and named HDMI sources. Exercise command failure, stale feedback, disconnection, show lock and target identity changes. Check desktop, tablet, phone and ultrawide layouts, both themes, keyboard focus and viewport containment. Real projector acceptance requires explicit operator commands and visual confirmation of the projected output.
 
-## Installed relay compatibility
+## Quiet Watch feedback and appearance
 
-The installed relay has newer polling and thermal sampling than main. Preserve those capabilities while applying the reviewed command-binding module and minimal index/store edits described below. The existing thermal view is retained under Tools and reads optional thermal data when the relay supplies it. It shows missing readings explicitly on relays without that capability.
+A reply age accompanies device status. Current, last-known and not-reported fields
+are distinct even within one successful poll. Power is Unknown while disconnected;
+its last report can remain as labeled context. Cached alarms, inputs and patterns
+carry the same qualification. Only current patterns appear selected. Repeated
+Power on is unavailable while on, warming or cooling. Ordinary command replies
+no longer overwrite newer WebSocket telemetry.
+
+Light, Dark and System share one preference and palette with Monitor, login and
+the public workspace. Keyboard users can open Appearance, choose a mode or cancel
+with Escape. Connection details separates the interface version from the connected
+relay version and explains the polling interval. No theme or navigation action
+sends a projector command.
+
+## Historical installed relay compatibility
+
+When this console was reviewed, the installed relay had newer polling and thermal sampling than main. Main gained thermal sampling on November 14 (README, "Thermal watch"). Preserve those capabilities while applying the reviewed command-binding module and minimal index/store edits described below. The existing thermal view is retained under Tools and reads optional thermal data when the relay supplies it. It shows missing readings explicitly on relays without that capability.
 
 Deployment records the reviewed source commit, retained backend base and digests of the changed files. Overlay `app.js`, `index.html`, `workspace-bridge.js`, `operator-console.js`, `operator-console.css`, `output-recovery.js`, `thermal-watch.js`, `thermal-watch.css`, `all-projectors.js`, `workspace-navigation.js`, `operator-preferences.js`, `operator-intent.js`, `lens-workspace.js`, `details-controls.js`, `details-controls.css`, `pattern-thumbs.js`, `heat-notice.js` and `session-timer.js` onto a copy of the installed public directory. Apply the reviewed backend changes to that candidate. Verify it in simulation before replacing the managed app, retain the prior app as a rollback copy, and restart the relay once. Reload the browser and verify served digests, target-binding capability and saved rig configuration.
 

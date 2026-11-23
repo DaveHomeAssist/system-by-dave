@@ -189,6 +189,28 @@ def valid_capture(event):
             and report.get("expectedCount") == 5 and report.get("readyCount") == 5)
 
 
+def shutdown_capture(capture, report):
+    if report.get("kind") != "power-off":
+        return False
+    projectors = capture.get("api", {}).get("/api/state", {}).get("projectors", [])
+    if (not isinstance(projectors, list) or len(projectors) != 4
+            or any(not isinstance(p, dict) for p in projectors)
+            or {p.get("lane") for p in projectors} != set(LANES)):
+        return False
+    try:
+        started = dt.datetime.fromisoformat(report["startedAt"].replace("Z", "+00:00"))
+        captured = dt.datetime.fromisoformat(capture["at"].replace("Z", "+00:00"))
+        for projector in projectors:
+            status = projector["status"]
+            replied = dt.datetime.fromisoformat(status["connection"]["lastSuccessAt"].replace("Z", "+00:00"))
+            if (status.get("power") != "off" or status.get("online") is not True
+                    or replied < started or not 0 <= (captured - replied).total_seconds() <= 180):
+                return False
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return False
+    return True
+
+
 def record(run, check, lane, result, witness, notes, evidence):
     if result not in ("pass", "fail", "not_tested") or lane not in CHECKS[check] or not witness.strip() or not notes.strip():
         raise ValueError("Correct lane, witness and detailed observation required")
@@ -204,7 +226,10 @@ def record(run, check, lane, result, witness, notes, evidence):
             for ref in evidence:
                 capture = indexed[ref]
                 if capture["kind"] == "capture" and capture.get("api", {}).get("/api/state", {}).get("simulation") is False:
-                    reports.extend(capture.get("api", {}).get("/api/health-reports", {}).get("reports", []))
+                    for summary in capture.get("api", {}).get("/api/health-reports", {}).get("reports", []):
+                        if check in ("shutdown-report", "delivery") and not shutdown_capture(capture, summary):
+                            continue
+                        reports.append(summary)
             current = [item for item in reports if item.get("startedAt")
                        and dt.datetime.fromisoformat(item["startedAt"].replace("Z", "+00:00"))
                        >= dt.datetime.fromisoformat(data["created"])]
@@ -212,16 +237,17 @@ def record(run, check, lane, result, witness, notes, evidence):
                 current = [item for item in current if item.get("counts", {}).get("units") == 4
                            and item["counts"].get("reached") == 4 and item["counts"].get("flagged") == 0
                            and item["counts"].get("incomplete") == 0]
-            else:
+            elif check == "shutdown-report":
                 current = [item for item in current if item.get("kind") == "power-off"]
+            else:
+                current = [item for item in current if item.get("kind") == "power-off"
+                           and item.get("notion", {}).get("state") == "published" and item["notion"].get("url")]
+            if check in ("shutdown-report", "delivery"):
                 shutdowns = {event["lane"]: event for event in events
                              if event["kind"] == "result" and event["check"] == "shutdown"}
                 if any(lane not in shutdowns or shutdowns[lane]["result"] != "pass"
                        or not set(shutdowns[lane]["evidence"]).intersection(evidence) for lane in LANES):
                     raise ValueError("Shutdown reporting requires witnessed shutdown passes for all lanes linked to this evidence")
-                if check == "delivery":
-                    current = [item for item in current if item.get("notion", {}).get("state") == "published"
-                               and item["notion"].get("url")]
             if not current:
                 raise ValueError("Pass requires a current real-rig report in the captured relay summaries")
         if result != "not_tested" and check in DISRUPTIVE:

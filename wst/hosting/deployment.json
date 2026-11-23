@@ -1,18 +1,225 @@
 {
   "siteId": "appgprj_6aed67f5df688191acf3e2641138818a",
-  "managedSourceCommit": "a71c93323f0c05f800dad739e100d19eb29e942d",
-  "deploymentId": "appgdep_6aef9e70105c8191b7eea51e3f68e574",
-  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_471db80b43a88191bf2314b335bb7eb3",
+  "managedSourceCommit": "1c50b07eaeee6c28335908c8e0cdec02301f093c",
+  "deploymentId": "appgdep_6b0014ef986881918e1452633ea9cf23",
+  "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_47a47ddac128819192562cdaf3fe7a74",
   "url": "https://wst-frozen.davein4k.chatgpt.site",
   "requestedDomain": "wst.housevideo.app",
   "customDomainStatus": "active",
   "customDomainTls": "active",
   "customDomainId": "appgdom_6aed6883c63c819190fa2e0197aca540",
   "customDomainVerifiedAt": "2026-11-06T05:49:13Z",
-  "versionNumber": 26,
-  "acceptedSourceCommit": "b09a0b06970892371173de0fa78a32a608a22fa9",
-  "publicVerifiedAt": "2026-11-13T22:45:00Z",
+  "versionNumber": 60,
+  "acceptedSourceCommit": "ae16db09a83fa06ab175b485595d2bb834c0537b",
+  "publicVerifiedAt": "2026-11-20T09:39:27.672633+00:00",
   "priorPublications": [
+    {
+      "versionNumber": 59,
+      "managedSourceCommit": "a9773cf0bf6d5351394883d072c8f2b09d21b254",
+      "deploymentId": "appgdep_6b0002c09ae081918dacebfa87bbc74b",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_144e7bbfd32481918333d05e2abb9b4e",
+      "acceptedSourceCommit": "7487083949940f37caf53e008dad0e8635d6edd8",
+      "publicVerifiedAt": "2026-11-20T08:21:20.968257+00:00",
+      "note": "Run Review usability baseline retained by the canonical navigation release."
+    },
+    {
+      "versionNumber": 56,
+      "managedSourceCommit": "db5eecb6d99fb28cebe20b605a79ec68bb695b4c",
+      "deploymentId": "appgdep_6aff897a1e3c8191b9895b19d42dfe72",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5f5e483b3d708191950e4e46f6edc5be",
+      "acceptedSourceCommit": "2008fc943ec79cde8f4aead5e58d268f97aa8b0f",
+      "publicVerifiedAt": "2026-11-19T23:52:56Z"
+    },
+    {
+      "versionNumber": 55,
+      "managedSourceCommit": "e755e56231e0167ad7d763ffce3920556ab1e07a",
+      "deploymentId": "appgdep_6aff874177b081918a8df766dbc5bc6b",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5aa4de64d30c819185e662f06afa4778",
+      "note": "November 19 media phase. The prior seven-session catalog remained active while 728 checksum-allowlisted originals were uploaded. The temporary uploader secret was removed before version 56."
+    },
+    {
+      "versionNumber": 50,
+      "managedSourceCommit": "ce13d80de2943dfc6ee127eee5373eeefe96796e",
+      "deploymentId": "appgdep_6afe83e3d3e08191825fc8deb12f981d",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_ff9dcf8a4840819185f77b72809bab18",
+      "acceptedSourceCommit": "0aedee2f3290c3534c6c0cd9c00543b132e74eda",
+      "publicVerifiedAt": "2026-11-19T05:14:59Z",
+      "note": "November 18 review catalog release."
+    },
+    {
+      "versionNumber": 49,
+      "managedSourceCommit": "8c2fc84ed1a41de71b933ac5828bfc8026c8c4ae",
+      "deploymentId": "appgdep_6afe81bd0288819191ae02a6154d1b2c",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_01c554cadde48191bd58679058a879ef",
+      "note": "November 18 media phase. The prior five-session catalog remained active while 1389 checksum-allowlisted objects were uploaded. The temporary uploader secret was removed before version 50."
+    },
+    {
+      "versionNumber": 48,
+      "managedSourceCommit": "80fa000e6755a405df7ce4fa78413ebdad14433b",
+      "deploymentId": "appgdep_6afe05747fe081919428b21d44e71752",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_b8e3299d86e08191805f27bae73708aa",
+      "acceptedSourceCommit": "eb3a8eab7b911e9fec6a9a6ee3fa589d247f87a4",
+      "publicVerifiedAt": "2026-11-18T20:11:12Z",
+      "note": "Five-session November 17 release with the approved timing correction, retained unchanged as the November 18 append baseline."
+    },
+    {
+      "versionNumber": 47,
+      "managedSourceCommit": "9acb4e77a03e308a4b076f7d46d6e4b6cf71a19b",
+      "deploymentId": "appgdep_6afdefaa3bac8191b62258d360bfefb3",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_86dc15797f8481918985ece439b44a4d",
+      "acceptedSourceCommit": "9ebb8dab79197e1612e8c757e8e80b4a31674cb9",
+      "publicVerifiedAt": "2026-11-18T18:42:36Z",
+      "note": "Initial five-session November 17 Run Review release, superseded only by the approved timing metadata correction."
+    },
+    {
+      "versionNumber": 46,
+      "managedSourceCommit": "461b60efd1c09f04fd60d516c9c477b2f35dc89e",
+      "deploymentId": "appgdep_6afdedc04a448191846b3ca20a8bbbb1",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_ebfdbbc385288191862d65be1e13a784",
+      "acceptedSourceCommit": "9ebb8dab79197e1612e8c757e8e80b4a31674cb9",
+      "note": "Intermediate active-source publication superseded before acceptance after the tracked viewer distribution was found stale."
+    },
+    {
+      "versionNumber": 45,
+      "managedSourceCommit": "c211220fccfc05eff7626abab33ded78af0e016d",
+      "deploymentId": "appgdep_6afde7174f188191a1a7dce4ab11fa45",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_165fdcf82714819199398796665da79b",
+      "acceptedSourceCommit": "a9dea1a8073e121d7df500eabb6cbfe9d6831b77",
+      "note": "Media upload phase. The temporary uploader secret was removed before the active-source publications."
+    },
+    {
+      "versionNumber": 44,
+      "managedSourceCommit": "a5bec7890a2bd54f7c6849a6f75d685275435f91",
+      "deploymentId": "appgdep_6afc5c2fc4188191baf07d2c60433a9d",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_007ae80f3ab4819192d2644af04e0288",
+      "publicVerifiedAt": "2026-11-17T13:52:58.672184+00:00",
+      "note": "Published baseline immediately before the November 17 Run Review release."
+    },
+    {
+      "versionNumber": 43,
+      "managedSourceCommit": "58e8a311935b847bc829f6fc8d7f7c2551e05949",
+      "deploymentId": "appgdep_6afb70f9396881919f33f64ad192f33e",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_30ad388287088191ac4a5d6d6abb4c3d",
+      "acceptedSourceCommit": "4f4dbd764803134b4b52306baec458c21a124f9f",
+      "publicVerifiedAt": "2026-11-16T21:10:07.631233+00:00"
+    },
+    {
+      "versionNumber": 42,
+      "managedSourceCommit": "b1012cd676c1d6afea68cc3ab93c0d872dd57595",
+      "deploymentId": "appgdep_6afb6d3946e08191843c54c6132c6370",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_5dd8e032d180819184b7b5820c7a1f0c",
+      "acceptedSourceCommit": "c67bc2201a2348f04ba3389a72a11cddcbd71ba1",
+      "publicVerifiedAt": "2026-11-16T20:54:16.910697+00:00"
+    },
+    {
+      "versionNumber": 41,
+      "managedSourceCommit": "59dd4a459b9e3e0d7c8287ca6e64f4dd523156f7",
+      "deploymentId": "appgdep_6afb5c362aec8191a45c941822fac2b2",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_e09f4a0bcecc819192d55a632a3cc183",
+      "acceptedSourceCommit": "49dc885d7e456e356b290f32bcde4e1983299cc6",
+      "publicVerifiedAt": "2026-11-16T19:41:17.147026+00:00"
+    },
+    {
+      "versionNumber": 40,
+      "managedSourceCommit": "ca8fb28943d0b231874cc0f3a83e422b2c60f146",
+      "deploymentId": "appgdep_6afb51f555508191843ebd3092205240",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_79cd8d5a4c4881919aa833fd96bb6b6e",
+      "acceptedSourceCommit": "49dc885d7e456e356b290f32bcde4e1983299cc6",
+      "publicVerifiedAt": "2026-11-16T18:58:20.751261+00:00",
+      "packagedBrowserStates": 32
+    },
+    {
+      "versionNumber": 39,
+      "managedSourceCommit": "2e752d113aa5d6e288231fd0bd9ad8397e49281c",
+      "deploymentId": "appgdep_6afb4f7d72d08191ab439027e5878d20",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_075c3d53a85481919bb1aa70870c120b",
+      "note": "Intermediate media publication; uploader secret removed before version 40."
+    },
+    {
+      "versionNumber": 38,
+      "managedSourceCommit": "ee20d6068b1ebcdeb99aa6df3e1fa7261baa49e3",
+      "note": "Inspected production baseline before the two-session integration; evening-only review and existing media routes preserved."
+    },
+    {
+      "managedSourceCommit": "32862549994fe01c184bbd43e3dc79adb37f459c",
+      "deploymentId": "appgdep_6af965e17da081919aac212d39147073",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_183a99f1c3748191982eb88e91645a0a",
+      "versionNumber": 36,
+      "acceptedSourceCommit": "6477335e552bf79a15f351aec797ec7979598e57",
+      "publicVerifiedAt": "2026-11-15T08:03:25.309Z",
+      "sourceReconciliation": "Quiet Watch 1 publishes shared Light, Dark and System appearance, concise crew navigation and the current handoff. Existing shared tasks and updates are preserved. Private controller settings and evidence are excluded.",
+      "verification": {
+        "browserWidths": [
+          1440,
+          680,
+          375
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "system"
+        ],
+        "host": "Dominic",
+        "themeReload": true,
+        "sharedTaskRecordsPreserved": 17,
+        "sharedTaskSnapshotSHA256": "8a57fd59bc03d9676ceb49860a97af2857eff3b4979982dc08f4d8be23672158",
+        "controllerRequests": 0,
+        "unexpectedBrowserErrors": 0,
+        "providerCspWarnings": "Four Cloudflare injected inline scripts per viewport were blocked by the existing CSP; exact script hashes identify these separately.",
+        "browserRendering": "Chromium with GPU disabled; SwiftShader screenshot capture stalled after navigation."
+      }
+    },
+    {
+      "versionNumber": 35,
+      "managedSourceCommit": "e0b82324f65fe26827503b16d1991cf730d5914a",
+      "deploymentId": "appgdep_6af90f28f8f081918f6b6897cd97e78d",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_e56ea81182f48191a4d3de5e19ea7ca8",
+      "acceptedSourceCommit": "53c3301d45f335743175dea51dd429f9a3c46f3d",
+      "note": "House handoff publication retained from the prior release record."
+    },
+    {
+      "versionNumber": 29,
+      "managedSourceCommit": "c2894ebce9ab3481b873a4ce8b66d34b27fbf2c6",
+      "deploymentId": "appgdep_6af8bb6b765c8191825560c90591e6a3",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_c5dcb4dab5bc8191b171addc594b4624",
+      "acceptedSourceCommit": "b3b2fb41d8902b3f376d1c58186e6fe75145a026",
+      "publicVerifiedAt": "2026-11-14T19:50:43.132913+00:00",
+      "verification": {
+        "pdfHashesMatch": true,
+        "combinedPDFPages": 18,
+        "signalFlowPDFPages": 5,
+        "combinedPDFSHA256": "8f2c6bfbefff1b8fb2262ad9f67969d21d358296d091cd9523963800b8560a97",
+        "signalFlowPDFSHA256": "cca5cf644477b2759679edbca82cec4e8a165bc2ca912d3a46f7010448de71a0",
+        "browserWidths": [
+          1440,
+          680,
+          375,
+          2560
+        ],
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "privateExportRoutes": "404",
+        "host": "Dominic"
+      }
+    },
+    {
+      "versionNumber": 28,
+      "managedSourceCommit": "bfc60c6cf52f79c5b9d08916b30c7d1adf0a8f30",
+      "deploymentId": "appgdep_6af80aea4b78819183693171baffc0b2",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_b3f8c5205054819189e1c84e78956dc0",
+      "acceptedSourceCommit": "a1ee7562f2a8a960258d0e9a58d0b93ec3ee7b03",
+      "publicVerifiedAt": "2026-11-14T07:18:00Z"
+    },
+    {
+      "versionNumber": 26,
+      "managedSourceCommit": "a71c93323f0c05f800dad739e100d19eb29e942d",
+      "deploymentId": "appgdep_6aef9e70105c8191b7eea51e3f68e574",
+      "versionId": "appgprj_6aed67f5df688191acf3e2641138818a~appgver_471db80b43a88191bf2314b335bb7eb3",
+      "acceptedSourceCommit": "b09a0b06970892371173de0fa78a32a608a22fa9",
+      "publicVerifiedAt": "2026-11-13T22:45:00Z"
+    },
     {
       "versionNumber": 25,
       "managedSourceCommit": "9230efa14436b24f95b060330b7e2291c767369d",
@@ -30,13 +237,541 @@
       "note": "Stage/reference polish from PR 448 (taskPublication)"
     }
   ],
-  "sourceReconciliation": "Reconciled 2026-11-13 at accepted source b09a0b0: Tech Schedule (v23), More navigation (v23), pixel reference (v25), photos and the Planning calendar (v26) now live in wst/ and are embedded by embed-hosted-assets.mjs, so the generated Worker equals production version 26 plus the #open-controller fallback.",
-  "pendingPublication": {
-    "preparedManagedSourceCommit": "e5f1db6fbdb703853d0d52171149dc60d6cebeea",
-    "basedOnManagedSourceCommit": "a71c93323f0c05f800dad739e100d19eb29e942d",
-    "expectedVersionNumber": 27,
-    "contents": "Site version 26 assets plus Open controller in a new tab fallback",
-    "blocker": "sites.* connector tools exist only in the Codex Desktop app; codex exec reports SITES_TOOL_UNAVAILABLE. Bundle, archive and EXECUTE steps are in the side-session notes folder (wst-sites-publish/).",
-    "preparedAt": "2026-11-13T22:45:00Z"
+  "november17Release": {
+    "releaseId": "nov17-57d1c28570e7",
+    "publishedAt": "2026-11-18T18:34:30.466541+00:00",
+    "frozenSourceCommits": [
+      "7bc1afbae10dcdf90d559684801e869f2b3808e6",
+      "31e5139dffabe51578c0e2baa9fe10dc2b842661",
+      "1fad761ae1b77cd787efc0943c035f59abc0dcd6"
+    ],
+    "systemSourceCommits": [
+      "79690d24feb6c2a01a22db93e6932e4a6635c40e",
+      "a9dea1a8073e121d7df500eabb6cbfe9d6831b77",
+      "9ebb8dab79197e1612e8c757e8e80b4a31674cb9"
+    ],
+    "sessions": [
+      {
+        "sessionId": "20261117-123916",
+        "label": "Afternoon run \u00b7 Nov 17",
+        "events": 145,
+        "go": 141,
+        "originalPhotos": 562,
+        "repeatGo": 18
+      },
+      {
+        "sessionId": "20261117-195209-act-1",
+        "label": "Show Act 1 \u00b7 Nov 17",
+        "events": 171,
+        "go": 154,
+        "originalPhotos": 476,
+        "repeatGo": 172
+      },
+      {
+        "sessionId": "20261117-195209-act-2",
+        "label": "Show Act 2 \u00b7 Nov 17",
+        "events": 177,
+        "go": 163,
+        "originalPhotos": 473,
+        "repeatGo": 235
+      }
+    ],
+    "referenceCues": 428,
+    "browserAcceptance": {
+      "host": "Dominic",
+      "statesPassed": 120,
+      "widths": [
+        1440,
+        1280,
+        680,
+        375,
+        2240,
+        3840
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "layouts": [
+        "grid",
+        "across"
+      ],
+      "behaviors": [
+        "original image dimensions",
+        "preview navigation and Escape",
+        "note isolation and reload",
+        "exact session and firing links",
+        "repeated cue jump",
+        "invalid context retains capture"
+      ]
+    },
+    "publicHashReadback": {
+      "expected": 3162,
+      "verified": 3162,
+      "manifestRoutes": 5,
+      "mediaRoutes": 3156,
+      "failures": 0
+    },
+    "november15Preservation": {
+      "routesMatched": 1647,
+      "changed": 0,
+      "missing": 0,
+      "afternoonManifestSha256": "5b649d362b7ec836b450f383314bcebfd1f43782cf7f0cef0faaa69560265ba8",
+      "eveningManifestSha256": "3aae115aaa16e8d910756317343032d323d959aabba4fe109ad007234a34d433"
+    },
+    "existingRuntime": {
+      "homeAndPlanningReviewLinks": true,
+      "taskApiStatus": 200,
+      "taskRecords": 17,
+      "taskSchemaValid": true,
+      "handoffStatus": 200,
+      "documentHashesMatch": true
+    },
+    "environmentRevision": 6,
+    "temporaryUploaderSecretRemoved": true,
+    "audience": "public",
+    "limitations": [
+      "FRC_AFTERNOON_ZIP was unavailable, so the real-afternoon archive fixture remained skipped.",
+      "The hosting provider injects an inline script that the existing content security policy blocks; application scripts and cue rendering passed."
+    ]
+  },
+  "november17TimingCorrection": {
+    "releaseId": "nov17-81958bb73e8c",
+    "publishedAt": "2026-11-18T20:07:29.572404+00:00",
+    "frozenSourceCommit": "eb3a8eab7b911e9fec6a9a6ee3fa589d247f87a4",
+    "managedSourceCommit": "80fa000e6755a405df7ce4fa78413ebdad14433b",
+    "siteVersion": 48,
+    "deploymentId": "appgdep_6afe05747fe081919428b21d44e71752",
+    "sourcePullRequest": "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/6",
+    "photoHashesUnchanged": true,
+    "photoRoutesVerified": 3156,
+    "november15ManifestsUnchanged": true,
+    "clockOffsets": [
+      {
+        "sessionId": "20261117-123916",
+        "beforeSeconds": 0.169,
+        "afterSeconds": 0.006
+      },
+      {
+        "sessionId": "20261117-195209-act-1",
+        "beforeSeconds": 0.357,
+        "afterSeconds": 0.006
+      },
+      {
+        "sessionId": "20261117-195209-act-2",
+        "beforeSeconds": 0.357,
+        "afterSeconds": 0.006
+      }
+    ],
+    "photoOffsetAdjustments": [
+      {
+        "sessionId": "20261117-123916",
+        "seconds": -0.163
+      },
+      {
+        "sessionId": "20261117-195209-act-1",
+        "seconds": -0.351
+      },
+      {
+        "sessionId": "20261117-195209-act-2",
+        "seconds": -0.351
+      }
+    ],
+    "warningCountsBefore": 0,
+    "warningCountsAfter": 0,
+    "negativeTriggerOffsetsPreserved": true,
+    "browserStatesPassed": 120,
+    "publicRoutesVerified": 3162,
+    "publicFailures": 0,
+    "uploadSecretPresent": false,
+    "environmentRevision": 6,
+    "audience": "public",
+    "limitations": [
+      "FRC_AFTERNOON_ZIP was unavailable, so the real-afternoon archive fixture remained skipped.",
+      "The first Sites archive upload attempt failed at the transport layer before a version was created; retrying the same validated archive created version 48.",
+      "Dominic's generic Node container lacked Git and Python for two checks; the checks passed with the documented baseline or locally, and all browser checks ran on Dominic."
+    ]
+  },
+  "november18Release": {
+    "releaseId": "nov18-74c142c636ee",
+    "publishedAt": "2026-11-19T05:06:55.256711+00:00",
+    "frozenSourceCommits": [
+      "ee20d95fc464365c6907bbbef935eea32ce59a87",
+      "0aedee2f3290c3534c6c0cd9c00543b132e74eda"
+    ],
+    "managedSourceCommits": [
+      "8c2fc84ed1a41de71b933ac5828bfc8026c8c4ae",
+      "32eaf720e52ec8b1b59104b4f0d4d4a639e1e61d",
+      "ce13d80de2943dfc6ee127eee5373eeefe96796e"
+    ],
+    "systemRecordCommit": "b05858c3b4296972a158d2b4261741a2aa046c74",
+    "sourcePullRequests": [
+      "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/7",
+      "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/8"
+    ],
+    "sessions": [
+      {
+        "sessionId": "20261118-185801-act-1",
+        "label": "Show Act 1 \u00b7 Nov 18",
+        "events": 252,
+        "withPhotos": 229,
+        "livePhotos": 606,
+        "rescuedPhotos": 153,
+        "publishedPhotos": 759,
+        "missingPhotoSlots": 249
+      },
+      {
+        "sessionId": "20261118-185801-act-2",
+        "label": "Show Act 2 \u00b7 Nov 18",
+        "events": 181,
+        "withPhotos": 178,
+        "livePhotos": 507,
+        "rescuedPhotos": 123,
+        "publishedPhotos": 630,
+        "missingPhotoSlots": 94
+      }
+    ],
+    "photoReadback": {
+      "expected": 4545,
+      "verified": 4545,
+      "uploaded": 1389,
+      "readOnly": 3156,
+      "failures": 0
+    },
+    "publicHashReadback": {
+      "expected": 4553,
+      "verified": 4553,
+      "manifestRoutes": 7,
+      "mediaRoutes": 4545,
+      "failures": 0
+    },
+    "existingFiveSessionPreservation": {
+      "manifestsByteEquivalent": 5,
+      "manifestsChanged": 0,
+      "photoRoutesReadOnly": 3156,
+      "photoHashConflicts": 0
+    },
+    "browserAcceptance": {
+      "host": "Dominic",
+      "statesPassed": 168,
+      "widths": [
+        1440,
+        1280,
+        680,
+        375,
+        2240,
+        3840
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "layouts": [
+        "grid",
+        "across"
+      ],
+      "behaviors": [
+        "all seven sessions",
+        "original image dimensions",
+        "rescued badge and exact desktop delay",
+        "preview navigation and Escape",
+        "note isolation and reload",
+        "exact session and firing links",
+        "repeated cue jump",
+        "invalid context retains capture"
+      ]
+    },
+    "environmentRevision": 8,
+    "temporaryUploaderSecretRemoved": true,
+    "audience": "public",
+    "limitations": [
+      "FRC_AFTERNOON_ZIP was unavailable, so the real-afternoon archive fixture remained skipped.",
+      "The first version 49 archive save was rejected before version creation because the archive root omitted the required dist directory. The corrected archive was saved and deployed.",
+      "The external Viewer Spec was not edited because this release explicitly prohibited Notion writes."
+    ]
+  },
+  "november19Release": {
+    "releaseId": "nov19-e41acdbf7d65",
+    "publishedAt": "2026-11-19T23:43:01.512979+00:00",
+    "frozenSourceCommit": "2008fc943ec79cde8f4aead5e58d268f97aa8b0f",
+    "managedSourceCommits": [
+      "e755e56231e0167ad7d763ffce3920556ab1e07a",
+      "db5eecb6d99fb28cebe20b605a79ec68bb695b4c"
+    ],
+    "mediaVersion": 55,
+    "activeVersion": 56,
+    "deploymentId": "appgdep_6aff897a1e3c8191b9895b19d42dfe72",
+    "sourcePullRequest": "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/10",
+    "sessions": [
+      {
+        "sessionId": "20261119-144854",
+        "label": "Rehearsal \u00b7 Nov 19",
+        "events": 228,
+        "withPhotos": 208,
+        "publishedPhotos": 728,
+        "missingPhotoSlots": 184
+      }
+    ],
+    "existingSevenSessionPreservation": {
+      "manifestsByteEquivalent": 7,
+      "manifestsChanged": 0,
+      "photoRoutesReadOnly": 4545,
+      "photoHashConflicts": 0
+    },
+    "photoReadback": {
+      "expected": 5273,
+      "verified": 5273,
+      "uploaded": 728,
+      "readOnly": 4545,
+      "failures": 0
+    },
+    "publicHashReadback": {
+      "expected": 5282,
+      "verified": 5282,
+      "catalogRoutes": 1,
+      "manifestRoutes": 8,
+      "mediaRoutes": 5273,
+      "failures": 0
+    },
+    "browserAcceptance": {
+      "host": "Dominic",
+      "statesPassed": 192,
+      "widths": [
+        1440,
+        1280,
+        680,
+        375,
+        2240,
+        3840
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "layouts": [
+        "grid",
+        "across"
+      ],
+      "behaviors": [
+        "all eight sessions",
+        "original image dimensions",
+        "preview navigation and Escape",
+        "note isolation and reload",
+        "exact session and firing links",
+        "repeated cue jump",
+        "invalid context retains capture"
+      ]
+    },
+    "environmentRevision": 10,
+    "temporaryUploaderSecretRemoved": true,
+    "audience": "public",
+    "limitations": [
+      "FRC_AFTERNOON_ZIP was unavailable, so the real-afternoon archive fixture remained skipped.",
+      "The first version 55 archive save was rejected before version creation because the archive root omitted the required dist directory. The corrected archive was saved and deployed."
+    ]
+  },
+  "sourceReconciliation": "The eight-session Frozen Rehearsal Review is live at /run-review/. The November 19 rehearsal appends 728 checksum-allowlisted original photos. The seven prior manifests are byte-equivalent to the 17:44 baseline and all 4545 prior photo routes passed read-only SHA verification. Existing Home and Planning navigation, task service, documents, public audience, session identities and browser note keys remain preserved. The temporary upload secret was removed before the active release. Video remains deferred.",
+  "verification": {
+    "host": "Dominic",
+    "macCheck": "Live reload verified Single and All photos use the clean cue 15 frame, with Replacement label, 19:08:27 EST time and +38.30 second offset. Existing note remains present.",
+    "viewerCommit": "ef5f0457b10a4870e2a922cc2babe23ef7f10a7b",
+    "viewerTests": {
+      "passed": 45,
+      "failed": 0,
+      "skipped": 0,
+      "realAfternoonArchive": true
+    },
+    "browserWidths": [
+      375,
+      680,
+      1280,
+      1440,
+      2240,
+      3840
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "layouts": [
+      "2x2",
+      "1x4"
+    ],
+    "liveBrowserStates": 48,
+    "liveBehavior": [
+      "original photo dimensions",
+      "preview arrows and Escape",
+      "note isolation and reload",
+      "exact session and firing links",
+      "repeated cue jump",
+      "invalid context retains capture",
+      "cue and timestamp non-overlap with 16px classic scrollbars",
+      "all visible filters fit on one line",
+      "112px desktop and 104px mobile timeline height retained",
+      "shared Frozen appearance, system preference and cross-tab changes",
+      "keyboard review tabs",
+      "curated cue 13 review image with actual time/provenance",
+      "replacement in Single, All photos, Compare, Repeats, preview, contact sheet and print content",
+      "old full-resolution and thumbnail URL bodies match replacement SHA256"
+    ],
+    "originalPhotoHashes": {
+      "matched": 1644,
+      "failed": 0,
+      "note": "All 1644 archived image hashes and raw capture files remain unchanged. The cue 13 Before public mapping and old original/thumbnail URLs now serve the approved replacement."
+    },
+    "releaseId": "nov15-26b7ab6b7f67",
+    "sessions": [
+      {
+        "sessionId": "20261115-130124",
+        "events": 254,
+        "go": 250,
+        "stop": 2,
+        "resume": 2,
+        "repeatGo": 91,
+        "originalPhotos": 119,
+        "missingPhotoSlots": 9,
+        "prePhotoEvents": 190,
+        "stalePhotoWarnings": 10,
+        "observations": 47
+      },
+      {
+        "sessionId": "20261115-190014",
+        "events": 417,
+        "originalPhotos": 1525,
+        "missingPhotoSlots": 33,
+        "observations": 54,
+        "observationLinkedFirings": 342,
+        "unassignedFirings": 75
+      }
+    ],
+    "referenceCues": 159,
+    "referenceScenes": 29,
+    "wstUnitTests": 5,
+    "wstBrowserWidths": [
+      1440,
+      680,
+      375,
+      2560
+    ],
+    "mediaHandlerTests": 2,
+    "frozenCase": {
+      "passed": 33,
+      "failed": 0,
+      "existingFindings": 6
+    },
+    "preservation": "Managed Worker checks confirm unchanged unrelated assets and original document bytes, with only approved Home/Planning navigation transformations. Shared task synthetic fixture passed.",
+    "limitations": [
+      "Managed test-documents.mjs fails the same outdated 18-page R5 handoff text assertion on the unchanged baseline; no document content modified.",
+      "Live task API snapshot returned HTTP 403 to the read-only runner request; persisted task record hash was not independently verified.",
+      "Notes remain browser-local; no live Notion/Sheets synchronization.",
+      "Production look approval, hardware behavior, physical mobile devices and print acceptance were not tested.",
+      "A direct Python URL read returned HTTP 403 during the v42 check; actual live browser acceptance passed. No claim of a second full public-media hash scan.",
+      "Previously cached or downloaded original images cannot be recalled. Current viewer requests use the replacement URL; private archival copies are deliberately retained."
+    ],
+    "environmentRevision": 4,
+    "temporaryUploaderSecretRemoved": true,
+    "captureOrEquipmentCommands": 0,
+    "timelineCorrection": {
+      "publishedAt": "2026-11-16T19:40:50.143624+00:00",
+      "baselineRegression": "Fails the all-filters-fit assertion before the fix",
+      "captureOrPhotoChanges": false
+    },
+    "candidateBrowserStates": 48,
+    "packagedBrowserStates": 48,
+    "scriptPolicyTests": 2,
+    "reviewPhoto": {
+      "sessionId": "20261115-190014",
+      "eventId": "de33248acb6c0408b35fe75d",
+      "sourceEventId": "3c69e229935e71229803b999",
+      "sourceSlot": "before",
+      "capturedAtEST": "2026-11-15 19:08:27",
+      "offsetSeconds": 38.29545617103577,
+      "sourcePreserved": true,
+      "replaceSlot": "before",
+      "originalPublicSha256": "ee3dd0ec775cb5032d887b266f2bc0b9b351db696d7ba72ecc094ff88e698028",
+      "replacementSha256": "ae15df7bb3a62243add297d171dd834e100b76b964c8005a93b748f69998f761",
+      "publicAliasHashChecks": 2
+    },
+    "liveBrowserStatus": "Passed on public WST hostname"
+  },
+  "workspaceRelease": {
+    "workspaceSourceCommit": "64053ade89ecd117885d72fc79298a75e35655f3",
+    "previousManagedSource": "cd1bef60d23cc1fa86ba959bef4144a1210f88a7",
+    "previousVersionNumber": 53,
+    "checks": [
+      "Byte-identical workspace and service worker scripts on both published domains",
+      "Public custom-domain Chromium palette, offline shell reload with a synthetic task, handoff backlink, hosted review load and synthetic ZIP scrub"
+    ],
+    "venueAcceptance": "Pending"
+  },
+  "reviewUsabilityRelease": {
+    "date": "2026-11-20",
+    "baselineVersion": 58,
+    "baselineManagedSource": "8d574f06732c1bf7b8dfbdb0f10d4fc513de9132",
+    "viewerPR": "https://github.com/DaveHomeAssist/frozen-rehearsal-capture/pull/11",
+    "viewerMerge": "16461608e67c78076c43c98f4b6cd07cf034b68d",
+    "scope": "Contact sheet search, filter recovery, notes close/save feedback, image retry, keyboard guards, small screen photo sizing",
+    "runner": "Dominic, cached Playwright 1.63 container",
+    "tests": {
+      "passed": 45,
+      "failed": 0,
+      "skipped": [
+        "F12: FRC_AFTERNOON_ZIP not supplied"
+      ]
+    },
+    "browserEngines": {
+      "chromium": "153.0.8010.12",
+      "firefox": "155.0",
+      "webkit": "26.6"
+    },
+    "viewportThemeCombinations": 84,
+    "tabLayoutChecks": 336,
+    "photoLayoutChecks": 168,
+    "liveCheck": "Mac in-app browser: Contact sheet search and return to cue, clear filters, notes Close, original preview next and Escape. Existing note count retained.",
+    "preserved": "Eight sessions; catalog, manifests, image routes, originals, observation context, IDs, note keys, DB/R2 bindings and current public audience",
+    "limits": "Native Windows/macOS browser and physical touch/assistive-technology acceptance not performed. Video remains deferred."
+  },
+  "navigationRelease": {
+    "date": "2026-11-20",
+    "sourcePR": "https://github.com/DaveHomeAssist/system-by-dave/pull/554",
+    "sourceCommit": "ae16db09a83fa06ab175b485595d2bb834c0537b",
+    "sourceMerge": "6f965fb48e393377ffb4cf4f4ce9025265a72acd",
+    "baselineVersion": 59,
+    "baselineManagedSource": "a9773cf0bf6d5351394883d072c8f2b09d21b254",
+    "destinations": [
+      "Home",
+      "Handoff",
+      "Calendar",
+      "Run review",
+      "Rig",
+      "Stage view",
+      "Pixels",
+      "Notes",
+      "Updates",
+      "Documents",
+      "Scenic",
+      "Throw calculator"
+    ],
+    "openingAt": "2026-11-25T19:00:00-05:00",
+    "scope": "Canonical header and utilities on every hosted HTML entry point, opening countdown in Home slot six, GSAP ice title, crystal and card entrance.",
+    "verification": {
+      "runner": "Dominic",
+      "sourceTestsPassed": 18,
+      "artifactModelTestsPassed": 5,
+      "htmlEntryPoints": 6,
+      "pageViewportThemeCases": 50,
+      "desktopAndPhoneDestinationChecks": 24,
+      "motion": "Normal motion, reduced motion, visibility and history/back passed; countdown clamps at zero.",
+      "frozenCaseSource": {
+        "steps": 33,
+        "passed": 33,
+        "failed": 0,
+        "existingFindings": 6
+      },
+      "liveDesktop": "Home, standalone handoff, Review, Stage and Scenic shared navigation, theme, finder and containment passed. Eight live manifests match the preserved source and a real Review photo loaded.",
+      "livePhone": "375 x 812 dark theme: all five page entry points, finder and containment passed. All 12 destinations passed on both desktop and phone."
+    },
+    "preserved": "Version 59 Review behavior; catalog, all eight session manifests and media; Worker runtime/data modules; binary payloads; audience, notes storage and task write guards.",
+    "limits": "Native physical touch devices, assistive technology and theater acceptance are not certified by these browser checks. The Studio source ZIP remains historical version 58."
   }
 }

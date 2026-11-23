@@ -5,16 +5,18 @@
   const gsap = window.gsap;
   if (!panel || !canvas || !gsap) return;
 
-  const brand = document.querySelector('header .brand');
-  const themeMeta = document.querySelector('meta[name="theme-color"]');
-  const themeDefault = themeMeta ? themeMeta.getAttribute('content') || '#edf5fb' : '#edf5fb';
+  const brand = null; // The canonical Home link stays visible on every page.
+  let snowColor = document.documentElement.dataset.theme === 'dark' ? '237,245,251' : '70,115,145';
+  window.addEventListener('frozen:themechange', event => { snowColor = event.detail.theme === 'dark' ? '237,245,251' : '70,115,145'; });
   const aurora = panel.querySelector('.snow-aurora');
   const chars = panel.querySelectorAll('.snow-char');
   const mark = panel.querySelector('.snow-mark');
   const eyebrow = panel.querySelector('.snow-eyebrow');
   const lede = panel.querySelector('.snow-lede');
   const foot = panel.querySelector('.snow-foot');
-  const cards = panel.querySelectorAll('.home-choices button');
+  const cards = panel.querySelectorAll('.home-choices :is(button,a):not([hidden])');
+  const crystal = panel.querySelector('.snow-crystal');
+  const titleRule = panel.querySelector('.snow-title-rule');
   const ctx = canvas.getContext('2d');
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 
@@ -64,7 +66,7 @@
       if (flake.x < -4) flake.x = width + 4;
       if (flake.x > width + 4) flake.x = -4;
       ctx.beginPath();
-      ctx.fillStyle = 'rgba(237,245,251,' + flake.alpha.toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(' + snowColor + ',' + flake.alpha.toFixed(3) + ')';
       ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
       ctx.fill();
     }
@@ -121,7 +123,6 @@
       if (home) brand.setAttribute('aria-hidden', 'true');
       else brand.removeAttribute('aria-hidden');
     }
-    if (themeMeta) themeMeta.setAttribute('content', home ? '#071520' : themeDefault);
   }
 
   function sync() {
@@ -148,11 +149,13 @@
     });
     intro
       .fromTo(eyebrow, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.65 }, 0.15)
-      .fromTo(chars, { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.06, ease: 'power4.out' }, 0.28)
-      .fromTo(mark, { opacity: 0, scale: 0.5, rotation: -30 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.7, ease: 'back.out(1.6)' }, '-=0.35')
-      .fromTo(lede, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6 }, '-=0.28')
-      .fromTo(cards, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.65, stagger: 0.07 }, '-=0.2')
-      .fromTo(foot, { opacity: 0 }, { opacity: 1, duration: 0.45 }, '-=0.15');
+      .fromTo(chars, { opacity: 0, yPercent: 80, rotationX: -75, rotationZ: -5, transformOrigin: '50% 100%' }, { opacity: 1, yPercent: 0, rotationX: 0, rotationZ: 0, duration: 1.15, stagger: 0.055, ease: 'expo.out' }, 0.08)
+      .fromTo(mark, { opacity: 0, scale: 0.15, rotation: -105 }, { opacity: 1, scale: 1, rotation: 0, duration: 1.1, ease: 'elastic.out(1,.7)' }, 0.42)
+      .fromTo(crystal, { opacity: 0, scale: .5, rotation: -30 }, { opacity: .2, scale: 1, rotation: 0, duration: 1.45, ease: 'expo.out' }, .2)
+      .fromTo(titleRule, { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: .7, duration: 1, ease: 'power3.inOut' }, .4)
+      .fromTo(lede, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .65 }, .45)
+      .fromTo(cards, { opacity: 0, y: 32, scale: .965, rotationX: 5, transformOrigin: '50% 100%' }, { opacity: 1, y: 0, scale: 1, rotationX: 0, duration: .85, stagger: {each:.065,grid:'auto',from:'start'}, ease:'power3.out' }, .6)
+      .fromTo(foot, { opacity: 0 }, { opacity: 1, duration: .5 }, 1.05);
     drift = gsap.to(aurora, {
       scale: 1.14,
       xPercent: 2.5,
@@ -177,6 +180,7 @@
         });
       }
     }
+    queueMicrotask(sync);
     return () => {
       stopSnow();
       intro = null;
@@ -193,6 +197,8 @@
   }).observe(panel);
   new MutationObserver(sync).observe(panel, { attributes: true, attributeFilter: ['hidden'] });
   document.addEventListener('visibilitychange', sync);
+  window.addEventListener('pagehide', () => { stopSnow(); pauseMotion(); });
+  window.addEventListener('pageshow', sync);
   // workspace.js navigates during its module script, which runs before this event.
   document.addEventListener('DOMContentLoaded', () => {
     resize();

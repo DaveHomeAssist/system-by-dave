@@ -1,0 +1,19 @@
+/* Shared Frozen surfaces. State and projector lane colors retain their operational meanings. */
+:root {
+  --frozen-ground:#edf5fa; --frozen-surface:#ffffff; --frozen-raised:#e2eff7; --frozen-sunken:#e8f2f8;
+  --frozen-ink:#153149; --frozen-muted:#465f73; --frozen-faint:#526b7e; --frozen-hairline:#c4d9e6; --frozen-control:#728fa3;
+  --frozen-accent:#175778; --frozen-on-accent:#ffffff; --frozen-focus:#006c96; --frozen-hover:#10425d; --frozen-aurora:#d8eef0;
+}
+:root[data-theme="dark"] {
+  --frozen-ground:#081421; --frozen-surface:#102438; --frozen-raised:#18334a; --frozen-sunken:#0a1b2c;
+  --frozen-ink:#edf7ff; --frozen-muted:#b1cbdc; --frozen-faint:#a2bdd1; --frozen-hairline:#2b4b63; --frozen-control:#7192aa;
+  --frozen-accent:#a3e6ee; --frozen-on-accent:#0b2536; --frozen-focus:#b1f5f5; --frozen-hover:#d1ffff; --frozen-aurora:#173f4c;
+}
+.frozen-theme-menu { position:fixed; inset:62px 12px auto auto; width:230px; max-width:calc(100vw - 24px); padding:12px; border:1px solid var(--line-control,var(--line,#9aabb6)); border-radius:12px; background:var(--surface,#fff); color:var(--ink,#19364a); box-shadow:0 10px 36px #0003; }
+.frozen-theme-menu:popover-open { display:grid; gap:8px; }
+.frozen-theme-menu strong { font:600 15px/1.4 system-ui,sans-serif; }
+.frozen-theme-menu button { min-height:44px; width:100%; padding:8px 12px; text-align:left; font:600 14px/1.4 system-ui,sans-serif; background:var(--surface,#fff); color:var(--ink,#19364a); border:1px solid var(--line-control,var(--line,#9aabb6)); border-radius:7px; cursor:pointer; }
+.frozen-theme-menu button[aria-pressed=true] { box-shadow:inset 4px 0 0 var(--accent,#127391); font-weight:750; }
+.frozen-theme-menu button:hover { background:var(--surface-raised,var(--tag,#dfeef5)); }
+.frozen-theme-menu button:focus-visible { outline:3px solid var(--focus-ring,var(--accent,#127391)); outline-offset:2px; }
+.frozen-theme-menu small { font:12px/1.5 system-ui,sans-serif; color:var(--ink-muted,var(--muted,#536a79)); }

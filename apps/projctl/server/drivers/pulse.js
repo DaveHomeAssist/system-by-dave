@@ -54,7 +54,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     });
   }
   const get = (property) => rpc('property.get', { property });
-  const set = (property, value) => rpc('property.set', { property, value });
+  const set = (property, value, { guard } = {}) => rpc('property.set', { property, value }, timeoutMs, guard);
   async function discover(signal) {
     if (Date.now() - refreshed < 60000) return;
     // Missing optional capabilities must not hide a reachable projector.
@@ -90,7 +90,7 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       throw new Error('Lens movement timed out');
     } catch (e) {
       for (const axis of selected) await rpc(axis + '.stop').catch(() => {});
-      throw new Error(`${e.message}; stop requested. Check the projector before retrying.`);
+      throw Object.assign(new Error(`${e.message}; stop requested. Check the projector before retrying.`), { status: e.status, commandRejected: e.commandRejected });
     }
   }
   async function lensReadback(signal) {
@@ -101,9 +101,9 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     }
     return out;
   }
-  async function moveTargets(targetList) {
+  async function moveTargets(targetList, { guard } = {}) {
       const generation = motionGeneration;
-      const checkMove = () => { if (generation !== motionGeneration) throw new Error('Lens movement cancelled by Stop lens'); };
+      const checkMove = () => { guard?.(); if (generation !== motionGeneration) throw new Error('Lens movement cancelled by Stop lens'); };
       if (mapPower(await get('system.state')) !== POWER.ON) throw new Error('Power on the projector before moving the lens.');
       if (!targetList.length) throw new Error('No supported lens positions.');
       const selected = targetList.map(([axis]) => axis);
@@ -115,16 +115,22 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       }
       // Validate every axis before sending the first target. A later invalid axis
       // must not leave an earlier motor moving after a rejected compound recall.
+      let moved = false;
       try {
-        for (const [axis, target] of targetList) await rpc('property.set', { property: axis + '.target', value: target }, timeoutMs, checkMove);
+        for (const [axis, target] of targetList) {
+          await rpc('property.set', { property: axis + '.target', value: target }, timeoutMs, checkMove);
+          moved = true;
+        }
       } catch (error) {
+        if (error.commandRejected && !moved) throw error;
         for (const axis of selected) await rpc(axis + '.stop').catch(() => {});
-        throw new Error(`${error.message}; stop requested. Check the projector before retrying.`);
+        throw Object.assign(new Error(`${error.message}; stop requested. Check the projector before retrying.`), { status: error.status, commandRejected: error.commandRejected });
       }
       await waitStopped(selected, checkMove);
       return 'OK';
   }
-  const mapPower = (v) => ({ on: POWER.ON, ready: POWER.OFF, eco: POWER.OFF, boot: POWER.WARMING, conditioning: POWER.WARMING, deconditioning: POWER.COOLING }[String(v).toLowerCase()] ?? POWER.UNKNOWN);
+  // Pulse system.state: standby is the network-standby state after deconditioning (seen as power unknown at WST 2026-11-17).
+  const mapPower = (v) => ({ on: POWER.ON, ready: POWER.OFF, standby: POWER.OFF, eco: POWER.OFF, boot: POWER.WARMING, conditioning: POWER.WARMING, deconditioning: POWER.COOLING }[String(v).toLowerCase()] ?? POWER.UNKNOWN);
   return {
     kind: 'pulse',
     lensJog: { axes: ['h', 'v', 'focus', 'zoom'], speeds: ['slow', 'normal', 'fast'], mode: 'bounded-step', stop: true, positionReadback: true },
@@ -132,17 +138,19 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
     patterns: PULSE_PATTERNS,
     get inputs() { return sources; },
     get pictureSchema() { return pictureSchema; },
-    async pattern(code) {
-      if (code === 'off' || code === '00') { await set('image.testpattern.show', false); return 'OK'; }
+    async pattern(code, options) {
+      if (code === 'off' || code === '00') { await set('image.testpattern.show', false, options); return 'OK'; }
       if (!PULSE_PATTERNS[code]) throw new Error(`pattern ${code} not on this projector`);
-      await set('image.testpattern.selected', code); await set('image.testpattern.show', true); return 'OK';
+      await set('image.testpattern.selected', code, options); await set('image.testpattern.show', true, options); return 'OK';
     },
     async getStatus({ signal } = {}) {
       // A successful core query proves liveness. Optional properties may be
       // unsupported, but total transport failure must reach the relay's offline policy.
       const read = (property) => rpc('property.get', { property }, timeoutMs, undefined, signal);
       const optional = async (fn, fallback) => { try { return await fn(); } catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; return fallback; } };
-      const s = { online: true, power: mapPower(await read('system.state')) };
+      const state = String(await read('system.state')).toLowerCase();
+      // The raw state stays beside the mapped power: READY can be woken from the network, STANDBY and ECO cannot.
+      const s = { online: true, power: mapPower(state), rawState: /^[a-z]{1,20}$/.test(state) ? state : null };
       await discover(signal);
       s.errors = null; // Pulse alarm telemetry is not implemented; unknown is not clear.
       s.shutter = await optional(async () => { const sh = String(await read('optics.shutter.target')).toLowerCase(); return sh === 'closed' ? SHUTTER.CLOSED : sh === 'open' ? SHUTTER.OPEN : SHUTTER.UNKNOWN; }, SHUTTER.UNKNOWN);
@@ -156,25 +164,34 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       return s;
     },
     // Read-only ambient temperature and alarm state for health reports.
-    async healthReadings({ signal } = {}) {
+    async healthReadings({ signal, onPartial } = {}) {
       const read = (property) => rpc('property.get', { property }, timeoutMs, undefined, signal);
       const optional = async (property) => { try { return await read(property); } catch (e) { throwIfAborted(signal); if (transportFailure(e)) throw e; return null; } };
       const raw = await optional('environment.temperature.ambient_outside.value');
       const ambient = raw == null || raw === '' ? NaN : Number(raw);
-      const alarm = await optional('environment.alarmstate');
-      throwIfAborted(signal);
+      const sensors = [{ id: 'ambient', label: 'Ambient, outside', role: 'intake', c: Number.isFinite(ambient) ? Math.round(ambient * 10) / 10 : null }];
+      onPartial?.({ sensors, alarm: null });
+      let alarm, readError;
+      try {
+        alarm = await optional('environment.alarmstate');
+        throwIfAborted(signal);
+      } catch (error) {
+        if (!Number.isFinite(ambient)) throw error;
+        readError = String(error.message || error);
+      }
       return {
-        sensors: [{ id: 'ambient', label: 'Ambient, outside', role: 'intake', c: Number.isFinite(ambient) ? Math.round(ambient * 10) / 10 : null }],
+        sensors,
         alarm: alarm == null ? null : String(alarm),
+        ...(readError ? { readError } : {}),
       };
     },
     power: (on, { guard } = {}) => rpc(on ? 'system.poweron' : 'system.poweroff', undefined, timeoutMs, guard).then(() => 'OK'),
-    shutter: (closed) => set('optics.shutter.target', closed ? 'Closed' : 'Open').then(() => 'OK'),
-    async input(idv) {
+    shutter: (closed, options) => set('optics.shutter.target', closed ? 'Closed' : 'Open', options).then(() => 'OK'),
+    async input(idv, { guard } = {}) {
       await discover();
       if (!Object.hasOwn(sources, idv)) throw new Error('Select an available projector input.');
       // Source changes can keep Pulse busy while the input electronics relock.
-      await rpc('property.set', { property: inputProperty, value: idv }, Math.max(timeoutMs, 15000));
+      await rpc('property.set', { property: inputProperty, value: idv }, Math.max(timeoutMs, 15000), guard);
       if (await rpc('property.get', { property: inputProperty }, Math.max(timeoutMs, 15000)) !== idv) throw new Error('Projector input did not match the requested source.');
       return 'OK';
     },
@@ -186,28 +203,34 @@ export function pulseDriver({ host, port = 9090, timeoutMs = 5000, inputProperty
       }
       return out;
     },
-    async picture(key, value) {
+    async picture(key, value, options) {
       await discover();
       const d = pictureSchema[key];
       if (!d || !Number.isFinite(value) || value < d.min || value > d.max || (d.step === 1 && !Number.isInteger(value))) throw new Error('Unsupported picture setting or value outside the projector range.');
-      await set('image.' + pictureProperties[key], value);
+      await set('image.' + pictureProperties[key], value, options);
       const actual = await get('image.' + pictureProperties[key]);
       if (!Number.isFinite(actual) || Math.abs(actual - value) > d.step / 2) throw new Error('Picture readback did not match the requested value.');
       return 'OK';
     },
-    async recallLens(targets) {
+    async recallLens(targets, options) {
       const entries = Object.entries(targets);
       if (entries.some(([axis, target]) => !Object.hasOwn(axes, axis) || !Number.isFinite(target))) throw new Error('Invalid lens recall targets.');
-      return moveTargets(entries.map(([axis, target]) => [axes[axis], target]));
+      return moveTargets(entries.map(([axis, target]) => [axes[axis], target]), options);
     },
-    async lens(op = {}) {
+    async lens(op = {}, { guard } = {}) {
       if (op.op === 'stop') {
         motionGeneration++;
-        for (const axis of Object.values(axes)) await rpc(axis + '.stop');
+        guard?.();
+        // Stop does not wait behind a queued status read, and one axis that fails
+        // does not keep the others moving: each axis gets its own connection.
+        const results = await Promise.allSettled(Object.values(axes).map((axis) => rpcOnce(axis + '.stop', undefined, timeoutMs, guard)));
+        const failed = results.filter((result) => result.status === 'rejected');
+        if (failed.length === results.length) throw failed[0].reason;
+        if (failed.length) throw new Error(`Stop lens was sent to every axis; ${failed.length} of ${results.length} did not acknowledge (${failed[0].reason?.message || failed[0].reason}).`);
         return 'OK';
       }
       const generation = motionGeneration;
-      const checkMove = () => { if (generation !== motionGeneration) throw new Error('Lens movement cancelled by Stop lens'); };
+      const checkMove = () => { guard?.(); if (generation !== motionGeneration) throw new Error('Lens movement cancelled by Stop lens'); };
       if (mapPower(await get('system.state')) !== POWER.ON) throw new Error('Power on the projector before moving the lens.');
       const selected = op.op === 'home' ? [axes.h, axes.v] : [axes[op.axis]];
       if (selected.some((axis) => !axis)) throw new Error('Unknown lens axis.');

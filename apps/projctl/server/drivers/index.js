@@ -6,7 +6,7 @@ import { simulatorDriver } from './simulator.js';
 export function makeDriver(proj) {
   const o = { host: proj.ip, password: proj.password || '', user: proj.user || 'admin1', model: proj.model || '' };
   switch (proj.driver) {
-    case 'simulator': return simulatorDriver({ name: proj.label, inputs: Object.keys(proj.inputs || { '31': 'HDMI' }) });
+    case 'simulator': return simulatorDriver({ name: proj.label, inputs: Object.keys(proj.inputs || { '31': 'HDMI' }), model: proj.model || '' });
     case 'pulse': return pulseDriver(o);
     case 'panasonic': return panasonicDriver(o);
     case 'pjlink':

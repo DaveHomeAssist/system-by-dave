@@ -87,6 +87,8 @@ try {
   const options = page.getByRole('button', { name: 'Signal Flow options' });
   await options.click(); await page.keyboard.press('Escape');
   assert.equal(await page.getByRole('menu').count(), 0);
+  // Focus goes back on the next timer tick, a few milliseconds after the key; wait for it instead of racing it.
+  await page.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Signal Flow options', null, { timeout: 2000 });
   assert.equal(await options.evaluate(el => el === document.activeElement), true);
   // Move and size by explicit commands; panels never overlap.
   await page.getByRole('button', { name: 'Checks options' }).click();

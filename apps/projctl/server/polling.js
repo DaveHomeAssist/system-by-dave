@@ -1,10 +1,11 @@
-import { abortable } from './drivers/transport.js';
+import { abortable, throwIfAborted } from './drivers/transport.js';
 
 export const pollIdentity = (p) => JSON.stringify([p.slot, p.driver, p.ip, p.user, p.password, p.model, p.lane]);
 
 // One bounded, disposable read per saved target. Cable recovery never scans,
 // changes addresses, or replays the last control command.
 export function createPoller({ target, read, started, succeeded, failed,
+  coordinate = (p, run) => run(),
   intervalMs = 5000, timeoutMs = 12000, maxRetryMs = 15000,
   now = Date.now, timer = setTimeout, cancelTimer = clearTimeout }) {
   const active = new Map(), scheduled = new Map(), identities = new Map(), failures = new Map();
@@ -28,9 +29,17 @@ export function createPoller({ target, read, started, succeeded, failed,
     active.set(slot, entry);
     const isCurrent = () => !closed && active.get(slot) === entry && pollIdentity(target(slot) || {}) === key;
     started?.(p, { identityChanged: changed, at: now() });
-    const deadline = timer(() => controller.abort(Object.assign(new Error('Projector poll timed out; retrying saved address'), { code: 'POLL_TIMEOUT' })), timeoutMs);
-    deadline?.unref?.();
-    entry.work = abortable(Promise.resolve().then(() => read(p, { signal: controller.signal })), controller.signal).then((value) => {
+    let deadline;
+    const options = { signal: controller.signal };
+    const run = () => {
+      throwIfAborted(controller.signal);
+      // Queue waiting is local contention, so only actual device I/O gets the
+      // status deadline that can mark a projector unreachable.
+      deadline = timer(() => controller.abort(Object.assign(new Error('Projector poll timed out; retrying saved address'), { code: 'POLL_TIMEOUT' })), timeoutMs);
+      deadline?.unref?.();
+      return read(p, options);
+    };
+    entry.work = abortable(Promise.resolve().then(() => coordinate(p, run, options)), controller.signal).then((value) => {
       if (!isCurrent()) return;
       failures.set(slot, 0);
       succeeded?.(p, value, { at: now() });

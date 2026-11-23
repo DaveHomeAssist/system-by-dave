@@ -74,7 +74,7 @@ test('PJLink silent/closed cable recovers on fresh sockets and sends queries onl
   const f = await fixture(t, (s, requests) => {
     if (mode === 'silent') return;
     if (mode === 'closed') { s.end(); return; }
-    s.write('PJLINK 0\r'); s.on('data', b => {
+    s.write('PJLINK 0\r'); s.once('data', b => {
       const command = b.toString().trim(); requests.push(command);
       const name = command.slice(2, 6), values = { POWR: '1', AVMT: '30', INPT: '31', ERST: '000000', LAMP: '10 1', NAME: 'fixture' };
       s.end(`%1${name}=${values[name]}\r`);

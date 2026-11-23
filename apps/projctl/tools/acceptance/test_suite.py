@@ -84,7 +84,9 @@ class AcceptanceTests(unittest.TestCase):
                 suite.record(self.run, check, lane, "pass", "Witness", "Observed", [evidence])
         report = {"startedAt": suite.now(), "kind": "manual", "counts": {"units": 4, "reached": 4, "flagged": 0, "incomplete": 0}}
         def save_report(value):
-            return suite.add_event(self.run, {"kind": "capture", "api": {"/api/state": {"simulation": False},
+            projectors = [{"lane": lane, "status": {"power": "off", "online": True,
+                           "connection": {"lastSuccessAt": suite.now()}}} for lane in suite.LANES]
+            return suite.add_event(self.run, {"kind": "capture", "api": {"/api/state": {"simulation": False, "projectors": projectors},
                      "/api/health-reports": {"reports": [value]}}})
         capture = save_report(report)
         suite.record(self.run, "temperature", "A", "pass", "Witness", "Observed", [capture])
@@ -141,6 +143,42 @@ class AcceptanceTests(unittest.TestCase):
         self.assertEqual(suite.report(self.run), 2)
         self.assertIn("legacy_unverified", (self.run / "report.md").read_text())
         self.assertEqual(original, (self.run / "run.json").read_bytes())
+
+    def test_relay_restart_cannot_prove_projector_shutdown_or_delivery(self):
+        report = {"startedAt": suite.now(), "kind": "relay-stop",
+                  "counts": {"units": 4, "reached": 4, "flagged": 0},
+                  "notion": {"state": "published", "url": "https://example.test/restart"}}
+        capture = suite.add_event(self.run, {"kind": "capture", "api": {
+            "/api/state": {"simulation": False},
+            "/api/health-reports": {"reports": [report]}}})
+        for check in ("shutdown-report", "delivery"):
+            with self.subTest(check=check), self.assertRaises(ValueError):
+                suite.record(self.run, check, "rig", "pass", "Witness", "Controller restarted", [capture])
+
+    def test_shutdown_report_requires_fresh_off_feedback_from_all_lanes(self):
+        report = {"kind": "power-off", "startedAt": "2026-11-15T08:00:00+00:00"}
+        capture = {"at": "2026-11-15T08:01:00+00:00", "api": {"/api/state": {"projectors": [
+            {"lane": lane, "status": {"power": "off", "online": True,
+             "connection": {"lastSuccessAt": "2026-11-15T08:00:30+00:00"}}} for lane in suite.LANES]}}}
+        self.assertTrue(suite.shutdown_capture(capture, report))
+        report["kind"] = "relay-stop"
+        self.assertFalse(suite.shutdown_capture(capture, report))
+        report["kind"] = "power-off"
+        projectors = capture["api"]["/api/state"]["projectors"]
+        for field, value in (("power", "on"), ("power", "cooling"), ("online", False)):
+            original = projectors[0]["status"][field]
+            projectors[0]["status"][field] = value
+            self.assertFalse(suite.shutdown_capture(capture, report))
+            projectors[0]["status"][field] = original
+        for replied in ("2026-11-15T07:59:59+00:00", "2026-11-15T08:01:01+00:00", None, "bad"):
+            projectors[0]["status"]["connection"]["lastSuccessAt"] = replied
+            self.assertFalse(suite.shutdown_capture(capture, report))
+        projectors[0]["status"]["connection"]["lastSuccessAt"] = "2026-11-15T08:00:30+00:00"
+        capture["at"] = "2026-11-15T08:04:00+00:00"
+        self.assertFalse(suite.shutdown_capture(capture, report))
+        capture["at"] = "2026-11-15T08:01:00+00:00"
+        projectors.pop()
+        self.assertFalse(suite.shutdown_capture(capture, report))
 
     def test_journal_lock_and_interrupted_transaction(self):
         before = (self.run / "run.json").read_bytes()

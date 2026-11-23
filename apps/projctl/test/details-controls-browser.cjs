@@ -1,6 +1,6 @@
 // Projector details control surface: pattern tiles, Stop lens, heat notices and the
-// session timer, at desktop, tablet and phone sizes. Thermal readings are injected because
-// the simulator does not sample them.
+// session timer, at desktop, tablet and phone sizes. Thermal readings are injected so each
+// level and age is exact; thermal-browser.cjs covers the relay's own sampling.
 const { selectLane, selectView } = require('./operator-ui.cjs');
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
@@ -47,6 +47,7 @@ const path = require('node:path');
         if (body.cmd === 'pattern') p.status.pattern = String(body.arg);
         fresh(state);
         await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ [body.slot]: { result: 'OK', status: p.status } }) });
+        push(); // Device feedback arrives on the status stream, independently of the acknowledgement.
       });
       await page.goto(relay.base);
       await page.locator('#grid .operator-card').first().waitFor();
@@ -102,6 +103,7 @@ const path = require('node:path');
           small: [...document.querySelectorAll('#tab-projector .pj-details-canvas button')].filter(node => visible(node) && node.getBoundingClientRect().height < 44).map(node => node.textContent.trim()),
         };
       });
+      if (layout.pageScroll) { console.log('overflow detail', await page.evaluate(() => ({ width: innerWidth, height: innerHeight, w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, outside: [...document.querySelectorAll('body *')].filter(el => el.getClientRects().length && (el.getBoundingClientRect().right > innerWidth + 1 || el.getBoundingClientRect().bottom > innerHeight + 1)).slice(0,15).map(el => [el.tagName,el.id,el.className,el.getBoundingClientRect().bottom]) }))); await page.screenshot({path: out + '/details-overflow.png'}); }
       assert.deepEqual(layout, { pageScroll: false, clipped: [], small: [] }, `details layout at ${width}x${height}`);
 
       if (width === 1440) {
