@@ -7,7 +7,8 @@
 //      launch config and checkout scripts.
 //   2. The checkout url in /js/sbd-launch-config.js matches ^https://buy\.stripe\.com/
 //      and that Payment Link answers 200 (redirects followed).
-//   3. /field-kit/thanks/ returns 200, is noindex and loads thanks.js.
+//   3. /field-kit/thanks/ returns 200, is noindex and loads thanks.js and the
+//      launch config; once checkout is live, a download link hash is registered.
 // Exit codes: 0 all pass (checkout live), 2 pages fine but checkout not
 // configured yet (Payment Link still a placeholder), 1 a check failed.
 const BASE = (process.argv[2] || 'https://avbydave.com').replace(/\/+$/, '');
@@ -57,6 +58,11 @@ try {
     else ok(`Payment Link HTTP 200 (final host ${new URL(pay.url).host})`);
     const remaining = (kit.text.match(/data-dave-placeholder/g) || []).length;
     if (remaining) fail(`${remaining} [DAVE] DRAFT block(s) still marked data-dave-placeholder: the button stays closed until they are approved`);
+    // With checkout live, buyers only get a download button for a registered link.
+    const download = cfg.text.match(/download\s*:\s*\{[^}]*\}/);
+    const hashes = download ? download[0].match(/['"][0-9a-fA-F]{64}['"]/g) || [] : [];
+    if (!hashes.length) fail('checkout is live but fieldKit.download.sha256 is empty: buyers would get "email me" instead of a download button (npm run hash:field-kit-link)');
+    else ok(`download link hash registered (${hashes.length})`);
   }
 
   const ty = await get(`${BASE}/field-kit/thanks/`);
@@ -64,6 +70,7 @@ try {
   else ok('/field-kit/thanks/ HTTP 200');
   if (!noindex(ty.text)) fail('/field-kit/thanks/ is not noindex');
   if (!/<script[^>]+src=["'][^"']*thanks\.js["']/.test(ty.text)) fail('/field-kit/thanks/ does not load thanks.js');
+  if (!/<script[^>]+src=["'][^"']*sbd-launch-config\.js["']/.test(ty.text)) fail('/field-kit/thanks/ does not load sbd-launch-config.js, so no download link can be recognised');
   const tyJs = await get(new URL('thanks.js', `${BASE}/field-kit/thanks/`).toString());
   if (tyJs.status !== 200) fail(`/field-kit/thanks/thanks.js returned HTTP ${tyJs.status}`);
   else ok('/field-kit/thanks/thanks.js HTTP 200');

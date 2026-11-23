@@ -43,7 +43,8 @@ const STANDALONE_RETURNS = [
   'fifa-pitch-crew/index.html',
   'scorecard/index.html',
   'prompts/index.html',
-  'noteforge/index.html'
+  'noteforge/index.html',
+  'thephilly/index.html'
 ];
 const REQUIRED_SKIP_LINKS = new Map([
   ['ontrack.html', 'ontrack-workspace'],
@@ -64,7 +65,8 @@ const REQUIRED_SKIP_LINKS = new Map([
   ['scorecard/index.html', 'scorecard-workspace'],
   ['noteforge/index.html', 'app'],
   ['prompts/index.html', 'prompt-library'],
-  ['teleprompter.html', 'teleprompter-workspace']
+  ['teleprompter.html', 'teleprompter-workspace'],
+  ['thephilly/index.html', 'stage']
 ]);
 const CUSTOM_SHELLS = new Map([
   ['depotops/index.html', ['href="/"', 'href="/tools.html"', 'aria-current="page">DepotOps']],

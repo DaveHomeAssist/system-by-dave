@@ -1,11 +1,75 @@
 {
   "schema": "equipment.lab.release.v1",
-  "revision": "1.0.0",
+  "revision": "1.2.0",
   "catalog": "catalog.json",
   "files": {
     "catalog.json": {
-      "bytes": 40078,
-      "sha256": "0adc5a52fb9c3587e26423c1b4197edb2080b6c2491c1b1859b885f859381fce"
+      "bytes": 44440,
+      "sha256": "1d71c2fed1204b877180795a7612797a989f449a3fe8aa5643a21e4fd8eb4ebb"
+    },
+    "models/barco.udm4k22.inspection/README.md": {
+      "bytes": 4207,
+      "sha256": "97fa6265cade72e2c1e267a83e8584c08f7b44a1d0979e9c12038ec92883bf56"
+    },
+    "models/barco.udm4k22.inspection/barco.udm4k22.definition.json": {
+      "bytes": 168138,
+      "sha256": "f1548421076bb5412a6d75157ef8bd367540e511eddcffe21a152e3ad90077b7"
+    },
+    "models/barco.udm4k22.inspection/barco.udm4k22.inspection.glb": {
+      "bytes": 1239440,
+      "sha256": "9583dc58786b7dd54442822b1b34b269aa5b2224dcb23ce1fa5b558b712744ba"
+    },
+    "models/barco.udm4k22.inspection/barco.udm4k22.manifest.json": {
+      "bytes": 2530,
+      "sha256": "df58d5efa596ff95e09605bc32d9114dfa74f7e86620f8f8283837e7e98f14a7"
+    },
+    "models/barco.udm4k22.inspection/evidence/front-light.png": {
+      "bytes": 86160,
+      "sha256": "23034131dda8a586c9da934560fdd796ba33ac5b423043e6c38869ac5d588264"
+    },
+    "models/barco.udm4k22.inspection/evidence/geometry.json": {
+      "bytes": 1114,
+      "sha256": "7aa3d1a5030c838322e6f1125fa3316f763fe7be9c2f13da07428eeb4f000d3d"
+    },
+    "models/barco.udm4k22.inspection/evidence/gltf-validation.json": {
+      "bytes": 5145,
+      "sha256": "59abfe001fd0ac1e12ce5c272b069709d0f4798105e01b9081ad3be99a7172a2"
+    },
+    "models/barco.udm4k22.inspection/evidence/io-dark.png": {
+      "bytes": 179963,
+      "sha256": "403124f28b649285b1062ecf983d8668b67309e4b0bc6ea5ef69693cb5d20f91"
+    },
+    "models/barco.udm4k22.inspection/evidence/io-light.png": {
+      "bytes": 182237,
+      "sha256": "a8e92f04e6cf47f92b807454ec96fe24639a8e0a8f3d1cf6cf09e16c85b7adce"
+    },
+    "models/barco.udm4k22.inspection/evidence/left-light.png": {
+      "bytes": 118650,
+      "sha256": "92d2ad00cd1f3f553a5599b4c7a62db3dc18a1511e5c3fa072783f6011301fc1"
+    },
+    "models/barco.udm4k22.inspection/evidence/overview-dark.png": {
+      "bytes": 258833,
+      "sha256": "476ac44349d88d9b4058f492b3212535f1270198698cc4d10ef7e89abf8e8824"
+    },
+    "models/barco.udm4k22.inspection/evidence/overview-light.png": {
+      "bytes": 262106,
+      "sha256": "d318c52227ba4d7cc6db6dbeae1a808c75dc2fd5df01a5578e61699b07ace967"
+    },
+    "models/barco.udm4k22.inspection/evidence/rear-light.png": {
+      "bytes": 204220,
+      "sha256": "29424a34e81129d3eac71af4ff33fb8b191f6018b56c70de79a800214fb6cad9"
+    },
+    "models/barco.udm4k22.inspection/evidence/roundtrip.json": {
+      "bytes": 608,
+      "sha256": "ee379a190f14b6dc4c0f023b1345d44463cc8900a6ca34430f99a2f8ed1857f6"
+    },
+    "models/barco.udm4k22.inspection/evidence/top-light.png": {
+      "bytes": 55255,
+      "sha256": "126665bdc33f4d66cd246beb3bfb751ac999b19b90ebb6b7316698b87b6678b3"
+    },
+    "models/barco.udm4k22.inspection/preview.jpg": {
+      "bytes": 21772,
+      "sha256": "77ddd7ac81079214b9dd0bf957bc8ad0ece5815062dc8b7b446247d72f8677d1"
     },
     "models/cartoni.maxima30.reference/README.md": {
       "bytes": 3599,
@@ -178,6 +242,166 @@
     "models/cartoni.maxima30.reference/evidence/visual-review.json": {
       "bytes": 1446,
       "sha256": "9684c276bbaba282beacc40fc778723151586f7ada71fb946f4b9bc636eff007"
+    },
+    "models/panasonic.ptdw830.inspection/README.md": {
+      "bytes": 6723,
+      "sha256": "03888ca3d74b9d0382bd9b30fd2aa9a8556e13da090974a0af666b7d2dc19f4f"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/bottom-light.png": {
+      "bytes": 68972,
+      "sha256": "ef5944c863ccb3defd311b9e1e3e743600d0d21628419c241a8ff5ef85b5af15"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/front-light.png": {
+      "bytes": 96863,
+      "sha256": "cbb89ef2b1590328135e4f2f6cc80ae941b20ceadeaca136280de6fce0db057b"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/geometry.json": {
+      "bytes": 2198,
+      "sha256": "136838764ed08644a4337800e9419ab05179fc73d6326dbc60396a8671a47528"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/gltf-validation.json": {
+      "bytes": 13917,
+      "sha256": "0366601855f212387b13148ee2e9c1299e10beca1d48e8f440066c836e460bbd"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/io-dark.png": {
+      "bytes": 138182,
+      "sha256": "c147683978d32308c2316b76fbbd4bb852cb83778e8fcfd3f39a1f044d0f3856"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/io-light.png": {
+      "bytes": 139851,
+      "sha256": "84b1af73f82b14b7027d6f24eee0fe4f881130b56db9c9659ea52bc4cd7f6293"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/lampBay-light.png": {
+      "bytes": 315118,
+      "sha256": "452a238d667d2049a3a864839396437ddf3a1e3dd1a48e85cf0c51b264b2b2e3"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/left-light.png": {
+      "bytes": 127907,
+      "sha256": "3c30db2847edcd88aff599af3b8f3a0f51b60a5c5ed928c1d8f835d131d9da2f"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/overview-dark.png": {
+      "bytes": 208951,
+      "sha256": "e6271d5cef918468d6627a0955db6077480e591d39d7bee1a959a4b244167531"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/overview-light.png": {
+      "bytes": 210709,
+      "sha256": "524cbfee27113c70b0326047cedfcbb543a8b6948e2991edfdb220e82a1a86a4"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/rear-light.png": {
+      "bytes": 270362,
+      "sha256": "634712d4b03139c23af31a3e2e8722e8a66cc40bcac7f1c0d1f36001cf9677e8"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/roundtrip.json": {
+      "bytes": 865,
+      "sha256": "9f33d864a6042a6aa561510d67b013c0c0ecee0a0341b4c425f74df8434c8d52"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/state-coveropen.png": {
+      "bytes": 218169,
+      "sha256": "97c3b0533eeb784108552dfcaf40f6e9f85a40a86f9196f4309b9edaf46de5d5"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/state-filtercaseout.png": {
+      "bytes": 248401,
+      "sha256": "3e31aa78f20228ffb76c40b5814bb029ef3baf3b145019b2877e24bd1ef25853"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/state-lampunit1out.png": {
+      "bytes": 214133,
+      "sha256": "8f217e32ad2a5f34765267b63afc003f11c6c0723df7f05a1b9103e93726c396"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/state-lampunit2out.png": {
+      "bytes": 217641,
+      "sha256": "a5b4dc1f91a573aac68a5acf01d3a11ea8868bd032247a168b5a133382810934"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/states.json": {
+      "bytes": 2770,
+      "sha256": "217c5de7822ae8d3194adccec58f42f30c51e6a20e185a44e42fb38566e1bc0f"
+    },
+    "models/panasonic.ptdw830.inspection/evidence/top-light.png": {
+      "bytes": 75808,
+      "sha256": "c883d6035d19ca3dd7849a399211f7d99903fc50fda27a5341fd188600830b2e"
+    },
+    "models/panasonic.ptdw830.inspection/panasonic.ptdw830.definition.json": {
+      "bytes": 283539,
+      "sha256": "d89f80a3ab7daaaa7994989f90ca2022fc518f934b7d2b609a5bd2586f5fb0ea"
+    },
+    "models/panasonic.ptdw830.inspection/panasonic.ptdw830.inspection.glb": {
+      "bytes": 1757124,
+      "sha256": "b555022fc2ba289d341668605a6d99760dfe13552db31058c91b602d128caaba"
+    },
+    "models/panasonic.ptdw830.inspection/panasonic.ptdw830.manifest.json": {
+      "bytes": 2685,
+      "sha256": "83e11ef2f9486633124e25eaf64898b3a638726ec4497af1f2cbe71a932a9b7b"
+    },
+    "models/panasonic.ptdw830.inspection/preview.jpg": {
+      "bytes": 20306,
+      "sha256": "dbcd16d15f639b9f387dec1fc0c1887e423857f975ce702cb429c63ac3b4960d"
+    },
+    "models/panasonic.ptrz970.inspection/README.md": {
+      "bytes": 4361,
+      "sha256": "cd0e67036ff32863814ec923a959595acb08d4bcb165bcd3c587a6e909c7a595"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/bottom-light.png": {
+      "bytes": 60439,
+      "sha256": "88f195d66afaebe559415b34a2b54dd82678f723dbcc7d6f37d091c4986837ef"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/front-light.png": {
+      "bytes": 96307,
+      "sha256": "acb46deafb18b8836c3e3a82492e45dc35e49df95f86682813e66b2c476afe70"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/geometry.json": {
+      "bytes": 1819,
+      "sha256": "f1ce4a1e20e3fbba67a5a0fd396a1c12226584a260d65d293fdb0fb7ebf5ff64"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/gltf-validation.json": {
+      "bytes": 12405,
+      "sha256": "acde54d91fc369e2a56d5dbc664498411c4a84799106a2809647dc5abc57d7d1"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/io-dark.png": {
+      "bytes": 135109,
+      "sha256": "333c49ce63aad5dd38aef21b539a052c1c9169132902bf9146208a27adb8ff11"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/io-light.png": {
+      "bytes": 136676,
+      "sha256": "6f533367718b41d9d46cfa03dc5809bb1326c8f86a7958885d9e915a9c615b40"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/left-light.png": {
+      "bytes": 192510,
+      "sha256": "99a0bda0fc1cf869042669c62441df396be35d1ebf0dc68ae18c888cbbe1f22e"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/overview-dark.png": {
+      "bytes": 204476,
+      "sha256": "51353bd12d9ef9fdd3d4f834fc8c22b667456de35ad8323331b7e1cecaab5ed5"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/overview-light.png": {
+      "bytes": 205882,
+      "sha256": "acc21ae66e6c7ea9ad8feb4801b0b2b41b49dfeb1a188e0f200455b2fd75c061"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/rear-light.png": {
+      "bytes": 211854,
+      "sha256": "e868ac8fd3c8be33ebf554754cfec89c5c7c89923aa9976959b8896f543c8152"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/roundtrip.json": {
+      "bytes": 691,
+      "sha256": "7ae9e8a619663d94eddc164940a5046a728c6b5594c9661371f019ffe2b9b3fe"
+    },
+    "models/panasonic.ptrz970.inspection/evidence/top-light.png": {
+      "bytes": 75811,
+      "sha256": "3fee01e8a5d45411954319ea88c54bb956892aeb8d114caf3aec2a974ed9df8d"
+    },
+    "models/panasonic.ptrz970.inspection/panasonic.ptrz970.definition.json": {
+      "bytes": 170131,
+      "sha256": "24e31db2c4adb30f122da1c41156c15e677ad5c47062c8a7b19901b2b678b8ba"
+    },
+    "models/panasonic.ptrz970.inspection/panasonic.ptrz970.inspection.glb": {
+      "bytes": 1245480,
+      "sha256": "0c139dd9d72c73f55f86631b188e2e9c513d73423df7d7d1a053cc030d4a8006"
+    },
+    "models/panasonic.ptrz970.inspection/panasonic.ptrz970.manifest.json": {
+      "bytes": 2685,
+      "sha256": "f487c8a37794f4948077ea450e7868165419a7146167085cdbcda9167e69740a"
+    },
+    "models/panasonic.ptrz970.inspection/preview.jpg": {
+      "bytes": 20076,
+      "sha256": "d3f02e97b3cb05b4ec8fe6a8f7ed7e6daef69f5cae3ef4642ca53c8007291a9c"
     }
   }
 }
