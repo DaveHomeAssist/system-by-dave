@@ -17,6 +17,8 @@ const BUDGET_MS = 1000;
   const relay = await startRelay();
   const browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}), args: ['--no-sandbox'] });
   try {
+    // Projector tiles exist only for projectors with a lane.
+    for (const [slot, lane] of Object.entries({ P1: 'A', P2: 'B', P3: 'C', P4: 'D' })) await relay.api('projector', { slot, lane });
     const page = await browser.newPage();
     // Keep the live socket so the page's own message handler can be fed directly and timed.
     await page.addInitScript(() => {
