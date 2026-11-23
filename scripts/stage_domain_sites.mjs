@@ -982,7 +982,7 @@ function main() {
       applyCutover(siteRoot, site, entries, options).forEach((file) => removed.add(file));
       console.log(`${site.id}: systembydave.com now redirects ${[...entries.pages].filter((file) => /\.html?$/i.test(file)).length} pages to ${site.domain}`);
     }
-    applyManagedSiteMirrors(siteRoot);
+    applyManagedSiteMirrors(siteRoot, { includeStartupRedirect: true });
     writeFile(siteRoot, 'deploy.json', deployMarker(staged, options));
     if (staged.some((item) => item.cutover)) {
       writeFile(siteRoot, 'js/domain-move-sites.js', moveSitesScript(config, policies, options));

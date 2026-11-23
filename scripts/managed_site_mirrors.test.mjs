@@ -61,3 +61,14 @@ test('absent managed entries do not create a WST tree', () => {
   try { assert.deepEqual(applyManagedSiteMirrors(temp), []); assert.deepEqual(fs.readdirSync(temp), []); }
   finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
+
+test('public staging generates only the Startup Checks redirect when its app is excluded', (t) => {
+  const staged = fs.mkdtempSync(path.join(os.tmpdir(), 'startup-checks-redirect-'));
+  t.after(() => fs.rmSync(staged, { recursive: true, force: true }));
+  const entry = 'apps/frozen-startup/checks-app/web/index.html';
+  assert.deepEqual(applyManagedSiteMirrors(staged, { includeStartupRedirect: true }), [entry]);
+  assert.deepEqual(fs.readdirSync(path.dirname(path.join(staged, entry))), ['index.html']);
+  const html = fs.readFileSync(path.join(staged, entry), 'utf8');
+  assert.ok(html.includes('content="0;url=https://wst.housevideo.app/"'));
+  assert.ok(html.includes('<link rel="canonical" href="https://wst.housevideo.app/">'));
+});
