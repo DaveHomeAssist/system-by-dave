@@ -8,7 +8,7 @@
 - The home page, Tools directory, and avbydave.com home page all say 19 browser tools, the live registry count. The avbydave.com tools tab no longer shows 6.
 - The privacy policy names David Robertson, an individual, New Jersey law, and avbydave@gmail.com.
 - The project registry labels its June 11, 2026 snapshot and shows Phillies Wire as paused until Feb 2027.
-- The demos tab bar scrolls at narrow widths instead of overlapping, and the demos page and Ballpark Scorecard have a page heading.
+- The demos tab bar scrolls at narrow widths instead of overlapping. The page heading stays outside the tab panels, where the hub probe does not treat it as clipped panel text.
 
 ## November 23, 2026. Theme Organizer on the tools directory
 
