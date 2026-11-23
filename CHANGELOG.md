@@ -178,6 +178,10 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 - The suite now runs in a parallel `retained` job, which builds the eight family fixtures it serves. Every step in both jobs has its own `timeout-minutes`, so a real stall fails at the step that stalled.
 - The retained runner stops any probe that runs past four minutes (`AV_RETAINED_PROBE_LIMIT_MS`) and names it in the error.
 
+## Frozen Monitor: compact app bar, 2026-11-17
+
+- The six Monitor pages move the Light, Dark and System buttons into one theme menu, following the refined header design. The bar stays on one row down to about 1000 px, so it no longer takes three rows when the Monitor shares a screen with Rehearsal Review, MIDI Live and PTZ. In Dark, the current section and an active Show Lock get the glow from the design. The saved theme and all relay behaviour are unchanged.
+
 ## Projctl Barco standby power state, 2026-11-17
 
 - The Barco Pulse driver now reads `system.state` `standby` as power OFF. Before, a Barco that had cooled down into standby showed UNKNOWN with "power unknown" on the monitor while still replying (seen on lane C at WST, Nov 17 after the 10:01 PM power-off). Power commands and lens guards are unchanged. A new test pins every mapped state.
