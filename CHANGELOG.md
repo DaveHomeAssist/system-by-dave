@@ -1,5 +1,9 @@
 # Changelog
 
+## November 23, 2026. Throwline sitemap check follows the Stage 3D page
+
+- `ProjectorThrow/` only redirects to `ProjectorThrow/Stage3D.html`, so the sitemap lists the final page. Throwline release verification checks that address and still requires the registry entry at `ProjectorThrow/`.
+
 ## November 23, 2026. Publish the public site, not the repository
 
 - GitHub Pages was copying the repository root. `scripts/stage_public_site.mjs` now publishes site content. Docs, scripts, reports, plans, tests, application source, and `career-market.html` stay in the repository and are not served. The Equipment Lab reference markdown and the Davai storyboard script stay, because pages link to them. `apps/projctl/public/` stays, because those noindex pages are part of the site. `scripts/stage_public_site.test.mjs` diffs the new publish against the previous one.
