@@ -83,7 +83,19 @@ async function scenario(name, initial, check) {
 const read = (p,k) => p.evaluate(k => localStorage.getItem(k), k);
 const settle = p => p.waitForTimeout(750); // Cross the documented 400ms draft debounce.
 const edit = (p,s) => p.getByLabel('Source', { exact: true }).fill(s);
-const warning = async (p,pattern) => assert.match(await p.getByRole('status').textContent(), pattern);
+// The draft conflict is reported after that debounce, and a busy runner can fire the
+// timer late. A single read then still shows "Plan loaded from this browser."
+const warning = async (p, pattern) => {
+  const status = p.getByRole('status');
+  const deadline = Date.now() + 8000;
+  let text = '';
+  while (Date.now() <= deadline) {
+    text = (await status.textContent()) || '';
+    if (pattern.test(text)) return;
+    await p.waitForTimeout(100);
+  }
+  assert.match(text, pattern);
+};
 const offered = (source='Old draft') => { const doc=JSON.parse(seed); doc.routes[0].source=source; return JSON.stringify({v:1,console:'av-video',at:'2026-10-05T10:00:00Z',baseline:seed,doc}); };
 try {
   await scenario('draft write failure is visible and Export works', {}, async p => {

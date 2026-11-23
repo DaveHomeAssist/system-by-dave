@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">Return loss and reflections</title><desc id="desc">Blue indicates incident power; amber indicates reflected power at one port. The examples use the positive return loss convention. Arrow lengths are not to scale.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 031</text>
+<text x="108" y="228" font-size="54" class="story-title">Return loss and reflections</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect width="240" height="400" class="canvas"/><text x="12" y="26" class="diagram-index">31</text><text x="48" y="26" class="diagram-heading">RETURN LOSS</text><path d="M12 40H228" class="rule"/>
+<rect x="12" y="52" width="216" height="132" rx="6" class="panel"/><text x="24" y="78" class="blue-label">1 / Return loss 20 dB</text><text x="24" y="103">Incident power: 100%</text><path d="M24 116H208m-6-5l6 5l-6 5" class="wire"/><path d="M216 108V148" class="rule"/><path d="M208 140H24m6-5l-6 5l6 5" class="reference"/><text x="24" y="169" class="note">Reflected power: 1%</text>
+<rect x="12" y="208" width="216" height="132" rx="6" class="panel"/><text x="24" y="234" class="blue-label">2 / Return loss 10 dB</text><text x="24" y="259">Incident power: 100%</text><path d="M24 272H208m-6-5l6 5l-6 5" class="wire"/><path d="M216 264V304" class="rule"/><path d="M208 296H24m6-5l-6 5l6 5" class="reference"/><text x="24" y="325" class="note">Reflected power: 10%</text><text x="24" y="368">Positive return loss</text><text x="24" y="394">Higher = less reflection</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">Blue indicates incident power; amber</text>
+<text x="108" y="1558" font-size="40" class="story-caption">indicates reflected power at one</text>
+<text x="108" y="1610" font-size="40" class="story-caption">port. The examples use the positive</text>
+<text x="108" y="1662" font-size="40" class="story-caption">return loss convention. Arrow</text>
+<text x="108" y="1714" font-size="40" class="story-caption">lengths are not to scale.</text>
+<a href="https://scdn.rohde-schwarz.com/ur/pws/dl_downloads/dl_application/application_notes/1ez54/1EZ54_0E.pdf#page=4"><text x="108" y="1808" font-size="28" class="story-source">Rohde &amp; Schwarz, return loss (1EZ54, p.4)</text></a>
+</svg>
