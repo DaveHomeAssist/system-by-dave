@@ -1,5 +1,9 @@
 # Changelog
 
+## November 23, 2026. The Philly 215 preview
+
+- Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.
+
 ## November 23, 2026. Throwline sitemap check follows the Stage 3D page
 
 - `ProjectorThrow/` only redirects to `ProjectorThrow/Stage3D.html`, so the sitemap lists the final page. Throwline release verification checks that address and still requires the registry entry at `ProjectorThrow/`.
@@ -17,6 +21,10 @@
 ## November 23, 2026. Frozen handoff brought current through November 21
 
 - The house handoff, on the Frozen workspace and the public WST pages, now says the house team has run video since November 19, names show file 3.1, and records lamps, deck pixels and opening night as they stood on November 21.
+
+## November 23, 2026. Frozen workspace and hosting plan
+
+- Record the proposed Frozen operator views inside the AV console and the separate assessment for moving the public workspace off GPT Sites. The plan does not change the running show pages and does not authorize a migration.
 
 ## November 23, 2026. Theme Organizer on the tools directory
 
@@ -810,6 +818,24 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 
 - Declare Node.js 24 for local package tooling, matching CI, with `.nvmrc`.
 - Include the venue walk publishing domain in repository orientation and the domain source map. Replace stale pre-cutover wording while preserving the separate authenticated acceptance gate.
+
+## 2026-10-30
+
+- AOM Copy text now reports confirmed clipboard results and offers selected
+  manual-copy text when permission or the fallback fails. Preserve an editor
+  opened during a pending permission request.
+
+- AOM now preserves existing saved bytes after failed reads or invalid saved
+  JSON. Block autosave of fallback sample data, retain visible failure feedback,
+  and offer an exact original-text download plus explicit reload retry.
+  Disposable local and artifact storage fixtures cover the failure boundary.
+
+- AOM show board now has an explicit resource policy and bounded Timeline, Live,
+  Turns and Tools views. Preserve the route, saved board key and data, import
+  confirmation and photo transcription request. Add keyboard room/session
+  controls and dialog focus handling. Mocked scan regression makes no inference
+  calls. Source validation and deployment remain separate.
+
 
 ## October 30, 2026: Davai reference navigation
 
