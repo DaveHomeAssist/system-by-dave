@@ -37,7 +37,8 @@ const FAULT = (label, id, text) => ({ state: 'fault', checks: [check(id, label, 
     const open = async () => { await page.goto(relay.base + '/monitor/rig.html'); await until(async () => (await page.locator('.fm-mac').count()) >= 2 && (await state('m5')) !== 'unknown'); };
     const word = async host => (await tile(host).locator('.fm-mac__word').textContent()).trim();
     const noScroll = () => page.evaluate(() => { const d = document.documentElement; return d.scrollHeight <= d.clientHeight && d.scrollWidth <= d.clientWidth; });
-    const theme = async t => { await page.locator(`[data-theme-choice="${t}"]`).click(); assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), t); };
+    // The compact app bar keeps the theme choices in a menu: open it first, as the other Monitor suites do.
+    const theme = async t => { const trigger = page.locator('#theme'); if (await trigger.count()) await trigger.click(); await page.locator(`[data-theme-choice="${t}"]`).click(); assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), t); };
     const shot = async name => { if (shots) await page.screenshot({ path: path.join(shots, `rig-macs-${name}.png`) }); };
 
     // 1. Nothing has reported: both tiles say so, and neither is green.
