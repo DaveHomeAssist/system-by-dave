@@ -123,7 +123,22 @@ try {
   assert.equal((await saved()).graphPositions['device:Camera%201'], undefined, 'one Undo reverses the entire drag');
   await button('↷ Redo').click(); await save();
   assert.deepEqual((await saved()).graphPositions['device:Camera%201'], position);
-  await page.reload(); await node('Production switcher').locator('.device-title').dblclick();
+  await page.reload();
+  const title = node('Production switcher').locator('.device-title');
+  await title.waitFor();
+  await button('Fit View').click();
+  // React Flow treats a pointer move of more than 1px as a drag and drops the double-click.
+  // After reload the diagram is still fitting, so the two clicks of an immediate dblclick land
+  // on different points and the rename dialog never opens.
+  await page.waitForFunction(() => {
+    const el = [...document.querySelectorAll('.device-title strong')].find(node => node.textContent === 'Production switcher');
+    if (!el) return false;
+    const box = el.getBoundingClientRect();
+    const previous = window.__probeTitleBox;
+    window.__probeTitleBox = { x: box.x, y: box.y };
+    return previous && box.width > 0 && Math.abs(previous.x - box.x) < 1 && Math.abs(previous.y - box.y) < 1;
+  });
+  await title.dblclick();
   const rename = page.getByRole('dialog', { name: 'Rename shared device' });
   await rename.getByLabel('Device name').fill('Main switcher');
   await rename.getByRole('button', { name: 'Rename device', exact: true }).click();
@@ -243,9 +258,15 @@ try {
     }
   }
   await page.setViewportSize({ width: 1440, height: 900 }); await button('Fit View').click();
-  const zoomBefore = await page.locator('.react-flow__viewport').getAttribute('style');
+  // Fit View lands a frame or two after its click and Zoom in animates. Reading the viewport straight
+  // after either click compares whichever frame arrived first, so the check passed or failed by timing.
+  // Read it once Fit View has settled, then wait for Zoom in to move it.
+  const viewportStyle = () => page.locator('.react-flow__viewport').getAttribute('style');
+  let zoomBefore = await viewportStyle();
+  for (let settled = 0; settled < 3;) { await page.waitForTimeout(100); const now = await viewportStyle(); settled = now === zoomBefore ? settled + 1 : 0; zoomBefore = now; }
   await button('Zoom in').click();
-  assert.notEqual(await page.locator('.react-flow__viewport').getAttribute('style'), zoomBefore);
+  await page.waitForFunction(before => document.querySelector('.react-flow__viewport')?.getAttribute('style') !== before, zoomBefore, { timeout: 5000 });
+  assert.notEqual(await viewportStyle(), zoomBefore);
   await button('Toggle overview').click(); assert.ok(await page.locator('.react-flow__minimap').isVisible());
   assert.deepEqual(errors, []);
   console.log(`AV Video graph browser passed: shared devices, trace, drag/save/reload, shared rename, keyboard connection, port dragging, patch parity, SVG export, format/connector presets, custom LED raster, undo/redo, zoom, overview and responsive themes (${BASE}).`);
