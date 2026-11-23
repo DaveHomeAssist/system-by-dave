@@ -8,6 +8,7 @@
 - Phone captures and the Lighting Console Spec Guide capture are in `img/` and unused. No card uses a `<picture>` set, and the console guide has no card.
 - Davai's headline now sizes from its column, so "architecture" stays beside the route panel from 1280 px through 1680 px.
 - Cue Sheet's column header sticks to the top of the table. The old 68 px offset was inside the table scroller, so the header covered cue 001.
+- On a short screen the home-page shots shrink to the same 50px cap as the other reader images, so they stay inside the page. Tool-card shots use the existing 7:5 art box instead of the file's height attribute.
 
 ## November 23, 2026. Domain publish staging path
 

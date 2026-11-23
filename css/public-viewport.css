@@ -118,7 +118,7 @@ html[data-theme="light"] { --bg: #f4f6f8; --bg-2: #eaf0f5; --surface: #fff; --su
   .public-pages .agent-table td.agent { width: auto; }
   .public-pages .chips li, .public-pages .chips a, .public-pages .footer-links li { display: block; }
   .public-pages .stat { padding: 4px; }
-  .public-pages .hero-portrait img, .public-pages .feat-shot img { max-height: 50px; width: auto; }
+  .public-pages .hero-portrait img, .public-pages .feat-shot img, .public-pages .card-shot, .public-pages .card-shot img { max-height: 50px; width: auto; height: auto; }
   .public-pages .comms-head, .public-pages .comms-cta { display: block; padding: 4px; }
   .public-pages .channel .val, .public-pages .channel .ch { display: block; width: auto; }
   .public-pages .tile, .public-pages .tile-body { min-height: 0; }
