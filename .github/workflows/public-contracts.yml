@@ -37,6 +37,11 @@ jobs:
           npm run test:browser --prefix apps/projctl
           npm run test:venue-browser --prefix apps/projctl
       - run: node scripts/probe_brand_reference.mjs
+      - name: Verify AOM board policy and operator views
+        run: |
+          node scripts/probe_aom_show_board.mjs
+          node scripts/probe_aom_storage.mjs
+          node scripts/probe_aom_clipboard.mjs
       - run: npm run test:public-viewport
       - run: npm run probe:cue-sheet-editing
       - run: npm run probe:thephilly

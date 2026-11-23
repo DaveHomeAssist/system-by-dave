@@ -26,8 +26,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: scripts/launch
-      - name: Post-publish check (waits for source.json after a deploy)
+      - name: Post-publish check (waits for deploy.json, then for this site's staged content)
         if: github.event_name == 'workflow_run'
-        run: node scripts/launch/smoke_live_domain.mjs --expect-commit "${{ github.event.workflow_run.head_sha }}" --wait 900 --delay 20
+        run: node scripts/launch/smoke_live_domain.mjs --expect-release "${{ github.event.workflow_run.head_sha }}" --wait 900 --delay 20
       - name: Uptime and live-behind-main
         run: node scripts/launch/smoke_live_domain.mjs --behind-main --max-behind-minutes 60
