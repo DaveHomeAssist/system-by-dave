@@ -1,5 +1,9 @@
 # Changelog
 
+## November 23, 2026. The Philly 215 preview
+
+- Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.
+
 ## November 23, 2026. Throwline sitemap check follows the Stage 3D page
 
 - `ProjectorThrow/` only redirects to `ProjectorThrow/Stage3D.html`, so the sitemap lists the final page. Throwline release verification checks that address and still requires the registry entry at `ProjectorThrow/`.
