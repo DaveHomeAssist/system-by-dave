@@ -10,6 +10,10 @@
 - The project registry labels its June 11, 2026 snapshot and shows Phillies Wire as paused until Feb 2027.
 - The demos tab bar scrolls at narrow widths instead of overlapping. The page heading stays outside the tab panels, where the hub probe does not treat it as clipped panel text.
 
+## November 23, 2026. Frozen handoff brought current through November 21
+
+- The house handoff, on the Frozen workspace and the public WST pages, now says the house team has run video since November 19, names show file 3.1, and records lamps, deck pixels and opening night as they stood on November 21.
+
 ## November 23, 2026. Theme Organizer on the tools directory
 
 - The Tools directory lists Theme Organizer under Labs. The card links to the live page at `https://davehomeassist.github.io/theme-organizer-resource/` and opens in a new tab. It browses, filters, compares, and shortlists 58 UI themes, and can inspect color tokens, copy CSS custom properties, preview a theme across the page, and export or import JSON. Choices stay in the browser.
@@ -66,6 +70,14 @@
 - The console page is now indexable at its own canonical address, `https://avbydave.com/av/` (it was noindex with the root as canonical), and is listed in the AV sitemap. Its breadcrumb reads AV by Dave, linking the site home, then Console; the System by Dave link moved to the home page footer.
 - The home page's files joined the registry's offline list and the cache generation is `v20261121-site-home`, so a saved copy of `/` opens styled offline. `verify:av` now requires `av-home/` as the staged home, the console's own canonical and return link, and the shared theme key; its pinned counts are 164 base and 183 offline assets.
 - Checked locally: all four sections at ten sizes from 320 by 568 to 3840 by 1080 in both themes with no page scroll, clipping or sub 44 px control; keyboard skip link, section history, theme persistence into the console and back, print and no JavaScript on the staged avbydave.com site; `verify:av`, `verify:indexing`, `verify:public-navigation`, `verify:public-consistency`, `verify:domain-sites`, `verify:private-exposure`, `verify:throwline`, the console shell, nav funnel and first visit probes, the 57 domain move scenarios and the 33 step Frozen reference.
+
+## November 21, 2026. Destination sites deploy only when their content changes
+
+- A push to `main` used to redeploy housevideo.app, walk.housevideo.app and avbydave.com even when it touched none of their pages (for example a new page under systembydave.com). Each destination's `source.json` carries the source commit, so it differs on every push and the "nothing changed" check in `scripts/publish_domain_site.sh` never held. Content digests were unchanged across the previous push; only that marker moved.
+- `scripts/domain_publish_plan.mjs` now decides per destination. It publishes when any file other than `source.json` differs, skips when only `source.json` differs and the live site already serves the staged content digest, and republishes (an empty commit if needed) when the live site does not serve the staged content or cannot be read, so a destination Pages deploy that failed earlier is retried instead of being reported as done. Covered by `scripts/domain_publish_plan.test.mjs` in `npm run verify:domain-sites`.
+- The walk cutover gate (`scripts/check_domain_cutover_ready.mjs --live`) compares the live walk site with the staged one by `artifactSha256` instead of `sourceCommit`, so a push that does not change the walk site no longer makes the systembydave.com deploy wait for a walk deploy that has nothing to deploy.
+- systembydave.com publishes `deploy.json` on every deploy: the source commit and the content digest staged for each destination (`scripts/stage_domain_sites.mjs`, `scripts/domain_deploy_marker.test.mjs`). The live-behind-main check (`scripts/launch/smoke_live_domain.mjs --behind-main`) compares `deploy.json` with main, then checks that each destination serves the digest staged for it, because a destination's own `source.json` commit is no longer expected to equal main HEAD. `--expect-release <sha>` replaces `--expect-commit` for post-deploy waits. Until the first deploy publishes `deploy.json` the check falls back to the old comparison.
+- `docs/domain-sites.md`, `docs/launch/uptime-monitoring.md`, the self-hosted smoke workflow example and the README describe the new behaviour. The publish step itself runs only on `main`, so it is covered by unit tests and a staged dry run rather than a pull request run.
 
 ## November 21, 2026. The Philly prototype at /thephilly/
 
@@ -789,6 +801,11 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 
 - Add a restrictive content policy to the noindex brand reference, allowing its existing Google font sources and local navigation script while blocking connections, inline scripts, objects and forms.
 - Preserve all seven reference sections and artwork with light/default and dark reading themes, keyboard section tabs, bounded reading, URL history, print expansion and no-JavaScript access.
+
+## October 30, 2026: Platform setup documentation
+
+- Declare Node.js 24 for local package tooling, matching CI, with `.nvmrc`.
+- Include the venue walk publishing domain in repository orientation and the domain source map. Replace stale pre-cutover wording while preserving the separate authenticated acceptance gate.
 
 ## 2026-10-30
 

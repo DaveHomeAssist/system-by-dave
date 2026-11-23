@@ -44,7 +44,10 @@ export async function checkDestination(site, directory, fetchImpl = fetch) {
   };
   try {
     const actual = await (await read('/source.json')).json();
-    for (const key of ['schema', 'site', 'domain', 'sourceRepository', 'sourceCommit', 'artifactSha256', 'cutover']) {
+    // Content decides readiness. sourceCommit is the commit the site was last published from; a site whose
+    // content did not change keeps an older one (scripts/domain_publish_plan.mjs), and artifactSha256 plus
+    // the page bytes below are what prove the destination serves this release.
+    for (const key of ['schema', 'site', 'domain', 'sourceRepository', 'artifactSha256', 'cutover']) {
       const seen = typeof actual[key] === 'string' ? actual[key].slice(0, 12) : actual[key];
       const wanted = typeof expected[key] === 'string' ? expected[key].slice(0, 12) : expected[key];
       assert.equal(actual[key], expected[key], `Destination ${key} differs from staged release (${seen} vs ${wanted})`);

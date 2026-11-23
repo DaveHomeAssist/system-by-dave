@@ -94,5 +94,8 @@
       document.getElementById('ty-paid').hidden = false;
     }
     document.documentElement.setAttribute('data-kit-link', 'registered');
+  }).catch(function () {
+    // Anything unexpected keeps the safe default: the "email me" card.
+    document.documentElement.setAttribute('data-kit-link', 'unregistered');
   });
 })();
