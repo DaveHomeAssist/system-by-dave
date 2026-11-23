@@ -1,5 +1,15 @@
 # Changelog
 
+## November 23, 2026. Publish the public site, not the repository
+
+- GitHub Pages was copying the repository root. `scripts/stage_public_site.mjs` now publishes site content. Docs, scripts, reports, plans, tests, application source, and `career-market.html` stay in the repository and are not served. The Equipment Lab reference markdown and the Davai storyboard script stay, because pages link to them. `apps/projctl/public/` stays, because those noindex pages are part of the site. `scripts/stage_public_site.test.mjs` diffs the new publish against the previous one.
+- `robots.txt` no longer lists paths this publish does not ship. `/command53/` is a noindex page that says the address is not available.
+- The Field Kit page no longer shows draft labels or a statement-descriptor placeholder. The card line says AVBYDAVE FIELD KIT. The price stays $12, and checkout stays closed.
+- The home page, Tools directory, and avbydave.com home page all say 19 browser tools, the live registry count. The avbydave.com tools tab no longer shows 6.
+- The privacy policy names David Robertson, an individual, New Jersey law, and avbydave@gmail.com.
+- The project registry labels its June 11, 2026 snapshot and shows Phillies Wire as paused until Feb 2027.
+- The demos tab bar scrolls at narrow widths instead of overlapping. The page heading stays outside the tab panels, where the hub probe does not treat it as clipped panel text.
+
 ## November 23, 2026. Frozen workspace and hosting plan
 
 - Record the proposed Frozen operator views inside the AV console and the separate assessment for moving the public workspace off GPT Sites. The plan does not change the running show pages and does not authorize a migration.

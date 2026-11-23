@@ -219,10 +219,12 @@
     color: var(--rust-dark);
     background: rgba(181, 101, 74, 0.1);
   }
-  .registry-status.archived {
+  .registry-status.archived,
+  .registry-status.paused {
     color: var(--charcoal-light);
     background: rgba(44, 44, 44, 0.06);
   }
+  .registry-status.paused { white-space: normal; }
   .registry-empty {
     padding: 44px 20px;
     color: var(--charcoal-light);
@@ -286,7 +288,7 @@
       <div class="container">
         <div class="registry-eyebrow">DaveHomeAssist GitHub</div>
         <h1>Public Project Registry</h1>
-        <p>A browsable snapshot of public repositories, grouped by purpose, stack, status, and recent activity. The private local audit stays offline.</p>
+        <p>Archive snapshot, June 11, 2026. The totals below are from that export. The private local audit stays offline.</p>
       </div>
     </section>
 
@@ -296,7 +298,7 @@
           <div class="registry-metric"><strong id="metric-total">0</strong><span>Public repos</span></div>
           <div class="registry-metric"><strong id="metric-active">0</strong><span>Active</span></div>
           <div class="registry-metric"><strong id="metric-archived">0</strong><span>Archived</span></div>
-          <div class="registry-metric"><strong id="metric-commits">0</strong><span>90 day commits</span></div>
+          <div class="registry-metric"><strong id="metric-commits">0</strong><span>90-day commits in the snapshot</span></div>
         </div>
 
         <form class="registry-toolbar" role="search" aria-label="Filter public repositories">
@@ -309,6 +311,7 @@
             <select id="registry-status">
               <option value="all">All statuses</option>
               <option value="active">Active</option>
+              <option value="paused">Paused</option>
               <option value="maintenance">Maintenance</option>
               <option value="archived">Archived</option>
             </select>
@@ -515,7 +518,8 @@
       rows.innerHTML = items.map((project) => {
         const stackItems = stack(project).slice(0, 4);
         const extraStack = Math.max(0, stack(project).length - stackItems.length);
-        const statusClass = project.status === 'archived' ? ' archived' : '';
+        const statusClass = project.status === 'archived' || project.status === 'paused' ? ' ' + project.status : '';
+        const statusLabel = project.status === 'paused' && project.pausedUntil ? project.status + ' until ' + project.pausedUntil : (project.status || 'public');
         const purpose = project.purpose || 'No public description recorded.';
         return '<tr>' +
           '<td><a class="repo-name" href="' + escapeHtml(project.github) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(project.name) + '</a>' +
@@ -524,7 +528,7 @@
           '<td><p class="repo-purpose">' + escapeHtml(purpose) + '</p></td>' +
           '<td><div class="registry-pills">' + stackItems.map((item) => '<span class="registry-pill">' + escapeHtml(item) + '</span>').join('') +
           (extraStack ? '<span class="registry-pill">+' + extraStack + '</span>' : '') + '</div></td>' +
-          '<td><span class="registry-status' + statusClass + '">' + escapeHtml(project.status || 'public') + '</span></td>' +
+          '<td><span class="registry-status' + statusClass + '">' + escapeHtml(statusLabel) + '</span></td>' +
           '<td>' + escapeHtml(formatDate(project.lastRemoteUpdate)) + '<span class="repo-meta">' + escapeHtml(project.recentCommits90d || 0) + ' commits / 90d</span></td>' +
           '</tr>';
       }).join('');
