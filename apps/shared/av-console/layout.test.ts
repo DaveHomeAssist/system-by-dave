@@ -60,4 +60,12 @@ describe("stored views", () => {
     expect(() => workspaceSchema.parse({ version: 2, views: [] })).toThrow();
     expect(() => workspaceSchema.parse({ version: 1, views: [{ id: "v", name: "V", panels: [{ ...P("a", -1, 0, 1, 1) }] }] })).toThrow();
   });
+  it("places, splits and stores panels on half cells", () => {
+    expect(workspaceSchema.parse({ version: 1, views: [{ id: "v", name: "V", panels: [P("a", 0.5, 0, 4.5, 3.5)] }] }).views[0].panels[0].w).toBe(4.5);
+    expect(() => workspaceSchema.parse({ version: 1, views: [{ id: "v", name: "V", panels: [P("a", 0.25, 0, 4, 4)] }] })).toThrow();
+    expect(fits({ x: 4.5, y: 0, w: 1, h: 1 }, [P("a", 0, 0, 4.5, 8)])).toBe(true);
+    expect(fits({ x: 4, y: 0, w: 1, h: 1 }, [P("a", 0, 0, 4.5, 8)])).toBe(false);
+    expect(split(P("a", 0, 0, 5, 4), "h")).toEqual({ keep: { x: 0, y: 0, w: 2.5, h: 4 }, rest: { x: 2.5, y: 0, w: 2.5, h: 4 } });
+    expect(firstFree([P("a", 0, 0, 8.5, 8)])).toEqual({ x: 8.5, y: 0, w: 3.5, h: 8 });
+  });
 });

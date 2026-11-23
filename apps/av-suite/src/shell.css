@@ -95,7 +95,7 @@ html[data-av-focus="true"] .focus-toggle span{display:none}
 .suite-app .console-strip{flex-wrap:nowrap;padding:0 8px;gap:4px;min-height:48px}
 .topic-menu .console-views,.topic-menu .console-quick{display:flex;flex-direction:column;align-items:stretch;flex-basis:auto;margin:0;border:0;gap:4px}
 .suite-app .console-bar{min-height:44px;padding:0 4px 0 10px}
-.suite-app .console-grid{padding:6px;gap:6px}
+.suite-app .console-grid{padding:6px;--console-gap:6px;gap:6px}
 .suite-app .console-context{font-size:11px}
 .suite-app .flow-workspace{position:relative}
 .flow-compact-tools{position:absolute;top:8px;left:8px;z-index:5}
