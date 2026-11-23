@@ -1,10 +1,10 @@
-/* Field Kit draft page (docs/launch/checkout.md).
-   Checkout stays disabled until window.SBD_LAUNCH.fieldKit.checkout names a
-   provider and a valid link on that provider's site (js/sbd-checkout.js), AND
-   every Dave-approval block (data-dave-placeholder: delivery, statement
-   descriptor, refunds, licence) has been approved and its marker
-   removed, AND fieldKit.priceLabel is a real price. That interlock keeps the page from selling before the terms exist.
-   Events go to the no-op dispatcher (js/sbd-events.js). */
+/* Field Kit page (docs/launch/checkout.md).
+   Checkout stays disabled until fieldKit.checkoutOpen is true, AND
+   fieldKit.checkout names a provider and a valid link on that provider's site
+   (js/sbd-checkout.js), AND no block is still marked data-dave-placeholder,
+   AND fieldKit.priceLabel is a real price. checkoutOpen is the switch: false
+   leaves "Checkout opens soon" in place and does not point the Buy button at
+   the Payment Link. Events go to the no-op dispatcher (js/sbd-events.js). */
 (function () {
   'use strict';
   var cfg = (window.SBD_LAUNCH && window.SBD_LAUNCH.fieldKit) || {};
@@ -30,7 +30,9 @@
   var buy = document.getElementById('kit-buy');
   var off = document.getElementById('kit-buy-disabled');
   var note = document.getElementById('kit-buy-note');
-  if (!checkout || !buy) return;
+  // The one switch. false keeps the static "Checkout opens soon" state and
+  // never writes the Payment Link onto the Buy button.
+  if (cfg.checkoutOpen !== true || !checkout || !buy) return;
   if (!priceSet) {
     if (window.console) console.warn('Field Kit checkout is configured but the price is still a placeholder; checkout stays closed.');
     return;
@@ -42,6 +44,8 @@
   buy.href = checkout.url;
   buy.hidden = false;
   if (off) off.hidden = true;
+  var status = document.getElementById('kit-status');
+  if (status) status.hidden = true;
   if (note) note.textContent = 'Secure checkout by ' + checkout.label + '. Your download link appears right after payment.';
   buy.addEventListener('click', function () { events.track('kit_click', { placement: 'field-kit', provider: checkout.provider }); });
 

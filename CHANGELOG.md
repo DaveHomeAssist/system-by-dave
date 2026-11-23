@@ -1,5 +1,11 @@
 # Changelog
 
+## November 23, 2026. Field Kit checkout open
+
+- Open the $12 Sync & Signal Field Kit. `checkoutOpen: true` in `js/sbd-launch-config.js` is the switch: the Buy button goes to the Stripe Payment Link, and avbydave.com publishes the page as indexable. Set that one line to `false` to keep "Checkout opens soon" and leave the page noindex.
+- Register the kit folder's download hash so the thanks page shows the download button for that link. The share link stays out of this repository.
+- Replace the three card previews with the final page-1 renders. The tear-test preview is unchanged.
+
 ## November 23, 2026. Screenshots on the tool cards
 
 - Tools directory cards that only had the sprite now show a live screenshot in the same art box (`img.tc-art.tc-art--shot`, lazy, with the capture's alt text). Theme Organizer keeps `img/theme-organizer-card.webp`; the new full-page capture is lighter and harder to read at that size. Garden OS, Back Focus, OnTrack and AV Video are unchanged. Prompts, Trailkeeper and Hat-in-Ring had no file in the capture set.
@@ -811,6 +817,12 @@ Workspace search opens show pages and R5 references. Notes retains the last shar
 
 - Add Edition 026, Active HDMI cable direction, with an Extron sourced lesson,
   matching diagram and SVG/PNG story card. Preserve previous editions and behavior.
+
+## November 1, 2026: Field Kit checkout
+
+- Wire the AV by Dave Stripe Payment Link ($12) into `js/sbd-launch-config.js`, finalise the Field Kit delivery, statement descriptor (AVBYDAVE FIELD KIT), refund and licence text, and remove the DRAFT markers, so the Buy button opens. `fieldKit.download.sha256` stays empty until Dave registers the kit share link, so the thanks page keeps the email-me card.
+- Index `/field-kit/` on avbydave.com only while checkout is live: the source stays noindex and the publish step swaps it, with a matching avbydave.com sitemap entry (`scripts/field_kit_launch.mjs`, `scripts/gen_sitemap.py`, tested in `verify:domain-sites`).
+- Add the avbydave.com/frame-sync/ Reel short link, a noindex redirect to systembydave.com/demos/frame-sync.html that keeps the query string.
 
 ## November 1, 2026: Video Engineering Daily
 
