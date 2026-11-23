@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-labelledby="title desc">
+<title id="title">LED refresh and shutter exposure</title><desc id="desc">At 50 fps, halving shutter angle halves exposure. A shorter window may cut an LED PWM cycle. Blue shows exposure or drive; amber marks a cutoff. Timing schematic, not to scale.</desc>
+<style>:root {
+  --ground:#111111; --surface:#191919; --surface-raised:#242424; --raised:#303030;
+  --line:#3c3c3c; --ink:#eeeeee; --muted:#b6b6b6; --faint:#a0a0a0;
+  --blue:#a8bed9; --cyan:#becbd9; --amber:#d0c0a0; --red:#e6a8a8;
+  --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+} text {font-family:system-ui,sans-serif;fill:var(--ink)} .eyebrow{fill:var(--cyan);letter-spacing:3px}.story-title{font-weight:750}.story-caption{fill:var(--ink)}.story-source{fill:var(--muted)}    .illustration text { fill: var(--ink); font: 16px var(--sans); }
+    .illustration .node { fill: var(--surface); stroke: var(--cyan); stroke-width: 2; }
+    .illustration .wire { fill: none; stroke: var(--blue); stroke-width: 3; }
+    .illustration .alternate { stroke: var(--amber); }
+    .illustration .note { fill: var(--amber); }
+    .illustration .canvas { fill: var(--surface); }
+    .illustration .panel { fill: var(--surface-raised); stroke: var(--line); stroke-width: 1; }
+    .illustration .diagram-index { fill: var(--cyan); font-family: var(--mono); font-weight: 700; }
+    .illustration .diagram-heading { font-weight: 700; }
+    .illustration .rule { fill: none; stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-label { fill: var(--blue); }
+    .illustration .good-label { fill: var(--cyan); }
+    .illustration .fault { fill: var(--red); font-weight: 700; }
+    .illustration .result { fill: var(--ground); stroke: var(--cyan); stroke-width: 1; }
+    .illustration .limit { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .packet, .illustration .picture { fill: var(--ground); stroke: var(--line); stroke-width: 1; }
+    .illustration .blue-packet { fill: var(--ground); stroke: var(--blue); stroke-width: 1; }
+    .illustration .amber-packet { fill: var(--ground); stroke: var(--amber); stroke-width: 1; }
+    .illustration .missing { fill: var(--ground); stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+    .illustration .packet-label { font-family: var(--mono); }
+    .illustration .reference { fill: none; stroke: var(--amber); stroke-width: 2; stroke-dasharray: 4 4; }</style>
+<rect width="1080" height="1920" fill="var(--surface)"/>
+<text x="108" y="148" font-size="28" class="eyebrow">VIDEO ENGINEERING DAILY · 025</text>
+<text x="108" y="228" font-size="54" class="story-title">LED refresh and shutter</text>
+<text x="108" y="304" font-size="54" class="story-title">exposure</text>
+<g class="illustration" transform="translate(216 342) scale(2.7)"><rect width="240" height="400" rx="6" class="canvas"/><text x="12" y="26" class="diagram-index">25</text><text x="48" y="26" class="diagram-heading">EXPOSURE WINDOW</text><path d="M12 40H228" class="rule"/><rect x="12" y="52" width="216" height="104" rx="6" class="panel"/><text x="24" y="77" class="blue-label">1 / 50 fps camera</text><text x="24" y="103">180 degrees = 10 ms</text><path d="M24 132H216M24 124v16m192-16v16" class="wire"/><rect x="12" y="170" width="216" height="104" rx="6" class="panel"/><text x="24" y="195" class="note">2 / Shorter shutter</text><text x="24" y="221">90 degrees = 5 ms</text><path d="M24 250H120M24 242v16m96-16v16" class="wire"/><path d="M120 250H216" class="reference"/><rect x="12" y="290" width="216" height="81" rx="6" class="panel"/><text x="24" y="315">Same LED drive cycle</text><path d="M24 351v-16h24v16h24v-16h24v16h24v-16h24v16h24v-16h24v16h24" class="wire"/><path d="M120 325V361" class="reference"/><text x="120" y="394" text-anchor="middle" class="note">Cycle may be cut short</text></g>
+<path d="M108 1460H972" stroke="var(--line)"/>
+<text x="108" y="1506" font-size="40" class="story-caption">At 50 fps, halving shutter angle</text>
+<text x="108" y="1558" font-size="40" class="story-caption">halves exposure. A shorter window</text>
+<text x="108" y="1610" font-size="40" class="story-caption">may cut an LED PWM cycle. Blue shows</text>
+<text x="108" y="1662" font-size="40" class="story-caption">exposure or drive; amber marks a</text>
+<text x="108" y="1714" font-size="40" class="story-caption">cutoff. Timing schematic, not to</text>
+<text x="108" y="1766" font-size="40" class="story-caption">scale.</text>
+<a href="https://www.bromptontech.com/online-help/Content/Tessera%20User%20Manual/03.%20Features/12.3.4%20-%20ShutterSync.htm"><text x="108" y="1808" font-size="28" class="story-source">Brompton Tessera online manual, ShutterSync</text></a>
+</svg>

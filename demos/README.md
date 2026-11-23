@@ -6,9 +6,10 @@ and their pipeline (it moved here from the Codex project folder on 2026-10-20).
 Site integration: each demo carries the public shell (skip link, `.sbd-site-return` breadcrumb,
 shared nav CSS/JS), a canonical URL and a sitemap entry (`scripts/gen_sitemap.py`). GSAP is the
 vendored `js/vendor/gsap.min.js`, never a CDN. `demo-shell.js` lays the stage out between the
-breadcrumb bar and the completion panel, loads Umami when `config.js` has a website ID, sends
+breadcrumb bar and the completion panel, would load Umami only if `config.js` had a website ID
+(analytics is off: no ID, and the demo CSP no longer allows `cloud.umami.is`), turns its event calls
 `demo_view` / `demo_start` / `demo_step_4` / `demo_complete` / `play_start` / `email_submit` /
-`checklist_interest` / `next_demo_click`, and shows the post-completion email ask after the last
+`checklist_interest` / `next_demo_click` into no-ops, and shows the post-completion email ask after the last
 step. In `?drive` or `?auto` (checks and capture) the shell is hidden and the stage is laid out
 exactly as before, so rendered frames are unaffected.
 

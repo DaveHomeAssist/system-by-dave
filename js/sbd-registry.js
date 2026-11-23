@@ -117,6 +117,18 @@
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
+    /* The avbydave.com home page (av-home/), so a saved copy of / opens styled offline. */
+    './av-home/index.html',
+    './av-home/home.css',
+    './av-home/home.js',
+    './av-home/favicon.svg',
+    './css/avd/tokens.css',
+    './css/avd/bundle.css',
+    './css/avd/fonts/ArchivoExpanded-Variable.woff2',
+    './css/avd/fonts/Archivo-Variable.woff2',
+    './css/avd/fonts/IBMPlexMono-Regular.woff2',
+    './css/avd/fonts/IBMPlexMono-Medium.woff2',
+    './css/avd/fonts/IBMPlexMono-SemiBold.woff2',
     './equipment-lab/index.html',
     './equipment-lab/assets/equipment-lab.js',
     './equipment-lab/assets/equipment-lab-Viewer.js',
@@ -126,6 +138,15 @@
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.manifest.json',
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.definition.json',
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.inspection.glb',
+    './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.manifest.json',
+    './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.definition.json',
+    './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.inspection.glb',
+    './equipment-lab/data/models/panasonic.ptdw830.inspection/panasonic.ptdw830.manifest.json',
+    './equipment-lab/data/models/panasonic.ptdw830.inspection/panasonic.ptdw830.definition.json',
+    './equipment-lab/data/models/panasonic.ptdw830.inspection/panasonic.ptdw830.inspection.glb',
+    './equipment-lab/data/models/panasonic.ptrz970.inspection/panasonic.ptrz970.manifest.json',
+    './equipment-lab/data/models/panasonic.ptrz970.inspection/panasonic.ptrz970.definition.json',
+    './equipment-lab/data/models/panasonic.ptrz970.inspection/panasonic.ptrz970.inspection.glb',
     './av-suite-worker.js',
     './js/sbd-registry.js',
     './js/av-suite-context.js',
@@ -338,7 +359,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261029-two-step-panel-chooser-verified',
+    version:'v20261122-chooser-bar',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

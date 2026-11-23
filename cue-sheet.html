@@ -1675,6 +1675,11 @@
   let detectedScreens = [];
   let previewMuted = false;
   let motionEnabled = false;
+  // A cue whose own edit moved it out of the current search or status filter. It stays in
+  // the table until focus leaves its row (see refilterWhenFocusLeaves).
+  let refilterRowId = '';
+  let refilterTimer = 0;
+  let pointerHeld = false;
   const motion = window.gsap?.matchMedia();
   motion?.add('(prefers-reduced-motion: no-preference)', () => {
     motionEnabled = true;
@@ -1845,6 +1850,8 @@
   }
 
   function render() {
+    refilterRowId = '';
+    window.clearTimeout(refilterTimer);
     els.showTitle.value = state.title;
     els.searchInput.value = state.search;
     els.statusFilter.value = state.filter;
@@ -2174,12 +2181,16 @@
     if (!state.rows.some(row => row.id === id) || state.selectedId === id) return;
     state.selectedId = id;
     saveState();
-    els.cueBody.querySelectorAll('tr[data-id]').forEach(row => {
-      row.classList.toggle('selected', row.dataset.id === id);
-    });
+    syncSelectedRows();
     renderCallerDeck();
     renderNextCue();
     updateButtons();
+  }
+
+  function syncSelectedRows() {
+    els.cueBody.querySelectorAll('tr[data-id]').forEach(row => {
+      row.classList.toggle('selected', row.dataset.id === state.selectedId);
+    });
   }
 
   function updateField(rowId, field, value) {
@@ -2209,6 +2220,43 @@
     const element = els.cueBody.querySelector(`[data-id="${CSS.escape(rowId)}"]`);
     if (!row || !element) return;
     element.className = `${row.id === state.selectedId ? 'selected ' : ''}status-${row.status.toLowerCase()}`;
+  }
+
+  // Finish a committed cell edit without rebuilding the table. A rebuild replaces every
+  // control, including the one that is taking focus (the next cell on Tab, a clicked cell,
+  // the status select between arrow keys), and leaves focus on <body>, where the next keys
+  // run as cue shortcuts.
+  function settleEditedRow(rowId, control) {
+    const row = state.rows.find(item => item.id === rowId);
+    const element = control.closest('tr[data-id]');
+    if (!row || !element || !fields.includes(control.dataset.field)) return;
+    const saved = String(row[control.dataset.field]);
+    if (control.value !== saved) control.value = saved;
+    element.querySelector('.row-grip')?.setAttribute('aria-label', `Select cue ${row.number || row.action}`);
+    syncSelectedRows();
+    updateButtons();
+    if (!visibleRows().includes(row)) refilterRowId = rowId;
+  }
+
+  // A cue edited out of the current search or filter stays on screen while focus is in its
+  // row. Once focus has settled somewhere else, that one row leaves the table. Nothing else
+  // is rebuilt: no other row can have changed sides since the last full render, and the
+  // control that now has focus keeps its caret, selection and open menu.
+  function refilterWhenFocusLeaves() {
+    window.clearTimeout(refilterTimer);
+    refilterTimer = window.setTimeout(() => {
+      // A press in progress finishes first, so the rows do not move under the pointer
+      // before its click lands; pointerup asks again.
+      if (!refilterRowId || pointerHeld) return;
+      const element = els.cueBody.querySelector(`[data-id="${CSS.escape(refilterRowId)}"]`);
+      // focusout also fires when the window loses focus; the row still holds focus then.
+      if (element?.contains(document.activeElement)) return;
+      const row = state.rows.find(item => item.id === refilterRowId);
+      const rows = visibleRows();
+      refilterRowId = '';
+      if (element && !rows.includes(row)) element.remove();
+      els.emptyState.hidden = rows.length > 0;
+    }, 0);
   }
 
   function addCue(preset = {}) {
@@ -2758,7 +2806,17 @@
     const row = target.closest('tr[data-id]');
     if (!row || !target.dataset.field) return;
     updateField(row.dataset.id, target.dataset.field, target.value);
-    render();
+    settleEditedRow(row.dataset.id, target);
+  });
+  els.cueBody.addEventListener('focusout', () => {
+    if (refilterRowId) refilterWhenFocusLeaves();
+  });
+  document.addEventListener('pointerdown', () => { pointerHeld = true; }, true);
+  ['pointerup', 'pointercancel'].forEach(eventName => {
+    document.addEventListener(eventName, () => {
+      pointerHeld = false;
+      if (refilterRowId) refilterWhenFocusLeaves();
+    }, true);
   });
   els.layerList.addEventListener('click', event => {
     const button = event.target.closest('button[data-layer-action]');
@@ -2841,6 +2899,8 @@
   els.importFile.addEventListener('change', () => importJson(els.importFile.files[0]));
   Array.from(document.querySelectorAll('button')).forEach(attachPressFeedback);
   document.addEventListener('keydown', event => {
+    // Browser and system chords (Ctrl+D, Cmd+L, Alt+N) are never cue shortcuts.
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
     const target = event.target;
     const typing = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
     if (typing) return;

@@ -3,10 +3,12 @@
 The source for [systembydave.com](https://systembydave.com) — a personal site
 documenting the Notion skills, agents, widgets, and templates I build and use.
 
-[Equipment Lab](https://avbydave.com/equipment-lab/) centralizes the 43-entry
-model catalog and offers the same four native panels in the AV workspace.
-Its first native model is the Cartoni Maxima 30 GLB; other entries open their
-existing viewers during migration. Build with `npm run build:equipment-lab`
+[Equipment Lab](https://avbydave.com/equipment-lab/) centralizes the shared
+model catalog, the confirmed 43-entry family plus later additions, and offers
+the same four native panels in the AV workspace. Its native models are GLB
+packages: the Cartoni Maxima 30, the Barco UDM-4K22, the Panasonic PT-DW830
+with lamp and air filter access, and the Panasonic PT-RZ970. Other entries open
+their existing viewers during migration. Build with `npm run build:equipment-lab`
 and verify with `npm run verify:equipment-lab`, `npm run typecheck:equipment-lab`
 and `npm run test:equipment-lab-browser`. See [the module brief](docs/equipment-lab.md).
 
@@ -84,6 +86,7 @@ use the tooling selected for that surface.
 | `privacy-policy.html` | Privacy policy |
 | `404.html` / `500.html` | Error pages |
 | `html/sbd-brand.html` | Internal brand reference |
+| `thephilly/index.html` | Noindex prototype of The Philly magazine site, with the Cheesesteak Radar in its Food Finders story (see [The Philly prototype](#the-philly-prototype)) |
 
 ## Deploy
 
@@ -166,6 +169,20 @@ backup for recovery. The read-only verifier compares file paths, bytes and
 provenance with the supplied build. It does not prove that `out/` was freshly
 built from that revision or that the live deployment matches. Run
 `npm run test:cheesesteaks-sync` for failure-path regression fixtures.
+
+### The Philly prototype
+
+`/thephilly/` is a copy of the single-file prototype in the private
+`DaveHomeAssist/the-philly` repository, adapted for this site: full public head
+(`noindex`, so it stays out of search and the sitemap), a Content Security Policy,
+fonts and the QR generator self-hosted under `thephilly/fonts/` and
+`thephilly/vendor/` (licences in `vendor/NOTICE.txt`) instead of Google Fonts and
+cdnjs, a System by Dave breadcrumb and skip link, and the Cheesesteak Radar in the
+Food Finders story. The radar opens the heatmap at `/cheesesteaks/` in a frame only
+when the reader asks, so the map's OpenStreetMap tile requests start then. To
+refresh the page, copy the prototype's `index.html` over `thephilly/index.html` and
+reapply those changes. Verify with `npm run probe:thephilly`,
+`npm run verify:public-navigation` and `npm run verify:indexing`.
 
 ### NoteForge canonical release
 

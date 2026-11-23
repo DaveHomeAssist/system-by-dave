@@ -30,10 +30,11 @@ home; no redirect is needed.
 | Where | Key | Today |
 |---|---|---|
 | `demos/config.js` | `emailSubscribeUrl` | `[DAVE: beehiiv subscribe URL]` placeholder: no signup link yet. Set → UTM-tagged button to beehiiv's hosted page (`email.md`) |
-| `demos/config.js` | `umamiWebsiteId`, `emailFormAction`, `checklistUrl` | No analytics, no email form; `checklistUrl` is the absolute, UTM-tagged Field Kit link on avbydave.com (see `demos/README.md`) |
+| `demos/config.js` | `umamiWebsiteId`, `emailFormAction`, `checklistUrl` | No analytics (demo CSP has no `cloud.umami.is` since 2026-10-30; re-adding needs a CSP + privacy-policy change), no email form; `checklistUrl` is the absolute, UTM-tagged Field Kit link on avbydave.com (see `demos/README.md`) |
 | `js/sbd-launch-config.js` | `analytics.provider` | `null`: **OFF by decision (2026-10-18)**, no-op dispatcher (`analytics.md`) |
 | `js/sbd-launch-config.js` | `fieldKit.checkout` | `provider: 'stripe'`, `url: '[DAVE: Stripe Payment Link]'`: checkout disabled. After payment, Stripe redirects to the noindex `field-kit/thanks/` download page. One block per provider (Gumroad, Lemon Squeezy, Stripe Payment Links): see `checkout.md`. Stays closed while `[DAVE]` placeholders remain |
 | `js/sbd-launch-config.js` | `fieldKit.priceLabel` | `$12` (Dave, 2026-10-30); checkout stays closed until the Payment Link is real |
+| `js/sbd-launch-config.js` | `fieldKit.download.sha256` | `[]`: the download page shows "email me" for every link. Set to the SHA-256 of the kit share link (`npm run hash:field-kit-link`) → download button and payment line for that link only (`checkout.md`) |
 
 Affiliate links: none, and none planned for now (decision 2026-10-18).
 
