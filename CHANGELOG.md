@@ -1,5 +1,9 @@
 # Changelog
 
+## November 23, 2026. The Philly 215 preview
+
+- Added a proposed citywide awards preview to The Philly and linked the pothole guide to official Philly311 reporting and tracking.
+
 ## November 23, 2026. Publish the public site, not the repository
 
 - GitHub Pages was copying the repository root. `scripts/stage_public_site.mjs` now publishes site content. Docs, scripts, reports, plans, tests, application source, and `career-market.html` stay in the repository and are not served. The Equipment Lab reference markdown and the Davai storyboard script stay, because pages link to them. `apps/projctl/public/` stays, because those noindex pages are part of the site. `scripts/stage_public_site.test.mjs` diffs the new publish against the previous one.
