@@ -28,9 +28,8 @@ KEEP_PREVIOUS_ASSETS="${KEEP_PREVIOUS_ASSETS-$(node "$KEEP_HELPER" --apps "$SITE
 : "${DEPLOY_KEY:?DEPLOY_KEY is not set; add the repository secret named in scripts/domain-sites.json}"
 
 [ -f "$STAGED/source.json" ] || { echo "FATAL: $STAGED is not a staged domain site (no source.json)"; exit 1; }
-# The workflow passes a path relative to the repository root, and the script later changes into the
-# destination checkout, so resolve it now.
-STAGED="$(cd "$STAGED" && pwd)"
+# Keep the staged path valid after entering the destination checkout.
+STAGED="$(cd -- "$STAGED" && pwd -P)"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
