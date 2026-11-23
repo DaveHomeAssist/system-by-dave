@@ -62,6 +62,8 @@ html.avd-locked[data-hp-tab="brief"] #brief { display: grid; }
 .hp-tools { grid-template-rows: auto minmax(0, 1fr); gap: var(--space-4); }
 .hp-tools__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-5); }
 .hp-tools__note { margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+.hp-tool { display: flex; align-items: center; gap: var(--space-3); }
+.hp-tool img { width: 112px; height: 70px; object-fit: cover; object-position: center top; border-radius: var(--radius-sm); flex: none; background: var(--surface-sunken, var(--surface)); }
 .hp-table td, .hp-table tbody th { vertical-align: middle; }
 .hp-table tbody th { position: static; z-index: auto; background: transparent; padding: 10px var(--space-3); border-bottom: 1px solid var(--hairline); color: var(--ink); font-family: var(--font-sans); font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: 0; text-transform: none; white-space: nowrap; }
 .hp-table tbody tr:last-child th { border-bottom: 0; }
@@ -123,6 +125,8 @@ html.avd-locked[data-hp-tab="brief"] #brief { display: grid; }
   .hp-footer { justify-content: flex-start; }
   .hp-tabs .avd-tab { padding: 0 var(--space-3); }
   .hp-table tbody th { white-space: normal; }
+  .hp-tool { flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+  .hp-tool img { width: 64px; height: 40px; max-width: 100%; }
   /* The legal line and the System by Dave link ride with the Brief screen on a phone. */
   html.avd-locked:not([data-hp-tab="brief"]) .hp-footer { display: none; }
 }

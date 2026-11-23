@@ -779,7 +779,9 @@
   }
   thead th{
     position:sticky;
-    top:68px;
+    /* Stick to the table, not 68px down it. The table scroller is the
+       sticky box, so a topbar offset covered cue 001. */
+    top:0;
     z-index:2;
     padding:10px 8px;
     color:var(--muted);
