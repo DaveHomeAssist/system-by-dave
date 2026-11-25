@@ -172,6 +172,13 @@ class Studio(unittest.TestCase):
         )
 
     def test_fit_plate_finish_and_restore(self):
+        url = self.api + "/owner-backup"
+        with self.http.head(url, headers=OWNER) as header:
+            self.assertEqual(header.status_code, 200)
+        with self.http.get(url, headers=OWNER, buffered=False) as interrupted:
+            self.assertEqual(interrupted.status_code, 200)
+        with self.http.get(url, headers=OWNER) as retry:
+            self.assertEqual(retry.status_code, 200)
         store = self.app.config["STORE"]
         im = Image.new("RGB", (100, 50), "#084080")
         ImageDraw.Draw(im).rectangle((0, 0, 11, 49), fill="orange")

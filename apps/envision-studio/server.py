@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import secrets
+import signal
 import tempfile
 import threading
 import time
@@ -79,6 +80,8 @@ def export_loop(store, stop):
                     label = f"{index:02} " + label
                 root = stem(d["name"]) + " - " + label
                 for fmt in opt["formats"]:
+                    if stop.is_set():
+                        return
                     if any(
                         f["format"] == fmt and f.get("stageId", opt["stage"]) == s["id"]
                         for f in files
@@ -137,6 +140,8 @@ def create_app(root, owner, worker_key, origin):
 
     @app.get(BASE + "/owner-backup")
     def owner_backup():
+        if request.method == "HEAD":
+            return Response(mimetype="application/zip")
         need(backup_lock.acquire(blocking=False), "Another backup is being prepared.", 409)
         try:
             temp = tempfile.TemporaryDirectory(dir=store.root)
@@ -152,15 +157,18 @@ def create_app(root, owner, worker_key, origin):
             backup_lock.release()
             raise
 
-        def chunks():
-            try:
-                with dest.open("rb") as f:
-                    yield from iter(lambda: f.read(256 * 1024), b"")
-            finally:
+        def close_snapshot():
+            nonlocal temp
+            if temp is not None:
                 temp.cleanup()
+                temp = None
                 backup_lock.release()
 
-        return Response(
+        def chunks():
+            with dest.open("rb") as f:
+                yield from iter(lambda: f.read(256 * 1024), b"")
+
+        response = Response(
             chunks(),
             mimetype="application/zip",
             headers={
@@ -168,6 +176,8 @@ def create_app(root, owner, worker_key, origin):
                 "Content-Disposition": 'attachment; filename="Envision-backup.zip"',
             },
         )
+        response.call_on_close(close_snapshot)
+        return response
 
     @app.before_request
     def access():
@@ -814,11 +824,12 @@ if __name__ == "__main__":
     store = app.config["STORE"]
     with store.tx(True) as c:
         c.execute("UPDATE exports SET state='queued' WHERE state='running'")
-    threading.Thread(target=export_loop, args=(store, threading.Event()), daemon=True).start()
-    serve(
-        app,
-        host=os.environ.get("ENVISION_BIND", "127.0.0.1"),
-        port=8766,
-        threads=6,
-        max_request_body_size=LIMIT + 1024 * 1024,
-    )
+    stopping = threading.Event()
+    exporter = threading.Thread(target=export_loop, args=(store, stopping), daemon=True)
+    exporter.start()
+    signal.signal(signal.SIGTERM, signal.default_int_handler)
+    try:
+        serve(app, host="127.0.0.1", port=8766, threads=6, max_request_body_size=LIMIT + 1024 * 1024)
+    finally:
+        stopping.set()
+        exporter.join(timeout=5)
