@@ -8,7 +8,7 @@ export const LIBRARY: PanelDef[] = [
   { type: 'fixtures', name: 'Fixtures', group: 'Common', description: 'Search, select and add fixture records.', minW: 3, minH: 3, lit: true },
   { type: 'details', name: 'Fixture details', group: 'Common', description: 'Edit all patch, focus and status fields.', minW: 3, minH: 3 },
   { type: 'focus', name: 'Focus', group: 'Common', description: 'Review focus notes and set fixture status.', minW: 3, minH: 3 },
-  { type: 'document', name: 'Document', group: 'Utilities', description: 'Show details, Save, export, restore and Lighting Patch or PlotForge imports.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Project', group: 'Utilities', description: 'Show details, Save, export, restore and Lighting Patch or PlotForge imports.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'patch', name: 'Patch', panels: [

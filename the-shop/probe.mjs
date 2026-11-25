@@ -15,7 +15,7 @@ const base=(process.env.SHOP_BASE || `http://127.0.0.1:${server.address().port}`
 const output=process.env.SHOP_CAPTURE_DIR||join(tmpdir(),'the-shop-legacy-evidence');
 await mkdir(output,{recursive:true});
 const quick=(page,name)=>page.locator('.console-quick').getByRole('button',{name,exact:true}).click();
-const openImport=async page=>{await quick(page,'Document');await page.getByRole('button',{name:'Import source',exact:true}).click()};
+const openImport=async page=>{await quick(page,'Project');await page.getByRole('button',{name:'Import source',exact:true}).click()};
 const headerSave=async page=>{await page.locator('#saveBtn').click();await page.waitForFunction(()=>/Saved to this browser|Recovered plan saved|Save failed/.test(document.getElementById('footerMessage').textContent))};
 let browser;
 try{
@@ -80,7 +80,7 @@ try{
     assert.match(await page.getByRole('button',{name:/Camera kit/}).innerText(),/Packed 1 \/ 3 \(partial\)/);
     assert.equal(await page.evaluate(()=>localStorage.getItem('gear-prep.v1')),legacy);
     const exportPromise=page.waitForEvent('download');
-    await quick(page,'Document');
+    await quick(page,'Project');
     await page.getByRole('button',{name:'Export JSON'}).click();
     const exportDownload=await exportPromise;
     const exported=JSON.parse(await readFile(await exportDownload.path(),'utf8'));
@@ -130,7 +130,7 @@ try{
     assert.equal(await page.evaluate(()=>document.activeElement.id),'main');
     const overflow=await page.evaluate(()=>({vertical:document.documentElement.scrollHeight>document.documentElement.clientHeight,horizontal:document.documentElement.scrollWidth>document.documentElement.clientWidth}));
     assert.deepEqual(overflow,{vertical:false,horizontal:false});
-    await quick(page,'Document');
+    await quick(page,'Project');
     const buttonPaint=await page.locator('#importBtn').evaluate(el=>getComputedStyle(el).backgroundColor);
     await quick(page,'Worklist');
     const paint=await page.evaluate(()=>{const swatch=document.createElement('span');swatch.style.color='var(--av-surface-2)';document.body.append(swatch);const expected=getComputedStyle(swatch).color;swatch.remove();return {expected,row:getComputedStyle(document.querySelector('.row')).backgroundColor}});
@@ -169,7 +169,7 @@ try{
     await headerSave(recoveryPage);
     assert.equal(await recoveryPage.evaluate(()=>localStorage.getItem('sbd.shop.v1')),damaged);
     const downloadPromise=recoveryPage.waitForEvent('download');
-    await quick(recoveryPage,'Document');
+    await quick(recoveryPage,'Project');
     await recoveryPage.getByRole('button',{name:'Export JSON'}).click();
     const download=await downloadPromise;
     assert.equal(await readFile(await download.path(),'utf8'),damaged);

@@ -126,6 +126,18 @@ export function App() {
     ws.setViewId(target.id); setStatus({ app: tool.label, text: `${tool.label} opened as a panel. Open full for its own page.`, error: false }); return true;
   }
   useEffect(() => {
+    (window as Window & { SBD_PANEL_INDEX?: { type: string; name: string; description: string; keywords?: string; app?: string }[] }).SBD_PANEL_INDEX = library.map(def => ({ type: def.type, name: def.name, description: def.description, keywords: def.keywords, app: def.app }));
+  }, [library]);
+  useEffect(() => {
+    const openPanel = (event: Event) => {
+      const type = (event as CustomEvent<{ type?: string }>).detail?.type;
+      if (!type) return;
+      if (ws.show(type)) event.preventDefault();
+    };
+    window.addEventListener("sbd:rail-open-panel", openPanel);
+    return () => window.removeEventListener("sbd:rail-open-panel", openPanel);
+  }, [ws]);
+  useEffect(() => {
     const select = (event: Event) => {
       const detail = (event as CustomEvent<{ ref?: string }>).detail;
       const ref = detail?.ref || "";
@@ -241,7 +253,7 @@ export function App() {
     <main id="workspace" tabIndex={-1} className="workspace-host">
       {storageState === "blocked" && <div className="console-notice" role="note">This browser is blocking site storage, so nothing can be saved here. Your work lasts for this visit only. Export anything you need before you leave.</div>}
       {ws.hidden > 0 && <div className="console-notice" role="note">{ws.hidden} unavailable saved slot{ws.hidden === 1 ? " is" : "s are"} retained in this layout. Add panels here; the saved view changes only when you store or update it.</div>}
-      <ConsoleWorkspace compact ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Tools" : undefined)} groupIcons={chooserIcons} />
+      <ConsoleWorkspace compact ws={panelWorkspace} label="AV Suite" quick={quick} render={render} onViewsChange={storeViews} notify={text => setStatus({ app: "", text, error: false })} viewTabs={viewTabs} defaultGroup={activePack?.label || (activeApp === TOOL_PREFIX ? "Show tools" : undefined)} groupIcons={chooserIcons} />
     </main>
     <footer role="status" className={`message ${status.error || activePack?.problem ? "error" : ""}`}>{[...(activePack?.recovery.errors || []), status.app ? `${status.app}: ${status.text}` : status.text].join(" ")}</footer>
     {packs.map(pack => <div key={pack.id} data-pack-dialogs={pack.id}>{pack.dialogs}</div>)}

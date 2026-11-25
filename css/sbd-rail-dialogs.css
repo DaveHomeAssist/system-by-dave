@@ -214,6 +214,12 @@
   }
 }
 
+.sbd-rail-dialog__search{display:flex;margin-bottom:8px}
+.sbd-rail-dialog__search input{flex:1;min-width:0;min-height:44px}
+.sbd-rail-dialog__chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.sbd-rail-dialog__chip{width:auto}
+.sbd-rail-dialog__section>summary{min-height:44px;cursor:pointer}
+
 @media (max-width: 719px) {
   .sbd-rail-dialog {
     width: 100vw;

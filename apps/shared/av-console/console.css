@@ -84,6 +84,11 @@ html[data-av-theme="black"] .console-grid{--av-dot:rgba(255,255,255,.13)}
 .console-menu>button.danger{margin-top:4px;box-shadow:0 -5px 0 -4px var(--av-line)}
 .console-icon[aria-expanded=true]{border-color:var(--av-focus-line,var(--av-line-strong));background:var(--av-focus-soft,var(--av-surface-2))}
 @media(forced-colors:active){.console-menu [role=menuitem]:focus-visible{outline:3px solid Highlight}}
+.console-sec{margin:2px 2px 6px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--av-muted)}
+.console-featured-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:8px}
+.console-featured-row button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:52px;text-align:left;background:var(--av-surface-2);border-color:color-mix(in srgb,var(--av-accent,#e48a4c) 45%,var(--av-line))}
+.console-featured-row button span{font-size:11px;font-weight:400;color:var(--av-muted)}
+.console-groups.is-tiles button small{display:block;font-weight:400;letter-spacing:0;text-transform:none;color:var(--av-muted);font-size:10.5px}
 .console-groups{display:flex;gap:4px}
 .console-groups button{flex:1;background:transparent}
 .console-groups button[aria-current=true]{border-color:var(--av-accent);background:var(--av-accent-soft)}

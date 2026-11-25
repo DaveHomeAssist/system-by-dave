@@ -86,6 +86,7 @@
       var continueNavigation=eventTarget.dispatchEvent(signal);
       if(continueNavigation&&!signal.defaultPrevented) return;
       if(event&&typeof event.preventDefault==='function') event.preventDefault();
+      if(rail.rememberRecent&&(entry.namespace==='console'||entry.namespace==='tool')) rail.rememberRecent(storage,registry.recentKey,{ref:entry.ref,label:entry.label,detail:''});
       setCurrent(entry.ref);
       if(controller&&typeof controller.closeAllApps==='function') controller.closeAllApps();
       if(fromRail){var replacement=renderedEntry(entry.ref);if(replacement&&typeof replacement.focus==='function') replacement.focus();}
@@ -110,6 +111,12 @@
         toolboxHref:(function(){var result=route('toolbox');return result.ok?result.href:'/av-suite.html?entry=toolbox';}()),
         resolveHref:resolvedHref,
         onNavigate:navigate,
+        onOpenPanel:function(type){
+          var detail={type:type};
+          var signal=typeof root.CustomEvent==='function'?new root.CustomEvent('sbd:rail-open-panel',{detail:detail,cancelable:true}):null;
+          if(signal&&eventTarget&&typeof eventTarget.dispatchEvent==='function') eventTarget.dispatchEvent(signal);
+          if(rail.rememberRecent) rail.rememberRecent(storage,registry.recentKey,{ref:'panel:'+type,label:type,detail:''});
+        },
         appsDialogId:'sbdRailAllApps',
         onAllApps:function(event){controller.openAllApps(eventTrigger(event));},
         onCustomize:function(event){controller.openCustomize(eventTrigger(event));},

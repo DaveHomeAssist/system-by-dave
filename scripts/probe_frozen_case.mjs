@@ -190,7 +190,7 @@ const choose = async (label, option) => { await page.getByRole('combobox', { nam
 const download = async (trigger, name) => { const pending = page.waitForEvent('download'); await trigger(); const file = join(OUT, 'exports', name); await (await pending).saveAs(file); return file; };
 const panel = name => page.locator(`.console-panel[data-panel=${name}]`);
 const cards = name => panel(name).locator('.route-card');
-const rail = name => page.locator('[data-sbd-rail-host]').getByText(name, { exact: true }).first();
+const rail = name => page.locator('[data-sbd-rail-host] .sbd-rail__entry').filter({ hasText: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`) }).first();
 const diagramMenu = async topic => { await panel('flow').locator('.flow-compact-tools').getByRole('button', { name: /^Diagram/ }).click(); await pause(300); await page.locator('dialog.topic-menu[open]').getByRole('button', { name: topic }).click(); await pause(300); };
 const drawnCables = async () => ({ devices: await panel('flow').locator('.react-flow__node').count(), cables: await panel('flow').locator('.react-flow__edge').evaluateAll(nodes => nodes.map(node => (node.getAttribute('aria-label') || '').replace(/^Connection /, '').replace(/:.*$/, ''))) });
 

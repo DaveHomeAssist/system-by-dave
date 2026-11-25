@@ -190,7 +190,19 @@ try {
   assert.equal(changed.pinned.at(-2), 'console:audio');
   await customizeDialog().locator('[data-rail-ref="defaults"][data-action="reset"]').click();
   await page.getByRole('button', { name: 'Close Customize rail', exact: true }).click();
-  assert.equal(await page.locator('.sbd-rail__entry').count(), 10);
+  const railRefs = await page.locator('.sbd-rail__entry').evaluateAll(entries => entries.map(entry => entry.getAttribute('data-rail-ref')));
+  assert.deepEqual(railRefs, [
+    'tool:throwline', 'tool:led-wall-calculator', 'panel:video:flow', 'guide:console-spec', 'console:av-calculator',
+    'console:av-video', 'console:audio', 'console:show-control', 'console:show-ops', 'console:front-office', 'console:shop', 'console:infrastructure', 'console:lighting',
+    'tool:teleprompter', 'tool:show-timer', 'tool:cue-sheet', 'tool:pixelforge', 'tool:stageplotter',
+    'console:equipment-lab', 'tool:gear-reference',
+    'guide:frame-sync', 'guide:fault-finding', 'guide:field-kit'
+  ], 'the rail is Featured, Departments, Show tools, Reference and Learn');
+  assert.deepEqual(await page.locator('.sbd-rail__heading').allTextContents(), ['Featured', 'Departments', 'Show tools', 'Reference', 'Learn']);
+  assert.equal(await page.locator('.sbd-rail__search-input').count(), 1);
+  assert.equal(await page.locator('.sbd-rail__toolbox').count(), 1);
+  assert.equal(await page.locator('.sbd-rail__all').count(), 1);
+  assert.equal(await page.locator('.sbd-rail__customize').count(), 1);
 
   await page.evaluate(key => localStorage.setItem(key, '{broken'), railKey);
   await page.reload();

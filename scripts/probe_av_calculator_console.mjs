@@ -74,6 +74,7 @@ try {
   const staticPage = await staticContext.newPage(); await staticPage.goto(base + '/av-calculator.html');
   const fallback = staticPage.locator('.calculator-noscript'); await fallback.waitFor();
   for (const name of Object.values(names).slice(0, 6)) assert.ok((await fallback.textContent()).includes(name), name + ' fallback description');
+  assert.match(await fallback.textContent(), /Throw distance \(quick\): screen dimensions and lens throw\. Throwline plans the full room/);
   assert.match(await fallback.textContent(), /Enable JavaScript and reload/); assert.match(await fallback.textContent(), /does not verify electrical safety/);
   await reachable(fallback.getByRole('link', { name: 'AV by Dave', exact: true }), 'static AV by Dave navigation');
   await fallback.getByText('Field verification required:', { exact: true }).scrollIntoViewIfNeeded(); await noOverflow(staticPage);

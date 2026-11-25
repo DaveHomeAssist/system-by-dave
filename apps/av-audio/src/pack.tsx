@@ -13,7 +13,7 @@ export const LIBRARY: PanelDef[] = [
   { type:"patch", name:"Patch", group:"Common", description:"Stagebox, console input and destination", minW:3,minH:3 },
   { type:"check", name:"Line check", group:"Common", description:"Operator, status and problems", minW:3,minH:3 },
   { type:"speakers", name:"Speakers", group:"Planning", description:"PA zones and processor outputs", minW:4,minH:3 },
-  { type:"document", name:"Document", group:"Utilities", description:"Plan title, Save, export, restore and legacy sheet imports", minW:4,minH:3 }
+  { type:"document", name:"Project", group:"Utilities", description:"Plan title, Save, export, restore and legacy sheet imports", minW:4,minH:3 }
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id:"channels", name:"Channels", panels:[{id:"input",type:"inputs",x:0,y:0,w:4,h:8},{id:"patch",type:"patch",x:4,y:0,w:4,h:8},{id:"check",type:"check",x:8,y:0,w:4,h:8}] },
