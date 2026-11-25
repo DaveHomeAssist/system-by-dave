@@ -84,7 +84,7 @@ def submit(store, c, pid, b):
             "strength": strength,
             "seed": secrets.randbelow(2**52) if seed is None else seed + i,
             "steps": 4,
-            "workflow": "turbo-v1",
+            "workflow": "turbo-v2",
         }
         c.execute(
             "INSERT INTO jobs(id,project,payload,state,created) VALUES(?,?,?,'queued',?)",
@@ -113,6 +113,11 @@ def claim(c, info):
         isinstance(profiles, list) and all(isinstance(p, str) for p in profiles),
         "Invalid worker profiles.",
     )
+    workflows = info.get("workflows", ["turbo-v1"])
+    need(
+        isinstance(workflows, list) and all(isinstance(w, str) for w in workflows),
+        "Invalid worker workflows.",
+    )
     c.execute(
         "INSERT INTO workers VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET seen=excluded.seen,info=excluded.info",
         (worker, now, pack(info)),
@@ -123,7 +128,9 @@ def claim(c, info):
     if c.execute("SELECT 1 FROM jobs WHERE state='running' AND worker=?", (worker,)).fetchone():
         return None
     row = c.execute(
-        "SELECT * FROM jobs WHERE state='queued' ORDER BY created,id LIMIT 1"
+        "SELECT * FROM jobs WHERE state='queued' AND json_extract(payload,'$.workflow') "
+        "IN (SELECT value FROM json_each(?)) ORDER BY created,id LIMIT 1",
+        (pack(workflows),),
     ).fetchone()
     if not row:
         return None
