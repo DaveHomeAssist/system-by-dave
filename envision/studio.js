@@ -191,6 +191,39 @@ function readEvents() {
   return stored;
 }
 
+const personalOriginKey = 'sbd.envision.personalOrigin.v1';
+function personalOrigin(value) {
+  const url = new URL(value);
+  if (url.protocol !== 'https:' || url.username || url.password || url.pathname !== '/' || url.search || url.hash) {
+    throw new Error('Enter the private studio’s HTTPS address without a path or credentials.');
+  }
+  return url.origin;
+}
+function showPersonalOrigin(value) {
+  const link = byId('open-personal');
+  link.removeAttribute('href');
+  link.hidden = !value;
+  if (value) link.href = value + '/';
+  byId('personal-origin').value = value;
+}
+try {
+  const saved = localStorage.getItem(personalOriginKey);
+  if (saved) showPersonalOrigin(personalOrigin(saved));
+} catch { /* The prompt kit also works without a saved studio address. */ }
+byId('personal-address').addEventListener('submit', event => {
+  event.preventDefault();
+  const input = byId('personal-origin').value.trim();
+  let value;
+  try { value = input ? personalOrigin(input) : ''; }
+  catch { announce('Enter the private studio’s HTTPS origin, including its port.'); return; }
+  try {
+    if (value) localStorage.setItem(personalOriginKey, value);
+    else localStorage.removeItem(personalOriginKey);
+    showPersonalOrigin(value);
+    announce(value ? 'Personal studio address saved in this browser.' : 'Personal studio address cleared.');
+  } catch { announce('This browser could not save the address.'); }
+});
+
 function saveEvent() {
   const brief = briefValues();
   if (!brief.title) {

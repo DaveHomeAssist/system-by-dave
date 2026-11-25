@@ -3,7 +3,7 @@
 ## November 25, 2026. Envision Personal Studio
 
 - Added private image generation on local hardware with a durable queue, reference and masked revisions, artwork comparison and reusable event layouts.
-- Added feed, story, lobby and campaign packages with event-based filenames, editable project import and export, and verified catalog backups. Saved events in the public prompt kit now offer a downloadable brief.
+- Added feed, story, lobby and campaign packages with event-based filenames, editable project import and export, and verified catalog backups. Saved events in the public prompt kit now offer a downloadable brief and a browser-local shortcut to the owner's private studio.
 
 ## November 24, 2026. Envision download names
 
