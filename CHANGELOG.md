@@ -1,5 +1,9 @@
 # Changelog
 
+## November 24, 2026. Envision flyer studio
+
+- Added a direct-access flyer prompt studio and portable layout editor at `/envision/`. The editor accepts existing AfterJinx project files and exports PNGs locally.
+
 ## November 23, 2026. Field Kit checkout open
 
 - Open the $12 Sync & Signal Field Kit. `checkoutOpen: true` in `js/sbd-launch-config.js` is the switch: the Buy button goes to the Stripe Payment Link, and avbydave.com publishes the page as indexable. Set that one line to `false` to keep "Checkout opens soon" and leave the page noindex.

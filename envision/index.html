@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Envision | System by Dave</title>
+  <meta name="description" content="Build an event flyer prompt, save a brief or edit a layered flyer.">
+  <link rel="canonical" href="https://systembydave.com/envision/">
+  <meta name="theme-color" content="#251d1a">
+  <meta property="og:type" content="website"><meta property="og:title" content="Envision | System by Dave">
+  <meta property="og:url" content="https://systembydave.com/envision/"><meta property="og:description" content="Build an event flyer prompt, save a brief or edit a layered flyer.">
+  <meta name="twitter:card" content="summary"><meta name="twitter:title" content="Envision | System by Dave"><meta name="twitter:description" content="Build an event flyer prompt, save a brief or edit a layered flyer.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="stylesheet" href="./studio.css">
+  <script src="./studio.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#workspace">Skip to workspace</a>
+<noscript>Enable JavaScript to use Envision.</noscript>
+<div class="shell">
+  <header class="masthead">
+    <div class="brand"><span><a href="/">System by Dave</a> / <a href="/tools.html">Tools</a></span><h1>Envision<span class="title-dot">.</span></h1></div>
+    <button class="theme" id="theme" type="button">Dark theme</button>
+  </header>
+  <nav role="tablist" aria-label="Envision sections" class="navigation">
+    <button id="tab-studio" role="tab" type="button" aria-selected="true" aria-controls="studio">Studio</button>
+    <button id="tab-saved" role="tab" type="button" aria-selected="false" aria-controls="saved" tabindex="-1">Saved events</button>
+    <button id="tab-guide" role="tab" type="button" aria-selected="false" aria-controls="guide" tabindex="-1">Field guide</button>
+  </nav>
+  <main id="workspace" tabindex="-1">
+    <section id="studio" class="studio" data-mobile-panel="brief" role="tabpanel" aria-labelledby="tab-studio">
+      <div class="mobile-switch" aria-label="Studio view">
+        <button id="show-brief" type="button" aria-controls="brief-panel" aria-pressed="true">Brief</button>
+        <button id="show-result" type="button" aria-controls="result-panel" aria-pressed="false">Prompt</button>
+      </div>
+      <div id="brief-panel" class="station brief">
+        <div class="station-heading"><h2>Flyer brief</h2><a class="button" href="./layout/">Edit a layout</a><button id="new-event" class="quiet" type="button" hidden>New event</button></div>
+        <form id="brief" class="brief-form">
+          <div class="form-fields">
+            <div class="field"><label for="project-name">Event name</label><input id="project-name" name="title" maxlength="100" placeholder="e.g. AfterBreak"></div>
+            <div class="fieldrow">
+              <div class="field"><label for="mode">Task</label><select id="mode" name="mode"><option value="new">New flyer</option><option value="revise">Revise an asset</option></select></div>
+              <div class="field"><label for="format">Format</label><select id="format" name="format"><option value="feed">Feed · 4:5</option><option value="story">Story · 9:16</option><option value="print">Print · 4 × 6</option><option value="keep" hidden disabled>Keep original size</option></select></div>
+            </div>
+            <div class="field" id="preset-field"><label for="preset">Art direction</label><select id="preset" name="preset"><option value="afterjinx">AfterJinx · deep sea</option><option value="afterbreak">AfterBreak · mystery bill</option><option value="endpoint">Endpoint · neon geometry</option><option value="portrait">Artist portrait</option><option value="custom">Custom</option></select></div>
+            <div class="field"><label for="direction" id="direction-label">Your direction <span>optional</span></label><textarea id="direction" name="direction" rows="2" maxlength="1000" placeholder="Icy blue around the edges. Room for six artist logos."></textarea></div>
+            <div class="field" id="preserve-field" hidden><label for="preserve">Keep in the existing art <span>optional</span></label><textarea id="preserve" name="preserve" rows="2" maxlength="700" placeholder="Same layout, title and artist logos."></textarea></div>
+            <details id="copy-details">
+              <summary>Event copy <span>optional</span></summary>
+              <div class="field"><label class="sr-only" for="event-copy">Approved show details</label><textarea id="event-copy" name="copy" rows="3" maxlength="1600" placeholder="Lineup, date, venue wording and ticket CTA"></textarea></div>
+              <p class="muted">Kept separate for layout.</p>
+            </details>
+          </div>
+          <div class="actions"><button class="primary" type="submit">Build prompt</button><button id="save-event" type="button">Save event</button></div>
+        </form>
+      </div>
+      <div id="result-panel" class="station result">
+        <div class="station-heading"><h2>Generator prompt</h2><button id="copy-prompt" type="button" disabled>Copy prompt</button></div>
+        <div id="result-body" class="result-body">
+          <div id="empty-prompt" class="empty-prompt">
+            <div class="art-crop" role="img" aria-label="Detail from the AfterJinx 2025 flyer"><span>From the AfterJinx flyer archive</span></div>
+            <h3>Draft your flyer prompt.</h3>
+            <p>Build a prompt for your image generator, or open a saved layout to update artwork and show details.</p>
+          </div>
+          <div id="prompt-content" hidden>
+            <p id="result-help" class="muted"></p>
+            <textarea id="prompt-output" class="output" aria-label="Generated prompt" rows="9" readonly></textarea>
+            <details class="layout-sample">
+              <summary>Layout zones</summary>
+              <div id="layout-map" class="layout-map" aria-label="Flyer layout from top to bottom">
+                <span>Top · Event title</span><span>Feature · Headliner or focal image</span>
+                <span>Middle · Support billing</span><span>Footer · Date, venue and tickets</span>
+              </div>
+              <p id="layout-note" class="muted"></p>
+            </details>
+            <section id="placement" class="placement" hidden>
+              <div class="station-heading"><h3>Copy for layout</h3><button id="copy-placement" type="button">Copy details</button></div>
+              <textarea id="placement-output" aria-label="Event copy for layout" rows="4" readonly></textarea>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="saved" class="station secondary" role="tabpanel" aria-labelledby="tab-saved" tabindex="0" hidden>
+      <div class="station-heading"><h2>Saved events</h2><button id="create-event" class="quiet" type="button">New event</button></div>
+      <p class="muted">Saved in this browser.</p>
+      <p id="empty-saved" class="empty-saved">Save a brief from the Studio to reopen it here.</p>
+      <ul id="saved-list" class="saved-list"></ul>
+    </section>
+    <section id="guide" class="station secondary" role="tabpanel" aria-labelledby="tab-guide" tabindex="0" hidden>
+      <div class="station-heading"><h2>Field guide</h2><a class="button" href="no-nonsense-flyer-prompts.zip" download>Download flyer prompt skill</a></div>
+      <div class="examples-strip">
+        <a href="./art/afterjinx-2025-card.webp"><img src="./art/afterjinx-2025-card.webp" alt="" loading="lazy"><span>AfterJinx</span></a>
+        <a href="./art/afterbreak-2026-card.webp"><img src="./art/afterbreak-2026-card.webp" alt="" loading="lazy"><span>AfterBreak</span></a>
+        <a href="./art/endpoint-connections-2-card.webp"><img src="./art/endpoint-connections-2-card.webp" alt="" loading="lazy"><span>Endpoint</span></a>
+      </div>
+      <details class="guide-details"><summary>Worked examples</summary>
+
+<div class="guide-grid"><article class="card"><h3>AfterJinx · a lineup reveal with billing still open</h3><blockquote>AfterJinx lineup drop. More tentacles around the edges. I’m still waiting on the final lineup.</blockquote><p><strong>Image prompt</strong></p><pre><code>Create a 4:5 artwork plate for an underground bass afterparty flyer.
+Frame the edges with curled deep-sea tentacles with hot orange
+highlights against black and inky teal. Keep the top center clear
+for a supplied event title. Leave a wide dark zone below it for one
+headliner mark and a calm middle area for rows of support marks.
+Keep the bottom low-detail for the event information. Artwork only,
+without lettering or logos.</code></pre><p><strong>Placement</strong><br>Top: No Nonsense wordmark and supplied AfterJinx title. Middle: headliner and support marks. Footer: approved night/date, hours, public venue wording, age, and CTA.</p><p><strong>Confirm</strong><br>Final billing and event copy before layout.</p></article><article class="card"><h3>AfterBreak · keep the layout, change the temperature</h3><blockquote>Make this icier. Same layout and mystery headliner. Need a story too.</blockquote><p><strong>Edit prompt</strong></p><pre><code>Shift the background accents to ice blue and cool chrome. Keep
+the black base, existing title, question mark, artist marks,
+billing order, and footer in place. Apply the new color to the
+background linework and edge texture. Keep contrast behind the
+artist marks and text.</code></pre><p><strong>Story adjustment</strong><br>Rebuild at 9:16. Keep the mystery mark near the top, stack support marks in the middle, and pull the date and CTA inward so interface overlays leave them visible. Use the same approved copy and supplied files.</p></article><article class="card"><h3>Justin Hawkes · use a supplied portrait</h3><blockquote>Use the Justin Hawkes flyer for layout. I have an approved artist photo. Make this one warm and smoky.</blockquote><p><strong>Image prompt</strong></p><pre><code>Create a 4:5 background for a portrait-led drum and bass flyer.
+Reserve a centered chest-up silhouette area for the supplied cutout.
+Wrap smoke, curved metallic shapes, and warm amber rim light around
+the portrait zone. Fade the lower third to dark charcoal for the
+headliner and support billing. Keep an open band near the bottom
+for event details. Artwork only, without faces, lettering, or logos.</code></pre><p><strong>Placement</strong><br>Add the supplied photo at center. Put the headliner directly below the portrait, followed by the supplied support marks and the event details.</p></article></div>
+</details>
+      <details class="guide-details"><summary>Flyer reference library and format notes</summary>
+
+<p class="intro">Match the event series and the job of the graphic. Use the current approved lineup and show details for the new design.</p>
+<div class="guide-grid"><article class="card"><h3>An AfterJinx save the date</h3><p>Deep blue and black, a quiet water texture, one octopus silhouette off to the side, and generous dark space for the title and date.</p><p class="refs"><a rel="noopener noreferrer" href="https://nononsensephilly.com/media/flyers/afterjinx-2026-card.webp">AfterJinx 2026 teaser</a></p></article><article class="card"><h3>An AfterJinx lineup reveal</h3><p>Saturated tentacle forms framing a darker center. Keep a large headliner zone, tiers for support, and a separate details footer.</p><p class="refs"><a rel="noopener noreferrer" href="https://nononsensephilly.com/media/flyers/afterjinx-2025-card.webp">AfterJinx 2025</a></p></article><article class="card"><h3>An AfterBreak mystery bill</h3><p>A dark ground, abrasive edges, and an obvious space for a big question mark graphic. Keep the support rows and public location wording easy to find.</p><p class="refs"><a rel="noopener noreferrer" href="https://nononsensephilly.com/media/flyers/afterbreak-2025-card.webp">AfterBreak 2025</a> and <a rel="noopener noreferrer" href="https://nononsensephilly.com/media/flyers/afterbreak-2026-card.webp">2026</a></p></article><article class="card"><h3>An Endpoint Connections edition</h3><p>A bright geometric axis, symmetrical circuit or laser lines, and dark zones behind artist marks. Shift the accent color or intensity to distinguish the edition.</p><p class="refs"><a rel="noopener noreferrer" href="https://nononsensephilly.com/media/flyers/endpoint-connections-1-card.webp">Endpoint 1.0</a> and <a rel="noopener noreferrer" href="https://nononsensephilly.com/media/flyers/endpoint-connections-2-card.webp">2.0</a></p></article><article class="card"><h3>An artist-led show</h3><p>Make the approved artist photo the focal point. The reference uses warm light and metallic shapes around the portrait, with billing stacked below.</p><p class="refs"><a rel="noopener noreferrer" href="https://nononsensephilly.com/media/flyers/justin-hawkes-2026-card.webp">Justin Hawkes</a></p></article><article class="card"><h3>A playful illustrated world</h3><p>Choose an event-specific hook. Kandi Island uses beaded type and palms. Park Rave uses a psychedelic bicycle scene and comic bursts. Off the Hook uses an oversized, thick-outlined fish and a big title and date.</p><p class="refs"><a rel="noopener noreferrer" href="https://nononsensephilly.com/media/flyers/kandi-island-2025-card.webp">Kandi Island</a>, <a rel="noopener noreferrer" href="https://nononsensephilly.com/media/flyers/park-rave-005-2026-card.webp">Park Rave 005</a>, and Off the Hook draft</p></article><article class="card"><h3>An FAQ story</h3><p>Carry over one small campaign motif. Build a dark, low-detail text area for a question and a short answer. Give dates, hours, and location their own slides when that clarifies the message.</p><p class="refs">AfterJinx FAQ story copy</p></article><article class="card"><h3>Format notes</h3><ul><li><strong>4:5 feed</strong> keeps the title, focal image, and first billing tier visible at thumbnail size. Use a clearly defined footer.</li><li><strong>9:16 story</strong> gives the layout more height. Reflow the billing or split a dense announcement across slides. Keep key text clear of top and bottom interface overlays.</li><li><strong>4 × 6 in print</strong> is a 2:3 trim ratio. Confirm the printer&#x27;s bleed and safe area, extend edge artwork through the bleed, and keep type and any real QR code inside the safe area.</li><li><strong>FAQ story</strong> uses editable type over a simple plate. Keep one answer per slide and verify midnight date wording against current event copy.</li></ul></article></div>
+</details>
+      <details class="guide-details"><summary>Use the skill in Codex</summary>
+        <p>Unzip the download. Place the entire <code>no-nonsense-flyer-prompts</code> folder inside your project’s <code>.agents/skills/</code> directory, then open a new chat in that project.</p>
+        <pre><code>$no-nonsense-flyer-prompts
+AfterJinx save the date. Big title, small octopus, clear space for the date. Story.</code></pre>
+        <p><a rel="noopener noreferrer" href="https://developers.openai.com/codex/skills/">Codex skills guide</a></p>
+      </details>
+    </section>
+  </main>
+  <div id="notice" class="notice" role="status"></div>
+</div>
+</body>
+</html>
