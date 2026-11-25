@@ -40,7 +40,7 @@ export function nativePanels(panels: Panel[]): Panel[] {
    panels of their own pages (Dave, 2026-10-15); each leaves the chooser the
    day it gains a pack, as AV Calculator did. */
 export function specialistLibrary(specialists: Specialist[] = SPECIALISTS): PanelDef[] {
-  return specialists.map(tool => ({ type: `${TOOL_PREFIX}:${tool.id}`, key: tool.id, name: tool.label, group: "Utilities", description: tool.description, minW: tool.minW, minH: tool.minH, app: "Tools" }));
+  return specialists.map(tool => ({ type: `${TOOL_PREFIX}:${tool.id}`, key: tool.id, name: tool.label, group: "Utilities" as const, description: tool.description, minW: tool.minW, minH: tool.minH, app: "Show tools", keywords: tool.id === "throwline" ? "throw projector lens" : tool.id === "led-wall-calculator" ? "led wall cabinet raster" : "" }));
 }
 export function defaultViews(packs: PackDef[], specialists: Specialist[] = SPECIALISTS): View[] {
   return [

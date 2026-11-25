@@ -188,7 +188,7 @@ test('typed route resolution carries context only to eligible internal destinati
   const audioConsole = new URL(dialogs.resolveRoute('console:audio', options).href);
   assert.equal(audioConsole.pathname, '/av-audio/');
   assert.equal(audioConsole.searchParams.get('sbdShow'), 'Gala');
-  assert.equal(dialogs.resolveRoute('external:arenaops', options).code, 'not-navigable');
+  assert.equal(dialogs.resolveRoute('external:arenaops', options).code, 'unknown-reference');
   assert.equal(dialogs.resolveRoute('tool:cueforge', options).code, 'unknown-reference');
 });
 
@@ -307,9 +307,7 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'family:audio').length, 0, 'All apps lists no Toolbox families');
   const cueForge = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:cueforge')[0];
   assert.equal(cueForge.getAttribute('href'), 'https://systembydave.com/cueforge.html');
-  const arenaOps = elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:arenaops')[0];
-  assert.equal(arenaOps.tagName, 'DIV');
-  assert.equal(arenaOps.hasAttribute('href'), false);
+  assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:arenaops').length, 0);
   assert.equal(action(controller.customizeDialog, 'external:arenaops', 'pin'), undefined);
   assert.equal(preferenceStorage.setCalls.length, 0);
 

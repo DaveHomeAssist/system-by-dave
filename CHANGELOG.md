@@ -1,5 +1,12 @@
 # Changelog
 
+## November 25, 2026. AV console menus: Featured, Show tools and Learn
+
+- The Rail on `/av/` is Search, Workspace, Featured, Departments, Show tools, Reference, Learn, then All apps and Customize. Featured is Throwline, LED Wall Calculator, Signal Flow, the Console Spec Guide and AV Calculator. Saved `sbd.rail.v1` pins are unchanged.
+- All apps uses those sections and a one-line description. The phone Apps sheet adds search, featured chips, the last three items used on this device (`sbd.avSuite.recent.v1`) and collapsed sections.
+- Add panel leads with the same featured panels plus Multiview, Audio Delay and On Deck, and shows a panel count on each tile. Show tools replaces the Tools group. Gear 3D models are inside Equipment Lab. Ion 3D and the second SmartFade stay registered and stay off the chooser.
+- Infrastructure's console label is Power, Network & Cable. The last panel in each pack is named Project. The header link reads Learn. The Shop is unchanged. Routes, the sitemap and existing storage keys are unchanged. Arena Ops and DeckForge are no longer menu cards. Retired sheet ids are out of the navigation groups.
+
 ## November 24, 2026. Envision download names
 
 - The layout editor names editable projects and PNGs after the event and remembers the event name in saved projects.

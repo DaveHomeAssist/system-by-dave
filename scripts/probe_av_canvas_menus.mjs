@@ -75,7 +75,7 @@ try {
  const chooser=page.getByRole('dialog',{name:'Add panel',exact:true});
  // The first step is a two-column grid of icon tiles, one per group.
  const tiles=chooser.getByRole('group',{name:'Panel categories'}).getByRole('button');
- assert.equal(await tiles.count(),12);
+ assert.equal(await tiles.count(),11);
  assert.ok(await tiles.evaluateAll(buttons=>buttons.every(button=>button.querySelector('svg path')&&button.getBoundingClientRect().height>=44&&button.scrollWidth<=button.clientWidth+1)),'every group tile has its icon and fits its name');
  assert.equal(await chooser.getByRole('group',{name:'Panel categories'}).evaluate(group=>getComputedStyle(group).gridTemplateColumns.split(' ').length),2);
  await chooser.getByRole('button',{name:'Lighting',exact:true}).click();

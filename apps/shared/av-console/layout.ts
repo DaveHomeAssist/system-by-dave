@@ -15,7 +15,7 @@ export type Panel = Rect & { id: string; type: string };
 export type View = { id: string; name: string; panels: Panel[] };
 /* `app` groups a panel under its application in a multi-application chooser;
    `key` is the stable short name used for data-panel when `type` is namespaced. */
-export type PanelDef = { type: string; name: string; group: "Common" | "Planning" | "Utilities"; description: string; minW: number; minH: number; module?: string; lit?: boolean; app?: string; key?: string };
+export type PanelDef = { type: string; name: string; group: "Common" | "Planning" | "Utilities"; description: string; minW: number; minH: number; module?: string; lit?: boolean; app?: string; key?: string; keywords?: string; chooser?: boolean };
 
 const half = z.number().multipleOf(STEP);
 const panelSchema = z.object({ id: z.string().min(1), type: z.string().min(1), x: half.min(0), y: half.min(0), w: half.min(STEP), h: half.min(STEP) }).strict();

@@ -127,7 +127,7 @@ test('missing preferences read the exact ten-console defaults without writing', 
   assert.equal(storage.data.unrelated, 'keep');
 });
 
-test('saved preferences dedupe exact refs, retain unknown refs, and reject status-only refs', () => {
+test('saved preferences dedupe exact refs and retain unknown refs', () => {
   const { rail, registry } = loadRuntime();
   const stored = {
     version: 1,
@@ -139,8 +139,8 @@ test('saved preferences dedupe exact refs, retain unknown refs, and reject statu
   assert.equal(state.status, 'saved');
   assert.deepEqual(Array.from(state.pinned), ['console:audio', 'tool:throwline', 'console:future', 'external:arenaops']);
   assert.deepEqual(Array.from(state.visibleRefs), ['console:audio', 'tool:throwline']);
-  assert.deepEqual(Array.from(state.suppressedRefs), ['console:future']);
-  assert.deepEqual(Array.from(state.rejectedRefs), ['external:arenaops']);
+  assert.deepEqual(Array.from(state.suppressedRefs), ['console:future', 'external:arenaops']);
+  assert.deepEqual(Array.from(state.rejectedRefs), []);
   assert.deepEqual(storage.setCalls, []);
 });
 
@@ -157,24 +157,24 @@ test('explicit edits keep unresolved refs after visible refs and never alias IDs
 
   assert.equal(store.move('console:av-video', 0).ok, true);
   assert.deepEqual(JSON.parse(storage.data['sbd.rail.v1']).pinned, [
-    'console:av-video', 'console:audio', 'console:future'
+    'console:av-video', 'console:audio', 'console:future', 'external:arenaops'
   ]);
 
   assert.equal(store.pin('console:lighting', 1).ok, true);
   assert.deepEqual(JSON.parse(storage.data['sbd.rail.v1']).pinned, [
-    'console:av-video', 'console:lighting', 'console:audio', 'console:future'
+    'console:av-video', 'console:lighting', 'console:audio', 'console:future', 'external:arenaops'
   ]);
 
   assert.equal(store.unpin('console:audio').ok, true);
   assert.deepEqual(JSON.parse(storage.data['sbd.rail.v1']).pinned, [
-    'console:av-video', 'console:lighting', 'console:future'
+    'console:av-video', 'console:lighting', 'console:future', 'external:arenaops'
   ]);
 
   assert.equal(store.pin('tool:cueforge').code, 'not-pinnable');
   assert.equal(store.pin('external:arenaops').code, 'not-pinnable');
   assert.equal(store.pin('external:cueforge', 0).ok, true);
   assert.deepEqual(JSON.parse(storage.data['sbd.rail.v1']).pinned, [
-    'external:cueforge', 'console:av-video', 'console:lighting', 'console:future'
+    'external:cueforge', 'console:av-video', 'console:lighting', 'console:future', 'external:arenaops'
   ]);
   assert.equal(storage.data.unrelated, 'keep');
 });

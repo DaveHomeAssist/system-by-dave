@@ -6,13 +6,13 @@ export const VIEWS_KEY = 'avCalculator.views.v1';
 export const LAYOUT_KEY = 'avCalculator.layout.v1';
 export const LIBRARY: PanelDef[] = [
   ['audioCard', 'Audio Delay', 'Distance, temperature, frames and samples.'],
-  ['projectionCard', 'Projection', 'Screen dimensions and lens throw.'],
+  ['projectionCard', 'Throw distance (quick)', 'Screen dimensions and lens throw. Throwline plans the full room.'],
   ['storageCard', 'Record Storage', 'Bitrate, recording time and headroom.'],
   ['powerCard', 'Power Load', 'Nameplate current or explicit manufacturer power factor.'],
   ['voltageDropCard', 'Voltage Drop', 'Cable length and copper conductor estimate.'],
   ['splCard', 'SPL Distance', 'Free-field distance loss estimate.'],
   ['summaryCard', 'Operator Summary', 'Copy, export, reset and field verification warnings.'],
-].map(([type, name, description]) => ({ type, name, description, group: 'Common', minW: 3, minH: 3 }));
+].map(([type, name, description]) => ({ type, name, description, group: 'Common' as const, minW: 3, minH: 3, keywords: type === 'audioCard' ? 'delay frames samples' : type === 'projectionCard' ? 'throw projector throwline' : '' }));
 export const CONTEXT: PanelDef = { type: 'showContextCard', name: 'Show context', description: 'Explicit show readiness and return navigation.', group: 'Utilities', minW: 3, minH: 3 };
 const trio = (id: string, name: string, first: string, second: string): View => ({ id, name, panels: [
   { id: id + '-a', type: first, x: 0, y: 0, w: 6, h: 8 },

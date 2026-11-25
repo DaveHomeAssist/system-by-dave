@@ -128,6 +128,7 @@
         "revision": 4,
         "keys": [
           "av-suite-dashboard.v1",
+          "sbd.avSuite.recent.v1",
           "av-suite-ui.v1",
           "av-suite-dock-compact.v1",
           "av-theme-mode.v1",

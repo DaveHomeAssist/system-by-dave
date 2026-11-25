@@ -142,7 +142,7 @@ export function useInfrastructurePack(host: PackHost): Pack {
   }
   const dialogs = <dialog ref={modal} className="infra-dialog" aria-label="Import source" onCancel={event => { event.preventDefault(); closeImport(); }}><header><h2>{purpose === 'backup' ? 'Restore backup' : 'Review source'}</h2><button aria-label="Close import" onClick={closeImport}>Close</button></header><div className="infra-import-body" data-web2-scroll><p>{purpose === 'backup' ? 'Choose an Infrastructure JSON backup. Preview before replacing working records.' : 'Choose a Power Plan, Network Plan or Cable Plan JSON export.'}</p><label>Import JSON<input id="importFile" type="file" accept=".json,application/json" onChange={e => { const file = e.target.files?.[0]; e.target.value = ''; if (file) void readFile(file); }} /></label><div id="importPreview" role="status"><p>{previewMessage}</p>{pending && <ul>{pending.plan.records.slice(pending.replacement ? 0 : plan.records.length).map((row, index) => <li key={index}><strong>{row.name.trim() || 'Unnamed record'}</strong><span>{TYPES[row.type].title} · {row.status}</span></li>)}</ul>}</div></div><button id="confirmImport" className="primary" disabled={!pending} onClick={confirmImport}>Apply preview</button></dialog>;
   return {
-    id: 'infrastructure', label: 'Infrastructure', title: plan.name, summary: `${summary.total} records · ${summary.ready} marked ready · ${summary.issues} issues`,
+    id: 'infrastructure', label: 'Power, Network & Cable', title: plan.name, summary: `${summary.total} records · ${summary.ready} marked ready · ${summary.issues} issues`,
     dirty, blocked: !editable, save: store, exportDoc: () => exportPlan(), status: message, problem, notify,
     recovery: { offer: recovery.offer, restore: recovery.restore, discard: recovery.discard, errors: recovery.errors },
     render, dialogs, quick: LIBRARY.map(p => ({ type: p.type, label: p.name })), library: LIBRARY, views,
@@ -151,4 +151,4 @@ export function useInfrastructurePack(host: PackHost): Pack {
   };
 }
 
-export const infrastructurePack: PackDef = { id: 'infrastructure', label: 'Infrastructure', consoleId: 'infrastructure', library: LIBRARY, defaultViews: DEFAULT_VIEWS, use: useInfrastructurePack };
+export const infrastructurePack: PackDef = { id: 'infrastructure', label: 'Power, Network & Cable', consoleId: 'infrastructure', library: LIBRARY, defaultViews: DEFAULT_VIEWS, use: useInfrastructurePack };
