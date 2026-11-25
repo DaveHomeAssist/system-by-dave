@@ -45,6 +45,8 @@ With nvm installed, run `nvm install` followed by `nvm use`, then `npm ci`.
 Python 3 is required for the site generators and their parity checks.
 Serving existing static files does not require installing Node dependencies.
 
+Envision Personal Studio runs separately on owner-controlled hardware. Its guide covers the private coordinator, GPU worker, show packages and recovery. [Envision Personal Studio](apps/envision-studio/README.md)
+
 [Infrastructure](https://avbydave.com/infrastructure/) has a native-console candidate in `apps/infrastructure/`: Power, Network, Cable, Issues, Plan/Import and Backup share its existing model. Use `npm run typecheck:infrastructure`, `npm run test:infrastructure`, `npm run build:infrastructure` and `npm run test:infrastructure-browser`. The build preserves the model and writes an ignored fixture in `apps/infrastructure/dist/`; the public route redirects into `/av/?app=infrastructure`. See [the brief and compatibility contract](docs/infrastructure-app.md); source presence does not establish release or browser acceptance.
 
 [Lighting](https://avbydave.com/av-lighting/) has a native-panel candidate in `apps/av-lighting/`: Fixtures, Fixture details, Focus, Plan/Import and Backup preserve existing patch/focus fields and reviewed PlotForge imports. Use `npm run typecheck:av-lighting`, `npm run test:av-lighting`, `npm run build:av-lighting` and `npm run test:av-lighting-browser`. See [the brief and compatibility contract](docs/av-lighting.md); candidate checks and publication/live proof are separate.

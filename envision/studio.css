@@ -177,6 +177,9 @@ summary { padding-block: .32rem; }
 .saved-list li { display: flex; align-items: center; gap: .5rem; min-width: 0; padding: .55rem; border: 1px solid var(--line); border-radius: .4rem; }
 .saved-list .event-name { margin-right: auto; overflow-wrap: anywhere; font-weight: 750; }
 .empty-saved { padding: .8rem 0; color: var(--muted); }
+#personal-address { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-block: .5rem; }
+#personal-address label { flex-basis: 100%; }
+#personal-origin { flex: 1 1 15rem; min-width: 0; }
 .examples-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; margin: .7rem 0; }
 .examples-strip a { display: grid; overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: .45rem; color: var(--ink); }
 .examples-strip img { width: 100%; aspect-ratio: 2.45; object-fit: cover; object-position: center 21%; }

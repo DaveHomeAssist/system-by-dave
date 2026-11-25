@@ -1,0 +1,9 @@
+.git
+.ruff_cache
+__pycache__
+**/__pycache__
+data
+config
+evidence
+*.key
+*.sqlite*

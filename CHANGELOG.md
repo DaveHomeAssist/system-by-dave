@@ -8,6 +8,12 @@
 - Infrastructure's console label is Power, Network & Cable. The last panel in each pack is named Project. On a short Show Control screen the backup launcher reads Project controls. The header link reads Learn. The Shop is unchanged. Routes, the sitemap and existing storage keys are unchanged. Arena Ops and DeckForge are no longer menu cards. Retired sheet ids are out of the navigation groups.
 - The calculator page's no-JavaScript list names Throw distance (quick) and points that estimate at Throwline.
 
+## November 25, 2026. Envision Personal Studio
+
+- Added private image generation on local hardware with a durable queue, reference and masked revisions, artwork comparison and reusable event layouts.
+- Added feed, story, lobby and campaign packages with event-based filenames, editable project import and export, and verified catalog backups. Saved events in the public prompt kit now offer a downloadable brief and a browser-local shortcut to the owner's private studio.
+- Fixed fragmented image output from the personal studio by using the SDXL Turbo noise schedule for new renders. Stored jobs retain their original workflow on retry.
+
 ## November 24, 2026. Envision download names
 
 - The layout editor names editable projects and PNGs after the event and remembers the event name in saved projects.
