@@ -272,3 +272,7 @@ byId('create-event').addEventListener('click', newEvent);
 addEventListener('storage', (event) => {
   if ((event.key === storageKey || event.key === null) && !byId('saved').hidden) renderSaved();
 });
+
+// Keep the static guide available until the studio is ready to use.
+selectTab(byId('tab-studio'));
+byId('tab-studio').parentElement.hidden = false;

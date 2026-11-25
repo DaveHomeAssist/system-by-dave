@@ -17,19 +17,19 @@
 </head>
 <body>
 <a class="skip" href="#workspace">Skip to workspace</a>
-<noscript>Enable JavaScript to use Envision.</noscript>
+<noscript>The field guide and skill download are available below. Enable JavaScript to use the studio.</noscript>
 <div class="shell">
   <header class="masthead">
     <div class="brand"><span><a href="/">System by Dave</a> / <a href="/tools.html">Tools</a></span><h1>Envision<span class="title-dot">.</span></h1></div>
     <button class="theme" id="theme" type="button">Dark theme</button>
   </header>
-  <nav role="tablist" aria-label="Envision sections" class="navigation">
+  <nav hidden role="tablist" aria-label="Envision sections" class="navigation">
     <button id="tab-studio" role="tab" type="button" aria-selected="true" aria-controls="studio">Studio</button>
     <button id="tab-saved" role="tab" type="button" aria-selected="false" aria-controls="saved" tabindex="-1">Saved events</button>
     <button id="tab-guide" role="tab" type="button" aria-selected="false" aria-controls="guide" tabindex="-1">Field guide</button>
   </nav>
   <main id="workspace" tabindex="-1">
-    <section id="studio" class="studio" data-mobile-panel="brief" role="tabpanel" aria-labelledby="tab-studio">
+    <section hidden id="studio" class="studio" data-mobile-panel="brief" role="tabpanel" aria-labelledby="tab-studio">
       <div class="mobile-switch" aria-label="Studio view">
         <button id="show-brief" type="button" aria-controls="brief-panel" aria-pressed="true">Brief</button>
         <button id="show-result" type="button" aria-controls="result-panel" aria-pressed="false">Prompt</button>
@@ -88,7 +88,7 @@
       <p id="empty-saved" class="empty-saved">Save a brief from the Studio to reopen it here.</p>
       <ul id="saved-list" class="saved-list"></ul>
     </section>
-    <section id="guide" class="station secondary" role="tabpanel" aria-labelledby="tab-guide" tabindex="0" hidden>
+    <section id="guide" class="station secondary" role="tabpanel" aria-labelledby="tab-guide" tabindex="0">
       <div class="station-heading"><h2>Field guide</h2><a class="button" href="no-nonsense-flyer-prompts.zip" download>Download flyer prompt skill</a></div>
       <div class="examples-strip">
         <a href="./art/afterjinx-2025-card.webp"><img src="./art/afterjinx-2025-card.webp" alt="" loading="lazy"><span>AfterJinx</span></a>
