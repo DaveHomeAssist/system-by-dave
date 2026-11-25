@@ -243,7 +243,26 @@ function renderSaved() {
       open.textContent = 'Open';
       open.setAttribute('aria-label', 'Open ' + record.title);
       open.addEventListener('click', () => openEvent(record));
-      item.append(title, open);
+      const transfer = document.createElement('button');
+      transfer.type = 'button';
+      transfer.textContent = 'Export brief';
+      transfer.setAttribute('aria-label', 'Export brief for ' + record.title);
+      transfer.addEventListener('click', () => {
+        if (typeof record.title !== 'string' || !record.title.trim() || !Object.hasOwn(formats, record.format)) {
+          announce('Open this saved event, choose its format and save it before exporting.');
+          return;
+        }
+        const brief = {format: 'envision-brief-1', title: record.title,
+          prompt: buildPrompt(record), copy: record.copy || ''};
+        const url = URL.createObjectURL(new Blob([JSON.stringify(brief)], {type: 'application/json'}));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = (record.title.replace(/[<>:"/\\|?*]/g, '-').slice(0, 100) || 'Envision') + '.brief.json';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        announce('Brief prepared for import into your personal studio.');
+      });
+      item.append(title, open, transfer);
       list.append(item);
     }
   } catch {
