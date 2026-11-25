@@ -1,5 +1,9 @@
 # Changelog
 
+## November 24, 2026. Envision download names
+
+- The layout editor names editable projects and PNGs after the event and remembers the event name in saved projects.
+
 ## November 24, 2026. Envision flyer studio
 
 - Added a direct-access flyer prompt studio and portable layout editor at `/envision/`. The editor accepts existing AfterJinx project files and exports PNGs locally.
