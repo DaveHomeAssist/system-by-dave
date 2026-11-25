@@ -115,25 +115,39 @@ def workflow(p, model, files, jid):
         graph["14"] = node("ImageToMask", image=["13", 0], channel="red")
         graph["15"] = node("SetLatentNoiseMask", samples=latent, mask=["14", 0])
         latent = ["15", 0]
-    graph.update(
-        {
-            "5": node(
-                "KSampler",
-                model=["1", 0],
-                positive=["2", 0],
-                negative=["3", 0],
-                latent_image=latent,
-                seed=p["seed"],
-                steps=p["steps"],
-                cfg=1.0,
-                sampler_name="euler_ancestral",
-                scheduler="normal",
-                denoise=strength,
-            ),
-            "6": node("VAEDecode", samples=["5", 0], vae=["1", 2]),
-            "7": node("SaveImage", images=["6", 0], filename_prefix="envision/" + jid),
-        }
-    )
+    conditioning = {
+        "model": ["1", 0],
+        "positive": ["2", 0],
+        "negative": ["3", 0],
+        "latent_image": latent,
+        "cfg": 1.0,
+    }
+    if p["workflow"] == "turbo-v2":
+        graph["16"] = node("SDTurboScheduler", model=["1", 0], steps=p["steps"], denoise=strength)
+        graph["17"] = node("KSamplerSelect", sampler_name="euler_ancestral")
+        graph["5"] = node(
+            "SamplerCustom",
+            **conditioning,
+            add_noise=True,
+            noise_seed=p["seed"],
+            sampler=["17", 0],
+            sigmas=["16", 0],
+        )
+    elif p["workflow"] == "turbo-v1":
+        # Keep the original graph for retries of jobs already stored in the catalog.
+        graph["5"] = node(
+            "KSampler",
+            **conditioning,
+            seed=p["seed"],
+            steps=p["steps"],
+            sampler_name="euler_ancestral",
+            scheduler="normal",
+            denoise=strength,
+        )
+    else:
+        raise ValueError("Unknown studio workflow. Update the worker before retrying.")
+    graph["6"] = node("VAEDecode", samples=["5", 0], vae=["1", 2])
+    graph["7"] = node("SaveImage", images=["6", 0], filename_prefix="envision/" + jid)
     return graph
 
 
@@ -190,6 +204,7 @@ class Runner:
         return {
             "id": self.worker,
             "profiles": [PROFILE] if self.model.name in models else [],
+            "workflows": ["turbo-v1", "turbo-v2"],
             "busy": bool(queue["queue_running"] or queue["queue_pending"]),
             "paused": (self.state / "pause").exists(),
             "engine": "ComfyUI " + self.stats["system"]["comfyui_version"],

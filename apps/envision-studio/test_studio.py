@@ -14,11 +14,13 @@ from server import create_app, export_loop
 from store import png
 from layout import render
 from backup import snapshot, verify
+from worker import workflow
 
 ORIGIN = "https://studio.test"
 KEY = "test-worker-identity-" + ("x" * 32)
 OWNER = {"Tailscale-User-Login": "owner@test", "X-Envision": "studio", "Origin": ORIGIN}
 WORKER = {"Authorization": "Bearer " + KEY}
+RENDERER = {"id": "runner", "profiles": ["sdxl-turbo-local"], "workflows": ["turbo-v1", "turbo-v2"]}
 
 
 def image(size, color):
@@ -96,9 +98,7 @@ class Studio(unittest.TestCase):
         ids = self.post(self.project + "/jobs", b)["jobs"]
         self.assertEqual(self.post(self.project + "/jobs", b)["jobs"], ids)
         self.post(self.project + "/jobs", b | {"seed": 18}, expected=(409,))
-        j = self.post("/worker/claim", {"id": "runner", "profiles": ["sdxl-turbo-local"]}, WORKER)[
-            "job"
-        ]
+        j = self.post("/worker/claim", RENDERER, WORKER)["job"]
         self.assertEqual(j["id"], ids[0])
         route = "/worker/jobs/" + j["id"]
         h = WORKER | {"X-Lease": j["lease"]}
@@ -110,9 +110,7 @@ class Studio(unittest.TestCase):
         self.post("/jobs/" + j["id"] + "/cancel")
         self.post(route + "/progress", headers=h, expected=(409,))
         self.post("/jobs/" + j["id"] + "/retry")
-        again = self.post(
-            "/worker/claim", {"id": "runner", "profiles": ["sdxl-turbo-local"]}, WORKER
-        )["job"]
+        again = self.post("/worker/claim", RENDERER, WORKER)["job"]
         self.assertNotEqual(again["lease"], j["lease"])
         h = WORKER | {"X-Lease": again["lease"]}
         r = self.http.post(
@@ -131,12 +129,45 @@ class Studio(unittest.TestCase):
         self.assertEqual(im.getpixel((16, 16)), (255, 255, 255, 255))
         self.assertEqual(self.get("/jobs/" + j["id"])["state"], "succeeded")
 
+    def test_turbo_schedule_and_older_worker(self):
+        new_id = self.post(self.project + "/jobs", {"key": "new", "prompt": "stage"})["jobs"][0]
+        older_worker = {"id": "old", "profiles": ["sdxl-turbo-local"]}
+        self.assertIsNone(self.post("/worker/claim", older_worker, WORKER)["job"])
+
+        previous_id = self.post(self.project + "/jobs", {"key": "old", "prompt": "iris"})["jobs"][0]
+        with self.app.config["STORE"].tx(True) as c:
+            c.execute(
+                "UPDATE jobs SET payload=json_set(payload,'$.workflow','turbo-v1') WHERE id=?",
+                (previous_id,),
+            )
+        old = self.post("/worker/claim", older_worker, WORKER)["job"]
+        self.assertEqual(old["id"], previous_id)
+        old_graph = workflow(old["payload"], "test", {}, previous_id)
+        self.assertEqual(old_graph["5"]["class_type"], "KSampler")
+
+        new = self.post("/worker/claim", RENDERER, WORKER)["job"]
+        self.assertEqual(new["id"], new_id)
+        p = new["payload"]
+        self.assertEqual(p["workflow"], "turbo-v2")
+        cases = [
+            ({}, 1.0, "4"),
+            ({"starting": "source.png"}, p["strength"], "9"),
+            ({"starting": "source.png", "mask": "region.png"}, p["strength"], "15"),
+        ]
+        for files, denoise, latent in cases:
+            graph = workflow(p, "test", files, new_id)
+            sampler = graph["5"]
+            self.assertEqual(sampler["class_type"], "SamplerCustom")
+            self.assertEqual(sampler["inputs"]["noise_seed"], p["seed"])
+            self.assertEqual(sampler["inputs"]["latent_image"], [latent, 0])
+            schedule = graph[sampler["inputs"]["sigmas"][0]]
+            self.assertEqual(schedule["class_type"], "SDTurboScheduler")
+            self.assertEqual(schedule["inputs"], {"model": ["1", 0], "steps": 4, "denoise": denoise})
+
     def test_expiry_and_queue_reopen(self):
         jid = self.post(self.project + "/jobs", {"key": "expire", "prompt": "p"})["jobs"][0]
         for attempt in (1, 2):
-            j = self.post(
-                "/worker/claim", {"id": "worker", "profiles": ["sdxl-turbo-local"]}, WORKER
-            )["job"]
+            j = self.post("/worker/claim", RENDERER | {"id": "worker"}, WORKER)["job"]
             self.assertEqual(j["attempt"], attempt)
             with self.app.config["STORE"].tx(True) as c:
                 c.execute("UPDATE jobs SET expires=1 WHERE id=?", (jid,))
@@ -149,7 +180,7 @@ class Studio(unittest.TestCase):
 
     def test_pause_low_disk_and_overnight(self):
         store = self.app.config["STORE"]
-        worker = {"id": "dedicated", "profiles": ["sdxl-turbo-local"]}
+        worker = RENDERER | {"id": "dedicated"}
         self.post("/worker/claim", worker, WORKER)
         self.post("/workers/dedicated/pause", {"paused": True})
         self.post(self.project + "/jobs", {"prompt": "fog", "key": "paused"})
