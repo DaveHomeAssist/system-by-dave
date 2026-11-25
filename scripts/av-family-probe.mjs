@@ -13,7 +13,7 @@ export const FAMILIES = {
   'show-ops': { route: 'show-ops', label: 'Show Ops', key: 'sbd.showOps.document.v1', document: 'Project', field: 'Show name' },
   'front-office': { route: 'front-office', label: 'Front Office', key: 'sbd.frontOffice.document.v1', document: 'Clients', field: 'Client name' },
   shop: { route: 'the-shop', label: 'The Shop', key: 'sbd.shop.v1', document: 'Project', field: 'Plan name' },
-  infrastructure: { route: 'infrastructure', label: 'Infrastructure', key: 'sbd.infrastructure.v1', document: 'Project', field: 'Plan name' },
+  infrastructure: { route: 'infrastructure', label: 'Power, Network & Cable', key: 'sbd.infrastructure.v1', document: 'Project', field: 'Plan name' },
   lighting: { route: 'av-lighting', label: 'Lighting', key: 'sbd.avLighting.v1', document: 'Project', field: 'Show name' },
 };
 const ROOT = resolve(import.meta.dirname, '..');

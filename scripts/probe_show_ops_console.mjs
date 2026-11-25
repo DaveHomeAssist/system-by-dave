@@ -193,7 +193,7 @@ try {
         await quick(page, name);
         const bounds = await page.evaluate(() => ({ h: document.documentElement.scrollHeight, ch: document.documentElement.clientHeight, w: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
         assert.ok(bounds.h <= bounds.ch && bounds.w <= bounds.cw, JSON.stringify({ theme, size, name, bounds }));
-        assert.equal(await panel(page, name.toLowerCase()).count(), 1);
+        assert.equal(await panel(page, name === 'Project' ? 'document' : name.toLowerCase()).count(), 1);
         if (['Rooms', 'Crew', 'Tasks'].includes(name)) {
           await reachable(panel(page, name.toLowerCase()).locator('[name="name"]'));
           await reachable(panel(page, name.toLowerCase()).locator('.record').last().getByRole('button', { name: /^Remove / }));

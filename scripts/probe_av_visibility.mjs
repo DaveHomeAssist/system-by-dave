@@ -14,6 +14,7 @@ const fixture = `<!doctype html><style>
   .av-page-window{width:200px;height:90px;overflow:hidden}
   .av-page-content{height:90px;columns:200px;column-gap:16px;column-fill:auto;transform:translateX(var(--av-page-offset,0px))}
   .av-page-content>div{height:60px;break-inside:avoid}
+  .av-page-content input{width:100%;box-sizing:border-box}
 </style><div id="visible" class="box"></div><div id="hidden" hidden class="box"></div>
 <div style="display:none"><div id="hiddenParent" class="box"></div></div>
 <div id="visibility" class="box" style="visibility:hidden"></div>
