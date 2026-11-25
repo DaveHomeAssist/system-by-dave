@@ -95,7 +95,8 @@ const robots = read('robots.txt');
 // lists the final address instead (scripts/gen_sitemap.py REDIRECT_ONLY) and adds one.
 const fieldKitListed = sitemapRoutes.has('/field-kit/');
 // Envision and its portable layout editor are both direct-access routes.
-const expectedUnlisted = fieldKitListed ? 223 : 224;
+// The private Envision coordinator adds one tracked noindex source template.
+const expectedUnlisted = fieldKitListed ? 224 : 225;
 if (unlisted.length !== expectedUnlisted) fail(`Expected ${expectedUnlisted} tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
