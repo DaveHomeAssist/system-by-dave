@@ -38,8 +38,13 @@ function draw() {
     }
   });
 }
-async function openLayout(data) {
-  if (data?.format !== 'nnc-layout-1' || !Array.isArray(data.layers) || data.layers.length !== 11) throw Error('Choose an AfterJinx .flyer.json layout.');
+function exportStem(name) {
+  const stem = name.replace(/[<>:"/\\|?*\u0000-\u001f]/g, '-').trim().slice(0, 100).replace(/[. ]+$/, '');
+  if (!stem) return 'Envision';
+  return /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(stem) ? '_' + stem : stem;
+}
+async function openLayout(data, filename = '') {
+  if (data?.format !== 'nnc-layout-1' || !Array.isArray(data.layers) || data.layers.length !== 11) throw Error('Choose an Envision .flyer.json layout.');
   for (const layer of data.layers) {
     if (!['artist','info'].includes(layer.kind) || !['label','text','original'].every(k => typeof layer[k] === 'string' && layer[k].length <= 200) ||
         !Array.isArray(layer.box) || layer.box.length !== 4 || !layer.box.every(Number.isFinite) || layer.box[2]<=0 || layer.box[3]<=0) throw Error('Invalid layout layer.');
@@ -49,6 +54,9 @@ async function openLayout(data) {
   const loaded = await Promise.all(data.layers.map(async layer => ({
     art: await loadImage(layer.art), logo: layer.logo ? await loadImage(layer.logo) : null
   })));
+  const importedName = filename.replace(/(?:\.flyer)?\.json$/i, '');
+  data.eventName = (typeof data.eventName === 'string' && data.eventName.trim() || importedName || 'Envision').trim().slice(0, 100);
+  el('event-name').value = data.eventName;
   project = data; background = bg; images = loaded;
   el('slot').replaceChildren(...data.layers.map(layer => new Option(layer.label)));
   canvas.hidden = false; el('empty').hidden = true; dirty = false;
@@ -65,9 +73,13 @@ el('project').onchange = async event => {
   busy = true; controls(); el('project').disabled = true;
   try {
     if (file.size > 40*1024*1024) throw Error('Layout exceeds 40 MB.');
-    await openLayout(JSON.parse(await file.text()));
+    await openLayout(JSON.parse(await file.text()), file.name);
   } catch (error) { report('Could not open layout. ' + error.message); }
   finally { busy = false; el('project').disabled = false; controls(); }
+};
+el('event-name').oninput = event => {
+  project.eventName = event.target.value.trim();
+  dirty = true; report('Unsaved event name.');
 };
 el('slot').onchange = controls;
 el('wording').oninput = event => {
@@ -95,13 +107,18 @@ el('logo').onchange = async event => {
   finally { busy = false; el('project').disabled = false; controls(); }
 };
 el('save').onclick = () => {
-  download(new Blob([JSON.stringify(project)],{type:'application/json'}),'AfterJinx.flyer.json');
+  if (!el('event-name').reportValidity() || !project.eventName) { el('event-name').focus(); return; }
+  download(new Blob([JSON.stringify(project)],{type:'application/json'}), exportStem(project.eventName) + '.flyer.json');
   dirty = false; report('Editable copy prepared for download.');
 };
-el('export').onclick = () => canvas.toBlob(blob => {
-  if (blob) download(blob,'AfterJinx.png');
-  report(blob ? 'PNG prepared for download.' : 'PNG export failed.');
-});
+el('export').onclick = () => {
+  if (!el('event-name').reportValidity() || !project.eventName) { el('event-name').focus(); return; }
+  const filename = exportStem(project.eventName) + '.png';
+  canvas.toBlob(blob => {
+    if (blob) download(blob, filename);
+    report(blob ? 'PNG prepared for download.' : 'PNG export failed.');
+  });
+};
 addEventListener('beforeunload', event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } });
 function theme(value) {
   document.documentElement.dataset.theme = value;

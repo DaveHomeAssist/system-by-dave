@@ -34,7 +34,7 @@ footer{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}#status{font-siz
 <section class="station controls" aria-label="Layout editor">
 <label>Open layout file<input type="file" id="project" accept=".json,application/json"></label>
 <p class="muted" id="help">Choose a .flyer.json file from Envision or the AfterJinx Flyer Kit. Edits stay on this device. Save an editable copy to reopen or share it.</p>
-<fieldset id="fields" disabled><label>Layer<select id="slot"></select></label>
+<fieldset id="fields" disabled><label>Event name for downloads<input id="event-name" maxlength="100" required pattern=".*\S.*" autocomplete="off"></label><label>Layer<select id="slot"></select></label>
 <label>Wording<input id="wording" maxlength="200" autocomplete="off"></label>
 <label id="logo-label">Replace artist logo<input type="file" id="logo" accept="image/png,image/jpeg,image/webp"></label>
 <button type="button" id="reset">Restore original layer</button>
