@@ -318,8 +318,9 @@ try {
   // On a full mixed phone workspace, the menu must bring an existing department forward.
   await page.setViewportSize({ width: 375, height: 812 });
   await recallPanel(page, 'Audio Delay');
-  await page.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
-  await chooser.getByRole('button', { name: 'Replace the focused panel', exact: true }).click();
+  // Add panel opens new panels at 4x4, so four departments no longer fill the grid; replace through the panel's own menu.
+  await page.getByRole('button', { name: 'Audio Delay options', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   await chooser.getByRole('button', { name: 'Audio', exact: true }).click();
   await chooser.locator('.console-choices button').filter({ hasText: 'Inputs' }).click();
   assert.equal(await page.locator('.console-panel').getAttribute('data-app'), 'Audio', 'phone selection supersedes the previous department quick-bar choice');
