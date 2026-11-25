@@ -94,7 +94,8 @@ const robots = read('robots.txt');
 // ProjectorThrow/ only forwards to ProjectorThrow/Stage3D.html, so the AV sitemap
 // lists the final address instead (scripts/gen_sitemap.py REDIRECT_ONLY) and adds one.
 const fieldKitListed = sitemapRoutes.has('/field-kit/');
-const expectedUnlisted = fieldKitListed ? 221 : 222;
+// Envision and its portable layout editor are both direct-access routes.
+const expectedUnlisted = fieldKitListed ? 223 : 224;
 if (unlisted.length !== expectedUnlisted) fail(`Expected ${expectedUnlisted} tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
