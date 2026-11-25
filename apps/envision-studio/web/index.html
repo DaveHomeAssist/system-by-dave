@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Envision · Personal image studio</title>
+    <meta name="description" content="Private image generation, revisions and show layouts." />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="theme-color" content="#f4f1eb" />
+    <link rel="canonical" href="/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Envision Personal Studio" />
+    <meta property="og:description" content="Private image generation, revisions and show layouts." />
+    <meta name="twitter:card" content="summary" />
+    <link rel="stylesheet" href="/ui/studio.css" />
+    <script defer src="/ui/studio.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#workspace">Skip to workspace</a>
+    <header>
+      <a class="brand" href="/" aria-label="Envision home"><i aria-hidden="true"></i>Envision</a>
+      <span id="worker">Checking Walter</span
+      ><button id="theme" aria-label="Switch theme">Dark</button>
+    </header>
+    <nav aria-label="Studio">
+      <button data-tab="projects" aria-current="page">Projects</button
+      ><button data-tab="create">Create</button><button data-tab="library">Library</button
+      ><button data-tab="layout">Layout</button
+      ><button data-tab="queue">Queue <span id="pending">0</span></button>
+    </nav>
+    <main id="workspace" tabindex="-1">
+      <section id="projects" class="page">
+        <div class="heading">
+          <div>
+            <p class="eyebrow">Studio</p>
+            <h1>Projects</h1>
+          </div>
+          <button class="primary" id="new-project">New project</button>
+        </div>
+        <div class="tools">
+          <input
+            id="search"
+            type="search"
+            aria-label="Search projects"
+            placeholder="Search projects or tags"
+          /><button id="archive-filter">Show archived</button
+          ><label class="file-btn"
+            >Import editable file<input type="file" id="import-project" accept=".json,.zip"
+          /></label>
+        </div>
+        <div id="project-grid" class="cards scroll"></div>
+      </section>
+
+      <section id="bench" class="page" hidden>
+        <div class="heading slim">
+          <div>
+            <p id="project-kind" class="eyebrow"></p>
+            <h1 id="project-title">Project</h1>
+          </div>
+          <button id="project-menu">Project details</button>
+        </div>
+        <div class="split">
+          <section class="preview" aria-label="Artwork preview">
+            <div class="preview-tools">
+              <select id="view-mode" aria-label="Preview mode">
+                <option value="art">Artwork</option>
+                <option value="layout">Layout proof</option></select
+              ><button id="compare">Compare</button><button id="zoom">Zoom</button
+              ><button id="expand-proof">Full view</button>
+            </div>
+            <div id="frames">
+              <figure>
+                <img id="art" alt="Selected artwork" /><span id="no-art"
+                  >Choose a reference or generate your first image.</span
+                >
+                <figcaption id="art-caption"></figcaption>
+              </figure>
+              <figure id="second-frame" hidden>
+                <img id="other-art" alt="Comparison artwork" />
+                <figcaption id="other-caption"></figcaption>
+              </figure>
+            </div>
+            <div id="compare-tools" hidden>
+              <label>Compare with<select id="compare-version"></select></label
+              ><button id="swap-compare">Switch image</button>
+            </div>
+          </section>
+          <aside class="inspector scroll">
+            <form id="create" class="panel">
+              <h2>Create image</h2>
+              <label
+                >Operation<select id="operation">
+                  <option value="generate">Generate image</option>
+                  <option value="revise">Revise source</option>
+                  <option value="mask">Edit a region</option>
+                  <option value="finish">Apply local finish</option>
+                </select></label
+              >
+              <div id="generative">
+                <label
+                  >Image direction<textarea
+                    id="prompt"
+                    rows="4"
+                    maxlength="6000"
+                    placeholder="Describe the subject, framing, light, and finish."
+                  ></textarea>
+                </label>
+                <div class="row">
+                  <label
+                    >Render size<select id="render-size">
+                      <option value="640,800">Portrait · 640 × 800</option>
+                      <option value="800,640">Landscape · 800 × 640</option>
+                      <option value="512,512">Square · 512 × 512</option>
+                      <option value="768,432">Wide · 768 × 432</option>
+                      <option value="432,768">Vertical · 432 × 768</option>
+                    </select></label
+                  ><label
+                    >Candidates<select id="count">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                    </select></label
+                  >
+                </div>
+                <details>
+                  <summary>References and settings</summary>
+                  <label>Starting image<select id="starting"></select></label
+                  ><label>Composition reference<select id="composition"></select></label
+                  ><label>Palette reference<select id="style-ref"></select></label>
+                  <label class="file-btn"
+                    >Upload reference<input
+                      type="file"
+                      id="reference-file"
+                      accept="image/png,image/jpeg,image/webp"
+                  /></label>
+                  <label
+                    >Revision strength<input
+                      id="strength"
+                      type="range"
+                      min=".1"
+                      max="1"
+                      step=".05"
+                      value=".55" /></label
+                  ><label
+                    >Seed <small>Blank for a new variation</small
+                    ><input id="seed" type="number" min="0" max="4503599627370492"
+                  /></label>
+                  <p>Local profile · SDXL Turbo, four steps</p>
+                </details>
+                <details>
+                  <summary>Style presets</summary>
+                  <label>Saved direction<select id="preset"></select></label>
+                  <div class="row">
+                    <button type="button" id="apply-preset">Apply preset</button
+                    ><button type="button" id="save-preset">Save preset</button>
+                  </div>
+                  <button type="button" id="save-brief">Save project direction</button>
+                </details>
+              </div>
+              <div id="mask-actions" hidden>
+                <button type="button" id="paint-mask">Paint edit region</button>
+                <p id="mask-state">Select a source to paint.</p>
+              </div>
+              <div id="finish-controls" hidden>
+                <label
+                  >Finish<select id="effect">
+                    <option value="scanlines">Dark scanlines</option>
+                    <option value="darken">Dark grade</option>
+                    <option value="grain">Print grain</option>
+                  </select></label
+                ><label
+                  >Amount<input id="amount" type="range" min="0" max="1" step=".05" value=".45"
+                /></label>
+              </div>
+              <button class="primary" id="generate" type="submit">Generate on Walter</button>
+            </form>
+
+            <section class="panel" id="library" hidden>
+              <h2>Artwork library</h2>
+              <input
+                type="search"
+                id="library-search"
+                placeholder="Search names or prompts"
+                aria-label="Search artwork"
+              />
+              <div class="tools">
+                <button id="favorites">Favorites</button
+                ><label class="file-btn"
+                  >Add image<input
+                    id="library-file"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                /></label>
+              </div>
+              <div id="versions" class="versions"></div>
+              <div id="version-actions" hidden>
+                <div class="tools">
+                  <button id="use-art" class="primary">Use as background</button
+                  ><button id="favorite">Favorite</button><button id="revise-art">Revise</button
+                  ><button id="replay">Reuse settings</button
+                  ><button id="download-art">Download PNG</button>
+                </div>
+                <details>
+                  <summary>Generation record</summary>
+                  <pre id="recipe"></pre>
+                </details>
+              </div>
+            </section>
+
+            <section class="panel" id="layout" hidden>
+              <h2>Layout</h2>
+              <div class="row">
+                <label>Stage<select id="stage"></select></label
+                ><label
+                  >Format<select id="format">
+                    <option value="source">Source</option>
+                    <option value="feed">Feed</option>
+                    <option value="story">Story</option>
+                    <option value="lobby">Lobby</option>
+                    <option value="custom">Custom</option>
+                  </select></label
+                >
+              </div>
+              <div id="custom-size" class="row" hidden>
+                <label
+                  >Width<input type="number" id="custom-w" value="1080" min="1" max="4096" /></label
+                ><label
+                  >Height<input type="number" id="custom-h" value="1080" min="1" max="4096"
+                /></label>
+              </div>
+              <div class="row">
+                <label
+                  >Framing<select id="framing">
+                    <option value="fit">Fit original</option>
+                    <option value="fill">Fill frame</option>
+                  </select></label
+                ><label class="check"><input type="checkbox" id="guides" />Safe area</label>
+              </div>
+              <details open>
+                <summary>Layer editor</summary>
+                <label>Layer<select id="layer"></select></label>
+                <div id="layer-edit">
+                  <label>Wording<input id="wording" maxlength="800" /></label
+                  ><label>Bound event field<select id="binding"></select></label>
+                  <label
+                    >Text template <small>Use {{doors}} or {{venue}}</small
+                    ><input id="template" maxlength="800"
+                  /></label>
+                  <div class="row">
+                    <label class="file-btn"
+                      >Replace logo<input
+                        id="replace-logo"
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp" /></label
+                    ><button id="clear-logo">Remove logo</button>
+                  </div>
+                  <details>
+                    <summary>Position and crop</summary>
+                    <div class="coords">
+                      <label
+                        >X %<input id="box-x" type="number" step=".01" min="0" max="100" /></label
+                      ><label
+                        >Y %<input id="box-y" type="number" step=".01" min="0" max="100" /></label
+                      ><label
+                        >Width %<input
+                          id="box-w"
+                          type="number"
+                          step=".01"
+                          min=".01"
+                          max="100" /></label
+                      ><label
+                        >Height %<input id="box-h" type="number" step=".01" min=".01" max="100"
+                      /></label>
+                    </div>
+                    <div class="row">
+                      <label
+                        >Crop X %<input
+                          id="crop-x"
+                          type="number"
+                          min="0"
+                          max="100"
+                          value="50" /></label
+                      ><label
+                        >Crop Y %<input id="crop-y" type="number" min="0" max="100" value="50"
+                      /></label>
+                    </div>
+                  </details>
+                  <label class="check"><input type="checkbox" id="locked" /> Lock layer</label
+                  ><button id="save-layer" class="primary">Save layer</button>
+                </div>
+                <button id="add-layer">Add layer</button>
+              </details>
+              <details>
+                <summary>Event fields</summary>
+                <div id="fields"></div>
+                <p id="field-effects" role="status"></p>
+                <div class="tools">
+                  <button id="add-field">Add field</button
+                  ><button id="save-fields">Save event fields</button>
+                </div>
+              </details>
+              <details>
+                <summary>Campaign stages</summary>
+                <button id="new-stage">Duplicate stage</button
+                ><label class="file-btn"
+                  >Import legacy stage<input id="stage-file" type="file" accept=".json"
+                /></label>
+              </details>
+              <details open>
+                <summary>Export</summary>
+                <div id="output-formats" class="checks">
+                  <label><input type="checkbox" value="source" /> Source</label
+                  ><label><input type="checkbox" value="feed" checked /> Feed</label
+                  ><label><input type="checkbox" value="story" checked /> Story</label
+                  ><label><input type="checkbox" value="lobby" /> Lobby</label
+                  ><label><input type="checkbox" value="custom" /> Custom</label>
+                </div>
+                <label class="check"
+                  ><input type="checkbox" id="all-stages" />Include every campaign stage</label
+                ><button class="primary" id="make-export">Render outputs</button>
+                <div class="tools">
+                  <button id="native">Editable package</button
+                  ><button id="legacy">Legacy flyer file</button>
+                  <button id="source-file" hidden>Original import</button>
+                </div>
+                <div id="export-list"></div>
+              </details>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section id="queue" class="page" hidden>
+        <div class="heading">
+          <div>
+            <p class="eyebrow">Local hardware</p>
+            <h1>Render queue</h1>
+          </div>
+          <div class="tools">
+            <button id="pause-worker">Pause worker</button
+            ><button id="refresh-jobs">Refresh</button>
+          </div>
+        </div>
+        <div id="jobs" class="scroll"></div>
+      </section>
+    </main>
+    <footer><span id="message" role="status" aria-live="polite">Opening studio…</span></footer>
+    <dialog id="proof-dialog" aria-labelledby="proof-label">
+      <h2 id="proof-label"></h2>
+      <img id="proof-art" alt="Full artwork preview" />
+      <div class="tools">
+        <button id="proof-swap">Switch image</button
+        ><button id="proof-close" autofocus>Close</button>
+      </div>
+    </dialog>
+    <dialog id="name-dialog">
+      <form method="dialog">
+        <h2 id="dialog-title">New project</h2>
+        <label>Name<input id="dialog-name" maxlength="100" required autocomplete="off" /></label
+        ><label id="kind-choice"
+          >Project type<select id="dialog-kind">
+            <option value="image">Blank image</option>
+            <option value="show">Show project</option>
+          </select></label
+        >
+        <div class="tools">
+          <button value="cancel" formnovalidate>Cancel</button
+          ><button class="primary" value="ok">Save</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="settings-dialog">
+      <form method="dialog">
+        <h2>Project details</h2>
+        <label>Name<input id="edit-name" maxlength="100" /></label
+        ><label>Tags<input id="edit-tags" placeholder="Separate with commas" /></label>
+        <div class="tools">
+          <button type="button" id="duplicate">Duplicate</button
+          ><button type="button" id="archive">Archive</button>
+        </div>
+        <div class="tools">
+          <button value="cancel">Close</button
+          ><button id="save-project" type="button" class="primary">Save</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="mask-dialog">
+      <h2>Edit region</h2>
+      <p>Paint the area Walter may change. Clear areas keep their original pixels.</p>
+      <div class="mask-frame"><canvas id="mask-canvas"></canvas></div>
+      <div class="tools">
+        <label>Brush<input id="brush" type="range" min="1" max="24" value="6" /></label
+        ><button id="undo-mask">Undo</button><button id="invert-mask">Invert</button
+        ><button id="clear-mask">Clear</button><button id="mask-zoom">Zoom</button>
+      </div>
+      <div class="tools">
+        <button id="mask-close">Close</button
+        ><button id="mask-save" class="primary">Use mask</button>
+      </div>
+    </dialog>
+    <noscript
+      >The private studio requires JavaScript to load projects and submit local jobs.</noscript
+    >
+  </body>
+</html>

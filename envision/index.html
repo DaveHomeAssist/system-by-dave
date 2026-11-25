@@ -85,6 +85,13 @@
     <section id="saved" class="station secondary" role="tabpanel" aria-labelledby="tab-saved" tabindex="0" hidden>
       <div class="station-heading"><h2>Saved events</h2><button id="create-event" class="quiet" type="button">New event</button></div>
       <p class="muted">Saved in this browser.</p>
+      <a id="open-personal" class="button" hidden target="_blank" rel="noopener noreferrer">Open personal studio</a>
+      <details class="guide-details"><summary>Personal studio address</summary>
+        <form id="personal-address"><label for="personal-origin">Private HTTPS address</label>
+          <input id="personal-origin" type="url" maxlength="300" autocomplete="off" spellcheck="false">
+          <button type="submit">Save address</button>
+        </form>
+      </details>
       <p id="empty-saved" class="empty-saved">Save a brief from the Studio to reopen it here.</p>
       <ul id="saved-list" class="saved-list"></ul>
     </section>
