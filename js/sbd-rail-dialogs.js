@@ -441,9 +441,10 @@
         }
       }
       sections.forEach(function(sectionData){
-        var section=documentRef.createElement(phone&&sectionData.id!=='featured'?'details':'section');
+        if(phone&&sectionData.id==='featured') return;
+        var section=documentRef.createElement(phone?'details':'section');
         section.className='sbd-rail-dialog__section';
-        var title=textElement(documentRef,phone&&sectionData.id!=='featured'?'summary':'h3','sbd-rail-dialog__section-title',sectionData.label+(phone?' · '+sectionData.entries.length:''));
+        var title=textElement(documentRef,phone?'summary':'h3','sbd-rail-dialog__section-title',sectionData.label+(phone?' · '+sectionData.entries.length:''));
         title.setAttribute('id',prefix+sectionData.id+'Title');
         if(section.tagName!=='DETAILS') section.setAttribute('aria-labelledby',title.getAttribute('id'));
         var grid=documentRef.createElement('div');
