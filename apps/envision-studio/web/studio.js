@@ -17,7 +17,8 @@ const state = {
   request: 0,
   pending: new Map(),
   exports: new Map(),
-  dirty: false,
+  drafts: new Map(),
+  get dirty() { return this.drafts.size > 0; },
   presets: [],
 };
 const uuid = () => crypto.randomUUID();
@@ -120,6 +121,20 @@ async function named(title, value = '', type = false) {
 function mayLeave() {
   return !state.dirty || confirm('Discard the unsaved form changes?');
 }
+function trackDraft(input) {
+  const key = input.dataset.key ? 'field:' + input.dataset.key : input.id;
+  state.drafts.set(key, input.type === 'checkbox' ? input.checked : input.value);
+}
+function restoreDrafts() {
+  for (const [key, value] of state.drafts) {
+    const input = key.startsWith('field:')
+      ? $('fields').querySelector('[data-key="' + key.slice(6) + '"]')
+      : $(key);
+    if (!input) continue;
+    if (input.type === 'checkbox') input.checked = value;
+    else input.value = value;
+  }
+}
 async function dashboard() {
   const data = await api('/state'),
     changed = JSON.stringify(state.list) !== JSON.stringify(data.projects);
@@ -210,7 +225,7 @@ function displayTab(name) {
   if (state.project && !$('bench').hidden) preview();
 }
 async function tab(name) {
-  if (name !== state.tab && !mayLeave()) return;
+  if (name === state.tab || !mayLeave()) return;
   if (['create', 'library', 'layout'].includes(name) && !state.project) {
     const last = recall('envision.personal.last'),
       p =
@@ -223,7 +238,7 @@ async function tab(name) {
     return;
   }
   if (state.dirty) {
-    state.dirty = false;
+    state.drafts.clear();
     syncProject(true);
   }
   displayTab(name);
@@ -236,7 +251,7 @@ async function open(pid, tabName = 'create') {
   const p = await api('/projects/' + pid);
   if (token !== state.request) return;
   state.project = p;
-  state.dirty = false;
+  state.drafts.clear();
   state.version = p.data.selected || p.versions[0]?.id || null;
   state.stage = p.data.stages[0].id;
   for (const e of p.exports || [])
@@ -253,6 +268,7 @@ async function open(pid, tabName = 'create') {
   for (const id of ['composition', 'style-ref']) $(id).replaceChildren();
   $('library-search').value = '';
   $('format').value = 'source';
+  state.lastFormat = 'source';
   remember('envision.personal.last', pid);
   syncProject(true);
   displayTab(tabName);
@@ -264,25 +280,33 @@ async function reload(forms = false) {
   const id = state.project.id,
     seq = ++state.request,
     p = await api('/projects/' + id);
-  if (seq !== state.request || state.project?.id !== id) return;
+  if (seq !== state.request || state.project?.id !== id) return false;
   if (state.dirty && !forms && p.revision !== state.project.revision) {
+    state.project.versions = p.versions;
+    state.project.exports = p.exports;
+    syncProject(false);
     say('Project changed on another device. Save your edits or reopen the latest revision.', true);
-    return;
+    return true;
   }
   state.project = p;
   syncProject(forms);
+  return true;
 }
-async function edit(change) {
+async function edit(change, savedForm) {
   const p = state.project,
     d = structuredClone(p.data);
+  const submitted = [...state.drafts].filter(([key]) =>
+    savedForm === (key.startsWith('field:') ? 'fields' : 'layer'));
   change(d);
   const out = await api('/projects/' + p.id, {
     method: 'PATCH',
     body: { revision: p.revision, data: d },
   });
   if (state.project?.id !== p.id) return;
-  state.project = { ...p, ...out };
-  state.dirty = false;
+  state.project = { ...state.project, ...out };
+  for (const [key, value] of submitted) {
+    if (state.drafts.get(key) === value) state.drafts.delete(key);
+  }
   syncProject(true);
   say('Saved revision ' + out.revision + '.');
   await dashboard();
@@ -324,6 +348,7 @@ function syncProject(forms) {
     );
     layerForm();
     fieldsForm();
+    restoreDrafts();
   }
   library();
   exportList();
@@ -391,7 +416,8 @@ function operation() {
   $('finish-controls').hidden = op !== 'finish';
   $('mask-actions').hidden = !['mask', 'finish'].includes(op);
   $('generate').textContent = op === 'finish' ? 'Apply local finish' : 'Generate on Walter';
-  $('mask-state').textContent = state.mask
+  const source = (op === 'finish' ? '' : $('starting').value) || state.version;
+  $('mask-state').textContent = state.mask && state.maskParent === source
     ? 'Edit region saved.'
     : op === 'finish'
       ? 'The finish applies to the whole image until you paint a region.'
@@ -496,7 +522,7 @@ function fieldsForm() {
     input.maxLength = 800;
     if (key === 'copy') input.maxLength = 1600;
     if (['starts', 'ends'].includes(key)) input.type = 'datetime-local';
-    input.addEventListener('input', () => (state.dirty = true));
+    input.addEventListener('input', () => trackDraft(input));
     l.append(input);
     return l;
   });
@@ -916,7 +942,7 @@ act(
       $('stage').value = state.stage;
       return;
     }
-    state.dirty = false;
+    state.drafts.clear();
     state.stage = $('stage').value;
     state.layer = null;
     syncProject(true);
@@ -930,9 +956,10 @@ act(
       $('layer').value = state.layer;
       return;
     }
-    state.dirty = false;
+    state.drafts.clear();
     state.layer = $('layer').value;
     layerForm();
+    fieldsForm();
   },
   'change',
 );
@@ -943,9 +970,10 @@ act(
       $('format').value = state.lastFormat || 'source';
       return;
     }
-    state.dirty = false;
+    state.drafts.clear();
     state.lastFormat = $('format').value;
     layerForm();
+    fieldsForm();
     preview();
   },
   'change',
@@ -974,10 +1002,13 @@ for (const k of [
   'crop-y',
   'locked',
 ]) {
-  $(k).addEventListener('input', () => (state.dirty = true));
+  $(k).addEventListener('input', () => trackDraft($(k)));
 }
 $('binding').onchange = () => {
-  if ($('binding').value) $('wording').value = state.project.data.fields[$('binding').value];
+  if ($('binding').value) {
+    $('wording').value = state.project.data.fields[$('binding').value];
+    trackDraft($('wording'));
+  }
 };
 act($('save-layer'), () =>
   edit((d) => {
@@ -1000,7 +1031,7 @@ act($('save-layer'), () =>
         cfg.boxes[l.id] = b;
     }
     l.locked = $('locked').checked;
-  }),
+  }, 'layer'),
 );
 fileInput('replace-logo', async (f) => {
   const r = await loadAsset(f, 'logo');
@@ -1010,7 +1041,8 @@ fileInput('replace-logo', async (f) => {
 act($('clear-logo'), () => saveMark(null));
 act($('add-layer'), async () => {
   const label = await named('New layer');
-  if (!label) return;
+  if (!label || !mayLeave()) return;
+  state.drafts.clear();
   const id = uuid();
   state.layer = id;
   await edit((d) =>
@@ -1042,17 +1074,18 @@ act($('add-field'), async () => {
     for (const input of $('fields').querySelectorAll('input'))
       d.fields[input.dataset.key] = input.value;
     d.fields[key] = '';
-  });
+  }, 'fields');
 });
 act($('save-fields'), () =>
   edit((d) => {
     for (const input of $('fields').querySelectorAll('input'))
       d.fields[input.dataset.key] = input.value;
-  }),
+  }, 'fields'),
 );
 act($('new-stage'), async () => {
   const name = await named('Duplicate stage', stage().name + ' copy');
-  if (!name) return;
+  if (!name || !mayLeave()) return;
+  state.drafts.clear();
   const s = structuredClone(stage());
   s.name = name;
   s.id = uuid();
@@ -1061,7 +1094,8 @@ act($('new-stage'), async () => {
 });
 fileInput('stage-file', async (f) => {
   const name = await named('Stage name', f.name.replace(/(?:\.flyer)?\.json$/i, ''));
-  if (!name) return;
+  if (!name || !mayLeave()) return;
+  state.drafts.clear();
   const form = new FormData();
   form.append('file', f);
   form.append('stage', name);
@@ -1117,6 +1151,7 @@ window.addEventListener('beforeunload', (e) => {
 
 // The edit map stays in source pixel coordinates. The overlay is display-only.
 let maskBase = null,
+  editingMaskParent = null,
   maskMap = null,
   history = [],
   painting = false,
@@ -1167,7 +1202,7 @@ act($('paint-mask'), async () => {
     for (let i = 0; i < data.data.length; i += 4) data.data[i + 3] = data.data[i];
     mc.putImageData(data, 0, 0);
   }
-  state.maskParent = id;
+  editingMaskParent = id;
   redrawMask();
   $('mask-dialog').showModal();
 });
@@ -1233,6 +1268,7 @@ act($('invert-mask'), () => {
 act($('mask-zoom'), () => cv.parentElement.classList.toggle('zoom'));
 act($('mask-close'), () => $('mask-dialog').close());
 act($('mask-save'), async () => {
+  const parent = editingMaskParent, pid = state.project.id;
   const out = element('canvas');
   out.width = cv.width;
   out.height = cv.height;
@@ -1243,7 +1279,9 @@ act($('mask-save'), async () => {
   const blob = await new Promise((resolve) => out.toBlob(resolve, 'image/png'));
   if (!blob) throw Error('Could not encode mask.');
   const r = await loadAsset(new File([blob], 'Edit region.png', { type: 'image/png' }), 'mask');
+  if (state.project.id !== pid || editingMaskParent !== parent) return;
   state.mask = r.hash;
+  state.maskParent = parent;
   $('mask-dialog').close();
   operation();
   say('Mask saved. Clear pixels are protected.');
@@ -1257,10 +1295,11 @@ async function tick() {
     await dashboard();
     if (state.tab === 'queue') await queueView();
     let update = false;
+    const finishedJobs = [], finishedExports = [];
     for (const [id, pid] of [...state.pending]) {
       const j = await api('/jobs/' + id);
       if (['succeeded', 'failed', 'cancelled'].includes(j.state)) {
-        state.pending.delete(id);
+        finishedJobs.push(id);
         if (state.project?.id === pid) {
           update = true;
           if (j.result && !state.dirty) state.version = j.result;
@@ -1274,12 +1313,14 @@ async function tick() {
     for (const [id, pid] of [...state.exports]) {
       const x = await api('/exports/' + id);
       if (!['queued', 'running'].includes(x.state)) {
-        state.exports.delete(id);
+        finishedExports.push(id);
         update ||= state.project?.id === pid;
         say(x.error || 'Export ready.', !!x.error);
       }
     }
-    if (update && !state.dirty) await reload();
+    if (update && !(await reload())) return;
+    for (const id of finishedJobs) state.pending.delete(id);
+    for (const id of finishedExports) state.exports.delete(id);
   } catch (err) {
     say(err.message, true);
   } finally {

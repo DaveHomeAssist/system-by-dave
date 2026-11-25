@@ -101,10 +101,17 @@ async function main() {
     await p.getByText('Event fields', { exact: true }).click();
     const field = p.locator('#fields input[data-key="slot8"]');
     await field.fill('18 MAR 2027   /   DOORS AT 08:30');
+    const wording = p.locator('#wording');
+    await wording.fill('Doors draft one');
+    await p.locator('#save-layer').click();
+    await p.waitForFunction(r => document.getElementById('message').textContent.includes('Saved revision ' + r), before.revision + 1);
+    assert.equal(await field.inputValue(), '18 MAR 2027   /   DOORS AT 08:30');
+    await wording.fill('Doors draft two');
     await p.locator('#save-fields').click();
-    await p.waitForFunction(() =>
-      document.getElementById('message').textContent.includes('Saved revision'),
-    );
+    await p.waitForFunction(r => document.getElementById('message').textContent.includes('Saved revision ' + r), before.revision + 2);
+    assert.equal(await wording.inputValue(), 'Doors draft two');
+    await p.locator('#save-layer').click();
+    await p.waitForFunction(r => document.getElementById('message').textContent.includes('Saved revision ' + r), before.revision + 3);
     const after = await get('/projects/' + copy.id);
     assert(after.revision > before.revision);
     assert.equal(after.data.background, before.data.background);
@@ -125,11 +132,16 @@ async function main() {
     );
     await p.locator('#output-formats input[value="lobby"]').check();
     await p.locator('#make-export').click();
+    await field.fill('Next doors draft');
     await p
       .locator('#export-list')
       .getByRole('button', { name: 'Package ZIP' })
       .first()
       .waitFor({ timeout: 45000 });
+    assert.equal(await field.inputValue(), 'Next doors draft');
+    await p.locator('#save-fields').click();
+    await p.waitForFunction(r => document.getElementById('message').textContent.includes('Saved revision ' + r), after.revision + 2);
+    result.preservedDrafts = true;
     const packPromise = p.waitForEvent('download');
     await p.locator('#export-list').getByRole('button', { name: 'Package ZIP' }).first().click();
     const pack = await packPromise;
@@ -155,6 +167,21 @@ async function main() {
     result.stageCount = done.data.stages.length;
     result.layoutJobsCreated = 0;
     result.outputSizes = done.exports[0].files.map((f) => f.size);
+    await p.getByRole('button', {name:'Create',exact:true}).click();
+    await p.locator('#operation').selectOption('finish');
+    await p.locator('#paint-mask').click();
+    await p.locator('#invert-mask').click();
+    await p.locator('#mask-save').click();
+    await p.locator('#mask-dialog').waitFor({state:'hidden'});
+    await p.getByRole('button', {name:'Library',exact:true}).click();
+    await p.locator('#versions .version:not(.active)').filter({hasText:'Imported background'}).first().click();
+    await p.getByRole('button', {name:'Create',exact:true}).click();
+    await p.locator('#paint-mask').click();
+    await p.locator('#mask-close').click();
+    await p.locator('#generate').click();
+    await p.waitForFunction(() => document.getElementById('message').textContent.includes('Local finish saved'));
+    const finish = (await get('/projects/' + copy.id)).versions.find(v => v.role === 'finish');
+    assert(finish);assert.equal(finish.recipe.mask,null);result.cancelledMaskPreservedSource=true;
     if (process.env.ENVISION_RENDER_TRIAL === '1') {
       await p.getByRole('button', { name: 'Projects', exact: true }).click();
       await p.locator('#new-project').click();
