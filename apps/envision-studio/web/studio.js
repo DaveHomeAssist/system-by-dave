@@ -112,7 +112,10 @@ async function download(route) {
   const utf = header.match(/filename\*=UTF-8''([^;]+)/i);
   const plain = header.match(/filename="?([^";]+)"?/i);
   const name = utf ? decodeURIComponent(utf[1]) : plain?.[1] || 'Envision';
-  const url = URL.createObjectURL(await res.blob());
+  saveBlob(await res.blob(), name);
+}
+function saveBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
   const link = element('a');
   link.href = url;
   link.download = name;
@@ -230,6 +233,7 @@ function routeFor(name) {
 }
 function displayTab(name, refresh = true) {
   if ($('direction-dialog').open) $('direction-dialog').close();
+  if ($('web-dialog').open) $('web-dialog').close();
   if (name === 'layout' && state.tab !== name) {
     state.compare = false;
     state.flipped = false;
@@ -1153,6 +1157,8 @@ act($('revise-art'), () => {
   operation();
 });
 act($('download-art'), () => download(path('/versions/' + librarySelection().id + '/png')));
+const webExporter = createWebExporter(saveBlob);
+act($('web-export'), () => webExporter(state.project, librarySelection()));
 act(
   $('stage'),
   () => {
