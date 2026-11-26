@@ -10,13 +10,21 @@ The first release targets Dave's Apple Silicon Mac. Build it with the macOS Comm
 
 The Generate screen should let Dave repeat a studio render without finding its recipe in another view. Recall the selected artwork's prompt, a saved project brief or the prompt for the included optical sample. Verify replacement and cancellation on an existing draft. Display the engine time only when the worker recorded it.
 
+## Comparing generated artwork
+
+Generate should send the chosen render into Compare without a Save or Open dialog. The user can pair a revision with its original, choose a different candidate from the same project, or place an image on one side of an existing comparison. Studio copies stay in the Mac app’s private support directory so the comparison reopens offline. Compare retains existing local file selections and displays recorded dimensions, model and render time when available.
+
+Use a pair of Walter renders to illustrate the workflow on a fresh offline installation. Verify the actual artwork bytes, the selected sides after relaunch, an interrupted pair download, existing local files and a change of project during a transfer. Generation, project storage on Dominic and the portable project formats keep their existing contracts.
+
 ## Using the app
 
 Open **Generate**, select an image project or create one, then enter a prompt. Choose a canvas size and number of images. The reference and advanced controls also support revising an existing image and choosing a seed. **Generate on Walter** submits the batch. Generated candidates appear in the project gallery. Choose **Save PNG** to export the selected image.
 
 **Recall prompt** offers the project brief, selected artwork prompt and studio sample as available. It fills the prompt editor and asks before replacing a draft. The artwork dimensions include Walter's engine time when recorded. The canvas, references and seed keep their current settings.
 
-Open **Studio** for the complete private workspace, including region edits, the job queue and editable project imports and exports. **Compare** opens two local PNG, JPEG or WebP files. Use **Phone** to check the art at a logical width of 375 points.
+Choose **Compare** beneath a render to see its original on the left and the selected revision on the right. With a new render, Compare uses the previous distinct artwork when available. Open the arrow beside Compare to pick any other artwork in the project or replace a single side. The app saves these images on this Mac and shows each available model and engine time below the image.
+
+Open **Compare** in the sidebar to return to the saved pair while offline. **Open images** accepts local PNG, JPEG and WebP files. Use **Phone** to check the art at a logical width of 375 points. An empty comparison offers **Open sample pair**. Open **Studio** for region edits, the job queue and editable project imports and exports.
 
 Use **File > Open** with a brief exported from the public Envision prompt builder. The Mac opens **Generate** with the imported prompt in its new project. A layered flyer or editable project package opens in **Studio** on **Layout**.
 
@@ -28,8 +36,10 @@ Use **File > Open** with a brief exported from the public Envision prompt builde
 | --- | --- | --- |
 | Aperture | App icon | 512 × 512, seed 241107 |
 | Refraction | Sample on an empty generation canvas | 768 × 432, seed 921065 |
+| Daylight study | Compare sample, original | 768 × 432, seed 826410, 21.946 s |
+| Tungsten revision | Compare sample, revised lighting | 768 × 432, seed 826422, 11.636 s |
 
-Both use the studio’s SDXL Turbo profile and four steps. The original candidate images, prompts, and revisions are available in the private **Envision Desktop Artwork** project.
+The artwork uses the studio’s SDXL Turbo profile and four steps. The original candidate images, prompts and revisions are available in the private **Envision Desktop Artwork** project.
 
 ## Build and connect
 
@@ -37,6 +47,12 @@ Run this from the repository root on an Apple Silicon Mac with the Command Line 
 
 ```sh
 bash apps/envision-mac/build.sh /tmp/envision-mac-build
+```
+
+Run the comparison regression checks on an Apple Silicon Mac.
+
+```sh
+bash apps/envision-mac/test-comparison.sh
 ```
 
 Copy **Envision Studio.app** from the output directory into your Applications folder. In the app, open **Connection**, enter the private HTTPS studio address including the port, and connect over Tailscale. Local builds use ad hoc signing. The ZIP contains the same application bundle. A fresh installation needs the private address from its owner. Offline comparison reads files directly on the Mac.

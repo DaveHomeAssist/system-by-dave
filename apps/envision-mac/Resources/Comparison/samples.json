@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Daylight study",
+    "project": "Envision Desktop Artwork",
+    "model": "SDXL Turbo",
+    "engineSeconds": 21.946,
+    "width": 768,
+    "height": 432,
+    "hash": "0c9a77e40a737affb303185c7509f64120605952394f84872217598f054305b0"
+  },
+  {
+    "title": "Tungsten revision",
+    "project": "Envision Desktop Artwork",
+    "model": "SDXL Turbo",
+    "engineSeconds": 11.636,
+    "width": 768,
+    "height": 432,
+    "hash": "4f614bdbbaedd2e793b6c8e50edc5ca2a225129229f74c1c0e3a38c39338610d"
+  }
+]

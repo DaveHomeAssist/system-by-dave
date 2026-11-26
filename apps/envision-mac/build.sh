@@ -21,6 +21,7 @@ trap cleanup EXIT
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$stage/Envision.iconset"
 cp Resources/Info.plist "$app/Contents/Info.plist"
 cp Resources/Refraction.png "$app/Contents/Resources/"
+cp -R Resources/Comparison "$app/Contents/Resources/"
 revision=$(git rev-parse HEAD)
 if [[ -n "$(git status --porcelain -- .)" ]]; then revision="$revision-dev"; fi
 /usr/libexec/PlistBuddy -c "Add :EnvisionSourceRevision string $revision" "$app/Contents/Info.plist"

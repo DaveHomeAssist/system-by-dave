@@ -179,18 +179,19 @@ struct GenerateView: View {
                         } else { Image(systemName: "camera.aperture").font(.system(size: 64)).foregroundStyle(.secondary) }
                     }.frame(maxWidth: .infinity, maxHeight: .infinity)
                     if let art = model.selected {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(art.label).lineLimit(2).help(art.label)
-                                HStack(spacing: 8) {
-                                    Text("\(art.width) × \(art.height)")
-                                    if let seconds = art.recipe?.engineSeconds {
-                                        Text("Render \(seconds.formatted(.number.precision(.fractionLength(1)))) s")
-                                    }
-                                }.font(.caption.monospacedDigit()).foregroundStyle(.secondary)
-                            }
-                            Spacer()
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(art.label).lineLimit(2).help(art.label)
+                            HStack(spacing: 8) {
+                                Text("\(art.width) × \(art.height)")
+                                if let seconds = art.recipe?.engineSeconds {
+                                    Text("Render \(seconds.formatted(.number.precision(.fractionLength(1)))) s")
+                                }
+                            }.font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                        }
+                        HStack(spacing: 8) {
+                            compareMenu(art)
                             Button("Revise this") { model.draft.starting = art.id; refsOpen = true }
+                            Spacer(minLength: 0)
                             Button("Save PNG…") { Task { await model.savePNG() } }
                         }.disabled(model.busy || !model.reachable)
                     } else {
@@ -214,5 +215,35 @@ struct GenerateView: View {
                 }.padding(.leading, 14).frame(minWidth: 315)
             }
         }.padding(20)
+    }
+
+    private func compareMenu(_ art: Artwork) -> some View {
+        let partner = model.comparisonPartner(for: art)
+        let options = model.artworks.filter { $0.id != art.id }
+        return Menu {
+            if let partner {
+                Button(partner.id == art.originalID ? "With original" : "With previous artwork") {
+                    Task { await model.compareRenders([partner, art]) }
+                }
+            }
+            if !options.isEmpty {
+                Menu("Choose another artwork") {
+                    ForEach(options) { other in
+                        Button(other.label) { Task { await model.compareRenders([other, art]) } }
+                    }
+                }
+                Divider()
+            }
+            Button("Use as left image") { Task { await model.compareRenders([art], slot: 0) } }
+            Button("Use as right image") { Task { await model.compareRenders([art], slot: 1) } }
+        } label: {
+            Label("Compare", systemImage: "rectangle.split.2x1")
+        } primaryAction: {
+            if let partner { Task { await model.compareRenders([partner, art]) } }
+            else { Task { await model.compareRenders([art]) } }
+        }
+        .fixedSize()
+        .accessibilityLabel("Compare artwork")
+        .help(partner.map { "Compare with " + $0.label } ?? "Add this artwork to the local comparison")
     }
 }

@@ -1,8 +1,9 @@
 # Changelog
 
-## November 26, 2026. Recipe Journal mirror
+## November 26, 2026. Envision Mac render comparisons
 
-- Browse the live public Recipe Journal at `/recipes/`. The full Journal opens separately for family sign-in and Kitchen.
+- Compare a generated revision with its original directly from the canvas, choose a different candidate, or replace one side. The Mac saves the selected pixels and their render details for offline use.
+- Compare includes two Walter renders of the same optical cube under daylight and tungsten lighting. Local image files and phone width remain available.
 
 ## November 26, 2026. Prompt Library image exports
 
@@ -47,6 +48,10 @@
 ## November 26, 2026. Envision editable exports
 
 - The private studio now asks you to save pending layer and event field edits before downloading an editable project ZIP or legacy flyer.
+
+## November 26, 2026. Recipe Journal mirror
+
+- Browse the live public Recipe Journal at `/recipes/`. The full Journal opens separately for family sign-in and Kitchen.
 
 ## November 25, 2026. AV console menus: Featured, Show tools and Learn
 
