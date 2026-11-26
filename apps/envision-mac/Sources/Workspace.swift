@@ -31,7 +31,7 @@ struct PromptReplacement: Identifiable {
 
 @MainActor final class Workspace: ObservableObject {
     static let shared = Workspace()
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
     @Published private(set) var client: StudioClient?
     @Published var area: WorkArea = .generate
     @Published var connectionSheet = false
@@ -51,11 +51,13 @@ struct PromptReplacement: Identifiable {
     @Published var issue: String?
     @Published var studioURL: URL?
     @Published var studioNavigation = 0
-    @Published var comparison = Comparison()
+    @Published var comparison: Comparison
     private var updating = false
     private var lastResult: String?
 
-    init() {
+    init(defaults: UserDefaults = .standard, comparisonStorage: ComparisonStorage = .onThisMac) {
+        self.defaults = defaults
+        comparison = Comparison(defaults: defaults, storage: comparisonStorage)
         if let saved = defaults.string(forKey: "StudioOrigin"), let origin = try? StudioOrigin(saved) {
             activate(origin)
         } else {
@@ -242,6 +244,78 @@ struct PromptReplacement: Identifiable {
         busy = false
         await refreshArt()
     }
+
+    func comparisonPartner(for art: Artwork) -> Artwork? {
+        if let parent = art.originalID, let original = artworks.first(where: { $0.id == parent && $0.id != art.id }) {
+            return original
+        }
+        guard let index = artworks.firstIndex(where: { $0.id == art.id }) else { return nil }
+        return artworks.dropFirst(index + 1).first { $0.hash != art.hash }
+    }
+
+    func compareRenders(_ items: [Artwork], slot: Int? = nil) async {
+        guard let api = client, let project = activeProject, let current = selected,
+              items.last?.id == current.id, items.allSatisfy({ item in artworks.contains { $0.id == item.id } })
+        else { return }
+        let details = items.map { RenderDetails(title: $0.label, project: project.name,
+                                                model: $0.recipe?.model, engineSeconds: $0.recipe?.engineSeconds,
+                                                width: $0.width, height: $0.height, hash: $0.hash) }
+        await fillComparison(details, slot: slot, current: {
+            self.client === api && self.projectID == project.id && self.area == .generate && self.selectedID == current.id
+        }) { index in
+            try await api.image(project: project.id, artwork: items[index])
+        }
+    }
+
+    func openComparisonSamples() async {
+        guard let url = Bundle.main.url(forResource: "samples", withExtension: "json", subdirectory: "Comparison") else {
+            issue = "The sample comparison is missing from the app."
+            return
+        }
+        do {
+            let details = try JSONDecoder().decode([RenderDetails].self, from: Data(contentsOf: url))
+            guard details.count == 2 else { throw StudioError("The sample pair is incomplete.") }
+            let files = ["Daylight.png", "Tungsten.png"].map { url.deletingLastPathComponent().appendingPathComponent($0) }
+            await fillComparison(details, slot: nil, current: { self.area == .compare }) { index in
+                try Data(contentsOf: files[index], options: .mappedIfSafe)
+            }
+        } catch { issue = error.localizedDescription }
+    }
+
+    func fillComparison(_ details: [RenderDetails], slot: Int?, current: () -> Bool,
+                        read: (Int) async throws -> Data) async {
+        guard !busy, current(), (1...2).contains(details.count) else { return }
+        busy = true
+        let revision = comparison.revision
+        let storage = comparison.storage
+        var images: [LocalArtwork] = []
+        var created: [LocalArtwork] = []
+        defer {
+            for image in created { storage.discard(image) }
+            busy = false
+        }
+        do {
+            for (index, entry) in details.enumerated() {
+                guard current(), comparison.revision == revision, !Task.isCancelled else { return }
+                if let cached = comparison.slots.compactMap({ $0 }).first(where: { $0.details == entry }),
+                   let copy = await Task.detached(priority: .userInitiated, operation: { try? storage.load(cached.url) }).value {
+                    images.append(copy)
+                } else {
+                    let bytes = try await read(index)
+                    let image = try await Task.detached(priority: .userInitiated) { try storage.snapshot(bytes, details: entry) }.value
+                    created.append(image)
+                    images.append(image)
+                }
+            }
+            guard current(), comparison.revision == revision, !Task.isCancelled else { return }
+            try comparison.replace(images, slot: slot)
+            created.removeAll()
+            area = .compare
+        } catch {
+            if current(), !Task.isCancelled { issue = error.localizedDescription }
+        }
+    }
+
     func savePNG() async {
         guard let api = client, let artwork = selected, !busy else { return }
         busy = true

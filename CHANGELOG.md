@@ -1,5 +1,10 @@
 # Changelog
 
+## November 26, 2026. Envision Mac render comparisons
+
+- Compare a generated revision with its original directly from the canvas, choose a different candidate, or replace one side. The Mac saves the selected pixels and their render details for offline use.
+- Compare includes two Walter renders of the same optical cube under daylight and tungsten lighting. Local image files and phone width remain available.
+
 ## November 26, 2026. Prompt Library image exports
 
 - Open an image prompt to copy it or export a named brief for Envision. The Urban Architecture entry includes a render made from its exact prompt.
