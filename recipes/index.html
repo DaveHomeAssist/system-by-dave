@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Recipe Journal | System by Dave</title>
+  <meta name="description" content="Browse the live Recipe Journal, including seasonal collections and recipes grouped by cuisine.">
+  <meta name="theme-color" content="#f6f4ec">
+  <link rel="canonical" href="https://davehomeassist.github.io/recipe-tracker/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Recipe Journal">
+  <meta property="og:description" content="Browse the Recipe Journal and its seasonal collections.">
+  <meta property="og:url" content="https://systembydave.com/recipes/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Recipe Journal">
+  <meta name="twitter:description" content="Browse the Recipe Journal and its seasonal collections.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src https://davehomeassist.github.io; style-src 'self' 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sbd-public-nav.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 0; height: 100dvh; margin: 0; }
+    .recipe-top { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; column-gap: 1rem; padding: 4px clamp(8px, 2vw, 24px); border-bottom: 1px solid currentColor; }
+    .recipe-top .sbd-site-return { position: static; margin: 0; padding: 0; }
+    .recipe-top a { display: inline-flex; align-items: center; min-height: 44px; }
+    .recipe-full { font-weight: 700; padding-inline: .5rem; }
+    .recipe-main { flex: 1; width: 100%; min-height: 0; display: flex; }
+    .recipe-main iframe { width: 100%; min-height: 0; flex: 1; border: 0; }
+    .recipe-main:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to recipes</a>
+  <header class="recipe-top">
+    <nav class="sbd-site-return" aria-label="Location">
+      <a href="/">System by Dave</a>
+      <a href="/tools.html">Tools</a>
+      <span class="sbd-site-return__current" aria-current="page">Recipe Journal</span>
+    </nav>
+    <a class="recipe-full" href="https://davehomeassist.github.io/recipe-tracker/" rel="noopener noreferrer">Open full Journal</a>
+  </header>
+  <main id="main" class="recipe-main" tabindex="-1">
+    <iframe title="Recipe Journal public reader" src="https://davehomeassist.github.io/recipe-tracker/index.html?embed=public" credentialless sandbox="allow-same-origin allow-scripts allow-modals allow-popups allow-popups-to-escape-sandbox">
+      <a href="https://davehomeassist.github.io/recipe-tracker/" rel="noopener noreferrer">Browse the Recipe Journal</a>
+    </iframe>
+  </main>
+</body>
+</html>

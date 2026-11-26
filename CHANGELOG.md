@@ -49,6 +49,10 @@
 
 - The private studio now asks you to save pending layer and event field edits before downloading an editable project ZIP or legacy flyer.
 
+## November 26, 2026. Recipe Journal mirror
+
+- Browse the live public Recipe Journal at `/recipes/`. The full Journal opens separately for family sign-in and Kitchen.
+
 ## November 25, 2026. AV console menus: Featured, Show tools and Learn
 
 - The Rail on `/av/` is Search, Workspace, Featured, Departments, Show tools, Reference, Learn, then All apps and Customize. Featured is Throwline, LED Wall Calculator, Signal Flow, the Console Spec Guide and AV Calculator. Saved `sbd.rail.v1` pins are unchanged.

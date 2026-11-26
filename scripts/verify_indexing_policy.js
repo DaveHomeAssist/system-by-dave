@@ -99,7 +99,8 @@ const fieldKitListed = sitemapRoutes.has('/field-kit/');
 // Rehearsal Capture adds three noindex pages: the avbydave.com route rehearsal-capture/,
 // the run-review/ forward from its first address, and its pinned upstream viewer under
 // apps/rehearsal-capture/upstream/ (docs/rehearsal-capture.md, 2026-11-26).
-const expectedUnlisted = fieldKitListed ? 227 : 228;
+// The public Recipe Journal mirror is intentionally outside the sitemap.
+const expectedUnlisted = fieldKitListed ? 228 : 229;
 if (unlisted.length !== expectedUnlisted) fail(`Expected ${expectedUnlisted} tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;
