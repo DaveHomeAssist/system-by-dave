@@ -27,6 +27,13 @@ try {
  await page.locator('dialog[open]').getByRole('button',{name:'Add device',exact:true}).click();
  // Gear choices: device types, then the Gear Reference library. One fills the name and role; a typed name is kept.
  const addDevice=page.getByRole('dialog',{name:'Add device',exact:true});
+ // One top bar: the title and its only close. No second Cancel at the bottom.
+ assert.equal(await addDevice.getByRole('button',{name:'Cancel',exact:true}).count(),0);
+ await addDevice.locator('header').getByRole('button',{name:'Close',exact:true}).click();
+ await addDevice.waitFor({state:'hidden'});
+ await page.getByRole('button',{name:/^Diagram/}).click();
+ await page.locator('dialog[open]').getByRole('button',{name:/^Devices/}).click();
+ await page.locator('dialog[open]').getByRole('button',{name:'Add device',exact:true}).click();
  const gear=addDevice.getByLabel('Gear'), deviceName=addDevice.getByLabel('Device name',{exact:true}), deviceRole=addDevice.getByLabel('Device role');
  await gear.locator('optgroup[label^="Gear Reference"] option').first().waitFor({state:'attached'});
  assert.deepEqual(await gear.locator('optgroup').evaluateAll(groups=>groups.slice(0,4).map(group=>group.label)),['Sources','Converters','Routing and processing','Destinations']);
