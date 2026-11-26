@@ -204,6 +204,79 @@ try {
   assert.equal(await page.locator('.sbd-rail__all').count(), 1);
   assert.equal(await page.locator('.sbd-rail__customize').count(), 1);
 
+  async function railIconReport() {
+    return page.locator('.sbd-rail__entry').evaluateAll(entries => entries.map(entry => ({
+      ref: entry.getAttribute('data-rail-ref'),
+      paths: Array.from(entry.querySelectorAll('.sbd-rail__icon path')).map(path => path.getAttribute('d')).join('|')
+    })));
+  }
+  function assertUniqueRailIcons(signatures) {
+    const seen = new Map();
+    for (const item of signatures) {
+      assert.ok(item.paths, `${item.ref} has an icon`);
+      assert.equal(seen.has(item.paths), false, `${item.ref} shares an icon with ${seen.get(item.paths)}`);
+      seen.set(item.paths, item.ref);
+    }
+  }
+  assertUniqueRailIcons(await railIconReport());
+
+  await page.setViewportSize({ width: 1280, height: 1400 });
+  const collapsed = await page.evaluate(() => {
+    const rail = document.querySelector('.sbd-rail').getBoundingClientRect();
+    const badges = Array.from(document.querySelectorAll('.sbd-rail__badge')).map(badge => {
+      const box = badge.getBoundingClientRect();
+      const tile = badge.closest('.sbd-rail__entry').getBoundingClientRect();
+      const style = getComputedStyle(badge);
+      return {
+        text: badge.textContent,
+        clip: style.clipPath,
+        position: style.position,
+        insideTile: box.left >= tile.left - 1 && box.right <= tile.right + 1 && box.top >= tile.top - 1 && box.bottom <= tile.bottom + 1,
+        insideRail: box.left >= rail.left - 1 && box.right <= rail.right + 1,
+        readable: box.width > 8 || box.height > 8
+      };
+    });
+    const sections = Array.from(document.querySelectorAll('.sbd-rail__section')).map(section => getComputedStyle(section).borderTopWidth);
+    return { badges, sections, railWidth: rail.width, headingsVisible: Array.from(document.querySelectorAll('.sbd-rail__heading')).some(heading => getComputedStyle(heading).display !== 'none') };
+  });
+  assert.ok(collapsed.railWidth <= 57, 'collapsed rail stays within the icon column');
+  assert.equal(collapsed.headingsVisible, false);
+  assert.ok(collapsed.badges.some(badge => badge.text === 'GUIDE'));
+  assert.ok(collapsed.badges.some(badge => badge.text === '$12'));
+  for (const badge of collapsed.badges) {
+    assert.equal(badge.position, 'absolute', badge.text);
+    assert.notEqual(badge.clip, 'none', badge.text);
+    assert.equal(badge.readable, false, `${badge.text} stays clipped`);
+    assert.equal(badge.insideTile, true, `${badge.text} stays inside its tile`);
+    assert.equal(badge.insideRail, true, `${badge.text} stays inside the rail`);
+  }
+  assert.equal(collapsed.sections[0], '0px');
+  assert.ok(collapsed.sections.slice(1).every(width => width === '1px'), 'collapsed sections are separated');
+  assertUniqueRailIcons(await railIconReport());
+
+  await page.setViewportSize({ width: 1600, height: 1400 });
+  const expanded = await page.evaluate(() => {
+    const badges = Array.from(document.querySelectorAll('.sbd-rail__badge')).map(badge => ({
+      text: badge.textContent,
+      clip: getComputedStyle(badge).clipPath,
+      position: getComputedStyle(badge).position,
+      width: badge.getBoundingClientRect().width
+    }));
+    const sections = Array.from(document.querySelectorAll('.sbd-rail__section')).map(section => getComputedStyle(section).borderTopWidth);
+    return {
+      badges,
+      sections,
+      railWidth: document.querySelector('.sbd-rail').getBoundingClientRect().width,
+      headings: Array.from(document.querySelectorAll('.sbd-rail__heading')).map(heading => heading.textContent)
+    };
+  });
+  assert.ok(expanded.railWidth >= 224, 'wide rail shows labels');
+  assert.deepEqual(expanded.headings, ['Featured', 'Departments', 'Show tools', 'Reference', 'Learn']);
+  assert.ok(expanded.badges.some(badge => badge.text === 'GUIDE' && badge.width > 8 && badge.clip === 'none'));
+  assert.ok(expanded.badges.some(badge => badge.text === '$12' && badge.width > 8 && badge.clip === 'none'));
+  assert.ok(expanded.sections.every(width => width === '0px'), 'wide rail does not add collapsed dividers');
+  await page.setViewportSize({ width: 1440, height: 900 });
+
   await page.evaluate(key => localStorage.setItem(key, '{broken'), railKey);
   await page.reload();
   await page.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();

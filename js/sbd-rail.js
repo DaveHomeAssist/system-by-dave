@@ -11,8 +11,43 @@
     all:['M3.4 3.4h3.2v3.2H3.4z','M10.4 3.4h3.2v3.2h-3.2z','M17.4 3.4h3.2v3.2h-3.2z','M3.4 10.4h3.2v3.2H3.4z','M10.4 10.4h3.2v3.2h-3.2z','M17.4 10.4h3.2v3.2h-3.2z','M3.4 17.4h3.2v3.2H3.4z','M10.4 17.4h3.2v3.2h-3.2z','M17.4 17.4h3.2v3.2h-3.2z'],
     customize:['M4 21v-7','M4 10V3','M12 21v-9','M12 8V3','M20 21v-5','M20 12V3','M2 14h4','M10 8h4','M18 16h4'],
     tool:['M4 4h16v16H4z','M8 9h8','M8 13h5'],
-    external:['M10 5H5v14h14v-5','M13 3h8v8','M21 3 11 13']
+    external:['M10 5H5v14h14v-5','M13 3h8v8','M21 3 11 13'],
+    throwline:['M3 5h18v10H3z','M8 19h8','M12 15v4','M9 9h6'],
+    ledwall:['M3 3h8v8H3z','M13 3h8v8h-8z','M3 13h8v8H3z','M13 13h8v8h-8z'],
+    flow:['M6 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z','M6 15a3 3 0 1 0 0 6 3 3 0 0 0 0-6z','M18 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z','M8.5 6.5l7 4','M8.5 17.5l7-4'],
+    book:['M4 19.5A2.5 2.5 0 0 1 6.5 17H20','M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'],
+    teleprompter:['M3 6h18v10H3z','M8 20h8','M12 16v4','M7 10h10','M7 13h6'],
+    clock:['M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z','M12 6v6l4 2'],
+    list:['M8 6h13','M8 12h13','M8 18h13','M3 6h.01','M3 12h.01','M3 18h.01'],
+    pixelforge:['M3 3h7v7H3z','M14 3h7v7h-7z','M3 14h7v7H3z','M17 14v7','M14 17h7'],
+    floorplan:['M3 3h18v18H3z','M3 9h18','M9 9v12'],
+    bookOpen:['M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z','M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'],
+    sync:['M3 12a9 9 0 0 1 15.5-6.4L21 8','M21 3v5h-5','M21 12a9 9 0 0 1-15.5 6.4L3 16','M8 16H3v5'],
+    search:['M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12z','m21 21-4.3-4.3'],
+    signal:['M5 12.55a11 11 0 0 1 14.08 0','M8.53 16.11a6 6 0 0 1 6.95 0','M12 20h.01']
   };
+
+  function iconPaths(icon,fallback){
+    if(Array.isArray(icon)&&icon.length) return icon.slice();
+    if(typeof icon==='string'&&Array.isArray(STATIC_ICONS[icon])&&STATIC_ICONS[icon].length) return STATIC_ICONS[icon].slice();
+    return (fallback||STATIC_ICONS.tool).slice();
+  }
+
+  function guideEntryShape(guide){
+    return {
+      ref:'guide:'+guide.id,
+      namespace:'guide',
+      id:guide.id,
+      label:guide.name,
+      icon:iconPaths(guide.icon,guide.external?STATIC_ICONS.external:STATIC_ICONS.tool),
+      availability:'available',
+      pinnable:false,
+      navigable:true,
+      href:guide.href,
+      external:!!guide.external,
+      source:guide
+    };
+  }
 
   function registryOrDefault(registry){return registry||root.SBD_REGISTRY||{};}
 
@@ -69,7 +104,7 @@
     if(namespace==='tool'){
       tool=exactById(registry.tools,id);
       if(!tool) return null;
-      return {ref:reference,namespace:namespace,id:id,label:tool.name,icon:STATIC_ICONS.tool.slice(),availability:'available',pinnable:true,navigable:!!tool.href,href:tool.href||null,source:tool};
+      return {ref:reference,namespace:namespace,id:id,label:tool.name,icon:iconPaths(tool.icon,STATIC_ICONS.tool),availability:'available',pinnable:true,navigable:!!tool.href,href:tool.href||null,source:tool};
     }
 
     if(namespace==='external'){
@@ -319,6 +354,10 @@
       mark.className='sbd-rail__badge';
       mark.textContent=badge;
       element.appendChild(mark);
+      var currentTitle=element.getAttribute('title')||element.getAttribute('data-label')||'';
+      element.setAttribute('title',currentTitle?currentTitle+' · '+badge:badge);
+      var aria=element.getAttribute('aria-label');
+      if(aria&&aria.indexOf(badge)===-1) element.setAttribute('aria-label',aria+' · '+badge);
     }
     return element;
   }
@@ -329,7 +368,7 @@
     button.className='sbd-rail__entry sbd-rail__entry--featured';
     button.setAttribute('data-rail-ref','panel:'+item.type);
     button.setAttribute('data-label',item.label);
-    button.appendChild(svgIcon(documentRef,STATIC_ICONS.tool));
+    button.appendChild(svgIcon(documentRef,iconPaths(item.icon,STATIC_ICONS.tool)));
     button.appendChild(labelSpan(documentRef,item.label));
     entryBlurb(documentRef,button,item.blurb,'');
     button.addEventListener('click',function(){
@@ -475,7 +514,7 @@
     var featuredBlock=section('Featured',false);
     (registry.featured||[]).forEach(function(item){
       if(item.kind==='panel'){
-        var button=panelButton(documentRef,{type:item.type,label:item.label,blurb:item.blurb},options.onOpenPanel);
+        var button=panelButton(documentRef,{type:item.type,label:item.label,blurb:item.blurb,icon:item.icon},options.onOpenPanel);
         featuredBlock.appendChild(button);
         byRef['panel:'+item.type]=button;
         return;
@@ -484,10 +523,7 @@
       if(item.kind==='guide'){
         var guide=registry.guideById?registry.guideById(item.id):null;
         if(!guide) return;
-        addEntry(featuredBlock,{
-          ref:reference,namespace:'guide',id:guide.id,label:guide.name,icon:STATIC_ICONS.tool.slice(),
-          availability:'available',pinnable:false,navigable:true,href:guide.href,external:!!guide.external,source:guide
-        },{blurb:item.blurb||guide.blurb,badge:guide.badge||'',featured:true});
+        addEntry(featuredBlock,guideEntryShape(guide),{blurb:item.blurb||guide.blurb,badge:guide.badge||'',featured:true});
         return;
       }
       addResolved(featuredBlock,reference,{blurb:item.blurb,featured:true});
@@ -511,10 +547,7 @@
     (menu.learn||[]).forEach(function(id){
       var guide=registry.guideById?registry.guideById(id):null;
       if(!guide) return;
-      addEntry(learn,{
-        ref:'guide:'+guide.id,namespace:'guide',id:guide.id,label:guide.name,icon:STATIC_ICONS.external.slice(),
-        availability:'available',pinnable:false,navigable:true,href:guide.href,external:!!guide.external,source:guide
-      },{blurb:guide.blurb,badge:guide.badge||''});
+      addEntry(learn,guideEntryShape(guide),{blurb:guide.blurb,badge:guide.badge||''});
     });
 
     var extras=pinned.filter(function(reference){return !placed(reference);});
