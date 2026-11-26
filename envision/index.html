@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
   <title>Envision | System by Dave</title>
-  <meta name="description" content="Build an event flyer prompt, save a brief or edit a layered flyer.">
+  <meta name="description" content="Draft image prompts, revise artwork and export briefs to your personal studio.">
   <link rel="canonical" href="https://systembydave.com/envision/">
   <meta name="theme-color" content="#251d1a">
   <meta property="og:type" content="website"><meta property="og:title" content="Envision | System by Dave">
-  <meta property="og:url" content="https://systembydave.com/envision/"><meta property="og:description" content="Build an event flyer prompt, save a brief or edit a layered flyer.">
-  <meta name="twitter:card" content="summary"><meta name="twitter:title" content="Envision | System by Dave"><meta name="twitter:description" content="Build an event flyer prompt, save a brief or edit a layered flyer.">
+  <meta property="og:url" content="https://systembydave.com/envision/"><meta property="og:description" content="Draft image prompts, revise artwork and export briefs to your personal studio.">
+  <meta name="twitter:card" content="summary"><meta name="twitter:title" content="Envision | System by Dave"><meta name="twitter:description" content="Draft image prompts, revise artwork and export briefs to your personal studio.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="stylesheet" href="./studio.css">
   <script src="./studio.js" defer></script>
@@ -25,7 +25,7 @@
   </header>
   <nav hidden role="tablist" aria-label="Envision sections" class="navigation">
     <button id="tab-studio" role="tab" type="button" aria-selected="true" aria-controls="studio">Studio</button>
-    <button id="tab-saved" role="tab" type="button" aria-selected="false" aria-controls="saved" tabindex="-1">Saved events</button>
+    <button id="tab-saved" role="tab" type="button" aria-selected="false" aria-controls="saved" tabindex="-1">Saved briefs</button>
     <button id="tab-guide" role="tab" type="button" aria-selected="false" aria-controls="guide" tabindex="-1">Field guide</button>
   </nav>
   <main id="workspace" tabindex="-1">
@@ -35,16 +35,16 @@
         <button id="show-result" type="button" aria-controls="result-panel" aria-pressed="false">Prompt</button>
       </div>
       <div id="brief-panel" class="station brief">
-        <div class="station-heading"><h2>Flyer brief</h2><a class="button" href="./layout/">Edit a layout</a><button id="new-event" class="quiet" type="button" hidden>New event</button></div>
+        <div class="station-heading"><h2 id="brief-heading">Image brief</h2><a class="button" href="./layout/">Edit a layout</a><button id="new-event" class="quiet" type="button" hidden>New brief</button></div>
         <form id="brief" class="brief-form">
           <div class="form-fields">
-            <div class="field"><label for="project-name">Event name</label><input id="project-name" name="title" maxlength="100" placeholder="e.g. AfterBreak"></div>
+            <div class="field"><label id="name-label" for="project-name">Brief name</label><input id="project-name" name="title" maxlength="100" placeholder="e.g. Prism study"></div>
             <div class="fieldrow">
-              <div class="field"><label for="mode">Task</label><select id="mode" name="mode"><option value="new">New flyer</option><option value="revise">Revise an asset</option></select></div>
-              <div class="field"><label for="format">Format</label><select id="format" name="format"><option value="feed">Feed · 4:5</option><option value="story">Story · 9:16</option><option value="print">Print · 4 × 6</option><option value="keep" hidden disabled>Keep original size</option></select></div>
+              <div class="field"><label for="mode">Task</label><select id="mode" name="mode"><option value="image">New image</option><option value="image-revise">Revise an image</option><option value="new">New flyer</option><option value="revise">Revise a flyer</option></select></div>
+              <div class="field"><label for="format">Format</label><select id="format" name="format"><option value="square">Square · 1:1</option><option value="wide">Wide · 16:9</option><option value="tall">Tall · 9:16</option><option value="feed">Feed · 4:5</option><option value="story">Story · 9:16</option><option value="print">Print · 4 × 6</option><option value="keep">Keep original size</option></select></div>
             </div>
-            <div class="field" id="preset-field"><label for="preset">Art direction</label><select id="preset" name="preset"><option value="afterjinx">AfterJinx · deep sea</option><option value="afterbreak">AfterBreak · mystery bill</option><option value="endpoint">Endpoint · neon geometry</option><option value="portrait">Artist portrait</option><option value="custom">Custom</option></select></div>
-            <div class="field"><label for="direction" id="direction-label">Your direction <span>optional</span></label><textarea id="direction" name="direction" rows="2" maxlength="1000" placeholder="Icy blue around the edges. Room for six artist logos."></textarea></div>
+            <div class="field" id="preset-field"><label for="preset">Art direction</label><select id="preset" name="preset"><option value="optical">Optical study</option><option value="paper">Paper and ink</option><option value="subject">Your own subject</option><option value="afterjinx">AfterJinx · deep sea</option><option value="afterbreak">AfterBreak · mystery bill</option><option value="endpoint">Endpoint · neon geometry</option><option value="portrait">Artist portrait</option><option value="custom">Custom</option></select></div>
+            <div class="field"><label for="direction" id="direction-label"><strong>Your direction</strong> <span>optional</span></label><textarea id="direction" name="direction" rows="2" maxlength="1000" placeholder="A cyan beam through amber glass on a cobalt workbench."></textarea></div>
             <div class="field" id="preserve-field" hidden><label for="preserve">Keep in the existing art <span>optional</span></label><textarea id="preserve" name="preserve" rows="2" maxlength="700" placeholder="Same layout, title and artist logos."></textarea></div>
             <details id="copy-details">
               <summary>Event copy <span>optional</span></summary>
@@ -52,21 +52,21 @@
               <p class="muted">Kept separate for layout.</p>
             </details>
           </div>
-          <div class="actions"><button class="primary" type="submit">Build prompt</button><button id="save-event" type="button">Save event</button></div>
+          <div class="actions"><button class="primary" type="submit">Build prompt</button><button id="save-event" type="button">Save brief</button></div>
         </form>
       </div>
       <div id="result-panel" class="station result">
         <div class="station-heading"><h2>Generator prompt</h2><button id="copy-prompt" type="button" disabled>Copy prompt</button></div>
         <div id="result-body" class="result-body">
           <div id="empty-prompt" class="empty-prompt">
-            <div class="art-crop" role="img" aria-label="Detail from the AfterJinx 2025 flyer"><span>From the AfterJinx flyer archive</span></div>
-            <h3>Draft your flyer prompt.</h3>
-            <p>Build a prompt for your image generator, or open a saved layout to update artwork and show details.</p>
+            <div id="art-crop" class="art-crop" data-kind="image" role="img" aria-label="Cyan and amber optical glass on a dark workbench"><span>Optical study · rendered on Walter</span></div>
+            <p id="empty-help">Choose an art direction and build the prompt. Export a named brief to use it in your personal studio.</p>
           </div>
           <div id="prompt-content" hidden>
             <p id="result-help" class="muted"></p>
             <textarea id="prompt-output" class="output" aria-label="Generated prompt" rows="9" readonly></textarea>
-            <details class="layout-sample">
+            <button id="export-current" type="button">Export brief</button>
+            <details id="layout-sample" class="layout-sample">
               <summary>Layout zones</summary>
               <div id="layout-map" class="layout-map" aria-label="Flyer layout from top to bottom">
                 <span>Top · Event title</span><span>Feature · Headliner or focal image</span>
@@ -83,7 +83,7 @@
       </div>
     </section>
     <section id="saved" class="station secondary" role="tabpanel" aria-labelledby="tab-saved" tabindex="0" hidden>
-      <div class="station-heading"><h2>Saved events</h2><button id="create-event" class="quiet" type="button">New event</button></div>
+      <div class="station-heading"><h2>Saved briefs</h2><button id="create-event" class="quiet" type="button">New brief</button></div>
       <p class="muted">Saved in this browser.</p>
       <a id="open-personal" class="button" hidden target="_blank" rel="noopener noreferrer">Open personal studio</a>
       <details class="guide-details"><summary>Personal studio address</summary>

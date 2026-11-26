@@ -390,6 +390,7 @@ def create_app(root, owner, worker_key, origin):
         need(f is not None, "Choose an editable file.")
         raw = f.read()
         name = f.filename or "Project"
+        source_format = None
         with store.tx(True) as c:
             pid = existing or uid()
             p = store.project(c, pid) if existing else None
@@ -404,9 +405,11 @@ def create_app(root, owner, worker_key, origin):
                     raise Fault("Invalid project JSON.")
                 if isinstance(obj, dict) and obj.get("format") == "envision-brief-1":
                     need(not existing, "Import a brief as a new project.")
-                    d = blank(obj.get("title"), "show")
+                    source_format = obj["format"]
+                    d = blank(obj.get("title"), obj.get("kind", "show"))
                     d["brief"] = string(obj.get("prompt"), 6000)
-                    d["fields"]["copy"] = string(obj.get("copy", ""), 1600)
+                    if d["kind"] == "show":
+                        d["fields"]["copy"] = string(obj.get("copy", ""), 1600)
                 else:
                     d = legacy_import(store, c, pid, obj, name)
                 d["stages"][0]["importFile"] = {
@@ -437,6 +440,8 @@ def create_app(root, owner, worker_key, origin):
                 current["stages"].append(s)
                 d = current
             out = store.save(c, pid, validate(store, c, pid, d), p["revision"] if p else 0)
+        if source_format:
+            out["sourceFormat"] = source_format
         return jsonify(out), 201
 
     @app.post(BASE + "/projects/<pid>/assets")

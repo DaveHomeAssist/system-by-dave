@@ -14,6 +14,8 @@ Open **Generate**, select an image project or create one, then enter a prompt. C
 
 Open **Studio** for the complete private workspace, including region edits, the job queue and editable project imports and exports. **Compare** opens two local PNG, JPEG or WebP files. Use **Phone** to check the art at a logical width of 375 points.
 
+Use **File > Open** with a brief exported from the public Envision prompt builder. The Mac opens **Generate** with the imported prompt in its new project. A layered flyer or editable project package opens in **Studio** on **Layout**.
+
 **Layout** opens a layered composition for the current project. Image projects start with an empty stage. In Library, choose an image and select **Use as background**, then open Layout to add type or a supplied logo. Show projects can also bind those layers to event fields.
 
 ## Artwork included in the app

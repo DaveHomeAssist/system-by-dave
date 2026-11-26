@@ -248,9 +248,16 @@ struct Direction: Codable {
         busy = true
         do {
             let limit = (file.pathExtension.lowercased() == "zip" ? 96 : 40) * 1_048_576
-            let imported: ProjectID = try await api.upload(file, to: "imports", limit: limit)
-            chooseProject(imported.id)
-            showStudio("layout", project: imported.id)
+            let imported: ImportedProject = try await api.upload(file, to: "imports", limit: limit)
+            if api === client {
+                chooseProject(imported.id)
+                if imported.sourceFormat == "envision-brief-1" {
+                    draft.prompt = imported.data.brief
+                    area = .generate
+                } else {
+                    showStudio("layout", project: imported.id)
+                }
+            }
         } catch { issue = error.localizedDescription }
         busy = false
         await refresh()

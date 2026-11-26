@@ -69,6 +69,12 @@ struct ProjectInfo: Decodable {
     let versions: [Artwork]
 }
 struct ProjectID: Decodable { let id: String }
+struct ImportedProject: Decodable {
+    struct Content: Decodable { let brief: String }
+    let id: String
+    let sourceFormat: String?
+    let data: Content
+}
 struct Upload: Decodable { let id: String; let hash: String }
 struct Batch: Decodable { let jobs: [String] }
 struct Job: Decodable, Identifiable {

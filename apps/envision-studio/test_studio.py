@@ -285,6 +285,32 @@ class Studio(unittest.TestCase):
             with self.assertRaises(ValueError):
                 verify(z, target)
 
+    def test_public_brief_import_preserves_project_kind(self):
+        brief = {"format": "envision-brief-1", "title": "Optical study", "prompt": "A prism in cyan light."}
+
+        def upload(payload):
+            raw = json.dumps(payload).encode()
+            return self.http.post(
+                self.api + "/imports", headers=OWNER, data={"file": (io.BytesIO(raw), "Study.brief.json")}
+            )
+
+        for kind in ("image", "show", None):
+            with self.subTest(kind=kind):
+                payload = brief | {"copy": "Approved show text"}
+                if kind:
+                    payload["kind"] = kind
+                reply = upload(payload)
+                self.assertEqual(reply.status_code, 201)
+                self.assertEqual(reply.json["sourceFormat"], "envision-brief-1")
+                data = self.get("/projects/" + reply.json["id"])["data"]
+                self.assertEqual(data["kind"], kind or "show")
+                self.assertEqual(data["brief"], brief["prompt"])
+                if kind == "image":
+                    self.assertEqual(data["fields"], {})
+                else:
+                    self.assertEqual(data["fields"]["copy"], payload["copy"])
+        self.assertEqual(upload(brief | {"kind": "unknown"}).status_code, 400)
+
     def test_legacy_native_export_and_snapshot(self):
         def url(raw):
             return "data:image/png;base64," + base64.b64encode(raw).decode()
