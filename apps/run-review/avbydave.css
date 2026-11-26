@@ -18,6 +18,13 @@ html, body { font-family: var(--font-sans); }
 code, kbd { font-family: var(--font-mono); }
 .btn.primary { background: var(--tape); color: var(--on-tape); border-color: var(--tape); }
 .btn.primary:hover { background: var(--action-hover); border-color: var(--action-hover); color: var(--on-tape); }
+/* Persistent icon controls (Help, Theme) meet the 44 by 44 target in AGENTS.md. */
+.btn.icon { width: 44px; min-width: 44px; }
+/* Without JavaScript the viewer cannot run: hide it and say so (see the noscript in body). */
+.rr-noscript { max-width: 40rem; margin: 15vh auto 0; padding: 24px 20px; color: var(--ink); background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-md); font: 16px/1.5 var(--font-sans); }
+.rr-noscript h1 { margin: 0 0 8px; font: 700 22px/1.2 var(--font-display); }
+.rr-noscript p { margin: 0 0 12px; }
+.rr-noscript a { color: var(--ink); }
 .sbd-skip-link { position: fixed; top: 8px; left: 8px; z-index: 2147483647; min-height: 44px; display: inline-flex; align-items: center; padding: 10px 14px; border-radius: var(--radius-md); background: var(--tape); color: var(--on-tape); font: 700 14px/1.2 var(--font-sans); text-decoration: none; transform: translateY(-160%); }
 .sbd-skip-link:focus { transform: translateY(0); outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .sbd-skip-link { transition: none; } }

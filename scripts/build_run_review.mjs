@@ -42,6 +42,10 @@ function once(html, from, to, label) {
 const DESCRIPTION = 'Step through a rehearsal capture cue by cue: photos, MIDI firings and observations, with review marks and notes kept in this browser.';
 const BRAND = '<h1><a id="workspace-link" class="avd-crumb-home frozen-home-link" href="/">AV by Dave</a><span class="brand-divider" aria-hidden="true"> / </span><a class="avd-crumb-parent frozen-home-link" href="/av/">Console</a><span class="brand-divider" aria-hidden="true"> / </span><span class="avd-crumb-current" aria-current="page">Run Review</span></h1>';
 
+// Application-only behavior fails clearly without JavaScript (AGENTS.md): the
+// viewer is hidden and this says why, with the way home.
+const NOSCRIPT = '<noscript><div class="rr-noscript" role="alert"><h1>Run Review needs JavaScript</h1><p>It opens rehearsal capture archives in this browser, so it cannot run with JavaScript turned off. Turn JavaScript on for avbydave.com and reload this page.</p><p><a href="/">AV by Dave home</a> · <a href="/av/">Console</a></p></div></noscript>';
+
 export function buildRunReview(upstream, skin) {
   let html = upstream;
   // Metadata: AV by Dave title family, the site's canonical address.
@@ -62,9 +66,9 @@ export function buildRunReview(upstream, skin) {
   html = once(html, "store.get('frozen.theme.v1')", "store.get('av-theme-mode.v1')", 'shared theme migration');
   html = once(html, "['light', 'dark', 'system'].includes(sharedTheme)", "['light', 'dark', 'system', 'white', 'black'].includes(sharedTheme)", 'shared theme check');
   // Palette and fonts follow the viewer's own styles.
-  html = once(html, '</style>\n</head>', `\n${skin.trim()}\n</style>\n</head>`, 'style block end');
+  html = once(html, '</style>\n</head>', `\n${skin.trim()}\n</style>\n<noscript><style>.shell, .sbd-skip-link { display: none; }</style></noscript>\n</head>`, 'style block end');
   // Public shell: skip link first, then home, parent and current location.
-  html = once(html, '<body>\n<div class="shell" id="shell">', `<body>\n<a class="sbd-skip-link" href="#${SKIP_TARGET}">Skip to the review</a>\n<div class="shell" id="shell">`, 'body start');
+  html = once(html, '<body>\n<div class="shell" id="shell">', `<body>\n<a class="sbd-skip-link" href="#${SKIP_TARGET}">Skip to the review</a>\n${NOSCRIPT}\n<div class="shell" id="shell">`, 'body start');
   html = once(html, '<h1><a id="workspace-link" class="frozen-brand frozen-home-link" href="/" aria-label="Frozen workspace home">Frozen <span aria-hidden="true">✳</span></a><span class="brand-divider" aria-hidden="true"> / </span>Run review</h1>', BRAND, 'Frozen breadcrumb');
   html = once(html, '<main class="panels">', `<main class="panels" id="${SKIP_TARGET}" tabindex="-1">`, 'workspace');
   html = once(html, "if (location.protocol === 'file:') $('#workspace-link').href = 'https://wst.housevideo.app/';", "if (location.protocol === 'file:') $('#workspace-link').href = 'https://avbydave.com/';", 'saved-copy home link');
