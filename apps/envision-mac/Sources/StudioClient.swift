@@ -58,14 +58,21 @@ struct Dashboard: Decodable {
 }
 struct ArtworkRecipe: Decodable {
     let prompt: String?
+    let parent: String?
+    let model: String?
     let engineSeconds: Double?
-    private enum Keys: String, CodingKey { case prompt, receipt, engineSeconds }
+    private enum Keys: String, CodingKey { case prompt, parent, profile, receipt, model, engineSeconds }
 
     init(from decoder: Decoder) throws {
         let values = try? decoder.container(keyedBy: Keys.self)
         let text = try? values?.decode(String.self, forKey: .prompt)
         prompt = text.flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
+        parent = try? values?.decode(String.self, forKey: .parent)
         let receipt = try? values?.nestedContainer(keyedBy: Keys.self, forKey: .receipt)
+        let recorded = try? receipt?.decode(String.self, forKey: .model)
+        let profile = try? values?.decode(String.self, forKey: .profile)
+        let name = [recorded, profile].compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }.first { !$0.isEmpty }
+        model = ["sd_xl_turbo_1.0_fp16.safetensors", "sdxl-turbo-local"].contains(name ?? "") ? "SDXL Turbo" : name
         let seconds = try? receipt?.decode(Double.self, forKey: .engineSeconds)
         engineSeconds = seconds.flatMap { $0.isFinite && $0 >= 0 ? $0 : nil }
     }
@@ -77,7 +84,9 @@ struct Artwork: Decodable, Identifiable {
     let role: String
     let width: Int
     let height: Int
+    let parent: String?
     let recipe: ArtworkRecipe?
+    var originalID: String? { parent ?? recipe?.parent }
 }
 struct ProjectContent: Decodable { let brief: String }
 struct ProjectInfo: Decodable {
@@ -179,14 +188,20 @@ final class StudioClient {
     }
 
     func image(project: String, artwork: Artwork, thumbnail: Bool = false) async throws -> Data {
-        if !thumbnail { return try await send("projects/\(project)/media/\(artwork.hash)").0 }
-        var parts = URLComponents(url: route("projects/\(project)/media/\(artwork.hash)"), resolvingAgainstBaseURL: false)!
-        parts.queryItems = [URLQueryItem(name: "thumb", value: "1")]
-        let (data, response) = try await session.data(from: parts.url!)
-        guard let http = response as? HTTPURLResponse, http.statusCode == 200, origin.contains(http.url) else {
-            throw StudioError("Artwork preview is unavailable.")
+        guard artwork.hash.utf8.count == 64, artwork.hash.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }) else {
+            throw StudioError("The studio did not provide a valid image identifier.")
         }
-        return data
+        var parts = URLComponents(url: route("projects/\(project)/media/\(artwork.hash)"), resolvingAgainstBaseURL: false)!
+        if thumbnail { parts.queryItems = [URLQueryItem(name: "thumb", value: "1")] }
+        let (file, response) = try await session.download(from: parts.url!)
+        defer { try? FileManager.default.removeItem(at: file) }
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200, origin.contains(http.url),
+              ["image/png", "image/jpeg", "image/webp"].contains(http.mimeType ?? "") else {
+            throw StudioError("The studio image is unavailable.")
+        }
+        let size = try file.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+        guard (1...(40 * 1_048_576)).contains(size) else { throw StudioError("The studio image exceeds the local image limit or is empty.") }
+        return try Data(contentsOf: file, options: .mappedIfSafe)
     }
 
     func png(project: String, version: String) async throws -> (data: Data, filename: String) {
