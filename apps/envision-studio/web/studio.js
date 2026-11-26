@@ -111,17 +111,20 @@ async function download(route) {
   setTimeout(() => URL.revokeObjectURL(url), 60000);
   say('Download requested · ' + name);
 }
-async function named(title, value = '', type = false) {
+async function named(title, value = '', type = false, maxLength = 100) {
   const dlg = $('name-dialog');
   $('dialog-title').textContent = title;
   $('dialog-name').value = value;
+  $('dialog-name').maxLength = maxLength;
   $('kind-choice').hidden = !type;
   dlg.returnValue = 'cancel';
   dlg.showModal();
   $('dialog-name').focus();
+  if (value) $('dialog-name').select();
   await new Promise((resolve) => dlg.addEventListener('close', resolve, { once: true }));
   return dlg.returnValue === 'ok' ? $('dialog-name').value.trim() : null;
 }
+$('dialog-cancel').addEventListener('click', () => $('name-dialog').close('cancel'));
 function mayLeave() {
   return !state.dirty || confirm('Discard the unsaved form changes?');
 }
@@ -1047,6 +1050,22 @@ act($('favorite'), async () => {
   await post(path('/versions/' + librarySelection().id + '/favorite'));
   if (state.project?.id !== pid) return;
   await reload();
+});
+act($('rename-art'), async () => {
+  const pid = state.project.id;
+  const artwork = librarySelection();
+  if (!artwork) return;
+  const label = await named('Rename artwork', artwork.label, false, 200);
+  if (!label || label === artwork.label || state.project?.id !== pid) return;
+  try {
+    await api('/projects/' + pid + '/versions/' + artwork.id + '/label', {
+      method: 'PATCH',
+      body: { label, expectedLabel: artwork.label },
+    });
+  } finally {
+    if (state.project?.id === pid) await reload();
+  }
+  if (state.project?.id === pid) say('Artwork renamed to ' + label + '.');
 });
 act($('use-art'), async () => {
   const v = librarySelection();

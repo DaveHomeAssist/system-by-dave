@@ -206,7 +206,7 @@
               <div id="version-actions" hidden>
                 <div class="tools">
                   <button id="use-art" class="primary">Use as background</button
-                  ><button id="favorite">Favorite</button><button id="revise-art">Revise</button
+                  ><button id="favorite">Favorite</button><button id="rename-art">Rename</button><button id="revise-art">Revise</button
                   ><button id="replay">Reuse settings</button
                   ><button id="download-art">Download PNG</button>
                 </div>
@@ -373,10 +373,10 @@
         </div>
       </div>
     </dialog>
-    <dialog id="name-dialog">
+    <dialog id="name-dialog" aria-labelledby="dialog-title">
       <form method="dialog">
         <h2 id="dialog-title">New project</h2>
-        <label>Name<input id="dialog-name" maxlength="100" required autocomplete="off" /></label
+        <label>Name<input id="dialog-name" maxlength="100" pattern=".*\S.*" required autocomplete="off" /></label
         ><label id="kind-choice"
           >Project type<select id="dialog-kind">
             <option value="image">Blank image</option>
@@ -384,7 +384,7 @@
           </select></label
         >
         <div class="tools">
-          <button value="cancel" formnovalidate>Cancel</button
+          <button type="button" id="dialog-cancel">Cancel</button
           ><button class="primary" value="ok">Save</button>
         </div>
       </form>

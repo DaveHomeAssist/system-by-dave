@@ -489,6 +489,27 @@ def create_app(root, owner, worker_key, origin):
             need(cur.rowcount == 1, "Unknown artwork.", 404)
         return jsonify(ok=True)
 
+    @app.patch(BASE + "/projects/<pid>/versions/<vid>/label")
+    def rename_artwork(pid, vid):
+        b = read_json()
+        label = string(b.get("label"), 200, True).strip()
+        need(all(ord(ch) >= 32 and ord(ch) != 127 for ch in label), "Use a single line for the artwork name.")
+        expected = b.get("expectedLabel")
+        need(isinstance(expected, str), "Reopen the artwork before renaming it.")
+        with store.tx(True) as c:
+            row = c.execute(
+                "SELECT label FROM versions WHERE project=? AND id=?", (pid, vid)
+            ).fetchone()
+            need(row is not None, "Unknown artwork.", 404)
+            if row["label"] != label:
+                need(
+                    row["label"] == expected,
+                    "Artwork was renamed on another device. Review its current name and try again.",
+                    409,
+                )
+                c.execute("UPDATE versions SET label=? WHERE project=? AND id=?", (label, pid, vid))
+        return jsonify(label=label)
+
     @app.get(BASE + "/projects/<pid>/versions/<vid>/png")
     def artwork_png(pid, vid):
         with store.tx() as c:

@@ -16,13 +16,15 @@ Project cards show the layout background chosen by the owner, or the latest gene
 
 1. Open **Projects**. Choose **New project** for an image or a show. **Import project** opens a native editable package, an eleven-layer flyer or a public Envision brief. Briefs open in **Create** with the imported prompt. A show brief also carries approved copy, and older briefs open as shows. Editable projects open in **Layout**.
 2. In **Create**, enter the image direction. Choose a native render size and one to four candidates. The advanced controls expose a seed, reference roles and strength. **Generate on Walter** queues the work. You can close the tab and open the same project from another device.
-3. In **Library**, select a candidate and use **Compare** to check it against an original. **Full view** expands the proof on a phone. **Use as background** selects it for layout. **Revise** starts from this version. The image stays available in the library after later changes.
+3. In **Library**, select a candidate and use **Compare** to check it against an original. **Full view** expands the proof on a phone. Use **Rename** to give the artwork a recognizable name in the project and its editable package. **Use as background** selects it for layout. **Revise** starts from this version. The image stays available in the library after later changes.
 4. Choose **Edit a region** to paint the area the GPU can change. Clear pixels retain the source exactly. **Apply local finish** adds scanlines, a darker grade or grain on the coordinator. A painted region can limit the finish.
 5. Open **Layout** to change an event field once across bound stages, replace a supplied logo, lock a layer or adjust its position per format. **Fit original** preserves a baked title in tall or wide outputs. **Fill frame** uses a crop. Feed and story safe guides appear in the proof only.
 6. Save pending changes with **Save layer** or **Save event fields** in the form you edited. If you edited both forms, save both. **Render outputs**, **Editable package**, and **Legacy flyer file** export the saved revision. Choose formats for the current stage or select **Include every campaign stage** for a full show. Each PNG and package uses the event name. The editable package carries the project, artwork versions, masks and font. The legacy flyer file supports the original eleven-layer canvas.
 7. Use **Queue** for elapsed time, errors, cancel, retry and pause. A pause takes effect between jobs. Finishing on the coordinator and exporting show layouts both work while the GPU is busy or unavailable.
 
 **References.** A starting image establishes revision coordinates. A composition reference conditions the generation. A style reference applies a palette transfer. Supply exact logos as layout layer assets. Existing legacy titles may be part of the background. Local art stays in the private data volume and explicit downloads.
+
+Artwork names belong to individual Library versions. Renaming updates the label in place. The project keeps its original image, seed and generation record. When two devices rename the same version, the studio refreshes the current name and invites the second operator to try again.
 
 ## Installation
 

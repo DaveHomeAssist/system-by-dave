@@ -81,6 +81,39 @@ class Studio(unittest.TestCase):
                 self.app.config["STORE"].project(c, self.pid, 1)["data"]["name"], "Test Show"
             )
 
+    def test_artwork_rename_is_scoped_and_survives_editable_export(self):
+        asset = self.asset(image((48, 32), "#334455"))
+        original = self.get(self.project)["versions"][0]
+        route = "/versions/" + asset["id"] + "/label"
+        endpoint = self.api + self.project + route
+
+        def rename(label, expected=original["label"]):
+            return self.http.patch(
+                endpoint, headers=OWNER, json={"label": label, "expectedLabel": expected}
+            )
+
+        for bad in ("   ", "x" * 201, "two\nlines"):
+            self.assertEqual(rename(bad).status_code, 400)
+        change = {"label": "Amber platter", "expectedLabel": original["label"]}
+        self.assertEqual(self.http.patch(endpoint, json=change, headers=WORKER).status_code, 403)
+        other = self.post("/projects", {"name": "Other", "kind": "image"})
+        other_project = self.api + "/projects/" + other["id"] + route
+        self.assertEqual(self.http.patch(other_project, headers=OWNER, json=change).status_code, 404)
+        self.assertEqual(rename(" Amber platter ").json, {"label": "Amber platter"})
+        self.assertEqual(rename("Amber platter").status_code, 200)
+        self.assertEqual(rename("Outdated choice").status_code, 409)
+        current = self.get(self.project)["versions"][0]
+        self.assertEqual(current, {**original, "label": "Amber platter"})
+        package = self.http.get(self.api + self.project + "/editable", headers=OWNER)
+        self.assertEqual(package.status_code, 200)
+        restored = self.http.post(
+            self.api + "/imports", headers=OWNER,
+            data={"file": (io.BytesIO(package.data), "Study.envision.zip")},
+        )
+        self.assertEqual(restored.status_code, 201)
+        reopened = self.get("/projects/" + restored.json["id"])["versions"][0]
+        self.assertEqual((reopened["label"], reopened["hash"]), ("Amber platter", original["hash"]))
+
     def test_project_card_uses_only_its_own_artwork(self):
         def cards():
             return {p["id"]: p for p in self.get("/state")["projects"]}
