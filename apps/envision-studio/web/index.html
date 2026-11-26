@@ -74,11 +74,11 @@
                 <img id="art" alt="Selected artwork" /><span id="no-art"
                   >Choose a reference or generate your first image.</span
                 >
-                <figcaption id="art-caption"></figcaption>
+                <figcaption><b id="art-caption"></b><span id="art-details"></span></figcaption>
               </figure>
               <figure id="second-frame" hidden>
                 <img id="other-art" alt="Comparison artwork" />
-                <figcaption id="other-caption"></figcaption>
+                <figcaption><b id="other-caption"></b><span id="other-details"></span></figcaption>
               </figure>
             </div>
             <div id="compare-tools" hidden>
@@ -178,7 +178,14 @@
             </form>
 
             <section class="panel" id="library" hidden>
-              <h2>Artwork library</h2>
+              <div class="review-heading">
+                <h2>Artwork library</h2>
+                <div class="review-nav" role="group" aria-label="Browse artwork">
+                  <button id="review-prev" aria-label="Previous artwork" disabled>&#8249;</button>
+                  <span id="review-position" role="status">0 / 0</span>
+                  <button id="review-next" aria-label="Next artwork" disabled>&#8250;</button>
+                </div>
+              </div>
               <input
                 type="search"
                 id="library-search"
@@ -195,6 +202,7 @@
                 /></label>
               </div>
               <div id="versions" class="versions"></div>
+              <p id="library-empty" hidden></p>
               <div id="version-actions" hidden>
                 <div class="tools">
                   <button id="use-art" class="primary">Use as background</button
@@ -348,11 +356,21 @@
     </main>
     <footer><span id="message" role="status" aria-live="polite">Opening studio…</span></footer>
     <dialog id="proof-dialog" aria-labelledby="proof-label">
-      <h2 id="proof-label"></h2>
+      <div class="proof-heading">
+        <h2 id="proof-label"></h2>
+        <p id="proof-details" hidden></p>
+      </div>
       <img id="proof-art" alt="Full artwork preview" />
-      <div class="tools">
-        <button id="proof-swap">Switch image</button
-        ><button id="proof-close" autofocus>Close</button>
+      <div class="proof-controls">
+        <div id="proof-nav" class="review-nav" role="group" aria-label="Browse artwork" hidden>
+          <button id="proof-prev" aria-label="Previous artwork" disabled>&#8249;</button>
+          <span id="proof-position" role="status"></span>
+          <button id="proof-next" aria-label="Next artwork" disabled>&#8250;</button>
+        </div>
+        <div class="tools">
+          <button id="proof-swap">Switch image</button>
+          <button id="proof-close" autofocus>Close</button>
+        </div>
       </div>
     </dialog>
     <dialog id="name-dialog">

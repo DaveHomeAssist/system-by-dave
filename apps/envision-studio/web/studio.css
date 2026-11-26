@@ -345,12 +345,21 @@ figure img:not([src]) {
   display: none;
 }
 figcaption {
+  width: 100%;
   max-width: 100%;
+  overflow: hidden;
+  font-size: 12px;
+  padding-top: 7px;
+}
+figcaption b,
+figcaption span {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12px;
-  padding-top: 7px;
+}
+figcaption span {
+  color: #c9cbd2;
 }
 #no-art {
   align-self: center;
@@ -372,17 +381,72 @@ nav #pending {
   padding: 12px;
 }
 #proof-dialog h2 {
-  font-size: 15px;
+  font-size: clamp(16px, 2vw, 22px);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.review-heading,
+.proof-controls,
+.review-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.review-heading,
+.proof-controls {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.review-heading {
+  margin-bottom: 8px;
+}
+.review-heading h2,
+#proof-details {
+  margin: 0;
+}
+.review-nav button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font-size: 24px;
+  line-height: 1;
+}
+.review-nav span {
+  min-width: 5ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+#proof-details {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.proof-controls .tools {
+  margin-inline-start: auto;
+}
+@media (min-width: 681px) {
+  #frames.original-first #second-frame {
+    order: -1;
+  }
+  #frames.zoomed:has(#second-frame:not([hidden])) {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  #frames.zoomed:has(#second-frame:not([hidden])) figure {
+    flex: none;
+    min-height: 0;
+  }
 }
 #proof-art {
   width: 100%;
   height: 100%;
   object-fit: contain;
   min-height: 0;
+  background: var(--grid);
+  border-radius: 6px;
 }
 #frames.zoomed {
   overflow: auto;
