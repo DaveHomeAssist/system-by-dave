@@ -6,6 +6,11 @@
 - `/run-review/` forwards to the new address and keeps any query or hash, so saved links still open it.
 - The Frozen copy at wst.housevideo.app/run-review/ is unchanged. The console registry generation is `v20261126-rehearsal-capture`.
 
+## November 26, 2026. Envision Studio for Mac
+
+- The Apple Silicon app opens on image generation. Select a project, give Walter a prompt or reference, compare candidates and save the chosen PNG. The app icon and sample artwork came from studio renders.
+- Open the private studio for layered compositions, masks, finishes and the render queue. Compare two saved images locally at fit or phone width, including while disconnected.
+
 ## November 26, 2026. Run Review on avbydave.com
 
 - Run Review now opens at `/run-review/` on avbydave.com, from the homepage tools table (Early build) and the console's Show tools menu. It is the Frozen Rehearsal Review viewer, unchanged, pinned to its `frozen-rehearsal-capture` build and given the AV by Dave name, breadcrumb, palette and shared theme choice.

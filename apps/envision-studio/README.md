@@ -2,6 +2,8 @@
 
 Envision runs image generation on a Windows GPU and keeps projects, revisions, proofs and show exports on a private Linux coordinator. The web app opens on the owner's Mac or phone through Tailscale Serve. The public Envision prompt kit can export a saved brief for import here.
 
+On Apple Silicon, the standalone app opens on image generation and offers native PNG export and offline image comparison. [Envision Studio for Mac](../envision-mac/README.md).
+
 ## Using the studio
 
 1. Open **Projects**. Choose **New project** for an image or a show. **Import project** opens a native editable package, an eleven-layer flyer or a public Envision brief.
