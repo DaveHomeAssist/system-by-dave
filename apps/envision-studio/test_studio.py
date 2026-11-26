@@ -81,6 +81,31 @@ class Studio(unittest.TestCase):
                 self.app.config["STORE"].project(c, self.pid, 1)["data"]["name"], "Test Show"
             )
 
+    def test_save_direction_preserves_other_edits_and_rejects_stale_replacements(self):
+        endpoint = self.api + self.project + "/brief"
+
+        def save(brief, expected, headers=OWNER):
+            return self.http.patch(
+                endpoint, headers=headers, json={"brief": brief, "expectedBrief": expected}
+            )
+
+        first = self.get(self.project)
+        old = first["data"].get("brief", "")
+        data = {**first["data"], "tags": ["Edited elsewhere"]}
+        whole = self.http.patch(
+            self.api + self.project, headers=OWNER, json={"data": data, "revision": first["revision"]}
+        )
+        self.assertEqual(whole.status_code, 200)
+        self.assertEqual(save("folded paper", old, WORKER).status_code, 403)
+        changed = save(" folded paper ", old)
+        self.assertEqual(changed.status_code, 200)
+        self.assertEqual(self.get(self.project)["data"], {**data, "brief": "folded paper"})
+        self.assertEqual(save("folded paper", old).json, changed.json)
+        self.assertEqual(save("new draft", old).status_code, 409)
+        self.assertEqual(save("x" * 6001, "folded paper").status_code, 400)
+        self.assertEqual(save("", "folded paper").json["brief"], "")
+        self.assertEqual(self.get(self.project)["data"]["tags"], data["tags"])
+
     def test_artwork_rename_is_scoped_and_survives_editable_export(self):
         asset = self.asset(image((48, 32), "#334455"))
         original = self.get(self.project)["versions"][0]
