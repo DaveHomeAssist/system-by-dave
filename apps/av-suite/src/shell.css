@@ -12,6 +12,7 @@
 .suite-actions .theme-label select{width:auto}
 .suite-actions .follow-system{display:flex;align-items:center;gap:6px;min-height:44px;font-size:11px;white-space:nowrap;cursor:pointer}
 .suite-actions .follow-system input{width:18px;min-width:18px;min-height:18px;margin:0;accent-color:var(--av-accent)}
+.suite-theme-toggle{display:contents}.suite-theme-toggle button{display:inline-grid;place-items:center;min-width:44px;padding:0;border-color:transparent;background:transparent;color:var(--av-text-2)}.suite-theme-toggle button:hover{color:var(--av-text);border-color:var(--av-line-strong)}.suite-theme-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .focus-toggle{display:inline-flex;align-items:center;gap:6px}
 .focus-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 /* Menu › Appearance: labelled rows with separators, readable at 320px and on touch. */
