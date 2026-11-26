@@ -30,6 +30,7 @@ from packages import LIMIT, portable, restore, stem
 from queueing import active, claim, finish, recover, submit
 from store import Catalog, Fault, need, pack, png, string, uid
 from backup import snapshot
+from web_assets import FORMATS as WEB_FORMATS, encode_artwork, web_options
 
 BASE = "/api/v1"
 WEB = Path(__file__).parent / "web"
@@ -241,7 +242,7 @@ def create_app(root, owner, worker_key, origin):
 
     @app.get("/ui/<name>")
     def ui(name):
-        need(name in ("studio.js", "studio.css", "create-directions.js"), "Unknown asset.", 404)
+        need(name in ("studio.js", "studio.css", "create-directions.js", "web-export.js"), "Unknown asset.", 404)
         return send_from_directory(WEB, name)
 
     @app.get("/ui/directions/<name>")
@@ -540,6 +541,24 @@ def create_app(root, owner, worker_key, origin):
             need(v, "Unknown artwork.", 404)
             raw = png(store.pixels(c, pid, v["hash"]))
         return result_file(stem(p["data"]["name"]) + " - " + vid[:8] + ".png", raw, "image/png")
+
+    @app.get(BASE + "/artwork-formats")
+    def artwork_formats():
+        return jsonify(formats=[{"id": key, **profile} for key, profile in WEB_FORMATS.items()])
+
+    @app.get(BASE + "/projects/<pid>/versions/<vid>/web-asset")
+    def artwork_for_web(pid, vid):
+        framing = request.args.get("framing", "center")
+        profile = web_options(request.args.get("format"), framing)
+        with store.tx() as c:
+            p = store.project(c, pid)
+            v = c.execute(
+                "SELECT hash FROM versions WHERE project=? AND id=? AND role != 'mask'", (pid, vid)
+            ).fetchone()
+            need(v, "Choose artwork from this project.", 404)
+            image = store.pixels(c, pid, v["hash"])
+        name = stem(p["data"]["name"]) + "." + profile["extension"]
+        return result_file(name, encode_artwork(image, profile, framing), profile["mime"])
 
     @app.post(BASE + "/projects/<pid>/finishes")
     def local_finish(pid):

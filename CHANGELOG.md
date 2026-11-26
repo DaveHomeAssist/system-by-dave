@@ -1,5 +1,10 @@
 # Changelog
 
+## November 26, 2026. Envision web artwork and Notion Agents
+
+- Export a selected Library image as a square thumbnail, wide card or link preview. Choose its framing and file name, then download the image shown in the preview.
+- The Notion Agents catalog opens with four workflow choices. Each portrait links directly to its setup details and contact action. The Tools card shows the catalog, and shared links use a desk illustration rendered on Walter.
+
 ## November 26, 2026. Envision image directions
 
 - Choose a folded paper, fiber light or botanical print study in the public builder and private studio. Walter rendered each sample from the prompt it supplies. The folded paper study also appears in Envision link previews.

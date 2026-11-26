@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="/ui/studio.css" />
     <script defer src="/ui/directions/catalog.js"></script>
     <script defer src="/ui/create-directions.js"></script>
+    <script defer src="/ui/web-export.js"></script>
     <script defer src="/ui/studio.js"></script>
   </head>
   <body>
@@ -226,7 +227,7 @@
                   <button id="use-art" class="primary">Use as background</button
                   ><button id="favorite">Favorite</button><button id="rename-art">Rename</button><button id="revise-art">Revise</button
                   ><button id="replay">Reuse settings</button
-                  ><button id="download-art">Download PNG</button>
+                  ><button id="download-art">Download PNG</button><button id="web-export">Export for web</button>
                 </div>
                 <details>
                   <summary>Generation record</summary>
@@ -401,6 +402,32 @@
         <button type="button" id="recall-art">Selected artwork direction</button>
       </div>
       <div class="direction-gallery" id="direction-gallery"></div>
+    </dialog>
+    <dialog id="web-dialog" aria-labelledby="web-title">
+      <div class="web-heading">
+        <h2 id="web-title">Export for web</h2>
+        <button type="button" id="web-close">Close</button>
+      </div>
+      <p id="web-source"></p>
+      <form id="web-form">
+        <div class="web-frame"><img id="web-preview" hidden alt="Preview of the image to download" /></div>
+        <div class="web-options">
+          <label>Format<select id="web-format" required></select></label>
+          <label>Framing<select id="web-framing">
+            <option value="center">Crop to center</option>
+            <option value="top">Crop toward top</option><option value="bottom">Crop toward bottom</option>
+            <option value="left">Crop toward left</option><option value="right">Crop toward right</option>
+            <option value="contain">Keep whole image</option>
+          </select></label>
+        </div>
+        <label for="web-name">File name</label>
+        <div class="web-name"><input id="web-name" required maxlength="100" autocomplete="off" aria-describedby="web-extension" /><span id="web-extension"></span></div>
+        <p id="web-status" role="status"></p>
+        <div class="tools">
+          <button type="button" id="web-retry" hidden>Retry preview</button>
+          <button type="submit" id="web-download" class="primary" disabled>Download image</button>
+        </div>
+      </form>
     </dialog>
     <dialog id="name-dialog" aria-labelledby="dialog-title">
       <form method="dialog">
