@@ -1,5 +1,11 @@
 # Changelog
 
+## November 26, 2026. Prompt Library image exports
+
+- Open an image prompt to copy it or export a named brief for Envision. The Urban Architecture entry includes a render made from its exact prompt.
+- The library has light and dark themes, a single results pane, collapsible filters and a manual copy dialog when clipboard access fails.
+- The tools directory uses individual artwork for Prompt Library and Trailkeeper. The library’s share preview uses its architecture study.
+
 ## November 26, 2026. Envision image briefs
 
 - Envision opens on image prompts with optical, paper and custom subjects. Image revisions can keep the source framing. The prompt can be exported directly to the owner's personal studio.
