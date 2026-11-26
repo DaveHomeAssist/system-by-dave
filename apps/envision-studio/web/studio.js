@@ -174,9 +174,10 @@ function projectCards() {
           ' · revision ' +
           p.revision,
       );
-      if (p.background) {
+      const cover = p.cover || p.background;
+      if (cover) {
         const im = element('img');
-        im.src = media(p.id, p.background, true);
+        im.src = media(p.id, cover, true);
         im.alt = '';
         im.loading = 'lazy';
         n.append(im);
@@ -252,7 +253,10 @@ async function open(pid, tabName = 'create') {
   if (token !== state.request) return;
   state.project = p;
   state.drafts.clear();
-  state.version = p.data.selected || p.versions[0]?.id || null;
+  const artwork = p.versions.filter((v) => v.role !== 'mask');
+  const cover = artwork.find((v) => v.hash === p.data.background)
+    || artwork.find((v) => v.role === 'generation' || v.role === 'finish');
+  state.version = p.data.selected || cover?.id || artwork[0]?.id || null;
   state.stage = p.data.stages[0].id;
   for (const e of p.exports || [])
     if (['queued', 'running'].includes(e.state)) state.exports.set(e.id, p.id);

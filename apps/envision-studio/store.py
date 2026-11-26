@@ -109,6 +109,8 @@ class Catalog:
                   worker TEXT, lease TEXT, expires REAL, created REAL, started REAL, finished REAL,
                   progress TEXT DEFAULT '', error TEXT DEFAULT '', result TEXT, receipt TEXT);
                 CREATE INDEX IF NOT EXISTS queue ON jobs(state,created);
+                CREATE INDEX IF NOT EXISTS version_card_art ON versions(project,created DESC,id DESC)
+                  WHERE role IN ('generation','finish');
                 CREATE TABLE IF NOT EXISTS workers(id TEXT PRIMARY KEY, seen REAL, info TEXT);
                 CREATE TABLE IF NOT EXISTS worker_controls(id TEXT PRIMARY KEY, paused INTEGER NOT NULL);
                 CREATE TABLE IF NOT EXISTS exports(
