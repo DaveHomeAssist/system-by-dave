@@ -327,14 +327,7 @@ function exportBrief(brief) {
     return;
   }
   const image = isImage(brief.mode);
-  const payload = {format: 'envision-brief-1', kind: image ? 'image' : 'show', title: brief.title, prompt: buildPrompt(brief)};
-  if (!image) payload.copy = brief.copy || '';
-  const url = URL.createObjectURL(new Blob([JSON.stringify(payload)], {type: 'application/json'}));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = (brief.title.replace(/[<>:"/\\|?*]/g, '-').slice(0, 100) || 'Envision') + '.brief.json';
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  window.downloadEnvisionBrief({kind: image ? 'image' : 'show', title: brief.title, prompt: buildPrompt(brief), copy: brief.copy});
   announce('Brief exported. Open Import project in your personal studio.');
 }
 

@@ -141,7 +141,7 @@
            directory category. Artwork comes from the two WebP atlases via --art-x/--art-y:
            the 5x7 atlas has 7:5 cells, and the 2x3 atlas has 3:2 cells that are scaled to
            the box height and cropped horizontally, so no icon is stretched. A tool without
-           artwork uses the tc-art--text monogram card. A product screenshot is an img.tc-art.tc-art--shot in that same box
+           artwork uses the tc-art--text monogram card. A screenshot or individual project artwork is an img.tc-art.tc-art--shot in that box
            (its own image, no lighten blend). Theme Organizer keeps the
            tc-art--shot background crop, which reads more clearly at this size.
            Cards deep-link to the live page; cross-domain links open in a new tab. -->
@@ -213,10 +213,10 @@
           <span class="sr-only">Self-contained widgets that embed in Notion pages via iframe. Free and open source.</span>
         </a>
         <a class="tool-card" data-chips="Notion" data-tone="violet" data-track-cta="tools:prompts" href="prompts/">
-          <span class="tc-art" style="--art-x:50%;--art-y:33.9%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/prompt-library-card.webp" alt="" width="448" height="320" loading="lazy" decoding="async">
           <h2>Prompts</h2>
           <span class="tc-badge">Notion</span>
-          <span class="sr-only">A library of reusable prompts for building systems inside Notion.</span>
+          <span class="sr-only">Search reusable prompts, fill in variables, or export an image prompt to Envision.</span>
         </a>
         <a class="tool-card" data-chips="Notion Labs" data-tone="violet" data-track-cta="tools:notionwidgets-gallery" href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" rel="noopener noreferrer">
           <img class="tc-art tc-art--shot" src="img/notionwidgets-gallery.webp" alt="NotionWidgets gallery page headed &quot;Small widgets, better Notion pages&quot;, with cards explaining URL-only configuration." width="1600" height="1000" loading="lazy" decoding="async">
@@ -309,7 +309,7 @@
           <span class="sr-only">A local-first writing workspace for structured notes, reusable documents, and focused drafting.</span>
         </a>
         <a class="tool-card" data-chips="Apps Trackers" data-tone="green" data-track-cta="tools:trailkeeper" href="https://davehomeassist.github.io/trailkeeper/" target="_blank" rel="noopener noreferrer">
-          <span class="tc-art" style="--art-x:100%;--art-y:48.8%" aria-hidden="true"></span>
+          <img class="tc-art tc-art--shot" src="img/trailkeeper-card.webp" alt="" width="448" height="320" loading="lazy" decoding="async">
           <h2>Trailkeeper</h2>
           <span class="tc-badge">Apps/Games/Trackers</span>
           <span class="sr-only">Plan, shortlist and log hiking trails with live weather and nearby-trail discovery. Opens davehomeassist.github.io/trailkeeper in a new tab.</span>

@@ -21,3 +21,11 @@ The first artwork pass covers three places where someone encounters a project fo
 - When someone shares the System by Dave Prompt Lab page, its preview uses artwork prepared for that project. The page itself continues to show the actual extension interface.
 
 Verify the sample through edit, save and reopen. Check a private card with a fixed background, a generated candidate and a reference-only library. Check the shared Prompt Lab image's dimensions and both metadata URLs on the published page.
+
+## Using an image prompt from the Prompt Library
+
+People choosing a prompt in the public library need a way to bring its exact wording into a new image project. Open an entry’s **Image prompt**, then choose **Export for Envision**. Import the named brief in the personal studio. The file carries the entry title and the displayed image prompt. Export happens on the device and uses the existing image brief format.
+
+The first artwork example comes from the library’s Urban Architecture entry. The tools directory also uses dedicated artwork for Trailkeeper. Test the handoff with an image entry and a text-only entry, check the copy recovery path with clipboard access denied, and reopen the downloaded brief in the studio. Verify that expanding and collapsing a card never leaves duplicate controls and that the phone layout keeps the chosen prompt and its actions within reach.
+
+Run the browser regression against a local or published site with Playwright installed. Set `ENVISION_PUBLIC_BASE` to the site origin and run `node apps/envision-studio/probe-library.cjs`. Set `ENVISION_BRIEF_EVIDENCE` to an existing directory to save the downloaded example and screenshots.
