@@ -9,3 +9,13 @@ Both downloads use the event name shown in the editor. Older layout files start 
 In Saved events, **Export brief** downloads the event name, resolved prompt and approved copy. Import the file into Envision Personal Studio to continue on your own GPU. The private studio keeps artwork versions, protected edits, campaign layouts and export history on the owner's hardware. Installation and recovery are covered in the [personal studio guide](../apps/envision-studio/README.md).
 
 To launch the private workspace from the public kit, open **Saved events**, enter its HTTPS origin under **Personal studio address**, and save. **Open personal studio** appears on this browser. Clearing the address removes the shortcut. Opening the studio requires the owner's private network.
+
+## Project artwork
+
+The first artwork pass covers three places where someone encounters a project for the first time.
+
+- In the browser layout editor, a visitor without a file can open an editable optical study, change its title and download the PNG or portable layout. The sample uses original software artwork. The existing file picker and unsaved-edit guard apply to imported layouts.
+- In the private studio, project cards show the chosen layout background first. A project without one can show its latest generated or finished image. The card uses the project's private thumbnail route. Choosing a card opens the existing project and leaves its saved layout and revisions intact.
+- When someone shares the System by Dave Prompt Lab page, its preview uses artwork prepared for that project. The page itself continues to show the actual extension interface.
+
+Verify the sample through edit, save and reopen. Check a private card with a fixed background, a generated candidate and a reference-only library. Check the shared Prompt Lab image's dimensions and both metadata URLs on the published page.

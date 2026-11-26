@@ -6,6 +6,8 @@ On Apple Silicon, the standalone app opens on image generation and offers native
 
 ## Using the studio
 
+Project cards show the layout background chosen by the owner, or the latest generated or finished image when the background is empty. Opening a card restores the saved selection first. References, logos and masks are excluded from automatic cover selection. Cards load small project-scoped WebP thumbnails from the private origin.
+
 1. Open **Projects**. Choose **New project** for an image or a show. **Import project** opens a native editable package, an eleven-layer flyer or a public Envision brief.
 2. In **Create**, enter the image direction. Choose a native render size and one to four candidates. The advanced controls expose a seed, reference roles and strength. **Generate on Walter** queues the work. You can close the tab and open the same project from another device.
 3. In **Library**, select a candidate and use **Compare** to check it against an original. **Full view** expands the proof on a phone. **Use as background** selects it for layout. **Revise** starts from this version. The image stays available in the library after later changes.

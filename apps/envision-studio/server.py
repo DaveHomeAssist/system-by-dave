@@ -213,6 +213,7 @@ def create_app(root, owner, worker_key, origin):
                 "Cache-Control": "private, no-store",
                 "X-Content-Type-Options": "nosniff",
                 "Referrer-Policy": "no-referrer",
+                "Cross-Origin-Resource-Policy": "same-origin",
                 "X-Frame-Options": "DENY",
                 "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'",
             }
@@ -253,7 +254,16 @@ def create_app(root, owner, worker_key, origin):
                     "SELECT project,count(*) FROM jobs WHERE state IN ('queued','running') GROUP BY project"
                 )
             )
-            for r in c.execute("SELECT * FROM projects ORDER BY updated DESC"):
+            for r in c.execute("""
+                SELECT p.*,
+                       COALESCE(NULLIF(json_extract(p.data,'$.background'),''), (
+                           SELECT v.hash FROM versions AS v
+                           JOIN links AS l ON l.project = v.project AND l.hash = v.hash
+                           WHERE v.project = p.id AND v.role IN ('generation','finish')
+                           ORDER BY v.created DESC, v.id DESC LIMIT 1
+                       )) AS cover
+                FROM projects AS p ORDER BY p.updated DESC
+            """):
                 d = json.loads(r["data"])
                 projects.append(
                     {
@@ -263,6 +273,7 @@ def create_app(root, owner, worker_key, origin):
                         "kind": d["kind"],
                         "archived": d["archived"],
                         "background": d["background"],
+                        "cover": r["cover"],
                         "tags": d.get("tags", []),
                         "updated": r["updated"],
                         "activeJobs": active_jobs.get(r["id"], 0),
@@ -330,7 +341,7 @@ def create_app(root, owner, worker_key, origin):
             p["versions"] = [
                 {**dict(r), "recipe": json.loads(r["recipe"])}
                 for r in c.execute(
-                    "SELECT v.*,m.width,m.height FROM versions v JOIN media m ON m.hash=v.hash WHERE v.project=? ORDER BY v.created DESC",
+                    "SELECT v.*,m.width,m.height FROM versions v JOIN media m ON m.hash=v.hash WHERE v.project=? ORDER BY v.created DESC,v.id DESC",
                     (pid,),
                 )
             ]

@@ -1,5 +1,11 @@
 # Changelog
 
+## November 26, 2026. Envision project artwork
+
+- The public Envision layout editor opens an editable optical study generated on Walter. Its title, caption and credit can be changed, exported as PNG and reopened from an editable copy.
+- Private studio project cards use the latest generated or finished artwork when a layout background has yet to be chosen. Thumbnail requests use project ownership, same-origin browser embedding and an indexed lookup.
+- The System by Dave Prompt Lab page has a dedicated share image made from Walter’s index-card study.
+
 ## November 26, 2026. Run Review is now Rehearsal Capture
 
 - The avbydave.com page is now Rehearsal Capture at `/rehearsal-capture/`, with that name on the homepage tools table, the console Show tools menu, the breadcrumb and the page title.
