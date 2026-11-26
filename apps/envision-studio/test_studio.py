@@ -81,6 +81,21 @@ class Studio(unittest.TestCase):
                 self.app.config["STORE"].project(c, self.pid, 1)["data"]["name"], "Test Show"
             )
 
+    def test_direction_assets_have_portable_media_types_and_owner_access(self):
+        for name in ("catalog.js", "folded-paper.webp", "fiber-lights.webp", "botanical-print.webp"):
+            with self.subTest(name=name):
+                route = "/ui/directions/" + name
+                self.assertEqual(self.http.get(route).status_code, 403)
+                with self.http.get(route, headers=OWNER) as response:
+                    self.assertEqual(response.status_code, 200)
+                    expected_type = "text/javascript" if name == "catalog.js" else "image/webp"
+                    self.assertEqual(response.mimetype, expected_type)
+                    self.assertTrue(response.cache_control.private)
+                    self.assertTrue(response.cache_control.no_store)
+                    if name.endswith(".webp"):
+                        with Image.open(io.BytesIO(response.data)) as thumbnail:
+                            self.assertEqual((thumbnail.format, thumbnail.size), ("WEBP", (640, 360)))
+
     def test_save_direction_preserves_other_edits_and_rejects_stale_replacements(self):
         endpoint = self.api + self.project + "/brief"
 
