@@ -609,6 +609,7 @@ try {
   });
 
   for (const site of sites) {
+    const RUN_REVIEW_MODE_PROBES = new Set(['/run-review/catalog.json', '/run-review/source/config.json']);
     await test(`${site.id} all published pages and home links`, async page => {
       // Some staged apps load large local bundles. Keep the 7s default for
       // migration interactions, but allow complete loads in this route sweep.
@@ -616,6 +617,9 @@ try {
       page.setDefaultTimeout(20000);
       const broken = [];
       page.on('response', response => {
+        // Run Review probes these two files to choose its mode; a 404 is the designed
+        // signal for local mode (docs/run-review.md), not a broken link.
+        if (response.status() === 404 && RUN_REVIEW_MODE_PROBES.has(new URL(response.url()).pathname)) return;
         if (response.status() >= 400 && response.url().startsWith(site.origin + '/') && !response.url().includes('/api/')) broken.push(response.url());
       });
       const routes = [...new Set(publishedPages.filter(item => item.site === site.id).map(item => item.route))];

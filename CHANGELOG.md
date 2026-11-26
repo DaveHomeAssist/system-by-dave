@@ -1,5 +1,11 @@
 # Changelog
 
+## November 26, 2026. Run Review on avbydave.com
+
+- Run Review now opens at `/run-review/` on avbydave.com, from the homepage tools table (Early build) and the console's Show tools menu. It is the Frozen Rehearsal Review viewer, unchanged, pinned to its `frozen-rehearsal-capture` build and given the AV by Dave name, breadcrumb, palette and shared theme choice.
+- With no show published on the site it runs in local mode: open a capture archive (and an optional Notion cue snapshot) from this computer. Review marks and notes stay in this browser and export as CSV, Markdown or JSON. The page is noindex for now.
+- The Frozen copy at wst.housevideo.app/run-review/ is unchanged. The console registry generation is `v20261126-run-review`.
+
 ## November 26, 2026. Envision editable exports
 
 - The private studio now asks you to save pending layer and event field edits before downloading an editable project ZIP or legacy flyer.

@@ -1,0 +1,2969 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-cRE/KOXW9UiUtL5nuAPeBxydQT7sJ8mCsQJh5HVuH7w=' 'sha256-fQf9Gb8xQcYWQ2cUoEf+9L24Au0FWux8UCdS2PhVucI='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light dark">
+<title>Run Review | AV by Dave</title>
+<meta name="description" content="Step through a rehearsal capture cue by cue: photos, MIDI firings and observations, with review marks and notes kept in this browser.">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#f3f2ec">
+<link rel="canonical" href="https://avbydave.com/run-review/">
+<link rel="icon" href="../av-home/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../css/avd/tokens.css">
+<meta property="og:title" content="Run Review | AV by Dave">
+<meta property="og:description" content="Step through a rehearsal capture cue by cue: photos, MIDI firings and observations, with review marks and notes kept in this browser.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://avbydave.com/run-review/">
+<meta property="og:site_name" content="AV by Dave">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Run Review | AV by Dave">
+<meta name="twitter:description" content="Step through a rehearsal capture cue by cue: photos, MIDI firings and observations, with review marks and notes kept in this browser.">
+<script>// Shared browser preference for the workspace, controller, login and Monitor.
+// Loaded before styles so a remembered dark choice does not flash light first.
+(() => {
+  if (window.FrozenTheme) return;
+  const KEY = 'av-theme-mode.v1';
+  const modes = ['light', 'dark', 'system'];
+  const valid = value => modes.includes(value);
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+  let mode = 'light', persisted = true, inherited = false;
+  function read() {
+    try {
+      const saved = localStorage.getItem(KEY);
+      if (valid(saved)) return saved;
+      if (saved === 'white') return 'light';
+      if (saved === 'black') return 'dark';
+      const legacy = [localStorage.getItem('wst.frozen.theme.v1'), localStorage.getItem('projctl.monitor.theme.v1'), localStorage.getItem('theme')];
+      try { legacy.unshift(JSON.parse(localStorage.getItem('projctl.ui.v1') || 'null')?.theme); } catch { /* Another preference may still be valid. */ }
+      return legacy.find(valid) || (legacy.includes('deep-freeze') ? 'dark' : 'light');
+    } catch { persisted = false; return 'light'; }
+  }
+  const theme = () => mode === 'system' ? media.matches ? 'dark' : 'light' : mode;
+  function apply() {
+    document.documentElement.dataset.theme = theme();
+    document.documentElement.dataset.themePreference = mode;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme() === 'dark' ? '#0f0f0e' : '#f3f2ec');
+    window.dispatchEvent(new CustomEvent('frozen:themechange', { detail: { mode, theme: theme(), persisted } }));
+  }
+  function set(value, { save = true } = {}) {
+    if (!valid(value)) return;
+    mode = value; inherited = !save;
+    if (save) { try { localStorage.setItem(KEY, mode); persisted = true; } catch { persisted = false; } }
+    apply();
+  }
+  window.FrozenTheme = { get mode() { return mode; }, get theme() { return theme(); }, get persisted() { return persisted; }, set };
+  mode = read(); apply();
+  media.addEventListener('change', () => { if (mode === 'system') apply(); });
+  window.addEventListener('storage', event => { if (event.key === KEY || event.key === null) { inherited = false; mode = read(); apply(); } });
+  document.addEventListener('DOMContentLoaded', () => {
+    apply();
+    const trigger = document.querySelector('#theme');
+    let menu;
+    if (trigger) {
+      menu = document.createElement('div'); menu.id = 'frozen-theme-menu'; menu.className = 'frozen-theme-menu';
+      menu.setAttribute('popover', 'auto'); menu.setAttribute('role', 'group'); menu.setAttribute('aria-label', 'Theme preference');
+      const heading = document.createElement('strong'); heading.textContent = 'Appearance'; menu.append(heading);
+      for (const choice of modes) {
+        const button = document.createElement('button'); button.type = 'button'; button.dataset.themeChoice = choice;
+        button.textContent = choice === 'system' ? 'System' : choice === 'dark' ? 'Dark' : 'Light'; menu.append(button);
+      }
+      const note = document.createElement('small'); note.dataset.themeStorage = ''; menu.append(note);
+      document.body.append(menu); trigger.setAttribute('popovertarget', menu.id); trigger.setAttribute('aria-expanded', 'false');
+      menu.addEventListener('toggle', event => { trigger.setAttribute('aria-expanded', String(event.newState === 'open')); });
+    }
+    const refresh = () => {
+      document.querySelectorAll('[data-theme-choice]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.themeChoice === mode)));
+      if (trigger) { trigger.setAttribute('aria-label', `Appearance: ${mode}. Change theme`); trigger.title = `Appearance: ${mode}`; }
+      const note = menu?.querySelector('[data-theme-storage]');
+      if (note) note.textContent = inherited ? 'Following the workspace appearance for this view.' : persisted ? 'Remembered in this browser. System follows your device.' : 'For this visit only. Browser storage is unavailable.';
+    };
+    document.querySelectorAll('[data-theme-choice]').forEach(button => button.addEventListener('click', () => {
+      set(button.dataset.themeChoice); if (menu?.matches(':popover-open')) { menu.hidePopover(); trigger.focus(); }
+    }));
+    window.addEventListener('frozen:themechange', refresh); refresh();
+  });
+})();
+</script>
+<style>/* Shared Frozen surfaces. State and projector lane colors retain their operational meanings. */
+:root {
+  --frozen-ground:#edf5fa; --frozen-surface:#ffffff; --frozen-raised:#e2eff7; --frozen-sunken:#e8f2f8;
+  --frozen-ink:#153149; --frozen-muted:#465f73; --frozen-faint:#526b7e; --frozen-hairline:#c4d9e6; --frozen-control:#728fa3;
+  --frozen-accent:#175778; --frozen-on-accent:#ffffff; --frozen-focus:#006c96; --frozen-hover:#10425d; --frozen-aurora:#d8eef0;
+}
+:root[data-theme="dark"] {
+  --frozen-ground:#081421; --frozen-surface:#102438; --frozen-raised:#18334a; --frozen-sunken:#0a1b2c;
+  --frozen-ink:#edf7ff; --frozen-muted:#b1cbdc; --frozen-faint:#a2bdd1; --frozen-hairline:#2b4b63; --frozen-control:#7192aa;
+  --frozen-accent:#a3e6ee; --frozen-on-accent:#0b2536; --frozen-focus:#b1f5f5; --frozen-hover:#d1ffff; --frozen-aurora:#173f4c;
+}
+.frozen-theme-menu { position:fixed; inset:62px 12px auto auto; width:230px; max-width:calc(100vw - 24px); padding:12px; border:1px solid var(--line-control,var(--line,#9aabb6)); border-radius:12px; background:var(--surface,#fff); color:var(--ink,#19364a); box-shadow:0 10px 36px #0003; }
+.frozen-theme-menu:popover-open { display:grid; gap:8px; }
+.frozen-theme-menu strong { font:600 15px/1.4 system-ui,sans-serif; }
+.frozen-theme-menu button { min-height:44px; width:100%; padding:8px 12px; text-align:left; font:600 14px/1.4 system-ui,sans-serif; background:var(--surface,#fff); color:var(--ink,#19364a); border:1px solid var(--line-control,var(--line,#9aabb6)); border-radius:7px; cursor:pointer; }
+.frozen-theme-menu button[aria-pressed=true] { box-shadow:inset 4px 0 0 var(--accent,#127391); font-weight:750; }
+.frozen-theme-menu button:hover { background:var(--surface-raised,var(--tag,#dfeef5)); }
+.frozen-theme-menu button:focus-visible { outline:3px solid var(--focus-ring,var(--accent,#127391)); outline-offset:2px; }
+.frozen-theme-menu small { font:12px/1.5 system-ui,sans-serif; color:var(--ink-muted,var(--muted,#536a79)); }
+
+/* Frozen review skin uses the canonical WST palette; photo wells remain neutral. */
+:root {
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px;
+  --fs-xs: 11px; --fs-s: 12px; --fs-m: 13px; --fs-b: 14px; --fs-l: 16px;
+  --radius: 10px; --radius-s: 6px;
+  --bg: var(--frozen-ground); --panel: var(--frozen-surface); --panel-2: var(--frozen-sunken); --fg: var(--frozen-ink); --muted: var(--frozen-muted); --faint: var(--frozen-faint); --line: var(--frozen-hairline); --line-2: var(--frozen-control);
+  --accent: var(--frozen-accent); --accent-soft: var(--frozen-raised);
+  --ok: #1d7444; --fix: #b3261e; --q: #855700; --ok-soft: #e5f2ea; --fix-soft: #fbeae8; --q-soft: #fbf2df;
+  --well: #17181b; --well-2: #212327; --well-line: #2c2f35; --well-fg: #e4e6ea; --well-muted: #a3a7af; --warn-on-well: #f3c96f; --bad-on-well: #ffaba3; --info-on-well: #a9c6ff;
+  --tick: #8b8f97; --tick-early: #cfd1d5; --band: #ebe9e4; --band-2: #e3e1db;
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --ok: #63c98e; --fix: #ff8f85; --q: #f0c35a; --ok-soft: #15261c; --fix-soft: #2d1917; --q-soft: #2a2311;
+  --well: #0c0d0f; --well-2: #16171a; --well-line: #24262b;
+  --tick: #7d8189; --tick-early: #3a3d43; --band: #1b1d20; --band-2: #222428;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: var(--bg); color: var(--fg); font: var(--fs-b)/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--frozen-focus); outline-offset: 2px; }
+.sr-only { position: fixed; top: 0; left: 0; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.muted { color: var(--muted); }
+code, kbd { font: var(--fs-s)/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; }
+kbd { border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; background: var(--panel-2); color: var(--muted); font-size: 10.5px; }
+[hidden] { display: none !important; }
+svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Shell */
+.shell { height: 100dvh; display: grid; grid-template-rows: auto auto minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
+.top { display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s4); background: var(--panel); border-bottom: 1px solid var(--line); }
+.brand { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: var(--s3); }
+.frozen-brand { color: var(--accent); }
+.brand-divider { color: var(--faint); font-weight: 400; }
+.brand h1 { margin: 0; font-size: var(--fs-l); letter-spacing: -0.01em; white-space: nowrap; }
+.sub { margin: 0; font-size: var(--fs-s); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.actions { display: flex; gap: var(--s1); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--line-2); background: var(--panel); border-radius: 8px; padding: 5px 11px; cursor: pointer; min-height: 32px; font-size: var(--fs-m); }
+.btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--frozen-on-accent); }
+
+.btn.icon { width: 32px; padding: 0; }
+.link-btn { border: 0; background: none; padding: 2px 0; color: var(--accent); cursor: pointer; font-size: var(--fs-s); display: inline-flex; gap: 4px; align-items: center; }
+.link-btn:hover { text-decoration: underline; }
+
+.tabs { background: var(--panel); border-bottom: 1px solid var(--line); }
+[role="tablist"] { display: flex; gap: 4px; padding: 3px var(--s3); }
+[role="tab"] { border: 1px solid transparent; border-radius: 8px; background: none; padding: 5px 11px; min-height: 32px; cursor: pointer; color: var(--muted); font-weight: 600; font-size: var(--fs-m); }
+[role="tab"]:hover { color: var(--fg); background: var(--accent-soft); }
+[role="tab"][aria-selected="true"] { color: var(--fg); border-color: var(--accent); background: var(--accent-soft); }
+.count:not(:empty) { margin-left: 4px; font-size: 10.5px; padding: 0 6px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line-2); color: var(--muted); }
+
+.panels { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); }
+[role="tabpanel"] { min-height: 0; min-width: 0; display: flex; flex-direction: column; }
+
+/* Welcome */
+.empty-state { flex: 1; display: grid; place-items: center; padding: var(--s5); min-height: 0; }
+.welcome-card { max-width: 540px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 28px 30px; box-shadow: 0 1px 2px #0000000a; }
+.welcome-card h2 { margin: 0 0 var(--s3); font-size: 20px; letter-spacing: -0.01em; }
+.steps { margin: 0 0 var(--s3); padding-left: 20px; display: grid; gap: 6px; }
+
+/* Review layout */
+.run { flex: 1; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.strip-wrap { padding: var(--s2) var(--s3) 0; }
+#run-strip { display: block; width: 100%; height: 26px; cursor: pointer; border-radius: var(--radius-s); }
+.review-grid { min-height: 0; display: grid; gap: var(--s2); padding: var(--s2) var(--s3) var(--s3); grid-template-columns: minmax(240px, 290px) minmax(0, 1fr) minmax(290px, 340px); grid-template-rows: minmax(0, 1fr); position: relative; }
+.pane-switch { display: none; }
+.list-pane, .stage-pane, .context-pane { min-height: 0; min-width: 0; border-radius: var(--radius); }
+
+/* Cue list */
+.list-pane { display: grid; grid-template-rows: auto minmax(0, 1fr); background: var(--panel); border: 1px solid var(--line); }
+.list-tools { padding: var(--s2); border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
+.list-tools input[type="search"] { width: 100%; padding: 6px 10px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel-2); font-size: var(--fs-m); }
+.chips { display: flex; flex-wrap: wrap; gap: 2px; }
+.chips button { border: 0; background: none; border-radius: 6px; padding: 2px 7px; font-size: var(--fs-s); cursor: pointer; color: var(--muted); }
+.chips button:hover { color: var(--fg); background: var(--panel-2); }
+.chips button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.progress { display: grid; gap: 4px; }
+.progress-row { display: flex; justify-content: space-between; align-items: center; font-size: var(--fs-s); color: var(--muted); }
+.progress-bar { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.progress-bar span { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s; }
+.firing-list { overflow: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; padding: 2px 4px 8px; }
+.group { margin: 0; padding: 0; }
+.section-row { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; gap: 8px; padding: 8px 8px 4px; background: var(--panel); font-size: var(--fs-xs); letter-spacing: .02em; color: var(--faint); white-space: nowrap; }
+.section-row > span { overflow: hidden; text-overflow: ellipsis; }
+.section-row b { color: var(--muted); font-weight: 650; }
+.early-row { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px; border: 1px dashed var(--line-2); background: var(--panel-2); border-radius: 8px; padding: 7px 9px; margin: 4px 0; cursor: pointer; color: var(--muted); font-size: var(--fs-s); text-align: left; }
+.early-row span:last-child { color: var(--accent); white-space: nowrap; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; column-gap: 10px; padding: 5px 8px; border-radius: 7px; cursor: pointer; }
+.row:hover { background: var(--panel-2); }
+.row[aria-selected="true"] { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+.r-cue { font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-cue small { font-weight: 600; font-size: 10px; color: var(--q); margin-left: 4px; letter-spacing: .04em; }
+.r-time { font: var(--fs-xs) ui-monospace, Menlo, monospace; color: var(--faint); }
+.r-state { display: flex; align-items: center; gap: 6px; min-width: 34px; justify-content: flex-end; }
+.r-meta { grid-column: 1 / -1; font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: -1px; }
+.bars { display: flex; gap: 2px; }
+.bars i { width: 5px; height: 9px; border-radius: 1.5px; background: var(--line-2); }
+.bars i.ok { background: var(--tick); opacity: .55; }
+.bars i.warn { background: var(--q); }
+.bars i.miss { background: transparent; box-shadow: inset 0 0 0 1.2px var(--fix); }
+.st { display: inline-flex; color: var(--muted); }
+.st svg.i { width: 15px; height: 15px; }
+.st.ok { color: var(--ok); } .st.fix { color: var(--fix); } .st.question { color: var(--q); }
+
+/* Stage: photos sit on a neutral dark well in both themes so colour judgments do not shift with the UI theme. */
+.stage-pane { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--well); color: var(--well-fg); border: 1px solid var(--well-line); container-type: inline-size; }
+.stage-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--s3); align-items: center; padding: var(--s2) var(--s3); border-bottom: 1px solid var(--well-line); }
+.stage-id { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.stage-id .label { color: var(--well-muted); font-size: var(--fs-s); }
+.stage-id .cue { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1.1; }
+.stage-id .cmd { color: var(--warn-on-well); font-weight: 600; font-size: var(--fs-xs); letter-spacing: .05em; }
+.stage-facts { grid-column: 1; color: var(--well-muted); font-size: var(--fs-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stage-flags { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+.stage-flags:empty { display: none; }
+.flag { font-size: var(--fs-xs); font-weight: 600; padding: 1px 7px; border-radius: 10px; background: #3a2b10; color: var(--warn-on-well); }
+.flag.bad { background: #3b1816; color: var(--bad-on-well); }
+.flag.info { background: #1e283a; color: var(--info-on-well); }
+.flag.pin { background: #252830; color: var(--well-fg); display: inline-flex; align-items: center; gap: 4px; }
+.flag.pin button { border: 0; background: none; color: var(--well-muted); cursor: pointer; padding: 0; display: inline-flex; }
+.stage-actions { grid-column: 2; grid-row: 1 / 3; display: flex; align-items: center; gap: 4px; }
+.modes { display: flex; gap: 2px; background: var(--well-2); border-radius: 8px; padding: 2px; }
+.modes button, .tool { display: inline-flex; align-items: center; gap: 5px; border: 0; background: none; color: var(--well-muted); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: var(--fs-s); }
+.modes button:hover, .tool:hover { color: var(--well-fg); }
+.modes button[aria-pressed="true"] { background: #33363d; color: #fff; }
+.tool[aria-pressed="true"] { color: #fff; background: #33363d; }
+.details-toggle { display: none !important; }
+@container (max-width: 760px) { .modes .lbl { display: none; } }
+@container (max-width: 520px) { .stage-actions { grid-row: auto; grid-column: 1 / -1; } }
+.stage-main { min-height: 0; min-width: 0; padding: var(--s2); display: grid; container-type: size; }
+.stage-main figure { margin: 0; min-height: 0; min-width: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 6px; }
+.photo { min-height: 0; min-width: 0; display: grid; place-items: center; background: #000; border-radius: var(--radius-s); overflow: hidden; position: relative; }
+.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+.photo.warned { box-shadow: inset 0 0 0 2px #c79425; }
+.rescue-badge { position: absolute; left: 8px; top: 8px; z-index: 1; padding: 3px 8px; border-radius: 999px; background: #0c416be6; color: #fff; font-size: var(--fs-xs); font-weight: 700; letter-spacing: .02em; pointer-events: none; }
+.photo:has(img:not([src]))::before, .photo[data-load-state="loading"]::before { content: 'Loading photo'; color: var(--well-muted); font-size: var(--fs-xs); }
+.photo[data-load-state="error"]::before { content: 'Photo unavailable. Use Retry photos.'; color: var(--bad-on-well); font-size: var(--fs-s); padding: 8px; text-align: center; }
+img[data-load-state="error"], img[data-load-state="loading"] { opacity: 0; }
+.photo.zoomable { cursor: zoom-in; touch-action: none; }
+.photo.zoomable img { transform-origin: 0 0; will-change: transform; }
+.photo.zoomed { cursor: grab; }
+.photo.zoomed.panning { cursor: grabbing; }
+.zoom-badge { position: absolute; right: 8px; bottom: 8px; padding: 2px 8px; border-radius: 6px; background: #000b; color: #fff; font-size: var(--fs-xs); pointer-events: none; }
+figcaption { font-size: var(--fs-s); color: var(--well-muted); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+figcaption b { color: var(--well-fg); font-weight: 600; }
+figcaption .warn { color: var(--warn-on-well); }
+figcaption .rescued-detail { color: #9dd8ff; font-weight: 600; }
+.placeholder { width: 100%; height: 100%; min-height: 60px; display: grid; place-content: center; text-align: center; gap: 4px; padding: var(--s3); color: var(--well-muted); border: 1px dashed #3a3d44; border-radius: var(--radius-s); background: var(--well-2); }
+.placeholder.missing { border-color: #6e3430; color: var(--bad-on-well); }
+.placeholder b { color: var(--well-fg); font-weight: 600; }
+.multi { display: grid; gap: var(--s2); min-height: 0; grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
+@container (max-aspect-ratio: 9 / 4) { .multi.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); } }
+@container (max-aspect-ratio: 5 / 4) { .multi.n2 { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); } }
+.repeats { display: grid; gap: var(--s2); min-height: 0; grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr)); align-content: start; overflow: auto; overscroll-behavior: contain; }
+.repeat-card { border: 1px solid var(--well-line); border-radius: 8px; padding: 6px; background: var(--well-2); color: inherit; text-align: left; cursor: pointer; display: grid; gap: 6px; }
+.repeat-card.current { border-color: #8ab4ff; box-shadow: 0 0 0 1px #8ab4ff; }
+.repeat-card .photo, .repeat-card .placeholder { aspect-ratio: 16 / 9; height: auto; min-height: 0; }
+.wipe { position: relative; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: var(--s2); }
+.wipe-frame { position: relative; min-height: 0; background: #000; border-radius: var(--radius-s); overflow: hidden; }
+.wipe-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.wipe-frame .top-img { clip-path: inset(0 calc(100% - var(--wipe, 50%)) 0 0); }
+.wipe-frame .wipe-line { position: absolute; top: 0; bottom: 0; left: var(--wipe, 50%); width: 2px; background: #fff; box-shadow: 0 0 0 1px #0008; pointer-events: none; }
+.wipe-frame .tag { position: absolute; top: 8px; padding: 2px 8px; border-radius: 6px; background: #000a; font-size: var(--fs-s); }
+.wipe-frame .tag.l { left: 8px; } .wipe-frame .tag.r { right: 8px; }
+.wipe input[type="range"] { width: 100%; accent-color: #8ab4ff; }
+.slot-strip { display: grid; gap: 6px; padding: 0 var(--s2) var(--s2); grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); }
+.slot-strip:empty { display: none; }
+.slot-thumb { border: 1px solid transparent; background: var(--well-2); color: var(--well-fg); border-radius: 8px; padding: 3px; cursor: pointer; display: grid; gap: 3px; text-align: left; min-width: 0; }
+.slot-thumb:hover { border-color: var(--well-line); }
+.slot-thumb[aria-pressed="true"] { border-color: #8ab4ff; }
+.slot-thumb .photo, .slot-thumb .placeholder { height: clamp(34px, 8vh, 78px); min-height: 0; padding: 2px; font-size: var(--fs-xs); }
+.slot-thumb span { font-size: var(--fs-xs); color: var(--well-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 2px; }
+.stage-pane.is-full { position: fixed; inset: 0; z-index: 50; border-radius: 0; }
+
+/* Details pane */
+.context-pane { overflow: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; background: var(--panel); border: 1px solid var(--line); }
+.note-box { position: sticky; top: 0; z-index: 2; background: var(--panel); padding: var(--s3) var(--s3) var(--s2); border-bottom: 1px solid var(--line); }
+.note-box h3, .ctx > summary { margin: 0; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--faint); font-weight: 650; }
+.note-box h3 { margin-bottom: 6px; display: flex; justify-content: space-between; }
+.status-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-bottom: 6px; }
+.status-row button { display: inline-flex; align-items: center; justify-content: center; gap: 4px; border: 1px solid var(--line-2); background: var(--panel); border-radius: 8px; padding: 5px 4px; cursor: pointer; font-size: var(--fs-s); white-space: nowrap; }
+.status-row button:hover { background: var(--panel-2); }
+.status-row button[aria-pressed="true"][data-status="ok"] { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.status-row button[aria-pressed="true"][data-status="fix"] { background: var(--fix-soft); border-color: var(--fix); color: var(--fix); }
+.status-row button[aria-pressed="true"][data-status="question"] { background: var(--q-soft); border-color: var(--q); color: var(--q); }
+.note-text { width: 100%; min-height: 64px; resize: vertical; padding: 7px 9px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel-2); font-size: var(--fs-m); }
+.note-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: var(--fs-s); color: var(--muted); margin-top: 4px; }
+.note-meta select { border: 1px solid var(--line-2); border-radius: 6px; background: var(--panel); padding: 1px 4px; font-size: var(--fs-s); }
+.ctx { border-bottom: 1px solid var(--line); }
+.ctx > summary { list-style: none; cursor: pointer; padding: 10px var(--s3); display: flex; justify-content: space-between; align-items: center; }
+.ctx > summary::-webkit-details-marker { display: none; }
+.ctx > summary::after { content: ''; width: 6px; height: 6px; border-right: 1.5px solid var(--faint); border-bottom: 1.5px solid var(--faint); transform: rotate(-45deg); transition: transform .15s; }
+.ctx[open] > summary::after { transform: rotate(45deg); }
+.ctx-body { padding: 0 var(--s3) var(--s3); font-size: var(--fs-m); }
+.pill { font-size: 10.5px; padding: 0 6px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line-2); color: var(--muted); text-transform: none; letter-spacing: 0; margin-left: 6px; }
+dl.facts { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 0; font-size: var(--fs-m); }
+dl.facts dt { color: var(--muted); }
+dl.facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+.slot-table { width: 100%; border-collapse: collapse; font-size: var(--fs-s); }
+.slot-table td { padding: 4px 4px; border-top: 1px solid var(--line); vertical-align: top; }
+.slot-table tr:first-child td { border-top: 0; }
+.obs { border-left: 2px solid var(--line-2); padding: 1px 0 1px 9px; margin: 6px 0; }
+.obs p { margin: 2px 0; }
+.obs .src { font-size: var(--fs-s); color: var(--muted); }
+.callout { font-size: var(--fs-s); color: var(--muted); background: var(--panel-2); border-radius: 8px; padding: 7px 9px; margin: 8px 0 0; }
+.warn-text { color: var(--q); }
+.bad-text { color: var(--fix); }
+.raw { margin-top: 8px; }
+.raw summary { cursor: pointer; color: var(--muted); font-size: var(--fs-s); }
+.raw code { display: block; margin-top: 4px; word-break: break-all; color: var(--muted); }
+
+/* Contact sheet */
+.sheet-tools, .notes-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); padding: var(--s2) var(--s4); border-bottom: 1px solid var(--line); background: var(--panel); }
+.sheet-tools p { margin: 0; flex: 1; font-size: var(--fs-m); }
+.sheet-tools input[type="search"] { flex: 1 1 200px; min-width: 120px; max-width: 420px; border: 1px solid var(--line-2); border-radius: 8px; padding: 7px 10px; background: var(--panel-2); }
+.empty-results { color: var(--muted); padding: 8px; margin: 0; grid-column: 1 / -1; }
+#note-saved { margin: 0 0 8px; font-size: var(--fs-xs); color: var(--muted); }
+#note-saved.bad-text { color: var(--bad); }
+.search-count { font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; }
+.search-count:empty { display: none; }
+.clear-filters { white-space: nowrap; min-height: 32px; }
+button:disabled { opacity: .45; cursor: default; }
+.seg { display: inline-flex; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 8px; padding: 2px; }
+.seg button { border: 0; background: none; padding: 2px 10px; border-radius: 6px; cursor: pointer; color: var(--muted); font-size: var(--fs-s); }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--fg); box-shadow: 0 0 0 1px var(--line-2); }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-m); }
+.sheet-grid { --thumb-min: 210px; flex: 1; min-height: 0; overflow: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; padding: var(--s3) var(--s4) var(--s4); display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(var(--thumb-min), 100%), 1fr)); align-content: start; }
+.sheet-section { grid-column: 1 / -1; display: flex; gap: 10px; align-items: baseline; padding: 6px 2px 0; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--faint); }
+.sheet-section b { color: var(--muted); }
+.sheet-card { border: 1px solid transparent; background: var(--panel); border-radius: 10px; padding: 5px; cursor: pointer; text-align: left; display: grid; gap: 5px; color: inherit; box-shadow: 0 0 0 1px var(--line); }
+.sheet-card:hover { box-shadow: 0 0 0 1px var(--line-2), 0 2px 8px #0000000f; }
+.sheet-card.selected { box-shadow: 0 0 0 2px var(--accent); }
+.sheet-card .photo, .sheet-card .placeholder { aspect-ratio: 16 / 9; height: auto; min-height: 0; }
+.sheet-cap { display: flex; align-items: center; gap: 6px; font-size: var(--fs-s); min-width: 0; }
+.sheet-cap b { font-size: var(--fs-b); font-variant-numeric: tabular-nums; }
+.sheet-cap .t { color: var(--faint); font: var(--fs-xs) ui-monospace, Menlo, monospace; }
+.sheet-cap .end { margin-left: auto; display: flex; gap: 4px; align-items: center; }
+.sheet-sub { font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Notes */
+.notes-tools label { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-m); }
+.notes-tools input[type="text"], .notes-tools select { border: 1px solid var(--line-2); border-radius: 8px; padding: 5px 8px; background: var(--panel-2); font-size: var(--fs-m); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.notes-hint { margin: 0; padding: 6px var(--s4); font-size: var(--fs-s); }
+.table-wrap { flex: 1; min-height: 0; overflow: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; margin: 0 var(--s4) var(--s4); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; scroll-padding-top: 2.5rem; }
+.notes-table { width: 100%; border-collapse: collapse; font-size: var(--fs-m); }
+.notes-table th { position: sticky; top: 0; background: var(--panel); text-align: left; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--faint); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.notes-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.notes-table td.note-cell { white-space: pre-wrap; max-width: 60ch; }
+.notes-table .empty td { color: var(--muted); text-align: center; padding: 28px; }
+.notes-table .status-cell { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.notes-compact { display: none; }
+
+/* Session */
+.session-wrap { flex: 1; min-height: 0; overflow: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; padding: var(--s4); display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); align-content: start; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: var(--s3) var(--s4); }
+.card h3 { margin: 0 0 var(--s2); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--faint); }
+.card ul { margin: 0; padding-left: 18px; font-size: var(--fs-m); }
+.card li { margin: 3px 0; }
+
+/* Overlays */
+.drop-overlay { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 18%, transparent); backdrop-filter: blur(2px); }
+.drop-overlay p { background: var(--panel); border: 2px dashed var(--accent); border-radius: 14px; padding: 24px 32px; font-size: 18px; font-weight: 600; }
+.toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 90; background: var(--fg); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-size: var(--fs-m); max-width: min(90vw, 560px); opacity: 0; pointer-events: none; transition: opacity .2s; }
+.toast.show { opacity: 1; }
+.toast { display: flex; align-items: center; gap: 10px; }
+.toast.show { pointer-events: auto; }
+#toast-dismiss { flex: none; width: 32px; min-height: 32px; border: 1px solid currentColor; border-radius: 5px; color: inherit; background: transparent; cursor: pointer; }
+#toast-dismiss:hover { background: #ffffff22; }
+.toast.error { background: var(--fix); color: #fff; }
+dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--fg); padding: 18px 22px; max-width: min(92vw, 540px); }
+dialog::backdrop { background: #0007; }
+dialog h2 { margin: 0 0 10px; font-size: var(--fs-l); }
+.keys { border-collapse: collapse; margin-bottom: 12px; font-size: var(--fs-m); }
+.keys td { padding: 4px 12px 4px 0; vertical-align: top; }
+#print-root { display: none; }
+
+/* Laptop and tablet: details become a drawer */
+@media (max-width: 1199px) and (min-width: 761px) {
+  .review-grid { grid-template-columns: minmax(220px, 260px) minmax(0, 1fr); }
+  .context-pane { position: absolute; top: var(--s2); right: var(--s3); bottom: var(--s3); width: min(360px, 70%); z-index: 20; box-shadow: 0 12px 32px #0003; display: none; }
+  .review-grid.show-details .context-pane { display: block; }
+  .details-toggle { display: inline-flex !important; }
+}
+
+/* Mobile: one pane at a time, tabs in a bottom rail */
+@media (max-width: 760px) {
+  .shell { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .tabs { order: 3; border-bottom: 0; border-top: 1px solid var(--line); }
+  [role="tablist"] { justify-content: space-around; padding: 0 4px max(6px, env(safe-area-inset-bottom)); }
+  [role="tab"] { padding: 8px 6px; font-size: var(--fs-m); border-bottom: 0; border-top: 2px solid transparent; }
+  [role="tab"][aria-selected="true"] { border-top-color: var(--accent); }
+  .panels { order: 2; }
+  .top { padding: 6px var(--s3); }
+  .brand { display: block; }
+  .strip-wrap { padding: 6px var(--s2) 0; }
+  .review-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); padding: 6px var(--s2) var(--s2); gap: 6px; }
+  .pane-switch { display: flex; gap: 2px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 2px; }
+  .pane-switch button { flex: 1; border: 0; background: none; padding: 5px; border-radius: 6px; cursor: pointer; color: var(--muted); font-size: var(--fs-m); }
+  .pane-switch button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .review-grid > .list-pane, .review-grid > .stage-pane, .review-grid > .context-pane { display: none; grid-row: 2; }
+  .review-grid[data-pane="list"] > .list-pane { display: grid; }
+  .review-grid[data-pane="photos"] > .stage-pane { display: grid; }
+  .review-grid[data-pane="details"] > .context-pane { display: block; }
+  .sheet-grid { --thumb-min: 150px !important; padding: var(--s2); }
+  .notes-tools, .sheet-tools { padding: var(--s2); }
+}
+
+/* Short screens */
+@media (max-height: 560px) {
+  .top { padding: 4px var(--s3); } .sub { display: none; }
+  [role="tab"] { padding: 5px 10px; }
+  .strip-wrap { display: none; }
+  .run { grid-template-rows: 0 minmax(0, 1fr); }
+  .stage-head { padding: 4px var(--s2); } .stage-id .cue { font-size: 18px; }
+  .stage-facts, .stage-flags { display: none; }
+  .slot-thumb .photo, .slot-thumb .placeholder { height: 30px; }
+  .slot-thumb span { display: none; }
+  .row { padding: 2px 6px; } .r-meta { display: none; }
+  .list-tools .chips, .list-tools .progress { display: none; }
+  .note-box { padding: 6px var(--s2); } .note-text { min-height: 40px; }
+}
+@media (max-height: 480px) {
+  .notes-tools, .sheet-tools { padding: 6px var(--s2); gap: 4px 8px; }
+  .notes-tools .btn, .notes-tools select, .notes-tools input[type="text"] { min-height: 28px; padding: 2px 8px; font-size: var(--fs-s); }
+  .notes-hint { display: none; }
+  .table-wrap { margin: 0 var(--s2) var(--s2); }
+}
+@media (max-height: 340px) {
+  .notes-tools { display: none; }
+  .notes-compact { display: flex; gap: 6px; padding: 6px var(--s2); }
+  .notes-compact select { flex: 1; min-width: 0; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel-2); }
+  .multi figcaption { display: none !important; }
+  .slot-strip { display: none; }
+  .stage-main { padding: 4px; }
+  .stage-main figcaption { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .note-box { position: static; }
+}
+
+/* Ultrawide */
+@media (min-width: 2200px) {
+  html, body { font-size: 15px; }
+  .review-grid { grid-template-columns: minmax(320px, 380px) minmax(0, 1fr) minmax(370px, 430px); gap: var(--s3); padding: var(--s3) var(--s4) var(--s4); }
+  .strip-wrap { padding: var(--s3) var(--s4) 0; }
+  #run-strip { height: 32px; }
+  .slot-thumb .photo, .slot-thumb .placeholder { height: clamp(60px, 11vh, 130px); }
+  .stage-id .cue { font-size: 30px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .toast, .progress-bar span, .ctx > summary::after { transition: none; } }
+
+/* Shared review: photos own the middle, the timeline stays below. */
+.review-controls { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.review-controls select, .review-controls input, #session-picker { color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; min-height: 44px; min-width: 0; max-width: 220px; }
+#jump-form { display: flex; gap: 4px; }
+#jump-cue { width: 82px; }
+.run { grid-template-rows: minmax(0, 1fr) auto; }
+.strip-wrap { grid-row: 2; padding: 0 12px 6px; }
+.review-grid { position: relative; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) 112px; gap: 7px; padding: 8px 12px; }
+.review-grid > .pane-switch { display: none; }
+.review-grid > .stage-pane { display: grid; grid-row: 2; grid-column: 1; }
+.review-grid > .list-pane { display: grid; grid-row: 3; grid-column: 1; grid-template-rows: auto minmax(0, 1fr); }
+.list-tools { display: flex; align-items: center; gap: 8px; padding: 3px 6px; min-width: 0; }
+.list-tools input[type="search"] { flex: 1 1 210px; width: auto; min-width: 0; }
+.list-tools .chips { display: flex; flex: 0 0 auto; flex-wrap: nowrap; }
+.list-tools .chips button { flex: 0 0 auto; min-height: 32px; white-space: nowrap; }
+.list-tools .progress { display: none; }
+.firing-list { display: flex; align-items: center; gap: 4px; overflow-x: auto; overflow-y: hidden; padding: 0 4px; scrollbar-gutter: auto; }
+.firing-list .group { display: contents; }
+.firing-list .section-row, .firing-list .r-meta { display: none; }
+.firing-list .row { flex: 0 0 112px; min-width: 0; min-height: 46px; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 26px 14px; row-gap: 2px; padding: 2px 7px; }
+.firing-list .r-cue { grid-column: 1; grid-row: 1; font-size: 23px; line-height: 26px; }
+.firing-list .r-time { grid-column: 1; grid-row: 2; font-size: 11px; line-height: 14px; white-space: nowrap; }
+.firing-list .r-state { grid-column: 2; grid-row: 1 / 3; }
+.firing-list .early-row { flex: 0 0 190px; white-space: normal; font-size: 12px; }
+.review-grid > .context-pane { display: none; position: absolute; z-index: 20; top: 61px; right: 12px; bottom: 127px; width: min(380px, calc(100% - 24px)); box-shadow: 0 12px 32px #0005; }
+.review-grid.show-details > .context-pane { display: block; }
+.stage-head { grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; padding: 7px 12px; }
+.stage-id { grid-column: 1; grid-row: 1; }
+.stage-id .cue { font-size: clamp(48px, 5vw, 76px); line-height: 1; }
+.stage-facts { grid-column: 2; grid-row: 1; display: grid; gap: 3px; min-width: 0; }
+.stage-facts > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cue-clock { font-size: clamp(20px, 2.4vw, 34px); color: var(--well-fg); font-weight: 650; font-variant-numeric: tabular-nums; }
+.cue-clock small { font-size: 12px; font-weight: 400; }
+.stage-actions { grid-column: 3; grid-row: 1; }
+.stage-actions .tool, .stage-actions button, .btn { min-height: 44px; }
+.stage-flags { grid-column: 1 / -1; }
+.stage-flags:empty { display: none; }
+.stage-main .multi[data-layout="grid"].n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.stage-main .multi[data-layout="across"] { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
+.stage-main .multi.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
+.open-photo { display: grid; min-height: 0; padding: 0; border: 0; background: transparent; cursor: zoom-in; color: inherit; }
+.open-photo .photo { width: 100%; height: 100%; }
+#stage-main .review-photo figcaption { white-space: normal; }
+#stage-main .review-photo figcaption > span { display: inline; }
+#photo-dialog { width: 97vw; height: 96dvh; max-width: none; max-height: none; padding: 12px; overflow: hidden; }
+#photo-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 8px; }
+.preview-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+#photo-preview { width: 100%; height: 100%; object-fit: contain; min-height: 0; background: #070d14; }
+#photo-caption { flex: 1; font-variant-numeric: tabular-nums; }
+.actions label { min-width: 0; }
+.frozen-home-link { text-decoration: none; border-radius: .2rem; }
+.frozen-home-link:hover, .frozen-home-link:focus-visible { text-decoration: underline; text-underline-offset: .2em; }
+.frozen-home-link:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+@media (max-width: 900px) {
+  .stage-actions .lbl { display: none; }
+  .stage-actions { gap: 0; }
+  .stage-actions .tool { padding: 4px 6px; }
+  #song-filter { max-width: 170px; }
+}
+@media (max-width: 760px) {
+  .top { flex-wrap: wrap; gap: 4px; }
+  .top .brand { flex-basis: 100%; }
+  .top .actions { width: 100%; gap: 4px; }
+  #session-picker { max-width: 100%; width: 100%; font-size: 12px; }
+  #session-picker-label { flex: 1; }
+  .hosted #open-btn { display: none; }
+  .review-grid { padding: 4px; grid-template-rows: auto minmax(0, 1fr) 104px; }
+  .review-controls { gap: 4px; }
+  .review-controls .btn, .review-controls select { font-size: 12px; padding: 4px 7px; }
+  #song-filter { max-width: 125px; }
+  #act-filter { max-width: 88px; }
+  #share-firing { margin-left: auto; }
+  .stage-head { padding: 5px; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; }
+  .stage-id .cue { font-size: 48px; }
+  .stage-facts { font-size: 10px; }
+  .cue-clock { font-size: 22px; }
+  .stage-actions { grid-row: 2; grid-column: 1 / -1; justify-content: flex-end; }
+  .stage-actions .modes { margin-right: auto; }
+  .stage-flags { font-size: 10px; }
+  .stage-main { padding: 4px; }
+  .stage-main figcaption { font-size: 10px; gap: 1px 4px; }
+  .stage-main figcaption > span:not(.warn) { display: none; }
+  .review-grid > .context-pane { top: 96px; right: 4px; bottom: 112px; width: calc(100% - 8px); }
+  .list-tools .chips { display: none; }
+  .list-tools input { width: 100%; }
+  .strip-wrap { padding: 0 4px 3px; }
+  #run-strip { height: 20px; }
+}
+
+/* Keep the existing toolbar in one scrollable row when wrapping would consume the photos. */
+@media (max-width: 760px), (max-height: 560px) {
+  .review-controls { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; scrollbar-width: thin; }
+  .review-controls > * { flex-shrink: 0; }
+  #share-firing { margin-left: 0; }
+}
+@media (max-height: 560px) {
+  .stage-id .cue { font-size: 36px; }
+  .cue-clock { font-size: 22px; }
+  .stage-head { padding: 4px 6px; gap: 3px 8px; }
+  .stage-facts { display: grid; }
+  .stage-facts > span { display: none; }
+  .stage-facts > .cue-clock { display: block; }
+}
+@media (max-height: 480px) {
+  .review-grid { grid-template-rows: auto minmax(0, 1fr) 96px; }
+  .stage-main { padding: 4px; }
+  .multi { gap: 4px; }
+  .multi figure { position: relative; grid-template-rows: minmax(0, 1fr); gap: 0; }
+  .multi figcaption { position: absolute; inset: auto 2px 2px; font-size: 10px; line-height: 12px; pointer-events: none; }
+  .multi figcaption > span { display: none; }
+  .multi figcaption b { background: #07131dcc; padding: 1px 3px; border-radius: 3px; color: #fff; }
+}
+
+@media print {
+  html, body { height: auto; overflow: visible; background: #fff; color: #000; }
+  .shell, .drop-overlay, .toast, dialog { display: none !important; }
+  #print-root { display: block; font: 11pt/1.35 system-ui, sans-serif; }
+  #print-root h1 { font-size: 16pt; margin: 0 0 4pt; }
+  #print-root .p-meta { color: #444; margin: 0 0 12pt; }
+  .p-item { break-inside: avoid; border-top: 1px solid #bbb; padding: 8pt 0; }
+  .p-item h2 { font-size: 12pt; margin: 0 0 4pt; }
+  .p-photos { display: grid; grid-template-columns: repeat(var(--n, 2), 1fr); gap: 6pt; }
+  .p-photos figure { margin: 0; }
+  .p-photos img { width: 100%; height: auto; display: block; border: 1px solid #ccc; }
+  .p-photos figcaption { color: #444; font-size: 8pt; }
+  .p-photos .p-missing { border: 1px dashed #999; padding: 12pt; text-align: center; color: #555; font-size: 9pt; }
+  .p-note { margin: 4pt 0 0; white-space: pre-wrap; }
+  .p-status { font-weight: 700; }
+}
+
+#run-strip { touch-action:none; }
+#strip-tooltip { position:fixed; z-index:8; pointer-events:none; padding:4px 8px; background:#14181d; color:#e6e4df; border:1px solid #475569; border-radius:4px; font:12px monospace; max-width:90vw; }
+
+/* AV by Dave skin for the Run Review managed release (docs/run-review.md).
+   Inlined after the viewer's own styles by scripts/build_run_review.mjs.
+   Colors come from css/avd/tokens.css, which the page links: Gaffer (dark)
+   by default and Call Sheet (light) under [data-theme="light"], the same
+   attribute the viewer's theme control sets. Photo wells stay neutral. */
+:root, :root[data-theme="dark"], :root[data-theme="light"] {
+  --frozen-ground: var(--ground); --frozen-surface: var(--surface); --frozen-raised: var(--surface-raised); --frozen-sunken: var(--surface-sunken);
+  --frozen-ink: var(--ink); --frozen-muted: var(--ink-muted); --frozen-faint: var(--ink-faint); --frozen-hairline: var(--hairline); --frozen-control: var(--line-control);
+  --frozen-accent: var(--tape); --frozen-on-accent: var(--on-tape); --frozen-focus: var(--focus-ring); --frozen-hover: var(--action-hover); --frozen-aurora: var(--surface-raised);
+  --ok: var(--state-done); --fix: var(--state-blocked); --q: var(--state-active);
+}
+html, body { font-family: var(--font-sans); }
+.brand h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: 0; }
+.brand h1 a { color: inherit; }
+.brand h1 a.avd-crumb-home { color: var(--ink); }
+.brand h1 a.avd-crumb-parent { color: var(--ink-muted); font-weight: 600; }
+.brand h1 .avd-crumb-current { color: var(--ink); }
+code, kbd { font-family: var(--font-mono); }
+.btn.primary { background: var(--tape); color: var(--on-tape); border-color: var(--tape); }
+.btn.primary:hover { background: var(--action-hover); border-color: var(--action-hover); color: var(--on-tape); }
+/* Persistent icon controls (Help, Theme) meet the 44 by 44 target in AGENTS.md. */
+.btn.icon { width: 44px; min-width: 44px; }
+/* Without JavaScript the viewer cannot run: hide it and say so (see the noscript in body). */
+.rr-noscript { max-width: 40rem; margin: 15vh auto 0; padding: 24px 20px; color: var(--ink); background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-md); font: 16px/1.5 var(--font-sans); }
+.rr-noscript h1 { margin: 0 0 8px; font: 700 22px/1.2 var(--font-display); }
+.rr-noscript p { margin: 0 0 12px; }
+.rr-noscript a { color: var(--ink); }
+.sbd-skip-link { position: fixed; top: 8px; left: 8px; z-index: 2147483647; min-height: 44px; display: inline-flex; align-items: center; padding: 10px 14px; border-radius: var(--radius-md); background: var(--tape); color: var(--on-tape); font: 700 14px/1.2 var(--font-sans); text-decoration: none; transform: translateY(-160%); }
+.sbd-skip-link:focus { transform: translateY(0); outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .sbd-skip-link { transition: none; } }
+</style>
+<noscript><style>.shell, .sbd-skip-link { display: none; }</style></noscript>
+</head>
+<body>
+<a class="sbd-skip-link" href="#run-review-workspace">Skip to the review</a>
+<noscript><div class="rr-noscript" role="alert"><h1>Run Review needs JavaScript</h1><p>It opens rehearsal capture archives in this browser, so it cannot run with JavaScript turned off. Turn JavaScript on for avbydave.com and reload this page.</p><p><a href="/">AV by Dave home</a> · <a href="/av/">Console</a></p></div></noscript>
+<div class="shell" id="shell">
+  <header class="top">
+    <div class="brand">
+      <h1><a id="workspace-link" class="avd-crumb-home frozen-home-link" href="/">AV by Dave</a><span class="brand-divider" aria-hidden="true"> / </span><a class="avd-crumb-parent frozen-home-link" href="/av/">Console</a><span class="brand-divider" aria-hidden="true"> / </span><span class="avd-crumb-current" aria-current="page">Run Review</span></h1>
+      <p class="sub" id="session-title">No session open</p>
+    </div>
+    <div class="actions">
+      <label id="session-picker-label" hidden><span class="sr-only">Capture session</span><select id="session-picker" aria-label="Capture session"></select></label>
+      <button type="button" id="open-btn" class="btn" data-icon="open">Open</button>
+      <input type="file" id="file-input" accept=".zip,.json,application/zip,application/json" multiple hidden>
+      <button type="button" id="help-btn" class="btn icon" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)" data-icon="keys"></button>
+      <button type="button" id="theme-btn" class="btn icon" aria-pressed="false" aria-label="Dark mode" title="Dark mode"></button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Sections">
+    <div role="tablist" aria-label="Sections">
+      <button role="tab" id="t-review" aria-controls="review" aria-selected="true">Review</button>
+      <button role="tab" id="t-sheet" aria-controls="sheet" aria-selected="false" tabindex="-1">Contact sheet</button>
+      <button role="tab" id="t-notes" aria-controls="notes" aria-selected="false" tabindex="-1">Notes <span class="count" id="notes-count"></span></button>
+      <button role="tab" id="t-session" aria-controls="session" aria-selected="false" tabindex="-1">Session</button>
+    </div>
+  </nav>
+
+  <main class="panels" id="run-review-workspace" tabindex="-1">
+    <section role="tabpanel" id="review" aria-labelledby="t-review">
+      <div class="empty-state" id="welcome">
+        <div class="welcome-card">
+          <h2>Review a rehearsal capture</h2>
+          <ol class="steps">
+            <li><b>Drop the session archive</b> (<code>.zip</code>) anywhere on this page, or choose Open.</li>
+            <li><b>Optional:</b> drop the Notion cue snapshot (<code>.json</code>) for expected looks and scene names.</li>
+            <li><b>Review</b> with <kbd>J</kbd> <kbd>K</kbd>, mark with <kbd>A</kbd> <kbd>X</kbd> <kbd>Q</kbd>, and jump to the next unmarked cue with <kbd>U</kbd>.</li>
+          </ol>
+          <p class="muted">Files stay on this computer. Nothing is uploaded and the archive is never changed.</p>
+          <button type="button" class="btn primary" id="welcome-open">Open archive</button>
+        </div>
+      </div>
+      <div class="run" id="run" hidden>
+        <div class="strip-wrap">
+          <output id="strip-tooltip" hidden></output><canvas id="run-strip" aria-hidden="true"></canvas>
+          <p class="sr-only">Run overview. Use J and K or Home and End to move between cues.</p>
+        </div>
+        <div class="review-grid" id="review-grid" data-pane="photos">
+          <div class="review-controls">
+            <button type="button" class="btn" id="previous-cue" aria-label="Previous firing" title="Previous firing (K or Up)">←</button>
+            <button type="button" class="btn" id="next-cue" aria-label="Next firing" title="Next firing (J or Down)">→</button>
+            <form id="jump-form"><label class="sr-only" for="jump-cue">Jump to cue number</label><input id="jump-cue" placeholder="Number" inputmode="decimal"><button class="btn" type="submit">Jump</button></form>
+            <select id="act-filter" aria-label="Filter by act"><option value="">All acts</option></select>
+            <select id="song-filter" aria-label="Filter by song"><option value="">All songs</option></select>
+            <select id="photo-layout" aria-label="Photo layout"><option value="grid">2 × 2</option><option value="across">1 × 4</option></select>
+            <button type="button" class="btn" id="context-toggle" aria-pressed="false">Notes & songs</button>
+            <button type="button" class="btn" id="share-firing">Copy link</button>
+          </div>
+          <div class="pane-switch" role="group" aria-label="Review panes">
+            <button type="button" data-pane="list" aria-pressed="false">Cues</button>
+            <button type="button" data-pane="photos" aria-pressed="true">Photos</button>
+            <button type="button" data-pane="details" aria-pressed="false">Details</button>
+          </div>
+          <aside class="list-pane" aria-label="Cues">
+            <div class="list-tools">
+              <label class="sr-only" for="search">Search cues, scenes and notes</label>
+              <input type="search" id="search" placeholder="Search cue, scene or note" autocomplete="off">
+              <span id="search-count" class="search-count" aria-live="polite"></span>
+              <button type="button" class="link-btn clear-filters" hidden>Clear filters</button>
+              <div class="chips" role="group" aria-label="Filter cues" id="filter-chips">
+                <button type="button" data-filter="all" aria-pressed="true">All</button>
+                <button type="button" data-filter="photos" aria-pressed="false">Photos</button>
+                <button type="button" data-filter="flags" aria-pressed="false">Flags</button>
+                <button type="button" data-filter="repeats" aria-pressed="false">Repeats</button>
+                <button type="button" data-filter="noted" aria-pressed="false">Noted</button>
+                <button type="button" data-filter="todo" aria-pressed="false">To review</button>
+              </div>
+              <div class="progress">
+                <div class="progress-row"><span id="progress-text"></span><button type="button" class="link-btn" id="next-unreviewed" title="Next cue to review (U)">Next to review <kbd>U</kbd></button></div>
+                <div class="progress-bar" aria-hidden="true"><span id="progress-fill"></span></div>
+              </div>
+            </div>
+            <div class="firing-list" id="firing-list" role="listbox" aria-label="Cues in show order" tabindex="0"></div>
+          </aside>
+          <section class="stage-pane" id="stage-pane" aria-label="Photos for the selected cue">
+            <header class="stage-head" id="stage-head"></header>
+            <div class="stage-main" id="stage-main"></div>
+            <div class="slot-strip" id="slot-strip"></div>
+          </section>
+          <aside class="context-pane" id="context-pane" aria-label="Note and details for the selected cue" tabindex="0"></aside>
+        </div>
+      </div>
+    </section>
+
+    <section role="tabpanel" id="sheet" aria-labelledby="t-sheet" hidden>
+      <div class="sheet-tools">
+        <label class="sr-only" for="sheet-search">Search contact sheet</label>
+        <input type="search" id="sheet-search" placeholder="Search cue, scene or note" autocomplete="off">
+        <p id="sheet-summary" class="muted"></p>
+        <button type="button" class="link-btn clear-filters" hidden>Clear filters</button>
+        <button type="button" class="btn retry-photos" hidden>Retry photos</button>
+        <div class="seg" role="group" aria-label="Frame size" id="density">
+          <button type="button" data-density="s" aria-pressed="false" title="Small photos">S</button>
+          <button type="button" data-density="m" aria-pressed="true" title="Medium photos">M</button>
+          <button type="button" data-density="l" aria-pressed="false" title="Large photos">L</button>
+        </div>
+        <label class="check"><input type="checkbox" id="sheet-photos-only" checked> Photos only</label>
+      </div>
+      <div class="sheet-grid" id="sheet-grid" tabindex="0" aria-label="Contact sheet in show order"></div>
+    </section>
+
+    <section role="tabpanel" id="notes" aria-labelledby="t-notes" hidden>
+      <div class="notes-tools">
+        <label>Reviewer <input type="text" id="reviewer" placeholder="Your name" autocomplete="name"></label>
+        <div class="btn-row">
+          <button type="button" class="btn" data-export="md">Copy for meeting</button>
+          <button type="button" class="btn" data-export="csv">CSV</button>
+          <button type="button" class="btn" data-export="mdfile">Markdown</button>
+          <button type="button" class="btn" data-export="json">JSON</button>
+          <button type="button" class="btn" id="import-btn">Import</button>
+          <input type="file" id="import-input" accept=".json,application/json" hidden>
+        </div>
+        <div class="btn-row">
+          <label class="sr-only" for="print-scope">Print</label>
+          <select id="print-scope">
+            <option value="noted">Noted cues</option>
+            <option value="filtered">Cues in the current filter</option>
+            <option value="photos">Every cue with photos</option>
+          </select>
+          <button type="button" class="btn primary" id="print-btn">Print packet</button>
+        </div>
+      </div>
+      <div class="notes-compact">
+        <label class="sr-only" for="notes-action">Notes action</label>
+        <select id="notes-action">
+          <option value="md">Copy for meeting</option>
+          <option value="csv">Export CSV</option>
+          <option value="mdfile">Export Markdown</option>
+          <option value="json">Export JSON</option>
+          <option value="import">Import notes</option>
+          <option value="print">Print review packet</option>
+        </select>
+        <button type="button" class="btn" id="notes-go">Go</button>
+      </div>
+      <p class="notes-hint muted" id="notes-hint"></p>
+      <div class="table-wrap" tabindex="0" aria-label="All notes">
+        <table class="notes-table">
+          <thead><tr><th scope="col">Status</th><th scope="col">Cue</th><th scope="col">Time</th><th scope="col">Firing</th><th scope="col">Photo</th><th scope="col">Note</th><th scope="col"><span class="sr-only">Open</span></th></tr></thead>
+          <tbody id="notes-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section role="tabpanel" id="session" aria-labelledby="t-session" hidden>
+      <div class="session-wrap" id="session-body" tabindex="0" aria-label="Session details"></div>
+    </section>
+  </main>
+</div>
+
+<div class="drop-overlay" id="drop-overlay" hidden><p>Drop the session archive or cue snapshot</p></div>
+<div class="toast" id="toast"><span id="toast-message" role="status" aria-live="polite"></span><button type="button" id="toast-dismiss" aria-label="Dismiss notification" title="Dismiss notification">×</button></div>
+<div class="sr-only" id="announcer" aria-live="polite"></div>
+
+<dialog id="help-dialog" aria-labelledby="help-title">
+  <h2 id="help-title">Keyboard shortcuts</h2>
+  <table class="keys">
+    <tbody>
+      <tr><td><kbd>J</kbd> <kbd>K</kbd> <kbd>&darr;</kbd> <kbd>&uarr;</kbd></td><td>Next or previous cue</td></tr>
+      <tr><td><kbd>U</kbd> <kbd>Shift</kbd>+<kbd>U</kbd></td><td>Next or previous cue still to review</td></tr>
+      <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd> <kbd>1</kbd>&ndash;<kbd>4</kbd></td><td>Choose photo</td></tr>
+      <tr><td><kbd>C</kbd></td><td>Cycle view: single, all photos, compare, repeats</td></tr>
+      <tr><td><kbd>Z</kbd>, wheel, drag</td><td>Zoom and pan the photo; double-click or <kbd>Esc</kbd> resets</td></tr>
+      <tr><td><kbd>P</kbd> <kbd>Shift</kbd>+<kbd>P</kbd></td><td>Pin this photo for Compare; clear the pin</td></tr>
+      <tr><td><kbd>W</kbd></td><td>Wipe between the two compare photos</td></tr>
+      <tr><td><kbd>F</kbd></td><td>Full screen (<kbd>Esc</kbd> to leave)</td></tr>
+      <tr><td><kbd>A</kbd> <kbd>X</kbd> <kbd>Q</kbd></td><td>Mark Looks right, Needs work, Question</td></tr>
+      <tr><td><kbd>N</kbd> <kbd>/</kbd></td><td>Write a note; search</td></tr>
+      <tr><td><kbd>Home</kbd> <kbd>End</kbd></td><td>First or last cue</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Close preview/help or notes, reset zoom, leave full screen, then return Home. In search, clear the query first.</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Shortcuts apply outside typing fields. Control, Command, Alt and Option combinations keep their browser behavior. On compact Mac keyboards, Fn + Left/Right provides Home/End.</p>
+  <form method="dialog"><button class="btn primary">Close</button></form>
+</dialog>
+
+<dialog id="photo-dialog" aria-label="Original photo preview">
+  <div class="preview-head"><button type="button" class="btn" id="photo-close">Close</button><button type="button" class="btn" id="photo-previous" aria-label="Previous photo" title="Previous photo (Left)">←</button><button type="button" class="btn" id="photo-next" aria-label="Next photo" title="Next photo (Right)">→</button><span id="photo-caption" aria-live="polite"></span><button type="button" class="btn retry-photos" hidden>Retry photo</button><a id="photo-original" target="_blank" rel="noopener noreferrer">Open original</a></div>
+  <img id="photo-preview" alt="">
+</dialog>
+
+<div id="print-root"></div>
+<script>/* Minimal read-only ZIP reader: central directory plus stored/deflate entries.
+   Works in browsers (DecompressionStream) and Node 22+. No writes, no dependencies. */
+(function (root) {
+  'use strict';
+  const FRC = root.FRC = root.FRC || {};
+  const utf8 = new TextDecoder();
+
+  function latin1(bytes) {
+    let s = '';
+    for (const b of bytes) s += String.fromCharCode(b);
+    return s;
+  }
+
+  function findEndRecord(view) {
+    const stop = Math.max(0, view.byteLength - 65557);
+    for (let i = view.byteLength - 22; i >= stop; i--) {
+      if (view.getUint32(i, true) === 0x06054b50) return i;
+    }
+    throw new Error('This file is not a zip archive (no end-of-directory record).');
+  }
+
+  async function inflateRaw(data, expected) {
+    if (typeof DecompressionStream === 'undefined') {
+      throw new Error('This browser cannot unpack zip files. Use a current Chrome, Edge, Safari or Firefox.');
+    }
+    const stream = new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    const out = new Uint8Array(await new Response(stream).arrayBuffer());
+    if (expected && out.byteLength !== expected) throw new Error('Unpacked size does not match the archive directory.');
+    return out;
+  }
+
+  function open(input) {
+    const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const end = findEndRecord(view);
+    const count = view.getUint16(end + 10, true);
+    const dirOffset = view.getUint32(end + 16, true);
+    if (count === 0xffff || dirOffset === 0xffffffff) throw new Error('ZIP64 archives are not supported yet.');
+    const entries = new Map();
+    let p = dirOffset;
+    for (let i = 0; i < count; i++) {
+      if (view.getUint32(p, true) !== 0x02014b50) throw new Error('The zip directory is damaged.');
+      const flags = view.getUint16(p + 8, true);
+      const method = view.getUint16(p + 10, true);
+      const compressed = view.getUint32(p + 20, true);
+      const size = view.getUint32(p + 24, true);
+      const nameLength = view.getUint16(p + 28, true);
+      const extraLength = view.getUint16(p + 30, true);
+      const commentLength = view.getUint16(p + 32, true);
+      const localOffset = view.getUint32(p + 42, true);
+      const raw = bytes.subarray(p + 46, p + 46 + nameLength);
+      const name = (flags & 0x800) ? utf8.decode(raw) : latin1(raw);
+      if (!name.endsWith('/')) entries.set(name, { flags, method, compressed, size, localOffset });
+      p += 46 + nameLength + extraLength + commentLength;
+    }
+
+    async function read(name) {
+      const entry = entries.get(name);
+      if (!entry) throw new Error('Not in the archive: ' + name);
+      if (entry.flags & 1) throw new Error('Encrypted zip entries are not supported.');
+      const lo = entry.localOffset;
+      if (view.getUint32(lo, true) !== 0x04034b50) throw new Error('Damaged zip entry: ' + name);
+      const start = lo + 30 + view.getUint16(lo + 26, true) + view.getUint16(lo + 28, true);
+      const data = bytes.subarray(start, start + entry.compressed);
+      if (entry.method === 0) return data.slice();
+      if (entry.method === 8) return inflateRaw(data, entry.size);
+      throw new Error('Unsupported zip compression (' + entry.method + '): ' + name);
+    }
+
+    return { names: [...entries.keys()], size: name => entries.get(name)?.size ?? 0, read };
+  }
+
+  FRC.zip = { open };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+/* MIDI Show Control decoding for raw observer rows.
+   Mirrors the capture service so event IDs match existing photo files and spreadsheet IDs:
+   id = first 24 hex of SHA-256("utc|direction|endpoint|sysex hex|ordinal"). */
+(function (root) {
+  'use strict';
+  const FRC = root.FRC = root.FRC || {};
+  const COMMANDS = { 1: 'GO', 2: 'STOP', 3: 'RESUME', 4: 'TIMED GO', 5: 'LOAD', 6: 'SET', 7: 'FIRE', 8: 'ALL OFF', 9: 'RESTORE', 10: 'RESET', 11: 'GO OFF' };
+  const hex2 = value => value.toString(16).padStart(2, '0');
+
+  function decode(rows) {
+    const buffers = new Map();
+    const occurrences = new Map();
+    const out = [];
+    for (const row of rows) {
+      if (!row || row.type !== 'midi') continue;
+      const stream = String(row.direction) + '\u0000' + String(row.endpoint);
+      let buffer = buffers.get(stream) || [];
+      for (const pair of String(row.hex || '').match(/[0-9a-fA-F]{2}/g) || []) {
+        const byte = parseInt(pair, 16);
+        if (byte >= 248) continue; // realtime bytes may interleave with SysEx
+        if (byte === 240) buffer = [];
+        if (!buffer.length && byte !== 240) continue;
+        buffer.push(byte);
+        if (byte !== 247) continue;
+        if (buffer.length >= 7 && buffer[0] === 240 && buffer[1] === 127 && buffer[3] === 2) {
+          const hex = buffer.map(hex2).join(' ');
+          const base = [row.utc ?? '', row.direction ?? '', String(row.endpoint ?? ''), hex].join('|');
+          const n = (occurrences.get(base) || 0) + 1;
+          occurrences.set(base, n);
+          const fields = String.fromCharCode(...buffer.slice(6, -1)).split('\u0000');
+          out.push({
+            key: base + '|' + n, utc: row.utc, unixSeconds: row.unixSeconds, direction: row.direction,
+            endpoint: row.endpoint, cue: fields[0] || 'current', cueList: fields.length > 1 ? fields[1] : '',
+            command: buffer[5], hex, hostTimestamp: row.hostTimestamp ?? null,
+          });
+        }
+        buffer = [];
+      }
+      buffers.set(stream, buffer);
+    }
+    return out;
+  }
+
+  async function sha256hex(text) {
+    const digest = await root.crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(digest), hex2).join('');
+  }
+
+  async function withIds(events) {
+    for (const event of events) event.id = (await sha256hex(event.key)).slice(0, 24);
+    return events;
+  }
+
+  FRC.msc = { COMMANDS, decode, sha256hex, withIds };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+/* Normalizes a rehearsal capture (archive zip or session folder) into one review model.
+   Read-only: a source only needs { name, names[], read(path) -> Uint8Array }. */
+(function (root) {
+  'use strict';
+  const FRC = root.FRC = root.FRC || {};
+  const text = new TextDecoder();
+
+  const LEGACY_SLOTS = [
+    { slot: 'before', label: 'Before', nominal: -0.5 },
+    { slot: 'after', label: 'After', nominal: 2.0 },
+  ];
+  const FOUR_SLOTS = [
+    { slot: 'trigger', label: 'Trigger', nominal: 0 },
+    { slot: 'plus1', label: '+1 s', nominal: 1 },
+    { slot: 'plus2', label: '+2 s', nominal: 2 },
+    { slot: 'plus3', label: '+3 s', nominal: 3 },
+  ];
+  const STALE_BEFORE_SECONDS = 1.5; // the capture service's own freshness limit for Before images
+  const LATE_SECONDS = 0.75;        // a four-photo frame must land within 0.75 s of its target
+  const SECTION_GAP = 4 * 60;       // a gap this long starts a new part of the run
+  const BREAK_GAP = 10 * 60;        // and this long is labelled as a break
+  const OBS_WINDOW_BEFORE = 20 * 60;
+  const OBS_WINDOW_AFTER = 2 * 60;
+  const clockOf = (() => {
+    const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    return t => fmt.format(new Date(t * 1000));
+  })();
+
+  const basename = path => path.slice(path.lastIndexOf('/') + 1);
+  const seconds = value => (value >= 60 ? Math.round(value) + ' s' : value.toFixed(1) + ' s');
+
+  function findOne(names, suffixes) {
+    for (const suffix of suffixes) {
+      const hits = names.filter(n => n === suffix || n.endsWith('/' + suffix)).sort((a, b) => a.length - b.length);
+      if (hits.length) return hits[0];
+    }
+    return null;
+  }
+
+  async function readText(source, path) { return text.decode(await source.read(path)); }
+  async function readJSON(source, path) { return JSON.parse(await readText(source, path)); }
+
+  const isObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+  const nonempty = value => typeof value === 'string' && value.trim().length > 0;
+
+  // Optional context must not prevent the capture from opening, or masquerade as an empty success.
+  async function optionalJSON(source, path, warnings, validate) {
+    if (!path) return null;
+    try {
+      const value = await readJSON(source, path);
+      if (validate) validate(value);
+      return value;
+    } catch (err) {
+      warnings.push(`${path}: ${err.message}. Context was not loaded. Check the file is readable and valid, then reopen it.`);
+      return null;
+    }
+  }
+
+  function resolveSessionIdentity(info) {
+    const unknown = reason => ({ canonicalId: null, reason });
+    if (!info) return unknown('No explicit session metadata is available.');
+    const ids = [];
+    if (Object.hasOwn(info, 'sessionId')) {
+      if (!nonempty(info.sessionId)) return unknown('session.json sessionId must be a nonempty string.');
+      ids.push(info.sessionId);
+    }
+    if (Object.hasOwn(info, 'session')) {
+      if (!nonempty(info.session) || !info.session.startsWith('/')) return unknown('session.json session must be an absolute session-directory path.');
+      const id = basename(info.session.replace(/\/+$/, ''));
+      if (!id || id === '.' || id === '..') return unknown('session.json session path has no usable directory name.');
+      ids.push(id);
+    }
+    if (!ids.length) return unknown('session.json has no sessionId or legacy session path.');
+    if (new Set(ids).size !== 1) return unknown('session.json sessionId conflicts with its legacy session path.');
+    return { canonicalId: ids[0], reason: null };
+  }
+
+  function validateReview(session, review) {
+    if (!isObject(review) || !Array.isArray(review.observations)) throw new Error('Expected an object with an observations array');
+    if (!nonempty(review.sessionId)) throw new Error('Review sessionId is missing or invalid; identity cannot be verified');
+    if (!session.identity.canonicalId) throw new Error(`Review identity cannot be verified: ${session.identity.reason}`);
+    if (review.sessionId !== session.identity.canonicalId) throw new Error(`Review sessionId "${review.sessionId}" conflicts with loaded session "${session.identity.canonicalId}"`);
+    for (const [i, row] of review.observations.entries()) {
+      const fields = Array.isArray(row) ? row.slice(0, 3) : isObject(row) ? [row.time, row.cues, row.text] : [];
+      if (fields.length !== 3 || !fields.every(nonempty)) throw new Error(`Observation ${i + 1} needs nonempty time, cue range and text strings`);
+    }
+  }
+
+  function validateReference(reference) {
+    if (!isObject(reference) || !Array.isArray(reference.cues)) throw new Error('Expected a reference object with a cues array');
+    if (reference.sceneLooks !== undefined && !Array.isArray(reference.sceneLooks)) throw new Error('Reference sceneLooks must be an array');
+    for (const [i, record] of reference.cues.entries()) {
+      if (!isObject(record) || !['string', 'number'].includes(typeof record['Cue number'])) throw new Error(`Reference cue ${i + 1} needs a Cue number`);
+      let related = record['Observed scene contexts'] ?? [];
+      if (typeof related === 'string') {
+        try { related = JSON.parse(related); } catch { throw new Error(`Reference cue ${i + 1}: Observed scene contexts must contain a JSON array`); }
+      }
+      if (!Array.isArray(related) || !related.every(u => typeof u === 'string')) throw new Error(`Reference cue ${i + 1}: Observed scene contexts must be an array of links`);
+    }
+    if ((reference.sceneLooks || []).some(scene => !isObject(scene))) throw new Error('Reference sceneLooks entries must be objects');
+  }
+
+  function parseJSONL(body, warnings, label) {
+    const rows = [];
+    let bad = 0;
+    for (const line of body.split('\n')) {
+      if (!line.trim()) continue;
+      try { rows.push(JSON.parse(line)); } catch { bad++; }
+    }
+    if (bad) warnings.push(`${bad} unreadable line(s) in ${label} were skipped.`);
+    return rows;
+  }
+
+  function embeddedJSON(html, id, warnings, path) {
+    const match = html.match(new RegExp('<script id="' + id + '" type="application/json">([\\s\\S]*?)</' + 'script>'));
+    if (!match) return null;
+    try { return JSON.parse(match[1]); }
+    catch (err) {
+      warnings.push(`${path} (${id}): ${err.message}. Embedded context was not loaded. Correct its JSON and reopen.`);
+      return null;
+    }
+  }
+
+  function buildSlots(firing, event, manifest, images) {
+    if (!event) return { mode: 'none', slots: [] };
+    const four = Boolean(event.photoMode) || FOUR_SLOTS.some(d => event[d.slot] || event[d.slot + 'Error']);
+    const defs = four ? FOUR_SLOTS : LEGACY_SLOTS.map(d => {
+      if (d.slot === 'before' && manifest && manifest.beforeSeconds) return { ...d, nominal: -manifest.beforeSeconds };
+      if (d.slot === 'after' && manifest && manifest.afterSeconds) return { ...d, nominal: manifest.afterSeconds };
+      return d;
+    });
+    const slots = defs.map(def => {
+      const frame = event[def.slot];
+      const error = event[def.slot + 'Error'];
+      const slot = { slot: def.slot, label: def.label, nominal: def.nominal, status: 'missing', path: null, offset: null, capturedAt: null, reason: null, warning: null };
+      if (frame) {
+        slot.offset = typeof frame.offsetSeconds === 'number' ? frame.offsetSeconds : null;
+        slot.capturedAt = typeof frame.capturedAt === 'number' ? frame.capturedAt : null;
+        slot.rescued = frame.rescued === true;
+        slot.secondsAfterTarget = typeof frame.secondsAfterTarget === 'number' ? frame.secondsAfterTarget : null;
+        slot.withinNormalWindow = typeof frame.withinNormalWindow === 'boolean' ? frame.withinNormalWindow : null;
+        slot.timingUncertaintySeconds = typeof frame.timingUncertaintySeconds === 'number' ? frame.timingUncertaintySeconds : null;
+        slot.sourceFrame = typeof frame.sourceFrame === 'string' ? frame.sourceFrame : null;
+        slot.originalError = typeof frame.originalError === 'string' ? frame.originalError : null;
+        slot.path = images.get(`${firing.id}-${def.slot}.jpg`) || null;
+        slot.status = slot.path ? 'saved' : 'lost';
+        if (!slot.path) slot.reason = 'Listed by the capture service, but the file is not in this archive.';
+        if (slot.offset !== null) {
+          if (def.slot === 'before' && slot.offset < -STALE_BEFORE_SECONDS) {
+            slot.warning = `Taken ${seconds(-slot.offset)} before the cue, so it may not show the look just before it.`;
+          } else if (four && slot.offset - def.nominal > LATE_SECONDS) {
+            slot.warning = `Taken ${(slot.offset - def.nominal).toFixed(2)} s after its target.`;
+          }
+        }
+      } else {
+        slot.reason = error || 'No photo was recorded for this slot.';
+      }
+      return slot;
+    });
+    return { mode: four ? 'four' : 'before-after', slots };
+  }
+
+  function representative(firing) {
+    const saved = firing.slots.filter(s => s.status === 'saved');
+    if (!saved.length) return null;
+    const clean = saved.filter(s => !s.warning);
+    return (clean.length ? clean : saved)[(clean.length ? clean : saved).length - 1];
+  }
+
+  function parseObservation(note, index, origin) {
+    const label = String(note.label || '');
+    const head = label.split(' · ')[0];
+    let cues = [];
+    if (/^\s*cues?\b/i.test(head)) cues = head.match(/\d+(?:\.\d+)?/g) || [];
+    else {
+      const prose = label.match(/Following the (.+?) sequence/i);
+      if (prose) cues = prose[1].match(/\d+(?:\.\d+)?/g) || [];
+    }
+    const t = Date.parse(note.utc);
+    return {
+      id: note.sourceMessage || `obs-${index}`, t: Number.isNaN(t) ? null : t / 1000, utc: note.utc || null,
+      text: label, cues: [...new Set(cues)], source: note.name || 'Observation', reportedAt: note.reportedAt || null, origin,
+    };
+  }
+
+  function linkObservations(session) {
+    const byCue = new Map();
+    for (const f of session.firings) {
+      if (!byCue.has(f.cue)) byCue.set(f.cue, []);
+      byCue.get(f.cue).push(f);
+    }
+    for (const obs of session.observations) {
+      obs.linked = 0;
+      for (const cue of obs.cues) {
+        const candidates = byCue.get(cue) || [];
+        const near = obs.t === null ? [] : candidates.filter(f => f.t >= obs.t - OBS_WINDOW_BEFORE && f.t <= obs.t + OBS_WINDOW_AFTER);
+        const chosen = near.length ? near : candidates;
+        for (const f of chosen) {
+          f.observations.push({ obs, timeMatched: near.length > 0 });
+          obs.linked++;
+        }
+      }
+    }
+  }
+
+  // A cue range as written in a post-run review: "19", "13–15", "134–136.1" or "173 onward". Cue text stays exact.
+  function parseCueRange(text) {
+    const s = String(text ?? '').trim();
+    const onward = s.match(/^(\S+)\s+onward$/i);
+    if (onward) return { from: onward[1], to: null, onward: true };
+    const parts = s.split(/\s*[–—-]\s*/);
+    return parts.length === 2 && parts[0] && parts[1] ? { from: parts[0], to: parts[1], onward: false } : { from: s, to: s, onward: false };
+  }
+
+  // Post-run review groups (review-observations.json): rows of [time, cue range, description, song?, basis?] in show
+  // order. Each group covers the firings from its first cue to its last cue, searched forward in show order so repeats
+  // resolve to the right pass; "onward" runs up to the next group. The stated start time is checked against the clock.
+  function linkReviewGroups(session, review) {
+    validateReview(session, review);
+    const firings = session.firings;
+    const rows = review && Array.isArray(review.observations) ? review.observations : [];
+    const origin = `Post-run review${review && review.reviewMethod ? ' (' + review.reviewMethod + ')' : ''}. Groups are linked by cue range in show order; song names and their basis are as the reviewer wrote them.`;
+    const groups = rows.map((row, i) => {
+      const [timeText, cueText, text, song, basis] = Array.isArray(row) ? row : [row.time, row.cues, row.text, row.song, row.basis];
+      return { i, timeText: String(timeText ?? ''), cueText: String(cueText ?? ''), text: String(text ?? ''), song: song || null, basis: basis || null, range: parseCueRange(cueText), start: -1 };
+    });
+    let cursor = 0;
+    for (const g of groups) {
+      for (let k = cursor; k < firings.length; k++) if (firings[k].cue === g.range.from) { g.start = k; break; }
+      if (g.start >= 0) cursor = g.start + 1;
+    }
+    return groups.map((g, n) => {
+      const next = groups.slice(n + 1).find(x => x.start >= 0);
+      const limit = next ? next.start : firings.length;
+      let end = -1;
+      if (g.start >= 0) {
+        if (g.range.onward) end = limit - 1;
+        else for (let k = g.start; k < limit; k++) if (firings[k].cue === g.range.to) { end = k; break; }
+      }
+      const first = g.start >= 0 ? firings[g.start] : null;
+      const statedStart = g.timeText.trim().split(/[\s–—-]/)[0];
+      const obs = {
+        id: `review-${g.i + 1}`, t: first ? first.t : null, utc: first ? first.utc : null, text: g.text, cues: [g.cueText],
+        source: ['Post-run review', g.song, g.basis].filter(Boolean).join(' · '), reportedAt: null, origin,
+        kind: 'review', timeText: g.timeText, cueText: g.cueText, song: g.song, basis: g.basis, linked: 0,
+        timeAgrees: first ? clockOf(first.t) === statedStart : null,
+      };
+      if (g.start >= 0 && end >= g.start) {
+        for (let k = g.start; k <= end; k++) firings[k].observations.push({ obs, timeMatched: obs.timeAgrees !== false });
+        obs.linked = end - g.start + 1;
+      }
+      return obs;
+    });
+  }
+
+  function buildSections(firings) {
+    const sections = [];
+    for (const f of firings) {
+      const last = sections[sections.length - 1];
+      if (!last || (f.gapBefore !== null && f.gapBefore > SECTION_GAP)) {
+        sections.push({ index: sections.length, start: f.t, end: f.t, gapBefore: last ? f.gapBefore : null, firings: [] });
+      }
+      const section = sections[sections.length - 1];
+      section.firings.push(f);
+      section.end = f.t;
+      f.section = section.index;
+    }
+    for (const s of sections) {
+      s.label = 'Part ' + (s.index + 1);
+      s.isBreak = s.gapBefore !== null && s.gapBefore >= BREAK_GAP;
+      s.withPhotos = s.firings.filter(f => f.saved > 0).length;
+    }
+    return sections;
+  }
+
+  const uuid = value => String(value || '').replaceAll('-', '').match(/[0-9a-f]{32}/i)?.[0]?.toLowerCase() || '';
+
+  function attachReference(session, reference) {
+    validateReference(reference); // Complete validation before replacing existing reference associations.
+    const cues = new Map();
+    for (const record of reference.cues || []) cues.set(String(record['Cue number']).trim(), record);
+    const scenes = new Map();
+    for (const scene of reference.sceneLooks || []) scenes.set(uuid(scene.id || scene.url), scene);
+    session.reference = {
+      fetchedAt: reference.fetchedAt || null, url: reference.databaseUrl || null,
+      cueCount: cues.size, sceneCount: scenes.size, partial: Boolean(reference.hasMore),
+    };
+    for (const firing of session.firings) {
+      const record = cues.get(firing.cue) || null;
+      let related = record ? record['Observed scene contexts'] || [] : [];
+      if (typeof related === 'string') { try { related = JSON.parse(related); } catch { related = []; } }
+      firing.reference = record ? {
+        expected: record['Expected look'] || null, mapping: record.Mapping || null, url: record.url || null,
+        scenes: related.map(u => scenes.get(uuid(u))).filter(Boolean).map(s => ({
+          name: s['Scene look'], observation: s.Observation || '', window: s['Observed cue window'] || '',
+          basis: s['Name basis'] || '', url: s.url || null,
+        })),
+      } : null;
+      firing.scene = firing.reference && firing.reference.scenes[0] ? firing.reference.scenes[0].name : null;
+    }
+    return session;
+  }
+
+  function deriveCapture(rows) {
+    if (!rows) return {};
+    const start = rows.find(r => r.type === 'start') || null;
+    const complete = rows.find(r => ['complete', 'end', 'stop', 'finished'].includes(r.type)) || null;
+    return { start, complete };
+  }
+
+  async function loadSession(source) {
+    const names = source.names;
+    const warnings = [];
+    const images = new Map();
+    for (const name of names) {
+      if (!/\.jpe?g$/i.test(name)) continue;
+      const base = basename(name);
+      if (!images.has(base) || name.length < images.get(base).length) images.set(base, name);
+    }
+
+    const decodedPath = findOne(names, ['data/decoded-cues.json']);
+    const manifestPath = findOne(names, ['data/image-manifest.json', 'images/manifest.json', 'image-manifest.json', 'manifest.json']);
+    const midiPath = findOne(names, ['data/midi.jsonl', 'midi.jsonl']);
+    const summaryPath = findOne(names, ['data/summary.json']);
+    const observationPath = findOne(names, ['data/observations.json', 'observations.json']);
+    const reviewPath = findOne(names, ['data/review-observations.json', 'review-observations.json']);
+    const sessionPath = findOne(names, ['session.json']);
+    const htmlPath = decodedPath ? null : findOne(names, ['index.html']);
+    const referencePath = findOne(names, ['notion-cue-reference.json', 'reference.json']);
+
+    if (!decodedPath && !midiPath && !manifestPath) {
+      throw new Error('No capture data found. Expected data/decoded-cues.json, midi.jsonl or an image manifest.');
+    }
+
+    let rows = null;
+    let raw = [];
+    if (decodedPath) raw = await readJSON(source, decodedPath);
+    if (midiPath && !decodedPath) {
+      rows = parseJSONL(await readText(source, midiPath), warnings, basename(midiPath));
+      raw = await FRC.msc.withIds(FRC.msc.decode(rows));
+    }
+    const manifest = manifestPath ? await readJSON(source, manifestPath) : null;
+    const events = (manifest && manifest.events) || {};
+    const known = new Set(raw.map(r => r.id));
+    let added = 0;
+    for (const event of Object.values(events)) {
+      if (event && event.id && !known.has(event.id)) { raw.push(event); added++; }
+    }
+    if (added) warnings.push(`${added} photo record(s) had no matching MIDI row and were added from the image manifest.`);
+    raw.sort((a, b) => (a.unixSeconds || 0) - (b.unixSeconds || 0));
+
+    const summary = summaryPath ? await readJSON(source, summaryPath) : null;
+    if (!summary && !rows && midiPath) rows = parseJSONL(await readText(source, midiPath), warnings, basename(midiPath));
+    const capture = summary ? { start: summary.start || null, complete: summary.complete || null } : deriveCapture(rows);
+    const photoStart = manifest && typeof manifest.startedAt === 'number' ? manifest.startedAt : null;
+
+    const counts = new Map();
+    const firings = raw.filter(r => (r.direction || 'incoming') === 'incoming').map((r, index) => {
+      const cue = String(r.cue);
+      const list = String(r.cueList ?? '');
+      const cueKey = list + '|' + cue;
+      const occurrence = (counts.get(cueKey) || 0) + 1;
+      counts.set(cueKey, occurrence);
+      const firing = {
+        id: r.id, index, cue, list, cueKey, occurrence, command: r.command,
+        commandName: FRC.msc.COMMANDS[r.command] || 'MSC ' + r.command,
+        t: r.unixSeconds, utc: r.utc, hex: r.hex || '', receivedAt: events[r.id] ? events[r.id].receivedAt || null : null,
+        overlap: Boolean(events[r.id] && events[r.id].overlap), observations: [], reference: null, scene: null,
+      };
+      const built = buildSlots(firing, events[r.id], manifest, images);
+      firing.photoMode = built.mode;
+      firing.slots = built.slots;
+      firing.saved = firing.slots.filter(s => s.status === 'saved').length;
+      firing.missing = firing.slots.filter(s => s.status !== 'saved').length;
+      firing.warnings = firing.slots.filter(s => s.warning).length;
+      if (built.mode === 'none') firing.photoStatus = photoStart !== null && firing.t < photoStart ? 'predates' : 'none';
+      else firing.photoStatus = firing.missing === 0 ? 'complete' : firing.saved ? 'partial' : 'missing';
+      firing.flagged = firing.missing > 0 && built.mode !== 'none' || firing.warnings > 0 || firing.overlap;
+      return firing;
+    });
+
+    const groups = new Map();
+    firings.forEach((f, i) => {
+      f.prev = firings[i - 1] || null;
+      f.next = firings[i + 1] || null;
+      f.gapBefore = f.prev ? f.t - f.prev.t : null;
+      if (!groups.has(f.cueKey)) groups.set(f.cueKey, []);
+      groups.get(f.cueKey).push(f);
+    });
+    for (const f of firings) {
+      f.siblings = groups.get(f.cueKey);
+      f.total = f.siblings.length;
+      f.cover = representative(f);
+    }
+
+    let observationData = null;
+    let origin = null;
+    if (observationPath) observationData = await readJSON(source, observationPath);
+    let embeddedReference = null;
+    if (htmlPath) {
+      try {
+        const html = await readText(source, htmlPath);
+        if (!observationData) observationData = embeddedJSON(html, 'observation-data', warnings, htmlPath);
+        embeddedReference = embeddedJSON(html, 'notion-cue-data', warnings, htmlPath);
+      } catch (err) { warnings.push(`${htmlPath}: ${err.message}. Embedded context was not loaded. Check the file is readable and reopen.`); }
+    }
+    if (observationData) {
+      origin = `${observationData.threadTitle ? 'Side chat "' + observationData.threadTitle + '"' : 'Side chat'}; imported from assistant messages, so wording may be a restatement of what was reported.`;
+    }
+    const notes = observationData && Array.isArray(observationData.notes) ? observationData.notes : [];
+
+    const sessionInfo = await optionalJSON(source, sessionPath, warnings, value => {
+      if (!isObject(value)) throw new Error('Expected session metadata to be an object');
+    });
+    const rootName = (decodedPath || manifestPath || midiPath || '').split('/').slice(0, -2).pop() || '';
+    const go = firings.filter(f => f.command === 1);
+    const distinct = new Set(go.map(f => f.cueKey)).size;
+
+    const session = {
+      title: rootName && rootName !== 'data' && rootName !== 'images' ? rootName : source.name.replace(/\.zip$/i, ''),
+      sourceName: source.name, layout: decodedPath ? 'archive' : 'session-folder',
+      key: (sessionInfo && nonempty(sessionInfo.storageKey) && sessionInfo.storageKey) || (capture.start && capture.start.utc) || (firings[0] && firings[0].id) || source.name,
+      capture, photoStart, firstT: firings.length ? firings[0].t : null, lastT: firings.length ? firings[firings.length - 1].t : null,
+      clock: manifest ? { offset: manifest.clockOffsetSeconds ?? null, uncertainty: manifest.clockUncertaintySeconds ?? null, source: manifest.source || null } : null,
+      imageManifest: manifest,
+      sessionInfo, identity: resolveSessionIdentity(sessionInfo), firings, warnings, reference: null,
+      observations: notes.map((n, i) => parseObservation(n, i, origin)),
+      observationMeta: observationData ? { thread: observationData.threadTitle || null, through: observationData.through || null, visualChanges: observationData.visualChanges ?? null } : null,
+      stats: {
+        firings: firings.length, go: go.length, distinct, repeats: go.length - distinct,
+        commands: firings.reduce((acc, f) => { acc[f.commandName] = (acc[f.commandName] || 0) + 1; return acc; }, {}),
+        withPhotos: firings.filter(f => f.saved > 0).length,
+        complete: firings.filter(f => f.photoStatus === 'complete').length,
+        predates: firings.filter(f => f.photoStatus === 'predates').length,
+        savedSlots: firings.reduce((n, f) => n + f.saved, 0),
+        missingSlots: firings.reduce((n, f) => n + (f.photoMode === 'none' ? 0 : f.missing), 0),
+        warnedSlots: firings.reduce((n, f) => n + f.warnings, 0),
+        fourPhoto: firings.filter(f => f.photoMode === 'four').length,
+        beforeAfter: firings.filter(f => f.photoMode === 'before-after').length,
+        images: images.size,
+      },
+    };
+    session.sections = buildSections(firings);
+    linkObservations(session);
+    const review = await optionalJSON(source, reviewPath, warnings, value => validateReview(session, value));
+    if (review) {
+      const groups = linkReviewGroups(session, review);
+      session.observations.push(...groups);
+      const covered = firings.filter(f => f.observations.some(o => o.obs.kind === 'review')).length;
+      session.reviewMeta = { method: review.reviewMethod || null, groups: groups.length, covered, unassigned: firings.length - covered };
+      const unresolved = groups.filter(g => !g.linked).length;
+      if (unresolved) warnings.push(`${unresolved} post-run review group(s) did not match any firings by cue range.`);
+      const offClock = groups.filter(g => g.timeAgrees === false).length;
+      if (offClock) warnings.push(`${offClock} post-run review group(s) start at a different time than their first cue.`);
+    }
+    const reference = referencePath ? await optionalJSON(source, referencePath, warnings, validateReference) : embeddedReference;
+    if (reference) {
+      try { attachReference(session, reference); }
+      catch (err) { warnings.push(`${htmlPath} (notion-cue-data): ${err.message}. Reference was not loaded; correct the embedded reference and reopen.`); }
+    }
+    return session;
+  }
+
+  FRC.model = { loadSession, attachReference, validateReference, representative, parseObservation, parseCueRange, linkReviewGroups, buildSections, STALE_BEFORE_SECONDS, LATE_SECONDS, SECTION_GAP, BREAK_GAP };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+/* Designer notes: export formats. Storage lives in the app (browser local storage per session). */
+(function (root) {
+  'use strict';
+  const FRC = root.FRC = root.FRC || {};
+  const STATUSES = { fix: 'Needs work', question: 'Question', ok: 'Looks right' };
+  const ORDER = ['fix', 'question', 'ok', null];
+
+  function csvCell(value) {
+    const s = String(value ?? '');
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  function rows(notes, session, clock) {
+    const byId = new Map(session.firings.map(f => [f.id, f]));
+    return Object.values(notes)
+      .map(note => ({ note, firing: byId.get(note.eventId) || null }))
+      .sort((a, b) => (a.firing ? a.firing.index : 1e9) - (b.firing ? b.firing.index : 1e9))
+      .map(({ note, firing }) => ({
+        cue: note.cue, list: note.list || '', time: firing ? clock(firing.t) : '', status: note.status || '',
+        statusLabel: STATUSES[note.status] || 'Note', text: note.text || '', slot: note.slot || '',
+        firing: firing ? `${firing.occurrence} of ${firing.total}` : '', eventId: note.eventId, updatedAt: note.updatedAt || '',
+      }));
+  }
+
+  function toCSV(notes, session, clock) {
+    const head = ['Cue', 'List', 'Time', 'Firing', 'Status', 'Photo', 'Note', 'Event ID', 'Updated'];
+    const lines = rows(notes, session, clock).map(r => [r.cue, r.list, r.time, r.firing, r.statusLabel, r.slot, r.text, r.eventId, r.updatedAt].map(csvCell).join(','));
+    return [head.join(','), ...lines].join('\r\n') + '\r\n';
+  }
+
+  function toMarkdown(notes, session, clock, reviewer) {
+    const all = rows(notes, session, clock);
+    const out = [`# Review notes: ${session.title}`, '', `${all.length} note(s)${reviewer ? ' by ' + reviewer : ''}. Times are show-local (America/New_York).`];
+    for (const status of ORDER) {
+      const group = all.filter(r => (r.status || null) === status);
+      if (!group.length) continue;
+      out.push('', `## ${STATUSES[status] || 'Other notes'} (${group.length})`, '');
+      for (const r of group) {
+        const where = [r.time, r.firing ? 'firing ' + r.firing : '', r.slot ? r.slot + ' photo' : ''].filter(Boolean).join(', ');
+        out.push(`- **Cue ${r.cue}${r.list && r.list !== '1' ? ' (list ' + r.list + ')' : ''}** (${where})${r.text ? ': ' + r.text.replace(/\s*\n\s*/g, ' ') : ''}`);
+      }
+    }
+    return out.join('\n') + '\n';
+  }
+
+  function toReviewRecords(notes, session, reviewer) {
+    return Object.values(notes).map(note => ({
+      reviewId: `${note.eventId}:designer-note:${note.updatedAt || ''}`,
+      target: { eventId: note.eventId, cueKey: { list: note.list || '', cue: note.cue } },
+      field: 'designerNote', value: { status: note.status || null, text: note.text || '', slot: note.slot || null },
+      reviewer: reviewer || null, at: note.updatedAt || null, supersedes: null, session: session.key,
+      ...(note.identityUnverified ? { identityUnverified: true } : {}),
+    }));
+  }
+
+  function fromReviewRecords(records, session) {
+    const list = Array.isArray(records) ? records : (records && Array.isArray(records.records) ? records.records : null);
+    if (!list) throw new Error('This file is not a notes export.');
+    if (!session) throw new Error('Open a session before importing notes.');
+    const accepted = new Set([session.key, session.identity && session.identity.canonicalId].filter(Boolean));
+    const eventIds = new Set(session.firings.map(f => f.id));
+    const identities = (value, label) => {
+      const found = ['session', 'sessionId'].filter(key => Object.hasOwn(value, key));
+      for (const key of found) {
+        if (typeof value[key] !== 'string' || !accepted.has(value[key])) {
+          throw new Error(`${label} ${key} "${String(value[key])}" does not identify the loaded session. No notes were imported. Open the matching session or use its export.`);
+        }
+      }
+      return found.length > 0;
+    };
+    const envelopeVerified = !Array.isArray(records) && identities(records, 'Export');
+    let unverified = 0;
+    let unknown = 0;
+    const unverifiedRecords = new Set();
+    // Validate the entire file first. A contradictory later record cannot partially import earlier notes.
+    for (const [i, r] of list.entries()) {
+      if (!r || typeof r !== 'object' || Array.isArray(r)) throw new Error(`Record ${i + 1} must be an object. No notes were imported.`);
+      const verified = identities(r, `Record ${i + 1}`);
+      if (r.field !== 'designerNote' || !r.target || !r.target.eventId) continue;
+      if ((!verified && !envelopeVerified) || r.identityUnverified === true) { unverified++; unverifiedRecords.add(r); }
+      if (!eventIds.has(r.target.eventId)) unknown++;
+    }
+    const notes = {};
+    for (const r of list) {
+      if (!r || r.field !== 'designerNote' || !r.target || !r.target.eventId) continue;
+      if (!eventIds.has(r.target.eventId)) continue;
+      const prior = notes[r.target.eventId];
+      if (prior && String(prior.updatedAt) > String(r.at)) continue;
+      notes[r.target.eventId] = {
+        eventId: r.target.eventId, cue: r.target.cueKey ? r.target.cueKey.cue : '', list: r.target.cueKey ? r.target.cueKey.list : '',
+        status: r.value ? r.value.status : null, text: r.value ? r.value.text : '', slot: r.value ? r.value.slot : null, updatedAt: r.at,
+        ...(unverifiedRecords.has(r) ? { identityUnverified: true } : {}),
+      };
+    }
+    const warnings = [];
+    if (unverified) warnings.push(`Unverified identity: ${unverified} legacy record(s) have no verified original session identity. Only event IDs present in this session were retained; confirm their origin before relying on them.`);
+    if (unknown) warnings.push(`${unknown} record(s) with unknown event IDs were skipped. Open their original session to import them.`);
+    return { notes, warnings };
+  }
+
+  const isReviewed = note => Boolean(note && note.status);
+  const reviewable = firing => firing.saved > 0;
+
+  function progress(firings, notes) {
+    const pool = firings.filter(reviewable);
+    return { reviewed: pool.filter(f => isReviewed(notes[f.id])).length, total: pool.length };
+  }
+
+  function nextUnreviewed(firings, notes, fromIndex, step) {
+    const n = firings.length;
+    const dir = step < 0 ? -1 : 1;
+    for (let k = 1; k <= n; k++) {
+      const f = firings[(((fromIndex + dir * k) % n) + n) % n];
+      if (reviewable(f) && !isReviewed(notes[f.id])) return f;
+    }
+    return null;
+  }
+
+  FRC.notes = { STATUSES, toCSV, toMarkdown, toReviewRecords, fromReviewRecords, progress, nextUnreviewed, isReviewed };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+/* Versioned, same-origin published sources. Original archives remain independent. */
+(function (root) {
+  'use strict';
+  const FRC = root.FRC = root.FRC || {};
+  const object = x => x && typeof x === 'object' && !Array.isArray(x);
+  const text = x => typeof x === 'string' && x.trim().length > 0;
+  const safePath = x => text(x) && !x.startsWith('/') && !x.includes('\\') && !x.split('/').some(p => !p || p === '.' || p === '..');
+  function assetURL(value, base) {
+    const url = new URL(value, base);
+    const origin = new URL(base).origin;
+    if (url.origin !== origin || !['http:', 'https:'].includes(url.protocol) || !url.pathname.startsWith('/run-review/') || url.username || url.password) throw new Error('Published asset must stay inside the same-site review');
+    return url.href;
+  }
+  function catalog(value, base) {
+    if (!object(value) || value.version !== 1 || !text(value.release) || !Array.isArray(value.sessions) || !value.sessions.length) throw new Error('Invalid review catalog');
+    const ids = new Set();
+    for (const s of value.sessions) {
+      if (!object(s) || !text(s.id) || !text(s.title) || !text(s.manifest) || ids.has(s.id)) throw new Error('Invalid or duplicate session in review catalog');
+      if (s.release !== undefined && !text(s.release)) throw new Error('Invalid session release in review catalog');
+      assetURL(s.manifest, base); ids.add(s.id);
+    }
+    if (!ids.has(value.defaultSession)) throw new Error('Default session is absent from the review catalog');
+    return value;
+  }
+  function source(value, entry, release, base, fetcher = root.fetch) {
+    const expectedRelease = entry.release || release;
+    if (!object(value) || value.version !== 1 || value.sessionId !== entry.id || value.release !== expectedRelease || !object(value.files) || !object(value.images)) throw new Error('Session manifest identity or release does not match the catalog');
+    const names = [...Object.keys(value.files), ...Object.keys(value.images)];
+    if (new Set(names).size !== names.length || names.some(n => !safePath(n))) throw new Error('Invalid or duplicate published file path');
+    for (const body of Object.values(value.files)) if (typeof body !== 'string') throw new Error('Published metadata must contain file text');
+    for (const frame of Object.values(value.images)) {
+      if (!object(frame) || !text(frame.url) || !Number.isInteger(frame.width) || frame.width < 1 || !Number.isInteger(frame.height) || frame.height < 1 || !/^[a-f0-9]{64}$/.test(frame.sha256)) throw new Error('Invalid original photo metadata');
+      assetURL(frame.url, base);
+      if (frame.thumbnail) assetURL(frame.thumbnail, base);
+    }
+    const result = {
+      name: entry.title, size: 0, buffer: null, names, published: value,
+      async read(path) {
+        if (Object.hasOwn(value.files, path)) return new TextEncoder().encode(value.files[path]);
+        const res = await fetcher(await result.url(path));
+        if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
+        return new Uint8Array(await res.arrayBuffer());
+      },
+      async url(path) {
+        if (!Object.hasOwn(value.images, path)) throw new Error(`Photo not in session manifest: ${path}`);
+        return assetURL(value.images[path].url, base);
+      },
+      async thumbnail(path) {
+        const frame = Object.hasOwn(value.images, path) && value.images[path];
+        if (!frame) throw new Error(`Photo not in session manifest: ${path}`);
+        return assetURL(frame.thumbnail || frame.url, base);
+      },
+    };
+    return result;
+  }
+  function attach(session, published) {
+    if (session.identity.canonicalId !== published.sessionId || session.key !== published.storageKey) throw new Error('Published session identity or original storage key does not match its capture');
+    const context = published.context;
+    if (!object(context) || context.sessionId !== published.sessionId || !Array.isArray(context.observations) || !object(context.events) || !Array.isArray(context.program)) throw new Error('Invalid published context identity or structure');
+    const known = new Map(session.firings.map(f => [f.id, f]));
+    const reviewPhotos = new Map();
+    const obsIds = new Set();
+    for (const row of context.observations) {
+      if (!object(row) || !text(row.id) || obsIds.has(row.id) || !text(row.text) || !Array.isArray(row.eventIds) || row.eventIds.some(id => !known.has(id))) throw new Error('Published observation contains an invalid identity or unknown firing');
+      obsIds.add(row.id);
+    }
+    for (const [id, row] of Object.entries(context.events)) {
+      if (!known.has(id) || !object(row) || !Array.isArray(row.songs) || row.songs.some(s => !text(s))) throw new Error('Published context contains an unknown firing or invalid songs');
+      if (row.reviewPhoto != null) {
+        const choice = row.reviewPhoto, target = known.get(id);
+        const origin = object(choice) && known.get(choice.sourceEventId);
+        const frame = origin?.slots?.find(s => s.slot === choice.sourceSlot);
+        const anchor = target.slots?.find(s => Number.isFinite(s.capturedAt) && Number.isFinite(s.offset));
+        if (!object(choice) || choice.sessionId !== published.sessionId || !frame || frame.status !== 'saved' || !Object.hasOwn(published.images, frame.path) || !Number.isFinite(frame.capturedAt) || !anchor) throw new Error('Invalid review photo: choose a saved frame from this session with verified timing');
+        if (choice.replaceSlot != null && !target.slots.some(s => s.slot === choice.replaceSlot && s.status === 'saved' && s.path !== frame.path)) throw new Error('Invalid review photo replacement: choose an existing saved target slot and a different source');
+        reviewPhotos.set(id, { ...frame, slot: 'review', label: 'Review image',
+          offset: frame.capturedAt - (anchor.capturedAt - anchor.offset),
+          provenance: `From ${origin.cue} · ${frame.label}`, sourceEventId: origin.id, sourceSlot: frame.slot });
+      }
+    }
+    // Validate everything before changing any association.
+    session.publishedContext = context;
+    session.title = published.title;
+    for (const [id, row] of Object.entries(context.events)) {
+      known.get(id).context = row;
+      known.get(id).reviewPhoto = reviewPhotos.get(id) || null;
+      if (row.reviewPhoto?.replaceSlot != null) {
+        const target = known.get(id), name = row.reviewPhoto.replaceSlot;
+        const previous = target.slots.find(s => s.slot === name);
+        const replacement = { ...target.reviewPhoto, slot: name, label: 'Replacement', replacesSlot: name };
+        // Change the review model only. Source manifests and capture statistics stay intact.
+        target.slots = target.slots.map(s => s === previous ? replacement : s);
+        if (target.cover?.path === previous.path) target.cover = replacement;
+      }
+    }
+    for (const row of context.observations) {
+      const obs = { ...row, kind: 'published', t: null, utc: null, cues: [row.cueText || ''], source: row.sourceLabel || 'Published review', origin: row.basis || '', linked: row.eventIds.length };
+      session.observations.push(obs);
+      for (const id of row.eventIds) known.get(id).observations.push({ obs, timeMatched: true });
+    }
+  }
+  FRC.hosted = { catalog, source, attach, assetURL };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Rehearsal Review v0.2: designer-facing viewer for rehearsal captures. Read-only on every source. */
+(function () {
+  'use strict';
+  const FRC = window.FRC;
+  const VERSION = '0.3.0';
+  const BUILT = '2026-11-20T08:18:09Z';
+  const TZ = 'America/New_York';
+  const $ = (sel, el = document) => el.querySelector(sel);
+  const $$ = (sel, el = document) => Array.from(el.querySelectorAll(sel));
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  const shortFmt = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false });
+  const dateFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  const zoneFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, timeZoneName: 'short' });
+  const clock = t => (t == null ? '—' : clockFmt.format(new Date(t * 1000)));
+  const hm = t => (t == null ? '—' : shortFmt.format(new Date(t * 1000)));
+  const zone = t => (zoneFmt.formatToParts(new Date((t ?? Date.now() / 1000) * 1000)).find(p => p.type === 'timeZoneName') || {}).value || '';
+  const signed = v => (v == null ? '—' : (v < 0 ? '−' : '+') + Math.abs(v).toFixed(2) + ' s');
+  const gap = s => (s == null ? '—' : s < 60 ? s.toFixed(1) + ' s' : s < 3600 ? Math.floor(s / 60) + ' min' + (s % 60 >= 1 ? ' ' + Math.round(s % 60) + ' s' : '') : (s / 3600).toFixed(1) + ' h');
+  const mins = s => Math.round(s / 60) + ' min';
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } },
+  };
+  const tabStore = {
+    get(k) { try { return sessionStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { sessionStorage.setItem(k, v); } catch { /* optional */ } },
+  };
+  const P = d => `<path d="${d}"/>`;
+  const ICONS = {
+    single: '<rect x="2.5" y="3.5" width="11" height="9" rx="1.5"/>',
+    all: '<rect x="2" y="3" width="5.2" height="4.2" rx="1"/><rect x="8.8" y="3" width="5.2" height="4.2" rx="1"/><rect x="2" y="8.8" width="5.2" height="4.2" rx="1"/><rect x="8.8" y="8.8" width="5.2" height="4.2" rx="1"/>',
+    compare: '<rect x="2" y="3.5" width="12" height="9" rx="1.5"/>' + P('M8 2v12'),
+    repeats: '<rect x="5" y="2.5" width="9" height="7" rx="1"/>' + P('M2.5 5.5v6.5a1 1 0 0 0 1 1h8'),
+    full: P('M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10'),
+    zoom: '<circle cx="7" cy="7" r="4.5"/>' + P('M10.4 10.4 14 14M7 5v4M5 7h4'),
+    pin: P('M8 10.5v4M5 6.5l1-4h4l1 4 1.5 2.5h-9z'),
+    details: '<rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/>' + P('M10 2.5v11'),
+    open: P('M2.5 4.5h4l1.5 1.5h5.5v6.5h-11zM2.5 6.5h11'),
+    keys: '<rect x="1.5" y="4" width="13" height="8" rx="1.5"/>' + P('M4 7h1M7 7h1M10 7h2M4.5 9.5h7'),
+    sun: '<circle cx="8" cy="8" r="2.8"/>' + P('M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1'),
+    moon: P('M13 9.5A5.5 5.5 0 1 1 6.5 3a4.5 4.5 0 0 0 6.5 6.5z'),
+    ok: P('M3.5 8.5l3 3 6-6.5'),
+    fix: '<circle cx="8" cy="8" r="5.8"/>' + P('M8 5v3.6M8 10.8v.2'),
+    question: '<circle cx="8" cy="8" r="5.8"/>' + P('M6.3 6.4a1.8 1.8 0 1 1 2.5 1.7c-.5.3-.8.6-.8 1.1M8 10.9v.2'),
+    note: P('M3 13l.8-3L10.5 3.3a1.3 1.3 0 0 1 1.9 1.9L5.7 11.9z'),
+    close: P('M4.5 4.5l7 7M11.5 4.5l-7 7'),
+  };
+  const icon = (name, label) => `<svg class="i" viewBox="0 0 16 16" aria-hidden="true"${label ? ` data-label="${esc(label)}"` : ''}>${ICONS[name] || ''}</svg>`;
+  const MODES = ['single', 'all', 'compare', 'repeats'];
+  const MODE_LABEL = { single: 'Single', all: 'All photos', compare: 'Compare', repeats: 'Repeats' };
+  const STATUS_KEY = { ok: 'A', fix: 'X', question: 'Q' };
+  const FILTER_LABEL = { all: 'All', photos: 'Photos', flags: 'Flags', repeats: 'Repeats', noted: 'Noted', todo: 'To review' };
+  const DENSITY = { s: '150px', m: '210px', l: '300px' };
+  const mobile = matchMedia('(max-width: 760px)');
+
+  const S = {
+    session: null, source: null, selected: null, slot: 0, mode: 'all', wipe: false, wipePos: 50,
+    filter: 'all', act: '', song: '', catalog: null, publishedId: null, query: '', notes: {}, reviewer: store.get('frc-reviewer') || '', pendingReference: null, sha: null,
+    showEarly: false, pin: null, density: store.get('frc-density') || 'm',
+    open: (() => { try { return JSON.parse(store.get('frc-open') || 'null') || { firing: true, photos: true, observations: true, context: true, reference: false }; } catch { return { firing: true, photos: true, observations: true, context: true, reference: false }; } })(),
+  };
+
+  /* ---------- feedback ---------- */
+  let toastTimer;
+  function toast(message, error = false, sticky = false) {
+    const el = $('#toast');
+    $('#toast-message').textContent = message;
+    el.classList.toggle('error', error);
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    if (!sticky) toastTimer = setTimeout(() => el.classList.remove('show'), error ? 6000 : 2400);
+  }
+  const announce = message => { $('#announcer').textContent = message; };
+  function importWarning(message) {
+    if (S.session) {
+      S.session.warnings.push(message);
+      renderSession();
+    }
+    toast(message, true, true);
+    announce(message);
+  }
+
+  /* ---------- images: full size for the stage, downscaled thumbnails elsewhere ---------- */
+  const fullCache = new Map();
+  const thumbCache = new Map();
+  const thumbQueue = [];
+  let thumbActive = 0;
+  function imageURL(path) {
+    if (!path || !S.source) return Promise.resolve(null);
+    if (!fullCache.has(path)) fullCache.set(path, S.source.url(path).catch(err => { fullCache.delete(path); throw err; }));
+    return fullCache.get(path);
+  }
+  function pumpThumbs() {
+    while (thumbActive < 4 && thumbQueue.length) {
+      const job = thumbQueue.shift();
+      thumbActive++;
+      job().finally(() => { thumbActive--; pumpThumbs(); });
+    }
+  }
+  async function makeThumb(path, source) {
+    if (source.thumbnail) return source.thumbnail(path);
+    if (typeof createImageBitmap !== 'function') return source.url(path);
+    try {
+      const bitmap = await createImageBitmap(new Blob([await source.read(path)], { type: 'image/jpeg' }));
+      const scale = Math.min(1, 480 / bitmap.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(bitmap.width * scale);
+      canvas.height = Math.round(bitmap.height * scale);
+      canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      if (bitmap.close) bitmap.close();
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.82));
+      return blob ? URL.createObjectURL(blob) : source.url(path);
+    } catch { return source.url(path); }
+  }
+  function thumbURL(path) {
+    if (!path || !S.source) return Promise.resolve(null);
+    if (!thumbCache.has(path)) {
+      const source = S.source;
+      thumbCache.set(path, new Promise((resolve, reject) => { thumbQueue.push(() => makeThumb(path, source).then(resolve, reject)); pumpThumbs(); }));
+    }
+    return thumbCache.get(path);
+  }
+  function revokeAll() {
+    const revoke = cache => { for (const p of cache.values()) p.then(u => { if (u && u.startsWith('blob:')) URL.revokeObjectURL(u); }).catch(() => {}); cache.clear(); };
+    revoke(fullCache);
+    revoke(thumbCache);
+    thumbQueue.length = 0;
+  }
+  let photoRetry = 0;
+  function loadImage(img, retry = false) {
+    const source = S.source;
+    const thumb = img.dataset.thumb;
+    const path = thumb || img.dataset.path;
+    const box = img.closest('.photo');
+    if (box) box.dataset.loadState = 'loading';
+    img.dataset.loadState = 'loading';
+    const active = () => source === S.source && img.isConnected && (img.dataset.thumb || img.dataset.path) === path;
+    const failed = () => {
+      if (!active()) return;
+      img.dataset.loadState = 'error';
+      if (box) box.dataset.loadState = 'error';
+      (thumb ? thumbCache : fullCache).delete(path);
+      const scope = img.closest('#sheet, #stage-pane, #photo-dialog');
+      scope?.querySelector('.retry-photos')?.removeAttribute('hidden');
+    };
+    img.onload = () => { if (active()) { img.dataset.loadState = 'ready'; if (box) box.dataset.loadState = 'ready'; } };
+    img.onerror = failed;
+    return (thumb ? thumbURL(path) : imageURL(path)).then(url => {
+      if (!active()) return;
+      if (url) {
+        let request = url;
+        if (retry && /^https?:/.test(url)) {
+          const fresh = new URL(url);
+          fresh.searchParams.set('_frc_retry', `${Date.now()}-${++photoRetry}`);
+          request = fresh.href;
+        }
+        img.src = request;
+        return url;
+      } else failed();
+    }).catch(failed);
+  }
+  function retryPhotos(root) {
+    root.querySelector('.retry-photos')?.setAttribute('hidden', '');
+    for (const img of $$('img[data-load-state="error"]', root)) loadImage(img, true);
+  }
+  const lazy = 'IntersectionObserver' in window
+    ? new IntersectionObserver(entries => { for (const e of entries) if (e.isIntersecting) { lazy.unobserve(e.target); loadImage(e.target); } }, { rootMargin: '300px' })
+    : null;
+  function hydrate(root, eager) {
+    for (const img of $$('img[data-path]:not([src]), img[data-thumb]:not([src])', root)) {
+      if (eager || !lazy) loadImage(img); else lazy.observe(img);
+    }
+  }
+  function photo(slot, alt, { thumb = false, zoom = false } = {}) {
+    if (!slot) return '<div class="placeholder"><b>No photo</b></div>';
+    if (slot.status !== 'saved') return `<div class="placeholder missing"><b>${slot.status === 'lost' ? 'File missing' : 'Missing'}</b><span>${esc(slot.reason)}</span></div>`;
+    const attr = thumb ? `data-thumb="${esc(slot.path)}"` : `data-path="${esc(slot.path)}"`;
+    return `<div class="photo${slot.warning ? ' warned' : ''}${slot.rescued ? ' rescued' : ''}${zoom ? ' zoomable' : ''}"><img ${attr} alt="${esc(alt)}" decoding="async" draggable="false">${slot.rescued ? '<span class="rescue-badge">Rescued</span>' : ''}${zoom ? '<span class="zoom-badge" id="zoom-badge" hidden></span>' : ''}</div>`;
+  }
+
+  /* ---------- model helpers ---------- */
+  const firings = () => (S.session ? S.session.firings : []);
+  const byId = id => firings().find(f => f.id === id) || null;
+  const current = () => byId(S.selected);
+  const runTime = t => {
+    if (!S.session || S.session.firstT == null || t == null) return '—';
+    const s = Math.max(0, Math.round(t - S.session.firstT));
+    return `${Math.floor(s / 3600)}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  };
+  const defaultSlot = f => (f.slots.length ? Math.max(0, f.cover ? f.slots.indexOf(f.cover) : 0) : 0);
+  const collapseEarly = () => S.session && S.session.stats.withPhotos > 0 && !S.showEarly && !S.query.trim();
+  function matches(f) {
+    const note = S.notes[f.id];
+    if (S.act && f.context?.act !== S.act) return false;
+    if (S.song && !f.context?.songs?.includes(S.song)) return false;
+    if (S.filter === 'photos' && !f.saved) return false;
+    if (S.filter === 'flags' && !f.flagged) return false;
+    if (S.filter === 'repeats' && f.total < 2) return false;
+    if (S.filter === 'noted' && !note) return false;
+    if (S.filter === 'todo' && (!f.saved || FRC.notes.isReviewed(note))) return false;
+    const q = S.query.trim().toLowerCase();
+    if (!q) return true;
+    if (/^\d+(\.\d+)?$/.test(q)) return f.cue === q || f.cue.startsWith(q + '.');
+    const hay = [f.cue, f.commandName, f.scene, f.context?.scene, ...(f.context?.songs || []), note && note.text, ...f.observations.map(o => o.obs.text)].join(' ').toLowerCase();
+    return hay.includes(q);
+  }
+  const visible = () => firings().filter(matches);
+  const navigable = () => visible().filter(f => !(collapseEarly() && f.photoStatus === 'predates'));
+  function statusIcon(note) {
+    if (!note) return '';
+    const st = note.status;
+    const label = FRC.notes.STATUSES[st] || 'Note';
+    return `<span class="st ${st || 'note'}" title="${esc(label)}">${icon(st || 'note')}<span class="sr-only">${esc(label)}</span></span>`;
+  }
+  function bars(f) {
+    if (f.photoMode === 'none') return '';
+    return `<span class="bars" title="${f.saved} of ${f.slots.length} photos">${f.slots.map(s => `<i class="${s.status === 'saved' ? (s.warning ? 'warn' : 'ok') : 'miss'}"></i>`).join('')}</span>`;
+  }
+  function beforeLook(f) {
+    if (S.pin) {
+      const pf = byId(S.pin.id);
+      const ps = pf && pf.slots[S.pin.slot];
+      if (pf && ps && !(pf.id === f.id && S.pin.slot === S.slot)) {
+        return { slot: ps, label: `Pinned: cue ${pf.cue} ${ps.label}`, detail: `${clock(ps.capturedAt ?? pf.t)} · firing ${pf.occurrence} of ${pf.total}` };
+      }
+    }
+    const own = f.slots.find(s => s.slot === 'before' && s.status === 'saved' && !s.warning);
+    if (own) return { slot: own, label: own.replacesSlot ? 'Replacement image' : 'Before this cue', detail: `${clock(own.capturedAt)} · ${signed(own.offset)} from the cue${own.provenance ? ' · ' + own.provenance : ''}` };
+    let p = f.prev;
+    while (p && !p.cover) p = p.prev;
+    if (!p) return null;
+    const at = p.cover.capturedAt ?? p.t;
+    const late = at > f.t;
+    return {
+      slot: p.cover, label: `Previous look: cue ${p.cue} ${p.cover.label}`, warn: late,
+      detail: late ? `taken ${gap(at - f.t)} after this cue fired, so it may already show this cue` : `${clock(at)}, ${gap(f.t - at)} before this cue`,
+    };
+  }
+  const afterLook = f => (f.cover ? { slot: f.cover, label: `This cue: ${f.cover.label}`, detail: `${signed(f.cover.offset)} from the cue` } : null);
+
+  /* ---------- notes and progress ---------- */
+  const notesKey = () => 'frc-notes:' + S.session.key;
+  const unsavedNotes = new Map();
+  function loadNotes() {
+    S.noteSaveFailed = unsavedNotes.has(notesKey());
+    if (S.noteSaveFailed) return unsavedNotes.get(notesKey());
+    try { return JSON.parse(store.get(notesKey()) || '{}') || {}; } catch { return {}; }
+  }
+  function saveNotes() {
+    S.noteSaveFailed = !store.set(notesKey(), JSON.stringify(S.notes));
+    if (S.noteSaveFailed) unsavedNotes.set(notesKey(), S.notes);
+    else unsavedNotes.delete(notesKey());
+    if (S.noteSaveFailed) toast('Notes could not be saved in this browser. Export them to keep them.', true, true);
+    updateCounts();
+  }
+  function noteSaveLabel() {
+    return S.noteSaveFailed ? 'Not saved · export to keep' : 'Saved in this browser';
+  }
+  function updateCounts() {
+    const n = S.session ? Object.keys(S.notes).length : 0;
+    $('#notes-count').textContent = n ? String(n) : '';
+    if (!S.session) return;
+    const p = FRC.notes.progress(firings(), S.notes);
+    $('#progress-text').textContent = p.total ? `${p.reviewed} of ${p.total} reviewed` : 'No photographed cues';
+    $('#progress-fill').style.width = p.total ? (100 * p.reviewed / p.total).toFixed(1) + '%' : '0';
+    $('#next-unreviewed').hidden = !p.total || p.reviewed === p.total;
+  }
+  function updateNote(f, patch) {
+    const prior = S.notes[f.id] || { eventId: f.id, cue: f.cue, list: f.list, status: null, text: '', slot: null };
+    const next = { ...prior, ...patch, updatedAt: new Date().toISOString() };
+    if (!next.status && !String(next.text || '').trim()) delete S.notes[f.id];
+    else S.notes[f.id] = next;
+    saveNotes();
+    refreshRow(f);
+    drawStrip();
+    const saved = $('#note-saved');
+    if (saved) { saved.textContent = S.noteSaveFailed || S.notes[f.id] ? noteSaveLabel() : 'No note'; saved.classList.toggle('bad-text', Boolean(S.noteSaveFailed)); }
+    if (!$('#notes').hidden) renderNotes();
+  }
+  function setStatus(status) {
+    const f = current();
+    if (!f) return;
+    const prior = S.notes[f.id];
+    const nextStatus = prior && prior.status === status ? null : status;
+    updateNote(f, { status: nextStatus });
+    $$('.status-row button[data-status]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.status === nextStatus)));
+    announce(nextStatus ? `Cue ${f.cue} marked ${FRC.notes.STATUSES[nextStatus]}` : `Status cleared for cue ${f.cue}`);
+  }
+  function nextToReview(step) {
+    const f = current();
+    const target = FRC.notes.nextUnreviewed(firings(), S.notes, f ? f.index : -1, step);
+    if (!target) return toast('Every photographed cue has a status.');
+    select(target.id);
+  }
+
+  /* ---------- cue list ---------- */
+  function rowHTML(f) {
+    const meta = [f.scene, f.total > 1 ? `firing ${f.occurrence} of ${f.total}` : '', f.list && f.list !== '1' ? `list ${f.list}` : ''].filter(Boolean).join(' · ');
+    return `<div role="option" class="row" id="row-${f.id}" data-id="${f.id}" aria-selected="${f.id === S.selected}">`
+      + `<span class="r-cue">${esc(f.cue)}${f.command !== 1 ? `<small>${esc(f.commandName)}</small>` : ''}</span>`
+      + `<span class="r-time">${clock(f.t)}</span>`
+      + `<span class="r-state">${bars(f)}${statusIcon(S.notes[f.id])}</span>`
+      + (meta ? `<span class="r-meta">${esc(meta)}</span>` : '') + '</div>';
+  }
+  function renderList() {
+    const list = visible();
+    const early = collapseEarly() ? list.filter(f => f.photoStatus === 'predates') : [];
+    const rest = early.length ? list.filter(f => f.photoStatus !== 'predates') : list;
+    const parts = [];
+    if (early.length) {
+      parts.push(`<button type="button" class="early-row" data-action="show-early"><span>${early.length} cues before photos began · ${hm(early[0].t)}–${hm(early[early.length - 1].t)}</span><span>Show</span></button>`);
+    }
+    const multi = S.session.sections.length > 1;
+    let open = null;
+    for (const f of rest) {
+      if (open !== f.section) {
+        if (open !== null) parts.push('</div>');
+        open = f.section;
+        const s = S.session.sections[f.section];
+        parts.push(`<div role="group" class="group" aria-labelledby="sec-${s.index}">`);
+        if (multi) {
+          parts.push(`<div class="section-row" id="sec-${s.index}"><span><b>${esc(s.label)}</b> · ${hm(s.start)}–${hm(s.end)}</span><span>${s.isBreak ? `${mins(s.gapBefore)} break before` : `${s.firings.length} cues`}</span></div>`);
+        } else parts.push(`<span class="sr-only" id="sec-${s.index}">All cues</span>`);
+      }
+      parts.push(rowHTML(f));
+    }
+    if (open !== null) parts.push('</div>');
+    $('#firing-list').innerHTML = parts.join('') || '<p class="empty-results">No cues match. Clear filters to see the run again.</p>';
+    syncFilterFeedback(list.length);
+    syncListSelection(true);
+  }
+  function syncFilterFeedback(count = visible().length) {
+    const filtered = Boolean(S.query.trim() || S.act || S.song || S.filter !== 'all');
+    $('#search-count').textContent = filtered ? `${count} of ${firings().length}` : '';
+    for (const b of $$('.clear-filters')) b.hidden = !filtered;
+    const rows = navigable(), index = rows.findIndex(f => f.id === S.selected);
+    $('#previous-cue').disabled = !rows.length || index === 0;
+    $('#next-cue').disabled = !rows.length || index === rows.length - 1;
+    $('#search-count').title = filtered ? `${count} matching firings${current() && !matches(current()) ? '; the displayed cue is outside this filter' : ''}` : '';
+  }
+  function setSearch(query) {
+    S.query = query;
+    $('#search').value = query;
+    $('#sheet-search').value = query;
+    if (!S.session) return;
+    renderList(); drawStrip();
+    if (!$('#sheet').hidden) renderSheet();
+  }
+  function clearFilters() {
+    S.act = ''; S.song = ''; S.filter = 'all';
+    $('#act-filter').value = ''; $('#song-filter').value = '';
+    $$('#filter-chips button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === 'all')));
+    setSearch('');
+    announce('Filters cleared. All firings are available.');
+  }
+  function refreshRow(f) {
+    const row = $('#row-' + f.id);
+    if (row) row.outerHTML = rowHTML(f);
+    const slot = $(`.sheet-card[data-id="${f.id}"] .note-slot`);
+    if (slot) slot.innerHTML = statusIcon(S.notes[f.id]);
+  }
+  function syncListSelection(scroll) {
+    for (const row of $$('#firing-list .row')) row.setAttribute('aria-selected', String(row.dataset.id === S.selected));
+    const row = $('#row-' + S.selected);
+    if (row) {
+      $('#firing-list').setAttribute('aria-activedescendant', row.id);
+      if (scroll) row.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    } else $('#firing-list').removeAttribute('aria-activedescendant');
+    syncFilterFeedback();
+  }
+
+  /* ---------- run strip ---------- */
+  let hoverId = null;
+  function stripLayout() {
+    const canvas = $('#run-strip'), rows = visible();
+    const width = Math.max(1, canvas.clientWidth - 12);
+    const x = index => rows.length === 1 ? canvas.clientWidth / 2 : 6 + index * width / Math.max(1, rows.length - 1);
+    return {canvas, rows, x, width};
+  }
+  function drawStrip() {
+    if (!S.session || $('#run').hidden) return;
+    const {canvas, rows, x, width} = stripLayout();
+    const h = canvas.clientHeight, w = canvas.clientWidth, scale = window.devicePixelRatio || 1;
+    if (!w || !h) return;
+    if (canvas.width !== Math.round(w * scale)) canvas.width = Math.round(w * scale);
+    if (canvas.height !== Math.round(h * scale)) canvas.height = Math.round(h * scale);
+    const g = canvas.getContext('2d');
+    g.setTransform(scale,0,0,scale,0,0); g.clearRect(0,0,w,h);
+    const palette = {ok:'#10B981',fix:'#F97316',question:'#22D3EE'};
+    const tickWidth = Math.max(1,Math.min(4,width/Math.max(1,rows.length)*0.65));
+    rows.forEach((row,index) => {
+      const n = S.notes[row.id], cx = x(index);
+      const height = h * (['fix','question'].includes(n?.status) ? .68 : .44);
+      g.fillStyle = palette[n?.status] || '#475569';
+      g.beginPath(); g.roundRect(cx-tickWidth/2,h-height,tickWidth,height,tickWidth/2); g.fill();
+      if (n?.text?.trim()) { g.fillStyle='#FBBF24'; g.beginPath(); g.arc(cx,h-height-3,1.8,0,Math.PI*2); g.fill(); }
+      if (row.id === hoverId) { g.fillStyle='#94A3B8'; g.fillRect(cx,0,1,h); }
+      if (row.id === S.selected) {
+        g.fillStyle='#F8FAFC'; g.fillRect(cx-.75,0,1.5,h);
+        g.beginPath(); g.moveTo(cx-4,0); g.lineTo(cx+4,0); g.lineTo(cx,4); g.fill();
+      }
+    });
+  }
+  function nearestAt(clientX) {
+    const {canvas, rows, width} = stripLayout();
+    const index = Math.round((clientX - canvas.getBoundingClientRect().left - 6) / width * (rows.length - 1));
+    return rows[Math.max(0,Math.min(index,rows.length-1))];
+  }
+
+  /* ---------- stage ---------- */
+  function flagsHTML(f) {
+    const out = [];
+    if (S.pin) {
+      const pf = byId(S.pin.id);
+      if (pf) out.push(`<span class="flag pin">${icon('pin')}Pinned cue ${esc(pf.cue)} ${esc((pf.slots[S.pin.slot] || {}).label || '')}<button type="button" data-action="unpin" aria-label="Clear pin">${icon('close')}</button></span>`);
+    }
+    if (f.photoStatus === 'predates') out.push('<span class="flag info">Before photo capture</span>');
+    if (f.photoMode !== 'none' && f.missing) out.push(`<span class="flag bad">${f.missing} missing</span>`);
+    if (f.warnings) out.push(`<span class="flag">${f.warnings} timing warning${f.warnings > 1 ? 's' : ''}</span>`);
+    if (f.overlap) out.push('<span class="flag info">Next cue inside the photo window</span>');
+    return out.join('');
+  }
+  function captionHTML(slot) {
+    if (!slot) return '';
+    const rescued = slot.rescued
+      ? `<span class="rescued-detail">Rescued photo · ${slot.secondsAfterTarget == null ? 'unknown delay' : `${slot.secondsAfterTarget.toFixed(2)} s after target`}${slot.withinNormalWindow == null ? '' : slot.withinNormalWindow ? ' · within normal window' : ' · outside normal window'}${slot.timingUncertaintySeconds == null ? '' : ` · ±${slot.timingUncertaintySeconds.toFixed(2)} s timing uncertainty`}${slot.sourceFrame ? ` · ${esc(slot.sourceFrame)}` : ''}</span>`
+      : '';
+    return `<b>${esc(slot.label)}</b>${slot.capturedAt ? `<span>${clock(slot.capturedAt)}</span>` : ''}${slot.offset != null ? `<span>${signed(slot.offset)} from the cue</span>` : ''}${rescued}${slot.provenance ? `<span>${esc(slot.provenance)}</span>` : ''}${slot.warning ? `<span class="warn">${esc(slot.warning)}</span>` : ''}`;
+  }
+  const showingReviewPhoto = f => Boolean(f.reviewPhoto && !S.originalPhotos && ['all', 'single'].includes(S.mode));
+  function lookFigure(look, emptyText) {
+    if (!look) return `<figure><div class="placeholder"><b>${esc(emptyText)}</b></div><figcaption></figcaption></figure>`;
+    return `<figure>${photo(look.slot, look.label)}<figcaption><b>${esc(look.label)}</b><span${look.warn ? ' class="warn"' : ''}>${esc(look.detail)}</span></figcaption></figure>`;
+  }
+  function mainHTML(f) {
+    if (showingReviewPhoto(f)) return `<figure class="review-photo"><button type="button" class="open-photo" data-preview="-1" aria-label="Enlarge review image">${photo(f.reviewPhoto, `Cue ${f.cue} review image`)}</button><figcaption>${captionHTML(f.reviewPhoto)}</figcaption></figure>`;
+    if (S.mode === 'repeats') {
+      return `<div class="repeats">${f.siblings.map(s => `<button type="button" class="repeat-card${s.id === f.id ? ' current' : ''}" data-open="${s.id}" aria-label="Firing ${s.occurrence} of ${s.total} at ${clock(s.t)}">`
+        + (s.cover ? photo(s.cover, `Cue ${s.cue} firing ${s.occurrence}`, { thumb: true }) : `<div class="placeholder"><span>${s.photoStatus === 'predates' ? 'Before photos began' : 'No photo'}</span></div>`)
+        + `<span class="sheet-cap"><b>${s.occurrence} of ${s.total}</b><span class="t">${clock(s.t)}</span><span class="end">${statusIcon(S.notes[s.id])}</span></span></button>`).join('')}</div>`;
+    }
+    if (S.mode === 'compare') {
+      const left = beforeLook(f);
+      const right = afterLook(f);
+      if (S.wipe && left && right && left.slot.status === 'saved' && right.slot.status === 'saved') {
+        return `<div class="wipe"><div class="wipe-frame" style="--wipe:${S.wipePos}%">`
+          + `<img data-path="${esc(right.slot.path)}" alt="${esc(right.label)}"><img class="top-img" data-path="${esc(left.slot.path)}" alt="${esc(left.label)}">`
+          + `<span class="wipe-line"></span><span class="tag l">${esc(left.label)}</span><span class="tag r">${esc(right.label)}</span></div>`
+          + `<label class="sr-only" for="wipe-range">Wipe position</label><input type="range" id="wipe-range" min="0" max="100" value="${S.wipePos}"></div>`;
+      }
+      return `<div class="multi n2" style="--n:2">${lookFigure(left, 'No earlier photo to compare')}${lookFigure(right, f.photoStatus === 'predates' ? 'Before photo capture' : 'No photo for this cue')}</div>`;
+    }
+    if (!f.slots.length) {
+      return f.photoStatus === 'predates'
+        ? `<div class="placeholder"><b>This cue fired before photo capture began</b><span>Photos start at ${clock(S.session.photoStart)}. Repeats and observations may still help.</span></div>`
+        : '<div class="placeholder"><b>No photos were captured for this cue</b></div>';
+    }
+    if (S.mode === 'all') {
+      return `<div class="multi n${f.slots.length}" data-layout="${$('#photo-layout').value}" style="--n:${f.slots.length}">${f.slots.map((s, i) => `<figure><button type="button" class="open-photo" data-preview="${i}" aria-label="Enlarge ${esc(s.label)} photo">${photo(s, `Cue ${f.cue} ${s.label}`)}</button><figcaption>${captionHTML(s)}</figcaption></figure>`).join('')}</div>`;
+    }
+    const slot = f.slots[S.slot] || f.slots[0];
+    return `<figure>${photo(slot, `Cue ${f.cue} ${slot.label}`, { zoom: true })}<figcaption>${captionHTML(slot)}</figcaption></figure>`;
+  }
+  function renderStage() {
+    const f = current();
+    const head = $('#stage-head');
+    const main = $('#stage-main');
+    const strip = $('#slot-strip');
+    resetZoom(false);
+    if (!f) { head.innerHTML = ''; main.innerHTML = '<div class="placeholder"><b>No cue selected</b></div>'; strip.innerHTML = ''; return; }
+    const full = $('#stage-pane').classList.contains('is-full');
+    const facts = [ `run ${runTime(f.t)}`, f.total > 1 ? `firing ${f.occurrence} of ${f.total}` : '', f.prev ? `${gap(f.gapBefore)} after ${esc(f.prev.cue)}` : '', f.context?.scene ? esc(f.context.scene) : f.scene ? esc(f.scene) : ''].filter(Boolean).join(' · ');
+    head.innerHTML = `<div class="stage-id"><span class="sr-only">Cue</span><span class="cue">${esc(f.cue)}</span>${f.command !== 1 ? `<span class="cmd">${esc(f.commandName)}</span>` : ''}${f.list && f.list !== '1' ? `<span class="label">list ${esc(f.list)}</span>` : ''}</div>`
+      + `<div class="stage-facts"><time class="cue-clock">${clock(f.t)} <small>${zone(f.t)}</small></time><span>${facts}</span></div>`
+      + '<div class="stage-actions">'
+      + `<div class="modes" role="group" aria-label="View">${f.reviewPhoto ? `<button type="button" data-action="review-photo" aria-pressed="${showingReviewPhoto(f)}">Review image</button>` : ''}${MODES.map(m => `<button type="button" data-mode="${m}" aria-pressed="${S.mode === m && !showingReviewPhoto(f)}" title="${MODE_LABEL[m]} (C)">${icon(m)}<span class="lbl">${MODE_LABEL[m]}</span></button>`).join('')}</div>`
+      + (S.mode === 'compare' ? `<button type="button" class="tool" data-action="wipe" aria-pressed="${S.wipe}" title="Wipe (W)">Wipe</button>` : '')
+      + `<button type="button" class="tool" data-action="pin" ${showingReviewPhoto(f) ? 'disabled' : ''} aria-pressed="${Boolean(S.pin && S.pin.id === f.id)}" title="Pin this photo for Compare (P)" aria-label="Pin this photo">${icon('pin')}</button>`
+      + `<button type="button" class="tool details-toggle" data-action="details" title="Details" aria-label="Show details">${icon('details')}</button>`
+      + `<button type="button" class="tool" data-action="full" aria-pressed="${full}" title="${full ? 'Exit full screen (Esc)' : 'Full screen (F)'}" aria-label="${full ? 'Exit full screen' : 'Full screen'}">${icon('full')}</button>`
+      + '<button type="button" class="tool retry-photos" hidden>Retry photos</button></div>'
+      + `<div class="stage-flags">${flagsHTML(f)}</div>`;
+    main.innerHTML = mainHTML(f);
+    if (S.mode === 'single' && !showingReviewPhoto(f) && f.slots.length > 1) {
+      strip.style.setProperty('--n', f.slots.length);
+      strip.innerHTML = f.slots.map((s, i) => `<button type="button" class="slot-thumb" data-slot="${i}" aria-pressed="${i === S.slot}" aria-label="${esc(s.label)} photo${s.status !== 'saved' ? ' (missing)' : ''}">`
+        + (s.status === 'saved' ? photo(s, '', { thumb: true }) : '<div class="placeholder missing"><span>Missing</span></div>')
+        + `<span>${i + 1} · ${esc(s.label)} ${s.offset != null ? signed(s.offset) : ''}</span></button>`).join('');
+    } else strip.innerHTML = '';
+    hydrate(main, true);
+    hydrate(strip, true);
+  }
+
+  /* ---------- zoom and pan ---------- */
+  const Z = { scale: 1, x: 0, y: 0, drag: null };
+  const zoomBox = () => $('#stage-main .photo.zoomable');
+  function applyZoom() {
+    const box = zoomBox();
+    if (!box) return;
+    const img = box.querySelector('img');
+    img.style.transform = Z.scale === 1 ? '' : `translate(${Z.x}px, ${Z.y}px) scale(${Z.scale})`;
+    box.classList.toggle('zoomed', Z.scale > 1);
+    const badge = $('#zoom-badge');
+    if (badge) { badge.hidden = Z.scale === 1; badge.textContent = `${Math.round(Z.scale * 100)}% · Esc resets`; }
+  }
+  function clampZoom() {
+    const box = zoomBox();
+    if (!box) return;
+    const r = box.getBoundingClientRect();
+    Z.x = Math.min(0, Math.max(r.width - r.width * Z.scale, Z.x));
+    Z.y = Math.min(0, Math.max(r.height - r.height * Z.scale, Z.y));
+  }
+  function zoomAt(factor, cx, cy) {
+    const next = Math.min(8, Math.max(1, Z.scale * factor));
+    if (next === Z.scale) return;
+    Z.x = cx - (cx - Z.x) * (next / Z.scale);
+    Z.y = cy - (cy - Z.y) * (next / Z.scale);
+    Z.scale = next;
+    if (next === 1) { Z.x = 0; Z.y = 0; }
+    clampZoom();
+    applyZoom();
+  }
+  function resetZoom(apply = true) { Z.scale = 1; Z.x = 0; Z.y = 0; Z.drag = null; if (apply) applyZoom(); }
+  function toggleZoom(cx, cy) {
+    if (S.mode !== 'single') { S.mode = 'single'; renderStage(); }
+    const box = zoomBox();
+    if (!box) return;
+    if (Z.scale > 1) return resetZoom();
+    const r = box.getBoundingClientRect();
+    zoomAt(2.5, cx ?? r.width / 2, cy ?? r.height / 2);
+  }
+
+  /* ---------- details pane ---------- */
+  function section(key, title, count, body) {
+    return `<details class="ctx" data-key="${key}"${S.open[key] ? ' open' : ''}><summary><span>${title}${count != null ? `<span class="pill">${count}</span>` : ''}</span></summary><div class="ctx-body">${body}</div></details>`;
+  }
+  function observationsHTML(f) {
+    if (!S.session.observations.length) return '<p class="muted">This session has no imported observations.</p>';
+    if (!f.observations.length) return `<p class="muted">No observation names cue ${esc(f.cue)}.</p>`;
+    const origin = f.observations[0].obs.origin;
+    return f.observations.map(({ obs, timeMatched }) => `<div class="obs"><p>${esc(obs.text)}</p><p class="src">${obs.t ? clock(obs.t) + ' · ' : ''}${esc(obs.source)}${obs.sourceUrl ? ` · <a href="${esc(obs.sourceUrl)}" target="_blank" rel="noopener noreferrer">Source</a>` : ''}${timeMatched ? '' : ' · <span class="warn-text">linked by cue number only</span>'}</p></div>`).join('')
+      + (origin ? `<p class="callout">${esc(origin)}</p>` : '');
+  }
+  function referenceHTML(f) {
+    const ref = S.session.reference;
+    if (!ref) return '<p class="muted">No Notion cue snapshot loaded. Drop the snapshot (.json) on the page to add expected looks and scene names.</p>';
+    const dated = ref.fetchedAt ? `Snapshot ${dateFmt.format(new Date(ref.fetchedAt))}, ${hm(Date.parse(ref.fetchedAt) / 1000)} · ${ref.cueCount} cues` : `${ref.cueCount} cues, undated snapshot`;
+    if (!f.reference) return `<p>No record for cue ${esc(f.cue)}.</p><p class="callout">${esc(dated)}. A newer snapshot may include it.</p>`;
+    const r = f.reference;
+    return `<dl class="facts"><dt>Expected look</dt><dd>${r.expected ? esc(r.expected) : '<span class="muted">Not recorded yet</span>'}</dd><dt>Mapping</dt><dd>${esc(r.mapping || 'Not recorded')}</dd></dl>`
+      + (r.scenes.length ? r.scenes.map(s => `<div class="obs"><p><b>${esc(s.name)}</b></p><p>${esc(s.observation)}</p><p class="src">Window ${esc(s.window)} · ${esc(s.basis)}</p></div>`).join('') : '')
+      + `<p class="callout">Scene looks were observed while this cue was in the window, not confirmed assignments. ${esc(dated)}.${r.url ? ` <a href="${esc(r.url)}" target="_blank" rel="noopener">Open in Notion</a>` : ''}</p>`;
+  }
+  function renderContext() {
+    const f = current();
+    const el = $('#context-pane');
+    if (!f) { el.innerHTML = ''; return; }
+    const note = S.notes[f.id] || {};
+    const others = f.siblings.filter(s => s.id !== f.id && S.notes[s.id]);
+    const facts = `<dl class="facts"><dt>Cue</dt><dd>${esc(f.cue)}${f.list ? ' · list ' + esc(f.list) : ''} · ${esc(f.commandName)}</dd><dt>Time</dt><dd>${clock(f.t)} ${zone(f.t)} · run ${runTime(f.t)}</dd>`
+      + `<dt>Firing</dt><dd>${f.occurrence} of ${f.total}</dd><dt>Previous</dt><dd>${f.prev ? `cue ${esc(f.prev.cue)}, ${gap(f.gapBefore)} earlier` : '—'}</dd><dt>Next</dt><dd>${f.next ? `cue ${esc(f.next.cue)}, ${gap(f.next.t - f.t)} later` : '—'}</dd>`
+      + (f.receivedAt ? `<dt>Photo service</dt><dd>${signed(f.receivedAt - f.t)} after the Studio</dd>` : '') + `</dl><details class="raw"><summary>Raw MIDI</summary><code>${esc(f.hex)}</code></details>`;
+    const photos = f.slots.length ? `<table class="slot-table"><tbody>${f.slots.map(s => `<tr><td><b>${esc(s.label)}</b></td><td>${s.status === 'saved' ? signed(s.offset) : '<span class="bad-text">Missing</span>'}</td><td>${s.warning ? `<span class="warn-text">${esc(s.warning)}</span>` : s.status !== 'saved' ? esc(s.reason) : 'On time'}</td></tr>`).join('')}</tbody></table>` : '';
+    el.innerHTML = `<div class="note-box"><h3><span>Your note</span><button type="button" class="link-btn" data-close-details aria-label="Close notes and details" title="Close notes and details (Esc)">Close</button></h3><p id="note-saved" class="${S.noteSaveFailed ? 'bad-text' : ''}">${S.noteSaveFailed || S.notes[f.id] ? noteSaveLabel() : ''}</p>`
+      + (note.identityUnverified ? '<p class="warn-text">Unverified identity: legacy note. Confirm its original session.</p>' : '')
+      + `<div class="status-row" role="group" aria-label="Note status">${['ok', 'fix', 'question'].map(st => `<button type="button" data-status="${st}" aria-pressed="${note.status === st}" title="${FRC.notes.STATUSES[st]} (${STATUS_KEY[st]})">${icon(st)}${FRC.notes.STATUSES[st]}</button>`).join('')}</div>`
+      + `<label class="sr-only" for="note-text">Note for cue ${esc(f.cue)}</label><textarea id="note-text" class="note-text" placeholder="What should change? (N)">${esc(note.text || '')}</textarea>`
+      + `<div class="note-meta"><label>About <select id="note-slot"><option value="">Whole cue</option>${f.slots.map(s => `<option value="${esc(s.slot)}"${note.slot === s.slot ? ' selected' : ''}>${esc(s.label)} photo</option>`).join('')}</select></label>`
+      + (others.length ? `<span>Other firings: ${others.map(s => `<button type="button" class="link-btn" data-open="${s.id}">${s.occurrence}</button>${statusIcon(S.notes[s.id])}`).join(' ')}</span>` : '') + '</div></div>'
+      + (f.context ? section('context', 'Scene & song candidates', null, `<p><b>${esc(f.context.scene || 'Unassigned')}</b></p><p>${esc(f.context.songs.join(' · ') || 'Song unassigned')}</p><p class="src">${esc(f.context.confidence || 'Unverified assignment')}${f.context.act ? ' · Act ' + esc(f.context.act) : ''}</p><p class="callout">Snapshot ${esc(S.session.publishedContext?.fetchedAt || 'undated')}. Observed context does not establish the intended trigger.</p>`) : '')
+      + section('firing', 'Firing', null, facts)
+      + (photos ? section('photos', 'Photos', `${f.saved}/${f.slots.length}`, photos) : '')
+      + section('observations', 'Observed in rehearsal', f.observations.length || null, observationsHTML(f))
+      + section('reference', 'Reference', null, referenceHTML(f));
+  }
+
+  /* ---------- selection ---------- */
+  function select(id, opts = {}) {
+    const f = byId(id);
+    if (!f) return;
+    if (f.photoStatus === 'predates' && collapseEarly()) { S.showEarly = true; renderList(); }
+    S.selected = f.id;
+    S.originalPhotos = false;
+    updateShareURL();
+    S.slot = defaultSlot(f);
+    tabStore.set('frc-selected:' + S.session.key, f.id);
+    syncListSelection(opts.scroll !== false);
+    renderStage();
+    renderContext();
+    drawStrip();
+    for (const card of $$('.sheet-card')) card.classList.toggle('selected', card.dataset.id === f.id);
+    if (opts.showPhotos && mobile.matches) setPane('photos');
+  }
+  function move(delta) {
+    const list = navigable();
+    if (!list.length) return;
+    const i = list.findIndex(f => f.id === S.selected);
+    const next = list[Math.max(0, Math.min(list.length - 1, i < 0 ? 0 : i + delta))];
+    if (next) select(next.id);
+  }
+  function chooseSlot(i) {
+    const f = current();
+    if (!f || !f.slots.length) return;
+    S.slot = (i + f.slots.length) % f.slots.length;
+    S.mode = 'single';
+    S.originalPhotos = true;
+    renderStage();
+  }
+  function setMode(mode) { S.mode = mode; S.originalPhotos = true; renderStage(); }
+  function setPane(pane) {
+    $('#review-grid').dataset.pane = pane;
+    $$('.pane-switch button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pane === pane)));
+  }
+  function togglePin(clear) {
+    const f = current();
+    if (f && showingReviewPhoto(f) && !clear) return toast('Choose a captured photo in All photos to pin.');
+    if (clear || !f) { S.pin = null; renderStage(); return; }
+    const slot = S.mode === 'single' ? S.slot : defaultSlot(f);
+    if (!f.slots[slot] || f.slots[slot].status !== 'saved') return toast('Pick a cue with a photo to pin.', true);
+    if (S.pin && S.pin.id === f.id && S.pin.slot === slot) S.pin = null;
+    else { S.pin = { id: f.id, slot }; toast(`Pinned cue ${f.cue} ${f.slots[slot].label}. Compare now shows it beside other cues.`); }
+    renderStage();
+  }
+
+  /* ---------- contact sheet ---------- */
+  function renderSheet() {
+    if (!S.session) return;
+    const onlyPhotos = $('#sheet-photos-only').checked;
+    const items = visible().filter(f => !onlyPhotos || f.cover);
+    const grid = $('#sheet-grid');
+    grid.style.setProperty('--thumb-min', DENSITY[S.density] || DENSITY.m);
+    $$('#density button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.density === S.density)));
+    $('#sheet-summary').textContent = `${items.length} cue${items.length === 1 ? '' : 's'} · ${FILTER_LABEL[S.filter]}${S.query ? ` · “${S.query}”` : ''}`;
+    const multi = S.session.sections.length > 1;
+    const parts = [];
+    let open = null;
+    for (const f of items) {
+      if (multi && open !== f.section) {
+        open = f.section;
+        const s = S.session.sections[f.section];
+        parts.push(`<div class="sheet-section"><b>${esc(s.label)}</b><span>${hm(s.start)}–${hm(s.end)}</span>${s.isBreak ? `<span>after ${mins(s.gapBefore)} break</span>` : ''}</div>`);
+      }
+      parts.push(`<button type="button" class="sheet-card${f.id === S.selected ? ' selected' : ''}" data-id="${f.id}">`
+        + (f.cover ? photo(f.reviewPhoto || f.cover, `Cue ${f.cue} ${f.reviewPhoto ? 'review image' : f.cover.label}`, { thumb: true }) : `<div class="placeholder"><span>${f.photoStatus === 'predates' ? 'Before photos began' : 'No photo'}</span></div>`)
+        + `<span class="sheet-cap"><b>${esc(f.cue)}</b><span class="t">${clock(f.t)}</span><span class="end">${bars(f)}<span class="note-slot">${statusIcon(S.notes[f.id])}</span></span></span>`
+        + ((f.scene || f.total > 1) ? `<span class="sheet-sub">${esc([f.scene, f.total > 1 ? `firing ${f.occurrence} of ${f.total}` : ''].filter(Boolean).join(' · '))}</span>` : '')
+        + '</button>');
+    }
+    grid.innerHTML = parts.join('') || '<p class="empty-results">No photos match. Clear filters or turn off Photos only.</p>';
+    hydrate(grid, false);
+  }
+
+  /* ---------- notes tab ---------- */
+  function renderNotes() {
+    if (!S.session) return;
+    const rows = firings().filter(f => S.notes[f.id]);
+    const p = FRC.notes.progress(firings(), S.notes);
+    const unverified = rows.filter(f => S.notes[f.id].identityUnverified).length;
+    $('#notes-hint').textContent = (rows.length
+      ? `${rows.length} note${rows.length === 1 ? '' : 's'} · ${p.reviewed} of ${p.total} photographed cues reviewed · saved in this browser until exported`
+      : 'Mark cues in Review with A, X or Q, or press N to write a note. U jumps to the next cue still to review.')
+      + (unverified ? ` · Unverified identity: ${unverified} legacy note(s). Confirm their origin.` : '');
+    if (S.noteSaveFailed) $('#notes-hint').textContent = 'Not saved in this browser. Export your notes now to keep them.';
+    $('#notes-hint').classList.toggle('bad-text', Boolean(S.noteSaveFailed));
+    $('#notes-body').innerHTML = rows.map(f => {
+      const n = S.notes[f.id];
+      return `<tr><td><span class="status-cell">${statusIcon(n)}${esc(FRC.notes.STATUSES[n.status] || 'Note')}</span></td><td><b>${esc(f.cue)}</b></td><td>${clock(f.t)}</td><td>${f.occurrence} of ${f.total}</td><td>${esc(n.slot || 'Whole cue')}</td><td class="note-cell">${esc(n.text || '')}</td><td><button type="button" class="btn" data-open="${f.id}">Open</button></td></tr>`;
+    }).join('') || '<tr class="empty"><td colspan="7">No notes yet.</td></tr>';
+  }
+  function download(name, body, type) {
+    const url = URL.createObjectURL(new Blob([body], { type }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: name });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  async function exportNotes(kind) {
+    if (!S.session) return;
+    if (!Object.keys(S.notes).length) return toast('There are no notes to export yet.', true);
+    const stamp = new Date().toISOString().slice(0, 10);
+    const base = `review-notes-${S.session.title.replace(/[^\w.-]+/g, '-')}-${stamp}`;
+    if (kind === 'csv') download(base + '.csv', FRC.notes.toCSV(S.notes, S.session, clock), 'text/csv');
+    if (kind === 'mdfile') download(base + '.md', FRC.notes.toMarkdown(S.notes, S.session, clock, S.reviewer), 'text/markdown');
+    if (kind === 'json') download(base + '.json', JSON.stringify({ format: 'frc-review-records/1', session: S.session.key, title: S.session.title, records: FRC.notes.toReviewRecords(S.notes, S.session, S.reviewer) }, null, 2), 'application/json');
+    if (kind === 'md') {
+      const md = FRC.notes.toMarkdown(S.notes, S.session, clock, S.reviewer);
+      try { await navigator.clipboard.writeText(md); toast('Notes copied for the meeting.'); } catch { download(base + '.md', md, 'text/markdown'); toast('Clipboard unavailable; saved a Markdown file instead.'); }
+      return;
+    }
+    toast('Notes exported.');
+  }
+  function importNotes(data, label) {
+    const incoming = FRC.notes.fromReviewRecords(data, S.session);
+    let added = 0;
+    for (const [id, note] of Object.entries(incoming.notes)) {
+      if (!byId(id)) continue;
+      const prior = S.notes[id];
+      if (!prior || String(prior.updatedAt) < String(note.updatedAt)) { S.notes[id] = note; added++; }
+    }
+    saveNotes();
+    renderList();
+    renderContext();
+    renderNotes();
+    drawStrip();
+    const result = `Imported ${added} note${added === 1 ? '' : 's'}.`;
+    if (incoming.warnings.length) importWarning(`${label}: ${result} ${incoming.warnings.join(' ')}`);
+    else toast(result);
+  }
+  async function printPacket() {
+    if (!S.session) return;
+    const scope = $('#print-scope').value;
+    const items = scope === 'noted' ? firings().filter(f => S.notes[f.id]) : scope === 'filtered' ? visible() : firings().filter(f => f.saved);
+    if (!items.length) return toast('Nothing to print for that choice.', true);
+    const root = $('#print-root');
+    root.innerHTML = `<h1>Review packet: ${esc(S.session.title)}</h1><p class="p-meta">${items.length} cue(s) · ${esc($('#print-scope').selectedOptions[0].textContent)}${S.reviewer ? ' · reviewer ' + esc(S.reviewer) : ''} · printed ${esc(new Date().toLocaleString())} · times ${esc(zone(S.session.firstT))}</p>`
+      + items.map(f => {
+        const n = S.notes[f.id];
+        const photos = f.slots.length
+          ? `<div class="p-photos" style="--n:${f.slots.length}">${f.slots.map(s => s.status === 'saved'
+            ? `<figure><img data-path="${esc(s.path)}" alt="${esc(s.label)}"><figcaption>${captionHTML(s)}</figcaption></figure>`
+            : `<div class="p-missing">${esc(s.label)}: ${esc(s.reason)}</div>`).join('')}</div>`
+          : `<p>${f.photoStatus === 'predates' ? 'Before photo capture began.' : 'No photos.'}</p>`;
+        return `<article class="p-item"><h2>Cue ${esc(f.cue)} · ${esc(f.commandName)} · ${clock(f.t)}${f.total > 1 ? ` · firing ${f.occurrence} of ${f.total}` : ''}${f.scene ? ' · ' + esc(f.scene) : ''}</h2>${photos}`
+          + (n ? `<p class="p-note"><span class="p-status">${esc(FRC.notes.STATUSES[n.status] || 'Note')}</span>${n.text ? ': ' + esc(n.text) : ''}</p>` : '') + '</article>';
+      }).join('');
+    toast('Preparing photos for printing…', false, true);
+    await Promise.all($$('img[data-path]', root).map(async img => { try { img.src = await imageURL(img.dataset.path); await img.decode(); } catch { /* print without it */ } }));
+    $('#toast').classList.remove('show');
+    window.print();
+  }
+
+  /* ---------- session tab ---------- */
+  function renderSession() {
+    const s = S.session;
+    if (!s) { $('#session-body').innerHTML = '<div class="card"><h3>No session open</h3><p class="muted">Open an archive to see its details.</p></div>'; return; }
+    const st = s.stats;
+    const start = s.capture.start;
+    const end = s.capture.complete;
+    const unlinked = s.observations.filter(o => !o.linked);
+    const cmds = Object.entries(st.commands).map(([k, v]) => `${v} ${k}`).join(', ');
+    const p = FRC.notes.progress(firings(), S.notes);
+    $('#session-body').innerHTML = [
+      `<div class="card"><h3>Source</h3><dl class="facts"><dt>File</dt><dd>${esc(s.sourceName)}</dd><dt>Layout</dt><dd>${s.layout === 'archive' ? 'Session archive' : 'Session folder'}</dd>`
+        + `${S.source && S.source.size ? `<dt>Size</dt><dd>${(S.source.size / 1048576).toFixed(1)} MB</dd>` : ''}<dt>Images</dt><dd>${st.images}</dd>`
+        + `<dt>SHA-256</dt><dd>${S.sha ? `<code style="word-break:break-all">${S.sha}</code>` : (S.source && S.source.buffer ? '<button type="button" class="btn" data-action="sha">Compute</button>' : 'Not available for folders')}</dd>`
+        + `<dt>Viewer</dt><dd>${VERSION} · built ${esc(BUILT)}</dd></dl><p class="callout">Read only. Nothing in the source is changed by this viewer.</p></div>`,
+      `<div class="card"><h3>Run</h3><dl class="facts"><dt>Date</dt><dd>${s.firstT ? dateFmt.format(new Date(s.firstT * 1000)) : '—'}</dd>`
+        + `<dt>Capture</dt><dd>${start ? clock(start.unixSeconds) : '—'} to ${end ? clock(end.unixSeconds) + (end.interrupted ? ' (stopped before its scheduled end)' : ' (completed normally)') : 'no completion record'}</dd>`
+        + `<dt>Cues</dt><dd>${s.firstT ? hm(s.firstT) : '—'} to ${s.lastT ? hm(s.lastT) : '—'} · run ${runTime(s.lastT)}</dd>`
+        + `<dt>Parts</dt><dd>${s.sections.length}${s.sections.some(x => x.isBreak) ? ` · breaks: ${s.sections.filter(x => x.isBreak).map(x => mins(x.gapBefore)).join(', ')}` : ''}</dd>`
+        + `<dt>Firings</dt><dd>${st.firings} (${esc(cmds)})</dd><dt>Distinct GO</dt><dd>${st.distinct} · ${st.repeats} repeats</dd></dl></div>`,
+      `<div class="card"><h3>Photos</h3><dl class="facts"><dt>Style</dt><dd>${[st.beforeAfter ? st.beforeAfter + ' Before/After' : '', st.fourPhoto ? st.fourPhoto + ' Trigger/+1/+2/+3' : ''].filter(Boolean).join(', ') || 'None'}</dd>`
+        + `<dt>Began</dt><dd>${s.photoStart ? clock(s.photoStart) : '—'}</dd><dt>Cues with photos</dt><dd>${st.withPhotos} (${st.complete} complete)</dd><dt>Before capture</dt><dd>${st.predates} cues</dd>`
+        + `<dt>Saved</dt><dd>${st.savedSlots}</dd><dt>Missing</dt><dd>${st.missingSlots}</dd><dt>Timing warnings</dt><dd>${st.warnedSlots}</dd>`
+        + (s.clock ? `<dt>Clock offset</dt><dd>${s.clock.offset != null ? s.clock.offset.toFixed(3) + ' s' : '—'}${s.clock.uncertainty != null ? ' ± ' + s.clock.uncertainty.toFixed(3) + ' s' : ''}</dd>` : '') + '</dl></div>',
+      `<div class="card"><h3>Review</h3><dl class="facts"><dt>Reviewed</dt><dd>${p.reviewed} of ${p.total} photographed cues</dd><dt>Notes</dt><dd>${Object.keys(S.notes).length}</dd><dt>Reviewer</dt><dd>${esc(S.reviewer || '—')}</dd></dl><p class="callout">Notes live in this browser for this session until exported from Notes.</p></div>`,
+      `<div class="card"><h3>Observations</h3><dl class="facts"><dt>Imported</dt><dd>${s.observations.length}</dd><dt>Linked to cues</dt><dd>${s.observations.length - unlinked.length}</dd>`
+        + (s.reviewMeta ? `<dt>Post-run review</dt><dd>${s.reviewMeta.groups} groups covering ${s.reviewMeta.covered} of ${st.firings} firings (${s.reviewMeta.unassigned} not assigned)</dd>` : '')
+        + (s.observationMeta && s.observations.some(o => o.kind !== 'review') ? `<dt>Through</dt><dd>${s.observationMeta.through ? clock(Date.parse(s.observationMeta.through) / 1000) : '—'}</dd><dt>Reported changes</dt><dd>at least ${esc(s.observationMeta.visualChanges ?? '—')}</dd>` : '') + '</dl>'
+        + (s.observations[0] && s.observations[0].origin ? `<p class="callout">${esc(s.observations[0].origin)}</p>` : '')
+        + (unlinked.length ? `<details class="raw"><summary>${unlinked.length} without a cue number</summary>${unlinked.map(o => `<div class="obs"><p>${esc(o.text)}</p><p class="src">${o.t ? clock(o.t) : ''}</p></div>`).join('')}</details>` : '') + '</div>',
+      `<div class="card"><h3>Reference</h3>${s.reference ? `<dl class="facts"><dt>Snapshot</dt><dd>${s.reference.fetchedAt ? dateFmt.format(new Date(s.reference.fetchedAt)) + ', ' + hm(Date.parse(s.reference.fetchedAt) / 1000) : 'Undated'}</dd><dt>Cue records</dt><dd>${s.reference.cueCount}</dd><dt>Scene looks</dt><dd>${s.reference.sceneCount}</dd><dt>Cues matched</dt><dd>${firings().filter(f => f.reference).length} of ${st.firings}</dd></dl><p class="callout">Expected looks are as of the snapshot date. Drop a newer snapshot to refresh.</p>` : '<p class="muted">No snapshot loaded. Drop the Notion cue snapshot (.json) to add expected looks and scene names.</p>'}</div>`,
+      `<div class="card"><h3>Warnings</h3>${s.warnings.length ? `<ul>${s.warnings.map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : '<p class="muted">None while reading this source.</p>'}</div>`,
+      '<div class="card"><h3>Reading the evidence</h3><ul><li>A received GO shows the cue reached the Studio observer.</li><li>Photos show the capture camera\'s view of the stage, including lighting and scenery.</li><li>The intended look needs the cue sheet or show file.</li><li>Projector response needs separate evidence.</li></ul></div>',
+    ].join('');
+  }
+
+  /* ---------- render entry ---------- */
+  function renderAll() {
+    const has = Boolean(S.session);
+    $('#welcome').hidden = has;
+    $('#run').hidden = !has;
+    $('#session-title').textContent = has ? `${S.session.title} · ${S.session.firstT ? dateFmt.format(new Date(S.session.firstT * 1000)) : ''} · ${S.session.stats.firings} cues · ${zone(S.session.firstT)}` : 'No session open';
+    $('#session-title').title = $('#session-title').textContent;
+    updateCounts();
+    renderSession();
+    if (!has) return;
+    renderList();
+    renderStage();
+    renderContext();
+    requestAnimationFrame(drawStrip);
+    if (!$('#sheet').hidden) renderSheet();
+    if (!$('#notes').hidden) renderNotes();
+  }
+
+  /* ---------- sources ---------- */
+  function zipSource(name, buffer) {
+    const zip = FRC.zip.open(buffer);
+    return { name, size: buffer.byteLength, buffer, names: zip.names, read: zip.read, async url(path) { return URL.createObjectURL(new Blob([await zip.read(path)], { type: 'image/jpeg' })); } };
+  }
+  async function folderSource(cfg) {
+    const names = await (await fetch('source/index.json', { cache: 'no-store' })).json();
+    const fileURL = path => 'source/files/' + path.split('/').map(encodeURIComponent).join('/');
+    return {
+      name: cfg.name || 'Session folder', size: 0, buffer: null, names,
+      async read(path) { const res = await fetch(fileURL(path), { cache: 'no-store' }); if (!res.ok) throw new Error('Could not read ' + path); return new Uint8Array(await res.arrayBuffer()); },
+      async url(path) { return fileURL(path); },
+    };
+  }
+  let openGeneration = 0;
+  async function openSource(source, contextWarnings = [], isCurrent = () => true) {
+    const generation = ++openGeneration;
+    toast(`Opening ${source.name}…`, false, true);
+    try {
+      const loaded = await FRC.model.loadSession(source);
+      if (generation !== openGeneration || !isCurrent()) return false;
+      loaded.warnings.push(...contextWarnings);
+      if (source.published) {
+        if (loaded.identity.canonicalId !== source.published.sessionId || loaded.key !== source.published.storageKey) throw new Error('Published capture identity or storage key mismatch');
+        try { FRC.hosted.attach(loaded, source.published); }
+        catch (err) { loaded.warnings.push('Published context: ' + err.message + '. Capture and photos remain available.'); }
+      }
+      if (S.pendingReference) { FRC.model.attachReference(loaded, S.pendingReference); S.pendingReference = null; }
+      revokeAll();
+      Object.assign(S, { source, session: loaded, sha: null, pin: null, showEarly: false, originalPhotos: false, act: '', song: '', query: '', publishedId: source.published?.sessionId || null });
+      $('#search').value = '';
+      $('#sheet-search').value = '';
+      S.noteSaveFailed = false;
+      refreshContextFilters();
+      S.notes = loadNotes();
+      const remembered = tabStore.get('frc-selected:' + loaded.key);
+      S.selected = (remembered && byId(remembered) && remembered) || (loaded.firings.find(f => f.saved) || loaded.firings[0] || {}).id || null;
+      const f = current();
+      S.slot = f ? defaultSlot(f) : 0;
+      renderAll();
+      toast(`Opened ${loaded.title}: ${loaded.stats.firings} cues, ${loaded.stats.withPhotos} with photos.${loaded.warnings.length ? ' Check Session warnings: ' + loaded.warnings.join(' ') : ''}`, loaded.warnings.length > 0, loaded.warnings.length > 0);
+      announce(`Opened ${loaded.title}`);
+      return true;
+    } catch (err) { if (generation === openGeneration && isCurrent()) toast(err && err.message ? err.message : 'Could not open this source.', true, true); return false; }
+  }
+  function applyReference(data, label) {
+    FRC.model.validateReference(data);
+    if (S.session) { FRC.model.attachReference(S.session, data); renderAll(); toast(`Reference loaded: ${S.session.reference.cueCount} cue records.`); }
+    else { S.pendingReference = data; toast(`Reference ${label} is ready. Now open the session archive.`); }
+  }
+  async function handleFiles(fileList) {
+    const files = Array.from(fileList || []);
+    const zips = files.filter(f => /\.zip$/i.test(f.name));
+    const jsons = files.filter(f => /\.json$/i.test(f.name));
+    if (!zips.length && !jsons.length) return toast('Choose a session archive (.zip) or a cue snapshot (.json).', true);
+    if (zips[0]) { try { await openSource(zipSource(zips[0].name, await zips[0].arrayBuffer())); } catch (err) { toast(err.message, true); } }
+    for (const file of jsons) {
+      try {
+        const data = JSON.parse(await file.text());
+        if (data && Object.hasOwn(data, 'cues')) applyReference(data, file.name);
+        else if (S.session) importNotes(data, file.name);
+        else toast('Open a session before importing notes.', true);
+      } catch (err) { importWarning(`${file.name}: ${err.message} Check this file and retry; existing notes and capture were retained.`); }
+    }
+  }
+  async function fetchWithProgress(url, label, hint) {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Could not load ${label} (HTTP ${res.status}).`);
+    if (!res.body || !res.body.getReader) return res.arrayBuffer();
+    const total = Number(res.headers.get('Content-Length')) || 0;
+    const reader = res.body.getReader();
+    const chunks = [];
+    let got = 0;
+    let last = Date.now();
+    const mb = n => (n / 1048576).toFixed(1);
+    const timer = setInterval(() => {
+      if (Date.now() - last > 6000) toast(hint || `Still waiting for ${label}. If it is stored in iCloud Drive it may still be downloading.`, false, true);
+      else toast(`Loading ${label}: ${mb(got)}${total ? ' of ' + mb(total) : ''} MB`, false, true);
+    }, 400);
+    try {
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        got += value.byteLength;
+        last = Date.now();
+      }
+    } finally { clearInterval(timer); }
+    const out = new Uint8Array(got);
+    let offset = 0;
+    for (const c of chunks) { out.set(c, offset); offset += c.byteLength; }
+    return out.buffer;
+  }
+  async function autoOpen() {
+    if (!/^https?:$/.test(location.protocol)) return;
+    try {
+      const catalogResponse = await fetch('catalog.json', { cache: 'no-store' });
+      if (catalogResponse.status !== 404) {
+        if (!catalogResponse.ok) throw new Error('catalog.json: HTTP ' + catalogResponse.status);
+        S.catalog = FRC.hosted.catalog(await catalogResponse.json(), location.href);
+        document.body.classList.add('hosted');
+        $('#session-picker-label').hidden = false;
+        $('#session-picker').innerHTML = S.catalog.sessions.map(s => `<option value="${esc(s.id)}">${esc(s.title)}</option>`).join('');
+        const params = new URLSearchParams(location.search);
+        const requestedSession = params.get('session');
+        if (requestedSession && !S.catalog.sessions.some(session => session.id === requestedSession)) {
+          if (await openPublished(S.catalog.defaultSession)) toast('That session is unavailable. Showing the default capture.', true, true);
+        } else {
+          await openPublished(requestedSession || S.catalog.defaultSession, params.get('event'), new URLSearchParams(location.hash.slice(1)).get('cue'));
+        }
+        return;
+      }
+      const res = await fetch('source/config.json', { cache: 'no-store' });
+      if (res.status === 404) return; // Optional when using a static server.
+      if (!res.ok) throw new Error(`source/config.json: HTTP ${res.status}. Check the local server configuration.`);
+      const cfg = await res.json();
+      const warnings = [];
+      if (cfg.reference) {
+        try {
+          const ref = await fetch('source/reference.json', { cache: 'no-store' });
+          if (!ref.ok) throw new Error(`HTTP ${ref.status}`);
+          const data = await ref.json();
+          FRC.model.validateReference(data);
+          S.pendingReference = data;
+        } catch (err) { warnings.push(`source/reference.json: ${err.message}. Reference was not loaded. Check the configured file and retry.`); }
+      }
+      if (cfg.mode === 'zip') {
+        const hint = cfg.dataless ? `${cfg.name} is stored in iCloud Drive and is downloading to this Mac first. It opens as soon as it arrives.` : null;
+        toast(hint || `Loading ${cfg.name}…`, false, true);
+        await openSource(zipSource(cfg.name, await fetchWithProgress('source/archive.zip', cfg.name, hint)), warnings);
+      }
+      else if (cfg.mode === 'folder') await openSource(await folderSource(cfg), warnings);
+      else if (warnings.length) importWarning(warnings.join(' '));
+    } catch (err) { importWarning(`source/config.json or its configured source: ${err.message} Check the local server, or open an archive manually.`); }
+  }
+
+
+  function updateShareURL() {
+    if (!S.publishedId) return;
+    const url = new URL(location.href);
+    url.searchParams.set('session', S.publishedId);
+    if (S.selected) url.searchParams.set('event', S.selected);
+    else url.searchParams.delete('event');
+    if (current() && (!url.hash || url.hash === '#review' || url.hash.startsWith('#cue='))) url.hash = 'cue=' + encodeURIComponent(current().cue);
+    history.replaceState(null, '', url);
+  }
+  let publishedGeneration = 0;
+  async function openPublished(id, eventId, legacyCue) {
+    const entry = S.catalog.sessions.find(s => s.id === id);
+    if (!entry) { toast('Unknown session in this link. Choose a capture session.', true, true); return; }
+    const generation = ++publishedGeneration;
+    toast('Opening ' + entry.title + '…', false, true);
+    try {
+      const response = await fetch(FRC.hosted.assetURL(entry.manifest, location.href), { cache: 'no-store' });
+      if (!response.ok) throw new Error('Session manifest: HTTP ' + response.status);
+      const source = FRC.hosted.source(await response.json(), entry, S.catalog.release, location.href);
+      if (generation !== publishedGeneration) return;
+      const opened = await openSource(source, [], () => generation === publishedGeneration);
+      if (generation !== publishedGeneration) return false;
+      if (!opened) {
+        $('#session-picker').value = S.publishedId || id;
+        return false;
+      }
+      $('#session-picker').value = id;
+      const requested = eventId ? byId(eventId) : legacyCue ? firings().find(f => f.cue === legacyCue) : null;
+      if (requested) select(requested.id);
+      else { updateShareURL(); if (eventId || legacyCue) toast('The requested firing is not in this session. The capture is still available.', true, true); }
+      return true;
+    } catch (err) {
+      if (generation !== publishedGeneration) return false;
+      $('#session-picker').value = S.publishedId || id;
+      toast(err.message + ' Retry with the session selector.', true, true);
+      return false;
+    }
+  }
+  function refreshContextFilters() {
+    const opts = (values, label) => '<option value="">' + label + '</option>' + [...new Set(values.filter(Boolean))].map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+    $('#act-filter').innerHTML = opts(firings().map(f => f.context?.act), 'All acts');
+    $('#song-filter').innerHTML = opts(firings().flatMap(f => f.context?.songs || []), 'All songs');
+  }
+  let previewSlot = 0;
+  let previewGeneration = 0;
+  async function openPreview(index, retry = false) {
+    const f = current(), source = S.source;
+    const slot = index === -1 ? f?.reviewPhoto : f?.slots[index];
+    if (!slot || slot.status !== 'saved') return;
+    const generation = ++previewGeneration;
+    previewSlot = index;
+    const img = $('#photo-preview');
+    img.removeAttribute('src');
+    img.dataset.path = slot.path;
+    img.alt = `${S.session.title}, ${f.cue}, ${slot.label}`;
+    $('#photo-dialog .retry-photos').hidden = true;
+    $('#photo-original').removeAttribute('href');
+    const dimensions = source.published?.images[slot.path];
+    const saved = f.slots.filter(s => s.status === 'saved');
+    const position = index === -1 ? 'Review image' : `Photo ${saved.indexOf(slot) + 1} of ${saved.length}`;
+    $('#photo-caption').textContent = `${f.cue} · ${position} · ${slot.label} · ${clock(slot.capturedAt)} · ${signed(slot.offset)}${slot.rescued ? ` · Rescued photo${slot.secondsAfterTarget == null ? '' : ` · ${slot.secondsAfterTarget.toFixed(2)} s after target`}` : ''}${slot.provenance ? ` · ${slot.provenance}` : ''}${dimensions ? ` · ${dimensions.width} × ${dimensions.height}` : ''}`;
+    $('#photo-previous').disabled = index === -1 || !f.slots.slice(0, index).some(s => s.status === 'saved');
+    $('#photo-next').disabled = index === -1 || !f.slots.slice(index + 1).some(s => s.status === 'saved');
+    if (!$('#photo-dialog').open) $('#photo-dialog').showModal();
+    const url = await loadImage(img, retry);
+    if (url && generation === previewGeneration && source === S.source && f === current()) $('#photo-original').href = url;
+  }
+  function stepPreview(step) {
+    if (previewSlot === -1) return;
+    const f = current(); if (!f) return;
+    for (let i = previewSlot + step; i >= 0 && i < f.slots.length; i += step) if (f.slots[i].status === 'saved') return openPreview(i);
+  }
+  function setDetails(open) {
+    $('#review-grid').classList.toggle('show-details', open);
+    $('#context-toggle').setAttribute('aria-pressed', String(open));
+    if (mobile.matches) setPane(open ? 'details' : 'photos');
+  }
+  function wireReviewControls() {
+    $('#session-picker').onchange = e => { $('#photo-dialog').close(); openPublished(e.target.value); };
+    $('#previous-cue').onclick = () => move(-1);
+    $('#next-cue').onclick = () => move(1);
+    $('#jump-form').onsubmit = e => {
+      e.preventDefault();
+      const matches = firings().filter(f => f.cue === $('#jump-cue').value.trim());
+      if (!matches.length) return toast('Number not found in this session.', true);
+      const next = matches.find(f => f.index > (current()?.index ?? -1)) || matches[0];
+      clearFilters();
+      renderList(); select(next.id); showTab('review');
+      if (matches.length > 1) toast(`Firing ${next.occurrence} of ${next.total}. Jump again for the next repeat.`);
+    };
+    for (const kind of ['act', 'song']) $('#' + kind + '-filter').onchange = e => { S[kind] = e.target.value; renderList(); drawStrip(); const first = visible()[0]; if (first && (!current() || !matches(current()))) select(first.id); };
+    $('#photo-layout').value = store.get('frozen-review-layout') === 'across' ? 'across' : 'grid';
+    $('#photo-layout').onchange = e => { store.set('frozen-review-layout', e.target.value); S.mode = 'all'; renderStage(); };
+    $('#context-toggle').onclick = () => setDetails(!$('#review-grid').classList.contains('show-details'));
+    $('#share-firing').onclick = async () => { updateShareURL(); try { await navigator.clipboard.writeText(location.href); toast('Link copied to this firing.'); } catch { toast('Copy the current address to share this firing.', true); } };
+    $('#photo-close').onclick = () => $('#photo-dialog').close();
+    $('#photo-previous').onclick = () => stepPreview(-1);
+    $('#photo-next').onclick = () => stepPreview(1);
+    $('#photo-dialog').onclick = e => { if (e.target === $('#photo-dialog')) $('#photo-dialog').close(); };
+  }
+
+  /* ---------- tabs ---------- */
+  const tabs = $$('[role="tab"]');
+  function showTab(id, { push = true } = {}) {
+    const tab = tabs.find(t => t.getAttribute('aria-controls') === id) || tabs[0];
+    for (const t of tabs) {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    }
+    const target = tab.getAttribute('aria-controls');
+    if (push && location.hash !== '#' + target) history.pushState(null, '', '#' + target);
+    if (target === 'review') requestAnimationFrame(drawStrip);
+    if (target === 'sheet') {
+      renderSheet();
+      requestAnimationFrame(() => $('#sheet-grid .selected')?.scrollIntoView({ block: 'nearest', inline: 'nearest' }));
+    }
+    if (target === 'notes') renderNotes();
+    if (target === 'session') renderSession();
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => showTab(t.getAttribute('aria-controls')));
+    t.addEventListener('keydown', e => {
+      if (e.isComposing || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      if (!step) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const next = tabs[(i + step + tabs.length) % tabs.length];
+      next.focus();
+      showTab(next.getAttribute('aria-controls'));
+    });
+  });
+  addEventListener('popstate', () => showTab(location.hash.slice(1), { push: false }));
+
+  function paintTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    const btn = $('#theme-btn');
+    const dark = theme === 'dark';
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.setAttribute('aria-label', dark ? 'Light mode' : 'Dark mode');
+    btn.title = dark ? 'Light mode' : 'Dark mode';
+    btn.innerHTML = icon(dark ? 'sun' : 'moon');
+    drawStrip();
+  }
+
+  function setTheme(theme) {
+    window.FrozenTheme.set(theme);
+    store.set('frc-theme', theme);
+  }
+
+  /* ---------- events ---------- */
+  function wire() {
+    for (const el of $$('[data-icon]')) el.insertAdjacentHTML('afterbegin', icon(el.dataset.icon));
+    const sharedTheme = store.get('av-theme-mode.v1');
+    const legacyTheme = store.get('frc-theme') || store.get('frozen-review-theme');
+    if (!['light', 'dark', 'system', 'white', 'black'].includes(sharedTheme) && ['light', 'dark'].includes(legacyTheme)) window.FrozenTheme.set(legacyTheme);
+    paintTheme(window.FrozenTheme.theme);
+    addEventListener('frozen:themechange', event => paintTheme(event.detail.theme));
+    wireReviewControls();
+    $('#theme-btn').addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+    $('#help-btn').addEventListener('click', () => $('#help-dialog').showModal());
+    const pick = () => $('#file-input').click();
+    $('#open-btn').addEventListener('click', pick);
+    $('#welcome-open').addEventListener('click', pick);
+    $('#file-input').addEventListener('change', e => { handleFiles(e.target.files); e.target.value = ''; });
+    $('#import-btn').addEventListener('click', () => $('#import-input').click());
+    $('#import-input').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file || !S.session) return;
+      try { importNotes(JSON.parse(await file.text()), file.name); }
+      catch (err) { importWarning(`${file.name}: ${err.message} Check this file and retry; existing notes were retained.`); }
+    });
+
+    let depth = 0;
+    const hasFiles = e => Array.from((e.dataTransfer && e.dataTransfer.types) || []).includes('Files');
+    addEventListener('dragenter', e => { if (hasFiles(e)) { depth++; $('#drop-overlay').hidden = false; } });
+    addEventListener('dragleave', e => { if (hasFiles(e) && --depth <= 0) { depth = 0; $('#drop-overlay').hidden = true; } });
+    addEventListener('dragover', e => { if (hasFiles(e)) e.preventDefault(); });
+    addEventListener('drop', e => { if (!hasFiles(e)) return; e.preventDefault(); depth = 0; $('#drop-overlay').hidden = true; handleFiles(e.dataTransfer.files); });
+
+    for (const input of [$('#search'), $('#sheet-search')]) {
+      input.addEventListener('input', e => setSearch(e.target.value));
+      input.addEventListener('keydown', e => { if (e.key === 'Escape' && input.value) { e.preventDefault(); e.stopPropagation(); setSearch(''); } });
+    }
+    for (const b of $$('.clear-filters')) b.addEventListener('click', clearFilters);
+    $('#toast-dismiss').addEventListener('click', () => $('#toast').classList.remove('show'));
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.retry-photos')) return;
+      if (e.target.closest('#photo-dialog')) openPreview(previewSlot, true);
+      else retryPhotos(e.target.closest('#sheet') || $('#stage-pane'));
+    });
+    addEventListener('beforeunload', e => { if (unsavedNotes.size) { e.preventDefault(); e.returnValue = ''; } });
+    $('#filter-chips').addEventListener('click', e => {
+      const b = e.target.closest('button[data-filter]');
+      if (!b) return;
+      S.filter = b.dataset.filter;
+      $$('#filter-chips button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      renderList();
+      drawStrip();
+    });
+    $('#next-unreviewed').addEventListener('click', () => nextToReview(1));
+    $('#firing-list').addEventListener('click', e => {
+      if (e.target.closest('[data-action="show-early"]')) { S.showEarly = true; renderList(); return; }
+      const row = e.target.closest('.row');
+      if (row) select(row.dataset.id, { scroll: false, showPhotos: true });
+    });
+    $('.pane-switch').addEventListener('click', e => { const b = e.target.closest('button[data-pane]'); if (b) setPane(b.dataset.pane); });
+
+    const strip = $('#run-strip');
+    let scrubbing = false;
+    const scrub = e => {
+      const f = nearestAt(e.clientX); if (!f) return;
+      if (f.id !== S.selected) select(f.id);
+      const url = new URL(location.href);
+      if (!S.publishedId) { url.searchParams.delete('session'); url.searchParams.delete('event'); }
+      url.hash = 'cue=' + encodeURIComponent(f.cue);
+      history.replaceState(null, '', url);
+    };
+    strip.addEventListener('pointerdown', e => { scrubbing = true; strip.setPointerCapture(e.pointerId); scrub(e); });
+    strip.addEventListener('pointermove', e => {
+      const f = nearestAt(e.clientX);
+      const tip = $('#strip-tooltip');
+      hoverId = f?.id; tip.hidden = !f;
+      if (f) {
+        const status = {ok:'Looks right',fix:'Needs work',question:'Question'}[S.notes[f.id]?.status] || 'Unmarked';
+        tip.textContent = ['Cue ' + f.cue, f.context?.scene || f.scene, status].filter(Boolean).join(' · ');
+        tip.style.left = Math.max(0,Math.min(innerWidth-tip.offsetWidth,e.clientX+8)) + 'px';
+        tip.style.top = Math.max(0,e.clientY-tip.offsetHeight-8) + 'px';
+      }
+      drawStrip();
+      if (scrubbing) scrub(e);
+    });
+    strip.addEventListener('pointerleave', () => { hoverId = null; $('#strip-tooltip').hidden = true; drawStrip(); });
+    strip.addEventListener('pointerup', () => { scrubbing = false; });
+    strip.addEventListener('pointercancel', () => { scrubbing = false; });
+    if ('ResizeObserver' in window) new ResizeObserver(() => drawStrip()).observe(strip);
+
+    $('#stage-pane').addEventListener('click', e => {
+      const preview = e.target.closest('button[data-preview]');
+      if (preview) return openPreview(Number(preview.dataset.preview));
+      const mode = e.target.closest('button[data-mode]');
+      if (mode) return setMode(mode.dataset.mode);
+      const slot = e.target.closest('button[data-slot]');
+      if (slot) return chooseSlot(Number(slot.dataset.slot));
+      const open = e.target.closest('[data-open]');
+      if (open) return select(open.dataset.open);
+      const action = e.target.closest('button[data-action]');
+      if (!action) return;
+      const a = action.dataset.action;
+      if (a === 'review-photo') { S.originalPhotos = false; S.mode = 'all'; renderStage(); }
+      if (a === 'full') toggleFull();
+      if (a === 'details') setDetails(!$('#review-grid').classList.contains('show-details'));
+      if (a === 'wipe') { S.wipe = !S.wipe; renderStage(); }
+      if (a === 'pin') togglePin(false);
+      if (a === 'unpin') togglePin(true);
+    });
+    const main = $('#stage-main');
+    main.addEventListener('input', e => {
+      if (e.target.id !== 'wipe-range') return;
+      S.wipePos = Number(e.target.value);
+      const frame = $('.wipe-frame');
+      if (frame) frame.style.setProperty('--wipe', S.wipePos + '%');
+    });
+    main.addEventListener('wheel', e => {
+      const box = e.target.closest('.photo.zoomable');
+      if (!box) return;
+      e.preventDefault();
+      const r = box.getBoundingClientRect();
+      zoomAt(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX - r.left, e.clientY - r.top);
+    }, { passive: false });
+    main.addEventListener('dblclick', e => {
+      const box = e.target.closest('.photo.zoomable');
+      if (!box) return;
+      const r = box.getBoundingClientRect();
+      toggleZoom(e.clientX - r.left, e.clientY - r.top);
+    });
+    main.addEventListener('pointerdown', e => {
+      const box = e.target.closest('.photo.zoomed');
+      if (!box) return;
+      Z.drag = { x: e.clientX, y: e.clientY, ox: Z.x, oy: Z.y };
+      box.classList.add('panning');
+      box.setPointerCapture(e.pointerId);
+    });
+    main.addEventListener('pointermove', e => {
+      if (!Z.drag) return;
+      Z.x = Z.drag.ox + (e.clientX - Z.drag.x);
+      Z.y = Z.drag.oy + (e.clientY - Z.drag.y);
+      clampZoom();
+      applyZoom();
+    });
+    const endDrag = () => { Z.drag = null; const box = zoomBox(); if (box) box.classList.remove('panning'); };
+    main.addEventListener('pointerup', endDrag);
+    main.addEventListener('pointercancel', endDrag);
+
+    const ctx = $('#context-pane');
+    ctx.addEventListener('click', e => {
+      if (e.target.closest('[data-close-details]')) { setDetails(false); $('#context-toggle').focus(); return; }
+      const st = e.target.closest('button[data-status]');
+      if (st) return setStatus(st.dataset.status);
+      const open = e.target.closest('[data-open]');
+      if (open) select(open.dataset.open);
+    });
+    ctx.addEventListener('input', e => {
+      const f = current();
+      if (!f) return;
+      if (e.target.id === 'note-text') updateNote(f, { text: e.target.value });
+      if (e.target.id === 'note-slot') updateNote(f, { slot: e.target.value || null });
+    });
+    ctx.addEventListener('toggle', e => {
+      const d = e.target;
+      if (!d.matches || !d.matches('details.ctx')) return;
+      S.open[d.dataset.key] = d.open;
+      store.set('frc-open', JSON.stringify(S.open));
+    }, true);
+
+    $('#sheet-grid').addEventListener('click', e => { const card = e.target.closest('.sheet-card'); if (!card) return; select(card.dataset.id); showTab('review'); });
+    $('#sheet-photos-only').addEventListener('change', renderSheet);
+    $('#density').addEventListener('click', e => { const b = e.target.closest('button[data-density]'); if (!b) return; S.density = b.dataset.density; store.set('frc-density', S.density); renderSheet(); });
+    $('#notes').addEventListener('click', e => {
+      const ex = e.target.closest('button[data-export]');
+      if (ex) return exportNotes(ex.dataset.export);
+      const open = e.target.closest('button[data-open]');
+      if (open) { select(open.dataset.open); showTab('review'); }
+    });
+    $('#print-btn').addEventListener('click', printPacket);
+    $('#notes-go').addEventListener('click', () => {
+      const action = $('#notes-action').value;
+      if (action === 'import') return $('#import-input').click();
+      if (action === 'print') return printPacket();
+      exportNotes(action);
+    });
+    $('#reviewer').value = S.reviewer;
+    $('#reviewer').addEventListener('input', e => { S.reviewer = e.target.value.trim(); store.set('frc-reviewer', S.reviewer); });
+    $('#session-body').addEventListener('click', async e => {
+      if (!e.target.closest('button[data-action="sha"]') || !S.source || !S.source.buffer) return;
+      const digest = await crypto.subtle.digest('SHA-256', S.source.buffer);
+      S.sha = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
+      renderSession();
+    });
+
+    document.addEventListener('keydown', onKey);
+    mobile.addEventListener('change', () => setPane('photos'));
+  }
+  function toggleFull(force) {
+    const pane = $('#stage-pane');
+    pane.classList.toggle('is-full', force ?? !pane.classList.contains('is-full'));
+    renderStage();
+  }
+  function onKey(e) {
+    if (e.isComposing || e.defaultPrevented) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target.isContentEditable || e.target.closest?.('input, textarea, select')) { if (e.key === 'Escape') e.target.blur(); return; }
+    if ($('#help-dialog').open) return;
+    if ($('#photo-dialog').open) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); stepPreview(e.key === 'ArrowRight' ? 1 : -1); }
+      return;
+    }
+    if (e.key === '?') { e.preventDefault(); $('#help-dialog').showModal(); return; }
+    if (e.key === '/' && S.session && !$('#sheet').hidden) { e.preventDefault(); $('#sheet-search').focus(); return; }
+    if (e.key === 'Escape' && $('#review-grid').classList.contains('show-details') && !$('#review').hidden) {
+      e.preventDefault(); setDetails(false); $('#context-toggle').focus(); return;
+    }
+    if (e.key === 'Escape' && !document.querySelector('dialog[open]') && Z.scale <= 1 && !$('#stage-pane').classList.contains('is-full')) {
+      e.preventDefault(); $('#workspace-link').click(); return;
+    }
+    if (!S.session || $('#review').hidden) return;
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (e.repeat && ['a', 'x', 'q', 'p', 'c', 'w', 'f', 'z'].includes(key)) { e.preventDefault(); return; }
+    const actions = {
+      j: () => move(1), ArrowDown: () => move(1), k: () => move(-1), ArrowUp: () => move(-1),
+      Home: () => { const v = navigable(); if (v[0]) select(v[0].id); },
+      End: () => { const v = navigable(); if (v.length) select(v[v.length - 1].id); },
+      ArrowRight: () => chooseSlot(S.slot + 1), ArrowLeft: () => chooseSlot(S.slot - 1),
+      1: () => chooseSlot(0), 2: () => chooseSlot(1), 3: () => chooseSlot(2), 4: () => chooseSlot(3),
+      c: () => setMode(MODES[(MODES.indexOf(S.mode) + 1) % MODES.length]),
+      w: () => { S.mode = 'compare'; S.wipe = !S.wipe; renderStage(); },
+      z: () => toggleZoom(),
+      p: () => togglePin(e.shiftKey),
+      u: () => nextToReview(e.shiftKey ? -1 : 1),
+      f: () => toggleFull(),
+      a: () => setStatus('ok'), x: () => setStatus('fix'), q: () => setStatus('question'),
+      n: () => { setDetails(true); $('#note-text')?.focus(); },
+      '/': () => { if (mobile.matches) setPane('list'); $('#search').focus(); },
+      Escape: () => {
+        if (Z.scale > 1) return resetZoom();
+        if ($('#stage-pane').classList.contains('is-full')) return toggleFull(false);
+        $('#review-grid').classList.remove('show-details');
+      },
+    };
+    const run = actions[key];
+    if (!run) return;
+    e.preventDefault();
+    run();
+  }
+
+  if (location.protocol === 'file:') $('#workspace-link').href = 'https://avbydave.com/';
+  wire();
+  showTab(location.hash.slice(1) || 'review', { push: false });
+  renderAll();
+  autoOpen();
+})();
+</script>
+</body>
+</html>

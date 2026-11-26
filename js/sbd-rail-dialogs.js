@@ -194,7 +194,7 @@
     return [
       {id:'featured',label:'Featured',entries:featured},
       {id:'departments',label:'Departments',entries:(menu.departments||[]).map(function(id){return railRuntime().resolveRef('console:'+id,registry);}).filter(Boolean)},
-      {id:'tools',label:'Show tools',entries:(menu.showTools||[]).map(function(id){return railRuntime().resolveRef('tool:'+id,registry);}).filter(Boolean)},
+      {id:'tools',label:'Show tools',entries:(menu.showTools||[]).map(function(id){return railRuntime().resolveRef(id.indexOf(':')===-1?'tool:'+id:id,registry);}).filter(Boolean)},
       {id:'reference',label:'Reference',entries:(menu.reference||[]).map(function(item){return railRuntime().resolveRef((item.kind==='tool'?'tool:':'console:')+item.id,registry);}).filter(Boolean)},
       {id:'learn',label:'Learn',entries:(menu.learn||[]).map(function(id){var guide=registry.guideById?registry.guideById(id):null;return guide?guideEntry(guide):null;}).filter(Boolean)},
       {id:'other',label:'Other apps',entries:(menu.otherTools||[]).map(function(id){return railRuntime().resolveRef('tool:'+id,registry);}).filter(Boolean).concat(array(registry.externals).map(function(item){return railRuntime().resolveRef('external:'+item.id,registry);}).filter(Boolean))}

@@ -79,13 +79,16 @@ const REQUIRED_SKIP_LINKS = new Map([
   ['noteforge/index.html', 'app'],
   ['prompts/index.html', 'prompt-library'],
   ['teleprompter.html', 'teleprompter-workspace'],
-  ['thephilly/index.html', 'stage']
+  ['thephilly/index.html', 'stage'],
+  ['run-review/index.html', 'run-review-workspace']
 ]);
 const CUSTOM_SHELLS = new Map([
   ['depotops/index.html', ['href="/"', 'href="/tools.html"', 'aria-current="page">DepotOps']],
   // AV by Dave pages are also published on avbydave.com, so their System by Dave
   // home link is absolute (scripts/domain-sites.json).
   ['ProjectorThrow/index.html', ['href="https://systembydave.com/"', 'href="../av/"', 'id="throwline-workspace"']],
+  // Run Review is a managed release (scripts/build_run_review.mjs): home, console, current page.
+  ['run-review/index.html', ['id="workspace-link" class="avd-crumb-home frozen-home-link" href="/"', 'href="/av/"', 'aria-current="page">Run Review']],
   ['ProjectorThrow/Stage3D.html', ['href="https://systembydave.com/"', 'href="index.html?workspace=planner"', 'href="../av/"', 'id="stage-workspace"']]
 ]);
 const SITE_ORIGIN = 'https://systembydave.com';

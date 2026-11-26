@@ -500,7 +500,7 @@
     departmentIds.forEach(function(id){addResolved(departments,'console:'+id);});
 
     var showTools=section('Show tools',shortRail);
-    (menu.showTools||[]).forEach(function(id){addResolved(showTools,'tool:'+id);});
+    (menu.showTools||[]).forEach(function(id){addResolved(showTools,id.indexOf(':')===-1?'tool:'+id:id);});
 
     var reference=section('Reference',shortRail);
     (menu.reference||[]).forEach(function(item){
