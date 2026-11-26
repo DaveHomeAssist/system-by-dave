@@ -25,21 +25,28 @@ permissions:
 # When the walk site did change, its check still has to wait for that
 # destination run, because a read before it finishes is cached for ten minutes
 # (see scripts/check_domain_cutover_ready.mjs).
+#
+# A manual run from another branch rehearses the checks only (the deploy job
+# stays main-only), in its own queue so it never holds up a main publish.
 concurrency:
-  group: systembydave-pages
+  group: ${{ github.ref == 'refs/heads/main' && 'systembydave-pages' || format('systembydave-pages-{0}', github.ref) }}
   cancel-in-progress: false
 
 
 # The release gates run as parallel jobs (2026-11-21); they used to be one list of
 # steps, about 26 minutes end to end. Each job builds what its own checks read,
 # so no job depends on another's workspace. The publish job needs all of them.
+# On 2026-11-26 the two longest jobs were split again: the browser page checks
+# into pages and runtimes, and the retained fixture probes into two slices of
+# scripts/probe_av_retained.mjs (AV_RETAINED_FROM / AV_RETAINED_UNTIL), so no
+# gate runs much past the domain cutover job. Every check still runs once.
 jobs:
   domain-cutover:
     uses: ./.github/workflows/domain-cutover.yml
 
   contracts:
     name: Site contracts
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -91,7 +98,7 @@ jobs:
 
   site-browser:
     name: Site pages in a browser
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -135,6 +142,27 @@ jobs:
       - name: Verify AV bounded workspaces
         run: npm run test:av-workspace
 
+  site-runtimes:
+    name: Throwline, Shader practice and NoteForge in a browser
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
+
       - name: Verify Throwline browser runtime
         run: npm run test:throwline-browser
 
@@ -148,7 +176,7 @@ jobs:
 
   console:
     name: AV Video, Equipment Lab and the console shell
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -202,7 +230,7 @@ jobs:
 
   panels:
     name: Department panels
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -279,7 +307,7 @@ jobs:
 
   retained:
     name: Infrastructure, Shop and retained fixtures
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -307,9 +335,12 @@ jobs:
           npm run build:front-office
           npm run build:av-lighting
 
+      # Runs the first slice of the retained probes, up to Front Office; the
+      # retained-consoles job runs the rest of scripts/probe_av_retained.mjs.
       - name: Verify Infrastructure and Shop panels
         env:
           CHROME_CHANNEL: chrome
+          AV_RETAINED_UNTIL: probe_front_office_console
         run: |
           npm run typecheck:infrastructure
           npm run test:infrastructure
@@ -327,9 +358,53 @@ jobs:
           git diff --exit-code -- the-shop infrastructure av-video av-audio show-ops show-control front-office av-lighting
           test -z "$(git status --porcelain -- the-shop infrastructure av-video av-audio show-ops show-control front-office av-lighting)"
 
+  retained-consoles:
+    name: Retained fixture consoles
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
+
+      - name: Build the family fixtures the retained suite serves
+        run: |
+          npm run build:av-video
+          npm run build:av-audio
+          npm run build:show-ops
+          npm run build:show-control
+          npm run build:front-office
+          npm run build:av-lighting
+          npm run build:infrastructure
+          npm run build:the-shop
+
+      # Second slice of scripts/probe_av_retained.mjs, from Front Office to the end.
+      - name: Verify retained fixture consoles
+        env:
+          CHROME_CHANNEL: chrome
+          AV_RETAINED_FROM: probe_front_office_console
+        run: npm run test:av-retained-browser
+
+      - name: Committed builds match their source
+        run: |
+          git diff --exit-code -- the-shop infrastructure av-video av-audio show-ops show-control front-office av-lighting
+          test -z "$(git status --porcelain -- the-shop infrastructure av-video av-audio show-ops show-control front-office av-lighting)"
+
   simulator:
     name: Workbook and Camera Simulator
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -372,7 +447,7 @@ jobs:
           test -z "$(git status --porcelain -- av-workbook camera-sim)"
 
   deploy:
-    needs: [domain-cutover, contracts, site-browser, console, panels, retained, simulator]
+    needs: [domain-cutover, contracts, site-browser, site-runtimes, console, panels, retained, retained-consoles, simulator]
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
