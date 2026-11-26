@@ -373,6 +373,7 @@ nav #pending {
 }
 #proof-dialog[open] {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 8px;
   width: min(94vw, 1200px);
@@ -386,6 +387,15 @@ nav #pending {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+@media (max-width: 680px) {
+  #proof-dialog h2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 .review-heading,
 .proof-controls,

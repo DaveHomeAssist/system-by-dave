@@ -28,6 +28,17 @@ async function shot(page, name) {
 }
 const selected = page => page.locator('#versions [aria-pressed="true"]').getAttribute('data-version');
 
+async function checkFullView(page) {
+  const dialog = page.locator('#proof-dialog');
+  assert.ok(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth), 'Full view overflows horizontally');
+  const frame = await dialog.boundingBox();
+  for (const id of ['proof-art', 'proof-prev', 'proof-next', 'proof-swap', 'proof-close']) {
+    const box = await page.locator('#' + id).boundingBox();
+    assert.ok(box && box.width >= 44 && box.height >= 44 && box.x >= frame.x && box.y >= frame.y
+      && box.x + box.width <= frame.x + frame.width && box.y + box.height <= frame.y + frame.height, id);
+  }
+}
+
 async function actual(page, project, rev, width) {
   await page.goto(origin + '/#project/' + project.id + '/library');
   const card = page.locator('[data-version="' + rev.id + '"]');
@@ -47,6 +58,7 @@ async function actual(page, project, rev, width) {
   await page.locator('#swap-compare').click();
   assert.equal(await selected(page), rev.id);
   await page.locator('#expand-proof').click();
+  await checkFullView(page);
   assert.ok((await page.locator('#proof-details').textContent()).includes('Render ' + rev.recipe.receipt.engineSeconds.toFixed(1) + ' s'));
   assert.ok((await page.locator('#proof-details').textContent()).includes(rev.width + ' × ' + rev.height));
   await page.locator('#proof-swap').click();
@@ -105,7 +117,7 @@ async function browserFixture(page, project, rev) {
   await page.goto('about:blank');
   const parent = project.versions.find(v => v.id === rev.parent);
   const twin = {...parent, id: '1'.repeat(32), label: 'Second label for same pixels', role: 'reference', recipe: {}, favorite: true};
-  const copy = {...rev, label: 'Revision <angle>', favorite: false, hash: parent.hash};
+  const copy = {...rev, label: 'Revision <angle> ' + 'a very long candidate title '.repeat(3), favorite: false, hash: parent.hash};
   const source = {...parent, label: 'Original', favorite: false};
   const mask = {...source, id: '2'.repeat(32), role: 'mask'};
   const fixture = {...project, data: {...project.data, selected: copy.id}, versions: [copy, twin, source, mask]};
@@ -122,6 +134,7 @@ async function browserFixture(page, project, rev) {
   await page.locator('#compare').click();
   assert.equal(await page.locator('#compare-version').inputValue(), source.id);
   await page.locator('#expand-proof').click();
+  await checkFullView(page);
   await page.locator('#proof-swap').click();
   assert.equal(await page.locator('#proof-label').textContent(), 'Original');
   await page.locator('#proof-swap').click();

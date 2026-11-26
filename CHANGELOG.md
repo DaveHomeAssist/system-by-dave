@@ -3,6 +3,7 @@
 ## November 26, 2026. Envision artwork review
 
 - Browse search results and favorites in the private studio with Previous, Next or the arrow keys. Full view shows each image’s dimensions, seed and recorded render time when available.
+- Phone full view keeps the whole image and its controls within the dialog when the generation prompt becomes a long artwork title.
 - Compare opens a revision beside its source. Switching the visible side keeps the candidate selected for editing. A completed background render leaves a review in place.
 - The Back Focus directory card and House Video link preview use two camera studies generated on Walter.
 
