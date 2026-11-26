@@ -778,7 +778,7 @@ fileInput('import-project', async (f) => {
   form.append('file', f);
   const p = await api('/imports', { method: 'POST', form });
   await dashboard();
-  await open(p.id, 'layout');
+  await open(p.id, p.sourceFormat === 'envision-brief-1' ? 'create' : 'layout');
 });
 for (const [id, role] of [
   ['reference-file', 'reference'],

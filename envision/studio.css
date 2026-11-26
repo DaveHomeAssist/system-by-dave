@@ -70,7 +70,7 @@ a { color: var(--focus); text-underline-offset: .17em; }
   border-radius: .75rem;
   color: #fff;
   background: #141121;
-  background-image: linear-gradient(100deg, #141121 38%, #14112198 66%, #14112155), url("./art/endpoint-connections-2-card.webp");
+  background-image: linear-gradient(100deg, #141121 38%, #14112198 66%, #14112155), url("./art/optical-study.webp");
   background-position: center, right 46%;
   background-size: cover, min(64%, 49rem) auto;
   background-repeat: no-repeat;
@@ -142,7 +142,6 @@ summary { padding-block: .32rem; }
 .quiet { background: transparent; }
 
 .empty-prompt { display: grid; gap: .75rem; }
-.empty-prompt h3 { font-size: clamp(1.7rem, 4vw, 3rem); font-weight: 870; line-height: 1; letter-spacing: -.055em; }
 .empty-prompt p { color: var(--muted); }
 .art-crop {
   display: flex;
@@ -158,6 +157,12 @@ summary { padding-block: .32rem; }
   color: white;
 }
 .art-crop span { padding: .24rem .46rem; background: #181323; font-size: .75rem; border-radius: .22rem; }
+.art-crop[data-kind="image"] {
+  aspect-ratio: 16 / 9;
+  background: #122433 url("./art/optical-study.webp") center / cover no-repeat;
+}
+.art-crop[data-kind="image"][data-preset="paper"] { background-image: url("./art/paper-study.webp"); }
+#export-current { margin-top: .55rem; }
 .output {
   margin-top: .6rem;
   resize: none;
@@ -220,4 +225,4 @@ summary { padding-block: .32rem; }
 .brand a { color: inherit; }
 .skip { position:absolute; z-index:10; top:0; left:.5rem; padding:.65rem; background:var(--surface); transform:translateY(-130%); }
 .skip:focus { transform:none; }
-button, .button, .theme, .navigation button, .station-heading .button { min-height:44px; }
+button, .button, .theme, .navigation button, .station-heading button, .station-heading .button, .mobile-switch button { min-height:44px; }

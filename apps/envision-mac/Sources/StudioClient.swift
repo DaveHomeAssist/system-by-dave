@@ -56,6 +56,20 @@ struct Dashboard: Decodable {
     let workers: [Worker]
     let pending: Int
 }
+struct ArtworkRecipe: Decodable {
+    let prompt: String?
+    let engineSeconds: Double?
+    private enum Keys: String, CodingKey { case prompt, receipt, engineSeconds }
+
+    init(from decoder: Decoder) throws {
+        let values = try? decoder.container(keyedBy: Keys.self)
+        let text = try? values?.decode(String.self, forKey: .prompt)
+        prompt = text.flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
+        let receipt = try? values?.nestedContainer(keyedBy: Keys.self, forKey: .receipt)
+        let seconds = try? receipt?.decode(Double.self, forKey: .engineSeconds)
+        engineSeconds = seconds.flatMap { $0.isFinite && $0 >= 0 ? $0 : nil }
+    }
+}
 struct Artwork: Decodable, Identifiable {
     let id: String
     let hash: String
@@ -63,12 +77,20 @@ struct Artwork: Decodable, Identifiable {
     let role: String
     let width: Int
     let height: Int
+    let recipe: ArtworkRecipe?
 }
+struct ProjectContent: Decodable { let brief: String }
 struct ProjectInfo: Decodable {
     let id: String
     let versions: [Artwork]
+    let data: ProjectContent?
 }
 struct ProjectID: Decodable { let id: String }
+struct ImportedProject: Decodable {
+    let id: String
+    let sourceFormat: String?
+    let data: ProjectContent
+}
 struct Upload: Decodable { let id: String; let hash: String }
 struct Batch: Decodable { let jobs: [String] }
 struct Job: Decodable, Identifiable {
