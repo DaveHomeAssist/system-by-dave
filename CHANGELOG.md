@@ -1,5 +1,9 @@
 # Changelog
 
+## November 26, 2026. Envision editable exports
+
+- The private studio now asks you to save pending layer and event field edits before downloading an editable project ZIP or legacy flyer.
+
 ## November 25, 2026. AV console menus: Featured, Show tools and Learn
 
 - The Rail on `/av/` is Search, Workspace, Featured, Departments, Show tools, Reference, Learn, then All apps and Customize. Featured is Throwline, LED Wall Calculator, Signal Flow, the Console Spec Guide and AV Calculator. Saved `sbd.rail.v1` pins are unchanged.
