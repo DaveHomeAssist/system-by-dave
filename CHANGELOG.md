@@ -5,6 +5,7 @@
 - Envision opens on image prompts with optical, paper and custom subjects. Image revisions can keep the source framing. The prompt can be exported directly to the owner's personal studio.
 - Image briefs import as image projects. Existing saved flyers keep their art direction, format and separate show copy.
 - Imported briefs open directly in Generate on the Mac or Create in the private browser studio. Editable layouts still open in their editor.
+- Mac Generate can recall a selected artwork prompt, the project's saved brief or the built-in sample prompt. Images with a worker receipt show their engine time beside their dimensions.
 
 ## November 26, 2026. Envision project artwork
 
