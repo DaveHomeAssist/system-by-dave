@@ -10,10 +10,15 @@
   <meta name="theme-color" content="#251d1a">
   <meta property="og:type" content="website"><meta property="og:title" content="Envision | System by Dave">
   <meta property="og:url" content="https://systembydave.com/envision/"><meta property="og:description" content="Draft image prompts, revise artwork and export briefs to your personal studio.">
-  <meta name="twitter:card" content="summary"><meta name="twitter:title" content="Envision | System by Dave"><meta name="twitter:description" content="Draft image prompts, revise artwork and export briefs to your personal studio.">
+  <meta property="og:image" content="https://systembydave.com/envision/art/envision-share.jpg">
+  <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Coral and ivory paper folded across a deep blue field.">
+  <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Envision | System by Dave"><meta name="twitter:description" content="Draft image prompts, revise artwork and export briefs to your personal studio.">
+  <meta name="twitter:image" content="https://systembydave.com/envision/art/envision-share.jpg"><meta name="twitter:image:alt" content="Coral and ivory paper folded across a deep blue field.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="stylesheet" href="./studio.css">
   <script src="./brief-download.js" defer></script>
+  <script src="./directions/catalog.js" defer></script>
   <script src="./studio.js" defer></script>
 </head>
 <body>
@@ -60,7 +65,7 @@
         <div class="station-heading"><h2>Generator prompt</h2><button id="copy-prompt" type="button" disabled>Copy prompt</button></div>
         <div id="result-body" class="result-body">
           <div id="empty-prompt" class="empty-prompt">
-            <div id="art-crop" class="art-crop" data-kind="image" role="img" aria-label="Cyan and amber optical glass on a dark workbench"><span>Optical study · rendered on Walter</span></div>
+            <div id="art-crop" class="art-crop" data-kind="image" role="img" aria-label="Cyan and amber optical glass on a dark workbench"><img id="direction-art" alt="" width="640" height="360" hidden><span id="art-label">Optical study · rendered on Walter</span></div>
             <p id="empty-help">Choose an art direction and build the prompt. Export a named brief to use it in your personal studio.</p>
           </div>
           <div id="prompt-content" hidden>

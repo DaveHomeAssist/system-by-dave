@@ -241,8 +241,13 @@ def create_app(root, owner, worker_key, origin):
 
     @app.get("/ui/<name>")
     def ui(name):
-        need(name in ("studio.js", "studio.css"), "Unknown asset.", 404)
+        need(name in ("studio.js", "studio.css", "create-directions.js"), "Unknown asset.", 404)
         return send_from_directory(WEB, name)
+
+    @app.get("/ui/directions/<name>")
+    def direction_asset(name):
+        need(name == "catalog.js" or name.endswith(".webp"), "Unknown direction asset.", 404)
+        return send_from_directory(WEB / "directions", name)
 
     @app.get(BASE + "/state")
     def dashboard():
@@ -370,6 +375,20 @@ def create_app(root, owner, worker_key, origin):
                 )
             p = store.save(c, pid, d, b.get("revision"))
         return jsonify(p)
+
+    @app.patch(BASE + "/projects/<pid>/brief")
+    def save_brief(pid):
+        b = read_json()
+        brief = string(b.get("brief"), 6000).strip()
+        expected = string(b.get("expectedBrief"), 6000)
+        with store.tx(True) as c:
+            project = store.project(c, pid)
+            saved = project["data"].get("brief", "")
+            if brief != saved:
+                need(saved == expected, "The project direction changed on another device.", 409)
+                data = {**project["data"], "brief": brief}
+                project = store.save(c, pid, data, project["revision"])
+        return jsonify(brief=brief, revision=project["revision"])
 
     @app.post(BASE + "/projects/<pid>/duplicate")
     def duplicate(pid):

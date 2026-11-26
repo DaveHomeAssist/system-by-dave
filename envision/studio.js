@@ -23,7 +23,9 @@ const formats = {
 
 const layout = 'Reserve distinct zones from top to bottom for the event title, a large headliner or focal image, support billing and a low-detail footer. Keep clear separation between tiers and let one focal point carry the image.';
 const imageFormats = ['square', 'wide', 'tall'];
-const imagePresets = ['optical', 'paper', 'subject'];
+const studies = globalThis.EnvisionDirections;
+const imagePresets = ['optical', 'paper', ...studies.map((s) => s.id), 'subject'];
+for (const study of studies) artDirection[study.id] = study.prompt;
 const isImage = (mode) => mode === 'image' || mode === 'image-revise';
 const isRevision = (mode) => mode === 'revise' || mode === 'image-revise';
 const validFormat = (mode, value) => Object.hasOwn(formats, value)
@@ -34,6 +36,8 @@ const storageKey = 'sbd.envision.events.v1';
 const byId = (id) => document.getElementById(id);
 const form = byId('brief');
 const field = (name) => form.elements.namedItem(name);
+const subjectOption = field('preset').querySelector('[value="subject"]');
+for (const study of studies) field('preset').add(new Option(study.name, study.id), subjectOption);
 const tabs = [...document.querySelectorAll('.navigation [role="tab"]')];
 const smallScreen = matchMedia('(max-width: 680px)');
 let activeId = null;
@@ -136,14 +140,23 @@ function syncMode(modeChanged = false) {
   byId('direction-label').querySelector('span').hidden = required;
   field('preserve').placeholder = image ? 'Camera angle, subject silhouette and palette.' : 'Same layout, title and artist logos.';
   field('direction').placeholder = image
-    ? (editing ? 'Soften the shadow and change the camera angle.' : 'A cyan beam through amber glass on a cobalt workbench.')
+    ? (editing ? 'Soften the shadow and change the camera angle.'
+      : field('preset').value === 'subject' ? 'Describe the subject, materials and light.'
+      : 'Bring the main subject closer and soften the shadows.')
     : (editing ? 'Flatten the excess glow and restore the scanline texture.' : 'Icy blue around the edges. Room for six artist logos.');
   const art = byId('art-crop');
-  const paper = image && !editing && field('preset').value === 'paper';
+  const preset = field('preset').value;
+  const paper = preset === 'paper';
+  const study = image && !editing && studies.find((s) => s.id === preset);
+  const thumb = byId('direction-art');
+  art.hidden = editing || (image ? preset === 'subject' : preset !== 'afterjinx');
   art.dataset.kind = image ? 'image' : 'show';
-  art.dataset.preset = paper ? 'paper' : 'optical';
-  art.setAttribute('aria-label', image ? (paper ? 'Ivory index cards and a pencil on a navy desk' : 'Cyan and amber optical glass on a dark workbench') : 'Detail from the AfterJinx 2025 flyer');
-  art.firstElementChild.textContent = image ? (paper ? 'Paper and ink · rendered on Walter' : 'Optical study · rendered on Walter') : 'From the AfterJinx flyer archive';
+  art.dataset.preset = preset;
+  thumb.hidden = !study;
+  if (study) thumb.src = './directions/' + study.id + '.webp';
+  else thumb.removeAttribute('src');
+  art.setAttribute('aria-label', study ? study.alt : image ? (paper ? 'Ivory index cards and a pencil on a navy desk' : 'Cyan and amber optical glass on a dark workbench') : 'Detail from the AfterJinx 2025 flyer');
+  byId('art-label').textContent = image ? (study?.name || (paper ? 'Paper and ink' : 'Optical study')) + ' · rendered on Walter' : 'From the AfterJinx flyer archive';
   byId('empty-help').textContent = editing ? 'Describe the change and what should stay in the original. Build the prompt to review your revision.'
     : 'Choose an art direction and build the prompt. Export a named brief to use it in your personal studio.';
 }

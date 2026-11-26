@@ -1,5 +1,11 @@
 # Changelog
 
+## November 26, 2026. Envision image directions
+
+- Choose a folded paper, fiber light or botanical print study in the public builder and private studio. Walter rendered each sample from the prompt it supplies. The folded paper study also appears in Envision link previews.
+- Recall a saved project or artwork direction, keep unsaved wording through reload in the same tab, and resolve a competing save before replacing it. Back and Forward revisit studio workspaces.
+- A render request keeps its project identity across navigation and can retry an unacknowledged submission after reload using the same job key.
+
 ## November 26, 2026. Project directory artwork and Envision names
 
 - Search the Tools directory by name or subject, combine a search with a category, and return to those results with Back. The results scroll beneath the controls in both themes.

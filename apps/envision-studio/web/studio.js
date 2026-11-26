@@ -19,6 +19,9 @@ const state = {
   mask: null,
   maskParent: null,
   request: 0,
+  navigation: 0,
+  submitting: new Set(),
+  submitKeys: new Map(),
   pending: new Map(),
   exports: new Map(),
   drafts: new Map(),
@@ -89,10 +92,18 @@ async function api(route, { method = 'GET', body, form } = {}) {
     body: form ?? (body === undefined ? undefined : JSON.stringify(body)),
     cache: 'no-store',
   });
-  const data = await res.json();
-  if (!res.ok) throw Error(data.error || 'Studio request failed (' + res.status + ').');
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const error = Error(data?.error || 'Studio request failed (' + res.status + '). Check the private connection and retry.');
+    error.status = res.status;
+    throw error;
+  }
+  if (data === null) throw Error('The studio returned an unreadable response. Check the private connection and retry.');
   return data;
 }
+const directionEditor = createDirectionEditor({
+  project: () => state.project, artwork: version, api, reload, notify: say,
+});
 const post = (route, body = {}) => api(route, { method: 'POST', body });
 async function download(route) {
   const res = await fetch(API + route);
@@ -213,18 +224,20 @@ function projectCards() {
     );
   $('archive-filter').textContent = state.archived ? 'Show active' : 'Show archived';
 }
+function routeFor(name) {
+  return '#' + (state.project && ['create', 'library', 'layout'].includes(name)
+    ? 'project/' + state.project.id + '/' + name : name);
+}
 function displayTab(name, refresh = true) {
+  if ($('direction-dialog').open) $('direction-dialog').close();
   if (name === 'layout' && state.tab !== name) {
     state.compare = false;
     state.flipped = false;
     $('frames').classList.remove('zoomed');
   }
   state.tab = name;
-  const target =
-    state.project && ['create', 'library', 'layout'].includes(name)
-      ? 'project/' + state.project.id + '/' + name
-      : name;
-  window.history.replaceState(null, '', '#' + target);
+  const target = routeFor(name);
+  if (location.hash !== target) window.history.pushState(null, '', target);
   for (const n of document.querySelectorAll('nav [data-tab]')) {
     if (n.dataset.tab === name) n.setAttribute('aria-current', 'page');
     else n.removeAttribute('aria-current');
@@ -241,17 +254,18 @@ function displayTab(name, refresh = true) {
   }
 }
 async function tab(name) {
-  if (name === state.tab || !mayLeave()) return;
+  ++state.navigation;
+  if (name === state.tab) return true;
+  if (!mayLeave()) return false;
   if (['create', 'library', 'layout'].includes(name) && !state.project) {
     const last = recall('envision.personal.last'),
       p =
         state.list.find((x) => !x.archived && x.id === last) || state.list.find((x) => !x.archived);
     if (!p) {
       say('Create or import a project first.');
-      return;
+      return false;
     }
-    await open(p.id, name);
-    return;
+    return open(p.id, name);
   }
   if (state.dirty) {
     state.drafts.clear();
@@ -260,12 +274,14 @@ async function tab(name) {
   displayTab(name);
   if (name === 'queue') await queueView();
   if (name === 'projects') await dashboard();
+  return true;
 }
 async function open(pid, tabName = 'create') {
   if (!mayLeave()) return false;
-  const token = ++state.request;
+  const token = ++state.navigation;
   const p = await api('/projects/' + pid);
-  if (token !== state.request) return false;
+  if (token !== state.navigation) return false;
+  ++state.request;
   state.project = p;
   state.drafts.clear();
   const artwork = p.versions.filter((v) => v.role !== 'mask');
@@ -286,8 +302,6 @@ async function open(pid, tabName = 'create') {
   $('frames').classList.remove('zoomed');
   state.mask = null;
   state.maskParent = null;
-  state.submitKey = null;
-  $('prompt').value = p.data.brief || '';
   $('operation').value = 'generate';
   $('starting').replaceChildren();
   for (const id of ['composition', 'style-ref']) $(id).replaceChildren();
@@ -311,6 +325,7 @@ async function reload(forms = false) {
   if (state.dirty && !forms && p.revision !== state.project.revision) {
     state.project.versions = p.versions;
     state.project.exports = p.exports;
+    state.project.data.brief = p.data.brief;
     syncProject(false);
     say('Project changed on another device. Save your edits or reopen the latest revision.', true);
     return true;
@@ -344,6 +359,7 @@ function visibleVersions() {
 function syncProject(forms) {
   const p = state.project;
   if (!p) return;
+  directionEditor.refresh();
   $('project-title').textContent = p.data.name;
   $('project-kind').textContent = p.data.kind === 'show' ? 'Show project' : 'Image project';
   if (!stage()) state.stage = p.data.stages[0].id;
@@ -467,7 +483,11 @@ function preview() {
   setImg('art', url);
   $('no-art').textContent = emptyLibrary ? $('library-empty').textContent
     : 'Choose a reference or generate your first image.';
-  $('no-art').hidden = !!url;
+  const showExamples = !url && state.tab === 'create' && $('operation').value === 'generate';
+  $('empty-directions').hidden = !showExamples;
+  if (showExamples && !$('direction-cover-image').hasAttribute('src'))
+    $('direction-cover-image').src = '/ui/directions/folded-paper.webp';
+  $('no-art').hidden = !!url || showExamples;
   $('zoom').disabled = !url;
   $('expand-proof').disabled = !url;
   $('compare').disabled = !v || !o;
@@ -489,6 +509,7 @@ function preview() {
 }
 function operation() {
   const op = $('operation').value;
+  $('generate').disabled = state.submitting.has(state.project?.id);
   $('generative').hidden = op === 'finish';
   $('finish-controls').hidden = op !== 'finish';
   $('mask-actions').hidden = !['mask', 'finish'].includes(op);
@@ -823,12 +844,29 @@ function recipe() {
     profile: 'sdxl-turbo-local',
   };
 }
+async function submissionKey(pid, settings) {
+  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(settings)));
+  const fingerprint = Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, '0')).join('');
+  const name = 'envision.create.submission.v1.' + pid;
+  let prior = state.submitKeys.get(pid);
+  if (!prior) {
+    try { prior = JSON.parse(sessionStorage.getItem(name)); } catch {}
+  }
+  if (prior?.fingerprint === fingerprint && typeof prior.key === 'string'
+      && /^[a-f0-9-]{36}$/.test(prior.key)) return prior.key;
+  const request = { fingerprint, key: uuid() };
+  state.submitKeys.set(pid, request);
+  try { sessionStorage.setItem(name, JSON.stringify(request)); } catch {}
+  return request.key;
+}
 act(
   $('create'),
   async (e) => {
     e.preventDefault();
-    if ($('generate').disabled) return;
-    $('generate').disabled = true;
+    const pid = state.project.id;
+    if (state.submitting.has(pid)) return;
+    state.submitting.add(pid);
+    operation();
     try {
       if ($('operation').value === 'finish') {
         const parent = state.version,
@@ -839,30 +877,33 @@ act(
           effect: $('effect').value,
           amount: Number($('amount').value),
         });
+        if (state.project?.id !== pid || state.tab !== 'create' || state.version !== parent) return;
+        if (!(await reload()) || state.project?.id !== pid || state.tab !== 'create') return;
         state.version = r.id;
-        await reload();
         displayTab('library');
         say('Local finish saved.');
         return;
       }
-      const b = recipe(),
-        fingerprint = JSON.stringify([state.project.id, b]);
+      const b = recipe();
       if (!b.prompt) throw Error('Enter an image direction.');
-      if (!state.submitKey || state.submitKey.fingerprint !== fingerprint)
-        state.submitKey = { fingerprint, key: uuid() };
-      const r = await post(path('/jobs'), { ...b, key: state.submitKey.key });
-      state.submitKey = null;
-      r.jobs.forEach((id) => state.pending.set(id, state.project.id));
-      say(
+      const key = await submissionKey(pid, b);
+      const r = await post('/projects/' + pid + '/jobs', { ...b, key });
+      state.submitKeys.delete(pid);
+      try { sessionStorage.removeItem('envision.create.submission.v1.' + pid); } catch {}
+      r.jobs.forEach((id) => state.pending.set(id, pid));
+      if (state.project?.id === pid && state.tab === 'create') say(
         r.jobs.length +
           ' candidate' +
           (r.jobs.length === 1 ? '' : 's') +
           ' queued. You can close this tab.',
       );
       await dashboard();
-      await queueView();
+      if (state.tab === 'queue') await queueView();
+    } catch (err) {
+      if (state.project?.id === pid && state.tab === 'create') throw err;
     } finally {
-      $('generate').disabled = false;
+      state.submitting.delete(pid);
+      operation();
     }
   },
   'submit',
@@ -952,7 +993,10 @@ act($('duplicate'), async () => {
   await dashboard();
   await open(p.id);
 });
-$('operation').onchange = operation;
+$('operation').onchange = () => {
+  operation();
+  preview();
+};
 $('starting').onchange = () => {
   state.mask = null;
   state.maskParent = null;
@@ -970,10 +1014,16 @@ act($('save-preset'), async () => {
   say('Style preset saved.');
 });
 act($('apply-preset'), async () => {
-  if (!$('preset').value) throw Error('Choose a saved style.');
-  const b = await post(path('/presets/' + $('preset').value + '/apply'));
+  const pid = state.project.id;
+  const preset = state.presets.find((p) => p.id === $('preset').value);
+  if (!preset) throw Error('Choose a saved style.');
+  if (!directionEditor.canReplace(preset.data.prompt)) return;
+  const before = $('prompt').value;
+  const b = await post(path('/presets/' + preset.id + '/apply'));
+  if (state.project?.id !== pid || state.tab !== 'create') return;
   await reload();
-  $('prompt').value = b.prompt;
+  if (state.project?.id !== pid || state.tab !== 'create' || $('prompt').value !== before) return;
+  directionEditor.setText(b.prompt);
   $('render-size').value = b.size.join(',');
   $('strength').value = b.strength;
   $('count').value = b.count;
@@ -988,6 +1038,7 @@ act($('apply-preset'), async () => {
     $(id).value = b.refs[role] || '';
   }
   operation();
+  preview();
   say('Style preset applied.');
 });
 act($('compare'), () => {
@@ -1075,15 +1126,11 @@ act($('use-art'), async () => {
     if (d.kind === 'image') d.canvas = [v.width, v.height];
   });
 });
-act($('save-brief'), async () => {
-  await edit((d) => {
-    d.brief = $('prompt').value.trim();
-  });
-});
 act($('replay'), () => {
   const r = librarySelection().recipe;
+  if (!directionEditor.canReplace(r.prompt)) return;
   displayTab('create');
-  $('prompt').value = r.prompt;
+  directionEditor.setText(r.prompt);
   $('operation').value = r.operation;
   $('render-size').value = r.size.join(',');
   $('seed').value = r.seed;
@@ -1095,6 +1142,7 @@ act($('replay'), () => {
   state.mask = r.refs?.mask || null;
   state.maskParent = r.parent;
   operation();
+  preview();
   say('Generation settings restored.');
 });
 act($('revise-art'), () => {
@@ -1326,7 +1374,7 @@ window.addEventListener('beforeunload', (e) => {
 let maskBase = null,
   editingMaskParent = null,
   maskMap = null,
-  history = [],
+  maskUndo = [],
   painting = false,
   lastPoint = null;
 function redrawMask() {
@@ -1346,8 +1394,8 @@ function redrawMask() {
   ctx.globalAlpha = 1;
 }
 function stash() {
-  if (history.length >= 6) history.shift();
-  history.push(maskMap.getContext('2d').getImageData(0, 0, maskMap.width, maskMap.height));
+  if (maskUndo.length >= 6) maskUndo.shift();
+  maskUndo.push(maskMap.getContext('2d').getImageData(0, 0, maskMap.width, maskMap.height));
 }
 act($('paint-mask'), async () => {
   const id = ($('operation').value === 'finish' ? '' : $('starting').value) || state.version,
@@ -1364,7 +1412,7 @@ act($('paint-mask'), async () => {
   const cv = $('mask-canvas');
   cv.width = maskMap.width;
   cv.height = maskMap.height;
-  history = [];
+  maskUndo = [];
   if (state.mask && state.maskParent === id) {
     const old = new Image();
     old.src = media(state.project.id, state.mask);
@@ -1417,8 +1465,8 @@ cv.onpointerup = cv.onpointercancel = () => {
   lastPoint = null;
 };
 act($('undo-mask'), () => {
-  if (history.length) {
-    maskMap.getContext('2d').putImageData(history.pop(), 0, 0);
+  if (maskUndo.length) {
+    maskMap.getContext('2d').putImageData(maskUndo.pop(), 0, 0);
     redrawMask();
   }
 });
@@ -1478,7 +1526,7 @@ async function tick() {
           if (j.result && !state.dirty && state.tab === 'create' && !$('proof-dialog').open)
             state.version = j.result;
         }
-        say(
+        if (state.tab === 'queue' || state.project?.id === pid) say(
           j.state === 'succeeded' ? 'Candidate ready in Library.' : j.error || j.state,
           j.state === 'failed',
         );
@@ -1489,7 +1537,7 @@ async function tick() {
       if (!['queued', 'running'].includes(x.state)) {
         finishedExports.push(id);
         update ||= state.project?.id === pid;
-        say(x.error || 'Export ready.', !!x.error);
+        if (state.tab === 'queue' || state.project?.id === pid) say(x.error || 'Export ready.', !!x.error);
       }
     }
     if (update && !(await reload())) return;
@@ -1508,15 +1556,22 @@ async function start() {
   const deep = location.hash.match(/^#project\/([a-f0-9]{32})\/(create|layout|library)$/);
   if (deep && state.list.some((p) => p.id === deep[1])) await open(deep[1], deep[2]);
   else if (location.hash === '#queue') await tab('queue');
-  else say('Private studio ready.');
+  else {
+    window.history.replaceState(null, '', '#projects');
+    say('Private studio ready.');
+  }
   setInterval(tick, 5000);
 }
 window.addEventListener('hashchange', async () => {
-  const deep = location.hash.match(/^#project\/([a-f0-9]{32})\/(create|layout|library)$/);
+  const requested = location.hash;
+  const deep = requested.match(/^#project\/([a-f0-9]{32})\/(create|layout|library)$/);
   try {
-    if (deep) await open(deep[1], deep[2]);
-    else await tab(location.hash === '#queue' ? 'queue' : 'projects');
+    const changed = deep && deep[1] !== state.project?.id ? await open(deep[1], deep[2])
+      : await tab(deep ? deep[2] : requested === '#queue' ? 'queue' : 'projects');
+    if (!changed && location.hash === requested && location.hash !== routeFor(state.tab))
+      window.history.pushState(null, '', routeFor(state.tab));
   } catch (err) {
+    if (location.hash === requested) window.history.replaceState(null, '', routeFor(state.tab));
     say(err.message, true);
   }
 });
