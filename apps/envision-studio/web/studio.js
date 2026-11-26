@@ -1104,11 +1104,14 @@ fileInput('stage-file', async (f) => {
   state.stage = p.data.stages.at(-1).id;
   await reload(true);
 });
-act($('make-export'), async () => {
+function exportRevision() {
   if (state.dirty) throw Error('Save your layer and event edits before exporting.');
+  return state.project.revision;
+}
+act($('make-export'), async () => {
   const formats = [...$('output-formats').querySelectorAll(':checked')].map((n) => n.value);
   const r = await post(path('/exports'), {
-    revision: state.project.revision,
+    revision: exportRevision(),
     stage: state.stage,
     campaign: $('all-stages').checked,
     formats,
@@ -1118,7 +1121,7 @@ act($('make-export'), async () => {
   await reload();
   say('Output set queued on Dominic.');
 });
-act($('native'), () => download(path('/editable?revision=' + state.project.revision)));
+act($('native'), () => download(path('/editable?revision=' + exportRevision())));
 act($('source-file'), () => {
   const file = stage().importFile;
   return download(path('/media/' + file.hash + '?' + query({ download: file.name })));
@@ -1127,7 +1130,7 @@ act($('legacy'), () =>
   download(
     path(
       '/editable?' +
-        query({ revision: state.project.revision, type: 'legacy', stage: state.stage }),
+        query({ revision: exportRevision(), type: 'legacy', stage: state.stage }),
     ),
   ),
 );
