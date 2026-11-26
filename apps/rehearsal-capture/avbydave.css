@@ -1,5 +1,5 @@
-/* AV by Dave skin for the Run Review managed release (docs/run-review.md).
-   Inlined after the viewer's own styles by scripts/build_run_review.mjs.
+/* AV by Dave skin for the Rehearsal Capture managed release (docs/rehearsal-capture.md).
+   Inlined after the viewer's own styles by scripts/build_rehearsal_capture.mjs.
    Colors come from css/avd/tokens.css, which the page links: Gaffer (dark)
    by default and Call Sheet (light) under [data-theme="light"], the same
    attribute the viewer's theme control sets. Photo wells stay neutral. */

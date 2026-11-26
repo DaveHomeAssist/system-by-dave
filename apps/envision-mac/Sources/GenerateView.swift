@@ -31,6 +31,7 @@ struct NetworkArtwork: View {
 
 struct GenerateView: View {
     private static let sample = Bundle.main.url(forResource: "Refraction", withExtension: "png").flatMap(NSImage.init(contentsOf:))
+    private static let samplePrompt = "Cinematic product photograph of a single finely machined optical lens on a deep indigo optical workbench. A narrow ribbon of amber light refracts through the glass into a bright teal caustic on brushed black metal. The lens sits right of center with clean dark space on the left. Macro industrial photography, crisp glass edges, soft shadows, horizontal composition, no text."
     @ObservedObject var model: Workspace
     @ViewState private var advanced = false
     @ViewState private var refsOpen = false
@@ -63,7 +64,25 @@ struct GenerateView: View {
                             }
                         }
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Prompt").font(.headline)
+                            HStack {
+                                Text("Prompt").font(.headline)
+                                Spacer()
+                                Menu("Recall prompt") {
+                                    if let text = model.selected?.recipe?.prompt {
+                                        Button("Selected artwork") { model.recallPrompt(text) }.disabled(text == model.draft.prompt)
+                                    }
+                                    if !model.projectBrief.isEmpty {
+                                        Button("Project brief") { model.recallPrompt(model.projectBrief) }.disabled(model.projectBrief == model.draft.prompt)
+                                    }
+                                    Button("Studio sample") { model.recallPrompt(Self.samplePrompt) }.disabled(Self.samplePrompt == model.draft.prompt)
+                                }.fixedSize()
+                                .alert(item: $model.promptReplacement) { pending in
+                                    Alert(title: Text("Replace the current prompt?"),
+                                          message: Text("This replaces the text in your draft."),
+                                          primaryButton: .default(Text("Replace prompt")) { model.replacePrompt(pending) },
+                                          secondaryButton: .cancel())
+                                }
+                            }
                             ZStack(alignment: .topLeading) {
                                 TextEditor(text: $model.draft.prompt).font(.body)
                                     .scrollContentBackground(.hidden).padding(5)
@@ -163,7 +182,12 @@ struct GenerateView: View {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(art.label).lineLimit(2).help(art.label)
-                                Text("\(art.width) × \(art.height)").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                                HStack(spacing: 8) {
+                                    Text("\(art.width) × \(art.height)")
+                                    if let seconds = art.recipe?.engineSeconds {
+                                        Text("Render \(seconds.formatted(.number.precision(.fractionLength(1)))) s")
+                                    }
+                                }.font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                             }
                             Spacer()
                             Button("Revise this") { model.draft.starting = art.id; refsOpen = true }

@@ -8,11 +8,17 @@ The Mac creates image projects and submits jobs through Dominic's existing owner
 
 The first release targets Dave's Apple Silicon Mac. Build it with the macOS Command Line Tools. Acceptance uses the installed application to submit original artwork for Envision, follow the jobs through completion, export a PNG, reopen the project, open the full studio and compare two local images offline. The two original show projects are reference fixtures. The app icon and sample image come from dedicated Walter jobs for the software.
 
+The Generate screen should let Dave repeat a studio render without finding its recipe in another view. Recall the selected artwork's prompt, a saved project brief or the prompt for the included optical sample. Verify replacement and cancellation on an existing draft. Display the engine time only when the worker recorded it.
+
 ## Using the app
 
 Open **Generate**, select an image project or create one, then enter a prompt. Choose a canvas size and number of images. The reference and advanced controls also support revising an existing image and choosing a seed. **Generate on Walter** submits the batch. Generated candidates appear in the project gallery. Choose **Save PNG** to export the selected image.
 
+**Recall prompt** offers the project brief, selected artwork prompt and studio sample as available. It fills the prompt editor and asks before replacing a draft. The artwork dimensions include Walter's engine time when recorded. The canvas, references and seed keep their current settings.
+
 Open **Studio** for the complete private workspace, including region edits, the job queue and editable project imports and exports. **Compare** opens two local PNG, JPEG or WebP files. Use **Phone** to check the art at a logical width of 375 points.
+
+Use **File > Open** with a brief exported from the public Envision prompt builder. The Mac opens **Generate** with the imported prompt in its new project. A layered flyer or editable project package opens in **Studio** on **Layout**.
 
 **Layout** opens a layered composition for the current project. Image projects start with an empty stage. In Library, choose an image and select **Use as background**, then open Layout to add type or a supplied logo. Show projects can also bind those layers to event fields.
 

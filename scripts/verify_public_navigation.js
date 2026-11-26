@@ -80,15 +80,17 @@ const REQUIRED_SKIP_LINKS = new Map([
   ['prompts/index.html', 'prompt-library'],
   ['teleprompter.html', 'teleprompter-workspace'],
   ['thephilly/index.html', 'stage'],
-  ['run-review/index.html', 'run-review-workspace']
+  ['rehearsal-capture/index.html', 'rehearsal-capture-workspace']
 ]);
 const CUSTOM_SHELLS = new Map([
   ['depotops/index.html', ['href="/"', 'href="/tools.html"', 'aria-current="page">DepotOps']],
   // AV by Dave pages are also published on avbydave.com, so their System by Dave
   // home link is absolute (scripts/domain-sites.json).
   ['ProjectorThrow/index.html', ['href="https://systembydave.com/"', 'href="../av/"', 'id="throwline-workspace"']],
-  // Run Review is a managed release (scripts/build_run_review.mjs): home, console, current page.
-  ['run-review/index.html', ['id="workspace-link" class="avd-crumb-home frozen-home-link" href="/"', 'href="/av/"', 'aria-current="page">Run Review']],
+  // Rehearsal Capture is a managed release (scripts/build_rehearsal_capture.mjs): home, console, current page.
+  // run-review/ is its first address, kept as a forward that carries the query and hash.
+  ['rehearsal-capture/index.html', ['id="workspace-link" class="avd-crumb-home frozen-home-link" href="/"', 'href="/av/"', 'aria-current="page">Rehearsal Capture']],
+  ['run-review/index.html', ['href="/rehearsal-capture/"', "location.replace('/rehearsal-capture/' + location.search + location.hash)", 'href="/"']],
   ['ProjectorThrow/Stage3D.html', ['href="https://systembydave.com/"', 'href="index.html?workspace=planner"', 'href="../av/"', 'id="stage-workspace"']]
 ]);
 const SITE_ORIGIN = 'https://systembydave.com';

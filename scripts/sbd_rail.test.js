@@ -455,7 +455,7 @@ test('default rail gives every entry its own icon and puts badges in the tooltip
     assert.notEqual(byRef[ref], generic, ref);
   });
   assert.notEqual(byRef['guide:field-kit'], external);
-  assert.equal(byRef['external:run-review'], external);
+  assert.equal(byRef['external:rehearsal-capture'], external);
   assert.equal(rail.resolveRef('tool:ontrack', registry).icon.join('|'), generic);
 
   const fieldKit = entries.find((entry) => entry.getAttribute('data-rail-ref') === 'guide:field-kit');

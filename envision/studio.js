@@ -1,6 +1,9 @@
 'use strict';
 
 const artDirection = {
+  optical: 'Photograph an amber glass prism on a dark cobalt optical bench. Show a narrow cyan beam bending through one polished face, a sharp reflection and fine surface grain.',
+  paper: 'Photograph blank ivory index cards and a graphite pencil on a midnight-blue desk. Use raking side light to reveal the paper fibers and cast a single crisp shadow.',
+  subject: 'Give the main subject a recognizable silhouette. Choose lighting, materials and a background that support the requested scene.',
   afterjinx: 'Build a deep-sea scene with one focal creature, ink-blue water and warm tentacle accents around the edges. Use controlled halftone or scanline texture in the shadows and crisp silhouettes where the artwork meets the lettering zones.',
   afterbreak: 'Use a near-black base, distressed chrome and cool, mirrored edge linework. Leave a prominent opening for a supplied mystery-headliner graphic.',
   endpoint: 'Use a near-black ground, a central geometric axis, crisp circuit lines and controlled neon at the edges. Keep the middle quiet for artist marks.',
@@ -9,6 +12,9 @@ const artDirection = {
 };
 
 const formats = {
+  square: { name: 'a square image (1:1)', spacing: 'Balance the subject within the square and leave breathing room at each edge.' },
+  wide: { name: 'a wide image (16:9)', spacing: 'Compose across the horizontal frame. Give the subject and its shadow room to read at a small size.' },
+  tall: { name: 'a tall image (9:16)', spacing: 'Use the height of the frame and leave room above and below the subject.' },
   feed: { name: 'a 4:5 feed flyer (1080 × 1350 px)', spacing: 'Leave a 6% margin on all sides for important artwork and text.' },
   story: { name: 'a 9:16 story (1080 × 1920 px)', spacing: 'Keep the title and CTA at least 250 px from the top and bottom and 72 px from either side.' },
   print: { name: 'a 4 × 6 inch portrait print flyer', spacing: 'Keep type and logos inside the printer’s safe area and extend edge artwork through the specified bleed.' },
@@ -16,6 +22,13 @@ const formats = {
 };
 
 const layout = 'Reserve distinct zones from top to bottom for the event title, a large headliner or focal image, support billing and a low-detail footer. Keep clear separation between tiers and let one focal point carry the image.';
+const imageFormats = ['square', 'wide', 'tall'];
+const imagePresets = ['optical', 'paper', 'subject'];
+const isImage = (mode) => mode === 'image' || mode === 'image-revise';
+const isRevision = (mode) => mode === 'revise' || mode === 'image-revise';
+const validFormat = (mode, value) => Object.hasOwn(formats, value)
+  && (value === 'keep' ? isRevision(mode) : imageFormats.includes(value) === isImage(mode));
+const validPreset = (mode, value) => Object.hasOwn(artDirection, value) && imagePresets.includes(value) === isImage(mode);
 const fieldNames = ['title', 'mode', 'format', 'preset', 'direction', 'preserve', 'copy'];
 const storageKey = 'sbd.envision.events.v1';
 const byId = (id) => document.getElementById(id);
@@ -24,7 +37,6 @@ const field = (name) => form.elements.namedItem(name);
 const tabs = [...document.querySelectorAll('.navigation [role="tab"]')];
 const smallScreen = matchMedia('(max-width: 680px)');
 let activeId = null;
-let previousMode = 'new';
 let built = false;
 
 function announce(message) {
@@ -88,35 +100,63 @@ byId('theme').addEventListener('click', () => {
 });
 
 function briefValues() {
-  return Object.fromEntries(fieldNames.map((name) => [name, field(name).value.trim()]));
+  const brief = Object.fromEntries(fieldNames.map((name) => [name, field(name).value.trim()]));
+  if (isImage(brief.mode)) brief.copy = '';
+  return brief;
 }
 
-function syncMode(resetFormat = false) {
-  const mode = field('mode').value;
-  const editing = mode === 'revise';
-  const keepOption = field('format').querySelector('[value="keep"]');
-  keepOption.disabled = !editing;
-  keepOption.hidden = !editing;
-  if (resetFormat && mode !== previousMode) {
-    if (editing) field('format').value = 'keep';
-    else if (field('format').value === 'keep') field('format').value = 'feed';
+function filterOptions(select, allowed, fallback) {
+  for (const option of select.options) {
+    option.disabled = !allowed(option.value);
+    option.hidden = option.disabled;
   }
-  previousMode = mode;
+  if (!allowed(select.value)) select.value = fallback;
+}
+
+function needsDirection(brief) {
+  return isRevision(brief.mode) || (brief.mode === 'image' && brief.preset === 'subject');
+}
+
+function syncMode(modeChanged = false) {
+  const mode = field('mode').value;
+  const image = isImage(mode);
+  const editing = isRevision(mode);
+  filterOptions(field('format'), value => validFormat(mode, value), image ? 'square' : 'feed');
+  filterOptions(field('preset'), value => validPreset(mode, value), image ? 'optical' : 'afterjinx');
+  if (editing && modeChanged) field('format').value = 'keep';
   byId('preset-field').hidden = editing;
   byId('preserve-field').hidden = !editing;
-  byId('direction-label').firstChild.textContent = editing ? 'What should change? ' : 'Your direction ';
-  byId('direction-label').querySelector('span').hidden = editing;
-  field('direction').required = editing;
-  field('direction').placeholder = editing
-    ? 'Flatten the excess glow and bring back a gritty scanline texture.'
-    : 'Icy blue around the edges. Room for six artist logos.';
+  byId('copy-details').hidden = image;
+  byId('brief-heading').textContent = image ? 'Image brief' : 'Flyer brief';
+  byId('name-label').textContent = image ? 'Brief name' : 'Event name';
+  field('title').placeholder = image ? 'e.g. Prism study' : 'e.g. AfterBreak';
+  const required = needsDirection(briefValues());
+  field('direction').required = required;
+  byId('direction-label').querySelector('strong').textContent = editing ? 'What should change?' : (required ? 'Describe your subject' : 'Your direction');
+  byId('direction-label').querySelector('span').hidden = required;
+  field('preserve').placeholder = image ? 'Camera angle, subject silhouette and palette.' : 'Same layout, title and artist logos.';
+  field('direction').placeholder = image
+    ? (editing ? 'Soften the shadow and change the camera angle.' : 'A cyan beam through amber glass on a cobalt workbench.')
+    : (editing ? 'Flatten the excess glow and restore the scanline texture.' : 'Icy blue around the edges. Room for six artist logos.');
+  const art = byId('art-crop');
+  const paper = image && !editing && field('preset').value === 'paper';
+  art.dataset.kind = image ? 'image' : 'show';
+  art.dataset.preset = paper ? 'paper' : 'optical';
+  art.setAttribute('aria-label', image ? (paper ? 'Ivory index cards and a pencil on a navy desk' : 'Cyan and amber optical glass on a dark workbench') : 'Detail from the AfterJinx 2025 flyer');
+  art.firstElementChild.textContent = image ? (paper ? 'Paper and ink · rendered on Walter' : 'Optical study · rendered on Walter') : 'From the AfterJinx flyer archive';
+  byId('empty-help').textContent = editing ? 'Describe the change and what should stay in the original. Build the prompt to review your revision.'
+    : 'Choose an art direction and build the prompt. Export a named brief to use it in your personal studio.';
 }
 
 function buildPrompt(brief) {
   const format = formats[brief.format];
   const eventContext = brief.title ? ' for ' + brief.title : '';
-  if (brief.mode === 'revise') {
+  if (isRevision(brief.mode)) {
     const size = brief.format === 'keep' ? format.spacing : 'Recompose for ' + format.name + '. ' + format.spacing;
+    if (isImage(brief.mode)) {
+      return ['Edit the supplied image' + eventContext + '.', 'Change: ' + brief.direction,
+        'Keep: ' + (brief.preserve || 'The subject, materials and lighting outside the requested edit.'), size].join('\n\n');
+    }
     const preserve = brief.preserve || 'Existing lettering, logos, billing order, layout hierarchy and all other unaffected artwork.';
     return [
       'Edit the supplied flyer' + eventContext + '.',
@@ -124,6 +164,9 @@ function buildPrompt(brief) {
       'Keep: ' + preserve,
       size + ' Preserve contrast and legibility around every text zone. Limit edits to the requested changes.'
     ].join('\n\n');
+  }
+  if (isImage(brief.mode)) {
+    return ['Create ' + format.name + eventContext + '.', artDirection[brief.preset], brief.direction, format.spacing].filter(Boolean).join('\n\n');
   }
   return [
     'Create artwork' + eventContext + ' for ' + format.name + '.',
@@ -136,15 +179,16 @@ function buildPrompt(brief) {
 
 function updateResult() {
   const brief = briefValues();
-  const available = built && (brief.mode !== 'revise' || Boolean(brief.direction));
+  const available = built && (!needsDirection(brief) || Boolean(brief.direction));
   byId('empty-prompt').hidden = available;
   byId('prompt-content').hidden = !available;
   byId('copy-prompt').disabled = !available;
   if (!available) return;
   byId('prompt-output').value = buildPrompt(brief);
-  byId('result-help').textContent = brief.mode === 'revise'
-    ? 'Attach the original flyer in your image generator and paste this edit prompt.'
-    : 'Paste this into your image generator. Add the real type and logos in layout.';
+  byId('result-help').textContent = isRevision(brief.mode)
+    ? 'Use the original artwork as a reference when you run this prompt.'
+    : (isImage(brief.mode) ? 'Copy the prompt to your generator or export the brief to your personal studio.' : 'Paste this into your image generator. Add the real type and logos in layout.');
+  byId('layout-sample').hidden = isImage(brief.mode);
   byId('layout-map').hidden = brief.mode === 'revise' && brief.format === 'keep';
   byId('layout-note').textContent = formats[brief.format].spacing;
   byId('placement').hidden = !brief.copy;
@@ -153,13 +197,14 @@ function updateResult() {
 
 form.addEventListener('input', (event) => {
   if (event.target === field('mode')) syncMode(true);
+  if (event.target === field('preset')) syncMode();
   updateResult();
 });
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
-  if (field('mode').value === 'revise' && !field('direction').value.trim()) {
-    announce('Describe what to change in the existing flyer.');
+  if (needsDirection(briefValues()) && !field('direction').value.trim()) {
+    announce('Enter your direction to build this prompt.');
     field('direction').focus();
     return;
   }
@@ -187,7 +232,7 @@ byId('copy-placement').addEventListener('click', () => copyOutput('placement-out
 
 function readEvents() {
   const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
-  if (!Array.isArray(stored)) throw new TypeError('Saved events must be an array');
+  if (!Array.isArray(stored)) throw new TypeError('Saved briefs must be an array');
   return stored;
 }
 
@@ -227,7 +272,7 @@ byId('personal-address').addEventListener('submit', event => {
 function saveEvent() {
   const brief = briefValues();
   if (!brief.title) {
-    announce('Enter an event name before saving.');
+    announce('Enter a name before saving the brief.');
     field('title').focus();
     return;
   }
@@ -235,18 +280,27 @@ function saveEvent() {
     const records = readEvents();
     const id = activeId || crypto.randomUUID();
     const entry = { id, ...brief };
-    const next = [entry, ...records.filter((record) => record.id !== id)];
+    const next = [entry, ...records.filter((record) => record?.id !== id)];
     localStorage.setItem(storageKey, JSON.stringify(next));
     activeId = id;
     byId('new-event').hidden = false;
-    announce('Event saved in this browser.');
+    announce('Brief saved in this browser.');
   } catch {
     announce('Could not save. Keep this tab open and copy any details you need.');
   }
 }
 
 function openEvent(record) {
-  for (const name of fieldNames) field(name).value = record[name];
+  field('mode').value = record.mode;
+  if (!field('mode').value) field('mode').value = 'new';
+  syncMode(true);
+  for (const name of ['format', 'preset']) {
+    const valid = [...field(name).options].some(option => option.value === record[name] && !option.disabled);
+    if (valid) field(name).value = record[name];
+  }
+  for (const name of ['title', 'direction', 'preserve', 'copy']) {
+    field(name).value = typeof record[name] === 'string' ? record[name] : '';
+  }
   activeId = record.id;
   built = false;
   byId('new-event').hidden = false;
@@ -256,8 +310,35 @@ function openEvent(record) {
   selectTab(byId('tab-studio'));
   showMobilePanel('brief');
   field('title').focus();
-  announce('Event opened.');
+  announce('Brief opened.');
 }
+
+function exportBrief(brief) {
+  if (!brief.title?.trim()) {
+    announce('Enter a name before exporting the brief.');
+    showMobilePanel('brief');
+    field('title').focus();
+    return;
+  }
+  if (!['new', 'revise', 'image', 'image-revise'].includes(brief.mode) || !validFormat(brief.mode, brief.format)
+    || (!isRevision(brief.mode) && !validPreset(brief.mode, brief.preset))
+    || (needsDirection(brief) && (typeof brief.direction !== 'string' || !brief.direction.trim()))) {
+    announce('Open the brief, choose a format and enter your direction before exporting.');
+    return;
+  }
+  const image = isImage(brief.mode);
+  const payload = {format: 'envision-brief-1', kind: image ? 'image' : 'show', title: brief.title, prompt: buildPrompt(brief)};
+  if (!image) payload.copy = brief.copy || '';
+  const url = URL.createObjectURL(new Blob([JSON.stringify(payload)], {type: 'application/json'}));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = (brief.title.replace(/[<>:"/\\|?*]/g, '-').slice(0, 100) || 'Envision') + '.brief.json';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  announce('Brief exported. Open Import project in your personal studio.');
+}
+
+byId('export-current').addEventListener('click', () => exportBrief(briefValues()));
 
 function renderSaved() {
   const list = byId('saved-list');
@@ -267,6 +348,7 @@ function renderSaved() {
     byId('empty-saved').hidden = records.length > 0;
     byId('empty-saved').textContent = 'Save a brief from the Studio to reopen it here.';
     for (const record of records) {
+      if (!record || typeof record.title !== 'string' || !record.id) continue;
       const item = document.createElement('li');
       const title = document.createElement('span');
       title.className = 'event-name';
@@ -280,27 +362,17 @@ function renderSaved() {
       transfer.type = 'button';
       transfer.textContent = 'Export brief';
       transfer.setAttribute('aria-label', 'Export brief for ' + record.title);
-      transfer.addEventListener('click', () => {
-        if (typeof record.title !== 'string' || !record.title.trim() || !Object.hasOwn(formats, record.format)) {
-          announce('Open this saved event, choose its format and save it before exporting.');
-          return;
-        }
-        const brief = {format: 'envision-brief-1', title: record.title,
-          prompt: buildPrompt(record), copy: record.copy || ''};
-        const url = URL.createObjectURL(new Blob([JSON.stringify(brief)], {type: 'application/json'}));
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = (record.title.replace(/[<>:"/\\|?*]/g, '-').slice(0, 100) || 'Envision') + '.brief.json';
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
-        announce('Brief prepared for import into your personal studio.');
-      });
+      transfer.addEventListener('click', () => exportBrief(record));
       item.append(title, open, transfer);
       list.append(item);
     }
+    if (list.children.length < records.length) {
+      byId('empty-saved').hidden = false;
+      byId('empty-saved').textContent = 'Some saved briefs could not be read. Their data is still in this browser.';
+    }
   } catch {
     byId('empty-saved').hidden = false;
-    byId('empty-saved').textContent = 'Saved events are unavailable in this browser.';
+    byId('empty-saved').textContent = 'Saved briefs are unavailable in this browser.';
   }
 }
 
@@ -326,5 +398,6 @@ addEventListener('storage', (event) => {
 });
 
 // Keep the static guide available until the studio is ready to use.
+syncMode();
 selectTab(byId('tab-studio'));
 byId('tab-studio').parentElement.hidden = false;

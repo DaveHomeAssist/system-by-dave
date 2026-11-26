@@ -3,6 +3,8 @@ const el = id => document.getElementById(id);
 const canvas = el('flyer');
 const ctx = canvas.getContext('2d');
 let project, background, images, generation = 0, busy = false, dirty = false;
+const sampleFilename = 'optical-study.flyer.json';
+const sampleLimit = 128 * 1024;
 const report = message => { el('status').textContent = message; };
 const allowedImage = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/;
 function loadImage(src) {
@@ -13,6 +15,8 @@ function loadImage(src) {
 }
 function current() { return project.layers[el('slot').selectedIndex]; }
 function controls() {
+  el('project').disabled = el('open-sample').disabled = el('reopen-sample').disabled = busy;
+  el('reopen-sample').hidden = !project;
   el('fields').disabled = el('save').disabled = el('export').disabled = !project || busy;
   if (!project) return;
   el('wording').value = current().text;
@@ -67,19 +71,65 @@ function download(blob, name) {
   link.href = url; link.download = name; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
-el('project').onchange = async event => {
-  const file = event.target.files[0]; event.target.value = '';
-  if (!file || busy || (dirty && !confirm('Open another layout and discard your unsaved edits?'))) return;
-  busy = true; controls(); el('project').disabled = true;
+async function importLayout(readText, filename) {
+  if (busy || (dirty && !confirm('Open another layout and discard your unsaved edits?'))) return false;
+  busy = true; controls();
+  report('Opening layout…');
   try {
+    await openLayout(JSON.parse(await readText()), filename);
+    el('file-options-title').textContent = 'Open another layout';
+    el('file-options').open = false;
+    return true;
+  } catch (error) {
+    report('Could not open layout. ' + error.message);
+    return false;
+  } finally {
+    busy = false; controls();
+  }
+}
+el('project').onchange = event => {
+  const file = event.target.files[0]; event.target.value = '';
+  if (!file) return;
+  return importLayout(() => {
     if (file.size > 40*1024*1024) throw Error('Layout exceeds 40 MB.');
-    await openLayout(JSON.parse(await file.text()), file.name);
-  } catch (error) { report('Could not open layout. ' + error.message); }
-  finally { busy = false; el('project').disabled = false; controls(); }
+    return file.text();
+  }, file.name);
 };
+async function readSample() {
+  const response = await fetch('./' + sampleFilename, {
+    mode: 'same-origin', redirect: 'error', signal: AbortSignal.timeout(10000)
+  });
+  if (!response.ok || !response.body) throw Error('Sample layout unavailable.');
+  if (Number(response.headers.get('content-length')) > sampleLimit) throw Error('Sample layout exceeds 128 KB.');
+  const reader = response.body.getReader();
+  const chunks = [];
+  let bytes = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > sampleLimit) {
+        await reader.cancel();
+        throw Error('Sample layout exceeds 128 KB.');
+      }
+      chunks.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  return new Blob(chunks).text();
+}
+async function openSample() {
+  const button = this;
+  const restoreFocus = document.activeElement === button;
+  const opened = await importLayout(readSample, sampleFilename);
+  if (restoreFocus && document.activeElement === document.body) {
+    (opened ? el('slot') : button).focus();
+  }
+}
+el('open-sample').onclick = el('reopen-sample').onclick = openSample;
 el('event-name').oninput = event => {
   project.eventName = event.target.value.trim();
-  dirty = true; report('Unsaved event name.');
+  dirty = true; report('Unsaved download name.');
 };
 el('slot').onchange = controls;
 el('wording').oninput = event => {
@@ -93,7 +143,7 @@ el('reset').onclick = () => {
 el('logo').onchange = async event => {
   const file = event.target.files[0]; if (!file) return;
   const layer = current(), index = el('slot').selectedIndex, version = ++generation;
-  busy = true; controls(); el('project').disabled = true;
+  busy = true; controls();
   try {
     if (file.size > 3*1024*1024) throw Error('Choose an image smaller than 3 MB.');
     const source = await new Promise((resolve,reject) => {
@@ -104,7 +154,7 @@ el('logo').onchange = async event => {
     images[index].logo = image; layer.logo = source; dirty = true;
     draw(); report('Logo replaced. Save your copy.');
   } catch { report('Choose a PNG, JPEG or WebP logo under 3 MB.'); }
-  finally { busy = false; el('project').disabled = false; controls(); }
+  finally { busy = false; controls(); }
 };
 el('save').onclick = () => {
   if (!el('event-name').reportValidity() || !project.eventName) { el('event-name').focus(); return; }

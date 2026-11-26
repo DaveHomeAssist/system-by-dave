@@ -164,7 +164,7 @@ function assertRailRegistryContracts(registry) {
     ['cueforge', 'CueForge', 'handoff', 'https://systembydave.com/cueforge.html', 'Desktop app'],
     ['plotforge', 'PlotForge', 'handoff', 'plotforge.html', 'Own app'],
     ['housevideo', 'House Video / FMP', 'handoff', 'https://housevideo.app/', 'Link out'],
-    ['run-review', 'Run Review', 'handoff', 'run-review/', 'Own app']
+    ['rehearsal-capture', 'Rehearsal Capture', 'handoff', 'rehearsal-capture/', 'Own app']
   ];
   const actualExternals = (registry.externals || []).map((external) => [
     external.id,
@@ -207,7 +207,7 @@ function assertRailRegistryContracts(registry) {
     if (!registry.baseAssets.includes(asset)) fail(`Rail asset is missing from baseAssets: ${asset}.`);
     if (!registry.offlineAssets().includes(asset)) fail(`Rail asset is missing from offlineAssets: ${asset}.`);
   });
-  if (registry.version !== 'v20261126-run-review') fail(`AV cache generation is not current: ${registry.version}.`);
+  if (registry.version !== 'v20261126-rehearsal-capture') fail(`AV cache generation is not current: ${registry.version}.`);
   if (registry.offlineAssets().some((asset) => /^https?:/i.test(asset))) fail('Offline assets include an external host.');
 
   const storageKeyCount = registry.tools.flatMap((tool) => tool.storageKeys || []).length;

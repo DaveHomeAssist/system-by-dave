@@ -1,5 +1,24 @@
 # Changelog
 
+## November 26, 2026. Envision image briefs
+
+- Envision opens on image prompts with optical, paper and custom subjects. Image revisions can keep the source framing. The prompt can be exported directly to the owner's personal studio.
+- Image briefs import as image projects. Existing saved flyers keep their art direction, format and separate show copy.
+- Imported briefs open directly in Generate on the Mac or Create in the private browser studio. Editable layouts still open in their editor.
+- Mac Generate can recall a selected artwork prompt, the project's saved brief or the built-in sample prompt. Images with a worker receipt show their engine time beside their dimensions.
+
+## November 26, 2026. Envision project artwork
+
+- The public Envision layout editor opens an editable optical study generated on Walter. Its title, caption and credit can be changed, exported as PNG and reopened from an editable copy.
+- Private studio project cards use the latest generated or finished artwork when a layout background has yet to be chosen. Thumbnail requests use project ownership, same-origin browser embedding and an indexed lookup.
+- The System by Dave Prompt Lab page has a dedicated share image made from Walter’s index-card study.
+
+## November 26, 2026. Run Review is now Rehearsal Capture
+
+- The avbydave.com page is now Rehearsal Capture at `/rehearsal-capture/`, with that name on the homepage tools table, the console Show tools menu, the breadcrumb and the page title.
+- `/run-review/` forwards to the new address and keeps any query or hash, so saved links still open it.
+- The Frozen copy at wst.housevideo.app/run-review/ is unchanged. The console registry generation is `v20261126-rehearsal-capture`.
+
 ## November 26, 2026. AV Suite rail icons
 
 - AV Suite rail: every tool has its own icon in the collapsed rail, badges collapse to a dot, groups separated.

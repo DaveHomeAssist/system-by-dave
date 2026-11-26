@@ -81,6 +81,43 @@ class Studio(unittest.TestCase):
                 self.app.config["STORE"].project(c, self.pid, 1)["data"]["name"], "Test Show"
             )
 
+    def test_project_card_uses_only_its_own_artwork(self):
+        def cards():
+            return {p["id"]: p for p in self.get("/state")["projects"]}
+
+        other = self.post("/projects", {"name": "Second project", "kind": "image"})["id"]
+        reference = self.asset(image((32, 24), "red"))
+        self.asset(image((32, 24), "white"), "mask")
+        self.assertIsNone(cards()[self.pid]["cover"])
+
+        store = self.app.config["STORE"]
+        with store.tx(True) as c:
+            first = store.image(c, self.pid, image((32, 24), "navy"))
+            store.version(c, self.pid, first, "First generation", "generation")
+            second = store.image(c, self.pid, image((32, 24), "teal"))
+            store.version(c, self.pid, second, "Color finish", "finish")
+        self.asset(image((32, 24), "silver"), "logo")
+        listing = cards()
+        self.assertEqual(listing[self.pid]["cover"], second)
+        self.assertIsNone(listing[self.pid]["background"])
+        self.assertIsNone(listing[other]["cover"])
+        self.assertEqual(listing[self.pid]["revision"], 1)
+        thumb_url = self.api + self.project + "/media/" + second + "?thumb=1"
+        with self.http.get(thumb_url, headers=OWNER) as thumb:
+            self.assertEqual(thumb.status_code, 200)
+            self.assertEqual(thumb.mimetype, "image/webp")
+            self.assertEqual(thumb.headers["Cross-Origin-Resource-Policy"], "same-origin")
+            self.assertEqual(thumb.headers["Cache-Control"], "private, no-store")
+
+        project = self.get(self.project)
+        project["data"]["background"] = reference["hash"]
+        saved = self.http.patch(
+            self.api + self.project, headers=OWNER,
+            json={"revision": project["revision"], "data": project["data"]},
+        )
+        self.assertEqual(saved.status_code, 200)
+        self.assertEqual(cards()[self.pid]["cover"], reference["hash"])
+
     def test_lease_cancel_retry_and_mask(self):
         source = self.asset(image((40, 30), "#123456"))
         mask = Image.new("L", (40, 30), 0)
@@ -247,6 +284,32 @@ class Studio(unittest.TestCase):
             )
             with self.assertRaises(ValueError):
                 verify(z, target)
+
+    def test_public_brief_import_preserves_project_kind(self):
+        brief = {"format": "envision-brief-1", "title": "Optical study", "prompt": "A prism in cyan light."}
+
+        def upload(payload):
+            raw = json.dumps(payload).encode()
+            return self.http.post(
+                self.api + "/imports", headers=OWNER, data={"file": (io.BytesIO(raw), "Study.brief.json")}
+            )
+
+        for kind in ("image", "show", None):
+            with self.subTest(kind=kind):
+                payload = brief | {"copy": "Approved show text"}
+                if kind:
+                    payload["kind"] = kind
+                reply = upload(payload)
+                self.assertEqual(reply.status_code, 201)
+                self.assertEqual(reply.json["sourceFormat"], "envision-brief-1")
+                data = self.get("/projects/" + reply.json["id"])["data"]
+                self.assertEqual(data["kind"], kind or "show")
+                self.assertEqual(data["brief"], brief["prompt"])
+                if kind == "image":
+                    self.assertEqual(data["fields"], {})
+                else:
+                    self.assertEqual(data["fields"]["copy"], payload["copy"])
+        self.assertEqual(upload(brief | {"kind": "unknown"}).status_code, 400)
 
     def test_legacy_native_export_and_snapshot(self):
         def url(raw):

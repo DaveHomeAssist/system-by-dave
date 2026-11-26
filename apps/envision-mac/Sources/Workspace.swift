@@ -22,6 +22,13 @@ struct Direction: Codable {
     var retryKey: String?
 }
 
+struct PromptReplacement: Identifiable {
+    let id = UUID()
+    let project: String
+    let previous: String
+    let text: String
+}
+
 @MainActor final class Workspace: ObservableObject {
     static let shared = Workspace()
     private let defaults = UserDefaults.standard
@@ -31,7 +38,9 @@ struct Direction: Codable {
     @Published var newProjectSheet = false
     @Published var projects: [ProjectRow] = []
     @Published var projectID = ""
+    @Published private(set) var projectBrief = ""
     @Published var draft = Direction() { didSet { persistDraft() } }
+    @Published var promptReplacement: PromptReplacement?
     @Published var artworks: [Artwork] = []
     @Published var selectedID = ""
     @Published var jobs: [Job] = []
@@ -69,6 +78,19 @@ struct Direction: Codable {
         let restored = defaults.data(forKey: draftKey).flatMap { try? JSONDecoder().decode(Direction.self, from: $0) }
         draft = restored ?? Direction()
     }
+    func recallPrompt(_ text: String) {
+        if draft.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            draft.prompt = text
+        } else if draft.prompt != text {
+            promptReplacement = PromptReplacement(project: projectID, previous: draft.prompt, text: text)
+        }
+    }
+    func replacePrompt(_ pending: PromptReplacement) {
+        if projectID == pending.project && draft.prompt == pending.previous {
+            draft.prompt = pending.text
+        }
+        promptReplacement = nil
+    }
     private func activate(_ origin: StudioOrigin) {
         let firstConnectionDraft = client == nil && !draft.prompt.isEmpty ? draft : nil
         client = StudioClient(origin)
@@ -78,6 +100,8 @@ struct Direction: Codable {
         projects = []
         jobs = []
         artworks = []
+        projectBrief = ""
+        promptReplacement = nil
         selectedID = ""
         studioURL = nil
         lastResult = nil
@@ -103,6 +127,8 @@ struct Direction: Codable {
         defaults.set(id, forKey: lastProjectKey)
         selectedID = ""
         artworks = []
+        projectBrief = ""
+        promptReplacement = nil
         lastResult = nil
         notice = ""
         if let unassigned, defaults.data(forKey: draftKey) == nil {
@@ -144,6 +170,8 @@ struct Direction: Codable {
         do {
             let info: ProjectInfo = try await api.read("projects/\(id)")
             guard api === client, id == projectID, !Task.isCancelled else { return }
+            let savedBrief = info.data?.brief ?? ""
+            if projectBrief != savedBrief { projectBrief = savedBrief }
             artworks = info.versions.filter { $0.role != "mask" }
             let result = projectJobs.first(where: { $0.state == "succeeded" })?.result
             if let result, result != lastResult, artworks.contains(where: { $0.id == result }) {
@@ -248,9 +276,16 @@ struct Direction: Codable {
         busy = true
         do {
             let limit = (file.pathExtension.lowercased() == "zip" ? 96 : 40) * 1_048_576
-            let imported: ProjectID = try await api.upload(file, to: "imports", limit: limit)
-            chooseProject(imported.id)
-            showStudio("layout", project: imported.id)
+            let imported: ImportedProject = try await api.upload(file, to: "imports", limit: limit)
+            if api === client {
+                chooseProject(imported.id)
+                if imported.sourceFormat == "envision-brief-1" {
+                    draft.prompt = imported.data.brief
+                    area = .generate
+                } else {
+                    showStudio("layout", project: imported.id)
+                }
+            }
         } catch { issue = error.localizedDescription }
         busy = false
         await refresh()
