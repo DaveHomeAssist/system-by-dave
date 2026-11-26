@@ -1,5 +1,11 @@
 # Changelog
 
+## November 26, 2026. Project directory artwork and Envision names
+
+- Search the Tools directory by name or subject, combine a search with a category, and return to those results with Back. The results scroll beneath the controls in both themes.
+- OnTrack, AV Video, Garden OS and Hat-in-Ring Radar use individual images generated on Walter. Theme Organizer keeps its selected screenshot crop. OnTrack uses its turntable study when a link is shared.
+- Rename a candidate in the private Envision Library and reopen its editable package with the saved artwork name. A concurrent rename prompts the operator to review the current name.
+
 ## November 26, 2026. Envision artwork review
 
 - Browse search results and favorites in the private studio with Previous, Next or the arrow keys. Full view shows each image’s dimensions, seed and recorded render time when available.
