@@ -1,5 +1,11 @@
 # Changelog
 
+## November 26, 2026. Envision artwork review
+
+- Browse search results and favorites in the private studio with Previous, Next or the arrow keys. Full view shows each image’s dimensions, seed and recorded render time when available.
+- Compare opens a revision beside its source. Switching the visible side keeps the candidate selected for editing. A completed background render leaves a review in place.
+- The Back Focus directory card and House Video link preview use two camera studies generated on Walter.
+
 ## November 26, 2026. Envision Mac render comparisons
 
 - Compare a generated revision with its original directly from the canvas, choose a different candidate, or replace one side. The Mac saves the selected pixels and their render details for offline use.

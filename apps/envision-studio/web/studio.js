@@ -12,6 +12,10 @@ const state = {
   favorite: false,
   compare: false,
   other: null,
+  pinnedOther: null,
+  flipped: false,
+  proofOther: false,
+  reviewItems: [],
   mask: null,
   maskParent: null,
   request: 0,
@@ -206,7 +210,12 @@ function projectCards() {
     );
   $('archive-filter').textContent = state.archived ? 'Show active' : 'Show archived';
 }
-function displayTab(name) {
+function displayTab(name, refresh = true) {
+  if (name === 'layout' && state.tab !== name) {
+    state.compare = false;
+    state.flipped = false;
+    $('frames').classList.remove('zoomed');
+  }
   state.tab = name;
   const target =
     state.project && ['create', 'library', 'layout'].includes(name)
@@ -222,8 +231,11 @@ function displayTab(name) {
   $('bench').hidden = !['create', 'library', 'layout'].includes(name);
   for (const id of ['create', 'library', 'layout']) $(id).hidden = id !== name;
   if (name === 'layout') $('view-mode').value = 'layout';
-  if (name === 'create') $('view-mode').value = 'art';
-  if (state.project && !$('bench').hidden) preview();
+  if (name === 'create' || name === 'library') $('view-mode').value = 'art';
+  if (refresh && state.project && !$('bench').hidden) {
+    if (name === 'library') library();
+    else updateArtwork();
+  }
 }
 async function tab(name) {
   if (name === state.tab || !mayLeave()) return;
@@ -247,22 +259,28 @@ async function tab(name) {
   if (name === 'projects') await dashboard();
 }
 async function open(pid, tabName = 'create') {
-  if (!mayLeave()) return;
+  if (!mayLeave()) return false;
   const token = ++state.request;
   const p = await api('/projects/' + pid);
-  if (token !== state.request) return;
+  if (token !== state.request) return false;
   state.project = p;
   state.drafts.clear();
   const artwork = p.versions.filter((v) => v.role !== 'mask');
   const cover = artwork.find((v) => v.hash === p.data.background)
     || artwork.find((v) => v.role === 'generation' || v.role === 'finish');
-  state.version = p.data.selected || cover?.id || artwork[0]?.id || null;
+  state.version = artwork.find((v) => v.id === p.data.selected)?.id || cover?.id || artwork[0]?.id || null;
   state.stage = p.data.stages[0].id;
   for (const e of p.exports || [])
     if (['queued', 'running'].includes(e.state)) state.exports.set(e.id, p.id);
   state.layer = null;
   state.compare = false;
   state.other = null;
+  state.pinnedOther = null;
+  state.flipped = false;
+  state.proofOther = false;
+  state.favorite = false;
+  state.reviewItems = [];
+  $('frames').classList.remove('zoomed');
   state.mask = null;
   state.maskParent = null;
   state.submitKey = null;
@@ -274,10 +292,12 @@ async function open(pid, tabName = 'create') {
   $('format').value = 'source';
   state.lastFormat = 'source';
   remember('envision.personal.last', pid);
+  displayTab(tabName, false);
   syncProject(true);
-  displayTab(tabName);
   await presets();
+  if (state.project?.id !== pid || state.tab !== tabName) return false;
   say(p.data.name + ' · revision ' + p.revision);
+  return true;
 }
 async function reload(forms = false) {
   if (!state.project) return;
@@ -324,21 +344,16 @@ function syncProject(forms) {
   $('project-title').textContent = p.data.name;
   $('project-kind').textContent = p.data.kind === 'show' ? 'Show project' : 'Image project';
   if (!stage()) state.stage = p.data.stages[0].id;
-  if (!version()) state.version = p.data.selected || visibleVersions()[0]?.id || null;
+  const artwork = visibleVersions();
+  if (!artwork.some((v) => v.id === state.version))
+    state.version = artwork.find((v) => v.id === p.data.selected)?.id || artwork[0]?.id || null;
   if (!layer()) state.layer = stage().layers[0]?.id || null;
-  const refs = visibleVersions().map((v) => [v.id, v.label]);
+  const refs = artwork.map((v) => [v.id, v.label]);
   options('starting', [['', 'None'], ...refs], $('starting').value);
+  const byHash = new Map(artwork.map((v) => [v.hash, v.label]));
   for (const id of ['composition', 'style-ref']) {
-    const map = new Map(visibleVersions().map((v) => [v.hash, v.label]));
-    options(id, [['', 'None'], ...map], $(id).value);
+    options(id, [['', 'None'], ...byHash], $(id).value);
   }
-  if (state.other === state.version || !p.versions.some((v) => v.id === state.other))
-    state.other = visibleVersions().find((v) => v.id !== state.version)?.id || null;
-  options(
-    'compare-version',
-    refs.filter(([id]) => id !== state.version),
-    state.other,
-  );
   if (forms) {
     options(
       'stage',
@@ -354,10 +369,9 @@ function syncProject(forms) {
     fieldsForm();
     restoreDrafts();
   }
-  library();
+  if (state.tab === 'library') library();
+  else updateArtwork();
   exportList();
-  preview();
-  operation();
 }
 function viewUrl(hash) {
   if ($('view-mode').value === 'art') return hash ? media(state.project.id, hash) : null;
@@ -393,26 +407,82 @@ for (const id of ['art', 'other-art']) {
     if (n.getAttribute('src') === url) say(message, true);
   });
 }
+function reviewedVersion() {
+  if (state.tab === 'library' && !state.reviewItems.length) return null;
+  return version();
+}
+function librarySelection() {
+  const selected = state.tab === 'library' && reviewedVersion();
+  if (!selected) throw Error('Select a visible artwork first.');
+  return selected;
+}
+function artworkDetails(v) {
+  if (!v) return '';
+  const parts = [v.width + ' × ' + v.height];
+  const receipt = v.recipe?.receipt;
+  if (receipt?.model) parts.push(receipt.model === 'sd_xl_turbo_1.0_fp16.safetensors'
+    ? 'SDXL Turbo' : receipt.model);
+  if (Number.isFinite(receipt?.engineSeconds) && receipt.engineSeconds >= 0)
+    parts.push('Render ' + receipt.engineSeconds.toFixed(1) + ' s');
+  if (Number.isInteger(v.recipe?.seed)) parts.push('Seed ' + v.recipe.seed);
+  return parts.join(' · ');
+}
+function compareSide(second, selected) {
+  if (!state.compare || !selected) return '';
+  if (!second) return 'Selected';
+  return state.other === (selected.parent || selected.recipe?.parent) ? 'Original' : 'Comparison';
+}
+function fullView() {
+  const second = state.compare && state.other && state.proofOther;
+  const src = $(second ? 'other-art' : 'art').getAttribute('src');
+  if (!src) {
+    if ($('proof-dialog').open) $('proof-dialog').close();
+    return;
+  }
+  const v = second ? state.project.versions.find((x) => x.id === state.other) : reviewedVersion();
+  setImg('proof-art', src);
+  const layout = $('view-mode').value === 'layout';
+  $('proof-label').textContent = layout ? $(second ? 'other-caption' : 'art-caption').textContent
+    : v?.label || state.project.data.name;
+  $('proof-details').textContent = layout ? ''
+    : [compareSide(second, reviewedVersion()), artworkDetails(v)].filter(Boolean).join(' · ');
+  $('proof-details').hidden = !$('proof-details').textContent;
+  $('proof-swap').hidden = !state.compare || !state.other;
+  $('proof-nav').hidden = state.tab !== 'library';
+}
 function preview() {
   if (!state.project) return;
-  const v = version(),
+  const v = reviewedVersion(),
     o = state.project.versions.find((x) => x.id === state.other);
   const comparing = state.compare && Boolean(o);
+  const emptyLibrary = state.tab === 'library' && !v;
   const currentHash =
     state.tab === 'layout' && !comparing
       ? stage()?.background || state.project.data.background
       : v?.hash || state.project.data.background;
-  const url = viewUrl(currentHash);
+  const url = emptyLibrary ? null : viewUrl(currentHash);
   setImg('art', url);
+  $('no-art').textContent = emptyLibrary ? $('library-empty').textContent
+    : 'Choose a reference or generate your first image.';
   $('no-art').hidden = !!url;
+  $('zoom').disabled = !url;
+  $('expand-proof').disabled = !url;
+  $('compare').disabled = !v || !o;
   $('second-frame').hidden = !comparing;
   $('compare-tools').hidden = !comparing;
   setImg('other-art', comparing ? viewUrl(o.hash) : null);
-  $('art-caption').textContent =
-    $('view-mode').value === 'layout' ? stage().name + ' · ' + $('format').value : v?.label || '';
+  $('art-caption').textContent = $('view-mode').value === 'layout' && url
+    ? stage().name + ' · ' + $('format').value : v?.label || '';
   $('other-caption').textContent = o?.label || '';
+  for (const [id, item, second] of [['art-details', v, false], ['other-details', o, true]]) {
+    $(id).textContent = [compareSide(second, v),
+      $('view-mode').value === 'art' ? artworkDetails(item) : ''].filter(Boolean).join(' · ');
+  }
   $('compare').textContent = comparing ? 'End compare' : 'Compare';
-  if (!comparing) $('frames').classList.remove('mobile-compare');
+  $('compare').setAttribute('aria-pressed', String(comparing));
+  $('frames').classList.toggle('mobile-compare', comparing && state.flipped);
+  $('frames').classList.toggle('original-first', comparing && !state.flipped);
+  if ($('proof-dialog').open) fullView();
 }
 function operation() {
   const op = $('operation').value;
@@ -427,42 +497,104 @@ function operation() {
       ? 'The finish applies to the whole image until you paint a region.'
       : 'Paint the area to change.';
 }
+function updateArtwork() {
+  const v = reviewedVersion();
+  const versions = visibleVersions();
+  const others = versions.filter((item) => item.id !== v?.id);
+  const parent = v?.parent || v?.recipe?.parent;
+  const index = versions.findIndex((item) => item.id === v?.id);
+  state.other = v ? (others.find((item) => item.id === state.pinnedOther)
+    || others.find((item) => item.id === parent) || versions[index + 1] || others[0])?.id : null;
+  if (!state.other) state.compare = false;
+  if (state.compare) updateCompareOptions(others);
+  if (state.tab === 'library') {
+    for (const card of $('versions').children) {
+      const selected = card.dataset.version === v?.id;
+      card.classList.toggle('active', selected);
+      card.setAttribute('aria-pressed', String(selected));
+    }
+    const position = state.reviewItems.findIndex((item) => item.id === v?.id);
+    for (const prefix of ['review', 'proof']) {
+      const prev = $(prefix + '-prev'), next = $(prefix + '-next');
+      const focus = document.activeElement;
+      prev.disabled = position < 1;
+      next.disabled = position < 0 || position + 1 >= state.reviewItems.length;
+      if (focus === prev && prev.disabled && !next.disabled) next.focus();
+      if (focus === next && next.disabled && !prev.disabled) prev.focus();
+      $(prefix + '-position').textContent = position + 1 + ' / ' + state.reviewItems.length;
+      $(prefix + '-position').setAttribute('aria-label', 'Artwork ' + (position + 1)
+        + ' of ' + state.reviewItems.length);
+    }
+    $('version-actions').hidden = !v;
+    $('recipe').textContent = v ? JSON.stringify(v.recipe, null, 2) : '';
+    $('favorite').textContent = v?.favorite ? 'Unfavorite' : 'Favorite';
+    $('favorite').setAttribute('aria-pressed', String(!!v?.favorite));
+    $('replay').hidden = !v?.recipe?.prompt;
+  }
+  preview();
+  operation();
+}
+function updateCompareOptions(others) {
+  options('compare-version', others.map((v) => [v.id,
+    Number.isInteger(v.recipe?.seed) ? 'Seed ' + v.recipe.seed + ' · ' + v.label : v.label]), state.other);
+}
+function selectArtwork(id) {
+  if (!state.reviewItems.some((v) => v.id === id) || state.tab !== 'library') return;
+  state.version = id;
+  state.flipped = false;
+  state.proofOther = false;
+  updateArtwork();
+}
+function moveArtwork(delta) {
+  const index = state.reviewItems.findIndex((v) => v.id === state.version);
+  const item = index >= 0 ? state.reviewItems[index + delta] : null;
+  if (!item) return;
+  const cardFocused = document.activeElement?.classList.contains('version');
+  selectArtwork(item.id);
+  if (cardFocused) $('versions').querySelector('[aria-pressed="true"]')?.focus();
+}
 function library() {
   const q = $('library-search').value.trim().toLowerCase();
-  const vs = visibleVersions().filter(
-    (v) =>
-      (!state.favorite || v.favorite) &&
-      [v.label, v.recipe?.prompt || ''].join(' ').toLowerCase().includes(q),
-  );
-  $('versions').replaceChildren(
-    ...vs.map((v) => {
-      const n = button(
-        '',
-        () => {
-          state.version = v.id;
-          syncProject(false);
-        },
-        'version' + (v.id === state.version ? ' active' : ''),
-      );
+  const versions = visibleVersions();
+  state.reviewItems = versions.filter((v) => (!state.favorite || v.favorite) &&
+    [v.label, v.recipe?.prompt || ''].join(' ').toLowerCase().includes(q));
+  const list = $('versions');
+  const nodes = new Map([...list.children].map((el) => [el.dataset.version, el]));
+  let cursor = list.firstElementChild;
+  for (const v of state.reviewItems) {
+    let card = nodes.get(v.id);
+    if (!card) {
+      card = button('', () => selectArtwork(v.id), 'version');
+      card.dataset.version = v.id;
       const im = element('img');
-      im.src = media(state.project.id, v.hash, true);
       im.loading = 'lazy';
+      im.decoding = 'async';
       im.alt = '';
-      n.append(
-        im,
-        element('b', (v.favorite ? '★ ' : '') + v.label),
-        element('small', v.width + ' × ' + v.height + ' · ' + v.role),
-      );
-      return n;
-    }),
-  );
-  $('version-actions').hidden = !version();
-  if (version()) {
-    $('recipe').textContent = JSON.stringify(version().recipe, null, 2);
-    $('favorite').textContent = version().favorite ? 'Unfavorite' : 'Favorite';
-    $('replay').hidden = !version().recipe?.prompt;
+      card.append(im, element('b'), element('small'));
+    }
+    const [im, title, dimensions] = card.children;
+    const src = media(state.project.id, v.hash, true);
+    if (im.getAttribute('src') !== src) im.src = src;
+    title.textContent = (v.favorite ? '★ ' : '') + v.label;
+    dimensions.textContent = (Number.isInteger(v.recipe?.seed) ? 'Seed ' + v.recipe.seed : v.role)
+      + ' · ' + v.width + ' × ' + v.height;
+    if (card !== cursor) list.insertBefore(card, cursor);
+    cursor = card.nextElementSibling;
+    nodes.delete(v.id);
   }
+  for (const obsolete of nodes.values()) obsolete.remove();
+  if (state.reviewItems.length && !state.reviewItems.some((v) => v.id === state.version)) {
+    state.version = state.reviewItems[0].id;
+    state.flipped = false;
+    state.proofOther = false;
+  }
+  $('library-empty').textContent = versions.length
+    ? 'No matching artwork. Clear the search or show all artwork.'
+    : 'Add an image or generate your first candidate in Create.';
+  $('library-empty').hidden = !!state.reviewItems.length;
   $('favorites').textContent = state.favorite ? 'Show all' : 'Favorites';
+  $('favorites').setAttribute('aria-pressed', String(state.favorite));
+  updateArtwork();
 }
 function layerForm() {
   $('source-file').hidden = !stage().importFile;
@@ -647,9 +779,7 @@ async function queueView() {
       if (j.result)
         controls.append(
           button('Open result', async () => {
-            await open(j.project, 'library');
-            state.version = j.result;
-            syncProject(false);
+            if (await open(j.project, 'library')) selectArtwork(j.result);
           }),
         );
       n.append(controls);
@@ -860,35 +990,49 @@ act($('apply-preset'), async () => {
 act($('compare'), () => {
   if (!state.other) throw Error('Add a second image to compare.');
   state.compare = !state.compare;
+  state.flipped = false;
+  state.proofOther = false;
+  if (state.compare) updateCompareOptions(visibleVersions().filter((v) => v.id !== state.version));
   preview();
 });
 act($('expand-proof'), () => {
-  if (!$('art').src) throw Error('Select artwork to view.');
-  $('proof-art').src = $('art').src;
-  $('proof-label').textContent = $('art-caption').textContent || state.project.data.name;
-  $('proof-swap').hidden = !state.compare;
+  if (!$('art').hasAttribute('src')) return;
+  state.proofOther = state.compare && state.flipped && matchMedia('(max-width: 680px)').matches;
+  fullView();
   $('proof-dialog').showModal();
 });
 act($('proof-swap'), () => {
-  const second = $('proof-art').src === $('art').src;
-  $('proof-art').src = $(second ? 'other-art' : 'art').src;
-  $('proof-label').textContent = $(second ? 'other-caption' : 'art-caption').textContent;
+  state.proofOther = !state.proofOther;
+  fullView();
 });
 act($('proof-close'), () => $('proof-dialog').close());
+$('proof-dialog').addEventListener('close', () => setImg('proof-art', null));
 act(
   $('compare-version'),
   () => {
-    state.other = $('compare-version').value;
+    state.pinnedOther = state.other = $('compare-version').value;
     preview();
   },
   'change',
 );
 act($('swap-compare'), () => {
-  const old = state.version;
-  state.version = state.other;
-  state.other = old;
-  syncProject(false);
+  state.flipped = !state.flipped;
+  preview();
 });
+for (const prefix of ['review', 'proof']) {
+  act($(prefix + '-prev'), () => moveArtwork(-1));
+  act($(prefix + '-next'), () => moveArtwork(1));
+}
+function reviewKeys(e) {
+  if (state.tab !== 'library' || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey
+    || e.target.closest('input, textarea, select, [contenteditable]')) return;
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    moveArtwork(e.key === 'ArrowLeft' ? -1 : 1);
+  }
+}
+for (const el of [$('library'), $('proof-dialog'), document.querySelector('.preview')])
+  el.addEventListener('keydown', reviewKeys);
 act($('zoom'), () => {
   $('frames').classList.toggle('zoomed');
 });
@@ -899,11 +1043,13 @@ act($('favorites'), () => {
 });
 $('library-search').oninput = library;
 act($('favorite'), async () => {
-  await post(path('/versions/' + state.version + '/favorite'));
+  const pid = state.project.id;
+  await post(path('/versions/' + librarySelection().id + '/favorite'));
+  if (state.project?.id !== pid) return;
   await reload();
 });
 act($('use-art'), async () => {
-  const v = version();
+  const v = librarySelection();
   await edit((d) => {
     d.selected = v.id;
     d.background = v.hash;
@@ -916,7 +1062,7 @@ act($('save-brief'), async () => {
   });
 });
 act($('replay'), () => {
-  const r = version().recipe;
+  const r = librarySelection().recipe;
   displayTab('create');
   $('prompt').value = r.prompt;
   $('operation').value = r.operation;
@@ -933,12 +1079,13 @@ act($('replay'), () => {
   say('Generation settings restored.');
 });
 act($('revise-art'), () => {
+  const id = librarySelection().id;
   displayTab('create');
-  $('starting').value = state.version;
+  $('starting').value = id;
   $('operation').value = 'revise';
   operation();
 });
-act($('download-art'), () => download(path('/versions/' + state.version + '/png')));
+act($('download-art'), () => download(path('/versions/' + librarySelection().id + '/png')));
 act(
   $('stage'),
   () => {
@@ -1309,7 +1456,8 @@ async function tick() {
         finishedJobs.push(id);
         if (state.project?.id === pid) {
           update = true;
-          if (j.result && !state.dirty) state.version = j.result;
+          if (j.result && !state.dirty && state.tab === 'create' && !$('proof-dialog').open)
+            state.version = j.result;
         }
         say(
           j.state === 'succeeded' ? 'Candidate ready in Library.' : j.error || j.state,
