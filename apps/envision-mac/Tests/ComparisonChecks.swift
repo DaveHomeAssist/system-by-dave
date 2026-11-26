@@ -24,7 +24,9 @@ private func expectsError(_ action: () throws -> Void) throws {
         defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
         let storage = ComparisonStorage(directory: root.appendingPathComponent("Comparisons", isDirectory: true))
         defaults.set(files.map(\.path), forKey: "CompareFiles")
+        let startingPreferences = defaults.persistentDomain(forName: suite) as NSDictionary?
         let model = Workspace(defaults: defaults, comparisonStorage: storage)
+        try check(startingPreferences == defaults.persistentDomain(forName: suite) as NSDictionary?, "Launching the studio wrote a draft or connection setting.")
         func paths(_ compare: Comparison) -> [String?] { compare.slots.map { $0?.url.path } }
         func copies() throws -> [String] {
             (try FileManager.default.contentsOfDirectory(atPath: storage.directory.path)).filter { UUID(uuidString: $0) != nil }
@@ -85,6 +87,10 @@ private func expectsError(_ action: () throws -> Void) throws {
         let picture = try storage.snapshot(rotated, details: metadata)
         try check(try storage.load(picture.url).dimensions == "432 × 768", "EXIF rotation was lost.")
         storage.discard(picture)
+        defaults.set("https://studio.example.invalid/", forKey: "StudioOrigin")
+        let connectedPreferences = defaults.persistentDomain(forName: suite) as NSDictionary?
+        _ = Workspace(defaults: defaults, comparisonStorage: storage)
+        try check(connectedPreferences == defaults.persistentDomain(forName: suite) as NSDictionary?, "Reopening a saved connection rewrote the owner's preferences.")
         print("PASS legacy and local files, invalid side, partial download, navigation cancellation, offline reopen, permissions, cached reuse, stale writer, corrupt copy recovery and EXIF orientation.")
     }
 

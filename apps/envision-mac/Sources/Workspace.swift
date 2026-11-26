@@ -53,6 +53,7 @@ struct PromptReplacement: Identifiable {
     @Published var studioNavigation = 0
     @Published var comparison: Comparison
     private var updating = false
+    private var restoringDraft = false
     private var lastResult: String?
 
     init(defaults: UserDefaults = .standard, comparisonStorage: ComparisonStorage = .onThisMac) {
@@ -73,11 +74,13 @@ struct PromptReplacement: Identifiable {
     private var draftKey: String { lastProjectKey + ":draft:" + projectID }
 
     private func persistDraft() {
-        guard let data = try? JSONEncoder().encode(draft) else { return }
+        guard !restoringDraft, let data = try? JSONEncoder().encode(draft) else { return }
         defaults.set(data, forKey: draftKey)
     }
     private func restoreDraft() {
         let restored = defaults.data(forKey: draftKey).flatMap { try? JSONDecoder().decode(Direction.self, from: $0) }
+        restoringDraft = true
+        defer { restoringDraft = false }
         draft = restored ?? Direction()
     }
     func recallPrompt(_ text: String) {
@@ -96,7 +99,6 @@ struct PromptReplacement: Identifiable {
     private func activate(_ origin: StudioOrigin) {
         let firstConnectionDraft = client == nil && !draft.prompt.isEmpty ? draft : nil
         client = StudioClient(origin)
-        defaults.set(origin.url.absoluteString, forKey: "StudioOrigin")
         reachable = false
         workerStatus = "Connecting"
         projects = []
@@ -116,7 +118,10 @@ struct PromptReplacement: Identifiable {
     func connect(_ address: String) async {
         do {
             let origin = try StudioOrigin(address)
-            if client?.origin != origin { activate(origin) }
+            if client?.origin != origin {
+                activate(origin)
+                defaults.set(origin.url.absoluteString, forKey: "StudioOrigin")
+            }
             connectionSheet = false
             await refresh()
             if area == .studio { showStudio() }
