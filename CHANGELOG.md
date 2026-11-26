@@ -1,5 +1,9 @@
 # Changelog
 
+## November 26, 2026. AV Suite rail icons
+
+- AV Suite rail: every tool has its own icon in the collapsed rail, badges collapse to a dot, groups separated.
+
 ## November 26, 2026. Envision Studio for Mac
 
 - The Apple Silicon app opens on image generation. Select a project, give Walter a prompt or reference, compare candidates and save the chosen PNG. The app icon and sample artwork came from studio renders.
