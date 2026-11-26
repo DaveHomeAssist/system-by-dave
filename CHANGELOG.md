@@ -1,5 +1,9 @@
 # Changelog
 
+## November 26, 2026. Recipe Journal mirror
+
+- Browse the live public Recipe Journal at `/recipes/`. The full Journal opens separately for family sign-in and Kitchen.
+
 ## November 26, 2026. Prompt Library image exports
 
 - Open an image prompt to copy it or export a named brief for Envision. The Urban Architecture entry includes a render made from its exact prompt.
