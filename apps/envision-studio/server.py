@@ -247,7 +247,8 @@ def create_app(root, owner, worker_key, origin):
     @app.get("/ui/directions/<name>")
     def direction_asset(name):
         need(name == "catalog.js" or name.endswith(".webp"), "Unknown direction asset.", 404)
-        return send_from_directory(WEB / "directions", name)
+        media_type = "text/javascript" if name == "catalog.js" else "image/webp"
+        return send_from_directory(WEB / "directions", name, mimetype=media_type)
 
     @app.get(BASE + "/state")
     def dashboard():
