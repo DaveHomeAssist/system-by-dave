@@ -194,7 +194,7 @@ try {
   assert.deepEqual(railRefs, [
     'tool:throwline', 'tool:led-wall-calculator', 'panel:video:flow', 'guide:console-spec', 'console:av-calculator',
     'console:av-video', 'console:audio', 'console:show-control', 'console:show-ops', 'console:front-office', 'console:shop', 'console:infrastructure', 'console:lighting',
-    'tool:teleprompter', 'tool:show-timer', 'tool:cue-sheet', 'tool:pixelforge', 'tool:stageplotter', 'external:run-review',
+    'tool:teleprompter', 'tool:show-timer', 'tool:cue-sheet', 'tool:pixelforge', 'tool:stageplotter', 'external:rehearsal-capture',
     'console:equipment-lab', 'tool:gear-reference',
     'guide:frame-sync', 'guide:fault-finding', 'guide:field-kit'
   ], 'the rail is Featured, Departments, Show tools, Reference and Learn');

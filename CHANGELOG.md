@@ -1,5 +1,11 @@
 # Changelog
 
+## November 26, 2026. Run Review is now Rehearsal Capture
+
+- The avbydave.com page is now Rehearsal Capture at `/rehearsal-capture/`, with that name on the homepage tools table, the console Show tools menu, the breadcrumb and the page title.
+- `/run-review/` forwards to the new address and keeps any query or hash, so saved links still open it.
+- The Frozen copy at wst.housevideo.app/run-review/ is unchanged. The console registry generation is `v20261126-rehearsal-capture`.
+
 ## November 26, 2026. Run Review on avbydave.com
 
 - Run Review now opens at `/run-review/` on avbydave.com, from the homepage tools table (Early build) and the console's Show tools menu. It is the Frozen Rehearsal Review viewer, unchanged, pinned to its `frozen-rehearsal-capture` build and given the AV by Dave name, breadcrumb, palette and shared theme choice.
