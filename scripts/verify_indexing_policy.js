@@ -96,7 +96,9 @@ const robots = read('robots.txt');
 const fieldKitListed = sitemapRoutes.has('/field-kit/');
 // Envision and its portable layout editor are both direct-access routes.
 // The private Envision coordinator adds one tracked noindex source template.
-const expectedUnlisted = fieldKitListed ? 224 : 225;
+// Run Review adds two noindex pages: the avbydave.com route run-review/ and its pinned
+// upstream viewer under apps/run-review/upstream/ (docs/run-review.md, 2026-11-26).
+const expectedUnlisted = fieldKitListed ? 226 : 227;
 if (unlisted.length !== expectedUnlisted) fail(`Expected ${expectedUnlisted} tracked routes outside the sitemap; found ${unlisted.length}.`);
 SBD_REGISTRY.tools.filter((tool) => tool.tag === 'Application').forEach((tool) => {
   const route = `/${tool.href}`;

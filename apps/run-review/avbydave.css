@@ -1,0 +1,23 @@
+/* AV by Dave skin for the Run Review managed release (docs/run-review.md).
+   Inlined after the viewer's own styles by scripts/build_run_review.mjs.
+   Colors come from css/avd/tokens.css, which the page links: Gaffer (dark)
+   by default and Call Sheet (light) under [data-theme="light"], the same
+   attribute the viewer's theme control sets. Photo wells stay neutral. */
+:root, :root[data-theme="dark"], :root[data-theme="light"] {
+  --frozen-ground: var(--ground); --frozen-surface: var(--surface); --frozen-raised: var(--surface-raised); --frozen-sunken: var(--surface-sunken);
+  --frozen-ink: var(--ink); --frozen-muted: var(--ink-muted); --frozen-faint: var(--ink-faint); --frozen-hairline: var(--hairline); --frozen-control: var(--line-control);
+  --frozen-accent: var(--tape); --frozen-on-accent: var(--on-tape); --frozen-focus: var(--focus-ring); --frozen-hover: var(--action-hover); --frozen-aurora: var(--surface-raised);
+  --ok: var(--state-done); --fix: var(--state-blocked); --q: var(--state-active);
+}
+html, body { font-family: var(--font-sans); }
+.brand h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: 0; }
+.brand h1 a { color: inherit; }
+.brand h1 a.avd-crumb-home { color: var(--ink); }
+.brand h1 a.avd-crumb-parent { color: var(--ink-muted); font-weight: 600; }
+.brand h1 .avd-crumb-current { color: var(--ink); }
+code, kbd { font-family: var(--font-mono); }
+.btn.primary { background: var(--tape); color: var(--on-tape); border-color: var(--tape); }
+.btn.primary:hover { background: var(--action-hover); border-color: var(--action-hover); color: var(--on-tape); }
+.sbd-skip-link { position: fixed; top: 8px; left: 8px; z-index: 2147483647; min-height: 44px; display: inline-flex; align-items: center; padding: 10px 14px; border-radius: var(--radius-md); background: var(--tape); color: var(--on-tape); font: 700 14px/1.2 var(--font-sans); text-decoration: none; transform: translateY(-160%); }
+.sbd-skip-link:focus { transform: translateY(0); outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .sbd-skip-link { transition: none; } }
