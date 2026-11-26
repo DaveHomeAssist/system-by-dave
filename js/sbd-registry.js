@@ -322,7 +322,7 @@
     {id:'cueforge',label:'CueForge',kind:'handoff',destination:'https://systembydave.com/cueforge.html',badge:'Desktop app'},
     {id:'plotforge',label:'PlotForge',kind:'handoff',destination:'plotforge.html',badge:'Own app'},
     {id:'housevideo',label:'House Video / FMP',kind:'handoff',destination:'https://housevideo.app/',badge:'Link out'},
-    {id:'run-review',label:'Run Review',kind:'handoff',destination:'run-review/',badge:'Own app'}
+    {id:'rehearsal-capture',label:'Rehearsal Capture',kind:'handoff',destination:'rehearsal-capture/',badge:'Own app'}
   ];
 
   /* Guide pages are not tools: they stay out of the sitemap, the offline
@@ -349,7 +349,7 @@
   var MENU={
     departments:['av-video','audio','lighting','show-control','show-ops','infrastructure','shop','front-office'],
     /* Plain ids are tools; a namespaced ref (external:...) is an own-app handoff. */
-    showTools:['teleprompter','show-timer','cue-sheet','pixelforge','stageplotter','external:run-review'],
+    showTools:['teleprompter','show-timer','cue-sheet','pixelforge','stageplotter','external:rehearsal-capture'],
     reference:[
       {kind:'console',id:'equipment-lab',blurb:'Library, practice and 3D models'},
       {kind:'tool',id:'gear-reference',blurb:'Offline field sheets'}
@@ -399,7 +399,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261126-run-review',
+    version:'v20261126-rehearsal-capture',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

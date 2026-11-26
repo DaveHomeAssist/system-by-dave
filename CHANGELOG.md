@@ -1,5 +1,11 @@
 # Changelog
 
+## November 26, 2026. Run Review is now Rehearsal Capture
+
+- The avbydave.com page is now Rehearsal Capture at `/rehearsal-capture/`, with that name on the homepage tools table, the console Show tools menu, the breadcrumb and the page title.
+- `/run-review/` forwards to the new address and keeps any query or hash, so saved links still open it.
+- The Frozen copy at wst.housevideo.app/run-review/ is unchanged. The console registry generation is `v20261126-rehearsal-capture`.
+
 ## November 26, 2026. Envision Studio for Mac
 
 - The Apple Silicon app opens on image generation. Select a project, give Walter a prompt or reference, compare candidates and save the chosen PNG. The app icon and sample artwork came from studio renders.
