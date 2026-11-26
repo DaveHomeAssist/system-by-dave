@@ -40,6 +40,11 @@ concurrency:
 # into pages and runtimes, and the retained fixture probes into two slices of
 # scripts/probe_av_retained.mjs (AV_RETAINED_FROM / AV_RETAINED_UNTIL), so no
 # gate runs much past the domain cutover job. Every check still runs once.
+# Later that day (round 2) the long jobs were split once more: ATEM and NoteForge
+# moved to their own job, AV Video and Equipment Lab became separate jobs, the
+# retained consoles run as two matrix legs, and the domain cutover browser test
+# runs its page sweeps and its flows as two legs (CUTOVER_PART). The camera
+# simulator, about three minutes, is now the longest gate.
 jobs:
   domain-cutover:
     uses: ./.github/workflows/domain-cutover.yml
@@ -134,16 +139,11 @@ jobs:
           node scripts/probe_engineering_daily.cjs
           node scripts/probe_engineering_entry.cjs
 
-      - name: Verify ATEM switcher guide
-        env:
-          CHROME_CHANNEL: chrome
-        run: npm run test:switcher-guide-browser
-
       - name: Verify AV bounded workspaces
         run: npm run test:av-workspace
 
   site-runtimes:
-    name: Throwline, Shader practice and NoteForge in a browser
+    name: Throwline and Shader practice in a browser
     if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -169,13 +169,39 @@ jobs:
       - name: Verify Shader practice browser runtime
         run: npm run test:shader-practice-browser
 
+  site-guides:
+    name: ATEM switcher guide and NoteForge in a browser
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
+
+      - name: Verify ATEM switcher guide
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:switcher-guide-browser
+
       - name: Verify NoteForge host shell
         env:
           CHROME_CHANNEL: chrome
         run: npm run test:noteforge-shell-browser
 
-  console:
-    name: AV Video, Equipment Lab and the console shell
+  av-video:
+    name: AV Video and the console shell
     if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -204,15 +230,6 @@ jobs:
           npm run build:av-video
           npm run test:av-video-browser
 
-      - name: Verify Equipment Lab
-        env:
-          CHROME_CHANNEL: chrome
-        run: |
-          npm run verify:equipment-lab
-          npm run typecheck:equipment-lab
-          npm run build:equipment-lab
-          npm run test:equipment-lab-browser
-
       - name: Verify AV Suite shell
         env:
           CHROME_CHANNEL: chrome
@@ -225,8 +242,43 @@ jobs:
 
       - name: Committed builds match their source
         run: |
-          git diff --exit-code -- av av-video equipment-lab
-          test -z "$(git status --porcelain -- av av-video equipment-lab)"
+          git diff --exit-code -- av av-video
+          test -z "$(git status --porcelain -- av av-video)"
+
+  equipment-lab:
+    name: Equipment Lab
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gen_sitemap.py --lastmod reads each page's last commit date
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install verification dependencies
+        run: npm ci
+
+      - name: Verify Equipment Lab
+        env:
+          CHROME_CHANNEL: chrome
+        run: |
+          npm run verify:equipment-lab
+          npm run typecheck:equipment-lab
+          npm run build:equipment-lab
+          npm run test:equipment-lab-browser
+
+      - name: Committed builds match their source
+        run: |
+          git diff --exit-code -- equipment-lab
+          test -z "$(git status --porcelain -- equipment-lab)"
 
   panels:
     name: Department panels
@@ -335,12 +387,12 @@ jobs:
           npm run build:front-office
           npm run build:av-lighting
 
-      # Runs the first slice of the retained probes, up to Front Office; the
-      # retained-consoles job runs the rest of scripts/probe_av_retained.mjs.
+      # Runs the first slice of the retained probes, up to the audio connector;
+      # the retained-consoles legs run the rest of scripts/probe_av_retained.mjs.
       - name: Verify Infrastructure and Shop panels
         env:
           CHROME_CHANNEL: chrome
-          AV_RETAINED_UNTIL: probe_front_office_console
+          AV_RETAINED_UNTIL: probe_av_audio_connector
         run: |
           npm run typecheck:infrastructure
           npm run test:infrastructure
@@ -359,10 +411,20 @@ jobs:
           test -z "$(git status --porcelain -- the-shop infrastructure av-video av-audio show-ops show-control front-office av-lighting)"
 
   retained-consoles:
-    name: Retained fixture consoles
+    name: Retained fixture consoles (${{ matrix.slice }})
     if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - slice: audio to Front Office
+            from: probe_av_audio_connector
+            until: probe_the_shop_console
+          - slice: Shop to Lighting
+            from: probe_the_shop_console
+            until: ''
     steps:
       # Actions pinned by SHA per GitHub's security-hardening guide.
       - name: Checkout
@@ -390,11 +452,12 @@ jobs:
           npm run build:infrastructure
           npm run build:the-shop
 
-      # Second slice of scripts/probe_av_retained.mjs, from Front Office to the end.
+      # Later slices of scripts/probe_av_retained.mjs; an empty until runs to the end.
       - name: Verify retained fixture consoles
         env:
           CHROME_CHANNEL: chrome
-          AV_RETAINED_FROM: probe_front_office_console
+          AV_RETAINED_FROM: ${{ matrix.from }}
+          AV_RETAINED_UNTIL: ${{ matrix.until }}
         run: npm run test:av-retained-browser
 
       - name: Committed builds match their source
@@ -447,7 +510,7 @@ jobs:
           test -z "$(git status --porcelain -- av-workbook camera-sim)"
 
   deploy:
-    needs: [domain-cutover, contracts, site-browser, site-runtimes, console, panels, retained, retained-consoles, simulator]
+    needs: [domain-cutover, contracts, site-browser, site-runtimes, site-guides, av-video, equipment-lab, panels, retained, retained-consoles, simulator]
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30

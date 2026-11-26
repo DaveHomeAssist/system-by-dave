@@ -74,8 +74,14 @@ try {
   }
   browser = await chromium.launch({ headless: true, ...(process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANNEL } : {}) });
 
+  // CUTOVER_PART splits the scenarios for parallel CI jobs: "pages" runs the
+  // published page sweeps, "flows" runs everything else. Unset runs all of them.
+  const PAGE_SWEEPS = /all published pages and home links|AV offline manifest and every supported page|AV claims a destination navigation missed during activation|FMP published pages and intentional CSP/;
+  const part = process.env.CUTOVER_PART;
+  if (part && part !== 'pages' && part !== 'flows') throw new Error(`Unknown CUTOVER_PART ${part}`);
   async function test(name, fn) {
     if (process.env.CUTOVER_FILTER && !name.includes(process.env.CUTOVER_FILTER)) return;
+    if (part && (part === 'pages') !== PAGE_SWEEPS.test(name)) return;
     const context = await browser.newContext({ acceptDownloads: true });
     context.setDefaultTimeout(7000);
     if (captureDir) await context.tracing.start({ screenshots: true, snapshots: true });
@@ -760,3 +766,5 @@ try {
 const failures = results.filter(result => !result.pass);
 console.log(`${results.length - failures.length}/${results.length} cutover scenarios passed`);
 if (failures.length) process.exitCode = 1;
+// A part or filter that matches nothing must not pass as a clean run.
+if (!results.length) { console.error('No cutover scenarios ran'); process.exitCode = 1; }
