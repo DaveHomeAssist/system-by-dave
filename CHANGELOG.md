@@ -1,5 +1,9 @@
 # Changelog
 
+## November 26, 2026. Cross-Pollinate clues and vine bonuses
+
+- Revised the starter clues for more challenge without revealing their answers. When a solved long answer grows a vine that reveals a letter, the game identifies the clue that earned it and the clue it helped.
+
 ## November 26, 2026. Cross-Pollinate playtest
 
 - Play the daily garden crossword at `/puzzle/`. Solve crossing words to grow the garden and earn wildcard seeds. The preview is available by direct link.
