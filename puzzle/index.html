@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-PANM59/2N3jfOVxkkYT9sOz+nCkgswpiRZi4/8Gv19w='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-FFaW1vEEh8pIxzP1ga0DkI/VZDbVOpEWTLIRq1K1q2o='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -59,10 +59,10 @@ h1 span{color:var(--accent)}
 .bed-icon{margin-right:5px;color:#dcd89f}
 #completion,#seed-count{font:700 11px var(--sans);color:#e6e8c5}
 .board-wrap{display:grid;place-items:center;min-height:0;container-type:size}
-.board{width:min(100cqw,100cqh);aspect-ratio:1;position:relative;isolation:isolate}
+.board{width:min(100cqw,100cqh);aspect-ratio:1;position:relative;isolation:isolate;container-type:inline-size}
 canvas,.tiles{position:absolute;inset:0;width:100%;height:100%}
 .tiles{display:grid;grid-template-columns:repeat(var(--grid-size,9),minmax(0,1fr));grid-template-rows:repeat(var(--grid-size,9),minmax(0,1fr))}
-.tile{position:relative;min-width:0;min-height:0;background:transparent;border:0;padding:0;display:grid;place-items:center;border-radius:6px;color:#253829;font-weight:750;font-size:clamp(13px,calc(50cqw / var(--grid-size,9)),34px);line-height:1}
+.tile{position:relative;min-width:0;min-height:0;background:transparent;border:0;padding:0;display:grid;place-items:center;border-radius:6px;color:#253829;font-weight:750;font-size:clamp(13px,calc(59cqw / var(--grid-size,9)),34px);line-height:1}
 .tile:focus{outline:0}
 .tile:focus-visible{outline:2px solid #ffcf89;outline-offset:-2px;z-index:1}
 .tile .number{position:absolute;top:6%;left:10%;font:700 clamp(7px,2cqw,11px)/1 var(--sans);color:#435642}
@@ -172,6 +172,18 @@ dialog::backdrop{background:#111a13a0}
 @media(any-pointer:coarse){
  #seed-actions button{min-width:44px;min-height:44px}
  .directions button{min-height:44px}
+}
+
+@media (max-width:720px) and (max-height:650px) and (orientation:portrait){
+ main[data-grid-size="11"]{gap:4px}
+ main[data-grid-size="11"] .play{grid-template-rows:minmax(0,1fr) 166px;gap:5px}
+ main[data-grid-size="11"] .bed{padding-block:4px;gap:2px}
+ main[data-grid-size="11"] .keyboard{gap:2px}
+}
+
+@media (max-height:500px) and (orientation:landscape){
+ main[data-grid-size="11"]{gap:4px;padding-top:4px}
+ main[data-grid-size="11"] .bed{padding-block:3px;gap:2px}
 }
 
 .sbd-skip-link{position:absolute;inset:2px auto auto 2px;transform:translateY(-120%);z-index:3;background:var(--panel);color:var(--ink);padding:12px;border:2px solid var(--accent);border-radius:6px}
@@ -1100,6 +1112,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     attempt = read(viewKey()) === "replay" ? "replay" : "original";
     puzzle = puzzleForDay(day);
     tiles.style.setProperty("--grid-size", String(puzzle.size));
+    document.querySelector("main").dataset.gridSize = String(puzzle.size);
     garden = restore();
     availableKinds = new Set(puzzle.slots.map((item) => plantKind(item.cells.length)));
     byId("plant-collection").style.setProperty("--types", String(availableKinds.size));
