@@ -6,7 +6,7 @@ playtest preview. The page includes up-front site navigation, a skip link,
 social metadata, and a CSP pinning the inline game script.
 
 The build owner is the Cross-Pollinate repository. The export was built
-from revision `0ba24fc17d348589f67449b24ea1f4f86dd808fc` with
+from revision `eb6c016111d00b39f5a68cf47fd036a6c884e1df` with
 `npm run build -- --system-by-dave`. Copy its
 `dist/system-by-dave/index.html` into `puzzle/index.html` for updates. Changes
 to the game or its hosted markup belong in the source repository.
