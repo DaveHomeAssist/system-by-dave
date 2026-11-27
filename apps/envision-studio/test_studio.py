@@ -68,6 +68,12 @@ class Studio(unittest.TestCase):
             403,
         )
         self.post("/worker/claim", {"id": "runner", "profiles": []}, OWNER, (403,))
+        state = self.get("/state")
+        self.assertEqual(
+            state["coordinator"],
+            {"id": "dominic", "name": "Dominic", "online": True, "role": "Project source"},
+        )
+        self.assertNotIn("origin", state["coordinator"])
 
     def test_web_artwork_downloads(self):
         source = Image.new("RGBA", (60, 120), "red")

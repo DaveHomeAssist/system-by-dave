@@ -20,6 +20,8 @@ Use a pair of Walter renders to illustrate the workflow on a fresh offline insta
 
 Open **Generate**, select an image project or create one, then enter a prompt. Choose a canvas size and number of images. The reference and advanced controls also support revising an existing image and choosing a seed. **Generate on Walter** submits the batch. Generated candidates appear in the project gallery. Choose **Save PNG** to export the selected image.
 
+The computer strip shows this Mac, Dominic and Walter separately. Choose **Keep offline** below the project picker to store that project's identity, image direction, artwork records and the selected artwork on this Mac. A disconnected launch can reopen those projects and display the stored image. Offline copies are read-only. Reconnect to Dominic to save, generate, import, edit a layout or update the copy. Choosing another artwork refreshes an enabled copy while connected.
+
 **Recall prompt** offers the project brief, selected artwork prompt and studio sample as available. It fills the prompt editor and asks before replacing a draft. The artwork dimensions include Walter's engine time when recorded. The canvas, references and seed keep their current settings.
 
 Choose **Compare** beneath a render to see its original on the left and the selected revision on the right. With a new render, Compare uses the previous distinct artwork when available. Open the arrow beside Compare to pick any other artwork in the project or replace a single side. The app saves these images on this Mac and shows each available model and engine time below the image.

@@ -58,6 +58,15 @@ async function main() {
     await p.goto(origin);
     await p.locator('#project-grid button').first().waitFor();
     await checkSize(p, 1440, 900);
+    await p.locator('#computers').click();
+    await p.getByRole('heading', { name: 'Computers' }).waitFor();
+    assert.equal(await p.locator('#computer-dominic-state').textContent(), 'Project source online');
+    assert.match(await p.locator('#computer-walter-state').textContent(), /^Walter (online|offline|paused|rendering)|^Engine offline$/);
+    await checkSize(p, 375, 812);
+    await p.locator('#computers-close').focus();
+    assert(await p.locator('#computers-close').evaluate((node) => node === document.activeElement));
+    await p.locator('#computers-close').click();
+    await p.setViewportSize({ width: 1440, height: 900 });
     await shot(p, 'Projects');
     const projects = (await get('/state')).projects;
     const original = projects.find((x) => x.name === 'AfterJinx' && !x.archived);
