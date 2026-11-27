@@ -1,8 +1,8 @@
 # Changelog
 
-## November 26, 2026. Retreat Series preview
+## November 26, 2026. New Bethlehem retreat preview
 
-- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link. The home page features the supplied devotional artwork at its original proportions. The About page introduces Sharon Delaney, links to her EWTN News author profile, and lists four of her National Catholic Register articles.
+- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link. The preview now names New Bethlehem and explains whom the one-day Catholic retreat is for. The home page features the supplied devotional artwork at its original proportions. The About page introduces Sharon Delaney, links to her EWTN News author profile, and lists four of her National Catholic Register articles.
 
 ## November 26, 2026. Envision web artwork and Notion Agents
 
