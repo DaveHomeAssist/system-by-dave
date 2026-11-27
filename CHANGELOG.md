@@ -1,5 +1,9 @@
 # Changelog
 
+## November 26, 2026. Cross-Pollinate playtest
+
+- Play the daily garden crossword at `/puzzle/`. Solve crossing words to grow the garden and earn wildcard seeds. The preview is available by direct link.
+
 ## November 26, 2026. New Bethlehem retreat preview
 
 - Connected the welcome, visit details, registration and public contact to the retreat editor’s published release. Drafts stay in the private editor.
