@@ -1,0 +1,16 @@
+[Unit]
+Description=projctl projector control relay (AV by Dave)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__APP__
+EnvironmentFile=__APP__/data/projctl.env
+ExecStart=__NODE__ __APP__/server/index.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

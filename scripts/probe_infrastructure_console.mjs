@@ -35,7 +35,7 @@ const sources = [
   { schema: 'system-by-dave.cable-plan.v1', items: [{id:'c1',cable:'FOH feed',source:'FOH',destination:'Stage',status:'tested'}] }
 ];
 const fixture = sources.reduce((plan,source)=>mergeLegacy(plan,legacyPreview(source)),{...blank(),name:'Synthetic infrastructure'});
-const panels = [['Power','power'],['Network','network'],['Cable','cable'],['Issues','issues'],['Document','document']];
+const panels = [['Power','power'],['Network','network'],['Cable','cable'],['Issues','issues'],['Project','document']];
 
 const read = (page, key = KEY) => page.evaluate(key => localStorage.getItem(key), key);
 const button = (scope, name) => scope.getByRole('button', { name, exact: true });
@@ -60,7 +60,7 @@ async function save(page) {
   await page.waitForFunction(() => !document.querySelector('.infra-header p').textContent.endsWith(' · unsaved') && /Saved to this browser|Recovered plan saved/.test(document.getElementById('footerMessage').textContent));
   if (await button(page, 'Back to panels').isVisible()) await button(page, 'Back to panels').click();
 }
-async function exportPlan(page) { await quick(page, 'Document'); const downloaded = page.waitForEvent('download'); await button(panel(page, 'document'), 'Export JSON').click(); return JSON.parse(await readFile(await (await downloaded).path(), 'utf8')); }
+async function exportPlan(page) { await quick(page, 'Project'); const downloaded = page.waitForEvent('download'); await button(panel(page, 'document'), 'Export JSON').click(); return JSON.parse(await readFile(await (await downloaded).path(), 'utf8')); }
 async function reachable(control, label = String(control)) {
   await control.scrollIntoViewIfNeeded();
   const r = await control.evaluate(element => {
@@ -128,18 +128,18 @@ try {
   const legacyKeys=['power-plan.v1','network-plan.v1','cable-plan.v1'];
   for(let i=0;i<sources.length;i++){
     const raw=JSON.stringify(sources[i]); await imports.evaluate(({key,raw})=>localStorage.setItem(key,raw),{key:legacyKeys[i],raw});
-    await quick(imports,'Document'); await button(imports,'Import source').click(); await imports.locator('#importFile').setInputFiles(jsonFile(sources[i]));
+    await quick(imports,'Project'); await button(imports,'Import source').click(); await imports.locator('#importFile').setInputFiles(jsonFile(sources[i]));
     await imports.locator('#confirmImport:enabled').waitFor();
     if(i===0){await button(imports,'Close import').click(); assert.equal(await read(imports),null); await button(imports,'Import source').click(); await imports.locator('#importFile').setInputFiles(jsonFile(sources[i]));}
     await imports.locator('#confirmImport').click(); assert.equal(await read(imports),null); assert.equal(await read(imports,legacyKeys[i]),raw);
   }
   await save(imports); const copied=JSON.parse(await read(imports)); assert.equal(copied.records.length,22); assert.deepEqual(copied.legacySources,sources);
-  await quick(imports,'Document'); await button(imports,'Import source').click();
+  await quick(imports,'Project'); await button(imports,'Import source').click();
   await imports.locator('#importFile').setInputFiles(jsonFile({schema:'unknown'})); await imports.getByText(/Import rejected:/).waitFor();
   assert.equal(await imports.locator('#confirmImport').isDisabled(),true); assert.deepEqual(JSON.parse(await read(imports)),copied);
   await imports.locator('#importFile').setInputFiles(jsonFile({schema:sources[1].schema,devices:[null]})); await imports.getByText(/Invalid legacy record/).waitFor();
   assert.deepEqual(JSON.parse(await read(imports)),copied); await button(imports,'Close import').click();
-  await quick(imports,'Document'); await button(imports,'Restore backup').click();
+  await quick(imports,'Project'); await button(imports,'Restore backup').click();
   await imports.locator('#importFile').setInputFiles(jsonFile({...copied,records:[{id:'x',type:'power',name:'bad',status:'',issue:{}}]}));
   await imports.getByText(/Import rejected:/).waitFor(); assert.equal(await imports.locator('#confirmImport').isDisabled(),true);
   await imports.locator('#importFile').setInputFiles(jsonFile({...copied,records:Array.from({length:2001},(_,i)=>({id:String(i),type:'power',name:'C',status:'planned'}))}));
@@ -152,30 +152,30 @@ try {
   assert.deepEqual(await exportPlan(imports),copied);
   pass('three legacy imports and originals, cancel, malformed/oversized/unknown-workspace rejection, stale preview and exportable work');
 
-  await quick(page,'Document'); await page.getByLabel('Plan name').fill('Unsaved recovery plan');
+  await quick(page,'Project'); await page.getByLabel('Plan name').fill('Unsaved recovery plan');
   await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key)||'null')?.doc.name==='Unsaved recovery plan',draftKey);
   assert.deepEqual(JSON.parse(await read(page)),saved); await page.reload(); await button(page,'Restore draft').click();
-  await quick(page,'Document'); assert.equal(await page.getByLabel('Plan name').inputValue(),'Unsaved recovery plan'); await save(page);
+  await quick(page,'Project'); assert.equal(await page.getByLabel('Plan name').inputValue(),'Unsaved recovery plan'); await save(page);
   await page.waitForFunction(key=>localStorage.getItem(key)===null,draftKey);
   const other=await primary.context.newPage(); other.on('dialog',dialog=>dialog.accept()); await other.goto(base+'/infrastructure/'); await other.locator('.console-shell').waitFor();
-  await quick(page,'Document'); await page.getByLabel('Plan name').fill('First tab'); await save(page);
-  await quick(other,'Document'); await other.getByLabel('Plan name').fill('Stale second tab'); await other.locator('#saveBtn').click();
+  await quick(page,'Project'); await page.getByLabel('Plan name').fill('First tab'); await save(page);
+  await quick(other,'Project'); await other.getByLabel('Plan name').fill('Stale second tab'); await other.locator('#saveBtn').click();
   await other.waitForFunction(()=>document.getElementById('footerMessage').textContent.includes('another tab'));
   assert.equal(JSON.parse(await read(other)).name,'First tab'); assert.equal((await exportPlan(other)).name,'Stale second tab'); await other.close();
   const malformed=(await fresh()).page; await malformed.evaluate(key=>localStorage.setItem(key,'{bad draft'),draftKey); await malformed.reload();
-  await quick(malformed,'Document'); await malformed.getByLabel('Plan name').fill('Exportable');
+  await quick(malformed,'Project'); await malformed.getByLabel('Plan name').fill('Exportable');
   await malformed.waitForFunction(()=>document.getElementById('footerMessage').textContent.includes('Draft recovery unavailable'));
   assert.equal(await read(malformed,draftKey),'{bad draft'); assert.equal((await exportPlan(malformed)).name,'Exportable');
   pass('draft offered/restored/cleared, stale-tab Save refusal, malformed draft preservation and exportable conflicts');
 
   const damaged=(await fresh()).page; await damaged.evaluate(key=>localStorage.setItem(key,'{unreadable original'),KEY); await damaged.reload();
-  await quick(damaged,'Document'); const originalDownload=damaged.waitForEvent('download'); await button(damaged,'Download unreadable original').click();
+  await quick(damaged,'Project'); const originalDownload=damaged.waitForEvent('download'); await button(damaged,'Download unreadable original').click();
   assert.equal(await readFile(await (await originalDownload).path(),'utf8'),'{unreadable original');
   await button(damaged,'Restore backup').click(); await damaged.locator('#importFile').setInputFiles(jsonFile(fixture)); await damaged.locator('#confirmImport').click();
   assert.equal(await read(damaged),'{unreadable original'); await save(damaged);
   assert.equal(await damaged.evaluate(()=>Object.keys(localStorage).filter(key=>key.startsWith('sbd.infrastructure.recovery.')).map(key=>localStorage.getItem(key)).includes('{unreadable original')),true);
   assert.deepEqual(JSON.parse(await read(damaged)),fixture);
-  const refused=(await fresh()).page; await seed(refused); await quick(refused,'Document'); await refused.getByLabel('Plan name').fill('Storage refused'); const before=await read(refused);
+  const refused=(await fresh()).page; await seed(refused); await quick(refused,'Project'); await refused.getByLabel('Plan name').fill('Storage refused'); const before=await read(refused);
   await refused.evaluate(key=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k===key)throw Error('Synthetic quota');return set.call(this,k,v);};},KEY);
   await refused.locator('#saveBtn').click(); await refused.waitForFunction(()=>document.getElementById('footerMessage').textContent.includes('Synthetic quota'));
   assert.equal(await read(refused),before); assert.equal((await exportPlan(refused)).name,'Storage refused');

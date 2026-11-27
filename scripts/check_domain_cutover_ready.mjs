@@ -13,26 +13,82 @@ export function checkPrerequisites(env) {
     'Verify Google OAuth origins and backend FMP_ALLOWED_ORIGINS, then record HOUSEVIDEO_WALK_AUTH_VERIFIED=true.');
 }
 
+// GitHub Pages sends cache-control: max-age=600 and its CDN ignores the query
+// string, so a read of the previous release stays fresh for that whole lifetime.
+export function cacheRemainingMs(headers) {
+  const read = name => headers?.get?.(name) ?? headers?.[name] ?? headers?.[String(name).toLowerCase()] ?? '';
+  const maxAge = Number(/max-age=(\d+)/.exec(String(read('cache-control')))?.[1]);
+  if (!Number.isFinite(maxAge)) return 0;
+  const age = Number(read('age') === '' || read('age') == null ? 0 : read('age'));
+  if (!Number.isFinite(age)) return 0;
+  return Math.max(0, (maxAge - age) * 1000);
+}
+
 export async function checkDestination(site, directory, fetchImpl = fetch) {
   const expected = JSON.parse(fs.readFileSync(path.join(directory, 'source.json'), 'utf8'));
   assert.equal(expected.site, site.id, 'Staged site identity differs');
   const origin = `https://${site.domain}`;
+  let carried = null;
   const read = async route => {
+    // cache: 'no-store' only bypasses this process. The Pages CDN still applies max-age.
     const response = await fetchImpl(`${origin}${route}?release=${expected.sourceCommit}`, {
       redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(15000)
     });
+    carried = response;
     assert.equal(response.status, 200, `Destination ${route} is not ready`);
     return response;
   };
-  const actual = await (await read('/source.json')).json();
-  for (const key of ['schema', 'site', 'domain', 'sourceRepository', 'sourceCommit', 'artifactSha256', 'cutover']) {
-    assert.equal(actual[key], expected[key], `Destination ${key} differs from staged release`);
+  const fail = error => {
+    if (carried) error.cacheRemainingMs = cacheRemainingMs(carried.headers);
+    throw error;
+  };
+  try {
+    const actual = await (await read('/source.json')).json();
+    // Content decides readiness. sourceCommit is the commit the site was last published from; a site whose
+    // content did not change keeps an older one (scripts/domain_publish_plan.mjs), and artifactSha256 plus
+    // the page bytes below are what prove the destination serves this release.
+    for (const key of ['schema', 'site', 'domain', 'sourceRepository', 'artifactSha256', 'cutover']) {
+      const seen = typeof actual[key] === 'string' ? actual[key].slice(0, 12) : actual[key];
+      const wanted = typeof expected[key] === 'string' ? expected[key].slice(0, 12) : expected[key];
+      assert.equal(actual[key], expected[key], `Destination ${key} differs from staged release (${seen} vs ${wanted})`);
+    }
+    // A green push or provenance endpoint alone does not establish served pages.
+    for (const route of [...new Set([site.home, ...site.pages.map(entry => '/' + entry), '/transfer.html'])]) {
+      const relative = route.slice(1) + (route.endsWith('/') ? 'index.html' : '');
+      const body = await (await read(route)).text();
+      assert.ok(body === fs.readFileSync(path.join(directory, relative), 'utf8'), `Destination ${route} bytes differ`);
+    }
+  } catch (error) {
+    fail(error);
   }
-  // A green push or provenance endpoint alone does not establish served pages.
-  for (const route of [...new Set([site.home, ...site.pages.map(entry => '/' + entry), '/transfer.html'])]) {
-    const relative = route.slice(1) + (route.endsWith('/') ? 'index.html' : '');
-    const body = await (await read(route)).text();
-    assert.ok(body === fs.readFileSync(path.join(directory, relative), 'utf8'), `Destination ${route} bytes differ`);
+}
+
+// One fresh cached object is served until Age reaches max-age. Polling during
+// that window repeats the same HIT, so wait it out once, then poll for the origin.
+export async function verifyLiveRelease(site, directory, {
+  fetchImpl = fetch, sleep = delay, log = console.log, now = Date.now, budgetMs = 120000
+} = {}) {
+  let heldCache = false;
+  let deadline = now() + budgetMs;
+  for (;;) {
+    try {
+      await checkDestination(site, directory, fetchImpl);
+      log(`Verified ${site.domain}: staged release and destination pages match over HTTPS.`);
+      return;
+    } catch (error) {
+      const remain = Number(error.cacheRemainingMs) || 0;
+      if (!heldCache && remain >= 1000) {
+        heldCache = true;
+        log(`Waiting ${Math.ceil((remain + 1000) / 1000)}s for cached ${site.domain} to expire: ${error.message.split('\n')[0]}`);
+        await sleep(remain + 1000);
+        // The poll budget starts when the cached object expires, not when the first read did.
+        deadline = now() + budgetMs;
+        continue;
+      }
+      if (now() >= deadline) throw error;
+      log(`Waiting for ${site.domain}: ${error.message.split('\n')[0]}`);
+      await sleep(10000);
+    }
   }
 }
 
@@ -47,18 +103,7 @@ async function main() {
     return;
   }
   assert.ok(mode === '--live' && directory, 'Usage: <site> --preflight | <site> --live <staged directory>');
-  const deadline = Date.now() + 600000;
-  for (;;) {
-    try {
-      await checkDestination(site, directory);
-      console.log(`Verified ${site.domain}: staged release and destination pages match over HTTPS.`);
-      return;
-    } catch (error) {
-      if (Date.now() >= deadline) throw error;
-      console.log(`Waiting for ${site.domain}: ${error.message.split('\n')[0]}`);
-      await delay(10000);
-    }
-  }
+  await verifyLiveRelease(site, directory);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

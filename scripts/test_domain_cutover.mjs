@@ -74,8 +74,14 @@ try {
   }
   browser = await chromium.launch({ headless: true, ...(process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANNEL } : {}) });
 
+  // CUTOVER_PART splits the scenarios for parallel CI jobs: "pages" runs the
+  // published page sweeps, "flows" runs everything else. Unset runs all of them.
+  const PAGE_SWEEPS = /all published pages and home links|AV offline manifest and every supported page|AV claims a destination navigation missed during activation|FMP published pages and intentional CSP/;
+  const part = process.env.CUTOVER_PART;
+  if (part && part !== 'pages' && part !== 'flows') throw new Error(`Unknown CUTOVER_PART ${part}`);
   async function test(name, fn) {
     if (process.env.CUTOVER_FILTER && !name.includes(process.env.CUTOVER_FILTER)) return;
+    if (part && (part === 'pages') !== PAGE_SWEEPS.test(name)) return;
     const context = await browser.newContext({ acceptDownloads: true });
     context.setDefaultTimeout(7000);
     if (captureDir) await context.tracing.start({ screenshots: true, snapshots: true });
@@ -609,6 +615,7 @@ try {
   });
 
   for (const site of sites) {
+    const REHEARSAL_CAPTURE_MODE_PROBES = new Set(['/rehearsal-capture/catalog.json', '/rehearsal-capture/source/config.json']);
     await test(`${site.id} all published pages and home links`, async page => {
       // Some staged apps load large local bundles. Keep the 7s default for
       // migration interactions, but allow complete loads in this route sweep.
@@ -616,6 +623,9 @@ try {
       page.setDefaultTimeout(20000);
       const broken = [];
       page.on('response', response => {
+        // Rehearsal Capture probes these two files to choose its mode; a 404 is the designed
+        // signal for local mode (docs/rehearsal-capture.md), not a broken link.
+        if (response.status() === 404 && REHEARSAL_CAPTURE_MODE_PROBES.has(new URL(response.url()).pathname)) return;
         if (response.status() >= 400 && response.url().startsWith(site.origin + '/') && !response.url().includes('/api/')) broken.push(response.url());
       });
       const routes = [...new Set(publishedPages.filter(item => item.site === site.id).map(item => item.route))];
@@ -756,3 +766,5 @@ try {
 const failures = results.filter(result => !result.pass);
 console.log(`${results.length - failures.length}/${results.length} cutover scenarios passed`);
 if (failures.length) process.exitCode = 1;
+// A part or filter that matches nothing must not pass as a clean run.
+if (!results.length) { console.error('No cutover scenarios ran'); process.exitCode = 1; }

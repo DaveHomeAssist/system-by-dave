@@ -6,6 +6,15 @@
 done and pauses further per-family console conversions under the
 [October 9 rollout](av-console-rollout.md).
 
+## November 21 site home
+
+Dave decided on November 21 that avbydave.com opens on a home page and the
+console is one part of the site. `av-home/` is staged at `/`; the console stays
+at `/av/` with its own canonical address and a breadcrumb back to the home
+page. Nothing else in this brief changes: one console, native department
+packs, redirect stubs into `/av/`, and the same saved workspace keys. See
+`docs/domain-sites.md`.
+
 ## October 29 menu redesign
 
 Dave requested a canvas-first layout and topic selection that enters a submenu.
@@ -109,15 +118,11 @@ Verify native mixed Calculator, Audio, Video and Lighting panels, replace/add,
 shared state, view save/reload, legacy layouts, export and palette/viewport
 containment before release. No new dependencies, hardware control or redesign.
 
-- `https://avbydave.com/av/` opens one console. The Rail on the left lists the
-  nine original application identities plus Equipment Lab and specialist tool links. Selecting a department
+- `https://avbydave.com/av/` opens one console. The Rail lists Search, Workspace, Featured, Departments, Show tools, Reference and Learn, then All apps and Customize. Saved `sbd.rail.v1` pins stay compatible. Selecting a department
   recalls its views in the same workspace and never renders a second console.
-- The panel chooser offers every application's panels in one library, grouped
-  by application, so a stored view can mix Video routes, Lighting fixtures and
-  Calculator controls side by side, plus a Tools group for the specialists
-  that have no native pack yet. Since October 29 it works in two steps: pick an
-  application, Tools or Gear 3D from the tiles, then pick a panel from that
-  group's list, which replaces the tiles (see the October 29 section below).
+- The panel chooser opens with a Featured row and department tiles that show panel counts. Show tools is the specialist group. Gear 3D models sit in Equipment Lab; Ion 3D and the second SmartFade stay registered for saved layouts and stay off the public list. Since October 29 it works in two steps: pick a
+  department or Show tools, then pick a panel from that
+  group's list, which replaces the tiles (see the October 29 section below). Search also reaches guide pages.
 - One view strip, one Add panel, one lock, one maximize, one status line.
   Views are owned by the shell (`sbd.avSuite.workspace.v1`), device-local
   arrangement in `sbd.avSuite.layout.v1`, both exportable as a layout file.
@@ -127,9 +132,9 @@ containment before release. No new dependencies, hardware control or redesign.
 - Specialist tools run as chrome-less panels of their own pages
   (`?sbdEmbed=panel`) until each has a native pack; "Open full" reaches the
   standalone route. Their documents and full-screen modes remain unchanged.
-- One **Document** panel per active application replaces the per-family
+- One **Project** panel per active application (the former Document panel) replaces the per-family
   Plan/Import and Backup panels: title and metadata, Save, Export, Restore,
-  and one-time import of legacy sheet data.
+  and one-time import of legacy sheet data. The panel type stays `document`.
 - Toolbox (`av-suite.html`) and `/av-video/` redirect into `/av/` preserving
   `sbd*` show context. Standalone family routes redirect to the shell with
   that application selected.
@@ -293,7 +298,11 @@ The detailed previous host regressions are retained behind
 runner serves their ignored `apps/<family>/dist/` output as disposable fixtures
 and invokes the original import, recovery, data and layout checks with
 `AV_RETAINED_HOST=1`. These fixtures establish source compatibility, not public
-standalone availability. The Pages pipeline excludes all `dist` directories,
+standalone availability. Each probe has a four-minute limit
+(`AV_RETAINED_PROBE_LIMIT_MS`); a probe that runs past it is stopped and named
+in the error. In the Verify AV Video workflow the suite runs as its own
+`retained` job, because inside the `video` job it pushed runs to the
+15-minute limit (17 November 2026). The Pages pipeline excludes all `dist` directories,
 and the release verifier rejects a standalone bundle replacing any route stub.
 
 ## Two-step chooser, 29 October 2026
@@ -313,5 +322,54 @@ Clients of its five).
 - The engine is shared, so the retained family hosts (`npm run
   test:av-retained-browser`) get the same two steps over their Common,
   Planning and Utilities categories.
+
+Panel types, views, layouts and saved documents are unchanged.
+
+## Refused site storage, November 12, 2026
+
+Some browsers refuse site storage outright (every cookie blocked, some private
+and embedded contexts): reading `window.localStorage` throws. Every pack reads
+it while it mounts, so the console rendered nothing.
+
+`apps/av-suite/src/storage.ts` checks once before anything mounts. When storage
+is refused it gives the page a stand-in that holds nothing and refuses every
+write. Reads see an empty browser. Each save, draft and layout write fails
+through the handling the packs already have for full storage, so nothing is
+reported as kept. The workspace shows a notice that nothing can be saved and
+that work lasts for the visit only; Export still works. If the stand-in cannot
+be installed either, `main.tsx` shows a plain message instead of a blank page.
+`npm run test:av-suite-browser` covers both cases.
+
+The stand-in is deliberately not an in-memory store: a save that appeared to
+work and vanished on reload would be worse than a save that says it failed.
+
+## Chooser tiles and one Close, November 22, 2026
+
+Dave asked for three things after using the console on a show plan.
+
+- **The chooser's first step is a grid of icon tiles.** He preferred the home
+  page's department grid to the chooser's plain list of names. The twelve
+  groups now show as two columns of tiles with an icon and the name in caps.
+  A department's icon is the one the Rail shows for it, read from
+  `js/sbd-registry.js` by Rail identity (`groupIcons` in `packs.ts`); Tools and
+  Gear 3D carry their own. Names stay on one line down to a 320 px screen, and
+  on a short screen the tiles scroll inside the chooser. Search, Back, Escape
+  and the marked current group are unchanged.
+- **Options menus have one Close.** The panel menu ended with **Close panel**
+  directly above a full-width **Close** that only dismissed the menu. That row
+  is gone from the panel and view menus. The title row carries a ✕, and a press
+  outside the menu, Escape or the trigger again also closes it. The Add panel
+  chooser keeps its Close button; it has no other item with that word.
+- **Signal Flow's Add device offers gear.** See `docs/av-video.md`.
+
+- **The chooser is one top bar and options.** A group used to open under four
+  rows of its own furniture: the title, the search field, a Back row that
+  repeated the group name, then at the bottom an orange placement map and a
+  Close row. On a 580 px high screen that left room for about two options, and
+  the map read as a button that did nothing. Back (an arrow), the name, search
+  and Close now share one bar. The map is gone; the dashed outline on the
+  workspace already shows where the panel lands. Choices sit in two columns,
+  and the chooser rises from where it opened until they fit: all ten AV Video
+  panels show at 1024 by 580.
 
 Panel types, views, layouts and saved documents are unchanged.

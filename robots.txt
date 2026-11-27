@@ -5,29 +5,16 @@ Disallow: /500.html
 Disallow: /prompt-browser.html
 Disallow: /youtube-pipeline.html
 Disallow: /agent-finder/
-Disallow: /career-market.html
 Disallow: /aom-show-board.html
-Disallow: /apps/av-workbook/
-Disallow: /apps/av-audio/
-Disallow: /apps/av-video/
-Disallow: /apps/show-ops/
-Disallow: /apps/show-control/
-Disallow: /apps/fmp-camera-sim/
-Disallow: /cross-project-actions.html
 Disallow: /html/sbd-brand.html
-Disallow: /.claude/
-
-Disallow: /cross-project-dashboard.html
 Disallow: /fmp-index/
 Disallow: /fmp/
 Disallow: /fmp-walk/
 Disallow: /fmpwalk/
 Disallow: /camera-sim/
 Disallow: /wedding-ops.html
+# Original downloadable Equipment Lab reference package
+Disallow: /equipment-lab/data/
+
 Sitemap: https://systembydave.com/sitemap.xml
 Sitemap: https://systembydave.com/systembydave/sitemap.xml
-Host: systembydave.com
-
-# Equipment Lab source and original downloadable reference package
-Disallow: /apps/equipment-lab/
-Disallow: /equipment-lab/data/

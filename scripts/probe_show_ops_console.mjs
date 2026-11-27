@@ -36,7 +36,7 @@ page.on('dialog', dialog => dialog.accept());
 const key = 'sbd.showOps.document.v1', draftKey = 'sbd.showOps.draft.v1', layoutKey = 'sbd.showOps.layout.v1';
 const read = (page, key) => page.evaluate(key => localStorage.getItem(key), key);
 const quick = (page, name) => page.locator('.console-quick').getByRole('button', { name, exact: true }).click();
-const setup = async (page, _field) => { await quick(page, 'Document'); };
+const setup = async (page, _field) => { await quick(page, 'Project'); };
 const panel = (page, name) => page.locator(`.console-panel[data-panel="${name}"]`);
 async function reachable(locator) {
   await locator.scrollIntoViewIfNeeded();
@@ -76,7 +76,7 @@ try {
   assert.equal(await read(page, layoutKey), null, 'fresh visit must not write a layout');
   await page.keyboard.press('Tab'); await page.keyboard.press('Enter');
   assert.equal(await page.evaluate(() => document.activeElement.id), 'main');
-  await quick(page, 'Document');
+  await quick(page, 'Project');
   await page.locator('#name').fill('Acceptance show'); await setup(page, 'date'); await page.locator('#date').fill('2026-10-09');
   await quick(page, 'Rooms');
   await panel(page, 'rooms').locator('[name="name"]').fill('Main room');
@@ -125,7 +125,7 @@ try {
   for (const type of ['room', 'task', 'crew']) {
     const raw = JSON.stringify(fixtures[type]), sourceKey = `${schemas[type]}.v1`;
     await page.evaluate(({ sourceKey, raw }) => localStorage.setItem(sourceKey, raw), { sourceKey, raw });
-    await quick(page, 'Document');
+    await quick(page, 'Project');
     const before = await read(page, key);
     await page.locator(`#${type}-saved`).click();
     assert.equal(await page.locator(`#${type}-preview input[type="checkbox"]`).count(), 1);
@@ -150,10 +150,10 @@ try {
     assert.equal(next[history][0].raw, raw);
     assert.equal(next.workspace.views.length, 3, 'copy retains stored views');
     assert.equal(await read(page, sourceKey), raw, 'copy leaves original byte-identical');
-    await quick(page, 'Document'); await page.locator(`#${type}-saved`).click();
+    await quick(page, 'Project'); await page.locator(`#${type}-saved`).click();
     assert.match(await notice(), /already copied|No new active/);
   }
-  await quick(page, 'Document');
+  await quick(page, 'Project');
   const downloading = page.waitForEvent('download'); await page.locator('#export').click();
   const exported = JSON.parse(await readFile(await (await downloading).path(), 'utf8'));
   assert.deepEqual(exported, JSON.parse(await read(page, key)));
@@ -189,15 +189,15 @@ try {
     if (await page.locator('html').getAttribute('data-av-theme') !== theme) await page.locator('#theme').click();
     for (const size of sizes) {
       await page.setViewportSize(size);
-      for (const name of ['Rooms', 'Crew', 'Tasks', 'Document', 'Handoff']) {
+      for (const name of ['Rooms', 'Crew', 'Tasks', 'Project', 'Handoff']) {
         await quick(page, name);
         const bounds = await page.evaluate(() => ({ h: document.documentElement.scrollHeight, ch: document.documentElement.clientHeight, w: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
         assert.ok(bounds.h <= bounds.ch && bounds.w <= bounds.cw, JSON.stringify({ theme, size, name, bounds }));
-        assert.equal(await panel(page, name.toLowerCase()).count(), 1);
+        assert.equal(await panel(page, name === 'Project' ? 'document' : name.toLowerCase()).count(), 1);
         if (['Rooms', 'Crew', 'Tasks'].includes(name)) {
           await reachable(panel(page, name.toLowerCase()).locator('[name="name"]'));
           await reachable(panel(page, name.toLowerCase()).locator('.record').last().getByRole('button', { name: /^Remove / }));
-        } else if (name === 'Document') {
+        } else if (name === 'Project') {
           await reachable(panel(page, 'document').locator('.ops-form input, .ops-form textarea').first());
           await reachable(page.locator('#export'));
           await reachable(page.locator('#crew-file'));
@@ -220,7 +220,7 @@ try {
   await safety.evaluate(key => localStorage.setItem(key, '{broken'), key); await safety.reload();
   assert.equal(await safety.locator('#save').isDisabled(), true);
   assert.equal(await read(safety, key), '{broken');
-  await quick(safety, 'Document');
+  await quick(safety, 'Project');
   assert.equal(await safety.getByRole('button', { name: 'Download original saved bytes' }).count(), 1);
   await safety.evaluate(({ key, draftKey, doc }) => {
     localStorage.setItem(key, JSON.stringify(doc));
@@ -237,7 +237,7 @@ try {
   assert.match(await safety.locator('#notice').textContent(), /Save failed/);
   assert.equal(await read(safety, key), null);
   await safety.waitForFunction(() => document.querySelector('#notice').textContent.includes('Draft'));
-  await quick(safety, 'Document');
+  await quick(safety, 'Project');
   const failedSaveExport = safety.waitForEvent('download'); await safety.locator('#export').click();
   assert.equal(JSON.parse(await readFile(await (await failedSaveExport).path(), 'utf8')).notes, 'Keep this unsaved text');
   await safetyContext.close();

@@ -9,7 +9,7 @@ export const LIBRARY: PanelDef[] = [
   { type: "crew", name: "Crew", group: "Common", description: "Crew calls, details and attendance recorded by the operator.", minW: 3, minH: 3 },
   { type: "tasks", name: "Tasks", group: "Common", description: "Open work, owners and next actions.", minW: 3, minH: 3 },
   { type: "handoff", name: "Handoff", group: "Planning", description: "Live summary of outstanding rooms, crew and tasks.", minW: 3, minH: 3 },
-  { type: "document", name: "Document", group: "Utilities", description: "Show identity, notes, Save, export, restore and reviewed copies from Room Check, Task Board or Crew Call.", minW: 4, minH: 4 },
+  { type: "document", name: "Project", group: "Utilities", description: "Show identity, notes, Save, export, restore and reviewed copies from Room Check, Task Board or Crew Call.", minW: 4, minH: 4 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: "operations", name: "Operations", panels: [

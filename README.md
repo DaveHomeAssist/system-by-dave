@@ -3,10 +3,12 @@
 The source for [systembydave.com](https://systembydave.com) — a personal site
 documenting the Notion skills, agents, widgets, and templates I build and use.
 
-[Equipment Lab](https://avbydave.com/equipment-lab/) centralizes the 43-entry
-model catalog and offers the same four native panels in the AV workspace.
-Its first native model is the Cartoni Maxima 30 GLB; other entries open their
-existing viewers during migration. Build with `npm run build:equipment-lab`
+[Equipment Lab](https://avbydave.com/equipment-lab/) centralizes the shared
+model catalog, the confirmed 43-entry family plus later additions, and offers
+the same four native panels in the AV workspace. Its native models are GLB
+packages: the Cartoni Maxima 30, the Barco UDM-4K22, the Panasonic PT-DW830
+with lamp and air filter access, and the Panasonic PT-RZ970. Other entries open
+their existing viewers during migration. Build with `npm run build:equipment-lab`
 and verify with `npm run verify:equipment-lab`, `npm run typecheck:equipment-lab`
 and `npm run test:equipment-lab-browser`. See [the module brief](docs/equipment-lab.md).
 
@@ -36,6 +38,14 @@ checks the console entry and all 42 sheet/family redirects. See the
 [cutover contract](docs/av-suite-shell.md#family-route-cutover-october-29-2026).
 
 ## Local development
+
+Use Node.js 24 for package scripts and builds, matching CI. The repository's
+`.nvmrc` selects that major version for version managers that support it.
+With nvm installed, run `nvm install` followed by `nvm use`, then `npm ci`.
+Python 3 is required for the site generators and their parity checks.
+Serving existing static files does not require installing Node dependencies.
+
+Envision Personal Studio runs separately on owner-controlled hardware. Its guide covers the private coordinator, GPU worker, show packages and recovery. [Envision Personal Studio](apps/envision-studio/README.md)
 
 [Infrastructure](https://avbydave.com/infrastructure/) has a native-console candidate in `apps/infrastructure/`: Power, Network, Cable, Issues, Plan/Import and Backup share its existing model. Use `npm run typecheck:infrastructure`, `npm run test:infrastructure`, `npm run build:infrastructure` and `npm run test:infrastructure-browser`. The build preserves the model and writes an ignored fixture in `apps/infrastructure/dist/`; the public route redirects into `/av/?app=infrastructure`. See [the brief and compatibility contract](docs/infrastructure-app.md); source presence does not establish release or browser acceptance.
 
@@ -68,7 +78,7 @@ use the tooling selected for that surface.
 | `widgets.html` | Widget gallery |
 | `fmp-index/index.html` | Retired FMP working index: noindex redirect to the `/fmp/` hub, keeping query and hash |
 | `fmp/` | Managed FMP video operations hub, camera commissioning, bowl training, and rig reference; authenticated camera API remains SETUP TEST only; [release and sync contract](docs/fmp-public-release.md) |
-| `fmpwalk/` | Managed local-first preshow venue walk; configured for walk.housevideo.app with destination verification before cutover; explicit download, Gmail, and Notion actions; no silent writes |
+| `fmpwalk/` | Managed local-first preshow venue walk; published to [walk.housevideo.app](https://walk.housevideo.app/fmpwalk/), with cutover enabled in `scripts/domain-sites.json`; authenticated acceptance remains a separate gate in the [release contract](docs/fmp-public-release.md); explicit download, Gmail, and Notion actions; no silent writes |
 | `av/` | AV by Dave: one console, ten departments of individual native panels; standalone tool links (`docs/av-suite-shell.md`) |
 | `av-suite.html` | Redirect stub into the console (keeps `sbd*` show context) |
 | `docs/av-suite-development-assets-index.md` | AV Suite source, spec, migration, release, and historical-asset authority map |
@@ -84,6 +94,7 @@ use the tooling selected for that surface.
 | `privacy-policy.html` | Privacy policy |
 | `404.html` / `500.html` | Error pages |
 | `html/sbd-brand.html` | Internal brand reference |
+| `thephilly/index.html` | Noindex prototype of The Philly magazine site, with the Cheesesteak Radar in its Food Finders story (see [The Philly prototype](#the-philly-prototype)) |
 
 ## Deploy
 
@@ -97,7 +108,9 @@ directly.
 The FMP suite and AV by Dave are also published on their own domains. The
 Pages workflow stages them with `scripts/stage_domain_sites.mjs` and pushes each
 to its repository (`DaveHomeAssist/housevideo`, `DaveHomeAssist/housevideo-walk`,
-`DaveHomeAssist/avbydave`) with that repository's deploy key. The walk destination
+`DaveHomeAssist/avbydave`) with that repository's deploy key, but only when that
+site's content changed (`scripts/domain_publish_plan.mjs`); the other destinations are
+not redeployed. The walk destination
 must pass the infrastructure and auth gates in `docs/domain-sites.md` before any
 old-origin redirects deploy. Check the staged sites locally with:
 
@@ -150,6 +163,7 @@ The heatmap at `/cheesesteaks/` is a static export of the private
 
 ```bash
 npm run sync:cheesesteaks -- /absolute/path/to/philly-cheesesteak-heatmap
+npm run verify:cheesesteaks -- /absolute/path/to/philly-cheesesteak-heatmap
 npm run verify:indexing
 npm run verify:public-navigation
 ```
@@ -157,6 +171,28 @@ npm run verify:public-navigation
 The sync replaces `cheesesteaks/`, drops the export's own 404 pages (Pages serves
 only the root `404.html`), and records the source commit in
 `cheesesteaks/SOURCE.txt`. Do not hand-edit `cheesesteaks/`.
+
+The importer validates the source revision and stages and compares the entire
+export before replacing the previous directory. A failed promotion restores the
+previous directory; if restoration itself fails, the error identifies the retained
+backup for recovery. The read-only verifier compares file paths, bytes and
+provenance with the supplied build. It does not prove that `out/` was freshly
+built from that revision or that the live deployment matches. Run
+`npm run test:cheesesteaks-sync` for failure-path regression fixtures.
+
+### The Philly prototype
+
+`/thephilly/` is a copy of the single-file prototype in the private
+`DaveHomeAssist/the-philly` repository, adapted for this site: full public head
+(`noindex`, so it stays out of search and the sitemap), a Content Security Policy,
+fonts and the QR generator self-hosted under `thephilly/fonts/` and
+`thephilly/vendor/` (licences in `vendor/NOTICE.txt`) instead of Google Fonts and
+cdnjs, a System by Dave breadcrumb and skip link, and the Cheesesteak Radar in the
+Food Finders story. The radar opens the heatmap at `/cheesesteaks/` in a frame only
+when the reader asks, so the map's OpenStreetMap tile requests start then. To
+refresh the page, copy the prototype's `index.html` over `thephilly/index.html` and
+reapply those changes. Verify with `npm run probe:thephilly`,
+`npm run verify:public-navigation` and `npm run verify:indexing`.
 
 ### NoteForge canonical release
 
@@ -194,3 +230,5 @@ contributor (human or agent) should follow.
 ### AV workspace foundation
 
 The first bounded workspace consumers are Throwline Stage 3D and LED Wall Calculator. See [architecture, generated sources and device acceptance](docs/av-workspace.md). Run `npm run sync:av-workspace` to regenerate the shared inline blocks, `npm run verify:av` to check them, and `npm run test:av-workspace` for the touch viewport and offline matrix.
+
+Davai reference navigation and verification: [reference contract](docs/davai-navigation.md). Run `npm run verify:davai` and `npm run test:davai-browser` after generator changes.

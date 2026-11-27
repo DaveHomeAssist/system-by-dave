@@ -1,0 +1,21 @@
+{
+  "name": "projctl",
+  "version": "0.1.0",
+  "description": "Frozen at WST projector control relay",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "sim": "SIM=1 node server/index.js",
+    "bundle:throwline": "node scripts/bundle-throwline.js",
+    "test": "node --test test/*.test.js",
+    "test:browser": "node test/run-browser-suite.cjs",
+    "test:venue-browser": "node test/venue-browser.cjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

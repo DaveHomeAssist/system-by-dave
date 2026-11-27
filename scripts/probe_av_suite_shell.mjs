@@ -45,7 +45,7 @@ const IDENTITIES = [
   ['console:show-ops', 'Show Ops', 'Operations'],
   ['console:front-office', 'Front Office', 'Desk'],
   ['console:shop', 'The Shop', 'Work'],
-  ['console:infrastructure', 'Infrastructure', 'Systems'],
+  ['console:infrastructure', 'Power, Network & Cable', 'Systems'],
   ['console:lighting', 'Lighting', 'Patch'],
   ['console:av-video', 'AV Video', 'Routing'],
   ['console:av-calculator', 'AV Calculator', 'Audio'],
@@ -207,16 +207,18 @@ try {
   await page.getByRole('button', { name: 'Inspector options' }).click();
   await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   const chooser = page.getByRole('dialog', { name: 'Add panel' });
-  assert.deepEqual((await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents()).slice(0, 3), ['AV Video', 'Audio', 'Show Control'], 'chooser groups panels by application');
-  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'the ten native departments plus Tools and Gear 3D groups are offered');
-  assert.equal(await chooser.getByRole('button', { name: 'Gear 3D', exact: true }).count(), 1, 'remote gear viewers are offered as a Gear 3D group');
-  assert.equal(await chooser.getByRole('button', { name: 'Tools', exact: true }).count(), 1, 'specialist tools are offered as a Tools group');
+  const groupNames = () => chooser.getByRole('group', { name: 'Panel categories' }).locator('button').evaluateAll(buttons => buttons.map(button => button.dataset.group));
+  assert.deepEqual((await groupNames()).slice(0, 3), ['AV Video', 'Audio', 'Show Control'], 'chooser groups panels by application');
+  assert.equal((await groupNames()).length, 11, 'the ten departments plus Show tools; Gear 3D sits inside Equipment Lab');
+  assert.equal(await chooser.getByRole('button', { name: 'Gear 3D', exact: true }).count(), 0, 'Gear 3D is no longer its own group');
+  assert.equal(await chooser.getByRole('button', { name: 'Show tools', exact: true }).count(), 1, 'specialist tools are offered as Show tools');
+  assert.equal(await chooser.locator('.console-featured button').count(), 6, 'the featured row lists six panels');
   // Two steps: the group tiles come first, then the picked group's panels replace them.
   assert.equal(await chooser.locator('.console-choices button').count(), 0, 'no panel choices before a group is picked');
-  assert.equal(await chooser.locator('.console-groups button[aria-current="true"]').textContent(), 'AV Video', 'the active application is marked');
+  assert.equal(await chooser.locator('.console-groups button[aria-current="true"]').getAttribute('data-group'), 'AV Video', 'the active application is marked');
   await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
   assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).count(), 0, 'the other groups leave once one is picked');
-  assert.equal(await chooser.locator('.console-sub strong').textContent(), 'Front Office');
+  assert.equal(await chooser.locator('.console-chooser-bar h3').textContent(), 'Front Office');
   assert.equal(await chooser.locator('.console-choices button').count(), 5, 'every Front Office panel is listed');
   await page.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null); // focus moves to the first panel choice
   await page.keyboard.press('Escape');
@@ -224,7 +226,7 @@ try {
   await page.waitForFunction(() => document.activeElement?.dataset.group === 'Front Office'); // focus returns to the group just left
   await chooser.getByRole('button', { name: 'Front Office', exact: true }).click();
   await chooser.getByRole('button', { name: 'Back', exact: true }).click();
-  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 12, 'Back restores every group');
+  assert.equal(await chooser.getByRole('group', { name: 'Panel categories' }).locator('button').count(), 11, 'Back restores every group');
   await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('fixture');
   assert.ok(await chooser.locator('.console-choices button').filter({ hasText: 'Fixtures' }).count() >= 1, 'search lists matches across groups');
   await chooser.getByRole('searchbox', { name: 'Search panels' }).fill('');
@@ -318,8 +320,9 @@ try {
   // On a full mixed phone workspace, the menu must bring an existing department forward.
   await page.setViewportSize({ width: 375, height: 812 });
   await recallPanel(page, 'Audio Delay');
-  await page.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
-  await chooser.getByRole('button', { name: 'Replace the focused panel', exact: true }).click();
+  // Replace through the panel's own menu, so the four departments keep their places on the grid.
+  await page.getByRole('button', { name: 'Audio Delay options', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Change panel…' }).click();
   await chooser.getByRole('button', { name: 'Audio', exact: true }).click();
   await chooser.locator('.console-choices button').filter({ hasText: 'Inputs' }).click();
   assert.equal(await page.locator('.console-panel').getAttribute('data-app'), 'Audio', 'phone selection supersedes the previous department quick-bar choice');
@@ -434,9 +437,8 @@ try {
       } else await menuPage.locator('.console-tools').getByRole('button', { name: /Add panel/ }).click();
     };
     await openMenu();
-    const groups = await menu.getByRole('group', { name: 'Panel categories' }).locator('button').allTextContents();
-    assert.equal(groups.length, 12);
-    const framed = new Set(['Tools', 'Gear 3D']);
+    const groups = await menu.getByRole('group', { name: 'Panel categories' }).locator('button').evaluateAll(buttons => buttons.map(button => button.dataset.group));
+    assert.equal(groups.length, 11);
     for (const group of groups) {
       await menu.getByRole('button', { name: group, exact: true }).click();
       const count = await menu.locator('.console-choices button').count();
@@ -445,7 +447,10 @@ try {
         await menu.locator('.console-choices button').nth(index).click();
         assert.equal(await menuPage.locator('.console-panel').count(), 1, `${group}: replacement stays in the same slot`);
         assert.equal(await menuPage.locator('.console-panel').getAttribute('data-app'), group);
-        assert.equal(await menuPage.locator('iframe').count(), framed.has(group) ? 1 : 0, framed.has(group) ? `${group}: a specialist choice renders its own page as a chrome-less panel` : `${group}: every choice renders natively`);
+        const frames = await menuPage.locator('iframe').count();
+        if (group === 'Show tools') assert.equal(frames, 1, `${group}: a specialist choice renders its own page as a chrome-less panel`);
+        else if (group === 'Equipment Lab') assert.ok(frames === 0 || frames === 1, `${group}: native panels stay native and 3D models stay framed`);
+        else assert.equal(frames, 0, `${group}: every choice renders natively`);
         assert.equal(await menuPage.locator('.console-panel .console-body').isVisible(), true);
         panelCount++;
       }
@@ -478,8 +483,9 @@ try {
         await addTrigger.click();
         const addChooser = addPage.getByRole('dialog', { name: 'Add panel' });
         await addPage.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Search panels');
+        // Search is the first control in the top bar, so reverse Tab wraps to the last group tile.
         await addPage.keyboard.press('Shift+Tab');
-        assert.equal(await addChooser.getByRole('button', { name: 'Close', exact: true }).evaluate(el => el === document.activeElement), true, 'modal retains reverse Tab focus');
+        assert.equal(await addChooser.locator('.console-groups button').last().evaluate(el => el === document.activeElement), true, 'modal retains reverse Tab focus');
         await addPage.keyboard.press('Tab');
         assert.equal(await addChooser.getByRole('searchbox').evaluate(el => el === document.activeElement), true, 'modal retains forward Tab focus');
         assert.equal(await addChooser.locator('[aria-current]').count(), 0, 'empty Workspace marks no application as current');
@@ -487,7 +493,7 @@ try {
         await frontOffice.focus();
         await addPage.keyboard.press('Enter');
         await addPage.waitForFunction(() => document.activeElement?.closest('.console-choices') !== null);
-        assert.deepEqual(await addChooser.locator('.console-choices strong').allTextContents(), ['Jobs', 'Clients', 'Venues', 'Job updates', 'Document']);
+        assert.deepEqual(await addChooser.locator('.console-choices strong').allTextContents(), ['Jobs', 'Clients', 'Venues', 'Job updates', 'Project']);
         assert.ok(await addChooser.locator('.console-choices').evaluate(el => el.clientHeight >= 44), `Add list has a usable visible row at ${width}x${height} ${theme}`);
         for (let index = 0; index < 5; index++) {
           if (index) await addPage.keyboard.press('Tab');
@@ -529,8 +535,45 @@ try {
     assert.equal(await blockedPage.locator('.suite-app > .message.error').count(), 1, 'failed autosave is visible in the shared status line');
     assert.equal(await blockedPage.evaluate(() => localStorage.getItem('avCalculator.v1')), null, 'failed autosave is not reported as persisted');
   } finally { await blockedContext.close(); }
+  /* Site storage refused outright (every cookie blocked): reading window.localStorage throws.
+     The console still opens, says nothing can be saved, and reports each failed write. */
+  const refuseStorage = configurable => {
+    const deny = () => { throw new DOMException('The operation is insecure.', 'SecurityError'); };
+    for (const name of ['localStorage', 'sessionStorage']) Object.defineProperty(window, name, { get: deny, configurable });
+  };
+  const refusedContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  try {
+    await refusedContext.addInitScript(refuseStorage, true);
+    const refusedPage = await refusedContext.newPage();
+    refusedPage.on('pageerror', error => errors.push(error.message));
+    await refusedPage.goto(`${BASE}/av/?app=calculator`);
+    await refusedPage.locator('.suite-header h1').waitFor();
+    assert.equal(await refusedPage.locator('.suite-header h1').textContent(), 'AV Calculator', 'the console opens with site storage refused');
+    assert.match(await refusedPage.locator('.workspace-host > .console-notice').first().textContent(), /blocking site storage.*nothing can be saved/, 'the operator is told nothing can be saved');
+    await refusedPage.locator('.console-panel #delayDistance').fill('88');
+    await refusedPage.waitForFunction(() => /storage.*unavailable|values were not saved/i.test(document.querySelector('.suite-app > .message')?.textContent || ''));
+    assert.equal(await refusedPage.locator('.suite-app > .message.error').count(), 1, 'a failed write is visible with site storage refused');
+    for (const [app, title] of [['video', 'AV Video'], ['shop', 'The Shop'], ['show-control', 'Show Control'], ['audio', 'Audio']]) {
+      await refusedPage.goto(`${BASE}/av/?app=${app}`);
+      await refusedPage.locator('.console-panel').first().waitFor();
+      assert.equal(await refusedPage.locator('.suite-header h1').textContent(), title, `${title} opens with site storage refused`);
+    }
+  } finally { await refusedContext.close(); }
+  // A browser where the stand-in cannot be installed gets a plain message, never a blank page.
+  const unusableContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  try {
+    await unusableContext.addInitScript(refuseStorage, false);
+    const unusablePage = await unusableContext.newPage();
+    unusablePage.on('pageerror', error => errors.push(error.message));
+    await unusablePage.goto(`${BASE}/av/`);
+    const blockedNotice = unusablePage.locator('#root > .suite-blocked[role="alert"]');
+    await blockedNotice.waitFor();
+    assert.match(await blockedNotice.textContent(), /blocking site storage/, 'an unusable browser is told why the console cannot open');
+    assert.equal(await unusablePage.locator('.suite-app').count(), 0, 'the console does not mount without any storage object');
+  } finally { await unusableContext.close(); }
+  console.log('Site storage refused: the console opens five applications with a notice and visible write failures; an unusable browser gets a plain message.');
   assert.deepEqual(errors, []);
-  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across ten native departments, seven specialist panels and two Gear 3D viewers, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
+  console.log(`AV Suite shell verification passed: all ${panelCount} individual menu choices across ten departments, Show tools and Equipment Lab 3D models, mixed panels and reloads, full Video menu with modules disabled, legacy layout bytes preserved, isolated saves, specialist pages as chrome-less panels, and all four named palettes at eight sizes.`);
 } catch (error) {
   if (process.env.AV_SUITE_EVIDENCE) {
     await mkdir(process.env.AV_SUITE_EVIDENCE, { recursive: true });

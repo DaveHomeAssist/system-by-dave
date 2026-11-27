@@ -10,7 +10,7 @@ export const LIBRARY: PanelDef[] = [
   { type: 'notes', name: 'Notes', group: 'Common', description: 'Operator notes saved with this run.', minW: 3, minH: 3 },
   { type: 'log', name: 'Call Log', group: 'Common', description: 'Time-stamped human calls, never hardware commands.', minW: 3, minH: 3 },
   { type: 'setup', name: 'Setup', group: 'Utilities', description: 'Add cues or review a Cue Sheet or CueForge calling snapshot.', minW: 3, minH: 3 },
-  { type: 'document', name: 'Document', group: 'Utilities', description: 'Run title, Save, export, restore and damaged-save recovery.', minW: 3, minH: 3 },
+  { type: 'document', name: 'Project', group: 'Utilities', description: 'Run title, Save, export, restore and damaged-save recovery.', minW: 3, minH: 3 },
 ];
 export const DEFAULT_VIEWS: View[] = [
   { id: 'calling', name: 'Calling', panels: [

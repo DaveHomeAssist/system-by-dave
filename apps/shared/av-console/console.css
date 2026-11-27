@@ -16,10 +16,14 @@
 .console-tools button[aria-pressed=true]{border-color:var(--av-warning-line);color:var(--av-warning)}
 .console-icon{min-width:44px;padding:0 10px;display:inline-grid;place-items:center;background:transparent}
 .console-notice{margin:0;padding:8px 14px;font-size:12px;background:var(--av-warning-soft);border-bottom:1px solid var(--av-warning-line);color:var(--av-text)}
-.console-grid{position:relative;flex:1;min-height:0;display:grid;gap:8px;padding:10px 12px;touch-action:none}
+.console-grid{position:relative;flex:1;min-height:0;display:grid;--console-gap:8px;gap:var(--console-gap);padding:10px 12px;touch-action:none}
 /* Snap-grid dots: visible on every palette (about 1.2-1.4:1 against the canvas) yet light
-   enough that body and muted text still clear WCAG AA 4.5:1 even where a glyph sits on a dot. */
-.console-grid{--av-dot:rgba(77,57,39,.12);background-image:radial-gradient(circle,var(--av-dot) 1.25px,transparent 1.6px);background-size:24px 24px;background-position:12px 10px}
+   enough that body and muted text still clear WCAG AA 4.5:1 even where a glyph sits on a dot.
+   Four dots per half-cell snap step (about 13px at 1470 wide, was a fixed 24px unrelated
+   to the cells), one centred in every gutter, so the dots show exactly where a panel edge
+   can land. Colours are unchanged; the dot is 0.25px wider (1.25 to 1.5px) because a dot
+   drawn across four fractional tiles renders softer than the old whole-pixel tile. */
+.console-grid{--av-dot:rgba(77,57,39,.12);background-image:radial-gradient(circle at 0 0,var(--av-dot) 1.5px,transparent 1.9px);background-origin:content-box;background-size:calc((100% + var(--console-gap,8px)) / 96) calc((100% + var(--console-gap,8px)) / 64);background-position:calc(var(--console-gap,8px) / -2) calc(var(--console-gap,8px) / -2)}
 html[data-av-theme="white"] .console-grid{--av-dot:rgba(0,0,0,.13)}
 html[data-av-theme="dark"] .console-grid{--av-dot:rgba(255,255,255,.12)}
 html[data-av-theme="black"] .console-grid{--av-dot:rgba(255,255,255,.13)}
@@ -49,52 +53,92 @@ html[data-av-theme="black"] .console-grid{--av-dot:rgba(255,255,255,.13)}
 .console-pop{position:fixed;z-index:50;width:min(460px,calc(100vw - 16px));max-height:calc(100dvh - 16px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:14px;background:var(--av-surface);border:1px solid var(--av-line-strong);border-radius:8px;box-shadow:var(--av-shadow-pop,0 16px 40px rgba(0,0,0,.35))}
 .console-menu{width:min(280px,calc(100vw - 16px))}
 .console-pop h3{font-size:15px}
+/* Chooser top bar: back, where you are, search and close share one row. Everything under it is options. */
+.console-chooser-bar{display:flex;align-items:center;gap:6px;min-width:0;margin:-6px -6px 0 0}
+.console-chooser-bar h3{flex:0 1 auto;min-width:0;margin:0 4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.console-chooser-bar .console-back{margin-left:-8px}
+.console-bar-icon{flex:none;display:inline-grid;place-items:center;min-width:44px;padding:0;border-color:transparent;background:transparent;color:var(--av-text-2)}
+.console-bar-icon:hover{color:var(--av-text);background:var(--av-surface-3,var(--av-surface-2))}
+.console-bar-icon svg,.console-search svg{flex:none;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.console-search,.console-chooser-bar label.console-search{flex:1 1 96px;min-width:0;display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:8px;font-size:14px;font-weight:400;min-height:44px;margin-left:auto;padding:0 10px;border:1px solid var(--av-line);border-radius:6px;background:var(--av-control,var(--av-surface-2));color:var(--av-muted);cursor:text}
+.console-search:hover{border-color:var(--av-line-strong)}
+.console-search:focus-within{border-color:var(--av-focus,var(--av-accent));outline:2px solid var(--av-focus,var(--av-accent));outline-offset:1px;color:var(--av-text)}
+.console-search input,html[data-av-theme] .console-search input{flex:1;width:100%;min-width:0;min-height:0;height:40px;padding:0;border:0;border-radius:0;background:transparent;color:var(--av-text);outline:0;box-shadow:none}
+@media(forced-colors:active){.console-search:focus-within{outline:3px solid Highlight}}
+/* Narrowest phones: the longest group name ("Infrastructure") stays whole beside the search field. */
+@media(max-width:374px){.console-chooser-bar h3{font-size:14px;margin-right:0}.console-search,.console-chooser-bar label.console-search{flex-basis:64px;padding:0 8px}.console-search svg{display:none}}
 .console-pop p{font-size:12px}
 .console-menu button,.console-choice-actions button{text-align:left;background:transparent}
 .console-menu button.danger{color:var(--av-danger)}
 .console-menu-title{font-weight:700;color:var(--av-text)!important}
 .console-menu-note{font-size:11px}
-/* Options menus: clear hover, focus and pressed states; destructive items and Close sit below a separator. */
+/* Options menus: clear hover, focus and pressed states; destructive items sit below a separator.
+   One dismiss control, in the title row. A press outside, Escape or the trigger also closes the menu. */
+.console-menu-head{display:flex;align-items:center;gap:8px;min-width:0;margin:-6px -6px -2px 0}
+.console-menu-head .console-menu-title{flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.console-menu .console-menu-x{flex:none;display:inline-grid;place-items:center;min-width:44px;padding:0;border-color:transparent;color:var(--av-muted);font-size:13px}
+.console-menu .console-menu-x:hover{color:var(--av-text);background:var(--av-surface-3,var(--av-surface-2))}
 .console-menu [role=menuitem]:not(:disabled):hover{background:var(--av-surface-3,var(--av-surface-2))}
 .console-menu [role=menuitem]:not(:disabled):active{background:var(--av-accent-soft,var(--av-surface-3))}
-.console-menu [role=menuitem]:focus-visible,.console-menu .console-close:focus-visible{outline:2px solid var(--av-focus,var(--av-accent));outline-offset:-2px;background:var(--av-surface-3,var(--av-surface-2))}
-.console-menu>button.danger,.console-menu>.console-close{margin-top:4px;box-shadow:0 -5px 0 -4px var(--av-line)}
+.console-menu [role=menuitem]:focus-visible,.console-menu .console-menu-x:focus-visible{outline:2px solid var(--av-focus,var(--av-accent));outline-offset:-2px;background:var(--av-surface-3,var(--av-surface-2))}
+.console-menu>button.danger{margin-top:4px;box-shadow:0 -5px 0 -4px var(--av-line)}
 .console-icon[aria-expanded=true]{border-color:var(--av-focus-line,var(--av-line-strong));background:var(--av-focus-soft,var(--av-surface-2))}
 @media(forced-colors:active){.console-menu [role=menuitem]:focus-visible{outline:3px solid Highlight}}
+.console-sec{margin:2px 2px 6px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--av-muted)}
+.console-featured-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:8px}
+.console-featured-row button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:52px;text-align:left;background:var(--av-surface-2);border-color:color-mix(in srgb,var(--av-accent,#e48a4c) 45%,var(--av-line))}
+.console-featured-row button span{font-size:11px;font-weight:400;color:var(--av-muted)}
+.console-groups.is-tiles button small{display:block;font-weight:400;letter-spacing:0;text-transform:none;color:var(--av-muted);font-size:10.5px}
 .console-groups{display:flex;gap:4px}
 .console-groups button{flex:1;background:transparent}
 .console-groups button[aria-current=true]{border-color:var(--av-accent);background:var(--av-accent-soft)}
-.console-sub{display:flex;align-items:center;gap:10px;min-width:0}
-.console-sub strong{font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.console-back{background:transparent;flex-shrink:0}
-/* The chooser may use the height below where it opened; a long group scrolls
-   inside its own list and the chooser frame stays put. */
+/* Group tiles: a console that supplies group icons gets a two-column grid of icon tiles. */
+.console-groups.is-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.console-groups.is-tiles button{display:flex;align-items:center;gap:10px;min-width:0;min-height:52px;padding:6px 12px;text-align:left;background:var(--av-surface-2);font-size:12px;font-weight:700;letter-spacing:.06em;line-height:1.25;text-transform:uppercase}
+.console-groups.is-tiles button:hover{border-color:var(--av-line-strong)}
+.console-groups.is-tiles button[aria-current=true]{border-color:var(--av-accent);background:var(--av-accent-soft)}
+.console-groups.is-tiles button span{min-width:0;overflow-wrap:anywhere}
+.console-group-icon{flex:none;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+/* A narrow sheet keeps each name on one line: "Infrastructure" is the longest. */
+@media(max-width:480px){.console-groups.is-tiles button{gap:8px;padding:6px 10px;font-size:11px;letter-spacing:.03em}}
+@media(max-width:374px){.console-groups.is-tiles button{gap:6px;padding:6px;font-size:10px;letter-spacing:.01em}.console-group-icon{width:18px;height:18px}}
+/* The chooser rises from where it opened until its options fit (Workspace.tsx sets --pop-top).
+   Only when the screen itself is too short does a long group scroll, inside its own list. */
 .console-chooser{max-height:calc(100dvh - var(--pop-top,8px) - 8px)}
-.console-choices{display:flex;flex-direction:column;gap:6px;min-height:0;overflow:auto;padding:2px}
-.console-choices>*{flex-shrink:0}
-.console-choices button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:10px 12px;background:var(--av-surface-2)}
+.console-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:6px;min-height:0;overflow:auto;padding:2px}
+.console-choices p{grid-column:1/-1;margin:0}
+.console-choices button{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;min-width:0;text-align:left;padding:10px 12px;background:var(--av-surface-2)}
+.console-choices button strong{overflow-wrap:anywhere}
+/* One column where two would squeeze the descriptions. */
+@media(max-width:479px){.console-pop.console-chooser{padding:10px 12px;gap:6px}.console-choices{grid-template-columns:minmax(0,1fr);gap:3px}.console-choices button{padding:7px 12px;gap:2px}}
 .console-choices button span{font-size:12px;color:var(--av-muted)}
 .console-choices small{font-weight:400}
 .console-choice-actions{display:flex;flex-direction:column;gap:6px}
-.console-preview{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(8,10px);gap:2px;padding:6px;border:1px solid var(--av-line);border-radius:4px}
-.console-preview i{background:var(--av-raised);border-radius:2px}
-.console-preview b{background:var(--av-accent);border-radius:2px;opacity:.75}
 .console-pad{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .console-pad button{text-align:center}
 .console-rename{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600}
-.console-close{margin-top:4px}
 @media(max-width:1099px){.console-strip{padding:4px 8px}.console-quick{margin-left:0;padding-left:0;border-left:0;order:3;flex-basis:100%}}
 @media(max-width:719px){
-  .console-grid{padding:6px;gap:6px}
+  .console-grid{padding:6px;--console-gap:6px;gap:6px}
   .console-quick{flex:none;margin:0;justify-content:stretch;padding:4px 6px max(4px,env(safe-area-inset-bottom));border-left:0;border-top:1px solid var(--av-line);background:var(--av-surface)}
   .console-quick button{flex:1;min-width:0;padding:8px 6px;font-size:12px;justify-content:center}
   .console-tools button:first-child{padding:0 10px}
   .console-pop{left:8px!important;right:8px;width:auto;top:auto!important;bottom:8px;max-height:70dvh}
   .console-pop.console-chooser{max-height:calc(100dvh - 16px)}
 }
-/* On short screens reserve space for choices instead of the decorative map. */
+/* A console may choose phone mode for a short screen that is wider than 719px, such as a phone held
+   sideways. The switcher is then a child of the shell's column, where the strip rule above
+   (flex-basis:100%) would claim the full height and leave the panel none. This keeps it a bar at any
+   width and changes nothing else: its buttons and background stay with the console. :where() keeps
+   the specificity of the rules above, so a console's own switcher rules still win. */
+@media(min-width:720px){:where(.mode-phone)>.console-quick{flex:none;order:0;margin:0;padding:4px 6px max(4px,env(safe-area-inset-bottom));border-left:0;border-top:1px solid var(--av-line)}}
+/* Short screens: the chooser takes the full height. */
 @media(max-height:500px){
-  .console-pop.console-chooser{top:8px!important;bottom:8px;max-height:calc(100dvh - 16px);padding:8px;gap:4px}
-  .console-chooser .console-preview{display:none}
+  .console-pop.console-chooser{top:8px!important;bottom:8px;max-height:calc(100dvh - 16px);padding:6px 8px;gap:4px}
+  .console-pop.console-chooser .console-chooser-bar{margin:0}
+  .console-groups.is-tiles{gap:4px}
+  .console-groups.is-tiles button{min-height:44px;padding-top:2px;padding-bottom:2px}
+  .console-choices{gap:4px}
+  .console-choices button{padding:5px 10px;gap:2px}
 }
 @media(prefers-reduced-motion:reduce){.console-shell *{transition:none!important;animation:none!important}}

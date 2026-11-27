@@ -15,7 +15,7 @@ const fallback = 'Operation failed. Keep this tab open and export your work.';
 export function impact(run: CallingRun, dirty: boolean) {
   return `${run.title} · ${run.cues.length} cues · position ${run.current}/${run.cues.length} · ${run.events.length} calls${run.held ? ' · on Hold' : ''}${dirty ? ' · unsaved changes' : ''}`;
 }
-const titles: Record<Action, string> = { setup: 'Setup and imports', backup: 'Document controls', add: 'Add a cue', 'cue-sheet': 'Cue Sheet copy', cueforge: 'CueForge calling snapshot', restore: 'Restore backup' };
+const titles: Record<Action, string> = { setup: 'Setup and imports', backup: 'Project controls', add: 'Add a cue', 'cue-sheet': 'Cue Sheet copy', cueforge: 'CueForge calling snapshot', restore: 'Restore backup' };
 
 export function useShowControlPack(host: PackHost): Pack {
   const [initial] = useState(() => { try { return loadRun(localStorage); } catch { return loadRun({ getItem: () => { throw Error('Unavailable'); } }); } });
@@ -125,7 +125,7 @@ export function useShowControlPack(host: PackHost): Pack {
     if (type === 'log') return { context: 'Local human calls · no triggers', body: <div className="call-list" data-web2-scroll tabIndex={0} role="region" aria-label="Call history">{!run.events.length ? <p>No calls recorded yet.</p> : run.events.map((event, i) => <article className="call-event" key={`${event.at}-${i}`}><strong>{event.action}{event.cue && ` · ${event.cue}`}</strong><time>{new Date(event.at).toLocaleString()}</time></article>)}</div> };
     const compact = window.innerHeight < 500;
     if (type === 'setup') return { body: compact ? <div className="call-single"><button onClick={() => openDialog('setup')}>Setup and imports</button></div> : setupActions };
-    return { context: run.title, body: compact ? <div className="call-single"><button onClick={() => openDialog('backup')}>Document controls</button></div> : documentBody };
+    return { context: run.title, body: compact ? <div className="call-single"><button onClick={() => openDialog('backup')}>Project controls</button></div> : documentBody };
   }
   const documentBody = <div className="call-menu" data-web2-scroll tabIndex={0} role="region" aria-label="Show Control document">
       <label>Run title<input disabled={blocked} maxLength={200} value={run.title} onChange={e => setRun(r => ({ ...r, title: e.target.value }))} /></label>{context && <p aria-label="Read-only show context">{context}</p>}

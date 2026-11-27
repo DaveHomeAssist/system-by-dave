@@ -37,7 +37,7 @@ const base = process.env.VIEWPORT_BASE || 'http://localhost:4173/';
   assert.equal(await page.locator('html').getAttribute('data-av-theme'), 'light', 'the operator choice survives reload');
   assert.equal(await page.evaluate(() => localStorage.getItem('avCalculator.v1')), state);
   await view('audioCard');
-  const nextPanel = page.locator('.console-quick').getByRole('button', {name:'Projection',exact:true}); await nextPanel.focus(); await page.keyboard.press('Enter');
+  const nextPanel = page.locator('.console-quick').getByRole('button', {name:'Throw distance (quick)',exact:true}); await nextPanel.focus(); await page.keyboard.press('Enter');
   assert.equal(await page.locator('.console-panel[data-panel=projectionCard]').isVisible(), true);
   assert.equal(await nextPanel.evaluate(el => el === document.activeElement), true);
   await page.keyboard.press('Tab');

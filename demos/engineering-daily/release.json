@@ -1,9 +1,233 @@
 {
   "schema": 1,
-  "sourceSha256": "c5e4093195f6cffa20cf3191e0d08532c031657938163e251a009ba086141eee",
-  "publicSha256": "3c0b612aedf88548746ee1722519a222e338403cb1e3ec85f22d5adfbdb4415a",
-  "editions": 25,
+  "sourceSha256": "710b4e68e9c1d17a1a7fcb8d2c8d118fc0e1c4f7e03baa4150b0be582fc458af",
+  "publicSha256": "178aefb56d19adecd3e14c6b9b789bfcdb4fc662e5b4666fc3e2d31d78e01058",
+  "editions": 41,
   "files": [
+    {
+      "name": "Edition 040.svg",
+      "id": 40,
+      "date": "2026-11-27",
+      "title": "SDI checkfield stress test",
+      "sha256": "12236a40ec6acbc58e4584180c4c9662d5dee61133695bce7ac71135bb39086a"
+    },
+    {
+      "name": "Edition 040.png",
+      "id": 40,
+      "date": "2026-11-27",
+      "title": "SDI checkfield stress test",
+      "sha256": "42af5500731a605243efefa81508996f035ffe35299a1b532ea39cd2bd0f7eec"
+    },
+    {
+      "name": "Edition 041.svg",
+      "id": 41,
+      "date": "2026-11-26",
+      "title": "SDI Auto can choose Level A",
+      "sha256": "b05db312d896b7fbe8d24f87ba4b427068e7fd9af5a80460fff5c8af548f799b"
+    },
+    {
+      "name": "Edition 041.png",
+      "id": 41,
+      "date": "2026-11-26",
+      "title": "SDI Auto can choose Level A",
+      "sha256": "b4ca5a84c3c47ad55e5ada8e09afd99543336556acd6cd77154d265fc16ae29e"
+    },
+    {
+      "name": "Edition 039.svg",
+      "id": 39,
+      "date": "2026-11-15",
+      "title": "When audio delay follows video",
+      "sha256": "daaa2625a92c0cb15fa52999e623312ba9b0c405d6950ff776e6f03972f8e9e1"
+    },
+    {
+      "name": "Edition 039.png",
+      "id": 39,
+      "date": "2026-11-15",
+      "title": "When audio delay follows video",
+      "sha256": "922ee0c64179bc979a8c280f04d0c8e13c7600450fce83e6db549796d4215f77"
+    },
+    {
+      "name": "Edition 038.svg",
+      "id": 38,
+      "date": "2026-11-14",
+      "title": "SDI CRC error counts",
+      "sha256": "22fff4e7b4db91ca1d0316578b2ebb4c63b546ad3e72d00dbc754c8ed7863c80"
+    },
+    {
+      "name": "Edition 038.png",
+      "id": 38,
+      "date": "2026-11-14",
+      "title": "SDI CRC error counts",
+      "sha256": "c476b3cb0ee371a96fbcd6c1c6839009e75937841032b8d46d4ad7229f6b29aa"
+    },
+    {
+      "name": "Edition 037.svg",
+      "id": 37,
+      "date": "2026-11-13",
+      "title": "RTP repair before playout",
+      "sha256": "e26a5c434e4b8ae7e06302b7de2418f37d1663d22eca95268afc3191d396677c"
+    },
+    {
+      "name": "Edition 037.png",
+      "id": 37,
+      "date": "2026-11-13",
+      "title": "RTP repair before playout",
+      "sha256": "2151c4edf47b07c21fe387334decb99967b70fb1d99dc5a46c94e814cbb4da3c"
+    },
+    {
+      "name": "Edition 036.svg",
+      "id": 36,
+      "date": "2026-11-12",
+      "title": "Combined lens shift limits",
+      "sha256": "b23e68aa7d4a8871caedc1d927032414cfa4802fb373b0aec8dd39b43dce6903"
+    },
+    {
+      "name": "Edition 036.png",
+      "id": 36,
+      "date": "2026-11-12",
+      "title": "Combined lens shift limits",
+      "sha256": "4e1029a4f0b1626b7a95b215c543b53b819c61d3341d3bf99b455fb6e67c576a"
+    },
+    {
+      "name": "Edition 035.svg",
+      "id": 35,
+      "date": "2026-11-11",
+      "title": "Shutter angle and exposure",
+      "sha256": "c60898159132d2474c4f2a88c35f26b0e5dc92bb1d842b36a723c881800f4696"
+    },
+    {
+      "name": "Edition 035.png",
+      "id": 35,
+      "date": "2026-11-11",
+      "title": "Shutter angle and exposure",
+      "sha256": "3ed711aee1c321f453e31886abd72f78ebe201b27e7fd6d9e5d05b636ce001a4"
+    },
+    {
+      "name": "Edition 034.svg",
+      "id": 34,
+      "date": "2026-11-10",
+      "title": "HDR graphics white",
+      "sha256": "df6b8a249a32f83a34fea775bff44848e22fad9465d3049329ad3a75ee56f36e"
+    },
+    {
+      "name": "Edition 034.png",
+      "id": 34,
+      "date": "2026-11-10",
+      "title": "HDR graphics white",
+      "sha256": "d2a085742e6bca94f5582098164d90cf74c41a4d68057e438816d5e357299f15"
+    },
+    {
+      "name": "Edition 033.svg",
+      "id": 33,
+      "date": "2026-11-09",
+      "title": "JPEG XS line latency",
+      "sha256": "89ca9a6cdc11efa83a9ac0a4e865baabcaa3471e6f50a80429d3226027b0b68b"
+    },
+    {
+      "name": "Edition 033.png",
+      "id": 33,
+      "date": "2026-11-09",
+      "title": "JPEG XS line latency",
+      "sha256": "f09c906e98f0edbe95044f50ba657b101bb7c034d3ab2bcf1291c7a626990fbc"
+    },
+    {
+      "name": "Edition 032.svg",
+      "id": 32,
+      "date": "2026-11-08",
+      "title": "DisplayPort MST shared capacity",
+      "sha256": "7128558bf5c99df1013eda3e000e66196f6b38fc451731e53b34ba17417ab0b1"
+    },
+    {
+      "name": "Edition 032.png",
+      "id": 32,
+      "date": "2026-11-08",
+      "title": "DisplayPort MST shared capacity",
+      "sha256": "a8be4588506ac4495347bde2675d0f91cd4f4b660a0e096b5beef48905ac8048"
+    },
+    {
+      "name": "Edition 031.svg",
+      "id": 31,
+      "date": "2026-11-07",
+      "title": "Return loss and reflections",
+      "sha256": "bf5abdc81dc116241070b0e812999e490827c97bccbf619727b1c7cc89fff508"
+    },
+    {
+      "name": "Edition 031.png",
+      "id": 31,
+      "date": "2026-11-07",
+      "title": "Return loss and reflections",
+      "sha256": "a8a2d579652c8db7659434e52242f6f74d2e71ccbb43e16699335db53ac7c1e0"
+    },
+    {
+      "name": "Edition 030.svg",
+      "id": 30,
+      "date": "2026-11-06",
+      "title": "ST 2110 essence routing",
+      "sha256": "c67dd87f854ee405f294631977cd9b5b83b97db750a196c9c8952bbae60cb938"
+    },
+    {
+      "name": "Edition 030.png",
+      "id": 30,
+      "date": "2026-11-06",
+      "title": "ST 2110 essence routing",
+      "sha256": "62946a0fd45e9fcc3a79f8e70b697e4a3f44b2519b2513538a4af7c8cfad2943"
+    },
+    {
+      "name": "Edition 029.svg",
+      "id": 29,
+      "date": "2026-11-05",
+      "title": "Rolling shutter row timing",
+      "sha256": "39def560efa2098f5386e9044971fedabcc41dd9530ac71d1dc73d6580687372"
+    },
+    {
+      "name": "Edition 029.png",
+      "id": 29,
+      "date": "2026-11-05",
+      "title": "Rolling shutter row timing",
+      "sha256": "eef6da87813673a0356494b0c385eeb4f6f65c988565885ab492038580489ecb"
+    },
+    {
+      "name": "Edition 028.svg",
+      "id": 28,
+      "date": "2026-11-04",
+      "title": "Processing depth and input depth",
+      "sha256": "4216ec52c355f8ac24af37ae049376372494a6cf94be7f9ea6329e7cd49eadc8"
+    },
+    {
+      "name": "Edition 028.png",
+      "id": 28,
+      "date": "2026-11-04",
+      "title": "Processing depth and input depth",
+      "sha256": "fc6793c83b5e11d41dab6cc3a4508d98f0f5d24efb9bff4cdb16c21755d85dec"
+    },
+    {
+      "name": "Edition 027.svg",
+      "id": 27,
+      "date": "2026-11-03",
+      "title": "Quad link image mapping",
+      "sha256": "1cb67c7dc03702ad0259181304bade85bae7c1ef7986344af5513002b3620c75"
+    },
+    {
+      "name": "Edition 027.png",
+      "id": 27,
+      "date": "2026-11-03",
+      "title": "Quad link image mapping",
+      "sha256": "f3027fca378af5b68e6a915cb30a82af24cbeb1e48247a847d049fa0b66d1cce"
+    },
+    {
+      "name": "Edition 026.svg",
+      "id": 26,
+      "date": "2026-11-02",
+      "title": "Active HDMI cable direction",
+      "sha256": "d4a65c36ce5a31ab6440b1b14faa852e87d56402161249d600760ddab4146e6f"
+    },
+    {
+      "name": "Edition 026.png",
+      "id": 26,
+      "date": "2026-11-02",
+      "title": "Active HDMI cable direction",
+      "sha256": "f278b85ae137190085fb8d5a24dc92904c2a46a25a0c98c4301359c7fa1f5700"
+    },
     {
       "name": "Edition 025.svg",
       "id": 25,

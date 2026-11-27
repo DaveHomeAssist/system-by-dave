@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleIdentifier</key><string>com.systembydave.envision.studio</string>
+  <key>CFBundleDisplayName</key><string>Envision Studio</string>
+  <key>CFBundleName</key><string>Envision Studio</string>
+  <key>CFBundleExecutable</key><string>EnvisionStudio</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>1.1.0</string>
+  <key>CFBundleVersion</key><string>4</string>
+  <key>CFBundleIconFile</key><string>Envision.icns</string>
+  <key>LSMinimumSystemVersion</key><string>13.0</string>
+  <key>LSApplicationCategoryType</key><string>public.app-category.graphics-design</string>
+  <key>NSHighResolutionCapable</key><true/>
+  <key>CFBundleDocumentTypes</key><array>
+    <dict>
+      <key>CFBundleTypeName</key><string>Image for comparison</string>
+      <key>CFBundleTypeRole</key><string>Viewer</string>
+      <key>LSHandlerRank</key><string>Alternate</string>
+      <key>LSItemContentTypes</key><array><string>public.png</string><string>public.jpeg</string><string>org.webmproject.webp</string></array>
+    </dict>
+    <dict>
+      <key>CFBundleTypeName</key><string>Envision editable project</string>
+      <key>CFBundleTypeRole</key><string>Viewer</string>
+      <key>LSHandlerRank</key><string>Alternate</string>
+      <key>LSItemContentTypes</key><array><string>public.zip-archive</string><string>public.json</string></array>
+    </dict>
+  </array>
+</dict></plist>

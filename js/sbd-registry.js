@@ -30,13 +30,13 @@
     {id:'show-ops',name:'Show Ops',href:'show-ops/',dept:'Rooms',phases:['advance','prep','loadin','show','closeout'],tag:'Application',desc:'Room readiness, crew calls, tasks and show handoff in one saved workspace.',storageKeys:[{key:'sbd.showOps.document.v1',label:'Show Ops document'},{key:'sbd.showOps.draft.v1',label:'Show Ops unsaved draft'},{key:'sbd.showOps.layout.v1',label:'Show Ops device layout'}]},
     {id:'front-office',name:'Front Office',href:'front-office/',dept:'Client',phases:['advance','prep','show','closeout'],tag:'Application',desc:'Working client, venue, job and advance panels with explicit Save and an independent local document.',storageKeys:[{key:'sbd.frontOffice.document.v1',label:'Front Office document'},{key:'sbd.frontOffice.draft.v1',label:'Front Office recovery draft'},{key:'sbd.frontOffice.layout.v1',label:'Front Office device layout'}]},
     {id:'the-shop',name:'The Shop',href:'the-shop/',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Application',desc:'Configurable worklist, item inspector, plan/import and backup panels with source-preserving copies.',storageKeys:[{key:'sbd.shop.v1',label:'The Shop plan'},{key:'sbd.shop.draft.v1',label:'The Shop recovery draft'},{key:'sbd.shop.layout.v1',label:'The Shop device layout'}]},
-    {id:'infrastructure',name:'Infrastructure',href:'infrastructure/',dept:'Power',phases:['advance','prep','loadin'],tag:'Application',desc:'Working power, network, cable and issue panels with compatible imports and explicit Save.',storageKeys:[{key:'sbd.infrastructure.v1',label:'Infrastructure plan'},{key:'sbd.infrastructure.draft.v1',label:'Infrastructure recovery draft'},{key:'sbd.infrastructure.layout.v1',label:'Infrastructure device layout'}]},
+    {id:'infrastructure',name:'Infrastructure',href:'infrastructure/',dept:'Power',phases:['advance','prep','loadin'],tag:'Application',desc:'Working power, network, cable and issue panels with compatible imports and explicit Save.',storageKeys:[{key:'sbd.infrastructure.v1',label:'Infrastructure plan'},{key:'sbd.infrastructure.draft.v1',label:'Infrastructure recovery draft'},{key:'sbd.infrastructure.layout.v1',label:'Infrastructure device layout'}],keywords:['power','network','cable']},
     {id:'av-lighting',name:'Lighting',href:'av-lighting/',dept:'Lighting',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Working fixture, patch, focus and import panels; PlotForge remains the full lighting-plot product.',storageKeys:[{key:'sbd.avLighting.v1',label:'Lighting plan'},{key:'sbd.avLighting.draft.v1',label:'Lighting recovery draft'},{key:'sbd.avLighting.layout.v1',label:'Lighting device layout'}]},
-    {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.pacePresets.v1',label:'Teleprompter saved paces'},{key:'teleprompter.bookmarks.v1',label:'Teleprompter bookmarks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
-    {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
-    {id:'cue-sheet',name:'Cue Sheet',href:'cue-sheet.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Browser based rundown control with preview, lightweight layered playback, monitor output, capture inputs, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'Cue Sheet state'}]},
+    {id:'teleprompter',icon:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.pacePresets.v1',label:'Teleprompter saved paces'},{key:'teleprompter.bookmarks.v1',label:'Teleprompter bookmarks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
+    {id:'show-timer',icon:'clock',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
+    {id:'cue-sheet',icon:'list',name:'Cue Sheet',href:'cue-sheet.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Browser based rundown control with preview, lightweight layered playback, monitor output, capture inputs, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'Cue Sheet state'}]},
     {id:'playback-check',retired:'video',name:'Playback Check',href:'playback-check.html',dept:'Playback',phases:['prep','show'],tag:'Media',desc:'Playback file checklist with routes, backups, duration, ready state, and export.',storageKeys:[{key:'playback-check.v1',label:'Playback Check'}]},
-    {id:'pixelforge',name:'PixelForge',href:'pixelforge/',dept:'Graphics',phases:['advance','prep','show','closeout'],tag:'Graphics',desc:'Raster, vector, text, and image-editing workspace for show graphics, signage fixes, simple overlays, and PNG export.',storageKeys:[{key:'PixelForge.prefs.v1',label:'PixelForge preferences'},{key:'pf:palettes:v1',label:'PixelForge palettes'}]},
+    {id:'pixelforge',icon:'pixelforge',name:'PixelForge',href:'pixelforge/',dept:'Graphics',phases:['advance','prep','show','closeout'],tag:'Graphics',desc:'Raster, vector, text, and image-editing workspace for show graphics, signage fixes, simple overlays, and PNG export.',storageKeys:[{key:'PixelForge.prefs.v1',label:'PixelForge preferences'},{key:'pf:palettes:v1',label:'PixelForge palettes'}]},
     {id:'record-log',retired:'video',name:'Record Log',href:'record-log.html',dept:'Playback',phases:['show','closeout'],tag:'Record',desc:'Program records, camera ISOs, audio captures, media destinations, backup status, and handoff notes.',storageKeys:[{key:'record-log.v1',label:'Record Log'}]},
     {id:'stream-plan',retired:'video',name:'Stream Plan',href:'stream-plan.html',dept:'Streaming',phases:['advance','prep','show'],tag:'Stream',desc:'Encoder, platform, destination, bitrate, audio, record, backup, and test tracking.',storageKeys:[{key:'sbd.streamPlan.v1',label:'Stream Plan'}]},
     {id:'show-advance',retired:'front-office',name:'Show Advance',href:'show-advance.html',dept:'Planning',phases:['advance'],tag:'Advance',desc:'Contacts, access, schedule, power, network, labor, deliverables, risks, and open questions.',storageKeys:[{key:'show-advance.v1',label:'Show Advance'}]},
@@ -61,20 +61,20 @@
     {id:'video-patch',retired:'video',consolidatedInto:'av-video',name:'Video Patch',href:'video-patch.html',dept:'Video',phases:['prep','loadin','show'],tag:'Video',desc:'Sources, formats, connectors, switcher inputs, converters, destinations, routes, backups, and tests.',storageKeys:[{key:'sbd.videoPatch.v1',label:'Video Patch'}]},
     {id:'display-plan',retired:'video',name:'Display Plan',href:'display-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Displays',desc:'Displays, inputs, processors, resolutions, aspect ratios, refresh rates, routes, backups, and status.',storageKeys:[{key:'display-plan.v1',label:'Display Plan'}]},
     {id:'projection-plan',retired:'video',name:'Projection Plan',href:'projection-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Projection',desc:'Screens, surfaces, projectors, lenses, throw, positions, routes, blends, backup paths, and alignment.',storageKeys:[{key:'sbd.projectionPlan.v1',label:'Projection Plan'}]},
-    {id:'throwline',name:'Throwline',href:'ProjectorThrow/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Projection',desc:'Offline projector throw, fit, field commissioning, spatial room planning, calculated multi-projector layouts, dimensioned views, and show handoff.',storageKeys:[{key:'throwline:lenses:v2',label:'Throwline custom lenses'},{key:'throwline:jobs:v2',label:'Throwline saved jobs'},{key:'throwline:shift-profiles:v1',label:'Throwline shift profiles'},{key:'throwline:inventory:v1',label:'Throwline crew inventory'},{key:'throwline:show:v1',label:'Throwline current show'},{key:'throwline:stage-scene:v1',label:'Throwline Stage scenes'},{key:'throwline:stage-onboarding:v1',label:'Throwline Stage onboarding'},{key:'throwline:stage-units:v1',label:'Throwline Stage measurement units'},{key:'throwline:theme:v1',label:'Throwline theme'}]},
+    {id:'throwline',icon:'throwline',name:'Throwline',href:'ProjectorThrow/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Projection',desc:'Offline projector throw, fit, field commissioning, spatial room planning, calculated multi-projector layouts, dimensioned views, and show handoff.',keywords:['throw','projector','lens','stage 3d'],storageKeys:[{key:'throwline:lenses:v2',label:'Throwline custom lenses'},{key:'throwline:jobs:v2',label:'Throwline saved jobs'},{key:'throwline:shift-profiles:v1',label:'Throwline shift profiles'},{key:'throwline:inventory:v1',label:'Throwline crew inventory'},{key:'throwline:show:v1',label:'Throwline current show'},{key:'throwline:stage-scene:v1',label:'Throwline Stage scenes'},{key:'throwline:stage-onboarding:v1',label:'Throwline Stage onboarding'},{key:'throwline:stage-units:v1',label:'Throwline Stage measurement units'},{key:'throwline:theme:v1',label:'Throwline theme'}]},
     {id:'lighting-patch',retired:'lighting',name:'Lighting Patch',href:'lighting-patch.html',dept:'Lighting',phases:['advance','prep','loadin','show'],tag:'LX',desc:'Fixtures, positions, modes, universes, addresses, channels, dimmers, colors, focus notes, and status.',storageKeys:[{key:'lighting-patch.v1',label:'Lighting Patch'}]},
     {id:'cable-plan',retired:'infrastructure',name:'Cable Plan',href:'cable-plan.html',dept:'Build',phases:['prep','loadin','strike'],tag:'Cable',desc:'Cable types, lengths, source, destination, path, labels, owners, pull status, trip, and slack issues.',storageKeys:[{key:'cable-plan.v1',label:'Cable Plan'}]},
     {id:'rf-coordination',retired:'audio',name:'RF Coordination',href:'rf-coordination.html',dept:'Comms',phases:['advance','prep','show'],tag:'RF',desc:'Wireless mics, IEM, IFB, comms packs, receivers, frequencies, bands, conflicts, and backups.',storageKeys:[{key:'rf-coordination.v1',label:'RF Coordination'}]},
     {id:'comms-check',retired:'audio',name:'Comms Check',href:'comms-check.html',dept:'Comms',phases:['prep','show'],tag:'Comms',desc:'Intercom, radio, and IFB assignments with channels, devices, battery, backups, and issue flags.',storageKeys:[{key:'comms-check.v1',label:'Comms Check'}]},
     {id:'camera-shot-list',retired:'video',name:'Camera Shot List',href:'camera-shot-list.html',dept:'Camera',phases:['advance','prep','show'],tag:'Camera',desc:'Camera plan with shot rows, framing, movement, presets, ready and problem status, and take next.',storageKeys:[{key:'camera-shot-list.v1',label:'Camera Shot List'}]},
-    {id:'stageplotter',name:'StagePlotter',href:'stage-plot.html',dept:'Planning',phases:['advance','prep','loadin'],tag:'Room Plot',desc:'Offline-capable room layout sketcher with illustrated stages, screens, cameras, speakers, mics, furniture, power, people, and cable paths.',storageKeys:[{key:'stage-plot.v1',label:'StagePlotter'}]},
+    {id:'stageplotter',icon:'floorplan',name:'StagePlotter',href:'stage-plot.html',dept:'Planning',phases:['advance','prep','loadin'],tag:'Room Plot',desc:'Offline-capable room layout sketcher with illustrated stages, screens, cameras, speakers, mics, furniture, power, people, and cable paths.',storageKeys:[{key:'stage-plot.v1',label:'StagePlotter'}]},
     {id:'gear-prep',retired:'shop',name:'Gear Prep',href:'gear-prep.html',dept:'Logistics',phases:['prep'],tag:'Gear',desc:'Pull sheets, case IDs, quantities, departments, owners, test, pack, load, issues, and open items.',storageKeys:[{key:'gear-prep.v1',label:'Gear Prep'}]},
-    {id:'gear-reference',name:'Gear Reference',href:'gear-reference.html',dept:'Logistics',phases:['prep','loadin'],tag:'Reference',desc:'Offline per-device field sheets with specifications, schematics, procedures, consumables, intake checks, and source confidence.',storageKeys:[]},
+    {id:'gear-reference',icon:'bookOpen',name:'Gear Reference',href:'gear-reference.html',dept:'Logistics',phases:['prep','loadin'],tag:'Reference',desc:'Offline per-device field sheets with specifications, schematics, procedures, consumables, intake checks, and source confidence.',storageKeys:[]},
     {id:'truck-pack',retired:'shop',name:'Truck Pack Plan',href:'truck-pack.html',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Truck',desc:'Cases, truck zones, load order, unload order, weights, owners, pack status, and issues.',storageKeys:[{key:'truck-pack.v1',label:'Truck Pack Plan'}]},
     {id:'load-in-plan',retired:'shop',name:'Load In Plan',href:'load-in-plan.html',dept:'Logistics',phases:['loadin'],tag:'Load In',desc:'Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps.',storageKeys:[{key:'load-in-plan.v1',label:'Load In Plan'}]},
     {id:'strike-plan',retired:'shop',name:'Strike Plan',href:'strike-plan.html',dept:'Logistics',phases:['strike'],tag:'Strike',desc:'Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues.',storageKeys:[{key:'strike-plan.v1',label:'Strike Plan'}]},
     {id:'av-calculator',name:'AV Calculator',href:'av-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'Math',desc:'Working calculation and summary panels with named field sets and configurable views.',storageKeys:[{key:'avCalculator.v1',label:'AV Calculator'},{key:'avCalculator.fieldSets.v1',label:'AV Calculator field sets'},{key:'avCalculator.views.v1',label:'AV Calculator stored views'},{key:'avCalculator.layout.v1',label:'AV Calculator device layout'}]},
-    {id:'led-wall-calculator',name:'LED Wall Calculator',href:'led-wall-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'LED',desc:'Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning.',storageKeys:[{key:'avCalculator.ledProfiles.v1',label:'LED wall cabinet profiles'}]},
+    {id:'led-wall-calculator',icon:'ledwall',name:'LED Wall Calculator',href:'led-wall-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'LED',desc:'Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning.',keywords:['led','wall','cabinet','raster','processor'],storageKeys:[{key:'avCalculator.ledProfiles.v1',label:'LED wall cabinet profiles'}]},
     {id:'ontrack',name:'OnTrack',href:'ontrack.html',dept:'Music',phases:['prep','show','closeout'],tag:'DJ',desc:'DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes.',storageKeys:[{key:'ontrack_v1',label:'OnTrack library, sets, and notes'}]}
   ];
 
@@ -90,19 +90,20 @@
 
   /* Universal-nav grouping (matches the homepage + All Tools directory).
      Coarser than tool.dept on purpose — ten browseable groups. */
+  /* Live tools only. Retired sheet ids and repeated ids stay out of the
+     directory; gear-reference remains in Logistics. */
   var NAV_DEPARTMENTS=[
-    {label:'Show planning',toolIds:['show-advance','show-ops','show-task-board','show-handoff','show-report']},
-    {label:'Run of show',toolIds:['show-control','teleprompter','show-timer','cue-sheet','playback-check','comms-check']},
-    {label:'Graphics',toolIds:['pixelforge','playback-check','display-plan','projection-plan']},
-    {label:'Audio',toolIds:['av-audio','audio-patch','line-check','input-list','speaker-plan','rf-coordination']},
-    {label:'Video',toolIds:['av-video','display-plan','projection-plan','throwline','stream-plan','record-log','camera-shot-list']},
-    {label:'Lighting',toolIds:['av-lighting','lighting-patch']},
-    {label:'Power & data',toolIds:['infrastructure','power-plan','network-plan','cable-plan']},
-    {label:'Spaces & staging',toolIds:['show-board','stageplotter','room-check','breakout-room-matrix','site-survey']},
-    {label:'Logistics',toolIds:['the-shop','gear-prep','gear-reference','truck-pack','load-in-plan','strike-plan','show-advance']},
-    {label:'Crew',toolIds:['crew-call','crew-time-log']},
-    {label:'Show docs & client',toolIds:['front-office','show-handoff','show-report','show-task-board','change-order','client-signoff']},
-    {label:'Equipment',toolIds:['equipment-lab','gear-reference']},
+    {label:'Show planning',toolIds:['show-ops']},
+    {label:'Run of show',toolIds:['show-control','teleprompter','show-timer','cue-sheet']},
+    {label:'Graphics',toolIds:['pixelforge']},
+    {label:'Audio',toolIds:['av-audio']},
+    {label:'Video',toolIds:['av-video','throwline']},
+    {label:'Lighting',toolIds:['av-lighting']},
+    {label:'Power & data',toolIds:['infrastructure']},
+    {label:'Spaces & staging',toolIds:['stageplotter']},
+    {label:'Logistics',toolIds:['the-shop','gear-reference']},
+    {label:'Show docs & client',toolIds:['front-office']},
+    {label:'Equipment',toolIds:['equipment-lab']},
     {label:'Calculators',toolIds:['av-calculator','led-wall-calculator']},
     {label:'Music',toolIds:['ontrack']}
   ];
@@ -117,6 +118,18 @@
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
+    /* The avbydave.com home page (av-home/), so a saved copy of / opens styled offline. */
+    './av-home/index.html',
+    './av-home/home.css',
+    './av-home/home.js',
+    './av-home/favicon.svg',
+    './css/avd/tokens.css',
+    './css/avd/bundle.css',
+    './css/avd/fonts/ArchivoExpanded-Variable.woff2',
+    './css/avd/fonts/Archivo-Variable.woff2',
+    './css/avd/fonts/IBMPlexMono-Regular.woff2',
+    './css/avd/fonts/IBMPlexMono-Medium.woff2',
+    './css/avd/fonts/IBMPlexMono-SemiBold.woff2',
     './equipment-lab/index.html',
     './equipment-lab/assets/equipment-lab.js',
     './equipment-lab/assets/equipment-lab-Viewer.js',
@@ -126,9 +139,19 @@
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.manifest.json',
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.definition.json',
     './equipment-lab/data/models/cartoni.maxima30.reference/cartoni.maxima30.inspection.glb',
+    './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.manifest.json',
+    './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.definition.json',
+    './equipment-lab/data/models/barco.udm4k22.inspection/barco.udm4k22.inspection.glb',
+    './equipment-lab/data/models/panasonic.ptdw830.inspection/panasonic.ptdw830.manifest.json',
+    './equipment-lab/data/models/panasonic.ptdw830.inspection/panasonic.ptdw830.definition.json',
+    './equipment-lab/data/models/panasonic.ptdw830.inspection/panasonic.ptdw830.inspection.glb',
+    './equipment-lab/data/models/panasonic.ptrz970.inspection/panasonic.ptrz970.manifest.json',
+    './equipment-lab/data/models/panasonic.ptrz970.inspection/panasonic.ptrz970.definition.json',
+    './equipment-lab/data/models/panasonic.ptrz970.inspection/panasonic.ptrz970.inspection.glb',
     './av-suite-worker.js',
     './js/sbd-registry.js',
     './js/av-suite-context.js',
+    './js/sbd-shortcuts.js',
     './js/sbd-nav.js',
     './js/sbd-public-nav.js',
     './js/av-theme.js',
@@ -172,7 +195,6 @@
     './js/sbd-rail.js',
     './js/sbd-rail-dialogs.js',
     './js/sbd-rail-mount.js',
-    './js/sbd-shortcuts.js',
     './js/av-offline.js',
     './css/responsive-tables.css',
     './css/fonts.css',
@@ -274,7 +296,7 @@
     {id:'show-ops',prototypeId:'showops',label:'Show Ops',availability:'available',toolId:'show-ops',panelGroup:'Common',draftKey:'sbd.showOps.draft.v1',layoutKey:'sbd.showOps.layout.v1',icon:['M3 5h18v16H3z','M3 10h18','M8 3v4','M16 3v4','M7 14h5','M10 17h7']},
     {id:'front-office',prototypeId:'office',label:'Front Office',availability:'available',toolId:'front-office',panelGroup:'Planning',draftKey:'sbd.frontOffice.draft.v1',layoutKey:'sbd.frontOffice.layout.v1',icon:['M5 4h14v17H5z','M9 4V2h6v2','m9 13 2 2 4-4']},
     {id:'shop',prototypeId:'shop',label:'The Shop',availability:'available',toolId:'the-shop',panelGroup:'Planning',draftKey:'sbd.shop.draft.v1',layoutKey:'sbd.shop.layout.v1',icon:['M4 4h16v13H4z','M4 9h16','M10 12h4','M8 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z','M16 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z']},
-    {id:'infrastructure',prototypeId:'infra',label:'Infrastructure',availability:'available',toolId:'infrastructure',panelGroup:'Planning',draftKey:'sbd.infrastructure.draft.v1',layoutKey:'sbd.infrastructure.layout.v1',icon:['M13 2 4 14h7l-1 8 9-12h-7z']},
+    {id:'infrastructure',prototypeId:'infra',label:'Power, Network & Cable',availability:'available',toolId:'infrastructure',panelGroup:'Planning',draftKey:'sbd.infrastructure.draft.v1',layoutKey:'sbd.infrastructure.layout.v1',icon:['M13 2 4 14h7l-1 8 9-12h-7z']},
     {id:'lighting',prototypeId:'lighting',label:'Lighting',availability:'available',toolId:'av-lighting',panelGroup:'Utilities',draftKey:'sbd.avLighting.draft.v1',layoutKey:'sbd.avLighting.layout.v1',icon:['M9 18h6','M10 21h4','M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z']},
     {id:'equipment-lab',prototypeId:'equipmentlab',label:'Equipment Lab',availability:'available',toolId:'equipment-lab',panelGroup:'Utilities',icon:['M3 7l9-5 9 5v10l-9 5-9-5z','M3 7l9 5 9-5','M12 12v10']},
     {id:'av-calculator',prototypeId:'calc',label:'AV Calculator',availability:'available',toolId:'av-calculator',panelGroup:'Utilities',icon:['M5 3h14v18H5z','M8 7h8v3H8z','M8 14h2','M11 14h2','M14 14h2','M8 17.5h2','M11 17.5h2','M14 17.5h2']}
@@ -301,9 +323,45 @@
     {id:'cueforge',label:'CueForge',kind:'handoff',destination:'https://systembydave.com/cueforge.html',badge:'Desktop app'},
     {id:'plotforge',label:'PlotForge',kind:'handoff',destination:'plotforge.html',badge:'Own app'},
     {id:'housevideo',label:'House Video / FMP',kind:'handoff',destination:'https://housevideo.app/',badge:'Link out'},
-    {id:'arenaops',label:'Arena Ops',kind:'status',badge:'API pending'},
-    {id:'deckforge',label:'DeckForge + Stream Deck',kind:'status',badge:'Control surface'}
+    {id:'rehearsal-capture',label:'Rehearsal Capture',kind:'handoff',destination:'rehearsal-capture/',badge:'Own app'}
   ];
+
+  /* Guide pages are not tools: they stay out of the sitemap, the offline
+     suite and the public tool count. Search and the Learn section link them. */
+  var GUIDES=[
+    {id:'console-spec',icon:'book',name:'Console Spec Guide',href:'console-guide/',badge:'GUIDE',blurb:'~50 lighting desks, free',keywords:['console','spec','desk','lighting','guide']},
+    {id:'frame-sync',icon:'sync',name:'Frame-sync demo',href:'https://systembydave.com/demos/frame-sync.html',external:true,blurb:'Genlock, sync and EDID',keywords:['sync','genlock','edid','hdcp','frame','signal']},
+    {id:'fault-finding',icon:'search',name:'Fault-finding game',href:'https://systembydave.com/demos/fault-finding.html',external:true,blurb:'Swap to isolate a fault',keywords:['fault','troubleshoot','swap','signal']},
+    {id:'field-kit',icon:'signal',name:'Sync & Signal Field Kit',href:'field-kit/',badge:'$12',blurb:'The sync and signal reference',keywords:['edid','hdcp','sync','genlock','field kit','signal']}
+  ];
+
+  /* Rail featured list. The Add panel row is the panel types in featuredPanels. */
+  var FEATURED=[
+    {kind:'tool',id:'throwline',blurb:'Projector throw & 3D room'},
+    {kind:'tool',id:'led-wall-calculator',blurb:'Cabinets, raster, ports, power'},
+    {kind:'panel',type:'video:flow',label:'Signal Flow',blurb:'AV Video · routes & export',icon:'flow'},
+    {kind:'guide',id:'console-spec',blurb:'~50 lighting desks, free'},
+    {kind:'console',id:'av-calculator',blurb:'Delay, storage, power, SPL'}
+  ];
+  var FEATURED_PANELS=['tool:throwline','tool:led-wall-calculator','video:flow','video:multiview','calculator:audioCard','show-control:deck'];
+
+  /* Fixed menu sections. Department ids are console ids. Saved rail pins stay
+     in sbd.rail.v1 and are not rewritten by this list. */
+  var MENU={
+    departments:['av-video','audio','lighting','show-control','show-ops','infrastructure','shop','front-office'],
+    /* Plain ids are tools; a namespaced ref (external:...) is an own-app handoff. */
+    showTools:['teleprompter','show-timer','cue-sheet','pixelforge','stageplotter','external:rehearsal-capture'],
+    reference:[
+      {kind:'console',id:'equipment-lab',blurb:'Library, practice and 3D models'},
+      {kind:'tool',id:'gear-reference',blurb:'Offline field sheets'}
+    ],
+    learn:['frame-sync','fault-finding','field-kit'],
+    otherTools:[],
+    /* Dave asked (Nov 27) to keep these out of All apps; they stay pinnable
+       from Customize and reachable by their own links. */
+    hiddenFromAllApps:['tool:ontrack','external:housevideo']
+  };
+  var RECENT_KEY='sbd.avSuite.recent.v1';
 
   function offlineAssets(){
     var seen={};
@@ -337,9 +395,15 @@
     return null;
   }
 
+  function guideById(id){
+    id=String(id||'');
+    for(var i=0;i<GUIDES.length;i++){if(GUIDES[i].id===id) return GUIDES[i];}
+    return null;
+  }
+
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261101-keyboard-shortcuts',
+    version:'v20261127-av-console-shortcuts',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
@@ -347,12 +411,18 @@
     consoles:CONSOLES,
     rail:RAIL,
     externals:EXTERNALS,
+    guides:GUIDES,
+    featured:FEATURED,
+    featuredPanels:FEATURED_PANELS,
+    menu:MENU,
+    recentKey:RECENT_KEY,
     aliases:ALIASES,
     idAliases:ID_ALIASES,
     baseAssets:BASE_ASSETS,
     offlineAssets:offlineAssets,
     toolById:toolById,
     normalizeToolId:normalizeToolId,
-    externalById:externalById
+    externalById:externalById,
+    guideById:guideById
   };
 })(typeof self!=='undefined'?self:this);

@@ -1,0 +1,119 @@
+"skill": "local-data-durability"
+"scope": "Failed saved-data reads, recovery, rejected writes and current-format restart only"
+"project": "System by Dave AOM Show Board"
+"target":
+  "revision": "Follow-up to d4405c26739b38f1392fd51914d1fd45cfcdb892; exact artifact SHA256 below"
+  "branch": "codex/aom-board-policy-1030"
+  "environment": "Dominic Linux Docker; isolated browser contexts; existing aom_show_board_v15 key with synthetic fixtures"
+  "artifact":
+    "aom-show-board.html": "859b5ea64ea2ce7ee89b124c551ff8885e90a0a54158460c2fbf1c041c2a1171"
+    "js/aom-show-board.js": "84153181b38f94e9944db3735782c01d216d6c1180e96d55cd004eb2e56c9ada"
+    "js/aom-show-board-shell.js": "d5f6e73f3ffa0f85ded8e383192d26b97c41be09153a929145edbd5a223119c6"
+    "scripts/probe_aom_storage.mjs": "5124573de9971885cf81ac8259dc7bf6feddafd1558c5247e4be54b1eb4976ee"
+  "platform": "Chromium; localStorage plus mocked artifact storage"
+"requirements":
+  -
+    "id": "read-preservation"
+    "acceptance_criterion": "Read or parse failure must not overwrite saved text; writes stay blocked."
+    "required": true
+  -
+    "id": "recovery"
+    "acceptance_criterion": "Recovery export preserves exact string code units; explicit retry reopens valid data."
+    "required": true
+  -
+    "id": "write-rejection"
+    "acceptance_criterion": "Rejected writes retain prior stored data and persistent visible failure."
+    "required": true
+  -
+    "id": "current-restart"
+    "acceptance_criterion": "Current format saves and reloads; fresh stores and explicit reset work."
+    "required": true
+  -
+    "id": "failure-layout"
+    "acceptance_criterion": "Recovery controls remain reachable in six viewport sizes and both themes."
+    "required": true
+  -
+    "id": "prior-migration"
+    "acceptance_criterion": "An identified prior format migrates without loss."
+    "required": false
+  -
+    "id": "interruption"
+    "acceptance_criterion": "Defined process interruption preserves committed data."
+    "required": false
+  -
+    "id": "human"
+    "acceptance_criterion": "Operator and assistive technology acceptance."
+    "required": false
+"evidence":
+  -
+    "requirement_id": "read-preservation"
+    "kind": "runtime"
+    "reference": "Baseline d4405c26739b38f1392fd51914d1fd45cfcdb892; malformed saved JSON then theme edit: AssertionError malformed JSON: original bytes were overwritten"
+    "observed_at": "2026-10-30T21:08:45.631907+00:00"
+    "result": "fail"
+    "limitations": "Failed-before disposable fixture, stopped at first data invariant. Superseded by passing repaired artifact below; not a production data-loss report."
+  -
+    "requirement_id": "read-preservation"
+    "kind": "runtime"
+    "reference": "scripts/probe_aom_storage.mjs; Dominic isolated Chromium, Node 24.20, Playwright image v1.63.0-noble; final sequential command exit 0"
+    "observed_at": "2026-10-30T21:08:45.631907+00:00"
+    "result": "pass"
+    "limitations": "Synthetic disposable localStorage and artifact adapter fixtures; network-disabled and font-only network runs. No real user data or artifact backend acceptance."
+  -
+    "requirement_id": "recovery"
+    "kind": "runtime"
+    "reference": "scripts/probe_aom_storage.mjs; Dominic isolated Chromium, Node 24.20, Playwright image v1.63.0-noble; final sequential command exit 0"
+    "observed_at": "2026-10-30T21:08:45.631907+00:00"
+    "result": "pass"
+    "limitations": "Synthetic disposable localStorage and artifact adapter fixtures; network-disabled and font-only network runs. No real user data or artifact backend acceptance."
+  -
+    "requirement_id": "write-rejection"
+    "kind": "runtime"
+    "reference": "scripts/probe_aom_storage.mjs; Dominic isolated Chromium, Node 24.20, Playwright image v1.63.0-noble; final sequential command exit 0"
+    "observed_at": "2026-10-30T21:08:45.631907+00:00"
+    "result": "pass"
+    "limitations": "Synthetic disposable localStorage and artifact adapter fixtures; network-disabled and font-only network runs. No real user data or artifact backend acceptance."
+  -
+    "requirement_id": "current-restart"
+    "kind": "runtime"
+    "reference": "scripts/probe_aom_storage.mjs; Dominic isolated Chromium, Node 24.20, Playwright image v1.63.0-noble; final sequential command exit 0"
+    "observed_at": "2026-10-30T21:08:45.631907+00:00"
+    "result": "pass"
+    "limitations": "Synthetic disposable localStorage and artifact adapter fixtures; network-disabled and font-only network runs. No real user data or artifact backend acceptance."
+  -
+    "requirement_id": "failure-layout"
+    "kind": "runtime"
+    "reference": "scripts/probe_aom_storage.mjs; Dominic isolated Chromium, Node 24.20, Playwright image v1.63.0-noble; final sequential command exit 0"
+    "observed_at": "2026-10-30T21:08:45.631907+00:00"
+    "result": "pass"
+    "limitations": "Synthetic disposable localStorage and artifact adapter fixtures; network-disabled and font-only network runs. No real user data or artifact backend acceptance."
+  -
+    "requirement_id": "prior-migration"
+    "kind": "runtime"
+    "reference": "Scope exclusion in docs/aom-show-board.md"
+    "observed_at": "2026-10-30T21:08:45.631907+00:00"
+    "result": "unknown"
+    "limitations": "No identified historical migration fixture, safe interruption protocol or human acceptance run. Not a full durability certification."
+  -
+    "requirement_id": "interruption"
+    "kind": "runtime"
+    "reference": "Scope exclusion in docs/aom-show-board.md"
+    "observed_at": "2026-10-30T21:08:45.631907+00:00"
+    "result": "unknown"
+    "limitations": "No identified historical migration fixture, safe interruption protocol or human acceptance run. Not a full durability certification."
+  -
+    "requirement_id": "human"
+    "kind": "human_acceptance"
+    "reference": "Scope exclusion in docs/aom-show-board.md"
+    "observed_at": "2026-10-30T21:08:45.631907+00:00"
+    "result": "unknown"
+    "limitations": "No identified historical migration fixture, safe interruption protocol or human acceptance run. Not a full durability certification."
+"changes_performed":
+  - "js/aom-show-board.js: fail closed on unreadable saved data; recovery download and reload; persistent rejected-write feedback"
+  - "aom-show-board.html and js/aom-show-board-shell.js: bounded warning and recovery dialog focus"
+  - "scripts/probe_aom_storage.mjs and .github/workflows/public-contracts.yml: isolated regression gate"
+  - "docs/aom-show-board.md and CHANGELOG.md: behavior and proof boundaries"
+"unresolved_decisions":
+  - "Historical migration and process interruption scenarios have no defined fixtures or protocol; left unknown."
+"blockers": []
+"next_action": "Current-head PR CI and review. Merge, deployment and human acceptance remain separate."

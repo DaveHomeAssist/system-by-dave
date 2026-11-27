@@ -95,8 +95,13 @@ to make stale documentation true.
 - **Davai bundle:** `build_site.py` generates `systembydave/`; edit the
   generator, run `python3 build_site.py`, and gate with `npm run verify:davai`.
   Do not hand-edit the generated pages.
+- **Published Pages site:** `scripts/stage_public_site.mjs` and
+ `scripts/pages-publish.filter` choose the files GitHub Pages receives.
+ Docs, scripts, reports, plans, tests, and private pages stay in the
+ repository and are not copied to the site.
 - **Domain sites:** `scripts/domain-sites.json` owns which pages are also
-  published on housevideo.app and avbydave.com, and each site's cutover state.
+  published on housevideo.app, walk.housevideo.app and avbydave.com, and each
+  site's cutover state.
   Those pages link systembydave.com-only destinations absolutely
   (`https://systembydave.com/...`); see `docs/domain-sites.md`. Release gates
   take expected canonical origins and sitemap membership from
@@ -186,9 +191,9 @@ to make stale documentation true.
 
 ## Session naming
 
-Follow [Status Naming](https://github.com/DaveHomeAssist/skills/blob/master/status-naming.md), the canonical authority for the format, parent/subproject emoji map, phases, date semantics and exceptions.
+Follow [Status Naming](https://github.com/DaveHomeAssist/skills/blob/master/status-naming.md), the canonical authority for the format, emoji registry, phases, time semantics and exceptions.
 
-`<emoji(s)> <Project> | <PHASE> | <Title> <MM-DD>`
+`<group emoji> | PHASE | Durable Purpose | MM-DD h:mm AM/PM`, for example `❄️ | FIX | Projctl PR Merge And Venue Install | 11-12 2:56 PM`. The time is the session's creation time in America/New_York; status and traffic lights never go in the title.
 
 Preserve Dave's manual titles and protected or uncertain sessions. Status belongs in the body; status changes do not authorize renames or Notion writes. Local instructions extend this rule only through a named, purposeful exception; they do not maintain a competing format.
 
@@ -205,6 +210,9 @@ Pages workflow before a production claim.
   `npm run verify:public-consistency`.
 - **AV registry, tools, themes, or offline assets:** `npm run verify:av`; add
   the relevant Gear Reference or browser probe when affected.
+- **AV console applications, Throwline or the Frozen reference in `wst/`:**
+  `npm run test:frozen-case` (`docs/frozen-case.md`); after deployment, read
+  it back with `FROZEN_CASE_BASE=https://avbydave.com`.
 - **AV Workbook:** `npm run typecheck:av-workbook`,
   `npm run test:av-workbook`, and `npm run build:av-workbook`.
 - **Throwline:** `npm run verify:throwline`.

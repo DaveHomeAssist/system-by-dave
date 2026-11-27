@@ -1,0 +1,105 @@
+{
+  "schema": "equipment.lab.geometry.v1",
+  "meshes": 277,
+  "triangles": 16256,
+  "materials": 56,
+  "textures": 38,
+  "components": {
+    "body.chassis": 18,
+    "body.feet": 12,
+    "body.airIntakeFront": 16,
+    "body.airIntakeLeft": 17,
+    "body.airIntakeBottom": 52,
+    "body.airExhaust": 17,
+    "body.irFront": 2,
+    "body.irRear": 2,
+    "body.indicatorPower": 3,
+    "body.indicatorLight1": 3,
+    "body.indicatorLight2": 3,
+    "body.indicatorTemp": 3,
+    "body.securitySlot": 2,
+    "body.burglarHook": 4,
+    "body.mountHoles": 10,
+    "body.mainPower": 3,
+    "body.acIn": 6,
+    "panel.plate": 1,
+    "panel.powerOn": 2,
+    "panel.standby": 2,
+    "panel.rgb1": 2,
+    "panel.rgb2": 2,
+    "panel.dviD": 2,
+    "panel.hdmi": 2,
+    "panel.digitalLink": 2,
+    "panel.sdi": 2,
+    "panel.menu": 2,
+    "panel.lens": 2,
+    "panel.enter": 2,
+    "panel.shutter": 2,
+    "panel.arrows": 8,
+    "panel.autoSetup": 2,
+    "io.plate": 1,
+    "io.remote1In": 4,
+    "io.remote1Out": 3,
+    "io.remote2In": 5,
+    "io.serialIn": 5,
+    "io.serialOut": 5,
+    "io.sdiIn": 4,
+    "io.rgb1In": 21,
+    "io.rgb2In": 5,
+    "io.dviDIn": 5,
+    "io.hdmiIn": 3,
+    "io.digitalLink": 3,
+    "lens.barrel": 5
+  },
+  "bounds": {
+    "min": [
+      -0.249,
+      0,
+      -0.2699
+    ],
+    "max": [
+      0.249,
+      0.2009,
+      0.31205
+    ],
+    "size": [
+      0.498,
+      0.2009,
+      0.58195
+    ]
+  },
+  "boundsWithoutLens": {
+    "min": [
+      -0.249,
+      0,
+      -0.2699
+    ],
+    "max": [
+      0.249,
+      0.2009,
+      0.2699
+    ],
+    "size": [
+      0.498,
+      0.2009,
+      0.5398
+    ]
+  },
+  "boundsCabinet": {
+    "min": [
+      -0.249,
+      0,
+      -0.269
+    ],
+    "max": [
+      0.249,
+      0.2,
+      0.269
+    ],
+    "size": [
+      0.498,
+      0.2,
+      0.538
+    ]
+  }
+}

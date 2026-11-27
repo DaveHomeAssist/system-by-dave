@@ -18,6 +18,8 @@ on:
       - 'transfer.html'
       - 'js/domain-*.js'
       - 'scripts/*domain*'
+      - 'scripts/managed_site_mirrors*'
+      - 'wst/**'
       - 'js/sbd-registry.js'
       - 'av-suite-worker.js'
       - 'av-suite.html'
@@ -31,6 +33,13 @@ permissions:
 
 jobs:
   browser:
+    # Two parallel parts of scripts/test_domain_cutover.mjs (CUTOVER_PART): the
+    # published page sweeps, and every other scenario. Together they run all of them.
+    name: browser (${{ matrix.part }})
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [flows, pages]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -55,11 +64,12 @@ jobs:
       - run: npm run test:domain-cutover
         env:
           CUTOVER_CAPTURE_DIR: ${{ runner.temp }}/cutover-evidence
+          CUTOVER_PART: ${{ matrix.part }}
       - name: Upload acceptance evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: domain-cutover-evidence
+          name: domain-cutover-evidence-${{ matrix.part }}
           path: ${{ runner.temp }}/cutover-evidence
           if-no-files-found: ignore
           retention-days: 3
