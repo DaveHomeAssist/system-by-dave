@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-irW5B/5mP3y7YJ1CPQdLILcOSNB1pMyF4Jid9hIrRXs='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-FFaW1vEEh8pIxzP1ga0DkI/VZDbVOpEWTLIRq1K1q2o='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Solve the daily garden crossword, grow plants and use wildcard seeds for a nearby clue.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://systembydave.com/puzzle/">
@@ -40,10 +40,15 @@ main{max-width:1500px;width:100%;margin:auto;height:100%;display:grid;grid-templ
 h1{margin:0;font:400 clamp(36px,5vw,72px)/.96 var(--serif);letter-spacing:-.067em}
 h1 span{color:var(--accent)}
 .date-box{display:flex;align-items:center;gap:10px;white-space:nowrap;border:1px solid var(--line);border-radius:10px;padding:4px;background:var(--panel);text-align:center}
-.date-box div{min-width:114px}
+#choose-date{min-width:114px;min-height:44px;border:0;border-radius:6px;background:transparent;padding:0 3px}
+#choose-date:hover{background:var(--wash)}
 .date-box span{display:block;color:var(--muted);font-size:8px;font-weight:800;letter-spacing:.13em}
 .date-box strong{display:block;font:700 16px var(--serif)}
-.day-btn{border:0;border-radius:6px;background:transparent;min-width:44px;height:44px;font:25px/.8 var(--serif)}
+.day-btn{border:0;border-radius:6px;background:transparent;min-width:44px;height:44px;display:grid;place-content:center;gap:2px;font:25px/.8 var(--serif)}
+.day-btn b{font-weight:400}.day-btn small{font:700 9px/1 var(--sans);color:var(--muted)}
+#date-form label{display:block;margin-top:12px}
+#garden-date{display:block;min-height:44px;width:100%;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:8px;font:inherit}
+#date-preview{min-height:1.5em;font-weight:700;color:var(--green)}
 .play{min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,1fr);gap:var(--gap)}
 .bed{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:var(--board);color:var(--boardText);border:1px solid #405642;border-radius:18px;padding:12px clamp(12px,1.75vw,24px);gap:8px;box-shadow:0 8px 24px var(--shadow)}
 .bed-top,.bed-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -54,10 +59,10 @@ h1 span{color:var(--accent)}
 .bed-icon{margin-right:5px;color:#dcd89f}
 #completion,#seed-count{font:700 11px var(--sans);color:#e6e8c5}
 .board-wrap{display:grid;place-items:center;min-height:0;container-type:size}
-.board{width:min(100cqw,100cqh);aspect-ratio:1;position:relative;isolation:isolate}
+.board{width:min(100cqw,100cqh);aspect-ratio:1;position:relative;isolation:isolate;container-type:inline-size}
 canvas,.tiles{position:absolute;inset:0;width:100%;height:100%}
-.tiles{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));grid-template-rows:repeat(9,minmax(0,1fr))}
-.tile{position:relative;min-width:0;min-height:0;background:transparent;border:0;padding:0;display:grid;place-items:center;border-radius:6px;color:#253829;font-weight:750;font-size:clamp(13px,5.6cqw,34px);line-height:1}
+.tiles{display:grid;grid-template-columns:repeat(var(--grid-size,9),minmax(0,1fr));grid-template-rows:repeat(var(--grid-size,9),minmax(0,1fr))}
+.tile{position:relative;min-width:0;min-height:0;background:transparent;border:0;padding:0;display:grid;place-items:center;border-radius:6px;color:#253829;font-weight:750;font-size:clamp(13px,calc(59cqw / var(--grid-size,9)),34px);line-height:1}
 .tile:focus{outline:0}
 .tile:focus-visible{outline:2px solid #ffcf89;outline-offset:-2px;z-index:1}
 .tile .number{position:absolute;top:6%;left:10%;font:700 clamp(7px,2cqw,11px)/1 var(--sans);color:#435642}
@@ -123,7 +128,7 @@ dialog::backdrop{background:#111a13a0}
 @media (max-width:720px) and (orientation:portrait){
  .topbar{height:46px}.mark{width:28px;height:28px;font-size:21px}.wide-label,.desktop-tip{display:none}.quiet{min-height:44px}
  main{gap:7px;padding:7px 8px 0}.eyebrow{font-size:8px;margin-bottom:3px}.mast{gap:4px;padding-inline:2px;align-items:center}h1{font-size:clamp(23px,7.4vw,47px);white-space:nowrap}
- .date-box{gap:0;padding:2px}.date-box div{min-width:72px}.date-box span{font-size:6px}.date-box strong{font-size:12px}.day-btn{min-width:44px;height:44px}
+ .date-box{gap:0;padding:2px}#choose-date{min-width:72px}.date-box span{font-size:6px}.date-box strong{font-size:12px}.day-btn{min-width:44px;height:44px}
  .play{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(110px,1.6fr) minmax(200px,1fr);gap:7px}
  .bed{border-radius:11px;padding:6px 9px;gap:3px}.bed-top{font-size:13px}.bed-foot{gap:8px;font-size:9px}
  .sidebar{gap:4px}.current{padding:4px 103px 4px 10px;border-radius:9px;flex:none}.current-top>span{font-size:8px}
@@ -169,6 +174,18 @@ dialog::backdrop{background:#111a13a0}
  .directions button{min-height:44px}
 }
 
+@media (max-width:720px) and (max-height:650px) and (orientation:portrait){
+ main[data-grid-size="11"]{gap:4px}
+ main[data-grid-size="11"] .play{grid-template-rows:minmax(0,1fr) 166px;gap:5px}
+ main[data-grid-size="11"] .bed{padding-block:4px;gap:2px}
+ main[data-grid-size="11"] .keyboard{gap:2px}
+}
+
+@media (max-height:500px) and (orientation:landscape){
+ main[data-grid-size="11"]{gap:4px;padding-top:4px}
+ main[data-grid-size="11"] .bed{padding-block:3px;gap:2px}
+}
+
 .sbd-skip-link{position:absolute;inset:2px auto auto 2px;transform:translateY(-120%);z-index:3;background:var(--panel);color:var(--ink);padding:12px;border:2px solid var(--accent);border-radius:6px}
 .sbd-skip-link:focus{transform:none}
 .sbd-site-return{display:flex;align-items:center;gap:clamp(2px,1vw,10px);min-width:0}
@@ -198,9 +215,9 @@ dialog::backdrop{background:#111a13a0}
     <div class="mast">
       <div><p class="eyebrow">THE DAILY GARDEN CROSSWORD</p><h1>Words in bloom<span>.</span></h1></div>
       <div class="date-box">
-        <button id="prev" class="day-btn" aria-label="Previous garden">‹</button>
-        <div><span id="day-caption">TODAY’S GARDEN</span><strong id="day-label"></strong></div>
-        <button id="next" class="day-btn" aria-label="Next garden">›</button>
+        <button id="prev" class="day-btn" aria-label="Previous garden"><b aria-hidden="true">‹</b><small id="prev-size" aria-hidden="true"></small></button>
+        <button id="choose-date" aria-haspopup="dialog"><span id="day-caption">TODAY’S GARDEN</span><strong id="day-label"></strong></button>
+        <button id="next" class="day-btn" aria-label="Next garden"><b aria-hidden="true">›</b><small id="next-size" aria-hidden="true"></small></button>
       </div>
     </div>
     <div class="play">
@@ -245,6 +262,15 @@ dialog::backdrop{background:#111a13a0}
     <footer><div class="garden-notices"><span id="vine-notice" role="status" aria-live="polite" aria-atomic="true"></span><span id="notice" role="status" aria-live="polite"></span></div><span class="desktop-tip">Type to fill · Space switches direction · Arrows move</span></footer>
   </main>
 </div>
+<dialog id="garden-picker" aria-labelledby="garden-picker-title">
+  <form method="dialog" class="help-content" id="date-form">
+    <div class="modal-top"><h2 id="garden-picker-title">Choose a garden</h2><button type="button" class="quiet" id="close-picker" aria-label="Close date picker">×</button></div>
+    <label for="garden-date">Puzzle date</label>
+    <input type="date" id="garden-date" required>
+    <p id="date-preview" role="status" aria-live="polite"></p>
+    <button class="primary" id="open-puzzle">Open puzzle</button>
+  </form>
+</dialog>
 <dialog id="instructions">
   <form method="dialog" class="help-content">
     <div class="modal-top"><h2>How to play</h2><button class="quiet" aria-label="Close instructions">×</button></div>
@@ -253,124 +279,12 @@ dialog::backdrop{background:#111a13a0}
       <li>Correct answers bloom automatically. Answers of eight or more letters grow vines that can reveal one letter in a nearby clue. Solve two crossing answers with a shared theme to earn a golden wildcard seed.</li>
       <li>Select a seed in the soil and plant it to reveal one letter in a nearby unsolved clue. The arrows slide it across soil until an edge or obstacle stops it. A move must leave a clue within reach.</li>
     </ol>
-    <p>Use the date arrows to visit other gardens. Finish a garden to unlock Replay, which saves separately from your original solve. Progress stays in this browser.</p>
+    <p>Use the date arrows to visit other gardens, or tap the date to preview and choose a puzzle. Finish a garden to unlock Replay, which saves separately from your original solve. Progress stays in this browser.</p>
     <button class="primary">Back to the garden</button>
   </form>
 </dialog>
 <script>"use strict";
 (() => {
-  // src/garden.ts
-  var reach = 3;
-  var delta = { up: [-1, 0], down: [1, 0], left: [0, -1], right: [0, 1] };
-  var plantKind = (length) => length <= 3 ? "clover" : length === 4 ? "daisy" : length === 5 ? "tulip" : length <= 7 ? "sunflower" : "vine";
-  function distance(a, b, size) {
-    return Math.max(Math.abs(Math.floor(a / size) - Math.floor(b / size)), Math.abs(a % size - b % size));
-  }
-  function distanceTo(slot2, cell, size) {
-    return Math.min(...slot2.cells.map((position) => distance(position, cell, size)));
-  }
-  function locked(puzzle2, garden2, cell) {
-    return garden2.hints.includes(cell) || garden2.solved.some((id) => puzzle2.slots[id].cells.includes(cell));
-  }
-  function planSeeds(puzzle2) {
-    const occupied = /* @__PURE__ */ new Set();
-    const usage = /* @__PURE__ */ new Map();
-    const plan = [];
-    const { size, soil, slots } = puzzle2;
-    for (const parents of puzzle2.pairs) {
-      const [a, b] = parents;
-      const crossing = slots[a].cells.find((cell) => slots[b].cells.includes(cell));
-      if (crossing === void 0) continue;
-      const available = soil.flatMap((block, cell) => block && !occupied.has(cell) ? [cell] : []).sort((x, y) => distance(x, crossing, size) - distance(y, crossing, size) || x - y);
-      for (const cell of available) {
-        const target = slots.filter((slot2) => !parents.includes(slot2.id) && slot2.id !== puzzle2.seed && distanceTo(slot2, cell, size) <= reach).sort((x, y) => (usage.get(x.id) ?? 0) - (usage.get(y.id) ?? 0) || y.cells.length - x.cells.length || x.id - y.id)[0];
-        if (!target) continue;
-        occupied.add(cell);
-        usage.set(target.id, (usage.get(target.id) ?? 0) + 1);
-        plan.push({ id: `${a}:${b}`, parents, cell, target: target.id, spent: false });
-        break;
-      }
-    }
-    return plan;
-  }
-  function newGarden(puzzle2) {
-    const garden2 = { ink: puzzle2.soil.map(() => ""), solved: [], plants: [], seeds: planSeeds(puzzle2), hints: [] };
-    const seed = puzzle2.slots[puzzle2.seed];
-    seed.cells.forEach((cell) => {
-      garden2.ink[cell] = puzzle2.letters[cell];
-    });
-    bloom(puzzle2, garden2, seed, false);
-    return garden2;
-  }
-  function reveal(puzzle2, garden2, slot2) {
-    const cell = slot2.cells.filter((position) => !locked(puzzle2, garden2, position)).sort((a, b) => Number(garden2.ink[a] === puzzle2.letters[a]) - Number(garden2.ink[b] === puzzle2.letters[b]) || Number(slot2.crossings.some((cross) => slot2.cells[cross.offset] === b && !garden2.solved.includes(cross.id))) - Number(slot2.crossings.some((cross) => slot2.cells[cross.offset] === a && !garden2.solved.includes(cross.id))))[0];
-    if (cell === void 0) return null;
-    garden2.ink[cell] = puzzle2.letters[cell];
-    garden2.hints.push(cell);
-    return cell;
-  }
-  function bloom(puzzle2, garden2, slot2, allowBridge) {
-    garden2.solved.push(slot2.id);
-    const plant = { slot: slot2.id, kind: plantKind(slot2.cells.length) };
-    garden2.plants.push(plant);
-    if (plant.kind !== "vine" || !allowBridge) return;
-    const near = puzzle2.slots.filter((other) => !garden2.solved.includes(other.id) && !slot2.crossings.some((cross) => cross.id === other.id)).map((other) => ({ other, distance: Math.min(...slot2.cells.map((cell) => distanceTo(other, cell, puzzle2.size))) })).sort((a, b) => a.distance - b.distance || a.other.id - b.other.id);
-    for (const { other } of near) {
-      if (reveal(puzzle2, garden2, other) === null) continue;
-      plant.bridge = other.id;
-      break;
-    }
-  }
-  function collectBlooms(puzzle2, garden2) {
-    const before = garden2.solved.length;
-    let changed;
-    do {
-      changed = false;
-      for (const slot2 of puzzle2.slots) {
-        if (garden2.solved.includes(slot2.id) || !slot2.cells.every((cell) => garden2.ink[cell] === puzzle2.letters[cell])) continue;
-        bloom(puzzle2, garden2, slot2, true);
-        changed = true;
-      }
-    } while (changed);
-    return garden2.solved.length - before;
-  }
-  function activeSeed(puzzle2, garden2, seed) {
-    return garden2.solved.length < puzzle2.slots.length && !seed.spent && seed.parents.every((id) => garden2.solved.includes(id));
-  }
-  function slideDestination(puzzle2, garden2, seed, direction) {
-    const { size, soil, slots } = puzzle2;
-    const [dr, dc] = delta[direction];
-    let row = Math.floor(seed.cell / size);
-    let col = seed.cell % size;
-    const occupied = garden2.seeds.filter((other) => other.id !== seed.id && !other.spent);
-    while (true) {
-      const nextRow = row + dr;
-      const nextCol = col + dc;
-      const next = nextRow * size + nextCol;
-      if (nextRow < 0 || nextRow >= size || nextCol < 0 || nextCol >= size || !soil[next] || occupied.some((other) => other.cell === next)) break;
-      row = nextRow;
-      col = nextCol;
-    }
-    const end = row * size + col;
-    const reachesTarget = distanceTo(slots[seed.target], end, size) <= reach;
-    const reachesAlternative = puzzle2.slots.some((slot2) => !garden2.solved.includes(slot2.id) && distanceTo(slot2, end, size) <= reach);
-    return end !== seed.cell && (reachesTarget || reachesAlternative) ? end : null;
-  }
-  function plantSeed(puzzle2, garden2, seed) {
-    if (!activeSeed(puzzle2, garden2, seed)) return null;
-    const viable = puzzle2.slots.filter((slot2) => !garden2.solved.includes(slot2.id) && distanceTo(slot2, seed.cell, puzzle2.size) <= reach);
-    const preferred = viable.find((slot2) => slot2.id === seed.target);
-    const targets = preferred ? [preferred, ...viable.filter((slot2) => slot2 !== preferred)] : viable;
-    for (const target of targets) {
-      const cell = reveal(puzzle2, garden2, target);
-      if (cell === null) continue;
-      seed.spent = true;
-      collectBlooms(puzzle2, garden2);
-      return { cell, target };
-    }
-    return null;
-  }
-
   // src/puzzle.ts
   function extractGrid(rows) {
     const size = rows.length;
@@ -514,6 +428,229 @@ dialog::backdrop{background:#111a13a0}
     return search() ? { size, soil, slots, entries: entries2, letters, seed: seed.id, pairs, day: day2 } : null;
   }
 
+  // src/editions.ts
+  var editions = [
+    "#PEA#####/#OWL#####/#TEA#####/###SHE###/###KEN###/###ANT###/#####IMP#/#####RUE#/#####EGG#",
+    "#FIG#####/#ATE#####/#TAN#####/##LOTUS##/##IMAGE##/##CEDAR##/#####NIB#/#####DAY#/#####ALE#",
+    "PEA##ONE#/OWN##FOG#/DEN##FRO#/##ORBIT##/##TOUCH##/##AGREE##/#ATE##APE/#HER##SIR/#ADS##TEA",
+    "#LAB#######/#ILL#######/#LOO#######/#YES#######/###SALEM###/###OPERA###/###METAL###/#######LOG#/#######AHA#/#######RIM#/#######DOE#",
+    "##BIO######/##ERR######/##TIC######/##ASH######/####ACE####/####ROT####/####DOE####/######RYE##/######NAY##/######ALE##/######LED##"
+  ].map((edition) => edition.split("/"));
+  var editionClues = `
+ACE|Card that can sit high or low|games
+ADO|Much ___ About Nothing|literature
+AGREE|Come around to the same view|speech
+ALASKA|State that reaches west into the Aleutians|geography nature/outdoors
+ALOE|Plant with a gel-filled leaf|nature/plants nature/life
+ANNOTATED|Supplied with marginal comments|reading
+ANT|One hauling a crumb many times its size|nature/wildlife nature/outdoors
+ATE|Had dinner, say|food
+BETA|Letter that follows alpha|letters
+BIO|School subject that might start with a cell|science
+BLOSSOM|What still has petals before the fruit sets|nature/plants nature/life science
+BUR|Prickly hitchhiker on a dog's fur|nature/plants
+BYE|What a top seed might get in the first round|games
+CEDAR|Wood that can scent a wardrobe|nature/plants nature/life
+DAY|One square on a wall calendar|time
+DEN|Where a vixen might raise her kits|nature/wildlife
+DOE|One that might lead a fawn out of cover|nature/wildlife nature/outdoors
+ENTIRE|Leaving nothing out|quantity
+ERR|Get it wrong|speech
+ETERNAL|Having no last day|time
+EYED|Sized up, perhaps|body
+FAT|What a cook skims off a stock|food
+FIG|Fruit in a Newton|nature/plants nature/life food
+FOG|What comes in on little cat feet in Sandburg's poem|weather
+FRO|Counterpart of to, in a phrase|speech
+GAME|Something that can be called on account of rain|games
+GENOME|An organism's complete set of DNA|science nature/life
+HEN|One responsible for the contents of a nest box|nature/wildlife
+HER|Pronoun in \u201Clend ___ a hand\u201D|speech
+ILL|Home from school, perhaps|health
+IMAGE|What a lens brings into focus|visual-design
+IMP|Small mischief maker|folklore
+IRIS|Flower named for a goddess of the rainbow|nature/plants
+ITALIC|Emphasis set at a slant|visual-design reading
+KEN|Range of one's understanding|reading
+LAB|Where you might test how seeds germinate|science nature/life nature/plants
+LED|Took the front of the procession|movement
+LET|Serve that clips the net and lands in, in tennis|games
+LILY|Flower whose pollen can stain a tablecloth|nature/plants nature/life
+LOG|Part of a floating turtle's basking spot, perhaps|nature/outdoors
+LOO|Convenience, in Britain|language
+LOTUS|Aquatic plant with leaves that shed water readily|nature/plants nature/life
+MALLARD|Duck with a green-headed drake|nature/wildlife nature/outdoors
+METAL|What a smith works at an anvil|materials
+MUG|Cup with a handle, often|food
+NAY|Vote from the opposing side|speech
+NIB|Part of a pen that meets the page|reading
+NORTHEAST|Compass heading of 045 degrees|geography weather
+OFFICE|Place to go for a file or a meeting|work
+OPERA|Stage work whose dialogue may be sung|performance
+ORBIT|Circuit with a remarkably distant center, perhaps|science
+ORCHARD|Rows you might walk to pick apples|nature/plants nature/outdoors decay
+OWL|Bird that might swivel to look behind itself|nature/wildlife nature/outdoors
+OWN|Admit to, with up|speech
+PEG|Something that can keep a tent grounded|tools
+POD|Several peas may share one|nature/plants
+POT|Vessel that might steep tea|food
+ROGERS|Mister who wore a cardigan on public television|media
+RYE|Grain that gives some whiskeys a spicy character|food
+SALEM|Massachusetts port associated with the 1692 trials|geography history
+SERIAL|Story that comes in installments|reading
+SHE|Pronoun for the captain in \u201C___ called all hands\u201D|speech
+SIR|Form of address for a knight|speech
+TAD|A bit, as in slightly overdone|quantity
+TAN|What might deepen on a beach vacation|nature/outdoors
+TEA|What an infuser is filled to make|food
+TIC|Small recurring involuntary movement|body
+TOUCH|One sense that Braille relies on|body
+UGANDA|Country whose capital is Kampala|geography
+YALE|School represented by the Bulldogs of New Haven|geography
+YES|RSVP that reserves a seat|speech
+`.trim();
+  function editionSize(index) {
+    return editions[index].length;
+  }
+  function authoredPuzzle(index, transpose, day2, book) {
+    const edition = editions[index];
+    const rows = transpose ? edition.map((_, col) => edition.map((row) => row[col]).join("")) : edition;
+    const { size, soil, slots, byCell } = extractGrid(rows.map((row) => row.replace(/[A-Z]/g, ".")));
+    const letters = rows.join("").split("").map((letter) => letter === "#" ? "" : letter);
+    const entries2 = slots.map((slot2) => {
+      const answer = slot2.cells.map((cell) => letters[cell]).join("");
+      const entry = book.get(answer);
+      if (!entry) throw new Error(`Missing clue for ${answer} in edition ${index}`);
+      return entry;
+    });
+    if (new Set(entries2.map((entry) => entry.answer)).size !== slots.length) {
+      throw new Error(`Repeated answer in edition ${index}`);
+    }
+    const center = byCell[Math.floor(letters.length / 2)].map(({ slot: slot2 }) => slot2);
+    const starter = center.reduce((shortest, slot2) => slot2.cells.length < shortest.cells.length ? slot2 : shortest);
+    const pairs = [];
+    for (const slot2 of slots) {
+      for (const crossing of slot2.crossings) {
+        if (crossing.id > slot2.id && sharedTag(entries2[slot2.id], entries2[crossing.id])) {
+          pairs.push([slot2.id, crossing.id]);
+        }
+      }
+    }
+    return { size, soil, slots, entries: entries2, letters, seed: starter.id, pairs, day: day2 };
+  }
+
+  // src/garden.ts
+  var reach = 3;
+  var delta = { up: [-1, 0], down: [1, 0], left: [0, -1], right: [0, 1] };
+  var plantKind = (length) => length <= 3 ? "clover" : length === 4 ? "daisy" : length === 5 ? "tulip" : length <= 7 ? "sunflower" : "vine";
+  function distance(a, b, size) {
+    return Math.max(Math.abs(Math.floor(a / size) - Math.floor(b / size)), Math.abs(a % size - b % size));
+  }
+  function distanceTo(slot2, cell, size) {
+    return Math.min(...slot2.cells.map((position) => distance(position, cell, size)));
+  }
+  function locked(puzzle2, garden2, cell) {
+    return garden2.hints.includes(cell) || garden2.solved.some((id) => puzzle2.slots[id].cells.includes(cell));
+  }
+  function planSeeds(puzzle2) {
+    const occupied = /* @__PURE__ */ new Set();
+    const usage = /* @__PURE__ */ new Map();
+    const plan = [];
+    const { size, soil, slots } = puzzle2;
+    for (const parents of puzzle2.pairs) {
+      const [a, b] = parents;
+      const crossing = slots[a].cells.find((cell) => slots[b].cells.includes(cell));
+      if (crossing === void 0) continue;
+      const available = soil.flatMap((block, cell) => block && !occupied.has(cell) ? [cell] : []).sort((x, y) => distance(x, crossing, size) - distance(y, crossing, size) || x - y);
+      for (const cell of available) {
+        const target = slots.filter((slot2) => !parents.includes(slot2.id) && slot2.id !== puzzle2.seed && distanceTo(slot2, cell, size) <= reach).sort((x, y) => (usage.get(x.id) ?? 0) - (usage.get(y.id) ?? 0) || y.cells.length - x.cells.length || x.id - y.id)[0];
+        if (!target) continue;
+        occupied.add(cell);
+        usage.set(target.id, (usage.get(target.id) ?? 0) + 1);
+        plan.push({ id: `${a}:${b}`, parents, cell, target: target.id, spent: false });
+        break;
+      }
+    }
+    return plan;
+  }
+  function newGarden(puzzle2) {
+    const garden2 = { ink: puzzle2.soil.map(() => ""), solved: [], plants: [], seeds: planSeeds(puzzle2), hints: [] };
+    const seed = puzzle2.slots[puzzle2.seed];
+    seed.cells.forEach((cell) => {
+      garden2.ink[cell] = puzzle2.letters[cell];
+    });
+    bloom(puzzle2, garden2, seed, false);
+    return garden2;
+  }
+  function reveal(puzzle2, garden2, slot2) {
+    const cell = slot2.cells.filter((position) => !locked(puzzle2, garden2, position)).sort((a, b) => Number(garden2.ink[a] === puzzle2.letters[a]) - Number(garden2.ink[b] === puzzle2.letters[b]) || Number(slot2.crossings.some((cross) => slot2.cells[cross.offset] === b && !garden2.solved.includes(cross.id))) - Number(slot2.crossings.some((cross) => slot2.cells[cross.offset] === a && !garden2.solved.includes(cross.id))))[0];
+    if (cell === void 0) return null;
+    garden2.ink[cell] = puzzle2.letters[cell];
+    garden2.hints.push(cell);
+    return cell;
+  }
+  function bloom(puzzle2, garden2, slot2, allowBridge) {
+    garden2.solved.push(slot2.id);
+    const plant = { slot: slot2.id, kind: plantKind(slot2.cells.length) };
+    garden2.plants.push(plant);
+    if (plant.kind !== "vine" || !allowBridge) return;
+    const near = puzzle2.slots.filter((other) => !garden2.solved.includes(other.id) && !slot2.crossings.some((cross) => cross.id === other.id)).map((other) => ({ other, distance: Math.min(...slot2.cells.map((cell) => distanceTo(other, cell, puzzle2.size))) })).sort((a, b) => a.distance - b.distance || a.other.id - b.other.id);
+    for (const { other } of near) {
+      if (reveal(puzzle2, garden2, other) === null) continue;
+      plant.bridge = other.id;
+      break;
+    }
+  }
+  function collectBlooms(puzzle2, garden2) {
+    const before = garden2.solved.length;
+    let changed;
+    do {
+      changed = false;
+      for (const slot2 of puzzle2.slots) {
+        if (garden2.solved.includes(slot2.id) || !slot2.cells.every((cell) => garden2.ink[cell] === puzzle2.letters[cell])) continue;
+        bloom(puzzle2, garden2, slot2, true);
+        changed = true;
+      }
+    } while (changed);
+    return garden2.solved.length - before;
+  }
+  function activeSeed(puzzle2, garden2, seed) {
+    return garden2.solved.length < puzzle2.slots.length && !seed.spent && seed.parents.every((id) => garden2.solved.includes(id));
+  }
+  function slideDestination(puzzle2, garden2, seed, direction) {
+    const { size, soil, slots } = puzzle2;
+    const [dr, dc] = delta[direction];
+    let row = Math.floor(seed.cell / size);
+    let col = seed.cell % size;
+    const occupied = garden2.seeds.filter((other) => other.id !== seed.id && !other.spent);
+    while (true) {
+      const nextRow = row + dr;
+      const nextCol = col + dc;
+      const next = nextRow * size + nextCol;
+      if (nextRow < 0 || nextRow >= size || nextCol < 0 || nextCol >= size || !soil[next] || occupied.some((other) => other.cell === next)) break;
+      row = nextRow;
+      col = nextCol;
+    }
+    const end = row * size + col;
+    const reachesTarget = distanceTo(slots[seed.target], end, size) <= reach;
+    const reachesAlternative = puzzle2.slots.some((slot2) => !garden2.solved.includes(slot2.id) && distanceTo(slot2, end, size) <= reach);
+    return end !== seed.cell && (reachesTarget || reachesAlternative) ? end : null;
+  }
+  function plantSeed(puzzle2, garden2, seed) {
+    if (!activeSeed(puzzle2, garden2, seed)) return null;
+    const viable = puzzle2.slots.filter((slot2) => !garden2.solved.includes(slot2.id) && distanceTo(slot2, seed.cell, puzzle2.size) <= reach);
+    const preferred = viable.find((slot2) => slot2.id === seed.target);
+    const targets = preferred ? [preferred, ...viable.filter((slot2) => slot2 !== preferred)] : viable;
+    for (const target of targets) {
+      const cell = reveal(puzzle2, garden2, target);
+      if (cell === null) continue;
+      seed.spent = true;
+      collectBlooms(puzzle2, garden2);
+      return { cell, target };
+    }
+    return null;
+  }
+
   // src/bank.ts
   var template = ["##...####", "##...####", "##...####", "###...###", "###...###", "###...###", "####...##", "####...##", "####...##"];
   var wideTemplate = ["#....####", "#....####", "#....####", "###...###", "###...###", "###...###", "####....#", "####....#", "####....#"];
@@ -632,19 +769,23 @@ WET|In need of a towel, say|weather nature/outdoors
 WHO|Question asked before putting a name to a face|speech
 WRY|Like a remark delivered with an arched eyebrow|speech emotion
 `.trim();
-  var entries = new Map(clueBook.split("\n").map((line) => {
-    const [answer, clue, tagList] = line.split("|");
-    return [answer, { answer, clue, tags: tagList.split(" ") }];
-  }));
-  var bankSize = entries.size;
-  function puzzleForDay(day2) {
+  function readClues(book) {
+    return new Map(book.split("\n").map((line) => {
+      const [answer, clue, tagList] = line.split("|");
+      return [answer, { answer, clue, tags: tagList.split(" ") }];
+    }));
+  }
+  var entries = readClues(clueBook);
+  var authoredEntries = new Map([...entries, ...readClues(editionClues)]);
+  var bankSize = authoredEntries.size;
+  function legacyPuzzle(day2, scheduledPack, transpose) {
     const daysSinceEpoch = Math.floor(Date.parse(`${day2}T00:00:00Z`) / 864e5);
     const cycle2 = Math.floor(daysSinceEpoch / packs.length);
     const offset = (daysSinceEpoch % packs.length + packs.length) % packs.length;
-    const [shape, anchor, curated] = packs[offset];
+    const [shape, anchor, curated] = packs[scheduledPack ?? offset];
     const base = shape === "wide" ? wideTemplate : template;
     let grid = shape === "mirror" ? base.map((row) => [...row].reverse().join("")) : base;
-    if (hash(String(cycle2)) % 2) grid = grid.map((_, col) => grid.map((row) => row[col]).join(""));
+    if (transpose ?? Boolean(hash(String(cycle2)) % 2)) grid = grid.map((_, col) => grid.map((row) => row[col]).join(""));
     const preferred = curated.split(" ").map((word) => {
       const entry = entries.get(word);
       if (!entry) throw new Error(`Missing clue for ${word}`);
@@ -652,11 +793,50 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     });
     const puzzle2 = fillGrid(grid, preferred, day2, anchor);
     if (!puzzle2) throw new Error(`No fair puzzle for ${day2} (${anchor})`);
-    const seed = puzzle2.slots.find((slot2) => slot2.id !== puzzle2.seed && slot2.cells.includes(40));
+    const seed = puzzle2.slots.find((slot2) => slot2.id !== puzzle2.seed && slot2.cells.includes(Math.floor(puzzle2.soil.length / 2)));
     if (!seed) throw new Error("Missing center crossing");
-    const result = { ...puzzle2, seed: seed.id };
-    if (planSeeds(result).length < 4) throw new Error(`No reachable seeds for ${day2}`);
-    return result;
+    return { ...puzzle2, seed: seed.id };
+  }
+  var layoutRotationStart = "2026-11-28";
+  var start = Date.parse(layoutRotationStart);
+  var dayMs = 864e5;
+  var cycleLength = 14;
+  var largeDay = 7;
+  var scheduledNine = [
+    ["edition", 0, false],
+    ["legacy", 0, false],
+    ["edition", 1, false],
+    ["legacy", 2, false],
+    ["edition", 2, false],
+    ["legacy", 4, false],
+    ["edition", 0, true],
+    ["legacy", 1, true],
+    ["edition", 1, true],
+    ["legacy", 3, true],
+    ["edition", 2, true],
+    ["legacy", 5, true],
+    ["legacy", 6, false],
+    ["legacy", 7, true]
+  ];
+  function scheduledGarden(day2) {
+    const offset = Math.floor((Date.parse(day2) - start) / dayMs);
+    if (offset < 0) return void 0;
+    const cycle2 = Math.floor(offset / cycleLength);
+    if (offset % cycleLength === largeDay) {
+      return ["edition", 3 + cycle2 % 2, false];
+    }
+    const priorLarge = Math.floor((offset + cycleLength - largeDay - 1) / cycleLength);
+    return scheduledNine[(offset - priorLarge) % scheduledNine.length];
+  }
+  function gridSizeForDay(day2) {
+    const choice = scheduledGarden(day2);
+    return choice?.[0] === "edition" ? editionSize(choice[1]) : template.length;
+  }
+  function puzzleForDay(day2) {
+    const choice = scheduledGarden(day2);
+    const puzzle2 = choice?.[0] === "edition" ? authoredPuzzle(choice[1], choice[2], day2, authoredEntries) : legacyPuzzle(day2, choice?.[1], choice?.[2]);
+    if (planSeeds(puzzle2).length < 4) throw new Error(`No reachable seeds for ${day2}`);
+    return puzzle2;
   }
 
   // src/renderer.ts
@@ -673,8 +853,8 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     if (canvas2.width !== width || canvas2.height !== width) canvas2.width = canvas2.height = width;
     const ctx = canvas2.getContext("2d");
     if (!ctx) return;
-    const bound = 900;
-    const pace = bound / puzzle2.size;
+    const pace = 100;
+    const bound = pace * puzzle2.size;
     ctx.setTransform(width / bound, 0, 0, width / bound, 0, 0);
     ctx.clearRect(0, 0, bound, bound);
     const flowers = garden2.ink.map(() => []);
@@ -790,7 +970,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
       ctx.stroke();
       for (let step = 1; step <= 5; step++) {
         const t = step / 6;
-        const blend = (start, control, end) => (1 - t) ** 2 * start + 2 * (1 - t) * t * control + t ** 2 * end;
+        const blend = (start2, control, end) => (1 - t) ** 2 * start2 + 2 * (1 - t) * t * control + t ** 2 * end;
         ellipse(blend(sx, curveX, tx), blend(sy, curveY, ty), 9, 3.5, step % 2 ? -0.55 : 0.55, "#a6c17e");
       }
       ctx.restore();
@@ -809,6 +989,9 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
   var tiles = byId("tiles");
   var clueList = byId("clues");
   var help = byId("instructions");
+  var picker = byId("garden-picker");
+  var dateInput = byId("garden-date");
+  var dateFormat = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" });
   var directionButtons = [...document.querySelectorAll("[data-direction]")];
   var slideButtons = [...document.querySelectorAll("[data-slide]")];
   var status = (message) => text("notice", message);
@@ -899,16 +1082,37 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     store("cross-pollinate:theme", dark ? "dark" : "light");
     if (puzzle) draw();
   }
-  function stepDate(offset) {
+  function dateAtOffset(offset) {
     const date = /* @__PURE__ */ new Date(`${day}T12:00:00Z`);
     date.setUTCDate(date.getUTCDate() + offset);
-    const dateKey = date.toISOString().slice(0, 10);
-    if (dateKey <= today) openDay(dateKey);
+    return date.toISOString().slice(0, 10);
+  }
+  function stepDate(offset) {
+    const date = dateAtOffset(offset);
+    if (date <= today) openDay(date);
+  }
+  var formatSize = (size) => `${size}\xD7${size}`;
+  function previewDate() {
+    const valid = dateInput.validity.valid;
+    text("date-preview", valid ? `${formatSize(gridSizeForDay(dateInput.value))} crossword` : "Choose today or an earlier date.");
+    byId("open-puzzle").disabled = !valid;
+  }
+  function updateDateArrows() {
+    for (const [id, offset, label] of [["prev", -1, "Previous garden"], ["next", 1, "Next garden"]]) {
+      const date = dateAtOffset(offset);
+      const button = byId(id);
+      const size = gridSizeForDay(date);
+      button.disabled = date > today;
+      text(`${id}-size`, button.disabled ? "" : formatSize(size));
+      button.setAttribute("aria-label", button.disabled ? label : `${label}, ${size} by ${size}`);
+    }
   }
   function openDay(value) {
     day = value;
     attempt = read(viewKey()) === "replay" ? "replay" : "original";
     puzzle = puzzleForDay(day);
+    tiles.style.setProperty("--grid-size", String(puzzle.size));
+    document.querySelector("main").dataset.gridSize = String(puzzle.size);
     garden = restore();
     availableKinds = new Set(puzzle.slots.map((item) => plantKind(item.cells.length)));
     byId("plant-collection").style.setProperty("--types", String(availableKinds.size));
@@ -918,9 +1122,9 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     focus = slot.cells.find((cell) => !locked(puzzle, garden, cell)) ?? slot.cells[0];
     clueDirection = slot.direction;
     selectedSeed = "";
-    text("day-caption", value === today ? "TODAY\u2019S GARDEN" : "FROM THE ARCHIVE");
-    text("day-label", new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" }).format(/* @__PURE__ */ new Date(`${day}T12:00:00Z`)));
-    byId("next").disabled = value >= today;
+    text("day-caption", `${value === today ? "TODAY" : "ARCHIVE"} \xB7 ${formatSize(puzzle.size)}`);
+    text("day-label", dateFormat.format(/* @__PURE__ */ new Date(`${day}T12:00:00Z`)));
+    updateDateArrows();
     status(attempt === "replay" && garden.solved.length === 1 ? "Your original solve is saved. This is a separate replay." : garden.solved.length > 1 ? "" : "The center word is planted for you.");
     buildTiles();
     fillClues();
@@ -940,11 +1144,11 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
       const tile = document.createElement("button");
       tile.className = "tile";
       tile.dataset.cell = String(cell);
-      const start = puzzle.slots.find((candidate) => candidate.cells[0] === cell);
-      if (start) {
+      const start2 = puzzle.slots.find((candidate) => candidate.cells[0] === cell);
+      if (start2) {
         const number = document.createElement("span");
         number.className = "number";
-        number.textContent = String(start.number);
+        number.textContent = String(start2.number);
         tile.append(number);
       }
       const letter = document.createElement("span");
@@ -1179,7 +1383,7 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     byId("keyboard").append(line);
   }
   document.addEventListener("keydown", (event) => {
-    if (help.open || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (help.open || picker.open || event.altKey || event.ctrlKey || event.metaKey) return;
     const boardFocused = event.target instanceof Element && event.target.closest("#tiles");
     const direction = slideDirections[event.key];
     if (direction && selectedSeed) {
@@ -1210,6 +1414,21 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     store(viewKey(), attempt === "original" ? "replay" : "original");
     openDay(day);
   });
+  dateInput.max = today;
+  byId("choose-date").addEventListener("click", () => {
+    dateInput.value = day;
+    previewDate();
+    picker.showModal();
+  });
+  byId("close-picker").addEventListener("click", () => picker.close());
+  dateInput.addEventListener("input", previewDate);
+  dateInput.addEventListener("change", previewDate);
+  byId("date-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!dateInput.validity.valid) return;
+    picker.close();
+    openDay(dateInput.value);
+  });
   byId("prev").addEventListener("click", () => stepDate(-1));
   byId("next").addEventListener("click", () => stepDate(1));
   byId("next-clue").addEventListener("click", () => cycle(1));
@@ -1238,8 +1457,9 @@ WRY|Like a remark delivered with an arched eyebrow|speech emotion
     mode: garden.solved.length === puzzle.slots.length ? "won" : "playing",
     day,
     attempt,
+    size: puzzle.size,
     coordinates: "Zero-based cells, row-major from top left",
-    grid: garden.ink.map((letter, cell) => puzzle.soil[cell] ? "#" : letter || ".").join("").match(/.{9}/g),
+    grid: garden.ink.map((letter, cell) => puzzle.soil[cell] ? "#" : letter || ".").join("").match(new RegExp(`.{${puzzle.size}}`, "g")),
     focus,
     selectedClue: slot.id,
     clues: puzzle.slots.map((item) => ({

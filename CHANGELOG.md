@@ -1,5 +1,9 @@
 # Changelog
 
+## November 27, 2026. Cross-Pollinate layout rotation
+
+- Rotates distinct 9×9 crossword patterns and adds an occasional 11×11 garden. The date arrows and date chooser preview grid size. Earlier puzzle dates and saves remain compatible.
+
 ## November 27, 2026. Cross-Pollinate replays
 
 - Replay a completed garden with the current clues. Replay progress saves separately so players can return to their original solve.
