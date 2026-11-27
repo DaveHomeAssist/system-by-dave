@@ -175,6 +175,10 @@ nav a[aria-current="page"] { background: var(--soft); }
 .about { background: var(--about); color: var(--on-about); }
 .about .eyebrow { color: #e0c79c; }
 .about-note, .contact-box { border-left: 1px solid currentColor; padding-left: 1.25rem; align-self: start; }
+.author-articles summary::marker { color: currentColor; }
+.author-articles ul { list-style: none; padding: 0; margin: 0 0 1rem; }
+.author-articles li + li { margin-top: .85rem; }
+.author-articles time { display: block; font-size: .875rem; }
 .contact-box strong { display: block; }
 details:last-child { border-bottom: 1px solid var(--line); }
 summary { cursor: pointer; font-weight: 700; padding: 1rem 0; }
