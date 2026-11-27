@@ -1,5 +1,10 @@
 # Changelog
 
+## November 27, 2026. OnTrack and House Video out of All apps
+
+- The console's All apps dialog no longer lists OnTrack or House Video / FMP. Both stay in the registry, can still be pinned from Customize, and keep their own links.
+- Registry version is now `v20261127-all-apps-trim`, so the offline cache refreshes.
+
 ## November 27, 2026. Console polish
 - All apps lists Rehearsal Capture once (under Show tools), shows each app's icon on its card, puts search in the top bar beside the title, and closes with an icon button like Add panel.
 - A new panel from Add panel opens at half the workspace when there is room (then a quarter, then 4x4), so it is big enough to use and to split side by side.

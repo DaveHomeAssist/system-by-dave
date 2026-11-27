@@ -327,6 +327,8 @@ test('All apps and Customize dialogs preserve truthful status, focus, and explic
   assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:arenaops').length, 0);
   assert.equal(action(controller.customizeDialog, 'external:arenaops', 'pin'), undefined);
   assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:rehearsal-capture').length, 1, 'Rehearsal Capture is listed once, under Show tools');
+  assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'tool:ontrack').length, 0, 'OnTrack stays out of All apps');
+  assert.equal(elementsByAttribute(controller.allAppsDialog, 'data-rail-ref', 'external:housevideo').length, 0, 'House Video stays out of All apps');
   assert.equal(elementsByClass(avVideo, 'sbd-rail-dialog__card-icon').length, 1, 'console cards carry their icon');
   const allAppsHeader = elementsByClass(controller.allAppsDialog, 'sbd-rail-dialog__header')[0];
   assert.equal(elementsByClass(allAppsHeader, 'sbd-rail-dialog__search--bar').length, 1, 'All apps search sits in the top bar');
