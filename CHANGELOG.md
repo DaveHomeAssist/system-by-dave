@@ -1,5 +1,9 @@
 # Changelog
 
+## November 26, 2026. Retreat Series preview
+
+- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link.
+
 ## November 26, 2026. Envision web artwork and Notion Agents
 
 - Export a selected Library image as a square thumbnail, wide card or link preview. Choose its framing and file name, then download the image shown in the preview.
