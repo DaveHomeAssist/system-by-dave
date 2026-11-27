@@ -7,7 +7,7 @@
   <title>New Bethlehem | A one-day Catholic retreat</title>
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#f8f6f0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src https://davehomeassist.github.io/new-bethlehem-editor/retreat.json; frame-src https://davehomeassist.github.io/new-bethlehem-editor/welcome.html; base-uri 'none'; form-action 'none'">
   <link rel="canonical" href="https://systembydave.com/retreat/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="New Bethlehem | A one-day Catholic retreat">
@@ -20,7 +20,9 @@
   <meta name="twitter:image" content="https://systembydave.com/retreat/assets/retreat-reflection.webp">
   <link rel="icon" href="assets/retreat-reflection.webp" type="image/webp">
   <script src="assets/theme.js" defer></script>
+  <script src="assets/details.js" defer></script>
   <link rel="stylesheet" href="assets/site.css">
+  <noscript><link rel="stylesheet" href="assets/no-script.css"></noscript>
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to retreat content</a>
@@ -42,7 +44,13 @@
 <section class="hero">
 <div class="wrap hero-grid">
 <div><span class="eyebrow">A one-day Catholic retreat</span><h1>New Bethlehem</h1>
-<p class="lead">If you are carrying grief or regret after an abortion, New Bethlehem offers you a day for prayer and reflection.</p>
+<p class="lead" data-retreat="welcome">If you are carrying grief or regret after an abortion, New Bethlehem offers you a day for prayer and reflection.</p>
+<p data-retreat-fallback><a href="https://davehomeassist.github.io/new-bethlehem-editor/welcome.html" rel="noopener noreferrer">Current retreat welcome</a></p>
+<noscript>
+  <iframe class="published-frame published-welcome" title="Current retreat welcome" src="https://davehomeassist.github.io/new-bethlehem-editor/welcome.html"
+          referrerpolicy="no-referrer" sandbox="allow-top-navigation-by-user-activation"></iframe>
+  <p><a href="https://davehomeassist.github.io/new-bethlehem-editor/welcome.html" rel="noopener noreferrer">Current retreat welcome</a></p>
+</noscript>
 <div class="actions"><a class="button" href="retreats.html">Retreat details</a><a class="button ghost" href="experience.html">What to expect</a>
 </div>
 </div>

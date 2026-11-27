@@ -7,7 +7,7 @@
   <title>Contact | New Bethlehem</title>
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#f8f6f0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src https://davehomeassist.github.io/new-bethlehem-editor/retreat.json; frame-src https://davehomeassist.github.io/new-bethlehem-editor/contact.html; base-uri 'none'; form-action 'none'">
   <link rel="canonical" href="https://systembydave.com/retreat/contact.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Contact | New Bethlehem">
@@ -20,7 +20,9 @@
   <meta name="twitter:image" content="https://systembydave.com/retreat/assets/retreat-reflection.webp">
   <link rel="icon" href="assets/retreat-reflection.webp" type="image/webp">
   <script src="assets/theme.js" defer></script>
+  <script src="assets/details.js" defer></script>
   <link rel="stylesheet" href="assets/site.css">
+  <noscript><link rel="stylesheet" href="assets/no-script.css"></noscript>
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to retreat content</a>
@@ -43,7 +45,12 @@
 <div class="wrap contact-grid">
 <div>
   <h1>Contact</h1>
-  <p>Contact information for New Bethlehem will be shared here when available.</p>
+  <div data-retreat="contact"><a href="https://davehomeassist.github.io/new-bethlehem-editor/contact.html" rel="noopener noreferrer">Current retreat contact information</a></div>
+<noscript>
+  <iframe class="published-frame published-contact" title="Current retreat contact information" src="https://davehomeassist.github.io/new-bethlehem-editor/contact.html"
+          referrerpolicy="no-referrer" sandbox="allow-top-navigation-by-user-activation"></iframe>
+  <p><a href="https://davehomeassist.github.io/new-bethlehem-editor/contact.html" rel="noopener noreferrer">Current retreat contact information</a></p>
+</noscript>
 </div>
 </div>
 </section>
