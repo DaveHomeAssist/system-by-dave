@@ -2,7 +2,7 @@
 
 ## November 26, 2026. Retreat Series preview
 
-- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link.
+- Added a temporary, unlisted retreat website at `/retreat/` for sharing by direct link. The home page features the supplied devotional artwork at its original proportions.
 
 ## November 26, 2026. Envision web artwork and Notion Agents
 

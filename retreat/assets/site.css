@@ -135,15 +135,16 @@ nav a[aria-current="page"] { background: var(--soft); }
 .button:hover { background: var(--green-hover); }
 .button.ghost { background: transparent; border-color: var(--line); color: var(--green); }
 .button.ghost:hover { background: var(--soft); }
-.hero-photo { margin: 0; }
-.hero-photo img {
+.hero-artwork { display: grid; justify-items: center; margin: 0; }
+.hero-artwork img {
   display: block;
-  width: 100%;
-  aspect-ratio: 6 / 5;
-  object-fit: cover;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(62dvh, 35rem);
+  border: 1px solid var(--line);
   border-radius: .5rem;
 }
-.hero-photo figcaption { color: var(--muted); font-size: .8rem; margin-top: .45rem; }
 .detail, .contact { background: var(--soft); }
 .muted, .experience p, .faq-grid p, .detail-grid p { color: var(--muted); }
 .retreats { background: var(--paper); }
@@ -224,8 +225,12 @@ details p { margin: 0 0 1rem; }
   section { padding-block: 1.5rem; }
   .hero-grid, .experience, .about-grid, .detail-grid, .faq-grid, .contact-grid { gap: 1.25rem; }
   .hero h1 { max-width: 15ch; }
-  .hero-photo img { aspect-ratio: 2 / 1; max-height: 18rem; }
+  .hero-artwork img { max-height: min(32dvh, 20rem); }
   .actions { margin-top: 1rem; }
+}
+@media (max-width: 30rem) {
+  .hero h1 { max-width: none; }
+  .hero-artwork img { max-height: 28dvh; }
 }
 @media (max-width: 24rem) {
   .brand small { display: none; }
